@@ -26,29 +26,40 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_GL3PlusTexBufferPacked_H_
-#define _Ogre_GL3PlusTexBufferPacked_H_
+#ifndef _Ogre_D3D11TexBufferPacked_H_
+#define _Ogre_D3D11TexBufferPacked_H_
 
-#include "OgreGL3PlusPrerequisites.h"
+#include "OgreD3D11Prerequisites.h"
 #include "Vao/OgreTexBufferPacked.h"
 
 namespace Ogre
 {
-    class GL3PlusBufferInterface;
+    class D3D11BufferInterface;
 
-    class _OgreGL3PlusExport GL3PlusTexBufferPacked : public TexBufferPacked
+    class _OgreD3D11Export D3D11TexBufferPacked : public TexBufferPacked
     {
-        GLuint mTexName;
-        GLenum mInternalFormat;
+        DXGI_FORMAT mInternalFormat;
+        D3D11Device &mDevice;
 
-        inline void bindBuffer( uint16 slot, size_t offset, size_t sizeBytes );
+        struct CachedResourceView
+        {
+            ID3D11ShaderResourceView    *mResourceView;
+            uint32                      mOffset;
+            uint32                      mSize;
+        };
+
+        CachedResourceView  mCachedResourceViews[16];
+        uint8               mCurrentCacheCursor;
+
+        ID3D11ShaderResourceView* createResourceView( int cacheIdx, uint32 offset, uint32 sizeBytes );
+        ID3D11ShaderResourceView* bindBufferCommon( size_t offset, size_t sizeBytes );
 
     public:
-        GL3PlusTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                                BufferType bufferType, void *initialData, bool keepAsShadow,
-                                VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface,
-                                Ogre::PixelFormat pf );
-        ~GL3PlusTexBufferPacked();
+        D3D11TexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
+                              BufferType bufferType, void *initialData, bool keepAsShadow,
+                              VaoManager *vaoManager, D3D11BufferInterface *bufferInterface,
+                              Ogre::PixelFormat pf, D3D11Device &device );
+        ~D3D11TexBufferPacked();
 
         virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
         virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );

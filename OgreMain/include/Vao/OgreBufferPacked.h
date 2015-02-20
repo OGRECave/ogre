@@ -92,6 +92,7 @@ namespace Ogre
     class _OgreExport BufferPacked : public BufferPackedAlloc
     {
         friend class BufferInterface;
+        friend class D3D11BufferInterface;
         friend class GL3PlusBufferInterface;
 
     protected:

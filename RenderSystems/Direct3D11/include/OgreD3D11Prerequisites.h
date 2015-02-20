@@ -108,6 +108,7 @@ namespace Ogre
     class D3D11DepthBuffer;
     class D3D11Driver;
     class D3D11DriverList;
+    class D3D11DynamicBuffer;
     class D3D11VideoMode;
     class D3D11VideoModeList;
     class D3D11GpuProgram;
@@ -115,6 +116,7 @@ namespace Ogre
     class D3D11HLSLProgramFactory;
     class D3D11HLSLProgram;
     class D3D11Device;
+    class D3D11VaoManager;
 
     namespace v1
     {

@@ -26,25 +26,24 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_GL3PlusConstBufferPacked_H_
-#define _Ogre_GL3PlusConstBufferPacked_H_
+#ifndef _Ogre_D3D11ConstBufferPacked_H_
+#define _Ogre_D3D11ConstBufferPacked_H_
 
-#include "OgreGL3PlusPrerequisites.h"
+#include "OgreD3D11Prerequisites.h"
 #include "Vao/OgreConstBufferPacked.h"
 
 namespace Ogre
 {
-    class _OgreGL3PlusExport GL3PlusConstBufferPacked : public ConstBufferPacked
+    class _OgreD3D11Export D3D11ConstBufferPacked : public ConstBufferPacked
     {
-        inline void bindBuffer( uint16 slot );
+        D3D11Device &mDevice;
 
     public:
-        GL3PlusConstBufferPacked( size_t internalBufferStartBytes, size_t numElements,
-                                  uint32 bytesPerElement,
-                                  BufferType bufferType, void *initialData, bool keepAsShadow,
-                                  VaoManager *vaoManager, BufferInterface *bufferInterface,
-                                  size_t bindableSize );
-        ~GL3PlusConstBufferPacked();
+        D3D11ConstBufferPacked( size_t numElements, uint32 bytesPerElement,
+                                BufferType bufferType, void *initialData, bool keepAsShadow,
+                                VaoManager *vaoManager, BufferInterface *bufferInterface,
+                                D3D11Device &device );
+        ~D3D11ConstBufferPacked();
 
         virtual void bindBufferVS( uint16 slot );
         virtual void bindBufferPS( uint16 slot );

@@ -52,6 +52,27 @@ namespace Ogre
 		return D3D11_TEXTURE_ADDRESS_WRAP;
     }
     //---------------------------------------------------------------------
+    D3D11_TEXTURE_ADDRESS_MODE D3D11Mappings::get(TextureAddressingMode tam)
+    {
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
+            return D3D11_TEXTURE_ADDRESS_WRAP;
+
+        //return D3D11_TEXTURE_ADDRESS_WRAP;
+        switch( tam )
+        {
+        case TAM_WRAP:
+            return D3D11_TEXTURE_ADDRESS_WRAP;
+        case TAM_MIRROR:
+            return D3D11_TEXTURE_ADDRESS_MIRROR;
+        case TAM_CLAMP:
+            return D3D11_TEXTURE_ADDRESS_CLAMP;
+        case TAM_BORDER:
+            return D3D11_TEXTURE_ADDRESS_BORDER;
+        }
+        return D3D11_TEXTURE_ADDRESS_WRAP;
+    }
+    //---------------------------------------------------------------------
     D3D11_BLEND D3D11Mappings::get(SceneBlendFactor sbf, bool forAlpha)
     {
         switch( sbf )
@@ -284,6 +305,44 @@ namespace Ogre
             return DXGI_FORMAT_R16G16_SINT;
         case VET_SHORT4:
             return DXGI_FORMAT_R16G16B16A16_SINT;
+        case VET_USHORT2:
+            return DXGI_FORMAT_R16G16_UINT;
+        case VET_USHORT4:
+            return DXGI_FORMAT_R16G16B16A16_UINT;
+        case VET_INT1:
+            return DXGI_FORMAT_R32_SINT;
+        case VET_INT2:
+            return DXGI_FORMAT_R32G32_SINT;
+        case VET_INT3:
+            return DXGI_FORMAT_R32G32B32_SINT;
+        case VET_INT4:
+            return DXGI_FORMAT_R32G32B32A32_SINT;
+        case VET_UINT1:
+            return DXGI_FORMAT_R32_UINT;
+        case VET_UINT2:
+            return DXGI_FORMAT_R32G32_UINT;
+        case VET_UINT3:
+            return DXGI_FORMAT_R32G32B32_UINT;
+        case VET_UINT4:
+            return DXGI_FORMAT_R32G32B32A32_UINT;
+        case VET_BYTE4:
+            return DXGI_FORMAT_R8G8B8A8_SINT;
+        case VET_BYTE4_SNORM:
+            return DXGI_FORMAT_R8G8B8A8_SNORM;
+        case VET_UBYTE4_NORM:
+            return DXGI_FORMAT_R8G8B8A8_UNORM;
+        case VET_SHORT2_SNORM:
+            return DXGI_FORMAT_R16G16_SNORM;
+        case VET_SHORT4_SNORM:
+            return DXGI_FORMAT_R16G16B16A16_SNORM;
+        case VET_USHORT2_NORM:
+            return DXGI_FORMAT_R16G16_UNORM;
+        case VET_USHORT4_NORM:
+            return DXGI_FORMAT_R16G16B16A16_UNORM;
+        case VET_HALF2:
+            return DXGI_FORMAT_R16G16_FLOAT;
+        case VET_HALF4:
+            return DXGI_FORMAT_R16G16B16A16_FLOAT;
         case VET_UBYTE4:
             return DXGI_FORMAT_R8G8B8A8_UINT;
         }

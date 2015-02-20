@@ -255,6 +255,16 @@ namespace Ogre {
       SMT_FRAME_SEQUENTIAL
     };
 
+    enum ShaderType
+    {
+        VertexShader,
+        PixelShader,
+        GeometryShader,
+        HullShader,
+        DomainShader,
+        NumShaderTypes
+    };
+
     /** Flags for the Instance Manager when calculating ideal number of instances per batch */
     enum InstanceManagerFlags
     {

@@ -44,7 +44,7 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusConstBufferPacked::bindBuffer( uint16 slot )
+    inline void GL3PlusConstBufferPacked::bindBuffer( uint16 slot )
     {
         assert( dynamic_cast<GL3PlusBufferInterface*>( mBufferInterface ) );
 
@@ -54,6 +54,36 @@ namespace Ogre
         OCGE(
           glBindBufferRange( GL_UNIFORM_BUFFER, slot, bufferInterface->getVboName(),
                              mFinalBufferStart * mBytesPerElement, mBindableSizeBytes ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusConstBufferPacked::bindBufferVS( uint16 slot )
+    {
+        bindBuffer( slot );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusConstBufferPacked::bindBufferPS( uint16 slot )
+    {
+        bindBuffer( slot );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusConstBufferPacked::bindBufferGS( uint16 slot )
+    {
+        bindBuffer( slot );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusConstBufferPacked::bindBufferHS( uint16 slot )
+    {
+        bindBuffer( slot );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusConstBufferPacked::bindBufferDS( uint16 slot )
+    {
+        bindBuffer( slot );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusConstBufferPacked::bindBufferCS( uint16 slot )
+    {
+        bindBuffer( slot );
     }
     //-----------------------------------------------------------------------------------
 }

@@ -69,16 +69,6 @@ namespace Ogre
         typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
 
     protected:
-        enum ShaderType
-        {
-            VertexShader,
-            PixelShader,
-            GeometryShader,
-            HullShader,
-            DomainShader,
-            NumShaderTypes
-        };
-
         typedef std::map<IdString, String> PiecesMap;
 
         struct RenderableCache

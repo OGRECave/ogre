@@ -56,7 +56,6 @@ out block
 
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
-@insertpiece( MaterialDecl )
 @property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
 // END UNIFORM DECLARATION

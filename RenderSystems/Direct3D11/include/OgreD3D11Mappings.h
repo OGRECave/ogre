@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreD3D11Prerequisites.h"
 #include "OgreTextureUnitState.h"
+#include "OgreHlmsSamplerblock.h"
 #include "OgreRenderSystem.h"
 #include "OgreRoot.h"
 #include "OgreD3D11RenderSystem.h"
@@ -41,6 +42,8 @@ namespace Ogre
 	public:
 		/// return a D3D11 equivalent for a Ogre TextureAddressingMode value
 		static D3D11_TEXTURE_ADDRESS_MODE get(TextureUnitState::TextureAddressingMode tam);
+        /// return a D3D11 equivalent for a Ogre TextureAddressingMode value
+        static D3D11_TEXTURE_ADDRESS_MODE get(TextureAddressingMode tam);
 		/// return a D3D11 equivalent for a Ogre SceneBlendFactor value
 		static D3D11_BLEND get(SceneBlendFactor sbf, bool forAlpha);
 		/// return a D3D11 equivalent for a Ogre SceneBlendOperation value

@@ -357,6 +357,8 @@ namespace Ogre
         void setVertexBufferBinding(v1::VertexBufferBinding* binding);
         void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
         void _render(const v1::RenderOperation& op);
+
+        virtual void _setVertexArrayObject( const VertexArrayObject *vao );
         /** See
           RenderSystem
          */

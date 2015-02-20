@@ -53,12 +53,22 @@ namespace Ogre
 
         virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_CONST; }
 
-        /** Binds the constant buffer to the given slot
+        /** Binds the constant buffer to the given slot in the
+            Vertex/Pixel/Geometry/Hull/Domain/Compute Shader
+        @remarks
+            Not all RS API separate by shader stage. For best compatibility,
+            don't assign two different buffers at the same slot for different
+            stages (just leave the slot empty on the stages you don't use).
         @param slot
             The slot to asign this constant buffer. In D3D11 it's called 'slot'.
             In GLSL it's called it's called 'binding'
         */
-        virtual void bindBuffer( uint16 slot ) = 0;
+        virtual void bindBufferVS( uint16 slot ) = 0;
+        virtual void bindBufferPS( uint16 slot ) = 0;
+        virtual void bindBufferGS( uint16 slot ) = 0;
+        virtual void bindBufferHS( uint16 slot ) = 0;
+        virtual void bindBufferDS( uint16 slot ) = 0;
+        virtual void bindBufferCS( uint16 slot ) = 0;
 
         /// Gets the size of the buffer that will get bound. May not be
         /// the same as the size of the entire buffer (i.e. due to padding)

@@ -143,6 +143,7 @@ namespace v1 {
 
                 if(!found)
                 {
+                    delete D3delems;
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D11 vertex declaration" , 
                                                 "D3D11VertexDeclaration::getILayoutByShader");
                 }

@@ -494,7 +494,9 @@ namespace Ogre
                     mCurrentConstBufferSize )
             {
                 *commandBuffer->addCommand<CbShaderBuffer>() =
-                        CbShaderBuffer( 2, mConstBuffers[mCurrentConstBuffer], 0, 0 );
+                        CbShaderBuffer( VertexShader, 2, mConstBuffers[mCurrentConstBuffer], 0, 0 );
+                *commandBuffer->addCommand<CbShaderBuffer>() =
+                        CbShaderBuffer( PixelShader, 2, mConstBuffers[mCurrentConstBuffer], 0, 0 );
             }
 
             rebindTexBuffer( commandBuffer );
@@ -504,13 +506,15 @@ namespace Ogre
         {
             //layout(binding = 1) uniform MaterialBuf {} materialArray
             const ConstBufferPool::BufferPool *newPool = datablock->getAssignedPool();
-            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 1, newPool->materialBuffer, 0,
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( PixelShader,
+                                                                           1, newPool->materialBuffer, 0,
                                                                            newPool->materialBuffer->
                                                                            getTotalSizeBytes() );
             if( newPool->extraBuffer )
             {
                 TexBufferPacked *extraBuffer = static_cast<TexBufferPacked*>( newPool->extraBuffer );
-                *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 1, extraBuffer, 0,
+                *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( VertexShader, 1,
+                                                                               extraBuffer, 0,
                                                                                extraBuffer->
                                                                                getTotalSizeBytes() );
             }
