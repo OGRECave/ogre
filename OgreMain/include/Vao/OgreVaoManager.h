@@ -59,9 +59,11 @@ namespace Ogre
         uint8           mDynamicBufferMultiplier;
         uint8           mDynamicBufferCurrentFrame;
         unsigned long   mNextStagingBufferTimestampCheckpoint;
+        uint32          mFrameCount;
 
         BufferPackedVec         mBuffers[NUM_BUFFER_PACKED_TYPES];
         VertexArrayObjectVec    mVertexArrayObjects;
+        uint32                  mNumGeneratedVaos; /// Increases on every createVertexArrayObject call
 
         struct DelayedBuffer
         {
@@ -75,8 +77,6 @@ namespace Ogre
 
         typedef vector<DelayedBuffer>::type DelayedBufferVec;
         DelayedBufferVec    mDelayedDestroyBuffers;
-
-        uint32          mFrameCount;
 
         uint32 mConstBufferAlignment;
         uint32 mTexBufferAlignment;
