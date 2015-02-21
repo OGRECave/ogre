@@ -1821,11 +1821,10 @@ bail:
     {
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
+    void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, Texture *tex )
     {
-        static D3D11TexturePtr dt;
-        dt = tex.staticCast<D3D11Texture>();
-        if (enabled && !dt.isNull() && dt->getSize() > 0)
+        D3D11Texture *dt = static_cast<D3D11Texture*>( tex );
+        if (enabled && dt && dt->getSize() > 0)
         {
             // note used
             dt->touch();
@@ -1853,41 +1852,41 @@ bail:
     void D3D11RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
-            _setTexture(stage, false, tex);
+            _setTexture(stage, false, tex.get());
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex.get());
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setGeometryTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
-            _setTexture(stage, false, tex);
+            _setTexture(stage, false, tex.get());
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex.get());
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setComputeTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
-            _setTexture(stage, false, tex);
+            _setTexture(stage, false, tex.get());
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex.get());
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTessellationHullTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
-            _setTexture(stage, false, tex);
+            _setTexture(stage, false, tex.get());
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex.get());
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTessellationDomainTexture(size_t stage, const TexturePtr& tex)
     {
         if (tex.isNull())
-            _setTexture(stage, false, tex);
+            _setTexture(stage, false, tex.get());
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex.get());
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_disableTextureUnit(size_t texUnit)

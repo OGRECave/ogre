@@ -302,7 +302,7 @@ namespace Ogre
         void _setPointSpritesEnabled(bool enabled);
         void _setPointParameters(Real size, bool attenuationEnabled, 
             Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
-        void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
+        void _setTexture(size_t unit, bool enabled, Texture *texPtr);
         void _setBindingType(TextureUnitState::BindingType bindingType);
         void _setVertexTexture(size_t unit, const TexturePtr& tex);
         void _setGeometryTexture(size_t unit, const TexturePtr& tex);
