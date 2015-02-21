@@ -57,9 +57,11 @@ THE SOFTWARE.
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
+#include "Vao/OgreD3D11VaoManager.h"
 #include "Vao/OgreD3D11BufferInterface.h"
 #include "Vao/OgreD3D11VertexArrayObject.h"
 #include "Vao/OgreIndexBufferPacked.h"
+#include "Vao/OgreIndirectBufferPacked.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
@@ -130,6 +132,7 @@ bail:
     D3D11RenderSystem::D3D11RenderSystem()
         : mDevice(),
           mUseAdjacency( false ),
+          mBoundIndirectBuffer( 0 ),
           mSwIndirectBufferPtr( 0 )
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
@@ -2609,6 +2612,30 @@ bail:
         }
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setIndirectBuffer( IndirectBufferPacked *indirectBuffer )
+    {
+        if( mVaoManager->supportsIndirectBuffers() )
+        {
+            if( mBoundIndirectBuffer )
+            {
+                D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                                        indirectBuffer->getBufferInterface() );
+                mBoundIndirectBuffer = bufferInterface->getVboName();
+            }
+            else
+            {
+                mBoundIndirectBuffer = 0;
+            }
+        }
+        else
+        {
+            if( indirectBuffer )
+                mSwIndirectBufferPtr = indirectBuffer->getSwBufferPtr();
+            else
+                mSwIndirectBufferPtr = 0;
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
     {
     }
@@ -3412,8 +3439,10 @@ bail:
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
         deviceContext->IASetInputLayout( inputLayout );
 
-        deviceContext->IASetVertexBuffers( 0, vao->mVertexBuffers.size(), sharedData->mVertexBuffers,
-                                           sharedData->mStrides, sharedData->mOffsets );
+        deviceContext->IASetVertexBuffers( 0, vao->mVertexBuffers.size() + 1, //+1 due to DrawId
+                                           sharedData->mVertexBuffers,
+                                           sharedData->mStrides,
+                                           sharedData->mOffsets );
         deviceContext->IASetIndexBuffer( sharedData->mIndexBuffer, sharedData->mIndexFormat, 0 );
 
         D3D11_PRIMITIVE_TOPOLOGY topology = mBoundTessellationDomainProgram ?
@@ -3422,26 +3451,63 @@ bail:
         deviceContext->IASetPrimitiveTopology( topology );
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::_render( const CbDrawCallIndexed *cmd )
+    {
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
+        UINT indirectBufferOffset = reinterpret_cast<UINT>(cmd->indirectBufferOffset);
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            deviceContext->DrawIndexedInstancedIndirect( mBoundIndirectBuffer, indirectBufferOffset );
+
+            indirectBufferOffset += sizeof( CbDrawIndexed );
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_render( const CbDrawCallStrip *cmd )
+    {
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
+        UINT indirectBufferOffset = reinterpret_cast<UINT>(cmd->indirectBufferOffset);
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            deviceContext->DrawInstancedIndirect( mBoundIndirectBuffer, indirectBufferOffset );
+
+            indirectBufferOffset += sizeof( CbDrawStrip );
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::_renderEmulated( const CbDrawCallIndexed *cmd )
     {
-        const D3D11VertexArrayObject *vao = static_cast<const D3D11VertexArrayObject*>( cmd->vao );
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 
         CbDrawIndexed *drawCmd = reinterpret_cast<CbDrawIndexed*>(
                                     mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
 
-        const size_t bytesPerIndexElement = vao->mIndexBuffer->getBytesPerElement();
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            deviceContext->DrawIndexedInstanced( drawCmd->primCount,
+                                                 drawCmd->instanceCount,
+                                                 drawCmd->firstVertexIndex,
+                                                 drawCmd->baseVertex,
+                                                 drawCmd->baseInstance );
+            ++drawCmd;
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_renderEmulated( const CbDrawCallStrip *cmd )
+    {
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
+        CbDrawStrip *drawCmd = reinterpret_cast<CbDrawStrip*>(
+                                    mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
 
         for( uint32 i=cmd->numDraws; i--; )
         {
-            /*OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
-                      mode,
-                      drawCmd->primCount,
-                      indexType,
-                      reinterpret_cast<void*>( drawCmd->firstVertexIndex * bytesPerIndexElement ),
-                      drawCmd->instanceCount,
-                      drawCmd->baseVertex,
-                      drawCmd->baseInstance ) );*/
+            deviceContext->DrawInstanced( drawCmd->primCount,
+                                          drawCmd->instanceCount,
+                                          drawCmd->firstVertexIndex,
+                                          drawCmd->baseInstance );
             ++drawCmd;
         }
     }

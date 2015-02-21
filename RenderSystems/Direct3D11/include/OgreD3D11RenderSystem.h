@@ -135,7 +135,8 @@ namespace Ogre
         bool mReadBackAsTexture;
 
         bool                        mUseAdjacency;
-        unsigned char *mSwIndirectBufferPtr;
+        ID3D11Buffer    *mBoundIndirectBuffer;
+        unsigned char   *mSwIndirectBufferPtr;
         D3D11HLSLProgram* mBoundVertexProgram;
         D3D11HLSLProgram* mBoundFragmentProgram;
         D3D11HLSLProgram* mBoundGeometryProgram;
@@ -331,6 +332,8 @@ namespace Ogre
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
         virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
 
+        virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
+
         void _beginFrame(void);
         void _endFrame(void);
         void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
@@ -361,7 +364,10 @@ namespace Ogre
         void _render(const v1::RenderOperation& op);
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
+        virtual void _render( const CbDrawCallIndexed *cmd );
+        virtual void _render( const CbDrawCallStrip *cmd );
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd );
+        virtual void _renderEmulated( const CbDrawCallStrip *cmd );
         /** See
           RenderSystem
          */

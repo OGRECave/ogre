@@ -46,7 +46,8 @@ namespace Ogre
 
         D3D11VertexArrayObjectShared( const VertexBufferPackedVec &vertexBuffers,
                                       IndexBufferPacked *indexBuffer,
-                                      v1::RenderOperation::OperationType opType );
+                                      v1::RenderOperation::OperationType opType,
+                                      VertexBufferPacked *drawId );
     };
 
     struct _OgreD3D11Export D3D11VertexArrayObject : public VertexArrayObject

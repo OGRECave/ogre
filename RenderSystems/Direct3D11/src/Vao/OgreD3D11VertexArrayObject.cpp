@@ -36,12 +36,13 @@ namespace Ogre
     D3D11VertexArrayObjectShared::D3D11VertexArrayObjectShared(
             const VertexBufferPackedVec &vertexBuffers,
             IndexBufferPacked *indexBuffer,
-            v1::RenderOperation::OperationType opType )
+            v1::RenderOperation::OperationType opType,
+            VertexBufferPacked *drawId )
     {
         memset( mStrides, 0, sizeof( mStrides ) );
         memset( mOffsets, 0, sizeof( mOffsets ) );
 
-        assert( vertexBuffers.size() < 16 );
+        assert( vertexBuffers.size() + 1 < 16 );
         const size_t numVertexBuffers = vertexBuffers.size();
         for( size_t i=0; i<numVertexBuffers; ++i )
         {
@@ -50,6 +51,14 @@ namespace Ogre
                                                         vertexBuffer->getBufferInterface() );
             mVertexBuffers[i]   = bufferInterface->getVboName();
             mStrides[i]         = vertexBuffer->getBytesPerElement();
+        }
+
+        {
+            VertexBufferPacked *vertexBuffer = drawId;
+            D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                                        vertexBuffer->getBufferInterface() );
+            mVertexBuffers[numVertexBuffers]    = bufferInterface->getVboName();
+            mStrides[numVertexBuffers]          = vertexBuffer->getBytesPerElement();
         }
 
         if( indexBuffer )

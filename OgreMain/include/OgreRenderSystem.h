@@ -1183,7 +1183,6 @@ namespace Ogre
         virtual void _setVertexArrayObject( const VertexArrayObject *vao ) = 0;
 
         /// Renders the VAO. Assumes _setVertexArrayObject has already been called.
-        virtual void _render( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd ) = 0;
         virtual void _render( const CbDrawCallStrip *cmd ) = 0;
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd ) = 0;

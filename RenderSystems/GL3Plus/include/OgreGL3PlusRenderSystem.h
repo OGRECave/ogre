@@ -483,7 +483,6 @@ namespace Ogre {
         void _render(const v1::RenderOperation& op);
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
-        virtual void _render( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd );
         virtual void _render( const CbDrawCallStrip *cmd );
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd );
