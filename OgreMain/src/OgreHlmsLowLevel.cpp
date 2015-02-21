@@ -80,16 +80,15 @@ namespace Ogre
         //Feels a bit hacky but gets the job done.
         HlmsCache *cache = new HlmsCache( pass->getId(), HLMS_LOW_LEVEL );
         if( pass->hasVertexProgram() )
-            cache->vertexShader             = pass->getVertexProgram()->_getBindingDelegate();
+            cache->vertexShader             = pass->getVertexProgram();
         if( pass->hasGeometryProgram() )
-            cache->geometryShader           = pass->getGeometryProgram()->_getBindingDelegate();
+            cache->geometryShader           = pass->getGeometryProgram();
         if( pass->hasTessellationHullProgram() )
-            cache->tesselationHullShader    = pass->getTessellationHullProgram()->_getBindingDelegate();
+            cache->tesselationHullShader    = pass->getTessellationHullProgram();
         if( pass->hasTessellationDomainProgram() )
-            cache->tesselationDomainShader  = pass->getTessellationDomainProgram()->
-                                                                                _getBindingDelegate();
+            cache->tesselationDomainShader  = pass->getTessellationDomainProgram();
         if( pass->hasFragmentProgram() )
-            cache->pixelShader              = pass->getFragmentProgram()->_getBindingDelegate();
+            cache->pixelShader              = pass->getFragmentProgram();
         mShaderCache.push_back( cache );
 
         return cache;
