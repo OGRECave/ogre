@@ -2447,35 +2447,6 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::_render( const VertexArrayObject *_vao )
-    {
-        RenderSystem::_render( _vao );
-
-        const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
-
-        GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
-
-        if( vao->mIndexBuffer )
-        {
-            GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
-                                                                GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-            const void *indexOffset = (const void*)(vao->mIndexBuffer->_getFinalBufferStart() *
-                                                    vao->mIndexBuffer->getBytesPerElement());
-
-            //glMultiDrawElementsBaseVertex
-            OCGE( glDrawElementsInstancedBaseVertex( mode,
-                                                     vao->mIndexBuffer->getNumElements(),
-                                                     indexType, indexOffset, 1,
-                                                     vao->mVertexBuffers[0]->_getFinalBufferStart() ) );
-        }
-        else
-        {
-            OCGE( glDrawArrays( vao->mPrimType[mUseAdjacency],
-                                vao->mVertexBuffers[0]->_getFinalBufferStart(),
-                                vao->mVertexBuffers[0]->getNumElements() ) );
-        }
-    }
-
     void GL3PlusRenderSystem::_render( const CbDrawCallIndexed *cmd )
     {
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
