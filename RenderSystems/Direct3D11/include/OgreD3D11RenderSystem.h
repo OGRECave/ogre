@@ -134,6 +134,8 @@ namespace Ogre
         
         bool mReadBackAsTexture;
 
+        bool                        mUseAdjacency;
+        unsigned char *mSwIndirectBufferPtr;
         D3D11HLSLProgram* mBoundVertexProgram;
         D3D11HLSLProgram* mBoundFragmentProgram;
         D3D11HLSLProgram* mBoundGeometryProgram;
@@ -359,6 +361,7 @@ namespace Ogre
         void _render(const v1::RenderOperation& op);
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
+        virtual void _renderEmulated( const CbDrawCallIndexed *cmd );
         /** See
           RenderSystem
          */

@@ -41,6 +41,7 @@ namespace Ogre
     {
         friend class RenderQueue;
         friend class RenderSystem;
+        friend class D3D11RenderSystem;
         friend class GL3PlusRenderSystem;
 
     protected:

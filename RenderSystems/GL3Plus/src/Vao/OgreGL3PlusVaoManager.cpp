@@ -904,6 +904,8 @@ namespace Ogre
             {
 				GLuint vaoName = glVao->getVaoName();
                 OCGE( glDeleteVertexArrays( 1, &vaoName ) );
+
+                efficientVectorRemove( mVaos, itor );
             }
         }
 

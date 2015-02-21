@@ -35,54 +35,32 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    struct _OgreD3D11Export D3D11VertexArrayObjectShared
+    {
+        ID3D11Buffer    *mVertexBuffers[16];
+        UINT            mStrides[16];
+        UINT            mOffsets[16];
+        ID3D11Buffer    *mIndexBuffer;
+        DXGI_FORMAT     mIndexFormat;
+        D3D11_PRIMITIVE_TOPOLOGY mPrimType[3];
+
+        D3D11VertexArrayObjectShared( const VertexBufferPackedVec &vertexBuffers,
+                                      IndexBufferPacked *indexBuffer,
+                                      v1::RenderOperation::OperationType opType );
+    };
+
     struct _OgreD3D11Export D3D11VertexArrayObject : public VertexArrayObject
     {
-        D3D11_PRIMITIVE_TOPOLOGY    mPrimType[3];
+        D3D11VertexArrayObjectShared    *mSharedData;
 
         D3D11VertexArrayObject( uint32 vaoName, uint32 renderQueueId,
                                 const VertexBufferPackedVec &vertexBuffers,
                                 IndexBufferPacked *indexBuffer,
-                                v1::RenderOperation::OperationType opType ) :
-            VertexArrayObject( vaoName, renderQueueId, vertexBuffers, indexBuffer, opType )
+                                v1::RenderOperation::OperationType opType,
+                                D3D11VertexArrayObjectShared *sharedData ) :
+            VertexArrayObject( vaoName, renderQueueId, vertexBuffers, indexBuffer, opType ),
+            mSharedData( sharedData )
         {
-            switch( opType )
-            {
-            case v1::RenderOperation::OT_POINT_LIST:
-                mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-                mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-                mPrimType[2] = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-                break;
-            case v1::RenderOperation::OT_LINE_LIST:
-                mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-                mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
-                mPrimType[2] = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
-                break;
-            case v1::RenderOperation::OT_LINE_STRIP:
-                mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-                mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
-                mPrimType[2] = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
-                break;
-            default:
-            case v1::RenderOperation::OT_TRIANGLE_LIST:
-                mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-                mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
-                mPrimType[2] = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
-                break;
-            case v1::RenderOperation::OT_TRIANGLE_STRIP:
-                mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-                mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
-                mPrimType[2] = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
-                break;
-            case v1::RenderOperation::OT_TRIANGLE_FAN:
-                mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
-                mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
-                mPrimType[2] = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
-
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "Error - DX11 render - no support for triangle fan (OT_TRIANGLE_FAN)",
-                             "D3D11VertexArrayObject::D3D11VertexArrayObject" );
-                break;
-            }
         }
     };
 }

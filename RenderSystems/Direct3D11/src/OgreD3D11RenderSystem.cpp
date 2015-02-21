@@ -57,6 +57,11 @@ THE SOFTWARE.
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
+#include "Vao/OgreD3D11BufferInterface.h"
+#include "Vao/OgreD3D11VertexArrayObject.h"
+#include "Vao/OgreIndexBufferPacked.h"
+#include "CommandBuffer/OgreCbDrawCall.h"
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
@@ -123,7 +128,9 @@ bail:
 
     //---------------------------------------------------------------------
     D3D11RenderSystem::D3D11RenderSystem()
-		: mDevice()
+        : mDevice(),
+          mUseAdjacency( false ),
+          mSwIndirectBufferPtr( 0 )
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
 #endif	
@@ -2502,6 +2509,14 @@ bail:
                         hlmsCache->tesselationDomainShader.get() );
         }
 
+        mVertexProgramBound             = false;
+        mGeometryProgramBound           = false;
+        mFragmentProgramBound           = false;
+        mTessellationHullProgramBound   = false;
+        mTessellationDomainProgramBound = false;
+        mComputeProgramBound            = false;
+        mUseAdjacency                   = false;
+
         //No subroutines for now
 
         if( mBoundVertexProgram )
@@ -2528,7 +2543,10 @@ bail:
                              "D3D11 device cannot set geometry shader\nError Description: " +
                              errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
             }
+
             mGeometryProgramBound = true;
+
+            mUseAdjacency = mBoundGeometryProgram->isAdjacencyInfoRequired();
         }
 
         if( mBoundTessellationHullProgram )
@@ -3382,6 +3400,50 @@ bail:
             memset(mNumClassInstances, 0, sizeof(mNumClassInstances));      
         }*/
 
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )
+    {
+        const D3D11VertexArrayObject *vao = static_cast<const D3D11VertexArrayObject*>( _vao );
+        D3D11VertexArrayObjectShared *sharedData = vao->mSharedData;
+
+        ID3D11InputLayout *inputLayout = mBoundVertexProgram->getLayoutForVao( vao );
+
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+        deviceContext->IASetInputLayout( inputLayout );
+
+        deviceContext->IASetVertexBuffers( 0, vao->mVertexBuffers.size(), sharedData->mVertexBuffers,
+                                           sharedData->mStrides, sharedData->mOffsets );
+        deviceContext->IASetIndexBuffer( sharedData->mIndexBuffer, sharedData->mIndexFormat, 0 );
+
+        D3D11_PRIMITIVE_TOPOLOGY topology = mBoundTessellationDomainProgram ?
+                                                        sharedData->mPrimType[2] :
+                                                        sharedData->mPrimType[mUseAdjacency];
+        deviceContext->IASetPrimitiveTopology( topology );
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_renderEmulated( const CbDrawCallIndexed *cmd )
+    {
+        const D3D11VertexArrayObject *vao = static_cast<const D3D11VertexArrayObject*>( cmd->vao );
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
+        CbDrawIndexed *drawCmd = reinterpret_cast<CbDrawIndexed*>(
+                                    mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
+
+        const size_t bytesPerIndexElement = vao->mIndexBuffer->getBytesPerElement();
+
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            /*OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
+                      mode,
+                      drawCmd->primCount,
+                      indexType,
+                      reinterpret_cast<void*>( drawCmd->firstVertexIndex * bytesPerIndexElement ),
+                      drawCmd->instanceCount,
+                      drawCmd->baseVertex,
+                      drawCmd->baseInstance ) );*/
+            ++drawCmd;
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName, unsigned int StartSlot)

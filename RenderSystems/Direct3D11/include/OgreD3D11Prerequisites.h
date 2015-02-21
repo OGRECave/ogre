@@ -118,6 +118,7 @@ namespace Ogre
     class D3D11HLSLProgram;
     class D3D11Device;
     class D3D11VaoManager;
+    struct D3D11VertexArrayObjectShared;
 
     namespace v1
     {

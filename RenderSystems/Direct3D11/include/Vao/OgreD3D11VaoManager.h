@@ -91,6 +91,7 @@ namespace Ogre
         struct Vao
         {
             uint32 vaoName;
+            D3D11VertexArrayObjectShared *sharedData;
 
             struct VertexBinding
             {
@@ -115,6 +116,7 @@ namespace Ogre
 
             typedef vector<VertexBinding>::type VertexBindingVec;
 
+            v1::RenderOperation::OperationType operationType;
             VertexBindingVec    vertexBuffers;
             ID3D11Buffer        *indexBufferVbo;
             IndexBufferPacked::IndexType indexType;

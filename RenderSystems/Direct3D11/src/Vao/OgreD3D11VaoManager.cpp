@@ -701,6 +701,7 @@ namespace Ogre
     {
         Vao vao;
 
+        vao.operationType = opType;
         vao.vertexBuffers.reserve( vertexBuffers.size() );
 
         {
@@ -750,7 +751,8 @@ namespace Ogre
 
         while( itor != end && !bFound )
         {
-            if( itor->indexBufferVbo == vao.indexBufferVbo &&
+            if( itor->operationType == vao.operationType &&
+                itor->indexBufferVbo == vao.indexBufferVbo &&
                 itor->indexType == vao.indexType &&
                 itor->vertexBuffers == vao.vertexBuffers )
             {
@@ -765,31 +767,47 @@ namespace Ogre
         if( !bFound )
         {
             vao.vaoName = createVao( vao );
+
+            //Bake all the D3D11 data that is shared by all VAOs.
+            vao.sharedData = new D3D11VertexArrayObjectShared( vertexBuffers, indexBuffer, opType );
+
             mVaos.push_back( vao );
             itor = mVaos.begin() + mVaos.size() - 1;
         }
 
-        size_t idx = mVertexArrayObjects.size();
-
-        const int bitsOpType = 3;
-        const int bitsVaoGl  = 2;
-        const uint32 maskOpType = OGRE_RQ_MAKE_MASK( bitsOpType );
+        //Mix mNumGeneratedVaos with the D3D11 Vao for better sorting purposes:
+        //  If we only use the D3D11's vao, the RQ will sort Meshes with
+        //  multiple submeshes mixed with other meshes.
+        //  For cache locality, and assuming all of them have the same GL vao,
+        //  we prefer the RQ to sort:
+        //      1. Mesh A - SubMesh 0
+        //      2. Mesh A - SubMesh 1
+        //      3. Mesh B - SubMesh 0
+        //      4. Mesh B - SubMesh 1
+        //      5. Mesh D - SubMesh 0
+        //  If we don't mix mNumGeneratedVaos in it; the following could be possible:
+        //      1. Mesh B - SubMesh 1
+        //      2. Mesh D - SubMesh 0
+        //      3. Mesh A - SubMesh 1
+        //      4. Mesh B - SubMesh 0
+        //      5. Mesh A - SubMesh 0
+        //  Thus thrashing the cache unnecessarily.
+        const int bitsVaoGl  = 5;
         const uint32 maskVaoGl  = OGRE_RQ_MAKE_MASK( bitsVaoGl );
-        const uint32 maskVao    = OGRE_RQ_MAKE_MASK( RqBits::MeshBits - bitsOpType - bitsVaoGl );
+        const uint32 maskVao    = OGRE_RQ_MAKE_MASK( RqBits::MeshBits - bitsVaoGl );
 
-        const uint32 shiftOpType    = RqBits::MeshBits - bitsOpType;
-        const uint32 shiftVaoGl     = shiftOpType - bitsVaoGl;
+        const uint32 shiftVaoGl     = RqBits::MeshBits - bitsVaoGl;
 
         uint32 renderQueueId =
-                ( (opType & maskOpType) << shiftOpType ) |
                 ( (itor->vaoName & maskVaoGl) << shiftVaoGl ) |
-                (idx & maskVao);
+                (mNumGeneratedVaos & maskVao);
 
         D3D11VertexArrayObject *retVal = OGRE_NEW D3D11VertexArrayObject( itor->vaoName,
                                                                           renderQueueId,
                                                                           vertexBuffers,
                                                                           indexBuffer,
-                                                                          opType );
+                                                                          opType,
+                                                                          itor->sharedData );
 
         ++itor->refCount;
 
@@ -814,6 +832,9 @@ namespace Ogre
             {
                 //TODO: Remove cached ID3D11InputLayout from all D3D11HLSLProgram
                 //(the one generated in D3D11HLSLProgram::getLayoutForVao)
+                delete glVao->mSharedData;
+                glVao->mSharedData = 0;
+                efficientVectorRemove( mVaos, itor );
             }
         }
 
