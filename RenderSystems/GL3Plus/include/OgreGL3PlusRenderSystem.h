@@ -76,6 +76,8 @@ namespace Ogre {
         /// Holds texture type settings for every stage
         GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
+        GLfloat mLargestSupportedAnisotropy;
+
         /// Number of fixed-function texture units
         unsigned short mFixedFunctionTextureUnits;
 
@@ -404,7 +406,7 @@ namespace Ogre {
         /** See
             RenderSystem
         */
-        void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end);
+        void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end) {}
         /** See
             RenderSystem
         */
