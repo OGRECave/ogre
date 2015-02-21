@@ -133,7 +133,9 @@ bail:
         : mDevice(),
           mUseAdjacency( false ),
           mBoundIndirectBuffer( 0 ),
-          mSwIndirectBufferPtr( 0 )
+          mSwIndirectBufferPtr( 0 ),
+          mCurrentVertexBuffer( 0 ),
+          mCurrentIndexBuffer( 0 )
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
 #endif	
@@ -1672,12 +1674,6 @@ bail:
         {
             // Set all texture units to nothing to release texture surfaces
             _disableTextureUnitsFrom(0);
-            // Unbind any vertex streams to avoid memory leaks
-            /*for (unsigned int i = 0; i < mLastVertexSourceCount; ++i)
-            {
-                HRESULT hr = mDevice->SetStreamSource(i, NULL, 0, 0);
-            }
-            */
             // Clean up depth stencil surfaces
             mDevice.ReleaseAll();
             //mActiveD3DDriver->setDevice(D3D11Device(NULL));
@@ -2691,9 +2687,8 @@ bail:
             }
         }
 
-        mLastVertexSourceCount = binds.size();      
+        static_cast<D3D11VaoManager*>(mVaoManager)->bindDrawId();
     }
-
     //---------------------------------------------------------------------
     // TODO: Move this class to the right place.
     class D3D11RenderOperationState : public Renderable::RenderSystemData
@@ -3510,6 +3505,99 @@ bail:
                                           drawCmd->baseInstance );
             ++drawCmd;
         }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setRenderOperation( const v1::CbRenderOp *cmd )
+    {
+        mCurrentVertexBuffer    = cmd->vertexData;
+        mCurrentIndexBuffer     = cmd->indexData;
+
+        setVertexDeclaration(cmd->vertexData->vertexDeclaration, cmd->vertexData->vertexBufferBinding);
+        setVertexBufferBinding(cmd->vertexData->vertexBufferBinding);
+
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
+        v1::D3D11HardwareIndexBuffer* indexBuffer =
+            static_cast<v1::D3D11HardwareIndexBuffer*>( cmd->indexData->indexBuffer.get() );
+        deviceContext->IASetIndexBuffer( indexBuffer->getD3DIndexBuffer(),
+                                         D3D11Mappings::getFormat( indexBuffer->getType() ),
+                                         0 );
+
+        D3D11_PRIMITIVE_TOPOLOGY primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+        if( mBoundTessellationHullProgram && mBoundTessellationDomainProgram )
+        {
+            // useful primitives for tessellation
+            switch( cmd->operationType )
+            {
+            case v1::RenderOperation::OT_LINE_LIST:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
+                break;
+
+            case v1::RenderOperation::OT_LINE_STRIP:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
+                break;
+
+            case v1::RenderOperation::OT_TRIANGLE_LIST:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+                break;
+
+            case v1::RenderOperation::OT_TRIANGLE_STRIP:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+                break;
+            }
+        }
+        else
+        {
+            //rendering without tessellation.
+            switch( cmd->operationType )
+            {
+            case v1::RenderOperation::OT_POINT_LIST:
+                primType = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+                break;
+
+            case v1::RenderOperation::OT_LINE_LIST:
+                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+                break;
+
+            case v1::RenderOperation::OT_LINE_STRIP:
+                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+                break;
+
+            case v1::RenderOperation::OT_TRIANGLE_LIST:
+                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+                break;
+
+            case v1::RenderOperation::OT_TRIANGLE_STRIP:
+                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+                break;
+
+            case v1::RenderOperation::OT_TRIANGLE_FAN:
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error - DX11 render - no support for triangle fan (OT_TRIANGLE_FAN)",
+                            "D3D11RenderSystem::_setRenderOperation");
+                primType = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED; // no TRIANGLE_FAN in DX 11
+                break;
+            }
+        }
+        deviceContext->IASetPrimitiveTopology( primType );
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
+    {
+        mDevice.GetImmediateContext()->DrawIndexedInstanced(
+            cmd->primCount,
+            cmd->instanceCount,
+            cmd->firstVertexIndex,
+            static_cast<INT>(mCurrentVertexBuffer->vertexStart),
+            cmd->baseInstance );
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_render( const v1::CbDrawCallStrip *cmd )
+    {
+        mDevice.GetImmediateContext()->DrawInstanced(
+                    cmd->primCount,
+                    cmd->instanceCount,
+                    cmd->firstVertexIndex,
+                    cmd->baseInstance );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName, unsigned int StartSlot)
@@ -4424,8 +4512,6 @@ bail:
 		mLastTextureUnitState = 0;
 
         ZeroMemory(mTexStageDesc, OGRE_MAX_TEXTURE_LAYERS * sizeof(sD3DTextureStageDesc));
-
-        mLastVertexSourceCount = 0;
         mReadBackAsTexture = false;
 
         ID3D11DeviceN * device = createD3D11Device(NULL, DT_HARDWARE, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, 0);

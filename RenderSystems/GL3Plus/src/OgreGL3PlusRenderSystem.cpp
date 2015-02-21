@@ -127,6 +127,7 @@ namespace Ogre {
           mGlobalVao( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
+          mCurrentPolygonMode( GL_TRIANGLES ),
           mShaderManager(0),
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
@@ -2665,41 +2666,41 @@ namespace Ogre {
                                                                     cmd->indexData->indexBuffer.get() );
             OCGE( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indexBuffer->getGLBufferId() ) );
         }
+
+        mCurrentPolygonMode = GL_TRIANGLES;
+        switch( cmd->operationType )
+        {
+        case v1::RenderOperation::OT_POINT_LIST:
+            mCurrentPolygonMode = GL_POINTS;
+            break;
+        case v1::RenderOperation::OT_LINE_LIST:
+            mCurrentPolygonMode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
+            break;
+        case v1::RenderOperation::OT_LINE_STRIP:
+            mCurrentPolygonMode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
+            break;
+        default:
+        case v1::RenderOperation::OT_TRIANGLE_LIST:
+            mCurrentPolygonMode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+            mCurrentPolygonMode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_FAN:
+            mCurrentPolygonMode = GL_TRIANGLE_FAN;
+            break;
+        }
     }
 
     void GL3PlusRenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
     {
-        GLenum mode = GL_TRIANGLES;
-        switch( cmd->operationType )
-        {
-        case v1::RenderOperation::OT_POINT_LIST:
-            mode = GL_POINTS;
-            break;
-        case v1::RenderOperation::OT_LINE_LIST:
-            mode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
-            break;
-        case v1::RenderOperation::OT_LINE_STRIP:
-            mode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
-            break;
-        default:
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
-            mode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
-            mode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
-            mode = GL_TRIANGLE_FAN;
-            break;
-        }
-
         GLenum indexType = mCurrentIndexBuffer->indexBuffer->getType() ==
                             v1::HardwareIndexBuffer::IT_16BIT ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
         const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
 
         OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
-                    mode,
+                    mCurrentPolygonMode,
                     cmd->primCount,
                     indexType,
                     reinterpret_cast<void*>( cmd->firstVertexIndex * bytesPerIndexElement ),
@@ -2710,32 +2711,8 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_render( const v1::CbDrawCallStrip *cmd )
     {
-        GLenum mode = GL_TRIANGLES;
-        switch( cmd->operationType )
-        {
-        case v1::RenderOperation::OT_POINT_LIST:
-            mode = GL_POINTS;
-            break;
-        case v1::RenderOperation::OT_LINE_LIST:
-            mode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
-            break;
-        case v1::RenderOperation::OT_LINE_STRIP:
-            mode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
-            break;
-        default:
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
-            mode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
-            mode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
-            mode = GL_TRIANGLE_FAN;
-            break;
-        }
-
         OCGE( glDrawArraysInstancedBaseInstance(
-                    mode,
+                    mCurrentPolygonMode,
                     cmd->firstVertexIndex,
                     cmd->primCount,
                     cmd->instanceCount,

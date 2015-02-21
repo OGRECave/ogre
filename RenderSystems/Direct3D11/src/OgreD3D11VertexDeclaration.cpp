@@ -38,7 +38,6 @@ namespace v1 {
     D3D11VertexDeclaration::D3D11VertexDeclaration(D3D11Device &  device) 
         : 
     mlpD3DDevice(device)
-    , mNeedsRebuild(true)
     {
 
     }
@@ -66,48 +65,6 @@ namespace v1 {
         }
 
 
-    }
-    //-----------------------------------------------------------------------
-    const VertexElement& D3D11VertexDeclaration::addElement(unsigned short source, 
-        size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        mNeedsRebuild = true;
-        return VertexDeclaration::addElement(source, offset, theType, semantic, index);
-    }
-    //-----------------------------------------------------------------------------
-    const VertexElement& D3D11VertexDeclaration::insertElement(unsigned short atPosition,
-        unsigned short source, size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        mNeedsRebuild = true;
-        return VertexDeclaration::insertElement(atPosition, source, offset, theType, semantic, index);
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::removeElement(unsigned short elem_index)
-    {
-        VertexDeclaration::removeElement(elem_index);
-        mNeedsRebuild = true;
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
-    {
-        VertexDeclaration::removeElement(semantic, index);
-        mNeedsRebuild = true;
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::removeAllElements(void)
-    {
-        VertexDeclaration::removeAllElements();
-        mNeedsRebuild = true;
-    }
-    //-----------------------------------------------------------------------
-    void D3D11VertexDeclaration::modifyElement(unsigned short elem_index, 
-        unsigned short source, size_t offset, VertexElementType theType,
-        VertexElementSemantic semantic, unsigned short index)
-    {
-        VertexDeclaration::modifyElement(elem_index, source, offset, theType, semantic, index);
-        mNeedsRebuild = true;
     }
     //-----------------------------------------------------------------------
     D3D11_INPUT_ELEMENT_DESC * D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
@@ -139,6 +96,19 @@ namespace v1 {
                         found = true;
                         break;
                     }
+                }
+
+                if( !found && strcmp("DRAWID", inputDesc.SemanticName) == 0 &&
+                    inputDesc.SemanticIndex == 0 )
+                {
+                    D3delems[idx].SemanticName          = inputDesc.SemanticName;
+                    D3delems[idx].SemanticIndex         = inputDesc.SemanticIndex;
+                    D3delems[idx].Format                = DXGI_FORMAT_R32_UINT;
+                    D3delems[idx].InputSlot             = 15;
+                    D3delems[idx].AlignedByteOffset     = static_cast<WORD>(0);
+                    D3delems[idx].InputSlotClass        = D3D11_INPUT_PER_INSTANCE_DATA;
+                    D3delems[idx].InstanceDataStepRate  = 1;
+                    continue;
                 }
 
                 if(!found)

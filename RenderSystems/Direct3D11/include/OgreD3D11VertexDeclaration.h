@@ -41,8 +41,6 @@ namespace v1 {
     protected:
         D3D11Device & mlpD3DDevice;
 
-        bool mNeedsRebuild;
-
         typedef map<D3D11HLSLProgram*, ID3D11InputLayout*>::type ShaderToILayoutMap;
         typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
         typedef map<D3D11HLSLProgram*, D3D11_INPUT_ELEMENT_DESC*>::type ShaderToInputDesc;
@@ -58,30 +56,6 @@ namespace v1 {
     public:
         D3D11VertexDeclaration(D3D11Device &  device);
         ~D3D11VertexDeclaration();
-
-        /** See VertexDeclaration */
-        const VertexElement& addElement(unsigned short source, size_t offset, VertexElementType theType,
-            VertexElementSemantic semantic, unsigned short index = 0);
-
-        /** See VertexDeclaration */
-        const VertexElement& insertElement(unsigned short atPosition,
-            unsigned short source, size_t offset, VertexElementType theType,
-            VertexElementSemantic semantic, unsigned short index = 0);
-
-        /** See VertexDeclaration */
-        void removeElement(unsigned short elem_index);
-
-        /** See VertexDeclaration */
-        void removeElement(VertexElementSemantic semantic, unsigned short index = 0);
-
-        /** See VertexDeclaration */
-        void removeAllElements(void);
-
-
-        /** See VertexDeclaration */
-        void modifyElement(unsigned short elem_index, unsigned short source, size_t offset, VertexElementType theType,
-            VertexElementSemantic semantic, unsigned short index = 0);
-
 
         D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
         void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);

@@ -694,6 +694,23 @@ namespace Ogre
         return mVaoNames++;
     }
     //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::bindDrawId()
+    {
+        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                                    mDrawId->getBufferInterface() );
+
+        ID3D11Buffer *vertexBuffer = bufferInterface->getVboName();
+        UINT stride = mDrawId->getBytesPerElement();
+        UINT offset = 0;
+
+        mDevice.GetImmediateContext()->IASetVertexBuffers(
+                    15,
+                    1,
+                    &vertexBuffer,
+                    &stride,
+                    &offset );
+    }
+    //-----------------------------------------------------------------------------------
     VertexArrayObject* D3D11VaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
@@ -769,7 +786,8 @@ namespace Ogre
             vao.vaoName = createVao( vao );
 
             //Bake all the D3D11 data that is shared by all VAOs.
-            vao.sharedData = new D3D11VertexArrayObjectShared( vertexBuffers, indexBuffer, opType );
+            vao.sharedData = new D3D11VertexArrayObjectShared( vertexBuffers, indexBuffer,
+                                                               opType, mDrawId );
 
             mVaos.push_back( vao );
             itor = mVaos.begin() + mVaos.size() - 1;

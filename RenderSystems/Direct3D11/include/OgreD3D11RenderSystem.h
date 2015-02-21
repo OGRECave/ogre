@@ -92,8 +92,6 @@ namespace Ogre
         D3D11GpuProgramManager* mGpuProgramManager;
         D3D11HLSLProgramFactory* mHLSLProgramFactory;
 
-        size_t mLastVertexSourceCount;
-
         /// Internal method for populating the capabilities structure
         RenderSystemCapabilities* createRenderSystemCapabilities() const;
         /** See RenderSystem definition */
@@ -143,6 +141,10 @@ namespace Ogre
         D3D11HLSLProgram* mBoundTessellationHullProgram;
         D3D11HLSLProgram* mBoundTessellationDomainProgram;
         D3D11HLSLProgram* mBoundComputeProgram;
+
+        /// For rendering legacy objects.
+        v1::VertexData  *mCurrentVertexBuffer;
+        v1::IndexData   *mCurrentIndexBuffer;
 
         TextureUnitState::BindingType mBindingType;
 
@@ -368,6 +370,10 @@ namespace Ogre
         virtual void _render( const CbDrawCallStrip *cmd );
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd );
         virtual void _renderEmulated( const CbDrawCallStrip *cmd );
+
+        virtual void _setRenderOperation( const v1::CbRenderOp *cmd );
+        virtual void _render( const v1::CbDrawCallIndexed *cmd );
+        virtual void _render( const v1::CbDrawCallStrip *cmd );
         /** See
           RenderSystem
          */

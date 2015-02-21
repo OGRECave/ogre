@@ -121,6 +121,7 @@ namespace Ogre {
         GLuint  mGlobalVao;
         v1::VertexData  *mCurrentVertexBuffer;
         v1::IndexData   *mCurrentIndexBuffer;
+        GLenum          mCurrentPolygonMode;
 
         GLSLShaderManager *mShaderManager;
         GLSLShaderFactory* mGLSLShaderFactory;

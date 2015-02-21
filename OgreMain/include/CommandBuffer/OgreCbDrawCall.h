@@ -89,8 +89,8 @@ namespace v1
     {
         v1::VertexData  *vertexData;
         v1::IndexData   *indexData;
+        uint8           operationType;
         //uint32          numberOfInstances;
-        //uint8           operationType;
         //uint8           renderToVertexBuffer; //Is this used???
         //uint8           useGlobalInstancingVertexBufferIsAvailable;
 
@@ -99,9 +99,8 @@ namespace v1
 
     struct _OgreExport CbDrawCall : public CbBase
     {
-        uint8           operationType;
         //uint8           renderToVertexBuffer; //Is this used???
-        uint8           useGlobalInstancingVertexBufferIsAvailable;
+        //uint8           useGlobalInstancingVertexBufferIsAvailable;
         //void            *indirectBufferOffset;
         uint32          baseInstance;
         uint32          primCount;
