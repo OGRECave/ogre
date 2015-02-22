@@ -948,8 +948,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void GL3PlusVaoManager::_update(void)
     {
-        VaoManager::_update();
-
         unsigned long currentTimeMs = mTimer->getMilliseconds();
 
         FastArray<GLuint> bufferNames;
@@ -1015,6 +1013,8 @@ namespace Ogre
             waitForTailFrameToFinish();
             destroyDelayedBuffers( mDynamicBufferCurrentFrame );
         }
+
+        VaoManager::_update();
 
         if( mFrameSyncVec[mDynamicBufferCurrentFrame] )
         {
