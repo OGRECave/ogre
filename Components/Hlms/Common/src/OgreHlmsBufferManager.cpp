@@ -132,7 +132,10 @@ namespace Ogre
         mCurrentMappedConstBuffer   = mStartMappedConstBuffer;
         mCurrentConstBufferSize     = constBuffer->getNumElements() >> 2;
 
-        *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 2, constBuffer, 0, 0 );
+        *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( VertexShader, 2,
+                                                                       constBuffer, 0, 0 );
+        *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( PixelShader, 2,
+                                                                       constBuffer, 0, 0 );
 
         return mStartMappedConstBuffer;
     }
@@ -205,7 +208,7 @@ namespace Ogre
         mCurrentTexBufferSize   = (texBuffer->getNumElements() - mTexLastOffset) >> 2;
 
         CbShaderBuffer *shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
-        *shaderBufferCmd = CbShaderBuffer( 0, texBuffer, mTexLastOffset, 0 );
+        *shaderBufferCmd = CbShaderBuffer( VertexShader, 0, texBuffer, mTexLastOffset, 0 );
 
         mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
 
@@ -252,7 +255,7 @@ namespace Ogre
 
             //Add a new binding command.
             shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
-            *shaderBufferCmd = CbShaderBuffer( 0, mTexBuffers[mCurrentTexBuffer],
+            *shaderBufferCmd = CbShaderBuffer( VertexShader, 0, mTexBuffers[mCurrentTexBuffer],
                                                mTexLastOffset + bindOffset, 0 );
             mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
         }

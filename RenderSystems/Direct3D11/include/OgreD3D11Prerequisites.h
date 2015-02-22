@@ -57,16 +57,19 @@ THE SOFTWARE.
 #define SAFE_DELETE_ARRAY(p) { if(p) { delete[] (p);   (p)=NULL; } }
 #define SAFE_RELEASE(p)      { if(p) { (p)->Release(); (p)=NULL; } }
 
+#if defined(_WIN32_WINNT_WIN8) // Win8 SDK required to compile, will work on Windows 8 and Platform Update for Windows 7
+#define OGRE_D3D11_PROFILING OGRE_PROFILING
+#endif
 
 #undef NOMINMAX
 #define NOMINMAX // required to stop windows.h screwing up std::min definition
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#include <d3d11.h>
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT || OGRE_D3D11_PROFILING
 #include <d3d11_1.h>
+#else
+#include <d3d11.h>
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WINRT && OGRE_WINRT_TARGET_TYPE == PHONE)
+#if __OGRE_WINRT_PHONE_80
 #   include <C:\Program Files (x86)\Windows Kits\8.0\Include\um\d3d11shader.h>
 #else
 #   include <d3d11shader.h>
@@ -100,23 +103,31 @@ namespace Ogre
     // Predefine classes
     class D3D11RenderSystem;
     class D3D11RenderWindowBase;
+    class D3D11CompatBufferInterface;
     class D3D11Texture;
     class D3D11TextureManager;
     class D3D11DepthBuffer;
     class D3D11Driver;
     class D3D11DriverList;
+    class D3D11DynamicBuffer;
     class D3D11VideoMode;
     class D3D11VideoModeList;
     class D3D11GpuProgram;
     class D3D11GpuProgramManager;
-    class D3D11HardwareBufferManager;
-    class D3D11HardwareIndexBuffer;
     class D3D11HLSLProgramFactory;
     class D3D11HLSLProgram;
-    class D3D11VertexDeclaration;
     class D3D11Device;
-    class D3D11HardwareBuffer;
-    class D3D11HardwarePixelBuffer;
+    class D3D11VaoManager;
+    struct D3D11VertexArrayObjectShared;
+
+    namespace v1
+    {
+        class D3D11HardwareBuffer;
+        class D3D11HardwareBufferManager;
+        class D3D11HardwareIndexBuffer;
+        class D3D11HardwarePixelBuffer;
+        class D3D11VertexDeclaration;
+    }
 
     typedef SharedPtr<D3D11GpuProgram>  D3D11GpuProgramPtr;
     typedef SharedPtr<D3D11HLSLProgram> D3D11HLSLProgramPtr;

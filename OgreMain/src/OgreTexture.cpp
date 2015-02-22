@@ -465,5 +465,9 @@ namespace Ogre {
             getNumFaces(), numMips - 1);
     }
 
+    //--------------------------------------------------------------------------
+    void Texture::getCustomAttribute(const String&, void*)
+    {
+    } 
 
 }

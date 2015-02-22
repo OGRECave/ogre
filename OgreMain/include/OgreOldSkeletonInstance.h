@@ -116,7 +116,7 @@ namespace v1 {
         /// @copydoc Resource::getHandle
         ResourceHandle getHandle(void) const;
         /// @copydoc Resource::getGroup
-        const String& getGroup(void);
+        const String& getGroup(void) const;
 
     protected:
         /// Pointer back to master Skeleton

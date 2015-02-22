@@ -757,9 +757,8 @@ namespace Ogre
                             mCommandBuffer->addCommand<v1::CbDrawCallIndexed>();
                     *drawCall = v1::CbDrawCallIndexed();
 
-                    drawCall->operationType     = renderOp.operationType;
-                    drawCall->useGlobalInstancingVertexBufferIsAvailable =
-                            renderOp.useGlobalInstancingVertexBufferIsAvailable;
+                    /*drawCall->useGlobalInstancingVertexBufferIsAvailable =
+                            renderOp.useGlobalInstancingVertexBufferIsAvailable;*/
                     drawCall->primCount         = renderOp.indexData->indexCount;
                     drawCall->instanceCount     = renderOp.numberOfInstances;
                     drawCall->firstVertexIndex  = renderOp.indexData->indexStart;
@@ -775,9 +774,8 @@ namespace Ogre
                             mCommandBuffer->addCommand<v1::CbDrawCallStrip>();
                     *drawCall = v1::CbDrawCallStrip();
 
-                    drawCall->operationType     = renderOp.operationType;
-                    drawCall->useGlobalInstancingVertexBufferIsAvailable =
-                            renderOp.useGlobalInstancingVertexBufferIsAvailable;
+                    /*drawCall->useGlobalInstancingVertexBufferIsAvailable =
+                            renderOp.useGlobalInstancingVertexBufferIsAvailable;*/
                     drawCall->primCount         = renderOp.vertexData->vertexCount;
                     drawCall->instanceCount     = renderOp.numberOfInstances;
                     drawCall->firstVertexIndex  = renderOp.vertexData->vertexStart;
@@ -809,6 +807,12 @@ namespace Ogre
     void RenderQueue::renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                           RenderSystem *rs, bool casterPass, bool dualParaboloid )
     {
+        if( mLastVaoName )
+        {
+            rs->_startLegacyV1Rendering();
+            mLastVaoName = 0;
+        }
+
         if( mLastWasCasterPass != casterPass )
         {
             clearState();

@@ -302,7 +302,7 @@ namespace Ogre {
     */
     void GLES2FBOManager::detectFBOFormats()
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN //|| OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // TODO: Fix that probing all formats slows down startup not just on the web also on Android / iOS
         for(size_t x = 0; x < PF_COUNT; ++x)
         {
@@ -439,6 +439,11 @@ namespace Ogre {
     void GLES2FBOManager::getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
     {
         const FormatProperties &props = mProps[internalFormat];
+        if (props.modes.size() == 0 ) {
+            *depthFormat = 0;
+            *stencilFormat = 0;
+            return;
+        }
         // Decide what stencil and depth formats to use
         // [best supported for internal format]
         size_t bestmode = 0;

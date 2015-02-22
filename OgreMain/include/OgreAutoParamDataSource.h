@@ -149,6 +149,8 @@ namespace Ogre {
          void setCurrentPass(const Pass* pass);
          void setCurrentShadowNode(const CompositorShadowNode *sn);
 
+         const Camera* getCurrentCamera() const;
+
 
          const Matrix4& getWorldMatrix(void) const;
          const Matrix4* getWorldMatrixArray(void) const;

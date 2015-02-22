@@ -127,6 +127,7 @@ namespace Ogre {
           mGlobalVao( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
+          mCurrentPolygonMode( GL_TRIANGLES ),
           mShaderManager(0),
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
@@ -195,6 +196,12 @@ namespace Ogre {
     const String& GL3PlusRenderSystem::getName(void) const
     {
         static String strName("OpenGL 3+ Rendering Subsystem");
+        return strName;
+    }
+
+    const String& GL3PlusRenderSystem::getFriendlyName(void) const
+    {
+        static String strName("OpenGL 3+");
         return strName;
     }
 
@@ -561,7 +568,7 @@ namespace Ogre {
         // Use FBO's for RTT, PBuffers and Copy are no longer supported
         // Create FBO manager
         LogManager::getSingleton().logMessage("GL3+: Using FBOs for rendering to textures");
-        mRTTManager = new GL3PlusFBOManager();
+        mRTTManager = new GL3PlusFBOManager(*mGLSupport);
         caps->setCapability(RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL);
 
         Log* defaultLog = LogManager::getSingleton().getDefaultLog();
@@ -1537,15 +1544,6 @@ namespace Ogre {
         //Polygon mode
         OCGE( glPolygonMode( GL_FRONT_AND_BACK, glMacroblock->mPolygonMode ) );
 
-        if( macroblock->mAlphaToCoverageEnabled )
-        {
-            OCGE( glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
-        }
-        else
-        {
-            OCGE( glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
-        }
-
         if( macroblock->mScissorTestEnabled )
         {
             OCGE( glEnable(GL_SCISSOR_TEST) );
@@ -1572,6 +1570,15 @@ namespace Ogre {
         {
             _setSceneBlending( blendblock->mSourceBlendFactor, blendblock->mDestBlendFactor,
                                blendblock->mBlendOperation );
+        }
+
+        if( blendblock->mAlphaToCoverageEnabled )
+        {
+            OCGE( glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
+        }
+        else
+        {
+            OCGE( glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
         }
     }
 
@@ -1620,11 +1627,11 @@ namespace Ogre {
     {
         GLSLShader::unbindAll();
 
-        mCurrentVertexShader    = static_cast<GLSLShader*>( hlmsCache->vertexShader.get() );
-        mCurrentGeometryShader  = static_cast<GLSLShader*>( hlmsCache->geometryShader.get() );
-        mCurrentHullShader      = static_cast<GLSLShader*>( hlmsCache->tesselationHullShader.get() );
-        mCurrentDomainShader    = static_cast<GLSLShader*>( hlmsCache->tesselationDomainShader.get() );
-        mCurrentFragmentShader  = static_cast<GLSLShader*>( hlmsCache->pixelShader.get() );
+        mCurrentVertexShader    = 0;
+        mCurrentGeometryShader  = 0;
+        mCurrentHullShader      = 0;
+        mCurrentDomainShader    = 0;
+        mCurrentFragmentShader  = 0;
 
         mActiveVertexGpuProgramParameters.setNull();
         mActiveGeometryGpuProgramParameters.setNull();
@@ -1640,34 +1647,44 @@ namespace Ogre {
         mComputeProgramBound            = false;
         mUseAdjacency                   = false;
 
-        if( mCurrentVertexShader )
+        if( !hlmsCache->vertexShader.isNull() )
         {
+            mCurrentVertexShader = static_cast<GLSLShader*>( hlmsCache->vertexShader->
+                                                             _getBindingDelegate() );
             mCurrentVertexShader->bind();
             mActiveVertexGpuProgramParameters = mCurrentVertexShader->getDefaultParameters();
             mVertexProgramBound = true;
         }
-        if( mCurrentGeometryShader )
+        if( !hlmsCache->geometryShader.isNull() )
         {
+            mCurrentGeometryShader = static_cast<GLSLShader*>( hlmsCache->geometryShader->
+                                                               _getBindingDelegate() );
             mCurrentGeometryShader->bind();
             mActiveGeometryGpuProgramParameters = mCurrentGeometryShader->getDefaultParameters();
             mGeometryProgramBound = true;
 
             mUseAdjacency = mCurrentGeometryShader->isAdjacencyInfoRequired();
         }
-        if( mCurrentHullShader )
+        if( !hlmsCache->tesselationHullShader.isNull() )
         {
+            mCurrentHullShader = static_cast<GLSLShader*>( hlmsCache->tesselationHullShader->
+                                                           _getBindingDelegate() );
             mCurrentHullShader->bind();
             mActiveTessellationHullGpuProgramParameters = mCurrentHullShader->getDefaultParameters();
             mTessellationHullProgramBound = true;
         }
-        if( mCurrentDomainShader )
+        if( !hlmsCache->tesselationDomainShader.isNull() )
         {
+            mCurrentDomainShader = static_cast<GLSLShader*>( hlmsCache->tesselationDomainShader->
+                                                             _getBindingDelegate() );
             mCurrentDomainShader->bind();
             mActiveTessellationDomainGpuProgramParameters = mCurrentDomainShader->getDefaultParameters();
             mTessellationDomainProgramBound = true;
         }
-        if( mCurrentFragmentShader )
+        if( !hlmsCache->pixelShader.isNull() )
         {
+            mCurrentFragmentShader = static_cast<GLSLShader*>( hlmsCache->pixelShader->
+                                                               _getBindingDelegate() );
             mCurrentFragmentShader->bind();
             mActiveFragmentGpuProgramParameters = mCurrentFragmentShader->getDefaultParameters();
             mFragmentProgramBound = true;
@@ -2430,35 +2447,6 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::_render( const VertexArrayObject *_vao )
-    {
-        RenderSystem::_render( _vao );
-
-        const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( _vao );
-
-        GLenum mode = mCurrentDomainShader ? GL_PATCHES : vao->mPrimType[mUseAdjacency];
-
-        if( vao->mIndexBuffer )
-        {
-            GLenum indexType = vao->mIndexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
-                                                                GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
-            const void *indexOffset = (const void*)(vao->mIndexBuffer->_getFinalBufferStart() *
-                                                    vao->mIndexBuffer->getBytesPerElement());
-
-            //glMultiDrawElementsBaseVertex
-            OCGE( glDrawElementsInstancedBaseVertex( mode,
-                                                     vao->mIndexBuffer->getNumElements(),
-                                                     indexType, indexOffset, 1,
-                                                     vao->mVertexBuffers[0]->_getFinalBufferStart() ) );
-        }
-        else
-        {
-            OCGE( glDrawArrays( vao->mPrimType[mUseAdjacency],
-                                vao->mVertexBuffers[0]->_getFinalBufferStart(),
-                                vao->mVertexBuffers[0]->getNumElements() ) );
-        }
-    }
-
     void GL3PlusRenderSystem::_render( const CbDrawCallIndexed *cmd )
     {
         const GL3PlusVertexArrayObject *vao = static_cast<const GL3PlusVertexArrayObject*>( cmd->vao );
@@ -2649,41 +2637,41 @@ namespace Ogre {
                                                                     cmd->indexData->indexBuffer.get() );
             OCGE( glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, indexBuffer->getGLBufferId() ) );
         }
+
+        mCurrentPolygonMode = GL_TRIANGLES;
+        switch( cmd->operationType )
+        {
+        case v1::RenderOperation::OT_POINT_LIST:
+            mCurrentPolygonMode = GL_POINTS;
+            break;
+        case v1::RenderOperation::OT_LINE_LIST:
+            mCurrentPolygonMode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
+            break;
+        case v1::RenderOperation::OT_LINE_STRIP:
+            mCurrentPolygonMode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
+            break;
+        default:
+        case v1::RenderOperation::OT_TRIANGLE_LIST:
+            mCurrentPolygonMode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+            mCurrentPolygonMode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
+            break;
+        case v1::RenderOperation::OT_TRIANGLE_FAN:
+            mCurrentPolygonMode = GL_TRIANGLE_FAN;
+            break;
+        }
     }
 
     void GL3PlusRenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
     {
-        GLenum mode = GL_TRIANGLES;
-        switch( cmd->operationType )
-        {
-        case v1::RenderOperation::OT_POINT_LIST:
-            mode = GL_POINTS;
-            break;
-        case v1::RenderOperation::OT_LINE_LIST:
-            mode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
-            break;
-        case v1::RenderOperation::OT_LINE_STRIP:
-            mode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
-            break;
-        default:
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
-            mode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
-            mode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
-            mode = GL_TRIANGLE_FAN;
-            break;
-        }
-
         GLenum indexType = mCurrentIndexBuffer->indexBuffer->getType() ==
                             v1::HardwareIndexBuffer::IT_16BIT ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT;
 
         const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
 
         OCGE( glDrawElementsInstancedBaseVertexBaseInstance(
-                    mode,
+                    mCurrentPolygonMode,
                     cmd->primCount,
                     indexType,
                     reinterpret_cast<void*>( cmd->firstVertexIndex * bytesPerIndexElement ),
@@ -2694,32 +2682,8 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_render( const v1::CbDrawCallStrip *cmd )
     {
-        GLenum mode = GL_TRIANGLES;
-        switch( cmd->operationType )
-        {
-        case v1::RenderOperation::OT_POINT_LIST:
-            mode = GL_POINTS;
-            break;
-        case v1::RenderOperation::OT_LINE_LIST:
-            mode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
-            break;
-        case v1::RenderOperation::OT_LINE_STRIP:
-            mode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
-            break;
-        default:
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
-            mode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
-            mode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
-            break;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
-            mode = GL_TRIANGLE_FAN;
-            break;
-        }
-
         OCGE( glDrawArraysInstancedBaseInstance(
-                    mode,
+                    mCurrentPolygonMode,
                     cmd->firstVertexIndex,
                     cmd->primCount,
                     cmd->instanceCount,
@@ -3547,4 +3511,27 @@ namespace Ogre {
             attribsBound.push_back(attrib);
         }
     }
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	bool GL3PlusRenderSystem::setDrawBuffer(ColourBufferType colourBuffer)
+	{
+		bool result = true;
+
+		switch (colourBuffer)
+		{
+            case CBT_BACK:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK));
+                break;
+            case CBT_BACK_LEFT:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK_LEFT));
+                break;
+            case CBT_BACK_RIGHT:
+                OGRE_CHECK_GL_ERROR(glDrawBuffer(GL_BACK_RIGHT));
+//                break;
+            default:
+                result = false;
+		}
+
+		return result;
+	}
+#endif
 }

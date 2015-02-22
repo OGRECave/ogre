@@ -585,6 +585,8 @@ namespace Ogre
 
         mPreparedPass.viewMatrix        = viewMatrix;
 
+        mPreparedPass.shadowMaps.clear();
+
         if( !casterPass )
         {
             //mat4 view;
@@ -710,7 +712,6 @@ namespace Ogre
                     ++passBufferPtr;
                 }
 
-                mPreparedPass.shadowMaps.clear();
                 mPreparedPass.shadowMaps.reserve( numShadowMaps );
                 for( int32 i=0; i<numShadowMaps; ++i )
                     mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );
@@ -826,7 +827,12 @@ namespace Ogre
         {
             //layout(binding = 0) uniform PassBuffer {} pass
             ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer-1];
-            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 0, passBuffer, 0,
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( VertexShader,
+                                                                           0, passBuffer, 0,
+                                                                           passBuffer->
+                                                                           getTotalSizeBytes() );
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( PixelShader,
+                                                                           0, passBuffer, 0,
                                                                            passBuffer->
                                                                            getTotalSizeBytes() );
 
@@ -868,7 +874,9 @@ namespace Ogre
                     mCurrentConstBufferSize )
             {
                 *commandBuffer->addCommand<CbShaderBuffer>() =
-                        CbShaderBuffer( 2, mConstBuffers[mCurrentConstBuffer], 0, 0 );
+                        CbShaderBuffer( VertexShader, 2, mConstBuffers[mCurrentConstBuffer], 0, 0 );
+                *commandBuffer->addCommand<CbShaderBuffer>() =
+                        CbShaderBuffer( PixelShader, 2, mConstBuffers[mCurrentConstBuffer], 0, 0 );
             }
 
             rebindTexBuffer( commandBuffer );
@@ -878,7 +886,8 @@ namespace Ogre
         {
             //layout(binding = 1) uniform MaterialBuf {} materialArray
             const ConstBufferPool::BufferPool *newPool = datablock->getAssignedPool();
-            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( 1, newPool->materialBuffer, 0,
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( PixelShader,
+                                                                           1, newPool->materialBuffer, 0,
                                                                            newPool->materialBuffer->
                                                                            getTotalSizeBytes() );
             mLastBoundPool = newPool;

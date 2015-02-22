@@ -790,14 +790,14 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     SceneManager* Root::createSceneManager(const String& typeName, size_t numWorkerThreads,
-        InstancingTheadedCullingMethod threadedCullingMethod, const String& instanceName)
+        InstancingThreadedCullingMethod threadedCullingMethod, const String& instanceName)
     {
         return mSceneManagerEnum->createSceneManager(typeName, numWorkerThreads,
                                                      threadedCullingMethod, instanceName);
     }
     //-----------------------------------------------------------------------
     SceneManager* Root::createSceneManager(SceneTypeMask typeMask, size_t numWorkerThreads,
-        InstancingTheadedCullingMethod threadedCullingMethod, const String& instanceName)
+        InstancingThreadedCullingMethod threadedCullingMethod, const String& instanceName)
     {
         return mSceneManagerEnum->createSceneManager(typeMask, numWorkerThreads,
                                                      threadedCullingMethod, instanceName);

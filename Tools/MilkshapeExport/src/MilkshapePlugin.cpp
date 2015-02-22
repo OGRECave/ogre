@@ -272,7 +272,10 @@ BOOL MilkshapePlugin::DlgProc(HWND hDlg, UINT iMsg, WPARAM wParam, LPARAM lParam
 //---------------------------------------------------------------------
 bool MilkshapePlugin::showOptions(void)
 {
-    HINSTANCE hInst = GetModuleHandle("msOGREExporter.dll");
+    HINSTANCE hInst = NULL;
+    static const TCHAR staticVar;
+    GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &hInst);
+
     plugin = this;
     exportMesh = true;
     exportSkeleton = false;

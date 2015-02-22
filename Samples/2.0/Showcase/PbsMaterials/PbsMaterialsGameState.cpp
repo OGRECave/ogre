@@ -164,8 +164,10 @@ namespace Demo
             }
         }
 
+        Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
+
         Ogre::Light *light = sceneManager->createLight();
-        Ogre::SceneNode *lightNode = sceneManager->createSceneNode();
+        Ogre::SceneNode *lightNode = rootNode->createChildSceneNode();
         lightNode->attachObject( light );
         light->setPowerScale( 1.0f );
         light->setType( Ogre::Light::LT_DIRECTIONAL );
@@ -174,7 +176,7 @@ namespace Demo
         mLightNodes[0] = lightNode;
 
         light = sceneManager->createLight();
-        lightNode = sceneManager->createSceneNode();
+        lightNode = rootNode->createChildSceneNode();
         lightNode->attachObject( light );
         light->setDiffuseColour( 0.8f, 0.4f, 0.2f ); //Warm
         light->setSpecularColour( 0.8f, 0.4f, 0.2f );
@@ -187,7 +189,7 @@ namespace Demo
         mLightNodes[1] = lightNode;
 
         light = sceneManager->createLight();
-        lightNode = sceneManager->createSceneNode();
+        lightNode = rootNode->createChildSceneNode();
         lightNode->attachObject( light );
         light->setDiffuseColour( 0.2f, 0.4f, 0.8f ); //Cold
         light->setSpecularColour( 0.2f, 0.4f, 0.8f );

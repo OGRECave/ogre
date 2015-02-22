@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareBuffer.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareIndexBuffer::D3D11HardwareIndexBuffer(HardwareBufferManagerBase* mgr, HardwareIndexBuffer::IndexType idxType, 
@@ -81,51 +82,10 @@ namespace Ogre {
         return mBufferImpl->isLocked();
     }
     //---------------------------------------------------------------------
-    bool D3D11HardwareIndexBuffer::releaseIfDefaultPool(void)
-    {
-        /*      if (mD3DPool == D3DPOOL_DEFAULT)
-        {
-        SAFE_RELEASE(mlpD3DBuffer);
-        return true;
-        }
-        return false;
-        */
-        return true;
-    }
-    //---------------------------------------------------------------------
-    bool D3D11HardwareIndexBuffer::recreateIfDefaultPool(D3D11Device & device)
-    {
-        /*  if (mD3DPool == D3DPOOL_DEFAULT)
-        {
-        // Create the Index buffer
-        HRESULT hr = device->CreateIndexBuffer(
-        static_cast<UINT>(mSizeInBytes),
-        D3D11Mappings::get(mUsage),
-        D3D11Mappings::get(mIndexType),
-        mD3DPool,
-        &mlpD3DBuffer,
-        NULL
-        );
-
-        if (FAILED(hr))
-        {
-        String msg = DXGetErrorDescription(hr);
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-        "Cannot create D3D11 Index buffer: " + msg, 
-        "D3D11HardwareIndexBuffer::D3D11HardwareIndexBuffer");
-        }
-
-        return true;
-        }
-        return false;
-        */
-        return true;
-    }
-    //---------------------------------------------------------------------
     ID3D11Buffer * D3D11HardwareIndexBuffer::getD3DIndexBuffer( void ) const
     {
         return mBufferImpl->getD3DBuffer();
     }
     //---------------------------------------------------------------------
-
+}
 }

@@ -52,7 +52,7 @@ namespace Ogre
         OCGE( glDeleteTextures( 1, &mTexName ) );
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusTexBufferPacked::bindBuffer( uint16 slot, size_t offset, size_t sizeBytes )
+    inline void GL3PlusTexBufferPacked::bindBuffer( uint16 slot, size_t offset, size_t sizeBytes )
     {
         assert( dynamic_cast<GL3PlusBufferInterface*>( mBufferInterface ) );
         assert( offset < (mNumElements * mBytesPerElement - 1) );
@@ -73,6 +73,36 @@ namespace Ogre
         //RenderSystem is always restores to 0 after using,
         //plus activateGLTextureUnit won't see our changes otherwise.
         OCGE( glActiveTexture( GL_TEXTURE0 ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusTexBufferPacked::bindBufferVS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        bindBuffer( slot, offset, sizeBytes );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusTexBufferPacked::bindBufferPS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        bindBuffer( slot, offset, sizeBytes );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusTexBufferPacked::bindBufferGS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        bindBuffer( slot, offset, sizeBytes );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusTexBufferPacked::bindBufferHS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        bindBuffer( slot, offset, sizeBytes );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusTexBufferPacked::bindBufferDS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        bindBuffer( slot, offset, sizeBytes );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusTexBufferPacked::bindBufferCS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        bindBuffer( slot, offset, sizeBytes );
     }
     //-----------------------------------------------------------------------------------
 }

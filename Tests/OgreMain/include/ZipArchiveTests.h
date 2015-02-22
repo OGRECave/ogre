@@ -25,6 +25,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
+#ifndef __ZipArchiveTests_H__
+#define __ZipArchiveTests_H__
+
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 #include "OgreString.h"
@@ -32,7 +36,7 @@ THE SOFTWARE.
 class ZipArchiveTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE( ZipArchiveTests );
+    CPPUNIT_TEST_SUITE(ZipArchiveTests);
     CPPUNIT_TEST(testListNonRecursive);
     CPPUNIT_TEST(testListRecursive);
     CPPUNIT_TEST(testListFileInfoNonRecursive);
@@ -44,8 +48,10 @@ class ZipArchiveTests : public CppUnit::TestFixture
     CPPUNIT_TEST(testFileRead);
     CPPUNIT_TEST(testReadInterleave);
     CPPUNIT_TEST_SUITE_END();
+
 protected:
-    Ogre::String testPath;
+    Ogre::String mTestPath;
+
 public:
     void setUp();
     void tearDown();
@@ -61,3 +67,5 @@ public:
     void testFileRead();
     void testReadInterleave();
 };
+
+#endif

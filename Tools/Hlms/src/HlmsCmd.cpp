@@ -177,10 +177,10 @@ void HlmsCmd::chooseSceneManager(void)
 {
 #if OGRE_DEBUG_MODE
     const size_t numThreads = 1;
-    Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+    Ogre::InstancingThreadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
 #else
     const size_t numThreads = std::max<int>(1, Ogre::PlatformInformation::getNumLogicalCores());
-    Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+    Ogre::InstancingThreadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
     if( numThreads > 1 )
         threadedCullingMethod = Ogre::INSTANCING_CULLING_THREADED;
 #endif

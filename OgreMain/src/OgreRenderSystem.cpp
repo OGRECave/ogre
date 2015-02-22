@@ -783,13 +783,13 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_render( const VertexArrayObject *vao )
+    /*void RenderSystem::_render( const VertexArrayObject *vao )
     {
         // Update stats
         mFaceCount      += vao->mFaceCount;
         mVertexCount    += vao->mVertexBuffers[0]->getNumElements();
         ++mBatchCount;
-    }
+    }*/
     //-----------------------------------------------------------------------
     void RenderSystem::_renderUsingReadBackAsTexture(unsigned int secondPass,Ogre::String variableName,unsigned int StartSlot)
     {

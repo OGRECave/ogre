@@ -120,9 +120,17 @@ namespace Ogre
             mHomePath = path;
         }
         
-        /** Create a directory */
-        bool createDirectory(const Ogre::String& name);
-        
+        /** Create a directory. */
+        static bool createDirectory(const Ogre::String& name);
+        /** Delete a directory. Should be empty */
+        static bool removeDirectory(const Ogre::String& name);
+        /** Test if the given file exists. */
+        static bool fileExists(const Ogre::String& path);
+        /** Delete a file. */
+        static bool removeFile(const Ogre::String& path);
+        /** Rename a file. */
+        static bool renameFile(const Ogre::String& oldpath, const Ogre::String& newpath);
+
     private:
         Ogre::StringVector mConfigPaths;
         Ogre::String mHomePath;
@@ -132,9 +140,6 @@ namespace Ogre
         
         /** Create an Ogre directory and the given subdir in the user's home. */
         void prepareUserHome(const Ogre::String& subdir);
-        
-        /** Test if the given file exists. */
-        bool fileExists(const Ogre::String& path) const;
     };
 
 }

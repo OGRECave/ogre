@@ -64,7 +64,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystemCapabilities::log(Log* pLog)
     {
-#if OGRE_PLATFORM != OGRE_PLATFORM_WINRT
         pLog->logMessage("RenderSystem capabilities");
         pLog->logMessage("-------------------------");
         pLog->logMessage("RenderSystem Name: " + getRenderSystemName());
@@ -341,7 +340,6 @@ namespace Ogre {
                 " * DirectX per stage constants: "
                 + StringConverter::toString(hasCapability(RSC_PERSTAGECONSTANT), true));
         }
-#endif
     }
     //---------------------------------------------------------------------
     StringVector RenderSystemCapabilities::msGPUVendorStrings;

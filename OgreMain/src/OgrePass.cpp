@@ -40,11 +40,12 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
-    AtomicScalar<uint32> Pass::mId = 0;
+    AtomicScalar<uint32> Pass::gId = 0;
 
     //-----------------------------------------------------------------------------
     Pass::Pass(Technique* parent, unsigned short index)
-        : mParent(parent)
+        : mId(gId++)
+        , mParent(parent)
         , mIndex(index)
         , mAmbient(ColourValue::White)
         , mDiffuse(ColourValue::White)
@@ -96,7 +97,7 @@ namespace Ogre {
 
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
-        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), "", HlmsMacroblock(),
+        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId ), "", HlmsMacroblock(),
                                                           HlmsBlendblock(), HlmsParamVec(), false );
 
         Material *parentMaterial = parent->getParent();
@@ -108,14 +109,15 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------
     Pass::Pass(Technique *parent, unsigned short index, const Pass& oth)
-        :mParent(parent), mIndex(index), mVertexProgramUsage(0), mShadowCasterVertexProgramUsage(0), 
+        :mId(gId++), mParent(parent), mIndex(index), mVertexProgramUsage(0),
+        mShadowCasterVertexProgramUsage(0),
         mShadowCasterFragmentProgramUsage(0), mFragmentProgramUsage(0), 
         mGeometryProgramUsage(0), mTessellationHullProgramUsage(0)
         , mTessellationDomainProgramUsage(0), mComputeProgramUsage(0), mPassIterationCount(1)
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
-        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId++ ), "", HlmsMacroblock(),
+        HlmsDatablock *datablock = hlms->createDatablock( IdString( mId ), "", HlmsMacroblock(),
                                                           HlmsBlendblock(), HlmsParamVec(), false );
 
         Material *parentMaterial = parent->getParent();
@@ -148,6 +150,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     Pass& Pass::operator=(const Pass& oth)
     {
+        //Do not copy mId
         mName = oth.mName;
         mAmbient = oth.mAmbient;
         mDiffuse = oth.mDiffuse;

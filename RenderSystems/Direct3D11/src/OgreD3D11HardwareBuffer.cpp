@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 #include "OgreException.h"
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareBuffer::D3D11HardwareBuffer(
@@ -90,7 +91,7 @@ namespace Ogre {
         if (FAILED(hr) || mDevice.isError())
         {
             String msg = device.getErrorDescription(hr);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Cannot create D3D11 buffer: " + msg, 
                 "D3D11HardwareBuffer::D3D11HardwareBuffer");
         }
@@ -123,7 +124,7 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String msg = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Cannot create D3D11 buffer: " + msg, 
                     "D3D11HardwareBuffer::D3D11HardwareBuffer");
             }
@@ -172,7 +173,7 @@ namespace Ogre {
             if (FAILED(hr) || mDevice.isError())
             {
                 String msg = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Error calling Map: " + msg, 
                     "D3D11HardwareBuffer::lockImpl");
             }
@@ -234,6 +235,16 @@ namespace Ogre {
     void D3D11HardwareBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
         size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
+		if (mUseShadowBuffer)
+		{
+			static_cast<D3D11HardwareBuffer*>(mShadowBuffer)->copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+		}
+		copyDataImpl(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareBuffer::copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset, 
+		size_t dstOffset, size_t length, bool discardWholeBuffer)
+	{
         // If we're copying same-size buffers in their entirety...
         if (srcOffset == 0 && dstOffset == 0 &&
             length == mSizeInBytes && mSizeInBytes == srcBuffer.getSizeInBytes())
@@ -268,6 +279,16 @@ namespace Ogre {
                     "Cannot copy D3D11 subresource region\nError Description:" + errorDescription,
                     "D3D11HardwareBuffer::copyData");
             }
+		}
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareBuffer::_updateFromShadow(void)
+	{
+		if(mUseShadowBuffer && mShadowUpdated && !mSuppressHardwareUpdate)
+		{
+			bool discardWholeBuffer = mLockStart == 0 && mLockSize == mSizeInBytes;
+			copyDataImpl(*static_cast<D3D11HardwareBuffer*>(mShadowBuffer), mLockStart, mLockStart, mLockSize, discardWholeBuffer);
+			mShadowUpdated = false;
         }
     }
     //---------------------------------------------------------------------
@@ -297,5 +318,5 @@ namespace Ogre {
         //mDevice.GetImmediateContext()->UpdateSubresource(mlpD3DBuffer, 0, NULL, pSource, offset, length);
     }
     //---------------------------------------------------------------------
-
+}
 }

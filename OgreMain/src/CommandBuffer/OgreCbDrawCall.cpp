@@ -117,6 +117,7 @@ namespace Ogre
     {
         vertexData  = renderOp.vertexData;
         indexData   = renderOp.indexData;
+        operationType = static_cast<uint8>( renderOp.operationType );
     }
 
     void CommandBuffer::execute_setV1RenderOp( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )

@@ -34,7 +34,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusFBOMultiRenderTarget.h"
 
 namespace Ogre {
-
+    static const size_t TEMP_FBOS = 2;
 
     GL3PlusFBORenderTexture::GL3PlusFBORenderTexture(
         GL3PlusFBOManager *manager, const String &name,
@@ -126,13 +126,16 @@ namespace Ogre {
         };
 #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-    GL3PlusFBOManager::GL3PlusFBOManager()
+    GL3PlusFBOManager::GL3PlusFBOManager(const GL3PlusSupport& support) : mGLSupport(support)
     {
         detectFBOFormats();
 
-        GLsizei numBuffers = 1;
+        mTempFBO.resize(Ogre::TEMP_FBOS, 0);
 
-        OGRE_CHECK_GL_ERROR(glGenFramebuffers(numBuffers, &mTempFBO));
+        for (size_t i = 0; i < Ogre::TEMP_FBOS; i++)
+        {
+            OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mTempFBO[i]));
+        }
     }
 
     GL3PlusFBOManager::~GL3PlusFBOManager()
@@ -142,9 +145,10 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("GL: Warning! GL3PlusFBOManager destructor called, but not all renderbuffers were released.", LML_CRITICAL);
         }
 
-        GLsizei numBuffers = 1;
-
-        OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(numBuffers, &mTempFBO));
+        for (size_t i = 0; i < Ogre::TEMP_FBOS; i++)
+        {
+            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mTempFBO[i]));
+        }
     }
 
     void GL3PlusFBOManager::_createTempFramebuffer(int ogreFormat, GLuint internalFormat, GLuint fmt, GLenum dataType, GLuint &fb, GLuint &tid)
@@ -284,35 +288,49 @@ namespace Ogre {
     */
     void GL3PlusFBOManager::detectFBOFormats()
     {
+        // is glGetInternalformativ supported?
+        // core since GL 4.2: see https://www.opengl.org/wiki/GLAPI/glGetInternalformat
+        bool hasInternalFormatQuery = gl3wIsSupported(4,2) || mGLSupport.checkExtension("GL_ARB_internalformat_query2");
+
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
+
+        bool formatSupported;
+        GLint params;
 
         for(int x = 0; x < PF_COUNT; ++x)
         {
             mProps[x].valid = false;
 
             // Fetch GL format token
-            GLenum fmt = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x, false);
-            GLenum fmt2 = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
-            GLenum type = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
-            if(fmt == GL_NONE && x != 0)
+            GLenum internalFormat = GL3PlusPixelUtil::getGLInternalFormat((PixelFormat)x, false);
+            GLenum originFormat = GL3PlusPixelUtil::getGLOriginFormat((PixelFormat)x);
+            GLenum dataType = GL3PlusPixelUtil::getGLOriginDataType((PixelFormat)x);
+            if(internalFormat == GL_NONE && x != 0)
                 continue;
 
             // No test for compressed formats
             if(PixelUtil::isCompressed((PixelFormat)x))
                 continue;
 
-            // Create and attach framebuffer
-            _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
+            if (hasInternalFormatQuery) {
+                OGRE_CHECK_GL_ERROR(
+                        glGetInternalformativ(GL_RENDERBUFFER, internalFormat, GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+                formatSupported = params == GL_FULL_SUPPORT;
+            } else {
+                // Create and attach framebuffer
+                _createTempFramebuffer(x, internalFormat, originFormat, dataType, fb, tid);
 
-            // Check status
-            GLuint status;
-            OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
+                // Check status
+                GLuint status;
+                OGRE_CHECK_GL_ERROR(status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
+                formatSupported = status == GL_FRAMEBUFFER_COMPLETE;
+            }
 
             // Ignore status in case of fmt==GL_NONE, because no implementation will accept
             // a buffer without *any* attachment. Buffers with only stencil and depth attachment
             // might still be supported, so we must continue probing.
-            if(fmt == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE)
+            if(internalFormat == GL_NONE || formatSupported)
             {
                 mProps[x].valid = true;
                 StringStream str;
@@ -326,6 +344,16 @@ namespace Ogre {
                     {
                         // General depth/stencil combination
 
+                        if(hasInternalFormatQuery) {
+                            OGRE_CHECK_GL_ERROR(
+                                    glGetInternalformativ(GL_RENDERBUFFER, depthFormats[depth], GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+
+                            // skip unsupported depth unless it is GL_NONE, as we still want D0Sxx formats
+                            if(params != GL_FULL_SUPPORT && depthFormats[depth] != GL_NONE) {
+                                continue;
+                            }
+                        }
+
                         for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
                             //                            StringStream l;
@@ -334,68 +362,58 @@ namespace Ogre {
                             //                                  << "S" << stencilBits[stencil];
                             //                            LogManager::getSingleton().logMessage(l.str());
 
-                            if (_tryFormat(depthFormats[depth], stencilFormats[stencil]))
+                            if (hasInternalFormatQuery) {
+                                OGRE_CHECK_GL_ERROR(
+                                        glGetInternalformativ( GL_RENDERBUFFER, stencilFormats[stencil], GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+
+                                // skip unsupported stencil unless it is GL_NONE, as we still want DxxS0 formats
+                                formatSupported = params == GL_FULL_SUPPORT || stencilFormats[stencil] == GL_NONE;
+                            } else {
+                                formatSupported = _tryFormat(depthFormats[depth], stencilFormats[stencil]);
+                            }
+
+                            if (formatSupported)
                             {
                                 // Add mode to allowed modes
                                 str << "D" << depthBits[depth] << "S" << stencilBits[stencil] << " ";
-                                FormatProperties::Mode mode;
-                                mode.depth = depth;
-                                mode.stencil = stencil;
+                                FormatProperties::Mode mode = {depth, stencil};
                                 mProps[x].modes.push_back(mode);
-                            }
-                            else
-                            {
-                                // There is a small edge case that FBO is trashed during the test
-                                // on some drivers resulting in undefined behavior
-                                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-                                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
-
-                                // Workaround for NVIDIA / Linux 169.21 driver problem
-                                // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                                OGRE_CHECK_GL_ERROR(glFinish());
-
-                                _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
                             }
                         }
                     }
                     else
                     {
                         // Packed depth/stencil format
-                        if (_tryPackedFormat(depthFormats[depth]))
+                        if (hasInternalFormatQuery) {
+                            OGRE_CHECK_GL_ERROR(
+                                    glGetInternalformativ( GL_RENDERBUFFER, depthFormats[depth], GL_FRAMEBUFFER_RENDERABLE, 1, &params));
+
+                            formatSupported = params == GL_FULL_SUPPORT;
+                        } else {
+                            formatSupported = _tryPackedFormat(depthFormats[depth]);
+                        }
+
+                        if (formatSupported)
                         {
                             // Add mode to allowed modes
                             str << "Packed-D" << depthBits[depth] << "S" << 8 << " ";
-                            FormatProperties::Mode mode;
-                            mode.depth = depth;
-                            mode.stencil = 0;   // unuse
+                            FormatProperties::Mode mode = {depth, 0}; // stencil unused
                             mProps[x].modes.push_back(mode);
-                        }
-                        else
-                        {
-                            // There is a small edge case that FBO is trashed during the test
-                            // on some drivers resulting in undefined behavior
-                            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-                            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
-
-                            // Workaround for NVIDIA / Linux 169.21 driver problem
-                            // see http://www.ogre3d.org/phpBB2/viewtopic.php?t=38037&start=25
-                            OGRE_CHECK_GL_ERROR(glFinish());
-
-                            _createTempFramebuffer(x, fmt, fmt2, type, fb, tid);
                         }
                     }
                 }
                 LogManager::getSingleton().logMessage(str.str());
             }
 
-            // Delete texture and framebuffer
-            OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
-            OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
+            if (!hasInternalFormatQuery) {
+                // Delete texture and framebuffer
+                OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+                OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &fb));
 
-            if (fmt != GL_NONE)
-            {
-                OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
-                tid = 0;
+                if (internalFormat != GL_NONE) {
+                    OGRE_CHECK_GL_ERROR(glDeleteTextures(1, &tid));
+                    tid = 0;
+                }
             }
         }
 
@@ -535,5 +553,12 @@ namespace Ogre {
                 //                                      << " of " << key.width << "x" << key.height << std::endl;
             }
         }
+    }
+
+    GLuint GL3PlusFBOManager::getTemporaryFBO(size_t i)
+    {
+        assert(i < mTempFBO.size());
+
+        return mTempFBO[i];
     }
 }

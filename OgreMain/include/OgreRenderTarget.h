@@ -261,6 +261,9 @@ namespace Ogre {
         */
         virtual bool isPrimary(void) const;
 
+		/** Indicates whether stereo is currently enabled for this target. Default is false. */
+		virtual bool isStereoEnabled(void) const;
+		
         /** Indicates whether on rendering, linear colour space is converted to 
             sRGB gamma colour space. This is the exact opposite conversion of
             what is indicated by Texture::isHardwareGammaEnabled, and can only
@@ -279,6 +282,14 @@ namespace Ogre {
         virtual const String& getFSAAHint() const { return mFSAAHint; }
 
         bool isFsaaResolveDirty(void) const         { return mFsaaResolveDirty; }
+
+        /** Set the level of multisample AA to be used if hardware support it.
+            This option will be ignored if the hardware does not support it 
+            or setting can not be changed on the fly on per-target level. 
+            @param fsaa The number of samples
+            @param fsaaHint Any hinting text (@see Root::createRenderWindow)
+        */
+        virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
 
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
@@ -370,6 +381,7 @@ namespace Ogre {
         uint mFSAA;
         String mFSAAHint;
         bool mFsaaResolveDirty;
+        bool mStereoEnabled;
 
         typedef vector<Viewport*>::type ViewportList;
         /// List of viewports, map on Z-order

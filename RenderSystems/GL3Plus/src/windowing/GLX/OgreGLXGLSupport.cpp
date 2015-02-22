@@ -169,6 +169,9 @@ namespace Ogre
         ConfigOption optRTTMode;
         ConfigOption optSRGB;
         ConfigOption optEnableFixedPipeline;
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		ConfigOption optStereoMode;
+#endif
 
         optFullScreen.name = "Full Screen";
         optFullScreen.immutable = false;
@@ -246,8 +249,19 @@ namespace Ogre
 
         optSRGB.currentValue = optSRGB.possibleValues[0];
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		optStereoMode.name = "Stereo Mode";
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
+		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_FRAME_SEQUENTIAL));
+		optStereoMode.currentValue = optStereoMode.possibleValues[0];
+		optStereoMode.immutable = false;
+
+		mOptions[optStereoMode.name] = optStereoMode;
+#endif
+
         mOptions[optFullScreen.name] = optFullScreen;
         mOptions[optVideoMode.name] = optVideoMode;
+        mOptions[optColourDepth.name] = optColourDepth;
         mOptions[optDisplayFrequency.name] = optDisplayFrequency;
         mOptions[optVSync.name] = optVSync;
         mOptions[optRTTMode.name] = optRTTMode;
@@ -373,6 +387,13 @@ namespace Ogre
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
             bool enableFixedPipeline = (opt->second.currentValue == "Yes");
             renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			opt = mOptions.find("Stereo Mode");
+			if (opt == mOptions.end())
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find stereo enabled options!", "GLXGLSupport::createWindow");
+			miscParams["stereoMode"] = opt->second.currentValue;			
+#endif
 
             window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
         }

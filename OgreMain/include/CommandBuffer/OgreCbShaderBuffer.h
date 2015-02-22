@@ -40,10 +40,10 @@ namespace Ogre
         uint32          bindOffset;
         uint32          bindSizeBytes;
 
-        CbShaderBuffer( uint16 _slot, ConstBufferPacked *_bufferPacked,
+        CbShaderBuffer( ShaderType shaderType, uint16 _slot, ConstBufferPacked *_bufferPacked,
                         uint32 _bindOffset, uint32 _bindSizeBytes );
 
-        CbShaderBuffer( uint16 _slot, TexBufferPacked *_bufferPacked,
+        CbShaderBuffer( ShaderType shaderType, uint16 _slot, TexBufferPacked *_bufferPacked,
                         uint32 _bindOffset, uint32 _bindSizeBytes );
     };
 

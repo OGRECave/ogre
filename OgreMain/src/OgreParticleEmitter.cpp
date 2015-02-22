@@ -247,7 +247,7 @@ namespace Ogre
             else
             {
                 // Constant angle
-                destVector = particleDir.normalisedCopy();
+                destVector = particleDir;
             }
         }
         else

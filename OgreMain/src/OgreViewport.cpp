@@ -56,6 +56,7 @@ namespace Ogre {
         , mShowSkies(true)
         , mVisibilityMask(0)
         , mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
+        , mColourBuffer(CBT_BACK)
     {           
         // Set the default orientation mode
         mOrientationMode = mDefaultOrientationMode;
@@ -339,5 +340,15 @@ namespace Ogre {
             break;
         }
     }
-
+    //-----------------------------------------------------------------------
+    void Viewport::setDrawBuffer(ColourBufferType colourBuffer) 
+    {
+        mColourBuffer = colourBuffer;
+    }
+    //-----------------------------------------------------------------------
+    ColourBufferType Viewport::getDrawBuffer() const
+    {
+        return mColourBuffer;
+    }
+    //-----------------------------------------------------------------------
 }

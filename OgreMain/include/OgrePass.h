@@ -67,8 +67,9 @@ namespace Ogre {
     {
     protected:
         /// Increments on the constructor, in order to create a unique datablock for each material pass
-        static AtomicScalar<uint32> mId;
+        static AtomicScalar<uint32> gId;
 
+        uint32 mId;
         Technique* mParent;
         unsigned short mIndex; /// Pass index
         String mName; /// Optional name for the pass
@@ -177,6 +178,8 @@ namespace Ogre {
         /// Operator = overload
         Pass& operator=(const Pass& oth);
         virtual ~Pass();
+
+        uint32 getId(void) const            { return mId; }
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
         bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||

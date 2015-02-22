@@ -125,7 +125,7 @@ elseif (WIN32)
       src/Threading/OgreThreadsWin.cpp
   )
   list(APPEND PLATFORM_SOURCE_FILES src/WIN32/OgreWin32Resources.rc)
-  if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
+  if (WINDOWS_STORE OR WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
       include/WIN32/OgreConfigDialogImpWinRT.h
@@ -133,10 +133,11 @@ elseif (WIN32)
       include/WIN32/OgreTimerImp.h
     )
     set(PLATFORM_SOURCE_FILES
+      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialogWinRT.cpp
       src/WIN32/OgreErrorDialogWinRT.cpp
+      src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
-	  src/WIN32/OgreOptimisedUtilDirectXMath.cpp
     )  
 
     set(PLATFORM_HEADER_INSTALL "WIN32")
@@ -149,37 +150,31 @@ elseif (WIN32)
       include/WIN32/OgreMinGWSupport.h
     )
     set(PLATFORM_SOURCE_FILES
+      src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialog.cpp
       src/WIN32/OgreErrorDialog.cpp
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
       src/WIN32/resource.h
-      src/WIN32/winres.h
     )  
     set(RESOURCE_FILES
       src/WIN32/resource.h
       src/WIN32/OgreWin32Resources.rc
-      src/WIN32/winres.h
     )
     source_group(Resources FILES ${RESOURCE_FILES})
     set(PLATFORM_HEADER_INSTALL "WIN32")
 
-    if (MINGW) 
+    if (MINGW)
       # Older CMake versions do not know how to deal with resource files on MinGW.
       # Newer ones do, but pass along invalid command options to windres.
       # This is a manual fix for the moment.
-      get_filename_component(OGRE_MINGW_PATH ${CMAKE_CXX_COMPILER} PATH)
-      #set(OGRE_MINGW_RC ${OGRE_MINGW_PATH}/windres.exe)
-      file(GLOB OGRE_MINGW_RC_NAMES "${OGRE_MINGW_PATH}/*windres*")
-      find_program(OGRE_MINGW_RC NAMES ${OGRE_MINGW_RC_NAMES} HINTS ${OGRE_MINGW_PATH} DOC "Path to MinGW resource compiler")
-      if (NOT OGRE_MINGW_RC)
-        message(SEND_ERROR "Could not find MinGW resource compiler. Please specify path in OGRE_MINGW_RC.")
+      if (NOT CMAKE_RC_COMPILER)
+        message(SEND_ERROR "Could not find MinGW resource compiler. Please specify path in CMAKE_RC_COMPILER.")
       endif ()
-      mark_as_advanced(OGRE_MINGW_RC)
       add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
-        COMMAND ${OGRE_MINGW_RC} -I${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32 
-                                 -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
-                                 -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
+        COMMAND ${CMAKE_RC_COMPILER} -I${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32 
+                                     -i${CMAKE_CURRENT_SOURCE_DIR}/src/WIN32/OgreWin32Resources.rc
+                                     -o${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj
         DEPENDS ${RESOURCE_FILES})
       list(APPEND PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_BINARY_DIR}/OgreWin32Resources.rc.obj)
     else ()
@@ -318,7 +313,7 @@ endif()
 
 if (OGRE_CONFIG_ENABLE_STBI)
   list(APPEND HEADER_FILES include/OgreSTBICodec.h)
-  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp  src/stbi/stb_image.c)
+  list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
@@ -359,9 +354,10 @@ endif ()
 set (TARGET_LINK_FLAGS "")
 
 # setup OgreMain target
-if (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE)
+if (WINDOWS_STORE OR WINDOWS_PHONE)
 	# exclude OgreTimer.cpp from unity builds; causes problem
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/WIN32/OgreTimer.cpp")
+	set_target_properties(OgreMain PROPERTIES VS_WINRT_COMPONENT "true")
 else ()
 	# exclude OgreAlignedAllocator.cpp from unity builds; causes problems on Linux
 	ogre_add_library(OgreMain ${OGRE_LIB_TYPE} ${PREC_HEADER} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCE_FILES} ${THREAD_HEADER_FILES} ${THREAD_SOURCE_FILES} SEPARATE "src/OgreAlignedAllocator.cpp")

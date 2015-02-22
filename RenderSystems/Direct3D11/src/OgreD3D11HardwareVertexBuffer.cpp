@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareVertexBuffer::D3D11HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, 
@@ -85,59 +86,19 @@ namespace Ogre {
             // src is a D3D11HardwareVertexBuffer use d3d11 optimized copy
             D3D11HardwareVertexBuffer& d3dBuf = static_cast<D3D11HardwareVertexBuffer&>(srcBuffer);
 
-            mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
-        }
-    }
-    //---------------------------------------------------------------------
-    bool D3D11HardwareVertexBuffer::isLocked(void) const
-    {
-        return mBufferImpl->isLocked();
-    }
-    //---------------------------------------------------------------------
-    bool D3D11HardwareVertexBuffer::releaseIfDefaultPool(void)
-    {
-        /*      if (mD3DPool == D3DPOOL_DEFAULT)
-        {
-        SAFE_RELEASE(mlpD3DBuffer);
-        return true;
-        }
-        return false;
-        */
-        return true;
-    }
-    //---------------------------------------------------------------------
-    bool D3D11HardwareVertexBuffer::recreateIfDefaultPool(D3D11Device & device)
-    {
-        /*  if (mD3DPool == D3DPOOL_DEFAULT)
-        {
-        // Create the Index buffer
-        HRESULT hr = device->CreateIndexBuffer(
-        static_cast<UINT>(mSizeInBytes),
-        D3D11Mappings::get(mUsage),
-        D3D11Mappings::get(mIndexType),
-        mD3DPool,
-        &mlpD3DBuffer,
-        NULL
-        );
-
-        if (FAILED(hr))
-        {
-        String msg = DXGetErrorDescription(hr);
-        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-        "Cannot create D3D11 Index buffer: " + msg, 
-        "D3D11HardwareVertexBuffer::D3D11HardwareVertexBuffer");
-        }
-
-        return true;
-        }
-        return false;
-        */
-        return true;
-    }
+			mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
+		}
+	}
+	//---------------------------------------------------------------------
+	bool D3D11HardwareVertexBuffer::isLocked(void) const
+	{
+		return mBufferImpl->isLocked();
+	}
+	//---------------------------------------------------------------------
     //---------------------------------------------------------------------
     ID3D11Buffer * D3D11HardwareVertexBuffer::getD3DVertexBuffer( void ) const
     {
         return mBufferImpl->getD3DBuffer();
     }
 }
-
+}

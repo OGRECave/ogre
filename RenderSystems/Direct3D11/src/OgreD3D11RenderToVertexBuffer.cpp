@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreD3D11HLSLProgram.h"
 
 namespace Ogre {
+namespace v1 {
 
     D3D11RenderToVertexBuffer::D3D11RenderToVertexBuffer(D3D11Device & device, 
                                                          D3D11HardwareBufferManagerBase * bufManager) 
@@ -189,4 +190,5 @@ namespace Ogre {
             HardwareBuffer::HBU_STATIC_WRITE_ONLY
             );
     }
+}
 }

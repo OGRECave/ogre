@@ -57,7 +57,7 @@ namespace Ogre {
         /// Rendering loop control
         bool mStopRendering;
 
-        typedef HashMap<GLenum, GLuint>  BindBufferMap;
+        typedef OGRE_HashMap<GLenum, GLuint>  BindBufferMap;
 
         /// View matrix to set world against
         Matrix4 mViewMatrix;
@@ -121,6 +121,7 @@ namespace Ogre {
         GLuint  mGlobalVao;
         v1::VertexData  *mCurrentVertexBuffer;
         v1::IndexData   *mCurrentIndexBuffer;
+        GLenum          mCurrentPolygonMode;
 
         GLSLShaderManager *mShaderManager;
         GLSLShaderFactory* mGLSLShaderFactory;
@@ -150,6 +151,10 @@ namespace Ogre {
         vector<GLuint>::type mRenderInstanceAttribsBound;
 
         GLint getCombinedMinMipFilter(void) const;
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		/// @copydoc RenderSystem::setDrawBuffer
+		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+#endif
 
         unsigned char *mSwIndirectBufferPtr;
 
@@ -188,6 +193,10 @@ namespace Ogre {
             RenderSystem
         */
         const String& getName(void) const;
+        /** See
+            RenderSystem
+        */
+            const String& getFriendlyName(void) const;
         /** See
             RenderSystem
         */
@@ -475,7 +484,6 @@ namespace Ogre {
         void _render(const v1::RenderOperation& op);
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
-        virtual void _render( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd );
         virtual void _render( const CbDrawCallStrip *cmd );
         virtual void _renderEmulated( const CbDrawCallIndexed *cmd );

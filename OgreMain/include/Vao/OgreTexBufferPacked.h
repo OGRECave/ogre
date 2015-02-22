@@ -52,7 +52,12 @@ namespace Ogre
 
         virtual BufferPackedTypes getBufferPackedType(void) const   { return BP_TYPE_TEX; }
 
-        /** Binds the texture buffer to the given slot
+        /** Binds the texture buffer to the given slot in the
+            Vertex/Pixel/Geometry/Hull/Domain/Compute Shader
+        @remarks
+            Not all RS API separate by shader stage. For best compatibility,
+            don't assign two different buffers at the same slot for different
+            stages (just leave the slot empty on the stages you don't use).
         @param slot
             The slot to asign this constant buffer. In D3D11 it's called 'slot'.
             In GLSL it's called it's called 'binding'
@@ -65,7 +70,12 @@ namespace Ogre
             Size in bytes to bind the tex buffer. When zero,
             binds from offset until the end of the buffer.
         */
-        virtual void bindBuffer( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
+        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
+        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
+        virtual void bindBufferGS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
+        virtual void bindBufferDS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
+        virtual void bindBufferHS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
+        virtual void bindBufferCS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) = 0;
 
         PixelFormat getPixelFormat(void) const           { return mPixelFormat; }
     };

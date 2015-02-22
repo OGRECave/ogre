@@ -36,6 +36,8 @@ namespace Ogre
 {
     class _OgreGL3PlusExport GL3PlusConstBufferPacked : public ConstBufferPacked
     {
+        inline void bindBuffer( uint16 slot );
+
     public:
         GL3PlusConstBufferPacked( size_t internalBufferStartBytes, size_t numElements,
                                   uint32 bytesPerElement,
@@ -44,7 +46,12 @@ namespace Ogre
                                   size_t bindableSize );
         ~GL3PlusConstBufferPacked();
 
-        virtual void bindBuffer( uint16 slot );
+        virtual void bindBufferVS( uint16 slot );
+        virtual void bindBufferPS( uint16 slot );
+        virtual void bindBufferGS( uint16 slot );
+        virtual void bindBufferHS( uint16 slot );
+        virtual void bindBufferDS( uint16 slot );
+        virtual void bindBufferCS( uint16 slot );
     };
 }
 

@@ -64,13 +64,25 @@ namespace Ogre
                                                  const CbBase * RESTRICT_ALIAS cmd );
 
         static CommandBufferExecuteFunc execute_setVao;
+        static CommandBufferExecuteFunc execute_setIndirectBuffer;
         static CommandBufferExecuteFunc execute_drawCallIndexedEmulated;
         static CommandBufferExecuteFunc execute_drawCallIndexed;
         static CommandBufferExecuteFunc execute_drawCallStripEmulated;
         static CommandBufferExecuteFunc execute_drawCallStrip;
-        static CommandBufferExecuteFunc execute_setConstantBuffer;
-        static CommandBufferExecuteFunc execute_setTextureBuffer;
-        static CommandBufferExecuteFunc execute_setIndirectBuffer;
+        static CommandBufferExecuteFunc execute_setConstantBufferVS;
+        static CommandBufferExecuteFunc execute_setConstantBufferPS;
+        static CommandBufferExecuteFunc execute_setConstantBufferGS;
+        static CommandBufferExecuteFunc execute_setConstantBufferHS;
+        static CommandBufferExecuteFunc execute_setConstantBufferDS;
+        static CommandBufferExecuteFunc execute_setConstantBufferCS;
+        static CommandBufferExecuteFunc execute_setConstantBufferInvalid;
+        static CommandBufferExecuteFunc execute_setTextureBufferVS;
+        static CommandBufferExecuteFunc execute_setTextureBufferPS;
+        static CommandBufferExecuteFunc execute_setTextureBufferGS;
+        static CommandBufferExecuteFunc execute_setTextureBufferHS;
+        static CommandBufferExecuteFunc execute_setTextureBufferDS;
+        static CommandBufferExecuteFunc execute_setTextureBufferCS;
+        static CommandBufferExecuteFunc execute_setTextureBufferInvalid;
         static CommandBufferExecuteFunc execute_setMacroblock;
         static CommandBufferExecuteFunc execute_setBlendblock;
         static CommandBufferExecuteFunc execute_setHlmsCache;

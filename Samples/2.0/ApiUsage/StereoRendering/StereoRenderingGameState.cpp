@@ -50,7 +50,7 @@ namespace Demo
         }
 
         Ogre::Light *light = sceneManager->createLight();
-        Ogre::SceneNode *lightNode = sceneManager->createSceneNode();
+        Ogre::SceneNode *lightNode = sceneManager->getRootSceneNode()->createChildSceneNode();
         lightNode->attachObject( light );
         light->setPowerScale( Ogre::Math::PI ); //Since we don't do HDR, counter the PBS' division by PI
         light->setType( Ogre::Light::LT_DIRECTIONAL );

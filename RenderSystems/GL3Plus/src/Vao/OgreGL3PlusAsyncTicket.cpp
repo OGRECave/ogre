@@ -68,12 +68,19 @@ namespace Ogre
     {
         bool retVal = false;
 
-        //Ask GL API to return immediately and tells us about the fence
-        GLenum waitRet = glClientWaitSync( mFenceName, 0, 0 );
-        if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
+        if( mFenceName )
         {
-            OCGE( glDeleteSync( mFenceName ) );
-            mFenceName = 0;
+            //Ask GL API to return immediately and tells us about the fence
+            GLenum waitRet = glClientWaitSync( mFenceName, 0, 0 );
+            if( waitRet == GL_ALREADY_SIGNALED || waitRet == GL_CONDITION_SATISFIED )
+            {
+                OCGE( glDeleteSync( mFenceName ) );
+                mFenceName = 0;
+                retVal = true;
+            }
+        }
+        else
+        {
             retVal = true;
         }
 

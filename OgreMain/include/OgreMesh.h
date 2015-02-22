@@ -122,7 +122,7 @@ namespace v1 {
         /** A hashmap used to store optional SubMesh names.
             Translates a name into SubMesh index.
         */
-        typedef HashMap<String, ushort> SubMeshNameMap ;
+        typedef OGRE_HashMap<String, ushort> SubMeshNameMap ;
 
         
     protected:
@@ -532,7 +532,7 @@ namespace v1 {
         /** Internal methods for loading LOD, do not use. */
         void _setLodInfo(unsigned short numLevels);
         /** Internal methods for loading LOD, do not use. */
-        void _setLodUsage(unsigned short level, MeshLodUsage& usage);
+        void _setLodUsage(unsigned short level, const MeshLodUsage& usage);
         /** Internal methods for loading LOD, do not use. */
         void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
         /** Internal methods for loading LOD, do not use. */

@@ -49,6 +49,7 @@ namespace Ogre
         mDynamicBufferCurrentFrame( 0 ),
         mNextStagingBufferTimestampCheckpoint( ~0 ),
         mFrameCount( 0 ),
+        mNumGeneratedVaos( 0 ),
         mConstBufferAlignment( 256 ),
         mTexBufferAlignment( 256 ),
         mConstBufferMaxSize( 16 * 1024 * 1024 ), //Minimum guaranteed by GL.
@@ -335,6 +336,7 @@ namespace Ogre
         VertexArrayObject *retVal;
         retVal = createVertexArrayObjectImpl( vertexBuffers, indexBuffer, opType );
         mVertexArrayObjects.push_back( retVal );
+        ++mNumGeneratedVaos;
         return retVal;
     }
     //-----------------------------------------------------------------------------------

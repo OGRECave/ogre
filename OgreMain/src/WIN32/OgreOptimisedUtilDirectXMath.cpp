@@ -39,6 +39,61 @@ THE SOFTWARE.
 #include <directxmath.h>
 using namespace DirectX;
 
+namespace DirectX
+{
+	//------------------------------------------------------------------------------
+	// 4D Vector; 8 bit char components
+	__declspec(align(4)) struct XMCHAR4
+	{
+		char c[4];
+
+		XMCHAR4() {}
+		XMCHAR4(int32_t c0, int32_t c1, int32_t c2, int32_t c3) { c[0] = c0; c[1] = c1; c[2] = c2; c[3] = c3; }
+		explicit XMCHAR4(_In_reads_(4) const char *pArray) { c[0] = pArray[0]; c[1] = pArray[1]; c[2] = pArray[2]; c[3] = pArray[3]; }
+
+		XMCHAR4& operator= (const XMCHAR4& Char4) { c[0] = Char4.c[0]; c[1] = Char4.c[1]; c[2] = Char4.c[2]; c[3] = Char4.c[3]; return *this; }
+	};
+
+	inline XMCHAR4 __fastcall XMVector4GreaterByteMask
+	(
+		FXMVECTOR V1,
+		FXMVECTOR V2
+	)
+	{
+#if defined(_XM_NO_INTRINSICS_)
+		XMCHAR4 byteMask( 
+			(V1.vector4_f32[0] > V2.vector4_f32[0] ? 0xFF : 0),
+			(V1.vector4_f32[1] > V2.vector4_f32[1] ? 0xFF : 0),
+			(V1.vector4_f32[2] > V2.vector4_f32[2] ? 0xFF : 0),
+			(V1.vector4_f32[3] > V2.vector4_f32[3] ? 0xFF : 0));
+		return byteMask;
+
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+		uint32x4_t vResult = vcgtq_f32(V1, V2);
+		int8x8x2_t vTemp = vzip_u8(vget_low_u8(vResult), vget_high_u8(vResult));
+		vTemp = vzip_u8(vTemp.val[0], vTemp.val[1]);
+		uint32_t r = vget_lane_u32(vTemp.val[1], 1);
+		return *(XMCHAR4*)&r;	// ARM is little endian
+
+#elif defined(_XM_SSE_INTRINSICS_)
+		static const uint32_t bmLE[16] = {
+			0x00000000, 0x000000FF, 0x0000FF00, 0x0000FFFF,
+			0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x00FFFFFF,
+			0xFF000000, 0xFF0000FF, 0xFF00FF00, 0xFF00FFFF,
+			0xFFFF0000, 0xFFFF00FF, 0xFFFFFF00, 0xFFFFFFFF,
+		};
+
+		XMVECTOR vTemp = _mm_cmpgt_ps(V1, V2);
+		int iTest = _mm_movemask_ps(vTemp);
+		uint32_t r = bmLE[iTest];
+		return *(XMCHAR4*)&r;	// SSE is little endian
+
+#else // _XM_VMX128_INTRINSICS_
+#endif // _XM_VMX128_INTRINSICS_
+	}
+
+}
+
 // Use unrolled version when vertices exceed this limit
 #define OGRE_DIRECTXMATH_SKINNING_UNROLL_VERTICES 16
 
@@ -1610,19 +1665,10 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
     {
         assert(_isAlignedForDirectXMath(faceNormals));
 
-        // Map to convert 4-bits mask to 4 byte values
-        static const char msMaskMapping[16][4] =
-        {
-            {0, 0, 0, 0},   {1, 0, 0, 0},   {0, 1, 0, 0},   {1, 1, 0, 0},
-            {0, 0, 1, 0},   {1, 0, 1, 0},   {0, 1, 1, 0},   {1, 1, 1, 0},
-            {0, 0, 0, 1},   {1, 0, 0, 1},   {0, 1, 0, 1},   {1, 1, 0, 1},
-            {0, 0, 1, 1},   {1, 0, 1, 1},   {0, 1, 1, 1},   {1, 1, 1, 1},
-        };
-
         XMVECTOR n0, n1, n2, n3;
         XMVECTOR t0, t1;
         XMVECTOR dp;
-        int bitmask;
+        XMCHAR4 bytemask;
 
         // Load light vector, unaligned
         XMVECTOR lp = XMLoadFloat4((XMFLOAT4*)(&lightPos.x));
@@ -1657,11 +1703,11 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
                 XMVectorPermute<0, 1, 4, 5>(t0, t1),    // x0+z0 x1+z1 x2+z2 x3+z3
                 XMVectorPermute<6, 7, 2, 3>(t1, t0));   // y0+w0 y1+w1 y2+w2 y3+w3
 
-            bitmask = XMVector4GreaterR(dp, g_XMZero);
+            bytemask = XMVector4GreaterByteMask(dp, g_XMZero);
 
             // Convert 4-bits mask to 4 bytes, and store results.
-            *reinterpret_cast<uint32*>(lightFacings) =
-                *reinterpret_cast<const uint32*>(msMaskMapping[bitmask]);
+            *reinterpret_cast<uint32*>(lightFacings) = 0x01010101 &
+                *reinterpret_cast<const uint32*>(&bytemask);
             lightFacings += 4;
         }
 
@@ -1687,11 +1733,11 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
                 XMVectorPermute<0, 1, 4, 5>(t0, t1),    // x0+z0 x1+z1 x2+z2 x2+z2
                 XMVectorPermute<6, 7, 2, 3>(t1, t0));   // y0+w0 y1+w1 y2+w2 y2+w2
 
-            bitmask = XMVector4GreaterR(dp, g_XMZero);
+            bytemask = XMVector4GreaterByteMask(dp, g_XMZero);
 
-            lightFacings[0] = msMaskMapping[bitmask][0];
-            lightFacings[1] = msMaskMapping[bitmask][1];
-            lightFacings[2] = msMaskMapping[bitmask][2];
+            lightFacings[0] = 0x01 & bytemask.c[0];
+            lightFacings[1] = 0x01 & bytemask.c[1];
+            lightFacings[2] = 0x01 & bytemask.c[2];
             break;
 
         case 2:
@@ -1708,10 +1754,10 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
                 XMVectorSwizzle<0, 1, 0, 1>(t0),        // x0+z0 x1+z1 x0+z0 x1+z1
                 XMVectorSwizzle<2, 3, 2, 3>(t0));   // y0+w0 y1+w1 y0+w0 y1+w1
 
-            bitmask = XMVector4GreaterR(dp, g_XMZero);
+            bytemask = XMVector4GreaterByteMask(dp, g_XMZero);
 
-            lightFacings[0] = msMaskMapping[bitmask][0];
-            lightFacings[1] = msMaskMapping[bitmask][1];
+            lightFacings[0] = 0x01 & bytemask.c[0];
+            lightFacings[1] = 0x01 & bytemask.c[1];
             break;
 
         case 1:
@@ -1726,9 +1772,9 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
                 XMVectorSplatX(t0),      // x0+z0 x0+z0 x0+z0 x0+z0
                 XMVectorSplatZ(t0));     // y0+w0 y0+w0 y0+w0 y0+w0
 
-            bitmask = XMVector4GreaterR(dp, g_XMZero);
+            bytemask = XMVector4GreaterByteMask(dp, g_XMZero);
 
-            lightFacings[0] = msMaskMapping[bitmask][0];
+            lightFacings[0] = 0x01 & bytemask.c[0];
             break;
         }
     }

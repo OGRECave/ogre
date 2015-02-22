@@ -122,7 +122,7 @@ namespace Ogre {
 
         Note that you can switch between methods at any time at runtime.
     */
-    enum InstancingTheadedCullingMethod
+    enum InstancingThreadedCullingMethod
     {
         INSTANCING_CULLING_SINGLETHREAD,
         INSTANCING_CULLING_THREADED,
@@ -908,7 +908,7 @@ namespace Ogre {
         UpdateLodRequest                mUpdateLodRequest;
         UpdateTransformRequest          mUpdateTransformRequest;
         ObjectMemoryManagerVec const    *mUpdateBoundsRequest;
-        InstancingTheadedCullingMethod  mInstancingThreadedCullingMethod;
+        InstancingThreadedCullingMethod mInstancingThreadedCullingMethod;
         InstanceBatchCullRequest        mInstanceBatchCullRequest;
         UniformScalableTask *mUserTask;
         RequestType         mRequestType;
@@ -1053,7 +1053,7 @@ namespace Ogre {
         /** Constructor.
         */
         SceneManager(const String& instanceName, size_t numWorkerThreads,
-                    InstancingTheadedCullingMethod threadedCullingMethod);
+                    InstancingThreadedCullingMethod threadedCullingMethod);
 
         /** Default destructor.
         */
@@ -1102,8 +1102,10 @@ namespace Ogre {
 
         /** Creates a camera to be managed by this scene manager.
             @remarks
-                This camera must be added to the scene at a later time using
-                the attachObject method of the SceneNode class.
+                This camera is automatically added to the scene by being attached to the Root
+                Scene Node before returning. If you want to use your own SceneNode for this
+                camera, you'll have to detach it first
+                (can be done via camera->detachFromParent();)
             @param name
                 Name to give the new camera. Must be unique.
             @param notShadowCaster
@@ -1152,13 +1154,10 @@ namespace Ogre {
 
         /** Creates a light for use in the scene.
             @remarks
-                Lights can either be in a fixed position and independent of the
-                scene graph, or they can be attached to SceneNodes so they derive
-                their position from the parent node. Either way, they are created
-                using this method so that the SceneManager manages their
-                existence.
-            @param
-                name The name of the new light, to identify it later.
+                The direction and position of a light is managed via
+                the scene node it is attached to. Make sure that you have
+                attached the light to a scene node (SceneNode::attachObject)
+                *before* calling Light::setDirection or Light::setPosition.
         */
         virtual Light* createLight();
 
@@ -1709,7 +1708,7 @@ namespace Ogre {
         /// @See mTmpVisibleObjects
         VisibleObjectsPerThreadArray& _getTmpVisibleObjectsList()           { return mTmpVisibleObjects; }
 
-        InstancingTheadedCullingMethod getInstancingThreadedCullingMethod() const
+        InstancingThreadedCullingMethod getInstancingThreadedCullingMethod() const
                                                             { return mInstancingThreadedCullingMethod; }
 
         /** Notifies that the given MovableObject is dirty (i.e. the AABBs have changed).
@@ -3206,7 +3205,7 @@ namespace Ogre {
         Don't call directly, use SceneManagerEnumerator::createSceneManager.
         */
         virtual SceneManager* createInstance(const String& instanceName, size_t numWorkerThreads,
-                                            InstancingTheadedCullingMethod threadedCullingMethod) = 0;
+                                            InstancingThreadedCullingMethod threadedCullingMethod) = 0;
         /** Destroy an instance of a SceneManager. */
         virtual void destroyInstance(SceneManager* instance) = 0;
 

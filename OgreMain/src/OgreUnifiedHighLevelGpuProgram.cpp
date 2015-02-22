@@ -208,6 +208,14 @@ namespace Ogre
             return false;
     }
     //-----------------------------------------------------------------------
+    ushort UnifiedHighLevelGpuProgram::getNumberOfPosesIncluded(void) const
+    {
+        if (!_getDelegate().isNull())
+            return _getDelegate()->getNumberOfPosesIncluded();
+        else
+            return 0;
+    }
+    //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::isVertexTextureFetchRequired(void) const
     {
         if (!_getDelegate().isNull())

@@ -759,6 +759,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         bool blankTerrain = false;
         //blankTerrain = true;
 
+        if (!Ogre::ResourceGroupManager::getSingleton().resourceGroupExists("Terrain"))
+            Ogre::ResourceGroupManager::getSingleton().createResourceGroup("Terrain");
+
         mTerrainGlobals = OGRE_NEW TerrainGlobalOptions();
 
         // Bugfix for D3D11 Render System because of pixel format incompatibility when using
@@ -878,7 +881,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         sn->attachObject(e);
         mHouseList.push_back(e);
 
-        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox", 5000);
+        mSceneMgr->setSkyBox(true, "Examples/CloudyNoonSkyBox");
 
 
     }
@@ -888,12 +891,21 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         if (mTerrainPaging)
         {
             OGRE_DELETE mTerrainPaging;
+            mTerrainPaging = 0;
             OGRE_DELETE mPageManager;
+            mPageManager = 0;
         }
-        else
+        else if(mTerrainGroup)
+        {
             OGRE_DELETE mTerrainGroup;
+            mTerrainGroup = 0;
+        }
 
         OGRE_DELETE mTerrainGlobals;
+        mTerrainGlobals = 0;
+
+        ResourceGroupManager::getSingleton().destroyResourceGroup("Terrain");
+
         mHouseList.clear();
 
         SdkSample::_shutdown();

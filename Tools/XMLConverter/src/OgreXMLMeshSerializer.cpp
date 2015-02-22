@@ -342,6 +342,7 @@ namespace v1 {
                     }
                 }
             }
+            ibuf->unlock();
         }
 
         // M_GEOMETRY chunk (Optional: present only if useSharedVertices = false)
@@ -1526,6 +1527,8 @@ namespace v1 {
                     }
 
                 }
+
+                ibuf->unlock();
             }
 
         }
@@ -1592,7 +1595,6 @@ namespace v1 {
             if (usageElem->ValueStr() == "lodmanual")
             {
                 readLodUsageManual(usageElem, i);
-                
             }
             else if (usageElem->ValueStr() == "lodgenerated")
             {

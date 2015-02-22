@@ -28,7 +28,6 @@ out block
 } outVs;
 
 // START UNIFORM DECLARATION
-@insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @property( texture_matrix )layout(binding = 1) uniform samplerBuffer animationMatrixBuf;@end

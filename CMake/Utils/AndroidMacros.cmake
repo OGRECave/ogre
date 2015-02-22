@@ -16,6 +16,16 @@ macro(add_static_libs LIB_DIR)
     SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\n    LOCAL_STATIC_LIBRARIES\t+= ")
 endmacro(add_static_libs)
 
+macro(add_static_libs_from_paths)
+    foreach(LIB ${ARGN})
+        get_filename_component(LIB_NAME ${LIB} NAME_WE)
+        string(SUBSTRING ${LIB_NAME} 3 -1 LIB_NAME) # strip lib prefix
+        
+        set(HEADERS "${HEADERS}# ${LIB_NAME}\n\tinclude $(CLEAR_VARS)\n\tLOCAL_MODULE    := ${LIB_NAME}\n\tLOCAL_SRC_FILES := ${LIB}\n\tinclude $(PREBUILT_STATIC_LIBRARY)\n\n")
+        set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS} ${LIB_NAME}")
+    endforeach()
+    set(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\n    LOCAL_STATIC_LIBRARIES\t+= ")
+endmacro(add_static_libs_from_paths)
 
 macro(create_android_proj ANDROID_PROJECT_TARGET)
     ##################################################################
@@ -45,11 +55,20 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	endforeach(DEPENDENCY ${DEPENDENCIES})
 	add_static_libs("${OGRE_BINARY_DIR}/lib" ${DEPEND_STATIC_LIBS})
 	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
-        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@"  "glsl_optimizer" "glcpp-library" "mesa")
+        add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_NDK_ABI_NAME@"  "glsl_optimizer" "glcpp-library" "mesa")
 	endif()
-	
-	add_static_libs("${OGRE_DEPENDENCIES_DIR}/lib/@ANDROID_ABI@" "OIS" "freetype" "FreeImage" "zlib" "zzip")
-	
+
+	if(OGRE_CONFIG_ENABLE_FREEIMAGE)
+	    add_static_libs_from_paths(${FreeImage_LIBRARY_REL})
+    endif()
+
+    if(OGRE_USE_BOOST)
+       set(OGRE_BOOST_INCLUDES ${Boost_INCLUDE_DIRS})       
+	   add_static_libs_from_paths(${Boost_LIBRARIES})
+    endif()
+
+    add_static_libs_from_paths(${OIS_LIBRARY_REL} ${FREETYPE_LIBRARY_REL} ${ZZip_LIBRARY_REL})
+
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
       SET(NDK_BUILD_EXECUTABLE "ndk-build")
@@ -84,7 +103,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	file(MAKE_DIRECTORY "${NDKOUT}/src")
 
     file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static\nNDK_TOOLCHAIN_VERSION := ${ANDROID_COMPILER_VERSION}")
+    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_NDK_ABI_NAME}\nLOCAL_ARM_NEON := ${NEON}\nAPP_STL := gnustl_static\nNDK_TOOLCHAIN_VERSION := ${ANDROID_COMPILER_VERSION}")
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
 	configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
     

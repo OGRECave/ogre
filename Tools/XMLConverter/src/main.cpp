@@ -77,6 +77,14 @@ struct XmlOptions
     Serializer::Endian endian;
 };
 
+void print_version(void)
+{
+    // OgreXMLConverter <Name> (1.10.0) unstable
+    cout << "OgreXMLConverter " << OGRE_VERSION_NAME << " "
+         << "(" << OGRE_VERSION_MAJOR << "." << OGRE_VERSION_MINOR << "." << OGRE_VERSION_PATCH << ")"
+         << " " << OGRE_VERSION_SUFFIX << endl;
+}
+
 void help(void)
 {
     // Print help message
@@ -84,6 +92,7 @@ void help(void)
     cout << "Provided for OGRE by Steve Streeting" << endl << endl;
     cout << "Usage: OgreXMLConverter [options] sourcefile [destfile] " << endl;
     cout << endl << "Available options:" << endl;
+    cout << "-v             = Display version information" << endl;
     cout << "-merge [n0,n1] = Merge texcoordn0 with texcoordn1. The , separator must be" << endl;
     cout << "                 present, otherwise only n0 is provided assuming n1 = n0+1;" << endl;
     cout << "                 n0 and n1 must be in the same buffer source & adjacent" << endl;
@@ -149,8 +158,8 @@ XmlOptions parseArgs(int numArgs, char **args)
     unOpt["-d3d"] = false;
     unOpt["-gl"] = false;
     unOpt["-h"] = false;
+    unOpt["-v"] = false;
     //binOpt["-l"] = "";
-    binOpt["-v"] = "";
     //binOpt["-s"] = "Distance";
     //binOpt["-p"] = "";
     //binOpt["-f"] = "";
@@ -164,6 +173,13 @@ XmlOptions parseArgs(int numArgs, char **args)
     int startIndex = findCommandLineOpts(numArgs, args, unOpt, binOpt);
     UnaryOptionList::iterator ui;
     BinaryOptionList::iterator bi;
+
+    ui = unOpt.find("-v");
+    if (ui->second)
+    {
+        print_version();
+        exit(0);
+    }
 
     ui = unOpt.find("-h");
     if (ui->second)

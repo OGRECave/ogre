@@ -553,6 +553,8 @@ namespace Ogre
         mPreparedPass.viewProjMatrix    = projectionMatrix * viewMatrix;
         mPreparedPass.viewMatrix        = viewMatrix;
 
+        mPreparedPass.shadowMaps.clear();
+
         if( !casterPass )
         {
             int32 numShadowMaps = getProperty( HlmsBaseProp::NumShadowMaps );
@@ -793,7 +795,6 @@ namespace Ogre
 #endif
             }
 
-            mPreparedPass.shadowMaps.clear();
             mPreparedPass.shadowMaps.reserve( numShadowMaps );
             for( int32 i=0; i<numShadowMaps; ++i )
                 mPreparedPass.shadowMaps.push_back( shadowNode->getLocalTextures()[i].textures[0] );

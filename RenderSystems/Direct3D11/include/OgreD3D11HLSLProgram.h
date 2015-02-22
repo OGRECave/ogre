@@ -86,6 +86,25 @@ namespace Ogre {
 
     protected:
 
+        struct InputLayoutVaoBind
+        {
+            uint32              vaoName;
+            ID3D11InputLayout   *inputLayout;
+
+            InputLayoutVaoBind() {}
+
+            InputLayoutVaoBind( uint32 _vaoName, ID3D11InputLayout *_inputLayout ) :
+                vaoName( _vaoName ),
+                inputLayout( _inputLayout )
+            {
+            }
+
+            bool operator < ( const InputLayoutVaoBind &_r ) const
+            {
+                return this->vaoName < _r.vaoName;
+            }
+        };
+
         static CmdEntryPoint msCmdEntryPoint;
         static CmdTarget msCmdTarget;
         static CmdPreprocessorDefines msCmdPreprocessorDefines;
@@ -104,7 +123,12 @@ namespace Ogre {
         void processParamElement(String prefix, LPCSTR pName, ID3D11ShaderReflectionType* varRefType);
 
         void populateDef(D3D11_SHADER_TYPE_DESC& d3dDesc, GpuConstantDefinition& def) const;
+		
+		void getDefines(String& stringBuffer, vector<D3D_SHADER_MACRO>::type& defines, const String& definesString);
 
+        typedef FastArray<InputLayoutVaoBind> InputLayoutVaoBindVec;
+        InputLayoutVaoBindVec mInputLayoutVaoBind;
+		
         String mTarget;
         String mEntryPoint;
         String mPreprocessorDefines;
@@ -120,7 +144,8 @@ namespace Ogre {
 
         D3D11Device & mDevice;
 
-        D3D11VertexDeclaration mInputVertexDeclaration;
+        /// TODO: Looks like this is dead code.
+        v1::D3D11VertexDeclaration mInputVertexDeclaration;
 
         ID3D11VertexShader* mVertexShader;
         ID3D11PixelShader* mPixelShader;
@@ -162,7 +187,7 @@ namespace Ogre {
             static _StringHash mHash;
             unsigned int mIdx;
             String mName;
-            mutable HardwareUniformBufferSharedPtr mUniformBuffer;
+            mutable v1::HardwareUniformBufferSharedPtr mUniformBuffer;
             mutable ShaderVars mShaderVars;
                 
             // Default constructor
@@ -339,6 +364,8 @@ namespace Ogre {
         // Get slot for a specific interface
         unsigned int getSubroutineSlot(const String& subroutineSlotName) const;
 
+        ID3D11InputLayout* getLayoutForVao( const VertexArrayObject *vao );
+
         void CreateVertexShader();
         void CreatePixelShader();
         void CreateGeometryShader();
@@ -350,7 +377,7 @@ namespace Ogre {
         */
         void loadFromSource(void);
 
-        D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
+        v1::D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
 
         void reinterpretGSForStreamOut(void);
         bool mReinterpretingGS;

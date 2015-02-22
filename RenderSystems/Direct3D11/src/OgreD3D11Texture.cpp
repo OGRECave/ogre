@@ -34,12 +34,12 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreException.h"
 
+// TODO: load DDS using DDSTextureLoader from DirectXTK rather than D3DX11
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && !defined(_WIN32_WINNT_WIN8)
 #define USE_D3DX11_LIBRARY
 #endif
 
 #ifdef USE_D3DX11_LIBRARY
-// D3DX11CreateShaderResourceViewFromMemory
 #include <d3dx11.h>
 #endif
 
@@ -58,10 +58,6 @@ namespace Ogre
         mp3DTex(NULL),
         mDynamicTextures(false),
         mAutoMipMapGeneration(false)
-//#ifdef USE_D3DX11_LIBRARY     
-//      , mEffect(NULL)
-//      , mEffectIndex(0)
-//#endif
     {
     }
     //---------------------------------------------------------------------
@@ -94,7 +90,7 @@ namespace Ogre
 
         D3D11Texture *other;
         // get the target
-        other = reinterpret_cast< D3D11Texture * >( target.get() );
+        other = static_cast< D3D11Texture * >( target.get() );
 
         mDevice.GetImmediateContext()->CopyResource(other->getTextureResource(), mpTex);
         if (mDevice.isError())
@@ -156,9 +152,6 @@ namespace Ogre
         SAFE_RELEASE(mp1DTex);
         SAFE_RELEASE(mp2DTex);
         SAFE_RELEASE(mp3DTex);
-//#ifdef USE_D3DX11_LIBRARY     
-//      SAFE_RELEASE(mEffect(NULL));
-//#endif
     }
     //---------------------------------------------------------------------
     void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
@@ -236,8 +229,8 @@ namespace Ogre
         MemoryDataStreamPtr memoryptr=MemoryDataStreamPtr(new MemoryDataStream(dstream));
 
         D3DX11_IMAGE_LOAD_INFO loadInfo;
-        loadInfo.Usage          = D3D11Mappings::_getUsage(mUsage);
-        loadInfo.CpuAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+        loadInfo.Usage          = D3D11Mappings::_getUsage(_getTextureUsage());
+		loadInfo.CpuAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         if(mUsage & TU_DYNAMIC)
         {
             loadInfo.MipLevels = 1;
@@ -307,7 +300,10 @@ namespace Ogre
                     mTextureType = TEX_TYPE_2D_ARRAY;
                 else
                     mTextureType = TEX_TYPE_2D;
-
+				
+				//TODO: move this line to a proper place.
+				_setSrcAttributes(desc.Width, desc.Height, 1, mFormat);
+				
                 _create2DResourceView();
             }
             break;
@@ -398,9 +394,9 @@ namespace Ogre
         desc.MipLevels      = numMips;
         desc.ArraySize      = 1;
         desc.Format         = d3dPF;
-        desc.Usage          = D3D11Mappings::_getUsage(mUsage);
-        desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
-        desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
+		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
+		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
 
         // create the texture
@@ -412,8 +408,9 @@ namespace Ogre
         if (FAILED(hr) || mDevice.isError())
         {
             this->freeInternalResources();
-            String errorDescription = mDevice.getErrorDescription();
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error creating texture\nError Description:" + errorDescription, 
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+				"Error creating texture\nError Description:" + errorDescription,
                 "D3D11Texture::_create1DTex" );
         }
 
@@ -441,19 +438,12 @@ namespace Ogre
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
                 "D3D11Texture::_create1DTex");
         }
 
-//#ifdef USE_D3DX11_LIBRARY
-//      ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
-//      v->AsShaderResource()->SetResource(mpShaderResourceView);
-//#endif
-
-
         this->_setFinalAttributes(desc.Width, 1, 1, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
-
     }
     //---------------------------------------------------------------------
     inline bool IsPowerOfTwo(unsigned int n)                { return ((n&(n-1))==0);                    }
@@ -474,10 +464,9 @@ namespace Ogre
             d3dPF == DXGI_FORMAT_BC4_TYPELESS || d3dPF == DXGI_FORMAT_BC4_UNORM || d3dPF == DXGI_FORMAT_BC4_SNORM ||
             d3dPF == DXGI_FORMAT_BC5_TYPELESS || d3dPF == DXGI_FORMAT_BC5_UNORM || d3dPF == DXGI_FORMAT_BC5_SNORM ||
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#endif
             d3dPF == DXGI_FORMAT_BC6H_TYPELESS || d3dPF == DXGI_FORMAT_BC6H_UF16 || d3dPF == DXGI_FORMAT_BC6H_SF16 || 
             d3dPF == DXGI_FORMAT_BC7_TYPELESS || d3dPF == DXGI_FORMAT_BC7_UNORM || d3dPF == DXGI_FORMAT_BC7_UNORM_SRGB ||
-
+#endif
             0;
 
         // determine total number of mipmaps including main one (d3d11 convention)
@@ -504,9 +493,9 @@ namespace Ogre
                 desc.SampleDesc.Quality = 0;
         }
 
-        desc.Usage          = D3D11Mappings::_getUsage(mUsage);
-        desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, mIsDynamic);
-        desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+        desc.Usage          = D3D11Mappings::_getUsage(_getTextureUsage());
+        desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
+        desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
 
         if (mIsDynamic)
@@ -553,7 +542,7 @@ namespace Ogre
         {
             this->freeInternalResources();
             String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Error creating texture\nError Description:" + errorDescription, 
                 "D3D11Texture::_create2DTex" );
         }
@@ -620,15 +609,10 @@ namespace Ogre
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
                 "D3D11Texture::_create2DTex");
         }
-
-//#ifdef USE_D3DX11_LIBRARY
-//      ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
-//      v->AsShaderResource()->SetResource(mpShaderResourceView);
-//#endif
 
         this->_setFinalAttributes(desc.Width, desc.Height, desc.ArraySize, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -651,14 +635,14 @@ namespace Ogre
         desc.Depth          = static_cast<UINT>(mDepth);
         desc.MipLevels      = numMips;
         desc.Format         = d3dPF;
-        desc.Usage          = D3D11Mappings::_getUsage(mUsage);
+		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
         desc.BindFlags      = D3D11_BIND_SHADER_RESOURCE;
 
-        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
            desc.BindFlags       |= D3D11_BIND_RENDER_TARGET;
 
-        desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(mUsage);
+		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
         desc.MiscFlags      = 0;
         if (mIsDynamic)
         {
@@ -677,7 +661,7 @@ namespace Ogre
         {
             this->freeInternalResources();
             String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Error creating texture\nError Description:" + errorDescription, 
                 "D3D11Texture::_create3DTex" );
         }
@@ -704,15 +688,10 @@ namespace Ogre
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "D3D11 device can't create shader resource view.\nError Description:" + errorDescription,
                 "D3D11Texture::_create3DTex");
         }
-
-//#ifdef USE_D3DX11_LIBRARY
-//      ID3DX11EffectVariable *v = mEffect->GetVariableByIndex(mEffectIndex++);
-//      v->AsShaderResource()->SetResource(mpShaderResourceView);
-//#endif
 
         this->_setFinalAttributes(desc.Width, desc.Height, desc.Depth, D3D11Mappings::_getPF(desc.Format), desc.MiscFlags);
     }
@@ -797,7 +776,7 @@ namespace Ogre
         if(mFormat == PF_UNKNOWN)
             return mBBPixelFormat;
 
-        D3D11RenderSystem* rsys = reinterpret_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
         if (rsys->_getFeatureLevel() < D3D_FEATURE_LEVEL_10_0 && mFormat == PF_L8)
         {
             // For 3D textures, PF_L8, which maps to DXGI_FORMAT_R8_UNORM, is not supported but PF_A8, which maps to DXGI_FORMAT_R8_UNORM is supported.
@@ -827,11 +806,11 @@ namespace Ogre
         unsigned int bufusage;
         if ((mUsage & TU_DYNAMIC))
         {
-            bufusage = HardwareBuffer::HBU_DYNAMIC;
+            bufusage = v1::HardwareBuffer::HBU_DYNAMIC;
         }
         else
         {
-            bufusage = HardwareBuffer::HBU_STATIC;
+            bufusage = v1::HardwareBuffer::HBU_STATIC;
         }
         if (mUsage & TU_RENDERTARGET)
         {
@@ -853,14 +832,14 @@ namespace Ogre
                 for(size_t mip=0; mip<=mNumMipmaps; ++mip)
                 { 
 
-                    D3D11HardwarePixelBuffer *buffer;
+                    v1::D3D11HardwarePixelBuffer *buffer;
                     size_t subresourceIndex = D3D11CalcSubresource(mip, face, mNumMipmaps);
                     if (getNumFaces() > 0)
                     {
                         subresourceIndex = mip;
 
                     }
-                    buffer = new D3D11HardwarePixelBuffer(
+                    buffer = new v1::D3D11HardwarePixelBuffer(
                         this, // parentTexture
                         mDevice, // device
                         subresourceIndex, // subresourceIndex
@@ -869,11 +848,11 @@ namespace Ogre
                         depth,
                         face,
                         format,
-                        (HardwareBuffer::Usage)bufusage // usage
+                        (v1::HardwareBuffer::Usage)bufusage // usage
                         ); 
 
                     mSurfaceList.push_back(
-                        HardwarePixelBufferSharedPtr(buffer)
+                        v1::HardwarePixelBufferSharedPtr(buffer)
                         );
                     width /= 2;
                     height /= 2;
@@ -885,7 +864,7 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    HardwarePixelBufferSharedPtr D3D11Texture::getBuffer(size_t face, size_t mipmap) 
+    v1::HardwarePixelBufferSharedPtr D3D11Texture::getBuffer(size_t face, size_t mipmap)
     {
         if(face >= getNumFaces())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "A three dimensional cube has six faces",
@@ -896,66 +875,6 @@ namespace Ogre
         size_t idx = face*(mNumMipmaps+1) + mipmap;
         assert(idx < mSurfaceList.size());
         return mSurfaceList[idx];
-    }
-    //---------------------------------------------------------------------
-    bool D3D11Texture::releaseIfDefaultPool(void)
-    {
-        if(mIsDynamic)
-        {
-            LogManager::getSingleton().logMessage(
-                "Releasing D3D11 default pool texture: " + mName);
-            // Just free any internal resources, don't call unload() here
-            // because we want the un-touched resource to keep its unloaded status
-            // after device reset.
-            freeInternalResources();
-            LogManager::getSingleton().logMessage(
-                "Released D3D11 default pool texture: " + mName);
-            return true;
-        }
-        return false;
-    }
-    //---------------------------------------------------------------------
-    bool D3D11Texture::recreateIfDefaultPool(D3D11Device &  device)
-    {
-        bool ret = false;
-        if(mIsDynamic)
-        {
-            ret = true;
-            LogManager::getSingleton().logMessage(
-                "Recreating D3D11 default pool texture: " + mName);
-            // We just want to create the texture resources if:
-            // 1. This is a render texture, or
-            // 2. This is a manual texture with no loader, or
-            // 3. This was an unloaded regular texture (preserve unloaded state)
-            if ((mIsManual && !mLoader) || (mUsage & TU_RENDERTARGET) || !isLoaded())
-            {
-                // just recreate any internal resources
-                createInternalResources();
-            }
-            // Otherwise, this is a regular loaded texture, or a manual texture with a loader
-            else
-            {
-                // The internal resources already freed, need unload/load here:
-                // 1. Make sure resource memory usage statistic correction.
-                // 2. Don't call unload() in releaseIfDefaultPool() because we want
-                //    the un-touched resource keep unload status after device reset.
-                unload();
-                // if manual, we need to recreate internal resources since load() won't do that
-                if (mIsManual)
-                    createInternalResources();
-                load();
-            }
-            LogManager::getSingleton().logMessage(
-                "Recreated D3D11 default pool texture: " + mName);
-        }
-
-        return ret;
-
-    }
-    //---------------------------------------------------------------------
-    D3D11_SHADER_RESOURCE_VIEW_DESC D3D11Texture::getShaderResourceViewDesc() const
-    {
-        return mSRVDesc;
     }
     //---------------------------------------------------------------------
     void D3D11Texture::prepareImpl( void )
@@ -1078,7 +997,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     // D3D11RenderTexture
     //---------------------------------------------------------------------
-    void D3D11RenderTexture::rebind( D3D11HardwarePixelBuffer *buffer )
+    void D3D11RenderTexture::rebind( v1::D3D11HardwarePixelBuffer *buffer )
     {
         mBuffer = buffer;
         mWidth = (unsigned int) mBuffer->getWidth();
@@ -1130,8 +1049,9 @@ namespace Ogre
 
         if (FAILED(hr) || mDevice.isError())
         {
-            String errorDescription = mDevice.getErrorDescription();
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error creating Render Target View\nError Description:" + errorDescription, 
+			String errorDescription = mDevice.getErrorDescription(hr);
+			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+				"Error creating Render Target View\nError Description:" + errorDescription,
                 "D3D11RenderTexture::rebind" );
         }
     }
@@ -1142,10 +1062,10 @@ namespace Ogre
         {
             //IDXGISurface ** pSurf = (IDXGISurface **)pData;
             //*pSurf = static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getSurface();
-            *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
+            *static_cast<v1::HardwarePixelBuffer**>(pData) = mBuffer;
             return;
         }
-        else if(name == "HWND")
+		else if(name == "HWND" || name == "WINDOW")
         {
             HWND *pHwnd = (HWND*)pData;
             *pHwnd = NULL;
@@ -1153,19 +1073,19 @@ namespace Ogre
         }
         else if(name == "isTexture")
         {
-            bool *b = reinterpret_cast< bool * >( pData );
+            bool *b = static_cast< bool * >( pData );
             *b = true;
             return;
         }
         else if(name == "BUFFER")
         {
-            *static_cast<HardwarePixelBuffer**>(pData) = mBuffer;
+            *static_cast<v1::HardwarePixelBuffer**>(pData) = mBuffer;
             return;
         }
         else if( name == "ID3D11Texture2D" )
         {
             ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
-            *pBackBuffer = static_cast<D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D();
+            *pBackBuffer = static_cast<v1::D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D();
             return;
         }
         else if(name == "ID3D11RenderTargetView")
@@ -1176,7 +1096,7 @@ namespace Ogre
         }
         else if( name == "numberOfViews" )
         {
-            unsigned int* n = reinterpret_cast<unsigned int*>(pData);
+            unsigned int* n = static_cast<unsigned int*>(pData);
             *n = 1;
             return;
         }
@@ -1184,8 +1104,10 @@ namespace Ogre
         RenderTexture::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
-    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : mDevice(device),
-    RenderTexture(buffer, 0)
+    D3D11RenderTexture::D3D11RenderTexture( const String &name, v1::D3D11HardwarePixelBuffer *buffer,
+                                            D3D11Device & device ) :
+        mDevice(device),
+        RenderTexture(buffer, 0)
     {
         mName = name;
 

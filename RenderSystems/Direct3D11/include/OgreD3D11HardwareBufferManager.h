@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 
 namespace Ogre {
+namespace v1 {
 
     /** Implementation of HardwareBufferManager for D3D11. */
     class D3D11HardwareBufferManagerBase : public HardwareBufferManagerBase
@@ -66,18 +67,6 @@ namespace Ogre {
         HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "");
-
-        /** Release all buffers in the default memory pool. 
-        @remarks
-        Method for dealing with lost devices.
-        */
-        void releaseDefaultPoolResources(void);
-        /** Recreate all buffers in the default memory pool. 
-        @remarks
-        Method for dealing with lost devices.
-        */
-        void recreateDefaultPoolResources(void);
-
     };
 
     /// D3D11HardwareBufferManagerBase as a Singleton
@@ -95,7 +84,7 @@ namespace Ogre {
         }
     };
 
-
+}
 }
 
 

@@ -221,7 +221,6 @@ namespace Ogre
 
             size_t poolSize = std::max( mDefaultPoolSize[vboFlag], sizeBytes );
 
-            //TODO: Deal with Out of memory errors
             //No luck, allocate a new buffer.
             OCGE( glGenBuffers( 1, &newVbo.vboName ) );
             OCGE( glBindBuffer( GL_ARRAY_BUFFER, newVbo.vboName ) );
@@ -398,7 +397,7 @@ namespace Ogre
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
@@ -456,7 +455,7 @@ namespace Ogre
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
@@ -505,7 +504,7 @@ namespace Ogre
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         ConstBufferPacked *retVal = OGRE_NEW GL3PlusConstBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
@@ -553,7 +552,7 @@ namespace Ogre
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
-        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName,
+        GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
@@ -604,7 +603,7 @@ namespace Ogre
             allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
 
             Vbo &vbo = mVbos[vboFlag][vboIdx];
-            bufferInterface = new GL3PlusBufferInterface( 0, vbo.vboName, vbo.dynamicBuffer );
+            bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName, vbo.dynamicBuffer );
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
@@ -779,6 +778,7 @@ namespace Ogre
     {
         Vao vao;
 
+        vao.operationType = opType;
         vao.vertexBuffers.reserve( vertexBuffers.size() );
 
         {
@@ -828,7 +828,8 @@ namespace Ogre
 
         while( itor != end && !bFound )
         {
-            if( itor->indexBufferVbo == vao.indexBufferVbo &&
+            if( itor->operationType == vao.operationType &&
+                itor->indexBufferVbo == vao.indexBufferVbo &&
                 itor->indexType == vao.indexType &&
                 itor->vertexBuffers == vao.vertexBuffers )
             {
@@ -847,21 +848,32 @@ namespace Ogre
             itor = mVaos.begin() + mVaos.size() - 1;
         }
 
-        size_t idx = mVertexArrayObjects.size();
-
-        const int bitsOpType = 3;
-        const int bitsVaoGl  = 2;
-        const uint32 maskOpType = OGRE_RQ_MAKE_MASK( bitsOpType );
+        //Mix mNumGeneratedVaos with the GL Vao for better sorting purposes:
+        //  If we only use the GL's vao, the RQ will sort Meshes with
+        //  multiple submeshes mixed with other meshes.
+        //  For cache locality, and assuming all of them have the same GL vao,
+        //  we prefer the RQ to sort:
+        //      1. Mesh A - SubMesh 0
+        //      2. Mesh A - SubMesh 1
+        //      3. Mesh B - SubMesh 0
+        //      4. Mesh B - SubMesh 1
+        //      5. Mesh D - SubMesh 0
+        //  If we don't mix mNumGeneratedVaos in it; the following could be possible:
+        //      1. Mesh B - SubMesh 1
+        //      2. Mesh D - SubMesh 0
+        //      3. Mesh A - SubMesh 1
+        //      4. Mesh B - SubMesh 0
+        //      5. Mesh A - SubMesh 0
+        //  Thus thrashing the cache unnecessarily.
+        const int bitsVaoGl  = 5;
         const uint32 maskVaoGl  = OGRE_RQ_MAKE_MASK( bitsVaoGl );
-        const uint32 maskVao    = OGRE_RQ_MAKE_MASK( RqBits::MeshBits - bitsOpType - bitsVaoGl );
+        const uint32 maskVao    = OGRE_RQ_MAKE_MASK( RqBits::MeshBits - bitsVaoGl );
 
-        const uint32 shiftOpType    = RqBits::MeshBits - bitsOpType;
-        const uint32 shiftVaoGl     = shiftOpType - bitsVaoGl;
+        const uint32 shiftVaoGl     = RqBits::MeshBits - bitsVaoGl;
 
         uint32 renderQueueId =
-                ( (opType & maskOpType) << shiftOpType ) |
                 ( (itor->vaoName & maskVaoGl) << shiftVaoGl ) |
-                (idx & maskVao);
+                (mNumGeneratedVaos & maskVao);
 
         GL3PlusVertexArrayObject *retVal = OGRE_NEW GL3PlusVertexArrayObject( itor->vaoName,
                                                                               renderQueueId,
@@ -892,6 +904,8 @@ namespace Ogre
             {
 				GLuint vaoName = glVao->getVaoName();
                 OCGE( glDeleteVertexArrays( 1, &vaoName ) );
+
+                efficientVectorRemove( mVaos, itor );
             }
         }
 

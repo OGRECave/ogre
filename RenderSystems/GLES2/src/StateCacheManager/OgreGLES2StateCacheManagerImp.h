@@ -41,9 +41,9 @@ namespace Ogre
     class _OgreGLES2Export GLES2StateCacheManagerImp : public StateCacheAlloc
     {
     private:
-        typedef HashMap<GLenum, GLuint> BindBufferMap;
-        typedef HashMap<GLenum, GLint> TexParameteriMap;
-        typedef HashMap<GLenum, GLfloat> TexParameterfMap;
+        typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;
+        typedef OGRE_HashMap<GLenum, GLint> TexParameteriMap;
+        typedef OGRE_HashMap<GLenum, GLfloat> TexParameterfMap;
 
         struct TextureUnitParams
         {
@@ -57,7 +57,7 @@ namespace Ogre
             TexParameterfMap mTexParameterfMap;
         };
 
-        typedef HashMap<GLuint, TextureUnitParams> TexUnitsMap;
+        typedef OGRE_HashMap<GLuint, TextureUnitParams> TexUnitsMap;
 
         /* These variables are used for caching OpenGL state.
          They are cached because state changes can be quite expensive,

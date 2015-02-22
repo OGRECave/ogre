@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11Device.h"
 
 namespace Ogre {
+namespace v1 {
 
     //---------------------------------------------------------------------
     D3D11HardwareUniformBuffer::D3D11HardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, HardwareBuffer::Usage usage, 
@@ -50,61 +51,51 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     void* D3D11HardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
-    {
-        return mBufferImpl->lock(offset, length, options);
-    }
-    //---------------------------------------------------------------------
-    void D3D11HardwareUniformBuffer::unlock(void)
-    {
-        mBufferImpl->unlock();
-    }
-    //---------------------------------------------------------------------
-    void D3D11HardwareUniformBuffer::readData(size_t offset, size_t length, void* pDest)
-    {
-        mBufferImpl->readData(offset, length, pDest);
-    }
-    //---------------------------------------------------------------------
-    void D3D11HardwareUniformBuffer::writeData(size_t offset, size_t length, const void* pSource,
-        bool discardWholeBuffer)
-    {
-        mBufferImpl->writeData(offset, length, pSource, discardWholeBuffer);
-    }
-    //---------------------------------------------------------------------
-    void D3D11HardwareUniformBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
-        size_t dstOffset, size_t length, bool discardWholeBuffer)
-    {
-        // check if the other buffer is also a D3D11HardwareVertexBuffer
-        if (srcBuffer.isSystemMemory())
-        {
-            // src is not a D3D11HardwareVertexBuffer - use default copy
-            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
-        }
-        else
-        {
-            // src is a D3D11HardwareUniformBuffer use d3d11 optimized copy
-            D3D11HardwareUniformBuffer& d3dBuf = static_cast<D3D11HardwareUniformBuffer&>(srcBuffer);
-            mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
-        }
-    }
-    //---------------------------------------------------------------------
-    bool D3D11HardwareUniformBuffer::isLocked(void) const
-    {
-        return mBufferImpl->isLocked();
-    }
-    //---------------------------------------------------------------------
-    bool D3D11HardwareUniformBuffer::releaseIfDefaultPool(void)
-    {
-        return true;
-    }
-    //---------------------------------------------------------------------
-    bool D3D11HardwareUniformBuffer::recreateIfDefaultPool(D3D11Device & device)
-    {
-        return true;
-    }
-    //---------------------------------------------------------------------
-    ID3D11Buffer * D3D11HardwareUniformBuffer::getD3DConstantBuffer( void ) const
-    {
-        return mBufferImpl->getD3DBuffer();
-    }
+	{
+		return mBufferImpl->lock(offset, length, options);
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareUniformBuffer::unlock(void)
+	{
+		mBufferImpl->unlock();
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareUniformBuffer::readData(size_t offset, size_t length, void* pDest)
+	{
+		mBufferImpl->readData(offset, length, pDest);
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareUniformBuffer::writeData(size_t offset, size_t length, const void* pSource,
+		bool discardWholeBuffer)
+	{
+		mBufferImpl->writeData(offset, length, pSource, discardWholeBuffer);
+	}
+	//---------------------------------------------------------------------
+	void D3D11HardwareUniformBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
+		size_t dstOffset, size_t length, bool discardWholeBuffer)
+	{
+		// check if the other buffer is also a D3D11HardwareVertexBuffer
+		if (srcBuffer.isSystemMemory())
+		{
+			// src is not a D3D11HardwareVertexBuffer - use default copy
+			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+		}
+		else
+		{
+			// src is a D3D11HardwareUniformBuffer use d3d11 optimized copy
+			D3D11HardwareUniformBuffer& d3dBuf = static_cast<D3D11HardwareUniformBuffer&>(srcBuffer);
+			mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
+		}
+	}
+	//---------------------------------------------------------------------
+	bool D3D11HardwareUniformBuffer::isLocked(void) const
+	{
+		return mBufferImpl->isLocked();
+	}
+	//---------------------------------------------------------------------
+	ID3D11Buffer * D3D11HardwareUniformBuffer::getD3DConstantBuffer( void ) const
+	{
+		return mBufferImpl->getD3DBuffer();
+	}
 }
-
+}

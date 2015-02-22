@@ -1155,7 +1155,7 @@ namespace v1 {
         }
     }
     //---------------------------------------------------------------------
-    void Mesh::_setLodUsage(unsigned short level, MeshLodUsage& usage)
+    void Mesh::_setLodUsage(unsigned short level, const MeshLodUsage& usage)
     {
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
@@ -1218,6 +1218,7 @@ namespace v1 {
             (*isub)->removeLodLevels();
         }
 
+        bool edgeListWasBuilt = isEdgeListBuilt();
         freeEdgeList();
         mMeshLodUsageList.clear();
         mLodValues.clear();

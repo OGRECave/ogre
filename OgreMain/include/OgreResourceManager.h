@@ -536,8 +536,8 @@ namespace Ogre {
 
 
     public:
-        typedef HashMap< String, ResourcePtr > ResourceMap;
-        typedef HashMap< String, ResourceMap > ResourceWithGroupMap;
+        typedef OGRE_HashMap< String, ResourcePtr > ResourceMap;
+        typedef OGRE_HashMap< String, ResourceMap > ResourceWithGroupMap;
         typedef map<ResourceHandle, ResourcePtr>::type ResourceHandleMap;
     protected:
         ResourceHandleMap mResourcesByHandle;

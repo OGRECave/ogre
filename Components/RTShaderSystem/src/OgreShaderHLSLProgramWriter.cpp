@@ -83,6 +83,8 @@ void HLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_UINT2] = "uint2";
     mGpuConstTypeMap[GCT_UINT3] = "uint3";
     mGpuConstTypeMap[GCT_UINT4] = "uint4";
+	mGpuConstTypeMap[GCT_SAMPLER2DARRAY] = "Texture2DArray";
+	
 
     mParamSemanticMap[Parameter::SPS_POSITION] = "POSITION";
     mParamSemanticMap[Parameter::SPS_BLEND_WEIGHTS] = "BLENDWEIGHT";
@@ -193,7 +195,7 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
 
     GpuConstantType paramType = parameter->getType();
 
-    if (isHlsl4 && paramType >= GCT_SAMPLER1D && paramType <= GCT_SAMPLERCUBE)
+	if (isHlsl4 && paramType >= GCT_SAMPLER1D && paramType <= GCT_SAMPLERCUBE)
         os<<mGpuConstTypeMapV4[paramType];
     else
         os<<mGpuConstTypeMap[paramType];
@@ -212,7 +214,7 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
             os << " : register(s" << parameter->getIndex() << ")";      
 
     }
-    else if (parameter->getType() == GCT_SAMPLER_STATE)
+	else if (parameter->getType() == GCT_SAMPLER_STATE)
     {
         os << " : register(s" << parameter->getIndex() << ")";      
     }

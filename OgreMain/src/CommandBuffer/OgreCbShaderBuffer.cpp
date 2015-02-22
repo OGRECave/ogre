@@ -38,45 +38,146 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    CbShaderBuffer::CbShaderBuffer( uint16 _slot, ConstBufferPacked *_bufferPacked,
+    CbShaderBuffer::CbShaderBuffer( ShaderType shaderType, uint16 _slot,
+                                    ConstBufferPacked *_bufferPacked,
                                     uint32 _bindOffset, uint32 _bindSizeBytes ) :
-        CbBase( CB_SET_CONSTANT_BUFFER ),
+        CbBase( CB_SET_CONSTANT_BUFFER_VS + shaderType ),
         slot( _slot ),
         bufferPacked( _bufferPacked ),
         bindOffset( _bindOffset ),
         bindSizeBytes( _bindSizeBytes )
     {
+        assert( shaderType != NumShaderTypes );
     }
 
-    void CommandBuffer::execute_setConstantBuffer( CommandBuffer *_this,
-                                                   const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setConstantBufferVS( CommandBuffer *_this,
+                                                     const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
-
         assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
-
-        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBuffer( cmd->slot );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferVS( cmd->slot );
+    }
+    void CommandBuffer::execute_setConstantBufferPS( CommandBuffer *_this,
+                                                     const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+        assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferPS( cmd->slot );
+    }
+    void CommandBuffer::execute_setConstantBufferGS( CommandBuffer *_this,
+                                                     const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+        assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferCS( cmd->slot );
+    }
+    void CommandBuffer::execute_setConstantBufferHS( CommandBuffer *_this,
+                                                     const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+        assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferHS( cmd->slot );
+    }
+    void CommandBuffer::execute_setConstantBufferDS( CommandBuffer *_this,
+                                                     const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+        assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferDS( cmd->slot );
+    }
+    void CommandBuffer::execute_setConstantBufferCS( CommandBuffer *_this,
+                                                     const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+        assert( dynamic_cast<ConstBufferPacked*>( cmd->bufferPacked ) );
+        static_cast<ConstBufferPacked*>( cmd->bufferPacked )->bindBufferCS( cmd->slot );
+    }
+    void CommandBuffer::execute_setConstantBufferInvalid( CommandBuffer *_this,
+                                                          const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                     "'NumShaderTypes' is not a valid parameter for this command!!!",
+                     "CommandBuffer::execute_setConstantBufferInvalid" );
     }
 
-    CbShaderBuffer::CbShaderBuffer( uint16 _slot, TexBufferPacked *_bufferPacked,
+    CbShaderBuffer::CbShaderBuffer( ShaderType shaderType, uint16 _slot,
+                                    TexBufferPacked *_bufferPacked,
                                     uint32 _bindOffset, uint32 _bindSizeBytes ) :
-        CbBase( CB_SET_TEXTURE_BUFFER ),
+        CbBase( CB_SET_TEXTURE_BUFFER_VS + shaderType ),
         slot( _slot ),
         bufferPacked( _bufferPacked ),
         bindOffset( _bindOffset ),
         bindSizeBytes( _bindSizeBytes )
     {
+        assert( shaderType != NumShaderTypes );
     }
 
-    void CommandBuffer::execute_setTextureBuffer( CommandBuffer *_this,
-                                                  const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setTextureBufferVS( CommandBuffer *_this,
+                                                    const CbBase * RESTRICT_ALIAS _cmd )
     {
         const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
 
         assert( dynamic_cast<TexBufferPacked*>( cmd->bufferPacked ) );
 
         TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
-        texBuffer->bindBuffer( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+        texBuffer->bindBufferVS( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
+    void CommandBuffer::execute_setTextureBufferPS( CommandBuffer *_this,
+                                                    const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+
+        assert( dynamic_cast<TexBufferPacked*>( cmd->bufferPacked ) );
+
+        TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
+        texBuffer->bindBufferPS( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
+    void CommandBuffer::execute_setTextureBufferGS( CommandBuffer *_this,
+                                                    const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+
+        assert( dynamic_cast<TexBufferPacked*>( cmd->bufferPacked ) );
+
+        TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
+        texBuffer->bindBufferGS( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
+    void CommandBuffer::execute_setTextureBufferHS( CommandBuffer *_this,
+                                                    const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+
+        assert( dynamic_cast<TexBufferPacked*>( cmd->bufferPacked ) );
+
+        TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
+        texBuffer->bindBufferHS( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
+    void CommandBuffer::execute_setTextureBufferDS( CommandBuffer *_this,
+                                                    const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+
+        assert( dynamic_cast<TexBufferPacked*>( cmd->bufferPacked ) );
+
+        TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
+        texBuffer->bindBufferDS( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
+    void CommandBuffer::execute_setTextureBufferCS( CommandBuffer *_this,
+                                                    const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        const CbShaderBuffer *cmd = static_cast<const CbShaderBuffer*>( _cmd );
+
+        assert( dynamic_cast<TexBufferPacked*>( cmd->bufferPacked ) );
+
+        TexBufferPacked *texBuffer = static_cast<TexBufferPacked*>( cmd->bufferPacked );
+        texBuffer->bindBufferCS( cmd->slot, cmd->bindOffset, cmd->bindSizeBytes );
+    }
+    void CommandBuffer::execute_setTextureBufferInvalid( CommandBuffer *_this,
+                                                         const CbBase * RESTRICT_ALIAS _cmd )
+    {
+        OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                     "'NumShaderTypes' is not a valid parameter for this command!!!",
+                     "CommandBuffer::execute_setTextureBufferInvalid" );
     }
 
     CbIndirectBuffer::CbIndirectBuffer( IndirectBufferPacked *_indirectBuffer ) :

@@ -25,7 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-void SGX_TriplanarTexturing(in float4 diffuse, in float3 normal, in float4 position, in sampler2D texFromX, in sampler2D texFromY, in sampler2D texFromZ, in float3 parameters, out float4 cOut) {
+void SGX_TriplanarTexturing(in float4 diffuse, in float3 normal, in float4 position, in SamplerData2D texFromX, in SamplerData2D texFromY, in SamplerData2D texFromZ, in float3 parameters, out float4 cOut) {
 	float3 blendWeights = abs(normalize(normal));
 	blendWeights = blendWeights - parameters.y;
 	blendWeights = pow(max(blendWeights, 0), parameters.z);
@@ -36,9 +36,9 @@ void SGX_TriplanarTexturing(in float4 diffuse, in float3 normal, in float4 posit
 	float2 coord2 = (position.zx + nLength) * parameters.x;
 	float2 coord3 = (position.xy + nLength) * parameters.x;
 	
-	float4 col1 = tex2D(texFromX, coord1);
-	float4 col2 = tex2D(texFromY, coord2);
-	float4 col3 = tex2D(texFromZ, coord3);
+	float4 col1 = FFP_SampleTexture(texFromX, coord1);
+	float4 col2 = FFP_SampleTexture(texFromY, coord2);
+	float4 col3 = FFP_SampleTexture(texFromZ, coord3);
 	cOut = diffuse * float4(col1.xyz * blendWeights.x +
 		col2.xyz * blendWeights.y +
 		col3.xyz * blendWeights.z, 1);

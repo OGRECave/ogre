@@ -48,6 +48,15 @@ namespace Ogre
         size_t  mUnmapTicket;
         GL3PlusDynamicBuffer *mDynamicBuffer;
 
+        /** @see BufferPacked::map.
+        @param bAdvanceFrame
+            When false, it doesn't really advance the mBuffer->mFinalBufferStart pointer,
+            it just calculates the next index without advancing and returns its value.
+            i.e. the value after advancing (was 0, would be incremented to 1, function returns 1).
+        @return
+            The 'next frame' index in the range [0; vaoManager->getDynamicBufferMultiplier())
+            i.e. the value after advancing (was 0, gets incremented to 1, function returns 1).
+        */
         size_t advanceFrame( bool bAdvanceFrame );
 
     public:

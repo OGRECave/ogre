@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreHardwareBuffer.h"
 
 namespace Ogre { 
-
+namespace v1 {
 
     /** Base implementation of a D3D11 buffer, dealing with all the common
     aspects.
@@ -74,12 +74,16 @@ namespace Ogre {
         /** See HardwareBuffer. We perform a hardware copy here. */
         void copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
             size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+		void copyDataImpl(HardwareBuffer& srcBuffer, size_t srcOffset,
+			size_t dstOffset, size_t length, bool discardWholeBuffer = false);
+		/// Updates the real buffer from the shadow buffer, if required
+		virtual void _updateFromShadow(void);
 
         /// Get the D3D-specific buffer
         ID3D11Buffer* getD3DBuffer(void) { return mlpD3DBuffer; }
     };
 
-
+}
 }
 
 

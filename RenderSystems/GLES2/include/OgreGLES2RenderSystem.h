@@ -49,7 +49,6 @@ namespace Ogre {
     class GLSLESGpuProgram;
     namespace v1 {
     class HardwareBufferManager;
-    }
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     class GLES2ManagedResourceManager;
 #endif
@@ -162,6 +161,10 @@ namespace Ogre {
               RenderSystem
              */
             const String& getName(void) const;
+            /** See
+              RenderSystem
+             */
+            const String& getFriendlyName(void) const;
             /** See
               RenderSystem
              */

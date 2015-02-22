@@ -36,6 +36,11 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreLogManager.h"
 #include "OgreShaderFFPRenderState.h"
+#include "OgreTechnique.h"
+#include "OgreShaderFFPAlphaTest.h"
+#include "OgreCommon.h"
+#include "OgreRenderSystem.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
 
@@ -98,6 +103,10 @@ bool FFPRenderStateBuilder::initialize()
     ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
     mFFPSubRenderStateFactoryList.push_back(curFactory);
 
+	curFactory = OGRE_NEW FFPAlphaTestFactory;	
+	ShaderGenerator::getSingleton().addSubRenderStateFactory(curFactory);
+	mFFPSubRenderStateFactoryList.push_back(curFactory);
+	
     return true;
 }
 
@@ -134,7 +143,14 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
     
     // Build fog sub state.
     buildFFPSubRenderState(FFP_FOG, FFPFog::Type, sgPass, renderState);
-    
+	
+	RenderSystem* rs = Root::getSingleton().getRenderSystem();
+	if (rs->getName().find("Direct3D11") != String::npos && 
+		sgPass->getSrcPass()->getAlphaRejectFunction() != CMPF_ALWAYS_PASS)
+	{
+		buildFFPSubRenderState(FFP_ALPHA_TEST, FFPAlphaTest::Type, sgPass, renderState);
+	}
+	
     // Resolve colour stage flags.
     resolveColourStageFlags(sgPass, renderState);
 

@@ -35,7 +35,7 @@ THE SOFTWARE.
 struct ID3D11Resource;
 
 namespace Ogre {
-
+namespace v1 {
     class D3D11HardwarePixelBuffer: public HardwarePixelBuffer
     {
     protected:
@@ -62,9 +62,6 @@ namespace Ogre {
 
         D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
 
-        /// Util functions to convert a D3D locked box to a pixel box
-        void fromD3DLock(PixelBox &rval, const DXGI_MAPPED_RECT &lrect);
-
         /// Render targets
         typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;
@@ -81,7 +78,8 @@ namespace Ogre {
         void _unmapstaticbuffer();
     public:
         D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
-            size_t width, size_t height, size_t depth, size_t face, PixelFormat format, hwGamma, HardwareBuffer::Usage usage);
+            size_t width, size_t height, size_t depth, size_t face, PixelFormat format,
+                                 HardwareBuffer::Usage usage);
 
         /// @copydoc HardwarePixelBuffer::blit
         void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
@@ -114,5 +112,6 @@ namespace Ogre {
         size_t getSubresourceIndex() const;
         size_t getFace() const;
     };
+}
 };
 #endif

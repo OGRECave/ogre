@@ -1081,6 +1081,8 @@ namespace Ogre {
         void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
         /// Get the texture filtering for the given type.
         FilterOptions getTextureFiltering(FilterType ftpye) const;
+        /// Returns true if texture filtering was not set explicitly and is determined by MaterialManager.
+        bool isDefaultFiltering() const     { return mIsDefaultFiltering; }
 
         void setTextureCompareEnabled(bool enabled);
         bool getTextureCompareEnabled() const;

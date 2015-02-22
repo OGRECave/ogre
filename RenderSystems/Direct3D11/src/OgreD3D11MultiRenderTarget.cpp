@@ -55,7 +55,7 @@ namespace Ogre
     {
         assert(attachment<OGRE_MAX_MULTIPLE_RENDER_TARGETS);
         /// Get buffer and surface to bind to
-        D3D11HardwarePixelBuffer *buffer = 0;
+        v1::D3D11HardwarePixelBuffer *buffer = 0;
         target->getCustomAttribute("BUFFER", &buffer);
         assert(buffer);
 
@@ -69,8 +69,7 @@ namespace Ogre
             if(targets[y]->getWidth() != buffer->getWidth() ||
                 targets[y]->getHeight() != buffer->getHeight())
             {
-                OGRE_EXCEPT(
-                    Exception::ERR_INVALIDPARAMS, 
+				OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                     "MultiRenderTarget surfaces are not of same size", 
                     "D3D11MultiRenderTarget::bindSurface"
                     );
@@ -132,13 +131,13 @@ namespace Ogre
         }
         else if( name == "numberOfViews" )
         {
-            uint* n = reinterpret_cast<unsigned int*>(pData);
+            uint* n = static_cast<unsigned int*>(pData);
             *n = mNumberOfViews;
             return;
         }
         else if(name == "isTexture")
         {
-            bool *b = reinterpret_cast< bool * >( pData );
+            bool *b = static_cast< bool * >( pData );
             *b = false;
             return;
         }

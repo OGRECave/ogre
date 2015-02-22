@@ -237,6 +237,9 @@ if (OGRE_INCOMPATIBLE)
   set(OGRE_LIBRARY "NOTFOUND")
 endif ()
 
+if("${OGRE_FRAMEWORK_INCLUDES}" STREQUAL NOTFOUND)
+  unset(OGRE_FRAMEWORK_INCLUDES CACHE)
+endif()
 set(OGRE_INCLUDE_DIR ${OGRE_CONFIG_INCLUDE_DIR} ${OGRE_INCLUDE_DIR} ${OGRE_FRAMEWORK_INCLUDES})
 list(REMOVE_DUPLICATES OGRE_INCLUDE_DIR)
 findpkg_finish(OGRE)
@@ -381,9 +384,10 @@ set(OGRE_COMPONENT_SEARCH_PATH_DBG
   ${OGRE_BIN_SEARCH_PATH}
 )
 
-macro(ogre_find_component COMPONENT HEADER)
+macro(ogre_find_component COMPONENT HEADER PATH_HINTS)
+  set(OGRE_${COMPONENT}_FIND_QUIETLY ${OGRE_FIND_QUIETLY})
   findpkg_begin(OGRE_${COMPONENT})
-  find_path(OGRE_${COMPONENT}_INCLUDE_DIR NAMES ${HEADER} HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES ${COMPONENT} OGRE/${COMPONENT} Components/${COMPONENT}/include)
+  find_path(OGRE_${COMPONENT}_INCLUDE_DIR NAMES ${HEADER} HINTS ${OGRE_INCLUDE_DIRS} ${OGRE_PREFIX_SOURCE} PATH_SUFFIXES ${PATH_HINTS} ${COMPONENT} OGRE/${COMPONENT} )
   set(OGRE_${COMPONENT}_LIBRARY_NAMES "Ogre${COMPONENT}${OGRE_LIB_SUFFIX}")
   get_debug_names(OGRE_${COMPONENT}_LIBRARY_NAMES)
   find_library(OGRE_${COMPONENT}_LIBRARY_REL NAMES ${OGRE_${COMPONENT}_LIBRARY_NAMES} HINTS ${OGRE_LIBRARY_DIR_REL} ${OGRE_FRAMEWORK_PATH} PATH_SUFFIXES "" "Release" "RelWithDebInfo" "MinSizeRel")
@@ -400,20 +404,29 @@ macro(ogre_find_component COMPONENT HEADER)
 	  mark_as_advanced(OGRE_${COMPONENT}_BINARY_REL OGRE_${COMPONENT}_BINARY_DBG)
     endif()
   endif()
+  unset(OGRE_${COMPONENT}_FIND_QUIETLY)
 endmacro()
 
 # look for Paging component
-ogre_find_component(Paging OgrePaging.h)
+ogre_find_component(Paging OgrePaging.h "")
 # look for Terrain component
-ogre_find_component(Terrain OgreTerrain.h)
+ogre_find_component(Terrain OgreTerrain.h "")
 # look for Property component
-ogre_find_component(Property OgreProperty.h)
+ogre_find_component(Property OgreProperty.h "")
 # look for RTShaderSystem component
-ogre_find_component(RTShaderSystem OgreRTShaderSystem.h)
+ogre_find_component(RTShaderSystem OgreRTShaderSystem.h "")
 # look for Volume component
-ogre_find_component(Volume OgreVolumePrerequisites.h)
+ogre_find_component(Volume OgreVolumePrerequisites.h "")
 # look for Overlay component
-ogre_find_component(Overlay OgreOverlaySystem.h)
+ogre_find_component(Overlay OgreOverlaySystem.h "")
+#look for HlmsPbs component
+ogre_find_component(HlmsPbs OgreHlmsPbs.h Hlms/Pbs/)
+#look for HlmsPbsMobile component
+ogre_find_component(HlmsPbsMobile OgreHlmsPbsMobile.h Hlms/PbsMobile/)
+#look for HlmsPbsMobile component
+ogre_find_component(HlmsUnlit OgreHlmsUnlit.h Hlms/Unlit)
+#look for HlmsUnlit component
+ogre_find_component(HlmsUnlitMobile OgreHlmsUnlitMobile.h Hlms/UnlitMobile)
 
 #########################################################
 # Find Ogre plugins
@@ -441,9 +454,9 @@ macro(ogre_find_plugin PLUGIN HEADER)
   get_debug_names(OGRE_${PLUGIN}_LIBRARY_NAMES)
   set(OGRE_${PLUGIN}_LIBRARY_FWK ${OGRE_LIBRARY_FWK})
   find_library(OGRE_${PLUGIN}_LIBRARY_REL NAMES ${OGRE_${PLUGIN}_LIBRARY_NAMES}
-    HINTS "${OGRE_BUILD}/lib" ${OGRE_LIBRARY_DIRS} ${OGRE_FRAMEWORK_PATH} PATH_SUFFIXES "" OGRE opt Release Release/opt RelWithDebInfo RelWithDebInfo/opt MinSizeRel MinSizeRel/opt)
+    HINTS "${OGRE_BUILD}/lib" ${OGRE_LIBRARY_DIRS} ${OGRE_FRAMEWORK_PATH} PATH_SUFFIXES "" OGRE OGRE-${OGRE_VERSION} opt Release Release/opt RelWithDebInfo RelWithDebInfo/opt MinSizeRel MinSizeRel/opt)
   find_library(OGRE_${PLUGIN}_LIBRARY_DBG NAMES ${OGRE_${PLUGIN}_LIBRARY_NAMES_DBG}
-    HINTS "${OGRE_BUILD}/lib" ${OGRE_LIBRARY_DIRS} ${OGRE_FRAMEWORK_PATH} PATH_SUFFIXES "" OGRE opt Debug Debug/opt)
+    HINTS "${OGRE_BUILD}/lib" ${OGRE_LIBRARY_DIRS} ${OGRE_FRAMEWORK_PATH} PATH_SUFFIXES "" OGRE OGRE-${OGRE_VERSION} opt Debug Debug/opt)
   make_library_set(OGRE_${PLUGIN}_LIBRARY)
 
   if (OGRE_${PLUGIN}_LIBRARY OR OGRE_${PLUGIN}_INCLUDE_DIR)

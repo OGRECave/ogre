@@ -421,8 +421,7 @@ namespace v1 {
         }
 
     }
-
-
+    //-----------------------------------------------------------------------
     void Entity::setMaterial( const MaterialPtr& material )
     {
         // Set for all subentities

@@ -488,7 +488,7 @@ namespace v1 {
         NumericTrackList::iterator j;
         for (j = mNumericTrackList.begin(); j != mNumericTrackList.end(); ++j)
         {
-            j->second->applyToAnimable(anim, weight, scale);
+            j->second->applyToAnimable(anim, timePos, weight, scale);
         }
    }
     //---------------------------------------------------------------------

@@ -39,6 +39,10 @@ THE SOFTWARE.
 #include "OgreD3D9DeviceManager.h"
 #include "OgreDepthBuffer.h"
 
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+#include "OgreD3D9StereoDriverBridge.h"
+#endif
+
 namespace Ogre
 {
     D3D9RenderWindow::D3D9RenderWindow(HINSTANCE instance)
@@ -57,6 +61,8 @@ namespace Ogre
         mUseNVPerfHUD = false;
         mWindowedWinStyle = 0;
         mFullscreenWinStyle = 0;
+		mDesiredWidth = 0;
+		mDesiredHeight = 0;
     }
 
     D3D9RenderWindow::~D3D9RenderWindow()
@@ -409,7 +415,6 @@ namespace Ogre
                 else
                 {
                     SetWindowPos(mHWnd, HWND_TOPMOST, mLeft, mTop, width, height, SWP_NOACTIVATE);
-                    //MoveWindow(mHWnd, mLeft, mTop, mWidth, mHeight, FALSE);
                     SetWindowLong(mHWnd, GWL_STYLE, getWindowStyle(mIsFullScreen));
                     SetWindowPos(mHWnd, 0, 0,0, 0,0, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
                 }
@@ -958,4 +963,12 @@ namespace Ogre
         mDeviceValid = mDevice->validate(this);
         return mDeviceValid;
     }
+	//---------------------------------------------------------------------
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+	void D3D9RenderWindow::_validateStereo()
+	{
+		mStereoEnabled = D3D9StereoDriverBridge::getSingleton().isStereoEnabled(this->getName());
+	}
+#endif
+	//---------------------------------------------------------------------
 }
