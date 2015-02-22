@@ -6,10 +6,12 @@
 	uint cellsPerTableOnGrid0= floatBitsToUint( pass.f3dData.w );
 
 	// See C++'s Forward3D::getSliceAtDepth
-	float fSlice = 1.0 - clamp( (-inPs.pos.z + f3dMinDistance) * f3dInvMaxDistance, 0.0, 1.0 );
+	/*float fSlice = 1.0 - clamp( (-inPs.pos.z + f3dMinDistance) * f3dInvMaxDistance, 0.0, 1.0 );
 	fSlice = (fSlice * fSlice) * (fSlice * fSlice);
 	fSlice = (fSlice * fSlice);
-	fSlice = floor( (1.0 - fSlice) * f3dNumSlicesSub1 );
+	fSlice = floor( (1.0 - fSlice) * f3dNumSlicesSub1 );*/
+	float fSlice = clamp( (-inPs.pos.z + f3dMinDistance) * f3dInvMaxDistance, 0.0, 1.0 );
+	fSlice = floor( fSlice * f3dNumSlicesSub1 );
 	uint slice = uint( fSlice );
 
 	//TODO: Profile performance: derive this mathematically or use a lookup table?
@@ -21,18 +23,12 @@
 	//pass.f3dGridHWW[slice].y = grid_height / renderTarget->height;
 	//pass.f3dGridHWW[slice].z = grid_width * lightsPerCell;
 	//uint sampleOffset = 0;
-	//uint sampleOffset = /*offset +*/ uint(floor( gl_FragCoord.x * pass.f3dGridHWW[0].x ) * lightsPerCell);
 	uint sampleOffset = offset +
 						uint(floor( gl_FragCoord.y * pass.f3dGridHWW[slice].y ) * pass.f3dGridHWW[slice].z) +
 						uint(floor( gl_FragCoord.x * pass.f3dGridHWW[slice].x ) * lightsPerCell);
 
 	uint numLightsInGrid = texelFetch( f3dGrid, int(sampleOffset) ).x;
 
-	/*if( numLightsInGrid > 0 )
-		finalColour.xyz = vec3( 0, 1, 0 );*/
-	//uint idx = texelFetch( f3dGrid, int(sampleOffset + 1 + 1) ).x;
-	//if( numLightsInGrid > 1 && idx == 12u )
-	//if( numLightsInGrid == 2u )
 	for( uint i=0; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
@@ -84,6 +80,17 @@
 		}
 	}
 
-	//finalColour.xyz = (numLightsInGrid / 32.0).xxx;
+	@property( hlms_forward3d_debug )
+		float occupancy = (numLightsInGrid / pass.f3dGridHWW[0].w);
+		vec3 occupCol = vec3( 0.0, 0.0, 0.0 );
+		if( occupancy < 1.0 / 3.0 )
+			occupCol.z = occupancy;
+		else if( occupancy < 2.0 / 3.0 )
+			occupCol.y = occupancy;
+		else
+			occupCol.x = occupancy;
+
+		finalColour.xyz = mix( finalColour.xyz, occupCol.xyz, 0.95f );
+	@end
 @end
 @end

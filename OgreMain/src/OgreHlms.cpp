@@ -81,6 +81,7 @@ namespace Ogre
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
+    const IdString HlmsBaseProp::Forward3DDebug     = IdString( "hlms_forward3d_debug" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
 
     //Change per material (hash can be cached on the renderable)
@@ -1618,7 +1619,8 @@ namespace Ogre
             Forward3D *forward3D = sceneManager->getForward3D();
             if( forward3D )
             {
-                setProperty( HlmsBaseProp::Forward3D, forward3D->getNumSlices() );
+                setProperty( HlmsBaseProp::Forward3D,       forward3D->getNumSlices() );
+                setProperty( HlmsBaseProp::Forward3DDebug,  forward3D->getDebugMode() );
                 setProperty( HlmsBaseProp::VPos, 1 );
             }
 

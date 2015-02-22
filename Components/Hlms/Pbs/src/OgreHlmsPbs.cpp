@@ -844,9 +844,9 @@ namespace Ogre
                 {
                     texUnit = 3;
                     *commandBuffer->addCommand<CbShaderBuffer>() =
-                            CbShaderBuffer( 1, mGridBuffer, 0, 0 );
+                            CbShaderBuffer( PixelShader, 1, mGridBuffer, 0, 0 );
                     *commandBuffer->addCommand<CbShaderBuffer>() =
-                            CbShaderBuffer( 2, mGlobalLightListBuffer, 0, 0 );
+                            CbShaderBuffer( PixelShader, 2, mGlobalLightListBuffer, 0, 0 );
                 }
 
                 //We changed HlmsType, rebind the shared textures.

@@ -72,6 +72,8 @@ namespace Ogre
         VaoManager      *mVaoManager;
         SceneManager    *mSceneManager;
 
+        bool    mDebugMode;
+
         /// Performs the reverse of getSliceAtDepth. @see getSliceAtDepth.
         inline Real getDepthAtSlice( uint32 slice ) const;
 
@@ -123,6 +125,10 @@ namespace Ogre
         */
         void fillConstBufferData( RenderTarget *renderTarget,
                                   float * RESTRICT_ALIAS passBufferPtr ) const;
+
+        /// Turns on visualization of light cell occupancy
+        void setDebugMode( bool debugMode )                             { mDebugMode = debugMode; }
+        bool getDebugMode(void) const                                   { return mDebugMode; }
     };
 
     /** @} */

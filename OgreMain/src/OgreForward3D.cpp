@@ -43,19 +43,20 @@ namespace Ogre
     Forward3D::Forward3D( SceneManager *sceneManager ) :
         mGridBuffer( 0 ),
         mGlobalLightListBuffer( 0 ),
-        mWidth( 8 ),
+        mWidth( 4 ),
         mHeight( 4 ),
         mNumSlices( 5 ),
         /*mWidth( 1 ),
         mHeight( 1 ),
         mNumSlices( 2 ),*/
-        mLightsPerCell( 32 ),
+        mLightsPerCell( 96 ),
         mTableSize( mWidth * mHeight * mLightsPerCell ),
         mMinDistance( 3.0f ),
-        mMaxDistance( 500 ),
+        mMaxDistance( 200 ),
         mInvMaxDistance( 1.0f / mMaxDistance ),
         mVaoManager( 0 ),
-        mSceneManager( sceneManager )
+        mSceneManager( sceneManager ),
+        mDebugMode( false )
     {
         uint32 width    = mWidth;
         uint32 height   = mHeight;
@@ -116,14 +117,15 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     inline Real Forward3D::getDepthAtSlice( uint32 uSlice ) const
     {
+        /*Real normalizedDepth = uSlice / static_cast<Real>( mNumSlices-1 );
+
+        normalizedDepth = 1.0f - normalizedDepth;
+        normalizedDepth = Math::Sqrt( normalizedDepth );
+        normalizedDepth = Math::Sqrt( normalizedDepth );
+        normalizedDepth = Math::Sqrt( normalizedDepth );
+
+        normalizedDepth = 1.0f - normalizedDepth;*/
         Real normalizedDepth = uSlice / static_cast<Real>( mNumSlices-1 );
-
-        normalizedDepth = 1.0f - normalizedDepth;
-        normalizedDepth = Math::Sqrt( normalizedDepth );
-        normalizedDepth = Math::Sqrt( normalizedDepth );
-        normalizedDepth = Math::Sqrt( normalizedDepth );
-
-        normalizedDepth = 1.0f - normalizedDepth;
         return -((normalizedDepth * mMaxDistance) - mMinDistance);
     }
     //-----------------------------------------------------------------------------------
@@ -132,10 +134,11 @@ namespace Ogre
         //normalizedDepth is in range [0; 1]
         //We use the formula f(x) = 1 - (1 - (x + min)) ^ 8
         //to have a non-linear distribution of the slices across depth.
-        Real normalizedDepth = 1.0f - Math::saturate( (-depth + mMinDistance) * mInvMaxDistance );
+        /*Real normalizedDepth = 1.0f - Math::saturate( (-depth + mMinDistance) * mInvMaxDistance );
         normalizedDepth = (normalizedDepth * normalizedDepth) * (normalizedDepth * normalizedDepth);
         normalizedDepth = normalizedDepth * normalizedDepth;
-        normalizedDepth = 1.0f - normalizedDepth;
+        normalizedDepth = 1.0f - normalizedDepth;*/
+        Real normalizedDepth = Math::saturate( (-depth + mMinDistance) * mInvMaxDistance );
 
         return static_cast<uint32>( floorf( normalizedDepth * (mNumSlices-1) ) );
     }
@@ -162,6 +165,7 @@ namespace Ogre
 
     void Forward3D::collectLights( Camera *camera )
     {
+        //TODO: This const_cast is wrong. Perform a local copy and sort.
         /*const */LightListInfo &globalLightList = (LightListInfo&)mSceneManager->getGlobalLightList();
         const size_t numLights = globalLightList.lights.size();
 
@@ -211,16 +215,19 @@ namespace Ogre
         assert( mNumSlices < 256 );
 
         float projSpaceSliceEnd[256];
-        for( uint32 i=0; i<mNumSlices; ++i )
+        for( uint32 i=0; i<mNumSlices-1; ++i )
         {
             Vector4 r = projMatrix * Vector4( 0, 0, Math::Clamp( mResolutionAtSlice[i].zEnd, -farPlane, -nearPlane ), 1.0f );
             projSpaceSliceEnd[i] = r.z / r.w;
         }
 
+        projSpaceSliceEnd[mNumSlices-1] = 1.0f;
+
         LightArray::const_iterator itLight = globalLightList.lights.begin();
 
         for( size_t i=0; i<numLights; ++i )
         {
+            //TODO: Shadow casting lights should also be ignored
             if( (*itLight)->getType() == Light::LT_DIRECTIONAL )
             {
                 ++itLight;
@@ -232,24 +239,16 @@ namespace Ogre
             Aabb lightAabb = (*itLight)->getLocalAabb();
             lightAabb.transformAffine( viewMat * (*itLight)->_getParentNodeFullTransform() );
 
-            /*if( (*itLight)->getType() == Light::LT_POINT )
-                lightAabb.mHalfSize *= 0.25f;*/
-
             //Lower left origin
             Vector3 vMin3 = lightAabb.getMinimum();
             //Upper right
             Vector3 vMax3 = lightAabb.getMaximum();
 
-            /*vMin3 = -vMax3;
-            vMax3 = -vMin3;*/
-            //Light space is backwards, is in range [-nearDistance; farDistance]
+            //Light space is backwards, in range [-farDistance; -nearDistance]
             std::swap( vMin3.z, vMax3.z );
 
             vMin3.z = Math::Clamp( vMin3.z, -farPlane, -nearPlane );
             vMax3.z = Math::Clamp( vMax3.z, -farPlane, -nearPlane );
-
-            /*const Real lightSpaceMinDepth = vMin3.z;
-            const Real lightSpaceMaxDepth = vMax3.z;*/
 
             // bottomLeft[0] = bottom left corner of front face of the AABB.
             // bottomLeft[1] = bottom left corner of back face of the AABB.
