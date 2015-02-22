@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreRenderTarget.h"
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreForward3D.h"
 
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -245,11 +246,20 @@ namespace Ogre
         GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
 
         int texUnit = 1; //Vertex shader consumes 1 slot with its tbuffer.
+
+        //Forward3D consumes 2 more slots.
+        if( mGridBuffer )
+        {
+            psParams->setNamedConstant( "f3dGrid",      1 );
+            psParams->setNamedConstant( "f3dLightList", 2 );
+            texUnit += 2;
+        }
+
         if( !mPreparedPass.shadowMaps.empty() )
         {
             vector<int>::type shadowMaps;
             shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
-            for( size_t i=0; i<(int)mPreparedPass.shadowMaps.size(); ++i )
+            for( size_t i=0; i<mPreparedPass.shadowMaps.size(); ++i )
                 shadowMaps.push_back( texUnit++ );
 
             psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
@@ -508,8 +518,19 @@ namespace Ogre
         //mat4 viewProj;
         size_t mapSize = 16 * 4;
 
+        mGridBuffer             = 0;
+        mGlobalLightListBuffer    = 0;
+
         if( !casterPass )
         {
+            Forward3D *forward3D = sceneManager->getForward3D();
+            if( forward3D )
+            {
+                mapSize += forward3D->getConstBufferSize();
+                mGridBuffer             = forward3D->getGridBuffer();
+                mGlobalLightListBuffer  = forward3D->getGlobalLightListBuffer();
+            }
+
             //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
             //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
             //              vec2 shadowRcv[numShadowMaps].invShadowMapSize +
@@ -726,6 +747,10 @@ namespace Ogre
                     ++passBufferPtr;
                 }
             }
+
+            Forward3D *forward3D = sceneManager->getForward3D();
+            forward3D->fillConstBufferData( renderTarget, passBufferPtr );
+            passBufferPtr += forward3D->getConstBufferSize() >> 2;
         }
         else
         {
@@ -808,6 +833,15 @@ namespace Ogre
             if( !casterPass )
             {
                 size_t texUnit = 1;
+
+                if( mGridBuffer )
+                {
+                    texUnit = 3;
+                    *commandBuffer->addCommand<CbShaderBuffer>() =
+                            CbShaderBuffer( 1, mGridBuffer, 0, 0 );
+                    *commandBuffer->addCommand<CbShaderBuffer>() =
+                            CbShaderBuffer( 2, mGlobalLightListBuffer, 0, 0 );
+                }
 
                 //We changed HlmsType, rebind the shared textures.
                 FastArray<TexturePtr>::const_iterator itor = mPreparedPass.shadowMaps.begin();
@@ -1018,7 +1052,7 @@ namespace Ogre
             if( datablock->mTextureHash != mLastTextureHash )
             {
                 //Rebind textures
-                size_t texUnit = mPreparedPass.shadowMaps.size() + 1;
+                size_t texUnit = mPreparedPass.shadowMaps.size() + !mGridBuffer ? 1 : 3;
 
                 PbsBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
                 PbsBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();

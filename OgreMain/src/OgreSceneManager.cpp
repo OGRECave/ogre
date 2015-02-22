@@ -67,6 +67,7 @@ THE SOFTWARE.
 #include "OgreRenderQueueListener.h"
 #include "OgreViewport.h"
 #include "OgreHlmsManager.h"
+#include "OgreForward3D.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -92,6 +93,7 @@ mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
 mName(name),
 mRenderQueue( 0 ),
+mForward3DImpl( 0 ),
 mAmbientLight(ColourValue::Black),
 mCameraInProgress(0),
 mCurrentViewport(0),
@@ -170,6 +172,8 @@ mGpuParamsDirty((uint16)GPV_ALL)
     mRenderQueue = OGRE_NEW RenderQueue( root->getHlmsManager(), this,
                                          mDestRenderSystem->getVaoManager() );
 
+    mForward3DImpl = OGRE_NEW Forward3D( this );
+
     // create the auto param data source instance
     mAutoParamDataSource = createAutoParamDataSource();
 
@@ -245,10 +249,12 @@ SceneManager::~SceneManager()
         mSceneRoot[i] = 0;
     }
     OGRE_DELETE mFullScreenQuad;
+    OGRE_DELETE mForward3DImpl;
     OGRE_DELETE mRenderQueue;
     OGRE_DELETE mAutoParamDataSource;
 
     mFullScreenQuad         = 0;
+    mForward3DImpl          = 0;
     mRenderQueue            = 0;
     mAutoParamDataSource    = 0;
 
@@ -1141,6 +1147,9 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
                                             &mEntitiesMemoryManagerCulledList, camera, lodCamera );
             fireCullFrustumThreads( cullRequest );
         }
+
+        if( mIlluminationStage != IRS_RENDER_TO_TEXTURE && mForward3DImpl )
+            mForward3DImpl->collectLights( camera );
     } // end lock on scene graph mutex
 }
 //-----------------------------------------------------------------------
@@ -1295,6 +1304,9 @@ void SceneManager::_frameEnded(void)
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
+
+    if( mForward3DImpl )
+        mForward3DImpl->_changeRenderSystem( sys );
 }
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)

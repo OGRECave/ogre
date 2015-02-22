@@ -523,6 +523,8 @@ namespace Ogre
         static const IdString NumShadowMaps;
         static const IdString PssmSplits;
         static const IdString ShadowCaster;
+        static const IdString Forward3D;
+        static const IdString VPos;
 
         //Change per material (hash can be cached on the renderable)
         static const IdString AlphaTest;

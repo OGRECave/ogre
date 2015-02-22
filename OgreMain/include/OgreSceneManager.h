@@ -462,6 +462,8 @@ namespace Ogre {
         /// Queue of objects for rendering
         RenderQueue* mRenderQueue;
 
+        Forward3D   *mForward3DImpl;
+
         /// Updated every frame, has enough memory to hold all lights.
         /// The order is not deterministic, it depends on the number
         /// of worker threads.
@@ -1258,6 +1260,8 @@ namespace Ogre {
 
         /// Returns the RenderQueue.
         RenderQueue* getRenderQueue(void) const             { return mRenderQueue; }
+
+        Forward3D* getForward3D(void)                       { return mForward3DImpl; }
 
         /** Retrieves the main entity memory manager.
         @remarks

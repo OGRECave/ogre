@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreLight.h"
 #include "OgreSceneManager.h"
 #include "OgreLogManager.h"
+#include "OgreForward3D.h"
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
 
@@ -79,6 +80,8 @@ namespace Ogre
     const IdString HlmsBaseProp::NumShadowMaps      = IdString( "hlms_num_shadow_maps" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
+    const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
 
     //Change per material (hash can be cached on the renderable)
     const IdString HlmsBaseProp::AlphaTest      = IdString( "alpha_test" );
@@ -1612,6 +1615,13 @@ namespace Ogre
                 setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
             }
 
+            Forward3D *forward3D = sceneManager->getForward3D();
+            if( forward3D )
+            {
+                setProperty( HlmsBaseProp::Forward3D, forward3D->getNumSlices() );
+                setProperty( HlmsBaseProp::VPos, 1 );
+            }
+
             uint numLightsPerType[Light::NUM_LIGHT_TYPES];
             memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
 
@@ -1680,6 +1690,7 @@ namespace Ogre
             setProperty( HlmsBaseProp::ShadowCaster, casterPass );
             setProperty( HlmsBaseProp::DualParaboloidMapping, dualParaboloid );
 
+            setProperty( HlmsBaseProp::Forward3D,         0 );
             setProperty( HlmsBaseProp::NumShadowMaps, 0 );
             setProperty( HlmsBaseProp::PssmSplits, 0 );
             setProperty( HlmsBaseProp::LightsAttenuation, 0 );

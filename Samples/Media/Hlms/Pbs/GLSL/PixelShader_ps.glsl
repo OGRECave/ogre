@@ -13,6 +13,10 @@ layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 layout(location = FRAG_COLOR, index = 0) out float outColour;
 @end
 
+@property( hlms_vpos )
+in vec4 gl_FragCoord;
+@end
+
 @property( !hlms_shadowcaster )
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
@@ -27,6 +31,9 @@ in block
 
 @property( !hlms_shadowcaster )
 
+@property( hlms_forward3d )
+layout(binding = 1) uniform usamplerBuffer f3dGrid;
+layout(binding = 2) uniform samplerBuffer f3dLightList;@end
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 @property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
@@ -303,7 +310,7 @@ void main()
 	{
 		lightDir *= 1.0 / fDistance;
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + pass.lights[@n].attenuation.y * fDistance + pass.lights[@n].attenuation.z * fDistance * fDistance );
+		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -328,9 +335,11 @@ void main()
 		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
 	@end
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + pass.lights[@n].attenuation.y * fDistance + pass.lights[@n].attenuation.z * fDistance * fDistance );
+		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
+
+@insertpiece( forward3dLighting )
 
 @property( envprobe_map )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
