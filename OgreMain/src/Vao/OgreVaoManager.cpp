@@ -455,11 +455,11 @@ namespace Ogre
 
         while( itor != end )
         {
-            assert( mFrameCount - itor->frame <= mDynamicBufferCurrentFrame &&
-                    "Delayed buffer has been in queue for more than it should be!" );
-
             if( itor->frameNumDynamic != fromDynamicFrame || itor->frame == mFrameCount )
                 break;
+
+            assert( mFrameCount - itor->frame == mDynamicBufferMultiplier &&
+                    "Delayed buffer must be destroyed in the last buffered frame!" );
 
             switch( itor->bufferPacked->getBufferPackedType() )
             {
