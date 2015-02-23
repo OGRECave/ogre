@@ -156,9 +156,10 @@ namespace Ogre
             mShadowNode->_update( mCamera, usedLodCamera, sceneManager );
             sceneManager->_swapVisibleObjectsForShadowMapping();
 
-            //ShadowNode passes may've overriden this setting.
+            //ShadowNode passes may've overriden these settings.
             sceneManager->_setCurrentShadowNode( mShadowNode, mDefinition->mShadowNodeRecalculation ==
                                                                                     SHADOW_NODE_REUSE );
+            mCamera->_notifyViewport( mViewport );
 
             //We need to restore the previous RT's update
             mTarget->_beginUpdate();

@@ -1148,11 +1148,6 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
                                             &mEntitiesMemoryManagerCulledList, camera, lodCamera );
             fireCullFrustumThreads( cullRequest );
         }
-
-        if( mIlluminationStage != IRS_RENDER_TO_TEXTURE && mForward3DImpl )
-        {
-            mForward3DImpl->collectLights( camera );
-        }
     } // end lock on scene graph mutex
 }
 //-----------------------------------------------------------------------
@@ -1207,6 +1202,11 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
         {
             OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
             prepareRenderQueue();
+        }
+
+        if( mIlluminationStage != IRS_RENDER_TO_TEXTURE && mForward3DImpl )
+        {
+            mForward3DImpl->collectLights( camera );
         }
 
         if (mFindVisibleObjects)
