@@ -148,6 +148,7 @@ std::string macBundlePath()
                          "GraphicsSystem::initialize" );
         }
 
+        Ogre::ConfigOptionMap& cfgOpts = mRoot->getRenderSystem()->getConfigOptions();
         Ogre::String winHandle;
         Ogre::NameValuePairList params;
 
@@ -180,8 +181,8 @@ std::string macBundlePath()
 
         params.insert( std::make_pair("title", windowTitle) );
         params.insert( std::make_pair("gamma", "true") );
-        //params.insert( std::make_pair("FSAA", ) );
-        //params.insert( std::make_pair("vsync", vsync ? "true" : "false") );
+        params.insert( std::make_pair("FSAA", cfgOpts["FSAA"].currentValue) );
+        params.insert( std::make_pair("vsync", cfgOpts["VSync"].currentValue) );
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         params.insert( std::make_pair("externalWindowHandle",  winHandle) );
