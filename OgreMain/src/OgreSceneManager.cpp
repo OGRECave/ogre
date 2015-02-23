@@ -2359,21 +2359,22 @@ void SceneManager::buildLightList()
         mGlobalLightList.lights.appendPOD( mGlobalLightListPerThread[i].begin(),
                                            mGlobalLightListPerThread[i].end() );
 
+        size_t numCollectedLights = mGlobalLightListPerThread[i].size();
+
         size_t srcOffset = mBuildLightListRequestPerThread[i].startLightIdx;
 
         if( dstOffset != srcOffset )
         {
             //Make it contiguous
-            size_t numCollectedLights = mGlobalLightListPerThread[i].size();
             memmove( mGlobalLightList.visibilityMask + dstOffset,
                      mGlobalLightList.visibilityMask + srcOffset,
                      sizeof( uint32 ) * numCollectedLights );
             memmove( mGlobalLightList.boundingSphere + dstOffset,
                      mGlobalLightList.boundingSphere + srcOffset,
                      sizeof( Sphere ) * numCollectedLights );
-
-            dstOffset += numCollectedLights;
         }
+
+        dstOffset += numCollectedLights;
     }
 
     //Now fire the threads again, to build the per-MovableObject lists
