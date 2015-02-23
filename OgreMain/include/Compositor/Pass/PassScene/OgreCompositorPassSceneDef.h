@@ -47,9 +47,24 @@ namespace Ogre
 
     enum ShadowNodeRecalculation
     {
+        /// Forces recalculation of the shadow node for this pass. Not recommended.
+        /// Only useful if you're doing very low level manipulation via listeners
+        /// and the compositor can't detect changes.
         SHADOW_NODE_RECALCULATE,
+
+        /// Forces the PassScene to not recalculate the ShadowNode even if it should.
+        /// Useful if you know what you're doing and want to use the ShadowNode of
+        /// a different pass with a different camera.
         SHADOW_NODE_REUSE,
+
+        /// Default option. The first PassScene to use a Camera will update its shadow node.
+        /// All subsequent passes (even from different nodes) using the same camera will
+        /// not update the shadow node again until a PassScene uses a different camera with
+        /// the same shadow node. The Compositor will log a performance warning on debug
+        /// builds if it detects the same Shadow node will be updated twice for the same
+        /// camera.
         SHADOW_NODE_FIRST_ONLY,
+
         SHADOW_NODE_CASTER_PASS     //Set automatically only when this pass is used by a ShadowNode
     };
 

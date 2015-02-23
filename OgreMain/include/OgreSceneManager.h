@@ -158,6 +158,8 @@ namespace Ogre {
         uint8                           lastRq;
         /// Whether this is a shadow mapping pass
         bool                            casterPass;
+        /// Whether we should immediately add to render queue v2 objects
+        bool                            addToRenderQueue;
         /** Memory manager of the objects to cull. Could contain all Lights, all Entity, etc.
             Could be more than one depending on the high level cull system (i.e. tree-based sys)
             Must be const (it is read only for all threads).
@@ -169,15 +171,17 @@ namespace Ogre {
         Camera const                    *lodCamera;
 
         CullFrustumRequest() :
-            firstRq( 0 ), lastRq( 0 ), objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
+            firstRq( 0 ), lastRq( 0 ), casterPass( false ), addToRenderQueue( true ),
+            objectMemManager( 0 ), camera( 0 ), lodCamera( 0 )
         {
         }
         CullFrustumRequest( uint8 _firstRq, uint8 _lastRq, bool _casterPass,
+                            bool _addToRenderQueue,
                             const ObjectMemoryManagerVec *_objectMemManager,
                             const Camera *_camera, const Camera *_lodCamera ) :
             firstRq( _firstRq ), lastRq( _lastRq ), casterPass( _casterPass ),
-            objectMemManager( _objectMemManager ), camera( _camera ),
-            lodCamera( _lodCamera )
+            addToRenderQueue( _addToRenderQueue ), objectMemManager( _objectMemManager ),
+            camera( _camera ), lodCamera( _lodCamera )
         {
         }
     };
@@ -193,7 +197,8 @@ namespace Ogre {
         UpdateLodRequest( uint8 _firstRq, uint8 _lastRq,
                             const ObjectMemoryManagerVec *_objectMemManager,
                             const Camera *_camera, const Camera *_lodCamera, Real _lodBias ) :
-            CullFrustumRequest( _firstRq, _lastRq, false, _objectMemManager, _camera, _lodCamera ),
+            CullFrustumRequest( _firstRq, _lastRq, false, false,
+                                _objectMemManager, _camera, _lodCamera ),
             lodBias( _lodBias )
         {
         }
@@ -512,6 +517,7 @@ namespace Ogre {
         Viewport* mCurrentViewport;
 
         CompositorShadowNode*   mCurrentShadowNode;
+        bool                    mShadowNodeIsReused;
 
         /// Root scene node
         SceneNode* mSceneRoot[NUM_SCENE_MEMORY_MANAGER_TYPES];
@@ -1810,6 +1816,9 @@ namespace Ogre {
         virtual void _renderPhase02( Camera* camera, const Camera* lodCamera, Viewport* vp,
                                      uint8 firstRq, uint8 lastRq, bool includeOverlays );
 
+        void cullLights( Camera *camera, Light::LightTypes startType,
+                         Light::LightTypes endType, LightArray &outLights );
+
         /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
         void _frameEnded(void);
 
@@ -2644,8 +2653,9 @@ namespace Ogre {
         */
         virtual void setShadowTextureCasterMaterial(const String& name);
 
-        void _setCurrentShadowNode( CompositorShadowNode *shadowNode );
+        void _setCurrentShadowNode( CompositorShadowNode *shadowNode, bool isReused );
         const CompositorShadowNode* getCurrentShadowNode(void) const    { return mCurrentShadowNode; }
+        bool isCurrentShadowNodeReused(void) const                      { return mShadowNodeIsReused; }
 
         /** Sets whether to use late material resolving or not. If set, materials will be resolved
             from the materials at the pass-setting stage and not at the render queue building stage.

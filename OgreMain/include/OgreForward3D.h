@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define _OgreForward3D_H_
 
 #include "OgrePrerequisites.h"
+#include "OgreCommon.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -39,6 +40,8 @@ namespace Ogre
     /** \addtogroup Resources
     *  @{
     */
+
+    class CompositorShadowNode;
 
     /** Forward3D */
     class _OgreExport Forward3D : public PassAlloc
@@ -53,8 +56,25 @@ namespace Ogre
                 width( w ), height( h ), zEnd( _zEnd ) {}
         };
 
-        TexBufferPacked     *mGridBuffer;
-        TexBufferPacked     *mGlobalLightListBuffer;
+        struct CachedGrid
+        {
+            Camera                  *camera;
+            /// Cameras used for reflection have a different view proj matrix
+            bool                    reflection;
+            /// Cameras can change their AR depending on the RTT they're rendering to.
+            Real                    aspectRatio;
+            /// Cameras w/out shadows have a different light list from cameras that do.
+            CompositorShadowNode const *shadowNode;
+            /// Last frame this cache was updated.
+            uint32                  lastFrame;
+
+            TexBufferPacked         *gridBuffer;
+            TexBufferPacked         *globalLightListBuffer;
+        };
+
+        typedef vector<CachedGrid>::type CachedGridVec;
+        CachedGridVec   mCachedGrid;
+        LightArray      mCurrentLightList;
 
         uint32  mWidth;
         uint32  mHeight;
@@ -100,7 +120,23 @@ namespace Ogre
         inline void projectionSpaceToGridSpace( const Vector2 &projSpace, uint32 slice,
                                                 uint32 &outX, uint32 &outY ) const;
 
-        void fillGlobalLightListBuffer( Camera *camera );
+        void fillGlobalLightListBuffer( Camera *camera, TexBufferPacked *globalLightListBuffer );
+
+        /** Finds a grid already cached in mCachedGrid that can be used for the given camera.
+            If the cache does not exist, we create a new entry.
+        @param camera
+            The camera for which we'll find a cached entry.
+        @param outCachedGrid
+            The CachedGrid being retrieved. May be new or an existing one.
+            This pointer may be invalidated on the next call to getCachedGridFor
+        @return
+            True if the cache is up to date. False if the cache needs to be updated.
+        */
+        bool getCachedGridFor( Camera *camera, CachedGrid **outCachedGrid );
+
+        /// The const version will not create a new cache if not found, and
+        /// output a null pointer instead (also returns false in that case).
+        bool getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const;
 
     public:
         Forward3D( SceneManager *sceneManager );
@@ -112,8 +148,10 @@ namespace Ogre
 
         uint32 getNumSlices(void) const                                 { return mNumSlices; }
 
-        TexBufferPacked* getGridBuffer(void) const;
-        TexBufferPacked* getGlobalLightListBuffer(void) const;
+        /// Cache the return value as internally we perform an O(N) search
+        TexBufferPacked* getGridBuffer( Camera *camera ) const;
+        /// Cache the return value as internally we perform an O(N) search
+        TexBufferPacked* getGlobalLightListBuffer( Camera *camera ) const;
 
         /// Returns the amount of bytes that fillConstBufferData is going to fill.
         size_t getConstBufferSize(void) const;

@@ -49,7 +49,7 @@
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (1.0 + (attenuation.y + attenuation.z * fDistance) * fDistance );
 
-			if( posAndType.w == 0.0 )
+			if( posAndType.w == 1.0 )
 			{
 				//Point light
 				vec3 tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );

@@ -98,6 +98,7 @@ mAmbientLight(ColourValue::Black),
 mCameraInProgress(0),
 mCurrentViewport(0),
 mCurrentShadowNode(0),
+mShadowNodeIsReused( false ),
 mSkyPlaneEntity(0),
 mSkyBoxObj(0),
 mSkyPlaneNode(0),
@@ -1143,13 +1144,15 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
             camera->_setRenderedRqs( realFirstRq, realLastRq );
 
             CullFrustumRequest cullRequest( realFirstRq, realLastRq,
-                                            mIlluminationStage == IRS_RENDER_TO_TEXTURE,
+                                            mIlluminationStage == IRS_RENDER_TO_TEXTURE, true,
                                             &mEntitiesMemoryManagerCulledList, camera, lodCamera );
             fireCullFrustumThreads( cullRequest );
         }
 
         if( mIlluminationStage != IRS_RENDER_TO_TEXTURE && mForward3DImpl )
+        {
             mForward3DImpl->collectLights( camera );
+        }
     } // end lock on scene graph mutex
 }
 //-----------------------------------------------------------------------
@@ -1294,6 +1297,38 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
     camera->_notifyRenderedBatches(mDestRenderSystem->_getBatchCount());
 
     Root::getSingleton()._popCurrentSceneManager(this);
+}
+//-----------------------------------------------------------------------
+void SceneManager::cullLights( Camera *camera, Light::LightTypes startType,
+                               Light::LightTypes endType, LightArray &outLights )
+{
+    mVisibleObjects.swap( mTmpVisibleObjects );
+    CullFrustumRequest cullRequest( startType, endType, false, false,
+                                    &mLightsMemoryManagerCulledList, camera, camera );
+    fireCullFrustumThreads( cullRequest );
+
+    outLights.clear();
+
+    VisibleObjectsPerThreadArray::const_iterator it = mVisibleObjects.begin();
+    VisibleObjectsPerThreadArray::const_iterator en = mVisibleObjects.end();
+
+    while( it != en )
+    {
+        for( uint8 i=startType; i<endType; ++i )
+        {
+            MovableObject::MovableObjectArray::const_iterator itor = (*it)[i].begin();
+            MovableObject::MovableObjectArray::const_iterator end  = (*it)[i].end();
+
+            Light * const *lightBegin  = reinterpret_cast<Light * const *>( itor );
+            Light * const *lightEnd    = reinterpret_cast<Light * const *>( end );
+
+            outLights.appendPOD( lightBegin, lightEnd );
+        }
+
+        ++it;
+    }
+
+    mVisibleObjects.swap( mTmpVisibleObjects );
 }
 //-----------------------------------------------------------------------
 void SceneManager::_frameEnded(void)
@@ -2262,7 +2297,7 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
                                         ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
                     outVisibleObjects, lodCamera );
 
-            if( mRenderQueue->getRenderQueueMode(i) == RenderQueue::FAST )
+            if( mRenderQueue->getRenderQueueMode(i) == RenderQueue::FAST && request.addToRenderQueue )
             {
                 //V2 meshes can be added to the render queue in parallel
                 bool casterPass = request.casterPass;
@@ -2299,6 +2334,7 @@ void SceneManager::buildLightList()
     size_t accumStartLightIdx = 0;
     for( size_t threadIdx=0; threadIdx<mNumWorkerThreads; ++threadIdx )
     {
+        size_t totalObjsInThread = 0;
         ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
         ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
 
@@ -2325,12 +2361,14 @@ void SceneManager::buildLightList()
                 //when there are less entities than ARRAY_PACKED_REALS
                 numObjs = std::min( numObjs, totalObjs - toAdvance );
 
-                mBuildLightListRequestPerThread[threadIdx].startLightIdx = accumStartLightIdx;
-                accumStartLightIdx += numObjs;
+                totalObjsInThread += numObjs;
             }
 
             ++it;
         }
+
+        mBuildLightListRequestPerThread[threadIdx].startLightIdx = accumStartLightIdx;
+        accumStartLightIdx += totalObjsInThread;
     }
 
     mRequestType = BUILD_LIGHT_LIST01;
@@ -2389,6 +2427,10 @@ void SceneManager::buildLightList()
     }
 
     //Now fire the threads again, to build the per-MovableObject lists
+
+    if( mForward3DImpl )
+        return; //Don't do this on non-forward passes.
+
     mRequestType = BUILD_LIGHT_LIST02;
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     _updateWorkerThread( NULL );
@@ -3435,9 +3477,12 @@ void SceneManager::removeRenderObjectListener(RenderObjectListener* delListener)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::_setCurrentShadowNode( CompositorShadowNode *shadowNode )
+void SceneManager::_setCurrentShadowNode( CompositorShadowNode *shadowNode, bool isReused )
 {
     mCurrentShadowNode = shadowNode;
+    mShadowNodeIsReused= isReused;
+    if( !shadowNode )
+        mShadowNodeIsReused = false;
     mAutoParamDataSource->setCurrentShadowNode( shadowNode );
 }
 //---------------------------------------------------------------------

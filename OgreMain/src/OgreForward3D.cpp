@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
 
+#include "Compositor/OgreCompositorShadowNode.h"
+
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreTexBufferPacked.h"
 
@@ -41,8 +43,6 @@ namespace Ogre
     const size_t c_numBytesPerLight = 6 * 4 * 4;
 
     Forward3D::Forward3D( SceneManager *sceneManager ) :
-        mGridBuffer( 0 ),
-        mGlobalLightListBuffer( 0 ),
         mWidth( 4 ),
         mHeight( 4 ),
         mNumSlices( 5 ),
@@ -77,34 +77,53 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Forward3D::~Forward3D()
     {
-        if( mGridBuffer )
-        {
-            mGridBuffer->unmap( UO_UNMAP_ALL );
-            mVaoManager->destroyTexBuffer( mGridBuffer );
-            mGridBuffer = 0;
-        }
+        CachedGridVec::iterator itor = mCachedGrid.begin();
+        CachedGridVec::iterator end  = mCachedGrid.end();
 
-        if( mGlobalLightListBuffer )
+        while( itor != end )
         {
-            mGlobalLightListBuffer->unmap( UO_UNMAP_ALL );
-            mVaoManager->destroyTexBuffer( mGlobalLightListBuffer );
-            mGlobalLightListBuffer = 0;
+            if( itor->gridBuffer )
+            {
+                itor->gridBuffer->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyTexBuffer( itor->gridBuffer );
+                itor->gridBuffer = 0;
+            }
+
+            if( itor->globalLightListBuffer )
+            {
+                if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                    itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
+                itor->globalLightListBuffer = 0;
+            }
+
+            ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
     void Forward3D::_changeRenderSystem( RenderSystem *newRs )
     {
-        if( mGridBuffer )
+        CachedGridVec::iterator itor = mCachedGrid.begin();
+        CachedGridVec::iterator end  = mCachedGrid.end();
+
+        while( itor != end )
         {
-            mGridBuffer->unmap( UO_UNMAP_ALL );
-            mVaoManager->destroyTexBuffer( mGridBuffer );
-            mGridBuffer = 0;
-        }
-        if( mGlobalLightListBuffer )
-        {
-            mGlobalLightListBuffer->unmap( UO_UNMAP_ALL );
-            mVaoManager->destroyTexBuffer( mGlobalLightListBuffer );
-            mGlobalLightListBuffer = 0;
+            if( itor->gridBuffer )
+            {
+                itor->gridBuffer->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyTexBuffer( itor->gridBuffer );
+                itor->gridBuffer = 0;
+            }
+
+            if( itor->globalLightListBuffer )
+            {
+                if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                    itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
+                itor->globalLightListBuffer = 0;
+            }
+
+            ++itor;
         }
 
         mVaoManager = 0;
@@ -153,58 +172,91 @@ namespace Ogre
         outY = static_cast<uint32>( Ogre::min( floorf( fy ), res.height - 1 ) );
     }
     //-----------------------------------------------------------------------------------
-    struct TmpSort
+    inline bool OrderLightByDistanceToCamera( const Light *left, const Light *right )
     {
-        Vector3 camPos;
-        inline bool operator () ( const Light *left, const Light *right ) const
-        {
-            return left->getParentNode()->_getDerivedPosition().squaredDistance( camPos ) <
-                    right->getParentNode()->_getDerivedPosition().squaredDistance( camPos );
-        }
-    };
+        return left->getCachedDistanceToCameraAsReal() < right->getCachedDistanceToCameraAsReal();
+    }
 
     void Forward3D::collectLights( Camera *camera )
     {
-        //TODO: This const_cast is wrong. Perform a local copy and sort.
-        /*const */LightListInfo &globalLightList = (LightListInfo&)mSceneManager->getGlobalLightList();
-        const size_t numLights = globalLightList.lights.size();
+        CachedGrid *cachedGrid = 0;
+        if( getCachedGridFor( camera, &cachedGrid ) )
+            return; //Up to date.
 
-        TmpSort tmpSort;
-        tmpSort.camPos = camera->getDerivedPosition();
-        std::sort( globalLightList.lights.begin()+1, globalLightList.lights.end(), tmpSort );
-
-        //TODO: Two buffers per camera, one for reflection, another without;
-        //also separated by ShadowNode and Aspect Ratio.
-        if( !mGridBuffer )
+        //Cull the lights against the camera. Get non-directional, non-shadow-casting lights
+        //(lights set to cast shadows but currently not casting shadows are also included)
+        if( mSceneManager->getCurrentShadowNode() )
         {
-            const size_t p = -((1 - (1 << (mNumSlices << 1))) / 3);
-            mGridBuffer = mVaoManager->createTexBuffer( PF_R16_UINT,
-                                                        p * mTableSize * sizeof(uint16),
-                                                        BT_DYNAMIC_PERSISTENT, 0, false );
-        }
+            const LightListInfo &globalLightList = mSceneManager->getGlobalLightList();
+            const CompositorShadowNode *shadowNode = mSceneManager->getCurrentShadowNode();
 
-        if( !mGlobalLightListBuffer ||
-            mGlobalLightListBuffer->getNumElements() < c_numBytesPerLight * numLights )
-        {
-            if( mGlobalLightListBuffer )
+            //Exclude shadow casting lights
+            const LightClosestArray &shadowCastingLights = shadowNode->getShadowCastingLights();
+            LightClosestArray::const_iterator itor = shadowCastingLights.begin();
+            LightClosestArray::const_iterator end  = shadowCastingLights.end();
+
+            while( itor != end )
             {
-                mGlobalLightListBuffer->unmap( UO_UNMAP_ALL );
-                mVaoManager->destroyTexBuffer( mGlobalLightListBuffer );
+                globalLightList.lights[itor->globalIndex]->setVisible( false );
+                ++itor;
             }
 
-            mGlobalLightListBuffer = mVaoManager->createTexBuffer( PF_FLOAT32_RGBA,
-                                                                   c_numBytesPerLight * numLights,
+            mSceneManager->cullLights( camera, Light::LT_POINT, Light::NUM_LIGHT_TYPES, mCurrentLightList );
+
+            //Restore shadow casting lights
+            itor = shadowCastingLights.begin();
+            end  = shadowCastingLights.end();
+
+            while( itor != end )
+            {
+                globalLightList.lights[itor->globalIndex]->setVisible( true );
+                ++itor;
+            }
+        }
+        else
+        {
+            mSceneManager->cullLights( camera, Light::LT_POINT, Light::NUM_LIGHT_TYPES, mCurrentLightList );
+        }
+
+        const size_t numLights = mCurrentLightList.size();
+
+        //Sort by distance to camera
+        std::sort( mCurrentLightList.begin(), mCurrentLightList.end(), OrderLightByDistanceToCamera );
+
+        //Allocate the buffers if not already.
+        if( !cachedGrid->gridBuffer )
+        {
+            const size_t p = -((1 - (1 << (mNumSlices << 1))) / 3);
+            cachedGrid->gridBuffer = mVaoManager->createTexBuffer( PF_R16_UINT,
+                                                                   p * mTableSize * sizeof(uint16),
                                                                    BT_DYNAMIC_PERSISTENT, 0, false );
         }
 
-        fillGlobalLightListBuffer( camera );
+        if( !cachedGrid->globalLightListBuffer ||
+            cachedGrid->globalLightListBuffer->getNumElements() < c_numBytesPerLight * numLights )
+        {
+            if( cachedGrid->globalLightListBuffer )
+            {
+                if( cachedGrid->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                    cachedGrid->globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                mVaoManager->destroyTexBuffer( cachedGrid->globalLightListBuffer );
+            }
 
+            cachedGrid->globalLightListBuffer = mVaoManager->createTexBuffer(
+                                                                    PF_FLOAT32_RGBA,
+                                                                    c_numBytesPerLight *
+                                                                    std::max<size_t>( numLights, 96 ),
+                                                                    BT_DYNAMIC_PERSISTENT, 0, false );
+        }
+
+        //Fill the first buffer with the light. The other buffer contains indexes into this list.
+        fillGlobalLightListBuffer( camera, cachedGrid->globalLightListBuffer );
+
+        //Fill the indexes buffer
         uint16 RESTRICT_ALIAS *gridBuffer = reinterpret_cast<uint16 RESTRICT_ALIAS*>(
-                    mGridBuffer->map( 0, mGridBuffer->getNumElements() ) );
+                    cachedGrid->gridBuffer->map( 0, cachedGrid->gridBuffer->getNumElements() ) );
 
         memset( mLightCountInCell.begin(), 0, mLightCountInCell.size() * sizeof(uint32) );
-
-        //TODO: Account visibilityMask? (do it in the shader??)
 
         Matrix4 viewMat = camera->getViewMatrix();
         Matrix4 projMatrix = camera->getProjectionMatrix();
@@ -217,23 +269,17 @@ namespace Ogre
         float projSpaceSliceEnd[256];
         for( uint32 i=0; i<mNumSlices-1; ++i )
         {
-            Vector4 r = projMatrix * Vector4( 0, 0, Math::Clamp( mResolutionAtSlice[i].zEnd, -farPlane, -nearPlane ), 1.0f );
+            Vector4 r = projMatrix * Vector4( 0, 0, Math::Clamp( mResolutionAtSlice[i].zEnd,
+                                                                 -farPlane, -nearPlane ), 1.0f );
             projSpaceSliceEnd[i] = r.z / r.w;
         }
 
         projSpaceSliceEnd[mNumSlices-1] = 1.0f;
 
-        LightArray::const_iterator itLight = globalLightList.lights.begin();
+        LightArray::const_iterator itLight = mCurrentLightList.begin();
 
         for( size_t i=0; i<numLights; ++i )
         {
-            //TODO: Shadow casting lights should also be ignored
-            if( (*itLight)->getType() == Light::LT_DIRECTIONAL )
-            {
-                ++itLight;
-                continue;
-            }
-
             //Aabb lightAabb = (*itLight)->getWorldAabb();
             //lightAabb.transformAffine( viewMat );
             Aabb lightAabb = (*itLight)->getLocalAabb();
@@ -371,36 +417,75 @@ namespace Ogre
             ++itLight;
         }
 
-        //Now write all the light counts
-        FastArray<uint32>::const_iterator itor = mLightCountInCell.begin();
-        FastArray<uint32>::const_iterator end  = mLightCountInCell.end();
-
-        const size_t cellSize = mLightsPerCell;
-        size_t gridIdx = 0;
-
-        while( itor != end )
         {
-            gridBuffer[gridIdx] = static_cast<uint16>( *itor );
-            gridIdx += cellSize;
-            ++itor;
+            //Now write all the light counts
+            FastArray<uint32>::const_iterator itor = mLightCountInCell.begin();
+            FastArray<uint32>::const_iterator end  = mLightCountInCell.end();
+
+            const size_t cellSize = mLightsPerCell;
+            size_t gridIdx = 0;
+
+            while( itor != end )
+            {
+                gridBuffer[gridIdx] = static_cast<uint16>( *itor );
+                gridIdx += cellSize;
+                ++itor;
+            }
         }
 
-        mGridBuffer->unmap( UO_KEEP_PERSISTENT );
+        cachedGrid->gridBuffer->unmap( UO_KEEP_PERSISTENT );
+
+        {
+            //Check if some of the caches are really old and delete them
+            CachedGridVec::iterator itor = mCachedGrid.begin();
+            CachedGridVec::iterator end  = mCachedGrid.end();
+
+            const uint32 currentFrame = mVaoManager->getFrameCount();
+
+            while( itor != end )
+            {
+                if( itor->lastFrame + 3 < currentFrame )
+                {
+                    if( itor->gridBuffer )
+                    {
+                        itor->gridBuffer->unmap( UO_UNMAP_ALL );
+                        mVaoManager->destroyTexBuffer( itor->gridBuffer );
+                        itor->gridBuffer = 0;
+                    }
+
+                    if( itor->globalLightListBuffer )
+                    {
+                        if( itor->globalLightListBuffer->getMappingState() != MS_UNMAPPED )
+                            itor->globalLightListBuffer->unmap( UO_UNMAP_ALL );
+                        mVaoManager->destroyTexBuffer( itor->globalLightListBuffer );
+                        itor->globalLightListBuffer = 0;
+                    }
+
+                    itor = efficientVectorRemove( mCachedGrid, itor );
+                    end  = mCachedGrid.end();
+                }
+
+                ++itor;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
-    void Forward3D::fillGlobalLightListBuffer( Camera *camera )
+    void Forward3D::fillGlobalLightListBuffer( Camera *camera, TexBufferPacked *globalLightListBuffer )
     {
-        const LightListInfo &globalLightList = mSceneManager->getGlobalLightList();
-        const size_t numLights = globalLightList.lights.size();
+        //const LightListInfo &globalLightList = mSceneManager->getGlobalLightList();
+        const size_t numLights = mCurrentLightList.size();
+
+        if( !numLights )
+            return;
 
         Matrix4 viewMatrix = camera->getViewMatrix();
         Matrix3 viewMatrix3;
         viewMatrix.extract3x3Matrix( viewMatrix3 );
 
         float * RESTRICT_ALIAS lightData = reinterpret_cast<float * RESTRICT_ALIAS>(
-                    mGlobalLightListBuffer->map( 0, c_numBytesPerLight * numLights ) );
-        LightArray::const_iterator itLights = globalLightList.lights.begin();
-        LightArray::const_iterator enLights = globalLightList.lights.end();
+                    globalLightListBuffer->map( 0, c_numBytesPerLight * numLights ) );
+        LightArray::const_iterator itLights = mCurrentLightList.begin();
+        LightArray::const_iterator enLights = mCurrentLightList.end();
 
         while( itLights != enLights )
         {
@@ -458,17 +543,104 @@ namespace Ogre
             ++itLights;
         }
 
-        mGlobalLightListBuffer->unmap( UO_KEEP_PERSISTENT );
+        globalLightListBuffer->unmap( UO_KEEP_PERSISTENT );
     }
     //-----------------------------------------------------------------------------------
-    TexBufferPacked* Forward3D::getGridBuffer(void) const
+    bool Forward3D::getCachedGridFor( Camera *camera, CachedGrid **outCachedGrid )
     {
-        return mGridBuffer;
+        const CompositorShadowNode *shadowNode = mSceneManager->getCurrentShadowNode();
+
+        CachedGridVec::iterator itor = mCachedGrid.begin();
+        CachedGridVec::iterator end  = mCachedGrid.end();
+
+        while( itor != end )
+        {
+            if( itor->camera == camera &&
+                itor->reflection == camera->isReflected() &&
+                (itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
+                itor->shadowNode == shadowNode )
+            {
+                bool upToDate = itor->lastFrame == mVaoManager->getFrameCount();
+                itor->lastFrame = mVaoManager->getFrameCount();
+                *outCachedGrid = &(*itor);
+
+                if( mSceneManager->isCurrentShadowNodeReused() )
+                    upToDate = false; //We can't really be sure the cache is up to date
+
+                return upToDate;
+            }
+
+            ++itor;
+        }
+
+        //If we end up here, the entry doesn't exist. Create a new one.
+        CachedGrid cachedGrid;
+        cachedGrid.camera      = camera;
+        cachedGrid.reflection  = camera->isReflected();
+        cachedGrid.aspectRatio = camera->getAspectRatio();
+        cachedGrid.shadowNode  = mSceneManager->getCurrentShadowNode();
+        cachedGrid.lastFrame   = mVaoManager->getFrameCount();
+
+        cachedGrid.gridBuffer               = 0;
+        cachedGrid.globalLightListBuffer    = 0;
+
+        mCachedGrid.push_back( cachedGrid );
+
+        *outCachedGrid = &mCachedGrid.back();
+
+        return false;
     }
     //-----------------------------------------------------------------------------------
-    TexBufferPacked* Forward3D::getGlobalLightListBuffer(void) const
+    bool Forward3D::getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const
     {
-        return mGlobalLightListBuffer;
+        CachedGridVec::const_iterator itor = mCachedGrid.begin();
+        CachedGridVec::const_iterator end  = mCachedGrid.end();
+
+        while( itor != end )
+        {
+            if( itor->camera == camera &&
+                itor->reflection == camera->isReflected() &&
+                (itor->aspectRatio - camera->getAspectRatio()) < 1e-6f &&
+                itor->shadowNode == mSceneManager->getCurrentShadowNode() )
+            {
+                bool upToDate = itor->lastFrame == mVaoManager->getFrameCount();
+                *outCachedGrid = &(*itor);
+
+                return upToDate;
+            }
+
+            ++itor;
+        }
+
+        return false;
+    }
+    //-----------------------------------------------------------------------------------
+    TexBufferPacked* Forward3D::getGridBuffer( Camera *camera ) const
+    {
+        CachedGrid const *cachedGrid = 0;
+
+#ifdef NDEBUG
+        getCachedGridFor( camera, &cachedGrid );
+#else
+        bool upToDate = getCachedGridFor( camera, &cachedGrid );
+        assert( upToDate && "You must call Forward3D::collectLights first!" );
+#endif
+
+        return cachedGrid->gridBuffer;
+    }
+    //-----------------------------------------------------------------------------------
+    TexBufferPacked* Forward3D::getGlobalLightListBuffer( Camera *camera ) const
+    {
+        CachedGrid const *cachedGrid = 0;
+
+#ifdef NDEBUG
+        getCachedGridFor( camera, &cachedGrid );
+#else
+        bool upToDate = getCachedGridFor( camera, &cachedGrid );
+        assert( upToDate && "You must call Forward3D::collectLights first!" );
+#endif
+
+        return cachedGrid->globalLightListBuffer;
     }
     //-----------------------------------------------------------------------------------
     size_t Forward3D::getConstBufferSize(void) const

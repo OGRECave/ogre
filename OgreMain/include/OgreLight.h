@@ -80,10 +80,10 @@ namespace Ogre {
         /// Defines the type of light
         enum LightTypes
         {
-            /// Point light sources give off light equally in all directions, so require only position not direction
-            LT_POINT = 0,
             /// Directional lights simulate parallel light beams from a distant source, hence have direction but no position
-            LT_DIRECTIONAL = 1,
+            LT_DIRECTIONAL = 0,
+            /// Point light sources give off light equally in all directions, so require only position not direction
+            LT_POINT = 1,
             /// Spotlights simulate a cone of light from a source so require position and direction, plus extra values for falloff
             LT_SPOTLIGHT = 2,
 
@@ -101,6 +101,9 @@ namespace Ogre {
         /** Sets the type of light - see LightTypes for more info.
         */
         void setType(LightTypes type);
+
+        /// Overload to avoid it. Light::setType uses the RenderQueue ID to classify lights per type.
+        virtual void setRenderQueueGroup(uint8 queueID);
 
         /** Returns the light type.
         */

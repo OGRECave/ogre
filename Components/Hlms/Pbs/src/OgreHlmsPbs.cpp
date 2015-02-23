@@ -519,7 +519,7 @@ namespace Ogre
         size_t mapSize = 16 * 4;
 
         mGridBuffer             = 0;
-        mGlobalLightListBuffer    = 0;
+        mGlobalLightListBuffer  = 0;
 
         if( !casterPass )
         {
@@ -527,8 +527,8 @@ namespace Ogre
             if( forward3D )
             {
                 mapSize += forward3D->getConstBufferSize();
-                mGridBuffer             = forward3D->getGridBuffer();
-                mGlobalLightListBuffer  = forward3D->getGlobalLightListBuffer();
+                mGridBuffer             = forward3D->getGridBuffer( camera );
+                mGlobalLightListBuffer  = forward3D->getGlobalLightListBuffer( camera );
             }
 
             //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
@@ -723,6 +723,8 @@ namespace Ogre
 
                 for( int32 i=0; i<numDirectionalLights; ++i )
                 {
+                    assert( globalLightList.lights[i]->getType() == Light::LT_DIRECTIONAL );
+
                     Vector4 lightPos4 = globalLightList.lights[i]->getAs4DVector();
                     Vector3 lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
 
