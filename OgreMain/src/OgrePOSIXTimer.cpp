@@ -28,8 +28,11 @@ THE SOFTWARE.
 #include "OgreTimer.h"
 #include <sys/time.h>
 
-using namespace Ogre;
+namespace Ogre {
 
+// better: use clock_gettime( CLOCK_MONOTONIC, &ts ) as gettimeofday might drift
+// for instance in case of leap days, travel across TZ etc.
+// even better: let std::chrono::steady_clock handle this cross platform
 //--------------------------------------------------------------------------------//
 Timer::Timer()
 {
@@ -76,4 +79,6 @@ unsigned long Timer::getMicrosecondsCPU()
 {
     clock_t newClock = clock();
     return (unsigned long)((float)(newClock-zeroClock) / ((float)CLOCKS_PER_SEC/1000000.0)) ;
+}
+
 }
