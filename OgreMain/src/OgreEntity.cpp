@@ -193,7 +193,14 @@ namespace Ogre {
 
         reevaluateVertexProcessing();
 
-        Aabb aabb( mMesh->getBounds().getCenter(), mMesh->getBounds().getHalfSize() );
+        Aabb aabb;
+        if( mMesh->getBounds().isInfinite() )
+            aabb = Aabb::BOX_INFINITE;
+        else if( mMesh->getBounds().isNull() )
+            aabb = Aabb::BOX_NULL;
+        else
+            aabb = Aabb( mMesh->getBounds().getCenter(), mMesh->getBounds().getHalfSize() );
+
         mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mWorldAabb->setFromAabb( aabb, mObjectData.mIndex );
         mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
