@@ -460,6 +460,9 @@ namespace Ogre
         if( initialData )
             bufferInterface->_firstUpload( initialData );
 
+        if( bufferType == BT_IMMUTABLE )
+            mDelayedBuffers[VERTEX_BUFFER].push_back( retVal );
+
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -656,6 +659,9 @@ namespace Ogre
         if( initialData )
             bufferInterface->_firstUpload( initialData );
 
+        if( bufferType == BT_IMMUTABLE )
+            mDelayedBuffers[INDEX_BUFFER].push_back( retVal );
+
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -798,6 +804,9 @@ namespace Ogre
         {
             if( initialData )
                 static_cast<D3D11BufferInterface*>( bufferInterface )->_firstUpload( initialData );
+
+            if( bufferType == BT_IMMUTABLE )
+                mDelayedBuffers[SHADER_BUFFER].push_back( retVal );
         }
 
         return retVal;
