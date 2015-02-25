@@ -93,7 +93,7 @@
 @foreach( diffuse_map, n )
 	@sub( diffuse_map@n_idx, diffuse_map@n, 1 ) @end
 
-@piece( diffuseIdx0 )material.indices0_3.x & 0x0000FFFF@end
+@piece( diffuseIdx0 )material.indices0_3.x & 0x0000FFFFu@end
 @piece( diffuseIdx1 )material.indices0_3.y >> 16u@end
 @piece( diffuseIdx2 )material.indices0_3.z & 0x0000FFFFu@end
 @piece( diffuseIdx3 )material.indices0_3.w >> 16u@end
