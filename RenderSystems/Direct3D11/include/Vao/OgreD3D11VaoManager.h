@@ -135,6 +135,8 @@ namespace Ogre
         VboMap  mMultiSourceVbos;
         size_t  mDefaultPoolSize[NumInternalBufferTypes][BT_DYNAMIC_DEFAULT+1];
 
+        BufferPackedVec mDelayedBuffers[NumInternalBufferTypes];
+
         VaoVec  mVaos;
         uint32  mVaoNames;
 
@@ -183,6 +185,12 @@ namespace Ogre
         void deallocateVbo( size_t vboIdx, size_t bufferOffset, size_t sizeBytes,
                             BufferType bufferType, InternalBufferType internalType );
 
+        void removeBufferFromDelayedQueue( BufferPackedVec &container, BufferPacked *buffer );
+
+        void createImmutableBuffer( InternalBufferType internalType,
+                                    size_t sizeBytes, void *initialData,
+                                    Vbo &inOutVbo );
+
     public:
         /// @see StagingBuffer::mergeContiguousBlocks
         static void mergeContiguousBlocks( BlockVec::iterator blockToMerge,
@@ -196,6 +204,8 @@ namespace Ogre
                                                             const VertexElement2Vec &vertexElements );
 
         virtual void destroyVertexBufferImpl( VertexBufferPacked *vertexBuffer );
+
+        void createDelayedImmutableBuffers(void);
 
         virtual MultiSourceVertexBufferPool* createMultiSourceVertexBufferPoolImpl(
                                             const VertexElement2VecVec &vertexElementsBySource,

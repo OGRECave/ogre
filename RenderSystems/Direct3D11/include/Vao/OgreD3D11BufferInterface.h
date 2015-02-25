@@ -66,6 +66,10 @@ namespace Ogre
         /// Only use this function for the first upload
         void _firstUpload( void *data );
 
+        const void* _getInitialData(void) const     { return mInitialData; }
+        void _deleteInitialData(void);
+        void _setVboName( size_t vboPoolIdx, ID3D11Buffer *vboName, size_t internalBufferStartBytes );
+
         virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
                                        MappingState prevMappingState, bool advanceFrame = true );
         virtual void unmap( UnmapOptions unmapOption,

@@ -155,6 +155,10 @@ namespace Ogre
     {
         assert( alignment > 0 );
 
+        //Immutable buffers are delayed as much as possible so we can merge all of them.
+        //See createDelayedImmutableBuffers
+        assert( bufferType != BT_IMMUTABLE );
+
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
             bufferType  = BT_DYNAMIC_DEFAULT; //Persitent mapping not supported in D3D11.
@@ -323,6 +327,51 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::createImmutableBuffer( InternalBufferType internalType,
+                                                 size_t sizeBytes, void *initialData,
+                                                 Vbo &inOutVbo )
+    {
+        const size_t poolSize = sizeBytes;
+
+        ID3D11DeviceN *d3dDevice = mDevice.get();
+
+        D3D11_BUFFER_DESC desc;
+        ZeroMemory( &desc, sizeof(D3D11_BUFFER_DESC) );
+        desc.ByteWidth  = poolSize;
+        desc.CPUAccessFlags = 0;
+        desc.Usage = D3D11_USAGE_IMMUTABLE;
+
+        if( internalType == VERTEX_BUFFER )
+            desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+        else if( internalType == INDEX_BUFFER )
+            desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+        else
+            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+        D3D11_SUBRESOURCE_DATA subResData;
+        ZeroMemory( &subResData, sizeof(D3D11_SUBRESOURCE_DATA) );
+        subResData.pSysMem = initialData;
+
+        HRESULT hr = d3dDevice->CreateBuffer( &desc, &subResData, &inOutVbo.vboName );
+
+        if( FAILED( hr ) )
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Failed to create buffer. ID3D11Device::CreateBuffer.\n"
+                         "Error code: " + StringConverter::toString( hr ) + ".\n" +
+                         errorDescription +
+                         "Requested: " + StringConverter::toString( poolSize ) + " bytes.",
+                         "D3D11VaoManager::createImmutableBuffer" );
+        }
+
+        inOutVbo.sizeBytes = poolSize;
+        inOutVbo.freeBlocks.clear(); //No free blocks
+        inOutVbo.dynamicBuffer = 0;
+
+        mVbos[internalType][BT_IMMUTABLE].push_back( inOutVbo );
+    }
+    //-----------------------------------------------------------------------------------
     void D3D11VaoManager::mergeContiguousBlocks( BlockVec::iterator blockToMerge,
                                                    BlockVec &blocks )
     {
@@ -378,16 +427,31 @@ namespace Ogre
     {
         size_t vboIdx;
         size_t bufferOffset;
+        ID3D11Buffer *vboName;
+        D3D11DynamicBuffer *dynamicBuffer;
 
-        allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, VERTEX_BUFFER,
-                     vboIdx, bufferOffset );
+        if( bufferType == BT_IMMUTABLE )
+        {
+            vboIdx          = 0;
+            bufferOffset    = 0;
+            vboName         = 0;
+            dynamicBuffer   = 0;
+        }
+        else
+        {
+            allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, VERTEX_BUFFER,
+                         vboIdx, bufferOffset );
 
-        BufferType vboFlag = bufferType;
-        if( vboFlag >= BT_DYNAMIC_DEFAULT )
-            vboFlag = BT_DYNAMIC_DEFAULT;
-        Vbo &vbo = mVbos[VERTEX_BUFFER][vboFlag][vboIdx];
-        D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vbo.vboName,
-                                                                          vbo.dynamicBuffer );
+            BufferType vboFlag = bufferType;
+            if( vboFlag >= BT_DYNAMIC_DEFAULT )
+                vboFlag = BT_DYNAMIC_DEFAULT;
+            Vbo &vbo = mVbos[VERTEX_BUFFER][vboFlag][vboIdx];
+            vboName         = vbo.vboName;
+            dynamicBuffer   = vbo.dynamicBuffer;
+        }
+
+        D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vboName,
+                                                                          dynamicBuffer );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
@@ -404,11 +468,129 @@ namespace Ogre
         D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
                                                         vertexBuffer->getBufferInterface() );
 
+        if( bufferInterface->_getInitialData() != 0 )
+        {
+            //Immutable buffer that never made to the GPU.
+            removeBufferFromDelayedQueue( mDelayedBuffers[VERTEX_BUFFER], vertexBuffer );
+        }
+        else
+        {
+            deallocateVbo( bufferInterface->getVboPoolIndex(),
+                           vertexBuffer->_getInternalBufferStart() * vertexBuffer->getBytesPerElement(),
+                           vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
+                           vertexBuffer->getBufferType(), VERTEX_BUFFER );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::removeBufferFromDelayedQueue( BufferPackedVec &container,
+                                                        BufferPacked *buffer )
+    {
+        assert( buffer->getBufferType() == BT_IMMUTABLE );
 
-        deallocateVbo( bufferInterface->getVboPoolIndex(),
-                       vertexBuffer->_getInternalBufferStart() * vertexBuffer->getBytesPerElement(),
-                       vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
-                       vertexBuffer->getBufferType(), VERTEX_BUFFER );
+        BufferPackedVec::iterator itor = container.begin();
+        BufferPackedVec::iterator end  = container.end();
+        while( itor != end )
+        {
+            if( *itor == buffer )
+            {
+                itor = efficientVectorRemove( container, itor );
+                itor = container.end();
+                end  = container.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::createDelayedImmutableBuffers(void)
+    {
+        size_t totalBytes = 0;
+
+        for( size_t i=0; i<NumInternalBufferTypes; ++i )
+        {
+            while( !mDelayedBuffers[i].empty() )
+            {
+                Vbo newVbo;
+
+                BufferPackedVec::const_iterator itor = mDelayedBuffers[i].begin();
+                BufferPackedVec::const_iterator end  = mDelayedBuffers[i].end();
+
+                while( itor != end )
+                {
+                    totalBytes = alignToNextMultiple( totalBytes, (*itor)->getBytesPerElement() );
+                    totalBytes += (*itor)->getTotalSizeBytes();
+
+                    if( totalBytes + (*itor)->getTotalSizeBytes() > mDefaultPoolSize[i][BT_IMMUTABLE] )
+                        end = itor + 1;
+
+                    ++itor;
+                }
+
+                uint8 *mergedData = reinterpret_cast<uint8*>(OGRE_MALLOC_SIMD( totalBytes,
+                                                                               MEMCATEGORY_GEOMETRY ));
+                size_t dstOffset = 0;
+
+                itor = mDelayedBuffers[i].begin();
+                while( itor != end )
+                {
+                    D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                (*itor)->getBufferInterface() );
+
+                    const size_t dstOffsetBeforeAlignment = dstOffset;
+                    dstOffset = alignToNextMultiple( dstOffset, (*itor)->getBytesPerElement() );
+
+                    if( dstOffsetBeforeAlignment != dstOffset )
+                    {
+                        //This is a stride changer, record as such.
+                        StrideChangerVec::iterator itStride = std::lower_bound(
+                                    newVbo.strideChangers.begin(),
+                                    newVbo.strideChangers.end(),
+                                    dstOffset, StrideChanger() );
+                        const size_t padding = dstOffset - dstOffsetBeforeAlignment;
+                        newVbo.strideChangers.insert( itStride, StrideChanger( dstOffset, padding ) );
+                    }
+
+                    memcpy( mergedData + dstOffset, bufferInterface->_getInitialData(),
+                            (*itor)->getTotalSizeBytes() );
+
+                    bufferInterface->_deleteInitialData();
+
+                    dstOffset += (*itor)->getTotalSizeBytes();
+
+                    if( totalBytes + (*itor)->getTotalSizeBytes() > mDefaultPoolSize[i][BT_IMMUTABLE] )
+                        end = itor + 1;
+
+                    ++itor;
+                }
+
+                createImmutableBuffer( static_cast<InternalBufferType>(i), totalBytes,
+                                       mergedData, newVbo );
+
+                const size_t vboIdx = mVbos[i][BT_IMMUTABLE].size() - 1;
+                ID3D11Buffer *vboName = newVbo.vboName;
+                dstOffset = 0;
+
+                itor = mDelayedBuffers[i].begin();
+                while( itor != end )
+                {
+                    D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                (*itor)->getBufferInterface() );
+                    dstOffset = alignToNextMultiple( dstOffset, (*itor)->getBytesPerElement() );
+
+                    bufferInterface->_setVboName( vboIdx, vboName, dstOffset );
+
+                    dstOffset += (*itor)->getTotalSizeBytes();
+                    ++itor;
+                }
+
+                mDelayedBuffers[i].erase( mDelayedBuffers[i].begin(), end );
+
+                OGRE_FREE_SIMD( mergedData, MEMCATEGORY_GEOMETRY );
+                mergedData = 0;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     MultiSourceVertexBufferPool* D3D11VaoManager::createMultiSourceVertexBufferPoolImpl(
@@ -441,17 +623,31 @@ namespace Ogre
     {
         size_t vboIdx;
         size_t bufferOffset;
+        ID3D11Buffer *vboName;
+        D3D11DynamicBuffer *dynamicBuffer;
 
-        allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, INDEX_BUFFER,
-                     vboIdx, bufferOffset );
+        if( bufferType == BT_IMMUTABLE )
+        {
+            vboIdx          = 0;
+            bufferOffset    = 0;
+            vboName         = 0;
+            dynamicBuffer   = 0;
+        }
+        else
+        {
+            allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, INDEX_BUFFER,
+                         vboIdx, bufferOffset );
 
-        BufferType vboFlag = bufferType;
-        if( vboFlag >= BT_DYNAMIC_DEFAULT )
-            vboFlag = BT_DYNAMIC_DEFAULT;
+            BufferType vboFlag = bufferType;
+            if( vboFlag >= BT_DYNAMIC_DEFAULT )
+                vboFlag = BT_DYNAMIC_DEFAULT;
+            Vbo &vbo = mVbos[INDEX_BUFFER][vboFlag][vboIdx];
+            vboName         = vbo.vboName;
+            dynamicBuffer   = vbo.dynamicBuffer;
+        }
 
-        Vbo &vbo = mVbos[INDEX_BUFFER][vboFlag][vboIdx];
-        D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vbo.vboName,
-                                                                          vbo.dynamicBuffer );
+        D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vboName,
+                                                                          dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
@@ -468,11 +664,18 @@ namespace Ogre
         D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
                                                         indexBuffer->getBufferInterface() );
 
-
-        deallocateVbo( bufferInterface->getVboPoolIndex(),
-                       indexBuffer->_getInternalBufferStart() * indexBuffer->getBytesPerElement(),
-                       indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
-                       indexBuffer->getBufferType(), INDEX_BUFFER );
+        if( bufferInterface->_getInitialData() != 0 )
+        {
+            //Immutable buffer that never made to the GPU.
+            removeBufferFromDelayedQueue( mDelayedBuffers[INDEX_BUFFER], indexBuffer );
+        }
+        else
+        {
+            deallocateVbo( bufferInterface->getVboPoolIndex(),
+                           indexBuffer->_getInternalBufferStart() * indexBuffer->getBytesPerElement(),
+                           indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
+                           indexBuffer->getBufferType(), INDEX_BUFFER );
+        }
     }
     //-----------------------------------------------------------------------------------
     D3D11CompatBufferInterface* D3D11VaoManager::createShaderBufferInterface( bool constantBuffer,
@@ -607,11 +810,18 @@ namespace Ogre
             D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
                         texBuffer->getBufferInterface() );
 
-
-            deallocateVbo( bufferInterface->getVboPoolIndex(),
-                           texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
-                           texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
-                           texBuffer->getBufferType(), SHADER_BUFFER );
+            if( bufferInterface->_getInitialData() != 0 )
+            {
+                //Immutable buffer that never made to the GPU.
+                removeBufferFromDelayedQueue( mDelayedBuffers[SHADER_BUFFER], texBuffer );
+            }
+            else
+            {
+                deallocateVbo( bufferInterface->getVboPoolIndex(),
+                               texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
+                               texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
+                               texBuffer->getBufferType(), SHADER_BUFFER );
+            }
         }
         else
         {
@@ -642,6 +852,8 @@ namespace Ogre
         D3D11BufferInterface *bufferInterface = 0;
         if( mSupportsIndirectBuffers )
         {
+            assert( bufferType != BT_IMMUTABLE && "Immutable indirect buffers not implemented yet" );
+
             size_t vboIdx;
             BufferType vboFlag = bufferType;
             if( vboFlag >= BT_DYNAMIC_DEFAULT )
@@ -680,12 +892,19 @@ namespace Ogre
             D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
                         indirectBuffer->getBufferInterface() );
 
-
-            deallocateVbo( bufferInterface->getVboPoolIndex(),
-                           indirectBuffer->_getInternalBufferStart() *
-                                indirectBuffer->getBytesPerElement(),
-                           indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
-                           indirectBuffer->getBufferType(), SHADER_BUFFER );
+            if( bufferInterface->_getInitialData() != 0 )
+            {
+                //Immutable buffer that never made to the GPU.
+                removeBufferFromDelayedQueue( mDelayedBuffers[SHADER_BUFFER], indirectBuffer );
+            }
+            else
+            {
+                deallocateVbo( bufferInterface->getVboPoolIndex(),
+                               indirectBuffer->_getInternalBufferStart() *
+                                    indirectBuffer->getBytesPerElement(),
+                               indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
+                               indirectBuffer->getBufferType(), SHADER_BUFFER );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
