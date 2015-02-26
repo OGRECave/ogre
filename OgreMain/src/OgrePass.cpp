@@ -54,7 +54,6 @@ namespace Ogre {
         , mShininess(0)
         , mTracking(TVC_NONE)
         , mDatablock(0)
-        , mColourWrite(true)
         , mAlphaRejectFunc(CMPF_ALWAYS_PASS)
         , mAlphaRejectVal(0)
         , mMaxSimultaneousLights(OGRE_MAX_SIMULTANEOUS_LIGHTS)
@@ -173,7 +172,6 @@ namespace Ogre {
 
         mAlphaRejectFunc = oth.mAlphaRejectFunc;
         mAlphaRejectVal = oth.mAlphaRejectVal;
-        mColourWrite = oth.mColourWrite;
         mMaxSimultaneousLights = oth.mMaxSimultaneousLights;
         mStartLight = oth.mStartLight;
         mIteratePerLight = oth.mIteratePerLight;
@@ -791,14 +789,9 @@ namespace Ogre {
         mAlphaRejectVal = val;
     }
     //-----------------------------------------------------------------------
-    void Pass::setColourWriteEnabled(bool enabled)
-    {
-        mColourWrite = enabled;
-    }
-    //-----------------------------------------------------------------------
     bool Pass::getColourWriteEnabled(void) const
     {
-        return mColourWrite;
+        return mDatablock->getBlendblock()->mBlendChannelMask != 0;
     }
     //-----------------------------------------------------------------------
     void Pass::setMaxSimultaneousLights(unsigned short maxLights)
@@ -1468,7 +1461,7 @@ namespace Ogre {
         // programs are expected to indicate they are ambient only by
         // setting the state so it matches one of the conditions above, even
         // though this state is not used in rendering.
-        return (!mColourWrite ||
+        return (!getColourWriteEnabled() ||
             (mDiffuse == ColourValue::Black &&
              mSpecular == ColourValue::Black));
     }

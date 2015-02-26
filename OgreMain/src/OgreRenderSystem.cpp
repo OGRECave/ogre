@@ -390,39 +390,10 @@ namespace Ogre {
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());
 
-        //Set texture layer compare state and function 
-        _setTextureUnitCompareEnabled(texUnit,tl.getTextureCompareEnabled());
-        _setTextureUnitCompareFunction(texUnit,tl.getTextureCompareFunction());
-
-
-        // Set texture layer filtering
-        _setTextureUnitFiltering(texUnit, 
-            tl.getTextureFiltering(FT_MIN), 
-            tl.getTextureFiltering(FT_MAG), 
-            tl.getTextureFiltering(FT_MIP));
-
-        // Set texture layer filtering
-        _setTextureLayerAnisotropy(texUnit, tl.getTextureAnisotropy());
-
-        // Set mipmap biasing
-        _setTextureMipmapBias(texUnit, tl.getTextureMipmapBias());
-
         // Set blend modes
         // Note, colour before alpha is important
         _setTextureBlendMode(texUnit, tl.getColourBlendMode());
         _setTextureBlendMode(texUnit, tl.getAlphaBlendMode());
-
-        // Texture addressing mode
-        const TextureUnitState::UVWAddressingMode& uvw = tl.getTextureAddressingMode();
-        _setTextureAddressingMode(texUnit, uvw);
-
-        // Set texture border colour only if required
-        if (uvw.u == TextureUnitState::TAM_BORDER ||
-            uvw.v == TextureUnitState::TAM_BORDER ||
-            uvw.w == TextureUnitState::TAM_BORDER)
-        {
-            _setTextureBorderColour(texUnit, tl.getTextureBorderColour());
-        }
 
         // Set texture effects
         TextureUnitState::EffectMap::iterator effi;
@@ -553,14 +524,6 @@ namespace Ogre {
         {
             _disableTextureUnit(i);
         }
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::_setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-            FilterOptions magFilter, FilterOptions mipFilter)
-    {
-        _setTextureUnitFiltering(unit, FT_MIN, minFilter);
-        _setTextureUnitFiltering(unit, FT_MAG, magFilter);
-        _setTextureUnitFiltering(unit, FT_MIP, mipFilter);
     }
     //---------------------------------------------------------------------
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )

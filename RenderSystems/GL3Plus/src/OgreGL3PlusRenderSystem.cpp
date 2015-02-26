@@ -121,7 +121,8 @@ static void APIENTRY GLDebugCallback(GLenum source,
 namespace Ogre {
 
     GL3PlusRenderSystem::GL3PlusRenderSystem()
-        : mDepthWrite(true),
+        : mBlendChannelMask( HlmsBlendblock::BlendChannelAll ),
+          mDepthWrite(true),
           mScissorsEnabled(false),
           mStencilWriteMask(0xFFFFFFFF),
           mGlobalVao( 0 ),
@@ -148,8 +149,6 @@ namespace Ogre {
         mViewMatrix = Matrix4::IDENTITY;
 
         initConfigOptions();
-
-        mColourWrite[0] = mColourWrite[1] = mColourWrite[2] = mColourWrite[3] = true;
 
         for (i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
         {
@@ -1074,36 +1073,6 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusRenderSystem::_setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw)
-    {
-        if (!activateGLTextureUnit(stage))
-            return;
-        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u)));
-        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v)));
-        OGRE_CHECK_GL_ERROR(glTexParameteri( mTextureTypes[stage], GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w)));
-
-        activateGLTextureUnit(0);
-    }
-
-    void GL3PlusRenderSystem::_setTextureBorderColour(size_t stage, const ColourValue& colour)
-    {
-        GLfloat border[4] = { colour.r, colour.g, colour.b, colour.a };
-        if (activateGLTextureUnit(stage))
-        {
-            OGRE_CHECK_GL_ERROR(glTexParameterfv( mTextureTypes[stage], GL_TEXTURE_BORDER_COLOR, border));
-            activateGLTextureUnit(0);
-        }
-    }
-
-    void GL3PlusRenderSystem::_setTextureMipmapBias(size_t stage, float bias)
-    {
-        if (activateGLTextureUnit(stage))
-        {
-            OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[stage], GL_TEXTURE_LOD_BIAS, bias));
-            activateGLTextureUnit(0);
-        }
-    }
-
     GLenum GL3PlusRenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
     {
         switch (ogreBlend)
@@ -1233,31 +1202,6 @@ namespace Ogre {
         }
 
         OGRE_CHECK_GL_ERROR(glBlendEquationSeparate(func, alphaFunc));
-    }
-
-    void GL3PlusRenderSystem::_setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage)
-    {
-        bool a2c = false;
-        static bool lasta2c = false;
-
-        if(func != CMPF_ALWAYS_PASS)
-        {
-            a2c = alphaToCoverage;
-        }
-
-        if (a2c != lasta2c && getCapabilities()->hasCapability(RSC_ALPHA_TO_COVERAGE))
-        {
-            if (a2c)
-            {
-                OGRE_CHECK_GL_ERROR(glEnable(GL_SAMPLE_ALPHA_TO_COVERAGE));
-            }
-            else
-            {
-                OGRE_CHECK_GL_ERROR(glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE));
-            }
-
-            lasta2c = a2c;
-        }
     }
 
     void GL3PlusRenderSystem::_setViewport(Viewport *vp)
@@ -1580,6 +1524,18 @@ namespace Ogre {
         {
             OCGE( glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
         }
+
+
+        if( mBlendChannelMask != blendblock->mBlendChannelMask )
+        {
+            GLboolean r = (blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelRed) != 0;
+            GLboolean g = (blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelGreen) != 0;
+            GLboolean b = (blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelBlue) != 0;
+            GLboolean a = (blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelAlpha) != 0;
+            OCGE( glColorMask( r, g, b, a ) );
+
+            mBlendChannelMask = blendblock->mBlendChannelMask;
+        }
     }
 
     void GL3PlusRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
@@ -1805,17 +1761,6 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glDisable(GL_POLYGON_OFFSET_POINT));
             OGRE_CHECK_GL_ERROR(glDisable(GL_POLYGON_OFFSET_LINE));
         }
-    }
-
-    void GL3PlusRenderSystem::_setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha)
-    {
-        OGRE_CHECK_GL_ERROR(glColorMask(red, green, blue, alpha));
-
-        // record this
-        mColourWrite[0] = red;
-        mColourWrite[1] = blue;
-        mColourWrite[2] = green;
-        mColourWrite[3] = alpha;
     }
 
     void GL3PlusRenderSystem::_convertProjectionMatrix(const Matrix4& matrix,
@@ -2060,82 +2005,6 @@ namespace Ogre {
 
         // should never get here
         return 0;
-    }
-
-    void GL3PlusRenderSystem::_setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions fo)
-    {
-        if (!activateGLTextureUnit(unit))
-            return;
-
-        switch (ftype)
-        {
-        case FT_MIN:
-            mMinFilter = fo;
-
-            // Combine with existing mip filter
-            OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
-                                                GL_TEXTURE_MIN_FILTER,
-                                                getCombinedMinMipFilter()));
-            break;
-
-        case FT_MAG:
-            switch (fo)
-            {
-            case FO_ANISOTROPIC: // GL treats linear and aniso the same
-            case FO_LINEAR:
-                OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
-                                                    GL_TEXTURE_MAG_FILTER,
-                                                    GL_LINEAR));
-                break;
-            case FO_POINT:
-            case FO_NONE:
-                OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
-                                                    GL_TEXTURE_MAG_FILTER,
-                                                    GL_NEAREST));
-                break;
-            }
-            break;
-        case FT_MIP:
-            mMipFilter = fo;
-
-            // Combine with existing min filter
-            OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit],
-                                                GL_TEXTURE_MIN_FILTER,
-                                                getCombinedMinMipFilter()));
-            break;
-        }
-
-        activateGLTextureUnit(0);
-    }
-
-    void GL3PlusRenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
-    {
-        // TODO: Sampler objects, GL 3.3 or GL_ARB_sampler_objects required. For example:
-        //        OGRE_CHECK_GL_ERROR(glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
-        //        OGRE_CHECK_GL_ERROR(glSamplerParameteri(m_rt_ss, GL_TEXTURE_COMPARE_FUNC, GL_NEVER));
-    }
-
-    void GL3PlusRenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
-    {
-        // TODO: GL 3.3 or later or GL_ARB_sampler_objects
-        mTextureCompareEnabled = compare;
-    }
-
-    void GL3PlusRenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
-    {
-        if (!mCurrentCapabilities->hasCapability(RSC_ANISOTROPY))
-            return;
-
-        if (!activateGLTextureUnit(unit))
-            return;
-
-        if (maxAnisotropy > mLargestSupportedAnisotropy)
-            maxAnisotropy = mLargestSupportedAnisotropy ?
-                static_cast<uint>(mLargestSupportedAnisotropy) : 1;
-
-        OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
-
-        activateGLTextureUnit(0);
     }
 
     void GL3PlusRenderSystem::_render(const v1::RenderOperation& op)
@@ -2694,8 +2563,7 @@ namespace Ogre {
                                                const ColourValue& colour,
                                                Real depth, unsigned short stencil)
     {
-        bool colourMask = !mColourWrite[0] || !mColourWrite[1] ||
-            !mColourWrite[2] || !mColourWrite[3];
+        bool colourMask = mBlendChannelMask != HlmsBlendblock::BlendChannelAll;
 
         GLbitfield flags = 0;
         if (buffers & FBT_COLOUR)
@@ -2792,7 +2660,11 @@ namespace Ogre {
 
         if (colourMask && (buffers & FBT_COLOUR))
         {
-            OGRE_CHECK_GL_ERROR(glColorMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]));
+            GLboolean r = (mBlendChannelMask & HlmsBlendblock::BlendChannelRed) != 0;
+            GLboolean g = (mBlendChannelMask & HlmsBlendblock::BlendChannelGreen) != 0;
+            GLboolean b = (mBlendChannelMask & HlmsBlendblock::BlendChannelBlue) != 0;
+            GLboolean a = (mBlendChannelMask & HlmsBlendblock::BlendChannelAlpha) != 0;
+            OCGE( glColorMask( r, g, b, a ) );
         }
 
         if (buffers & FBT_STENCIL)
@@ -2853,7 +2725,13 @@ namespace Ogre {
         // clearFrameBuffer would be wrong because the value we are recorded may be
         // difference with the really state stored in GL context.
         OGRE_CHECK_GL_ERROR(glDepthMask(mDepthWrite));
-        OGRE_CHECK_GL_ERROR(glColorMask(mColourWrite[0], mColourWrite[1], mColourWrite[2], mColourWrite[3]));
+        {
+            GLboolean r = (mBlendChannelMask & HlmsBlendblock::BlendChannelRed) != 0;
+            GLboolean g = (mBlendChannelMask & HlmsBlendblock::BlendChannelGreen) != 0;
+            GLboolean b = (mBlendChannelMask & HlmsBlendblock::BlendChannelBlue) != 0;
+            GLboolean a = (mBlendChannelMask & HlmsBlendblock::BlendChannelAlpha) != 0;
+            OCGE( glColorMask( r, g, b, a ) );
+        }
         OGRE_CHECK_GL_ERROR(glStencilMask(mStencilWriteMask));
     }
 
@@ -2951,6 +2829,8 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target)
     {
+        mActiveViewport = 0;
+
         // Unbind frame buffer object
         if (mActiveRenderTarget)
             mRTTManager->unbind(mActiveRenderTarget);

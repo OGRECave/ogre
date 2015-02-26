@@ -760,95 +760,11 @@ namespace Ogre
         */
         virtual void _setTextureBlendMode(size_t unit, const LayerBlendModeEx& bm) = 0;
 
-        /** Sets the filtering options for a given texture unit.
-        @param unit The texture unit to set the filtering options for
-        @param minFilter The filter used when a texture is reduced in size
-        @param magFilter The filter used when a texture is magnified
-        @param mipFilter The filter used between mipmap levels, FO_NONE disables mipmapping
-        */
-        virtual void _setTextureUnitFiltering(size_t unit, FilterOptions minFilter,
-            FilterOptions magFilter, FilterOptions mipFilter);
-
-        /** Sets a single filter for a given texture unit.
-        @param unit The texture unit to set the filtering options for
-        @param ftype The filter type
-        @param filter The filter to be used
-        */
-        virtual void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter) = 0;
-
-        /** Sets whether the compare func is enabled or not for this texture unit 
-        @param unit The texture unit to set the filtering options for
-        @param compare The state (enabled/disabled)
-        */
-        virtual void _setTextureUnitCompareEnabled(size_t unit, bool compare) = 0;
-
-
-        /** Sets the compare function to use for a given texture unit
-        @param unit The texture unit to set the filtering options for
-        @param function The comparison function
-        */
-        virtual void _setTextureUnitCompareFunction(size_t unit, CompareFunction function) = 0;
-
-
-        /** Sets the maximal anisotropy for the specified texture unit.*/
-        virtual void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy) = 0;
-
-        /** Sets the texture addressing mode for a texture unit.*/
-        virtual void _setTextureAddressingMode(size_t unit, const TextureUnitState::UVWAddressingMode& uvw) = 0;
-
-        /** Sets the texture border colour for a texture unit.*/
-        virtual void _setTextureBorderColour(size_t unit, const ColourValue& colour) = 0;
-
-        /** Sets the mipmap bias value for a given texture unit.
-        @remarks
-        This allows you to adjust the mipmap calculation up or down for a
-        given texture unit. Negative values force a larger mipmap to be used, 
-        positive values force a smaller mipmap to be used. Units are in numbers
-        of levels, so +1 forces the mipmaps to one smaller level.
-        @note Only does something if render system has capability RSC_MIPMAP_LOD_BIAS.
-        */
-        virtual void _setTextureMipmapBias(size_t unit, float bias) = 0;
-
         /** Sets the texture coordinate transformation matrix for a texture unit.
         @param unit Texture unit to affect
         @param xform The 4x4 matrix
         */
         virtual void _setTextureMatrix(size_t unit, const Matrix4& xform) = 0;
-
-        /** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-        The result of the blending operation is:
-        <p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
-        Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
-        enumerated type.
-        By changing the operation you can change addition between the source and destination pixels to a different operator.
-        @param sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
-        @param destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-        @param op The blend operation mode for combining pixels
-        */
-        virtual void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD) = 0;
-
-        /** Sets the global blending factors for combining subsequent renders with the existing frame contents.
-        The result of the blending operation is:
-        <p align="center">final = (texture * sourceFactor) + (pixel * destFactor)</p>
-        Each of the factors is specified as one of a number of options, as specified in the SceneBlendFactor
-        enumerated type.
-        @param sourceFactor The source factor in the above calculation, i.e. multiplied by the texture colour components.
-        @param destFactor The destination factor in the above calculation, i.e. multiplied by the pixel colour components.
-        @param sourceFactorAlpha The source factor in the above calculation for the alpha channel, i.e. multiplied by the texture alpha components.
-        @param destFactorAlpha The destination factor in the above calculation for the alpha channel, i.e. multiplied by the pixel alpha components.
-        @param op The blend operation mode for combining pixels
-        @param alphaOp The blend operation mode for combining pixel alpha values
-        */
-        virtual void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
-            SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD) = 0;
-
-        /** Sets the global alpha rejection approach for future renders.
-        By default images are rendered regardless of texture alpha. This method lets you change that.
-        @param func The comparison function which must pass for a pixel to be written.
-        @param value The value to compare each pixels alpha value to (0-255)
-        @param alphaToCoverage Whether to enable alpha to coverage, if supported
-        */
-        virtual void _setAlphaRejectSettings(CompareFunction func, unsigned char value, bool alphaToCoverage) = 0;
 
         /** Notify the rendersystem that it should adjust texture projection to be 
             relative to a different origin.
@@ -965,14 +881,6 @@ namespace Ogre
         for the new pixel to be written.
         */
         virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) = 0;
-        /** Sets whether or not colour buffer writing is enabled, and for which channels. 
-        @remarks
-        For some advanced effects, you may wish to turn off the writing of certain colour
-        channels, or even all of the colour channels so that only the depth buffer is updated
-        in a rendering pass. However, the chances are that you really want to use this option
-        through the Material class.
-        @param red, green, blue, alpha Whether writing is enabled for each of the 4 colour channels. */
-        virtual void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha) = 0;
         /** Sets the depth bias, NB you should use the Material version of this. 
         @remarks
         When polygons are coplanar, you can get problems with 'depth fighting' where
@@ -994,8 +902,10 @@ namespace Ogre
         of the polygon, see the description above. This is not supported by all
         cards.
 
+        Documentation TODO: This feature was moved to HlmsMacroblock
+
         */
-        virtual void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) = 0;
+        //virtual void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) = 0;
 
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
         virtual void _beginGeometryCount(void);

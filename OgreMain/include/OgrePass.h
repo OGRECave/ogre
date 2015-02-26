@@ -84,9 +84,6 @@ namespace Ogre {
         //-------------------------------------------------------------------------
         HlmsLowLevelDatablock *mDatablock;
 
-        /// Colour buffer settings
-        bool mColourWrite;
-
         // Alpha reject settings
         CompareFunction mAlphaRejectFunc;
         unsigned char mAlphaRejectVal;
@@ -545,17 +542,6 @@ namespace Ogre {
         /** Returns true if this pass has some element of transparency. */
         bool isTransparent(void) const;
 
-        /** Sets whether or not colour buffer writing is enabled for this Pass.
-        @remarks
-            For some effects, you might wish to turn off the colour write operation
-            when rendering geometry; this means that only the depth buffer will be
-            updated (provided you have depth buffer writing enabled, which you
-            probably will do, although you may wish to only update the stencil
-            buffer for example - stencil buffer state is managed at the RenderSystem
-            level only, not the Material since you are likely to want to manage it
-            at a higher level).
-        */
-        void setColourWriteEnabled(bool enabled);
         /** Determines if colour buffer writing is enabled for this pass. */
         bool getColourWriteEnabled(void) const;
 

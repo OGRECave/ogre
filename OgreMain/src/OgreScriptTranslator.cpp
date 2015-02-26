@@ -2460,7 +2460,9 @@ namespace Ogre{
                     {
                         bool val = false;
                         if(getBoolean(prop->values.front(), &val))
-                            mPass->setColourWriteEnabled(val);
+                        {
+                            blendblock.mBlendChannelMask = val ? HlmsBlendblock::BlendChannelAll : 0;
+                        }
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                prop->values.front()->getValue() + " is not a valid boolean");

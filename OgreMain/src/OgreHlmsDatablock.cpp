@@ -63,6 +63,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsBlendblock::HlmsBlendblock() :
         BasicBlock( BLOCK_BLEND ),
+        mBlendChannelMask( BlendChannelAll ),
         mIsTransparent( false ),
         mSeparateBlend( false ),
         mSourceBlendFactor( SBF_ONE ),

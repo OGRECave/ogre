@@ -177,9 +177,6 @@ namespace Ogre
                                           mCurrentSceneManager->getFogEnd() );
         }
 
-        bool colWrite = pass->getColourWriteEnabled();
-        mRenderSystem->_setColourBufferWriteEnabled( colWrite, colWrite, colWrite, colWrite );
-
         Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
         size_t unit = 0;
         while( texIter.hasMoreElements() )

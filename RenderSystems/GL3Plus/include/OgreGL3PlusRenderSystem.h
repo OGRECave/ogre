@@ -89,7 +89,7 @@ namespace Ogre {
         void initConfigOptions(void);
 
         /// Store last colour write state
-        bool mColourWrite[4];
+        uint8 mBlendChannelMask;
 
         /// Store last depth write state
         bool mDepthWrite;
@@ -344,18 +344,6 @@ namespace Ogre {
         /** See
             RenderSystem
         */
-        void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
-        /** See
-            RenderSystem
-        */
-        void _setTextureBorderColour(size_t stage, const ColourValue& colour);
-        /** See
-            RenderSystem
-        */
-        void _setTextureMipmapBias(size_t unit, float bias);
-        /** See
-            RenderSystem
-        */
         void _setTextureMatrix(size_t stage, const Matrix4& xform) { };   // Not supported
         /** See
             RenderSystem
@@ -399,10 +387,6 @@ namespace Ogre {
             RenderSystem
         */
         void _setDepthBias(float constantBias, float slopeScaleBias);
-        /** See
-            RenderSystem
-        */
-        void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
         /** See
             RenderSystem
         */
@@ -450,22 +434,6 @@ namespace Ogre {
                                     StencilOperation passOp = SOP_KEEP,
                     bool twoSidedOperation = false,
                     bool readBackAsTexture = false);
-        /** See
-            RenderSystem
-        */
-        void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
-        /** See
-            RenderSystem
-        */
-        void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-        /** See
-            RenderSystem
-        */
-        void _setTextureUnitCompareEnabled(size_t unit, bool compare);
-        /** See
-            RenderSystem
-        */
-        void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
         /** See
             RenderSystem
         */
@@ -547,8 +515,6 @@ namespace Ogre {
         void _setSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op );
         /// @copydoc RenderSystem::_setSeparateSceneBlending
         void _setSeparateSceneBlending( SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, SceneBlendFactor destFactorAlpha, SceneBlendOperation op, SceneBlendOperation alphaOp );
-        /// @copydoc RenderSystem::_setAlphaRejectSettings
-        void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         /// @copydoc RenderSystem::getDisplayMonitorCount
         unsigned int getDisplayMonitorCount() const;
 

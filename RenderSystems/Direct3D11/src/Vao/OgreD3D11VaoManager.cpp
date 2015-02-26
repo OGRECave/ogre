@@ -1099,11 +1099,18 @@ namespace Ogre
         D3D11_BUFFER_DESC desc;
         ZeroMemory( &desc, sizeof(D3D11_BUFFER_DESC) );
         desc.ByteWidth  = sizeBytes;
-        desc.Usage      = D3D11_USAGE_STAGING;
+
         if( forUpload )
+        {
             desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+            desc.Usage          = D3D11_USAGE_DYNAMIC;
+            desc.BindFlags      = D3D11_BIND_VERTEX_BUFFER|D3D11_BIND_INDEX_BUFFER;
+        }
         else
+        {
             desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+            desc.Usage          = D3D11_USAGE_STAGING;
+        }
 
         ID3D11Buffer *bufferName = 0;
         HRESULT hr = d3dDevice->CreateBuffer( &desc, 0, &bufferName );

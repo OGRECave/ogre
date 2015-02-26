@@ -64,7 +64,7 @@ namespace Ogre
         mMappingCount = sizeBytes;
 
         D3D11_MAPPED_SUBRESOURCE mappedSubres;
-        mDevice.GetImmediateContext()->Map( mVboName, 0, D3D11_MAP_WRITE_NO_OVERWRITE,
+        mDevice.GetImmediateContext()->Map( mVboName, 0, mapFlag,
                                             0, &mappedSubres );
         mMappedPtr = mappedSubres.pData;
 
