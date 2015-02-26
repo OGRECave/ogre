@@ -146,6 +146,15 @@ namespace Ogre
 
         HlmsBlendblock();
 
+        /// Shortcut to set the blend factors to common blending operations.
+        /// Sets both blend and alpha to the same value and mSeparateBlend is
+        /// turned off.
+        void setBlendType( SceneBlendType blendType );
+
+        /// Shortcut to set the blend factors to common blending operations.
+        /// Sets colour and alpha individually, turns mSeparateBlend on.
+        void setBlendType( SceneBlendType colour, SceneBlendType alpha );
+
         bool operator != ( const HlmsBlendblock &_r ) const
         {
             //Don't include the ID in the comparision
