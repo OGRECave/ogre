@@ -588,6 +588,11 @@ namespace Ogre {
         mDepthBufferPool.clear();
     }
     //-----------------------------------------------------------------------
+    void RenderSystem::_beginFrameOnce(void)
+    {
+        mVaoManager->_beginFrame();
+    }
+    //-----------------------------------------------------------------------
     bool RenderSystem::getFixedPipelineEnabled(void) const
     {
         return mEnableFixedPipeline;

@@ -1080,6 +1080,8 @@ bail:
 
 			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
 
+            assert( !mVaoManager );
+            mVaoManager = OGRE_NEW D3D11VaoManager( false, mDevice, this );
 		}
 		else
 		{
@@ -1141,6 +1143,11 @@ bail:
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_HWOCCLUSION);
         rsc->setCapability(RSC_HWOCCLUSION_ASYNCHRONOUS);
+
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
+
+        if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
+            rsc->setCapability(RSC_TEXTURE_CUBE_MAP_ARRAY);
 
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);
@@ -2388,6 +2395,8 @@ bail:
                 "Failed to create blend state\nError Description: " + errorDescription,
                 "D3D11RenderSystem::_hlmsBlendblockCreated" );
         }
+
+        newBlock->mRsData = blendState;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_hlmsBlendblockDestroyed( HlmsBlendblock *block )

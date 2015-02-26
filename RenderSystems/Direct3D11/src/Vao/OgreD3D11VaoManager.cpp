@@ -60,14 +60,17 @@ namespace Ogre
         mDrawId( 0 ),
         mD3D11RenderSystem( renderSystem )
     {
-        mDefaultPoolSize[VERTEX_BUFFER][BT_IMMUTABLE]   = 32 * 1024 * 1024;
-        mDefaultPoolSize[INDEX_BUFFER][BT_IMMUTABLE]    = 16 * 1024 * 1024;
+        mDefaultPoolSize[VERTEX_BUFFER][BT_IMMUTABLE]   = 64 * 1024 * 1024;
+        mDefaultPoolSize[INDEX_BUFFER][BT_IMMUTABLE]    = 64 * 1024 * 1024;
+        mDefaultPoolSize[SHADER_BUFFER][BT_IMMUTABLE]   = 64 * 1024 * 1024;
 
         mDefaultPoolSize[VERTEX_BUFFER][BT_DEFAULT]     = 32 * 1024 * 1024;
         mDefaultPoolSize[INDEX_BUFFER][BT_DEFAULT]      = 16 * 1024 * 1024;
+        mDefaultPoolSize[SHADER_BUFFER][BT_DEFAULT]     = 16 * 1024 * 1024;
 
         mDefaultPoolSize[VERTEX_BUFFER][BT_DYNAMIC_DEFAULT] = 16 * 1024 * 1024;
         mDefaultPoolSize[INDEX_BUFFER][BT_DYNAMIC_DEFAULT]  = 16 * 1024 * 1024;
+        mDefaultPoolSize[SHADER_BUFFER][BT_DYNAMIC_DEFAULT] = 16 * 1024 * 1024;
 
         mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
 
@@ -711,7 +714,7 @@ namespace Ogre
         subResData.pSysMem = initialData;
         ID3D11Buffer *vboName = 0;
 
-        HRESULT hr = d3dDevice->CreateBuffer( &desc, &subResData, &vboName );
+        HRESULT hr = d3dDevice->CreateBuffer( &desc, initialData ? &subResData : 0, &vboName );
 
         if( FAILED( hr ) )
         {
@@ -721,7 +724,7 @@ namespace Ogre
                          "Error code: " + StringConverter::toString( hr ) + ".\n" +
                          errorDescription +
                          "Requested: " + StringConverter::toString( sizeBytes ) + " bytes.",
-                         "D3D11VaoManager::createConstBufferImpl" );
+                         "D3D11VaoManager::createShaderBufferInterface" );
         }
 
         return new D3D11CompatBufferInterface( 0, vboName, mDevice );
@@ -1132,6 +1135,14 @@ namespace Ogre
         return AsyncTicketPtr( OGRE_NEW D3D11AsyncTicket( creator, stagingBuffer,
                                                           elementStart, elementCount,
                                                           mDevice ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::_beginFrame(void)
+    {
+        createDelayedImmutableBuffers();
+
+        //TODO: If we have many tiny immutable buffers, get the data back to CPU,
+        //destroy the buffers and create a unified immutable buffer.
     }
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::_update(void)

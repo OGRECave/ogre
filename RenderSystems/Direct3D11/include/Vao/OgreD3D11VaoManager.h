@@ -266,6 +266,7 @@ namespace Ogre
         virtual AsyncTicketPtr createAsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,
                                                   size_t elementStart, size_t elementCount );
 
+        virtual void _beginFrame(void);
         virtual void _update(void);
 
         /// @see VaoManager::waitForTailFrameToFinish

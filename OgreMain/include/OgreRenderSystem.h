@@ -873,6 +873,10 @@ namespace Ogre
         */
         void _cleanupDepthBuffers( bool bCleanManualBuffers=true );
 
+        /// Signifies the beginning of the main frame. i.e. will only be called once per frame,
+        /// not per viewport
+        virtual void _beginFrameOnce(void);
+
         /**
         * Signifies the beginning of a frame, i.e. the start of rendering on a single viewport. Will occur
         * several times per complete frame if multiple viewports exist.
