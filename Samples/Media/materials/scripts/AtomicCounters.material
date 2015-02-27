@@ -1,3 +1,19 @@
+shared_params switches
+{
+        shared_param_named awesome bool true
+}
+
+shared_params colors
+{
+        shared_param_named R float 1.0
+        // shared_param_named GB float2 0.0 1.0
+}
+
+shared_params more_switches
+{
+        shared_param_named more_awesome bool false
+}
+
 //shared_params counters
 
 //////////
@@ -78,28 +94,9 @@
 //////////
 // GLSL //
 //////////
-compute_program Compute/CS_GLSL glsl
+vertex_program AtomicCounters/VS_GLSL glsl
 {
-        source ComputeCS.glsl
-        syntax glsl430
-        compute_group_dimensions 32 1 1
-        //TODO is this necessary?
-        // placement postrender
-        //TODO how to handle glMemoryBarrier?
-        // do other programs need to support this?
-        // should be able to handle multiple barriers via bit ops
-        // pre_memory_barrier texture
-        // post_memory_barrier texture
-
-        default_params
-        {
-            param_named multiplier float 10.0
-        }
-}
-
-vertex_program Compute/VS_GLSL glsl
-{
-        source ComputeVS.glsl
+        source AtomicVS.glsl
         syntax glsl150
 
         default_params
@@ -108,9 +105,9 @@ vertex_program Compute/VS_GLSL glsl
         }
 }
 
-geometry_program Compute/GS_GLSL glsl
+geometry_program AtomicCounters/GS_GLSL glsl
 {
-        source ComputeGS.glsl
+        source AtomicGS.glsl
         syntax glsl150
 
         default_params
@@ -119,9 +116,9 @@ geometry_program Compute/GS_GLSL glsl
         }
 }
 
-fragment_program Compute/PS_GLSL glsl
+fragment_program AtomicCounters/PS_GLSL glsl
 {
-        source ComputeFS.glsl
+        source AtomicFS.glsl
         syntax glsl430
 
         default_params
@@ -135,35 +132,28 @@ fragment_program Compute/PS_GLSL glsl
         }
 }
 
-compute_program Compute/CS unified
+vertex_program AtomicCounters/VS unified
 {
-        delegate Compute/CS_GLSL
-        // delegate Compute/CS_HLSL
-        // delegate Compute/CS_CG
-}
-
-vertex_program Compute/VS unified
-{
-        delegate Compute/VS_GLSL
+        delegate AtomicCounters/VS_GLSL
         // delegate Compute/VS_HLSL
         // delegate Compute/VS_CG
 }
 
-geometry_program Compute/GS unified
+geometry_program AtomicCounters/GS unified
 {
-        delegate Compute/GS_GLSL
+        delegate AtomicCounters/GS_GLSL
         // delegate Compute/GS_HLSL
         // delegate Compute/GS_CG
 }
 
-fragment_program Compute/PS unified
+fragment_program AtomicCounters/PS unified
 {
-        delegate Compute/PS_GLSL
+        delegate AtomicCounters/PS_GLSL
         // delegate Compute/PS_HLSL
         // delegate Compute/PS_CG
 }
 
-material Compute
+material AtomicCounters
 {
         technique
         {
@@ -171,16 +161,11 @@ material Compute
                 {
                     texture_unit
                     {
-                      texture data.csv
-                      image_bind 0 read X8R8B8G8
+                      //texture data.csv
+                      //image_bind 0 read X8R8B8G8
                     }
 
-                        compute_program_ref Compute/CS
-                        {
-
-                        }
-
-                        vertex_program_ref Compute/VS
+                        vertex_program_ref AtomicCounters/VS
                         {
 
                         }
@@ -195,12 +180,12 @@ material Compute
 
                         // }
 
-                        geometry_program_ref Compute/GS
+                        geometry_program_ref AtomicCounters/GS
                         {
 
                         }
 
-                        fragment_program_ref Compute/PS
+                        fragment_program_ref AtomicCounters/PS
                         {
 
                         }
