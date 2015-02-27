@@ -35,15 +35,15 @@ class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
     {
         mInfo["Title"] = "Atomic Counters";
         mInfo["Description"] = "An example of using atomic counters to visualise GPU rasterization order";
-        mInfo["Thumbnail"] = "thumb_compute.png";
+        mInfo["Thumbnail"] = "thumb_atomicc.png";
         mInfo["Category"] = "Unsorted";
     }
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        /*OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
                     "Sample currently under construction.  Try again soon!",
-                    "Sample_Compute::testCapabilities");*/
+                    "Sample_Compute::testCapabilities");
 
         if (!caps->hasCapability(RSC_ATOMIC_COUNTERS))
         {
