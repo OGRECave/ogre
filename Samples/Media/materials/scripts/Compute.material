@@ -1,80 +1,3 @@
-//shared_params counters
-
-//////////
-// HLSL //
-//////////
-
-//TODO Implement me.
-// vertex_program Compute/VS_HLSL hlsl
-// {
-//         source Compute.hlsl
-//         entry_point mainVS
-//         target vs_4_0
-
-//         default_params
-//         {
-//                 param_named_auto WorldViewProj worldviewproj_matrix
-//         }
-// }
-
-// geometry_program Compute/GS_HLSL hlsl
-// {
-//         source Compute.hlsl
-//         entry_point mainGS
-//         target gs_4_0
-//         uses_adjacency_information true
-
-//         default_params
-//         {
-//                 param_named IsoValue float 1
-//         }
-// }
-
-// fragment_program Compute/PS_HLSL hlsl
-// {
-//         source Compute.hlsl
-//         entry_point mainPS
-//         target ps_4_0
-// }
-
-//////////
-//  CG  //
-//////////
-
-// As of CG 3.1, compute shaders are not yet supported.
-
-// vertex_program Compute/VS_CG cg
-// {
-//         source Compute.cg
-//         entry_point mainVS
-//         profiles vp40 arbvp1
-
-//         default_params
-//         {
-//                 param_named_auto WorldViewProj worldviewproj_matrix
-//         }
-// }
-
-// geometry_program Compute/GS_CG cg
-// {
-//         source Compute.cg
-//         entry_point mainGS
-//         profiles gpu_gp gp4_gp
-//         uses_adjacency_information true
-
-//         default_params
-//         {
-//             param_named IsoValue float 1
-//         }
-// }
-
-// fragment_program Compute/PS_CG cg
-// {
-//         source Compute.cg
-//         entry_point mainPS
-//         profiles fp40 arbfp1
-// }
-
 //////////
 // GLSL //
 //////////
@@ -82,7 +5,10 @@ compute_program Compute/CS_GLSL glsl
 {
         source ComputeCS.glsl
         syntax glsl430
-        compute_group_dimensions 32 1 1
+
+        // the texture size is 256x256x1 and the group size is 16x16x1
+        // so we have to launch 16x16x1 groups
+        compute_group_dimensions 16 16 1
         //TODO is this necessary?
         // placement postrender
         //TODO how to handle glMemoryBarrier?
@@ -91,9 +17,11 @@ compute_program Compute/CS_GLSL glsl
         // pre_memory_barrier texture
         // post_memory_barrier texture
 
+        // FIXME setting uniforms on compute shaders does not work yet
+        // extractUniformsFromProgram seems to fail
         default_params
         {
-            param_named multiplier float 10.0
+            param_named roll float 0.5
         }
 }
 
@@ -108,31 +36,10 @@ vertex_program Compute/VS_GLSL glsl
         }
 }
 
-geometry_program Compute/GS_GLSL glsl
-{
-        source ComputeGS.glsl
-        syntax glsl150
-
-        default_params
-        {
-            param_named_auto WorldViewProj worldviewproj_matrix
-        }
-}
-
 fragment_program Compute/PS_GLSL glsl
 {
         source ComputeFS.glsl
         syntax glsl430
-
-        default_params
-        {
-            shared_params_ref switches
-            shared_params_ref more_switches
-            param_named atom_counter uint 10
-            param_named pretty_colours bool false
-            param_named image_load_store bool false
-            param_named colour_factor uint[3] 50 50 100
-        }
 }
 
 compute_program Compute/CS unified
@@ -149,13 +56,6 @@ vertex_program Compute/VS unified
         // delegate Compute/VS_CG
 }
 
-geometry_program Compute/GS unified
-{
-        delegate Compute/GS_GLSL
-        // delegate Compute/GS_HLSL
-        // delegate Compute/GS_CG
-}
-
 fragment_program Compute/PS unified
 {
         delegate Compute/PS_GLSL
@@ -165,45 +65,21 @@ fragment_program Compute/PS unified
 
 material Compute
 {
-        technique
+    technique
+    {
+        pass
         {
-                pass
-                {
-                    texture_unit
-                    {
-                      texture data.csv
-                      image_bind 0 read X8R8B8G8
-                    }
+            texture_unit
+            {
+              //texture data.csv
+              // FIXME not implemented in script parser
+              //image_bind 0 read X8R8B8G8
+            }
 
-                        compute_program_ref Compute/CS
-                        {
+            compute_program_ref Compute/CS {}
 
-                        }
-
-                        vertex_program_ref Compute/VS
-                        {
-
-                        }
-
-                        // tesselation_hull_program_ref Compute/THS
-                        // {
-
-                        // }
-
-                        // tesselation_domain_program_ref Compute/TDS
-                        // {
-
-                        // }
-
-                        geometry_program_ref Compute/GS
-                        {
-
-                        }
-
-                        fragment_program_ref Compute/PS
-                        {
-
-                        }
-                }
+            vertex_program_ref Compute/VS {}
+            fragment_program_ref Compute/PS {}
         }
+    }
 }
