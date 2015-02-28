@@ -35,8 +35,11 @@ namespace Demo
         //---------------------------------------------------------------------------------------
 
         //Load the v1 mesh. Notice the v1 namespace
+        //Also notice the HBU_STATIC flag; since the HBU_WRITE_ONLY
+        //bit would prohibit us from reading the data for importing.
         v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
-                    "athene.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+                    "athene.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                    Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC );
 
         //Create a v2 mesh to import to, with a different name (arbitrary).
         v2Mesh = Ogre::MeshManager::getSingleton().createManual(
@@ -73,7 +76,8 @@ namespace Demo
         //Import Barrel to save it to disk.
         //---------------------------------------------------------------------------------------
         v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
-                    "Barrel.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+                    "Barrel.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                    Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC );
         //Create a v2 mesh to import to, with a different name.
         v2Mesh = Ogre::MeshManager::getSingleton().createManual(
                     "Barrel Imported", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
