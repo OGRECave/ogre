@@ -493,6 +493,8 @@ namespace Ogre
             ++itor;
         }
 
+        mRenderSystem->_beginFrameOnce();
+
         itor = mWorkspaces.begin();
 
         while( itor != end )

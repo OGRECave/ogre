@@ -66,7 +66,7 @@ namespace Ogre
         D3D11_MAPPED_SUBRESOURCE mappedSubres;
         mDevice.GetImmediateContext()->Map( mVboName, 0, mapFlag,
                                             0, &mappedSubres );
-        mMappedPtr = mappedSubres.pData;
+        mMappedPtr = reinterpret_cast<uint8*>( mappedSubres.pData ) + mMappingStart;
 
         return mMappedPtr;
     }
@@ -174,7 +174,7 @@ namespace Ogre
 
         D3D11_MAPPED_SUBRESOURCE mappedSubres;
         mDevice.GetImmediateContext()->Map( mVboName, 0, D3D11_MAP_READ, 0, &mappedSubres );
-        mMappedPtr = mappedSubres.pData;
+        mMappedPtr = reinterpret_cast<uint8*>( mappedSubres.pData ) + mMappingStart;
 
         //Put the mapped region back to our records as "available" for subsequent _asyncDownload
         _cancelDownload( offset, sizeBytes );

@@ -104,6 +104,28 @@ namespace Ogre
                                    "HullShader_hs", "DomainShader_ds" };
     const String PieceFilePatterns[] = { "piece_vs", "piece_ps", "piece_gs", "piece_hs", "piece_ds" };
 
+    //Must be sorted from best to worst
+    const String BestD3DShaderTargets[NumShaderTypes][5] =
+    {
+        {
+            "vs_5_0", "vs_4_1", "vs_4_0",
+            "vs_4_0_level_9_3", "vs_4_0_level_9_1"
+        },
+        {
+            "ps_5_0", "ps_4_1", "ps_4_0",
+            "ps_4_0_level_9_3", "ps_4_0_level_9_1"
+        },
+        {
+            "gs_5_0", "gs_4_1", "gs_4_0", "placeholder", "placeholder"
+        },
+        {
+            "hs_5_0", "hs_4_1", "hs_4_0", "placeholder", "placeholder"
+        },
+        {
+            "ds_5_0", "ds_4_1", "ds_4_0", "placeholder", "placeholder"
+        },
+    };
+
     Hlms::Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder ) :
         mDataFolder( dataFolder ),
         mHlmsManager( 0 ),
@@ -117,6 +139,7 @@ namespace Ogre
         mType( type ),
         mTypeName( typeName )
     {
+        memset( mShaderTargets, 0, sizeof(mShaderTargets) );
         enumeratePieceFiles();
     }
     //-----------------------------------------------------------------------------------
@@ -632,6 +655,8 @@ namespace Ogre
         int mulOp( int op1, int op2 ) { return op1 * op2; }
         int divOp( int op1, int op2 ) { return op1 / op2; }
         int modOp( int op1, int op2 ) { return op1 % op2; }
+        int minOp( int op1, int op2 ) { return std::min( op1, op2 ); }
+        int maxOp( int op1, int op2 ) { return std::max( op1, op2 ); }
 
         struct Operation
         {
@@ -642,14 +667,16 @@ namespace Ogre
                 opName( _name ), length( len ), opFunc( _opFunc ) {}
         };
 
-        const Operation c_operations[6] =
+        const Operation c_operations[8] =
         {
             Operation( "pset", sizeof( "@pset" ), &setOp ),
             Operation( "padd", sizeof( "@padd" ), &addOp ),
             Operation( "psub", sizeof( "@psub" ), &subOp ),
             Operation( "pmul", sizeof( "@pmul" ), &mulOp ),
             Operation( "pdiv", sizeof( "@pdiv" ), &divOp ),
-            Operation( "pmod", sizeof( "@pmod" ), &modOp )
+            Operation( "pmod", sizeof( "@pmod" ), &modOp ),
+            Operation( "pmin", sizeof( "@pmin" ), &minOp ),
+            Operation( "pmax", sizeof( "@pmax" ), &maxOp )
         };
     //-----------------------------------------------------------------------------------
     bool Hlms::parseMath( const String &inBuffer, String &outBuffer )
@@ -671,7 +698,7 @@ namespace Ogre
             SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                 subString.getStart() + maxSize );
 
-            for( size_t i=0; i<6 && keyword == (size_t)~0; ++i )
+            for( size_t i=0; i<8 && keyword == (size_t)~0; ++i )
             {
                 if( keywordStr.matchEqual( c_operations[i].opName ) )
                     keyword = i;
@@ -743,7 +770,7 @@ namespace Ogre
                 SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                     subString.getStart() + maxSize );
 
-                for( size_t i=0; i<6 && keyword == (size_t)~0; ++i )
+                for( size_t i=0; i<8 && keyword == (size_t)~0; ++i )
                 {
                     if( keywordStr.matchEqual( c_operations[i].opName ) )
                         keyword = i;
@@ -978,7 +1005,7 @@ namespace Ogre
         return syntaxError;
     }
     //-----------------------------------------------------------------------------------
-        const Operation c_counterOperations[8] =
+        const Operation c_counterOperations[10] =
         {
             Operation( "counter", sizeof( "@counter" ), 0 ),
             Operation( "value", sizeof( "@value" ), 0 ),
@@ -987,7 +1014,9 @@ namespace Ogre
             Operation( "sub", sizeof( "@sub" ), &subOp ),
             Operation( "mul", sizeof( "@mul" ), &mulOp ),
             Operation( "div", sizeof( "@div" ), &divOp ),
-            Operation( "mod", sizeof( "@mod" ), &modOp )
+            Operation( "mod", sizeof( "@mod" ), &modOp ),
+            Operation( "min", sizeof( "@min" ), &minOp ),
+            Operation( "max", sizeof( "@max" ), &maxOp )
         };
     //-----------------------------------------------------------------------------------
     bool Hlms::parseCounter( const String &inBuffer, String &outBuffer )
@@ -1009,7 +1038,7 @@ namespace Ogre
             SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                 subString.getStart() + maxSize );
 
-            for( size_t i=0; i<8 && keyword == (size_t)~0; ++i )
+            for( size_t i=0; i<10 && keyword == (size_t)~0; ++i )
             {
                 if( keywordStr.matchEqual( c_counterOperations[i].opName ) )
                     keyword = i;
@@ -1105,7 +1134,7 @@ namespace Ogre
                 SubStringRef keywordStr( &inBuffer, subString.getStart() + pos + 1,
                                                     subString.getStart() + maxSize );
 
-                for( size_t i=0; i<8 && keyword == (size_t)~0; ++i )
+                for( size_t i=0; i<10 && keyword == (size_t)~0; ++i )
                 {
                     if( keywordStr.matchEqual( c_counterOperations[i].opName ) )
                         keyword = i;
@@ -1444,6 +1473,13 @@ namespace Ogre
                                     mShaderProfile, static_cast<GpuProgramType>(i) );
                 gp->setSource( outString );
 
+                if( mShaderTargets[i] )
+                {
+                    //D3D-specific
+                    gp->setParameter( "target", *mShaderTargets[i] );
+                    gp->setParameter( "entry_point", "main" );
+                }
+
                 gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
                 gp->setMorphAnimationIncluded( false );
                 gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) );
@@ -1761,6 +1797,7 @@ namespace Ogre
         mRenderSystem = newRs;
 
         mShaderProfile = "unset!";
+        memset( mShaderTargets, 0, sizeof(mShaderTargets) );
 
         if( mRenderSystem )
         {
@@ -1772,6 +1809,18 @@ namespace Ogre
             {
                 if( capabilities->isShaderProfileSupported( shaderProfiles[i] ) )
                     mShaderProfile = shaderProfiles[i];
+            }
+
+            if( mShaderProfile == "hlsl" )
+            {
+                for( size_t i=0; i<NumShaderTypes; ++i )
+                {
+                    for( size_t j=0; j<5 && !mShaderTargets[i]; ++j )
+                    {
+                        if( capabilities->isShaderProfileSupported( BestD3DShaderTargets[i][j] ) )
+                            mShaderTargets[i] = &BestD3DShaderTargets[i][j];
+                    }
+                }
             }
 
             if( !mDefaultDatablock )

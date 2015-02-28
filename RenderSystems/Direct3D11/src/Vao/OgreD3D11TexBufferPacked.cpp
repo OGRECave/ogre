@@ -28,8 +28,10 @@ THE SOFTWARE.
 
 #include "Vao/OgreD3D11TexBufferPacked.h"
 #include "Vao/OgreD3D11BufferInterface.h"
+#include "Vao/OgreD3D11VaoManager.h"
 
 #include "OgreD3D11Mappings.h"
+#include "OgreD3D11RenderSystem.h"
 
 namespace Ogre
 {
@@ -64,7 +66,7 @@ namespace Ogre
     ID3D11ShaderResourceView* D3D11TexBufferPacked::createResourceView( int cacheIdx, uint32 offset,
                                                                         uint32 sizeBytes )
     {
-        assert( cacheIdx % 16 );
+        assert( cacheIdx < 16 );
 
         if( mCachedResourceViews[cacheIdx].mResourceView )
             mCachedResourceViews[cacheIdx].mResourceView->Release();
@@ -79,10 +81,25 @@ namespace Ogre
         srDesc.Buffer.FirstElement  = mFinalBufferStart + offset / mBytesPerElement;
         srDesc.Buffer.NumElements   = sizeBytes / mBytesPerElement;
 
-        assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>( mBufferInterface );
+        D3D11RenderSystem *rs = static_cast<D3D11VaoManager*>(mVaoManager)->getD3D11RenderSystem();
+        ID3D11Buffer *vboName = 0;
 
-        mDevice.get()->CreateShaderResourceView( bufferInterface->getVboName(), &srDesc,
+        if( rs->_getFeatureLevel() > D3D_FEATURE_LEVEL_11_0 )
+        {
+            assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
+            D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                        mBufferInterface );
+            vboName = bufferInterface->getVboName();
+        }
+        else
+        {
+            assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
+            D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
+                        mBufferInterface );
+            vboName = bufferInterface->getVboName();
+        }
+
+        mDevice.get()->CreateShaderResourceView( vboName, &srDesc,
                                                  &mCachedResourceViews[cacheIdx].mResourceView );
 
         mCurrentCacheCursor = (cacheIdx + 1) % 16;

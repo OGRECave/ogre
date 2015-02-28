@@ -1841,6 +1841,10 @@ bail:
             mTexStageDesc[stage].type = dt->getTextureType();
 
             mLastTextureUnitState = stage+1;
+
+            mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(stage), static_cast<UINT>(1), &pTex);
+            mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(stage), static_cast<UINT>(1), &pTex);
+            //mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
         }
         else
         {
@@ -2350,9 +2354,9 @@ bail:
         //TODO: Refactor Ogre to:
         //  a. Separate samplerblocks from textures (GL can emulate the merge).
         //  b. Set all of them at once.
-        mDevice.GetImmediateContext()->VSSetSamplers( static_cast<UINT>(0), static_cast<UINT>(1),
+        mDevice.GetImmediateContext()->VSSetSamplers( static_cast<UINT>(texUnit), static_cast<UINT>(1),
                                                       &samplerState );
-        mDevice.GetImmediateContext()->PSSetSamplers( static_cast<UINT>(0), static_cast<UINT>(1),
+        mDevice.GetImmediateContext()->PSSetSamplers( static_cast<UINT>(texUnit), static_cast<UINT>(1),
                                                       &samplerState );
         if( mDevice.isError() )
         {
@@ -3108,11 +3112,18 @@ bail:
 
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 
-        v1::D3D11HardwareIndexBuffer* indexBuffer =
-            static_cast<v1::D3D11HardwareIndexBuffer*>( cmd->indexData->indexBuffer.get() );
-        deviceContext->IASetIndexBuffer( indexBuffer->getD3DIndexBuffer(),
-                                         D3D11Mappings::getFormat( indexBuffer->getType() ),
-                                         0 );
+        if( cmd->indexData )
+        {
+            v1::D3D11HardwareIndexBuffer* indexBuffer =
+                    static_cast<v1::D3D11HardwareIndexBuffer*>( cmd->indexData->indexBuffer.get() );
+            deviceContext->IASetIndexBuffer( indexBuffer->getD3DIndexBuffer(),
+                                             D3D11Mappings::getFormat( indexBuffer->getType() ),
+                                             0 );
+        }
+        else
+        {
+            deviceContext->IASetIndexBuffer( 0, DXGI_FORMAT_UNKNOWN, 0 );
+        }
 
         D3D11_PRIMITIVE_TOPOLOGY primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         if( mBoundTessellationHullProgram && mBoundTessellationDomainProgram )

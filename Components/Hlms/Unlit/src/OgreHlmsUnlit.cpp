@@ -203,6 +203,9 @@ namespace Ogre
         const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash,
                                                                 queuedRenderable );
 
+        if( mShaderProfile == "hlsl" )
+            return retVal; //D3D embeds the texture slots in the shader.
+
         //Set samplers.
         GpuProgramParametersSharedPtr vsParams = retVal->vertexShader->getDefaultParameters();
         GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
@@ -280,6 +283,7 @@ namespace Ogre
         setProperty( HlmsBaseProp::Tangent,     0 );
         setProperty( HlmsBaseProp::BonesPerVertex, 0 );
 
+        int texUnit = 2; //Vertex shader consumes 2 slots with its two tbuffers.
         int numTextures = 0;
         int numArrayTextures = 0;
 
@@ -290,10 +294,19 @@ namespace Ogre
             while( itor != end )
             {
                 if( itor->texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+                {
+                    setProperty( "array_texture_bind" + StringConverter::toString( numArrayTextures ),
+                                 texUnit );
                     ++numArrayTextures;
+                }
                 else
+                {
+                    setProperty( "texture_bind" + StringConverter::toString( numArrayTextures ),
+                                 texUnit );
                     ++numTextures;
+                }
 
+                ++texUnit;
                 ++itor;
             }
         }
@@ -413,18 +426,27 @@ namespace Ogre
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
         Matrix4 projectionMatrix = camera->getProjectionMatrixWithRSDepth();
+        Matrix4 identityProjMat;
+
+        mRenderSystem->_convertProjectionMatrix( Matrix4::IDENTITY,
+                                                 identityProjMat, true );
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         if( renderTarget->requiresTextureFlipping() )
         {
-            projectionMatrix[1][0] = -projectionMatrix[1][0];
-            projectionMatrix[1][1] = -projectionMatrix[1][1];
-            projectionMatrix[1][2] = -projectionMatrix[1][2];
-            projectionMatrix[1][3] = -projectionMatrix[1][3];
+            projectionMatrix[1][0]  = -projectionMatrix[1][0];
+            projectionMatrix[1][1]  = -projectionMatrix[1][1];
+            projectionMatrix[1][2]  = -projectionMatrix[1][2];
+            projectionMatrix[1][3]  = -projectionMatrix[1][3];
+
+            identityProjMat[1][0]   = -identityProjMat[1][0];
+            identityProjMat[1][1]   = -identityProjMat[1][1];
+            identityProjMat[1][2]   = -identityProjMat[1][2];
+            identityProjMat[1][3]   = -identityProjMat[1][3];
         }
 
-        mPreparedPass.viewProjMatrix[0]     = projectionMatrix * viewMatrix;
-        mPreparedPass.viewProjMatrix[1]     = Matrix4::IDENTITY;
+        mPreparedPass.viewProjMatrix[0] = projectionMatrix * viewMatrix;
+        mPreparedPass.viewProjMatrix[1] = identityProjMat;
 
         mSetProperties.clear();
 

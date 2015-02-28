@@ -118,7 +118,7 @@ namespace Ogre
 
         if( mCurrentConstBuffer >= mConstBuffers.size() )
         {
-            size_t bufferSize = std::min<size_t>( 65535, mVaoManager->getConstBufferMaxSize() );
+            size_t bufferSize = std::min<size_t>( 65536, mVaoManager->getConstBufferMaxSize() );
             ConstBufferPacked *newBuffer = mVaoManager->createConstBuffer( bufferSize,
                                                                            BT_DYNAMIC_PERSISTENT,
                                                                            0, false );

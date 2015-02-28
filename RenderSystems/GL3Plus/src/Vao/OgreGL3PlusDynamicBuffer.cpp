@@ -93,7 +93,7 @@ namespace Ogre
 
         outTicket = addMappedRange( start, count );
 
-        return static_cast<char*>(mMappedPtr) + start;
+        return static_cast<uint8*>(mMappedPtr) + start;
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusDynamicBuffer::flush( size_t ticket, size_t start, size_t count )
