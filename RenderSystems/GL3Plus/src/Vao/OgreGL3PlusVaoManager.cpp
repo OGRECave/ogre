@@ -909,6 +909,7 @@ namespace Ogre
             }
         }
 
+        //We delete it here because this class has no virtual destructor on purpose
         OGRE_DELETE glVao;
     }
     //-----------------------------------------------------------------------------------

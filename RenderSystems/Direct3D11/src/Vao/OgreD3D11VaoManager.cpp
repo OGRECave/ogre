@@ -516,12 +516,15 @@ namespace Ogre
 
         for( size_t i=0; i<NumInternalBufferTypes; ++i )
         {
-            while( !mDelayedBuffers[i].empty() )
+            BufferPackedVec::const_iterator itor = mDelayedBuffers[i].begin();
+
+            while( itor != mDelayedBuffers[i].end() )
             {
+                //Each iteration means a new pool
                 Vbo newVbo;
 
-                BufferPackedVec::const_iterator itor = mDelayedBuffers[i].begin();
-                BufferPackedVec::const_iterator end  = mDelayedBuffers[i].end();
+                //Calculate the size for this pool
+                BufferPackedVec::const_iterator end = mDelayedBuffers[i].end();
 
                 while( itor != end )
                 {
@@ -538,6 +541,7 @@ namespace Ogre
                                                                                MEMCATEGORY_GEOMETRY ));
                 size_t dstOffset = 0;
 
+                //Merge the binary data as a contiguous array
                 itor = mDelayedBuffers[i].begin();
                 while( itor != end )
                 {
@@ -571,6 +575,7 @@ namespace Ogre
                     ++itor;
                 }
 
+                //Create the actual D3D11 object loaded with the merged data
                 createImmutableBuffer( static_cast<InternalBufferType>(i), totalBytes,
                                        mergedData, newVbo );
 
@@ -578,6 +583,8 @@ namespace Ogre
                 ID3D11Buffer *vboName = newVbo.vboName;
                 dstOffset = 0;
 
+                //Each buffer needs to be told about its new D3D11 object
+                //(and pool index & where it starts).
                 itor = mDelayedBuffers[i].begin();
                 while( itor != end )
                 {
@@ -591,11 +598,83 @@ namespace Ogre
                     ++itor;
                 }
 
-                mDelayedBuffers[i].erase( mDelayedBuffers[i].begin(), end );
-
                 OGRE_FREE_SIMD( mergedData, MEMCATEGORY_GEOMETRY );
                 mergedData = 0;
             }
+        }
+
+        reorganizeImmutableVaos();
+
+        for( size_t i=0; i<NumInternalBufferTypes; ++i )
+            mDelayedBuffers[i].clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::reorganizeImmutableVaos(void)
+    {
+        VertexArrayObjectVec::const_iterator itor = mVertexArrayObjects.begin();
+        VertexArrayObjectVec::const_iterator end  = mVertexArrayObjects.end();
+
+        while( itor != end )
+        {
+            VertexArrayObject *vertexArrayObject = *itor;
+
+            bool needsUpdate = false;
+
+            const VertexBufferPackedVec &vertexBuffers = vertexArrayObject->getVertexBuffers();
+            VertexBufferPackedVec::const_iterator itVertexBuf = vertexBuffers.begin();
+            VertexBufferPackedVec::const_iterator enVertexBuf = vertexBuffers.end();
+
+            while( itVertexBuf != enVertexBuf && !needsUpdate )
+            {
+                if( (*itVertexBuf)->getBufferType() == BT_IMMUTABLE )
+                {
+                    BufferPackedVec::const_iterator it = std::find(
+                                mDelayedBuffers[VERTEX_BUFFER].begin(),
+                                mDelayedBuffers[VERTEX_BUFFER].end(),
+                                *itVertexBuf );
+
+                    if( it != mDelayedBuffers[VERTEX_BUFFER].end() )
+                        needsUpdate = true;
+                }
+
+                ++itVertexBuf;
+            }
+
+            if( vertexArrayObject->getIndexBuffer() &&
+                vertexArrayObject->getIndexBuffer()->getBufferType() == BT_IMMUTABLE )
+            {
+                BufferPackedVec::const_iterator it = std::find( mDelayedBuffers[INDEX_BUFFER].begin(),
+                                                                mDelayedBuffers[INDEX_BUFFER].end(),
+                                                                vertexArrayObject->getIndexBuffer() );
+                if( it != mDelayedBuffers[INDEX_BUFFER].end() )
+                    needsUpdate = true;
+            }
+
+            if( needsUpdate )
+            {
+                if( vertexArrayObject->getVaoName() )
+                    releaseVao( vertexArrayObject );
+
+                VaoVec::iterator itor = findVao( vertexArrayObject->getVertexBuffers(),
+                                                 vertexArrayObject->getIndexBuffer(),
+                                                 vertexArrayObject->getOperationType() );
+
+                D3D11VertexArrayObject *d3dVao = static_cast<D3D11VertexArrayObject*>(
+                            vertexArrayObject );
+
+                uint32 uniqueVaoId = extractUniqueVaoIdFromRenderQueueId( d3dVao->getRenderQueueId() );
+
+                const uint32 renderQueueId = generateRenderQueueId( itor->vaoName, uniqueVaoId );
+
+                *d3dVao = D3D11VertexArrayObject( itor->vaoName,
+                                                  renderQueueId,
+                                                  d3dVao->getVertexBuffers(),
+                                                  d3dVao->getIndexBuffer(),
+                                                  d3dVao->getOperationType(),
+                                                  itor->sharedData );
+            }
+
+            ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -920,32 +999,10 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    uint32 D3D11VaoManager::createVao( const Vao &vaoRef )
-    {
-        return mVaoNames++;
-    }
-    //-----------------------------------------------------------------------------------
-    void D3D11VaoManager::bindDrawId()
-    {
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
-                                                    mDrawId->getBufferInterface() );
-
-        ID3D11Buffer *vertexBuffer = bufferInterface->getVboName();
-        UINT stride = mDrawId->getBytesPerElement();
-        UINT offset = 0;
-
-        mDevice.GetImmediateContext()->IASetVertexBuffers(
-                    15,
-                    1,
-                    &vertexBuffer,
-                    &stride,
-                    &offset );
-    }
-    //-----------------------------------------------------------------------------------
-    VertexArrayObject* D3D11VaoManager::createVertexArrayObjectImpl(
-                                                            const VertexBufferPackedVec &vertexBuffers,
-                                                            IndexBufferPacked *indexBuffer,
-                                                            v1::RenderOperation::OperationType opType )
+    D3D11VaoManager::VaoVec::iterator D3D11VaoManager::findVao(
+                                                        const VertexBufferPackedVec &vertexBuffers,
+                                                        IndexBufferPacked *indexBuffer,
+                                                        v1::RenderOperation::OperationType opType )
     {
         Vao vao;
 
@@ -1024,6 +1081,58 @@ namespace Ogre
             itor = mVaos.begin() + mVaos.size() - 1;
         }
 
+        return itor;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 D3D11VaoManager::createVao( const Vao &vaoRef )
+    {
+        return mVaoNames++;
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::releaseVao( VertexArrayObject *vao )
+    {
+        D3D11VertexArrayObject *glVao = static_cast<D3D11VertexArrayObject*>( vao );
+
+        VaoVec::iterator itor = mVaos.begin();
+        VaoVec::iterator end  = mVaos.end();
+
+        while( itor != end && itor->vaoName != glVao->getVaoName() )
+            ++itor;
+
+        if( itor != end )
+        {
+            --itor->refCount;
+
+            if( !itor->refCount )
+            {
+                //TODO: Remove cached ID3D11InputLayout from all D3D11HLSLProgram
+                //(the one generated in D3D11HLSLProgram::getLayoutForVao)
+                delete glVao->mSharedData;
+                glVao->mSharedData = 0;
+                efficientVectorRemove( mVaos, itor );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11VaoManager::bindDrawId()
+    {
+        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                                    mDrawId->getBufferInterface() );
+
+        ID3D11Buffer *vertexBuffer = bufferInterface->getVboName();
+        UINT stride = mDrawId->getBytesPerElement();
+        UINT offset = 0;
+
+        mDevice.GetImmediateContext()->IASetVertexBuffers(
+                    15,
+                    1,
+                    &vertexBuffer,
+                    &stride,
+                    &offset );
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 D3D11VaoManager::generateRenderQueueId( uint32 vaoName, uint32 uniqueVaoId )
+    {
         //Mix mNumGeneratedVaos with the D3D11 Vao for better sorting purposes:
         //  If we only use the D3D11's vao, the RQ will sort Meshes with
         //  multiple submeshes mixed with other meshes.
@@ -1048,8 +1157,57 @@ namespace Ogre
         const uint32 shiftVaoGl     = RqBits::MeshBits - bitsVaoGl;
 
         uint32 renderQueueId =
-                ( (itor->vaoName & maskVaoGl) << shiftVaoGl ) |
-                (mNumGeneratedVaos & maskVao);
+                ( (vaoName & maskVaoGl) << shiftVaoGl ) |
+                (uniqueVaoId & maskVao);
+
+        return renderQueueId;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 D3D11VaoManager::extractUniqueVaoIdFromRenderQueueId( uint32 rqId )
+    {
+        const int bitsVaoGl  = 5;
+        const uint32 maskVao = OGRE_RQ_MAKE_MASK( RqBits::MeshBits - bitsVaoGl );
+        return rqId & maskVao;
+    }
+    //-----------------------------------------------------------------------------------
+    VertexArrayObject* D3D11VaoManager::createVertexArrayObjectImpl(
+                                                            const VertexBufferPackedVec &vertexBuffers,
+                                                            IndexBufferPacked *indexBuffer,
+                                                            v1::RenderOperation::OperationType opType )
+    {
+        {
+            bool hasImmutableDelayedBuffer = false;
+            VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+            VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+            while( itor != end && !hasImmutableDelayedBuffer )
+            {
+                if( (*itor)->getBufferType() == BT_IMMUTABLE )
+                    hasImmutableDelayedBuffer = true;
+                ++itor;
+            }
+
+            if( indexBuffer && indexBuffer->getBufferType() == BT_IMMUTABLE )
+                hasImmutableDelayedBuffer = true;
+
+            if( hasImmutableDelayedBuffer )
+            {
+                const uint32 renderQueueId = generateRenderQueueId( 0, mNumGeneratedVaos );
+                //If the Vao contains an immutable buffer that is delayed, we can't
+                //create the actual Vao yet. We'll modify the pointer later.
+                D3D11VertexArrayObject *retVal = OGRE_NEW D3D11VertexArrayObject( 0,
+                                                                                  renderQueueId,
+                                                                                  vertexBuffers,
+                                                                                  indexBuffer,
+                                                                                  opType,
+                                                                                  0 );
+                return retVal;
+            }
+        }
+
+        VaoVec::iterator itor = findVao( vertexBuffers, indexBuffer, opType );
+
+        const uint32 renderQueueId = generateRenderQueueId( itor->vaoName, mNumGeneratedVaos );
 
         D3D11VertexArrayObject *retVal = OGRE_NEW D3D11VertexArrayObject( itor->vaoName,
                                                                           renderQueueId,
@@ -1065,28 +1223,10 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::destroyVertexArrayObjectImpl( VertexArrayObject *vao )
     {
+        releaseVao( vao );
+
         D3D11VertexArrayObject *glVao = static_cast<D3D11VertexArrayObject*>( vao );
-
-        VaoVec::iterator itor = mVaos.begin();
-        VaoVec::iterator end  = mVaos.end();
-
-        while( itor != end && itor->vaoName != glVao->getVaoName() )
-            ++itor;
-
-        if( itor != end )
-        {
-            --itor->refCount;
-
-            if( !itor->refCount )
-            {
-                //TODO: Remove cached ID3D11InputLayout from all D3D11HLSLProgram
-                //(the one generated in D3D11HLSLProgram::getLayoutForVao)
-                delete glVao->mSharedData;
-                glVao->mSharedData = 0;
-                efficientVectorRemove( mVaos, itor );
-            }
-        }
-
+        //We delete it here because this class has no virtual destructor on purpose
         OGRE_DELETE glVao;
     }
     //-----------------------------------------------------------------------------------

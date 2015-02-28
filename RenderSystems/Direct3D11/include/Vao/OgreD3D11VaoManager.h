@@ -206,6 +206,7 @@ namespace Ogre
         virtual void destroyVertexBufferImpl( VertexBufferPacked *vertexBuffer );
 
         void createDelayedImmutableBuffers(void);
+        void reorganizeImmutableVaos(void);
 
         virtual MultiSourceVertexBufferPool* createMultiSourceVertexBufferPoolImpl(
                                             const VertexElement2VecVec &vertexElementsBySource,
@@ -232,7 +233,15 @@ namespace Ogre
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
 
+        /// Finds the Vao. Calls createVao automatically if not found.
+        VaoVec::iterator findVao( const VertexBufferPackedVec &vertexBuffers,
+                                  IndexBufferPacked *indexBuffer,
+                                  v1::RenderOperation::OperationType opType );
         uint32 createVao( const Vao &vaoRef );
+        void releaseVao( VertexArrayObject *vao );
+
+        static uint32 generateRenderQueueId( uint32 vaoName, uint32 uniqueVaoId );
+        static uint32 extractUniqueVaoIdFromRenderQueueId( uint32 rqId );
 
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
