@@ -133,6 +133,7 @@ namespace Ogre
         mNumLightsLimit( 8 ),
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
+        mShaderFileExt( "unset!" ),
         mDebugOutput( true ),
         mHighQuality( false ),
         mDefaultDatablock( 0 ),
@@ -193,9 +194,10 @@ namespace Ogre
         //Check this folder can at least generate one valid type of shader.
         for( size_t i=0; i<NumShaderTypes; ++i )
         {
-             //Generate the shader file. TODO: Identify the file extension at runtime
-            const String filename = ShaderFiles[i] + ".glsl";
-            hasValidFile |= mDataFolder->exists( filename );
+             //Probe both types since this may be called before we know what RS to use.
+            const String filename = ShaderFiles[i];
+            hasValidFile |= mDataFolder->exists( filename + ".glsl" );
+            hasValidFile |= mDataFolder->exists( filename + ".hlsl" );
         }
 
         if( !hasValidFile )
@@ -1421,8 +1423,8 @@ namespace Ogre
                 ++itor;
             }
 
-            //Generate the shader file. TODO: Identify the file extension at runtime
-            const String filename = ShaderFiles[i] + ".glsl";
+            //Generate the shader file.
+            const String filename = ShaderFiles[i] + mShaderFileExt;
             if( mDataFolder->exists( filename ) )
             {
                 DataStreamPtr inFile = mDataFolder->open( filename );
@@ -1459,7 +1461,7 @@ namespace Ogre
                 {
                     std::ofstream outFile( (mOutputPath + "./" +
                                            StringConverter::toString( finalHash ) +
-                                           ShaderFiles[i]).c_str(),
+                                           ShaderFiles[i] + mShaderFileExt).c_str(),
                                            std::ios::out | std::ios::binary );
                     outFile.write( &outString[0], outString.size() );
                 }
@@ -1797,6 +1799,7 @@ namespace Ogre
         mRenderSystem = newRs;
 
         mShaderProfile = "unset!";
+        mShaderFileExt = "unset!";
         memset( mShaderTargets, 0, sizeof(mShaderTargets) );
 
         if( mRenderSystem )
@@ -1813,6 +1816,8 @@ namespace Ogre
 
             if( mShaderProfile == "hlsl" )
             {
+                mShaderFileExt = ".hlsl";
+
                 for( size_t i=0; i<NumShaderTypes; ++i )
                 {
                     for( size_t j=0; j<5 && !mShaderTargets[i]; ++j )
@@ -1821,6 +1826,10 @@ namespace Ogre
                             mShaderTargets[i] = &BestD3DShaderTargets[i][j];
                     }
                 }
+            }
+            else
+            {
+                mShaderFileExt = ".glsl";
             }
 
             if( !mDefaultDatablock )

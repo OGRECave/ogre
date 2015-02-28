@@ -848,39 +848,6 @@ namespace Ogre
         /// @See HlmsCache
         virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache ) = 0;
 
-        /** Sets the mode of operation for depth buffer tests from this point onwards.
-        Sometimes you may wish to alter the behaviour of the depth buffer to achieve
-        special effects. Because it's unlikely that you'll set these options for an entire frame,
-        but rather use them to tweak settings between rendering objects, this is an internal
-        method (indicated by the '_' prefix) which will be used by a SceneManager implementation
-        rather than directly from the client application.
-        If this method is never called the settings are automatically the same as the default parameters.
-        @param depthTest If true, the depth buffer is tested for each pixel and the frame buffer is only updated
-        if the depth function test succeeds. If false, no test is performed and pixels are always written.
-        @param depthWrite If true, the depth buffer is updated with the depth of the new pixel if the depth test succeeds.
-        If false, the depth buffer is left unchanged even if a new pixel is written.
-        @param depthFunction Sets the function required for the depth test.
-        */
-        virtual void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL) = 0;
-
-        /** Sets whether or not the depth buffer check is performed before a pixel write.
-        @param enabled If true, the depth buffer is tested for each pixel and the frame buffer is only updated
-        if the depth function test succeeds. If false, no test is performed and pixels are always written.
-        */
-        virtual void _setDepthBufferCheckEnabled(bool enabled = true) = 0;
-        /** Sets whether or not the depth buffer is updated after a pixel write.
-        @param enabled If true, the depth buffer is updated with the depth of the new pixel if the depth test succeeds.
-        If false, the depth buffer is left unchanged even if a new pixel is written.
-        */
-        virtual void _setDepthBufferWriteEnabled(bool enabled = true) = 0;
-        /** Sets the comparison function for the depth buffer check.
-        Advanced use only - allows you to choose the function applied to compare the depth values of
-        new and existing pixels in the depth buffer. Only an issue if the deoth buffer check is enabled
-        (see _setDepthBufferCheckEnabled)
-        @param  func The comparison between the new depth and the existing depth which must return true
-        for the new pixel to be written.
-        */
-        virtual void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL) = 0;
         /** Sets the depth bias, NB you should use the Material version of this. 
         @remarks
         When polygons are coplanar, you can get problems with 'depth fighting' where

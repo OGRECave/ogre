@@ -1926,46 +1926,17 @@ bail:
     {
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setDepthBufferParams( bool depthTest, bool depthWrite, CompareFunction depthFunction )
-    {
-        _setDepthBufferCheckEnabled( depthTest );
-        _setDepthBufferWriteEnabled( depthWrite );
-        _setDepthBufferFunction( depthFunction );
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setDepthBufferCheckEnabled( bool enabled )
-    {
-        mDepthStencilDesc.DepthEnable = enabled;
-        mDepthStencilDescChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setDepthBufferWriteEnabled( bool enabled )
-    {
-        if (enabled)
-        {
-            mDepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-        }
-        else
-        {
-            mDepthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-        }
-        mDepthStencilDescChanged = true;
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setDepthBufferFunction( CompareFunction func )
-    {
-        mDepthStencilDesc.DepthFunc = D3D11Mappings::get(func);
-        mDepthStencilDescChanged = true;
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
     {
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setStencilCheckEnabled(bool enabled)
     {
-        mDepthStencilDesc.StencilEnable = enabled;
-        mDepthStencilDescChanged = true;
+        if( mDepthStencilDesc.StencilEnable != (BOOL)enabled )
+        {
+            mDepthStencilDesc.StencilEnable = enabled;
+            updateDepthStencilView();
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setStencilBufferParams(CompareFunction func, 
@@ -1995,7 +1966,36 @@ bail:
 		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(func);
 		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
         mReadBackAsTexture = readBackAsTexture;
-        mDepthStencilDescChanged = true;
+
+        updateDepthStencilView();
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::updateDepthStencilView(void)
+    {
+        ID3D11DepthStencilState *oldDepthStencilState = mBoundDepthStencilState;
+        mBoundDepthStencilState = 0;
+
+        HRESULT hr = mDevice->CreateDepthStencilState( &mDepthStencilDesc, &mBoundDepthStencilState );
+        if (FAILED(hr))
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create depth stencil state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::updateDepthStencilView" );
+        }
+
+        if( mBoundDepthStencilState != oldDepthStencilState )
+        {
+            mDevice.GetImmediateContext()->OMSetDepthStencilState( mBoundDepthStencilState,
+                                                                   mStencilRef );
+            if (mDevice.isError())
+            {
+                String errorDescription = mDevice.getErrorDescription();
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            "D3D11 device cannot set depth stencil state\nError Description: " +
+                            errorDescription, "D3D11RenderSystem::updateDepthStencilView");
+            }
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
@@ -2330,6 +2330,17 @@ bail:
                 "D3D11 device cannot set rasterizer state\nError Description: " + errorDescription,
                 "D3D11RenderSystem::_setHlmsMacroblock");
         }
+
+        if( mDepthStencilDesc.DepthEnable != (BOOL)macroblock->mDepthCheck ||
+            mDepthStencilDesc.DepthFunc != D3D11Mappings::get( macroblock->mDepthFunc ) ||
+            (mDepthStencilDesc.DepthWriteMask == D3D11_DEPTH_WRITE_MASK_ALL) != macroblock->mDepthWrite )
+        {
+            mDepthStencilDesc.DepthEnable   = macroblock->mDepthCheck;
+            mDepthStencilDesc.DepthFunc     = D3D11Mappings::get( macroblock->mDepthFunc );
+            mDepthStencilDesc.DepthWriteMask= macroblock->mDepthWrite ? D3D11_DEPTH_WRITE_MASK_ALL :
+                                                                        D3D11_DEPTH_WRITE_MASK_ZERO;
+            updateDepthStencilView();
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
@@ -2567,14 +2578,11 @@ bail:
     class D3D11RenderOperationState : public Renderable::RenderSystemData
     {
     public:
-        ID3D11DepthStencilState * mDepthStencilState;
-
         ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mTexturesCount;
 
         D3D11RenderOperationState() :
-              mDepthStencilState(NULL)
-            , mTexturesCount(0)
+            mTexturesCount(0)
         {
             for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
             {
@@ -2618,25 +2626,6 @@ bail:
         D3D11RenderOperationState stackOpState;
         D3D11RenderOperationState * opState = &stackOpState;
 
-        if(mDepthStencilDescChanged)
-		{
-			mBoundDepthStencilState = 0;
-			mDepthStencilDescChanged=false;
-
-            HRESULT hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, &opState->mDepthStencilState) ;
-            if (FAILED(hr))
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create depth stencil state\nError Description:" + errorDescription, 
-                    "D3D11RenderSystem::_render" );
-            }
-        }
-        else
-		{
-			opState->mDepthStencilState = mBoundDepthStencilState;
-		}
-
         if(mSamplerStatesChanged)
 		{
             // samplers mapping
@@ -2664,20 +2653,6 @@ bail:
 			{
 				opState->mTextures[n] = NULL;
 			}
-        }
-
-        if (opState->mDepthStencilState != mBoundDepthStencilState)
-        {
-            mBoundDepthStencilState = opState->mDepthStencilState ;
-
-            mDevice.GetImmediateContext()->OMSetDepthStencilState(opState->mDepthStencilState, mStencilRef); 
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set depth stencil state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
         }
 
         if (mSamplerStatesChanged && opState->mTexturesCount > 0 ) //  if the NumTextures is 0, the operation effectively does nothing.
@@ -4065,7 +4040,6 @@ bail:
         ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
 
         //sets the modification trackers to true
-		mDepthStencilDescChanged = true;
 		mSamplerStatesChanged = true;
 		mLastTextureUnitState = 0;
 
@@ -4086,11 +4060,6 @@ bail:
         }
 
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found: " + name, "RenderSystem::getCustomAttribute");
-    }
-    //---------------------------------------------------------------------
-    bool D3D11RenderSystem::_getDepthBufferCheckEnabled( void )
-    {
-        return mDepthStencilDesc.DepthEnable == TRUE;
     }
     //---------------------------------------------------------------------
     D3D11HLSLProgram* D3D11RenderSystem::_getBoundVertexProgram() const

@@ -103,10 +103,6 @@ namespace Ogre
 
         bool checkVertexTextureFormats(void);
         void detachRenderTargetImpl(const String& name);
-
-        UINT mStencilRef;
-        D3D11_DEPTH_STENCIL_DESC    mDepthStencilDesc; 
-        bool                        mDepthStencilDescChanged;
         
         bool mReadBackAsTexture;
 
@@ -127,7 +123,10 @@ namespace Ogre
         TextureUnitState::BindingType mBindingType;
 
         ID3D11ShaderResourceView* mDSTResView;
-        ID3D11DepthStencilState * mBoundDepthStencilState;
+
+        UINT                        mStencilRef;
+        D3D11_DEPTH_STENCIL_DESC    mDepthStencilDesc;
+        ID3D11DepthStencilState     *mBoundDepthStencilState;
 
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundTexturesCount;
@@ -184,6 +183,8 @@ namespace Ogre
          * from us each Present(), and we need the way to reestablish connection.
          */
         void _setRenderTargetViews();
+
+        void updateDepthStencilView(void);
 
     public:
         // constructor
@@ -304,11 +305,6 @@ namespace Ogre
 
         void _beginFrame(void);
         void _endFrame(void);
-        void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
-        void _setDepthBufferCheckEnabled( bool enabled = true );
-        bool _getDepthBufferCheckEnabled( void );
-        void _setDepthBufferWriteEnabled(bool enabled = true);
-        void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
         void _setFog( FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0 );
 		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
         void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 

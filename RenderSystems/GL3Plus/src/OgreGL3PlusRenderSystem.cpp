@@ -1711,40 +1711,6 @@ namespace Ogre {
         glBindProgramPipeline( 0 );
     }
 
-    void GL3PlusRenderSystem::_setDepthBufferParams(bool depthTest, bool depthWrite, CompareFunction depthFunction)
-    {
-        _setDepthBufferCheckEnabled(depthTest);
-        _setDepthBufferWriteEnabled(depthWrite);
-        _setDepthBufferFunction(depthFunction);
-    }
-
-    void GL3PlusRenderSystem::_setDepthBufferCheckEnabled(bool enabled)
-    {
-        if (enabled)
-        {
-            OGRE_CHECK_GL_ERROR(glClearDepth(1.0));
-            OGRE_CHECK_GL_ERROR(glEnable(GL_DEPTH_TEST));
-        }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_DEPTH_TEST));
-        }
-    }
-
-    void GL3PlusRenderSystem::_setDepthBufferWriteEnabled(bool enabled)
-    {
-        GLboolean flag = enabled ? GL_TRUE : GL_FALSE;
-        OGRE_CHECK_GL_ERROR(glDepthMask(flag));
-
-        // Store for reference in _beginFrame
-        mDepthWrite = enabled;
-    }
-
-    void GL3PlusRenderSystem::_setDepthBufferFunction(CompareFunction func)
-    {
-        OGRE_CHECK_GL_ERROR(glDepthFunc(convertCompareFunction(func)));
-    }
-
     void GL3PlusRenderSystem::_setDepthBias(float constantBias, float slopeScaleBias)
     {
         //FIXME glPolygonOffset currently is buggy in GL3+ RS but not GL RS.

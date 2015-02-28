@@ -118,6 +118,7 @@ namespace Ogre
 
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
         String const    *mShaderTargets[NumShaderTypes]; ///[0] = "vs_4_0", etc. Only used by D3D
+        String          mShaderFileExt; /// Either glsl or hlsl
         String          mOutputPath;
         bool            mDebugOutput;
         bool            mHighQuality;

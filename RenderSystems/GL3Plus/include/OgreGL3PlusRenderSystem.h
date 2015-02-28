@@ -370,22 +370,6 @@ namespace Ogre {
         /** See
             RenderSystem
         */
-        void _setDepthBufferParams(bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL);
-        /** See
-            RenderSystem
-        */
-        void _setDepthBufferCheckEnabled(bool enabled = true);
-        /** See
-            RenderSystem
-        */
-        void _setDepthBufferWriteEnabled(bool enabled = true);
-        /** See
-            RenderSystem
-        */
-        void _setDepthBufferFunction(CompareFunction func = CMPF_LESS_EQUAL);
-        /** See
-            RenderSystem
-        */
         void _setDepthBias(float constantBias, float slopeScaleBias);
         /** See
             RenderSystem
