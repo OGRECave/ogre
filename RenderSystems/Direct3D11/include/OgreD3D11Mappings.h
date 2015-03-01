@@ -93,7 +93,7 @@ namespace Ogre
 		static TextureType _getTexType(D3D11_SRV_DIMENSION type);
 
 		static UINT _getTextureBindFlags(DXGI_FORMAT format, TextureUsage usage);
-		static UINT _getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic);
+        static UINT _getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic, int usage);
 	};
 }
 #endif

@@ -645,7 +645,7 @@ namespace Ogre
 		// We mark all textures as render target to be able to use GenerateMips() on it
 		// TODO: use DDSTextureLoader way of determining supported formats via CheckFormatSupport() & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN
 		// TODO: explore DDSTextureLoader way of generating mips on temporary texture, to avoid D3D11_BIND_RENDER_TARGET flag injection 
-		bool isRenderTarget = /*(usage & TU_RENDERTARGET) &&*/ !(usage & TU_DYNAMIC);
+        bool isRenderTarget = /*(usage & TU_RENDERTARGET) &&*/ !(usage & TU_DYNAMIC) && (usage & TU_AUTOMIPMAP);
 
 		// check for incompatible pixel formats
 		if(isRenderTarget)
@@ -710,15 +710,18 @@ namespace Ogre
 		return isRenderTarget ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
 	}
 
-    UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic)
+    UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic, int usage)
     {
         if(isdynamic)
             return 0;
 
         UINT flags = 0;
 
-		if((bindflags & D3D11_BIND_SHADER_RESOURCE) && (bindflags & D3D11_BIND_RENDER_TARGET))
+        if((bindflags & D3D11_BIND_SHADER_RESOURCE) && (bindflags & D3D11_BIND_RENDER_TARGET) &&
+            (usage & TU_AUTOMIPMAP) )
+        {
 			flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+        }
 
         if(textype == TEX_TYPE_CUBE_MAP)
             flags |= D3D11_RESOURCE_MISC_TEXTURECUBE;

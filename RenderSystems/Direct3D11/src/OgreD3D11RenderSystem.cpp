@@ -83,6 +83,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
+#if 1
     HRESULT WINAPI D3D11CreateDeviceN(
         _In_opt_ IDXGIAdapter* pAdapter,
         D3D_DRIVER_TYPE DriverType,
@@ -127,6 +128,7 @@ bail:
         return hr;
 #endif
     }
+#endif
 
     //---------------------------------------------------------------------
     D3D11RenderSystem::D3D11RenderSystem()
@@ -1113,6 +1115,9 @@ bail:
 
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setStencilBufferBitDepth(8);
+
+        rsc->setCapability(RSC_HW_GAMMA);
+        rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
 
         rsc->setCapability(RSC_VBO);
         UINT formatSupport;

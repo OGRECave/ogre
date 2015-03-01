@@ -397,7 +397,8 @@ namespace Ogre
 		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
 		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
-        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
+        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags( desc.BindFlags, getTextureType(),
+                                                                   mIsDynamic, mUsage );
 
         // create the texture
         hr = mDevice->CreateTexture1D(  
@@ -496,7 +497,8 @@ namespace Ogre
         desc.Usage          = D3D11Mappings::_getUsage(_getTextureUsage());
         desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
         desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
-        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
+        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags( desc.BindFlags, getTextureType(),
+                                                                   mIsDynamic, mUsage );
 
         if (mIsDynamic)
         {
