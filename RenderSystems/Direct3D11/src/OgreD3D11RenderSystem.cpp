@@ -149,6 +149,23 @@ bail:
         mSwitchingFullscreenCounter = 0;
         mDriverType = DT_HARDWARE;
 
+        ZeroMemory( &mDepthStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
+        mDepthStencilDesc.DepthEnable       = TRUE;
+        mDepthStencilDesc.DepthWriteMask    = D3D11_DEPTH_WRITE_MASK_ALL;
+        mDepthStencilDesc.DepthFunc         = D3D11_COMPARISON_LESS;
+        mDepthStencilDesc.StencilEnable     = FALSE;
+        mDepthStencilDesc.StencilReadMask   = D3D11_DEFAULT_STENCIL_READ_MASK;
+        mDepthStencilDesc.StencilWriteMask  = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+        mDepthStencilDesc.FrontFace.StencilFunc         = D3D11_COMPARISON_ALWAYS;
+        mDepthStencilDesc.FrontFace.StencilDepthFailOp  = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.FrontFace.StencilPassOp       = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.FrontFace.StencilFailOp       = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.BackFace.StencilFunc          = D3D11_COMPARISON_ALWAYS;
+        mDepthStencilDesc.BackFace.StencilDepthFailOp   = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.BackFace.StencilPassOp        = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.BackFace.StencilFailOp        = D3D11_STENCIL_OP_KEEP;
+
+
         initRenderSystem();
 
         // set config options defaults
@@ -2009,8 +2026,8 @@ bail:
         mActiveRenderTarget = target;
         if (mActiveRenderTarget)
         {
-            // we need to clear the state 
-            mDevice.GetImmediateContext()->ClearState();
+            // we need to clear the state -- dark_sylinc: No we don't.
+            //mDevice.GetImmediateContext()->ClearState();
 
             if (mDevice.isError())
             {
