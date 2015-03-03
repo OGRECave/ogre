@@ -142,7 +142,7 @@ Buffer<float4> worldMatBuf : register(t0);
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n = mul( passBuf.shadowRcv[@n].texViewProj, float4(worldPos.xyz, 1.0f) =;@end
+	outVs.posL@n = mul( passBuf.shadowRcv[@n].texViewProj, float4(worldPos.xyz, 1.0f) );@end
 @end
 
 PS_INPUT main( VS_INPUT input )
@@ -164,7 +164,7 @@ PS_INPUT main( VS_INPUT input )
 	float3 tangent	= yAxis( input.qtangent );
 	outVs.biNormalReflection = sign( input.qtangent.w ); //We ensure in C++ qtangent.w is never 0
 	@end
-@end @property( !hlms_qtangent )
+@end @property( !hlms_qtangent && hlms_normal )
 	float3 normal	= input.normal;
 	@property( normal_map )float3 tangent	= input.tangent;@end
 @end
@@ -183,7 +183,7 @@ PS_INPUT main( VS_INPUT input )
 
 	outVs.drawId = input.drawId;
 @end @property( hlms_shadowcaster )
-	float shadowConstantBias = uintBitsToFloat( worldMaterialIdx[input.drawId].y );
+	float shadowConstantBias = asfloat( worldMaterialIdx[input.drawId].y );
 	//Linear depth
 	outVs.depth	= (outVs.gl_Position.z - passBuf.depthRange.x + shadowConstantBias) * passBuf.depthRange.y;
 

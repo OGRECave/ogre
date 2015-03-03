@@ -345,11 +345,8 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 }
 @end
 @property( hlms_shadowcaster )
-void main()
+float main( PS_INPUT inPs ) : SV_Target0
 {
-@property( GL3+ )
-	outColour = inPs.depth;@end
-@property( !GL3+ )
-	gl_FragColor.x = inPs.depth;@end
+	return inPs.depth;
 }
 @end
