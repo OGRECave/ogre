@@ -329,7 +329,7 @@ namespace Ogre
                 uint32 heighestRes = std::max( std::max( image.getWidth(), image.getHeight() ),
                                                std::max<uint32>( image.getDepth(),
                                                                  image.getNumFaces() ) );
-#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1700))
+#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1800))
                 numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) /
                                                          logf( 2.0f ) ) );
 #else
@@ -695,7 +695,7 @@ namespace Ogre
         if( pack.hasMipmaps )
         {
             uint32 heighestRes = std::max( std::max( width, height ), depth );
-#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1700))
+#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1800))
             numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) / logf( 2.0f ) ) );
 #else
             numMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(heighestRes) ) ) );
