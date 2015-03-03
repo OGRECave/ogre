@@ -38,6 +38,7 @@ namespace Ogre
      */
     class _OgreExport TexBufferPacked : public BufferPacked
     {
+    protected:
         PixelFormat mPixelFormat;
 
     public:

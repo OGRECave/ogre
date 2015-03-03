@@ -874,8 +874,8 @@ namespace Ogre
             bufferInterface = createShaderBufferInterface( false, sizeBytes, bufferType, initialData );
         }
 
-        const size_t numElements        = sizeBytes / PixelUtil::getNumElemBytes( pixelFormat );
-        const size_t bytesPerElement    = PixelUtil::getNumElemBytes( pixelFormat );
+        const size_t numElements        = sizeBytes;
+        const size_t bytesPerElement    = 1;
 
         D3D11TexBufferPacked *retVal = OGRE_NEW D3D11TexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
