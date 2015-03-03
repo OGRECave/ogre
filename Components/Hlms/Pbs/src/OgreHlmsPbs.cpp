@@ -221,13 +221,25 @@ namespace Ogre
             }
 
             HlmsSamplerblock samplerblock;
-            samplerblock.mMinFilter     = FO_POINT;
-            samplerblock.mMagFilter     = FO_POINT;
-            samplerblock.mMipFilter     = FO_NONE;
             samplerblock.mU             = TAM_BORDER;
             samplerblock.mV             = TAM_BORDER;
             samplerblock.mW             = TAM_CLAMP;
             samplerblock.mBorderColour  = ColourValue::White;
+
+            if( mShaderProfile == "hlsl" )
+            {
+                samplerblock.mMinFilter     = FO_LINEAR;
+                samplerblock.mMagFilter     = FO_LINEAR;
+                samplerblock.mMipFilter     = FO_NONE;
+                samplerblock.mCompareFunction   = CMPF_LESS_EQUAL;
+            }
+            else
+            {
+                samplerblock.mMinFilter     = FO_POINT;
+                samplerblock.mMagFilter     = FO_POINT;
+                samplerblock.mMipFilter     = FO_NONE;
+            }
+
             mShadowmapSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
         }
     }
@@ -239,6 +251,9 @@ namespace Ogre
     {
         const HlmsCache *retVal = Hlms::createShaderCacheEntry( renderableHash, passCache, finalHash,
                                                                 queuedRenderable );
+
+        if( mShaderProfile == "hlsl" )
+            return retVal; //D3D embeds the texture slots in the shader.
 
         //Set samplers.
         GpuProgramParametersSharedPtr vsParams = retVal->vertexShader->getDefaultParameters();
