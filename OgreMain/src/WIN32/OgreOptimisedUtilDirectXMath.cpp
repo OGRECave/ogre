@@ -141,7 +141,7 @@ namespace Ogre {
         /// @copydoc OptimisedUtil::calculateFaceNormals
         virtual void calculateFaceNormals(
             const float *positions,
-            const EdgeData::Triangle *triangles,
+            const v1::EdgeData::Triangle *triangles,
             Vector4 *faceNormals,
             size_t numTriangles);
 
@@ -1551,7 +1551,7 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
     //---------------------------------------------------------------------
     void OptimisedUtilDirectXMath::calculateFaceNormals(
         const float *positions,
-        const EdgeData::Triangle *triangles,
+        const v1::EdgeData::Triangle *triangles,
         Vector4 *faceNormals,
         size_t numTriangles)
     {

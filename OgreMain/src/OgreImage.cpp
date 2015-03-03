@@ -681,7 +681,7 @@ namespace Ogre {
 
         // Allocate new buffer
         uint32 heighestRes = std::max( std::max( mWidth, mHeight ), mDepth );
-#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1700))
+#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1800))
         mNumMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) /
                                                   logf( 2.0f ) ) );
 #else
