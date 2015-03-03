@@ -466,10 +466,10 @@ namespace Ogre
         case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:     return PF_UNKNOWN;
         case DXGI_FORMAT_X24_TYPELESS_G8_UINT:      return PF_UNKNOWN;
         case DXGI_FORMAT_R8G8_TYPELESS:             return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_UNORM:                return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_UINT:                 return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_SNORM:                return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_SINT:                 return PF_UNKNOWN;
+        case DXGI_FORMAT_R8G8_UNORM:                return PF_RG8;
+        case DXGI_FORMAT_R8G8_UINT:                 return PF_R8G8_UINT;
+        case DXGI_FORMAT_R8G8_SNORM:                return PF_R8G8_SNORM;
+        case DXGI_FORMAT_R8G8_SINT:                 return PF_R8G8_SINT;
         case DXGI_FORMAT_R16_TYPELESS:              return PF_UNKNOWN;
         case DXGI_FORMAT_R16_FLOAT:                 return PF_FLOAT16_R;
         case DXGI_FORMAT_D16_UNORM:                 return PF_UNKNOWN;
