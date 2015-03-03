@@ -33,6 +33,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBOMultiRenderTarget.h"
 
+#define TEMP_FBOS 2
+
 namespace Ogre {
     static const size_t TEMP_FBOS = 2;
 

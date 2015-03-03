@@ -147,6 +147,7 @@ namespace Ogre {
         GLRTTManager *mRTTManager;
 
         ushort mActiveTextureUnit;
+        ushort mMaxBuiltInTextureAttribIndex;
 
         // local data members of _render that were moved here to improve performance
         // (save allocations)

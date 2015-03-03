@@ -214,6 +214,8 @@ namespace Ogre {
         // Transform user LOD values (starting at index 1, no need to transform base value)
         for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin() + 1; i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
+        // Rewrite first value
+        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
 #endif
     }
     //-----------------------------------------------------------------------
@@ -2467,12 +2469,13 @@ namespace Ogre {
         mLodStrategy = lodStrategy;
 
         assert(mMeshLodUsageList.size());
-        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
-
+        
         // Re-transform user LOD values (starting at index 1, no need to transform base value)
         for (MeshLodUsageList::iterator i = mMeshLodUsageList.begin()+1; i != mMeshLodUsageList.end(); ++i)
             i->value = mLodStrategy->transformUserValue(i->userValue);
 
+        // Rewrite first value
+        mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
     }
 #endif
 
