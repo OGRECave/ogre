@@ -50,7 +50,6 @@ namespace Ogre {
         mHardwarePoseCount = 0;
         mIndexStart = 0;
         mIndexEnd = 0;
-        setMaterialName("BaseWhite");
     }
     //-----------------------------------------------------------------------
     SubEntity::~SubEntity()

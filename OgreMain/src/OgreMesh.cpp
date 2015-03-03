@@ -227,9 +227,9 @@ namespace Ogre {
         }
         if( !mLodValues.empty() )
         {
-                // Rewrite first value
-                mLodValues[0] = mLodStrategy->getBaseValue();
-                mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
+            // Rewrite first value
+            mLodValues[0] = lodStrategy->getBaseValue();
+            mMeshLodUsageList[0].value = lodStrategy->getBaseValue();
         }
 #endif
     }
