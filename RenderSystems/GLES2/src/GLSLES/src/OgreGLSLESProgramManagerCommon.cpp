@@ -248,32 +248,19 @@ namespace Ogre {
             StringStream os;
             if(glslopt_get_status(shader))
             {
-                // Write the current version (this forces the driver to fulfill the glsl es standard)
-                // TODO: Need to insert the current or compatibility version.  This is not future-proof
-                os << "#version 100" << std::endl;
-
-                // Default precision declaration is required in fragment and vertex shaders.
-                os << "precision highp float;" << std::endl;
-                os << "precision highp int;" << std::endl;
-                String source = const_cast<char *>(glslopt_get_output(shader));
-
-                // We want to make sure that there are precision qualifiers so strip out the first line
-                // which is the version string. We don't want duplicates since we are adding our own.
-                size_t pos = source.find_first_of("\n");
-                os << source.substr(pos+1, source.length()-1);
-
-                gpuProgram->getGLSLProgram()->setOptimisedSource(os.str());
+                const String source = glslopt_get_output(shader);
+                gpuProgram->getGLSLProgram()->setOptimisedSource(source);
                 gpuProgram->getGLSLProgram()->setIsOptimised(true);
             }
             else
             {
                 LogManager::getSingleton().logMessage("Error from GLSL Optimiser, disabling optimisation for program: " + gpuProgram->getName());
                 gpuProgram->getGLSLProgram()->setParameter("use_optimiser", "false");
-//                LogManager::getSingleton().logMessage(String(glslopt_get_log(shader)));
-//                LogManager::getSingleton().logMessage("Original Shader");
-//                LogManager::getSingleton().logMessage(gpuProgram->getGLSLProgram()->getSource());
-//                LogManager::getSingleton().logMessage("Optimized Shader");
-//                LogManager::getSingleton().logMessage(os.str());
+                //LogManager::getSingleton().logMessage(String(glslopt_get_log(shader)));
+                //LogManager::getSingleton().logMessage("Original Shader");
+                //LogManager::getSingleton().logMessage(gpuProgram->getGLSLProgram()->getSource());
+                //LogManager::getSingleton().logMessage("Optimized Shader");
+                //LogManager::getSingleton().logMessage(os.str());
             }
             glslopt_shader_delete(shader);
         }
