@@ -99,9 +99,12 @@ namespace Ogre{
 				}
 				break;
 			case COMMENT:
-				// This newline happens to be ignored automatically
 				if(isNewline(c))
+				{
+					lexeme = c;
+					setToken(lexeme, line, source, tokens.get());
 					state = READY;
+				}
 				break;
 			case MULTICOMMENT:
 				if(c == slash && lastc == star)
