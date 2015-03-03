@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreD3D11TexBufferPacked.h"
 #include "Vao/OgreD3D11BufferInterface.h"
+#include "Vao/OgreD3D11CompatBufferInterface.h"
 #include "Vao/OgreD3D11VaoManager.h"
 
 #include "OgreD3D11Mappings.h"
