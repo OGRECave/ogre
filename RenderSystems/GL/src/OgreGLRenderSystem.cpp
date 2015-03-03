@@ -114,7 +114,8 @@ namespace Ogre {
         mGpuProgramManager(0),
         mGLSLProgramFactory(0),
         mRTTManager(0),
-        mActiveTextureUnit(0)
+        mActiveTextureUnit(0),
+        mMaxBuiltInTextureAttribIndex(0)
     {
         size_t i;
 
@@ -2860,15 +2861,16 @@ namespace Ogre {
         // Call super class
         RenderSystem::_render(op);
 
+        mMaxBuiltInTextureAttribIndex = 0;
         if ( ! mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
-             &&
+             && 
              (
                  ( mCurrentVertexProgram == NULL ) ||
-                 ( mCurrentFragmentProgram == NULL && op.operationType != RenderOperation::OT_POINT_LIST)
+                 ( mCurrentFragmentProgram == NULL && op.operationType != RenderOperation::OT_POINT_LIST) 		  
              )
-        )
+        ) 
         {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                         "Attempted to render using the fixed pipeline when it is disabled.",
                         "GLRenderSystem::_render");
         }
@@ -3023,7 +3025,8 @@ namespace Ogre {
         // only valid up to GL_MAX_TEXTURE_UNITS, which is recorded in mFixedFunctionTextureUnits
         if (multitexturing)
         {
-            for (unsigned short i = 0; i < std::min((unsigned short)mDisabledTexUnitsFrom, mFixedFunctionTextureUnits); i++)
+            unsigned short mNumEnabledTextures = std::max(std::min((unsigned short)mDisabledTexUnitsFrom, mFixedFunctionTextureUnits), (unsigned short)(mMaxBuiltInTextureAttribIndex + 1));		
+            for (unsigned short i = 0; i < mNumEnabledTextures; i++)
             {
                 // No need to disable for texture units that weren't used
                 glClientActiveTextureARB(GL_TEXTURE0 + i);
@@ -3820,6 +3823,8 @@ namespace Ogre {
                         static_cast<GLsizei>(vertexBuffer->getVertexSize()),
                         pBufferData);
                     glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+                    if (elem.getIndex() > mMaxBuiltInTextureAttribIndex)
+                        mMaxBuiltInTextureAttribIndex = elem.getIndex();
                 }
                 else
                 {

@@ -225,6 +225,12 @@ namespace Ogre {
             i->value = lodStrategy->transformUserValue(i->userValue);
             *lodValueIt++ = i->value;
         }
+        if( !mLodValues.empty() )
+        {
+                // Rewrite first value
+                mLodValues[0] = mLodStrategy->getBaseValue();
+                mMeshLodUsageList[0].value = mLodStrategy->getBaseValue();
+        }
 #endif
     }
     //-----------------------------------------------------------------------

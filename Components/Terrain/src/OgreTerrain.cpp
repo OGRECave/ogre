@@ -291,7 +291,7 @@ namespace Ogre
         load(0,true);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        DataStreamPtr stream = Root::getSingleton().createFileStream(macBundlePath() + "/../Documents/" + filename,
+        DataStreamPtr stream = Root::getSingleton().createFileStream(iOSDocumentsDirectory() + "/" + filename,
                                                                    _getDerivedResourceGroup(), true);
 #else
         DataStreamPtr stream = Root::getSingleton().createFileStream(filename,

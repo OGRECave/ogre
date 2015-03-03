@@ -373,15 +373,11 @@ namespace Ogre {
         // set the user attribute to be ogre's
         Hlsl2Glsl_SetUserAttributeNames (parser, gAttribSemantic, gAttribString, gNumberOfAttribSemantic);
 
-        // we want user varyings in this case (and not opengl's)
-        Hlsl2Glsl_UseUserVaryings(parser, true);
-
-
         int res = 0;
         // parse the file
-        res = Hlsl2Glsl_Parse (parser, sourceToUse.c_str(), options);
+        res = Hlsl2Glsl_Parse(parser, sourceToUse.c_str(), ETargetGLSL_ES_100, nullptr, options);
         // convert from cg to glsl
-        res = res && Hlsl2Glsl_Translate( parser,  mEntryPoint.c_str(), options);
+        res = res && Hlsl2Glsl_Translate(parser,  mEntryPoint.c_str(), ETargetGLSL_ES_100, options);
 
         // check for error
         if (res == 0)
