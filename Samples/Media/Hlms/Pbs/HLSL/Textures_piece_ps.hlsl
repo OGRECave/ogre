@@ -5,21 +5,26 @@
 
 @property( diffuse_map || detail_maps_diffuse )
     @piece( MulDiffuseMapValue )* diffuseCol.xyz@end
-	@piece( diffuseExtraParam ), diffuseCol@end
+	@piece( diffuseExtraParamDef ), float3 diffuseCol@end
+	@piece( diffuseExtraParam ), diffuseCol.xyz@end
 @end
 
 @property( specular_map )
 	@piece( SampleSpecularMap )	specularCol = textureMaps[@value( specular_map_idx )].Sample( samplerStates[@value(specular_map_idx)], float3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz;@end
 	@piece( MulSpecularMapValue )* specularCol@end
-	@piece( specularExtraParam ), specularCol@end
+	@piece( specularExtraParamDef ), float3 specularCol@end
+	@piece( specularExtraParam ), specularCol.xyz@end
 @end
 
-@piece( brdfExtraParams )@insertpiece( diffuseExtraParam )@insertpiece( specularExtraParam )@end
-
-@property( roughness_map )r
-	@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w * (1.0f - textureMaps[@value( roughness_map_idx )].Sample( samplerStates[@value( roughness_map_idx )], float3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x);
-ROUGHNESS = max( ROUGHNESS, 0.001f );@end
+@property( roughness_map )
+	@piece( SampleRoughnessMap )	ROUGHNESS = material.kS.w * (1.0f - textureMaps[@value( roughness_map_idx )].Sample( samplerStates[@value( roughness_map_idx )], float3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x);
+	ROUGHNESS = max( ROUGHNESS, 0.001f );@end
+	@piece( roughnessExtraParamDef ), float ROUGHNESS@end
+	@piece( roughnessExtraParam ), ROUGHNESS@end
 @end
+
+@piece( brdfExtraParamDefs )@insertpiece( diffuseExtraParamDef )@insertpiece( specularExtraParamDef )@insertpiece( roughnessExtraParamDef )@end
+@piece( brdfExtraParams )@insertpiece( diffuseExtraParam )@insertpiece( specularExtraParam )@insertpiece( roughnessExtraParam )@end
 
 @foreach( detail_maps_normal, n )
 	@piece( SampleDetailMapNm@n )getTSDetailNormal( samplerStates[@value(detail_map_nm@n_idx)], textureMaps[@value(detail_map_nm@n_idx)], float3( inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ), detailNormMapIdx@n ) ) * detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul )@end

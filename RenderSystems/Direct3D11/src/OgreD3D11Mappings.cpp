@@ -580,6 +580,10 @@ namespace Ogre
         case PF_BC7_UNORM:      return DXGI_FORMAT_BC7_UNORM;
         case PF_BC7_UNORM_SRGB: return DXGI_FORMAT_BC7_UNORM_SRGB;
         case PF_R16G16_SINT:    return DXGI_FORMAT_R16G16_SINT;
+        case PF_RG8:            return DXGI_FORMAT_R8G8_UNORM;
+        case PF_R8G8_SINT:      return DXGI_FORMAT_R8G8_SINT;
+        case PF_R8G8_UINT:      return DXGI_FORMAT_R8G8_UINT;
+        case PF_R8G8_SNORM:     return DXGI_FORMAT_R8G8_SNORM;
         case PF_UNKNOWN:
         default:                return DXGI_FORMAT_UNKNOWN;
         }

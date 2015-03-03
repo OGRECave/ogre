@@ -20,11 +20,11 @@ struct PS_INPUT
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));@end
 
-@pset( samplerStateStart, hlms_num_shadow_maps )
+@padd( samplerStateStart, hlms_num_shadow_maps, 1 )
 @pset( numSamplerStates, num_textures )
 @property( envprobe_map )@add( numSamplerStates, 1 )@end
 
-@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+@property( numSamplerStates || envprobe_map )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
 @property( normal_map )
 @property( hlms_qtangent )
@@ -96,7 +96,7 @@ float3 qmul( float4 q, float3 v )
 @end
 
 @property( hlms_normal || hlms_qtangent )
-float3 cookTorrance( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, float3 lightSpecular, Material material, float3 nNormal@property( diffuse_map || detail_maps_diffuse ), float3 diffuseCol@end @property( specular_map ), float3 specularCol@end  )
+float3 cookTorrance( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, float3 lightSpecular, Material material, float3 nNormal @insertpiece( brdfExtraParamDefs ) )
 {
 	float3 halfWay= normalize( lightDir + viewDir );
 	float NdotL = saturate( dot( nNormal, lightDir ) );
@@ -187,12 +187,12 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 		@property( detail_weights )detailWeights *= material.cDetailWeights;@end
 	@end @property( !detail_weight_map )
 		@property( detail_weights )float4 detailWeights = material.cDetailWeights;@end
-		@property( !detail_weights )float4 detailWeights = float4( 1.0 );@end
+		@property( !detail_weights )float4 detailWeights = float4( 1.0, 1.0, 1.0, 1.0 );@end
 	@end
 @end
 
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
-	float4 detailCol@n	= textureMaps[@value(detail_map@n_idx)].Sample( samplerStates[@value(detail_map@n_idx)]], float3( inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ) );
+	float4 detailCol@n	= textureMaps[@value(detail_map@n_idx)].Sample( samplerStates[@value(detail_map@n_idx)], float3( inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol@n.xyz = detailCol@n.xyz * detailCol@n.xyz;@end
 	detailWeights.@insertpiece(detail_swizzle@n) *= detailCol@n.w;
@@ -211,10 +211,10 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 	//Get the TBN matrix
 	float3 vBinormal	= normalize( cross( vTangent, geomNormal )@insertpiece( tbnApplyReflection ) );
-	mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
+	float3x3 TBN		= float3x3( vTangent, vBinormal, geomNormal );
 
 	@property( normal_map_tex )nNormal = getTSNormal( float3( inPs.uv@value(uv_normal).xy, normalIdx ) );@end
-	@property( normal_weight_tex )nNormal = mix( float3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );@end
+	@property( normal_weight_tex )nNormal = lerp( float3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );@end
 @end
 
 @property( hlms_pssm_splits )
@@ -265,7 +265,7 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 	nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 @property( normal_map )
-	nNormal = normalize( TBN * nNormal );
+	nNormal = normalize( mul( TBN, nNormal ) );
 @end
 
 	//Everything's in Camera space, we use Cook-Torrance lighting
@@ -325,7 +325,7 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 @property( envprobe_map )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	float3 envColour = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], reflDir * passBuf.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz;
+	float3 envColour = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz;
 	@property( !hw_gamma_read )//Gamma to linear space
 	envColour = envColour * envColour;@end
 	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS), material, nNormal @insertpiece( brdfExtraParams ) );@end
