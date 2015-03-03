@@ -42,7 +42,7 @@ namespace Ogre{
 
         // Set up some constant characters of interest
         const wchar_t varopener = '$', quote = '\"', slash = '/', backslash = '\\', openbrace = '{', closebrace = '}', colon = ':', star = '*', cr = '\r', lf = '\n';
-        char c = 0;
+        char c = 0, lastc = 0;
 
         String lexeme;
         uint32 line = 1, state = READY, lastQuote = 0;
@@ -52,7 +52,7 @@ namespace Ogre{
         String::const_iterator i = str.begin(), end = str.end();
         while(i != end)
         {
-            char lastc = c;
+            lastc = c;
             c = *i;
 
             if(c == quote)
@@ -99,9 +99,12 @@ namespace Ogre{
                 }
                 break;
             case COMMENT:
-                // This newline happens to be ignored automatically
                 if(isNewline(c))
+                {
+                    lexeme = c;
+                    setToken(lexeme, line, source, tokens.get());
                     state = READY;
+                }
                 break;
             case MULTICOMMENT:
                 if(c == slash && lastc == star)
@@ -203,7 +206,7 @@ namespace Ogre{
             // Separate check for newlines just to track line numbers
             if(c == cr || (c == lf && lastc != cr))
                 line++;
-            
+
             i++;
         }
 
@@ -219,7 +222,7 @@ namespace Ogre{
             {
                 OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
                     Ogre::String("no matching \" found for \" at line ") + 
-                        Ogre::StringConverter::toString(lastQuote),
+                    Ogre::StringConverter::toString(lastQuote),
                     "ScriptLexer::tokenize");
             }
         }
