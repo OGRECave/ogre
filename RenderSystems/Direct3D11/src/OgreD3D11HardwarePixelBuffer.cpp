@@ -166,8 +166,13 @@ namespace v1 {
         }
 
         box.data = pMappedResource.pData;
-        box.rowPitch = pMappedResource.RowPitch;
-        box.slicePitch = pMappedResource.DepthPitch;
+
+        if( !PixelUtil::isCompressed( box.format ) )
+        {
+            const size_t bytePerPixel = PixelUtil::getNumElemBytes( box.format );
+            box.rowPitch    = pMappedResource.RowPitch / bytePerPixel;
+            box.slicePitch  = pMappedResource.DepthPitch / bytePerPixel;
+        }
     }
     //-----------------------------------------------------------------------------  
     void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
@@ -179,7 +184,7 @@ namespace v1 {
         return mDataForStaticUsageLock;
     }
     //-----------------------------------------------------------------------------  
-    void *D3D11HardwarePixelBuffer::_mapstagingbuffer(D3D11_MAP flags)
+    void D3D11HardwarePixelBuffer::_mapstagingbuffer(D3D11_MAP flags, PixelBox &box)
     {
         if(!mStagingBuffer)
             createStagingBuffer();
@@ -201,9 +206,7 @@ namespace v1 {
         else if(flags == D3D11_MAP_WRITE_DISCARD)
             flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
 
-        PixelBox box;
         _map(mStagingBuffer, flags, box);
-        return box.data;
     }
     //-----------------------------------------------------------------------------  
     PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box &lockBox, LockOptions options)
@@ -247,12 +250,13 @@ namespace v1 {
         if(mUsage == HBU_STATIC || mUsage & HBU_DYNAMIC)
         {
             if(mUsage == HBU_STATIC || options == HBL_READ_ONLY || options == HBL_NORMAL || options == HBL_WRITE_ONLY)
-                rval.data = _mapstagingbuffer(flags);
+                _mapstagingbuffer(flags, rval);
             else
                 _map(mParentTexture->getTextureResource(), flags, rval);
 
             // calculate the offset in bytes
-			offset = PixelUtil::getMemorySize(rval.left, rval.front, 1, rval.format);
+            offset = (rval.left * rval.rowPitch + rval.front * rval.slicePitch) *
+                        PixelUtil::getNumElemBytes( rval.format );
             // add the offset, so the right memory will be changed
             //rval.data = static_cast<int*>(rval.data) + offset;
         }
