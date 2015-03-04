@@ -2158,17 +2158,27 @@ bail:
             }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			D3D11RenderWindowBase* d3d11Window = static_cast<D3D11RenderWindowBase*>(target);
-			d3d11Window->_validateStereo();
+            if( target->isRenderWindow() )
+            {
+                assert( dynamic_cast<D3D11RenderWindowBase*>(target) );
+                D3D11RenderWindowBase* d3d11Window = static_cast<D3D11RenderWindowBase*>(target);
+                d3d11Window->_validateStereo();
+            }
 #endif
 
             vp->_clearUpdatedFlag();
         }
         else
         {
-            // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
-            if(static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer())
-                _setRenderTargetViews();
+            if( vp->getTarget()->isRenderWindow() )
+            {
+                // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL
+                // we need to reestablish render target views
+                assert( dynamic_cast<D3D11RenderWindowBase*>(vp->getTarget()) );
+
+                if( static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer() )
+                    _setRenderTargetViews();
+            }
         }
     }
     //---------------------------------------------------------------------
