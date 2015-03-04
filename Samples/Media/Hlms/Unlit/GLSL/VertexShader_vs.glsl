@@ -1,5 +1,10 @@
 @insertpiece( SetCrossPlatformSettings )
 
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
+
 mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
 {
         vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
