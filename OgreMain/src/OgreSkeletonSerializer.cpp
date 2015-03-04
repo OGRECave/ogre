@@ -125,10 +125,10 @@ namespace v1 {
         // Check header
         readFileHeader(stream);
         pushInnerChunk(stream);
-        bool invalidChunkID = false;
-        while(!stream->eof() && !invalidChunkID)
+        unsigned short streamID = readChunk(stream);
+
+        while(!stream->eof())
         {
-            unsigned short streamID = readChunk(stream);
             switch (streamID)
             {
             case SKELETON_BLENDMODE:
@@ -152,9 +152,10 @@ namespace v1 {
                 readSkeletonAnimationLink(stream, pSkel);
                 break;
             default:
-                invalidChunkID = true;
                 break;
             }
+
+            streamID = readChunk(stream);
         }
         // Assume bones are stored in the binding pose
         pSkel->setBindingPose();

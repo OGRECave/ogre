@@ -41,7 +41,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLSLESCgProgramFactory::~GLSLESCgProgramFactory()
     {
-            Hlsl2Glsl_Finalize();
+        Hlsl2Glsl_Shutdown();
     }
     //-----------------------------------------------------------------------
     const String& GLSLESCgProgramFactory::getLanguage(void) const

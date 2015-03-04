@@ -145,7 +145,7 @@ namespace Ogre {
         const TextureUnitState &oth )
     {
         assert(mAnimController == 0);
-        assert(mEffects.empty());
+        removeAllEffects();
 
         // copy basic members (int's, real's)
         memcpy( this, &oth, (const uchar *)(&oth.mFrames) - (const uchar *)(&oth) );
