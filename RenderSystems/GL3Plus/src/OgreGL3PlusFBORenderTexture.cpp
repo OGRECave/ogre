@@ -33,8 +33,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusFBOMultiRenderTarget.h"
 
-#define TEMP_FBOS 2
-
 namespace Ogre {
     static const size_t TEMP_FBOS = 2;
 
@@ -371,7 +369,7 @@ namespace Ogre {
                                 // skip unsupported stencil unless it is GL_NONE, as we still want DxxS0 formats
                                 formatSupported = params == GL_FULL_SUPPORT || stencilFormats[stencil] == GL_NONE;
                             } else {
-                                formatSupported = _tryFormat(depthFormats[depth], stencilFormats[stencil]);
+                                formatSupported = _tryFormat(depthFormats[depth], stencilFormats[stencil]) != 0;
                             }
 
                             if (formatSupported)
