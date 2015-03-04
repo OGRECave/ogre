@@ -406,7 +406,7 @@ namespace v1 {
             srcBoxDx11.front = 0;
             srcBoxDx11.back = mLockBox.getDepth();
 
-            unsigned int dstSubresource = D3D11CalcSubresource( mSubresourceIndex, mLockBox.front,
+            unsigned int dstSubresource = D3D11CalcSubresource( mSubresourceIndex, mLockBox.front + mFace,
                                                                 mParentTexture->getNumMipmaps()+1 );
             mDevice.GetImmediateContext()->CopySubresourceRegion(
                         mParentTexture->getTextureResource(),

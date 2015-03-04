@@ -71,7 +71,7 @@ namespace v1 {
         ID3D11Resource *mStagingBuffer;
         
         void _map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box);
-        void _mapstagingbuffer(D3D11_MAP flags, PixelBox & box);
+        void _mapstagingbuffer(D3D11_MAP flags, PixelBox &box);
         void *_mapstaticbuffer(PixelBox lock);
         void _unmap(ID3D11Resource *res);
         void _unmapstagingbuffer(bool copyback = true);

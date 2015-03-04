@@ -512,13 +512,13 @@ namespace Ogre
         case DXGI_FORMAT_BC7_TYPELESS:              return PF_BC7_UNORM;
         case DXGI_FORMAT_BC7_UNORM:                 return PF_BC7_UNORM;
         case DXGI_FORMAT_BC7_UNORM_SRGB:            return PF_BC7_UNORM_SRGB;
-
-#if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && defined(DXGI_FORMAT_AYUV)
         case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:return PF_UNKNOWN;
         case DXGI_FORMAT_B8G8R8A8_TYPELESS:         return PF_UNKNOWN;
         case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:       return PF_A8R8G8B8;
         case DXGI_FORMAT_B8G8R8X8_TYPELESS:         return PF_UNKNOWN;
         case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:       return PF_X8R8G8B8;
+
+#if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && defined(DXGI_FORMAT_AYUV)
         case DXGI_FORMAT_AYUV:                      return PF_UNKNOWN;
         case DXGI_FORMAT_Y410:                      return PF_UNKNOWN;
         case DXGI_FORMAT_Y416:                      return PF_UNKNOWN;

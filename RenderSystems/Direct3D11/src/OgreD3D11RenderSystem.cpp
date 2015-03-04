@@ -1171,6 +1171,32 @@ bail:
         if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
             rsc->setCapability(RSC_TEXTURE_CUBE_MAP_ARRAY);
 
+        if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
+        {
+            rsc->setMaximumResolutions( static_cast<ushort>(D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION),
+                                        static_cast<ushort>(D3D11_REQ_TEXTURE3D_U_V_OR_W_DIMENSION),
+                                        static_cast<ushort>(D3D11_REQ_TEXTURECUBE_DIMENSION) );
+        }
+        else if( mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 )
+        {
+            rsc->setMaximumResolutions( static_cast<ushort>(D3D10_REQ_TEXTURE2D_U_OR_V_DIMENSION),
+                                        static_cast<ushort>(D3D10_REQ_TEXTURE3D_U_V_OR_W_DIMENSION),
+                                        static_cast<ushort>(D3D10_REQ_TEXTURECUBE_DIMENSION) );
+        }
+        /*TODO
+        else if( mFeatureLevel >= D3D_FEATURE_LEVEL_9_3 )
+        {
+            rsc->setMaximumResolutions( static_cast<ushort>(D3D_FL9_3_REQ_TEXTURE2D_U_OR_V_DIMENSION),
+                                        static_cast<ushort>(D3D_FL9_3_REQ_TEXTURE3D_U_V_OR_W_DIMENSION),
+                                        static_cast<ushort>(D3D_FL9_3_REQ_TEXTURECUBE_DIMENSION) );
+        }
+        else
+        {
+            rsc->setMaximumResolutions( static_cast<ushort>(D3D_FL9_1_REQ_TEXTURE2D_U_OR_V_DIMENSION),
+                                        static_cast<ushort>(D3D_FL9_1_REQ_TEXTURE3D_U_V_OR_W_DIMENSION),
+                                        static_cast<ushort>(D3D_FL9_1_REQ_TEXTURECUBE_DIMENSION) );
+        }*/
+
         convertVertexShaderCaps(rsc);
         convertPixelShaderCaps(rsc);
         convertGeometryShaderCaps(rsc);
