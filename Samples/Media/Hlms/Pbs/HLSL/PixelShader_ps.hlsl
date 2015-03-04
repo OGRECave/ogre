@@ -43,7 +43,7 @@ float getShadow( Texture2D shadowMap, float4 psPosLN, float2 invShadowMapSize )
 	float2 uv = psPosLN.xy / psPosLN.w;
 	float3 o = float3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
 
-	float c = shadowMap.SampleCmpLevelZero( shadowSampler, -o.xy, fDepth );
+	float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy - o.xy, fDepth );
 	return c;@end
 @property( hlms_shadow_uses_depth_texture )
 	return texture( shadowMap, psPosLN.xyz, 0 ).x;@end

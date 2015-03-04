@@ -35,6 +35,7 @@ cbuffer PassBuffer : register(b0)
 
 	//Pixel shader
 	float3x3 invViewMatCubemap;
+	float padding; //Compatibility with GLSL.
 @property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )
 	float pssmSplitPoints@n;@end @end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end

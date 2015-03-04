@@ -2029,6 +2029,19 @@ bail:
             // we need to clear the state -- dark_sylinc: No we don't.
             //mDevice.GetImmediateContext()->ClearState();
 
+            //Set all textures to 0 to prevent the runtime from thinkin we might
+            //be sampling from the render target (common when doing shadow map
+            //rendering)
+            ID3D11ShaderResourceView *nullViews[16];
+            memset( nullViews, 0, sizeof( nullViews ) );
+            ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+            deviceContext->VSSetShaderResources( 0, 16, nullViews );
+            deviceContext->PSSetShaderResources( 0, 16, nullViews );
+            deviceContext->HSSetShaderResources( 0, 16, nullViews );
+            deviceContext->DSSetShaderResources( 0, 16, nullViews );
+            deviceContext->GSSetShaderResources( 0, 16, nullViews );
+            deviceContext->CSSetShaderResources( 0, 16, nullViews );
+
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
