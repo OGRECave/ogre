@@ -119,8 +119,6 @@ namespace Ogre
 	of exactly which 3D API is in use.
 	@author
 	Steven Streeting
-	@version
-	1.0
 	*/
 	class _OgreExport RenderSystem : public RenderSysAlloc
 	{
@@ -277,8 +275,8 @@ namespace Ogre
 		/** Creates a new rendering window.
 		@remarks
 		This method creates a new rendering window as specified
-		by the paramteters. The rendering system could be
-		responible for only a single window (e.g. in the case
+		by the parameters. The rendering system could be
+		responsible for only a single window (e.g. in the case
 		of a game), or could be in charge of multiple ones (in the
 		case of a level editor). The option to create the window
 		as a child of another is therefore given.
@@ -298,7 +296,8 @@ namespace Ogre
 		without borders, title bar or menu bar.
 		@param
 		miscParams A NameValuePairList describing the other parameters for the new rendering window. 
-		Options are case sensitive. Unrecognised parameters will be ignored silently.
+		Options are case sensitive. Unrecognised parameters will be ignored silently (check the coding of
+        RenderWindow::create of your target rendersystem to verify which parameters are actually recongnised).
 		These values might be platform dependent, but these are present for all platforms unless
 		indicated otherwise:
 		<table>
@@ -524,6 +523,83 @@ namespace Ogre
 			<td>Enable the window to keep track and transmit double click messages.</td>
 			<td>Win32 Specific</td>
 		</tr>
+        <tr>
+            <td>monitorIndex</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Win32 Specific</td>
+        </tr>
+        <tr>
+            <td>monitorHandle</td>
+            <td>true, false</td>
+            <td>false</td>
+            <td>Enable the window to keep track and transmit double click messages.</td>
+            <td>Win32 OpenGL Specific</td>
+        </tr>
+        <tr>
+            <td>hidden</td>
+            <td>true, false</td>
+            <td>false</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>show</td>
+            <td>true, false</td>
+            <td></td>
+            <td></td>
+            <td>D3D9 & D3D11 Specific</td>
+        </tr>
+        <tr>
+            <td>pp::Instance</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>NaCL Specific</td>
+        </tr>
+        <tr>
+            <td>SwapCallback</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>NaCL Specific</td>
+        </tr>
+        <tr>
+            <td>currentGLContext</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>OpenGL Specific</td>
+        </tr>
+        <tr>
+            <td>androidConfig</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Android Specific</td>
+        </tr>
+        <tr>
+            <td>maxColourBufferSize</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Android Specific</td>
+        </tr>
+        <tr>
+            <td>maxStencilBufferSize</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Android Specific</td>
+        </tr>
+        <tr>
+            <td>maxDepthBufferSize</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Android Specific</td>
+        </tr>
 		
 		*/
 		virtual RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
@@ -532,13 +608,14 @@ namespace Ogre
 		/** Creates multiple rendering windows.		
 		@param
 		renderWindowDescriptions Array of structures containing the descriptions of each render window.
-		The structure's members are the same as the parameters of _createRenderWindow:
-		* name
-		* width
-		* height
-		* fullScreen
-		* miscParams
-		See _createRenderWindow for details about each member.		
+		The structure's members are the same as the parameters of RenderSystem::_createRenderWindow:
+		  - name
+		  - width
+		  - height
+		  - fullScreen
+		  - miscParams
+		
+        See RenderSystem::_createRenderWindow for details about each member.		
 		@param
 		createdWindows This array will hold the created render windows.
 		@return
@@ -754,7 +831,7 @@ namespace Ogre
 		/**
 		Sets the texture coordinate set to use for a texture unit.
 
-		Meant for use internally - not generally used directly by apps - the Material and TextureUnitState
+		Meant for use internally only - not generally used directly by applications. The Material and TextureUnitState
 		classes let you manage textures far more easily.
 
 		@param unit Texture unit as above
@@ -764,7 +841,7 @@ namespace Ogre
 
 		/**
 		Sets a method for automatically calculating texture coordinates for a stage.
-		Should not be used by apps - for use by Ogre only.
+		Should not be used by applications - for internal use by Ogre only.
 		@param unit Texture unit as above
 		@param m Calculation method to use
 		@param frustum Optional Frustum param, only used for projective effects
@@ -773,7 +850,7 @@ namespace Ogre
 			const Frustum* frustum = 0) = 0;
 
 		/** Sets the texture blend modes from a TextureUnitState record.
-		Meant for use internally only - apps should use the Material
+		Meant for use internally only. Applications should use the Material
 		and TextureUnitState classes.
 		@param unit Texture unit as above
 		@param bm Details of the blending mode
@@ -992,7 +1069,7 @@ namespace Ogre
 		When polygons are coplanar, you can get problems with 'depth fighting' where
 		the pixels from the two polys compete for the same screen pixel. This is particularly
 		a problem for decals (polys attached to another surface to represent details such as
-		bulletholes etc.).
+		bulletholes, etc.).
 		@par
 		A way to combat this problem is to use a depth bias to adjust the depth buffer value
 		used for the decal such that it is slightly higher than the true value, ensuring that
@@ -1494,7 +1571,7 @@ namespace Ogre
         */
         virtual void markProfileEvent( const String &event ) = 0;
 
-		/** Determines if the system has anisotropic mip map filter support
+		/** Determines if the system has anisotropic mipmap filter support
 		*/
 		virtual bool hasAnisotropicMipMapFilter() const = 0;
 
@@ -1517,7 +1594,7 @@ namespace Ogre
 		/** The Active render target. */
 		RenderTarget * mActiveRenderTarget;
 
-		/** The Active GPU programs and gpu program parameters*/
+		/** The Active Gpu programs and Gpu program parameters*/
 		GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveGeometryGpuProgramParameters;
 		GpuProgramParametersSharedPtr mActiveFragmentGpuProgramParameters;
@@ -1550,26 +1627,26 @@ namespace Ogre
 		/// Texture units from this upwards are disabled
 		size_t mDisabledTexUnitsFrom;
 
-		/// number of times to render the current state
+		/// Number of times to render the current state
 		size_t mCurrentPassIterationCount;
 		size_t mCurrentPassIterationNum;
-		/// Whether to update the depth bias per render call
+		/// Indicator whether to update the depth bias per render call
 		bool mDerivedDepthBias;
 		float mDerivedDepthBiasBase;
 		float mDerivedDepthBiasMultiplier;
 		float mDerivedDepthBiasSlopeScale;
 
-        /// a global vertex buffer for global instancing
+        /// Global vertex buffer for global instancing
         HardwareVertexBufferSharedPtr mGlobalInstanceVertexBuffer;
-        /// a vertex declaration for the global vertex buffer for the global instancing
+        /// Vertex declaration for the global vertex buffer for the global instancing
         VertexDeclaration* mGlobalInstanceVertexBufferVertexDeclaration;
-        /// the number of global instances (this number will be multiply by the render op instance number) 
+        /// Number of global instances (this number will be multiply by the render op instance number) 
         size_t mGlobalNumberOfInstances;
 
-		/// is fixed pipeline enabled
+		/// Indicator whether fixed pipeline is enabled
 		bool mEnableFixedPipeline;
 
-		/** updates pass iteration rendering state including bound gpu program parameter
+		/** Updates pass iteration rendering state including bound Gpu program parameter
 		pass iteration auto constant entry
 		@return True if more iterations are required
 		*/
