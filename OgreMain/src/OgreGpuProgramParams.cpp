@@ -2666,7 +2666,7 @@ namespace Ogre
                     break;
                 case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(l), i->elementCount);
                     break;
                 case ACT_LIGHT_POSITION_OBJECT_SPACE:
                     _writeRawConstant(i->physicalIndex,
@@ -2879,7 +2879,7 @@ namespace Ogre
                     break;
                 case ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(l), i->elementCount);
                     break;
                 case ACT_SHADOW_COLOUR:
                     _writeRawConstant(i->physicalIndex, source->getShadowColour(), i->elementCount);
@@ -2901,7 +2901,7 @@ namespace Ogre
                     break;
                 case ACT_LIGHT_CASTS_SHADOWS_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getLightCastsShadows(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getLightCastsShadows(l), i->elementCount);
                     break;
                 case ACT_LIGHT_ATTENUATION:
                     _writeRawConstant(i->physicalIndex, source->getLightAttenuation(i->data), i->elementCount);
