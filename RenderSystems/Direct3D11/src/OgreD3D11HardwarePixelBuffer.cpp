@@ -173,6 +173,11 @@ namespace v1 {
             box.rowPitch    = pMappedResource.RowPitch / bytePerPixel;
             box.slicePitch  = pMappedResource.DepthPitch / bytePerPixel;
         }
+        else
+        {
+            box.rowPitch    = pMappedResource.RowPitch;
+            box.slicePitch  = pMappedResource.DepthPitch;
+        }
     }
     //-----------------------------------------------------------------------------  
     void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
