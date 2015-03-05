@@ -4442,6 +4442,7 @@ void SceneManager::findLightsAffectingFrustum(const Camera* camera)
 				lightInfo.light = l;
 				lightInfo.type = l->getType();
 				lightInfo.lightMask = l->getLightMask();
+				lightInfo.castsShadows = l->getCastShadows();
 				if (lightInfo.type == Light::LT_DIRECTIONAL)
 				{
 					// Always visible
