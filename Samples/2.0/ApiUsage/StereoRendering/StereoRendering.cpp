@@ -10,6 +10,9 @@
 #include "OgreRenderWindow.h"
 #include "Compositor/OgreCompositorManager2.h"
 
+//Declares WinMain / main
+#include "MainEntryPointHelper.h"
+
 using namespace Demo;
 
 namespace Demo
@@ -97,9 +100,9 @@ namespace Demo
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int main()
+int mainApp()
 #endif
 {
     StereoRenderingGameState stereoGameState(

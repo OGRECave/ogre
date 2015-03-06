@@ -7,12 +7,15 @@
 
 #include "Threading/OgreThreads.h"
 
+//Declares WinMain / main
+#include "MainEntryPointHelper.h"
+
 using namespace Demo;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int main()
+int mainApp()
 #endif
 {
     MyGameState myGameState(
