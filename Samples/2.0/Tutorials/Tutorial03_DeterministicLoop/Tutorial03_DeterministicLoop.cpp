@@ -8,6 +8,9 @@
 
 #include "Threading/OgreThreads.h"
 
+//Declares WinMain / main
+#include "MainEntryPointHelper.h"
+
 using namespace Demo;
 
 const double cFrametime[2] = { 1.0 / 25.0, 1.0 / 60.0 };
@@ -19,9 +22,9 @@ extern bool gFakeSlowmo;
 bool gFakeSlowmo = false;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int main()
+int mainApp()
 #endif
 {
     MyGameState myGameState(
@@ -59,6 +62,12 @@ int main()
     myGameState._notifyGraphicsSystem( &graphicsSystem );
 
     graphicsSystem.initialize( "Tutorial 03: Deterministic Loop" );
+
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 

@@ -18,6 +18,9 @@
 
 #include "Threading/OgreThreads.h"
 
+//Declares WinMain / main
+#include "MainEntryPointHelper.h"
+
 using namespace Demo;
 
 namespace Demo
@@ -34,15 +37,21 @@ namespace Demo
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int main()
+int mainApp()
 #endif
 {
     GameState gameState;
     MyGraphicsSystem graphicsSystem( &gameState );
 
     graphicsSystem.initialize( "Tutorial 01: Initialization" );
+
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 

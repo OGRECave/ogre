@@ -536,10 +536,17 @@ namespace Ogre {
                 continue;
             }
 
-            ConfigFile::SettingsMultiMap::const_iterator i;
-            for (i = settings.begin(); i != settings.end(); ++i)
+            try
             {
-                rs->setConfigOption(i->first, i->second);
+                ConfigFile::SettingsMultiMap::const_iterator i;
+                for (i = settings.begin(); i != settings.end(); ++i)
+                {
+                    rs->setConfigOption(i->first, i->second);
+                }
+            }
+            catch( Exception &e )
+            {
+                LogManager::getSingleton().logMessage( e.getFullDescription() );
             }
         }
 

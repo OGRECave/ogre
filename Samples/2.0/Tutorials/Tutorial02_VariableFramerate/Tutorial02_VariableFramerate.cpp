@@ -7,12 +7,15 @@
 
 #include "Threading/OgreThreads.h"
 
+//Declares WinMain / main
+#include "MainEntryPointHelper.h"
+
 using namespace Demo;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int main()
+int mainApp()
 #endif
 {
     MyGameState myGameState(
@@ -34,6 +37,12 @@ int main()
     myGameState._notifyGraphicsSystem( &graphicsSystem );
 
     graphicsSystem.initialize( "Tutorial 02: Variable Framerate" );
+
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 

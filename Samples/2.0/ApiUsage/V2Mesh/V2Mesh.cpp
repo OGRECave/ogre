@@ -7,12 +7,15 @@
 #include "Threading/OgreThreads.h"
 #include "OgreRenderWindow.h"
 
+//Declares WinMain / main
+#include "MainEntryPointHelper.h"
+
 using namespace Demo;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int main()
+int mainApp()
 #endif
 {
     V2MeshGameState v2MeshGameState(
@@ -50,6 +53,12 @@ int main()
     v2MeshGameState._notifyGraphicsSystem( &graphicsSystem );
 
     graphicsSystem.initialize( "Importing V1 meshes into V2 objects (convert v1 objects to v2 format)" );
+
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
 
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 

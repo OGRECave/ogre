@@ -144,7 +144,6 @@ bail:
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
-        mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
         mDriverType = DT_HARDWARE;
@@ -1126,9 +1125,6 @@ bail:
         rsc->setDriverVersion(mDriverVersion);
         rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
         rsc->setRenderSystemName(getName());
-		
-        // Does NOT support fixed-function!
-        //rsc->setCapability(RSC_FIXED_FUNCTION);
 
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setStencilBufferBitDepth(8);

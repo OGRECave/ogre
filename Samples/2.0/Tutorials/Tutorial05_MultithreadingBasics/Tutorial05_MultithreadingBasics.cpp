@@ -11,6 +11,8 @@
 #include "Threading/OgreThreads.h"
 #include "Threading/OgreBarrier.h"
 
+#include <iostream>
+
 using namespace Demo;
 
 extern const double cFrametime;
@@ -83,7 +85,7 @@ int main()
 
 
 //---------------------------------------------------------------------
-unsigned long renderThread( Ogre::ThreadHandle *threadHandle )
+unsigned long renderThreadApp( Ogre::ThreadHandle *threadHandle )
 {
     ThreadData *threadData = reinterpret_cast<ThreadData*>( threadHandle->getUserParam() );
     GraphicsSystem *graphicsSystem  = threadData->graphicsSystem;
@@ -91,6 +93,12 @@ unsigned long renderThread( Ogre::ThreadHandle *threadHandle )
 
     graphicsSystem->initialize( "Tutorial 05: Multithreading Basics" );
     barrier->sync();
+
+    if( graphicsSystem->getQuit() )
+    {
+        graphicsSystem->deinitialize();
+        return 0; //User cancelled config
+    }
 
     graphicsSystem->createScene01();
     barrier->sync();
@@ -137,6 +145,29 @@ unsigned long renderThread( Ogre::ThreadHandle *threadHandle )
 
     return 0;
 }
+unsigned long renderThread( Ogre::ThreadHandle *threadHandle )
+{
+    unsigned long retVal = -1;
+
+    try
+    {
+        retVal = renderThreadApp( threadHandle );
+    }
+    catch( Ogre::Exception& e )
+    {
+   #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!",
+                    MB_OK | MB_ICONERROR | MB_TASKMODAL );
+   #else
+        std::cerr << "An exception has occured: " <<
+                     e.getFullDescription().c_str() << std::endl;
+   #endif
+
+        abort();
+    }
+
+    return retVal;
+}
 //---------------------------------------------------------------------
 unsigned long logicThread( Ogre::ThreadHandle *threadHandle )
 {
@@ -147,6 +178,12 @@ unsigned long logicThread( Ogre::ThreadHandle *threadHandle )
 
     logicSystem->initialize();
     barrier->sync();
+
+    if( graphicsSystem->getQuit() )
+    {
+        logicSystem->deinitialize();
+        return 0; //Render thread cancelled early
+    }
 
     logicSystem->createScene01();
     barrier->sync();

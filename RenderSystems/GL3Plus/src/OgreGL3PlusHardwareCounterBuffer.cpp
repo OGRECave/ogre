@@ -89,8 +89,8 @@ namespace v1 {
         // Use glMapBuffer
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ATOMIC_COUNTER_BUFFER, mBufferId));
 
-        assert( (mUsage & HBU_WRITE_ONLY && options != HBL_NORMAL && options != HBL_READ_ONLY) ||
-                !(mUsage & HBU_WRITE_ONLY) &&
+        assert( ((mUsage & HBU_WRITE_ONLY && options != HBL_NORMAL && options != HBL_READ_ONLY) ||
+                !(mUsage & HBU_WRITE_ONLY)) &&
                 "Reading from a write-only buffer! Create the buffer without HBL_WRITE_ONLY bit" );
 
         if (mUsage & HBU_WRITE_ONLY)

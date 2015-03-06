@@ -327,12 +327,6 @@ namespace Ogre {
             if (aavalues.size() > 1)
                 multisample_hint = aavalues[1];
 
-            opt = mOptions.find("Fixed Pipeline Enabled");
-            if (opt == mOptions.end())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
-            bool enableFixedPipeline = (opt->second.currentValue == "Yes");
-            renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
-
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			opt = mOptions.find("Stereo Mode");
 			if (opt == mOptions.end())

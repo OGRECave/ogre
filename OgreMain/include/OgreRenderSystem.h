@@ -570,10 +570,6 @@ namespace Ogre
         */
         void setGlobalNumberOfInstances(const size_t val);
 
-        /** Sets if fixed pipeline rendering is enabled on the system.
-        */
-        void setFixedPipelineEnabled(bool enabled);
-
         /** Returns true if fixed pipeline rendering is enabled on the system.
         */
         bool getFixedPipelineEnabled(void) const;
@@ -1422,9 +1418,6 @@ namespace Ogre
         v1::VertexDeclaration* mGlobalInstanceVertexBufferVertexDeclaration;
         /// the number of global instances (this number will be multiply by the render op instance number) 
         size_t mGlobalNumberOfInstances;
-
-        /// is fixed pipeline enabled
-        bool mEnableFixedPipeline;
 
         /** updates pass iteration rendering state including bound gpu program parameter
         pass iteration auto constant entry
