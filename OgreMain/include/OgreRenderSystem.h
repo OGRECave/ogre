@@ -570,10 +570,6 @@ namespace Ogre
         */
         void setGlobalNumberOfInstances(const size_t val);
 
-        /** Sets if fixed pipeline rendering is enabled on the system.
-        */
-        void setFixedPipelineEnabled(bool enabled);
-
         /** Returns true if fixed pipeline rendering is enabled on the system.
         */
         bool getFixedPipelineEnabled(void) const;
