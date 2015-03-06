@@ -148,6 +148,7 @@ std::string macBundlePath()
                          "GraphicsSystem::initialize" );
         }
 
+        Ogre::ConfigOptionMap& cfgOpts = mRoot->getRenderSystem()->getConfigOptions();
         Ogre::String winHandle;
         Ogre::NameValuePairList params;
 
@@ -180,8 +181,8 @@ std::string macBundlePath()
 
         params.insert( std::make_pair("title", windowTitle) );
         params.insert( std::make_pair("gamma", "true") );
-        //params.insert( std::make_pair("FSAA", ) );
-        //params.insert( std::make_pair("vsync", vsync ? "true" : "false") );
+        params.insert( std::make_pair("FSAA", cfgOpts["FSAA"].currentValue) );
+        params.insert( std::make_pair("vsync", cfgOpts["VSync"].currentValue) );
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         params.insert( std::make_pair("externalWindowHandle",  winHandle) );
@@ -401,15 +402,19 @@ std::string macBundlePath()
         else if( *(dataFolder.end() - 1) != '/' )
             dataFolder += "/";
 
+        Ogre::String shaderSyntax = "GLSL";
+        if( mRoot->getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem" )
+            shaderSyntax = "HLSL";
+
         Ogre::Archive *archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Unlit/GLSL",
+                        dataFolder + "Hlms/Unlit/" + shaderSyntax,
                         "FileSystem", true );
 
         Ogre::HlmsUnlit *hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsUnlit );
 
         Ogre::Archive *archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(
-                        dataFolder + "Hlms/Pbs/GLSL",
+                        dataFolder + "Hlms/Pbs/" + shaderSyntax,
                         "FileSystem", true );
         Ogre::HlmsPbs *hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsPbs );

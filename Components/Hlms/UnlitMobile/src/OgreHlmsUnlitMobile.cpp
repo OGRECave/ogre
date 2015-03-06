@@ -332,6 +332,10 @@ namespace Ogre
         Matrix4 viewMatrix = camera->getViewMatrix(true);
 
         Matrix4 projectionMatrix = camera->getProjectionMatrixWithRSDepth();
+        Matrix4 identityProjMat;
+
+        mRenderSystem->_convertProjectionMatrix( Matrix4::IDENTITY,
+                                                 identityProjMat, true );
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         if( renderTarget->requiresTextureFlipping() )
@@ -340,11 +344,15 @@ namespace Ogre
             projectionMatrix[1][1] = -projectionMatrix[1][1];
             projectionMatrix[1][2] = -projectionMatrix[1][2];
             projectionMatrix[1][3] = -projectionMatrix[1][3];
+
+            identityProjMat[1][0]   = -identityProjMat[1][0];
+            identityProjMat[1][1]   = -identityProjMat[1][1];
+            identityProjMat[1][2]   = -identityProjMat[1][2];
+            identityProjMat[1][3]   = -identityProjMat[1][3];
         }
 
-        //mPreparedPass.viewProjMatrix[0]   = camera->getProjectionMatrix() * viewMatrix; //TODO
-        mPreparedPass.viewProjMatrix[0]     = projectionMatrix * viewMatrix;
-        mPreparedPass.viewProjMatrix[1]     = Matrix4::IDENTITY;
+        mPreparedPass.viewProjMatrix[0] = projectionMatrix * viewMatrix;
+        mPreparedPass.viewProjMatrix[1] = identityProjMat;
 
         return retVal;
     }

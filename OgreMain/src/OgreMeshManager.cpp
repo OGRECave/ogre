@@ -442,8 +442,8 @@ namespace v1
 
         // Set up vertex data
         // Use a single shared buffer
-        pMesh->sharedVertexData = OGRE_NEW VertexData();
-        VertexData* vertexData = pMesh->sharedVertexData;
+        pSub->vertexData = OGRE_NEW VertexData();
+        VertexData* vertexData = pSub->vertexData;
         // Set up Vertex Declaration
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
         size_t currOffset = 0;
@@ -574,7 +574,7 @@ namespace v1
         // Unlock
         vbuf->unlock();
         // Generate face list
-        pSub->useSharedVertices = true;
+        pSub->useSharedVertices = false;
         tesselate2DMesh(pSub, params.xsegments + 1, params.ysegments + 1, false, 
             params.indexBufferUsage, params.indexShadowBuffer);
 
@@ -591,12 +591,13 @@ namespace v1
         SubMesh *pSub = pMesh->createSubMesh();
 
         // Set options
-        pMesh->sharedVertexData = OGRE_NEW VertexData();
-        pMesh->sharedVertexData->vertexStart = 0;
-        VertexBufferBinding* bind = pMesh->sharedVertexData->vertexBufferBinding;
-        VertexDeclaration* decl = pMesh->sharedVertexData->vertexDeclaration;
+        pSub->vertexData = OGRE_NEW VertexData();
+        VertexData* vertexData = pSub->vertexData;
+        vertexData->vertexStart = 0;
+        VertexBufferBinding* bind = vertexData->vertexBufferBinding;
+        VertexDeclaration* decl = vertexData->vertexDeclaration;
 
-        pMesh->sharedVertexData->vertexCount = (params.xsegments + 1) * (params.ysegments + 1);
+        vertexData->vertexCount = (params.xsegments + 1) * (params.ysegments + 1);
 
         size_t offset = 0;
         decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
@@ -618,7 +619,7 @@ namespace v1
         HardwareVertexBufferSharedPtr vbuf = 
             HardwareBufferManager::getSingleton().createVertexBuffer(
             offset, 
-            pMesh->sharedVertexData->vertexCount, 
+            vertexData->vertexCount,
             params.vertexBufferUsage, 
             params.vertexShadowBuffer);
         bind->setBinding(0, vbuf);
@@ -752,8 +753,8 @@ namespace v1
 
         // Set up vertex data
         // Use a single shared buffer
-        pMesh->sharedVertexData = OGRE_NEW VertexData();
-        VertexData* vertexData = pMesh->sharedVertexData;
+        pSub->vertexData = OGRE_NEW VertexData();
+        VertexData* vertexData = pSub->vertexData;
         // Set up Vertex Declaration
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
         size_t currOffset = 0;
@@ -914,7 +915,7 @@ namespace v1
         // Unlock
         vbuf->unlock();
         // Generate face list
-        pSub->useSharedVertices = true;
+        pSub->useSharedVertices = false;
         tesselate2DMesh(pSub, params.xsegments + 1, params.ySegmentsToKeep + 1, false, 
             params.indexBufferUsage, params.indexShadowBuffer);
 

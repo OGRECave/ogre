@@ -84,9 +84,6 @@ namespace Ogre
         void refreshD3DSettings(void);
         void refreshFSAAOptions(void);
         void freeDevice(void);
-
-        /// return anisotropy level
-        DWORD _getCurrentAnisotropy(size_t unit);
         
         v1::D3D11HardwareBufferManager* mHardwareBufferManager;
         D3D11GpuProgramManager* mGpuProgramManager;
@@ -106,29 +103,6 @@ namespace Ogre
 
         bool checkVertexTextureFormats(void);
         void detachRenderTargetImpl(const String& name);
-
-        CompareFunction mSceneAlphaRejectFunc; // should be merged with - mBlendDesc
-        unsigned char mSceneAlphaRejectValue; // should be merged with - mBlendDesc
-        bool mSceneAlphaToCoverage;
-
-        D3D11_BLEND_DESC    mBlendDesc;
-        bool                mBlendDescChanged;
-
-        D3D11_RASTERIZER_DESC   mRasterizerDesc;
-        bool                    mRasterizerDescChanged;
-
-        UINT mStencilRef;
-        D3D11_DEPTH_STENCIL_DESC    mDepthStencilDesc; 
-        bool                        mDepthStencilDescChanged;
-
-        PolygonMode mPolygonMode;
-
-        FilterOptions FilterMinification[OGRE_MAX_TEXTURE_LAYERS];
-        FilterOptions FilterMagnification[OGRE_MAX_TEXTURE_LAYERS];
-        FilterOptions FilterMips[OGRE_MAX_TEXTURE_LAYERS];
-        bool          CompareEnabled;
-
-        D3D11_RECT mScissorRect;
         
         bool mReadBackAsTexture;
 
@@ -149,11 +123,10 @@ namespace Ogre
         TextureUnitState::BindingType mBindingType;
 
         ID3D11ShaderResourceView* mDSTResView;
-        ID3D11BlendState * mBoundBlendState;
-        ID3D11RasterizerState * mBoundRasterizer;
-        ID3D11DepthStencilState * mBoundDepthStencilState;
-        ID3D11SamplerState * mBoundSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
-        size_t mBoundSamplerStatesCount;
+
+        UINT                        mStencilRef;
+        D3D11_DEPTH_STENCIL_DESC    mDepthStencilDesc;
+        ID3D11DepthStencilState     *mBoundDepthStencilState;
 
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundTexturesCount;
@@ -179,7 +152,6 @@ namespace Ogre
 
             /// texture 
             ID3D11ShaderResourceView  *pTex;
-            D3D11_SAMPLER_DESC  samplerDesc;
             bool used;
         } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
 
@@ -211,6 +183,8 @@ namespace Ogre
          * from us each Present(), and we need the way to reestablish connection.
          */
         void _setRenderTargetViews();
+
+        void updateDepthStencilView(void);
 
     public:
         // constructor
@@ -313,14 +287,7 @@ namespace Ogre
         void _setTextureCoordSet( size_t unit, size_t index );
         void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, const Frustum* frustum = 0);
         void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
-        void _setTextureAddressingMode(size_t stage, const TextureUnitState::UVWAddressingMode& uvw);
-        void _setTextureBorderColour(size_t stage, const ColourValue& colour);
-        void _setTextureMipmapBias(size_t unit, float bias);
         void _setTextureMatrix( size_t unit, const Matrix4 &xform );
-        void _setSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendOperation op = SBO_ADD);
-        void _setSeparateSceneBlending(SceneBlendFactor sourceFactor, SceneBlendFactor destFactor, SceneBlendFactor sourceFactorAlpha, 
-            SceneBlendFactor destFactorAlpha, SceneBlendOperation op = SBO_ADD, SceneBlendOperation alphaOp = SBO_ADD);
-        void _setAlphaRejectSettings( CompareFunction func, unsigned char value, bool alphaToCoverage );
         void _setViewport( Viewport *vp );
 
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
@@ -338,13 +305,6 @@ namespace Ogre
 
         void _beginFrame(void);
         void _endFrame(void);
-        void _setDepthBufferParams( bool depthTest = true, bool depthWrite = true, CompareFunction depthFunction = CMPF_LESS_EQUAL );
-        void _setDepthBufferCheckEnabled( bool enabled = true );
-        bool _getDepthBufferCheckEnabled( void );
-        void _setColourBufferWriteEnabled(bool red, bool green, bool blue, bool alpha);
-        void _setDepthBufferWriteEnabled(bool enabled = true);
-        void _setDepthBufferFunction( CompareFunction func = CMPF_LESS_EQUAL );
-        void _setDepthBias(float constantBias, float slopeScaleBias);
         void _setFog( FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0 );
 		void _convertProjectionMatrix(const Matrix4& matrix, Matrix4& dest, bool forGpuProgram = false);
         void _makeProjectionMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
@@ -354,11 +314,6 @@ namespace Ogre
         void _makeOrthoMatrix(const Radian& fovy, Real aspect, Real nearPlane, Real farPlane, 
             Matrix4& dest, bool forGpuProgram = false);
         void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, bool forGpuProgram);
-        void _setPolygonMode(PolygonMode level);
-        void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
-        void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
-        void _setTextureUnitCompareEnabled(size_t unit, bool compare);
-        void _setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy);
         void setVertexDeclaration(v1::VertexDeclaration* decl);
         void setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding);
         void setVertexBufferBinding(v1::VertexBufferBinding* binding);
@@ -391,7 +346,6 @@ namespace Ogre
          */
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
-        void setScissorTest(bool enabled, size_t left = 0, size_t top = 0, size_t right = 800, size_t bottom = 600);
         void clearFrameBuffer(unsigned int buffers, 
             const ColourValue& colour = ColourValue::Black, 
             Real depth = 1.0f, unsigned short stencil = 0);

@@ -34,7 +34,7 @@ namespace Ogre
 {
 	void FileSystemLayer::getConfigPaths()
 	{
-		mConfigPaths.push_back(Ogre::macBundlePath() + "/../Documents/");
+        mConfigPaths.push_back(Ogre::iOSDocumentsDirectory() + "/");
 		mConfigPaths.push_back(Ogre::macBundlePath() + "/");
 	}
     //---------------------------------------------------------------------

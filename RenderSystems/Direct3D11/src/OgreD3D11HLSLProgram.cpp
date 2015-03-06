@@ -726,10 +726,14 @@ namespace Ogre {
                                             ID3D11ShaderReflectionType* memberType = varType->GetMemberTypeByIndex(m);
                                             memberType->GetDesc(&memberTypeDesc);
 
+                                            const LPCSTR c_unknownPtr = "UNKNOWN";
+                                            if( !memberTypeDesc.Name )
+                                                memberTypeDesc.Name = c_unknownPtr;
+
                                             {
                                                 String * name = new String(memberTypeDesc.Name);
                                                 mSerStrings.push_back(name);
-                                                memberTypeDesc.Name = &(*name)[0]; 
+                                                memberTypeDesc.Name = &(*name)[0];
                                                 mMemberTypeDesc.push_back(memberTypeDesc);
                                             }
                                             {
@@ -739,7 +743,7 @@ namespace Ogre {
                                                 memberTypeName.Name = &(*name)[0];
                                                 mMemberTypeName.push_back(memberTypeName);
                                             }
-                                            
+
                                         }
                                     }
                                 }

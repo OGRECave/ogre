@@ -1,5 +1,10 @@
 @insertpiece( SetCrossPlatformSettings )
 
+out gl_PerVertex
+{
+	vec4 gl_Position;
+};
+
 mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
 {
         vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
@@ -58,7 +63,7 @@ void main()
 @property( texture_matrix )	mat4 textureMatrix;@end
 
 @foreach( out_uv_count, n )
-	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.materialIdx[drawId] << 4) + @value( out_uv@n_tex_unit ) );@end
+	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.materialIdx[drawId] << 4u) + @value( out_uv@n_tex_unit ) );@end
 	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy @property( out_uv@_texture_matrix ) * textureMatrix@end ;@end
 
 	outVs.drawId = drawId;

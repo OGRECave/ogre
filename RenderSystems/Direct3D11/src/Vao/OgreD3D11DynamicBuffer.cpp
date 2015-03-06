@@ -80,7 +80,7 @@ namespace Ogre
 
         outTicket = addMappedRange( start, count );
 
-        return static_cast<char*>(mMappedPtr) + start;
+        return static_cast<uint8*>(mMappedPtr) + start;
     }
     //-----------------------------------------------------------------------------------
     void D3D11DynamicBuffer::unmap( size_t ticket )

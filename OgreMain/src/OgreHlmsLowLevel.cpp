@@ -177,9 +177,6 @@ namespace Ogre
                                           mCurrentSceneManager->getFogEnd() );
         }
 
-        bool colWrite = pass->getColourWriteEnabled();
-        mRenderSystem->_setColourBufferWriteEnabled( colWrite, colWrite, colWrite, colWrite );
-
         Pass::ConstTextureUnitStateIterator texIter =  pass->getTextureUnitStateIterator();
         size_t unit = 0;
         while( texIter.hasMoreElements() )
@@ -262,7 +259,7 @@ namespace Ogre
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
-                     "Change the mode with RenderQueue::setSortRenderQueue, or place the "
+                     "Change the mode with RenderQueue::setRenderQueueMode, or place the "
                      "object in a different RenderQueue",
                      "HlmsLowLevel::fillBuffersFor" );
     }
@@ -274,7 +271,7 @@ namespace Ogre
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
-                     "Change the mode with RenderQueue::setSortRenderQueue, or place the "
+                     "Change the mode with RenderQueue::setRenderQueueMode, or place the "
                      "object in a different RenderQueue",
                      "HlmsLowLevel::fillBuffersFor" );
     }

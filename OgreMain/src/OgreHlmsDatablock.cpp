@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreLogManager.h"
 
+#include "OgrePass.h"
+
 namespace Ogre
 {
     extern CompareFunction convertCompareFunction(const String& param);
@@ -61,6 +63,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsBlendblock::HlmsBlendblock() :
         BasicBlock( BLOCK_BLEND ),
+        mBlendChannelMask( BlendChannelAll ),
         mIsTransparent( false ),
         mSeparateBlend( false ),
         mSourceBlendFactor( SBF_ONE ),
@@ -71,6 +74,21 @@ namespace Ogre
         mBlendOperationAlpha( SBO_ADD ),
         mAlphaToCoverageEnabled( false )
     {
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsBlendblock::setBlendType( SceneBlendType blendType )
+    {
+        mSeparateBlend = false;
+        Pass::_getBlendFlags( blendType, mSourceBlendFactor, mDestBlendFactor );
+        mSourceBlendFactorAlpha = mSourceBlendFactor;
+        mDestBlendFactorAlpha   = mDestBlendFactor;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsBlendblock::setBlendType( SceneBlendType colour, SceneBlendType alpha )
+    {
+        mSeparateBlend = true;
+        Pass::_getBlendFlags( colour, mSourceBlendFactor, mDestBlendFactor );
+        Pass::_getBlendFlags( alpha, mSourceBlendFactorAlpha, mDestBlendFactorAlpha );
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------

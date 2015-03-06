@@ -96,8 +96,8 @@ namespace Ogre
             break;
         default:
         case v1::RenderOperation::OT_TRIANGLE_LIST:
-            mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-            mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+            mPrimType[0] = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+            mPrimType[1] = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
             mPrimType[2] = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
             break;
         case v1::RenderOperation::OT_TRIANGLE_STRIP:

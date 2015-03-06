@@ -128,6 +128,23 @@ namespace Ogre
     */
     struct _OgreExport HlmsBlendblock : public BasicBlock
     {
+        enum BlendChannelMasks
+        {
+            BlendChannelRed     = 0x01,
+            BlendChannelGreen   = 0x02,
+            BlendChannelBlue    = 0x04,
+            BlendChannelAlpha   = 0x08,
+            BlendChannelAll     = BlendChannelRed | BlendChannelGreen |
+                                    BlendChannelBlue | BlendChannelAlpha
+        };
+
+        /// Masks which colour channels will be writing to. Default: BlendChannelAll
+        /// For some advanced effects, you may wish to turn off the writing of certain colour
+        /// channels, or even all of the colour channels so that only the depth buffer is updated
+        /// in a rendering pass (if depth writes are on; may be you want to only update the
+        /// stencil buffer).
+        uint8               mBlendChannelMask;
+
         /// This value calculated by HlmsManager::getBlendblock
         bool                mIsTransparent;
         /// Used to determine if separate alpha blending should be used for color and alpha channels
@@ -145,6 +162,15 @@ namespace Ogre
         bool                mAlphaToCoverageEnabled;
 
         HlmsBlendblock();
+
+        /// Shortcut to set the blend factors to common blending operations.
+        /// Sets both blend and alpha to the same value and mSeparateBlend is
+        /// turned off.
+        void setBlendType( SceneBlendType blendType );
+
+        /// Shortcut to set the blend factors to common blending operations.
+        /// Sets colour and alpha individually, turns mSeparateBlend on.
+        void setBlendType( SceneBlendType colour, SceneBlendType alpha );
 
         bool operator != ( const HlmsBlendblock &_r ) const
         {

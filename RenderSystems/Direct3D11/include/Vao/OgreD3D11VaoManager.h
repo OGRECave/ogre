@@ -135,6 +135,8 @@ namespace Ogre
         VboMap  mMultiSourceVbos;
         size_t  mDefaultPoolSize[NumInternalBufferTypes][BT_DYNAMIC_DEFAULT+1];
 
+        BufferPackedVec mDelayedBuffers[NumInternalBufferTypes];
+
         VaoVec  mVaos;
         uint32  mVaoNames;
 
@@ -183,6 +185,12 @@ namespace Ogre
         void deallocateVbo( size_t vboIdx, size_t bufferOffset, size_t sizeBytes,
                             BufferType bufferType, InternalBufferType internalType );
 
+        void removeBufferFromDelayedQueue( BufferPackedVec &container, BufferPacked *buffer );
+
+        void createImmutableBuffer( InternalBufferType internalType,
+                                    size_t sizeBytes, void *initialData,
+                                    Vbo &inOutVbo );
+
     public:
         /// @see StagingBuffer::mergeContiguousBlocks
         static void mergeContiguousBlocks( BlockVec::iterator blockToMerge,
@@ -196,6 +204,9 @@ namespace Ogre
                                                             const VertexElement2Vec &vertexElements );
 
         virtual void destroyVertexBufferImpl( VertexBufferPacked *vertexBuffer );
+
+        void createDelayedImmutableBuffers(void);
+        void reorganizeImmutableVaos(void);
 
         virtual MultiSourceVertexBufferPool* createMultiSourceVertexBufferPoolImpl(
                                             const VertexElement2VecVec &vertexElementsBySource,
@@ -222,7 +233,15 @@ namespace Ogre
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
 
+        /// Finds the Vao. Calls createVao automatically if not found.
+        VaoVec::iterator findVao( const VertexBufferPackedVec &vertexBuffers,
+                                  IndexBufferPacked *indexBuffer,
+                                  v1::RenderOperation::OperationType opType );
         uint32 createVao( const Vao &vaoRef );
+        void releaseVao( VertexArrayObject *vao );
+
+        static uint32 generateRenderQueueId( uint32 vaoName, uint32 uniqueVaoId );
+        static uint32 extractUniqueVaoIdFromRenderQueueId( uint32 rqId );
 
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
@@ -256,6 +275,7 @@ namespace Ogre
         virtual AsyncTicketPtr createAsyncTicket( BufferPacked *creator, StagingBuffer *stagingBuffer,
                                                   size_t elementStart, size_t elementCount );
 
+        virtual void _beginFrame(void);
         virtual void _update(void);
 
         /// @see VaoManager::waitForTailFrameToFinish

@@ -616,6 +616,9 @@ namespace Ogre {
             //Initialize mask to 0
             ArrayMaskI mask = ARRAY_INT_ZERO;
 
+            ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mVisibilityFlags);
+
             for( size_t j=0; j<numFrustums; ++j )
             {
                 ArrayMaskR tmpMask;
@@ -681,6 +684,12 @@ namespace Ogre {
             //Use the light mask to discard null mOwner ptrs
             mask = Mathlib::TestFlags4( mask, *reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
                                                 (objData.mLightMask) );
+
+            //isVisible = isVisible() //Check if the light is disabled.
+            ArrayMaskI isVisible = Mathlib::TestFlags4( *visibilityFlags,
+                                                        Mathlib::SetAll( LAYER_VISIBILITY ) );
+
+            mask = Mathlib::And( mask, isVisible );
 
             const uint32 scalarMask = BooleanMask4::getScalarMask( mask );
 

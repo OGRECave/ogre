@@ -80,41 +80,45 @@ namespace Ogre {
         /** Number of elements between the leftmost pixel of one row and the left
             pixel of the next. This value must always be equal to getWidth() (consecutive) 
             for compressed formats.
+        @remarks
+            For compressed formats, this value is in bytes; not in elements.
         */
         size_t rowPitch;
         /** Number of elements between the top left pixel of one (depth) slice and 
             the top left pixel of the next. This can be a negative value. Must be a multiple of
             rowPitch. This value must always be equal to getWidth()*getHeight() (consecutive) 
             for compressed formats.
+        @remarks
+            For compressed formats, this value is in bytes; not in elements.
         */
         size_t slicePitch;
         
         /** Set the rowPitch and slicePitch so that the buffer is laid out consecutive 
             in memory.
         */        
-        void setConsecutive()
-        {
-            rowPitch = getWidth();
-            slicePitch = getWidth()*getHeight();
-        }
+        void setConsecutive();
+
         /** Get the number of elements between one past the rightmost pixel of 
             one row and the leftmost pixel of the next row. (IE this is zero if rows
             are consecutive).
+        @remarks
+            For compressed formats, this value is in bytes; not in elements.
         */
-        size_t getRowSkip() const { return rowPitch - getWidth(); }
+        size_t getRowSkip() const;
+
         /** Get the number of elements between one past the right bottom pixel of
             one slice and the left top pixel of the next slice. (IE this is zero if slices
             are consecutive).
+        @remarks
+            For compressed formats, this value is in bytes; not in elements.
         */
         size_t getSliceSkip() const { return slicePitch - (getHeight() * rowPitch); }
 
         /** Return whether this buffer is laid out consecutive in memory (ie the pitches
             are equal to the dimensions)
         */        
-        bool isConsecutive() const 
-        { 
-            return rowPitch == getWidth() && slicePitch == getWidth()*getHeight(); 
-        }
+        bool isConsecutive() const;
+
         /** Return the size (in bytes) this image would take if it was
             laid out consecutive in memory
         */

@@ -37,6 +37,18 @@ namespace Ogre
 {
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
 
+    /** Vertex array objects (Vaos) are immutable objects that describe a
+        combination of vertex buffers and index buffer with a given operation
+        type. Once created, they can't be modified. You have to destroy them
+        and create a new one.
+    @remarks
+        If the VertexArrayObject contains one BT_IMMUTABLE buffer (i.e. one of
+        the vertex buffers or the index buffer) then despite the immutability
+        of this class, the internal values of mVaoName & mRenderQueueId may
+        be changed automatically by the VaoManager as it performs maintenance
+        and cleanups of these type of buffers (in practice only affects D3D11).
+        Don't rely on the contents of these two variables if the Vao contains
+    */
     struct _OgreExport VertexArrayObject : public VertexArrayObjectAlloc
     {
         friend class RenderQueue;

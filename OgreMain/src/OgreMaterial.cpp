@@ -625,16 +625,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Material::setColourWriteEnabled(bool enabled)
-    {
-        Techniques::iterator i, iend;
-        iend = mTechniques.end();
-        for (i = mTechniques.begin(); i != iend; ++i)
-        {
-            (*i)->setColourWriteEnabled(enabled);
-        }
-    }
-    //-----------------------------------------------------------------------
     void Material::setShadingMode( ShadeOptions mode )
     {
         Techniques::iterator i, iend;

@@ -702,16 +702,6 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Technique::setColourWriteEnabled(bool enabled)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setColourWriteEnabled(enabled);
-        }
-    }
-    //-----------------------------------------------------------------------
     void Technique::setShadingMode( ShadeOptions mode )
     {
         Passes::iterator i, iend;

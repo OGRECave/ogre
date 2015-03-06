@@ -996,9 +996,6 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
         mDestRenderSystem->_setAlphaRejectSettings(
             pass->getAlphaRejectFunction(), pass->getAlphaRejectValue(), pass->isAlphaToCoverageEnabled());*/
         // Set colour write mode
-        // Right now we only use on/off, not per-channel
-        bool colWrite = pass->getColourWriteEnabled();
-        mDestRenderSystem->_setColourBufferWriteEnabled(colWrite, colWrite, colWrite, colWrite);
         // Culling mode
         /*if ( mIlluminationStage == IRS_RENDER_TO_TEXTURE
             && mShadowCasterRenderBackFaces

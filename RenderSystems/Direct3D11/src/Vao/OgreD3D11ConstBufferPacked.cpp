@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 #include "Vao/OgreD3D11ConstBufferPacked.h"
-#include "Vao/OgreD3D11BufferInterface.h"
+#include "Vao/OgreD3D11CompatBufferInterface.h"
 
 #include "OgreD3D11Device.h"
 
@@ -52,10 +52,10 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11ConstBufferPacked::bindBufferVS( uint16 slot )
     {
-        assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
+        assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
 
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
-                                                                      mBufferInterface );
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
+                                                                        mBufferInterface );
 
         ID3D11Buffer *d3dBuffer = bufferInterface->getVboName();
         mDevice.GetImmediateContext()->VSSetConstantBuffers( slot, 1, &d3dBuffer );
@@ -63,9 +63,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11ConstBufferPacked::bindBufferPS( uint16 slot )
     {
-        assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
+        assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
 
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
                                                                       mBufferInterface );
 
         ID3D11Buffer *d3dBuffer = bufferInterface->getVboName();
@@ -74,9 +74,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11ConstBufferPacked::bindBufferGS( uint16 slot )
     {
-        assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
+        assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
 
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
                                                                       mBufferInterface );
 
         ID3D11Buffer *d3dBuffer = bufferInterface->getVboName();
@@ -85,9 +85,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11ConstBufferPacked::bindBufferHS( uint16 slot )
     {
-        assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
+        assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
 
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
                                                                       mBufferInterface );
 
         ID3D11Buffer *d3dBuffer = bufferInterface->getVboName();
@@ -96,9 +96,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11ConstBufferPacked::bindBufferDS( uint16 slot )
     {
-        assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
+        assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
 
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
                                                                       mBufferInterface );
 
         ID3D11Buffer *d3dBuffer = bufferInterface->getVboName();
@@ -107,9 +107,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11ConstBufferPacked::bindBufferCS( uint16 slot )
     {
-        assert( dynamic_cast<D3D11BufferInterface*>( mBufferInterface ) );
+        assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
 
-        D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+        D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
                                                                       mBufferInterface );
 
         ID3D11Buffer *d3dBuffer = bufferInterface->getVboName();

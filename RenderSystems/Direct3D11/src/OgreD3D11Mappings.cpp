@@ -466,10 +466,10 @@ namespace Ogre
         case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:     return PF_UNKNOWN;
         case DXGI_FORMAT_X24_TYPELESS_G8_UINT:      return PF_UNKNOWN;
         case DXGI_FORMAT_R8G8_TYPELESS:             return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_UNORM:                return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_UINT:                 return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_SNORM:                return PF_UNKNOWN;
-        case DXGI_FORMAT_R8G8_SINT:                 return PF_UNKNOWN;
+        case DXGI_FORMAT_R8G8_UNORM:                return PF_RG8;
+        case DXGI_FORMAT_R8G8_UINT:                 return PF_R8G8_UINT;
+        case DXGI_FORMAT_R8G8_SNORM:                return PF_R8G8_SNORM;
+        case DXGI_FORMAT_R8G8_SINT:                 return PF_R8G8_SINT;
         case DXGI_FORMAT_R16_TYPELESS:              return PF_UNKNOWN;
         case DXGI_FORMAT_R16_FLOAT:                 return PF_FLOAT16_R;
         case DXGI_FORMAT_D16_UNORM:                 return PF_UNKNOWN;
@@ -512,13 +512,13 @@ namespace Ogre
         case DXGI_FORMAT_BC7_TYPELESS:              return PF_BC7_UNORM;
         case DXGI_FORMAT_BC7_UNORM:                 return PF_BC7_UNORM;
         case DXGI_FORMAT_BC7_UNORM_SRGB:            return PF_BC7_UNORM_SRGB;
-
-#if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && defined(DXGI_FORMAT_AYUV)
         case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:return PF_UNKNOWN;
         case DXGI_FORMAT_B8G8R8A8_TYPELESS:         return PF_UNKNOWN;
         case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:       return PF_A8R8G8B8;
         case DXGI_FORMAT_B8G8R8X8_TYPELESS:         return PF_UNKNOWN;
         case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB:       return PF_X8R8G8B8;
+
+#if defined(_WIN32_WINNT_WIN8) && (_WIN32_WINNT >= _WIN32_WINNT_WIN8) && defined(DXGI_FORMAT_AYUV)
         case DXGI_FORMAT_AYUV:                      return PF_UNKNOWN;
         case DXGI_FORMAT_Y410:                      return PF_UNKNOWN;
         case DXGI_FORMAT_Y416:                      return PF_UNKNOWN;
@@ -580,6 +580,10 @@ namespace Ogre
         case PF_BC7_UNORM:      return DXGI_FORMAT_BC7_UNORM;
         case PF_BC7_UNORM_SRGB: return DXGI_FORMAT_BC7_UNORM_SRGB;
         case PF_R16G16_SINT:    return DXGI_FORMAT_R16G16_SINT;
+        case PF_RG8:            return DXGI_FORMAT_R8G8_UNORM;
+        case PF_R8G8_SINT:      return DXGI_FORMAT_R8G8_SINT;
+        case PF_R8G8_UINT:      return DXGI_FORMAT_R8G8_UINT;
+        case PF_R8G8_SNORM:     return DXGI_FORMAT_R8G8_SNORM;
         case PF_UNKNOWN:
         default:                return DXGI_FORMAT_UNKNOWN;
         }
@@ -645,7 +649,7 @@ namespace Ogre
 		// We mark all textures as render target to be able to use GenerateMips() on it
 		// TODO: use DDSTextureLoader way of determining supported formats via CheckFormatSupport() & D3D11_FORMAT_SUPPORT_MIP_AUTOGEN
 		// TODO: explore DDSTextureLoader way of generating mips on temporary texture, to avoid D3D11_BIND_RENDER_TARGET flag injection 
-		bool isRenderTarget = /*(usage & TU_RENDERTARGET) &&*/ !(usage & TU_DYNAMIC);
+        bool isRenderTarget = (usage & TU_RENDERTARGET) || (!(usage & TU_DYNAMIC) && (usage & TU_AUTOMIPMAP));
 
 		// check for incompatible pixel formats
 		if(isRenderTarget)
@@ -710,15 +714,18 @@ namespace Ogre
 		return isRenderTarget ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
 	}
 
-    UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic)
+    UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic, int usage)
     {
         if(isdynamic)
             return 0;
 
         UINT flags = 0;
 
-		if((bindflags & D3D11_BIND_SHADER_RESOURCE) && (bindflags & D3D11_BIND_RENDER_TARGET))
+        if((bindflags & D3D11_BIND_SHADER_RESOURCE) && (bindflags & D3D11_BIND_RENDER_TARGET) &&
+            (usage & TU_AUTOMIPMAP) )
+        {
 			flags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+        }
 
         if(textype == TEX_TYPE_CUBE_MAP)
             flags |= D3D11_RESOURCE_MISC_TEXTURECUBE;

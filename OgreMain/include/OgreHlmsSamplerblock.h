@@ -71,6 +71,11 @@ namespace Ogre
         TextureAddressingMode   mV;
         TextureAddressingMode   mW;
 
+        /// This allows you to adjust the mipmap calculation up or down for a
+        /// given texture unit. Negative values force a larger mipmap to be used,
+        /// positive values force a smaller mipmap to be used. Units are in numbers
+        /// of levels, so +1 forces the mipmaps to one smaller level.
+        /// @note Only does something if render system has capability RSC_MIPMAP_LOD_BIAS.
         float               mMipLodBias;
         float               mMaxAnisotropy;
         /// Defaults to NUM_COMPARE_FUNCTIONS which means disabled.

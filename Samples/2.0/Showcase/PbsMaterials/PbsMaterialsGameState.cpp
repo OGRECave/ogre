@@ -41,7 +41,9 @@ namespace Demo
         Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
                                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                             Ogre::Plane( Ogre::Vector3::UNIT_Y, 1.0f ), 50.0f, 50.0f,
-                                            1, 1, true, 1, 4.0f, 4.0f, Ogre::Vector3::UNIT_Z );
+                                            1, 1, true, 1, 4.0f, 4.0f, Ogre::Vector3::UNIT_Z,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC );
 
         Ogre::MeshPtr planeMesh = Ogre::MeshManager::getSingleton().createManual(
                     "Plane", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );

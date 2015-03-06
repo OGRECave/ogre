@@ -317,16 +317,6 @@ namespace Ogre {
         */
         void setSelfIllumination(const ColourValue& selfIllum);
 
-        /** Sets whether or not colour buffer writing is enabled for each Pass.
-        @note
-            This property actually exists on the Pass class. For simplicity, this method allows 
-            you to set these properties for every current Pass within this Technique. If 
-            you need more precision, retrieve the Pass instance and set the
-            property there.
-        @see Pass::setColourWriteEnabled
-        */
-        void setColourWriteEnabled(bool enabled);
-
         /** Sets the type of light shading required
         @note
             This property actually exists on the Pass class. For simplicity, this method allows 

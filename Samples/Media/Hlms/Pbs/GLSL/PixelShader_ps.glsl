@@ -69,7 +69,7 @@ uniform @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps
 
 float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
 {
-@property( !hlms_shadow_usues_depth_texture )
+@property( !hlms_shadow_uses_depth_texture )
 	float fDepth = psPosLN.z;
 	vec2 uv = psPosLN.xy / psPosLN.w;
 	vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
@@ -81,7 +81,7 @@ float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 i
 	c +=		(fDepth <= texture(shadowMap, uv + o.xy).r) ? 1 : 0; // bottom right
 
 	return c * 0.25;@end
-@property( hlms_shadow_usues_depth_texture )
+@property( hlms_shadow_uses_depth_texture )
 	return texture( shadowMap, psPosLN.xyz, 0 ).x;@end
 }
 @end
@@ -203,7 +203,7 @@ void main()
 		@property( detail_weights )detailWeights *= material.cDetailWeights;@end
 	@end @property( !detail_weight_map )
 		@property( detail_weights )vec4 detailWeights = material.cDetailWeights;@end
-		@property( !detail_weights )vec4 detailWeights = vec4( 1.0 );@end
+		@property( !detail_weights )vec4 detailWeights = vec4( 1.0, 1.0, 1.0, 1.0 );@end
 	@end
 @end
 

@@ -397,7 +397,8 @@ namespace Ogre
 		desc.Usage			= D3D11Mappings::_getUsage(_getTextureUsage());
 		desc.BindFlags		= D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
 		desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
-        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
+        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags( desc.BindFlags, getTextureType(),
+                                                                   mIsDynamic, mUsage );
 
         // create the texture
         hr = mDevice->CreateTexture1D(  
@@ -496,7 +497,8 @@ namespace Ogre
         desc.Usage          = D3D11Mappings::_getUsage(_getTextureUsage());
         desc.BindFlags      = D3D11Mappings::_getTextureBindFlags(d3dPF, _getTextureUsage());
         desc.CPUAccessFlags = D3D11Mappings::_getAccessFlags(_getTextureUsage());
-        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags(desc.BindFlags, getTextureType(), mIsDynamic);
+        desc.MiscFlags      = D3D11Mappings::_getTextureMiscFlags( desc.BindFlags, getTextureType(),
+                                                                   mIsDynamic, mUsage );
 
         if (mIsDynamic)
         {
@@ -791,6 +793,8 @@ namespace Ogre
             switch ( dxFmt )
             {
                 case DXGI_FORMAT_R8G8B8A8_UNORM:  dxFmt = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; break;
+                case DXGI_FORMAT_B8G8R8A8_UNORM:  dxFmt = DXGI_FORMAT_B8G8R8A8_UNORM_SRGB; break;
+                case DXGI_FORMAT_B8G8R8X8_UNORM:  dxFmt = DXGI_FORMAT_B8G8R8X8_UNORM_SRGB; break;
                 case DXGI_FORMAT_BC1_UNORM:       dxFmt = DXGI_FORMAT_BC1_UNORM_SRGB; break;
                 case DXGI_FORMAT_BC2_UNORM:       dxFmt = DXGI_FORMAT_BC2_UNORM_SRGB; break;
                 case DXGI_FORMAT_BC3_UNORM:       dxFmt = DXGI_FORMAT_BC3_UNORM_SRGB; break;

@@ -46,12 +46,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     D3D11BufferInterface::~D3D11BufferInterface()
     {
-        if( mInitialData )
-        {
-            if( !mBuffer->mShadowCopy )
-                OGRE_FREE_SIMD( mInitialData, MEMCATEGORY_GEOMETRY );
-            mInitialData = 0;
-        }
+        _deleteInitialData();
     }
     //-----------------------------------------------------------------------------------
     void D3D11BufferInterface::_firstUpload( void *data )
@@ -108,6 +103,26 @@ namespace Ogre
         mBuffer->mLastMappingCount = elementCount;
 
         return mMappedPtr;
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11BufferInterface::_deleteInitialData(void)
+    {
+        if( mInitialData )
+        {
+            if( !mBuffer->mShadowCopy )
+                OGRE_FREE_SIMD( mInitialData, MEMCATEGORY_GEOMETRY );
+            mInitialData = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void D3D11BufferInterface::_setVboName( size_t vboPoolIdx, ID3D11Buffer *vboName,
+                                            size_t internalBufferStartBytes )
+    {
+        mVboPoolIdx = vboPoolIdx;
+        mVboName    = vboName;
+
+        mBuffer->mInternalBufferStart   = internalBufferStartBytes / mBuffer->mBytesPerElement;
+        mBuffer->mFinalBufferStart      = internalBufferStartBytes / mBuffer->mBytesPerElement;
     }
     //-----------------------------------------------------------------------------------
     void D3D11BufferInterface::unmap( UnmapOptions unmapOption,

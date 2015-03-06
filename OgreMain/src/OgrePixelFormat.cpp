@@ -41,6 +41,45 @@ namespace {
 namespace Ogre {
 
     //-----------------------------------------------------------------------
+    void PixelBox::setConsecutive()
+    {
+        if( PixelUtil::isCompressed( format ) )
+        {
+            rowPitch    = PixelUtil::getMemorySize( getWidth(), 1, 1, format );
+            slicePitch  = PixelUtil::getMemorySize( getWidth(), getHeight(), 1, format );
+        }
+        else
+        {
+            rowPitch = getWidth();
+            slicePitch = getWidth()*getHeight();
+        }
+    }
+    //-----------------------------------------------------------------------
+    size_t PixelBox::getRowSkip() const
+    {
+        if( PixelUtil::isCompressed( format ) )
+        {
+            return rowPitch - PixelUtil::getMemorySize( getWidth(), 1, 1, format );
+        }
+        else
+        {
+            return rowPitch - getWidth();
+        }
+    }
+    //-----------------------------------------------------------------------
+    bool PixelBox::isConsecutive() const
+    {
+        if( PixelUtil::isCompressed( format ) )
+        {
+            return rowPitch == PixelUtil::getMemorySize( getWidth(), 1, 1, format ) &&
+                    slicePitch == PixelUtil::getMemorySize( getWidth(), getHeight(), 1, format );
+        }
+        else
+        {
+            return rowPitch == getWidth() && slicePitch == getWidth()*getHeight();
+        }
+    }
+    //-----------------------------------------------------------------------
     size_t PixelBox::getConsecutiveSize() const
     {
         return PixelUtil::getMemorySize(getWidth(), getHeight(), getDepth(), format);
@@ -822,7 +861,37 @@ namespace Ogre {
         {
             if(src.format == dst.format)
             {
-                memcpy(dst.data, src.data, src.getConsecutiveSize());
+                if( src.getConsecutiveSize() && dst.isConsecutive() )
+                    memcpy(dst.data, src.data, src.getConsecutiveSize());
+                else
+                {
+                    const size_t rowSize = PixelUtil::getMemorySize( src.getWidth(), 1, 1, src.format );
+
+                    uint8 *srcptr = static_cast<uint8*>(src.data)
+                        + src.left + src.top * src.rowPitch + src.front * src.slicePitch;
+                    uint8 *dstptr = static_cast<uint8*>(dst.data)
+                        + dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch;
+
+                    // Calculate pitches+skips in bytes
+                    const size_t srcRowPitchBytes = src.rowPitch;
+                    const size_t srcSliceSkipBytes = src.getSliceSkip();
+
+                    const size_t dstRowPitchBytes   = dst.rowPitch;
+                    const size_t dstSliceSkipBytes  = dst.getSliceSkip();
+
+                    for( size_t z=src.front; z<src.back; ++z )
+                    {
+                        for( size_t y=src.top; y<src.bottom; ++y )
+                        {
+                            memcpy( dstptr, srcptr, rowSize );
+                            srcptr += srcRowPitchBytes;
+                            dstptr += dstRowPitchBytes;
+                        }
+
+                        srcptr += srcSliceSkipBytes;
+                        dstptr += dstSliceSkipBytes;
+                    }
+                }
                 return;
             }
             else

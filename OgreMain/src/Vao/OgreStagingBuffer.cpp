@@ -121,7 +121,9 @@ namespace Ogre
 
         mMappingState = MS_UNMAPPED;
         mMappingStart += mMappingCount;
-        mMappingStart = mMappingStart % mSizeBytes;
+
+        if( mMappingStart >= mSizeBytes )
+            mMappingStart = 0;
     }
     //-----------------------------------------------------------------------------------
     void StagingBuffer::addReferenceCount(void)

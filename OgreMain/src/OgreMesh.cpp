@@ -226,6 +226,12 @@ namespace v1 {
             i->value = lodStrategy->transformUserValue(i->userValue);
             *lodValueIt++ = i->value;
         }
+        if( !mLodValues.empty() )
+        {
+            // Rewrite first value
+            mLodValues[0] = lodStrategy->getBaseValue();
+            mMeshLodUsageList[0].value = lodStrategy->getBaseValue();
+        }
 #endif
     }
     //-----------------------------------------------------------------------

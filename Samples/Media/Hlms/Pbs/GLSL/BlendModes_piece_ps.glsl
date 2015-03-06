@@ -11,14 +11,14 @@
 @piece( Add )
 	//Add @value(t)
 	diffuseCol.xyz = mix( diffuseCol.xyz,
-						  min( diffuseCol.xyz + detailCol@value(t).xyz, vec3(1.0) ),
+						  min( diffuseCol.xyz + detailCol@value(t).xyz, vec3(1.0, 1.0, 1.0) ),
 						  detailCol@value(t).a );@add( t, 1 )
 @end
 
 @piece( Subtract )
 	//Subtract @value(t)
 	diffuseCol.xyz = mix( diffuseCol.xyz,
-						  max( diffuseCol.xyz - detailCol@value(t).xyz, vec3(0.0) ),
+						  max( diffuseCol.xyz - detailCol@value(t).xyz, vec3(0.0, 0.0, 0.0) ),
 						  detailCol@value(t).a );@add( t, 1 )
 @end
 
@@ -32,7 +32,7 @@
 @piece( Multiply2x )
 	//Multiply2x @value(t)
 	diffuseCol.xyz = mix( diffuseCol.xyz,
-						  min( diffuseCol.xyz * detailCol@value(t).xyz * 2.0, vec3(1.0) ),
+						  min( diffuseCol.xyz * detailCol@value(t).xyz * 2.0, vec3(1.0, 1.0, 1.0) ),
 						  detailCol@value(t).a );@add( t, 1 )
 @end
 

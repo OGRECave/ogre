@@ -82,12 +82,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     BufferPacked::~BufferPacked()
     {
-        if( mShadowCopy )
-        {
-            OGRE_FREE_SIMD( mShadowCopy, MEMCATEGORY_GEOMETRY );
-            mShadowCopy = 0;
-        }
-
         if( mMappingState != MS_UNMAPPED )
         {
             LogManager::getSingleton().logMessage( "WARNING: Deleting mapped buffer without "
@@ -100,6 +94,13 @@ namespace Ogre
 
         delete mBufferInterface;
         mBufferInterface = 0;
+
+        //The shadow copy must be destroyed after the mBufferInterface
+        if( mShadowCopy )
+        {
+            OGRE_FREE_SIMD( mShadowCopy, MEMCATEGORY_GEOMETRY );
+            mShadowCopy = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     AsyncTicketPtr BufferPacked::readRequest( size_t elementStart, size_t elementCount )
