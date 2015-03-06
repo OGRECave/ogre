@@ -35,6 +35,12 @@ int main()
 
     graphicsSystem.initialize( "Tutorial 02: Variable Framerate" );
 
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
+
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();

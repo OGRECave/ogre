@@ -172,7 +172,6 @@ namespace Ogre {
         mCurrentHullShader = 0;
         mCurrentDomainShader = 0;
         mCurrentComputeShader = 0;
-        mEnableFixedPipeline = false;
         mLargestSupportedAnisotropy = 1;
     }
 

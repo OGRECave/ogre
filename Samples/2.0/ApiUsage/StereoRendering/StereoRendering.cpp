@@ -116,6 +116,12 @@ int main()
 
     graphicsSystem.initialize( "Stereo Rendering Sample" );
 
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
+
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();

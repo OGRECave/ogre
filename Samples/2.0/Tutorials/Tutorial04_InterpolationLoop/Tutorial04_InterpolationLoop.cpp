@@ -63,6 +63,13 @@ int main()
     graphicsSystem.initialize( "Tutorial 04: Interpolation Loop" );
     logicSystem.initialize();
 
+    if( graphicsSystem.getQuit() )
+    {
+        logicSystem.deinitialize();
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
+
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();

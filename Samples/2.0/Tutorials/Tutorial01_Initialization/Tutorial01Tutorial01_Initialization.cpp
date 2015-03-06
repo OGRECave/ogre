@@ -44,6 +44,12 @@ int main()
 
     graphicsSystem.initialize( "Tutorial 01: Initialization" );
 
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
+
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();

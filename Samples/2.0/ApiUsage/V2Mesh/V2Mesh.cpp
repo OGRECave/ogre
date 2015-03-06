@@ -51,6 +51,12 @@ int main()
 
     graphicsSystem.initialize( "Importing V1 meshes into V2 objects (convert v1 objects to v2 format)" );
 
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
+
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();

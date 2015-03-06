@@ -95,6 +95,12 @@ int main()
 
     graphicsSystem.initialize( "PBS Materials Sample" );
 
+    if( graphicsSystem.getQuit() )
+    {
+        graphicsSystem.deinitialize();
+        return 0; //User cancelled config
+    }
+
     Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
 
     graphicsSystem.createScene01();

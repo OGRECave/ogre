@@ -92,6 +92,12 @@ unsigned long renderThread( Ogre::ThreadHandle *threadHandle )
     graphicsSystem->initialize( "Tutorial 05: Multithreading Basics" );
     barrier->sync();
 
+    if( graphicsSystem->getQuit() )
+    {
+        graphicsSystem->deinitialize();
+        return 0; //User cancelled config
+    }
+
     graphicsSystem->createScene01();
     barrier->sync();
 
@@ -147,6 +153,12 @@ unsigned long logicThread( Ogre::ThreadHandle *threadHandle )
 
     logicSystem->initialize();
     barrier->sync();
+
+    if( graphicsSystem->getQuit() )
+    {
+        logicSystem->deinitialize();
+        return 0; //Render thread cancelled early
+    }
 
     logicSystem->createScene01();
     barrier->sync();

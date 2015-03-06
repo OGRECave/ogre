@@ -1423,9 +1423,6 @@ namespace Ogre
         /// the number of global instances (this number will be multiply by the render op instance number) 
         size_t mGlobalNumberOfInstances;
 
-        /// is fixed pipeline enabled
-        bool mEnableFixedPipeline;
-
         /** updates pass iteration rendering state including bound gpu program parameter
         pass iteration auto constant entry
         @return True if more iterations are required

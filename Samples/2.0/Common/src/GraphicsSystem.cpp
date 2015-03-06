@@ -114,14 +114,29 @@ std::string macBundlePath()
         mRoot->getRenderSystem()->setConfigOption( "sRGB Gamma Conversion", "Yes" );
         mRoot->initialise(false);
 
+        Ogre::ConfigOptionMap& cfgOpts = mRoot->getRenderSystem()->getConfigOptions();
+
         int width   = 1280;
         int height  = 720;
+
+        Ogre::ConfigOptionMap::iterator opt = cfgOpts.find( "Video Mode" );
+        if( opt != cfgOpts.end() )
+        {
+            //Get the width and height
+            Ogre::String::size_type widthEnd = opt->second.currentValue.find(' ');
+            // we know that the height starts 3 characters after the width and goes until the next space
+            Ogre::String::size_type heightEnd = opt->second.currentValue.find(' ', widthEnd+3);
+            // Now we can parse out the values
+            width   = Ogre::StringConverter::parseInt( opt->second.currentValue.substr( 0, widthEnd ) );
+            height  = Ogre::StringConverter::parseInt( opt->second.currentValue.substr(
+                                                           widthEnd+3, heightEnd ) );
+        }
 
         int screen = 0;
         int posX = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
         int posY = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
 
-        bool fullscreen = false;
+        bool fullscreen = Ogre::StringConverter::parseBool( cfgOpts["Full Screen"].currentValue );
         if(fullscreen)
         {
             posX = SDL_WINDOWPOS_UNDEFINED_DISPLAY(screen);
@@ -148,7 +163,6 @@ std::string macBundlePath()
                          "GraphicsSystem::initialize" );
         }
 
-        Ogre::ConfigOptionMap& cfgOpts = mRoot->getRenderSystem()->getConfigOptions();
         Ogre::String winHandle;
         Ogre::NameValuePairList params;
 
