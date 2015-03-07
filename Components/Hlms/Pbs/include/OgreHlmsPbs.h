@@ -70,6 +70,9 @@ namespace Ogre
 
         uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
 
+        TexBufferPacked         *mGridBuffer;
+        TexBufferPacked         *mGlobalLightListBuffer;
+
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
         uint32 mLastTextureHash;

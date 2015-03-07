@@ -43,6 +43,15 @@ cbuffer PassBuffer : register(b0)
 	//Vertex shader
 	float2 depthRange;
 @end
+
+@property( hlms_forward3d )
+	//f3dData.x = minDistance;
+	//f3dData.y = invMaxDistance;
+	//f3dData.z = f3dNumSlicesSub1;
+	//f3dData.w = uint cellsPerTableOnGrid0 (floatBitsToUint);
+	float4 f3dData;
+	float4 f3dGridHWW[@value( hlms_forward3d )];
+@end
 	} passBuf;
 };
 @end

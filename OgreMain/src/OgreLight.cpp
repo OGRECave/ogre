@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre {
     //-----------------------------------------------------------------------
     Light::Light( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager )
-        : MovableObject( id, objectMemoryManager, manager, 1 ),
+        : MovableObject( id, objectMemoryManager, manager, LT_POINT ),
           mLightType(LT_POINT),
           mDiffuse(ColourValue::White),
           mSpecular(ColourValue::White),
@@ -89,6 +89,13 @@ namespace Ogre {
             //Keep compiler happy
             break;
         }
+
+        MovableObject::setRenderQueueGroup( static_cast<uint8>( type ) );
+    }
+    //-----------------------------------------------------------------------
+    void Light::setRenderQueueGroup(uint8 queueID)
+    {
+        //Nothing
     }
     //-----------------------------------------------------------------------
     void Light::setDirection(const Vector3& vec)

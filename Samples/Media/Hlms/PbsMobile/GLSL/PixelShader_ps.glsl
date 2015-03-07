@@ -364,7 +364,7 @@ void main()
 	{
 		lightDir *= 1.0 / fDistance;
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );
-		@insertpiece( mediump ) float atten = 1.0 / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		@insertpiece( mediump ) float atten = 1.0 / (1.0 + (attenuation[@value(atten)].y + attenuation[@counter(atten)].z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -389,7 +389,7 @@ void main()
 		spotAtten = pow( spotAtten, spotParams[@counter(spot_params)].z );
 	@end
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse[@n], lightSpecular[@n] )@insertpiece( DarkenWithShadow );
-		@insertpiece( mediump ) float atten = 1.0 / (1.0 + attenuation[@value(atten)].y * fDistance + attenuation[@counter(atten)].z * fDistance * fDistance );
+		@insertpiece( mediump ) float atten = 1.0 / (1.0 + (attenuation[@value(atten)].y + attenuation[@counter(atten)].z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
 

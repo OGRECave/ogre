@@ -21,7 +21,8 @@ namespace Demo
         mGraphicsSystem( 0 ),
         mCameraController( 0 ),
         mHelpDescription( helpDescription ),
-        mDisplayHelp( false ),
+        mDisplayHelpMode( 1 ),
+        mNumDisplayHelpModes( 1 ),
         mDebugText( 0 )
     {
     }
@@ -54,7 +55,7 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void TutorialGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
-        if( mDisplayHelp )
+        if( mDisplayHelpMode == 0 )
         {
             outText = mHelpDescription;
             outText += "\n\nPress F1 to toggle help";
@@ -84,7 +85,7 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void TutorialGameState::update( float timeSinceLast )
     {
-        if( !mDisplayHelp )
+        if( mDisplayHelpMode != 0 )
         {
             //Show FPS
             Ogre::String finalText;
@@ -111,7 +112,7 @@ namespace Demo
     {
         if( arg.keysym.sym == SDLK_F1 )
         {
-            mDisplayHelp = !mDisplayHelp;
+            mDisplayHelpMode = (mDisplayHelpMode + 1) % mNumDisplayHelpModes;
 
             Ogre::String finalText;
             generateDebugText( 0, finalText );

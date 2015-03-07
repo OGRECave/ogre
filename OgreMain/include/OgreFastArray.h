@@ -200,6 +200,24 @@ namespace Ogre
             return mData + idx;
         }
 
+        /// otherBegin & otherEnd must not overlap with this->begin() and this->end()
+        iterator insertPOD( iterator where, const_iterator otherBegin, const_iterator otherEnd )
+        {
+            size_t idx = (where - mData);
+
+            const size_t otherSize = otherEnd - otherBegin;
+
+            growToFit( otherSize );
+
+            memmove( mData + idx + otherSize, mData + idx, (mSize - idx) *  sizeof(T) );
+
+            while( otherBegin != otherEnd )
+                *where++ = *otherBegin++;
+            mSize += otherSize;
+
+            return mData + idx;
+        }
+
         void appendPOD( const_iterator otherBegin, const_iterator otherEnd )
         {
             growToFit( otherEnd - otherBegin );
@@ -214,6 +232,35 @@ namespace Ogre
             toErase->~T();
             memmove( mData + idx, mData + idx + 1, (mSize - idx - 1) * sizeof(T) );
             --mSize;
+
+            return mData + idx;
+        }
+
+        iterator erase( iterator first, iterator last )
+        {
+            assert( first <= last && last <= end() );
+
+            size_t idx      = (first - mData);
+            size_t idxNext  = (last - mData);
+            while( first != last )
+            {
+                first->~T();
+                ++first;
+            }
+            memmove( mData + idx, mData + idxNext, (mSize - idxNext) * sizeof(T) );
+            mSize -= idxNext - idx;
+
+            return mData + idx;
+        }
+
+        iterator erasePOD( iterator first, iterator last )
+        {
+            assert( first <= last && last <= end() );
+
+            size_t idx      = (first - mData);
+            size_t idxNext  = (last - mData);
+            memmove( mData + idx, mData + idxNext, (mSize - idxNext) * sizeof(T) );
+            mSize -= idxNext - idx;
 
             return mData + idx;
         }

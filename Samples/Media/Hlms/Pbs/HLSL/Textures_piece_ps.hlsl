@@ -1,3 +1,21 @@
+
+//Set the sampler starts. Note that 'padd' get calculated before _any_ 'add'
+@pset( textureRegShadowMapStart, 1 )
+@padd( textureRegStart, hlms_num_shadow_maps, 1 )
+@padd( envMapReg, textureRegStart, num_textures )
+
+@padd( samplerStateStart, hlms_num_shadow_maps, 1 )
+@pset( numSamplerStates, num_textures )
+@property( envprobe_map )
+	@add( numSamplerStates, 1 )
+@end
+
+@property( hlms_forward3d )
+	@add( textureRegStart, 2 )
+	@add( envMapReg, 2 )
+	@add( textureRegShadowMapStart, 2 )
+@end
+
 @property( diffuse_map )
 	@piece( SampleDiffuseMap )	diffuseCol = textureMaps[@value( diffuse_map_idx )].Sample( samplerStates[@value(diffuse_map_idx)], float3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
 @property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end @end

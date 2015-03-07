@@ -67,6 +67,7 @@ THE SOFTWARE.
 #include "OgreRenderQueueListener.h"
 #include "OgreViewport.h"
 #include "OgreHlmsManager.h"
+#include "OgreForward3D.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -92,10 +93,12 @@ mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
 mName(name),
 mRenderQueue( 0 ),
+mForward3DImpl( 0 ),
 mAmbientLight(ColourValue::Black),
 mCameraInProgress(0),
 mCurrentViewport(0),
 mCurrentShadowNode(0),
+mShadowNodeIsReused( false ),
 mSkyPlaneEntity(0),
 mSkyBoxObj(0),
 mSkyPlaneNode(0),
@@ -245,10 +248,12 @@ SceneManager::~SceneManager()
         mSceneRoot[i] = 0;
     }
     OGRE_DELETE mFullScreenQuad;
+    OGRE_DELETE mForward3DImpl;
     OGRE_DELETE mRenderQueue;
     OGRE_DELETE mAutoParamDataSource;
 
     mFullScreenQuad         = 0;
+    mForward3DImpl          = 0;
     mRenderQueue            = 0;
     mAutoParamDataSource    = 0;
 
@@ -762,6 +767,22 @@ void SceneManager::unregisterSceneNodeListener( SceneNode *sceneNode )
         mSceneNodesWithListeners.erase( itor );
 }
 //-----------------------------------------------------------------------
+void SceneManager::setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
+                                 uint32 lightsPerCell, float minDistance, float maxDistance )
+{
+    OGRE_DELETE mForward3DImpl;
+    mForward3DImpl = 0;
+
+    if( bEnable )
+    {
+        mForward3DImpl = OGRE_NEW Forward3D( width, height, numSlices, lightsPerCell,
+                                             minDistance, maxDistance, this );
+
+        if( mDestRenderSystem )
+            mForward3DImpl->_changeRenderSystem( mDestRenderSystem );
+    }
+}
+//-----------------------------------------------------------------------
 const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed, 
                                    bool shadowDerivation)
 {
@@ -1134,7 +1155,7 @@ void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewpo
             camera->_setRenderedRqs( realFirstRq, realLastRq );
 
             CullFrustumRequest cullRequest( realFirstRq, realLastRq,
-                                            mIlluminationStage == IRS_RENDER_TO_TEXTURE,
+                                            mIlluminationStage == IRS_RENDER_TO_TEXTURE, true,
                                             &mEntitiesMemoryManagerCulledList, camera, lodCamera );
             fireCullFrustumThreads( cullRequest );
         }
@@ -1192,6 +1213,11 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
         {
             OgreProfileGroup("prepareRenderQueue", OGREPROF_GENERAL);
             prepareRenderQueue();
+        }
+
+        if( mIlluminationStage != IRS_RENDER_TO_TEXTURE && mForward3DImpl )
+        {
+            mForward3DImpl->collectLights( camera );
         }
 
         if (mFindVisibleObjects)
@@ -1284,6 +1310,38 @@ void SceneManager::_renderPhase02(Camera* camera, const Camera *lodCamera, Viewp
     Root::getSingleton()._popCurrentSceneManager(this);
 }
 //-----------------------------------------------------------------------
+void SceneManager::cullLights( Camera *camera, Light::LightTypes startType,
+                               Light::LightTypes endType, LightArray &outLights )
+{
+    mVisibleObjects.swap( mTmpVisibleObjects );
+    CullFrustumRequest cullRequest( startType, endType, false, false,
+                                    &mLightsMemoryManagerCulledList, camera, camera );
+    fireCullFrustumThreads( cullRequest );
+
+    outLights.clear();
+
+    VisibleObjectsPerThreadArray::const_iterator it = mVisibleObjects.begin();
+    VisibleObjectsPerThreadArray::const_iterator en = mVisibleObjects.end();
+
+    while( it != en )
+    {
+        for( uint8 i=startType; i<endType; ++i )
+        {
+            MovableObject::MovableObjectArray::const_iterator itor = (*it)[i].begin();
+            MovableObject::MovableObjectArray::const_iterator end  = (*it)[i].end();
+
+            Light * const *lightBegin  = reinterpret_cast<Light * const *>( itor );
+            Light * const *lightEnd    = reinterpret_cast<Light * const *>( end );
+
+            outLights.appendPOD( lightBegin, lightEnd );
+        }
+
+        ++it;
+    }
+
+    mVisibleObjects.swap( mTmpVisibleObjects );
+}
+//-----------------------------------------------------------------------
 void SceneManager::_frameEnded(void)
 {
     mRenderQueue->frameEnded();
@@ -1292,6 +1350,9 @@ void SceneManager::_frameEnded(void)
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
+
+    if( mForward3DImpl )
+        mForward3DImpl->_changeRenderSystem( sys );
 }
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
@@ -2247,7 +2308,7 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
                                         ~VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
                     outVisibleObjects, lodCamera );
 
-            if( mRenderQueue->getRenderQueueMode(i) == RenderQueue::FAST )
+            if( mRenderQueue->getRenderQueueMode(i) == RenderQueue::FAST && request.addToRenderQueue )
             {
                 //V2 meshes can be added to the render queue in parallel
                 bool casterPass = request.casterPass;
@@ -2284,6 +2345,7 @@ void SceneManager::buildLightList()
     size_t accumStartLightIdx = 0;
     for( size_t threadIdx=0; threadIdx<mNumWorkerThreads; ++threadIdx )
     {
+        size_t totalObjsInThread = 0;
         ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
         ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
 
@@ -2310,12 +2372,14 @@ void SceneManager::buildLightList()
                 //when there are less entities than ARRAY_PACKED_REALS
                 numObjs = std::min( numObjs, totalObjs - toAdvance );
 
-                mBuildLightListRequestPerThread[threadIdx].startLightIdx = accumStartLightIdx;
-                accumStartLightIdx += numObjs;
+                totalObjsInThread += numObjs;
             }
 
             ++it;
         }
+
+        mBuildLightListRequestPerThread[threadIdx].startLightIdx = accumStartLightIdx;
+        accumStartLightIdx += totalObjsInThread;
     }
 
     mRequestType = BUILD_LIGHT_LIST01;
@@ -2375,6 +2439,10 @@ void SceneManager::buildLightList()
     }
 
     //Now fire the threads again, to build the per-MovableObject lists
+
+    if( mForward3DImpl )
+        return; //Don't do this on non-forward passes.
+
     mRequestType = BUILD_LIGHT_LIST02;
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     _updateWorkerThread( NULL );
@@ -3421,9 +3489,12 @@ void SceneManager::removeRenderObjectListener(RenderObjectListener* delListener)
     }
 }
 //---------------------------------------------------------------------
-void SceneManager::_setCurrentShadowNode( CompositorShadowNode *shadowNode )
+void SceneManager::_setCurrentShadowNode( CompositorShadowNode *shadowNode, bool isReused )
 {
     mCurrentShadowNode = shadowNode;
+    mShadowNodeIsReused= isReused;
+    if( !shadowNode )
+        mShadowNodeIsReused = false;
     mAutoParamDataSource->setCurrentShadowNode( shadowNode );
 }
 //---------------------------------------------------------------------

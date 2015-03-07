@@ -454,6 +454,9 @@ namespace Ogre {
         /// Returns the distance to camera as calculated in @cullFrustum
         inline RealAsUint getCachedDistanceToCamera(void) const;
 
+        /// Returns the distance to camera as calculated in @cullFrustum
+        inline Real getCachedDistanceToCameraAsReal(void) const;
+
         /** Sets the visibility flags for this object.
         @remarks
             As well as a simple true/false value for visibility (as seen in setVisible), 

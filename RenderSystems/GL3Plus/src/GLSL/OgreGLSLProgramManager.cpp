@@ -249,6 +249,8 @@ namespace Ogre {
             break;
         case GL_INT:
         case GL_SAMPLER_BUFFER:
+        case GL_INT_SAMPLER_BUFFER:
+        case GL_UNSIGNED_INT_SAMPLER_BUFFER:
             defToUpdate.constType = GCT_INT1;
             break;
         case GL_INT_VEC2:

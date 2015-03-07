@@ -1294,8 +1294,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::_update(void)
     {
-        VaoManager::_update();
-
         unsigned long currentTimeMs = mTimer->getMilliseconds();
 
         if( currentTimeMs >= mNextStagingBufferTimestampCheckpoint )
@@ -1346,6 +1344,8 @@ namespace Ogre
             waitForTailFrameToFinish();
             destroyDelayedBuffers( mDynamicBufferCurrentFrame );
         }
+
+        VaoManager::_update();
 
         if( mFrameSyncVec[mDynamicBufferCurrentFrame] )
         {

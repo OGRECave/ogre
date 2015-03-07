@@ -183,6 +183,7 @@ namespace Ogre {
     class ErrorDialog;
     class ExternalTextureSourceManager;
     class Factory;
+    class Forward3D;
     struct FrameEvent;
     class FrameListener;
     class Frustum;

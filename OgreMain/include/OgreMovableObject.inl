@@ -45,6 +45,11 @@ namespace Ogre
         return mObjectData.mDistanceToCamera[mObjectData.mIndex];
     }
     //-----------------------------------------------------------------------------------
+    inline Real MovableObject::getCachedDistanceToCameraAsReal(void) const
+    {
+        return (reinterpret_cast<Real*RESTRICT_ALIAS>(mObjectData.mDistanceToCamera))[mObjectData.mIndex];
+    }
+    //-----------------------------------------------------------------------------------
     inline void MovableObject::setVisibilityFlags( uint32 flags )
     {
         mObjectData.mVisibilityFlags[mObjectData.mIndex] =

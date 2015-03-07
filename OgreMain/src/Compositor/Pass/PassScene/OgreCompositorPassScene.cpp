@@ -132,7 +132,10 @@ namespace Ogre
 
         //Passes belonging to a ShadowNode should not override their parent.
         if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
-            sceneManager->_setCurrentShadowNode( mShadowNode );
+        {
+            sceneManager->_setCurrentShadowNode( mShadowNode, mDefinition->mShadowNodeRecalculation ==
+                                                                                    SHADOW_NODE_REUSE );
+        }
 
         mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
 
@@ -153,8 +156,10 @@ namespace Ogre
             mShadowNode->_update( mCamera, usedLodCamera, sceneManager );
             sceneManager->_swapVisibleObjectsForShadowMapping();
 
-            //ShadowNode passes may've overriden this setting.
-            sceneManager->_setCurrentShadowNode( mShadowNode );
+            //ShadowNode passes may've overriden these settings.
+            sceneManager->_setCurrentShadowNode( mShadowNode, mDefinition->mShadowNodeRecalculation ==
+                                                                                    SHADOW_NODE_REUSE );
+            mCamera->_notifyViewport( mViewport );
 
             //We need to restore the previous RT's update
             mTarget->_beginUpdate();

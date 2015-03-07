@@ -13,16 +13,13 @@ struct PS_INPUT
 
 @property( !hlms_shadowcaster )
 
-@padd( textureRegStart, hlms_num_shadow_maps, 1 )
-@padd( envMapReg, textureRegStart, num_textures )
+@property( hlms_forward3d )
+Buffer<uint> f3dGrid : register(t1);
+Buffer<float4> f3dLightList : register(t2);@end
 
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));@end
-
-@padd( samplerStateStart, hlms_num_shadow_maps, 1 )
-@pset( numSamplerStates, num_textures )
-@property( envprobe_map )@add( numSamplerStates, 1 )@end
 
 @property( numSamplerStates || envprobe_map )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
@@ -33,8 +30,8 @@ struct PS_INPUT
 @end
 
 @property( hlms_num_shadow_maps )
-Texture2D texShadowMap[@value(hlms_num_shadow_maps)] : register(t1);
-SamplerComparisonState shadowSampler : register(s1);
+Texture2D texShadowMap[@value(hlms_num_shadow_maps)] : register(t@value(textureRegShadowMapStart));
+SamplerComparisonState shadowSampler : register(s@value(textureRegShadowMapStart));
 
 float getShadow( Texture2D shadowMap, float4 psPosLN, float2 invShadowMapSize )
 {
@@ -141,7 +138,8 @@ float3 cookTorrance( float3 lightDir, float3 viewDir, float NdotV, float3 lightD
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
-float4 main( PS_INPUT inPs ) : SV_Target0
+float4 main( PS_INPUT inPs
+@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) : SV_Target0
 {
 	Material material;
 	float4 outColour;
@@ -294,7 +292,7 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 	{
 		lightDir *= 1.0 / fDistance;
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + passBuf.lights[@n].attenuation.y * fDistance + passBuf.lights[@n].attenuation.z * fDistance * fDistance );
+		float atten = 1.0 / (1.0 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
 
@@ -319,9 +317,11 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 		spotAtten = pow( spotAtten, passBuf.lights[@n].spotParams.z );
 	@end
 		tmpColour = cookTorrance( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
-		float atten = 1.0 / (1.0 + passBuf.lights[@n].attenuation.y * fDistance + passBuf.lights[@n].attenuation.z * fDistance * fDistance );
+		float atten = 1.0 / (1.0 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
+
+@insertpiece( forward3dLighting )
 
 @property( envprobe_map )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
