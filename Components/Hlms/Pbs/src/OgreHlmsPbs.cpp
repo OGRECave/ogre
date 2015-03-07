@@ -767,8 +767,11 @@ namespace Ogre
             }
 
             Forward3D *forward3D = sceneManager->getForward3D();
-            forward3D->fillConstBufferData( renderTarget, passBufferPtr );
-            passBufferPtr += forward3D->getConstBufferSize() >> 2;
+            if( forward3D )
+            {
+                forward3D->fillConstBufferData( renderTarget, passBufferPtr );
+                passBufferPtr += forward3D->getConstBufferSize() >> 2;
+            }
         }
         else
         {
