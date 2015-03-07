@@ -55,7 +55,8 @@ namespace Demo
         mAnimateObjects( true ),
         mCurrentForward3DPreset( -1 ),
         mNumLights( 128 ),
-        mLightRadius( 10.0f )
+        mLightRadius( 10.0f ),
+        mLowThreshold( true )
     {
         mDisplayHelpMode        = 2;
         mNumDisplayHelpModes    = 3;
@@ -239,13 +240,13 @@ namespace Demo
             light->setCastShadows( false );
             light->setType( Ogre::Light::LT_POINT );
             lightNode->setPosition( Ogre::Math::RangeRandom( -250, 250 ),
-                                    2.5f,
+                                    Ogre::Math::RangeRandom( 2.0f, 10.0f ),
                                     Ogre::Math::RangeRandom( -250, 250 ) );
             /*light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
             light->setDirection( Ogre::Vector3( Ogre::Math::RangeRandom( -1, 1 ),
                                                 Ogre::Math::RangeRandom( -1, -0.5 ),
                                                 Ogre::Math::RangeRandom( -1, 1 ) ).normalisedCopy() );*/
-            light->setAttenuationBasedOnRadius( mLightRadius, 0.00192f );
+            light->setAttenuationBasedOnRadius( mLightRadius, mLowThreshold ? 0.00192f : 0.0192f );
 
             mGeneratedLights.push_back( light );
         }
@@ -270,11 +271,13 @@ namespace Demo
         {
             outText += "\nPress F2 to toggle animation. ";
             outText += mAnimateObjects ? "[On]" : "[Off]";
+            outText += "\nPress F3 to use a low/high threshold for radius. ";
+            outText += mLowThreshold ? "[Low]" : "[High]";
             outText += "\nPress F5/F6 to increase/reduce number of lights. ";
             outText += "[" + Ogre::StringConverter::toString( mNumLights ) + "]";
             outText += "\nPress F7/F8 to increase/reduce light's radius. ";
             outText += "[" + Ogre::StringConverter::toString( mLightRadius ) + "]";
-            outText += "\nPress SPACE to switch Forward3D settings. ";
+            outText += "\nPress [Shift+] SPACE to switch Forward3D settings back and forth. ";
             outText += "Preset: [" + Ogre::StringConverter::toString( mCurrentForward3DPreset ) + "]";
 
             const Presets &preset = c_presets[mCurrentForward3DPreset];
@@ -292,6 +295,11 @@ namespace Demo
         if( arg.keysym.sym == SDLK_F2 )
         {
             mAnimateObjects = !mAnimateObjects;
+        }
+        if( arg.keysym.sym == SDLK_F3 )
+        {
+            mLowThreshold = !mLowThreshold;
+            generateLights();
         }
         else if( arg.keysym.sym == SDLK_F5 || arg.keysym.sym == SDLK_F6 )
         {

@@ -257,7 +257,7 @@ namespace Ogre
         fillGlobalLightListBuffer( camera, cachedGrid->globalLightListBuffer );
 
         //Fill the indexes buffer
-        uint16 RESTRICT_ALIAS *gridBuffer = reinterpret_cast<uint16 RESTRICT_ALIAS*>(
+        uint16 * RESTRICT_ALIAS gridBuffer = reinterpret_cast<uint16 * RESTRICT_ALIAS>(
                     cachedGrid->gridBuffer->map( 0, cachedGrid->gridBuffer->getNumElements() ) );
 
         memset( mLightCountInCell.begin(), 0, mLightCountInCell.size() * sizeof(uint32) );
@@ -402,7 +402,7 @@ namespace Ogre
                         //for the number of lights in cell
                         if( *numLightsInCell < mLightsPerCell - 1 )
                         {
-                            uint16 RESTRICT_ALIAS *cellElem = gridBuffer + offset +
+                            uint16 * RESTRICT_ALIAS cellElem = gridBuffer + offset +
                                                                 (y * sliceRes.width + x) * mLightsPerCell +
                                                                 (*numLightsInCell + 1);
                             ++(*numLightsInCell);

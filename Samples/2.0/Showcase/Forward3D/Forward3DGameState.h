@@ -23,6 +23,7 @@ namespace Demo
         Ogre::LightArray    mGeneratedLights;
         Ogre::uint32        mNumLights;
         float               mLightRadius;
+        bool                mLowThreshold;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 

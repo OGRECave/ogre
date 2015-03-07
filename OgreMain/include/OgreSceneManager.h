@@ -1266,6 +1266,32 @@ namespace Ogre {
         /// Returns the RenderQueue.
         RenderQueue* getRenderQueue(void) const             { return mRenderQueue; }
 
+        /** Enables or disables the Forward3D implementation for using many non-shadowed
+            lights in the scene.
+            See the Forward3D sample for more information.
+        @remarks
+            The Hlms implementation must support this feature in order to work.
+            Calling this function can recreate resources (even if called multiple
+            times with the same exact paramters). Don't do it often.
+        @param bEnable
+            True to enable it. False to disable it.
+        @param width
+            The width of the view-space grid. Recommended value is 4 unless
+            numSlices is very small.
+        @param height
+            The height of the view-space grid. Recommended value is 4 unless
+            numSlices is very small.
+        @param numSlices
+            The number of slices. Each additional slice consumes much more memory.
+            The width and height is doubled on each slice. It's like mipmapping
+            but on reverse.
+        @param lightsPerCell
+            The maximum number of lights a cell in the grid can hold.
+        @param minDistance
+            Bias towards the camera for grid.
+        @param maxDistance
+            How far the grid array can go.
+        */
         void setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
                            uint32 lightsPerCell, float minDistance, float maxDistance );
 
