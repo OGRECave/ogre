@@ -48,6 +48,15 @@ namespace Demo
                     overlayManager.createOverlayElement( "TextArea", "DebugText" ) );
         mDebugText->setFontName( "DebugFont" );
         mDebugText->setCharHeight( 0.025f );
+
+        mDebugTextShadow= static_cast<Ogre::v1::TextAreaOverlayElement*>(
+                    overlayManager.createOverlayElement( "TextArea", "0DebugTextShadow" ) );
+        mDebugTextShadow->setFontName( "DebugFont" );
+        mDebugTextShadow->setCharHeight( 0.025f );
+        mDebugTextShadow->setColour( Ogre::ColourValue::Black );
+        mDebugTextShadow->setPosition( 0.002f, 0.002f );
+
+        panel->addChild( mDebugTextShadow );
         panel->addChild( mDebugText );
         overlay->add2D( panel );
         overlay->show();
@@ -81,6 +90,7 @@ namespace Demo
         outText.swap( finalText );
 
         mDebugText->setCaption( finalText );
+        mDebugTextShadow->setCaption( finalText );
     }
     //-----------------------------------------------------------------------------------
     void TutorialGameState::update( float timeSinceLast )
@@ -91,6 +101,7 @@ namespace Demo
             Ogre::String finalText;
             generateDebugText( timeSinceLast, finalText );
             mDebugText->setCaption( finalText );
+            mDebugTextShadow->setCaption( finalText );
         }
 
         if( mCameraController )
@@ -117,6 +128,7 @@ namespace Demo
             Ogre::String finalText;
             generateDebugText( 0, finalText );
             mDebugText->setCaption( finalText );
+            mDebugTextShadow->setCaption( finalText );
         }
         else
         {

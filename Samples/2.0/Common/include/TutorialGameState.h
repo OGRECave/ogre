@@ -32,6 +32,7 @@ namespace Demo
         Ogre::uint16        mNumDisplayHelpModes;
 
         Ogre::v1::TextAreaOverlayElement *mDebugText;
+        Ogre::v1::TextAreaOverlayElement *mDebugTextShadow;
 
         virtual void createDebugTextOverlay(void);
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
