@@ -102,7 +102,7 @@ std::string macBundlePath()
                                      mResourcePath + "ogre.cfg",
                                      mResourcePath + "Ogre.log" );
 
-        if( !mRoot->restoreConfig() )
+        //if( !mRoot->restoreConfig() )
         {
             if( !mRoot->showConfigDialog() )
             {
