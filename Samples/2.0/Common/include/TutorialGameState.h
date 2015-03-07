@@ -28,7 +28,8 @@ namespace Demo
         CameraController    *mCameraController;
 
         Ogre::String        mHelpDescription;
-        bool                mDisplayHelp;
+        Ogre::uint16        mDisplayHelpMode;
+        Ogre::uint16        mNumDisplayHelpModes;
 
         Ogre::v1::TextAreaOverlayElement *mDebugText;
 

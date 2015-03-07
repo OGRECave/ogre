@@ -173,8 +173,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
     mRenderQueue = OGRE_NEW RenderQueue( root->getHlmsManager(), this,
                                          mDestRenderSystem->getVaoManager() );
 
-    mForward3DImpl = OGRE_NEW Forward3D( this );
-
     // create the auto param data source instance
     mAutoParamDataSource = createAutoParamDataSource();
 
@@ -767,6 +765,22 @@ void SceneManager::unregisterSceneNodeListener( SceneNode *sceneNode )
     assert( itor != mSceneNodesWithListeners.end() && *itor == sceneNode );
     if( itor != mSceneNodesWithListeners.end() && *itor == sceneNode )
         mSceneNodesWithListeners.erase( itor );
+}
+//-----------------------------------------------------------------------
+void SceneManager::setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
+                                 uint32 lightsPerCell, float minDistance, float maxDistance )
+{
+    OGRE_DELETE mForward3DImpl;
+    mForward3DImpl = 0;
+
+    if( bEnable )
+    {
+        mForward3DImpl = OGRE_NEW Forward3D( width, height, numSlices, lightsPerCell,
+                                             minDistance, maxDistance, this );
+
+        if( mDestRenderSystem )
+            mForward3DImpl->_changeRenderSystem( mDestRenderSystem );
+    }
 }
 //-----------------------------------------------------------------------
 const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed, 

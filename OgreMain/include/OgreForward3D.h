@@ -139,7 +139,8 @@ namespace Ogre
         bool getCachedGridFor( Camera *camera, const CachedGrid **outCachedGrid ) const;
 
     public:
-        Forward3D( SceneManager *sceneManager );
+        Forward3D( uint32 width, uint32 height, uint32 numSlices, uint32 lightsPerCell,
+                   float minDistance, float maxDistance, SceneManager *sceneManager );
         ~Forward3D();
 
         void _changeRenderSystem( RenderSystem *newRs );

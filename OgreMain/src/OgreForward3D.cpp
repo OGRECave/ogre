@@ -42,31 +42,35 @@ namespace Ogre
     //Six variables * 4 (padded vec3) * 4 (bytes) * numLights
     const size_t c_numBytesPerLight = 6 * 4 * 4;
 
-    Forward3D::Forward3D( SceneManager *sceneManager ) :
-        mWidth( 4 ),
-        mHeight( 4 ),
-        mNumSlices( 5 ),
+    Forward3D::Forward3D( uint32 width, uint32 height,
+                          uint32 numSlices, uint32 lightsPerCell,
+                          float minDistance, float maxDistance,
+                          SceneManager *sceneManager ) :
+        mWidth( width ),
+        mHeight( height ),
+        mNumSlices( numSlices ),
         /*mWidth( 1 ),
         mHeight( 1 ),
         mNumSlices( 2 ),*/
-        mLightsPerCell( 96 ),
+        mLightsPerCell( lightsPerCell ),
         mTableSize( mWidth * mHeight * mLightsPerCell ),
-        mMinDistance( 3.0f ),
-        mMaxDistance( 200 ),
+        mMinDistance( minDistance ),
+        mMaxDistance( maxDistance ),
         mInvMaxDistance( 1.0f / mMaxDistance ),
         mVaoManager( 0 ),
         mSceneManager( sceneManager ),
         mDebugMode( false )
     {
-        uint32 width    = mWidth;
-        uint32 height   = mHeight;
+        uint32 sliceWidth   = mWidth;
+        uint32 sliceHeight  = mHeight;
         mResolutionAtSlice.reserve( mNumSlices );
 
         for( uint32 i=0; i<mNumSlices; ++i )
         {
-            mResolutionAtSlice.push_back( Resolution( width, height, getDepthAtSlice( i + 1 ) ) );
-            width   *= 2;
-            height  *= 2;
+            mResolutionAtSlice.push_back( Resolution( sliceWidth, sliceHeight,
+                                                      getDepthAtSlice( i + 1 ) ) );
+            sliceWidth   *= 2;
+            sliceHeight  *= 2;
         }
 
         mResolutionAtSlice.back().zEnd = std::numeric_limits<Real>::max();

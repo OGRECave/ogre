@@ -25,7 +25,7 @@ namespace Demo
         //Show the current weight.
         //The text doesn't get updated every frame while displaying
         //help, so don't show the weight as it is inaccurate.
-        if( !mDisplayHelp )
+        if( mDisplayHelpMode != 0 )
         {
             outText += "\nSEE HELP DESCRIPTION!";
 

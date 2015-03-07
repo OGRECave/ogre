@@ -20,6 +20,7 @@ if( OGRE_BUILD_SAMPLES2 )
 	add_subdirectory(ApiUsage/StereoRendering)
 	add_subdirectory(ApiUsage/ShadowMapDebugging)
 
+	add_subdirectory(Showcase/Forward3D)
 	add_subdirectory(Showcase/PbsMaterials)
 
 	add_subdirectory(Tutorials/Tutorial01_Initialization)

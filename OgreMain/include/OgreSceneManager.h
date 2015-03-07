@@ -1266,6 +1266,9 @@ namespace Ogre {
         /// Returns the RenderQueue.
         RenderQueue* getRenderQueue(void) const             { return mRenderQueue; }
 
+        void setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
+                           uint32 lightsPerCell, float minDistance, float maxDistance );
+
         Forward3D* getForward3D(void)                       { return mForward3DImpl; }
 
         /** Retrieves the main entity memory manager.
