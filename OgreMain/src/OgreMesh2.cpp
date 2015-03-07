@@ -553,7 +553,7 @@ namespace Ogre {
                     mesh->buildTangentVectors( VES_TANGENT, sourceCoordSet, index, false, false, true );
             }
         }
-        catch( Exception &e )
+        catch( Exception & )
         {
         }
 

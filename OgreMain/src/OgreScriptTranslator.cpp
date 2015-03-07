@@ -1201,7 +1201,7 @@ namespace Ogre{
         hlms->createDatablock( obj->name, obj->name, macroblock, blendblock, paramVec );
 
         }
-        catch( Exception &e )
+        catch( Exception & )
         {
             if( i != obj->children.end() )
                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, (*i)->file, (*i)->line);

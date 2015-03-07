@@ -921,7 +921,7 @@ namespace Ogre {
                 //monolithicProgram->updateAtomicCounters(params, mask, mType);
             }
         }
-        catch (Exception& e) {}
+        catch (Exception&) {}
     }
 
 
@@ -965,7 +965,7 @@ namespace Ogre {
                 monolithicProgram->updateUniformBlocks(params, mask, mType);
             }
         }
-        catch (Exception& e) {}
+        catch (Exception&) {}
     }
 
 

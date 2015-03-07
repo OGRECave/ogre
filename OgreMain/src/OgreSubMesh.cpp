@@ -725,10 +725,10 @@ namespace v1 {
 
                     uint16 *dstData16 = reinterpret_cast<uint16*>(data + acumOffset);
 
-                    dstData16[0] = Math::Clamp( qTangent.w * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[1] = Math::Clamp( qTangent.x * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[2] = Math::Clamp( qTangent.y * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[3] = Math::Clamp( qTangent.z * 32767.0f, -32768.0f, 32767.0f );
+                    dstData16[0] = (uint16)Math::Clamp( qTangent.w * 32767.0f, -32768.0f, 32767.0f );
+                    dstData16[1] = (uint16)Math::Clamp( qTangent.x * 32767.0f, -32768.0f, 32767.0f );
+                    dstData16[2] = (uint16)Math::Clamp( qTangent.y * 32767.0f, -32768.0f, 32767.0f );
+                    dstData16[3] = (uint16)Math::Clamp( qTangent.z * 32767.0f, -32768.0f, 32767.0f );
                 }
                 else
                 {

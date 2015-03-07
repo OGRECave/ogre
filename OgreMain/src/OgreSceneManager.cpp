@@ -1503,8 +1503,8 @@ void SceneManager::setSkyPlane(
                                int xsegments, int ysegments, 
                                const String& groupName)
 {
-    _setSkyPlane(enable, plane, materialName, gscale, tiling,
-                 0, bow, xsegments, ysegments, groupName);
+    _setSkyPlane(enable, plane, materialName, 0, gscale, tiling,
+                 bow, xsegments, ysegments, groupName);
 }
 //-----------------------------------------------------------------------
 void SceneManager::_setSkyBox(bool enable,
@@ -1726,7 +1726,7 @@ void SceneManager::setSkyBox(
                              const Quaternion& orientation,
                              const String& groupName)
 {
-    _setSkyBox(enable, materialName, distance, 0,
+    _setSkyBox(enable, materialName, 0, distance,
                orientation, groupName);
 }
 //-----------------------------------------------------------------------
@@ -1826,8 +1826,8 @@ void SceneManager::setSkyDome(
                               int xsegments, int ysegments, int ySegmentsToKeep,
                               const String& groupName)
 {
-    _setSkyDome(enable, materialName, curvature, tiling, distance, 
-                0, orientation, xsegments, ysegments, ySegmentsToKeep, groupName);
+    _setSkyDome(enable, materialName, 0, curvature, tiling, distance, 
+                orientation, xsegments, ysegments, ySegmentsToKeep, groupName);
 }
 //-----------------------------------------------------------------------
 v1::MeshPtr SceneManager::createSkyboxPlane(
