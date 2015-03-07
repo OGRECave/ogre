@@ -32,14 +32,14 @@
 	for( uint i=0; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = texelFetch( f3dGrid, int(sampleOffset + i + 1) ).x;
+		uint idx = texelFetch( f3dGrid, int(sampleOffset + i + 1u) ).x;
 
 		//Get the light
 		vec4 posAndType = texelFetch( f3dLightList, int(idx) );
 
-		vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1) ).xyz;
-		vec3 lightSpecular	= texelFetch( f3dLightList, int(idx + 2) ).xyz;
-		vec3 attenuation	= texelFetch( f3dLightList, int(idx + 3) ).xyz;
+		vec3 lightDiffuse	= texelFetch( f3dLightList, int(idx + 1u) ).xyz;
+		vec3 lightSpecular	= texelFetch( f3dLightList, int(idx + 2u) ).xyz;
+		vec3 attenuation	= texelFetch( f3dLightList, int(idx + 3u) ).xyz;
 
 		vec3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
@@ -62,8 +62,8 @@
 				//spotParams.z = falloff
 
 				//Spot light
-				vec3 spotDirection	= texelFetch( f3dLightList, int(idx + 4) ).xyz;
-				vec3 spotParams		= texelFetch( f3dLightList, int(idx + 5) ).xyz;
+				vec3 spotDirection	= texelFetch( f3dLightList, int(idx + 4u) ).xyz;
+				vec3 spotParams		= texelFetch( f3dLightList, int(idx + 5u) ).xyz;
 
 				float spotCosAngle = dot( normalize( inPs.pos - posAndType.xyz ), spotDirection.xyz );
 

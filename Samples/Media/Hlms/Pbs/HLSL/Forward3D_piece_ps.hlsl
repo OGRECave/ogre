@@ -33,14 +33,14 @@
 	//for( uint i=0; i<1; ++i )
 	{
 		//Get the light index
-		uint idx = f3dGrid.Load( int(sampleOffset + i + 1) ).x;
+		uint idx = f3dGrid.Load( int(sampleOffset + i + 1u) ).x;
 
 		//Get the light
 		float4 posAndType = f3dLightList.Load( int(idx) );
 
-		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1) ).xyz;
-		float3 lightSpecular= f3dLightList.Load( int(idx + 2) ).xyz;
-		float3 attenuation	= f3dLightList.Load( int(idx + 3) ).xyz;
+		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyz;
+		float3 lightSpecular= f3dLightList.Load( int(idx + 2u) ).xyz;
+		float3 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyz;
 
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
@@ -63,8 +63,8 @@
 				//spotParams.z = falloff
 
 				//Spot light
-				float3 spotDirection	= f3dLightList.Load( int(idx + 4) ).xyz;
-				float3 spotParams		= f3dLightList.Load( int(idx + 5) ).xyz;
+				float3 spotDirection	= f3dLightList.Load( int(idx + 4u) ).xyz;
+				float3 spotParams		= f3dLightList.Load( int(idx + 5u) ).xyz;
 
 				float spotCosAngle = dot( normalize( inPs.pos - posAndType.xyz ), spotDirection.xyz );
 
