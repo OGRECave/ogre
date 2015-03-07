@@ -29,7 +29,7 @@
 
 	uint numLightsInGrid = texelFetch( f3dGrid, int(sampleOffset) ).x;
 
-	for( uint i=0; i<numLightsInGrid; ++i )
+	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
 		uint idx = texelFetch( f3dGrid, int(sampleOffset + i + 1u) ).x;

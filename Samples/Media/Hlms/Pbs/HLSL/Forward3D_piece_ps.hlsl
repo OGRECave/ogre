@@ -29,8 +29,7 @@
 
 	uint numLightsInGrid = f3dGrid.Load( int(sampleOffset) ).x;
 
-	for( uint i=0; i<numLightsInGrid; ++i )
-	//for( uint i=0; i<1; ++i )
+	for( uint i=0u; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
 		uint idx = f3dGrid.Load( int(sampleOffset + i + 1u) ).x;
