@@ -67,6 +67,8 @@ namespace Demo
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
+        mGraphicsSystem->getCamera()->setPosition( Ogre::Vector3( 0, 30, 100 ) );
+
         changeForward3DPreset( true );
 
         Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",

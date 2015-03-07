@@ -81,7 +81,7 @@ int mainApp()
 
     forward3DGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize( "Shadow map debugging" );
+    graphicsSystem.initialize( "Forward3D Lights" );
 
     if( graphicsSystem.getQuit() )
     {

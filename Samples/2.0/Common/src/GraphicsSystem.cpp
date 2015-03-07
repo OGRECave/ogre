@@ -475,7 +475,7 @@ std::string macBundlePath()
         mCamera = mSceneManager->createCamera( "Main Camera" );
 
         // Position it at 500 in Z direction
-        mCamera->setPosition( Ogre::Vector3( 0, 30, 100 ) );
+        mCamera->setPosition( Ogre::Vector3( 0, 5, 15 ) );
         // Look back along -Z
         mCamera->lookAt( Ogre::Vector3( 0, 0, 0 ) );
         mCamera->setNearClipDistance( 0.2f );
