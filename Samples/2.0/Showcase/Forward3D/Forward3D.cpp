@@ -43,7 +43,8 @@ int mainApp()
 #endif
 {
     Forward3DGameState forward3DGameState(
-        "Forward3D is a technique capable of rendering many lights.\n"
+        "Forward3D is a technique capable of rendering many lights. It is required in order\n"
+        "to render non-shadow casting non-directional lights with the PBS implementation.\n"
         "Deferred shading has a lot of problems (transparency, antialiasing, multiple BDRF). Besides,\n"
         "it uses a lot of bandwidth. Forward+/Forward2.5 is great, but requires DX11 HW (needs UAV) and\n"
         "a Z-Prepass. This Z-prepass is often a turn off for many (even though in some cases it may\n"
@@ -71,6 +72,8 @@ int mainApp()
         "Light's size has a direct impact on quality. Theoretically all lights have an unlimited\n"
         "range. However we cut it off after certain threshold for performance reasons. Very low\n"
         "thresholds stress the F3D system, but very high thresholds will cut the light too early.\n"
+        "\n"
+        "Forward+ and Deferred as alternative implementations are planned in the future.\n"
         "\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/ShadowMapDebugging.compositor" );
