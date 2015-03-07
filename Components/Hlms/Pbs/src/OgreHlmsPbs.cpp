@@ -1078,7 +1078,7 @@ namespace Ogre
             if( datablock->mTextureHash != mLastTextureHash )
             {
                 //Rebind textures
-                size_t texUnit = mPreparedPass.shadowMaps.size() + !mGridBuffer ? 1 : 3;
+                size_t texUnit = mPreparedPass.shadowMaps.size() + (!mGridBuffer ? 1 : 3);
 
                 PbsBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
                 PbsBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();
