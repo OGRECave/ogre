@@ -88,7 +88,8 @@ namespace Ogre
         {
             if( itor->gridBuffer )
             {
-                itor->gridBuffer->unmap( UO_UNMAP_ALL );
+                if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
+                    itor->gridBuffer->unmap( UO_UNMAP_ALL );
                 mVaoManager->destroyTexBuffer( itor->gridBuffer );
                 itor->gridBuffer = 0;
             }
@@ -114,7 +115,8 @@ namespace Ogre
         {
             if( itor->gridBuffer )
             {
-                itor->gridBuffer->unmap( UO_UNMAP_ALL );
+                if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
+                    itor->gridBuffer->unmap( UO_UNMAP_ALL );
                 mVaoManager->destroyTexBuffer( itor->gridBuffer );
                 itor->gridBuffer = 0;
             }
@@ -452,7 +454,8 @@ namespace Ogre
                 {
                     if( itor->gridBuffer )
                     {
-                        itor->gridBuffer->unmap( UO_UNMAP_ALL );
+                        if( itor->gridBuffer->getMappingState() != MS_UNMAPPED )
+                            itor->gridBuffer->unmap( UO_UNMAP_ALL );
                         mVaoManager->destroyTexBuffer( itor->gridBuffer );
                         itor->gridBuffer = 0;
                     }
