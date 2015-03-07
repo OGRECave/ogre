@@ -22,7 +22,7 @@ namespace Demo
         mCameraController( 0 ),
         mHelpDescription( helpDescription ),
         mDisplayHelpMode( 1 ),
-        mNumDisplayHelpModes( 1 ),
+        mNumDisplayHelpModes( 2 ),
         mDebugText( 0 )
     {
     }

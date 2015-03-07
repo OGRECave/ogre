@@ -866,11 +866,24 @@ namespace Ogre {
                 else
                 {
                     const size_t rowSize = PixelUtil::getMemorySize( src.getWidth(), 1, 1, src.format );
+                    const uint32 blockWidth  = PixelUtil::getCompressedBlockWidth( dst.format, false );
+                    const uint32 blockHeight = PixelUtil::getCompressedBlockHeight( dst.format, false );
+
+                    if( blockWidth == 0 || blockHeight == 0 )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                            "This format should be consecutive!",
+                            "PixelUtil::bulkPixelConversion");
+                    }
 
                     uint8 *srcptr = static_cast<uint8*>(src.data)
-                        + src.left + src.top * src.rowPitch + src.front * src.slicePitch;
+                        + (src.left + blockWidth - 1) / blockWidth +
+                            (src.top + blockHeight - 1) / blockHeight * src.rowPitch +
+                            src.front * src.slicePitch;
                     uint8 *dstptr = static_cast<uint8*>(dst.data)
-                        + dst.left + dst.top * dst.rowPitch + dst.front * dst.slicePitch;
+                        + (dst.left + blockWidth - 1) / blockWidth +
+                            (dst.top + blockHeight - 1) / blockHeight * dst.rowPitch +
+                            dst.front * dst.slicePitch;
 
                     // Calculate pitches+skips in bytes
                     const size_t srcRowPitchBytes = src.rowPitch;
@@ -879,9 +892,12 @@ namespace Ogre {
                     const size_t dstRowPitchBytes   = dst.rowPitch;
                     const size_t dstSliceSkipBytes  = dst.getSliceSkip();
 
+                    const size_t compressedSrcTop = (src.top + blockHeight - 1) / blockHeight;
+                    const size_t compressedSrcBottom = (src.bottom + blockHeight - 1) / blockHeight;
+
                     for( size_t z=src.front; z<src.back; ++z )
                     {
-                        for( size_t y=src.top; y<src.bottom; ++y )
+                        for( size_t y=compressedSrcTop; y<compressedSrcBottom; ++y )
                         {
                             memcpy( dstptr, srcptr, rowSize );
                             srcptr += srcRowPitchBytes;
