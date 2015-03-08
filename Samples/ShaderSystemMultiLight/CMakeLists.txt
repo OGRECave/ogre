@@ -17,7 +17,7 @@ ogre_add_component_include_dir(RTShaderSystem)
 
 ogre_add_library_to_folder(Samples Sample_ShaderSystemMultiLight ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_ShaderSystemMultiLight ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_ShaderSystemMultiLight ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_ShaderSystemMultiLight)
 
 if (APPLE AND NOT APPLE_IOS)

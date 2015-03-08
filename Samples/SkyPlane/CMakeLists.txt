@@ -7,7 +7,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 ogre_add_library_to_folder(Samples Sample_SkyPlane ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_SkyPlane ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_SkyPlane ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_SkyPlane)
 
 if (APPLE AND NOT APPLE_IOS)

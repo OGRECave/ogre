@@ -188,7 +188,6 @@ include_directories(
   ${OGRE_INCLUDE_DIRS}
   ${OGRE_Plugin_PCZSceneManager_INCLUDE_DIRS}
   ${OGRE_Plugin_OctreeZone_INCLUDE_DIRS}
-  ${OIS_INCLUDE_DIRS}
   ${CMAKE_CURRENT_SOURCE_DIR}/Common/include
 )
 if (APPLE)
