@@ -553,17 +553,17 @@ namespace Ogre
         </tr>
         <tr>
             <td>pp::Instance</td>
+            <td>pp::Instance*</td>
             <td></td>
-            <td></td>
-            <td></td>
-            <td>NaCL Specific</td>
+            <td>The NaCl instance object that will be used to create the OpenGL context in the render system.</td>
+            <td>NaCl Specific</td>
         </tr>
         <tr>
             <td>SwapCallback</td>
+            <td>pp::CompletionCallback*</td>
             <td></td>
-            <td></td>
-            <td></td>
-            <td>NaCL Specific</td>
+            <td>A NaCl callback that is called after the frame finished rendering.</td>
+            <td>NaCl Specific</td>
         </tr>
         <tr>
             <td>currentGLContext</td>
