@@ -333,42 +333,40 @@ protected:
         }
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+    bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerDown(evt, id)) 
+        if (mTrayMgr->injectMouseDown(evt)) 
             return true;
-        if (id == OIS::MB_Left)     
-            mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
+        if (evt.button == BUTTON_LEFT)
+            // Hide the cursor if user left-clicks in the scene            .
+            mTrayMgr->hideCursor();  
     
         return true;
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+
+    bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerUp(evt, id)) 
+        if (mTrayMgr->injectMouseUp(evt)) 
             return true;
-        if (id == OIS::MB_Left) 
-            mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
+        if (evt.button == BUTTON_LEFT)
+            // Unhide the cursor if user lets go of LMB.
+            mTrayMgr->showCursor();  
 
         return true;
     }
 
-    //-----------------------------------------------------------------------
-    bool pointerMoved( const OIS::PointerEvent& evt )
+
+    bool mouseMoved(const MouseMotionEvent& evt)
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible()) 
-            mTrayMgr->injectPointerMove(evt);
+            mTrayMgr->injectMouseMove(evt);
         else 
-            mCameraMan->injectPointerMove(evt);
-
+            mCameraMan->injectMouseMove(evt);
 
         return true;
     }
-
-    
 
 private:
 

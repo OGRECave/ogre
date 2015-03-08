@@ -2,9 +2,10 @@
 #define __Sinbad_H__
 
 #include "Ogre.h"
-#include "OIS.h"
+#include "Input.h"
 
 using namespace Ogre;
+using namespace OgreBites;
 
 #define NUM_ANIMS 13           // number of animations the character has
 #define CHAR_HEIGHT 5          // height of character's center of mass above ground
@@ -55,15 +56,16 @@ public:
         updateCamera(deltaTime);
     }
 
-    void injectKeyDown(const OIS::KeyEvent& evt)
+    void injectKeyDown(const KeyboardEvent& evt)
     {
-        if (evt.key == OIS::KC_Q && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
+        Keycode key = evt.keysym.scancode;
+        if (key == SDL_SCANCODE_Q && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
         {
             // take swords out (or put them back, since it's the same animation but reversed)
             setTopAnimation(ANIM_DRAW_SWORDS, true);
             mTimer = 0;
         }
-        else if (evt.key == OIS::KC_E && !mSwordsDrawn)
+        else if (key == SDL_SCANCODE_E && !mSwordsDrawn)
         {
             if (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP)
             {
@@ -84,12 +86,12 @@ public:
         }
 
         // keep track of the player's intended direction
-        else if (evt.key == OIS::KC_W) mKeyDirection.z = -1;
-        else if (evt.key == OIS::KC_A) mKeyDirection.x = -1;
-        else if (evt.key == OIS::KC_S) mKeyDirection.z = 1;
-        else if (evt.key == OIS::KC_D) mKeyDirection.x = 1;
+        else if (key == SDL_SCANCODE_W) mKeyDirection.z = -1;
+        else if (key == SDL_SCANCODE_A) mKeyDirection.x = -1;
+        else if (key == SDL_SCANCODE_S) mKeyDirection.z = 1;
+        else if (key == SDL_SCANCODE_D) mKeyDirection.x = 1;
 
-        else if (evt.key == OIS::KC_SPACE && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
+        else if (key == SDL_SCANCODE_SPACE && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
         {
             // jump if on ground
             setBaseAnimation(ANIM_JUMP_START, true);
@@ -105,13 +107,14 @@ public:
         }
     }
 
-    void injectKeyUp(const OIS::KeyEvent& evt)
+    void injectKeyUp(const KeyboardEvent& evt)
     {
+        Keycode key = evt.keysym.scancode;
         // keep track of the player's intended direction
-        if (evt.key == OIS::KC_W && mKeyDirection.z == -1) mKeyDirection.z = 0;
-        else if (evt.key == OIS::KC_A && mKeyDirection.x == -1) mKeyDirection.x = 0;
-        else if (evt.key == OIS::KC_S && mKeyDirection.z == 1) mKeyDirection.z = 0;
-        else if (evt.key == OIS::KC_D && mKeyDirection.x == 1) mKeyDirection.x = 0;
+        if (key == SDL_SCANCODE_W && mKeyDirection.z == -1) mKeyDirection.z = 0;
+        else if (key == SDL_SCANCODE_A && mKeyDirection.x == -1) mKeyDirection.x = 0;
+        else if (key == SDL_SCANCODE_S && mKeyDirection.z == 1) mKeyDirection.z = 0;
+        else if (key == SDL_SCANCODE_D && mKeyDirection.x == 1) mKeyDirection.x = 0;
 
         if (mKeyDirection.isZeroLength() && mBaseAnimID == ANIM_RUN_BASE)
         {
@@ -121,19 +124,25 @@ public:
         }
     }
 
-    void injectPointerMove(const OIS::PointerEvent& evt)
+    void injectMouseMove(const MouseMotionEvent& evt)
     {
         // update camera goal based on mouse movement
-        updateCameraGoal(-0.05f * evt.state.X.rel, -0.05f * evt.state.Y.rel, -0.0005f * evt.state.Z.rel);
+        updateCameraGoal(-0.05f * evt.xrel, -0.05f * evt.yrel, 0);
     }
 
-    void injectPointerDown(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+    void injectMouseWheel(const MouseWheelEvent& evt)
+    {
+        // update camera goal based on mouse movement
+        updateCameraGoal(0, 0, -0.0005f * evt.y);
+    }
+
+    void injectMouseDown(const MouseButtonEvent& evt)
     {
         if (mSwordsDrawn && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
         {
             // if swords are out, and character's not doing something weird, then SLICE!
-            if (id == OIS::MB_Left) setTopAnimation(ANIM_SLICE_VERTICAL, true);
-            else if (id == OIS::MB_Right) setTopAnimation(ANIM_SLICE_HORIZONTAL, true);
+            if (evt.button == BUTTON_LEFT) setTopAnimation(ANIM_SLICE_VERTICAL, true);
+            else if (evt.button == BUTTON_RIGHT) setTopAnimation(ANIM_SLICE_HORIZONTAL, true);
             mTimer = 0;
         }
     }
