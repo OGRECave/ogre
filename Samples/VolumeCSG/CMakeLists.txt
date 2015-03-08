@@ -21,7 +21,7 @@ ogre_add_component_include_dir(Volume)
 
 add_library(Sample_VolumeCSG ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_VolumeCSG ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Volume_LIBRARIES})
+target_link_libraries(Sample_VolumeCSG ${OGRE_LIBRARIES} ${SDL2_LIBRARY} ${OGRE_Volume_LIBRARIES})
 ogre_config_sample_lib(Sample_VolumeCSG)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

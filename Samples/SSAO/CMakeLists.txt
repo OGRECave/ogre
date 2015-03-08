@@ -8,7 +8,7 @@ set(SOURCE_FILES src/SSAO.cpp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_SSAO ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_SSAO ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_SSAO ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_SSAO)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)

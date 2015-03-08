@@ -250,7 +250,7 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
    target_link_libraries(SampleBrowser ${DirectX9_LIBRARIES})
 endif()
 
-target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
+target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES})
 
 # Add samples as dependencies
 add_dependencies(SampleBrowser ${OGRE_SAMPLES_LIST})

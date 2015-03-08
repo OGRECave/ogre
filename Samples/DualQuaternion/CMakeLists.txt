@@ -6,7 +6,7 @@ set(SOURCE_FILES src/DualQuaternion.cpp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_DualQuaternion ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(Sample_DualQuaternion ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_DualQuaternion ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_DualQuaternion)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
