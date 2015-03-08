@@ -300,12 +300,5 @@ if (OGRE_BUILD_TESTS)
     endif ()
   endif (CppUnit_FOUND)
 
-  # Configure interactive test build
-  if (OIS_FOUND)
-
-    # add VisualTests directory
-    add_subdirectory(VisualTests)
-
-  endif (OIS_FOUND)
-
+  add_subdirectory(VisualTests)
 endif (OGRE_BUILD_TESTS)

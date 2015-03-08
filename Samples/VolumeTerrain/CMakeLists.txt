@@ -21,7 +21,7 @@ ogre_add_component_include_dir(Volume)
 
 ogre_add_library_to_folder(Samples Sample_VolumeTerrain ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_VolumeTerrain ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Volume_LIBRARIES})
+target_link_libraries(Sample_VolumeTerrain ${OGRE_LIBRARIES} ${SDL2_LIBRARY} ${OGRE_Volume_LIBRARIES})
 ogre_config_sample_lib(Sample_VolumeTerrain)
 
 if (APPLE AND NOT APPLE_IOS)
