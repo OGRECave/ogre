@@ -177,25 +177,6 @@ class TestContext : public OgreBites::SampleContext
 
     VisualTest* getCurrentTest() { return mCurrentTest; }
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    virtual bool touchCancelled(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-#endif
-
  protected:
 
     /// The timestep

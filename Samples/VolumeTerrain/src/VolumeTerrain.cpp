@@ -105,22 +105,20 @@ Sample_VolumeTerrain::Sample_VolumeTerrain(void) : mVolumeRoot(0), mHideAll(fals
     
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
+bool Sample_VolumeTerrain::keyPressed(const KeyboardEvent& evt)
 {
-    if (evt.key == OIS::KC_F10)
+    switch(evt.keysym.scancode)
     {
+    case SDL_SCANCODE_F10:
         mVolumeRoot->setVolumeVisible(!mVolumeRoot->getVolumeVisible());
-    }
-    if (evt.key == OIS::KC_F11)
-    {
+        break;
+    case SDL_SCANCODE_F11:
         mVolumeRoot->setOctreeVisible(!mVolumeRoot->getOctreeVisible());
-    }
-    if (evt.key == OIS::KC_F12)
-    {
+        break;
+    case SDL_SCANCODE_F12:
         mVolumeRoot->setDualGridVisible(!mVolumeRoot->getDualGridVisible());
-    }
-    if (evt.key == OIS::KC_H)
-    {
+        break;
+    case SDL_SCANCODE_H:
         if (mHideAll)
         {
             mTrayMgr->showAll();
@@ -130,6 +128,9 @@ bool Sample_VolumeTerrain::keyPressed(const OIS::KeyEvent& evt)
             mTrayMgr->hideAll();
         }
         mHideAll = !mHideAll;
+        break;
+    default:
+        break;
     }
     return SdkSample::keyPressed(evt);
 }
@@ -157,63 +158,57 @@ void Sample_VolumeTerrain::shootRay(Ray ray, bool doUnion)
 
 //-----------------------------------------------------------------------
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-bool Sample_VolumeTerrain::pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::touchPressed(const TouchFingerEvent& evt)
 {
-    Real x = (Real)evt.state.X.abs / (Real)evt.state.width;
-    Real y = (Real)evt.state.Y.abs / (Real)evt.state.height;
-    Ray ray = mCamera->getCameraToViewportRay(x, y);
+    Ray ray = mCamera->getCameraToViewportRay(evt.x, evt.y);
     shootRay(ray, true);
 
-    return SdkSample::pointerPressed(evt, id);
+    return SdkSample::touchPressed(evt);
 }
-
-#else
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::mousePressed(const MouseButtonEvent& evt)
 {
     if (mMouseState == 0)
     {
-        if (id == OIS::MB_Middle)
+        if (evt.button == BUTTON_MIDDLE)
         {
             mMouseState = 1;
             mMouseCountdown = MOUSE_MODIFIER_TIME_LIMIT;
         }
-        if (id == OIS::MB_Right)
+        if (evt.button == BUTTON_RIGHT)
         {
             mMouseState = 2;
             mMouseCountdown = MOUSE_MODIFIER_TIME_LIMIT;
         }
     }
 
-    return SdkSample::pointerPressed(evt, id);
+    return SdkSample::mousePressed(evt);
 }
-#endif
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+bool Sample_VolumeTerrain::mouseReleased(const MouseButtonEvent& evt)
 {
-    
-    if (id == OIS::MB_Middle || id == OIS::MB_Right)
+    if (evt.button == BUTTON_MIDDLE || evt.button == BUTTON_RIGHT)
     {
         mMouseState = 0;
     }
 
-    return SdkSample::pointerReleased(evt, id);
+    return SdkSample::mouseReleased(evt);
 }
 
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeTerrain::pointerMoved(const OIS::PointerEvent& evt)
+bool Sample_VolumeTerrain::mouseMoved(const MouseMotionEvent& evt)
 {
-    mMouseX = (Real)evt.state.X.abs / (Real)evt.state.width;
-    mMouseY = (Real)evt.state.Y.abs / (Real)evt.state.height;
-    return SdkSample::pointerMoved(evt);
+    int width = mWindow->getWidth(), height = mWindow->getHeight();
+    
+    mMouseX = (Real)evt.x / (Real)width;
+    mMouseY = (Real)evt.y / (Real)height;
+    return SdkSample::mouseMoved(evt);
 }
-
 
 //-----------------------------------------------------------------------
 

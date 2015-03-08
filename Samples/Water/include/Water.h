@@ -552,6 +552,17 @@ protected:
     
 public:
     
+    bool keyPressed(const KeyboardEvent& evt)
+    {
+        static bool rain = false;
+
+        if(evt.keysym.scancode == SDL_SCANCODE_SPACE) {
+            rain = !rain;
+            particleEmitter->setEmissionRate(rain ? 20.0f : 0.0f);
+        }
+
+        return SdkSample::keyPressed(evt);
+    }
     
     bool frameRenderingQueued(const FrameEvent& evt)
     {
@@ -562,12 +573,7 @@ public:
         
         // rain
         processCircles(evt.timeSinceLastFrame);
-        if(mInputContext.mKeyboard)
-        {
-            particleEmitter->setEmissionRate(mInputContext.mKeyboard->isKeyDown(OIS::KC_SPACE) ? 20.0f : 0.0f);
-        }
         processParticles();
-        
         
         timeoutDelay-=evt.timeSinceLastFrame ;
         if (timeoutDelay<=0)

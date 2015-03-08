@@ -63,16 +63,16 @@ public:
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
     }
 
-    bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+    bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerDown(evt, id)) return true;
+        if (mTrayMgr->injectMouseDown(evt)) return true;
         mWiping = true;  // wipe frost if user left clicks in the scene
         return true;
     }
     
-    bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+    bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerUp(evt, id)) return true;
+        if (mTrayMgr->injectMouseUp(evt)) return true;
         mWiping = false;  // stop wiping frost if user releases LMB
         return true;
     }
