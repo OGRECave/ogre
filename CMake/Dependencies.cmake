@@ -245,17 +245,9 @@ endif()
 # Samples dependencies
 #######################################################################
 
-# Find OIS
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-	# for WinRT we need only includes
-	set(OIS_FIND_QUIETLY TRUE)
-        find_package(OIS)
-	set(OIS_INCLUDE_DIRS ${OIS_INCLUDE_DIR})
-	macro_log_feature(OIS_INCLUDE_DIRS "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
-else ()
-	find_package(OIS)
-	macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
-endif ()
+# Find sdl2
+find_package(SDL2)
+macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for the samples" "https://www.libsdl.org/" FALSE "" "")
 
 #######################################################################
 # Tools
@@ -303,7 +295,6 @@ include_directories(
   ${OPENGLES_INCLUDE_DIRS}
   ${OPENGLES2_INCLUDE_DIRS}
   ${OPENGLES3_INCLUDE_DIRS}
-  ${OIS_INCLUDE_DIRS}
   ${Cg_INCLUDE_DIRS}
   ${X11_INCLUDE_DIR}
   ${DirectX_INCLUDE_DIRS}

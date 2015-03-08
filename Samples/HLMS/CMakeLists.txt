@@ -7,7 +7,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 ogre_add_library_to_folder(Samples Sample_HLMS ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_HLMS ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_DEPENDENCIES})
+target_link_libraries(Sample_HLMS ${OGRE_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_DEPENDENCIES})
 ogre_config_sample_lib(Sample_HLMS)
 
 if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
@@ -17,4 +17,3 @@ if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
        INSTALL_NAME_DIR "@executable_path/../Plugins"
     )
 endif()
-

@@ -52,7 +52,7 @@ ogre_add_component_include_dir(Overlay)
 ogre_add_component_include_dir(Volume)
 
 ogre_add_executable(TestContext ${HEADER_FILES} ${SOURCE_FILES})
-target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem)
+target_link_libraries(TestContext ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES} OgreOverlay OgreRTShaderSystem)
 ogre_config_common(TestContext)
 
 # Make sure all plugins are built
