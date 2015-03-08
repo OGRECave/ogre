@@ -18,6 +18,7 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
+	${OGRE_SOURCE_DIR}/Samples/Common/include/Input.h
 )
 
 if (WINDOWS_STORE OR WINDOWS_PHONE)

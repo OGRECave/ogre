@@ -35,6 +35,10 @@
 #include "OgreFrameListener.h"
 #include "OgreOverlaySystem.h"
 
+#ifdef HAVE_SDL
+#include <SDL_video.h>
+#endif
+
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
 #ifdef OGRE_STATIC_LIB
@@ -96,7 +100,7 @@
 
 #include "Sample.h"
 
-#include "OIS.h"
+#include "Input.h"
 
 namespace OgreBites
 {
@@ -107,12 +111,7 @@ namespace OgreBites
     =============================================================================*/
     class SampleContext :
         public Ogre::FrameListener,
-        public Ogre::WindowEventListener,
-        public OIS::KeyListener,
-        public OIS::MouseListener
-#if OIS_WITH_MULTITOUCH
-        ,public OIS::MultiTouchListener  // note: we will send events either to MouseListener or to MultiTouchListener, depending on platform
-#endif
+        public Ogre::WindowEventListener
     {
     public:
 
@@ -124,13 +123,15 @@ namespace OgreBites
             mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
             mRoot = 0;
             mWindow = 0;
+#ifdef HAVE_SDL
+            mSDLWindow = NULL;
+#endif
             mCurrentSample = 0;
             mOverlaySystem = 0;
             mSamplePaused = false;
             mFirstRun = true;
             mLastRun = false;
             mLastSample = 0;
-            mInputMgr = 0;
         }
 
         virtual ~SampleContext() 
@@ -205,7 +206,7 @@ namespace OgreBites
                 // test system capabilities against sample requirements
                 s->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
 
-                s->_setup(mWindow, mInputContext, mFSLayer, mOverlaySystem);   // start new sample
+                s->_setup(mWindow, mFSLayer, mOverlaySystem);   // start new sample
             }
 #if OGRE_PROFILING
             if (prof)
@@ -289,6 +290,7 @@ namespace OgreBites
                 OGRE_DELETE mOverlaySystem;
                 OGRE_DELETE mRoot;
             }
+
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader.unload();
 #endif
@@ -296,6 +298,11 @@ namespace OgreBites
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
             if (mTaskScheduler.is_active())
                 mTaskScheduler.terminate();
+#endif
+
+#ifdef HAVE_SDL
+            SDL_DestroyWindow(mSDLWindow);
+            mSDLWindow = 0;
 #endif
         }
 
@@ -410,15 +417,6 @@ namespace OgreBites
         {
             // manually call sample callback to ensure correct order
             if (mCurrentSample && !mSamplePaused) mCurrentSample->windowResized(rw);
-
-            if(mInputContext.mMouse)
-            {
-                // as OIS work in windowing system units we need to convert pixels to them
-                const OIS::MouseState& ms = mInputContext.mMouse->getMouseState();
-                float scale = rw->getViewPointToPixelScale();
-                ms.width = (int)(rw->getWidth() / scale);
-                ms.height = (int)(rw->getHeight() / scale);
-            }
         }
 
         // window event callbacks which manually call their respective sample callbacks to ensure correct order
@@ -446,20 +444,21 @@ namespace OgreBites
 
         // keyboard and mouse callbacks which manually call their respective sample callbacks to ensure correct order
 
-        virtual bool keyPressed(const OIS::KeyEvent& evt)
+        virtual bool keyPressed(const KeyboardEvent& evt)
         {
             if (mCurrentSample && !mSamplePaused) return mCurrentSample->keyPressed(evt);
             return true;
         }
 
-        virtual bool keyReleased(const OIS::KeyEvent& evt)
+        virtual bool keyReleased(const KeyboardEvent& evt)
         {
             if (mCurrentSample && !mSamplePaused) return mCurrentSample->keyReleased(evt);
             return true;
         }
 
-        void transformInputState(OIS::PointerState &state)
+        void transformInputState(TouchFingerEvent &state)
         {
+#if 0
             int w = mWindow->getViewport(0)->getActualWidth();
             int h = mWindow->getViewport(0)->getActualHeight();
             int absX = state.X.abs;
@@ -528,39 +527,70 @@ namespace OgreBites
                 state.height = w;
                 break;
             }
-        }
-
-        // don`t override this functions, override pointerXxx analogs below
-        virtual bool mouseMoved(const OIS::MouseEvent& evt)                           { return pointerMoved(evt); }
-        virtual bool mousePressed(const OIS::MouseEvent& evt, OIS::MouseButtonID id)  { return pointerPressed(evt, id); }
-        virtual bool mouseReleased(const OIS::MouseEvent& evt, OIS::MouseButtonID id) { return pointerReleased(evt, id); }
-#if OIS_WITH_MULTITOUCH
-        virtual bool touchMoved(const OIS::MultiTouchEvent& evt)                      { return pointerMoved(evt); }
-        virtual bool touchPressed(const OIS::MultiTouchEvent& evt)                    { return pointerPressed(evt, OIS::MB_Left); }
-        virtual bool touchReleased(const OIS::MultiTouchEvent& evt)                   { return pointerReleased(evt, OIS::MB_Left); }
-        virtual bool touchCancelled(const OIS::MultiTouchEvent &evt)                  { return pointerCancelled(evt); }
 #endif
+        }
 
-        virtual bool pointerMoved(const OIS::PointerEvent& evt)
+        virtual bool touchMoved(const TouchFingerEvent& evt)
         {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->pointerMoved(evt);
+            if (mCurrentSample && !mSamplePaused)
+                return mCurrentSample->touchMoved(evt);
             return true;
         }
 
-        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        virtual bool mouseMoved(const MouseMotionEvent& evt)
         {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->pointerPressed(evt, id);
+            // Miniscule mouse movements are still considered hovering.
+            // if (evt.xrel > 100000 || evt.yrel > 100000)
+            // {
+            //     mTimeSinceMouseMoved = 0;
+            // }
+
+            if (mCurrentSample && !mSamplePaused)
+                return mCurrentSample->mouseMoved(evt);
             return true;
         }
 
-        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        virtual bool touchPressed(const TouchFingerEvent& evt)
         {
-            if (mCurrentSample && !mSamplePaused) return mCurrentSample->pointerReleased(evt, id);
+            if (mCurrentSample && !mSamplePaused)
+                return mCurrentSample->touchPressed(evt);
             return true;
         }
 
-        virtual bool pointerCancelled(const OIS::PointerEvent& evt)
+        virtual bool mousePressed(const MouseButtonEvent& evt)
         {
+            if (mCurrentSample && !mSamplePaused)
+                return mCurrentSample->mousePressed(evt);
+            return true;
+        }
+
+        virtual bool touchReleased(const TouchFingerEvent& evt)
+        {
+            if (mCurrentSample && !mSamplePaused)
+                return mCurrentSample->touchReleased(evt);
+            return true;
+        }
+
+        virtual bool mouseReleased(const MouseButtonEvent& evt)
+        {
+            if (mCurrentSample && !mSamplePaused)
+                return mCurrentSample->mouseReleased(evt);
+            return true;
+        }
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+        //FIXME: Handle mouse wheel wheel events on mobile devices.
+        // virtual bool touchReleased(const SDL_TouchFingerEvent& evt)
+        // {
+        //     if (mCurrentSample && !mSamplePaused)
+        //         return mCurrentSample->touchReleased(evt);
+        //     return true;
+        // }
+#endif
+        virtual bool mouseWheelRolled(const MouseWheelEvent& evt)
+        {
+            if (mCurrentSample && !mSamplePaused)
+                return mCurrentSample->mouseWheelRolled(evt);
             return true;
         }
 
@@ -575,6 +605,11 @@ namespace OgreBites
          -----------------------------------------------------------------------------*/
         virtual void setup()
         {
+#ifdef HAVE_SDL
+            SDL_Init(0);
+            SDL_InitSubSystem(SDL_INIT_VIDEO);
+#endif
+
             mWindow = createWindow();
             setupInput();
             locateResources();
@@ -625,79 +660,39 @@ namespace OgreBites
             // return mRoot->restoreConfig();
         }
 
-        /*-----------------------------------------------------------------------------
-        | Creates the render window to be used for this context. I use an auto-created
-        | window here, but you can also create an external window if you wish.
-        | Just don't forget to initialise the root.
-        -----------------------------------------------------------------------------*/
+        /**
+         * Create the render window to be used for this context here.
+         * You must use SDL and not an auto-created window as SDL does not get the events
+         * otherwise.
+         */
         virtual Ogre::RenderWindow* createWindow()
         {
-            return mRoot->initialise(true);
+            return NULL;
         }
 
         /*-----------------------------------------------------------------------------
-        | Sets up OIS input.
+        | Sets up SDL input.
         -----------------------------------------------------------------------------*/
         virtual void setupInput(bool nograb = false)
         {
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-            OIS::ParamList pl;
-            size_t winHandle = 0;
-            std::ostringstream winHandleStr;
-
-            mWindow->getCustomAttribute("WINDOW", &winHandle);
-            winHandleStr << winHandle;
-
-            pl.insert(std::make_pair("WINDOW", winHandleStr.str()));
-            if (nograb)
+#ifdef HAVE_SDL
+            if (SDL_InitSubSystem(SDL_INIT_EVENTS) != 0)
             {
-                pl.insert(std::make_pair("x11_keyboard_grab", "false"));
-                pl.insert(std::make_pair("x11_mouse_grab", "false"));
-                pl.insert(std::make_pair("w32_mouse", "DISCL_FOREGROUND"));
-                pl.insert(std::make_pair("w32_mouse", "DISCL_NONEXCLUSIVE"));
-                pl.insert(std::make_pair("w32_keyboard", "DISCL_FOREGROUND"));
-                pl.insert(std::make_pair("w32_keyboard", "DISCL_NONEXCLUSIVE"));
+                OGRE_EXCEPT(Ogre::Exception::ERR_INVALID_STATE,
+                            Ogre::String("Could not initialize SDL2 input: ")
+                            + SDL_GetError(),
+                            "SampleContext::setupInput");
             }
+            
+            SDL_ShowCursor(SDL_FALSE);
+            
+            SDL_bool grab = SDL_bool(!nograb);
 
-            mInputMgr = OIS::InputManager::createInputSystem(pl);
-
-            createInputDevices();      // create the specific input devices
-#endif
-
-            // attach input devices
-            windowResized(mWindow);    // do an initial adjustment of mouse area
-#if (OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS) && (OGRE_PLATFORM != OGRE_PLATFORM_ANDROID)
-            if(mInputContext.mKeyboard)
-                mInputContext.mKeyboard->setEventCallback(this);
-            if(mInputContext.mMouse)
-                mInputContext.mMouse->setEventCallback(this);
-#else
-            if(mInputContext.mMultiTouch)
-                mInputContext.mMultiTouch->setEventCallback(this);
+            SDL_SetWindowGrab(mSDLWindow, grab);
+            SDL_SetRelativeMouseMode(grab);
 #endif
         }
 
-        /*-----------------------------------------------------------------------------
-        | Creates the individual input devices. I only create a keyboard and mouse
-        | here because they are the most common, but you can override this method
-        | for other modes and devices.
-        -----------------------------------------------------------------------------*/
-        virtual void createInputDevices()
-        {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-            mInputContext.mMultiTouch = static_cast<OIS::MultiTouch*>(mInputMgr->createInputObject(OIS::OISMultiTouch, true));
-            mInputContext.mAccelerometer = static_cast<OIS::JoyStick*>(mInputMgr->createInputObject(OIS::OISJoyStick, true));
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            // nothing to do
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            // mInputMgr is NULL and input devices are already passed to us, therefore nothing to do
-            assert(mInputContext.mKeyboard);
-            assert(mInputContext.mMouse);
-#else
-            mInputContext.mKeyboard = static_cast<OIS::Keyboard*>(mInputMgr->createInputObject(OIS::OISKeyboard, true));
-            mInputContext.mMouse = static_cast<OIS::Mouse*>(mInputMgr->createInputObject(OIS::OISMouse, true));
-#endif
-        }
 
         /*-----------------------------------------------------------------------------
         | Finds context-wide resource groups. I load paths from a config file here,
@@ -901,44 +896,9 @@ namespace OgreBites
             // remove window event listener before shutting down OIS
             Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
 
-            shutdownInput();
-        }
-
-        /*-----------------------------------------------------------------------------
-        | Destroys OIS input devices and the input manager.
-        -----------------------------------------------------------------------------*/
-        virtual void shutdownInput()
-        {
-            // detach input devices
-            windowResized(mWindow);    // do an initial adjustment of mouse area
-            if(mInputContext.mKeyboard)
-                mInputContext.mKeyboard->setEventCallback(NULL);
-            if(mInputContext.mMouse)
-                mInputContext.mMouse->setEventCallback(NULL);
-#if OIS_WITH_MULTITOUCH
-            if(mInputContext.mMultiTouch)
-                mInputContext.mMultiTouch->setEventCallback(NULL);
-#endif
-            if(mInputContext.mAccelerometer)
-                mInputContext.mAccelerometer->setEventCallback(NULL);
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-            if (mInputMgr)
-            {
-                if(mInputContext.mKeyboard)
-                    mInputMgr->destroyInputObject(mInputContext.mKeyboard);
-                if(mInputContext.mMouse)
-                    mInputMgr->destroyInputObject(mInputContext.mMouse);
-#if OIS_WITH_MULTITOUCH
-                if(mInputContext.mMultiTouch)
-                    mInputMgr->destroyInputObject(mInputContext.mMultiTouch);
-#endif
-                if(mInputContext.mAccelerometer)
-                    mInputMgr->destroyInputObject(mInputContext.mAccelerometer);
-
-                OIS::InputManager::destroyInputSystem(mInputMgr);
-                mInputMgr = 0;
-            }
+#ifdef HAVE_SDL
+            SDL_QuitSubSystem(SDL_INIT_EVENTS);
+            SDL_QuitSubSystem(SDL_INIT_VIDEO);
 #endif
         }
 
@@ -947,7 +907,53 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual void captureInputDevices()
         {
-            mInputContext.capture();
+#ifdef HAVE_SDL
+            SDL_Event event;
+            while (SDL_PollEvent(&event))
+            {
+                switch (event.type)
+                {
+                case SDL_QUIT:
+                    mRoot->queueEndRendering();
+                    break;
+                case SDL_WINDOWEVENT:
+                    if(event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                        mWindow->resize(event.window.data1, event.window.data2);
+                        windowResized(mWindow);
+                    }
+                    break;
+                case SDL_KEYDOWN:
+                    // Ignore repeated signals from key being held down.
+                    if (event.key.repeat) break;
+                    keyPressed(event.key);
+                    break;
+                case SDL_KEYUP:
+                    keyReleased(event.key);
+                    break;
+                case SDL_MOUSEBUTTONDOWN:
+                    mousePressed(event.button);
+                    break;
+                case SDL_MOUSEBUTTONUP:
+                    mouseReleased(event.button);
+                    break;
+                case SDL_MOUSEWHEEL:
+                    mouseWheelRolled(event.wheel);
+                    break;
+                case SDL_MOUSEMOTION:
+                    mouseMoved(event.motion);
+                    break;
+                case SDL_FINGERDOWN:
+                    touchPressed(event.tfinger);
+                    break;
+                case SDL_FINGERUP:
+                    touchReleased(event.tfinger);
+                    break;
+                case SDL_FINGERMOTION:
+                    touchMoved(event.tfinger);
+                    break;
+                }
+        	}
+#endif
         }
         
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
@@ -975,8 +981,6 @@ namespace OgreBites
 
         Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
         Ogre::Root* mRoot;              // OGRE root
-        OIS::InputManager* mInputMgr;   // OIS input manager
-        InputContext mInputContext;     // all OIS devices are here
         Ogre::OverlaySystem* mOverlaySystem;  // Overlay system
 #ifdef OGRE_STATIC_LIB
         Ogre::StaticPluginLoader mStaticPluginLoader;
@@ -988,6 +992,9 @@ namespace OgreBites
         Ogre::String mNextRenderer;     // name of renderer used for next run
         Sample* mLastSample;            // last sample run before reconfiguration
         Ogre::NameValuePairList mLastSampleState;     // state of last sample
+#ifdef HAVE_SDL
+        SDL_Window* mSDLWindow;
+#endif
     public:
         Ogre::RenderWindow* mWindow;    // render window
     };

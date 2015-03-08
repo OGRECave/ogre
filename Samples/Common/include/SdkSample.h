@@ -132,9 +132,11 @@ namespace OgreBites
             mCamera->setAspectRatio((Ogre::Real)mViewport->getActualWidth() / (Ogre::Real)mViewport->getActualHeight());
         }
 
-        virtual bool keyPressed(const OIS::KeyEvent& evt)
+        virtual bool keyPressed(const KeyboardEvent& evt)
         {
-            if (evt.key == OIS::KC_H || evt.key == OIS::KC_F1)   // toggle visibility of help dialog
+        	Keycode key = evt.keysym.scancode;
+        	
+            if (key == SDL_SCANCODE_H || key == SDL_SCANCODE_F1)   // toggle visibility of help dialog
             {
                 if (!mTrayMgr->isDialogVisible() && mInfo["Help"] != "") mTrayMgr->showOkDialog("Help", mInfo["Help"]);
                 else mTrayMgr->closeDialog();
@@ -142,11 +144,11 @@ namespace OgreBites
 
             if (mTrayMgr->isDialogVisible()) return true;   // don't process any more keys if dialog is up
 
-            if (evt.key == OIS::KC_F)   // toggle visibility of advanced frame stats
+            if (key == SDL_SCANCODE_F)   // toggle visibility of advanced frame stats
             {
                 mTrayMgr->toggleAdvancedFrameStats();
             }
-            else if (evt.key == OIS::KC_G)   // toggle visibility of even rarer debugging details
+            else if (key == SDL_SCANCODE_G)   // toggle visibility of even rarer debugging details
             {
                 if (mDetailsPanel->getTrayLocation() == TL_NONE)
                 {
@@ -159,7 +161,7 @@ namespace OgreBites
                     mDetailsPanel->hide();
                 }
             }
-            else if (evt.key == OIS::KC_T)   // cycle texture filtering mode
+            else if (key == SDL_SCANCODE_T)   // cycle texture filtering mode
             {
                 Ogre::String newVal;
                 Ogre::TextureFilterOptions tfo;
@@ -192,7 +194,7 @@ namespace OgreBites
                 Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
                 mDetailsPanel->setParamValue(9, newVal);
             }
-            else if (evt.key == OIS::KC_R)   // cycle polygon rendering mode
+            else if (key == SDL_SCANCODE_R)   // cycle polygon rendering mode
             {
                 Ogre::String newVal;
                 Ogre::PolygonMode pm;
@@ -215,18 +217,18 @@ namespace OgreBites
                 mCamera->setPolygonMode(pm);
                 mDetailsPanel->setParamValue(10, newVal);
             }
-            else if(evt.key == OIS::KC_F5)   // refresh all textures
+            else if(key == SDL_SCANCODE_F5)   // refresh all textures
             {
                 Ogre::TextureManager::getSingleton().reloadAll();
             }
-            else if (evt.key == OIS::KC_F6)   // take a screenshot
+            else if (key == SDL_SCANCODE_F6)   // take a screenshot
             {
                 mWindow->writeContentsToTimestampedFile("screenshot", ".png");
             }
 
 #ifdef INCLUDE_RTSHADER_SYSTEM      
             // Toggle schemes.          
-            else if (evt.key == OIS::KC_F2)
+            else if (key == SDL_SCANCODE_F2)
             {   
                 if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
                 {
@@ -246,7 +248,7 @@ namespace OgreBites
                 }
             }           
             // Toggles per pixel per light model.
-            else if (evt.key == OIS::KC_F3)
+            else if (key == SDL_SCANCODE_F3)
             {
                 static bool usePerPixelLighting = true;                 
                                                 
@@ -296,7 +298,7 @@ namespace OgreBites
             }   
 
             // Switch vertex shader outputs compaction policy.
-            else if (evt.key == OIS::KC_F4)   
+            else if (key == SDL_SCANCODE_F4)
             {
                 switch (mShaderGenerator->getVertexShaderOutputsCompactPolicy())
                 {
@@ -323,7 +325,7 @@ namespace OgreBites
 
 #if OGRE_PROFILING
             // Toggle visibility of profiler window
-            else if (evt.key == OIS::KC_P)
+            else if (key == SDL_SCANCODE_P)
             {
                 Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
                 if (prof)
@@ -335,7 +337,7 @@ namespace OgreBites
             return true;
         }
 
-        virtual bool keyReleased(const OIS::KeyEvent& evt)
+        virtual bool keyReleased(const KeyboardEvent& evt)
         {
             mCameraMan->injectKeyUp(evt);
 
@@ -345,55 +347,79 @@ namespace OgreBites
         /* IMPORTANT: When overriding these following handlers, remember to allow the tray manager
         to filter out any interface-related mouse events before processing them in your scene.
         If the tray manager handler returns true, the event was meant for the trays, not you. */
-
-        virtual bool pointerMoved(const OIS::PointerEvent& evt)
+        virtual bool mouseMoved(const MouseMotionEvent& evt)
         {
-            if (mTrayMgr->injectPointerMove(evt)) return true;
+            if (mTrayMgr->injectMouseMove(evt)) return true;
 
-            mCameraMan->injectPointerMove(evt);
-
+            mCameraMan->injectMouseMove(evt);
             return true;
         }
 
-        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        // convert and redirect
+        virtual bool touchMoved(const TouchFingerEvent& evt) {
+            MouseMotionEvent e;
+            e.xrel = evt.dx * mWindow->getWidth();
+            e.yrel = evt.dy * mWindow->getHeight();
+            return mouseMoved(e);
+        }
+
+        virtual bool mousePressed(const MouseButtonEvent& evt)
         {
-            if (mTrayMgr->injectPointerDown(evt, id)) return true;
-            
-            if (mDragLook && id == OIS::MB_Left)
+            if (mTrayMgr->injectMouseDown(evt)) return true;
+
+            if (mDragLook && evt.button == BUTTON_LEFT)
             {
                 mCameraMan->setStyle(CS_FREELOOK);
                 mTrayMgr->hideCursor();
             }
 
-            mCameraMan->injectPointerDown(evt, id);
-
+            mCameraMan->injectMouseDown(evt);
             return true;
         }
 
-        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        // convert and redirect
+        virtual bool touchPressed(const TouchFingerEvent& evt) {
+            MouseButtonEvent e;
+            e.button = BUTTON_LEFT;
+            return mousePressed(e);
+        }
+
+        virtual bool mouseReleased(const MouseButtonEvent& evt)
         {
-            if (mTrayMgr->injectPointerUp(evt, id)) return true;
-            
-            if (mDragLook && id == OIS::MB_Left)
+            if (mTrayMgr->injectMouseUp(evt)) return true;
+
+            if (mDragLook && evt.button == BUTTON_LEFT)
             {
                 mCameraMan->setStyle(CS_MANUAL);
                 mTrayMgr->showCursor();
             }
 
-            mCameraMan->injectPointerUp(evt, id);
+            mCameraMan->injectMouseUp(evt);
+            return true;
+        }
 
+        // convert and redirect
+        virtual bool touchReleased(const TouchFingerEvent& evt) {
+            MouseButtonEvent e;
+            e.button = BUTTON_LEFT;
+            return mouseReleased(e);
+        }
+
+        virtual bool mouseWheelRolled(const MouseWheelEvent& evt) {
+            if (mTrayMgr->injectMouseWheel(evt)) return true;
+
+            mCameraMan->injectMouseWheel(evt);
             return true;
         }
 
         /*-----------------------------------------------------------------------------
         | Extended to setup a default tray interface and camera controller.
         -----------------------------------------------------------------------------*/
-        virtual void _setup(Ogre::RenderWindow* window, InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+        virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
         {
             // assign mRoot here in case Root was initialised after the Sample's constructor ran.
             mRoot = Ogre::Root::getSingletonPtr();
             mWindow = window;
-            mInputContext = inputContext;
             mFSLayer = fsLayer;
             mOverlaySystem = overlaySys;
 
@@ -401,7 +427,7 @@ namespace OgreBites
             createSceneManager();
             setupView();
 
-            mTrayMgr = new SdkTrayManager("SampleControls", window, inputContext, this);  // create a tray interface
+            mTrayMgr = new SdkTrayManager("SampleControls", window, this);  // create a tray interface
 
             loadResources();
             mResourcesLoaded = true;

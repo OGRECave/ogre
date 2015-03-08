@@ -84,7 +84,7 @@ public:
     
     /** Overridden from SdkSample.
     */
-    virtual bool keyPressed(const OIS::KeyEvent& evt);
+    virtual bool keyPressed(const KeyboardEvent& evt);
     
     /** Overridden from SdkSample.
     */

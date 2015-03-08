@@ -81,16 +81,15 @@ public:
             mStatusPanel->setParamValue(mBoneBoundingBoxesItemName, mBoneBoundingBoxes ? "On" : "Off");
         }
     }
-    bool keyPressed(const OIS::KeyEvent& evt)
-    {
-        // unless the help dialog is visible,
+    bool keyPressed(const KeyboardEvent& evt)
+    {   
         if ( !mTrayMgr->isDialogVisible() )
         {
-            // handle keypresses
-            switch (evt.key)
+            // Handle keypresses.
+            switch (evt.keysym.scancode)
             {
-            case OIS::KC_V:
-                // toggle visualise bounding boxes
+            case SDL_SCANCODE_V:
+                // Toggle visualise bounding boxes.
                 switch (mVisualiseBoundingBoxMode)
                 {
                 case kVisualiseNone:
@@ -106,9 +105,9 @@ public:
                 return true;
                 break;
 
-            case OIS::KC_B:
+            case SDL_SCANCODE_B:
                 {
-                    // toggle bone based bounding boxes for all models
+                    // Toggle bone based bounding boxes for all models.
                     enableBoneBoundingBoxMode( ! mBoneBoundingBoxes );
                     return true;
                 }
