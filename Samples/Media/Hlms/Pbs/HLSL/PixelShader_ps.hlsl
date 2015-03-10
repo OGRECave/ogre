@@ -263,7 +263,7 @@ float4 main( PS_INPUT inPs
 	nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 @property( normal_map )
-	nNormal = normalize( mul( TBN, nNormal ) );
+	nNormal = normalize( mul( nNormal, TBN ) );
 @end
 
 	//Everything's in Camera space, we use Cook-Torrance lighting
