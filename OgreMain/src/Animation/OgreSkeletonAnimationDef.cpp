@@ -156,18 +156,18 @@ namespace Ogre
                     {
 						OldNodeAnimationTrack *oldTrack = animation->getOldNodeTrack( boneIdx );
 
-                        v1::TransformKeyFrame originalKF( 0, fTime );
+                        TransformKeyFrame originalKF( 0, fTime );
                         /*oldTrack->getInterpolatedKeyFrame( animation->_getTimeIndex( fTime ),
                                                            &originalKF );*/
                         {
-                            v1::KeyFrame *kBase1, *kBase2;
-                            v1::TransformKeyFrame *k1, *k2;
+                            KeyFrame *kBase1, *kBase2;
+                            TransformKeyFrame *k1, *k2;
                             unsigned short firstKeyIndex;
 
                             Real t = oldTrack->getKeyFramesAtTime( animation->_getTimeIndex( fTime ),
                                                                    &kBase1, &kBase2, &firstKeyIndex);
-                            k1 = static_cast<v1::TransformKeyFrame*>(kBase1);
-                            k2 = static_cast<v1::TransformKeyFrame*>(kBase2);
+                            k1 = static_cast<TransformKeyFrame*>(kBase1);
+                            k2 = static_cast<TransformKeyFrame*>(kBase2);
 
                             if (t == 0.0)
                             {

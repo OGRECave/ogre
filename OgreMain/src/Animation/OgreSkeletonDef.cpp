@@ -98,10 +98,10 @@ namespace Ogre
         mBoneToSlot.reserve( originalSkeleton->getNumBones() );
         for( size_t i=0; i<originalSkeleton->getNumBones(); ++i )
         {
-            const v1::OldBone *bone = originalSkeleton->getBone( i );
+            const OldBone *bone = originalSkeleton->getBone( i );
 
             size_t depthLevel = 0;
-            v1::OldNode const *parentBone = bone;
+            OldNode const *parentBone = bone;
             while( (parentBone = parentBone->getParent()) )
                 ++depthLevel;
 
