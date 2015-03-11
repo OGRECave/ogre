@@ -97,6 +97,63 @@ namespace Ogre {
         virtual T calculate(T sourceValue) = 0;
     };
 
+    template <>
+    float ControllerFunction<float>::getAdjustedInput(float input)
+    {
+        if (mDeltaInput)
+        {
+            mDeltaCount += input;
+            // Wrap to range [0; 1)
+            //  i.e.
+            //      0       => 0
+            //      0.99    => 0.99
+            //      1       => 0
+            //      1.1     => 0.1
+            //     -0.1     => 0.9
+            mDeltaCount = mDeltaCount - floorf( mDeltaCount );
+
+            return mDeltaCount;
+        }
+        else
+        {
+            return input;
+        }
+    }
+
+    template <>
+    double ControllerFunction<double>::getAdjustedInput(double input)
+    {
+        if (mDeltaInput)
+        {
+            mDeltaCount += input;
+            mDeltaCount = mDeltaCount - floor( mDeltaCount );
+
+            return mDeltaCount;
+        }
+        else
+        {
+            return input;
+        }
+    }
+
+    template <>
+    Vector3 ControllerFunction<Vector3>::getAdjustedInput(Vector3 input)
+    {
+        if (mDeltaInput)
+        {
+            mDeltaCount += input;
+            mDeltaCount.x = mDeltaCount.x - Math::Floor( mDeltaCount.x );
+            mDeltaCount.y = mDeltaCount.y - Math::Floor( mDeltaCount.y );
+            mDeltaCount.z = mDeltaCount.z - Math::Floor( mDeltaCount.z );
+
+            return mDeltaCount;
+        }
+        else
+        {
+            return input;
+        }
+    }
+
 
     /** Can either be used as an input or output value.
     */
