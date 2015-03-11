@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __Controller_H__
 
 #include "OgrePrerequisites.h"
+#include "OgreMath.h"
 
 #include "OgreSharedPtr.h"
 
