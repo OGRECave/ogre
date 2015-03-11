@@ -339,7 +339,7 @@ namespace Ogre {
     bool sortVertexElementsBySemantic( const v1::VertexElement &l, const v1::VertexElement &r )
     {
         if( l.getSemantic() == r.getSemantic() )
-            return l.getIndex() < l.getIndex();
+            return l.getIndex() < r.getIndex();
 
         return l.getSemantic() < r.getSemantic();
     }

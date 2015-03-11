@@ -531,7 +531,10 @@ namespace v1 {
     }
     bool sortVertexElementsBySemantic( const VertexElement &l, const VertexElement &r )
     {
-        return l.getSemantic() < r.getSemantic() && l.getIndex() < l.getIndex();
+        if( l.getSemantic() == r.getSemantic() )
+            return l.getIndex() < r.getIndex();
+
+        return l.getSemantic() < r.getSemantic();
     }
 
     char* SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords,
