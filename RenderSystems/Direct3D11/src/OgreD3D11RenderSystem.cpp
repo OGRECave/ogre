@@ -2447,18 +2447,6 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )
     {
-        mBoundVertexProgram     = static_cast<D3D11HLSLProgram*>( hlmsCache->vertexShader.get() );
-        mBoundGeometryProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->geometryShader.get() );
-        mBoundFragmentProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->pixelShader.get() );
-
-        if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
-        {
-            mBoundTessellationHullProgram   = static_cast<D3D11HLSLProgram*>(
-                        hlmsCache->tesselationHullShader.get() );
-            mBoundTessellationDomainProgram = static_cast<D3D11HLSLProgram*>(
-                        hlmsCache->tesselationDomainShader.get() );
-        }
-
         mVertexProgramBound             = false;
         mGeometryProgramBound           = false;
         mFragmentProgramBound           = false;
@@ -2469,8 +2457,11 @@ bail:
 
         //No subroutines for now
 
-        if( mBoundVertexProgram )
+        if( !hlmsCache->vertexShader.isNull() )
         {
+            mBoundVertexProgram = static_cast<D3D11HLSLProgram*>( hlmsCache->vertexShader->
+                                                                  _getBindingDelegate() );
+
             mDevice.GetImmediateContext()->VSSetShader( mBoundVertexProgram->getVertexShader(), 0, 0 );
             if (mDevice.isError())
             {
@@ -2482,8 +2473,10 @@ bail:
             mVertexProgramBound = true;
         }
 
-        if( mBoundGeometryProgram )
+        if( !hlmsCache->geometryShader.isNull() )
         {
+            mBoundGeometryProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->geometryShader->
+                                                                      _getBindingDelegate() );
             mDevice.GetImmediateContext()->GSSetShader( mBoundGeometryProgram->getGeometryShader(),
                                                         0, 0 );
             if (mDevice.isError())
@@ -2499,36 +2492,47 @@ bail:
             mUseAdjacency = mBoundGeometryProgram->isAdjacencyInfoRequired();
         }
 
-        if( mBoundTessellationHullProgram )
+        if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
         {
-            mDevice.GetImmediateContext()->HSSetShader( mBoundTessellationHullProgram->getHullShader(),
-                                                        0, 0 );
-            if (mDevice.isError())
+            if( !hlmsCache->tesselationHullShader.isNull() )
             {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "D3D11 device cannot set hull shader\nError Description: " +
-                             errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
+                mBoundTessellationHullProgram   = static_cast<D3D11HLSLProgram*>(
+                            hlmsCache->tesselationHullShader->_getBindingDelegate() );
+
+                mDevice.GetImmediateContext()->HSSetShader( mBoundTessellationHullProgram->
+                                                            getHullShader(), 0, 0 );
+                if (mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "D3D11 device cannot set hull shader\nError Description: " +
+                                 errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
+                }
+                mTessellationHullProgramBound = true;
             }
-            mTessellationHullProgramBound = true;
+
+            if( !hlmsCache->tesselationDomainShader.isNull() )
+            {
+                mBoundTessellationDomainProgram = static_cast<D3D11HLSLProgram*>(
+                            hlmsCache->tesselationDomainShader->_getBindingDelegate() );
+
+                mDevice.GetImmediateContext()->DSSetShader(
+                            mBoundTessellationDomainProgram->getDomainShader(), 0, 0 );
+                if (mDevice.isError())
+                {
+                    String errorDescription = mDevice.getErrorDescription();
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "D3D11 device cannot set domain shader\nError Description: " +
+                                 errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
+                }
+                mTessellationDomainProgramBound = true;
+            }
         }
 
-        if( mBoundTessellationDomainProgram )
+        if( !hlmsCache->pixelShader.isNull() )
         {
-            mDevice.GetImmediateContext()->DSSetShader(
-                        mBoundTessellationDomainProgram->getDomainShader(), 0, 0 );
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "D3D11 device cannot set domain shader\nError Description: " +
-                             errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
-            }
-            mTessellationDomainProgramBound = true;
-        }
-
-        if( mBoundFragmentProgram )
-        {
+            mBoundFragmentProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->pixelShader->
+                                                                      _getBindingDelegate() );
             mDevice.GetImmediateContext()->PSSetShader( mBoundFragmentProgram->getPixelShader(), 0, 0 );
             if (mDevice.isError())
             {
