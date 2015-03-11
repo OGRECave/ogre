@@ -31,27 +31,6 @@ THE SOFTWARE.
 namespace Ogre 
 {
     //---------------------------------------------------------------------
-    D3D11_TEXTURE_ADDRESS_MODE D3D11Mappings::get(TextureUnitState::TextureAddressingMode tam)
-    {
-        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-        if (rsys->_getFeatureLevel() == D3D_FEATURE_LEVEL_9_1)
-            return D3D11_TEXTURE_ADDRESS_WRAP;
-
-        //return D3D11_TEXTURE_ADDRESS_WRAP;
-        switch( tam )
-        {
-        case TextureUnitState::TAM_WRAP:
-            return D3D11_TEXTURE_ADDRESS_WRAP;
-        case TextureUnitState::TAM_MIRROR:
-            return D3D11_TEXTURE_ADDRESS_MIRROR;
-        case TextureUnitState::TAM_CLAMP:
-            return D3D11_TEXTURE_ADDRESS_CLAMP;
-        case TextureUnitState::TAM_BORDER:
-            return D3D11_TEXTURE_ADDRESS_BORDER;
-        }
-		return D3D11_TEXTURE_ADDRESS_WRAP;
-    }
-    //---------------------------------------------------------------------
     D3D11_TEXTURE_ADDRESS_MODE D3D11Mappings::get(TextureAddressingMode tam)
     {
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
