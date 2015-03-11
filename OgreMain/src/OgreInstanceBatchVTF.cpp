@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreRoot.h"
 #include "OgreDualQuaternion.h"
+#include "OgreHlmsSamplerblock.h"
 
 namespace Ogre
 {
@@ -228,7 +229,11 @@ namespace v1
                     if( texUnit->getName() == "InstancingVTF" )
                     {
                         texUnit->setTextureName( mMatrixTexture->getName(), textureType );
-                        texUnit->setTextureFiltering( TFO_NONE );
+
+                        HlmsSamplerblock samplerblock;
+                        samplerblock.mAllowGlobalDefaults = 0;
+                        samplerblock.setFiltering( TFO_NONE );
+                        texUnit->setSamplerblock( samplerblock );
                         texUnit->setBindingType( TextureUnitState::BT_VERTEX );
                     }
                 }

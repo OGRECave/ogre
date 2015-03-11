@@ -44,7 +44,8 @@ namespace Ogre
         mRsData( 0 ),
         mRefCount( 0 ),
         mId( 0 ),
-        mBlockType( blockType )
+        mBlockType( blockType ),
+        mAllowGlobalDefaults( 1 )
     {
     }
     //-----------------------------------------------------------------------------------

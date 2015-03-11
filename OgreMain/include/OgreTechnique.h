@@ -341,24 +341,15 @@ namespace Ogre {
             const ColourValue& colour = ColourValue::White,
             Real expDensity = 0.001, Real linearStart = 0.0, Real linearEnd = 1.0 );
 
-        /** Set texture filtering for every texture unit in every Pass
+        /** Set samplerblock for every texture unit in every Pass
         @note
             This property actually exists on the TextureUnitState class
             For simplicity, this method allows you to set these properties for 
             every current TeextureUnitState, If you need more precision, retrieve the  
             Pass and TextureUnitState instances and set the property there.
-        @see TextureUnitState::setTextureFiltering
+        @see TextureUnitState::setSamplerblock
         */
-        void setTextureFiltering(TextureFilterOptions filterType);
-        /** Sets the anisotropy level to be used for all textures.
-        @note
-            This property has been moved to the TextureUnitState class, which is accessible via the 
-            Technique and Pass. For simplicity, this method allows you to set these properties for 
-            every current TeextureUnitState, If you need more precision, retrieve the Technique, 
-            Pass and TextureUnitState instances and set the property there.
-        @see TextureUnitState::setTextureAnisotropy
-        */
-        void setTextureAnisotropy(unsigned int maxAniso);
+        void setSamplerblock( const HlmsSamplerblock &samplerblock );
 
         /** Sets the macroblock every pass has with the existing contents of the scene.
         @note

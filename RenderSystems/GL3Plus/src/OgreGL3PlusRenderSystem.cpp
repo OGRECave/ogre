@@ -1056,22 +1056,6 @@ namespace Ogre {
         }
     }
 
-    GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const
-    {
-        switch (tam)
-        {
-        default:
-        case TextureUnitState::TAM_WRAP:
-            return GL_REPEAT;
-        case TextureUnitState::TAM_MIRROR:
-            return GL_MIRRORED_REPEAT;
-        case TextureUnitState::TAM_CLAMP:
-            return GL_CLAMP_TO_EDGE;
-        case TextureUnitState::TAM_BORDER:
-            return GL_CLAMP_TO_BORDER;
-        }
-    }
-
     GLenum GL3PlusRenderSystem::getBlendMode(SceneBlendFactor ogreBlend) const
     {
         switch (ogreBlend)

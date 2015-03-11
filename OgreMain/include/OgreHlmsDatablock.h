@@ -56,6 +56,11 @@ namespace Ogre
         uint16      mId;
         uint8       mBlockType;
 
+        /// When zero, HlmsManager cannot override the block's values with
+        /// enforced global settings. (such as lower quality texture filtering or
+        /// turning off depth checks for debugging)
+        uint8       mAllowGlobalDefaults;
+
         BasicBlock( uint8 blockType );
     };
 

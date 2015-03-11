@@ -3098,6 +3098,9 @@ namespace Ogre{
         if(!obj->name.empty())
             mUnit->setName(obj->name);
 
+        HlmsSamplerblock samplerblock;
+        samplerblock.setAddressinMode( TAM_WRAP );
+
         // Set the properties for the material
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
@@ -3398,8 +3401,6 @@ namespace Ogre{
                             AbstractNodeList::const_iterator i0 = getNodeAt(prop->values, 0),
                                 i1 = getNodeAt(prop->values, 1),
                                 i2 = getNodeAt(prop->values, 2);
-                            TextureUnitState::UVWAddressingMode mode;
-                            mode.u = mode.v = mode.w = TextureUnitState::TAM_WRAP;
 
                             if(i0 != prop->values.end() && (*i0)->type == ANT_ATOM)
                             {
@@ -3407,24 +3408,24 @@ namespace Ogre{
                                 switch(atom->id)
                                 {
                                 case ID_WRAP:
-                                    mode.u = TextureUnitState::TAM_WRAP;
+                                    samplerblock.mU = TAM_WRAP;
                                     break;
                                 case ID_CLAMP:
-                                    mode.u = TextureUnitState::TAM_CLAMP;
+                                    samplerblock.mU = TAM_CLAMP;
                                     break;
                                 case ID_MIRROR:
-                                    mode.u = TextureUnitState::TAM_MIRROR;
+                                    samplerblock.mU = TAM_MIRROR;
                                     break;
                                 case ID_BORDER:
-                                    mode.u = TextureUnitState::TAM_BORDER;
+                                    samplerblock.mU = TAM_BORDER;
                                     break;
                                 default:
                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                        (*i0)->getValue() + " not supported as first argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
                                 }
                             }
-                            mode.v = mode.u;
-                            mode.w = mode.u;
+                            samplerblock.mV = samplerblock.mU;
+                            samplerblock.mW = samplerblock.mU;
 
                             if(i1 != prop->values.end() && (*i1)->type == ANT_ATOM)
                             {
@@ -3432,16 +3433,16 @@ namespace Ogre{
                                 switch(atom->id)
                                 {
                                 case ID_WRAP:
-                                    mode.v = TextureUnitState::TAM_WRAP;
+                                    samplerblock.mV = TAM_WRAP;
                                     break;
                                 case ID_CLAMP:
-                                    mode.v = TextureUnitState::TAM_CLAMP;
+                                    samplerblock.mV = TAM_CLAMP;
                                     break;
                                 case ID_MIRROR:
-                                    mode.v = TextureUnitState::TAM_MIRROR;
+                                    samplerblock.mV = TAM_MIRROR;
                                     break;
                                 case ID_BORDER:
-                                    mode.v = TextureUnitState::TAM_BORDER;
+                                    samplerblock.mV = TAM_BORDER;
                                     break;
                                 default:
                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -3455,24 +3456,22 @@ namespace Ogre{
                                 switch(atom->id)
                                 {
                                 case ID_WRAP:
-                                    mode.w = TextureUnitState::TAM_WRAP;
+                                    samplerblock.mW = TAM_WRAP;
                                     break;
                                 case ID_CLAMP:
-                                    mode.w = TextureUnitState::TAM_CLAMP;
+                                    samplerblock.mW = TAM_CLAMP;
                                     break;
                                 case ID_MIRROR:
-                                    mode.w = TextureUnitState::TAM_MIRROR;
+                                    samplerblock.mW = TAM_MIRROR;
                                     break;
                                 case ID_BORDER:
-                                    mode.w = TextureUnitState::TAM_BORDER;
+                                    samplerblock.mW = TAM_BORDER;
                                     break;
                                 default:
                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                        (*i0)->getValue() + " not supported as third argument (must be \"wrap\", \"clamp\", \"mirror\", or \"border\")");
                                 }
                             }
-
-                            mUnit->setTextureAddressingMode(mode);
                         }
                     }
                     break;
@@ -3483,12 +3482,11 @@ namespace Ogre{
                     }
                     else
                     {
-                        ColourValue val;
-                        if(getColour(prop->values.begin(), prop->values.end(), &val))
-                            mUnit->setTextureBorderColour(val);
-                        else
+                        if(!getColour(prop->values.begin(), prop->values.end(), &samplerblock.mBorderColour))
+                        {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                "tex_border_colour only accepts a colour argument");
+                        }
                     }
                     break;
                 case ID_FILTERING:
@@ -3504,16 +3502,16 @@ namespace Ogre{
                             switch(atom->id)
                             {
                             case ID_NONE:
-                                mUnit->setTextureFiltering(TFO_NONE);
+                                samplerblock.setFiltering(TFO_NONE);
                                 break;
                             case ID_BILINEAR:
-                                mUnit->setTextureFiltering(TFO_BILINEAR);
+                                samplerblock.setFiltering(TFO_BILINEAR);
                                 break;
                             case ID_TRILINEAR:
-                                mUnit->setTextureFiltering(TFO_TRILINEAR);
+                                samplerblock.setFiltering(TFO_TRILINEAR);
                                 break;
                             case ID_ANISOTROPIC:
-                                mUnit->setTextureFiltering(TFO_ANISOTROPIC);
+                                samplerblock.setFiltering(TFO_ANISOTROPIC);
                                 break;
                             default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -3538,20 +3536,19 @@ namespace Ogre{
                             AtomAbstractNode *atom0 = (AtomAbstractNode*)(*i0).get(),
                                 *atom1 = (AtomAbstractNode*)(*i1).get(),
                                 *atom2 = (AtomAbstractNode*)(*i2).get();
-                            FilterOptions tmin = FO_NONE, tmax = FO_NONE, tmip = FO_NONE;
                             switch(atom0->id)
                             {
                             case ID_NONE:
-                                tmin = FO_NONE;
+                                samplerblock.mMinFilter = FO_NONE;
                                 break;
                             case ID_POINT:
-                                tmin = FO_POINT;
+                                samplerblock.mMinFilter = FO_POINT;
                                 break;
                             case ID_LINEAR:
-                                tmin = FO_LINEAR;
+                                samplerblock.mMinFilter = FO_LINEAR;
                                 break;
                             case ID_ANISOTROPIC:
-                                tmin = FO_ANISOTROPIC;
+                                samplerblock.mMinFilter = FO_ANISOTROPIC;
                                 break;
                             default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -3561,16 +3558,16 @@ namespace Ogre{
                             switch(atom1->id)
                             {
                             case ID_NONE:
-                                tmax = FO_NONE;
+                                samplerblock.mMagFilter = FO_NONE;
                                 break;
                             case ID_POINT:
-                                tmax = FO_POINT;
+                                samplerblock.mMagFilter = FO_POINT;
                                 break;
                             case ID_LINEAR:
-                                tmax = FO_LINEAR;
+                                samplerblock.mMagFilter = FO_LINEAR;
                                 break;
                             case ID_ANISOTROPIC:
-                                tmax = FO_ANISOTROPIC;
+                                samplerblock.mMagFilter = FO_ANISOTROPIC;
                                 break;
                             default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
@@ -3580,23 +3577,21 @@ namespace Ogre{
                             switch(atom2->id)
                             {
                             case ID_NONE:
-                                tmip = FO_NONE;
+                                samplerblock.mMipFilter = FO_NONE;
                                 break;
                             case ID_POINT:
-                                tmip = FO_POINT;
+                                samplerblock.mMipFilter = FO_POINT;
                                 break;
                             case ID_LINEAR:
-                                tmip = FO_LINEAR;
+                                samplerblock.mMipFilter = FO_LINEAR;
                                 break;
                             case ID_ANISOTROPIC:
-                                tmip = FO_ANISOTROPIC;
+                                samplerblock.mMipFilter = FO_ANISOTROPIC;
                                 break;
                             default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                    (*i0)->getValue() + " not supported as third argument (must be \"none\", \"point\", \"linear\", or \"anisotropic\")");
                             }
-
-                            mUnit->setTextureFiltering(tmin, tmax, tmip);
                         }
                         else
                         {
@@ -3607,38 +3602,6 @@ namespace Ogre{
                     {
                         compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
                                            "filtering must have either 1 or 3 arguments");
-                    }
-                    break;
-                case ID_CMPTEST:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
-                    }
-                    else if(prop->values.size() > 1)
-                    {
-                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                                           "compare_test must have at most 1 argument");
-                    }
-                    else
-                    {
-                        if(prop->values.front()->type == ANT_ATOM)
-                        {
-                            AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                            bool enabled = false;
-                            switch(atom->id)
-                            {
-                            case ScriptCompiler::ID_ON:
-                                enabled=true;
-                                break;
-                            case ScriptCompiler::ID_OFF:
-                                enabled=false;
-                                break;
-                            default:
-                                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                   prop->values.front()->getValue() + " is not a valid parameter");
-                            }
-                            mUnit->setTextureCompareEnabled(enabled);
-                        }
                     }
                     break;
                 case ID_CMPFUNC:
@@ -3656,39 +3619,36 @@ namespace Ogre{
                         if(prop->values.front()->type == ANT_ATOM)
                         {
                             AtomAbstractNode *atom = (AtomAbstractNode*)prop->values.front().get();
-                            CompareFunction func = CMPF_GREATER_EQUAL;
                             switch(atom->id)
                             {
                             case ID_ALWAYS_FAIL:
-                                func = CMPF_ALWAYS_FAIL;
+                                samplerblock.mCompareFunction = CMPF_ALWAYS_FAIL;
                                 break;
                             case ID_ALWAYS_PASS:
-                                func = CMPF_ALWAYS_PASS;
+                                samplerblock.mCompareFunction = CMPF_ALWAYS_PASS;
                                 break;
                             case ID_LESS:
-                                func = CMPF_LESS;
+                                samplerblock.mCompareFunction = CMPF_LESS;
                                 break;
                             case ID_LESS_EQUAL:
-                                func = CMPF_LESS_EQUAL;
+                                samplerblock.mCompareFunction = CMPF_LESS_EQUAL;
                                 break;
                             case ID_EQUAL:
-                                func = CMPF_EQUAL;
+                                samplerblock.mCompareFunction = CMPF_EQUAL;
                                 break;
                             case ID_NOT_EQUAL:
-                                func = CMPF_NOT_EQUAL;
+                                samplerblock.mCompareFunction = CMPF_NOT_EQUAL;
                                 break;
                             case ID_GREATER_EQUAL:
-                                func = CMPF_GREATER_EQUAL;
+                                samplerblock.mCompareFunction = CMPF_GREATER_EQUAL;
                                 break;
                             case ID_GREATER:
-                                func = CMPF_GREATER;
+                                samplerblock.mCompareFunction = CMPF_GREATER;
                                 break;
                             default:
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                    prop->values.front()->getValue() + "is not a valid parameter");
                             }
-
-                            mUnit->setTextureCompareFunction(func);
                         }
                     }
                     break;
@@ -3704,12 +3664,11 @@ namespace Ogre{
                     }
                     else
                     {
-                        uint32 val = 0;
-                        if(getUInt(prop->values.front(), &val))
-                            mUnit->setTextureAnisotropy(val);
-                        else
+                        if(!getFloat(prop->values.front(), &samplerblock.mMaxAnisotropy))
+                        {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                prop->values.front()->getValue() + " is not a valid integer argument");
+                        }
                     }
                     break;
                 case ID_MIPMAP_BIAS:
@@ -3724,12 +3683,11 @@ namespace Ogre{
                     }
                     else
                     {
-                        Real val = 0.0f;
-                        if(getReal(prop->values.front(), &val))
-                            mUnit->setTextureMipmapBias(val);
-                        else
+                        if(!getReal(prop->values.front(), &samplerblock.mMipLodBias))
+                        {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                prop->values.front()->getValue() + " is not a valid number argument");
+                        }
                     }
                     break;
                 case ID_COLOUR_OP:
@@ -4537,6 +4495,8 @@ namespace Ogre{
                 processNode(compiler, *i);
             }
         }
+
+        mUnit->setSamplerblock( samplerblock );
     }
 
     /**************************************************************************

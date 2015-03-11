@@ -723,23 +723,13 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Technique::setTextureFiltering(TextureFilterOptions filterType)
+    void Technique::setSamplerblock( const HlmsSamplerblock &samplerblock )
     {
         Passes::iterator i, iend;
         iend = mPasses.end();
         for (i = mPasses.begin(); i != iend; ++i)
         {
-            (*i)->setTextureFiltering(filterType);
-        }
-    }
-    // --------------------------------------------------------------------
-    void Technique::setTextureAnisotropy(unsigned int maxAniso)
-    {
-        Passes::iterator i, iend;
-        iend = mPasses.end();
-        for (i = mPasses.begin(); i != iend; ++i)
-        {
-            (*i)->setTextureAnisotropy(maxAniso);
+            (*i)->setSamplerblock( samplerblock );
         }
     }
     // --------------------------------------------------------------------

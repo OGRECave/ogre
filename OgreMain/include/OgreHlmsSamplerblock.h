@@ -102,6 +102,10 @@ namespace Ogre
                     mMinLod             != _r.mMinLod ||
                     mMaxLod             != _r.mMaxLod;
         }
+
+        /// Helper function to set filtering to the most common settings
+        void setFiltering( TextureFilterOptions filterType );
+        void setAddressinMode( TextureAddressingMode addressingMode );
     };
 
     /** @} */

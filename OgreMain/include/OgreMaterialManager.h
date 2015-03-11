@@ -118,21 +118,6 @@ namespace Ogre {
         };
 
     protected:
-
-        /// Default Texture filtering - minification
-        FilterOptions mDefaultMinFilter;
-        /// Default Texture filtering - magnification
-        FilterOptions mDefaultMagFilter;
-        /// Default Texture filtering - mipmapping
-        FilterOptions mDefaultMipFilter;
-        /// Default Texture filtering - comparison
-        FilterOptions mDefaultCompare;
-
-        bool            mDefaultCompareEnabled;
-        CompareFunction mDefaultCompareFunction;
-
-        /// Default Texture anisotropy
-        unsigned int mDefaultMaxAniso;
         /// Serializer - Hold instance per thread if necessary
         OGRE_THREAD_POINTER(MaterialSerializer, mSerializer);
         /// Default settings
@@ -186,38 +171,6 @@ namespace Ogre {
         /** @see ScriptLoader::parseScript
         */
         void parseScript(DataStreamPtr& stream, const String& groupName);
-
-
-        /** Sets the default texture filtering to be used for loaded textures, for when textures are
-            loaded automatically (e.g. by Material class) or when 'load' is called with the default
-            parameters by the application.
-            @note
-                The default value is TFO_BILINEAR.
-        */
-        virtual void setDefaultTextureFiltering(TextureFilterOptions fo);
-        /** Sets the default texture filtering to be used for loaded textures, for when textures are
-            loaded automatically (e.g. by Material class) or when 'load' is called with the default
-            parameters by the application.
-        */
-        virtual void setDefaultTextureFiltering(FilterType ftype, FilterOptions opts);
-        /** Sets the default texture filtering to be used for loaded textures, for when textures are
-            loaded automatically (e.g. by Material class) or when 'load' is called with the default
-            parameters by the application.
-        */
-        virtual void setDefaultTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
-
-        /// Get the default texture filtering
-        virtual FilterOptions getDefaultTextureFiltering(FilterType ftype) const;
-
-        /** Sets the default anisotropy level to be used for loaded textures, for when textures are
-            loaded automatically (e.g. by Material class) or when 'load' is called with the default
-            parameters by the application.
-            @note
-                The default value is 1 (no anisotropy).
-        */
-        void setDefaultAnisotropy(unsigned int maxAniso);
-        /// Get the default maxAnisotropy
-        unsigned int getDefaultAnisotropy() const;
 
         /** Returns a pointer to the default Material settings.
             @remarks

@@ -1133,7 +1133,6 @@ namespace Ogre
         mIds["bilinear"] = ID_BILINEAR;
         mIds["trilinear"] = ID_TRILINEAR;
         mIds["anisotropic"] = ID_ANISOTROPIC;
-        mIds["compare_test"] = ID_CMPTEST;
         mIds["compare_func"] = ID_CMPFUNC;
         mIds["max_anisotropy"] = ID_MAX_ANISOTROPY;
         mIds["mipmap_bias"] = ID_MIPMAP_BIAS;

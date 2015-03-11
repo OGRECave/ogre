@@ -244,10 +244,14 @@ namespace Ogre
 
         // Make sure material is aware of colour per vertex.
         mMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
+        HlmsSamplerblock samplerblock = *texLayer->getSamplerblock();
         // Clamp to avoid fuzzy edges
-        texLayer->setTextureAddressingMode( TextureUnitState::TAM_CLAMP );
+        samplerblock.setAddressinMode( TAM_CLAMP );
         // Allow min/mag filter, but no mip
-        texLayer->setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_NONE);
+        samplerblock.mMinFilter = FO_LINEAR;
+        samplerblock.mMagFilter = FO_LINEAR;
+        samplerblock.mMipFilter = FO_NONE;
+        texLayer->setSamplerblock( samplerblock );
     }
     //---------------------------------------------------------------------
     void Font::unloadImpl()
@@ -283,8 +287,14 @@ namespace Ogre
 
         TextureUnitState* t = mMaterial->getTechnique(0)->getPass(0)->createTextureUnitState( texName );
         // Allow min/mag filter, but no mip
-        t->setTextureFiltering(FO_LINEAR, FO_LINEAR, FO_NONE);
-
+        HlmsSamplerblock samplerblock = *t->getSamplerblock();
+        // Clamp to avoid fuzzy edges
+        samplerblock.setAddressinMode( TAM_CLAMP );
+        // Allow min/mag filter, but no mip
+        samplerblock.mMinFilter = FO_LINEAR;
+        samplerblock.mMagFilter = FO_LINEAR;
+        samplerblock.mMipFilter = FO_NONE;
+        t->setSamplerblock( samplerblock );
     }
     //---------------------------------------------------------------------
     void Font::loadResource(Resource* res)

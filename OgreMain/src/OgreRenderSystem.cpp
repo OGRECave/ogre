@@ -386,6 +386,8 @@ namespace Ogre {
             _setTexture(texUnit, true, tex.get());
         }
 
+        _setHlmsSamplerblock( texUnit, tl.getSamplerblock() );
+
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());
 

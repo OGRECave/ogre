@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreDistanceLodStrategy.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreHlmsSamplerblock.h"
 
 namespace Ogre
 {
@@ -754,18 +755,18 @@ namespace Ogre
         return "point";
     }
     //-----------------------------------------------------------------------
-    String convertTexAddressMode(TextureUnitState::TextureAddressingMode tam)
+    String convertTexAddressMode( TextureAddressingMode tam)
     {
         switch (tam)
         {
-        case TextureUnitState::TAM_BORDER:
+        case TAM_BORDER:
             return "border";
-        case TextureUnitState::TAM_CLAMP:
+        case TAM_CLAMP:
             return "clamp";
-        case TextureUnitState::TAM_MIRROR:
+        case TAM_MIRROR:
             return "mirror";
-        case TextureUnitState::TAM_WRAP:
-        case TextureUnitState::TAM_UNKNOWN:
+        case TAM_WRAP:
+        case TAM_UNKNOWN:
             return "wrap";
         }
 
@@ -863,13 +864,11 @@ namespace Ogre
                     writeValue("separateUV");
             }
 
+            const HlmsSamplerblock *samplerblock = pTex->getSamplerblock();
+
             //anisotropy level
-            if (mDefaults ||
-                pTex->getTextureAnisotropy() != 1)
-            {
-                writeAttribute(4, "max_anisotropy");
-                writeValue(StringConverter::toString(pTex->getTextureAnisotropy()));
-            }
+            writeAttribute(4, "max_anisotropy");
+            writeValue(StringConverter::toString( samplerblock->mMaxAnisotropy ));
 
             //texture coordinate set
             if (mDefaults ||
@@ -880,58 +879,49 @@ namespace Ogre
             }
 
             //addressing mode
-            const TextureUnitState::UVWAddressingMode& uvw =
-                pTex->getTextureAddressingMode();
             if (mDefaults ||
-                uvw.u != Ogre::TextureUnitState::TAM_WRAP ||
-                uvw.v != Ogre::TextureUnitState::TAM_WRAP ||
-                uvw.w != Ogre::TextureUnitState::TAM_WRAP )
+                samplerblock->mU != Ogre::TAM_WRAP ||
+                samplerblock->mV != Ogre::TAM_WRAP ||
+                samplerblock->mW != Ogre::TAM_WRAP )
             {
                 writeAttribute(4, "tex_address_mode");
-                if (uvw.u == uvw.v && uvw.u == uvw.w)
+                if( samplerblock->mU == samplerblock->mV == samplerblock->mW )
                 {
-                    writeValue(convertTexAddressMode(uvw.u));
+                    writeValue(convertTexAddressMode(samplerblock->mU));
                 }
                 else
                 {
-                    writeValue(convertTexAddressMode(uvw.u));
-                    writeValue(convertTexAddressMode(uvw.v));
-                    if (uvw.w != TextureUnitState::TAM_WRAP)
+                    writeValue(convertTexAddressMode(samplerblock->mU));
+                    writeValue(convertTexAddressMode(samplerblock->mV));
+                    if (samplerblock->mW != TAM_WRAP)
                     {
-                        writeValue(convertTexAddressMode(uvw.w));
+                        writeValue(convertTexAddressMode(samplerblock->mW));
                     }
                 }
             }
 
             //border colour
-            const ColourValue& borderColour =
-                pTex->getTextureBorderColour();
-            if (mDefaults ||
-                borderColour != ColourValue::Black)
+            if (mDefaults || samplerblock->mBorderColour != ColourValue::White)
             {
                 writeAttribute(4, "tex_border_colour");
-                writeColourValue(borderColour, true);
+                writeColourValue(samplerblock->mBorderColour, true);
             }
 
             //filtering
-            if (mDefaults || !pTex->isDefaultFiltering())
-            {
-                writeAttribute(4, "filtering");
-                writeValue(
-                    convertFiltering(pTex->getTextureFiltering(FT_MIN))
-                    + " "
-                    + convertFiltering(pTex->getTextureFiltering(FT_MAG))
-                    + " "
-                    + convertFiltering(pTex->getTextureFiltering(FT_MIP)));
-            }
+            writeAttribute(4, "filtering");
+            writeValue(
+                convertFiltering( samplerblock->mMinFilter )
+                + " "
+                + convertFiltering( samplerblock->mMagFilter )
+                + " "
+                + convertFiltering( samplerblock->mMipFilter ) );
 
             // Mip biasing
-            if (mDefaults ||
-                pTex->getTextureMipmapBias() != 0.0f)
+            if (mDefaults || samplerblock->mMipLodBias != 0.0f)
             {
                 writeAttribute(4, "mipmap_bias");
                 writeValue(
-                    StringConverter::toString(pTex->getTextureMipmapBias()));
+                    StringConverter::toString( samplerblock->mMipLodBias ));
             }
 
             // colour_op_ex

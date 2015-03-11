@@ -19,7 +19,7 @@ namespace Demo
 {
     class StereoGraphicsSystem : public GraphicsSystem
     {
-        Ogre::SceneNode             *mCameraNode;
+        Ogre::SceneNode             *mCamerasNode;
         Ogre::Camera                *mEyeCameras[2];
         Ogre::CompositorWorkspace   *mEyeWorkspaces[2];
 
@@ -27,11 +27,11 @@ namespace Demo
         virtual void createCamera(void)
         {
             //Use one node to control both cameras
-            Ogre::SceneNode *camerasNode = mSceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
+            mCamerasNode = mSceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
                     createChildSceneNode( Ogre::SCENE_DYNAMIC );
-            camerasNode->setName( "Cameras Node" );
+            mCamerasNode->setName( "Cameras Node" );
 
-            camerasNode->setPosition( 0, 5, 15 );
+            mCamerasNode->setPosition( 0, 5, 15 );
 
             mEyeCameras[0] = mSceneManager->createCamera( "Left Eye" );
             mEyeCameras[1] = mSceneManager->createCamera( "Right Eye" );
@@ -55,7 +55,7 @@ namespace Demo
 
                 //By default cameras are attached to the Root Scene Node.
                 mEyeCameras[i]->detachFromParent();
-                camerasNode->attachObject( mEyeCameras[i] );
+                mCamerasNode->attachObject( mEyeCameras[i] );
             }
 
             mCamera = mEyeCameras[0];

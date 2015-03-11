@@ -1677,8 +1677,12 @@ void SceneManager::_setSkyBox(bool enable,
                     if (tech->getPass(0)->getNumTextureUnitStates() > 0)
                     {
                         TextureUnitState* t = tech->getPass(0)->getTextureUnitState(0);
+
                         // Also clamp texture, don't wrap (otherwise edges can get filtered)
-                        t->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+                        HlmsSamplerblock samplerblock = *t->getSamplerblock();
+                        samplerblock.setAddressinMode( TAM_CLAMP );
+
+                        t->setSamplerblock( samplerblock );
                         t->setCurrentFrame(i);
 
                     }

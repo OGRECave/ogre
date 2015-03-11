@@ -988,24 +988,15 @@ namespace Ogre {
         size_t _getTextureUnitWithContentTypeIndex( TextureUnitState::ContentType contentType,
                                                     size_t index) const;
 
-        /** Set texture filtering for every texture unit
+        /** Set samplerblock for every texture unit
             @note
             This property actually exists on the TextureUnitState class
             For simplicity, this method allows you to set these properties for
             every current TeextureUnitState, If you need more precision, retrieve the
             TextureUnitState instance and set the property there.
-            @see TextureUnitState::setTextureFiltering
+            @see TextureUnitState::setSamplerblock
         */
-        void setTextureFiltering(TextureFilterOptions filterType);
-        /** Sets the anisotropy level to be used for all textures.
-            @note
-            This property has been moved to the TextureUnitState class, which is accessible via the
-            Technique and Pass. For simplicity, this method allows you to set these properties for
-            every current TeextureUnitState, If you need more precision, retrieve the Technique,
-            Pass and TextureUnitState instances and set the property there.
-            @see TextureUnitState::setTextureAnisotropy
-        */
-        void setTextureAnisotropy(unsigned int maxAniso);
+        void setSamplerblock( const HlmsSamplerblock &samplerblock );
 
         /** Returns whether this pass is ambient only.
          */

@@ -49,4 +49,39 @@ namespace Ogre
         mMaxLod( FLT_MAX )
     {
     }
+    //-----------------------------------------------------------------------------------
+    void HlmsSamplerblock::setFiltering( TextureFilterOptions filterType )
+    {
+        switch( filterType )
+        {
+        case TFO_NONE:
+            mMinFilter = FO_POINT;
+            mMagFilter = FO_POINT;
+            mMipFilter = FO_NONE;
+            break;
+        case TFO_BILINEAR:
+            mMinFilter = FO_LINEAR;
+            mMagFilter = FO_LINEAR;
+            mMipFilter = FO_POINT;
+            break;
+        case TFO_TRILINEAR:
+            mMinFilter = FO_LINEAR;
+            mMagFilter = FO_LINEAR;
+            mMipFilter = FO_LINEAR;
+            break;
+        case TFO_ANISOTROPIC:
+            mMinFilter = FO_ANISOTROPIC;
+            mMagFilter = FO_ANISOTROPIC;
+            // OpenGL doesn't support anisotropic on mip filter, linear will be used automatically.
+            mMipFilter = FO_ANISOTROPIC;
+            break;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsSamplerblock::setAddressinMode( TextureAddressingMode addressingMode )
+    {
+        mU = addressingMode;
+        mV = addressingMode;
+        mW = addressingMode;
+    }
 }

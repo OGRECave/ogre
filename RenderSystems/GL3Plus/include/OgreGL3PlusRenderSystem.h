@@ -166,7 +166,6 @@ namespace Ogre {
         GLSLShader* mCurrentComputeShader;
 
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
-        GLint getTextureAddressingMode(TextureUnitState::TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
         bool activateGLTextureUnit(size_t unit);

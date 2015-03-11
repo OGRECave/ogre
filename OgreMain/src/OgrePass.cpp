@@ -1391,7 +1391,7 @@ namespace Ogre {
         return mParent->isLoaded();
     }
     //-----------------------------------------------------------------------
-    void Pass::setTextureFiltering(TextureFilterOptions filterType)
+    void Pass::setSamplerblock( const HlmsSamplerblock &samplerblock )
     {
         OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
 
@@ -1399,18 +1399,7 @@ namespace Ogre {
         iend = mTextureUnitStates.end();
         for (i = mTextureUnitStates.begin(); i != iend; ++i)
         {
-            (*i)->setTextureFiltering(filterType);
-        }
-    }
-    // --------------------------------------------------------------------
-    void Pass::setTextureAnisotropy(unsigned int maxAniso)
-    {
-        OGRE_LOCK_MUTEX(mTexUnitChangeMutex);
-        TextureUnitStates::iterator i, iend;
-        iend = mTextureUnitStates.end();
-        for (i = mTextureUnitStates.begin(); i != iend; ++i)
-        {
-            (*i)->setTextureAnisotropy(maxAniso);
+            (*i)->setSamplerblock( samplerblock );
         }
     }
     //-----------------------------------------------------------------------

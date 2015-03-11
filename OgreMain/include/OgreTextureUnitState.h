@@ -117,31 +117,6 @@ namespace Ogre {
             TT_ROTATE
         };
 
-        /** Texture addressing modes - default is TAM_WRAP.
-        @note
-            These settings are relevant in both the fixed-function and the
-            programmable pipeline.
-        */
-        enum TextureAddressingMode
-        {
-            /// Texture wraps at values over 1.0.
-            TAM_WRAP,
-            /// Texture mirrors (flips) at joins over 1.0.
-            TAM_MIRROR,
-            /// Texture clamps at 1.0.
-            TAM_CLAMP,
-            /// Texture coordinates outside the range [0.0, 1.0] are set to the border colour.
-            TAM_BORDER,
-            /// Unknown
-            TAM_UNKNOWN = 99
-        };
-
-        /** Texture addressing mode for each texture coordinate. */
-        struct UVWAddressingMode
-        {
-            TextureAddressingMode u, v, w;
-        };
-
         /** Enum identifying the frame indexes for faces of a cube map (not the composite 3D type.
         */
         enum TextureCubeFace
@@ -688,61 +663,6 @@ namespace Ogre {
         /// Get texture rotation effects angle value.
         const Radian& getTextureRotate(void) const;
 
-        /** Gets the texture addressing mode for a given coordinate, 
-            i.e. what happens at uv values above 1.0.
-        @note
-            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
-        */
-        const UVWAddressingMode& getTextureAddressingMode(void) const;
-
-        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
-        @note
-            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
-        @note This is a shortcut method which sets the addressing mode for all
-            coordinates at once; you can also call the more specific method
-            to set the addressing mode per coordinate.
-        @note
-            This is a shortcut method which sets the addressing mode for all
-            coordinates at once; you can also call the more specific method
-            to set the addressing mode per coordinate.
-        @note
-            This applies for both the fixed-function and programmable pipelines.
-        */
-        void setTextureAddressingMode( TextureAddressingMode tam);
-
-        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
-        @note
-            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
-        @note
-            This applies for both the fixed-function and programmable pipelines.
-        */
-        void setTextureAddressingMode( TextureAddressingMode u, 
-            TextureAddressingMode v, TextureAddressingMode w);
-
-        /** Sets the texture addressing mode, i.e. what happens at uv values above 1.0.
-        @note
-            The default is TAM_WRAP i.e. the texture repeats over values of 1.0.
-        @note
-            This applies for both the fixed-function and programmable pipelines.
-        */
-        void setTextureAddressingMode( const UVWAddressingMode& uvw);
-
-        /** Sets the texture border colour.
-        @note
-            The default is ColourValue::Black, and this value only used when addressing mode
-            is TAM_BORDER.
-        @note
-            This applies for both the fixed-function and programmable pipelines.
-        */
-        void setTextureBorderColour(const ColourValue& colour);
-
-        /** Sets the texture border colour.
-        @note
-            The default is ColourValue::Black, and this value only used when addressing mode
-            is TAM_BORDER.
-        */
-        const ColourValue& getTextureBorderColour(void) const;
-
         /** Setting advanced blending options.
         @remarks
             This is an extended version of the TextureUnitState::setColourOperation method which allows
@@ -1044,81 +964,18 @@ namespace Ogre {
         */
         void retryTextureLoad() { mTextureLoadFailed = false; }
 
+        /// Changes the current samplerblock for a new one.
+        void setSamplerblock( const HlmsSamplerblock &samplerblock );
+
+        /** Retrieves current samplerblock. Don't const_cast the return value to modify it.
+            @See HlmsDatablock remarks.
+        */
+        const HlmsSamplerblock* getSamplerblock(void) const;
+
         /// Get texture effects in a multimap paired array.
         const EffectMap& getEffects(void) const;
         /// Get the animated-texture animation duration.
         Real getAnimationDuration(void) const;
-
-        /** Set the texture filtering for this unit, using the simplified interface.
-        @remarks
-            You also have the option of specifying the minification, magnification
-            and mip filter individually if you want more control over filtering
-            options. See the alternative setTextureFiltering methods for details.
-        @note
-            This option applies in both the fixed function and the programmable pipeline.
-        @param filterType
-            The high-level filter type to use.
-        */
-        void setTextureFiltering(TextureFilterOptions filterType);
-        /** Set a single filtering option on this texture unit. 
-        @param ftype
-            The filtering type to set.
-        @param opts
-            The filtering option to set.
-        */
-        void setTextureFiltering(FilterType ftype, FilterOptions opts);
-        /** Set a the detailed filtering options on this texture unit. 
-        @param minFilter
-            The filtering to use when reducing the size of the texture. 
-            Can be FO_POINT, FO_LINEAR or FO_ANISOTROPIC.
-        @param magFilter
-            The filtering to use when increasing the size of the texture.
-            Can be FO_POINT, FO_LINEAR or FO_ANISOTROPIC.
-        @param mipFilter
-            The filtering to use between mip levels.
-            Can be FO_NONE (turns off mipmapping), FO_POINT or FO_LINEAR (trilinear filtering).
-        */
-        void setTextureFiltering(FilterOptions minFilter, FilterOptions magFilter, FilterOptions mipFilter);
-        /// Get the texture filtering for the given type.
-        FilterOptions getTextureFiltering(FilterType ftpye) const;
-        /// Returns true if texture filtering was not set explicitly and is determined by MaterialManager.
-        bool isDefaultFiltering() const     { return mIsDefaultFiltering; }
-
-        void setTextureCompareEnabled(bool enabled);
-        bool getTextureCompareEnabled() const;
-    
-        void setTextureCompareFunction(CompareFunction function);
-        CompareFunction getTextureCompareFunction() const;
-
-        /** Sets the anisotropy level to be used for this texture level.
-        @param maxAniso
-            The maximal anisotropy level, should be between 2 and the maximum
-            supported by hardware (1 is the default, ie. no anisotrophy).
-        @note
-            This option applies in both the fixed function and the programmable pipeline.
-        */
-        void setTextureAnisotropy(unsigned int maxAniso);
-        /// Get this layer texture anisotropy level.
-        unsigned int getTextureAnisotropy() const;
-
-        /** Sets the bias value applied to the mipmap calculation.
-        @remarks
-            You can alter the mipmap calculation by biasing the result with a 
-            single floating point value. After the mip level has been calculated,
-            this bias value is added to the result to give the final mip level.
-            Lower mip levels are larger (higher detail), so a negative bias will
-            force the larger mip levels to be used, and a positive bias
-            will cause smaller mip levels to be used. The bias values are in 
-            mip levels, so a -1 bias will force mip levels one larger than by the
-            default calculation.
-        @param bias
-            The bias value as described above, can be positive or negative.
-        */
-        void setTextureMipmapBias(float bias) { mMipmapBias = bias; }
-        /** Gets the bias value applied to the mipmap calculation.
-        @see TextureUnitState::setTextureMipmapBias
-        */
-        float getTextureMipmapBias(void) const { return mMipmapBias; }
 
         /** Set the compositor reference for this texture unit state.
         @remarks 
@@ -1219,8 +1076,7 @@ protected:
         int mTextureSrcMipmaps; /// Request number of mipmaps.
 
         unsigned int mTextureCoordSetIndex;
-        UVWAddressingMode mAddressMode;
-        ColourValue mBorderColour;
+        HlmsSamplerblock const  *mSamplerblock;
 
         LayerBlendModeEx mColourBlendMode;
         SceneBlendFactor mColourBlendFallbackSrc;
@@ -1238,23 +1094,6 @@ protected:
         Radian mRotate;
         mutable Matrix4 mTexModMatrix;
 
-        /// Texture filtering - minification.
-        FilterOptions mMinFilter;
-        /// Texture filtering - magnification.
-        FilterOptions mMagFilter;
-        /// Texture filtering - mipmapping.
-        FilterOptions mMipFilter;
-
-        bool mCompareEnabled;
-        CompareFunction mCompareFunc;
-
-        /// Texture anisotropy.
-        unsigned int mMaxAniso;
-        /// Mipmap bias (always float, not Real).
-        float mMipmapBias;
-
-        bool mIsDefaultAniso;
-        bool mIsDefaultFiltering;
         /// Binding type (fragment, vertex, tessellation hull and domain pipeline).
         BindingType mBindingType;
         /// Content type of texture (normal loaded texture, auto-texture).
