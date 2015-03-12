@@ -1109,11 +1109,13 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     D3D11RenderTexture::D3D11RenderTexture( const String &name, v1::D3D11HardwarePixelBuffer *buffer,
+                                            bool writeGamma,
                                             D3D11Device & device ) :
         mDevice(device),
         RenderTexture(buffer, 0)
     {
         mName = name;
+        mHwGamma = writeGamma;
 
         rebind(buffer);
     }

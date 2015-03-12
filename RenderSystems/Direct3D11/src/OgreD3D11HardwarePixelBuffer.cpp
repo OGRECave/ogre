@@ -65,7 +65,7 @@ namespace v1 {
                 String name;
                 name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" + StringConverter::toString(mSubresourceIndex) + "/" + parentTexture->getName();
 
-                RenderTexture *trt = new D3D11RenderTexture(name, this, mDevice);
+                RenderTexture *trt = new D3D11RenderTexture(name, this, mHwGamma, mDevice);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }

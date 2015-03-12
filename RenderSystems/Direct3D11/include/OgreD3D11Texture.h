@@ -188,7 +188,8 @@ namespace Ogre {
         ID3D11RenderTargetView * mRenderTargetView;
         ID3D11DepthStencilView * mDepthStencilView;
     public:
-        D3D11RenderTexture(const String &name, v1::D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
+        D3D11RenderTexture( const String &name, v1::D3D11HardwarePixelBuffer *buffer,
+                            bool writeGamma, D3D11Device & device );
         virtual ~D3D11RenderTexture();
 
         void rebind(v1::D3D11HardwarePixelBuffer *buffer);
