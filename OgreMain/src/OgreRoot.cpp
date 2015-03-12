@@ -1084,8 +1084,6 @@ namespace Ogre {
         if(mActiveRenderer)
             mActiveRenderer->_setViewport(NULL);
 
-		mHlmsManager->_changeRenderSystem( (RenderSystem*)0 );
-
         // Since background thread might be access resources,
         // ensure shutdown before destroying resource manager.
         mResourceBackgroundQueue->shutdown();
@@ -1098,6 +1096,8 @@ namespace Ogre {
         shutdownPlugins();
 
         ResourceGroupManager::getSingleton().shutdownAll();
+
+        mHlmsManager->_changeRenderSystem((RenderSystem*)0);
 
         // Destroy pools
         ConvexBody::_destroyPool();
