@@ -143,6 +143,8 @@ namespace Ogre
                                     BlendChannelBlue | BlendChannelAlpha
         };
 
+        bool                mAlphaToCoverageEnabled;
+
         /// Masks which colour channels will be writing to. Default: BlendChannelAll
         /// For some advanced effects, you may wish to turn off the writing of certain colour
         /// channels, or even all of the colour channels so that only the depth buffer is updated
@@ -163,8 +165,6 @@ namespace Ogre
         // Blending operations
         SceneBlendOperation mBlendOperation;
         SceneBlendOperation mBlendOperationAlpha;
-
-        bool                mAlphaToCoverageEnabled;
 
         HlmsBlendblock();
 

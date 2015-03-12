@@ -64,6 +64,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsBlendblock::HlmsBlendblock() :
         BasicBlock( BLOCK_BLEND ),
+        mAlphaToCoverageEnabled( false ),
         mBlendChannelMask( BlendChannelAll ),
         mIsTransparent( false ),
         mSeparateBlend( false ),
@@ -72,8 +73,7 @@ namespace Ogre
         mSourceBlendFactorAlpha( SBF_ONE ),
         mDestBlendFactorAlpha( SBF_ZERO ),
         mBlendOperation( SBO_ADD ),
-        mBlendOperationAlpha( SBO_ADD ),
-        mAlphaToCoverageEnabled( false )
+        mBlendOperationAlpha( SBO_ADD )
     {
     }
     //-----------------------------------------------------------------------------------
