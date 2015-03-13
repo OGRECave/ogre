@@ -167,9 +167,9 @@ namespace v1 {
 
         box.data = pMappedResource.pData;
 
-        if( !PixelUtil::isCompressed( box.format ) )
+        if( !PixelUtil::isCompressed( mFormat ) )
         {
-            const size_t bytePerPixel = PixelUtil::getNumElemBytes( box.format );
+            const size_t bytePerPixel = PixelUtil::getNumElemBytes( mFormat );
             box.rowPitch    = pMappedResource.RowPitch / bytePerPixel;
             box.slicePitch  = pMappedResource.DepthPitch / bytePerPixel;
         }
@@ -349,7 +349,7 @@ namespace v1 {
             dstBoxDx11.bottom   = std::max( dstBoxDx11.top + blockHeight, dstBoxDx11.bottom );
         }
 
-		size_t rowWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
+        size_t rowWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mFormat);
 
         switch(mParentTexture->getTextureType()) {
         case TEX_TYPE_1D:
@@ -401,7 +401,7 @@ namespace v1 {
             break;
         case TEX_TYPE_3D:
             {
-				size_t sliceWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format);
+                size_t sliceWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mFormat);
 
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex3D(), static_cast<UINT>(mSubresourceIndex), 
                     &dstBoxDx11, mDataForStaticUsageLock, rowWidth, sliceWidth);
