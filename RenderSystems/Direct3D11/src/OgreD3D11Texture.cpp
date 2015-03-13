@@ -827,12 +827,12 @@ namespace Ogre
             // Create new list of surfaces
             mSurfaceList.clear();
             PixelFormat format = D3D11Mappings::_getClosestSupportedPF(mSrcFormat);
-            size_t depth = mDepth;
 
             for(size_t face=0; face<getNumFaces(); ++face)
             {
-                size_t width = mWidth;
+                size_t width  = mWidth;
                 size_t height = mHeight;
+                size_t depth  = mDepth;
                 for(size_t mip=0; mip<=mNumMipmaps; ++mip)
                 { 
 
@@ -858,8 +858,12 @@ namespace Ogre
                     mSurfaceList.push_back(
                         v1::HardwarePixelBufferSharedPtr(buffer)
                         );
-                    width /= 2;
-                    height /= 2;
+
+                    width  = std::max<size_t>( width >> 1, 1 );
+                    height = std::max<size_t>( height>> 1, 1 );
+
+                    if (depth > 1 && mTextureType != TEX_TYPE_2D_ARRAY)
+                        depth = std::max<size_t>( depth >> 1, 1 );
                 }
             }
         }
