@@ -200,6 +200,15 @@ namespace v1 {
             srcBoxDx11.front = 0;
             srcBoxDx11.back = mLockBox.getDepth();
 
+            if( PixelUtil::isCompressed( mFormat ) )
+            {
+                const uint32 blockWidth     = PixelUtil::getCompressedBlockWidth( mFormat, true );
+                const uint32 blockHeight    = PixelUtil::getCompressedBlockHeight( mFormat, true );
+
+                srcBoxDx11.right    = std::max( srcBoxDx11.left + blockWidth, srcBoxDx11.right );
+                srcBoxDx11.bottom   = std::max( srcBoxDx11.top + blockHeight, srcBoxDx11.bottom );
+            }
+
             unsigned int subresource = D3D11CalcSubresource( mSubresourceIndex,
                                                              mLockBox.front,
                                                              mParentTexture->getNumMipmaps()+1 );
@@ -331,6 +340,15 @@ namespace v1 {
         dstBoxDx11.front = 0;
         dstBoxDx11.back = mLockBox.getDepth();
 
+        if( PixelUtil::isCompressed( mFormat ) )
+        {
+            const uint32 blockWidth     = PixelUtil::getCompressedBlockWidth( mFormat, true );
+            const uint32 blockHeight    = PixelUtil::getCompressedBlockHeight( mFormat, true );
+
+            dstBoxDx11.right    = std::max( dstBoxDx11.left + blockWidth, dstBoxDx11.right );
+            dstBoxDx11.bottom   = std::max( dstBoxDx11.top + blockHeight, dstBoxDx11.bottom );
+        }
+
 		size_t rowWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
 
         switch(mParentTexture->getTextureType()) {
@@ -410,6 +428,15 @@ namespace v1 {
             D3D11_BOX srcBoxDx11 = OgreImageBoxToDx11Box(mLockBox);
             srcBoxDx11.front = 0;
             srcBoxDx11.back = mLockBox.getDepth();
+
+            if( PixelUtil::isCompressed( mFormat ) )
+            {
+                const uint32 blockWidth     = PixelUtil::getCompressedBlockWidth( mFormat, true );
+                const uint32 blockHeight    = PixelUtil::getCompressedBlockHeight( mFormat, true );
+
+                srcBoxDx11.right    = std::max( srcBoxDx11.left + blockWidth, srcBoxDx11.right );
+                srcBoxDx11.bottom   = std::max( srcBoxDx11.top + blockHeight, srcBoxDx11.bottom );
+            }
 
             unsigned int dstSubresource = D3D11CalcSubresource( mSubresourceIndex, mLockBox.front + mFace,
                                                                 mParentTexture->getNumMipmaps()+1 );
@@ -877,6 +904,14 @@ namespace v1 {
     {
         D3D11Texture *tex = static_cast<D3D11Texture*>(mParentTexture);
 
+        uint32 minWidth     = 0;
+        uint32 minHeight    = 0;
+        if( PixelUtil::isCompressed( mFormat ) )
+        {
+            minWidth    = PixelUtil::getCompressedBlockWidth( mFormat, true );
+            minHeight   = PixelUtil::getCompressedBlockHeight( mFormat, true );
+        }
+
         switch (mParentTexture->getTextureType())
         {
         case TEX_TYPE_1D:
@@ -884,7 +919,7 @@ namespace v1 {
                 D3D11_TEXTURE1D_DESC desc;
                 tex->GetTex1D()->GetDesc(&desc);
 
-                desc.Width     = std::max<uint32>( 4, mWidth );
+                desc.Width     = std::max<uint32>( minWidth, mWidth );
                 desc.MipLevels = 0;
                 desc.BindFlags = 0;
                 desc.MiscFlags = 0;
@@ -901,8 +936,8 @@ namespace v1 {
                 D3D11_TEXTURE2D_DESC desc;
                 tex->GetTex2D()->GetDesc(&desc);
 
-                desc.Width     = std::max<uint32>( 4, mWidth );
-                desc.Height    = std::max<uint32>( 4, mHeight );
+                desc.Width     = std::max<uint32>( minWidth, mWidth );
+                desc.Height    = std::max<uint32>( minHeight, mHeight );
                 desc.MipLevels = 0;
                 desc.BindFlags = 0;
                 desc.MiscFlags = 0;
@@ -917,8 +952,8 @@ namespace v1 {
                 D3D11_TEXTURE3D_DESC desc;
                 tex->GetTex3D()->GetDesc(&desc);
 
-                desc.Width     = std::max<uint32>( 4, mWidth );
-                desc.Height    = std::max<uint32>( 4, mHeight );
+                desc.Width     = std::max<uint32>( minWidth, mWidth );
+                desc.Height    = std::max<uint32>( minHeight, mHeight );
                 desc.Depth     = mDepth;
                 desc.MipLevels = 0;
                 desc.BindFlags = 0;
