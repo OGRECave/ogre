@@ -114,6 +114,13 @@ namespace Ogre
             }
             return;
         }
+        else if(name == "First_ID3D11Texture2D")
+        {
+            ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
+            if( targets[0] )
+                *pBackBuffer = targets[0]->getParentTexture()->GetTex2D();
+            return;
+        }
         else if(name == "ID3D11RenderTargetView")
         {
             //*static_cast<ID3D11RenderTargetView***>(pData) = mRenderTargetViews;

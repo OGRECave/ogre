@@ -57,43 +57,11 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool D3D11DepthBuffer::isCompatible( RenderTarget *renderTarget ) const
     {
-        D3D11_TEXTURE2D_DESC BBDesc;
-
-        bool isTexture = false;
-        renderTarget->getCustomAttribute( "isTexture", &isTexture );
-
-        if(isTexture)
-        {
-            ID3D11Texture2D *D3D11texture;
-            v1::D3D11HardwarePixelBuffer *pBuffer;
-            renderTarget->getCustomAttribute( "BUFFER", &pBuffer );
-            D3D11texture = static_cast<ID3D11Texture2D*>( pBuffer->getParentTexture()->getTextureResource() );
-            D3D11texture->GetDesc(&BBDesc);
-        }
-        else
-        {
-            ID3D11Texture2D* pBack[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-            memset( pBack, 0, sizeof(pBack) );
-            renderTarget->getCustomAttribute( "DDBACKBUFFER", &pBack );
-            
-            if( pBack[0] )
-            {
-                pBack[0]->GetDesc(&BBDesc);
-            }
-            else
-            {
-                ID3D11Texture2D *D3D11texture;
-                renderTarget->getCustomAttribute( "ID3D11Texture2D", &D3D11texture );
-                D3D11texture->GetDesc( &BBDesc );
-            }
-        }
-
-        /*
         ID3D11Texture2D *D3D11texture = NULL;
-        renderTarget->getCustomAttribute( "ID3D11Texture2D", &D3D11texture );
+        renderTarget->getCustomAttribute( "First_ID3D11Texture2D", &D3D11texture );
         D3D11_TEXTURE2D_DESC BBDesc;
         D3D11texture->GetDesc( &BBDesc );
-        */
+
         //RenderSystem will determine if bitdepths match (i.e. 32 bit RT don't like 16 bit Depth)
         //This is the same function used to create them. Note results are usually cached so this should
         //be quick

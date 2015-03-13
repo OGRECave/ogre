@@ -97,7 +97,6 @@ namespace Ogre
         ID3D11Texture2D*        mpBackBuffer;
         ID3D11Texture2D*        mpBackBufferNoMSAA;             // optional, always holds up-to-date copy data from mpBackBuffer if not NULL
         ID3D11RenderTargetView* mRenderTargetView;
-        ID3D11DepthStencilView* mDepthStencilView;
     };
 
     

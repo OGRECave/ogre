@@ -1090,7 +1090,7 @@ namespace Ogre
             *static_cast<v1::HardwarePixelBuffer**>(pData) = mBuffer;
             return;
         }
-        else if( name == "ID3D11Texture2D" )
+        else if( name == "ID3D11Texture2D" || name == "First_ID3D11Texture2D" )
         {
             ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
             *pBackBuffer = static_cast<v1::D3D11HardwarePixelBuffer*>(mBuffer)->getParentTexture()->GetTex2D();

@@ -63,7 +63,6 @@ namespace Ogre
         mpBackBuffer = 0;
         mpBackBufferNoMSAA = 0;
         mRenderTargetView = 0;
-        mDepthStencilView = 0;
     }
     //---------------------------------------------------------------------
     D3D11RenderWindowBase::~D3D11RenderWindowBase()
@@ -153,7 +152,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::_createSizeDependedD3DResources(void)
     {
-        assert(mpBackBuffer && !mRenderTargetView && !mDepthStencilView);
+        assert(mpBackBuffer && !mRenderTargetView);
 
         HRESULT hr;
 
@@ -179,60 +178,6 @@ namespace Ogre
                 "Unable to create rendertagert view\nError Description:" + errorDescription,
                 "D3D11RenderWindow::_createSizeDependedD3DResources");
         }
-
-
-        if( mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH )
-        {
-            // Create depth stencil texture
-            ID3D11Texture2D* pDepthStencil = NULL;
-            D3D11_TEXTURE2D_DESC descDepth;
-
-            descDepth.Width = BBDesc.Width;
-            descDepth.Height = BBDesc.Height;
-            descDepth.MipLevels = 1;
-            descDepth.ArraySize = 1;
-            descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-            descDepth.SampleDesc.Count = mFSAAType.Count;
-            descDepth.SampleDesc.Quality = mFSAAType.Quality;
-            descDepth.Usage = D3D11_USAGE_DEFAULT;
-            descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-            descDepth.CPUAccessFlags = 0;
-            descDepth.MiscFlags = 0;
-
-            hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
-            if( FAILED(hr) || mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Unable to create depth texture\nError Description:" + errorDescription,
-                    "D3D11RenderWindow::_createSizeDependedD3DResources");
-            }
-
-            // Create the depth stencil view
-            D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-            ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
-
-            descDSV.Format =  descDepth.Format;
-            descDSV.ViewDimension = mFSAAType.Count > 1 ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-            hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
-
-            SAFE_RELEASE(pDepthStencil);
-                
-            if( FAILED(hr) )
-            {
-				String errorDescription = mDevice.getErrorDescription(hr);
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Unable to create depth stencil view\nError Description:" + errorDescription,
-                    "D3D11RenderWindow::_createSizeDependedD3DResources");
-            }
-
-            D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-            DepthBuffer *depthBuf = rsys->_addManualDepthBuffer( mDepthStencilView, mWidth, mHeight,
-                                                                 mFSAAType.Count, mFSAAType.Quality );
-
-            //Don't forget we want this window to use _this_ depth buffer
-            this->attachDepthBuffer( depthBuf );
-        } 
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::_destroySizeDependedD3DResources()
@@ -241,14 +186,7 @@ namespace Ogre
         SAFE_RELEASE(mpBackBufferNoMSAA);
         SAFE_RELEASE(mRenderTargetView);
 
-        // delete manual depth buffer (depth buffer view non-owning wrapper)
-        DepthBuffer* depthBuf = this->getDepthBuffer();
         detachDepthBuffer();
-        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-        rsys->_removeManualDepthBuffer(depthBuf);
-        delete depthBuf;
-
-        SAFE_RELEASE(mDepthStencilView);
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::destroy()
@@ -311,7 +249,7 @@ namespace Ogre
             *static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView;
             return;
         }
-        else if( name == "ID3D11Texture2D" )
+        else if( name == "ID3D11Texture2D" || name == "First_ID3D11Texture2D" )
         {
             ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
             *pBackBuffer = mpBackBuffer;

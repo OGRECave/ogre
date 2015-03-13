@@ -756,6 +756,7 @@ bail:
         //AIZ:recreate the device for the selected adapter
         {
             mDevice.ReleaseAll();
+            _cleanupDepthBuffers( false );
 
             opt = mOptions.find( "Information Queue Exceptions Bottom Level" );
             if( opt == mOptions.end() )
@@ -1532,10 +1533,10 @@ bail:
     DepthBuffer* D3D11RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
         //Get surface data (mainly to get MSAA data)
-        v1::D3D11HardwarePixelBuffer *pBuffer;
-        renderTarget->getCustomAttribute( "BUFFER", &pBuffer );
+        ID3D11Texture2D *rtTexture = 0;
+        renderTarget->getCustomAttribute( "First_ID3D11Texture2D", &rtTexture );
         D3D11_TEXTURE2D_DESC BBDesc;
-        static_cast<ID3D11Texture2D*>(pBuffer->getParentTexture()->getTextureResource())->GetDesc( &BBDesc );
+        rtTexture->GetDesc( &BBDesc );
 
         // Create depth stencil texture
         ID3D11Texture2D* pDepthStencil = NULL;
@@ -1546,10 +1547,12 @@ bail:
         descDepth.MipLevels             = 1;
         descDepth.ArraySize             = BBDesc.ArraySize;
 
-        if ( mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
+        //TODO: It's the RenderTarget who must tell the precision it wants,
+        //and reject those it doesn't want in attachDepthBuffer.
+        //if ( mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
             descDepth.Format            = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        else
-            descDepth.Format            = DXGI_FORMAT_R32_TYPELESS;
+        /*else
+            descDepth.Format            = DXGI_FORMAT_R32_TYPELESS;*/
 
         descDepth.SampleDesc.Count      = BBDesc.SampleDesc.Count;
         descDepth.SampleDesc.Quality    = BBDesc.SampleDesc.Quality;
@@ -1725,6 +1728,7 @@ bail:
         {
             // Set all texture units to nothing to release texture surfaces
             _disableTextureUnitsFrom(0);
+            _cleanupDepthBuffers( false );
             // Clean up depth stencil surfaces
             mDevice.ReleaseAll();
             //mActiveD3DDriver->setDevice(D3D11Device(NULL));
