@@ -984,6 +984,8 @@ bail:
 
         mRenderSystemWasInited = false;
 
+        SAFE_RELEASE(mDSTResView);
+
         mPrimaryWindow = NULL; // primary window deleted by base class.
         freeDevice();
         SAFE_DELETE( mDriverList );
@@ -1550,7 +1552,8 @@ bail:
         //TODO: It's the RenderTarget who must tell the precision it wants,
         //and reject those it doesn't want in attachDepthBuffer.
         //if ( mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-            descDepth.Format            = DXGI_FORMAT_D24_UNORM_S8_UINT;
+            descDepth.Format            = DXGI_FORMAT_R24G8_TYPELESS;
+            //descDepth.Format            = DXGI_FORMAT_D24_UNORM_S8_UINT;
         /*else
             descDepth.Format            = DXGI_FORMAT_R32_TYPELESS;*/
 
@@ -1589,8 +1592,10 @@ bail:
         if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
         {
             D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-            viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
+            //viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+            viewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+            viewDesc.ViewDimension = BBDesc.SampleDesc.Count > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS :
+                                                                   D3D11_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
             SAFE_RELEASE(mDSTResView);
@@ -1609,12 +1614,13 @@ bail:
         D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
         ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
 
-        if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
+        //if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
             descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        else
-            descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+        /*else
+            descDSV.Format = DXGI_FORMAT_D32_FLOAT;*/
 
-        descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
+        descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS :
+                                                                D3D11_DSV_DIMENSION_TEXTURE2D;
         descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
                                                                                             // TODO: Decide how to expose this feature
         descDSV.Texture2D.MipSlice = 0;
