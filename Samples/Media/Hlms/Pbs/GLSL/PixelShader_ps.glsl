@@ -180,7 +180,7 @@ vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, 
 void main()
 {
 @property( hlms_normal || hlms_qtangent )
-        uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
+        uint materialId	= uint(instance.worldMaterialIdx[inPs.drawId].x) & 0x1FFu;
 	material = materialArray.m[materialId];
 @property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
 @property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16u;@end

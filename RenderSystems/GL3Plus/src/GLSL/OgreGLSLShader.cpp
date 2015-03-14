@@ -323,6 +323,24 @@ namespace Ogre {
 
         if (!mCompiled)
         {
+            std::stringstream ss;
+
+            int line = 0;
+            for (std::string::const_iterator it = mSource.begin(); it != mSource.end(); it++)
+            {
+                if (*it == '\n')
+                {
+                    ss << '\n' << line << ": ";
+                    line ++;
+                }
+                else
+                {
+                    ss << *it;
+                }
+            }
+
+            LogManager::getSingleton().logMessage(ss.str());
+
             String shaderType = getShaderTypeLabel(mType);
             StringUtil::toTitleCase(shaderType);
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
