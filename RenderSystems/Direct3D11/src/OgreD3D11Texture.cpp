@@ -1128,6 +1128,6 @@ namespace Ogre
 
     D3D11RenderTexture::~D3D11RenderTexture()
     {
-
+        SAFE_RELEASE(mRenderTargetView);
     }
 }
