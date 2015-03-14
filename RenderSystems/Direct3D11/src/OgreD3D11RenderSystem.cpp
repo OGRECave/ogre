@@ -985,6 +985,7 @@ bail:
         mRenderSystemWasInited = false;
 
         SAFE_RELEASE(mDSTResView);
+        SAFE_RELEASE(mBoundDepthStencilState);
 
         mPrimaryWindow = NULL; // primary window deleted by base class.
         freeDevice();
@@ -2037,6 +2038,9 @@ bail:
                 "Failed to create depth stencil state\nError Description: " + errorDescription,
                 "D3D11RenderSystem::updateDepthStencilView" );
         }
+
+        if( oldDepthStencilState )
+            oldDepthStencilState->Release();
 
         if( mBoundDepthStencilState != oldDepthStencilState )
         {
