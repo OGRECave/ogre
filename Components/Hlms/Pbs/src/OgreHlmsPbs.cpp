@@ -241,7 +241,8 @@ namespace Ogre
                 samplerblock.mMipFilter     = FO_NONE;
             }
 
-            mShadowmapSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+            if( !mShadowmapSamplerblock )
+                mShadowmapSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
         }
     }
     //-----------------------------------------------------------------------------------

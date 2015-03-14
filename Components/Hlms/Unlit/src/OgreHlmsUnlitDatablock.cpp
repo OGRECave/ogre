@@ -124,6 +124,7 @@ namespace Ogre
                 mTexIndices[i] = 0;
                 textures[i].texture = hlmsTextureManager->getBlankTexture().texture;
                 mSamplerblocks[i] = defaultSamplerblock;
+                hlmsManager->addReference( mSamplerblocks[i] );
 
                 StringVector vec = StringUtil::split( paramVal );
 
@@ -163,6 +164,9 @@ namespace Ogre
                 }
             }
         }
+
+        //Remove the reference
+        hlmsManager->destroySamplerblock( defaultSamplerblock );
 
         for( size_t i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
             textures[i].samplerBlock = mSamplerblocks[i];

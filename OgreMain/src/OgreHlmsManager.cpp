@@ -440,6 +440,11 @@ namespace Ogre
             end  = mActiveBlocks[BLOCK_BLEND].end();
             while( itor != end )
                 mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[*itor++] );
+
+            itor = mActiveBlocks[BLOCK_SAMPLER].begin();
+            end  = mActiveBlocks[BLOCK_SAMPLER].end();
+            while( itor != end )
+                mRenderSystem->_hlmsSamplerblockDestroyed( &mSamplerblocks[*itor++] );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -459,6 +464,11 @@ namespace Ogre
             end  = mActiveBlocks[BLOCK_BLEND].end();
             while( itor != end )
                 mRenderSystem->_hlmsBlendblockCreated( &mBlendblocks[*itor++] );
+
+            itor = mActiveBlocks[BLOCK_SAMPLER].begin();
+            end  = mActiveBlocks[BLOCK_SAMPLER].end();
+            while( itor != end )
+                mRenderSystem->_hlmsSamplerblockCreated( &mSamplerblocks[*itor++] );
         }
 
         mTextureManager->_changeRenderSystem( newRs );
