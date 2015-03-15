@@ -1431,6 +1431,9 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
     {
+        assert( macroblock->mRsData &&
+                "The block must have been created via HlmsManager::getMacroblock!" );
+
         GL3PlusHlmsMacroblock *glMacroblock = reinterpret_cast<GL3PlusHlmsMacroblock*>(
                                                                     macroblock->mRsData );
 
@@ -1486,6 +1489,9 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
     {
+        assert( blendblock->mRsData &&
+                "The block must have been created via HlmsManager::getBlendblock!" );
+
         if( blendblock->mSeparateBlend )
         {
             _setSeparateSceneBlending(
@@ -1523,6 +1529,9 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
+        assert( samplerblock->mRsData &&
+                "The block must have been created via HlmsManager::getSamplerblock!" );
+
         if( !samplerblock )
         {
             glBindSampler( texUnit, 0 );

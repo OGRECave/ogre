@@ -2400,6 +2400,9 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
     {
+        assert( macroblock->mRsData &&
+                "The block must have been created via HlmsManager::getMacroblock!" );
+
         ID3D11RasterizerState *rasterizerState = reinterpret_cast<ID3D11RasterizerState*>(
                                                                         macroblock->mRsData );
 
@@ -2426,6 +2429,9 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
     {
+        assert( blendblock->mRsData &&
+                "The block must have been created via HlmsManager::getBlendblock!" );
+
         ID3D11BlendState *blendState = reinterpret_cast<ID3D11BlendState*>( blendblock->mRsData );
 
         // TODO - Add this functionality to Ogre (what's the GL equivalent?)
@@ -2441,6 +2447,9 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
+        assert( samplerblock->mRsData &&
+                "The block must have been created via HlmsManager::getSamplerblock!" );
+
         ID3D11SamplerState *samplerState = reinterpret_cast<ID3D11SamplerState*>( samplerblock->mRsData );
 
         //TODO: Refactor Ogre to:

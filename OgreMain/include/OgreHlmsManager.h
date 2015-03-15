@@ -90,10 +90,13 @@ namespace Ogre
         /** Creates a macroblock that matches the same parameter as the input. If it already exists,
             returns the existing one.
         @par
-            Macroblocks are destroyed by the HlmsManager. Don't try to delete them manually.
+            Macroblocks must be destroyed with destroyMacroblock.
+            Don't try to delete the pointer directly.
         @par
-            Macroblocks are manually reference counted. They increment with each getMacroblock call.
-            Make sure to call destroyMacroblock after you're done using it.
+            Calling this function will increase the reference count of the block.
+            Make sure to call destroyMacroblock after you're done using it; which will
+            decrease the reference count (it won't be actually destroyed until the
+            reference is 0).
         @par
             Up to 32 different macroblocks are supported at the same time.
         @param baseParams
@@ -116,6 +119,7 @@ namespace Ogre
         void destroyMacroblock( const HlmsMacroblock *macroblock );
 
         /// @See getMacroblock. This is the same for blend states
+        /// The block's reference count will be increased. Use destroyBlendblock to decrease it.
         const HlmsBlendblock* getBlendblock( const HlmsBlendblock &baseParams );
 
         /// @See destroyMacroblock
@@ -123,6 +127,7 @@ namespace Ogre
 
         /** @See getMacroblock. This is the same for Sampler states
         @remarks
+            The block's reference count will be increased. Use destroySamplerblock to decrease it.
             The input is a hard copy because it may be modified if invalid parameters are detected
             (i.e. specifying anisotropic level higher than 1, but no anisotropic filter)
             A warning on the log will be generated in such cases.
