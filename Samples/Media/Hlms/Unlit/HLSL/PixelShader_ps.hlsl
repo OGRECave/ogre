@@ -40,10 +40,10 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 @property( diffuse_map )@property( diffuse_map0 )
 	//Load base image
-		outColour = @insertpiece( TextureOrigin0 ).Sample( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) );@end
+	outColour = @insertpiece( TextureOrigin0 ).Sample( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) ).@insertpiece(diffuse_map0_tex_swizzle);@end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
-		float4 topImage@n = @insertpiece( TextureOrigin@n ).Sample( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) );@end @end
+	float4 topImage@n = @insertpiece( TextureOrigin@n ).Sample( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) ).@insertpiece(diffuse_map@n_tex_swizzle);@end @end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
 	@insertpiece( blend_mode_idx@n )@end @end

@@ -35,10 +35,10 @@ void main()
 
 @property( diffuse_map )@property( diffuse_map0 )
 	//Load base image
-        outColour = texture( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) );@end
+	outColour = texture( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) ).@insertpiece(diffuse_map0_tex_swizzle);@end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
-        vec4 topImage@n = texture( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) );@end @end
+	vec4 topImage@n = texture( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) ).@insertpiece(diffuse_map@n_tex_swizzle);@end @end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
 	@insertpiece( blend_mode_idx@n )@end @end

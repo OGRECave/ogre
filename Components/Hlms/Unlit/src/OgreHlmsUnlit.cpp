@@ -398,6 +398,25 @@ namespace Ogre
                         uvOutputs.push_back( uvOutput );
                     }
                 }
+
+                //Generate the texture swizzle for the pixel shader.
+                IdString diffuseMapNTexSwizzle( diffuseMapNStr + "_tex_swizzle" );
+                String texSwizzle;
+                texSwizzle.reserve( 4 );
+
+                for( size_t i=0; i<4; ++i )
+                {
+                    const size_t swizzleMask = (datablock->mTextureSwizzles[i] >> (6u - i*2u)) & 0x03u;
+                    if( swizzleMask == HlmsUnlitDatablock::R_MASK )
+                        texSwizzle += "x";
+                    else if( swizzleMask == HlmsUnlitDatablock::G_MASK )
+                        texSwizzle += "y";
+                    else if( swizzleMask == HlmsUnlitDatablock::B_MASK )
+                        texSwizzle += "z";
+                    else if( swizzleMask == HlmsUnlitDatablock::A_MASK )
+                        texSwizzle += "w";
+                }
+                inOutPieces[PixelShader][diffuseMapNTexSwizzle] = texSwizzle;
             }
         }
 
