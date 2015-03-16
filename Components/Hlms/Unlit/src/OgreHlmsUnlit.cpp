@@ -404,9 +404,9 @@ namespace Ogre
                 String texSwizzle;
                 texSwizzle.reserve( 4 );
 
-                for( size_t i=0; i<4; ++i )
+                for( size_t j=0; j<4; ++j )
                 {
-                    const size_t swizzleMask = (datablock->mTextureSwizzles[i] >> (6u - i*2u)) & 0x03u;
+                    const size_t swizzleMask = (datablock->mTextureSwizzles[i] >> (6u - j*2u)) & 0x03u;
                     if( swizzleMask == HlmsUnlitDatablock::R_MASK )
                         texSwizzle += "x";
                     else if( swizzleMask == HlmsUnlitDatablock::G_MASK )
