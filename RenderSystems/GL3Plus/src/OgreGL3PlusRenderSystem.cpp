@@ -1287,6 +1287,19 @@ namespace Ogre {
         block->mRsData = 0;
     }
 
+    void GL3PlusRenderSystem::_hlmsBlendblockCreated( HlmsBlendblock *newBlock )
+    {
+        //HACK: Set it to non-zero to get the assert in _setHlmsBlendblock
+        //to work correctly (which is a very useful assert)
+        //TODO: Use a RS-specific blendblock like with do with macroblocks.
+        newBlock->mRsData = reinterpret_cast<void*>( 1 );
+    }
+
+    void GL3PlusRenderSystem::_hlmsBlendblockDestroyed( HlmsBlendblock *block )
+    {
+        block->mRsData = 0;
+    }
+
     void GL3PlusRenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newBlock )
     {
         GLuint samplerName;
