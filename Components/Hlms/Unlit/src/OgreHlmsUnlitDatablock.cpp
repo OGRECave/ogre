@@ -86,7 +86,7 @@ namespace Ogre
         for( size_t i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
         {
             mTextureMatrices[i] = Matrix4::IDENTITY;
-            setTextureSwizzles( i, R_MASK, G_MASK, B_MASK, A_MASK );
+            setTextureSwizzle( i, R_MASK, G_MASK, B_MASK, A_MASK );
         }
 
         memset( mUvSource, 0, sizeof( mUvSource ) );
@@ -431,7 +431,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsUnlitDatablock::setTextureSwizzles( uint8 texType, uint8 r, uint8 g, uint8 b, uint8 a )
+    void HlmsUnlitDatablock::setTextureSwizzle( uint8 texType, uint8 r, uint8 g, uint8 b, uint8 a )
     {
         assert( texType < NUM_UNLIT_TEXTURE_TYPES );
         mTextureSwizzles[texType] = (r << 6u) | ((g & 0x03u) << 4u) | ((b & 0x03u) << 2u) | (a & 0x03u);

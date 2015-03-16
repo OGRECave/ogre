@@ -194,7 +194,7 @@ namespace Ogre
         TexturePtr getTexture( uint8 texType ) const;
 
         /** Sets the final swizzle when sampling the given texture. e.g.
-            calling setTextureSwizzles( 0, R_MASK, G_MASK, R_MASK, G_MASK );
+            calling setTextureSwizzle( 0, R_MASK, G_MASK, R_MASK, G_MASK );
             will generated the following pixel shader:
                 vec4 texColour = texture( tex, uv ).xyxy;
 
@@ -214,7 +214,7 @@ namespace Ogre
             Where to source the alpha channel from.
             Default: A_MASK
         */
-        void setTextureSwizzles( uint8 texType, uint8 r, uint8 g, uint8 b, uint8 a );
+        void setTextureSwizzle( uint8 texType, uint8 r, uint8 g, uint8 b, uint8 a );
 
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc). If the samplerblock changes,
