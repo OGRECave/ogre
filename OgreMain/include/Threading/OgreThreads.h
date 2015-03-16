@@ -64,10 +64,9 @@ THE SOFTWARE.
     #define THREAD_DECLARE( threadFunction ) \
     void* OGRE_THREAD_CALL_CONVENTION threadFunction##_internal( void *argName )\
     {\
-        unsigned long retVal = 0;\
         ThreadHandle *threadHandle( reinterpret_cast<ThreadHandle*>( argName ) );\
         try {\
-            retVal = threadFunction( threadHandle );\
+            threadFunction( threadHandle );\
         }\
         catch( ... )\
         {\

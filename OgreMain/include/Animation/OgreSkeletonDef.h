@@ -96,12 +96,12 @@ namespace Ogre
         ///  It's the place in SoA slots the bone will end up with, with an index containing
         ///  the parent level in the high 8 bits.
         ///     For example the given bone hierarchy:
-        ///         A
-        ///         |\ \
-        ///         | \ \
-        ///         B  C D
-        ///         |
-        ///         E
+        ///          A
+        ///        /| |
+        ///       / | |
+        ///      B  C D
+        ///     /
+        ///     E
         ///     A is the first root at depth level 0; the index is 0
         ///     B is (1 << 24) | (0 & 0x00FFFFF); because it's the first bone in depth level 1
         ///     C is (1 << 24) | (1 & 0x00FFFFF); because it's the second bone in depth lv 1

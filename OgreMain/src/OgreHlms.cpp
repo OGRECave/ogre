@@ -224,8 +224,8 @@ namespace Ogre
                 {
                     for( size_t i=0; i<sizeof( blockNames ) / sizeof( char* ); ++i )
                     {
-                        size_t idx = subString.find( blockNames[i] );
-                        if( idx == 0 )
+                        size_t idx2 = subString.find( blockNames[i] );
+                        if( idx2 == 0 )
                         {
                             it = subString.begin() + strlen( blockNames[i] );
                             ++nesting;
@@ -1310,7 +1310,7 @@ namespace Ogre
         uint16 numWorldTransforms = 1;
         bool castShadows          = true;
 
-        /*std::ifstream inFile( "E:/Projects/Hlms/bin/Hlms/PBS/GLSL/VertexShader_vs.glsl",
+        *//*std::ifstream inFile( "E:/Projects/Hlms/bin/Hlms/PBS/GLSL/VertexShader_vs.glsl",
                               std::ios::in | std::ios::binary );
         std::ofstream outFile( "E:/Projects/Hlms/bin/Hlms/PBS/GLSL/Output_vs.glsl",
                                std::ios::out | std::ios::binary );*//*

@@ -1203,7 +1203,6 @@ namespace Ogre {
             (*isub)->removeLodLevels();
         }
 
-        bool edgeListWasBuilt = isEdgeListBuilt();
         freeEdgeList();
         mMeshLodUsageList.clear();
         mLodValues.clear();
