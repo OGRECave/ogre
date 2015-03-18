@@ -2044,7 +2044,7 @@ namespace Ogre
 	void D3D9RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
 	{
 		// if vertex shader is being used, stage and index must match
-		if (mVertexProgramBound)
+		if (mDeviceManager->getActiveDevice()->isVertexProgramBound())
 			index = stage;
 
 		HRESULT hr;
@@ -2098,7 +2098,7 @@ namespace Ogre
 		TexCoordCalcMethod autoTexCoordType = mTexStageDesc[stage].autoTexCoordType;
 
 		// if a vertex program is bound, we mustn't set texture transforms
-		if (mVertexProgramBound)
+		if (mDeviceManager->getActiveDevice()->isVertexProgramBound())
 		{
 			hr = __SetTextureStageState( static_cast<DWORD>(stage), D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_DISABLE );
 			if( FAILED( hr ) )
@@ -3472,8 +3472,8 @@ namespace Ogre
 		if ( !mEnableFixedPipeline && !mRealCapabilities->hasCapability(RSC_FIXED_FUNCTION)
 			 && 
 			 (
-				( !mVertexProgramBound ) ||
-				(!mFragmentProgramBound && op.operationType != RenderOperation::OT_POINT_LIST) 		  
+			 (!mDeviceManager->getActiveDevice()->isVertexProgramBound()) ||
+			 (!mDeviceManager->getActiveDevice()->isFragmentProgramBound() && op.operationType != RenderOperation::OT_POINT_LIST)
 			  )
 		   ) 
 		{
@@ -3615,6 +3615,7 @@ namespace Ogre
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error calling SetVertexShader", "D3D9RenderSystem::bindGpuProgram");
 			}
+			mDeviceManager->getActiveDevice()->_setVertexProgramBound(true);
 			break;
 		case GPT_FRAGMENT_PROGRAM:
 			hr = getActiveD3D9Device()->SetPixelShader(
@@ -3623,6 +3624,7 @@ namespace Ogre
 			{
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error calling SetPixelShader", "D3D9RenderSystem::bindGpuProgram");
 			}
+			mDeviceManager->getActiveDevice()->_setFragmentProgramBound(true);
 			break;
 		};
 
@@ -3657,6 +3659,7 @@ namespace Ogre
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error resetting SetVertexShader to NULL", 
 					"D3D9RenderSystem::unbindGpuProgram");
 			}
+			mDeviceManager->getActiveDevice()->_setVertexProgramBound(false);
 			break;
 		case GPT_FRAGMENT_PROGRAM:
 			mActiveFragmentGpuProgramParameters.setNull();
@@ -3666,6 +3669,7 @@ namespace Ogre
 				OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error resetting SetPixelShader to NULL", 
 					"D3D9RenderSystem::unbindGpuProgram");
 			}
+			mDeviceManager->getActiveDevice()->_setFragmentProgramBound(false);
 			break;
 		};
 		RenderSystem::unbindGpuProgram(gptype);
@@ -3853,6 +3857,22 @@ namespace Ogre
 		}
 	}
 	//---------------------------------------------------------------------
+	bool D3D9RenderSystem::isGpuProgramBound(GpuProgramType gptype)
+	{
+		D3D9Device* activeDevice = mDeviceManager->getActiveDevice();
+		switch (gptype)
+		{
+		case GPT_VERTEX_PROGRAM:
+			return activeDevice->isVertexProgramBound();
+		case GPT_GEOMETRY_PROGRAM:
+			return false;
+		case GPT_FRAGMENT_PROGRAM:
+			return activeDevice->isFragmentProgramBound();
+		}
+		// Make compiler happy
+		return false;
+	}
+	//---------------------------------------------------------------------
 	void D3D9RenderSystem::setClipPlanesImpl(const PlaneList& clipPlanes)
 	{
 		size_t i;
@@ -3871,7 +3891,7 @@ namespace Ogre
 			dx9ClipPlane.c = plane.normal.z;
 			dx9ClipPlane.d = plane.d;
 
-			if (mVertexProgramBound)
+			if (mDeviceManager->getActiveDevice()->isVertexProgramBound())
 			{
 				// programmable clips in clip space (ugh)
 				// must transform worldspace planes by view/proj

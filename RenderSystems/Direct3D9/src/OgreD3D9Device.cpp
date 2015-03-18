@@ -56,6 +56,8 @@ namespace Ogre
 		mDeviceLost					= false;
 		mPresentationParamsCount 	= 0;
 		mPresentationParams		 	= NULL;
+		mVertexProgramBound			= false;
+		mFragmentProgramBound		= false;
 		memset(&mD3D9DeviceCaps, 0, sizeof(mD3D9DeviceCaps));
 		memset(&mCreationParams, 0, sizeof(mCreationParams));		
 	}

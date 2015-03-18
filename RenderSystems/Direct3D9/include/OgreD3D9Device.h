@@ -80,6 +80,11 @@ namespace Ogre {
 		void					copyContentsToMemory(D3D9RenderWindow* window, const PixelBox &dst, RenderTarget::FrameBuffer buffer);
 		void					clearDeviceStreams		();
 	
+		bool					isVertexProgramBound	() const { return mVertexProgramBound; }
+		bool					isFragmentProgramBound	() const { return mFragmentProgramBound; }
+		void					_setVertexProgramBound	(bool programBound) { mVertexProgramBound = programBound; }
+		void					_setFragmentProgramBound(bool programBound) { mFragmentProgramBound = programBound; }
+
 	public:
 		D3D9Device	(D3D9DeviceManager* deviceManager,
 					 UINT adapterNumber, 
@@ -105,7 +110,9 @@ namespace Ogre {
 		D3DDEVICE_CREATION_PARAMETERS	mCreationParams;			// Creation parameters.
 		uint							mLastPresentFrame;			// Last frame that this device present method called.
 		bool							mDeviceLost;				// True if device entered lost state.
-	
+		bool							mVertexProgramBound;		// Is a vertex program currently bound to the device
+		bool							mFragmentProgramBound;		// Is a fragment program currently bound to the device
+
 		struct RenderWindowResources
 		{
 			IDirect3DSwapChain9* 	swapChain;						// Swap chain interface.
