@@ -63,7 +63,7 @@ uniform mat4 worldViewProj;
 	_localPos.x = dot( worldMat[_idx + 0], vertex );
 	_localPos.y = dot( worldMat[_idx + 1], vertex );
 	_localPos.z = dot( worldMat[_idx + 2], vertex );
-	_localPos *= blendWeights[0];
+	_localPos.xyz *= blendWeights[0];
 	@property( hlms_normal )vec3 _localNorm;
 	_localNorm.x = dot( worldMat[_idx + 0].xyz, normal );
 	_localNorm.y = dot( worldMat[_idx + 1].xyz, normal );
@@ -76,13 +76,13 @@ uniform mat4 worldViewProj;
 	_localTang *= blendWeights[0];@end
 
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
-	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;@end
+	@property( NeedsMoreThan1BonePerVertex )vec3 tmp;@end
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = int(blendIndices[@n] * 3.0);
 	tmp.x = dot( worldMat[_idx + 0], vertex );
 	tmp.y = dot( worldMat[_idx + 1], vertex );
 	tmp.z = dot( worldMat[_idx + 2], vertex );
-	_localPos += tmp * blendWeights[@n];
+	_localPos.xyz += tmp.xyz * blendWeights[@n];
 	@property( hlms_normal )
 	tmp.x = dot( worldMat[_idx + 0].xyz, normal );
 	tmp.y = dot( worldMat[_idx + 1].xyz, normal );
