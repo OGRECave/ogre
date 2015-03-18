@@ -629,7 +629,7 @@ namespace Ogre {
     void BorderPanelOverlayElement::_update(void)
     {
         if (mMetricsMode != GMM_RELATIVE && 
-            (OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate))
+            mGeomPositionsOutOfDate)
         {
             mLeftBorderSize = mPixelLeftBorderSize * mPixelScaleX;
             mRightBorderSize = mPixelRightBorderSize * mPixelScaleX;

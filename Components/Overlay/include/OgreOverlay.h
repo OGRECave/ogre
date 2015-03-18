@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreOverlayPrerequisites.h"
 #include "OgreIteratorWrappers.h"
 #include "OgreMatrix4.h"
+#include "OgreViewport.h"
 
 namespace Ogre {
 
@@ -86,6 +87,8 @@ namespace Ogre {
         Real mScrollX, mScrollY;
         /// Scale values
         Real mScaleX, mScaleY;
+
+        int mLastViewportWidth, mLastViewportHeight;
 
         mutable Matrix4 mTransform;
         mutable bool mTransformOutOfDate;
@@ -244,7 +247,7 @@ namespace Ogre {
         void _getWorldTransforms(Matrix4* xform) const;
 
         /** Internal method to put the overlay contents onto the render queue. */
-        void _findVisibleObjects(Camera* cam, RenderQueue* queue);
+        void _findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp);
 
         /** This returns a OverlayElement at position x,y. */
         virtual OverlayElement* findElementAt(Real x, Real y);
