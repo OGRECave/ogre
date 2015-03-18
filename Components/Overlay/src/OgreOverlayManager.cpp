@@ -52,7 +52,6 @@ namespace Ogre {
     OverlayManager::OverlayManager() 
       : mLastViewportWidth(0), 
         mLastViewportHeight(0), 
-        mViewportDimensionsChanged(false),
         mLastViewportOrientationMode(OR_DEGREE_0)
     {
 
@@ -273,16 +272,11 @@ namespace Ogre {
             mLastViewportHeight != vp->getActualHeight() ||
             orientationModeChanged)
         {
-            mViewportDimensionsChanged = true;
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
             mLastViewportOrientationMode = vp->getOrientationMode();
 #endif
             mLastViewportWidth = vp->getActualWidth();
             mLastViewportHeight = vp->getActualHeight();
-        }
-        else
-        {
-            mViewportDimensionsChanged = false;
         }
 
         OverlayMap::iterator i, iend;
@@ -297,7 +291,7 @@ namespace Ogre {
                 o->scroll(0.f, 0.f);
             }
 #endif
-            o->_findVisibleObjects(cam, pQueue);
+            o->_findVisibleObjects(cam, pQueue, vp);
         }
     }
     //---------------------------------------------------------------------
@@ -472,11 +466,6 @@ namespace Ogre {
             line = stream->getLine();
         }
 
-    }
-    //---------------------------------------------------------------------
-    bool OverlayManager::hasViewportChanged(void) const
-    {
-        return mViewportDimensionsChanged;
     }
     //---------------------------------------------------------------------
     int OverlayManager::getViewportHeight(void) const

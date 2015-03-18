@@ -63,9 +63,8 @@ namespace Ogre {
         void parseElementAttrib( const String& line, Overlay* pOverlay, OverlayElement* pElement );
         void skipToNextCloseBrace(DataStreamPtr& chunk);
         void skipToNextOpenBrace(DataStreamPtr& chunk);
-        
+
         int mLastViewportWidth, mLastViewportHeight;
-        bool mViewportDimensionsChanged;
         OrientationMode mLastViewportOrientationMode;
 
         bool parseChildren( DataStreamPtr& chunk, const String& line,
@@ -124,12 +123,6 @@ namespace Ogre {
 
         /** Internal method for queueing the visible overlays for rendering. */
         void _queueOverlaysForRendering(Camera* cam, RenderQueue* pQueue, Viewport *vp);
-
-        /** Method for determining if the viewport has changed dimensions. 
-        @remarks This is used by pixel-based OverlayElements to work out if they need to
-            recalculate their sizes.
-        */
-        bool hasViewportChanged(void) const;
 
         /** Gets the height of the destination viewport in pixels. */
         int getViewportHeight(void) const;
