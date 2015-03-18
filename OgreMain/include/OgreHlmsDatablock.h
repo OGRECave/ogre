@@ -51,10 +51,10 @@ namespace Ogre
 
     struct _OgreExport BasicBlock
     {
-        void        *mRsData;       ///Render-System specific data
+        void        *mRsData;       /// Render-System specific data
         uint16      mRefCount;
         uint16      mId;
-        uint8       mBlockType;
+        uint8       mBlockType;     /// @see HlmsBasicBlock
 
         /// When zero, HlmsManager cannot override the block's values with
         /// enforced global settings. (such as lower quality texture filtering or
@@ -112,7 +112,8 @@ namespace Ogre
         bool operator != ( const HlmsMacroblock &_r ) const
         {
             //Don't include the ID in the comparision
-            return  mScissorTestEnabled     != _r.mScissorTestEnabled ||
+            return  mAllowGlobalDefaults    != _r.mAllowGlobalDefaults ||
+                    mScissorTestEnabled     != _r.mScissorTestEnabled ||
                     mDepthCheck             != _r.mDepthCheck ||
                     mDepthWrite             != _r.mDepthWrite ||
                     mDepthFunc              != _r.mDepthFunc ||
@@ -182,7 +183,8 @@ namespace Ogre
             //Don't include the ID in the comparision
             //AND don't include mIsTransparent, which is filled
             //automatically only for some managed objects.
-            return  mSeparateBlend          != _r.mSeparateBlend ||
+            return  mAllowGlobalDefaults    != _r.mAllowGlobalDefaults ||
+                    mSeparateBlend          != _r.mSeparateBlend ||
                     mSourceBlendFactor      != _r.mSourceBlendFactor ||
                     mDestBlendFactor        != _r.mDestBlendFactor ||
                     mSourceBlendFactorAlpha != _r.mSourceBlendFactorAlpha ||

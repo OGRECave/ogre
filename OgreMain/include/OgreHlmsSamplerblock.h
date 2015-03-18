@@ -89,7 +89,8 @@ namespace Ogre
         bool operator != ( const HlmsSamplerblock &_r ) const
         {
             //Don't include the ID in the comparision
-            return  mMinFilter          != _r.mMinFilter ||
+            return  mAllowGlobalDefaults!= _r.mAllowGlobalDefaults ||
+                    mMinFilter          != _r.mMinFilter ||
                     mMagFilter          != _r.mMagFilter ||
                     mMipFilter          != _r.mMipFilter ||
                     mU                  != _r.mU ||

@@ -147,6 +147,10 @@ namespace Ogre
     const HlmsMacroblock* HlmsManager::getMacroblock( const HlmsMacroblock &baseParams )
     {
         assert( mRenderSystem && "A render system must be selected first!" );
+        assert( baseParams.mBlockType == BLOCK_MACRO &&
+                "baseParams.mBlockType should always be BLOCK_MACRO! You can ignore this assert,"
+                " but it usually indicates memory corruption (or you created the block without "
+                "its default constructor)." );
 
         BlockIdxVec::iterator itor = mActiveBlocks[BLOCK_MACRO].begin();
         BlockIdxVec::iterator end  = mActiveBlocks[BLOCK_MACRO].end();
@@ -165,7 +169,10 @@ namespace Ogre
             size_t idx = getFreeBasicBlock( BLOCK_MACRO );
 
             mMacroblocks[idx] = baseParams;
-            mMacroblocks[idx].mId = idx; //Restore the ID which has just been overwritten.
+            //Restore the values which has just been overwritten and we need properly set.
+            mMacroblocks[idx].mRefCount = 0;
+            mMacroblocks[idx].mId       = idx;
+            mMacroblocks[idx].mBlockType= BLOCK_MACRO;
             mRenderSystem->_hlmsMacroblockCreated( &mMacroblocks[idx] );
 
             retVal = &mMacroblocks[idx];
@@ -198,6 +205,10 @@ namespace Ogre
     const HlmsBlendblock* HlmsManager::getBlendblock( const HlmsBlendblock &baseParams )
     {
         assert( mRenderSystem && "A render system must be selected first!" );
+        assert( baseParams.mBlockType == BLOCK_BLEND &&
+                "baseParams.mBlockType should always be BLOCK_BLEND! You can ignore this assert,"
+                " but it usually indicates memory corruption (or you created the block without "
+                "its default constructor)." );
 
         BlockIdxVec::iterator itor = mActiveBlocks[BLOCK_BLEND].begin();
         BlockIdxVec::iterator end  = mActiveBlocks[BLOCK_BLEND].end();
@@ -216,7 +227,12 @@ namespace Ogre
             size_t idx = getFreeBasicBlock( BLOCK_BLEND );
 
             mBlendblocks[idx] = baseParams;
-            mBlendblocks[idx].mId = idx; //Restore the ID which has just been overwritten.
+
+            //Restore the values which has just been overwritten and we need properly set.
+            mBlendblocks[idx].mRefCount = 0;
+            mBlendblocks[idx].mId       = idx;
+            mBlendblocks[idx].mBlockType= BLOCK_BLEND;
+
             mBlendblocks[idx].mIsTransparent =
                      !( baseParams.mDestBlendFactor == SBF_ZERO &&
                         baseParams.mSourceBlendFactor != SBF_DEST_COLOUR &&
@@ -255,6 +271,10 @@ namespace Ogre
     const HlmsSamplerblock* HlmsManager::getSamplerblock( HlmsSamplerblock baseParams )
     {
         assert( mRenderSystem && "A render system must be selected first!" );
+        assert( baseParams.mBlockType == BLOCK_SAMPLER &&
+                "baseParams.mBlockType should always be BLOCK_SAMPLER! You can ignore this assert,"
+                " but it usually indicates memory corruption (or you created the block without "
+                "its default constructor)." );
 
         bool errorsFixed = false;
 
@@ -295,7 +315,10 @@ namespace Ogre
             size_t idx = getFreeBasicBlock( BLOCK_SAMPLER );
 
             mSamplerblocks[idx] = baseParams;
-            mSamplerblocks[idx].mId = idx; //Restore the ID which has just been overwritten.
+            //Restore the values which has just been overwritten and we need properly set.
+            mSamplerblocks[idx].mRefCount   = 0;
+            mSamplerblocks[idx].mId         = idx;
+            mSamplerblocks[idx].mBlockType  = BLOCK_SAMPLER;
             mRenderSystem->_hlmsSamplerblockCreated( &mSamplerblocks[idx] );
 
             retVal = &mSamplerblocks[idx];
