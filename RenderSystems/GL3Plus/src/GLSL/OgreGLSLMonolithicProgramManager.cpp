@@ -55,8 +55,8 @@ namespace Ogre {
     }
 
 
-    GLSLMonolithicProgramManager::GLSLMonolithicProgramManager(void) :
-        GLSLProgramManager(),
+    GLSLMonolithicProgramManager::GLSLMonolithicProgramManager(const GL3PlusSupport& support) :
+        GLSLProgramManager(support),
         mActiveMonolithicProgram(NULL)
     {
     }

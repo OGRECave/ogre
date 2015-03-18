@@ -65,15 +65,8 @@ namespace Ogre {
 #   include <GL/glext.h>
 #   include <GL/wglext.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-#   define GL_GLEXT_PROTOTYPES
-#   define GLX_GLXEXT_PROTOTYPES
-
-#   include <X11/Xlib.h>
 #   include <GL/gl3w.h>
 #   include <GL/glext.h>
-#   include <GL/glx.h>
-#   include <GL/glxext.h>
-#   include <GL/glu.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <GL/gl3w.h>
 #   include <OpenGL/gl3ext.h>

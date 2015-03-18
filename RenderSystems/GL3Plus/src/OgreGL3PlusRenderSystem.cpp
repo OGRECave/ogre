@@ -229,25 +229,19 @@ namespace Ogre {
         rsc->setDriverVersion(mDriverVersion);
 
         const char* deviceName = (const char*)glGetString(GL_RENDERER);
-        const char* vendorName = (const char*)glGetString(GL_VENDOR);
         if (deviceName)
         {
             rsc->setDeviceName(deviceName);
         }
 
         rsc->setRenderSystemName(getName());
+        rsc->parseVendorFromString(mGLSupport->getGLVendor());
 
-        // Determine vendor
-        if (strstr(vendorName, "NVIDIA"))
-            rsc->setVendor(GPU_NVIDIA);
-        else if (strstr(vendorName, "ATI"))
-            rsc->setVendor(GPU_AMD);
-        else if (strstr(vendorName, "AMD"))
-            rsc->setVendor(GPU_AMD);
-        else if (strstr(vendorName, "Intel"))
-            rsc->setVendor(GPU_INTEL);
-        else
-            rsc->setVendor(GPU_UNKNOWN);
+        bool hasGL31 = mGLSupport->checkMinGLVersion(3, 1);
+        bool hasGL33 = mGLSupport->checkMinGLVersion(3, 3);
+        bool hasGL40 = mGLSupport->checkMinGLVersion(4, 0);
+        bool hasGL41 = mGLSupport->checkMinGLVersion(4, 1);
+        bool hasGL42 = mGLSupport->checkMinGLVersion(4, 2);
 
         // Check for hardware mipmapping support.
         bool disableAutoMip = false;
@@ -310,7 +304,7 @@ namespace Ogre {
         }
 
         // Check for etc compression
-        if (mGLSupport->checkExtension("GL_ARB_ES3_compatibility") || gl3wIsSupported(4, 3))
+        if (mGLSupport->checkExtension("GL_ARB_ES3_compatibility") || mHasGL43)
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
         }
@@ -325,7 +319,7 @@ namespace Ogre {
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
 
         // BPTC(BC6H/BC7) is supported by the extension or OpenGL 4.2 or higher
-        if (mGLSupport->checkExtension("GL_ARB_texture_compression_bptc") || gl3wIsSupported(4, 2))
+        if (mGLSupport->checkExtension("GL_ARB_texture_compression_bptc") || hasGL42)
         {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
@@ -351,11 +345,11 @@ namespace Ogre {
 
         // Check for non-power-of-2 texture support
         if (mGLSupport->checkExtension("GL_ARB_texture_rectangle") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") ||
-            gl3wIsSupported(3, 1))
+                hasGL31)
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
 
         // Check for atomic counter support
-        if (mGLSupport->checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
+        if (mGLSupport->checkExtension("GL_ARB_shader_atomic_counters") || hasGL42)
             rsc->setCapability(RSC_ATOMIC_COUNTERS);
 
         // Scissor test is standard
@@ -407,7 +401,7 @@ namespace Ogre {
             rsc->addShaderProfile("glsl130");
 
         // FIXME: This isn't working right yet in some rarer cases
-        if (mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || gl3wIsSupported(4, 1))
+        if (mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || hasGL41)
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
 
         // Vertex/Fragment Programs
@@ -444,7 +438,7 @@ namespace Ogre {
         rsc->setGeometryProgramConstantIntCount(floatConstantCount);
 
         // Tessellation Program Properties
-        if (mGLSupport->checkExtension("GL_ARB_tessellation_shader") || gl3wIsSupported(4, 0))
+        if (mGLSupport->checkExtension("GL_ARB_tessellation_shader") || hasGL40)
         {
             rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
             rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
@@ -467,7 +461,7 @@ namespace Ogre {
         }
 
         // Compute Program Properties
-        if (mGLSupport->checkExtension("GL_ARB_compute_shader") || gl3wIsSupported(4, 3))
+        if (mGLSupport->checkExtension("GL_ARB_compute_shader") || mHasGL43)
         {
             rsc->setCapability(RSC_COMPUTE_PROGRAM);
 
@@ -482,7 +476,7 @@ namespace Ogre {
             // OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || gl3wIsSupported(4, 1))
+        if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || hasGL41)
         {
             GLint formats;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
@@ -491,7 +485,7 @@ namespace Ogre {
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || gl3wIsSupported(3, 3))
+        if (mGLSupport->checkExtension("GL_ARB_instanced_arrays") || hasGL33)
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
@@ -533,7 +527,7 @@ namespace Ogre {
         mShaderManager = OGRE_NEW GLSLShaderManager();
 
         // Create GLSL shader factory
-        mGLSLShaderFactory = new GLSLShaderFactory();
+        mGLSLShaderFactory = new GLSLShaderFactory(*mGLSupport);
         HighLevelGpuProgramManager::getSingleton().addFactory(mGLSLShaderFactory);
 
         // Set texture the number of texture units
@@ -895,7 +889,7 @@ namespace Ogre {
 
             if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
             {
-                if (gl3wIsSupported(3, 2))
+                if (mHasGL32)
                 {
                     OGRE_CHECK_GL_ERROR(glEnable(GL_PROGRAM_POINT_SIZE));
                 }
@@ -909,7 +903,7 @@ namespace Ogre {
         {
             if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
             {
-                if (gl3wIsSupported(3, 2))
+                if (mHasGL32)
                 {
                     OGRE_CHECK_GL_ERROR(glDisable(GL_PROGRAM_POINT_SIZE));
                 }
@@ -1980,7 +1974,7 @@ namespace Ogre {
                 GLuint indexEnd = op.indexData->indexCount - op.indexData->indexStart;
                 if (hasInstanceData)
                 {
-                    if (mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
+                    if (mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || mHasGL32)
                     {
                         OGRE_CHECK_GL_ERROR(glDrawElementsInstancedBaseVertex(primType, op.indexData->indexCount, indexType, pBufferData, numberOfInstances, op.vertexData->vertexStart));
                     }
@@ -1991,7 +1985,7 @@ namespace Ogre {
                 }
                 else
                 {
-                    if (mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || gl3wIsSupported(3, 2))
+                    if (mGLSupport->checkExtension("GL_ARB_draw_elements_base_vertex") || mHasGL32)
                     {
                         OGRE_CHECK_GL_ERROR(glDrawRangeElementsBaseVertex(primType, op.indexData->indexStart, indexEnd, op.indexData->indexCount, indexType, pBufferData, op.vertexData->vertexStart));
                     }
@@ -2280,7 +2274,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Using FSAA.");
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || gl3wIsSupported(3, 2))
+        if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || mHasGL32)
         {
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
             // Some Apple NVIDIA hardware can't handle seamless cubemaps
@@ -2290,13 +2284,13 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
         }
 
-        if (mGLSupport->checkExtension("GL_ARB_provoking_vertex") || gl3wIsSupported(3, 2))
+        if (mGLSupport->checkExtension("GL_ARB_provoking_vertex") || mHasGL32)
         {
             // Set provoking vertex convention
             OGRE_CHECK_GL_ERROR(glProvokingVertex(GL_FIRST_VERTEX_CONVENTION));
         }
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
         {
 #if OGRE_DEBUG_MODE
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
@@ -2319,12 +2313,7 @@ namespace Ogre {
             mCurrentContext->setCurrent();
 
         // Initialise GL3W
-        if (gl3wInit())
-            LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
-
-        // Make sure that OpenGL 3.0+ is supported in this context
-        if (!gl3wIsSupported(3, 0))
-        {
+        if (gl3wInit()) { // gl3wInit() fails if GL3.0 is not supported
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.0 is not supported",
                         "GL3PlusRenderSystem::initialiseContext");
@@ -2332,6 +2321,9 @@ namespace Ogre {
 
         // Setup GL3PlusSupport
         mGLSupport->initialiseExtensions();
+
+        mHasGL32 = mGLSupport->checkMinGLVersion(3, 2);
+        mHasGL43 = mGLSupport->checkMinGLVersion(4, 3);
 
         LogManager::getSingleton().logMessage("**************************************");
         LogManager::getSingleton().logMessage("***   OpenGL 3+ Renderer Started   ***");
@@ -2742,7 +2734,7 @@ namespace Ogre {
     void GL3PlusRenderSystem::beginProfileEvent( const String &eventName )
     {
         markProfileEvent("Begin Event: " + eventName);
-        if (mGLSupport->checkExtension("ARB_debug_group") || gl3wIsSupported(4, 3))
+        if (mGLSupport->checkExtension("ARB_debug_group") || mHasGL43)
             OGRE_CHECK_GL_ERROR(glPushDebugGroup(GL_DEBUG_SOURCE_THIRD_PARTY, 0, static_cast<GLint>(eventName.length()), eventName.c_str()));
     }
 
@@ -2750,7 +2742,7 @@ namespace Ogre {
     void GL3PlusRenderSystem::endProfileEvent( void )
     {
         markProfileEvent("End Event");
-        if (mGLSupport->checkExtension("ARB_debug_group") || gl3wIsSupported(4, 3))
+        if (mGLSupport->checkExtension("ARB_debug_group") || mHasGL43)
             OGRE_CHECK_GL_ERROR(glPopDebugGroup());
     }
 
@@ -2760,7 +2752,7 @@ namespace Ogre {
         if ( eventName.empty() )
             return;
 
-        if (mGLSupport->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
             glDebugMessageInsert(GL_DEBUG_SOURCE_THIRD_PARTY,
                                  GL_DEBUG_TYPE_PERFORMANCE,
                                  GL_DEBUG_SEVERITY_LOW,
