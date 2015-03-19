@@ -54,6 +54,8 @@ if (OGRE_BUILD_PLATFORM_NACL)
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
 elseif (EMSCRIPTEN)
+  list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
+
   include_directories(include/Emscripten)
 
   file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
@@ -61,6 +63,8 @@ elseif (EMSCRIPTEN)
 
   set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
+  list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgrePOSIXTimerImp.h")
+
   if (WINDOWS_STORE OR WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS

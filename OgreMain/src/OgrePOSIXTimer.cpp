@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreTimer.h"
-#include <sys/time.h>
 
 namespace Ogre {
 
