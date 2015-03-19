@@ -296,6 +296,8 @@ void main()
 @end
 @foreach( hlms_lights_directional, n, 1 )
 	finalColour += cookTorrance( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );@end
+@foreach( hlms_lights_directional_non_caster, n, hlms_lights_directional )
+	finalColour += cookTorrance( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular );@end
 
 @property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
 	float fDistance;
@@ -303,7 +305,7 @@ void main()
 	float spotCosAngle;@end
 
 	//Point lights
-@foreach( hlms_lights_point, n, hlms_lights_directional )
+@foreach( hlms_lights_point, n, hlms_lights_directional_non_caster )
 	lightDir = pass.lights[@n].position - inPs.pos;
 	fDistance= length( lightDir );
 	if( fDistance <= pass.lights[@n].attenuation.x )

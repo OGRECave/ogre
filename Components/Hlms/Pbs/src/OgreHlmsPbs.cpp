@@ -527,7 +527,7 @@ namespace Ogre
         }
 
         int32 numLights             = getProperty( HlmsBaseProp::LightsSpot );
-        int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirectional );
+        int32 numDirectionalLights  = getProperty( HlmsBaseProp::LightsDirNonCaster );
         int32 numShadowMaps         = getProperty( HlmsBaseProp::NumShadowMaps );
         int32 numPssmSplits         = getProperty( HlmsBaseProp::PssmSplits );
 
@@ -669,14 +669,40 @@ namespace Ogre
 
             if( shadowNode )
             {
+                //All directional lights (caster and non-caster) are sent.
+                //Then non-directional shadow-casting shadow lights are sent.
+                size_t shadowLightIdx = 0;
+                size_t nonShadowLightIdx = 0;
+                const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
                 const LightClosestArray &lights = shadowNode->getShadowCastingLights();
+
+                const CompositorShadowNode::LightsBitSet &affectedLights =
+                        shadowNode->getAffectedLightsBitSet();
+
+                int32 shadowCastingDirLights = getProperty( HlmsBaseProp::LightsDirectional );
 
                 for( int32 i=0; i<numLights; ++i )
                 {
-                    Vector4 lightPos4 = lights[i].light->getAs4DVector();
+                    Light const *light = 0;
+
+                    if( i >= shadowCastingDirLights && i < numDirectionalLights )
+                    {
+                        while( affectedLights[nonShadowLightIdx] )
+                            ++nonShadowLightIdx;
+
+                        light = globalLightList.lights[nonShadowLightIdx++];
+
+                        assert( light->getType() == Light::LT_DIRECTIONAL );
+                    }
+                    else
+                    {
+                        light = lights[shadowLightIdx++].light;
+                    }
+
+                    Vector4 lightPos4 = light->getAs4DVector();
                     Vector3 lightPos;
 
-                    if( lights[i].light->getType() == Light::LT_DIRECTIONAL )
+                    if( light->getType() == Light::LT_DIRECTIONAL )
                         lightPos = viewMatrix3 * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
                     else
                         lightPos = viewMatrix * Vector3( lightPos4.x, lightPos4.y, lightPos4.z );
@@ -688,43 +714,43 @@ namespace Ogre
                     ++passBufferPtr;
 
                     //vec3 lights[numLights].diffuse
-                    ColourValue colour = lights[i].light->getDiffuseColour() *
-                                         lights[i].light->getPowerScale();
+                    ColourValue colour = light->getDiffuseColour() *
+                                         light->getPowerScale();
                     *passBufferPtr++ = colour.r;
                     *passBufferPtr++ = colour.g;
                     *passBufferPtr++ = colour.b;
                     ++passBufferPtr;
 
                     //vec3 lights[numLights].specular
-                    colour = lights[i].light->getSpecularColour() * lights[i].light->getPowerScale();
+                    colour = light->getSpecularColour() * light->getPowerScale();
                     *passBufferPtr++ = colour.r;
                     *passBufferPtr++ = colour.g;
                     *passBufferPtr++ = colour.b;
                     ++passBufferPtr;
 
                     //vec3 lights[numLights].attenuation;
-                    Real attenRange     = lights[i].light->getAttenuationRange();
-                    Real attenLinear    = lights[i].light->getAttenuationLinear();
-                    Real attenQuadratic = lights[i].light->getAttenuationQuadric();
+                    Real attenRange     = light->getAttenuationRange();
+                    Real attenLinear    = light->getAttenuationLinear();
+                    Real attenQuadratic = light->getAttenuationQuadric();
                     *passBufferPtr++ = attenRange;
                     *passBufferPtr++ = attenLinear;
                     *passBufferPtr++ = attenQuadratic;
                     ++passBufferPtr;
 
                     //vec3 lights[numLights].spotDirection;
-                    Vector3 spotDir = viewMatrix3 * lights[i].light->getDerivedDirection();
+                    Vector3 spotDir = viewMatrix3 * light->getDerivedDirection();
                     *passBufferPtr++ = spotDir.x;
                     *passBufferPtr++ = spotDir.y;
                     *passBufferPtr++ = spotDir.z;
                     ++passBufferPtr;
 
                     //vec3 lights[numLights].spotParams;
-                    Radian innerAngle = lights[i].light->getSpotlightInnerAngle();
-                    Radian outerAngle = lights[i].light->getSpotlightOuterAngle();
+                    Radian innerAngle = light->getSpotlightInnerAngle();
+                    Radian outerAngle = light->getSpotlightOuterAngle();
                     *passBufferPtr++ = 1.0f / ( cosf( innerAngle.valueRadians() * 0.5f ) -
                                              cosf( outerAngle.valueRadians() * 0.5f ) );
                     *passBufferPtr++ = cosf( outerAngle.valueRadians() * 0.5f );
-                    *passBufferPtr++ = lights[i].light->getSpotlightFalloff();
+                    *passBufferPtr++ = light->getSpotlightFalloff();
                     ++passBufferPtr;
                 }
 

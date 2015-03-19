@@ -278,6 +278,8 @@ float4 main( PS_INPUT inPs
 @end
 @foreach( hlms_lights_directional, n, 1 )
 	finalColour += cookTorrance( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
+@foreach( hlms_lights_directional_non_caster, n, hlms_lights_directional )
+	finalColour += cookTorrance( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
 
 @property( hlms_lights_point || hlms_lights_spot )	float3 lightDir;
 	float fDistance;
@@ -285,7 +287,7 @@ float4 main( PS_INPUT inPs
 	float spotCosAngle;@end
 
 	//Point lights
-@foreach( hlms_lights_point, n, hlms_lights_directional )
+@foreach( hlms_lights_point, n, hlms_lights_directional_non_caster )
 	lightDir = passBuf.lights[@n].position - inPs.pos;
 	fDistance= length( lightDir );
 	if( fDistance <= passBuf.lights[@n].attenuation.x )

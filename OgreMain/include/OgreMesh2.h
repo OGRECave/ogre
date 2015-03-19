@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreResource.h"
-#include "OgreAxisAlignedBox.h"
+#include "Math/Simple/OgreAabb.h"
 #include "Vao/OgreBufferPacked.h"
 #include "OgreHeaderPrefix.h"
 

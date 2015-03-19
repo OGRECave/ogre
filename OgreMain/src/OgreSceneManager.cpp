@@ -2340,13 +2340,105 @@ void SceneManager::cullFrustum( const CullFrustumRequest &request, size_t thread
     }
 }
 //-----------------------------------------------------------------------
+inline bool OrderLightByShadowCastThenId( const Light *_l, const Light *_r )
+{
+    if( _l->getCastShadows() && !_r->getCastShadows() )
+        return true;
+    if( !_l->getCastShadows() && _r->getCastShadows() )
+        return false;
+
+    return _l->getId() < _r->getId();
+}
+
+void quickSortDirectionalLights( LightListInfo &_globalLightList, const size_t startIdx, const size_t n )
+{
+    if( n < 2 )
+        return;
+
+    LightListInfo lightList;
+    lightList.lights.swap( _globalLightList.lights );
+    lightList.visibilityMask = _globalLightList.visibilityMask;
+    lightList.boundingSphere = _globalLightList.boundingSphere;
+
+    size_t i, j;
+    Light const *p;
+
+    p = lightList.lights[startIdx + (n >> 1)];
+    for( i = 0, j = n - 1;; ++i, --j )
+    {
+        while( OrderLightByShadowCastThenId( lightList.lights[startIdx + i], p ) )
+            i++;
+        while( OrderLightByShadowCastThenId( p, lightList.lights[startIdx + j] ) )
+            j--;
+        if( i >= j )
+            break;
+
+        std::swap( lightList.lights[startIdx + i],          lightList.lights[startIdx + j] );
+        std::swap( lightList.visibilityMask[startIdx + i],  lightList.visibilityMask[startIdx + j] );
+        std::swap( lightList.boundingSphere[startIdx + i],  lightList.boundingSphere[startIdx + j] );
+    }
+
+    quickSortDirectionalLights( lightList, startIdx, i );
+    quickSortDirectionalLights( lightList, startIdx + i, n - i );
+
+    //Nullify the pointers to prevent freeing them in the destructor (we do not own them).
+    lightList.lights.swap( _globalLightList.lights );
+    lightList.visibilityMask = 0;
+    lightList.boundingSphere = 0;
+}
+
 void SceneManager::buildLightList()
 {
     mGlobalLightList.lights.clear();
 
+    {
+        //Copy directional lights first. They aren't many. And we need them sorted:
+        //  1. Shadow casting lights first
+        //  2. Then ordered by ID (order of creation)
+        ObjectMemoryManagerVec::const_iterator it = mLightsMemoryManagerCulledList.begin();
+        ObjectMemoryManagerVec::const_iterator en = mLightsMemoryManagerCulledList.end();
+
+        size_t idx = 0;
+
+        while( it != en )
+        {
+            ObjectMemoryManager *objMemoryManager = *it;
+
+            //Cull the lights against all cameras to build the list of visible lights.
+            ObjectData objData;
+            const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, 0 );
+
+            for( size_t i=0; i<totalObjs; ++i )
+            {
+                for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+                {
+                    const bool isVisible = (objData.mVisibilityFlags[j] &
+                                            VisibilityFlags::LAYER_VISIBILITY) != 0;
+                    if( isVisible )
+                    {
+                        mGlobalLightList.visibilityMask[idx] = objData.mVisibilityFlags[j];
+                        mGlobalLightList.boundingSphere[idx] = Sphere(
+                                    objData.mWorldAabb->mCenter.getAsVector3( j ),
+                                    objData.mWorldRadius[j] );
+                        assert( dynamic_cast<Light*>( objData.mOwner[j] ) );
+                        mGlobalLightList.lights.push_back( static_cast<Light*>( objData.mOwner[j] ) );
+
+                        ++idx;
+                    }
+                }
+
+                objData.advanceFrustumPack();
+            }
+
+            ++it;
+        }
+
+        quickSortDirectionalLights( mGlobalLightList, 0, mGlobalLightList.lights.size() );
+    }
+
     //Perform frustum culling against the lights to build the light list,
     //but first, calculate the startLightIdx for each thread.
-    size_t accumStartLightIdx = 0;
+    size_t accumStartLightIdx = mGlobalLightList.lights.size();
     for( size_t threadIdx=0; threadIdx<mNumWorkerThreads; ++threadIdx )
     {
         size_t totalObjsInThread = 0;
@@ -2359,7 +2451,7 @@ void SceneManager::buildLightList()
             const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
 
             //Cull the lights against all cameras to build the list of visible lights.
-            for( size_t i=0; i<numRenderQueues; ++i )
+            for( size_t i=1; i<numRenderQueues; ++i )
             {
                 ObjectData objData;
                 const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, i );
@@ -2384,6 +2476,12 @@ void SceneManager::buildLightList()
 
         mBuildLightListRequestPerThread[threadIdx].startLightIdx = accumStartLightIdx;
         accumStartLightIdx += totalObjsInThread;
+    }
+
+    if( accumStartLightIdx == mGlobalLightList.lights.size() )
+    {
+        //All of the lights were directional. We're done. Avoid the sync point with worker threads.
+        return;
     }
 
     mRequestType = BUILD_LIGHT_LIST01;
@@ -2418,7 +2516,7 @@ void SceneManager::buildLightList()
 
     //Now merge the results into a single list.
 
-    size_t dstOffset = 0;
+    size_t dstOffset = mGlobalLightList.lights.size(); //Start where the directional lights end
     for( size_t i=0; i<mNumWorkerThreads; ++i )
     {
         mGlobalLightList.lights.appendPOD( mGlobalLightListPerThread[i].begin(),
@@ -2478,7 +2576,7 @@ void SceneManager::buildLightListThread01( const BuildLightListRequest &buildLig
         const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
 
         //Cull the lights against all cameras to build the list of visible lights.
-        for( size_t i=0; i<numRenderQueues; ++i )
+        for( size_t i=1; i<numRenderQueues; ++i )
         {
             ObjectData objData;
             const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, i );
@@ -2504,6 +2602,7 @@ void SceneManager::buildLightListThread01( const BuildLightListRequest &buildLig
     }
 
     threadLocalLightList.lights.swap( outVisibleLights );
+    //Nullify the pointers to prevent freeing them in the destructor (we do not own them).
     threadLocalLightList.visibilityMask = 0;
     threadLocalLightList.boundingSphere = 0;
 }

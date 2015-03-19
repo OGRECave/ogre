@@ -111,6 +111,10 @@ namespace Ogre
     */
     class _OgreExport CompositorShadowNode : public CompositorNode
     {
+    public:
+        typedef vector<bool>::type LightsBitSet;
+
+    private:
         CompositorShadowNodeDef const *mDefinition;
 
         struct ShadowMapCamera
@@ -137,7 +141,6 @@ namespace Ogre
         */
         AxisAlignedBox          mCastersBox;
 
-        typedef vector<bool>::type LightsBitSet;
         LightsBitSet            mAffectedLights;
 
         /// Changes with each call to setShadowMapsToPass
@@ -205,6 +208,8 @@ namespace Ogre
         */
         size_t getNumShadowCastingLights(void) const                { return mShadowMapCastingLights.size(); }
         const LightClosestArray& getShadowCastingLights(void) const { return mShadowMapCastingLights; }
+
+        const LightsBitSet& getAffectedLightsBitSet(void) const     { return mAffectedLights; }
 
         /// @copydoc CompositorNode::finalTargetResized
         virtual void finalTargetResized( const RenderTarget *finalTarget );

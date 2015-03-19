@@ -97,8 +97,10 @@ namespace Ogre
             }
         };
 
+        typedef vector<HlmsPropertyVec>::type HlmsPropertyVecVec;
         typedef vector<RenderableCache>::type RenderableCacheVec;
 
+        HlmsPropertyVecVec  mPassCache;
         RenderableCacheVec  mRenderableCache;
         HlmsCacheVec        mShaderCache;
 
@@ -505,6 +507,7 @@ namespace Ogre
 
         //Change per frame (grouped together with scene pass)
         static const IdString LightsDirectional;
+        static const IdString LightsDirNonCaster;
         static const IdString LightsPoint;
         static const IdString LightsSpot;
         static const IdString LightsAttenuation;
