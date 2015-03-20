@@ -341,13 +341,14 @@ namespace Ogre
             
             // necessary overrides
             const String& getMovableType(void) const;
-            const AxisAlignedBox& getBoundingBox(void) const;
-            Real getBoundingRadius(void) const;
             void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
             void visitRenderables(Renderable::Visitor* visitor,  bool debugRenderables = false);
-            bool isVisible(void) const;
-            uint32 getVisibilityFlags(void) const;
-            uint32 getQueryFlags(void) const;
+
+            // TODO "Ogre::MovableObject"-methods "isVisible", "getVisibilityFlags" and "getQueryFlags" are no longer virtual in OGRE 2.0 rendering the following methods useless. Remove them or update the implementation.
+            // bool isVisible(void) const;
+            // uint32 getVisibilityFlags(void) const;
+            // uint32 getQueryFlags(void) const;
+
 //            bool getCastShadows(void) const;
 
             void setMaterialLodValues( const MaterialPtr &material );
