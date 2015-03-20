@@ -17,8 +17,8 @@ layout(location = FRAG_COLOR, index = 0) out float outColour;
 in vec4 gl_FragCoord;
 @end
 
-@property( !hlms_shadowcaster )
 // START UNIFORM DECLARATION
+@property( !hlms_shadowcaster )
 @insertpiece( PassDecl )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )

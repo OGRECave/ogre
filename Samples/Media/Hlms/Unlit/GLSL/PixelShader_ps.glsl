@@ -2,17 +2,25 @@
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
+
+@property( !hlms_shadowcaster )
 layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+@end @property( hlms_shadowcaster )
+layout(location = FRAG_COLOR, index = 0) out float outColour;
+@end
 
 // START UNIFORM DECLARATION
+@property( !hlms_shadowcaster )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
+@end
 in block
 {
 @insertpiece( VStoPS_block )
 } inPs;
 // END UNIFORM DECLARATION
 
+@property( !hlms_shadowcaster )
 @property( num_array_textures )uniform sampler2DArray	textureMapsArray[@value( num_array_textures )];@end
 @property( num_textures )uniform sampler2D	textureMaps[@value( num_textures )];@end
 
@@ -23,7 +31,7 @@ in block
 void main()
 {
 @property( diffuse_map || alpha_test || diffuse )
-	uint materialId	= instance.materialIdx[inPs.drawId];
+	uint materialId	= instance.materialIdx[inPs.drawId].x;
 	material = materialArray.m[materialId];
 @end
 
@@ -51,3 +59,10 @@ void main()
 	if( material.alpha_test_threshold.x @insertpiece( alpha_test_cmp_func ) outColour.a )
 		discard;@end
 }
+
+@end @property( hlms_shadowcaster )
+void main()
+{
+	outColour = inPs.depth;
+}
+@end

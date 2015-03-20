@@ -60,6 +60,8 @@ namespace Ogre
         };
 
         PassData                mPreparedPass;
+        ConstBufferPackedVec    mPassBuffers;
+        uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
 
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
@@ -80,6 +82,8 @@ namespace Ogre
                                  uint8 texType );
 
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
+
+        virtual void destroyAllBuffers(void);
 
         FORCEINLINE uint32 fillBuffersFor( const HlmsCache *cache,
                                            const QueuedRenderable &queuedRenderable,
@@ -109,6 +113,8 @@ namespace Ogre
                                          const QueuedRenderable &queuedRenderable,
                                          bool casterPass, uint32 lastCacheHash,
                                          CommandBuffer *commandBuffer );
+
+        virtual void frameEnded(void);
 
         /// Changes the default suggested size for the texture buffer.
         /// Actual size may be lower if the GPU can't honour the request.

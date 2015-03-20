@@ -381,7 +381,7 @@ namespace Ogre
 
         //const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
         Matrix4 worldMat;
-        assert( queuedRenderable.renderable->getNumWorldTransforms() == 1 );
+        assert( queuedRenderable.renderable->getNumWorldTransforms() == 1u );
         queuedRenderable.renderable->getWorldTransforms( &worldMat );
 
         bool useIdentityProjection = queuedRenderable.renderable->getUseIdentityProjection();

@@ -1,6 +1,6 @@
 
-@property( !hlms_shadowcaster )
 // START UNIFORM DECLARATION
+@property( !hlms_shadowcaster )
 @insertpiece( PassDecl )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )

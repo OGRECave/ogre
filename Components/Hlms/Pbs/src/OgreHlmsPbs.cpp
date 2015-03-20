@@ -811,7 +811,7 @@ namespace Ogre
             passBufferPtr += 2;
         }
 
-        assert( (size_t)(passBufferPtr - startupPtr) * 4 == mapSize );
+        assert( (size_t)(passBufferPtr - startupPtr) * 4u == mapSize );
 
         passBuffer->unmap( UO_KEEP_PERSISTENT );
 
@@ -1000,7 +1000,7 @@ namespace Ogre
             if( isV1 )
             {
                 uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
-                assert( numWorldTransforms <= 256 );
+                assert( numWorldTransforms <= 256u );
 
                 const size_t minimumTexBufferSize = 12 * numWorldTransforms;
                 bool exceedsTexBuffer = (currentMappedTexBuffer - mStartMappedTexBuffer) +

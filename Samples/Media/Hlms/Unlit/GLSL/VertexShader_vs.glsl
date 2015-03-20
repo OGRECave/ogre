@@ -33,6 +33,7 @@ out block
 } outVs;
 
 // START UNIFORM DECLARATION
+@insertpiece( PassDecl )
 @insertpiece( InstanceDecl )
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @property( texture_matrix )layout(binding = 1) uniform samplerBuffer animationMatrixBuf;@end
@@ -58,13 +59,25 @@ void main()
 	gl_Position.z	= (L - NearPlane) / (FarPlane - NearPlane);
 @end
 
+@property( !hlms_shadowcaster )
 @property( hlms_colour )	outVs.colour = colour;@end
 
 @property( texture_matrix )	mat4 textureMatrix;@end
 
 @foreach( out_uv_count, n )
-	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.materialIdx[drawId] << 4u) + @value( out_uv@n_tex_unit ) );@end
+	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.materialIdx[drawId].x << 4u) + @value( out_uv@n_tex_unit ) );@end
 	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy @property( out_uv@_texture_matrix ) * textureMatrix@end ;@end
 
 	outVs.drawId = drawId;
+
+@end @property( hlms_shadowcaster )
+	float shadowConstantBias = uintBitsToFloat( instance.materialIdx[drawId].y );
+	//Linear depth
+	outVs.depth	= (gl_Position.z - pass.depthRange.x + shadowConstantBias) * pass.depthRange.y;
+
+	//We can't make the depth buffer linear without Z out in the fragment shader;
+	//however we can use a cheap approximation ("pseudo linear depth")
+	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
+	gl_Position.z = gl_Position.z * (gl_Position.w * pass.depthRange.y);
+@end
 }

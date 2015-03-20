@@ -1,13 +1,17 @@
 @insertpiece( SetCrossPlatformSettings )
 
 // START UNIFORM DECLARATION
+@property( !hlms_shadowcaster )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
+@end
 struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 };
 // END UNIFORM DECLARATION
+
+@property( !hlms_shadowcaster )
 
 @foreach( num_array_textures, n )
 Texture2DArray textureMapsArray@n : register(t@value(array_texture_bind@n));@end
@@ -28,7 +32,7 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 	float4 outColour;
 @property( diffuse_map || alpha_test || diffuse )
-	uint materialId	= materialIdx[inPs.drawId];
+	uint materialId	= materialIdx[inPs.drawId].x;
 	material = materialArray[materialId];
 @end
 
@@ -58,3 +62,9 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 	return outColour;
 }
+@end @property( hlms_shadowcaster )
+float main( PS_INPUT inPs ) : SV_Target0
+{
+	return inPs.depth;
+}
+@end
