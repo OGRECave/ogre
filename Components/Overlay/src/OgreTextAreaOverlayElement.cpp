@@ -597,7 +597,7 @@ namespace Ogre {
         switch (mMetricsMode)
         {
         case GMM_PIXELS:
-            if(OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate)
+            if(mGeomPositionsOutOfDate)
             {
                 // recalculate character size
                 mCharHeight = (Real) mPixelCharHeight / vpHeight;
@@ -607,7 +607,7 @@ namespace Ogre {
             break;
 
         case GMM_RELATIVE_ASPECT_ADJUSTED:
-            if(OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate)
+            if(mGeomPositionsOutOfDate)
             {
                 // recalculate character size
                 mCharHeight = (Real) mPixelCharHeight / 10000.0f;

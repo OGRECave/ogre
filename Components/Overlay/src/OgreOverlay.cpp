@@ -41,7 +41,8 @@ namespace Ogre {
         mName(name),
         mRotate(0.0f), 
         mScrollX(0.0f), mScrollY(0.0f),
-        mScaleX(1.0f), mScaleY(1.0f), 
+        mScaleX(1.0f), mScaleY(1.0f),
+        mLastViewportWidth(0), mLastViewportHeight(0),
         mTransformOutOfDate(true), mTransformUpdated(true), 
         mZOrder(100), mVisible(false), mInitialised(false)
 
@@ -246,36 +247,46 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void Overlay::_findVisibleObjects(Camera* cam, RenderQueue* queue)
+    void Overlay::_findVisibleObjects(Camera* cam, RenderQueue* queue, Viewport* vp)
     {
-        OverlayContainerList::iterator i, iend;
-
-        if (OverlayManager::getSingleton().hasViewportChanged())
-        {
-            iend = m2DElements.end();
-            for (i = m2DElements.begin(); i != iend; ++i)
-            {
-                (*i)->_notifyViewport();
-            }
-        }
-
-        // update elements
-        if (mTransformUpdated)
-        {
-            Matrix4 xform;
-
-            _getWorldTransforms(&xform);
-            iend = m2DElements.end();
-            for (i = m2DElements.begin(); i != iend; ++i)
-            {
-                (*i)->_notifyWorldTransforms(xform);
-            }
-
-            mTransformUpdated = false;
-        }
-
         if (mVisible)
         {
+            // Flag for update pixel-based GUIElements if viewport has changed dimensions
+            bool tmpViewportDimensionsChanged = false;
+            if (mLastViewportWidth != vp->getActualWidth() ||
+                mLastViewportHeight != vp->getActualHeight())
+            {
+                tmpViewportDimensionsChanged = true;
+                mLastViewportWidth = vp->getActualWidth();
+                mLastViewportHeight = vp->getActualHeight();
+            }
+
+            OverlayContainerList::iterator i, iend;
+
+            if(tmpViewportDimensionsChanged)
+            {
+                iend = m2DElements.end();
+                for (i = m2DElements.begin(); i != iend; ++i)
+                {
+                    (*i)->_notifyViewport();
+                }
+            }
+
+            // update elements
+            if (mTransformUpdated)
+            {
+                Matrix4 xform;
+                _getWorldTransforms(&xform);
+
+                iend = m2DElements.end();
+                for (i = m2DElements.begin(); i != iend; ++i)
+                {
+                    (*i)->_notifyWorldTransforms(xform);
+                }
+
+                mTransformUpdated = false;
+            }
+
             // Add 3D elements
             mRootNode->setPosition(cam->getDerivedPosition());
             mRootNode->setOrientation(cam->getDerivedOrientation());
@@ -298,10 +309,6 @@ namespace Ogre {
                 (*i)->_updateRenderQueue(queue);
             }
         }
-
-
-
-       
     }
     //---------------------------------------------------------------------
     void Overlay::updateTransform(void) const
