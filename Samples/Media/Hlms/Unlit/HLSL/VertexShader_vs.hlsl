@@ -11,6 +11,7 @@ float4x4 UNPACK_MAT4( Buffer<float4> matrixBuf, uint pixelIdx )
 }
 
 // START UNIFORM DECLARATION
+@insertpiece( PassDecl )
 @insertpiece( InstanceDecl )
 Buffer<float4> worldMatBuf : register(t0);
 @property( texture_matrix )Buffer<float4> animationMatrixBuf : register(t1);@end
@@ -28,7 +29,7 @@ struct VS_INPUT
 struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
-	float4 pos : SV_Position;
+	float4 gl_Position : SV_Position;
 };
 
 PS_INPUT main( VS_INPUT input )
@@ -40,25 +41,26 @@ PS_INPUT main( VS_INPUT input )
 	worldViewProj = UNPACK_MAT4( worldMatBuf, input.drawId );
 
 @property( !hlms_dual_paraboloid_mapping )
-	outVs.pos = mul( worldViewProj, input.vertex );
+	outVs.gl_Position = mul( worldViewProj, input.vertex );
 @end
 
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
-	outVs.pos.w		= 1.0f;
-	outVs.pos.xyz	= mul( worldViewProj, input.vertex ).xyz;
-	float L = length( outVs.pos.xyz );
-	outVs.pos.z		+= 1.0f;
-	outVs.pos.xy	/= outVs.pos.z;
-	outVs.pos.z	= (L - NearPlane) / (FarPlane - NearPlane);
+	outVs.gl_Position.w		= 1.0f;
+	outVs.gl_Position.xyz	= mul( worldViewProj, input.vertex ).xyz;
+	float L = length( outVs.gl_Position.xyz );
+	outVs.gl_Position.z		+= 1.0f;
+	outVs.gl_Position.xy	/= outVs.gl_Position.z;
+	outVs.gl_Position.z	= (L - NearPlane) / (FarPlane - NearPlane);
 @end
 
+@property( !hlms_shadowcaster )
 @property( hlms_colour )	outVs.colour = input.colour;@end
 
 @property( texture_matrix )	float4x4 textureMatrix;@end
 
 @foreach( out_uv_count, n )
-	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (materialIdx[input.drawId] << 4u) + @value( out_uv@n_tex_unit ) );@end
+	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (materialIdx[input.drawId].x << 4u) + @value( out_uv@n_tex_unit ) );@end
 	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) =
 @property( out_uv@_texture_matrix )
 			mul( textureMatrix, input.uv@value( out_uv@n_source_uv ).xy );
@@ -66,6 +68,17 @@ PS_INPUT main( VS_INPUT input )
 			input.uv@value( out_uv@n_source_uv ).xy;@end @end
 
 	outVs.drawId = input.drawId;
+
+@end @property( hlms_shadowcaster )
+	float shadowConstantBias = asfloat( materialIdx[input.drawId].y );
+	//Linear depth
+	outVs.depth	= (outVs.gl_Position.z - passBuf.depthRange.x + shadowConstantBias) * passBuf.depthRange.y;
+
+	//We can't make the depth buffer linear without Z out in the fragment shader;
+	//however we can use a cheap approximation ("pseudo linear depth")
+	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
+	outVs.gl_Position.z = outVs.gl_Position.z * (outVs.gl_Position.w * passBuf.depthRange.y);
+@end
 
 	return outVs;
 }

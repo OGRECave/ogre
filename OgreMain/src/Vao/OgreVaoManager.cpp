@@ -380,7 +380,12 @@ namespace Ogre
             BufferPackedVec::const_iterator end  = mBuffers[i].end();
 
             while( itor != end )
+            {
+                //For some RS 'callDestroyBufferImpl' is unnecessary and will only
+                //increase shutdown times. However for other RS, this is necessary.
+                callDestroyBufferImpl( *itor );
                 OGRE_DELETE *itor++;
+            }
 
             mBuffers[i].clear();
         }
@@ -391,6 +396,9 @@ namespace Ogre
 
             while( itor != end )
             {
+                //For some RS 'callDestroyBufferImpl' is unnecessary and will only
+                //increase shutdown times. However for other RS, this is necessary.
+                callDestroyBufferImpl( itor->bufferPacked );
                 OGRE_DELETE itor->bufferPacked;
                 ++itor;
             }
@@ -461,29 +469,7 @@ namespace Ogre
             assert( mFrameCount - itor->frame == mDynamicBufferMultiplier &&
                     "Delayed buffer must be destroyed in the last buffered frame!" );
 
-            switch( itor->bufferPacked->getBufferPackedType() )
-            {
-            case BP_TYPE_VERTEX:
-                assert( dynamic_cast<VertexBufferPacked*>( itor->bufferPacked ) );
-                destroyVertexBufferImpl( static_cast<VertexBufferPacked*>( itor->bufferPacked ) );
-                break;
-            case BP_TYPE_INDEX:
-                assert( dynamic_cast<IndexBufferPacked*>( itor->bufferPacked ) );
-                destroyIndexBufferImpl( static_cast<IndexBufferPacked*>( itor->bufferPacked ) );
-                break;
-            case BP_TYPE_CONST:
-                assert( dynamic_cast<ConstBufferPacked*>( itor->bufferPacked ) );
-                destroyConstBufferImpl( static_cast<ConstBufferPacked*>( itor->bufferPacked ) );
-                break;
-            case BP_TYPE_TEX:
-                assert( dynamic_cast<TexBufferPacked*>( itor->bufferPacked ) );
-                destroyTexBufferImpl( static_cast<TexBufferPacked*>( itor->bufferPacked ) );
-                break;
-            case BP_TYPE_INDIRECT:
-                assert( dynamic_cast<IndirectBufferPacked*>( itor->bufferPacked ) );
-                destroyIndirectBufferImpl( static_cast<IndirectBufferPacked*>( itor->bufferPacked ) );
-                break;
-            }
+            callDestroyBufferImpl( itor->bufferPacked );
 
             OGRE_DELETE itor->bufferPacked;
 
@@ -491,6 +477,33 @@ namespace Ogre
         }
 
         mDelayedDestroyBuffers.erase( mDelayedDestroyBuffers.begin(), itor );
+    }
+    //-----------------------------------------------------------------------------------
+    inline void VaoManager::callDestroyBufferImpl( BufferPacked *bufferPacked )
+    {
+        switch( bufferPacked->getBufferPackedType() )
+        {
+        case BP_TYPE_VERTEX:
+            assert( dynamic_cast<VertexBufferPacked*>( bufferPacked ) );
+            destroyVertexBufferImpl( static_cast<VertexBufferPacked*>( bufferPacked ) );
+            break;
+        case BP_TYPE_INDEX:
+            assert( dynamic_cast<IndexBufferPacked*>( bufferPacked ) );
+            destroyIndexBufferImpl( static_cast<IndexBufferPacked*>( bufferPacked ) );
+            break;
+        case BP_TYPE_CONST:
+            assert( dynamic_cast<ConstBufferPacked*>( bufferPacked ) );
+            destroyConstBufferImpl( static_cast<ConstBufferPacked*>( bufferPacked ) );
+            break;
+        case BP_TYPE_TEX:
+            assert( dynamic_cast<TexBufferPacked*>( bufferPacked ) );
+            destroyTexBufferImpl( static_cast<TexBufferPacked*>( bufferPacked ) );
+            break;
+        case BP_TYPE_INDIRECT:
+            assert( dynamic_cast<IndirectBufferPacked*>( bufferPacked ) );
+            destroyIndirectBufferImpl( static_cast<IndirectBufferPacked*>( bufferPacked ) );
+            break;
+        }
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::_update(void)

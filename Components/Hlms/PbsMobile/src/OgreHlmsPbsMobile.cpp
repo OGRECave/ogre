@@ -873,7 +873,7 @@ namespace Ogre
         assert( mPreparedPass.vertexShaderSharedBuffer.size() - sharedViewTransfElem <
                 vpParams->getFloatConstantList().size() );
         assert( ( mPreparedPass.pixelShaderSharedBuffer.size() -
-                  ((!casterPass && datablock->mTexture[PBSM_REFLECTION].isNull()) ? 9 : 0) ) <=
+                  ((!casterPass && datablock->mTexture[PBSM_REFLECTION].isNull()) ? 9u : 0u) ) <=
                 psParams->getFloatConstantList().size() );
 
         if( cache->hash != lastCacheHash )
@@ -916,7 +916,7 @@ namespace Ogre
         else
         {
             uint16 numWorldTransforms = queuedRenderable.renderable->getNumWorldTransforms();
-            assert( numWorldTransforms <= 60 );
+            assert( numWorldTransforms <= 60u );
 
             //TODO: Don't rely on a virtual function + make a direct 4x3 copy
             Matrix4 tmp[60];

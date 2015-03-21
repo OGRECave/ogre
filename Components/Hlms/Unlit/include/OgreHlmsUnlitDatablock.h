@@ -66,6 +66,11 @@ namespace Ogre
     {
         friend class HlmsUnlit;
     public:
+        static const uint8 R_MASK;
+        static const uint8 G_MASK;
+        static const uint8 B_MASK;
+        static const uint8 A_MASK;
+
         Matrix4 mTextureMatrices[NUM_UNLIT_TEXTURE_TYPES];
 
     protected:
@@ -83,6 +88,7 @@ namespace Ogre
         /// mBakedTextures[mTexToBakedTextureIdx[0]]
         /// Then read mTexIndices[0] to know which slice of the texture array.
         uint8   mTexToBakedTextureIdx[NUM_UNLIT_TEXTURE_TYPES];
+        uint8   mTextureSwizzles[NUM_UNLIT_TEXTURE_TYPES];
 
         HlmsSamplerblock const  *mSamplerblocks[NUM_UNLIT_TEXTURE_TYPES];
 
@@ -186,6 +192,29 @@ namespace Ogre
                          const HlmsSamplerblock *refParams=0 );
 
         TexturePtr getTexture( uint8 texType ) const;
+
+        /** Sets the final swizzle when sampling the given texture. e.g.
+            calling setTextureSwizzle( 0, R_MASK, G_MASK, R_MASK, G_MASK );
+            will generated the following pixel shader:
+                vec4 texColour = texture( tex, uv ).xyxy;
+
+            Calling this function triggers a HlmsDatablock::flushRenderables.
+        @param texType
+            Texture unit. Must be in range [0; NUM_UNLIT_TEXTURE_TYPES)
+        @param r
+            Where to source the red channel from. Must be R_MASK, G_MASK, B_MASK or A_MASK.
+            Default: R_MASK
+        @param g
+            Where to source the green channel from.
+            Default: G_MASK
+        @param b
+            Where to source the blue channel from.
+            Default: B_MASK
+        @param a
+            Where to source the alpha channel from.
+            Default: A_MASK
+        */
+        void setTextureSwizzle( uint8 texType, uint8 r, uint8 g, uint8 b, uint8 a );
 
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc). If the samplerblock changes,

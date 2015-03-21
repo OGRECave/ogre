@@ -70,6 +70,7 @@ namespace Ogre
 
     //Change per frame (grouped together with scene pass)
     const IdString HlmsBaseProp::LightsDirectional  = IdString( "hlms_lights_directional" );
+    const IdString HlmsBaseProp::LightsDirNonCaster = IdString( "hlms_lights_directional_non_caster" );
     const IdString HlmsBaseProp::LightsPoint        = IdString( "hlms_lights_point" );
     const IdString HlmsBaseProp::LightsSpot         = IdString( "hlms_lights_spot" );
     const IdString HlmsBaseProp::LightsAttenuation  = IdString( "hlms_lights_attenuation" );
@@ -184,6 +185,7 @@ namespace Ogre
         setProperty( HlmsBaseProp::ShadowCaster, 0 );
 
         setProperty( HlmsBaseProp::LightsDirectional, 1 );
+        setProperty( HlmsBaseProp::LightsDirNonCaster, 1 );
         setProperty( HlmsBaseProp::LightsPoint, 2 );
         setProperty( HlmsBaseProp::LightsSpot, 3 );
     }
@@ -1168,7 +1170,7 @@ namespace Ogre
     size_t Hlms::addRenderableCache( const HlmsPropertyVec &renderableSetProperties,
                                      const PiecesMap *pieces )
     {
-        assert( mRenderableCache.size() < 128 );
+        assert( mRenderableCache.size() < 8192 );
 
         RenderableCache cacheEntry( renderableSetProperties, pieces );
 
@@ -1180,7 +1182,8 @@ namespace Ogre
             it = mRenderableCache.end() - 1;
         }
 
-        return (mType << 7) | (it - mRenderableCache.begin());
+        //3 bits for mType (see getMaterial)
+        return (mType << 14) | (it - mRenderableCache.begin());
     }
     //-----------------------------------------------------------------------------------
     const Hlms::RenderableCache &Hlms::getRenderableCache( uint32 hash ) const
@@ -1357,6 +1360,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void Hlms::clearShaderCache(void)
     {
+        mPassCache.clear();
+
         HlmsCacheVec::const_iterator itor = mShaderCache.begin();
         HlmsCacheVec::const_iterator end  = mShaderCache.end();
 
@@ -1665,6 +1670,8 @@ namespace Ogre
             uint numLightsPerType[Light::NUM_LIGHT_TYPES];
             memset( numLightsPerType, 0, sizeof( numLightsPerType ) );
 
+            uint shadowCasterDirectional = 0;
+
             if( mLightGatheringMode == LightGatherForwardPlus )
             {
                 if( shadowNode )
@@ -1675,6 +1682,9 @@ namespace Ogre
                     LightClosestArray::const_iterator end  = lights.end();
                     while( itor != end )
                     {
+                        if( itor->light->getType() == Light::LT_DIRECTIONAL )
+                            ++shadowCasterDirectional;
+
                         ++numLightsPerType[itor->light->getType()];
                         ++itor;
                     }
@@ -1697,6 +1707,20 @@ namespace Ogre
             }
             else if( mLightGatheringMode == LightGatherForward )
             {
+                if( shadowNode )
+                {
+                    //Gather shadow casting *directional* lights.
+                    const LightClosestArray &lights = shadowNode->getShadowCastingLights();
+                    LightClosestArray::const_iterator itor = lights.begin();
+                    LightClosestArray::const_iterator end  = lights.end();
+                    while( itor != end )
+                    {
+                        if( itor->light->getType() == Light::LT_DIRECTIONAL )
+                            ++shadowCasterDirectional;
+                        ++itor;
+                    }
+                }
+
                 //Gather all lights.
                 const LightListInfo &globalLightList = sceneManager->getGlobalLightList();
                 LightArray::const_iterator itor = globalLightList.lights.begin();
@@ -1721,7 +1745,8 @@ namespace Ogre
             numLightsPerType[Light::LT_SPOTLIGHT]   += numLightsPerType[Light::LT_POINT];
 
             //The value is cummulative for each type (order: Directional, point, spot)
-            setProperty( HlmsBaseProp::LightsDirectional, numLightsPerType[Light::LT_DIRECTIONAL] );
+            setProperty( HlmsBaseProp::LightsDirectional, shadowCasterDirectional );
+            setProperty( HlmsBaseProp::LightsDirNonCaster,numLightsPerType[Light::LT_DIRECTIONAL] );
             setProperty( HlmsBaseProp::LightsPoint,       numLightsPerType[Light::LT_POINT] );
             setProperty( HlmsBaseProp::LightsSpot,        numLightsPerType[Light::LT_SPOTLIGHT] );
         }
@@ -1736,17 +1761,21 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsAttenuation, 0 );
             setProperty( HlmsBaseProp::LightsSpotParams,  0 );
             setProperty( HlmsBaseProp::LightsDirectional, 0 );
+            setProperty( HlmsBaseProp::LightsDirNonCaster,0 );
             setProperty( HlmsBaseProp::LightsPoint,       0 );
             setProperty( HlmsBaseProp::LightsSpot,        0 );
         }
 
-        uint32 hash = getProperty( HlmsBaseProp::DualParaboloidMapping ) |
-                (getProperty( HlmsBaseProp::NumShadowMaps )         << 1 )|
-                (getProperty( HlmsBaseProp::PssmSplits )            << 5 )|
-                (getProperty( HlmsBaseProp::LightsDirectional )     << 8 )|
-                (getProperty( HlmsBaseProp::LightsPoint )           << 12)|
-                (getProperty( HlmsBaseProp::LightsSpot )            << 16)|
-                (getProperty( HlmsBaseProp::ShadowCaster )          << 20);
+        assert( mPassCache.size() < 32768 );
+        HlmsPropertyVecVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(),
+                                                     mSetProperties );
+        if( it == mPassCache.end() )
+        {
+            mPassCache.push_back( mSetProperties );
+            it = mPassCache.end() - 1;
+        }
+
+        const uint32 hash = it - mPassCache.begin();
 
         HlmsCache retVal( hash, mType );
         retVal.setProperties = mSetProperties;
@@ -1767,10 +1796,11 @@ namespace Ogre
 
         //MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
 
-        assert( !(hash[0] & ~((1 << 10) - 1)) );
-        assert( !(hash[1] & ~((1 << 21) - 1)) );
+        //If this assert triggers, we've created too many shader variations (or bug)
+        assert( !(hash[0] & ~((1 << 17) - 1)) ); //Too many material / meshes variations
+        assert( !(hash[1] & ~((1 << 15) - 1)) ); //Too many pass conditions (extremely rare!!!).
 
-        finalHash = (hash[0] << 22) | hash[1];
+        finalHash = (hash[0] << 15) | hash[1];
 
         if( lastReturnedValue->hash != finalHash )
         {

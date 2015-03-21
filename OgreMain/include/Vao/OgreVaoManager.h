@@ -142,6 +142,8 @@ namespace Ogre
         */
         void destroyDelayedBuffers( uint8 fromDynamicFrame );
 
+        inline void callDestroyBufferImpl( BufferPacked *bufferPacked );
+
     public:
         VaoManager();
         virtual ~VaoManager();

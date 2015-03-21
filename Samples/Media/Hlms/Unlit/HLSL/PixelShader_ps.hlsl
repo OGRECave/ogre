@@ -1,13 +1,17 @@
 @insertpiece( SetCrossPlatformSettings )
 
 // START UNIFORM DECLARATION
+@property( !hlms_shadowcaster )
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
+@end
 struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 };
 // END UNIFORM DECLARATION
+
+@property( !hlms_shadowcaster )
 
 @foreach( num_array_textures, n )
 Texture2DArray textureMapsArray@n : register(t@value(array_texture_bind@n));@end
@@ -28,7 +32,7 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 	float4 outColour;
 @property( diffuse_map || alpha_test || diffuse )
-	uint materialId	= materialIdx[inPs.drawId];
+	uint materialId	= materialIdx[inPs.drawId].x;
 	material = materialArray[materialId];
 @end
 
@@ -40,10 +44,10 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 @property( diffuse_map )@property( diffuse_map0 )
 	//Load base image
-		outColour = @insertpiece( TextureOrigin0 ).Sample( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) );@end
+	outColour = @insertpiece( TextureOrigin0 ).Sample( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) ).@insertpiece(diffuse_map0_tex_swizzle);@end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
-		float4 topImage@n = @insertpiece( TextureOrigin@n ).Sample( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) );@end @end
+	float4 topImage@n = @insertpiece( TextureOrigin@n ).Sample( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) ).@insertpiece(diffuse_map@n_tex_swizzle);@end @end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
 	@insertpiece( blend_mode_idx@n )@end @end
@@ -58,3 +62,9 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 
 	return outColour;
 }
+@end @property( hlms_shadowcaster )
+float main( PS_INPUT inPs ) : SV_Target0
+{
+	return inPs.depth;
+}
+@end

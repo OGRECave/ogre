@@ -61,6 +61,7 @@ namespace Ogre  {
         case PF_R16_SNORM:
             return GL_RED;
         case PF_BYTE_LA:
+        case PF_RG8:
         case PF_FLOAT16_GR:
         case PF_FLOAT32_GR:
         case PF_SHORT_GR:
@@ -180,6 +181,7 @@ namespace Ogre  {
         case PF_L8:
         case PF_R8G8B8:
         case PF_B8G8R8:
+        case PF_RG8:
             return GL_UNSIGNED_BYTE;
         case PF_R8_SNORM:
         case PF_R8G8_SNORM:
@@ -441,6 +443,8 @@ namespace Ogre  {
             return GL_COMPRESSED_RGBA_BPTC_UNORM_ARB;
         case PF_BC7_UNORM_SRGB:
             return GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM_ARB;
+        case PF_RG8:
+            return GL_RG8;
         case PF_ETC2_RGB8:
             return GL_COMPRESSED_RGB8_ETC2;
         case PF_ETC2_RGBA8:

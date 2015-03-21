@@ -350,6 +350,8 @@ namespace Ogre {
         void _setViewport(Viewport *vp);
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
+        virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock );
+        virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
         virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );

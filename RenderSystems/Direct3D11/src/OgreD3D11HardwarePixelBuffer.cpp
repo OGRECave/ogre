@@ -445,6 +445,8 @@ namespace v1 {
                         dstSubresource,
                         mLockBox.left, mLockBox.top, 0, //TODO: Support 3D array textures
                         mStagingBuffer, 0, &srcBoxDx11 );
+
+            SAFE_RELEASE(mStagingBuffer);
         }
     }
     //-----------------------------------------------------------------------------  

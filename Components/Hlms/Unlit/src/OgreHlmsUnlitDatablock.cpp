@@ -69,7 +69,10 @@ namespace Ogre
     const size_t HlmsUnlitDatablock::MaterialSizeInGpuAligned   = alignToNextMultiple(
                                                                    HlmsUnlitDatablock::MaterialSizeInGpu,
                                                                    4 * 4 );
-
+    const uint8 HlmsUnlitDatablock::R_MASK  = 0;
+    const uint8 HlmsUnlitDatablock::G_MASK  = 1;
+    const uint8 HlmsUnlitDatablock::B_MASK  = 2;
+    const uint8 HlmsUnlitDatablock::A_MASK  = 3;
     //-----------------------------------------------------------------------------------
     HlmsUnlitDatablock::HlmsUnlitDatablock( IdString name, HlmsUnlit *creator,
                                             const HlmsMacroblock *macroblock,
@@ -81,7 +84,10 @@ namespace Ogre
         mR( 1.0f ), mG( 1.0f ), mB( 1.0f ), mA( 1.0f )
     {
         for( size_t i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
+        {
             mTextureMatrices[i] = Matrix4::IDENTITY;
+            setTextureSwizzle( i, R_MASK, G_MASK, B_MASK, A_MASK );
+        }
 
         memset( mUvSource, 0, sizeof( mUvSource ) );
         memset( mBlendModes, 0, sizeof( mBlendModes ) );
@@ -124,6 +130,7 @@ namespace Ogre
                 mTexIndices[i] = 0;
                 textures[i].texture = hlmsTextureManager->getBlankTexture().texture;
                 mSamplerblocks[i] = defaultSamplerblock;
+                hlmsManager->addReference( mSamplerblocks[i] );
 
                 StringVector vec = StringUtil::split( paramVal );
 
@@ -163,6 +170,9 @@ namespace Ogre
                 }
             }
         }
+
+        //Remove the reference
+        hlmsManager->destroySamplerblock( defaultSamplerblock );
 
         for( size_t i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
             textures[i].samplerBlock = mSamplerblocks[i];
@@ -419,6 +429,13 @@ namespace Ogre
             retVal = mBakedTextures[mTexToBakedTextureIdx[texType]].texture;
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsUnlitDatablock::setTextureSwizzle( uint8 texType, uint8 r, uint8 g, uint8 b, uint8 a )
+    {
+        assert( texType < NUM_UNLIT_TEXTURE_TYPES );
+        mTextureSwizzles[texType] = (r << 6u) | ((g & 0x03u) << 4u) | ((b & 0x03u) << 2u) | (a & 0x03u);
+        flushRenderables();
     }
     //-----------------------------------------------------------------------------------
     void HlmsUnlitDatablock::setSamplerblock( uint8 texType, const HlmsSamplerblock &params )

@@ -62,6 +62,20 @@ namespace Ogre
         SAFE_RELEASE(mInfoQueue);
         SAFE_RELEASE(mClassLinkage);
         SAFE_RELEASE(mImmediateContext);
+
+        /*
+        //Uncomment this code to get detailed information of resource leaks.
+        if( mD3D11Device )
+        {
+            ID3D11Debug *d3dDebug = 0;
+            mD3D11Device->QueryInterface( __uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug) );
+            if( d3dDebug )
+            {
+                d3dDebug->ReportLiveDeviceObjects( D3D11_RLDO_DETAIL );
+                d3dDebug->Release();
+            }
+        }*/
+
         SAFE_RELEASE(mD3D11Device);
     }
     //---------------------------------------------------------------------

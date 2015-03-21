@@ -186,7 +186,6 @@ namespace Ogre {
     {
         D3D11Device & mDevice;
         ID3D11RenderTargetView * mRenderTargetView;
-        ID3D11DepthStencilView * mDepthStencilView;
     public:
         D3D11RenderTexture( const String &name, v1::D3D11HardwarePixelBuffer *buffer,
                             bool writeGamma, D3D11Device & device );

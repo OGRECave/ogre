@@ -312,18 +312,47 @@ namespace Ogre
         uint32 combinedVisibilityFlags = viewport->getVisibilityMask() &
                                             sceneManager->getVisibilityMask();
 
+        size_t startIndex = 0;
         const size_t numLights = std::min( mDefinition->mNumLights, globalLightList.lights.size() );
         mShadowMapCastingLights.clear();
         mShadowMapCastingLights.reserve( numLights );
         mAffectedLights.clear();
         mAffectedLights.resize( globalLightList.lights.size(), false );
 
+        {
+            //SceneManager put the directional lights first. Add them first as casters.
+            LightArray::const_iterator itor = globalLightList.lights.begin();
+            LightArray::const_iterator end  = globalLightList.lights.end();
+
+            uint32 const * RESTRICT_ALIAS visibilityMask = globalLightList.visibilityMask;
+
+            while( itor != end && (*itor)->getType() == Light::LT_DIRECTIONAL &&
+                   mShadowMapCastingLights.size() < numLights )
+            {
+                if( (*visibilityMask & combinedVisibilityFlags) &&
+                    (*visibilityMask & VisibilityFlags::LAYER_SHADOW_CASTER) )
+                {
+                    const size_t listIdx = itor - globalLightList.lights.begin();
+                    mAffectedLights[listIdx] = true;
+                    mShadowMapCastingLights.push_back( LightClosest( *itor, listIdx, 0 ) );
+                }
+
+                ++visibilityMask;
+                ++itor;
+            }
+
+            //Reach the end of directional lights section
+            while( itor != end && (*itor)->getType() == Light::LT_DIRECTIONAL )
+                ++itor;
+
+            startIndex = itor - globalLightList.lights.begin();
+        }
+
         const Vector3 &camPos( newCamera->getDerivedPosition() );
 
-        //mShadowMapCastingLights.resize( numLights, 0 );
         vector<size_t>::type sortedIndexes;
-        sortedIndexes.resize( numLights, ~0 );
-        std::partial_sort_copy( MemoryLessInputIterator( 0 ),
+        sortedIndexes.resize( numLights - mShadowMapCastingLights.size(), ~0 );
+        std::partial_sort_copy( MemoryLessInputIterator( startIndex ),
                             MemoryLessInputIterator( globalLightList.lights.size() ),
                             sortedIndexes.begin(), sortedIndexes.end(),
                             ShadowMappingLightCmp( &globalLightList, combinedVisibilityFlags, camPos ) );

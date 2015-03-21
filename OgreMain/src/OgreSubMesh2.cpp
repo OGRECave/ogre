@@ -72,7 +72,8 @@ namespace Ogre {
                 ++itBuffers;
             }
 
-            vaoManager->destroyIndexBuffer( vao->getIndexBuffer() );
+            if( vao->getIndexBuffer() )
+                vaoManager->destroyIndexBuffer( vao->getIndexBuffer() );
             vaoManager->destroyVertexArrayObject( vao );
 
             ++itor;

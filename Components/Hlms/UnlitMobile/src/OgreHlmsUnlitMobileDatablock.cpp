@@ -141,6 +141,7 @@ namespace Ogre
 
                 mShaderCreationData->mDiffuseTextures[i] = hlmsTextureManager->getBlankTexture().texture;
                 mShaderCreationData->mSamplerblocks[i] = defaultSamplerblock;
+                hlmsManager->addReference( mShaderCreationData->mSamplerblocks[i] );
 
                 StringVector vec = StringUtil::split( paramVal );
 
@@ -197,6 +198,9 @@ namespace Ogre
                 ++mNumTextureUnits;
             }
         }
+
+        //Remove the reference
+        hlmsManager->destroySamplerblock( defaultSamplerblock );
 
         size_t maxTextureUnits = mCreator->getRenderSystem()->getCapabilities()->getNumTextureUnits();
         if( mNumTextureUnits > maxTextureUnits )
