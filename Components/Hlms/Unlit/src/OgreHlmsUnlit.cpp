@@ -439,6 +439,37 @@ namespace Ogre
         inOutPieces[PixelShader][UnlitProperty::MaterialsPerBuffer]  = slotsPerPoolStr;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsUnlit::calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces )
+    {
+        //HlmsUnlitDatablock *datablock = static_cast<HlmsUnlitDatablock*>(
+        //                                              renderable->getDatablock() );
+
+        HlmsPropertyVec::iterator itor = mSetProperties.begin();
+        HlmsPropertyVec::iterator end  = mSetProperties.end();
+
+        while( itor != end )
+        {
+            if( itor->keyName != UnlitProperty::HwGammaRead &&
+                     //itor->keyName != UnlitProperty::UvDiffuse &&
+                     itor->keyName != HlmsBaseProp::Skeleton &&
+                     itor->keyName != HlmsBaseProp::BonesPerVertex &&
+                     itor->keyName != HlmsBaseProp::DualParaboloidMapping &&
+                     itor->keyName != HlmsBaseProp::AlphaTest )
+            {
+                itor = mSetProperties.erase( itor );
+                end  = mSetProperties.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+
+        String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
+        inOutPieces[VertexShader][UnlitProperty::MaterialsPerBuffer] = slotsPerPoolStr;
+        inOutPieces[PixelShader][UnlitProperty::MaterialsPerBuffer] = slotsPerPoolStr;
+    }
+    //-----------------------------------------------------------------------------------
     HlmsCache HlmsUnlit::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                           bool dualParaboloid, SceneManager *sceneManager )
     {
