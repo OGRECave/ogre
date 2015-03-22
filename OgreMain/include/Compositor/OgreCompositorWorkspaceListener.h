@@ -49,7 +49,7 @@ namespace Ogre
             manually updated Workspaces without having to call
             @CompositorWorkspace::_beginUpdate( forceBeginFrame=true )
         */
-        virtual void workspacePreUpdate(void)   {}
+        virtual void workspacePreUpdate( CompositorWorkspace *workspace ) {}
         /** Called when each pass is about to be executed.
             Warning: calling pass->execute can result in recursive calls.
         */

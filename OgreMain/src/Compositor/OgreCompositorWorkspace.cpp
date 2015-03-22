@@ -443,7 +443,7 @@ namespace Ogre
     void CompositorWorkspace::_update(void)
     {
         if( mListener )
-            mListener->workspacePreUpdate();
+            mListener->workspacePreUpdate( this );
 
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that our calls go to the right device.
