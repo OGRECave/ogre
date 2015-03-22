@@ -117,6 +117,10 @@ namespace Ogre
     const IdString PbsProperty::DetailMapsNormal  = IdString( "detail_maps_normal" );
     const IdString PbsProperty::FirstValidDetailMapNm= IdString( "first_valid_detail_map_nm" );
 
+    const IdString PbsProperty::Pcf3x3            = IdString( "pcf_3x3" );
+    const IdString PbsProperty::Pcf4x4            = IdString( "pcf_4x4" );
+    const IdString PbsProperty::PcfIterations     = IdString( "pcf_iterations" );
+
     const IdString *PbsProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
     {
         &PbsProperty::UvDiffuse,
@@ -191,7 +195,8 @@ namespace Ogre
         mShadowmapSamplerblock( 0 ),
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
-        mLastTextureHash( 0 )
+        mLastTextureHash( 0 ),
+        mShadowFilter( PCF_3x3 )
     {
         //Override defaults
         mLightGatheringMode = LightGatherForwardPlus;
@@ -500,7 +505,36 @@ namespace Ogre
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                         bool dualParaboloid, SceneManager *sceneManager )
     {
-        HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
+        mSetProperties.clear();
+
+        //The properties need to be set before preparePassHash so that
+        //they are considered when building the HlmsCache's hash.
+        if( shadowNode && !casterPass )
+        {
+            //Shadow receiving can be improved in performance by using gather sampling.
+            //(it's the only feature so far that uses gather)
+            const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
+            if( capabilities->hasCapability( RSC_TEXTURE_GATHER ) )
+                setProperty( HlmsBaseProp::TexGather, 1 );
+
+            if( mShadowFilter == PCF_3x3 )
+            {
+                setProperty( PbsProperty::Pcf3x3, 1 );
+                setProperty( PbsProperty::PcfIterations, 4 );
+            }
+            else if( mShadowFilter == PCF_4x4 )
+            {
+                setProperty( PbsProperty::Pcf4x4, 1 );
+                setProperty( PbsProperty::PcfIterations, 9 );
+            }
+            else
+            {
+                setProperty( PbsProperty::PcfIterations, 1 );
+            }
+        }
+
+        HlmsCache retVal = Hlms::preparePassHashBase( shadowNode, casterPass,
+                                                      dualParaboloid, sceneManager );
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
 
@@ -510,7 +544,6 @@ namespace Ogre
                                                         renderTarget->isHardwareGammaEnabled() );
         setProperty( PbsProperty::SignedIntTex, capabilities->hasCapability(
                                                             RSC_TEXTURE_SIGNED_INT ) );
-
         retVal.setProperties = mSetProperties;
 
         Camera *camera = sceneManager->getCameraInProgress();
@@ -549,9 +582,10 @@ namespace Ogre
 
             //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
             //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
-            //              vec2 shadowRcv[numShadowMaps].invShadowMapSize +
+            //              vec2 padding +
+            //              vec4 shadowRcv[numShadowMaps].invShadowMapSize +
             //mat3 invViewMatCubemap (upgraded to three vec4)
-            mapSize += ( 16 + (16 + 2 + 2) * numShadowMaps + 4 * 3 ) * 4;
+            mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
             mapSize += numPssmSplits * 4;
             mapSize = alignToNextMultiple( mapSize, 16 );
 
@@ -624,6 +658,8 @@ namespace Ogre
                 const Real depthRange = fFar - fNear;
                 *passBufferPtr++ = fNear;
                 *passBufferPtr++ = 1.0f / depthRange;
+                ++passBufferPtr; //Padding
+                ++passBufferPtr; //Padding
 
 
                 //vec2 shadowRcv[numShadowMaps].invShadowMapSize
@@ -633,6 +669,8 @@ namespace Ogre
                 uint32 texHeight = shadowNode->getLocalTextures()[i].textures[0]->getHeight();
                 *passBufferPtr++ = 1.0f / texWidth;
                 *passBufferPtr++ = 1.0f / texHeight;
+                *passBufferPtr++ = static_cast<float>( texWidth );
+                *passBufferPtr++ = static_cast<float>( texHeight );
             }
 
             //---------------------------------------------------------------------------
@@ -1158,6 +1196,11 @@ namespace Ogre
     {
         HlmsBufferManager::frameEnded();
         mCurrentPassBuffer  = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setShadowSettings( ShadowFilter filter )
+    {
+        mShadowFilter = filter;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsPbs::createDatablockImpl( IdString datablockName,

@@ -60,6 +60,12 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void MyGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
+        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
+        {
+            TutorialGameState::keyReleased( arg );
+            return;
+        }
+
         if( arg.keysym.sym == SDLK_F2 )
         {
             gCurrentFrameTimeIdx = !gCurrentFrameTimeIdx;

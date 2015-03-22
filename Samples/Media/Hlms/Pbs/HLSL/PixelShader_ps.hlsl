@@ -33,15 +33,55 @@ Buffer<float4> f3dLightList : register(t2);@end
 Texture2D texShadowMap[@value(hlms_num_shadow_maps)] : register(t@value(textureRegShadowMapStart));
 SamplerComparisonState shadowSampler : register(s@value(textureRegShadowMapStart));
 
-float getShadow( Texture2D shadowMap, float4 psPosLN, float2 invShadowMapSize )
+float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
 {
 @property( !hlms_shadow_uses_depth_texture )
 	float fDepth = psPosLN.z;
 	float2 uv = psPosLN.xy / psPosLN.w;
-	float3 o = float3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
+	/*float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
+	return c;*/
+	
+	float retVal = 0;
 
-	float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy - o.xy, fDepth );
-	return c;@end
+@property( pcf_3x3 || pcf_4x4 )
+	float2 offsets[@value(pcf_iterations)] =
+	{
+	@property( pcf_3x3 )
+		float2( 0, 0 ),	//0, 0
+		float2( 1, 0 ),	//1, 0
+		float2( 0, 1 ),	//1, 1
+		float2( 0, 0 ) 	//1, 1
+	@end
+	@property( pcf_4x4 )
+		float2( 0, 0 ),	//0, 0
+		float2( 1, 0 ),	//1, 0
+		float2( 1, 0 ),	//2, 0
+
+		float2(-2, 1 ),	//0, 1
+		float2( 1, 0 ),	//1, 1
+		float2( 1, 0 ),	//2, 1
+
+		float2(-2, 1 ),	//0, 2
+		float2( 1, 0 ),	//1, 2
+		float2( 1, 0 )	//2, 2
+	@end
+	};
+@end
+
+	@foreach( pcf_iterations, n )
+		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * invShadowMapSize.xy;@end
+		// 2x2 PCF
+		retVal += shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
+	@end
+
+	@property( pcf_3x3 )
+		retVal *= 0.25;
+	@end @property( pcf_4x4 )
+		retVal *= 0.11111111111111;
+	@end
+
+	return retVal;
+@end
 @property( hlms_shadow_uses_depth_texture )
 	return texture( shadowMap, psPosLN.xyz, 0 ).x;@end
 }

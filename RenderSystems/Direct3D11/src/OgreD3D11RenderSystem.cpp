@@ -1171,6 +1171,9 @@ bail:
         if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
             rsc->setCapability(RSC_TEXTURE_CUBE_MAP_ARRAY);
 
+        if( mFeatureLevel >= D3D_FEATURE_LEVEL_10_1 )
+            rsc->setCapability(RSC_TEXTURE_GATHER);
+
         if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
         {
             rsc->setMaximumResolutions( static_cast<ushort>(D3D11_REQ_TEXTURE2D_U_OR_V_DIMENSION),

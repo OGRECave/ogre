@@ -13,6 +13,10 @@
 #include "OgreRoot.h"
 #include "OgreFrameStats.h"
 
+#include "OgreHlmsManager.h"
+#include "OgreHlms.h"
+#include "OgreGpuProgramManager.h"
+
 using namespace Demo;
 
 namespace Demo
@@ -68,6 +72,9 @@ namespace Demo
         {
             outText = mHelpDescription;
             outText += "\n\nPress F1 to toggle help";
+            outText += "\n\nProtip: Ctrl+F1 will reload PBS shaders (for real time template editing).\n"
+                       "Ctrl+F2 reloads Unlit shaders. Note: If the modified templates produce\n"
+                       "invalid shader code, crashes or exceptions can happen.\n";
             return;
         }
 
@@ -121,7 +128,7 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void TutorialGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
-        if( arg.keysym.sym == SDLK_F1 )
+        if( arg.keysym.sym == SDLK_F1 && (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) == 0 )
         {
             mDisplayHelpMode = (mDisplayHelpMode + 1) % mNumDisplayHelpModes;
 
@@ -129,6 +136,27 @@ namespace Demo
             generateDebugText( 0, finalText );
             mDebugText->setCaption( finalText );
             mDebugTextShadow->setCaption( finalText );
+        }
+        else if( arg.keysym.sym == SDLK_F1 && (arg.keysym.mod & (KMOD_LCTRL|KMOD_RCTRL)) )
+        {
+            //Hot reload of PBS shaders. We need to clear the microcode cache
+            //to prevent using old compiled versions.
+            Ogre::Root *root = mGraphicsSystem->getRoot();
+            Ogre::HlmsManager *hlmsManager = root->getHlmsManager();
+
+            Ogre::Hlms *hlms = hlmsManager->getHlms( Ogre::HLMS_PBS );
+            Ogre::GpuProgramManager::getSingleton().clearMicrocodeCache();
+            hlms->reloadFrom( hlms->getDataFolder() );
+        }
+        else if( arg.keysym.sym == SDLK_F2 && (arg.keysym.mod & (KMOD_LCTRL|KMOD_RCTRL)) )
+        {
+            //Hot reload of Unlit shaders.
+            Ogre::Root *root = mGraphicsSystem->getRoot();
+            Ogre::HlmsManager *hlmsManager = root->getHlmsManager();
+
+            Ogre::Hlms *hlms = hlmsManager->getHlms( Ogre::HLMS_UNLIT );
+            Ogre::GpuProgramManager::getSingleton().clearMicrocodeCache();
+            hlms->reloadFrom( hlms->getDataFolder() );
         }
         else
         {

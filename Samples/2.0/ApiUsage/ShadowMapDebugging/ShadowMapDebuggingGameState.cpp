@@ -19,6 +19,7 @@
 #include "OgreRoot.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
+#include "OgreHlmsPbs.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
@@ -30,6 +31,13 @@ using namespace Demo;
 
 namespace Demo
 {
+    const Ogre::String c_shadowMapFilters[Ogre::HlmsPbs::NumShadowFilter] =
+    {
+        "PCF 2x2",
+        "PCF 3x3",
+        "PCF 4x4"
+    };
+
     ShadowMapDebuggingGameState::ShadowMapDebuggingGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mAnimateObjects( true ),
@@ -204,6 +212,11 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void ShadowMapDebuggingGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
+        Ogre::Hlms *hlms = mGraphicsSystem->getRoot()->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
+        Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
+
         TutorialGameState::generateDebugText( timeSinceLast, outText );
         TutorialGameState::generateDebugText( timeSinceLast, outText );
         outText += "\nPress F2 to toggle animation. ";
@@ -212,10 +225,17 @@ namespace Demo
         outText += mDebugOverlayPSSM->getVisible() ? "[On]" : "[Off]";
         outText += "\nPress F4 to show/hide spotlight maps. ";
         outText += mDebugOverlaySpotlights->getVisible() ? "[On]" : "[Off]";
+        outText += "\nPress F5 to switch filter. [" + c_shadowMapFilters[pbs->getShadowFilter()] + "]";
     }
     //-----------------------------------------------------------------------------------
     void ShadowMapDebuggingGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
+        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
+        {
+            TutorialGameState::keyReleased( arg );
+            return;
+        }
+
         if( arg.keysym.sym == SDLK_F2 )
         {
             mAnimateObjects = !mAnimateObjects;
@@ -233,6 +253,17 @@ namespace Demo
                 mDebugOverlaySpotlights->hide();
             else
                 mDebugOverlaySpotlights->show();
+        }
+        else if( arg.keysym.sym == SDLK_F5 )
+        {
+            Ogre::Hlms *hlms = mGraphicsSystem->getRoot()->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+
+            assert( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
+            Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
+
+            pbs->setShadowSettings( static_cast<Ogre::HlmsPbs::ShadowFilter>(
+                                        (pbs->getShadowFilter() + 1) %
+                                        Ogre::HlmsPbs::NumShadowFilter ) );
         }
         else
         {
