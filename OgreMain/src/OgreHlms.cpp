@@ -1293,6 +1293,7 @@ namespace Ogre
         }
 
         mDatablocks.clear();
+        mDefaultDatablock = 0;
     }
     //-----------------------------------------------------------------------------------
     void Hlms::destroyAllDatablocks(void)

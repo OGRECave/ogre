@@ -50,6 +50,7 @@ THE SOFTWARE.
 #include "OgreStaticGeometry.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreManualObject.h"
+#include "OgreManualObject2.h"
 #include "OgreBillboardChain.h"
 #include "OgreRibbonTrail.h"
 #include "OgreParticleSystemManager.h"
@@ -526,20 +527,20 @@ void SceneManager::destroyAllBillboardSets(void)
     destroyAllMovableObjectsByType(v1::BillboardSetFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
-v1::ManualObject* SceneManager::createManualObject( SceneMemoryMgrTypes sceneType )
+ManualObject * SceneManager::createManualObject( SceneMemoryMgrTypes sceneType )
 {
-    return static_cast<v1::ManualObject*>(
-        createMovableObject(v1::ManualObjectFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager[sceneType]) );
+    return static_cast<ManualObject*>(
+        createMovableObject(ManualObjectFactory::FACTORY_TYPE_NAME, &mEntityMemoryManager[sceneType]) );
 }
 //-----------------------------------------------------------------------
-void SceneManager::destroyManualObject(v1::ManualObject* obj)
+void SceneManager::destroyManualObject(ManualObject* obj)
 {
     destroyMovableObject(obj);
 }
 //-----------------------------------------------------------------------
 void SceneManager::destroyAllManualObjects(void)
 {
-    destroyAllMovableObjectsByType(v1::ManualObjectFactory::FACTORY_TYPE_NAME);
+    destroyAllMovableObjectsByType(ManualObjectFactory::FACTORY_TYPE_NAME);
 }
 //-----------------------------------------------------------------------
 v1::BillboardChain* SceneManager::createBillboardChain()

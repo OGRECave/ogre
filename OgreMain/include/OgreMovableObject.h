@@ -595,8 +595,6 @@ namespace Ogre {
         }
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera,
                                         RealAsUint depth) {}
-        virtual void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false) {}
     };
 
     /** @} */
