@@ -86,9 +86,8 @@ namespace Ogre
             object with.
         @param opType The type of operation to use to render. 
         */
-        virtual_l1 void begin(const String& materialName,
-                           v1::RenderOperation::OperationType opType = v1::RenderOperation::OT_TRIANGLE_LIST,
-                           const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        virtual_l1 void begin(const String& datablockName,
+                           v1::RenderOperation::OperationType opType = v1::RenderOperation::OT_TRIANGLE_LIST);
 
         /** Start the definition of an update to a part of the object.
         @remarks
@@ -155,16 +154,23 @@ namespace Ogre
         /// @copydoc ManualObject::textureCoord(Real)
         virtual_l1 void textureCoord(const Vector4& xyzw);
 
-        /** Add a vertex colour to a vertex.
+        /** Add a vertex diffuse colour to a vertex.
         */
         virtual_l1 void colour(const ColourValue& col);
-        /** Add a vertex colour to a vertex.
+        /** Add a vertex diffuse colour to a vertex.
         @param r,g,b,a Colour components expressed as floating point numbers from 0-1
         */
         virtual_l1 void colour(Real r, Real g, Real b, Real a = 1.0f);
 
-        /** Add a vertex index to construct faces / lines / points via indexing
-            rather than just by a simple list of vertices. 
+        /** Add a vertex specular colour to a vertex.
+        */
+        virtual_l1 void specular(const ColourValue& col);
+        /** Add a vertex specular colour to a vertex.
+        @param r,g,b,a Colour components expressed as floating point numbers from 0-1
+        */
+        virtual_l1 void specular(Real r, Real g, Real b, Real a = 1.0f);
+
+        /** Add a vertex index to construct faces / lines / points.
         @remarks
             You will have to call this 3 times for each face for a triangle list, 
             or use the alternative 3-parameter version. Other operation types
@@ -215,7 +221,7 @@ namespace Ogre
         @param subIndex The index of the subsection to alter
         @param name The name of the new material to use
         */
-        virtual void setMaterialName(size_t subIndex, const String& name, const String & group = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+        void setDatablock(size_t subIndex, const String& name);
 
         /** Gets a pointer to a ManualObjectSection, i.e. a part of a ManualObject.
         */
@@ -236,12 +242,8 @@ namespace Ogre
         {
         protected:
             ManualObject* mParent;
-            String mMaterialName;
-            String mGroupName;
-            mutable MaterialPtr mMaterial;
+            String mDatablockName;
             bool m32BitIndices;
-
-//            const MaterialPtr& getMaterial(void) const;
 
         public:
             VertexArrayObject * mVao;
@@ -255,14 +257,9 @@ namespace Ogre
 
             void clear();
 
-            ManualObjectSection(ManualObject* parent, const String& materialName,
-                v1::RenderOperation::OperationType opType, const String & groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            ManualObjectSection(ManualObject* parent, const String& datablockName, v1::RenderOperation::OperationType opType);
             virtual ~ManualObjectSection();
 
-            /// Retrieve the material name in use
-            const String& getMaterialName(void) const { return mMaterialName; }
-            /// Retrieve the material group in use
-            const String& getMaterialGroup(void) const { return mGroupName; }
             /// update the material name in use
 //            void setMaterialName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
             /// Set whether we need 32-bit indices
@@ -279,6 +276,8 @@ namespace Ogre
             virtual const LightList &getLights(void) const OGRE_OVERRIDE;
 
             virtual bool getCastsShadows(void) const;
+
+            void _setDatablock (const Ogre::String & datablockName);
         };
 
         typedef vector<ManualObjectSection*>::type SectionList;
@@ -300,7 +299,7 @@ namespace Ogre
         float * mTempVertexBuffer;
         size_t mTempVertexBufferSize;
 
-        uint32 * mTempIndexBuffer;
+        char * mTempIndexBuffer;
         size_t mTempIndexBufferSize;
 
 //        /// Temporary vertex structure
@@ -322,9 +321,9 @@ namespace Ogre
 
         /// Current buffer we write to
         float * mVertexBuffer;
-        uint32 * mIndexBuffer;
+        char * mIndexBuffer;
         float * mVertexBufferCursor;
-        uint32 * mIndexBufferCursor;
+        char * mIndexBufferCursor;
 
 //        /// System memory allocation size, in bytes
 //        size_t mTempVertexSize;

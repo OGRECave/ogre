@@ -125,6 +125,9 @@ namespace Ogre {
                 // delete old buffer
                 OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
             }
+
+            mVertexBuffer = mTempVertexBuffer;
+            mVertexBufferCursor = mVertexBuffer + mVertices * sizeof(float);
             mTempVertexBufferSize = newSize;
         }
     }
@@ -144,14 +147,16 @@ namespace Ogre {
                 // increase to at least double current
                 newSize = std::max(newSize, mTempIndexBufferSize*2);
             }
-            numInds = newSize / sizeof(uint32);
-            uint32 * tmp = mTempIndexBuffer;
-            mTempIndexBuffer = OGRE_ALLOC_T(uint32, numInds, MEMCATEGORY_GEOMETRY);
+            char * tmp = mTempIndexBuffer;
+            mTempIndexBuffer = OGRE_ALLOC_T(char, newSize, MEMCATEGORY_GEOMETRY);
             if (tmp)
             {
                 memcpy(mTempIndexBuffer, tmp, mTempIndexBufferSize);
                 OGRE_FREE(tmp, MEMCATEGORY_GEOMETRY);
             }
+
+            mIndexBuffer = mTempIndexBuffer;
+            mIndexBufferCursor = mIndexBuffer + mIndices * sizeof(uint32);
             mTempIndexBufferSize = newSize;
         }
     }
@@ -168,8 +173,7 @@ namespace Ogre {
 //        mEstIndexCount = icount;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::begin(const String& materialName,
-        v1::RenderOperation::OperationType opType, const String & groupName)
+    void ManualObject::begin(const String & datablockName, v1::RenderOperation::OperationType opType)
     {
         if (mCurrentSection)
         {
@@ -178,28 +182,7 @@ namespace Ogre {
                 "ManualObject::begin");
         }
 
-        // Check that a valid material was provided
-        MaterialPtr material = MaterialManager::getSingleton().getByName(materialName, groupName);
-
-        if( material.isNull() )
-        {
-            LogManager::getSingleton().logMessage("Can't assign material " + materialName +
-                                                  " to the ManualObject " + mName + " because this "
-                                                  "Material does not exist. Have you forgotten to define it in a "
-                                                  ".material script?", LML_CRITICAL);
-
-            material = MaterialManager::getSingleton().getByName("BaseWhite");
-
-            if (material.isNull())
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't assign default material "
-                            "to the ManualObject " + mName + ". Did "
-                            "you forget to call MaterialManager::initialise()?",
-                            "ManualObject::begin");
-            }
-        }
-
-        mCurrentSection = OGRE_NEW ManualObjectSection(this, materialName, opType, groupName);
+        mCurrentSection = OGRE_NEW ManualObjectSection(this, datablockName, opType);
 
         mCurrentSection->mVaoManager = mManager->getDestinationRenderSystem()->getVaoManager();
 
@@ -211,7 +194,6 @@ namespace Ogre {
 
         mVertices = 0;
         mIndices = 0;
-//        mTexCoordIndex = 0;
 
         resizeVertexBufferIfNeeded(mVertices);
         resizeIndexBufferIfNeeded(mIndices);
@@ -240,13 +222,12 @@ namespace Ogre {
 
         mVertices = 0;
         mIndices = 0;
-//        mTexCoordIndex = 0;
 
         VertexBufferPacked * vertexBuffer = mCurrentSection->mVao->getVertexBuffers()[0];
         IndexBufferPacked * indexBuffer = mCurrentSection->mVao->getIndexBuffer();
 
         mVertexBuffer = mVertexBufferCursor = static_cast<float *>(vertexBuffer->map(0, vertexBuffer->getNumElements()));
-        mIndexBuffer = mIndexBufferCursor = static_cast<uint32 *>(indexBuffer->map(0, indexBuffer->getNumElements()));
+        mIndexBuffer = mIndexBufferCursor = static_cast<char *>(indexBuffer->map(0, indexBuffer->getNumElements()));
     }
     //-----------------------------------------------------------------------------
     void ManualObject::position(const Vector3& pos)
@@ -501,6 +482,36 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
+    void ManualObject::specular(const ColourValue & col)
+    {
+        specular(col.r, col.g, col.b, col.a);
+    }
+    //-----------------------------------------------------------------------------
+    void ManualObject::specular(Real r, Real g, Real b, Real a)
+    {
+        if (!mCurrentSection)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "You must call begin() before this method",
+                "ManualObject::specular");
+        }
+
+        if (mVertices == 1 &&
+            !mCurrentUpdating)
+        {
+            // defining declaration
+            VertexElement2 colorElement(VET_COLOUR, VES_SPECULAR);
+            mCurrentSection->mVertexElements.push_back(colorElement);
+
+            mDeclSize += v1::VertexElement::getTypeSize(VET_COLOUR);
+        }
+
+        *mVertexBufferCursor++ = r;
+        *mVertexBufferCursor++ = g;
+        *mVertexBufferCursor++ = b;
+        *mVertexBufferCursor++ = a;
+    }
+    //-----------------------------------------------------------------------------
     void ManualObject::index(uint32 idx)
     {
         if (!mCurrentSection)
@@ -510,24 +521,26 @@ namespace Ogre {
                 "ManualObject::index");
         }
 
-        if (idx >= 65536)
-            mCurrentSection->set32BitIndices(true);
-
-//        // make sure we have index data
-//        RenderOperation* rop = mCurrentSection->getRenderOperation();
-//        if (!rop->indexData)
-//        {
-//            rop->indexData = OGRE_NEW IndexData();
-//            rop->indexData->indexCount = 0;
-//        }
-//        rop->useIndexes = true;
-
         if (!mCurrentUpdating)
         {
-            resizeIndexBufferIfNeeded(mIndices + 1);
-        }
+            if (idx >= 65536)
+                mCurrentSection->set32BitIndices(true);
 
-        *mIndexBufferCursor++ = idx;
+            resizeIndexBufferIfNeeded(mIndices + 1);
+
+            *((uint32 *)mIndexBufferCursor) = idx;
+            mIndexBufferCursor += sizeof(uint32);
+        }
+        else if (mCurrentSection->get32BitIndices())
+        {
+            *((uint32 *)mIndexBufferCursor) = idx;
+            mIndexBufferCursor += sizeof(uint32);
+        }
+        else
+        {
+            *((uint16 *)mIndexBufferCursor) = idx;
+            mIndexBufferCursor += sizeof(uint16);
+        }
 
         mIndices++;
     }
@@ -586,11 +599,6 @@ namespace Ogre {
                 "ManualObject::end");
         }
 
-        if (mCurrentSection->mVao)
-        {
-            mCurrentSection->clear();
-        }
-
         if (! mVertices)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -610,6 +618,11 @@ namespace Ogre {
 
         if (!mCurrentUpdating)
         {
+            if (mCurrentSection->mVao)
+            {
+                mCurrentSection->clear();
+            }
+
             VaoManager *vaoManager = mCurrentSection->mVaoManager;
             VertexBufferPackedVec vertexBuffers;
 
@@ -641,14 +654,16 @@ namespace Ogre {
 
             if (mCurrentSection->get32BitIndices())
             {
-                memcpy(indexData, mIndexBuffer, mIndices * 4);
+                memcpy(indexData, mIndexBuffer, mIndices * sizeof(uint32));
             }
             else
             {
+                uint32 * l32Buffer = (uint32 *)mIndexBuffer;
+
                 for (size_t i = 0; i < mIndices; i++)
                 {
-                    *((uint16 *)indexData) = mIndexBuffer[i];
-                    indexData += 2;
+                    *((uint16 *)indexData) = l32Buffer[i];
+                    indexData += sizeof(uint16);
                 }
             }
 
@@ -669,6 +684,9 @@ namespace Ogre {
 
             vertexBuffer->unmap(UO_KEEP_PERSISTENT);
             indexBuffer->unmap(UO_KEEP_PERSISTENT);
+
+            mVertexBuffer = mVertexBufferCursor = 0;
+            mIndexBuffer = mIndexBufferCursor = 0;
         }
 
         mCurrentSection = 0;
@@ -678,7 +696,7 @@ namespace Ogre {
         return result;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::setMaterialName(size_t idx, const String& name, const String& group)
+    void ManualObject::setDatablock(size_t idx, const String& name)
     {
         if (idx >= mSectionList.size())
         {
@@ -687,7 +705,7 @@ namespace Ogre {
                 "ManualObject::setMaterialName");
         }
 
-        mSectionList[idx]->setMaterialName(name, group);
+        mSectionList[idx]->_setDatablock(name);
 
     }
     //-----------------------------------------------------------------------
@@ -720,8 +738,7 @@ namespace Ogre {
     void ManualObject::ManualObjectSection::finalize()
     {
         mVaoPerLod.push_back(mVao);
-
-        setMaterialName(mMaterialName, mGroupName);
+        _setDatablock(mDatablockName);
     }
     //-----------------------------------------------------------------------------
     void ManualObject::ManualObjectSection::clear()
@@ -730,6 +747,19 @@ namespace Ogre {
 
         if (vao)
         {
+            VertexBufferPacked * vertexBuffer = vao->getVertexBuffers()[0];
+            IndexBufferPacked * indexBuffer = vao->getIndexBuffer();
+
+            if (vertexBuffer->isCurrentlyMapped())
+            {
+                vertexBuffer->unmap(UO_UNMAP_ALL);
+            }
+
+            if (indexBuffer->isCurrentlyMapped())
+            {
+                indexBuffer->unmap(UO_UNMAP_ALL);
+            }
+
             VaoManager *vaoManager = mVaoManager;
 
             const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
@@ -756,8 +786,8 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------------
     ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
-        const String& materialName, v1::RenderOperation::OperationType opType, const String & groupName)
-        : mParent(parent), mMaterialName(materialName), mGroupName(groupName), m32BitIndices(false),
+        const String& datablockName, v1::RenderOperation::OperationType opType)
+        : mParent(parent), mDatablockName(datablockName), m32BitIndices(false),
           mVao(0), mOperationType(opType)
     {
 
@@ -794,6 +824,12 @@ namespace Ogre {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "ManualObject do not implement getCastsShadows.",
                      "ManualObjectSection::getCastsShadows" );
+    }
+
+    void ManualObject::ManualObjectSection::_setDatablock(const String & datablockName)
+    {
+        mDatablockName = datablockName;
+        setDatablock(mDatablockName);
     }
     //-----------------------------------------------------------------------------
     String ManualObjectFactory::FACTORY_TYPE_NAME = "ManualObject2";
