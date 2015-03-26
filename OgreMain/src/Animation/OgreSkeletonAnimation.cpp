@@ -110,6 +110,16 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    Real SkeletonAnimation::getNumFrames(void) const
+    {
+        return mDefinition->mNumFrames;
+    }
+    //-----------------------------------------------------------------------------------
+    Real SkeletonAnimation::getDuration(void) const
+    {
+        return mDefinition->mNumFrames / mFrameRate;
+    }
+    //-----------------------------------------------------------------------------------
     void SkeletonAnimation::setBoneWeight( IdString boneName, Real weight )
     {
         map<IdString, size_t>::type::const_iterator itor = mDefinition->mBoneToWeights.find( boneName );

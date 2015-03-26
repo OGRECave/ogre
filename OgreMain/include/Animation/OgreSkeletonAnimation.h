@@ -90,10 +90,16 @@ namespace Ogre
         void addFrame( Real frames );
 
         /// Gets the current animation time, in seconds. Prefer using getCurrentFrame
-        Real getCurrentTime( Real time ) const                      { return mCurrentFrame / mFrameRate; }
+        Real getCurrentTime(void) const                      { return mCurrentFrame / mFrameRate; }
 
         /// Gets the current animation frame, in frames.
-        Real getCurrentFrame( Real time ) const                     { return mCurrentFrame; }
+        Real getCurrentFrame(void) const                     { return mCurrentFrame; }
+
+        /// Gets the frame count.
+        Real getNumFrames(void) const;
+
+        /// Gets animation length, in seconds.
+        Real getDuration(void) const;
 
         IdString getName(void) const                                { return mName; }
 
