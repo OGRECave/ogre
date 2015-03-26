@@ -448,7 +448,7 @@ namespace OgreBites
 #ifdef INCLUDE_RTSHADER_SYSTEM
             mDetailsPanel->setParamValue(11, "Off");
 
-            Ogre::Viewport* mainVP = mCamera->getLastViewport();
+            //Ogre::Viewport* mainVP = mCamera->getLastViewport();
             //const Ogre::String& curMaterialScheme = mainVP->getMaterialScheme();
             if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
             {
