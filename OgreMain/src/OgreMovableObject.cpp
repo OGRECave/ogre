@@ -725,6 +725,8 @@ namespace Ogre {
                                                                         (objData.mWorldRadius);
             ArraySphere objSphere( *arrayRadius, objData.mWorldAabb->mCenter );
 
+            const ArrayInt * RESTRICT_ALIAS objVisibilityMask = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                            (objData.mVisibilityFlags);
             const ArrayInt * RESTRICT_ALIAS objLightMask = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
                                                                                 (objData.mLightMask);
 
@@ -752,6 +754,11 @@ namespace Ogre {
                 //Note visibilityMask is shuffled ARRAY_PACKED_REALS times (it's 1 light, not 4)
                 //rMask = ( intersects() && lightMask & visibilityMask )
                 rMask = Mathlib::TestFlags4( rMask, Mathlib::And( *objLightMask, *visibilityMask ) );
+
+                ArrayMaskI isVisible = Mathlib::TestFlags4( *objVisibilityMask,
+                                                            Mathlib::SetAll( LAYER_VISIBILITY ) );
+
+                rMask = Mathlib::And( rMask, isVisible );
 
                 //Convert rMask into something smaller we can work with.
                 uint32 r = BooleanMask4::getScalarMask( rMask );
