@@ -772,6 +772,7 @@ namespace Ogre {
                     if( IS_BIT_SET( k, r ) )
                     {
                         LightList &lightList = objData.mOwner[k]->mLightList;
+                        lightList.dirtyHash(); //Don't calculate hash incrementally
                         lightList.push_back( LightClosest( *lightsIt, lightList.size(), distance[k] ) );
                     }
                 }
