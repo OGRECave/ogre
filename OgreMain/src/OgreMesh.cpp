@@ -1224,7 +1224,6 @@ namespace v1 {
             (*isub)->removeLodLevels();
         }
 
-        bool edgeListWasBuilt = isEdgeListBuilt();
         freeEdgeList();
         mMeshLodUsageList.clear();
         mLodValues.clear();

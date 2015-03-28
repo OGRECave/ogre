@@ -200,6 +200,8 @@ namespace Ogre
         RSC_TEXTURE_2D_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 1),
         /// TEX_TYPE_CUBE_MAP_ARRAY is supported
         RSC_TEXTURE_CUBE_MAP_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 2),
+        /// Hardware/API supports texture gather operation.
+        RSC_TEXTURE_GATHER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 3),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

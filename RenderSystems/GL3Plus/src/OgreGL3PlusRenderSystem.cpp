@@ -347,6 +347,9 @@ namespace Ogre {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
 
+        if( mGLSupport->checkExtension("GL_ARB_texture_gather") || gl3wIsSupported(4, 0) )
+            rsc->setCapability(RSC_TEXTURE_GATHER);
+
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
         // Probe number of draw buffers

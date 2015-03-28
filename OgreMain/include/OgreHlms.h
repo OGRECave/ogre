@@ -265,6 +265,10 @@ namespace Ogre
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces ) {}
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces ) {}
 
+        HlmsCache preparePassHashBase( const Ogre::CompositorShadowNode *shadowNode,
+                                       bool casterPass, bool dualParaboloid,
+                                       SceneManager *sceneManager );
+
     public:
         Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder );
         virtual ~Hlms();
@@ -527,6 +531,7 @@ namespace Ogre
 
         static const IdString GL3Plus;
         static const IdString HighQuality;
+        static const IdString TexGather;
 
         static const IdString *UvCountPtrs[8];
     };

@@ -82,6 +82,7 @@ namespace Ogre
                                  uint8 texType );
 
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
+        virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
 
         virtual void destroyAllBuffers(void);
 

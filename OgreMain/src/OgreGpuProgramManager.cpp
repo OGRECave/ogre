@@ -360,5 +360,11 @@ namespace Ogre {
         
     }
     //---------------------------------------------------------------------
+    void GpuProgramManager::clearMicrocodeCache(void)
+    {
+        mMicrocodeCache.clear();
+        mCacheDirty = false;
+    }
+    //---------------------------------------------------------------------
 
 }

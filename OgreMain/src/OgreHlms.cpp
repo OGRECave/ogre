@@ -90,6 +90,7 @@ namespace Ogre
 
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
+    const IdString HlmsBaseProp::TexGather      = IdString( "hlms_tex_gather" );
 
     const IdString HlmsBasePieces::AlphaTestCmpFunc = IdString( "alpha_test_cmp_func" );
 
@@ -1214,6 +1215,10 @@ namespace Ogre
     void Hlms::reloadFrom( Archive *newDataFolder )
     {
         clearShaderCache();
+
+        for( size_t i=0; i<NumShaderTypes; ++i )
+            mPieceFiles[i].clear();
+
         mDataFolder = newDataFolder;
         enumeratePieceFiles();
     }
@@ -1643,7 +1648,12 @@ namespace Ogre
                                      bool dualParaboloid, SceneManager *sceneManager )
     {
         mSetProperties.clear();
-
+        return preparePassHashBase( shadowNode, casterPass, dualParaboloid, sceneManager );
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsCache Hlms::preparePassHashBase( const CompositorShadowNode *shadowNode, bool casterPass,
+                                         bool dualParaboloid, SceneManager *sceneManager )
+    {
         if( !casterPass )
         {
             if( shadowNode )

@@ -52,6 +52,23 @@ namespace Ogre
     */
     class _OgreHlmsPbsExport HlmsPbs : public HlmsBufferManager, public ConstBufferPool
     {
+    public:
+        enum ShadowFilter
+        {
+            /// Standard quality. Very fast.
+            PCF_2x2,
+
+            /// Good quality. Still quite fast on most modern hardware.
+            PCF_3x3,
+
+            /// High quality. Very slow in old hardware (i.e. DX10 level hw and below)
+            /// Use RSC_TEXTURE_GATHER to check whether it will be slow or not.
+            PCF_4x4,
+
+            NumShadowFilter
+        };
+
+    protected:
         typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
         typedef vector<HlmsDatablock*>::type HlmsDatablockVec;
 
@@ -76,6 +93,8 @@ namespace Ogre
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
         uint32 mLastTextureHash;
+
+        ShadowFilter mShadowFilter;
 
         virtual const HlmsCache* createShaderCacheEntry( uint32 renderableHash,
                                                          const HlmsCache &passCache,
@@ -125,6 +144,9 @@ namespace Ogre
                                          CommandBuffer *commandBuffer );
 
         virtual void frameEnded(void);
+
+        void setShadowSettings( ShadowFilter filter );
+        ShadowFilter getShadowFilter(void) const            { return mShadowFilter; }
     };
 
     struct _OgreHlmsPbsExport PbsProperty
@@ -195,6 +217,10 @@ namespace Ogre
         static const IdString BlendModeIndex1;
         static const IdString BlendModeIndex2;
         static const IdString BlendModeIndex3;
+
+        static const IdString Pcf3x3;
+        static const IdString Pcf4x4;
+        static const IdString PcfIterations;
 
         static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
         static const IdString *BlendModes[4];

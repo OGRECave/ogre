@@ -2407,28 +2407,35 @@ void SceneManager::buildLightList()
 
             //Cull the lights against all cameras to build the list of visible lights.
             ObjectData objData;
-            const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, 0 );
 
-            for( size_t i=0; i<totalObjs; ++i )
+            const size_t numRenderQueues = objMemoryManager->getNumRenderQueues();
+
+            if( numRenderQueues )
             {
-                for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+                const size_t totalObjs = objMemoryManager->getFirstObjectData( objData, 0 );
+
+                for( size_t i=0; i<totalObjs; ++i )
                 {
-                    const bool isVisible = (objData.mVisibilityFlags[j] &
-                                            VisibilityFlags::LAYER_VISIBILITY) != 0;
-                    if( isVisible )
+                    for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
                     {
-                        mGlobalLightList.visibilityMask[idx] = objData.mVisibilityFlags[j];
-                        mGlobalLightList.boundingSphere[idx] = Sphere(
-                                    objData.mWorldAabb->mCenter.getAsVector3( j ),
-                                    objData.mWorldRadius[j] );
-                        assert( dynamic_cast<Light*>( objData.mOwner[j] ) );
-                        mGlobalLightList.lights.push_back( static_cast<Light*>( objData.mOwner[j] ) );
+                        const bool isVisible = (objData.mVisibilityFlags[j] &
+                                                VisibilityFlags::LAYER_VISIBILITY) != 0;
+                        if( isVisible )
+                        {
+                            mGlobalLightList.visibilityMask[idx] = objData.mVisibilityFlags[j];
+                            mGlobalLightList.boundingSphere[idx] = Sphere(
+                                        objData.mWorldAabb->mCenter.getAsVector3( j ),
+                                        objData.mWorldRadius[j] );
+                            assert( dynamic_cast<Light*>( objData.mOwner[j] ) );
+                            mGlobalLightList.lights.push_back( static_cast<Light*>(
+                                                                   objData.mOwner[j] ) );
 
-                        ++idx;
+                            ++idx;
+                        }
                     }
-                }
 
-                objData.advanceFrustumPack();
+                    objData.advanceFrustumPack();
+                }
             }
 
             ++it;

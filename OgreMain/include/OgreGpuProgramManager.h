@@ -231,6 +231,9 @@ namespace Ogre {
         @param stream The source stream
         */
         virtual void loadMicrocodeCache( DataStreamPtr stream );
+
+        /// Deletes all microcodes. Useful when hot reloading.
+        virtual void clearMicrocodeCache(void);
         
 
 

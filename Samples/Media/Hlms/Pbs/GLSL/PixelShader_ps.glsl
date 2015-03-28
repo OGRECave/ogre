@@ -3,6 +3,7 @@
 @end @property( !GL430 )
 #version 330 core
 #extension GL_ARB_shading_language_420pack: require
+@property( hlms_tex_gather )#extension GL_ARB_texture_gather: require@end
 @end
 
 layout(std140) uniform;
@@ -67,20 +68,92 @@ Material material;
 @property( !hlms_shadow_uses_depth_texture )@piece( SAMPLER2DSHADOW )sampler2D@end @end
 uniform @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps)];
 
-float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec2 invShadowMapSize )
+float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec4 invShadowMapSize )
 {
 @property( !hlms_shadow_uses_depth_texture )
 	float fDepth = psPosLN.z;
 	vec2 uv = psPosLN.xy / psPosLN.w;
-	vec3 o = vec3( invShadowMapSize, -invShadowMapSize.x ) * 0.3;
 
-	// 2x2 PCF
-	float c =	(fDepth <= texture(shadowMap, uv - o.xy).r) ? 1 : 0; // top left
-	c +=		(fDepth <= texture(shadowMap, uv - o.zy).r) ? 1 : 0; // top right
-	c +=		(fDepth <= texture(shadowMap, uv + o.zy).r) ? 1 : 0; // bottom left
-	c +=		(fDepth <= texture(shadowMap, uv + o.xy).r) ? 1 : 0; // bottom right
+	float retVal = 0;
 
-	return c * 0.25;@end
+@property( pcf_3x3 || pcf_4x4 )
+	vec2 offsets[@value(pcf_iterations)] =
+	{
+	@property( pcf_3x3 )
+		vec2( 0, 0 ),	//0, 0
+		vec2( 1, 0 ),	//1, 0
+		vec2( 0, 1 ),	//1, 1
+		vec2( 0, 0 ) 	//1, 1
+	@end
+	@property( pcf_4x4 )
+		vec2( 0, 0 ),	//0, 0
+		vec2( 1, 0 ),	//1, 0
+		vec2( 1, 0 ),	//2, 0
+
+		vec2(-2, 1 ),	//0, 1
+		vec2( 1, 0 ),	//1, 1
+		vec2( 1, 0 ),	//2, 1
+
+		vec2(-2, 1 ),	//0, 2
+		vec2( 1, 0 ),	//1, 2
+		vec2( 1, 0 )	//2, 2
+	@end
+	};
+
+	float row[2];
+	row[0] = 0;
+	row[1] = 0;
+@end
+
+	vec2 fW;
+	vec4 c;
+
+	@foreach( pcf_iterations, n )
+		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * invShadowMapSize.xy;@end
+
+		// 2x2 PCF
+		//The 0.00196 is a magic number that prevents floating point
+		//precision problems ("1000" becomes "999.999" causing fW to
+		//be 0.999 instead of 0, hence ugly pixel-sized dot artifacts
+		//appear at the edge of the shadow).
+		fW = fract( uv * invShadowMapSize.zw + 0.00196 );
+
+		@property( !hlms_tex_gather )
+			c.w = texture(shadowMap, uv ).r;
+			c.z = texture(shadowMap, uv + vec2( invShadowMapSize.x, 0.0 ) ).r;
+			c.x = texture(shadowMap, uv + vec2( 0.0, invShadowMapSize.y ) ).r;
+			c.y = texture(shadowMap, uv + vec2( invShadowMapSize.x, invShadowMapSize.y ) ).r;
+		@end @property( hlms_tex_gather )
+			c = textureGather( shadowMap, uv + invShadowMapSize.xy * 0.5 );
+		@end
+
+		c = step( fDepth, c );
+
+		@property( !pcf_3x3 && !pcf_4x4 )
+			//2x2 PCF: It's slightly faster to calculate this directly.
+			retVal += mix(
+						mix( c.w, c.z, fW.x ),
+						mix( c.x, c.y, fW.x ),
+						fW.y );
+		@end @property( pcf_3x3 || pcf_4x4 )
+			row[0] += mix( c.w, c.z, fW.x );
+			row[1] += mix( c.x, c.y, fW.x );
+		@end
+	@end
+
+	@property( pcf_3x3 || pcf_4x4 )
+		//NxN PCF: It's much faster to leave the final mix out of the loop (when N > 2).
+		retVal = mix( row[0], row[1], fW.y );
+	@end
+
+	@property( pcf_3x3 )
+		retVal *= 0.25;
+	@end @property( pcf_4x4 )
+		retVal *= 0.11111111111111;
+	@end
+
+	return retVal;
+@end
 @property( hlms_shadow_uses_depth_texture )
 	return texture( shadowMap, psPosLN.xyz, 0 ).x;@end
 }

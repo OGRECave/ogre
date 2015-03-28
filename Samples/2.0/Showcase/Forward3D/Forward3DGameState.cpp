@@ -22,6 +22,8 @@
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
+#include "OgreHlmsPbs.h"
+
 #include "OgreOverlayManager.h"
 #include "OgreOverlayContainer.h"
 #include "OgreOverlay.h"
@@ -180,6 +182,12 @@ namespace Demo
 
         mCameraController = new CameraController( mGraphicsSystem, false );
 
+        //This sample is too taxing on pixel shaders. Use the fastest PCF filter.
+        Ogre::Hlms *hlms = mGraphicsSystem->getRoot()->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
+        Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
+        pbs->setShadowSettings( Ogre::HlmsPbs::PCF_2x2 );
+
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
@@ -294,6 +302,12 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void Forward3DGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
+        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
+        {
+            TutorialGameState::keyReleased( arg );
+            return;
+        }
+
         if( arg.keysym.sym == SDLK_F2 )
         {
             mAnimateObjects = !mAnimateObjects;

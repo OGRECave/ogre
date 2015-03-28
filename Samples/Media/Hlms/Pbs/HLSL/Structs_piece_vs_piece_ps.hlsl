@@ -3,7 +3,8 @@ struct ShadowReceiverData
 {
 	float4x4 texViewProj;
 	float2 shadowDepthRange;
-	float2 invShadowMapSize;
+	float2 padding;
+	float4 invShadowMapSize;
 };
 
 struct Light
