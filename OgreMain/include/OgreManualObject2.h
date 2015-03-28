@@ -61,19 +61,15 @@ namespace Ogre
         
         /** Estimate the number of vertices ahead of time.
         @remarks
-            Calling this helps to avoid memory reallocation when you define
-            vertices. Also very handy when using beginUpdate() to manage dynamic
-            data - you can make the vertex buffers a little larger than their
-            initial needs to allow for growth later with this method.
+            Calling this helps to avoid memory reallocation when you first define
+            indices with begin() -> end() sequence.
         */
         virtual_l1 void estimateVertexCount(size_t vcount);
 
         /** Estimate the number of indices ahead of time.
         @remarks
-            Calling this helps to avoid memory reallocation when you define
-            indices. Also very handy when using beginUpdate() to manage dynamic
-            data - you can make the index buffer a little larger than the
-            initial need to allow for growth later with this method.
+            Calling this helps to avoid memory reallocation when you first define
+            indices with begin() -> end() sequence.
         */
         virtual_l1 void estimateIndexCount(size_t icount);
 
@@ -82,7 +78,7 @@ namespace Ogre
             Each time you call this method, you start a new section of the
             object with its own material and potentially its own type of
             rendering operation (triangles, points or lines for example).
-        @param materialName The name of the material to render this part of the
+        @param datablockName The name of the datablock to render this part of the
             object with.
         @param opType The type of operation to use to render. 
         */
@@ -94,9 +90,10 @@ namespace Ogre
             Using this method, you can update an existing section of the object
             efficiently. You do not have the option of changing the operation type
             obviously, since it must match the one that was used before. 
-        @note If your sections are changing size, particularly growing, use
-            estimateVertexCount and estimateIndexCount to pre-size the buffers a little
-            larger than the initial needs to avoid buffer reconstruction.
+        @note Changing size of the sections is not supported, you are expected to
+            supply the same amount of data with the same layout when updating.
+            If you want to change the data layout, call clear() and create
+            new sections with begin().
         @param sectionIndex The index of the section you want to update. The first
             call to begin() would have created section 0, the second section 1, etc.
         */
@@ -181,6 +178,17 @@ namespace Ogre
         @param idx A vertex index from 0 to 4294967295. 
         */
         virtual_l1 void index(uint32 idx);
+
+        /** Add a set of 2 vertex indices to construct a line; this is a
+            shortcut to calling index() 2 times. It is only valid for line
+            lists.
+        @note
+            32-bit indexes are not supported on all cards and will only be used
+            when required, if an index is > 65535.
+        @param i1, i2 2 vertex indices from 0 to 4294967295 defining a face.
+        */
+        virtual_l1 void line(uint32 i1, uint32 i2);
+
         /** Add a set of 3 vertex indices to construct a triangle; this is a
             shortcut to calling index() 3 times. It is only valid for triangle 
             lists.
@@ -190,6 +198,7 @@ namespace Ogre
         @param i1, i2, i3 3 vertex indices from 0 to 4294967295 defining a face.
         */
         virtual_l1 void triangle(uint32 i1, uint32 i2, uint32 i3);
+
         /** Add a set of 4 vertex indices to construct a quad (out of 2 
             triangles); this is a shortcut to calling index() 6 times, 
             or triangle() twice. It's only valid for triangle list operations.
@@ -215,11 +224,15 @@ namespace Ogre
         /** Alter the material for a subsection of this object after it has been
             specified.
         @remarks
-            You specify the material to use on a section of this object during the
-            call to begin(), however if you want to change the material afterwards
+            You specify the datablock to use on a section of this object during the
+            call to begin(), however if you want to change the datablock afterwards
             you can do so by calling this method.
+        @note This function is a shortcut of calling Renderable::setDatablock() on all
+            sections in this manual object. If you want to set a datablock with pointer
+            instead of ID string, you need to get the section and call the appropriate
+            function.
         @param subIndex The index of the subsection to alter
-        @param name The name of the new material to use
+        @param name The name of the new datablock to use
         */
         void setDatablock(size_t subIndex, const String& name);
 
@@ -234,38 +247,26 @@ namespace Ogre
         // MovableObject overrides
         /** @copydoc MovableObject::getMovableType. */
         const String& getMovableType(void) const;
-        /** @copydoc MovableObject::_updateRenderQueue. */
-        void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
         /// Built, renderable section of geometry
         class _OgreExport ManualObjectSection : public Renderable, public MovableAlloc
         {
         protected:
             ManualObject* mParent;
-            String mDatablockName;
-            bool m32BitIndices;
-
-        public:
-            VertexArrayObject * mVao;
-            VaoManager * mVaoManager;
-
-            v1::RenderOperation::OperationType mOperationType;
-
-            VertexElement2Vec mVertexElements;
-
-            void finalize();
 
             void clear();
 
+        public:
+            friend class ManualObject;
+
+            VertexArrayObject * mVao;
+            VaoManager * mVaoManager;
+            v1::RenderOperation::OperationType mOperationType;
+            VertexElement2Vec mVertexElements;
+            bool m32BitIndices;
+
             ManualObjectSection(ManualObject* parent, const String& datablockName, v1::RenderOperation::OperationType opType);
             virtual ~ManualObjectSection();
-
-            /// update the material name in use
-//            void setMaterialName(const String& name, const String& groupName = ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-            /// Set whether we need 32-bit indices
-            void set32BitIndices(bool n32) { m32BitIndices = n32; }
-            /// Get whether we need 32-bit indices
-            bool get32BitIndices() const { return m32BitIndices; }
             
             // Renderable overrides
             /** @copydoc Renderable::getRenderOperation. */
@@ -274,10 +275,8 @@ namespace Ogre
             virtual void getWorldTransforms(Matrix4* xform) const OGRE_OVERRIDE;
             /** @copydoc Renderable::getLights. */
             virtual const LightList &getLights(void) const OGRE_OVERRIDE;
-
+            /** @copydoc Renderable::getCastsShadows. */
             virtual bool getCastsShadows(void) const;
-
-            void _setDatablock (const Ogre::String & datablockName);
         };
 
         typedef vector<ManualObjectSection*>::type SectionList;
@@ -291,6 +290,7 @@ namespace Ogre
 
         /// Are we updating?
         bool mCurrentUpdating;
+        String mCurrentDatablockName;
 
         size_t mVertices;
         size_t mIndices;

@@ -29,6 +29,72 @@ namespace Demo
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
+
+        //---------------------------------------------------------------------------------------
+        //
+        //---------------------------------------------------------------------------------------
+        Ogre::ManualObject * manualObject = sceneManager->createManualObject();
+
+        manualObject->begin("BaseWhite", Ogre::v1::RenderOperation::OT_LINE_LIST);
+
+        // Back
+        manualObject->position(0.0f, 0.0f, 0.0f);
+        manualObject->position(0.0f, 1.0f, 0.0f);
+        manualObject->line(0, 1);
+
+        manualObject->position(0.0f, 1.0f, 0.0f);
+        manualObject->position(1.0f, 1.0f, 0.0f);
+        manualObject->line(2, 3);
+
+        manualObject->position(1.0f, 1.0f, 0.0f);
+        manualObject->position(1.0f, 0.0f, 0.0f);
+        manualObject->line(4, 5);
+
+        manualObject->position(1.0f, 0.0f, 0.0f);
+        manualObject->position(0.0f, 0.0f, 0.0f);
+        manualObject->line(6, 7);
+
+        // Front
+        manualObject->position(0.0f, 0.0f, 1.0f);
+        manualObject->position(0.0f, 1.0f, 1.0f);
+        manualObject->line(8, 9);
+
+        manualObject->position(0.0f, 1.0f, 1.0f);
+        manualObject->position(1.0f, 1.0f, 1.0f);
+        manualObject->line(10, 11);
+
+        manualObject->position(1.0f, 1.0f, 1.0f);
+        manualObject->position(1.0f, 0.0f, 1.0f);
+        manualObject->line(12, 13);
+
+        manualObject->position(1.0f, 0.0f, 1.0f);
+        manualObject->position(0.0f, 0.0f, 1.0f);
+        manualObject->line(14, 15);
+
+        // Sides
+        manualObject->position(0.0f, 0.0f, 0.0f);
+        manualObject->position(0.0f, 0.0f, 1.0f);
+        manualObject->line(16, 17);
+
+        manualObject->position(0.0f, 1.0f, 0.0f);
+        manualObject->position(0.0f, 1.0f, 1.0f);
+        manualObject->line(18, 19);
+
+        manualObject->position(1.0f, 0.0f, 0.0f);
+        manualObject->position(1.0f, 0.0f, 1.0f);
+        manualObject->line(20, 21);
+
+        manualObject->position(1.0f, 1.0f, 0.0f);
+        manualObject->position(1.0f, 1.0f, 1.0f);
+        manualObject->line(22, 23);
+
+        manualObject->end();
+
+        Ogre::SceneNode *sceneNodeLines = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
+                                     createChildSceneNode( Ogre::SCENE_DYNAMIC );
+        sceneNodeLines->attachObject(manualObject);
+        sceneNodeLines->scale(4.0f, 4.0f, 4.0f);
+        sceneNodeLines->translate(-4.5f, -1.5f, 0.0f, Ogre::SceneNode::TS_LOCAL);
         //---------------------------------------------------------------------------------------
         //
         //---------------------------------------------------------------------------------------
@@ -51,11 +117,11 @@ namespace Demo
 
         mManualObject->end();
 
-        Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
+        Ogre::SceneNode *sceneNodeGrid = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
                                      createChildSceneNode( Ogre::SCENE_DYNAMIC );
-        sceneNode->attachObject(mManualObject);
-        sceneNode->scale(5.0f, 5.0f, 5.0f);
-        sceneNode->translate(-1.5f, -1.5f, 0.0f, Ogre::SceneNode::TS_LOCAL);
+        sceneNodeGrid->attachObject(mManualObject);
+        sceneNodeGrid->scale(4.0f, 4.0f, 4.0f);
+        sceneNodeGrid->translate(1.5f, -1.5f, 0.0f, Ogre::SceneNode::TS_LOCAL);
         //---------------------------------------------------------------------------------------
         //
         //---------------------------------------------------------------------------------------

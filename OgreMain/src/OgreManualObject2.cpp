@@ -164,13 +164,11 @@ namespace Ogre {
     void ManualObject::estimateVertexCount(size_t vcount)
     {
         resizeVertexBufferIfNeeded(vcount);
-//        mEstVertexCount = vcount;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::estimateIndexCount(size_t icount)
     {
         resizeIndexBufferIfNeeded(icount);
-//        mEstIndexCount = icount;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::begin(const String & datablockName, v1::RenderOperation::OperationType opType)
@@ -190,13 +188,16 @@ namespace Ogre {
 
         mSectionList.push_back(mCurrentSection);
 
+        mCurrentDatablockName = datablockName;
+
         mDeclSize = 0;
 
         mVertices = 0;
         mIndices = 0;
 
-        resizeVertexBufferIfNeeded(mVertices);
-        resizeIndexBufferIfNeeded(mIndices);
+        // Will initialize to default size
+        resizeVertexBufferIfNeeded(0);
+        resizeIndexBufferIfNeeded(0);
 
         mVertexBuffer = mVertexBufferCursor = mTempVertexBuffer;
         mIndexBuffer = mIndexBufferCursor = mTempIndexBuffer;
@@ -524,14 +525,14 @@ namespace Ogre {
         if (!mCurrentUpdating)
         {
             if (idx >= 65536)
-                mCurrentSection->set32BitIndices(true);
+                mCurrentSection->m32BitIndices = true;
 
             resizeIndexBufferIfNeeded(mIndices + 1);
 
             *((uint32 *)mIndexBufferCursor) = idx;
             mIndexBufferCursor += sizeof(uint32);
         }
-        else if (mCurrentSection->get32BitIndices())
+        else if (mCurrentSection->m32BitIndices)
         {
             *((uint32 *)mIndexBufferCursor) = idx;
             mIndexBufferCursor += sizeof(uint32);
@@ -545,20 +546,40 @@ namespace Ogre {
         mIndices++;
     }
     //-----------------------------------------------------------------------------
+    void ManualObject::line(uint32 i1, uint32 i2)
+    {
+        if (!mCurrentSection)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "You must call begin() before this method",
+                "ManualObject::line");
+        }
+
+        if (mCurrentSection->mOperationType != v1::RenderOperation::OT_LINE_LIST)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "This method is only valid on line lists",
+                "ManualObject::line");
+        }
+
+        index(i1);
+        index(i2);
+    }
+    //-----------------------------------------------------------------------------
     void ManualObject::triangle(uint32 i1, uint32 i2, uint32 i3)
     {
         if (!mCurrentSection)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "You must call begin() before this method",
-                "ManualObject::index");
+                "ManualObject::triangle");
         }
 
         if (mCurrentSection->mOperationType != v1::RenderOperation::OT_TRIANGLE_LIST)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "This method is only valid on triangle lists",
-                "ManualObject::index");
+                "ManualObject::triangle");
         }
 
         index(i1);
@@ -609,7 +630,7 @@ namespace Ogre {
         if (! mIndices)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "No indices have been defined in ManualObject.",
+                "No indices have been defined in ManualObject. This is not supported.",
                 "ManualObject::end");
         }
 
@@ -641,8 +662,8 @@ namespace Ogre {
 
             vertexBuffer->unmap(UO_KEEP_PERSISTENT);
 
-            IndexBufferPacked *indexBuffer = vaoManager->createIndexBuffer(mCurrentSection->get32BitIndices() ? IndexBufferPacked::IT_32BIT :
-                                                                                                                IndexBufferPacked::IT_16BIT,
+            IndexBufferPacked *indexBuffer = vaoManager->createIndexBuffer(mCurrentSection->m32BitIndices ? IndexBufferPacked::IT_32BIT :
+                                                                                                            IndexBufferPacked::IT_16BIT,
                                                                            mIndices,
                                                                            BT_DYNAMIC_PERSISTENT_COHERENT,
                                                                            NULL,
@@ -652,7 +673,7 @@ namespace Ogre {
 
             assert(indexData);
 
-            if (mCurrentSection->get32BitIndices())
+            if (mCurrentSection->m32BitIndices)
             {
                 memcpy(indexData, mIndexBuffer, mIndices * sizeof(uint32));
             }
@@ -671,18 +692,29 @@ namespace Ogre {
 
             mCurrentSection->mVao = vaoManager->createVertexArrayObject(vertexBuffers, indexBuffer, mCurrentSection->mOperationType);
 
-            mCurrentSection->finalize();
+            mCurrentSection->mVaoPerLod.push_back(mCurrentSection->mVao);
+            mCurrentSection->setDatablock(mCurrentDatablockName);
 
             mRenderables.push_back(mCurrentSection);
 
             resetBuffers();
+
+            mCurrentDatablockName.clear();
         }
         else
         {
-            VertexBufferPacked * vertexBuffer = mCurrentSection->mVao->getVertexBuffers()[0];
-            IndexBufferPacked * indexBuffer = mCurrentSection->mVao->getIndexBuffer();
+            const VertexBufferPackedVec &vertexBuffers = mCurrentSection->mVao->getVertexBuffers();
+            VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
+            VertexBufferPackedVec::const_iterator endBuffers = vertexBuffers.end();
 
-            vertexBuffer->unmap(UO_KEEP_PERSISTENT);
+            while (itBuffers != endBuffers)
+            {
+                VertexBufferPacked * vertexBuffer = *itBuffers;
+                vertexBuffer->unmap(UO_KEEP_PERSISTENT);
+                itBuffers++;
+            }
+
+            IndexBufferPacked * indexBuffer = mCurrentSection->mVao->getIndexBuffer();
             indexBuffer->unmap(UO_KEEP_PERSISTENT);
 
             mVertexBuffer = mVertexBufferCursor = 0;
@@ -705,7 +737,7 @@ namespace Ogre {
                 "ManualObject::setMaterialName");
         }
 
-        mSectionList[idx]->_setDatablock(name);
+        mSectionList[idx]->setDatablock(name);
 
     }
     //-----------------------------------------------------------------------
@@ -728,18 +760,7 @@ namespace Ogre {
         return ManualObjectFactory::FACTORY_TYPE_NAME;
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
-    {
-
-    }
     //-----------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------
-    //-----------------------------------------------------------------------------
-    void ManualObject::ManualObjectSection::finalize()
-    {
-        mVaoPerLod.push_back(mVao);
-        _setDatablock(mDatablockName);
-    }
     //-----------------------------------------------------------------------------
     void ManualObject::ManualObjectSection::clear()
     {
@@ -747,35 +768,36 @@ namespace Ogre {
 
         if (vao)
         {
-            VertexBufferPacked * vertexBuffer = vao->getVertexBuffers()[0];
-            IndexBufferPacked * indexBuffer = vao->getIndexBuffer();
-
-            if (vertexBuffer->isCurrentlyMapped())
-            {
-                vertexBuffer->unmap(UO_UNMAP_ALL);
-            }
-
-            if (indexBuffer->isCurrentlyMapped())
-            {
-                indexBuffer->unmap(UO_UNMAP_ALL);
-            }
-
             VaoManager *vaoManager = mVaoManager;
 
             const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
             VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
-            VertexBufferPackedVec::const_iterator enBuffers = vertexBuffers.end();
+            VertexBufferPackedVec::const_iterator endBuffers = vertexBuffers.end();
 
-            while( itBuffers != enBuffers )
+            while (itBuffers != endBuffers)
             {
-                vaoManager->destroyVertexBuffer(*itBuffers);
+                VertexBufferPacked * vertexBuffer = *itBuffers;
+
+                if (vertexBuffer->isCurrentlyMapped())
+                {
+                    vertexBuffer->unmap(UO_UNMAP_ALL);
+                }
+
+                vaoManager->destroyVertexBuffer(vertexBuffer);
 
                 ++itBuffers;
             }
 
-            if (vao->getIndexBuffer())
+            IndexBufferPacked * indexBuffer = vao->getIndexBuffer();
+
+            if (indexBuffer)
             {
-                vaoManager->destroyIndexBuffer(vao->getIndexBuffer());
+                if (indexBuffer->isCurrentlyMapped())
+                {
+                    indexBuffer->unmap(UO_UNMAP_ALL);
+                }
+
+                vaoManager->destroyIndexBuffer(indexBuffer);
             }
 
             vaoManager->destroyVertexArrayObject(vao);
@@ -787,8 +809,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
         const String& datablockName, v1::RenderOperation::OperationType opType)
-        : mParent(parent), mDatablockName(datablockName), m32BitIndices(false),
-          mVao(0), mOperationType(opType)
+        : mParent(parent), mVao(0), mOperationType(opType), m32BitIndices(false)
     {
 
     }
@@ -824,12 +845,6 @@ namespace Ogre {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "ManualObject do not implement getCastsShadows.",
                      "ManualObjectSection::getCastsShadows" );
-    }
-
-    void ManualObject::ManualObjectSection::_setDatablock(const String & datablockName)
-    {
-        mDatablockName = datablockName;
-        setDatablock(mDatablockName);
     }
     //-----------------------------------------------------------------------------
     String ManualObjectFactory::FACTORY_TYPE_NAME = "ManualObject2";
