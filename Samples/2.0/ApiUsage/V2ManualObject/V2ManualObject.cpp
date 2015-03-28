@@ -53,35 +53,14 @@ int mainApp()
 #endif
 {
     V2ManualObjectGameState v2ManualObjectGameState(
-        "The mesh file format for v2 objects (i.e. Items) is currently WIP. You can easily\n"
-        "import V1 meshes into the V2 format.\n"
-        "There are a couple considerations to take care:\n"
-        "   * You must explicitly import the mesh before using it for v2 objects.\n"
-        "   * Doing so will make two copies in GPU VRAM; one for each version. If you won't\n"
-        "     be using the v1 version, you can unload it to free memory.\n"
-        "\n"
-        "The import process can optionally perform the following tasks for you:\n"
-        "   * Convert Position to 16-bit half floating point format. Recommended for desktop.\n"
-        "     Most of the time you don't need the extra precision for local coordinates.\n"
-        "   * Convert UVs to 16-bit half floating point. Same recommendations as position.\n"
-        "   * Generate QTangents, stored as 16-bit normalized signed short. Recommended on most\n"
-        "     platforms.\n"
-        "\n"
-        "QTangents store normal tangent and reflection information as a special quaternion (the\n"
-        "sign of 'q.w' stores the reflection information). They're used for normal mapping and\n"
-        "are storage efficient. They only require 8 bytes per vertex whereas the traditional\n"
-        "encoding needs 28 bytes, but require slightly more ALU ops for decoding inside the\n"
-        "vertex shader. QTangents can't be used if tangents can't be generated (i.e. the mesh\n"
-        "doesn't contain normals or one set of UV); and will automatically generate the tangent\n"
-        "and reflection data for you, before converting to QTangent if tangents weren't originally\n"
-        "present.\n"
-        "Hlms automatically handles QTangents. Even if you won't be using normal mapping, a\n"
-        "QTangent requires 8 bytes whereas a normal needs 12 bytes. Whether the higher ALU\n"
-        "cost is worth it needs profiling on mobile; which are usually very bandwidth limited.\n"
-        "\n"
-        "With all options turned on, a 1.9 vertex format weighting 48 bytes per vertex\n"
-        "(3x Position, 3x Normals, 1x reflection, 2x UV) can be stored with just 20 bytes,\n"
-        "halving the video memory size and bandwidth required" );
+        "Original ManualObject allowed users to simply create custom meshes in runtime.\n"
+        "The new one does the same thing, except some limitations arising from the method\n"
+        "used to update vertex and index buffers. Previously you were able to change the data layout\n"
+        "after calling beginUpdate(). This is no longer possible, as the buffers are bound in a persistent\n"
+        "fashion and updated in-place, which means you need to keep the exact same data layout and size.\n"
+        "Not complying to this would cause buffer overflow and most likely crash the application.\n"
+        "To change the data layout or buffer size, call clear() and create the buffer from scratch by\n"
+        "calling begin() again.");
     ManualObjectGraphicsSystem graphicsSystem( &v2ManualObjectGameState );
 
     v2ManualObjectGameState._notifyGraphicsSystem( &graphicsSystem );

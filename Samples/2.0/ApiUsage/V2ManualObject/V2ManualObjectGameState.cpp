@@ -145,9 +145,12 @@ namespace Demo
         outText += "\nPress F2 to toggle animation ";
         outText += mAnimate ? "[On]" : "[Off]";
 
-        std::stringstream ss;
-        ss << "\n[currently showing " << mVertices.size() << " vertices]";
-        outText += ss.str();
+        if (mAnimate)
+        {
+            std::stringstream ss;
+            ss << "\n[currently animating " << mVertices.size() << " vertices]";
+            outText += ss.str();
+        }
     }
 
     void V2ManualObjectGameState::update(float timeSinceLast)
