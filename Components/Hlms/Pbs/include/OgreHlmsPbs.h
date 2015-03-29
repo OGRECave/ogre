@@ -222,6 +222,11 @@ namespace Ogre
         static const IdString Pcf4x4;
         static const IdString PcfIterations;
 
+        static const IdString BrdfDefault;
+        static const IdString BrdfCookTorrance;
+        static const IdString FresnelSeparateDiffuse;
+        static const IdString GgxHeightCorrelated;
+
         static const IdString *UvSourcePtrs[NUM_PBSM_SOURCES];
         static const IdString *BlendModes[4];
         static const IdString *DetailNormalWeights[4];

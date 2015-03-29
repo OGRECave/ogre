@@ -133,47 +133,7 @@ float3 qmul( float4 q, float3 v )
 @end
 
 @property( hlms_normal || hlms_qtangent )
-float3 cookTorrance( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, float3 lightSpecular, Material material, float3 nNormal @insertpiece( brdfExtraParamDefs ) )
-{
-	float3 halfWay= normalize( lightDir + viewDir );
-	float NdotL = saturate( dot( nNormal, lightDir ) );
-	float NdotH = clamp( dot( nNormal, halfWay ), 0.001, 1.0 );
-	float VdotH = clamp( dot( viewDir, halfWay ), 0.001, 1.0 );
-
-	float sqR = ROUGHNESS * ROUGHNESS;
-
-	//Roughness term (Beckmann distribution)
-	//Formula:
-	//	Where alpha = NdotH and m = roughness
-	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( -tan(alpha)^2 / m^2 ) ]
-	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( ( cos(alpha)^2 - 1 )  /  (m^2 cos(alpha)^2 ) ]
-	float NdotH_sq = NdotH * NdotH;
-	float roughness_a = 1.0 / ( 3.141592654 * sqR * NdotH_sq * NdotH_sq );//( 1 / (m^2 x cos(alpha)^4 )
-	float roughness_b = NdotH_sq - 1.0;	//( cos(alpha)^2 - 1 )
-	float roughness_c = sqR * NdotH_sq;		//( m^2 cos(alpha)^2 )
-
-	//Avoid Inf * 0 = NaN; we need Inf * 0 = 0
-	float R = min( roughness_a, 65504.0 ) * exp( roughness_b / roughness_c );
-
-	//Geometric term
-	float shared_geo = 2.0 * NdotH / VdotH;
-	float geo_b	= shared_geo * NdotV;
-	float geo_c	= shared_geo * NdotL;
-	float G	 	= min( 1.0, min( geo_b, geo_c ) );
-
-	//Fresnel term (Schlick's approximation)
-	//Formula:
-	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
-	//	fresnelD = lerp( (1 - N*L)^5, 1, 1 - F0 )
-	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
-	@insertpiece( FresnelType ) fresnelD = 1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle );
-
-	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
-	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
-
-	return NdotL * (material.kS.xyz * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
-					material.kD.xyz * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
-}
+@insertpiece( DeclareBRDF )
 @end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
@@ -313,13 +273,13 @@ float4 main( PS_INPUT inPs
 
 	float3 finalColour = float3(0, 0, 0);
 @property( hlms_lights_directional )
-	finalColour += cookTorrance( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) );
+	finalColour += BRDF( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
 @end
 @foreach( hlms_lights_directional, n, 1 )
-	finalColour += cookTorrance( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
+	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
 @foreach( hlms_lights_directional_non_caster, n, hlms_lights_directional )
-	finalColour += cookTorrance( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
+	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
 
 @property( hlms_lights_point || hlms_lights_spot )	float3 lightDir;
 	float fDistance;
@@ -333,7 +293,7 @@ float4 main( PS_INPUT inPs
 	if( fDistance <= passBuf.lights[@n].attenuation.x )
 	{
 		lightDir *= 1.0 / fDistance;
-		tmpColour = cookTorrance( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
 		float atten = 1.0 / (1.0 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
@@ -358,7 +318,7 @@ float4 main( PS_INPUT inPs
 		float spotAtten = saturate( (spotCosAngle - passBuf.lights[@n].spotParams.y) * passBuf.lights[@n].spotParams.x );
 		spotAtten = pow( spotAtten, passBuf.lights[@n].spotParams.z );
 	@end
-		tmpColour = cookTorrance( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );
 		float atten = 1.0 / (1.0 + (passBuf.lights[@n].attenuation.y + passBuf.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
@@ -367,10 +327,13 @@ float4 main( PS_INPUT inPs
 
 @property( envprobe_map )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	float3 envColour = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz;
+	float3 envColourS = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz;
+	float3 envColourD = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), 11.0 ).xyz;
 	@property( !hw_gamma_read )//Gamma to linear space
-	envColour = envColour * envColour;@end
-	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS), material, nNormal @insertpiece( brdfExtraParams ) );@end
+	envColourS = envColourS * envColourS;
+	envColourD = envColourD * envColourD;@end
+	@insertpiece( BRDF_EnvMap )
+@end
 
 @property( !hw_gamma_write )
 	//Linear to Gamma space

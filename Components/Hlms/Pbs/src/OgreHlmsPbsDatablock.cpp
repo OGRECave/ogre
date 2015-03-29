@@ -62,7 +62,8 @@ namespace Ogre
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
         mRoughness( 0.1f ),
         mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
-        mNormalMapWeight( 1.0f )
+        mNormalMapWeight( 1.0f ),
+        mBrdf( PbsBrdf::Default )
     {
         memset( mUvSource, 0, sizeof( mUvSource ) );
         memset( mBlendModes, 0, sizeof( mBlendModes ) );
@@ -687,6 +688,51 @@ namespace Ogre
     {
         HlmsDatablock::setAlphaTestThreshold( threshold );
         scheduleConstBufferUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setBrdf( PbsBrdf::PbsBrdf brdf )
+    {
+        if( mBrdf != brdf )
+        {
+            mBrdf = brdf;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsPbsDatablock::getBrdf(void) const
+    {
+        return mBrdf;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::importUnity( const Vector3 &diffuse, const Vector3 &specular, Real roughness,
+                                        bool changeBrdf )
+    {
+        if( changeBrdf )
+        {
+            //Set the BRDF that matches Unity the closest.
+            setBrdf( PbsBrdf::DefaultUncorrelated );
+        }
+
+        setDiffuse( diffuse );
+
+        //Unity uses coloured fresnel as if it were specular. So we need to
+        //set our kS to white and use the fresnel for colouring instead.
+        setSpecular( Vector3::UNIT_SCALE );
+        bool separateFresnel = false;
+        if( Math::Abs( specular.x - specular.y ) <= 1e-5f &&
+            Math::Abs( specular.y - specular.z ) <= 1e-5f )
+        {
+            separateFresnel = true;
+        }
+
+        setFresnel( specular, separateFresnel );
+        setRoughness( roughness );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::importUnity( const Vector3 &colour, Real metallic, Real roughness, bool changeBrdf )
+    {
+        Vector3 fresnel = Math::lerp( Vector3( 0.03f ), colour, metallic );
+        importUnity( colour, fresnel, roughness, changeBrdf );
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureMapType HlmsPbsDatablock::suggestMapTypeBasedOnTextureType(

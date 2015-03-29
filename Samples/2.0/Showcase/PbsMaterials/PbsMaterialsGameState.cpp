@@ -146,8 +146,8 @@ namespace Demo
                     datablock->setTexture( Ogre::PBSM_REFLECTION, texLocation.xIdx, texLocation.texture );
                     datablock->setDiffuse( Ogre::Vector3( 0.0f, 1.0f, 0.0f ) );
 
-                    datablock->setRoughness( std::max( 0.02f, x / (float)numX ) );
-                    datablock->setFresnel( Ogre::Vector3( z / (float)numZ ), false );
+                    datablock->setRoughness( std::max( 0.02f, x / Ogre::max( 1, (float)(numX-1) ) ) );
+                    datablock->setFresnel( Ogre::Vector3( z / Ogre::max( 1, (float)(numZ-1) ) ), false );
 
                     Ogre::Item *item = sceneManager->createItem( "Sphere1000.mesh",
                                                                  Ogre::ResourceGroupManager::

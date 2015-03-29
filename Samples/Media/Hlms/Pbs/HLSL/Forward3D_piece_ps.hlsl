@@ -52,7 +52,7 @@
 			if( posAndType.w == 1.0 )
 			{
 				//Point light
-				float3 tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
+				float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
 				finalColour += tmpColour * atten;
 			}
 			else
@@ -73,7 +73,7 @@
 
 				if( spotCosAngle >= spotParams.y )
 				{
-					float3 tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
+					float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
 					finalColour += tmpColour * atten;
 				}
 			}
