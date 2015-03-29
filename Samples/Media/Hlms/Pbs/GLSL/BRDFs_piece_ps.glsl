@@ -72,7 +72,7 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 	float Lambda_GGXV = NdotL * sqrt( (-NdotV * sqR + NdotV) * NdotV + sqR );
 	float Lambda_GGXL = NdotV * sqrt( (-NdotL * sqR + NdotL) * NdotL + sqR );
 
-	float G = 0.5 / (( Lambda_GGXV + Lambda_GGXL ) *  * 3.141592654);
+	float G = 0.5 / (( Lambda_GGXV + Lambda_GGXL ) * 3.141592654);
 @end @property( !GGX_height_correlated )
 	float gL = NdotL * (1-sqR) + sqR;
 	float gV = NdotV * (1-sqR) + sqR;

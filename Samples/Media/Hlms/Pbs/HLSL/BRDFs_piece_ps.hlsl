@@ -72,19 +72,19 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 	float Lambda_GGXV = NdotL * sqrt( (-NdotV * sqR + NdotV) * NdotV + sqR );
 	float Lambda_GGXL = NdotV * sqrt( (-NdotL * sqR + NdotL) * NdotL + sqR );
 
-	float G = 0.5 / ( Lambda_GGXV + Lambda_GGXL );
+	float G = 0.5 / (( Lambda_GGXV + Lambda_GGXL ) * 3.141592654);
 @end @property( !GGX_height_correlated )
 	float gL = NdotL * (1-sqR) + sqR;
 	float gV = NdotV * (1-sqR) + sqR;
-	float G = 1.0 / (( gL * gV + 1e-4f ) * 4);
+	float G = 1.0 / (( gL * gV + 1e-4f ) * 4 * 3.141592654);
 @end
 
 	//Formula:
 	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
 	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
 
-	//We should divide Rs by PI, but it is already included in kS
-	float3 Rs = ( fresnelS * (R * G) ) * material.kS.xyz * lightSpecular @insertpiece( MulSpecularMapValue ) / 3.141592654;
+	//We should divide Rs by PI, but it was done inside G for performance
+	float3 Rs = ( fresnelS * (R * G) ) * material.kS.xyz * lightSpecular @insertpiece( MulSpecularMapValue );
 
 	//Diffuse BRDF (*Normalized* Disney, see course_notes_moving_frostbite_to_pbr.pdf
 	//"Moving Frostbite to Physically Based Rendering" Sebastien Lagarde & Charles de Rousiers)

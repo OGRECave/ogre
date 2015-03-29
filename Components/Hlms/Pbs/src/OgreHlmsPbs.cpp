@@ -394,12 +394,14 @@ namespace Ogre
 
         uint32 brdf = datablock->getBrdf();
         if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::Default )
+        {
             setProperty( PbsProperty::BrdfDefault, 1 );
+
+            if( !(brdf & PbsBrdf::FLAG_UNCORRELATED) )
+                setProperty( PbsProperty::GgxHeightCorrelated, 1 );
+        }
         else if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::CookTorrance )
             setProperty( PbsProperty::BrdfCookTorrance, 1 );
-
-        if( brdf & PbsBrdf::FLAG_UNCORRELATED )
-            setProperty( PbsProperty::GgxHeightCorrelated, 1 );
 
         if( brdf & PbsBrdf::FLAG_SPERATE_DIFFUSE_FRESNEL )
             setProperty( PbsProperty::FresnelSeparateDiffuse, 1 );
