@@ -381,7 +381,8 @@ void main()
 	vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz;
 	vec3 envColourD = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, 11.0 ).xyz;
 	@property( !hw_gamma_read )//Gamma to linear space
-	envColour = envColour * envColour;@end
+	envColourS = envColourS * envColourS;
+	envColourD = envColourD * envColourD;@end
 	@insertpiece( BRDF_EnvMap )
 @end
 

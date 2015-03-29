@@ -327,9 +327,11 @@ float4 main( PS_INPUT inPs
 
 @property( envprobe_map )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	float3 envColour = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz;
+	float3 envColourS = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz;
+	float3 envColourD = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), 11.0 ).xyz;
 	@property( !hw_gamma_read )//Gamma to linear space
-	envColour = envColour * envColour;@end
+	envColourS = envColourS * envColourS;
+	envColourD = envColourD * envColourD;@end
 	@insertpiece( BRDF_EnvMap )
 @end
 
