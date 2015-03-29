@@ -106,14 +106,16 @@ namespace Ogre
         /// which can be unintuitive for artists.
         ///
         /// This BRDF is very useful for representing surfaces with complex refractions
-        /// and reflections like glass, transparent plastics, fur, that cannot be
-        /// represented very well with the default BRDF.
+        /// and reflections like glass, transparent plastics, fur, and surface with
+        /// refractions and multiple rescattering that cannot be represented well
+        /// with the default BRDF.
         DefaultSeparateDiffuseFresnel   = Default|FLAG_SPERATE_DIFFUSE_FRESNEL,
 
         /// @see DefaultSeparateDiffuseFresnel. This is the same
         /// but the Cook Torrance model is used instead.
         ///
         /// Ideal for shiny objects like glass toy marbles, some types of rubber.
+        /// silk, synthetic fabric.
         CookTorranceSeparateDiffuseFresnel  = CookTorrance|FLAG_SPERATE_DIFFUSE_FRESNEL,
     };
     }
