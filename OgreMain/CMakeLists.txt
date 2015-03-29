@@ -35,6 +35,7 @@ list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImage
 
 # Remove optional source files
 list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCodec.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreDDSCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePVRTCCodec.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreETCCodec.cpp"
@@ -49,7 +50,8 @@ if (OGRE_BUILD_PLATFORM_NACL)
   include_directories("include/NaCl")
   file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/NaCl/*.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/NaCl/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
 
   set(PLATFORM_LIBS nosys)
   set(PLATFORM_HEADER_INSTALL "NaCl")
@@ -59,7 +61,8 @@ elseif (EMSCRIPTEN)
   include_directories(include/Emscripten)
 
   file(GLOB PLATFORM_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/Emscripten/*.h)
-  file(GLOB PLATFORM_SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp)
+  file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Emscripten/*.cpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
 
   set(PLATFORM_HEADER_INSTALL "Emscripten")
 elseif (WIN32)
@@ -68,13 +71,11 @@ elseif (WIN32)
   if (WINDOWS_STORE OR WINDOWS_PHONE)
     include_directories("include/WIN32")
     set(PLATFORM_HEADERS
-      include/WIN32/OgreConfigDialogImpWinRT.h
-      include/WIN32/OgreErrorDialogImpWinRT.h
       include/WIN32/OgreTimerImp.h
     )
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreOptimisedUtilDirectXMath.cpp
-      src/WIN32/OgreConfigDialogWinRT.cpp
+      src/OgreConfigDialogNoOp.cpp
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
     )  
@@ -129,7 +130,8 @@ elseif (APPLE)
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/iOS/*.h")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/iOS/*.mm"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
 
     set(PLATFORM_LIBS "")
     set(PLATFORM_HEADER_INSTALL "iOS")
@@ -159,7 +161,8 @@ elseif(ANDROID)
 
   file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/Android/*.h")
   file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/Android/*.cpp"
-      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp")
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
+      "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreConfigDialogNoOp.cpp")
 
   set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
