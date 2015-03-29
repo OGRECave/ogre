@@ -32,28 +32,34 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 
 // Bring in the specific platform's header file
-#if defined OGRE_GUI_WIN32
+#if defined(OGRE_GUI_WIN32) || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 # include "WIN32/OgreErrorDialogImp.h"
-#elif defined OGRE_GUI_gtk
-# include "gtk/OgreErrorDialogImp.h"
-#elif defined OGRE_GUI_GLX
-# include "GLX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-# include "WIN32/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-# include "WIN32/OgreErrorDialogImpWinRT.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
-# include "NaCl/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iOS/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreErrorDialogImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-#include "Emscripten/OgreErrorDialogImp.h"
+#else
+namespace Ogre
+{
+    /** Class for displaying the error dialog if Ogre fails badly. */
+    class _OgreExport ErrorDialog
+    {
+    public:
+        ErrorDialog();
+
+        /**
+        @remarks
+            Displays the error dialog.
+        @param
+            errorMessage The error message which has caused the failure.
+        @param
+            logName Optional name of the log to display in the detail pane.
+        */
+        void display(const String& errorMessage, String logName = "");
+
+    protected:
+        // platform specific implementation
+        // TODO: use this on win32 instead of duplicating whole header
+        struct PrivateData;
+        PrivateData* mImpl;
+    };
+}
 #endif
 
 #endif

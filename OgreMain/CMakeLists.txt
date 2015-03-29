@@ -75,7 +75,6 @@ elseif (WIN32)
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialogWinRT.cpp
-      src/WIN32/OgreErrorDialogWinRT.cpp
       src/WIN32/OgreFileSystemLayer.cpp
       src/WIN32/OgreTimer.cpp
     )  
@@ -89,6 +88,8 @@ elseif (WIN32)
       include/WIN32/OgreTimerImp.h
       include/WIN32/OgreMinGWSupport.h
     )
+    
+    list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreErrorDialogNoOp.cpp")
     set(PLATFORM_SOURCE_FILES
       src/WIN32/OgreOptimisedUtilDirectXMath.cpp
       src/WIN32/OgreConfigDialog.cpp
@@ -136,6 +137,8 @@ elseif (APPLE)
     include_directories("include/OSX")
     
     file(GLOB PLATFORM_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/OSX/*.h")
+    
+    list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreErrorDialogNoOp.cpp")
     file(GLOB PLATFORM_SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.cpp"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OSX/*.mm"
       "${CMAKE_CURRENT_SOURCE_DIR}/src/OgrePOSIXTimer.cpp"
