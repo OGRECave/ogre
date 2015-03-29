@@ -58,6 +58,66 @@ namespace Ogre
         }
     };
 
+    namespace PbsBrdf
+    {
+    enum PbsBrdf
+    {
+        FLAG_UNCORRELATED                           = 0x80000000,
+        FLAG_SPERATE_DIFFUSE_FRESNEL                = 0x40000000,
+        BRDF_MASK                                   = 0x00000FFF,
+
+        /// Most physically accurate BRDF we have. Good for representing
+        /// the majority of materials.
+        /// Uses:
+        ///     * Roughness/Distribution/NDF term: GGX
+        ///     * Geometric/Visibility term: Smith GGX Height-Correlated
+        ///     * Normalized Disney Diffuse BRDF,see
+        ///         "Moving Frostbite to Physically Based Rendering" from
+        ///         Sebastien Lagarde & Charles de Rousiers
+        Default         = 0x00000000,
+
+        /// Implements Cook-Torrance BRDF.
+        /// Uses:
+        ///     * Roughness/Distribution/NDF term: Beckmann
+        ///     * Geometric/Visibility term: Cook-Torrance
+        ///     * Lambertian Diffuse.
+        ///
+        /// Ideal for silk (use high roughness values), synthetic fabric
+        CookTorrance    = 0x00000001,
+
+        /// Same as Default, but the geometry term is not height-correlated
+        /// which most notably causes edges to be dimmer and is less correct.
+        /// Unity (Marmoset too?) use an uncorrelated term, so you may want to
+        /// use this BRDF to get the closest look for a nice exchangeable
+        /// pipeline workflow.
+        DefaultUncorrelated             = Default|FLAG_UNCORRELATED,
+
+        /// Same as Default but the fresnel of the diffuse is calculated
+        /// differently. Normally the diffuse component would be multiplied against
+        /// the inverse of the specular's fresnel to maintain energy conservation.
+        /// This has the nice side effect that to achieve a perfect mirror effect,
+        /// you just need to raise the fresnel term to 1; which is very intuitive
+        /// to artists (specially if using coloured fresnel)
+        ///
+        /// When using this BRDF, the diffuse fresnel will be calculated differently,
+        /// causing the diffuse component to still affect the colour even when
+        /// the fresnel = 1 (although subtly). To achieve a perfect mirror you will
+        /// have to set the fresnel to 1 *and* the diffuse colour to black;
+        /// which can be unintuitive for artists.
+        ///
+        /// This BRDF is very useful for representing surfaces with complex refractions
+        /// and reflections like glass, transparent plastics, fur, that cannot be
+        /// represented very well with the default BRDF.
+        DefaultSeparateDiffuseFresnel   = Default|FLAG_SPERATE_DIFFUSE_FRESNEL,
+
+        /// @see DefaultSeparateDiffuseFresnel. This is the same
+        /// but the Cook Torrance model is used instead.
+        ///
+        /// Ideal for shiny objects like glass toy marbles, some types of rubber.
+        CookTorranceSeparateDiffuseFresnel  = CookTorrance|FLAG_SPERATE_DIFFUSE_FRESNEL,
+    };
+    }
+
     typedef FastArray<PbsBakedTexture> PbsBakedTextureArray;
 
     /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
@@ -91,6 +151,9 @@ namespace Ogre
         uint8   mTexToBakedTextureIdx[NUM_PBSM_TEXTURE_TYPES];
 
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
+
+        /// @see PbsBrdf::PbsBrdf
+        uint32  mBrdf;
 
         void scheduleConstBufferUpdate(void);
         virtual void uploadToConstBuffer( char *dstPtr );
@@ -369,6 +432,27 @@ namespace Ogre
             compared against the value 1.0
         */
         virtual void setAlphaTestThreshold( float threshold );
+
+        /// Changes the BRDF in use. Calling this function may trigger an
+        /// HlmsDatablock::flushRenderables
+        void setBrdf( PbsBrdf::PbsBrdf brdf );
+        uint32 getBrdf(void) const;
+
+        /** Helper function to import & convert values from Unity (specular workflow).
+        @param changeBrdf
+            True if you want us to select a BRDF that closely matches that of Unity.
+            It will change the BRDF to PbsBrdf::DefaultUncorrelated.
+            For best realism though, it is advised that you use that you actually use
+            PbsBrdf::Default.
+        */
+        void importUnity( const Vector3 &diffuse, const Vector3 &specular, Real roughness,
+                          bool changeBrdf );
+
+        /** Helper function to import values from Unity (metallic workflow).
+        @remarks
+            The metallic parameter will be converted to a specular workflow.
+        */
+        void importUnity( const Vector3 &colour, Real metallic, Real roughness, bool changeBrdf );
 
         /** Suggests the TextureMapType (aka texture category) for each type of texture
             (i.e. normals should load from TEXTURE_TYPE_NORMALS).

@@ -52,7 +52,7 @@
 			if( posAndType.w == 1.0 )
 			{
 				//Point light
-				vec3 tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
+				vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
 				finalColour += tmpColour * atten;
 			}
 			else
@@ -73,7 +73,7 @@
 
 				if( spotCosAngle >= spotParams.y )
 				{
-					vec3 tmpColour = cookTorrance( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
+					vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
 					finalColour += tmpColour * atten;
 				}
 			}

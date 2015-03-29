@@ -205,47 +205,7 @@ vec3 qmul( vec4 q, vec3 v )
 @end
 
 @property( hlms_normal || hlms_qtangent )
-vec3 cookTorrance( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lightSpecular )
-{
-	vec3 halfWay= normalize( lightDir + viewDir );
-	float NdotL = clamp( dot( nNormal, lightDir ), 0.0, 1.0 );
-	float NdotH = clamp( dot( nNormal, halfWay ), 0.001, 1.0 );
-	float VdotH = clamp( dot( viewDir, halfWay ), 0.001, 1.0 );
-
-	float sqR = ROUGHNESS * ROUGHNESS;
-
-	//Roughness term (Beckmann distribution)
-	//Formula:
-	//	Where alpha = NdotH and m = roughness
-	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( -tan(alpha)^2 / m^2 ) ]
-	//	R = [ 1 / (m^2 x cos(alpha)^4 ] x [ e^( ( cos(alpha)^2 - 1 )  /  (m^2 cos(alpha)^2 ) ]
-	float NdotH_sq = NdotH * NdotH;
-	float roughness_a = 1.0 / ( 3.141592654 * sqR * NdotH_sq * NdotH_sq );//( 1 / (m^2 x cos(alpha)^4 )
-	float roughness_b = NdotH_sq - 1.0;	//( cos(alpha)^2 - 1 )
-	float roughness_c = sqR * NdotH_sq;		//( m^2 cos(alpha)^2 )
-
-	//Avoid Inf * 0 = NaN; we need Inf * 0 = 0
-	float R = min( roughness_a, 65504.0 ) * exp( roughness_b / roughness_c );
-
-	//Geometric term
-	float shared_geo = 2.0 * NdotH / VdotH;
-	float geo_b	= shared_geo * NdotV;
-	float geo_c	= shared_geo * NdotL;
-	float G	 	= min( 1.0, min( geo_b, geo_c ) );
-
-	//Fresnel term (Schlick's approximation)
-	//Formula:
-	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
-	//	fresnelD = lerp( (1 - N*L)^5, 1, 1 - F0 )
-	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
-	@insertpiece( FresnelType ) fresnelD = 1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle );
-
-	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
-	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
-
-	return NdotL * (material.kS.xyz * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
-					material.kD.xyz * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
-}
+@insertpiece( DeclareBRDF )
 @end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
@@ -364,13 +324,13 @@ void main()
 
 	vec3 finalColour = vec3(0);
 @property( hlms_lights_directional )
-	finalColour += cookTorrance( pass.lights[0].position, viewDir, NdotV, pass.lights[0].diffuse, pass.lights[0].specular );
+	finalColour += BRDF( pass.lights[0].position, viewDir, NdotV, pass.lights[0].diffuse, pass.lights[0].specular );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
 @end
 @foreach( hlms_lights_directional, n, 1 )
-	finalColour += cookTorrance( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );@end
+	finalColour += BRDF( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );@end
 @foreach( hlms_lights_directional_non_caster, n, hlms_lights_directional )
-	finalColour += cookTorrance( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular );@end
+	finalColour += BRDF( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular );@end
 
 @property( hlms_lights_point || hlms_lights_spot )	vec3 lightDir;
 	float fDistance;
@@ -384,7 +344,7 @@ void main()
 	if( fDistance <= pass.lights[@n].attenuation.x )
 	{
 		lightDir *= 1.0 / fDistance;
-		tmpColour = cookTorrance( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
 		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * atten;
 	}@end
@@ -409,7 +369,7 @@ void main()
 		float spotAtten = clamp( (spotCosAngle - pass.lights[@n].spotParams.y) * pass.lights[@n].spotParams.x, 0.0, 1.0 );
 		spotAtten = pow( spotAtten, pass.lights[@n].spotParams.z );
 	@end
-		tmpColour = cookTorrance( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
+		tmpColour = BRDF( lightDir, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );
 		float atten = 1.0 / (1.0 + (pass.lights[@n].attenuation.y + pass.lights[@n].attenuation.z * fDistance) * fDistance );
 		finalColour += tmpColour * (atten * spotAtten);
 	}@end
@@ -418,10 +378,12 @@ void main()
 
 @property( envprobe_map )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	vec3 envColour = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz;
+	vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz;
+	vec3 envColourD = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, 11.0 ).xyz;
 	@property( !hw_gamma_read )//Gamma to linear space
 	envColour = envColour * envColour;@end
-	finalColour += cookTorrance( reflDir, viewDir, NdotV, envColour, envColour * (ROUGHNESS * ROUGHNESS) );@end
+	@insertpiece( BRDF_EnvMap )
+@end
 
 @property( !hw_gamma_write )
 	//Linear to Gamma space

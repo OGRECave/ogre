@@ -121,6 +121,11 @@ namespace Ogre
     const IdString PbsProperty::Pcf4x4            = IdString( "pcf_4x4" );
     const IdString PbsProperty::PcfIterations     = IdString( "pcf_iterations" );
 
+    const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
+    const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
+    const IdString PbsProperty::FresnelSeparateDiffuse  = IdString( "fresnel_separate_diffuse" );
+    const IdString PbsProperty::GgxHeightCorrelated     = IdString( "GGX_height_correlated" );
+
     const IdString *PbsProperty::UvSourcePtrs[NUM_PBSM_SOURCES] =
     {
         &PbsProperty::UvDiffuse,
@@ -386,6 +391,18 @@ namespace Ogre
         HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(
                                                         renderable->getDatablock() );
         setProperty( PbsProperty::FresnelScalar, datablock->hasSeparateFresnel() );
+
+        uint32 brdf = datablock->getBrdf();
+        if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::Default )
+            setProperty( PbsProperty::BrdfDefault, 1 );
+        else if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::CookTorrance )
+            setProperty( PbsProperty::BrdfCookTorrance, 1 );
+
+        if( brdf & PbsBrdf::FLAG_UNCORRELATED )
+            setProperty( PbsProperty::GgxHeightCorrelated, 1 );
+
+        if( brdf & PbsBrdf::FLAG_SPERATE_DIFFUSE_FRESNEL )
+            setProperty( PbsProperty::FresnelSeparateDiffuse, 1 );
 
         for( size_t i=0; i<PBSM_REFLECTION; ++i )
         {
