@@ -221,7 +221,9 @@ namespace Ogre {
                 The engine will call this method when this object is to be rendered. The object must then create one or more
                 Renderable subclass instances which it places on the passed in Queue for rendering.
         */
-        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {};
+        virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
+
+        virtual void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false) {}
 
         /** @See SceneManager::updateAllBounds
         @remarks
