@@ -244,6 +244,11 @@ namespace Ogre
         */
         unsigned int getNumSections(void) const;
 
+        /** Removes the section with given index.
+         * @param idx Index of section to remove
+         */
+        void removeSection(unsigned int idx);
+
         // MovableObject overrides
         /** @copydoc MovableObject::getMovableType. */
         const String& getMovableType(void) const;
@@ -259,6 +264,7 @@ namespace Ogre
         public:
             friend class ManualObject;
 
+            Aabb mAabb;
             VertexArrayObject * mVao;
             VaoManager * mVaoManager;
             v1::RenderOperation::OperationType mOperationType;

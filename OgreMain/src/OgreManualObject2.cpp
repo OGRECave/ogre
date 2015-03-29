@@ -272,12 +272,7 @@ namespace Ogre {
         *mVertexBufferCursor++ = y;
         *mVertexBufferCursor++ = z;
 
-        // update bounds
-        Aabb aabb;
-        mObjectData.mLocalAabb->getAsAabb( aabb, mObjectData.mIndex );
-        aabb.merge(Vector3(x, y, z));
-        mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
-        mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+        mCurrentSection->mAabb.merge(Vector3(x, y, z));
 
         // reset current texture coord
 //        mTexCoordIndex = 0;
@@ -470,10 +465,10 @@ namespace Ogre {
             !mCurrentUpdating)
         {
             // defining declaration
-            VertexElement2 colorElement(VET_COLOUR, VES_DIFFUSE);
+            VertexElement2 colorElement(VET_FLOAT4, VES_DIFFUSE);
             mCurrentSection->mVertexElements.push_back(colorElement);
 
-            mDeclSize += v1::VertexElement::getTypeSize(VET_COLOUR);
+            mDeclSize += v1::VertexElement::getTypeSize(VET_FLOAT4);
         }
 
         *mVertexBufferCursor++ = r;
@@ -615,21 +610,21 @@ namespace Ogre {
     {
         if (!mCurrentSection)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                 "You cannot call end() until after you call begin()",
                 "ManualObject::end");
         }
 
         if (! mVertices)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                 "No vertices have been defined in ManualObject.",
                 "ManualObject::end");
         }
 
         if (! mIndices)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
                 "No indices have been defined in ManualObject. This is not supported.",
                 "ManualObject::end");
         }
@@ -721,6 +716,13 @@ namespace Ogre {
             mIndexBuffer = mIndexBufferCursor = 0;
         }
 
+        // update bounds
+        Aabb aabb;
+        mObjectData.mLocalAabb->getAsAabb(aabb, mObjectData.mIndex);
+        aabb.merge(mCurrentSection->mAabb);
+        mObjectData.mLocalAabb->setFromAabb(aabb, mObjectData.mIndex);
+        mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
+
         mCurrentSection = 0;
 
         // will return the finished section or NULL if
@@ -753,6 +755,40 @@ namespace Ogre {
     unsigned int ManualObject::getNumSections(void) const
     {
         return static_cast< unsigned int >( mSectionList.size() );
+    }
+    //-----------------------------------------------------------------------
+    void ManualObject::removeSection(unsigned int idx)
+    {
+        if (idx >= mSectionList.size())
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Index out of bounds!",
+                "ManualObject::removeSection");
+        }
+
+        SectionList::iterator it = mSectionList.begin() + idx;
+
+        if (*it == mCurrentSection)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                "Can't remove section while building it's geometry!",
+                "ManualObject::removeSection");
+        }
+
+        OGRE_DELETE *it;
+
+        mSectionList.erase(it);
+        mRenderables.erase(mRenderables.begin() + idx);
+
+        Aabb aabb;
+
+        for (SectionList::iterator i = mSectionList.begin(); i != mSectionList.end(); ++i)
+        {
+            aabb.merge((*i)->mAabb);
+        }
+
+        mObjectData.mLocalAabb->setFromAabb(aabb, mObjectData.mIndex);
+        mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
     }
     //-----------------------------------------------------------------------------
     const String& ManualObject::getMovableType(void) const
