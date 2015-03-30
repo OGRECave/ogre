@@ -273,8 +273,7 @@ namespace Ogre
         createGpuIndexData();
         if (!mLocalNode)
         {
-            mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode();
-            mLocalNode->setPosition(mLocalCentre);
+            mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(SCENE_STATIC, mLocalCentre);
         }
 
         if (!mMovable->isAttached())
