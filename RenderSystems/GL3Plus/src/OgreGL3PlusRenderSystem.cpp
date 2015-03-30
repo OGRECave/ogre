@@ -347,7 +347,13 @@ namespace Ogre {
             rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
 
-        if( mGLSupport->checkExtension("GL_ARB_texture_gather") || gl3wIsSupported(4, 0) )
+        //Technically D3D10.1 hardware (GL3) supports gather and exposes this extension.
+        //However we have bug reports that textureGather isn't working properly, and
+        //sadly these cards no longer receive updates. So, assume modern cards and
+        //modern drivers are needed.
+        //https://bitbucket.org/sinbad/ogre/commits/c76e1bedfed65d0f9dc45353d432a26f278cc968#comment-1776416
+        //if( mGLSupport->checkExtension("GL_ARB_texture_gather") || gl3wIsSupported(4, 0) )
+        if( gl3wIsSupported(4, 3) )
             rsc->setCapability(RSC_TEXTURE_GATHER);
 
         rsc->setCapability(RSC_FBO);
