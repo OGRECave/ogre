@@ -134,6 +134,7 @@ namespace Ogre
         mTerrain->getPoint(midpointx, midpointy, 0, &mLocalCentre);
 
         mMovable = OGRE_NEW Movable(Id::generateNewId<MovableObject>(), objectMemoryManager, this);
+        mMovable->_notifyManager(terrain->_getRootSceneNode()->getCreator());
         mRend = OGRE_NEW Rend(this);
     }
     //---------------------------------------------------------------------
