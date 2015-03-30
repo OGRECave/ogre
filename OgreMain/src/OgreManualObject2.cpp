@@ -45,8 +45,8 @@ namespace Ogre {
         : MovableObject( id, objectMemoryManager, manager, 0 ),
           mCurrentSection(0),
           mCurrentUpdating(false),
-          mVertices(0),
-          mIndices(0),
+          mVertices(0), mIndices(0),
+          mEstimatedVertices(0), mEstimatedIndices(0),
           mTempVertexBuffer(0), mTempVertexBufferSize(TEMP_INITIAL_VERTEX_SIZE),
           mTempIndexBuffer(0), mTempIndexBufferSize(TEMP_INITIAL_INDEX_SIZE),
           mVertexBuffer(0), mIndexBuffer(0),
@@ -76,6 +76,8 @@ namespace Ogre {
         mObjectData.mLocalAabb->setFromAabb( Aabb::BOX_NULL, mObjectData.mIndex );
 
         mRenderables.clear();
+
+        mCurrentSection = 0;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::resetBuffers(void)
@@ -109,7 +111,7 @@ namespace Ogre {
             if (!mTempVertexBuffer)
             {
                 // init
-                newSize = mTempVertexBufferSize;
+                newSize = std::max(newSize, mTempVertexBufferSize);
             }
             else
             {
@@ -127,7 +129,7 @@ namespace Ogre {
             }
 
             mVertexBuffer = mTempVertexBuffer;
-            mVertexBufferCursor = mVertexBuffer + mVertices * sizeof(float);
+            mVertexBufferCursor = mVertexBuffer + mVertices * mDeclSize / sizeof(float);
             mTempVertexBufferSize = newSize;
         }
     }
@@ -140,7 +142,7 @@ namespace Ogre {
             if (!mTempIndexBuffer)
             {
                 // init
-                newSize = mTempIndexBufferSize;
+                newSize = std::max(newSize, mTempIndexBufferSize);
             }
             else
             {
@@ -164,11 +166,13 @@ namespace Ogre {
     void ManualObject::estimateVertexCount(size_t vcount)
     {
         resizeVertexBufferIfNeeded(vcount);
+        mEstimatedVertices = vcount;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::estimateIndexCount(size_t icount)
     {
         resizeIndexBufferIfNeeded(icount);
+        mEstimatedIndices = icount;
     }
     //-----------------------------------------------------------------------------
     void ManualObject::begin(const String & datablockName, v1::RenderOperation::OperationType opType)
@@ -196,8 +200,8 @@ namespace Ogre {
         mIndices = 0;
 
         // Will initialize to default size
-        resizeVertexBufferIfNeeded(0);
-        resizeIndexBufferIfNeeded(0);
+        resizeVertexBufferIfNeeded(mEstimatedVertices);
+        resizeIndexBufferIfNeeded(mEstimatedIndices);
 
         mVertexBuffer = mVertexBufferCursor = mTempVertexBuffer;
         mIndexBuffer = mIndexBufferCursor = mTempIndexBuffer;
@@ -211,12 +215,14 @@ namespace Ogre {
                 "You cannot call begin() again until after you call end()",
                 "ManualObject::beginUpdate");
         }
+
         if (sectionIndex >= mSectionList.size())
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Invalid section index - out of range.",
                 "ManualObject::beginUpdate");
         }
+
         mCurrentSection = mSectionList[sectionIndex];
 
         mCurrentUpdating = true;
@@ -245,15 +251,11 @@ namespace Ogre {
                 "ManualObject::position");
         }
 
-        mVertices++;
-
         // First vertex, update elements and declaration size
         // If updating section, no need to declare elements or resize buffers
         if (!mCurrentUpdating)
         {
-            // First vertex was added, we could check for zero and increment,
-            // but keeping it like this for consistency with subsequent elements
-            if (mVertices == 1)
+            if (mVertices == 0)
             {
                 // defining declaration
                 VertexElement2 positionElement(VET_FLOAT3, VES_POSITION);
@@ -272,10 +274,9 @@ namespace Ogre {
         *mVertexBufferCursor++ = y;
         *mVertexBufferCursor++ = z;
 
-        mCurrentSection->mAabb.merge(Vector3(x, y, z));
+        mVertices++;
 
-        // reset current texture coord
-//        mTexCoordIndex = 0;
+        mCurrentSection->mAabb.merge(Vector3(x, y, z));
     }
     //-----------------------------------------------------------------------------
     void ManualObject::normal(const Vector3& norm)
@@ -615,11 +616,14 @@ namespace Ogre {
                 "ManualObject::end");
         }
 
+        // pointer that will be returned
+        ManualObjectSection * result = mCurrentSection;
+
+        // Support calling begin() and end() without defining any geometry
         if (! mVertices)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
-                "No vertices have been defined in ManualObject.",
-                "ManualObject::end");
+            mCurrentSection = 0;
+            return result;
         }
 
         if (! mIndices)
@@ -628,9 +632,6 @@ namespace Ogre {
                 "No indices have been defined in ManualObject. This is not supported.",
                 "ManualObject::end");
         }
-
-        // pointer that will be returned
-        ManualObjectSection * result = mCurrentSection;
 
         if (!mCurrentUpdating)
         {
@@ -791,6 +792,16 @@ namespace Ogre {
         mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
     }
     //-----------------------------------------------------------------------------
+    size_t ManualObject::currentIndexCount()
+    {
+        return mIndices;
+    }
+    //-----------------------------------------------------------------------------
+    size_t ManualObject::currentVertexCount()
+    {
+        return mVertices;
+    }
+    //-----------------------------------------------------------------------------
     const String& ManualObject::getMovableType(void) const
     {
         return ManualObjectFactory::FACTORY_TYPE_NAME;
@@ -814,10 +825,7 @@ namespace Ogre {
             {
                 VertexBufferPacked * vertexBuffer = *itBuffers;
 
-                if (vertexBuffer->isCurrentlyMapped())
-                {
-                    vertexBuffer->unmap(UO_UNMAP_ALL);
-                }
+                vertexBuffer->unmap(UO_UNMAP_ALL);
 
                 vaoManager->destroyVertexBuffer(vertexBuffer);
 
@@ -828,10 +836,7 @@ namespace Ogre {
 
             if (indexBuffer)
             {
-                if (indexBuffer->isCurrentlyMapped())
-                {
-                    indexBuffer->unmap(UO_UNMAP_ALL);
-                }
+                indexBuffer->unmap(UO_UNMAP_ALL);
 
                 vaoManager->destroyIndexBuffer(indexBuffer);
             }

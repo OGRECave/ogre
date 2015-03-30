@@ -89,6 +89,7 @@ namespace Ogre
                                                    " a resource leak or a bad pattern. "
                                                    "Umapping the buffer for you...",
                                                    LML_CRITICAL );
+
             unmap( UO_UNMAP_ALL );
         }
 

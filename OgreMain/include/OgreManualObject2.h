@@ -249,6 +249,16 @@ namespace Ogre
          */
         void removeSection(unsigned int idx);
 
+        /** Get the current count of indices when building a new buffer.
+         * @return Index count
+         */
+        size_t currentIndexCount();
+
+        /** Get the current count of vertices when building a new buffer.
+         * @return Vertex count
+         */
+        size_t currentVertexCount();
+
         // MovableObject overrides
         /** @copydoc MovableObject::getMovableType. */
         const String& getMovableType(void) const;
@@ -301,6 +311,9 @@ namespace Ogre
         size_t mVertices;
         size_t mIndices;
 
+        size_t mEstimatedVertices;
+        size_t mEstimatedIndices;
+
         /// System-memory buffer whilst we establish the size required and buffer layout
         float * mTempVertexBuffer;
         size_t mTempVertexBufferSize;
@@ -308,45 +321,14 @@ namespace Ogre
         char * mTempIndexBuffer;
         size_t mTempIndexBufferSize;
 
-//        /// Temporary vertex structure
-//        struct TempVertex
-//        {
-//            Vector3 position;
-//            Vector3 normal;
-//            Vector3 tangent;
-//            Vector4 texCoord[OGRE_MAX_TEXTURE_COORD_SETS];
-//            ushort texCoordDims[OGRE_MAX_TEXTURE_COORD_SETS];
-//            ColourValue colour;
-//        };
-//        /// Temp storage
-//        TempVertex mTempVertex;
-//        /// First vertex indicator
-//        bool mFirstVertex;
-//        /// Temp vertex data to copy?
-//        bool mTempVertexPending;
-
         /// Current buffer we write to
         float * mVertexBuffer;
         char * mIndexBuffer;
         float * mVertexBufferCursor;
         char * mIndexBufferCursor;
 
-//        /// System memory allocation size, in bytes
-//        size_t mTempVertexSize;
-//        /// System-memory buffer whilst we establish the size required
-//        uint32* mTempIndexBuffer;
-//        /// System memory allocation size, in bytes
-//        size_t mTempIndexSize;
-
         /// Current declaration vertex size
         size_t mDeclSize;
-
-//        /// Estimated vertex count
-//        size_t mEstVertexCount;
-//        /// Estimated index count
-//        size_t mEstIndexCount;
-//        /// Current texture coordinate
-//        ushort mTexCoordIndex;
 
         /// Delete temp buffers and reset init counts
         void resetBuffers(void);
