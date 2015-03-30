@@ -26,45 +26,36 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __Ogre_Overlay_Prereq_H__
-#define __Ogre_Overlay_Prereq_H__
+#pragma once
 
-#include "OgrePrerequisites.h"
+#include "Ogre.h"		 
+#include "OgreHlmsPrerequisites.h"
 
 namespace Ogre
 {
-    // forward decls
-    class Font;
-    class FontManager;
-    class Overlay;
-    class OverlayContainer;
-    class OverlayElement;
-    class OverlayElementFactory;
-    class OverlayManager;
+	class ShaderPiecesManager;
+	class HlmsDatablock;
 
-    typedef SharedPtr<Font> FontPtr;
+	/** \addtogroup Component
+	*  @{
+	*/
+	/** \addtogroup Hlms
+	*  @{
+	*/
+    class _OgreHlmsExport ShaderManager
+    {
+    public:
+		ShaderManager();
+		virtual ~ShaderManager();
+
+		Ogre::GpuProgramPtr getGpuProgram(HlmsDatablock* dataBlock);
+
+		void clearCache();
+
+	protected:
+
+		std::unordered_map<Ogre::uint32, Ogre::GpuProgramPtr> mShaderCache;
+		ShaderPiecesManager* mShaderPiecesManager;
+    };
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   if defined( OGRE_STATIC_LIB )
-#       define _OgreOverlayExport
-#   else
-#       if defined( OGRE_OVERLAY_EXPORTS )
-#           define _OgreOverlayExport __declspec( dllexport )
-#       else
-#           if defined( __MINGW32__ )
-#               define _OgreOverlayExport
-#           else
-#               define _OgreOverlayExport __declspec( dllimport )
-#           endif
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#   define _OgreOverlayExport __attribute__ ((visibility("default")))
-#else
-#   define _OgreOverlayExport
-#endif 
-
-
-
-#endif 

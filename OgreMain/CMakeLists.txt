@@ -16,13 +16,13 @@ PROJECT(OgreMain)
 include(PrecompiledHeader)
 
 # define header and source files for the library
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h")
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
     src/OgreImageResampler.h
     src/OgrePixelConversions.h
     src/OgreSIMDHelper.h)
 
-file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/Hash/*.cpp")
 
 # Remove optional header files
 list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
@@ -44,6 +44,21 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreFreeImageCode
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSearchOps.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreSTBICodec.cpp"
 )
+
+# Add threading (backport from 2.X)
+list(APPEND HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/OgreThreads.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/OgreBarrier.h
+	${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/OgreLightweightMutex.h)
+	
+if(WIN32 AND NOT ANDROID)
+	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreBarrierWin.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreThreadsWin.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreLightweightMutexWin.cpp)
+else()
+	list(APPEND SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreBarrierPThreads.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreLightweightMutexPThreads.cpp
+		${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/OgreThreadsPThreads.cpp)
+endif()
 
 # Add platform specific files
 if (OGRE_BUILD_PLATFORM_NACL)

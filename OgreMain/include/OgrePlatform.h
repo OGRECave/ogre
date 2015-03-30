@@ -324,6 +324,43 @@ namespace Ogre {
 #   define OGRE_BUILD_SUFFIX ""
 #endif
 
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#define DECL_MALLOC __declspec(restrict) __declspec(noalias)
+#else
+#define DECL_MALLOC __attribute__ ((malloc))
+#endif
+
+// Stack-alignment hackery.
+//
+// If macro __OGRE_SIMD_ALIGN_STACK defined, means there requests
+// special code to ensure stack align to a 16-bytes boundary.
+//
+// Note:
+//   This macro can only guarantee callee stack pointer (esp) align
+// to a 16-bytes boundary, but not that for frame pointer (ebp).
+// Because most compiler might use frame pointer to access to stack
+// variables, so you need to wrap those alignment required functions
+// with extra function call.
+//
+#if defined(__INTEL_COMPILER)
+// For intel's compiler, simply calling alloca seems to do the right
+// thing. The size of the allocated block seems to be irrelevant.
+#define _OGRE_SIMD_ALIGN_STACK()   _alloca(16)
+#define _OGRE_SIMD_ALIGN_ATTRIBUTE
+
+#elif OGRE_CPU == OGRE_CPU_X86 && (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && (OGRE_ARCH_TYPE != OGRE_ARCHITECTURE_64)
+// mark functions with GCC attribute to force stack alignment to 16 bytes
+#define _OGRE_SIMD_ALIGN_ATTRIBUTE __attribute__((force_align_arg_pointer))
+
+#elif defined(_MSC_VER)
+// Fortunately, MSVC will align the stack automatically
+#define _OGRE_SIMD_ALIGN_ATTRIBUTE
+
+#else
+#define _OGRE_SIMD_ALIGN_ATTRIBUTE
+
+#endif
+
 // Integer formats of fixed bit width
 typedef unsigned int uint32;
 typedef unsigned short uint16;

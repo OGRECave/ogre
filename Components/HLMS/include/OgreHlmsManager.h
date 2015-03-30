@@ -26,45 +26,47 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __Ogre_Overlay_Prereq_H__
-#define __Ogre_Overlay_Prereq_H__
+#pragma once
 
-#include "OgrePrerequisites.h"
+#include "Ogre.h"	  
+#include "OgreHlmsPrerequisites.h"
+#include "OgreHlmsShaderManager.h"
+#include "Threading/OgreThreadHeaders.h"
 
 namespace Ogre
 {
-    // forward decls
-    class Font;
-    class FontManager;
-    class Overlay;
-    class OverlayContainer;
-    class OverlayElement;
-    class OverlayElementFactory;
-    class OverlayManager;
+	class HlmsMaterialBase;
 
-    typedef SharedPtr<Font> FontPtr;
+	/** \addtogroup Component
+	*  @{
+	*/
+	/** \addtogroup Hlms
+	*  @{
+	*/
+	class _OgreHlmsExport HlmsManager : public Ogre::RenderObjectListener, public Ogre::Camera::Listener
+    {
+    public:
+		HlmsManager(Ogre::Camera* camera);
+		virtual ~HlmsManager();
+
+		virtual void cameraPreRenderScene(Ogre::Camera* cam);
+
+		virtual void notifyRenderSingleObject(
+			Ogre::Renderable* rend, 
+			const Ogre::Pass* pass,
+			const Ogre::AutoParamDataSource* source,
+			const Ogre::LightList* pLightList,
+			bool suppressRenderStateChanges);
+
+		void bind(Ogre::Renderable* rend, HlmsMaterialBase* material);
+
+	protected:
+		Ogre::Camera* mCamera;
+		Ogre::SceneManager* mSceneManager;
+
+		ShaderManager mShaderManager;
+
+		std::unordered_map<Ogre::Renderable*, HlmsMaterialBase*> mBindedMaterials;
+    };
 }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#   if defined( OGRE_STATIC_LIB )
-#       define _OgreOverlayExport
-#   else
-#       if defined( OGRE_OVERLAY_EXPORTS )
-#           define _OgreOverlayExport __declspec( dllexport )
-#       else
-#           if defined( __MINGW32__ )
-#               define _OgreOverlayExport
-#           else
-#               define _OgreOverlayExport __declspec( dllimport )
-#           endif
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#   define _OgreOverlayExport __attribute__ ((visibility("default")))
-#else
-#   define _OgreOverlayExport
-#endif 
-
-
-
-#endif 
