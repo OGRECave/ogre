@@ -102,7 +102,7 @@ namespace Ogre
         mType( creator->getType() ),
         mAlphaTestCmp( CMPF_ALWAYS_PASS ),
         mAlphaTestThreshold( 0.5f ),
-        mShadowConstantBias( 0.0002f )
+        mShadowConstantBias( 0.01f )
     {
         mMacroblockHash[0] = mMacroblockHash[1] = 0;
         mMacroblock[0] = mMacroblock[1] = 0;
