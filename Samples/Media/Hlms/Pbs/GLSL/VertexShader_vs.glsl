@@ -197,7 +197,7 @@ void main()
 @end @property( hlms_shadowcaster )
     float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
 	//Linear depth
-    outVs.depth	= (gl_Position.z - pass.depthRange.x + shadowConstantBias) * pass.depthRange.y;
+	outVs.depth	= (gl_Position.z - pass.depthRange.x + 0.01 * pass.depthRange.y) * pass.depthRange.y;
 
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
