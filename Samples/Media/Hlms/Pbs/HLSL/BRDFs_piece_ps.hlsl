@@ -65,14 +65,14 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 	//	Where alpha = roughness
 	//	R = alpha^2 / [ PI * [ ( NdotH^2 * (alpha^2 - 1) ) + 1 ]^2 ]
 	float f = ( NdotH * sqR - NdotH ) * NdotH + 1.0;
-	float R = sqR / (f * f);
+	float R = sqR / (f * f + 1e-6f);
 
 	//Geometric/Visibility term (Smith GGX Height-Correlated)
 @property( GGX_height_correlated )
 	float Lambda_GGXV = NdotL * sqrt( (-NdotV * sqR + NdotV) * NdotV + sqR );
 	float Lambda_GGXL = NdotV * sqrt( (-NdotL * sqR + NdotL) * NdotL + sqR );
 
-	float G = 0.5 / (( Lambda_GGXV + Lambda_GGXL ) * 3.141592654);
+	float G = 0.5 / (( Lambda_GGXV + Lambda_GGXL + 1e-6f ) * 3.141592654);
 @end @property( !GGX_height_correlated )
 	float gL = NdotL * (1-sqR) + sqR;
 	float gV = NdotV * (1-sqR) + sqR;

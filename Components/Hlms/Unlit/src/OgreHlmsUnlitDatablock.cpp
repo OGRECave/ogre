@@ -156,8 +156,7 @@ namespace Ogre
                         if( it == c_unlitBlendModes + sizeof(c_unlitBlendModes) / sizeof( String ) )
                         {
                             //Not blend mode, try loading a texture
-                            textures[i].texture = setTexture( *itor,
-                                                              HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+                            textures[i].texture = setTexture( *itor, i );
                         }
                         else
                         {
@@ -336,17 +335,16 @@ namespace Ogre
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
-    TexturePtr HlmsUnlitDatablock::setTexture( const String &name,
-                                               HlmsTextureManager::TextureMapType textureMapType )
+    TexturePtr HlmsUnlitDatablock::setTexture( const String &name, uint8 texUnit )
     {
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
         HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
-                                                    createOrRetrieveTexture( name, textureMapType );
+                                                    createOrRetrieveTexture(
+                                                        name,
+                                                        HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
 
-        assert( texLocation.texture->isTextureTypeArray() );
-
-        mTexIndices[textureMapType] = texLocation.xIdx;
+        mTexIndices[texUnit] = texLocation.xIdx;
 
         return texLocation.texture;
     }
