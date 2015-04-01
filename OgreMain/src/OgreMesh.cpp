@@ -854,11 +854,23 @@ namespace v1 {
             bindIndex = bind->getNextIndex();
         }
 
+        // Determine what usage to use for the new buffer
+        HardwareBuffer::Usage currentBufferUsage;
+        const VertexBufferBinding::VertexBufferBindingMap & bindingMap = bind->getBindings();
+        VertexBufferBinding::VertexBufferBindingMap::const_iterator currentBindingIt = bindingMap.find(bindIndex);
+        if (currentBindingIt != bindingMap.end()) {
+            currentBufferUsage = currentBindingIt->second->getUsage();
+        } else if (bindingMap.size()) {
+            currentBufferUsage = bindingMap.begin()->second->getUsage();
+        } else {
+            currentBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY;
+        }
+        // Create a new buffer for bone assignments
         HardwareVertexBufferSharedPtr vbuf =
             HardwareBufferManager::getSingleton().createVertexBuffer(
                 sizeof(unsigned char)*4 + sizeof(float)*numBlendWeightsPerVertex,
                 targetVertexData->vertexCount,
-                HardwareBuffer::HBU_STATIC_WRITE_ONLY,
+                currentBufferUsage,
                 true // use shadow buffer
                 );
         // bind new buffer
