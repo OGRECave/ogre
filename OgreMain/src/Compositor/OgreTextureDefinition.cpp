@@ -148,7 +148,7 @@ namespace Ogre
         while( itor != end )
         {
             String textureName;
-            if( !uniqueNames )
+            if( uniqueNames )
                 textureName = (itor->name + IdString( id )).getFriendlyText();
             else
                 textureName = itor->name.getFriendlyText();
