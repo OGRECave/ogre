@@ -2265,7 +2265,14 @@ namespace Ogre {
         // Initialise GL3W
 		bool gl3wFailed = gl3wInit();
         if( gl3wFailed )
+        {
             LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
+        }
+        else
+        {
+            // Setup GL3PlusSupport
+            mGLSupport->initialiseExtensions();
+        }
 
         // Make sure that OpenGL 3.3+ is supported in this context
         if( gl3wFailed || !mGLSupport->checkMinGLVersion(3, 3) )
@@ -2274,9 +2281,6 @@ namespace Ogre {
                         "OpenGL 3.3 is not supported",
                         "GL3PlusRenderSystem::initialiseContext");
         }
-
-        // Setup GL3PlusSupport
-        mGLSupport->initialiseExtensions();
 
         mHasGL43 = mGLSupport->checkMinGLVersion(4, 3);
 
