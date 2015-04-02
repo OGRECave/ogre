@@ -40,13 +40,14 @@
 namespace Ogre {
 
     
-    GLSLProgramManager::GLSLProgramManager(void) :
+    GLSLProgramManager::GLSLProgramManager(const GL3PlusSupport& support) :
         mActiveVertexShader(NULL),
         mActiveHullShader(NULL),
         mActiveDomainShader(NULL),
         mActiveGeometryShader(NULL),
         mActiveFragmentShader(NULL),
-        mActiveComputeShader(NULL)
+        mActiveComputeShader(NULL),
+        mGLSupport(support)
     {
         // Fill in the relationship between type names and enums
         mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));
@@ -180,11 +181,6 @@ namespace Ogre {
 
         // GL 4.2
         mTypeEnumMap.insert(StringToEnumMap::value_type("atomic_uint", GL_UNSIGNED_INT_ATOMIC_COUNTER));
-    }
-
-    
-    GLSLProgramManager::~GLSLProgramManager(void)
-    {
     }
     
     void GLSLProgramManager::convertGLUniformtoOgreType(GLenum gltype,
@@ -768,7 +764,7 @@ namespace Ogre {
 
         //TODO Need easier, more robust feature checking.
         // if (mGLSupport.checkExtension("GL_ARB_program_interface_query") || gl3wIsSupported(4, 3))
-        if (gl3wIsSupported(4, 3))
+        if (mGLSupport.checkMinGLVersion(4, 3))
         {
             OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(programObject, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &blockCount));
 
@@ -838,7 +834,7 @@ namespace Ogre {
             }
         }
         // if (mGLSupport.checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
-        if (gl3wIsSupported(4, 2))
+        if (mGLSupport.checkMinGLVersion(4, 2))
         {
             // Now deal with atomic counters buffers
             OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));

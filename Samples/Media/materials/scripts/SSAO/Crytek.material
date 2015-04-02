@@ -25,7 +25,7 @@ fragment_program SSAO/Crytek_fp_glsl glsl
 
 fragment_program SSAO/Crytek_fp unified
 {
-	//delegate SSAO/Crytek_fp_glsl 
+	delegate SSAO/Crytek_fp_glsl 
 	delegate SSAO/Crytek_fp_hlsl 
 	//delegate SSAO/Crytek_fp_cg
 }

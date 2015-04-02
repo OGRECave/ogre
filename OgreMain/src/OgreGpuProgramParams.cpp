@@ -2666,7 +2666,7 @@ namespace Ogre
                     break;
                 case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(l), i->elementCount);
                     break;
                 case ACT_PSSM_SPLITS:
                     {
@@ -2904,7 +2904,7 @@ namespace Ogre
                     break;
                 case ACT_LIGHT_CASTS_SHADOWS_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getLightCastsShadows(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getLightCastsShadows(l), i->elementCount);
                     break;
                 case ACT_LIGHT_ATTENUATION:
                     _writeRawConstant(i->physicalIndex, source->getLightAttenuation(i->data), i->elementCount);

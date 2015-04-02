@@ -143,6 +143,8 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
+        bool hasGL42 = mGLSupport.checkMinGLVersion(4, 2);
+
         // Set up texture swizzling.
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN));
@@ -170,7 +172,7 @@ namespace Ogre {
         height = mHeight;
         depth = mDepth;
 
-        if (mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
+        if (mGLSupport.checkExtension("GL_ARB_texture_storage") || hasGL42)
         {
             switch(mTextureType)
             {
@@ -603,7 +605,7 @@ namespace Ogre {
         //         mLayered.find('all') != str::npos ? GL_TRUE : GL_FALSE, mLayer,
         //         mImageAccess (READ, WRITE, READ_WRITE), 
         //         toImageFormat(mFormatInShader))); //GL_RGBA8)); //GL_R32UI)); GL_READ_WRITE
-        if (mGLSupport.checkExtension("GL_ARB_shader_image_load_store") || gl3wIsSupported(4, 2))
+        if (mGLSupport.checkExtension("GL_ARB_shader_image_load_store") || mGLSupport.checkMinGLVersion(4, 2))
         {
             OGRE_CHECK_GL_ERROR(glBindImageTexture(bindPoint, mTextureID, mipmapLevel, isArrayTexture, textureArrayIndex, GlAccess, GlFormat));
         }

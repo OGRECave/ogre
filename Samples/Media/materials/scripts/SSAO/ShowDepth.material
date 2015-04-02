@@ -25,7 +25,7 @@ fragment_program SSAO/ShowDepth_fp_glsl glsl
 
 fragment_program SSAO/ShowDepth_fp unified
 {
-	//delegate SSAO/ShowDepth_fp_glsl 
+	delegate SSAO/ShowDepth_fp_glsl 
 	delegate SSAO/ShowDepth_fp_hlsl 
 	//delegate SSAO/ShowDepth_fp_cg
 }
