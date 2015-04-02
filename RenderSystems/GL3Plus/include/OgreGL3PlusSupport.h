@@ -119,7 +119,7 @@ namespace Ogre
             /**
             * Check if GL Version is supported
             */
-            bool checkMinGLVersion(int major, int minor) const;
+            bool hasMinGLVersion(int major, int minor) const;
 
             /**
             * Get the address of a function
