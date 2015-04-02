@@ -51,6 +51,7 @@ namespace Ogre {
             return requiresAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINES;
         default:
         case RenderOperation::OT_TRIANGLE_LIST:
+            return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
         case RenderOperation::OT_TRIANGLE_STRIP:
             return requiresAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLES;
         case RenderOperation::OT_TRIANGLE_FAN:

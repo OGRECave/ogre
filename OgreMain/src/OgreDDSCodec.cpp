@@ -227,13 +227,6 @@ namespace Ogre {
         String notImplementedString = "";
 
         // Check for all the 'not implemented' conditions
-        if (imgData->num_mipmaps != 0)
-        {
-            // No mip map functionality yet
-            notImplemented = true;
-            notImplementedString += " mipmaps";
-        }
-
         if ((isVolume == true)&&(imgData->width != imgData->height))
         {
             // Square textures only
@@ -258,6 +251,9 @@ namespace Ogre {
         case PF_A8R8G8B8:
         case PF_X8R8G8B8:
         case PF_R8G8B8:
+        case PF_A8B8G8R8:
+        case PF_X8B8G8R8:
+        case PF_B8G8R8:
         case PF_FLOAT32_R:
         case PF_FLOAT16_RGBA:
         case PF_FLOAT32_RGBA:
@@ -295,16 +291,23 @@ namespace Ogre {
             ddsHeaderFlags = (isVolume) ? DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_DEPTH|DDSD_PIXELFORMAT :
                 DDSD_CAPS|DDSD_WIDTH|DDSD_HEIGHT|DDSD_PIXELFORMAT;  
 
+            bool flipRgbMasks = false;
+
             // Initalise the rgbBits flags
             switch(imgData->format)
             {
+            case PF_A8B8G8R8:
+                flipRgbMasks = true;
             case PF_A8R8G8B8:
                 ddsHeaderRgbBits = 8 * 4;
                 hasAlpha = true;
                 break;
+            case PF_X8B8G8R8:
+                flipRgbMasks = true;
             case PF_X8R8G8B8:
                 ddsHeaderRgbBits = 8 * 4;
                 break;
+            case PF_B8G8R8:
             case PF_R8G8B8:
                 ddsHeaderRgbBits = 8 * 3;
                 break;
@@ -341,6 +344,9 @@ namespace Ogre {
                     DDSCAPS2_CUBEMAP_POSITIVEZ|DDSCAPS2_CUBEMAP_NEGATIVEZ;
             }
 
+            if( imgData->num_mipmaps > 0 )
+                ddsHeaderCaps1 |= DDSCAPS_MIPMAP;
+
             // Populate the DDS header information
             DDSHeader ddsHeader;
             ddsHeader.size = DDS_HEADER_SIZE;
@@ -349,7 +355,7 @@ namespace Ogre {
             ddsHeader.height = (uint32)imgData->height;
             ddsHeader.depth = (uint32)(isVolume ? imgData->depth : 0);
             ddsHeader.depth = (uint32)(isCubeMap ? 6 : ddsHeader.depth);
-            ddsHeader.mipMapCount = 0;
+            ddsHeader.mipMapCount = imgData->num_mipmaps + 1;
             ddsHeader.sizeOrPitch = ddsHeaderSizeOrPitch;
             for (uint32 reserved1=0; reserved1<11; reserved1++) // XXX nasty constant 11
             {
@@ -380,6 +386,9 @@ namespace Ogre {
             ddsHeader.pixelFormat.greenMask = (isFloat32r) ? 0x00000000 :0x0000FF00;
             ddsHeader.pixelFormat.blueMask  = (isFloat32r) ? 0x00000000 :0x000000FF;
 
+            if( flipRgbMasks )
+                std::swap( ddsHeader.pixelFormat.redMask, ddsHeader.pixelFormat.blueMask );
+
             ddsHeader.caps.caps1 = ddsHeaderCaps1;
             ddsHeader.caps.caps2 = ddsHeaderCaps2;
 //          ddsHeader.caps.reserved[0] = 0;
@@ -389,14 +398,35 @@ namespace Ogre {
             flipEndian(&ddsMagic, sizeof(uint32));
             flipEndian(&ddsHeader, 4, sizeof(DDSHeader) / 4);
 
-            // Write the file           
-            std::ofstream of;
-            of.open(outFileName.c_str(), std::ios_base::binary|std::ios_base::out);
-            of.write((const char *)&ddsMagic, sizeof(uint32));
-            of.write((const char *)&ddsHeader, DDS_HEADER_SIZE);
-            // XXX flipEndian on each pixel chunk written unless isFloat32r ?
-            of.write((const char *)input->getPtr(), (uint32)imgData->size);
-            of.close();
+            char *tmpData = 0;
+            char const *dataPtr = (char const *)input->getPtr();
+
+            if( imgData->format == PF_B8G8R8 )
+            {
+                PixelBox src( imgData->size / 3, 1, 1, PF_B8G8R8, input->getPtr() );
+                tmpData = new char[imgData->size];
+                PixelBox dst( imgData->size / 3, 1, 1, PF_R8G8B8, tmpData );
+
+                PixelUtil::bulkPixelConversion( src, dst );
+
+                dataPtr = tmpData;
+            }
+
+            try
+            {
+                // Write the file
+                std::ofstream of;
+                of.open(outFileName.c_str(), std::ios_base::binary|std::ios_base::out);
+                of.write((const char *)&ddsMagic, sizeof(uint32));
+                of.write((const char *)&ddsHeader, DDS_HEADER_SIZE);
+                // XXX flipEndian on each pixel chunk written unless isFloat32r ?
+                of.write(dataPtr, (uint32)imgData->size);
+                of.close();
+            }
+            catch(...)
+            {
+                delete [] tmpData;
+            }
         }
     }
     //---------------------------------------------------------------------
@@ -892,9 +922,9 @@ namespace Ogre {
                 else
                 {
                     // Note: We assume the source and destination have the same pitch
-                    for (size_t z = 0; z < imgData->depth; ++z)
+                    for (size_t z = 0; z < depth; ++z)
                     {
-                        for (size_t y = 0; y < imgData->height; ++y)
+                        for (size_t y = 0; y < height; ++y)
                         {
                             stream->read(destPtr, dstPitch);
                             destPtr = static_cast<void*>(static_cast<uchar*>(destPtr) + dstPitch);

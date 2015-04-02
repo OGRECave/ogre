@@ -331,14 +331,20 @@ if( _CMAKE_IN_TRY_COMPILE )
 endif()
 
 # this one is important
-set( CMAKE_SYSTEM_NAME Linux )
+if( CMAKE_VERSION VERSION_GREATER "3.0.99" AND WIN32)
+	set( CMAKE_SYSTEM_NAME "Android" )
+	 set(CMAKE_VS_PLATFORM_NAME "Tegra-Android")
+else()
+	set( CMAKE_SYSTEM_NAME Linux )
+endif()
+
 # this one not so much
 set( CMAKE_SYSTEM_VERSION 1 )
 
 # rpath makes low sence for Android
 set( CMAKE_SKIP_RPATH TRUE CACHE BOOL "If set, runtime paths are not added when using shared libraries." )
 
-set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r10c -r9d -r9c -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
+set( ANDROID_SUPPORTED_NDK_VERSIONS ${ANDROID_EXTRA_NDK_VERSIONS} -r10d -r10c -r9d -r9c -r9b -r9 -r8e -r8d -r8c -r8b -r8 -r7c -r7b -r7 -r6b -r6 -r5c -r5b -r5 "" )
 if(NOT DEFINED ANDROID_NDK_SEARCH_PATHS)
  if( CMAKE_HOST_WIN32 )
   file( TO_CMAKE_PATH "$ENV{PROGRAMFILES}" ANDROID_NDK_SEARCH_PATHS )

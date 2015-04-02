@@ -282,19 +282,8 @@ namespace Ogre {
         /// Container of attached shaders.
         GLSLShaderContainer mAttachedGLSLShaders;
 
-
-        /// Keep track of the number of vertex shaders created.
-        static GLuint mVertexShaderCount;
-        /// Keep track of the number of fragment shaders created.
-        static GLuint mFragmentShaderCount;
-        /// Keep track of the number of geometry shaders created.
-        static GLuint mGeometryShaderCount;
-        /// Keep track of the number of tessellation hull (control) shaders created.
-        static GLuint mHullShaderCount;
-        /// Keep track of the number of tessellation domain (evaluation) shaders created.
-        static GLuint mDomainShaderCount;
-        /// Keep track of the number of compute shaders created.
-        static GLuint mComputeShaderCount;
+        /// Keep track of the number of shaders created.
+        static GLuint mShaderCount;
 
         /** Flag indicating that the shader has been successfully
             linked.

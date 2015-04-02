@@ -18,6 +18,10 @@ cmake_minimum_required(VERSION 2.6.2)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS TRUE)
 cmake_policy(SET CMP0003 NEW)
 
+if(CMAKE_VS_PLATFORM_NAME STREQUAL "Tegra-Android")
+	set(CMAKE_LINK_LIBRARY_FLAG "")
+endif()
+
 # CMake 2.8.2 has a bug that creates unusable Xcode projects when using ARCHS_STANDARD_32_BIT
 # to specify both armv6 and armv7.
 if(OGRE_BUILD_PLATFORM_APPLE_IOS AND (CMAKE_VERSION VERSION_EQUAL 2.8.2) AND (CMAKE_GENERATOR STREQUAL "Xcode"))

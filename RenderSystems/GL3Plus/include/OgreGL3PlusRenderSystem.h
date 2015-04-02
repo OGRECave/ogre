@@ -130,6 +130,12 @@ namespace Ogre {
         /// Check if the GL system has already been initialised
         bool mGLInitialised;
 
+        // check if GL 4.3 is supported
+        bool mHasGL43;
+
+        // check if GL 3.2 is supported
+        bool mHasGL32;
+
         // local data members of _render that were moved here to improve performance
         // (save allocations)
         vector<GLuint>::type mRenderAttribsBound;

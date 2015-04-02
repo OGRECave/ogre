@@ -25,7 +25,7 @@ fragment_program SSAO/HorizonBased_fp_glsl glsl
 }
 fragment_program SSAO/HorizonBased_fp unified
 {
-	//delegate SSAO/HorizonBased_fp_glsl 
+	delegate SSAO/HorizonBased_fp_glsl 
 	delegate SSAO/HorizonBased_fp_hlsl 
 	//delegate SSAO/HorizonBased_fp_cg
 }

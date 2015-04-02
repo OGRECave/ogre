@@ -29,6 +29,9 @@
 #define OGRE_GLXGLSupport_H
 
 #include "OgreGL3PlusSupport.h"
+#define GLX_GLXEXT_PROTOTYPES
+#include <GL/glx.h>
+#include <GL/glxext.h>
 
 namespace Ogre {
 
