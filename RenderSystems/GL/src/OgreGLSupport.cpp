@@ -87,7 +87,7 @@ namespace Ogre {
         }
     }
 
-    bool GLSupport::checkMinGLVersion(const String& v) const
+    bool GLSupport::hasMinGLVersion(const String& v) const
     {
         unsigned int first, second, third;
         unsigned int cardFirst, cardSecond, cardThird;

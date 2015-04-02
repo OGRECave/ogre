@@ -238,9 +238,9 @@ namespace Ogre {
         rsc->setRenderSystemName(getName());
         rsc->parseVendorFromString(mGLSupport->getGLVendor());
 
-        bool hasGL40 = mGLSupport->checkMinGLVersion(4, 0);
-        bool hasGL41 = mGLSupport->checkMinGLVersion(4, 1);
-        bool hasGL42 = mGLSupport->checkMinGLVersion(4, 2);
+        bool hasGL40 = mGLSupport->hasMinGLVersion(4, 0);
+        bool hasGL41 = mGLSupport->hasMinGLVersion(4, 1);
+        bool hasGL42 = mGLSupport->hasMinGLVersion(4, 2);
 
         // Check for hardware mipmapping support.
         bool disableAutoMip = false;
@@ -2275,14 +2275,14 @@ namespace Ogre {
         }
 
         // Make sure that OpenGL 3.3+ is supported in this context
-        if( gl3wFailed || !mGLSupport->checkMinGLVersion(3, 3) )
+        if( gl3wFailed || !mGLSupport->hasMinGLVersion(3, 3) )
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.3 is not supported",
                         "GL3PlusRenderSystem::initialiseContext");
         }
 
-        mHasGL43 = mGLSupport->checkMinGLVersion(4, 3);
+        mHasGL43 = mGLSupport->hasMinGLVersion(4, 3);
 
         LogManager::getSingleton().logMessage("**************************************");
         LogManager::getSingleton().logMessage("***   OpenGL 3+ Renderer Started   ***");

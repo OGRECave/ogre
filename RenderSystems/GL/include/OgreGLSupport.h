@@ -110,7 +110,7 @@ public:
     /**
     * Compare GL version numbers
     */
-    bool checkMinGLVersion(const String& v) const;
+    bool hasMinGLVersion(const String& v) const;
 
     /**
     * Check if an extension is available
