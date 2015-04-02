@@ -2775,7 +2775,7 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
 
         // Make sure that OpenGL 3.3+ is supported in this context
-        if( !mGLSupport->checkMinGLVersion(3, 3) )
+        if( gl3wFailed || !mGLSupport->checkMinGLVersion(3, 3) )
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.3 is not supported. Please update your graphics card drivers.",
