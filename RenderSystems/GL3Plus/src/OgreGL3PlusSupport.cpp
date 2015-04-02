@@ -90,7 +90,7 @@ namespace Ogre {
         }
     }
 
-    bool GL3PlusSupport::checkMinGLVersion(int major, int minor) const
+    bool GL3PlusSupport::hasMinGLVersion(int major, int minor) const
     {
         if (mVersion.major == major) {
             return mVersion.minor >= minor;

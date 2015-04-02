@@ -764,7 +764,7 @@ namespace Ogre {
 
         //TODO Need easier, more robust feature checking.
         // if (mGLSupport.checkExtension("GL_ARB_program_interface_query") || mHasGL43)
-        if (mGLSupport.checkMinGLVersion(4, 3))
+        if (mGLSupport.hasMinGLVersion(4, 3))
         {
             OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(programObject, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &blockCount));
 
@@ -833,8 +833,8 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(programObject, index, bufferBinding));
             }
         }
-        // if (mGLSupport.checkExtension("GL_ARB_shader_atomic_counters") || mHasGL42)
-        if (mGLSupport.checkMinGLVersion(4, 2))
+        // if (mGLSupport.checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
+        if (mGLSupport.hasMinGLVersion(4, 2))
         {
             // Now deal with atomic counters buffers
             OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));
