@@ -112,9 +112,17 @@ namespace Ogre
 
         for( size_t i=0; i<2; ++i )
         {
-            //Collect the buffer names from all staging buffers to use one API call
-            StagingBufferVec::const_iterator itor = mStagingBuffers[i].begin();
-            StagingBufferVec::const_iterator end  = mStagingBuffers[i].end();
+            StagingBufferVec::const_iterator itor = mRefedStagingBuffers[i].begin();
+            StagingBufferVec::const_iterator end  = mRefedStagingBuffers[i].end();
+
+            while( itor != end )
+            {
+                static_cast<D3D11StagingBuffer*>(*itor)->getBufferName()->Release();
+                ++itor;
+            }
+
+            itor = mZeroRefStagingBuffers[i].begin();
+            end  = mZeroRefStagingBuffers[i].end();
 
             while( itor != end )
             {
@@ -1270,7 +1278,7 @@ namespace Ogre
         D3D11StagingBuffer *stagingBuffer = OGRE_NEW D3D11StagingBuffer( sizeBytes, this,
                                                                          forUpload, bufferName,
                                                                          mDevice );
-        mStagingBuffers[forUpload].push_back( stagingBuffer );
+        mRefedStagingBuffers[forUpload].push_back( stagingBuffer );
 
         return stagingBuffer;
     }
@@ -1320,11 +1328,6 @@ namespace Ogre
                         //Time to delete this buffer.
                         static_cast<D3D11StagingBuffer*>(stagingBuffer)->getBufferName()->Release();
 
-                        //We have to remove it from two lists.
-                        StagingBufferVec::iterator itFullList = std::find( mStagingBuffers[i].begin(),
-                                                                           mStagingBuffers[i].end(),
-                                                                           stagingBuffer );
-                        efficientVectorRemove( mStagingBuffers[i], itFullList );
                         delete *itor;
 
                         itor = efficientVectorRemove( mZeroRefStagingBuffers[i], itor );

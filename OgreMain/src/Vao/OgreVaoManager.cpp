@@ -62,8 +62,17 @@ namespace Ogre
     {
         for( size_t i=0; i<2; ++i )
         {
-            StagingBufferVec::const_iterator itor = mStagingBuffers[i].begin();
-            StagingBufferVec::const_iterator end  = mStagingBuffers[i].end();
+            StagingBufferVec::const_iterator itor = mRefedStagingBuffers[i].begin();
+            StagingBufferVec::const_iterator end  = mRefedStagingBuffers[i].end();
+
+            while( itor != end )
+            {
+                OGRE_DELETE *itor;
+                ++itor;
+            }
+
+            itor = mZeroRefStagingBuffers[i].begin();
+            end  = mZeroRefStagingBuffers[i].end();
 
             while( itor != end )
             {
@@ -412,10 +421,10 @@ namespace Ogre
         StagingBuffer *candidates[NUM_STALL_TYPES];
         memset( candidates, 0, sizeof( candidates ) );
 
-        StagingBufferVec::const_iterator itor = mStagingBuffers[forUpload].begin();
-        StagingBufferVec::const_iterator end  = mStagingBuffers[forUpload].end();
+        StagingBufferVec::const_iterator itor = mZeroRefStagingBuffers[forUpload].begin();
+        StagingBufferVec::const_iterator end  = mZeroRefStagingBuffers[forUpload].end();
 
-        while( itor != end && minSizeBytes < (*itor)->getMaxSize() )
+        while( itor != end )
         {
             if( forUpload )
             {
@@ -513,6 +522,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void VaoManager::_notifyStagingBufferEnteredZeroRef( StagingBuffer *stagingBuffer )
     {
+        StagingBufferVec &refedStagingBuffers = mRefedStagingBuffers[stagingBuffer->getUploadOnly()];
+        StagingBufferVec::iterator itor = std::find( refedStagingBuffers.begin(),
+                                                     refedStagingBuffers.end(), stagingBuffer );
+
+        assert( itor != refedStagingBuffers.end() );
+        efficientVectorRemove( refedStagingBuffers, itor );
+
         mZeroRefStagingBuffers[stagingBuffer->getUploadOnly()].push_back( stagingBuffer );
     }
     //-----------------------------------------------------------------------------------
@@ -524,6 +540,8 @@ namespace Ogre
 
         assert( itor != zeroRefStagingBuffers.end() );
         efficientVectorRemove( zeroRefStagingBuffers, itor );
+
+        mRefedStagingBuffers[stagingBuffer->getUploadOnly()].push_back( stagingBuffer );
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::setDefaultStagingBufferlifetime( uint32 lifetime, uint32 unfencedTime )
