@@ -238,8 +238,6 @@ namespace Ogre {
         rsc->setRenderSystemName(getName());
         rsc->parseVendorFromString(mGLSupport->getGLVendor());
 
-        bool hasGL31 = mGLSupport->checkMinGLVersion(3, 1);
-        bool hasGL33 = mGLSupport->checkMinGLVersion(3, 3);
         bool hasGL40 = mGLSupport->checkMinGLVersion(4, 0);
         bool hasGL41 = mGLSupport->checkMinGLVersion(4, 1);
         bool hasGL42 = mGLSupport->checkMinGLVersion(4, 2);
@@ -2280,7 +2278,6 @@ namespace Ogre {
         // Setup GL3PlusSupport
         mGLSupport->initialiseExtensions();
 
-        mHasGL32 = mGLSupport->checkMinGLVersion(3, 2);
         mHasGL43 = mGLSupport->checkMinGLVersion(4, 3);
 
         LogManager::getSingleton().logMessage("**************************************");
