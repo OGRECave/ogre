@@ -211,13 +211,13 @@ namespace Ogre {
 
         //TODO GL 4.3 KHR_debug
 
-        // if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        // if (getGLSupport()->checkExtension("GL_KHR_debug") || mHasGL43)
         //     glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
 
         // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         // {
         //     OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-        //     if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        //     if(getGLSupport()->checkExtension("GL_KHR_debug") || mHasGL43)
         //         glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
         // }
 

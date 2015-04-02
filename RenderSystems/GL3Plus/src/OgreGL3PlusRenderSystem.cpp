@@ -344,8 +344,8 @@ namespace Ogre {
         //sadly these cards no longer receive updates. So, assume modern cards and
         //modern drivers are needed.
         //https://bitbucket.org/sinbad/ogre/commits/c76e1bedfed65d0f9dc45353d432a26f278cc968#comment-1776416
-        //if( mGLSupport->checkExtension("GL_ARB_texture_gather") || gl3wIsSupported(4, 0) )
-        if( gl3wIsSupported(4, 3) )
+        //if( mGLSupport->checkExtension("GL_ARB_texture_gather") || mHasGL40 )
+        if( mHasGL43 )
             rsc->setCapability(RSC_TEXTURE_GATHER);
 
         rsc->setCapability(RSC_FBO);
@@ -2772,7 +2772,14 @@ namespace Ogre {
         // Initialise GL3W
 		bool gl3wFailed = gl3wInit();
         if( gl3wFailed )
+        {
             LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
+        }
+        else
+        {
+            // Setup GL3PlusSupport
+            mGLSupport->initialiseExtensions();
+        }
 
         // Make sure that OpenGL 3.3+ is supported in this context
         if( gl3wFailed || !mGLSupport->checkMinGLVersion(3, 3) )
@@ -2781,9 +2788,6 @@ namespace Ogre {
                         "OpenGL 3.3 is not supported. Please update your graphics card drivers.",
                         "GL3PlusRenderSystem::initialiseContext");
         }
-
-        // Setup GL3PlusSupport
-        mGLSupport->initialiseExtensions();
 
         mHasGL43 = mGLSupport->checkMinGLVersion(4, 3);
 

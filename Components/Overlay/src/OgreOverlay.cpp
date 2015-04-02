@@ -46,8 +46,8 @@ namespace v1 {
         mScrollX(0.0f), mScrollY(0.0f),
         mScaleX(1.0f), mScaleY(1.0f),
         mLastViewportWidth(0), mLastViewportHeight(0),
-        mTransformOutOfDate(true), mTransformUpdated(true), 
-        mZOrder(100), mVisible(false), mInitialised(false)
+        mTransformOutOfDate(true),
+        mInitialised(false)
 
     {
         this->setName( name );
@@ -220,7 +220,7 @@ namespace v1 {
     //---------------------------------------------------------------------
     void Overlay::_updateRenderQueue( RenderQueue *queue, Camera *camera, const Camera *lodCamera, Viewport* vp )
     {
-        if (mVisible)
+        if( getVisible() )
         {
             // Flag for update pixel-based GUIElements if viewport has changed dimensions
             bool tmpViewportDimensionsChanged = false;
@@ -243,8 +243,6 @@ namespace v1 {
                 }
             }
 
-        if( getVisible() )
-        {
             // Add 2D elements
             iend = m2DElements.end();
             for (i = m2DElements.begin(); i != iend; ++i)
