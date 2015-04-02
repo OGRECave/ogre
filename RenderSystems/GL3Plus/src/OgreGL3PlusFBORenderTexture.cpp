@@ -290,7 +290,8 @@ namespace Ogre {
     {
         // is glGetInternalformativ supported?
         // core since GL 4.2: see https://www.opengl.org/wiki/GLAPI/glGetInternalformat
-        bool hasInternalFormatQuery = gl3wIsSupported(4,2) || mGLSupport.checkExtension("GL_ARB_internalformat_query2");
+        // NOTE! GL_FRAMEBUFFER_RENDERABLE is supported only if the GL version is 4.3 or higher
+        bool hasInternalFormatQuery = gl3wIsSupported(4,3) || mGLSupport.checkExtension("GL_ARB_internalformat_query2");
 
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
