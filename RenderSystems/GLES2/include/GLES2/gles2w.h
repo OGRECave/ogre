@@ -255,7 +255,7 @@ typedef void (GL_APIENTRY* PFNGLREADBUFFERINDEXEDEXTPROC) (GLenum src, GLint ind
 typedef void (GL_APIENTRY* PFNGLDRAWBUFFERSINDEXEDEXTPROC) (GLint n, const GLenum *location, const GLint *indices);
 typedef void (GL_APIENTRY* PFNGLGETINTEGERI_VEXTPROC) (GLenum target, GLuint index, GLint *data);
 typedef void (GL_APIENTRY* PFNGLMULTIDRAWARRAYSEXTPROC) (GLenum, const GLint *, const GLsizei *, GLsizei);
-typedef void (GL_APIENTRY* PFNGLMULTIDRAWELEMENTSEXTPROC) (GLenum, const GLsizei *, GLenum, const GLvoid* *, GLsizei);
+typedef void (GL_APIENTRY* PFNGLMULTIDRAWELEMENTSEXTPROC) (GLenum, const GLsizei *, GLenum, const GLvoid* const*, GLsizei);
 typedef GLenum (GL_APIENTRY* PFNGLGETGRAPHICSRESETSTATUSEXTPROC) (void);
 typedef void (GL_APIENTRY* PFNGLREADNPIXELSEXTPROC) (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLsizei bufSize, void *data);
 typedef void (GL_APIENTRY* PFNGLGETNUNIFORMFVEXTPROC) (GLuint program, GLint location, GLsizei bufSize, float *params);
