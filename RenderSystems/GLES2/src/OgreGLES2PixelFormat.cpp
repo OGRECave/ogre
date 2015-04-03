@@ -51,22 +51,13 @@ namespace Ogre {
                 return GL_RGBA;
 #endif
 
-#if (OGRE_NO_GLES3_SUPPORT == 0)
-            case PF_FLOAT16_R:
-            case PF_FLOAT32_R:
-            case PF_R8:
-                return GL_RED_EXT;
-            case PF_FLOAT16_GR:
-            case PF_FLOAT32_GR:
-            case PF_RG8:
-                return GL_RG_EXT;
-#else
+#if OGRE_NO_GLES3_SUPPORT
             case PF_BYTE_LA:
             case PF_SHORT_GR:
                 return GL_LUMINANCE_ALPHA;
 #endif
 
-#if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL)
+#if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || !OGRE_NO_GLES3_SUPPORT
             case PF_FLOAT16_R:
             case PF_FLOAT32_R:
             case PF_R8:
@@ -103,11 +94,11 @@ namespace Ogre {
 #   endif
 #   ifdef GL_AMD_compressed_ATC_texture
             case PF_ATC_RGB:
-                return ATC_RGB_AMD;
+                return GL_ATC_RGB_AMD;
             case PF_ATC_RGBA_EXPLICIT_ALPHA:
-                return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+                return GL_ATC_RGBA_EXPLICIT_ALPHA_AMD;
             case PF_ATC_RGBA_INTERPOLATED_ALPHA:
-                return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+                return GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
 #   endif
 #endif
 
@@ -362,11 +353,11 @@ namespace Ogre {
 #   endif
 #   ifdef GL_AMD_compressed_ATC_texture
             case PF_ATC_RGB:
-                return ATC_RGB_AMD;
+                return GL_ATC_RGB_AMD;
             case PF_ATC_RGBA_EXPLICIT_ALPHA:
-                return ATC_RGBA_EXPLICIT_ALPHA_AMD;
+                return GL_ATC_RGBA_EXPLICIT_ALPHA_AMD;
             case PF_ATC_RGBA_INTERPOLATED_ALPHA:
-                return ATC_RGBA_INTERPOLATED_ALPHA_AMD;
+                return GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD;
 #   endif
 #endif
 
@@ -620,11 +611,11 @@ namespace Ogre {
                 return PF_ETC1_RGB8;
 #   endif
 #   ifdef GL_AMD_compressed_ATC_texture
-            case ATC_RGB_AMD:
+            case GL_ATC_RGB_AMD:
                 return PF_ATC_RGB;
-            case ATC_RGBA_EXPLICIT_ALPHA_AMD:
+            case GL_ATC_RGBA_EXPLICIT_ALPHA_AMD:
                 return PF_ATC_RGBA_EXPLICIT_ALPHA;
-            case ATC_RGBA_INTERPOLATED_ALPHA_AMD:
+            case GL_ATC_RGBA_INTERPOLATED_ALPHA_AMD:
                 return PF_ATC_RGBA_INTERPOLATED_ALPHA;
 #   endif
 #endif
