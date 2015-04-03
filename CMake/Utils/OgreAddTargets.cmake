@@ -35,6 +35,12 @@ endfunction()
 # generate unity build files for the given target.
 # If in the list of source files the key word SEPARATE is specified, then
 # any source file after that will be compiled separately.
+# Remarks:
+#	SEPARATE src/MyFile.cpp
+#	is not the same as:
+#	SEPARATE ${CMAKE_CURRENT_SOURCE_DIR}/src/MyFile.cpp
+#	SEPARATE ${CMAKE_CURRENT_SOURCE_DIR}\src\MyFile.cpp
+#	Always double check the paths is exactly the same. Keep consistency.
 macro(create_unity_build_files TARGETNAME)
   # first step: build the primary and separate lists
   set(_PRIMARY "")
