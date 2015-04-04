@@ -1116,7 +1116,8 @@ namespace Ogre
                                             bool writeGamma,
                                             D3D11Device & device ) :
         mDevice(device),
-        RenderTexture(buffer, 0)
+        RenderTexture(buffer, 0),
+        mRenderTargetView(NULL)
     {
         mName = name;
         mHwGamma = writeGamma;
