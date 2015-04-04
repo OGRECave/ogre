@@ -141,6 +141,7 @@ namespace Ogre
         mAutoParamDataSource->setCurrentCamera( camera );
         mAutoParamDataSource->setCurrentSceneManager( sceneManager );
         mAutoParamDataSource->setCurrentShadowNode( shadowNode );
+        mAutoParamDataSource->setCurrentViewport(sceneManager->getCurrentViewport());
 
         return retVal;
     }
