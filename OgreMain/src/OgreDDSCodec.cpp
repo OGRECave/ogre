@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreBitwise.h"
+#include "OgrePixelBox.h"
 
 namespace Ogre {
     // Internal DDS structure definitions
