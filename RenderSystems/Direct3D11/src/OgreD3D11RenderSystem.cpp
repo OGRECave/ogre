@@ -138,7 +138,9 @@ bail:
           mSwIndirectBufferPtr( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
-          mBoundDepthStencilState(0)
+          mBoundDepthStencilState(0),
+          mpDXGIFactory(0),
+          mDSTResView(0)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
 #endif	
