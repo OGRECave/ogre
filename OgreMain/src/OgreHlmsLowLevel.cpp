@@ -78,7 +78,7 @@ namespace Ogre
 
         //We push into mShaderCache then clear each pass so that we can return unique references.
         //Feels a bit hacky but gets the job done.
-        HlmsCache *cache = new HlmsCache( pass->getId(), HLMS_LOW_LEVEL );
+        HlmsCache *cache = new HlmsCache( mShaderCache.size() + 1, HLMS_LOW_LEVEL );
         if( pass->hasVertexProgram() )
             cache->vertexShader             = pass->getVertexProgram();
         if( pass->hasGeometryProgram() )
@@ -130,7 +130,7 @@ namespace Ogre
     HlmsCache HlmsLowLevel::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                              bool dualParaboloid, SceneManager *sceneManager )
     {
-        mShaderCache.empty();
+        clearShaderCache();
 
         mCurrentSceneManager = sceneManager;
 

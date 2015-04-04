@@ -88,6 +88,7 @@ namespace Ogre
     protected:
         v1::Rectangle2D *mFsRect;
         HlmsDatablock   *mDatablock;
+        MaterialPtr     mMaterial;
         Pass            *mPass;
         Camera          *mCamera;
 
