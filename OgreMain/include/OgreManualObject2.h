@@ -240,12 +240,16 @@ namespace Ogre
         */
         ManualObjectSection* getSection(unsigned int index) const;
 
+        /** Gets a pointer to a previously named ManualObjectSection (via ManualObjectSection::setName).
+        */
+        ManualObjectSection* getSection(const Ogre::String & name) const;
+
         /** Retrieves the number of ManualObjectSection objects making up this ManualObject.
         */
         unsigned int getNumSections(void) const;
 
         /** Removes the section with given index.
-         * @param idx Index of section to remove
+         * @param idx Index of section to remove.
          */
         void removeSection(unsigned int idx);
 
@@ -268,18 +272,18 @@ namespace Ogre
         {
         protected:
             ManualObject* mParent;
-
-            void clear();
-
-        public:
-            friend class ManualObject;
-
             Aabb mAabb;
             VertexArrayObject * mVao;
             VaoManager * mVaoManager;
             v1::RenderOperation::OperationType mOperationType;
             VertexElement2Vec mVertexElements;
             bool m32BitIndices;
+            Ogre::String mName;
+
+            void clear();
+
+        public:
+            friend class ManualObject;
 
             ManualObjectSection(ManualObject* parent, const String& datablockName, v1::RenderOperation::OperationType opType);
             virtual ~ManualObjectSection();
@@ -293,6 +297,15 @@ namespace Ogre
             virtual const LightList &getLights(void) const OGRE_OVERRIDE;
             /** @copydoc Renderable::getCastsShadows. */
             virtual bool getCastsShadows(void) const;
+
+            /** Sets an user defined name that can serve to identify this section.
+             */
+            void setName(const Ogre::String & name);
+
+            /** Gets the previously set name.
+             * @return Name of this section previously set with ManualObjectSection::setName.
+             */
+            const Ogre::String & getName();
         };
 
         typedef vector<ManualObjectSection*>::type SectionList;

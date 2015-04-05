@@ -741,7 +741,6 @@ namespace Ogre {
         }
 
         mSectionList[idx]->setDatablock(name);
-
     }
     //-----------------------------------------------------------------------
     ManualObject::ManualObjectSection* ManualObject::getSection(unsigned int inIndex) const
@@ -751,6 +750,20 @@ namespace Ogre {
             "Index out of bounds.",
             "ManualObject::getSection");
         return mSectionList[inIndex];
+    }
+    //-----------------------------------------------------------------------
+    ManualObject::ManualObjectSection* ManualObject::getSection(const String & name) const
+    {
+        for (SectionList::const_iterator i = mSectionList.begin();
+             i != mSectionList.end(); ++i)
+        {
+            if ((*i)->mName == name)
+            {
+                return *i;
+            }
+        }
+
+        return 0;
     }
     //-----------------------------------------------------------------------
     unsigned int ManualObject::getNumSections(void) const
@@ -886,6 +899,16 @@ namespace Ogre {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "ManualObject do not implement getCastsShadows.",
                      "ManualObjectSection::getCastsShadows" );
+    }
+    //-----------------------------------------------------------------------------
+    void ManualObject::ManualObjectSection::setName(const String & name)
+    {
+        mName = name;
+    }
+    //-----------------------------------------------------------------------------
+    const String &ManualObject::ManualObjectSection::getName()
+    {
+        return mName;
     }
     //-----------------------------------------------------------------------------
     String ManualObjectFactory::FACTORY_TYPE_NAME = "ManualObject2";
