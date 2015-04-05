@@ -33,10 +33,6 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreMath.h"
 
-#ifndef GL_GLEXT_PROTOTYPES
-#  define  GL_GLEXT_PROTOTYPES
-#endif
-
 #if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #   include <GLES3/gles3w.h>
 #else
@@ -55,9 +51,6 @@ THE SOFTWARE.
 #       endif
 #   endif
 #elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL) || (OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
-#   ifndef GL_GLEXT_PROTOTYPES
-#       define GL_GLEXT_PROTOTYPES
-#   endif
 #   if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #       include <GLES3/gl3platform.h>
 #       include <GLES3/gl3.h>
@@ -67,9 +60,11 @@ THE SOFTWARE.
 #       include <GLES2/gl2ext.h>
 #   endif
 #   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#       define GL_GLEXT_PROTOTYPES
 #       define gleswIsSupported(x,y) (false)
 #   endif
 #   if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#       define GL_GLEXT_PROTOTYPES
 #       include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
 #       include "ppapi/c/ppp_graphics_3d.h"
@@ -92,7 +87,6 @@ THE SOFTWARE.
 #           endif
 #       endif
 #   endif
-#   undef  GL_GLEXT_PROTOTYPES
 #   if OGRE_NO_GLES3_SUPPORT == 0
 #       include <GLES3/gl3platform.h>
 #       include <GLES3/gl3.h>
