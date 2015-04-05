@@ -132,7 +132,8 @@ namespace v1 {
             // was deleted by the user.
             for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
             {
-                Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
+                if( *it )
+                    Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
             }
         }
     }

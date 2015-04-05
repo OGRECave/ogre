@@ -42,7 +42,7 @@ namespace Ogre
         static String mLanguageName;
 
     public:
-        GLSLShaderFactory(void);
+        GLSLShaderFactory(const GL3PlusSupport& support);
         ~GLSLShaderFactory(void);
         /// Get the name of the language this factory creates shaders for.
         const String& getLanguage(void) const;

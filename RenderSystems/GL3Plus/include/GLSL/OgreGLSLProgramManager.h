@@ -60,6 +60,8 @@ namespace Ogre {
         GLSLShader* mActiveFragmentShader;
         GLSLShader* mActiveComputeShader;
 
+        const GL3PlusSupport& mGLSupport;
+
         typedef map<String, GLenum>::type StringToEnumMap;
         /// 
         StringToEnumMap mTypeEnumMap;
@@ -101,8 +103,7 @@ namespace Ogre {
 
     public:
 
-        GLSLProgramManager(void);
-        ~GLSLProgramManager(void);
+        GLSLProgramManager(const GL3PlusSupport& support);
 
         /** Populate a list of uniforms based on an OpenGL program object.
             @param programObject Handle to the program object to query.

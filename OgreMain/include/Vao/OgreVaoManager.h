@@ -51,7 +51,7 @@ namespace Ogre
         uint32 mDefaultStagingBufferLifetime;
 
         /// [0] = for uploads, [1] = for downloads
-        StagingBufferVec mStagingBuffers[2];
+        StagingBufferVec mRefedStagingBuffers[2];
         StagingBufferVec mZeroRefStagingBuffers[2];
 
         bool            mSupportsPersistentMapping;

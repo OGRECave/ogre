@@ -161,8 +161,8 @@ namespace Ogre
         virtual void uploadToConstBuffer( char *dstPtr );
         void bakeVariableParameters(void);
 
-        /// Sets the appropiate mTexIndices[textureMapType], and returns the texture pointer
-        TexturePtr setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType );
+        /// Sets the appropiate mTexIndices[textureType], and returns the texture pointer
+        TexturePtr setTexture( const String &name, PbsTextureTypes textureType );
 
         void decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] );
         void bakeTextures( const PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES] );

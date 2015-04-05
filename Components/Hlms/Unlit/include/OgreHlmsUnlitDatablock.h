@@ -97,8 +97,8 @@ namespace Ogre
         virtual void uploadToExtraBuffer( char *dstPtr );
         void bakeVariableParameters(void);
 
-        /// Sets the appropiate mTexIndices[textureMapType], and returns the texture pointer
-        TexturePtr setTexture( const String &name, HlmsTextureManager::TextureMapType textureMapType );
+        /// Sets the appropiate mTexIndices[texUnit], and returns the texture pointer
+        TexturePtr setTexture( const String &name, uint8 texUnit );
 
         void decompileBakedTextures( UnlitBakedTexture outTextures[NUM_UNLIT_TEXTURE_TYPES] );
         void bakeTextures( const UnlitBakedTexture textures[NUM_UNLIT_TEXTURE_TYPES] );

@@ -44,9 +44,11 @@ namespace v1 {
         MovableObject( id, objectMemoryManager, (SceneManager*)0, renderQueueId ),
         mRotate(0.0f), 
         mScrollX(0.0f), mScrollY(0.0f),
-        mScaleX(1.0f), mScaleY(1.0f), 
+        mScaleX(1.0f), mScaleY(1.0f),
+        mLastViewportWidth(0), mLastViewportHeight(0),
         mTransformOutOfDate(true),
         mInitialised(false)
+
     {
         this->setName( name );
     }
@@ -216,21 +218,31 @@ namespace v1 {
 
     }
     //---------------------------------------------------------------------
-    void Overlay::_updateRenderQueue( RenderQueue *queue, Camera *camera, const Camera *lodCamera )
+    void Overlay::_updateRenderQueue( RenderQueue *queue, Camera *camera, const Camera *lodCamera, Viewport* vp )
     {
-        OverlayContainerList::iterator i, iend;
-
-        if (OverlayManager::getSingleton().hasViewportChanged())
-        {
-            iend = m2DElements.end();
-            for (i = m2DElements.begin(); i != iend; ++i)
-            {
-                (*i)->_notifyViewport();
-            }
-        }
-
         if( getVisible() )
         {
+            // Flag for update pixel-based GUIElements if viewport has changed dimensions
+            bool tmpViewportDimensionsChanged = false;
+            if (mLastViewportWidth != vp->getActualWidth() ||
+                mLastViewportHeight != vp->getActualHeight())
+            {
+                tmpViewportDimensionsChanged = true;
+                mLastViewportWidth = vp->getActualWidth();
+                mLastViewportHeight = vp->getActualHeight();
+            }
+
+            OverlayContainerList::iterator i, iend;
+
+            if(tmpViewportDimensionsChanged)
+            {
+                iend = m2DElements.end();
+                for (i = m2DElements.begin(); i != iend; ++i)
+                {
+                    (*i)->_notifyViewport();
+                }
+            }
+
             // Add 2D elements
             iend = m2DElements.end();
             for (i = m2DElements.begin(); i != iend; ++i)

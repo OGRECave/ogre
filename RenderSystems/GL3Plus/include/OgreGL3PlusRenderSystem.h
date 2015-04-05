@@ -145,6 +145,9 @@ namespace Ogre {
         bool mGLInitialised;
         bool mUseAdjacency;
 
+        // check if GL 4.3 is supported
+        bool mHasGL43;
+
         // local data members of _render that were moved here to improve performance
         // (save allocations)
         vector<GLuint>::type mRenderAttribsBound;

@@ -250,7 +250,7 @@ namespace Ogre
         convexBody.clip( p );
         p.redefine( Vector3::UNIT_Y, vMaxCamFrustumLS );
         convexBody.clip( p );
-        p.redefine( Vector3::NEGATIVE_UNIT_Z, vMinCamFrustumLS );
+        p.redefine( Vector3::UNIT_Z, vMaxCamFrustumLS );
         convexBody.clip( p );
 
         Vector3 vMin( std::numeric_limits<Real>::max(), std::numeric_limits<Real>::max(),

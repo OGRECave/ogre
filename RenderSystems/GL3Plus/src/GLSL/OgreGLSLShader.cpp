@@ -49,15 +49,8 @@ namespace Ogre {
     GLSLShader::CmdInputOperationType GLSLShader::msInputOperationTypeCmd;
     GLSLShader::CmdOutputOperationType GLSLShader::msOutputOperationTypeCmd;
     GLSLShader::CmdMaxOutputVertices GLSLShader::msMaxOutputVerticesCmd;
-
-
-    GLuint GLSLShader::mVertexShaderCount = 0;
-    GLuint GLSLShader::mFragmentShaderCount = 0;
-    GLuint GLSLShader::mGeometryShaderCount = 0;
-    GLuint GLSLShader::mHullShaderCount = 0;
-    GLuint GLSLShader::mDomainShaderCount = 0;
-    GLuint GLSLShader::mComputeShaderCount = 0;
-
+    
+    GLuint GLSLShader::mShaderCount = 0;
 
     GLSLShader::GLSLShader(
         ResourceManager* creator,
@@ -104,41 +97,14 @@ namespace Ogre {
                              "of this geometry program can output",
                              PT_INT), &msMaxOutputVerticesCmd);
         }
-        // Manually assign language now since we use it immediately.
-        //mSyntaxCode = "glsl";
 
-
-
-        mType = getType();
+        mType = GPT_VERTEX_PROGRAM; // default value, to be corrected after the constructor with GpuProgram::setType()
         mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
 
         mLinked = 0;
-
-        if (getType() == GPT_VERTEX_PROGRAM)
-        {
-            mShaderID = ++mVertexShaderCount;
-        }
-        else if (getType() == GPT_FRAGMENT_PROGRAM)
-        {
-            mShaderID = ++mFragmentShaderCount;
-        }
-        else if (getType() == GPT_GEOMETRY_PROGRAM)
-        {
-            mShaderID = ++mGeometryShaderCount;
-        }
-        else if (getType() == GPT_HULL_PROGRAM)
-        {
-            mShaderID = ++mHullShaderCount;
-        }
-        else if (getType() == GPT_COMPUTE_PROGRAM)
-        {
-            mShaderID = ++mComputeShaderCount;
-        }
-        else
-        {
-            mShaderID = ++mDomainShaderCount;
-        }
-
+        // Increase shader counter and use as ID
+        mShaderID = ++mShaderCount;        
+        
         // Transfer skeletal animation status from parent
         mSkeletalAnimation = isSkeletalAnimationIncluded();
         // There is nothing to load
@@ -245,13 +211,13 @@ namespace Ogre {
 
         //TODO GL 4.3 KHR_debug
 
-        // if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        // if (getGLSupport()->checkExtension("GL_KHR_debug") || mHasGL43)
         //     glObjectLabel(GL_SHADER, mGLShaderHandle, 0, mName.c_str());
 
         // if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         // {
         //     OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-        //     if(getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
+        //     if(getGLSupport()->checkExtension("GL_KHR_debug") || mHasGL43)
         //         glObjectLabel(GL_PROGRAM, mGLProgramHandle, 0, mName.c_str());
         // }
 

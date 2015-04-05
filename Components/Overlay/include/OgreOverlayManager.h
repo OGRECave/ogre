@@ -72,7 +72,6 @@ namespace v1 {
 
     protected:
         int mLastViewportWidth, mLastViewportHeight;
-        bool mViewportDimensionsChanged;
         OrientationMode mLastViewportOrientationMode;
 
         bool parseChildren( DataStreamPtr& chunk, const String& line,
@@ -133,12 +132,6 @@ namespace v1 {
 
         /** Internal method for queueing the visible overlays for rendering. */
         void _queueOverlaysForRendering( RenderQueue* pQueue, Viewport *vp );
-
-        /** Method for determining if the viewport has changed dimensions. 
-        @remarks This is used by pixel-based OverlayElements to work out if they need to
-            recalculate their sizes.
-        */
-        bool hasViewportChanged(void) const;
 
         /** Gets the height of the destination viewport in pixels. */
         int getViewportHeight(void) const;

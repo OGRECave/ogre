@@ -87,29 +87,29 @@ namespace Ogre
         }
         else
         {
-            MaterialPtr material = MaterialManager::getSingleton().getByName( mDefinition->mMaterialName );
-            if( material.isNull() )
+            mMaterial = MaterialManager::getSingleton().getByName( mDefinition->mMaterialName );
+            if( mMaterial.isNull() )
             {
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find material '" +
                              mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
             }
-            material->load();
+            mMaterial->load();
 
-            if( !material->getBestTechnique() )
+            if( !mMaterial->getBestTechnique() )
             {
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find best technique for material '" +
                              mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
             }
 
-            if( !material->getBestTechnique()->getPass( 0 ) )
+            if( !mMaterial->getBestTechnique()->getPass( 0 ) )
             {
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Best technique must have a Pass! Material '" +
                              mDefinition->mMaterialName + "'", "CompositorPassQuad::CompositorPassQuad" );
             }
 
-            mPass = material->getBestTechnique()->getPass( 0 );
+            mPass = mMaterial->getBestTechnique()->getPass( 0 );
 
-            mFsRect->setMaterial( material );
+            mFsRect->setMaterial( mMaterial );
         }
 
         mDatablock = mFsRect->getDatablock();
@@ -186,7 +186,10 @@ namespace Ogre
             listener->passPreExecute( this );
 
         //sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
-        mFsRect->setDatablock( mDatablock );
+        if( !mMaterial.isNull() )
+            mFsRect->setMaterial( mMaterial ); //Low level material
+        else
+            mFsRect->setDatablock( mDatablock ); //Hlms material
         sceneManager->_renderSingleObject( mFsRect, mFsRect, false, false );
 
         if( listener )

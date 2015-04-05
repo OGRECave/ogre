@@ -885,7 +885,8 @@ namespace Ogre
                 samplerblock->mW != Ogre::TAM_WRAP )
             {
                 writeAttribute(4, "tex_address_mode");
-                if( samplerblock->mU == samplerblock->mV == samplerblock->mW )
+                if( samplerblock->mU == samplerblock->mV &&
+                    samplerblock->mV == samplerblock->mW )
                 {
                     writeValue(convertTexAddressMode(samplerblock->mU));
                 }

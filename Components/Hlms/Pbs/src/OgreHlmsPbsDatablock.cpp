@@ -150,38 +150,32 @@ namespace Ogre
 
         if( Hlms::findParamInVec( params, "diffuse_map", paramVal ) )
         {
-            textures[PBSM_DIFFUSE].texture = setTexture( paramVal,
-                                                         HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+            textures[PBSM_DIFFUSE].texture = setTexture( paramVal, PBSM_DIFFUSE );
             mSamplerblocks[PBSM_DIFFUSE] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "normal_map", paramVal ) )
         {
-            textures[PBSM_NORMAL].texture = setTexture( paramVal,
-                                                        HlmsTextureManager::TEXTURE_TYPE_NORMALS );
+            textures[PBSM_NORMAL].texture = setTexture( paramVal, PBSM_NORMAL );
             mSamplerblocks[PBSM_NORMAL] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "specular_map", paramVal ) )
         {
-            textures[PBSM_SPECULAR].texture = setTexture( paramVal,
-                                                          HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+            textures[PBSM_SPECULAR].texture = setTexture( paramVal, PBSM_SPECULAR );
             mSamplerblocks[PBSM_SPECULAR] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "roughness_map", paramVal ) )
         {
-            textures[PBSM_ROUGHNESS].texture = setTexture( paramVal,
-                                                           HlmsTextureManager::TEXTURE_TYPE_MONOCHROME );
+            textures[PBSM_ROUGHNESS].texture = setTexture( paramVal, PBSM_ROUGHNESS );
             mSamplerblocks[PBSM_ROUGHNESS] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "detail_weight_map", paramVal ) )
         {
-            textures[PBSM_DETAIL_WEIGHT].texture = setTexture( paramVal,
-                                                               HlmsTextureManager::TEXTURE_TYPE_DETAIL );
+            textures[PBSM_DETAIL_WEIGHT].texture = setTexture( paramVal, PBSM_DETAIL_WEIGHT );
             mSamplerblocks[PBSM_DETAIL_WEIGHT] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
         if( Hlms::findParamInVec( params, "reflection_map", paramVal ) )
         {
-            textures[PBSM_REFLECTION].texture = setTexture( paramVal,
-                                                            HlmsTextureManager::TEXTURE_TYPE_ENV_MAP );
+            textures[PBSM_REFLECTION].texture = setTexture( paramVal, PBSM_REFLECTION );
             mSamplerblocks[PBSM_REFLECTION] = hlmsManager->getSamplerblock( HlmsSamplerblock() );
         }
 
@@ -211,7 +205,7 @@ namespace Ogre
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
                 textures[PBSM_DETAIL0 + i].texture = setTexture(
-                            paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL );
+                            paramVal, static_cast<PbsTextureTypes>( PBSM_DETAIL0 + i ) );
                 mSamplerblocks[PBSM_DETAIL0 + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
 
@@ -219,7 +213,7 @@ namespace Ogre
             if( Hlms::findParamInVec( params, key, paramVal ) )
             {
                 textures[PBSM_DETAIL0_NM + i].texture = setTexture(
-                            paramVal, HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP );
+                            paramVal, static_cast<PbsTextureTypes>( PBSM_DETAIL0_NM + i ) );
                 mSamplerblocks[PBSM_DETAIL0_NM + i] = hlmsManager->getSamplerblock( detailSamplerRef );
             }
 
@@ -383,16 +377,35 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     TexturePtr HlmsPbsDatablock::setTexture( const String &name,
-                                             HlmsTextureManager::TextureMapType textureMapType )
+                                             PbsTextureTypes textureType )
     {
+        const HlmsTextureManager::TextureMapType texMapTypes[NUM_PBSM_TEXTURE_TYPES] =
+        {
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_NORMALS,
+            HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
+            HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+            HlmsTextureManager::TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+            HlmsTextureManager::TEXTURE_TYPE_ENV_MAP
+        };
+
         HlmsManager *hlmsManager = mCreator->getHlmsManager();
         HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
         HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
-                                                    createOrRetrieveTexture( name, textureMapType );
+                                                    createOrRetrieveTexture( name,
+                                                                             texMapTypes[textureType] );
 
-        assert( texLocation.texture->isTextureTypeArray() );
+        assert( texLocation.texture->isTextureTypeArray() || textureType == PBSM_REFLECTION );
 
-        mTexIndices[textureMapType] = texLocation.xIdx;
+        mTexIndices[textureType] = texLocation.xIdx;
 
         return texLocation.texture;
     }
