@@ -34,7 +34,11 @@ THE SOFTWARE.
 #include "OgreMath.h"
 
 #if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#   include <GL/gl3w.h>
+#else
 #   include <GLES3/gles3w.h>
+#endif
 #else
 #   include <GLES2/gles2w.h>
 #endif
@@ -88,13 +92,57 @@ THE SOFTWARE.
 #       endif
 #   endif
 #   if OGRE_NO_GLES3_SUPPORT == 0
-#       include <GLES3/gl3platform.h>
-#       include <GLES3/gl3.h>
+#   include <GL/glext.h>
 #   else
 #       include <GLES2/gl2.h>
 #       include <GLES2/gl2ext.h>
 #   endif
 #   include <EGL/egl.h>
+#endif
+
+// Defines for ES 3 extensions that are core in GL3
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX && OGRE_NO_GLES3_SUPPORT == 0
+#define glIsProgramPipelineEXT glIsProgramPipeline
+#define glGetProgramPipelineivEXT glGetProgramPipelineiv
+#define glGetProgramPipelineInfoLogEXT glGetProgramPipelineInfoLog
+#define glValidateProgramPipelineEXT glValidateProgramPipeline
+#define GL_LUMINANCE GL_RED
+#define GL_LUMINANCE_ALPHA GL_RG
+
+#define GL_PROGRAM_SEPARABLE_EXT GL_PROGRAM_SEPARABLE
+#define GL_VERTEX_SHADER_BIT_EXT GL_VERTEX_SHADER_BIT
+#define GL_FRAGMENT_SHADER_BIT_EXT GL_FRAGMENT_SHADER_BIT
+#define glDeleteProgramPipelinesEXT glDeleteProgramPipelines
+#define glGenProgramPipelinesEXT glGenProgramPipelines
+#define glBindProgramPipelineEXT glBindProgramPipeline
+#define glProgramParameteriEXT glProgramParameteri
+#define glUseProgramStagesEXT glUseProgramStages
+#define glProgramUniform1fvEXT glProgramUniform1fv
+#define glProgramUniform2fvEXT glProgramUniform2fv
+#define glProgramUniform3fvEXT glProgramUniform3fv
+#define glProgramUniform4fvEXT glProgramUniform4fv
+#define glProgramUniform1ivEXT glProgramUniform1iv
+#define glProgramUniform2ivEXT glProgramUniform2iv
+#define glProgramUniform3ivEXT glProgramUniform3iv
+#define glProgramUniform4ivEXT glProgramUniform4iv
+#define glProgramUniformMatrix2fvEXT glProgramUniformMatrix2fv
+#define glProgramUniformMatrix3fvEXT glProgramUniformMatrix3fv
+#define glProgramUniformMatrix4fvEXT glProgramUniformMatrix4fv
+#define glProgramUniformMatrix2x3fvEXT glProgramUniformMatrix2x3fv
+#define glProgramUniformMatrix2x4fvEXT glProgramUniformMatrix2x4fv
+#define glProgramUniformMatrix3x2fvEXT glProgramUniformMatrix3x2fv
+#define glProgramUniformMatrix3x4fvEXT glProgramUniformMatrix3x4fv
+#define glProgramUniformMatrix4x2fvEXT glProgramUniformMatrix4x2fv
+#define glProgramUniformMatrix4x3fvEXT glProgramUniformMatrix4x3fv
+
+#define GL_ALIASED_POINT_SIZE_RANGE       0x846D
+#define GL_STENCIL_BITS                   0x0D57
+
+// not available in desktop GL
+#define glLabelObjectEXT(a, b, c, d) {}
+#define glInsertEventMarkerEXT(a, b) {}
+#define glPopGroupMarkerEXT(a) {}
+#define glPushGroupMarkerEXT(a, b) {}
 #endif
 
 #if (OGRE_NO_ETC_CODEC == 0)
