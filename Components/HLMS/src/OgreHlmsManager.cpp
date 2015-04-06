@@ -57,11 +57,11 @@ namespace Ogre
 	{
 		if (pass->getName() == "pbs")
 		{
-			auto materialAny = rend->getUserObjectBindings().getUserAny("hlmsMat");
-			if (!materialAny.isEmpty())
+			HlmsMaterialBase* materialAny = any_cast<HlmsMaterialBase*>(rend->getUserObjectBindings().getUserAny("hlmsMat"));
+			if (materialAny)
 			{
-				auto material = materialAny.get<HlmsMaterialBase*>();
-				auto& propMap = material->getPropertyMap();
+				HlmsMaterialBase* material = materialAny;//materialAny.get<HlmsMaterialBase*>();
+				PropertyMap propMap = material->getPropertyMap();
 
 				if (!pass->isProgrammable())
 				{
@@ -71,15 +71,15 @@ namespace Ogre
 
 				material->updatePropertyMap(mCamera, pLightList);
 
-				auto p = const_cast<Ogre::Pass*>(pass);
+				Ogre::Pass* p = const_cast<Ogre::Pass*>(pass);
 
 				bool shaderHasChanged = false;
 
 				// Vertex program
-				auto vertexDatablock = material->getVertexDatablock();
+				HlmsDatablock* vertexDatablock = material->getVertexDatablock();
 				if (vertexDatablock)
 				{
-					auto gpuProgram = mShaderManager.getGpuProgram(vertexDatablock);
+					GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(vertexDatablock);
 
 					if (!p->hasVertexProgram() || p->getVertexProgram() != gpuProgram)
 					{
@@ -90,15 +90,15 @@ namespace Ogre
 				}
 
 				// Fragment program
-				auto fragmentDatablock = material->getFragmentDatablock();
+				HlmsDatablock* fragmentDatablock = material->getFragmentDatablock();
 				if (fragmentDatablock)
 				{
-					auto gpuProgram = mShaderManager.getGpuProgram(fragmentDatablock);
+					GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(fragmentDatablock);
 
 					if (!p->hasFragmentProgram() || p->getFragmentProgram() != gpuProgram)
 					{
 						p->setFragmentProgram(gpuProgram->getName());
-						auto params = gpuProgram->createParameters();
+						GpuProgramParametersSharedPtr params = gpuProgram->createParameters();
 						p->setFragmentProgramParameters(params);
 						shaderHasChanged = true;
 					}

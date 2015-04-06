@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreHlmsDataBlock.h"
+#include "OgreHlmsDatablock.h"
 #include "OgreHlmsPropertyMap.h"
 #include "OgreHlmsShaderCommon.h"
 
@@ -84,7 +84,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void HlmsDatablock::reload()
 	{
-		auto path = mTamplateName + FilePatterns[mShaderType] + "." + mLanguarge + "t";
+		Ogre::String path = mTamplateName + FilePatterns[mShaderType] + "." + mLanguarge + "t";
 		mTemplate.setTemplateFileName(path);
 
 		mHash = mTemplate.getHash() + mShaderType + calcHash(mLanguarge) + calcHash(mProfilesList);

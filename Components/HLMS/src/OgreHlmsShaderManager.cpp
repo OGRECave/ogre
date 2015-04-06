@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreHlmsShaderManager.h"
 #include "OgreHlmsShaderGenerator.h"
 #include "OgreHlmsShaderPiecesManager.h"
-#include "OgreHlmsDataBlock.h"
+#include "OgreHlmsDatablock.h"
 #include "OgreHlmsShaderCommon.h"
 
 namespace Ogre
@@ -48,28 +48,28 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	Ogre::GpuProgramPtr ShaderManager::getGpuProgram(HlmsDatablock* dataBlock)
 	{
-		auto hash = dataBlock->getHash();
+		Ogre::uint32 hash = dataBlock->getHash();
 
-		auto it = mShaderCache.find(hash);
+		std::map<Ogre::uint32, Ogre::GpuProgramPtr>::iterator it = mShaderCache.find(hash);
 		if (it != mShaderCache.end())
 		{
 			return (*it).second;
 		}
 		else
 		{
-			auto typeStr = FilePatterns[dataBlock->getShaderType()];
+			Ogre::String typeStr = FilePatterns[dataBlock->getShaderType()];
 
 			std::stringstream sstream;
 			sstream << std::hex << hash;
 			std::string hashString = sstream.str();
 
-			auto name = hashString + typeStr;
+			Ogre::String name = hashString + typeStr;
 
 			// generate the shader code
-			auto code = dataBlock->getTemplate()->getTemplate();
+			Ogre::String code = dataBlock->getTemplate()->getTemplate();
 			code = ShaderGenerator::parse(code, *(dataBlock->getPropertyMap()), mShaderPiecesManager->getPieces(dataBlock->getLanguarge(), dataBlock->getShaderType()));
 
-			auto gpuProgram = Ogre::HighLevelGpuProgramManager::getSingleton().createProgram(name,
+			HighLevelGpuProgramPtr gpuProgram = Ogre::HighLevelGpuProgramManager::getSingleton().createProgram(name,
 				Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, dataBlock->getLanguarge(), dataBlock->getShaderType());
 
 			gpuProgram->setSource(code);

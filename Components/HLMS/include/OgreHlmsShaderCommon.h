@@ -145,20 +145,20 @@ namespace Ogre
 
 	inline Ogre::uint32 calcHash(Ogre::String str)
 	{
-		auto chars = str.c_str();
+		const char* chars = str.c_str();
 		return calcHash((void*)chars, str.length() * sizeof(char));
 	}
 
 	inline Ogre::uint32 calcHash(const Ogre::StringVector& vec)
 	{
 		Ogre::StringStream stream;
-		for (Ogre::String str : vec)
+		for (unsigned int i = 0; i < vec.size(); i++)
 		{
-			stream << str;
+			stream << vec[i];
 		}
 		
-		auto str = stream.str();
-		auto chars = str.c_str();
+		Ogre::String str = stream.str();
+		const char* chars = str.c_str();
 		return calcHash((void*)chars, str.length() * sizeof(char));
 	}
 }

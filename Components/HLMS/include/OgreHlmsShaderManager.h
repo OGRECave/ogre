@@ -54,7 +54,7 @@ namespace Ogre
 
 	protected:
 
-		std::unordered_map<Ogre::uint32, Ogre::GpuProgramPtr> mShaderCache;
+		std::map<Ogre::uint32, Ogre::GpuProgramPtr> mShaderCache;
 		ShaderPiecesManager* mShaderPiecesManager;
     };
 }

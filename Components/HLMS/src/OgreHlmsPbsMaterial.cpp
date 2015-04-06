@@ -31,8 +31,18 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	PbsMaterial::PbsMaterial() : mAlbedo(1, 1, 1, 0), mF0(0.1f, 0.1f, 0.1f, 1.0f), mRothness(0.1f)
+	PbsMaterial::PbsMaterial() : mAlbedo(1, 1, 1, 0), mF0(0.1f, 0.1f, 0.1f, 1.0f), mRothness(0.1f), 
+	/*header initial values*/	mMainUvSetIndex(0), mD1UvSetIndex(0), mD2UvSetIndex(0), _hasSamplerListChanged(false), 
+								_hasSamplerChanged(false)
 	{
+		//Header initial values
+		mMainOffset = Ogre::Vector2::ZERO;
+		mMainScale = Ogre::Vector2::UNIT_SCALE;	
+		mD1Offset = Ogre::Vector2::ZERO;
+		mD1Scale = Ogre::Vector2::UNIT_SCALE;
+		mD2Offset = Ogre::Vector2::ZERO;
+		mD2Scale = Ogre::Vector2::UNIT_SCALE;
+
 		_samplers[ST_ENV_MAP].init("environment", false, false, false, false, true, true, Ogre::TEX_TYPE_CUBE_MAP);
 
 		_samplers[ST_MAIN_ALBEDO].init("main_albedo", true, true, false, true);
@@ -48,11 +58,11 @@ namespace Ogre
 		_samplers[ST_D2_F0R].init("d2_f0r", true, true, true);
 
 		// TODO select languarge
-		auto languarge = "hlsl";
+		Ogre::String languarge = "hlsl";
 		mVertexDatablock.setLanguarge(languarge);
 		mFragmentDatablock.setLanguarge(languarge);
 
-		if (languarge)
+		if (!languarge.empty())
 		{
 			mVertexDatablock.addProfile("vs_3_0");
 			mFragmentDatablock.addProfile("ps_3_0");
@@ -137,9 +147,10 @@ namespace Ogre
 		mDirectionalLightCount = 0;
 		mPointLightCount = 0;
 		mSpotLightCount = 0;
-
-		for (auto light : *pLightList)
+		
+		for (unsigned int i = 0; i < pLightList->size(); i++)
 		{
+			Ogre::Light* light = pLightList->at(i);
 			switch (light->getType())
 			{
 			case Ogre::Light::LT_DIRECTIONAL:
@@ -190,7 +201,7 @@ namespace Ogre
 			int registerIndex = 0;
 			for (int i = 0; i < ST_COUNT; i++)
 			{
-				auto& s = _samplers[i];
+				SamplerContainer s = _samplers[i];
 
 				if (s.status == SS_ACTIVE || s.status == SS_ADDED || s.status == SS_UPDATED)
 				{
@@ -210,7 +221,7 @@ namespace Ogre
 		{
 			for (int i = 0; i < ST_COUNT; i++)
 			{
-				auto& s = _samplers[i];
+				SamplerContainer s = _samplers[i];
 
 				if (s.hasBlendFunc)
 				{
@@ -230,14 +241,14 @@ namespace Ogre
 	void PbsMaterial::updateUniforms(Ogre::Camera* camera, Ogre::Pass* pass, const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList, bool shaderHasChanged)
 	{
 		// Vertex program
-		auto vertexParams = pass->getVertexProgramParameters();
+		GpuProgramParametersSharedPtr vertexParams = pass->getVertexProgramParameters();
 		vertexParams->setIgnoreMissingParams(true);
 
 		vertexParams->setNamedAutoConstant("mvpMat", Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
 		vertexParams->setNamedAutoConstant("mvMat", Ogre::GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
 
 		// Fragment program
-		auto fragmentParams = pass->getFragmentProgramParameters();
+		GpuProgramParametersSharedPtr fragmentParams = pass->getFragmentProgramParameters();
 		fragmentParams->setIgnoreMissingParams(true);
 		
 		fragmentParams->setNamedAutoConstant("ivMat", Ogre::GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
@@ -256,27 +267,27 @@ namespace Ogre
 		fragmentParams->setNamedConstant("in_scale_d2", mD2Scale);
 
 		// Set light uniforms
-		auto count = std::min(mDirectionalLightCount + mPointLightCount + mSpotLightCount, maxLightCount);
+		int count = std::min(mDirectionalLightCount + mPointLightCount + mSpotLightCount, maxLightCount);
 		if (count)
 		{
-			auto viewMatrix = camera->getViewMatrix();
-			auto viewMatrixQuat = viewMatrix.extractQuaternion();
+			Ogre::Matrix4 viewMatrix = camera->getViewMatrix();
+			Ogre::Quaternion viewMatrixQuat = viewMatrix.extractQuaternion();
 
 			for (unsigned int i = 0; i < count; i++)
 			{
-				auto light = (*pLightList)[i];
+				Ogre::Light* light = (*pLightList)[i];
 
-				auto pos = viewMatrix * light->getPosition();
+				Ogre::Vector3 pos = viewMatrix * light->getPosition();
 				mLightPositions_es[i * 3 + 0] = pos.x;
 				mLightPositions_es[i * 3 + 1] = pos.y;
 				mLightPositions_es[i * 3 + 2] = pos.z;
 
-				auto dir = -(viewMatrixQuat * light->getDirection()).normalisedCopy();
+				Ogre::Vector3 dir = -(viewMatrixQuat * light->getDirection()).normalisedCopy();
 				mLightDirections_es[i * 3 + 0] = dir.x;
 				mLightDirections_es[i * 3 + 1] = dir.y;
 				mLightDirections_es[i * 3 + 2] = dir.z;
 
-				auto color = light->getDiffuseColour();
+				Ogre::ColourValue color = light->getDiffuseColour();
 				mLightColors[i * 3 + 0] = color.r;
 				mLightColors[i * 3 + 1] = color.g;
 				mLightColors[i * 3 + 2] = color.b;
@@ -299,7 +310,7 @@ namespace Ogre
 
 			for (int i = 0; i < ST_COUNT; i++)
 			{
-				auto& s = _samplers[i];
+				SamplerContainer s = _samplers[i];
 				if (s.status == SS_ACTIVE || s.status == SS_ADDED || s.status == SS_UPDATED)
 				{
 					s.textureUnitState = pass->createTextureUnitState("map_" + s.name);
@@ -316,7 +327,7 @@ namespace Ogre
 		{
 			for (int i = 0; i < ST_COUNT; i++)
 			{
-				auto& s = _samplers[i];
+				SamplerContainer s = _samplers[i];
 				if (s.status == SS_UPDATED)
 				{
 					updateTexturUnits(s.textureUnitState, fragmentParams, s);
@@ -369,7 +380,7 @@ namespace Ogre
 	void PbsMaterial::setTexture(SamplerType samplerType, Ogre::TexturePtr tex, TextureAddressing textureAddr,
 		float blendFactor1, float blendFactor2, BlendFunction blendFunc, float intensityFactor)
 	{
-		auto& s = _samplers[samplerType];
+		SamplerContainer s = _samplers[samplerType];
 		if (s.status == SS_ACTIVE && tex == s.tex && s.blendFunc == blendFunc && s.blendFactor1 == blendFactor1 && s.blendFactor2 == blendFactor2 &&
 			s.intensity == intensityFactor && s.textureAddressing == textureAddr)
 			return;

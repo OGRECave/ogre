@@ -69,7 +69,7 @@ namespace Ogre
 
 		void setProperty(IdString key, Ogre::int32 value);
 		bool hasProperty(IdString key);
-		Ogre::int32 getProperty(IdString key, Ogre::int32 defaultVal = 0) const;
+		Ogre::int32 getProperty(IdString key, Ogre::int32 defaultVal = 0);
 		void removeProperty(IdString key);
 
 		Ogre::uint32 getHash();

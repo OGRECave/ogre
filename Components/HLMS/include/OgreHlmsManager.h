@@ -66,7 +66,7 @@ namespace Ogre
 
 		ShaderManager mShaderManager;
 
-		std::unordered_map<Ogre::Renderable*, HlmsMaterialBase*> mBindedMaterials;
+		std::map<Ogre::Renderable*, HlmsMaterialBase*> mBindedMaterials;
     };
 }
 

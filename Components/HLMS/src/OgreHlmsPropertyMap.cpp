@@ -70,7 +70,7 @@ namespace Ogre
 	void PropertyMap::setProperty(IdString key, Ogre::int32 value)
     {
         Property p( key, value );
-		auto it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		if (it == mProperties.end() || it->keyName != p.keyName)
 			mProperties.insert(it, p);
         else
@@ -82,14 +82,14 @@ namespace Ogre
 	bool PropertyMap::hasProperty(IdString key)
 	{
 		Property p(key, 0);
-		auto it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		return it != mProperties.end() && it->keyName == p.keyName;
 	}
     //-----------------------------------------------------------------------------------
-	Ogre::int32 PropertyMap::getProperty(IdString key, Ogre::int32 defaultVal) const
+	Ogre::int32 PropertyMap::getProperty(IdString key, Ogre::int32 defaultVal)
     {
         Property p( key, 0 );
-		auto it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		if (it != mProperties.end() && it->keyName == p.keyName)
             defaultVal = it->value;
 
@@ -99,7 +99,7 @@ namespace Ogre
 	void PropertyMap::removeProperty(IdString key)
 	{
 		Property p(key, 0);
-		auto it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		if (it != mProperties.end() && it->keyName == p.keyName)
 			mProperties.erase(it);
 	}
@@ -115,11 +115,12 @@ namespace Ogre
 			if (mHash == 0)
 			{
 				float* buffer = new float[mProperties.size() * 2];
-				int i = 0;
-				for (auto prop : mProperties)
+				int j = 0;
+				//for (auto prop : mProperties)
+				for (unsigned int i = 0; i < mProperties.size(); i++)
 				{
-					buffer[i++] = prop.keyName.mHash;
-					buffer[i++] = prop.value;
+					buffer[j++] = mProperties[i].keyName.mHash;
+					buffer[j++] = mProperties[i].value;
 				}
 
 				mHash = calcHash((void*)buffer, mProperties.size() * 2 * sizeof(float));

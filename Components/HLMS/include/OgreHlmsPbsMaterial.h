@@ -70,8 +70,11 @@ namespace Ogre
 		class TextureAddressing
 		{
 		public:
-			Ogre::TextureUnitState::TextureAddressingMode u = Ogre::TextureUnitState::TAM_WRAP;
-			Ogre::TextureUnitState::TextureAddressingMode v = Ogre::TextureUnitState::TAM_WRAP;
+			TextureAddressing() : u(Ogre::TextureUnitState::TAM_WRAP), v(Ogre::TextureUnitState::TAM_WRAP)
+			{}
+
+			Ogre::TextureUnitState::TextureAddressingMode u;
+			Ogre::TextureUnitState::TextureAddressingMode v;
 			bool operator ==(TextureAddressing& b){ return u == b.u && v == b.v; }
 		};
 
@@ -103,29 +106,35 @@ namespace Ogre
 		class SamplerContainer
 		{
 		public:
+			SamplerContainer() :textureUnitState(NULL), status(SS_NOT_ACTIVE), hasIntensity(false), intensity(0), 
+									hasMipmapCount(false), mipmapCount(0), hasBlendFunc(false), blendFunc(BF_ALPHA), 
+									hasBlendFactor1(false), blendFactor1(0), hasBlendFactor2(false), blendFactor2(0), 
+									needsGammaCorrection(false)
+			{}
+
 			Ogre::String name;
 			Ogre::TextureType textureType;
 			Ogre::TexturePtr tex;
-			Ogre::TextureUnitState* textureUnitState = NULL;
+			Ogre::TextureUnitState* textureUnitState;
 
-			SamplerStatus status = SS_NOT_ACTIVE;
+			SamplerStatus status;
 
-			bool hasIntensity = false;
-			float intensity = 0;
+			bool hasIntensity;
+			float intensity;
 
-			bool hasMipmapCount = false;
-			float mipmapCount = 0;
+			bool hasMipmapCount;
+			float mipmapCount;
 
-			bool hasBlendFunc = false;
-			BlendFunction blendFunc = BF_ALPHA;
-			bool hasBlendFactor1 = false;
-			float blendFactor1 = 0;
-			bool hasBlendFactor2 = false;
-			float blendFactor2 = 0;
+			bool hasBlendFunc;
+			BlendFunction blendFunc;
+			bool hasBlendFactor1;
+			float blendFactor1;
+			bool hasBlendFactor2;
+			float blendFactor2;
 
 			TextureAddressing textureAddressing;
 
-			bool needsGammaCorrection = false;
+			bool needsGammaCorrection;
 
 			void init(Ogre::String n, bool hasBlendFu = false, bool hasBlendFc1 = false, bool hasBlendFc2 = false, bool needsGammaCorrect = false, bool hasIntens = false, bool hasMipmapC = false, Ogre::TextureType texType = Ogre::TEX_TYPE_2D)
 			{
@@ -142,6 +151,7 @@ namespace Ogre
 
     public:
 		PbsMaterial();
+
 		PbsMaterial(const PbsMaterial &obj);
 		virtual ~PbsMaterial();
 
@@ -172,25 +182,25 @@ namespace Ogre
 		Ogre::ColourValue mF0;
 		Ogre::Real mRothness;
 
-		Ogre::Vector2 mMainOffset = Ogre::Vector2::ZERO;
-		Ogre::Vector2 mMainScale = Ogre::Vector2::UNIT_SCALE;
-		Ogre::uint mMainUvSetIndex = 0;
+		Ogre::Vector2 mMainOffset;
+		Ogre::Vector2 mMainScale;
+		Ogre::uint mMainUvSetIndex;
 
-		Ogre::Vector2 mD1Offset = Ogre::Vector2::ZERO;
-		Ogre::Vector2 mD1Scale = Ogre::Vector2::UNIT_SCALE;
-		Ogre::uint mD1UvSetIndex = 0;
+		Ogre::Vector2 mD1Offset;
+		Ogre::Vector2 mD1Scale;
+		Ogre::uint mD1UvSetIndex;
 
-		Ogre::Vector2 mD2Offset = Ogre::Vector2::ZERO;
-		Ogre::Vector2 mD2Scale = Ogre::Vector2::UNIT_SCALE;
-		Ogre::uint mD2UvSetIndex = 0;
+		Ogre::Vector2 mD2Offset;
+		Ogre::Vector2 mD2Scale;
+		Ogre::uint mD2UvSetIndex;
 
 		Ogre::uint32 mDirectionalLightCount;
 		Ogre::uint32 mPointLightCount;
 		Ogre::uint32 mSpotLightCount;
 
 		SamplerContainer _samplers[ST_COUNT];
-		bool _hasSamplerListChanged = false;
-		bool _hasSamplerChanged = false;
+		bool _hasSamplerListChanged;
+		bool _hasSamplerChanged;
 
 		static const Ogre::uint32 maxLightCount = 10;
 

@@ -86,7 +86,7 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	Ogre::StringVector& ShaderPiecesManager::getPieces(Ogre::String languarge, Ogre::GpuProgramType shaderType)
 	{
-		auto langIt = mPieceFiles.find(languarge);
+		std::map<Ogre::String, Ogre::StringVector[5]>::iterator langIt = mPieceFiles.find(languarge);
 		if (langIt != mPieceFiles.end())
 		{
 			return (*langIt).second[shaderType];

@@ -902,8 +902,8 @@ namespace Ogre
 		outBuffer.reserve(inBuffer.size());
 
 		//Collect pieces
-		auto itor = pieceFiles.begin();
-		auto end = pieceFiles.end();
+		Ogre::StringVector::iterator itor = pieceFiles.begin();
+		Ogre::StringVector::iterator end = pieceFiles.end();
 
 		Ogre::String inPiece;
 		Ogre::String outPiece;
