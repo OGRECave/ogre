@@ -126,7 +126,12 @@ namespace Ogre
     const IdString UnlitProperty::BlendModeIndex15      = IdString( "blend_mode_idx15" );
 
     const IdString UnlitProperty::OutUvCount            = IdString( "out_uv_count" );
-    /*const IdString UnlitProperty::OutUv0TextureMatrix   = IdString( "out_uv0_out_uv" );
+    /*
+    //There are OutUvCount of this (half of hlms_uv_count)
+    const IdString UnlitProperty::OutUvCount0           = IdString( "out_uv_count0" );
+
+    //There are hlms_uv_count of these
+    const IdString UnlitProperty::OutUv0TextureMatrix   = IdString( "out_uv0_out_uv" );
     const IdString UnlitProperty::OutUv0TextureMatrix   = IdString( "out_uv0_texture_matrix" );
     const IdString UnlitProperty::OutUv0TexUnit         = IdString( "out_uv0_tex_unit" );
     const IdString UnlitProperty::OutUv0Swizzle         = IdString( "out_uv0_swizzle" );
@@ -367,7 +372,7 @@ namespace Ogre
                     uvOutput.isAnimated = true;
 
                     setProperty( *UnlitProperty::DiffuseMapPtrs[i].uvSource,
-                                 static_cast<int32>( uvOutputs.size() ) );
+                                 static_cast<int32>( uvOutputs.size() >> 1u ) );
                     inOutPieces[PixelShader][uvSourceSwizzleN] = uvOutputs.size() % 2 ? "zw" : "xy";
 
                     uvOutputs.push_back( uvOutput );
@@ -384,7 +389,7 @@ namespace Ogre
                         ++itor;
                     }
 
-                    int32 idx = static_cast<int32>( itor - uvOutputs.begin() );
+                    int32 idx = static_cast<int32>( (size_t)(itor - uvOutputs.begin()) >> 1u );
                     setProperty( *UnlitProperty::DiffuseMapPtrs[i].uvSource, idx );
                     inOutPieces[PixelShader][uvSourceSwizzleN] = idx % 2 ? "zw" : "xy";
 
@@ -421,13 +426,23 @@ namespace Ogre
             }
         }
 
-        setProperty( UnlitProperty::OutUvCount, static_cast<int32>( uvOutputs.size() ) );
+        size_t halfUvOutputs = (uvOutputs.size() + 1u) >> 1u;
+        setProperty( UnlitProperty::OutUvCount, static_cast<int32>( halfUvOutputs ) );
+
+        for( size_t i=0; i<halfUvOutputs; ++i )
+        {
+            //Decide whether to use vec4 or vec2 in VStoPS_block piece:
+            // vec4 uv0; //--> When interpolant contains two uvs in one
+            // vec2 uv0; //--> When interpolant contains the last UV (uvOutputs.size() is odd)
+            setProperty( "out_uv_count" + StringConverter::toString( i ),
+                         (i << 1u) == (uvOutputs.size() - 1u) ? 2 : 4 );
+        }
 
         for( size_t i=0; i<uvOutputs.size(); ++i )
         {
             String outPrefix = "out_uv" + StringConverter::toString( i );
 
-            setProperty( outPrefix + "_out_uv", i >> 1 );
+            setProperty( outPrefix + "_out_uv", i >> 1u );
             setProperty( outPrefix + "_texture_matrix", uvOutputs[i].isAnimated );
             setProperty( outPrefix + "_tex_unit", uvOutputs[i].texUnit );
             setProperty( outPrefix + "_source_uv", uvOutputs[i].uvSource );

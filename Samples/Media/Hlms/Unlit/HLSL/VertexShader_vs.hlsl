@@ -59,7 +59,7 @@ PS_INPUT main( VS_INPUT input )
 
 @property( texture_matrix )	float4x4 textureMatrix;@end
 
-@foreach( out_uv_count, n )
+@foreach( hlms_uv_count, n )
 	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (materialIdx[input.drawId].x << 4u) + @value( out_uv@n_tex_unit ) );@end
 	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) =
 @property( out_uv@_texture_matrix )

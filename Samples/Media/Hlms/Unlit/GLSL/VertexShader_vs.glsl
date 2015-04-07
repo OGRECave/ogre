@@ -64,7 +64,7 @@ void main()
 
 @property( texture_matrix )	mat4 textureMatrix;@end
 
-@foreach( out_uv_count, n )
+@foreach( hlms_uv_count, n )
 	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (instance.materialIdx[drawId].x << 4u) + @value( out_uv@n_tex_unit ) );@end
 	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = uv@value( out_uv@n_source_uv ).xy @property( out_uv@_texture_matrix ) * textureMatrix@end ;@end
 
