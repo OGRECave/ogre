@@ -46,8 +46,7 @@ namespace Ogre
     HlmsLowLevel::HlmsLowLevel() :
         Hlms( HLMS_LOW_LEVEL, IdString(), 0 ),
         mAutoParamDataSource( 0 ),
-        mCurrentSceneManager( 0 ),
-        mId( 1 )
+        mCurrentSceneManager( 0 )
     {
         mAutoParamDataSource = OGRE_NEW AutoParamDataSource();
     }
@@ -77,7 +76,11 @@ namespace Ogre
         }
 
         //We push into mShaderCache then clear each pass so that we can return unique references.
-        //Feels a bit hacky but gets the job done.
+        //This forces a new hash per renderable, and therefore forces HLMS to update the shaders & tex units for each renderable
+        //This will cause a performance hit if a pass has many objects with the same low level material, as it will
+        //cause a state change for each object. However currently there has not been devised a way of supporting low
+        //level materials without impacting the peformance of normal HLMS materials.
+        //Basically avoid low level materials as much as possible
         HlmsCache *cache = new HlmsCache( mShaderCache.size() + 1, HLMS_LOW_LEVEL );
         if( pass->hasVertexProgram() )
             cache->vertexShader             = pass->getVertexProgram();
@@ -118,13 +121,12 @@ namespace Ogre
             }
         }
 
-        //Each Renderable should use a different hash so that Hlms::getMaterial does not think
-        //that shaders never need to change. It will then lookup the HlmsCache and if the
-        //material pass didn't actually change, the HlmsCache::hash value will be the same
-        //and thus the Hlms shaders will not cause a state change.
-        //Nonetheless, there is a lookup, just avoid low level materials as much as possible.
-        outHash         = mId;
-        outCasterHash   = mId++;
+        //Each Renderable should use a different hash so that Hlms::getMaterial forces
+        //shaders to change. HlmsLowLevel::createShaderCacheEntry takes care of this, so 
+        //here we just set the hashes to the max value possible so no asserts are thrown in Hlms::getMaterial
+        //This will causes more state changes than is needed so avoid low level materials as much as possible!
+        outHash = 0x1FFFF;
+        outCasterHash = 0x1FFFF;
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsLowLevel::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
