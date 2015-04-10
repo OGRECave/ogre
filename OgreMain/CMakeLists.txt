@@ -310,7 +310,11 @@ else()
 endif()
 
 if(OGRE_GCC_VERSION VERSION_EQUAL 4.8 OR OGRE_GCC_VERSION VERSION_GREATER 4.8)
-  list(APPEND LIBRARIES "-latomic")
+	if(CMAKE_SYSTEM_NAME STREQUAL "Android") 
+	  list(APPEND LIBRARIES "atomic")
+	else()
+	  list(APPEND LIBRARIES "-latomic")
+	endif()
 endif()
 
 if (APPLE)
