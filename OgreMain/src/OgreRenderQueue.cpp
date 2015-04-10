@@ -869,14 +869,7 @@ namespace Ogre
         mFreeIndirectBuffers.insert( mFreeIndirectBuffers.end(),
                                      mUsedIndirectBuffers.begin(),
                                      mUsedIndirectBuffers.end() );
-        mUsedIndirectBuffers.clear();
-
-        for( size_t i=0; i<HLMS_MAX; ++i )
-        {
-            Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
-            if( hlms )
-                hlms->frameEnded();
-        }
+        mUsedIndirectBuffers.clear();        
     }
     //-----------------------------------------------------------------------
     void RenderQueue::_swapQueuesForShadowMapping(void)
