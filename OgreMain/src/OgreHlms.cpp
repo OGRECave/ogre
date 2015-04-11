@@ -91,6 +91,7 @@ namespace Ogre
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
     const IdString HlmsBaseProp::TexGather      = IdString( "hlms_tex_gather" );
+    const IdString HlmsBaseProp::DisableStage   = IdString( "hlms_disable_stage" );
 
     const IdString HlmsBasePieces::AlphaTestCmpFunc = IdString( "alpha_test_cmp_func" );
 
@@ -1480,30 +1481,37 @@ namespace Ogre
                     outFile.write( &outString[0], outString.size() );
                 }
 
-                HighLevelGpuProgramManager *gpuProgramManager =
-                                                        HighLevelGpuProgramManager::getSingletonPtr();
-
-                HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
-                                    StringConverter::toString( finalHash ) + ShaderFiles[i],
-                                    ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                    mShaderProfile, static_cast<GpuProgramType>(i) );
-                gp->setSource( outString );
-
-                if( mShaderTargets[i] )
+                //Don't create and compile if template requested not to
+                if( !getProperty( HlmsBaseProp::DisableStage ) )
                 {
-                    //D3D-specific
-                    gp->setParameter( "target", *mShaderTargets[i] );
-                    gp->setParameter( "entry_point", "main" );
+                    HighLevelGpuProgramManager *gpuProgramManager =
+                            HighLevelGpuProgramManager::getSingletonPtr();
+
+                    HighLevelGpuProgramPtr gp = gpuProgramManager->createProgram(
+                                StringConverter::toString( finalHash ) + ShaderFiles[i],
+                                ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+                                mShaderProfile, static_cast<GpuProgramType>(i) );
+                    gp->setSource( outString );
+
+                    if( mShaderTargets[i] )
+                    {
+                        //D3D-specific
+                        gp->setParameter( "target", *mShaderTargets[i] );
+                        gp->setParameter( "entry_point", "main" );
+                    }
+
+                    gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
+                    gp->setMorphAnimationIncluded( false );
+                    gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) );
+                    gp->setVertexTextureFetchRequired( false );
+
+                    gp->load();
+
+                    shaders[i] = gp;
                 }
 
-                gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
-                gp->setMorphAnimationIncluded( false );
-                gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) );
-                gp->setVertexTextureFetchRequired( false );
-
-                gp->load();
-
-                shaders[i] = gp;
+                //Reset the disable flag.
+                setProperty( HlmsBaseProp::DisableStage, 0 );
             }
         }
 
