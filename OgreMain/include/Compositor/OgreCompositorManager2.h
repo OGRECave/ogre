@@ -327,7 +327,7 @@ namespace Ogre
         /// Calls @see CompositorNode::_validateAndFinish on all objects who aren't yet validated
         void validateAllNodes();
 
-        void _update( SceneManagerEnumerator &sceneManagers );
+        void _update( SceneManagerEnumerator &sceneManagers, HlmsManager *hlmsManager );
         void _swapAllFinalTargets(void);
 
         /** Utility helper to create a basic workspace to get you out of the rush. Advanced users will

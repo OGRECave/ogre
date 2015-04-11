@@ -42,7 +42,8 @@ namespace Ogre
         StagingBuffer( internalBufferStart, sizeBytes, vaoManager, uploadOnly ),
         mVboName( vboName ),
         mMappedPtr( 0 ),
-        mFenceThreshold( sizeBytes / 4 )
+        mFenceThreshold( sizeBytes / 4 ),
+        mUnfencedBytes( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -62,18 +63,46 @@ namespace Ogre
 
         mUnfencedHazards.push_back( unfencedHazard );
 
-        size_t start = mUnfencedHazards.front().start;
-        size_t end   = mUnfencedHazards.back().end;
+        assert( from <= to );
 
-        assert( start <= end );
+        mUnfencedBytes += to - from;
 
-        if( end - start >= mFenceThreshold || forceFence )
+        if( mUnfencedBytes >= mFenceThreshold || forceFence )
         {
-            GLFence fence( start, end );
+            GLFenceVec::const_iterator itor = mUnfencedHazards.begin();
+            GLFenceVec::const_iterator end  = mUnfencedHazards.end();
+
+            size_t startRange = itor->start;
+            size_t endRange   = itor->end;
+
+            while( itor != end )
+            {
+                if( endRange <= itor->end )
+                {
+                    //Keep growing (merging) the fences into one fence
+                    endRange = itor->end;
+                }
+                else
+                {
+                    //We wrapped back to 0. Can't keep merging. Make a fence.
+                    GLFence fence( startRange, endRange );
+                    OCGE( fence.fenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
+                    mFences.push_back( fence );
+
+                    startRange  = itor->start;
+                    endRange    = itor->end;
+                }
+
+                ++itor;
+            }
+
+            //Make the last fence.
+            GLFence fence( startRange, endRange );
             OCGE( fence.fenceName = glFenceSync( GL_SYNC_GPU_COMMANDS_COMPLETE, 0 ) );
             mFences.push_back( fence );
 
             mUnfencedHazards.clear();
+            mUnfencedBytes = 0;
         }
     }
     //-----------------------------------------------------------------------------------

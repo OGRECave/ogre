@@ -77,6 +77,7 @@ namespace Ogre
         /// Regions of memory that were unmapped but haven't
         /// been fenced due to not passing the threshold yet.
         GLFenceVec mUnfencedHazards;
+        size_t mUnfencedBytes;
         //------------------------------------
         // End used for uploads
         //------------------------------------

@@ -45,6 +45,8 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
 #include "OgreSceneManagerEnumerator.h"
+#include "OgreHlmsManager.h"
+#include "OgreHlms.h"
 
 namespace Ogre
 {
@@ -479,7 +481,7 @@ namespace Ogre
         mUnfinishedShadowNodes.clear();
     }
     //-----------------------------------------------------------------------------------
-    void CompositorManager2::_update( SceneManagerEnumerator &sceneManagers )
+    void CompositorManager2::_update( SceneManagerEnumerator &sceneManagers, HlmsManager *hlmsManager )
     {
         WorkspaceVec::const_iterator itor = mWorkspaces.begin();
         WorkspaceVec::const_iterator end  = mWorkspaces.end();
@@ -545,6 +547,13 @@ namespace Ogre
         {
             SceneManager *sceneManager = sceneManagerItor.getNext();
             sceneManager->_frameEnded();
+        }
+
+        for( size_t i=0; i<HLMS_MAX; ++i )
+        {
+            Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+            if( hlms )
+                hlms->frameEnded();
         }
 
         mRenderSystem->_update();

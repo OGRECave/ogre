@@ -1504,7 +1504,7 @@ namespace Ogre {
     {
         // update all targets but don't swap buffers
         //mActiveRenderer->_updateAllRenderTargets(false);
-        mCompositorManager2->_update( *mSceneManagerEnum );
+        mCompositorManager2->_update( *mSceneManagerEnum, mHlmsManager );
 
         // give client app opportunity to use queued GPU time
         bool ret = _fireFrameRenderingQueued();
@@ -1523,7 +1523,7 @@ namespace Ogre {
     bool Root::_updateAllRenderTargets(FrameEvent& evt)
     {
         // update all targets but don't swap buffers
-        mCompositorManager2->_update( *mSceneManagerEnum );
+        mCompositorManager2->_update( *mSceneManagerEnum, mHlmsManager );
         // give client app opportunity to use queued GPU time
         bool ret = _fireFrameRenderingQueued(evt);
         // block for final swap

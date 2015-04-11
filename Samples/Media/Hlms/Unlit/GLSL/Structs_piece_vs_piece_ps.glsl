@@ -46,7 +46,7 @@ layout(binding = 2) uniform InstanceBuffer
 		flat uint drawId;
 		@property( hlms_colour )vec4 colour;@end
 		@foreach( out_uv_count, n )
-			vec@value( hlms_uv_count@n ) uv@n;@end
+			vec@value( out_uv_count@n ) uv@n;@end
 	@end
 	@property( hlms_shadowcaster )	float depth;@end
 @end
