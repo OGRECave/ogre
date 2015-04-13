@@ -67,6 +67,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
+#include "OgreGL3PlusPixelFormat.h"
 
 #if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
@@ -133,7 +134,9 @@ namespace Ogre {
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
           mRTTManager(0),
-          mActiveTextureUnit(0)
+          mActiveTextureUnit(0),
+          mNullColourFramebuffer( 0 ),
+          mMaxModifiedUavPlusOne( 0 )
     {
         size_t i;
 
@@ -347,6 +350,12 @@ namespace Ogre {
         //if( mGLSupport->checkExtension("GL_ARB_texture_gather") || mHasGL40 )
         if( mHasGL43 )
             rsc->setCapability(RSC_TEXTURE_GATHER);
+
+        if( mHasGL43 || (mGLSupport->checkExtension("GL_ARB_shader_image_load_store") &&
+                         mGLSupport->checkExtension("GL_ARB_shader_storage_buffer_object")) )
+        {
+            rsc->setCapability(RSC_UAV);
+        }
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -632,6 +641,9 @@ namespace Ogre {
             OGRE_DELETE pCurContext;
         }
         mBackgroundContextList.clear();
+
+        OCGE( glDeleteFramebuffers( 1, &mNullColourFramebuffer ) );
+        mNullColourFramebuffer = 0;
 
         mGLSupport->stop();
         mStopRendering = true;
@@ -1031,6 +1043,92 @@ namespace Ogre {
         mTextureCoordIndex[stage] = index;
     }
 
+    void GL3PlusRenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
+                                            TextureAccess access,
+                                            int32 mipmapLevel, int32 textureArrayIndex,
+                                            PixelFormat pixelFormat )
+    {
+        assert( slot < 64 );
+
+        // TODO
+        // * add memory barrier
+        // * compositor script access (can have multiple instances for a single texture_unit)
+        //     shader_access <binding point> [<access>] [<mipmap level>] [<texture array layer>] [<format>]
+        //     shader_access 2 read_write 0 0 PF_UINT32_R
+
+        if( mUavs[slot].texture.isNull() && texture.isNull() )
+            return;
+
+        mUavs[slot].dirty       = true;
+        mUavs[slot].texture     = texture;
+
+        if( texture.isNull() )
+        {
+            if( !texture.isNull() && !(texture->getUsage() & TU_UAV) )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Texture must have been created with TU_UAV to be bound as UAV",
+                             "GL3PlusRenderSystem::queueBindUAV" );
+            }
+
+            bool isFsaa;
+
+            if( pixelFormat == PF_UNKNOWN )
+                pixelFormat = texture->getFormat();
+
+            mUavs[slot].textureName = static_cast<GL3PlusTexture*>( texture.get() )->getGLID( isFsaa );
+            mUavs[slot].mipmap      = mipmapLevel;
+            mUavs[slot].isArrayTexture = texture->getTextureType() == TEX_TYPE_2D_ARRAY ? GL_TRUE :
+                                                                                          GL_FALSE;
+            mUavs[slot].arrayIndex  = textureArrayIndex;
+            mUavs[slot].format      = GL3PlusPixelUtil::getClosestGLImageInternalFormat( pixelFormat );
+
+            switch( access )
+            {
+            case TA_READ:
+                mUavs[slot].access = GL_READ_ONLY;
+                break;
+            case TA_WRITE:
+                mUavs[slot].access = GL_WRITE_ONLY;
+                break;
+            case TA_READ_WRITE:
+                mUavs[slot].access = GL_READ_WRITE;
+                break;
+            default:
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid TextureAccess parameter '" +
+                             StringConverter::toString( access ) + "'",
+                             "GL3PlusRenderSystem::queueBindUAV" );
+                break;
+            }
+        }
+
+        mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+    }
+
+    void GL3PlusRenderSystem::flushUAVs(void)
+    {
+        for( uint32 i=0; i<mMaxModifiedUavPlusOne; ++i )
+        {
+            if( mUavs[i].dirty )
+            {
+                if( !mUavs[i].texture.isNull() )
+                {
+                    OCGE( glBindImageTexture( i, mUavs[i].textureName, mUavs[i].mipmap,
+                                              mUavs[i].isArrayTexture, mUavs[i].arrayIndex,
+                                              mUavs[i].access, mUavs[i].format) );
+                }
+                else
+                {
+                    glBindImageTexture( 0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
+                }
+
+                mUavs[i].dirty = false;
+            }
+        }
+
+        mMaxModifiedUavPlusOne = 0;
+    }
+
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
     {
         switch (tam)
@@ -1184,14 +1282,14 @@ namespace Ogre {
         if (!vp)
         {
             mActiveViewport = NULL;
-            _setRenderTarget(NULL);
+            _setRenderTarget(NULL, true);
         }
         else if (vp != mActiveViewport || vp->_isUpdated())
         {
             RenderTarget* target;
 
             target = vp->getTarget();
-            _setRenderTarget(target);
+            _setRenderTarget(target, vp->getColourWrite());
             mActiveViewport = vp;
 
             GLsizei x, y, w, h;
@@ -2737,6 +2835,8 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
         }
 
+        OCGE( glGenFramebuffers( 1, &mNullColourFramebuffer ) );
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         // Some Apple NVIDIA hardware can't handle seamless cubemaps
         if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
@@ -2796,7 +2896,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("**************************************");
     }
 
-    void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target)
+    void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target, bool colourWrite)
     {
         mActiveViewport = 0;
 
@@ -2818,16 +2918,57 @@ namespace Ogre {
             // Check the FBO's depth buffer status
             GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(target->getDepthBuffer());
 
-            if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-                (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+            if( !colourWrite )
             {
-                // Depth is automatically managed and there is no depth buffer attached to this RT
-                // or the Current context doesn't match the one this Depth buffer was created with
-                setDepthBufferFor( target );
-            }
+                if( target->isRenderWindow() )
+                {
+                    OCGE( glBindFramebuffer( GL_FRAMEBUFFER, 0 ) );
+                }
+                else
+                {
+                    OCGE( glBindFramebuffer( GL_FRAMEBUFFER, mNullColourFramebuffer ) );
 
-            // Bind frame buffer object
-            mRTTManager->bind(target);
+                    if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+                        (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+                    {
+                        //Attach the depth buffer to this no-colour framebuffer
+                        depthBuffer->getDepthBuffer()->bindToFramebuffer( GL_DEPTH_ATTACHMENT, 0 );
+                        depthBuffer->getStencilBuffer()->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
+                    }
+                    else
+                    {
+                        //Detach all depth buffers from this no-colour framebuffer
+                        OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                                         GL_RENDERBUFFER, 0 ) );
+                        OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                                         GL_RENDERBUFFER, 0 ) );
+                    }
+                }
+
+                //Do not render to colour Render Targets.
+                OCGE( glDrawBuffer( GL_NONE ) );
+            }
+            else
+            {
+                if( target->isRenderWindow() )
+                {
+                    //Make sure colour writes are enabled for RenderWindows.
+                    OCGE( glBindFramebuffer( GL_FRAMEBUFFER, 0 ) );
+                    //TODO: Restore the setting sent to OGRE_NO_QUAD_BUFFER_STEREO?
+                    OCGE( glDrawBuffer( GL_BACK ) );
+                }
+
+                if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+                    (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+                {
+                    // Depth is automatically managed and there is no depth buffer attached to this RT
+                    // or the Current context doesn't match the one this Depth buffer was created with
+                    setDepthBufferFor( target );
+                }
+
+                // Bind frame buffer object
+                mRTTManager->bind(target);
+            }
 
             // Enable / disable sRGB states
             if (target->isHardwareGammaEnabled())
@@ -2843,6 +2984,8 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glDisable(GL_FRAMEBUFFER_SRGB));
             }
         }
+
+        flushUAVs();
     }
 
     GLint GL3PlusRenderSystem::convertCompareFunction(CompareFunction func) const

@@ -168,6 +168,28 @@ namespace Ogre {
         GLSLShader* mCurrentDomainShader;
         GLSLShader* mCurrentComputeShader;
 
+        struct Uav
+        {
+            bool        dirty;
+            TexturePtr  texture;
+            GLuint      textureName;
+            GLint       mipmap;
+            GLboolean   isArrayTexture;
+            GLint       arrayIndex;
+            GLenum      access;
+            GLenum      format;
+
+            Uav() : dirty( false ) {}
+        };
+
+        GLuint  mNullColourFramebuffer;
+
+        Uav     mUavs[64];
+        /// In range [0; 64]; note that a user may use
+        /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
+        /// and still mMaxUavIndexPlusOne = 3.
+        uint8   mMaxModifiedUavPlusOne;
+
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
@@ -347,6 +369,13 @@ namespace Ogre {
             RenderSystem
         */
         void _setTextureMatrix(size_t stage, const Matrix4& xform) { };   // Not supported
+
+        virtual void queueBindUAV( uint32 slot, TexturePtr texture,
+                                   TextureAccess access = TA_READ_WRITE,
+                                   int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
+                                   PixelFormat pixelFormat = PF_UNKNOWN );
+
+        virtual void flushUAVs(void);
         /** See
             RenderSystem
         */
@@ -489,7 +518,7 @@ namespace Ogre {
         /**
          * Set current render target to target, enabling its GL context if needed
          */
-        void _setRenderTarget(RenderTarget *target);
+        void _setRenderTarget(RenderTarget *target, bool colourWrite);
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;

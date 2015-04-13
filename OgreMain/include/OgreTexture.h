@@ -59,6 +59,17 @@ namespace Ogre {
         /** This texture will be a render target, i.e. used as a target for render to texture
             setting this flag will ignore all other texture usages except TU_AUTOMIPMAP */
         TU_RENDERTARGET = 0x20,
+
+        /// Texture can be bound as an Unordered Access View
+        /// (imageStore/imageRead/glBindImageTexture in GL jargon)
+        TU_UAV = 0x40,
+
+        /// @see TU_UAV_NOT_TEXTURE
+        TU_NOT_TEXTURE = 0x80,
+
+        /// Texture can be used as an UAV, but not as a regular texture.
+        TU_UAV_NOT_TEXTURE = TU_UAV|TU_NOT_TEXTURE,
+
         /// Default to automatic mipmap generation static textures
         TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY
     };
@@ -399,19 +410,6 @@ namespace Ogre {
          @param pData Pointer to memory matching the type of data you want to retrieve.
         */
         virtual void getCustomAttribute(const String& name, void* pData);
-        
-
-        /** Enable read and/or write privileges to the texture from shaders.
-            @param bindPoint The buffer binding location for shader access. For OpenGL this must be unique and is not related to the texture binding point.
-            @param access The texture access privileges given to the shader.
-            @param mipmapLevel The texture mipmap level to use.
-            @param textureArrayIndex The index of the texture array to use. If texture is not a texture array, set to 0.
-            @param format Texture format to be read in by shader. For OpenGL this may be different than the bound texture format.
-        */
-        virtual void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
-                                             int mipmapLevel = 0, int textureArrayIndex = 0,
-                                             PixelFormat* format = NULL) {}
-
 
     protected:
         uint32 mHeight;

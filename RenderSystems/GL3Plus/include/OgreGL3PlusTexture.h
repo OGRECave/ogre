@@ -99,10 +99,6 @@ namespace Ogre {
 
         void getCustomAttribute(const String& name, void* pData);
 
-        void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
-                                     int mipmapLevel = 0, int textureArrayIndex = 0,
-                                     PixelFormat* format = NULL);
-
     protected:
         /// @copydoc Texture::createInternalResourcesImpl
         void createInternalResourcesImpl(void);

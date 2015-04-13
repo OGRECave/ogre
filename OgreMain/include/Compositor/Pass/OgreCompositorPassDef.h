@@ -103,6 +103,12 @@ namespace Ogre
         /// End if we're the last consecutive pass to alter the contents of the same render target
         bool                mEndRtUpdate;
 
+        /// When false will not really bind the RenderTarget for rendering and
+        /// use a null colour buffer instead. Useful for depth prepass, or if
+        /// the RTT is actually an UAV.
+        /// Some passes may ignore this setting (e.g. Clear passes)
+        bool                mColourWrite;
+
         /** TODO: Refactor OgreOverlay to remove this design atrocity.
             A custom overlay pass is a better alternative (or just use their own RQ)
         */
@@ -121,6 +127,7 @@ namespace Ogre
             mShadowMapIdx( 0 ),
             mNumInitialPasses( -1 ), mIdentifier( 0 ),
             mBeginRtUpdate( true ), mEndRtUpdate( true ),
+            mColourWrite( true ),
             mIncludeOverlays( false ),
             mExecutionMask( 0xFF ),
             mViewportModifierMask( 0xFF ) {}
