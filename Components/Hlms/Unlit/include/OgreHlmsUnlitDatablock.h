@@ -60,7 +60,7 @@ namespace Ogre
 
     typedef FastArray<UnlitBakedTexture> UnlitBakedTextureArray;
 
-    /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
+    /** Contains information needed by PBS (Physically Based Shading) for OpenGL 3+ & D3D11+
     */
     class _OgreHlmsUnlitExport HlmsUnlitDatablock : public HlmsDatablock, public ConstBufferPoolUser
     {
@@ -95,7 +95,6 @@ namespace Ogre
         void scheduleConstBufferUpdate(void);
         virtual void uploadToConstBuffer( char *dstPtr );
         virtual void uploadToExtraBuffer( char *dstPtr );
-        void bakeVariableParameters(void);
 
         /// Sets the appropiate mTexIndices[texUnit], and returns the texture pointer
         TexturePtr setTexture( const String &name, uint8 texUnit );

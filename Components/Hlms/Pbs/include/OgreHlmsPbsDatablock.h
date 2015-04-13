@@ -122,7 +122,7 @@ namespace Ogre
 
     typedef FastArray<PbsBakedTexture> PbsBakedTextureArray;
 
-    /** Contains information needed by PBS (Physically Based Shading) for OpenGL ES 2.0
+    /** Contains information needed by PBS (Physically Based Shading) for OpenGL 3+ & D3D11+
     */
     class _OgreHlmsPbsExport HlmsPbsDatablock : public HlmsDatablock, public ConstBufferPoolUser
     {
@@ -159,7 +159,6 @@ namespace Ogre
 
         void scheduleConstBufferUpdate(void);
         virtual void uploadToConstBuffer( char *dstPtr );
-        void bakeVariableParameters(void);
 
         /// Sets the appropiate mTexIndices[textureType], and returns the texture pointer
         TexturePtr setTexture( const String &name, PbsTextureTypes textureType );
