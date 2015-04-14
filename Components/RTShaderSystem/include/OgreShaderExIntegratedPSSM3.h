@@ -111,6 +111,8 @@ protected:
         unsigned int mTextureSamplerIndex;
         // The shadow map sampler.          
         UniformParameterPtr mTextureSampler;
+		// The shadow map sampler state
+		UniformParameterPtr mTextureSamplerState;
         // The inverse texture 
         UniformParameterPtr mInvTextureSize;
         // The source light view projection matrix combined with world matrix.      
