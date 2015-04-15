@@ -33,86 +33,198 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	HlmsManager::HlmsManager(Ogre::Camera* camera) : mCamera(camera)
+	HlmsManager::HlmsManager(SceneManager* sceneManager) : mSceneManager(sceneManager),
+		mShaderManager(mSceneManager)
 	{
-		mSceneManager = mCamera->getSceneManager();
-
-		mCamera->addListener(this);
+		mSceneManager->addListener(this);
 		mSceneManager->addRenderObjectListener(this);
 	}
 	//-----------------------------------------------------------------------------------
 	HlmsManager::~HlmsManager()
 	{
 		mSceneManager->removeRenderObjectListener(this);
-		mCamera->removeListener(this);
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsManager::cameraPreRenderScene(Ogre::Camera* cam)
+	void HlmsManager::preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v)
 	{
-		//mViewMatrix = cam->getViewMatrix();
-	}
-	//-----------------------------------------------------------------------------------
-	void HlmsManager::notifyRenderSingleObject(Ogre::Renderable* rend, const Ogre::Pass* pass,
-		const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList, bool suppressRenderStateChanges)
-	{
-		if (pass->getName() == "pbs")
+		// Before the frame is renderd, check all binded renderables if there shaders have to be changed
+		const String& curMaterialScheme = v->getMaterialScheme();
+		const LightList& lightList = source->_getLightsAffectingFrustum();
+
+		// set all materials to dirty (IsUpToDate = false)
+		RenderableVector::iterator rendIt = mBindedRenderables.begin();
+		RenderableVector::iterator rendItEnd = mBindedRenderables.end();
+		for (; rendIt != rendItEnd; rendIt++)
 		{
-			HlmsMaterialBase* materialAny = any_cast<HlmsMaterialBase*>(rend->getUserObjectBindings().getUserAny("hlmsMat"));
-			if (materialAny)
+			Renderable* rend = *rendIt;
+
+			Any hlmsMatBindingAny = rend->getUserObjectBindings().getUserAny("hlmsMatBinding");
+
+			// this check should not fail
+			if (hlmsMatBindingAny.isEmpty())
+				continue;
+
+			HlmsMatBindingMap* hlmsMatBindingMap = hlmsMatBindingAny.get<HlmsMatBindingMap*>();
+
+			HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->begin();
+			HlmsMatBindingMap::iterator bindingItEnd = hlmsMatBindingMap->end();
+			for (; bindingIt != bindingItEnd; bindingIt++)
 			{
-				HlmsMaterialBase* material = materialAny;//materialAny.get<HlmsMaterialBase*>();
-				PropertyMap propMap = material->getPropertyMap();
+				bindingIt->second->IsDirty = true;
+			}
+		}
 
-				if (!pass->isProgrammable())
+		// itreate over all binded renderables
+		rendIt = mBindedRenderables.begin();
+		rendItEnd = mBindedRenderables.end();
+		for (; rendIt != rendItEnd; rendIt++)
+		{
+			Renderable* rend = *rendIt;
+
+			Any hlmsMatBindingAny = rend->getUserObjectBindings().getUserAny("hlmsMatBinding");
+
+			// this check should not fail
+			if (hlmsMatBindingAny.isEmpty())
+				continue;
+
+			HlmsMatBindingMap* hlmsMatBindingMap = hlmsMatBindingAny.get<HlmsMatBindingMap*>();
+
+			HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->begin();
+			HlmsMatBindingMap::iterator bindingItEnd = hlmsMatBindingMap->end();
+			for (; bindingIt != bindingItEnd; bindingIt++)
+			{
+				String passName = bindingIt->first;
+				HlmsMaterialBase* hlmsMaterial = bindingIt->second;
+
+				MaterialPtr mat = rend->getMaterial();
+
+				unsigned short numTechniques = mat->getNumTechniques();
+				for (int t = 0; t < numTechniques; t++)
 				{
-					// This has to be done because it is not called if the pass is not programmable
-					const_cast<Ogre::AutoParamDataSource*>(source)->setCurrentRenderable(rend);
-				}
+					Technique* tech = mat->getTechnique(t);
 
-				material->updatePropertyMap(mCamera, pLightList);
+					// do not update technics which are not used
+					if (tech->getSchemeName() != curMaterialScheme)
+						continue;
 
-				Ogre::Pass* p = const_cast<Ogre::Pass*>(pass);
-
-				bool shaderHasChanged = false;
-
-				// Vertex program
-				HlmsDatablock* vertexDatablock = material->getVertexDatablock();
-				if (vertexDatablock)
-				{
-					GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(vertexDatablock);
-
-					if (!p->hasVertexProgram() || p->getVertexProgram() != gpuProgram)
+					unsigned short numPasses = tech->getNumPasses();
+					for (int p = 0; p < numPasses; p++)
 					{
-						p->setVertexProgram(gpuProgram->getName());
-						p->setVertexProgramParameters(gpuProgram->createParameters());
-						shaderHasChanged = true;
+						Pass* pass = tech->getPass(p);
+						if (passName == pass->getName())
+						{
+							if (hlmsMaterial->IsDirty)
+							{
+								// update the property map of the material with the lightList
+								hlmsMaterial->updatePropertyMap(v->getCamera(), &lightList);
+								hlmsMaterial->IsDirty = false;
+							}
+
+							bool HasShaderChanged = false;
+
+							// Vertex program
+							HlmsDatablock* vertexDatablock = hlmsMaterial->getVertexDatablock();
+							if (vertexDatablock)
+							{
+								GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(vertexDatablock);
+
+								if (!pass->hasVertexProgram() || pass->getVertexProgram() != gpuProgram)
+								{
+									pass->removeAllTextureUnitStates();
+									pass->setVertexProgram(gpuProgram->getName());
+									pass->setVertexProgramParameters(gpuProgram->createParameters());
+									HasShaderChanged = true;
+								}
+							}
+
+							// Fragment program
+							HlmsDatablock* fragmentDatablock = hlmsMaterial->getFragmentDatablock();
+							if (fragmentDatablock)
+							{
+								GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(fragmentDatablock);
+
+								if (!pass->hasFragmentProgram() || pass->getFragmentProgram() != gpuProgram)
+								{
+									pass->removeAllTextureUnitStates();
+									pass->setFragmentProgram(gpuProgram->getName());
+									GpuProgramParametersSharedPtr params = gpuProgram->createParameters();
+									pass->setFragmentProgramParameters(params);
+									HasShaderChanged = true;
+								}
+							}
+
+							// Recreate all texture unit states
+							if (HasShaderChanged)
+							{
+								hlmsMaterial->createTexturUnits(pass);
+							}
+						}
 					}
 				}
-
-				// Fragment program
-				HlmsDatablock* fragmentDatablock = material->getFragmentDatablock();
-				if (fragmentDatablock)
-				{
-					GpuProgramPtr gpuProgram = mShaderManager.getGpuProgram(fragmentDatablock);
-
-					if (!p->hasFragmentProgram() || p->getFragmentProgram() != gpuProgram)
-					{
-						p->setFragmentProgram(gpuProgram->getName());
-						GpuProgramParametersSharedPtr params = gpuProgram->createParameters();
-						p->setFragmentProgramParameters(params);
-						shaderHasChanged = true;
-					}
-				}
-
-				material->updateUniforms(mCamera, p, source, pLightList, shaderHasChanged);
 			}
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsManager::bind(Ogre::Renderable* rend, HlmsMaterialBase* material)
+	void HlmsManager::notifyRenderSingleObject(Renderable* rend, const Pass* pass,
+		const AutoParamDataSource* source, const LightList* pLightList, bool suppressRenderStateChanges)
 	{
-		rend->getUserObjectBindings().setUserAny("hlmsMat", Ogre::Any(material));
-		//mBindedMaterials[rend] = material;
+		// check if the renderable has bounded hlmsMaterials
+		Any hlmsMatBindingAny = rend->getUserObjectBindings().getUserAny("hlmsMatBinding");
+		if (hlmsMatBindingAny.isEmpty())
+			return;
+
+		// get the bounded material for the current pass
+		HlmsMatBindingMap* hlmsMatBindingMap = hlmsMatBindingAny.get<HlmsMatBindingMap*>();
+		HlmsMatBindingMap::iterator bindingIt = hlmsMatBindingMap->find(pass->getName());
+		if (bindingIt != hlmsMatBindingMap->end())
+		{
+			HlmsMaterialBase* material = bindingIt->second;
+
+			// update the uniforms
+			material->updateUniforms(pass, source, pLightList);
+		}
+	}
+	//-----------------------------------------------------------------------------------
+	void HlmsManager::bind(Renderable* rend, HlmsMaterialBase* material, String passName)
+	{
+		HlmsMatBindingMap* hlmsMatMap;
+		if (rend->getUserObjectBindings().getUserAny("hlmsMatBinding").isEmpty())
+		{
+			hlmsMatMap = new HlmsMatBindingMap();
+			rend->getUserObjectBindings().setUserAny("hlmsMatBinding", Any(hlmsMatMap));
+
+			// add the randerable to the mBindedRenderables list
+			RenderableVector::iterator it = std::find(mBindedRenderables.begin(), mBindedRenderables.end(), rend);
+			if (it == mBindedRenderables.end())
+				mBindedRenderables.push_back(rend);
+		}
+		else
+		{
+			hlmsMatMap = rend->getUserObjectBindings().getUserAny("hlmsMatBinding").get<HlmsMatBindingMap*>();
+		}
+
+		(*hlmsMatMap)[passName] = material;
+	}
+	//-----------------------------------------------------------------------------------
+	void HlmsManager::unbind(Renderable* rend, String passName)
+	{
+		if (!rend->getUserObjectBindings().getUserAny("hlmsMatBinding").isEmpty())
+		{
+			HlmsMatBindingMap* hlmsMatMap = rend->getUserObjectBindings().getUserAny("hlmsMatBinding").get<HlmsMatBindingMap*>();
+			hlmsMatMap->erase(passName);
+
+			// if the hasmap is empty delete it
+			if (hlmsMatMap->size() <= 0)
+			{
+				rend->getUserObjectBindings().eraseUserAny("hlmsMatBinding");
+				delete hlmsMatMap;
+
+				// remove the randerable from the mBindedRenderables list
+				RenderableVector::iterator it = std::find(mBindedRenderables.begin(), mBindedRenderables.end(), rend);
+				if (it != mBindedRenderables.end())
+					mBindedRenderables.erase(it);
+			}
+		}
 	}
 	//-----------------------------------------------------------------------------------
 }

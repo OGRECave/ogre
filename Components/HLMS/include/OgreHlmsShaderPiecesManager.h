@@ -39,22 +39,19 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-	class _OgreHlmsExport ShaderPiecesManager
+	class _OgreHlmsExport ShaderPiecesManager : public PassAlloc
 	{
 	public:
-		ShaderPiecesManager(const Ogre::String& piecesFolder);
+		ShaderPiecesManager(Archive *dataFolder = NULL);
 		~ShaderPiecesManager();
 
 		void enumeratePieceFiles();
 
-		Ogre::StringVector& getPieces(Ogre::String languarge, Ogre::GpuProgramType shaderType);
+		StringVector getPieces(String language, GpuProgramType shaderType);
 
 	protected:
-
-		Ogre::String mPiecesFolder;
-		std::map<Ogre::String, Ogre::StringVector[5]> mPieceFiles;
-		Ogre::StringVector mDefaultStringVector;
-		
+		Archive* mDataFolder;
+		map<String, StringVector>::type mPieceFiles;
 	};
 }
 

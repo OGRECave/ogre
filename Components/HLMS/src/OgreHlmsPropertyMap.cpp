@@ -43,7 +43,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
 	void PropertyMap::setCommonProperties(void)
     {
-        Ogre::uint16 numWorldTransforms = 2;
+        uint16 numWorldTransforms = 2;
 
 		setProperty(DefaultProperties::Skeleton, numWorldTransforms > 1);
 		setProperty(DefaultProperties::UvCount, 2);
@@ -67,10 +67,10 @@ namespace Ogre
 		setProperty(DefaultProperties::LightsSpot, 3);
     }
     //-----------------------------------------------------------------------------------
-	void PropertyMap::setProperty(IdString key, Ogre::int32 value)
+	void PropertyMap::setProperty(IdString key, int32 value)
     {
         Property p( key, value );
-		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		if (it == mProperties.end() || it->keyName != p.keyName)
 			mProperties.insert(it, p);
         else
@@ -82,14 +82,14 @@ namespace Ogre
 	bool PropertyMap::hasProperty(IdString key)
 	{
 		Property p(key, 0);
-		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		return it != mProperties.end() && it->keyName == p.keyName;
 	}
     //-----------------------------------------------------------------------------------
-	Ogre::int32 PropertyMap::getProperty(IdString key, Ogre::int32 defaultVal)
+	int32 PropertyMap::getProperty(IdString key, int32 defaultVal)
     {
         Property p( key, 0 );
-		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		if (it != mProperties.end() && it->keyName == p.keyName)
             defaultVal = it->value;
 
@@ -99,12 +99,12 @@ namespace Ogre
 	void PropertyMap::removeProperty(IdString key)
 	{
 		Property p(key, 0);
-		std::vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
+		vector<Property>::iterator it = std::lower_bound(mProperties.begin(), mProperties.end(), p, orderPropertyByIdString);
 		if (it != mProperties.end() && it->keyName == p.keyName)
 			mProperties.erase(it);
 	}
 	//-----------------------------------------------------------------------------------
-	Ogre::uint32 PropertyMap::getHash()
+	uint32 PropertyMap::getHash()
 	{
 		if (mProperties.size() == 0)
 		{
@@ -116,7 +116,6 @@ namespace Ogre
 			{
 				float* buffer = new float[mProperties.size() * 2];
 				int j = 0;
-				//for (auto prop : mProperties)
 				for (unsigned int i = 0; i < mProperties.size(); i++)
 				{
 					buffer[j++] = mProperties[i].keyName.mHash;

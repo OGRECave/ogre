@@ -31,19 +31,19 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	PbsMaterial::PbsMaterial() : mAlbedo(1, 1, 1, 0), mF0(0.1f, 0.1f, 0.1f, 1.0f), mRothness(0.1f), 
+	PbsMaterial::PbsMaterial() : mAlbedo(1, 1, 1, 0), mF0(0.1f, 0.1f, 0.1f, 1.0f), mRoughness(0.1f),
 	/*header initial values*/	mMainUvSetIndex(0), mD1UvSetIndex(0), mD2UvSetIndex(0), _hasSamplerListChanged(false), 
 								_hasSamplerChanged(false)
 	{
 		//Header initial values
-		mMainOffset = Ogre::Vector2::ZERO;
-		mMainScale = Ogre::Vector2::UNIT_SCALE;	
-		mD1Offset = Ogre::Vector2::ZERO;
-		mD1Scale = Ogre::Vector2::UNIT_SCALE;
-		mD2Offset = Ogre::Vector2::ZERO;
-		mD2Scale = Ogre::Vector2::UNIT_SCALE;
+		mMainOffset = Vector2::ZERO;
+		mMainScale = Vector2::UNIT_SCALE;	
+		mD1Offset = Vector2::ZERO;
+		mD1Scale = Vector2::UNIT_SCALE;
+		mD2Offset = Vector2::ZERO;
+		mD2Scale = Vector2::UNIT_SCALE;
 
-		_samplers[ST_ENV_MAP].init("environment", false, false, false, false, true, true, Ogre::TEX_TYPE_CUBE_MAP);
+		_samplers[ST_ENV_MAP].init("environment", false, false, false, false, true, true, TEX_TYPE_CUBE_MAP);
 
 		_samplers[ST_MAIN_ALBEDO].init("main_albedo", true, true, false, true);
 		_samplers[ST_MAIN_NORMAL].init("main_normal", false, true);
@@ -57,16 +57,23 @@ namespace Ogre
 		_samplers[ST_D2_NORMAL].init("d2_normal", false, true);
 		_samplers[ST_D2_F0R].init("d2_f0r", true, true, true);
 
-		// TODO select languarge
-		Ogre::String languarge = "hlsl";
-		mVertexDatablock.setLanguarge(languarge);
-		mFragmentDatablock.setLanguarge(languarge);
 
-		if (!languarge.empty())
+		RenderSystem* rs = Root::getSingleton().getRenderSystem();
+
+		String language = "";
+		if (rs->getCapabilities()->isShaderProfileSupported("hlsl"))
 		{
+			language = "hlsl";
 			mVertexDatablock.addProfile("vs_3_0");
 			mFragmentDatablock.addProfile("ps_3_0");
 		}
+		else if (rs->getCapabilities()->isShaderProfileSupported("glsl"))
+		{
+			language = "glsl";
+		}
+
+		mVertexDatablock.setLanguage(language);
+		mFragmentDatablock.setLanguage(language);
 
 		mVertexDatablock.setTemplateName("PBS");
 		mFragmentDatablock.setTemplateName("PBS");
@@ -82,27 +89,27 @@ namespace Ogre
 
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setEnvironmapTexture(Ogre::TexturePtr tex, float intensityFactor)
+	void PbsMaterial::setEnvironmentMap(TexturePtr tex, float intensityFactor)
 	{
 		setTexture(ST_ENV_MAP, tex, TextureAddressing(), 0, 0, BF_ADD, intensityFactor);
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setAlbedoTexture(MapSlot mapSlot, Ogre::TexturePtr tex, TextureAddressing textureAddressing, BlendFunction blendFunc, float blendFactor)
+	void PbsMaterial::setAlbedoTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing, BlendFunction blendFunc, float blendFactor)
 	{
 		setTexture((SamplerType)(ST_MAIN_ALBEDO + mapSlot * 3), tex, textureAddressing, blendFactor, 0, blendFunc);
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setNormalTexture(MapSlot mapSlot, Ogre::TexturePtr tex, TextureAddressing textureAddressing, float blendFactor)
+	void PbsMaterial::setNormalTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing, float blendFactor)
 	{
 		setTexture((SamplerType)(ST_MAIN_NORMAL + mapSlot * 3), tex, textureAddressing, blendFactor);
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setF0RTexture(MapSlot mapSlot, Ogre::TexturePtr tex, TextureAddressing textureAddressing, BlendFunction f0BlendFunc, float f0BlendFactor, float rBlendFactor)
+	void PbsMaterial::setF0RTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing, BlendFunction f0BlendFunc, float f0BlendFactor, float rBlendFactor)
 	{
 		setTexture((SamplerType)(ST_MAIN_F0R + mapSlot * 3), tex, textureAddressing, f0BlendFactor, rBlendFactor, f0BlendFunc);
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setOffsetAndScale(MapSlot mapSlot, Ogre::Vector2 offset, Ogre::Vector2 scale)
+	void PbsMaterial::setOffsetAndScale(MapSlot mapSlot, Vector2 offset, Vector2 scale)
 	{
 		switch (mapSlot)
 		{
@@ -123,7 +130,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setUvSetIndex(MapSlot mapSlot, Ogre::uint index)
+	void PbsMaterial::setUvSetIndex(MapSlot mapSlot, uint index)
 	{
 		switch (mapSlot)
 		{
@@ -141,7 +148,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::updatePropertyMap(Ogre::Camera* camera, const Ogre::LightList* pLightList)
+	void PbsMaterial::updatePropertyMap(Camera* camera, const LightList* pLightList)
 	{
 		// Update the light properties
 		mDirectionalLightCount = 0;
@@ -150,18 +157,18 @@ namespace Ogre
 		
 		for (unsigned int i = 0; i < pLightList->size(); i++)
 		{
-			Ogre::Light* light = pLightList->at(i);
+			Light* light = pLightList->at(i);
 			switch (light->getType())
 			{
-			case Ogre::Light::LT_DIRECTIONAL:
+			case Light::LT_DIRECTIONAL:
 				mDirectionalLightCount++;
 				break;
 
-			case Ogre::Light::LT_POINT:
+			case Light::LT_POINT:
 				mPointLightCount++;
 				break;
 
-			case Ogre::Light::LT_SPOTLIGHT:
+			case Light::LT_SPOTLIGHT:
 				mSpotLightCount++;
 				break;
 
@@ -182,7 +189,7 @@ namespace Ogre
 		mPropertyMap.setProperty("lights_count", mDirectionalLightCount + mPointLightCount + mSpotLightCount);
 
 		// tell the shader if the hardware supports hardware gamma correction or not
-		// TODO check if the hardware supports gamma correction "Ogre::Root::getSingleton().getRenderSystem()->getCapabilities()" doesen't support this check
+		// TODO check if the hardware supports gamma correction "Root::getSingleton().getRenderSystem()->getCapabilities()" doesen't support this check
 		bool canHardwareGamma = true; 
 		mPropertyMap.setProperty("hw_gamma_read", canHardwareGamma);
 
@@ -214,6 +221,8 @@ namespace Ogre
 					mPropertyMap.removeProperty("map_" + s.name + "_register");
 				}
 			}
+
+			_hasSamplerListChanged = false;
 		}
 
 		// Update the texture properties
@@ -238,24 +247,55 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::updateUniforms(Ogre::Camera* camera, Ogre::Pass* pass, const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList, bool shaderHasChanged)
+	void PbsMaterial::createTexturUnits(Pass* pass)
+	{
+		GpuProgramParametersSharedPtr fragmentParams = pass->getFragmentProgramParameters();
+		fragmentParams->setIgnoreMissingParams(true);
+
+		// Create the texture unit states
+		for (int i = 0; i < ST_COUNT; i++)
+		{
+			SamplerContainer& s = _samplers[i];
+			if (s.status == SS_ACTIVE || s.status == SS_ADDED || s.status == SS_UPDATED)
+			{
+				s.textureUnitState = pass->createTextureUnitState();
+				s.textureUnitState->setName("map_" + s.name);
+				s.status = SS_UPDATED;
+			}
+			else
+			{
+				s.status = SS_NOT_ACTIVE;
+			}
+		}
+
+		// set the sampler name for the texture unit state
+		int size = pass->getNumTextureUnitStates();
+		for (int i = 0; i < size; i++)
+		{
+			TextureUnitState* tus = pass->getTextureUnitState(i);
+			fragmentParams->setNamedConstant("in_" + tus->getName(), i);
+		}
+
+		_hasSamplerChanged = true;
+	}
+	//-----------------------------------------------------------------------------------
+	void PbsMaterial::updateUniforms(const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList)
 	{
 		// Vertex program
 		GpuProgramParametersSharedPtr vertexParams = pass->getVertexProgramParameters();
 		vertexParams->setIgnoreMissingParams(true);
 
-		vertexParams->setNamedAutoConstant("mvpMat", Ogre::GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
-		vertexParams->setNamedAutoConstant("mvMat", Ogre::GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
+		vertexParams->setNamedAutoConstant("mvpMat", GpuProgramParameters::ACT_WORLDVIEWPROJ_MATRIX);
+		vertexParams->setNamedAutoConstant("mvMat", GpuProgramParameters::ACT_WORLDVIEW_MATRIX);
 
 		// Fragment program
 		GpuProgramParametersSharedPtr fragmentParams = pass->getFragmentProgramParameters();
-		fragmentParams->setIgnoreMissingParams(true);
 		
-		fragmentParams->setNamedAutoConstant("ivMat", Ogre::GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
+		fragmentParams->setNamedAutoConstant("ivMat", GpuProgramParameters::ACT_INVERSE_VIEW_MATRIX);
 		
 		fragmentParams->setNamedConstant("in_albedo", mAlbedo);
 		fragmentParams->setNamedConstant("in_f0", mF0);
-		fragmentParams->setNamedConstant("in_roughness", mRothness);
+		fragmentParams->setNamedConstant("in_roughness", mRoughness);
 
 		fragmentParams->setNamedConstant("in_offset_main", mMainOffset);
 		fragmentParams->setNamedConstant("in_scale_main", mMainScale);
@@ -267,33 +307,33 @@ namespace Ogre
 		fragmentParams->setNamedConstant("in_scale_d2", mD2Scale);
 
 		// Set light uniforms
-		int count = std::min(mDirectionalLightCount + mPointLightCount + mSpotLightCount, maxLightCount);
+		unsigned int count = std::min(mDirectionalLightCount + mPointLightCount + mSpotLightCount, maxLightCount);
 		if (count)
 		{
-			Ogre::Matrix4 viewMatrix = camera->getViewMatrix();
-			Ogre::Quaternion viewMatrixQuat = viewMatrix.extractQuaternion();
+			Matrix4 viewMatrix = source->getViewMatrix();
+			Quaternion viewMatrixQuat = viewMatrix.extractQuaternion();
 
 			for (unsigned int i = 0; i < count; i++)
 			{
-				Ogre::Light* light = (*pLightList)[i];
+				Light* light = (*pLightList)[i];
 
-				Ogre::Vector3 pos = viewMatrix * light->getPosition();
+				Vector3 pos = viewMatrix * light->getPosition();
 				mLightPositions_es[i * 3 + 0] = pos.x;
 				mLightPositions_es[i * 3 + 1] = pos.y;
 				mLightPositions_es[i * 3 + 2] = pos.z;
 
-				Ogre::Vector3 dir = -(viewMatrixQuat * light->getDirection()).normalisedCopy();
+				Vector3 dir = -(viewMatrixQuat * light->getDirection()).normalisedCopy();
 				mLightDirections_es[i * 3 + 0] = dir.x;
 				mLightDirections_es[i * 3 + 1] = dir.y;
 				mLightDirections_es[i * 3 + 2] = dir.z;
 
-				Ogre::ColourValue color = light->getDiffuseColour();
+				ColourValue color = light->getDiffuseColour();
 				mLightColors[i * 3 + 0] = color.r;
 				mLightColors[i * 3 + 1] = color.g;
 				mLightColors[i * 3 + 2] = color.b;
 
 				mLightParameters[i * 3 + 0] = light->getAttenuationRange();
-				mLightParameters[i * 3 + 1] = Ogre::Math::Cos(light->getSpotlightOuterAngle() / 2.0);
+				mLightParameters[i * 3 + 1] = Math::Cos(light->getSpotlightOuterAngle() / 2.0);
 				mLightParameters[i * 3 + 2] = light->getSpotlightFalloff();
 			}
 
@@ -304,57 +344,35 @@ namespace Ogre
 		}
 
 		// update the textures
-		if (shaderHasChanged)
-		{
-			pass->removeAllTextureUnitStates();
-
-			for (int i = 0; i < ST_COUNT; i++)
-			{
-				SamplerContainer s = _samplers[i];
-				if (s.status == SS_ACTIVE || s.status == SS_ADDED || s.status == SS_UPDATED)
-				{
-					s.textureUnitState = pass->createTextureUnitState("map_" + s.name);
-					updateTexturUnits(s.textureUnitState, fragmentParams, s);
-					s.status = SS_ACTIVE;
-				}
-				else
-				{
-					s.status = SS_NOT_ACTIVE;
-				}
-			}
-		}
-		else if (_hasSamplerChanged)
+		if (_hasSamplerChanged)
 		{
 			for (int i = 0; i < ST_COUNT; i++)
 			{
 				SamplerContainer s = _samplers[i];
 				if (s.status == SS_UPDATED)
 				{
-					updateTexturUnits(s.textureUnitState, fragmentParams, s);
+					updateTexturUnits(s.textureUnitState, fragmentParams, s, i);
 					s.status = SS_ACTIVE;
 				}
 			}
-		}
 
-		_hasSamplerListChanged = false;
-		_hasSamplerChanged = false;
+			_hasSamplerChanged = false;
+		}
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::updateTexturUnits(Ogre::TextureUnitState* textureUnitState, Ogre::GpuProgramParametersSharedPtr fragmentParams, SamplerContainer& s)
+	void PbsMaterial::updateTexturUnits(TextureUnitState* textureUnitState, GpuProgramParametersSharedPtr fragmentParams, SamplerContainer& s, int index)
 	{
-		fragmentParams->setNamedConstant("in_map_" + s.name, 0);
-
-		if (s.textureType == Ogre::TEX_TYPE_2D)
+		if (s.textureType == TEX_TYPE_2D)
 		{
 			s.textureUnitState->setTexture(s.tex);
-			s.textureUnitState->setTextureAddressingMode(s.textureAddressing.u, s.textureAddressing.v, Ogre::TextureUnitState::TAM_WRAP);
+			s.textureUnitState->setTextureAddressingMode(s.textureAddressing.u, s.textureAddressing.v, TextureUnitState::TAM_WRAP);
 		}
-		else if (s.textureType == Ogre::TEX_TYPE_CUBE_MAP)
+		else if (s.textureType == TEX_TYPE_CUBE_MAP)
 		{
 			s.textureUnitState->setCubicTexture(&s.tex, true);
 		}
 
-		s.textureUnitState->setTextureFiltering(Ogre::TFO_TRILINEAR);
+		s.textureUnitState->setTextureFiltering(TFO_TRILINEAR);
 
 		if (s.hasIntensity)
 		{
@@ -377,7 +395,7 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setTexture(SamplerType samplerType, Ogre::TexturePtr tex, TextureAddressing textureAddr,
+	void PbsMaterial::setTexture(SamplerType samplerType, TexturePtr tex, TextureAddressing textureAddr,
 		float blendFactor1, float blendFactor2, BlendFunction blendFunc, float intensityFactor)
 	{
 		SamplerContainer s = _samplers[samplerType];
@@ -415,7 +433,7 @@ namespace Ogre
 		s.blendFactor2 = blendFactor2;
 
 		s.intensity = intensityFactor;
-		s.mipmapCount = tex.isNull() ? 0 : tex->getNumMipmaps();
+		s.mipmapCount = tex.isNull() ? 0.0f : tex->getNumMipmaps();
 
 		_hasSamplerChanged = true;
 		_hasSamplerListChanged = s.status == SS_ADDED || s.status == SS_REMOVED;

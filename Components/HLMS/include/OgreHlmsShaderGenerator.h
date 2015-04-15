@@ -42,11 +42,11 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-	class _OgreHlmsExport ShaderGenerator
+	class _OgreHlmsExport ShaderGenerator : public PassAlloc
 	{
 	protected:
 
-		typedef std::map<IdString, Ogre::String> PiecesMap;
+		typedef map<IdString, String>::type PiecesMap;
 
 		enum ExpressionType
 		{
@@ -61,23 +61,23 @@ namespace Ogre
 			bool                    result;
 			bool                    negated;
 			ExpressionType          type;
-			std::vector<Expression> children;
-			Ogre::String            value;
+			vector<Expression>::type children;
+			String            value;
 
 			Expression() : result(false), negated(false), type(EXPR_VAR) {}
 		};
 
-		typedef std::vector<Expression> ExpressionVec;
+		typedef vector<Expression>::type ExpressionVec;
 
-		static void copy(Ogre::String &outBuffer, const SubStringRef &inSubString, size_t length);
-		static void repeat(Ogre::String &outBuffer, const SubStringRef &inSubString, size_t length,
-			size_t passNum, const Ogre::String &counterVar);
-		static bool parseMath(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties);
-		static bool parseForEach(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties);
-		static bool parseProperties(Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties);
-		static bool collectPieces(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties, PiecesMap& pieces);
-		static bool insertPieces(Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties, PiecesMap& pieces);
-		static bool parseCounter(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties);
+		static void copy(String &outBuffer, const SubStringRef &inSubString, size_t length);
+		static void repeat(String &outBuffer, const SubStringRef &inSubString, size_t length,
+			size_t passNum, const String &counterVar);
+		static bool parseMath(const String &inBuffer, String &outBuffer, PropertyMap &properties);
+		static bool parseForEach(const String &inBuffer, String &outBuffer, PropertyMap &properties);
+		static bool parseProperties(String &inBuffer, String &outBuffer, PropertyMap &properties);
+		static bool collectPieces(const String &inBuffer, String &outBuffer, PropertyMap &properties, PiecesMap& pieces);
+		static bool insertPieces(String &inBuffer, String &outBuffer, PropertyMap &properties, PiecesMap& pieces);
+		static bool parseCounter(const String &inBuffer, String &outBuffer, PropertyMap &properties);
 
 		/** Goes through 'buffer', starting from startPos (inclusive) looking for the given
 			character while skipping whitespace. If any character other than whitespace or
@@ -86,7 +86,7 @@ namespace Ogre
 			String::npos if not found or wasn't the next character. If found, the position
 			in the buffer, from start
 			*/
-		static size_t findNextCharacter(const Ogre::String &buffer, size_t startPos, char character);
+		static size_t findNextCharacter(const String &buffer, size_t startPos, char character);
 
 		static void findBlockEnd(SubStringRef &outSubString, bool &syntaxError);
 
@@ -94,13 +94,13 @@ namespace Ogre
 		static bool evaluateExpressionRecursive(ExpressionVec &expression, bool &outSyntaxError, PropertyMap &properties);
 		static size_t evaluateExpressionEnd(const SubStringRef &outSubString);
 
-		static void evaluateParamArgs(SubStringRef &outSubString, Ogre::StringVector &outArgs,
+		static void evaluateParamArgs(SubStringRef &outSubString, StringVector &outArgs,
 			bool &outSyntaxError);
 
-		static size_t calculateLineCount(const Ogre::String &buffer, size_t idx);
+		static size_t calculateLineCount(const String &buffer, size_t idx);
 		static size_t calculateLineCount(const SubStringRef &subString);
 
 	public:
-		static Ogre::String parse(Ogre::String &inBuffer, PropertyMap &properties, Ogre::StringVector& pieceFiles);
+		static String parse(String &inBuffer, PropertyMap &properties, StringVector& pieceFiles);
 	};
 }

@@ -33,7 +33,7 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	HlmsDatablock::HlmsDatablock(Ogre::GpuProgramType type, PropertyMap* propertyMap) : mShaderType(type), mPropertyMap(propertyMap), mHash(0)
+	HlmsDatablock::HlmsDatablock(GpuProgramType type, PropertyMap* propertyMap) : mShaderType(type), mPropertyMap(propertyMap), mHash(0)
 	{
 
 	}
@@ -47,16 +47,16 @@ namespace Ogre
 		return &mTemplate;
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsDatablock::setLanguarge(const Ogre::String& languarge)
+	void HlmsDatablock::setLanguage(const String& language)
 	{
-		if (mLanguarge != languarge)
+		if (mLanguage != language)
 		{
 			mHash = 0;
-			mLanguarge = languarge;
+			mLanguage = language;
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsDatablock::setTemplateName(const Ogre::String& tamplateName)
+	void HlmsDatablock::setTemplateName(const String& tamplateName)
 	{
 		if (mTamplateName != tamplateName)
 		{
@@ -65,13 +65,13 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	void HlmsDatablock::addProfile(const Ogre::String& profile)
+	void HlmsDatablock::addProfile(const String& profile)
 	{
 		mHash = 0;
 		mProfilesList.push_back(profile);
 	}
 	//-----------------------------------------------------------------------------------
-	Ogre::uint32 HlmsDatablock::getHash()
+	uint32 HlmsDatablock::getHash()
 	{
 		if (mHash == 0)
 		{
@@ -84,10 +84,10 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void HlmsDatablock::reload()
 	{
-		Ogre::String path = mTamplateName + FilePatterns[mShaderType] + "." + mLanguarge + "t";
+		String path = mTamplateName + FilePatterns[mShaderType] + "." + mLanguage + "t";
 		mTemplate.setTemplateFileName(path);
 
-		mHash = mTemplate.getHash() + mShaderType + calcHash(mLanguarge) + calcHash(mProfilesList);
+		mHash = mTemplate.getHash() + mShaderType + calcHash(mLanguage) + calcHash(mProfilesList);
 	}
 	//-----------------------------------------------------------------------------------
 }

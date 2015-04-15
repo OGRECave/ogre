@@ -42,19 +42,19 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-    class _OgreHlmsExport ShaderManager
+	class _OgreHlmsExport ShaderManager : public PassAlloc
     {
     public:
-		ShaderManager();
+		ShaderManager(SceneManager* sceneManager);
 		virtual ~ShaderManager();
 
-		Ogre::GpuProgramPtr getGpuProgram(HlmsDatablock* dataBlock);
-
-		void clearCache();
+		GpuProgramPtr getGpuProgram(HlmsDatablock* dataBlock);
+		static GpuProgramPtr createGpuProgram(const String& name, const String& code, HlmsDatablock* dataBlock);
 
 	protected:
 
-		std::map<Ogre::uint32, Ogre::GpuProgramPtr> mShaderCache;
+		SceneManager* mSceneManager;
+		map<uint32, GpuProgramPtr>::type mShaderCache;
 		ShaderPiecesManager* mShaderPiecesManager;
     };
 }

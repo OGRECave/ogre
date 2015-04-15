@@ -41,16 +41,16 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-	class _OgreHlmsExport PropertyMap
+	class _OgreHlmsExport PropertyMap : public PassAlloc
 	{
 	public:
 
 		struct Property
 		{
 			IdString    keyName;
-			Ogre::int32 value;
+			int32 value;
 
-			Property(IdString _keyName, Ogre::int32 _value) :
+			Property(IdString _keyName, int32 _value) :
 				keyName(_keyName), value(_value) {}
 
 			bool operator == (const Property &_r) const
@@ -67,29 +67,17 @@ namespace Ogre
 			*/
 		void setCommonProperties();
 
-		void setProperty(IdString key, Ogre::int32 value);
+		void setProperty(IdString key, int32 value);
 		bool hasProperty(IdString key);
-		Ogre::int32 getProperty(IdString key, Ogre::int32 defaultVal = 0);
+		int32 getProperty(IdString key, int32 defaultVal = 0);
 		void removeProperty(IdString key);
 
-		Ogre::uint32 getHash();
-
-		/** Finds the parameter with key 'key' in the given 'paramVec'. If found, outputs
-			the value to 'inOut', otherwise leaves 'inOut' as is.
-			@return
-			True if the key was found (inOut was modified), false otherwise
-			@remarks
-			Assumes paramVec is sorted by key.
-			*/
-		//static bool findParamInVec(const std::vector<Property> &paramVec, IdString key, String &inOut);
-
-		/// For debugging stuff. I.e. the Command line uses it for testing manually set properties
-		//void _setProperty(IdString key, int32 value)      { setProperty(key, value); }
+		uint32 getHash();
 
 	protected:
 
-		std::vector<Property> mProperties;
-		Ogre::uint32 mHash;
+		vector<Property>::type mProperties;
+		uint32 mHash;
 
 		static bool orderPropertyByIdString(const PropertyMap::Property &_left, const PropertyMap::Property &_right)
 		{

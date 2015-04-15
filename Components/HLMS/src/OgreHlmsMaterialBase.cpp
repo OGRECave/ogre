@@ -32,8 +32,8 @@ namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
 	HlmsMaterialBase::HlmsMaterialBase() : 
-		mVertexDatablock(Ogre::GPT_VERTEX_PROGRAM, &mPropertyMap),
-		mFragmentDatablock(Ogre::GPT_FRAGMENT_PROGRAM, &mPropertyMap)
+		mVertexDatablock(GPT_VERTEX_PROGRAM, &mPropertyMap),
+		mFragmentDatablock(GPT_FRAGMENT_PROGRAM, &mPropertyMap)
 	{
 
 	}

@@ -39,23 +39,23 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-	class _OgreHlmsExport ShaderTemplate
+	class _OgreHlmsExport ShaderTemplate : public PassAlloc
 	{
 	public:
 		ShaderTemplate();
 		~ShaderTemplate();
 
-		const Ogre::String& getTemplateFileName() { return mTemplateFileName; }
-		void setTemplateFileName(const Ogre::String& templateFileName);
+		const String& getTemplateFileName() { return mTemplateFileName; }
+		void setTemplateFileName(const String& templateFileName);
 
 		void load();
-		const Ogre::String& getTemplate();
-		Ogre::uint32 getHash();
+		const String& getTemplate();
+		uint32 getHash();
 
 	protected:
-		Ogre::String mTemplateFileName;
-		Ogre::String mTemplate;
-		Ogre::uint32 mHash;
+		String mTemplateFileName;
+		String mTemplate;
+		uint32 mHash;
 	};
 }
 

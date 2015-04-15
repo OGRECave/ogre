@@ -42,13 +42,13 @@ namespace Ogre
 
 	}
 	//-----------------------------------------------------------------------------------
-	void ShaderTemplate::setTemplateFileName(const Ogre::String& templateFileName)
+	void ShaderTemplate::setTemplateFileName(const String& templateFileName)
 	{
 		mTemplateFileName = templateFileName;
 		mHash = 0;
 	}
 	//-----------------------------------------------------------------------------------
-	const Ogre::String& ShaderTemplate::getTemplate()
+	const String& ShaderTemplate::getTemplate()
 	{
 		if (mHash == 0)
 		{
@@ -58,7 +58,7 @@ namespace Ogre
 		return mTemplate; 
 	}
 	//-----------------------------------------------------------------------------------
-	Ogre::uint32 ShaderTemplate::getHash()
+	uint32 ShaderTemplate::getHash()
 	{
 		if (mHash == 0)
 		{
@@ -72,9 +72,9 @@ namespace Ogre
 	{
 		if (mTemplateFileName.empty()) return;
 
-		if (Ogre::ResourceGroupManager::getSingletonPtr()->resourceExists(Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, mTemplateFileName))
+		if (ResourceGroupManager::getSingletonPtr()->resourceExists(ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, mTemplateFileName))
 		{
-			Ogre::DataStreamPtr logoCornersFile = Ogre::ResourceGroupManager::getSingletonPtr()->openResource(mTemplateFileName);
+			DataStreamPtr logoCornersFile = ResourceGroupManager::getSingletonPtr()->openResource(mTemplateFileName);
 			mTemplate = logoCornersFile->getAsString();
 			mHash = calcHash(mTemplate);
 		}

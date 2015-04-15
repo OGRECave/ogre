@@ -40,8 +40,8 @@ namespace Ogre
 			"piece"
 		};
 
-		Ogre::String::const_iterator it = outSubString.begin();
-		Ogre::String::const_iterator en = outSubString.end();
+		String::const_iterator it = outSubString.begin();
+		String::const_iterator en = outSubString.end();
 
 		int nesting = 0;
 
@@ -91,7 +91,7 @@ namespace Ogre
 	{
 		size_t expEnd = evaluateExpressionEnd(outSubString);
 
-		if (expEnd == Ogre::String::npos)
+		if (expEnd == String::npos)
 		{
 			outSyntaxError = true;
 			return false;
@@ -107,15 +107,15 @@ namespace Ogre
 		bool syntaxError = false;
 		bool nextExpressionNegates = false;
 
-		std::vector<Expression*> expressionParents;
+		vector<Expression*>::type expressionParents;
 		ExpressionVec outExpressions;
 		outExpressions.clear();
 		outExpressions.resize(1);
 
 		Expression *currentExpression = &outExpressions.back();
 
-		Ogre::String::const_iterator it = subString.begin();
-		Ogre::String::const_iterator en = subString.end();
+		String::const_iterator it = subString.begin();
+		String::const_iterator en = subString.end();
 
 		while (it != en && !syntaxError)
 		{
@@ -281,8 +281,8 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	size_t ShaderGenerator::evaluateExpressionEnd(const SubStringRef &outSubString)
 	{
-		Ogre::String::const_iterator it = outSubString.begin();
-		Ogre::String::const_iterator en = outSubString.end();
+		String::const_iterator it = outSubString.begin();
+		String::const_iterator en = outSubString.end();
 
 		int nesting = 0;
 
@@ -297,7 +297,7 @@ namespace Ogre
 
 		assert(nesting >= -1);
 
-		size_t retVal = Ogre::String::npos;
+		size_t retVal = String::npos;
 		if (it != en && nesting < 0)
 		{
 			retVal = it - outSubString.begin() - 1;
@@ -311,12 +311,12 @@ namespace Ogre
 		return retVal;
 	}
 	//-----------------------------------------------------------------------------------
-	void ShaderGenerator::evaluateParamArgs(SubStringRef &outSubString, Ogre::StringVector &outArgs,
+	void ShaderGenerator::evaluateParamArgs(SubStringRef &outSubString, StringVector &outArgs,
 		bool &outSyntaxError)
 	{
 		size_t expEnd = evaluateExpressionEnd(outSubString);
 
-		if (expEnd == Ogre::String::npos)
+		if (expEnd == String::npos)
 		{
 			outSyntaxError = true;
 			return;
@@ -332,10 +332,10 @@ namespace Ogre
 		bool syntaxError = false;
 
 		outArgs.clear();
-		outArgs.push_back(Ogre::String());
+		outArgs.push_back(String());
 
-		Ogre::String::const_iterator it = subString.begin();
-		Ogre::String::const_iterator en = subString.end();
+		String::const_iterator it = subString.begin();
+		String::const_iterator en = subString.end();
 
 		while (it != en && !syntaxError)
 		{
@@ -353,7 +353,7 @@ namespace Ogre
 			else if (c == ',')
 			{
 				expressionState = 0;
-				outArgs.push_back(Ogre::String());
+				outArgs.push_back(String());
 			}
 			else
 			{
@@ -379,20 +379,20 @@ namespace Ogre
 		outSyntaxError = syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	void ShaderGenerator::copy(Ogre::String &outBuffer, const SubStringRef &inSubString, size_t length)
+	void ShaderGenerator::copy(String &outBuffer, const SubStringRef &inSubString, size_t length)
 	{
-		Ogre::String::const_iterator itor = inSubString.begin();
-		Ogre::String::const_iterator end = inSubString.begin() + length;
+		String::const_iterator itor = inSubString.begin();
+		String::const_iterator end = inSubString.begin() + length;
 
 		while (itor != end)
 			outBuffer.push_back(*itor++);
 	}
 	//-----------------------------------------------------------------------------------
-	void ShaderGenerator::repeat(Ogre::String &outBuffer, const SubStringRef &inSubString, size_t length,
-		size_t passNum, const Ogre::String &counterVar)
+	void ShaderGenerator::repeat(String &outBuffer, const SubStringRef &inSubString, size_t length,
+		size_t passNum, const String &counterVar)
 	{
-		Ogre::String::const_iterator itor = inSubString.begin();
-		Ogre::String::const_iterator end = inSubString.begin() + length;
+		String::const_iterator itor = inSubString.begin();
+		String::const_iterator end = inSubString.begin() + length;
 
 		while (itor != end)
 		{
@@ -444,22 +444,22 @@ namespace Ogre
 		Operation("pmod", sizeof("@pmod"), &modOp)
 	};
 	//-----------------------------------------------------------------------------------
-	bool ShaderGenerator::parseMath(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties)
+	bool ShaderGenerator::parseMath(const String &inBuffer, String &outBuffer, PropertyMap &properties)
 	{
 		outBuffer.clear();
 		outBuffer.reserve(inBuffer.size());
 
-		Ogre::StringVector argValues;
+		StringVector argValues;
 		SubStringRef subString(&inBuffer, 0);
 
 		size_t pos;
 		pos = subString.find("@");
 		size_t keyword = ~0;
 
-		while (pos != Ogre::String::npos && keyword == (size_t)~0)
+		while (pos != String::npos && keyword == (size_t)~0)
 		{
 			size_t maxSize = subString.findFirstOf(" \t(", pos + 1);
-			maxSize = maxSize == Ogre::String::npos ? subString.getSize() : maxSize;
+			maxSize = maxSize == String::npos ? subString.getSize() : maxSize;
 			SubStringRef keywordStr(&inBuffer, subString.getStart() + pos + 1,
 				subString.getStart() + maxSize);
 
@@ -475,7 +475,7 @@ namespace Ogre
 
 		bool syntaxError = false;
 
-		while (pos != Ogre::String::npos && !syntaxError)
+		while (pos != String::npos && !syntaxError)
 		{
 			//Copy what comes before the block
 			copy(outBuffer, subString, pos);
@@ -498,7 +498,7 @@ namespace Ogre
 				if (argValues.size() == 3)
 					srcProperty = argValues[idx++];
 				op1Value = properties.getProperty(srcProperty);
-				op2Value = Ogre::StringConverter::parseInt(argValues[idx],
+				op2Value = StringConverter::parseInt(argValues[idx],
 					-std::numeric_limits<int>::max());
 
 				if (op2Value == -std::numeric_limits<int>::max())
@@ -528,10 +528,10 @@ namespace Ogre
 			pos = subString.find("@");
 			keyword = ~0;
 
-			while (pos != Ogre::String::npos && keyword == (size_t)~0)
+			while (pos != String::npos && keyword == (size_t)~0)
 			{
 				size_t maxSize = subString.findFirstOf(" \t(", pos + 1);
-				maxSize = maxSize == Ogre::String::npos ? subString.getSize() : maxSize;
+				maxSize = maxSize == String::npos ? subString.getSize() : maxSize;
 				SubStringRef keywordStr(&inBuffer, subString.getStart() + pos + 1,
 					subString.getStart() + maxSize);
 
@@ -551,18 +551,18 @@ namespace Ogre
 		return syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	bool ShaderGenerator::parseForEach(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties)
+	bool ShaderGenerator::parseForEach(const String &inBuffer, String &outBuffer, PropertyMap &properties)
 	{
 		outBuffer.clear();
 		outBuffer.reserve(inBuffer.size());
 
-		Ogre::StringVector argValues;
+		StringVector argValues;
 		SubStringRef subString(&inBuffer, 0);
 		size_t pos = subString.find("@foreach");
 
 		bool syntaxError = false;
 
-		while (pos != Ogre::String::npos && !syntaxError)
+		while (pos != String::npos && !syntaxError)
 		{
 			//Copy what comes before the block
 			copy(outBuffer, subString, pos);
@@ -578,7 +578,7 @@ namespace Ogre
 				char *endPtr;
 
 				// Arg 1 (var)
-				Ogre::String counterVar;
+				String counterVar;
 				counterVar = argValues[0];
 
 				// Agr 2 (start)
@@ -611,7 +611,7 @@ namespace Ogre
 		return syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	bool ShaderGenerator::parseProperties(Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties)
+	bool ShaderGenerator::parseProperties(String &inBuffer, String &outBuffer, PropertyMap &properties)
 	{
 		outBuffer.clear();
 		outBuffer.reserve(inBuffer.size());
@@ -621,7 +621,7 @@ namespace Ogre
 
 		bool syntaxError = false;
 
-		while (pos != Ogre::String::npos && !syntaxError)
+		while (pos != String::npos && !syntaxError)
 		{
 			//Copy what comes before the block
 			copy(outBuffer, subString, pos);
@@ -641,7 +641,7 @@ namespace Ogre
 
 		copy(outBuffer, subString, subString.getSize());
 
-		while (!syntaxError && outBuffer.find("@property") != Ogre::String::npos)
+		while (!syntaxError && outBuffer.find("@property") != String::npos)
 		{
 			inBuffer.swap(outBuffer);
 			syntaxError = parseProperties(inBuffer, outBuffer, properties);
@@ -650,18 +650,18 @@ namespace Ogre
 		return syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	bool ShaderGenerator::collectPieces(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties, PiecesMap& pieces)
+	bool ShaderGenerator::collectPieces(const String &inBuffer, String &outBuffer, PropertyMap &properties, PiecesMap& pieces)
 	{
 		outBuffer.clear();
 		outBuffer.reserve(inBuffer.size());
 
-		Ogre::StringVector argValues;
+		StringVector argValues;
 		SubStringRef subString(&inBuffer, 0);
 		size_t pos = subString.find("@piece");
 
 		bool syntaxError = false;
 
-		while (pos != Ogre::String::npos && !syntaxError)
+		while (pos != String::npos && !syntaxError)
 		{
 			//Copy what comes before the block
 			copy(outBuffer, subString, pos);
@@ -686,7 +686,7 @@ namespace Ogre
 					SubStringRef blockSubString = subString;
 					findBlockEnd(blockSubString, syntaxError);
 
-					Ogre::String tmpBuffer;
+					String tmpBuffer;
 					copy(tmpBuffer, blockSubString, blockSubString.getSize());
 					pieces[pieceName] = tmpBuffer;
 
@@ -707,18 +707,18 @@ namespace Ogre
 		return syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	bool ShaderGenerator::insertPieces(Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties, PiecesMap& pieces)
+	bool ShaderGenerator::insertPieces(String &inBuffer, String &outBuffer, PropertyMap &properties, PiecesMap& pieces)
 	{
 		outBuffer.clear();
 		outBuffer.reserve(inBuffer.size());
 
-		Ogre::StringVector argValues;
+		StringVector argValues;
 		SubStringRef subString(&inBuffer, 0);
 		size_t pos = subString.find("@insertpiece");
 
 		bool syntaxError = false;
 
-		while (pos != Ogre::String::npos && !syntaxError)
+		while (pos != String::npos && !syntaxError)
 		{
 			//Copy what comes before the block
 			copy(outBuffer, subString, pos);
@@ -746,7 +746,7 @@ namespace Ogre
 
 		copy(outBuffer, subString, subString.getSize());
 
-		while (!syntaxError && outBuffer.find("@insertpiece") != Ogre::String::npos)
+		while (!syntaxError && outBuffer.find("@insertpiece") != String::npos)
 		{
 			inBuffer.swap(outBuffer);
 			syntaxError = insertPieces(inBuffer, outBuffer, properties, pieces);
@@ -767,19 +767,19 @@ namespace Ogre
 		Operation("mod", sizeof("@mod"), &modOp)
 	};
 	//-----------------------------------------------------------------------------------
-	bool ShaderGenerator::parseCounter(const Ogre::String &inBuffer, Ogre::String &outBuffer, PropertyMap &properties)
+	bool ShaderGenerator::parseCounter(const String &inBuffer, String &outBuffer, PropertyMap &properties)
 	{
 		outBuffer.clear();
 		outBuffer.reserve(inBuffer.size());
 
-		Ogre::StringVector argValues;
+		StringVector argValues;
 		SubStringRef subString(&inBuffer, 0);
 
 		size_t pos;
 		pos = subString.find("@");
 		size_t keyword = ~0;
 
-		if (pos != Ogre::String::npos)
+		if (pos != String::npos)
 		{
 			size_t maxSize = subString.findFirstOf(" \t(", pos + 1);
 			SubStringRef keywordStr(&inBuffer, subString.getStart() + pos + 1,
@@ -792,12 +792,12 @@ namespace Ogre
 			}
 
 			if (keyword == (size_t)~0)
-				pos = Ogre::String::npos;
+				pos = String::npos;
 		}
 
 		bool syntaxError = false;
 
-		while (pos != Ogre::String::npos && !syntaxError)
+		while (pos != String::npos && !syntaxError)
 		{
 			//Copy what comes before the block
 			copy(outBuffer, subString, pos);
@@ -843,7 +843,7 @@ namespace Ogre
 					if (argValues.size() == 3)
 						srcProperty = argValues[idx++];
 					op1Value = properties.getProperty(srcProperty);
-					op2Value = Ogre::StringConverter::parseInt(argValues[idx],
+					op2Value = StringConverter::parseInt(argValues[idx],
 						-std::numeric_limits<int>::max());
 
 					if (op2Value == -std::numeric_limits<int>::max())
@@ -874,7 +874,7 @@ namespace Ogre
 			pos = subString.find("@");
 			keyword = ~0;
 
-			if (pos != Ogre::String::npos)
+			if (pos != String::npos)
 			{
 				size_t maxSize = subString.findFirstOf(" \t(", pos + 1);
 				SubStringRef keywordStr(&inBuffer, subString.getStart() + pos + 1,
@@ -887,7 +887,7 @@ namespace Ogre
 				}
 
 				if (keyword == (size_t)~0)
-					pos = Ogre::String::npos;
+					pos = String::npos;
 			}
 		}
 
@@ -896,17 +896,17 @@ namespace Ogre
 		return syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	Ogre::String ShaderGenerator::parse(Ogre::String &inBuffer, PropertyMap &properties, Ogre::StringVector& pieceFiles)
+	String ShaderGenerator::parse(String &inBuffer, PropertyMap &properties, StringVector& pieceFiles)
 	{
-		Ogre::String outBuffer;
+		String outBuffer;
 		outBuffer.reserve(inBuffer.size());
 
 		//Collect pieces
-		Ogre::StringVector::iterator itor = pieceFiles.begin();
-		Ogre::StringVector::iterator end = pieceFiles.end();
+		StringVector::iterator itor = pieceFiles.begin();
+		StringVector::iterator end = pieceFiles.end();
 
-		Ogre::String inPiece;
-		Ogre::String outPiece;
+		String inPiece;
+		String outPiece;
 
 		PiecesMap pieces;
 
@@ -931,10 +931,10 @@ namespace Ogre
 		return outBuffer;
 	}
 	//-----------------------------------------------------------------------------------
-	size_t ShaderGenerator::calculateLineCount(const Ogre::String &buffer, size_t idx)
+	size_t ShaderGenerator::calculateLineCount(const String &buffer, size_t idx)
 	{
-		Ogre::String::const_iterator itor = buffer.begin();
-		Ogre::String::const_iterator end = buffer.begin() + idx;
+		String::const_iterator itor = buffer.begin();
+		String::const_iterator end = buffer.begin() + idx;
 
 		size_t lineCount = 0;
 

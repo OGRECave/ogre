@@ -43,30 +43,31 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-	class _OgreHlmsExport HlmsManager : public Ogre::RenderObjectListener, public Ogre::Camera::Listener
+	class _OgreHlmsExport HlmsManager : public PassAlloc, public RenderObjectListener, public SceneManager::Listener
     {
     public:
-		HlmsManager(Ogre::Camera* camera);
+		HlmsManager(SceneManager* sceneManager);
 		virtual ~HlmsManager();
 
-		virtual void cameraPreRenderScene(Ogre::Camera* cam);
-
 		virtual void notifyRenderSingleObject(
-			Ogre::Renderable* rend, 
-			const Ogre::Pass* pass,
-			const Ogre::AutoParamDataSource* source,
-			const Ogre::LightList* pLightList,
+			Renderable* rend, 
+			const Pass* pass,
+			const AutoParamDataSource* source,
+			const LightList* pLightList,
 			bool suppressRenderStateChanges);
 
-		void bind(Ogre::Renderable* rend, HlmsMaterialBase* material);
+		virtual void preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v);
+
+		void bind(Renderable* rend, HlmsMaterialBase* material, String passName);
+		void unbind(Renderable* rend, String passName);
 
 	protected:
-		Ogre::Camera* mCamera;
-		Ogre::SceneManager* mSceneManager;
+		typedef OGRE_HashMap<String, HlmsMaterialBase*> HlmsMatBindingMap;
+		typedef vector<Renderable*>::type RenderableVector;
 
+		SceneManager* mSceneManager;
 		ShaderManager mShaderManager;
-
-		std::map<Ogre::Renderable*, HlmsMaterialBase*> mBindedMaterials;
+		RenderableVector mBindedRenderables;
     };
 }
 

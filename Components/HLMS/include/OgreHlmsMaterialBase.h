@@ -41,7 +41,7 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-	class _OgreHlmsExport HlmsMaterialBase
+	class _OgreHlmsExport HlmsMaterialBase : public PassAlloc
     {
     public:
 		HlmsMaterialBase();
@@ -52,8 +52,16 @@ namespace Ogre
 
 		PropertyMap& getPropertyMap(){ return mPropertyMap; }
 
-		virtual void updatePropertyMap(Ogre::Camera* camera, const Ogre::LightList* pLightList){}
-		virtual void updateUniforms(Ogre::Camera* camera, Ogre::Pass* pass, const Ogre::AutoParamDataSource* source, const Ogre::LightList* pLightList, bool shaderHasChanged) {}
+		// this is called once per frame
+		virtual void updatePropertyMap(Camera* camera, const LightList* pLightList){}
+
+		// this is called once per frame if the shader has changed. (it is guaranteed that there are not texture units in the pass)
+		virtual void createTexturUnits(Pass* pass){}
+
+		// this is called for every renderable before it is renderd with the given pass
+		virtual void updateUniforms(const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) {}
+
+		bool IsDirty = true;
 
 	protected:
 		HlmsDatablock mVertexDatablock;

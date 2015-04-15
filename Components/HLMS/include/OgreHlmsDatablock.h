@@ -41,33 +41,33 @@ namespace Ogre
 	/** \addtogroup Hlms
 	*  @{
 	*/
-	class _OgreHlmsExport HlmsDatablock
+	class _OgreHlmsExport HlmsDatablock : public PassAlloc
 	{
 	public:
-		HlmsDatablock(Ogre::GpuProgramType type, PropertyMap* propertyMap);
+		HlmsDatablock(GpuProgramType type, PropertyMap* propertyMap);
 
 		PropertyMap* getPropertyMap(){ return mPropertyMap; }
 
-		Ogre::GpuProgramType getShaderType(){ return mShaderType; }
-		const Ogre::String& getLanguarge(){ return mLanguarge; }
+		GpuProgramType getShaderType(){ return mShaderType; }
+		const String& getLanguage(){ return mLanguage; }
 		ShaderTemplate* getTemplate();
-		const Ogre::StringVector& getProfileList(){ return mProfilesList; }
+		const StringVector& getProfileList(){ return mProfilesList; }
 
-		void setLanguarge(const Ogre::String& languarge);
-		void setTemplateName(const Ogre::String& tamplateName);
-		void addProfile(const Ogre::String& profile);
+		void setLanguage(const String& language);
+		void setTemplateName(const String& tamplateName);
+		void addProfile(const String& profile);
 
-		Ogre::uint32 getHash();
+		uint32 getHash();
 
 	protected:
 		ShaderTemplate mTemplate;
-		Ogre::String mTamplateName;
-		Ogre::String mLanguarge;
-		Ogre::GpuProgramType mShaderType;
+		String mTamplateName;
+		String mLanguage;
+		GpuProgramType mShaderType;
 		PropertyMap* mPropertyMap;
-		Ogre::StringVector mProfilesList; // vs_2_0, fs_3_0, ...
+		StringVector mProfilesList; // vs_2_0, fs_3_0, ...
 
-		Ogre::uint32 mHash;
+		uint32 mHash;
 
 		void reload();
 	};

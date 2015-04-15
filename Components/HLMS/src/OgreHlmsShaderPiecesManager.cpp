@@ -31,8 +31,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	const String PieceFilePatterns[] = { "piece_vs", "piece_ps", "piece_gs", "piece_hs", "piece_ds" };
+
 	//-----------------------------------------------------------------------------------
-	ShaderPiecesManager::ShaderPiecesManager(const Ogre::String& piecesFolder)
+	ShaderPiecesManager::ShaderPiecesManager(Archive *dataFolder)
+		: mDataFolder(dataFolder)
 	{
 
 	}
@@ -44,15 +47,14 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void ShaderPiecesManager::enumeratePieceFiles(void)
 	{
-		// TODO
-		/*
-		auto stringVectorPtr = mDataFolder->list(false, false);
+		if (!mDataFolder)
+			return; //Some Hlms implementations may not use template files at all
 
-		Ogre::StringVector stringVectorLowerCase(*stringVectorPtr);
-
+		StringVectorPtr stringVectorPtr = mDataFolder->list(false, false);
+		StringVector stringVectorLowerCase(*stringVectorPtr);
 		{
-			Ogre::StringVector::iterator itor = stringVectorLowerCase.begin();
-			Ogre::StringVector::iterator end = stringVectorLowerCase.end();
+			StringVector::iterator itor = stringVectorLowerCase.begin();
+			StringVector::iterator end = stringVectorLowerCase.end();
 			while (itor != end)
 			{
 				std::transform(itor->begin(), itor->end(), itor->begin(), ::tolower);
@@ -60,39 +62,37 @@ namespace Ogre
 			}
 		}
 
-		auto size = sizeof(FilePatterns) / sizeof(*FilePatterns);
-		for (size_t i = 0; i < size; ++i)
+		size_t numShaderTypes = sizeof(PieceFilePatterns) / sizeof(*PieceFilePatterns);
+		for (size_t i = 0; i<numShaderTypes; ++i)
 		{
-			auto itLowerCase = stringVectorLowerCase.begin();
-			auto itor = stringVectorPtr->begin();
-			auto end = stringVectorPtr->end();
+			StringVector::const_iterator itLowerCase = stringVectorLowerCase.begin();
+			StringVector::const_iterator itor = stringVectorPtr->begin();
+			StringVector::const_iterator end = stringVectorPtr->end();
 
 			while (itor != end)
 			{
-				if (itLowerCase->find(FilePatterns[i]) != Ogre::String::npos)
-					mPieceFiles.push_back(*itor);
+				if (itLowerCase->find(PieceFilePatterns[i]) != String::npos)
+				{
+					String outBasename;
+					String outExtention;
+
+					StringUtil::splitBaseFilename(*itor, outBasename, outExtention);
+					if (!outExtention.empty())
+					{
+						mPieceFiles[outExtention].push_back(*itor);
+					}
+				}
 
 				++itLowerCase;
 				++itor;
 			}
 		}
-
-		auto langIt = mPieceFiles.find(languarge);
-		if (langIt != mPieceFiles.end())
-		{
-			return (*langIt).second[shaderType];
-		}*/
 	}
 	//-----------------------------------------------------------------------------------
-	Ogre::StringVector& ShaderPiecesManager::getPieces(Ogre::String languarge, Ogre::GpuProgramType shaderType)
+	StringVector ShaderPiecesManager::getPieces(String language, GpuProgramType shaderType)
 	{
-		std::map<Ogre::String, Ogre::StringVector[5]>::iterator langIt = mPieceFiles.find(languarge);
-		if (langIt != mPieceFiles.end())
-		{
-			return (*langIt).second[shaderType];
-		}
-
-		return mDefaultStringVector;
+		//TODO Finish impl.
+		return StringVector();
 	}
 	//-----------------------------------------------------------------------------------
 }
