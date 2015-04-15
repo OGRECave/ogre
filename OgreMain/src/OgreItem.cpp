@@ -138,16 +138,12 @@ namespace Ogre {
         mRenderables.clear();
 
         // If mesh is skeletally animated: destroy instance
-        if( mSkeletonInstance && mManager )
+        assert( mManager || !mSkeletonInstance );
+        if (mSkeletonInstance)
         {
             mManager->destroySkeletonInstance( mSkeletonInstance );
+            mSkeletonInstance = 0;
         }
-        else
-        {
-            OGRE_DELETE mSkeletonInstance;
-        }
-
-        mSkeletonInstance = 0;
 
         mInitialised = false;
     }
