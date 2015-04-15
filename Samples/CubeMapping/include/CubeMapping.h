@@ -56,7 +56,7 @@ public:
         return SdkSample::frameRenderingQueued(evt);      // don't forget the parent updates!
     }
 
-    virtual void workspacePreUpdate(void)
+    virtual void workspacePreUpdate( CompositorWorkspace* )
     {
         /** CompositorWorkspaceListener::workspacePreUpdate is the best place to update other (manual)
             Workspaces for multiple reasons:
