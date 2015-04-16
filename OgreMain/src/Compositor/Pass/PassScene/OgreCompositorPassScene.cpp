@@ -131,8 +131,9 @@ namespace Ogre
         }
 
         //Passes belonging to a ShadowNode should not override their parent.
+        CompositorShadowNode* shadowNode = ( mShadowNode && mShadowNode->getEnabled() ) ? mShadowNode : 0;
         if( mDefinition->mShadowNodeRecalculation != SHADOW_NODE_CASTER_PASS )
-            sceneManager->_setCurrentShadowNode( mShadowNode );
+            sceneManager->_setCurrentShadowNode( shadowNode );
 
         mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
 
@@ -144,17 +145,17 @@ namespace Ogre
         mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
                                              mDefinition->mFirstRQ, mDefinition->mLastRQ );
 
-        if( mShadowNode && mUpdateShadowNode )
+        if( mUpdateShadowNode && shadowNode )
         {
             //We need to prepare for rendering another RT (we broke the contiguous chain)
             mTarget->_endUpdate();
 
             sceneManager->_swapVisibleObjectsForShadowMapping();
-            mShadowNode->_update( mCamera, usedLodCamera, sceneManager );
+            shadowNode->_update( mCamera, usedLodCamera, sceneManager );
             sceneManager->_swapVisibleObjectsForShadowMapping();
 
             //ShadowNode passes may've overriden this setting.
-            sceneManager->_setCurrentShadowNode( mShadowNode );
+            sceneManager->_setCurrentShadowNode( shadowNode );
 
             //We need to restore the previous RT's update
             mTarget->_beginUpdate();
