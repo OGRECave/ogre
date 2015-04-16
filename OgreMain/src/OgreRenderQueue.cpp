@@ -421,8 +421,8 @@ namespace Ogre
             }
             else if( numNeededDraws > 0 /*&& mRenderQueues[i].mMode == FAST*/ )
             {
-                renderGL3( casterPass, dualParaboloid, passCache, mRenderQueues[i],
-                           indirectBuffer, indirectDraw, startIndirectDraw );
+                indirectDraw = renderGL3( casterPass, dualParaboloid, passCache, mRenderQueues[i],
+                                          indirectBuffer, indirectDraw, startIndirectDraw );
             }
         }
 
@@ -522,11 +522,11 @@ namespace Ogre
         mLastTextureHash    = lastTextureHash;
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::renderGL3( bool casterPass, bool dualParaboloid, HlmsCache passCache[],
-                                 const RenderQueueGroup &renderQueueGroup,
-                                 IndirectBufferPacked *indirectBuffer,
-                                 unsigned char *indirectDraw,
-                                 unsigned char *startIndirectDraw )
+    unsigned char* RenderQueue::renderGL3( bool casterPass, bool dualParaboloid, HlmsCache passCache[],
+                                           const RenderQueueGroup &renderQueueGroup,
+                                           IndirectBufferPacked *indirectBuffer,
+                                           unsigned char *indirectDraw,
+                                           unsigned char *startIndirectDraw )
     {
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
@@ -671,6 +671,8 @@ namespace Ogre
         mLastVertexData     = 0;
         mLastIndexData      = 0;
         mLastTextureHash    = 0;
+
+        return indirectDraw;
     }
     //-----------------------------------------------------------------------
     void RenderQueue::renderGL3V1( bool casterPass, bool dualParaboloid,
