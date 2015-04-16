@@ -40,19 +40,18 @@ namespace Ogre
                                           v1::RenderOperation::OperationType operationType ) :
             mVaoName( vaoName ),
             mRenderQueueId( renderQueueId ),
-            mFaceCount( 0 ),
+            mPrimStart( 0 ),
+            mPrimCount( 0 ),
             mVertexBuffers( vertexBuffers ),
             mIndexBuffer( indexBuffer ),
             mOperationType( operationType )
     {
-        size_t val;
-
         if( mIndexBuffer )
-            val = mIndexBuffer->getNumElements();
+            mPrimCount = mIndexBuffer->getNumElements();
         else
-            val = mVertexBuffers[0]->getNumElements();
+            mPrimCount = mVertexBuffers[0]->getNumElements();
 
-        switch( mOperationType )
+        /*switch( mOperationType )
         {
         case v1::RenderOperation::OT_TRIANGLE_LIST:
             mFaceCount = (val / 3);
@@ -63,6 +62,34 @@ namespace Ogre
             break;
         default:
             break;
+        }*/
+    }
+    //-----------------------------------------------------------------------------------
+    void VertexArrayObject::setPrimitiveRange( uint32 primStart, uint32 primCount )
+    {
+        size_t limit;
+        if( mIndexBuffer )
+            limit = mIndexBuffer->getNumElements();
+        else
+            limit = mVertexBuffers[0]->getNumElements();
+
+        if( primStart > limit )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "primStart must be less or equal than " +
+                         StringConverter::toString( limit ),
+                         "VertexArrayObject::setPrimitiveRange" );
         }
+
+        if( primStart + primCount > limit )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "primStart + primCount must be less or equal than " +
+                         StringConverter::toString( limit ),
+                         "VertexArrayObject::setPrimitiveRange" );
+        }
+
+        mPrimStart = primStart;
+        mPrimCount = primCount;
     }
 }

@@ -631,9 +631,10 @@ namespace Ogre
                     indirectDraw += sizeof( CbDrawIndexed );
 
                     drawCountPtr = drawIndexedPtr;
-                    drawIndexedPtr->primCount       = vao->mIndexBuffer->getNumElements();
+                    drawIndexedPtr->primCount       = vao->mPrimCount;
                     drawIndexedPtr->instanceCount   = 1;
-                    drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart();
+                    drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart() +
+                                                                                    vao->mPrimStart;
                     drawIndexedPtr->baseVertex      = vao->mVertexBuffers[0]->_getFinalBufferStart();
                     drawIndexedPtr->baseInstance    = baseInstance;
 
@@ -645,9 +646,10 @@ namespace Ogre
                     indirectDraw += sizeof( CbDrawStrip );
 
                     drawCountPtr = drawStripPtr;
-                    drawStripPtr->primCount         = vao->mVertexBuffers[0]->getNumElements();
+                    drawStripPtr->primCount         = vao->mPrimCount;
                     drawStripPtr->instanceCount     = 1;
-                    drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart();
+                    drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart() +
+                                                                                        vao->mPrimStart;
                     drawStripPtr->baseInstance      = baseInstance;
 
                     instanceCount = 1;
