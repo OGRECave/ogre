@@ -221,7 +221,7 @@ float4 main( PS_INPUT inPs
         fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= passBuf.pssmSplitPoints@value(CurrentShadowMap) )
         fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps )
+@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
     float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end
 
