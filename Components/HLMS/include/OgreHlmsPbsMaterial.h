@@ -34,6 +34,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+
+#	define PBS_MAX_LIGHT_COUNT 10
+
 	/** \addtogroup Component
 	*  @{
 	*/
@@ -209,12 +212,12 @@ namespace Ogre
 		bool _hasSamplerListChanged;
 		bool _hasSamplerChanged;
 
-		static const uint32 maxLightCount = 10;
+		static const uint32 maxLightCount;
 
-		float mLightPositions_es[maxLightCount * 3];
-		float mLightDirections_es[maxLightCount * 3];
-		float mLightColors[maxLightCount * 3];
-		float mLightParameters[maxLightCount * 3];
+		float mLightPositions_es[PBS_MAX_LIGHT_COUNT * 3];
+		float mLightDirections_es[PBS_MAX_LIGHT_COUNT * 3];
+		float mLightColors[PBS_MAX_LIGHT_COUNT * 3];
+		float mLightParameters[PBS_MAX_LIGHT_COUNT * 3];
 
 		void setTexture(SamplerType samplerType, TexturePtr tex, TextureAddressing uTextureAddr,
 			float blendFactor1 = 0, float blendFactor2 = 0, BlendFunction blendFunc = BF_ALPHA, float intensityFactor = 1.0);

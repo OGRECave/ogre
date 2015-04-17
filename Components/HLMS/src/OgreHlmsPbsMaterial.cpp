@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+	const uint32 PbsMaterial::maxLightCount = PBS_MAX_LIGHT_COUNT;
 	//-----------------------------------------------------------------------------------
 	PbsMaterial::PbsMaterial() : mAlbedo(1, 1, 1, 0), mF0(0.1f, 0.1f, 0.1f, 1.0f), mRoughness(0.1f),
 	/*header initial values*/	mMainUvSetIndex(0), mD1UvSetIndex(0), mD2UvSetIndex(0), _hasSamplerListChanged(false), 
@@ -208,7 +209,7 @@ namespace Ogre
 			int registerIndex = 0;
 			for (int i = 0; i < ST_COUNT; i++)
 			{
-				SamplerContainer s = _samplers[i];
+				SamplerContainer& s = _samplers[i];
 
 				if (s.status == SS_ACTIVE || s.status == SS_ADDED || s.status == SS_UPDATED)
 				{
@@ -230,7 +231,7 @@ namespace Ogre
 		{
 			for (int i = 0; i < ST_COUNT; i++)
 			{
-				SamplerContainer s = _samplers[i];
+				SamplerContainer& s = _samplers[i];
 
 				if (s.hasBlendFunc)
 				{
@@ -348,7 +349,7 @@ namespace Ogre
 		{
 			for (int i = 0; i < ST_COUNT; i++)
 			{
-				SamplerContainer s = _samplers[i];
+				SamplerContainer& s = _samplers[i];
 				if (s.status == SS_UPDATED)
 				{
 					updateTexturUnits(s.textureUnitState, fragmentParams, s, i);
@@ -398,7 +399,7 @@ namespace Ogre
 	void PbsMaterial::setTexture(SamplerType samplerType, TexturePtr tex, TextureAddressing textureAddr,
 		float blendFactor1, float blendFactor2, BlendFunction blendFunc, float intensityFactor)
 	{
-		SamplerContainer s = _samplers[samplerType];
+		SamplerContainer& s = _samplers[samplerType];
 		if (s.status == SS_ACTIVE && tex == s.tex && s.blendFunc == blendFunc && s.blendFactor1 == blendFactor1 && s.blendFactor2 == blendFactor2 &&
 			s.intensity == intensityFactor && s.textureAddressing == textureAddr)
 			return;
