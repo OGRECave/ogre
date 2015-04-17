@@ -72,6 +72,10 @@ namespace Ogre
 		{
 			language = "glsl";
 		}
+		else 
+		{
+			language = "glsles";
+		}
 
 		mVertexDatablock.setLanguage(language);
 		mFragmentDatablock.setLanguage(language);
