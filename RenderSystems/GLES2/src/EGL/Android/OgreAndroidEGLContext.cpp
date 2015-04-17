@@ -45,4 +45,17 @@ namespace Ogre {
     {
         return new AndroidEGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable);
     }
+
+    void AndroidEGLContext::_updateInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable)
+    {
+        mDrawable = drawable;
+        mConfig = glconfig;
+        mEglDisplay = eglDisplay;
+
+        setCurrent();
+
+        // Initialise GL3W
+        if (gleswInit())
+            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
+    }
 }

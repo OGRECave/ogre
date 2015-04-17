@@ -51,6 +51,7 @@ namespace Ogre {
         uint mMaxStencilSize;
         uint mMSAA;
         uint mCSAA;
+        bool preserveContext;
         
     protected:
         virtual EGLContext * createEGLContext() const;

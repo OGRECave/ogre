@@ -309,6 +309,7 @@ namespace OgreBites
                             Ogre::NameValuePairList opt;
                             opt["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(app->window));
                             opt["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(config));
+                            opt["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
                             
                             mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
                             

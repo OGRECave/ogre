@@ -40,6 +40,8 @@ namespace Ogre {
         
         virtual ~AndroidEGLContext();
         GLES2Context* clone() const;
+
+        void _updateInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable);
     };
 }
 
