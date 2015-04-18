@@ -207,6 +207,7 @@ namespace Ogre
         static const IdString BlendModeIndex15;
 
         static const IdString OutUvCount;
+        static const IdString OutUvHalfCount;
 
         struct DiffuseMapPtr
         {

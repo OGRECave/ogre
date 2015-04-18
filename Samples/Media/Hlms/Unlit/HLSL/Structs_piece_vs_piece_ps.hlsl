@@ -51,8 +51,8 @@ cbuffer instance : register(b2)
 	@property( !hlms_shadowcaster )
 		nointerpolation uint drawId	: TEXCOORD@counter(texcoord);
 		@property( hlms_colour )float4 colour	: TEXCOORD@counter(texcoord);@end
-		@foreach( out_uv_count, n )
-			float@value( out_uv_count@n ) uv@n	: TEXCOORD@counter(texcoord);@end
+		@foreach( out_uv_half_count, n )
+			float@value( out_uv_half_count@n ) uv@n	: TEXCOORD@counter(texcoord);@end
 	@end
 	@property( hlms_shadowcaster )	float depth	: TEXCOORD@counter(texcoord);@end
 @end
