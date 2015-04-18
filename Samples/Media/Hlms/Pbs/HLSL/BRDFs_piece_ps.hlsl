@@ -42,8 +42,8 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
 	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
 
-	return NdotL * (material.kS.xyz * lightSpecular * Rs @insertpiece( MulSpecularMapValue ) +
-					material.kD.xyz * lightDiffuse * fresnelD @insertpiece( MulDiffuseMapValue ));
+	return NdotL * (@insertpiece( kS ).xyz * lightSpecular * Rs +
+					@insertpiece( kD ).xyz * lightDiffuse * fresnelD);
 }
 @end
 @end
@@ -84,7 +84,7 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
 
 	//We should divide Rs by PI, but it was done inside G for performance
-	float3 Rs = ( fresnelS * (R * G) ) * material.kS.xyz * lightSpecular @insertpiece( MulSpecularMapValue );
+	float3 Rs = ( fresnelS * (R * G) ) * @insertpiece( kS ).xyz * lightSpecular;
 
 	//Diffuse BRDF (*Normalized* Disney, see course_notes_moving_frostbite_to_pbr.pdf
 	//"Moving Frostbite to Physically Based Rendering" Sebastien Lagarde & Charles de Rousiers)
@@ -100,7 +100,7 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 	@insertpiece( FresnelType ) fresnelD = 1.0 - fresnelS;@end
 
 	//We should divide Rd by PI, but it is already included in kD
-	float3 Rd = (lightScatter * viewScatter * fresnelD) * material.kD.xyz * lightDiffuse @insertpiece( MulDiffuseMapValue );
+	float3 Rd = (lightScatter * viewScatter * fresnelD) * @insertpiece( kD ).xyz * lightDiffuse;
 
 	return NdotL * (Rs + Rd);
 }
@@ -113,9 +113,9 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
 
 	@property( !fresnel_separate_diffuse )
-		finalColour += lerp( envColourD * material.kD.xyz, envColourS * material.kS.xyz, fresnelS );
+		finalColour += lerp( envColourD * @insertpiece( kD ).xyz, envColourS * @insertpiece( kS ).xyz, fresnelS );
 	@end @property( fresnel_separate_diffuse )
 		@insertpiece( FresnelType ) fresnelD = 1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle );
-		finalColour += envColourD * material.kD.xyz + envColourS * material.kS.xyz * fresnelS;
+		finalColour += envColourD * @insertpiece( kD ).xyz + envColourS * @insertpiece( kS ).xyz * fresnelS;
 	@end
 @end

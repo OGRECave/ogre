@@ -4,12 +4,17 @@
 @end
 
 @property( diffuse_map || detail_maps_diffuse )
-    @piece( MulDiffuseMapValue )* diffuseCol.xyz@end
+    //diffuseCol is multiplied against material.kD in PixelShader_ps as it is influenced by the detail maps.
+    @piece( kD )diffuseCol@end
+@end @property( !diffuse_map && !detail_maps_diffuse )
+    @piece( kD )material.kD@end
 @end
 
 @property( specular_map )
-	@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz;@end
-	@piece( MulSpecularMapValue )* specularCol@end
+	@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz * material.kS.xyz;@end
+	@piece( kS )specularCol@end
+@end @property( !specular_map )
+	@piece( kS )material.kS.xyz@end
 @end
 
 @property( roughness_map )

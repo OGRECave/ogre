@@ -296,6 +296,8 @@ void main()
 @foreach( detail_maps_diffuse, n )
 	@insertpiece( blend_mode_idx@n ) @end
 
+@property( diffuse_map || detail_maps_diffuse )	diffuseCol.xyz *= material.kD.xyz;@end
+
 @property( normal_map_tex )
 	@piece( detail_nm_op_sum )+=@end
 	@piece( detail_nm_op_mul )*=@end
