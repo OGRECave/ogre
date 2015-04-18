@@ -462,6 +462,9 @@ namespace Ogre {
             planes[i].signFlip.setToSign();
             planes[i].planeNegD = Mathlib::SetAll( -frustumPlanes[i].d );
         }
+        
+        const ArrayMaskR ignoreRenderingDistance = CastIntToReal(
+                    Mathlib::SetAll( lodCamera->getUseRenderingDistance() ? 0 : 0xffffffff ) );
 
         //TODO: Profile whether we should use XOR to flip the sign or simple multiplication.
         //In theory xor is faster, but some archs have a penalty for switching between integer
@@ -518,8 +521,10 @@ namespace Ogre {
                                 mask );
 
             ArrayReal distance = lodCameraPos.distance( objData.mWorldAabb->mCenter );
-            mask = Mathlib::And( Mathlib::Or( mask, tmpMask ),
-                                 Mathlib::CompareLessEqual( distance, *worldRadius + *upperDistance ) );
+            ArrayMaskR isCloseEnough = Mathlib::CompareLessEqual( distance, *worldRadius + *upperDistance );
+            isCloseEnough = Mathlib::Or( ignoreRenderingDistance, isCloseEnough );
+
+            mask = Mathlib::And( Mathlib::Or( mask, tmpMask ), isCloseEnough );
 
             //isVisible = isVisible() && (isCaster || includeNonCasters)
             ArrayMaskI isVisible = Mathlib::And(
