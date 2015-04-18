@@ -226,24 +226,27 @@ namespace Ogre
         UnlitBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
         UnlitBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();
 
-        int numTextures = 0;
-        int numArrayTextures = 0;
-        while( itor != end )
+        if( !getProperty( HlmsBaseProp::ShadowCaster ) )
         {
-            if( itor->texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+            int numTextures = 0;
+            int numArrayTextures = 0;
+            while( itor != end )
             {
-                psParams->setNamedConstant( "textureMapsArray[" +
-                                            StringConverter::toString( numArrayTextures++ ) + "]",
-                                            texUnit++ );
-            }
-            else
-            {
-                psParams->setNamedConstant( "textureMaps[" +
-                                            StringConverter::toString( numTextures++ ) + "]",
-                                            texUnit++ );
-            }
+                if( itor->texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+                {
+                    psParams->setNamedConstant( "textureMapsArray[" +
+                                                StringConverter::toString( numArrayTextures++ ) + "]",
+                                                texUnit++ );
+                }
+                else
+                {
+                    psParams->setNamedConstant( "textureMaps[" +
+                                                StringConverter::toString( numTextures++ ) + "]",
+                                                texUnit++ );
+                }
 
-            ++itor;
+                ++itor;
+            }
         }
 
         vsParams->setNamedConstant( "worldMatBuf", 0 );
