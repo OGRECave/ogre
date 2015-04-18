@@ -368,15 +368,6 @@ void SceneManager::destroyCamera(Camera *cam)
 
     checkMovableObjectIntegrity( mCameras, cam );
 
-    // Find in list
-    CameraList::iterator itor = mCameras.begin() + cam->mGlobalIndex;
-
-    IdString camName( cam->getName() );
-
-    itor = efficientVectorRemove( mCameras, itor );
-    OGRE_DELETE cam;
-    cam = 0;
-
     {
         FrustumVec::iterator it = std::find( mVisibleCameras.begin(), mVisibleCameras.end(), cam );
         if( it != mVisibleCameras.end() )
@@ -386,6 +377,14 @@ void SceneManager::destroyCamera(Camera *cam)
         if( it != mCubeMapCameras.end() )
             efficientVectorRemove( mCubeMapCameras, it );
     }
+
+    IdString camName( cam->getName() );
+
+    // Find in list
+    CameraList::iterator itor = mCameras.begin() + cam->mGlobalIndex;
+    itor = efficientVectorRemove( mCameras, itor );
+    OGRE_DELETE cam;
+    cam = 0;
 
     //The node that was at the end got swapped and has now a different index
     if( itor != mCameras.end() )
