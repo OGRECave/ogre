@@ -204,7 +204,11 @@ namespace Ogre {
                 //Queries must be performed after all bounds have been updated
                 //(i.e. SceneManager::updateSceneGraph does this for you), and don't
                 //move the objects between that call and this query.
-                assert( !objData.mOwner[j]->isCachedAabbOutOfDate() &&
+                //Ignore out of date Aabbs from objects that have been
+                //explicitly disabled or fail the query mask.
+                assert( (objData.mVisibilityFlags[objData.mIndex] & VisibilityFlags::LAYER_VISIBILITY) &&
+                        (objData.mQueryFlags[objData.mIndex] & mQueryMask) &&
+                        !objData.mOwner[j]->isCachedAabbOutOfDate() &&
                         "Perform the queries after MovableObject::updateAllBounds has been called!" );
 #endif
             }
@@ -341,7 +345,11 @@ namespace Ogre {
                 //Queries must be performed after all bounds have been updated
                 //(i.e. SceneManager::updateSceneGraph does this for you), and don't
                 //move the objects between that call and this query.
-                assert( !objData.mOwner[j]->isCachedAabbOutOfDate() &&
+                //Ignore out of date Aabbs from objects that have been
+                //explicitly disabled or fail the query mask.
+                assert( (objData.mVisibilityFlags[objData.mIndex] & VisibilityFlags::LAYER_VISIBILITY) &&
+                        (objData.mQueryFlags[objData.mIndex] & mQueryMask) &&
+                        !objData.mOwner[j]->isCachedAabbOutOfDate() &&
                         "Perform the queries after MovableObject::updateAllBounds has been called!" );
 #endif
             }
@@ -430,7 +438,11 @@ namespace Ogre {
                 //Queries must be performed after all bounds have been updated
                 //(i.e. SceneManager::updateSceneGraph does this for you), and don't
                 //move the objects between that call and this query.
-                assert( !objData.mOwner[j]->isCachedAabbOutOfDate() &&
+                //Ignore out of date Aabbs from objects that have been
+                //explicitly disabled or fail the query mask.
+                assert( (objData.mVisibilityFlags[objData.mIndex] & VisibilityFlags::LAYER_VISIBILITY) &&
+                        (objData.mQueryFlags[objData.mIndex] & mQueryMask) &&
+                        !objData.mOwner[j]->isCachedAabbOutOfDate() &&
                         "Perform the queries after MovableObject::updateAllBounds has been called!" );
 #endif
             }
