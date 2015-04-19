@@ -32,9 +32,12 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreViewport.h"
 
 #include "OgreGLESPixelFormat.h"
 #include "OgreGLESRenderSystem.h"
+
+#include <iomanip>  
 
 namespace Ogre {
     EAGLWindow::EAGLWindow(EAGLSupport *glsupport)
