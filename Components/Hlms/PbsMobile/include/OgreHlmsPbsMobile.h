@@ -79,7 +79,7 @@ namespace Ogre
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
 
     public:
-        HlmsPbsMobile( Archive *dataFolder );
+        HlmsPbsMobile( Archive *dataFolder, ArchiveVec *libraryFolders );
         ~HlmsPbsMobile();
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,

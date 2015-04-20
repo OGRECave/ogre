@@ -160,8 +160,8 @@ namespace Ogre
         { &UnlitProperty::UvDiffuse15, &UnlitProperty::UvDiffuseSwizzle15, &UnlitProperty::BlendModeIndex15 },
     };
 
-    HlmsUnlit::HlmsUnlit( Archive *dataFolder ) :
-        HlmsBufferManager( HLMS_UNLIT, "unlit", dataFolder ),
+    HlmsUnlit::HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders ) :
+        HlmsBufferManager( HLMS_UNLIT, "unlit", dataFolder, libraryFolders ),
         ConstBufferPool( HlmsUnlitDatablock::MaterialSizeInGpuAligned,
                          ExtraBufferParams( 64 * NUM_UNLIT_TEXTURE_TYPES ) ),
         mCurrentPassBuffer( 0 ),

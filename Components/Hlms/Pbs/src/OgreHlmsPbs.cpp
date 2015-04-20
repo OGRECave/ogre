@@ -193,8 +193,8 @@ namespace Ogre
 
     extern const String c_pbsBlendModes[];
 
-    HlmsPbs::HlmsPbs( Archive *dataFolder ) :
-        HlmsBufferManager( HLMS_PBS, "pbs", dataFolder ),
+    HlmsPbs::HlmsPbs( Archive *dataFolder, ArchiveVec *libraryFolders ) :
+        HlmsBufferManager( HLMS_PBS, "pbs", dataFolder, libraryFolders ),
         ConstBufferPool( HlmsPbsDatablock::MaterialSizeInGpuAligned,
                          ConstBufferPool::ExtraBufferParams() ),
         mShadowmapSamplerblock( 0 ),

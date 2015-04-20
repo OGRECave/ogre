@@ -107,8 +107,16 @@ namespace Ogre
         HlmsPropertyVec mSetProperties;
         PiecesMap       mPieces;
 
+        struct Library
+        {
+            Archive         *dataFolder;
+            StringVector    pieceFiles[NumShaderTypes];
+        };
+
+        typedef vector<Library>::type LibraryVec;
+        LibraryVec      mLibrary;
         Archive         *mDataFolder;
-        StringVector    mPieceFiles[5];
+        StringVector    mPieceFiles[NumShaderTypes];
         HlmsManager     *mHlmsManager;
 
         LightGatheringMode  mLightGatheringMode;
@@ -145,6 +153,7 @@ namespace Ogre
             Case insensitive.
         */
         void enumeratePieceFiles(void);
+        static void enumeratePieceFiles( Archive *dataFolder, StringVector *pieceFiles );
 
         void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
@@ -227,6 +236,8 @@ namespace Ogre
         const HlmsCache* getShaderCache( uint32 hash ) const;
         void clearShaderCache(void);
 
+        void processPieces( Archive *archive, const StringVector &pieceFiles );
+
         /** Creates a shader based on input parameters. Caller is responsible for ensuring
             this shader hasn't already been created.
             Shader template files will be processed and then compiled.
@@ -270,7 +281,13 @@ namespace Ogre
                                        SceneManager *sceneManager );
 
     public:
-        Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder );
+        /**
+        @param libraryFolders
+            Path to folders to be processed first for collecting pieces. Will be processed in order.
+            Pointer can be null.
+        */
+        Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder,
+              ArchiveVec *libraryFolders );
         virtual ~Hlms();
 
         HlmsTypes getType(void) const                       { return mType; }
@@ -305,8 +322,13 @@ namespace Ogre
         @par
             Existing datablock materials won't be reloaded from files, so their properties
             won't change (i.e. changed from blue to red), but the shaders will.
+        @param libraryFolders
+            When null pointer, the library folders paths won't be changed at all
+            (but still will be reloaded).
+            When non-null pointer, the library folders will be overwriten.
+            Pass an empty container if you want to stop using libraries.
         */
-        virtual void reloadFrom( Archive *newDataFolder );
+        virtual void reloadFrom( Archive *newDataFolder, ArchiveVec *libraryFolders=0 );
 
         Archive* getDataFolder(void)                        { return mDataFolder; }
 

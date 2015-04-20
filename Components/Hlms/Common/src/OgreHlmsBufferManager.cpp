@@ -40,8 +40,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    HlmsBufferManager::HlmsBufferManager( HlmsTypes type, IdString typeName, Archive *dataFolder ) :
-        Hlms( type, typeName, dataFolder ),
+    HlmsBufferManager::HlmsBufferManager( HlmsTypes type, IdString typeName, Archive *dataFolder,
+                                          ArchiveVec *libraryFolders ) :
+        Hlms( type, typeName, dataFolder, libraryFolders ),
         mVaoManager( 0 ),
         mCurrentConstBuffer( 0 ),
         mCurrentTexBuffer( 0 ),

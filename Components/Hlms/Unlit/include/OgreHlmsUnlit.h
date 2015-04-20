@@ -93,7 +93,7 @@ namespace Ogre
                                            CommandBuffer *commandBuffer, bool isV1 );
 
     public:
-        HlmsUnlit( Archive *dataFolder );
+        HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders );
         ~HlmsUnlit();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );

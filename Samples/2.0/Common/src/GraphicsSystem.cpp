@@ -420,17 +420,24 @@ std::string macBundlePath()
         if( mRoot->getRenderSystem()->getName() == "Direct3D11 Rendering Subsystem" )
             shaderSyntax = "HLSL";
 
+        Ogre::Archive *archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(
+                        dataFolder + "Hlms/Common/" + shaderSyntax,
+                        "FileSystem", true );
+
+        Ogre::ArchiveVec library;
+        library.push_back( archiveLibrary );
+
         Ogre::Archive *archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Unlit/" + shaderSyntax,
                         "FileSystem", true );
 
-        Ogre::HlmsUnlit *hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit );
+        Ogre::HlmsUnlit *hlmsUnlit = OGRE_NEW Ogre::HlmsUnlit( archiveUnlit, &library );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsUnlit );
 
         Ogre::Archive *archivePbs = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Pbs/" + shaderSyntax,
                         "FileSystem", true );
-        Ogre::HlmsPbs *hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs );
+        Ogre::HlmsPbs *hlmsPbs = OGRE_NEW Ogre::HlmsPbs( archivePbs, &library );
         Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsPbs );
     }
     //-----------------------------------------------------------------------------------

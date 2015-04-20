@@ -121,7 +121,7 @@ namespace Ogre
                                            CommandBuffer *commandBuffer, bool isV1 );
 
     public:
-        HlmsPbs( Archive *dataFolder );
+        HlmsPbs( Archive *dataFolder, ArchiveVec *libraryFolders );
         ~HlmsPbs();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
