@@ -603,15 +603,15 @@ namespace Ogre
                 {
                     assert(_getRenderFormat() == _getSwapChainFormat());
                     mDevice.GetImmediateContext()->ResolveSubresource(swapChainBackBuffer, 0, mpBackBuffer, 0, _getRenderFormat());
-                }
-                else
+				}
+				else
                 {
                     assert(mpBackBufferNoMSAA);
                     mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, _getRenderFormat());
                     mDevice.GetImmediateContext()->CopyResource(swapChainBackBuffer, mpBackBufferNoMSAA);
                 }
                 SAFE_RELEASE(swapChainBackBuffer);
-            }
+			}
 
             // flip presentation model swap chains have another semantic for first parameter
             UINT syncInterval = mUseFlipSequentialMode ? std::max(1U, mVSyncInterval) : (mVSync ? mVSyncInterval : 0);
@@ -1478,6 +1478,14 @@ namespace Ogre
 
         // Create back buffer, maybe with FSAA
         HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+        if(FAILED(hr) && mFSAAType.Count > 1)
+        {
+            // Second chance - try without FSAA, keep mFSAAType synchronized.
+            LogManager::getSingleton().logMessage("Unable to Create MSAA Back Buffer, retry without MSAA support");
+            desc.SampleDesc.Count = mFSAAType.Count = 1;
+            desc.SampleDesc.Quality = mFSAAType.Quality = 0;
+            hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+        }
         if( FAILED(hr) )
         {
             OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
@@ -1555,8 +1563,8 @@ namespace Ogre
         // resolve multi-sample texture into single-sample texture if needed
         if(mpBackBufferNoMSAA)
         {
-            mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, _getRenderFormat());
-            mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBufferNoMSAA, 0, NULL, 0);
+		mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, _getRenderFormat());
+		mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBufferNoMSAA, 0, NULL, 0);
         }
         else
             mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBuffer, 0, NULL, 0);

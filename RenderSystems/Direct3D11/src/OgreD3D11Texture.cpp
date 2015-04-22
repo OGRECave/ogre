@@ -822,7 +822,7 @@ namespace Ogre
         {   
             // Create new list of surfaces
             mSurfaceList.clear();
-            PixelFormat format = D3D11Mappings::_getClosestSupportedPF(mSrcFormat);
+            PixelFormat format = D3D11Mappings::_getClosestSupportedPF(mFormat);
             size_t depth = mDepth;
 
             for(size_t face=0; face<getNumFaces(); ++face)

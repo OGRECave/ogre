@@ -492,6 +492,7 @@ namespace Ogre {
             radiusSqr = std::max<Real>(radiusSqr, pos.squaredLength());
         }
         outRadius = std::sqrt(radiusSqr);
+        vbuf->unlock();
     }
     //-----------------------------------------------------------------------
     void Mesh::setSkeletonName(const String& skelName)
