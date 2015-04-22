@@ -75,9 +75,9 @@ namespace Ogre
 			++it;
 		}
 
-		assert(nesting >= -1);
+		assert(nesting == -1);
 
-		if (it != en && nesting < 0)
+		if (nesting == -1)
 			outSubString.setEnd(it - outSubString.getOriginalBuffer().begin() - sizeof("end"));
 		else
 		{
@@ -896,27 +896,30 @@ namespace Ogre
 		return syntaxError;
 	}
 	//-----------------------------------------------------------------------------------
-	String ShaderGenerator::parse(String &inBuffer, PropertyMap &properties, StringVector& pieceFiles)
+	String ShaderGenerator::parse(String &inBuffer, PropertyMap &properties, StringVectorPtr pieceFiles)
 	{
 		String outBuffer;
 		outBuffer.reserve(inBuffer.size());
 
-		//Collect pieces
-		StringVector::iterator itor = pieceFiles.begin();
-		StringVector::iterator end = pieceFiles.end();
-
-		String inPiece;
-		String outPiece;
-
 		PiecesMap pieces;
 
-		while (itor != end)
+		if (!pieceFiles.isNull())
 		{
-			parseMath(*itor, inPiece, properties);
-			parseForEach(inPiece, outPiece, properties);
-			parseProperties(outPiece, inPiece, properties);
-			collectPieces(inPiece, outPiece, properties, pieces);
-			++itor;
+			//Collect pieces
+			StringVector::iterator itor = pieceFiles->begin();
+			StringVector::iterator end = pieceFiles->end();
+
+			String inPiece;
+			String outPiece;
+
+			while (itor != end)
+			{
+				parseMath(*itor, inPiece, properties);
+				parseForEach(inPiece, outPiece, properties);
+				parseProperties(outPiece, inPiece, properties);
+				collectPieces(inPiece, outPiece, properties, pieces);
+				++itor;
+			}
 		}
 
 		parseMath(inBuffer, outBuffer, properties);

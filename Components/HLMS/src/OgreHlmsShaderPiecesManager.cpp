@@ -31,11 +31,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	const String PieceFilePatterns[] = { "piece_vs", "piece_ps", "piece_gs", "piece_hs", "piece_ds" };
-
 	//-----------------------------------------------------------------------------------
-	ShaderPiecesManager::ShaderPiecesManager(Archive *dataFolder)
-		: mDataFolder(dataFolder)
+	ShaderPiecesManager::ShaderPiecesManager(const String& pieseFilesResorceGroup)
+		: mResorceGroup(pieseFilesResorceGroup)
 	{
 
 	}
@@ -47,52 +45,89 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void ShaderPiecesManager::enumeratePieceFiles(void)
 	{
-		if (!mDataFolder)
-			return; //Some Hlms implementations may not use template files at all
-
-		StringVectorPtr stringVectorPtr = mDataFolder->list(false, false);
-		StringVector stringVectorLowerCase(*stringVectorPtr);
+		// remove all pieces
+		for (size_t i = 0; i < mNumShaderTypes; i++)
 		{
-			StringVector::iterator itor = stringVectorLowerCase.begin();
-			StringVector::iterator end = stringVectorLowerCase.end();
-			while (itor != end)
-			{
-				std::transform(itor->begin(), itor->end(), itor->begin(), ::tolower);
-				++itor;
-			}
+			mPieceFileNames[i].clear();
+			mLoadedPieces[i].clear();
 		}
 
-		size_t numShaderTypes = sizeof(PieceFilePatterns) / sizeof(*PieceFilePatterns);
-		for (size_t i = 0; i<numShaderTypes; ++i)
+		ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+
+		for (size_t i = 0; i < mNumShaderTypes; ++i)
 		{
-			StringVector::const_iterator itLowerCase = stringVectorLowerCase.begin();
-			StringVector::const_iterator itor = stringVectorPtr->begin();
-			StringVector::const_iterator end = stringVectorPtr->end();
+			StringVecMap& pieceFileNames = mPieceFileNames[i];
 
-			while (itor != end)
+			FileInfoListPtr list = rgm.findResourceFileInfo(mResorceGroup, "*_piece" + FilePatterns[i] + ".*");
+			FileInfoList::iterator it = list->begin();
+			FileInfoList::iterator end = list->end();
+
+			for (; it != end; it++)
 			{
-				if (itLowerCase->find(PieceFilePatterns[i]) != String::npos)
-				{
-					String outBasename;
-					String outExtention;
+				String name, ext;
+				StringUtil::splitBaseFilename(it->filename, name, ext);
 
-					StringUtil::splitBaseFilename(*itor, outBasename, outExtention);
-					if (!outExtention.empty())
-					{
-						mPieceFiles[outExtention].push_back(*itor);
-					}
+				StringVectorPtr namesVec;
+				StringVecMap::iterator pieceFileNamesIt = pieceFileNames.find(ext);
+				if (pieceFileNamesIt == pieceFileNames.end())
+				{
+					namesVec = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+					pieceFileNames[ext] = namesVec;
+				}
+				else
+				{
+					namesVec = pieceFileNames[ext];
 				}
 
-				++itLowerCase;
-				++itor;
+				namesVec->push_back(it->filename);
 			}
 		}
 	}
 	//-----------------------------------------------------------------------------------
-	StringVector ShaderPiecesManager::getPieces(String language, GpuProgramType shaderType)
+	StringVectorPtr ShaderPiecesManager::getPieces(const String& language, GpuProgramType shaderType, bool reload)
 	{
-		//TODO Finish impl.
-		return StringVector();
+		String languageTemplateExtension = language + "t";
+
+		ResourceGroupManager& rgm = ResourceGroupManager::getSingleton();
+
+		StringVecMap& loadedPieces = mLoadedPieces[(int)shaderType];
+		StringVecMap& pieceFileNames = mPieceFileNames[(int)shaderType];
+
+		if (reload)
+		{
+			StringVecMap::iterator it = loadedPieces.find(languageTemplateExtension);
+			if (it == loadedPieces.end())
+				loadedPieces.erase(it);
+		}
+		
+		StringVecMap::iterator loadedFilesIt = loadedPieces.find(languageTemplateExtension);
+		if (loadedFilesIt == loadedPieces.end())
+		{
+			// the piece files for the given shader type and languarge are not loaded yet.
+			StringVecMap::iterator pieceFileNamesIt = pieceFileNames.find(languageTemplateExtension);
+			if (pieceFileNamesIt != pieceFileNames.end())
+			{
+				StringVectorPtr pieces = StringVectorPtr(OGRE_NEW_T(StringVector, MEMCATEGORY_GENERAL)(), SPFM_DELETE_T);
+
+				StringVector::iterator it = pieceFileNamesIt->second->begin();
+				StringVector::iterator end = pieceFileNamesIt->second->end();
+
+				for (; it != end; it++)
+				{
+					pieces->push_back(rgm.openResource(*it, mResorceGroup, false)->getAsString());
+				}
+
+				loadedPieces[languageTemplateExtension] = pieces;
+
+				return pieces;
+			}
+		}
+		else
+		{
+			return loadedFilesIt->second;
+		}
+
+		return StringVectorPtr();
 	}
 	//-----------------------------------------------------------------------------------
 }

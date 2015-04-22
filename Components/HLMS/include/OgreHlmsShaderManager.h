@@ -45,7 +45,7 @@ namespace Ogre
 	class _OgreHlmsExport ShaderManager : public PassAlloc
     {
     public:
-		ShaderManager(SceneManager* sceneManager);
+		ShaderManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup);
 		virtual ~ShaderManager();
 
 		GpuProgramPtr getGpuProgram(HlmsDatablock* dataBlock);

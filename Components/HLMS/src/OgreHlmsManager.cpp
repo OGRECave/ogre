@@ -33,8 +33,8 @@ THE SOFTWARE.
 namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
-	HlmsManager::HlmsManager(SceneManager* sceneManager) : mSceneManager(sceneManager),
-		mShaderManager(mSceneManager)
+	HlmsManager::HlmsManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup) : mSceneManager(sceneManager),
+		mShaderManager(mSceneManager, pieseFilesResorceGroup)
 	{
 		mSceneManager->addListener(this);
 		mSceneManager->addRenderObjectListener(this);

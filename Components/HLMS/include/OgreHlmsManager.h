@@ -46,7 +46,7 @@ namespace Ogre
 	class _OgreHlmsExport HlmsManager : public PassAlloc, public RenderObjectListener, public SceneManager::Listener
     {
     public:
-		HlmsManager(SceneManager* sceneManager);
+		HlmsManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 		virtual ~HlmsManager();
 
 		virtual void notifyRenderSingleObject(

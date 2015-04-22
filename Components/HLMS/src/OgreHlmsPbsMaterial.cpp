@@ -207,6 +207,10 @@ namespace Ogre
 		mPropertyMap.setProperty("uvset_d1_index", mD1UvSetIndex);
 		mPropertyMap.setProperty("uvset_d2_index", mD2UvSetIndex);
 
+		// check for duplicate attributes (e.g. do not define attribut vec4 uv0 more than once)
+		mPropertyMap.setProperty("uvset_d1_setattribute", mD1UvSetIndex != mMainUvSetIndex);
+		mPropertyMap.setProperty("uvset_d2_setattribute", mD2UvSetIndex != mMainUvSetIndex && mD2UvSetIndex != mD1UvSetIndex);
+
 		// Add or remove the texture units
 		if (_hasSamplerListChanged)
 		{
@@ -371,13 +375,18 @@ namespace Ogre
 		{
 			s.textureUnitState->setTexture(s.tex);
 			s.textureUnitState->setTextureAddressingMode(s.textureAddressing.u, s.textureAddressing.v, TextureUnitState::TAM_WRAP);
+			s.textureUnitState->setTextureFiltering(TFO_TRILINEAR);
 		}
 		else if (s.textureType == TEX_TYPE_CUBE_MAP)
 		{
 			s.textureUnitState->setCubicTexture(&s.tex, true);
+			if (mFragmentDatablock.getLanguage() != "hlsl")
+			{
+				s.textureUnitState->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
+			}
 		}
 
-		s.textureUnitState->setTextureFiltering(TFO_TRILINEAR);
+		
 
 		if (s.hasIntensity)
 		{
