@@ -375,7 +375,6 @@ namespace Ogre
 		{
 			s.textureUnitState->setTexture(s.tex);
 			s.textureUnitState->setTextureAddressingMode(s.textureAddressing.u, s.textureAddressing.v, TextureUnitState::TAM_WRAP);
-			s.textureUnitState->setTextureFiltering(TFO_TRILINEAR);
 		}
 		else if (s.textureType == TEX_TYPE_CUBE_MAP)
 		{
@@ -385,9 +384,8 @@ namespace Ogre
 				s.textureUnitState->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
 			}
 		}
-
-		
-
+		s.textureUnitState->setTextureFiltering(TFO_TRILINEAR);
+	
 		if (s.hasIntensity)
 		{
 			fragmentParams->setNamedConstant("in_map_" + s.name + "_intensity", s.intensity);
