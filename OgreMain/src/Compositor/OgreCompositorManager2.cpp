@@ -367,15 +367,29 @@ namespace Ogre
                                 Id::generateNewId<CompositorWorkspace>(), itor->second,
                                 finalRenderTarget, sceneManager, defaultCam, mRenderSystem, bEnabled );
 
-            position = std::min<int>( position, mWorkspaces.size() );
-
-            if( position < 0 )
-                mWorkspaces.push_back( workspace );
-            else
-                mWorkspaces.insert( mWorkspaces.begin() + position, workspace );
+            mQueuedWorkspaces.push_back( QueuedWorkspace( workspace, position ) );
         }
 
         return workspace;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::addQueuedWorkspaces(void)
+    {
+        QueuedWorkspaceVec::const_iterator itor = mQueuedWorkspaces.begin();
+        QueuedWorkspaceVec::const_iterator end  = mQueuedWorkspaces.end();
+
+        while( itor != end )
+        {
+            int position = std::min<int>( itor->position, mWorkspaces.size() );
+
+            if( position < 0 )
+                mWorkspaces.push_back( itor->workspace );
+            else
+                mWorkspaces.insert( mWorkspaces.begin() + position, itor->workspace );
+            ++itor;
+        }
+
+        mQueuedWorkspaces.clear();
     }
     //-----------------------------------------------------------------------------------
     void CompositorManager2::removeWorkspace( CompositorWorkspace *workspace )
@@ -383,8 +397,22 @@ namespace Ogre
         WorkspaceVec::iterator itor = std::find( mWorkspaces.begin(), mWorkspaces.end(), workspace );
         if( itor == mWorkspaces.end() )
         {
-            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace not created with this "
-                            "Compositor Manager", "CompositorManager2::removeWorkspace" );
+            QueuedWorkspaceVec::iterator it = mQueuedWorkspaces.begin();
+            QueuedWorkspaceVec::iterator en = mQueuedWorkspaces.end();
+
+            while( it != en && it->workspace != workspace )
+                ++it;
+
+            if( it == mQueuedWorkspaces.end() )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace not created with this "
+                             "Compositor Manager", "CompositorManager2::removeWorkspace" );
+            }
+            else
+            {
+                OGRE_DELETE it->workspace;
+                mQueuedWorkspaces.erase( it ); //Preserve the order of workspace execution
+            }
         }
         else
         {
@@ -395,6 +423,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorManager2::removeAllWorkspaces(void)
     {
+        addQueuedWorkspaces();
         deleteAllClear( mWorkspaces );
     }
     //-----------------------------------------------------------------------------------
@@ -467,6 +496,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorManager2::_update(void)
     {
+        addQueuedWorkspaces();
+
         WorkspaceVec::const_iterator itor = mWorkspaces.begin();
         WorkspaceVec::const_iterator end  = mWorkspaces.end();
 
