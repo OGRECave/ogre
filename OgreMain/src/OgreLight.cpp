@@ -268,10 +268,8 @@ namespace Ogre {
             if (mParentNode)
             {
                 // Ok, update with SceneNode we're attached to
-                const Quaternion& parentOrientation = mParentNode->_getDerivedOrientation();
-                const Vector3& parentPosition = mParentNode->_getDerivedPosition();
-                mDerivedDirection = parentOrientation * mDirection;
-                mDerivedPosition = (parentOrientation * mPosition) + parentPosition;
+                mDerivedDirection = mParentNode->convertLocalToWorldDirection(mDirection, false);
+                mDerivedPosition = mParentNode->convertLocalToWorldPosition(mPosition);
             }
             else
             {
