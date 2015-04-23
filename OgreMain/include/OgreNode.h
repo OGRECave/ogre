@@ -692,6 +692,13 @@ namespace Ogre {
             useful for simple transforms that don't require a child node.*/
         virtual Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
 
+        /** Gets the local direction, relative to this node, of the given world-space direction */
+        virtual Vector3 convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale );
+
+        /** Gets the world direction of a point in the node local space
+            useful for simple transforms that don't require a child node.*/
+        virtual Vector3 convertLocalToWorldDirection( const Vector3 &localDir, bool useScale );
+
         /** Gets the local orientation, relative to this node, of the given world-space orientation */
         virtual Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation );
 

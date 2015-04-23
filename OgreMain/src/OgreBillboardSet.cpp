@@ -382,9 +382,8 @@ namespace Ogre {
             // Default behaviour is that billboards are in local node space
             // so orientation of camera (in world space) must be reverse-transformed
             // into node space
-            mCamQ = mParentNode->_getDerivedOrientation().UnitInverse() * mCamQ;
-            mCamPos = mParentNode->_getDerivedOrientation().UnitInverse() *
-                (mCamPos - mParentNode->_getDerivedPosition()) / mParentNode->_getDerivedScale();
+            mCamQ = mParentNode->convertWorldToLocalOrientation(mCamQ);
+            mCamPos = mParentNode->convertWorldToLocalPosition(mCamPos);
         }
 
         // Camera direction points down -Z

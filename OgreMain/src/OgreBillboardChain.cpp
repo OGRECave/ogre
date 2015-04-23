@@ -496,8 +496,7 @@ namespace Ogre {
         void* pBufferStart = pBuffer->lock(HardwareBuffer::HBL_DISCARD);
 
         const Vector3& camPos = cam->getDerivedPosition();
-        Vector3 eyePos = mParentNode->_getDerivedOrientation().Inverse() *
-            (camPos - mParentNode->_getDerivedPosition()) / mParentNode->_getDerivedScale();
+        Vector3 eyePos = mParentNode->convertWorldToLocalPosition(camPos);
 
         Vector3 chainTangent;
         for (ChainSegmentList::iterator segi = mChainSegmentList.begin();

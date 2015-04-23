@@ -592,12 +592,8 @@ namespace Ogre {
             // Translate position & direction into world space
             if (!mLocalSpace)
             {
-                p->mPosition  =
-                    (mParentNode->_getDerivedOrientation() *
-                    (mParentNode->_getDerivedScale() * p->mPosition))
-                    + mParentNode->_getDerivedPosition();
-                p->mDirection =
-                    (mParentNode->_getDerivedOrientation() * p->mDirection);
+                p->mPosition = mParentNode->convertLocalToWorldPosition(p->mPosition);
+                p->mDirection = mParentNode->convertLocalToWorldDirection(p->mDirection, false);
             }
 
             // apply partial frame motion to this particle
@@ -1223,7 +1219,7 @@ namespace Ogre {
                 if (mLocalSpace)
                 {
                     // transform the camera direction into local space
-                    camDir = mParentNode->_getDerivedOrientation().UnitInverse() * camDir;
+                    camDir = mParentNode->convertWorldToLocalDirection(camDir, false);
                 }
                 mRadixSorter.sort(mActiveParticles, SortByDirectionFunctor(- camDir));
             }
@@ -1233,8 +1229,7 @@ namespace Ogre {
                 if (mLocalSpace)
                 {
                     // transform the camera position into local space
-                    camPos = mParentNode->_getDerivedOrientation().UnitInverse() *
-                        (camPos - mParentNode->_getDerivedPosition()) / mParentNode->_getDerivedScale();
+                    camPos = mParentNode->convertWorldToLocalPosition(camPos);
                 }
                 mRadixSorter.sort(mActiveParticles, SortByDistanceFunctor(camPos));
             }

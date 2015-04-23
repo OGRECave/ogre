@@ -209,8 +209,7 @@ namespace Ogre {
         // transform to parent space
         if (mParentNode)
         {
-            mOrientation =
-                mParentNode->_getDerivedOrientation().Inverse() * targetWorldOrientation;
+            mOrientation = mParentNode->convertWorldToLocalOrientation(targetWorldOrientation);
         }
         else
         {

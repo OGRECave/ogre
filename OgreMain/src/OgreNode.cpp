@@ -448,8 +448,7 @@ namespace Ogre {
             // position is relative to parent so transform upwards
             if (mParent)
             {
-                mPosition += (mParent->_getDerivedOrientation().Inverse() * d)
-                    / mParent->_getDerivedScale();
+                mPosition += mParent->convertWorldToLocalDirection(d, true);
             }
             else
             {
@@ -591,6 +590,28 @@ namespace Ogre {
             _updateFromParent();
         }
         return (mDerivedOrientation * (localPos * mDerivedScale)) + mDerivedPosition;
+    }
+    //-----------------------------------------------------------------------
+    Vector3 Node::convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale )
+    {
+        if (mNeedParentUpdate)
+        {
+            _updateFromParent();
+        }
+        return useScale ? 
+            mDerivedOrientation.Inverse() * worldDir / mDerivedScale :
+            mDerivedOrientation.Inverse() * worldDir;
+    }
+    //-----------------------------------------------------------------------
+    Vector3 Node::convertLocalToWorldDirection( const Vector3 &localDir, bool useScale )
+    {
+        if (mNeedParentUpdate)
+        {
+            _updateFromParent();
+        }
+        return useScale ? 
+            mDerivedOrientation * (localDir * mDerivedScale) :
+            mDerivedOrientation * localDir;
     }
     //-----------------------------------------------------------------------
     Quaternion Node::convertWorldToLocalOrientation( const Quaternion &worldOrientation )
