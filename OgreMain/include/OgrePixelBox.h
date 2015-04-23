@@ -92,6 +92,11 @@ namespace Ogre {
             For compressed formats, this value is in bytes; not in elements.
         */
         size_t slicePitch;
+
+        /// Returns rowPitch, but always in bytes.
+        size_t rowPitchAlwaysBytes(void) const;
+        /// Returns slicePitch, but always in bytes.
+        size_t slicePitchAlwaysBytes(void) const;
         
         /** Set the rowPitch and slicePitch so that the buffer is laid out consecutive 
             in memory.
@@ -113,6 +118,9 @@ namespace Ogre {
             For compressed formats, this value is in bytes; not in elements.
         */
         size_t getSliceSkip() const { return slicePitch - (getHeight() * rowPitch); }
+
+        /// @see getSliceSkip, but value is always in bytes.
+        size_t getSliceSkipAlwaysBytes() const;
 
         /** Return whether this buffer is laid out consecutive in memory (ie the pitches
             are equal to the dimensions)
