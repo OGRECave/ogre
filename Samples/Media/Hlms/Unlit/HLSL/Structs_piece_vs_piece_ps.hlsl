@@ -7,6 +7,7 @@ cbuffer PassBuffer : register(b0)
 	{
 	//Vertex shader
 	float2 depthRange;
+	@insertpiece( custom_passBuffer )
 	} passBuf;
 };
 @end
@@ -55,4 +56,5 @@ cbuffer instance : register(b2)
 			float@value( out_uv_half_count@n ) uv@n	: TEXCOORD@counter(texcoord);@end
 	@end
 	@property( hlms_shadowcaster )	float depth	: TEXCOORD@counter(texcoord);@end
+	@insertpiece( custom_VStoPS )
 @end

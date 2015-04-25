@@ -14,11 +14,12 @@ layout(location = FRAG_COLOR, index = 0) out float outColour;
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
 @end
+@insertpiece( custom_ps_uniformDeclaration )
+// END UNIFORM DECLARATION
 in block
 {
 @insertpiece( VStoPS_block )
 } inPs;
-// END UNIFORM DECLARATION
 
 @property( !hlms_shadowcaster )
 @property( num_array_textures )uniform sampler2DArray	textureMapsArray[@value( num_array_textures )];@end
@@ -30,10 +31,12 @@ in block
 
 void main()
 {
+	@insertpiece( custom_ps_preExecution )
 @property( diffuse_map || alpha_test || diffuse )
 	uint materialId	= instance.materialIdx[inPs.drawId].x;
 	material = materialArray.m[materialId];
 @end
+	@insertpiece( custom_ps_posMaterialLoad )
 
 @property( !diffuse_map && !diffuse_map0 )
 @property( hlms_colour && !diffuse_map )	outColour = inPs.colour @insertpiece( MultiplyDiffuseConst );@end
@@ -55,14 +58,20 @@ void main()
 	@property( !hlms_colour && diffuse )outColour *= material.diffuse;@end
 @end
 
+	@insertpiece( custom_ps_preLights )
+
 @property( alpha_test )
 	if( material.alpha_test_threshold.x @insertpiece( alpha_test_cmp_func ) outColour.a )
 		discard;@end
+
+	@insertpiece( custom_ps_posExecution )
 }
 
 @end @property( hlms_shadowcaster )
 void main()
 {
+	@insertpiece( custom_ps_preExecution )
 	outColour = inPs.depth;
+	@insertpiece( custom_ps_posExecution )
 }
 @end

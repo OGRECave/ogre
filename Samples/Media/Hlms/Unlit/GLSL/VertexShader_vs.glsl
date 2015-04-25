@@ -17,6 +17,8 @@ in vec@value( hlms_uv_count@n ) uv@n;@end
 
 in uint drawId;
 
+@insertpiece( custom_vs_attributes )
+
 out block
 {
 @insertpiece( VStoPS_block )
@@ -27,10 +29,12 @@ out block
 @insertpiece( InstanceDecl )
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @property( texture_matrix )layout(binding = 1) uniform samplerBuffer animationMatrixBuf;@end
+@insertpiece( custom_vs_uniformDeclaration )
 // END UNIFORM DECLARATION
 
 void main()
 {
+	@insertpiece( custom_vs_preExecution )
 	//uint drawId = 1;
 	mat4 worldViewProj;
 	worldViewProj = UNPACK_MAT4( worldMatBuf, drawId );
@@ -70,4 +74,5 @@ void main()
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	gl_Position.z = gl_Position.z * (gl_Position.w * pass.depthRange.y);
 @end
+	@insertpiece( custom_vs_posExecution )
 }

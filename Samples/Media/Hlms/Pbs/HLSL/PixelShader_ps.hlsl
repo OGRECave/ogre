@@ -5,11 +5,12 @@
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
 @end
+@insertpiece( custom_ps_uniformDeclaration )
+// END UNIFORM DECLARATION
 struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 };
-// END UNIFORM DECLARATION
 
 @property( !hlms_shadowcaster )
 
@@ -141,6 +142,8 @@ float3 qmul( float4 q, float3 v )
 float4 main( PS_INPUT inPs
 @property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) : SV_Target0
 {
+	@insertpiece( custom_ps_preExecution )
+
 	Material material;
 	float4 outColour;
 	
@@ -178,6 +181,8 @@ float4 main( PS_INPUT inPs
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
 @property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
+
+	@insertpiece( custom_ps_posMaterialLoad )
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
@@ -274,6 +279,9 @@ float4 main( PS_INPUT inPs
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
 	float3 finalColour = float3(0, 0, 0);
+
+	@insertpiece( custom_ps_preLights )
+
 @property( hlms_lights_directional )
 	finalColour += BRDF( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
@@ -348,12 +356,16 @@ float4 main( PS_INPUT inPs
 	outColour = float4( 1.0, 1.0, 1.0, 1.0 );
 @end
 
+	@insertpiece( custom_ps_posExecution )
+
 	return outColour;
 }
 @end
 @property( hlms_shadowcaster )
 float main( PS_INPUT inPs ) : SV_Target0
 {
+	@insertpiece( custom_ps_preExecution )
+	@insertpiece( custom_ps_posExecution )
 	return inPs.depth;
 }
 @end

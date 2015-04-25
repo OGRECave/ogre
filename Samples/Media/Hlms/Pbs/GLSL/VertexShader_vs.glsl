@@ -30,6 +30,8 @@ in vec@value( hlms_uv_count@n ) uv@n;@end
 
 in uint drawId;
 
+@insertpiece( custom_vs_attributes )
+
 out block
 {
 @insertpiece( VStoPS_block )
@@ -39,6 +41,7 @@ out block
 @insertpiece( PassDecl )
 @property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
+@insertpiece( custom_vs_uniformDeclaration )
 // END UNIFORM DECLARATION
 
 @property( hlms_qtangent )
@@ -139,6 +142,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 void main()
 {
+    @insertpiece( custom_vs_preExecution )
 @property( !hlms_skeleton )
     mat4x3 worldMat = UNPACK_MAT4x3( worldMatBuf, drawId @property( !hlms_shadowcaster )<< 1u@end );
 	@property( hlms_normal || hlms_qtangent )
@@ -180,6 +184,8 @@ void main()
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	gl_Position.z = gl_Position.z * (gl_Position.w * pass.depthRange.y);
 @end
+
+	@insertpiece( custom_vs_posExecution )
 }
 @end
 @property( false )

@@ -202,6 +202,7 @@ namespace Ogre {
     struct HlmsBlendblock;
     struct HlmsCache;
     class HlmsDatablock;
+    class HlmsListener;
     class HlmsLowLevel;
     class HlmsLowLevelDatablock;
     struct HlmsMacroblock;

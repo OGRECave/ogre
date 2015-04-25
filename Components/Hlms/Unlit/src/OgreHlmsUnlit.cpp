@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsUnlit.h"
 #include "OgreHlmsUnlitDatablock.h"
+#include "OgreHlmsListener.h"
 
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
@@ -532,6 +533,9 @@ namespace Ogre
             //vec2 depthRange;
             size_t mapSize = 4 * 4;
 
+            mapSize += mListener->getPassBufferSize( shadowNode, casterPass,
+                                                     dualParaboloid, sceneManager );
+
             //Arbitrary 16kb (minimum supported by GL), should be enough.
             const size_t maxBufferSize = 16 * 1024;
             assert( mapSize <= maxBufferSize );
@@ -560,6 +564,9 @@ namespace Ogre
             *passBufferPtr++ = fNear;
             *passBufferPtr++ = 1.0f / depthRange;
             passBufferPtr += 2;
+
+            passBufferPtr = mListener->preparePassBuffer( shadowNode, casterPass, dualParaboloid,
+                                                          sceneManager, passBufferPtr );
 
             assert( (size_t)(passBufferPtr - startupPtr) * 4u == mapSize );
 
@@ -648,6 +655,8 @@ namespace Ogre
             }
 
             rebindTexBuffer( commandBuffer );
+
+            mListener->hlmsTypeChanged( casterPass, commandBuffer, datablock );
         }
 
         if( mLastBoundPool != datablock->getAssignedPool() )

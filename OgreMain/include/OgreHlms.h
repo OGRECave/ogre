@@ -122,6 +122,7 @@ namespace Ogre
         LightGatheringMode  mLightGatheringMode;
         uint16              mNumLightsLimit;
 
+        HlmsListener    *mListener;
         RenderSystem    *mRenderSystem;
 
         HlmsDatablockMap mDatablocks;
@@ -495,6 +496,8 @@ namespace Ogre
             (i.e. C:/path/ instead of C:/path; or /home/user/ instead of /home/user)
         */
         void setDebugOutputPath( bool enableDebugOutput, const String &path = BLANKSTRING );
+
+        void setListener( HlmsListener *listener );
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }

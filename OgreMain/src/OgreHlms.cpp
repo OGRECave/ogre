@@ -45,6 +45,8 @@ THE SOFTWARE.
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
 
+#include "OgreHlmsListener.h"
+
 namespace Ogre
 {
     //Change per mesh (hash can be cached on the renderable)
@@ -133,12 +135,15 @@ namespace Ogre
         },
     };
 
+    HlmsListener c_defaultListener;
+
     Hlms::Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder,
                 ArchiveVec *libraryFolders ) :
         mDataFolder( dataFolder ),
         mHlmsManager( 0 ),
         mLightGatheringMode( LightGatherForward ),
         mNumLightsLimit( 8 ),
+        mListener( &c_defaultListener ),
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
         mShaderFileExt( "unset!" ),
@@ -1915,6 +1920,14 @@ namespace Ogre
     {
         mDebugOutput	= enableDebugOutput;
         mOutputPath		= path;
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::setListener( HlmsListener *listener )
+    {
+        if( !listener )
+            mListener = &c_defaultListener;
+        else
+            mListener = listener;
     }
     //-----------------------------------------------------------------------------------
     void Hlms::_notifyShadowMappingBackFaceSetting(void)
