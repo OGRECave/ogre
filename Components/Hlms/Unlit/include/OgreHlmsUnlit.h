@@ -47,8 +47,9 @@ namespace Ogre
 
     class HlmsUnlitDatablock;
 
-    /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
-        RenderSystems which do not support uniform buffers.
+    /** Implementation without lighting or skeletal animation specfically designed for
+        OpenGL 3+, D3D11 and other RenderSystems which support uniform buffers.
+        Useful for GUI, ParticleFXs, other misc objects that don't require lighting.
     */
     class _OgreHlmsUnlitExport HlmsUnlit : public HlmsBufferManager, public ConstBufferPool
     {
@@ -92,7 +93,7 @@ namespace Ogre
                                            CommandBuffer *commandBuffer, bool isV1 );
 
     public:
-        HlmsUnlit( Archive *dataFolder );
+        HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders );
         ~HlmsUnlit();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
@@ -206,6 +207,7 @@ namespace Ogre
         static const IdString BlendModeIndex15;
 
         static const IdString OutUvCount;
+        static const IdString OutUvHalfCount;
 
         struct DiffuseMapPtr
         {

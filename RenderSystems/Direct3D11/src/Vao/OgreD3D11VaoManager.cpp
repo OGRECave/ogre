@@ -49,6 +49,7 @@ THE SOFTWARE.
 
 #include "OgreTimer.h"
 #include "OgreStringConverter.h"
+#include "OgreLogManager.h"
 
 namespace Ogre
 {
@@ -1287,6 +1288,29 @@ namespace Ogre
                                                        StagingBuffer *stagingBuffer,
                                                        size_t elementStart, size_t elementCount )
     {
+        if( creator->getBufferType() == BT_IMMUTABLE )
+        {
+            bool delayedBuffersPending = false;
+            for( size_t i=0; i<NumInternalBufferTypes; ++i )
+                delayedBuffersPending |= !mDelayedBuffers[i].empty();
+
+            if( delayedBuffersPending )
+            {
+                LogManager::getSingleton().logMessage(
+                            "PERFORMANCE WARNING D3D11: Calling createAsyncTicket when there are "
+                            "pending immutable buffers to be created. This will force Ogre to "
+                            "create them immediately; which diminish our ability to batch meshes "
+                            "toghether & could affect performance during rendering.\n"
+                            "You should call createAsyncTicket after all immutable meshes have "
+                            "been loaded to ensure they get batched together. If you're already "
+                            "doing this, you can ignore this warning.\n"
+                            "If you're not going to render (i.e. this is a mesh export tool) "
+                            "you can also ignore this warning." );
+            }
+
+            createDelayedImmutableBuffers();
+        }
+
         return AsyncTicketPtr( OGRE_NEW D3D11AsyncTicket( creator, stagingBuffer,
                                                           elementStart, elementCount,
                                                           mDevice ) );

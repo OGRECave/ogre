@@ -102,6 +102,14 @@ namespace Ogre
         typedef map<IdString, CompositorNodeDef*>::type         CompositorNodeDefMap;
 
     protected:
+        struct QueuedWorkspace
+        {
+            CompositorWorkspace *workspace;
+            int position;
+            QueuedWorkspace( CompositorWorkspace *_workspace, int _position ) :
+                workspace( _workspace ), position( _position ) {}
+        };
+
         CompositorNodeDefMap    mNodeDefinitions;
 
         typedef map<IdString, CompositorShadowNodeDef*>::type   CompositorShadowNodeDefMap;
@@ -113,7 +121,13 @@ namespace Ogre
         CompositorWorkspaceDefMap mWorkspaceDefs;
 
         typedef vector<CompositorWorkspace*>::type              WorkspaceVec;
+        typedef vector<QueuedWorkspace>::type                   QueuedWorkspaceVec;
         WorkspaceVec            mWorkspaces;
+        /// All workspaces created via addWorkspace are first stored in this
+        /// container, to prevent corrupting mWorkspaces' iterators in
+        /// case we happen to be adding a workspace while inside the
+        /// workspace's update loop (i.e. in a listener)
+        QueuedWorkspaceVec      mQueuedWorkspaces;
 
         size_t                  mFrameCount;
 
@@ -127,7 +141,7 @@ namespace Ogre
         /// For custom passes.
         CompositorPassProvider  *mCompositorPassProvider;
 
-        void validateNodes(void);
+        void addQueuedWorkspaces(void);
 
     public:
         CompositorManager2( RenderSystem *renderSystem );

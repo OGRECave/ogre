@@ -68,7 +68,8 @@ namespace Ogre
         /// This ID may be shared by many VertexArrayObject instances.
         uint32 mRenderQueueId;
 
-        uint32                  mFaceCount; /// For statistics
+        uint32                  mPrimStart;
+        uint32                  mPrimCount;
         VertexBufferPackedVec   mVertexBuffers;
         IndexBufferPacked       *mIndexBuffer;
 
@@ -88,6 +89,21 @@ namespace Ogre
         IndexBufferPacked* getIndexBuffer(void) const                   { return mIndexBuffer; }
 
         v1::RenderOperation::OperationType getOperationType(void) const { return mOperationType; }
+
+        /** Limits the range of triangle primitives that is rendered.
+            For VAOs with index buffers, this controls the index start & count,
+            akin to indexStart & indexCount from the v1 objects.
+        @par
+            For VAOs with no index buffers, this controls the vertex start & count,
+            akin to vertexStart & vertexCount from the v1 objects.
+        @remarks
+            An exception is thrown if primStart, or primStart + primCount are
+            out of the half open range:
+            [0; mIndexBuffer->getNumElements()) or [0; mVertexBuffers[0]->getNumElements())
+        @par
+            Parameters are always in elements (indices or vertices)
+        */
+        void setPrimitiveRange( uint32 primStart, uint32 primCount );
     };
 }
 

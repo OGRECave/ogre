@@ -67,6 +67,42 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    size_t PixelBox::rowPitchAlwaysBytes() const
+    {
+        if( PixelUtil::isCompressed( format ) )
+        {
+            return rowPitch;
+        }
+        else
+        {
+            return rowPitch * PixelUtil::getNumElemBytes( format );
+        }
+    }
+    //-----------------------------------------------------------------------
+    size_t PixelBox::slicePitchAlwaysBytes(void) const
+    {
+        if( PixelUtil::isCompressed( format ) )
+        {
+            return slicePitch;
+        }
+        else
+        {
+            return slicePitch * PixelUtil::getNumElemBytes( format );
+        }
+    }
+    //-----------------------------------------------------------------------
+    size_t PixelBox::getSliceSkipAlwaysBytes() const
+    {
+        if( PixelUtil::isCompressed( format ) )
+        {
+            return getSliceSkip();
+        }
+        else
+        {
+            return getSliceSkip() * PixelUtil::getNumElemBytes( format );
+        }
+    }
+    //-----------------------------------------------------------------------
     bool PixelBox::isConsecutive() const
     {
         if( PixelUtil::isCompressed( format ) )

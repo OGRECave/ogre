@@ -1,20 +1,13 @@
 @insertpiece( SetCrossPlatformSettings )
 
-float4x4 UNPACK_MAT4( Buffer<float4> matrixBuf, uint pixelIdx )
-{
-	float4 row1 = matrixBuf.Load( int((pixelIdx) << 2u) );
-	float4 row2 = matrixBuf.Load( int(((pixelIdx) << 2u) + 1u) );
-	float4 row3 = matrixBuf.Load( int(((pixelIdx) << 2u) + 2u) );
-	float4 row4 = matrixBuf.Load( int(((pixelIdx) << 2u) + 3u) );
-
-	return float4x4( row1, row2, row3, row4 );
-}
+@insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
 
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
 @insertpiece( InstanceDecl )
 Buffer<float4> worldMatBuf : register(t0);
 @property( texture_matrix )Buffer<float4> animationMatrixBuf : register(t1);@end
+@insertpiece( custom_vs_uniformDeclaration )
 // END UNIFORM DECLARATION
 
 struct VS_INPUT
@@ -24,6 +17,7 @@ struct VS_INPUT
 @foreach( hlms_uv_count, n )
 	float@value( hlms_uv_count@n ) uv@n : TEXCOORD@n;@end
 	uint drawId : DRAWID;
+	@insertpiece( custom_vs_attributes )
 };
 
 struct PS_INPUT
@@ -35,6 +29,7 @@ struct PS_INPUT
 PS_INPUT main( VS_INPUT input )
 {
 	PS_INPUT outVs;
+	@insertpiece( custom_vs_preExecution )
 
 	//uint drawId = 1;
 	float4x4 worldViewProj;
@@ -59,7 +54,7 @@ PS_INPUT main( VS_INPUT input )
 
 @property( texture_matrix )	float4x4 textureMatrix;@end
 
-@foreach( hlms_uv_count, n )
+@foreach( out_uv_count, n )
 	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (materialIdx[input.drawId].x << 4u) + @value( out_uv@n_tex_unit ) );@end
 	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) =
 @property( out_uv@_texture_matrix )
@@ -79,6 +74,8 @@ PS_INPUT main( VS_INPUT input )
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	outVs.gl_Position.z = outVs.gl_Position.z * (outVs.gl_Position.w * passBuf.depthRange.y);
 @end
+
+	@insertpiece( custom_vs_posExecution )
 
 	return outVs;
 }

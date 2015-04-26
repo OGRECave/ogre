@@ -1,39 +1,15 @@
 @property( !false )
-@property( GL430 )#version 430 core
-@end @property( !GL430 )
-#version 330 core
-#extension GL_ARB_shading_language_420pack: require
-@end
+@insertpiece( SetCrossPlatformSettings )
 
 out gl_PerVertex
 {
 	vec4 gl_Position;
 };
 
-mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
-{
-        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
-        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
-        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
-        vec4 row3 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 3u) );
-	return mat4( row0.x, row1.x, row2.x, row3.x,
-				 row0.y, row1.y, row2.y, row3.y,
-				 row0.z, row1.z, row2.z, row3.z,
-				 row0.w, row1.w, row2.w, row3.w );
-}
-
-mat4x3 UNPACK_MAT4x3( samplerBuffer matrixBuf, uint pixelIdx )
-{
-        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
-        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
-        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
-        return mat4x3( row0.x, row1.x, row2.x,
-                       row0.y, row1.y, row2.y,
-                       row0.z, row1.z, row2.z,
-                       row0.w, row1.w, row2.w );
-}
-
 layout(std140) uniform;
+
+@insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
+@insertpiece( Common_Matrix_DeclUnpackMatrix4x3 )
 
 in vec4 vertex;
 
@@ -54,6 +30,8 @@ in vec@value( hlms_uv_count@n ) uv@n;@end
 
 in uint drawId;
 
+@insertpiece( custom_vs_attributes )
+
 out block
 {
 @insertpiece( VStoPS_block )
@@ -63,6 +41,7 @@ out block
 @insertpiece( PassDecl )
 @property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
 layout(binding = 0) uniform samplerBuffer worldMatBuf;
+@insertpiece( custom_vs_uniformDeclaration )
 // END UNIFORM DECLARATION
 
 @property( hlms_qtangent )
@@ -163,6 +142,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 void main()
 {
+    @insertpiece( custom_vs_preExecution )
 @property( !hlms_skeleton )
     mat4x3 worldMat = UNPACK_MAT4x3( worldMatBuf, drawId @property( !hlms_shadowcaster )<< 1u@end );
 	@property( hlms_normal || hlms_qtangent )
@@ -197,13 +177,15 @@ void main()
 @end @property( hlms_shadowcaster )
     float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
 	//Linear depth
-	outVs.depth	= (gl_Position.z - pass.depthRange.x + 0.01 * pass.depthRange.y) * pass.depthRange.y;
+	outVs.depth	= (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y;
 
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	gl_Position.z = gl_Position.z * (gl_Position.w * pass.depthRange.y);
 @end
+
+	@insertpiece( custom_vs_posExecution )
 }
 @end
 @property( false )
@@ -212,28 +194,8 @@ void main()
 
 layout(std140) uniform;
 
-mat4 UNPACK_MAT4( samplerBuffer matrixBuf, uint pixelIdx )
-{
-        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
-        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
-        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
-        vec4 row3 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 3u) );
-        return mat4( row0.x, row1.x, row2.x, row3.x,
-                                 row0.y, row1.y, row2.y, row3.y,
-                                 row0.z, row1.z, row2.z, row3.z,
-                                 row0.w, row1.w, row2.w, row3.w );
-}
-
-mat4x3 UNPACK_MAT4x3( samplerBuffer matrixBuf, uint pixelIdx )
-{
-        vec4 row0 = texelFetch( matrixBuf, int((pixelIdx) << 2u) );
-        vec4 row1 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 1u) );
-        vec4 row2 = texelFetch( matrixBuf, int(((pixelIdx) << 2u) + 2u) );
-        return mat4x3( row0.x, row1.x, row2.x,
-                       row0.y, row1.y, row2.y,
-                       row0.z, row1.z, row2.z,
-                       row0.w, row1.w, row2.w );
-}
+@insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
+@insertpiece( Common_Matrix_DeclUnpackMatrix4x3 )
 
 in vec4 vertex;
 in uint drawId;

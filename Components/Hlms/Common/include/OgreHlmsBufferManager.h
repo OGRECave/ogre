@@ -162,7 +162,8 @@ namespace Ogre
         virtual void destroyAllBuffers(void);
 
     public:
-        HlmsBufferManager( HlmsTypes type, IdString typeName, Archive *dataFolder );
+        HlmsBufferManager( HlmsTypes type, IdString typeName, Archive *dataFolder,
+                           ArchiveVec *libraryFolders );
         ~HlmsBufferManager();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );

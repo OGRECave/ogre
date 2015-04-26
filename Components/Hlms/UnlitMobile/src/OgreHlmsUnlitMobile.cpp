@@ -169,7 +169,8 @@ namespace Ogre
         "atlasOffsets"
     };
 
-    HlmsUnlitMobile::HlmsUnlitMobile( Archive *dataFolder ) : Hlms( HLMS_UNLIT, "unlit", dataFolder )
+    HlmsUnlitMobile::HlmsUnlitMobile( Archive *dataFolder, ArchiveVec *libraryFolders ) :
+        Hlms( HLMS_UNLIT, "unlit", dataFolder, libraryFolders )
     {
         //Override defaults
         mLightGatheringMode = LightGatherNone;

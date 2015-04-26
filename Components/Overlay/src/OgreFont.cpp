@@ -241,6 +241,9 @@ namespace Ogre
         guiDatablock->setTexture( 0, mTexture, OverlayUnlitDatablock::UvAtlasParams() );
 #endif
         guiDatablock->calculateHash();
+        //Source the alpha from the green channel.
+        guiDatablock->setTextureSwizzle( 0, HlmsUnlitDatablock::R_MASK, HlmsUnlitDatablock::R_MASK,
+                                         HlmsUnlitDatablock::R_MASK, HlmsUnlitDatablock::G_MASK );
 
         // Make sure material is aware of colour per vertex.
         mMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
@@ -477,7 +480,7 @@ namespace Ogre
             OGRE_NEW MemoryDataStream(imageData, data_size, true));
 
         Image img;
-        img.loadRawData( memStream, finalWidth, finalHeight, PF_BYTE_LA );
+        img.loadRawData( memStream, finalWidth, finalHeight, PF_RG8 );
 
         Texture* tex = static_cast<Texture*>(res);
 

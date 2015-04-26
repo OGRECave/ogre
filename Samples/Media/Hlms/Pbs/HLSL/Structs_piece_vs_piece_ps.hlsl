@@ -53,6 +53,7 @@ cbuffer PassBuffer : register(b0)
 	float4 f3dData;
 	float4 f3dGridHWW[@value( hlms_forward3d )];
 @end
+	@insertpiece( custom_passBuffer )
 	} passBuf;
 };
 @end
@@ -124,4 +125,5 @@ cbuffer InstanceBuffer : register(b2)
 			float4 posL@n	: TEXCOORD@counter(texcoord);@end
 	@end
 	@property( hlms_shadowcaster || hlms_pssm_splits )	float depth	: TEXCOORD@counter(texcoord);@end
+	@insertpiece( custom_VStoPS )
 @end

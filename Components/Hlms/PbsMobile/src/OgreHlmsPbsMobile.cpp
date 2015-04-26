@@ -198,7 +198,8 @@ namespace Ogre
         "detailOffsetScaleN",
     };
 
-    HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder ) : Hlms( HLMS_PBS, "pbs", dataFolder )
+    HlmsPbsMobile::HlmsPbsMobile( Archive *dataFolder, ArchiveVec *libraryFolders ) :
+        Hlms( HLMS_PBS, "pbs", dataFolder, libraryFolders )
     {
     }
     //-----------------------------------------------------------------------------------

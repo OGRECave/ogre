@@ -1,21 +1,5 @@
-float4x4 UNPACK_MAT4( Buffer<float4> matrixBuf, uint pixelIdx )
-{
-	float4 row1 = matrixBuf.Load( int((pixelIdx) << 2u) );
-	float4 row2 = matrixBuf.Load( int(((pixelIdx) << 2u) + 1u) );
-	float4 row3 = matrixBuf.Load( int(((pixelIdx) << 2u) + 2u) );
-	float4 row4 = matrixBuf.Load( int(((pixelIdx) << 2u) + 3u) );
-
-	return float4x4( row1, row2, row3, row4 );
-}
-
-float3x4 UNPACK_MAT3x4( Buffer<float4> matrixBuf, uint pixelIdx )
-{
-	float4 row1 = matrixBuf.Load( int((pixelIdx) << 2u) );
-	float4 row2 = matrixBuf.Load( int(((pixelIdx) << 2u) + 1u) );
-	float4 row3 = matrixBuf.Load( int(((pixelIdx) << 2u) + 2u) );
-
-	return float3x4( row1, row2, row3 );
-}
+@insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
+@insertpiece( Common_Matrix_DeclUnpackMatrix3x4 )
 
 struct VS_INPUT
 {
@@ -35,6 +19,7 @@ struct VS_INPUT
 @foreach( hlms_uv_count, n )
 	float@value( hlms_uv_count@n ) uv@n : TEXCOORD@n;@end
 	uint drawId : DRAWID;
+	@insertpiece( custom_vs_attributes )
 };
 
 struct PS_INPUT
@@ -47,6 +32,7 @@ struct PS_INPUT
 @insertpiece( PassDecl )
 @property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
 Buffer<float4> worldMatBuf : register(t0);
+@insertpiece( custom_vs_uniformDeclaration )
 // END UNIFORM DECLARATION
 
 @property( hlms_qtangent )
@@ -148,6 +134,7 @@ Buffer<float4> worldMatBuf : register(t0);
 PS_INPUT main( VS_INPUT input )
 {
 	PS_INPUT outVs;
+	@insertpiece( custom_vs_preExecution )
 @property( !hlms_skeleton )
 	float3x4 worldMat = UNPACK_MAT3x4( worldMatBuf, input.drawId @property( !hlms_shadowcaster )<< 1u@end );
 	@property( hlms_normal || hlms_qtangent )
@@ -192,6 +179,7 @@ PS_INPUT main( VS_INPUT input )
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	outVs.gl_Position.z = outVs.gl_Position.z * (outVs.gl_Position.w * passBuf.depthRange.y);
 @end
+	@insertpiece( custom_vs_posExecution )
 
 	return outVs;
 }

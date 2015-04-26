@@ -421,8 +421,8 @@ namespace Ogre
             }
             else if( numNeededDraws > 0 /*&& mRenderQueues[i].mMode == FAST*/ )
             {
-                renderGL3( casterPass, dualParaboloid, passCache, mRenderQueues[i],
-                           indirectBuffer, indirectDraw, startIndirectDraw );
+                indirectDraw = renderGL3( casterPass, dualParaboloid, passCache, mRenderQueues[i],
+                                          indirectBuffer, indirectDraw, startIndirectDraw );
             }
         }
 
@@ -522,11 +522,11 @@ namespace Ogre
         mLastTextureHash    = lastTextureHash;
     }
     //-----------------------------------------------------------------------
-    void RenderQueue::renderGL3( bool casterPass, bool dualParaboloid, HlmsCache passCache[],
-                                 const RenderQueueGroup &renderQueueGroup,
-                                 IndirectBufferPacked *indirectBuffer,
-                                 unsigned char *indirectDraw,
-                                 unsigned char *startIndirectDraw )
+    unsigned char* RenderQueue::renderGL3( bool casterPass, bool dualParaboloid, HlmsCache passCache[],
+                                           const RenderQueueGroup &renderQueueGroup,
+                                           IndirectBufferPacked *indirectBuffer,
+                                           unsigned char *indirectDraw,
+                                           unsigned char *startIndirectDraw )
     {
         HlmsMacroblock const *lastMacroblock = mLastMacroblock;
         HlmsBlendblock const *lastBlendblock = mLastBlendblock;
@@ -631,9 +631,10 @@ namespace Ogre
                     indirectDraw += sizeof( CbDrawIndexed );
 
                     drawCountPtr = drawIndexedPtr;
-                    drawIndexedPtr->primCount       = vao->mIndexBuffer->getNumElements();
+                    drawIndexedPtr->primCount       = vao->mPrimCount;
                     drawIndexedPtr->instanceCount   = 1;
-                    drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart();
+                    drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart() +
+                                                                                    vao->mPrimStart;
                     drawIndexedPtr->baseVertex      = vao->mVertexBuffers[0]->_getFinalBufferStart();
                     drawIndexedPtr->baseInstance    = baseInstance;
 
@@ -645,9 +646,10 @@ namespace Ogre
                     indirectDraw += sizeof( CbDrawStrip );
 
                     drawCountPtr = drawStripPtr;
-                    drawStripPtr->primCount         = vao->mVertexBuffers[0]->getNumElements();
+                    drawStripPtr->primCount         = vao->mPrimCount;
                     drawStripPtr->instanceCount     = 1;
-                    drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart();
+                    drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart() +
+                                                                                        vao->mPrimStart;
                     drawStripPtr->baseInstance      = baseInstance;
 
                     instanceCount = 1;
@@ -671,6 +673,8 @@ namespace Ogre
         mLastVertexData     = 0;
         mLastIndexData      = 0;
         mLastTextureHash    = 0;
+
+        return indirectDraw;
     }
     //-----------------------------------------------------------------------
     void RenderQueue::renderGL3V1( bool casterPass, bool dualParaboloid,

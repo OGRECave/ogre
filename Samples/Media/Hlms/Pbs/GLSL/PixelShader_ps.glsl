@@ -1,8 +1,6 @@
 @property( !false )
-@property( GL430 )#version 430 core
-@end @property( !GL430 )
-#version 330 core
-#extension GL_ARB_shading_language_420pack: require
+@insertpiece( SetCrossPlatformSettings )
+@property( !GL430 )
 @property( hlms_tex_gather )#extension GL_ARB_texture_gather: require@end
 @end
 
@@ -24,11 +22,12 @@ in vec4 gl_FragCoord;
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
 @end
+@insertpiece( custom_ps_uniformDeclaration )
+// END UNIFORM DECLARATION
 in block
 {
 @insertpiece( VStoPS_block )
 } inPs;
-// END UNIFORM DECLARATION
 
 @property( !hlms_shadowcaster )
 
@@ -212,6 +211,7 @@ vec3 qmul( vec4 q, vec3 v )
 
 void main()
 {
+    @insertpiece( custom_ps_preExecution )
 @property( hlms_normal || hlms_qtangent )
         uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
 	material = materialArray.m[materialId];
@@ -229,6 +229,8 @@ void main()
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
 @property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
+
+	@insertpiece( custom_ps_posMaterialLoad )
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	@property( detail_weight_map )
@@ -272,7 +274,7 @@ void main()
         fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
         fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
-@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps )
+@end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
     float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end
 
@@ -295,6 +297,8 @@ void main()
 
 @foreach( detail_maps_diffuse, n )
 	@insertpiece( blend_mode_idx@n ) @end
+
+@property( diffuse_map || detail_maps_diffuse )	diffuseCol.xyz *= material.kD.xyz;@end
 
 @property( normal_map_tex )
 	@piece( detail_nm_op_sum )+=@end
@@ -323,6 +327,9 @@ void main()
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
 	vec3 finalColour = vec3(0);
+
+	@insertpiece( custom_ps_preLights )
+
 @property( hlms_lights_directional )
 	finalColour += BRDF( pass.lights[0].position, viewDir, NdotV, pass.lights[0].diffuse, pass.lights[0].specular );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
@@ -396,15 +403,21 @@ void main()
 @end @property( !hlms_normal && !hlms_qtangent )
 	outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
 @end
+
+	@insertpiece( custom_ps_posExecution )
 }
 @end
 @property( hlms_shadowcaster )
 void main()
 {
+	@insertpiece( custom_ps_preExecution )
+
 @property( GL3+ )
 	outColour = inPs.depth;@end
 @property( !GL3+ )
 	gl_FragColor.x = inPs.depth;@end
+
+	@insertpiece( custom_ps_posExecution )
 }
 @end
 @end

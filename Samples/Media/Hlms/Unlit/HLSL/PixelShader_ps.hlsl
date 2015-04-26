@@ -5,11 +5,12 @@
 @insertpiece( MaterialDecl )
 @insertpiece( InstanceDecl )
 @end
+@insertpiece( custom_ps_uniformDeclaration )
+// END UNIFORM DECLARATION
 struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
 };
-// END UNIFORM DECLARATION
 
 @property( !hlms_shadowcaster )
 
@@ -28,6 +29,8 @@ SamplerState samplerState@n : register(s@counter(samplerStateBind));@end
 
 float4 main( PS_INPUT inPs ) : SV_Target0
 {
+	@insertpiece( custom_ps_preExecution )
+
 	@property( diffuse_map || alpha_test || diffuse )Material material;@end
 
 	float4 outColour;
@@ -35,6 +38,8 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 	uint materialId	= materialIdx[inPs.drawId].x;
 	material = materialArray[materialId];
 @end
+
+	@insertpiece( custom_ps_posMaterialLoad )
 
 @property( !diffuse_map && !diffuse_map0 )
 @property( hlms_colour && !diffuse_map )	outColour = inPs.colour @insertpiece( MultiplyDiffuseConst );@end
@@ -56,15 +61,21 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 	@property( !hlms_colour && diffuse )outColour *= material.diffuse;@end
 @end
 
+	@insertpiece( custom_ps_preLights )
+
 @property( alpha_test )
 	if( material.alpha_test_threshold.x @insertpiece( alpha_test_cmp_func ) outColour.a )
 		discard;@end
+
+	@insertpiece( custom_ps_posExecution )
 
 	return outColour;
 }
 @end @property( hlms_shadowcaster )
 float main( PS_INPUT inPs ) : SV_Target0
 {
+	@insertpiece( custom_ps_preExecution )
+	@insertpiece( custom_ps_posExecution )
 	return inPs.depth;
 }
 @end

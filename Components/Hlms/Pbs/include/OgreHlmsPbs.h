@@ -47,8 +47,8 @@ namespace Ogre
 
     class HlmsPbsDatablock;
 
-    /** Physically based shading implementation specfically designed for OpenGL ES 2.0 and other
-        RenderSystems which do not support uniform buffers.
+    /** Physically based shading implementation specfically designed for
+        OpenGL 3+, D3D11 and other RenderSystems which support uniform buffers.
     */
     class _OgreHlmsPbsExport HlmsPbs : public HlmsBufferManager, public ConstBufferPool
     {
@@ -121,7 +121,7 @@ namespace Ogre
                                            CommandBuffer *commandBuffer, bool isV1 );
 
     public:
-        HlmsPbs( Archive *dataFolder );
+        HlmsPbs( Archive *dataFolder, ArchiveVec *libraryFolders );
         ~HlmsPbs();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );

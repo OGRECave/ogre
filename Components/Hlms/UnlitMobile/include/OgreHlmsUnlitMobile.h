@@ -70,7 +70,7 @@ namespace Ogre
                                                     const HlmsParamVec &paramVec );
 
     public:
-        HlmsUnlitMobile( Archive *dataFolder );
+        HlmsUnlitMobile( Archive *dataFolder, ArchiveVec *libraryFolders );
         ~HlmsUnlitMobile();
 
         virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
