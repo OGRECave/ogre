@@ -642,8 +642,11 @@ namespace Ogre {
         }
         mBackgroundContextList.clear();
 
-        OCGE( glDeleteFramebuffers( 1, &mNullColourFramebuffer ) );
-        mNullColourFramebuffer = 0;
+        if( mNullColourFramebuffer )
+        {
+            OCGE( glDeleteFramebuffers( 1, &mNullColourFramebuffer ) );
+            mNullColourFramebuffer = 0;
+        }
 
         mGLSupport->stop();
         mStopRendering = true;
