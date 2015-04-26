@@ -1043,6 +1043,20 @@ namespace Ogre {
         mTextureCoordIndex[stage] = index;
     }
 
+    void GL3PlusRenderSystem::setUavStartingSlot( uint32 startingSlot )
+    {
+        if( startingSlot != mUavStartingSlot )
+        {
+            for( uint32 i=0; i<64; ++i )
+            {
+                if( !mUavs[i].texture.isNull() )
+                    mUavs[i].dirty = true;
+            }
+        }
+
+        RenderSystem::setUavStartingSlot( startingSlot );
+    }
+
     void GL3PlusRenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
                                             TextureAccess access,
                                             int32 mipmapLevel, int32 textureArrayIndex,
@@ -1062,9 +1076,9 @@ namespace Ogre {
         mUavs[slot].dirty       = true;
         mUavs[slot].texture     = texture;
 
-        if( texture.isNull() )
+        if( !texture.isNull() )
         {
-            if( !texture.isNull() && !(texture->getUsage() & TU_UAV) )
+            if( !(texture->getUsage() & TU_UAV) )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                              "Texture must have been created with TU_UAV to be bound as UAV",
@@ -1113,9 +1127,10 @@ namespace Ogre {
             {
                 if( !mUavs[i].texture.isNull() )
                 {
-                    OCGE( glBindImageTexture( i, mUavs[i].textureName, mUavs[i].mipmap,
-                                              mUavs[i].isArrayTexture, mUavs[i].arrayIndex,
-                                              mUavs[i].access, mUavs[i].format) );
+                    OCGE( glBindImageTexture( mUavStartingSlot + i, mUavs[i].textureName,
+                                              mUavs[i].mipmap, mUavs[i].isArrayTexture,
+                                              mUavs[i].arrayIndex, mUavs[i].access,
+                                              mUavs[i].format) );
                 }
                 else
                 {

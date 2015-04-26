@@ -729,6 +729,22 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled,  Texture *texPtr) = 0;
 
+        /** In Direct3D11, UAV & RenderTargets share the same slots. Because of this,
+            we enforce the same behavior on all RenderSystems.
+            An unfortunate consequence is that if you attach an MRT consisting of 3 RTs;
+            the UAV needs to set at slot 3; not slot 0.
+            This setting lets you tell Ogre the starting slot; so queueBindUAV( 0, ... )
+            can goes to slot 3 if you call setUavStartingSlot( 3 )
+        @par
+            Ogre will raise an exception if the starting slot is lower than the number
+            of attached RTs.
+        @remarks
+            Will not take effect until the next call to flushUAVs or setting a new RTT.
+        @param startingSlot
+            Default value: 1.
+        */
+        virtual void setUavStartingSlot( uint32 startingSlot );
+
         /** Queues the binding of an UAV to the binding point/slot.
             It won't actually take effect until you flush the UAVs or set another RTT.
         @param bindPoint
@@ -1480,6 +1496,8 @@ namespace Ogre
         float mDerivedDepthBiasBase;
         float mDerivedDepthBiasMultiplier;
         float mDerivedDepthBiasSlopeScale;
+
+        uint32  mUavStartingSlot;
 
         /// a global vertex buffer for global instancing
         v1::HardwareVertexBufferSharedPtr mGlobalInstanceVertexBuffer;

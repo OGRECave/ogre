@@ -370,6 +370,8 @@ namespace Ogre {
         */
         void _setTextureMatrix(size_t stage, const Matrix4& xform) { };   // Not supported
 
+        virtual void setUavStartingSlot( uint32 startingSlot );
+
         virtual void queueBindUAV( uint32 slot, TexturePtr texture,
                                    TextureAccess access = TA_READ_WRITE,
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,

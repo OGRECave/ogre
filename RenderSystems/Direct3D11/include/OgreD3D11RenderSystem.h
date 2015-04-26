@@ -116,6 +116,14 @@ namespace Ogre
         D3D11HLSLProgram* mBoundTessellationDomainProgram;
         D3D11HLSLProgram* mBoundComputeProgram;
 
+        TexturePtr                  mUavTexPtr[64];
+        ID3D11UnorderedAccessView   *mUavs[64];
+
+        /// In range [0; 64]; note that a user may use
+        /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
+        /// and still mMaxUavIndexPlusOne = 3.
+        uint8   mMaxModifiedUavPlusOne;
+
         /// For rendering legacy objects.
         v1::VertexData  *mCurrentVertexBuffer;
         v1::IndexData   *mCurrentIndexBuffer;
@@ -182,7 +190,7 @@ namespace Ogre
          * With DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL flag render target views are unbound
          * from us each Present(), and we need the way to reestablish connection.
          */
-        void _setRenderTargetViews();
+        void _setRenderTargetViews( bool colourWrite );
 
         void updateDepthStencilView(void);
 
@@ -290,6 +298,12 @@ namespace Ogre
         void _setTextureMatrix( size_t unit, const Matrix4 &xform );
         void _setViewport( Viewport *vp );
 
+        virtual void queueBindUAV( uint32 slot, TexturePtr texture,
+                                   TextureAccess access = TA_READ_WRITE,
+                                   int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
+                                   PixelFormat pixelFormat = PF_UNKNOWN );
+        virtual void flushUAVs(void);
+
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock );
@@ -364,7 +378,7 @@ namespace Ogre
         /**
          * Set current render target to target, enabling its GL context if needed
          */
-        void _setRenderTarget(RenderTarget *target);
+        virtual void _setRenderTarget( RenderTarget *target, bool colourWrite );
 
         /** Check whether or not filtering is supported for the precise texture format requested
         with the given usage options.
