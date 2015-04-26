@@ -7479,6 +7479,7 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7626,6 +7627,7 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7859,27 +7861,28 @@ namespace Ogre{
                         }
                     }
                     break;
-                    case ID_MATERIAL_SCHEME:
+                case ID_MATERIAL_SCHEME:
+                    {
+                        if (prop->values.empty())
                         {
-                            if (prop->values.empty())
-                            {
-                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                                return;
-                            }
-
-                            AbstractNodeList::const_iterator it0 = prop->values.begin();
-                            if (!getString(*it0, &passScene->mMaterialScheme))
-                            {
-                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                            }
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
                         }
-                        break;
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if (!getString(*it0, &passScene->mMaterialScheme))
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
                 case ID_VIEWPORT:
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7987,6 +7990,7 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8090,7 +8094,7 @@ namespace Ogre{
                             mPassDef->mVpScissorLeft    = mPassDef->mVpLeft;
                             mPassDef->mVpScissorTop     = mPassDef->mVpTop;
                             mPassDef->mVpScissorWidth   = mPassDef->mVpWidth;
-                            mPassDef->mVpScissorHeight  	= mPassDef->mVpHeight;
+                            mPassDef->mVpScissorHeight  = mPassDef->mVpHeight;
                         }
                     }
                     break;
@@ -8197,6 +8201,25 @@ namespace Ogre{
                         else
                         {
                             mPassDef->mViewportModifierMask = static_cast<uint8>( val & 0xFF );
+                        }
+                    }
+                    break;
+                case ID_COLOUR_WRITE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "colour_write only supports 1 argument");
+                    }
+                    else
+                    {
+                        if(!getBoolean(prop->values.front(), &mPassDef->mColourWrite))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "colour_write argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
                         }
                     }
                     break;

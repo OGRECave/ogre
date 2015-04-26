@@ -837,12 +837,13 @@ namespace Ogre
                     ID_OVERLAYS,
                     ID_EXECUTION_MASK,
                     ID_VIEWPORT_MODIFIER_MASK,
+                    //ID_COLOUR_WRITE,
 
                     //Used by PASS_SCENE
                     ID_LOD_BIAS,
                     ID_LOD_UPDATE_LIST,
                     ID_LOD_CAMERA,
-                    ID_MATERIAL_SCHEME, //TODO
+                    ID_MATERIAL_SCHEME,
                     ID_VISIBILITY_MASK,
                     ID_SHADOWS_ENABLED,
                     ID_CAMERA,
