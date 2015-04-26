@@ -736,8 +736,9 @@ namespace Ogre
             This setting lets you tell Ogre the starting slot; so queueBindUAV( 0, ... )
             can goes to slot 3 if you call setUavStartingSlot( 3 )
         @par
-            Ogre will raise an exception if the starting slot is lower than the number
-            of attached RTs.
+            Ogre will raise an exception in D3D11 if the starting slot is lower than
+            the number of attached RTs, but will let it pass if you're using GL3+
+            [TODO: Make this behavior consistent?]
         @remarks
             Will not take effect until the next call to flushUAVs or setting a new RTT.
         @param startingSlot
