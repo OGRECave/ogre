@@ -335,8 +335,8 @@ namespace Ogre {
                 // Ok, we're out of date with SceneNode we're attached to
                 mLastParentOrientation = mParentNode->_getDerivedOrientation();
                 mLastParentPosition = mParentNode->_getDerivedPosition();
-                mRealOrientation = mLastParentOrientation * mOrientation;
-                mRealPosition = (mLastParentOrientation * mPosition) + mLastParentPosition;
+                mRealOrientation = mParentNode->convertLocalToWorldOrientation(mOrientation);
+                mRealPosition = mParentNode->convertLocalToWorldPosition(mPosition);
                 mRecalcView = true;
                 mRecalcWindow = true;
             }
