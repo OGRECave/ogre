@@ -282,6 +282,7 @@ float4 main( PS_INPUT inPs
 
 	@insertpiece( custom_ps_preLights )
 
+@property( !custom_disable_directional_lights )
 @property( hlms_lights_directional )
 	finalColour += BRDF( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
@@ -290,6 +291,7 @@ float4 main( PS_INPUT inPs
 	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
 @foreach( hlms_lights_directional_non_caster, n, hlms_lights_directional )
 	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
+@end
 
 @property( hlms_lights_point || hlms_lights_spot )	float3 lightDir;
 	float fDistance;
