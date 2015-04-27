@@ -1122,6 +1122,19 @@ namespace Ogre {
         mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
     }
 
+    void GL3PlusRenderSystem::clearUAVs(void)
+    {
+        for( size_t i=0; i<64; ++i )
+        {
+            if( !mUavs[i].texture.isNull() )
+            {
+                mUavs[i].dirty = true;
+                mUavs[i].texture.setNull();
+                mMaxModifiedUavPlusOne = i + 1;
+            }
+        }
+    }
+
     void GL3PlusRenderSystem::flushUAVs(void)
     {
         for( uint32 i=0; i<mMaxModifiedUavPlusOne; ++i )
@@ -1341,6 +1354,10 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glScissor(x, y, w, h));
 
             vp->_clearUpdatedFlag();
+        }
+        else if( mMaxModifiedUavPlusOne )
+        {
+            flushUAVs();
         }
     }
 

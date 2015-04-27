@@ -766,6 +766,10 @@ namespace Ogre
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN ) = 0;
 
+        /// By default queueBindUAV will keep all other slots intact. Calling this function
+        /// will unset all bound UAVs. Will take effect after flushUAVs or setting a new RT.
+        virtual void clearUAVs(void) = 0;
+
         /// Forces to take effect all the queued UAV binding requests. @see _queueBindUAV.
         /// You don't need to call this if you're going to set the render target next.
         virtual void flushUAVs(void) = 0;

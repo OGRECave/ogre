@@ -145,6 +145,8 @@ namespace Ogre
         IdString getName(void) const                                { return mName; }
         const CompositorNodeDef* getDefinition() const              { return mDefinition; }
 
+        RenderSystem* getRenderSystem(void) const                   { return mRenderSystem; }
+
         /** Enables or disables all instances of this node
         @remarks
             Note that we just won't execute our passes. It's your job to change the

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUavDef.h"
 
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "Compositor/OgreCompositorManager2.h"
@@ -70,6 +71,9 @@ namespace Ogre
             break;
         case PASS_STENCIL:
             retVal = OGRE_NEW CompositorPassStencilDef( mRtIndex );
+            break;
+        case PASS_UAV:
+            retVal = OGRE_NEW CompositorPassUavDef( mParentNodeDef, mRtIndex );
             break;
         case PASS_CUSTOM:
             {

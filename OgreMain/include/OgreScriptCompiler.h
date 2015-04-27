@@ -512,6 +512,7 @@ namespace Ogre
             TEXTURE,
             MATERIAL,
             GPU_PROGRAM,
+            UAV,
             COMPOSITOR
         };
         ResourceType mResourceType;
@@ -831,6 +832,7 @@ namespace Ogre
                 ID_STENCIL,
                 ID_RENDER_SCENE,
                 ID_RENDER_QUAD,
+                ID_UAV_QUEUE,
                     ID_VIEWPORT,
                     ID_NUM_INITIAL,
                     ID_IDENTIFIER,
@@ -882,6 +884,16 @@ namespace Ogre
                     ID_DEPTH_FAIL_OP,
                     ID_PASS_OP,
                     ID_TWO_SIDED,
+
+                    //Used by PASS_UAV
+                    ID_UAV,
+                    ID_UAV_EXTERNAL,
+                    ID_STARTING_SLOT,
+                    ID_KEEP_PREVIOUS_UAV,
+                    ID_READ,
+                    ID_WRITE,
+                    ID_MIPMAP,
+
             ID_READ_BACK_AS_TEXTURE,
 
         ID_SHADOW_NODE,

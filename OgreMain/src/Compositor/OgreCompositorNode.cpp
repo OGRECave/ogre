@@ -36,6 +36,8 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUav.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUavDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
 #include "Compositor/OgreCompositorManager2.h"
@@ -379,6 +381,11 @@ namespace Ogre
                     newPass = OGRE_NEW CompositorPassStencil(
                                             static_cast<CompositorPassStencilDef*>(*itPass),
                                             *channel, this, mRenderSystem );
+                    break;
+                case PASS_UAV:
+                    newPass = OGRE_NEW CompositorPassUav(
+                                            static_cast<CompositorPassUavDef*>(*itPass),
+                                            this, *channel );
                     break;
                 case PASS_CUSTOM:
                     {

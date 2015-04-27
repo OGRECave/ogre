@@ -123,6 +123,7 @@ namespace Ogre
         /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
         /// and still mMaxUavIndexPlusOne = 3.
         uint8   mMaxModifiedUavPlusOne;
+        bool    mUavsDirty;
 
         /// For rendering legacy objects.
         v1::VertexData  *mCurrentVertexBuffer;

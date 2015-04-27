@@ -141,6 +141,7 @@ bail:
           mBoundDepthStencilState(0),
           mpDXGIFactory(0),
           mMaxModifiedUavPlusOne( 0 ),
+          mUavsDirty( false ),
           mDSTResView(0)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
@@ -2248,6 +2249,10 @@ bail:
                 if( static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer() )
                     _setRenderTargetViews( vp->getColourWrite() );
             }
+            else if( mUavsDirty )
+            {
+                flushUAVs();
+            }
         }
     }
     //---------------------------------------------------------------------
@@ -2260,6 +2265,8 @@ bail:
 
         if( mUavTexPtr[slot].isNull() && texture.isNull() )
             return;
+
+        mUavsDirty = true;
 
         mUavTexPtr[slot] = texture;
 
@@ -2351,8 +2358,26 @@ bail:
         }
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::clearUAVs(void)
+    {
+        mUavsDirty = true;
+
+        for( size_t i=0; i<64; ++i )
+        {
+            mUavTexPtr[i].setNull();
+
+            if( mUavs[i] )
+            {
+                mUavs[i]->Release();
+                mUavs[i] = 0;
+            }
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::flushUAVs(void)
     {
+        mUavsDirty = false;
+
         bool colourWrite = true;
         if( mActiveViewport )
             colourWrite = mActiveViewport->getColourWrite();

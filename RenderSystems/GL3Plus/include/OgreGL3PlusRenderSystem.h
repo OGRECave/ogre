@@ -377,6 +377,8 @@ namespace Ogre {
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN );
 
+        virtual void clearUAVs(void);
+
         virtual void flushUAVs(void);
         /** See
             RenderSystem
