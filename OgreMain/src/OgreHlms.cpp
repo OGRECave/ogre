@@ -1866,6 +1866,8 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsSpot,        0 );
         }
 
+        mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
+
         assert( mPassCache.size() < 32768 );
         HlmsPropertyVecVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(),
                                                      mSetProperties );

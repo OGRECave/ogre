@@ -43,10 +43,31 @@ namespace Ogre
     *  @{
     */
 
-    /** HLMS stands for "High Level Material System". */
+    /** Listener that can be hooked to an Hlms implementation for extending it with custom
+        code. See "8.6.5 Customizing an existing implementation" of the 2.x manual
+        on the different approaches to customizing Hlms implementations.
+    @remarks
+        For performance reasons, the listener interface does not allow you to add
+        customizations that work per Renderable, as that loop is performance sensitive.
+        The only listener callback that works inside Hlms::fillBuffersFor is hlmsTypeChanged
+        which only gets evaluated when the previous Renderable used a different Hlms
+        implementation; which is rare, and since we sort the RenderQueue, it often branch
+        predicts well.
+    */
     class _OgreExport HlmsListener
     {
     public:
+        /** Called right before creating the pass cache, to allow the listener
+            to add/remove properties.
+        @remarks
+            For the rest of the parameters, @see Hlms::preparePassHash
+        @param hlms
+            Caller Hlms; from which you can alter the properties using Hlms::setProperty
+        */
+        virtual void preparePassHash( const CompositorShadowNode *shadowNode,
+                                      bool casterPass, bool dualParaboloid,
+                                      SceneManager *sceneManager, Hlms *hlms ) {}
+
         /// Listeners should return the extra bytes they wish to allocate for storing additional
         /// data in the pass buffer.
         virtual uint32 getPassBufferSize( const CompositorShadowNode *shadowNode, bool casterPass,
