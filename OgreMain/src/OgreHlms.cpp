@@ -1893,8 +1893,7 @@ namespace Ogre
         uint32 hash[2];
         hash[0] = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                queuedRenderable.renderable->getHlmsHash();
-        hash[1] = passCache.hash &
-                        (queuedRenderable.movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
+        hash[1] = passCache.hash;
 
         //MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
 
