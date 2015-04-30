@@ -241,9 +241,11 @@ namespace Ogre
         guiDatablock->setTexture( 0, mTexture, OverlayUnlitDatablock::UvAtlasParams() );
 #endif
         guiDatablock->calculateHash();
-        //Source the alpha from the green channel.
-        guiDatablock->setTextureSwizzle( 0, HlmsUnlitDatablock::R_MASK, HlmsUnlitDatablock::R_MASK,
-                                         HlmsUnlitDatablock::R_MASK, HlmsUnlitDatablock::G_MASK );
+        if (mType == FT_TRUETYPE || !blendByAlpha) {
+            //Source the alpha from the green channel.
+            guiDatablock->setTextureSwizzle( 0, HlmsUnlitDatablock::R_MASK, HlmsUnlitDatablock::R_MASK,
+                                    HlmsUnlitDatablock::R_MASK, HlmsUnlitDatablock::G_MASK );
+        }
 
         // Make sure material is aware of colour per vertex.
         mMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
