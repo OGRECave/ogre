@@ -188,6 +188,8 @@ namespace Ogre
 
 	protected:
 
+		bool mCanHardwareGamma;
+
 		ColourValue mAlbedo;
 		ColourValue mF0;
 		Real mRoughness;

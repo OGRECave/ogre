@@ -82,6 +82,9 @@ namespace Ogre
 
 		mVertexDatablock.setTemplateName("PBS");
 		mFragmentDatablock.setTemplateName("PBS");
+
+		// TODO check if the hardware supports gamma correction "Root::getSingleton().getRenderSystem()->getCapabilities()" doesen't support this check
+		mCanHardwareGamma = false;
 	}
 	//-----------------------------------------------------------------------------------
 	PbsMaterial::PbsMaterial(const PbsMaterial &obj)
@@ -193,14 +196,12 @@ namespace Ogre
 
 		mPropertyMap.setProperty("lights_count", mDirectionalLightCount + mPointLightCount + mSpotLightCount);
 
-		// tell the shader if the hardware supports hardware gamma correction or not
-		// TODO check if the hardware supports gamma correction "Root::getSingleton().getRenderSystem()->getCapabilities()" doesen't support this check
-		bool canHardwareGamma = true; 
-		mPropertyMap.setProperty("hw_gamma_read", canHardwareGamma);
+		// tell the shader if the hardware supports hardware gamma correction or not 
+		mPropertyMap.setProperty("hw_gamma_read", mCanHardwareGamma);
 
 		// if HardwareGammaWrite is enable we don't need to bring the result from the shader to gamma space
 		bool isHardwareGammaWriteEnabled = camera->getViewport()->getTarget()->isHardwareGammaEnabled();
-		mPropertyMap.setProperty("hw_gamma_write", canHardwareGamma && isHardwareGammaWriteEnabled);
+		mPropertyMap.setProperty("hw_gamma_write", isHardwareGammaWriteEnabled);
 
 		// UV Sets
 		mPropertyMap.setProperty("uvset_main_index", mMainUvSetIndex);
@@ -420,7 +421,7 @@ namespace Ogre
 		if (!tex.isNull())
 		{
 			// Ensure that the texture in the shader is in linear space
-			tex->setHardwareGammaEnabled(s.needsGammaCorrection);
+			tex->setHardwareGammaEnabled(mCanHardwareGamma && s.needsGammaCorrection);
 
 			if (s.status == SS_NOT_ACTIVE) s.status = SS_ADDED;
 			else if (s.status == SS_ACTIVE) s.status = SS_UPDATED;
