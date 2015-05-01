@@ -28,6 +28,8 @@
 #ifndef __OGRE_DEFLATE_H__
 #define __OGRE_DEFLATE_H__
 
+#if OGRE_NO_ZIP_ARCHIVE == 0
+
 #include "OgrePrerequisites.h"
 #include "OgreDataStream.h"
 #include "OgreHeaderPrefix.h"
@@ -139,5 +141,7 @@ namespace Ogre
 }
 
 #include "OgreHeaderSuffix.h"
+
+#endif
 
 #endif
