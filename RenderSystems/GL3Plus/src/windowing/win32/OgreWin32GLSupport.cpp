@@ -563,7 +563,7 @@ namespace Ogre {
                         mHasPixelFormatARB = true;
                     else if (ext == "WGL_ARB_multisample")
                         mHasMultisample = true;
-                    else if (ext == "WGL_EXT_framebuffer_sRGB")
+                    else if (ext == "WGL_EXT_framebuffer_sRGB" || ext == "WGL_ARB_framebuffer_sRGB")
                         mHasHardwareGamma = true;
                 }
             }
