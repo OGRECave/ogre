@@ -166,14 +166,16 @@ namespace Ogre
         z = _mm_madd_ps( Mathlib::Abs4( m.mChunkBase[9] ), mHalfSize.mChunkBase[1], z );            // abs( m21 ) * y +
         z = _mm_madd_ps( Mathlib::Abs4( m.mChunkBase[8] ), mHalfSize.mChunkBase[0], z );            // abs( m20 ) * x
 
-        //Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
-        //(which is ok since we need them to say 'false' to intersection tests)
-        x = MathlibNEON::CmovRobust( MathlibNEON::INFINITEA, x,
-                                    vceqq_f32( mHalfSize.mChunkBase[0], MathlibNEON::INFINITEA ) );
-        y = MathlibNEON::CmovRobust( MathlibNEON::INFINITEA, y,
-                                    vceqq_f32( mHalfSize.mChunkBase[1], MathlibNEON::INFINITEA ) );
-        z = MathlibNEON::CmovRobust( MathlibNEON::INFINITEA, z,
-                                    vceqq_f32( mHalfSize.mChunkBase[2], MathlibNEON::INFINITEA ) );
+        //Handle infinity & null boxes becoming NaN; leaving the original value instead.
+        x = MathlibNEON::CmovRobust( mHalfSize.mChunkBase[0], x,
+                                     vceqq_f32( Mathlib::Abs4(mHalfSize.mChunkBase[0]),
+                                                MathlibNEON::INFINITEA ) );
+        y = MathlibNEON::CmovRobust( mHalfSize.mChunkBase[1], y,
+                                     vceqq_f32( Mathlib::Abs4(mHalfSize.mChunkBase[1]),
+                                                MathlibNEON::INFINITEA ) );
+        z = MathlibNEON::CmovRobust( mHalfSize.mChunkBase[2], z,
+                                     vceqq_f32( Mathlib::Abs4(mHalfSize.mChunkBase[2]),
+                                                MathlibNEON::INFINITEA ) );
 
         mHalfSize = ArrayVector3( x, y, z );
     }

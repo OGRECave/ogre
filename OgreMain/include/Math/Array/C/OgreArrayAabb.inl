@@ -142,11 +142,11 @@ namespace Ogre
 
         mCenter = m * mCenter;
 
-        ArrayReal x = Math::Abs( m.mChunkBase[2] ) * mHalfSize.mChunkBase[2];           // abs( m02 ) * z +
+        ArrayReal x = Math::Abs( m.mChunkBase[2] ) * mHalfSize.mChunkBase[2];       // abs( m02 ) * z +
         x = ogre_madd( Math::Abs( m.mChunkBase[1] ), mHalfSize.mChunkBase[1], x );  // abs( m01 ) * y +
         x = ogre_madd( Math::Abs( m.mChunkBase[0] ), mHalfSize.mChunkBase[0], x );  // abs( m00 ) * x
 
-        ArrayReal y = Math::Abs( m.mChunkBase[6] ) * mHalfSize.mChunkBase[2];           // abs( m12 ) * z +
+        ArrayReal y = Math::Abs( m.mChunkBase[6] ) * mHalfSize.mChunkBase[2];       // abs( m12 ) * z +
         y = ogre_madd( Math::Abs( m.mChunkBase[5] ), mHalfSize.mChunkBase[1], y );  // abs( m11 ) * y +
         y = ogre_madd( Math::Abs( m.mChunkBase[4] ), mHalfSize.mChunkBase[0], y );  // abs( m10 ) * x
 
@@ -156,9 +156,12 @@ namespace Ogre
 
         //Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
         //(which is ok since we need them to say 'false' to intersection tests)
-        x = MathlibC::CmovRobust( MathlibC::INFINITEA, x, mHalfSize.mChunkBase[0] == MathlibC::INFINITEA );
-        y = MathlibC::CmovRobust( MathlibC::INFINITEA, y, mHalfSize.mChunkBase[1] == MathlibC::INFINITEA );
-        z = MathlibC::CmovRobust( MathlibC::INFINITEA, z, mHalfSize.mChunkBase[2] == MathlibC::INFINITEA );
+        x = MathlibC::CmovRobust( mHalfSize.mChunkBase[0], x,
+                                    Math::Abs(mHalfSize.mChunkBase[0]) == MathlibC::INFINITEA );
+        y = MathlibC::CmovRobust( mHalfSize.mChunkBase[1], y,
+                                    Math::Abs(mHalfSize.mChunkBase[1]) == MathlibC::INFINITEA );
+        z = MathlibC::CmovRobust( mHalfSize.mChunkBase[2], z,
+                                    Math::Abs(mHalfSize.mChunkBase[2]) == MathlibC::INFINITEA );
 
         mHalfSize = ArrayVector3( x, y, z );
     }
