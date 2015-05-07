@@ -866,6 +866,7 @@ namespace v1 {
         }
 
         mMainBuf.setNull();
+        mMainBuffers.clear();
 
         mBuffersCreated = false;
     }
