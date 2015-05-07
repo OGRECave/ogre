@@ -168,12 +168,11 @@ namespace Ogre
         Real y = Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z;
         Real z = Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z;
 
-        //Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
-        //(which is ok since we need them to say 'false' to intersection tests)
+        //Handle infinity & null boxes becoming NaN; leaving the original value instead.
         mHalfSize = Vector3(
-                mHalfSize.x == std::numeric_limits<Real>::infinity() ? mHalfSize.x : x,
-                mHalfSize.y == std::numeric_limits<Real>::infinity() ? mHalfSize.y : y,
-                mHalfSize.z == std::numeric_limits<Real>::infinity() ? mHalfSize.z : z );
+                Math::Abs(mHalfSize.x) == std::numeric_limits<Real>::infinity() ? mHalfSize.x : x,
+                Math::Abs(mHalfSize.y) == std::numeric_limits<Real>::infinity() ? mHalfSize.y : y,
+                Math::Abs(mHalfSize.z) == std::numeric_limits<Real>::infinity() ? mHalfSize.z : z );
     }
     //-----------------------------------------------------------------------------------
     inline Real Aabb::getRadius() const
