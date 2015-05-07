@@ -155,7 +155,7 @@ namespace Ogre
         dist.y = Math::Abs( dist.y ) - mHalfSize.y;
         dist.z = Math::Abs( dist.z ) - mHalfSize.z;
 
-        return std::max( std::min( std::min( dist.x, dist.y ), dist.z ), 1.0f );
+        return Ogre::max( Ogre::min( Ogre::min( dist.x, dist.y ), dist.z ), 1.0f );
     }
     //-----------------------------------------------------------------------------------
     inline void Aabb::transformAffine( const Matrix4 &m )
@@ -164,10 +164,16 @@ namespace Ogre
 
         mCenter = m.transformAffine( mCenter );
 
+        Real x = Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z;
+        Real y = Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z;
+        Real z = Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z;
+
+        //Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
+        //(which is ok since we need them to say 'false' to intersection tests)
         mHalfSize = Vector3(
-                Math::Abs(m[0][0]) * mHalfSize.x + Math::Abs(m[0][1]) * mHalfSize.y + Math::Abs(m[0][2]) * mHalfSize.z, 
-                Math::Abs(m[1][0]) * mHalfSize.x + Math::Abs(m[1][1]) * mHalfSize.y + Math::Abs(m[1][2]) * mHalfSize.z,
-                Math::Abs(m[2][0]) * mHalfSize.x + Math::Abs(m[2][1]) * mHalfSize.y + Math::Abs(m[2][2]) * mHalfSize.z );
+                mHalfSize.x == std::numeric_limits<Real>::infinity() ? mHalfSize.x : x,
+                mHalfSize.y == std::numeric_limits<Real>::infinity() ? mHalfSize.y : y,
+                mHalfSize.z == std::numeric_limits<Real>::infinity() ? mHalfSize.z : z );
     }
     //-----------------------------------------------------------------------------------
     inline Real Aabb::getRadius() const
