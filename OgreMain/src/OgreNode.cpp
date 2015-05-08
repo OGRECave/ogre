@@ -166,11 +166,41 @@ namespace Ogre {
     {
         if (mCachedTransformOutOfDate)
         {
+#if OGRE_NODE_INHERIT_TRANSFORM
+            Ogre::Matrix4 tr;
+            tr.makeTransform(mPosition, mScale, mOrientation);
+
+            if(mParent == NULL)
+            {
+                mCachedTransform = tr;
+            }
+            else if(mInheritOrientation && mInheritScale) // everything is inherited
+            {
+                mCachedTransform = mParent->_getFullTransform() * tr;
+            }
+            else if(!mInheritOrientation && !mInheritScale) // only position is inherited
+            {
+                mCachedTransform = tr;
+                mCachedTransform.setTrans(tr.getTrans() + mParent->_getFullTransform().getTrans());
+            }
+            else // shear is inherited together with orientation, controlled by mInheritOrientation
+            {
+                const Ogre::Matrix4& parentTr = mParent->_getFullTransform();
+                Ogre::Vector3 parentScale(
+                    parentTr.transformDirectionAffine(Vector3::UNIT_X).length(),
+                    parentTr.transformDirectionAffine(Vector3::UNIT_Y).length(),
+                    parentTr.transformDirectionAffine(Vector3::UNIT_Z).length());
+
+                assert(mInheritOrientation ^ mInheritScale);
+                mCachedTransform = (mInheritOrientation ? Matrix4::getScale(1.0f / parentScale)  * parentTr : Matrix4::getScale(parentScale)) * tr;
+            }
+#else
             // Use derived values
             mCachedTransform.makeTransform(
                 _getDerivedPosition(),
                 _getDerivedScale(),
                 _getDerivedOrientation());
+#endif
             mCachedTransformOutOfDate = false;
         }
         return mCachedTransform;
@@ -231,8 +261,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::updateFromParentImpl(void) const
     {
+        mCachedTransformOutOfDate = true;
+
         if (mParent)
         {
+#if OGRE_NODE_INHERIT_TRANSFORM
+            // Decompose full transform to position, orientation and scale, shear is lost here.
+            _getFullTransform().decomposition(mDerivedPosition, mDerivedScale, mDerivedOrientation);
+#else
             // Update orientation
             const Quaternion& parentOrientation = mParent->_getDerivedOrientation();
             if (mInheritOrientation)
@@ -265,6 +301,7 @@ namespace Ogre {
 
             // Add altered position vector to parents
             mDerivedPosition += mParent->_getDerivedPosition();
+#endif
         }
         else
         {
@@ -274,7 +311,6 @@ namespace Ogre {
             mDerivedScale = mScale;
         }
 
-        mCachedTransformOutOfDate = true;
         mNeedParentUpdate = false;
 
     }
@@ -580,7 +616,11 @@ namespace Ogre {
         {
             _updateFromParent();
         }
+#if OGRE_NODE_INHERIT_TRANSFORM
+        return _getFullTransform().inverseAffine().transformAffine(worldPos);
+#else
         return mDerivedOrientation.Inverse() * (worldPos - mDerivedPosition) / mDerivedScale;
+#endif
     }
     //-----------------------------------------------------------------------
     Vector3 Node::convertLocalToWorldPosition( const Vector3 &localPos )
@@ -589,7 +629,7 @@ namespace Ogre {
         {
             _updateFromParent();
         }
-        return (mDerivedOrientation * (localPos * mDerivedScale)) + mDerivedPosition;
+        return _getFullTransform().transformAffine(localPos);
     }
     //-----------------------------------------------------------------------
     Vector3 Node::convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale )
@@ -598,9 +638,15 @@ namespace Ogre {
         {
             _updateFromParent();
         }
+
         return useScale ? 
+#if OGRE_NODE_INHERIT_TRANSFORM
+            _getFullTransform().inverseAffine().transformDirectionAffine(worldDir) :
+            mDerivedOrientation.Inverse() * worldDir;
+#else
             mDerivedOrientation.Inverse() * worldDir / mDerivedScale :
             mDerivedOrientation.Inverse() * worldDir;
+#endif
     }
     //-----------------------------------------------------------------------
     Vector3 Node::convertLocalToWorldDirection( const Vector3 &localDir, bool useScale )
@@ -610,7 +656,7 @@ namespace Ogre {
             _updateFromParent();
         }
         return useScale ? 
-            mDerivedOrientation * (localDir * mDerivedScale) :
+            _getFullTransform().transformDirectionAffine(localDir) :
             mDerivedOrientation * localDir;
     }
     //-----------------------------------------------------------------------
