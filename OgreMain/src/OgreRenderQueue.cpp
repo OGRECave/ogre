@@ -582,6 +582,9 @@ namespace Ogre
                 CbHlmsCache *hlmsCacheCmd = mCommandBuffer->addCommand<CbHlmsCache>();
                 *hlmsCacheCmd = CbHlmsCache( hlmsCache );
                 lastHlmsCache = hlmsCache;
+
+                //Flush the Vao when changing shaders. Needed by D3D11/12 & possibly Vulkan
+                lastVaoName = 0;
             }
 
             uint32 baseInstance = hlms->fillBuffersForV2( hlmsCache, queuedRenderable, casterPass,
@@ -731,6 +734,10 @@ namespace Ogre
                 CbHlmsCache *hlmsCacheCmd = mCommandBuffer->addCommand<CbHlmsCache>();
                 *hlmsCacheCmd = CbHlmsCache( hlmsCache );
                 lastHlmsCache = hlmsCache;
+
+                //Flush the RenderOp when changing shaders. Needed by D3D11/12 & possibly Vulkan
+                lastRenderOp.vertexData = 0;
+                lastRenderOp.indexData  = 0;
             }
 
             uint32 baseInstance = hlms->fillBuffersForV1( hlmsCache, queuedRenderable, casterPass,
