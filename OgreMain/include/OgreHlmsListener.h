@@ -57,6 +57,25 @@ namespace Ogre
     class _OgreExport HlmsListener
     {
     public:
+        /** Called after the shader was created/compiled, and right before
+            bindGpuProgramParameters (relevant information for OpenGL programs).
+        @param shaderProfile
+            @see Hlms::mShaderProfile
+        @param hlmsCacheEntry
+            The created shader.
+        @param passCache
+            @see Hlms::createShaderCacheEntry
+        @param properties
+            The current contents of Hlms::mSetProperties
+        @param queuedRenderable
+            @see Hlms::createShaderCacheEntry
+        */
+        virtual void shaderCacheEntryCreated( const String &shaderProfile,
+                                              const HlmsCache *hlmsCacheEntry,
+                                              const HlmsCache &passCache,
+                                              const HlmsPropertyVec &properties,
+                                              const QueuedRenderable &queuedRenderable ) {}
+
         /** Called right before creating the pass cache, to allow the listener
             to add/remove properties.
         @remarks

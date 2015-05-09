@@ -297,13 +297,25 @@ namespace Ogre
             *it = p;
     }
     //-----------------------------------------------------------------------------------
-    int32 Hlms::getProperty(IdString key, int32 defaultVal ) const
+    int32 Hlms::getProperty( IdString key, int32 defaultVal ) const
     {
         HlmsProperty p( key, 0 );
         HlmsPropertyVec::const_iterator it = std::lower_bound( mSetProperties.begin(),
                                                                mSetProperties.end(),
                                                                p, OrderPropertyByIdString );
         if( it != mSetProperties.end() && it->keyName == p.keyName )
+            defaultVal = it->value;
+
+        return defaultVal;
+    }
+    //-----------------------------------------------------------------------------------
+    int32 Hlms::getProperty( const HlmsPropertyVec &properties, IdString key, int32 defaultVal )
+    {
+        HlmsProperty p( key, 0 );
+        HlmsPropertyVec::const_iterator it = std::lower_bound( properties.begin(),
+                                                               properties.end(),
+                                                               p, OrderPropertyByIdString );
+        if( it != properties.end() && it->keyName == p.keyName )
             defaultVal = it->value;
 
         return defaultVal;

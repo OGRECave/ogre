@@ -266,7 +266,11 @@ namespace Ogre
                                                                 queuedRenderable );
 
         if( mShaderProfile == "hlsl" )
+        {
+            mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
+                                                mSetProperties, queuedRenderable );
             return retVal; //D3D embeds the texture slots in the shader.
+        }
 
         //Set samplers.
         GpuProgramParametersSharedPtr vsParams = retVal->vertexShader->getDefaultParameters();
@@ -310,6 +314,9 @@ namespace Ogre
         }
 
         vsParams->setNamedConstant( "worldMatBuf", 0 );
+
+        mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
+                                            mSetProperties, queuedRenderable );
 
         mRenderSystem->_setProgramsFromHlms( retVal );
 
