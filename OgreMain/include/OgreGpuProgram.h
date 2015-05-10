@@ -236,6 +236,16 @@ namespace Ogre {
     */
     virtual void setSource(const String& source);
 
+    /** Sets the source assembly for this program from an in-memory string,
+        while providing a path to a file, which can be needed/useful for
+        debugging shaders (i.e. Visual Studio Graphics Debugger)
+    @param source
+        Shader source code
+    @param debugFilename
+        Optional Path to this file. Can be left blank.
+    */
+    virtual void setSource(const String& source, const String &debugFilename);
+
     /** Gets the syntax code for this program e.g. arbvp1, fp20, vs_1_1 etc */
     virtual const String& getSyntaxCode(void) const { return mSyntaxCode; }
 

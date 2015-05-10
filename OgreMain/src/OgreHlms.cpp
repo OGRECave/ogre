@@ -1566,11 +1566,14 @@ namespace Ogre
                                                            ShaderFiles[i] );
                 }
 
+                String debugFilenameOutput;
+
                 if( mDebugOutput )
                 {
-                    std::ofstream outFile( (mOutputPath + "./" +
-                                           StringConverter::toString( finalHash ) +
-                                           ShaderFiles[i] + mShaderFileExt).c_str(),
+                    debugFilenameOutput = mOutputPath + "./" +
+                                            StringConverter::toString( finalHash ) +
+                                            ShaderFiles[i] + mShaderFileExt;
+                    std::ofstream outFile( debugFilenameOutput.c_str(),
                                            std::ios::out | std::ios::binary );
                     outFile.write( &outString[0], outString.size() );
                 }
@@ -1585,7 +1588,7 @@ namespace Ogre
                                 StringConverter::toString( finalHash ) + ShaderFiles[i],
                                 ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
                                 mShaderProfile, static_cast<GpuProgramType>(i) );
-                    gp->setSource( outString );
+                    gp->setSource( outString, debugFilenameOutput );
 
                     if( mShaderTargets[i] )
                     {

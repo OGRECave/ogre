@@ -85,6 +85,14 @@ namespace Ogre
         mLoadFromFile = false;
         mCompileError = false;
     }
+    //-----------------------------------------------------------------------------
+    void GpuProgram::setSource(const String& source, const String &debugFilename)
+    {
+        mSource = source;
+        mFilename = debugFilename;
+        mLoadFromFile = false;
+        mCompileError = false;
+    }
     size_t GpuProgram::calculateSize(void) const
     {
         size_t memSize = 0;
