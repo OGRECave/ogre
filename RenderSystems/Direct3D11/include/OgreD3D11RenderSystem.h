@@ -300,7 +300,7 @@ namespace Ogre
         void _setViewport( Viewport *vp );
 
         virtual void queueBindUAV( uint32 slot, TexturePtr texture,
-                                   TextureAccess access = TA_READ_WRITE,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN );
         virtual void flushUAVs(void);

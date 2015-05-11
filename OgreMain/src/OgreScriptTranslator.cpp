@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "OgreParticleSystem.h"
 #include "OgreRoot.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreResourceTransition.h"
 
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
@@ -8045,7 +8046,7 @@ namespace Ogre{
                         }
 
                         // Clearing the UAV
-                        passUav->setUav( slot, false, "", 0, TA_READ, 0, PF_UNKNOWN );
+                        passUav->setUav( slot, false, "", 0, ResourceAccess::Read, 0, PF_UNKNOWN );
                     }
                     else
                     {
@@ -8080,9 +8081,9 @@ namespace Ogre{
                                     switch(atom->id)
                                     {
                                     case ID_READ:
-                                        access |= TA_READ;
+                                        access |= ResourceAccess::Read;
                                     case ID_WRITE:
-                                        access |= TA_WRITE;
+                                        access |= ResourceAccess::Write;
                                         break;
                                     case ID_MIPMAP:
                                         mipmapFollows = true;
@@ -8120,7 +8121,8 @@ namespace Ogre{
                             }
 
                             passUav->setUav( slot, isExternal, evt.mName, mrtIndex,
-                                             static_cast<TextureAccess>(access), mipmap, format );
+                                             static_cast<ResourceAccess::ResourceAccess>(access),
+                                             mipmap, format );
                         }
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,

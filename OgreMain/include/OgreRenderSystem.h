@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgrePlane.h"
 #include "OgreHardwareVertexBuffer.h"
+#include "OgreResourceTransition.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -762,7 +763,7 @@ namespace Ogre
             Will be the same is left as PF_UNKNOWN
         */
         virtual void queueBindUAV( uint32 slot, TexturePtr texture,
-                                   TextureAccess access = TA_READ_WRITE,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN ) = 0;
 

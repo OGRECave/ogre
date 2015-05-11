@@ -43,7 +43,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     void CompositorPassUavDef::setUav( uint32 slot, bool isExternal, const String &textureName,
-                                       uint32 mrtIndex, TextureAccess access,
+                                       uint32 mrtIndex, ResourceAccess::ResourceAccess access,
                                        int32 mipmapLevel, PixelFormat pixelFormat )
     {
         IdString internalName;

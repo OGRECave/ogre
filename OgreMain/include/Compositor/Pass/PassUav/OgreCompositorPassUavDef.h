@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "../OgreCompositorPassDef.h"
 #include "OgreCommon.h"
 #include "OgreTexture.h"
+#include "OgreResourceTransition.h"
 
 namespace Ogre
 {
@@ -61,13 +62,13 @@ namespace Ogre
             /// Index in case of MRT. Ignored if textureSource isn't mrt
             uint32      mrtIndex;
 
-            TextureAccess   access;
+            ResourceAccess::ResourceAccess access;
             int32           mipmapLevel;
             PixelFormat     pixelFormat;
 
             TextureSource( uint32 _uavSlot, IdString _textureName,
                            const String &_externalTextureName,
-                           uint32 _mrtIndex, TextureAccess _access,
+                           uint32 _mrtIndex, ResourceAccess::ResourceAccess _access,
                            int32 _mipmapLevel, PixelFormat _pixelFormat ) :
                 uavSlot( _uavSlot ), textureName( _textureName ),
                 externalTextureName( _externalTextureName ), mrtIndex( _mrtIndex ),
@@ -104,7 +105,7 @@ namespace Ogre
             Name of the texture. When empty, it will clear the slots.
         */
         void setUav( uint32 slot, bool isExternal, const String &textureName, uint32 mrtIndex,
-                     TextureAccess access, int32 mipmapLevel, PixelFormat pixelFormat );
+                     ResourceAccess::ResourceAccess access, int32 mipmapLevel, PixelFormat pixelFormat );
 
         const TextureSources& getTextureSources(void) const     { return mTextureSources; }
     };

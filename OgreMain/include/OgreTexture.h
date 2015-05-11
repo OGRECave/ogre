@@ -74,15 +74,6 @@ namespace Ogre {
         TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY
     };
 
-    /** Enum identifying the texture access privilege
-     */
-    enum TextureAccess
-    {
-        TA_READ = 0x01,
-        TA_WRITE = 0x10,
-        TA_READ_WRITE = TA_READ | TA_WRITE
-    };
-
     /** Enum identifying the texture type
     */
     enum TextureType

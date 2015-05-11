@@ -2257,7 +2257,7 @@ bail:
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
-                                          TextureAccess access,
+                                          ResourceAccess::ResourceAccess access,
                                           int32 mipmapLevel, int32 textureArrayIndex,
                                           PixelFormat pixelFormat )
     {

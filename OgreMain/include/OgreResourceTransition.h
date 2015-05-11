@@ -103,6 +103,17 @@ namespace Ogre
     };
     }
 
+    namespace ResourceAccess
+    {
+    /// Enum identifying the texture access privilege
+    enum ResourceAccess
+    {
+        Read = 0x01,
+        Write = 0x10,
+        ReadWrite = Read | Write
+    };
+    }
+
     struct ResourceTransition
     {
         Resource *resource;

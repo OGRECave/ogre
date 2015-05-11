@@ -1061,7 +1061,7 @@ namespace Ogre {
     }
 
     void GL3PlusRenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
-                                            TextureAccess access,
+                                            ResourceAccess::ResourceAccess access,
                                             int32 mipmapLevel, int32 textureArrayIndex,
                                             PixelFormat pixelFormat )
     {
@@ -1102,13 +1102,13 @@ namespace Ogre {
 
             switch( access )
             {
-            case TA_READ:
+            case ResourceAccess::Read:
                 mUavs[slot].access = GL_READ_ONLY;
                 break;
-            case TA_WRITE:
+            case ResourceAccess::Write:
                 mUavs[slot].access = GL_WRITE_ONLY;
                 break;
-            case TA_READ_WRITE:
+            case ResourceAccess::ReadWrite:
                 mUavs[slot].access = GL_READ_WRITE;
                 break;
             default:
