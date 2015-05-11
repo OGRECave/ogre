@@ -38,6 +38,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     class CompositorNodeDef;
+    class CompositorPassResourceTransition;
 
     /** \addtogroup Core
     *  @{
@@ -205,6 +206,8 @@ namespace Ogre
         */
         TexturePtr getDefinedTexture( IdString textureName, size_t mrtIndex ) const;
 
+        const CompositorChannel* _getDefinedTexture( IdString textureName ) const;
+
         /** Creates all passes based on our definition
         @remarks
             Call this function after connecting all channels (at least our input)
@@ -212,6 +215,27 @@ namespace Ogre
             @See connectTo and @see connectFinalRT
         */
         void createPasses(void);
+
+        /** Inserts a 'CompositorPassResourceTransition' pass in the middle of two existing
+            passes. This function must be called after createPasses.
+        @remarks
+            Normally, all passes are baked through their definition, thus createPasses
+            is a one-time initialization step.
+            However, resource transitions (aka barriers) are inserted afterwards for three
+            reasons:
+                1. It's much easier to evaluate the data dependencies after the instance
+                   has been constructed.
+                2. These passes must be generated automatically.
+                3. If the definition changes, all the barriers may need to be rearranged.
+        @par
+            After this call, the iterators pointing to the vector from _getPasses may be
+            invalidated.
+        @param idx
+            Where to insert this pass. Must be in range [0; mPasses.size())
+        @param pass
+            The pass to insert. We will delete this pointer.
+        */
+        void _insertResourceTransitionPass( size_t idx, CompositorPassResourceTransition *pass );
 
         const CompositorPassVec& _getPasses() const                 { return mPasses; }
 

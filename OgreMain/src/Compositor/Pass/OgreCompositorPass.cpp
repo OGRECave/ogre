@@ -97,10 +97,38 @@ namespace Ogre
             mViewport->setColourWrite( mDefinition->mColourWrite );
             mViewport->setOverlaysEnabled( mDefinition->mIncludeOverlays );
         }
+
+        populateTextureDependenciesFromExposedTextures();
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorPass::CompositorPass( const CompositorPassDef *definition, CompositorNode *parentNode,
+                                    bool specialPass ) :
+        mDefinition( definition ),
+        mTarget( 0 ),
+        mViewport( 0 ),
+        mNumPassesLeft( 0 ),
+        mParentNode( parentNode )
+    {
+        assert( specialPass && "Don't use this constructor if you don't know what you're doing!"
+                " Use the other one instead.");
     }
     //-----------------------------------------------------------------------------------
     CompositorPass::~CompositorPass()
     {
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::populateTextureDependenciesFromExposedTextures(void)
+    {
+        IdStringVec::const_iterator itor = mDefinition->mExposedTextures.begin();
+        IdStringVec::const_iterator end  = mDefinition->mExposedTextures.end();
+
+        while( itor != end )
+        {
+            const CompositorChannel *channel = mParentNode->_getDefinedTexture( *itor );
+            mTextureDependencies.push_back( CompositorTexture( *itor, &channel->textures ) );
+
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     RenderTarget* CompositorPass::calculateRenderTarget( size_t rtIndex,

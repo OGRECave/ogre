@@ -38,6 +38,8 @@ namespace Ogre
 {
     class CompositorNodeDef;
 
+    typedef vector<IdString>::type IdStringVec;
+
     /** \addtogroup Core
     *  @{
     */
@@ -53,6 +55,7 @@ namespace Ogre
         PASS_STENCIL,
         PASS_RESOLVE,
         PASS_UAV,
+        PASS_RESOURCE_TRANSITION,
         PASS_CUSTOM
     };
 
@@ -118,6 +121,9 @@ namespace Ogre
 
         uint8               mExecutionMask;
         uint8               mViewportModifierMask;
+
+        IdStringVec         mExposedTextures;
+        IdStringVec         mUavDependencies;
 
     public:
         CompositorPassDef( CompositorPassType passType, uint32 rtIndex ) :

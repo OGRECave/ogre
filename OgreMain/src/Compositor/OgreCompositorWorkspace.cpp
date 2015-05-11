@@ -1,4 +1,4 @@
-/*
+﻿/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -34,6 +34,10 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNode.h"
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+#include "Compositor/Pass/PassResourceTransition/OgreCompositorPassResourceTransition.h"
+
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderTexture.h"
 
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
@@ -250,6 +254,8 @@ namespace Ogre
             mNodeSequence.insert( mNodeSequence.end(), unprocessedList.begin(), unprocessedList.end() );
 
             mValid = true;
+
+            analyzeHazardsAndPlaceBarriers();
         }
     }
     //-----------------------------------------------------------------------------------
@@ -362,6 +368,185 @@ namespace Ogre
                 ++itor;
             }
             ++itShadowNode;
+        }
+    }
+
+    inline void fillResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                     const CompositorChannelVec &compositorChannels,
+                                     ResourceLayout::Layout layout )
+    {
+        CompositorChannelVec::const_iterator itor = compositorChannels.begin();
+        CompositorChannelVec::const_iterator end  = compositorChannels.end();
+
+        while( itor != end )
+        {
+            outResourcesLayout[itor->target] = layout;
+            ++itor;
+        }
+    }
+
+    inline uint32 transitionWriteBarrierBits( ResourceLayout::Layout oldLayout )
+    {
+        uint32 retVal = 0;
+        switch( oldLayout )
+        {
+        case ResourceLayout::RenderTarget:
+            retVal = WriteBarrier::RenderTarget;
+            break;
+        case ResourceLayout::RenderDepth:
+            retVal = WriteBarrier::DepthStencil;
+            break;
+        case ResourceLayout::Uav:
+            retVal = WriteBarrier::Uav;
+            break;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorPassResourceTransition* CompositorWorkspace::createCompositorPassResourceTransition(
+                                                                            CompositorNode *parentNode )
+    {
+        return OGRE_NEW CompositorPassResourceTransition( OGRE_NEW CompositorPassResourceTransitionDef(),
+                                                          parentNode, mRenderSys );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspace::addResourceTransition( CompositorNode *node,
+                                                     ResourceLayoutMap::iterator currentLayout,
+                                                     CompositorPassResourceTransition **transitionPass,
+                                                     ResourceLayout::Layout newLayout,
+                                                     uint32 readBarrierBits )
+    {
+        if( !(*transitionPass) )
+            (*transitionPass) = createCompositorPassResourceTransition( node );
+
+        ResourceTransition transition;
+        transition.oldLayout = currentLayout->second;
+        transition.newLayout = newLayout;
+        transition.writeBarrierBits = transitionWriteBarrierBits( transition.oldLayout );
+        transition.readBarrierBits  = readBarrierBits;
+
+        (*transitionPass)->addTransition( transition );
+
+        currentLayout->second = transition.newLayout;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspace::analyzeHazardsAndPlaceBarriers(void)
+    {
+        ResourceLayoutMap resourcesLayout;
+
+        resourcesLayout[mRenderWindow.target] = ResourceLayout::RenderTarget;
+        fillResourcesLayout( resourcesLayout, mGlobalTextures, ResourceLayout::Undefined );
+
+        CompositorNodeVec newSequence;
+        newSequence.reserve( mNodeSequence.size() );
+
+        CompositorNodeVec::iterator itor = mNodeSequence.begin();
+        CompositorNodeVec::iterator end  = mNodeSequence.end();
+
+        while( itor != end )
+        {
+            CompositorNode *node = *itor;
+
+            fillResourcesLayout( resourcesLayout, node->getLocalTextures(), ResourceLayout::Undefined );
+
+            const CompositorPassVec &passes = (*itor)->_getPasses();
+            CompositorPassVec::const_iterator itPasses = passes.begin();
+            CompositorPassVec::const_iterator enPasses = passes.end();
+
+            //Check <anything> -> RT
+            while( itPasses != enPasses )
+            {
+                CompositorPassResourceTransition *transitionPass = 0;
+
+                CompositorPass *pass = *itPasses;
+                RenderTarget *rt = pass->getRenderTarget();
+                ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( rt );
+
+                if( currentLayout->second != ResourceLayout::RenderTarget )
+                {
+                    addResourceTransition( node, currentLayout, &transitionPass,
+                                           ResourceLayout::RenderTarget,
+                                           ReadBarrier::RenderTarget );
+                }
+
+                //Check <anything> -> Texture
+                const CompositorTextureVec &textureDependencies = pass->getTextureDependencies();
+                CompositorTextureVec::const_iterator itDep = textureDependencies.begin();
+                CompositorTextureVec::const_iterator enDep = textureDependencies.end();
+
+                while( itDep != enDep )
+                {
+                    TexturePtr texture = itDep->textures->front();
+                    RenderTarget *renderTarget = texture->getBuffer()->getRenderTarget();
+
+                    currentLayout = resourcesLayout.find( renderTarget );
+
+                    if( currentLayout->second != ResourceLayout::Texture )
+                    {
+                        //TODO: Account for depth textures.
+                        addResourceTransition( node, currentLayout, &transitionPass,
+                                               ResourceLayout::Texture,
+                                               ReadBarrier::Texture );
+                    }
+
+                    ++itDep;
+                }
+
+                //Check <anything> -> UAV
+                const CompositorPassDef *passDef = pass->getDefinition();
+                IdStringVec::const_iterator itUavNames = passDef->mUavDependencies.begin();
+                IdStringVec::const_iterator enUavNames = passDef->mUavDependencies.end();
+
+                while( itUavNames != enUavNames )
+                {
+                    if( !transitionPass )
+                        transitionPass = createCompositorPassResourceTransition( node );
+
+                    const CompositorChannel *channel = node->_getDefinedTexture( *itUavNames );
+
+                    currentLayout = resourcesLayout.find( channel->target );
+
+                    //Uavs are always hazardous, an UAV->UAV 'transition' is just a memory barrier.
+                    addResourceTransition( node, currentLayout, &transitionPass,
+                                           ResourceLayout::Uav,
+                                           ReadBarrier::Uav );
+
+                    ++itUavNames;
+                }
+
+                if( transitionPass )
+                {
+                    //Inject the ResourceTransition pass in between the regular passes.
+                    const size_t passIdx = itPasses - passes.begin() + 1;
+                    node->_insertResourceTransitionPass( passIdx, transitionPass );
+
+                    //Iterators have been invalidated, refresh them. Continuing where we left off.
+                    itPasses = passes.begin() + passIdx + 1;
+                    enPasses = passes.end();
+                }
+
+                ++itPasses;
+            }
+
+            ++itor;
+        }
+
+        //TODO: Take shadow nodes in mind.
+
+        //Check the output is still a RenderTarget at the end.
+        ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( mRenderWindow.target );
+        if( currentLayout->second != ResourceLayout::RenderTarget )
+        {
+            CompositorNode *node = mNodeSequence.back();
+            CompositorPassResourceTransition *transitionPass =
+                                                        createCompositorPassResourceTransition( node );
+
+            addResourceTransition( node, currentLayout, &transitionPass,
+                                   ResourceLayout::RenderTarget,
+                                   ReadBarrier::RenderTarget );
+
+            node->_insertResourceTransitionPass( node->_getPasses().size(), transitionPass );
         }
     }
     //-----------------------------------------------------------------------------------

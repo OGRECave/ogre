@@ -46,6 +46,24 @@ namespace Ogre
     *  @{
     */
 
+    typedef vector<TexturePtr>::type TextureVec;
+
+    struct CompositorTexture
+    {
+        IdString            name;
+        TextureVec const    *textures;
+
+        CompositorTexture( IdString _name, const TextureVec *_textures ) :
+                name( _name ), textures( _textures ) {}
+
+        bool operator == ( IdString right ) const
+        {
+            return name == right;
+        }
+    };
+
+    typedef vector<CompositorTexture>::type CompositorTextureVec;
+
     /** Abstract class for compositor passes. A pass can be a fullscreen quad, a scene
         rendering, a clear. etc.
         Derived classes are responsible for performing an actual job.
@@ -67,11 +85,17 @@ namespace Ogre
 
         CompositorNode  *mParentNode;
 
+        CompositorTextureVec    mTextureDependencies;
+
+        void populateTextureDependenciesFromExposedTextures(void);
+
         RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
 
     public:
         CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
                         CompositorNode *parentNode );
+        CompositorPass( const CompositorPassDef *definition, CompositorNode *parentNode,
+                        bool specialPass );
         virtual ~CompositorPass();
 
         virtual void execute( const Camera *lodCameraconst ) = 0;
@@ -90,9 +114,13 @@ namespace Ogre
 
         Viewport* getViewport() const       { return mViewport; }
 
+        RenderTarget* getRenderTarget(void) const           { return mTarget; }
+
         const CompositorPassDef* getDefinition(void) const  { return mDefinition; }
 
 		const CompositorNode* getParentNode(void) const		{ return mParentNode; }
+
+        const CompositorTextureVec& getTextureDependencies(void) const  { return mTextureDependencies; }
     };
 
     /** @} */
