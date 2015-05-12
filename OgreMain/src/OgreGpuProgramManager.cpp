@@ -31,6 +31,13 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 
+#include "Hash/MurmurHash3.h"
+
+#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32
+        #define OGRE_HASH128_FUNC MurmurHash3_x86_128
+#else
+        #define OGRE_HASH128_FUNC MurmurHash3_x64_128
+#endif
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -235,22 +242,29 @@ namespace Ogre {
         return mCacheDirty;     
     }
     //---------------------------------------------------------------------
-    String GpuProgramManager::addRenderSystemToName( const String & name )
+    GpuProgramManager::Hash GpuProgramManager::computeHashWithRenderSystemName( const String &source )
     {
         // Use the current render system
-        RenderSystem* rs = Root::getSingleton().getRenderSystem();
+        RenderSystem *rs = Root::getSingleton().getRenderSystem();
 
-        return rs->getName() + "_" + name;
+        Hash hashVal[2];
+        OGRE_HASH128_FUNC( source.c_str(), source.size(), IdString::Seed, &hashVal[0] );
+        OGRE_HASH128_FUNC( rs->getName().c_str(), rs->getName().size(), IdString::Seed, &hashVal[1] );
+
+        Hash retVal;
+        OGRE_HASH128_FUNC( hashVal, sizeof( hashVal ), IdString::Seed, &retVal );
+
+        return retVal;
     }
     //---------------------------------------------------------------------
-    bool GpuProgramManager::isMicrocodeAvailableInCache( const String & name ) const
+    bool GpuProgramManager::isMicrocodeAvailableInCache( const String &source ) const
     {
-        return mMicrocodeCache.find(addRenderSystemToName(name)) != mMicrocodeCache.end();
+        return mMicrocodeCache.find(computeHashWithRenderSystemName(source)) != mMicrocodeCache.end();
     }
     //---------------------------------------------------------------------
-    const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( const String & name ) const
+    const GpuProgramManager::Microcode & GpuProgramManager::getMicrocodeFromCache( const String & source ) const
     {
-        return mMicrocodeCache.find(addRenderSystemToName(name))->second;
+        return mMicrocodeCache.find(computeHashWithRenderSystemName(source))->second;
     }
     //---------------------------------------------------------------------
     GpuProgramManager::Microcode GpuProgramManager::createMicrocode( const uint32 size ) const
@@ -258,27 +272,27 @@ namespace Ogre {
         return Microcode(OGRE_NEW MemoryDataStream(size));  
     }
     //---------------------------------------------------------------------
-    void GpuProgramManager::addMicrocodeToCache( const String & name, const GpuProgramManager::Microcode & microcode )
+    void GpuProgramManager::addMicrocodeToCache( const String & source, const GpuProgramManager::Microcode & microcode )
     {   
-        String nameWithRenderSystem = addRenderSystemToName(name);
-        MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
+        Hash hash = computeHashWithRenderSystemName( source );
+
+        MicrocodeMap::iterator foundIter = mMicrocodeCache.find(hash);
         if ( foundIter == mMicrocodeCache.end() )
         {
-            mMicrocodeCache.insert(make_pair(nameWithRenderSystem, microcode));
+            mMicrocodeCache.insert( std::make_pair(hash, microcode) );
             // if cache is modified, mark it as dirty.
             mCacheDirty = true;
         }
         else
         {
             foundIter->second = microcode;
-
-        }       
+        }
     }
     //---------------------------------------------------------------------
-    void GpuProgramManager::removeMicrocodeFromCache( const String & name )
+    void GpuProgramManager::removeMicrocodeFromCache( const String & source )
     {
-        String nameWithRenderSystem = addRenderSystemToName(name);
-        MicrocodeMap::iterator foundIter = mMicrocodeCache.find(nameWithRenderSystem);
+        Hash hash = computeHashWithRenderSystemName( source );
+        MicrocodeMap::iterator foundIter = mMicrocodeCache.find( hash );
 
         if (foundIter != mMicrocodeCache.end())
         {
@@ -308,12 +322,10 @@ namespace Ogre {
         MicrocodeMap::const_iterator iterE = mMicrocodeCache.end();
         for ( ; iter != iterE ; ++iter )
         {
-            // saves the name of the shader
+            // saves the hash of the shader
             {
-                const String & nameOfShader = iter->first;
-                uint32 stringLength = static_cast<uint32>(nameOfShader.size());
-                stream->write(&stringLength, sizeof(uint32));               
-                stream->write(&nameOfShader[0], stringLength);
+                Hash hash = iter->first;
+                stream->write(&hash, sizeof(Hash));
             }
             // saves the microcode
             {
@@ -337,22 +349,19 @@ namespace Ogre {
 
         for ( uint32 i = 0 ; i < sizeOfArray ; i++ )
         {
-            String nameOfShader;
-            // loads the name of the shader
-            uint32 stringLength  = 0;
-            stream->read(&stringLength, sizeof(uint32));
-            nameOfShader.resize(stringLength);              
-            stream->read(&nameOfShader[0], stringLength);
+            Hash shaderHash;
+            // loads the hash of the shader
+            stream->read( &shaderHash, sizeof(Hash) );
 
             // loads the microcode
             uint32 microcodeLength = 0;
             stream->read(&microcodeLength, sizeof(uint32));     
 
-            Microcode microcodeOfShader(OGRE_NEW MemoryDataStream(nameOfShader, microcodeLength));      
+            Microcode microcodeOfShader(OGRE_NEW MemoryDataStream(microcodeLength));
             microcodeOfShader->seek(0);
             stream->read(microcodeOfShader->getPtr(), microcodeLength);
 
-            mMicrocodeCache.insert(make_pair(nameOfShader, microcodeOfShader));
+            mMicrocodeCache.insert( std::make_pair(shaderHash, microcodeOfShader) );
         }
 
         // if cache is not modified, mark it as clean.
