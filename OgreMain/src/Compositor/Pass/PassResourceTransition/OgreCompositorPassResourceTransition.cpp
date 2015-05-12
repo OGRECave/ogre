@@ -78,4 +78,29 @@ namespace Ogre
     {
         mResourceTransitions.push_back( transition );
     }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassResourceTransition::_prepareBarrierAndEmulateUavExecution(
+                                            BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
+                                            ResourceLayoutMap &resourcesLayout,
+                                            CompositorPassResourceTransition **transitionPass )
+    {
+        ResourceTransitionVec::const_iterator itor = mResourceTransitions.begin();
+        ResourceTransitionVec::const_iterator end  = mResourceTransitions.end();
+
+        while( itor != end )
+        {
+            if( itor->newLayout == ResourceLayout::Uav &&
+                itor->writeBarrierBits & WriteBarrier::Uav &&
+                itor->readBarrierBits & ReadBarrier::Uav )
+            {
+                //resourcesLayout.
+                //itor->resource.
+                RenderTarget *renderTarget = 0;
+                resourcesLayout[renderTarget] = ResourceLayout::Uav;
+                //Set to undefined so that regular passes can see it's safe / shielded by a barrier
+                uavsAccess[renderTarget] = ResourceAccess::Undefined;
+            }
+            ++itor;
+        }
+    }
 }

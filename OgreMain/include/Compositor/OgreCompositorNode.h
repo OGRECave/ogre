@@ -282,6 +282,9 @@ namespace Ogre
         */
         virtual void finalTargetResized( const RenderTarget *finalTarget );
 
+        /// @copydoc CompositorPassDef::getPassNumber
+        size_t getPassNumber( CompositorPass *pass ) const;
+
         /// Returns our parent workspace
         CompositorWorkspace* getWorkspace(void)                     { return mWorkspace; }
 

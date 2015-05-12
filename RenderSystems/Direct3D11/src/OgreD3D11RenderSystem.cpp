@@ -2287,7 +2287,8 @@ bail:
                 }
 
                 OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             "Texture must have been created with TU_UAV to be bound as UAV",
+                             "Texture " + texture->getName() +
+                             "must have been created with TU_UAV to be bound as UAV",
                              "D3D11RenderSystem::queueBindUAV" );
             }
 

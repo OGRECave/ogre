@@ -78,6 +78,11 @@ namespace Ogre
 
         virtual void execute( const Camera *lodCamera );
 
+        virtual void _prepareBarrierAndEmulateUavExecution(
+                                            BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
+                                            ResourceLayoutMap &resourcesLayout,
+                                            CompositorPassResourceTransition **transitionPass );
+
         void addTransition( const ResourceTransition &transition );
     };
 

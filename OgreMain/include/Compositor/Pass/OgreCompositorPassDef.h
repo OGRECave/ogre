@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 
 #include "OgreIdString.h"
+#include "OgreResourceTransition.h"
 #include "OgrePrerequisites.h"
 
 namespace Ogre
@@ -123,7 +124,23 @@ namespace Ogre
         uint8               mViewportModifierMask;
 
         IdStringVec         mExposedTextures;
-        IdStringVec         mUavDependencies;
+
+        struct UavDependency
+        {
+            uint32                          uavSlot;
+            //The UAV pass already sets the texture access.
+            //However two passes in a row may only read from it,
+            //thus this is convenient (without needing to add
+            //another set UAV pass)
+            ResourceAccess::ResourceAccess  access;
+            bool                            allowWriteAfterWrite;
+
+            UavDependency( uint32 _uavSlot, ResourceAccess::ResourceAccess _access,
+                           bool _allowWriteAfterWrite ) :
+                uavSlot( _uavSlot ), access( _access ), allowWriteAfterWrite( _allowWriteAfterWrite ) {}
+        };
+        typedef vector<UavDependency>::type UavDependencyVec;
+        UavDependencyVec    mUavDependencies;
 
     public:
         CompositorPassDef( CompositorPassType passType, uint32 rtIndex ) :

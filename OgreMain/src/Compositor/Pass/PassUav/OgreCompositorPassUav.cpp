@@ -36,9 +36,10 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceListener.h"
 
-#include "OgreRenderTarget.h"
+#include "OgreRenderTexture.h"
 #include "OgreRenderSystem.h"
 #include "OgreTextureManager.h"
+#include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre
 {
@@ -146,5 +147,54 @@ namespace Ogre
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
             mTarget->_endUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassUav::_prepareBarrierAndEmulateUavExecution(
+                                            BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
+                                            ResourceLayoutMap &resourcesLayout,
+                                            CompositorPassResourceTransition **transitionPass )
+    {
+        const CompositorPassUavDef::TextureSources &textureSources =
+                                                            mDefinition->getTextureSources();
+        CompositorPassUavDef::TextureSources::const_iterator itor = textureSources.begin();
+        CompositorPassUavDef::TextureSources::const_iterator end  = textureSources.end();
+        while( itor != end )
+        {
+            TexturePtr texture;
+
+            if( itor->externalTextureName.empty() )
+            {
+                texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+            }
+            else if( itor->textureName != IdString() )
+            {
+                texture = TextureManager::getSingleton().getByName(
+                            itor->externalTextureName,
+                            ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+                if( texture.isNull() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                                 "Texture with name: " + itor->externalTextureName + " does not exist."
+                                 "The texture must exist by the time the workspace is executed. "
+                                 "Are you trying to use a texture defined by the compositor? If so"
+                                 "you need to set it via 'uav' instead of 'uav_external'",
+                                 "CompositorPassUav::_prepareBarrierAndEmulateUavExecution" );
+                }
+            }
+
+            if( !(texture->getUsage() & TU_UAV) )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Texture " + texture->getName() +
+                             " must have been created with TU_UAV to be bound as UAV",
+                             "CompositorPassUav::_prepareBarrierAndEmulateUavExecution" );
+            }
+
+            boundUavs[itor->uavSlot].renderTarget = texture->getBuffer()->getRenderTarget();
+            boundUavs[itor->uavSlot].boundAccess = itor->access;
+
+            ++itor;
+        }
     }
 }

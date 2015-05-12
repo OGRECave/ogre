@@ -492,4 +492,9 @@ namespace Ogre
                                                             finalTarget, mRenderSystem, mConnectedNodes,
                                                             &mPasses );
     }
+    //-----------------------------------------------------------------------------------
+    size_t CompositorNode::getPassNumber( CompositorPass *pass ) const
+    {
+        return mDefinition->getPassNumber( pass->getDefinition() );
+    }
 }

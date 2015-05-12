@@ -1084,7 +1084,8 @@ namespace Ogre {
             if( !(texture->getUsage() & TU_UAV) )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             "Texture must have been created with TU_UAV to be bound as UAV",
+                             "Texture " + texture->getName() +
+                             " must have been created with TU_UAV to be bound as UAV",
                              "GL3PlusRenderSystem::queueBindUAV" );
             }
 
@@ -1112,7 +1113,7 @@ namespace Ogre {
                 mUavs[slot].access = GL_READ_WRITE;
                 break;
             default:
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid TextureAccess parameter '" +
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid ResourceAccess parameter '" +
                              StringConverter::toString( access ) + "'",
                              "GL3PlusRenderSystem::queueBindUAV" );
                 break;

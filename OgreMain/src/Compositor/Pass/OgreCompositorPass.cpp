@@ -172,6 +172,74 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    void CompositorPass::_prepareBarrierAndEmulateUavExecution(
+                                            BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
+                                            ResourceLayoutMap &resourcesLayout,
+                                            CompositorPassResourceTransition **transitionPass )
+    {
+        CompositorPassDef::UavDependencyVec::const_iterator itor = mDefinition->mUavDependencies.begin();
+        CompositorPassDef::UavDependencyVec::const_iterator end  = mDefinition->mUavDependencies.end();
+
+        while( itor != end )
+        {
+            RenderTarget *uavRt = boundUavs[itor->uavSlot].renderTarget;
+
+            if( !uavRt )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                             "No UAV is bound at slot " + StringConverter::toString( itor->uavSlot ) +
+                             " but it is marked as used by node " +
+                             mParentNode->getName().getFriendlyText() + "; pass #" +
+                             StringConverter::toString( mParentNode->getPassNumber( this ) ),
+                             "CompositorPass::emulateUavExecution" );
+            }
+
+            if( !(itor->access & boundUavs[itor->uavSlot].boundAccess) )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                             "Node " + mParentNode->getName().getFriendlyText() + "; pass #" +
+                             StringConverter::toString( mParentNode->getPassNumber( this ) ) +
+                             " marked " + ResourceAccess::toString( itor->access ) +
+                             " access to UAV at slot " +
+                             StringConverter::toString( itor->uavSlot ) + " but this UAV is bound for " +
+                             ResourceAccess::toString( boundUavs[itor->uavSlot].boundAccess ) +
+                             " access.", "CompositorPass::emulateUavExecution" );
+            }
+
+            ResourceAccessMap::iterator itResAccess = uavsAccess.find( uavRt );
+
+            if( itResAccess == uavsAccess.end() )
+            {
+                //First time accessing the UAV. If we need a barrier,
+                //we will see it in the second pass.
+                uavsAccess[uavRt] = ResourceAccess::Undefined;
+                itResAccess = uavsAccess.find( uavRt );
+            }
+
+            ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( uavRt );
+
+            if( currentLayout->second != ResourceLayout::Uav ||
+                !( (itor->access == ResourceAccess::Read &&
+                    itResAccess->second == ResourceAccess::Read) ||
+                   (itor->access == ResourceAccess::Write &&
+                    itResAccess->second == ResourceAccess::Write &&
+                    itor->allowWriteAfterWrite) ||
+                   itResAccess->second == ResourceAccess::Undefined ) )
+            {
+                //Not RaR (or not WaW when they're explicitly allowed). Insert the barrier.
+                //We also may need the barrier if the resource wasn't an UAV.
+                CompositorWorkspace::addResourceTransition( mParentNode, currentLayout,
+                                                            transitionPass,
+                                                            ResourceLayout::Uav,
+                                                            ReadBarrier::Uav );
+            }
+
+            itResAccess->second = itor->access;
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorPass::notifyRecreated( const CompositorChannel &oldChannel,
                                             const CompositorChannel &newChannel )
     {

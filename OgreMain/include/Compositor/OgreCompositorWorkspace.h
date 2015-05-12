@@ -130,13 +130,6 @@ namespace Ogre
         */
         void setupPassesShadowNodes(void);
 
-        CompositorPassResourceTransition* createCompositorPassResourceTransition(
-                                                                        CompositorNode *parentNode );
-        void addResourceTransition( CompositorNode *node,
-                                    ResourceLayoutMap::iterator currentLayout,
-                                    CompositorPassResourceTransition **transitionPass,
-                                    ResourceLayout::Layout newLayout,
-                                    uint32 readBarrierBits );
         void analyzeHazardsAndPlaceBarriers(void);
 
     public:
@@ -276,6 +269,14 @@ namespace Ogre
         const CompositorManager2* getCompositorManager() const;
 
         size_t getFrameCount(void) const;
+
+        static CompositorPassResourceTransition* createCompositorPassResourceTransition(
+                                                                        CompositorNode *parentNode );
+        static void addResourceTransition( CompositorNode *node,
+                                           ResourceLayoutMap::iterator currentLayout,
+                                           CompositorPassResourceTransition **transitionPass,
+                                           ResourceLayout::Layout newLayout,
+                                           uint32 readBarrierBits );
     };
 
     /** @} */

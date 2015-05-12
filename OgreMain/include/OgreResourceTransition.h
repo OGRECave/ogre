@@ -108,10 +108,13 @@ namespace Ogre
     /// Enum identifying the texture access privilege
     enum ResourceAccess
     {
+        Undefined = 0x00,
         Read = 0x01,
         Write = 0x10,
         ReadWrite = Read | Write
     };
+
+    const char* toString( ResourceAccess value );
     }
 
     struct ResourceTransition
@@ -125,6 +128,7 @@ namespace Ogre
     };
 
     typedef map<RenderTarget*, ResourceLayout::Layout>::type ResourceLayoutMap;
+    typedef map<RenderTarget*, ResourceAccess::ResourceAccess>::type ResourceAccessMap;
 
     /** @} */
     /** @} */

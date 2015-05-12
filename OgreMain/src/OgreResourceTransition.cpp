@@ -1,4 +1,4 @@
-/*
+﻿/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -26,57 +26,24 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __CompositorPassUav_H__
-#define __CompositorPassUav_H__
-
-#include "OgreHeaderPrefix.h"
-
-#include "Compositor/Pass/OgreCompositorPass.h"
-#include "Compositor/OgreCompositorCommon.h"
+#include "OgreStableHeaders.h"
+#include "OgreResourceTransition.h"
 
 namespace Ogre
 {
-    namespace v1
+    namespace ResourceAccess
     {
-        class Rectangle2D;
+        const char* resourceAccessTable[] =
+        {
+            "Undefined",
+            "Read",
+            "Write",
+            "ReadWrite"
+        };
+
+        const char* toString( ResourceAccess value )
+        {
+            return resourceAccessTable[value];
+        }
     }
-    class CompositorPassUavDef;
-
-    /** \addtogroup Core
-    *  @{
-    */
-    /** \addtogroup Effects
-    *  @{
-    */
-
-    /** Implementation of CompositorPass
-        This implementation will set UAVs.
-    @author
-        Matias N. Goldberg
-    @version
-        1.0
-    */
-    class _OgreExport CompositorPassUav : public CompositorPass
-    {
-        CompositorPassUavDef const *mDefinition;
-    protected:
-
-    public:
-        CompositorPassUav( const CompositorPassUavDef *definition, CompositorNode *parentNode,
-                           const CompositorChannel &target );
-
-        virtual void execute( const Camera *lodCamera );
-
-        virtual void _prepareBarrierAndEmulateUavExecution(
-                                            BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
-                                            ResourceLayoutMap &resourcesLayout,
-                                            CompositorPassResourceTransition **transitionPass );
-    };
-
-    /** @} */
-    /** @} */
 }
-
-#include "OgreHeaderSuffix.h"
-
-#endif

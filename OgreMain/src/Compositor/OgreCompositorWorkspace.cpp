@@ -33,8 +33,9 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
-#include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/Pass/PassResourceTransition/OgreCompositorPassResourceTransition.h"
+#include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUav.h"
 
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderTexture.h"
@@ -408,7 +409,7 @@ namespace Ogre
                                                                             CompositorNode *parentNode )
     {
         return OGRE_NEW CompositorPassResourceTransition( OGRE_NEW CompositorPassResourceTransitionDef(),
-                                                          parentNode, mRenderSys );
+                                                          parentNode, parentNode->getRenderSystem() );
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::addResourceTransition( CompositorNode *node,
@@ -434,6 +435,11 @@ namespace Ogre
     void CompositorWorkspace::analyzeHazardsAndPlaceBarriers(void)
     {
         ResourceLayoutMap resourcesLayout;
+        ResourceAccessMap uavsAccess;
+
+        //TODO? Include the listener in the constructor
+        BoundUav boundUavs[64];
+        memset( boundUavs, 0, sizeof(boundUavs) );
 
         resourcesLayout[mRenderWindow.target] = ResourceLayout::RenderTarget;
         fillResourcesLayout( resourcesLayout, mGlobalTextures, ResourceLayout::Undefined );
@@ -454,7 +460,6 @@ namespace Ogre
             CompositorPassVec::const_iterator itPasses = passes.begin();
             CompositorPassVec::const_iterator enPasses = passes.end();
 
-            //Check <anything> -> RT
             while( itPasses != enPasses )
             {
                 CompositorPassResourceTransition *transitionPass = 0;
@@ -463,6 +468,7 @@ namespace Ogre
                 RenderTarget *rt = pass->getRenderTarget();
                 ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( rt );
 
+                //Check <anything> -> RT
                 if( currentLayout->second != ResourceLayout::RenderTarget )
                 {
                     addResourceTransition( node, currentLayout, &transitionPass,
@@ -493,27 +499,11 @@ namespace Ogre
                     ++itDep;
                 }
 
-                //Check <anything> -> UAV
-                const CompositorPassDef *passDef = pass->getDefinition();
-                IdStringVec::const_iterator itUavNames = passDef->mUavDependencies.begin();
-                IdStringVec::const_iterator enUavNames = passDef->mUavDependencies.end();
-
-                while( itUavNames != enUavNames )
-                {
-                    if( !transitionPass )
-                        transitionPass = createCompositorPassResourceTransition( node );
-
-                    const CompositorChannel *channel = node->_getDefinedTexture( *itUavNames );
-
-                    currentLayout = resourcesLayout.find( channel->target );
-
-                    //Uavs are always hazardous, an UAV->UAV 'transition' is just a memory barrier.
-                    addResourceTransition( node, currentLayout, &transitionPass,
-                                           ResourceLayout::Uav,
-                                           ReadBarrier::Uav );
-
-                    ++itUavNames;
-                }
+                //Check <anything> -> UAV; including UAV -> UAV
+                //Except for RaR (Read after Read) and some WaW (Write after Write),
+                //Uavs are always hazardous, an UAV->UAV 'transition' is just a memory barrier.
+                pass->_prepareBarrierAndEmulateUavExecution( boundUavs, uavsAccess,
+                                                             resourcesLayout, &transitionPass );
 
                 if( transitionPass )
                 {
