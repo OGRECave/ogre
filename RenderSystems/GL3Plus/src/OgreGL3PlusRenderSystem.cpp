@@ -114,7 +114,15 @@ static void APIENTRY GLDebugCallback(GLenum source,
     else if (severity == GL_DEBUG_SEVERITY_LOW)
         strcpy(debSev, "low");
     else if( severity == GL_DEBUG_SEVERITY_NOTIFICATION )
+    {
         strcpy(debSev, "notification");
+
+#if OGRE_PROFILING == 0
+        //Filter notification debug GL messages as they can
+        //be quite noisy, annoying and useless on NVIDIA.
+        return;
+#endif
+    }
     else
         strcpy(debSev, "unknown");
 
@@ -2756,11 +2764,6 @@ namespace Ogre {
 #if OGRE_DEBUG_MODE
             OGRE_CHECK_GL_ERROR(glDebugMessageCallbackARB(&GLDebugCallback, NULL));
             OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_OTHER, GL_DONT_CARE, 0, NULL, GL_TRUE));
-    #if OGRE_PROFILING == 0
-            //Disable notification debug GL messages as they can be quite noisy, annoying and useless on NVIDIA.
-            OGRE_CHECK_GL_ERROR(glDebugMessageControlARB(GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_OTHER,
-                                                         GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE));
-    #endif
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
 #endif
