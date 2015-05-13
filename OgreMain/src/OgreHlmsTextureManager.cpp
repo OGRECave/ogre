@@ -301,6 +301,8 @@ namespace Ogre
 
         TextureLocation retVal;
 
+        assert( !aliasName.empty() && "Alias name can't be left empty!" );
+
         try
         {
         if( it == mEntries.end() || it->name != searchName.name )
@@ -612,12 +614,15 @@ namespace Ogre
 
                     while( itor != end )
                     {
-                        searchName.name = *itor;
-                        TextureEntryVec::iterator itEntry = std::lower_bound( mEntries.begin(),
-                                                                              mEntries.end(),
-                                                                              searchName );
-                        assert( itEntry != mEntries.end() && itEntry->name == searchName.name );
-                        itEntry->arrayIdx = newArrayIdx;
+                        if( !itor->empty() )
+                        {
+                            searchName.name = *itor;
+                            TextureEntryVec::iterator itEntry = std::lower_bound( mEntries.begin(),
+                                                                                  mEntries.end(),
+                                                                                  searchName );
+                            assert( itEntry != mEntries.end() && itEntry->name == searchName.name );
+                            itEntry->arrayIdx = newArrayIdx;
+                        }
                         ++itor;
                     }
                 }
@@ -887,7 +892,7 @@ namespace Ogre
                 row += StringConverter::toString( itor->entries.size() );
 
                 StringVector::const_iterator itEntry = itor->entries.begin();
-                StringVector::const_iterator enEntry = itor->entries.begin() + itor->activeEntries;
+                StringVector::const_iterator enEntry = itor->entries.end();
 
                 while( itEntry != enEntry )
                     row += "|" + *itEntry++;
