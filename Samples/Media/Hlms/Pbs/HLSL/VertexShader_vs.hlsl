@@ -77,7 +77,7 @@ Buffer<float4> worldMatBuf : register(t0);
 
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
 	@property( NeedsMoreThan1BonePerVertex )float4 tmp;
-	tmp.w = 1.0;@end
+	tmp.w = 1.0;@end //!NeedsMoreThan1BonePerVertex
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = (input.blendIndices[@n] << 1u) + input.blendIndices[@n]; //blendIndices[@n] * 3; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
 		worldMat[0] = worldMatBuf.Load( int(matStart + _idx + 0u) );
@@ -98,10 +98,9 @@ Buffer<float4> worldMatBuf : register(t0);
 	tmp.z = dot( worldMat[2].xyz, tangent );
 	worldTang += tmp.xyz * input.blendWeights[@n];@end
 	@end
-	@end
 
 	worldPos.w = 1.0;
-@end
+@end @end  //SkeletonTransform // !hlms_skeleton
 
 @property( hlms_skeleton )
 	@piece( worldViewMat )passBuf.view@end

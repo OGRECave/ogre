@@ -86,7 +86,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
 	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;
-	tmp.w = 1.0;@end
+	tmp.w = 1.0;@end //!NeedsMoreThan1BonePerVertex
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = (blendIndices[@n] << 1u) + blendIndices[@n]; //blendIndices[@n] * 3; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
         worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
@@ -107,10 +107,9 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	tmp.z = dot( worldMat[2].xyz, tangent );
     worldTang += tmp.xyz * blendWeights[@n];@end
 	@end
-	@end
 
 	worldPos.w = 1.0;
-@end
+@end @end //SkeletonTransform // !hlms_skeleton
 
 @property( hlms_skeleton )
     @piece( worldViewMat )pass.view@end
