@@ -1069,7 +1069,7 @@ namespace Ogre {
         assert(src.getWidth() == dst.getWidth() &&
                src.getHeight() == dst.getHeight() &&
                src.getDepth() == dst.getDepth() &&
-               (dst.format == PF_R8G8_SNORM || dst.format == PF_BYTE_LA)  );
+               (dst.format == PF_R8G8_SNORM || dst.format == PF_RG8 || dst.format == PF_BYTE_LA)  );
 
         const PixelFormatDescription &srcDesc = getDescriptionFor( src.format );
 
@@ -1105,7 +1105,7 @@ namespace Ogre {
 
         uint8 shiftOffset = 0x7F;
 
-        if( dst.format == PF_BYTE_LA )
+        if( dst.format == PF_BYTE_LA || dst.format == PF_RG8 )
             shiftOffset = 0x00;
 
         uint8 r, g, b, a;

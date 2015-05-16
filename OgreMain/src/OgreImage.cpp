@@ -627,6 +627,18 @@ namespace Ogre {
                 downsamplerCubeFunc = downscale2x_sRGB_XA88_cube;
             }
             break;
+        case PF_RG8: case PF_R8G8_UINT:
+            if( !gammaCorrected )
+            {
+                downsampler2DFunc   = downscale2x_XX88;
+                downsamplerCubeFunc = downscale2x_XX88_cube;
+            }
+            else
+            {
+                downsampler2DFunc   = downscale2x_sRGB_XX88;
+                downsamplerCubeFunc = downscale2x_sRGB_XX88_cube;
+            }
+            break;
         case PF_R8G8B8: case PF_B8G8R8:
             if( !gammaCorrected )
             {

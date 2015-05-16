@@ -586,7 +586,7 @@ namespace Ogre  {
             return PF_L16;
         case GL_RG: //TODO Is there a better OGRE format?
         case GL_RG8:
-            return PF_BYTE_LA;
+            return PF_RG8;
         case GL_R3_G3_B2:
             return PF_R3G3B2;
         case GL_RGB5_A1:
