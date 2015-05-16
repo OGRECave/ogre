@@ -72,7 +72,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
     worldPos.x = dot( worldMat[0], vertex );
     worldPos.y = dot( worldMat[1], vertex );
     worldPos.z = dot( worldMat[2], vertex );
-    worldPos *= blendWeights[0];
+    worldPos.xyz *= blendWeights[0];
     @property( hlms_normal || hlms_qtangent )vec3 worldNorm;
     worldNorm.x = dot( worldMat[0].xyz, normal );
     worldNorm.y = dot( worldMat[1].xyz, normal );
@@ -85,7 +85,8 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
     worldTang *= blendWeights[0];@end
 
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
-	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;@end
+	@property( NeedsMoreThan1BonePerVertex )vec4 tmp;
+	tmp.w = 1.0;@end
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = (blendIndices[@n] << 1u) + blendIndices[@n]; //blendIndices[@n] * 3; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
         worldMat[0] = texelFetch( worldMatBuf, int(matStart + _idx + 0u) );
@@ -94,7 +95,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	tmp.x = dot( worldMat[0], vertex );
 	tmp.y = dot( worldMat[1], vertex );
 	tmp.z = dot( worldMat[2], vertex );
-    worldPos += tmp * blendWeights[@n];
+	worldPos.xyz += (tmp * blendWeights[@n]).xyz;
 	@property( hlms_normal || hlms_qtangent )
 	tmp.x = dot( worldMat[0].xyz, normal );
 	tmp.y = dot( worldMat[1].xyz, normal );
@@ -106,9 +107,10 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 	tmp.z = dot( worldMat[2].xyz, tangent );
     worldTang += tmp.xyz * blendWeights[@n];@end
 	@end
+	@end
 
-    worldPos.w = 1.0;
-@end @end
+	worldPos.w = 1.0;
+@end
 
 @property( hlms_skeleton )
     @piece( worldViewMat )pass.view@end
