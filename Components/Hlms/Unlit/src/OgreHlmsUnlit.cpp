@@ -666,7 +666,9 @@ namespace Ogre
             mListener->hlmsTypeChanged( casterPass, commandBuffer, datablock );
         }
 
-        if( mLastBoundPool != datablock->getAssignedPool() )
+        //Don't bind the material buffer on caster passes (important to keep
+        //MDI & auto-instancing running on shadow map passes)
+        if( mLastBoundPool != datablock->getAssignedPool() && !casterPass )
         {
             //layout(binding = 1) uniform MaterialBuf {} materialArray
             const ConstBufferPool::BufferPool *newPool = datablock->getAssignedPool();
