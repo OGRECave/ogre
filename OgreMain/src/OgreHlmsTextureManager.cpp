@@ -313,6 +313,10 @@ namespace Ogre
             image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
             PixelFormat imageFormat = image.getFormat();
+
+            if( mDefaultTextureParameters[mapType].pixelFormat != PF_UNKNOWN )
+                imageFormat = mDefaultTextureParameters[mapType].pixelFormat;
+
             if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 ||
                 imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 ||
                 imageFormat == PF_A8R8G8B8 )
@@ -427,7 +431,6 @@ namespace Ogre
             if( dstArrayIt == mTextureArrays[mapType].end() )
             {
                 //Create a new array
-                PixelFormat defaultPixelFormat = mDefaultTextureParameters[mapType].pixelFormat;
                 uint limit          = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                 uint limitSquared   = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                 bool packNonPow2    = mDefaultTextureParameters[mapType].packNonPow2;
@@ -455,10 +458,8 @@ namespace Ogre
                     }
                     else if( texType == TEX_TYPE_2D_ARRAY )
                     {
-                        PixelFormat pf = defaultPixelFormat == PF_UNKNOWN ? imageFormat :
-                                                                            defaultPixelFormat;
-
-                        size_t textureSizeNoMips = PixelUtil::getMemorySize( width, height, 1, pf );
+                        size_t textureSizeNoMips = PixelUtil::getMemorySize( width, height, 1,
+                                                                             imageFormat );
 
                         ThresholdVec::const_iterator itThres =  mDefaultTextureParameters[mapType].
                                                                     textureArraysTresholds.begin();
@@ -510,8 +511,7 @@ namespace Ogre
                                             StringConverter::toString( mTextureId++ ),
                                             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                             texType, width, height, depth, numMipmaps - baseMipLevel,
-                                            defaultPixelFormat == PF_UNKNOWN ? imageFormat :
-                                                                               defaultPixelFormat,
+                                            imageFormat,
                                             TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
                                             mDefaultTextureParameters[mapType].hwGammaCorrection,
                                             0, BLANKSTRING, false );
