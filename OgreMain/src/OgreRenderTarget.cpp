@@ -43,7 +43,9 @@ namespace Ogre {
 
     RenderTarget::RenderTarget()
         : mPriority(OGRE_DEFAULT_RT_GROUP)
-        , mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
+        , mDepthBufferPoolId( DepthBuffer::POOL_DEFAULT )
+        , mPreferDepthTexture( false )
+        , mDesiredDepthBufferFormat( PF_D24_UNORM_S8_UINT )
         , mDepthBuffer(0)
         , mActive(true)
         , mHwGamma(false)
@@ -115,16 +117,50 @@ namespace Ogre {
         return mDepthBufferPoolId;
     }
     //-----------------------------------------------------------------------
+    void RenderTarget::setPreferDepthTexture( bool preferDepthTexture )
+    {
+        if( mPreferDepthTexture != preferDepthTexture )
+        {
+            mPreferDepthTexture = preferDepthTexture;
+            detachDepthBuffer();
+        }
+    }
+    //-----------------------------------------------------------------------
+    bool RenderTarget::prefersDepthTexture() const
+    {
+        return mPreferDepthTexture;
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::setDesiredDepthBufferFormat( PixelFormat desiredDepthBufferFormat )
+    {
+        assert( desiredDepthBufferFormat == PF_D24_UNORM_S8_UINT ||
+                desiredDepthBufferFormat == PF_D24_UNORM_X8 ||
+                desiredDepthBufferFormat == PF_D16_UNORM ||
+                desiredDepthBufferFormat == PF_D32_FLOAT ||
+                desiredDepthBufferFormat == PF_D32_FLOAT_X24_S8_UINT );
+
+        if( mDesiredDepthBufferFormat != desiredDepthBufferFormat )
+        {
+            mDesiredDepthBufferFormat = desiredDepthBufferFormat;
+            detachDepthBuffer();
+        }
+    }
+    //-----------------------------------------------------------------------
+    PixelFormat RenderTarget::getDesiredDepthBufferFormat() const
+    {
+        return mDesiredDepthBufferFormat;
+    }
+    //-----------------------------------------------------------------------
     DepthBuffer* RenderTarget::getDepthBuffer() const
     {
         return mDepthBuffer;
     }
     //-----------------------------------------------------------------------
-    bool RenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
+    bool RenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch )
     {
         bool retVal = false;
 
-        if( (retVal = depthBuffer->isCompatible( this )) )
+        if( (retVal = depthBuffer->isCompatible( this, exactFormatMatch )) )
         {
             detachDepthBuffer();
             mDepthBuffer = depthBuffer;

@@ -245,7 +245,7 @@ namespace Ogre {
                                   RenderWindowList& createdWindows);
 
         /// @copydoc RenderSystem::_createDepthBufferFor
-        DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
+        DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget, bool exactMatchFormat );
 
         /// Mimics D3D9RenderSystem::_getDepthStencilFormatFor, if no FBO RTT manager, outputs GL_NONE
         void _getDepthStencilFormatFor( GLenum internalColourFormat, GLenum *depthFormat,
@@ -493,6 +493,8 @@ namespace Ogre {
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;
+
+        const GL3PlusSupport* getGLSupport(void) const { return mGLSupport; }
 
         void bindGpuProgram(GpuProgram* prg);
         void unbindGpuProgram(GpuProgramType gptype);

@@ -172,7 +172,7 @@ namespace Ogre {
         height = mHeight;
         depth = mDepth;
 
-        if (mGLSupport.checkExtension("GL_ARB_texture_storage") || hasGL42)
+        if (hasGL42 || mGLSupport.checkExtension("GL_ARB_texture_storage"))
         {
             switch(mTextureType)
             {

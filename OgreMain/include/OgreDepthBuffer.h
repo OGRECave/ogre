@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __DepthBuffer_H__
 
 #include "OgrePrerequisites.h"
+#include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -90,7 +91,8 @@ namespace Ogre
         };
 
         DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
-                     uint32 fsaa, const String &fsaaHint, bool manual );
+                     uint32 fsaa, const String &fsaaHint, PixelFormat pixelFormat,
+                     bool isDepthTexture, bool manual );
         virtual ~DepthBuffer();
 
         /** Sets the pool id in which this DepthBuffer lives.
@@ -104,6 +106,8 @@ namespace Ogre
         virtual uint32 getHeight() const;
         virtual uint32 getFsaa() const;
         virtual const String& getFsaaHint() const;
+        PixelFormat getFormat(void) const;
+        bool isDepthTexture(void) const;
 
         /** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
             with it's render target (aka, a backbuffer or similar) */
@@ -111,14 +115,18 @@ namespace Ogre
 
         /** Returns whether the specified RenderTarget is compatible with this DepthBuffer
             That is, this DepthBuffer can be attached to that RenderTarget
-            @remarks
-                Most APIs impose the following restrictions:
-                Width & height must be equal or higher than the render target's
-                They must be of the same bit depth.
-                They need to have the same FSAA setting
-            @param renderTarget The render target to test against
+        @remarks
+            Most APIs impose the following restrictions:
+            Width & height must be equal or higher than the render target's
+            They must be of the same bit depth.
+            They need to have the same FSAA setting
+        @param renderTarget
+            The render target to test against
+        @param exactFormatMatch
+            True if looking for the exact format according to the RT's preferred format.
+            False if the RT's preferred format should be ignored.
         */
-        virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
 
         /** Called when a RenderTarget is attaches this DepthBuffer
             @remarks
@@ -145,6 +153,8 @@ namespace Ogre
         uint32                      mHeight;
         uint32                      mFsaa;
         String                      mFsaaHint;
+        PixelFormat                 mFormat;
+        bool                        mDepthTexture;
 
         bool                        mManual; //We don't Release manual surfaces on destruction
         RenderTargetSet             mAttachedRenderTargets;

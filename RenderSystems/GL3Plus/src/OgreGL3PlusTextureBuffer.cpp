@@ -253,21 +253,7 @@ namespace v1 {
 
             GLenum type = GL3PlusPixelUtil::getGLOriginDataType(data.format);
 
-            if (data.format == PF_DEPTH)
-            {
-                switch (GL3PlusPixelUtil::getGLInternalFormat(data.format, mHwGamma))
-                {
-                    case GL_DEPTH_COMPONENT16:
-                        type = GL_UNSIGNED_SHORT;
-                        break;
-
-                    default:
-                    case GL_DEPTH_COMPONENT24:
-                    case GL_DEPTH_COMPONENT32:
-                        type = GL_UNSIGNED_INT;
-                        break;
-                }
-            }
+            assert( !PixelUtil::isDepth( data.format ) );
 
             switch(mTarget)
             {
@@ -582,37 +568,22 @@ namespace v1 {
         {
             if (!tempTex)
             {
-                // Bind directly
-                if (mFormat == PF_DEPTH)
-                    bindToFramebuffer(GL_DEPTH_ATTACHMENT, slice);
-                else
-                    bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice);
+                assert( !PixelUtil::isDepth( mFormat ) );
+                bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice);
             }
 
             OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER));
 
             GLbitfield mask = GL_ZERO;
 
+            assert( !PixelUtil::isDepth( mFormat ) );
+
             // Bind the appropriate source texture to the read framebuffer
-            if (mFormat == PF_DEPTH)
-            {
-                src->_bindToFramebuffer(GL_DEPTH_ATTACHMENT, slice, GL_READ_FRAMEBUFFER);
+            src->_bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice, GL_READ_FRAMEBUFFER);
 
-                OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));
+            OGRE_CHECK_GL_ERROR(glReadBuffer(GL_COLOR_ATTACHMENT0));
 
-                mask |= GL_DEPTH_BUFFER_BIT;
-
-                // Depth framebuffer sources can only be blit with nearest filtering
-                filtering = GL_NEAREST;
-            }
-            else
-            {
-                src->_bindToFramebuffer(GL_COLOR_ATTACHMENT0, slice, GL_READ_FRAMEBUFFER);
-
-                OGRE_CHECK_GL_ERROR(glReadBuffer(GL_COLOR_ATTACHMENT0));
-
-                mask |= GL_COLOR_BUFFER_BIT;
-            }
+            mask |= GL_COLOR_BUFFER_BIT;
 
             OGRE_CHECK_GL_ERROR(glCheckFramebufferStatus(GL_READ_FRAMEBUFFER));
 
@@ -640,16 +611,8 @@ namespace v1 {
         // Reset source texture to sane state
         OGRE_CHECK_GL_ERROR(glBindTexture(src->mTarget, src->mTextureID));
 
-        if (mFormat == PF_DEPTH)
-        {
-            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                                                          GL_RENDERBUFFER, 0));
-        }
-        else
-        {
-            OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                                          GL_RENDERBUFFER, 0));
-        }
+        OGRE_CHECK_GL_ERROR(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                                      GL_RENDERBUFFER, 0));
 
         // Reset read buffer/framebuffer
         OGRE_CHECK_GL_ERROR(glReadBuffer(GL_NONE));

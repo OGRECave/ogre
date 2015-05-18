@@ -557,7 +557,7 @@ namespace Ogre {
         mVaoManager->_beginFrame();
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
+    void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget, bool exactMatch )
     {
         uint16 poolId = renderTarget->getDepthBufferPool();
         if( poolId == DepthBuffer::POOL_NO_DEPTH )
@@ -569,26 +569,37 @@ namespace Ogre {
 
         bool bAttached = false;
         while( itor != end && !bAttached )
-            bAttached = renderTarget->attachDepthBuffer( *itor++ );
+            bAttached = renderTarget->attachDepthBuffer( *itor++, exactMatch );
 
         //Not found yet? Create a new one!
         if( !bAttached )
         {
-            DepthBuffer *newDepthBuffer = _createDepthBufferFor( renderTarget );
+            DepthBuffer *newDepthBuffer = _createDepthBufferFor( renderTarget, exactMatch );
 
             if( newDepthBuffer )
             {
                 newDepthBuffer->_setPoolId( poolId );
                 mDepthBufferPool[poolId].push_back( newDepthBuffer );
 
-                bAttached = renderTarget->attachDepthBuffer( newDepthBuffer );
+                bAttached = renderTarget->attachDepthBuffer( newDepthBuffer, exactMatch );
 
-                assert( bAttached && "A new DepthBuffer for a RenderTarget was created, but after creation"
-                                     "it says it's incompatible with that RT" );
+                assert( bAttached && "A new DepthBuffer for a RenderTarget was created, but after"
+                                     " creation it says it's incompatible with that RT" );
             }
             else
-                LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited DepthBuffer"
-                                                       "for RT: " + renderTarget->getName() , LML_CRITICAL);
+            {
+                if( exactMatch )
+                {
+                    //The GPU doesn't support this depth buffer format. Try a fallback.
+                    setDepthBufferFor( renderTarget, false );
+                }
+                else
+                {
+                    LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited "
+                                                           "DepthBuffer for RT: " +
+                                                           renderTarget->getName(), LML_CRITICAL );
+                }
+            }
         }
     }
     bool RenderSystem::getWBufferEnabled(void) const

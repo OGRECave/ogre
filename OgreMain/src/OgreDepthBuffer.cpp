@@ -32,13 +32,16 @@ THE SOFTWARE.
 namespace Ogre
 {
     DepthBuffer::DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
-                              uint32 fsaa, const String &fsaaHint, bool manual ) :
+                              uint32 fsaa, const String &fsaaHint, PixelFormat pixelFormat,
+                              bool isDepthTexture, bool manual ) :
                 mPoolId(poolId),
                 mBitDepth(bitDepth),
                 mWidth(width),
                 mHeight(height),
                 mFsaa(fsaa),
                 mFsaaHint(fsaaHint),
+                mFormat(pixelFormat),
+                mDepthTexture(isDepthTexture),
                 mManual(manual)
     {
     }
@@ -88,16 +91,29 @@ namespace Ogre
         return mFsaaHint;
     }
     //-----------------------------------------------------------------------
+    PixelFormat DepthBuffer::getFormat() const
+    {
+        return mFormat;
+    }
+    //-----------------------------------------------------------------------
+    bool DepthBuffer::isDepthTexture() const
+    {
+        return mDepthTexture;
+    }
+    //-----------------------------------------------------------------------
     bool DepthBuffer::isManual() const
     {
         return mManual;
     }
     //-----------------------------------------------------------------------
-    bool DepthBuffer::isCompatible( RenderTarget *renderTarget ) const
+    bool DepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
     {
         if( this->getWidth() >= renderTarget->getWidth() &&
             this->getHeight() >= renderTarget->getHeight() &&
-            this->getFsaa() == renderTarget->getFSAA() )
+            this->getFsaa() == renderTarget->getFSAA() &&
+            mDepthTexture == renderTarget->prefersDepthTexture() &&
+            ((!exactFormatMatch && mFormat == PF_D24_UNORM_S8_UINT) ||
+             mFormat == renderTarget->getDesiredDepthBufferFormat()) )
         {
             return true;
         }

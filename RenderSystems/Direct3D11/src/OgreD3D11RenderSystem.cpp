@@ -2118,7 +2118,7 @@ bail:
             {
                 //Depth is automatically managed and there is no depth buffer attached to this RT
                 //or the Current D3D device doesn't match the one this Depth buffer was created
-                setDepthBufferFor( target );
+                setDepthBufferFor( target, true );
             }
 
             //Retrieve depth buffer again (it may have changed)

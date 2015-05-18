@@ -48,7 +48,7 @@ namespace Ogre {
         virtual void swapBuffers();
 
         /// Override so we can attach the depth buffer to the FBO
-        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
         virtual void detachDepthBuffer();
         virtual void _detachDepthBuffer();
     protected:
@@ -74,7 +74,8 @@ namespace Ogre {
 
         /** Get best depth and stencil supported for given internalFormat
          */
-        void getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat);
+        virtual void getBestDepthStencil( PixelFormat depthFormat, GLenum fboInternalFormat,
+                                          GLenum *outDepthFormat, GLenum *outStencilFormat );
 
         /** Create a texture rendertarget object
          */

@@ -155,7 +155,7 @@ namespace Ogre {
         mRenderInstanceAttribsBound.reserve(100);
 
         // Get our GLSupport
-        mGLSupport = getGLSupport();
+        mGLSupport = Ogre::getGLSupport();
 
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
@@ -767,20 +767,22 @@ namespace Ogre {
             GL3PlusContext *windowContext = 0;
             win->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
             GL3PlusDepthBuffer *depthBuffer = new GL3PlusDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-                                                                      windowContext, 0, 0,
+                                                                      windowContext, GL_NONE, GL_NONE,
                                                                       win->getWidth(), win->getHeight(),
-                                                                      win->getFSAA(), 0, true );
+                                                                      win->getFSAA(), 0, PF_UNKNOWN,
+                                                                      false, true );
 
             mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
-            win->attachDepthBuffer( depthBuffer );
+            win->attachDepthBuffer( depthBuffer, false );
         }
 
         return win;
     }
 
     //---------------------------------------------------------------------
-    DepthBuffer* GL3PlusRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
+    DepthBuffer* GL3PlusRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget,
+                                                             bool exactMatchFormat )
     {
         GL3PlusDepthBuffer *retVal = 0;
 
@@ -792,26 +794,33 @@ namespace Ogre {
 
         if( fbo )
         {
+            PixelFormat desiredDepthBufferFormat = renderTarget->getDesiredDepthBufferFormat();
+
+            if( !exactMatchFormat )
+            {
+                if( desiredDepthBufferFormat == PF_D24_UNORM_X8 && renderTarget->prefersDepthTexture() )
+                    desiredDepthBufferFormat = PF_D24_UNORM;
+                else
+                    desiredDepthBufferFormat = PF_D24_UNORM_S8_UINT;
+            }
+
             // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
             // Find best depth & stencil format suited for the RT's format
             GLuint depthFormat, stencilFormat;
-            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
-                                                                        &depthFormat, &stencilFormat );
+            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( desiredDepthBufferFormat,
+                                                                               fbo->getFormat(),
+                                                                               &depthFormat,
+                                                                               &stencilFormat );
 
-            v1::GL3PlusRenderBuffer *depthBuffer = new v1::GL3PlusRenderBuffer(
-                                                        depthFormat, fbo->getWidth(),
-                                                        fbo->getHeight(), fbo->getFSAA() );
-
-            v1::GL3PlusRenderBuffer *stencilBuffer = fbo->getFormat() != PF_DEPTH ? depthBuffer : 0;
-            if( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilFormat != GL_NONE )
+            // OpenGL specs explicitly disallow depth textures with separate stencil.
+            if( stencilFormat == GL_NONE || !renderTarget->prefersDepthTexture() )
             {
-                stencilBuffer = new v1::GL3PlusRenderBuffer( stencilFormat, fbo->getWidth(),
-                                                             fbo->getHeight(), fbo->getFSAA() );
+                // No "custom-quality" multisample for now in GL
+                retVal = new GL3PlusDepthBuffer( 0, this, mCurrentContext, depthFormat, stencilFormat,
+                                                 fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), 0,
+                                                 desiredDepthBufferFormat,
+                                                 renderTarget->prefersDepthTexture(), false );
             }
-
-            // No "custom-quality" multisample for now in GL
-            retVal = new GL3PlusDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
-                                             fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), 0, false );
         }
 
         return retVal;
@@ -2835,7 +2844,7 @@ namespace Ogre {
             {
                 // Depth is automatically managed and there is no depth buffer attached to this RT
                 // or the Current context doesn't match the one this Depth buffer was created with
-                setDepthBufferFor( target );
+                setDepthBufferFor( target, true );
             }
 
             // Bind frame buffer object

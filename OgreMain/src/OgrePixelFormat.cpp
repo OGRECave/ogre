@@ -630,7 +630,7 @@ namespace Ogre {
                 ((float*)dest)[2] = b;
                 ((float*)dest)[3] = a;
                 break;
-            case PF_DEPTH:
+            case PF_DEPTH_DEPRECATED:
             case PF_FLOAT16_R:
                 ((uint16*)dest)[0] = Bitwise::floatToHalf(r);
                 break;
@@ -768,7 +768,7 @@ namespace Ogre {
                 *b = ((const float*)src)[2];
                 *a = ((const float*)src)[3];
                 break;
-            case PF_DEPTH:
+            case PF_DEPTH_DEPRECATED:
             case PF_FLOAT16_R:
                 *r = *g = *b = Bitwise::halfToFloat(((const uint16*)src)[0]);
                 *a = 1.0f;
