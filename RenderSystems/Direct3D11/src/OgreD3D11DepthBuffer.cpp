@@ -34,10 +34,14 @@ namespace Ogre
 {
     D3D11DepthBuffer::D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
                                         ID3D11DepthStencilView *depthBufferView,
-                                        uint32 width, uint32 height,
-                                        uint32 fsaa, uint32 multiSampleQuality, bool isManual ) :
-                DepthBuffer( poolId, 0, width, height, fsaa, "", isManual ),
+                                        ID3D11ShaderResourceView *depthTextureView,
+                                        uint32 width, uint32 height, uint32 fsaa,
+                                        uint32 multiSampleQuality, PixelFormat pixelFormat,
+                                        bool isDepthTexture, bool isManual ) :
+                DepthBuffer( poolId, 0, width, height, fsaa, "", pixelFormat,
+                             isDepthTexture, isManual ),
                 mDepthStencilView( depthBufferView ),
+                mDepthTextureView( depthTextureView ),
                 mMultiSampleQuality( multiSampleQuality),
                 mRenderSystem(renderSystem)
     {
@@ -55,7 +59,7 @@ namespace Ogre
         mDepthStencilView = 0;
     }
     //---------------------------------------------------------------------
-    bool D3D11DepthBuffer::isCompatible( RenderTarget *renderTarget ) const
+    bool D3D11DepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
     {
         ID3D11Texture2D *D3D11texture = NULL;
         renderTarget->getCustomAttribute( "First_ID3D11Texture2D", &D3D11texture );
@@ -66,11 +70,13 @@ namespace Ogre
         //This is the same function used to create them. Note results are usually cached so this should
         //be quick
 
-        //TODO: Needs to check format too!
         if( mFsaa == BBDesc.SampleDesc.Count &&
             mMultiSampleQuality == BBDesc.SampleDesc.Quality &&
             this->getWidth() == renderTarget->getWidth() &&
-            this->getHeight() == renderTarget->getHeight() )
+            this->getHeight() == renderTarget->getHeight() &&
+            mDepthTexture == renderTarget->prefersDepthTexture() &&
+            ((!exactFormatMatch && mFormat == PF_D24_UNORM_S8_UINT) ||
+             mFormat == renderTarget->getDesiredDepthBufferFormat()) )
         {
             return true;
         }
@@ -81,6 +87,11 @@ namespace Ogre
     ID3D11DepthStencilView* D3D11DepthBuffer::getDepthStencilView() const
     {
         return mDepthStencilView;
+    }
+    //---------------------------------------------------------------------
+    ID3D11ShaderResourceView* D3D11DepthBuffer::getDepthTextureView() const
+    {
+        return mDepthTextureView;
     }
     //---------------------------------------------------------------------
     void D3D11DepthBuffer::_resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height)

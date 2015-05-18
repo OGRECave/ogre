@@ -37,20 +37,24 @@ namespace Ogre
     {
     public:
         D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
-                            ID3D11DepthStencilView *depthBufferView,
-                            uint32 width, uint32 height,
-                            uint32 fsaa, uint32 multiSampleQuality, bool isManual );
+                          ID3D11DepthStencilView *depthBufferView,
+                          ID3D11ShaderResourceView *depthTextureView,
+                          uint32 width, uint32 height,
+                          uint32 fsaa, uint32 multiSampleQuality,
+                          PixelFormat pixelFormat, bool isDepthTexture,  bool isManual );
         ~D3D11DepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible
-        virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
 
         ID3D11DepthStencilView* getDepthStencilView() const;
+        ID3D11ShaderResourceView* getDepthTextureView() const;
         /// internal method, gets called when the renderwindow was resized
         void _resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height);
 
     protected:
         ID3D11DepthStencilView      *mDepthStencilView; //aka. actual "DepthBuffer"
+        ID3D11ShaderResourceView    *mDepthTextureView;
         uint32                      mMultiSampleQuality;
         D3D11RenderSystem           *mRenderSystem;
     };

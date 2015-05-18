@@ -137,7 +137,8 @@ namespace Ogre {
                 desiredDepthBufferFormat == PF_D24_UNORM_X8 ||
                 desiredDepthBufferFormat == PF_D16_UNORM ||
                 desiredDepthBufferFormat == PF_D32_FLOAT ||
-                desiredDepthBufferFormat == PF_D32_FLOAT_X24_S8_UINT );
+                desiredDepthBufferFormat == PF_D32_FLOAT_X24_S8_UINT ||
+                desiredDepthBufferFormat == PF_D32_FLOAT_X24_X8 );
 
         if( mDesiredDepthBufferFormat != desiredDepthBufferFormat )
         {

@@ -55,6 +55,7 @@ namespace Ogre  {
         case PF_D24_UNORM_X8:
         case PF_X24_S8_UINT:
         case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
         case PF_X32_X24_S8_UINT:
             return GL_DEPTH_STENCIL;
         case PF_A8:
@@ -192,6 +193,7 @@ namespace Ogre  {
         case PF_D24_UNORM_X8:
         case PF_X24_S8_UINT:
         case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
         case PF_X32_X24_S8_UINT:
             return GL_DEPTH_STENCIL;
 
@@ -317,6 +319,7 @@ namespace Ogre  {
         case PF_D32_FLOAT:
             return GL_DEPTH_COMPONENT32F;
         case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
         case PF_X32_X24_S8_UINT:
             return GL_DEPTH32F_STENCIL8;
         case PF_L8:

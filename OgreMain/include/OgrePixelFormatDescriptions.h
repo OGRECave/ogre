@@ -1455,6 +1455,20 @@ namespace Ogre {
             0, 0, 0, 0
         },
         //-----------------------------------------------------------------------
+        {"PF_D32_FLOAT_X24_X8",
+            /* Bytes per element */
+            8,
+            /* Flags */
+            PFF_DEPTH|PFF_FLOAT|PFF_INTEGER,
+            /* Component type and count */
+            PCT_FLOAT32, 2,
+            /* rbits, gbits, bbits, abits */
+            32, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0,
+            0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
         {"PF_X32_X24_S8_UINT",
             /* Bytes per element */
             8,

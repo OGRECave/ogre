@@ -260,8 +260,8 @@ namespace Ogre {
         /// Depth texture format. 24 bits for depth, 8 bits for stencil.
         /// The following formats are just reinterpretations of the same depth buffer:
         ///  24-bit normalized uint depth and 8-bit stencil
-        ///     * PF_D24_UNORM_X8
         ///     * PF_D24_UNORM_S8_UINT
+        ///     * PF_D24_UNORM_X8
         ///     * PF_X24_S8_UINT
         /// 24-bit normalized uint depth
         ///     * PF_D24_UNORM
@@ -270,8 +270,8 @@ namespace Ogre {
         ///  32-bit floating point depth
         ///     * PF_D32_FLOAT
         ///  32-bit floating point depth & 8-bit stencil (+24 unused bits)
-        ///     * PF_D32_FLOAT
         ///     * PF_D32_FLOAT_X24_S8_UINT
+        ///     * PF_D32_FLOAT_X24_X8
         ///     * PF_X32_X24_S8_UINT
         ///
         /// This means that e.g. a PF_D24_UNORM_X8 and a PF_D24_UNORM_S8_UINT
@@ -291,11 +291,13 @@ namespace Ogre {
         PF_D32_FLOAT = 100,
         /// Depth texture format. 32 bits for depth. 8 bits for stencil
         PF_D32_FLOAT_X24_S8_UINT = 101,
+        /// Depth texture format. 32 bits for depth.
+        PF_D32_FLOAT_X24_X8 = 102,
         /// Depth texture format. 8 bits for stencil
-        PF_X32_X24_S8_UINT = 102,
+        PF_X32_X24_S8_UINT = 103,
 
         // Number of pixel formats currently defined
-        PF_COUNT = 103
+        PF_COUNT = 104
     };
     typedef vector<PixelFormat>::type PixelFormatList;
 

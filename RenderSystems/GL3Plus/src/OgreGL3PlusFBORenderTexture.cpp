@@ -456,7 +456,8 @@ namespace Ogre {
                      depthFormat == PF_X24_S8_UINT)) ||
                 (depthFormats[props.modes[mode].depth] == GL_DEPTH_COMPONENT32F &&
                 stencilFormats[props.modes[mode].stencil] == GL_STENCIL_INDEX8 &&
-                    (depthFormat == PF_D32_FLOAT_X24_S8_UINT || depthFormat == PF_X32_X24_S8_UINT)) )
+                    (depthFormat == PF_D32_FLOAT_X24_S8_UINT || depthFormat == PF_D32_FLOAT_X24_X8 ||
+                     depthFormat == PF_X32_X24_S8_UINT)) )
             {
                 *outDepthFormat      = depthFormats[props.modes[mode].depth];
                 *outStencilFormat    = stencilFormats[props.modes[mode].stencil];
