@@ -1,6 +1,10 @@
 //////////
 // GLSL //
 //////////
+shared_params DataBlock {
+    shared_param_named roll float 1.0
+}
+
 compute_program Compute/CS_GLSL glsl
 {
         source ComputeCS.glsl
@@ -16,13 +20,6 @@ compute_program Compute/CS_GLSL glsl
         // should be able to handle multiple barriers via bit ops
         // pre_memory_barrier texture
         // post_memory_barrier texture
-
-        // FIXME setting uniforms on compute shaders does not work yet
-        // extractUniformsFromProgram seems to fail
-        default_params
-        {
-            param_named roll float 0.5
-        }
 }
 
 vertex_program Compute/VS_GLSL glsl

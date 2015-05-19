@@ -1,8 +1,10 @@
 #version 430
 
-uniform float roll;
-
 layout(binding = 0, rgba8) coherent uniform image2D image_data;
+
+uniform DataBlock {
+    float roll;
+};
 
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 

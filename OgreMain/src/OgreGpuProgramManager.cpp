@@ -196,7 +196,7 @@ namespace Ogre {
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, 
                 "No shared parameter set with name '" + name + "'!", 
-                "GpuProgramManager::createSharedParameters");
+                "GpuProgramManager::getSharedParameters");
         }
         return i->second;
     }
