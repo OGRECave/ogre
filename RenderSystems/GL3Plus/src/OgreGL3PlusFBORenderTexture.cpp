@@ -290,7 +290,9 @@ namespace Ogre {
     {
         // is glGetInternalformativ supported?
         // core since GL 4.2: see https://www.opengl.org/wiki/GLAPI/glGetInternalformat
-        bool hasInternalFormatQuery = gl3wIsSupported(4,2) || mGLSupport.checkExtension("GL_ARB_internalformat_query2");
+        // NOTE! GL_FRAMEBUFFER_RENDERABLE is supported only if the GL version is 4.3 or higher
+        bool hasInternalFormatQuery = mGLSupport.hasMinGLVersion(4, 3)
+                || mGLSupport.checkExtension("GL_ARB_internalformat_query2");
 
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
@@ -369,7 +371,7 @@ namespace Ogre {
                                 // skip unsupported stencil unless it is GL_NONE, as we still want DxxS0 formats
                                 formatSupported = params == GL_FULL_SUPPORT || stencilFormats[stencil] == GL_NONE;
                             } else {
-                                formatSupported = _tryFormat(depthFormats[depth], stencilFormats[stencil]);
+                                formatSupported = _tryFormat(depthFormats[depth], stencilFormats[stencil]) != 0;
                             }
 
                             if (formatSupported)

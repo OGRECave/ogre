@@ -521,7 +521,48 @@ namespace Ogre
             <td>Enable the window to keep track and transmit double click messages.</td>
             <td>Win32 Specific</td>
         </tr>
-        
+        <tr>
+            <td>MSAA</td>
+            <td>Positive integer (usually 0, 2, 4, 8, 16)</td>
+            <td>0</td>
+            <td>Full screen antialiasing factor</td>	  
+            <td>Android Specific</td>
+        </tr>  
+        <tr>
+            <td>CSAA</td>
+            <td>Positive integer (usually 0, 2, 4, 8, 16)</td>
+            <td>0</td>
+            <td>Coverage sampling factor (https://www.khronos.org/registry/egl/extensions/NV/EGL_NV_coverage_sample.txt)</td>	  
+            <td>Android Specific</td>
+        </tr>	
+        <tr>
+            <td>maxColourBufferSize</td>
+            <td>Positive integer (usually 16, 32)</td>
+            <td>32</td>
+            <td>Max EGL_BUFFER_SIZE</td>	  
+            <td>Android Specific</td>
+        </tr>	 
+        <tr>
+            <td>minColourBufferSize</td>
+            <td>Positive integer (usually 16, 32)</td>
+            <td>16</td>
+            <td>Min EGL_BUFFER_SIZE</td>	  
+            <td>Android Specific</td>
+        </tr>  
+        <tr>
+            <td>maxStencilBufferSize</td>
+            <td>Positive integer (usually 0, 8)</td>
+            <td>0</td>
+            <td>EGL_STENCIL_SIZE</td>	  
+            <td>Android Specific</td>
+        </tr>	
+        <tr>
+            <td>maxDepthBufferSize</td>
+            <td>Positive integer (usually 0, 16, 24)</td>
+            <td>16</td>
+            <td>EGL_DEPTH_SIZE</td>	  
+            <td>Android Specific</td>
+        </tr>
         */
         virtual RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0) = 0;

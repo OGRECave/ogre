@@ -364,7 +364,7 @@ namespace Ogre {
         switch (mMetricsMode)
         {
         case GMM_PIXELS :
-            if (OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate)
+            if (mGeomPositionsOutOfDate)
             {               
                 mPixelScaleX = 1.0f / vpWidth;
                 mPixelScaleY = 1.0f / vpHeight; 
@@ -372,7 +372,7 @@ namespace Ogre {
             break;
 
         case GMM_RELATIVE_ASPECT_ADJUSTED :
-            if (OverlayManager::getSingleton().hasViewportChanged() || mGeomPositionsOutOfDate)
+            if (mGeomPositionsOutOfDate)
             {
                 mPixelScaleX = 1.0f / (10000.0f * (vpWidth / vpHeight));
                 mPixelScaleY = 1.0f /  10000.0f;

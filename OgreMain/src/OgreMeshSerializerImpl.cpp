@@ -110,16 +110,18 @@ namespace Ogre {
         // Check header
         readFileHeader(stream);
         pushInnerChunk(stream);
-        unsigned short streamID;
+        unsigned short streamID = readChunk(stream);
+
         while(!stream->eof())
         {
-            streamID = readChunk(stream);
             switch (streamID)
             {
             case M_MESH:
                 readMesh(stream, pMesh, listener);
                 break;
             }
+
+            streamID = readChunk(stream);
         }
         popInnerChunk(stream);
     }

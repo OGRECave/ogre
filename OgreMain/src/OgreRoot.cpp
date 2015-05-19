@@ -375,8 +375,8 @@ namespace Ogre {
         // Check the Documents directory within the application sandbox
         Ogre::String outBaseName, extension, configFileName;
         Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
-        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
-        std::ofstream of(configFileName.c_str());
+        configFileName = iOSDocumentsDirectory() + "/" + outBaseName;
+		std::ofstream of(configFileName.c_str());
         if (of.is_open())
             mConfigFileName = configFileName;
         else
@@ -429,7 +429,7 @@ namespace Ogre {
 
         Ogre::String outBaseName, extension, configFileName;
         Ogre::StringUtil::splitFilename(mConfigFileName, outBaseName, extension);
-        configFileName = macBundlePath() + "/../Documents/" + outBaseName;
+        configFileName = iOSDocumentsDirectory() + "/" + outBaseName;
 
         std::ifstream fp;
         fp.open(configFileName.c_str(), std::ios::in);

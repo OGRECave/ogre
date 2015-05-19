@@ -32,9 +32,12 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreViewport.h"
 
 #include "OgreGLESPixelFormat.h"
 #include "OgreGLESRenderSystem.h"
+
+#include <iomanip>  
 
 namespace Ogre {
     EAGLWindow::EAGLWindow(EAGLSupport *glsupport)
@@ -116,19 +119,8 @@ namespace Ogre {
 	{
         if(!mWindow) return;
         
-        Real w = mContentScalingFactor, h = mContentScalingFactor;
-        
-        // Check the orientation of the view controller and adjust dimensions
-        if (UIInterfaceOrientationIsPortrait(mViewController.interfaceOrientation))
-        {
-            h *= std::max(width, height);
-            w *= std::min(width, height);
-        }
-        else
-        {
-            w *= std::max(width, height);
-            h *= std::min(width, height);
-        }
+        Real w = width * mContentScalingFactor;
+        Real h = height * mContentScalingFactor;
         
         // Check if the window size really changed
         if(mWidth == w && mHeight == h)
@@ -151,10 +143,10 @@ namespace Ogre {
 	void EAGLWindow::windowMovedOrResized()
 	{
 		CGRect frame = [mView frame];
-		mWidth = (unsigned int)frame.size.width;
-		mHeight = (unsigned int)frame.size.height;
-        mLeft = (int)frame.origin.x;
-        mTop = (int)frame.origin.y+(int)frame.size.height;
+        mWidth = (unsigned int)frame.size.width * mContentScalingFactor;
+        mHeight = (unsigned int)frame.size.height * mContentScalingFactor;
+        mLeft = (int)frame.origin.x * mContentScalingFactor;
+        mTop = ((int)frame.origin.y + (int)frame.size.height) * mContentScalingFactor;
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
@@ -264,7 +256,8 @@ namespace Ogre {
         
         OgreAssert(mContext != nil, "EAGLWindow: Failed to create OpenGL ES context");
 
-        [mWindow addSubview:mViewController.view];
+        if(!mUsingExternalViewController)
+            [mWindow addSubview:mViewController.view];
 
         mViewController.mGLSupport = mGLSupport;
 
@@ -274,7 +267,8 @@ namespace Ogre {
         if(!mUsingExternalView)
             [mView release];
 
-        [mWindow makeKeyAndVisible];
+        if(!mUsingExternalViewController)
+            [mWindow makeKeyAndVisible];
 
         mContext->createFramebuffer();
 

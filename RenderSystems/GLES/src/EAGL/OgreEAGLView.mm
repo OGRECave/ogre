@@ -32,7 +32,8 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLESRenderSystem.h"
-
+#include "OgreViewport.h"
+#include "OgreCamera.h"
 #import <QuartzCore/QuartzCore.h>
 
 using namespace Ogre;

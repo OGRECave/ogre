@@ -28,3 +28,4 @@ AndroidDependencies/
 Build/
 EmscriptenDependencies
 EmscriptenBuild
+buildx64

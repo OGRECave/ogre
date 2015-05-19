@@ -69,6 +69,10 @@ namespace Ogre {
         static String toString(Real val, unsigned short precision = 6, 
             unsigned short width = 0, char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
+
+// This counter-intuitive guard is correct. In case of enabled double precision
+// the toString() version above using Ogre::Real already provides a double precision
+// version and hence we need to explicitly declare a float version as well.
 #if OGRE_DOUBLE_PRECISION == 1
         /** Converts a float to a String. */
         static String toString(float val, unsigned short precision = 6,

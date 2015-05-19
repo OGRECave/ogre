@@ -259,7 +259,7 @@ namespace Ogre {
             // since pow(anything, 0) == 1
             // However we also need to ensure we don't overflow because of the division
             // therefore set x = 1 and y = 0 so divisor doesn't change scale
-            return Vector4(1.0, 0.0, 0.0, 1.0); // since the main op is pow(.., vec4.z), this will result in 1.0
+            return Vector4(1.0, 0.0, 0.0, 0.0); // since the main op is pow(.., vec4.z), this will result in 1.0
         }
     }
     //-----------------------------------------------------------------------------

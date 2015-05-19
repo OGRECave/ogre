@@ -73,21 +73,21 @@ fragment_program SSAO/UnsharpMask/GaussianBlurY_fp_glsl glsl
 
 fragment_program SSAO/UnsharpMask_fp unified
 {
-	//delegate SSAO/UnsharpMask_fp_glsl 
+	delegate SSAO/UnsharpMask_fp_glsl 
 	delegate SSAO/UnsharpMask_fp_hlsl 
 	//delegate SSAO/UnsharpMask_fp_cg
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurX_fp unified
 {
-	//delegate SSAO/UnsharpMask/GaussianBlurX_fp_glsl 
+	delegate SSAO/UnsharpMask/GaussianBlurX_fp_glsl 
 	delegate SSAO/UnsharpMask/GaussianBlurX_fp_hlsl 
 	//delegate SSAO/UnsharpMask/GaussianBlurX_fp_cg
 }
 
 fragment_program SSAO/UnsharpMask/GaussianBlurY_fp unified
 {
-	//delegate SSAO/UnsharpMask/GaussianBlurY_fp_glsl 
+	delegate SSAO/UnsharpMask/GaussianBlurY_fp_glsl 
 	delegate SSAO/UnsharpMask/GaussianBlurY_fp_hlsl 
 	//delegate SSAO/UnsharpMask/GaussianBlurY_fp_cg
 }

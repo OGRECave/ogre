@@ -24,7 +24,7 @@ fragment_program SSAO/ShowNormals_fp_glsl glsl
 
 fragment_program SSAO/ShowNormals_fp unified
 {
-	//delegate SSAO/ShowNormals_fp_glsl 
+	delegate SSAO/ShowNormals_fp_glsl 
 	delegate SSAO/ShowNormals_fp_hlsl 
 	//delegate SSAO/ShowNormals_fp_cg
 }

@@ -48,17 +48,12 @@ namespace Ogre {
         case RenderOperation::OT_LINE_LIST:
             return requiresAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
         case RenderOperation::OT_LINE_STRIP:
-            if(gl3wIsSupported(3, 2))
-                return requiresAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINES;
-            else
-                return requiresAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
+            return requiresAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINES;
         default:
         case RenderOperation::OT_TRIANGLE_LIST:
+            return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
         case RenderOperation::OT_TRIANGLE_STRIP:
-            if(gl3wIsSupported(3, 2))
-                return requiresAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLES;
-            else
-                return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
+            return requiresAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLES;
         case RenderOperation::OT_TRIANGLE_FAN:
             return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
         }

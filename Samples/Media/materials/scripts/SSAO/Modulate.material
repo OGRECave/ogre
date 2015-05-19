@@ -25,7 +25,7 @@ fragment_program SSAO/Post/Modulate_fp_glsl glsl
 
 fragment_program SSAO/Post/Modulate_fp unified
 {
-	//delegate SSAO/Post/Modulate_fp_glsl
+	delegate SSAO/Post/Modulate_fp_glsl
 	delegate SSAO/Post/Modulate_fp_hlsl
 	//delegate SSAO/Post/Modulate_fp_cg 
 }
