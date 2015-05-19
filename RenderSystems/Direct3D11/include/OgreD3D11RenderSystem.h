@@ -182,7 +182,7 @@ namespace Ogre
          * With DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL flag render target views are unbound
          * from us each Present(), and we need the way to reestablish connection.
          */
-        void _setRenderTargetViews();
+        void _setRenderTargetViews( bool colourWrite );
 
         void updateDepthStencilView(void);
 
@@ -356,7 +356,7 @@ namespace Ogre
         /**
          * Set current render target to target, enabling its GL context if needed
          */
-        void _setRenderTarget(RenderTarget *target);
+        virtual void _setRenderTarget( RenderTarget *target, bool colourWrite );
 
         /** Check whether or not filtering is supported for the precise texture format requested
         with the given usage options.

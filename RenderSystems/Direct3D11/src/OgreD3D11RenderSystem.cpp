@@ -2157,7 +2157,7 @@ bail:
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
+    void D3D11RenderSystem::_setRenderTarget( RenderTarget *target, bool colourWrite )
     {
         mActiveViewport = 0;
         mActiveRenderTarget = target;
@@ -2187,12 +2187,12 @@ bail:
                     "D3D11RenderSystem::_setRenderTarget");
             }
 
-            _setRenderTargetViews();
+            _setRenderTargetViews( colourWrite );
         }
     }
 
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setRenderTargetViews()
+    void D3D11RenderSystem::_setRenderTargetViews( bool colourWrite )
     {
         RenderTarget *target = mActiveRenderTarget;
 
@@ -2219,6 +2219,9 @@ bail:
             //Retrieve depth buffer again (it may have changed)
             depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
 
+            if( !colourWrite )
+                numberOfViews = 0;
+
             // now switch to the new render target
             mDevice.GetImmediateContext()->OMSetRenderTargets(
                 numberOfViews,
@@ -2240,7 +2243,7 @@ bail:
         if (!vp)
         {
             mActiveViewport = NULL;
-            _setRenderTarget(NULL);
+            _setRenderTarget(NULL, true);
         }
         else if( vp != mActiveViewport || vp->_isUpdated() )
         {
@@ -2251,7 +2254,7 @@ bail:
             RenderTarget* target;
             target = vp->getTarget();
 
-            _setRenderTarget(target);
+            _setRenderTarget(target, vp->getColourWrite());
 
             mActiveViewport = vp;
 
@@ -2314,7 +2317,7 @@ bail:
                 assert( dynamic_cast<D3D11RenderWindowBase*>(vp->getTarget()) );
 
                 if( static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer() )
-                    _setRenderTargetViews();
+                    _setRenderTargetViews( vp->getColourWrite() );
             }
         }
     }

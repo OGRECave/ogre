@@ -50,6 +50,7 @@ namespace Ogre {
         , mScissorRelTop(top)
         , mScissorRelWidth(width)
         , mScissorRelHeight(height)
+        , mColourWrite( true )
         // Actual dimensions will update later
         , mUpdated(false)
         , mShowOverlays(true)
@@ -308,6 +309,12 @@ namespace Ogre {
     bool Viewport::getSkiesEnabled(void) const
     {
         return mShowSkies;
+    }
+    //-----------------------------------------------------------------------
+    void Viewport::setColourWrite( bool colourWrite )
+    {
+        mColourWrite = colourWrite;
+        mUpdated = true;
     }
     //-----------------------------------------------------------------------
     void Viewport::pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv)

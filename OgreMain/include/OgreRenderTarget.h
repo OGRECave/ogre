@@ -395,6 +395,9 @@ namespace Ogre {
         */
         virtual void _endUpdate();
 
+        /// Used by depth texture views which need to disable colour writes when rendering to it
+        virtual bool getForceDisableColourWrites(void) const    { return false; }
+
     protected:
         /// The name of this target.
         String mName;

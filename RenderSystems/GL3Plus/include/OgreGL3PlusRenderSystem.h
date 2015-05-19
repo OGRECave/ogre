@@ -168,6 +168,8 @@ namespace Ogre {
         GLSLShader* mCurrentDomainShader;
         GLSLShader* mCurrentComputeShader;
 
+        GLuint  mNullColourFramebuffer;
+
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
 
@@ -489,7 +491,7 @@ namespace Ogre {
         /**
          * Set current render target to target, enabling its GL context if needed
          */
-        void _setRenderTarget(RenderTarget *target);
+        void _setRenderTarget(RenderTarget *target, bool colourWrite);
 
         GLint convertCompareFunction(CompareFunction func) const;
         GLint convertStencilOp(StencilOperation op, bool invert = false) const;

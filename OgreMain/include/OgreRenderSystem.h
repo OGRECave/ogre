@@ -1271,8 +1271,11 @@ namespace Ogre
 
         /**
          * Set current render target to target, enabling its device context if needed
+        @param colourWrite
+            False to disable colour writes. @see CompositorPassDef::mColourWrite
+            The RenderTarget is needed to know the depth/stencil information.
          */
-        virtual void _setRenderTarget(RenderTarget *target) = 0;
+        virtual void _setRenderTarget(RenderTarget *target, bool colourWrite) = 0;
 
         /** Defines a listener on the custom events that this render system 
         can raise.

@@ -145,7 +145,8 @@ namespace Ogre {
           mGLSLShaderFactory(0),
           mHardwareBufferManager(0),
           mRTTManager(0),
-          mActiveTextureUnit(0)
+          mActiveTextureUnit(0),
+          mNullColourFramebuffer( 0 )
     {
         size_t i;
 
@@ -644,6 +645,12 @@ namespace Ogre {
             OGRE_DELETE pCurContext;
         }
         mBackgroundContextList.clear();
+
+        if( mNullColourFramebuffer )
+        {
+            OCGE( glDeleteFramebuffers( 1, &mNullColourFramebuffer ) );
+            mNullColourFramebuffer = 0;
+        }
 
         mGLSupport->stop();
         mStopRendering = true;
@@ -1205,14 +1212,14 @@ namespace Ogre {
         if (!vp)
         {
             mActiveViewport = NULL;
-            _setRenderTarget(NULL);
+            _setRenderTarget(NULL, true);
         }
         else if (vp != mActiveViewport || vp->_isUpdated())
         {
             RenderTarget* target;
 
             target = vp->getTarget();
-            _setRenderTarget(target);
+            _setRenderTarget(target, vp->getColourWrite());
             mActiveViewport = vp;
 
             GLsizei x, y, w, h;
@@ -2758,6 +2765,8 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
         }
 
+        OCGE( glGenFramebuffers( 1, &mNullColourFramebuffer ) );
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
         // Some Apple NVIDIA hardware can't handle seamless cubemaps
         if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
@@ -2817,7 +2826,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("**************************************");
     }
 
-    void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target)
+    void GL3PlusRenderSystem::_setRenderTarget(RenderTarget *target, bool colourWrite)
     {
         mActiveViewport = 0;
 
@@ -2827,7 +2836,7 @@ namespace Ogre {
 
         mActiveRenderTarget = target;
         if (target)
-        {
+        {        
             // Switch context if different from current one
             GL3PlusContext *newContext = 0;
             target->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
@@ -2847,8 +2856,58 @@ namespace Ogre {
                 setDepthBufferFor( target, true );
             }
 
-            // Bind frame buffer object
-            mRTTManager->bind(target);
+            colourWrite |= target->getForceDisableColourWrites();
+
+            if( !colourWrite )
+            {
+                if( target->isRenderWindow() )
+                {
+                    OCGE( glBindFramebuffer( GL_FRAMEBUFFER, 0 ) );
+                }
+                else
+                {
+                    OCGE( glBindFramebuffer( GL_FRAMEBUFFER, mNullColourFramebuffer ) );
+
+                    if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+                        (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+                    {
+                        //Attach the depth buffer to this no-colour framebuffer
+                        depthBuffer->bindToFramebuffer();
+                    }
+                    else
+                    {
+                        //Detach all depth buffers from this no-colour framebuffer
+                        OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                                         GL_RENDERBUFFER, 0 ) );
+                        OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                                         GL_RENDERBUFFER, 0 ) );
+                    }
+                }
+
+                //Do not render to colour Render Targets.
+                OCGE( glDrawBuffer( GL_NONE ) );
+            }
+            else
+            {
+                if( target->isRenderWindow() )
+                {
+                    //Make sure colour writes are enabled for RenderWindows.
+                    OCGE( glBindFramebuffer( GL_FRAMEBUFFER, 0 ) );
+                    //TODO: Restore the setting sent to OGRE_NO_QUAD_BUFFER_STEREO?
+                    OCGE( glDrawBuffer( GL_BACK ) );
+                }
+
+                if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+                    (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+                {
+                    // Depth is automatically managed and there is no depth buffer attached to this RT
+                    // or the Current context doesn't match the one this Depth buffer was created with
+                    setDepthBufferFor( target, true );
+                }
+
+                // Bind frame buffer object
+                mRTTManager->bind(target);
+            }
 
             // Enable / disable sRGB states
             if (target->isHardwareGammaEnabled())
