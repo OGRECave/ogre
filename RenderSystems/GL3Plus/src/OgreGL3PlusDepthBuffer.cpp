@@ -29,6 +29,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusFrameBufferObject.h"
+#include "OgreGL3PlusPixelFormat.h"
 
 namespace Ogre
 {
