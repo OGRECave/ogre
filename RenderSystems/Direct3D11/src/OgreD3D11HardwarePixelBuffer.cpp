@@ -473,6 +473,13 @@ namespace v1 {
             _unmapstaticbuffer();
 
         _genMipmaps();
+
+        //NVIDIA driver can let the staging buffers accumulate and skyrocket the
+        //memory consumption until the process runs out of memory and crashes
+        //(if it has a lot of textures to load).
+        //Worst part this only repros in some machines, not driver specific.
+        //Flushing here fixes it.
+        mDevice.GetImmediateContext()->Flush();
     }
     //-----------------------------------------------------------------------------  
     D3D11_BOX D3D11HardwarePixelBuffer::OgreImageBoxToDx11Box(const Image::Box &inBox) const
