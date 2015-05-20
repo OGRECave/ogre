@@ -54,6 +54,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreGL3PlusHlmsMacroblock.h"
 #include "OgreHlmsDatablock.h"
@@ -799,7 +800,7 @@ namespace Ogre {
         GL3PlusFrameBufferObject *fbo = 0;
         renderTarget->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
 
-        if( fbo )
+        if( fbo || renderTarget->getForceDisableColourWrites() )
         {
             PixelFormat desiredDepthBufferFormat = renderTarget->getDesiredDepthBufferFormat();
 
@@ -811,11 +812,21 @@ namespace Ogre {
                     desiredDepthBufferFormat = PF_D24_UNORM_S8_UINT;
             }
 
+            PixelFormat renderTargetFormat;
+
+            if( fbo )
+                renderTargetFormat = fbo->getFormat();
+            else
+            {
+                //Deal with depth textures
+                renderTargetFormat = desiredDepthBufferFormat;
+            }
+
             // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
             // Find best depth & stencil format suited for the RT's format
             GLuint depthFormat, stencilFormat;
             static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( desiredDepthBufferFormat,
-                                                                               fbo->getFormat(),
+                                                                               renderTargetFormat,
                                                                                &depthFormat,
                                                                                &stencilFormat );
 
@@ -824,7 +835,8 @@ namespace Ogre {
             {
                 // No "custom-quality" multisample for now in GL
                 retVal = new GL3PlusDepthBuffer( 0, this, mCurrentContext, depthFormat, stencilFormat,
-                                                 fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), 0,
+                                                 renderTarget->getWidth(), renderTarget->getHeight(),
+                                                 renderTarget->getFSAA(), 0,
                                                  desiredDepthBufferFormat,
                                                  renderTarget->prefersDepthTexture(), false );
             }
@@ -2856,7 +2868,9 @@ namespace Ogre {
                 setDepthBufferFor( target, true );
             }
 
-            colourWrite |= target->getForceDisableColourWrites();
+            depthBuffer = static_cast<GL3PlusDepthBuffer*>(target->getDepthBuffer());
+
+            colourWrite &= !target->getForceDisableColourWrites();
 
             if( !colourWrite )
             {
@@ -2868,8 +2882,7 @@ namespace Ogre {
                 {
                     OCGE( glBindFramebuffer( GL_FRAMEBUFFER, mNullColourFramebuffer ) );
 
-                    if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-                        (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+                    if( depthBuffer )
                     {
                         //Attach the depth buffer to this no-colour framebuffer
                         depthBuffer->bindToFramebuffer();
@@ -2895,14 +2908,6 @@ namespace Ogre {
                     OCGE( glBindFramebuffer( GL_FRAMEBUFFER, 0 ) );
                     //TODO: Restore the setting sent to OGRE_NO_QUAD_BUFFER_STEREO?
                     OCGE( glDrawBuffer( GL_BACK ) );
-                }
-
-                if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-                    (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
-                {
-                    // Depth is automatically managed and there is no depth buffer attached to this RT
-                    // or the Current context doesn't match the one this Depth buffer was created with
-                    setDepthBufferFor( target, true );
                 }
 
                 // Bind frame buffer object

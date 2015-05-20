@@ -108,6 +108,8 @@ namespace v1
         /// Notifies the ultimate texture owner the buffer changed
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
         virtual void detachDepthBuffer();
+
+        void getCustomAttribute( const String& name, void* pData );
     };
 }
 

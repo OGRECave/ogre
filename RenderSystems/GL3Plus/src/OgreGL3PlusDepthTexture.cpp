@@ -29,6 +29,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusDepthTexture.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
+#include "OgreGL3PlusRenderTexture.h"
+#include "OgreGL3PlusFrameBufferObject.h"
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreRoot.h"
 #include "OgreTextureManager.h"
@@ -220,5 +222,22 @@ namespace v1
     {
         RenderTexture::detachDepthBuffer();
         mUltimateTextureOwner->_setGlTextureName( 0 );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusDepthTextureTarget::getCustomAttribute( const String& name, void* pData )
+    {
+        if( name == GL3PlusRenderTexture::CustomAttributeString_FBO )
+        {
+            *static_cast<GL3PlusFrameBufferObject**>(pData) = 0;
+        }
+        else if (name == "GL_MULTISAMPLEFBOID")
+        {
+            if( mDepthBuffer )
+            {
+                assert( dynamic_cast<GL3PlusDepthBuffer*>(mDepthBuffer) );
+                GL3PlusDepthBuffer *gl3PlusDepthBuffer = static_cast<GL3PlusDepthBuffer*>(mDepthBuffer);
+                *static_cast<GLuint*>(pData) = gl3PlusDepthBuffer->getDepthBuffer();
+            }
+        }
     }
 }

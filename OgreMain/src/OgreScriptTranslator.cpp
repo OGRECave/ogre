@@ -6331,7 +6331,7 @@ namespace Ogre{
                 else
                 {
                     // pixel format?
-                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, true);
+                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, false);
                     if (format == PF_UNKNOWN)
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -6922,7 +6922,7 @@ namespace Ogre{
                 else
                 {
                     // pixel format or optional name?
-                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, true);
+                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, false);
                     if (format == PF_UNKNOWN)
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);

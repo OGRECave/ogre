@@ -428,10 +428,10 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("[GL] : Valid FBO targets " + fmtstring);
     }
 
-    void GL3PlusFBOManager::getBestDepthStencil( PixelFormat depthFormat, GLenum fboInternalFormat,
-                                                 GLenum *outDepthFormat, GLenum *outStencilFormat)
+    void GL3PlusFBOManager::getBestDepthStencil( PixelFormat depthFormat, PixelFormat fboFormat,
+                                                 GLenum *outDepthFormat, GLenum *outStencilFormat )
     {
-        const FormatProperties &props = mProps[fboInternalFormat];
+        const FormatProperties &props = mProps[fboFormat];
 
         GLenum internalDepthFormat = GL3PlusPixelUtil::getGLInternalFormat( depthFormat, false );
 

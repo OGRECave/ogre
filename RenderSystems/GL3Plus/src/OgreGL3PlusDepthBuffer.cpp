@@ -197,11 +197,13 @@ namespace Ogre
             }
         }
 
-        //Now check this is the appropriate format
+        //Now check this DepthBuffer is for FBOs and RenderTarget is for FBOs
+        //(or that this DepthBuffer is for a RenderWindow, and RenderTarget is for RenderWindow)
+        //while skipping depth textures.
         GL3PlusFrameBufferObject *fbo = 0;
         renderTarget->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
 
-        if( !fbo )
+        if( !fbo && !renderTarget->getForceDisableColourWrites() )
         {
             GL3PlusContext *windowContext = 0;
             renderTarget->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT,
@@ -223,10 +225,7 @@ namespace Ogre
             assert( mStencilBufferName == 0 && "OpenGL specs don't allow depth textures "
                     "with separate stencil format. We should have never hit this path." );
 
-            //Either GL_DEPTH_ATTACHMENT, GL_DEPTH_STENCIL or GL_STENCIL_ATTACHMENT
-            GLenum originFormat = GL3PlusPixelUtil::getGLOriginFormat( mFormat );
-
-            OCGE( glFramebufferTexture( GL_FRAMEBUFFER, originFormat, mDepthBufferName, 0 ) );
+            OCGE( glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mDepthBufferName, 0 ) );
         }
         else
         {
