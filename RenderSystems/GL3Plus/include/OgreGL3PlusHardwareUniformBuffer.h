@@ -36,15 +36,6 @@ namespace Ogre {
     /// Specialisation of HardwareUniformBuffer for OpenGL
     class _OgreGL3PlusExport GL3PlusHardwareUniformBuffer : public HardwareUniformBuffer
     {
-        struct GL3PlusBufferParametersLayout 
-        {
-            //TODO should this be a name, property map?  Probably.
-            std::vector<GLuint> indices;
-            std::vector<GLint> offsets;
-            /* std::vector<GLint> arrayStrides; */
-            /* std::vector<GLint> matrixStrides; */
-        };
-
     private:
         GLuint mBufferId;
         GLint mBinding;
@@ -56,8 +47,6 @@ namespace Ogre {
         void unlockImpl(void);
 
     public:
-        GL3PlusBufferParametersLayout mBufferParamsLayout;
-
         GL3PlusHardwareUniformBuffer(HardwareBufferManagerBase* mgr, size_t bufferSize, HardwareBuffer::Usage usage,
                                      bool useShadowBuffer, const String& name);
         ~GL3PlusHardwareUniformBuffer();

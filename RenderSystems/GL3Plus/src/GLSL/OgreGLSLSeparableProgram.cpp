@@ -630,39 +630,6 @@ namespace Ogre
         // }
     }
 
-
-    // void GLSLSeparableProgram::updateShaderStorageBlocks(GpuProgramParametersSharedPtr params,
-    //                                                     uint16 mask, GpuProgramType fromProgType)
-    // {
-    //     // Iterate through the list of uniform buffers and update them as needed
-    //     GLShaderStorageBufferIterator currentBuffer = mGLShaderStorageBufferReferences.begin();
-    //     GLShaderStorageBufferIterator endBuffer = mGLShaderStorageBufferReferences.end();
-
-    //     const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-
-    //     GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-    //     for (it = sharedParams.begin(); it != end; ++it)
-    //     {
-    //         for (;currentBuffer != endBuffer; ++currentBuffer)
-    //         {
-    //             GL3PlusHardwareShaderStorageBuffer* hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(currentBuffer->get());
-    //             GpuSharedParametersPtr paramsPtr = it->getSharedParams();
-
-    //             // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
-    //             GLint blockIndex;
-    //             OGRE_CHECK_GL_ERROR(blockIndex = glGetProgramResourceIndex(mGLProgramHandle, GL_SHADER_STORAGE_BLOCK, it->getName().c_str()));
-    //             OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(mGLProgramHandle, blockIndex, hwGlBuffer->getGLBufferBinding()));
-
-    //             //FIXME does not check if current progrtype, or if shared param is active
-
-    //             //FIXME This seems to only support copying float data.
-    //             // What about int, uint, double, etc?
-    //             hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
-    //         }
-    //     }
-    // }
-
-
     void GLSLSeparableProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
                                                    uint16 mask, GpuProgramType fromProgType)
     {
@@ -682,7 +649,7 @@ namespace Ogre
             GpuSharedParametersPtr paramsPtr = currentPair->first;
 
             //FIXME Possible buffer does not exist if no associated uniform block.
-            GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(currentPair->second.get());
+            HardwareUniformBuffer* hwGlBuffer = currentPair->second.get();
 
             if (!paramsPtr->isDirty()) continue;
 
@@ -702,6 +669,7 @@ namespace Ogre
 
                 void* dataPtr;
 
+                // NOTE: the naming is backward. this is the logical index
                 size_t index =  param->physicalIndex;
 
                 //TODO Maybe move to GpuSharedParams?  Otherwise create bool buffer.
@@ -730,7 +698,9 @@ namespace Ogre
 
                 // in bytes
                 size_t length = param->arraySize * param->elementSize * 4;
-                size_t offset = hwGlBuffer->mBufferParamsLayout.offsets[i];
+
+                // NOTE: the naming is backward. this is the physical offset in bytes
+                size_t offset = param->logicalIndex;
                 hwGlBuffer->writeData(offset, length, dataPtr);
             }
 
