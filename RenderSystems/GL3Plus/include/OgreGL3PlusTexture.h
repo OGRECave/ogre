@@ -97,7 +97,7 @@ namespace Ogre {
                 return mTextureID;
             }
 
-        void getCustomAttribute(const String& name, void* pData);
+        virtual void getCustomAttribute(const String& name, void* pData);
 
         void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
                                      int mipmapLevel = 0, int textureArrayIndex = 0,
@@ -131,8 +131,6 @@ namespace Ogre {
         */
         LoadedImages mLoadedImages;
 
-
-    private:
         GLuint mTextureID;
         GL3PlusSupport& mGLSupport;
 

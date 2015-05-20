@@ -174,7 +174,17 @@ namespace Ogre {
         {
             usage = (usage & ~(int)TU_STATIC) | (int)TU_DYNAMIC;
         }
-        ret = createResource(name, group, true, loader).staticCast<Texture>();
+
+        NameValuePairList params;
+        NameValuePairList *paramsPtr = 0;
+
+        if( PixelUtil::isDepth( format ) )
+        {
+            paramsPtr = &params;
+            params["DepthTexture"] = "True";
+        }
+
+        ret = createResource(name, group, true, loader, paramsPtr).staticCast<Texture>();
         ret->setTextureType(texType);
         ret->setWidth(width);
         ret->setHeight(height);

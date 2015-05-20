@@ -218,13 +218,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GL3PlusDepthBuffer::bindToFramebuffer(void)
     {
-        //Either GL_DEPTH_ATTACHMENT, GL_DEPTH_STENCIL or GL_STENCIL_ATTACHMENT
-        GLenum originFormat = GL3PlusPixelUtil::getGLOriginFormat( mFormat );
-
         if( mDepthTexture )
         {
             assert( mStencilBufferName == 0 && "OpenGL specs don't allow depth textures "
                     "with separate stencil format. We should have never hit this path." );
+
+            //Either GL_DEPTH_ATTACHMENT, GL_DEPTH_STENCIL or GL_STENCIL_ATTACHMENT
+            GLenum originFormat = GL3PlusPixelUtil::getGLOriginFormat( mFormat );
 
             OCGE( glFramebufferTexture( GL_FRAMEBUFFER, originFormat, mDepthBufferName, 0 ) );
         }
@@ -232,7 +232,7 @@ namespace Ogre
         {
             if( mDepthBufferName )
             {
-                OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, originFormat,
+                OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                                                  GL_RENDERBUFFER, mDepthBufferName ) );
             }
             if( mStencilBufferName )
