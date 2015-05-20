@@ -99,16 +99,9 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
             uint* data = static_cast<uint*>(pb.data);
             size_t height = pb.getHeight();
             size_t width = pb.getWidth();
-            size_t pitch = pb.rowPitch; // Skip between rows of image
 
-            for (size_t y = 0; y < height; ++y)
-            {
-                for (size_t x = 0; x < width; ++x)
-                {
-                    // 0xXXRRGGBB -> fill the buffer with yellow pixels
-                    data[pitch * y + x] = 0x00FFFF00;
-                }
-            }
+            // 0xXXRRGGBB -> fill the buffer with yellow pixels
+            std::fill(data, data + width * height, 0x00FFFF00);
 
             // Unlock the buffer again (frees it for use by the GPU)
             mPixelBuffer->unlock();
