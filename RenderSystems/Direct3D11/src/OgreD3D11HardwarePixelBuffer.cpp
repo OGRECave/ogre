@@ -479,7 +479,8 @@ namespace v1 {
         //(if it has a lot of textures to load).
         //Worst part this only repros in some machines, not driver specific.
         //Flushing here fixes it.
-        mDevice.GetImmediateContext()->Flush();
+        if( mUsage == HBU_STATIC )
+            mDevice.GetImmediateContext()->Flush();
     }
     //-----------------------------------------------------------------------------  
     D3D11_BOX D3D11HardwarePixelBuffer::OgreImageBoxToDx11Box(const Image::Box &inBox) const
