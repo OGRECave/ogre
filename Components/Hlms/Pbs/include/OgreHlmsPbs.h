@@ -83,7 +83,9 @@ namespace Ogre
 
         PassData                mPreparedPass;
         ConstBufferPackedVec    mPassBuffers;
-        HlmsSamplerblock const  *mShadowmapSamplerblock;
+        HlmsSamplerblock const  *mShadowmapSamplerblock;    /// GL3+ only when not using depth textures
+        HlmsSamplerblock const  *mShadowmapCmpSamplerblock; /// For depth textures & D3D11
+        HlmsSamplerblock const  *mCurrentShadowmapSamplerblock;
 
         uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
 

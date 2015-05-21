@@ -32,10 +32,12 @@ in uint drawId;
 
 @insertpiece( custom_vs_attributes )
 
+@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture )
 out block
 {
 @insertpiece( VStoPS_block )
 } outVs;
+@end
 
 // START UNIFORM DECLARATION
 @insertpiece( PassDecl )
@@ -178,14 +180,17 @@ void main()
     outVs.drawId = drawId;
 @end @property( hlms_shadowcaster )
     float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
-	//Linear depth
-	outVs.depth	= (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y;
-	outVs.depth = (outVs.depth * 0.5) + 0.5;
+
+	@property( !hlms_shadow_uses_depth_texture )
+		//Linear depth
+		outVs.depth	= (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y;
+		outVs.depth = (outVs.depth * 0.5) + 0.5;
+	@end
 
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-	gl_Position.z	= (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y * gl_Position.w;
+	gl_Position.z = (gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y * gl_Position.w;
 @end
 
 	@insertpiece( custom_vs_posExecution )

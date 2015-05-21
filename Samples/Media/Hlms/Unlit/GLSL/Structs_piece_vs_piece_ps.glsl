@@ -49,6 +49,6 @@ layout(binding = 2) uniform InstanceBuffer
 		@foreach( out_uv_half_count, n )
 			vec@value( out_uv_half_count@n ) uv@n;@end
 	@end
-	@property( hlms_shadowcaster )	float depth;@end
+	@property( hlms_shadowcaster && !hlms_shadow_uses_depth_texture )	float depth;@end
 	@insertpiece( custom_VStoPS )
 @end

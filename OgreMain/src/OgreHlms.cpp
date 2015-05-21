@@ -44,6 +44,8 @@ THE SOFTWARE.
 #include "OgreForward3D.h"
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
+#include "OgreViewport.h"
+#include "OgreRenderTarget.h"
 
 #include "OgreHlmsListener.h"
 
@@ -83,6 +85,7 @@ namespace Ogre
     const IdString HlmsBaseProp::NumShadowMaps      = IdString( "hlms_num_shadow_maps" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
     const IdString HlmsBaseProp::Forward3DDebug     = IdString( "hlms_forward3d_debug" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
@@ -1772,6 +1775,40 @@ namespace Ogre
                 if( numPssmSplits )
                     numShadowMaps += numPssmSplits - 1;
                 setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
+
+                int usesDepthTextures = -1;
+
+                const CompositorChannelVec &shadowTextures = shadowNode->getLocalTextures();
+                for( size_t i=0; i<numShadowMaps; ++i )
+                {
+                    bool missmatch = false;
+
+                    if( PixelUtil::isDepth( shadowTextures[i].textures[0]->getFormat() ) )
+                    {
+                        missmatch = usesDepthTextures == 0;
+                        usesDepthTextures = 1;
+                    }
+                    else
+                    {
+                        missmatch = usesDepthTextures == 1;
+                        usesDepthTextures = 0;
+                    }
+
+                    if( missmatch )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                                     "Mixing depth textures with non-depth textures for "
+                                     "shadow mapping is not supported. Either all of "
+                                     "them are depth textures, or none of them are.\n"
+                                     "Shadow Node: '" + shadowNode->getName().getFriendlyText() + "'",
+                                     "Hlms::preparePassHash" );
+                    }
+                }
+
+                if( usesDepthTextures == -1 )
+                    usesDepthTextures = 0;
+
+                setProperty( HlmsBaseProp::ShadowUsesDepthTexture, usesDepthTextures );
             }
 
             Forward3D *forward3D = sceneManager->getForward3D();
@@ -1879,6 +1916,10 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsDirNonCaster,0 );
             setProperty( HlmsBaseProp::LightsPoint,       0 );
             setProperty( HlmsBaseProp::LightsSpot,        0 );
+
+            RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+            setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
+                         renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         }
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );

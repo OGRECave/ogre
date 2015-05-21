@@ -68,6 +68,9 @@ void main()
 }
 
 @end @property( hlms_shadowcaster )
+	@property( hlms_shadow_uses_depth_texture )
+		@set( hlms_disable_stage, 1 )
+	@end
 void main()
 {
 	@insertpiece( custom_ps_preExecution )
