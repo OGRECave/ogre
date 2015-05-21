@@ -39,11 +39,10 @@ namespace Ogre
                                         uint32 multiSampleQuality, PixelFormat pixelFormat,
                                         bool isDepthTexture, bool isManual ) :
                 DepthBuffer( poolId, 0, width, height, fsaa, "", pixelFormat,
-                             isDepthTexture, isManual ),
+                             isDepthTexture, isManual, renderSystem ),
                 mDepthStencilView( depthBufferView ),
                 mDepthTextureView( depthTextureView ),
-                mMultiSampleQuality( multiSampleQuality),
-                mRenderSystem(renderSystem)
+                mMultiSampleQuality( multiSampleQuality )
     {
         D3D11_DEPTH_STENCIL_VIEW_DESC pDesc;
         mDepthStencilView->GetDesc( &pDesc );
