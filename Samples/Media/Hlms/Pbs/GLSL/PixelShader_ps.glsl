@@ -69,7 +69,6 @@ uniform @insertpiece( SAMPLER2DSHADOW ) texShadowMap[@value(hlms_num_shadow_maps
 
 float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec4 invShadowMapSize )
 {
-@property( !hlms_shadow_uses_depth_texture )
 	float fDepth = psPosLN.z;
 	vec2 uv = psPosLN.xy / psPosLN.w;
 
@@ -110,6 +109,7 @@ float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec4 i
 	@foreach( pcf_iterations, n )
 		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * invShadowMapSize.xy;@end
 
+		@property( !hlms_shadow_uses_depth_texture )
 		// 2x2 PCF
 		//The 0.00196 is a magic number that prevents floating point
 		//precision problems ("1000" becomes "999.999" causing fW to
@@ -138,9 +138,12 @@ float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec4 i
 			row[0] += mix( c.w, c.z, fW.x );
 			row[1] += mix( c.x, c.y, fW.x );
 		@end
+		@end @property( hlms_shadow_uses_depth_texture )
+			retVal += texture( shadowMap, vec3( uv, fDepth ) ).r;
+		@end
 	@end
 
-	@property( pcf_3x3 || pcf_4x4 )
+	@property( (pcf_3x3 || pcf_4x4) && !hlms_shadow_uses_depth_texture )
 		//NxN PCF: It's much faster to leave the final mix out of the loop (when N > 2).
 		retVal = mix( row[0], row[1], fW.y );
 	@end
@@ -152,9 +155,6 @@ float getShadow( @insertpiece( SAMPLER2DSHADOW ) shadowMap, vec4 psPosLN, vec4 i
 	@end
 
 	return retVal;
-@end
-@property( hlms_shadow_uses_depth_texture )
-	return texture( shadowMap, psPosLN.xyz, 0 ).x;@end
 }
 @end
 
