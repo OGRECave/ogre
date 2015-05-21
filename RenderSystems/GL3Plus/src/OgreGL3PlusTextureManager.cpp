@@ -57,7 +57,12 @@ namespace Ogre {
                                                 const NameValuePairList* createParams)
     {
         if( createParams && createParams->find( "DepthTexture" ) != createParams->end() )
-            return new GL3PlusDepthTexture(this, name, handle, group, isManual, loader, mGLSupport);
+        {
+            const bool shareableDepthBuffer = createParams->find( "shareableDepthBuffer" ) !=
+                                                                            createParams->end();
+            return new GL3PlusDepthTexture( shareableDepthBuffer, this, name, handle, group,
+                                            isManual, loader, mGLSupport );
+        }
 
         return new GL3PlusTexture(this, name, handle, group, isManual, loader, mGLSupport);
     }

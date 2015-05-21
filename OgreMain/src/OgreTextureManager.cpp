@@ -155,7 +155,7 @@ namespace Ogre {
     TexturePtr TextureManager::createManual(const String & name, const String& group,
         TextureType texType, uint width, uint height, uint depth, int numMipmaps,
         PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma, 
-        uint fsaa, const String& fsaaHint, bool explicitResolve)
+        uint fsaa, const String& fsaaHint, bool explicitResolve, bool shareableDepthBuffer)
     {
         TexturePtr ret;
         ret.setNull();
@@ -181,7 +181,9 @@ namespace Ogre {
         if( PixelUtil::isDepth( format ) )
         {
             paramsPtr = &params;
-            params["DepthTexture"] = "True";
+            params["DepthTexture"] = "";
+            if( shareableDepthBuffer )
+                params["shareableDepthBuffer"] = "";
         }
 
         ret = createResource(name, group, true, loader, paramsPtr).staticCast<Texture>();

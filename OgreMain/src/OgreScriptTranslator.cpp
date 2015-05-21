@@ -6217,7 +6217,9 @@ namespace Ogre{
         TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::BoolUndefined;
         bool fsaa = true;
         bool fsaaExplicitResolve = false;
-        uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
+        uint16 depthBufferId = DepthBuffer::POOL_INVALID;
+        PixelFormat depthBufferFormat = PF_UNKNOWN;
+        bool preferDepthTexture = false;
         Ogre::PixelFormatList formats;
 
         while (atomIndex < prop->values.size())
@@ -6309,6 +6311,28 @@ namespace Ogre{
                     depthBufferId = StringConverter::parseInt(atom->value);
                 }
                 break;
+            case ID_DEPTH_TEXTURE:
+                preferDepthTexture = true;
+                break;
+            case ID_DEPTH_FORMAT:
+                {
+                    // advance to next to get the ID
+                    it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+                    if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    atom = (AtomAbstractNode*)(*it).get();
+
+                    depthBufferFormat = PixelUtil::getFormatFromName(atom->value, false);
+                    if( depthBufferFormat == PF_UNKNOWN )
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                }
+                break;
             default:
                 if (StringConverter::isNumber(atom->value))
                 {
@@ -6339,6 +6363,14 @@ namespace Ogre{
                     }
                     formats.push_back(format);
                     formatSet = true;
+
+                    if( depthBufferId == DepthBuffer::POOL_INVALID )
+                    {
+                        if( PixelUtil::isDepth( format ) )
+                            depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else
+                            depthBufferId = DepthBuffer::POOL_DEFAULT;
+                    }
                 }
 
             }
@@ -6360,6 +6392,8 @@ namespace Ogre{
         td->fsaa            = fsaa;
         td->hwGammaWrite    = hwGammaWrite;
         td->depthBufferId   = depthBufferId;
+        td->depthBufferFormat   = depthBufferFormat;
+        td->preferDepthTexture  = preferDepthTexture;
         td->fsaaExplicitResolve = fsaaExplicitResolve;
     }
 
@@ -6762,7 +6796,9 @@ namespace Ogre{
         bool widthSet = false, heightSet = false, formatSet = false;
         bool hwGammaWrite = false;
         uint fsaa = 0;
-        uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
+        bool preferDepthTexture = false;
+        uint16 depthBufferId = DepthBuffer::POOL_INVALID;
+        PixelFormat depthBufferFormat = PF_UNKNOWN;
         Ogre::PixelFormatList formats;
         int lightIdx = ~0;
         size_t splitIdx = 0;
@@ -6837,6 +6873,28 @@ namespace Ogre{
                         return;
                     }
                     if( !getUInt( *it, &fsaa ) )
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                }
+                break;
+            case ID_DEPTH_TEXTURE:
+                preferDepthTexture = true;
+                break;
+            case ID_DEPTH_FORMAT:
+                {
+                    // advance to next to get the ID
+                    it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+                    if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    atom = (AtomAbstractNode*)(*it).get();
+
+                    depthBufferFormat = PixelUtil::getFormatFromName(atom->value, false);
+                    if( depthBufferFormat == PF_UNKNOWN )
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                         return;
@@ -6933,6 +6991,14 @@ namespace Ogre{
                         formats.push_back(format);
                         formatSet = true;
                     }
+
+                    if( depthBufferId == DepthBuffer::POOL_INVALID )
+                    {
+                        if( PixelUtil::isDepth( format ) )
+                            depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else
+                            depthBufferId = DepthBuffer::POOL_DEFAULT;
+                    }
                 }
 
             }
@@ -6953,7 +7019,9 @@ namespace Ogre{
         td->formatList      = formats;
         td->fsaa            = fsaa;
         td->hwGammaWrite    = hwGammaWrite;
+        td->preferDepthTexture= preferDepthTexture;
         td->depthBufferId   = depthBufferId;
+        td->depthBufferFormat=depthBufferFormat;
 
         td->pssmLambda      = defaultParams.pssmLambda;
         td->splitPadding    = defaultParams.splitPadding;

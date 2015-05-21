@@ -1,4 +1,4 @@
-/*
+﻿/*
   -----------------------------------------------------------------------------
   This source file is part of OGRE
   (Object-oriented Graphics Rendering Engine)
@@ -37,10 +37,12 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre
 {
-    GL3PlusDepthTexture::GL3PlusDepthTexture( ResourceManager* creator, const String& name,
-                                              ResourceHandle handle, const String& group, bool isManual,
+    GL3PlusDepthTexture::GL3PlusDepthTexture( bool shareableDepthBuffer, ResourceManager* creator,
+                                              const String& name, ResourceHandle handle,
+                                              const String& group, bool isManual,
                                               ManualResourceLoader* loader, GL3PlusSupport& support )
-        : GL3PlusTexture( creator, name, handle, group, isManual, loader, support )
+        : GL3PlusTexture( creator, name, handle, group, isManual, loader, support ),
+          mShareableDepthBuffer( shareableDepthBuffer )
     {
         mMipmapsHardwareGenerated = true;
     }
@@ -198,6 +200,9 @@ namespace v1
         mFSAA       = ultimateTextureOwner->getFSAA();
         mFSAAHint   = ultimateTextureOwner->getFSAAHint();
         mFsaaResolveDirty = true; //Should be permanent true.
+
+        if( !ultimateTextureOwner->getShareableDepthBuffer() )
+            mDepthBufferPoolId = DepthBuffer::POOL_NON_SHAREABLE;
     }
     //-----------------------------------------------------------------------------------
     GL3PlusDepthTextureTarget::~GL3PlusDepthTextureTarget()

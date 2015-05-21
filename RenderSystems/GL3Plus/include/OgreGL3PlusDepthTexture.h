@@ -37,15 +37,19 @@ namespace Ogre
     {
     public:
         // Constructor
-        GL3PlusDepthTexture( ResourceManager* creator, const String& name, ResourceHandle handle,
-                             const String& group, bool isManual, ManualResourceLoader* loader,
-                             GL3PlusSupport& support );
+        GL3PlusDepthTexture( bool shareableDepthBuffer, ResourceManager* creator, const String& name,
+                             ResourceHandle handle, const String& group, bool isManual,
+                             ManualResourceLoader* loader, GL3PlusSupport& support );
 
         virtual ~GL3PlusDepthTexture();
 
         void _setGlTextureName( GLuint textureName );
 
+        bool getShareableDepthBuffer(void) const        { return mShareableDepthBuffer; }
+
     protected:
+        bool mShareableDepthBuffer;
+
         /// @copydoc Texture::createInternalResourcesImpl
         virtual void createInternalResourcesImpl(void);
         /// @copydoc Resource::freeInternalResourcesImpl
@@ -77,8 +81,7 @@ namespace v1
 
     public:
         GL3PlusDepthPixelBuffer( GL3PlusDepthTexture *parentTexture, const String &baseName,
-                                 uint32 width, uint32 height, uint32 depth,
-                                 PixelFormat format );
+                                 uint32 width, uint32 height, uint32 depth, PixelFormat format );
         virtual ~GL3PlusDepthPixelBuffer();
 
         virtual void blitFromMemory( const PixelBox &src, const Image::Box &dstBox );
@@ -92,8 +95,9 @@ namespace v1
         GL3PlusDepthTexture *mUltimateTextureOwner;
 
     public:
-        GL3PlusDepthTextureTarget( GL3PlusDepthTexture *ultimateTextureOwner, const String &name,
-                                   v1::HardwarePixelBuffer *buffer, uint32 zoffset );
+        GL3PlusDepthTextureTarget( GL3PlusDepthTexture *ultimateTextureOwner,
+                                   const String &name, v1::HardwarePixelBuffer *buffer,
+                                   uint32 zoffset );
         virtual ~GL3PlusDepthTextureTarget();
 
         virtual bool requiresTextureFlipping() const { return true; }

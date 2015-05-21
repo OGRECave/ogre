@@ -28,12 +28,15 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreDepthBuffer.h"
 #include "OgreRenderTarget.h"
+#include "OgreRenderSystem.h"
 
 namespace Ogre
 {
+    PixelFormat DepthBuffer::DefaultDepthBufferFormat = PF_D24_UNORM_S8_UINT;
+
     DepthBuffer::DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
                               uint32 fsaa, const String &fsaaHint, PixelFormat pixelFormat,
-                              bool isDepthTexture, bool manual ) :
+                              bool isDepthTexture, bool manual, RenderSystem *renderSystem ) :
                 mPoolId(poolId),
                 mBitDepth(bitDepth),
                 mWidth(width),
@@ -42,23 +45,23 @@ namespace Ogre
                 mFsaaHint(fsaaHint),
                 mFormat(pixelFormat),
                 mDepthTexture(isDepthTexture),
-                mManual(manual)
+                mManual(manual),
+                mRenderSystem(renderSystem)
     {
     }
 
     DepthBuffer::~DepthBuffer()
     {
-        detachFromAllRenderTargets();
+        detachFromAllRenderTargets( true );
     }
 
     void DepthBuffer::_setPoolId( uint16 poolId )
     {
+        //Can't have Render Targets attached to us, because they have a different pool Id
+        assert( mAttachedRenderTargets.empty() );
+
         //Change the pool Id
         mPoolId = poolId;
-
-        //Render Targets were attached to us, but they have a different pool Id,
-        //so detach ourselves from them
-        detachFromAllRenderTargets();
     }
     //-----------------------------------------------------------------------
     uint16 DepthBuffer::getPoolId() const
@@ -134,9 +137,12 @@ namespace Ogre
         assert( itor != mAttachedRenderTargets.end() );
 
         mAttachedRenderTargets.erase( itor );
+
+        if( mAttachedRenderTargets.empty() && mPoolId == DepthBuffer::POOL_NON_SHAREABLE )
+            mRenderSystem->_destroyDepthBuffer( this );
     }
     //-----------------------------------------------------------------------
-    void DepthBuffer::detachFromAllRenderTargets()
+    void DepthBuffer::detachFromAllRenderTargets( bool inDestructor )
     {
         RenderTargetSet::const_iterator itor = mAttachedRenderTargets.begin();
         RenderTargetSet::const_iterator end  = mAttachedRenderTargets.end();
@@ -148,5 +154,8 @@ namespace Ogre
         }
 
         mAttachedRenderTargets.clear();
+
+        if( !inDestructor && mPoolId == DepthBuffer::POOL_NON_SHAREABLE )
+            mRenderSystem->_destroyDepthBuffer( this );
     }
 }

@@ -622,6 +622,10 @@ namespace Ogre
         */
         virtual void setDepthBufferFor( RenderTarget *renderTarget, bool exactMatch );
 
+        virtual void createUniqueDepthBufferFor( RenderTarget *renderTarget, bool exactMatch );
+
+        virtual void _destroyDepthBuffer( DepthBuffer *depthBuffer );
+
         // ------------------------------------------------------------------------
         //                     Internal Rendering Access
         // All methods below here are normally only called by other OGRE classes
@@ -1407,8 +1411,11 @@ namespace Ogre
 
     protected:
 
+        void cleanReleasedDepthBuffers(void);
+
         /** DepthBuffers to be attached to render targets */
         DepthBufferMap  mDepthBufferPool;
+        DepthBufferVec  mReleasedDepthBuffers;
 
         /** The render targets. */
         RenderTargetMap mRenderTargets;

@@ -41,12 +41,11 @@ namespace Ogre
                                             uint32 multiSampleQuality, PixelFormat pixelFormat,
                                             bool isDepthTexture, bool _isManual ) :
                 DepthBuffer( poolId, 0, width, height, fsaa, "", pixelFormat,
-                             isDepthTexture, _isManual ),
+                             isDepthTexture, _isManual, renderSystem ),
                 mMultiSampleQuality( multiSampleQuality ),
                 mCreatorContext( creatorContext ),
                 mDepthBufferName( 0 ),
-                mStencilBufferName( 0 ),
-                mRenderSystem( renderSystem )
+                mStencilBufferName( 0 )
     {
         switch( depthFormat )
         {

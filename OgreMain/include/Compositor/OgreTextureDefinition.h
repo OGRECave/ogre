@@ -83,6 +83,10 @@ namespace Ogre
             BoolSetting hwGammaWrite;   // Do sRGB gamma correction on write (only 8-bit per channel formats) 
             uint16 depthBufferId;//Depth Buffer's pool ID.
 
+            /// @see RenderTarget::setPreferDepthTexture
+            bool preferDepthTexture;
+            PixelFormat depthBufferFormat;
+
             /** In D3D9, reading from an fsaa texture is not possible, hence it always has
                 to be resolved before using it. When resolves are implicit, trying to read
                 a render target as a texture will make Ogre to automatically resolve the
@@ -104,6 +108,7 @@ namespace Ogre
 
             TextureDefinition( IdString _name ) : name(_name), width(0), height(0), widthFactor(1.0f),
                     heightFactor(1.0f), fsaa(true), hwGammaWrite(BoolUndefined), depthBufferId(1),
+                    depthBufferFormat(PF_UNKNOWN), preferDepthTexture(false),
                     fsaaExplicitResolve(false) {}
         };
 

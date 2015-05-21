@@ -825,6 +825,8 @@ namespace Ogre
                 ID_NO_FSAA,
                 ID_EXPLICIT_RESOLVE,
                 ID_DEPTH_POOL,
+                ID_DEPTH_TEXTURE,
+                ID_DEPTH_FORMAT,
             ID_TARGET,
         //  ID_PASS,
                 ID_CLEAR,

@@ -87,12 +87,14 @@ namespace Ogre
         {
             POOL_NO_DEPTH       = 0,
             POOL_MANUAL_USAGE   = 0,
-            POOL_DEFAULT        = 1
+            POOL_DEFAULT        = 1,
+            POOL_NON_SHAREABLE  = 65534,
+            POOL_INVALID        = 65535
         };
 
         DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
                      uint32 fsaa, const String &fsaaHint, PixelFormat pixelFormat,
-                     bool isDepthTexture, bool manual );
+                     bool isDepthTexture, bool manual, RenderSystem *renderSystem );
         virtual ~DepthBuffer();
 
         /** Sets the pool id in which this DepthBuffer lives.
@@ -144,6 +146,8 @@ namespace Ogre
         */
         virtual void _notifyRenderTargetDetached( RenderTarget *renderTarget );
 
+        static PixelFormat DefaultDepthBufferFormat;
+
     protected:
         typedef set<RenderTarget*>::type RenderTargetSet;
 
@@ -158,8 +162,9 @@ namespace Ogre
 
         bool                        mManual; //We don't Release manual surfaces on destruction
         RenderTargetSet             mAttachedRenderTargets;
+        RenderSystem                *mRenderSystem;
 
-        void detachFromAllRenderTargets();
+        void detachFromAllRenderTargets( bool inDestructor );
     };
 
     /** @} */

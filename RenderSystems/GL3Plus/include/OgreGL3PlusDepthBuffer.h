@@ -73,7 +73,6 @@ namespace Ogre
         GL3PlusContext              *mCreatorContext;
         GLuint                      mDepthBufferName;
         GLuint                      mStencilBufferName;
-        GL3PlusRenderSystem         *mRenderSystem;
     };
 }
 #endif

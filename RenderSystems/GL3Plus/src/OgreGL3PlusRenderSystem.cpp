@@ -446,8 +446,8 @@ namespace Ogre {
             rsc->addShaderProfile("glsl130");
 
         // FIXME: This isn't working right yet in some rarer cases
-        if (mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || hasGL41)
-            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+        /*if (mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || hasGL41)
+            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);*/
 
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);
@@ -597,6 +597,21 @@ namespace Ogre {
         {
             // Enable microcache
             mShaderManager->setSaveMicrocodesToCache(true);
+        }
+
+        if( mGLSupport->hasMinGLVersion( 4, 3 ) )
+        {
+            //On AMD's GCN cards, there is no performance or memory difference between
+            //PF_D24_UNORM_S8_UINT & PF_D32_FLOAT_X24_S8_UINT, so prefer the latter
+            //on modern cards (GL >= 4.3) and that also claim to support this format.
+            //NVIDIA's preference? Dunno, they don't tell. But at least the quality
+            //will be consistent.
+            GLenum depthFormat, stencilFormat;
+            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( PF_D32_FLOAT_X24_S8_UINT,
+                                                                               PF_D32_FLOAT_X24_S8_UINT,
+                                                                               &depthFormat,
+                                                                               &stencilFormat );
+            DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
         }
 
         mGLInitialised = true;
@@ -824,7 +839,7 @@ namespace Ogre {
 
             // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
             // Find best depth & stencil format suited for the RT's format
-            GLuint depthFormat, stencilFormat;
+            GLenum depthFormat, stencilFormat;
             static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( desiredDepthBufferFormat,
                                                                                renderTargetFormat,
                                                                                &depthFormat,
