@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
+#include "OgreD3D11DepthTexture.h"
 #include "OgreD3D11Texture.h"
 #include "OgreD3D11Mappings.h"
 
@@ -63,7 +64,20 @@ namespace Ogre
         ID3D11Texture2D *D3D11texture = NULL;
         renderTarget->getCustomAttribute( "First_ID3D11Texture2D", &D3D11texture );
         D3D11_TEXTURE2D_DESC BBDesc;
-        D3D11texture->GetDesc( &BBDesc );
+
+        ZeroMemory( &BBDesc, sizeof(D3D11_TEXTURE2D_DESC) );
+        if( D3D11texture )
+        {
+            D3D11texture->GetDesc( &BBDesc );
+        }
+        else
+        {
+            //Depth textures.
+            assert( dynamic_cast<D3D11DepthTextureTarget*>(renderTarget) );
+            //BBDesc.ArraySize = renderTarget;
+            BBDesc.SampleDesc.Count     = std::max( 1u, renderTarget->getFSAA() );
+            BBDesc.SampleDesc.Quality   = atoi( renderTarget->getFSAAHint().c_str() );
+        }
 
         //RenderSystem will determine if bitdepths match (i.e. 32 bit RT don't like 16 bit Depth)
         //This is the same function used to create them. Note results are usually cached so this should

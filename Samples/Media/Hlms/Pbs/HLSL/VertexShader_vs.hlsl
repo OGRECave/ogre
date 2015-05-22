@@ -165,20 +165,23 @@ PS_INPUT main( VS_INPUT input )
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n.z = (outVs.posL@n.z - passBuf.shadowRcv[@n].shadowDepthRange.x) * passBuf.shadowRcv[@n].shadowDepthRange.y;@end
+	outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;@end
 
 @property( hlms_pssm_splits )	outVs.depth = outVs.gl_Position.z;@end
 
 	outVs.drawId = input.drawId;
 @end @property( hlms_shadowcaster )
 	float shadowConstantBias = asfloat( worldMaterialIdx[input.drawId].y );
-	//Linear depth
-	outVs.depth	= (outVs.gl_Position.z - passBuf.depthRange.x + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
-
+	
+	@property( !hlms_shadow_uses_depth_texture )
+		//Linear depth
+		outVs.depth	= (outVs.gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
+	@end
+		
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-	outVs.gl_Position.z = outVs.gl_Position.z * (outVs.gl_Position.w * passBuf.depthRange.y);
+	outVs.gl_Position.z = (outVs.gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y * outVs.gl_Position.w;
 @end
 	@insertpiece( custom_vs_posExecution )
 

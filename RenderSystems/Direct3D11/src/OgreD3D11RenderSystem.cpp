@@ -54,6 +54,7 @@ THE SOFTWARE.
 #include "OgreHlmsSamplerblock.h"
 
 #include "OgreD3D11DepthBuffer.h"
+#include "OgreD3D11DepthTexture.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
@@ -861,6 +862,14 @@ bail:
             SAFE_RELEASE(pDXGIDevice);
 
             mDevice.TransferOwnership(device) ;
+
+            //On AMD's GCN cards, there is no performance or memory difference between
+            //PF_D24_UNORM_S8_UINT & PF_D32_FLOAT_X24_S8_UINT, so prefer the latter
+            //on modern cards (GL >= 4.3) and that also claim to support this format.
+            //NVIDIA's preference? Dunno, they don't tell. But at least the quality
+            //will be consistent.
+            if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
+                DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
         }
 
         if( autoCreateWindow )
@@ -1545,17 +1554,30 @@ bail:
         //Get surface data (mainly to get MSAA data)
         ID3D11Texture2D *rtTexture = 0;
         renderTarget->getCustomAttribute( "First_ID3D11Texture2D", &rtTexture );
+
         D3D11_TEXTURE2D_DESC BBDesc;
-        rtTexture->GetDesc( &BBDesc );
+        ZeroMemory( &BBDesc, sizeof(D3D11_TEXTURE2D_DESC) );
+        if( rtTexture )
+        {
+            rtTexture->GetDesc( &BBDesc );
+        }
+        else
+        {
+            //Depth textures.
+            assert( dynamic_cast<D3D11DepthTextureTarget*>(renderTarget) );
+            //BBDesc.ArraySize = renderTarget;
+            BBDesc.SampleDesc.Count     = std::max( 1u, renderTarget->getFSAA() );
+            BBDesc.SampleDesc.Quality   = atoi( renderTarget->getFSAAHint().c_str() );
+        }
 
         // Create depth stencil texture
         ID3D11Texture2D* pDepthStencil = NULL;
         D3D11_TEXTURE2D_DESC descDepth;
 
-        descDepth.Width                 = renderTarget->getWidth();
-        descDepth.Height                = renderTarget->getHeight();
-        descDepth.MipLevels             = 1;
-        descDepth.ArraySize             = BBDesc.ArraySize;
+        descDepth.Width     = renderTarget->getWidth();
+        descDepth.Height    = renderTarget->getHeight();
+        descDepth.MipLevels = 1;
+        descDepth.ArraySize = 1; //BBDesc.ArraySize?
 
         PixelFormat desiredDepthBufferFormat = renderTarget->getDesiredDepthBufferFormat();
 
@@ -2584,12 +2606,14 @@ bail:
 
         //No subroutines for now
 
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
         if( !hlmsCache->vertexShader.isNull() )
         {
             mBoundVertexProgram = static_cast<D3D11HLSLProgram*>( hlmsCache->vertexShader->
                                                                   _getBindingDelegate() );
 
-            mDevice.GetImmediateContext()->VSSetShader( mBoundVertexProgram->getVertexShader(), 0, 0 );
+            deviceContext->VSSetShader( mBoundVertexProgram->getVertexShader(), 0, 0 );
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
@@ -2599,13 +2623,16 @@ bail:
             }
             mVertexProgramBound = true;
         }
+        else
+        {
+            deviceContext->VSSetShader( 0, 0, 0 );
+        }
 
         if( !hlmsCache->geometryShader.isNull() )
         {
             mBoundGeometryProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->geometryShader->
                                                                       _getBindingDelegate() );
-            mDevice.GetImmediateContext()->GSSetShader( mBoundGeometryProgram->getGeometryShader(),
-                                                        0, 0 );
+            deviceContext->GSSetShader( mBoundGeometryProgram->getGeometryShader(), 0, 0 );
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
@@ -2618,6 +2645,10 @@ bail:
 
             mUseAdjacency = mBoundGeometryProgram->isAdjacencyInfoRequired();
         }
+        else
+        {
+            deviceContext->GSSetShader( 0, 0, 0 );
+        }
 
         if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
         {
@@ -2626,8 +2657,7 @@ bail:
                 mBoundTessellationHullProgram   = static_cast<D3D11HLSLProgram*>(
                             hlmsCache->tesselationHullShader->_getBindingDelegate() );
 
-                mDevice.GetImmediateContext()->HSSetShader( mBoundTessellationHullProgram->
-                                                            getHullShader(), 0, 0 );
+                deviceContext->HSSetShader( mBoundTessellationHullProgram->getHullShader(), 0, 0 );
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2637,14 +2667,17 @@ bail:
                 }
                 mTessellationHullProgramBound = true;
             }
+            else
+            {
+                deviceContext->HSSetShader( 0, 0, 0 );
+            }
 
             if( !hlmsCache->tesselationDomainShader.isNull() )
             {
                 mBoundTessellationDomainProgram = static_cast<D3D11HLSLProgram*>(
                             hlmsCache->tesselationDomainShader->_getBindingDelegate() );
 
-                mDevice.GetImmediateContext()->DSSetShader(
-                            mBoundTessellationDomainProgram->getDomainShader(), 0, 0 );
+                deviceContext->DSSetShader( mBoundTessellationDomainProgram->getDomainShader(), 0, 0 );
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2654,13 +2687,17 @@ bail:
                 }
                 mTessellationDomainProgramBound = true;
             }
+            else
+            {
+                deviceContext->DSSetShader( 0, 0, 0 );
+            }
         }
 
         if( !hlmsCache->pixelShader.isNull() )
         {
             mBoundFragmentProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->pixelShader->
                                                                       _getBindingDelegate() );
-            mDevice.GetImmediateContext()->PSSetShader( mBoundFragmentProgram->getPixelShader(), 0, 0 );
+            deviceContext->PSSetShader( mBoundFragmentProgram->getPixelShader(), 0, 0 );
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
@@ -2669,6 +2706,10 @@ bail:
                              errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
             }
             mFragmentProgramBound = true;
+        }
+        else
+        {
+            deviceContext->PSSetShader( 0, 0, 0 );
         }
 
         // Check consistency of tessellation shaders

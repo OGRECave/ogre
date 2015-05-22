@@ -94,6 +94,8 @@ namespace Ogre
 
         // Get final internal format.
         mFormat = getBuffer(0,0)->getFormat();
+
+        mSize = calculateSize();
     }
     //---------------------------------------------------------------------
     void D3D11DepthTexture::_createSurfaceList(void)

@@ -73,6 +73,8 @@ namespace Ogre
 
         // Get final internal format.
         mFormat = getBuffer(0,0)->getFormat();
+
+        mSize = calculateSize();
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusDepthTexture::freeInternalResourcesImpl()

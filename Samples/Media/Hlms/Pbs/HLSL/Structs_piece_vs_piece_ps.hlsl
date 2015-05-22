@@ -124,6 +124,6 @@ cbuffer InstanceBuffer : register(b2)
 		@foreach( hlms_num_shadow_maps, n )
 			float4 posL@n	: TEXCOORD@counter(texcoord);@end
 	@end
-	@property( hlms_shadowcaster || hlms_pssm_splits )	float depth	: TEXCOORD@counter(texcoord);@end
+	@property( (hlms_shadowcaster && !hlms_shadow_uses_depth_texture) || hlms_pssm_splits )		float depth	: TEXCOORD@counter(texcoord);@end
 	@insertpiece( custom_VStoPS )
 @end
