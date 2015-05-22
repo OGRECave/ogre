@@ -36,7 +36,6 @@ SamplerComparisonState shadowSampler : register(s@value(textureRegShadowMapStart
 
 float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
 {
-@property( !hlms_shadow_uses_depth_texture )
 	float fDepth = psPosLN.z;
 	float2 uv = psPosLN.xy / psPosLN.w;
 	/*float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
@@ -82,9 +81,6 @@ float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
 	@end
 
 	return retVal;
-@end
-@property( hlms_shadow_uses_depth_texture )
-	return texture( shadowMap, psPosLN.xyz, 0 ).x;@end
 }
 @end
 
@@ -364,6 +360,9 @@ float4 main( PS_INPUT inPs
 }
 @end
 @property( hlms_shadowcaster )
+	@property( hlms_shadow_uses_depth_texture )
+		@set( hlms_disable_stage, 1 )
+	@end
 float main( PS_INPUT inPs ) : SV_Target0
 {
 	@insertpiece( custom_ps_preExecution )

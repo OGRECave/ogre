@@ -428,7 +428,7 @@ namespace Ogre
     {
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that _beginFrame calls go to the right device.
-        mRenderSys->_setRenderTarget( mRenderWindow.target );
+        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
         if( mRenderWindow.target->isRenderWindow() || forceBeginFrame )
         {
             // Begin the frame
@@ -440,7 +440,7 @@ namespace Ogre
     {
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that _endFrame calls go to the right device.
-        mRenderSys->_setRenderTarget( mRenderWindow.target );
+        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
         if( mRenderWindow.target->isRenderWindow() || forceEndFrame )
         {
             // End the frame
@@ -455,7 +455,7 @@ namespace Ogre
 
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that our calls go to the right device.
-        mRenderSys->_setRenderTarget( mRenderWindow.target );
+        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
 
         if( mCurrentWidth != mRenderWindow.target->getWidth() || mCurrentHeight != mRenderWindow.target->getHeight() )
         {
@@ -551,7 +551,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::_validateFinalTarget(void)
     {
-        mRenderSys->_setRenderTarget( mRenderWindow.target );
+        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
     }
     //-----------------------------------------------------------------------------------
     CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const

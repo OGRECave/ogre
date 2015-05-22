@@ -49,26 +49,30 @@ namespace Ogre
     */
     class _OgreGL3PlusExport GL3PlusDepthBuffer : public DepthBuffer
     {
+        GLuint createRenderBuffer( GLenum format );
+
     public:
-        GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
-                        v1::GL3PlusRenderBuffer *depth, v1::GL3PlusRenderBuffer *stencil,
-                        uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-                        bool _isManual );
+        GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem,
+                            GL3PlusContext *creatorContext,
+                            GLenum depthFormat, GLenum stencilFormat,
+                            uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                            PixelFormat pixelFormat, bool isDepthTexture, bool _isManual );
         ~GL3PlusDepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible
-        virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
+
+        void bindToFramebuffer(void);
 
         GL3PlusContext* getGLContext() const { return mCreatorContext; }
-        v1::GL3PlusRenderBuffer* getDepthBuffer() const  { return mDepthBuffer; }
-        v1::GL3PlusRenderBuffer* getStencilBuffer() const { return mStencilBuffer; }
+        GLuint getDepthBuffer() const  { return mDepthBufferName; }
+        GLuint getStencilBuffer() const { return mStencilBufferName; }
 
     protected:
         uint32                  mMultiSampleQuality;
         GL3PlusContext              *mCreatorContext;
-        v1::GL3PlusRenderBuffer     *mDepthBuffer;
-        v1::GL3PlusRenderBuffer     *mStencilBuffer;
-        GL3PlusRenderSystem         *mRenderSystem;
+        GLuint                      mDepthBufferName;
+        GLuint                      mStencilBufferName;
     };
 }
 #endif

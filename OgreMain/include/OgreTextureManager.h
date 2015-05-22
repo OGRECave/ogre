@@ -298,12 +298,18 @@ namespace Ogre {
             @param explicitResolve Whether FSAA resolves are done implicitly when used as
                 texture, or must be done explicitly.
                 @See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
+            @param shareableDepthBuffer
+                Only valid for depth texture formats. When true, the depth buffer is a "view"
+                of an existing depth texture (e.g. useful for reading the depth buffer contents
+                of a GBuffer pass in deferred rendering). When false, the texture gets its own
+                depth buffer created for itself (e.g. useful for shadow mapping, which is
+                a depth-only pass)
         */
         virtual TexturePtr createManual(const String & name, const String& group,
-            TextureType texType, uint width, uint height, uint depth, 
+            TextureType texType, uint width, uint height, uint depth,
             int numMipmaps, PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
             bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = BLANKSTRING,
-            bool explicitResolve = false);
+            bool explicitResolve = false, bool shareableDepthBuffer = true);
             
         /** Create a manual texture with a depth of 1 (not loaded from a file).
             @param
@@ -351,15 +357,23 @@ namespace Ogre {
             @param explicitResolve Whether FSAA resolves are done implicitly when used as
                 texture, or must be done explicitly.
                 @See TextureDefinitionBase::TextureDefinition::fsaaExplicitResolve
+            @param shareableDepthBuffer
+                Only valid for depth texture formats. When true, the depth buffer is a "view"
+                of an existing depth texture (e.g. useful for reading the depth buffer contents
+                of a GBuffer pass in deferred rendering). When false, the texture gets its own
+                depth buffer created for itself (e.g. useful for shadow mapping, which is
+                a depth-only pass)
         */
         TexturePtr createManual(const String & name, const String& group,
             TextureType texType, uint width, uint height, int numMipmaps,
             PixelFormat format, int usage = TU_DEFAULT, ManualResourceLoader* loader = 0,
             bool hwGammaCorrection = false, uint fsaa = 0, const String& fsaaHint = BLANKSTRING,
-            bool explicitResolve = false)
+            bool explicitResolve = false, bool shareableDepthBuffer = true)
         {
             return createManual(name, group, texType, width, height, 1, 
-                numMipmaps, format, usage, loader, hwGammaCorrection, fsaa, fsaaHint, explicitResolve);
+                                numMipmaps, format, usage, loader, hwGammaCorrection,
+                                fsaa, fsaaHint, explicitResolve,
+                                shareableDepthBuffer);
         }
 
         /** Sets preferred bit depth for integer pixel format textures.

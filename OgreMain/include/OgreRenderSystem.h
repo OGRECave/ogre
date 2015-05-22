@@ -620,7 +620,11 @@ namespace Ogre
             @remarks
                 RenderTarget's pool ID is respected. @see RenderTarget::setDepthBufferPool()
         */
-        virtual void setDepthBufferFor( RenderTarget *renderTarget );
+        virtual void setDepthBufferFor( RenderTarget *renderTarget, bool exactMatch );
+
+        virtual void createUniqueDepthBufferFor( RenderTarget *renderTarget, bool exactMatch );
+
+        virtual void _destroyDepthBuffer( DepthBuffer *depthBuffer );
 
         // ------------------------------------------------------------------------
         //                     Internal Rendering Access
@@ -815,7 +819,8 @@ namespace Ogre
                 attaching, and deleting it. Here's where API-specific magic happens.
                 Don't call this directly unless you know what you're doing.
         */
-        virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget ) = 0;
+        virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget,
+                                                    bool exactMatchFormat ) = 0;
 
         /** Removes all depth buffers. Should be called on device lost and shutdown
             @remarks
@@ -1270,8 +1275,11 @@ namespace Ogre
 
         /**
          * Set current render target to target, enabling its device context if needed
+        @param colourWrite
+            False to disable colour writes. @see CompositorPassDef::mColourWrite
+            The RenderTarget is needed to know the depth/stencil information.
          */
-        virtual void _setRenderTarget(RenderTarget *target) = 0;
+        virtual void _setRenderTarget(RenderTarget *target, bool colourWrite) = 0;
 
         /** Defines a listener on the custom events that this render system 
         can raise.
@@ -1403,8 +1411,11 @@ namespace Ogre
 
     protected:
 
+        void cleanReleasedDepthBuffers(void);
+
         /** DepthBuffers to be attached to render targets */
         DepthBufferMap  mDepthBufferPool;
+        DepthBufferVec  mReleasedDepthBuffers;
 
         /** The render targets. */
         RenderTargetMap mRenderTargets;

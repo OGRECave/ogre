@@ -285,6 +285,10 @@ namespace Ogre {
         */
         uint getVisibilityMask(void) const { return mVisibilityMask; }
 
+        void setColourWrite( bool colourWrite );
+
+        bool getColourWrite(void) const { return mColourWrite; }
+
         /** Convert oriented input point coordinates to screen coordinates. */
         void pointOrientedToScreen(const Vector2 &v, int orientationMode, Vector2 &outv);
         void pointOrientedToScreen(Real orientedX, Real orientedY, int orientationMode,
@@ -321,6 +325,7 @@ namespace Ogre {
 
         /// Z-order
         int mZOrder;
+        bool mColourWrite;
         /// Background options
         bool mUpdated;
         bool mShowOverlays;

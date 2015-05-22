@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
+#include "OgreD3D11DepthTexture.h"
 #include "OgreD3D11Texture.h"
 #include "OgreD3D11Mappings.h"
 
@@ -34,12 +35,15 @@ namespace Ogre
 {
     D3D11DepthBuffer::D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
                                         ID3D11DepthStencilView *depthBufferView,
-                                        uint32 width, uint32 height,
-                                        uint32 fsaa, uint32 multiSampleQuality, bool isManual ) :
-                DepthBuffer( poolId, 0, width, height, fsaa, "", isManual ),
+                                        ID3D11ShaderResourceView *depthTextureView,
+                                        uint32 width, uint32 height, uint32 fsaa,
+                                        uint32 multiSampleQuality, PixelFormat pixelFormat,
+                                        bool isDepthTexture, bool isManual ) :
+                DepthBuffer( poolId, 0, width, height, fsaa, "", pixelFormat,
+                             isDepthTexture, isManual, renderSystem ),
                 mDepthStencilView( depthBufferView ),
-                mMultiSampleQuality( multiSampleQuality),
-                mRenderSystem(renderSystem)
+                mDepthTextureView( depthTextureView ),
+                mMultiSampleQuality( multiSampleQuality )
     {
         D3D11_DEPTH_STENCIL_VIEW_DESC pDesc;
         mDepthStencilView->GetDesc( &pDesc );
@@ -55,22 +59,37 @@ namespace Ogre
         mDepthStencilView = 0;
     }
     //---------------------------------------------------------------------
-    bool D3D11DepthBuffer::isCompatible( RenderTarget *renderTarget ) const
+    bool D3D11DepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
     {
         ID3D11Texture2D *D3D11texture = NULL;
         renderTarget->getCustomAttribute( "First_ID3D11Texture2D", &D3D11texture );
         D3D11_TEXTURE2D_DESC BBDesc;
-        D3D11texture->GetDesc( &BBDesc );
+
+        ZeroMemory( &BBDesc, sizeof(D3D11_TEXTURE2D_DESC) );
+        if( D3D11texture )
+        {
+            D3D11texture->GetDesc( &BBDesc );
+        }
+        else
+        {
+            //Depth textures.
+            assert( dynamic_cast<D3D11DepthTextureTarget*>(renderTarget) );
+            //BBDesc.ArraySize = renderTarget;
+            BBDesc.SampleDesc.Count     = std::max( 1u, renderTarget->getFSAA() );
+            BBDesc.SampleDesc.Quality   = atoi( renderTarget->getFSAAHint().c_str() );
+        }
 
         //RenderSystem will determine if bitdepths match (i.e. 32 bit RT don't like 16 bit Depth)
         //This is the same function used to create them. Note results are usually cached so this should
         //be quick
 
-        //TODO: Needs to check format too!
         if( mFsaa == BBDesc.SampleDesc.Count &&
             mMultiSampleQuality == BBDesc.SampleDesc.Quality &&
             this->getWidth() == renderTarget->getWidth() &&
-            this->getHeight() == renderTarget->getHeight() )
+            this->getHeight() == renderTarget->getHeight() &&
+            mDepthTexture == renderTarget->prefersDepthTexture() &&
+            ((!exactFormatMatch && mFormat == PF_D24_UNORM_S8_UINT) ||
+             mFormat == renderTarget->getDesiredDepthBufferFormat()) )
         {
             return true;
         }
@@ -81,6 +100,11 @@ namespace Ogre
     ID3D11DepthStencilView* D3D11DepthBuffer::getDepthStencilView() const
     {
         return mDepthStencilView;
+    }
+    //---------------------------------------------------------------------
+    ID3D11ShaderResourceView* D3D11DepthBuffer::getDepthTextureView() const
+    {
+        return mDepthTextureView;
     }
     //---------------------------------------------------------------------
     void D3D11DepthBuffer::_resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height)

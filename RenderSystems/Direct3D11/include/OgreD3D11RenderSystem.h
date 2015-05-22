@@ -182,7 +182,7 @@ namespace Ogre
          * With DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL flag render target views are unbound
          * from us each Present(), and we need the way to reestablish connection.
          */
-        void _setRenderTargetViews();
+        void _setRenderTargetViews( bool colourWrite );
 
         void updateDepthStencilView(void);
 
@@ -220,15 +220,7 @@ namespace Ogre
         /// @copydoc RenderSystem::createMultiRenderTarget
         virtual MultiRenderTarget * createMultiRenderTarget(const String & name);
 
-        virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget );
-
-        /**
-         * This function is meant to add Depth Buffers to the pool that aren't released when the DepthBuffer
-         * is deleted. This is specially useful to put the Depth Buffer created along with the window's
-         * back buffer into the pool. All depth buffers introduced with this method go to POOL_DEFAULT
-         */
-        DepthBuffer* _addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
-                                            uint32 width, uint32 height, uint32 fsaa, uint32 fsaaQuality );
+        virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget, bool exactMatchFormat );
 
         /// Reverts _addManualDepthBuffer actions
         void _removeManualDepthBuffer(DepthBuffer *depthBuffer);
@@ -364,7 +356,7 @@ namespace Ogre
         /**
          * Set current render target to target, enabling its GL context if needed
          */
-        void _setRenderTarget(RenderTarget *target);
+        virtual void _setRenderTarget( RenderTarget *target, bool colourWrite );
 
         /** Check whether or not filtering is supported for the precise texture format requested
         with the given usage options.

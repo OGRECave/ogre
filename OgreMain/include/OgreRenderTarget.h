@@ -109,13 +109,49 @@ namespace Ogre {
          */
         void setDepthBufferPool( uint16 poolId );
 
-        //Returns the pool ID this RenderTarget should query from. @see DepthBuffer
+        /// Returns the pool ID this RenderTarget should query from. @see DepthBuffer
         uint16 getDepthBufferPool() const;
+
+        /** Whether this RT should be attached to a depth texture, or a regular depth buffer.
+        @remarks
+            On older GPUs, preferring depth textures may result in certain depth precisions
+            to not be available (or use integer precision instead of floating point, etc).
+        @par
+            Changing this setting will cause the current depth buffer to be detached unless
+            the old and the setting are the same.
+        @param preferDepthTexture
+            True to use depth textures. False otherwise (default).
+        */
+        void setPreferDepthTexture( bool preferDepthTexture );
+
+        /// @see setPreferDepthTexture
+        bool prefersDepthTexture() const;
+
+        /** Set the desired depth buffer format
+        @remarks
+            Ogre will try to honour this request, but if it's not supported,
+            you may get lower precision.
+            All formats will try to fallback to PF_D24_UNORM_S8_UINT if not supported.
+        @par
+            Changing this setting will cause the current depth buffer to be detached unless
+            the old and the setting are the same.
+        @param desiredDepthBufferFormat
+            Must be one of the following:
+                PF_D24_UNORM_S8_UINT
+                PF_D24_UNORM_X8
+                PF_D16_UNORM
+                PF_D32_FLOAT
+                PF_D32_FLOAT_X24_S8_UINT
+        */
+        void setDesiredDepthBufferFormat( PixelFormat desiredDepthBufferFormat );
+
+        /// @see setDesiredDepthBufferFormat
+        PixelFormat getDesiredDepthBufferFormat(void) const;
 
         DepthBuffer* getDepthBuffer() const;
 
-        //Returns false if couldn't attach
-        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
+        /// Returns false if couldn't attach
+        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
 
         virtual void detachDepthBuffer();
 
@@ -359,6 +395,9 @@ namespace Ogre {
         */
         virtual void _endUpdate();
 
+        /// Used by depth texture views which need to disable colour writes when rendering to it
+        virtual bool getForceDisableColourWrites(void) const    { return false; }
+
     protected:
         /// The name of this target.
         String mName;
@@ -368,7 +407,9 @@ namespace Ogre {
         uint32 mWidth;
         uint32 mHeight;
         uint32 mColourDepth;
-        uint16       mDepthBufferPoolId;
+        uint16      mDepthBufferPoolId;
+        bool        mPreferDepthTexture;
+        PixelFormat mDesiredDepthBufferFormat;
         DepthBuffer *mDepthBuffer;
 
         // Stats

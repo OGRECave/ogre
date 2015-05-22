@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderSystem.h"
 #include "OgreTextureManager.h"
+#include "OgreDepthBuffer.h"
 
 namespace Ogre
 {
@@ -200,9 +201,14 @@ namespace Ogre
                                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
                                             TEX_TYPE_2D, width, height, 0,
                                             textureDef.formatList[0], TU_RENDERTARGET, 0, hwGamma,
-                                            fsaa, fsaaHint, textureDef.fsaaExplicitResolve );
+                                            fsaa, fsaaHint, textureDef.fsaaExplicitResolve,
+                                            textureDef.depthBufferId != DepthBuffer::POOL_NON_SHAREABLE );
             RenderTexture* rt = tex->getBuffer()->getRenderTarget();
             rt->setDepthBufferPool( textureDef.depthBufferId );
+            if( !PixelUtil::isDepth( textureDef.formatList[0] ) )
+                rt->setPreferDepthTexture( textureDef.preferDepthTexture );
+            if( textureDef.depthBufferFormat != PF_UNKNOWN )
+                rt->setDesiredDepthBufferFormat( textureDef.depthBufferFormat );
             newChannel.target = rt;
             newChannel.textures.push_back( tex );
         }
@@ -214,6 +220,10 @@ namespace Ogre
             PixelFormatList::const_iterator pixEn = textureDef.formatList.end();
 
             mrt->setDepthBufferPool( textureDef.depthBufferId );
+            if( !PixelUtil::isDepth( textureDef.formatList[0] ) )
+                mrt->setPreferDepthTexture( textureDef.preferDepthTexture );
+            if( textureDef.depthBufferFormat != PF_UNKNOWN )
+                mrt->setDesiredDepthBufferFormat( textureDef.depthBufferFormat );
             newChannel.target = mrt;
 
             while( pixIt != pixEn )
@@ -224,7 +234,8 @@ namespace Ogre
                                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
                                             TEX_TYPE_2D, width, height, 0,
                                             *pixIt, TU_RENDERTARGET, 0, hwGamma,
-                                            fsaa, fsaaHint, textureDef.fsaaExplicitResolve );
+                                            fsaa, fsaaHint, textureDef.fsaaExplicitResolve,
+                                            textureDef.depthBufferId != DepthBuffer::POOL_NON_SHAREABLE );
                 RenderTexture* rt = tex->getBuffer()->getRenderTarget();
                 mrt->bindSurface( rtNum, rt );
                 newChannel.textures.push_back( tex );

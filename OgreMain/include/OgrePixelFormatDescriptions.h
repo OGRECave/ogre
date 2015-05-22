@@ -458,7 +458,7 @@ namespace Ogre {
             24, 16, 8, 0
         },
         //-----------------------------------------------------------------------
-        {"PF_DEPTH",
+        {"PF_DEPTH_DEPRECATED",
             /* Bytes per element */
             4,
             /* Flags */
@@ -1355,6 +1355,132 @@ namespace Ogre {
             0, 0, 0, 0,
             /* Masks and shifts */
             0, 0, 0, 0, 0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_D24_UNORM_S8_UINT",
+            /* Bytes per element */
+            4,
+            /* Flags */
+            PFF_DEPTH,
+            /* Component type and count */
+            PCT_UINT, 2,
+            /* rbits, gbits, bbits, abits */
+            24, 8, 0, 0,
+            /* Masks and shifts */
+            0xFFFFFF00, 0x000000FF, 0, 0,
+            8, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_D24_UNORM_X8",
+            /* Bytes per element */
+            4,
+            /* Flags */
+            PFF_DEPTH,
+            /* Component type and count */
+            PCT_UINT, 2,
+            /* rbits, gbits, bbits, abits */
+            24, 0, 0, 0,
+            /* Masks and shifts */
+            0xFFFFFF00, 0, 0, 0,
+            8, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_X24_S8_UINT",
+            /* Bytes per element */
+            4,
+            /* Flags */
+            PFF_DEPTH | PFF_INTEGER,
+            /* Component type and count */
+            PCT_UINT, 2,
+            /* rbits, gbits, bbits, abits */
+            0, 8, 0, 0,
+            /* Masks and shifts */
+            0, 0x000000FF, 0, 0,
+            0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_D24_UNORM",
+            /* Bytes per element */
+            4,
+            /* Flags */
+            PFF_DEPTH,
+            /* Component type and count */
+            PCT_UINT, 1,
+            /* rbits, gbits, bbits, abits */
+            24, 0, 0, 0,
+            /* Masks and shifts */
+            0xFFFFFF00, 0, 0, 0,
+            8, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_D16_UNORM",
+            /* Bytes per element */
+            2,
+            /* Flags */
+            PFF_DEPTH,
+            /* Component type and count */
+            PCT_UINT, 1,
+            /* rbits, gbits, bbits, abits */
+            16, 0, 0, 0,
+            /* Masks and shifts */
+            0xFFFF, 0, 0, 0,
+            16, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_D32_FLOAT",
+            /* Bytes per element */
+            4,
+            /* Flags */
+            PFF_DEPTH|PFF_FLOAT,
+            /* Component type and count */
+            PCT_FLOAT32, 1,
+            /* rbits, gbits, bbits, abits */
+            32, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0,
+            0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_D32_FLOAT_X24_S8_UINT",
+            /* Bytes per element */
+            8,
+            /* Flags */
+            PFF_DEPTH|PFF_FLOAT|PFF_INTEGER,
+            /* Component type and count */
+            PCT_FLOAT32, 2,
+            /* rbits, gbits, bbits, abits */
+            32, 32, 0, 0,
+            /* Masks and shifts */
+            0, 0x000000FF, 0, 0,
+            0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_D32_FLOAT_X24_X8",
+            /* Bytes per element */
+            8,
+            /* Flags */
+            PFF_DEPTH|PFF_FLOAT|PFF_INTEGER,
+            /* Component type and count */
+            PCT_FLOAT32, 2,
+            /* rbits, gbits, bbits, abits */
+            32, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0,
+            0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_X32_X24_S8_UINT",
+            /* Bytes per element */
+            8,
+            /* Flags */
+            PFF_DEPTH|PFF_INTEGER,
+            /* Component type and count */
+            PCT_FLOAT32, 2,
+            /* rbits, gbits, bbits, abits */
+            0, 32, 0, 0,
+            /* Masks and shifts */
+            0, 0x000000FF, 0, 0,
+            0, 0, 0, 0
         }
     };
     /** @} */

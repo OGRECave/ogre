@@ -29,118 +29,215 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusFrameBufferObject.h"
+#include "OgreGL3PlusPixelFormat.h"
 
 namespace Ogre
 {
-    GL3PlusDepthBuffer::GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
-                                    v1::GL3PlusRenderBuffer *depth, v1::GL3PlusRenderBuffer *stencil,
-                                    uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-                                    bool _isManual ) :
-                DepthBuffer( poolId, 0, width, height, fsaa, "", _isManual ),
+
+    GL3PlusDepthBuffer::GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem,
+                                            GL3PlusContext *creatorContext,
+                                            GLenum depthFormat, GLenum stencilFormat,
+                                            uint32 width, uint32 height, uint32 fsaa,
+                                            uint32 multiSampleQuality, PixelFormat pixelFormat,
+                                            bool isDepthTexture, bool _isManual ) :
+                DepthBuffer( poolId, 0, width, height, fsaa, "", pixelFormat,
+                             isDepthTexture, _isManual, renderSystem ),
                 mMultiSampleQuality( multiSampleQuality ),
                 mCreatorContext( creatorContext ),
-                mDepthBuffer( depth ),
-                mStencilBuffer( stencil ),
-                mRenderSystem( renderSystem )
+                mDepthBufferName( 0 ),
+                mStencilBufferName( 0 )
     {
-        if( mDepthBuffer )
+        switch( depthFormat )
         {
-            switch( mDepthBuffer->getGLFormat() )
+        case GL_DEPTH_COMPONENT16:
+            mBitDepth = 16;
+            break;
+        case GL_DEPTH_COMPONENT24:
+        case GL_DEPTH24_STENCIL8:  // Packed depth / stencil
+            mBitDepth = 24;
+            break;
+        case GL_DEPTH_COMPONENT32:
+        case GL_DEPTH_COMPONENT32F:
+        case GL_DEPTH32F_STENCIL8:
+            mBitDepth = 32;
+            break;
+        default:
+            mBitDepth = 0;
+            break;
+        }
+
+        if( depthFormat == GL_NONE && stencilFormat == GL_NONE )
+        {
+            assert( _isManual &&
+                    "depthFormat = GL_NONE && stencilFormat = GL_NONE but _isManual = false" );
+            return; //Most likely a dummy depth buffer
+        }
+
+        if( mDepthTexture )
+        {
+            assert( stencilFormat == GL_NONE && "OpenGL specs don't allow depth textures "
+                    "with separate stencil format. We should have never hit this path." );
+
+            const GL3PlusSupport *support = renderSystem->getGLSupport();
+            const bool hasGL42 = support->hasMinGLVersion( 4, 2 );
+            const bool hasGL43 = support->hasMinGLVersion( 4, 3 );
+
+            OCGE( glActiveTexture( GL_TEXTURE0 ) );
+            OCGE( glGenTextures( 1, &mDepthBufferName ) );
+
+            if( !mFsaa )
             {
-            case GL_DEPTH_COMPONENT16:
-                mBitDepth = 16;
-                break;
-            case GL_DEPTH_COMPONENT24:
-            case GL_DEPTH24_STENCIL8:  // Packed depth / stencil
-                mBitDepth = 24;
-            case GL_DEPTH_COMPONENT32:
-            case GL_DEPTH_COMPONENT32F:
-            case GL_DEPTH32F_STENCIL8:
-                mBitDepth = 32;
-                break;
+                OCGE( glBindTexture( GL_TEXTURE_2D, mDepthBufferName ) );
+                OCGE( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0 ) );
+                OCGE( glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 ) );
+
+                if( hasGL42 || support->checkExtension("GL_ARB_texture_storage") )
+                {
+                    OCGE( glTexStorage2D( GL_TEXTURE_2D, GLint(1), depthFormat,
+                                          GLsizei(mWidth), GLsizei(mHeight) ) );
+                }
+                else
+                {
+                    OCGE( glTexImage2D( GL_TEXTURE_2D, GLint(0), depthFormat,
+                                        GLsizei(mWidth), GLsizei(mHeight),
+                                        0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL ) );
+                }
             }
+            else
+            {
+                OCGE( glBindTexture( GL_TEXTURE_2D_MULTISAMPLE, mDepthBufferName ) );
+                OCGE( glTexParameteri( GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_BASE_LEVEL, 0 ) );
+                OCGE( glTexParameteri( GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAX_LEVEL, 0 ) );
+
+                if( hasGL43 || support->checkExtension("GL_ARB_texture_storage_multisample") )
+                {
+                    OCGE( glTexStorage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE,
+                                                     GLsizei(mFsaa), depthFormat,
+                                                     GLsizei(mWidth), GLsizei(mHeight), GL_TRUE ) );
+                }
+                else
+                {
+                    OCGE( glTexImage2DMultisample( GL_TEXTURE_2D_MULTISAMPLE,
+                                                   GLsizei(mFsaa), depthFormat,
+                                                   GLsizei(mWidth), GLsizei(mHeight), GL_TRUE ) );
+                }
+            }
+        }
+        else
+        {
+            if( depthFormat != GL_NONE )
+                mDepthBufferName = createRenderBuffer( depthFormat );
+            if( stencilFormat != GL_NONE )
+                mStencilBufferName = createRenderBuffer( stencilFormat );
         }
     }
 
     GL3PlusDepthBuffer::~GL3PlusDepthBuffer()
     {
-        if( mStencilBuffer && mStencilBuffer != mDepthBuffer )
+        if( mDepthTexture )
         {
-            delete mStencilBuffer;
-            mStencilBuffer = 0;
-        }
+            assert( mStencilBufferName == 0 && "OpenGL specs don't allow depth textures "
+                    "with separate stencil format. We should have never hit this path." );
 
-        if( mDepthBuffer )
+            if( mDepthBufferName )
+                glDeleteTextures( 1, &mDepthBufferName );
+        }
+        else
         {
-            delete mDepthBuffer;
-            mDepthBuffer = 0;
+            if( mDepthBufferName )
+                glDeleteFramebuffers( 1, &mDepthBufferName );
+            if( mStencilBufferName )
+                glDeleteFramebuffers( 1, &mStencilBufferName );
         }
     }
     //---------------------------------------------------------------------
-    bool GL3PlusDepthBuffer::isCompatible( RenderTarget *renderTarget ) const
+    GLuint GL3PlusDepthBuffer::createRenderBuffer( GLenum format )
+    {
+        GLuint renderBufferName = 0;
+        OCGE( glGenRenderbuffers( 1, &renderBufferName ) );
+        OCGE( glBindRenderbuffer( GL_RENDERBUFFER, renderBufferName ) );
+
+        if( !mFsaa )
+        {
+            OCGE( glRenderbufferStorageMultisample( GL_RENDERBUFFER, GLsizei(mFsaa), format,
+                                                    GLsizei(mWidth), GLsizei(mHeight) ) );
+        }
+        else
+        {
+            OCGE( glRenderbufferStorage( GL_RENDERBUFFER, format,
+                                         GLsizei(mWidth), GLsizei(mHeight) ) );
+        }
+
+        return renderBufferName;
+    }
+    //---------------------------------------------------------------------
+    bool GL3PlusDepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
     {
         bool retVal = false;
 
         //Check standard stuff first.
         if( mRenderSystem->getCapabilities()->hasCapability( RSC_RTT_DEPTHBUFFER_RESOLUTION_LESSEQUAL ) )
         {
-            if( !DepthBuffer::isCompatible( renderTarget ) )
-                return false;
+            retVal = DepthBuffer::isCompatible( renderTarget, exactFormatMatch );
         }
         else
         {
             if( this->getWidth() != renderTarget->getWidth() ||
                 this->getHeight() != renderTarget->getHeight() ||
-                this->getFsaa() != renderTarget->getFSAA() )
-                    return false;
-        }
-
-        //Now check this is the appropriate format
-        GL3PlusFrameBufferObject *fbo = 0;
-        renderTarget->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
-
-        if( !fbo )
-        {
-            GL3PlusContext *windowContext = 0;
-            renderTarget->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
-
-            //Non-FBO targets and FBO depth surfaces don't play along, only dummies which match the same
-            //context
-            if( !mDepthBuffer && !mStencilBuffer && mCreatorContext == windowContext )
-                retVal = true;
-        }
-        else
-        {
-            //Check this isn't a dummy non-FBO depth buffer with an FBO target, don't mix them.
-            //If you don't want depth buffer, use a Null Depth Buffer, not a dummy one.
-            if( mDepthBuffer || mStencilBuffer )
+                this->getFsaa() != renderTarget->getFSAA() ||
+                (exactFormatMatch && mDepthTexture != renderTarget->prefersDepthTexture()) ||
+                (!exactFormatMatch && (mFormat != PF_D24_UNORM_S8_UINT || mFormat != PF_D24_UNORM) ) )
             {
-                GLenum internalFormat = fbo->getFormat();
-                GLenum depthFormat, stencilFormat;
-                mRenderSystem->_getDepthStencilFormatFor( internalFormat, &depthFormat, &stencilFormat );
-
-                bool bSameDepth = false;
-
-                if( mDepthBuffer )
-                    bSameDepth |= mDepthBuffer->getGLFormat() == depthFormat;
-
-                bool bSameStencil = false;
-
-                if( !mStencilBuffer || mStencilBuffer == mDepthBuffer )
-                    bSameStencil = stencilFormat == GL_NONE;
-                else
-                {
-                    if( mStencilBuffer )
-                        bSameStencil = stencilFormat == mStencilBuffer->getGLFormat();
-                }
-
-                if(internalFormat == PF_DEPTH)
-                    retVal = bSameDepth;
-                else
-                    retVal = bSameDepth && bSameStencil;
+                retVal = false;
+            }
+            else
+            {
+                retVal = true;
             }
         }
 
+        //Now check this DepthBuffer is for FBOs and RenderTarget is for FBOs
+        //(or that this DepthBuffer is for a RenderWindow, and RenderTarget is for RenderWindow)
+        //while skipping depth textures.
+        GL3PlusFrameBufferObject *fbo = 0;
+        renderTarget->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
+
+        if( !fbo && !renderTarget->getForceDisableColourWrites() )
+        {
+            GL3PlusContext *windowContext = 0;
+            renderTarget->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT,
+                                              &windowContext );
+
+            //Non-FBO targets and FBO depth surfaces don't play along,
+            //only dummies which match the same context
+            if( !mDepthBufferName && !mStencilBufferName && mCreatorContext == windowContext )
+                retVal = true;
+        }
+
         return retVal;
+    }
+    //---------------------------------------------------------------------
+    void GL3PlusDepthBuffer::bindToFramebuffer(void)
+    {
+        if( mDepthTexture )
+        {
+            assert( mStencilBufferName == 0 && "OpenGL specs don't allow depth textures "
+                    "with separate stencil format. We should have never hit this path." );
+
+            OCGE( glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mDepthBufferName, 0 ) );
+        }
+        else
+        {
+            if( mDepthBufferName )
+            {
+                OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                                 GL_RENDERBUFFER, mDepthBufferName ) );
+            }
+            if( mStencilBufferName )
+            {
+                OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                                 GL_RENDERBUFFER, mDepthBufferName ) );
+            }
+        }
     }
 }
