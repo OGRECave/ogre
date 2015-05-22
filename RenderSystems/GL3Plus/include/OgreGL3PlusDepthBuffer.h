@@ -62,7 +62,7 @@ namespace Ogre
         /// @copydoc DepthBuffer::isCompatible
         virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
 
-        void bindToFramebuffer(void);
+        void bindToFramebuffer( GLenum target = GL_FRAMEBUFFER );
 
         GL3PlusContext* getGLContext() const { return mCreatorContext; }
         GLuint getDepthBuffer() const  { return mDepthBufferName; }
@@ -73,6 +73,8 @@ namespace Ogre
         GL3PlusContext              *mCreatorContext;
         GLuint                      mDepthBufferName;
         GLuint                      mStencilBufferName;
+
+        virtual bool copyToImpl( DepthBuffer *destination );
     };
 }
 #endif

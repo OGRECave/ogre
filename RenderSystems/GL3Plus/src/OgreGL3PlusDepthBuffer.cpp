@@ -30,6 +30,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusFrameBufferObject.h"
 #include "OgreGL3PlusPixelFormat.h"
+#include "OgreGL3PlusFBORenderTexture.h"
 
 namespace Ogre
 {
@@ -217,27 +218,92 @@ namespace Ogre
         return retVal;
     }
     //---------------------------------------------------------------------
-    void GL3PlusDepthBuffer::bindToFramebuffer(void)
+    void GL3PlusDepthBuffer::bindToFramebuffer( GLenum target )
     {
         if( mDepthTexture )
         {
             assert( mStencilBufferName == 0 && "OpenGL specs don't allow depth textures "
                     "with separate stencil format. We should have never hit this path." );
 
-            OCGE( glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, mDepthBufferName, 0 ) );
+            OCGE( glFramebufferTexture( target, GL_DEPTH_ATTACHMENT, mDepthBufferName, 0 ) );
         }
         else
         {
             if( mDepthBufferName )
             {
-                OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                OCGE( glFramebufferRenderbuffer( target, GL_DEPTH_ATTACHMENT,
                                                  GL_RENDERBUFFER, mDepthBufferName ) );
             }
             if( mStencilBufferName )
             {
-                OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                OCGE( glFramebufferRenderbuffer( target, GL_STENCIL_ATTACHMENT,
                                                  GL_RENDERBUFFER, mDepthBufferName ) );
             }
         }
+    }
+    //---------------------------------------------------------------------
+    bool GL3PlusDepthBuffer::copyToImpl( DepthBuffer *_destination )
+    {
+        GL3PlusDepthBuffer *destination = static_cast<GL3PlusDepthBuffer*>( _destination );
+
+        // Store old binding so it can be restored later
+        GLint oldfb, oldDrawBuffer;
+        OCGE( glGetIntegerv( GL_FRAMEBUFFER_BINDING, &oldfb ) );
+        OCGE( glGetIntegerv( GL_DRAW_BUFFER, &oldDrawBuffer ) );
+
+        GL3PlusFBOManager *fboMan = static_cast<GL3PlusFBOManager*>(
+                                            GL3PlusRTTManager::getSingletonPtr() );
+
+        // Set up temporary FBO
+        OCGE( glBindFramebuffer( GL_READ_FRAMEBUFFER, this->getDepthBuffer() ?
+                                                        fboMan->getTemporaryFBO(0) : 0 ) );
+        OCGE( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, destination->getDepthBuffer() ?
+                                                        fboMan->getTemporaryFBO(1) : 0 ) );
+
+        OCGE( glViewport( 0, 0, mWidth, mHeight ) );
+
+        if( this->getDepthBuffer() )
+            this->bindToFramebuffer( GL_READ_FRAMEBUFFER );
+        else
+            OCGE( glReadBuffer( GL_DEPTH_ATTACHMENT ) );
+
+        if( destination->getDepthBuffer() )
+            destination->bindToFramebuffer( GL_DRAW_FRAMEBUFFER );
+        else
+            OCGE( glDrawBuffer( GL_DEPTH_ATTACHMENT ) );
+
+        GLenum readStatus, drawStatus;
+        OCGE( readStatus = glCheckFramebufferStatus( GL_READ_FRAMEBUFFER ) );
+        OCGE( drawStatus = glCheckFramebufferStatus( GL_DRAW_FRAMEBUFFER ) );
+
+        const bool retVal = readStatus == GL_FRAMEBUFFER_COMPLETE &&
+                            drawStatus == GL_FRAMEBUFFER_COMPLETE;
+        if( retVal )
+        {
+            OCGE( glBlitFramebuffer( 0, 0, mWidth, mHeight,
+                                     0, 0, mWidth, mHeight,
+                                     GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,
+                                     GL_NEAREST ) );
+        }
+
+        //Unbind them from the temporary FBOs (we don't want "accidental" bugs)
+        OCGE( glFramebufferRenderbuffer( GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                         GL_RENDERBUFFER, 0 ) );
+        OCGE( glFramebufferRenderbuffer( GL_READ_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                         GL_RENDERBUFFER, 0 ) );
+        OCGE( glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                                         GL_RENDERBUFFER, 0 ) );
+        OCGE( glFramebufferRenderbuffer( GL_DRAW_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
+                                         GL_RENDERBUFFER, 0 ) );
+
+        // Reset read buffer/framebuffer
+        OCGE( glReadBuffer( GL_NONE ) );
+        OCGE( glBindFramebuffer( GL_READ_FRAMEBUFFER, 0 ) );
+
+        // Restore old framebuffer
+        OCGE( glDrawBuffer( oldDrawBuffer ) );
+        OCGE( glBindFramebuffer( GL_DRAW_FRAMEBUFFER, oldfb ) );
+
+        return retVal;
     }
 }

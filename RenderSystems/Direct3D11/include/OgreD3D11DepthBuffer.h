@@ -37,6 +37,7 @@ namespace Ogre
     {
     public:
         D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
+                          ID3D11Texture2D *depthStencilResource,
                           ID3D11DepthStencilView *depthBufferView,
                           ID3D11ShaderResourceView *depthTextureView,
                           uint32 width, uint32 height,
@@ -56,7 +57,9 @@ namespace Ogre
         ID3D11DepthStencilView      *mDepthStencilView; //aka. actual "DepthBuffer"
         ID3D11ShaderResourceView    *mDepthTextureView;
         uint32                      mMultiSampleQuality;
-        D3D11RenderSystem           *mRenderSystem;
+        ID3D11Texture2D             *mDepthStencilResource;
+
+        virtual bool copyToImpl( DepthBuffer *destination );
     };
 }
 #endif

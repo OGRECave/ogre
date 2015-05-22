@@ -1724,6 +1724,7 @@ bail:
             HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &depthTextureView);
             if( FAILED(hr) || mDevice.isError())
             {
+                SAFE_RELEASE( pDepthStencil );
                 String errorDescription = mDevice.getErrorDescription(hr);
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Unable to create the view of the depth texture \nError Description:" + errorDescription,
@@ -1771,9 +1772,10 @@ bail:
                                                                                             // TODO: Decide how to expose this feature
         descDSV.Texture2D.MipSlice = 0;
         hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &depthStencilView );
-        SAFE_RELEASE( pDepthStencil );
         if( FAILED(hr) )
         {
+            SAFE_RELEASE( depthTextureView );
+            SAFE_RELEASE( pDepthStencil );
 			String errorDescription = mDevice.getErrorDescription(hr);
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to create depth stencil view\nError Description:" + errorDescription,
@@ -1782,6 +1784,7 @@ bail:
 
         //Create the abstract container
         D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+                                                                 pDepthStencil,
                                                                  depthStencilView,
                                                                  depthTextureView,
                                                                  descDepth.Width, descDepth.Height,

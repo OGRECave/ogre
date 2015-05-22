@@ -34,6 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     D3D11DepthBuffer::D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
+                                        ID3D11Texture2D *depthStencilResource,
                                         ID3D11DepthStencilView *depthBufferView,
                                         ID3D11ShaderResourceView *depthTextureView,
                                         uint32 width, uint32 height, uint32 fsaa,
@@ -43,7 +44,8 @@ namespace Ogre
                              isDepthTexture, isManual, renderSystem ),
                 mDepthStencilView( depthBufferView ),
                 mDepthTextureView( depthTextureView ),
-                mMultiSampleQuality( multiSampleQuality )
+                mMultiSampleQuality( multiSampleQuality ),
+                mDepthStencilResource( depthStencilResource )
     {
         D3D11_DEPTH_STENCIL_VIEW_DESC pDesc;
         mDepthStencilView->GetDesc( &pDesc );
@@ -55,8 +57,17 @@ namespace Ogre
     D3D11DepthBuffer::~D3D11DepthBuffer()
     {
         if( !mManual )
+        {
             mDepthStencilView->Release();
-        mDepthStencilView = 0;
+
+            if( mDepthTextureView )
+                mDepthTextureView->Release();
+
+            mDepthStencilResource->Release();
+        }
+        mDepthStencilView       = 0;
+        mDepthTextureView       = 0;
+        mDepthStencilResource   = 0;
     }
     //---------------------------------------------------------------------
     bool D3D11DepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
@@ -95,6 +106,27 @@ namespace Ogre
         }
 
         return false;
+    }
+    //---------------------------------------------------------------------
+    bool D3D11DepthBuffer::copyToImpl( DepthBuffer *_destination )
+    {
+        bool retVal = false;
+        D3D11RenderSystem *renderSystem = static_cast<D3D11RenderSystem*>( mRenderSystem );
+
+        if( renderSystem->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_1 )
+        {
+            D3D11DepthBuffer *destination   = static_cast<D3D11DepthBuffer*>( _destination );
+
+            D3D11Device &device = renderSystem->_getDevice();
+            ID3D11DeviceContextN *deviceContext = device.GetImmediateContext();
+
+            deviceContext->CopyResource( this->mDepthStencilResource,
+                                         destination->mDepthStencilResource );
+
+            retVal = true;
+        }
+
+        return retVal;
     }
     //---------------------------------------------------------------------
     ID3D11DepthStencilView* D3D11DepthBuffer::getDepthStencilView() const

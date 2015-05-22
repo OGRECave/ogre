@@ -44,6 +44,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11DepthTexture::~D3D11DepthTexture()
     {
+        freeInternalResourcesImpl();
     }
     //---------------------------------------------------------------------
     void D3D11DepthTexture::_setD3DShaderResourceView( ID3D11ShaderResourceView *depthTextureView )
@@ -69,7 +70,7 @@ namespace Ogre
     void D3D11DepthTexture::freeInternalResourcesImpl()
     {
         mSurfaceList.clear();        
-        assert( mpTex );
+        assert( !mpTex );
         mpShaderResourceView = 0;
         assert( !mp1DTex );
         assert( !mp2DTex );

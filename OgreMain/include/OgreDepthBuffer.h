@@ -130,6 +130,22 @@ namespace Ogre
         */
         virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
 
+        /** Copies the contents of the DepthBuffer to the destination. Useful when you
+            want to bind a DepthBuffer for sampling as a texture, but later resume
+            rendering with this depth buffer (binding a DepthBuffer as a texture forces
+            it to be decompressed and disables other optimization algorithms on a lot of
+            Hardware. GCN Tahiti aka AMD Radeon R9 280 is no longer affected by this issue)
+        @remarks
+            The function will throw if the depth buffers are incompatible (e.g. different
+            resolution, different format, different MSAA settings)
+        @param destination
+            DepthBuffer to copy to.
+        @return
+            False if failed to copy for hardware reasons (DX10 does not allow copying
+            MSAA depth buffer; DX10.1 does)
+        */
+        bool copyTo( DepthBuffer *destination );
+
         /** Called when a RenderTarget is attaches this DepthBuffer
             @remarks
                 This function doesn't actually attach. It merely informs the DepthBuffer
@@ -165,6 +181,8 @@ namespace Ogre
         RenderSystem                *mRenderSystem;
 
         void detachFromAllRenderTargets( bool inDestructor );
+
+        virtual bool copyToImpl( DepthBuffer *destination ) = 0;
     };
 
     /** @} */

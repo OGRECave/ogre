@@ -124,6 +124,29 @@ namespace Ogre
         return false;
     }
     //-----------------------------------------------------------------------
+    bool DepthBuffer::copyTo( DepthBuffer *destination )
+    {
+        if( this->getWidth() != destination->getWidth() ||
+            this->getHeight() != destination->getHeight() ||
+            this->getFsaa() != destination->getFsaa() ||
+            this->getFsaaHint() != destination->getFsaaHint() ||
+            this->getFormat() != destination->getFormat() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Source and destination must be of the same resolution, format & FSAA settings",
+                         "DepthBuffer::copyTo" );
+        }
+
+        if( this == destination )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Source and destination must be different Depth Buffers",
+                         "DepthBuffer::copyTo" );
+        }
+
+        return copyToImpl( destination );
+    }
+    //-----------------------------------------------------------------------
     void DepthBuffer::_notifyRenderTargetAttached( RenderTarget *renderTarget )
     {
         assert( mAttachedRenderTargets.find( renderTarget ) == mAttachedRenderTargets.end() );
