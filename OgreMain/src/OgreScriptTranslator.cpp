@@ -53,6 +53,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopyDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
@@ -7556,6 +7557,90 @@ namespace Ogre{
         }
     }
 
+    void CompositorPassTranslator::translateDepthCopy( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                                       CompositorTargetDef *targetDef )
+    {
+        mPassDef = targetDef->addPass( PASS_DEPTHCOPY );
+        CompositorPassDepthCopyDef *passDepthCopy = static_cast<CompositorPassDepthCopyDef*>( mPassDef );
+
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        obj->context = Any(mPassDef);
+
+        String srcTextureName;
+        String dstTextureName;
+
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_OBJECT)
+            {
+                processNode(compiler, *i);
+            }
+            else if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                switch(prop->id)
+                {
+                case ID_ALIAS_ON_COPY_FAILURE:
+                    {
+                        if(prop->values.size() != 1)
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+                                               "Boolean value expected");
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getBoolean( *it0, &passDepthCopy->mAliasDepthBufferOnCopyFailure ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_IN:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getString( *it0, &srcTextureName ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_OUT:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getString( *it0, &dstTextureName ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_IDENTIFIER:
+                case ID_NUM_INITIAL:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
+                    break;
+                default:
+                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
+                        "token \"" + prop->name + "\" is not recognized");
+                }
+            }
+        }
+
+        passDepthCopy->setDepthTextureCopy( srcTextureName, dstTextureName );
+    }
+
     void CompositorPassTranslator::translateQuad(ScriptCompiler *compiler, const AbstractNodePtr &node,
                                                     CompositorTargetDef *targetDef)
     {
@@ -8085,6 +8170,8 @@ namespace Ogre{
             translateQuad( compiler, node, target );
         else if(obj->name == "render_scene")
             translateScene( compiler, node, target );
+        else if(obj->name == "depth_copy")
+            translateDepthCopy( compiler, node, target );
         else if(obj->name == "custom")
         {
             IdString customId;

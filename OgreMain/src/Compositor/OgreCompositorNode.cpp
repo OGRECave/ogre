@@ -323,6 +323,32 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    const CompositorChannel* CompositorNode::_getDefinedTexture( IdString textureName ) const
+    {
+        CompositorChannel const * channel = 0;
+        size_t index;
+        TextureDefinitionBase::TextureSource textureSource;
+        mDefinition->getTextureSource( textureName, index, textureSource );
+        switch( textureSource )
+        {
+        case TextureDefinitionBase::TEXTURE_INPUT:
+            channel = &mInTextures[index];
+            break;
+        case TextureDefinitionBase::TEXTURE_LOCAL:
+            channel = &mLocalTextures[index];
+            break;
+        case TextureDefinitionBase::TEXTURE_GLOBAL:
+            channel = &mWorkspace->getGlobalTexture( textureName );
+            break;
+        default:
+            break;
+        }
+
+        assert( !channel->textures.empty() && "Are you trying to use the RenderWindow as a texture???" );
+
+        return channel;
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorNode::createPasses(void)
     {
         CompositorTargetDefVec::const_iterator itor = mDefinition->mTargetPasses.begin();

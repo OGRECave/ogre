@@ -833,6 +833,7 @@ namespace Ogre
                 ID_STENCIL,
                 ID_RENDER_SCENE,
                 ID_RENDER_QUAD,
+                ID_DEPTH_COPY,
                     ID_VIEWPORT,
                     ID_NUM_INITIAL,
                     ID_IDENTIFIER,
@@ -858,6 +859,9 @@ namespace Ogre
                         ID_CAMERA_FAR_CORNERS_VIEW_SPACE,
                         ID_CAMERA_FAR_CORNERS_WORLD_SPACE,
                     ID_INPUT,
+
+                    //Used by ID_DEPTH_COPY
+                    ID_ALIAS_ON_COPY_FAILURE,
 
                     //Used by PASS_CLEAR
                     ID_BUFFERS,

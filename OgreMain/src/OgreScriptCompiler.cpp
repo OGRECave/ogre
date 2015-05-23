@@ -1233,6 +1233,7 @@ namespace Ogre
         mIds["stencil"]         = ID_STENCIL;
         mIds["render_scene"]    = ID_RENDER_SCENE;
         mIds["render_quad"]     = ID_RENDER_QUAD;
+        mIds["depth_copy"]      = ID_DEPTH_COPY;
 
         mIds["viewport"]        = ID_VIEWPORT;
         mIds["num_initial"]     = ID_NUM_INITIAL;
@@ -1257,6 +1258,8 @@ namespace Ogre
         mIds["camera_far_corners_view_space"]   = ID_CAMERA_FAR_CORNERS_VIEW_SPACE;
         mIds["camera_far_corners_world_space"]  = ID_CAMERA_FAR_CORNERS_WORLD_SPACE;
         mIds["input"]           = ID_INPUT;
+
+        mIds["alias_on_copy_failure"]           = ID_ALIAS_ON_COPY_FAILURE;
 
         mIds["buffers"]         = ID_BUFFERS;
         mIds["colour"]          = ID_COLOUR;

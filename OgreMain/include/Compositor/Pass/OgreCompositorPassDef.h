@@ -52,6 +52,7 @@ namespace Ogre
         PASS_CLEAR,
         PASS_STENCIL,
         PASS_RESOLVE,
+        PASS_DEPTHCOPY,
         PASS_CUSTOM
     };
 

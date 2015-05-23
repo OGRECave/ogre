@@ -203,6 +203,8 @@ namespace Ogre
         */
         TexturePtr getDefinedTexture( IdString textureName, size_t mrtIndex ) const;
 
+        const CompositorChannel* _getDefinedTexture( IdString textureName ) const;
+
         /** Creates all passes based on our definition
         @remarks
             Call this function after connecting all channels (at least our input)

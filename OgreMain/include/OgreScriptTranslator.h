@@ -306,6 +306,8 @@ namespace Ogre{
                              CompositorTargetDef *targetDef );
         void translateQuad( ScriptCompiler *compiler, const AbstractNodePtr &node,
                             CompositorTargetDef *targetDef );
+        void translateDepthCopy( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                 CompositorTargetDef *targetDef );
         void translateScene( ScriptCompiler *compiler, const AbstractNodePtr &node,
                              CompositorTargetDef *targetDef );
         void translateStencil( ScriptCompiler *compiler, const AbstractNodePtr &node,
