@@ -256,6 +256,7 @@ namespace Ogre
         /// "VERY_TECHNICAL_NAME_HASH_1234.png" as texName, you can make your first
         /// call with aliasName as "Tree Wood", and the next calls to
         /// createOrRetrieveTexture( "Tree Wood", mapType ) will refer to this texture
+        /// NOTE: aliasName cannot be blank/empty.
         TextureLocation createOrRetrieveTexture( const String &aliasName,
                                                  const String &texName,
                                                  TextureMapType mapType );

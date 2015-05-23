@@ -62,7 +62,12 @@ namespace Ogre
         PixelFormatList formatList; // more than one means MRT
         uint        fsaa;           // FSAA level
         bool        hwGammaWrite;   // Do sRGB gamma correction on write (only 8-bit per channel formats)
-        uint16      depthBufferId;  // Depth Buffer's pool ID
+        /// @see RenderTarget::setPreferDepthTexture
+        bool        preferDepthTexture;
+        /// Depth Buffer's pool ID. If the format is a depth format, it
+        /// is recommended you set this value to POOL_NON_SHAREABLE
+        uint16      depthBufferId;
+        PixelFormat depthBufferFormat;
 
         size_t      light;  //Render Nth closest light
         size_t      split;  //Split for that light (only for PSSM/CSM)
@@ -81,7 +86,8 @@ namespace Ogre
     public:
         ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
                                 size_t _light, size_t _split ) :
-                width(1024), height(1024), fsaa(0), hwGammaWrite(false), depthBufferId(2),
+                width(1024), height(1024), fsaa(0), hwGammaWrite(false), preferDepthTexture(false),
+                depthBufferId(2), depthBufferFormat( PF_UNKNOWN ),
                 light(_light), split(_split), shadowMapTechnique(t),
                 pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
                 name( _name ), sharesSetupWith( -1 ) {}

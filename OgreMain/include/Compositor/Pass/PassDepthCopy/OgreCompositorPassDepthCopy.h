@@ -26,37 +26,50 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __GL3PlusMULTIRENDERTARGET_H__
-#define __GL3PlusMULTIRENDERTARGET_H__
+#ifndef _OgreCompositorPassDepthCopy_H_
+#define _OgreCompositorPassDepthCopy_H_
 
-#include "OgreGL3PlusFrameBufferObject.h"
+#include "OgreHeaderPrefix.h"
 
-namespace Ogre {
-    
-    class GL3PlusFBOManager;
+#include "Compositor/Pass/OgreCompositorPass.h"
+#include "Compositor/OgreCompositorCommon.h"
 
-    /** MultiRenderTarget for OpenGL
+namespace Ogre
+{
+    class CompositorPassDepthCopyDef;
+
+    /** \addtogroup Core
+    *  @{
     */
-    class _OgreGL3PlusExport GL3PlusFBOMultiRenderTarget : public MultiRenderTarget
+    /** \addtogroup Effects
+    *  @{
+    */
+
+    /** Implementation of CompositorPass
+        This implementation will copy one DepthBuffer to another DepthBuffer from
+        two RTs.
+    @author
+        Matias N. Goldberg
+    @version
+        1.0
+    */
+    class _OgreExport CompositorPassDepthCopy : public CompositorPass
     {
+        CompositorPassDepthCopyDef const *mDefinition;
+    protected:
+        bool mCopyFailed;
+
     public:
-        GL3PlusFBOMultiRenderTarget(GL3PlusFBOManager *manager, const String &name);
-        ~GL3PlusFBOMultiRenderTarget();
+        CompositorPassDepthCopy( const CompositorPassDepthCopyDef *definition,
+                                 CompositorNode *parentNode );
 
-        virtual void getCustomAttribute( const String& name, void *pData );
-
-        bool requiresTextureFlipping() const { return true; }
-
-        /// Override so we can attach the depth buffer to the FBO
-        virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
-        virtual void detachDepthBuffer();
-        virtual void _detachDepthBuffer();
-    private:
-        virtual void bindSurfaceImpl(size_t attachment, RenderTexture *target);
-        virtual void unbindSurfaceImpl(size_t attachment); 
-        GL3PlusFrameBufferObject fbo;
+        virtual void execute( const Camera *lodCamera );
     };
 
+    /** @} */
+    /** @} */
 }
 
-#endif // __GL3PlusMULTIRENDERTARGET_H__
+#include "OgreHeaderSuffix.h"
+
+#endif

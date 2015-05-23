@@ -54,6 +54,7 @@ THE SOFTWARE.
 #include "OgreHlmsSamplerblock.h"
 
 #include "OgreD3D11DepthBuffer.h"
+#include "OgreD3D11DepthTexture.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
@@ -865,6 +866,14 @@ bail:
             SAFE_RELEASE(pDXGIDevice);
 
             mDevice.TransferOwnership(device) ;
+
+            //On AMD's GCN cards, there is no performance or memory difference between
+            //PF_D24_UNORM_S8_UINT & PF_D32_FLOAT_X24_S8_UINT, so prefer the latter
+            //on modern cards (GL >= 4.3) and that also claim to support this format.
+            //NVIDIA's preference? Dunno, they don't tell. But at least the quality
+            //will be consistent.
+            if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
+                DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
         }
 
         if( autoCreateWindow )
@@ -1543,30 +1552,100 @@ bail:
         return retval;
     }
     //-----------------------------------------------------------------------
-    DepthBuffer* D3D11RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
+    DepthBuffer* D3D11RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget,
+                                                           bool exactMatchFormat )
     {
         //Get surface data (mainly to get MSAA data)
         ID3D11Texture2D *rtTexture = 0;
         renderTarget->getCustomAttribute( "First_ID3D11Texture2D", &rtTexture );
+
         D3D11_TEXTURE2D_DESC BBDesc;
-        rtTexture->GetDesc( &BBDesc );
+        ZeroMemory( &BBDesc, sizeof(D3D11_TEXTURE2D_DESC) );
+        if( rtTexture )
+        {
+            rtTexture->GetDesc( &BBDesc );
+        }
+        else
+        {
+            //Depth textures.
+            assert( dynamic_cast<D3D11DepthTextureTarget*>(renderTarget) );
+            //BBDesc.ArraySize = renderTarget;
+            BBDesc.SampleDesc.Count     = std::max( 1u, renderTarget->getFSAA() );
+            BBDesc.SampleDesc.Quality   = atoi( renderTarget->getFSAAHint().c_str() );
+        }
 
         // Create depth stencil texture
         ID3D11Texture2D* pDepthStencil = NULL;
         D3D11_TEXTURE2D_DESC descDepth;
 
-        descDepth.Width                 = renderTarget->getWidth();
-        descDepth.Height                = renderTarget->getHeight();
-        descDepth.MipLevels             = 1;
-        descDepth.ArraySize             = BBDesc.ArraySize;
+        descDepth.Width     = renderTarget->getWidth();
+        descDepth.Height    = renderTarget->getHeight();
+        descDepth.MipLevels = 1;
+        descDepth.ArraySize = 1; //BBDesc.ArraySize?
 
-        //TODO: It's the RenderTarget who must tell the precision it wants,
-        //and reject those it doesn't want in attachDepthBuffer.
-        //if ( mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-            descDepth.Format            = DXGI_FORMAT_R24G8_TYPELESS;
-            //descDepth.Format            = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        /*else
-            descDepth.Format            = DXGI_FORMAT_R32_TYPELESS;*/
+        PixelFormat desiredDepthBufferFormat = renderTarget->getDesiredDepthBufferFormat();
+
+        if( !exactMatchFormat )
+            desiredDepthBufferFormat = PF_D24_UNORM_S8_UINT;
+
+        const bool bDepthTexture = renderTarget->prefersDepthTexture();
+
+        if( bDepthTexture )
+        {
+            switch( desiredDepthBufferFormat )
+            {
+            case PF_D24_UNORM_S8_UINT:
+            case PF_D24_UNORM_X8:
+            case PF_X24_S8_UINT:
+            case PF_D24_UNORM:
+                descDepth.Format = DXGI_FORMAT_R24G8_TYPELESS;
+                break;
+            case PF_D16_UNORM:
+                descDepth.Format = DXGI_FORMAT_R16_TYPELESS;
+                break;
+            case PF_D32_FLOAT:
+                descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
+                break;
+            case PF_D32_FLOAT_X24_S8_UINT:
+            case PF_D32_FLOAT_X24_X8:
+            case PF_X32_X24_S8_UINT:
+                descDepth.Format = DXGI_FORMAT_R32G8X24_TYPELESS;
+                break;
+            default:
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "PixelFormat '" + PixelUtil::getFormatName( desiredDepthBufferFormat ) +
+                             "' is not a valid depth buffer format",
+                             "D3D11RenderSystem::_createDepthBufferFor" );
+            }
+        }
+        else
+        {
+            switch( desiredDepthBufferFormat )
+            {
+            case PF_D24_UNORM_S8_UINT:
+            case PF_D24_UNORM_X8:
+            case PF_X24_S8_UINT:
+            case PF_D24_UNORM:
+                descDepth.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+                break;
+            case PF_D16_UNORM:
+                descDepth.Format = DXGI_FORMAT_D16_UNORM;
+                break;
+            case PF_D32_FLOAT:
+                descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+                break;
+            case PF_D32_FLOAT_X24_S8_UINT:
+            case PF_D32_FLOAT_X24_X8:
+            case PF_X32_X24_S8_UINT:
+                descDepth.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+                break;
+            default:
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "PixelFormat '" + PixelUtil::getFormatName( desiredDepthBufferFormat ) +
+                             "' is not a valid depth buffer format",
+                             "D3D11RenderSystem::_createDepthBufferFor" );
+            }
+        }
 
         descDepth.SampleDesc.Count      = BBDesc.SampleDesc.Count;
         descDepth.SampleDesc.Quality    = BBDesc.SampleDesc.Quality;
@@ -1575,7 +1654,7 @@ bail:
 
         // If we tell we want to use it as a Shader Resource when in MSAA, we will fail
         // This is a recomandation from NVidia.
-        if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+        if( bDepthTexture && (mFeatureLevel >= D3D_FEATURE_LEVEL_10_1 || BBDesc.SampleDesc.Count == 1) )
             descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 
         descDepth.CPUAccessFlags        = 0;
@@ -1600,19 +1679,56 @@ bail:
         // Create the View of the texture
         // If MSAA is used, we cannot do this
         //
-        if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
+        ID3D11ShaderResourceView *depthTextureView = 0;
+        if( bDepthTexture && (mFeatureLevel >= D3D_FEATURE_LEVEL_10_1 || BBDesc.SampleDesc.Count == 1) )
         {
             D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
             //viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
             viewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+            switch( desiredDepthBufferFormat )
+            {
+            case PF_D24_UNORM_S8_UINT:
+                //TODO: Unsupported by API?
+                viewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+                break;
+            case PF_D24_UNORM_X8:
+                viewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+                break;
+            case PF_X24_S8_UINT:
+                viewDesc.Format = DXGI_FORMAT_X24_TYPELESS_G8_UINT;
+                break;
+            case PF_D24_UNORM:
+                viewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+                break;
+            case PF_D16_UNORM:
+                viewDesc.Format = DXGI_FORMAT_R16_UNORM;
+                break;
+            case PF_D32_FLOAT:
+                viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
+                break;
+            case PF_D32_FLOAT_X24_S8_UINT:
+                //TODO: Unsupported by API?
+                viewDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+                break;
+            case PF_D32_FLOAT_X24_X8:
+                viewDesc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+                break;
+            case PF_X32_X24_S8_UINT:
+                viewDesc.Format = DXGI_FORMAT_X32_TYPELESS_G8X24_UINT;
+                break;
+            default:
+                assert( false && "This is impossible" );
+                break;
+            }
+
             viewDesc.ViewDimension = BBDesc.SampleDesc.Count > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS :
                                                                    D3D11_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
-            SAFE_RELEASE(mDSTResView);
-            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &mDSTResView);
+            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &depthTextureView);
             if( FAILED(hr) || mDevice.isError())
             {
+                SAFE_RELEASE( pDepthStencil );
                 String errorDescription = mDevice.getErrorDescription(hr);
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Unable to create the view of the depth texture \nError Description:" + errorDescription,
@@ -1625,10 +1741,34 @@ bail:
         D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
         ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
 
-        //if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-            descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        /*else
-            descDSV.Format = DXGI_FORMAT_D32_FLOAT;*/
+        if( bDepthTexture )
+        {
+            switch( desiredDepthBufferFormat )
+            {
+            case PF_D24_UNORM_S8_UINT:
+            case PF_D24_UNORM_X8:
+            case PF_X24_S8_UINT:
+            case PF_D24_UNORM:
+                descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+                break;
+            case PF_D16_UNORM:
+                descDSV.Format = DXGI_FORMAT_R16_UNORM;
+                break;
+            case PF_D32_FLOAT:
+                descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+                break;
+            case PF_D32_FLOAT_X24_S8_UINT:
+            case PF_D32_FLOAT_X24_X8:
+            case PF_X32_X24_S8_UINT:
+                descDSV.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+                break;
+            default:
+                assert( false && "This is impossible" );
+                break;
+            }
+        }
+        else
+            descDSV.Format = descDepth.Format;
 
         descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS :
                                                                 D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -1636,9 +1776,10 @@ bail:
                                                                                             // TODO: Decide how to expose this feature
         descDSV.Texture2D.MipSlice = 0;
         hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &depthStencilView );
-        SAFE_RELEASE( pDepthStencil );
         if( FAILED(hr) )
         {
+            SAFE_RELEASE( depthTextureView );
+            SAFE_RELEASE( pDepthStencil );
 			String errorDescription = mDevice.getErrorDescription(hr);
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to create depth stencil view\nError Description:" + errorDescription,
@@ -1646,10 +1787,15 @@ bail:
         }
 
         //Create the abstract container
-        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, depthStencilView,
-                                                descDepth.Width, descDepth.Height,
-                                                descDepth.SampleDesc.Count, descDepth.SampleDesc.Quality,
-                                                false );
+        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
+                                                                 pDepthStencil,
+                                                                 depthStencilView,
+                                                                 depthTextureView,
+                                                                 descDepth.Width, descDepth.Height,
+                                                                 descDepth.SampleDesc.Count,
+                                                                 descDepth.SampleDesc.Quality,
+                                                                 desiredDepthBufferFormat,
+                                                                 bDepthTexture, false );
 
         return newDepthBuffer;
     }
@@ -1661,32 +1807,6 @@ bail:
             DepthBufferVec& pool = mDepthBufferPool[depthBuffer->getPoolId()];
             pool.erase(std::remove(pool.begin(), pool.end(), depthBuffer), pool.end());
         }
-    }
-    //---------------------------------------------------------------------
-    DepthBuffer* D3D11RenderSystem::_addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
-                                                            uint32 width, uint32 height,
-                                                            uint32 fsaa, uint32 fsaaQuality )
-    {
-        //If this depth buffer was already added, return that one
-        DepthBufferVec::const_iterator itor = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].begin();
-        DepthBufferVec::const_iterator end  = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].end();
-
-        while( itor != end )
-        {
-            if( static_cast<D3D11DepthBuffer*>(*itor)->getDepthStencilView() == depthSurface )
-                return *itor;
-
-            ++itor;
-        }
-
-        //Create a new container for it
-        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, depthSurface,
-                                                                    width, height, fsaa, fsaaQuality, true );
-
-        //Add the 'main' depth buffer to the pool
-        mDepthBufferPool[newDepthBuffer->getPoolId()].push_back( newDepthBuffer );
-
-        return newDepthBuffer;
     }
     //---------------------------------------------------------------------
     RenderTarget* D3D11RenderSystem::detachRenderTarget(const String &name)
@@ -2122,7 +2242,7 @@ bail:
             {
                 //Depth is automatically managed and there is no depth buffer attached to this RT
                 //or the Current D3D device doesn't match the one this Depth buffer was created
-                setDepthBufferFor( target );
+                setDepthBufferFor( target, true );
             }
 
             //Retrieve depth buffer again (it may have changed)
@@ -2647,12 +2767,14 @@ bail:
 
         //No subroutines for now
 
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
         if( !hlmsCache->vertexShader.isNull() )
         {
             mBoundVertexProgram = static_cast<D3D11HLSLProgram*>( hlmsCache->vertexShader->
                                                                   _getBindingDelegate() );
 
-            mDevice.GetImmediateContext()->VSSetShader( mBoundVertexProgram->getVertexShader(), 0, 0 );
+            deviceContext->VSSetShader( mBoundVertexProgram->getVertexShader(), 0, 0 );
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
@@ -2662,13 +2784,16 @@ bail:
             }
             mVertexProgramBound = true;
         }
+        else
+        {
+            deviceContext->VSSetShader( 0, 0, 0 );
+        }
 
         if( !hlmsCache->geometryShader.isNull() )
         {
             mBoundGeometryProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->geometryShader->
                                                                       _getBindingDelegate() );
-            mDevice.GetImmediateContext()->GSSetShader( mBoundGeometryProgram->getGeometryShader(),
-                                                        0, 0 );
+            deviceContext->GSSetShader( mBoundGeometryProgram->getGeometryShader(), 0, 0 );
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
@@ -2681,6 +2806,10 @@ bail:
 
             mUseAdjacency = mBoundGeometryProgram->isAdjacencyInfoRequired();
         }
+        else
+        {
+            deviceContext->GSSetShader( 0, 0, 0 );
+        }
 
         if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
         {
@@ -2689,8 +2818,7 @@ bail:
                 mBoundTessellationHullProgram   = static_cast<D3D11HLSLProgram*>(
                             hlmsCache->tesselationHullShader->_getBindingDelegate() );
 
-                mDevice.GetImmediateContext()->HSSetShader( mBoundTessellationHullProgram->
-                                                            getHullShader(), 0, 0 );
+                deviceContext->HSSetShader( mBoundTessellationHullProgram->getHullShader(), 0, 0 );
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2700,14 +2828,17 @@ bail:
                 }
                 mTessellationHullProgramBound = true;
             }
+            else
+            {
+                deviceContext->HSSetShader( 0, 0, 0 );
+            }
 
             if( !hlmsCache->tesselationDomainShader.isNull() )
             {
                 mBoundTessellationDomainProgram = static_cast<D3D11HLSLProgram*>(
                             hlmsCache->tesselationDomainShader->_getBindingDelegate() );
 
-                mDevice.GetImmediateContext()->DSSetShader(
-                            mBoundTessellationDomainProgram->getDomainShader(), 0, 0 );
+                deviceContext->DSSetShader( mBoundTessellationDomainProgram->getDomainShader(), 0, 0 );
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -2717,13 +2848,17 @@ bail:
                 }
                 mTessellationDomainProgramBound = true;
             }
+            else
+            {
+                deviceContext->DSSetShader( 0, 0, 0 );
+            }
         }
 
         if( !hlmsCache->pixelShader.isNull() )
         {
             mBoundFragmentProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->pixelShader->
                                                                       _getBindingDelegate() );
-            mDevice.GetImmediateContext()->PSSetShader( mBoundFragmentProgram->getPixelShader(), 0, 0 );
+            deviceContext->PSSetShader( mBoundFragmentProgram->getPixelShader(), 0, 0 );
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
@@ -2732,6 +2867,10 @@ bail:
                              errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
             }
             mFragmentProgramBound = true;
+        }
+        else
+        {
+            deviceContext->PSSetShader( 0, 0, 0 );
         }
 
         // Check consistency of tessellation shaders

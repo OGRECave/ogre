@@ -680,6 +680,10 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void BillboardSet::createExtraVertexBuffer( size_t vertexSize )
     {
+        size_t vertexCount = mPoolSize;
+        if( !mPointRendering )
+            vertexCount = mPoolSize * 4;
+
         if( mAutoUpdate )
         {
             const size_t dynamicBufferMultiplier = mVaoManager->getDynamicBufferMultiplier();
@@ -692,7 +696,7 @@ namespace v1 {
                 mMainBuffers[i].push_back(
                             HardwareBufferManager::getSingleton().createVertexBuffer(
                                 vertexSize,
-                                mVertexData->vertexCount * dynamicBufferMultiplier,
+                                vertexCount * dynamicBufferMultiplier,
                                 HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE) );
             }
         }
@@ -705,7 +709,7 @@ namespace v1 {
 
             mMainBuffers[0].push_back(
                         HardwareBufferManager::getSingleton().createVertexBuffer(
-                            vertexSize, mVertexData->vertexCount,
+                            vertexSize, vertexCount,
                             HardwareBuffer::HBU_STATIC_WRITE_ONLY) );
         }
     }
@@ -866,6 +870,7 @@ namespace v1 {
         }
 
         mMainBuf.setNull();
+        mMainBuffers.clear();
 
         mBuffersCreated = false;
     }

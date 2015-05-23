@@ -54,6 +54,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLSeparableProgramManager.h"
 #include "OgreGLSLSeparableProgram.h"
 #include "OgreGLSLMonolithicProgramManager.h"
+#include "OgreGL3PlusPixelFormat.h"
 #include "OgreGL3PlusVertexArrayObject.h"
 #include "OgreGL3PlusHlmsMacroblock.h"
 #include "OgreHlmsDatablock.h"
@@ -114,6 +115,18 @@ static void APIENTRY GLDebugCallback(GLenum source,
         strcpy(debSev, "medium");
     else if (severity == GL_DEBUG_SEVERITY_LOW)
         strcpy(debSev, "low");
+    else if( severity == GL_DEBUG_SEVERITY_NOTIFICATION )
+    {
+        strcpy(debSev, "notification");
+
+#if OGRE_PROFILING == 0
+        //Filter notification debug GL messages as they can
+        //be quite noisy, annoying and useless on NVIDIA.
+        return;
+#endif
+    }
+    else
+        strcpy(debSev, "unknown");
 
     Ogre::LogManager::getSingleton().stream() << debSource << ":" << debType << "(" << debSev << ") " << id << ": " << message;
 }
@@ -146,7 +159,7 @@ namespace Ogre {
         mRenderInstanceAttribsBound.reserve(100);
 
         // Get our GLSupport
-        mGLSupport = getGLSupport();
+        mGLSupport = Ogre::getGLSupport();
 
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
@@ -441,8 +454,8 @@ namespace Ogre {
             rsc->addShaderProfile("glsl130");
 
         // FIXME: This isn't working right yet in some rarer cases
-        if (mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || hasGL41)
-            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
+        /*if (mGLSupport->checkExtension("GL_ARB_separate_shader_objects") || hasGL41)
+            rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);*/
 
         // Vertex/Fragment Programs
         rsc->setCapability(RSC_VERTEX_PROGRAM);
@@ -592,6 +605,21 @@ namespace Ogre {
         {
             // Enable microcache
             mShaderManager->setSaveMicrocodesToCache(true);
+        }
+
+        if( mGLSupport->hasMinGLVersion( 4, 3 ) )
+        {
+            //On AMD's GCN cards, there is no performance or memory difference between
+            //PF_D24_UNORM_S8_UINT & PF_D32_FLOAT_X24_S8_UINT, so prefer the latter
+            //on modern cards (GL >= 4.3) and that also claim to support this format.
+            //NVIDIA's preference? Dunno, they don't tell. But at least the quality
+            //will be consistent.
+            GLenum depthFormat, stencilFormat;
+            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( PF_D32_FLOAT_X24_S8_UINT,
+                                                                               PF_D32_FLOAT_X24_S8_UINT,
+                                                                               &depthFormat,
+                                                                               &stencilFormat );
+            DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
         }
 
         mGLInitialised = true;
@@ -770,20 +798,22 @@ namespace Ogre {
             GL3PlusContext *windowContext = 0;
             win->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext );
             GL3PlusDepthBuffer *depthBuffer = new GL3PlusDepthBuffer( DepthBuffer::POOL_DEFAULT, this,
-                                                                      windowContext, 0, 0,
+                                                                      windowContext, GL_NONE, GL_NONE,
                                                                       win->getWidth(), win->getHeight(),
-                                                                      win->getFSAA(), 0, true );
+                                                                      win->getFSAA(), 0, PF_UNKNOWN,
+                                                                      false, true );
 
             mDepthBufferPool[depthBuffer->getPoolId()].push_back( depthBuffer );
 
-            win->attachDepthBuffer( depthBuffer );
+            win->attachDepthBuffer( depthBuffer, false );
         }
 
         return win;
     }
 
     //---------------------------------------------------------------------
-    DepthBuffer* GL3PlusRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
+    DepthBuffer* GL3PlusRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget,
+                                                             bool exactMatchFormat )
     {
         GL3PlusDepthBuffer *retVal = 0;
 
@@ -793,28 +823,46 @@ namespace Ogre {
         GL3PlusFrameBufferObject *fbo = 0;
         renderTarget->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo);
 
-        if( fbo )
+        if( fbo || renderTarget->getForceDisableColourWrites() )
         {
-            // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
-            // Find best depth & stencil format suited for the RT's format
-            GLuint depthFormat, stencilFormat;
-            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( fbo->getFormat(),
-                                                                        &depthFormat, &stencilFormat );
+            PixelFormat desiredDepthBufferFormat = renderTarget->getDesiredDepthBufferFormat();
 
-            v1::GL3PlusRenderBuffer *depthBuffer = new v1::GL3PlusRenderBuffer(
-                                                        depthFormat, fbo->getWidth(),
-                                                        fbo->getHeight(), fbo->getFSAA() );
-
-            v1::GL3PlusRenderBuffer *stencilBuffer = fbo->getFormat() != PF_DEPTH ? depthBuffer : 0;
-            if( depthFormat != GL_DEPTH24_STENCIL8 && depthFormat != GL_DEPTH32F_STENCIL8 && stencilFormat != GL_NONE )
+            if( !exactMatchFormat )
             {
-                stencilBuffer = new v1::GL3PlusRenderBuffer( stencilFormat, fbo->getWidth(),
-                                                             fbo->getHeight(), fbo->getFSAA() );
+                if( desiredDepthBufferFormat == PF_D24_UNORM_X8 && renderTarget->prefersDepthTexture() )
+                    desiredDepthBufferFormat = PF_D24_UNORM;
+                else
+                    desiredDepthBufferFormat = PF_D24_UNORM_S8_UINT;
             }
 
-            // No "custom-quality" multisample for now in GL
-            retVal = new GL3PlusDepthBuffer( 0, this, mCurrentContext, depthBuffer, stencilBuffer,
-                                             fbo->getWidth(), fbo->getHeight(), fbo->getFSAA(), 0, false );
+            PixelFormat renderTargetFormat;
+
+            if( fbo )
+                renderTargetFormat = fbo->getFormat();
+            else
+            {
+                //Deal with depth textures
+                renderTargetFormat = desiredDepthBufferFormat;
+            }
+
+            // Presence of an FBO means the manager is an FBO Manager, that's why it's safe to downcast
+            // Find best depth & stencil format suited for the RT's format
+            GLenum depthFormat, stencilFormat;
+            static_cast<GL3PlusFBOManager*>(mRTTManager)->getBestDepthStencil( desiredDepthBufferFormat,
+                                                                               renderTargetFormat,
+                                                                               &depthFormat,
+                                                                               &stencilFormat );
+
+            // OpenGL specs explicitly disallow depth textures with separate stencil.
+            if( stencilFormat == GL_NONE || !renderTarget->prefersDepthTexture() )
+            {
+                // No "custom-quality" multisample for now in GL
+                retVal = new GL3PlusDepthBuffer( 0, this, mCurrentContext, depthFormat, stencilFormat,
+                                                 renderTarget->getWidth(), renderTarget->getHeight(),
+                                                 renderTarget->getFSAA(), 0,
+                                                 desiredDepthBufferFormat,
+                                                 renderTarget->prefersDepthTexture(), false );
+            }
         }
 
         return retVal;
@@ -2942,7 +2990,7 @@ namespace Ogre {
 
         mActiveRenderTarget = target;
         if (target)
-        {
+        {        
             // Switch context if different from current one
             GL3PlusContext *newContext = 0;
             target->getCustomAttribute(GL3PlusRenderTexture::CustomAttributeString_GLCONTEXT, &newContext);
@@ -2954,6 +3002,18 @@ namespace Ogre {
             // Check the FBO's depth buffer status
             GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(target->getDepthBuffer());
 
+            if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
+                (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+            {
+                // Depth is automatically managed and there is no depth buffer attached to this RT
+                // or the Current context doesn't match the one this Depth buffer was created with
+                setDepthBufferFor( target, true );
+            }
+
+            depthBuffer = static_cast<GL3PlusDepthBuffer*>(target->getDepthBuffer());
+
+            colourWrite &= !target->getForceDisableColourWrites();
+
             if( !colourWrite )
             {
                 if( target->isRenderWindow() )
@@ -2964,12 +3024,10 @@ namespace Ogre {
                 {
                     OCGE( glBindFramebuffer( GL_FRAMEBUFFER, mNullColourFramebuffer ) );
 
-                    if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-                        (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
+                    if( depthBuffer )
                     {
                         //Attach the depth buffer to this no-colour framebuffer
-                        depthBuffer->getDepthBuffer()->bindToFramebuffer( GL_DEPTH_ATTACHMENT, 0 );
-                        depthBuffer->getStencilBuffer()->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
+                        depthBuffer->bindToFramebuffer();
                     }
                     else
                     {
@@ -2992,14 +3050,6 @@ namespace Ogre {
                     OCGE( glBindFramebuffer( GL_FRAMEBUFFER, 0 ) );
                     //TODO: Restore the setting sent to OGRE_NO_QUAD_BUFFER_STEREO?
                     OCGE( glDrawBuffer( GL_BACK ) );
-                }
-
-                if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH &&
-                    (!depthBuffer || depthBuffer->getGLContext() != mCurrentContext ) )
-                {
-                    // Depth is automatically managed and there is no depth buffer attached to this RT
-                    // or the Current context doesn't match the one this Depth buffer was created with
-                    setDepthBufferFor( target );
                 }
 
                 // Bind frame buffer object

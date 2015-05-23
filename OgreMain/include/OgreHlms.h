@@ -122,6 +122,8 @@ namespace Ogre
         LightGatheringMode  mLightGatheringMode;
         uint16              mNumLightsLimit;
 
+        /// Listener for adding extensions. @see setListener.
+        /// Pointer is [b]never[/b] null.
         HlmsListener    *mListener;
         RenderSystem    *mRenderSystem;
 
@@ -497,10 +499,25 @@ namespace Ogre
         */
         void setDebugOutputPath( bool enableDebugOutput, const String &path = BLANKSTRING );
 
+        /** Sets a listener to extend an existing Hlms implementation's with custom code,
+            without having to rewrite it or modify the source code directly.
+        @remarks
+            Other alternatives for extending an existing implementation is to derive
+            from the class and override particular virtual functions.
+            For performance reasons, listeners are never called on a per-object basis.
+            Consult the section "Customizing an existing implementation" from the
+            manual in the Docs/2.0 folder.
+        @param listener
+            Listener pointer. Use null to disable.
+        */
         void setListener( HlmsListener *listener );
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
+
+        /// Utility helper, mostly useful to HlmsListener implementations.
+        static int32 getProperty( const HlmsPropertyVec &properties,
+                                  IdString key, int32 defaultVal=0 );
 
         /// Internal use. @see HlmsManager::setShadowMappingUseBackFaces
         void _notifyShadowMappingBackFaceSetting(void);
@@ -547,6 +564,7 @@ namespace Ogre
         static const IdString NumShadowMaps;
         static const IdString PssmSplits;
         static const IdString ShadowCaster;
+        static const IdString ShadowUsesDepthTexture;
         static const IdString Forward3D;
         static const IdString Forward3DDebug;
         static const IdString VPos;

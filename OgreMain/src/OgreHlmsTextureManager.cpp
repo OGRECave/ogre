@@ -301,6 +301,8 @@ namespace Ogre
 
         TextureLocation retVal;
 
+        assert( !aliasName.empty() && "Alias name can't be left empty!" );
+
         try
         {
         if( it == mEntries.end() || it->name != searchName.name )
@@ -311,6 +313,10 @@ namespace Ogre
             image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
             PixelFormat imageFormat = image.getFormat();
+
+            if( mDefaultTextureParameters[mapType].pixelFormat != PF_UNKNOWN )
+                imageFormat = mDefaultTextureParameters[mapType].pixelFormat;
+
             if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 ||
                 imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 ||
                 imageFormat == PF_A8R8G8B8 )
@@ -425,7 +431,6 @@ namespace Ogre
             if( dstArrayIt == mTextureArrays[mapType].end() )
             {
                 //Create a new array
-                PixelFormat defaultPixelFormat = mDefaultTextureParameters[mapType].pixelFormat;
                 uint limit          = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                 uint limitSquared   = mDefaultTextureParameters[mapType].maxTexturesPerArray;
                 bool packNonPow2    = mDefaultTextureParameters[mapType].packNonPow2;
@@ -453,10 +458,8 @@ namespace Ogre
                     }
                     else if( texType == TEX_TYPE_2D_ARRAY )
                     {
-                        PixelFormat pf = defaultPixelFormat == PF_UNKNOWN ? imageFormat :
-                                                                            defaultPixelFormat;
-
-                        size_t textureSizeNoMips = PixelUtil::getMemorySize( width, height, 1, pf );
+                        size_t textureSizeNoMips = PixelUtil::getMemorySize( width, height, 1,
+                                                                             imageFormat );
 
                         ThresholdVec::const_iterator itThres =  mDefaultTextureParameters[mapType].
                                                                     textureArraysTresholds.begin();
@@ -508,8 +511,7 @@ namespace Ogre
                                             StringConverter::toString( mTextureId++ ),
                                             ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                             texType, width, height, depth, numMipmaps - baseMipLevel,
-                                            defaultPixelFormat == PF_UNKNOWN ? imageFormat :
-                                                                               defaultPixelFormat,
+                                            imageFormat,
                                             TU_DEFAULT & ~TU_AUTOMIPMAP, 0,
                                             mDefaultTextureParameters[mapType].hwGammaCorrection,
                                             0, BLANKSTRING, false );
@@ -593,12 +595,10 @@ namespace Ogre
 
         if( it != mEntries.end() && it->name == searchName.name )
         {
-            mEntries.erase( it );
-
             TextureArrayVec::iterator texArrayIt = mTextureArrays[it->mapType].begin() + it->arrayIdx;
             texArrayIt->destroyEntry( it->entryIdx );
 
-            if( texArrayIt->activeEntries == texArrayIt->maxTextures )
+            if( texArrayIt->activeEntries == 0 )
             {
                 //The whole array has no actual content. Destroy the texture.
                 ResourcePtr texResource = texArrayIt->texture;
@@ -608,20 +608,27 @@ namespace Ogre
                 if( texArrayIt != mTextureArrays[it->mapType].end() )
                 {
                     //The last element has now a new index. Update the references in mEntries
-                    size_t newArrayIdx = it->arrayIdx;
+                    const size_t newArrayIdx = texArrayIt - mTextureArrays[it->mapType].begin();
                     StringVector::const_iterator itor = texArrayIt->entries.begin();
                     StringVector::const_iterator end  = texArrayIt->entries.end();
 
                     while( itor != end )
                     {
-                        searchName.name = *itor;
-                        it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
-                        assert( it != mEntries.end() && it->name == searchName.name );
-                        it->arrayIdx = newArrayIdx;
+                        if( !itor->empty() )
+                        {
+                            searchName.name = *itor;
+                            TextureEntryVec::iterator itEntry = std::lower_bound( mEntries.begin(),
+                                                                                  mEntries.end(),
+                                                                                  searchName );
+                            assert( itEntry != mEntries.end() && itEntry->name == searchName.name );
+                            itEntry->arrayIdx = newArrayIdx;
+                        }
                         ++itor;
                     }
                 }
             }
+
+            mEntries.erase( it );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -885,7 +892,7 @@ namespace Ogre
                 row += StringConverter::toString( itor->entries.size() );
 
                 StringVector::const_iterator itEntry = itor->entries.begin();
-                StringVector::const_iterator enEntry = itor->entries.begin() + itor->activeEntries;
+                StringVector::const_iterator enEntry = itor->entries.end();
 
                 while( itEntry != enEntry )
                     row += "|" + *itEntry++;

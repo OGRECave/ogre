@@ -36,7 +36,6 @@ SamplerComparisonState shadowSampler : register(s@value(textureRegShadowMapStart
 
 float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
 {
-@property( !hlms_shadow_uses_depth_texture )
 	float fDepth = psPosLN.z;
 	float2 uv = psPosLN.xy / psPosLN.w;
 	/*float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
@@ -82,9 +81,6 @@ float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
 	@end
 
 	return retVal;
-@end
-@property( hlms_shadow_uses_depth_texture )
-	return texture( shadowMap, psPosLN.xyz, 0 ).x;@end
 }
 @end
 
@@ -282,6 +278,7 @@ float4 main( PS_INPUT inPs
 
 	@insertpiece( custom_ps_preLights )
 
+@property( !custom_disable_directional_lights )
 @property( hlms_lights_directional )
 	finalColour += BRDF( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) );
 @property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
@@ -290,6 +287,7 @@ float4 main( PS_INPUT inPs
 	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
 @foreach( hlms_lights_directional_non_caster, n, hlms_lights_directional )
 	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) );@end
+@end
 
 @property( hlms_lights_point || hlms_lights_spot )	float3 lightDir;
 	float fDistance;
@@ -362,6 +360,9 @@ float4 main( PS_INPUT inPs
 }
 @end
 @property( hlms_shadowcaster )
+	@property( hlms_shadow_uses_depth_texture )
+		@set( hlms_disable_stage, 1 )
+	@end
 float main( PS_INPUT inPs ) : SV_Target0
 {
 	@insertpiece( custom_ps_preExecution )

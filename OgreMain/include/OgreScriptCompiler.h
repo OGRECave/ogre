@@ -826,12 +826,15 @@ namespace Ogre
                 ID_NO_FSAA,
                 ID_EXPLICIT_RESOLVE,
                 ID_DEPTH_POOL,
+                ID_DEPTH_TEXTURE,
+                ID_DEPTH_FORMAT,
             ID_TARGET,
         //  ID_PASS,
                 ID_CLEAR,
                 ID_STENCIL,
                 ID_RENDER_SCENE,
                 ID_RENDER_QUAD,
+                ID_DEPTH_COPY,
                 ID_UAV_QUEUE,
                     ID_VIEWPORT,
                     ID_NUM_INITIAL,
@@ -859,6 +862,9 @@ namespace Ogre
                         ID_CAMERA_FAR_CORNERS_VIEW_SPACE,
                         ID_CAMERA_FAR_CORNERS_WORLD_SPACE,
                     ID_INPUT,
+
+                    //Used by ID_DEPTH_COPY
+                    ID_ALIAS_ON_COPY_FAILURE,
 
                     //Used by PASS_CLEAR
                     ID_BUFFERS,

@@ -147,10 +147,10 @@ namespace Ogre {
                     ss << "Attachment " << x << " has incompatible format.";
                     OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, ss.str(), "GL3PlusFrameBufferObject::initialise");
                 }
-                if(getFormat() == PF_DEPTH)
-                    mColour[x].buffer->bindToFramebuffer(GL_DEPTH_ATTACHMENT, mColour[x].zoffset);
-                else
-                    mColour[x].buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0+x, mColour[x].zoffset);
+
+                assert( !PixelUtil::isDepth( getFormat() ) );
+
+                mColour[x].buffer->bindToFramebuffer(GL_COLOR_ATTACHMENT0+x, mColour[x].zoffset);
             }
             else
             {
@@ -189,10 +189,9 @@ namespace Ogre {
             // Fill attached colour buffers
             if(mColour[x].buffer)
             {
-                if(getFormat() == PF_DEPTH)
-                    bufs[x] = GL_DEPTH_ATTACHMENT;
-                else
-                    bufs[x] = GL_COLOR_ATTACHMENT0 + x;
+                assert( !PixelUtil::isDepth( getFormat() ) );
+
+                bufs[x] = GL_COLOR_ATTACHMENT0 + x;
                 // Keep highest used buffer + 1
                 n = x+1;
             }
@@ -203,8 +202,7 @@ namespace Ogre {
         }
 
         // Drawbuffer extension supported, use it
-        if(getFormat() != PF_DEPTH)
-            OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
+        OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));
 
         if (mMultisampleFB)
         {
@@ -273,15 +271,7 @@ namespace Ogre {
 
         if( glDepthBuffer )
         {
-            v1::GL3PlusRenderBuffer *depthBuf   = glDepthBuffer->getDepthBuffer();
-            v1::GL3PlusRenderBuffer *stencilBuf = glDepthBuffer->getStencilBuffer();
-
-            // Attach depth buffer, if it has one.
-            if( depthBuf )
-                depthBuf->bindToFramebuffer( GL_DEPTH_ATTACHMENT, 0 );
-            // Attach stencil buffer, if it has one.
-            if( stencilBuf )
-                stencilBuf->bindToFramebuffer( GL_STENCIL_ATTACHMENT, 0 );
+            glDepthBuffer->bindToFramebuffer();
         }
         else
         {

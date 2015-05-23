@@ -556,6 +556,22 @@ namespace Ogre {
         }
 
         mDepthBufferPool.clear();
+
+        cleanReleasedDepthBuffers();
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::cleanReleasedDepthBuffers(void)
+    {
+        DepthBufferVec::const_iterator itor = mReleasedDepthBuffers.begin();
+        DepthBufferVec::const_iterator end  = mReleasedDepthBuffers.end();
+
+        while( itor != end )
+        {
+            delete *itor;
+            ++itor;
+        }
+
+        mReleasedDepthBuffers.clear();
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_beginFrameOnce(void)
@@ -563,11 +579,17 @@ namespace Ogre {
         mVaoManager->_beginFrame();
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget )
+    void RenderSystem::setDepthBufferFor( RenderTarget *renderTarget, bool exactMatch )
     {
         uint16 poolId = renderTarget->getDepthBufferPool();
         if( poolId == DepthBuffer::POOL_NO_DEPTH )
             return; //RenderTarget explicitly requested no depth buffer
+
+        if( poolId == DepthBuffer::POOL_NON_SHAREABLE )
+        {
+            createUniqueDepthBufferFor( renderTarget, exactMatch );
+            return;
+        }
 
         //Find a depth buffer in the pool
         DepthBufferVec::const_iterator itor = mDepthBufferPool[poolId].begin();
@@ -575,28 +597,91 @@ namespace Ogre {
 
         bool bAttached = false;
         while( itor != end && !bAttached )
-            bAttached = renderTarget->attachDepthBuffer( *itor++ );
+            bAttached = renderTarget->attachDepthBuffer( *itor++, exactMatch );
 
         //Not found yet? Create a new one!
         if( !bAttached )
         {
-            DepthBuffer *newDepthBuffer = _createDepthBufferFor( renderTarget );
+            DepthBuffer *newDepthBuffer = _createDepthBufferFor( renderTarget, exactMatch );
 
             if( newDepthBuffer )
             {
                 newDepthBuffer->_setPoolId( poolId );
                 mDepthBufferPool[poolId].push_back( newDepthBuffer );
 
-                bAttached = renderTarget->attachDepthBuffer( newDepthBuffer );
+                bAttached = renderTarget->attachDepthBuffer( newDepthBuffer, exactMatch );
 
-                assert( bAttached && "A new DepthBuffer for a RenderTarget was created, but after creation"
-                                     "it says it's incompatible with that RT" );
+                assert( bAttached && "A new DepthBuffer for a RenderTarget was created, but after"
+                                     " creation it says it's incompatible with that RT" );
             }
             else
-                LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited DepthBuffer"
-                                                       "for RT: " + renderTarget->getName() , LML_CRITICAL);
+            {
+                if( exactMatch )
+                {
+                    //The GPU doesn't support this depth buffer format. Try a fallback.
+                    setDepthBufferFor( renderTarget, false );
+                }
+                else
+                {
+                    LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited "
+                                                           "DepthBuffer for RT: " +
+                                                           renderTarget->getName(), LML_CRITICAL );
+                }
+            }
         }
     }
+    //-----------------------------------------------------------------------
+    void RenderSystem::createUniqueDepthBufferFor( RenderTarget *renderTarget, bool exactMatch )
+    {
+        assert( renderTarget->getForceDisableColourWrites() );
+        assert( renderTarget->getDepthBufferPool() == DepthBuffer::POOL_NON_SHAREABLE );
+        assert( !renderTarget->getDepthBuffer() );
+
+        const uint16 poolId = DepthBuffer::POOL_NON_SHAREABLE;
+
+        DepthBuffer *newDepthBuffer = _createDepthBufferFor( renderTarget, exactMatch );
+
+        if( newDepthBuffer )
+        {
+            newDepthBuffer->_setPoolId( poolId );
+            mDepthBufferPool[poolId].push_back( newDepthBuffer );
+
+            bool bAttached = renderTarget->attachDepthBuffer( newDepthBuffer, exactMatch );
+
+            assert( bAttached && "A new DepthBuffer for a RenderTarget was created, but after"
+                                 " creation it says it's incompatible with that RT" );
+        }
+        else
+        {
+            if( exactMatch )
+            {
+                //The GPU doesn't support this depth buffer format. Try a fallback.
+                createUniqueDepthBufferFor( renderTarget, false );
+            }
+            else
+            {
+                LogManager::getSingleton().logMessage( "WARNING: Couldn't create a suited "
+                                                       "unique DepthBuffer for RT: " +
+                                                       renderTarget->getName(), LML_CRITICAL );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::_destroyDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        DepthBufferVec &depthBuffersInPool = mDepthBufferPool[depthBuffer->getPoolId()];
+        DepthBufferVec::iterator itor = depthBuffersInPool.begin();
+        DepthBufferVec::iterator end  = depthBuffersInPool.end();
+
+        while( itor != end && *itor != depthBuffer )
+            ++itor;
+
+        assert( itor != depthBuffersInPool.end() );
+
+        efficientVectorRemove( depthBuffersInPool, itor );
+        mReleasedDepthBuffers.push_back( depthBuffer );
+    }
+    //-----------------------------------------------------------------------
     bool RenderSystem::getWBufferEnabled(void) const
     {
         return mWBuffer;
@@ -974,6 +1059,7 @@ namespace Ogre {
     void RenderSystem::_update(void)
     {
         mVaoManager->_update();
+        cleanReleasedDepthBuffers();
     }
     //---------------------------------------------------------------------
     const String& RenderSystem::_getDefaultViewportMaterialScheme( void ) const

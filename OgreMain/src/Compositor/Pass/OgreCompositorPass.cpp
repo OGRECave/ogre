@@ -113,6 +113,18 @@ namespace Ogre
                 " Use the other one instead.");
     }
     //-----------------------------------------------------------------------------------
+    CompositorPass::CompositorPass( const CompositorPassDef *definition, CompositorNode *parentNode,
+                                    bool specialPass ) :
+        mDefinition( definition ),
+        mTarget( 0 ),
+        mViewport( 0 ),
+        mNumPassesLeft( 0 ),
+        mParentNode( parentNode )
+    {
+        assert( specialPass && "Don't use this constructor if you don't know what you're doing!"
+                " Use the other one instead.");
+    }
+    //-----------------------------------------------------------------------------------
     CompositorPass::~CompositorPass()
     {
     }

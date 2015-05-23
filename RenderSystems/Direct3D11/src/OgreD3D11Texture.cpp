@@ -147,6 +147,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
+        mSurfaceList.clear();        
         SAFE_RELEASE(mpTex);
         SAFE_RELEASE(mpShaderResourceView);
         SAFE_RELEASE(mp1DTex);

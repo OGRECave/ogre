@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __DepthBuffer_H__
 
 #include "OgrePrerequisites.h"
+#include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -86,11 +87,14 @@ namespace Ogre
         {
             POOL_NO_DEPTH       = 0,
             POOL_MANUAL_USAGE   = 0,
-            POOL_DEFAULT        = 1
+            POOL_DEFAULT        = 1,
+            POOL_NON_SHAREABLE  = 65534,
+            POOL_INVALID        = 65535
         };
 
         DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
-                     uint32 fsaa, const String &fsaaHint, bool manual );
+                     uint32 fsaa, const String &fsaaHint, PixelFormat pixelFormat,
+                     bool isDepthTexture, bool manual, RenderSystem *renderSystem );
         virtual ~DepthBuffer();
 
         /** Sets the pool id in which this DepthBuffer lives.
@@ -104,6 +108,8 @@ namespace Ogre
         virtual uint32 getHeight() const;
         virtual uint32 getFsaa() const;
         virtual const String& getFsaaHint() const;
+        PixelFormat getFormat(void) const;
+        bool isDepthTexture(void) const;
 
         /** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
             with it's render target (aka, a backbuffer or similar) */
@@ -111,14 +117,34 @@ namespace Ogre
 
         /** Returns whether the specified RenderTarget is compatible with this DepthBuffer
             That is, this DepthBuffer can be attached to that RenderTarget
-            @remarks
-                Most APIs impose the following restrictions:
-                Width & height must be equal or higher than the render target's
-                They must be of the same bit depth.
-                They need to have the same FSAA setting
-            @param renderTarget The render target to test against
+        @remarks
+            Most APIs impose the following restrictions:
+            Width & height must be equal or higher than the render target's
+            They must be of the same bit depth.
+            They need to have the same FSAA setting
+        @param renderTarget
+            The render target to test against
+        @param exactFormatMatch
+            True if looking for the exact format according to the RT's preferred format.
+            False if the RT's preferred format should be ignored.
         */
-        virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
+
+        /** Copies the contents of the DepthBuffer to the destination. Useful when you
+            want to bind a DepthBuffer for sampling as a texture, but later resume
+            rendering with this depth buffer (binding a DepthBuffer as a texture forces
+            it to be decompressed and disables other optimization algorithms on a lot of
+            Hardware. GCN Tahiti aka AMD Radeon R9 280 is no longer affected by this issue)
+        @remarks
+            The function will throw if the depth buffers are incompatible (e.g. different
+            resolution, different format, different MSAA settings)
+        @param destination
+            DepthBuffer to copy to.
+        @return
+            False if failed to copy for hardware reasons (DX10 does not allow copying
+            MSAA depth buffer; DX10.1 does)
+        */
+        bool copyTo( DepthBuffer *destination );
 
         /** Called when a RenderTarget is attaches this DepthBuffer
             @remarks
@@ -136,6 +162,8 @@ namespace Ogre
         */
         virtual void _notifyRenderTargetDetached( RenderTarget *renderTarget );
 
+        static PixelFormat DefaultDepthBufferFormat;
+
     protected:
         typedef set<RenderTarget*>::type RenderTargetSet;
 
@@ -145,11 +173,16 @@ namespace Ogre
         uint32                      mHeight;
         uint32                      mFsaa;
         String                      mFsaaHint;
+        PixelFormat                 mFormat;
+        bool                        mDepthTexture;
 
         bool                        mManual; //We don't Release manual surfaces on destruction
         RenderTargetSet             mAttachedRenderTargets;
+        RenderSystem                *mRenderSystem;
 
-        void detachFromAllRenderTargets();
+        void detachFromAllRenderTargets( bool inDestructor );
+
+        virtual bool copyToImpl( DepthBuffer *destination ) = 0;
     };
 
     /** @} */

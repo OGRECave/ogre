@@ -212,52 +212,66 @@ namespace Ogre
                                                                 queuedRenderable );
 
         if( mShaderProfile == "hlsl" )
+        {
+            mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
+                                                mSetProperties, queuedRenderable );
             return retVal; //D3D embeds the texture slots in the shader.
+        }
 
         //Set samplers.
-        GpuProgramParametersSharedPtr vsParams = retVal->vertexShader->getDefaultParameters();
-        GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
-
-        int texUnit = 2; //Vertex shader consumes 2 slots with its two tbuffers.
-
         assert( dynamic_cast<const HlmsUnlitDatablock*>( queuedRenderable.renderable->getDatablock() ) );
         const HlmsUnlitDatablock *datablock = static_cast<const HlmsUnlitDatablock*>(
-                                                    queuedRenderable.renderable->getDatablock() );
+                                                queuedRenderable.renderable->getDatablock() );
 
-        UnlitBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
-        UnlitBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();
-
-        if( !getProperty( HlmsBaseProp::ShadowCaster ) )
+        if( !retVal->pixelShader.isNull() )
         {
-            int numTextures = 0;
-            int numArrayTextures = 0;
-            while( itor != end )
-            {
-                if( itor->texture->getTextureType() == TEX_TYPE_2D_ARRAY )
-                {
-                    psParams->setNamedConstant( "textureMapsArray[" +
-                                                StringConverter::toString( numArrayTextures++ ) + "]",
-                                                texUnit++ );
-                }
-                else
-                {
-                    psParams->setNamedConstant( "textureMaps[" +
-                                                StringConverter::toString( numTextures++ ) + "]",
-                                                texUnit++ );
-                }
+            GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
 
-                ++itor;
+            int texUnit = 2; //Vertex shader consumes 2 slots with its two tbuffers.
+
+            UnlitBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
+            UnlitBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();
+
+            if( !getProperty( HlmsBaseProp::ShadowCaster ) )
+            {
+                int numTextures = 0;
+                int numArrayTextures = 0;
+                while( itor != end )
+                {
+                    if( itor->texture->getTextureType() == TEX_TYPE_2D_ARRAY )
+                    {
+                        psParams->setNamedConstant( "textureMapsArray[" +
+                                                    StringConverter::toString( numArrayTextures++ ) +
+                                                    "]", texUnit++ );
+                    }
+                    else
+                    {
+                        psParams->setNamedConstant( "textureMaps[" +
+                                                    StringConverter::toString( numTextures++ ) + "]",
+                                                    texUnit++ );
+                    }
+
+                    ++itor;
+                }
             }
         }
 
+        GpuProgramParametersSharedPtr vsParams = retVal->vertexShader->getDefaultParameters();
         vsParams->setNamedConstant( "worldMatBuf", 0 );
         if( datablock->mNumEnabledAnimationMatrices )
             vsParams->setNamedConstant( "animationMatrixBuf", 1 );
 
+        mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
+                                            mSetProperties, queuedRenderable );
+
         mRenderSystem->_setProgramsFromHlms( retVal );
 
         mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vsParams, GPV_ALL );
-        mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
+        if( !retVal->pixelShader.isNull() )
+        {
+            GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
+            mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
+        }
 
         return retVal;
     }
@@ -659,7 +673,9 @@ namespace Ogre
             mListener->hlmsTypeChanged( casterPass, commandBuffer, datablock );
         }
 
-        if( mLastBoundPool != datablock->getAssignedPool() )
+        //Don't bind the material buffer on caster passes (important to keep
+        //MDI & auto-instancing running on shadow map passes)
+        if( mLastBoundPool != datablock->getAssignedPool() && !casterPass )
         {
             //layout(binding = 1) uniform MaterialBuf {} materialArray
             const ConstBufferPool::BufferPool *newPool = datablock->getAssignedPool();

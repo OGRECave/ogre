@@ -44,6 +44,8 @@ THE SOFTWARE.
 #include "OgreForward3D.h"
 //#include "OgreMovableObject.h"
 //#include "OgreRenderable.h"
+#include "OgreViewport.h"
+#include "OgreRenderTarget.h"
 
 #include "OgreHlmsListener.h"
 
@@ -83,6 +85,7 @@ namespace Ogre
     const IdString HlmsBaseProp::NumShadowMaps      = IdString( "hlms_num_shadow_maps" );
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
+    const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
     const IdString HlmsBaseProp::Forward3DDebug     = IdString( "hlms_forward3d_debug" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
@@ -297,13 +300,25 @@ namespace Ogre
             *it = p;
     }
     //-----------------------------------------------------------------------------------
-    int32 Hlms::getProperty(IdString key, int32 defaultVal ) const
+    int32 Hlms::getProperty( IdString key, int32 defaultVal ) const
     {
         HlmsProperty p( key, 0 );
         HlmsPropertyVec::const_iterator it = std::lower_bound( mSetProperties.begin(),
                                                                mSetProperties.end(),
                                                                p, OrderPropertyByIdString );
         if( it != mSetProperties.end() && it->keyName == p.keyName )
+            defaultVal = it->value;
+
+        return defaultVal;
+    }
+    //-----------------------------------------------------------------------------------
+    int32 Hlms::getProperty( const HlmsPropertyVec &properties, IdString key, int32 defaultVal )
+    {
+        HlmsProperty p( key, 0 );
+        HlmsPropertyVec::const_iterator it = std::lower_bound( properties.begin(),
+                                                               properties.end(),
+                                                               p, OrderPropertyByIdString );
+        if( it != properties.end() && it->keyName == p.keyName )
             defaultVal = it->value;
 
         return defaultVal;
@@ -1554,11 +1569,14 @@ namespace Ogre
                                                            ShaderFiles[i] );
                 }
 
+                String debugFilenameOutput;
+
                 if( mDebugOutput )
                 {
-                    std::ofstream outFile( (mOutputPath + "./" +
-                                           StringConverter::toString( finalHash ) +
-                                           ShaderFiles[i] + mShaderFileExt).c_str(),
+                    debugFilenameOutput = mOutputPath + "./" +
+                                            StringConverter::toString( finalHash ) +
+                                            ShaderFiles[i] + mShaderFileExt;
+                    std::ofstream outFile( debugFilenameOutput.c_str(),
                                            std::ios::out | std::ios::binary );
                     outFile.write( &outString[0], outString.size() );
                 }
@@ -1573,7 +1591,7 @@ namespace Ogre
                                 StringConverter::toString( finalHash ) + ShaderFiles[i],
                                 ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
                                 mShaderProfile, static_cast<GpuProgramType>(i) );
-                    gp->setSource( outString );
+                    gp->setSource( outString, debugFilenameOutput );
 
                     if( mShaderTargets[i] )
                     {
@@ -1757,6 +1775,40 @@ namespace Ogre
                 if( numPssmSplits )
                     numShadowMaps += numPssmSplits - 1;
                 setProperty( HlmsBaseProp::NumShadowMaps, numShadowMaps );
+
+                int usesDepthTextures = -1;
+
+                const CompositorChannelVec &shadowTextures = shadowNode->getLocalTextures();
+                for( size_t i=0; i<numShadowMaps; ++i )
+                {
+                    bool missmatch = false;
+
+                    if( PixelUtil::isDepth( shadowTextures[i].textures[0]->getFormat() ) )
+                    {
+                        missmatch = usesDepthTextures == 0;
+                        usesDepthTextures = 1;
+                    }
+                    else
+                    {
+                        missmatch = usesDepthTextures == 1;
+                        usesDepthTextures = 0;
+                    }
+
+                    if( missmatch )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                                     "Mixing depth textures with non-depth textures for "
+                                     "shadow mapping is not supported. Either all of "
+                                     "them are depth textures, or none of them are.\n"
+                                     "Shadow Node: '" + shadowNode->getName().getFriendlyText() + "'",
+                                     "Hlms::preparePassHash" );
+                    }
+                }
+
+                if( usesDepthTextures == -1 )
+                    usesDepthTextures = 0;
+
+                setProperty( HlmsBaseProp::ShadowUsesDepthTexture, usesDepthTextures );
             }
 
             Forward3D *forward3D = sceneManager->getForward3D();
@@ -1864,7 +1916,13 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsDirNonCaster,0 );
             setProperty( HlmsBaseProp::LightsPoint,       0 );
             setProperty( HlmsBaseProp::LightsSpot,        0 );
+
+            RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+            setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
+                         renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         }
+
+        mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 
         assert( mPassCache.size() < 32768 );
         HlmsPropertyVecVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(),
@@ -1891,8 +1949,7 @@ namespace Ogre
         uint32 hash[2];
         hash[0] = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                queuedRenderable.renderable->getHlmsHash();
-        hash[1] = passCache.hash &
-                        (queuedRenderable.movableObject->getCastShadows() ? 0xffffffff : 0xffffffe1 );
+        hash[1] = passCache.hash;
 
         //MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
 

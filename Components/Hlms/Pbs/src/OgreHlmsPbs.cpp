@@ -199,6 +199,8 @@ namespace Ogre
         ConstBufferPool( HlmsPbsDatablock::MaterialSizeInGpuAligned,
                          ConstBufferPool::ExtraBufferParams() ),
         mShadowmapSamplerblock( 0 ),
+        mShadowmapCmpSamplerblock( 0 ),
+        mCurrentShadowmapSamplerblock( 0 ),
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
@@ -238,22 +240,23 @@ namespace Ogre
             samplerblock.mW             = TAM_CLAMP;
             samplerblock.mBorderColour  = ColourValue::White;
 
-            if( mShaderProfile == "hlsl" )
+            if( mShaderProfile != "hlsl" )
             {
-                samplerblock.mMinFilter     = FO_LINEAR;
-                samplerblock.mMagFilter     = FO_LINEAR;
-                samplerblock.mMipFilter     = FO_NONE;
-                samplerblock.mCompareFunction   = CMPF_LESS_EQUAL;
-            }
-            else
-            {
-                samplerblock.mMinFilter     = FO_POINT;
-                samplerblock.mMagFilter     = FO_POINT;
-                samplerblock.mMipFilter     = FO_NONE;
+                samplerblock.mMinFilter = FO_POINT;
+                samplerblock.mMagFilter = FO_POINT;
+                samplerblock.mMipFilter = FO_NONE;
+
+                if( !mShadowmapSamplerblock )
+                    mShadowmapSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
             }
 
-            if( !mShadowmapSamplerblock )
-                mShadowmapSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
+            samplerblock.mMinFilter     = FO_LINEAR;
+            samplerblock.mMagFilter     = FO_LINEAR;
+            samplerblock.mMipFilter     = FO_NONE;
+            samplerblock.mCompareFunction   = CMPF_LESS_EQUAL;
+
+            if( !mShadowmapCmpSamplerblock )
+                mShadowmapCmpSamplerblock = mHlmsManager->getSamplerblock( samplerblock );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -266,55 +269,69 @@ namespace Ogre
                                                                 queuedRenderable );
 
         if( mShaderProfile == "hlsl" )
+        {
+            mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
+                                                mSetProperties, queuedRenderable );
             return retVal; //D3D embeds the texture slots in the shader.
+        }
 
         //Set samplers.
+        if( !retVal->pixelShader.isNull() )
+        {
+            GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
+
+            int texUnit = 1; //Vertex shader consumes 1 slot with its tbuffer.
+
+            //Forward3D consumes 2 more slots.
+            if( mGridBuffer )
+            {
+                psParams->setNamedConstant( "f3dGrid",      1 );
+                psParams->setNamedConstant( "f3dLightList", 2 );
+                texUnit += 2;
+            }
+
+            if( !mPreparedPass.shadowMaps.empty() )
+            {
+                vector<int>::type shadowMaps;
+                shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
+                for( size_t i=0; i<mPreparedPass.shadowMaps.size(); ++i )
+                    shadowMaps.push_back( texUnit++ );
+
+                psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
+            }
+
+            assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
+            const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
+                                                        queuedRenderable.renderable->getDatablock() );
+
+            int numTextures = getProperty( PbsProperty::NumTextures );
+            for( int i=0; i<numTextures; ++i )
+            {
+                psParams->setNamedConstant( "textureMaps[" + StringConverter::toString( i ) + "]",
+                                            texUnit++ );
+            }
+
+            if( getProperty( PbsProperty::EnvProbeMap ) )
+            {
+                assert( !datablock->getTexture( PBSM_REFLECTION ).isNull() );
+                psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
+            }
+        }
+
         GpuProgramParametersSharedPtr vsParams = retVal->vertexShader->getDefaultParameters();
-        GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
-
-        int texUnit = 1; //Vertex shader consumes 1 slot with its tbuffer.
-
-        //Forward3D consumes 2 more slots.
-        if( mGridBuffer )
-        {
-            psParams->setNamedConstant( "f3dGrid",      1 );
-            psParams->setNamedConstant( "f3dLightList", 2 );
-            texUnit += 2;
-        }
-
-        if( !mPreparedPass.shadowMaps.empty() )
-        {
-            vector<int>::type shadowMaps;
-            shadowMaps.reserve( mPreparedPass.shadowMaps.size() );
-            for( size_t i=0; i<mPreparedPass.shadowMaps.size(); ++i )
-                shadowMaps.push_back( texUnit++ );
-
-            psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
-        }
-
-        assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
-        const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
-                                                    queuedRenderable.renderable->getDatablock() );
-
-        int numTextures = getProperty( PbsProperty::NumTextures );
-        for( int i=0; i<numTextures; ++i )
-        {
-            psParams->setNamedConstant( "textureMaps[" + StringConverter::toString( i ) + "]",
-                                        texUnit++ );
-        }
-
-        if( getProperty( PbsProperty::EnvProbeMap ) )
-        {
-            assert( !datablock->getTexture( PBSM_REFLECTION ).isNull() );
-            psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
-        }
-
         vsParams->setNamedConstant( "worldMatBuf", 0 );
+
+        mListener->shaderCacheEntryCreated( mShaderProfile, retVal, passCache,
+                                            mSetProperties, queuedRenderable );
 
         mRenderSystem->_setProgramsFromHlms( retVal );
 
         mRenderSystem->bindGpuProgramParameters( GPT_VERTEX_PROGRAM, vsParams, GPV_ALL );
-        mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
+        if( !retVal->pixelShader.isNull() )
+        {
+            GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
+            mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM, psParams, GPV_ALL );
+        }
 
         return retVal;
     }
@@ -893,6 +910,11 @@ namespace Ogre
 
         mLastBoundPool = 0;
 
+        if( mShadowmapSamplerblock && !getProperty( HlmsBaseProp::ShadowUsesDepthTexture ) )
+            mCurrentShadowmapSamplerblock = mShadowmapSamplerblock;
+        else
+            mCurrentShadowmapSamplerblock = mShadowmapCmpSamplerblock;
+
         uploadDirtyDatablocks();
 
         return retVal;
@@ -966,7 +988,7 @@ namespace Ogre
                 while( itor != end )
                 {
                     *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, itor->get(),
-                                                                         mShadowmapSamplerblock );
+                                                                         mCurrentShadowmapSamplerblock );
                     ++texUnit;
                     ++itor;
                 }
@@ -995,7 +1017,9 @@ namespace Ogre
             mListener->hlmsTypeChanged( casterPass, commandBuffer, datablock );
         }
 
-        if( mLastBoundPool != datablock->getAssignedPool() )
+        //Don't bind the material buffer on caster passes (important to keep
+        //MDI & auto-instancing running on shadow map passes)
+        if( mLastBoundPool != datablock->getAssignedPool() && !casterPass )
         {
             //layout(binding = 1) uniform MaterialBuf {} materialArray
             const ConstBufferPool::BufferPool *newPool = datablock->getAssignedPool();

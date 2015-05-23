@@ -54,6 +54,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
+#include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopyDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
@@ -6219,7 +6220,9 @@ namespace Ogre{
         TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::BoolUndefined;
         bool fsaa = true;
         bool fsaaExplicitResolve = false;
-        uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
+        uint16 depthBufferId = DepthBuffer::POOL_INVALID;
+        PixelFormat depthBufferFormat = PF_UNKNOWN;
+        bool preferDepthTexture = false;
         Ogre::PixelFormatList formats;
 
         while (atomIndex < prop->values.size())
@@ -6311,6 +6314,28 @@ namespace Ogre{
                     depthBufferId = StringConverter::parseInt(atom->value);
                 }
                 break;
+            case ID_DEPTH_TEXTURE:
+                preferDepthTexture = true;
+                break;
+            case ID_DEPTH_FORMAT:
+                {
+                    // advance to next to get the ID
+                    it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+                    if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    atom = (AtomAbstractNode*)(*it).get();
+
+                    depthBufferFormat = PixelUtil::getFormatFromName(atom->value, false);
+                    if( depthBufferFormat == PF_UNKNOWN )
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                }
+                break;
             default:
                 if (StringConverter::isNumber(atom->value))
                 {
@@ -6333,7 +6358,7 @@ namespace Ogre{
                 else
                 {
                     // pixel format?
-                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, true);
+                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, false);
                     if (format == PF_UNKNOWN)
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -6341,6 +6366,14 @@ namespace Ogre{
                     }
                     formats.push_back(format);
                     formatSet = true;
+
+                    if( depthBufferId == DepthBuffer::POOL_INVALID )
+                    {
+                        if( PixelUtil::isDepth( format ) )
+                            depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else
+                            depthBufferId = DepthBuffer::POOL_DEFAULT;
+                    }
                 }
 
             }
@@ -6362,6 +6395,8 @@ namespace Ogre{
         td->fsaa            = fsaa;
         td->hwGammaWrite    = hwGammaWrite;
         td->depthBufferId   = depthBufferId;
+        td->depthBufferFormat   = depthBufferFormat;
+        td->preferDepthTexture  = preferDepthTexture;
         td->fsaaExplicitResolve = fsaaExplicitResolve;
     }
 
@@ -6764,7 +6799,9 @@ namespace Ogre{
         bool widthSet = false, heightSet = false, formatSet = false;
         bool hwGammaWrite = false;
         uint fsaa = 0;
-        uint16 depthBufferId = DepthBuffer::POOL_DEFAULT;
+        bool preferDepthTexture = false;
+        uint16 depthBufferId = DepthBuffer::POOL_INVALID;
+        PixelFormat depthBufferFormat = PF_UNKNOWN;
         Ogre::PixelFormatList formats;
         int lightIdx = ~0;
         size_t splitIdx = 0;
@@ -6839,6 +6876,28 @@ namespace Ogre{
                         return;
                     }
                     if( !getUInt( *it, &fsaa ) )
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                }
+                break;
+            case ID_DEPTH_TEXTURE:
+                preferDepthTexture = true;
+                break;
+            case ID_DEPTH_FORMAT:
+                {
+                    // advance to next to get the ID
+                    it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+                    if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    atom = (AtomAbstractNode*)(*it).get();
+
+                    depthBufferFormat = PixelUtil::getFormatFromName(atom->value, false);
+                    if( depthBufferFormat == PF_UNKNOWN )
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                         return;
@@ -6924,7 +6983,7 @@ namespace Ogre{
                 else
                 {
                     // pixel format or optional name?
-                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, true);
+                    PixelFormat format = PixelUtil::getFormatFromName(atom->value, false);
                     if (format == PF_UNKNOWN)
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -6934,6 +6993,14 @@ namespace Ogre{
                     {
                         formats.push_back(format);
                         formatSet = true;
+                    }
+
+                    if( depthBufferId == DepthBuffer::POOL_INVALID )
+                    {
+                        if( PixelUtil::isDepth( format ) )
+                            depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else
+                            depthBufferId = DepthBuffer::POOL_DEFAULT;
                     }
                 }
 
@@ -6955,7 +7022,9 @@ namespace Ogre{
         td->formatList      = formats;
         td->fsaa            = fsaa;
         td->hwGammaWrite    = hwGammaWrite;
+        td->preferDepthTexture= preferDepthTexture;
         td->depthBufferId   = depthBufferId;
+        td->depthBufferFormat=depthBufferFormat;
 
         td->pssmLambda      = defaultParams.pssmLambda;
         td->splitPadding    = defaultParams.splitPadding;
@@ -7489,6 +7558,90 @@ namespace Ogre{
                 }
             }
         }
+    }
+
+    void CompositorPassTranslator::translateDepthCopy( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                                       CompositorTargetDef *targetDef )
+    {
+        mPassDef = targetDef->addPass( PASS_DEPTHCOPY );
+        CompositorPassDepthCopyDef *passDepthCopy = static_cast<CompositorPassDepthCopyDef*>( mPassDef );
+
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        obj->context = Any(mPassDef);
+
+        String srcTextureName;
+        String dstTextureName;
+
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_OBJECT)
+            {
+                processNode(compiler, *i);
+            }
+            else if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                switch(prop->id)
+                {
+                case ID_ALIAS_ON_COPY_FAILURE:
+                    {
+                        if(prop->values.size() != 1)
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+                                               "Boolean value expected");
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getBoolean( *it0, &passDepthCopy->mAliasDepthBufferOnCopyFailure ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_IN:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getString( *it0, &srcTextureName ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_OUT:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getString( *it0, &dstTextureName ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_IDENTIFIER:
+                case ID_NUM_INITIAL:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
+                    break;
+                default:
+                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
+                        "token \"" + prop->name + "\" is not recognized");
+                }
+            }
+        }
+
+        passDepthCopy->setDepthTextureCopy( srcTextureName, dstTextureName );
     }
 
     void CompositorPassTranslator::translateQuad(ScriptCompiler *compiler, const AbstractNodePtr &node,
@@ -8202,6 +8355,8 @@ namespace Ogre{
             translateQuad( compiler, node, target );
         else if(obj->name == "render_scene")
             translateScene( compiler, node, target );
+        else if(obj->name == "depth_copy")
+            translateDepthCopy( compiler, node, target );
         else if(obj->name == "uav_queue")
             translateUav( compiler, node, target );
         else if(obj->name == "custom")

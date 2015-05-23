@@ -97,7 +97,7 @@ namespace Ogre {
                 return mTextureID;
             }
 
-        void getCustomAttribute(const String& name, void* pData);
+        virtual void getCustomAttribute(const String& name, void* pData);
 
     protected:
         /// @copydoc Texture::createInternalResourcesImpl
@@ -127,8 +127,6 @@ namespace Ogre {
         */
         LoadedImages mLoadedImages;
 
-
-    private:
         GLuint mTextureID;
         GL3PlusSupport& mGLSupport;
 

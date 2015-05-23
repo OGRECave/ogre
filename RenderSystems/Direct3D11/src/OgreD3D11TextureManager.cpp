@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreD3D11TextureManager.h"
 #include "OgreD3D11Texture.h"
+#include "OgreD3D11DepthTexture.h"
 #include "OgreRoot.h"
 #include "OgreLogManager.h"
 #include "OgreD3D11RenderSystem.h"
@@ -54,6 +55,14 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, const NameValuePairList* createParams)
     {
+        if( createParams && createParams->find( "DepthTexture" ) != createParams->end() )
+        {
+            const bool shareableDepthBuffer = createParams->find( "shareableDepthBuffer" ) !=
+                                                                            createParams->end();
+            return new D3D11DepthTexture( shareableDepthBuffer, this, name, handle, group,
+                                          isManual, loader, mDevice );
+        }
+
         return new D3D11Texture(this, name, handle, group, isManual, loader, mDevice); 
     }
     //---------------------------------------------------------------------

@@ -135,7 +135,7 @@ namespace Ogre {
         /// 64-bit, 2-channel floating point pixel format, 32-bit green, 32-bit red
         PF_FLOAT32_GR = 36,
         /// Depth texture format
-        PF_DEPTH = 29,
+        PF_DEPTH_DEPRECATED = 29,
         /// 64-bit pixel format, 16 bits for red, green, blue and alpha
         PF_SHORT_RGBA = 30,
         /// 32-bit pixel format, 16-bit green, 16-bit red
@@ -256,8 +256,48 @@ namespace Ogre {
         PF_ATC_RGBA_EXPLICIT_ALPHA = 93,
         /// ATC (AMD_compressed_ATC_texture)
         PF_ATC_RGBA_INTERPOLATED_ALPHA = 94,
+
+        /// Depth texture format. 24 bits for depth, 8 bits for stencil.
+        /// The following formats are just reinterpretations of the same depth buffer:
+        ///  24-bit normalized uint depth and 8-bit stencil
+        ///     * PF_D24_UNORM_S8_UINT
+        ///     * PF_D24_UNORM_X8
+        ///     * PF_X24_S8_UINT
+        /// 24-bit normalized uint depth
+        ///     * PF_D24_UNORM
+        ///  16-bit normalized uint depth
+        ///     * PF_D16_UNORM
+        ///  32-bit floating point depth
+        ///     * PF_D32_FLOAT
+        ///  32-bit floating point depth & 8-bit stencil (+24 unused bits)
+        ///     * PF_D32_FLOAT_X24_S8_UINT
+        ///     * PF_D32_FLOAT_X24_X8
+        ///     * PF_X32_X24_S8_UINT
+        ///
+        /// This means that e.g. a PF_D24_UNORM_X8 and a PF_D24_UNORM_S8_UINT
+        /// may or may not internally point to the same depth buffer. Use depth buffer
+        /// pools if you want a guarantee that they use different buffers.
+        /// Last but not least, not all GPUs support all these formats.
+        PF_D24_UNORM_S8_UINT = 95,
+        /// Depth texture format. 24 bits for depth.
+        PF_D24_UNORM_X8 = 96,
+        /// Depth texture format. 8 bits for stencil.
+        PF_X24_S8_UINT = 97,
+        /// Depth texture format 24 bits for depth.
+        PF_D24_UNORM = 98,
+        /// Depth texture format. 16 bits for depth.
+        PF_D16_UNORM = 99,
+        /// Depth texture format. 32 bits for depth.
+        PF_D32_FLOAT = 100,
+        /// Depth texture format. 32 bits for depth. 8 bits for stencil
+        PF_D32_FLOAT_X24_S8_UINT = 101,
+        /// Depth texture format. 32 bits for depth.
+        PF_D32_FLOAT_X24_X8 = 102,
+        /// Depth texture format. 8 bits for stencil
+        PF_X32_X24_S8_UINT = 103,
+
         // Number of pixel formats currently defined
-        PF_COUNT = 95
+        PF_COUNT = 104
     };
     typedef vector<PixelFormat>::type PixelFormatList;
 

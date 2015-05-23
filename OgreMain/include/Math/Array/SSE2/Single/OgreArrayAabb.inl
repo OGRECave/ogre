@@ -166,14 +166,16 @@ namespace Ogre
         z = _mm_madd_ps( Mathlib::Abs4( m.mChunkBase[9] ), mHalfSize.mChunkBase[1], z );            // abs( m21 ) * y +
         z = _mm_madd_ps( Mathlib::Abs4( m.mChunkBase[8] ), mHalfSize.mChunkBase[0], z );            // abs( m20 ) * x
 
-        //Handle infinity boxes not becoming NaN. Null boxes containing -Inf will still have NaNs
-        //(which is ok since we need them to say 'false' to intersection tests)
-        x = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, x,
-                                    _mm_cmpeq_ps( mHalfSize.mChunkBase[0], MathlibSSE2::INFINITEA ) );
-        y = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, y,
-                                    _mm_cmpeq_ps( mHalfSize.mChunkBase[1], MathlibSSE2::INFINITEA ) );
-        z = MathlibSSE2::CmovRobust( MathlibSSE2::INFINITEA, z,
-                                    _mm_cmpeq_ps( mHalfSize.mChunkBase[2], MathlibSSE2::INFINITEA ) );
+        //Handle infinity & null boxes becoming NaN; leaving the original value instead.
+        x = MathlibSSE2::CmovRobust( mHalfSize.mChunkBase[0], x,
+                                     _mm_cmpeq_ps( Mathlib::Abs4(mHalfSize.mChunkBase[0]),
+                                                   Mathlib::INFINITEA ) );
+        y = MathlibSSE2::CmovRobust( mHalfSize.mChunkBase[1], y,
+                                     _mm_cmpeq_ps( Mathlib::Abs4(mHalfSize.mChunkBase[1]),
+                                                   Mathlib::INFINITEA ) );
+        z = MathlibSSE2::CmovRobust( mHalfSize.mChunkBase[2], z,
+                                     _mm_cmpeq_ps( Mathlib::Abs4(mHalfSize.mChunkBase[2]),
+                                                   Mathlib::INFINITEA ) );
 
         mHalfSize = ArrayVector3( x, y, z );
     }

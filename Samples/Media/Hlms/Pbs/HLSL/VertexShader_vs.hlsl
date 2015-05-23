@@ -63,7 +63,7 @@ Buffer<float4> worldMatBuf : register(t0);
 	worldPos.x = dot( worldMat[0], input.vertex );
 	worldPos.y = dot( worldMat[1], input.vertex );
 	worldPos.z = dot( worldMat[2], input.vertex );
-	worldPos *= input.blendWeights[0];
+	worldPos.xyz *= input.blendWeights[0];
 	@property( hlms_normal || hlms_qtangent )float3 worldNorm;
 	worldNorm.x = dot( worldMat[0].xyz, normal );
 	worldNorm.y = dot( worldMat[1].xyz, normal );
@@ -76,7 +76,8 @@ Buffer<float4> worldMatBuf : register(t0);
 	worldTang *= input.blendWeights[0];@end
 
 	@psub( NeedsMoreThan1BonePerVertex, hlms_bones_per_vertex, 1 )
-	@property( NeedsMoreThan1BonePerVertex )float4 tmp;@end
+	@property( NeedsMoreThan1BonePerVertex )float4 tmp;
+	tmp.w = 1.0;@end //!NeedsMoreThan1BonePerVertex
 	@foreach( hlms_bones_per_vertex, n, 1 )
 	_idx = (input.blendIndices[@n] << 1u) + input.blendIndices[@n]; //blendIndices[@n] * 3; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
 		worldMat[0] = worldMatBuf.Load( int(matStart + _idx + 0u) );
@@ -85,7 +86,7 @@ Buffer<float4> worldMatBuf : register(t0);
 	tmp.x = dot( worldMat[0], input.vertex );
 	tmp.y = dot( worldMat[1], input.vertex );
 	tmp.z = dot( worldMat[2], input.vertex );
-	worldPos += tmp * input.blendWeights[@n];
+	worldPos.xyz += (tmp * input.blendWeights[@n]).xyz;
 	@property( hlms_normal || hlms_qtangent )
 	tmp.x = dot( worldMat[0].xyz, normal );
 	tmp.y = dot( worldMat[1].xyz, normal );
@@ -98,8 +99,8 @@ Buffer<float4> worldMatBuf : register(t0);
 	worldTang += tmp.xyz * input.blendWeights[@n];@end
 	@end
 
-    worldPos.w = 1.0;
-@end @end
+	worldPos.w = 1.0;
+@end @end  //SkeletonTransform // !hlms_skeleton
 
 @property( hlms_skeleton )
 	@piece( worldViewMat )passBuf.view@end
@@ -164,20 +165,23 @@ PS_INPUT main( VS_INPUT input )
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n.z = (outVs.posL@n.z - passBuf.shadowRcv[@n].shadowDepthRange.x) * passBuf.shadowRcv[@n].shadowDepthRange.y;@end
+	outVs.posL@n.z = outVs.posL@n.z * passBuf.shadowRcv[@n].shadowDepthRange.y;@end
 
 @property( hlms_pssm_splits )	outVs.depth = outVs.gl_Position.z;@end
 
 	outVs.drawId = input.drawId;
 @end @property( hlms_shadowcaster )
 	float shadowConstantBias = asfloat( worldMaterialIdx[input.drawId].y );
-	//Linear depth
-	outVs.depth	= (outVs.gl_Position.z - passBuf.depthRange.x + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
-
+	
+	@property( !hlms_shadow_uses_depth_texture )
+		//Linear depth
+		outVs.depth	= (outVs.gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y;
+	@end
+		
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
-	outVs.gl_Position.z = outVs.gl_Position.z * (outVs.gl_Position.w * passBuf.depthRange.y);
+	outVs.gl_Position.z = (outVs.gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y * outVs.gl_Position.w;
 @end
 	@insertpiece( custom_vs_posExecution )
 

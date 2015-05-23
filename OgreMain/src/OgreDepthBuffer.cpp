@@ -28,34 +28,40 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreDepthBuffer.h"
 #include "OgreRenderTarget.h"
+#include "OgreRenderSystem.h"
 
 namespace Ogre
 {
+    PixelFormat DepthBuffer::DefaultDepthBufferFormat = PF_D24_UNORM_S8_UINT;
+
     DepthBuffer::DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
-                              uint32 fsaa, const String &fsaaHint, bool manual ) :
+                              uint32 fsaa, const String &fsaaHint, PixelFormat pixelFormat,
+                              bool isDepthTexture, bool manual, RenderSystem *renderSystem ) :
                 mPoolId(poolId),
                 mBitDepth(bitDepth),
                 mWidth(width),
                 mHeight(height),
                 mFsaa(fsaa),
                 mFsaaHint(fsaaHint),
-                mManual(manual)
+                mFormat(pixelFormat),
+                mDepthTexture(isDepthTexture),
+                mManual(manual),
+                mRenderSystem(renderSystem)
     {
     }
 
     DepthBuffer::~DepthBuffer()
     {
-        detachFromAllRenderTargets();
+        detachFromAllRenderTargets( true );
     }
 
     void DepthBuffer::_setPoolId( uint16 poolId )
     {
+        //Can't have Render Targets attached to us, because they have a different pool Id
+        assert( mAttachedRenderTargets.empty() );
+
         //Change the pool Id
         mPoolId = poolId;
-
-        //Render Targets were attached to us, but they have a different pool Id,
-        //so detach ourselves from them
-        detachFromAllRenderTargets();
     }
     //-----------------------------------------------------------------------
     uint16 DepthBuffer::getPoolId() const
@@ -88,21 +94,57 @@ namespace Ogre
         return mFsaaHint;
     }
     //-----------------------------------------------------------------------
+    PixelFormat DepthBuffer::getFormat() const
+    {
+        return mFormat;
+    }
+    //-----------------------------------------------------------------------
+    bool DepthBuffer::isDepthTexture() const
+    {
+        return mDepthTexture;
+    }
+    //-----------------------------------------------------------------------
     bool DepthBuffer::isManual() const
     {
         return mManual;
     }
     //-----------------------------------------------------------------------
-    bool DepthBuffer::isCompatible( RenderTarget *renderTarget ) const
+    bool DepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
     {
         if( this->getWidth() >= renderTarget->getWidth() &&
             this->getHeight() >= renderTarget->getHeight() &&
-            this->getFsaa() == renderTarget->getFSAA() )
+            this->getFsaa() == renderTarget->getFSAA() &&
+            mDepthTexture == renderTarget->prefersDepthTexture() &&
+            ((!exactFormatMatch && mFormat == PF_D24_UNORM_S8_UINT) ||
+             mFormat == renderTarget->getDesiredDepthBufferFormat()) )
         {
             return true;
         }
 
         return false;
+    }
+    //-----------------------------------------------------------------------
+    bool DepthBuffer::copyTo( DepthBuffer *destination )
+    {
+        if( this->getWidth() != destination->getWidth() ||
+            this->getHeight() != destination->getHeight() ||
+            this->getFsaa() != destination->getFsaa() ||
+            this->getFsaaHint() != destination->getFsaaHint() ||
+            this->getFormat() != destination->getFormat() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Source and destination must be of the same resolution, format & FSAA settings",
+                         "DepthBuffer::copyTo" );
+        }
+
+        if( this == destination )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Source and destination must be different Depth Buffers",
+                         "DepthBuffer::copyTo" );
+        }
+
+        return copyToImpl( destination );
     }
     //-----------------------------------------------------------------------
     void DepthBuffer::_notifyRenderTargetAttached( RenderTarget *renderTarget )
@@ -118,9 +160,12 @@ namespace Ogre
         assert( itor != mAttachedRenderTargets.end() );
 
         mAttachedRenderTargets.erase( itor );
+
+        if( mAttachedRenderTargets.empty() && mPoolId == DepthBuffer::POOL_NON_SHAREABLE )
+            mRenderSystem->_destroyDepthBuffer( this );
     }
     //-----------------------------------------------------------------------
-    void DepthBuffer::detachFromAllRenderTargets()
+    void DepthBuffer::detachFromAllRenderTargets( bool inDestructor )
     {
         RenderTargetSet::const_iterator itor = mAttachedRenderTargets.begin();
         RenderTargetSet::const_iterator end  = mAttachedRenderTargets.end();
@@ -132,5 +177,8 @@ namespace Ogre
         }
 
         mAttachedRenderTargets.clear();
+
+        if( !inDestructor && mPoolId == DepthBuffer::POOL_NON_SHAREABLE )
+            mRenderSystem->_destroyDepthBuffer( this );
     }
 }

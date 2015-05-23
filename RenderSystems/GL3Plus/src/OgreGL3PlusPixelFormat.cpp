@@ -46,8 +46,18 @@ namespace Ogre  {
     {
         switch(format)
         {
-        case PF_DEPTH:
+        case PF_DEPTH_DEPRECATED:
+        case PF_D24_UNORM:
+        case PF_D16_UNORM:
+        case PF_D32_FLOAT:
             return GL_DEPTH_COMPONENT;
+        case PF_D24_UNORM_S8_UINT:
+        case PF_D24_UNORM_X8:
+        case PF_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
+        case PF_X32_X24_S8_UINT:
+            return GL_DEPTH_STENCIL;
         case PF_A8:
         case PF_L8:
         case PF_L16:
@@ -174,8 +184,19 @@ namespace Ogre  {
     {
         switch(format)
         {
-        case PF_DEPTH:
-            return GL_UNSIGNED_INT;
+        case PF_DEPTH_DEPRECATED:
+        case PF_D24_UNORM:
+        case PF_D16_UNORM:
+        case PF_D32_FLOAT:
+            return GL_DEPTH_COMPONENT;
+        case PF_D24_UNORM_S8_UINT:
+        case PF_D24_UNORM_X8:
+        case PF_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
+        case PF_X32_X24_S8_UINT:
+            return GL_DEPTH_STENCIL;
+
         case PF_BYTE_LA:
         case PF_A8:
         case PF_L8:
@@ -285,8 +306,22 @@ namespace Ogre  {
     {
         switch(format)
         {
-        case PF_DEPTH:
+        case PF_DEPTH_DEPRECATED:
             return GL_DEPTH_COMPONENT16;
+        case PF_D24_UNORM_S8_UINT:
+        case PF_D24_UNORM_X8:
+        case PF_X24_S8_UINT:
+            return GL_DEPTH24_STENCIL8;
+        case PF_D24_UNORM:
+            return GL_DEPTH_COMPONENT24;
+        case PF_D16_UNORM:
+            return GL_DEPTH_COMPONENT16;
+        case PF_D32_FLOAT:
+            return GL_DEPTH_COMPONENT32F;
+        case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
+        case PF_X32_X24_S8_UINT:
+            return GL_DEPTH32F_STENCIL8;
         case PF_L8:
         case PF_A8:
             return GL_R8;
@@ -575,18 +610,24 @@ namespace Ogre  {
         switch(format)
         {
         case GL_DEPTH_COMPONENT16:
+            return PF_D16_UNORM;
         case GL_DEPTH_COMPONENT24:
+            return PF_D24_UNORM;
         case GL_DEPTH_COMPONENT32:
         case GL_DEPTH_COMPONENT32F:
+            return PF_D32_FLOAT;
         case GL_DEPTH_COMPONENT:
-            return PF_DEPTH;
+        case GL_DEPTH24_STENCIL8:
+            return PF_D24_UNORM_S8_UINT;
+        case GL_DEPTH32F_STENCIL8:
+            return PF_D32_FLOAT_X24_S8_UINT;
         case GL_R8:
             return PF_L8;
         case GL_R16:
             return PF_L16;
         case GL_RG: //TODO Is there a better OGRE format?
         case GL_RG8:
-            return PF_BYTE_LA;
+            return PF_RG8;
         case GL_R3_G3_B2:
             return PF_R3G3B2;
         case GL_RGB5_A1:
