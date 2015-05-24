@@ -89,6 +89,8 @@ namespace Ogre
             break;
         }
 
+        mParentNodeDef->postInitializePassDef( retVal );
+
         mCompositorPasses.push_back( retVal );
         
         return retVal;

@@ -138,6 +138,8 @@ namespace Ogre
         virtual IdString addTextureSourceName( const String &name, size_t index,
                                                 TextureSource textureSource );
 
+        virtual void postInitializePassDef( CompositorPassDef *passDef );
+
         void setDefaultTechnique( ShadowMapTechniques techn )   { mDefaultTechnique = techn; }
 
         /** Reserves enough memory for all texture definitions
