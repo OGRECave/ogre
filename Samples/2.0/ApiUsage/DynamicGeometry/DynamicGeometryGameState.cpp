@@ -94,25 +94,30 @@ namespace Demo
         Ogre::RenderSystem *renderSystem = root->getRenderSystem();
         Ogre::VaoManager *vaoManager = renderSystem->getVaoManager();
 
+        //Create the mesh
         Ogre::MeshPtr mesh = Ogre::MeshManager::getSingleton().createManual(
                     partialMesh ? "My PartialMesh" : "My StaticMesh",
                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
 
+        //Create one submesh
         Ogre::SubMesh *subMesh = mesh->createSubMesh();
 
+        //Vertex declaration
         Ogre::VertexElement2Vec vertexElements;
         vertexElements.push_back( Ogre::VertexElement2( Ogre::VET_FLOAT3, Ogre::VES_POSITION ) );
         vertexElements.push_back( Ogre::VertexElement2( Ogre::VET_FLOAT3, Ogre::VES_NORMAL ) );
 
-        //For immutable buffers, it is mandatory that cubeVertices isn't a null pointer.
+        //For immutable buffers, it is mandatory that cubeVertices is not a null pointer.
         CubeVertices *cubeVertices = reinterpret_cast<CubeVertices*>( OGRE_MALLOC_SIMD(
                                                                           sizeof(CubeVertices) * 8,
                                                                           Ogre::MEMCATEGORY_GEOMETRY ) );
+        //Fill the data.
         memcpy( cubeVertices, c_originalVertices, sizeof(CubeVertices) * 8 );
 
         Ogre::VertexBufferPacked *vertexBuffer = 0;
         try
         {
+            //Create the actual vertex buffer.
             vertexBuffer = vaoManager->createVertexBuffer( vertexElements, 8,
                                                            partialMesh ? Ogre::BT_DEFAULT :
                                                                          Ogre::BT_IMMUTABLE,
@@ -125,13 +130,15 @@ namespace Demo
             throw e;
         }
 
-        //Now the Vao
+        //Now the Vao. We'll just use one vertex buffer source (multi-source not working yet)
         Ogre::VertexBufferPackedVec vertexBuffers;
         vertexBuffers.push_back( vertexBuffer );
-        Ogre::IndexBufferPacked *indexBuffer = createIndexBuffer();
+        Ogre::IndexBufferPacked *indexBuffer = createIndexBuffer(); //Create the actual index buffer
         Ogre::VertexArrayObject *vao = vaoManager->createVertexArrayObject(
                     vertexBuffers, indexBuffer, Ogre::v1::RenderOperation::OT_TRIANGLE_LIST );
 
+        //Each Vao pushed to the vector refers to an LOD level.
+        //Must be in sync with mesh->mLodValues & mesh->mNumLods if you use more than one level
         subMesh->mVao.push_back( vao );
 
         //Set the bounds to get frustum culling and LOD to work correctly.
@@ -158,7 +165,7 @@ namespace Demo
         vertexElements.push_back( Ogre::VertexElement2( Ogre::VET_FLOAT3, Ogre::VES_POSITION ) );
         vertexElements.push_back( Ogre::VertexElement2( Ogre::VET_FLOAT3, Ogre::VES_NORMAL ) );
 
-        //Pass cubeVertices to have initialized values. However you can safely pass a null pointer.
+        //Pass cubeVertices to have initialized values. However you can safely use a null pointer.
         CubeVertices cubeVertices[8];
         memcpy( cubeVertices, c_originalVertices, sizeof(CubeVertices) * 8 );
 
@@ -185,6 +192,7 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void DynamicGeometryGameState::createScene01(void)
     {
+        //Create all four types of meshes.
         mStaticMesh  = createStaticMesh( false );
         mPartialMesh = createStaticMesh( true );
 
@@ -196,6 +204,7 @@ namespace Demo
             mDynamicVertexBuffer[i] = dynamicMesh.second;
         }
 
+        //Initialize the scene (items)
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
         Ogre::Item *item = sceneManager->createItem( mStaticMesh, Ogre::SCENE_DYNAMIC );
