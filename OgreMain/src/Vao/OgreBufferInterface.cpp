@@ -38,7 +38,7 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void BufferInterface::upload( void *data, size_t elementStart, size_t elementCount )
+    void BufferInterface::upload( const void *data, size_t elementStart, size_t elementCount )
     {
         if( mBuffer->mBufferType >= BT_DYNAMIC_DEFAULT )
         {

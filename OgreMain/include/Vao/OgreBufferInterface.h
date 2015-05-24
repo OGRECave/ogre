@@ -45,7 +45,7 @@ namespace Ogre
         BufferInterface();
         virtual ~BufferInterface() {}
 
-        void upload( void *data, size_t elementStart, size_t elementCount );
+        void upload( const void *data, size_t elementStart, size_t elementCount );
 
         virtual DECL_MALLOC void* map( size_t elementStart, size_t elementCount,
                                        MappingState prevMappingState, bool advanceFrame = true ) = 0;

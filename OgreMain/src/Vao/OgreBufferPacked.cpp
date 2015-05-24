@@ -111,7 +111,7 @@ namespace Ogre
         return mVaoManager->createAsyncTicket( this, stagingBuffer, elementStart, elementCount );
     }
     //-----------------------------------------------------------------------------------
-    void BufferPacked::upload( void *data, size_t elementStart, size_t elementCount )
+    void BufferPacked::upload( const void *data, size_t elementStart, size_t elementCount )
     {
         if( mBufferType == BT_IMMUTABLE )
         {
