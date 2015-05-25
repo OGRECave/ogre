@@ -94,6 +94,17 @@ namespace Ogre
         /// Node this SkeletonInstance is attached to (so we can work in world space)
         Node                    *mParentNode;
 
+        struct SceneNodeBonePair
+        {
+            Bone        *boneChild;
+            SceneNode   *sceneNodeParent;
+            SceneNodeBonePair( Bone *_boneChild, SceneNode *_sceneNodeParent ) :
+                boneChild( _boneChild ), sceneNodeParent( _sceneNodeParent ) {}
+        };
+        typedef vector<SceneNodeBonePair>::type SceneNodeBonePairVec;
+
+        SceneNodeBonePairVec    mCustomParentSceneNodes;
+
     public:
         SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
         ~SkeletonInstance();
@@ -127,6 +138,14 @@ namespace Ogre
         */
         bool isManualBone( Bone *bone );
 
+        /** Sets a regular SceneNode to be parent of this Bone for manually controlling
+            a bone (e.g. have a bone follow a character). You may want to also call
+            setManualBone as well to prevent animation on this bone.
+        @param nodeParent
+            Node to be parent of this scene node. Use a null pointer to remove the attachment.
+        */
+        void setSceneNodeAsParentOfBone( Bone *bone, SceneNode *nodeParent );
+
         /// Gets full transform of a bone by its index.
         FORCEINLINE const SimpleMatrixAf4x3& _getBoneFullTransform( size_t index ) const
         {
@@ -154,6 +173,9 @@ namespace Ogre
 
         /** Sets our parent node so that our bones are in World space.
             Iterates through all our bones and sets the root bones
+        @remarks
+            Bones explicitly parented to a different node via setSceneNodeAsParentOfBone
+            will remain parented to that node.
         */
         void setParentNode( Node *parentNode );
 

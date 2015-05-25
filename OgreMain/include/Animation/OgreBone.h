@@ -136,7 +136,10 @@ namespace Ogre {
         /// Gets this Bones's parent (NULL if this is the root).
         Bone* getParent(void) const                                 { return mParent; }
 
-        /** Sets a regular Node to be parent of this Bone
+        /** Sets a regular Node to be parent of this Bone.
+            DO NOT USE THIS FUNCTION IF YOU DON'T KNOW WHAT YOU'RE DOING. If you want
+            to use a regular Node to control a bone,
+            @see SkeletonInstance::setSceneNodeAsParentOfBone instead.
         @remarks
             1. Multiple calls to _setNodeParent with different arguments will
                silently override previous calls.
@@ -277,6 +280,11 @@ namespace Ogre {
         static void updateAllTransforms( const size_t numNodes, BoneTransform t,
                                          ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind,
                                          size_t numBinds );
+
+#ifndef NDEBUG
+        virtual void _setCachedTransformOutOfDate(void);
+        bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
+#endif
     };
     /** @} */
     /** @} */

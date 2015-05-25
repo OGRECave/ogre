@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreMovableObject.h"
 #include "OgreWireBoundingBox.h"
 
+#include "Animation/OgreSkeletonInstance.h"
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     SceneNode::SceneNode( IdType id, SceneManager* creator, NodeMemoryManager *nodeMemoryManager,
@@ -61,6 +63,7 @@ namespace Ogre {
 
         // Detach all objects
         detachAllObjects();
+        detachAllBones();
     }
     //-----------------------------------------------------------------------
     bool SceneNode::setStatic( bool bStatic )
@@ -218,6 +221,51 @@ namespace Ogre {
         mAttachments.clear();
     }
     //-----------------------------------------------------------------------
+    void SceneNode::_attachBone( SkeletonInstance *skeletonInstance, Bone *bone )
+    {
+        mBoneChildren[skeletonInstance].push_back( bone );
+    }
+    //-----------------------------------------------------------------------
+    void SceneNode::_detachBone( SkeletonInstance *skeletonInstance, Bone *bone )
+    {
+        BoneVec::iterator itor = std::find( mBoneChildren[skeletonInstance].begin(),
+                                            mBoneChildren[skeletonInstance].end(),
+                                            bone );
+
+        assert( itor != mBoneChildren[skeletonInstance].end() );
+
+        efficientVectorRemove( mBoneChildren[skeletonInstance], itor );
+    }
+    //-----------------------------------------------------------------------
+    void SceneNode::_detachAllBones( SkeletonInstance *skeletonInstance )
+    {
+        BonesPerSkeletonInstance::iterator itor = mBoneChildren.find( skeletonInstance );
+        if( itor != mBoneChildren.end() )
+            mBoneChildren.erase( itor );
+    }
+    //-----------------------------------------------------------------------
+    void SceneNode::detachAllBones(void)
+    {
+        BonesPerSkeletonInstance::const_iterator itSkeletons = mBoneChildren.begin();
+        BonesPerSkeletonInstance::const_iterator enSkeletons = mBoneChildren.end();
+
+        while( itSkeletons != enSkeletons )
+        {
+            BoneVec::const_iterator itBone = itSkeletons->second.begin();
+            BoneVec::const_iterator enBone = itSkeletons->second.end();
+
+            while( itBone != enBone )
+            {
+                itSkeletons->first->setSceneNodeAsParentOfBone( *itBone, 0 );
+                ++itBone;
+            }
+
+            ++itSkeletons;
+        }
+
+        mBoneChildren.clear();
+    }
+    //-----------------------------------------------------------------------
     void SceneNode::_callMemoryChangeListeners(void)
     {
         ObjectVec::iterator itor = mAttachments.begin();
@@ -227,6 +275,23 @@ namespace Ogre {
         {
             (*itor)->_notifyParentNodeMemoryChanged();
             ++itor;
+        }
+
+        BonesPerSkeletonInstance::const_iterator itSkeletons = mBoneChildren.begin();
+        BonesPerSkeletonInstance::const_iterator enSkeletons = mBoneChildren.end();
+
+        while( itSkeletons != enSkeletons )
+        {
+            BoneVec::const_iterator itBone = itSkeletons->second.begin();
+            BoneVec::const_iterator enBone = itSkeletons->second.end();
+
+            while( itBone != enBone )
+            {
+                (*itBone)->_setNodeParent( this );
+                ++itBone;
+            }
+
+            ++itSkeletons;
         }
     }
     /*TODO
@@ -507,6 +572,23 @@ namespace Ogre {
         {
             (*itor)->_setCachedAabbOutOfDate();
             ++itor;
+        }
+
+        BonesPerSkeletonInstance::const_iterator itSkeletons = mBoneChildren.begin();
+        BonesPerSkeletonInstance::const_iterator enSkeletons = mBoneChildren.end();
+
+        while( itSkeletons != enSkeletons )
+        {
+            BoneVec::const_iterator itBone = itSkeletons->second.begin();
+            BoneVec::const_iterator enBone = itSkeletons->second.end();
+
+            while( itBone != enBone )
+            {
+                (*itBone)->_setCachedTransformOutOfDate();
+                ++itBone;
+            }
+
+            ++itSkeletons;
         }
     }
 #endif

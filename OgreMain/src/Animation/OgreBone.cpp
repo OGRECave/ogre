@@ -352,6 +352,13 @@ namespace Ogre {
             }
         }
     }
+    //-----------------------------------------------------------------------
+#ifndef NDEBUG
+    void Bone::_setCachedTransformOutOfDate(void)
+    {
+        mCachedTransformOutOfDate = true;
+    }
+#endif
 }
 
 #undef CACHED_TRANSFORM_OUT_OF_DATE

@@ -35,6 +35,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    typedef vector<Bone*>::type BoneVec;
+    typedef map<SkeletonInstance*, BoneVec>::type BonesPerSkeletonInstance;
+
     /** \addtogroup Core
     *  @{
     */
@@ -59,6 +62,7 @@ namespace Ogre {
 
     protected:
         ObjectVec mAttachments;
+        BonesPerSkeletonInstance    mBoneChildren;
 
         /// SceneManager which created this node
         SceneManager* mCreator;
@@ -127,6 +131,21 @@ namespace Ogre {
         /** Detaches all objects attached to this node.
         */
         virtual void detachAllObjects(void);
+
+        /// Attaches a bone to this SceneNode. Don't use directly.
+        /// @see SkeletonInstance::setSceneNodeAsParentOfBone
+        virtual_l1 void _attachBone( SkeletonInstance *skeletonInstance, Bone *bone );
+
+        /// Detaches a bone from this SceneNode. Don't use directly.
+        /// @see SkeletonInstance::setSceneNodeAsParentOfBone
+        virtual_l1 void _detachBone( SkeletonInstance *skeletonInstance, Bone *bone );
+
+        /// Detaches all bones from this SceneNode that belong to the given SkeletonInstance.
+        /// Don't use directly. @see SkeletonInstance::setSceneNodeAsParentOfBone
+        virtual_l1 void _detachAllBones( SkeletonInstance *skeletonInstance );
+
+        /// Detaches all bones from from this SceneNode. It is safe to use directly.
+        virtual void detachAllBones(void);
 
         /// @copydoc Node::_callMemoryChangeListeners
         virtual void _callMemoryChangeListeners(void);
