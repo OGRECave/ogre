@@ -16,6 +16,7 @@ if( OGRE_BUILD_SAMPLES2 )
 
 	set( OGRE_SAMPLES_LIBRARIES "OgreSamplesCommon" "OgreOverlay" )
 
+	add_subdirectory(ApiUsage/CustomRenderable)
 	add_subdirectory(ApiUsage/DynamicGeometry)
     add_subdirectory(ApiUsage/V2Mesh)
 	add_subdirectory(ApiUsage/StereoRendering)
