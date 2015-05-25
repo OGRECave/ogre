@@ -160,13 +160,13 @@ namespace Ogre
 
         if( !mFsaa )
         {
-            OCGE( glRenderbufferStorageMultisample( GL_RENDERBUFFER, GLsizei(mFsaa), format,
-                                                    GLsizei(mWidth), GLsizei(mHeight) ) );
+            OCGE( glRenderbufferStorage( GL_RENDERBUFFER, format,
+                                         GLsizei(mWidth), GLsizei(mHeight) ) );
         }
         else
         {
-            OCGE( glRenderbufferStorage( GL_RENDERBUFFER, format,
-                                         GLsizei(mWidth), GLsizei(mHeight) ) );
+            OCGE( glRenderbufferStorageMultisample( GL_RENDERBUFFER, GLsizei(mFsaa), format,
+                                                    GLsizei(mWidth), GLsizei(mHeight) ) );
         }
 
         return renderBufferName;
