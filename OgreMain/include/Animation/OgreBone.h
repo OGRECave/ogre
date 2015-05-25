@@ -220,6 +220,15 @@ namespace Ogre {
         */
         bool getInheritScale(void) const;
 
+        /** Gets the derived transform in world space
+        @remarks
+            Position, scale & orientation can be extracted using Matrix4::decomposition
+            Note, that matrices may contain stretch and shearing (aka non-uniform scaling)
+            which doesn't translate well to a scale/orientation paradigm (not a problem
+            if the bones don't use scaling, or if scale is not inherited).
+        */
+        Matrix4 _getDerivedTransform(void) const;
+
         /** Gets the transformation matrix for this bone in local space (i.e. as if the
             skeleton wasn't attached to a SceneNode).
         @remarks

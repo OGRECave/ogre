@@ -200,6 +200,21 @@ namespace Ogre {
         return mTransform.mInheritScale[mTransform.mIndex];
     }
     //-----------------------------------------------------------------------
+    Matrix4 Bone::_getDerivedTransform(void) const
+    {
+        assert( !mCachedTransformOutOfDate );
+
+        OGRE_ALIGNED_DECL( Matrix4, localSpaceBone, OGRE_SIMD_ALIGNMENT );
+        OGRE_ALIGNED_DECL( Matrix4, parentNodeTransform, OGRE_SIMD_ALIGNMENT );
+
+        mTransform.mDerivedTransform[mTransform.mIndex].store4x3( &localSpaceBone );
+        mTransform.mParentNodeTransform[mTransform.mIndex]->store4x3( &parentNodeTransform );
+
+        parentNodeTransform.concatenateAffine( localSpaceBone );
+
+        return parentNodeTransform;
+    }
+    //-----------------------------------------------------------------------
     const SimpleMatrixAf4x3& Bone::_getFullTransformUpdated(void)
     {
         _updateFromParent();
