@@ -87,8 +87,6 @@ namespace Ogre {
         GLuint mFB;
         GLuint mMultisampleFB;
         GL3PlusSurfaceDesc mMultisampleColourBuffer;
-        GL3PlusSurfaceDesc mDepth;
-        GL3PlusSurfaceDesc mStencil;
         // Arbitrary number of texture surfaces
         GL3PlusSurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 
