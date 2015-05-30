@@ -124,7 +124,7 @@ float3 qmul( float4 q, float3 v )
 	@property( normal_weight_tex )#define normalMapWeight material.F0.w@end
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
-			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )]@end
+			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )@end
 		@end
 	@end
 @end
