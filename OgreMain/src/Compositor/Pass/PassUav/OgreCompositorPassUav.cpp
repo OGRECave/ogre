@@ -149,10 +149,9 @@ namespace Ogre
             mTarget->_endUpdate();
     }
     //-----------------------------------------------------------------------------------
-    void CompositorPassUav::_prepareBarrierAndEmulateUavExecution(
+    void CompositorPassUav::_placeBarriersAndEmulateUavExecution(
                                             BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
-                                            ResourceLayoutMap &resourcesLayout,
-                                            CompositorPassResourceTransition **transitionPass )
+                                            ResourceLayoutMap &resourcesLayout )
     {
         const CompositorPassUavDef::TextureSources &textureSources =
                                                             mDefinition->getTextureSources();
@@ -179,7 +178,7 @@ namespace Ogre
                                  "The texture must exist by the time the workspace is executed. "
                                  "Are you trying to use a texture defined by the compositor? If so"
                                  "you need to set it via 'uav' instead of 'uav_external'",
-                                 "CompositorPassUav::_prepareBarrierAndEmulateUavExecution" );
+                                 "CompositorPassUav::_placeBarriersAndEmulateUavExecution" );
                 }
             }
 
@@ -188,13 +187,18 @@ namespace Ogre
                 OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                              "Texture " + texture->getName() +
                              " must have been created with TU_UAV to be bound as UAV",
-                             "CompositorPassUav::_prepareBarrierAndEmulateUavExecution" );
+                             "CompositorPassUav::_placeBarriersAndEmulateUavExecution" );
             }
 
+            //Only "simulate the bind" of UAVs. We will evaluate the actual resource
+            //transition when the UAV is actually used in the subsequent passes.
             boundUavs[itor->uavSlot].renderTarget = texture->getBuffer()->getRenderTarget();
             boundUavs[itor->uavSlot].boundAccess = itor->access;
 
             ++itor;
         }
+
+        //Do not use base class functionality at all.
+        //CompositorPassv::_placeBarriersAndEmulateUavExecution();
     }
 }

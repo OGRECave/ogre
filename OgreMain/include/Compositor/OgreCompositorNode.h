@@ -32,13 +32,13 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
 #include "Compositor/OgreCompositorChannel.h"
+#include "OgreResourceTransition.h"
 #include "OgreIdString.h"
 #include "OgreId.h"
 
 namespace Ogre
 {
     class CompositorNodeDef;
-    class CompositorPassResourceTransition;
 
     /** \addtogroup Core
     *  @{
@@ -46,6 +46,8 @@ namespace Ogre
     /** \addtogroup Effects
     *  @{
     */
+
+    struct BoundUav;
 
     /** Compositor nodes are the core subject of compositing.
         This is an instantiation. All const, shared parameters are in the definition
@@ -216,27 +218,6 @@ namespace Ogre
         */
         void createPasses(void);
 
-        /** Inserts a 'CompositorPassResourceTransition' pass in the middle of two existing
-            passes. This function must be called after createPasses.
-        @remarks
-            Normally, all passes are baked through their definition, thus createPasses
-            is a one-time initialization step.
-            However, resource transitions (aka barriers) are inserted afterwards for three
-            reasons:
-                1. It's much easier to evaluate the data dependencies after the instance
-                   has been constructed.
-                2. These passes must be generated automatically.
-                3. If the definition changes, all the barriers may need to be rearranged.
-        @par
-            After this call, the iterators pointing to the vector from _getPasses may be
-            invalidated.
-        @param idx
-            Where to insert this pass. Must be in range [0; mPasses.size())
-        @param pass
-            The pass to insert. We will delete this pointer.
-        */
-        void _insertResourceTransitionPass( size_t idx, CompositorPassResourceTransition *pass );
-
         const CompositorPassVec& _getPasses() const                 { return mPasses; }
 
         /** Calling this function every frame will cause us to execute all our passes (ie. render)
@@ -246,6 +227,20 @@ namespace Ogre
             used for syncing shadow mapping).
         */
         void _update( const Camera *lodCamera, SceneManager *sceneManager );
+
+        static void fillResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                         const CompositorChannelVec &compositorChannels,
+                                         ResourceLayout::Layout layout );
+
+        /// @see CompositorPass::_placeBarriersAndEmulateUavExecution
+        void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                   ResourceAccessMap &uavsAccess,
+                                                   ResourceLayoutMap &resourcesLayout );
+
+        /// Places a resource transition in our last pass to the given RenderTarget.
+        /// Usually needed to ensure the final 'RenderWindow' is still a RenderTarget
+        /// after the workspace is finished.
+        void _setFinalTargetAsRenderTarget( ResourceLayoutMap::iterator finalTargetCurrentLayout );
 
         /** Call this function when you're replacing the textures from oldChannel with the
             ones in newChannel. Useful when recreating textures (i.e. resolution changed)

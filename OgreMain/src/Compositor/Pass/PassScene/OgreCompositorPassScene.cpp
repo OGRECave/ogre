@@ -186,6 +186,19 @@ namespace Ogre
             mTarget->_endUpdate();
     }
     //-----------------------------------------------------------------------------------
+    void CompositorPassScene::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                                    ResourceAccessMap &uavsAccess,
+                                                                    ResourceLayoutMap &resourcesLayout )
+    {
+        if( mShadowNode && mUpdateShadowNode )
+        {
+            mShadowNode->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess,
+                                                               resourcesLayout );
+        }
+
+        CompositorPass::_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorPassScene::notifyCleared(void)
     {
         mShadowNode = 0; //Allow changes to our shadow nodes too.

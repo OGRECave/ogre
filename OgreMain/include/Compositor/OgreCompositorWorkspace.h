@@ -43,7 +43,7 @@ namespace Ogre
     *  @{
     */
 
-    class CompositorPassResourceTransition;
+    struct BoundUav;
 
     /** A compositor workspace is the main interface to render into an RT, be it a RenderWindow or an
         RTT (Render Texture Target). Whereas Ogre 1.x needed you to set a Viewport in order to render
@@ -269,14 +269,6 @@ namespace Ogre
         const CompositorManager2* getCompositorManager() const;
 
         size_t getFrameCount(void) const;
-
-        static CompositorPassResourceTransition* createCompositorPassResourceTransition(
-                                                                        CompositorNode *parentNode );
-        static void addResourceTransition( CompositorNode *node,
-                                           ResourceLayoutMap::iterator currentLayout,
-                                           CompositorPassResourceTransition **transitionPass,
-                                           ResourceLayout::Layout newLayout,
-                                           uint32 readBarrierBits );
     };
 
     /** @} */

@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
-#include "Compositor/Pass/PassResourceTransition/OgreCompositorPassResourceTransition.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
 #include "Compositor/Pass/PassUav/OgreCompositorPassUav.h"
@@ -439,10 +438,53 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void CompositorNode::_insertResourceTransitionPass( size_t idx,
-                                                        CompositorPassResourceTransition *pass )
+    void CompositorNode::fillResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                              const CompositorChannelVec &compositorChannels,
+                                              ResourceLayout::Layout layout )
     {
-        mPasses.insert( mPasses.begin() + idx, 1, pass );
+        CompositorChannelVec::const_iterator itor = compositorChannels.begin();
+        CompositorChannelVec::const_iterator end  = compositorChannels.end();
+
+        while( itor != end )
+        {
+            outResourcesLayout[itor->target] = layout;
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                               ResourceAccessMap &uavsAccess,
+                                                               ResourceLayoutMap &resourcesLayout )
+    {
+        //All locally defined textures start as 'undefined'.
+        fillResourcesLayout( resourcesLayout, mLocalTextures, ResourceLayout::Undefined );
+
+        CompositorPassVec::const_iterator itPasses = mPasses.begin();
+        CompositorPassVec::const_iterator enPasses = mPasses.end();
+
+        while( itPasses != enPasses )
+        {
+            CompositorPass *pass = *itPasses;
+            pass->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
+
+            ++itPasses;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::_setFinalTargetAsRenderTarget(
+                                                ResourceLayoutMap::iterator finalTargetCurrentLayout )
+    {
+        if( mPasses.empty() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Node " + mName.getFriendlyText() + "has no passes!",
+                         "CompositorNode::_setFinalTargetAsRenderTarget" );
+        }
+
+        CompositorPass *pass = mPasses.back();
+        pass->addResourceTransition( finalTargetCurrentLayout,
+                                     ResourceLayout::RenderTarget,
+                                     ReadBarrier::RenderTarget );
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::_update( const Camera *lodCamera, SceneManager *sceneManager )

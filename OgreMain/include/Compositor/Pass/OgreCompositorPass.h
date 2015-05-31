@@ -38,7 +38,6 @@ namespace Ogre
     class RenderTarget;
     struct CompositorChannel;
     class CompositorNode;
-    class CompositorPassResourceTransition;
 
     /** \addtogroup Core
     *  @{
@@ -94,6 +93,9 @@ namespace Ogre
 
         CompositorTextureVec    mTextureDependencies;
 
+        typedef vector<ResourceTransition>::type ResourceTransitionVec;
+        ResourceTransitionVec  mResourceTransitions;
+
         void populateTextureDependenciesFromExposedTextures(void);
 
         RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
@@ -107,6 +109,10 @@ namespace Ogre
 
         virtual void execute( const Camera *lodCameraconst ) = 0;
 
+        void addResourceTransition( ResourceLayoutMap::iterator currentLayout,
+                                    ResourceLayout::Layout newLayout,
+                                    uint32 readBarrierBits );
+
         /** Emulates the execution of a UAV to understand memory dependencies,
             and adds a memory barrier / resource transition if we need to.
         @remarks
@@ -119,22 +125,17 @@ namespace Ogre
             A map with the last access flag used for each RenderTarget. We need it
             to identify RaR situations, which are the only ones that don't need
             a barrier (and also WaW hazards, when explicitly allowed by the pass).
-            Derived class CompositorPassResourceTransition implementation will
-            set the access to ResourceAccess::Undefined to signal base implementations
-            that the UAV hazard already has a barrier (just in case there was one
-            already created).
+            Note: We will set the access to ResourceAccess::Undefined to signal other
+            passes  that the UAV hazard already has a barrier (just in case there was
+            one already created).
         @param resourcesLayout [in/out]
             A map with the current layout of every RenderTarget used so far.
             Needed to identify if we need to change the resource layout
             to an UAV.
-        @param transitionPass [in/out]
-            The ResourceTransition pass. If (*transitionPass) was a null ptr,
-            a new one will be created.
         */
-        virtual void _prepareBarrierAndEmulateUavExecution(
-                                            BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
-                                            ResourceLayoutMap &resourcesLayout,
-                                            CompositorPassResourceTransition **transitionPass );
+        virtual void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                           ResourceAccessMap &uavsAccess,
+                                                           ResourceLayoutMap &resourcesLayout );
 
         /// @See CompositorNode::notifyRecreated
         virtual void notifyRecreated( const CompositorChannel &oldChannel,

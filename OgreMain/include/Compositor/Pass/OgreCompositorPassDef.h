@@ -57,7 +57,6 @@ namespace Ogre
         PASS_RESOLVE,
         PASS_DEPTHCOPY,
         PASS_UAV,
-        PASS_RESOURCE_TRANSITION,
         PASS_CUSTOM
     };
 
@@ -66,6 +65,7 @@ namespace Ogre
             * PASS_QUAD (@See CompositorPassQuadDef)
             * PASS_CLEAR (@See CompositorPassClearDef)
             * PASS_STENCIL (@See CompositorPassStencilDef)
+            * PASS_DEPTHCOPY (@See CompositorPassDepthCopy)
             * PASS_UAV (@See CompositorPassUavDef)
         This class doesn't do much on its own. See the derived types for more information
         A definition is shared by all pass instantiations (i.e. Five CompositorPassScene can
