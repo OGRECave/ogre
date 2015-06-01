@@ -539,38 +539,54 @@ namespace Ogre
 
         mSetProperties.clear();
 
+        //mat4 viewProj[2];
+        size_t mapSize = (16 + 16) * 4;
+
         if( casterPass )
         {
+            //vec2 depthRange; (+padding)
+            mapSize += 4 * 4;
+
             setProperty( HlmsBaseProp::ShadowCaster, 1 );
             retVal.setProperties = mSetProperties;
+        }
 
-            //vec2 depthRange;
-            size_t mapSize = 4 * 4;
+        mapSize += mListener->getPassBufferSize( shadowNode, casterPass,
+                                                 dualParaboloid, sceneManager );
 
-            mapSize += mListener->getPassBufferSize( shadowNode, casterPass,
-                                                     dualParaboloid, sceneManager );
+        //Arbitrary 16kb (minimum supported by GL), should be enough.
+        const size_t maxBufferSize = 16 * 1024;
+        assert( mapSize <= maxBufferSize );
 
-            //Arbitrary 16kb (minimum supported by GL), should be enough.
-            const size_t maxBufferSize = 16 * 1024;
-            assert( mapSize <= maxBufferSize );
+        if( mCurrentPassBuffer >= mPassBuffers.size() )
+        {
+            mPassBuffers.push_back( mVaoManager->createConstBuffer( /*maxBufferSize*/mapSize,
+                                                                    BT_DYNAMIC_PERSISTENT,
+                                                                    0, false ) );
+        }
 
-            if( mCurrentPassBuffer >= mPassBuffers.size() )
-            {
-                mPassBuffers.push_back( mVaoManager->createConstBuffer( /*maxBufferSize*/mapSize,
-                                                                        BT_DYNAMIC_PERSISTENT,
-                                                                        0, false ) );
-            }
-
-            ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer++];
-            float *passBufferPtr = reinterpret_cast<float*>( passBuffer->map( 0, mapSize ) );
+        ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer++];
+        float *passBufferPtr = reinterpret_cast<float*>( passBuffer->map( 0, mapSize ) );
 
 #ifndef NDEBUG
-            const float *startupPtr = passBufferPtr;
+        const float *startupPtr = passBufferPtr;
 #endif
-            //---------------------------------------------------------------------------
-            //                          ---- VERTEX SHADER ----
-            //---------------------------------------------------------------------------
+        //---------------------------------------------------------------------------
+        //                          ---- VERTEX SHADER ----
+        //---------------------------------------------------------------------------
 
+        //mat4 viewProj[0];
+        Matrix4 tmp = mPreparedPass.viewProjMatrix[0].transpose();
+        for( size_t i=0; i<16; ++i )
+            *passBufferPtr++ = (float)tmp[0][i];
+
+        //mat4 viewProj[1] (identityProj);
+        tmp = mPreparedPass.viewProjMatrix[1].transpose();
+        for( size_t i=0; i<16; ++i )
+            *passBufferPtr++ = (float)tmp[0][i];
+
+        if( casterPass )
+        {
             //vec2 depthRange;
             Real fNear, fFar;
             shadowNode->getMinMaxDepthRange( camera, fNear, fFar );
@@ -578,14 +594,14 @@ namespace Ogre
             *passBufferPtr++ = fNear;
             *passBufferPtr++ = 1.0f / depthRange;
             passBufferPtr += 2;
-
-            passBufferPtr = mListener->preparePassBuffer( shadowNode, casterPass, dualParaboloid,
-                                                          sceneManager, passBufferPtr );
-
-            assert( (size_t)(passBufferPtr - startupPtr) * 4u == mapSize );
-
-            passBuffer->unmap( UO_KEEP_PERSISTENT );
         }
+
+        passBufferPtr = mListener->preparePassBuffer( shadowNode, casterPass, dualParaboloid,
+                                                      sceneManager, passBufferPtr );
+
+        assert( (size_t)(passBufferPtr - startupPtr) * 4u == mapSize );
+
+        passBuffer->unmap( UO_KEEP_PERSISTENT );
 
         //mTexBuffers must hold at least one buffer to prevent out of bound exceptions.
         if( mTexBuffers.empty() )
@@ -729,6 +745,7 @@ namespace Ogre
         *currentMappedConstBuffer = datablock->getAssignedSlot();
         *reinterpret_cast<float * RESTRICT_ALIAS>( currentMappedConstBuffer+1 ) = datablock->
                                                                                     mShadowConstantBias;
+        *(currentMappedConstBuffer+2) = useIdentityProjection;
         currentMappedConstBuffer += 4;
 
         //mat4 worldViewProj

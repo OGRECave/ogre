@@ -528,6 +528,9 @@ namespace v1 {
         /** See setDefaultDimensions - this gets 1 component individually. */
         virtual Real getDefaultHeight(void) const;
 
+        /// Overriden from Renderable
+        virtual bool getUseIdentityWorldMatrix(void) const;
+
         /** Overridden from MovableObject
         @see
             MovableObject

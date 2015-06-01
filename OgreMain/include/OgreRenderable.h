@@ -152,6 +152,28 @@ namespace Ogre {
 
         bool hasSkeletonAnimation(void) const               { return mHasSkeletonAnimation; }
 
+        /** Returns whether the world matrix is an identify matrix.
+        @remarks
+            It is up to the Hlms implementation whether to honour this request. Take in mind
+            changes of this value at runtime may not be seen until the datablock is flushed.
+            It is implemented as a virtual call because this functionality isn't required
+            very often (hence we save per-Renderable space for those that don't use it)
+            and this function will be called at creation time to use a different shader;
+            not during rendering time per Renderable.
+        */
+        virtual bool getUseIdentityWorldMatrix(void) const          { return false; }
+
+        /** Returns whether the Hlms implementation should evaluate getUseIdentityProjection
+            per object at runtime, or if it can assume the Renderable will remain with
+            the same setting until the datablock is flushed (performance optimization)
+        @remarks
+            Hlms implementations may ignore this setting (e.g. assume always true or always
+            false) or even not support identity matrix overrides at all.
+            For example currently Unlit supports them all, but will assume this returns
+            always true if getUseIdentityWorldMatrix returns false.
+        */
+        virtual bool getUseIdentityViewProjMatrixIsDynamic(void) const  { return false; }
+
         /** Sets whether or not to use an 'identity' projection.
         @remarks
             Usually Renderable objects will use a projection matrix as determined

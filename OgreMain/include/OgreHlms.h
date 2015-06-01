@@ -541,6 +541,11 @@ namespace Ogre
 
         static const IdString Colour;
 
+        static const IdString IdentityWorld;
+        static const IdString IdentityViewProj;
+        /// When this is set, the value of IdentityViewProj is meaningless.
+        static const IdString IdentityViewProjDynamic;
+
         static const IdString UvCount;
         static const IdString UvCount0;
         static const IdString UvCount1;

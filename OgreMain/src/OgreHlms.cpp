@@ -62,6 +62,10 @@ namespace Ogre
 
     const IdString HlmsBaseProp::Colour             = IdString( "hlms_colour" );
 
+    const IdString HlmsBaseProp::IdentityWorld      = IdString( "hlms_identity_world" );
+    const IdString HlmsBaseProp::IdentityViewProj   = IdString( "hlms_identity_viewproj" );
+    const IdString HlmsBaseProp::IdentityViewProjDynamic= IdString( "hlms_identity_viewproj_dynamic" );
+
     const IdString HlmsBaseProp::UvCount            = IdString( "hlms_uv_count" );
     const IdString HlmsBaseProp::UvCount0           = IdString( "hlms_uv_count0" );
     const IdString HlmsBaseProp::UvCount1           = IdString( "hlms_uv_count1" );
@@ -1725,6 +1729,14 @@ namespace Ogre
         HlmsDatablock *datablock = renderable->getDatablock();
 
         setProperty( HlmsBaseProp::AlphaTest, datablock->getAlphaTest() != CMPF_ALWAYS_PASS );
+
+        if( renderable->getUseIdentityWorldMatrix() )
+            setProperty( HlmsBaseProp::IdentityWorld, 1 );
+
+        if( renderable->getUseIdentityViewProjMatrixIsDynamic() )
+            setProperty( HlmsBaseProp::IdentityViewProjDynamic, 1 );
+        else if( renderable->getUseIdentityProjection() )
+            setProperty( HlmsBaseProp::IdentityViewProj, 1 );
 
         PiecesMap pieces[NumShaderTypes];
         if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )

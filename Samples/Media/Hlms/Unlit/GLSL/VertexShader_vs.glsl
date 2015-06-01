@@ -34,21 +34,32 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @insertpiece( custom_vs_uniformDeclaration )
 // END UNIFORM DECLARATION
 
+@property( !hlms_identity_world )
+	@piece( worldViewProj )worldViewProj@end
+@end @property( hlms_identity_world )
+	@property( !hlms_identity_viewproj_dynamic )
+		@piece( worldViewProj )pass.viewProj[@value(hlms_identity_viewproj)]@end
+	@end @property( hlms_identity_viewproj_dynamic )
+		@piece( worldViewProj )pass.viewProj[instance.materialIdx[drawId].z]@end
+	@end
+@end
+
 void main()
 {
 	@insertpiece( custom_vs_preExecution )
-	//uint drawId = 1;
-	mat4 worldViewProj;
-	worldViewProj = UNPACK_MAT4( worldMatBuf, drawId );
+	@property( !hlms_identity_world )
+		mat4 worldViewProj;
+		worldViewProj = UNPACK_MAT4( worldMatBuf, drawId );
+	@end
 
 @property( !hlms_dual_paraboloid_mapping )
-	gl_Position = worldViewProj * vertex;
+	gl_Position = @insertpiece( worldViewProj ) * vertex;
 @end
 
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	gl_Position.w	= 1.0f;
-	gl_Position.xyz	= (worldViewProj * vertex).xyz;
+	gl_Position.xyz	= (@insertpiece( worldViewProj ) * vertex).xyz;
 	float L = length( gl_Position.xyz );
 	gl_Position.z	+= 1.0f;
 	gl_Position.xy	/= gl_Position.z;

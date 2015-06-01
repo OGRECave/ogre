@@ -328,6 +328,11 @@ namespace v1 {
         }
     }
     //-----------------------------------------------------------------------
+    bool BillboardSet::getUseIdentityWorldMatrix(void) const
+    {
+        return mWorldSpace;
+    }
+    //-----------------------------------------------------------------------
     void BillboardSet::_notifyCurrentCamera( Camera* cam )
     {
         // Calculate camera orientation and position
