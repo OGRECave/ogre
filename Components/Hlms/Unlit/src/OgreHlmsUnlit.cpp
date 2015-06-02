@@ -509,6 +509,8 @@ namespace Ogre
     HlmsCache HlmsUnlit::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                           bool dualParaboloid, SceneManager *sceneManager )
     {
+        mSetProperties.clear();
+
         //Set the properties and create/retrieve the cache.
         if( casterPass )
             setProperty( HlmsBaseProp::ShadowCaster, 1 );
