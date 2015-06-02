@@ -684,15 +684,12 @@ namespace Ogre
             mLastTextureHash = 0;
             mLastBoundPool = 0;
 
-            if( casterPass )
-            {
-                //layout(binding = 0) uniform PassBuffer {} pass
-                ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer-1];
-                *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( VertexShader,
-                                                                               0, passBuffer, 0,
-                                                                               passBuffer->
-                                                                               getTotalSizeBytes() );
-            }
+            //layout(binding = 0) uniform PassBuffer {} pass
+            ConstBufferPacked *passBuffer = mPassBuffers[mCurrentPassBuffer-1];
+            *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( VertexShader,
+                                                                           0, passBuffer, 0,
+                                                                           passBuffer->
+                                                                           getTotalSizeBytes() );
 
             //layout(binding = 2) uniform InstanceBuffer {} instance
             if( mCurrentConstBuffer < mConstBuffers.size() &&
