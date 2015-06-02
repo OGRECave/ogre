@@ -509,7 +509,30 @@ namespace Ogre
     HlmsCache HlmsUnlit::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                           bool dualParaboloid, SceneManager *sceneManager )
     {
-        HlmsCache retVal( casterPass, HLMS_UNLIT );
+        //Set the properties and create/retrieve the cache.
+        if( casterPass )
+            setProperty( HlmsBaseProp::ShadowCaster, 1 );
+
+        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+        setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
+                     renderTarget->getForceDisableColourWrites() ? 1 : 0 );
+
+        mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
+
+        assert( mPassCache.size() < 32768 );
+        HlmsPropertyVecVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(),
+                                                     mSetProperties );
+        if( it == mPassCache.end() )
+        {
+            mPassCache.push_back( mSetProperties );
+            it = mPassCache.end() - 1;
+        }
+
+        const uint32 hash = it - mPassCache.begin();
+
+        //Fill the buffers
+        HlmsCache retVal( hash, mType );
+        retVal.setProperties = mSetProperties;
 
         Camera *camera = sceneManager->getCameraInProgress();
         Matrix4 viewMatrix = camera->getViewMatrix(true);
@@ -520,7 +543,6 @@ namespace Ogre
         mRenderSystem->_convertProjectionMatrix( Matrix4::IDENTITY,
                                                  identityProjMat, true );
 
-        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         if( renderTarget->requiresTextureFlipping() )
         {
             projectionMatrix[1][0]  = -projectionMatrix[1][0];
@@ -546,9 +568,6 @@ namespace Ogre
         {
             //vec2 depthRange; (+padding)
             mapSize += 4 * 4;
-
-            setProperty( HlmsBaseProp::ShadowCaster, 1 );
-            retVal.setProperties = mSetProperties;
         }
 
         mapSize += mListener->getPassBufferSize( shadowNode, casterPass,
