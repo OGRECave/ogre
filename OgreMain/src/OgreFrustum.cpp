@@ -1017,14 +1017,6 @@ namespace Ogre {
 //        static LightList ll;
         return ll;
     }
-    //-----------------------------------------------------------------------
-    void Frustum::_notifyCurrentCamera(Camera* cam)
-    {
-        //TODO: (dark_sylinc)
-        // Make sure bounding box up-to-date
-        updateFrustum();
-    }
-
     // -------------------------------------------------------------------
     void Frustum::invalidateFrustum() const
     {

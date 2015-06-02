@@ -239,7 +239,7 @@ namespace v1 {
         return mBillboardSet->getCommonUpVector();
     }
     //-----------------------------------------------------------------------
-    void BillboardParticleRenderer::_notifyCurrentCamera(Camera* cam)
+    void BillboardParticleRenderer::_notifyCurrentCamera( const Camera* cam )
     {
         mBillboardSet->_notifyCurrentCamera(cam);
     }

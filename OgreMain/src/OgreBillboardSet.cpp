@@ -283,7 +283,7 @@ namespace v1 {
         return mDefaultHeight;
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::_sortBillboards( Camera* cam)
+    void BillboardSet::_sortBillboards(void)
     {
         switch (_getSortMode())
         {
@@ -333,7 +333,7 @@ namespace v1 {
         return mWorldSpace;
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::_notifyCurrentCamera( Camera* cam )
+    void BillboardSet::_notifyCurrentCamera( const Camera* cam )
     {
         // Calculate camera orientation and position
         mCamQ = cam->getDerivedOrientation();
@@ -567,14 +567,14 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void BillboardSet::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
-        _notifyCurrentCamera( camera );
+        _notifyCurrentCamera( lodCamera );
 
         // If we're driving this from our own data, update geometry if need to.
         if (!mExternalData && (mAutoUpdate || mBillboardDataChanged || !mBuffersCreated))
         {
             if (mSortingEnabled)
             {
-                _sortBillboards(camera);
+                _sortBillboards();
             }
 
             beginBillboards(mActiveBillboards.size());
@@ -583,7 +583,7 @@ namespace v1 {
                 it != mActiveBillboards.end();
                 ++it )
             {
-                injectBillboard(*(*it), camera);
+                injectBillboard(*(*it), lodCamera);
             }
             endBillboards();
 

@@ -74,8 +74,6 @@ namespace Ogre {
                       const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2 );
         ~MovablePlane() {}
         /// Overridden from MovableObject
-        void _notifyCurrentCamera(Camera*) { /* don't care */ }
-        /// Overridden from MovableObject
         const AxisAlignedBox& getBoundingBox(void) const { return mNullBB; }
         /// Overridden from MovableObject
         void _updateRenderQueue(RenderQueue*, Camera *camera, const Camera *lodCamera) { /* do nothing */}
