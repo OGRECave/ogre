@@ -379,7 +379,7 @@ namespace Ogre
             outSubString.setEnd( it - outSubString.getOriginalBuffer().begin() - (sizeof( "end" ) - 1) );
         else
         {
-            syntaxError = false;
+            syntaxError = true;
             printf( "Syntax Error at line %lu: start block (e.g. @foreach; @property) "
                     "without matching @end\n", calculateLineCount( outSubString ) );
         }
