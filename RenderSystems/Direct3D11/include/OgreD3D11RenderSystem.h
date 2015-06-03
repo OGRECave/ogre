@@ -176,6 +176,9 @@ namespace Ogre
 #endif
 
     protected:
+
+        void setDepthStencilDefaults(void);
+
         void setClipPlanesImpl(const PlaneList& clipPlanes);
 
         /**
@@ -393,6 +396,8 @@ namespace Ogre
 		
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+
+        void _clearStateAndFlushCommandBuffer(void);
     };
 }
 #endif
