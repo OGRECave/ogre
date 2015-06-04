@@ -3958,6 +3958,12 @@ bail:
         mDepthStencilDesc.BackFace.StencilDepthFailOp   = D3D11_STENCIL_OP_KEEP;
         mDepthStencilDesc.BackFace.StencilPassOp        = D3D11_STENCIL_OP_KEEP;
         mDepthStencilDesc.BackFace.StencilFailOp        = D3D11_STENCIL_OP_KEEP;
+
+        if( mBoundDepthStencilState )
+        {
+            mBoundDepthStencilState->Release();
+            mBoundDepthStencilState = 0;
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setClipPlanesImpl(const PlaneList& clipPlanes)
