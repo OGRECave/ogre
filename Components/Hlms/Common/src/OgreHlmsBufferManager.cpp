@@ -55,7 +55,7 @@ namespace Ogre
         mCurrentTexBufferSize( 0 ),
         mTexLastOffset( 0 ),
         mLastTexBufferCmdOffset( (size_t)~0 ),
-        mTextureBufferDefaultSize( 4 * 1024 * 1024 )
+        mTextureBufferDefaultSize( 512 * 1024 )
     {
     }
     //-----------------------------------------------------------------------------------

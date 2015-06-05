@@ -4310,6 +4310,16 @@ bail:
             *device = mDevice.get();
             return;
         }
+        else if( name == "MapNoOverwriteOnDynamicConstantBuffer" )
+        {
+            *reinterpret_cast<bool*>(pData) = false; //TODO
+            return;
+        }
+        else if( name == "MapNoOverwriteOnDynamicBufferSRV" )
+        {
+            *reinterpret_cast<bool*>(pData) = false; //TODO
+            return;
+        }
 
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found: " + name, "RenderSystem::getCustomAttribute");
     }
