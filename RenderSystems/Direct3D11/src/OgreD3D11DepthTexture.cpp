@@ -238,7 +238,7 @@ namespace v1
         }
         else if( name == "numberOfViews" )
         {
-            *static_cast<uint**>(pData) = 0;
+            *static_cast<uint*>(pData) = 0;
         }
     }
 }
