@@ -1,15 +1,15 @@
 
 #include "GraphicsSystem.h"
-#include "PbsMaterialsGameState.h"
+#include "TutorialSky_PostprocessGameState.h"
 #include "SdlInputHandler.h"
 
 #include "OgreTimer.h"
-#include "OgreSceneManager.h"
-#include "OgreCamera.h"
-#include "OgreRoot.h"
+#include "Threading/OgreThreads.h"
 #include "OgreRenderWindow.h"
-#include "OgreConfigFile.h"
+
+#include "OgreRoot.h"
 #include "Compositor/OgreCompositorManager2.h"
+#include "OgreConfigFile.h"
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
@@ -18,13 +18,13 @@ using namespace Demo;
 
 namespace Demo
 {
-    class PbsMaterialsGraphicsSystem : public GraphicsSystem
+    class TutorialSky_PostprocessGraphicsSystem : public GraphicsSystem
     {
         virtual Ogre::CompositorWorkspace* setupCompositor()
         {
             Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
             return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-                                                    "PbsMaterialsWorkspace", true );
+                                                    "TutorialSky_PostprocessWorkspace", true );
         }
 
         virtual void setupResources(void)
@@ -41,13 +41,13 @@ namespace Demo
             else if( *(dataFolder.end() - 1) != '/' )
                 dataFolder += "/";
 
-            dataFolder += "2.0/scripts/materials/PbsMaterials";
+            dataFolder += "2.0/scripts/materials/TutorialSky_Postprocess";
 
             addResourceLocation( dataFolder, "FileSystem", "General" );
         }
 
     public:
-        PbsMaterialsGraphicsSystem( GameState *gameState ) :
+        TutorialSky_PostprocessGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
         }
@@ -60,46 +60,24 @@ INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 int mainApp()
 #endif
 {
-    PbsMaterialsGameState pbsMaterialsGameState(
-        "Shows how to use the PBS material system. There's nothing really fancy,\n"
-        "it's just programmer art. The PBS materials can be setup from script or\n"
-        "code. This sample does both. At the time being, not all settings from the\n"
-        "PBS implementation can be tweaked with scripts. See PbsDatablock::PbsDatablock\n"
-        "constructor documentation. Also see the Hlms section of the porting guide in\n"
-        "the Docs/2.0 folder.\n"
-        "\n"
-        "The sphere palette shows what happens when tweaking the roughness around the\n"
-        "X axis; and the fresnel term around the Z axis.\n"
-        "The scene is being lit by a white directional light (3-split PSSM) and two spot\n"
-        "lights, one of warm colour, one cold. Both are also shadowed."
-        "\n"
-        "Of all the features supported by the PBS implementation, perhaps the hardest to\n"
-        "to understand is the Detail Weight Map. It allows you to 'paint' the detail maps\n"
-        "over the mesh, by controlling weight of each of the 4 maps via the RGBA channels\n"
-        "of the weight map. 'R' controls the detail map 0, 'G' the detail map 1,\n"
-        "'B' the detail map 2, and 'A' the detail map 3.\n"
-        "\n"
+    TutorialSky_PostprocessGameState tutorialSky_PostprocessGameState(
+        "Shows how to create a sky as simple postprocess effect.\n"
+        "The vertex shader ensures the depth is always = 1, and the pixel shader\n"
+        "takes a cubemap texture.\n"
+        "The magic is in the compositor feature 'quad_normals camera_direction' which\n"
+        "sends the data needed by the cubemap lookup via normals. This data can also\n"
+        "be used for realtime analytical atmosphere scattering shaders.\n"
         "This sample depends on the media files:\n"
-        "   * Samples/Media/2.0/scripts/Compositors/PbsMaterials.compositor\n"
-        "   * Samples/Media/2.0/materials/PbsMaterials/PbsMaterials.material\n"
-        "\n"
-        "Known issues:\n"
-        " * Non shadow casting point & spot lights require Forward3D to be enabled (on desktop).\n"
-        "   This is by design (more implementations will come: Forward+ & Deferred; for now the\n"
-        "   only one working is F3D).\n"
-        " * Shadow casting point lights don't work or work poorly. (feature not implemented yet)\n"
-        " * Point lights require a directional light to exist (bug)\n"
-        " * If PSSM shadow casting enabled, the system requires at least one shadow-casting\n"
-        "   directional light (bug)\n"
-        " * Mobile version only supports forward lighting.\n"
+        "   * Samples/Media/2.0/scripts/Compositors/TutorialSky_Postprocess.compositor\n"
+        "   * Samples/Media/2.0/materials/TutorialSky_Postprocess/*.*\n"
         "\n"
         "LEGAL: Uses Saint Peter's Basilica (C) by Emil Persson under CC Attrib 3.0 Unported\n"
-        "See Samples/Media/materials/textures/Cubemaps/License.txt for more information.");
-    PbsMaterialsGraphicsSystem graphicsSystem( &pbsMaterialsGameState );
+        "See Samples/Media/materials/textures/Cubemaps/License.txt for more information." );
+    TutorialSky_PostprocessGraphicsSystem graphicsSystem( &tutorialSky_PostprocessGameState );
 
-    pbsMaterialsGameState._notifyGraphicsSystem( &graphicsSystem );
+    tutorialSky_PostprocessGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize( "PBS Materials Sample" );
+    graphicsSystem.initialize( "Dynamic Buffers Example" );
 
     if( graphicsSystem.getQuit() )
     {

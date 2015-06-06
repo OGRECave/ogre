@@ -72,6 +72,7 @@ namespace Ogre
             NO_CORNERS,
             VIEW_SPACE_CORNERS,
             WORLD_SPACE_CORNERS,
+            CAMERA_DIRECTION
         };
 
         /** Whether to use a full screen quad or triangle. (default: false). Note that you may not

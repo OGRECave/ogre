@@ -7691,6 +7691,8 @@ namespace Ogre{
                                 passQuad->mFrustumCorners = CompositorPassQuadDef::VIEW_SPACE_CORNERS;
                             else if(atom->id == ID_CAMERA_FAR_CORNERS_WORLD_SPACE)
                                 passQuad->mFrustumCorners = CompositorPassQuadDef::WORLD_SPACE_CORNERS;
+                            else if(atom->id == ID_CAMERA_DIRECTION)
+                                passQuad->mFrustumCorners = CompositorPassQuadDef::CAMERA_DIRECTION;
                             else
                                 compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                         }
