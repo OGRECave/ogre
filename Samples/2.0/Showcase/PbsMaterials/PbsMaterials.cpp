@@ -88,7 +88,6 @@ int mainApp()
         "   This is by design (more implementations will come: Forward+ & Deferred; for now the\n"
         "   only one working is F3D).\n"
         " * Shadow casting point lights don't work or work poorly. (feature not implemented yet)\n"
-        " * Point lights require a directional light to exist (bug)\n"
         " * If PSSM shadow casting enabled, the system requires at least one shadow-casting\n"
         "   directional light (bug)\n"
         " * Mobile version only supports forward lighting.\n"

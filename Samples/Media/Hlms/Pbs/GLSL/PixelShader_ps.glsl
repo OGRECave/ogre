@@ -321,8 +321,8 @@ void main()
 	nNormal = normalize( TBN * nNormal );
 @end
 
-	//Everything's in Camera space, we use Cook-Torrance lighting
-@property( hlms_lights_spot || envprobe_map )
+	//Everything's in Camera space
+@property( hlms_lights_spot || envprobe_map || hlms_forward3d )
 	vec3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
