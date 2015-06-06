@@ -18,7 +18,7 @@
 @end
 
 @property( roughness_map )
-	@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w * (1.0f - texture( textureMaps[@value( roughness_map_idx )], vec3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x);
+	@piece( SampleRoughnessMap )ROUGHNESS = material.kS.w * texture( textureMaps[@value( roughness_map_idx )], vec3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x;
 ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 @end
 

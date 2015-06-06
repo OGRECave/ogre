@@ -60,7 +60,7 @@ namespace Ogre
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 0 ),
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
-        mRoughness( 0.1f ),
+        mRoughness( 1.0f ),
         mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
         mNormalMapWeight( 1.0f ),
         mBrdf( PbsBrdf::Default )

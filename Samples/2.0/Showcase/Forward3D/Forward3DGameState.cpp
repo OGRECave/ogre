@@ -23,6 +23,7 @@
 #include "Compositor/OgreCompositorShadowNode.h"
 
 #include "OgreHlmsPbs.h"
+#include "OgreHlmsPbsDatablock.h"
 
 #include "OgreOverlayManager.h"
 #include "OgreOverlayContainer.h"
@@ -187,6 +188,9 @@ namespace Demo
         assert( dynamic_cast<Ogre::HlmsPbs*>( hlms ) );
         Ogre::HlmsPbs *pbs = static_cast<Ogre::HlmsPbs*>( hlms );
         pbs->setShadowSettings( Ogre::HlmsPbs::PCF_2x2 );
+
+        //Change the roughness of the default datablock to something prettier.
+        static_cast<Ogre::HlmsPbsDatablock*>( pbs->getDefaultDatablock() )->setRoughness( 0.1f );
 
         TutorialGameState::createScene01();
     }
