@@ -239,6 +239,7 @@ namespace Ogre {
     class MemoryManager;
     class Mesh;
     class MeshManager;
+    class ManualObject;
     class MovableObject;
     class MovablePlane;
     class MultiSourceVertexBufferPool;

@@ -46,6 +46,7 @@ Torus Knot Software Ltd.
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreLodListener.h"
+#include "OgreManualObject2.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "Animation/OgreSkeletonAnimManager.h"
@@ -1455,10 +1456,10 @@ namespace Ogre {
         /** Create a ManualObject, an object which you populate with geometry
             manually through a GL immediate-mode style interface.
         */
-        virtual v1::ManualObject* createManualObject( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
+        virtual ManualObject* createManualObject( SceneMemoryMgrTypes sceneType = SCENE_DYNAMIC );
         /** Removes & destroys a ManualObject from the SceneManager.
         */
-        virtual void destroyManualObject(v1::ManualObject* obj);
+        virtual void destroyManualObject(ManualObject* obj);
         /** Removes & destroys all ManualObjects from the SceneManager.
         */
         virtual void destroyAllManualObjects(void);

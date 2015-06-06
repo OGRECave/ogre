@@ -19,6 +19,7 @@ if( OGRE_BUILD_SAMPLES2 )
 	add_subdirectory(ApiUsage/CustomRenderable)
 	add_subdirectory(ApiUsage/DynamicGeometry)
     add_subdirectory(ApiUsage/V2Mesh)
+    add_subdirectory(ApiUsage/V2ManualObject)
 	add_subdirectory(ApiUsage/StereoRendering)
 	add_subdirectory(ApiUsage/ShadowMapDebugging)
 
