@@ -1,0 +1,17 @@
+import SkyPostprocess from SkyPostprocess.material
+
+material PostprocessingSample/Sky : SkyPostprocess
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				//Dummy command to set the gamma correction
+				texture morning.jpg gamma
+				cubic_texture morning.jpg combinedUVW
+			}
+		}
+	}
+}

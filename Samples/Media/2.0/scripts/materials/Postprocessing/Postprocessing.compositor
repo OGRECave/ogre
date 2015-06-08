@@ -552,8 +552,14 @@ compositor_node PostprocessingSampleStdRenderer
 		pass render_scene
 		{
 			//lod_update_list	off					//Turn Lod off?
-			//shadows			myShadowNode		//Shadow node?
+			shadows				ShadowMapDebuggingShadowNode
 			overlays			off
+		}
+
+		pass render_quad
+		{
+			quad_normals	camera_direction
+			material PostprocessingSample/Sky
 		}
 	}
 	

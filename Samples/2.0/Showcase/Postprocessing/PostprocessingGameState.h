@@ -17,6 +17,8 @@ namespace Demo
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
+        void importV1Mesh( const Ogre::String &meshName );
+
         /// Creates textures needed by some of the postprocessing effects.
         void createCustomTextures(void);
 

@@ -42,17 +42,22 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[6] =
+            const char *c_locations[8] =
             {
                 "2.0/scripts/materials/Common",
                 "2.0/scripts/materials/Common/GLSL",
                 "2.0/scripts/materials/Common/HLSL",
+                "2.0/scripts/materials/TutorialSky_Postprocess",
                 "2.0/scripts/materials/Postprocessing",
                 "2.0/scripts/materials/Postprocessing/GLSL",
                 "2.0/scripts/materials/Postprocessing/HLSL",
+                "2.0/scripts/materials/Postprocessing/SceneAssets",
             };
 
-            for( size_t i=0; i<6; ++i )
+            Ogre::String dataFolder = originalDataFolder + "packs/cubemapsJS.zip";
+            addResourceLocation( dataFolder, "Zip", "General" );
+
+            for( size_t i=0; i<8; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
@@ -89,12 +94,14 @@ int mainApp()
         "avoid useless copies.\n\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/materials/Common/*.*\n"
-        "   * Samples/Media/2.0/materials/Postprocessing/*.*\n" );
+        "   * Samples/Media/2.0/materials/Postprocessing/*.*\n"
+        "   * Samples/Media/2.0/scripts/materials/TutorialSky_Postprocess/*.*\n"
+        "   * Samples/Media/packs/cubemapsJS.zip\n" );
     PostprocessingGraphicsSystem graphicsSystem( &postprocessingGameState );
 
     postprocessingGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize( "PBS Materials Sample" );
+    graphicsSystem.initialize( "Postprocessing Sample" );
 
     if( graphicsSystem.getQuit() )
     {

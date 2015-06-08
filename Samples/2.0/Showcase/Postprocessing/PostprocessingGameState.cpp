@@ -45,6 +45,26 @@ namespace Demo
     {
     }
     //-----------------------------------------------------------------------------------
+    void PostprocessingGameState::importV1Mesh( const Ogre::String &meshName )
+    {
+        Ogre::v1::MeshPtr v1Mesh;
+        Ogre::MeshPtr v2Mesh;
+
+        v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
+                    meshName, Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                    Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC );
+
+        //Create a v2 mesh to import to, with a different name (arbitrary).
+        v2Mesh = Ogre::MeshManager::getSingleton().createManual(
+                    meshName, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+
+        v2Mesh->importV1( v1Mesh.get(), true, true, true );
+
+        //Free memory
+        v1Mesh->unload();
+        Ogre::v1::MeshManager::getSingleton().remove( meshName );
+    }
+    //-----------------------------------------------------------------------------------
     void PostprocessingGameState::createCustomTextures(void)
     {
         TexturePtr tex = TextureManager::getSingleton().createManual(
@@ -360,35 +380,6 @@ namespace Demo
         return workspace;
     }
     //-----------------------------------------------------------------------------------
-    void PostprocessingGameState::createScene01(void)
-    {
-        SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-
-        createExtraEffectsFromCode();
-        createCustomTextures();
-
-        Ogre::Item *item = sceneManager->createItem( "Cube_d.mesh",
-                                                     Ogre::ResourceGroupManager::
-                                                     AUTODETECT_RESOURCE_GROUP_NAME,
-                                                     Ogre::SCENE_DYNAMIC );
-
-        Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
-                createChildSceneNode( Ogre::SCENE_DYNAMIC );
-
-        sceneNode->attachObject( item );
-
-        Ogre::Light *light = sceneManager->createLight();
-        Ogre::SceneNode *lightNode = sceneManager->getRootSceneNode()->createChildSceneNode();
-        lightNode->attachObject( light );
-        light->setPowerScale( Ogre::Math::PI ); //Since we don't do HDR, counter the PBS' division by PI
-        light->setType( Ogre::Light::LT_DIRECTIONAL );
-        light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
-
-        mCameraController = new CameraController( mGraphicsSystem, false );
-
-        TutorialGameState::createScene01();
-    }
-    //-----------------------------------------------------------------------------------
     void PostprocessingGameState::createExtraEffectsFromCode(void)
     {
         Root *root = mGraphicsSystem->getRoot();
@@ -562,6 +553,97 @@ namespace Demo
             motionBlurDef->mapOutputChannel( 0, "rt_output" );
             motionBlurDef->mapOutputChannel( 1, "rt_input" );
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void PostprocessingGameState::createScene01(void)
+    {
+        SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+
+        createExtraEffectsFromCode();
+        createCustomTextures();
+
+        Ogre::v1::MeshManager::getSingleton().createPlane( "MyPlane",
+                                            Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                                            Ogre::Plane( Ogre::Vector3::UNIT_Y, 1.0f ), 50.0f, 50.0f,
+                                            1, 1, true, 1, 8.1f, 8.12f, Ogre::Vector3::UNIT_Z,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC,
+                                            Ogre::v1::HardwareBuffer::HBU_STATIC );
+        importV1Mesh( "MyPlane" );
+
+        Ogre::Item *item = sceneManager->createItem(
+                    "MyPlane", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                    Ogre::SCENE_STATIC );
+        item->setDatablock( "Rocks" );
+
+        HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        Ogre::Hlms *hlms = hlmsManager->getHlms(Ogre::HLMS_PBS);
+        Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                                                    hlms->getDatablock( "Rocks" ) );
+
+        for( size_t i=PBSM_DIFFUSE; i<=PBSM_ROUGHNESS; ++i )
+        {
+            HlmsSamplerblock samplerblock;
+            samplerblock.mU = TAM_WRAP;
+            samplerblock.mV = TAM_WRAP;
+            datablock->setSamplerblock( static_cast<PbsTextureTypes>(i), samplerblock );
+        }
+
+        Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_STATIC )->
+                                                createChildSceneNode( Ogre::SCENE_STATIC );
+        sceneNode->setPosition( 0, -1.9, 0 );
+        sceneNode->attachObject( item );
+
+        importV1Mesh( "tudorhouse.mesh" );
+
+        // House
+        item = sceneManager->createItem( "tudorhouse.mesh",
+                                         ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                                         SCENE_STATIC );
+        sceneNode = sceneManager->getRootSceneNode()->
+                        createChildSceneNode( SCENE_STATIC, Vector3(3.5f, 4.5f, -2.0f) );
+        sceneNode->scale( 0.01f, 0.01f, 0.01f );
+        sceneNode->attachObject( item );
+
+        item = sceneManager->createItem( "tudorhouse.mesh",
+                                         ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                                         SCENE_STATIC );
+        sceneNode = sceneManager->getRootSceneNode()->
+                        createChildSceneNode( SCENE_STATIC, Vector3(-3.5f, 4.5f, -2.0f) );
+        sceneNode->scale( 0.01f, 0.01f, 0.01f );
+        sceneNode->attachObject( item );
+
+        Ogre::Light *light = sceneManager->createLight();
+        Ogre::SceneNode *lightNode = sceneManager->getRootSceneNode()->createChildSceneNode();
+        lightNode->attachObject( light );
+        light->setPowerScale( Ogre::Math::PI ); //Since we don't do HDR, counter the PBS' division by PI
+        light->setType( Ogre::Light::LT_DIRECTIONAL );
+        light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
+
+        light = sceneManager->createLight();
+        lightNode = sceneManager->getRootSceneNode()->createChildSceneNode();
+        lightNode->attachObject( light );
+        light->setDiffuseColour( 0.8f, 0.4f, 0.2f ); //Warm
+        light->setSpecularColour( 0.8f, 0.4f, 0.2f );
+        //light->setPowerScale( Ogre::Math::PI );
+        light->setType( Ogre::Light::LT_DIRECTIONAL );
+        lightNode->setPosition( -10.0f, 10.0f, 10.0f );
+        light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
+        light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+
+        light = sceneManager->createLight();
+        lightNode = sceneManager->getRootSceneNode()->createChildSceneNode();
+        lightNode->attachObject( light );
+        light->setDiffuseColour( 0.2f, 0.4f, 0.8f ); //Cold
+        light->setSpecularColour( 0.2f, 0.4f, 0.8f );
+        //light->setPowerScale( Ogre::Math::PI );
+        light->setType( Ogre::Light::LT_DIRECTIONAL );
+        lightNode->setPosition( 10.0f, 10.0f, -10.0f );
+        light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
+        light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+
+        mCameraController = new CameraController( mGraphicsSystem, false );
+
+        TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
     void PostprocessingGameState::update( float timeSinceLast )
