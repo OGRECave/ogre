@@ -641,6 +641,9 @@ namespace Demo
         light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
+        Camera *camera = mGraphicsSystem->getCamera();
+        camera->move( Vector3( -8.0f, -2.6f, -4.5f ) );
+        camera->lookAt( Vector3::ZERO );
         mCameraController = new CameraController( mGraphicsSystem, false );
 
         TutorialGameState::createScene01();
