@@ -4,13 +4,13 @@ struct VS_INPUT
 	float2 uv0		: TEXCOORD0;
 };
 
-struct VS_OUTPUT
+struct PS_INPUT
 {
 	float2 uv0			: TEXCOORD0;
 	float4 gl_Position	: SV_Position;
 };
 
-VS_OUTPUT main
+PS_INPUT main
 (
 	VS_INPUT input,
 	uniform matrix worldViewProj

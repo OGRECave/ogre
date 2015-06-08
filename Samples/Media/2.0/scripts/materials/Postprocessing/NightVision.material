@@ -45,7 +45,6 @@ material Postprocess/NightVision
 
 			fragment_program_ref Postprocess/NightVision_ps
 			{
-			
 			}
 
 			texture_unit RT

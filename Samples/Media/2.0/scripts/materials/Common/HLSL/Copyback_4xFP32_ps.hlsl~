@@ -1,8 +1,0 @@
-
-Texture2D		myTexture : register(t0);
-SamplerState	mySampler : register(s0);
-
-float4 copy_4xFP32_ps( float2 uv : TEXCOORD0 ) : SV_Target
-{
-	return myTexture.Sample( mySampler, uv ).xyzw;
-}

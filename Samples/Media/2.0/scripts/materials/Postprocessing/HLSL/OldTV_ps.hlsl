@@ -2,12 +2,13 @@ Texture2D Image	: register(t0);
 Texture3D Rand	: register(t1);
 Texture3D Noise	: register(t2);
 
-SamplerState samplerState	: register(s0);
-SamplerState samplerState3D	: register(s2);
+SamplerState samplerState		: register(s0);
+SamplerState samplerStateRand	: register(s1);
+SamplerState samplerState3D		: register(s2);
 
 float4 main
 (
-	float2 img : TEXCOORD0,
+	float2 uv0 : TEXCOORD0,
 	uniform float distortionFreq	: register(c3),
 	uniform float distortionScale	: register(c4),
 	uniform float distortionRoll	: register(c5),
@@ -21,12 +22,12 @@ float4 main
 ) : SV_Target
 {
    // Define a frame shape
-   float2 pos = abs((img - 0.5) * 2.0);
+   float2 pos = abs((uv0 - 0.5) * 2.0);
    float f = (1 - pos.x * pos.x) * (1 - pos.y * pos.y);
    float frame = saturate(frameSharpness * (pow(abs(f), frameShape) - frameLimit));
 
    // Interference ... just a texture filled with rand()
-   float4 rand = Rand.Sample(samplerState, float3(1.5 * inPs.uv0.xy * 2.0, time_0_X));
+   float4 rand = Rand.Sample(samplerStateRand, float3(1.5 * uv0.xy * 2.0, time_0_X));
    rand -= float4(0.2,0.2,0.2,0.2);
 
    // Some signed noise for the distortion effect
@@ -40,8 +41,8 @@ float4 main
    dst /= 1 + distortionScale * abs(pos.y);
 
    // ... and finally distort
-   img.x += distortionScale * noisy.x * dst;
-   float4 image = Image.Sample(samplerState, img);
+   uv0.x += distortionScale * noisy.x * dst;
+   float4 image = Image.Sample(samplerState, uv0);
 
    // Combine frame, distorted image and interference
    return frame * (interference * rand.x + image);

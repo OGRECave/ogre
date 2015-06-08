@@ -28,7 +28,7 @@ float4 main
     if (st.x < Threshold) { c2 = c1; }
     if (st.y < Threshold) { c2 = c1; }
     half4 cTop = c2;
-    half4 tileColor = tex2D(RT, PCenter);
+    half4 tileColor = RT.Sample( samplerState, PCenter );
     half4 result = tileColor + cTop - cBottom;
     return result;
 }

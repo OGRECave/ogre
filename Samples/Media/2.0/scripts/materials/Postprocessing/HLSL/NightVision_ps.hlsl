@@ -1,5 +1,5 @@
 Texture2D RT				: register(t0);
-Texture2D noiseVol			: register(t1);
+Texture3D noiseVol			: register(t1);
 SamplerState samplerState[2]: register(s0);
 
 float4 main

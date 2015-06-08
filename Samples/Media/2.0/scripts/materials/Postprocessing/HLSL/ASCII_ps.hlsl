@@ -2,7 +2,7 @@ Texture2D RT					: register(t0);
 Texture3D pattern				: register(t1);
 SamplerState samplerState[2]	: register(s0);
 
-float4 ASCII_ps
+float4 main
 (
 	float2 TexCoord : TEXCOORD0,
 	uniform float2 numTiles,
