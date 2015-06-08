@@ -23,18 +23,6 @@ using namespace Demo;
 
 namespace Demo
 {
-    const CubeVertices c_originalVertices[8] =
-    {
-        CubeVertices( -1, -1,  1, -0.57737, -0.57737,  0.57737 ),
-        CubeVertices(  1, -1,  1,  0.57737, -0.57737,  0.57737 ),
-        CubeVertices(  1,  1,  1,  0.57737,  0.57737,  0.57737 ),
-        CubeVertices( -1,  1,  1, -0.57737,  0.57737,  0.57737 ),
-        CubeVertices( -1, -1, -1, -0.57737, -0.57737, -0.57737 ),
-        CubeVertices(  1, -1, -1,  0.57737, -0.57737, -0.57737 ),
-        CubeVertices(  1,  1, -1,  0.57737,  0.57737, -0.57737 ),
-        CubeVertices( -1,  1, -1, -0.57737,  0.57737, -0.57737 )
-    };
-
     TutorialSky_PostprocessGameState::TutorialSky_PostprocessGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription )
     {

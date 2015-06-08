@@ -24,5 +24,5 @@ PS_INPUT main
 	outVs.gl_Position	= mul( worldViewProj, input.vertex ).xyww;
 	outVs.cameraDir		= input.normal;
 
-	return Out;
+	return outVs;
 }

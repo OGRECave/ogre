@@ -25,6 +25,7 @@ if( OGRE_BUILD_SAMPLES2 )
 
 	add_subdirectory(Showcase/Forward3D)
 	add_subdirectory(Showcase/PbsMaterials)
+	add_subdirectory(Showcase/Postprocessing)
 
 	add_subdirectory(Tutorials/Tutorial01_Initialization)
 	add_subdirectory(Tutorials/Tutorial02_VariableFramerate)

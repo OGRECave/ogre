@@ -1,0 +1,48 @@
+fragment_program Postprocess/Tiling_ps_HLSL hlsl
+{
+	source Tiling_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program Postprocess/Tiling_ps_GLSL glsl
+{
+	source Tiling_ps.glsl
+}
+
+fragment_program Postprocess/Tiling_ps unified
+{
+	delegate Postprocess/Tiling_ps_GLSL
+	delegate Postprocess/Tiling_ps_HLSL
+}
+
+material Postprocess/Tiling
+{
+    technique
+    {
+
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Postprocess/Tiling_ps
+			{
+				param_named NumTiles float 75.0
+				param_named Threshold float 0.15
+			}
+
+			texture_unit RT
+			{
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
