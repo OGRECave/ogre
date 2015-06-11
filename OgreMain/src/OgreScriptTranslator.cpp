@@ -8210,7 +8210,7 @@ namespace Ogre{
                 {
                 case ID_VIEWPORT:
                     {
-                        if(prop->values.size() != 4 || prop->values.size() != 8)
+                        if(prop->values.size() != 4 && prop->values.size() != 8)
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
                                                 "4 or 8 numeric arguments expected");
