@@ -575,13 +575,13 @@ namespace Ogre
         mapSize += mListener->getPassBufferSize( shadowNode, casterPass,
                                                  dualParaboloid, sceneManager );
 
-        //Arbitrary 16kb (minimum supported by GL), should be enough.
-        const size_t maxBufferSize = 16 * 1024;
+        //Arbitrary 2kb (minimum supported by GL is 64kb), should be enough.
+        const size_t maxBufferSize = 2 * 1024;
         assert( mapSize <= maxBufferSize );
 
         if( mCurrentPassBuffer >= mPassBuffers.size() )
         {
-            mPassBuffers.push_back( mVaoManager->createConstBuffer( /*maxBufferSize*/mapSize,
+            mPassBuffers.push_back( mVaoManager->createConstBuffer( maxBufferSize,
                                                                     BT_DYNAMIC_PERSISTENT,
                                                                     0, false ) );
         }
