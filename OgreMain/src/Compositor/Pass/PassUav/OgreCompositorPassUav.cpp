@@ -98,6 +98,12 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
+        //Do not execute resource transitions. This pass shouldn't have them.
+        //The transitions are made when the bindings are needed
+        //(<sarcasm>we'll have fun with the validation layers later</sarcasm>).
+        //executeResourceTransitions();
+        assert( mResourceTransitions.empty() );
+
         RenderSystem *renderSystem = mParentNode->getRenderSystem();
 
         if( mDefinition->mStartingSlot != std::numeric_limits<uint8>::max() )
@@ -199,6 +205,6 @@ namespace Ogre
         }
 
         //Do not use base class functionality at all.
-        //CompositorPassv::_placeBarriersAndEmulateUavExecution();
+        //CompositorPass::_placeBarriersAndEmulateUavExecution();
     }
 }

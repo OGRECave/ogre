@@ -794,6 +794,10 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
+        virtual void _resourceTransitionCreated( ResourceTransition *resTransition )    {}
+        virtual void _resourceTransitionDestroyed( ResourceTransition *resTransition )  {}
+        virtual void _executeResourceTransition( ResourceTransition *resTransition )    {}
+
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock ) {}
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block ) {}
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock ) {}

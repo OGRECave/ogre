@@ -207,6 +207,8 @@ namespace Ogre
                                  (corners[7] - cameraPos).normalisedCopy() );
         }
 
+        executeResourceTransitions();
+
         SceneManager *sceneManager = mCamera->getSceneManager();
         sceneManager->_setViewport( mViewport );
 

@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "OgreDepthBuffer.h"
 #include "OgreRenderTarget.h"
 
+#include "OgreRenderSystem.h"
+
 namespace Ogre
 {
     void CompositorPassDepthCopyDef::setDepthTextureCopy( const String &srcTextureName,
@@ -86,6 +88,8 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
+        executeResourceTransitions();
+
         //Should we retrieve every update, or cache the return values
         //and listen to notifyRecreated and family of funtions?
         const CompositorChannel *srcChannel = mParentNode->_getDefinedTexture(
@@ -112,5 +116,50 @@ namespace Ogre
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
             mTarget->_endUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassDepthCopy::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                                        ResourceAccessMap &uavsAccess,
+                                                                        ResourceLayoutMap &resourcesLayout )
+    {
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+        const RenderSystemCapabilities *caps = renderSystem->getCapabilities();
+        const bool explicitApi = caps->hasCapability( RSC_EXPLICIT_API );
+
+        if( !explicitApi )
+            return;
+
+        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "D3D12/Vulkan/Mantle Stub",
+                     "CompositorPassDepthCopy::_placeBarriersAndEmulateUavExecution" );
+
+        /*{
+            const CompositorChannel *srcChannel = mParentNode->_getDefinedTexture(
+                                                    mDefinition->mSrcDepthTextureName );
+
+            //Check <anything> -> CopySrc
+            ResourceLayoutMap::iterator currentLayout = resourcesLayout.find(
+                        srcChannel->target->getDepthBuffer() );
+            if( currentLayout->second != ResourceLayout::CopySrc )
+            {
+                addResourceTransition( currentLayout,
+                                       ResourceLayout::CopySrc,
+                                       ReadBarrier::? ); //Likely 0
+            }
+
+            const CompositorChannel *dstChannel = mParentNode->_getDefinedTexture(
+                                                    mDefinition->mDstDepthTextureName );
+
+            //Check <anything> -> CopyDst
+            currentLayout = resourcesLayout.find( dstChannel->target->getDepthBuffer() );
+            if( currentLayout->second != ResourceLayout::CopyDst )
+            {
+                addResourceTransition( currentLayout,
+                                       ResourceLayout::CopyDst,
+                                       ReadBarrier::? ); //Likely 0
+            }
+        }*/
+
+        //Do not use base class functionality at all.
+        //CompositorPass::_placeBarriersAndEmulateUavExecution();
     }
 }

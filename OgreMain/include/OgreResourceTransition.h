@@ -119,12 +119,14 @@ namespace Ogre
 
     struct ResourceTransition
     {
-        Resource *resource;
+        //Resource *resource; //TODO: We'll get here when D3D12/Vulkan is finished
         ResourceLayout::Layout      oldLayout;
         ResourceLayout::Layout      newLayout;
 
         uint32 writeBarrierBits;    /// @see WriteBarrier::WriteBarrier
         uint32 readBarrierBits;     /// @see ReadBarrier::ReadBarrier
+
+        void    *mRsData;       /// Render-System specific data
     };
 
     typedef map<RenderTarget*, ResourceLayout::Layout>::type ResourceLayoutMap;

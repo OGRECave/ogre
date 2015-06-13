@@ -59,13 +59,15 @@ namespace Ogre
             --mNumPassesLeft;
         }
 
-        //TODO: Implement mDiscardOnly
-        mSceneManager->_setViewport( mViewport );
-
         //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
             listener->passPreExecute( this );
+
+        executeResourceTransitions();
+
+        //TODO: Implement mDiscardOnly
+        mSceneManager->_setViewport( mViewport );
 
         mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
                             mDefinition->mDepthValue, mDefinition->mStencilValue );

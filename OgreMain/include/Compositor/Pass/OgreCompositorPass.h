@@ -94,9 +94,17 @@ namespace Ogre
         CompositorTextureVec    mTextureDependencies;
 
         typedef vector<ResourceTransition>::type ResourceTransitionVec;
-        ResourceTransitionVec  mResourceTransitions;
+        ResourceTransitionVec   mResourceTransitions;
+        /// In OpenGL, only the first entry in mResourceTransitions contains a real
+        /// memory barrier. The rest is just kept for debugging purposes. So
+        /// mNumValidResourceTransitions is either 0 or 1.
+        /// In D3D12/Vulkan/Mantle however,
+        /// mNumValidResourceTransitions = mResourceTransitions.size()
+        uint32                  mNumValidResourceTransitions;
 
         void populateTextureDependenciesFromExposedTextures(void);
+
+        void executeResourceTransitions(void);
 
         RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
 

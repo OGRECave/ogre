@@ -1410,6 +1410,81 @@ namespace Ogre {
         }
     }
 
+    void GL3PlusRenderSystem::_resourceTransitionCreated( ResourceTransition *resTransition )
+    {
+        assert( sizeof(void*) >= sizeof(GLbitfield) );
+
+        assert( (resTransition->readBarrierBits || resTransition->writeBarrierBits) &&
+                "A zero-bit memory barrier is invalid!" );
+
+        GLbitfield barriers = 0;
+
+        //TODO:
+        //GL_QUERY_BUFFER_BARRIER_BIT is nearly impossible to determine
+        //specifically
+        //Should be used in all barriers? Since we don't yet support them,
+        //we don't include it in case it brings performance down.
+        //Or should we use 'All' instead for these edge cases?
+
+        if( resTransition->readBarrierBits & ReadBarrier::CpuRead ||
+            resTransition->writeBarrierBits & WriteBarrier::CpuWrite )
+        {
+            barriers |= GL_PIXEL_BUFFER_BARRIER_BIT|GL_TEXTURE_UPDATE_BARRIER_BIT|
+                        GL_BUFFER_UPDATE_BARRIER_BIT|GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT;
+        }
+
+        if( resTransition->readBarrierBits & ReadBarrier::Indirect )
+            barriers |= GL_COMMAND_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::VertexBuffer )
+            barriers |= GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT|GL_TRANSFORM_FEEDBACK_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::IndexBuffer )
+            barriers |= GL_ELEMENT_ARRAY_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::ConstBuffer )
+            barriers |= GL_UNIFORM_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::Texture )
+            barriers |= GL_TEXTURE_FETCH_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::Uav ||
+            resTransition->writeBarrierBits & WriteBarrier::Uav )
+        {
+            barriers |= GL_SHADER_IMAGE_ACCESS_BARRIER_BIT|GL_SHADER_STORAGE_BARRIER_BIT|
+                        GL_ATOMIC_COUNTER_BARRIER_BIT;
+        }
+
+        if( resTransition->readBarrierBits & (ReadBarrier::RenderTarget|ReadBarrier::DepthStencil) ||
+            resTransition->writeBarrierBits & (WriteBarrier::RenderTarget|WriteBarrier::DepthStencil) )
+        {
+            barriers |= GL_FRAMEBUFFER_BARRIER_BIT;
+        }
+
+        if( resTransition->readBarrierBits == ReadBarrier::All ||
+            resTransition->writeBarrierBits == WriteBarrier::All )
+        {
+            barriers = GL_ALL_BARRIER_BITS;
+        }
+
+        resTransition->mRsData = reinterpret_cast<void*>( barriers );
+    }
+
+    void GL3PlusRenderSystem::_resourceTransitionDestroyed( ResourceTransition *resTransition )
+    {
+        assert( resTransition->mRsData ); //A zero-bit memory barrier is invalid
+        resTransition->mRsData = 0;
+    }
+
+    void GL3PlusRenderSystem::_executeResourceTransition( ResourceTransition *resTransition )
+    {
+        GLbitfield barriers = static_cast<GLbitfield>( reinterpret_cast<intptr_t>(
+                                                           resTransition->mRsData ) );
+
+        assert( barriers && "A zero-bit memory barrier is invalid" );
+        glMemoryBarrier( barriers );
+    }
+
     void GL3PlusRenderSystem::_hlmsMacroblockCreated( HlmsMacroblock *newBlock )
     {
         GL3PlusHlmsMacroblock *glMacroblock = new GL3PlusHlmsMacroblock();

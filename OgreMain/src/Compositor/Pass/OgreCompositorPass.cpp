@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 #include "OgreViewport.h"
 
+#include "OgreRenderSystem.h"
+
 #include "OgreStringConverter.h"
 
 namespace Ogre
@@ -47,7 +49,8 @@ namespace Ogre
             mTarget( 0 ),
             mViewport( 0 ),
             mNumPassesLeft( definition->mNumInitialPasses ),
-            mParentNode( parentNode )
+            mParentNode( parentNode ),
+            mNumValidResourceTransitions( 0 )
     {
         assert( definition->mNumInitialPasses && "Definition is broken, pass will never execute!" );
 
@@ -115,6 +118,19 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorPass::~CompositorPass()
     {
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+
+
+        assert( mNumValidResourceTransitions <= mResourceTransitions.size() );
+        ResourceTransitionVec::iterator itor = mResourceTransitions.begin();
+
+        for( size_t i=0; i<mNumValidResourceTransitions; ++i )
+        {
+            renderSystem->_resourceTransitionDestroyed( &(*itor) );
+            ++itor;
+        }
+
+        mNumValidResourceTransitions = 0;
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::populateTextureDependenciesFromExposedTextures(void)
@@ -127,6 +143,20 @@ namespace Ogre
             const CompositorChannel *channel = mParentNode->_getDefinedTexture( *itor );
             mTextureDependencies.push_back( CompositorTexture( *itor, &channel->textures ) );
 
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::executeResourceTransitions(void)
+    {
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+
+        assert( mNumValidResourceTransitions <= mResourceTransitions.size() );
+        ResourceTransitionVec::iterator itor = mResourceTransitions.begin();
+
+        for( size_t i=0; i<mNumValidResourceTransitions; ++i )
+        {
+            renderSystem->_executeResourceTransition( &(*itor) );
             ++itor;
         }
     }
@@ -201,6 +231,45 @@ namespace Ogre
         transition.writeBarrierBits = transitionWriteBarrierBits( transition.oldLayout );
         transition.readBarrierBits  = readBarrierBits;
 
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+        const RenderSystemCapabilities *caps = renderSystem->getCapabilities();
+        if( !caps->hasCapability( RSC_EXPLICIT_API ) )
+        {
+            //OpenGL. Merge the bits and use only one global barrier.
+            //Keep the extra barriers uninitialized for debugging purposes,
+            //but we won't be really using them.
+            if( mResourceTransitions.empty() )
+            {
+                ResourceTransition globalBarrier;
+                globalBarrier.oldLayout = ResourceLayout::Undefined;
+                globalBarrier.newLayout = ResourceLayout::Undefined;
+                globalBarrier.writeBarrierBits  = transition.readBarrierBits;
+                globalBarrier.readBarrierBits   = transition.writeBarrierBits;
+                globalBarrier.mRsData = 0;
+                renderSystem->_resourceTransitionCreated( &globalBarrier );
+                mResourceTransitions.push_back( globalBarrier );
+            }
+            else
+            {
+                ResourceTransition &globalBarrier = mResourceTransitions.front();
+
+                renderSystem->_resourceTransitionDestroyed( &globalBarrier );
+
+                globalBarrier.readBarrierBits   |= transition.readBarrierBits;
+                globalBarrier.writeBarrierBits  |= transition.writeBarrierBits;
+
+                renderSystem->_resourceTransitionCreated( &globalBarrier );
+            }
+
+            mNumValidResourceTransitions = 1;
+        }
+        else
+        {
+            //D3D12, Vulkan, Mantle. Takes advantage of per-resource barriers
+            renderSystem->_resourceTransitionCreated( &transition );
+            ++mNumValidResourceTransitions;
+        }
+
         mResourceTransitions.push_back( transition );
 
         currentLayout->second = transition.newLayout;
@@ -210,6 +279,10 @@ namespace Ogre
                                             BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
                                             ResourceLayoutMap &resourcesLayout )
     {
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+        const RenderSystemCapabilities *caps = renderSystem->getCapabilities();
+        const bool explicitApi = caps->hasCapability( RSC_EXPLICIT_API );
+
         {
             //mResourceTransitions will be non-empty if we call _placeBarriersAndEmulateUavExecution
             //for a second time (i.e. 2nd pass to check frame-to-frame dependencies). We need
@@ -220,8 +293,8 @@ namespace Ogre
             while( itor != end )
             {
                 if( itor->newLayout == ResourceLayout::Uav &&
-                        itor->writeBarrierBits & WriteBarrier::Uav &&
-                        itor->readBarrierBits & ReadBarrier::Uav )
+                    itor->writeBarrierBits & WriteBarrier::Uav &&
+                    itor->readBarrierBits & ReadBarrier::Uav )
                 {
                     RenderTarget *renderTarget = 0;
                     resourcesLayout[renderTarget] = ResourceLayout::Uav;
@@ -236,7 +309,8 @@ namespace Ogre
         {
             //Check <anything> -> RT
             ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( mTarget );
-            if( currentLayout->second != ResourceLayout::RenderTarget )
+            if( (currentLayout->second != ResourceLayout::RenderTarget && explicitApi) ||
+                currentLayout->second == ResourceLayout::Uav )
             {
                 addResourceTransition( currentLayout,
                                        ResourceLayout::RenderTarget,
@@ -256,7 +330,8 @@ namespace Ogre
 
                 ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( renderTarget );
 
-                if( currentLayout->second != ResourceLayout::Texture )
+                if( (currentLayout->second != ResourceLayout::Texture && explicitApi) ||
+                     currentLayout->second == ResourceLayout::Uav )
                 {
                     //TODO: Account for depth textures.
                     addResourceTransition( currentLayout,
