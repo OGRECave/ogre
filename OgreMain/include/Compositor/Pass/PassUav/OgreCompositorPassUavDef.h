@@ -84,6 +84,7 @@ namespace Ogre
     public:
         bool    mKeepPreviousUavs;
         /// Max value (0xff) means don't alter it.
+        /// @see RenderSystem::setUavStartingSlot
         uint8   mStartingSlot;
 
         CompositorPassUavDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :

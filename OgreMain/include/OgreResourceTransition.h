@@ -50,6 +50,7 @@ namespace Ogre
         TextureDepth,
         RenderTarget,
         RenderDepth,
+        Clear,
         Uav,
         CopySrc,
         CopyDst,

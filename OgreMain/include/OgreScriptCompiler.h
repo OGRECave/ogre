@@ -835,13 +835,15 @@ namespace Ogre
                 ID_RENDER_SCENE,
                 ID_RENDER_QUAD,
                 ID_DEPTH_COPY,
-                ID_UAV_QUEUE,
+                ID_BIND_UAV,
                     ID_VIEWPORT,
                     ID_NUM_INITIAL,
                     ID_IDENTIFIER,
                     ID_OVERLAYS,
                     ID_EXECUTION_MASK,
                     ID_VIEWPORT_MODIFIER_MASK,
+                    ID_USES_UAV,
+                        ID_ALLOW_WRITE_AFTER_WRITE, //Used inside ID_USES_UAV
                     //ID_COLOUR_WRITE,
 
                     //Used by PASS_SCENE

@@ -7550,6 +7550,7 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
                 case ID_COLOUR_WRITE:
                     break;
                 default:
@@ -7633,6 +7634,7 @@ namespace Ogre{
                 case ID_NUM_INITIAL:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -7784,6 +7786,7 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
                 case ID_COLOUR_WRITE:
                     break;
                 default:
@@ -8039,6 +8042,7 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
                 case ID_COLOUR_WRITE:
                     break;
                 default:
@@ -8147,6 +8151,7 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
                 case ID_COLOUR_WRITE:
                     break;
                 default:
@@ -8320,13 +8325,14 @@ namespace Ogre{
                     }
                 }
                 break;
-                case ID_VIEWPORT:
+                //case ID_VIEWPORT:
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:
-                case ID_OVERLAYS:
+                //case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
-                case ID_COLOUR_WRITE:
+                //case ID_USES_UAV:
+                //case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -8359,7 +8365,7 @@ namespace Ogre{
             translateScene( compiler, node, target );
         else if(obj->name == "depth_copy")
             translateDepthCopy( compiler, node, target );
-        else if(obj->name == "uav_queue")
+        else if(obj->name == "bind_uav")
             translateUav( compiler, node, target );
         else if(obj->name == "custom")
         {
@@ -8543,6 +8549,64 @@ namespace Ogre{
                         {
                             mPassDef->mViewportModifierMask = static_cast<uint8>( val & 0xFF );
                         }
+                    }
+                    break;
+                case ID_USES_UAV:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() < 2 || prop->values.size() > 4)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "uses_uav needs between 2 and 4 arguments");
+                    }
+                    else
+                    {
+                        uint32 uavSlot              = 0;
+                        uint32 access               = ResourceAccess::Undefined;
+                        bool   allowWriteAfterWrite = false;
+
+                        if(!getUInt( prop->values.front(), &uavSlot ))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "uses_uav should be 'uses_uav <number betwee 0 and 63> "
+                                "<[read] [write]> [allow_write_after_write]'");
+                        }
+
+                        //Skip the slot #
+                        AbstractNodeList::const_iterator it = ++prop->values.begin();
+                        AbstractNodeList::const_iterator en = prop->values.end();
+
+                        while( it != en )
+                        {
+                            if( (*it)->type == ANT_ATOM )
+                            {
+                                AtomAbstractNode *atom = (AtomAbstractNode*)(*it).get();
+                                switch( atom->id )
+                                {
+                                case ID_READ:
+                                    access |= ResourceAccess::Read;
+                                case ID_WRITE:
+                                    access |= ResourceAccess::Write;
+                                    break;
+                                case ID_ALLOW_WRITE_AFTER_WRITE:
+                                    allowWriteAfterWrite = true;
+                                    break;
+                                default:
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                        "unrecognized token in uses_uav: " + atom->getValue() );
+                                    break;
+                                }
+                            }
+
+                            ++it;
+                        }
+
+                        CompositorPassDef::UavDependency uavDep(
+                                    uavSlot, static_cast<ResourceAccess::ResourceAccess>(access),
+                                    allowWriteAfterWrite );
+                        mPassDef->mUavDependencies.push_back( uavDep );
                     }
                     break;
                 case ID_COLOUR_WRITE:

@@ -128,11 +128,14 @@ namespace Ogre
 
         struct UavDependency
         {
+            /// The slot must be in range [0; 64) and ignores the starting
+            /// slot (@see CompositorPassUavDef::mStartingSlot)
             uint32                          uavSlot;
-            //The UAV pass already sets the texture access.
-            //However two passes in a row may only read from it,
-            //thus this is convenient (without needing to add
-            //another set UAV pass)
+
+            /// The UAV pass already sets the texture access.
+            /// However two passes in a row may only read from it,
+            /// thus having this information is convenient (without
+            /// needing to add another bind UAV pass)
             ResourceAccess::ResourceAccess  access;
             bool                            allowWriteAfterWrite;
 
