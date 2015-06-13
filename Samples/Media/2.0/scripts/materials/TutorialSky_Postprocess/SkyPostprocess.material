@@ -1,0 +1,82 @@
+
+// GLSL shaders
+vertex_program SkyPostprocess_vs_GLSL glsl
+{
+	source SkyPostprocess_vs.glsl
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+fragment_program SkyPostprocess_ps_GLSL glsl
+{
+	source SkyPostprocess_ps.glsl
+	default_params
+	{
+		param_named skyCubemap int 0
+	}
+}
+
+// HLSL shaders
+vertex_program SkyPostprocess_vs_HLSL hlsl
+{
+    source SkyPostprocess_vs.hlsl
+    entry_point main
+    target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+fragment_program SkyPostprocess_ps_HLSL hlsl
+{
+	source SkyPostprocess_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+// Unified definitions
+vertex_program SkyPostprocess_vs unified
+{
+	delegate SkyPostprocess_vs_HLSL
+	delegate SkyPostprocess_vs_GLSL
+}
+
+fragment_program SkyPostprocess_ps unified
+{
+	delegate SkyPostprocess_ps_HLSL
+	delegate SkyPostprocess_ps_GLSL
+}
+
+// Material definition
+material SkyPostprocess
+{
+	technique
+	{
+		pass
+		{
+			depth_check on
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref SkyPostprocess_vs
+			{
+			}
+
+			fragment_program_ref SkyPostprocess_ps
+			{
+			}
+
+			texture_unit
+			{
+				texture SaintPetersBasilica.dds gamma
+				filtering			trilinear
+				tex_address_mode	clamp
+			}
+		}
+	}
+}

@@ -528,11 +528,14 @@ namespace v1 {
         /** See setDefaultDimensions - this gets 1 component individually. */
         virtual Real getDefaultHeight(void) const;
 
+        /// Overriden from Renderable
+        virtual bool getUseIdentityWorldMatrix(void) const;
+
         /** Overridden from MovableObject
         @see
             MovableObject
         */
-        virtual void _notifyCurrentCamera(Camera* cam);
+        virtual void _notifyCurrentCamera( const Camera* cam );
 
         /** Begin injection of billboard data; applicable when 
             constructing the BillboardSet for external data use.
@@ -700,7 +703,7 @@ namespace v1 {
             bool debugRenderables = false);
 
         /** Sort the billboard set. Only called when enabled via setSortingEnabled */
-        virtual void _sortBillboards( Camera* cam);
+        virtual void _sortBillboards(void);
 
         /** Gets the sort mode of this billboard set */
         virtual SortMode _getSortMode(void) const;

@@ -26,23 +26,34 @@ struct PS_INPUT
 	float4 gl_Position : SV_Position;
 };
 
+@property( !hlms_identity_world )
+	@piece( worldViewProj )worldViewProj@end
+@end @property( hlms_identity_world )
+	@property( !hlms_identity_viewproj_dynamic )
+		@piece( worldViewProj )passBuf.viewProj[@value(hlms_identity_viewproj)]@end
+	@end @property( hlms_identity_viewproj_dynamic )
+		@piece( worldViewProj )passBuf.viewProj[materialIdx[input.drawId].z]@end
+	@end
+@end
+
 PS_INPUT main( VS_INPUT input )
 {
 	PS_INPUT outVs;
 	@insertpiece( custom_vs_preExecution )
 
-	//uint drawId = 1;
-	float4x4 worldViewProj;
-	worldViewProj = UNPACK_MAT4( worldMatBuf, input.drawId );
+	@property( !hlms_identity_world )
+		float4x4 worldViewProj;
+		worldViewProj = UNPACK_MAT4( worldMatBuf, input.drawId );
+	@end
 
 @property( !hlms_dual_paraboloid_mapping )
-	outVs.gl_Position = mul( worldViewProj, input.vertex );
+	outVs.gl_Position = mul( @insertpiece( worldViewProj ), input.vertex );
 @end
 
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	outVs.gl_Position.w		= 1.0f;
-	outVs.gl_Position.xyz	= mul( worldViewProj, input.vertex ).xyz;
+	outVs.gl_Position.xyz	= mul( @insertpiece( worldViewProj ), input.vertex ).xyz;
 	float L = length( outVs.gl_Position.xyz );
 	outVs.gl_Position.z		+= 1.0f;
 	outVs.gl_Position.xy	/= outVs.gl_Position.z;

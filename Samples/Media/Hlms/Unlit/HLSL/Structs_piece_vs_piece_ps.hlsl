@@ -1,4 +1,3 @@
-@property( hlms_shadowcaster )
 @piece( PassDecl )
 //Uniforms that change per pass
 cbuffer PassBuffer : register(b0)
@@ -6,11 +5,13 @@ cbuffer PassBuffer : register(b0)
 	struct PassData
 	{
 	//Vertex shader
-	float2 depthRange;
+	float4x4 viewProj[2];
+	@property( hlms_shadowcaster )
+		float4 depthRange;
+	@end
 	@insertpiece( custom_passBuffer )
 	} passBuf;
 };
-@end
 @end
 
 @piece( MaterialDecl )
@@ -41,6 +42,10 @@ cbuffer instance : register(b2)
     //shadowConstantBias. Send the bias directly to avoid an
     //unnecessary indirection during the shadow mapping pass.
     //Must be loaded with uintBitsToFloat
+    //
+    //.z =
+    //Contains 0 or 1 to index into pass.viewProj[]. Only used
+    //if hlms_identity_viewproj_dynamic is set.
 	uint4 materialIdx[4096];
 };
 @end

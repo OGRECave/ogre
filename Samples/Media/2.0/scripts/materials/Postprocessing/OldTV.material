@@ -1,0 +1,77 @@
+fragment_program OldTV_ps_GLSL glsl
+{
+	source OldTV_ps.glsl
+    default_params
+	{
+   		param_named Image int 0
+   		param_named Rand int 1
+   		param_named Noise int 2
+	}
+}
+
+fragment_program OldTV_ps_HLSL hlsl
+{
+	source OldTV_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program OldTV_ps unified
+{
+	delegate OldTV_ps_GLSL
+	delegate OldTV_ps_HLSL
+}
+
+material Postprocess/OldTV
+{
+	technique
+	{
+
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref OldTV_ps
+			{
+                param_named distortionFreq float 2.7
+                param_named distortionScale float 2.5
+                param_named distortionRoll float 0.93
+                param_named interference float 0.5
+                param_named frameLimit float 0.40
+                param_named frameShape float 0.26
+                param_named frameSharpness float 6.0
+				
+                param_named_auto time_0_X time_0_x 120
+                param_named_auto sin_time_0_X sintime_0_x 120				
+			}
+
+			texture_unit
+			{
+                tex_coord_set 0
+				tex_address_mode clamp
+				filtering linear linear linear
+			}
+
+			texture_unit
+			{
+				texture Random3D.dds 3d
+				tex_address_mode wrap
+				filtering linear linear linear
+			}
+
+			texture_unit
+			{
+				texture NoiseVolume.dds 3d
+				tex_address_mode wrap
+				filtering linear linear point
+			}
+		}
+	}
+}

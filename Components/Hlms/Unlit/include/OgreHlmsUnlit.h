@@ -117,10 +117,6 @@ namespace Ogre
                                          CommandBuffer *commandBuffer );
 
         virtual void frameEnded(void);
-
-        /// Changes the default suggested size for the texture buffer.
-        /// Actual size may be lower if the GPU can't honour the request.
-        void setTextureBufferDefaultSize( size_t defaultSize );
     };
 
     struct _OgreHlmsUnlitExport UnlitProperty

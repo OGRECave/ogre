@@ -156,22 +156,7 @@ bail:
         mSwitchingFullscreenCounter = 0;
         mDriverType = DT_HARDWARE;
 
-        ZeroMemory( &mDepthStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
-        mDepthStencilDesc.DepthEnable       = TRUE;
-        mDepthStencilDesc.DepthWriteMask    = D3D11_DEPTH_WRITE_MASK_ALL;
-        mDepthStencilDesc.DepthFunc         = D3D11_COMPARISON_LESS;
-        mDepthStencilDesc.StencilEnable     = FALSE;
-        mDepthStencilDesc.StencilReadMask   = D3D11_DEFAULT_STENCIL_READ_MASK;
-        mDepthStencilDesc.StencilWriteMask  = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-        mDepthStencilDesc.FrontFace.StencilFunc         = D3D11_COMPARISON_ALWAYS;
-        mDepthStencilDesc.FrontFace.StencilDepthFailOp  = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.FrontFace.StencilPassOp       = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.FrontFace.StencilFailOp       = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.BackFace.StencilFunc          = D3D11_COMPARISON_ALWAYS;
-        mDepthStencilDesc.BackFace.StencilDepthFailOp   = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.BackFace.StencilPassOp        = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.BackFace.StencilFailOp        = D3D11_STENCIL_OP_KEEP;
-
+        setDepthStencilDefaults();
 
         initRenderSystem();
 
@@ -4114,6 +4099,31 @@ bail:
         setSubroutine(gptype, slotIdx, subroutineName);
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::setDepthStencilDefaults(void)
+    {
+        ZeroMemory( &mDepthStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
+        mDepthStencilDesc.DepthEnable       = TRUE;
+        mDepthStencilDesc.DepthWriteMask    = D3D11_DEPTH_WRITE_MASK_ALL;
+        mDepthStencilDesc.DepthFunc         = D3D11_COMPARISON_LESS;
+        mDepthStencilDesc.StencilEnable     = FALSE;
+        mDepthStencilDesc.StencilReadMask   = D3D11_DEFAULT_STENCIL_READ_MASK;
+        mDepthStencilDesc.StencilWriteMask  = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+        mDepthStencilDesc.FrontFace.StencilFunc         = D3D11_COMPARISON_ALWAYS;
+        mDepthStencilDesc.FrontFace.StencilDepthFailOp  = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.FrontFace.StencilPassOp       = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.FrontFace.StencilFailOp       = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.BackFace.StencilFunc          = D3D11_COMPARISON_ALWAYS;
+        mDepthStencilDesc.BackFace.StencilDepthFailOp   = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.BackFace.StencilPassOp        = D3D11_STENCIL_OP_KEEP;
+        mDepthStencilDesc.BackFace.StencilFailOp        = D3D11_STENCIL_OP_KEEP;
+
+        if( mBoundDepthStencilState )
+        {
+            mBoundDepthStencilState->Release();
+            mBoundDepthStencilState = 0;
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::setClipPlanesImpl(const PlaneList& clipPlanes)
     {
     }
@@ -4458,6 +4468,16 @@ bail:
             *device = mDevice.get();
             return;
         }
+        else if( name == "MapNoOverwriteOnDynamicConstantBuffer" )
+        {
+            *reinterpret_cast<bool*>(pData) = false; //TODO
+            return;
+        }
+        else if( name == "MapNoOverwriteOnDynamicBufferSRV" )
+        {
+            *reinterpret_cast<bool*>(pData) = false; //TODO
+            return;
+        }
 
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found: " + name, "RenderSystem::getCustomAttribute");
     }
@@ -4531,5 +4551,13 @@ bail:
             mDevice.GetProfiler()->SetMarker(wideNameOk ? wideName : L"<too long or empty event name>");
         }
 #endif
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_clearStateAndFlushCommandBuffer(void)
+    {
+        mDevice.GetImmediateContext()->ClearState();
+        mDevice.GetImmediateContext()->Flush();
+
+        setDepthStencilDefaults();
     }
 }

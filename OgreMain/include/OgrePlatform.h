@@ -191,6 +191,21 @@ namespace Ogre {
 // Disable OGRE_WCHAR_T_STRINGS until we figure out what to do about it.
 #define OGRE_WCHAR_T_STRINGS 0
 
+// For safely overriding virtual functions
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#   define OGRE_OVERRIDE override
+#elif OGRE_COMPILER == OGRE_COMPILER_GNUC
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
+#   define OGRE_OVERRIDE
+#else
+#   define OGRE_OVERRIDE
+#endif
+#elif __cplusplus >= 201103L // Noone defines this these days...
+#   define OGRE_OVERRIDE override
+#else
+#   define OGRE_OVERRIDE
+#endif
+
 //----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT

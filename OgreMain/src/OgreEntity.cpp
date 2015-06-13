@@ -468,10 +468,10 @@ namespace v1 {
         }
     }
     //-----------------------------------------------------------------------
+#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
     void Entity::_notifyCurrentCamera(Camera* cam)
     {
         //TODO (dark_sylinc): This whole state tracking thing feels wrong.
-#ifdef ENABLE_INCOMPATIBLE_OGRE_2_0
         // Calculate the LOD
         if (mParentNode)
         {
@@ -558,8 +558,8 @@ namespace v1 {
         {
             (*child_itr).second->_notifyCurrentCamera(cam);
         }
-#endif
     }
+#endif
     //-----------------------------------------------------------------------
     void Entity::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {

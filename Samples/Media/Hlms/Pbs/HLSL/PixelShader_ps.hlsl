@@ -124,7 +124,7 @@ float3 qmul( float4 q, float3 v )
 	@property( normal_weight_tex )#define normalMapWeight material.F0.w@end
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
-			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )]@end
+			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )@end
 		@end
 	@end
 @end
@@ -269,8 +269,8 @@ float4 main( PS_INPUT inPs
 	nNormal = normalize( mul( nNormal, TBN ) );
 @end
 
-	//Everything's in Camera space, we use Cook-Torrance lighting
-@property( hlms_lights_spot || envprobe_map )
+	//Everything's in Camera space
+@property( hlms_lights_spot || envprobe_map || hlms_forward3d )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 

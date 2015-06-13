@@ -273,7 +273,7 @@ namespace Ogre {
         addMovableObjectFactory(mLightFactory);
         mBillboardSetFactory = OGRE_NEW v1::BillboardSetFactory();
         addMovableObjectFactory(mBillboardSetFactory);
-        mManualObjectFactory = OGRE_NEW v1::ManualObjectFactory();
+        mManualObjectFactory = OGRE_NEW ManualObjectFactory();
         addMovableObjectFactory(mManualObjectFactory);
         mBillboardChainFactory = OGRE_NEW v1::BillboardChainFactory();
         addMovableObjectFactory(mBillboardChainFactory);

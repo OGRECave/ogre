@@ -1,0 +1,68 @@
+fragment_program Postprocess/Halftone_ps_GLSL glsl
+{
+	source Halftone_ps.glsl
+
+	default_params
+	{
+		param_named RT int 0
+		param_named noise int 1
+	}
+}
+fragment_program Postprocess/Halftone_ps_HLSL hlsl
+{
+	source Halftone_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program Postprocess/Halftone_ps unified
+{
+	delegate Postprocess/Halftone_ps_GLSL
+	delegate Postprocess/Halftone_ps_HLSL
+
+	default_params
+	{
+		param_named numTiles float2 133.3 100
+		param_named iNumTiles float2 0.00750750 0.01
+		param_named iNumTiles2 float2 0.00375375 0.005
+		param_named lum float4 0.30 0.59 0.11 0.0
+	}
+}
+
+material Postprocess/Halftone
+{
+    technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Postprocess/Halftone_ps
+			{
+
+			}
+
+			texture_unit RT
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+
+			texture_unit noise
+			{
+				texture HalftoneVolume
+				filtering trilinear
+				tex_address_mode clamp
+				tex_border_colour 1.0 0.0 0.0
+			}
+		}
+	}
+}
+

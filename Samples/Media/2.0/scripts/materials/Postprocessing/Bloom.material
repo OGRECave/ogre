@@ -1,0 +1,206 @@
+//---------------------------------------------------
+//Bloom: Dark Sylinc's Bloom implementation
+//     Postprocess/BloomBlend is the final material applied.
+//     it has 2 parameters:
+//             OriginalImageWeight float
+//             BlurWeight float
+//  Usually they range from 0.0 to 1.0; but it can be any number
+//  higher numbers will result in a brighter scene. Increment BlurWeight
+//  to obtain increase Bloom effect.
+//  Works faster on my GeForce 6200 256 MB AGP 8x (Chip NV 43 Rev a1)
+//  than Manuel's bloom. (And at my opinion, looks nicer ;)
+//  Unlike Manuel's bloom, we apply a bright high-filter pass
+//Copyright (C) Dark Sylinc 2007-2015
+//---------------------------------------------------
+
+//------------------------
+//OpenGL GLSL Definitions
+//------------------------
+fragment_program BlurV_ps_GLSL glsl
+{
+	source BlurV_ps.glsl
+}
+fragment_program BlurH_ps_GLSL glsl
+{
+	source BlurH_ps.glsl
+}
+fragment_program BrightBloom_ps_GLSL glsl
+{
+	source BrightBloom_ps.glsl
+}
+fragment_program Bloom_ps_GLSL glsl
+{
+	source Bloom_ps.glsl
+	default_params
+	{
+		param_named RT int 0
+		param_named Blur1 int 1
+	}
+}
+
+//------------------------
+//DirectX 11 HLSL Definitions
+//------------------------	
+//DirectX 11 HLSL Pixel Shader ps_4_0
+fragment_program BlurV_ps_HLSL hlsl
+{
+	source BlurV_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+fragment_program BlurH_ps_HLSL hlsl
+{
+	source BlurH_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+fragment_program Bloom_ps_HLSL hlsl
+{
+	source Bloom_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+//DirectX 11 HLSL Pixel Shader ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+fragment_program BrightBloom_ps_HLSL hlsl
+{
+	source BrightBloom_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+//------------------------
+//Unified Definitions
+//------------------------
+fragment_program Bloom_ps unified
+{
+	delegate Bloom_ps_HLSL
+	delegate Bloom_ps_GLSL
+}
+fragment_program BlurV_ps unified
+{
+	delegate BlurV_ps_HLSL
+	delegate BlurV_ps_GLSL
+}
+fragment_program BlurH_ps unified
+{
+	delegate BlurH_ps_HLSL
+	delegate BlurH_ps_GLSL
+}
+fragment_program BrightBloom_ps unified
+{
+	delegate BrightBloom_ps_HLSL
+	delegate BrightBloom_ps_GLSL
+}
+
+
+//Blur: Horizontal Gaussian pass
+material Postprocess/BlurH
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref BlurH_ps
+			{
+			}
+
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering bilinear
+			}
+		}
+	}
+}
+
+//Blur: Vertical Gaussian pass
+material Postprocess/BlurV : Postprocess/BlurH
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref BlurV_ps
+			{
+			}
+		}
+	}
+}
+
+//Final Bloom pass: Blends the blurred with the sharp image
+material Postprocess/BloomBlend2
+{
+    technique
+    {
+        pass
+        {
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Bloom_ps
+			{
+				param_named OriginalImageWeight float 1.0
+				param_named BlurWeight float 0.65
+			}
+
+	        texture_unit
+			{
+				tex_address_mode clamp
+				filtering none
+	        }
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering bilinear
+			}
+        }
+    }
+}
+
+//High-pass Bright filter
+//First pass
+material Postprocess/BrightPass2
+{
+    technique
+    {
+        pass
+        {
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref BrightBloom_ps
+			{
+			}
+			
+			texture_unit
+			{
+				tex_address_mode clamp
+  				filtering none
+			}
+        }
+    }
+}

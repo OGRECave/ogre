@@ -475,9 +475,6 @@ namespace Ogre
         /** Overridden from MovableObject */
         const String& getMovableType(void) const;
 
-        /** Overridden from MovableObject */
-        void _notifyCurrentCamera(Camera* cam);
-
         /** Overridden from Renderable */
         void getRenderOperation(v1::RenderOperation& op);
 

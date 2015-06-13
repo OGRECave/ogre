@@ -1,0 +1,18 @@
+hlms Rocks pbs
+{
+	roughness	0.4
+	fresnel		1.33
+
+	diffuse_map		Rocks_Diffuse.tga
+	normal_map		Rocks_Normal.tga
+	roughness_map	Rocks_Spec.tga
+	specular_map	Rocks_Diffuse.tga
+}
+
+hlms Examples/TudorHouse pbs
+{
+	roughness	0.4
+	fresnel		1.33
+
+	diffuse_map		fw12b.jpg
+}

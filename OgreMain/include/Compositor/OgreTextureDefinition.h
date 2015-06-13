@@ -108,7 +108,7 @@ namespace Ogre
 
             TextureDefinition( IdString _name ) : name(_name), width(0), height(0), widthFactor(1.0f),
                     heightFactor(1.0f), fsaa(true), hwGammaWrite(BoolUndefined), depthBufferId(1),
-                    depthBufferFormat(PF_UNKNOWN), preferDepthTexture(false),
+                    preferDepthTexture(false), depthBufferFormat(PF_UNKNOWN),
                     fsaaExplicitResolve(false) {}
         };
 

@@ -125,6 +125,13 @@ namespace Ogre
         */
         void getTextureSource( size_t outputChannel, size_t &index, TextureSource &textureSource ) const;
 
+        /** Called right after we create a pass definition. Derived
+            classes may want to do something with it
+        @param passDef
+            Newly created pass to toy with.
+        */
+        virtual void postInitializePassDef( CompositorPassDef *passDef ) {}
+
         /** Reserves enough memory for all passes
         @remarks
             Calling this function is obligatory, otherwise unexpected crashes may occur.

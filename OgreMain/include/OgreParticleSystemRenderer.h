@@ -73,7 +73,7 @@ namespace Ogre {
         /** Sets the material this renderer must use; called by ParticleSystem. */
         virtual void _setMaterialName( const String &matName, const String &resourceGroup ) = 0;
         /** Delegated to by ParticleSystem::_notifyCurrentCamera */
-        virtual void _notifyCurrentCamera(Camera* cam) = 0;
+        virtual void _notifyCurrentCamera(const Camera* cam) = 0;
         /** Delegated to by ParticleSystem::_notifyAttached */
         virtual void _notifyAttached(Node* parent) = 0;
         /** Optional callback notified when particles are rotated */

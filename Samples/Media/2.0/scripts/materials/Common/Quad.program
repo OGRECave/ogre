@@ -1,0 +1,27 @@
+vertex_program Ogre/Compositor/Quad_vs_GLSL glsl
+{
+	source Quad_vs.glsl
+    default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+vertex_program Ogre/Compositor/Quad_vs_HLSL hlsl
+{
+	source Quad_vs.hlsl
+	entry_point main
+	target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+// Unified definitions
+vertex_program Ogre/Compositor/Quad_vs unified
+{
+	delegate Ogre/Compositor/Quad_vs_GLSL
+	delegate Ogre/Compositor/Quad_vs_HLSL
+}

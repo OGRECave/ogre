@@ -185,6 +185,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     SkeletonInstance::~SkeletonInstance()
     {
+        {
+            SceneNodeBonePairVec::iterator itor = mCustomParentSceneNodes.begin();
+            SceneNodeBonePairVec::iterator end  = mCustomParentSceneNodes.end();
+            while( itor != end )
+            {
+                itor->sceneNodeParent->_detachAllBones( this );
+                ++itor;
+            }
+        }
+
         //Detach all bones in the reverse order they were attached (LIFO!!!)
         size_t currentDepth = mDefinition->mBonesPerDepth.size() - 1;
         vector<list<size_t>::type>::type::const_reverse_iterator ritDepth = mDefinition->mBonesPerDepth.rbegin();
@@ -295,6 +305,33 @@ namespace Ogre
         return manualBones[diff] != 0.0f;
     }
     //-----------------------------------------------------------------------------------
+    void SkeletonInstance::setSceneNodeAsParentOfBone( Bone *bone, SceneNode *nodeParent )
+    {
+        assert( &mBones[bone->mGlobalIndex] == bone && "The bone doesn't belong to this instance!" );
+
+        SceneNodeBonePairVec::iterator itor = mCustomParentSceneNodes.begin();
+        SceneNodeBonePairVec::iterator end  = mCustomParentSceneNodes.end();
+        while( itor != end && itor->boneChild != bone )
+            ++itor;
+
+        if( itor != end && itor->boneChild == bone )
+        {
+            efficientVectorRemove( mCustomParentSceneNodes, itor );
+            nodeParent->_detachBone( this, itor->boneChild );
+        }
+
+        if( nodeParent )
+        {
+            bone->_setNodeParent( nodeParent );
+            mCustomParentSceneNodes.push_back( SceneNodeBonePair( bone, nodeParent ) );
+            nodeParent->_attachBone( this, bone );
+        }
+        else
+        {
+            bone->_setNodeParent( mParentNode );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     Bone* SkeletonInstance::getBone( IdString boneName )
     {
         SkeletonDef::BoneNameMap::const_iterator itor = mDefinition->mBoneIndexByName.find( boneName );
@@ -365,13 +402,26 @@ namespace Ogre
     {
         mParentNode = parentNode;
 
-        BoneVec::iterator itor = mBones.begin();
-        BoneVec::iterator end  = mBones.end();
-
-        while( itor != end )
         {
-            itor->_setNodeParent( mParentNode );
-            ++itor;
+            BoneVec::iterator itor = mBones.begin();
+            BoneVec::iterator end  = mBones.end();
+
+            while( itor != end )
+            {
+                itor->_setNodeParent( mParentNode );
+                ++itor;
+            }
+        }
+
+        {
+            //Restore the bones with custom scene nodes.
+            SceneNodeBonePairVec::iterator itor = mCustomParentSceneNodes.begin();
+            SceneNodeBonePairVec::iterator end  = mCustomParentSceneNodes.end();
+            while( itor != end )
+            {
+                itor->boneChild->_setNodeParent( itor->sceneNodeParent );
+                ++itor;
+            }
         }
     }
     //-----------------------------------------------------------------------------------

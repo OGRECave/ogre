@@ -72,6 +72,9 @@ float4 main( PS_INPUT inPs ) : SV_Target0
 	return outColour;
 }
 @end @property( hlms_shadowcaster )
+	@property( hlms_shadow_uses_depth_texture )
+		@set( hlms_disable_stage, 1 )
+	@end
 float main( PS_INPUT inPs ) : SV_Target0
 {
 	@insertpiece( custom_ps_preExecution )

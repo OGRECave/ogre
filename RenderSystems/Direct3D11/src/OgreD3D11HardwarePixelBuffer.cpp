@@ -480,7 +480,11 @@ namespace v1 {
         //Worst part this only repros in some machines, not driver specific.
         //Flushing here fixes it.
         if( mUsage == HBU_STATIC )
-            mDevice.GetImmediateContext()->Flush();
+        {
+            D3D11RenderSystem *renderSystem = static_cast<D3D11RenderSystem*>(
+                                                Root::getSingleton().getRenderSystem() );
+            renderSystem->_clearStateAndFlushCommandBuffer();
+        }
     }
     //-----------------------------------------------------------------------------  
     D3D11_BOX D3D11HardwarePixelBuffer::OgreImageBoxToDx11Box(const Image::Box &inBox) const

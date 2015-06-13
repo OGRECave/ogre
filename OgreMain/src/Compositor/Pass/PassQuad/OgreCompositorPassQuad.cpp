@@ -72,7 +72,7 @@ namespace Ogre
         const CompositorWorkspace *workspace = parentNode->getWorkspace();
 
         if( mDefinition->mUseQuad ||
-            mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS )
+            mDefinition->mFrustumCorners != CompositorPassQuadDef::NO_CORNERS )
         {
             mFsRect = workspace->getCompositorManager()->getSharedFullscreenQuad();
         }
@@ -196,6 +196,15 @@ namespace Ogre
         {
             const Vector3 *corners = mCamera->getWorldSpaceCorners();
             mFsRect->setNormals( corners[5], corners[6], corners[4], corners[7] );
+        }
+        else if( mDefinition->mFrustumCorners == CompositorPassQuadDef::CAMERA_DIRECTION )
+        {
+            const Vector3 *corners = mCamera->getWorldSpaceCorners();
+            const Vector3 &cameraPos = mCamera->getDerivedPosition();
+            mFsRect->setNormals( (corners[5] - cameraPos).normalisedCopy(),
+                                 (corners[6] - cameraPos).normalisedCopy(),
+                                 (corners[4] - cameraPos).normalisedCopy(),
+                                 (corners[7] - cameraPos).normalisedCopy() );
         }
 
         SceneManager *sceneManager = mCamera->getSceneManager();

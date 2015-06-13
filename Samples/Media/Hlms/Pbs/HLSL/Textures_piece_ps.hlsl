@@ -40,7 +40,7 @@
 @end
 
 @property( roughness_map )
-	@piece( SampleRoughnessMap )	ROUGHNESS = material.kS.w * (1.0f - textureMaps[@value( roughness_map_idx )].Sample( samplerStates[@value( roughness_map_idx )], float3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x);
+	@piece( SampleRoughnessMap )	ROUGHNESS = material.kS.w * textureMaps[@value( roughness_map_idx )].Sample( samplerStates[@value( roughness_map_idx )], float3(inPs.uv@value(uv_roughness).xy, roughnessIdx) ).x;
 	ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 	@piece( roughnessExtraParamDef ), float ROUGHNESS@end
 	@piece( roughnessExtraParam ), ROUGHNESS@end

@@ -136,7 +136,10 @@ namespace Ogre {
         /// Gets this Bones's parent (NULL if this is the root).
         Bone* getParent(void) const                                 { return mParent; }
 
-        /** Sets a regular Node to be parent of this Bone
+        /** Sets a regular Node to be parent of this Bone.
+            DO NOT USE THIS FUNCTION IF YOU DON'T KNOW WHAT YOU'RE DOING. If you want
+            to use a regular Node to control a bone,
+            @see SkeletonInstance::setSceneNodeAsParentOfBone instead.
         @remarks
             1. Multiple calls to _setNodeParent with different arguments will
                silently override previous calls.
@@ -220,6 +223,15 @@ namespace Ogre {
         */
         bool getInheritScale(void) const;
 
+        /** Gets the derived transform in world space
+        @remarks
+            Position, scale & orientation can be extracted using Matrix4::decomposition
+            Note, that matrices may contain stretch and shearing (aka non-uniform scaling)
+            which doesn't translate well to a scale/orientation paradigm (not a problem
+            if the bones don't use scaling, or if scale is not inherited).
+        */
+        Matrix4 _getDerivedTransform(void) const;
+
         /** Gets the transformation matrix for this bone in local space (i.e. as if the
             skeleton wasn't attached to a SceneNode).
         @remarks
@@ -268,6 +280,11 @@ namespace Ogre {
         static void updateAllTransforms( const size_t numNodes, BoneTransform t,
                                          ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind,
                                          size_t numBinds );
+
+#ifndef NDEBUG
+        virtual void _setCachedTransformOutOfDate(void);
+        bool isCachedTransformOutOfDate(void) const             { return mCachedTransformOutOfDate; }
+#endif
     };
     /** @} */
     /** @} */

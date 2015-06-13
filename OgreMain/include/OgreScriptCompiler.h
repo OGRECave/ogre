@@ -861,6 +861,7 @@ namespace Ogre
                     ID_QUAD_NORMALS,
                         ID_CAMERA_FAR_CORNERS_VIEW_SPACE,
                         ID_CAMERA_FAR_CORNERS_WORLD_SPACE,
+                        ID_CAMERA_DIRECTION,
                     ID_INPUT,
 
                     //Used by ID_DEPTH_COPY

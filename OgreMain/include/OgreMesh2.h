@@ -33,6 +33,10 @@ THE SOFTWARE.
 #include "OgreResource.h"
 #include "Math/Simple/OgreAabb.h"
 #include "Vao/OgreBufferPacked.h"
+
+#include "OgreVertexBoneAssignment.h"
+#include "OgreDataStream.h"
+
 #include "OgreHeaderPrefix.h"
 
 

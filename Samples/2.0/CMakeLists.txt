@@ -16,12 +16,16 @@ if( OGRE_BUILD_SAMPLES2 )
 
 	set( OGRE_SAMPLES_LIBRARIES "OgreSamplesCommon" "OgreOverlay" )
 
+	add_subdirectory(ApiUsage/CustomRenderable)
+	add_subdirectory(ApiUsage/DynamicGeometry)
     add_subdirectory(ApiUsage/V2Mesh)
+    add_subdirectory(ApiUsage/V2ManualObject)
 	add_subdirectory(ApiUsage/StereoRendering)
 	add_subdirectory(ApiUsage/ShadowMapDebugging)
 
 	add_subdirectory(Showcase/Forward3D)
 	add_subdirectory(Showcase/PbsMaterials)
+	add_subdirectory(Showcase/Postprocessing)
 
 	add_subdirectory(Tutorials/Tutorial01_Initialization)
 	add_subdirectory(Tutorials/Tutorial02_VariableFramerate)
@@ -29,4 +33,5 @@ if( OGRE_BUILD_SAMPLES2 )
 	add_subdirectory(Tutorials/Tutorial04_InterpolationLoop)
 	add_subdirectory(Tutorials/Tutorial05_MultithreadingBasics)
 	add_subdirectory(Tutorials/Tutorial06_Multithreading)
+	add_subdirectory(Tutorials/TutorialSky_Postprocess)
 endif()

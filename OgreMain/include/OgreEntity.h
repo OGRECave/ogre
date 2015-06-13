@@ -363,10 +363,6 @@ namespace v1 {
         */
         void setRenderQueueSubGroup( uint8 subGroup );
 
-        /** @copydoc MovableObject::_notifyCurrentCamera.
-        */
-        void _notifyCurrentCamera(Camera* cam);
-
         /// @copydoc MovableObject::setRenderQueueGroup.
         void setRenderQueueGroup(uint8 queueID);
 

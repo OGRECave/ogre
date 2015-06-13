@@ -109,6 +109,13 @@ namespace Ogre
         return &mShadowMapTexDefinitions.back();
     }
     //-----------------------------------------------------------------------------------
+    void CompositorShadowNodeDef::postInitializePassDef( CompositorPassDef *passDef )
+    {
+        //Shadow nodes usually should be unaffected by these masks.
+        passDef->mExecutionMask         = 0xFF;
+        passDef->mViewportModifierMask  = 0x00;
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorShadowNodeDef::_validateAndFinish(void)
     {
         const Real EPSILON = 1e-6f;

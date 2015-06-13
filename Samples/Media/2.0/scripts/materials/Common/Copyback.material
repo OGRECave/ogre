@@ -1,0 +1,78 @@
+fragment_program Ogre/Copy/4xFP32_ps_HLSL hlsl
+{
+	source Copyback_4xFP32_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program Ogre/Copy/4xFP32_ps_GLSL glsl
+{
+	source Copyback_4xFP32_ps.glsl
+	default_params { param_named tex int 0 }
+}
+
+fragment_program Ogre/Copy/4xFP32_ps unified
+{
+	delegate Ogre/Copy/4xFP32_ps_GLSL
+	delegate Ogre/Copy/4xFP32_ps_HLSL
+}
+
+material Ogre/Copy/4xFP32
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+			
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Copy/4xFP32_ps
+			{
+			}
+
+			texture_unit
+			{
+				filtering none
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+fragment_program Ogre/Copy/3xFP32_ps_HLSL hlsl
+{
+	source Copyback_3xFP32_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program Ogre/Copy/3xFP32_ps_GLSL glsl
+{
+	source Copyback_3xFP32_ps.glsl
+	default_params { param_named tex int 0 }
+}
+
+fragment_program Ogre/Copy/3xFP32_ps unified
+{
+	delegate Ogre/Copy/3xFP32_ps_GLSL
+	delegate Ogre/Copy/3xFP32_ps_HLSL
+}
+
+material Ogre/Copy/3xFP32 : Ogre/Copy/4xFP32
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Ogre/Copy/3xFP32_ps
+			{
+			}
+		}
+	}
+}

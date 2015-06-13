@@ -1261,6 +1261,7 @@ namespace Ogre
         mIds["quad_normals"]    = ID_QUAD_NORMALS;
         mIds["camera_far_corners_view_space"]   = ID_CAMERA_FAR_CORNERS_VIEW_SPACE;
         mIds["camera_far_corners_world_space"]  = ID_CAMERA_FAR_CORNERS_WORLD_SPACE;
+        mIds["camera_direction"]                = ID_CAMERA_DIRECTION;
         mIds["input"]           = ID_INPUT;
 
         mIds["alias_on_copy_failure"]           = ID_ALIAS_ON_COPY_FAILURE;

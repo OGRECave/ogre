@@ -60,7 +60,7 @@ namespace Ogre
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 0 ),
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
-        mRoughness( 0.1f ),
+        mRoughness( 1.0f ),
         mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
         mNormalMapWeight( 1.0f ),
         mBrdf( PbsBrdf::Default )
@@ -604,35 +604,35 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setDetailMapBlendMode( uint8 detailMap, PbsBlendModes blendMode )
+    void HlmsPbsDatablock::setDetailMapBlendMode( uint8 detailMapIdx, PbsBlendModes blendMode )
     {
-        assert( detailMap < 4 );
+        assert( detailMapIdx < 4 );
 
-        if( mBlendModes[detailMap] != blendMode )
+        if( mBlendModes[detailMapIdx] != blendMode )
         {
-            mBlendModes[detailMap] = blendMode;
+            mBlendModes[detailMapIdx] = blendMode;
             flushRenderables();
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setDetailNormalWeight( uint8 detailNormalMap, Real weight )
+    void HlmsPbsDatablock::setDetailNormalWeight( uint8 detailNormalMapIdx, Real weight )
     {
-        assert( detailNormalMap < 4 );
+        assert( detailNormalMapIdx < 4 );
 
-        bool wasOne = mDetailNormalWeight[detailNormalMap] == 1.0f;
-        mDetailNormalWeight[detailNormalMap] = weight;
+        bool wasOne = mDetailNormalWeight[detailNormalMapIdx] == 1.0f;
+        mDetailNormalWeight[detailNormalMapIdx] = weight;
 
-        if( wasOne != (mDetailNormalWeight[detailNormalMap] == 1.0f) )
+        if( wasOne != (mDetailNormalWeight[detailNormalMapIdx] == 1.0f) )
         {
             flushRenderables();
             scheduleConstBufferUpdate();
         }
     }
     //-----------------------------------------------------------------------------------
-    Real HlmsPbsDatablock::getDetailNormalWeight( uint8 detailNormalMap ) const
+    Real HlmsPbsDatablock::getDetailNormalWeight( uint8 detailNormalMapIdx ) const
     {
-        assert( detailNormalMap < 4 );
-        return mDetailNormalWeight[detailNormalMap];
+        assert( detailNormalMapIdx < 4 );
+        return mDetailNormalWeight[detailNormalMapIdx];
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setNormalMapWeight( Real weight )

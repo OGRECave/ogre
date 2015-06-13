@@ -60,8 +60,6 @@ namespace Ogre {
         }
 
         // Initialise state
-        mDepth.buffer=0;
-        mStencil.buffer=0;
         for(size_t x=0; x<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++x)
         {
             mColour[x].buffer=0;
@@ -70,8 +68,6 @@ namespace Ogre {
     
     GL3PlusFrameBufferObject::~GL3PlusFrameBufferObject()
     {
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
         mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // Delete framebuffer object
         OGRE_CHECK_GL_ERROR(glDeleteFramebuffers(1, &mFB));
@@ -101,8 +97,6 @@ namespace Ogre {
     void GL3PlusFrameBufferObject::initialise()
     {
         // Release depth and stencil, if they were bound
-        mManager->releaseRenderBuffer(mDepth);
-        mManager->releaseRenderBuffer(mStencil);
         mManager->releaseRenderBuffer(mMultisampleColourBuffer);
         // First buffer must be bound
         if(!mColour[0].buffer)

@@ -1,0 +1,599 @@
+//Dark Sylinc's Bloom
+compositor_node Bloom
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	texture rt0 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
+	texture rt1 target_width_scaled 0.25 target_height_scaled 0.25 PF_R8G8B8
+
+	target rt0
+	{
+		// "Bright" pass
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/BrightPass2
+			input 0 rt_input
+		}
+	}
+
+	target rt1
+	{
+		// Vertical blur pass
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/BlurV
+			input 0 rt0
+		}
+	}
+
+	target rt0
+	{
+		// Horizontal blur pass
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/BlurH
+			input 0 rt1
+		}
+	}
+
+	target rt_output
+	{
+		// Draw a fullscreen quad
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/BloomBlend2
+			input 0 rt_input
+			input 1 rt0
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+compositor_node Glass
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			material Postprocess/Glass
+			input 0 rt_input
+		}
+	}
+	
+	out 0 rt_output
+	out 1 rt_input
+}
+
+compositor_node "Old TV"
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			// convert the previous render target to a black and white image, add some noise, distort it,
+			// then render to scene aligned quad
+			material Postprocess/OldTV
+			input 0 rt_input
+		}
+	}
+	
+	out 0 rt_output
+	out 1 rt_input
+}
+
+
+// Black and white effect
+compositor_node B&W
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		// Draw a fullscreen quad with the black and white image
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/BlackAndWhite
+			input 0 rt_input
+		}
+	}
+	
+	out 0 rt_output
+	out 1 rt_input
+}
+
+//compositor DOF // based on Blur but final pass does depth of field
+//{
+//    technique
+//    {
+//        // Temporary textures
+//        texture rt0 target_width target_height PF_A8R8G8B8
+//        texture rt1 target_width target_height PF_A8R8G8B8
+//
+//        target rt1
+//        {
+//            // Render output from previous compositor (or original scene)
+//            input previous
+//        }
+//
+//        target rt0
+//        {
+//            // Start with clear texture
+//            input none
+//            // Vertical blur pass
+//            pass render_quad
+//            {
+//                // Renders a fullscreen quad with a material
+//                material Postprocess/DOF_Blur0
+//                input 0 rt1
+//            }
+//        }
+//
+//        target rt1
+//        {
+//            // Start with clear texture
+//            input none
+//            // Horizontal blur pass
+//            pass render_quad
+//            {
+//                // Renders a fullscreen quad with a material
+//                material Postprocess/DOF_Blur1
+//                input 0 rt0
+//            }
+//        }
+//
+//        target_output
+//        {
+//            // Start with clear output
+//            input none
+//            // Draw a fullscreen quad
+//            pass render_quad
+//            {
+//                // Renders a fullscreen quad with a material
+//                material Postprocess/DOF_Blend
+//                input 0 rt0
+//                input 1 rt1
+//            }
+//        }
+//    }
+//}
+
+// Embossed (fake bump) effect
+compositor_node Embossed
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		// Draw a fullscreen quad with the black and white image
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/Embossed
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// SharpenEdges
+compositor_node "Sharpen Edges"
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		// Draw a fullscreen quad with the black and white image
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/SharpenEdges
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// Invert
+compositor_node Invert
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/Invert
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// Posterize
+compositor_node Posterize
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/Posterize
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// Laplace
+compositor_node Laplace
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		// Draw a fullscreen quad with the black and white image
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/Laplace
+			input 0 rt_input
+		}
+	}
+	
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// Tiling
+compositor_node Tiling
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/Tiling
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// Old Movie
+compositor_node "Old Movie"
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		// Draw a fullscreen quad with the old-movie-looking image
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/OldMovie
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// Testing MRT
+/*compositor TestMRT
+{
+	technique
+	{
+		// temporary texture (MRT!)
+		// 4 sub-surfaces, all 32-bit
+		texture mrt0 target_width target_height PF_A8R8G8B8 PF_A8R8G8B8 PF_A8R8G8B8 PF_A8R8G8B8
+
+        target mrt0
+        {
+            // Render scene using MRT-compatible material scheme
+          input none
+			material_scheme MRT			
+			pass clear
+			{
+				
+			}
+			pass render_scene
+			{
+			}
+        }
+
+		target_output
+		{
+			input none
+            pass render_quad
+            {
+                // Renders a fullscreen quad 
+				material Ogre/MRTtest/quad
+				// bind 4 MRT surfaces as texture inputs
+                input 0 mrt0 0
+                input 1 mrt0 1
+				input 2 mrt0 2
+                input 3 mrt0 3
+          }
+			
+		}
+
+	}
+}*/
+
+//Radial blur effect
+compositor_node "Radial Blur"
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+	
+	target rt_output
+	{
+		// Apply radial blur
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/RadialBlur
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// ASCII effect
+compositor_node ASCII
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/ASCII
+			input 0 rt_input
+		}
+	}
+	
+	out 0 rt_output
+	out 1 rt_input
+}
+
+// Halftone effect
+compositor_node Halftone
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			// Renders a fullscreen quad with a material
+			material Postprocess/Halftone
+			input 0 rt_input
+		}
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+//Night Vision effect
+compositor_node "Night Vision"
+{
+	in 0 rt_input
+	in 1 rt_output
+
+	custom_id Ogre/Postprocess
+	
+	target rt_output
+	{
+	    pass render_quad
+	    {
+			material Postprocess/NightVision
+	    	input 0 rt_input
+	    }
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+//Dither effect
+compositor_node Dither
+{
+	in 0 rt_input
+	in 1 rt_output
+	
+	custom_id Ogre/Postprocess
+
+	target rt_output
+	{
+	    pass render_quad
+	    {
+			material Postprocess/Dither
+	    	input 0 rt_input
+	    }
+	}
+
+	out 0 rt_output
+	out 1 rt_input
+}
+
+//Performs the final pass: Takes the temporary textures (created in PostprocessingSampleStdRenderer)
+//and copies it to the actual RenderWindow
+compositor_node FinalComposition
+{
+	in 0 rt_output
+	// Take input texture #1 and use the local name "rtN" for reference in this scope
+	in 1 rtN
+
+	target rt_output
+	{
+		//Play nice with Multi-GPU setups by telling the API there is no inter-frame dependency.
+		//On APIs that support discard_only (e.g. DX11) the driver may just ignore the colour value,
+		//and use a different memory region (i.e. the value read from a pixel of a discarded buffer
+		//without having written to it is undefined)
+		pass clear
+		{
+			colour_value	1 0 0 1
+			buffers			colour
+			discard_only	true
+		}
+
+		pass render_quad
+	    {
+			//Ignore the alpha channel
+			material Ogre/Copy/3xFP32
+	    	input 0 rtN
+		}
+		
+		pass render_scene
+		{
+			lod_update_list	off
+
+			//Render Overlays
+			overlays	on
+			rq_first	254
+			rq_last		255
+		}
+	}
+}
+
+compositor_node PostprocessingSampleStdRenderer
+{
+	//Temporary textures one of them that we don't use, but the rest of simple compositors (Bloom,
+	//Invert, Glass, etc) will take as 2nd input, and then ping pong between rt0 and rt1 to avoid creating
+	//more than 2 RTs. In Ogre 1.x; each compositor created an implicit RT, which could quickly
+	//turn very VRAM intensive.
+	//
+	//Another advantage from this approach (besides saving tons of VRAM) is that HDR renderers can
+	//pass RTs with floating point formats, thus for example, a simple compositor wouldn't lose
+	//precision converting from FP16 to RGB888.
+	texture rt0 target_width target_height PF_R8G8B8
+	texture rt1 target_width target_height PF_R8G8B8
+
+	target rt0
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		pass render_scene
+		{
+			//lod_update_list	off					//Turn Lod off?
+			shadows				ShadowMapDebuggingShadowNode
+			overlays			off
+		}
+
+		pass render_quad
+		{
+			quad_normals	camera_direction
+			material PostprocessingSample/Sky
+		}
+	}
+	
+	//Play nice with Multi-GPU setups by telling the API there is no inter-frame dependency.
+	//On APIs that support discard_only (e.g. DX11) the driver may just ignore the colour value,
+	//and use a different memory region (i.e. the value read from a pixel of a discarded buffer
+	//without having written to it is undefined)
+	target rt1
+	{
+		pass clear
+		{
+			colour_value	0 1 0 1
+			buffers			colour
+			discard_only	true
+		}
+	}
+	
+	out 0 rt0
+	out 1 rt1
+}
+
+workspace PostprocessingSampleWorkspace
+{
+	//This shows how to setup a workspace with Bloom and Glass from scripts.
+	//In C++ we're going to wipe this all out and recreate this workspace manually
+	//(with all the rest of compositors).
+	
+	//Connect all PostprocessingSampleStdRenderer outputs to Bloom's input
+	connect PostprocessingSampleStdRenderer Bloom
+	//Connect all Bloom outputs to Glass' input
+	connect Bloom Glass
+
+	//Connect RenderWindow to FinalComposition's input channel #0
+	connect_output FinalComposition 0
+	//Connect Glass's output #0 to FinalComposition's input #1
+	connect Glass 0 FinalComposition 1
+}

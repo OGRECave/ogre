@@ -86,7 +86,8 @@ namespace Ogre
     public:
         ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
                                 size_t _light, size_t _split ) :
-                width(1024), height(1024), fsaa(0), hwGammaWrite(false), preferDepthTexture(false),
+                width(1024), height(1024), widthFactor(1.0f), heightFactor(1.0f),
+                fsaa(0), hwGammaWrite(false), preferDepthTexture(false),
                 depthBufferId(2), depthBufferFormat( PF_UNKNOWN ),
                 light(_light), split(_split), shadowMapTechnique(t),
                 pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),
@@ -137,6 +138,8 @@ namespace Ogre
         /// Overloaded to prevent creating input channels.
         virtual IdString addTextureSourceName( const String &name, size_t index,
                                                 TextureSource textureSource );
+
+        virtual void postInitializePassDef( CompositorPassDef *passDef );
 
         void setDefaultTechnique( ShadowMapTechniques techn )   { mDefaultTechnique = techn; }
 

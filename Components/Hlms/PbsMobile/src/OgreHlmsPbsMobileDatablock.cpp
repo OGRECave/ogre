@@ -531,35 +531,36 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobileDatablock::setDetailMapBlendMode( uint8 detailMap, PbsMobileBlendModes blendMode )
+    void HlmsPbsMobileDatablock::setDetailMapBlendMode( uint8 detailMapIdx,
+                                                        PbsMobileBlendModes blendMode )
     {
-        assert( detailMap < 4 );
+        assert( detailMapIdx < 4 );
 
-        if( mShaderCreationData->blendModes[detailMap] != blendMode )
+        if( mShaderCreationData->blendModes[detailMapIdx] != blendMode )
         {
-            mShaderCreationData->blendModes[detailMap] = blendMode;
+            mShaderCreationData->blendModes[detailMapIdx] = blendMode;
             flushRenderables();
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsMobileDatablock::setDetailNormalWeight( uint8 detailNormalMap, Real weight )
+    void HlmsPbsMobileDatablock::setDetailNormalWeight( uint8 detailNormalMapIdx, Real weight )
     {
-        assert( detailNormalMap < 4 );
+        assert( detailNormalMapIdx < 4 );
 
-        bool wasOne = mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f;
-        mShaderCreationData->mDetailNormalWeight[detailNormalMap] = weight;
+        bool wasOne = mShaderCreationData->mDetailNormalWeight[detailNormalMapIdx] == 1.0f;
+        mShaderCreationData->mDetailNormalWeight[detailNormalMapIdx] = weight;
 
-        if( wasOne != (mShaderCreationData->mDetailNormalWeight[detailNormalMap] == 1.0f) )
+        if( wasOne != (mShaderCreationData->mDetailNormalWeight[detailNormalMapIdx] == 1.0f) )
         {
             flushRenderables();
             bakeVariableParameters();
         }
     }
     //-----------------------------------------------------------------------------------
-    Real HlmsPbsMobileDatablock::getDetailNormalWeight( uint8 detailNormalMap ) const
+    Real HlmsPbsMobileDatablock::getDetailNormalWeight( uint8 detailNormalMapIdx ) const
     {
-        assert( detailNormalMap < 4 );
-        return mShaderCreationData->mDetailNormalWeight[detailNormalMap];
+        assert( detailNormalMapIdx < 4 );
+        return mShaderCreationData->mDetailNormalWeight[detailNormalMapIdx];
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsMobileDatablock::setNormalMapWeight( Real weight )

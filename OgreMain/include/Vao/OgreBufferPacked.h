@@ -167,7 +167,7 @@ namespace Ogre
         @param elementCount
             Size, in number of elements, of data. Must be less than @getNumElements - elementStart
         */
-        virtual void upload( void *data, size_t elementStart, size_t elementCount );
+        virtual void upload( const void *data, size_t elementStart, size_t elementCount );
 
         /** Maps the specified region to a pointer the CPU can access. Only dynamic buffers
             can use this function. The region [elementStart; elementStart + elementCount)

@@ -1,13 +1,14 @@
-@property( hlms_shadowcaster )
 @piece( PassDecl )
 //Uniforms that change per pass
 layout(binding = 0) uniform PassBuffer
 {
 	//Vertex shader
-	vec2 depthRange;
+	mat4 viewProj[2];
+	@property( hlms_shadowcaster )
+		vec4 depthRange;
+	@end
 	@insertpiece( custom_passBuffer )
 } pass;
-@end
 @end
 
 @piece( MaterialDecl )
@@ -38,6 +39,10 @@ layout(binding = 2) uniform InstanceBuffer
 	//shadowConstantBias. Send the bias directly to avoid an
 	//unnecessary indirection during the shadow mapping pass.
 	//Must be loaded with uintBitsToFloat
+	//
+	//.z =
+	//Contains 0 or 1 to index into pass.viewProj[]. Only used
+	//if hlms_identity_viewproj_dynamic is set.
 	uvec4 materialIdx[4096];
 } instance;
 @end

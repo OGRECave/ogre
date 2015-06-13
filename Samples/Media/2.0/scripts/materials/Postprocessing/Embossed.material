@@ -1,0 +1,47 @@
+fragment_program Embossed_ps_HLSL hlsl
+{
+	source Embossed_ps.hlsl
+	entry_point Embossed_ps
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program Embossed_ps_GLSL glsl
+{
+	source Embossed_ps.glsl
+}
+
+fragment_program Embossed_ps unified
+{
+	delegate Embossed_ps_HLSL
+	delegate Embossed_ps_GLSL
+}
+
+material Postprocess/Embossed
+{
+	technique
+	{
+
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Embossed_ps
+			{
+			}
+
+			texture_unit RT
+			{
+				tex_address_mode clamp
+				filtering none
+			}
+		}
+	}
+}

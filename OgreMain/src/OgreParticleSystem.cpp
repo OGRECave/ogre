@@ -112,6 +112,9 @@ namespace Ogre {
         // Default to billboard renderer
         setRenderer("billboard");
 
+        //By default most particles don't cast shadows.
+        setCastShadows( false );
+
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_FX_DEFAULT_MASK;
     }
     //-----------------------------------------------------------------------

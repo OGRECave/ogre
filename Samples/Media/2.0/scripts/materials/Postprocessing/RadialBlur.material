@@ -1,0 +1,57 @@
+fragment_program Postprocess/RadialBlur_ps_GLSL glsl
+{
+	source RadialBlur_ps.glsl
+}
+
+fragment_program Postprocess/RadialBlur_ps_HLSL hlsl
+{
+	source RadialBlur_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program Postprocess/RadialBlur_ps unified
+{
+	delegate Postprocess/RadialBlur_ps_GLSL
+	delegate Postprocess/RadialBlur_ps_HLSL
+}
+
+//Effect: Radial Blur
+material Postprocess/RadialBlur
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Postprocess/RadialBlur_ps
+			{
+				//Center of radial blur, in UV space.
+				//Z contains the min distance and W = 1 / (max - min)
+				//The minimum UV distance is in UV space
+				//The strength of the radial blur begins to attenuate
+				//past the minimum distance, until the max distance is
+				//reached, then there is no blur.
+				//The exponent controls the curve of this attenuation.
+				//In other words, you can control how big the spot of radial
+				//blur is.
+				param_named			centerUVPos			float4 0.5 0.5 0.2 1.333
+				param_named			exponent			float 4.5
+			}
+			
+			texture_unit
+			{
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}

@@ -1,0 +1,40 @@
+compositor_node TutorialSky_PostprocessRenderingNode
+{
+	in 0 rt_renderwindow
+
+	target rt_renderwindow
+	{
+		
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		//Render opaque stuff
+		pass render_scene
+		{
+			overlays	off
+			rq_first	0
+			rq_last		2
+		}
+		
+		//Render sky after opaque stuff (performance optimization)
+		pass render_quad
+		{
+			quad_normals	camera_direction
+			material SkyPostprocess
+		}
+		
+		//Render transparent stuff after sky
+		pass render_scene
+		{
+			overlays	on
+			rq_first	2
+		}
+	}
+}
+
+workspace TutorialSky_PostprocessWorkspace
+{
+	connect_output TutorialSky_PostprocessRenderingNode 0
+}
