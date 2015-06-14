@@ -243,8 +243,8 @@ namespace Ogre
                 ResourceTransition globalBarrier;
                 globalBarrier.oldLayout = ResourceLayout::Undefined;
                 globalBarrier.newLayout = ResourceLayout::Undefined;
-                globalBarrier.writeBarrierBits  = transition.readBarrierBits;
-                globalBarrier.readBarrierBits   = transition.writeBarrierBits;
+                globalBarrier.writeBarrierBits  = transition.writeBarrierBits;
+                globalBarrier.readBarrierBits   = transition.readBarrierBits;
                 globalBarrier.mRsData = 0;
                 renderSystem->_resourceTransitionCreated( &globalBarrier );
                 mResourceTransitions.push_back( globalBarrier );
@@ -255,8 +255,8 @@ namespace Ogre
 
                 renderSystem->_resourceTransitionDestroyed( &globalBarrier );
 
-                globalBarrier.readBarrierBits   |= transition.readBarrierBits;
                 globalBarrier.writeBarrierBits  |= transition.writeBarrierBits;
+                globalBarrier.readBarrierBits   |= transition.readBarrierBits;
 
                 renderSystem->_resourceTransitionCreated( &globalBarrier );
             }

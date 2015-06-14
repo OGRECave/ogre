@@ -8570,7 +8570,7 @@ namespace Ogre{
                         if(!getUInt( prop->values.front(), &uavSlot ))
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                "uses_uav should be 'uses_uav <number betwee 0 and 63> "
+                                "uses_uav should be 'uses_uav <number between 0 and 63> "
                                 "<[read] [write]> [allow_write_after_write]'");
                         }
 

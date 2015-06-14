@@ -39,6 +39,20 @@
 
 namespace Ogre {
 
+    const size_t c_numTypeQualifiers = 8;
+
+    const String c_typeQualifiers[c_numTypeQualifiers] =
+    {
+        "lowp",
+        "mediump",
+        "highp",
+        "restrict",
+        "coherent",
+        "volatile",
+        "readonly",
+        "writeonly"
+    };
+
     
     GLSLProgramManager::GLSLProgramManager(const GL3PlusSupport& support) :
         mActiveVertexShader(NULL),
@@ -350,7 +364,10 @@ namespace Ogre {
             defToUpdate.constType = GCT_BOOL4;
             break;
         default:
-            defToUpdate.constType = GCT_UNKNOWN;
+            if( gltype >= GL_IMAGE_1D && gltype <= GL_UNSIGNED_INT_IMAGE_2D_MULTISAMPLE_ARRAY )
+                defToUpdate.constType = GCT_INT1;
+            else
+                defToUpdate.constType = GCT_UNKNOWN;
             break;
         }
 
@@ -904,20 +921,24 @@ namespace Ogre {
                 line = src.substr(currPos, lineEndPos - currPos);
                 StringVector parts = StringUtil::split(line, " \t");
 
-                // Skip over precision keywords
-                if(StringUtil::match((parts.front()), "lowp") ||
-                   StringUtil::match((parts.front()), "mediump") ||
-                   StringUtil::match((parts.front()), "highp"))
-                    typeString = parts[1];
+                size_t partStart = 0;
+                for( size_t i=0; i<c_numTypeQualifiers && partStart<parts.size(); ++i )
+                {
+                    if( StringUtil::match( parts[partStart], c_typeQualifiers[i] ) )
+                    {
+                        i = 0;
+                        ++partStart;
+                    }
+                }
+
+                if( partStart < parts.size() )
+                    typeString = parts[partStart];
                 else
                     typeString = parts[0];
 
                 StringToEnumMap::iterator typei = mTypeEnumMap.find(typeString);
                 if (typei == mTypeEnumMap.end())
                 {
-                    // Gobble up the external name
-                    String externalName = parts.front();
-
                     // Now there should be an opening brace
                     String::size_type openBracePos = src.find("{", currPos);
                     if (openBracePos != String::npos)
@@ -1048,11 +1069,15 @@ namespace Ogre {
                 StringUtil::trim(*i);
                 if (i->empty()) continue;
 
-                // Skip over precision keywords
-                if(StringUtil::match((*i), "lowp") ||
-                   StringUtil::match((*i), "mediump") ||
-                   StringUtil::match((*i), "highp"))
-                    continue;
+                {
+                    // Skip over precision keywords & other similar type qualifiers
+                    bool skipElement = false;
+                    for( size_t j=0; j<c_numTypeQualifiers && !skipElement; ++j )
+                        skipElement = StringUtil::match( *i, c_typeQualifiers[j] );
+
+                    if( skipElement )
+                        continue;
+                }
 
                 String::size_type arrayStart = i->find("[", 0);
                 if (arrayStart != String::npos)
