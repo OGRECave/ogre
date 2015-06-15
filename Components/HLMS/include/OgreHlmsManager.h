@@ -60,6 +60,7 @@ namespace Ogre
 
 		void bind(Renderable* rend, HlmsMaterialBase* material, String passName);
 		void unbind(Renderable* rend, String passName);
+		bool hasBinding(Renderable* rend, String passName);
 
 	protected:
 		typedef OGRE_HashMap<String, HlmsMaterialBase*> HlmsMatBindingMap;

@@ -227,4 +227,15 @@ namespace Ogre
 		}
 	}
 	//-----------------------------------------------------------------------------------
+	bool HlmsManager::hasBinding(Renderable* rend, String passName)
+	{
+		if (!rend->getUserObjectBindings().getUserAny("hlmsMatBinding").isEmpty())
+		{
+			auto hlmsMatMap = rend->getUserObjectBindings().getUserAny("hlmsMatBinding").get<HlmsMatBindingMap*>();
+			return hlmsMatMap->find(passName) != hlmsMatMap->end();
+		}
+
+		return false;
+	}
+	//-----------------------------------------------------------------------------------
 }

@@ -32,7 +32,7 @@ namespace Ogre
 {
 	const uint32 PbsMaterial::maxLightCount = PBS_MAX_LIGHT_COUNT;
 	//-----------------------------------------------------------------------------------
-	PbsMaterial::PbsMaterial() : mAlbedo(1, 1, 1, 0), mF0(0.1f, 0.1f, 0.1f, 1.0f), mRoughness(0.1f),
+	PbsMaterial::PbsMaterial() : mAlbedo(1, 1, 1, 0), mF0(0.1f, 0.1f, 0.1f, 1.0f), mRoughness(0.1f), mLightRoughnessOffset(0.0f),
 	/*header initial values*/	mMainUvSetIndex(0), mD1UvSetIndex(0), mD2UvSetIndex(0), _hasSamplerListChanged(false), 
 								_hasSamplerChanged(false)
 	{
@@ -47,16 +47,16 @@ namespace Ogre
 		_samplers[ST_ENV_MAP].init("environment", false, false, false, false, true, true, TEX_TYPE_CUBE_MAP);
 
 		_samplers[ST_MAIN_ALBEDO].init("main_albedo", true, true, false, true);
-		_samplers[ST_MAIN_NORMAL].init("main_normal", false, true);
-		_samplers[ST_MAIN_F0R].init("main_f0r", true, true, true);
+		_samplers[ST_MAIN_NORMALR].init("main_normalr", false, true, true);
+		_samplers[ST_MAIN_F0].init("main_f0", true, true);
 
 		_samplers[ST_D1_ALBEDO].init("d1_albedo", true, true, false, true);
-		_samplers[ST_D1_NORMAL].init("d1_normal", false, true);
-		_samplers[ST_D1_F0R].init("d1_f0r", true, true, true);
+		_samplers[ST_D1_NORMALR].init("d1_normalr", false, true, true);
+		_samplers[ST_D1_F0].init("d1_f0", true, true);
 
 		_samplers[ST_D2_ALBEDO].init("d2_albedo", true, true, false, true);
-		_samplers[ST_D2_NORMAL].init("d2_normal", false, true);
-		_samplers[ST_D2_F0R].init("d2_f0r", true, true, true);
+		_samplers[ST_D2_NORMALR].init("d2_normalr", false, true, true);
+		_samplers[ST_D2_F0].init("d2_f0", true, true);
 
 
 		RenderSystem* rs = Root::getSingleton().getRenderSystem();
@@ -107,14 +107,14 @@ namespace Ogre
 		setTexture((SamplerType)(ST_MAIN_ALBEDO + mapSlot * 3), tex, textureAddressing, blendFactor, 0, blendFunc);
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setNormalTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing, float blendFactor)
+	void PbsMaterial::setNormalrTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing, float normalBlendFactor, float rBlendFactor)
 	{
-		setTexture((SamplerType)(ST_MAIN_NORMAL + mapSlot * 3), tex, textureAddressing, blendFactor);
+		setTexture((SamplerType)(ST_MAIN_NORMALR + mapSlot * 3), tex, textureAddressing, normalBlendFactor, rBlendFactor);
 	}
 	//-----------------------------------------------------------------------------------
-	void PbsMaterial::setF0RTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing, BlendFunction f0BlendFunc, float f0BlendFactor, float rBlendFactor)
+	void PbsMaterial::setF0Texture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing, BlendFunction blendFunc, float blendFactor)
 	{
-		setTexture((SamplerType)(ST_MAIN_F0R + mapSlot * 3), tex, textureAddressing, f0BlendFactor, rBlendFactor, f0BlendFunc);
+		setTexture((SamplerType)(ST_MAIN_F0 + mapSlot * 3), tex, textureAddressing, blendFactor, 0, blendFunc);
 	}
 	//-----------------------------------------------------------------------------------
 	void PbsMaterial::setOffsetAndScale(MapSlot mapSlot, Vector2 offset, Vector2 scale)
@@ -269,7 +269,7 @@ namespace Ogre
 			if (s.status == SS_ACTIVE || s.status == SS_ADDED || s.status == SS_UPDATED)
 			{
 				s.textureUnitState = pass->createTextureUnitState();
-				s.textureUnitState->setName("map_" + s.name);
+				s.textureUnitState->setName("in_map_" + s.name);
 				s.status = SS_UPDATED;
 			}
 			else
@@ -283,7 +283,7 @@ namespace Ogre
 		for (int i = 0; i < size; i++)
 		{
 			TextureUnitState* tus = pass->getTextureUnitState(i);
-			fragmentParams->setNamedConstant("in_" + tus->getName(), i);
+			fragmentParams->setNamedConstant(tus->getName(), i);
 		}
 
 		_hasSamplerChanged = true;
@@ -306,6 +306,7 @@ namespace Ogre
 		fragmentParams->setNamedConstant("in_albedo", mAlbedo);
 		fragmentParams->setNamedConstant("in_f0", mF0);
 		fragmentParams->setNamedConstant("in_roughness", mRoughness);
+		fragmentParams->setNamedConstant("in_light_roughness_offset", mLightRoughnessOffset);
 
 		fragmentParams->setNamedConstant("in_offset_main", mMainOffset);
 		fragmentParams->setNamedConstant("in_scale_main", mMainScale);

@@ -86,14 +86,14 @@ namespace Ogre
 		{
 			ST_ENV_MAP = 0,
 			ST_MAIN_ALBEDO,
-			ST_MAIN_NORMAL,
-			ST_MAIN_F0R,
+			ST_MAIN_NORMALR,
+			ST_MAIN_F0,
 			ST_D1_ALBEDO,
-			ST_D1_NORMAL,
-			ST_D1_F0R,
+			ST_D1_NORMALR,
+			ST_D1_F0,
 			ST_D2_ALBEDO,
-			ST_D2_NORMAL,
-			ST_D2_F0R,
+			ST_D2_NORMALR,
+			ST_D2_F0,
 			ST_COUNT
 		};
 
@@ -169,9 +169,12 @@ namespace Ogre
 		Real getRoughness(){ return mRoughness; }
 		void setRoughness(Real val){ mRoughness = val; }
 
+		Real getLightRoughnessOffset(){ return mLightRoughnessOffset; }
+		void setLightRoughnessOffset(Real val){ mLightRoughnessOffset = val; }
+
 		void setAlbedoTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 0);
-		void setNormalTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), float blendFactor = 0);
-		void setF0RTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float f0BlendFactor = 0, float rBlendFactor = 0);
+		void setNormalrTexture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), float normalBlendFactor = 0, float rBlendFactor = 0);
+		void setF0Texture(MapSlot mapSlot, TexturePtr tex, TextureAddressing textureAddressing = TextureAddressing(), BlendFunction blendFunc = BF_ALPHA, float blendFactor = 0);
 		void setOffsetAndScale(MapSlot mapSlot, Vector2 offset, Vector2 scale);
 		void setUvSetIndex(MapSlot mapSlot, uint index);
 
@@ -193,6 +196,7 @@ namespace Ogre
 		ColourValue mAlbedo;
 		ColourValue mF0;
 		Real mRoughness;
+		Real mLightRoughnessOffset;
 
 		Vector2 mMainOffset;
 		Vector2 mMainScale;
