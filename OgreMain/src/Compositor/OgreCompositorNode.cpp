@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "Compositor/Pass/OgreCompositorPass.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
+#include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopy.h"
+#include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopyDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
@@ -405,6 +407,11 @@ namespace Ogre
                     newPass = OGRE_NEW CompositorPassStencil(
                                             static_cast<CompositorPassStencilDef*>(*itPass),
                                             *channel, this, mRenderSystem );
+                    break;
+                case PASS_DEPTHCOPY:
+                    newPass = OGRE_NEW CompositorPassDepthCopy(
+                                            static_cast<CompositorPassDepthCopyDef*>(*itPass),
+                                            this );
                     break;
                 case PASS_CUSTOM:
                     {
