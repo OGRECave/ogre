@@ -112,7 +112,7 @@ namespace v1
                                  uint32 zoffset );
         virtual ~D3D11DepthTextureTarget();
 
-        virtual bool requiresTextureFlipping() const { return false; }
+        virtual bool requiresTextureFlipping(void) const        { return false; }
 
         /// @copydoc RenderTarget::getForceDisableColourWrites
         virtual bool getForceDisableColourWrites(void) const    { return true; }
@@ -123,7 +123,7 @@ namespace v1
 
         /// Notifies the ultimate texture owner the buffer changed
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
-        virtual void detachDepthBuffer();
+        virtual void detachDepthBuffer(void);
 
         void getCustomAttribute( const String& name, void* pData );
     };

@@ -33,7 +33,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusFrameBufferObject.h"
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreRoot.h"
-#include "OgreTextureManager.h"
 
 namespace Ogre
 {
@@ -225,7 +224,7 @@ namespace v1
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void GL3PlusDepthTextureTarget::detachDepthBuffer()
+    void GL3PlusDepthTextureTarget::detachDepthBuffer(void)
     {
         RenderTexture::detachDepthBuffer();
         mUltimateTextureOwner->_setGlTextureName( 0 );

@@ -224,7 +224,7 @@ namespace v1
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    void D3D11DepthTextureTarget::detachDepthBuffer()
+    void D3D11DepthTextureTarget::detachDepthBuffer(void)
     {
         RenderTexture::detachDepthBuffer();
         mUltimateTextureOwner->_setD3DShaderResourceView( 0 );

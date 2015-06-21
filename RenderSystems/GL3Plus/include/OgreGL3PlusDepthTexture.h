@@ -26,8 +26,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 
-#ifndef __GL3PlusDepthTexture_H__
-#define __GL3PlusDepthTexture_H__
+#ifndef _OgreGL3PlusDepthTexture_H_
+#define _OgreGL3PlusDepthTexture_H_
 
 #include "OgreGL3PlusTexture.h"
 
@@ -100,7 +100,7 @@ namespace v1
                                    uint32 zoffset );
         virtual ~GL3PlusDepthTextureTarget();
 
-        virtual bool requiresTextureFlipping() const { return true; }
+        virtual bool requiresTextureFlipping(void) const        { return true; }
 
         /// @copydoc RenderTarget::getForceDisableColourWrites
         virtual bool getForceDisableColourWrites(void) const    { return true; }
@@ -111,7 +111,7 @@ namespace v1
 
         /// Notifies the ultimate texture owner the buffer changed
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
-        virtual void detachDepthBuffer();
+        virtual void detachDepthBuffer(void);
 
         void getCustomAttribute( const String& name, void* pData );
     };
