@@ -29,6 +29,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusTextureManager.h"
 #include "OgreGL3PlusRenderTexture.h"
 #include "OgreGL3PlusDepthTexture.h"
+#include "OgreGL3PlusNullTexture.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
 
@@ -56,12 +57,22 @@ namespace Ogre {
                                                 ManualResourceLoader* loader,
                                                 const NameValuePairList* createParams)
     {
-        if( createParams && createParams->find( "DepthTexture" ) != createParams->end() )
+        if( createParams )
         {
-            const bool shareableDepthBuffer = createParams->find( "shareableDepthBuffer" ) !=
-                                                                            createParams->end();
-            return new GL3PlusDepthTexture( shareableDepthBuffer, this, name, handle, group,
-                                            isManual, loader, mGLSupport );
+            if( createParams->find( "DepthTexture" ) != createParams->end() )
+            {
+                const bool shareableDepthBuffer = createParams->find( "shareableDepthBuffer" ) !=
+                                                                                createParams->end();
+                return new GL3PlusDepthTexture( shareableDepthBuffer, this, name, handle, group,
+                                                isManual, loader, mGLSupport );
+            }
+
+            NameValuePairList::const_iterator it = createParams->find( "SpecialFormat" );
+            if( it != createParams->end() && it->second == "PF_NULL" )
+            {
+                return new GL3PlusNullTexture( this, name, handle, group,
+                                               isManual, loader, mGLSupport );
+            }
         }
 
         return new GL3PlusTexture(this, name, handle, group, isManual, loader, mGLSupport);

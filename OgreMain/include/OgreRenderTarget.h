@@ -396,6 +396,8 @@ namespace Ogre {
         virtual void _endUpdate();
 
         /// Used by depth texture views which need to disable colour writes when rendering to it
+        /// PF_NULL targets can be identified because they set this value to true and have
+        /// no depth buffers attached.
         virtual bool getForceDisableColourWrites(void) const    { return false; }
 
     protected:

@@ -6371,6 +6371,8 @@ namespace Ogre{
                     {
                         if( PixelUtil::isDepth( format ) )
                             depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else if( format == PF_NULL )
+                            depthBufferId = DepthBuffer::POOL_NO_DEPTH;
                         else
                             depthBufferId = DepthBuffer::POOL_DEFAULT;
                     }
@@ -6999,6 +7001,8 @@ namespace Ogre{
                     {
                         if( PixelUtil::isDepth( format ) )
                             depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else if( format == PF_NULL )
+                            depthBufferId = DepthBuffer::POOL_NO_DEPTH;
                         else
                             depthBufferId = DepthBuffer::POOL_DEFAULT;
                     }

@@ -1,4 +1,4 @@
-/*
+﻿/*
   -----------------------------------------------------------------------------
   This source file is part of OGRE
   (Object-oriented Graphics Rendering Engine)
@@ -3111,6 +3111,14 @@ namespace Ogre {
                                                          GL_RENDERBUFFER, 0 ) );
                         OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
                                                          GL_RENDERBUFFER, 0 ) );
+
+                        OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_WIDTH,
+                                                       target->getWidth() ) );
+                        OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_HEIGHT,
+                                                       target->getHeight() ) );
+
+                        OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_SAMPLES,
+                                                       target->getFSAA() > 1 ? target->getFSAA() : 0 ) );
                     }
                 }
 
