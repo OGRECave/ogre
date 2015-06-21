@@ -1226,6 +1226,9 @@ namespace Ogre
         mIds["depth_pool"]          = ID_DEPTH_POOL;
         mIds["depth_texture"]       = ID_DEPTH_TEXTURE;
         mIds["depth_format"]        = ID_DEPTH_FORMAT;
+        mIds["2d_array"]            = ID_2D_ARRAY;
+        //mIds["3d"]                = ID_3D;
+        mIds["cubemap"]             = ID_CUBEMAP;
 
         mIds["target"] = ID_TARGET;
 

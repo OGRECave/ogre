@@ -194,13 +194,22 @@ namespace Ogre
                 height = static_cast<uint>( ceilf( finalTarget->getHeight() * textureDef.heightFactor ) );
         }
 
+        uint32 texUsageFlags = TU_RENDERTARGET;
+
+        if( textureDef.uav )
+            texUsageFlags |= TU_UAV;
+
+        assert( textureDef.depth > 0 &&
+                (textureDef.depth == 1 || textureDef.textureType > TEX_TYPE_2D) &&
+                (textureDef.depth == 6 || textureDef.textureType != TEX_TYPE_CUBE_MAP) );
+
         if( textureDef.formatList.size() == 1 )
         {
             //Normal RT
             TexturePtr tex = TextureManager::getSingleton().createManual( texName,
                                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                            TEX_TYPE_2D, width, height, 0,
-                                            textureDef.formatList[0], TU_RENDERTARGET, 0, hwGamma,
+                                            textureDef.textureType, width, height, textureDef.depth, 0,
+                                            textureDef.formatList[0], (int)texUsageFlags, 0, hwGamma,
                                             fsaa, fsaaHint, textureDef.fsaaExplicitResolve,
                                             textureDef.depthBufferId != DepthBuffer::POOL_NON_SHAREABLE );
             RenderTexture* rt = tex->getBuffer()->getRenderTarget();
@@ -232,8 +241,8 @@ namespace Ogre
                 TexturePtr tex = TextureManager::getSingleton().createManual(
                                             texName + StringConverter::toString( rtNum ),
                                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                            TEX_TYPE_2D, width, height, 0,
-                                            *pixIt, TU_RENDERTARGET, 0, hwGamma,
+                                            textureDef.textureType, width, height, textureDef.depth, 0,
+                                            *pixIt, (int)texUsageFlags, 0, hwGamma,
                                             fsaa, fsaaHint, textureDef.fsaaExplicitResolve,
                                             textureDef.depthBufferId != DepthBuffer::POOL_NON_SHAREABLE );
                 RenderTexture* rt = tex->getBuffer()->getRenderTarget();

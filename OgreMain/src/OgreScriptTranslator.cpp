@@ -6214,7 +6214,8 @@ namespace Ogre{
         // Save the first atom, should be name
         AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
-        uint width = 0, height = 0;
+        TextureType textureType = TEX_TYPE_2D;
+        uint width = 0, height = 0, depth = 1;
         float widthFactor = 1.0f, heightFactor = 1.0f;
         bool widthSet = false, heightSet = false, formatSet = false;
         TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::BoolUndefined;
@@ -6222,6 +6223,7 @@ namespace Ogre{
         bool fsaaExplicitResolve = false;
         uint16 depthBufferId = DepthBuffer::POOL_INVALID;
         PixelFormat depthBufferFormat = PF_UNKNOWN;
+        bool isUav = false;
         bool preferDepthTexture = false;
         Ogre::PixelFormatList formats;
 
@@ -6336,6 +6338,12 @@ namespace Ogre{
                     }
                 }
                 break;
+            case ID_UAV:
+                isUav = true;
+                break;
+            case ID_2D_ARRAY:   textureType = TEX_TYPE_2D_ARRAY; break;
+            case ID_3D:         textureType = TEX_TYPE_3D; break;
+            case ID_CUBEMAP:    textureType = TEX_TYPE_CUBE_MAP; break;
             default:
                 if (StringConverter::isNumber(atom->value))
                 {
@@ -6348,6 +6356,10 @@ namespace Ogre{
                     {
                         height = StringConverter::parseInt(atom->value);
                         heightSet = true;
+                    }
+                    else if (atomIndex == 4)
+                    {
+                        depth = StringConverter::parseInt(atom->value);
                     }
                     else
                     {
@@ -6386,15 +6398,22 @@ namespace Ogre{
             return;
         }
 
+        if( textureType == TEX_TYPE_2D )
+            depth = 1;
+        else if( textureType == TEX_TYPE_CUBE_MAP )
+            depth = 6;
 
         // No errors, create
         TextureDefinitionBase::TextureDefinition *td = defBase->addTextureDefinition( atom0->value );
+        td->textureType     = textureType;
         td->width           = width;
         td->height          = height;
+        td->depth           = depth;
         td->widthFactor     = widthFactor;
         td->heightFactor    = heightFactor;
         td->formatList      = formats;
         td->fsaa            = fsaa;
+        td->uav             = isUav;
         td->hwGammaWrite    = hwGammaWrite;
         td->depthBufferId   = depthBufferId;
         td->depthBufferFormat   = depthBufferFormat;
@@ -6796,11 +6815,13 @@ namespace Ogre{
         // Save the first atom, should be shadow map name.
         AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
-        uint width = 0, height = 0;
+        TextureType textureType = TEX_TYPE_2D;
+        uint width = 0, height = 0, depth = 1;
         float widthFactor = 1.0f, heightFactor = 1.0f;
         bool widthSet = false, heightSet = false, formatSet = false;
         bool hwGammaWrite = false;
         uint fsaa = 0;
+        bool isUav = false;
         bool preferDepthTexture = false;
         uint16 depthBufferId = DepthBuffer::POOL_INVALID;
         PixelFormat depthBufferFormat = PF_UNKNOWN;
@@ -6925,6 +6946,12 @@ namespace Ogre{
                     depthBufferId = StringConverter::parseInt(atom->value);
                 }
                 break;
+            case ID_UAV:
+                isUav = true;
+                break;
+            case ID_2D_ARRAY:   textureType = TEX_TYPE_2D_ARRAY; break;
+            case ID_3D:         textureType = TEX_TYPE_3D; break;
+            case ID_CUBEMAP:    textureType = TEX_TYPE_CUBE_MAP; break;
             case ID_LIGHT:
                 {
                     // advance to next to get the ID
@@ -6976,6 +7003,10 @@ namespace Ogre{
                         height = StringConverter::parseInt(atom->value);
                         heightSet = true;
                     }
+                    else if (atomIndex == 4)
+                    {
+                        depth = StringConverter::parseInt(atom->value);
+                    }
                     else
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -7016,15 +7047,23 @@ namespace Ogre{
             return;
         }
 
+        if( textureType == TEX_TYPE_2D )
+            depth = 1;
+        else if( textureType == TEX_TYPE_CUBE_MAP )
+            depth = 6;
+
         ShadowTextureDefinition *td = mShadowNodeDef->addShadowTextureDefinition( lightIdx, splitIdx,
                                                                                 atom0->value, isAtlas );
         // No errors, create
+        td->textureType     = textureType;
         td->width           = width;
         td->height          = height;
+        td->depth           = depth;
         td->widthFactor     = widthFactor;
         td->heightFactor    = heightFactor;
         td->formatList      = formats;
         td->fsaa            = fsaa;
+        td->uav             = isUav;
         td->hwGammaWrite    = hwGammaWrite;
         td->preferDepthTexture= preferDepthTexture;
         td->depthBufferId   = depthBufferId;
