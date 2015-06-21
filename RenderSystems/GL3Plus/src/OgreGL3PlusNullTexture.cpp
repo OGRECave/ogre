@@ -213,6 +213,8 @@ namespace v1
                      "If you're manually setting the compositor, "
                      "set TextureDefinition::depthBufferId to 0",
                      "GL3PlusNullTextureTarget::attachDepthBuffer" );
+
+        return false;
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusNullTextureTarget::getCustomAttribute( const String& name, void* pData )

@@ -298,6 +298,9 @@ namespace Ogre
                                    ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN );
+
+        virtual void clearUAVs(void);
+
         virtual void flushUAVs(void);
 
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
