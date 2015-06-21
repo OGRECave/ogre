@@ -3061,7 +3061,18 @@ namespace Ogre {
 
         // Unbind frame buffer object
         if (mActiveRenderTarget)
+        {
             mRTTManager->unbind(mActiveRenderTarget);
+
+            if( mActiveRenderTarget->getForceDisableColourWrites() &&
+                !mActiveRenderTarget->getDepthBuffer() )
+            {
+                //Disable target independent rasterization to let the driver warn us
+                //of wrong behavior during regular rendering.
+                OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_WIDTH, 0 ) );
+                OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_HEIGHT, 0 ) );
+            }
+        }
 
         mActiveRenderTarget = target;
         if (target)
