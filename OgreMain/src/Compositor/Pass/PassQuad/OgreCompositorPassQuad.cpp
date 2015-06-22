@@ -176,14 +176,27 @@ namespace Ogre
             const Vector3 *corners = mCamera->getWorldSpaceCorners();
             mFsRect->setNormals( corners[5], corners[6], corners[4], corners[7] );
         }
-        else if( mDefinition->mFrustumCorners == CompositorPassQuadDef::CAMERA_DIRECTION )
+        else if( mDefinition->mFrustumCorners == CompositorPassQuadDef::WORLD_SPACE_CORNERS_CENTERED ||
+                 mDefinition->mFrustumCorners == CompositorPassQuadDef::CAMERA_DIRECTION )
         {
             const Vector3 *corners = mCamera->getWorldSpaceCorners();
             const Vector3 &cameraPos = mCamera->getDerivedPosition();
-            mFsRect->setNormals( (corners[5] - cameraPos).normalisedCopy(),
-                                 (corners[6] - cameraPos).normalisedCopy(),
-                                 (corners[4] - cameraPos).normalisedCopy(),
-                                 (corners[7] - cameraPos).normalisedCopy() );
+
+            Vector3 cameraDirs[4];
+            cameraDirs[0] = corners[5] - cameraPos;
+            cameraDirs[1] = corners[6] - cameraPos;
+            cameraDirs[2] = corners[4] - cameraPos;
+            cameraDirs[3] = corners[7] - cameraPos;
+
+            if( mDefinition->mFrustumCorners == CompositorPassQuadDef::CAMERA_DIRECTION )
+            {
+                cameraDirs[0].normalise();
+                cameraDirs[1].normalise();
+                cameraDirs[2].normalise();
+                cameraDirs[3].normalise();
+            }
+
+            mFsRect->setNormals( cameraDirs[0], cameraDirs[1], cameraDirs[2], cameraDirs[3] );
         }
 
         SceneManager *sceneManager = mCamera->getSceneManager();

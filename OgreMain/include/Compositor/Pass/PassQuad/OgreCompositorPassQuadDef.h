@@ -72,6 +72,7 @@ namespace Ogre
             NO_CORNERS,
             VIEW_SPACE_CORNERS,
             WORLD_SPACE_CORNERS,
+            WORLD_SPACE_CORNERS_CENTERED,
             CAMERA_DIRECTION
         };
 
