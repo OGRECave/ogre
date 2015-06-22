@@ -72,8 +72,6 @@ namespace Ogre
     public:
         CompositorPass( const CompositorPassDef *definition, const CompositorChannel &target,
                         CompositorNode *parentNode );
-        CompositorPass( const CompositorPassDef *definition, CompositorNode *parentNode,
-                        bool specialPass );
         virtual ~CompositorPass();
 
         virtual void execute( const Camera *lodCameraconst ) = 0;

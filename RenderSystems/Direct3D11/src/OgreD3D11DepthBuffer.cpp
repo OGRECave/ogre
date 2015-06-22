@@ -120,8 +120,8 @@ namespace Ogre
             D3D11Device &device = renderSystem->_getDevice();
             ID3D11DeviceContextN *deviceContext = device.GetImmediateContext();
 
-            deviceContext->CopyResource( this->mDepthStencilResource,
-                                         destination->mDepthStencilResource );
+            deviceContext->CopyResource( destination->mDepthStencilResource,
+                                         this->mDepthStencilResource );
 
             retVal = true;
         }

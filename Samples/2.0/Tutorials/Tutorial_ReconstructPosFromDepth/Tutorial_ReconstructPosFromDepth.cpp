@@ -61,23 +61,28 @@ int mainApp()
 #endif
 {
     Tutorial_ReconstructPosFromDepthGameState tutorial_ReconstructPosFromDepthGameState(
-        "Shows how to create a sky as simple postprocess effect.\n"
-        "The vertex shader ensures the depth is always = 1, and the pixel shader\n"
-        "takes a cubemap texture.\n"
-        "The magic is in the compositor feature 'quad_normals camera_direction' which\n"
-        "sends the data needed by the cubemap lookup via normals. This data can also\n"
-        "be used for realtime analytical atmosphere scattering shaders.\n"
+        "This tutorial shows how to reconstruct the position from only the depth buffer in\n"
+        "a very efficient way. This is very useful for Deferred Shading, SSAO, etc.\n"
+        "The sample uses the compositor feature 'quad_normals camera_far_corners_view_space'\n"
+        "in combination with a special shader so that we can unproject the depth sampled\n"
+        "from the depth buffer and combine it with the frustum corners to get the view space\n"
+        "projection. The code (commented out) also shows how to get the world-space position\n"
+        "which requires only slight adjustments.\n\n"
+        "Additionally, we show how to avoid depth buffer decompression using the compositor.\n"
+        "See section '4.1.4.2 Depth Textures' of the manual for an explanation.\n\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/Tutorial_ReconstructPosFromDepth.compositor\n"
         "   * Samples/Media/2.0/materials/Tutorial_ReconstructPosFromDepth/*.*\n"
         "\n"
-        "LEGAL: Uses Saint Peter's Basilica (C) by Emil Persson under CC Attrib 3.0 Unported\n"
-        "See Samples/Media/materials/textures/Cubemaps/License.txt for more information." );
+        "For the technical explanation, see 'Reconstructing Position From Depth':\n"
+        "   Part I: http://mynameismjp.wordpress.com/2009/03/10/reconstructing-position-from-depth/\n"
+        "   Part II: http://mynameismjp.wordpress.com/2009/05/05/reconstructing-position-from-depth-continued/\n"
+        "   Part III: http://mynameismjp.wordpress.com/2010/09/05/position-from-depth-3/\n");
     Tutorial_ReconstructPosFromDepthGraphicsSystem graphicsSystem( &tutorial_ReconstructPosFromDepthGameState );
 
     tutorial_ReconstructPosFromDepthGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize( "Dynamic Buffers Example" );
+    graphicsSystem.initialize( "Reconstructing Position from Depth" );
 
     if( graphicsSystem.getQuit() )
     {

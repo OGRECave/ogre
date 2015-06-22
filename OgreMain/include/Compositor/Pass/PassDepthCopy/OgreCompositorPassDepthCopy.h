@@ -61,6 +61,7 @@ namespace Ogre
 
     public:
         CompositorPassDepthCopy( const CompositorPassDepthCopyDef *definition,
+                                 const CompositorChannel &target,
                                  CompositorNode *parentNode );
 
         virtual void execute( const Camera *lodCamera );

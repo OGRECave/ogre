@@ -109,6 +109,8 @@ namespace v1
         /// true so that the proper path is taken in GL3PlusTexture::getGLID)
         virtual void setFsaaResolveDirty(void)  {}
 
+        virtual void setDepthBufferPool( uint16 poolId );
+
         /// Notifies the ultimate texture owner the buffer changed
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
         virtual void detachDepthBuffer(void);

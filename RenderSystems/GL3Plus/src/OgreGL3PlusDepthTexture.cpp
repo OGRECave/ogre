@@ -210,6 +210,19 @@ namespace v1
     {
     }
     //-----------------------------------------------------------------------------------
+    void GL3PlusDepthTextureTarget::setDepthBufferPool( uint16 poolId )
+    {
+        const uint16 oldPoolId = mDepthBufferPoolId;
+
+        RenderTexture::setDepthBufferPool( poolId );
+
+        if( oldPoolId != poolId )
+        {
+            RenderSystem *renderSystem = Root::getSingleton().getRenderSystem();
+            renderSystem->setDepthBufferFor( this, true );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     bool GL3PlusDepthTextureTarget::attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch )
     {
         bool retVal = RenderTexture::attachDepthBuffer( depthBuffer, exactFormatMatch );

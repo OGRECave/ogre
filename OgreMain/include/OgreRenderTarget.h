@@ -107,7 +107,7 @@ namespace Ogre {
          *      Changing the pool Id will cause the current depth buffer to be detached unless the old
          *      id and the new one are the same
          */
-        void setDepthBufferPool( uint16 poolId );
+        virtual void setDepthBufferPool( uint16 poolId );
 
         /// Returns the pool ID this RenderTarget should query from. @see DepthBuffer
         uint16 getDepthBufferPool() const;

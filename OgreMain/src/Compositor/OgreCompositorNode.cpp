@@ -411,7 +411,7 @@ namespace Ogre
                 case PASS_DEPTHCOPY:
                     newPass = OGRE_NEW CompositorPassDepthCopy(
                                             static_cast<CompositorPassDepthCopyDef*>(*itPass),
-                                            this );
+                                            *channel, this );
                     break;
                 case PASS_CUSTOM:
                     {
