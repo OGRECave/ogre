@@ -223,8 +223,6 @@ namespace Ogre {
         */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera) {}
 
-        virtual void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false) {}
-
         /** @See SceneManager::updateAllBounds
         @remarks
             We don't pass by reference on purpose (avoid implicit aliasing)
