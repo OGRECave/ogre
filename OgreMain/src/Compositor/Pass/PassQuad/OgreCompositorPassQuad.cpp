@@ -190,10 +190,11 @@ namespace Ogre
 
             if( mDefinition->mFrustumCorners == CompositorPassQuadDef::CAMERA_DIRECTION )
             {
-                cameraDirs[0].normalise();
-                cameraDirs[1].normalise();
-                cameraDirs[2].normalise();
-                cameraDirs[3].normalise();
+                Real invFarPlane = 1.0f / mCamera->getFarClipDistance();
+                cameraDirs[0] /= invFarPlane;
+                cameraDirs[1] /= invFarPlane;
+                cameraDirs[2] /= invFarPlane;
+                cameraDirs[3] /= invFarPlane;
             }
 
             mFsRect->setNormals( cameraDirs[0], cameraDirs[1], cameraDirs[2], cameraDirs[3] );

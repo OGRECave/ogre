@@ -111,8 +111,12 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool DepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
     {
-        if( this->getWidth() >= renderTarget->getWidth() &&
+        if( ((this->getWidth() >= renderTarget->getWidth() &&
             this->getHeight() >= renderTarget->getHeight() &&
+              !renderTarget->prefersDepthTexture()) ||
+            (this->getWidth() == renderTarget->getWidth() &&
+            this->getHeight() == renderTarget->getHeight() &&
+                renderTarget->prefersDepthTexture())) &&
             this->getFsaa() == renderTarget->getFSAA() &&
             mDepthTexture == renderTarget->prefersDepthTexture() &&
             ((!exactFormatMatch && mFormat == PF_D24_UNORM_S8_UINT) ||

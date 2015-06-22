@@ -1,0 +1,77 @@
+
+// GLSL shaders
+vertex_program ReconstructPosFromDepth_vs_GLSL glsl
+{
+	source ReconstructPosFromDepth_vs.glsl
+}
+
+fragment_program ReconstructPosFromDepth_ps_GLSL glsl
+{
+	source ReconstructPosFromDepth_ps.glsl
+	default_params
+	{
+		param_named depthTexture int 0
+	}
+}
+
+// HLSL shaders
+vertex_program ReconstructPosFromDepth_vs_HLSL hlsl
+{
+    source ReconstructPosFromDepth_vs.hlsl
+    entry_point main
+    target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+}
+
+fragment_program ReconstructPosFromDepth_ps_HLSL hlsl
+{
+	source ReconstructPosFromDepth_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+// Unified definitions
+vertex_program ReconstructPosFromDepth_vs unified
+{
+	delegate ReconstructPosFromDepth_vs_HLSL
+	delegate ReconstructPosFromDepth_vs_GLSL
+	
+	default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+fragment_program ReconstructPosFromDepth_ps unified
+{
+	delegate ReconstructPosFromDepth_ps_HLSL
+	delegate ReconstructPosFromDepth_ps_GLSL
+}
+
+// Material definition
+material ReconstructPosFromDepth
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref ReconstructPosFromDepth_vs
+			{
+			}
+
+			fragment_program_ref ReconstructPosFromDepth_ps
+			{
+			}
+
+			texture_unit
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+		}
+	}
+}

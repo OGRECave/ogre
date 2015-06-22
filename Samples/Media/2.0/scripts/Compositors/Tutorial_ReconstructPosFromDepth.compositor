@@ -1,0 +1,65 @@
+compositor_node Tutorial_ReconstructPosFromDepthNode
+{
+	in 0 rt_renderwindow
+	
+	//Inform that we want to use a depth texture, the format and pool ID must match
+	//We don't read the depth buffer directly from rt_renderwindow because OpenGL doesn't support it.
+	//(D3D11 does though, and will work)
+	texture rt0 target_width target_height PF_R8G8B8 depth_texture depth_format PF_D32_FLOAT depth_pool 1
+	texture rt1 target_width target_height PF_FLOAT32_R depth_pool 0
+
+	//The depthBuffer will be a "view" to rt0's depth because it has the exact same parameters
+	//(PF_D32_FLOAT, pool ID = 1; rt0 was asked to use a depth_texture)
+	//
+	//Note that other RTTs may share the same depth buffer if they have the same parameters as well due
+	//to depth buffer sharing (depth_pool 65534 is a special pool where sharing is disabled so each RTT gets
+	//its own depth buffer/texture; depth textures are by default placed there so we need to explicitly set
+	//it to 1).
+	texture depthBuffer target_width target_height PF_D32_FLOAT depth_pool 1
+
+	target rt0
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		pass render_scene
+		{
+			overlays	off
+		}
+	}
+	
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 1 0 0 0
+			buffers			colour
+			discard_only	true
+		}
+		
+		pass render_quad
+		{
+			material ReconstructPosFromDepth
+	    	input 0 depthBuffer
+
+			quad_normals	camera_far_corners_view_space
+		}
+		
+		pass render_scene
+		{
+			lod_update_list	off
+
+			//Render Overlays
+			overlays	on
+			rq_first	254
+			rq_last		255
+		}
+	}
+}
+
+workspace Tutorial_ReconstructPosFromDepthWorkspace
+{
+	connect_output Tutorial_ReconstructPosFromDepthNode 0
+}
