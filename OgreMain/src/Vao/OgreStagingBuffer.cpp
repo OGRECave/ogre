@@ -261,7 +261,7 @@ namespace Ogre
             }
             else if( blockToMerge->end == itor->start )
             {
-                blockToMerge->end += itor->start;
+                blockToMerge->end = itor->end;
                 size_t idx = blockToMerge - blocks.begin();
 
                 //When blockToMerge is the last one, its index won't be the same
