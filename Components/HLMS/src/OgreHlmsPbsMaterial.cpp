@@ -328,12 +328,12 @@ namespace Ogre
 			{
 				Light* light = (*pLightList)[i];
 
-				Vector3 pos = viewMatrix * light->getPosition();
+				Vector3 pos = viewMatrix * light->getDerivedPosition();
 				mLightPositions_es[i * 3 + 0] = pos.x;
 				mLightPositions_es[i * 3 + 1] = pos.y;
 				mLightPositions_es[i * 3 + 2] = pos.z;
 
-				Vector3 dir = -(viewMatrixQuat * light->getDirection()).normalisedCopy();
+				Vector3 dir = -(viewMatrixQuat * light->getDerivedDirection()).normalisedCopy();
 				mLightDirections_es[i * 3 + 0] = dir.x;
 				mLightDirections_es[i * 3 + 1] = dir.y;
 				mLightDirections_es[i * 3 + 2] = dir.z;
