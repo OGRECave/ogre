@@ -30,6 +30,10 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreCommon.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#include "macUtils.h"
+#endif
+
 #include "UnitTestSuite.h"
 
 // Register the test suite
