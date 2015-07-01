@@ -349,12 +349,12 @@ namespace Ogre
             // a vertical retrace anyhow.
 #if defined(MAC_OS_X_VERSION_10_4) && MAC_OS_X_VERSION_MAX_ALLOWED <= MAC_OS_X_VERSION_10_4
             long swapInterval = 1;
-            cgErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
+            cglErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
 #else
             GLint swapInterval = 1;
-            cgErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
+            cglErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
 #endif
-            CG_CHECK_ERROR(cgErr)
+            CGL_CHECK_ERROR(cglErr)
             
             // Give a copy of our context to the rendersystem
             if(!mContext)
