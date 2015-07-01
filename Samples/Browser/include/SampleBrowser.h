@@ -59,28 +59,18 @@
 
 #ifdef OGRE_STATIC_LIB
 #   ifdef INCLUDE_RTSHADER_SYSTEM
-#       include "ShaderSystem.h"
-#       include "DualQuaternion.h"
-#       include "DeferredShadingDemo.h"
-#       include "NewInstancing.h"
-#       include "TextureArray.h"
-#       include "SSAO.h"
-#       include "OceanDemo.h"
+//#       include "ShaderSystem.h"
 #       ifdef OGRE_BUILD_COMPONENT_VOLUME
 #           include "VolumeCSG.h"
 #           include "VolumeTerrain.h"
 #       endif
 #       ifdef OGRE_BUILD_COMPONENT_TERRAIN
 #           include "EndlessWorld.h"
-#           include "Terrain.h"
 #       endif
 #   endif
 #   include "DualQuaternion.h"
-#   include "DeferredShadingDemo.h"
-#   include "Instancing.h"
 #   include "NewInstancing.h"
 #   include "TextureArray.h"
-#   include "SSAO.h"
 #   include "OceanDemo.h"
 #   ifdef OGRE_BUILD_COMPONENT_VOLUME
 #       include "VolumeCSG.h"
@@ -88,7 +78,6 @@
 #   endif
 #   ifdef OGRE_BUILD_COMPONENT_TERRAIN
 #       include "EndlessWorld.h"
-#       include "Terrain.h"
 #   endif
 #   include "CelShading.h"
 #   include "Compositor.h"
@@ -109,7 +98,6 @@
 #   include "MeshLod.h"
 #   include "ParticleFX.h"
 #   include "PNTrianglesTessellation.h"
-#   include "Shadows.h"
 #   include "SkeletalAnimation.h"
 #   include "SkyBox.h"
 #   include "SkyDome.h"
@@ -1083,7 +1071,6 @@ namespace OgreBites
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 #                       endif
-            mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
             mPluginNameMap["Sample_MeshLod"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_MeshLod();
             mPluginNameMap["Sample_ParticleFX"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_ParticleFX();
@@ -1104,14 +1091,10 @@ namespace OgreBites
                 mPluginNameMap["Sample_CelShading"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_CelShading();
                 mPluginNameMap["Sample_Compositor"]         = (OgreBites::SdkSample *) OGRE_NEW Sample_Compositor();
                 mPluginNameMap["Sample_CubeMapping"]        = (OgreBites::SdkSample *) OGRE_NEW Sample_CubeMapping();
-
-                mPluginNameMap["Sample_DeferredShading"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_DeferredShading();
-                mPluginNameMap["Sample_SSAO"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_SSAO();
-                mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+//                mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
                 mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
                 mPluginNameMap["Sample_Water"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Water();
 #       ifdef OGRE_BUILD_COMPONENT_TERRAIN
-                mPluginNameMap["Sample_Terrain"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Terrain();
                 mPluginNameMap["Sample_EndlessWorld"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_EndlessWorld();
 #       endif
                 mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
@@ -1385,7 +1368,7 @@ namespace OgreBites
             sampleList.push_back("Sample_Fresnel");
             sampleList.push_back("Sample_ParticleFX");
 #   ifdef INCLUDE_RTSHADER_SYSTEM
-            sampleList.push_back("Sample_ShaderSystem");
+//            sampleList.push_back("Sample_ShaderSystem");
 #   endif
             sampleList.push_back("Sample_Lighting");
             sampleList.push_back("Sample_MeshLod");

@@ -10,11 +10,6 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint32 NonRefractiveSurfaces  = 0x00000001;
-const uint32 RefractiveSurfaces     = 0x00000002; //Not used in this demo
-const uint32 ReflectedSurfaces      = 0x00000004;
-const uint32 RegularSurfaces        = NonRefractiveSurfaces|ReflectedSurfaces;
-
 class _OgreSampleClassExport Sample_CubeMapping : public SdkSample, public CompositorWorkspaceListener
 {
 public:

@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
 #include "OgreGLESRenderSystem.h"
+#include "OgreViewport.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -116,7 +117,7 @@ using namespace Ogre;
         window->resize(width, height);
 
         // After rotation the aspect ratio of the viewport has changed, update that as well.
-        viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
+//        viewPort->getCamera()->setAspectRatio((Real) width / (Real) height);
     }
 }
 

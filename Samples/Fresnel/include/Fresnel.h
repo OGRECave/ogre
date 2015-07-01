@@ -10,11 +10,6 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint32 NonRefractiveSurfaces  = 0x00000001;
-const uint32 RefractiveSurfaces     = 0x00000002;
-const uint32 ReflectedSurfaces      = 0x00000004;
-const uint32 RegularSurfaces        = NonRefractiveSurfaces|ReflectedSurfaces;
-
 class _OgreSampleClassExport Sample_Fresnel : public SdkSample, public CompositorWorkspaceListener
 {
     uint32 mPreviousVisibilityFlags;

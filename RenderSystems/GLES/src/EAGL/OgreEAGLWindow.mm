@@ -32,9 +32,13 @@ THE SOFTWARE.
 
 #include "OgreRoot.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreViewport.h"
+#include "OgrePixelBox.h"
 
 #include "OgreGLESPixelFormat.h"
 #include "OgreGLESRenderSystem.h"
+
+#include <iomanip>
 
 namespace Ogre {
     EAGLWindow::EAGLWindow(EAGLSupport *glsupport)
@@ -133,7 +137,7 @@ namespace Ogre {
         
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
-            (*it).second->_updateDimensions();
+            (*it)->_updateDimensions();
         }
 	}
 
@@ -147,7 +151,7 @@ namespace Ogre {
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
-            (*it).second->_updateDimensions();
+            (*it)->_updateDimensions();
         }
 	}
 

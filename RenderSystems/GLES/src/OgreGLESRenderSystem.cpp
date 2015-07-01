@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreGLESFBORenderTexture.h"
 #include "OgreLogManager.h"
 #include "OgreViewport.h"
+#include "OgreRenderOperation.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   include "OgreEAGLWindow.h"
