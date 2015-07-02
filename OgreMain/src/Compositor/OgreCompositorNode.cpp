@@ -261,6 +261,25 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorNode::connectTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB )
     {
+        if( inChannelB >= nodeB->mInTextures.size() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "There is no input channel #" +
+                         StringConverter::toString( inChannelB ) + " for node " +
+                         nodeB->mDefinition->mNameStr + " when trying to connect it "
+                         "from " + this->mDefinition->mNameStr + " channel #" +
+                         StringConverter::toString( outChannelA ),
+                         "CompositorNode::connectTo" );
+        }
+        if( outChannelA >= this->mOutTextures.size() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "There is no output channel #" +
+                         StringConverter::toString( outChannelA ) + " for node " +
+                         this->mDefinition->mNameStr + " when trying to connect it "
+                         "to " + nodeB->mDefinition->mNameStr + " channel #" +
+                         StringConverter::toString( inChannelB ),
+                         "CompositorNode::connectTo" );
+        }
+
         //Nodes must be connected in the right order (and after routeOutputs was called)
         //to avoid passing null pointers (which is probably not what we wanted)
         assert( this->mOutTextures[outChannelA].isValid() &&
@@ -279,6 +298,13 @@ namespace Ogre
     void CompositorNode::connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
                                             size_t inChannelA )
     {
+        if( inChannelA >= mInTextures.size() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "There is no input channel #" +
+                         StringConverter::toString( inChannelA ) + " for node " +
+                         mDefinition->mNameStr, "CompositorNode::connectFinalRT" );
+        }
+
         if( !mInTextures[inChannelA].target )
             ++mNumConnectedInputs;
         mInTextures[inChannelA].target      = rt;
