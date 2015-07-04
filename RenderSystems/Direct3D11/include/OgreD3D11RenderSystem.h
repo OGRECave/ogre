@@ -344,6 +344,7 @@ namespace Ogre
         void clearFrameBuffer(unsigned int buffers, 
             const ColourValue& colour = ColourValue::Black, 
             Real depth = 1.0f, unsigned short stencil = 0);
+        void discardFrameBuffer( unsigned int buffers );
         void setClipPlane (ushort index, Real A, Real B, Real C, Real D);
         void enableClipPlane (ushort index, bool enable);
         HardwareOcclusionQuery* createHardwareOcclusionQuery(void);

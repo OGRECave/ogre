@@ -67,8 +67,15 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
-        mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
-                            mDefinition->mDepthValue, mDefinition->mStencilValue );
+        if( mDefinition->mDiscardOnly )
+        {
+            mViewport->discard( mDefinition->mClearBufferFlags );
+        }
+        else
+        {
+            mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
+                              mDefinition->mDepthValue, mDefinition->mStencilValue );
+        }
 
         if( listener )
             listener->passPosExecute( this );

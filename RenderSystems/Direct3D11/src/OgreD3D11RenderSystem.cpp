@@ -3988,13 +3988,8 @@ bail:
                 // Clear all views
                 uint numberOfViews;
                 mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
-                if( numberOfViews == 1 )
-                    mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[0], ClearColor );
-                else
-                {
-                    for( uint i = 0; i < numberOfViews; ++i )
-                        mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[i], ClearColor );
-                }
+                for( uint i = 0; i < numberOfViews; ++i )
+                    mDevice.GetImmediateContext()->ClearRenderTargetView( pRTView[i], ClearColor );
 
             }
             UINT ClearFlags = 0;
@@ -4009,8 +4004,8 @@ bail:
 
             if (ClearFlags)
             {
-                D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(mActiveRenderTarget->
-                                                                                        getDepthBuffer());
+                D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(
+                                                    mActiveRenderTarget->getDepthBuffer());
                 if( depthBuffer )
                 {
                     mDevice.GetImmediateContext()->ClearDepthStencilView(
@@ -4019,6 +4014,40 @@ bail:
                 }
             }
         }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::discardFrameBuffer( unsigned int buffers )
+    {
+        //TODO: Use DX11.1 interfaces on Windows too.
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+        if (mActiveRenderTarget)
+        {
+            ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+            memset(pRTView, 0, sizeof(pRTView));
+
+            mActiveRenderTarget->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
+
+            if (buffers & FBT_COLOUR)
+            {
+                float ClearColor[4];
+                D3D11Mappings::get(colour, ClearColor);
+
+                // Clear all views
+                uint numberOfViews;
+                mActiveRenderTarget->getCustomAttribute( "numberOfViews", &numberOfViews );
+                for( uint i = 0; i < numberOfViews; ++i )
+                    mDevice.GetImmediateContext()->DiscardView( pRTView[i], ClearColor );
+            }
+
+            if( buffers & (FBT_DEPTH|FBT_STENCIL) )
+            {
+                D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(
+                                                    mActiveRenderTarget-> getDepthBuffer() );
+                if( depthBuffer )
+                    mDevice.GetImmediateContext()->DiscardView( depthBuffer->getDepthStencilView() );
+            }
+        }
+#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_makeProjectionMatrix(Real left, Real right, 
