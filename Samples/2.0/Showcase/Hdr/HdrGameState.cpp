@@ -182,6 +182,10 @@ namespace Demo
 
         mLightNodes[0] = lightNode;
 
+        sceneManager->setAmbientLight( Ogre::ColourValue( 0.3f, 0.5f, 0.7f ) * 0.1f * 0.75f * 60.0f,
+                                       Ogre::ColourValue( 0.6f, 0.45f, 0.3f ) * 0.065f * 0.75f * 60.0f,
+                                       -light->getDirection() + Ogre::Vector3::UNIT_Y * 0.2f );
+
         light = sceneManager->createLight();
         lightNode = rootNode->createChildSceneNode();
         lightNode->attachObject( light );

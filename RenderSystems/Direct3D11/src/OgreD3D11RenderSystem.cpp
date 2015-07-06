@@ -1950,10 +1950,6 @@ bail:
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setAmbientLight( float r, float g, float b )
-    {
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::_useLights(const LightList& lights, unsigned short limit)
     {
     }

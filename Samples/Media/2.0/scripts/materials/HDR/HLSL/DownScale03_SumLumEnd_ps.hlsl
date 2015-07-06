@@ -31,6 +31,6 @@ float4 main
 	float newLum = 1.0f / exp( clamp( fLumAvg, minLuminance, maxLuminance ) );
 	float oldLum = oldLumRt.Sample( samplerPoint, float( 0.0 ).xx ).x;
 
-	//Adapt luminicense based 95% per second.
-	return lerp( newLum, oldLum, pow( 0.05f, timeSinceLast ) );
+	//Adapt luminicense based 75% per second.
+	return lerp( newLum, oldLum, pow( 0.25f, timeSinceLast ) );
 }

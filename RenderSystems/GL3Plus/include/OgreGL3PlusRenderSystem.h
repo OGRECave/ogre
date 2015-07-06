@@ -235,10 +235,6 @@ namespace Ogre {
             RenderSystem
         */
         void shutdown(void);
-        /** See
-            RenderSystem
-        */
-        void setAmbientLight(float r, float g, float b) { };   // Not supported
 
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height,

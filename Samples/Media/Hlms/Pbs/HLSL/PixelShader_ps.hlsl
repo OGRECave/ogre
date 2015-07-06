@@ -133,6 +133,7 @@ float3 qmul( float4 q, float3 v )
 @insertpiece( DeclareBRDF )
 @end
 
+@property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
 float4 main( PS_INPUT inPs
@@ -274,14 +275,17 @@ float4 main( PS_INPUT inPs
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
+@property( !ambient_fixed )
 	float3 finalColour = float3(0, 0, 0);
+@end @property( ambient_fixed )
+	float3 finalColour = passBuf.ambientUpperHemi.xyz * @insertpiece( kD ).xyz;
+@end
 
 	@insertpiece( custom_ps_preLights )
 
 @property( !custom_disable_directional_lights )
 @property( hlms_lights_directional )
-	finalColour += BRDF( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) );
-@property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
+	finalColour += BRDF( passBuf.lights[0].position, viewDir, NdotV, passBuf.lights[0].diffuse, passBuf.lights[0].specular, material, nNormal @insertpiece( brdfExtraParams ) ) @insertpiece( DarkenWithShadowFirstLight );
 @end
 @foreach( hlms_lights_directional, n, 1 )
 	finalColour += BRDF( passBuf.lights[@n].position, viewDir, NdotV, passBuf.lights[@n].diffuse, passBuf.lights[@n].specular, material, nNormal @insertpiece( brdfExtraParams ) )@insertpiece( DarkenWithShadow );@end
@@ -333,13 +337,30 @@ float4 main( PS_INPUT inPs
 
 @insertpiece( forward3dLighting )
 
-@property( envprobe_map )
+@property( envprobe_map || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	float3 envColourS = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz;
-	float3 envColourD = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), 11.0 ).xyz;
-	@property( !hw_gamma_read )//Gamma to linear space
-	envColourS = envColourS * envColourS;
-	envColourD = envColourD * envColourD;@end
+	
+	@property( envprobe_map )
+		float3 envColourS = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz;
+		float3 envColourD = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( nNormal, passBuf.invViewMatCubemap ), 11.0 ).xyz;
+		@property( !hw_gamma_read )	//Gamma to linear space
+			envColourS = envColourS * envColourS;
+			envColourD = envColourD * envColourD;
+		@end
+	@end
+	@property( ambient_hemisphere )
+		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
+		float ambientWS = dot( passBuf.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
+
+		@property( envprobe_map )
+			envColourS	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
+			envColourD	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
+		@end @property( !envprobe_map )
+			float3 envColourS = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
+			float3 envColourD = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
+		@end
+	@end
+
 	@insertpiece( BRDF_EnvMap )
 @end
 

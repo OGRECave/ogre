@@ -17,10 +17,10 @@ vec3 toSRGB( vec3 x )
 
 uniform float fMiddleGray;
 
-//.x = 'low' threshold. All colour below this value is 0
-//.y = 'high' threshold. All colour below this value starts to fade to 0.
-//.z = 1 / (y - x)
-uniform vec3 brightThreshold;
+//.x = 'low' threshold. All colour below this value is 0.
+//.y = 1 / (low - high). All colour above 'high' is at full brightness.
+//Colour between low and high is faded.
+uniform vec2 brightThreshold;
 
 void main()
 {
@@ -30,15 +30,8 @@ void main()
 	vec3 vSample = texture( rt0, inPs.uv0 ).xyz;
 	vSample.xyz *= fMiddleGray * fInvLumAvg * 1024.0;
 	
-	vec3 loweredSample = smoothstep( float( 0.0 ).xxx, brightThreshold.yyy,
-										(vSample.xyz - brightThreshold.xxx) * brightThreshold.zzz );
-										
-	vSample.xyz = (vSample.x >= brightThreshold.y ||
-				   vSample.z >= brightThreshold.y ||
-				   vSample.z >= brightThreshold.y ) ? vSample.xyz : loweredSample.xyz;
-
-	//Filter negative values (extrapolation bellow brightThreshold.x)
-	vSample.xyz	 = max( vSample.xyz, 0.0 );
+	vec3 w = clamp( (vSample.xyz - brightThreshold.xxx) * brightThreshold.yyy, 0, 1 );
+	vSample.xyz *= w * w * (3.0 - 2.0 * w);
 
 	//We use RGB10 format which doesn't natively support sRGB, so we use a cheap approximation (gamma = 2)
 	//This preserves a lot of quality. Don't forget to convert it back when sampling from the texture.

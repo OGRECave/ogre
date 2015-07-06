@@ -178,7 +178,7 @@ fragment_program HDR/BrightPass_Start_ps unified
 	default_params
 	{
 		param_named			fMiddleGray				float 0.15
-		param_named			brightThreshold			float3 1.9 2.0 10
+		param_named			brightThreshold			float2 3.0 0.5
 	}
 }
 

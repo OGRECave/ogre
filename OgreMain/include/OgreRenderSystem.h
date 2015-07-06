@@ -222,11 +222,6 @@ namespace Ogre
         */
         virtual void shutdown(void);
 
-
-        /** Sets the colour & strength of the ambient (global directionless) light in the world.
-        */
-        virtual void setAmbientLight(float r, float g, float b) = 0;
-
         /** Sets whether or not W-buffers are enabled if they are available for this renderer.
         @param
         enabled If true and the renderer supports them W-buffers will be used.  If false 

@@ -83,7 +83,7 @@ compositor_node HdrPostprocessingNode
 		pass clear
 		{
 			num_initial 1
-			colour_value 1 1 1 1
+			colour_value 0.01 0.01 0.01 1
 		}
 	}
 	

@@ -484,9 +484,12 @@ namespace Ogre {
         return mLodCameraPositionObjectSpace;
     }
     //-----------------------------------------------------------------------------
-    void AutoParamDataSource::setAmbientLightColour(const ColourValue& ambient)
+    void AutoParamDataSource::setAmbientLightColour( const ColourValue hemispheres[2],
+                                                     const Vector3 &hemisphereDir)
     {
-        mAmbientLight = ambient;
+        mAmbientLight[0] = hemispheres[0];
+        mAmbientLight[1] = hemispheres[1];
+        mAmbientLightHemisphereDir = hemisphereDir;
     }
     //---------------------------------------------------------------------
     float AutoParamDataSource::getLightCount() const
@@ -501,7 +504,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     const ColourValue& AutoParamDataSource::getAmbientLightColour(void) const
     {
-        return mAmbientLight;
+        return mAmbientLight[0];
         
     }
     //-----------------------------------------------------------------------------
