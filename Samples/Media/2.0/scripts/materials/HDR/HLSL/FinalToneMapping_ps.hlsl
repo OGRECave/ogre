@@ -40,15 +40,14 @@ SamplerState samplerBilinear: register(s2);
 
 float4 main
 (
-	in float2 uv : TEXCOORD0,
-	uniform float fMiddleGray
+	in float2 uv : TEXCOORD0
 ) : SV_Target
 {
 	float fInvLumAvg = lumRt.Sample( samplerPoint, float2( 0.0, 0.0 ) ).x;
 
 	float4 vSample = rt0.Sample( samplerPoint, uv );
 
-	vSample.xyz *= fMiddleGray * fInvLumAvg * 1024.0f;
+	vSample.xyz *= fInvLumAvg;
 	vSample.xyz	+= fromSRGB( bloomRt.Sample( samplerBilinear, uv ).xyz ) * 16.0;
 	vSample.xyz  = FilmicTonemap( vSample.xyz ) / FilmicTonemap( W );
 	//vSample.xyz  = vSample.xyz / (1 + vSample.xyz); //Reinhard Simple

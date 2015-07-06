@@ -16,7 +16,6 @@ float3 toSRGB( float3 x )
 float3 main
 (
 	in float2 uv : TEXCOORD0,
-	uniform float fMiddleGray,
 	
 	//.x = 'low' threshold. All colour below this value is 0.
 	//.y = 1 / (low - high). All colour above 'high' is at full brightness.
@@ -28,7 +27,7 @@ float3 main
 	float fInvLumAvg = lumRt.Sample( samplerPoint, float( 0.0 ).xx ).x;
 
 	float3 vSample = rt0.Sample( samplerBilinear, uv ).xyz;
-	vSample.xyz *= fMiddleGray * fInvLumAvg * 1024.0f;
+	vSample.xyz *= fInvLumAvg;
 	
 	float3 w = clamp( (vSample.xyz - brightThreshold.xxx) * brightThreshold.yyy, 0, 1 );
 	vSample.xyz *= w * w * (3.0 - 2.0 * w);

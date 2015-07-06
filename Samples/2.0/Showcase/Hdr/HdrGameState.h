@@ -15,6 +15,10 @@ namespace Demo
 
         bool                mAnimateObjects;
 
+        float mExposure;
+        float mMinAutoExposure;
+        float mMaxAutoExposure;
+
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
     public:

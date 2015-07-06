@@ -16,8 +16,7 @@ const vec2 c_offsets[4] =
 uniform sampler2D lumRt;
 uniform sampler2D oldLumRt;
 
-uniform float minLuminance;
-uniform float maxLuminance;
+uniform vec3 exposure;
 uniform float timeSinceLast;
 uniform vec4 tex0Size;
 
@@ -30,9 +29,7 @@ void main()
 
 	fLumAvg *= 0.25; // /= 4.0;
 
-	//Save the expresion already inverted and non-zero,  executing it only once, instead of doing it every frame
-	//when we use it
-	float newLum = 1.0 / exp( clamp( fLumAvg, minLuminance, maxLuminance ) );
+	float newLum = exposure.x / exp( clamp( fLumAvg, exposure.y, exposure.z ) );
 	float oldLum = texture( oldLumRt, float( 0.0 ).xx ).x;
 
 	//Adapt luminicense based 75% per second.

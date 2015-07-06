@@ -21,13 +21,18 @@
 #include "OgreHlmsTextureManager.h"
 #include "OgreHlmsPbs.h"
 
+#include "Utils/HdrUtils.h"
+
 using namespace Demo;
 
 namespace Demo
 {
     HdrGameState::HdrGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
-        mAnimateObjects( true )
+        mAnimateObjects( true ),
+        mExposure( 0.0f ),
+        mMinAutoExposure( -2.5f ),
+        mMaxAutoExposure( 2.5f )
     {
         memset( mSceneNode, 0, sizeof(mSceneNode) );
     }
@@ -175,7 +180,7 @@ namespace Demo
         //(due to limited range in 16-bit float RenderTargets).
         //Direct sunlight on a perpendicular surface is ~100.000 lumens
         //100.000 / 1024 = ~97.0f
-        light->setPowerScale( 97.0f );
+        light->setPowerScale( 90.0f );
         //light->setPowerScale( 32.0f );
         light->setType( Ogre::Light::LT_DIRECTIONAL );
         light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
@@ -191,11 +196,12 @@ namespace Demo
         lightNode->attachObject( light );
         light->setDiffuseColour( 0.8f, 0.4f, 0.2f ); //Warm
         light->setSpecularColour( 0.8f, 0.4f, 0.2f );
-        light->setPowerScale( /*Ogre::Math::PI*/ 50.0f );
+        light->setPowerScale( /*Ogre::Math::PI*/ 90.0f );
         light->setType( Ogre::Light::LT_SPOTLIGHT );
         lightNode->setPosition( -10.0f, 10.0f, 10.0f );
         light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+        //light->setVisible( false );
 
         mLightNodes[1] = lightNode;
 
@@ -204,11 +210,12 @@ namespace Demo
         lightNode->attachObject( light );
         light->setDiffuseColour( 0.2f, 0.4f, 0.8f ); //Cold
         light->setSpecularColour( 0.2f, 0.4f, 0.8f );
-        light->setPowerScale( /*Ogre::Math::PI*/ 50.0f );
+        light->setPowerScale( /*Ogre::Math::PI*/ 90.0f );
         light->setType( Ogre::Light::LT_SPOTLIGHT );
         lightNode->setPosition( 10.0f, 10.0f, -10.0f );
         light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+        //light->setVisible( false );
 
         mLightNodes[2] = lightNode;
 
@@ -233,23 +240,66 @@ namespace Demo
         Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
 
         TutorialGameState::generateDebugText( timeSinceLast, outText );
-        outText += "\nPress F2 to toggle animation. ";
+        outText += "\nF2 Exposure = ";
+        outText += Ogre::StringConverter::toString( mExposure );
+        outText += "\nF2 Min Auto Exposure = ";
+        outText += Ogre::StringConverter::toString( mMinAutoExposure );
+        outText += "\nF3 Max Auto Exposure = ";
+        outText += Ogre::StringConverter::toString( mMaxAutoExposure );
+        /*outText += "\nPress F2 to toggle animation. ";
         outText += mAnimateObjects ? "[On]" : "[Off]";
         outText += "\nPress F3 to show/hide animated objects. ";
         outText += (visibilityMask & 0x000000001) ? "[On]" : "[Off]";
         outText += "\nPress F4 to show/hide palette of spheres. ";
-        outText += (visibilityMask & 0x000000002) ? "[On]" : "[Off]";
+        outText += (visibilityMask & 0x000000002) ? "[On]" : "[Off]";*/
     }
     //-----------------------------------------------------------------------------------
     void HdrGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
-        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
+        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS|KMOD_LSHIFT|KMOD_RSHIFT)) != 0 )
         {
             TutorialGameState::keyReleased( arg );
             return;
         }
 
         if( arg.keysym.sym == SDLK_F2 )
+        {
+            if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
+                mExposure -= 0.5;
+            else
+                mExposure += 0.5;
+
+            HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
+        }
+        else if( arg.keysym.sym == SDLK_F3 )
+        {
+            if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
+                mMinAutoExposure -= 0.5;
+            else
+            {
+                mMinAutoExposure += 0.5;
+                if( mMinAutoExposure > mMaxAutoExposure )
+                    mMaxAutoExposure = mMinAutoExposure;
+            }
+
+            HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
+        }
+        else if( arg.keysym.sym == SDLK_F4 )
+        {
+            if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
+            {
+                mMaxAutoExposure -= 0.5;
+                if( mMaxAutoExposure < mMinAutoExposure )
+                    mMinAutoExposure = mMaxAutoExposure;
+            }
+            else
+            {
+                mMaxAutoExposure += 0.5;
+            }
+
+            HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
+        }
+        /*if( arg.keysym.sym == SDLK_F2 )
         {
             mAnimateObjects = !mAnimateObjects;
         }
@@ -270,7 +320,7 @@ namespace Demo
             visibilityMask &= ~0x00000002;
             visibilityMask |= (Ogre::uint32)(showPalette) << 1;
             mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
-        }
+        }*/
         else
         {
             TutorialGameState::keyReleased( arg );

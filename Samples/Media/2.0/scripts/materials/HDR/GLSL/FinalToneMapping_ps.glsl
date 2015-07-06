@@ -43,15 +43,13 @@ uniform sampler2D rt0;
 uniform sampler2D lumRt;
 uniform sampler2D bloomRt;
 
-uniform float fMiddleGray;
-
 void main()
 {
 	float fInvLumAvg = texture( lumRt, float( 0.0 ).xx ).x;
 
 	vec4 vSample = texture( rt0, inPs.uv0 );
 
-	vSample.xyz *= fMiddleGray * fInvLumAvg * 1024.0;
+	vSample.xyz *= fInvLumAvg;
 	vSample.xyz	+= fromSRGB( texture( bloomRt, inPs.uv0 ).xyz ) * 16.0;
 	vSample.xyz  = FilmicTonemap( vSample.xyz ) / FilmicTonemap( W );
 	//vSample.xyz  = vSample.xyz / (1 + vSample.xyz); //Reinhard Simple

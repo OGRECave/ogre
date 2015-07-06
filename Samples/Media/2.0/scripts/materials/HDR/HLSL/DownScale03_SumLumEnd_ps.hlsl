@@ -13,10 +13,9 @@ SamplerState samplerPoint	: register(s1);
 float4 main
 (
 	in float2 uv : TEXCOORD0,
-	uniform float minLuminance,
-	uniform float maxLuminance,
-	uniform float4 tex0Size,
-	uniform float timeSinceLast
+	uniform float3 exposure,
+	uniform float timeSinceLast,
+	uniform float4 tex0Size
 ) : SV_Target
 {
 	float fLumAvg = lumRt.Sample( samplerBilinear, uv + c_offsets[0] * tex0Size.zw ).x;
@@ -26,9 +25,7 @@ float4 main
 
 	fLumAvg *= 0.25f; // /= 4.0f;
 
-	//Save the expresion already inverted and non-zero,  executing it only once, instead of doing it every frame
-	//when we use it
-	float newLum = 1.0f / exp( clamp( fLumAvg, minLuminance, maxLuminance ) );
+	float newLum = exposure.x / exp( clamp( fLumAvg, exposure.y, exposure.z ) );
 	float oldLum = oldLumRt.Sample( samplerPoint, float( 0.0 ).xx ).x;
 
 	//Adapt luminicense based 75% per second.

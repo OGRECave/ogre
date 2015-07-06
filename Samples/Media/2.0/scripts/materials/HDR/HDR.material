@@ -152,8 +152,7 @@ fragment_program HDR/DownScale03_SumLumEnd_ps unified
 	
 	default_params
 	{
-		param_named			minLuminance			float 5
-		param_named			maxLuminance			float 10
+		param_named			exposure				float3 138.5833 5 10
 		param_named_auto	tex0Size				packed_texture_size 0
 		param_named_auto	timeSinceLast			frame_time 1
 	}
@@ -163,11 +162,6 @@ fragment_program HDR/FinalToneMapping_ps unified
 {
 	delegate HDR/FinalToneMapping_ps_GLSL
 	delegate HDR/FinalToneMapping_ps_HLSL
-	
-	default_params
-	{
-		param_named			fMiddleGray				float 0.15
-	}
 }
 
 fragment_program HDR/BrightPass_Start_ps unified
@@ -177,7 +171,6 @@ fragment_program HDR/BrightPass_Start_ps unified
 	
 	default_params
 	{
-		param_named			fMiddleGray				float 0.15
 		param_named			brightThreshold			float2 3.0 0.5
 	}
 }
