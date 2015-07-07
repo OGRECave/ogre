@@ -404,13 +404,13 @@ namespace Demo
         {
             outText += "\nHold SHIFT to decrease values\n[SPACE] Preset: ";
             outText += mPresetName;
-            outText += "\nF2 Exposure = ";
+            outText += "\nF5 Exposure = ";
             outText += Ogre::StringConverter::toString( mExposure );
-            outText += "\nF3 Min Auto Exposure = ";
+            outText += "\nF6 Min Auto Exposure = ";
             outText += Ogre::StringConverter::toString( mMinAutoExposure );
-            outText += "\nF4 Max Auto Exposure = ";
+            outText += "\nF7 Max Auto Exposure = ";
             outText += Ogre::StringConverter::toString( mMaxAutoExposure );
-            outText += "\nF5 Bloom Threshold = ";
+            outText += "\nF8 Bloom Threshold = ";
             outText += Ogre::StringConverter::toString( mBloomFullThreshold );
         }
         else if( mDisplayHelpMode == 1 )
@@ -434,98 +434,84 @@ namespace Demo
             return;
         }
 
-        if( mDisplayHelpMode == 2 )
+        if( arg.keysym.sym == SDLK_F5 )
         {
-            if( arg.keysym.sym == SDLK_F2 )
-            {
-                if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
-                    mExposure -= 0.5;
-                else
-                    mExposure += 0.5;
-
-                HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
-            }
-            else if( arg.keysym.sym == SDLK_F3 )
-            {
-                if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
-                    mMinAutoExposure -= 0.5;
-                else
-                {
-                    mMinAutoExposure += 0.5;
-                    if( mMinAutoExposure > mMaxAutoExposure )
-                        mMaxAutoExposure = mMinAutoExposure;
-                }
-
-                HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
-            }
-            else if( arg.keysym.sym == SDLK_F4 )
-            {
-                if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
-                {
-                    mMaxAutoExposure -= 0.5;
-                    if( mMaxAutoExposure < mMinAutoExposure )
-                        mMinAutoExposure = mMaxAutoExposure;
-                }
-                else
-                {
-                    mMaxAutoExposure += 0.5;
-                }
-
-                HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
-            }
-            else if( arg.keysym.sym == SDLK_F5 )
-            {
-                if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
-                {
-                    mBloomFullThreshold *= 0.5f;
-                    if( mBloomFullThreshold < 0 )
-                        mBloomFullThreshold = 0;
-                }
-                else
-                {
-                    mBloomFullThreshold *= 2.0f;
-                }
-
-                HdrUtils::setBloomThreshold( Ogre::max( mBloomFullThreshold - 2.0f, 0.0f ),
-                                             Ogre::max( mBloomFullThreshold, 0.01f ) );
-            }
-            else if( arg.keysym.sym == SDLK_SPACE )
-            {
-                switchPreset( (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) ? -1 : 1 );
-            }
+            if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
+                mExposure -= 0.5;
             else
-            {
-                TutorialGameState::keyReleased( arg );
-            }
+                mExposure += 0.5;
+
+            HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
         }
-        else if( mDisplayHelpMode == 1 )
+        else if( arg.keysym.sym == SDLK_F6 )
         {
-            if( arg.keysym.sym == SDLK_F2 )
+            if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
+                mMinAutoExposure -= 0.5;
+            else
             {
-                mAnimateObjects = !mAnimateObjects;
+                mMinAutoExposure += 0.5;
+                if( mMinAutoExposure > mMaxAutoExposure )
+                    mMaxAutoExposure = mMinAutoExposure;
             }
-            else if( arg.keysym.sym == SDLK_F3 )
+
+            HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
+        }
+        else if( arg.keysym.sym == SDLK_F7 )
+        {
+            if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
             {
-                Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
-                bool showMovingObjects = (visibilityMask & 0x00000001);
-                showMovingObjects = !showMovingObjects;
-                visibilityMask &= ~0x00000001;
-                visibilityMask |= (Ogre::uint32)showMovingObjects;
-                mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
-            }
-            else if( arg.keysym.sym == SDLK_F4 )
-            {
-                Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
-                bool showPalette = (visibilityMask & 0x00000002) != 0;
-                showPalette = !showPalette;
-                visibilityMask &= ~0x00000002;
-                visibilityMask |= (Ogre::uint32)(showPalette) << 1;
-                mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
+                mMaxAutoExposure -= 0.5;
+                if( mMaxAutoExposure < mMinAutoExposure )
+                    mMinAutoExposure = mMaxAutoExposure;
             }
             else
             {
-                TutorialGameState::keyReleased( arg );
+                mMaxAutoExposure += 0.5;
             }
+
+            HdrUtils::setExposure( mExposure, mMinAutoExposure, mMaxAutoExposure );
+        }
+        else if( arg.keysym.sym == SDLK_F8 )
+        {
+            if( arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT) )
+            {
+                mBloomFullThreshold *= 0.5f;
+                if( mBloomFullThreshold < 0 )
+                    mBloomFullThreshold = 0;
+            }
+            else
+            {
+                mBloomFullThreshold *= 2.0f;
+            }
+
+            HdrUtils::setBloomThreshold( Ogre::max( mBloomFullThreshold - 2.0f, 0.0f ),
+                                         Ogre::max( mBloomFullThreshold, 0.01f ) );
+        }
+        else if( arg.keysym.sym == SDLK_SPACE )
+        {
+            switchPreset( (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) ? -1 : 1 );
+        }
+        if( arg.keysym.sym == SDLK_F2 )
+        {
+            mAnimateObjects = !mAnimateObjects;
+        }
+        else if( arg.keysym.sym == SDLK_F3 )
+        {
+            Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
+            bool showMovingObjects = (visibilityMask & 0x00000001);
+            showMovingObjects = !showMovingObjects;
+            visibilityMask &= ~0x00000001;
+            visibilityMask |= (Ogre::uint32)showMovingObjects;
+            mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
+        }
+        else if( arg.keysym.sym == SDLK_F4 )
+        {
+            Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
+            bool showPalette = (visibilityMask & 0x00000002) != 0;
+            showPalette = !showPalette;
+            visibilityMask &= ~0x00000002;
+            visibilityMask |= (Ogre::uint32)(showPalette) << 1;
+            mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
         }
         else
         {

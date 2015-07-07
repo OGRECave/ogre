@@ -23,18 +23,18 @@ in block
 //for x in range(0, 16):
 //	printMorton(x)
 
-const vec2 c_offsets[16] =
-{
+const vec2 c_offsets[16] = vec2[16]
+(
 	vec2( 0, 0 ), vec2( 1, 0 ), vec2( 0, 1 ), vec2( 1, 1 ),
 	vec2( 2, 0 ), vec2( 3, 0 ), vec2( 2, 1 ), vec2( 3, 1 ),
 	vec2( 0, 2 ), vec2( 1, 2 ), vec2( 0, 3 ), vec2( 1, 3 ),
 	vec2( 2, 2 ), vec2( 3, 2 ), vec2( 2, 3 ), vec2( 3, 3 )
-};
+);
 
 //Luminance coefficient taken from the DX SDK Docs
 const vec3 c_luminanceCoeffs = vec3(0.2125f, 0.7154f, 0.0721f);
 //Luminance vector for RGB colour in linear space (the usual coeffs are for gamma space colours)
-//static const vec3 c_luminanceCoeffs = vec3( 0.3086f, 0.6094f, 0.0820f );
+//const vec3 c_luminanceCoeffs = vec3( 0.3086f, 0.6094f, 0.0820f );
 
 uniform sampler2D rt0;
 

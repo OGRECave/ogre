@@ -7,11 +7,11 @@ in block
 	vec2 uv0;
 } inPs;
 
-const vec2 c_offsets[4] =
-{
+const vec2 c_offsets[4] = vec2[4]
+(
 	vec2( -1.0, -1.0 ), vec2( 1.0, -1.0 ),
 	vec2( -1.0,  1.0 ), vec2( 1.0,  1.0 )
-};
+);
 
 uniform sampler2D lumRt;
 uniform sampler2D oldLumRt;
