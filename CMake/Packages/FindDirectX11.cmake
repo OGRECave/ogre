@@ -18,8 +18,18 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	include(FindPkgMacros)
 	findpkg_begin(DirectX11)
 
+	# Windows 10 Universal SDK
+	if(MSVC14)
+		if(VS_TARGET_PLATFORM_VERSION)
+			set(W10SDK_VER VS_TARGET_PLATFORM_VERSION)
+		else()
+			set(W10SDK_VER 10.0.10069.0)
+		endif()
+		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/10/include/${W10SDK_VER}/um" "C:/Program Files/Windows Kits/10/include/${W10SDK_VER}/um")
+		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/10/lib/${W10SDK_VER}/um/${MSVC_CXX_ARCHITECTURE_ID}/"
+		
 	# Windows Phone 8.1 SDK
-	if(WINDOWS_PHONE AND MSVC12)
+	elseif(WINDOWS_PHONE AND MSVC12)
 		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Phone Kits/8.1/include" "C:/Program Files/Windows Phone Kits/8.1/include")
 		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Phone Kits/8.1/lib/${MSVC_CXX_ARCHITECTURE_ID}/"
 
@@ -30,12 +40,12 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 
 	# Windows 8.1 SDK
 	elseif(MSVC12)
-	    find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.1/include/um" "C:/Program Files/Windows Kits/8.1/include/um")
+		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.1/include/um" "C:/Program Files/Windows Kits/8.1/include/um")
 		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/8.1/lib/winv6.3/um/${MSVC_CXX_ARCHITECTURE_ID}/"
 		
 	# Windows 8.0 SDK
 	elseif(MSVC11)
-	    find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.0/include/um" "C:/Program Files/Windows Kits/8.0/include/um")
+		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.0/include/um" "C:/Program Files/Windows Kits/8.0/include/um")
 		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/8.0/lib/win8/um/${MSVC_CXX_ARCHITECTURE_ID}/"
 
 	# Legacy Direct X SDK
