@@ -30,7 +30,7 @@ void main()
 	fLumAvg *= 0.25; // /= 4.0;
 
 	float newLum = exposure.x / exp( clamp( fLumAvg, exposure.y, exposure.z ) );
-	float oldLum = texture( oldLumRt, float( 0.0 ).xx ).x;
+	float oldLum = texture( oldLumRt, float( 0.0, 0.0 ) ).x;
 
 	//Adapt luminicense based 75% per second.
 	fragColour = mix( newLum, oldLum, pow( 0.25, timeSinceLast ) );

@@ -45,7 +45,7 @@ uniform sampler2D bloomRt;
 
 void main()
 {
-	float fInvLumAvg = texture( lumRt, float( 0.0 ).xx ).x;
+	float fInvLumAvg = texture( lumRt, float( 0.0, 0.0 ) ).x;
 
 	vec4 vSample = texture( rt0, inPs.uv0 );
 
