@@ -14,12 +14,17 @@ namespace Demo
         Ogre::SceneNode     *mLightNodes[3];
 
         bool                mAnimateObjects;
+        Ogre::uint32        mCurrentPreset;
 
+        Ogre::String mPresetName;
         float mExposure;
         float mMinAutoExposure;
         float mMaxAutoExposure;
+        float mBloomFullThreshold;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
+
+        void switchPreset( int direction=1 );
 
     public:
         HdrGameState( const Ogre::String &helpDescription );

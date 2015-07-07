@@ -42,3 +42,7 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 	@sub( detail_map@n_idx, detail_map@n, 1 )@end
 @foreach( 4, n )
 	@sub( detail_map_nm@n_idx, detail_map_nm@n, 1 )@end
+
+@property( envmap_scale )
+	@piece( ApplyEnvMapScale )* pass.ambientUpperHemi.w@end
+@end

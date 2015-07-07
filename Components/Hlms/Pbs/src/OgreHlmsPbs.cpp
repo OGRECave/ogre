@@ -122,6 +122,7 @@ namespace Ogre
     const IdString PbsProperty::Pcf4x4            = IdString( "pcf_4x4" );
     const IdString PbsProperty::PcfIterations     = IdString( "pcf_iterations" );
 
+    const IdString PbsProperty::EnvMapScale       = IdString( "envmap_scale" );
     const IdString PbsProperty::AmbientFixed      = IdString( "ambient_fixed" );
     const IdString PbsProperty::AmbientHemisphere = IdString( "ambient_hemisphere" );
 
@@ -578,6 +579,7 @@ namespace Ogre
         ColourValue upperHemisphere = sceneManager->getAmbientLightUpperHemisphere();
         ColourValue lowerHemisphere = sceneManager->getAmbientLightLowerHemisphere();
 
+        const float envMapScale = upperHemisphere.a;
         //Ignore alpha channel
         upperHemisphere.a = lowerHemisphere.a = 1.0;
 
@@ -602,6 +604,9 @@ namespace Ogre
                 setProperty( PbsProperty::AmbientFixed, 1 );
             if( ambientMode == AmbientHemisphere )
                 setProperty( PbsProperty::AmbientHemisphere, 1 );
+
+            if( envMapScale != 1.0f )
+                setProperty( PbsProperty::EnvMapScale, 1 );
         }
 
         HlmsCache retVal = Hlms::preparePassHashBase( shadowNode, casterPass,
@@ -658,8 +663,8 @@ namespace Ogre
             //mat3 invViewMatCubemap (upgraded to three vec4)
             mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
 
-            //vec3 ambientUpperHemi + padding
-            if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere )
+            //vec3 ambientUpperHemi + float envMapScale
+            if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere || envMapScale != 1.0f )
                 mapSize += 4 * 4;
 
             //vec3 ambientLowerHemi + padding + vec3 ambientHemisphereDir + padding
@@ -789,7 +794,7 @@ namespace Ogre
                 *passBufferPtr++ = static_cast<float>( upperHemisphere.r );
                 *passBufferPtr++ = static_cast<float>( upperHemisphere.g );
                 *passBufferPtr++ = static_cast<float>( upperHemisphere.b );
-                *passBufferPtr++ = 1.0f;
+                *passBufferPtr++ = envMapScale;
             }
 
             //vec3 ambientLowerHemi + padding + vec3 ambientHemisphereDir + padding

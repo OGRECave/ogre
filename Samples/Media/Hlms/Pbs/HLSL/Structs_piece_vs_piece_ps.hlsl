@@ -38,7 +38,7 @@ cbuffer PassBuffer : register(b0)
 	float3x3 invViewMatCubemap;
 	float padding; //Compatibility with GLSL.
 	
-@property( ambient_hemisphere || ambient_fixed )
+@property( ambient_hemisphere || ambient_fixed || envmap_scale )
 	float4 ambientUpperHemi;
 @end
 @property( ambient_hemisphere )

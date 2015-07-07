@@ -74,8 +74,19 @@ int mainApp()
 #endif
 {
     HdrGameState hdrGameState(
-        "THIS SAMPLE IS A WORK IN PROGRESS (WIP)\n"
+        "This samples shows the HDR (High Dynamic Range) pipeline in action\n"
+        "HDR combined with PBR let us use real world values as input for our lighting and\n"
+        "a real world scale such as lumen, lux and EV Stops (photography, in log2 space)\n"
+        "The parameters for the presets have been taken from Wikipedia:\n"
+        "   1. https://en.wikipedia.org/wiki/Exposure_value#Tabulated_exposure_values\n"
+        "   2. https://en.wikipedia.org/wiki/Sunlight#Summary\n"
+        "   3. http://lumennow.org/lumens-vs-watts/\n"
+        "   4. http://www.greenbusinesslight.com/page/119/lux-lumens-and-watts\n"
         "\n"
+        "We still need to tweak the parameters a little because we don't do real\n"
+        "Global Illumination. However real world parameters are a great starting point.\n\n"
+        "HDR can of course, also be used with artistic purposes.\n"
+        "This sample lets you control the exposure, auto-exposure, and bloom parameters.\n\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/materials/Common/Copyback.material (Copyback_1xFP32_ps)\n"
         "   * Samples/Media/2.0/materials/HDR/*.*\n"

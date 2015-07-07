@@ -1568,9 +1568,13 @@ namespace Ogre {
         @param hemisphereDir
             Hemisphere's direction reference to compare the surface normal to.
             The internal vector will be normalized.
+        @param envmapScale
+            Global scale to apply to all environment maps (for relevant Hlms implementations,
+            like PBS). The value will be stored in upperHemisphere.a
+            Use 1.0 to disable.
         */
         void setAmbientLight( const ColourValue& upperHemisphere, const ColourValue& lowerHemisphere,
-                              const Vector3 &hemisphereDir );
+                              const Vector3 &hemisphereDir, Real envmapScale = 1.0f );
 
         /** Returns the ambient light level to be used for the scene.
         */

@@ -34,7 +34,7 @@ layout(binding = 0) uniform PassBuffer
 	//Pixel shader
 	mat3 invViewMatCubemap;
 
-@property( ambient_hemisphere || ambient_fixed )
+@property( ambient_hemisphere || ambient_fixed || envmap_scale )
 	vec4 ambientUpperHemi;
 @end
 @property( ambient_hemisphere )

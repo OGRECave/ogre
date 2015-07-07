@@ -93,7 +93,7 @@ namespace Demo
         psParams->setNamedConstant( "brightThreshold",
                                     Ogre::Vector4(
                                         minThreshold,
-                                        1.0f / (fullColourThreshold / minThreshold),
+                                        1.0f / (fullColourThreshold - minThreshold),
                                         0, 0 ) );
     }
 }

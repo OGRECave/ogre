@@ -246,6 +246,7 @@ namespace Ogre
         static const IdString Pcf4x4;
         static const IdString PcfIterations;
 
+        static const IdString EnvMapScale;
         static const IdString AmbientFixed;
         static const IdString AmbientHemisphere;
 
