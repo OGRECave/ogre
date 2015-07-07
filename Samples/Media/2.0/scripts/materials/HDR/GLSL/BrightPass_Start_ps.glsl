@@ -23,7 +23,7 @@ uniform vec2 brightThreshold;
 void main()
 {
 	//Perform a high-pass filter on the image
-	float fInvLumAvg = texture( lumRt, float( 0.0, 0.0 ) ).x;
+	float fInvLumAvg = texture( lumRt, vec2( 0.0, 0.0 ) ).x;
 
 	vec3 vSample = texture( rt0, inPs.uv0 ).xyz;
 	vSample.xyz *= fInvLumAvg;
