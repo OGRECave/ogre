@@ -53,7 +53,7 @@ namespace Ogre
     */
     class _OgreHlmsUnlitExport HlmsUnlit : public HlmsBufferManager, public ConstBufferPool
     {
-	protected:
+    protected:
         typedef vector<HlmsDatablock*>::type HlmsDatablockVec;
 
         struct PassData

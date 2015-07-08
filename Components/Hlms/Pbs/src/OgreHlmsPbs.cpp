@@ -789,7 +789,7 @@ namespace Ogre
             }
 
             //vec3 ambientUpperHemi + padding
-            if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere )
+            if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere || envMapScale != 1.0f )
             {
                 *passBufferPtr++ = static_cast<float>( upperHemisphere.r );
                 *passBufferPtr++ = static_cast<float>( upperHemisphere.g );

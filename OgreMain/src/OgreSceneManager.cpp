@@ -155,8 +155,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
     for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
         mSceneRoot[i] = 0;
 
-    memset( mAmbientLight, 0, sizeof(mAmbientLight) );
-    mAmbientLightHemisphereDir = Vector3::UNIT_Y;
+    setAmbientLight( ColourValue::Black, ColourValue::Black, Vector3::UNIT_Y, 1.0f );
 
     mNodeMemoryManager[SCENE_STATIC]._setTwin( SCENE_STATIC, &mNodeMemoryManager[SCENE_DYNAMIC] );
     mNodeMemoryManager[SCENE_DYNAMIC]._setTwin( SCENE_DYNAMIC, &mNodeMemoryManager[SCENE_STATIC] );
