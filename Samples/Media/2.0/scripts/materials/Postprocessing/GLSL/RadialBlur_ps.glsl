@@ -16,8 +16,8 @@ in block
 
 void main()
 {
-	const float c_multipliers[NUM_SAMPLES] =
-	{
+	const float c_multipliers[NUM_SAMPLES] = float[NUM_SAMPLES]
+	(
 		1.00f,
 		0.99f,
 		0.98f,
@@ -25,7 +25,7 @@ void main()
 		0.96f,
 		0.94f,
 		0.93f
-	};
+	);
 
 	float atten = ( distance( inPs.uv0, centerUVPos.xy ) - centerUVPos.z ) * centerUVPos.w;
 	atten = 1.0f - clamp( atten, 0.0, 1.0 );
