@@ -37,7 +37,6 @@ namespace Demo
             To prevent that looking at a very bright object makes the rest of
             the scene really dark, use higher values.
         @param maxAutoExposure
-            Maximum luminance the auto exposure will be clamped to.
             It's in EV stops. Valid range is [-inf; inf]
             Must be minAutoExposure <= maxAutoExposure
             Controls how much auto exposure brightens a dark scene.
@@ -54,7 +53,7 @@ namespace Demo
             Scale is in lumens / 1024.
         @param fullColourThreshold
             The bloom fades between minThreshold & fullColourThreshold.
-            Must be >= minThreshold. If it is too close to it, bloom fading
+            Must be > minThreshold. If it is too close to it, bloom fading
             may be too harsh/sudden.
             Scale is the same as minThreshold.
         */

@@ -80,7 +80,7 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void HdrUtils::setBloomThreshold( float minThreshold, float fullColourThreshold )
     {
-        assert( minThreshold <= fullColourThreshold );
+        assert( minThreshold < fullColourThreshold );
 
         Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
                     "HDR/BrightPass_Start",
