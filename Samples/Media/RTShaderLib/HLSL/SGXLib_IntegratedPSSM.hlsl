@@ -29,17 +29,17 @@ void SGX_ApplyShadowFactor_Diffuse(in float4 ambient,
 }
 	
 //-----------------------------------------------------------------------------
-float _SGX_ShadowPCF4(sampler2D shadowMap, float4 shadowMapPos, float2 offset)
+float _SGX_ShadowPCF4(SamplerData2D shadowMap, float4 shadowMapPos, float2 offset)
 {
 	shadowMapPos = shadowMapPos / shadowMapPos.w;
 	float2 uv = shadowMapPos.xy;
 	float3 o = float3(offset, -offset.x) * 0.3f;
 
 	// Note: We using 2x2 PCF. Good enough and is a lot faster.
-	float c =	(shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.xy).r) ? 1 : 0; // top left
-	c +=		(shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.xy).r) ? 1 : 0; // bottom right
-	c +=		(shadowMapPos.z <= tex2D(shadowMap, uv.xy + o.zy).r) ? 1 : 0; // bottom left
-	c +=		(shadowMapPos.z <= tex2D(shadowMap, uv.xy - o.zy).r) ? 1 : 0; // top right
+	float c =	(shadowMapPos.z <= FFP_SampleTexture(shadowMap, uv.xy - o.xy).r) ? 1 : 0; // top left
+	c +=		(shadowMapPos.z <= FFP_SampleTexture(shadowMap, uv.xy + o.xy).r) ? 1 : 0; // bottom right
+	c +=		(shadowMapPos.z <= FFP_SampleTexture(shadowMap, uv.xy + o.zy).r) ? 1 : 0; // bottom left
+	c +=		(shadowMapPos.z <= FFP_SampleTexture(shadowMap, uv.xy - o.zy).r) ? 1 : 0; // top right
 		
 	return c / 4;
 }
@@ -50,9 +50,9 @@ void SGX_ComputeShadowFactor_PSSM3(in float fDepth,
 							in float4 lightPosition0,
 							in float4 lightPosition1,
 							in float4 lightPosition2,
-							in sampler2D shadowMap0,
-							in sampler2D shadowMap1,
-							in sampler2D shadowMap2,
+							in SamplerData2D shadowMap0,
+							in SamplerData2D shadowMap1,
+							in SamplerData2D shadowMap2,
 							in float4 invShadowMapSize0,
 							in float4 invShadowMapSize1,
 							in float4 invShadowMapSize2,																			

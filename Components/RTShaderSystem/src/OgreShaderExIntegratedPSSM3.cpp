@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreShaderExIntegratedPSSM3.h"
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderFFPRenderState.h"
+#include "OgreShaderFFPTexturing.h"
 #include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
 #include "OgreAutoParamDataSource.h"
@@ -35,6 +36,7 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreTechnique.h"
+#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -81,9 +83,10 @@ void IntegratedPSSM3::updateGpuProgramsParams(Renderable* rend, Pass* pass,
     }
 
     Vector4 vSplitPoints;
-
-    vSplitPoints.x = mShadowTextureParamsList[0].mMaxRange;
-    vSplitPoints.y = mShadowTextureParamsList[1].mMaxRange;
+	//get the split points from the auto params 
+	const vector<Real>::type &pssmSplitPoints = source->getPssmSplits(0);
+	vSplitPoints.x = pssmSplitPoints[1];
+	vSplitPoints.y = pssmSplitPoints[2];
     vSplitPoints.z = 0.0;
     vSplitPoints.w = 0.0;
 
@@ -221,7 +224,10 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
             it->mVSOutLightPosition->getContent(),
             GCT_FLOAT4);    
 
-        it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");       
+        it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");  
+
+		if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+			it->mTextureSamplerState = psProgram->resolveParameter(GCT_SAMPLER_STATE, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map_sampler");
 
         it->mInvTextureSize = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "inv_shadow_texture_size");       
 
@@ -322,6 +328,12 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder, 
     ShadowTextureParams& splitParams1 = mShadowTextureParamsList[1];
     ShadowTextureParams& splitParams2 = mShadowTextureParamsList[2];
 
+	if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+	{
+		FFPTexturing::AddTextureSampleWrapperInvocation(splitParams0.mTextureSampler, splitParams0.mTextureSamplerState, GCT_SAMPLER2D, psMain, groupOrder, internalCounter);
+		FFPTexturing::AddTextureSampleWrapperInvocation(splitParams1.mTextureSampler, splitParams1.mTextureSamplerState, GCT_SAMPLER2D, psMain, groupOrder, internalCounter);
+		FFPTexturing::AddTextureSampleWrapperInvocation(splitParams2.mTextureSampler, splitParams2.mTextureSamplerState, GCT_SAMPLER2D, psMain, groupOrder, internalCounter);
+	}
     // Compute shadow factor.
     curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_COMPUTE_SHADOW_COLOUR3, groupOrder, internalCounter++);                                
     curFuncInvocation->pushOperand(mPSInDepth, Operand::OPS_IN);    
@@ -329,13 +341,24 @@ bool IntegratedPSSM3::addPSInvocation(Program* psProgram, const int groupOrder, 
     curFuncInvocation->pushOperand(splitParams0.mPSInLightPosition, Operand::OPS_IN);   
     curFuncInvocation->pushOperand(splitParams1.mPSInLightPosition, Operand::OPS_IN);   
     curFuncInvocation->pushOperand(splitParams2.mPSInLightPosition, Operand::OPS_IN);   
-    curFuncInvocation->pushOperand(splitParams0.mTextureSampler, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(splitParams1.mTextureSampler, Operand::OPS_IN);  
-    curFuncInvocation->pushOperand(splitParams2.mTextureSampler, Operand::OPS_IN);  
+
+	if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+	{
+		curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(splitParams0.mTextureSampler, psMain), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(splitParams1.mTextureSampler, psMain), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(splitParams2.mTextureSampler, psMain), Operand::OPS_IN);
+	}
+	else
+	{
+		curFuncInvocation->pushOperand(splitParams0.mTextureSampler, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(splitParams1.mTextureSampler, Operand::OPS_IN);
+		curFuncInvocation->pushOperand(splitParams2.mTextureSampler, Operand::OPS_IN);
+	}
     curFuncInvocation->pushOperand(splitParams0.mInvTextureSize, Operand::OPS_IN);  
     curFuncInvocation->pushOperand(splitParams1.mInvTextureSize, Operand::OPS_IN);  
     curFuncInvocation->pushOperand(splitParams2.mInvTextureSize, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSLocalShadowFactor, Operand::OPS_OUT); 
+
     psMain->addAtomInstance(curFuncInvocation); 
     
     // Apply shadow factor on diffuse colour.

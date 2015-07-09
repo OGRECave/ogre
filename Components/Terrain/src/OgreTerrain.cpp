@@ -201,7 +201,7 @@ namespace Ogre
         , mLodManager(0)
 
     {
-        mRootNode = sm->getRootSceneNode()->createChildSceneNode();
+        mRootNode = sm->getRootSceneNode()->createChildSceneNode(SCENE_STATIC);
         sm->addListener(this);
 
         Root::getSingleton().addFrameListener(this);
@@ -773,7 +773,7 @@ namespace Ogre
         }
 
         // Create & load quadtree
-        mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+        mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_STATIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
         mQuadTree->prepare(stream);
 
         // stop uncompressing
@@ -907,7 +907,7 @@ namespace Ogre
         mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
         memset(mDeltaData, 0, sizeof(float) * numVertices);
 
-        mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+        mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_STATIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
         mQuadTree->prepare();
 
         // calculate entire terrain
@@ -4595,7 +4595,7 @@ namespace Ogre
             mDeltaData = OGRE_ALLOC_T(float, numVertices, MEMCATEGORY_GEOMETRY);
             memset(mDeltaData, 0, sizeof(float) * numVertices);
 
-            mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_DYNAMIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
+            mQuadTree = OGRE_NEW TerrainQuadTreeNode(&mSceneMgr->_getEntityMemoryManager(SCENE_STATIC), this, 0, 0, 0, mSize, mNumLodLevels - 1, 0, 0);
             mQuadTree->prepare();
 
             // calculate entire terrain

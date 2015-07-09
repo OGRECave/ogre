@@ -38,6 +38,12 @@
 #include "OgreRTShaderSystem.h"
 #endif
 
+// Used in Fresnel and CubeMapping samples. Moved here to fix static builds of the SampleBrowser
+const Ogre::uint32 NonRefractiveSurfaces  = 0x00000001;
+const Ogre::uint32 RefractiveSurfaces     = 0x00000002;
+const Ogre::uint32 ReflectedSurfaces      = 0x00000004;
+const Ogre::uint32 RegularSurfaces        = NonRefractiveSurfaces|ReflectedSurfaces;
+
 namespace OgreBites
 {
     /*=============================================================================

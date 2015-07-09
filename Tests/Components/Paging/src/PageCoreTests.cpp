@@ -59,7 +59,7 @@ void PageCoreTests::setUp()
     const size_t numThreads = std::max<Ogre::uint32>
     ( 1, Ogre::PlatformInformation::getNumLogicalCores() );
 
-    Ogre::InstancingTheadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
+    Ogre::InstancingThreadedCullingMethod threadedCullingMethod = Ogre::INSTANCING_CULLING_SINGLETHREAD;
 
     //See doxygen documentation regarding culling methods.
     //In some cases you may still want to use single thread.

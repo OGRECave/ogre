@@ -134,6 +134,7 @@ namespace Ogre
         mTerrain->getPoint(midpointx, midpointy, 0, &mLocalCentre);
 
         mMovable = OGRE_NEW Movable(Id::generateNewId<MovableObject>(), objectMemoryManager, this);
+        mMovable->_notifyManager(terrain->_getRootSceneNode()->getCreator());
         mRend = OGRE_NEW Rend(this);
     }
     //---------------------------------------------------------------------
@@ -273,8 +274,7 @@ namespace Ogre
         createGpuIndexData();
         if (!mLocalNode)
         {
-            mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode();
-            mLocalNode->setPosition(mLocalCentre);
+            mLocalNode = mTerrain->_getRootSceneNode()->createChildSceneNode(SCENE_STATIC, mLocalCentre);
         }
 
         if (!mMovable->isAttached())
@@ -582,10 +582,9 @@ namespace Ogre
                     childBox.setMaximum(childBox.getMaximum() + boxoffset);
                     mAABB.merge(childBox);
                 }
-
+                mMovable->setLocalAabb(Aabb(mAABB.getCenter(), mAABB.getHalfSize()));
             }
         }
-
     }
     //---------------------------------------------------------------------
     const TerrainQuadTreeNode::VertexDataRecord* TerrainQuadTreeNode::getVertexDataRecord() const
@@ -1122,7 +1121,6 @@ namespace Ogre
             OGRE_DELETE ll->gpuIndexData;
             ll->gpuIndexData = 0;
         }
-
     }
     //---------------------------------------------------------------------
     void TerrainQuadTreeNode::mergeIntoBounds(long x, long y, const Vector3& pos)
@@ -1131,8 +1129,9 @@ namespace Ogre
         {
             Vector3 localPos = pos - mLocalCentre;
             mAABB.merge(localPos);
+            mMovable->setLocalAabb(Aabb(mAABB.getCenter(), mAABB.getHalfSize()));
             mBoundingRadius = std::max(mBoundingRadius, localPos.length());
-            
+
             if (!isLeaf())
             {
                 for (int i = 0; i < 4; ++i)
@@ -1146,15 +1145,14 @@ namespace Ogre
         if (rectContainsNode(rect))
         {
             mAABB.setNull();
+            mMovable->setLocalAabb(Aabb(mAABB.getCenter(), mAABB.getHalfSize()));
             mBoundingRadius = 0;
-            
+
             if (!isLeaf())
             {
                 for (int i = 0; i < 4; ++i)
                     mChildren[i]->resetBounds(rect);
             }
-
-            
         }
     }
     //---------------------------------------------------------------------
@@ -1503,16 +1501,8 @@ namespace Ogre
         return stype;
 
     }
-    //---------------------------------------------------------------------
-    const AxisAlignedBox& TerrainQuadTreeNode::Movable::getBoundingBox(void) const
-    {
-        return mParent->getAABB();
-    }
-    //---------------------------------------------------------------------
-    Real TerrainQuadTreeNode::Movable::getBoundingRadius(void) const
-    {
-        return mParent->getBoundingRadius();
-    }
+    // TODO "Ogre::MovableObject"-methods "isVisible", "getVisibilityFlags" and "getQueryFlags" are no longer virtual in OGRE 2.0 rendering the following methods useless. Remove them or update the implementation.
+    /*
     //---------------------------------------------------------------------
     bool TerrainQuadTreeNode::Movable::isVisible(void) const
     {
@@ -1533,6 +1523,7 @@ namespace Ogre
         // Combine own vis (in case anyone sets this) and terrain overall
         return MovableObject::getQueryFlags() & mParent->getTerrain()->getQueryFlags();
     }
+    */
     //------------------------------------------------------------------------
     void TerrainQuadTreeNode::Movable::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
