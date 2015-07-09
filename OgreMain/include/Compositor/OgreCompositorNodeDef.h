@@ -181,6 +181,9 @@ namespace Ogre
         */
         void mapOutputChannel( size_t outChannel, IdString textureName );
 
+        /// @copydoc TextureDefinitionBase::removeTexture
+        virtual void removeTexture( IdString name );
+
         CompositorManager2* getCompositorManager(void) const { return mCompositorManager; }
     };
 

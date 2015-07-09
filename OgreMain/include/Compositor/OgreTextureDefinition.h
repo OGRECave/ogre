@@ -72,8 +72,8 @@ namespace Ogre
         /// Local texture definition
         class _OgreExport TextureDefinition : public CompositorInstAlloc
         {
-        public:
             IdString name;
+        public:
             uint width;       // 0 means adapt to target width
             uint height;      // 0 means adapt to target height
             float widthFactor;  // multiple of target width to use (if width = 0)
@@ -102,19 +102,23 @@ namespace Ogre
             */
             bool    fsaaExplicitResolve;
 
+            /// Do not call directly. @see TextureDefinition::renameTexture instead.
+            void _setName( IdString newName )   { name = newName; }
+            IdString getName(void) const        { return name; }
+
             TextureDefinition( IdString _name ) : name(_name), width(0), height(0), widthFactor(1.0f),
                     heightFactor(1.0f), fsaa(true), hwGammaWrite(BoolUndefined), depthBufferId(1),
                     fsaaExplicitResolve(false) {}
         };
+        typedef vector<TextureDefinition>::type     TextureDefinitionVec;
 
     protected:
         friend class CompositorNode;
         friend class CompositorWorkspace;
-        typedef vector<TextureDefinition>::type     TextureDefinitionVec;
         typedef map<IdString, uint32>::type         NameToChannelMap;
 
         /** TextureSource to use by addLocalTextureDefinition. Could be either
-            TEXTURE_LOCAL or TEXTURE_GLOBAL (depends on our derived class)
+            TEXTURE_LOCAL or TEXTURE_GLOBAL (!!depends on our derived class!!)
         */
         TextureSource           mDefaultLocalTextureSource;
         TextureDefinitionVec    mLocalTextureDefs;
@@ -166,6 +170,33 @@ namespace Ogre
         virtual IdString addTextureSourceName( const String &name, size_t index,
                                                 TextureSource textureSource );
 
+        /** WARNING: Be very careful with this function.
+            Removes a texture.
+            * If the texture is from an input channel (TEXTURE_INPUT),
+              the input channel is removed.
+            * If the texture is a local definition (TEXTURE_LOCAL) the texture definition
+              is removed and all the references to mLocalTextureDefs[i+1] ...
+              mLocalTextureDefs[i+n] are updated.
+              However, the output channels will now contain an invalid index and will
+              only be removed if it was the last output channel (since we can't alter
+              the order). It is your responsability to call
+              CompositorNodeDef::mapOutputChannel again with a valid texture name to
+              the channel it was occupying.
+            * If the texture is a global texture (TEXTURE_GLOBAL), the global texture
+              can no longer be accessed until
+              addTextureSourceName( name, 0, TEXTURE_GLOBAL ) is called again.
+        @param name
+            Name of the texture to remove.
+        */
+        virtual void removeTexture( IdString name );
+
+        /** Changes the name of a texture. Texture can come from an input channel,
+            be a global texture, or a locally defined one.
+            You can't rename a global texture to avoid the "global_" prefix, or
+            add the "global_" prefix to a texture that wasn't global.
+        */
+        void renameTexture( IdString oldName, const String &newName );
+
         /** Retrieves in which container to look for when looking to which texture is a given name
             associated with.
         @remarks
@@ -203,6 +234,18 @@ namespace Ogre
             is used correctly.
         */
         TextureDefinition* addTextureDefinition( const String &name );
+
+        const TextureDefinitionVec& getLocalTextureDefinitions(void) const  { return mLocalTextureDefs; }
+
+        /** Returns the local texture definitions.
+        @remarks
+            WARNING: Use with care. You should not add/remove elements or change the name
+            as mNameToChannelMap needs to be kept in sync. @see addTextureDefinition,
+            @see removeTexture and @see renameTexture to perform these actions
+        */
+        TextureDefinitionVec& getLocalTextureDefinitionsNonConst(void)      { return mLocalTextureDefs; }
+
+        const NameToChannelMap& getNameToChannelMap(void) const             { return mNameToChannelMap; }
 
         /** Utility function to create the textures based on a given set of
             texture definitions and put them in a container.

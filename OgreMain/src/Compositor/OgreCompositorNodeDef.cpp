@@ -71,4 +71,70 @@ namespace Ogre
                         mName.getFriendlyText() + "'", "CompositorNodeDef::mapOutputChannel" );
         }
     }
+    //-----------------------------------------------------------------------------------
+    void CompositorNodeDef::removeTexture( IdString name )
+    {
+        size_t index;
+        TextureSource textureSource;
+        getTextureSource( name, index, textureSource );
+
+        assert( mDefaultLocalTextureSource == TEXTURE_LOCAL );
+
+        //Update the references from the output channels to our local textures
+        if( textureSource == mDefaultLocalTextureSource )
+        {
+            ChannelMappings::iterator itor = mOutChannelMapping.begin();
+            ChannelMappings::iterator end  = mOutChannelMapping.end();
+
+            while( itor != end )
+            {
+                size_t otherIndex;
+                decodeTexSource( *itor, otherIndex, textureSource );
+
+                if( textureSource == mDefaultLocalTextureSource )
+                {
+                    if( otherIndex > index )
+                    {
+                        *itor = encodeTexSource( otherIndex - 1, textureSource );
+                    }
+                    else
+                    {
+                        //Purposedly cause a crash if left unfilled. This
+                        //entry will only be removed if it's the last one.
+                        *itor = encodeTexSource( 0x3FFFFFFF, textureSource );
+                    }
+                }
+
+                ++itor;
+            }
+
+            //Mappings in the last channels that are no longer valid can be removed
+            bool stopIterating = false;
+            size_t mappingsToRemove = 0;
+            ChannelMappings::const_reverse_iterator ritor = mOutChannelMapping.rbegin();
+            ChannelMappings::const_reverse_iterator rend  = mOutChannelMapping.rend();
+
+            while( ritor != rend && !stopIterating )
+            {
+                size_t otherIndex;
+                decodeTexSource( *ritor, otherIndex, textureSource );
+
+                stopIterating = true;
+
+                if( otherIndex == 0x3FFFFFFF && textureSource == mDefaultLocalTextureSource )
+                {
+                    stopIterating = false;
+                    ++mappingsToRemove;
+                }
+
+                ++ritor;
+            }
+
+            mOutChannelMapping.erase( mOutChannelMapping.begin() +
+                                        (mOutChannelMapping.size() - mappingsToRemove),
+                                      mOutChannelMapping.end() );
+        }
+
+        TextureDefinitionBase::removeTexture( name );
+    }
 }

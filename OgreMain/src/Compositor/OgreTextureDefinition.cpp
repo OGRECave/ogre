@@ -108,6 +108,79 @@ namespace Ogre
         return hashedName;
     }
     //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::removeTexture( IdString name )
+    {
+        size_t index = -1;
+        TextureSource textureSource = NUM_TEXTURES_SOURCES;
+        {
+            NameToChannelMap::const_iterator it = mNameToChannelMap.find( name );
+            if( it == mNameToChannelMap.end() )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                             "Texture with name '" + name.getFriendlyText() + "' does not exist",
+                             "TextureDefinitionBase::removeTexture" );
+            }
+
+            decodeTexSource( it->second, index, textureSource );
+            mNameToChannelMap.erase( it );
+        }
+
+        if( textureSource == mDefaultLocalTextureSource )
+        {
+            //Try to keep order (don't use efficientVectorRemove)
+            mLocalTextureDefs.erase( mLocalTextureDefs.begin() + index );
+
+            //Update the references
+            NameToChannelMap::iterator itor = mNameToChannelMap.begin();
+            NameToChannelMap::iterator end  = mNameToChannelMap.end();
+
+            while( itor != end )
+            {
+                size_t otherIndex;
+                decodeTexSource( itor->second, otherIndex, textureSource );
+
+                if( textureSource == mDefaultLocalTextureSource && otherIndex > index )
+                    itor->second = encodeTexSource( otherIndex - 1, textureSource );
+
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::renameTexture( IdString oldName, const String &newName )
+    {
+        NameToChannelMap::iterator it = mNameToChannelMap.find( oldName );
+        if( it == mNameToChannelMap.end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "Texture with name '" + oldName.getFriendlyText() + "' does not exist",
+                         "TextureDefinitionBase::renameTexture" );
+        }
+
+        size_t index = -1;
+        TextureSource textureSource = NUM_TEXTURES_SOURCES;
+        decodeTexSource( it->second, index, textureSource );
+
+        String::size_type findResult = newName.find( "global_" );
+        if( textureSource == TEXTURE_GLOBAL && findResult != 0 ||
+            textureSource != TEXTURE_GLOBAL && findResult == 0 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Can't rename global texture without the global_ prefix,"
+                         " or add a global_ prefix to a non-global texture",
+                         "TextureDefinitionBase::renameTexture" );
+        }
+
+        const IdString hashedNewName( newName );
+
+        if( textureSource == mDefaultLocalTextureSource )
+            mLocalTextureDefs[index]._setName( hashedNewName );
+
+        uint32 encodedVal = it->second;
+        mNameToChannelMap.erase( it );
+        mNameToChannelMap[hashedNewName] = encodedVal;
+    }
+    //-----------------------------------------------------------------------------------
     void TextureDefinitionBase::getTextureSource( IdString name, size_t &index,
                                                     TextureSource &textureSource ) const
     {
@@ -131,7 +204,6 @@ namespace Ogre
         mLocalTextureDefs.push_back( TextureDefinition( hashedName ) );
         return &mLocalTextureDefs.back();
     }
-
     //-----------------------------------------------------------------------------------
     void TextureDefinitionBase::createTextures( const TextureDefinitionVec &textureDefs,
                                                 CompositorChannelVec &inOutTexContainer,
@@ -149,9 +221,9 @@ namespace Ogre
         {
             String textureName;
             if( uniqueNames )
-                textureName = (itor->name + IdString( id )).getFriendlyText();
+                textureName = (itor->getName() + IdString( id )).getFriendlyText();
             else
-                textureName = itor->name.getFriendlyText();
+                textureName = itor->getName().getFriendlyText();
 
             CompositorChannel newChannel = createTexture( *itor, textureName, finalTarget, renderSys );
             inOutTexContainer.push_back( newChannel );
