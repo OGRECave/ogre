@@ -201,6 +201,7 @@ namespace Ogre {
     protected:
         // In the past we could select to use manual or automatic generated Lod levels,
         // but now we can mix them. If it is mixed, we can't export it to older mesh formats.
+        String compatibleLodStrategyName(String lodStrategyName);
         virtual bool isLodMixed(const Mesh* pMesh);
         virtual size_t calcLodLevelSize(const Mesh* pMesh);
         virtual size_t calcLodUsageManualSize(const MeshLodUsage& usage);

@@ -2774,6 +2774,15 @@ namespace Ogre {
     {
     }
     //--------------------------------------------------------------------
+    String MeshSerializerImpl_v1_8::compatibleLodStrategyName(String strategyName)
+    {
+        if(strategyName == "distance_box" || strategyName == "distance_sphere")
+            strategyName = "Distance";
+        else if(strategyName == "pixel_count" || strategyName == "screen_ratio_pixel_count")
+            strategyName = "PixelCount";
+        return strategyName;
+    }
+    //--------------------------------------------------------------------
     bool MeshSerializerImpl_v1_8::isLodMixed(const Mesh* pMesh)
     {
         if(!pMesh->hasManualLodLevel()) {
@@ -2797,7 +2806,7 @@ namespace Ogre {
         }
         exportedLodCount = pMesh->getNumLodLevels();
         size_t size = MSTREAM_OVERHEAD_SIZE; // Header
-        size += calcStringSize(pMesh->getLodStrategy()->getName()); // string strategyName;
+        size += calcStringSize(compatibleLodStrategyName(pMesh->getLodStrategy()->getName())); // string strategyName;
         size += sizeof(unsigned short); // unsigned short numLevels;
         size += sizeof(bool); // bool manual; <== this is removed in v1_9
 
@@ -2872,16 +2881,8 @@ namespace Ogre {
 
             writeChunkHeader(M_MESH_LOD_LEVEL, calcLodLevelSize(pMesh));
 
-            // Details
-            // Get backward compatible strategy name
-            String strategyName = pMesh->getLodStrategy()->getName();
-            if (strategyName == "distance_box" || strategyName == "distance_sphere") {
-                strategyName = "Distance";
-            } else if (strategyName == "pixel_count" || strategyName == "screen_ratio_pixel_count") {
-                strategyName = "PixelCount";
-            }
             // string strategyName;
-            writeString(strategyName);
+            writeString(compatibleLodStrategyName(pMesh->getLodStrategy()->getName()));
             // unsigned short numLevels;
             writeShorts(&exportedLodCount, 1);
             // bool manual;  (true for manual alternate meshes, false for generated)
