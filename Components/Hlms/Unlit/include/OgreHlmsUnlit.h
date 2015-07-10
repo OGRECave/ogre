@@ -95,6 +95,7 @@ namespace Ogre
 
     public:
         HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders );
+        HlmsUnlit(Archive *dataFolder, ArchiveVec *libraryFolders, HlmsTypes type,  IdString typeName);
         ~HlmsUnlit();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
@@ -120,101 +121,7 @@ namespace Ogre
         virtual void frameEnded(void);
     };
 
-    struct _OgreHlmsUnlitExport UnlitProperty
-    {
-        static const IdString HwGammaRead;
-        static const IdString HwGammaWrite;
-        static const IdString SignedIntTex;
-        static const IdString MaterialsPerBuffer;
-        static const IdString AnimationMatricesPerBuffer;
-
-        static const IdString TexMatrixCount;
-        static const IdString TexMatrixCount0;
-        static const IdString TexMatrixCount1;
-        static const IdString TexMatrixCount2;
-        static const IdString TexMatrixCount3;
-        static const IdString TexMatrixCount4;
-        static const IdString TexMatrixCount5;
-        static const IdString TexMatrixCount6;
-        static const IdString TexMatrixCount7;
-
-        /// Whether uses material's colour.
-        static const IdString Diffuse;
-
-        /// Number of texture arrays actually baked.
-        static const IdString NumArrayTextures;
-        static const IdString NumTextures;
-
-        /// Number of diffuse maps.
-        static const IdString DiffuseMap;
-
-        //static const IdString DiffuseMap0;
-        //static const IdString DiffuseMap0Array;
-
-        /// UV source # assigned to each texture.
-        static const IdString UvDiffuse0;
-        static const IdString UvDiffuse1;
-        static const IdString UvDiffuse2;
-        static const IdString UvDiffuse3;
-        static const IdString UvDiffuse4;
-        static const IdString UvDiffuse5;
-        static const IdString UvDiffuse6;
-        static const IdString UvDiffuse7;
-        static const IdString UvDiffuse8;
-        static const IdString UvDiffuse9;
-        static const IdString UvDiffuse10;
-        static const IdString UvDiffuse11;
-        static const IdString UvDiffuse12;
-        static const IdString UvDiffuse13;
-        static const IdString UvDiffuse14;
-        static const IdString UvDiffuse15;
-
-        static const IdString UvDiffuseSwizzle0;
-        static const IdString UvDiffuseSwizzle1;
-        static const IdString UvDiffuseSwizzle2;
-        static const IdString UvDiffuseSwizzle3;
-        static const IdString UvDiffuseSwizzle4;
-        static const IdString UvDiffuseSwizzle5;
-        static const IdString UvDiffuseSwizzle6;
-        static const IdString UvDiffuseSwizzle7;
-        static const IdString UvDiffuseSwizzle8;
-        static const IdString UvDiffuseSwizzle9;
-        static const IdString UvDiffuseSwizzle10;
-        static const IdString UvDiffuseSwizzle11;
-        static const IdString UvDiffuseSwizzle12;
-        static const IdString UvDiffuseSwizzle13;
-        static const IdString UvDiffuseSwizzle14;
-        static const IdString UvDiffuseSwizzle15;
-
-        static const IdString BlendModeIndex0;
-        static const IdString BlendModeIndex1;
-        static const IdString BlendModeIndex2;
-        static const IdString BlendModeIndex3;
-        static const IdString BlendModeIndex4;
-        static const IdString BlendModeIndex5;
-        static const IdString BlendModeIndex6;
-        static const IdString BlendModeIndex7;
-        static const IdString BlendModeIndex8;
-        static const IdString BlendModeIndex9;
-        static const IdString BlendModeIndex10;
-        static const IdString BlendModeIndex11;
-        static const IdString BlendModeIndex12;
-        static const IdString BlendModeIndex13;
-        static const IdString BlendModeIndex14;
-        static const IdString BlendModeIndex15;
-
-        static const IdString OutUvCount;
-        static const IdString OutUvHalfCount;
-
-        struct DiffuseMapPtr
-        {
-            IdString const *uvSource;
-            IdString const *uvSourceSwizzle;
-            IdString const *blendModeIndex;
-        };
-
-        static const DiffuseMapPtr DiffuseMapPtrs[NUM_UNLIT_TEXTURE_TYPES];
-    };
+ 
 
     /** @} */
     /** @} */
