@@ -301,10 +301,11 @@ namespace Ogre
     void D3D11VaoManager::deallocateVbo( size_t vboIdx, size_t bufferOffset, size_t sizeBytes,
                                          BufferType bufferType, InternalBufferType internalType )
     {
-        assert( bufferType <= BT_DYNAMIC_DEFAULT );
-
-        if( bufferType >= BT_DYNAMIC_DEFAULT )
+        if (bufferType >= BT_DYNAMIC_DEFAULT)
+        {
+            bufferType = BT_DYNAMIC_DEFAULT; //Persitent mapping not supported in D3D11.
             sizeBytes *= mDynamicBufferMultiplier;
+        }
 
         Vbo &vbo = mVbos[internalType][bufferType][vboIdx];
         StrideChangerVec::iterator itStride = std::lower_bound( vbo.strideChangers.begin(),
