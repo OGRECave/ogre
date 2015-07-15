@@ -1376,15 +1376,17 @@ namespace v1 {
     {
         bool retVal = true;
 
-        retVal &= sharedVertexData[1] == 0 && sharedVertexData[0] != 0;
+        retVal &= (sharedVertexData[0] == 0) || (sharedVertexData[0] != 0 && sharedVertexData[1] != 0);
 
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
 
         while( itor != end && retVal )
         {
-            retVal &= (*itor)->vertexData[1] == 0 && (*itor)->vertexData[0] != 0;
-            retVal &= (*itor)->indexData[1] == 0 && (*itor)->indexData[0] != 0;
+            retVal &= ((*itor)->vertexData[0] == 0) || ((*itor)->vertexData[0] != 0 &&
+                                                        (*itor)->vertexData[1] != 0);
+            retVal &= ((*itor)->indexData[0] == 0) || ((*itor)->indexData[0] != 0 &&
+                                                       (*itor)->indexData[1] != 0);
 
             ++itor;
         }

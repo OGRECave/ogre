@@ -237,8 +237,30 @@ namespace Ogre {
         mBlendIndexToBoneIndexMap = subMesh->blendIndexToBoneIndexMap;
         mBoneAssignmentsOutOfDate = false;
 
+        importBuffersFromV1( subMesh, halfPos, halfTexCoords, qTangents, 0 );
+
+        assert( subMesh->parent->hasValidShadowMappingBuffers() );
+
+        //Deal with shadow mapping optimized buffers
+        if( subMesh->vertexData[0] != subMesh->vertexData[1] ||
+            subMesh->indexData[0] != subMesh->indexData[1] )
+        {
+            //Use the special version already built for v1
+            importBuffersFromV1( subMesh, halfPos, halfTexCoords, qTangents, 1 );
+        }
+        else
+        {
+            //No special version in the v1 format, let the autogeneration routine decide.
+            this->_prepareForShadowMapping( false );
+        }
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::importBuffersFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
+                                       bool qTangents, size_t vaoPassIdx )
+    {
         VertexElement2Vec vertexElements;
-        char *data = arrangeEfficient( subMesh, halfPos, halfTexCoords, qTangents, &vertexElements );
+        char *data = arrangeEfficient( subMesh, halfPos, halfTexCoords, qTangents, &vertexElements,
+                                       vaoPassIdx );
 
         //Wrap the ptrs around these, because the VaoManager's call
         //can throw thus causing a leak if we don't free them.
@@ -250,7 +272,7 @@ namespace Ogre {
         //Create the vertex buffer
         bool keepAsShadow = mParent->mVertexBufferShadowBuffer;
         VertexBufferPacked *vertexBuffer = vaoManager->createVertexBuffer( vertexElements,
-                                                        subMesh->vertexData[0]->vertexCount,
+                                                        subMesh->vertexData[vaoPassIdx]->vertexCount,
                                                         mParent->mVertexBufferDefaultType,
                                                         data, keepAsShadow );
         vertexBuffers.push_back( vertexBuffer );
@@ -258,13 +280,12 @@ namespace Ogre {
         if( keepAsShadow ) //Don't free the pointer ourselves
             dataPtrContainer.ptr = 0;
 
-        IndexBufferPacked *indexBuffer = importFromV1( subMesh->indexData[0] );
+        IndexBufferPacked *indexBuffer = importFromV1( subMesh->indexData[vaoPassIdx] );
 
         {
             VertexArrayObject *vao = vaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
                                                                           subMesh->operationType );
-            mVao[0].push_back( vao );
-            mVao[1].push_back( vao );
+            mVao[vaoPassIdx].push_back( vao );
         }
 
         //Now deal with the automatic LODs
@@ -278,8 +299,7 @@ namespace Ogre {
             VertexArrayObject *vao = vaoManager->createVertexArrayObject( vertexBuffers, lodIndexBuffer,
                                                                           subMesh->operationType );
 
-            mVao[0].push_back( vao );
-            mVao[1].push_back( vao );
+            mVao[vaoPassIdx].push_back( vao );
             ++itor;
         }
     }
@@ -326,7 +346,8 @@ namespace Ogre {
     }
 
     char* SubMesh::arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
-                                     bool qTangents, VertexElement2Vec *outVertexElements )
+                                     bool qTangents, VertexElement2Vec *outVertexElements,
+                                     size_t vaoPassIdx )
     {
         typedef FastArray<v1::VertexElement> VertexElementArray;
 
@@ -337,7 +358,7 @@ namespace Ogre {
         v1::VertexElement const *tangentElement  = 0;
         v1::VertexElement const *binormalElement = 0;
 
-        v1::VertexData *vertexData = subMesh->vertexData[0];
+        v1::VertexData *vertexData = subMesh->vertexData[vaoPassIdx];
 
         {
             //Get an AZDO-friendly vertex declaration out of the original declaration.

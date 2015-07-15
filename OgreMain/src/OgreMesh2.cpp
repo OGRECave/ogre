@@ -592,8 +592,6 @@ namespace Ogre {
         else
             mLodValues = MovableObject::c_DefaultLodMesh;
 
-        prepareForShadowMapping( false );
-
         mIsManual = true;
         setToLoaded();
     }

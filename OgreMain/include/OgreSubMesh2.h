@@ -159,6 +159,8 @@ namespace Ogre {
         void _prepareForShadowMapping( bool forceSameBuffers );
 
     protected:
+        void importBuffersFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords, bool qTangents,
+                                  size_t vaoPassIdx );
 
         /// Converts a v1 IndexBuffer to a v2 format. Returns nullptr if indexData is also nullptr
         IndexBufferPacked* importFromV1( v1::IndexData *indexData );
@@ -183,7 +185,8 @@ namespace Ogre {
             Caller MUST free the pointer with OGRE_FREE_SIMD( MEMCATEGORY_GEOMETRY ).
         */
         char* arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
-                                bool qTangents, VertexElement2Vec *outVertexElements );
+                                bool qTangents, VertexElement2Vec *outVertexElements,
+                                size_t vaoPassIdx );
 
         void destroyVaos( VertexArrayObjectArray &vaos );
         void destroyShadowMappingVaos(void);
