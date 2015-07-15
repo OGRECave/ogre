@@ -428,12 +428,15 @@ namespace Ogre
         {
             if( forUpload )
             {
-                StagingStallType stallType = (*itor)->uploadWillStall( minSizeBytes );
-                candidates[stallType] = *itor;
+                if( minSizeBytes <= (*itor)->getMaxSize() )
+                {
+                    StagingStallType stallType = (*itor)->uploadWillStall( minSizeBytes );
+                    candidates[stallType] = *itor;
 
-                //This is best case scenario, we can stop looking.
-                if( stallType == STALL_NONE )
-                    break;
+                    //This is best case scenario, we can stop looking.
+                    if( stallType == STALL_NONE )
+                        break;
+                }
             }
             else
             {
