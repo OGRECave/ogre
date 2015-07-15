@@ -60,7 +60,7 @@ namespace v1 {
         return mMaterial;
     }
 
-    void SimpleRenderable::getRenderOperation(RenderOperation& op)
+    void SimpleRenderable::getRenderOperation(RenderOperation& op, bool casterPass)
     {
         op = mRenderOp;
     }

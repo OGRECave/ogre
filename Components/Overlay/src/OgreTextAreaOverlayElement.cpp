@@ -443,7 +443,7 @@ namespace v1 {
         return mMaterial;
     }
     //---------------------------------------------------------------------
-    void TextAreaOverlayElement::getRenderOperation(RenderOperation& op)
+    void TextAreaOverlayElement::getRenderOperation(RenderOperation& op, bool casterPass)
     { 
         op = mRenderOp;
     }

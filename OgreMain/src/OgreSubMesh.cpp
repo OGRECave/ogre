@@ -42,7 +42,6 @@ namespace v1 {
         : useSharedVertices(true)
         , renderOpMeshIndex(++RenderOperation::MeshIndexId)
         , operationType(RenderOperation::OT_TRIANGLE_LIST)
-        , vertexData(0)
         , parent(0)
         , mMatInitialised(false)
         , mBoneAssignmentsOutOfDate(false)
@@ -50,14 +49,26 @@ namespace v1 {
         , mVertexAnimationIncludesNormals(false)
         , mBuildEdgesEnabled(true)
     {
-        indexData = OGRE_NEW IndexData();
+        memset( vertexData, 0, sizeof(vertexData) );
+
+        indexData[0] = OGRE_NEW IndexData();
+        indexData[1] = indexData[0];
     }
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
     {
         removeLodLevels();
-        OGRE_DELETE vertexData;
-        OGRE_DELETE indexData;
+
+        if( vertexData[1] == vertexData[0] )
+            vertexData[1] = 0;
+        if( indexData[1] == indexData[0] )
+            indexData[1] = 0;
+
+        for( size_t i=0; i<2; ++i )
+        {
+            OGRE_DELETE vertexData[i];
+            OGRE_DELETE indexData[i];
+        }
 
         removeLodLevels();
     }
@@ -80,11 +91,11 @@ namespace v1 {
 
     }
     //-----------------------------------------------------------------------
-    void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex)
+    void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex, bool casterPass)
     {
         assert( !lodIndex || (lodIndex - 1) < (ushort)mLodFaceList.size() );
 
-        ro.useIndexes = indexData->indexCount != 0;
+        ro.useIndexes = indexData[casterPass]->indexCount != 0;
         if (lodIndex > 0)
         {
             // lodIndex - 1 because we don't store full detail version in mLodFaceList
@@ -92,10 +103,10 @@ namespace v1 {
         }
         else
         {
-            ro.indexData = indexData;
+            ro.indexData = indexData[casterPass];
         }
         ro.operationType = operationType;
-        ro.vertexData = useSharedVertices? parent->sharedVertexData : vertexData;
+        ro.vertexData = useSharedVertices? parent->sharedVertexData[casterPass] : vertexData[casterPass];
         ro.meshIndex = renderOpMeshIndex;
     }
     //-----------------------------------------------------------------------
@@ -121,12 +132,12 @@ namespace v1 {
     void SubMesh::_compileBoneAssignments(void)
     {
         unsigned short maxBones =
-            parent->_rationaliseBoneAssignments(vertexData->vertexCount, mBoneAssignments);
+            parent->_rationaliseBoneAssignments(vertexData[0]->vertexCount, mBoneAssignments);
 
         if (maxBones != 0)
         {
-            parent->compileBoneAssignments(mBoneAssignments, maxBones, 
-                blendIndexToBoneIndexMap, vertexData);
+            parent->compileBoneAssignments(mBoneAssignments, maxBones,
+                blendIndexToBoneIndexMap, vertexData[0]);
         }
 
         mBoneAssignmentsOutOfDate = false;
@@ -331,7 +342,7 @@ namespace v1 {
          */
 
         VertexData *vert = useSharedVertices ?
-            parent->sharedVertexData : vertexData;
+            parent->sharedVertexData[0] : vertexData[0];
         const VertexElement *poselem = vert->vertexDeclaration->
             findElementBySemantic (VES_POSITION);
         HardwareVertexBufferSharedPtr vbuf = vert->vertexBufferBinding->
@@ -345,27 +356,27 @@ namespace v1 {
         // First of all, find min and max bounding box of the submesh
         boxes.push_back (Cluster ());
 
-        if (indexData->indexCount > 0)
+        if (indexData[0]->indexCount > 0)
         {
 
-            uint elsz = indexData->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
+            uint elsz = indexData[0]->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
                 4 : 2;
-            uint8 *idata = (uint8 *)indexData->indexBuffer->lock (
-                indexData->indexStart * elsz, indexData->indexCount * elsz,
+            uint8 *idata = (uint8 *)indexData[0]->indexBuffer->lock (
+                indexData[0]->indexStart * elsz, indexData[0]->indexCount * elsz,
                 HardwareIndexBuffer::HBL_READ_ONLY);
 
-            for (size_t i = 0; i < indexData->indexCount; i++)
+            for (size_t i = 0; i < indexData[0]->indexCount; i++)
             {
                 int idx = (elsz == 2) ? ((uint16 *)idata) [i] : ((uint32 *)idata) [i];
                 boxes [0].mIndices.insert (idx);
             }
-            indexData->indexBuffer->unlock ();
+            indexData[0]->indexBuffer->unlock ();
 
         }
         else
         {
             // just insert all indexes
-            for (size_t i = vertexData->vertexStart; i < vertexData->vertexCount; i++)
+            for (size_t i = vertexData[0]->vertexStart; i < vertexData[0]->vertexCount; i++)
             {
                 boxes [0].mIndices.insert (static_cast<int>(i));
             }
@@ -481,14 +492,29 @@ namespace v1 {
         if (!this->useSharedVertices)
         {
             // Copy unique vertex data
-            newSub->vertexData = this->vertexData->clone();
+            newSub->vertexData[0] = this->vertexData[0]->clone();
+
+            if( this->vertexData[0] == this->vertexData[1] )
+                newSub->vertexData[0] = newSub->vertexData[1];
+            else
+                newSub->vertexData[1] = this->vertexData[1]->clone();
+
             // Copy unique index map
             newSub->blendIndexToBoneIndexMap = this->blendIndexToBoneIndexMap;
         }
 
         // Copy index data
-        OGRE_DELETE newSub->indexData;
-        newSub->indexData = this->indexData->clone();
+        if( newSub->indexData[0] == newSub->indexData[1] )
+            newSub->indexData[1] = 0;
+        OGRE_DELETE newSub->indexData[0];
+        OGRE_DELETE newSub->indexData[1];
+        newSub->indexData[0] = this->indexData[0]->clone();
+
+        if( this->indexData[0] == this->indexData[1] )
+            newSub->indexData[0] = newSub->indexData[1];
+        else
+            newSub->indexData[1] = this->indexData[1]->clone();
+
         // Copy any bone assignments
         newSub->mBoneAssignments = this->mBoneAssignments;
         newSub->mBoneAssignmentsOutOfDate = this->mBoneAssignmentsOutOfDate;
@@ -509,14 +535,14 @@ namespace v1 {
     {
         char *data = arrangeEfficient( halfPos, halfTexCoords, 0 );
 
-        HardwareBufferManagerBase *hwManager = vertexData->_getHardwareBufferManager();
-        vertexData->vertexBufferBinding = hwManager->createVertexBufferBinding();
+        HardwareBufferManagerBase *hwManager = vertexData[0]->_getHardwareBufferManager();
+        vertexData[0]->vertexBufferBinding = hwManager->createVertexBufferBinding();
         HardwareVertexBufferSharedPtr vbuf = hwManager->createVertexBuffer(
-                                                vertexData->vertexDeclaration->getVertexSize( 0 ),
-                                                vertexData->vertexCount,
+                                                vertexData[0]->vertexDeclaration->getVertexSize( 0 ),
+                                                vertexData[0]->vertexCount,
                                                 parent->mVertexBufferUsage,
                                                 parent->mVertexBufferShadowBuffer );
-        vertexData->vertexBufferBinding->setBinding( 0, vbuf );
+        vertexData[0]->vertexBufferBinding->setBinding( 0, vbuf );
 
         void *dstBuffer = vbuf->lock( HardwareBuffer::HBL_DISCARD );
         memcpy( dstBuffer, data, vbuf->getSizeInBytes() );
@@ -551,8 +577,8 @@ namespace v1 {
 
         {
             //Get an AZDO-friendly vertex declaration out of the original declaration.
-            const VertexDeclaration::VertexElementList &origElements = vertexData->vertexDeclaration->
-                                                                                        getElements();
+            const VertexDeclaration::VertexElementList &origElements = vertexData[0]->vertexDeclaration->
+                                                                                            getElements();
             srcElements.reserve( origElements.size() );
             VertexDeclaration::VertexElementList::const_iterator itor = origElements.begin();
             VertexDeclaration::VertexElementList::const_iterator end  = origElements.end();
@@ -612,15 +638,15 @@ namespace v1 {
 
         //Prepare for the transfer between buffers.
         size_t vertexSize = VaoManager::calculateVertexSize( vertexElements );
-        char *data = static_cast<char*>( OGRE_MALLOC_SIMD( vertexSize * vertexData->vertexCount,
+        char *data = static_cast<char*>( OGRE_MALLOC_SIMD( vertexSize * vertexData[0]->vertexCount,
                                                            MEMCATEGORY_GEOMETRY ) );
 
         FastArray<char*> srcPtrs;
         FastArray<size_t> vertexBuffSizes;
-        srcPtrs.reserve( vertexData->vertexBufferBinding->getBufferCount() );
-        for( size_t i=0; i<vertexData->vertexBufferBinding->getBufferCount(); ++i )
+        srcPtrs.reserve( vertexData[0]->vertexBufferBinding->getBufferCount() );
+        for( size_t i=0; i<vertexData[0]->vertexBufferBinding->getBufferCount(); ++i )
         {
-            const HardwareVertexBufferSharedPtr &vBuffer = vertexData->vertexBufferBinding->
+            const HardwareVertexBufferSharedPtr &vBuffer = vertexData[0]->vertexBufferBinding->
                                                                                 getBuffer( i );
             srcPtrs.push_back( static_cast<char*>( vBuffer->lock( HardwareBuffer::HBL_READ_ONLY ) ) );
             vertexBuffSizes.push_back( vBuffer->getVertexSize() );
@@ -629,7 +655,7 @@ namespace v1 {
         //Perform the transfer. Note that vertexElements & srcElements do not match.
         //As vertexElements is modified for smaller types and may include padding
         //for alignment reasons.
-        for( size_t i=0; i<vertexData->vertexCount; ++i )
+        for( size_t i=0; i<vertexData[0]->vertexCount; ++i )
         {
             size_t acumOffset = 0;
             VertexElement2Vec::const_iterator itor = vertexElements.begin();
@@ -751,16 +777,16 @@ namespace v1 {
         }
 
         //Cleanup
-        for( size_t i=0; i<vertexData->vertexBufferBinding->getBufferCount(); ++i )
-            vertexData->vertexBufferBinding->getBuffer( i )->unlock();
+        for( size_t i=0; i<vertexData[0]->vertexBufferBinding->getBufferCount(); ++i )
+            vertexData[0]->vertexBufferBinding->getBuffer( i )->unlock();
 
-        HardwareBufferManagerBase *hwManager = vertexData->_getHardwareBufferManager();
-        hwManager->destroyVertexBufferBinding( vertexData->vertexBufferBinding );
-        vertexData->vertexBufferBinding = 0;
+        HardwareBufferManagerBase *hwManager = vertexData[0]->_getHardwareBufferManager();
+        hwManager->destroyVertexBufferBinding( vertexData[0]->vertexBufferBinding );
+        vertexData[0]->vertexBufferBinding = 0;
 
         {
             //Recreate the vertex declaration
-            vertexData->vertexDeclaration->removeAllElements();
+            vertexData[0]->vertexDeclaration->removeAllElements();
 
             size_t acumOffset = 0;
             unsigned short repeatCounts[VES_COUNT];
@@ -770,8 +796,8 @@ namespace v1 {
 
             while( itor != end )
             {
-                vertexData->vertexDeclaration->addElement( 0, acumOffset, itor->mType, itor->mSemantic,
-                                                           repeatCounts[itor->mSemantic-1]++ );
+                vertexData[0]->vertexDeclaration->addElement( 0, acumOffset, itor->mType, itor->mSemantic,
+                                                              repeatCounts[itor->mSemantic-1]++ );
                 acumOffset += VertexElement::getTypeSize( itor->mType );
                 ++itor;
             }

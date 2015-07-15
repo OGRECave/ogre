@@ -1629,7 +1629,9 @@ namespace Ogre
     uint16 Hlms::calculateHashForV1( Renderable *renderable )
     {
         v1::RenderOperation op;
-        renderable->getRenderOperation( op );
+        //The Hlms uses the pass scene data to know whether this is a caster pass.
+        //We want to know all the details, so request for the non-caster RenderOp.
+        renderable->getRenderOperation( op, false );
         v1::VertexDeclaration *vertexDecl = op.vertexData->vertexDeclaration;
         const v1::VertexDeclaration::VertexElementList &elementList = vertexDecl->getElements();
         v1::VertexDeclaration::VertexElementList::const_iterator itor = elementList.begin();
@@ -1650,7 +1652,7 @@ namespace Ogre
     uint16 Hlms::calculateHashForV2( Renderable *renderable )
     {
         //TODO: Account LOD
-        VertexArrayObject *vao = renderable->getVaos()[0];
+        VertexArrayObject *vao = renderable->getVaos( false )[0];
         const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
 
         uint numTexCoords = 0;
@@ -1720,7 +1722,7 @@ namespace Ogre
         setProperty( HlmsBaseProp::Skeleton, renderable->hasSkeletonAnimation() );
 
         uint16 numTexCoords = 0;
-        if( renderable->getVaos().empty() )
+        if( renderable->getVaos( false ).empty() )
             numTexCoords = calculateHashForV1( renderable );
         else
             numTexCoords = calculateHashForV2( renderable );

@@ -595,7 +595,7 @@ namespace v1 {
         }
     }
     //-----------------------------------------------------------------------
-    void BillboardSet::getRenderOperation(RenderOperation& op)
+    void BillboardSet::getRenderOperation(RenderOperation& op, bool casterPass)
     {
         op.vertexData = mVertexData;
         op.vertexData->vertexStart = 0;

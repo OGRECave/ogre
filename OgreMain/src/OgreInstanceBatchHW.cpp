@@ -91,7 +91,7 @@ namespace v1
     //-----------------------------------------------------------------------
     void InstanceBatchHW::setupVertices( const SubMesh* baseSubMesh )
     {
-        mRenderOperation.vertexData = baseSubMesh->vertexData->clone();
+        mRenderOperation.vertexData = baseSubMesh->vertexData[0]->clone();
         mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
         
         VertexData *thisVertexData = mRenderOperation.vertexData;
@@ -125,7 +125,7 @@ namespace v1
     {
         //We could use just a reference, but the InstanceManager will in the end attampt to delete
         //the pointer, and we can't give it something that doesn't belong to us.
-        mRenderOperation.indexData = baseSubMesh->indexData->clone( true );
+        mRenderOperation.indexData = baseSubMesh->indexData[0]->clone( true );
         mRemoveOwnIndexData = true; //Raise flag to remove our own index data in the end (not always needed)
     }
     //-----------------------------------------------------------------------
@@ -160,13 +160,13 @@ namespace v1
     bool InstanceBatchHW::checkSubMeshCompatibility( const SubMesh* baseSubMesh )
     {
         //Max number of texture coordinates is _usually_ 8, we need at least 3 available
-        if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() > 8-2 )
+        if( baseSubMesh->vertexData[0]->vertexDeclaration->getNextFreeTextureCoordinate() > 8-2 )
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "Given mesh must have at "
                                                         "least 3 free TEXCOORDs",
                         "InstanceBatchHW::checkSubMeshCompatibility");
         }
-        if( baseSubMesh->vertexData->vertexDeclaration->getNextFreeTextureCoordinate() >
+        if( baseSubMesh->vertexData[0]->vertexDeclaration->getNextFreeTextureCoordinate() >
             8-2-mCreator->getNumCustomParams() ||
             3 + mCreator->getNumCustomParams() >= 8 )
         {

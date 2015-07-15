@@ -83,12 +83,12 @@ namespace v1 {
         mParentEntity->reevaluateVertexProcessing();
     }
     //-----------------------------------------------------------------------
-    void SubEntity::getRenderOperation(RenderOperation& op)
+    void SubEntity::getRenderOperation(RenderOperation& op, bool casterPass)
     {
         // Use LOD
-        mSubMesh->_getRenderOperation(op, mParentEntity->mCurrentMeshLod );
+        mSubMesh->_getRenderOperation( op, mParentEntity->mCurrentMeshLod, casterPass );
         // Deal with any vertex data overrides
-        op.vertexData = getVertexDataForBinding();
+        op.vertexData = getVertexDataForBinding( casterPass );
 
         // If we use custom index position the client is responsible to set meaningful values 
         if(mIndexStart != mIndexEnd)
@@ -100,8 +100,19 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void SubEntity::setIndexDataStartIndex(size_t start_index)
     {
-        if(start_index < mSubMesh->indexData->indexCount)
+        if(start_index < mSubMesh->indexData[0]->indexCount)
+        {
             mIndexStart = start_index;
+
+            if( start_index && mSubMesh->indexData[0] != mSubMesh->indexData[1] )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
+                             "To call this function you will have to disable separate "
+                             "vertex/index data for shadow caster passes optimization. "
+                             "See Mesh::prepareForShadowMapping( true )",
+                             "SubEntity::setIndexDataStartIndex" );
+            }
+        }
     }
     //-----------------------------------------------------------------------
     size_t SubEntity::getIndexDataStartIndex() const
@@ -111,8 +122,20 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void SubEntity::setIndexDataEndIndex(size_t end_index)
     {
-        if(end_index > 0 && end_index <= mSubMesh->indexData->indexCount)
+        if(end_index > 0 && end_index <= mSubMesh->indexData[0]->indexCount)
+        {
             mIndexEnd = end_index;
+
+            if( end_index != mSubMesh->indexData[0]->indexCount &&
+                mSubMesh->indexData[0] != mSubMesh->indexData[1] )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
+                             "To call this function you will have to disable separate "
+                             "vertex/index data for shadow caster passes optimization. "
+                             "See Mesh::prepareForShadowMapping( true )",
+                             "SubEntity::setIndexDataStartIndex" );
+            }
+        }
     }
     //-----------------------------------------------------------------------
     size_t SubEntity::getIndexDataEndIndex() const
@@ -126,11 +149,11 @@ namespace v1 {
         mIndexEnd = 0;
     }
     //-----------------------------------------------------------------------
-    VertexData* SubEntity::getVertexDataForBinding(void)
+    VertexData* SubEntity::getVertexDataForBinding( bool casterPass )
     {
         if (mSubMesh->useSharedVertices)
         {
-            return mParentEntity->getVertexDataForBinding();
+            return mParentEntity->getVertexDataForBinding( casterPass );
         }
         else
         {
@@ -140,16 +163,19 @@ namespace v1 {
             switch(c)
             {
             case Entity::BIND_ORIGINAL:
-                return mSubMesh->vertexData;
+                return mSubMesh->vertexData[casterPass];
             case Entity::BIND_HARDWARE_MORPH:
+                assert( !casterPass );
                 return mHardwareVertexAnimVertexData;
             case Entity::BIND_SOFTWARE_MORPH:
+                assert( !casterPass );
                 return mSoftwareVertexAnimVertexData;
             case Entity::BIND_SOFTWARE_SKELETAL:
+                assert( !casterPass );
                 return mSkelAnimVertexData;
             };
             // keep compiler happy
-            return mSubMesh->vertexData;
+            return mSubMesh->vertexData[casterPass];
 
         }
     }
@@ -267,12 +293,12 @@ namespace v1 {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, don't remove any blending info
                 // (since if we skeletally animate too, we need it)
-                mSoftwareVertexAnimVertexData = mSubMesh->vertexData->clone(false);
+                mSoftwareVertexAnimVertexData = mSubMesh->vertexData[0]->clone(false);
                 mParentEntity->extractTempBufferInfo(mSoftwareVertexAnimVertexData, &mTempVertexAnimInfo);
 
                 // Also clone for hardware usage, don't remove blend info since we'll
                 // need it if we also hardware skeletally animate
-                mHardwareVertexAnimVertexData = mSubMesh->vertexData->clone(false);
+                mHardwareVertexAnimVertexData = mSubMesh->vertexData[0]->clone(false);
             }
 
             if (mParentEntity->hasSkeleton())
@@ -282,7 +308,7 @@ namespace v1 {
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
                 mSkelAnimVertexData = 
-                    mParentEntity->cloneVertexDataRemoveBlendInfo(mSubMesh->vertexData);
+                    mParentEntity->cloneVertexDataRemoveBlendInfo(mSubMesh->vertexData[0]);
                 mParentEntity->extractTempBufferInfo(mSkelAnimVertexData, &mTempSkelAnimInfo);
 
             }
@@ -381,9 +407,9 @@ namespace v1 {
             // Note, VES_POSITION is specified here but if normals are included in animation
             // then these will be re-bound too (buffers must be shared)
             const VertexElement* srcPosElem = 
-                mSubMesh->vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+                mSubMesh->vertexData[0]->vertexDeclaration->findElementBySemantic(VES_POSITION);
             HardwareVertexBufferSharedPtr srcBuf = 
-                mSubMesh->vertexData->vertexBufferBinding->getBuffer(
+                mSubMesh->vertexData[0]->vertexBufferBinding->getBuffer(
                 srcPosElem->getSource());
 
             // Bind to software
@@ -401,7 +427,7 @@ namespace v1 {
             && mSubMesh->getVertexAnimationType() == VAT_POSE)
         {
             mParentEntity->bindMissingHardwarePoseBuffers(
-                mSubMesh->vertexData, mHardwareVertexAnimVertexData);
+                mSubMesh->vertexData[0], mHardwareVertexAnimVertexData);
         }
 
     }

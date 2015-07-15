@@ -362,7 +362,7 @@ namespace v1
 
         //Renderable overloads
         /** @copydoc Renderable::getRenderOperation. */
-        void getRenderOperation( RenderOperation& op )  { op = mRenderOperation; }
+        void getRenderOperation( RenderOperation& op, bool casterPass ) { op = mRenderOperation; }
 
         /** @copydoc Renderable::getSquaredViewDepth. */
         Real getSquaredViewDepth( const Camera* cam ) const;

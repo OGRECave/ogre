@@ -98,7 +98,7 @@ namespace v1 {
         /** See OverlayElement. */
         virtual const String& getTypeName(void) const;
         /** See Renderable. */
-        void getRenderOperation(v1::RenderOperation& op);
+        void getRenderOperation(v1::RenderOperation& op, bool casterPass);
         /** Overridden from OverlayElement */
         void setMaterialName(const String& matName);
         /** Overridden from OverlayContainer */

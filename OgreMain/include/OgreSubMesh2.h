@@ -67,7 +67,12 @@ namespace Ogre {
 
         /// VAO to render the submesh. One per LOD level. Each LOD may or
         /// may not share the vertex and index buffers the other levels
-        VertexArrayObjectArray  mVao;
+        /// [0] = Used for regular rendering
+        /// [1] = Used for shadow map caster passes
+        /// Note that mVao[1] = mVao[0] is valid.
+        /// But if they're not exactly the same VertexArrayObject pointers,
+        /// then they won't share any pointer.
+        VertexArrayObjectArray  mVao[2];
 
         /** Dedicated index map for translate blend index to bone index
             @par
@@ -151,6 +156,8 @@ namespace Ogre {
         /// @See arrangeEfficient
         void importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords, bool qTangents );
 
+        void _prepareForShadowMapping( bool forceSameBuffers );
+
     protected:
 
         /// Converts a v1 IndexBuffer to a v2 format. Returns nullptr if indexData is also nullptr
@@ -177,6 +184,9 @@ namespace Ogre {
         */
         char* arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
                                 bool qTangents, VertexElement2Vec *outVertexElements );
+
+        void destroyVaos( VertexArrayObjectArray &vaos );
+        void destroyShadowMappingVaos(void);
     };
     /** @} */
     /** @} */

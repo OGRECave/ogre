@@ -52,6 +52,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace v1 {
+    bool Mesh::msOptimizeForShadowMapping = false;
+
     //-----------------------------------------------------------------------
     Mesh::Mesh(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
@@ -72,9 +74,10 @@ namespace v1 {
         mSharedVertexDataAnimationType(VAT_NONE),
         mSharedVertexDataAnimationIncludesNormals(false),
         mAnimationTypesDirty(true),
-        mPosesIncludeNormals(false),
-        sharedVertexData(0)
+        mPosesIncludeNormals(false)
     {
+        memset( sharedVertexData, 0, sizeof(sharedVertexData) );
+
         // Init first (manual) lod
         MeshLodUsage lod;
         lod.userValue = 0; // User value not used for base LOD level
@@ -288,11 +291,16 @@ namespace v1 {
         {
             OGRE_DELETE *i;
         }
-        if (sharedVertexData)
+
+        if( sharedVertexData[0] == sharedVertexData[1] )
+            sharedVertexData[1] = 0;
+
+        for( size_t i=0; i<2; ++i )
         {
-            OGRE_DELETE sharedVertexData;
-            sharedVertexData = NULL;
+            OGRE_DELETE sharedVertexData[i];
+            sharedVertexData[i] = 0;
         }
+
         // Clear SubMesh lists
         mSubMeshList.clear();
         mSubMeshNameMap.clear();
@@ -316,7 +324,7 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void Mesh::arrangeEfficientFor( bool oldInterface, bool halfPos, bool halfTexCoords )
     {
-        /*if( sharedVertexData )
+        /*if( sharedVertexData[0] )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
                          "Meshes with shared verex data are not supported in the interface." );
@@ -332,7 +340,9 @@ namespace v1 {
                 (*itor)->arrangeEfficientForItems( halfPos, halfTexCoords );
 
             ++itor;
-        }*/
+        }
+
+        prepareForShadowMapping( false );*/
     }
     //-----------------------------------------------------------------------
     MeshPtr Mesh::clone(const String& newName, const String& newGroup)
@@ -361,9 +371,14 @@ namespace v1 {
         }
 
         // Copy shared geometry and index map, if any
-        if (sharedVertexData)
+        if (sharedVertexData[0])
         {
-            newMesh->sharedVertexData = sharedVertexData->clone();
+            newMesh->sharedVertexData[0] = sharedVertexData[0]->clone();
+            if( sharedVertexData[0] == sharedVertexData[1] )
+                newMesh->sharedVertexData[1] = newMesh->sharedVertexData[0];
+            else
+                newMesh->sharedVertexData[1] = sharedVertexData[1]->clone();
+
             newMesh->sharedBlendIndexToBoneIndexMap = sharedBlendIndexToBoneIndexMap;
         }
 
@@ -474,13 +489,13 @@ namespace v1 {
     void Mesh::_updateBoundsFromVertexBuffers(bool pad)
     {
         bool extendOnly = false; // First time we need full AABB of the given submesh, but on the second call just extend that one.
-        if (sharedVertexData){
-            _calcBoundsFromVertexBuffer(sharedVertexData, mAABB, mBoundRadius, extendOnly);
+        if (sharedVertexData[1]){
+            _calcBoundsFromVertexBuffer(sharedVertexData[1], mAABB, mBoundRadius, extendOnly);
             extendOnly = true;
         }
         for (size_t i = 0; i < mSubMeshList.size(); i++){
-            if (mSubMeshList[i]->vertexData){
-                _calcBoundsFromVertexBuffer(mSubMeshList[i]->vertexData, mAABB, mBoundRadius, extendOnly);
+            if (mSubMeshList[i]->vertexData[1]){
+                _calcBoundsFromVertexBuffer(mSubMeshList[i]->vertexData[1], mAABB, mBoundRadius, extendOnly);
                 extendOnly = true;
             }
         }
@@ -668,6 +683,8 @@ namespace v1 {
                 (*i)->_compileBoneAssignments();
             }
         }
+
+        prepareForShadowMapping( false );
     }
     //-----------------------------------------------------------------------
     typedef multimap<Real, Mesh::VertexBoneAssignmentList::iterator>::type WeightIteratorMap;
@@ -769,14 +786,14 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void  Mesh::_compileBoneAssignments(void)
     {
-        if (sharedVertexData)
+        if (sharedVertexData[0])
         {
-            unsigned short maxBones = _rationaliseBoneAssignments(sharedVertexData->vertexCount, mBoneAssignments);
+            unsigned short maxBones = _rationaliseBoneAssignments(sharedVertexData[0]->vertexCount, mBoneAssignments);
 
             if (maxBones != 0)
             {
                 compileBoneAssignments(mBoneAssignments, maxBones, 
-                    sharedBlendIndexToBoneIndexMap, sharedVertexData);
+                    sharedBlendIndexToBoneIndexMap, sharedVertexData[0]);
             }
         }
         mBoneAssignmentsOutOfDate = false;
@@ -1049,10 +1066,10 @@ namespace v1 {
                     }
                 }
             }
-            if (sharedVertexData)
+            if (sharedVertexData[0])
             {
                 // check shared vertices
-                radius = _computeBoneBoundingRadiusHelper(sharedVertexData, mBoneAssignments, bonePositions, boneChildren);
+                radius = _computeBoneBoundingRadiusHelper(sharedVertexData[0], mBoneAssignments, bonePositions, boneChildren);
             }
 
             // check submesh vertices
@@ -1062,9 +1079,10 @@ namespace v1 {
             while( itor != end )
             {
                 SubMesh* submesh = *itor;
-                if (!submesh->useSharedVertices && submesh->vertexData)
+                if (!submesh->useSharedVertices && submesh->vertexData[0])
                 {
-                    Real r = _computeBoneBoundingRadiusHelper(submesh->vertexData, submesh->mBoneAssignments, bonePositions, boneChildren);
+                    Real r = _computeBoneBoundingRadiusHelper( submesh->vertexData[0], submesh->mBoneAssignments,
+                                                               bonePositions, boneChildren );
                     radius = std::max( radius, r );
                 }
                 ++itor;
@@ -1277,8 +1295,8 @@ namespace v1 {
     void Mesh::mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
                                         unsigned short texCoordSetToDestroy )
     {
-        if( sharedVertexData )
-            mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, sharedVertexData );
+        if( sharedVertexData[0] )
+            mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, sharedVertexData[0] );
 
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
@@ -1286,7 +1304,7 @@ namespace v1 {
         while( itor != end )
         {
             if( !(*itor)->useSharedVertices )
-                mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, (*itor)->vertexData );
+                mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, (*itor)->vertexData[0] );
             ++itor;
         }
     }
@@ -1336,6 +1354,42 @@ namespace v1 {
                 vDecl->closeGapsInSource();
             }
         }
+    }
+    //---------------------------------------------------------------------
+    void Mesh::prepareForShadowMapping( bool forceSameBuffers )
+    {
+        sharedVertexData[1] = sharedVertexData[0];
+
+        SubMeshList::const_iterator itor = mSubMeshList.begin();
+        SubMeshList::const_iterator end  = mSubMeshList.end();
+
+        while( itor != end )
+        {
+            (*itor)->vertexData[1] = (*itor)->vertexData[0];
+            (*itor)->indexData[1] = (*itor)->indexData[0];
+
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    bool Mesh::hasValidShadowMappingBuffers(void) const
+    {
+        bool retVal = true;
+
+        retVal &= sharedVertexData[1] == 0 && sharedVertexData[0] != 0;
+
+        SubMeshList::const_iterator itor = mSubMeshList.begin();
+        SubMeshList::const_iterator end  = mSubMeshList.end();
+
+        while( itor != end && retVal )
+        {
+            retVal &= (*itor)->vertexData[1] == 0 && (*itor)->vertexData[0] != 0;
+            retVal &= (*itor)->indexData[1] == 0 && (*itor)->indexData[0] != 0;
+
+            ++itor;
+        }
+
+        return retVal;
     }
     //---------------------------------------------------------------------
     void Mesh::organiseTangentsBuffer(VertexData *vertexData,
@@ -1430,16 +1484,16 @@ namespace v1 {
         tangentsCalc.setStoreParityInW(storeParityInW);
 
         // shared geometry first
-        if (sharedVertexData)
+        if (sharedVertexData[0])
         {
-            tangentsCalc.setVertexData(sharedVertexData);
+            tangentsCalc.setVertexData(sharedVertexData[0]);
             bool found = false;
             for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
             {
                 SubMesh* sm = *i;
                 if (sm->useSharedVertices)
                 {
-                    tangentsCalc.addIndexData(sm->indexData);
+                    tangentsCalc.addIndexData(sm->indexData[0]);
                     found = true;
                 }
             }
@@ -1503,8 +1557,8 @@ namespace v1 {
             if (!sm->useSharedVertices)
             {
                 tangentsCalc.clear();
-                tangentsCalc.setVertexData(sm->vertexData);
-                tangentsCalc.addIndexData(sm->indexData, sm->operationType);
+                tangentsCalc.setVertexData(sm->vertexData[0]);
+                tangentsCalc.addIndexData(sm->indexData[0], sm->operationType);
                 TangentSpaceCalc::Result res = 
                     tangentsCalc.build(targetSemantic, sourceTexCoordSet, index);
 
@@ -1534,6 +1588,7 @@ namespace v1 {
             }
         }
 
+        prepareForShadowMapping( false );
     }
     //---------------------------------------------------------------------
     bool Mesh::suggestTangentVectorBuildParams(VertexElementSemantic targetSemantic,
@@ -1554,12 +1609,12 @@ namespace v1 {
             {
                 if (sharedGeometryDone)
                     continue;
-                vertexData = sharedVertexData;
+                vertexData = sharedVertexData[0];
                 sharedGeometryDone = true;
             }
             else
             {
-                vertexData = sm->vertexData;
+                vertexData = sm->vertexData[0];
             }
 
             const VertexElement *sourceElem = 0;
@@ -1679,9 +1734,9 @@ namespace v1 {
                 size_t vertexSetCount = 0;
                 bool atLeastOneIndexSet = false;
 
-                if (sharedVertexData)
+                if (sharedVertexData[0])
                 {
-                    eb.addVertexData(sharedVertexData);
+                    eb.addVertexData(sharedVertexData[0]);
                     vertexSetCount++;
                 }
 
@@ -1702,7 +1757,7 @@ namespace v1 {
                         // Use shared vertex data, index as set 0
                         if (lodIndex == 0)
                         {
-                            eb.addIndexData(s->indexData, 0, s->operationType);
+                            eb.addIndexData(s->indexData[0], 0, s->operationType);
                         }
                         else
                         {
@@ -1713,11 +1768,11 @@ namespace v1 {
                     else if(s->isBuildEdgesEnabled())
                     {
                         // own vertex data, add it and reference it directly
-                        eb.addVertexData(s->vertexData);
+                        eb.addVertexData(s->vertexData[0]);
                         if (lodIndex == 0)
                         {
                             // Base index data
-                            eb.addIndexData(s->indexData, vertexSetCount++,
+                            eb.addIndexData(s->indexData[0], vertexSetCount++,
                                 s->operationType);
                         }
                         else
@@ -1756,9 +1811,9 @@ namespace v1 {
         // Build
         EdgeListBuilder eb;
         size_t vertexSetCount = 0;
-        if (sharedVertexData)
+        if (sharedVertexData[0])
         {
-            eb.addVertexData(sharedVertexData);
+            eb.addVertexData(sharedVertexData[0]);
             vertexSetCount++;
         }
 
@@ -1836,9 +1891,9 @@ namespace v1 {
         if (mPreparedForShadowVolumes)
             return;
 
-        if (sharedVertexData)
+        if (sharedVertexData[0])
         {
-            sharedVertexData->prepareForShadowVolume();
+            sharedVertexData[0]->prepareForShadowVolume();
         }
         SubMeshList::iterator i, iend;
         iend = mSubMeshList.end();
@@ -1850,7 +1905,7 @@ namespace v1 {
                 s->operationType == RenderOperation::OT_TRIANGLE_LIST ||
                 s->operationType == RenderOperation::OT_TRIANGLE_STRIP))
             {
-                s->vertexData->prepareForShadowVolume();
+                s->vertexData[0]->prepareForShadowVolume();
             }
         }
         mPreparedForShadowVolumes = true;
@@ -2158,14 +2213,25 @@ namespace v1 {
         size_t ret = 0;
         unsigned short i;
         // Shared vertices
-        if (sharedVertexData)
+        if (sharedVertexData[0])
         {
             for (i = 0;
-                i < sharedVertexData->vertexBufferBinding->getBufferCount();
+                i < sharedVertexData[0]->vertexBufferBinding->getBufferCount();
                 ++i)
             {
-                ret += sharedVertexData->vertexBufferBinding
+                ret += sharedVertexData[0]->vertexBufferBinding
                     ->getBuffer(i)->getSizeInBytes();
+            }
+
+            if (sharedVertexData[0] != sharedVertexData[1])
+            {
+                for (i = 0;
+                    i < sharedVertexData[1]->vertexBufferBinding->getBufferCount();
+                    ++i)
+                {
+                    ret += sharedVertexData[1]->vertexBufferBinding
+                        ->getBuffer(i)->getSizeInBytes();
+                }
             }
         }
 
@@ -2176,17 +2242,31 @@ namespace v1 {
             if (!(*si)->useSharedVertices)
             {
                 for (i = 0;
-                    i < (*si)->vertexData->vertexBufferBinding->getBufferCount();
+                    i < (*si)->vertexData[0]->vertexBufferBinding->getBufferCount();
                     ++i)
                 {
-                    ret += (*si)->vertexData->vertexBufferBinding
+                    ret += (*si)->vertexData[0]->vertexBufferBinding
                         ->getBuffer(i)->getSizeInBytes();
                 }
+
+                if( (*si)->vertexData[0] != (*si)->vertexData[1] )
+                {
+                    for (i = 0;
+                         i < (*si)->vertexData[1]->vertexBufferBinding->getBufferCount();
+                         ++i)
+                    {
+                        ret += (*si)->vertexData[1]->vertexBufferBinding
+                                ->getBuffer(i)->getSizeInBytes();
+                    }
+                }
             }
-            if (!(*si)->indexData->indexBuffer.isNull())
+            if (!(*si)->indexData[0]->indexBuffer.isNull())
             {
                 // Index data
-                ret += (*si)->indexData->indexBuffer->getSizeInBytes();
+                ret += (*si)->indexData[0]->indexBuffer->getSizeInBytes();
+
+                if( (*si)->indexData[0] != (*si)->indexData[1] )
+                    ret += (*si)->indexData[1]->indexBuffer->getSizeInBytes();
             }
 
         }
@@ -2398,11 +2478,11 @@ namespace v1 {
     {
         if (handle == 0)
         {
-            return sharedVertexData;
+            return sharedVertexData[0];
         }
         else
         {
-            return getSubMesh(handle-1)->vertexData;
+            return getSubMesh(handle-1)->vertexData[0];
         }
     }
     //---------------------------------------------------------------------

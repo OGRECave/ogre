@@ -78,16 +78,18 @@ namespace v1 {
         RenderOperation::OperationType operationType;
 
         /** Dedicated vertex data (only valid if useSharedVertices = false).
+            [0] is for the regular pass, [1] is for the caster. Note that
+            vertexData[0] = vertexData[1] is possible.
             @remarks
                 This data is completely owned by this submesh.
             @par
                 The use of shared or non-shared buffers is determined when
                 model data is converted to the OGRE .mesh format.
         */
-        VertexData *vertexData;
+        VertexData *vertexData[2];
 
         /// Face index data
-        IndexData *indexData;
+        IndexData *indexData[2];
 
         /** Dedicated index map for translate blend index to bone index (only valid if useSharedVertices = false).
             @remarks
@@ -152,7 +154,7 @@ namespace v1 {
             @param
                 lodIndex The index of the LOD to use. 
         */
-        void _getRenderOperation(RenderOperation& rend, ushort lodIndex = 0);
+        void _getRenderOperation(RenderOperation& rend, ushort lodIndex, bool casterPass);
 
         /** Assigns a vertex to a bone with a given weight, for skeletal animation. 
         @remarks    

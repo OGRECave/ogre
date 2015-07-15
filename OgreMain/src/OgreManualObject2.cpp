@@ -688,7 +688,8 @@ namespace Ogre {
 
             mCurrentSection->mVao = vaoManager->createVertexArrayObject(vertexBuffers, indexBuffer, mCurrentSection->mOperationType);
 
-            mCurrentSection->mVaoPerLod.push_back(mCurrentSection->mVao);
+            mCurrentSection->mVaoPerLod[0].push_back(mCurrentSection->mVao);
+            mCurrentSection->mVaoPerLod[1].push_back(mCurrentSection->mVao);
             mCurrentSection->setDatablock(mCurrentDatablockName);
 
             mRenderables.push_back(mCurrentSection);
@@ -858,7 +859,8 @@ namespace Ogre {
         }
 
         mVao = 0;
-        mVaoPerLod.clear();
+        mVaoPerLod[0].clear();
+        mVaoPerLod[1].clear();
     }
     //-----------------------------------------------------------------------------
     ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
@@ -873,7 +875,7 @@ namespace Ogre {
         clear();
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::ManualObjectSection::getRenderOperation(v1::RenderOperation& op)
+    void ManualObject::ManualObjectSection::getRenderOperation(v1::RenderOperation& op, bool casterPass)
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "ManualObject does not implement getRenderOperation. "

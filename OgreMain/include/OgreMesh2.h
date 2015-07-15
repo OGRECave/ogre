@@ -402,6 +402,24 @@ namespace Ogre {
             normal mapping).
         */
         void importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords, bool qTangents );
+
+        /// When this bool is false, prepareForShadowMapping will use the same Vaos for
+        /// both regular and shadow mapping rendering. When it's true, it will
+        /// calculate an optimized version to speed up shadow map rendering (uses a bit
+        /// more GPU VRAM).
+        /// Large meshes can take long to optimize thus it is recommended to
+        /// perform this offline and save it into the mesh file.
+        /// It's off by default.
+        ///
+        /// @see Ogre::Mesh::msOptimizeForShadowMapping for the v2 version
+        /// @see Ogre::v1::Mesh::msOptimizeForShadowMapping for the v1 version
+        static bool msOptimizeForShadowMapping;
+
+        void prepareForShadowMapping( bool forceSameBuffers );
+
+        /// Returns true if the mesh is ready for rendering with valid shadow mapping Vaos
+        /// Otherwise prepareForShadowMapping must be called on this mesh.
+        bool hasValidShadowMappingVaos(void) const;
     };
 
     /** @} */

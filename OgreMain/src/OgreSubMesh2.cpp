@@ -37,6 +37,8 @@ THE SOFTWARE.
 
 #include "Vao/OgreVaoManager.h"
 
+#include "OgreVertexShadowMapHelper.h"
+
 namespace Ogre {
     //-----------------------------------------------------------------------
     SubMesh::SubMesh() :
@@ -47,37 +49,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
     {
-        typedef set<VertexBufferPacked*>::type VertexBufferPackedSet;
-        VertexBufferPackedSet destroyedBuffers;
-
-        VertexArrayObjectArray::const_iterator itor = mVao.begin();
-        VertexArrayObjectArray::const_iterator end  = mVao.end();
-        while( itor != end )
-        {
-            VertexArrayObject *vao = *itor;
-
-            VaoManager *vaoManager = mParent->mVaoManager;
-            const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
-            VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
-            VertexBufferPackedVec::const_iterator enBuffers = vertexBuffers.end();
-
-            //If LOD share the same buffers, we'll try to destroy the buffers only once.
-            while( itBuffers != enBuffers )
-            {
-                std::pair<VertexBufferPackedSet::iterator, bool> bufferNotSeenYet =
-                                                        destroyedBuffers.insert( *itBuffers );
-                if( bufferNotSeenYet.second )
-                    vaoManager->destroyVertexBuffer( *itBuffers );
-
-                ++itBuffers;
-            }
-
-            if( vao->getIndexBuffer() )
-                vaoManager->destroyIndexBuffer( vao->getIndexBuffer() );
-            vaoManager->destroyVertexArrayObject( vao );
-
-            ++itor;
-        }
+        destroyShadowMappingVaos();
+        destroyVaos( mVao[0] );
     }
     //-----------------------------------------------------------------------
     void SubMesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
@@ -277,7 +250,7 @@ namespace Ogre {
         //Create the vertex buffer
         bool keepAsShadow = mParent->mVertexBufferShadowBuffer;
         VertexBufferPacked *vertexBuffer = vaoManager->createVertexBuffer( vertexElements,
-                                                        subMesh->vertexData->vertexCount,
+                                                        subMesh->vertexData[0]->vertexCount,
                                                         mParent->mVertexBufferDefaultType,
                                                         data, keepAsShadow );
         vertexBuffers.push_back( vertexBuffer );
@@ -285,10 +258,14 @@ namespace Ogre {
         if( keepAsShadow ) //Don't free the pointer ourselves
             dataPtrContainer.ptr = 0;
 
-        IndexBufferPacked *indexBuffer = importFromV1( subMesh->indexData );
+        IndexBufferPacked *indexBuffer = importFromV1( subMesh->indexData[0] );
 
-        mVao.push_back( vaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
-                                                             subMesh->operationType ) );
+        {
+            VertexArrayObject *vao = vaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
+                                                                          subMesh->operationType );
+            mVao[0].push_back( vao );
+            mVao[1].push_back( vao );
+        }
 
         //Now deal with the automatic LODs
         v1::SubMesh::LODFaceList::const_iterator itor = subMesh->mLodFaceList.begin();
@@ -298,8 +275,11 @@ namespace Ogre {
         {
             IndexBufferPacked *lodIndexBuffer = importFromV1( *itor );
 
-            mVao.push_back( vaoManager->createVertexArrayObject( vertexBuffers, lodIndexBuffer,
-                                                                 subMesh->operationType ) );
+            VertexArrayObject *vao = vaoManager->createVertexArrayObject( vertexBuffers, lodIndexBuffer,
+                                                                          subMesh->operationType );
+
+            mVao[0].push_back( vao );
+            mVao[1].push_back( vao );
             ++itor;
         }
     }
@@ -357,7 +337,7 @@ namespace Ogre {
         v1::VertexElement const *tangentElement  = 0;
         v1::VertexElement const *binormalElement = 0;
 
-        v1::VertexData *vertexData = subMesh->vertexData;
+        v1::VertexData *vertexData = subMesh->vertexData[0];
 
         {
             //Get an AZDO-friendly vertex declaration out of the original declaration.
@@ -579,5 +559,60 @@ namespace Ogre {
             outVertexElements->swap( vertexElements );
 
         return data;
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::destroyVaos( VertexArrayObjectArray &vaos )
+    {
+        typedef set<VertexBufferPacked*>::type VertexBufferPackedSet;
+        VertexBufferPackedSet destroyedBuffers;
+
+        VertexArrayObjectArray::const_iterator itor = vaos.begin();
+        VertexArrayObjectArray::const_iterator end  = vaos.end();
+        while( itor != end )
+        {
+            VertexArrayObject *vao = *itor;
+
+            VaoManager *vaoManager = mParent->mVaoManager;
+            const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
+            VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
+            VertexBufferPackedVec::const_iterator enBuffers = vertexBuffers.end();
+
+            //If LOD share the same buffers, we'll try to destroy the buffers only once.
+            while( itBuffers != enBuffers )
+            {
+                std::pair<VertexBufferPackedSet::iterator, bool> bufferNotSeenYet =
+                                                        destroyedBuffers.insert( *itBuffers );
+                if( bufferNotSeenYet.second )
+                    vaoManager->destroyVertexBuffer( *itBuffers );
+
+                ++itBuffers;
+            }
+
+            if( vao->getIndexBuffer() )
+                vaoManager->destroyIndexBuffer( vao->getIndexBuffer() );
+            vaoManager->destroyVertexArrayObject( vao );
+
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::destroyShadowMappingVaos(void)
+    {
+        if( mVao[0].empty() || mVao[1].empty() || mVao[0][0] == mVao[1][0] )
+            mVao[1].clear(); //Using the same Vaos for both shadow mapping and regular rendering
+
+        destroyVaos( mVao[1] );
+
+        mVao[1].reserve( mVao[0].size() );
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::_prepareForShadowMapping( bool forceSameBuffers )
+    {
+        destroyShadowMappingVaos();
+
+        if( !forceSameBuffers && Mesh::msOptimizeForShadowMapping )
+            VertexShadowMapHelper::optimizeForShadowMapping( mParent->mVaoManager, mVao[0], mVao[1] );
+        else
+            VertexShadowMapHelper::useSameVaos( mVao[0], mVao[1] );
     }
 }

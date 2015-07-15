@@ -74,7 +74,7 @@ namespace v1
         /** See Renderable. */
         const MaterialPtr& getMaterial(void) const;
         /** See Renderable. */
-        void getRenderOperation(v1::RenderOperation& op);
+        void getRenderOperation(v1::RenderOperation& op, bool casterPass);
         /** Overridden from OverlayElement */
         void setMaterialName(const String& matName);
 

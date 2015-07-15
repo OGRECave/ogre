@@ -990,7 +990,7 @@ namespace Ogre {
     }
 #endif
     //-----------------------------------------------------------------------
-    void Frustum::getRenderOperation(v1::RenderOperation& op)
+    void Frustum::getRenderOperation(v1::RenderOperation& op, bool casterPass)
     {
         updateVertexData();
         op.operationType = v1::RenderOperation::OT_LINE_LIST;

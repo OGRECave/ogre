@@ -233,7 +233,7 @@ namespace v1
         xform->makeTransform( mPosition, mScale, mOrientation );
     }
     //-----------------------------------------------------------------------------------
-    void Rectangle2D::getRenderOperation(RenderOperation& op)
+    void Rectangle2D::getRenderOperation( RenderOperation& op, bool casterPass )
     {
         op = mRenderOp;
     }

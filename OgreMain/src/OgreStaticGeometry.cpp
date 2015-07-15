@@ -338,7 +338,7 @@ namespace v1 {
             IndexData *lodIndexData;
             if (lod == 0)
             {
-                lodIndexData = sm->indexData;
+                lodIndexData = sm->indexData[0];
             }
             else
             {
@@ -350,13 +350,13 @@ namespace v1 {
                 if (sm->parent->getNumSubMeshes() == 1)
                 {
                     // Ok, this is actually our own anyway
-                    geomLink.vertexData = sm->parent->sharedVertexData;
+                    geomLink.vertexData = sm->parent->sharedVertexData[0];
                     geomLink.indexData = lodIndexData;
                 }
                 else
                 {
                     // We have to split it
-                    splitGeometry(sm->parent->sharedVertexData,
+                    splitGeometry(sm->parent->sharedVertexData[0],
                         lodIndexData, &geomLink);
                 }
             }
@@ -366,13 +366,13 @@ namespace v1 {
                 {
                     // Ok, we can use the existing geometry; should be in full
                     // use by just this SubMesh
-                    geomLink.vertexData = sm->vertexData;
-                    geomLink.indexData = sm->indexData;
+                    geomLink.vertexData = sm->vertexData[0];
+                    geomLink.indexData = sm->indexData[0];
                 }
                 else
                 {
                     // We have to split it
-                    splitGeometry(sm->vertexData,
+                    splitGeometry(sm->vertexData[0],
                         lodIndexData, &geomLink);
                 }
             }
@@ -1218,7 +1218,7 @@ namespace v1 {
         return mParent->getCurrentTechnique();
     }
     //--------------------------------------------------------------------------
-    void StaticGeometry::GeometryBucket::getRenderOperation(RenderOperation& op)
+    void StaticGeometry::GeometryBucket::getRenderOperation(RenderOperation& op, bool casterPass)
     {
         op.indexData = mIndexData;
         op.operationType = RenderOperation::OT_TRIANGLE_LIST;

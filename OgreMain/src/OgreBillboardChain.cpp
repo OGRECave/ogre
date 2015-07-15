@@ -723,7 +723,7 @@ namespace v1 {
         }
 	}
 	//-----------------------------------------------------------------------
-	void BillboardChain::getRenderOperation(RenderOperation& op)
+    void BillboardChain::getRenderOperation(RenderOperation& op, bool casterPass)
 	{
 		op.indexData = mIndexData;
 		op.operationType = RenderOperation::OT_TRIANGLE_LIST;

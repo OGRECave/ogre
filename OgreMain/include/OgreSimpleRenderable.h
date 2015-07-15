@@ -70,7 +70,7 @@ namespace v1 {
         virtual const MaterialPtr& getMaterial(void) const;
 
         virtual void setRenderOperation( const RenderOperation& rend );
-        virtual void getRenderOperation(RenderOperation& op);
+        virtual void getRenderOperation(RenderOperation& op, bool casterPass);
 
         void setWorldTransform( const Matrix4& xform );
         virtual void getWorldTransforms( Matrix4* xform ) const;

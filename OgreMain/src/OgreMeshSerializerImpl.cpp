@@ -125,6 +125,9 @@ namespace v1 {
             streamID = readChunk(stream);
         }
         popInnerChunk(stream);
+
+        if( !pMesh->hasValidShadowMappingBuffers() )
+            pMesh->prepareForShadowMapping( false );
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeMesh(const Mesh* pMesh)
@@ -141,8 +144,8 @@ namespace v1 {
             pushInnerChunk(mStream);
             
         // Write shared geometry
-        if (pMesh->sharedVertexData)
-            writeGeometry(pMesh->sharedVertexData);
+        if (pMesh->sharedVertexData[0])
+            writeGeometry(pMesh->sharedVertexData[0]);
 
         // Write Submeshes
         for (unsigned short i = 0; i < pMesh->getNumSubMeshes(); ++i)
@@ -254,28 +257,28 @@ namespace v1 {
         // bool useSharedVertices
         writeBools(&s->useSharedVertices, 1);
 
-        unsigned int indexCount = static_cast<unsigned int>(s->indexData->indexCount);
+        unsigned int indexCount = static_cast<unsigned int>(s->indexData[0]->indexCount);
         writeInts(&indexCount, 1);
 
         // bool indexes32Bit
-        bool idx32bit = (!s->indexData->indexBuffer.isNull() &&
-            s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+        bool idx32bit = (!s->indexData[0]->indexBuffer.isNull() &&
+            s->indexData[0]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
         writeBools(&idx32bit, 1);
 
         if (indexCount > 0)
         {
             // unsigned short* faceVertexIndices ((indexCount)
-            HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
+            HardwareIndexBufferSharedPtr ibuf = s->indexData[0]->indexBuffer;
             void* pIdx = ibuf->lock(HardwareBuffer::HBL_READ_ONLY);
             if (idx32bit)
             {
                 unsigned int* pIdx32 = static_cast<unsigned int*>(pIdx);
-                writeInts(pIdx32, s->indexData->indexCount);
+                writeInts(pIdx32, s->indexData[0]->indexCount);
             }
             else
             {
                 unsigned short* pIdx16 = static_cast<unsigned short*>(pIdx);
-                writeShorts(pIdx16, s->indexData->indexCount);
+                writeShorts(pIdx16, s->indexData[0]->indexCount);
             }
             ibuf->unlock();
         }
@@ -285,7 +288,7 @@ namespace v1 {
         // M_GEOMETRY stream (Optional: present only if useSharedVertices = false)
         if (!s->useSharedVertices)
         {
-            writeGeometry(s->vertexData);
+            writeGeometry(s->vertexData[0]);
         }
 
         // write out texture alias chunks
@@ -529,9 +532,9 @@ namespace v1 {
         size += sizeof(bool);
 
         // Geometry
-        if (pMesh->sharedVertexData)
+        if (pMesh->sharedVertexData[0])
         {
-            size += calcGeometrySize(pMesh->sharedVertexData);
+            size += calcGeometrySize(pMesh->sharedVertexData[0]);
         }
 
         // Submeshes
@@ -595,18 +598,18 @@ namespace v1 {
         // bool indexes32bit
         size += sizeof(bool);
 
-        bool idx32bit = (!pSub->indexData->indexBuffer.isNull() &&
-            pSub->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+        bool idx32bit = (!pSub->indexData[0]->indexBuffer.isNull() &&
+            pSub->indexData[0]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
         // unsigned int* / unsigned short* faceVertexIndices
         if (idx32bit)
-            size += sizeof(unsigned int) * pSub->indexData->indexCount;
+            size += sizeof(unsigned int) * pSub->indexData[0]->indexCount;
         else
-            size += sizeof(unsigned short) * pSub->indexData->indexCount;
+            size += sizeof(unsigned short) * pSub->indexData[0]->indexCount;
 
         // Geometry
         if (!pSub->useSharedVertices)
         {
-            size += calcGeometrySize(pSub->vertexData);
+            size += calcGeometrySize(pSub->vertexData[0]);
         }
 
         size += calcSubMeshTextureAliasesSize(pSub);
@@ -924,17 +927,22 @@ namespace v1 {
                 switch(streamID)
                 {
                 case M_GEOMETRY:
-                    pMesh->sharedVertexData = OGRE_NEW VertexData();
+                    pMesh->sharedVertexData[0] = OGRE_NEW VertexData();
                     try {
-                        readGeometry(stream, pMesh, pMesh->sharedVertexData);
+                        readGeometry(stream, pMesh, pMesh->sharedVertexData[0]);
                     }
                     catch (Exception& e)
                     {
                         if (e.getNumber() == Exception::ERR_ITEM_NOT_FOUND)
                         {
+                            if( pMesh->sharedVertexData[0] == pMesh->sharedVertexData[1] )
+                                pMesh->sharedVertexData[1] = 0;
+
                             // duff geometry data entry with 0 vertices
-                            OGRE_DELETE pMesh->sharedVertexData;
-                            pMesh->sharedVertexData = 0;
+                            OGRE_DELETE pMesh->sharedVertexData[0];
+                            OGRE_DELETE pMesh->sharedVertexData[1];
+                            pMesh->sharedVertexData[0] = 0;
+                            pMesh->sharedVertexData[1] = 0;
                             // Skip this stream (pointer will have been returned to just after header)
                             stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
                         }
@@ -1007,10 +1015,10 @@ namespace v1 {
         // bool useSharedVertices
         readBools(stream,&sm->useSharedVertices, 1);
 
-        sm->indexData->indexStart = 0;
+        sm->indexData[0]->indexStart = 0;
         unsigned int indexCount = 0;
         readInts(stream, &indexCount, 1);
-        sm->indexData->indexCount = indexCount;
+        sm->indexData[0]->indexCount = indexCount;
 
         HardwareIndexBufferSharedPtr ibuf;
         // bool indexes32Bit
@@ -1023,14 +1031,14 @@ namespace v1 {
                 ibuf = HardwareBufferManager::getSingleton().
                     createIndexBuffer(
                         HardwareIndexBuffer::IT_32BIT,
-                        sm->indexData->indexCount,
+                        sm->indexData[0]->indexCount,
                         pMesh->mIndexBufferUsage,
                         pMesh->mIndexBufferShadowBuffer);
                 // unsigned int* faceVertexIndices
                 unsigned int* pIdx = static_cast<unsigned int*>(
                     ibuf->lock(HardwareBuffer::HBL_DISCARD)
                     );
-                readInts(stream, pIdx, sm->indexData->indexCount);
+                readInts(stream, pIdx, sm->indexData[0]->indexCount);
                 ibuf->unlock();
 
             }
@@ -1039,18 +1047,18 @@ namespace v1 {
                 ibuf = HardwareBufferManager::getSingleton().
                     createIndexBuffer(
                         HardwareIndexBuffer::IT_16BIT,
-                        sm->indexData->indexCount,
+                        sm->indexData[0]->indexCount,
                         pMesh->mIndexBufferUsage,
                         pMesh->mIndexBufferShadowBuffer);
                 // unsigned short* faceVertexIndices
                 unsigned short* pIdx = static_cast<unsigned short*>(
                     ibuf->lock(HardwareBuffer::HBL_DISCARD)
                     );
-                readShorts(stream, pIdx, sm->indexData->indexCount);
+                readShorts(stream, pIdx, sm->indexData[0]->indexCount);
                 ibuf->unlock();
             }
         }
-        sm->indexData->indexBuffer = ibuf;
+        sm->indexData[0]->indexBuffer = ibuf;
 
         pushInnerChunk(stream);
         {
@@ -1063,8 +1071,8 @@ namespace v1 {
                 OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Missing geometry data in mesh file",
                     "MeshSerializerImpl::readSubMesh");
             }
-            sm->vertexData = OGRE_NEW VertexData();
-            readGeometry(stream, pMesh, sm->vertexData);
+            sm->vertexData[0] = OGRE_NEW VertexData();
+            readGeometry(stream, pMesh, sm->vertexData[0]);
         }
 
 
@@ -1925,22 +1933,22 @@ namespace v1 {
                         // Populate edgeGroup.vertexData pointers
                         // If there is shared vertex data, vertexSet 0 is that,
                         // otherwise 0 is first dedicated
-                        if (pMesh->sharedVertexData)
+                        if (pMesh->sharedVertexData[0])
                         {
                             if (edgeGroup.vertexSet == 0)
                             {
-                                edgeGroup.vertexData = pMesh->sharedVertexData;
+                                edgeGroup.vertexData = pMesh->sharedVertexData[0];
                             }
                             else
                             {
                                 edgeGroup.vertexData = pMesh->getSubMesh(
-                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData;
+                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData[0];
                             }
                         }
                         else
                         {
                             edgeGroup.vertexData = pMesh->getSubMesh(
-                                (unsigned short)edgeGroup.vertexSet)->vertexData;
+                                (unsigned short)edgeGroup.vertexSet)->vertexData[0];
                         }
                     }
                 }

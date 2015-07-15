@@ -317,7 +317,7 @@ namespace v1 {
             The use of shared or non-shared buffers is determined when
             model data is converted to the OGRE .mesh format.
         */
-        VertexData *sharedVertexData;
+        VertexData *sharedVertexData[2];
 
         /** Shared index map for translating blend index to bone index.
         @remarks
@@ -651,6 +651,15 @@ namespace v1 {
             successful merges.
         */
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
+
+        /// @copydoc Mesh::msOptimizeForShadowMapping
+        static bool msOptimizeForShadowMapping;
+
+        void prepareForShadowMapping( bool forceSameBuffers );
+
+        /// Returns true if the mesh is ready for rendering with valid shadow mapping buffers
+        /// Otherwise prepareForShadowMapping must be called on this mesh.
+        bool hasValidShadowMappingBuffers(void) const;
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

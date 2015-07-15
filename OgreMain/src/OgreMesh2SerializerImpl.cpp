@@ -94,7 +94,7 @@ namespace Ogre {
 
         for (uint16 i = 0; i < pMesh->getNumSubMeshes(); ++i)
         {
-            if( pMesh->getSubMesh(i)->mVao.empty() )
+            if( pMesh->getSubMesh(i)->mVao[0].empty() )
             {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The Mesh you have supplied does not have all"
                     " of its submeshes properfly initialized. Initialize their vertex buffers "
@@ -139,6 +139,9 @@ namespace Ogre {
             }
         }
         popInnerChunk(stream);
+
+        if( !pMesh->hasValidShadowMappingVaos() )
+            pMesh->prepareForShadowMapping( false );
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeMesh(const Mesh* pMesh)
@@ -152,7 +155,7 @@ namespace Ogre {
         {
             const SubMesh *s = pMesh->getSubMesh( i );
 
-            size_t numLodLevels = s->mVao.size();
+            size_t numLodLevels = s->mVao[0].size();
             lodVertexTable[i].reserve( numLodLevels );
             lodVertexTable[i].push_back( 0 );
 
@@ -161,7 +164,7 @@ namespace Ogre {
                 for( uint8 j=0; j<lodLevel && lodVertexTable[i].size() == lodLevel; ++j )
                 {
                     //Find if a previous LOD already uses these vertex buffers.
-                    if( s->mVao[lodLevel]->getVertexBuffers() == s->mVao[j]->getVertexBuffers() )
+                    if( s->mVao[0][lodLevel]->getVertexBuffers() == s->mVao[0][j]->getVertexBuffers() )
                         lodVertexTable[i].push_back( j );
                 }
 
@@ -262,11 +265,11 @@ namespace Ogre {
         // char* materialName
         writeString(s->getMaterialName());
 
-        uint8 numLodLevels = static_cast<uint8>( s->mVao.size() );
+        uint8 numLodLevels = static_cast<uint8>( s->mVao[0].size() );
         writeData( &numLodLevels, 1, 1 );
 
         for( uint8 lodLevel=0; lodLevel<numLodLevels; ++lodLevel )
-            writeSubMeshLod( s->mVao[lodLevel], lodLevel, lodVertexTable[lodLevel] );
+            writeSubMeshLod( s->mVao[0][lodLevel], lodLevel, lodVertexTable[lodLevel] );
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSubMeshLod( const VertexArrayObject *vao, uint8 lodLevel,
@@ -538,8 +541,8 @@ namespace Ogre {
         // uint8 numLodLevels
         size += sizeof(uint8);
 
-        for( uint8 lodLevel=0; lodLevel<pSub->mVao.size(); ++lodLevel )
-            size += calcSubMeshLodSize( pSub->mVao[lodLevel], lodVertexTable[lodLevel] != lodLevel );
+        for( uint8 lodLevel=0; lodLevel<pSub->mVao[0].size(); ++lodLevel )
+            size += calcSubMeshLodSize( pSub->mVao[0][lodLevel], lodVertexTable[lodLevel] != lodLevel );
 
         return size;
     }
@@ -818,7 +821,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::createSubMeshVao( SubMesh *sm, const SubMeshLodVec &submeshLods )
     {
-        sm->mVao.reserve( submeshLods.size() );
+        sm->mVao[0].reserve( submeshLods.size() );
 
         VertexBufferPackedVec vertexBuffers;
         for( size_t i=0; i<submeshLods.size(); ++i )
@@ -864,7 +867,7 @@ namespace Ogre {
             }
             else
             {
-                vertexBuffers = sm->mVao[subMeshLod.lodSource]->getVertexBuffers();
+                vertexBuffers = sm->mVao[0][subMeshLod.lodSource]->getVertexBuffers();
             }
 
             IndexBufferPacked *indexBuffer = 0;
@@ -877,8 +880,10 @@ namespace Ogre {
                                     subMeshLod.indexData, true );
             }
 
-            sm->mVao.push_back( mVaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
-                                                                      subMeshLod.operationType ) );
+            VertexArrayObject *vao = mVaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
+                                                                           subMeshLod.operationType );
+
+            sm->mVao[0].push_back( vao );
         }
     }
     //---------------------------------------------------------------------
@@ -1450,7 +1455,7 @@ namespace Ogre {
                         // Populate edgeGroup.vertexData pointers
                         // If there is shared vertex data, vertexSet 0 is that,
                         // otherwise 0 is first dedicated
-                        if (pMesh->sharedVertexData)
+                        if (pMesh->sharedVertexData[0])
                         {
                             if (edgeGroup.vertexSet == 0)
                             {
