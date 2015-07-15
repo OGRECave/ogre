@@ -18,5 +18,5 @@ void main()
 
 	c = step(c, 0.5);
 
-	fragColour = vec4( c.xxx, 1.0 );
+	fragColour = vec4( c, c, c, 1.0 );
 }

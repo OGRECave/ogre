@@ -1,0 +1,220 @@
+abstract target discardTarget
+{
+	pass clear
+	{
+		discard_only yes
+	}
+}
+
+compositor_node HdrRenderingNode
+{
+	texture rt0 target_width target_height PF_FLOAT16_RGBA
+
+	target rt0
+	{
+		pass clear
+		{
+			//colour_value 0.2 0.4 0.6 1
+			colour_value 6.667 13.333 20 1
+			//colour_value 13.333 26.667 40 1
+		}
+
+		pass render_scene
+		{
+			//lod_update_list	off					//Turn Lod off?
+			shadows				ShadowMapDebuggingShadowNode
+			overlays			off
+		}
+	}
+	
+	out 0 rt0
+}
+
+compositor_node HdrPostprocessingNode
+{
+	in 0 rt0
+	in 1 rt_output
+	
+	//For maximum quality use these as FLOAT16_RGBA, however they're slower on
+	//AMD cards (0.748ms slower on AMD Radeon HD 7770 at 1920x1080).
+	//texture rtBlur0	256 256 PF_FLOAT16_RGBA	depth_pool 0
+	//texture rtBlur1	256 256 PF_FLOAT16_RGBA	depth_pool 0
+
+	texture rtBlur0	256 256 PF_A2R10G10B10	depth_pool 0
+	texture rtBlur1	256 256 PF_A2R10G10B10	depth_pool 0
+
+	texture lumRt0	  1   1 PF_FLOAT16_R	depth_pool 0
+	texture lumRt1	  1   1 PF_FLOAT16_R	depth_pool 0
+	texture rtIter0	 64  64 PF_FLOAT16_R	depth_pool 0
+	texture rtIter1	 16  16 PF_FLOAT16_R	depth_pool 0
+	texture rtIter2	  4   4 PF_FLOAT16_R	depth_pool 0
+
+	//Calculate luminosity
+	target rtIter0 : discardTarget
+	{
+		pass render_quad
+		{
+			material	HDR/DownScale01_SumLumStart
+			input		0	rt0
+		}
+	}
+	
+	target rtIter1 : discardTarget
+	{
+		pass render_quad
+		{
+			material	HDR/DownScale02_SumLumIterative
+			input		0	rtIter0
+		}
+	}
+	
+	target rtIter2 : discardTarget
+	{
+		pass render_quad
+		{
+			material	HDR/DownScale02_SumLumIterative
+			input		0	rtIter1
+		}
+	}
+	
+	//Initialize lumRt1 at startup, to avoid NaNs.
+	target lumRt1
+	{
+		pass clear
+		{
+			num_initial 1
+			colour_value 0.01 0.01 0.01 1
+		}
+	}
+	
+	target lumRt0
+	{
+		pass render_quad
+		{
+			material	HDR/DownScale03_SumLumEnd
+			input		0	rtIter2
+			input		1	lumRt1
+		}
+	}
+	
+	target lumRt1
+	{
+		pass render_quad
+		{
+			material	Ogre/Copy/1xFP32
+			input		0	lumRt0
+		}
+	}
+
+	//Perform Bloom	
+	target rtBlur0 : discardTarget
+	{
+		pass render_quad
+		{
+			material	HDR/BrightPass_Start
+			input		0	rt0
+			input		1	lumRt0
+		}
+	}
+	
+	target rtBlur1 : discardTarget
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurH
+			input		0	rtBlur0
+		}
+	}
+	
+	target rtBlur0
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurV
+			input		0	rtBlur1
+		}
+	}
+	
+	target rtBlur1
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurH
+			input		0	rtBlur0
+		}
+	}
+	
+	target rtBlur0
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurV
+			input		0	rtBlur1
+		}
+	}
+	
+	target rtBlur1
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurH
+			input		0	rtBlur0
+		}
+	}
+	
+	target rtBlur0
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurH
+			input		0	rtBlur1
+		}
+	}
+	
+	target rtBlur1
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurH
+			input		0	rtBlur0
+		}
+	}
+	
+	target rtBlur0
+	{
+		pass render_quad
+		{
+			material	HDR/BoxBlurH
+			input		0	rtBlur1
+		}
+	}
+
+	target rt_output : discardTarget
+	{
+		pass render_quad
+		{
+			material	HDR/FinalToneMapping
+			input		0	rt0
+			input		1	lumRt0
+			input		2	rtBlur0
+		}
+		
+		pass render_scene
+		{
+			lod_update_list	off
+
+			//Render Overlays
+			overlays	on
+			rq_first	254
+			rq_last		255
+		}
+	}
+	
+	out 0 rt0
+}
+
+workspace HdrWorkspace
+{
+	connect HdrRenderingNode 0 HdrPostprocessingNode 0
+	connect_output HdrPostprocessingNode 1
+}

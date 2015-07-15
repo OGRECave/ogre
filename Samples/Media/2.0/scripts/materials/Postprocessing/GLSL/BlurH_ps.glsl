@@ -12,17 +12,17 @@ in block
 	vec2 uv0;
 } inPs;
 
-float offsets[11]  =
-{
+float offsets[11]  = float[11]
+(
 	-5.0, -4.0, -3.0, -2.0, -1.0,
 	 0.0,
 	 1.0,  2.0,  3.0,  4.0,  5.0
-};
+);
 
 //We use the Normal-gauss distribution formula
 //f(x) being the formula, we used f(0.5)-f(-0.5); f(1.5)-f(0.5)...
-float samples[11] =
-{//stddev=2.0
+float samples[11] = float[11]
+(//stddev=2.0
 	0.01222447,
 	0.02783468,
 	0.06559061,
@@ -36,7 +36,7 @@ float samples[11] =
 	0.06559061,
 	0.02783468,
 	0.01222447
-};
+);
 
 void main()
 {

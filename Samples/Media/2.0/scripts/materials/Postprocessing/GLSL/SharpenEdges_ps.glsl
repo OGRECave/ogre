@@ -12,8 +12,8 @@ in block
 
 void main()
 {
-	const vec2 usedTexelED[8] =
-	{
+	const vec2 usedTexelED[8] = vec2[8]
+	(
 		vec2(-1, -1),
 		vec2( 0, -1),
 		vec2( 1, -1),
@@ -22,7 +22,7 @@ void main()
 		vec2(-1,  1),
 		vec2( 0,  1),
 		vec2( 1,  1)
-	};
+	);
 
 	vec4 cAvgColor = 9.0 * texture( RT, inPs.uv0 );
 

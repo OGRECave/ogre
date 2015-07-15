@@ -538,8 +538,8 @@ namespace Ogre
         case PF_A8B8G8R8:       return DXGI_FORMAT_R8G8B8A8_UNORM;
         case PF_X8R8G8B8:       return DXGI_FORMAT_UNKNOWN;
         case PF_X8B8G8R8:       return DXGI_FORMAT_UNKNOWN;
-        case PF_A2B10G10R10:    return DXGI_FORMAT_R10G10B10A2_TYPELESS;
-        case PF_A2R10G10B10:    return DXGI_FORMAT_UNKNOWN;
+        case PF_A2B10G10R10:    return DXGI_FORMAT_R10G10B10A2_UNORM;
+        case PF_A2R10G10B10:    return DXGI_FORMAT_R10G10B10A2_UNORM;
         case PF_FLOAT16_R:      return DXGI_FORMAT_R16_FLOAT;
         case PF_FLOAT16_RGBA:   return DXGI_FORMAT_R16G16B16A16_FLOAT;
         case PF_FLOAT32_R:      return DXGI_FORMAT_R32_FLOAT;

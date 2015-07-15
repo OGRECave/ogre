@@ -839,7 +839,10 @@ namespace Ogre {
             {
                 VertexBufferPacked * vertexBuffer = *itBuffers;
 
-                vertexBuffer->unmap(UO_UNMAP_ALL);
+                if (vertexBuffer->getMappingState() != Ogre::MS_UNMAPPED)
+                {
+                    vertexBuffer->unmap(UO_UNMAP_ALL);
+                }
 
                 vaoManager->destroyVertexBuffer(vertexBuffer);
 
@@ -850,7 +853,10 @@ namespace Ogre {
 
             if (indexBuffer)
             {
-                indexBuffer->unmap(UO_UNMAP_ALL);
+                if (indexBuffer->getMappingState() != Ogre::MS_UNMAPPED)
+                {
+                    indexBuffer->unmap(UO_UNMAP_ALL);
+                }
 
                 vaoManager->destroyIndexBuffer(indexBuffer);
             }

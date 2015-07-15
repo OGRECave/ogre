@@ -356,7 +356,7 @@ namespace Ogre  {
                 return GL_RGBA8;
         case PF_A2R10G10B10:
         case PF_A2B10G10R10:
-            return GL_RGB10_A2UI;
+            return GL_RGB10_A2;
         case PF_FLOAT16_R:
             return GL_R16F;
         case PF_FLOAT16_RGB:

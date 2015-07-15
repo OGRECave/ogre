@@ -102,7 +102,8 @@ namespace Ogre {
         mutable bool mSpotlightViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable bool mSpotlightWorldViewProjMatrixDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable bool mShadowCamDepthRangesDirty[OGRE_MAX_SIMULTANEOUS_LIGHTS];
-        mutable ColourValue mAmbientLight;
+        mutable ColourValue mAmbientLight[2];
+        mutable Vector3 mAmbientLightHemisphereDir;
         mutable ColourValue mFogColour;
         mutable Vector4 mFogParams;
         mutable int mPassNumber;
@@ -182,7 +183,8 @@ namespace Ogre {
          Real getLightPowerScale(size_t index) const;
          Vector4 getLightAttenuation(size_t index) const;
          Vector4 getSpotlightParams(size_t index) const;
-         void setAmbientLightColour(const ColourValue& ambient);
+         void setAmbientLightColour( const ColourValue hemispheres[2],
+                                     const Vector3 &hemisphereDir );
          const ColourValue& getAmbientLightColour(void) const;
          const ColourValue& getSurfaceAmbientColour(void) const;
          const ColourValue& getSurfaceDiffuseColour(void) const;

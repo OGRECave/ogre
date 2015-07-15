@@ -222,11 +222,6 @@ namespace Ogre
         */
         virtual void shutdown(void);
 
-
-        /** Sets the colour & strength of the ambient (global directionless) light in the world.
-        */
-        virtual void setAmbientLight(float r, float g, float b) = 0;
-
         /** Sets whether or not W-buffers are enabled if they are available for this renderer.
         @param
         enabled If true and the renderer supports them W-buffers will be used.  If false 
@@ -1209,6 +1204,10 @@ namespace Ogre
         virtual void clearFrameBuffer(unsigned int buffers, 
             const ColourValue& colour = ColourValue::Black, 
             Real depth = 1.0f, unsigned short stencil = 0) = 0;
+
+        /// @copydoc Viewport::discard
+        virtual void discardFrameBuffer( unsigned int buffers ) = 0;
+
         /** Returns the horizontal texel offset value required for mapping 
         texel origins to pixel origins in this rendersystem.
         @remarks

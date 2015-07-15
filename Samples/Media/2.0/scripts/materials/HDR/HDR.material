@@ -1,0 +1,364 @@
+//------------------------
+//OpenGL GLSL Definitions
+//------------------------
+fragment_program HDR/DownScale01_SumLumStart_ps_GLSL glsl
+{
+	source DownScale01_SumLumStart_ps.glsl
+	default_params
+	{
+		param_named rt0			int 0
+	}
+}
+
+fragment_program HDR/DownScale02_SumLumIterative_ps_GLSL glsl
+{
+	source DownScale02_SumLumIterative_ps.glsl
+	default_params
+	{
+		param_named lumRt		int 0
+	}
+}
+
+fragment_program HDR/DownScale03_SumLumEnd_ps_GLSL glsl
+{
+	source DownScale03_SumLumEnd_ps.glsl
+	default_params
+	{
+		param_named lumRt		int 0
+		param_named oldLumRt	int 1
+	}
+}
+
+fragment_program HDR/FinalToneMapping_ps_GLSL glsl
+{
+	source FinalToneMapping_ps.glsl
+	
+	default_params
+	{
+		param_named rt0			int 0
+		param_named lumRt		int 1
+		param_named bloomRt		int 2
+	}
+}
+
+fragment_program HDR/BrightPass_Start_ps_GLSL glsl
+{
+	source BrightPass_Start_ps.glsl
+	default_params
+	{
+		param_named rt0			int 0
+		param_named lumRt		int 1
+	}
+}
+
+fragment_program HDR/BoxBlurH_ps_GLSL glsl
+{
+	source BoxBlurH_ps.glsl
+	default_params
+	{
+		param_named Blur0		int 0
+	}
+}
+
+fragment_program HDR/BoxBlurV_ps_GLSL glsl
+{
+	source BoxBlurV_ps.glsl
+	default_params
+	{
+		param_named Blur0		int 0
+	}
+}
+
+//------------------------
+//DirectX 11 HLSL Definitions
+//------------------------
+
+fragment_program HDR/DownScale01_SumLumStart_ps_HLSL hlsl
+{
+	source DownScale01_SumLumStart_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/DownScale02_SumLumIterative_ps_HLSL hlsl
+{
+	source DownScale02_SumLumIterative_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/DownScale03_SumLumEnd_ps_HLSL hlsl
+{
+	source DownScale03_SumLumEnd_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/FinalToneMapping_ps_HLSL hlsl
+{
+	source FinalToneMapping_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/BrightPass_Start_ps_HLSL hlsl
+{
+	source BrightPass_Start_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/BoxBlurH_ps_HLSL hlsl
+{
+	source BoxBlurH_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/BoxBlurV_ps_HLSL hlsl
+{
+	source BoxBlurV_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program HDR/DownScale01_SumLumStart_ps unified
+{
+	delegate HDR/DownScale01_SumLumStart_ps_GLSL
+	delegate HDR/DownScale01_SumLumStart_ps_HLSL
+	
+	default_params
+	{
+		param_named_auto	tex0Size				packed_texture_size 0
+		param_named_auto	viewportSize			viewport_size
+	}
+}
+
+fragment_program HDR/DownScale02_SumLumIterative_ps unified
+{
+	delegate HDR/DownScale02_SumLumIterative_ps_GLSL
+	delegate HDR/DownScale02_SumLumIterative_ps_HLSL
+	
+	default_params
+	{
+		param_named_auto	tex0Size				packed_texture_size 0
+	}
+}
+
+fragment_program HDR/DownScale03_SumLumEnd_ps unified
+{
+	delegate HDR/DownScale03_SumLumEnd_ps_GLSL
+	delegate HDR/DownScale03_SumLumEnd_ps_HLSL
+	
+	default_params
+	{
+		param_named			exposure				float3 138.5833 5 10
+		param_named_auto	tex0Size				packed_texture_size 0
+		param_named_auto	timeSinceLast			frame_time 1
+	}
+}
+
+fragment_program HDR/FinalToneMapping_ps unified
+{
+	delegate HDR/FinalToneMapping_ps_GLSL
+	delegate HDR/FinalToneMapping_ps_HLSL
+}
+
+fragment_program HDR/BrightPass_Start_ps unified
+{
+	delegate HDR/BrightPass_Start_ps_GLSL
+	delegate HDR/BrightPass_Start_ps_HLSL
+	
+	default_params
+	{
+		param_named			brightThreshold			float2 3.0 0.5
+	}
+}
+
+fragment_program HDR/BoxBlurH_ps unified
+{
+	delegate HDR/BoxBlurH_ps_GLSL
+	delegate HDR/BoxBlurH_ps_HLSL
+	
+	default_params
+	{
+		param_named_auto	invTex0Size				inverse_texture_size 0
+	}
+}
+
+fragment_program HDR/BoxBlurV_ps unified
+{
+	delegate HDR/BoxBlurV_ps_GLSL
+	delegate HDR/BoxBlurV_ps_HLSL
+	
+	default_params
+	{
+		param_named_auto	invTex0Size				inverse_texture_size 0
+	}
+}
+
+abstract material HDR/BaseMaterial
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+		}
+	}
+}
+
+material HDR/DownScale01_SumLumStart : HDR/BaseMaterial
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref HDR/DownScale01_SumLumStart_ps
+			{
+			}
+
+			texture_unit rt0
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material HDR/DownScale02_SumLumIterative : HDR/BaseMaterial
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref HDR/DownScale02_SumLumIterative_ps
+			{
+			}
+
+			texture_unit rtIter
+			{
+				filtering bilinear
+			}
+		}
+	}
+}
+
+material HDR/DownScale03_SumLumEnd : HDR/BaseMaterial
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref HDR/DownScale03_SumLumEnd_ps
+			{
+			}
+
+			texture_unit rtIter
+			{
+				filtering bilinear
+			}
+			
+			texture_unit oldLumRt
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material HDR/FinalToneMapping : HDR/BaseMaterial
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref HDR/FinalToneMapping_ps
+			{
+			}
+
+			texture_unit rt0
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+			
+			texture_unit lumRt
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+
+			texture_unit bloomRt
+			{
+				tex_address_mode	clamp
+				filtering bilinear
+			}
+		}
+	}
+}
+
+material HDR/BrightPass_Start : HDR/BaseMaterial
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref HDR/BrightPass_Start_ps
+			{
+			}
+
+			texture_unit rt0
+			{
+				tex_address_mode	clamp
+				filtering bilinear
+			}
+			
+			texture_unit lumRt
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+		}
+	}
+}
+
+material HDR/BoxBlurH : HDR/BaseMaterial
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref HDR/BoxBlurH_ps
+			{
+			}
+
+			texture_unit Blur0
+			{
+				tex_address_mode	clamp
+				filtering bilinear
+			}
+		}
+	}
+}
+
+material HDR/BoxBlurV : HDR/BoxBlurH
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref HDR/BoxBlurV_ps
+			{
+			}
+		}
+	}
+}

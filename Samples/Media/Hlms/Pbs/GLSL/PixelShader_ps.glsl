@@ -207,6 +207,7 @@ vec3 qmul( vec4 q, vec3 v )
 @insertpiece( DeclareBRDF )
 @end
 
+@property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
 void main()
@@ -326,14 +327,17 @@ void main()
 	vec3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
+@property( !ambient_fixed )
 	vec3 finalColour = vec3(0);
+@end @property( ambient_fixed )
+	vec3 finalColour = pass.ambientUpperHemi.xyz * @insertpiece( kD ).xyz;
+@end
 
 	@insertpiece( custom_ps_preLights )
 
 @property( !custom_disable_directional_lights )
 @property( hlms_lights_directional )
-	finalColour += BRDF( pass.lights[0].position, viewDir, NdotV, pass.lights[0].diffuse, pass.lights[0].specular );
-@property( hlms_num_shadow_maps )	finalColour *= fShadow;	//1st directional light's shadow@end
+	finalColour += BRDF( pass.lights[0].position, viewDir, NdotV, pass.lights[0].diffuse, pass.lights[0].specular ) @insertpiece(DarkenWithShadowFirstLight);
 @end
 @foreach( hlms_lights_directional, n, 1 )
 	finalColour += BRDF( pass.lights[@n].position, viewDir, NdotV, pass.lights[@n].diffuse, pass.lights[@n].specular )@insertpiece( DarkenWithShadow );@end
@@ -385,16 +389,32 @@ void main()
 
 @insertpiece( forward3dLighting )
 
-@property( envprobe_map )
+@property( envprobe_map || ambient_hemisphere )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
-	vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz;
-	vec3 envColourD = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, 11.0 ).xyz;
-	@property( !hw_gamma_read )//Gamma to linear space
-	envColourS = envColourS * envColourS;
-	envColourD = envColourD * envColourD;@end
+
+	@property( envprobe_map )
+		vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+		vec3 envColourD = textureLod( texEnvProbeMap, nNormal * pass.invViewMatCubemap, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+		@property( !hw_gamma_read )	//Gamma to linear space
+			envColourS = envColourS * envColourS;
+			envColourD = envColourD * envColourD;
+		@end
+	@end
+	@property( ambient_hemisphere )
+		float ambientWD = dot( pass.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
+		float ambientWS = dot( pass.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
+
+		@property( envprobe_map )
+			envColourS	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
+			envColourD	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
+		@end @property( !envprobe_map )
+			vec3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
+			vec3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
+		@end
+	@end
+
 	@insertpiece( BRDF_EnvMap )
 @end
-
 @property( !hw_gamma_write )
 	//Linear to Gamma space
 	outColour.xyz	= sqrt( finalColour );

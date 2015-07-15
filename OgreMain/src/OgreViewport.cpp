@@ -283,6 +283,23 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
+    void Viewport::discard( unsigned int buffers )
+    {
+        RenderSystem* rs = Root::getSingleton().getRenderSystem();
+        if (rs)
+        {
+            Viewport* currentvp = rs->_getViewport();
+            if (currentvp == this)
+                rs->discardFrameBuffer( buffers );
+            else
+            {
+                rs->_setViewport(this);
+                rs->discardFrameBuffer( buffers );
+                rs->_setViewport(currentvp);
+            }
+        }
+    }
+    //---------------------------------------------------------------------
     void Viewport::getActualDimensions(int &left, int&top, int &width, int &height) const
     {
         left = mActLeft;

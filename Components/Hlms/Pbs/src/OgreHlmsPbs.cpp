@@ -122,6 +122,10 @@ namespace Ogre
     const IdString PbsProperty::Pcf4x4            = IdString( "pcf_4x4" );
     const IdString PbsProperty::PcfIterations     = IdString( "pcf_iterations" );
 
+    const IdString PbsProperty::EnvMapScale       = IdString( "envmap_scale" );
+    const IdString PbsProperty::AmbientFixed      = IdString( "ambient_fixed" );
+    const IdString PbsProperty::AmbientHemisphere = IdString( "ambient_hemisphere" );
+
     const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
     const IdString PbsProperty::FresnelSeparateDiffuse  = IdString( "fresnel_separate_diffuse" );
@@ -204,7 +208,8 @@ namespace Ogre
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
-        mShadowFilter( PCF_3x3 )
+        mShadowFilter( PCF_3x3 ),
+        mAmbientLightMode( AmbientAuto )
     {
         //Override defaults
         mLightGatheringMode = LightGatherForwardPlus;
@@ -570,6 +575,40 @@ namespace Ogre
             }
         }
 
+        AmbientLightMode ambientMode = mAmbientLightMode;
+        ColourValue upperHemisphere = sceneManager->getAmbientLightUpperHemisphere();
+        ColourValue lowerHemisphere = sceneManager->getAmbientLightLowerHemisphere();
+
+        const float envMapScale = upperHemisphere.a;
+        //Ignore alpha channel
+        upperHemisphere.a = lowerHemisphere.a = 1.0;
+
+        if( !casterPass )
+        {
+            if( mAmbientLightMode == AmbientAuto )
+            {
+                if( upperHemisphere == lowerHemisphere )
+                {
+                    if( upperHemisphere == ColourValue::Black )
+                        ambientMode = AmbientNone;
+                    else
+                        ambientMode = AmbientFixed;
+                }
+                else
+                {
+                    ambientMode = AmbientHemisphere;
+                }
+            }
+
+            if( ambientMode == AmbientFixed )
+                setProperty( PbsProperty::AmbientFixed, 1 );
+            if( ambientMode == AmbientHemisphere )
+                setProperty( PbsProperty::AmbientHemisphere, 1 );
+
+            if( envMapScale != 1.0f )
+                setProperty( PbsProperty::EnvMapScale, 1 );
+        }
+
         HlmsCache retVal = Hlms::preparePassHashBase( shadowNode, casterPass,
                                                       dualParaboloid, sceneManager );
 
@@ -623,6 +662,16 @@ namespace Ogre
             //              vec4 shadowRcv[numShadowMaps].invShadowMapSize +
             //mat3 invViewMatCubemap (upgraded to three vec4)
             mapSize += ( 16 + (16 + 2 + 2 + 4) * numShadowMaps + 4 * 3 ) * 4;
+
+            //vec3 ambientUpperHemi + float envMapScale
+            if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere || envMapScale != 1.0f )
+                mapSize += 4 * 4;
+
+            //vec3 ambientLowerHemi + padding + vec3 ambientHemisphereDir + padding
+            if( ambientMode == AmbientHemisphere )
+                mapSize += 8 * 4;
+
+            //float pssmSplitPoints N times.
             mapSize += numPssmSplits * 4;
             mapSize = alignToNextMultiple( mapSize, 16 );
 
@@ -737,6 +786,31 @@ namespace Ogre
                 //Alignment: each row/column is one vec4, despite being 3x3
                 if( !( (i+1) % 3 ) )
                     ++passBufferPtr;
+            }
+
+            //vec3 ambientUpperHemi + padding
+            if( ambientMode == AmbientFixed || ambientMode == AmbientHemisphere || envMapScale != 1.0f )
+            {
+                *passBufferPtr++ = static_cast<float>( upperHemisphere.r );
+                *passBufferPtr++ = static_cast<float>( upperHemisphere.g );
+                *passBufferPtr++ = static_cast<float>( upperHemisphere.b );
+                *passBufferPtr++ = envMapScale;
+            }
+
+            //vec3 ambientLowerHemi + padding + vec3 ambientHemisphereDir + padding
+            if( ambientMode == AmbientHemisphere )
+            {
+                *passBufferPtr++ = static_cast<float>( lowerHemisphere.r );
+                *passBufferPtr++ = static_cast<float>( lowerHemisphere.g );
+                *passBufferPtr++ = static_cast<float>( lowerHemisphere.b );
+                *passBufferPtr++ = 1.0f;
+
+                Vector3 hemisphereDir = viewMatrix3 * sceneManager->getAmbientLightHemisphereDir();
+                hemisphereDir.normalise();
+                *passBufferPtr++ = static_cast<float>( hemisphereDir.x );
+                *passBufferPtr++ = static_cast<float>( hemisphereDir.y );
+                *passBufferPtr++ = static_cast<float>( hemisphereDir.z );
+                *passBufferPtr++ = 1.0f;
             }
 
             //float pssmSplitPoints
@@ -1253,6 +1327,11 @@ namespace Ogre
     void HlmsPbs::setShadowSettings( ShadowFilter filter )
     {
         mShadowFilter = filter;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setAmbientLightMode( AmbientLightMode mode )
+    {
+        mAmbientLightMode = mode;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsPbs::createDatablockImpl( IdString datablockName,

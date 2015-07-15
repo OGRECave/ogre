@@ -24,13 +24,13 @@ in block
 
 void main()
 {
-	const vec2 samples[4] =
-	{
+	const vec2 samples[4] = vec2[4]
+	(
 		vec2(  0, -1 ),
 		vec2( -1,  0 ),
 		vec2(  1,  0 ),
 		vec2(  0,  1 )
-	};
+	);
 
 	mediump vec4 tc = texture( Image, inPs.uv0 );
     vec4 laplace = -4.0 * tc;

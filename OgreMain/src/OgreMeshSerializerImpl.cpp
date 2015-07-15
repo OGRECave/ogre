@@ -1512,6 +1512,7 @@ namespace v1 {
         readShorts(stream, &(pMesh->mNumLods), 1);
 
         pMesh->mMeshLodUsageList.resize(pMesh->mNumLods);
+        pMesh->mLodValues.resize(pMesh->mNumLods, 0);
         ushort numSubs, i;
         numSubs = pMesh->getNumSubMeshes();
         for (i = 0; i < numSubs; ++i)

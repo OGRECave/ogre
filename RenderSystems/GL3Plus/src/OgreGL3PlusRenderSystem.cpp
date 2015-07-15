@@ -147,6 +147,7 @@ namespace Ogre {
           mHardwareBufferManager(0),
           mRTTManager(0),
           mActiveTextureUnit(0),
+          mHasArbInvalidateSubdata( false ),
           mNullColourFramebuffer( 0 )
     {
         size_t i;
@@ -768,6 +769,9 @@ namespace Ogre {
             // Initialise GL after the first window has been created
             // TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
             mRealCapabilities = createRenderSystemCapabilities();
+
+            mHasArbInvalidateSubdata = mHasGL43 ||
+                                        mGLSupport->checkExtension( "GL_ARB_invalidate_subdata" );
 
             // use real capabilities if custom capabilities are not available
             if (!mUseCustomCapabilities)
@@ -2688,6 +2692,70 @@ namespace Ogre {
         {
             OGRE_CHECK_GL_ERROR(glStencilMask(mStencilWriteMask));
         }
+    }
+
+    void GL3PlusRenderSystem::discardFrameBuffer( unsigned int buffers )
+    {
+        //To GLES2 porting note:
+        //GL_EXT_discard_framebuffer does not imply a clear.
+        //GL_EXT_discard_framebuffer should be called after rendering
+        //(Allows to omit writeback of unneeded data e.g. Z-buffers, Stencil)
+        //On most renderers, not clearing (and invalidate is not clearing)
+        //can put you in slow mode
+
+        //GL_ARB_invalidate_subdata
+
+        assert( mActiveRenderTarget );
+        if( !mHasArbInvalidateSubdata )
+            return;
+
+        GLsizei numAttachments = 0;
+        GLenum attachments[OGRE_MAX_MULTIPLE_RENDER_TARGETS+2];
+
+        GL3PlusFrameBufferObject *fbo = 0;
+        mActiveRenderTarget->getCustomAttribute( GL3PlusRenderTexture::CustomAttributeString_FBO, &fbo );
+
+        if( fbo )
+        {
+            if( buffers & FBT_COLOUR )
+            {
+                for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+                {
+                    const GL3PlusSurfaceDesc &surfDesc = fbo->getSurface( i );
+                    if( surfDesc.buffer )
+                        attachments[numAttachments++] = static_cast<GLenum>( GL_COLOR_ATTACHMENT0 + i );
+                }
+            }
+
+            GL3PlusDepthBuffer *depthBuffer = static_cast<GL3PlusDepthBuffer*>(
+                                                mActiveRenderTarget->getDepthBuffer() );
+
+            if( depthBuffer )
+            {
+                if( buffers & FBT_STENCIL && depthBuffer->getStencilBuffer() )
+                    attachments[numAttachments++] = GL_STENCIL_ATTACHMENT;
+                if( buffers & FBT_DEPTH )
+                    attachments[numAttachments++] = GL_DEPTH_ATTACHMENT;
+            }
+        }
+        else
+        {
+            if( buffers & FBT_COLOUR )
+            {
+                attachments[numAttachments++] = GL_COLOR;
+                /*attachments[numAttachments++] = GL_BACK_LEFT;
+                attachments[numAttachments++] = GL_BACK_RIGHT;*/
+            }
+
+            if( buffers & FBT_DEPTH )
+                attachments[numAttachments++] = GL_DEPTH;
+            if( buffers & FBT_STENCIL )
+                attachments[numAttachments++] = GL_STENCIL;
+        }
+
+        assert( numAttachments && "Bad flags provided" );
+        assert( numAttachments <= sizeof(attachments) / sizeof(attachments[0]) );
+        glInvalidateFramebuffer( GL_FRAMEBUFFER, numAttachments, attachments );
     }
 
     void GL3PlusRenderSystem::_switchContext(GL3PlusContext *context)

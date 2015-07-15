@@ -479,8 +479,9 @@ namespace Ogre {
         LightArrayPerThread             mGlobalLightListPerThread;
         BuildLightListRequestPerThread  mBuildLightListRequestPerThread;
 
-        /// Current ambient light, cached for RenderSystem
-        ColourValue mAmbientLight;
+        /// Current ambient light.
+        ColourValue mAmbientLight[2];
+        Vector3     mAmbientLightHemisphereDir;
 
         /// The rendering system to send the scene to
         RenderSystem *mDestRenderSystem;
@@ -1538,22 +1539,48 @@ namespace Ogre {
         virtual void clearScene(void);
 
         /** Sets the ambient light level to be used for the scene.
-            @remarks
-                This sets the colour and intensity of the ambient light in the scene, i.e. the
-                light which is 'sourceless' and illuminates all objects equally.
-                The colour of an object is affected by a combination of the light in the scene,
-                and the amount of light that object reflects (in this case based on the Material::ambient
-                property).
-            @remarks
-                By default the ambient light in the scene is ColourValue::Black, i.e. no ambient light. This
-                means that any objects rendered with a Material which has lighting enabled (see Material::setLightingEnabled)
-                will not be visible unless you have some dynamic lights in your scene.
+        @remarks
+            Ambient lighting is a cheap fake to compensate the lack of global illumination.
+            Hemisphere ambient lighting will set the final ambient light to the following
+            formula:
+                float w = dot( objNormal, hemisphereDir ) * 0.5 + 0.5;
+                finalAmbient = lerp( lowerHemisphere, upperHemisphere, w );
+
+            Setting upperHemisphere = lowerHemisphere is effectively a traditional
+            fixed-colour ambient light.
+        @par
+            Tip: Set the upperHemisphere to a cold colour (e.g. blueish sky) and lowerHemisphere
+            to a warm colour (e.g. sun-yellowish, orange) and the hemisphereDir in the opposite
+            direction of your main directional light for a convincing look.
+        @par
+            By default the ambient light in the scene is ColourValue::Black, i.e. no ambient light.
+            This means that any objects rendered with a Material which has lighting enabled
+            (see Material::setLightingEnabled) will not be visible unless you have some dynamic
+            lights in your scene.
+        @par
+            For compatibility reasons with legacy (e.g. low level materials) upperHemisphere's
+            colour is the old ambient colour from 1.x
+
+        @param upperHemisphere
+            Ambient colour when the surface normal is close to hemisphereDir
+        @param lowerHemisphere
+            Ambient colour when the surface normal is pointing away from hemisphereDir
+        @param hemisphereDir
+            Hemisphere's direction reference to compare the surface normal to.
+            The internal vector will be normalized.
+        @param envmapScale
+            Global scale to apply to all environment maps (for relevant Hlms implementations,
+            like PBS). The value will be stored in upperHemisphere.a
+            Use 1.0 to disable.
         */
-        void setAmbientLight(const ColourValue& colour);
+        void setAmbientLight( const ColourValue& upperHemisphere, const ColourValue& lowerHemisphere,
+                              const Vector3 &hemisphereDir, Real envmapScale = 1.0f );
 
         /** Returns the ambient light level to be used for the scene.
         */
-        const ColourValue& getAmbientLight(void) const;
+        const ColourValue& getAmbientLightUpperHemisphere(void) const   { return mAmbientLight[0]; }
+        const ColourValue& getAmbientLightLowerHemisphere(void) const   { return mAmbientLight[1]; }
+        const Vector3& getAmbientLightHemisphereDir(void) const { return mAmbientLightHemisphereDir; }
 
         /** Sets the source of the 'world' geometry, i.e. the large, mainly static geometry
             making up the world e.g. rooms, landscape etc.

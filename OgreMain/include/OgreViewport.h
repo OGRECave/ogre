@@ -114,6 +114,11 @@ namespace Ogre {
                    const ColourValue& colour = ColourValue::Black, 
                    Real depth = 1.0f, unsigned short stencil = 0);
 
+        /** Instructs the viewport to 'discard' the buffers.
+            @see CompositorPassClearDef::mDiscardOnly
+        */
+        void discard( unsigned int buffers = FBT_COLOUR | FBT_DEPTH );
+
         /** Retrieves a pointer to the render target for this viewport.
         */
         RenderTarget* getTarget(void) const;

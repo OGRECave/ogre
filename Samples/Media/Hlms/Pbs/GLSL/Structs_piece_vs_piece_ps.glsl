@@ -33,6 +33,15 @@ layout(binding = 0) uniform PassBuffer
 
 	//Pixel shader
 	mat3 invViewMatCubemap;
+
+@property( ambient_hemisphere || ambient_fixed || envmap_scale )
+	vec4 ambientUpperHemi;
+@end
+@property( ambient_hemisphere )
+	vec4 ambientLowerHemi;
+	vec4 ambientHemisphereDir;
+@end
+
 @property( hlms_pssm_splits )@foreach( hlms_pssm_splits, n )
 	float pssmSplitPoints@n;@end @end
 	@property( hlms_lights_spot )Light lights[@value(hlms_lights_spot)];@end

@@ -76,3 +76,35 @@ material Ogre/Copy/3xFP32 : Ogre/Copy/4xFP32
 		}
 	}
 }
+
+fragment_program Ogre/Copy/1xFP32_ps_HLSL hlsl
+{
+	source Copyback_1xFP32_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program Ogre/Copy/1xFP32_ps_GLSL glsl
+{
+	source Copyback_1xFP32_ps.glsl
+	default_params { param_named tex int 0 }
+}
+
+fragment_program Ogre/Copy/1xFP32_ps unified
+{
+	delegate Ogre/Copy/1xFP32_ps_GLSL
+	delegate Ogre/Copy/1xFP32_ps_HLSL
+}
+
+material Ogre/Copy/1xFP32 : Ogre/Copy/4xFP32
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Ogre/Copy/1xFP32_ps
+			{
+			}
+		}
+	}
+}
