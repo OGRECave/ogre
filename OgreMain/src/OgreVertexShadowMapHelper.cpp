@@ -31,13 +31,21 @@ THE SOFTWARE.
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreAsyncTicket.h"
 
+#include "OgreSubMesh2.h"
+
+#include "OgreHardwareBufferManager.h"
+
 namespace Ogre
 {
     //---------------------------------------------------------------------
-    void VertexShadowMapHelper::useSameVaos( const VertexArrayObjectArray &inVao,
+    void VertexShadowMapHelper::useSameVaos( VaoManager *vaoManager,
+                                             const VertexArrayObjectArray &inVao,
                                              VertexArrayObjectArray &outVao )
     {
-        assert( outVao.empty() );
+        if( inVao.empty() || outVao.empty() || inVao[0] == outVao[0] )
+            outVao.clear(); //Using the same Vaos for both shadow mapping and regular rendering
+
+        SubMesh::destroyVaos( outVao, vaoManager );
 
         outVao.reserve( inVao.size() );
 
@@ -80,7 +88,7 @@ namespace Ogre
             {
                 //This Vao is invalid for shadow mapping (doesn't
                 //have a VES_POSITION semantic). Abort.
-                useSameVaos( inVao, outVao );
+                useSameVaos( vaoManager, inVao, outVao );
                 return;
             }
 
@@ -88,7 +96,7 @@ namespace Ogre
             findFirstAppearance( inVao, origVertexBuffers[bufferIdx[0]],
                                  sharedVaoIdx, sharedVertexBufferIdx );
 
-            if( sharedVaoIdx != currentVaoIdx && bufferIdx[0] != sharedVaoIdx )
+            if( sharedVaoIdx != currentVaoIdx )
             {
                 //Shared with a vertex buffer we've already created in a previous iteration.
                 shadowVertexBuffer = outVao[sharedVaoIdx]->getVertexBuffers()[sharedVertexBufferIdx];
@@ -129,9 +137,9 @@ namespace Ogre
                     {
                         for( size_t j=0; j<i; ++j )
                         {
-                            if( bufferIdx[j] == bufferIdx[i] )
+                            if( bufferIdx[i] == bufferIdx[j] )
                             {
-                                srcData[j] = srcData[i];
+                                srcData[i] = srcData[j];
                                 break;
                             }
                         }
@@ -405,4 +413,276 @@ namespace Ogre
 
         return bFound;
     }
+namespace v1
+{
+    //---------------------------------------------------------------------
+    void VertexShadowMapHelper::useSameGeoms( const GeometryVec &inGeom, GeometryVec &outGeom )
+    {
+        if( inGeom.empty() || outGeom.empty() || inGeom[0].vertexData != outGeom[0].vertexData )
+        {
+            GeometryVec::const_iterator itor = outGeom.begin();
+            GeometryVec::const_iterator end  = outGeom.end();
+
+            while( itor != end )
+            {
+                OGRE_DELETE itor->vertexData;
+                OGRE_DELETE itor->indexData;
+                ++itor;
+            }
+        }
+
+        outGeom.clear();
+        outGeom.reserve( inGeom.size() );
+
+        GeometryVec::const_iterator itor = inGeom.begin();
+        GeometryVec::const_iterator end  = inGeom.end();
+
+        while( itor != end )
+            outGeom.push_back( *itor++ );
+    }
+    //---------------------------------------------------------------------
+    void VertexShadowMapHelper::optimizeForShadowMapping(
+                                const VertexShadowMapHelper::GeometryVec &inGeom,
+                                VertexShadowMapHelper::GeometryVec &outGeom )
+    {
+        assert( outGeom.empty() );
+        outGeom.reserve( inGeom.size() );
+
+        GeometryVec::const_iterator itor = inGeom.begin();
+        GeometryVec::const_iterator end  = inGeom.end();
+
+        vector< FastArray<uint32> >::type vertexConversionLuts; //One per Geom
+        vertexConversionLuts.resize( inGeom.size() );
+
+        while( itor != end )
+        {
+            const Geometry &geom = *itor;
+            const size_t currentVaoIdx = itor - inGeom.begin();
+
+            VertexData *shadowVertexBuffer = 0;
+
+            size_t bufferIdx[3] = { -1, -1, -1 };
+            VertexElement const *origElements[3];
+            origElements[0] = geom.vertexData->vertexDeclaration->findElementBySemantic( VES_POSITION );
+
+            if( !origElements[0] )
+            {
+                //This Vao is invalid for shadow mapping (doesn't
+                //have a VES_POSITION semantic). Abort.
+                useSameGeoms( inGeom, outGeom );
+                return;
+            }
+
+            bufferIdx[0] = origElements[0]->getSource();
+
+            size_t sharedVaoIdx = 0;
+            findFirstAppearance( inGeom, geom.vertexData, sharedVaoIdx );
+
+            if( sharedVaoIdx != currentVaoIdx )
+            {
+                //Shared with a vertex buffer we've already created in a previous iteration.
+                shadowVertexBuffer = outGeom[sharedVaoIdx].vertexData->clone( false );
+            }
+            else
+            {
+                //Not shared. Create a new one by converting the original.
+                shadowVertexBuffer = OGRE_NEW VertexData();
+                origElements[1] = geom.vertexData->vertexDeclaration->
+                                                            findElementBySemantic( VES_BLEND_INDICES );
+                origElements[2] = geom.vertexData->vertexDeclaration->
+                                                            findElementBySemantic( VES_BLEND_WEIGHTS );
+                for( int i=1; i<3; ++i )
+                {
+                    if( origElements[i] )
+                        bufferIdx[i] = origElements[i]->getSource();
+                }
+
+                HardwareVertexBufferSharedPtr tickets[3];
+                uint8 const * srcData[3];
+                size_t srcOffset[3];
+                size_t srcBytesPerVertex[3];
+
+                memset( srcData, 0, sizeof( srcData ) );
+                memset( srcOffset, 0, sizeof( srcOffset ) );
+                memset( srcBytesPerVertex, 0, sizeof( srcBytesPerVertex ) );
+
+                //Map the buffers
+                for( size_t i=0; i<3; ++i )
+                {
+                    bool sameBuffer = false;
+                    for( size_t j=0; j<i && !sameBuffer; ++j )
+                    {
+                        sameBuffer = bufferIdx[j] == bufferIdx[i];
+
+                        if( sameBuffer && origElements[i] )
+                        {
+                            srcData[i] = srcData[j];
+                            srcBytesPerVertex[i] = tickets[j]->getVertexSize();
+                        }
+                    }
+
+                    if( origElements[i] )
+                    {
+                        if( !sameBuffer )
+                        {
+                            tickets[i] = geom.vertexData->vertexBufferBinding->getBuffer( bufferIdx[i] );
+                            srcData[i] = reinterpret_cast<uint8 const *>(
+                                            tickets[i]->lock( HardwareBuffer::HBL_READ_ONLY ) );
+                            srcBytesPerVertex[i] = tickets[i]->getVertexSize();
+                        }
+
+                        srcOffset[i] = origElements[i]->getOffset();
+                    }
+                }
+
+                VertexElement2Vec vertexElements;
+                {
+                    size_t elementOffset = 0;
+                    for( size_t i=0; i<3; ++i )
+                    {
+                        if( origElements[i] )
+                        {
+                            vertexElements.push_back( VertexElement2( origElements[i]->getType(),
+                                                                      origElements[i]->getSemantic() ) );
+                            shadowVertexBuffer->vertexDeclaration->addElement(
+                                        0, elementOffset,
+                                        origElements[i]->getType(),
+                                        origElements[i]->getSemantic() );
+
+                            elementOffset += v1::VertexElement::getTypeSize(origElements[i]->getType());
+                        }
+                    }
+                }
+
+                uint32 numVertices = geom.vertexData->vertexCount; //numVertices may shrink
+                const uint32 bytesPerVertex = VaoManager::calculateVertexSize( vertexElements );
+
+                uint8 *finalVertexData = reinterpret_cast<uint8*>(
+                            OGRE_MALLOC_SIMD( numVertices * bytesPerVertex, MEMCATEGORY_GEOMETRY ) );
+
+                VertexElement2 origElements2Stack[3] =
+                {
+                    VertexElement2( VET_BYTE4, VES_POSITION ),
+                    VertexElement2( VET_BYTE4, VES_BLEND_INDICES ),
+                    VertexElement2( VET_BYTE4, VES_BLEND_WEIGHTS )
+                };
+                VertexElement2 const *origElements2[3];
+
+                for( int i=0; i<3; ++i )
+                {
+                    if( origElements[i] )
+                    {
+                        origElements2Stack[i] = VertexElement2( origElements[i]->getType(),
+                                                                origElements[i]->getSemantic() );
+                        origElements2[i] = &origElements2Stack[i];
+                    }
+                    else
+                    {
+                        origElements2[i] = 0;
+                    }
+                }
+
+                const size_t newVertexCount =
+                        Ogre::VertexShadowMapHelper::shrinkVertexBuffer( finalVertexData, origElements2,
+                                                                         vertexConversionLuts[currentVaoIdx],
+                                                                         geom.indexData != 0, srcData,
+                                                                         srcOffset, srcBytesPerVertex,
+                                                                         numVertices );
+
+                for( size_t i=0; i<3; ++i )
+                {
+                    if( !tickets[i].isNull() )
+                        tickets[i]->unlock();
+                }
+
+                HardwareBufferManagerBase *hwManager = HardwareBufferManager::getSingletonPtr();
+
+                {
+                    HardwareVertexBufferSharedPtr vertexBuf = hwManager->createVertexBuffer(
+                                bytesPerVertex, newVertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+
+                    memcpy( vertexBuf->lock( HardwareBuffer::HBL_NO_OVERWRITE ),
+                            finalVertexData,
+                            vertexBuf->getSizeInBytes() );
+                    vertexBuf->unlock();
+
+                    OGRE_FREE_SIMD( finalVertexData, MEMCATEGORY_GEOMETRY );
+                    finalVertexData = 0;
+
+                    shadowVertexBuffer->vertexBufferBinding->setBinding( 0, vertexBuf );
+                }
+            }
+
+            v1::IndexData *shadowIndexData = 0;
+
+            if( geom.indexData )
+            {
+                shadowIndexData = OGRE_NEW v1::IndexData();
+                shadowIndexData->indexCount = geom.indexData->indexCount;
+                shadowIndexData->indexBuffer = v1::HardwareBufferManager::getSingleton().
+                                createIndexBuffer( geom.indexData->indexBuffer->getType(),
+                                                   geom.indexData->indexBuffer->getNumIndexes(),
+                                                   HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+
+                const FastArray<uint32> &vertexConvLut = vertexConversionLuts[currentVaoIdx];
+
+                const void *indexData = geom.indexData->indexBuffer->lock(
+                            HardwareBuffer::HBL_READ_ONLY );
+                void *shadowIndexDataPtr = shadowIndexData->indexBuffer->lock(
+                            HardwareBuffer::HBL_NO_OVERWRITE );
+
+                if( geom.indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT )
+                {
+                    uint16 const *srcIndexData = reinterpret_cast<const uint16*>( indexData );
+                    uint16 *dstIndexData = reinterpret_cast<uint16*>( shadowIndexDataPtr );
+
+                    for( size_t i=0; i<geom.indexData->indexBuffer->getNumIndexes(); ++i )
+                        *dstIndexData++ = static_cast<uint16>( vertexConvLut[*srcIndexData++] );
+                }
+                else
+                {
+                    uint32 const *srcIndexData = reinterpret_cast<const uint32*>( indexData );
+                    uint32 *dstIndexData = reinterpret_cast<uint32*>( shadowIndexDataPtr );
+
+                    for( size_t i=0; i<geom.indexData->indexBuffer->getNumIndexes(); ++i )
+                        *dstIndexData++ = vertexConvLut[*srcIndexData++];
+                }
+
+                shadowIndexData->indexBuffer->unlock();
+                geom.indexData->indexBuffer->unlock();
+            }
+
+            Geometry finalGeom;
+            finalGeom.vertexData = shadowVertexBuffer;
+            finalGeom.indexData  = shadowIndexData;
+
+            outGeom.push_back( finalGeom );
+
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    bool VertexShadowMapHelper::findFirstAppearance( const GeometryVec &geom,
+                                                     const VertexData *vertexBuffer,
+                                                     size_t &outVaoIdx )
+    {
+        bool bFound = false;
+
+        GeometryVec::const_iterator itor = geom.begin();
+        GeometryVec::const_iterator end  = geom.end();
+
+        while( itor != end && !bFound )
+        {
+            if( itor->vertexData == vertexBuffer )
+            {
+                outVaoIdx = itor - geom.begin();
+                bFound = true;
+            }
+
+            ++itor;
+        }
+
+        return bFound;
+    }
+}
 }

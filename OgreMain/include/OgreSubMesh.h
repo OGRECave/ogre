@@ -79,7 +79,9 @@ namespace v1 {
 
         /** Dedicated vertex data (only valid if useSharedVertices = false).
             [0] is for the regular pass, [1] is for the caster. Note that
-            vertexData[0] = vertexData[1] is possible.
+            vertexData[0] = vertexData[1] is possible, but if one
+            submesh has vertexData[0] = vertexData[1], then all submeshes in the mesh
+            must have vertexData[0] = vertexData[1] as well for the sake of simplicity.
             @remarks
                 This data is completely owned by this submesh.
             @par
@@ -114,7 +116,7 @@ namespace v1 {
         IndexMap blendIndexToBoneIndexMap;
 
         typedef vector<IndexData*>::type LODFaceList;
-        LODFaceList mLodFaceList;
+        LODFaceList mLodFaceList[2];
 
         /** A list of extreme points on the submesh (optional).
             @remarks
@@ -296,6 +298,8 @@ namespace v1 {
 
         /// Internal method for removing LOD data
         void removeLodLevels(void);
+
+        static void removeLodLevel( LODFaceList &lodList );
 
         /** Rearranges the buffers to be efficiently rendered in Ogre 2.0 with Hlms
         @remarks

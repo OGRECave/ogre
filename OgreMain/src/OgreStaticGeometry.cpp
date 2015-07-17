@@ -342,7 +342,7 @@ namespace v1 {
             }
             else
             {
-                lodIndexData = sm->mLodFaceList[lod - 1];
+                lodIndexData = sm->mLodFaceList[0][lod - 1];
             }
             // Can use the original mesh geometry?
             if (sm->useSharedVertices)

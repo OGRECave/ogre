@@ -52,7 +52,6 @@ namespace v1 {
         memset( vertexData, 0, sizeof(vertexData) );
 
         indexData[0] = OGRE_NEW IndexData();
-        indexData[1] = indexData[0];
     }
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
@@ -69,8 +68,6 @@ namespace v1 {
             OGRE_DELETE vertexData[i];
             OGRE_DELETE indexData[i];
         }
-
-        removeLodLevels();
     }
 
     //-----------------------------------------------------------------------
@@ -93,13 +90,13 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex, bool casterPass)
     {
-        assert( !lodIndex || (lodIndex - 1) < (ushort)mLodFaceList.size() );
+        assert( !lodIndex || (lodIndex - 1) < (ushort)mLodFaceList[casterPass].size() );
 
         ro.useIndexes = indexData[casterPass]->indexCount != 0;
         if (lodIndex > 0)
         {
             // lodIndex - 1 because we don't store full detail version in mLodFaceList
-            ro.indexData = mLodFaceList[lodIndex-1];
+            ro.indexData = mLodFaceList[casterPass][lodIndex-1];
         }
         else
         {
@@ -229,15 +226,25 @@ namespace v1 {
     //---------------------------------------------------------------------
     void SubMesh::removeLodLevels(void)
     {
-        LODFaceList::iterator lodi, lodend;
-        lodend = mLodFaceList.end();
-        for (lodi = mLodFaceList.begin(); lodi != lodend; ++lodi)
+        if( mLodFaceList[0].empty() || mLodFaceList[1].empty() ||
+            mLodFaceList[0][0] == mLodFaceList[1][0] )
         {
-            OGRE_DELETE *lodi;
+            mLodFaceList[1].clear();
         }
 
-        mLodFaceList.clear();
+        removeLodLevel( mLodFaceList[1] );
+        removeLodLevel( mLodFaceList[0] );
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::removeLodLevel( LODFaceList &lodList )
+    {
+        LODFaceList::const_iterator itor = lodList.begin();
+        LODFaceList::const_iterator end  = lodList.end();
 
+        while( itor != end )
+            OGRE_DELETE *itor++;
+
+        lodList.clear();
     }
     //---------------------------------------------------------------------
     VertexAnimationType SubMesh::getVertexAnimationType(void) const
@@ -522,12 +529,27 @@ namespace v1 {
         newSub->mTextureAliases = this->mTextureAliases;
 
         // Copy lod face lists
-        newSub->mLodFaceList.reserve(this->mLodFaceList.size());
-        SubMesh::LODFaceList::const_iterator facei;
-        for (facei = this->mLodFaceList.begin(); facei != this->mLodFaceList.end(); ++facei) {
-            IndexData* newIndexData = (*facei)->clone();
-            newSub->mLodFaceList.push_back(newIndexData);
+        newSub->mLodFaceList[0].reserve( this->mLodFaceList[0].size() );
+        newSub->mLodFaceList[1].reserve( this->mLodFaceList[1].size() );
+
+        assert( this->mLodFaceList[0].size() == this->mLodFaceList[1].size() );
+
+        for( size_t i=0; i<this->mLodFaceList[0].size(); ++i )
+        {
+            IndexData* newIndexData = this->mLodFaceList[0][i]->clone();
+            newSub->mLodFaceList[0].push_back( newIndexData );
+
+            if( this->mLodFaceList[0][i] == this->mLodFaceList[1][i] )
+            {
+                newSub->mLodFaceList[1].push_back( newIndexData );
+            }
+            else
+            {
+                newIndexData = this->mLodFaceList[1][i]->clone();
+                newSub->mLodFaceList[1].push_back( newIndexData );
+            }
         }
+
         return newSub;
     }
     //---------------------------------------------------------------------

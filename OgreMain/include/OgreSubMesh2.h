@@ -187,8 +187,9 @@ namespace Ogre {
         char* arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
                                 bool qTangents, VertexElement2Vec *outVertexElements,
                                 size_t vaoPassIdx );
-
-        void destroyVaos( VertexArrayObjectArray &vaos );
+    public:
+        static void destroyVaos( VertexArrayObjectArray &vaos, VaoManager *vaoManager );
+    protected:
         void destroyShadowMappingVaos(void);
     };
     /** @} */

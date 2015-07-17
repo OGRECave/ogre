@@ -209,6 +209,7 @@ namespace v1 {
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
                                      unsigned short texCoordSetToDestroy, VertexData *vertexData );
 
+        void destroyShadowMappingGeom(void);
 
     public:
         /** Default constructor - used by MeshManager
@@ -534,7 +535,8 @@ namespace v1 {
         /** Internal methods for loading LOD, do not use. */
         void _setLodUsage(unsigned short level, const MeshLodUsage& usage);
         /** Internal methods for loading LOD, do not use. */
-        void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
+        void _setSubMeshLodFaceList( unsigned short subIdx, unsigned short level, IndexData* facedata,
+                                     bool casterPass );
         /** Internal methods for loading LOD, do not use. */
         bool _isManualLodLevel(unsigned short level) const;
 

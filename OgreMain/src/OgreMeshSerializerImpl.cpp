@@ -1269,14 +1269,14 @@ namespace v1 {
 
     void MeshSerializerImpl::writeLodUsageGeneratedSubmesh( const SubMesh* submesh, unsigned short lodNum )
     {
-        const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        const IndexData* indexData = submesh->mLodFaceList[0][lodNum-1];
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(!ibuf.isNull());
         unsigned int bufferIndex = -1;
         for(ushort i = 1; i < lodNum; i++){
             // it will check any previous Lod levels for the same buffer.
             // This will allow to use merged/shared/compressed buffers.
-            const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
+            const IndexData* prevIndexData = submesh->mLodFaceList[0][i-1];
             if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
                 bufferIndex = i;
             }
@@ -1372,14 +1372,14 @@ namespace v1 {
     {
         size_t size = 0;
         
-        const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        const IndexData* indexData = submesh->mLodFaceList[0][lodNum-1];
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(!ibuf.isNull());
         unsigned int bufferIndex = -1;
         for(ushort i = 1; i < lodNum; i++){
             // it will check any previous Lod levels for the same buffer.
             // This will allow to use merged/shared/compressed buffers.
-            const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
+            const IndexData* prevIndexData = submesh->mLodFaceList[0][i-1];
             if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
                 bufferIndex = i;
             }
@@ -1518,8 +1518,8 @@ namespace v1 {
         for (i = 0; i < numSubs; ++i)
         {
             SubMesh* sm = pMesh->getSubMesh(i);
-            assert(sm->mLodFaceList.empty());
-            sm->mLodFaceList.resize(pMesh->mNumLods-1);
+            assert(sm->mLodFaceList[0].empty());
+            sm->mLodFaceList[0].resize(pMesh->mNumLods-1);
         }
         pushInnerChunk(stream);
         // lodID=0 is the original mesh. We need to skip it.
@@ -1560,7 +1560,7 @@ namespace v1 {
         {
             
             SubMesh* sm = pMesh->getSubMesh(i);
-            sm->mLodFaceList[lodNum-1] = OGRE_NEW IndexData();
+            sm->mLodFaceList[0][lodNum-1] = OGRE_NEW IndexData();
         }
     }
     //---------------------------------------------------------------------
@@ -1574,8 +1574,8 @@ namespace v1 {
         for (i = 0; i < numSubs; ++i)
         {
             SubMesh* sm = pMesh->getSubMesh(i);
-            sm->mLodFaceList[lodNum-1] = OGRE_NEW IndexData();
-            IndexData* indexData = sm->mLodFaceList[lodNum-1];
+            sm->mLodFaceList[0][lodNum-1] = OGRE_NEW IndexData();
+            IndexData* indexData = sm->mLodFaceList[0][lodNum-1];
 
             unsigned int numIndexes;
             readInts(stream, &numIndexes, 1);
@@ -1591,7 +1591,7 @@ namespace v1 {
             readInts(stream, &bufferIndex, 1);
             if(bufferIndex != (unsigned int)-1) {
                 // copy buffer pointer
-                indexData->indexBuffer = sm->mLodFaceList[bufferIndex-1]->indexBuffer;
+                indexData->indexBuffer = sm->mLodFaceList[0][bufferIndex-1]->indexBuffer;
                 assert(!indexData->indexBuffer.isNull());
             } else {
                 // generate buffers
@@ -2851,7 +2851,7 @@ namespace v1 {
     }
     size_t MeshSerializerImpl_v1_8::calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum)
     {
-        const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        const IndexData* indexData = submesh->mLodFaceList[0][lodNum - 1];
         const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
 
         size_t size = MSTREAM_OVERHEAD_SIZE; // M_MESH_LOD_GENERATED
@@ -2916,7 +2916,7 @@ namespace v1 {
         for (unsigned short subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
         {
             SubMesh* sm = pMesh->getSubMesh(subidx);
-            const IndexData* indexData = sm->mLodFaceList[lodNum-1];
+            const IndexData* indexData = sm->mLodFaceList[0][lodNum-1];
 
             // Lock index buffer to write
             HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
@@ -2964,7 +2964,7 @@ namespace v1 {
     }
     void MeshSerializerImpl_v1_8::writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum)
     {
-        const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        const IndexData* indexData = submesh->mLodFaceList[0][lodNum - 1];
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(!ibuf.isNull());
 
@@ -3022,7 +3022,7 @@ namespace v1 {
 
                 SubMesh* sm = pMesh->getSubMesh(i);
                 IndexData* indexData = OGRE_NEW IndexData();
-                sm->mLodFaceList[lodNum - 1] = indexData;
+                sm->mLodFaceList[0][lodNum - 1] = indexData;
                 // unsigned int numIndexes
                 unsigned int numIndexes;
                 readInts(stream, &numIndexes, 1);
@@ -3174,8 +3174,8 @@ namespace v1 {
             for (i = 0; i < numsubs; ++i)
             {
                 SubMesh* sm = pMesh->getSubMesh(i);
-                assert(sm->mLodFaceList.empty());
-                sm->mLodFaceList.resize(pMesh->mNumLods - 1);
+                assert(sm->mLodFaceList[0].empty());
+                sm->mLodFaceList[0].resize(pMesh->mNumLods - 1);
             }
         }
 
@@ -3571,13 +3571,12 @@ namespace v1 {
         // Preallocate submesh LOD face data if not manual
         if (!manual)
         {
-
             unsigned short numsubs = pMesh->getNumSubMeshes();
             for (i = 0; i < numsubs; ++i)
             {
                 SubMesh* sm = pMesh->getSubMesh(i);
-                assert(sm->mLodFaceList.empty());
-                sm->mLodFaceList.resize(pMesh->mNumLods-1);
+                assert( sm->mLodFaceList[0].empty() );
+                sm->mLodFaceList[0].resize(pMesh->mNumLods-1);
             }
         }
         pushInnerChunk(stream);

@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreVertexShadowMapHelper.h"
 
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonManager.h"
@@ -1187,7 +1188,8 @@ namespace v1 {
         // Resize submesh face data lists too
         for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
         {
-            (*i)->mLodFaceList.resize(numLevels - 1);
+            (*i)->mLodFaceList[0].resize(numLevels - 1);
+            (*i)->mLodFaceList[1].resize(numLevels - 1);
         }
     }
     //---------------------------------------------------------------------
@@ -1209,8 +1211,8 @@ namespace v1 {
         }
     }
     //---------------------------------------------------------------------
-    void Mesh::_setSubMeshLodFaceList(unsigned short subIdx, unsigned short level,
-        IndexData* facedata)
+    void Mesh::_setSubMeshLodFaceList( unsigned short subIdx, unsigned short level,
+                                       IndexData* facedata, bool casterPass )
     {
         assert(!mEdgeListsBuilt && "Can't modify LOD after edge lists built");
 
@@ -1218,10 +1220,11 @@ namespace v1 {
         assert(mMeshLodUsageList[level].manualName.empty() && "Not using generated LODs!");
         assert(subIdx < mSubMeshList.size() && "Index out of bounds");
         assert(level != 0 && "Can't modify first LOD level (full detail)");
-        assert(level-1 < (unsigned short)mSubMeshList[subIdx]->mLodFaceList.size() && "Index out of bounds");
+        assert(level-1 < (unsigned short)mSubMeshList[subIdx]->mLodFaceList[casterPass].size() &&
+               "Index out of bounds");
 
         SubMesh* sm = mSubMeshList[subIdx];
-        sm->mLodFaceList[level - 1] = facedata;
+        sm->mLodFaceList[casterPass][level - 1] = facedata;
     }
     //---------------------------------------------------------------------
     bool Mesh::_isManualLodLevel( unsigned short level ) const
@@ -1356,19 +1359,117 @@ namespace v1 {
         }
     }
     //---------------------------------------------------------------------
-    void Mesh::prepareForShadowMapping( bool forceSameBuffers )
+    void Mesh::destroyShadowMappingGeom(void)
     {
-        sharedVertexData[1] = sharedVertexData[0];
+        if( sharedVertexData[1] != sharedVertexData[0] )
+            OGRE_DELETE sharedVertexData[1];
+        sharedVertexData[1] = 0;
 
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
 
         while( itor != end )
         {
-            (*itor)->vertexData[1] = (*itor)->vertexData[0];
-            (*itor)->indexData[1] = (*itor)->indexData[0];
+            if( (*itor)->vertexData[1] != (*itor)->vertexData[0] )
+                OGRE_DELETE (*itor)->vertexData[1];
+            (*itor)->vertexData[1] = 0;
+
+            if( (*itor)->indexData[1] != (*itor)->indexData[0] )
+                OGRE_DELETE (*itor)->indexData[1];
+            (*itor)->indexData[1] = 0;
+
+            if( (*itor)->mLodFaceList[0].empty() || (*itor)->mLodFaceList[1].empty() ||
+                (*itor)->mLodFaceList[0][0] != (*itor)->mLodFaceList[1][0] )
+            {
+                SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[1].begin();
+                SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[1].end();
+
+                while( itLod != enLod )
+                    OGRE_DELETE *itLod++;
+            }
+
+            (*itor)->mLodFaceList[1].clear();
 
             ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    void Mesh::prepareForShadowMapping( bool forceSameBuffers )
+    {
+        destroyShadowMappingGeom();
+
+        if( !msOptimizeForShadowMapping || forceSameBuffers )
+        {
+            sharedVertexData[1] = sharedVertexData[0];
+
+            SubMeshList::const_iterator itor = mSubMeshList.begin();
+            SubMeshList::const_iterator end  = mSubMeshList.end();
+
+            while( itor != end )
+            {
+                (*itor)->vertexData[1] = (*itor)->vertexData[0];
+                (*itor)->indexData[1] = (*itor)->indexData[0];
+
+                ++itor;
+            }
+        }
+        else
+        {
+            VertexShadowMapHelper::GeometryVec inGeom;
+            VertexShadowMapHelper::GeometryVec outGeom;
+
+            {
+                SubMeshList::const_iterator itor = mSubMeshList.begin();
+                SubMeshList::const_iterator end  = mSubMeshList.end();
+
+                while( itor != end )
+                {
+                    VertexShadowMapHelper::Geometry geom;
+
+                    if( (*itor)->vertexData[0] )
+                        geom.vertexData = (*itor)->vertexData[0];
+                    else
+                        geom.vertexData = sharedVertexData[0];
+
+                    geom.indexData = (*itor)->indexData[0];
+                    inGeom.push_back( geom );
+
+                    SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[0].begin();
+                    SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[0].end();
+
+                    while( itLod != enLod )
+                    {
+                        geom.indexData = *itLod;
+                        inGeom.push_back( geom );
+                        ++itLod;
+                    }
+
+                    ++itor;
+                }
+            }
+
+            VertexShadowMapHelper::optimizeForShadowMapping( inGeom, outGeom );
+
+            const size_t numSubMeshes = mSubMeshList.size();
+            VertexShadowMapHelper::GeometryVec::const_iterator itGeom = outGeom.begin();
+
+            for( size_t i=0; i<numSubMeshes; ++i )
+            {
+                if( mSubMeshList[i]->vertexData[0] )
+                    mSubMeshList[i]->vertexData[1] = itGeom->vertexData;
+                else
+                    sharedVertexData[1] = itGeom->vertexData;
+
+                mSubMeshList[i]->indexData[1] = itGeom->indexData;
+                ++itGeom;
+
+                const size_t numLods = mSubMeshList[i]->mLodFaceList[0].size();
+                for( size_t j=0; j<numLods; ++j )
+                {
+                    mSubMeshList[i]->mLodFaceList[1].push_back( itGeom->indexData );
+                    ++itGeom;
+                }
+            }
         }
     }
     //---------------------------------------------------------------------
@@ -1387,6 +1488,8 @@ namespace v1 {
                                                         (*itor)->vertexData[1] != 0);
             retVal &= ((*itor)->indexData[0] == 0) || ((*itor)->indexData[0] != 0 &&
                                                        (*itor)->indexData[1] != 0);
+
+            retVal &= (*itor)->mLodFaceList[0].size() == (*itor)->mLodFaceList[1].size();
 
             ++itor;
         }
@@ -1763,8 +1866,8 @@ namespace v1 {
                         }
                         else
                         {
-                            eb.addIndexData(s->mLodFaceList[lodIndex-1], 0,
-                                s->operationType);
+                            eb.addIndexData(s->mLodFaceList[0][lodIndex-1], 0,
+                                            s->operationType);
                         }
                     }
                     else if(s->isBuildEdgesEnabled())
@@ -1780,7 +1883,7 @@ namespace v1 {
                         else
                         {
                             // LOD index data
-                            eb.addIndexData(s->mLodFaceList[lodIndex-1],
+                            eb.addIndexData(s->mLodFaceList[0][lodIndex-1],
                                 vertexSetCount++, s->operationType);
                         }
 

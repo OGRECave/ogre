@@ -50,7 +50,7 @@ namespace Ogre {
     SubMesh::~SubMesh()
     {
         destroyShadowMappingVaos();
-        destroyVaos( mVao[0] );
+        destroyVaos( mVao[0], mParent->mVaoManager );
     }
     //-----------------------------------------------------------------------
     void SubMesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
@@ -289,8 +289,8 @@ namespace Ogre {
         }
 
         //Now deal with the automatic LODs
-        v1::SubMesh::LODFaceList::const_iterator itor = subMesh->mLodFaceList.begin();
-        v1::SubMesh::LODFaceList::const_iterator end  = subMesh->mLodFaceList.end();
+        v1::SubMesh::LODFaceList::const_iterator itor = subMesh->mLodFaceList[vaoPassIdx].begin();
+        v1::SubMesh::LODFaceList::const_iterator end  = subMesh->mLodFaceList[vaoPassIdx].end();
 
         while( itor != end )
         {
@@ -582,7 +582,7 @@ namespace Ogre {
         return data;
     }
     //---------------------------------------------------------------------
-    void SubMesh::destroyVaos( VertexArrayObjectArray &vaos )
+    void SubMesh::destroyVaos( VertexArrayObjectArray &vaos, VaoManager *vaoManager )
     {
         typedef set<VertexBufferPacked*>::type VertexBufferPackedSet;
         VertexBufferPackedSet destroyedBuffers;
@@ -593,7 +593,6 @@ namespace Ogre {
         {
             VertexArrayObject *vao = *itor;
 
-            VaoManager *vaoManager = mParent->mVaoManager;
             const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
             VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
             VertexBufferPackedVec::const_iterator enBuffers = vertexBuffers.end();
@@ -622,7 +621,7 @@ namespace Ogre {
         if( mVao[0].empty() || mVao[1].empty() || mVao[0][0] == mVao[1][0] )
             mVao[1].clear(); //Using the same Vaos for both shadow mapping and regular rendering
 
-        destroyVaos( mVao[1] );
+        destroyVaos( mVao[1], mParent->mVaoManager );
 
         mVao[1].reserve( mVao[0].size() );
     }
@@ -634,6 +633,6 @@ namespace Ogre {
         if( !forceSameBuffers && Mesh::msOptimizeForShadowMapping )
             VertexShadowMapHelper::optimizeForShadowMapping( mParent->mVaoManager, mVao[0], mVao[1] );
         else
-            VertexShadowMapHelper::useSameVaos( mVao[0], mVao[1] );
+            VertexShadowMapHelper::useSameVaos( mParent->mVaoManager, mVao[0], mVao[1] );
     }
 }
