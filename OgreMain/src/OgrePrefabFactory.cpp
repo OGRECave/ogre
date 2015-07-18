@@ -112,7 +112,7 @@ namespace v1 {
         mesh->_setBounds(AxisAlignedBox(-100,-100,0,100,100,0), true);
         mesh->_setBoundingSphereRadius(Math::Sqrt(100*100+100*100));
 
-        mesh->prepareForShadowMapping( false );
+        mesh->prepareForShadowMapping( true );
     }
     //---------------------------------------------------------------------
     void PrefabFactory::createCube(Mesh* mesh)
@@ -279,7 +279,7 @@ namespace v1 {
 
         mesh->_setBoundingSphereRadius(CUBE_HALF_SIZE);
 
-        mesh->prepareForShadowMapping( false );
+        mesh->prepareForShadowMapping( true );
     }
     //---------------------------------------------------------------------
     void PrefabFactory::createSphere(Mesh* mesh)
@@ -371,7 +371,7 @@ namespace v1 {
 
         mesh->_setBoundingSphereRadius(SPHERE_RADIUS);
 
-        mesh->prepareForShadowMapping( false );
+        mesh->prepareForShadowMapping( true );
     }
     //---------------------------------------------------------------------
 }

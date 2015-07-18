@@ -89,6 +89,7 @@ namespace v1 {
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
+        friend class MeshSerializerImpl_v1_10;
         friend class MeshSerializerImpl_v1_8;
         friend class MeshSerializerImpl_v1_4;
         friend class MeshSerializerImpl_v1_3;
@@ -662,6 +663,10 @@ namespace v1 {
         /// Returns true if the mesh is ready for rendering with valid shadow mapping buffers
         /// Otherwise prepareForShadowMapping must be called on this mesh.
         bool hasValidShadowMappingBuffers(void) const;
+
+        /// Returns true if the shadow mapping buffers do not just reference the real buffers,
+        /// but are rather their own separate set of optimized geometry.
+        bool hasIndependentShadowMappingBuffers(void) const;
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

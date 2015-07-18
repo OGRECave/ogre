@@ -226,11 +226,8 @@ namespace v1 {
     //---------------------------------------------------------------------
     void SubMesh::removeLodLevels(void)
     {
-        if( mLodFaceList[0].empty() || mLodFaceList[1].empty() ||
-            mLodFaceList[0][0] == mLodFaceList[1][0] )
-        {
+        if( !parent->hasIndependentShadowMappingBuffers() )
             mLodFaceList[1].clear();
-        }
 
         removeLodLevel( mLodFaceList[1] );
         removeLodLevel( mLodFaceList[0] );

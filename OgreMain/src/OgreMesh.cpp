@@ -1497,6 +1497,25 @@ namespace v1 {
         return retVal;
     }
     //---------------------------------------------------------------------
+    bool Mesh::hasIndependentShadowMappingBuffers(void) const
+    {
+        if( !hasValidShadowMappingBuffers() )
+            return false;
+
+        bool independent = sharedVertexData[0] != sharedVertexData[1];
+
+        SubMeshList::const_iterator itor = mSubMeshList.begin();
+        SubMeshList::const_iterator end  = mSubMeshList.end();
+
+        while( itor != end && !independent )
+        {
+            independent |= (*itor)->vertexData[0] != (*itor)->vertexData[1];
+            ++itor;
+        }
+
+        return independent;
+    }
+    //---------------------------------------------------------------------
     void Mesh::organiseTangentsBuffer(VertexData *vertexData,
         VertexElementSemantic targetSemantic, unsigned short index, 
         unsigned short sourceTexCoordSet)

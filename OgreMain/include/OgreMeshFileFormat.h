@@ -59,6 +59,7 @@ namespace Ogre {
             // char*          version           : Version number check
         M_MESH                = 0x3000,
             // bool skeletallyAnimated   // important flag which affects h/w buffer policies
+            // unsigned char numPasses. // Number of caster passes data. Must be 1 or 2.
             // string strategyName;
             M_SUBMESH             = 0x4000,
                 // char* materialName

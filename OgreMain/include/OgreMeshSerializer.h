@@ -43,6 +43,9 @@ namespace v1 {
     {
         /// Latest version available
         MESH_VERSION_LATEST,
+
+        /// OGRE version v2.1+
+        MESH_VERSION_2_1,
         
         /// OGRE version v1.10+
         MESH_VERSION_1_10,
