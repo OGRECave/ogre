@@ -599,7 +599,7 @@ namespace v1
 
                 {
                     HardwareVertexBufferSharedPtr vertexBuf = hwManager->createVertexBuffer(
-                                bytesPerVertex, newVertexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+                                bytesPerVertex, newVertexCount, tickets[0]->getUsage() );
 
                     memcpy( vertexBuf->lock( HardwareBuffer::HBL_NO_OVERWRITE ),
                             finalVertexData,
@@ -611,6 +611,8 @@ namespace v1
 
                     shadowVertexBuffer->vertexBufferBinding->setBinding( 0, vertexBuf );
                 }
+
+                shadowVertexBuffer->vertexCount = newVertexCount;
             }
 
             v1::IndexData *shadowIndexData = 0;
@@ -622,7 +624,7 @@ namespace v1
                 shadowIndexData->indexBuffer = v1::HardwareBufferManager::getSingleton().
                                 createIndexBuffer( geom.indexData->indexBuffer->getType(),
                                                    geom.indexData->indexBuffer->getNumIndexes(),
-                                                   HardwareBuffer::HBU_STATIC_WRITE_ONLY );
+                                                   geom.indexData->indexBuffer->getUsage() );
 
                 const FastArray<uint32> &vertexConvLut = vertexConversionLuts[currentVaoIdx];
 
