@@ -480,11 +480,11 @@ Ogre::v1::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName,
     }
 
     /// Create vertex data structure for 8 vertices shared between submeshes
-    mesh->sharedVertexData = new v1::VertexData();
-    mesh->sharedVertexData->vertexCount = mHull.size() * 3;
+    mesh->sharedVertexData[0] = new v1::VertexData();
+    mesh->sharedVertexData[0]->vertexCount = mHull.size() * 3;
 
     /// Create declaration (memory format) of vertex data
-    v1::VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
+    v1::VertexDeclaration* decl = mesh->sharedVertexData[0]->vertexDeclaration;
     size_t offset = 0;
     // 1st buffer
     decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
@@ -494,12 +494,12 @@ Ogre::v1::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName,
     /// and bytes per vertex (offset)
     v1::HardwareVertexBufferSharedPtr vbuf =
         v1::HardwareBufferManager::getSingleton().createVertexBuffer(
-        offset, mesh->sharedVertexData->vertexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        offset, mesh->sharedVertexData[0]->vertexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
     /// Upload the vertex data to the card
     vbuf->writeData(0, vbuf->getSizeInBytes(), &vertexBuffer[0], true);
 
     /// Set vertex buffer binding so buffer 0 is bound to our vertex buffer
-    v1::VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
+    v1::VertexBufferBinding* bind = mesh->sharedVertexData[0]->vertexBufferBinding;
     bind->setBinding(0, vbuf);
 
     /// Allocate index buffer of the requested number of vertices (ibufCount) 
@@ -514,13 +514,15 @@ Ogre::v1::MeshPtr LodOutsideMarker::createConvexHullMesh(const String& meshName,
 
     /// Set parameters of the submesh
     subMesh->useSharedVertices = true;
-    subMesh->indexData->indexBuffer = ibuf;
-    subMesh->indexData->indexCount = indexBuffer.size();
-    subMesh->indexData->indexStart = 0;
+    subMesh->indexData[0]->indexBuffer = ibuf;
+    subMesh->indexData[0]->indexCount = indexBuffer.size();
+    subMesh->indexData[0]->indexStart = 0;
 
     /// Set bounding information (for culling)
     mesh->_setBounds(AxisAlignedBox(minBounds, maxBounds));
     mesh->_setBoundingSphereRadius(maxBounds.distance(minBounds) / 2.0f);
+
+    mesh->prepareForShadowMapping( true );
 
     /// Set material to transparent blue
     subMesh->setMaterialName("Examples/TransparentBlue50");

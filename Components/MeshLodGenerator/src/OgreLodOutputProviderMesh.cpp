@@ -40,7 +40,7 @@ namespace Ogre
 
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[0];
             lods.resize(1);
         }
     }
@@ -50,7 +50,7 @@ namespace Ogre
         // placeholder dummy
         unsigned short submeshCount = mMesh->getNumSubMeshes();
         for (unsigned short i = 0; i < submeshCount; i++) {
-            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[0];
             lods.insert(lods.begin() + lodIndex, OGRE_NEW v1::IndexData());
         }
     }
@@ -61,7 +61,7 @@ namespace Ogre
 
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[0];
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount;
             v1::IndexData* curLod = OGRE_NEW v1::IndexData();
             curLod->indexStart = 0;
@@ -112,7 +112,7 @@ namespace Ogre
 
         // Close buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
-            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList;
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[0];
             lods[lodIndex]->indexBuffer->unlock();
         }
     }

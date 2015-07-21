@@ -93,7 +93,7 @@ namespace Ogre
 	{
 		ushort submeshCount = mesh->getNumSubMeshes();
 		remapInfos.resize(1 + submeshCount);
-		remapInfos[0].prepare(mesh->sharedVertexData ? mesh->sharedVertexData->vertexCount : 0);
+        remapInfos[0].prepare(mesh->sharedVertexData[0] ? mesh->sharedVertexData[0]->vertexCount : 0);
 		for(ushort i = 0; i < submeshCount; i++)
 		{
 			const SubMesh* submesh = mesh->getSubMesh(i);
@@ -288,8 +288,8 @@ namespace Ogre
 
 		generateRemapInfo(mesh, stableVertexOrder);
 
-		if(mesh->sharedVertexData)
-			performVertexDataRemap(mesh->sharedVertexData, remapInfos[0]);
+        if(mesh->sharedVertexData[0])
+            performVertexDataRemap(mesh->sharedVertexData[0], remapInfos[0]);
 		performBoneAssignmentRemap(mesh.get(), remapInfos[0]);
 
 		ushort submeshCount = mesh->getNumSubMeshes();

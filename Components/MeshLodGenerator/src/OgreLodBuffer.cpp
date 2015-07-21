@@ -127,13 +127,13 @@ namespace Ogre
         for (unsigned short i = 0; i < submeshCount; i++) {
             const v1::SubMesh* ogresubmesh = mesh->getSubMesh(i);
             LodInputBuffer::Submesh& outsubmesh = submesh[i];
-            outsubmesh.indexBuffer.fillBuffer(ogresubmesh->indexData);
+            outsubmesh.indexBuffer.fillBuffer(ogresubmesh->indexData[0]);
             outsubmesh.useSharedVertexBuffer = ogresubmesh->useSharedVertices;
             if (!outsubmesh.useSharedVertexBuffer) {
-                outsubmesh.vertexBuffer.fillBuffer(ogresubmesh->vertexData);
+                outsubmesh.vertexBuffer.fillBuffer(ogresubmesh->vertexData[0]);
             } else if (!sharedVerticesAdded) {
                 sharedVerticesAdded = true;
-                sharedVertexBuffer.fillBuffer(mesh->sharedVertexData);
+                sharedVertexBuffer.fillBuffer(mesh->sharedVertexData[0]);
             }
         }
     }
