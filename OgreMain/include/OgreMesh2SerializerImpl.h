@@ -107,7 +107,7 @@ namespace Ogre {
         // Internal methods
         virtual void writeSubMeshNameTable(const Mesh* pMesh);
         virtual void writeMesh(const Mesh* pMesh);
-        virtual void writeSubMesh(const SubMesh* s, const LodLevelVertexBufferTable &lodVertexTable);
+        virtual void writeSubMesh( const SubMesh* s, const LodLevelVertexBufferTable &lodVertexTable );
         virtual void writeSubMeshLod( const VertexArrayObject *vao, uint8 lodLevel, uint8 lodSource );
         virtual void writeSubMeshLodOperation( const VertexArrayObject *vao );
         virtual void writeIndexes(IndexBufferPacked *indexBuffer);
@@ -150,7 +150,7 @@ namespace Ogre {
         virtual void readTextureLayer(DataStreamPtr& stream, Mesh* pMesh, MaterialPtr& pMat);
         virtual void readSubMeshNameTable(DataStreamPtr& stream, Mesh* pMesh);
         virtual void readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
-        virtual void readSubMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
+        virtual void readSubMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener, uint8 numVaoPasses);
         virtual void readSubMeshLod( DataStreamPtr& stream, Mesh *pMesh,
                                      SubMeshLod *subLod, uint8 currentLod );
         virtual void readIndexes(DataStreamPtr& stream, SubMeshLod *subLod);
@@ -176,7 +176,8 @@ namespace Ogre {
         virtual void readMorphKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track);
         virtual void readPoseKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track);*/
 
-        virtual void createSubMeshVao( SubMesh *sm, const SubMeshLodVec &submeshLods );
+        virtual void createSubMeshVao( SubMesh *sm, const SubMeshLodVec &submeshLods,
+                                       uint8 numVaoPasses );
 
         /// Flip an entire vertex buffer to/from little endian
         /// working on the data pointer passed in pData
@@ -195,6 +196,16 @@ namespace Ogre {
 
         ushort exportedLodCount; // Needed to limit exported Edge data, when exporting
         VaoManager *mVaoManager;
+    };
+
+    class _OgrePrivate MeshSerializerImpl_v2_1_R0 : public MeshSerializerImpl
+    {
+    public:
+        MeshSerializerImpl_v2_1_R0( VaoManager *vaoManager );
+        virtual ~MeshSerializerImpl_v2_1_R0();
+
+    protected:
+        virtual void readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
     };
 
     /** @} */

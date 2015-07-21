@@ -623,4 +623,24 @@ namespace Ogre {
         return retVal;
     }
     //---------------------------------------------------------------------
+    bool Mesh::hasIndependentShadowMappingVaos(void) const
+    {
+        if( !hasValidShadowMappingVaos() )
+            return false;
+
+        bool independent = false;
+
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
+
+        while( itor != end && !independent )
+        {
+            if( !(*itor)->mVao[0].empty() )
+                independent |= (*itor)->mVao[0][0] != (*itor)->mVao[1][0];
+            ++itor;
+        }
+
+        return independent;
+    }
+    //---------------------------------------------------------------------
 }

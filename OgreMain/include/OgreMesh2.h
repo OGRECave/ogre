@@ -420,6 +420,10 @@ namespace Ogre {
         /// Returns true if the mesh is ready for rendering with valid shadow mapping Vaos
         /// Otherwise prepareForShadowMapping must be called on this mesh.
         bool hasValidShadowMappingVaos(void) const;
+
+        /// Returns true if the shadow mapping buffers do not just reference the real buffers,
+        /// but are rather their own separate set of optimized geometry.
+        bool hasIndependentShadowMappingVaos(void) const;
     };
 
     /** @} */

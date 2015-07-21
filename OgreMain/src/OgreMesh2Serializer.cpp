@@ -45,8 +45,12 @@ namespace Ogre {
         // Note MUST be added in reverse order so latest is first in the list
 
         mVersionData.push_back(OGRE_NEW MeshVersionData(
-            MESH_VERSION_2_1, "[MeshSerializer_v2.1]",
+            MESH_VERSION_2_1_R1, "[MeshSerializer_v2.1 R1]",
             OGRE_NEW MeshSerializerImpl( vaoManager )));
+
+        mVersionData.push_back(OGRE_NEW MeshVersionData(
+            MESH_VERSION_LEGACY, "[MeshSerializer_v2.1]",
+            OGRE_NEW MeshSerializerImpl_v2_1_R0( vaoManager )));
     }
     //---------------------------------------------------------------------
     MeshSerializer::~MeshSerializer()
@@ -58,7 +62,6 @@ namespace Ogre {
             OGRE_DELETE *i;
         }
         mVersionData.clear();
-
     }
     //---------------------------------------------------------------------
     void MeshSerializer::exportMesh(const Mesh* pMesh, const String& filename,
@@ -76,6 +79,13 @@ namespace Ogre {
     void MeshSerializer::exportMesh(const Mesh* pMesh, const String& filename,
                                     MeshVersion version, Endian endianMode)
     {
+        if( version == MESH_VERSION_LEGACY )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "You may not supply a legacy version number for writing meshes.",
+                         "MeshSerializer::exportMesh" );
+        }
+
         std::fstream *f = OGRE_NEW_T(std::fstream, MEMCATEGORY_GENERAL)();
         f->open(filename.c_str(), std::ios::binary | std::ios::out);
         DataStreamPtr stream(OGRE_NEW FileStreamDataStream(f));

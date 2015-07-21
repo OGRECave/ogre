@@ -61,7 +61,7 @@ namespace Ogre {
         mVaoManager( vaoManager )
     {
         // Version number
-        mVersion = "[MeshSerializer_v2.1]";
+        mVersion = "[MeshSerializer_v2.1 R1]";
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()
@@ -177,9 +177,8 @@ namespace Ogre {
         // Header
         writeChunkHeader(M_MESH, calcMeshSize(pMesh, lodVertexTable));
         {
-        // bool skeletallyAnimated
-        bool skelAnim = pMesh->hasSkeleton();
-        writeBools(&skelAnim, 1);
+        const uint8 numVaoPasses = pMesh->hasIndependentShadowMappingVaos() + 1;
+        writeData( &numVaoPasses, 1, 1 );
 
         writeString(pMesh->getLodStrategyName()); // string strategyName;
 
@@ -268,8 +267,12 @@ namespace Ogre {
         uint8 numLodLevels = static_cast<uint8>( s->mVao[0].size() );
         writeData( &numLodLevels, 1, 1 );
 
-        for( uint8 lodLevel=0; lodLevel<numLodLevels; ++lodLevel )
-            writeSubMeshLod( s->mVao[0][lodLevel], lodLevel, lodVertexTable[lodLevel] );
+        uint8 numVaoPasses = s->mParent->hasIndependentShadowMappingVaos() + 1;
+        for( uint i=0; i<numVaoPasses; ++i )
+        {
+            for( uint8 lodLevel=0; lodLevel<numLodLevels; ++lodLevel )
+                writeSubMeshLod( s->mVao[i][lodLevel], lodLevel, lodVertexTable[lodLevel] );
+        }
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSubMeshLod( const VertexArrayObject *vao, uint8 lodLevel,
@@ -541,8 +544,12 @@ namespace Ogre {
         // uint8 numLodLevels
         size += sizeof(uint8);
 
-        for( uint8 lodLevel=0; lodLevel<pSub->mVao[0].size(); ++lodLevel )
-            size += calcSubMeshLodSize( pSub->mVao[0][lodLevel], lodVertexTable[lodLevel] != lodLevel );
+        uint8 numVaoPasses = pSub->mParent->hasIndependentShadowMappingVaos() + 1;
+        for( uint8 i=0; i<numVaoPasses; ++i )
+        {
+            for( uint8 lodLevel=0; lodLevel<pSub->mVao[i].size(); ++lodLevel )
+                size += calcSubMeshLodSize( pSub->mVao[i][lodLevel], lodVertexTable[lodLevel] != lodLevel );
+        }
 
         return size;
     }
@@ -683,13 +690,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void MeshSerializerImpl::readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener)
     {
-        // bool skeletallyAnimated
-        bool skeletallyAnimated;
-        readBools(stream, &skeletallyAnimated, 1);
-
         // Read the strategy to be used for this mesh
         // string strategyName;
         pMesh->setLodStrategyName( readString( stream ) );
+
+        uint8 numVaoPasses = 1;
+        readChar( stream, &numVaoPasses );
+        assert( numVaoPasses == 1 || numVaoPasses == 2 );
 
         // Find all substreams
         if (!stream->eof())
@@ -708,7 +715,7 @@ namespace Ogre {
                 switch(streamID)
                 {
                 case M_SUBMESH:
-                    readSubMesh(stream, pMesh, listener);
+                    readSubMesh(stream, pMesh, listener, numVaoPasses);
                     break;
                 case M_MESH_SKELETON_LINK:
                     readSkeletonLink(stream, pMesh, listener);
@@ -749,7 +756,8 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl::readSubMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener)
+    void MeshSerializerImpl::readSubMesh( DataStreamPtr& stream, Mesh* pMesh,
+                                          MeshSerializerListener *listener, uint8 numVaoPasses )
     {
         SubMesh* sm = pMesh->createSubMesh();
 
@@ -762,35 +770,37 @@ namespace Ogre {
         uint8 numLodLevels = 0;
         readChar( stream, &numLodLevels );
 
-        SubMeshLodVec submeshLods;
-        submeshLods.reserve( numLodLevels );
+        SubMeshLodVec totalSubmeshLods;
+        totalSubmeshLods.reserve( numLodLevels * numVaoPasses );
 
         //M_SUBMESH_LOD
         pushInnerChunk(stream);
         try
         {
-            uint16 streamID = readChunk(stream);
-            while( !stream->eof() &&
-                   streamID == M_SUBMESH_LOD )
-            {
-                submeshLods.push_back( SubMeshLod() );
-                readSubMeshLod( stream, pMesh, &submeshLods.back(), submeshLods.size() - 1 );
+            SubMeshLodVec submeshLods;
+            submeshLods.reserve( numLodLevels );
 
-                // Get next stream
-                streamID = readChunk(stream);
-            }
-            if( !stream->eof() )
+            for( uint8 i=0; i<numVaoPasses; ++i )
             {
-                // Backpedal back to start of non-submesh stream
-                backpedalChunkHeader(stream);
-            }
+                for( uint8 j=0; j<numLodLevels; ++j )
+                {
+                    uint16 streamID = readChunk(stream);
+                    assert( streamID == M_SUBMESH_LOD && !stream->eof() );
 
-            createSubMeshVao( sm, submeshLods );
+                    totalSubmeshLods.push_back( SubMeshLod() );
+                    readSubMeshLod( stream, pMesh, &totalSubmeshLods.back(), totalSubmeshLods.size() - 1 );
+
+                    submeshLods.push_back( totalSubmeshLods.back() );
+                }
+
+                createSubMeshVao( sm, submeshLods, i );
+                submeshLods.clear();
+            }
         }
         catch( Exception &e )
         {
-            SubMeshLodVec::iterator itor = submeshLods.begin();
-            SubMeshLodVec::iterator end  = submeshLods.end();
+            SubMeshLodVec::iterator itor = totalSubmeshLods.begin();
+            SubMeshLodVec::iterator end  = totalSubmeshLods.end();
 
             while( itor != end )
             {
@@ -819,9 +829,10 @@ namespace Ogre {
         popInnerChunk(stream);
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl::createSubMeshVao( SubMesh *sm, const SubMeshLodVec &submeshLods )
+    void MeshSerializerImpl::createSubMeshVao( SubMesh *sm, const SubMeshLodVec &submeshLods,
+                                               uint8 casterPass )
     {
-        sm->mVao[0].reserve( submeshLods.size() );
+        sm->mVao[casterPass].reserve( submeshLods.size() );
 
         VertexBufferPackedVec vertexBuffers;
         for( size_t i=0; i<submeshLods.size(); ++i )
@@ -867,7 +878,7 @@ namespace Ogre {
             }
             else
             {
-                vertexBuffers = sm->mVao[0][subMeshLod.lodSource]->getVertexBuffers();
+                vertexBuffers = sm->mVao[casterPass][subMeshLod.lodSource]->getVertexBuffers();
             }
 
             IndexBufferPacked *indexBuffer = 0;
@@ -883,7 +894,7 @@ namespace Ogre {
             VertexArrayObject *vao = mVaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
                                                                            subMeshLod.operationType );
 
-            sm->mVao[0].push_back( vao );
+            sm->mVao[casterPass].push_back( vao );
         }
     }
     //---------------------------------------------------------------------
@@ -2135,5 +2146,73 @@ namespace Ogre {
         numIndices( 0 ),
         indexData( 0 )
     {
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    MeshSerializerImpl_v2_1_R0::MeshSerializerImpl_v2_1_R0( VaoManager *vaoManager ) :
+        MeshSerializerImpl( vaoManager )
+    {
+        // Version number
+        mVersion = "[MeshSerializer_v2.1]";
+    }
+    //---------------------------------------------------------------------
+    MeshSerializerImpl_v2_1_R0::~MeshSerializerImpl_v2_1_R0()
+    {
+    }
+    //---------------------------------------------------------------------
+    void MeshSerializerImpl_v2_1_R0::readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener)
+    {
+        // bool skeletallyAnimated
+        bool skeletallyAnimated;
+        readBools(stream, &skeletallyAnimated, 1);
+
+        // Read the strategy to be used for this mesh
+        // string strategyName;
+        pMesh->setLodStrategyName( readString( stream ) );
+
+        // Find all substreams
+        if (!stream->eof())
+        {
+            pushInnerChunk(stream);
+            uint16 streamID = readChunk(stream);
+            while(!stream->eof() &&
+                (streamID == M_SUBMESH ||
+                 streamID == M_MESH_SKELETON_LINK ||
+                 streamID == M_MESH_BOUNDS ||
+                 streamID == M_SUBMESH_NAME_TABLE ))
+            {
+                switch(streamID)
+                {
+                case M_SUBMESH:
+                    readSubMesh(stream, pMesh, listener, 1);
+                    break;
+                case M_MESH_SKELETON_LINK:
+                    readSkeletonLink(stream, pMesh, listener);
+                    break;
+                case M_MESH_BOUNDS:
+                    readBoundsInfo(stream, pMesh);
+                    break;
+                case M_SUBMESH_NAME_TABLE:
+                    readSubMeshNameTable(stream, pMesh);
+                    break;
+                }
+
+                if (!stream->eof())
+                {
+                    streamID = readChunk(stream);
+                }
+
+            }
+            if (!stream->eof())
+            {
+                // Backpedal back to start of stream
+                backpedalChunkHeader(stream);
+            }
+            popInnerChunk(stream);
+        }
+
     }
 }

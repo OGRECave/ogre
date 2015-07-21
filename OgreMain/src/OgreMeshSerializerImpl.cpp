@@ -133,15 +133,11 @@ namespace v1 {
     void MeshSerializerImpl::writeMesh(const Mesh* pMesh)
     {
         exportedLodCount = 1; // generate edge data for original mesh
+        mNumBufferPasses = pMesh->hasIndependentShadowMappingBuffers() + 1;
 
         // Header
         writeChunkHeader(M_MESH, calcMeshSize(pMesh));
         {
-        // bool skeletallyAnimated
-        bool skelAnim = pMesh->hasSkeleton();
-        writeBools(&skelAnim, 1);
-
-        mNumBufferPasses = pMesh->hasIndependentShadowMappingBuffers() + 1;
         writeData( &mNumBufferPasses, 1, 1 ); //unsigned char numPasses
 
             pushInnerChunk(mStream);
@@ -542,9 +538,10 @@ namespace v1 {
         size += sizeof(bool);
 
         // Geometry
-        if (pMesh->sharedVertexData[0])
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
         {
-            size += calcGeometrySize(pMesh->sharedVertexData[0]);
+            if (pMesh->sharedVertexData[i])
+                size += calcGeometrySize(pMesh->sharedVertexData[i]);
         }
 
         // Submeshes
@@ -608,18 +605,24 @@ namespace v1 {
         // bool indexes32bit
         size += sizeof(bool);
 
-        bool idx32bit = (!pSub->indexData[0]->indexBuffer.isNull() &&
-            pSub->indexData[0]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
-        // unsigned int* / unsigned short* faceVertexIndices
-        if (idx32bit)
-            size += sizeof(unsigned int) * pSub->indexData[0]->indexCount;
-        else
-            size += sizeof(unsigned short) * pSub->indexData[0]->indexCount;
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
+        {
+            bool idx32bit = (!pSub->indexData[i]->indexBuffer.isNull() &&
+                    pSub->indexData[i]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+            // unsigned int* / unsigned short* faceVertexIndices
+            if (idx32bit)
+                size += sizeof(unsigned int) * pSub->indexData[i]->indexCount;
+            else
+                size += sizeof(unsigned short) * pSub->indexData[i]->indexCount;
+        }
 
         // Geometry
-        if (!pSub->useSharedVertices)
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
         {
-            size += calcGeometrySize(pSub->vertexData[0]);
+            if (!pSub->useSharedVertices)
+            {
+                size += calcGeometrySize(pSub->vertexData[i]);
+            }
         }
 
         size += calcSubMeshTextureAliasesSize(pSub);
@@ -911,10 +914,6 @@ namespace v1 {
         // Never automatically build edge lists for this version
         // expect them in the file or not at all
         pMesh->mAutoBuildEdgeLists = false;
-
-        // bool skeletallyAnimated
-        bool skeletallyAnimated;
-        readBools(stream, &skeletallyAnimated, 1);
 
         readChar( stream, &mNumBufferPasses );
         assert( mNumBufferPasses == 1 || mNumBufferPasses == 2 );
@@ -1267,10 +1266,8 @@ namespace v1 {
         writeString(pMesh->getLodStrategyName()); // string strategyName;
         writeShorts(&exportedLodCount, 1); // unsigned short numLevels;
 
-        const bool hasIndependentCasterBuffer = pMesh->hasIndependentShadowMappingBuffers();
-
         pushInnerChunk(mStream);
-        for( size_t j=0; j<hasIndependentCasterBuffer+1; ++j )
+        for( size_t j=0; j<mNumBufferPasses; ++j )
         {
             // Loop from LOD 1 (not 0, this is full detail)
             for (ushort i = 1; i < exportedLodCount; ++i)
@@ -1363,9 +1360,7 @@ namespace v1 {
         size += sizeof(unsigned short); // unsigned short numLevels;
         //size += sizeof(bool); // bool manual; <== this is removed in v1_9
 
-        const bool hasIndependentCasterBuffer = pMesh->hasIndependentShadowMappingBuffers();
-
-        for( size_t j=0; j<hasIndependentCasterBuffer+1; ++j )
+        for( size_t j=0; j<mNumBufferPasses; ++j )
         {
             // Loop from LOD 1 (not 0, this is full detail)
             for (ushort i = 1; i < exportedLodCount; ++i)
@@ -2935,10 +2930,6 @@ namespace v1 {
         // Header
         writeChunkHeader(M_MESH, calcMeshSize(pMesh));
         {
-        // bool skeletallyAnimated
-        bool skelAnim = pMesh->hasSkeleton();
-        writeBools(&skelAnim, 1);
-
             pushInnerChunk(mStream);
 
         // Write shared geometry
