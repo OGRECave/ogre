@@ -7,18 +7,18 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-# Configure MeshUpgrader
+# Configure MeshTool
 
 set(SOURCE_FILES 
   src/main.cpp
 )
 
-ogre_add_executable(OgreMeshUpgrader ${SOURCE_FILES})
+ogre_add_executable(OgreMeshTool ${SOURCE_FILES})
 ogre_add_component_include_dir(MeshLodGenerator)
-target_link_libraries(OgreMeshUpgrader ${OGRE_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
+target_link_libraries(OgreMeshTool ${OGRE_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
 if (APPLE)
-    set_target_properties(OgreMeshUpgrader PROPERTIES
+    set_target_properties(OgreMeshTool PROPERTIES
         LINK_FLAGS "-framework Carbon -framework Cocoa")
 endif ()
 
-ogre_config_tool(OgreMeshUpgrader)
+ogre_config_tool(OgreMeshTool)

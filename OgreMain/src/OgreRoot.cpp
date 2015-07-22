@@ -305,6 +305,7 @@ namespace Ogre {
             << "Worst time: \t" << mFrameStats->getWorstTime()<< " ms";
 
         shutdown();
+
         OGRE_DELETE mSceneManagerEnum;
         OGRE_DELETE mShadowTextureManager;
         OGRE_DELETE mRenderSystemCapabilitiesManager;
@@ -346,15 +347,15 @@ namespace Ogre {
         OGRE_DELETE mMeshManagerV1;
         OGRE_DELETE mParticleManager;
 
-        OGRE_DELETE mControllerManager;
-        OGRE_DELETE mHighLevelGpuProgramManager;
-
         OGRE_DELETE mMaterialManager;
-
         OGRE_DELETE mHlmsLowLevelProxy;
         mHlmsLowLevelProxy = 0;
+        mHlmsManager->_changeRenderSystem((RenderSystem*)0);
         OGRE_DELETE mHlmsManager;
         mHlmsManager = 0;
+
+        OGRE_DELETE mControllerManager;
+        OGRE_DELETE mHighLevelGpuProgramManager;
 
         unloadPlugins();
 
@@ -1096,8 +1097,6 @@ namespace Ogre {
         shutdownPlugins();
 
         ResourceGroupManager::getSingleton().shutdownAll();
-
-        mHlmsManager->_changeRenderSystem((RenderSystem*)0);
 
         // Destroy pools
         ConvexBody::_destroyPool();

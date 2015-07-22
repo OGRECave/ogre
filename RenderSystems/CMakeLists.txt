@@ -39,3 +39,4 @@ if (OGRE_BUILD_RENDERSYSTEM_GLES2)
   endif()
 endif()
 
+add_subdirectory(NULL)

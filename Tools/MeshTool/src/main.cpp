@@ -37,6 +37,8 @@ THE SOFTWARE.
 #include "OgreHardwareVertexBuffer.h"
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreLodConfig.h"
+#include "OgreRoot.h"
+#include "OgreMeshManager2.h"
 
 #include <iostream>
 #include <sys/stat.h>
@@ -79,7 +81,8 @@ void help(void)
     cout << endl;
 }
 
-struct UpgradeOptions {
+struct UpgradeOptions
+{
     bool interactive;
     bool suppressEdgeLists;
     bool generateTangents;
@@ -101,23 +104,14 @@ struct UpgradeOptions {
     Serializer::Endian endian;
     bool recalcBounds;
     v1::MeshVersion targetVersion;
-
 };
 
 
 // Crappy globals
 // NB some of these are not directly used, but are required to
 //   instantiate the singletons used in the dlls
-LogManager* logMgr = 0;
-Math* mth = 0;
-LodStrategyManager* lodMgr = 0;
-MaterialManager* matMgr = 0;
-v1::OldSkeletonManager* skelMgr = 0;
 v1::MeshSerializer* meshSerializer = 0;
 v1::SkeletonSerializer* skeletonSerializer = 0;
-v1::DefaultHardwareBufferManager *bufferManager = 0;
-ResourceGroupManager* rgm = 0;
-v1::MeshManager* meshMgr = 0;
 UpgradeOptions opts;
 
 void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
@@ -247,7 +241,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         } else if (bi->second == "1.0") {
             opts.targetVersion = v1::MESH_VERSION_1_0;
         } else {
-            logMgr->stream() << "Unrecognised target mesh version '" << bi->second << "'";          
+            LogManager::getSingleton().getDefaultLog()->stream() << "Unrecognised target mesh version '" << bi->second << "'";
     }
     }
     
@@ -475,21 +469,21 @@ void reorganiseVertexBuffers(v1::Mesh& mesh)
     // Make sure animation types up to date
     mesh._determineAnimationTypes();
 
-    if (mesh.sharedVertexData) {
+    if (mesh.sharedVertexData[0]) {
         if (opts.interactive) {
-            reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData);
+            reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData[0]);
         } else {
             // Automatic
             v1::VertexDeclaration* newDcl =
-                mesh.sharedVertexData->vertexDeclaration->getAutoOrganisedDeclaration(
+                mesh.sharedVertexData[0]->vertexDeclaration->getAutoOrganisedDeclaration(
                 mesh.hasSkeleton(), mesh.hasVertexAnimation(), mesh.getSharedVertexDataAnimationIncludesNormals());
-            if (*newDcl != *(mesh.sharedVertexData->vertexDeclaration)) {
+            if (*newDcl != *(mesh.sharedVertexData[0]->vertexDeclaration)) {
                 // Usages don't matter here since we're onlly exporting
                 v1::BufferUsageList bufferUsages;
                 for (size_t u = 0; u <= newDcl->getMaxSource(); ++u) {
                     bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                 }
-                mesh.sharedVertexData->reorganiseBuffers(newDcl, bufferUsages);
+                mesh.sharedVertexData[0]->reorganiseBuffers(newDcl, bufferUsages);
             }
 
         }
@@ -503,21 +497,21 @@ void reorganiseVertexBuffers(v1::Mesh& mesh)
             if (opts.interactive) {
                 StringStream str;
                 str << "SubMesh " << idx++; 
-                reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData);
+                reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData[0]);
             } else {
                 const bool hasVertexAnim = sm->getVertexAnimationType() != Ogre::v1::VAT_NONE;
 
                 // Automatic
                 v1::VertexDeclaration* newDcl =
-                    sm->vertexData->vertexDeclaration->getAutoOrganisedDeclaration(
+                    sm->vertexData[0]->vertexDeclaration->getAutoOrganisedDeclaration(
                     mesh.hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals() );
-                if (*newDcl != *(sm->vertexData->vertexDeclaration)) {
+                if (*newDcl != *(sm->vertexData[0]->vertexDeclaration)) {
                     // Usages don't matter here since we're onlly exporting
                     v1::BufferUsageList bufferUsages;
                     for (size_t u = 0; u <= newDcl->getMaxSource(); ++u) {
                         bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                     }
-                    sm->vertexData->reorganiseBuffers(newDcl, bufferUsages);
+                    sm->vertexData[0]->reorganiseBuffers(newDcl, bufferUsages);
                 }
                 
             }
@@ -582,13 +576,13 @@ void recalcBounds(v1::Mesh* mesh)
     AxisAlignedBox aabb;
     Real radius = 0.0f;
 
-    if (mesh->sharedVertexData) {
-        recalcBounds(mesh->sharedVertexData, aabb, radius);
+    if (mesh->sharedVertexData[0]) {
+        recalcBounds(mesh->sharedVertexData[0], aabb, radius);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
         v1::SubMesh* sm = mesh->getSubMesh(i);
         if (!sm->useSharedVertices) {
-            recalcBounds(sm->vertexData, aabb, radius);
+            recalcBounds(sm->vertexData[0], aabb, radius);
     }
     }
 
@@ -900,13 +894,13 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
     bool hasColour = false;
     bool hasAmbiguousColour = false;
     VertexElementType originalType = VET_FLOAT1;
-    if (mesh->sharedVertexData) {
-        checkColour(mesh->sharedVertexData, hasColour, hasAmbiguousColour, originalType);
+    if (mesh->sharedVertexData[0]) {
+        checkColour(mesh->sharedVertexData[0], hasColour, hasAmbiguousColour, originalType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
         v1::SubMesh* sm = mesh->getSubMesh(i);
         if (sm->useSharedVertices == false) {
-            checkColour(sm->vertexData, hasColour, hasAmbiguousColour, originalType);
+            checkColour(sm->vertexData[0], hasColour, hasAmbiguousColour, originalType);
         }
     }
 
@@ -967,12 +961,12 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
     }
 
     if (mesh->sharedVertexData && hasColour) {
-        mesh->sharedVertexData->convertPackedColour(originalType, desiredType);
+        mesh->sharedVertexData[0]->convertPackedColour(originalType, desiredType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i) {
         v1::SubMesh* sm = mesh->getSubMesh(i);
         if (sm->useSharedVertices == false && hasColour) {
-            sm->vertexData->convertPackedColour(originalType, desiredType);
+            sm->vertexData[0]->convertPackedColour(originalType, desiredType);
         }
     }
 
@@ -981,6 +975,8 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
 
 int main(int numargs, char** args)
 {
+    Root *root = 0;
+
     if (numargs < 2) {
         help();
         return -1;
@@ -989,20 +985,24 @@ int main(int numargs, char** args)
     int retCode = 0;
     try 
     {
-        logMgr = new LogManager();
-        logMgr->createLog("OgreMeshUpgrade.log", true);
-        rgm = new ResourceGroupManager();
-        mth = new Math();
-        lodMgr = new LodStrategyManager();
-        matMgr = new MaterialManager();
-        matMgr->initialise();
-        skelMgr = new v1::OldSkeletonManager();
+        Ogre::String pluginsPath;
+        // only use plugins.cfg if not static
+#ifndef OGRE_STATIC_LIB
+    #if OGRE_DEBUG_MODE
+        pluginsPath = "plugins_tools_d.cfg";
+    #else
+        pluginsPath = "plugins_tools.cfg";
+    #endif
+#endif
+        root = OGRE_NEW Root( pluginsPath, "", "OgreMeshTool.log" ) ;
+        root->setRenderSystem( root->getRenderSystemByName( "NULL Rendering Subsystem" ) );
+        root->initialise(true);
+
         meshSerializer = new v1::MeshSerializer();
         skeletonSerializer = new v1::SkeletonSerializer();
-        bufferManager = new v1::DefaultHardwareBufferManager(); // needed because we don't have a rendersystem
-        meshMgr = new v1::MeshManager();
         // don't pad during upgrade
-        meshMgr->setBoundsPaddingFactor(0.0f);
+        v1::MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
+        MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
 
         
         UnaryOptionList unOptList;
@@ -1170,15 +1170,11 @@ int main(int numargs, char** args)
     }
 
 
-    delete meshMgr;
     delete skeletonSerializer;
     delete meshSerializer;
-    delete skelMgr;
-    delete matMgr;
-    delete lodMgr;
-    delete mth;
-    delete rgm;
-    delete logMgr;
+
+    OGRE_DELETE root;
+    root = 0;
 
     return retCode;
 

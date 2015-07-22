@@ -54,7 +54,9 @@ namespace v1 {
     GL3PlusHardwarePixelBuffer::~GL3PlusHardwarePixelBuffer()
     {
         // Force free buffer
-        delete [] (uint8*)mBuffer.data;
+        uint8 *p = reinterpret_cast<uint8*>( mBuffer.data );
+        delete [] p;
+        mBuffer.data = 0;
     }
 
     void GL3PlusHardwarePixelBuffer::allocateBuffer( size_t bytes )
@@ -71,7 +73,8 @@ namespace v1 {
         // Free buffer if we're STATIC to save memory
         if (mUsage & HBU_STATIC)
         {
-            delete [] (uint8*)mBuffer.data;
+            uint8 *p = reinterpret_cast<uint8*>( mBuffer.data );
+            delete [] p;
             mBuffer.data = 0;
         }
     }
