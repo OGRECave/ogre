@@ -34,14 +34,14 @@
 namespace Ogre
 {
 
-class _OgreLodExport LodWorkQueueInjectorListener
-{
-public:
-    LodWorkQueueInjectorListener(){}
-    virtual ~LodWorkQueueInjectorListener(){}
-    virtual bool shouldInject(LodWorkQueueRequest* request) = 0;
-    virtual void injectionCompleted(LodWorkQueueRequest* request) = 0;
-};
+    class _OgreLodExport LodWorkQueueInjectorListener
+    {
+    public:
+        LodWorkQueueInjectorListener() {}
+        virtual ~LodWorkQueueInjectorListener() {}
+        virtual bool shouldInject(LodWorkQueueRequest* request) = 0;
+        virtual void injectionCompleted(LodWorkQueueRequest* request) = 0;
+    };
 
 }
 #endif

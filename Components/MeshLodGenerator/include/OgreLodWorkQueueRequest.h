@@ -39,14 +39,15 @@
 
 namespace Ogre
 {
-struct _OgreLodExport LodWorkQueueRequest {
-    LodConfig config;
-    LodDataPtr data;
-    LodInputProviderPtr input;
-    LodOutputProviderPtr output;
-    LodCollapseCostPtr cost;
-    LodCollapserPtr collapser;
-};
+    struct _OgreLodExport LodWorkQueueRequest
+    {
+        LodConfig config;
+        LodDataPtr data;
+        LodInputProviderPtr input;
+        LodOutputProviderPtr output;
+        LodCollapseCostPtr cost;
+        LodCollapserPtr collapser;
+    };
 
 }
 #endif

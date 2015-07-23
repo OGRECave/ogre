@@ -45,13 +45,16 @@ namespace Ogre
         // Are we going to invert a face normal of one of the neighboring faces?
         // Can occur when we have a very small remaining edge and collapse crosses it
         // Look for a face normal changing by > 90 degrees
-        if(MESHLOD_QUALITY >= 2) { // 30% speedup if disabled.
+        if(MESHLOD_QUALITY >= 2)   // 30% speedup if disabled.
+        {
             LodData::VTriangles::iterator it = src->triangles.begin();
             LodData::VTriangles::iterator itEnd = src->triangles.end();
-            for (; it != itEnd; ++it) {
+            for (; it != itEnd; ++it)
+            {
                 LodData::Triangle* triangle = *it;
                 // Ignore the deleted faces (those including src & dest)
-                if (!triangle->hasVertex(dst)) {
+                if (!triangle->hasVertex(dst))
+                {
                     // Test the new face normal
                     LodData::Vertex* pv0, * pv1, * pv2;
 
@@ -68,7 +71,8 @@ namespace Ogre
 
                     // Dot old and new face normal
                     // If < 0 then more than 90 degree difference
-                    if (newNormal.dotProduct(triangle->normal) < 0.0f) {
+                    if (newNormal.dotProduct(triangle->normal) < 0.0f)
+                    {
                         // Don't do it!
                         return LodData::NEVER_COLLAPSE_COST;
                     }
@@ -80,14 +84,18 @@ namespace Ogre
 
         // Special cases
         // If we're looking at a border vertex
-        if (isBorderVertex(src)) {
-            if (dstEdge->refCount > 1) {
+        if (isBorderVertex(src))
+        {
+            if (dstEdge->refCount > 1)
+            {
                 // src is on a border, but the src-dest edge has more than one tri on it
                 // So it must be collapsing inwards
                 // Mark as very high-value cost
                 // curvature = 1.0f;
                 cost = 1.0f;
-            } else {
+            }
+            else
+            {
                 // Collapsing ALONG a border
                 // We can't use curvature to measure the effect on the model
                 // Instead, see what effect it has on 'pulling' the other border edges
@@ -102,9 +110,11 @@ namespace Ogre
                 collapseEdge.normalise();
                 LodData::VEdges::iterator it = src->edges.begin();
                 LodData::VEdges::iterator itEnd = src->edges.end();
-                for (; it != itEnd; it++) {
+                for (; it != itEnd; it++)
+                {
                     LodData::Vertex* neighbor = it->dst;
-                    if (neighbor != dst && it->refCount == 1) {
+                    if (neighbor != dst && it->refCount == 1)
+                    {
                         Vector3 otherBorderEdge = src->position - neighbor->position;
                         otherBorderEdge.normalise();
                         // This time, the nearer the dot is to -1, the better, because that means
@@ -116,7 +126,9 @@ namespace Ogre
                 }
                 cost = (1.002f + cost) * 0.5f;
             }
-        } else { // not a border
+        }
+        else     // not a border
+        {
 
             // Standard inner vertex
             // Calculate curvature
@@ -126,13 +138,16 @@ namespace Ogre
             cost = 1.0f;
             LodData::VTriangles::iterator it = src->triangles.begin();
             LodData::VTriangles::iterator itEnd = src->triangles.end();
-            for (; it != itEnd; ++it) {
+            for (; it != itEnd; ++it)
+            {
                 Real mincurv = -1.0f; // curve for face i and closer side to it
                 LodData::Triangle* triangle = *it;
                 LodData::VTriangles::iterator it2 = src->triangles.begin();
-                for (; it2 != itEnd; ++it2) {
+                for (; it2 != itEnd; ++it2)
+                {
                     LodData::Triangle* triangle2 = *it2;
-                    if (triangle2->hasVertex(dst)) {
+                    if (triangle2->hasVertex(dst))
+                    {
 
                         // Dot product of face normal gives a good delta angle
                         Real dotprod = triangle->normal.dotProduct(triangle2->normal);
@@ -147,33 +162,46 @@ namespace Ogre
         }
 
         // check for texture seam ripping and multiple submeshes
-        if (src->seam) {
-            if (!dst->seam) {
+        if (src->seam)
+        {
+            if (!dst->seam)
+            {
                 cost = std::max<Real>(cost, (Real)0.05f);
                 cost *= 64;
-            } else {
-                if(MESHLOD_QUALITY >= 3) {
+            }
+            else
+            {
+                if(MESHLOD_QUALITY >= 3)
+                {
                     int seamNeighbors = 0;
                     LodData::Vertex* otherSeam;
                     LodData::VEdges::iterator it = src->edges.begin();
                     LodData::VEdges::iterator itEnd = src->edges.end();
-                    for (; it != itEnd; it++) {
+                    for (; it != itEnd; it++)
+                    {
                         LodData::Vertex* neighbor = it->dst;
-                        if(neighbor->seam) {
+                        if(neighbor->seam)
+                        {
                             seamNeighbors++;
-                            if(neighbor != dst){
+                            if(neighbor != dst)
+                            {
                                 otherSeam = neighbor;
                             }
                         }
                     }
-                    if(seamNeighbors != 2 || (seamNeighbors == 2 && dst->edges.has(LodData::Edge(otherSeam)))) {
+                    if(seamNeighbors != 2 || (seamNeighbors == 2 && dst->edges.has(LodData::Edge(otherSeam))))
+                    {
                         cost = std::max<Real>(cost, 0.05f);
                         cost *= 64;
-                    } else {
+                    }
+                    else
+                    {
                         cost = std::max<Real>(cost, 0.005f);
                         cost *= 8;
                     }
-                } else {
+                }
+                else
+                {
                     cost = std::max<Real>(cost, 0.005f);
                     cost *= 8;
                 }
@@ -184,25 +212,27 @@ namespace Ogre
         Real diff = src->normal.dotProduct(dst->normal) / 8.0f;
         Real dist = src->position.distance(dst->position);
         cost = cost * dist;
-        if(data->mUseVertexNormals){
+        if(data->mUseVertexNormals)
+        {
             //Take into account vertex normals.
             Real normalCost = 0;
             LodData::VEdges::iterator it = src->edges.begin();
             LodData::VEdges::iterator itEnd = src->edges.end();
-            for (; it != itEnd; ++it) {
+            for (; it != itEnd; ++it)
+            {
                 LodData::Vertex* neighbor = it->dst;
                 Real beforeDist = neighbor->position.distance(src->position);
                 Real afterDist = neighbor->position.distance(dst->position);
                 Real beforeDot = neighbor->normal.dotProduct(src->normal);
                 Real afterDot = neighbor->normal.dotProduct(dst->normal);
                 normalCost = std::max<Real>(normalCost, std::max<Real>(diff, std::abs(beforeDot - afterDot)) *
-                    std::max<Real>(afterDist/8.0f, std::max<Real>(dist, std::abs(beforeDist - afterDist))));
+                                            std::max<Real>(afterDist/8.0f, std::max<Real>(dist, std::abs(beforeDist - afterDist))));
             }
             cost = std::max<Real>(normalCost * 0.25f, cost);
         }
 
         OgreAssert(cost >= 0 && cost != LodData::UNINITIALIZED_COLLAPSE_COST, "Invalid collapse cost");
         return cost;
-    }   
+    }
 }
 

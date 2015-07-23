@@ -52,13 +52,17 @@ namespace Ogre
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
         unsigned short submeshCount = mBuffer.submesh.size();
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        for (unsigned short i = 0; i < submeshCount; i++)
+        {
             const LodInputBuffer::Submesh& submesh = mBuffer.submesh[i];
-            if (!submesh.useSharedVertexBuffer) {
+            if (!submesh.useSharedVertexBuffer)
+            {
                 size_t count = submesh.vertexBuffer.vertexCount;
                 vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
                 vertexCount += count;
-            } else if (!sharedVerticesAdded) {
+            }
+            else if (!sharedVerticesAdded)
+            {
                 sharedVerticesAdded = true;
                 sharedVertexLookupSize = mBuffer.sharedVertexBuffer.vertexCount;
                 vertexCount += sharedVertexLookupSize;
@@ -85,7 +89,8 @@ namespace Ogre
 #endif
         data->mMeshBoundingSphereRadius = mBuffer.boundingSphereRadius;
         unsigned short submeshCount = mBuffer.submesh.size();
-        for (unsigned short i = 0; i < submeshCount; ++i) {
+        for (unsigned short i = 0; i < submeshCount; ++i)
+        {
             LodInputBuffer::Submesh& submesh = mBuffer.submesh[i];
             LodVertexBuffer& vertexBuffer =
                 (submesh.useSharedVertexBuffer ? mBuffer.sharedVertexBuffer : submesh.vertexBuffer);
@@ -99,7 +104,8 @@ namespace Ogre
     }
     void LodInputProviderBuffer::addVertexData(LodData* data, LodVertexBuffer& vertexBuffer, bool useSharedVertexLookup)
     {
-        if (useSharedVertexLookup && !mSharedVertexLookup.empty()) {
+        if (useSharedVertexLookup && !mSharedVertexLookup.empty())
+        {
             return; // We already loaded the shared vertex buffer.
         }
 
@@ -112,33 +118,41 @@ namespace Ogre
         // Loop through all vertices and insert them to the Unordered Map.
         Vector3* pOut = vertexBuffer.vertexBuffer.get();
         Vector3* pEnd = pOut + vertexBuffer.vertexCount;
-        for (; pOut < pEnd; pOut++) {
+        for (; pOut < pEnd; pOut++)
+        {
             data->mVertexList.push_back(LodData::Vertex());
             LodData::Vertex* v = &data->mVertexList.back();
             v->position = *pOut;
             std::pair<LodData::UniqueVertexSet::iterator, bool> ret;
             ret = data->mUniqueVertexSet.insert(v);
-            if (!ret.second) {
+            if (!ret.second)
+            {
                 // Vertex position already exists.
                 data->mVertexList.pop_back();
                 v = *ret.first; // Point to the existing vertex.
                 v->seam = true;
-                if(data->mUseVertexNormals){
-                    if(v->normal.x != (*pNormalOut).x){
+                if(data->mUseVertexNormals)
+                {
+                    if(v->normal.x != (*pNormalOut).x)
+                    {
                         v->normal += *pNormalOut;
-                        if(v->normal.isZeroLength()){
+                        if(v->normal.isZeroLength())
+                        {
                             v->normal = Vector3(1.0, 0.0, 0.0);
                         }
                         v->normal.normalise();
                     }
                     pNormalOut++;
                 }
-            } else {
+            }
+            else
+            {
 #if OGRE_DEBUG_MODE
                 v->costHeapPosition = data->mCollapseCostHeap.end();
 #endif
                 v->seam = false;
-                if(data->mUseVertexNormals){
+                if(data->mUseVertexNormals)
+                {
                     v->normal = *pNormalOut;
                     v->normal.normalise();
                     pNormalOut++;
@@ -157,13 +171,17 @@ namespace Ogre
 
         // Lock the buffer for reading.
         unsigned char* iStart = indexBuffer.indexBuffer.get();
-        if(!iStart) {
+        if(!iStart)
+        {
             return;
         }
         unsigned char* iEnd = iStart + indexBuffer.indexCount * isize;
-        if (isize == sizeof(unsigned short)) {
+        if (isize == sizeof(unsigned short))
+        {
             addIndexDataImpl<unsigned short>(data, (unsigned short*) iStart, (unsigned short*) iEnd, lookup, submeshID);
-        } else {
+        }
+        else
+        {
             // Unsupported index size.
             OgreAssert(isize == sizeof(unsigned int), "");
             addIndexDataImpl<unsigned int>(data, (unsigned int*) iStart, (unsigned int*) iEnd, lookup, submeshID);

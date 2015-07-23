@@ -37,7 +37,8 @@ namespace Ogre
     void LodIndexBuffer::fillBuffer( Ogre::v1::IndexData* data )
     {
         indexCount = data->indexCount;
-        if (indexCount > 0) {
+        if (indexCount > 0)
+        {
             const v1::HardwareIndexBufferSharedPtr& hwIndexBuffer = data->indexBuffer;
             indexSize = hwIndexBuffer->getIndexSize();
             unsigned char* pBuffer = (unsigned char*) hwIndexBuffer->lock(v1::HardwareBuffer::HBL_READ_ONLY);
@@ -53,7 +54,8 @@ namespace Ogre
     void LodVertexBuffer::fillBuffer( Ogre::v1::VertexData* data )
     {
         vertexCount = data->vertexCount;
-        if (vertexCount > 0) {
+        if (vertexCount > 0)
+        {
             // Locate position element and the buffer to go with it.
             const v1::VertexElement* elemPos = data->vertexDeclaration->findElementBySemantic(VES_POSITION);
 
@@ -76,13 +78,17 @@ namespace Ogre
             bool useVertexNormals = true;
             elemNormal = data->vertexDeclaration->findElementBySemantic(VES_NORMAL);
             useVertexNormals = useVertexNormals && (elemNormal != 0);
-            if(useVertexNormals){
+            if(useVertexNormals)
+            {
                 vertexNormalBuffer = Ogre::SharedPtr<Vector3>(new Vector3[vertexCount]);
                 pNormalOut = vertexNormalBuffer.get();
-                if(elemNormal->getSource() == elemPos->getSource()){
+                if(elemNormal->getSource() == elemPos->getSource())
+                {
                     vNormalBuf = vbuf;
                     vNormal = vStart;
-                }  else {
+                }
+                else
+                {
                     vNormalBuf = data->vertexBufferBinding->getBuffer(elemNormal->getSource());
                     assert(vNormalBuf->getSizeInBytes() == vbuf->getSizeInBytes());
                     assert(vNormalBuf->getVertexSize() == vbuf->getVertexSize());
@@ -94,14 +100,16 @@ namespace Ogre
             // Loop through all vertices and insert them to the Unordered Map.
             Vector3* pOut = vertexBuffer.get();
             Vector3* pEnd = pOut + vertexCount;
-            for (; pOut < pEnd; pOut++) {
+            for (; pOut < pEnd; pOut++)
+            {
                 float* pFloat;
                 elemPos->baseVertexPointerToElement(vertex, &pFloat);
                 pOut->x = *pFloat;
                 pOut->y = *(++pFloat);
                 pOut->z = *(++pFloat);
                 vertex += vSize;
-                if(useVertexNormals){
+                if(useVertexNormals)
+                {
                     elemNormal->baseVertexPointerToElement(vNormal, &pFloat);
                     pNormalOut->x = *pFloat;
                     pNormalOut->y = *(++pFloat);
@@ -111,7 +119,8 @@ namespace Ogre
                 }
             }
             vbuf->unlock();
-            if(elemNormal && elemNormal->getSource() != elemPos->getSource()){
+            if(elemNormal && elemNormal->getSource() != elemPos->getSource())
+            {
                 vNormalBuf->unlock();
             }
         }
@@ -124,18 +133,21 @@ namespace Ogre
         bool sharedVerticesAdded = false;
         unsigned short submeshCount = mesh->getNumSubMeshes();
         submesh.resize(submeshCount);
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        for (unsigned short i = 0; i < submeshCount; i++)
+        {
             const v1::SubMesh* ogresubmesh = mesh->getSubMesh(i);
             LodInputBuffer::Submesh& outsubmesh = submesh[i];
             outsubmesh.indexBuffer.fillBuffer(ogresubmesh->indexData[0]);
             outsubmesh.useSharedVertexBuffer = ogresubmesh->useSharedVertices;
-            if (!outsubmesh.useSharedVertexBuffer) {
+            if (!outsubmesh.useSharedVertexBuffer)
+            {
                 outsubmesh.vertexBuffer.fillBuffer(ogresubmesh->vertexData[0]);
-            } else if (!sharedVerticesAdded) {
+            }
+            else if (!sharedVerticesAdded)
+            {
                 sharedVerticesAdded = true;
                 sharedVertexBuffer.fillBuffer(mesh->sharedVertexData[0]);
             }
         }
     }
-
- }
+}

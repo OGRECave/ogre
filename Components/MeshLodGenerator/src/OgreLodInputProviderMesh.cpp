@@ -51,13 +51,17 @@ namespace Ogre
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
         unsigned short submeshCount = mMesh->getNumSubMeshes();
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        for (unsigned short i = 0; i < submeshCount; i++)
+        {
             const v1::SubMesh* submesh = mMesh->getSubMesh(i);
-            if (!submesh->useSharedVertices) {
+            if (!submesh->useSharedVertices)
+            {
                 size_t count = submesh->vertexData[0]->vertexCount;
                 vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
                 vertexCount += count;
-            } else if (!sharedVerticesAdded) {
+            }
+            else if (!sharedVerticesAdded)
+            {
                 sharedVerticesAdded = true;
                 sharedVertexLookupSize = mMesh->sharedVertexData[0]->vertexCount;
                 vertexCount += sharedVertexLookupSize;
@@ -84,10 +88,11 @@ namespace Ogre
 #endif
         data->mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
         unsigned short submeshCount = mMesh->getNumSubMeshes();
-        for (unsigned short i = 0; i < submeshCount; ++i) {
+        for (unsigned short i = 0; i < submeshCount; ++i)
+        {
             const v1::SubMesh* submesh = mMesh->getSubMesh(i);
             v1::VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData[0] :
-                                                                       submesh->vertexData[0]);
+                                          submesh->vertexData[0]);
             addVertexData(data, vertexData, submesh->useSharedVertices);
             if(submesh->indexData[0]->indexCount > 0)
                 addIndexData(data, submesh->indexData[0], submesh->useSharedVertices, i);
@@ -99,20 +104,21 @@ namespace Ogre
     }
     void LodInputProviderMesh::addVertexData(LodData* data, v1::VertexData* vertexData, bool useSharedVertexLookup)
     {
-        if ((useSharedVertexLookup && !mSharedVertexLookup.empty())) { // We already loaded the shared vertex buffer.
+        if ((useSharedVertexLookup && !mSharedVertexLookup.empty()))   // We already loaded the shared vertex buffer.
+        {
             return;
         }
         OgreAssert(vertexData->vertexCount != 0, "");
 
         // Locate position element and the buffer to go with it.
         const v1::VertexElement* elemPos = vertexData->vertexDeclaration->
-                                                findElementBySemantic(VES_POSITION);
+                                           findElementBySemantic(VES_POSITION);
 
         // Only float supported.
         OgreAssert(elemPos->getSize() == 12, "");
 
         v1::HardwareVertexBufferSharedPtr vbuf = vertexData->vertexBufferBinding->getBuffer(
-                                                                        elemPos->getSource() );
+                    elemPos->getSource() );
 
         // Lock the buffer for reading.
         unsigned char* vStart = static_cast<unsigned char*>(vbuf->lock(v1::HardwareBuffer::HBL_READ_ONLY));
@@ -127,25 +133,30 @@ namespace Ogre
         unsigned char* vNormal = NULL;
         size_t vNormSize = 0;
         const v1::VertexElement* elemNormal = vertexData->vertexDeclaration->
-                                                findElementBySemantic(VES_NORMAL);
+                                              findElementBySemantic(VES_NORMAL);
 
         data->mUseVertexNormals &= (elemNormal != NULL);
-        if(data->mUseVertexNormals){
-            if(elemNormal->getSource() == elemPos->getSource()){
+        if(data->mUseVertexNormals)
+        {
+            if(elemNormal->getSource() == elemPos->getSource())
+            {
                 // Don't open the same buffer twice. Just copy the pointer.
                 vNormalBuf = vbuf;
                 vNormal = vStart;
-            }  else {
+            }
+            else
+            {
                 vNormalBuf = vertexData->vertexBufferBinding->getBuffer(elemNormal->getSource());
                 vNormal = static_cast<unsigned char*>(
-                                vNormalBuf->lock(v1::HardwareBuffer::HBL_READ_ONLY) );
+                              vNormalBuf->lock(v1::HardwareBuffer::HBL_READ_ONLY) );
             }
             vNormSize = vNormalBuf->getVertexSize();
         }
 
 
         // Loop through all vertices and insert them to the Unordered Map.
-        for (; vertex < vEnd; vertex += vSize) {
+        for (; vertex < vEnd; vertex += vSize)
+        {
             float* pFloat;
             elemPos->baseVertexPointerToElement(vertex, &pFloat);
             data->mVertexList.push_back(LodData::Vertex());
@@ -155,12 +166,15 @@ namespace Ogre
             v->position.z = pFloat[2];
             std::pair<LodData::UniqueVertexSet::iterator, bool> ret;
             ret = data->mUniqueVertexSet.insert(v);
-            if (!ret.second) {
+            if (!ret.second)
+            {
                 // Vertex position already exists.
                 data->mVertexList.pop_back();
                 v = *ret.first; // Point to the existing vertex.
                 v->seam = true;
-            } else {
+            }
+            else
+            {
 #if OGRE_DEBUG_MODE
                 // Needed for an assert, don't remove it.
                 v->costHeapPosition = data->mCollapseCostHeap.end();
@@ -169,19 +183,25 @@ namespace Ogre
             }
             lookup.push_back(v);
 
-            if(data->mUseVertexNormals){
+            if(data->mUseVertexNormals)
+            {
                 elemNormal->baseVertexPointerToElement(vNormal, &pFloat);
-                if (!ret.second) {
-                    if(v->normal.x != pFloat[0]){
+                if (!ret.second)
+                {
+                    if(v->normal.x != pFloat[0])
+                    {
                         v->normal.x += pFloat[0];
                         v->normal.y += pFloat[1];
                         v->normal.z += pFloat[2];
-                        if(v->normal.isZeroLength()){
+                        if(v->normal.isZeroLength())
+                        {
                             v->normal = Vector3(1.0, 0.0, 0.0);
                         }
                         v->normal.normalise();
                     }
-                } else {
+                }
+                else
+                {
                     v->normal.x = pFloat[0];
                     v->normal.y = pFloat[1];
                     v->normal.z = pFloat[2];
@@ -191,18 +211,20 @@ namespace Ogre
             }
         }
         vbuf->unlock();
-        if(data->mUseVertexNormals && elemNormal->getSource() != elemPos->getSource()){
+        if(data->mUseVertexNormals && elemNormal->getSource() != elemPos->getSource())
+        {
             vNormalBuf->unlock();
         }
     }
     void LodInputProviderMesh::addIndexData( LodData* data, v1::IndexData* indexData,
-                                             bool useSharedVertexLookup, unsigned short submeshID )
+            bool useSharedVertexLookup, unsigned short submeshID )
     {
         const v1::HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
         size_t isize = ibuf->getIndexSize();
         data->mIndexBufferInfoList[submeshID].indexSize = isize;
         data->mIndexBufferInfoList[submeshID].indexCount = indexData->indexCount;
-        if (indexData->indexCount == 0) {
+        if (indexData->indexCount == 0)
+        {
             // Locking a zero length buffer on Linux with nvidia cards fails.
             return;
         }
@@ -211,14 +233,17 @@ namespace Ogre
         // Lock the buffer for reading.
         char* iStart = static_cast<char*>(ibuf->lock(v1::HardwareBuffer::HBL_READ_ONLY));
         char* iEnd = iStart + ibuf->getSizeInBytes();
-        if (isize == sizeof(unsigned short)) {
+        if (isize == sizeof(unsigned short))
+        {
             addIndexDataImpl<unsigned short>(data, (unsigned short*) iStart, (unsigned short*) iEnd, lookup, submeshID);
-        } else {
+        }
+        else
+        {
             // Unsupported index size.
             OgreAssert(isize == sizeof(unsigned int), "");
             addIndexDataImpl<unsigned int>(data, (unsigned int*) iStart, (unsigned int*) iEnd, lookup, submeshID);
         }
         ibuf->unlock();
-    }   
+    }
 
 }

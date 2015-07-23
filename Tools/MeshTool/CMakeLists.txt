@@ -9,9 +9,11 @@
 
 # Configure MeshTool
 
-set(SOURCE_FILES 
-  src/main.cpp
-)
+macro( add_recursive dir retVal )
+	file( GLOB_RECURSE ${retVal} ${dir}/*.h ${dir}/*.cpp ${dir}/*.c )
+endmacro()
+
+add_recursive( ./ SOURCE_FILES )
 
 ogre_add_executable(OgreMeshTool ${SOURCE_FILES})
 ogre_add_component_include_dir(MeshLodGenerator)

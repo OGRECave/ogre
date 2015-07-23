@@ -59,10 +59,14 @@ namespace Ogre
     Real LodCollapseCostOutside::computeEdgeCollapseCost( LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge )
     {
         Real cost = mCostCalculator->computeEdgeCollapseCost(data, src, dstEdge);
-        if(mOutsideMarker->isVertexOutside(src) || mOutsideMarker->isVertexOutside(dstEdge->dst)) {
-            if(mOutsideWeight != LodData::NEVER_COLLAPSE_COST && cost != LodData::NEVER_COLLAPSE_COST) {
+        if(mOutsideMarker->isVertexOutside(src) || mOutsideMarker->isVertexOutside(dstEdge->dst))
+        {
+            if(mOutsideWeight != LodData::NEVER_COLLAPSE_COST && cost != LodData::NEVER_COLLAPSE_COST)
+            {
                 cost *= std::max<Real>(0.0078125f, mOutsideWeight * 8.0f);
-            } else {
+            }
+            else
+            {
                 return LodData::NEVER_COLLAPSE_COST;
             }
         }
