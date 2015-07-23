@@ -54,7 +54,7 @@ namespace Ogre {
           mMaxStencilSize(0),
           mMSAA(0),
           mCSAA(0),
-          preserveContext(false)
+          mPreserveContext(false)
     {
     }
 
@@ -93,12 +93,12 @@ namespace Ogre {
     {
         if(mActive)
         {		
-			// When using GPU rendering for Android UI the os creates a context in the main thread
-			// Now we have 2 choices create OGRE in its own thread or set our context current before doing
-			// anything else. I put this code here because this function called before any rendering is done.
-			// Because the events for screen rotation / resizing did not worked on all devices it is the best way
-			// to query the correct dimensions.
-	        mContext->setCurrent(); 
+            // When using GPU rendering for Android UI the os creates a context in the main thread
+            // Now we have 2 choices create OGRE in its own thread or set our context current before doing
+            // anything else. I put this code here because this function called before any rendering is done.
+            // Because the events for screen rotation / resizing did not worked on all devices it is the best way
+            // to query the correct dimensions.
+            mContext->setCurrent(); 
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_WIDTH, (EGLint*)&mWidth);
             eglQuerySurface(mEglDisplay, mEglSurface, EGL_HEIGHT, (EGLint*)&mHeight);
             
@@ -241,7 +241,7 @@ namespace Ogre {
         mActive = true;
         mVisible = true;
         mClosed = false;
-        preserveContext = preserveContextOpt;
+        mPreserveContext = preserveContextOpt;
     }
 
     void AndroidEGLWindow::_destroyInternalResources()
@@ -249,7 +249,7 @@ namespace Ogre {
         if(mClosed)
             return;
         
-        if (!preserveContext)
+        if (!mPreserveContext)
         {
             mContext->setCurrent();
 
@@ -275,7 +275,7 @@ namespace Ogre {
     {
         mWindow = window;
         
-        if (preserveContext)
+        if (mPreserveContext)
         {
             mEglDisplay = mGLSupport->getGLDisplay();
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
@@ -380,7 +380,7 @@ namespace Ogre {
             mVisible = true;
             mClosed = false;
             
-            if (!preserveContext)
+            if (!mPreserveContext)
             {
                 mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
 
