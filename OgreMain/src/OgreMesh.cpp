@@ -1410,6 +1410,11 @@ namespace v1 {
                 (*itor)->vertexData[1] = (*itor)->vertexData[0];
                 (*itor)->indexData[1] = (*itor)->indexData[0];
 
+                SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[0].begin();
+                SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[0].end();
+                while( itLod != enLod )
+                    (*itor)->mLodFaceList[1].push_back( *itLod++ );
+
                 ++itor;
             }
         }

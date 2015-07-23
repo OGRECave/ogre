@@ -263,6 +263,8 @@ namespace Ogre
         {
             _generateManualLodLevels(lodConfig);
         }
+
+        lodConfig.mesh->prepareForShadowMapping( false );
     }
 
     void MeshLodGenerator::computeLods(LodConfig& lodConfig,

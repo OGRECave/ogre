@@ -219,7 +219,7 @@ namespace Ogre
 
             if( origIndexBuffer )
             {
-                const FastArray<uint32> &vertexConvLut = vertexConversionLuts[currentVaoIdx];
+                const FastArray<uint32> &vertexConvLut = vertexConversionLuts[sharedVaoIdx];
 
                 AsyncTicketPtr ticket =
                         origIndexBuffer->readRequest( 0, origIndexBuffer->getNumElements() );
@@ -626,7 +626,7 @@ namespace v1
                                                    geom.indexData->indexBuffer->getNumIndexes(),
                                                    geom.indexData->indexBuffer->getUsage() );
 
-                const FastArray<uint32> &vertexConvLut = vertexConversionLuts[currentVaoIdx];
+                const FastArray<uint32> &vertexConvLut = vertexConversionLuts[sharedVaoIdx];
 
                 const void *indexData = geom.indexData->indexBuffer->lock(
                             HardwareBuffer::HBL_READ_ONLY );

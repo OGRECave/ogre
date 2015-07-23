@@ -534,8 +534,8 @@ namespace v1 {
     {
         size_t size = MSTREAM_OVERHEAD_SIZE;
 
-        // bool hasSkeleton
-        size += sizeof(bool);
+        // bool hasSkeleton or uint8 numPasses
+        size += sizeof(uint8);
 
         // Geometry
         for( uint8 i=0; i<mNumBufferPasses; ++i )
@@ -600,13 +600,14 @@ namespace v1 {
 
         // bool useSharedVertices
         size += sizeof(bool);
-        // unsigned int indexCount
-        size += sizeof(unsigned int);
-        // bool indexes32bit
-        size += sizeof(bool);
 
         for( uint8 i=0; i<mNumBufferPasses; ++i )
         {
+            // unsigned int indexCount
+            size += sizeof(unsigned int);
+            // bool indexes32bit
+            size += sizeof(bool);
+
             bool idx32bit = (!pSub->indexData[i]->indexBuffer.isNull() &&
                     pSub->indexData[i]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
             // unsigned int* / unsigned short* faceVertexIndices
@@ -1086,15 +1087,15 @@ namespace v1 {
         // M_GEOMETRY stream (Optional: present only if useSharedVertices = false)
         if (!sm->useSharedVertices)
         {
-            streamID = readChunk(stream);
-            if (streamID != M_GEOMETRY)
-            {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Missing geometry data in mesh file",
-                    "MeshSerializerImpl::readSubMesh");
-            }
-
             for( uint8 i=0; i<mNumBufferPasses; ++i )
             {
+                streamID = readChunk(stream);
+                if (streamID != M_GEOMETRY)
+                {
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Missing geometry data in mesh file",
+                        "MeshSerializerImpl::readSubMesh");
+                }
+
                 sm->vertexData[i] = OGRE_NEW VertexData();
                 readGeometry(stream, pMesh, sm->vertexData[i]);
             }

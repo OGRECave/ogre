@@ -75,7 +75,7 @@ void help(void)
     cout << "-E endian  = Set endian mode 'big' 'little' or 'native' (default)" << endl;
     cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
-    cout << "             Options are: 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
+    cout << "             Options are: 2.1, 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
     cout << "sourcefile = name of file to convert" << endl;
     cout << "destfile   = optional name of file to write to. If you don't" << endl;
     cout << "             specify this OGRE overwrites the existing file." << endl;
@@ -226,7 +226,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     bi = binOpts.find("-V");
     if (!bi->second.empty())
     {
-        if (bi->second == "1.10")
+        if (bi->second == "2.1")
+        {
+            opts.targetVersion = v1::MESH_VERSION_2_1;
+        }
+        else if (bi->second == "1.10")
         {
             opts.targetVersion = v1::MESH_VERSION_1_10;
         }
