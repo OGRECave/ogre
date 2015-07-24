@@ -51,9 +51,9 @@ using namespace Ogre;
 void help(void)
 {
     // Print help message
-    cout << endl << "OgreMeshUpgrader: Upgrades or downgrades .mesh file versions." << endl;
+    cout << endl << "OgreMeshTool: Upgrades or downgrades .mesh file versions." << endl;
     cout << "Provided for OGRE by Steve Streeting 2004-2014" << endl << endl;
-    cout << "Usage: OgreMeshUpgrader [opts] sourcefile [destfile] " << endl;
+    cout << "Usage: OgreMeshTool [opts] sourcefile [destfile] " << endl;
     cout << "-i             = Interactive mode, prompt for options" << endl;
     cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!" << endl;
     cout << "-l lodlevels   = number of LOD levels" << endl;
@@ -76,9 +76,23 @@ void help(void)
     cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
     cout << "             Options are: 2.1, 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
+    cout << "-o puqs    = Optimize vertex buffers for shaders." << endl;
+    cout << "             p converts POSITION to 16-bit floats" << endl;
+    cout << "             q converts normal tangent and bitangent (28-36 bytes) to QTangents (8 bytes)." << endl;
+    cout << "             u converts UVs to 16-bit floats." << endl;
+    cout << "             s make shadow mapping passes have their own optimized buffers. Overrides existing ones if any." << endl;
     cout << "sourcefile = name of file to convert" << endl;
     cout << "destfile   = optional name of file to write to. If you don't" << endl;
     cout << "             specify this OGRE overwrites the existing file." << endl;
+    cout << endl;
+    cout << "Recommended params for modern DESKTOP (w/ normal mapping):" << endl;
+    cout << "   OgreMeshTool -e -t -ts 4 -o puqs sourcefile [destfile]" << endl;
+    cout << "Recommended params for GLES2 (w/ normal mapping):" << endl;
+    cout << "   OgreMeshTool -e -t -ts 4 -o qs sourcefile [destfile]" << endl;
+    cout << "Recommended params for modern DESKTOP (w/out normal mapping):" << endl;
+    cout << "   OgreMeshTool -e -o puqs sourcefile [destfile]" << endl;
+    cout << "Recommended params for GLES2 (w/out normal mapping):" << endl;
+    cout << "   OgreMeshTool -e -o qs sourcefile [destfile]" << endl;
 
     cout << endl;
 }
@@ -110,6 +124,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.usePercent = true;
     opts.recalcBounds = false;
     opts.targetVersion = v1::MESH_VERSION_LATEST;
+    opts.optimizeBuffer = false;
+    opts.halfPos        = false;
+    opts.halfTexCoords  = false;
+    opts.qTangents      = false;
+    opts.optimizeForShadowMapping = false;
 
 
     UnaryOptionList::iterator ui = unOpts.find("-e");
@@ -256,6 +275,21 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         }
     }
 
+    ui = unOpts.find("-o");
+    opts.optimizeBuffer = ui->second;
+
+    bi = binOpts.find("-o");
+    if( !bi->second.empty() )
+    {
+        if( bi->second.find( 'p' ) != String::npos )
+            opts.halfPos = true;
+        if( bi->second.find( 'u' ) != String::npos )
+            opts.halfTexCoords = true;
+        if( bi->second.find( 'q' ) != String::npos )
+            opts.qTangents = true;
+        if( bi->second.find( 's' ) != String::npos )
+            opts.optimizeForShadowMapping = true;
+    }
 }
 
 // Utility function to allow the user to modify the layout of vertex buffers.
@@ -866,6 +900,7 @@ int main(int numargs, char** args)
         unOptList["-srcd3d"] = false;
         unOptList["-autogen"] = false;
         unOptList["-b"] = false;
+        unOptList["-o"] = false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
         binOptList["-p"] = "";
@@ -874,6 +909,9 @@ int main(int numargs, char** args)
         binOptList["-td"] = "";
         binOptList["-ts"] = "";
         binOptList["-V"] = "";
+        binOptList["-o"] = "";
+
+        v1::Mesh::msOptimizeForShadowMapping = true;
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
         parseOpts(unOptList, binOptList);
@@ -888,14 +926,14 @@ int main(int numargs, char** args)
         if (!pFile)
         {
             OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                        "File " + source + " not found.", "OgreMeshUpgrade");
+                        "File " + source + " not found.", "OgreMeshTool");
         }
         stat( source.c_str(), &tagStat );
         MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
         size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
         if (result != tagStat.st_size)
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Unexpected error while reading file " + source, "OgreMeshUpgrade");
+                        "Unexpected error while reading file " + source, "OgreMeshTool");
         fclose( pFile );
 
         v1::MeshPtr meshPtr = v1::MeshManager::getSingleton().createManual("conversion",
@@ -1041,10 +1079,21 @@ int main(int numargs, char** args)
             }
         }
 
+        if( opts.optimizeBuffer )
+        {
+            mesh->arrangeEfficient( opts.halfPos, opts.halfTexCoords, opts.qTangents );
+        }
 
         if (opts.recalcBounds)
         {
             recalcBounds(mesh);
+        }
+
+        if( opts.optimizeForShadowMapping )
+        {
+            v1::Mesh::msOptimizeForShadowMapping = true;
+            mesh->prepareForShadowMapping( false );
+            v1::Mesh::msOptimizeForShadowMapping = false;
         }
 
         meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);

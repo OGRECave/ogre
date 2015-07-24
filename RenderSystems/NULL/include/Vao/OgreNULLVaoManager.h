@@ -176,7 +176,7 @@ namespace Ogre
         static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 
     public:
-        NULLVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers );
+        NULLVaoManager( bool _supportsArbBufferStorage, bool _supportsIndirectBuffers );
         virtual ~NULLVaoManager();
 
         bool supportsArbBufferStorage(void) const       { return mArbBufferStorage; }

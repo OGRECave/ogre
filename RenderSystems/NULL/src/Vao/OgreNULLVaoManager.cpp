@@ -44,8 +44,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    NULLVaoManager::NULLVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers ) :
-        mArbBufferStorage( supportsArbBufferStorage ),
+    NULLVaoManager::NULLVaoManager( bool _supportsArbBufferStorage, bool _supportsIndirectBuffers ) :
+        mArbBufferStorage( _supportsArbBufferStorage ),
         mDrawId( 0 )
     {
         mConstBufferAlignment   = 256;

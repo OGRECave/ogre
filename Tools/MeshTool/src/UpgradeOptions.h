@@ -28,6 +28,12 @@ struct UpgradeOptions
     Ogre::Serializer::Endian endian;
     bool recalcBounds;
     Ogre::v1::MeshVersion targetVersion;
+
+    bool optimizeBuffer;
+    bool halfPos;
+    bool halfTexCoords;
+    bool qTangents;
+    bool optimizeForShadowMapping;
 };
 
 extern UpgradeOptions opts;
