@@ -259,8 +259,8 @@ namespace Ogre {
                                        bool qTangents, size_t vaoPassIdx )
     {
         VertexElement2Vec vertexElements;
-        char *data = arrangeEfficient( subMesh, halfPos, halfTexCoords, qTangents, &vertexElements,
-                                       vaoPassIdx );
+        char *data = _arrangeEfficient( subMesh, halfPos, halfTexCoords, qTangents, &vertexElements,
+                                        vaoPassIdx );
 
         //Wrap the ptrs around these, because the VaoManager's call
         //can throw thus causing a leak if we don't free them.
@@ -345,9 +345,9 @@ namespace Ogre {
         return l.getSemantic() < r.getSemantic();
     }
 
-    char* SubMesh::arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
-                                     bool qTangents, VertexElement2Vec *outVertexElements,
-                                     size_t vaoPassIdx )
+    char* SubMesh::_arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
+                                      bool qTangents, VertexElement2Vec *outVertexElements,
+                                      size_t vaoPassIdx )
     {
         typedef FastArray<v1::VertexElement> VertexElementArray;
 

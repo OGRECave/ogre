@@ -268,8 +268,10 @@ namespace v1 {
          */
         SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
-        /// @See arrangeEfficient
-        void arrangeEfficientForOldInterface( bool halfPos, bool halfTexCoords );
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+    protected:
+        /// @See v1::Mesh::arrangeEfficient
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents, size_t vaoPassIdx );
 
     protected:
 

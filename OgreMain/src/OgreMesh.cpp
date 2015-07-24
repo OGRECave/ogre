@@ -323,27 +323,24 @@ namespace v1 {
         setSkeletonName(BLANKSTRING);
     }
     //-----------------------------------------------------------------------
-    void Mesh::arrangeEfficientFor( bool oldInterface, bool halfPos, bool halfTexCoords )
+    void Mesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
     {
-        /*if( sharedVertexData[0] )
+        if( sharedVertexData[0] )
         {
-            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                         "Meshes with shared verex data are not supported in the interface." );
+            LogManager::getSingleton().logMessage( "WARNING: Mesh '" + this->getName() +
+                                                   "' has shared vertices. They're being "
+                                                   "'unshared' in Mesh::arrangeEfficient" );
+            v1::MeshManager::unshareVertices( this );
         }
+
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
 
         while( itor != end )
         {
-            if( oldInterface )
-                (*itor)->arrangeEfficientForOldInterface( halfPos, halfTexCoords );
-            else
-                (*itor)->arrangeEfficientForItems( halfPos, halfTexCoords );
-
+            (*itor)->arrangeEfficient( halfPos, halfTexCoords, qTangents );
             ++itor;
         }
-
-        prepareForShadowMapping( false );*/
     }
     //-----------------------------------------------------------------------
     MeshPtr Mesh::clone(const String& newName, const String& newGroup)

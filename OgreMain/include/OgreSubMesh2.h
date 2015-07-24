@@ -165,6 +165,7 @@ namespace Ogre {
         /// Converts a v1 IndexBuffer to a v2 format. Returns nullptr if indexData is also nullptr
         IndexBufferPacked* importFromV1( v1::IndexData *indexData );
 
+    public:
         /** Rearranges the buffers to be efficiently rendered in Ogre 2.0 with Hlms
         @remarks
             vertexData->vertexDeclaration is modified and vertexData->vertexBufferBinding
@@ -184,10 +185,10 @@ namespace Ogre {
             Buffer pointer with reorganized data.
             Caller MUST free the pointer with OGRE_FREE_SIMD( MEMCATEGORY_GEOMETRY ).
         */
-        char* arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
-                                bool qTangents, VertexElement2Vec *outVertexElements,
-                                size_t vaoPassIdx );
-    public:
+        static char* _arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
+                                        bool qTangents, VertexElement2Vec *outVertexElements,
+                                        size_t vaoPassIdx );
+
         static void destroyVaos( VertexArrayObjectArray &vaos, VaoManager *vaoManager );
     protected:
         void destroyShadowMappingVaos(void);

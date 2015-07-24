@@ -284,32 +284,33 @@ namespace v1 {
         SubMeshIterator getSubMeshIterator(void)
         { return SubMeshIterator(mSubMeshList.begin(), mSubMeshList.end()); }
 
-        /** Rearranges the buffers in this Mesh so that they are more efficient, an
-            prepared for 2.0 rendering methods.
-            You can't use the same Mesh for both Items and Entity
-        @param oldInterface
-            When true, the Mesh can be used with Entity and InstancedEntity, which
-            is the old 1.x interface; and the buffers are rearranged in a similar way
-            to 2.0's interface; which is useful i.e. for saving file to disk.
-            When false, the Mesh can be used with Items, which are the 2.0 interface.
+        /** Rearranges the buffers in this Mesh so that they are more efficient for
+            rendering with shaders. It's not recommended to use this option if
+            you plan on using SW skinning or pose/morph animations.
+        @remarks
+            Multiple buffer streams will be merged into one, making an interleaved format.
+            Shared vertices with submeshes will be unshared.
         @param halfPos
-            When true, converts the position buffer from FLOAT3 or FLOAT4 (32-bit
-            floating point) to HALF4 (16-bit half precision floating point).
-            May reduce precision which is often not needed or noticeable.
-            Recommended value is true unless the mesh is too big.
+            True if you want to convert the position data to VET_HALF4 format.
+            Recommended on desktop to reduce memory and bandwidth requirements.
+            Rarely the extra precision is needed.
 
+            Unfortuntately on mobile, not all ES2 devices support VET_HALF4.
             Do NOT use this flag if you intend to run the mesh in GLES2 devices which
             don't have the GL_OES_VERTEX_HALF_FLOAT extension (many iOS, some Android).
         @param halfTexCoords
-            The same as halfPos, but converts the texture coordinates to 16-bit half
-            precision floating point instead of the position. If there are 3 coordinates,
-            they will be paddded to 4 tex. coords. for alignment reasons.
-            Recommended value is true.
-
-            Do NOT use this flag if you intend to run the mesh in GLES2 devices which
-            don't have the GL_OES_VERTEX_HALF_FLOAT extension (many iOS, some Android).
+            True if you want to convert the position data to VET_HALF2 or VET_HALF4 format.
+            Same recommendations as halfPos.
+        @param qTangents
+            True if you want to generate tangent and reflection information (modifying
+            the original v1 mesh) and convert this data to a QTangent, requiring
+            VET_SHORT4_SNORM (8 bytes vs 28 bytes to store normals, tangents and
+            reflection). Needs much less space, trading for more ALU ops in the
+            vertex shader for decoding the QTangent.
+            Highly recommended on both desktop and mobile if you need tangents (i.e.
+            normal mapping).
         */
-        void arrangeEfficientFor( bool oldInterface, bool halfPos, bool halfTexCoords );
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
       
         /** Shared vertex data.
         @remarks

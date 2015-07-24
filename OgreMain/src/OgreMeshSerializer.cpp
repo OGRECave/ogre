@@ -197,7 +197,7 @@ namespace v1 {
         {
             LogManager::getSingleton().logMessage("WARNING: " + pDest->getName() + 
                 " is an older format (" + ver + "); you should upgrade it as soon as possible" +
-                " using the OgreMeshUpgrade tool.", LML_CRITICAL);
+                " using the OgreMeshTool tool.", LML_CRITICAL);
         }
 
         if(mListener)
