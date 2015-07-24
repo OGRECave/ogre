@@ -29,6 +29,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreNULLRenderSystem.h"
 #include "OgreNULLRenderWindow.h"
 #include "OgreNULLTextureManager.h"
+#include "Vao/OgreNULLVaoManager.h"
 
 #include "OgreDefaultHardwareBufferManager.h"
 
@@ -146,6 +147,7 @@ namespace Ogre
 
             mHardwareBufferManager = new v1::DefaultHardwareBufferManager();
             mTextureManager = new NULLTextureManager();
+            mVaoManager = OGRE_NEW NULLVaoManager();
 
             mInitialized = true;
         }

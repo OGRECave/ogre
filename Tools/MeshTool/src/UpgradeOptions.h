@@ -4,6 +4,7 @@
 
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreMeshSerializer.h"
+#include "OgreMesh2Serializer.h"
 
 struct UpgradeOptions
 {
@@ -28,6 +29,9 @@ struct UpgradeOptions
     Ogre::Serializer::Endian endian;
     bool recalcBounds;
     Ogre::v1::MeshVersion targetVersion;
+    Ogre::MeshVersion targetVersionV2;
+
+    bool exportAsV2;
 
     bool optimizeBuffer;
     bool halfPos;

@@ -177,10 +177,10 @@ namespace Ogre {
         // Header
         writeChunkHeader(M_MESH, calcMeshSize(pMesh, lodVertexTable));
         {
+        writeString(pMesh->getLodStrategyName()); // string strategyName;
+
         const uint8 numVaoPasses = pMesh->hasIndependentShadowMappingVaos() + 1;
         writeData( &numVaoPasses, 1, 1 );
-
-        writeString(pMesh->getLodStrategyName()); // string strategyName;
 
             pushInnerChunk(mStream);
 
@@ -788,7 +788,8 @@ namespace Ogre {
                     assert( streamID == M_SUBMESH_LOD && !stream->eof() );
 
                     totalSubmeshLods.push_back( SubMeshLod() );
-                    readSubMeshLod( stream, pMesh, &totalSubmeshLods.back(), totalSubmeshLods.size() - 1 );
+                    const uint8 currentLod = static_cast<uint8>( submeshLods.size() );
+                    readSubMeshLod( stream, pMesh, &totalSubmeshLods.back(), currentLod );
 
                     submeshLods.push_back( totalSubmeshLods.back() );
                 }

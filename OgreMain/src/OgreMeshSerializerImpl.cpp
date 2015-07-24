@@ -57,7 +57,7 @@ namespace v1 {
     MeshSerializerImpl::MeshSerializerImpl()
     {
         // Version number
-        mVersion = "[MeshSerializer_v2.1 LEGACYV1]";
+        mVersion = "[MeshSerializer_v2.1 R0 LEGACYV1]";
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()

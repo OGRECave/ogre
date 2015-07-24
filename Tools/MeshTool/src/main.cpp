@@ -28,7 +28,6 @@ THE SOFTWARE.
 
 
 #include "Ogre.h"
-#include "OgreMeshSerializer.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
 #include "OgreMeshLodGenerator.h"
@@ -38,7 +37,9 @@ THE SOFTWARE.
 #include "OgrePixelCountLodStrategy.h"
 #include "OgreLodConfig.h"
 #include "OgreRoot.h"
+
 #include "OgreMeshManager2.h"
+#include "OgreMesh2.h"
 
 #include "UpgradeOptions.h"
 
@@ -76,6 +77,7 @@ void help(void)
     cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
     cout << "             Options are: 2.1, 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
+    cout << "-v2          Export the mesh as a v2 object." << endl;
     cout << "-o puqs    = Optimize vertex buffers for shaders." << endl;
     cout << "             p converts POSITION to 16-bit floats" << endl;
     cout << "             q converts normal tangent and bitangent (28-36 bytes) to QTangents (8 bytes)." << endl;
@@ -123,7 +125,9 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.numLods = 0;
     opts.usePercent = true;
     opts.recalcBounds = false;
-    opts.targetVersion = v1::MESH_VERSION_LATEST;
+    opts.targetVersion  = v1::MESH_VERSION_LATEST;
+    opts.targetVersionV2= MESH_VERSION_LATEST;
+    opts.exportAsV2     = false;
     opts.optimizeBuffer = false;
     opts.halfPos        = false;
     opts.halfTexCoords  = false;
@@ -175,6 +179,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     if (ui->second)
     {
         opts.recalcBounds = true;
+    }
+    ui = unOpts.find("-v2");
+    if (ui->second)
+    {
+        opts.exportAsV2 = true;
     }
 
 
@@ -247,31 +256,43 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     {
         if (bi->second == "2.1")
         {
-            opts.targetVersion = v1::MESH_VERSION_2_1;
+            opts.targetVersion  = v1::MESH_VERSION_2_1;
+            opts.targetVersionV2= MESH_VERSION_2_1;
         }
-        else if (bi->second == "1.10")
+
+        if( opts.exportAsV2 )
         {
-            opts.targetVersion = v1::MESH_VERSION_1_10;
+            if (bi->second == "1.10")
+            {
+                opts.targetVersion = v1::MESH_VERSION_1_10;
+            }
+            else if (bi->second == "1.8")
+            {
+                opts.targetVersion = v1::MESH_VERSION_1_8;
+            }
+            else if (bi->second == "1.7")
+            {
+                opts.targetVersion = v1::MESH_VERSION_1_7;
+            }
+            else if (bi->second == "1.4")
+            {
+                opts.targetVersion = v1::MESH_VERSION_1_4;
+            }
+            else if (bi->second == "1.0")
+            {
+                opts.targetVersion = v1::MESH_VERSION_1_0;
+            }
         }
-        else if (bi->second == "1.8")
-        {
-            opts.targetVersion = v1::MESH_VERSION_1_8;
-        }
-        else if (bi->second == "1.7")
-        {
-            opts.targetVersion = v1::MESH_VERSION_1_7;
-        }
-        else if (bi->second == "1.4")
-        {
-            opts.targetVersion = v1::MESH_VERSION_1_4;
-        }
-        else if (bi->second == "1.0")
-        {
-            opts.targetVersion = v1::MESH_VERSION_1_0;
-        }
-        else
+
+        if( opts.targetVersion == v1::MESH_VERSION_LATEST && !opts.exportAsV2 )
         {
             LogManager::getSingleton().getDefaultLog()->stream() << "Unrecognised target mesh version '" << bi->second << "'";
+        }
+        else if( opts.targetVersionV2 == MESH_VERSION_LATEST && opts.exportAsV2 )
+        {
+            LogManager::getSingleton().getDefaultLog()->stream() << "Unrecognised target mesh version '" <<
+                                                                    bi->second <<
+                                                                    "' or version can't be used with -v2 argument";
         }
     }
 
@@ -880,6 +901,9 @@ int main(int numargs, char** args)
 
         meshSerializer = new v1::MeshSerializer();
         skeletonSerializer = new v1::SkeletonSerializer();
+
+        Ogre::MeshSerializer meshSerializer2( root->getRenderSystem()->getVaoManager() );
+
         // don't pad during upgrade
         v1::MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
         MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
@@ -901,6 +925,7 @@ int main(int numargs, char** args)
         unOptList["-autogen"] = false;
         unOptList["-b"] = false;
         unOptList["-o"] = false;
+        unOptList["-v2"]= false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
         binOptList["-p"] = "";
@@ -1096,7 +1121,18 @@ int main(int numargs, char** args)
             v1::Mesh::msOptimizeForShadowMapping = false;
         }
 
-        meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);
+        if( !opts.exportAsV2 )
+        {
+            meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);
+        }
+        else
+        {
+            MeshPtr v2Mesh = MeshManager::getSingleton().createManual( "v2Mesh",
+                                                                       ResourceGroupManager::
+                                                                       DEFAULT_RESOURCE_GROUP_NAME );
+            v2Mesh->importV1( mesh, false, false, false );
+            meshSerializer2.exportMesh( v2Mesh.get(), dest, opts.targetVersionV2, opts.endian );
+        }
 
     }
     catch (Exception& e)

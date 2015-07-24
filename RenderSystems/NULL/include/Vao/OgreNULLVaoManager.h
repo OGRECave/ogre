@@ -128,8 +128,6 @@ namespace Ogre
 
         VaoVec  mVaos;
 
-        /// True if ARB_buffer_storage is supported (Persistent Mapping and immutable buffers)
-        bool    mArbBufferStorage;
         VertexBufferPacked  *mDrawId;
 
     protected:
@@ -176,10 +174,10 @@ namespace Ogre
         static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 
     public:
-        NULLVaoManager( bool _supportsArbBufferStorage, bool _supportsIndirectBuffers );
+        NULLVaoManager();
         virtual ~NULLVaoManager();
 
-        bool supportsArbBufferStorage(void) const       { return mArbBufferStorage; }
+        bool supportsArbBufferStorage(void) const       { return false; }
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

@@ -44,7 +44,7 @@ namespace Ogre {
         MESH_VERSION_LATEST,
         
         /// OGRE version v2.0+
-        MESH_VERSION_2_1_R1,
+        MESH_VERSION_2_1,
         MESH_VERSION_LEGACY //R0 (beta)
     };
 

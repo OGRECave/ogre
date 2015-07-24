@@ -58,8 +58,11 @@ namespace Ogre
 
                 startIndex += indexIncrement;
 
-                // Invalid option
-                LogManager::getSingleton().logMessage("Invalid option " + tmp, LML_CRITICAL);
+                if( !indexIncrement )
+                {
+                    // Invalid option
+                    LogManager::getSingleton().logMessage("Invalid option " + tmp, LML_CRITICAL);
+                }
 
             }
         }

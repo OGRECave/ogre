@@ -47,7 +47,7 @@ namespace v1 {
         // Note MUST be added in reverse order so latest is first in the list
 
         mVersionData.push_back(OGRE_NEW MeshVersionData(
-            MESH_VERSION_2_1, "[MeshSerializer_v2.1 LEGACYV1]",
+            MESH_VERSION_2_1, "[MeshSerializer_v2.1 R0 LEGACYV1]",
             OGRE_NEW MeshSerializerImpl()));
 
         // This one is a little ugly, 1.10 is used for version 1.1 legacy meshes.
