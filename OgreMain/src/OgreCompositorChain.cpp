@@ -63,14 +63,20 @@ void CompositorChain::destroyResources(void)
 {
     clearCompiledState();
 
-    if (mViewport)
+    if (mViewport != NULL)
     {
         mViewport->getTarget()->removeListener(this);
         mViewport->removeListener(this);
         removeAllCompositors();
         destroyOriginalScene();
 
-        mViewport = 0;
+        String compName = String("Ogre/Scene/") + StringConverter::toString((size_t)mViewport);
+        
+        // destory base "original scene" compositor
+        CompositorManager::getSingleton().remove(compName);
+            
+
+        mViewport = NULL;
     }
 }
 //-----------------------------------------------------------------------
@@ -102,8 +108,8 @@ void CompositorChain::createOriginalScene()
     // If two viewports use the same scheme but differ in settings like visibility masks, shadows, etc we don't
     // want compositors to share their technique.  Otherwise both compositors will have to recompile every time they
     // render.  Thus we generate a unique compositor per viewport.
-    String compName("Ogre/Scene/");
-    compName += StringConverter::toString((size_t)mViewport);
+
+    String compName = String("Ogre/Scene/") + StringConverter::toString((size_t)mViewport);
 
     mOriginalSceneScheme = mViewport->getMaterialScheme();
     CompositorPtr scene = CompositorManager::getSingleton().getByName(compName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
