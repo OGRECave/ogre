@@ -398,6 +398,8 @@ namespace Ogre {
 		*/
 		void setDrawBuffer(ColourBufferType colourBuffer);
 
+        void setEnabled(bool enabled);
+        bool getEnabled();
 		/** Returns the current colour buffer type for this viewport.*/
 		ColourBufferType getDrawBuffer() const;
 
@@ -435,6 +437,7 @@ namespace Ogre {
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
 		ColourBufferType mColourBuffer;
+        bool mEnabled;
     };
     /** @} */
     /** @} */
