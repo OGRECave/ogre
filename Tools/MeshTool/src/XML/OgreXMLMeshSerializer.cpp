@@ -27,7 +27,7 @@ THE SOFTWARE.
 */
 
 
-#include "OgreXMLMeshSerializer.h"
+#include "XML/OgreXMLMeshSerializer.h"
 #include "OgreSubMesh.h"
 #include "OgreLogManager.h"
 #include "OgreSkeleton.h"
@@ -78,8 +78,8 @@ namespace v1 {
             const char *claimedVertexCount_ = elem->Attribute("vertexcount");
             if(!claimedVertexCount_ || StringConverter::parseInt(claimedVertexCount_) > 0)
             {
-                mMesh->sharedVertexData = new VertexData();
-                readGeometry(elem, mMesh->sharedVertexData);
+                mMesh->sharedVertexData[0] = new VertexData();
+                readGeometry(elem, mMesh->sharedVertexData[0]);
             }
         }
 
@@ -127,6 +127,7 @@ namespace v1 {
 
         LogManager::getSingleton().logMessage("XMLMeshSerializer import successful.");
         
+        mMesh->prepareForShadowMapping( true );
     }
     //---------------------------------------------------------------------
     void XMLMeshSerializer::exportMesh(const Mesh* pMesh, const String& filename)
@@ -166,11 +167,11 @@ namespace v1 {
     {
         TiXmlElement* rootNode = mXMLDoc->RootElement();
         // Write geometry
-        if (pMesh->sharedVertexData)
+        if (pMesh->sharedVertexData[0])
         {
             TiXmlElement* geomNode = 
                 rootNode->InsertEndChild(TiXmlElement("sharedgeometry"))->ToElement();
-            writeGeometry(geomNode, pMesh->sharedVertexData);
+            writeGeometry(geomNode, pMesh->sharedVertexData[0]);
         }
 
         // Write Submeshes
@@ -237,8 +238,8 @@ namespace v1 {
         subMeshNode->SetAttribute("usesharedvertices", 
             StringConverter::toString(s->useSharedVertices) );
         // bool use32BitIndexes
-        bool use32BitIndexes = (!s->indexData->indexBuffer.isNull() && 
-            s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+        bool use32BitIndexes = (!s->indexData[0]->indexBuffer.isNull() &&
+            s->indexData[0]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
         subMeshNode->SetAttribute("use32bitindexes", 
             StringConverter::toString( use32BitIndexes ));
 
@@ -265,7 +266,7 @@ namespace v1 {
             break;
         }
 
-        if (s->indexData->indexCount > 0)
+        if (s->indexData[0]->indexCount > 0)
         {
             // Faces
             TiXmlElement* facesNode = 
@@ -274,17 +275,17 @@ namespace v1 {
             {
             case RenderOperation::OT_TRIANGLE_LIST:
                 // tri list
-                numFaces = s->indexData->indexCount / 3;
+                numFaces = s->indexData[0]->indexCount / 3;
 
                 break;
             case RenderOperation::OT_LINE_LIST:
-                numFaces = s->indexData->indexCount / 2;
+                numFaces = s->indexData[0]->indexCount / 2;
 
                 break;
             case RenderOperation::OT_TRIANGLE_FAN:
             case RenderOperation::OT_TRIANGLE_STRIP:
                 // triangle fan or triangle strip
-                numFaces = s->indexData->indexCount - 2;
+                numFaces = s->indexData[0]->indexCount - 2;
 
                 break;
             default:
@@ -298,7 +299,7 @@ namespace v1 {
             size_t i;
             unsigned int* pInt = 0;
             unsigned short* pShort = 0;
-            HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
+            HardwareIndexBufferSharedPtr ibuf = s->indexData[0]->indexBuffer;
             if (use32BitIndexes)
             {
                 pInt = static_cast<unsigned int*>(
@@ -350,7 +351,7 @@ namespace v1 {
         {
             TiXmlElement* geomNode = 
                 subMeshNode->InsertEndChild(TiXmlElement("geometry"))->ToElement();
-            writeGeometry(geomNode, s->vertexData);
+            writeGeometry(geomNode, s->vertexData[0]);
         }
 
         // texture aliases
@@ -763,17 +764,17 @@ namespace v1 {
                     {
                     case RenderOperation::OT_TRIANGLE_LIST:
                         // tri list
-                        sm->indexData->indexCount = actualCount * 3;
+                        sm->indexData[0]->indexCount = actualCount * 3;
 
                         break;
                     case RenderOperation::OT_LINE_LIST:
-                        sm->indexData->indexCount = actualCount * 2;
+                        sm->indexData[0]->indexCount = actualCount * 2;
 
                         break;
                     case RenderOperation::OT_TRIANGLE_FAN:
                     case RenderOperation::OT_TRIANGLE_STRIP:
                         // triangle fan or triangle strip
-                        sm->indexData->indexCount = actualCount + 2;
+                        sm->indexData[0]->indexCount = actualCount + 2;
 
                         break;
                     default:
@@ -785,10 +786,10 @@ namespace v1 {
                     HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
                         createIndexBuffer(
                             use32BitIndexes? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT, 
-                            sm->indexData->indexCount, 
+                            sm->indexData[0]->indexCount,
                             HardwareBuffer::HBU_DYNAMIC,
                             false);
-                    sm->indexData->indexBuffer = ibuf;
+                    sm->indexData[0]->indexBuffer = ibuf;
                     unsigned int *pInt = 0;
                     unsigned short *pShort = 0;
                     if (use32BitIndexes)
@@ -846,8 +847,8 @@ namespace v1 {
                 TiXmlElement* geomNode = smElem->FirstChildElement("geometry");
                 if (geomNode)
                 {
-                    sm->vertexData = new VertexData();
-                    readGeometry(geomNode, sm->vertexData);
+                    sm->vertexData[0] = new VertexData();
+                    readGeometry(geomNode, sm->vertexData[0]);
                 }
             }
 
@@ -1484,7 +1485,7 @@ namespace v1 {
             SubMesh* sub = pMesh->getSubMesh(subi);
             subNode->SetAttribute("submeshindex", StringConverter::toString(subi));
             // NB level - 1 because SubMeshes don't store the first index in geometry
-            IndexData* facedata = sub->mLodFaceList[levelNum - 1];
+            IndexData* facedata = sub->mLodFaceList[0][levelNum - 1];
             subNode->SetAttribute("numfaces", StringConverter::toString(facedata->indexCount / 3));
 
             if (facedata->indexCount > 0)
@@ -1637,7 +1638,7 @@ namespace v1 {
         for (i = 0; i < numSubs; ++i)
         {
             SubMesh* sm = mMesh->getSubMesh(i);
-            sm->mLodFaceList[index - 1] = OGRE_NEW IndexData();
+            sm->mLodFaceList[0][index - 1] = OGRE_NEW IndexData();
         }
         mMesh->_setLodUsage(index, usage);
     }
@@ -1681,7 +1682,7 @@ namespace v1 {
             {
                 // use of 32bit indexes depends on submesh
                 HardwareIndexBuffer::IndexType itype = 
-                    mMesh->getSubMesh(subidx)->indexData->indexBuffer->getType();
+                    mMesh->getSubMesh(subidx)->indexData[0]->indexBuffer->getType();
                 bool use32bitindexes = (itype == HardwareIndexBuffer::IT_32BIT);
 
                 // Assign memory: this will be deleted by the submesh 
@@ -1731,7 +1732,7 @@ namespace v1 {
             facedata->indexCount = numFaces * 3;
             facedata->indexStart = 0;
             facedata->indexBuffer = ibuf;
-            mMesh->_setSubMeshLodFaceList(subidx, index, facedata);
+            mMesh->_setSubMeshLodFaceList(subidx, index, facedata, false);
 
             faceListElem = faceListElem->NextSiblingElement();
         }
@@ -1884,7 +1885,7 @@ namespace v1 {
             if(target == "mesh")
             {
                 targetID = 0;
-                vertexData = m->sharedVertexData;
+                vertexData = m->sharedVertexData[0];
             }
             else
             {
@@ -1900,7 +1901,7 @@ namespace v1 {
                     StringConverter::parseUnsignedInt(val));
 
                 targetID = submeshIndex + 1;
-                vertexData = m->getSubMesh(submeshIndex)->vertexData;
+                vertexData = m->getSubMesh(submeshIndex)->vertexData[0];
 
             }
 

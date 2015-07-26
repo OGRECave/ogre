@@ -1788,7 +1788,15 @@ namespace v1 {
                 {
                     foundExisting = true;
                 }
+            }
 
+            if( !foundExisting )
+            {
+                const VertexElement* testElem =
+                    vertexData->vertexDeclaration->findElementBySemantic( VES_NORMAL, 0 );
+
+                if( testElem && testElem->getType() == VET_SHORT4_SNORM )
+                    foundExisting = true; //Tangents were stored as QTangents
             }
 
             // After iterating, we should have a source and a possible destination (t)

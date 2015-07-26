@@ -111,13 +111,17 @@ namespace Ogre
         @param outIndex
             The index to mVertexBuffers[index] if it's found.
             Otherwise the value is left untouched.
+        @param outIndex
+            The offset in bytes to retrieve the element in the vertex data.
+            If the semantic isn't found, the value is left untouched.
         @return
             Null if not found. The returned pointer might be invalidated by future calls
             (e.g. something happens to the vertex buffer or the Vao) although this is
             strange since in general these objects are immutable once they've been
             constructed.
         */
-        const VertexElement2* findBySemantic( VertexElementSemantic semantic, size_t &outIndex ) const;
+        const VertexElement2* findBySemantic( VertexElementSemantic semantic, size_t &outIndex,
+                                              size_t &outOffset ) const;
     };
 }
 

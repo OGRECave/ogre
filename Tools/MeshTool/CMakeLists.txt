@@ -13,6 +13,7 @@ macro( add_recursive dir retVal )
 	file( GLOB_RECURSE ${retVal} ${dir}/*.h ${dir}/*.cpp ${dir}/*.c )
 endmacro()
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_recursive( ./ SOURCE_FILES )
 
 ogre_add_executable(OgreMeshTool ${SOURCE_FILES})
@@ -22,5 +23,9 @@ if (APPLE)
     set_target_properties(OgreMeshTool PROPERTIES
         LINK_FLAGS "-framework Carbon -framework Cocoa")
 endif ()
+
+set(TINYXML_INCLUDE_DIR "")
+set(TINYXML_LIBRARIES "")
+add_definitions(-DTIXML_USE_STL)
 
 ogre_config_tool(OgreMeshTool)

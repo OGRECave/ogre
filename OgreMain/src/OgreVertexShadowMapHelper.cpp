@@ -81,8 +81,9 @@ namespace Ogre
             const VertexBufferPackedVec &origVertexBuffers = vao->getVertexBuffers();
 
             size_t bufferIdx[3] = { -1u, -1u, -1u };
+            size_t srcOffset[3] = { 0u, 0u, 0u };
             VertexElement2 const *origElements[3];
-            origElements[0] = vao->findBySemantic( VES_POSITION, bufferIdx[0] );
+            origElements[0] = vao->findBySemantic( VES_POSITION, bufferIdx[0], srcOffset[0] );
 
             if( !origElements[0] )
             {
@@ -104,17 +105,21 @@ namespace Ogre
             else
             {
                 //Not shared. Create a new one by converting the original.
-                origElements[1] = vao->findBySemantic( VES_BLEND_INDICES, bufferIdx[1] );
-                origElements[2] = vao->findBySemantic( VES_BLEND_WEIGHTS, bufferIdx[2] );
+                origElements[1] = vao->findBySemantic( VES_BLEND_INDICES, bufferIdx[1], srcOffset[1] );
+                origElements[2] = vao->findBySemantic( VES_BLEND_WEIGHTS, bufferIdx[2], srcOffset[2] );
 
                 AsyncTicketPtr tickets[3];
                 uint8 const * srcData[3];
-                size_t srcOffset[3];
                 size_t srcBytesPerVertex[3];
 
                 memset( srcData, 0, sizeof( srcData ) );
-                memset( srcOffset, 0, sizeof( srcOffset ) );
                 memset( srcBytesPerVertex, 0, sizeof( srcBytesPerVertex ) );
+
+                for( size_t i=0; i<3; ++i )
+                {
+                    if( origElements[i] )
+                        srcBytesPerVertex[i] = origVertexBuffers[bufferIdx[i]]->getBytesPerElement();
+                }
 
                 //Pack all the requests together
                 for( size_t i=0; i<3; ++i )
@@ -147,27 +152,6 @@ namespace Ogre
                     else
                     {
                         srcData[i] = reinterpret_cast<const uint8*>( tickets[i]->map() );
-                    }
-                }
-
-                for( size_t i=0; i<3; ++i )
-                {
-                    if( origElements[i] )
-                    {
-                        const VertexElement2Vec &vertexElements =
-                                origVertexBuffers[bufferIdx[i]]->getVertexElements();
-                        VertexElement2Vec::const_iterator itElements = vertexElements.begin();
-                        VertexElement2Vec::const_iterator enElements = vertexElements.end();
-
-                        while( itElements != enElements )
-                        {
-                            if( itElements->mSemantic == origElements[i]->mSemantic )
-                                srcOffset[i] = srcBytesPerVertex[i];
-
-                            srcBytesPerVertex[i] += v1::VertexElement::getTypeSize( itElements->mType );
-
-                            ++itElements;
-                        }
                     }
                 }
 

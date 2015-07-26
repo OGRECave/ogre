@@ -43,6 +43,10 @@ THE SOFTWARE.
 
 #include "UpgradeOptions.h"
 
+#include "XML/tinyxml.h"
+#include "XML/OgreXMLMeshSerializer.h"
+#include "XML/OgreXMLSkeletonSerializer.h"
+
 #include <iostream>
 #include <sys/stat.h>
 
@@ -78,7 +82,7 @@ void help(void)
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
     cout << "             Options are: 2.1, 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
     cout << "-v2          Export the mesh as a v2 object." << endl;
-    cout << "-o puqs    = Optimize vertex buffers for shaders." << endl;
+    cout << "-O puqs    = Optimize vertex buffers for shaders." << endl;
     cout << "             p converts POSITION to 16-bit floats" << endl;
     cout << "             q converts normal tangent and bitangent (28-36 bytes) to QTangents (8 bytes)." << endl;
     cout << "             u converts UVs to 16-bit floats." << endl;
@@ -88,13 +92,13 @@ void help(void)
     cout << "             specify this OGRE overwrites the existing file." << endl;
     cout << endl;
     cout << "Recommended params for modern DESKTOP (w/ normal mapping):" << endl;
-    cout << "   OgreMeshTool -e -t -ts 4 -o puqs sourcefile [destfile]" << endl;
+    cout << "   OgreMeshTool -e -t -ts 4 -O puqs sourcefile [destfile]" << endl;
     cout << "Recommended params for GLES2 (w/ normal mapping):" << endl;
-    cout << "   OgreMeshTool -e -t -ts 4 -o qs sourcefile [destfile]" << endl;
+    cout << "   OgreMeshTool -e -t -ts 4 -O qs sourcefile [destfile]" << endl;
     cout << "Recommended params for modern DESKTOP (w/out normal mapping):" << endl;
-    cout << "   OgreMeshTool -e -o puqs sourcefile [destfile]" << endl;
+    cout << "   OgreMeshTool -e -O puqs sourcefile [destfile]" << endl;
     cout << "Recommended params for GLES2 (w/out normal mapping):" << endl;
-    cout << "   OgreMeshTool -e -o qs sourcefile [destfile]" << endl;
+    cout << "   OgreMeshTool -e -O qs sourcefile [destfile]" << endl;
 
     cout << endl;
 }
@@ -102,6 +106,7 @@ void help(void)
 // Crappy globals
 v1::MeshSerializer* meshSerializer = 0;
 v1::SkeletonSerializer* skeletonSerializer = 0;
+LogManager *logManager = 0;
 UpgradeOptions opts;
 
 void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
@@ -296,10 +301,10 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
         }
     }
 
-    ui = unOpts.find("-o");
+    ui = unOpts.find("-O");
     opts.optimizeBuffer = ui->second;
 
-    bi = binOpts.find("-o");
+    bi = binOpts.find("-O");
     if( !bi->second.empty() )
     {
         if( bi->second.find( 'p' ) != String::npos )
@@ -315,54 +320,9 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
 
 // Utility function to allow the user to modify the layout of vertex buffers.
 void vertexBufferReorg(v1::Mesh& mesh);
-
-void recalcBounds(const v1::VertexData* vdata, AxisAlignedBox& aabb, Real& radius)
-{
-    const v1::VertexElement* posElem =
-        vdata->vertexDeclaration->findElementBySemantic(VES_POSITION);
-
-    const v1::HardwareVertexBufferSharedPtr buf = vdata->vertexBufferBinding->getBuffer(
-                posElem->getSource());
-    void* pBase = buf->lock(v1::HardwareBuffer::HBL_READ_ONLY);
-
-    for (size_t v = 0; v < vdata->vertexCount; ++v)
-    {
-        float* pFloat;
-        posElem->baseVertexPointerToElement(pBase, &pFloat);
-
-        Vector3 pos(pFloat[0], pFloat[1], pFloat[2]);
-        aabb.merge(pos);
-        radius = std::max(radius, pos.length());
-
-        pBase = static_cast<void*>(static_cast<char*>(pBase) + buf->getVertexSize());
-
-    }
-
-    buf->unlock();
-
-}
-
-void recalcBounds(v1::Mesh* mesh)
-{
-    AxisAlignedBox aabb;
-    Real radius = 0.0f;
-
-    if (mesh->sharedVertexData[0])
-    {
-        recalcBounds(mesh->sharedVertexData[0], aabb, radius);
-    }
-    for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
-    {
-        v1::SubMesh* sm = mesh->getSubMesh(i);
-        if (!sm->useSharedVertices)
-        {
-            recalcBounds(sm->vertexData[0], aabb, radius);
-        }
-    }
-
-    mesh->_setBounds(aabb, false);
-    mesh->_setBoundingSphereRadius(radius);
-}
+void buildEdgeLists( v1::MeshPtr &mesh );
+void generateTangents( v1::MeshPtr &mesh );
+void recalcBounds( v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh );
 
 void printLodConfig(const LodConfig& lodConfig)
 {
@@ -715,8 +675,11 @@ void buildLod(v1::MeshPtr& mesh)
         }
     }
 
-    // ensure we use correct bounds
-    recalcBounds(mesh.get());
+    {
+        // ensure we use correct bounds
+        MeshPtr nullv2;
+        recalcBounds( mesh, nullv2 );
+    }
 
     MeshLodGenerator gen;
     if (opts.lodAutoconfigure)
@@ -867,8 +830,144 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
             sm->vertexData[0]->convertPackedColour(originalType, desiredType);
         }
     }
+}
 
+/** Loads a mesh to either meshPtr or v2MeshPtr. Both may be empty if we just loaded
+    an XML skeleton (in which case we just save it)
+@param source [in]
+@param meshPtr [out]
+@param v2MeshPtr [out]
+@param meshSerializer2 [in]
+@return
+    True on success.
+    False on failure.
+*/
+bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
+               Ogre::MeshSerializer &meshSerializer2, v1::XMLMeshSerializer &xmlMeshSerializer,
+               v1::XMLSkeletonSerializer &xmlSkeletonSerializer )
+{
+    bool retVal = false;
 
+    const String::size_type extPos = source.find_last_of( '.' );
+    const String sourceExt( source.substr( extPos + 1, source.size() ) );
+
+    if( sourceExt == "mesh" )
+    {
+        struct stat tagStat;
+
+        FILE* pFile = fopen( source.c_str(), "rb" );
+        if (!pFile)
+        {
+            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+                        "File " + source + " not found.", "OgreMeshTool");
+        }
+        stat( source.c_str(), &tagStat );
+        MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
+        size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
+        if (result != tagStat.st_size)
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                        "Unexpected error while reading file " + source, "OgreMeshTool");
+        fclose( pFile );
+
+        DataStreamPtr stream( memstream );
+
+        try
+        {
+            cout << "Trying to read " << source << " as a v1 mesh..." << endl;
+            v1MeshPtr = v1::MeshManager::getSingleton().createManual(
+                        "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+            meshSerializer->importMesh( stream, v1MeshPtr.get() );
+            retVal = true;
+            cout << "Success!" << endl;
+        }
+        catch( Exception & )
+        {
+            cout << "Failed." << endl;
+            v1MeshPtr.setNull();
+        }
+
+        if( !retVal )
+        {
+            try
+            {
+                cout << "Trying to read " << source << " as a v2 mesh..." << endl;
+                v2MeshPtr = MeshManager::getSingleton().createManual(
+                            "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+                stream->seek( 0 );
+                meshSerializer2.importMesh( stream, v2MeshPtr.get() );
+                retVal = true;
+                cout << "Success!" << endl;
+            }
+            catch( Exception & )
+            {
+                cout << "Failed." << endl;
+                v2MeshPtr.setNull();
+            }
+        }
+    }
+    else if( sourceExt == "skeleton" )
+    {
+        //TODO
+    }
+    else if( sourceExt == "xml" )
+    {
+        // Read root element and decide from there what type
+        TiXmlDocument* doc = new TiXmlDocument( source );
+        // Some double-parsing here but never mind
+        if( !doc->LoadFile() )
+        {
+            cout << "Unable to open file " << source << " - fatal error." << endl;
+        }
+        else
+        {
+            TiXmlElement* root = doc->RootElement();
+            if( !stricmp(root->Value(), "mesh") )
+            {
+                delete doc;
+                v1MeshPtr = v1::MeshManager::getSingleton().createManual(
+                            "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+
+                VertexElementType colourElementType = VET_COLOUR_ABGR;
+                if( opts.destColourFormatSet )
+                    colourElementType = opts.destColourFormat;
+
+                xmlMeshSerializer.importMesh( source, colourElementType, v1MeshPtr.get() );
+
+                // Re-jig the buffers?
+                // Make sure animation types are up to date first
+                v1MeshPtr->_determineAnimationTypes();
+
+                retVal = true;
+            }
+            else if( !stricmp(root->Value(), "skeleton") )
+            {
+                delete doc;
+                v1::SkeletonPtr newSkel = v1::OldSkeletonManager::getSingleton().create(
+                            "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+                xmlSkeletonSerializer.importSkeleton( source, newSkel.get() );
+                /*TODO
+                if( opts.optimiseAnimations )
+                {
+                    newSkel->optimiseAllAnimations();
+                }
+                skeletonSerializer->exportSkeleton( newSkel.get(), opts.dest,
+                                                    v1::SKELETON_VERSION_LATEST, opts.endian );*/
+
+                // Clean up the conversion skeleton
+                v1::OldSkeletonManager::getSingleton().remove("conversion");
+
+                retVal = true;
+            }
+        }
+
+        delete doc;
+    }
+    else
+    {
+        cout << "Couldn't identify extension of filename '" << source << "'" << endl;
+    }
+
+    return retVal;
 }
 
 int main(int numargs, char** args)
@@ -893,16 +992,20 @@ int main(int numargs, char** args)
         pluginsPath = "plugins_tools.cfg";
 #endif
 #endif
-        root = OGRE_NEW Root( pluginsPath, "", "OgreMeshTool.log" ) ;
+        logManager = OGRE_NEW LogManager();
+        logManager->createLog( "OgreMeshTool.log", true, true );
         LogManager::getSingleton().getDefaultLog()->setLogDetail( LL_LOW );
+        root = OGRE_NEW Root( pluginsPath, "", "OgreMeshTool.log" ) ;
         root->setRenderSystem( root->getRenderSystemByName( "NULL Rendering Subsystem" ) );
-        root->initialise(true);
+        root->initialise( true );
         LogManager::getSingleton().getDefaultLog()->setLogDetail( LL_NORMAL );
 
         meshSerializer = new v1::MeshSerializer();
         skeletonSerializer = new v1::SkeletonSerializer();
 
         Ogre::MeshSerializer meshSerializer2( root->getRenderSystem()->getVaoManager() );
+        v1::XMLMeshSerializer xmlMeshSerializer;
+        v1::XMLSkeletonSerializer xmlSkeletonSerializer;
 
         // don't pad during upgrade
         v1::MeshManager::getSingleton().setBoundsPaddingFactor(0.0f);
@@ -924,7 +1027,7 @@ int main(int numargs, char** args)
         unOptList["-srcd3d"] = false;
         unOptList["-autogen"] = false;
         unOptList["-b"] = false;
-        unOptList["-o"] = false;
+        unOptList["-O"] = false;
         unOptList["-v2"]= false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
@@ -934,7 +1037,7 @@ int main(int numargs, char** args)
         binOptList["-td"] = "";
         binOptList["-ts"] = "";
         binOptList["-V"] = "";
-        binOptList["-o"] = "";
+        binOptList["-O"] = "";
 
         v1::Mesh::msOptimizeForShadowMapping = true;
 
@@ -943,30 +1046,15 @@ int main(int numargs, char** args)
 
         String source(args[startIdx]);
 
-
         // Load the mesh
-        struct stat tagStat;
+        v1::MeshPtr v1Mesh;
+        MeshPtr v2Mesh;
 
-        FILE* pFile = fopen( source.c_str(), "rb" );
-        if (!pFile)
+        if( !loadMesh( source, v1Mesh, v2Mesh, meshSerializer2, xmlMeshSerializer, xmlSkeletonSerializer ) )
         {
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                        "File " + source + " not found.", "OgreMeshTool");
+            OGRE_EXCEPT( Exception::ERR_FILE_NOT_FOUND, "Could not open '" + source + "'", "main" );
         }
-        stat( source.c_str(), &tagStat );
-        MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
-        size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
-        if (result != tagStat.st_size)
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Unexpected error while reading file " + source, "OgreMeshTool");
-        fclose( pFile );
-
-        v1::MeshPtr meshPtr = v1::MeshManager::getSingleton().createManual("conversion",
-                              ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-        v1::Mesh* mesh = meshPtr.get();
-
-        DataStreamPtr stream(memstream);
-        meshSerializer->importMesh(stream, mesh);
+        v1::Mesh* mesh = v1Mesh.get();
 
         // Write out the converted mesh
         String dest;
@@ -979,146 +1067,46 @@ int main(int numargs, char** args)
             dest = source;
         }
 
-        String response;
-
-        vertexBufferReorg(*mesh);
-
-        // Deal with VET_COLOUR ambiguities
-        resolveColourAmbiguities(mesh);
-
-        buildLod(meshPtr);
-
-        if (opts.interactive)
+        if( !v1Mesh.isNull() )
         {
-            do
-            {
-                std::cout << "\nWould you like to (b)uild/(r)emove/(k)eep Edge lists? (b/r/k) ";
-                cin >> response;
-                StringUtil::toLowerCase(response);
-                if (response == "k")
-                {
-                    // Do nothing
-                }
-                else if (response == "b")
-                {
-                    cout << "\nGenerating edge lists...";
-                    mesh->buildEdgeList();
-                    cout << "success\n";
-                }
-                else if (response == "r")
-                {
-                    mesh->freeEdgeList();
-                }
-                else
-                {
-                    std::cout << "Wrong answer!\n";
-                    response = "";
-                }
-            }
-            while (response == "");
-        }
-        else
-        {
-            // Make sure we generate edge lists, provided they are not deliberately disabled
-            if (!opts.suppressEdgeLists)
-            {
-                cout << "\nGenerating edge lists...";
-                mesh->buildEdgeList();
-                cout << "success\n";
-            }
-            else
-            {
-                mesh->freeEdgeList();
-            }
-        }
-        if (opts.interactive)
-        {
-            do
-            {
-                std::cout << "\nWould you like to (g)enerate/(k)eep tangent buffer? (g/k) ";
-                cin >> response;
-                StringUtil::toLowerCase(response);
-                if (response == "k")
-                {
-                    opts.generateTangents = false;
-                }
-                else if (response == "g")
-                {
-                    opts.generateTangents = true;
-                }
-                else
-                {
-                    std::cout << "Wrong answer!\n";
-                    response = "";
-                }
-            }
-            while (response == "");
-        }
-        // Generate tangents?
-        if (opts.generateTangents)
-        {
-            unsigned short srcTex, destTex;
-            bool existing = mesh->suggestTangentVectorBuildParams(opts.tangentSemantic, srcTex, destTex);
-            if (existing)
-            {
-                if (opts.interactive)
-                {
-                    do
-                    {
-                        std::cout << "\nThis mesh appears to already have a set of tangents, " <<
-                                  "which would suggest tangent vectors have already been calculated. Do you really " <<
-                                  "want to generate new tangent vectors (may duplicate)? (y/n) ";
-                        cin >> response;
-                        StringUtil::toLowerCase(response);
-                        if (response == "y")
-                        {
-                            // Do nothing
-                        }
-                        else if (response == "n")
-                        {
-                            opts.generateTangents = false;
-                        }
-                        else
-                        {
-                            std::cout << "Wrong answer!\n";
-                            response = "";
-                        }
+            vertexBufferReorg(*mesh);
 
-                    }
-                    while (response == "");
-                }
-                else
-                {
-                    // safe
-                    opts.generateTangents = false;
-                }
-
-            }
-            if (opts.generateTangents)
-            {
-                cout << "\nGenerating tangent vectors....";
-                mesh->buildTangentVectors(opts.tangentSemantic, srcTex, destTex,
-                                          opts.tangentSplitMirrored, opts.tangentSplitRotated,
-                                          opts.tangentUseParity);
-                cout << "success" << std::endl;
-            }
+            // Deal with VET_COLOUR ambiguities
+            resolveColourAmbiguities(mesh);
         }
+
+        buildLod( v1Mesh );
+        buildEdgeLists( v1Mesh );
+        generateTangents( v1Mesh );
 
         if( opts.optimizeBuffer )
         {
-            mesh->arrangeEfficient( opts.halfPos, opts.halfTexCoords, opts.qTangents );
+            if( !v1Mesh.isNull() )
+                mesh->arrangeEfficient( opts.halfPos, opts.halfTexCoords, opts.qTangents );
+            if( !v2Mesh.isNull() )
+                v2Mesh->arrangeEfficient( opts.halfPos, opts.halfTexCoords, opts.qTangents );
         }
 
         if (opts.recalcBounds)
         {
-            recalcBounds(mesh);
+            recalcBounds( v1Mesh, v2Mesh );
         }
 
         if( opts.optimizeForShadowMapping )
         {
-            v1::Mesh::msOptimizeForShadowMapping = true;
-            mesh->prepareForShadowMapping( false );
-            v1::Mesh::msOptimizeForShadowMapping = false;
+            if( !v1Mesh.isNull() )
+            {
+                v1::Mesh::msOptimizeForShadowMapping = true;
+                mesh->prepareForShadowMapping( false );
+                v1::Mesh::msOptimizeForShadowMapping = false;
+            }
+
+            if( !v2Mesh.isNull() )
+            {
+                Mesh::msOptimizeForShadowMapping = true;
+                v2Mesh->prepareForShadowMapping( false );
+                Mesh::msOptimizeForShadowMapping = false;
+            }
         }
 
         if( !opts.exportAsV2 )
@@ -1127,26 +1115,36 @@ int main(int numargs, char** args)
         }
         else
         {
-            MeshPtr v2Mesh = MeshManager::getSingleton().createManual( "v2Mesh",
-                                                                       ResourceGroupManager::
-                                                                       DEFAULT_RESOURCE_GROUP_NAME );
-            v2Mesh->importV1( mesh, false, false, false );
+            if( v2Mesh.isNull() )
+            {
+                v2Mesh = MeshManager::getSingleton().createManual( "v2Mesh",
+                                                                   ResourceGroupManager::
+                                                                   DEFAULT_RESOURCE_GROUP_NAME );
+            }
+
+            if( !v1Mesh.isNull() )
+                v2Mesh->importV1( mesh, false, false, false );
+
             meshSerializer2.exportMesh( v2Mesh.get(), dest, opts.targetVersionV2, opts.endian );
         }
 
     }
     catch (Exception& e)
     {
-        cout << "Exception caught: " << e.getDescription();
+        cout << "Exception caught: " << e.getDescription() << std::endl;
         retCode = 1;
     }
 
+    LogManager::getSingleton().getDefaultLog()->setLogDetail( LL_LOW );
 
     delete skeletonSerializer;
     delete meshSerializer;
 
     OGRE_DELETE root;
     root = 0;
+
+    delete logManager;
+    logManager = 0;
 
     return retCode;
 
