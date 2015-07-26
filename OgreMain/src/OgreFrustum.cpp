@@ -1035,32 +1035,48 @@ namespace Ogre {
         return mLastParentOrientation;
     }
     //-----------------------------------------------------------------------
-    void Frustum::enableReflection(const Plane& p)
+    void Frustum::setReflectionPlane(const Plane* p)
     {
-        mReflect = true;
-        mReflectPlane = p;
-        mLinkedReflectPlane = 0;
-        mReflectMatrix = Math::buildReflectionMatrix(p);
-        invalidateView();
+        mReflect = p != NULL;
+        if (p == NULL)
+        {
+            mLinkedReflectPlane = NULL;
+            mLastLinkedReflectionPlane.normal = Vector3::ZERO;
+        }
+        else
+        {
+            const MovablePlane* moveablePlane = dynamic_cast<const MovablePlane*>(p);
+            if (moveablePlane != NULL)
+            {
+                mLinkedReflectPlane = moveablePlane;
+                mReflectPlane = mLinkedReflectPlane->_getDerivedPlane();
+                mLastLinkedReflectionPlane = mLinkedReflectPlane->_getDerivedPlane();
+            }
+            else
+            {
+                mReflectPlane = *p;
+                mLinkedReflectPlane = NULL;
+                
+            }
 
+            mReflectMatrix = Math::buildReflectionMatrix(mReflectPlane);
+            invalidateView();
+        }
     }
     //-----------------------------------------------------------------------
     void Frustum::enableReflection(const MovablePlane* p)
     {
-        mReflect = true;
-        mLinkedReflectPlane = p;
-        mReflectPlane = mLinkedReflectPlane->_getDerivedPlane();
-        mReflectMatrix = Math::buildReflectionMatrix(mReflectPlane);
-        mLastLinkedReflectionPlane = mLinkedReflectPlane->_getDerivedPlane();
-        invalidateView();
+        setReflectionPlane(p);
     }
     //-----------------------------------------------------------------------
     void Frustum::disableReflection(void)
     {
-        mReflect = false;
-        mLinkedReflectPlane = 0;
-        mLastLinkedReflectionPlane.normal = Vector3::ZERO;
-        invalidateView();
+        setReflectionPlane(NULL);
+    }
+    //-----------------------------------------------------------------------
+    void Frustum::enableReflection(const Plane& p)
+    {
+        setReflectionPlane(&p);
     }
     //---------------------------------------------------------------------
     bool Frustum::projectSphere(const Sphere& sphere, 

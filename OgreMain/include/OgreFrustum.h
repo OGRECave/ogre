@@ -548,12 +548,14 @@ namespace Ogre
         */
         virtual Real getOrthoWindowWidth() const;
 
+        void setReflectionPlane(const Plane* p);
         /** Modifies this frustum so it always renders from the reflection of itself through the
             plane specified.
         @remarks
             This is obviously useful for performing planar reflections. 
         */
-        virtual void enableReflection(const Plane& p);
+        OGRE_DEPRECATED_EX("Frustum::enableReflection is obsolete, please use setReflectionPlane")
+          virtual void enableReflection(const Plane& p);
         /** Modifies this frustum so it always renders from the reflection of itself through the
             plane specified. Note that this version of the method links to a plane
             so that changes to it are picked up automatically. It is important that
@@ -562,9 +564,11 @@ namespace Ogre
         @remarks
             This is obviously useful for performing planar reflections. 
         */
-        virtual void enableReflection(const MovablePlane* p);
+        OGRE_DEPRECATED_EX("Frustum::enableReflection is obsolete, please use setReflectionPlane")
+         virtual void enableReflection(const MovablePlane* p);
 
         /** Disables reflection modification previously turned on with enableReflection */
+        OGRE_DEPRECATED_EX("Frustum::enableReflection is obsolete, please use setReflectionPlane")
         virtual void disableReflection(void);
 
         /// Returns whether this frustum is being reflected
