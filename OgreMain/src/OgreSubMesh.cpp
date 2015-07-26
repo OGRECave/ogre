@@ -53,6 +53,7 @@ namespace v1 {
         memset( vertexData, 0, sizeof(vertexData) );
 
         indexData[0] = OGRE_NEW IndexData();
+        indexData[1] = 0;
     }
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()

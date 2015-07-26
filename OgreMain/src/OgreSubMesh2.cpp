@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 #include "Vao/OgreVaoManager.h"
+#include "Vao/OgreAsyncTicket.h"
 
 #include "OgreVertexShadowMapHelper.h"
 
@@ -333,6 +334,148 @@ namespace Ogre {
         return indexBuffer;
     }
     //---------------------------------------------------------------------
+    void SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
+    {
+        uint8 numVaoPasses = mParent->hasIndependentShadowMappingVaos() + 1;
+
+        for( uint8 vaoPassIdx=0; vaoPassIdx<numVaoPasses; ++vaoPassIdx )
+        {
+            VertexArrayObjectArray newVaos;
+            newVaos.reserve( mVao[vaoPassIdx].size() );
+            map<VertexBufferPacked*, VertexBufferPacked*>::type sharedBuffers;
+            VertexArrayObjectArray::const_iterator itor = mVao[vaoPassIdx].begin();
+            VertexArrayObjectArray::const_iterator end  = mVao[vaoPassIdx].end();
+
+            while( itor != end )
+            {
+                newVaos.push_back( arrangeEfficient( halfPos, halfTexCoords, qTangents, *itor,
+                                                     sharedBuffers, mParent->mVaoManager ) );
+                ++itor;
+            }
+
+            mVao[vaoPassIdx].swap( newVaos );
+            //Now 'newVaos' contains the old ones. We need to destroy all of them at
+            //the end because vertex buffers may be shared while we still iterate.
+            destroyVaos( newVaos, mParent->mVaoManager, false );
+        }
+    }
+    //---------------------------------------------------------------------
+    VertexArrayObject* SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents,
+                                                  VertexArrayObject *vao,
+                                                  map<VertexBufferPacked*, VertexBufferPacked*>::type
+                                                  &sharedBuffers,
+                                                  VaoManager *vaoManager )
+    {
+        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
+        VertexBufferPacked *newVertexBuffer = 0;
+
+        map<VertexBufferPacked*, VertexBufferPacked*>::type::const_iterator itShared =
+                                                            sharedBuffers.find( vertexBuffers[0] );
+        if( itShared != sharedBuffers.end() )
+        {
+            //Shared vertex buffer. We've already converted this one. Reuse.
+            newVertexBuffer = itShared->second;
+        }
+        else
+        {
+            VertexElement2Vec vertexElements;
+            SourceDataArray srcData;
+            bool hasTangents = false;
+
+            vector<AsyncTicketPtr>::type asyncTickets;
+            FastArray<char const *> srcPtrs;
+
+            for( size_t i=0; i<vertexBuffers.size(); ++i )
+            {
+                //Retrieve the data from each buffer
+                AsyncTicketPtr asyncTicket = vertexBuffers[i]->readRequest(
+                                                    0, vertexBuffers[i]->getNumElements() );
+                asyncTickets.push_back( asyncTicket );
+                srcPtrs.push_back( reinterpret_cast<const char*>( asyncTicket->map() ) );
+
+                //Setup the VertexElement array and the srcData for the conversion.
+                size_t accumOffset = 0;
+                VertexElement2Vec::const_iterator itor = vertexBuffers[i]->getVertexElements().begin();
+                VertexElement2Vec::const_iterator end  = vertexBuffers[i]->getVertexElements().end();
+
+                while( itor != end )
+                {
+                    const VertexElement2 &origElement = *itor;
+
+                    if( origElement.mSemantic == VES_TANGENT ||
+                        origElement.mSemantic == VES_BINORMAL )
+                    {
+                        hasTangents = true;
+                    }
+                    else
+                    {
+                        vertexElements.push_back( origElement );
+                    }
+
+                    srcData.push_back( SourceData( srcPtrs.back() + accumOffset,
+                                                   vertexBuffers[i]->getBytesPerElement(),
+                                                   *itor ) );
+                    accumOffset += v1::VertexElement::getTypeSize( itor->mType );
+
+                    //We can't convert to half if it wasn't in floating point
+                    //Also avoid converting 1 Float ==> 2 Half.
+                    if( v1::VertexElement::getBaseType( origElement.mType ) == VET_FLOAT1 &&
+                        v1::VertexElement::getTypeCount( origElement.mType ) != 1 )
+                    {
+                        if( (origElement.mSemantic == VES_POSITION && halfPos) ||
+                            (origElement.mSemantic == VES_TEXTURE_COORDINATES && halfTexCoords) )
+                        {
+                            VertexElementType type = v1::VertexElement::multiplyTypeCount(
+                                        VET_HALF2, v1::VertexElement::getTypeCount( origElement.mType ) );
+
+                            VertexElement2 &lastInserted = vertexElements.back();
+                            lastInserted.mType = type;
+                        }
+                    }
+
+                    ++itor;
+                }
+
+                //If the vertex format has tangents, prepare the normal to hold QTangents.
+                if( hasTangents == true && qTangents )
+                {
+                    VertexElement2Vec::iterator it = std::find( vertexElements.begin(),
+                                                                vertexElements.end(),
+                                                                VertexElement2( VET_FLOAT3,
+                                                                                VES_NORMAL ) );
+                    if( it != vertexElements.end() )
+                        it->mType = VET_SHORT4_SNORM;
+                }
+            }
+
+            char *data = _arrangeEfficient( srcData, vertexElements, vertexBuffers[0]->getNumElements() );
+            SafeDelete dataPtrContainer( data );
+
+            //Cleanup the mappings, free some memory.
+            for( size_t i=0; i<asyncTickets.size(); ++i )
+                asyncTickets[i]->unmap();
+            asyncTickets.clear();
+
+            //Create the new vertex buffer.
+            const bool keepAsShadow = vertexBuffers[0]->getShadowCopy() != 0;
+            newVertexBuffer = vaoManager->createVertexBuffer( vertexElements,
+                                                              vertexBuffers[0]->getNumElements(),
+                                                              vertexBuffers[0]->getBufferType(),
+                                                              data, keepAsShadow );
+
+            if( keepAsShadow ) //Don't free the pointer ourselves
+                dataPtrContainer.ptr = 0;
+
+            sharedBuffers[vertexBuffers[0]] = newVertexBuffer;
+        }
+
+        VertexBufferPackedVec newVertexBuffers;
+        newVertexBuffers.push_back( newVertexBuffer );
+
+        return vaoManager->createVertexArrayObject( newVertexBuffers, vao->getIndexBuffer(),
+                                                    vao->getOperationType() );
+    }
+    //---------------------------------------------------------------------
     bool sortVertexElementsBySemantic2( const VertexElement2 &l, const VertexElement2 &r )
     {
         return l.mSemantic < r.mSemantic;
@@ -355,9 +498,6 @@ namespace Ogre {
         VertexElementArray srcElements;
         bool hasTangents = false;
 
-        v1::VertexElement const *tangentElement  = 0;
-        v1::VertexElement const *binormalElement = 0;
-
         v1::VertexData *vertexData = subMesh->vertexData[vaoPassIdx];
 
         {
@@ -376,17 +516,14 @@ namespace Ogre {
                     origElement.getSemantic() == VES_BINORMAL )
                 {
                     hasTangents = true;
-                    if( origElement.getSemantic() == VES_TANGENT )
-                        tangentElement = &origElement;
-                    else
-                        binormalElement = &origElement;
                 }
                 else
                 {
                     vertexElements.push_back( VertexElement2( origElement.getType(),
                                                               origElement.getSemantic() ) );
-                    srcElements.push_back( *itor );
                 }
+
+                srcElements.push_back( *itor );
 
                 //We can't convert to half if it wasn't in floating point
                 //Also avoid converting 1 Float ==> 2 Half.
@@ -423,11 +560,32 @@ namespace Ogre {
         std::sort( vertexElements.begin(), vertexElements.end(), sortVertexElementsBySemantic2 );
         std::sort( srcElements.begin(), srcElements.end(), sortVertexElementsBySemantic );
 
-        //Prepare for the transfer between buffers.
-        size_t vertexSize = VaoManager::calculateVertexSize( vertexElements );
-        char *data = static_cast<char*>( OGRE_MALLOC_SIMD( vertexSize * vertexData->vertexCount,
-                                                           MEMCATEGORY_GEOMETRY ) );
+        {
+            //Put VES_TANGENT & VES_BINORMAL at the bottom of the array.
+            size_t reorderedElements = 0;
+            VertexElementArray::iterator itor = srcElements.begin();
+            VertexElementArray::iterator end  = srcElements.end();
+            while( itor != end )
+            {
+                if( itor->getSemantic() == VES_TANGENT || itor->getSemantic() == VES_BINORMAL )
+                {
+                    v1::VertexElement element = *itor;
+                    const size_t idx = (itor - srcElements.begin());
+                    ++reorderedElements;
 
+                    itor = srcElements.erase( itor );
+                    srcElements.push_back( element );
+                    itor = srcElements.begin() + idx;
+                    end  = srcElements.end() - reorderedElements;
+                }
+                else
+                {
+                    ++itor;
+                }
+            }
+        }
+
+        //Prepare for the transfer between buffers.
         FastArray<char*> srcPtrs;
         FastArray<size_t> vertexBuffSizes;
         srcPtrs.reserve( vertexData->vertexBufferBinding->getBufferCount() );
@@ -439,51 +597,143 @@ namespace Ogre {
             vertexBuffSizes.push_back( vBuffer->getVertexSize() );
         }
 
+        SourceDataArray sourceData;
+        sourceData.reserve( srcElements.size() );
+
+        VertexElementArray::const_iterator itor = srcElements.begin();
+        VertexElementArray::const_iterator end  = srcElements.end();
+
+        while( itor != end )
+        {
+            const VertexElement2 element( itor->getType(), itor->getSemantic() );
+            const SourceData srcData( srcPtrs[itor->getSource()] + itor->getOffset(),
+                                      vertexBuffSizes[itor->getSource()],
+                                      element );
+            sourceData.push_back( srcData );
+            ++itor;
+        }
+
+        //Perform actual transfer
+        char *retVal = _arrangeEfficient( sourceData, vertexElements,
+                                          static_cast<uint32>(vertexData->vertexCount) );
+
+        //Cleanup
+        for( size_t i=0; i<vertexData->vertexBufferBinding->getBufferCount(); ++i )
+            vertexData->vertexBufferBinding->getBuffer( i )->unlock();
+
+        if( outVertexElements )
+            outVertexElements->swap( vertexElements );
+
+        return retVal;
+    }
+    //---------------------------------------------------------------------
+    char* SubMesh::_arrangeEfficient( SourceDataArray srcData,
+                                      const VertexElement2Vec &vertexElements,
+                                      uint32 vertexCount )
+    {
+        //Prepare for the transfer between buffers.
+        size_t vertexSize = VaoManager::calculateVertexSize( vertexElements );
+        char *data = static_cast<char*>( OGRE_MALLOC_SIMD( vertexSize * vertexCount,
+                                                           MEMCATEGORY_GEOMETRY ) );
         char *dstData = data;
+
+        SourceData *tangentSrc = 0;
+        SourceData *binormalSrc = 0;
+
+        {
+            //Find the pointers for tangentSrc & binormalSrc (may both be null) since
+            //we will be merging all three (normal, tangent & binormal) into just one
+            //element.
+            bool wantsQTangents = false;
+            {
+                VertexElement2Vec::const_iterator itor = vertexElements.begin();
+                VertexElement2Vec::const_iterator end  = vertexElements.end();
+
+                while( itor != end && !wantsQTangents )
+                {
+                    if( itor->mSemantic == VES_NORMAL && itor->mType == VET_SHORT4_SNORM )
+                        wantsQTangents = true;
+
+                    ++itor;
+                }
+            }
+
+            if( wantsQTangents )
+            {
+                SourceDataArray::iterator itor = srcData.begin();
+                SourceDataArray::iterator end  = srcData.end();
+
+                while( itor != end )
+                {
+                    if( itor->element.mSemantic == VES_TANGENT )
+                    {
+                        tangentSrc = &(*itor);
+
+                        assert( (itor - srcData.begin() >= srcData.size() - 2) &&
+                                "Tangent element must be at the end of srcData array!" );
+                    }
+                    else if( itor->element.mSemantic == VES_BINORMAL )
+                    {
+                        binormalSrc = &(*itor);
+
+                        assert( (itor - srcData.begin() >= srcData.size() - 2) &&
+                                "Binormal element must be at the end of srcData array!" );
+                    }
+
+                    ++itor;
+                }
+            }
+        }
 
         //Perform the transfer. Note that vertexElements & srcElements do not match.
         //As vertexElements is modified for smaller types and may include padding
         //for alignment reasons.
-        for( size_t i=0; i<vertexData->vertexCount; ++i )
+        for( size_t i=0; i<vertexCount; ++i )
         {
             size_t acumOffset = 0;
             VertexElement2Vec::const_iterator itor = vertexElements.begin();
             VertexElement2Vec::const_iterator end  = vertexElements.end();
-            VertexElementArray::const_iterator itSrc = srcElements.begin();
+            SourceDataArray::iterator itSrc = srcData.begin();
 
             while( itor != end )
             {
                 const VertexElement2 &vElement = *itor;
                 size_t writeSize = v1::VertexElement::getTypeSize( vElement.mType );
 
-                if( vElement.mSemantic == VES_NORMAL && hasTangents && vElement.mType != VET_FLOAT3 )
+                assert( itor->mSemantic == itSrc->element.mSemantic );
+
+                if( vElement.mSemantic == VES_NORMAL &&
+                    vElement.mType == VET_SHORT4_SNORM && tangentSrc )
                 {
-                    size_t readSize = v1::VertexElement::getTypeSize( itSrc->getType() );
+                    //QTangents
+                    const size_t readSize = v1::VertexElement::getTypeSize( itSrc->element.mType );
+                    const size_t tangentSize = v1::VertexElement::getTypeSize( tangentSrc->element.mType );
 
                     //Convert TBN matrix (between 6 to 9 floats, 24-36 bytes)
                     //to a QTangent (4 shorts, 8 bytes)
                     assert( readSize == sizeof(float) * 3 );
-                    assert( tangentElement->getSize() <= sizeof(float) * 4 &&
-                            tangentElement->getSize() >= sizeof(float) * 3 );
+                    assert( tangentSize <= sizeof(float) * 4 &&
+                            tangentSize >= sizeof(float) * 3 );
 
                     float normal[3];
                     float tangent[4];
                     tangent[3] = 1.0f;
-                    memcpy( normal, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), readSize );
-                    memcpy( tangent,
-                            srcPtrs[tangentElement->getSource()] + tangentElement->getOffset(),
-                            tangentElement->getSize() );
+                    memcpy( normal, itSrc->data, readSize );
+                    memcpy( tangent, tangentSrc->data, tangentSize );
+
+                    tangentSrc->data += tangentSrc->bytesPerVertex;
 
                     Vector3 vNormal( normal[0], normal[1], normal[2] );
                     Vector3 vTangent( tangent[0], tangent[1], tangent[2] );
 
-                    if( binormalElement )
+                    if( binormalSrc )
                     {
-                        assert( binormalElement->getSize() == sizeof(float) * 3 );
+                        const size_t binormalSize = v1::VertexElement::getTypeSize( binormalSrc->
+                                                                                    element.mType );
+
+                        assert( binormalSize == sizeof(float) * 3 );
                         float binormal[3];
-                        memcpy( binormal,
-                                srcPtrs[binormalElement->getSource()] + binormalElement->getOffset(),
-                                binormalElement->getSize() );
+                        memcpy( binormal, binormalSrc->data, binormalSize );
 
                         Vector3 vBinormal( binormal[0], binormal[1], binormal[2] );
 
@@ -491,6 +741,8 @@ namespace Ogre {
                         Vector3 naturalBinormal = vTangent.crossProduct( vNormal );
                         if( naturalBinormal.dotProduct( vBinormal ) <= 0 )
                             tangent[3] = -1.0f;
+
+                        binormalSrc->data += binormalSrc->bytesPerVertex;
                     }
 
                     Matrix3 tbn;
@@ -529,23 +781,23 @@ namespace Ogre {
                     if( tangent[3] < 0 )
                         qTangent = -qTangent;
 
-                    uint16 *dstData16 = reinterpret_cast<uint16*>(dstData + acumOffset);
+                    int16 *dstData16 = reinterpret_cast<int16*>(dstData + acumOffset);
 
-                    dstData16[0] = (uint16)Math::Clamp( qTangent.x * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[1] = (uint16)Math::Clamp( qTangent.y * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[2] = (uint16)Math::Clamp( qTangent.z * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[3] = (uint16)Math::Clamp( qTangent.w * 32767.0f, -32768.0f, 32767.0f );
+                    dstData16[0] = Bitwise::floatToSnorm16( qTangent.x );
+                    dstData16[1] = Bitwise::floatToSnorm16( qTangent.y );
+                    dstData16[2] = Bitwise::floatToSnorm16( qTangent.z );
+                    dstData16[3] = Bitwise::floatToSnorm16( qTangent.w );
                 }
                 else if( v1::VertexElement::getBaseType( vElement.mType ) == VET_HALF2 &&
-                         v1::VertexElement::getBaseType( itSrc->getType() ) == VET_FLOAT1 )
+                         v1::VertexElement::getBaseType( itSrc->element.mType ) == VET_FLOAT1 )
                 {
-                    size_t readSize = v1::VertexElement::getTypeSize( itSrc->getType() );
+                    size_t readSize = v1::VertexElement::getTypeSize( itSrc->element.mType );
 
                     //Convert float to half.
                     float fpData[4];
                     fpData[0] = fpData[1] = fpData[2] = 0.0f;
                     fpData[3] = 1.0f;
-                    memcpy( fpData, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), readSize );
+                    memcpy( fpData, itSrc->data, readSize );
 
                     uint16 *dstData16 = reinterpret_cast<uint16*>(dstData + acumOffset);
 
@@ -555,34 +807,220 @@ namespace Ogre {
                 else
                 {
                     //Raw. Transfer as is.
-                    memcpy( dstData + acumOffset,
-                            srcPtrs[itSrc->getSource()] + itSrc->getOffset(),
-                            writeSize ); //writeSize = readSize
+                    memcpy( dstData + acumOffset, itSrc->data, writeSize ); //writeSize = readSize
                 }
 
-                acumOffset += writeSize;
+                acumOffset  += writeSize;
+                itSrc->data += itSrc->bytesPerVertex;
+
                 ++itSrc;
                 ++itor;
             }
 
             dstData += vertexSize;
-            for( size_t j=0; j<srcPtrs.size(); ++j )
-                srcPtrs[j] += vertexBuffSizes[j];
         }
 
-        assert( dstData == data + vertexSize * vertexData->vertexCount );
-
-        //Cleanup
-        for( size_t i=0; i<vertexData->vertexBufferBinding->getBufferCount(); ++i )
-            vertexData->vertexBufferBinding->getBuffer( i )->unlock();
-
-        if( outVertexElements )
-            outVertexElements->swap( vertexElements );
+        assert( dstData == data + vertexSize * vertexCount );
 
         return data;
     }
     //---------------------------------------------------------------------
-    void SubMesh::destroyVaos( VertexArrayObjectArray &vaos, VaoManager *vaoManager )
+    void SubMesh::dearrangeToInefficient(void)
+    {
+        uint8 numVaoPasses = mParent->hasIndependentShadowMappingVaos() + 1;
+
+        for( uint8 vaoPassIdx=0; vaoPassIdx<numVaoPasses; ++vaoPassIdx )
+        {
+            VertexArrayObjectArray newVaos;
+            newVaos.reserve( mVao[vaoPassIdx].size() );
+            map<VertexBufferPacked*, VertexBufferPacked*>::type sharedBuffers;
+            VertexArrayObjectArray::const_iterator itor = mVao[vaoPassIdx].begin();
+            VertexArrayObjectArray::const_iterator end  = mVao[vaoPassIdx].end();
+
+            while( itor != end )
+            {
+                newVaos.push_back( dearrangeEfficient( *itor, sharedBuffers, mParent->mVaoManager ) );
+                ++itor;
+            }
+
+            mVao[vaoPassIdx].swap( newVaos );
+            //Now 'newVaos' contains the old ones. We need to destroy all of them at
+            //the end because vertex buffers may be shared while we still iterate.
+            destroyVaos( newVaos, mParent->mVaoManager, false );
+        }
+    }
+    //---------------------------------------------------------------------
+    VertexArrayObject* SubMesh::dearrangeEfficient( const VertexArrayObject *vao,
+                                                    map<VertexBufferPacked*, VertexBufferPacked*>::type
+                                                    &sharedBuffers, VaoManager *vaoManager )
+    {
+        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
+
+        VertexElement2VecVec newVertexElements;
+        newVertexElements.resize( vertexBuffers.size() );
+        VertexBufferPackedVec newVertexBuffers;
+        newVertexBuffers.reserve(  vertexBuffers.size() );
+
+        VertexElement2VecVec::iterator itNewElementVec = newVertexElements.begin();
+        VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+        while( itor != end )
+        {
+            AsyncTicketPtr asyncTicket = (*itor)->readRequest( 0, (*itor)->getNumElements() );
+
+            map<VertexBufferPacked*, VertexBufferPacked*>::type::const_iterator itShared = sharedBuffers.find( *itor );
+            if( itShared != sharedBuffers.end() )
+            {
+                //Shared vertex buffer. We've already converted this one. Reuse.
+                newVertexBuffers.push_back( itShared->second );
+            }
+            else
+            {
+                const void *srcData = asyncTicket->map();
+                char *data = _dearrangeEfficient( reinterpret_cast<const char * RESTRICT_ALIAS>(srcData),
+                                                  (*itor)->getNumElements(), (*itor)->getVertexElements(),
+                                                  &(*itNewElementVec) );
+                asyncTicket->unmap();
+
+                SafeDelete dataPtrContainer( data );
+                const bool keepAsShadow = (*itor)->getShadowCopy() != 0;
+                VertexBufferPacked *newVertexBuffer =
+                        vaoManager->createVertexBuffer( *itNewElementVec,
+                                                        (*itor)->getNumElements(),
+                                                        (*itor)->getBufferType(),
+                                                        data, keepAsShadow );
+
+                if( keepAsShadow ) //Don't free the pointer ourselves
+                    dataPtrContainer.ptr = 0;
+
+                sharedBuffers[*itor] = newVertexBuffer;
+                newVertexBuffers.push_back( newVertexBuffer );
+            }
+
+            ++itNewElementVec;
+            ++itor;
+        }
+
+        return vaoManager->createVertexArrayObject( newVertexBuffers, vao->getIndexBuffer(),
+                                                    vao->getOperationType() );
+    }
+    //---------------------------------------------------------------------
+    char* SubMesh::_dearrangeEfficient( char const * RESTRICT_ALIAS srcData, uint32 numElements,
+                                        const VertexElement2Vec &vertexElements,
+                                        VertexElement2Vec *outVertexElements )
+    {
+        VertexElement2Vec newVertexElements;
+
+        VertexElement2Vec::const_iterator itElements = vertexElements.begin();
+        VertexElement2Vec::const_iterator enElements = vertexElements.end();
+        while( itElements != enElements )
+        {
+            VertexElement2 element( *itElements );
+
+            const VertexElementType baseType = v1::VertexElement::getBaseType( element.mType );
+            if( baseType == VET_HALF2 )
+            {
+                //Convert from half to float
+                element.mType = v1::VertexElement::multiplyTypeCount( baseType,
+                                                                      v1::VertexElement::
+                                                                      getTypeCount( element.mType ) );
+
+                newVertexElements.push_back( element );
+            }
+            else if( element.mSemantic == VES_NORMAL && element.mType == VET_SHORT4_SNORM )
+            {
+                //Dealing with QTangents.
+                newVertexElements.push_back( VertexElement2( VET_FLOAT3, VES_NORMAL ) );
+                newVertexElements.push_back( VertexElement2( VET_FLOAT4, VES_TANGENT ) );
+            }
+            else
+            {
+                //Send through
+                newVertexElements.push_back( element );
+            }
+
+            ++itElements;
+        }
+
+        const size_t newVertexSize = VaoManager::calculateVertexSize( newVertexElements );
+
+        char *data = static_cast<char*>( OGRE_MALLOC_SIMD( numElements * newVertexSize, MEMCATEGORY_GEOMETRY ) );
+        char *dstData = data;
+
+        for( uint32 i=0; i<numElements; ++i )
+        {
+            itElements = vertexElements.begin();
+
+            const size_t readSize = v1::VertexElement::getTypeSize( itElements->mType );
+
+            while( itElements != enElements )
+            {
+                const VertexElementType baseType = v1::VertexElement::getBaseType( itElements->mType );
+                if( baseType == VET_HALF2 )
+                {
+                    //Convert half to float.
+                    uint16 hfData[4];
+                    memcpy( hfData, srcData, readSize );
+
+                    uint32 *dstData32 = reinterpret_cast<uint32*>(dstData);
+                    const size_t typeCount = v1::VertexElement::getTypeCount( itElements->mType );
+
+                    for( size_t j=0; j<typeCount; ++j )
+                        dstData32[j] = Bitwise::halfToFloatI( hfData[j] );
+
+                    dstData += typeCount * sizeof(uint32);
+                }
+                else if( itElements->mSemantic == VES_NORMAL && itElements->mType == VET_SHORT4_SNORM )
+                {
+                    //Dealing with QTangents.
+                    newVertexElements.push_back( VertexElement2( VET_FLOAT3, VES_NORMAL ) );
+                    newVertexElements.push_back( VertexElement2( VET_FLOAT4, VES_TANGENT ) );
+
+                    Quaternion qTangent;
+                    const int16 *srcData16 = reinterpret_cast<const int16*>( srcData );
+                    qTangent.x = Bitwise::snorm16ToFloat( srcData16[0] );
+                    qTangent.y = Bitwise::snorm16ToFloat( srcData16[1] );
+                    qTangent.z = Bitwise::snorm16ToFloat( srcData16[2] );
+                    qTangent.w = Bitwise::snorm16ToFloat( srcData16[3] );
+
+                    float reflection = 1.0f;
+                    if( qTangent.w < 0 )
+                        reflection = -1.0f;
+
+                    Vector3 vNormal = qTangent.xAxis();
+                    Vector3 vTangent = qTangent.yAxis();
+
+                    float *dstDataF32 = reinterpret_cast<float*>(dstData);
+                    dstDataF32[0] = vNormal.x;
+                    dstDataF32[1] = vNormal.y;
+                    dstDataF32[2] = vNormal.z;
+                    dstDataF32[3] = vTangent.x;
+                    dstDataF32[4] = vTangent.y;
+                    dstDataF32[5] = vTangent.z;
+                    dstDataF32[6] = reflection;
+
+                    dstData += 7 * sizeof(float);
+                }
+                else
+                {
+                    //Raw. Transfer as is.
+                    memcpy( dstData, srcData, readSize );
+                    dstData += readSize;
+                }
+
+                srcData += readSize;
+                ++itElements;
+            }
+        }
+
+        outVertexElements->swap( newVertexElements );
+
+        return data;
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::destroyVaos( VertexArrayObjectArray &vaos, VaoManager *vaoManager,
+                               bool destroyIndexBuffer )
     {
         typedef set<VertexBufferPacked*>::type VertexBufferPackedSet;
         VertexBufferPackedSet destroyedBuffers;
@@ -608,7 +1046,7 @@ namespace Ogre {
                 ++itBuffers;
             }
 
-            if( vao->getIndexBuffer() )
+            if( vao->getIndexBuffer() && destroyIndexBuffer )
                 vaoManager->destroyIndexBuffer( vao->getIndexBuffer() );
             vaoManager->destroyVertexArrayObject( vao );
 

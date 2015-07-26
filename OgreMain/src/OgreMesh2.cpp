@@ -596,6 +596,30 @@ namespace Ogre {
         setToLoaded();
     }
     //---------------------------------------------------------------------
+    void Mesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
+    {
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
+
+        while( itor != end )
+        {
+            (*itor)->arrangeEfficient( halfPos, halfTexCoords, qTangents );
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    void Mesh::dearrangeToInefficient(void)
+    {
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
+
+        while( itor != end )
+        {
+            (*itor)->dearrangeToInefficient();
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
     void Mesh::prepareForShadowMapping( bool forceSameBuffers )
     {
         SubMeshVec::const_iterator itor = mSubMeshes.begin();

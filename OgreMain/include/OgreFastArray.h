@@ -115,8 +115,7 @@ namespace Ogre
             mData = (T*)::operator new( mSize * sizeof(T) );
             for( size_t i=0; i<mSize; ++i )
             {
-                new (&mData[i]) T();
-                mData[i] = copy.mData[i];
+                new (&mData[i]) T( copy.mData[i] );
             }
         }
 
@@ -134,8 +133,7 @@ namespace Ogre
                 mData = (T*)::operator new( mSize * sizeof(T) );
                 for( size_t i=0; i<mSize; ++i )
                 {
-                    new (&mData[i]) T();
-                    mData[i] = copy.mData[i];
+                    new (&mData[i]) T( copy.mData[i] );
                 }
             }
         }
@@ -156,8 +154,7 @@ namespace Ogre
             mData = (T*)::operator new( count * sizeof(T) );
             for( size_t i=0; i<count; ++i )
             {
-                new (&mData[i]) T();
-                mData[i] = value;
+                new (&mData[i]) T( value );
             }
         }
 
@@ -174,8 +171,7 @@ namespace Ogre
         void push_back( const T& val )
         {
             growToFit( 1 );
-            new (&mData[mSize]) T();
-            mData[mSize] = val;
+            new (&mData[mSize]) T( val );
             ++mSize;
         }
 
@@ -193,8 +189,7 @@ namespace Ogre
             growToFit( 1 );
 
             memmove( mData + idx + 1, mData + idx, (mSize - idx) *  sizeof(T) );
-            new (&mData[idx]) T();
-            mData[idx] = val;
+            new (&mData[idx]) T( val );
             ++mSize;
 
             return mData + idx;
@@ -295,8 +290,7 @@ namespace Ogre
                 growToFit( newSize - mSize );
                 for( size_t i=mSize; i<newSize; ++i )
                 {
-                    new (&mData[i]) T();
-                    mData[i] = value;
+                    new (&mData[i]) T( value );
                 }
             }
 

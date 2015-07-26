@@ -403,6 +403,16 @@ namespace Ogre {
         */
         void importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords, bool qTangents );
 
+        /// Converts this SubMesh to an efficient arrangement. @See Mesh::importV1 for an
+        /// explanation on the parameters. @see dearrangeEfficientToInefficient
+        /// to perform the opposite operation.
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+
+        /// Reverts the effects from arrangeEfficient by converting all 16-bit half float back
+        /// to 32-bit float; and QTangents to Normal, Tangent + Reflection representation,
+        /// which are more compatible for doing certain operations vertex operations in the CPU.
+        void dearrangeToInefficient(void);
+
         /// When this bool is false, prepareForShadowMapping will use the same Vaos for
         /// both regular and shadow mapping rendering. When it's true, it will
         /// calculate an optimized version to speed up shadow map rendering (uses a bit

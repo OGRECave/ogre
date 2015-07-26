@@ -237,6 +237,8 @@ namespace Ogre
 
         size_t _getInternalBufferStart(void) const              { return mInternalBufferStart; }
         size_t _getFinalBufferStart(void) const                 { return mFinalBufferStart; }
+
+        const void* getShadowCopy(void) const   { return mShadowCopy; }
     };
 
     typedef vector<BufferPacked*>::type BufferPackedVec;
