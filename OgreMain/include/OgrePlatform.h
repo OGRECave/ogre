@@ -193,6 +193,19 @@ namespace Ogre {
 #   define OGRE_DEPRECATED
 #endif
 
+
+/*********** OGRE_DEPRECATED_EX *****************/
+#if defined(__cplusplus) &&  __cplusplus > 201402L
+    #define OGRE_DEPRECATED_EX(message) [[deprecated(message)]]
+#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
+    #define OGRE_DEPRECATED_EX(message) __declspec(deprecated(message))
+#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#   define OGRE_DEPRECATED_EX(message) __attribute__ ((deprecated))
+#else
+#   pragma message("WARNING: You need to implement OGRE_DEPRECATED_EX for this compiler")
+#   define OGRE_DEPRECATED_EX(message)
+#endif
+
 //----------------------------------------------------------------------------
 // Windows Settings
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
