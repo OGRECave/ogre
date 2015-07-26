@@ -504,7 +504,16 @@ namespace Ogre {
 	{
 		return mColourBuffer;
 	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void Viewport::setMaterialScheme(const String& schemeName)
+    {
+        mMaterialSchemeName = schemeName;
+    }
+    //-----------------------------------------------------------------------
+    const String& Viewport::getMaterialScheme(void) const
+    {
+        return mMaterialSchemeName;
+    }
     //-----------------------------------------------------------------------
     void Viewport::Listener::viewportCameraChanged(Viewport*)
     {
