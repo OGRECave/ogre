@@ -361,12 +361,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::setCamera(Camera* cam)
     {
-        if(mCamera)
+        if (cam != NULL && mCamera != NULL && mCamera->getViewport() == this)
         {
-            if(mCamera->getViewport() == this)
-            {
-                mCamera->_notifyViewport(0);
-            }
+                mCamera->_notifyViewport(NULL);
         }
 
         mCamera = cam;
