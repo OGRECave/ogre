@@ -56,7 +56,7 @@ namespace Ogre {
 
         *this = substr(lspaces, len-lspaces-rspaces);
         */
-        static const String delims = " \t\r";
+        static const String delims = " \t\r\n";
         if(right)
             str.erase(str.find_last_not_of(delims)+1); // trim right
         if(left)
