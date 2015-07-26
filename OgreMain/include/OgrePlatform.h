@@ -181,7 +181,10 @@ namespace Ogre {
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
 
 // For marking functions as deprecated
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+/*********** OGRE_DEPRECATED *****************/
+#if  defined(__cplusplus) &&  __cplusplus > 201402L
+#define OGRE_DEPRECATED [[deprecated()]]
+#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   define OGRE_DEPRECATED __declspec(deprecated)
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
 #   define OGRE_DEPRECATED __attribute__ ((deprecated))
