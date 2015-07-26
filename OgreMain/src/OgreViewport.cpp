@@ -60,7 +60,8 @@ namespace Ogre {
         , mRQSequence(0)
         , mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
         , mIsAutoUpdated(true)
-		, mColourBuffer(CBT_BACK)
+        , mColourBuffer(CBT_BACK)
+        , mEnabled(true)
     {           
 #if OGRE_COMPILER != OGRE_COMPILER_GCCE && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         LogManager::getSingleton().stream(LML_TRIVIAL)
@@ -218,7 +219,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::update(void)
     {
-        if (mCamera)
+        if (mCamera && mEnabled)
         {
             // Tell Camera to render into me
             mCamera->_renderScene(this, mShowOverlays);
@@ -518,5 +519,17 @@ namespace Ogre {
     void Viewport::Listener::viewportDestroyed(Viewport*)
     {
     }
-
+    //-----------------------------------------------------------------------
+    void Viewport::setEnabled(bool enabled)
+    {
+        mEnabled = enabled;
+    }
+    //-----------------------------------------------------------------------
+    bool Viewport::getEnabled()
+    {
+        return mEnabled;
+    }
+    
+    //-----------------------------------------------------------------------
+    
 }
