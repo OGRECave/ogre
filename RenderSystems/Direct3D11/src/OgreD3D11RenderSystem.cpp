@@ -950,6 +950,34 @@ bail:
             }           
         }
 
+        #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+                new MonitorInfo();
+        #endif
+
+        // Create the GPU program manager
+        mGpuProgramManager = new D3D11GpuProgramManager(mDevice);
+
+        // Create the texture manager for use by others
+        mTextureManager = new D3D11TextureManager(mDevice);
+        // Also create hardware buffer manager
+        mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
+
+        // create & register HLSL factory
+        if (mHLSLProgramFactory == NULL)
+            mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
+        mRealCapabilities = createRenderSystemCapabilities();
+        mRealCapabilities->addShaderProfile("hlsl");
+
+        // if we are using custom capabilities, then 
+        // mCurrentCapabilities has already been loaded
+        if (!mUseCustomCapabilities)
+            mCurrentCapabilities = mRealCapabilities;
+
+        fireEvent("RenderSystemCapabilitiesCreated");
+
+        initialiseFromRenderSystemCapabilities(mCurrentCapabilities, NULL);
+
+
         LogManager::getSingleton().logMessage("***************************************");
         LogManager::getSingleton().logMessage("*** D3D11 : Subsystem Initialized OK ***");
         LogManager::getSingleton().logMessage("***************************************");
@@ -1067,33 +1095,6 @@ bail:
 		if (!mPrimaryWindow)
 		{
 			mPrimaryWindow = win;
-			win->getCustomAttribute("D3DDEVICE", &mDevice);
-
-			// Create the texture manager for use by others
-			mTextureManager = new D3D11TextureManager(mDevice);
-			// Also create hardware buffer manager
-			mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
-
-            #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-                new MonitorInfo();
-            #endif
-			// Create the GPU program manager
-			mGpuProgramManager = new D3D11GpuProgramManager(mDevice);
-			// create & register HLSL factory
-			if (mHLSLProgramFactory == NULL)
-				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
-			mRealCapabilities = createRenderSystemCapabilities();
-			mRealCapabilities->addShaderProfile("hlsl");
-
-			// if we are using custom capabilities, then 
-			// mCurrentCapabilities has already been loaded
-			if (!mUseCustomCapabilities)
-				mCurrentCapabilities = mRealCapabilities;
-
-			fireEvent("RenderSystemCapabilitiesCreated");
-
-			initialiseFromRenderSystemCapabilities(mCurrentCapabilities, mPrimaryWindow);
-
 		}
 		else
 		{
