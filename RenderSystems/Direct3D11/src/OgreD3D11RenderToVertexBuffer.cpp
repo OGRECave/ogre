@@ -111,7 +111,7 @@ namespace v1 {
         if (mResetRequested || mResetsEveryUpdate)
         {
             //Use source data to render to first buffer
-            mSourceRenderable->getRenderOperation(renderOp);
+            mSourceRenderable->getRenderOperation(renderOp, false);
             targetBufferIndex = 0;
         }
         else
