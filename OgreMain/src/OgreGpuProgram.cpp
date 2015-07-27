@@ -75,7 +75,7 @@ namespace Ogre
         mFilename = filename;
         mSource.clear();
         mLoadFromFile = true;
-        mCompileError = false;
+        resetCompileError();
     }
     //-----------------------------------------------------------------------------
     void GpuProgram::setSource(const String& source)
@@ -83,7 +83,7 @@ namespace Ogre
         mSource = source;
         mFilename.clear();
         mLoadFromFile = false;
-        mCompileError = false;
+        resetCompileError();
     }
     size_t GpuProgram::calculateSize(void) const
     {
@@ -145,10 +145,13 @@ namespace Ogre
         }
         catch (const Exception&)
         {
-            // will already have been logged
-            LogManager::getSingleton().stream()
-                << "Gpu program " << mName << " encountered an error "
+            StringStream ss;
+            ss << "Gpu program " << mName << " encountered an error "
                 << "during loading and is thus not supported.";
+            
+            mCompileErrorMessage = ss.str();
+            // will already have been logged
+            LogManager::getSingleton().stream() << mCompileErrorMessage;
 
             mCompileError = true;
         }
@@ -350,7 +353,12 @@ namespace Ogre
             &msComputeGroupDimsCmd);
             
     }
-
+    //-----------------------------------------------------------------------
+    void GpuProgram::resetCompileError(void)
+    {
+        mCompileError = false;
+        mCompileErrorMessage = BLANKSTRING;
+    }
     //-----------------------------------------------------------------------
     const String& GpuProgram::getLanguage(void) const
     {
