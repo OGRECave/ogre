@@ -156,6 +156,8 @@ namespace Ogre {
     Vector3 mComputeGroupDimensions;
     /// The default parameters for use with this object
     GpuProgramParametersSharedPtr mDefaultParams;
+    /// Compilation error message.
+    String mCompileErrorMessage;
     /// Did we encounter a compilation error?
     bool mCompileError;
     /** Record of logical to physical buffer maps. Mandatory for low-level
@@ -400,10 +402,13 @@ namespace Ogre {
     /** Did this program encounter a compile error when loading?
      */
     virtual bool hasCompileError(void) const { return mCompileError; }
+    /** Return the last compilation error message.
+     */
+    virtual const String& getCompileErrorMessage(void) const { return mCompileErrorMessage; }
 
     /** Reset a compile error if it occurred, allowing the load to be retried
      */
-    virtual void resetCompileError(void) { mCompileError = false; }
+    virtual void resetCompileError(void);
 
     /** Allows you to manually provide a set of named parameter mappings
         to a program which would not be able to derive named parameters itself.
