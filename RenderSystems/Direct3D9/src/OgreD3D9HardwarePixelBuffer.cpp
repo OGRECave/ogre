@@ -653,7 +653,7 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
         // if the row doesn't divide by 4 - there is padding to 4
         if(converted.rowPitch  % 4 > 0)
         {
-            converted.rowPitch  += 4;
+            converted.rowPitch  += 4 - converted.rowPitch  % 4;
         }
 
         // D3D wants the width of one row of cells in bytes
