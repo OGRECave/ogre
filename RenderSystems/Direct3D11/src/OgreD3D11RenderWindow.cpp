@@ -58,6 +58,7 @@ namespace Ogre
         mSizing = false;
         mClosed = false;
         mHidden = false;
+        mAlwaysWindowedMode = false;
         mpBackBuffer = 0;
         mpBackBufferNoMSAA = 0;
         mRenderTargetView = 0;
@@ -753,6 +754,10 @@ namespace Ogre
             opt = miscParams->find("vsyncInterval");
             if(opt != miscParams->end())
                 mVSyncInterval = StringConverter::parseUnsignedInt(opt->second);
+           
+            opt = miscParams->find("alwaysWindowedMode");
+            if(opt != miscParams->end())
+                mAlwaysWindowedMode = StringConverter::parseBool(opt->second);
 
             // enable double click messages
             opt = miscParams->find("enableDoubleClick");
@@ -898,7 +903,7 @@ namespace Ogre
 
         _createSwapChain();
         _createSizeDependedD3DResources();
-        mpDXGIFactory->MakeWindowAssociation(mHWnd, NULL);
+        mpDXGIFactory->MakeWindowAssociation(mHWnd, mAlwaysWindowedMode == true ? DXGI_MWA_NO_ALT_ENTER : static_cast<UINT>(0));
         setHidden(mHidden);
 
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -955,7 +960,7 @@ namespace Ogre
 
         mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         mSwapChainDesc.OutputWindow         = mHWnd;
-        mSwapChainDesc.Windowed             = !mIsFullScreen;
+        mSwapChainDesc.Windowed             =  !mIsFullScreen || mAlwaysWindowedMode;
 
         if (!mVSync && !mIsFullScreen)
         {
@@ -1113,7 +1118,7 @@ namespace Ogre
 				updateWindowRect();
             }
 
-            mSwapChainDesc.Windowed = !fullScreen;
+            mSwapChainDesc.Windowed = !fullScreen || mAlwaysWindowedMode;
             mSwapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
             mSwapChainDesc.BufferDesc.RefreshRate.Denominator=0;
             mSwapChainDesc.BufferDesc.Height = height;
@@ -1179,7 +1184,7 @@ namespace Ogre
 		mpSwapChain->GetDesc(&dsc);
 		if((dsc.Windowed != 0) == mIsFullScreen)
 		{
-            mpSwapChain->SetFullscreenState(mIsFullScreen, NULL);
+            mpSwapChain->SetFullscreenState(mIsFullScreen && !mAlwaysWindowedMode, NULL);
 		}
 		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
 		mLastSwitchingFullscreenCounter = rsys->getSwitchingFullscreenCounter();

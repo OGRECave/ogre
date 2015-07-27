@@ -90,6 +90,7 @@ namespace Ogre
         bool    mSizing;
         bool    mClosed;
         bool    mHidden;
+        bool    mAlwaysWindowedMode;
 
         DXGI_SAMPLE_DESC mFSAAType;     // Effective FSAA mode, limited by hardware capabilities
 
