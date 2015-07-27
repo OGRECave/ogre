@@ -50,6 +50,9 @@ namespace Ogre {
 		/// destructor
 		~D3D11Texture();
 
+        /// @copydoc Texture::copyToTexture
+        virtual void copyToTexture( size_t sourceArrayIndex, TexturePtr& target, 
+             size_t targetArrayIndex );
 		/// overridden from Texture
 		void copyToTexture(TexturePtr& target);
 		/// overridden from Texture

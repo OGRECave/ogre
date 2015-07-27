@@ -103,6 +103,50 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
+    void D3D11Texture::copyToTexture( size_t sourceArrayIndex, 
+        TexturePtr& target, size_t targetArrayIndex )
+    {
+        D3D11Texture *other;
+        other = static_cast< D3D11Texture * >( target.get() );
+
+        D3D11_TEXTURE2D_DESC desc;
+        mp2DTex->GetDesc(&desc);
+        UINT sourceMips = desc.MipLevels ;
+        other->GetTex2D()->GetDesc(&desc);
+        UINT destMips = desc.MipLevels;
+
+
+        if (target->getFormat() != this->getFormat() ||
+            target->getWidth() !=  this->getWidth() ||
+            target->getHeight() !=  this->getHeight() ||
+            sourceMips != destMips
+            )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+                "Src. and dest. textures must be of same type and must have the same usage !!!", 
+                "D3D11Texture::copyToTexture" );
+        }
+
+        uint32 height = mHeight;
+        uint32 width = mWidth;
+        
+
+        for(UINT i = 0 ; i < sourceMips ; i++)
+        {
+
+            mDevice.GetImmediateContext()->CopySubresourceRegion(other->getTextureResource(), D3D11CalcSubresource(i ,targetArrayIndex, destMips), 
+                0, 0, 0, mpTex, 
+                D3D11CalcSubresource(i ,sourceArrayIndex, sourceMips), NULL );
+            if (mDevice.isError())
+            {
+                String errorDescription = mDevice.getErrorDescription();
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                    "D3D11 device cannot copy resource\nError Description:" + errorDescription,
+                    "D3D11Texture::copyToTexture");
+            }
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11Texture::loadImage( const Image &img )
     {
         // Use OGRE its own codecs
