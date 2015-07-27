@@ -642,7 +642,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
 	int D3D11RenderWindowSwapChainBased::getVBlankMissCount()
 	{
-		if (!(mIsFullScreen || (!mIsFullScreen && isVSyncEnabled() && mUseFlipSequentialMode == true && mFSAA == 0)))
+        // Frame statistics works only with VSync.
+        // If in window mode, flip mode must be active and FSAA disabled.
+        if (isVSyncEnabled() == false 
+        || mIsFullScreen == false 
+        && (mUseFlipSequentialMode == false || mFSAA != 0))
 		{
 			return -1;
 		}
