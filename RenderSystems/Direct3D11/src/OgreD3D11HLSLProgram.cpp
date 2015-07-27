@@ -2080,6 +2080,21 @@ namespace Ogre {
         return mD3d11ShaderInputParameters.size();
     }
     //-----------------------------------------------------------------------------
+    unsigned int D3D11HLSLProgram::getNumOfVertexInputs(void) const
+    {
+        int count = 0;
+        D3d11ShaderParameters::const_iterator it_end = mD3d11ShaderInputParameters.end();
+        for (D3d11ShaderParameters::const_iterator it = mD3d11ShaderInputParameters.begin(); it != it_end; it++)
+        {
+            const D3D11_SIGNATURE_PARAMETER_DESC& param = *it;
+            if (param.SystemValueType == D3D_NAME_UNDEFINED)
+
+                count++;
+        }
+        return count;
+    }
+
+    //-----------------------------------------------------------------------------
     unsigned int D3D11HLSLProgram::getNumOutputs( void ) const
     {
         return mD3d11ShaderOutputParameters.size();

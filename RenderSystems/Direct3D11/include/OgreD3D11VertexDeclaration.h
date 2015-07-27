@@ -85,6 +85,14 @@ namespace Ogre {
         D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
         void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 
+        /** Internal method to find a vertex element that matches a D3D11_SIGNATURE_PARAMETER_DESC*/
+        bool findElemment(const D3D11_SIGNATURE_PARAMETER_DESC& inputDesc, VertexElementList::const_iterator& it);
+
+        /** Internal method to Initialize a D3D11_INPUT_ELEMENT_DESC*/
+        void fillInputElement(const D3D11_SIGNATURE_PARAMETER_DESC& inputDesc, 
+            const VertexElementList::const_iterator& it, 
+            HardwareVertexBufferSharedPtr vertexBuffer,
+            D3D11_INPUT_ELEMENT_DESC& element);
     };
 
 }

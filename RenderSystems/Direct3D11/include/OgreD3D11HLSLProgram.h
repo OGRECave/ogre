@@ -359,6 +359,8 @@ namespace Ogre {
         
         unsigned int getNumInputs(void)const;
         unsigned int getNumOutputs(void)const;
+        // Gets the expected number of inputs from the vertex buffer.
+        unsigned int getNumOfVertexInputs(void) const;
 
         String getNameForMicrocodeCache();
 
