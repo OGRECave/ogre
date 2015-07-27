@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
 #include <iomanip>
+#include "OgreMonitorInfo.h"
 
 #define OGRE_D3D11_WIN_CLASS_NAME "OgreD3D11Wnd"
 
@@ -988,6 +989,11 @@ namespace Ogre
         HRESULT hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, &mpSwapChain);
 
         return hr;
+    }
+    //---------------------------------------------------------------------
+    int D3D11RenderWindowHwnd::getContainingMonitorNumber()
+    {
+        return MonitorInfo::getSingleton().getMonitorSequentialNumberFromSwapChain(_getSwapChain());
     }
     //---------------------------------------------------------------------
     bool D3D11RenderWindowHwnd::isVisible() const

@@ -58,6 +58,8 @@ THE SOFTWARE.
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
 
+#include "OgreMonitorInfo.h"
+
 
 #ifndef D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT
 #   define D3D_FL9_3_SIMULTANEOUS_RENDER_TARGET_COUNT 4
@@ -960,6 +962,9 @@ bail:
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
         SAFE_DELETE( mGpuProgramManager );
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+        delete(MonitorInfo::getSingletonPtr());
+#endif
 
     }
     //---------------------------------------------------------------------
@@ -1048,6 +1053,9 @@ bail:
 			// Also create hardware buffer manager
 			mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
 
+            #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+                new MonitorInfo();
+            #endif
 			// Create the GPU program manager
 			mGpuProgramManager = new D3D11GpuProgramManager(mDevice);
 			// create & register HLSL factory

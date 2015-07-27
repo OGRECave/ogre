@@ -178,6 +178,7 @@ namespace Ogre
         void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, unsigned int* winWidth, unsigned int* winHeight);
         void updateWindowRect();
         void _beginUpdate();
+        int getContainingMonitorNumber();
 
     protected:
         DXGI_FORMAT _getBasicFormat()                           { return DXGI_FORMAT_R8G8B8A8_UNORM; } // be compatible with pre-Win8 D3D11
