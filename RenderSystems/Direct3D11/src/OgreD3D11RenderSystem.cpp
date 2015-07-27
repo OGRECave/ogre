@@ -426,6 +426,7 @@ bail:
         // Driver type
         optDriverType.name = "Driver type";
         optDriverType.possibleValues.push_back("Hardware");
+        optDriverType.possibleValues.push_back("Reference");
         optDriverType.possibleValues.push_back("Software");
         optDriverType.possibleValues.push_back("Warp");
         optDriverType.currentValue = "Hardware";
@@ -768,6 +769,10 @@ bail:
             if ("Hardware" == driverTypeName)
             {
                  mDriverType = DT_HARDWARE;
+            }
+            if ("Reference" == driverTypeName)
+            {
+                mDriverType = DT_REFERENCE;
             }
             if ("Software" == driverTypeName)
             {

@@ -54,7 +54,8 @@ namespace Ogre
         enum OGRE_D3D11_DRIVER_TYPE
         {
             DT_HARDWARE, // GPU based
-            DT_SOFTWARE, // microsoft original (slow) software driver
+            DT_REFERENCE, // microsoft original (slow) software driver
+            DT_SOFTWARE, // Not clear what this is
             DT_WARP // microsoft new (faster) software driver - (Windows Advanced Rasterization Platform) - http://msdn.microsoft.com/en-us/library/dd285359.aspx
         };
 
