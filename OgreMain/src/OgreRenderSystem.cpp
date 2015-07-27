@@ -686,6 +686,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::shutdown(void)
     {
+        _disableTextureUnitsFrom(0);
+
         // Remove occlusion queries
         for (HardwareOcclusionQueryList::iterator i = mHwOcclusionQueries.begin();
             i != mHwOcclusionQueries.end(); ++i)

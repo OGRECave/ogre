@@ -1691,7 +1691,9 @@ bail:
         if (!mDevice.isNull() && mCurrentCapabilities)
         {
             // Set all texture units to nothing to release texture surfaces
-            _disableTextureUnitsFrom(0);
+            //Moved upwards to RenderSystem
+            //_disableTextureUnitsFrom(0);
+            
             // Unbind any vertex streams to avoid memory leaks
             /*for (unsigned int i = 0; i < mLastVertexSourceCount; ++i)
             {
