@@ -30,7 +30,7 @@ THE SOFTWARE.
 #define _Ogre_VertexBufferPacked_H_
 
 #include "Vao/OgreBufferPacked.h"
-#include "OgreHardwareVertexBuffer.h"
+#include "Vao/OgreVertexElements.h"
 
 namespace Ogre
 {

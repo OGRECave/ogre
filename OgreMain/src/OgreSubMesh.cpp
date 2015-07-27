@@ -570,23 +570,7 @@ namespace v1 {
                                                      &vertexElements, vaoPassIdx );
 
             //Recreate the vertex declaration
-            vertexData[vaoPassIdx]->vertexDeclaration->removeAllElements();
-
-            size_t acumOffset = 0;
-            unsigned short repeatCounts[VES_COUNT];
-            memset( repeatCounts, 0, sizeof( repeatCounts ) );
-            VertexElement2Vec::const_iterator itor = vertexElements.begin();
-            VertexElement2Vec::const_iterator end  = vertexElements.end();
-
-            while( itor != end )
-            {
-                vertexData[vaoPassIdx]->vertexDeclaration->addElement(
-                                                                0, acumOffset, itor->mType,
-                                                                itor->mSemantic,
-                                                                repeatCounts[itor->mSemantic-1]++ );
-                acumOffset += VertexElement::getTypeSize( itor->mType );
-                ++itor;
-            }
+            vertexData[vaoPassIdx]->vertexDeclaration->convertFromV2( vertexElements );
         }
 
         HardwareBufferManagerBase *hwManager = vertexData[vaoPassIdx]->_getHardwareBufferManager();
@@ -604,6 +588,48 @@ namespace v1 {
         vbuf->unlock();
 
         OGRE_FREE_SIMD( data, MEMCATEGORY_GEOMETRY );
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::dearrangeToInefficient(void)
+    {
+        assert( !useSharedVertices );
+
+        const uint8 numVaoPasses = parent->hasIndependentShadowMappingBuffers() + 1;
+
+        for( uint8 i=0; i<numVaoPasses; ++i )
+        {
+            VertexElement2VecVec vertexElements = vertexData[i]->vertexDeclaration->convertToV2();
+            VertexElement2VecVec newDeclaration;
+            newDeclaration.resize( vertexData[i]->vertexDeclaration->getMaxSource()+1 );
+
+            for( size_t j=0; j<vertexData[i]->vertexDeclaration->getMaxSource()+1; ++j )
+            {
+                const HardwareVertexBufferSharedPtr &vertexBuffer = vertexData[i]->
+                                                                vertexBufferBinding->getBuffer( j );
+
+                const char *data = reinterpret_cast<const char*>( vertexBuffer->lock( HardwareBuffer::
+                                                                                      HBL_READ_ONLY ) );
+
+                char *newData = Ogre::SubMesh::_dearrangeEfficient( data, vertexData[i]->vertexCount,
+                                                                    vertexElements[j],
+                                                                    &newDeclaration[j] );
+                vertexBuffer->unlock();
+
+                HardwareBufferManagerBase *hwManager = vertexData[i]->_getHardwareBufferManager();
+                HardwareVertexBufferSharedPtr vbuf = hwManager->createVertexBuffer(
+                                                        vertexData[i]->
+                                                            vertexDeclaration->getVertexSize( j ),
+                                                        vertexData[i]->vertexCount,
+                                                        parent->mVertexBufferUsage,
+                                                        parent->mVertexBufferShadowBuffer );
+                void *dstBuffer = vbuf->lock( HardwareBuffer::HBL_DISCARD );
+                memcpy( dstBuffer, newData, vbuf->getSizeInBytes() );
+                vbuf->unlock();
+                vertexData[i]->vertexBufferBinding->setBinding( j, vbuf );
+            }
+
+            vertexData[i]->vertexDeclaration->convertFromV2( newDeclaration );
+        }
     }
 }
 }

@@ -588,6 +588,72 @@ namespace v1 {
         }
         return ret;
     }
+    //-----------------------------------------------------------------------------------
+    VertexElement2VecVec VertexDeclaration::convertToV2(void)
+    {
+        VertexElement2VecVec retVal;
+        retVal.resize( getMaxSource() + 1 );
+
+        //Make sure the declaration is sorted
+        sort();
+
+        VertexElementList::const_iterator itor = mElementList.begin();
+        VertexElementList::const_iterator end  = mElementList.end();
+
+        while( itor != end )
+        {
+            retVal[itor->getSource()].push_back( VertexElement2( itor->getType(),
+                                                                 itor->getSemantic() ) );
+            ++itor;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VertexDeclaration::convertFromV2( const VertexElement2Vec &v2Decl )
+    {
+        //Recreate the vertex declaration
+        removeAllElements();
+
+        size_t acumOffset = 0;
+        unsigned short repeatCounts[VES_COUNT];
+        memset( repeatCounts, 0, sizeof( repeatCounts ) );
+
+        VertexElement2Vec::const_iterator itor = v2Decl.begin();
+        VertexElement2Vec::const_iterator end  = v2Decl.end();
+
+        while( itor != end )
+        {
+            addElement( 0, acumOffset, itor->mType, itor->mSemantic,
+                        repeatCounts[itor->mSemantic-1]++ );
+            acumOffset += v1::VertexElement::getTypeSize( itor->mType );
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void VertexDeclaration::convertFromV2( const VertexElement2VecVec &v2Decl )
+    {
+        //Recreate the vertex declaration
+        removeAllElements();
+
+        size_t acumOffset = 0;
+        unsigned short repeatCounts[VES_COUNT];
+        memset( repeatCounts, 0, sizeof( repeatCounts ) );
+
+        for( size_t i=0; i<v2Decl.size(); ++i )
+        {
+            VertexElement2Vec::const_iterator itor = v2Decl[i].begin();
+            VertexElement2Vec::const_iterator end  = v2Decl[i].end();
+
+            while( itor != end )
+            {
+                addElement( i, acumOffset, itor->mType, itor->mSemantic,
+                            repeatCounts[itor->mSemantic-1]++ );
+                acumOffset += v1::VertexElement::getTypeSize( itor->mType );
+                ++itor;
+            }
+        }
+    }
     //-----------------------------------------------------------------------------
     // Sort routine for VertexElement
     bool VertexDeclaration::vertexElementLess(const VertexElement& e1, const VertexElement& e2)

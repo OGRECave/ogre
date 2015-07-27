@@ -343,6 +343,25 @@ namespace v1 {
         }
     }
     //-----------------------------------------------------------------------
+    void Mesh::dearrangeToInefficient(void)
+    {
+        if( sharedVertexData[0] )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
+                         "Meshes with shared vertex buffers can't be dearranged.",
+                         "v1::Mesh::dearrangeToInefficient" );
+        }
+
+        SubMeshList::const_iterator itor = mSubMeshList.begin();
+        SubMeshList::const_iterator end  = mSubMeshList.end();
+
+        while( itor != end )
+        {
+            (*itor)->dearrangeToInefficient();
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
     MeshPtr Mesh::clone(const String& newName, const String& newGroup)
     {
         // This is a bit like a copy constructor, but with the additional aspect of registering the clone with

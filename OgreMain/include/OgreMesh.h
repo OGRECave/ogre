@@ -311,6 +311,11 @@ namespace v1 {
             normal mapping).
         */
         void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+
+        /// Reverts the effects from arrangeEfficient by converting all 16-bit half float back
+        /// to 32-bit float; and QTangents to Normal, Tangent + Reflection representation,
+        /// which are more compatible for doing certain operations vertex operations in the CPU.
+        void dearrangeToInefficient(void);
       
         /** Shared vertex data.
         @remarks

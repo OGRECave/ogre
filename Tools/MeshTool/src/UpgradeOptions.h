@@ -33,11 +33,13 @@ struct UpgradeOptions
 
     bool exportAsV2;
 
+    bool unoptimizeBuffer;
     bool optimizeBuffer;
     bool halfPos;
     bool halfTexCoords;
     bool qTangents;
     bool optimizeForShadowMapping;
+    bool stripShadowMapping;
 };
 
 extern UpgradeOptions opts;

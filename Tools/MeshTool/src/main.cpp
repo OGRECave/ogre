@@ -87,6 +87,10 @@ void help(void)
     cout << "             q converts normal tangent and bitangent (28-36 bytes) to QTangents (8 bytes)." << endl;
     cout << "             u converts UVs to 16-bit floats." << endl;
     cout << "             s make shadow mapping passes have their own optimized buffers. Overrides existing ones if any." << endl;
+    cout << "             S strips the buffers for shadow mapping (consumes less space and memory)." << endl;
+    cout << "-U         = Performs the opposite of -O puq: Converts 16-bit half to to float and " << endl;
+    cout << "             converts QTangents to Normal + Tangent + Reflection. Needed by many" << endl;
+    cout << "             other options that have to read from position or UVs." << endl;
     cout << "sourcefile = name of file to convert" << endl;
     cout << "destfile   = optional name of file to write to. If you don't" << endl;
     cout << "             specify this OGRE overwrites the existing file." << endl;
@@ -133,11 +137,13 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.targetVersion  = v1::MESH_VERSION_LATEST;
     opts.targetVersionV2= MESH_VERSION_LATEST;
     opts.exportAsV2     = false;
+    opts.unoptimizeBuffer = false;
     opts.optimizeBuffer = false;
     opts.halfPos        = false;
     opts.halfTexCoords  = false;
     opts.qTangents      = false;
     opts.optimizeForShadowMapping = false;
+    opts.stripShadowMapping = false;
 
 
     UnaryOptionList::iterator ui = unOpts.find("-e");
@@ -189,6 +195,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     if (ui->second)
     {
         opts.exportAsV2 = true;
+    }
+    ui = unOpts.find("-U");
+    if (ui->second)
+    {
+        opts.unoptimizeBuffer = true;
     }
 
 
@@ -315,6 +326,11 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
             opts.qTangents = true;
         if( bi->second.find( 's' ) != String::npos )
             opts.optimizeForShadowMapping = true;
+        if( bi->second.find( 'S' ) != String::npos )
+        {
+            opts.optimizeForShadowMapping = true;
+            opts.stripShadowMapping = true;
+        }
     }
 }
 
@@ -1028,6 +1044,7 @@ int main(int numargs, char** args)
         unOptList["-autogen"] = false;
         unOptList["-b"] = false;
         unOptList["-O"] = false;
+        unOptList["-U"] = false;
         unOptList["-v2"]= false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
@@ -1038,8 +1055,6 @@ int main(int numargs, char** args)
         binOptList["-ts"] = "";
         binOptList["-V"] = "";
         binOptList["-O"] = "";
-
-        v1::Mesh::msOptimizeForShadowMapping = true;
 
         int startIdx = findCommandLineOpts(numargs, args, unOptList, binOptList);
         parseOpts(unOptList, binOptList);
@@ -1054,6 +1069,16 @@ int main(int numargs, char** args)
         {
             OGRE_EXCEPT( Exception::ERR_FILE_NOT_FOUND, "Could not open '" + source + "'", "main" );
         }
+
+        if( opts.unoptimizeBuffer )
+        {
+            if( !v1Mesh.isNull() )
+                v1Mesh->dearrangeToInefficient();
+
+            if( !v2Mesh.isNull() )
+                v2Mesh->dearrangeToInefficient();
+        }
+
         v1::Mesh* mesh = v1Mesh.get();
 
         // Write out the converted mesh
@@ -1096,14 +1121,14 @@ int main(int numargs, char** args)
         {
             if( !v1Mesh.isNull() )
             {
-                v1::Mesh::msOptimizeForShadowMapping = true;
+                v1::Mesh::msOptimizeForShadowMapping = !opts.stripShadowMapping;
                 mesh->prepareForShadowMapping( false );
                 v1::Mesh::msOptimizeForShadowMapping = false;
             }
 
             if( !v2Mesh.isNull() )
             {
-                Mesh::msOptimizeForShadowMapping = true;
+                Mesh::msOptimizeForShadowMapping = !opts.stripShadowMapping;
                 v2Mesh->prepareForShadowMapping( false );
                 Mesh::msOptimizeForShadowMapping = false;
             }

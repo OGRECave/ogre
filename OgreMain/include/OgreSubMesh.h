@@ -269,6 +269,9 @@ namespace v1 {
         SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
         void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+
+        void dearrangeToInefficient(void);
+
     protected:
         /// @See v1::Mesh::arrangeEfficient
         void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents, size_t vaoPassIdx );

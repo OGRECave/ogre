@@ -358,6 +358,10 @@ namespace Ogre {
             //the end because vertex buffers may be shared while we still iterate.
             destroyVaos( newVaos, mParent->mVaoManager, false );
         }
+
+        //If we shared vaos, we need to share the new Vaos (and remove the dangling pointers)
+        if( numVaoPasses == 1 )
+            mVao[1] = mVao[0];
     }
     //---------------------------------------------------------------------
     VertexArrayObject* SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents,
@@ -827,7 +831,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void SubMesh::dearrangeToInefficient(void)
     {
-        uint8 numVaoPasses = mParent->hasIndependentShadowMappingVaos() + 1;
+        const uint8 numVaoPasses = mParent->hasIndependentShadowMappingVaos() + 1;
 
         for( uint8 vaoPassIdx=0; vaoPassIdx<numVaoPasses; ++vaoPassIdx )
         {
@@ -848,6 +852,10 @@ namespace Ogre {
             //the end because vertex buffers may be shared while we still iterate.
             destroyVaos( newVaos, mParent->mVaoManager, false );
         }
+
+        //If we shared vaos, we need to share the new Vaos (and remove the dangling pointers)
+        if( numVaoPasses == 1 )
+            mVao[1] = mVao[0];
     }
     //---------------------------------------------------------------------
     VertexArrayObject* SubMesh::dearrangeEfficient( const VertexArrayObject *vao,
@@ -859,7 +867,7 @@ namespace Ogre {
         VertexElement2VecVec newVertexElements;
         newVertexElements.resize( vertexBuffers.size() );
         VertexBufferPackedVec newVertexBuffers;
-        newVertexBuffers.reserve(  vertexBuffers.size() );
+        newVertexBuffers.reserve( vertexBuffers.size() );
 
         VertexElement2VecVec::iterator itNewElementVec = newVertexElements.begin();
         VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
@@ -922,7 +930,7 @@ namespace Ogre {
             if( baseType == VET_HALF2 )
             {
                 //Convert from half to float
-                element.mType = v1::VertexElement::multiplyTypeCount( baseType,
+                element.mType = v1::VertexElement::multiplyTypeCount( VET_FLOAT1,
                                                                       v1::VertexElement::
                                                                       getTypeCount( element.mType ) );
 
@@ -952,10 +960,10 @@ namespace Ogre {
         {
             itElements = vertexElements.begin();
 
-            const size_t readSize = v1::VertexElement::getTypeSize( itElements->mType );
-
             while( itElements != enElements )
             {
+                const size_t readSize = v1::VertexElement::getTypeSize( itElements->mType );
+
                 const VertexElementType baseType = v1::VertexElement::getBaseType( itElements->mType );
                 if( baseType == VET_HALF2 )
                 {
@@ -1052,6 +1060,8 @@ namespace Ogre {
 
             ++itor;
         }
+
+        vaos.clear();
     }
     //---------------------------------------------------------------------
     void SubMesh::destroyShadowMappingVaos(void)
