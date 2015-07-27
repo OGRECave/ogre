@@ -2300,8 +2300,10 @@ bail:
         }
         else
         {
-            // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
-            if(static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer())
+            // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL, we need to rebind render target views.
+
+            D3D11RenderWindowBase* renderWindow = dynamic_cast <D3D11RenderWindowBase*>(vp->getTarget());
+            if (renderWindow != NULL && renderWindow->_shouldRebindBackBuffer() == true)
                 _setRenderTargetViews();
         }
     }
