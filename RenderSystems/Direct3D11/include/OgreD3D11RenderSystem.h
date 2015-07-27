@@ -115,6 +115,7 @@ namespace Ogre
         bool mSceneAlphaToCoverage;
 
         D3D11_BLEND_DESC    mBlendDesc;
+        D3D11_BLEND_DESC mDefaultTargetBlend;
         bool                mBlendDescChanged;
 
         D3D11_RASTERIZER_DESC   mRasterizerDesc;

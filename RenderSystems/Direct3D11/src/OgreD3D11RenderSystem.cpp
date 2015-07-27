@@ -132,8 +132,24 @@ bail:
         mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
+        
+        D3D11_RENDER_TARGET_BLEND_DESC defaultTargetBlend;
+        defaultTargetBlend.BlendEnable = false;
+        defaultTargetBlend.SrcBlend = D3D11_BLEND_ONE;
+        defaultTargetBlend.DestBlend = D3D11_BLEND_ZERO;
+        defaultTargetBlend.BlendOp = D3D11_BLEND_OP_ADD;
+        defaultTargetBlend.SrcBlendAlpha = D3D11_BLEND_ONE;
+        defaultTargetBlend.DestBlendAlpha = D3D11_BLEND_ZERO;
+        defaultTargetBlend.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        defaultTargetBlend.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+        mDefaultTargetBlend.AlphaToCoverageEnable = false;
+        mDefaultTargetBlend.IndependentBlendEnable = false;
         mDriverType = DT_HARDWARE;
-
+        for(int i = 0 ; i < 8 ; i++)
+        {
+            mDefaultTargetBlend.RenderTarget[i] = defaultTargetBlend;
+        }
+        
         initRenderSystem();
 
         // set config options defaults
@@ -3963,7 +3979,8 @@ bail:
 
         mBindingType = TextureUnitState::BT_FRAGMENT;
 
-        ZeroMemory( &mBlendDesc, sizeof(mBlendDesc));
+        mBlendDesc = mDefaultTargetBlend;
+
 
         ZeroMemory( &mRasterizerDesc, sizeof(mRasterizerDesc));
         mRasterizerDesc.FrontCounterClockwise = true;
