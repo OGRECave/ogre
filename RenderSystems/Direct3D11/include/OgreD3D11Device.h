@@ -44,12 +44,18 @@ namespace Ogre
         ID3DUserDefinedAnnotation* mPerf;
 #endif
 
-        const D3D11Device& operator=(D3D11Device& device); /* intentionally not implemented */
+        
+        // Private abstract copy constructor and copy assignment operator intentionally not implemented,
+        // copying instances of D3D11Device is not allowed in D3D11Device class.
+
+        D3D11Device(const D3D11Device& device);
+        const D3D11Device& operator=(D3D11Device& device);
+        
 
     public:
         D3D11Device();
         ~D3D11Device();
-
+        
         void ReleaseAll();
         void TransferOwnership(ID3D11DeviceN* device);
 
