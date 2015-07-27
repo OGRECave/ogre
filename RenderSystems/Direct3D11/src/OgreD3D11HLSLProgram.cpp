@@ -1256,25 +1256,39 @@ namespace Ogre {
         {
             GpuConstantDefinitionWithName def = mD3d11ShaderVariableSubparts[i];
             int paramIndex = def.logicalIndex;
+            GpuLogicalBufferStructPtr currentBuffer;
+            size_t* currentBufferSize = NULL;
             if (def.isFloat())
             {
-                def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-                    mFloatLogicalToPhysical->map.insert(
-                    GpuLogicalIndexUseMap::value_type(paramIndex, 
+                currentBuffer = mFloatLogicalToPhysical;
+                currentBufferSize = &mConstantDefs->floatBufferSize;
+            }
+            else if (def.isInt())
+            {
+                currentBuffer = mIntLogicalToPhysical;
+                currentBufferSize = &mConstantDefs->intBufferSize;
+            }
+            else if (def.isUnsignedInt())
+            {
+                currentBuffer = mUIntLogicalToPhysical;
+                currentBufferSize = &mConstantDefs->uintBufferSize;
+            }
+
+            if (!currentBuffer.isNull() && currentBufferSize != NULL)
+            {
+                def.physicalIndex = currentBuffer->bufferSize;
+                OGRE_LOCK_MUTEX(currentBuffer->mutex);
+                currentBuffer->map.insert(
+                    GpuLogicalIndexUseMap::value_type(paramIndex,
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-                mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
+                currentBuffer->bufferSize += def.arraySize * def.elementSize;
+                *currentBufferSize = currentBuffer->bufferSize;
             }
             else
             {
-                def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-                    mIntLogicalToPhysical->map.insert(
-                    GpuLogicalIndexUseMap::value_type(paramIndex, 
-                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-                mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+                            "Currently the only supported variables for Direct3D11 hlsl program are: 'float', 'int' and ' unsigned int'", 
+                            "D3D11HLSLProgram::getConstantBuffer");
             }
 
             mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(def.Name, def));
@@ -1355,7 +1369,10 @@ namespace Ogre {
         else
         {
             // Process params
-            if (varRefTypeDesc.Type == D3D_SVT_FLOAT || varRefTypeDesc.Type == D3D_SVT_INT || varRefTypeDesc.Type == D3D_SVT_BOOL)
+            if (   varRefTypeDesc.Type == D3D_SVT_FLOAT 
+                || varRefTypeDesc.Type == D3D_SVT_INT 
+                || varRefTypeDesc.Type == D3D_SVT_UINT 
+                || varRefTypeDesc.Type == D3D_SVT_BOOL)
             {
                 GpuConstantDefinitionWithName def;
                 String * name = new String(prefix + paramName);
@@ -1393,6 +1410,23 @@ namespace Ogre {
                 break;
             case 4:
                 def.constType = GCT_INT4;
+                break;
+            } // columns
+            break;
+        case D3D10_SVT_UINT:
+            switch (d3dDesc.Columns)
+            {
+            case 1:
+                def.constType = GCT_UINT1;
+                break;
+            case 2:
+                def.constType = GCT_UINT2;
+                break;
+            case 3:
+                def.constType = GCT_UINT3;
+                break;
+            case 4:
+                def.constType = GCT_UINT4;
                 break;
             } // columns
             break;
@@ -1940,10 +1974,23 @@ namespace Ogre {
                         {
                             src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
                         }
-                        else
+                        else if (def.isInt())
                         {
                             src = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
                         }
+
+                        else if (def.isUnsignedInt())
+                        {
+                            src = (void *)&(*(params->getUnsignedIntConstantList().begin() + def.physicalIndex));
+                        }
+                        else
+                        {
+                            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+                                        "Currently the only supported variables for Direct3D11 hlsl program are: 'float', 'int' and ' unsigned int'", 
+                                        "D3D11HLSLProgram::getConstantBuffer");
+                        }
+                        
+
 
                         memcpy( &(((char *)(pMappedData))[iter->startOffset]), src , iter->size);
                     }
