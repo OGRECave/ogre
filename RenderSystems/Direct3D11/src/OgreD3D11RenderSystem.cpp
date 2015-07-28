@@ -1576,13 +1576,13 @@ bail:
         // Do the real removal
         RenderSystem::destroyRenderTarget(name);
 
-        // Did we destroy the primary?
-        if (!mPrimaryWindow)
-        {
-            // device is no longer valid, so free it all up
-            freeDevice();
-        }
-
+        // We should not free the device if the primary window is destroyed, there may 
+        // active secondary windows in the current D3D11RenderSystem implementation
+        //if (!mPrimaryWindow)
+        //{
+        //// device is no longer valid, so free it all up
+        //  freeDevice();
+        //}
     }
     //-----------------------------------------------------------------------
     void D3D11RenderSystem::freeDevice(void)
