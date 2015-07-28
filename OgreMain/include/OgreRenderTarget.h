@@ -104,6 +104,7 @@ namespace Ogre {
 
         virtual uint32 getWidth(void) const;
         virtual uint32 getHeight(void) const;
+        virtual uint32 getDepth(void) const;
         virtual uint32 getColourDepth(void) const;
 
         /**
@@ -486,6 +487,7 @@ namespace Ogre {
 
         uint32 mWidth;
         uint32 mHeight;
+        uint32 mDepth;
         uint32 mColourDepth;
         uint16       mDepthBufferPoolId;
         DepthBuffer *mDepthBuffer;

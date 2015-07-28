@@ -1044,6 +1044,7 @@ namespace Ogre
         mBuffer = buffer;
         mWidth = (unsigned int) mBuffer->getWidth();
         mHeight = (unsigned int) mBuffer->getHeight();
+        mDepth = (unsigned int)mBuffer->getDepth();
         mColourDepth = (unsigned int) PixelUtil::getNumElemBits(mBuffer->getFormat());
         updateRenderTargetView();
         

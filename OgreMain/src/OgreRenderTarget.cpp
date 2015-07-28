@@ -45,6 +45,7 @@ namespace Ogre {
         , mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
         , mDepthBuffer(0)
         , mActive(true)
+        , mDepth(1)
         , mAutoUpdate(true)
         , mHwGamma(false)
         , mFSAA(0)
@@ -102,6 +103,11 @@ namespace Ogre {
     unsigned int RenderTarget::getHeight(void) const
     {
         return mHeight;
+    }
+
+    unsigned int RenderTarget::getDepth(void) const
+    {
+        return mDepth;
     }
     unsigned int RenderTarget::getColourDepth(void) const
     {

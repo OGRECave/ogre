@@ -44,6 +44,7 @@ namespace Ogre
             , bool dontBindToShader
             , uint32 width 
             , uint32 height
+            , uint32 depth
             , uint32 fsaa
             , uint32 multiSampleQuality
             , bool isManual );

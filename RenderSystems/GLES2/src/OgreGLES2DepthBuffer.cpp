@@ -36,7 +36,7 @@ namespace Ogre
                                     GLES2RenderBuffer *depth, GLES2RenderBuffer *stencil,
                                     uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
                                     bool manual ) :
-                DepthBuffer( poolId, 0, width, height, fsaa, "", manual ),
+                DepthBuffer( poolId, 0, width, height,1/*depth*/ , fsaa, "", manual ),
                 mMultiSampleQuality( multiSampleQuality ),
                 mCreatorContext( creatorContext ),
                 mDepthBuffer( depth ),

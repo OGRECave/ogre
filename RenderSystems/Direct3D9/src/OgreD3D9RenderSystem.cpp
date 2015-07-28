@@ -3031,7 +3031,7 @@ namespace Ogre
 
         D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                 activeDevice, depthBufferSurface,
-                                                dsfmt, srfDesc.Width, srfDesc.Height,
+                                                dsfmt, srfDesc.Width, srfDesc.Height,1,
                                                 srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, false );
 
         return newDepthBuffer;
@@ -3059,7 +3059,7 @@ namespace Ogre
 
         D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                 depthSurfaceDevice, depthSurface,
-                                                dsDesc.Format, dsDesc.Width, dsDesc.Height,
+                                                dsDesc.Format, dsDesc.Width, dsDesc.Height,1,
                                                 dsDesc.MultiSampleType, dsDesc.MultiSampleQuality, true );
 
         //Add the 'main' depth buffer to the pool

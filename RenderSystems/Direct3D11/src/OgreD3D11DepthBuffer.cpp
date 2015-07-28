@@ -39,15 +39,16 @@ namespace Ogre
                                         , bool dontBindToShader
                                         , uint32 width 
                                         , uint32 height 
+                                        , uint32 depth
                                         , uint32 fsaa
                                         , uint32 multiSampleQuality
                                         , bool isManual ) :
-                                         DepthBuffer(poolId, 0, width, height, fsaa, "", isManual)
+                                         DepthBuffer(poolId, 0, width, height, depth, fsaa, "", isManual)
                                         , mMultiSampleQuality( multiSampleQuality)
                                         , mRenderSystem(renderSystem)
                                         , mDontBindToShader(dontBindToShader)
                                         , mDepthStencilView(NULL)
-                                        , mDepthStencilTexture(NULL)   
+                                        , mDepthStencilTexture(NULL)
     {
         init(renderTarget);
     }
@@ -57,7 +58,7 @@ namespace Ogre
         , RenderTarget *renderTarget
         , bool dontBindToShader 
         , bool isManual) :
-        DepthBuffer(poolId, 0, -1, -1, -1, "", isManual)
+        DepthBuffer(poolId, 0, /*width*/-1, /*height*/-1, /*depth*/-1, /*fsaa*/-1, "", isManual)
         , mRenderSystem(renderSystem)
         , mMultiSampleQuality(-1)
         , mDontBindToShader(dontBindToShader)
@@ -250,6 +251,7 @@ namespace Ogre
         //Update parent fields
         mWidth = descDepth.Width;
         mHeight = descDepth.Height;
+        mDepth = descDepth.ArraySize;
         mFsaa = descDepth.SampleDesc.Count;
         
         mMultiSampleQuality = descDepth.SampleDesc.Quality;
@@ -326,7 +328,8 @@ namespace Ogre
             mMultiSampleQuality == BBDesc.SampleDesc.Quality &&
             this->getFormatFor(renderTarget) == DepthDesc.Format &&
             this->getWidth() == renderTarget->getWidth() &&
-            this->getHeight() == renderTarget->getHeight()
+            this->getHeight() == renderTarget->getHeight()  && 
+            this->getDepth() == renderTarget->getDepth()
             )
         {
             return true;
