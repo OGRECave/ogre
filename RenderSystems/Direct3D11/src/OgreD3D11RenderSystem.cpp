@@ -3038,17 +3038,17 @@ namespace Ogre
                         if (hasInstanceData)
                         {
                             mDevice.GetImmediateContext()->DrawInstanced(
+                                static_cast<UINT>(op.vertexData->vertexCount),
                                 static_cast<UINT>(numberOfInstances), 
-                                static_cast<UINT>(op.vertexData->vertexCount), 
-                                static_cast<INT>(op.vertexData->vertexStart),
-                                0
+                                static_cast<UINT>(op.vertexData->vertexStart),
+                                static_cast<UINT>(0)
                                 ); 
                         }
                         else
                         {
                             mDevice.GetImmediateContext()->Draw(
                                 static_cast<UINT>(op.vertexData->vertexCount), 
-                                static_cast<INT>(op.vertexData->vertexStart)
+                                static_cast<UINT>(op.vertexData->vertexStart)
                                 ); 
                         }
                     }
