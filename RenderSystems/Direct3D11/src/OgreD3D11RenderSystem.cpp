@@ -2927,11 +2927,15 @@ bail:
                         if (mDevice.isError())
                         {
                             String errorDescription = mDevice.getErrorDescription();
-                            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                "D3D11 device cannot draw indexed\nError Description:" + errorDescription +
-                                "Active OGRE vertex shader name: " + mBoundVertexProgram->getName() +
-                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName(),
-                                "D3D11RenderSystem::_render");
+                            errorDescription = "D3D11 device cannot draw indexed\nError Description:" + errorDescription +
+                                "Active OGRE vertex shader name: " + mBoundVertexProgram->getName();
+                            if (mBoundGeometryProgram != NULL)
+                                errorDescription += "\nActive OGRE geometry shader name: " + mBoundGeometryProgram->getName();
+                                
+                            errorDescription += "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName();
+                                
+                            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, errorDescription, "D3D11RenderSystem::_render");
+                                
                         }
                     }
                 } while (updatePassIterationRenderState());
