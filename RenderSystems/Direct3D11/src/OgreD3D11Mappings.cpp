@@ -271,6 +271,8 @@ namespace Ogre
         case VET_COLOUR_ABGR:
         case VET_COLOUR_ARGB:
             return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+        // Float32
         case VET_FLOAT1:
             return DXGI_FORMAT_R32_FLOAT;
         case VET_FLOAT2:
@@ -279,10 +281,43 @@ namespace Ogre
             return DXGI_FORMAT_R32G32B32_FLOAT;
         case VET_FLOAT4:
             return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+        // Signed short
+        case VET_SHORT1:
+            return DXGI_FORMAT_R16_SINT;
         case VET_SHORT2:
             return DXGI_FORMAT_R16G16_SINT;
         case VET_SHORT4:
             return DXGI_FORMAT_R16G16B16A16_SINT;
+
+        // Unsigned short
+        case VET_USHORT1:
+            return DXGI_FORMAT_R16_UINT;
+        case VET_USHORT2:
+            return DXGI_FORMAT_R16G16_UINT;
+        case VET_USHORT4:
+            return DXGI_FORMAT_R16G16B16A16_UINT;
+
+        // Signed int
+        case VET_INT1:
+            return DXGI_FORMAT_R32_SINT;
+        case VET_INT2:
+            return DXGI_FORMAT_R32G32_SINT;
+        case VET_INT3:
+            return DXGI_FORMAT_R32G32B32_SINT;
+        case VET_INT4:
+            return DXGI_FORMAT_R32G32B32A32_SINT;
+
+        // Unsigned int
+        case VET_UINT1:
+            return DXGI_FORMAT_R32_UINT;
+        case VET_UINT2:
+            return DXGI_FORMAT_R32G32_UINT;
+        case VET_UINT3:
+            return DXGI_FORMAT_R32G32B32_UINT;
+        case VET_UINT4:
+            return DXGI_FORMAT_R32G32B32A32_UINT;
+
         case VET_UBYTE4:
             return DXGI_FORMAT_R8G8B8A8_UINT;
         }
