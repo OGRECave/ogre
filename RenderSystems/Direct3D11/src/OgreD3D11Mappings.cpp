@@ -373,7 +373,7 @@ namespace Ogre
         case DXGI_FORMAT_R16G16B16A16_SNORM:        return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16B16A16_SINT:         return PF_UNKNOWN;
         case DXGI_FORMAT_R32G32_TYPELESS:           return PF_UNKNOWN;
-        case DXGI_FORMAT_R32G32_FLOAT:              return PF_UNKNOWN;
+        case DXGI_FORMAT_R32G32_FLOAT:              return PF_FLOAT32_GR;
         case DXGI_FORMAT_R32G32_UINT:               return PF_UNKNOWN;
         case DXGI_FORMAT_R32G32_SINT:               return PF_UNKNOWN;
         case DXGI_FORMAT_R32G8X24_TYPELESS:         return PF_UNKNOWN;
@@ -497,7 +497,7 @@ namespace Ogre
         case PF_R8G8B8:         return DXGI_FORMAT_UNKNOWN;
         case PF_A8R8G8B8:       return DXGI_FORMAT_B8G8R8A8_UNORM;
         case PF_A8B8G8R8:       return DXGI_FORMAT_R8G8B8A8_UNORM;
-        case PF_X8R8G8B8:       return DXGI_FORMAT_UNKNOWN;
+        case PF_X8R8G8B8:       return DXGI_FORMAT_B8G8R8X8_UNORM;
         case PF_X8B8G8R8:       return DXGI_FORMAT_UNKNOWN;
         case PF_A2B10G10R10:    return DXGI_FORMAT_R10G10B10A2_TYPELESS;
         case PF_A2R10G10B10:    return DXGI_FORMAT_UNKNOWN;
@@ -520,6 +520,7 @@ namespace Ogre
         case PF_BC7_UNORM:      return DXGI_FORMAT_BC7_UNORM;
         case PF_BC7_UNORM_SRGB: return DXGI_FORMAT_BC7_UNORM_SRGB;
         case PF_R16G16_SINT:    return DXGI_FORMAT_R16G16_SINT;
+        case PF_FLOAT32_GR:     return DXGI_FORMAT_R32G32_FLOAT;         
         case PF_UNKNOWN:
         default:                return DXGI_FORMAT_UNKNOWN;
         }
