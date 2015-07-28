@@ -468,6 +468,15 @@ namespace Ogre {
         @see _beginUpdate for more details.
         */
         virtual void _endUpdate();
+        
+        /** Sets whether this render target needs the use of a a stencil buffer 
+      @remarks
+        This flag acts as a hint to render system how to propetly manage the depth buffer.
+        */
+        void setIsStencilBufferRequired(const bool stencilBufferRequired);
+        
+        /** Gets whether this render target needs the use of a a stencil buffer */
+        const bool getIsStencilBufferRequired() const;
 
     protected:
         /// The name of this target.
@@ -506,7 +515,8 @@ namespace Ogre {
 
         typedef vector<RenderTargetListener*>::type RenderTargetListenerList;
         RenderTargetListenerList mListeners;
-    
+        bool mStencilBufferRequired;
+
 
         /// internal method for firing events
         virtual void firePreUpdate(void);

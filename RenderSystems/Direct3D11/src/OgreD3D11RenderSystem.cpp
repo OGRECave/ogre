@@ -1498,137 +1498,36 @@ bail:
     //-----------------------------------------------------------------------
     DepthBuffer* D3D11RenderSystem::_createDepthBufferFor( RenderTarget *renderTarget )
     {
-        //Get surface data (mainly to get MSAA data)
-        D3D11HardwarePixelBuffer *pBuffer;
-        renderTarget->getCustomAttribute( "BUFFER", &pBuffer );
-        D3D11_TEXTURE2D_DESC BBDesc;
-        static_cast<ID3D11Texture2D*>(pBuffer->getParentTexture()->getTextureResource())->GetDesc( &BBDesc );
-
-        // Create depth stencil texture
-        ID3D11Texture2D* pDepthStencil = NULL;
-        D3D11_TEXTURE2D_DESC descDepth;
-
-        descDepth.Width                 = renderTarget->getWidth();
-        descDepth.Height                = renderTarget->getHeight();
-        descDepth.MipLevels             = 1;
-        descDepth.ArraySize             = BBDesc.ArraySize;
-
-        if ( mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-            descDepth.Format            = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        else
-            descDepth.Format            = DXGI_FORMAT_R32_TYPELESS;
-
-        descDepth.SampleDesc.Count      = BBDesc.SampleDesc.Count;
-        descDepth.SampleDesc.Quality    = BBDesc.SampleDesc.Quality;
-        descDepth.Usage                 = D3D11_USAGE_DEFAULT;
-        descDepth.BindFlags             = D3D11_BIND_DEPTH_STENCIL;
-
-        // If we tell we want to use it as a Shader Resource when in MSAA, we will fail
-        // This is a recomandation from NVidia.
-        if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
-            descDepth.BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-        descDepth.CPUAccessFlags        = 0;
-        descDepth.MiscFlags             = 0;
-
-        if (descDepth.ArraySize == 6)
-        {
-            descDepth.MiscFlags     |= D3D11_RESOURCE_MISC_TEXTURECUBE;
-        }
-
-
-        HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
-        if( FAILED(hr) || mDevice.isError())
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Unable to create depth texture\nError Description:" + errorDescription,
-                "D3D11RenderSystem::_createDepthBufferFor");
-        }
-
-        //
-        // Create the View of the texture
-        // If MSAA is used, we cannot do this
-        //
-        if(!mReadBackAsTexture && mFeatureLevel >= D3D_FEATURE_LEVEL_10_0 && BBDesc.SampleDesc.Count == 1)
-        {
-            D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-            viewDesc.Format = DXGI_FORMAT_R32_FLOAT;
-            viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
-            viewDesc.Texture2D.MostDetailedMip = 0;
-            viewDesc.Texture2D.MipLevels = 1;
-            SAFE_RELEASE(mDSTResView);
-            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &mDSTResView);
-            if( FAILED(hr) || mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Unable to create the view of the depth texture \nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_createDepthBufferFor");
-            }
-        }
-
-        // Create the depth stencil view
-        ID3D11DepthStencilView      *depthStencilView;
-        D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-        ZeroMemory( &descDSV, sizeof(D3D11_DEPTH_STENCIL_VIEW_DESC) );
-
-        if (mFeatureLevel < D3D_FEATURE_LEVEL_10_0)
-            descDSV.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-        else
-            descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-
-        descDSV.ViewDimension = (BBDesc.SampleDesc.Count > 1) ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-        descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
-                                                                                            // TODO: Decide how to expose this feature
-        descDSV.Texture2D.MipSlice = 0;
-        hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &depthStencilView );
-        SAFE_RELEASE( pDepthStencil );
-        if( FAILED(hr) )
-        {
-			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Unable to create depth stencil view\nError Description:" + errorDescription,
-                "D3D11RenderSystem::_createDepthBufferFor");
-        }
-
-        //Create the abstract container
-        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, depthStencilView,
-                                                descDepth.Width, descDepth.Height,
-                                                descDepth.SampleDesc.Count, descDepth.SampleDesc.Quality,
-                                                false );
-
-        return newDepthBuffer;
+        
+            return new D3D11DepthBuffer(DepthBuffer::POOL_DEFAULT, this, renderTarget, mReadBackAsTexture, false);
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_removeManualDepthBuffer(DepthBuffer *depthBuffer)
     {
-        if(depthBuffer != NULL)
+        if (depthBuffer != NULL && !depthBuffer->getHasAttachedRenderTargets())
         {
             DepthBufferVec& pool = mDepthBufferPool[depthBuffer->getPoolId()];
             pool.erase(std::remove(pool.begin(), pool.end(), depthBuffer), pool.end());
+            delete depthBuffer; 
         }
     }
     //---------------------------------------------------------------------
-    DepthBuffer* D3D11RenderSystem::_addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
-                                                            uint32 width, uint32 height,
-                                                            uint32 fsaa, uint32 fsaaQuality )
+    DepthBuffer* D3D11RenderSystem::_addManualDepthBuffer(RenderTarget* renderTarget)
     {
         //If this depth buffer was already added, return that one
         DepthBufferVec::const_iterator itor = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].begin();
         DepthBufferVec::const_iterator end  = mDepthBufferPool[DepthBuffer::POOL_DEFAULT].end();
-
+        
         while( itor != end )
         {
-            if( static_cast<D3D11DepthBuffer*>(*itor)->getDepthStencilView() == depthSurface )
+            if (static_cast<D3D11DepthBuffer*>(*itor) == renderTarget->getDepthBuffer())
                 return *itor;
 
             ++itor;
         }
-
-        //Create a new container for it
-        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, depthSurface,
-                                                                    width, height, fsaa, fsaaQuality, true );
+    
+        
+        D3D11DepthBuffer *newDepthBuffer = new D3D11DepthBuffer( DepthBuffer::POOL_DEFAULT, this, renderTarget,mReadBackAsTexture, true);
 
         //Add the 'main' depth buffer to the pool
         mDepthBufferPool[newDepthBuffer->getPoolId()].push_back( newDepthBuffer );

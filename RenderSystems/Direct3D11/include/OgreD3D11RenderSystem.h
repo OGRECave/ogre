@@ -250,9 +250,10 @@ namespace Ogre
          * is deleted. This is specially useful to put the Depth Buffer created along with the window's
          * back buffer into the pool. All depth buffers introduced with this method go to POOL_DEFAULT
          */
-        DepthBuffer* _addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
-                                            uint32 width, uint32 height, uint32 fsaa, uint32 fsaaQuality );
 
+        DepthBuffer* _addManualDepthBuffer(RenderTarget* renderTarget);
+
+      
         /// Reverts _addManualDepthBuffer actions
         void _removeManualDepthBuffer(DepthBuffer *depthBuffer);
         /// @copydoc RenderSystem::detachRenderTarget

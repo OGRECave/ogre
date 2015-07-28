@@ -104,6 +104,7 @@ namespace Ogre
         virtual uint32 getHeight() const;
         virtual uint32 getFsaa() const;
         virtual const String& getFsaaHint() const;
+        virtual const bool getHasAttachedRenderTargets() const;
 
         /** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
             with it's render target (aka, a backbuffer or similar) */

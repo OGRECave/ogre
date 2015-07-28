@@ -93,6 +93,11 @@ namespace Ogre
         return mManual;
     }
     //-----------------------------------------------------------------------
+    const bool DepthBuffer::getHasAttachedRenderTargets() const
+    {
+        return !mAttachedRenderTargets.empty();
+    }
+    //-----------------------------------------------------------------------
     bool DepthBuffer::isCompatible( RenderTarget *renderTarget ) const
     {
         if( this->getWidth() >= renderTarget->getWidth() &&

@@ -1050,7 +1050,67 @@ namespace Ogre
     }
     
     //--------------------------------------------------------------------- 
-   
+
+
+    void D3D11Texture::fillDSVDescription(ID3D11Texture2D * const depthTexture, D3D11_DEPTH_STENCIL_VIEW_DESC &dsvDesc)
+    {
+
+        D3D11_TEXTURE2D_DESC BBDesc;
+        depthTexture->GetDesc(&BBDesc);
+        switch (BBDesc.Format)
+        {
+        case DXGI_FORMAT_D24_UNORM_S8_UINT:
+            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+            break;
+        case DXGI_FORMAT_R32_TYPELESS:
+            dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            break;
+        default:
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                "could not find a suitable depth stencil view format ",
+                "D3D11Texture::FillDSVDescription");
+            break;
+
+        }
+        
+        switch (mSRVDesc.ViewDimension)
+        {
+            
+        case D3D11_SRV_DIMENSION_TEXTURE1D:
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE1D;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE1DARRAY:
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE1DARRAY;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURECUBE:
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+            dsvDesc.Texture2DArray.ArraySize = 1;
+            dsvDesc.Texture2DArray.MipSlice = 0;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2D:
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+            dsvDesc.Texture2DArray.FirstArraySlice = 0;
+            dsvDesc.Texture2DArray.ArraySize = mDepth;
+            dsvDesc.Texture2DArray.MipSlice = 0;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2DMS:
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY:
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+            dsvDesc.Texture2DMSArray.FirstArraySlice = 0;
+            dsvDesc.Texture2DMSArray.ArraySize = mDepth;
+
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE3D:
+        case D3D11_SRV_DIMENSION_BUFFER:
+        default:
+            assert(false);
+        }
+    }
     //--------------------------------------------------------------------- 
     void D3D11Texture::fillRTVDescription(D3D11_RENDER_TARGET_VIEW_DESC &rtvDesc)
     {

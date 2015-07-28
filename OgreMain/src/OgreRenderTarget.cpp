@@ -48,6 +48,7 @@ namespace Ogre {
         , mAutoUpdate(true)
         , mHwGamma(false)
         , mFSAA(0)
+        , mStencilBufferRequired(true)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		, mStereoEnabled(true)
 #else
@@ -632,5 +633,16 @@ namespace Ogre {
         OgreProfileEndGPUEvent("RenderTarget: " + getName());
     }
     
+    //-----------------------------------------------------------------------
+    const bool RenderTarget::getIsStencilBufferRequired() const
+    {
+        return mStencilBufferRequired;
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::setIsStencilBufferRequired(const bool stencilBufferRequired)
+    {
+        mStencilBufferRequired = stencilBufferRequired;
+        
+    }
 
 }        

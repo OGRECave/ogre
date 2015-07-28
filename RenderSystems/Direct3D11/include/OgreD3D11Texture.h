@@ -59,6 +59,12 @@ namespace Ogre {
 		void loadImage(const Image &img);
         /** Fills a "render target view" description struct with values matching this texture*/
         void fillRTVDescription(D3D11_RENDER_TARGET_VIEW_DESC &rtvDesc);
+        
+        /** Fills a "depth stencil view" description struct with values 
+            matching this texture and a depth-stencil texture*/
+        void fillDSVDescription(ID3D11Texture2D * const depthTexture, D3D11_DEPTH_STENCIL_VIEW_DESC &dsvDesc); 
+        
+        
 
 		/// @copydoc Texture::getBuffer
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
