@@ -998,6 +998,9 @@ bail:
     void D3D11RenderSystem::shutdown()
     {
         RenderSystem::shutdown();
+        SAFE_RELEASE(mBoundBlendState);
+        SAFE_RELEASE(mBoundRasterizer);
+        SAFE_RELEASE(mBoundDepthStencilState)
 
         mRenderSystemWasInited = false;
 
@@ -2282,6 +2285,8 @@ bail:
 
         ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mTexturesCount;
+        bool autoRelease;
+        bool autoReleaseBaseStates;
 
         D3D11RenderOperationState() :
             mBlendState(NULL)
@@ -2289,6 +2294,8 @@ bail:
             , mDepthStencilState(NULL)
             , mSamplerStatesCount(0)
             , mTexturesCount(0)
+            , autoRelease(true)
+            , autoReleaseBaseStates(true)
         {
             for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
             {
@@ -2296,16 +2303,28 @@ bail:
             }
         }
 
+        void D3D11RenderOperationState::release()
+        {
+            if (autoReleaseBaseStates == true)
+            {
+                SAFE_RELEASE(mBlendState);
+                SAFE_RELEASE(mRasterizer);
+                SAFE_RELEASE(mDepthStencilState);
+            }
+
+            for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
+            {
+                SAFE_RELEASE(mSamplerStates[i]);
+                mTextures[i] = NULL;
+            }
+        }
+
 
         ~D3D11RenderOperationState()
         {
-            SAFE_RELEASE( mBlendState );
-            SAFE_RELEASE( mRasterizer );
-            SAFE_RELEASE( mDepthStencilState );
-
-            for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
+            if (autoRelease)
             {
-                SAFE_RELEASE( mSamplerStates[i] );
+                release();
             }
         }
     };
@@ -2340,10 +2359,12 @@ bail:
         D3D11RenderOperationState stackOpState;
         D3D11RenderOperationState * opState = &stackOpState;
 
+        opState->autoReleaseBaseStates = false;
+
         if(mBlendDescChanged)
         {
             mBlendDescChanged = false;
-            mBoundBlendState = 0;
+            SAFE_RELEASE(mBoundBlendState);
 
             HRESULT hr = mDevice->CreateBlendState(&mBlendDesc, &opState->mBlendState) ;
             if (FAILED(hr))
@@ -2359,10 +2380,10 @@ bail:
             opState->mBlendState = mBoundBlendState;
         }
 
-        if(mRasterizerDescChanged)
-		{
-			mRasterizerDescChanged=false;
-			mBoundRasterizer = 0;
+        if (mRasterizerDescChanged)
+        {
+            mRasterizerDescChanged = false;
+            SAFE_RELEASE(mBoundRasterizer);
 
             HRESULT hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer) ;
             if (FAILED(hr))
@@ -2378,10 +2399,10 @@ bail:
             opState->mRasterizer = mBoundRasterizer;
         }
 
-        if(mDepthStencilDescChanged)
-		{
-			mBoundDepthStencilState = 0;
-			mDepthStencilDescChanged=false;
+        if (mDepthStencilDescChanged)
+        {
+            SAFE_RELEASE(mBoundDepthStencilState);
+            mDepthStencilDescChanged = false;
 
             HRESULT hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, &opState->mDepthStencilState) ;
             if (FAILED(hr))
@@ -3884,6 +3905,10 @@ bail:
         mBoundTessellationHullProgram = NULL;
         mBoundTessellationDomainProgram = NULL;
         mBoundComputeProgram = NULL;
+
+        mBoundRasterizer = NULL;
+        mBoundBlendState = NULL;
+        mBoundDepthStencilState = NULL;
 
         mBindingType = TextureUnitState::BT_FRAGMENT;
 
