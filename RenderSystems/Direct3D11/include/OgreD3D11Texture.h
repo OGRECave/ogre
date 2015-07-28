@@ -57,7 +57,8 @@ namespace Ogre {
 		void copyToTexture(TexturePtr& target);
 		/// overridden from Texture
 		void loadImage(const Image &img);
-
+        /** Fills a "render target view" description struct with values matching this texture*/
+        void fillRTVDescription(D3D11_RENDER_TARGET_VIEW_DESC &rtvDesc);
 
 		/// @copydoc Texture::getBuffer
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
@@ -199,6 +200,12 @@ namespace Ogre {
         virtual void getCustomAttribute( const String& name, void *pData );
 
         bool requiresTextureFlipping() const { return false; }
+        
+        private:
+        //* Build a render target view accoring to current state*/
+            ID3D11RenderTargetView* createRenderTargetView();
+        //* Assign a newley created render target view as the active one
+            void updateRenderTargetView();
     };
 
 }

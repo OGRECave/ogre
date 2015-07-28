@@ -1045,56 +1045,59 @@ namespace Ogre
         mWidth = (unsigned int) mBuffer->getWidth();
         mHeight = (unsigned int) mBuffer->getHeight();
         mColourDepth = (unsigned int) PixelUtil::getNumElemBits(mBuffer->getFormat());
+        updateRenderTargetView();
         
-        ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
-
-        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-        ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
-
-        RTVDesc.Format = buffer->getParentTexture()->getShaderResourceViewDesc().Format;
-        switch(buffer->getParentTexture()->getShaderResourceViewDesc().ViewDimension)
+    }
+    
+    //--------------------------------------------------------------------- 
+   
+    //--------------------------------------------------------------------- 
+    void D3D11Texture::fillRTVDescription(D3D11_RENDER_TARGET_VIEW_DESC &rtvDesc)
+    {
+        rtvDesc.Format = mSRVDesc.Format;
+        
+        switch (mSRVDesc.ViewDimension)
         {
         case D3D11_SRV_DIMENSION_BUFFER:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_BUFFER;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_BUFFER;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE1D:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE1DARRAY:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
             break;
         case D3D11_SRV_DIMENSION_TEXTURECUBE:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-            RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
-            RTVDesc.Texture2DArray.ArraySize = 1;
-            RTVDesc.Texture2DArray.MipSlice = 0;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            rtvDesc.Texture2DArray.ArraySize = 1;
+            rtvDesc.Texture2DArray.MipSlice = 0;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2D:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            rtvDesc.Texture2DArray.FirstArraySlice = 0;
+            rtvDesc.Texture2DArray.ArraySize = mDepth;
+            rtvDesc.Texture2DArray.MipSlice = 0;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMS:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+            rtvDesc.Texture2DMSArray.FirstArraySlice = 0;
+            rtvDesc.Texture2DMSArray.ArraySize = mDepth;
+            
             break;
         case D3D11_SRV_DIMENSION_TEXTURE3D:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+            rtvDesc.Texture3D.FirstWSlice = 0;
+            rtvDesc.Texture3D.MipSlice = 0;
+            rtvDesc.Texture3D.WSize = mDepth;
             break;
         default:
             assert(false);
-        }
-        HRESULT hr = mDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &mRenderTargetView );
-
-        if (FAILED(hr) || mDevice.isError())
-        {
-			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-				"Error creating Render Target View\nError Description:" + errorDescription,
-                "D3D11RenderTexture::rebind" );
         }
     }
     //---------------------------------------------------------------------
@@ -1146,8 +1149,55 @@ namespace Ogre
         RenderTexture::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
-    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : mDevice(device),
-    RenderTexture(buffer, 0)
+    void D3D11RenderTexture::updateRenderTargetView()
+    {
+            SAFE_RELEASE(mRenderTargetView);
+            mRenderTargetView = createRenderTargetView();
+    }
+    //---------------------------------------------------------------------
+    ID3D11RenderTargetView* D3D11RenderTexture::createRenderTargetView()
+    {
+        D3D11HardwarePixelBuffer *buffer = static_cast<D3D11HardwarePixelBuffer*>(mBuffer);
+        ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
+
+        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
+        ZeroMemory(&RTVDesc, sizeof(RTVDesc));
+        D3D11Texture* parentTexture = static_cast<D3D11Texture*>(buffer->getParentTexture());
+        parentTexture->fillRTVDescription(RTVDesc);
+
+        if (RTVDesc.ViewDimension == D3D10_RTV_DIMENSION_TEXTURE2DARRAY)
+        {
+            D3D_SRV_DIMENSION srvDimension = parentTexture->getShaderResourceViewDesc().ViewDimension;
+            switch (srvDimension)
+            {
+            case D3D_SRV_DIMENSION_TEXTURECUBE:
+                RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
+                break;
+            }
+        }
+
+        ID3D11RenderTargetView* result = NULL;
+
+        HRESULT hr = mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc, &result);
+
+        if (FAILED(hr) || mDevice.isError())
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Error creating Render Target View\nError Description:" + errorDescription,
+                "D3D11RenderTexture::rebind");
+        }
+
+        
+
+        return result;
+    }
+    
+    //---------------------------------------------------------------------
+    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : 
+        mDevice(device),
+        mRenderTargetView(NULL),
+        RenderTexture(buffer, 0)
     {
         mName = name;
 
@@ -1158,6 +1208,6 @@ namespace Ogre
 
     D3D11RenderTexture::~D3D11RenderTexture()
     {
-
+        SAFE_RELEASE(mRenderTargetView);
     }
 }
