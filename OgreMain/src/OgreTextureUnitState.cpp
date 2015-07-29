@@ -85,6 +85,7 @@ namespace Ogre {
         {
             mParent->_dirtyHash();
         }
+        mParent->setRenderStateHashDirty();
 
     }
 
@@ -145,6 +146,8 @@ namespace Ogre {
             mParent->_dirtyHash();
         }
 
+        mParent->setRenderStateHashDirty();
+
     }
     //-----------------------------------------------------------------------
     TextureUnitState::~TextureUnitState()
@@ -188,6 +191,7 @@ namespace Ogre {
             mParent->_dirtyHash();
         }
 
+        mParent->setRenderStateHashDirty();
         return *this;
     }
     //-----------------------------------------------------------------------
@@ -237,7 +241,7 @@ namespace Ogre {
                 mParent->_dirtyHash();
             }
         }
-
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setTexture( const TexturePtr& texPtr)
@@ -279,12 +283,14 @@ namespace Ogre {
                 mParent->_dirtyHash();
             }
         }
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setBindingType(TextureUnitState::BindingType bt)
     {
         mBindingType = bt;
 
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     TextureUnitState::BindingType TextureUnitState::getBindingType(void) const
@@ -303,6 +309,7 @@ namespace Ogre {
             mFramePtrs.resize(1);
             mFramePtrs[0].setNull();
         }
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     TextureUnitState::ContentType TextureUnitState::getContentType(void) const
@@ -341,6 +348,7 @@ namespace Ogre {
 
             setCubicTextureName(fullNames, forUVW);
         }
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setCubicTextureName(const String* const names, bool forUVW)
@@ -362,6 +370,7 @@ namespace Ogre {
         }
         // Tell parent we need recompiling, will cause reload too
         mParent->_notifyNeedsRecompile();
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void TextureUnitState::setCubicTexture( const TexturePtr* const texPtrs, bool forUVW )
@@ -383,6 +392,7 @@ namespace Ogre {
         }
         // Tell parent we need recompiling, will cause reload too
         mParent->_notifyNeedsRecompile();
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     bool TextureUnitState::isCubic(void) const
@@ -426,6 +436,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
                 "TextureUnitState::setFrameTextureName");
         }
+        mParent->setRenderStateHashDirty();
     }
 
     //-----------------------------------------------------------------------
@@ -448,6 +459,7 @@ namespace Ogre {
         {
             mParent->_dirtyHash();
         }
+        mParent->setRenderStateHashDirty();
     }
 
     //-----------------------------------------------------------------------
@@ -474,6 +486,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
                 "TextureUnitState::deleteFrameTextureName");
         }
+        mParent->setRenderStateHashDirty();
     }
 
     //-----------------------------------------------------------------------
@@ -514,6 +527,7 @@ namespace Ogre {
         {
             mParent->_dirtyHash();
         }
+        mParent->setRenderStateHashDirty();
 
     }
     //-----------------------------------------------------------------------
@@ -545,6 +559,7 @@ namespace Ogre {
         {
             mParent->_dirtyHash();
         }
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     std::pair< size_t, size_t > TextureUnitState::getTextureDimensions( unsigned int frame ) const
@@ -574,7 +589,7 @@ namespace Ogre {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "frameNumber parameter value exceeds number of stored frames.",
                 "TextureUnitState::setCurrentFrame");
         }
-
+        mParent->setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     unsigned int TextureUnitState::getCurrentFrame(void) const
