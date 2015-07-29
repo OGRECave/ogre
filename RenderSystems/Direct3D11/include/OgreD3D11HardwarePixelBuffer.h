@@ -57,7 +57,6 @@ namespace Ogre {
         size_t mFace;
 
         Image::Box mLockBox;
-        PixelBox mCurrentLock;
         LockOptions mCurrentLockOptions;
 
         D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;

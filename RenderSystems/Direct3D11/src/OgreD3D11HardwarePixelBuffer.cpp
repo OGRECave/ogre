@@ -155,9 +155,27 @@ namespace Ogre {
             break;
         }
 
+        Ogre::PixelFormat format = mParentTexture->getFormat();
+
+        size_t bpp = PixelUtil::getNumElemBytes(mParentTexture->getFormat());
+        if (bpp != 0 && format != Ogre::PF_UNKNOWN)
+        {
+            box.rowPitch = pMappedResource.RowPitch / bpp;
+            box.slicePitch = box.rowPitch * box.getHeight();
+            assert((pMappedResource.RowPitch % bpp) == 0);
+        }
+        else if (PixelUtil::isCompressed(box.format) || format == Ogre::PF_UNKNOWN /*this is a hack -  fix this !*/)
+        {
+            box.rowPitch = box.getWidth();
+            box.slicePitch = box.getWidth() * box.getHeight();
+        }
+        else
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Invalid pixel format", "D3D11HardwarePixelBuffer::_map");
+        }
+
         box.data = pMappedResource.pData;
-        box.rowPitch = pMappedResource.RowPitch;
-        box.slicePitch = pMappedResource.DepthPitch;
     }
     //-----------------------------------------------------------------------------  
     void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
@@ -615,15 +633,17 @@ namespace Ogre {
             
             const Ogre::PixelBox &locked = lock(dstBox, HBL_DISCARD);
 
-            int srcRowPitch = converted.rowPitch * PixelUtil::getNumElemBytes(converted.format);
-            int destRowPitch = locked.rowPitch;
+            const size_t pixelSize = PixelUtil::getNumElemBytes(converted.format);
+            const size_t srcRowSize = src.getWidth() * pixelSize;
+            int srcRowPitch = converted.rowPitch * pixelSize;
+            int destRowPitch = locked.rowPitch * pixelSize;
 
             byte *src = (byte*)converted.data;
             byte *dst = (byte*)locked.data;
 
-            for (unsigned int row = 0 ; row < converted.getHeight() ; row ++)
+            for (unsigned int row = 0 ; row < converted.getHeight() ; row++)
             {
-                memcpy((void*)dst, (void*)src, srcRowPitch);
+                memcpy((void*)dst, (void*)src, srcRowSize);
                 src += srcRowPitch;
                 dst += destRowPitch;
             }
