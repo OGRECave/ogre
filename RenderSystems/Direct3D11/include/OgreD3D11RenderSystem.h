@@ -38,7 +38,7 @@ namespace Ogre
 	// Enable recognizing SM2.0 HLSL shaders.
 	// (the same shader code could be used by many RenderSystems, directly or via Cg)
 	#define SUPPORT_SM2_0_HLSL_SHADERS  0
-
+    class D3D11RenderOperationState;
     class D3D11DriverList;
     class D3D11Driver;
 	class D3D11StereoDriverBridge;
@@ -422,6 +422,8 @@ namespace Ogre
 		
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+        void _bindSamplersForStages(D3D11RenderOperationState* opState);
+        void _applyRenderStates(D3D11RenderOperationState* opState);
     };
 }
 #endif
