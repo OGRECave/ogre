@@ -950,13 +950,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     bool D3D11RenderWindowHwnd::isVisible() const
     {
-       HWND currentWindowHandle = mHWnd;
+        HWND currentWindowHandle = mHWnd;
         bool visible;
         while ((visible = (IsIconic(currentWindowHandle) == false)) &&
             (GetWindowLong(currentWindowHandle, GWL_STYLE) & WS_CHILD) != 0)
         {
             currentWindowHandle = GetParent(currentWindowHandle);
-        } 
+        }
         return visible;
     }
     //---------------------------------------------------------------------

@@ -258,7 +258,7 @@ namespace Ogre {
         macro.Name = 0;
         macro.Definition = 0;
         defines.push_back(macro);
-    }       
+    }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::loadFromSource(void)
     {

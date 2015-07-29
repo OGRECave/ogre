@@ -3159,14 +3159,9 @@ bail:
                     pRTView,
                     NULL);
 
-                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), &mDSTResView);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
+                   OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+                        "Implementation is not completed for this state",
                         "D3D11RenderSystem::_renderUsingReadBackAsTexture");
-                }
 
             }
             break;

@@ -145,12 +145,9 @@ namespace Ogre
         D3D11HLSLProgram* mBoundTessellationDomainProgram;
         D3D11HLSLProgram* mBoundComputeProgram;
 
-        ID3D11ShaderResourceView* mDSTResView;
         ID3D11BlendState * mBoundBlendState;
         ID3D11RasterizerState * mBoundRasterizer;
         ID3D11DepthStencilState * mBoundDepthStencilState;
-        ID3D11SamplerState * mBoundSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
-        size_t mBoundSamplerStatesCount;
 
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundTexturesCount;
