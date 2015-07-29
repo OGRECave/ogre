@@ -2397,10 +2397,6 @@ bail:
                 opState->mSamplerStates[n] = samplerState;
                 opState->mTextures[n] = texture;
             }
-            for (size_t n = opState->mTexturesCount; n < OGRE_MAX_TEXTURE_LAYERS; n++)
-            {
-                opState->mTextures[n] = NULL;
-            }
         }
 
         if (opState->mBlendState != mBoundBlendState)
