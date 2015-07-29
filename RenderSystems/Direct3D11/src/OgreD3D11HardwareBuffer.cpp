@@ -41,7 +41,11 @@ namespace Ogre {
         mpTempStagingBuffer(0),
         mUseTempStagingBuffer(false),
         mBufferType(btype),
-        mDevice(device)
+        mDevice(device),
+        mLocked(false),
+        mLockOffset(0),
+        mLockLength(0),
+        mLockOptions(HBL_NORMAL)
     {
         mSizeInBytes = sizeBytes;
         mDesc.ByteWidth = static_cast<UINT>(sizeBytes);
@@ -114,6 +118,12 @@ namespace Ogre {
     void* D3D11HardwareBuffer::lockImpl(size_t offset, 
         size_t length, LockOptions options)
     {
+        return lockImpl(offset, length, options, HBU_DEFAULT);
+    }
+    //---------------------------------------------------------------------
+    void* D3D11HardwareBuffer::lockImpl(size_t offset, 
+        size_t length, LockOptions options, UploadOptions uploadOpt)
+    {
         if (length > mSizeInBytes)
         {
             // need to realloc
@@ -129,6 +139,18 @@ namespace Ogre {
             }
         }
 
+        if(mLocked == true)
+        {
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, 0,
+                "Cannot lock a buffer more then once.", 
+                "D3D11HardwareBuffer::lockImpl");
+        }
+
+        mLocked = true;
+        mLockOffset = offset;
+        mLockLength = length;
+        mLockOptions = options;
+        mLockUploadOpt = uploadOpt;
 
         if (mSystemMemory ||
             (mUsage & HardwareBuffer::HBU_DYNAMIC && 
@@ -165,10 +187,10 @@ namespace Ogre {
             }
 
             void * pRet = NULL;
-            D3D11_MAPPED_SUBRESOURCE mappedSubResource;
-            mappedSubResource.pData = NULL;
+
+            mLockMappedSubResource.pData = NULL;
             mDevice.clearStoredErrorMessages();
-            HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer, 0, mapType, 0, &mappedSubResource);
+            HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer, 0, mapType, 0, &mLockMappedSubResource);
             if (FAILED(hr) || mDevice.isError())
             {
                 String msg = mDevice.getErrorDescription(hr);
@@ -177,7 +199,7 @@ namespace Ogre {
                     "D3D11HardwareBuffer::lockImpl");
             }
 
-            pRet = static_cast<void*>(static_cast<char*>(mappedSubResource.pData) + offset);
+            pRet = static_cast<void*>(static_cast<char*>(mLockMappedSubResource.pData) + offset);
 
             return pRet;
 
@@ -199,7 +221,7 @@ namespace Ogre {
             // register whether we'll need to upload on unlock
             mStagingUploadNeeded = (options != HBL_READ_ONLY);
 
-            return mpTempStagingBuffer->lock(offset, length, options);
+            return mpTempStagingBuffer->lock(offset, length, options, uploadOpt);
 
 
         }
@@ -207,6 +229,14 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void D3D11HardwareBuffer::unlockImpl(void)
     {
+        if(mLocked == false)
+        {
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, 0,
+                "Cannot lock an unlocked buffer.", 
+                "D3D11HardwareBuffer::unlockImpl");
+        }
+
+        mLocked = false;
 
         if (mUseTempStagingBuffer)
         {
@@ -226,6 +256,21 @@ namespace Ogre {
         }
         else
         {
+#if MULTI_DEVICE_WRAP == 1
+            if( (mLockOptions != HBL_READ_ONLY) )
+            {
+
+                D3D11MultiDevice::CopyBufferNoneActiveDevices(
+                    mDevice.GetImmediateContext(),
+                    &mLockMappedSubResource,
+                    mlpD3DBuffer,
+                    0,
+                    mLockOffset,
+                    mLockLength, 
+                    mLockUploadOpt == HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE ? TRUE : FALSE);
+            }
+#endif
+
             // unmap
             mDevice.GetImmediateContext()->Unmap(mlpD3DBuffer, 0);
         }

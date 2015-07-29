@@ -54,11 +54,17 @@ namespace Ogre {
         BufferType mBufferType;
         D3D11Device & mDevice;
         D3D11_BUFFER_DESC mDesc;
-
-
+        bool mLocked;
+        size_t mLockOffset;
+        size_t mLockLength;
+        LockOptions mLockOptions;
+        UploadOptions mLockUploadOpt;
+        D3D11_MAPPED_SUBRESOURCE mLockMappedSubResource;
 
         /** See HardwareBuffer. */
         void* lockImpl(size_t offset, size_t length, LockOptions options);
+        /** See HardwareBuffer. */
+        void* lockImpl(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt);
         /** See HardwareBuffer. */
         void unlockImpl(void);
 

@@ -54,6 +54,8 @@ THE SOFTWARE.
 #include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
+#include "d3d11MultiDevice.h"
+
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
 #endif
@@ -88,7 +90,11 @@ namespace Ogre
         _Out_opt_ ID3D11DeviceContextN** ppImmediateContext )
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if MULTI_DEVICE_WRAP == 1
+        return D3D11MultiDevice::D3D11CreateMultiDevice(DriverType, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+#else
         return D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
+#endif
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         ID3D11Device * device = NULL;
@@ -3329,9 +3335,6 @@ bail:
             break;
         }
     }
-
-    
-
     //---------------------------------------------------------------------
     void D3D11RenderSystem::setNormaliseNormals(bool normalise)
     {
@@ -4065,10 +4068,14 @@ bail:
         // set pointers to NULL
         mpDXGIFactory = NULL;
         HRESULT hr;
+#if MULTI_DEVICE_WRAP == 1
+        hr = D3D11MultiDevice::CreateMultiDeviceDXGIFactory1(&mpDXGIFactory);
+#else
         hr = CreateDXGIFactory1( __uuidof(IDXGIFactoryN), (void**)&mpDXGIFactory );
+#endif
         if( FAILED(hr) )
         {
-			OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr, 
+            OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr, 
                 "Failed to create Direct3D11 DXGIFactory1", 
                 "D3D11RenderSystem::D3D11RenderSystem" );
         }

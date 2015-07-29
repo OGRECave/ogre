@@ -28,6 +28,16 @@ THE SOFTWARE.
 #ifndef __D3D11PREREQUISITES_H__
 #define __D3D11PREREQUISITES_H__
 
+// MULTI_DEVICE_WRAP - Set this flag to enable the Direct3D11 wrapper to enable multi device.
+// A Direct3D11 device is being created for each adapter (a PHYSICAL graphic card).
+// The Direct3D11 calls are redirected to the device/adapter that is attached
+// to the working output (monitor).
+
+#define MULTI_DEVICE_WRAP 0
+
+// MULTI_DEVICE_WRAP_OPENGL_INTEROP - enables Direct3D11 multi device to work 
+// with NV_DX_interop OpenGL extension.
+#define MULTI_DEVICE_WRAP_OPENGL_INTEROP 0
 
 // Performance optimisation flag - SAVE_STATE_RENDERABLE.
 // Caches the Direct3D11 render states instead of recreating them every frame.
@@ -80,6 +90,8 @@ THE SOFTWARE.
 #   include <d3d11shader.h>
 #   include <D3Dcompiler.h>
 #endif
+
+#include "d3d11MultiDevice.h"
  
 
 namespace Ogre

@@ -51,7 +51,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void* D3D11HardwareUniformBuffer::lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
 	{
-		return mBufferImpl->lock(offset, length, options);
+        return mBufferImpl->lock(offset, length, options, uploadOpt);
 	}
 	//---------------------------------------------------------------------
 	void D3D11HardwareUniformBuffer::unlock(void)

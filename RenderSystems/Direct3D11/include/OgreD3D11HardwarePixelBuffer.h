@@ -41,6 +41,7 @@ namespace Ogre {
     protected:
         /// Lock a box
         PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
+        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options, UploadOptions uploadOpt);
 
         /// Unlock a box
         void unlockImpl(void);
@@ -57,8 +58,10 @@ namespace Ogre {
         size_t mFace;
 
         Image::Box mLockBox;
+        UploadOptions mLockUploadOpt;
         LockOptions mCurrentLockOptions;
 
+        D3D11_MAPPED_SUBRESOURCE mLockMappedSubResource;
         D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
 
         /// Render targets

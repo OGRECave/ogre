@@ -1944,7 +1944,7 @@ namespace Ogre {
             
             if (!it->mUniformBuffer.isNull())
             {
-                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
+                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD, Ogre::HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE);
 
                 // Only iterate through parsed variables (getting size of list)
                 void* src = 0;
@@ -2003,7 +2003,7 @@ namespace Ogre {
         {
             if (!it->mUniformBuffer.isNull())
             {
-                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
+                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD, Ogre::HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE);
 
                 // Only iterate through parsed variables (getting size of list)
                 void* src = 0;

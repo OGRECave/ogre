@@ -1037,6 +1037,30 @@ namespace Ogre
         mLoadedStreams.setNull();   
     }
     //---------------------------------------------------------------------
+    ID3D11Resource * D3D11Texture::getTextureResource()
+    {
+        // this is required for the multi device support - to save it from call GetDesc to know the resource type
+        ID3D11Resource * res = NULL;
+        switch(getTextureType())
+        {
+        case TEX_TYPE_1D:
+            res = GetTex1D();
+            break;
+        case TEX_TYPE_2D:
+        case TEX_TYPE_2D_RECT:
+        case TEX_TYPE_2D_ARRAY:
+		case TEX_TYPE_CUBE_MAP:
+            res = GetTex2D();
+            break;
+        case TEX_TYPE_3D:
+            res = GetTex3D();
+            break;
+        }
+
+		assert(res);
+        return res;
+    }
+    //---------------------------------------------------------------------
     // D3D11RenderTexture
     //---------------------------------------------------------------------
     void D3D11RenderTexture::rebind( D3D11HardwarePixelBuffer *buffer )

@@ -69,7 +69,7 @@ namespace Ogre {
 		/// @copydoc Texture::getBuffer
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
-		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
+        ID3D11Resource *getTextureResource();
 		/// retrieves a pointer to the actual texture
 		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView; }
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }

@@ -95,15 +95,14 @@ namespace Ogre {
     void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
     {
         mDevice.clearStoredErrorMessages();
-
-        D3D11_MAPPED_SUBRESOURCE pMappedResource;
-        pMappedResource.pData = NULL;
+        
+        mLockMappedSubResource.pData = NULL;
 
         switch(mParentTexture->getTextureType()) 
         {
         case TEX_TYPE_1D:
             {  
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+                HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &mLockMappedSubResource);
                 if (mDevice.isError())
                 {
 					String errorDescription = mDevice.getErrorDescription(hr);
@@ -117,7 +116,7 @@ namespace Ogre {
         case TEX_TYPE_2D:
             {
 				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1), 
-                    flags, 0, &pMappedResource);
+                    flags, 0, &mLockMappedSubResource);
                 if (mDevice.isError())
                 {
 					String errorDescription = mDevice.getErrorDescription(hr);
@@ -130,7 +129,7 @@ namespace Ogre {
         case TEX_TYPE_2D_ARRAY:
             {
 				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1), 
-                    flags, 0, &pMappedResource);
+                    flags, 0, &mLockMappedSubResource);
                 if (mDevice.isError())
                 {
 					String errorDescription = mDevice.getErrorDescription(hr);
@@ -142,7 +141,7 @@ namespace Ogre {
             break;
         case TEX_TYPE_3D:
             {
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+                HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &mLockMappedSubResource);
 
                 if (mDevice.isError())
                 {
@@ -160,9 +159,9 @@ namespace Ogre {
         size_t bpp = PixelUtil::getNumElemBytes(mParentTexture->getFormat());
         if (bpp != 0 && format != Ogre::PF_UNKNOWN)
         {
-            box.rowPitch = pMappedResource.RowPitch / bpp;
+            box.rowPitch = mLockMappedSubResource.RowPitch / bpp;
             box.slicePitch = box.rowPitch * box.getHeight();
-            assert((pMappedResource.RowPitch % bpp) == 0);
+            assert((mLockMappedSubResource.RowPitch % bpp) == 0);
         }
         else if (PixelUtil::isCompressed(box.format) || format == Ogre::PF_UNKNOWN /*this is a hack -  fix this !*/)
         {
@@ -175,7 +174,8 @@ namespace Ogre {
                 "Invalid pixel format", "D3D11HardwarePixelBuffer::_map");
         }
 
-        box.data = pMappedResource.pData;
+        box.data = static_cast<void*>(static_cast<char*>(mLockMappedSubResource.pData) + box.left * bpp + box.top * box.rowPitch);
+
     }
     //-----------------------------------------------------------------------------  
     void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
@@ -213,7 +213,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------  
-    PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box &lockBox, LockOptions options)
+    PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box &lockBox, LockOptions options, UploadOptions uploadOpt)
     {
         // Check for misuse
         if(mUsage & TU_RENDERTARGET)
@@ -221,6 +221,7 @@ namespace Ogre {
             "D3D11HardwarePixelBuffer::lockImpl");  
 
         mLockBox = lockBox;
+        mLockUploadOpt = uploadOpt;
 
         // Set extents and format
         // Note that we do not carry over the left/top/front here, since the returned
@@ -279,8 +280,29 @@ namespace Ogre {
         return rval;
     }
     //-----------------------------------------------------------------------------
+
+    Ogre::PixelBox D3D11HardwarePixelBuffer::lockImpl( const Image::Box &lockBox, LockOptions options )
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+            "lockImpl without UploadOptions was used",
+            "D3D11HardwarePixelBuffer::lockImpl");
+    }
+
+    //-----------------------------------------------------------------------------
     void D3D11HardwarePixelBuffer::_unmap(ID3D11Resource *res)
     {
+#if MULTI_DEVICE_WRAP == 1
+        // for now copy it all - TODO: copy only the box
+        D3D11MultiDevice::CopyBufferNoneActiveDevices(
+            mDevice.GetImmediateContext(),
+            &mLockMappedSubResource,
+            res,
+            0,
+            0, 
+            0,
+            mLockUploadOpt == HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE ? TRUE : FALSE);
+#endif
+
         switch(mParentTexture->getTextureType()) {
         case TEX_TYPE_1D:
             {

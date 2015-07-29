@@ -66,6 +66,8 @@ namespace Ogre {
         
         /// Internal implementation of lock(), must be overridden in subclasses
         virtual PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options) = 0;
+        virtual PixelBox lockImpl(const Image::Box &lockBox,  LockOptions options, UploadOptions uploadOpt);        
+
 
         /** Internal implementation of lock(), do not OVERRIDE or CALL this
             for HardwarePixelBuffer implementations, but override the previous method */
@@ -94,7 +96,7 @@ namespace Ogre {
             @return PixelBox containing the locked region, the pitches and
                 the pixel format
         */
-        virtual const PixelBox& lock(const Image::Box& lockBox, LockOptions options);
+        virtual const PixelBox& lock(const Image::Box& lockBox, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
         /// @copydoc HardwareBuffer::lock
         virtual void* lock(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt = HBU_DEFAULT);
 
