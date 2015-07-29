@@ -1070,19 +1070,6 @@ namespace Ogre {
     void D3D11HLSLProgram::analizeMicrocode()
     {
         // enum parameters
-        mInputVertexDeclaration.removeAllElements();
-
-        for (UINT i=0 ; i < mD3d11ShaderInputParameters.size() ; i++)
-        {
-            D3D11_SIGNATURE_PARAMETER_DESC  & paramDesc = mD3d11ShaderInputParameters[i];
-            mInputVertexDeclaration.addElement(
-                paramDesc.Register, 
-                -1, // we don't need the offset
-                VET_FLOAT1, // doesn't matter
-                D3D11Mappings::get(paramDesc.SemanticName),
-                paramDesc.SemanticIndex);
-        }
-
         UINT bufferCount = 0;
         UINT pointerCount = 0;
         UINT typeCount = 0;
@@ -1518,7 +1505,7 @@ namespace Ogre {
         , mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device)
         , mVertexShader(NULL), mConstantBufferSize(0)
         , mPixelShader(NULL),mGeometryShader(NULL), mHullShader(NULL), mDomainShader(NULL), mComputeShader(NULL)
-		, mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false), mInputVertexDeclaration(device)
+        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
 		mEnableBackwardsCompatibility = true;

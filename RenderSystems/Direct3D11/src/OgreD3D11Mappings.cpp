@@ -313,8 +313,13 @@ namespace Ogre
         case VET_UBYTE4:
             return DXGI_FORMAT_R8G8B8A8_UINT;
         }
-        // to keep compiler happy
-        return DXGI_FORMAT_R32G32B32_FLOAT;
+
+
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+            "Vertex element mapping not found.",
+            "D3D11Mappings::get");
+            
+        return DXGI_FORMAT_UNKNOWN;
     }
     //---------------------------------------------------------------------
     VertexElementSemantic D3D11Mappings::get(LPCSTR sem)
@@ -340,8 +345,11 @@ namespace Ogre
         if( strcmp(sem, "TANGENT") == 0 )
             return VES_TANGENT;
 
-        // to keep compiler happy
-        return VES_POSITION;
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+            String("Could not find suitable vertex element semantic for: ") + sem ,
+            "D3D11Mappings::get");
+        
+        return VES_UNKNOWN;
     }
     //---------------------------------------------------------------------
     LPCSTR D3D11Mappings::get(VertexElementSemantic sem)
@@ -368,7 +376,11 @@ namespace Ogre
         case VES_TANGENT:
             return "TANGENT";
         }
-        // to keep compiler happy
+        
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+        "Could not find suitable semantic string for the requested vertex element",
+            "D3D11Mappings::get");
+
         return "";
     }
     //---------------------------------------------------------------------

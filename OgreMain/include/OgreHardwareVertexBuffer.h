@@ -96,7 +96,9 @@ namespace Ogre {
     typedef HardwareBufferLockGuard<HardwareVertexBufferSharedPtr> HardwareVertexBufferLockGuard;
 
     /// Vertex element semantics, used to identify the meaning of vertex buffer contents
-    enum VertexElementSemantic {
+    enum VertexElementSemantic 
+    {
+        VES_UNKNOWN = 0,
         /// Position, 3 reals per vertex
         VES_POSITION = 1,
         /// Blending weights
