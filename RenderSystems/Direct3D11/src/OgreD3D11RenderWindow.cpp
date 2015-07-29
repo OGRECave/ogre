@@ -743,13 +743,12 @@ namespace Ogre
 			HMONITOR    hMonitor = NULL;		
 			MONITORINFO monitorInfo;
 			RECT		rc;
-			if (hMonitor == NULL)
-			{
-				POINT windowAnchorPoint;
-				windowAnchorPoint.x = left;
-				windowAnchorPoint.y = top;
-				hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
-			}
+            POINT windowAnchorPoint;
+            windowAnchorPoint.x = left == INT_MAX ? 0 : left;
+            windowAnchorPoint.y = top == INT_MAX ? 0 : top;
+
+			hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
+
 			memset(&monitorInfo, 0, sizeof(MONITORINFO));
 			monitorInfo.cbSize = sizeof(MONITORINFO);
 			GetMonitorInfo(hMonitor, &monitorInfo);
