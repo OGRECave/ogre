@@ -3495,7 +3495,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 updateGpuProgramParameters(pass);
 
                 rend->getRenderOperation(ro);
-
+                ro.renderStateHash = pass->getRenderStateHash();
                 if (rend->preRender(this, mDestRenderSystem))
                     mDestRenderSystem->_render(ro);
                 rend->postRender(this, mDestRenderSystem);
@@ -3563,7 +3563,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                     updateGpuProgramParameters(pass);
 
                     rend->getRenderOperation(ro);
-
+                    ro.renderStateHash = pass->getRenderStateHash();
                     if (rend->preRender(this, mDestRenderSystem))
                         mDestRenderSystem->_render(ro);
                     rend->postRender(this, mDestRenderSystem);
@@ -3585,6 +3585,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         if (rend->preRender(this, mDestRenderSystem))
         {
             rend->getRenderOperation(ro);
+			ro.renderStateHash = pass->getRenderStateHash();
             try
             {
                 mDestRenderSystem->_render(ro);
@@ -3880,6 +3881,7 @@ void SceneManager::manualRender(RenderOperation* rend,
         mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
         updateGpuProgramParameters(pass);
     }
+	rend->renderStateHash = pass->getRenderStateHash();
     mDestRenderSystem->_render(*rend);
 
     if (doBeginEndFrame)

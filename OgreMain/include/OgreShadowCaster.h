@@ -66,7 +66,7 @@ namespace Ogre {
         /// @copydoc Renderable::getMaterial
         const MaterialPtr& getMaterial(void) const { return mMaterial; }
         /// @copydoc Renderable::getRenderOperation
-        void getRenderOperation(RenderOperation& op) { op = mRenderOp; }
+        void getRenderOperation(RenderOperation& op) { op = mRenderOp; /*op.srcRenderable = this;*/ }
         /// Get the internal render operation for set up.
         RenderOperation* getRenderOperationForUpdate(void) {return &mRenderOp;}
         /// @copydoc Renderable::getWorldTransforms

@@ -32,13 +32,14 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreD3D11StateManager.h"
 
 namespace Ogre 
 {
 	// Enable recognizing SM2.0 HLSL shaders.
 	// (the same shader code could be used by many RenderSystems, directly or via Cg)
 	#define SUPPORT_SM2_0_HLSL_SHADERS  0
-    class D3D11RenderOperationState;
+
     class D3D11DriverList;
     class D3D11Driver;
 	class D3D11StereoDriverBridge;
@@ -166,6 +167,10 @@ namespace Ogre
         typedef std::map<String, ID3D11ClassInstance*>::iterator ClassInstanceIterator;
         ClassInstanceMap mInstanceMap;
 
+#if SAVE_STATE_RENDERABLE == 1
+        StateManager mStateManager;
+#endif
+
         /// structure holding texture unit settings for every stage
         struct sD3DTextureStageDesc
         {
@@ -208,6 +213,14 @@ namespace Ogre
          * from us each Present(), and we need the way to reestablish connection.
          */
         void _setRenderTargetViews();
+
+#if SAVE_STATE_RENDERABLE  == 1
+        /** Creates the render states and the sampler states and save them to the renderable
+        */
+        void _applyRenderStateForRenderable(D3D11RenderOperationState* &opState, const RenderOperation& op);
+#endif
+        void _bindSamplersForStages(D3D11RenderOperationState* opState);
+        void _applyRenderStates(D3D11RenderOperationState* opState);
 
     public:
         // constructor
@@ -272,6 +285,7 @@ namespace Ogre
         void setShadingType( ShadeOptions so );
         void setLightingEnabled( bool enabled );
         void destroyRenderTarget(const String& name);
+        void _notifyCameraRemoved(const Camera* cam);
         VertexElementType getColourVertexElementType(void) const;
         void setStencilCheckEnabled(bool enabled);
         void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
@@ -422,8 +436,6 @@ namespace Ogre
 		
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
-        void _bindSamplersForStages(D3D11RenderOperationState* opState);
-        void _applyRenderStates(D3D11RenderOperationState* opState);
     };
 }
 #endif

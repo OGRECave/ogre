@@ -676,7 +676,7 @@ namespace Ogre {
     {
         op.vertexData = mVertexData;
         op.vertexData->vertexStart = 0;
-
+        op.srcRenderable = this;
         if (mPointRendering)
         {
             op.operationType = RenderOperation::OT_POINT_LIST;

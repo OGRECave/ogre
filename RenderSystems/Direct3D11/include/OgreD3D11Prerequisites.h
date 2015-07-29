@@ -29,6 +29,11 @@ THE SOFTWARE.
 #define __D3D11PREREQUISITES_H__
 
 
+// Performance optimisation flag - SAVE_STATE_RENDERABLE.
+// Caches the Direct3D11 render states instead of recreating them every frame.
+// Setting this flag may result in a significant performance boost.
+
+#define SAVE_STATE_RENDERABLE 0
 
 #include "OgrePrerequisites.h"
 #include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK

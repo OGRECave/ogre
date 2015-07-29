@@ -103,7 +103,7 @@ namespace Ogre {
             mRenderOp.vertexData->vertexStart = 0;
             mRenderOp.useGlobalInstancingVertexBufferIsAvailable = false;
             // Vertex buffer will be created in checkMemoryAllocation
-
+            mRenderOp.srcRenderable = this;
             checkMemoryAllocation( DEFAULT_INITIAL_CHARS );
 
             mInitialised = true;
