@@ -2397,6 +2397,15 @@ bail:
                 opState->mSamplerStates[n] = samplerState;
                 opState->mTextures[n] = texture;
             }
+
+            // If no textures are bounded and stencil is enable, then reset texture unit 0,
+            // to prevent D3D error message where wrong texture type is bounded when reading
+            // from stencil buffer in a shader.
+                if (opState->mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
+                {
+                    opState->mTextures[0] = NULL;
+                    opState->mTexturesCount = 1;
+                }
         }
 
         if (opState->mBlendState != mBoundBlendState)
@@ -3181,6 +3190,15 @@ bail:
                 opState->mTextures[n] = texture;
             }
 
+            // If no textures are bounded and stencil is enable, then reset texture unit 0,
+            // to prevent D3D error message where wrong texture type is bounded when reading
+            // from stencil buffer in a shader.
+
+            if (opState->mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
+            {
+                opState->mTextures[0] = NULL;
+                opState->mTexturesCount = 1;
+            }
         }
 
             mDevice.GetImmediateContext()->OMSetBlendState(opState->mBlendState, 0, 0xffffffff); // TODO - find out where to get the parameters
