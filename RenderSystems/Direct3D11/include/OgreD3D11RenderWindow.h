@@ -121,7 +121,7 @@ namespace Ogre
         void setVSyncEnabled(bool vsync)                        { mVSync = vsync; }
         bool isVSyncEnabled() const                             { return mVSync || mUseFlipSequentialMode; }
         void setVSyncInterval(unsigned interval)                { mVSyncInterval = interval; }
-        unsigned getVSyncInterval() const                       { return mVSyncInterval; }
+        unsigned int  getVSyncInterval() const                  { return mVSyncInterval; }
 
         void swapBuffers();
         void updateStats(void);
