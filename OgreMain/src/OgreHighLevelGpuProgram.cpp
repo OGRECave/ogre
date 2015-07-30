@@ -147,6 +147,7 @@ namespace Ogre
                     << e.getFullDescription();
 
                 mCompileError = true;
+                mCompileErrorMessage = e.getFullDescription();
             }
         }
     }
