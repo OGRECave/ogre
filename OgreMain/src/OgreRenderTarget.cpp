@@ -130,7 +130,11 @@ namespace Ogre {
     {
         bool retVal = false;
 
-        if( (retVal = depthBuffer->isCompatible( this )) )
+		if (depthBuffer == NULL)
+		{
+			detachDepthBuffer();
+		}
+        else if( (retVal = depthBuffer->isCompatible( this )) )
         {
             detachDepthBuffer();
             mDepthBuffer = depthBuffer;
