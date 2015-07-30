@@ -87,7 +87,7 @@ namespace v1 {
         Real getSquaredViewDepth(const Camera* cam) const   { (void)cam; return 0; }
 
         virtual void getWorldTransforms( Matrix4* xform ) const;
-        virtual void getRenderOperation( RenderOperation& op );
+        virtual void getRenderOperation( RenderOperation& op, bool casterPass );
         virtual const LightList& getLights(void) const;
 
         /** Returns the type name of this object. */

@@ -564,7 +564,7 @@ namespace v1 {
         @see
             MovableObject
         */
-        virtual void getRenderOperation(RenderOperation& op);
+        virtual void getRenderOperation(RenderOperation& op, bool casterPass);
 
         /** Overridden from MovableObject
         @see

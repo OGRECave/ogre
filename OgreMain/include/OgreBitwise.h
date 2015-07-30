@@ -397,7 +397,25 @@ namespace Ogre {
         
             return (s << 31) | (e << 23) | m;
         }
-         
+
+        static inline int16 floatToSnorm16( float v )
+        {
+            //According to D3D10 rules, the value "-1.0f" has two representations:
+            //  0x1000 and 0x10001
+            //This allows everyone to convert by just multiplying by 32767 instead
+            //of multiplying the negative values by 32768 and 32767 for positive.
+            return static_cast<int16>( Math::Clamp( v >= 0.0f ?
+                                                        (v * 32767.0f + 0.5f) :
+                                                        (v * 32767.0f - 0.5f),
+                                                    -32768.0f,
+                                                     32767.0f ) );
+        }
+
+        static inline float snorm16ToFloat( int16 v )
+        {
+            // -32768 & -32767 both map to -1 according to D3D10 rules.
+            return Ogre::max( v / 32767.0f, -1.0f );
+        }
 
     };
     /** @} */

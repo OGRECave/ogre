@@ -262,7 +262,7 @@ namespace v1 {
         const AxisAlignedBox& getBoundingBox(void) const;
         const String& getMovableType(void) const;
         void _updateRenderQueue(RenderQueue *, Camera *camera, const Camera *lodCamera);
-        void getRenderOperation(RenderOperation &);
+        void getRenderOperation(RenderOperation &, bool casterPass);
         virtual bool preRender(SceneManager* sm, RenderSystem* rsys);
         void getWorldTransforms(Matrix4 *) const;
         const LightList& getLights(void) const;

@@ -111,6 +111,9 @@ configure_file(${OGRE_TEMPLATES_DIR}/resources.cfg.in ${OGRE_BINARY_DIR}/inst/bi
 # create plugins.cfg
 configure_file(${OGRE_TEMPLATES_DIR}/plugins_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg)
+# create plugins_tools.cfg
+configure_file(${OGRE_TEMPLATES_DIR}/plugins_tools_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_tools_d.cfg)
+configure_file(${OGRE_TEMPLATES_DIR}/plugins_tools.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/plugins_tools.cfg)
 # create samples.cfg
 configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg)
 configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg)
@@ -124,6 +127,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/debug/resources2.cfg
     ${OGRE_BINARY_DIR}/inst/bin/debug/resources_d.cfg
     ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg
+	${OGRE_BINARY_DIR}/inst/bin/debug/plugins_tools_d.cfg
 	${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg
 	${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg
     DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_DEBUG_PATH}" CONFIGURATIONS Debug
@@ -132,6 +136,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/release/resources2.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+	${OGRE_BINARY_DIR}/inst/bin/release/plugins_tools.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
     DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELEASE_PATH}" CONFIGURATIONS Release None ""
@@ -140,6 +145,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/release/resources2.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+	${OGRE_BINARY_DIR}/inst/bin/release/plugins_tools.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
 	DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELWDBG_PATH}" CONFIGURATIONS RelWithDebInfo
@@ -148,6 +154,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
     ${OGRE_BINARY_DIR}/inst/bin/release/resources2.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
     ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+	${OGRE_BINARY_DIR}/inst/bin/release/plugins_tools.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
 	${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
 	DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_MINSIZE_PATH}" CONFIGURATIONS MinSizeRel
@@ -159,6 +166,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
       ${OGRE_BINARY_DIR}/inst/bin/release/resources2.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+	  ${OGRE_BINARY_DIR}/inst/bin/release/plugins_tools.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
       DESTINATION "${OGRE_CFG_INSTALL_PATH}${OGRE_RELEASE_PATH}"
@@ -219,6 +227,11 @@ elseif (MSVC AND NOT NMAKE)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/release/plugins.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/plugins.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/plugins.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/plugins.cfg)
+  # create plugins_tools.cfg
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins_tools_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/plugins_tools_d.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins_tools.cfg.in ${OGRE_BINARY_DIR}/bin/release/plugins_tools.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins_tools.cfg.in ${OGRE_BINARY_DIR}/bin/relwithdebinfo/plugins_tools.cfg)
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins_tools.cfg.in ${OGRE_BINARY_DIR}/bin/minsizerel/plugins_tools.cfg)
   # create samples.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/samples_d.cfg.in ${OGRE_BINARY_DIR}/bin/debug/samples_d.cfg)
   configure_file(${OGRE_TEMPLATES_DIR}/samples.cfg.in ${OGRE_BINARY_DIR}/bin/release/samples.cfg)
@@ -240,6 +253,8 @@ else() # other OS only need one cfg file
   configure_file(${OGRE_TEMPLATES_DIR}/resources${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/resources${OGRE_CFG_SUFFIX}.cfg)
   # create plugins.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/plugins${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/plugins${OGRE_CFG_SUFFIX}.cfg)
+  # create plugins_tools.cfg
+  configure_file(${OGRE_TEMPLATES_DIR}/plugins_tools${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/plugins_tools${OGRE_CFG_SUFFIX}.cfg)
   # create samples.cfg
   configure_file(${OGRE_TEMPLATES_DIR}/samples${OGRE_CFG_SUFFIX}.cfg.in ${OGRE_BINARY_DIR}/bin/samples${OGRE_CFG_SUFFIX}.cfg)
   # create tests.cfg

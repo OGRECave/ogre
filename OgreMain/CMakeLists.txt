@@ -62,9 +62,9 @@ add_filtered_std("Math/Simple/C")
 add_filtered_std("Vao")
 
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
-    src/OgreImageResampler.h
-    src/OgrePixelConversions.h
-    src/OgreSIMDHelper.h)
+	src/OgreImageResampler.h
+	src/OgrePixelConversions.h
+	src/OgreSIMDHelper.h)
 
 add_filter_only( "Header Files\\Threading" "${CMAKE_CURRENT_SOURCE_DIR}/include/Threading/*.h" )
 add_filter_only( "Source Files\\Threading" "${CMAKE_CURRENT_SOURCE_DIR}/src/Threading/*.cpp" )

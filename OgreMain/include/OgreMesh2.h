@@ -402,6 +402,38 @@ namespace Ogre {
             normal mapping).
         */
         void importV1( v1::Mesh *mesh, bool halfPos, bool halfTexCoords, bool qTangents );
+
+        /// Converts this SubMesh to an efficient arrangement. @See Mesh::importV1 for an
+        /// explanation on the parameters. @see dearrangeEfficientToInefficient
+        /// to perform the opposite operation.
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+
+        /// Reverts the effects from arrangeEfficient by converting all 16-bit half float back
+        /// to 32-bit float; and QTangents to Normal, Tangent + Reflection representation,
+        /// which are more compatible for doing certain operations vertex operations in the CPU.
+        void dearrangeToInefficient(void);
+
+        /// When this bool is false, prepareForShadowMapping will use the same Vaos for
+        /// both regular and shadow mapping rendering. When it's true, it will
+        /// calculate an optimized version to speed up shadow map rendering (uses a bit
+        /// more GPU VRAM).
+        /// Large meshes can take long to optimize thus it is recommended to
+        /// perform this offline and save it into the mesh file.
+        /// It's off by default.
+        ///
+        /// @see Ogre::Mesh::msOptimizeForShadowMapping for the v2 version
+        /// @see Ogre::v1::Mesh::msOptimizeForShadowMapping for the v1 version
+        static bool msOptimizeForShadowMapping;
+
+        void prepareForShadowMapping( bool forceSameBuffers );
+
+        /// Returns true if the mesh is ready for rendering with valid shadow mapping Vaos
+        /// Otherwise prepareForShadowMapping must be called on this mesh.
+        bool hasValidShadowMappingVaos(void) const;
+
+        /// Returns true if the shadow mapping buffers do not just reference the real buffers,
+        /// but are rather their own separate set of optimized geometry.
+        bool hasIndependentShadowMappingVaos(void) const;
     };
 
     /** @} */

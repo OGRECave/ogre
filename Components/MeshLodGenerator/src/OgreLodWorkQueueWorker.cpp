@@ -39,8 +39,9 @@ namespace Ogre
         return msSingleton;
     }
     LodWorkQueueWorker& LodWorkQueueWorker::getSingleton(void)
-    {  
-        assert( msSingleton );  return ( *msSingleton );  
+    {
+        assert( msSingleton );
+        return ( *msSingleton );
     }
 
     LodWorkQueueWorker::LodWorkQueueWorker()
@@ -71,9 +72,11 @@ namespace Ogre
     LodWorkQueueWorker::~LodWorkQueueWorker()
     {
         Root* root = Root::getSingletonPtr();
-        if (root) {
+        if (root)
+        {
             WorkQueue* wq = root->getWorkQueue();
-            if (wq) {
+            if (wq)
+            {
                 wq->removeRequestHandler(mChannelID, this);
             }
         }

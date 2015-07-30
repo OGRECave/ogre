@@ -98,8 +98,8 @@ namespace v1 {
 
         virtual void writeLodLevel(const Mesh* pMesh);
         virtual void writeLodUsageManual(const MeshLodUsage& usage);
-        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
-        virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum);
+        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass);
+        virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum, uint8 casterPass);
 
         virtual void writeBoundsInfo(const Mesh* pMesh);
         virtual void writeEdgeList(const Mesh* pMesh);
@@ -123,8 +123,8 @@ namespace v1 {
         virtual size_t calcSubMeshNameTableSize(const Mesh* pMesh);
         virtual size_t calcLodLevelSize(const Mesh* pMesh);
         virtual size_t calcLodUsageManualSize(const MeshLodUsage& usage);
-        virtual size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
-        virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum);
+        virtual size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass);
+        virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum, uint8 casterPass);
         virtual size_t calcEdgeListSize(const Mesh* pMesh);
         virtual size_t calcEdgeListLodSize(const EdgeData* data, bool isManual);
         virtual size_t calcEdgeGroupSize(const EdgeData::EdgeGroup& group);
@@ -160,7 +160,7 @@ namespace v1 {
         virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
 #if !OGRE_NO_MESHLOD
         virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
-        virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
+        virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage, uint8 casterPass);
 #endif
         virtual void readBoundsInfo(DataStreamPtr& stream, Mesh* pMesh);
         virtual void readEdgeList(DataStreamPtr& stream, Mesh* pMesh);
@@ -187,14 +187,30 @@ namespace v1 {
         /// This function can be overloaded to disable validation in debug builds.
         virtual void enableValidation();
 
+        uint8 mNumBufferPasses;
         ushort exportedLodCount; // Needed to limit exported Edge data, when exporting
+    };
+
+    /** Class for providing backwards-compatibility for loading version 1.10 of the .mesh format.
+     This mesh format was used from Ogre v1.10.
+     */
+    class _OgrePrivate MeshSerializerImpl_v1_10 : public MeshSerializerImpl
+    {
+    public:
+        MeshSerializerImpl_v1_10();
+        virtual ~MeshSerializerImpl_v1_10();
+
+    protected:
+        virtual void readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener);
+        virtual void writeMesh(const Mesh* pMesh);
+        virtual size_t calcLodLevelSize(const Mesh* pMesh);
     };
 
 
     /** Class for providing backwards-compatibility for loading version 1.8 of the .mesh format. 
      This mesh format was used from Ogre v1.8.
      */
-    class _OgrePrivate MeshSerializerImpl_v1_8 : public MeshSerializerImpl
+    class _OgrePrivate MeshSerializerImpl_v1_8 : public MeshSerializerImpl_v1_10
     {
     public:
         MeshSerializerImpl_v1_8();
@@ -205,16 +221,17 @@ namespace v1 {
         virtual bool isLodMixed(const Mesh* pMesh);
         virtual size_t calcLodLevelSize(const Mesh* pMesh);
         virtual size_t calcLodUsageManualSize(const MeshLodUsage& usage);
-        virtual size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
-        virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum);
+        virtual size_t calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass);
+        virtual size_t calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum, uint8 casterPass);
 #if !OGRE_NO_MESHLOD
         virtual void writeLodLevel(const Mesh* pMesh);
-        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
-        virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum);
+        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass);
+        virtual void writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum, uint8 casterPass);
         virtual void writeLodUsageManual(const MeshLodUsage& usage);
 
-        virtual void readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, 
-            unsigned short lodNum, MeshLodUsage& usage);
+        virtual void readMeshLodUsageGenerated( DataStreamPtr& stream, Mesh* pMesh,
+                                                unsigned short lodNum, MeshLodUsage& usage,
+                                                uint8 casterPass );
         virtual void readMeshLodUsageManual(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage);
 #endif
         virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
@@ -252,7 +269,7 @@ namespace v1 {
         virtual void readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh);
 #if !OGRE_NO_MESHLOD
         virtual void writeLodLevel(const Mesh* pMesh);
-        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum);
+        virtual void writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass);
 #endif
     };
 

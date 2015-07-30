@@ -329,7 +329,7 @@ namespace v1 {
             mUseIdentityProjection = true;
             mUseIdentityView = true;
         }
-        void getRenderOperation(v1::RenderOperation& op) { op = mParent->mRenderOp2; }
+        void getRenderOperation(v1::RenderOperation& op, bool casterPass) { op = mParent->mRenderOp2; }
         void getWorldTransforms(Matrix4* xform) const { mParent->getWorldTransforms(xform); }
         unsigned short getNumWorldTransforms(void) const { return 1; }
         const LightList& getLights(void) const

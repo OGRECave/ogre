@@ -36,28 +36,37 @@
 namespace Ogre
 {
 
-/**
- * @brief Injects the output of a request to the mesh in a thread safe way.
- */
-class _OgreLodExport LodWorkQueueInjector :
-    public WorkQueue::ResponseHandler,
-    public Singleton<LodWorkQueueInjector>
-{
-public:
-    LodWorkQueueInjector();
-    virtual ~LodWorkQueueInjector();
-    
-    static LodWorkQueueInjector* getSingletonPtr();
-    static LodWorkQueueInjector& getSingleton();
+    /**
+     * @brief Injects the output of a request to the mesh in a thread safe way.
+     */
+    class _OgreLodExport LodWorkQueueInjector :
+        public WorkQueue::ResponseHandler,
+        public Singleton<LodWorkQueueInjector>
+    {
+    public:
+        LodWorkQueueInjector();
+        virtual ~LodWorkQueueInjector();
 
-    void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+        static LodWorkQueueInjector* getSingletonPtr();
+        static LodWorkQueueInjector& getSingleton();
 
-    void setInjectorListener(LodWorkQueueInjectorListener* injectorListener) {mInjectorListener = injectorListener;}
-    LodWorkQueueInjectorListener* getInjectorListener() {return mInjectorListener;}
-    void removeInjectorListener() {mInjectorListener = 0;}
-protected:
-    LodWorkQueueInjectorListener* mInjectorListener;
-};
+        void handleResponse(const WorkQueue::Response* res, const WorkQueue* srcQ);
+
+        void setInjectorListener(LodWorkQueueInjectorListener* injectorListener)
+        {
+            mInjectorListener = injectorListener;
+        }
+        LodWorkQueueInjectorListener* getInjectorListener()
+        {
+            return mInjectorListener;
+        }
+        void removeInjectorListener()
+        {
+            mInjectorListener = 0;
+        }
+    protected:
+        LodWorkQueueInjectorListener* mInjectorListener;
+    };
 
 }
 #endif

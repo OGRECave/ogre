@@ -95,6 +95,7 @@ namespace Ogre
         friend class D3D11BufferInterface;
         friend class D3D11CompatBufferInterface;
         friend class GL3PlusBufferInterface;
+        friend class NULLBufferInterface;
 
     protected:
         size_t mInternalBufferStart;  /// In elements
@@ -236,6 +237,8 @@ namespace Ogre
 
         size_t _getInternalBufferStart(void) const              { return mInternalBufferStart; }
         size_t _getFinalBufferStart(void) const                 { return mFinalBufferStart; }
+
+        const void* getShadowCopy(void) const   { return mShadowCopy; }
     };
 
     typedef vector<BufferPacked*>::type BufferPackedVec;

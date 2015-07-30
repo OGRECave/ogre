@@ -44,7 +44,8 @@ namespace Ogre {
     {
         //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
-        mVaoPerLod = subMeshBasis->mVao;
+        mVaoPerLod[0] = subMeshBasis->mVao[0];
+        mVaoPerLod[1] = subMeshBasis->mVao[1];
 
         if( !subMeshBasis->mBlendIndexToBoneIndexMap.empty() )
         {
@@ -72,7 +73,7 @@ namespace Ogre {
         return mParentItem->queryLights();
     }
     //-----------------------------------------------------------------------------
-    void SubItem::getRenderOperation( v1::RenderOperation& op )
+    void SubItem::getRenderOperation( v1::RenderOperation& op, bool casterPass )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                      "Items do not implement getRenderOperation. You've put an Item in "

@@ -50,6 +50,8 @@ THE SOFTWARE.
 #include "OgreOldSkeletonManager.h"
 
 namespace Ogre {
+    bool Mesh::msOptimizeForShadowMapping = false;
+
     //-----------------------------------------------------------------------
     Mesh::Mesh( ResourceManager* creator, const String& name, ResourceHandle handle,
                 const String& group, VaoManager *vaoManager, bool isManual, ManualResourceLoader* loader )
@@ -219,7 +221,7 @@ namespace Ogre {
         }
 
         // Copy shared geometry and index map, if any
-        if (sharedVertexData)
+        if (sharedVertexData[0])
         {
             newMesh->sharedVertexData = sharedVertexData->clone();
             newMesh->sharedBlendIndexToBoneIndexMap = sharedBlendIndexToBoneIndexMap;
@@ -493,25 +495,35 @@ namespace Ogre {
         while( itor != end )
         {
             SubMesh *s = *itor;
-            VertexArrayObjectArray::const_iterator itVao = s->mVao.begin();
-            VertexArrayObjectArray::const_iterator enVao = s->mVao.end();
 
-            while( itVao != enVao )
+            size_t numExtraVaos = 2;
+
+            if( !s->mVao[0].empty() && !s->mVao[1].empty() && s->mVao[0][0] == s->mVao[1][0] )
+                numExtraVaos = 1;
+
+            for( size_t i=0; i<numExtraVaos; ++i )
             {
-                VertexArrayObject *vao = *itVao;
-                VertexBufferPackedVec::const_iterator itVertexBuf = vao->getVertexBuffers().begin();
-                VertexBufferPackedVec::const_iterator enVertexBuf = vao->getVertexBuffers().end();
+                VertexArrayObjectArray::const_iterator itVao = s->mVao[i].begin();
+                VertexArrayObjectArray::const_iterator enVao = s->mVao[i].end();
 
-                while( itVertexBuf != enVertexBuf )
+                while( itVao != enVao )
                 {
-                    retVal += (*itVertexBuf)->getTotalSizeBytes();
-                    ++itVertexBuf;
-                }
+                    VertexArrayObject *vao = *itVao;
+                    VertexBufferPackedVec::const_iterator itVertexBuf = vao->getVertexBuffers().begin();
+                    VertexBufferPackedVec::const_iterator enVertexBuf = vao->getVertexBuffers().end();
 
-                if( vao->getIndexBuffer() )
-                    retVal += vao->getIndexBuffer()->getTotalSizeBytes();
-                ++itVao;
+                    while( itVertexBuf != enVertexBuf )
+                    {
+                        retVal += (*itVertexBuf)->getTotalSizeBytes();
+                        ++itVertexBuf;
+                    }
+
+                    if( vao->getIndexBuffer() )
+                        retVal += vao->getIndexBuffer()->getTotalSizeBytes();
+                    ++itVao;
+                }
             }
+
             ++itor;
         }
 
@@ -529,7 +541,7 @@ namespace Ogre {
                          "Mesh::importV1" );
         }
 
-        if( mesh->sharedVertexData )
+        if( mesh->sharedVertexData[0] )
         {
             LogManager::getSingleton().logMessage( "WARNING: Mesh '" + mesh->getName() +
                                                    "' has shared vertices. They're being "
@@ -584,5 +596,75 @@ namespace Ogre {
         setToLoaded();
     }
     //---------------------------------------------------------------------
-}
+    void Mesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
+    {
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
 
+        while( itor != end )
+        {
+            (*itor)->arrangeEfficient( halfPos, halfTexCoords, qTangents );
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    void Mesh::dearrangeToInefficient(void)
+    {
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
+
+        while( itor != end )
+        {
+            (*itor)->dearrangeToInefficient();
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    void Mesh::prepareForShadowMapping( bool forceSameBuffers )
+    {
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
+
+        while( itor != end )
+        {
+            (*itor)->_prepareForShadowMapping( forceSameBuffers );
+            ++itor;
+        }
+    }
+    //---------------------------------------------------------------------
+    bool Mesh::hasValidShadowMappingVaos(void) const
+    {
+        bool retVal = true;
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
+
+        while( itor != end && retVal )
+        {
+            retVal &= (*itor)->mVao[0].size() == (*itor)->mVao[1].size();
+            ++itor;
+        }
+
+        return retVal;
+    }
+    //---------------------------------------------------------------------
+    bool Mesh::hasIndependentShadowMappingVaos(void) const
+    {
+        if( !hasValidShadowMappingVaos() )
+            return false;
+
+        bool independent = false;
+
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
+
+        while( itor != end && !independent )
+        {
+            if( !(*itor)->mVao[0].empty() )
+                independent |= (*itor)->mVao[0][0] != (*itor)->mVao[1][0];
+            ++itor;
+        }
+
+        return independent;
+    }
+    //---------------------------------------------------------------------
+}

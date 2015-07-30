@@ -40,8 +40,9 @@ namespace Ogre
         return msSingleton;
     }
     LodWorkQueueInjector& LodWorkQueueInjector::getSingleton(void)
-    {  
-        assert( msSingleton );  return ( *msSingleton );  
+    {
+        assert( msSingleton );
+        return ( *msSingleton );
     }
 
 
@@ -56,9 +57,11 @@ namespace Ogre
     LodWorkQueueInjector::~LodWorkQueueInjector()
     {
         Root* root = Root::getSingletonPtr();
-        if (root) {
+        if (root)
+        {
             WorkQueue* wq = root->getWorkQueue();
-            if (wq) {
+            if (wq)
+            {
                 unsigned short workQueueChannel = wq->getChannel("PMGen");
                 wq->removeResponseHandler(workQueueChannel, this);
             }
@@ -69,8 +72,10 @@ namespace Ogre
     {
         LodWorkQueueRequest* request = any_cast<LodWorkQueueRequest*>(res->getData());
 
-        if(mInjectorListener){
-            if(!mInjectorListener->shouldInject(request)) {
+        if(mInjectorListener)
+        {
+            if(!mInjectorListener->shouldInject(request))
+            {
                 return;
             }
         }
@@ -79,10 +84,11 @@ namespace Ogre
         MeshLodGenerator::_configureMeshLodUsage(request->config);
         //lodConfig.mesh->buildEdgeList();
 
-        if(mInjectorListener){
+        if(mInjectorListener)
+        {
             mInjectorListener->injectionCompleted(request);
         }
     }
 
-    
+
 }

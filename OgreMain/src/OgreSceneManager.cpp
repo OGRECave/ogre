@@ -3056,7 +3056,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 // Finalise GPU parameter bindings
                 updateGpuProgramParameters(pass);
 
-                rend->getRenderOperation(ro);
+                rend->getRenderOperation(ro, false);
 
                 if (rend->preRender(this, mDestRenderSystem))
                     mDestRenderSystem->_render(ro);
@@ -3126,7 +3126,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                     // Finalise GPU parameter bindings
                     updateGpuProgramParameters(pass);
 
-                    rend->getRenderOperation(ro);
+                    rend->getRenderOperation(ro, false);
 
                     if (rend->preRender(this, mDestRenderSystem))
                         mDestRenderSystem->_render(ro);
@@ -3148,7 +3148,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         mDestRenderSystem->setCurrentPassIterationCount(1);
         if (rend->preRender(this, mDestRenderSystem))
         {
-            rend->getRenderOperation(ro);
+            rend->getRenderOperation(ro, false);
             try
             {
                 mDestRenderSystem->_render(ro);

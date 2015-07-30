@@ -37,17 +37,21 @@ namespace Ogre
         data->mCollapseCostHeap.clear();
         LodData::VertexList::iterator it = data->mVertexList.begin();
         LodData::VertexList::iterator itEnd = data->mVertexList.end();
-        for (; it != itEnd; it++) {
-            if (!it->edges.empty()) {
+        for (; it != itEnd; it++)
+        {
+            if (!it->edges.empty())
+            {
                 initVertexCollapseCost(data, &*it);
-            } else {
+            }
+            else
+            {
 #if OGRE_DEBUG_MODE
                 LogManager::getSingleton().stream() << "In " << data->mMeshName << " never used vertex found with ID: " << data->mCollapseCostHeap.size() << ". "
-                    << "Vertex position: ("
-                    << it->position.x << ", "
-                    << it->position.y << ", "
-                    << it->position.z << ") "
-                    << "It will be excluded from Lod level calculations.";
+                                                    << "Vertex position: ("
+                                                    << it->position.x << ", "
+                                                    << it->position.y << ", "
+                                                    << it->position.z << ") "
+                                                    << "It will be excluded from Lod level calculations.";
 #endif
             }
         }
@@ -56,9 +60,11 @@ namespace Ogre
     void LodCollapseCost::computeVertexCollapseCost( LodData* data, LodData::Vertex* vertex, Real& collapseCost, LodData::Vertex*& collapseTo )
     {
         LodData::VEdges::iterator it = vertex->edges.begin();
-        for (; it != vertex->edges.end(); ++it) {
+        for (; it != vertex->edges.end(); ++it)
+        {
             it->collapseCost = computeEdgeCollapseCost(data, vertex, &*it);
-            if (collapseCost > it->collapseCost) {
+            if (collapseCost > it->collapseCost)
+            {
                 collapseCost = it->collapseCost;
                 collapseTo = it->dst;
             }
@@ -82,13 +88,17 @@ namespace Ogre
         LodData::Vertex* collapseTo = NULL;
         computeVertexCollapseCost(data, vertex, collapseCost, collapseTo);
 
-        if (vertex->collapseTo != collapseTo || collapseCost != vertex->costHeapPosition->first) {
+        if (vertex->collapseTo != collapseTo || collapseCost != vertex->costHeapPosition->first)
+        {
             OgreAssert(vertex->costHeapPosition != data->mCollapseCostHeap.end(), "");
             data->mCollapseCostHeap.erase(vertex->costHeapPosition);
-            if (collapseCost != LodData::UNINITIALIZED_COLLAPSE_COST) {
+            if (collapseCost != LodData::UNINITIALIZED_COLLAPSE_COST)
+            {
                 vertex->collapseTo = collapseTo;
                 vertex->costHeapPosition = data->mCollapseCostHeap.insert(LodData::CollapseCostHeap::value_type(collapseCost, vertex));
-            } else {
+            }
+            else
+            {
 #if OGRE_DEBUG_MODE
                 vertex->collapseTo = NULL;
                 vertex->costHeapPosition = data->mCollapseCostHeap.end();
@@ -101,8 +111,10 @@ namespace Ogre
     {
         LodData::VEdges::const_iterator it = vertex->edges.begin();
         LodData::VEdges::const_iterator itEnd = vertex->edges.end();
-        for (; it != itEnd; ++it) {
-            if (it->refCount == 1) {
+        for (; it != itEnd; ++it)
+        {
+            if (it->refCount == 1)
+            {
                 return true;
             }
         }

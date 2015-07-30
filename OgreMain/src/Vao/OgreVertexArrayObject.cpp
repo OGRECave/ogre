@@ -92,4 +92,39 @@ namespace Ogre
         mPrimStart = primStart;
         mPrimCount = primCount;
     }
+    //-----------------------------------------------------------------------------------
+    const VertexElement2* VertexArrayObject::findBySemantic( VertexElementSemantic semantic,
+                                                             size_t &outIndex, size_t &outOffset ) const
+    {
+        const VertexElement2 *retVal = 0;
+
+        VertexBufferPackedVec::const_iterator itBuffers = mVertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator enBuffers = mVertexBuffers.end();
+
+        while( itBuffers != enBuffers && !retVal )
+        {
+            size_t accumOffset = 0;
+            const VertexElement2Vec &elements =  (*itBuffers)->getVertexElements();
+
+            VertexElement2Vec::const_iterator itElements = elements.begin();
+            VertexElement2Vec::const_iterator enElements = elements.end();
+
+            while( itElements != enElements && itElements->mSemantic != semantic )
+            {
+                accumOffset += v1::VertexElement::getTypeSize( itElements->mType );
+                ++itElements;
+            }
+
+            if( itElements != enElements && itElements->mSemantic == semantic )
+            {
+                outIndex = itBuffers - mVertexBuffers.begin();
+                outOffset = accumOffset;
+                retVal = &(*itElements);
+            }
+
+            ++itBuffers;
+        }
+
+        return retVal;
+    }
 }

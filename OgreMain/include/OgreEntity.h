@@ -638,7 +638,7 @@ namespace v1 {
         /// Override to return specific type flag.
         uint32 getTypeFlags(void) const;
         /// Retrieve the VertexData which should be used for GPU binding.
-        VertexData* getVertexDataForBinding(void);
+        VertexData* getVertexDataForBinding( bool casterPass );
 
         /// Identify which vertex data we should be sending to the renderer.
         enum VertexDataBindChoice

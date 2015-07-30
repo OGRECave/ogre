@@ -89,6 +89,7 @@ namespace v1 {
     {
         friend class SubMesh;
         friend class MeshSerializerImpl;
+        friend class MeshSerializerImpl_v1_10;
         friend class MeshSerializerImpl_v1_8;
         friend class MeshSerializerImpl_v1_4;
         friend class MeshSerializerImpl_v1_3;
@@ -209,6 +210,7 @@ namespace v1 {
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
                                      unsigned short texCoordSetToDestroy, VertexData *vertexData );
 
+        void destroyShadowMappingGeom(void);
 
     public:
         /** Default constructor - used by MeshManager
@@ -282,32 +284,38 @@ namespace v1 {
         SubMeshIterator getSubMeshIterator(void)
         { return SubMeshIterator(mSubMeshList.begin(), mSubMeshList.end()); }
 
-        /** Rearranges the buffers in this Mesh so that they are more efficient, an
-            prepared for 2.0 rendering methods.
-            You can't use the same Mesh for both Items and Entity
-        @param oldInterface
-            When true, the Mesh can be used with Entity and InstancedEntity, which
-            is the old 1.x interface; and the buffers are rearranged in a similar way
-            to 2.0's interface; which is useful i.e. for saving file to disk.
-            When false, the Mesh can be used with Items, which are the 2.0 interface.
+        /** Rearranges the buffers in this Mesh so that they are more efficient for
+            rendering with shaders. It's not recommended to use this option if
+            you plan on using SW skinning or pose/morph animations.
+        @remarks
+            Multiple buffer streams will be merged into one, making an interleaved format.
+            Shared vertices with submeshes will be unshared.
         @param halfPos
-            When true, converts the position buffer from FLOAT3 or FLOAT4 (32-bit
-            floating point) to HALF4 (16-bit half precision floating point).
-            May reduce precision which is often not needed or noticeable.
-            Recommended value is true unless the mesh is too big.
+            True if you want to convert the position data to VET_HALF4 format.
+            Recommended on desktop to reduce memory and bandwidth requirements.
+            Rarely the extra precision is needed.
 
+            Unfortuntately on mobile, not all ES2 devices support VET_HALF4.
             Do NOT use this flag if you intend to run the mesh in GLES2 devices which
             don't have the GL_OES_VERTEX_HALF_FLOAT extension (many iOS, some Android).
         @param halfTexCoords
-            The same as halfPos, but converts the texture coordinates to 16-bit half
-            precision floating point instead of the position. If there are 3 coordinates,
-            they will be paddded to 4 tex. coords. for alignment reasons.
-            Recommended value is true.
-
-            Do NOT use this flag if you intend to run the mesh in GLES2 devices which
-            don't have the GL_OES_VERTEX_HALF_FLOAT extension (many iOS, some Android).
+            True if you want to convert the position data to VET_HALF2 or VET_HALF4 format.
+            Same recommendations as halfPos.
+        @param qTangents
+            True if you want to generate tangent and reflection information (modifying
+            the original v1 mesh) and convert this data to a QTangent, requiring
+            VET_SHORT4_SNORM (8 bytes vs 28 bytes to store normals, tangents and
+            reflection). Needs much less space, trading for more ALU ops in the
+            vertex shader for decoding the QTangent.
+            Highly recommended on both desktop and mobile if you need tangents (i.e.
+            normal mapping).
         */
-        void arrangeEfficientFor( bool oldInterface, bool halfPos, bool halfTexCoords );
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+
+        /// Reverts the effects from arrangeEfficient by converting all 16-bit half float back
+        /// to 32-bit float; and QTangents to Normal, Tangent + Reflection representation,
+        /// which are more compatible for doing certain operations vertex operations in the CPU.
+        void dearrangeToInefficient(void);
       
         /** Shared vertex data.
         @remarks
@@ -317,7 +325,7 @@ namespace v1 {
             The use of shared or non-shared buffers is determined when
             model data is converted to the OGRE .mesh format.
         */
-        VertexData *sharedVertexData;
+        VertexData *sharedVertexData[2];
 
         /** Shared index map for translating blend index to bone index.
         @remarks
@@ -534,7 +542,8 @@ namespace v1 {
         /** Internal methods for loading LOD, do not use. */
         void _setLodUsage(unsigned short level, const MeshLodUsage& usage);
         /** Internal methods for loading LOD, do not use. */
-        void _setSubMeshLodFaceList(unsigned short subIdx, unsigned short level, IndexData* facedata);
+        void _setSubMeshLodFaceList( unsigned short subIdx, unsigned short level, IndexData* facedata,
+                                     bool casterPass );
         /** Internal methods for loading LOD, do not use. */
         bool _isManualLodLevel(unsigned short level) const;
 
@@ -651,6 +660,19 @@ namespace v1 {
             successful merges.
         */
         void mergeAdjacentTexcoords( unsigned short finalTexCoordSet, unsigned short texCoordSetToDestroy );
+
+        /// @copydoc Mesh::msOptimizeForShadowMapping
+        static bool msOptimizeForShadowMapping;
+
+        void prepareForShadowMapping( bool forceSameBuffers );
+
+        /// Returns true if the mesh is ready for rendering with valid shadow mapping buffers
+        /// Otherwise prepareForShadowMapping must be called on this mesh.
+        bool hasValidShadowMappingBuffers(void) const;
+
+        /// Returns true if the shadow mapping buffers do not just reference the real buffers,
+        /// but are rather their own separate set of optimized geometry.
+        bool hasIndependentShadowMappingBuffers(void) const;
 
         /** This method builds a set of tangent vectors for a given mesh into a 3D texture coordinate buffer.
         @remarks

@@ -174,7 +174,7 @@ namespace v1 {
         return msTypeName;
     }
     //---------------------------------------------------------------------
-    void PanelOverlayElement::getRenderOperation(RenderOperation& op)
+    void PanelOverlayElement::getRenderOperation(RenderOperation& op, bool casterPass)
     {
         op = mRenderOp;
     }

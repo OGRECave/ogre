@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreXMLSkeletonSerializer.h"
+#include "XML/OgreXMLSkeletonSerializer.h"
 #include "OgreSkeleton.h"
 #include "OgreAnimation.h"
 #include "OgreAnimationTrack.h"
@@ -524,7 +524,7 @@ namespace v1 {
     }
     //---------------------------------------------------------------------
     // 
-    // Modifications effectuées:
+    // Modifications effectu\E9es:
     //
     // on stoque les noms et pas les Id. c'est plus lisibles.
 

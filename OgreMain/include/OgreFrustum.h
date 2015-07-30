@@ -476,7 +476,7 @@ namespace Ogre
         const String& getMovableType(void) const;
 
         /** Overridden from Renderable */
-        void getRenderOperation(v1::RenderOperation& op);
+        void getRenderOperation(v1::RenderOperation& op, bool casterPass);
 
         /** Overridden from Renderable */
         void getWorldTransforms(Matrix4* xform) const;

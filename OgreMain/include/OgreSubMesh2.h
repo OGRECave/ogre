@@ -67,7 +67,12 @@ namespace Ogre {
 
         /// VAO to render the submesh. One per LOD level. Each LOD may or
         /// may not share the vertex and index buffers the other levels
-        VertexArrayObjectArray  mVao;
+        /// [0] = Used for regular rendering
+        /// [1] = Used for shadow map caster passes
+        /// Note that mVao[1] = mVao[0] is valid.
+        /// But if they're not exactly the same VertexArrayObject pointers,
+        /// then they won't share any pointer.
+        VertexArrayObjectArray  mVao[2];
 
         /** Dedicated index map for translate blend index to bone index
             @par
@@ -148,19 +153,85 @@ namespace Ogre {
         void setMaterialName( const String &name )          { mMaterialName = name; }
         String getMaterialName(void) const                  { return mMaterialName; }
 
-        /// @See arrangeEfficient
+        /// Imports a v1 SubMesh @See Mesh::importV1. Automatically performs what arrangeEfficient does.
         void importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords, bool qTangents );
 
+        /// Converts this SubMesh to an efficient arrangement. @See Mesh::importV1 for an
+        /// explanation on the parameters. @see dearrangeEfficientToInefficient
+        /// to perform the opposite operation.
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+
+        /// Reverts the effects from arrangeEfficient by converting all 16-bit half float back
+        /// to 32-bit float; and QTangents to Normal, Tangent + Reflection representation,
+        /// which are more compatible for doing certain operations vertex operations in the CPU.
+        void dearrangeToInefficient(void);
+
+        void _prepareForShadowMapping( bool forceSameBuffers );
+
     protected:
+        void importBuffersFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords, bool qTangents,
+                                  size_t vaoPassIdx );
 
         /// Converts a v1 IndexBuffer to a v2 format. Returns nullptr if indexData is also nullptr
         IndexBufferPacked* importFromV1( v1::IndexData *indexData );
 
-        /** Rearranges the buffers to be efficiently rendered in Ogre 2.0 with Hlms
+        /** @see arrangeEfficient overload
+        @param vao
+            The Vao to convert to.
+        @param sharedBuffers
+            Maps old Vertex Buffers to the new converted ones, so we can reuse them
+            when we detect the vertex buffers were being shared across Vaos.
+            Reads and writes from/to it.
+        @param vaoManager
+            Needed to create the new Vao
+        @return
+            New Vao containing the dearranged buffers. It will share the index buffers
+            with the original vao.
+        */
+        static VertexArrayObject* arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents,
+                                                    VertexArrayObject *vao,
+                                                    map<VertexBufferPacked*, VertexBufferPacked*>::type
+                                                    &sharedBuffers,
+                                                    VaoManager *vaoManager );
+
+        /** @see dearrangeEfficientToInefficient. Works on an individual VertexArrayObject.
+            Delegates work to the generic method @see _dearrangeEfficient which
+            performs the actual buffer conversion.
+        @param vao
+            The Vao to convert to.
+        @param sharedBuffers
+            Maps old Vertex Buffers to the new converted ones, so we can reuse them
+            when we detect the vertex buffers were being shared across Vaos.
+            Reads and writes from/to it.
+        @param vaoManager
+            Needed to create the new Vao
+        @return
+            New Vao containing the dearranged buffers. It will share the index buffers
+            with the original vao.
+        */
+        static VertexArrayObject* dearrangeEfficient(
+                const VertexArrayObject *vao,
+                map<VertexBufferPacked*, VertexBufferPacked*>::type &sharedBuffers,
+                VaoManager *vaoManager );
+
+    public:
+        struct SourceData
+        {
+            char const      *data;
+            size_t          bytesPerVertex;
+            VertexElement2  element;
+
+            SourceData( char const *_data, size_t _bytesPerVertex, VertexElement2 _element ) :
+                data( _data ), bytesPerVertex( _bytesPerVertex ), element( _element ) {}
+        };
+
+        typedef FastArray<SourceData> SourceDataArray;
+
+        /** Rearranges the buffers to be efficiently rendered in Ogre 2.1 with Hlms
+            Takes a v1 SubMesh and returns a pointer with the data interleaved,
+            and a VertexElement2Vec with the new vertex format.
         @remarks
-            vertexData->vertexDeclaration is modified and vertexData->vertexBufferBinding
-            is destroyed. Caller must reallocate the vertex buffer filled with the returned
-            pointer
+            Final work is delegated to the generic overload.
         @param halfPos
             @See Mesh::importV1
         @param halfTexCoords
@@ -168,15 +239,58 @@ namespace Ogre {
         @param qTangents
             @See Mesh::importV1
         @param outVertexElements [out]
-            Description of the buffer in the new Vao system. Matches the same as
-            vertexData->vertexDeclaration, provided as out param as convenience.
-            Can be null.
+            Description of the buffer in the new v2 system.
         @return
             Buffer pointer with reorganized data.
             Caller MUST free the pointer with OGRE_FREE_SIMD( MEMCATEGORY_GEOMETRY ).
         */
-        char* arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
-                                bool qTangents, VertexElement2Vec *outVertexElements );
+        static char* _arrangeEfficient( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords,
+                                        bool qTangents, VertexElement2Vec *outVertexElements,
+                                        size_t vaoPassIdx );
+
+        /** Generic form that does the actual job for both v1 and v2 objects. Takes
+            an array of pointers to source each vertex element, and returns a
+            pointer with the valid data.
+        @param srcData
+            Array that points to the source data for every vertex element.
+            VES_TANGENT and VES_BINORMAL must be at the end if converting
+            to QTangents. The pointer in SourceData::data must already
+            be offsetted.
+        @param vertexElements
+            The vertex format we're converting to.
+        @param vertexCount
+            Number of vertices
+        @return
+            Buffer pointer with reorganized data.
+        static char* _arrangeEfficient( SourceDataArray srcData,
+            Caller MUST free the pointer with OGRE_FREE_SIMD( MEMCATEGORY_GEOMETRY ).
+        */
+        static char* _arrangeEfficient( SourceDataArray srcData,
+                                        const VertexElement2Vec &vertexElements,
+                                        uint32 vertexCount );
+
+        /** Generic form that does the actual job for both v1 and v2 objects
+            @see dearrangeEfficientToInefficient.
+        @param srcData
+            Single pointer with interleaved data.
+        @param numElements
+            Number of vertices.
+        @param vertexElements
+            Vertex format of the original vertex buffer.
+        @param outVertexElements [out]
+            Vertex format of the new converted vertex buffer.
+        @return
+            Pointer to the decompressed/dearranged data, interleaved in a single buffer.
+        */
+        static char* _dearrangeEfficient( char const * RESTRICT_ALIAS srcData, uint32 numElements,
+                                          const VertexElement2Vec &vertexElements,
+                                          VertexElement2Vec *outVertexElements );
+
+        static void destroyVaos( VertexArrayObjectArray &vaos, VaoManager *vaoManager,
+                                 bool destroyIndexBuffer = true );
+
+    protected:
+        void destroyShadowMappingVaos(void);
     };
     /** @} */
     /** @} */

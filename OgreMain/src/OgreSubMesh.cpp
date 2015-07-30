@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreMaterialManager.h"
 #include "OgreHardwareBufferManager.h"
+#include "OgreSubMesh2.h"
 
 #include "Vao/OgreVaoManager.h"
 
@@ -42,7 +43,6 @@ namespace v1 {
         : useSharedVertices(true)
         , renderOpMeshIndex(++RenderOperation::MeshIndexId)
         , operationType(RenderOperation::OT_TRIANGLE_LIST)
-        , vertexData(0)
         , parent(0)
         , mMatInitialised(false)
         , mBoneAssignmentsOutOfDate(false)
@@ -50,16 +50,26 @@ namespace v1 {
         , mVertexAnimationIncludesNormals(false)
         , mBuildEdgesEnabled(true)
     {
-        indexData = OGRE_NEW IndexData();
+        memset( vertexData, 0, sizeof(vertexData) );
+
+        indexData[0] = OGRE_NEW IndexData();
+        indexData[1] = 0;
     }
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
     {
         removeLodLevels();
-        OGRE_DELETE vertexData;
-        OGRE_DELETE indexData;
 
-        removeLodLevels();
+        if( vertexData[1] == vertexData[0] )
+            vertexData[1] = 0;
+        if( indexData[1] == indexData[0] )
+            indexData[1] = 0;
+
+        for( size_t i=0; i<2; ++i )
+        {
+            OGRE_DELETE vertexData[i];
+            OGRE_DELETE indexData[i];
+        }
     }
 
     //-----------------------------------------------------------------------
@@ -80,22 +90,22 @@ namespace v1 {
 
     }
     //-----------------------------------------------------------------------
-    void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex)
+    void SubMesh::_getRenderOperation(RenderOperation& ro, ushort lodIndex, bool casterPass)
     {
-        assert( !lodIndex || (lodIndex - 1) < (ushort)mLodFaceList.size() );
+        assert( !lodIndex || (lodIndex - 1) < (ushort)mLodFaceList[casterPass].size() );
 
-        ro.useIndexes = indexData->indexCount != 0;
+        ro.useIndexes = indexData[casterPass]->indexCount != 0;
         if (lodIndex > 0)
         {
             // lodIndex - 1 because we don't store full detail version in mLodFaceList
-            ro.indexData = mLodFaceList[lodIndex-1];
+            ro.indexData = mLodFaceList[casterPass][lodIndex-1];
         }
         else
         {
-            ro.indexData = indexData;
+            ro.indexData = indexData[casterPass];
         }
         ro.operationType = operationType;
-        ro.vertexData = useSharedVertices? parent->sharedVertexData : vertexData;
+        ro.vertexData = useSharedVertices? parent->sharedVertexData[casterPass] : vertexData[casterPass];
         ro.meshIndex = renderOpMeshIndex;
     }
     //-----------------------------------------------------------------------
@@ -121,12 +131,12 @@ namespace v1 {
     void SubMesh::_compileBoneAssignments(void)
     {
         unsigned short maxBones =
-            parent->_rationaliseBoneAssignments(vertexData->vertexCount, mBoneAssignments);
+            parent->_rationaliseBoneAssignments(vertexData[0]->vertexCount, mBoneAssignments);
 
         if (maxBones != 0)
         {
-            parent->compileBoneAssignments(mBoneAssignments, maxBones, 
-                blendIndexToBoneIndexMap, vertexData);
+            parent->compileBoneAssignments(mBoneAssignments, maxBones,
+                blendIndexToBoneIndexMap, vertexData[0]);
         }
 
         mBoneAssignmentsOutOfDate = false;
@@ -218,15 +228,22 @@ namespace v1 {
     //---------------------------------------------------------------------
     void SubMesh::removeLodLevels(void)
     {
-        LODFaceList::iterator lodi, lodend;
-        lodend = mLodFaceList.end();
-        for (lodi = mLodFaceList.begin(); lodi != lodend; ++lodi)
-        {
-            OGRE_DELETE *lodi;
-        }
+        if( !parent->hasIndependentShadowMappingBuffers() )
+            mLodFaceList[1].clear();
 
-        mLodFaceList.clear();
+        removeLodLevel( mLodFaceList[1] );
+        removeLodLevel( mLodFaceList[0] );
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::removeLodLevel( LODFaceList &lodList )
+    {
+        LODFaceList::const_iterator itor = lodList.begin();
+        LODFaceList::const_iterator end  = lodList.end();
 
+        while( itor != end )
+            OGRE_DELETE *itor++;
+
+        lodList.clear();
     }
     //---------------------------------------------------------------------
     VertexAnimationType SubMesh::getVertexAnimationType(void) const
@@ -331,7 +348,7 @@ namespace v1 {
          */
 
         VertexData *vert = useSharedVertices ?
-            parent->sharedVertexData : vertexData;
+            parent->sharedVertexData[0] : vertexData[0];
         const VertexElement *poselem = vert->vertexDeclaration->
             findElementBySemantic (VES_POSITION);
         HardwareVertexBufferSharedPtr vbuf = vert->vertexBufferBinding->
@@ -345,27 +362,27 @@ namespace v1 {
         // First of all, find min and max bounding box of the submesh
         boxes.push_back (Cluster ());
 
-        if (indexData->indexCount > 0)
+        if (indexData[0]->indexCount > 0)
         {
 
-            uint elsz = indexData->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
+            uint elsz = indexData[0]->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
                 4 : 2;
-            uint8 *idata = (uint8 *)indexData->indexBuffer->lock (
-                indexData->indexStart * elsz, indexData->indexCount * elsz,
+            uint8 *idata = (uint8 *)indexData[0]->indexBuffer->lock (
+                indexData[0]->indexStart * elsz, indexData[0]->indexCount * elsz,
                 HardwareIndexBuffer::HBL_READ_ONLY);
 
-            for (size_t i = 0; i < indexData->indexCount; i++)
+            for (size_t i = 0; i < indexData[0]->indexCount; i++)
             {
                 int idx = (elsz == 2) ? ((uint16 *)idata) [i] : ((uint32 *)idata) [i];
                 boxes [0].mIndices.insert (idx);
             }
-            indexData->indexBuffer->unlock ();
+            indexData[0]->indexBuffer->unlock ();
 
         }
         else
         {
             // just insert all indexes
-            for (size_t i = vertexData->vertexStart; i < vertexData->vertexCount; i++)
+            for (size_t i = vertexData[0]->vertexStart; i < vertexData[0]->vertexCount; i++)
             {
                 boxes [0].mIndices.insert (static_cast<int>(i));
             }
@@ -481,14 +498,29 @@ namespace v1 {
         if (!this->useSharedVertices)
         {
             // Copy unique vertex data
-            newSub->vertexData = this->vertexData->clone();
+            newSub->vertexData[0] = this->vertexData[0]->clone();
+
+            if( this->vertexData[0] == this->vertexData[1] )
+                newSub->vertexData[0] = newSub->vertexData[1];
+            else
+                newSub->vertexData[1] = this->vertexData[1]->clone();
+
             // Copy unique index map
             newSub->blendIndexToBoneIndexMap = this->blendIndexToBoneIndexMap;
         }
 
         // Copy index data
-        OGRE_DELETE newSub->indexData;
-        newSub->indexData = this->indexData->clone();
+        if( newSub->indexData[0] == newSub->indexData[1] )
+            newSub->indexData[1] = 0;
+        OGRE_DELETE newSub->indexData[0];
+        OGRE_DELETE newSub->indexData[1];
+        newSub->indexData[0] = this->indexData[0]->clone();
+
+        if( this->indexData[0] == this->indexData[1] )
+            newSub->indexData[0] = newSub->indexData[1];
+        else
+            newSub->indexData[1] = this->indexData[1]->clone();
+
         // Copy any bone assignments
         newSub->mBoneAssignments = this->mBoneAssignments;
         newSub->mBoneAssignmentsOutOfDate = this->mBoneAssignmentsOutOfDate;
@@ -496,27 +528,60 @@ namespace v1 {
         newSub->mTextureAliases = this->mTextureAliases;
 
         // Copy lod face lists
-        newSub->mLodFaceList.reserve(this->mLodFaceList.size());
-        SubMesh::LODFaceList::const_iterator facei;
-        for (facei = this->mLodFaceList.begin(); facei != this->mLodFaceList.end(); ++facei) {
-            IndexData* newIndexData = (*facei)->clone();
-            newSub->mLodFaceList.push_back(newIndexData);
+        newSub->mLodFaceList[0].reserve( this->mLodFaceList[0].size() );
+        newSub->mLodFaceList[1].reserve( this->mLodFaceList[1].size() );
+
+        assert( this->mLodFaceList[0].size() == this->mLodFaceList[1].size() );
+
+        for( size_t i=0; i<this->mLodFaceList[0].size(); ++i )
+        {
+            IndexData* newIndexData = this->mLodFaceList[0][i]->clone();
+            newSub->mLodFaceList[0].push_back( newIndexData );
+
+            if( this->mLodFaceList[0][i] == this->mLodFaceList[1][i] )
+            {
+                newSub->mLodFaceList[1].push_back( newIndexData );
+            }
+            else
+            {
+                newIndexData = this->mLodFaceList[1][i]->clone();
+                newSub->mLodFaceList[1].push_back( newIndexData );
+            }
         }
+
         return newSub;
     }
     //---------------------------------------------------------------------
-    void SubMesh::arrangeEfficientForOldInterface( bool halfPos, bool halfTexCoords )
+    void SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
     {
-        char *data = arrangeEfficient( halfPos, halfTexCoords, 0 );
+        assert( !useSharedVertices );
+        arrangeEfficient( halfPos, halfTexCoords, qTangents, 0 );
 
-        HardwareBufferManagerBase *hwManager = vertexData->_getHardwareBufferManager();
-        vertexData->vertexBufferBinding = hwManager->createVertexBufferBinding();
+        if( parent->hasIndependentShadowMappingBuffers() )
+            arrangeEfficient( halfPos, halfTexCoords, qTangents, 1 );
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents, size_t vaoPassIdx )
+    {
+        char *data = 0;
+        {
+            VertexElement2Vec vertexElements;
+            data = Ogre::SubMesh::_arrangeEfficient( this, halfPos, halfTexCoords, qTangents,
+                                                     &vertexElements, vaoPassIdx );
+
+            //Recreate the vertex declaration
+            vertexData[vaoPassIdx]->vertexDeclaration->convertFromV2( vertexElements );
+        }
+
+        HardwareBufferManagerBase *hwManager = vertexData[vaoPassIdx]->_getHardwareBufferManager();
         HardwareVertexBufferSharedPtr vbuf = hwManager->createVertexBuffer(
-                                                vertexData->vertexDeclaration->getVertexSize( 0 ),
-                                                vertexData->vertexCount,
+                                                vertexData[vaoPassIdx]->
+                                                    vertexDeclaration->getVertexSize( 0 ),
+                                                vertexData[vaoPassIdx]->vertexCount,
                                                 parent->mVertexBufferUsage,
                                                 parent->mVertexBufferShadowBuffer );
-        vertexData->vertexBufferBinding->setBinding( 0, vbuf );
+        vertexData[vaoPassIdx]->vertexBufferBinding->unsetAllBindings();
+        vertexData[vaoPassIdx]->vertexBufferBinding->setBinding( 0, vbuf );
 
         void *dstBuffer = vbuf->lock( HardwareBuffer::HBL_DISCARD );
         memcpy( dstBuffer, data, vbuf->getSizeInBytes() );
@@ -525,262 +590,46 @@ namespace v1 {
         OGRE_FREE_SIMD( data, MEMCATEGORY_GEOMETRY );
     }
     //---------------------------------------------------------------------
-    bool sortVertexElementsBySemantic2( const VertexElement2 &l, const VertexElement2 &r )
+    void SubMesh::dearrangeToInefficient(void)
     {
-        return l.mSemantic < r.mSemantic;
-    }
-    bool sortVertexElementsBySemantic( const VertexElement &l, const VertexElement &r )
-    {
-        if( l.getSemantic() == r.getSemantic() )
-            return l.getIndex() < r.getIndex();
+        assert( !useSharedVertices );
 
-        return l.getSemantic() < r.getSemantic();
-    }
+        const uint8 numVaoPasses = parent->hasIndependentShadowMappingBuffers() + 1;
 
-    char* SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords,
-                                     VertexElement2Vec *outVertexElements )
-    {
-        typedef FastArray<VertexElement> VertexElementArray;
-
-        VertexElement2Vec vertexElements;
-        VertexElementArray srcElements;
-        bool hasTangents = false;
-
-        VertexElement const *tangentElement  = 0;
-        VertexElement const *binormalElement = 0;
-
+        for( uint8 i=0; i<numVaoPasses; ++i )
         {
-            //Get an AZDO-friendly vertex declaration out of the original declaration.
-            const VertexDeclaration::VertexElementList &origElements = vertexData->vertexDeclaration->
-                                                                                        getElements();
-            srcElements.reserve( origElements.size() );
-            VertexDeclaration::VertexElementList::const_iterator itor = origElements.begin();
-            VertexDeclaration::VertexElementList::const_iterator end  = origElements.end();
+            VertexElement2VecVec vertexElements = vertexData[i]->vertexDeclaration->convertToV2();
+            VertexElement2VecVec newDeclaration;
+            newDeclaration.resize( vertexData[i]->vertexDeclaration->getMaxSource()+1 );
 
-            while( itor != end )
+            for( size_t j=0; j<vertexData[i]->vertexDeclaration->getMaxSource()+1; ++j )
             {
-                const VertexElement &origElement = *itor;
+                const HardwareVertexBufferSharedPtr &vertexBuffer = vertexData[i]->
+                                                                vertexBufferBinding->getBuffer( j );
 
-                if( origElement.getSemantic() == VES_TANGENT ||
-                    origElement.getSemantic() == VES_BINORMAL )
-                {
-                    hasTangents = true;
-                    if( origElement.getSemantic() == VES_TANGENT )
-                        tangentElement = &origElement;
-                    else
-                        binormalElement = &origElement;
-                }
-                else
-                {
-                    vertexElements.push_back( VertexElement2( origElement.getType(),
-                                                              origElement.getSemantic() ) );
-                    srcElements.push_back( *itor );
-                }
+                const char *data = reinterpret_cast<const char*>( vertexBuffer->lock( HardwareBuffer::
+                                                                                      HBL_READ_ONLY ) );
 
-                if( origElement.getBaseType( origElement.getType() ) != VET_FLOAT1 )
-                {
-                    //We can't convert to half if it wasn't in floating point
-                    if( origElement.getSemantic() == VES_POSITION )
-                        halfPos = false;
-                    else if( origElement.getSemantic() == VES_TEXTURE_COORDINATES )
-                        halfTexCoords = false;
-                }
-                else if( origElement.getSemantic() == VES_POSITION )
-                {
-                    //All attributes must be aligned at least to 4 bytes.
-                    VertexElement2 &lastInserted = vertexElements.back();
-                    lastInserted.mType = VET_HALF4;
-                }
+                char *newData = Ogre::SubMesh::_dearrangeEfficient( data, vertexData[i]->vertexCount,
+                                                                    vertexElements[j],
+                                                                    &newDeclaration[j] );
+                vertexBuffer->unlock();
 
-                ++itor;
+                HardwareBufferManagerBase *hwManager = vertexData[i]->_getHardwareBufferManager();
+                HardwareVertexBufferSharedPtr vbuf = hwManager->createVertexBuffer(
+                                                        vertexData[i]->
+                                                            vertexDeclaration->getVertexSize( j ),
+                                                        vertexData[i]->vertexCount,
+                                                        parent->mVertexBufferUsage,
+                                                        parent->mVertexBufferShadowBuffer );
+                void *dstBuffer = vbuf->lock( HardwareBuffer::HBL_DISCARD );
+                memcpy( dstBuffer, newData, vbuf->getSizeInBytes() );
+                vbuf->unlock();
+                vertexData[i]->vertexBufferBinding->setBinding( j, vbuf );
             }
 
-            //If it has tangents, prepare the normal to hold QTangents.
-            if( hasTangents == true )
-            {
-                VertexElement2Vec::iterator it = std::find( vertexElements.begin(),
-                                                            vertexElements.end(),
-                                                            VertexElement2( VET_FLOAT3,
-                                                                            VES_NORMAL ) );
-                if( it != vertexElements.end() )
-                    it->mType = VET_SHORT4;
-            }
+            vertexData[i]->vertexDeclaration->convertFromV2( newDeclaration );
         }
-
-        std::sort( vertexElements.begin(), vertexElements.end(), sortVertexElementsBySemantic2 );
-        std::sort( srcElements.begin(), srcElements.end(), sortVertexElementsBySemantic );
-
-        //Prepare for the transfer between buffers.
-        size_t vertexSize = VaoManager::calculateVertexSize( vertexElements );
-        char *data = static_cast<char*>( OGRE_MALLOC_SIMD( vertexSize * vertexData->vertexCount,
-                                                           MEMCATEGORY_GEOMETRY ) );
-
-        FastArray<char*> srcPtrs;
-        FastArray<size_t> vertexBuffSizes;
-        srcPtrs.reserve( vertexData->vertexBufferBinding->getBufferCount() );
-        for( size_t i=0; i<vertexData->vertexBufferBinding->getBufferCount(); ++i )
-        {
-            const HardwareVertexBufferSharedPtr &vBuffer = vertexData->vertexBufferBinding->
-                                                                                getBuffer( i );
-            srcPtrs.push_back( static_cast<char*>( vBuffer->lock( HardwareBuffer::HBL_READ_ONLY ) ) );
-            vertexBuffSizes.push_back( vBuffer->getVertexSize() );
-        }
-
-        //Perform the transfer. Note that vertexElements & srcElements do not match.
-        //As vertexElements is modified for smaller types and may include padding
-        //for alignment reasons.
-        for( size_t i=0; i<vertexData->vertexCount; ++i )
-        {
-            size_t acumOffset = 0;
-            VertexElement2Vec::const_iterator itor = vertexElements.begin();
-            VertexElement2Vec::const_iterator end  = vertexElements.end();
-            VertexElementArray::const_iterator itSrc = srcElements.begin();
-
-            while( itor != end )
-            {
-                const VertexElement2 &vElement = *itor;
-                size_t veSize = VertexElement::getTypeSize( itSrc->getType() );
-
-                if( (halfPos && vElement.mSemantic == VES_POSITION) ||
-                    (halfTexCoords && vElement.mSemantic == VES_TEXTURE_COORDINATES) )
-                {
-                    //Convert float to half.
-                    float fpData[4];
-                    fpData[0] = fpData[1] = fpData[2] = 0.0f;
-                    fpData[3] = 1.0f;
-                    memcpy( fpData, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), veSize );
-
-                    for( size_t j=0; j<VertexElement::getTypeCount( vElement.mType ); ++j )
-                    {
-                        *reinterpret_cast<uint16*>(data + acumOffset + j) =
-                                                            Bitwise::floatToHalf( fpData[j] );
-                    }
-                }
-                else if( vElement.mSemantic == VES_NORMAL && hasTangents &&
-                         vElement.mType == VET_FLOAT3 )
-                {
-                    //Convert TBN matrix (between 6 to 9 floats, 24-36 bytes)
-                    //to a QTangent (4 shorts, 8 bytes)
-                    assert( veSize == sizeof(float) * 3 );
-                    assert( tangentElement->getSize() < sizeof(float) * 4 &&
-                            tangentElement->getSize() >= sizeof(float) * 3 );
-
-                    float normal[3];
-                    float tangent[4];
-                    tangent[3] = 1.0f;
-                    memcpy( normal, srcPtrs[itSrc->getSource()] + itSrc->getOffset(), veSize );
-                    memcpy( tangent,
-                            srcPtrs[tangentElement->getSource()] + tangentElement->getOffset(),
-                            tangentElement->getSize() );
-
-                    Vector3 vNormal( normal[0], normal[1], normal[2] );
-                    Vector3 vTangent( tangent[0], tangent[1], tangent[2] );
-
-                    if( binormalElement )
-                    {
-                        assert( binormalElement->getSize() == sizeof(float) * 3 );
-                        float binormal[3];
-                        memcpy( binormal,
-                                srcPtrs[binormalElement->getSource()] + binormalElement->getOffset(),
-                                binormalElement->getSize() );
-
-                        Vector3 vBinormal( binormal[0], binormal[1], binormal[2] );
-
-                        //It is reflected.
-                        Vector3 naturalBinormal = vTangent.crossProduct( vNormal );
-                        if( naturalBinormal.dotProduct( vBinormal ) <= 0 )
-                            tangent[3] = -1.0f;
-                    }
-
-                    Matrix3 tbn;
-                    tbn.SetColumn( 0, vNormal );
-                    tbn.SetColumn( 1, vTangent );
-                    tbn.SetColumn( 2, vTangent.crossProduct( vNormal ) );
-
-                    //See Spherical Skinning with Dual-Quaternions and QTangents,
-                    //Ivo Zoltan Frey, SIGRAPH 2011 Vancounver.
-                    //http://www.crytek.com/download/izfrey_siggraph2011.ppt
-
-                    Quaternion qTangent( tbn );
-                    qTangent.normalise();
-
-                    //Bias = 1 / [2^(bits-1) - 1]
-                    const Real bias = 1.0f / 32767.0f;
-
-                    //Make sure QTangent is always positive
-                    //Because '-0' sign information is lost when using integers,
-                    //we need to apply a "bias"; while making sure the Quatenion
-                    //stays normalized.
-                    //if( qTangent.w < 0 )
-                    //  qTangent = -qTangent;
-                    if( qTangent.w < bias )
-                    {
-                        Real normFactor = Math::Sqrt( 1 - bias * bias );
-                        qTangent.w = bias;
-                        qTangent.x *= normFactor;
-                        qTangent.y *= normFactor;
-                        qTangent.z *= normFactor;
-                    }
-
-                    //Now negate if we require reflection
-                    if( tangent[3] < 0 )
-                        qTangent = -qTangent;
-
-                    uint16 *dstData16 = reinterpret_cast<uint16*>(data + acumOffset);
-
-                    dstData16[0] = (uint16)Math::Clamp( qTangent.w * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[1] = (uint16)Math::Clamp( qTangent.x * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[2] = (uint16)Math::Clamp( qTangent.y * 32767.0f, -32768.0f, 32767.0f );
-                    dstData16[3] = (uint16)Math::Clamp( qTangent.z * 32767.0f, -32768.0f, 32767.0f );
-                }
-                else
-                {
-                    //Raw. Transfer as is.
-                    memcpy( data + acumOffset,
-                            srcPtrs[itSrc->getSource()] + itSrc->getOffset(),
-                            veSize );
-                }
-
-                acumOffset += veSize;
-                ++itor;
-            }
-
-            data += vertexSize;
-            for( size_t j=0; j<srcPtrs.size(); ++j )
-                srcPtrs[j] += vertexBuffSizes[j];
-        }
-
-        //Cleanup
-        for( size_t i=0; i<vertexData->vertexBufferBinding->getBufferCount(); ++i )
-            vertexData->vertexBufferBinding->getBuffer( i )->unlock();
-
-        HardwareBufferManagerBase *hwManager = vertexData->_getHardwareBufferManager();
-        hwManager->destroyVertexBufferBinding( vertexData->vertexBufferBinding );
-        vertexData->vertexBufferBinding = 0;
-
-        {
-            //Recreate the vertex declaration
-            vertexData->vertexDeclaration->removeAllElements();
-
-            size_t acumOffset = 0;
-            unsigned short repeatCounts[VES_COUNT];
-            memset( repeatCounts, 0, sizeof( repeatCounts ) );
-            VertexElement2Vec::const_iterator itor = vertexElements.begin();
-            VertexElement2Vec::const_iterator end  = vertexElements.end();
-
-            while( itor != end )
-            {
-                vertexData->vertexDeclaration->addElement( 0, acumOffset, itor->mType, itor->mSemantic,
-                                                           repeatCounts[itor->mSemantic-1]++ );
-                acumOffset += VertexElement::getTypeSize( itor->mType );
-                ++itor;
-            }
-        }
-
-        if( outVertexElements )
-            outVertexElements->swap( vertexElements );
-
-        return data;
     }
 }
 }

@@ -75,8 +75,8 @@ namespace Ogre
     {
         VaoManager *vaoManager = mManager->getDestinationRenderSystem()->getVaoManager();
 
-        VertexArrayObjectArray::const_iterator itor = mVaoPerLod.begin();
-        VertexArrayObjectArray::const_iterator end  = mVaoPerLod.end();
+        VertexArrayObjectArray::const_iterator itor = mVaoPerLod[0].begin();
+        VertexArrayObjectArray::const_iterator end  = mVaoPerLod[0].end();
         while( itor != end )
         {
             VertexArrayObject *vao = *itor;
@@ -175,7 +175,12 @@ namespace Ogre
         Ogre::VertexArrayObject *vao = vaoManager->createVertexArrayObject(
                     vertexBuffers, indexBuffer, v1::RenderOperation::OT_TRIANGLE_LIST );
 
-        mVaoPerLod.push_back( vao );
+        mVaoPerLod[0].push_back( vao );
+        //Use the same geometry for shadow casting. You can optimize performance by creating
+        //a different Vao that only uses VES_POSITION, VES_BLEND_INDICES & VES_BLEND_WEIGHTS
+        //(packed together to fit the caches) and avoids duplicated vertices (usually
+        //needed by normals, UVs, etc)
+        mVaoPerLod[1].push_back( vao );
     }
     //-----------------------------------------------------------------------------------
     const String& MyCustomRenderable::getMovableType(void) const
@@ -188,7 +193,7 @@ namespace Ogre
         return this->queryLights(); //Return the data from our MovableObject base class.
     }
     //-----------------------------------------------------------------------------------
-    void MyCustomRenderable::getRenderOperation( v1::RenderOperation& op )
+    void MyCustomRenderable::getRenderOperation( v1::RenderOperation& op , bool casterPass )
     {
         OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
                         "MyCustomRenderable do not implement getRenderOperation."

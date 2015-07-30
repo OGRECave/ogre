@@ -290,7 +290,7 @@ namespace Ogre
             
             // Renderable overrides
             /** @copydoc Renderable::getRenderOperation. */
-            virtual void getRenderOperation(v1::RenderOperation& op) OGRE_OVERRIDE;
+            virtual void getRenderOperation(v1::RenderOperation& op, bool casterPass) OGRE_OVERRIDE;
             /** @copydoc Renderable::getWorldTransforms. */
             virtual void getWorldTransforms(Matrix4* xform) const OGRE_OVERRIDE;
             /** @copydoc Renderable::getLights. */

@@ -57,7 +57,8 @@ namespace Ogre
     typename VectorSet<T, S>::iterator VectorSet<T, S>::add(const T& item)
     {
         iterator it = find(item);
-        if (it == this->end()) {
+        if (it == this->end())
+        {
             this->push_back(item);
             return this->end();
         }
@@ -76,10 +77,13 @@ namespace Ogre
     bool VectorSet<T, S>::remove(const T& item)
     {
         iterator it = find(item);
-        if (it != this->end()) {
+        if (it != this->end())
+        {
             remove(it);
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }

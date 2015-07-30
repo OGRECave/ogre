@@ -78,16 +78,20 @@ namespace v1 {
         RenderOperation::OperationType operationType;
 
         /** Dedicated vertex data (only valid if useSharedVertices = false).
+            [0] is for the regular pass, [1] is for the caster. Note that
+            vertexData[0] = vertexData[1] is possible, but if one
+            submesh has vertexData[0] = vertexData[1], then all submeshes in the mesh
+            must have vertexData[0] = vertexData[1] as well for the sake of simplicity.
             @remarks
                 This data is completely owned by this submesh.
             @par
                 The use of shared or non-shared buffers is determined when
                 model data is converted to the OGRE .mesh format.
         */
-        VertexData *vertexData;
+        VertexData *vertexData[2];
 
         /// Face index data
-        IndexData *indexData;
+        IndexData *indexData[2];
 
         /** Dedicated index map for translate blend index to bone index (only valid if useSharedVertices = false).
             @remarks
@@ -112,7 +116,7 @@ namespace v1 {
         IndexMap blendIndexToBoneIndexMap;
 
         typedef vector<IndexData*>::type LODFaceList;
-        LODFaceList mLodFaceList;
+        LODFaceList mLodFaceList[2];
 
         /** A list of extreme points on the submesh (optional).
             @remarks
@@ -152,7 +156,7 @@ namespace v1 {
             @param
                 lodIndex The index of the LOD to use. 
         */
-        void _getRenderOperation(RenderOperation& rend, ushort lodIndex = 0);
+        void _getRenderOperation(RenderOperation& rend, ushort lodIndex, bool casterPass);
 
         /** Assigns a vertex to a bone with a given weight, for skeletal animation. 
         @remarks    
@@ -264,8 +268,13 @@ namespace v1 {
          */
         SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
-        /// @See arrangeEfficient
-        void arrangeEfficientForOldInterface( bool halfPos, bool halfTexCoords );
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
+
+        void dearrangeToInefficient(void);
+
+    protected:
+        /// @See v1::Mesh::arrangeEfficient
+        void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents, size_t vaoPassIdx );
 
     protected:
 
@@ -294,6 +303,8 @@ namespace v1 {
 
         /// Internal method for removing LOD data
         void removeLodLevels(void);
+
+        static void removeLodLevel( LODFaceList &lodList );
 
         /** Rearranges the buffers to be efficiently rendered in Ogre 2.0 with Hlms
         @remarks

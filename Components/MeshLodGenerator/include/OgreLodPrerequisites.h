@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    // forward decls
+// forward decls
     class LodCollapseCost;
     class LodCollapseCostCurvature;
     class LodCollapseCostOutside;
@@ -88,6 +88,6 @@ namespace Ogre
 #   define _OgreLodExport __attribute__ ((visibility("default")))
 #else
 #   define _OgreLodExport
-#endif 
+#endif
 
-#endif 
+#endif

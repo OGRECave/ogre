@@ -29,7 +29,7 @@ float3 main
 	float3 vSample = rt0.Sample( samplerBilinear, uv ).xyz;
 	vSample.xyz *= fInvLumAvg;
 	
-	float3 w = clamp( (vSample.xyz - brightThreshold.xxx) * brightThreshold.yyy, 0, 1 );
+	float3 w = saturate( (vSample.xyz - brightThreshold.xxx) * brightThreshold.yyy );
 	vSample.xyz *= w * w * (3.0 - 2.0 * w);
 
 	//We use RGB10 format which doesn't natively support sRGB, so we use a cheap approximation (gamma = 2)

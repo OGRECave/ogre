@@ -37,34 +37,40 @@ namespace Ogre
         mMesh = mesh;
         fallback = new LodOutputProviderBuffer(mesh);
     }
-    void LodOutputProviderCompressedBuffer::bakeFirstPass(LodData* data, int lodIndex) {
+    void LodOutputProviderCompressedBuffer::bakeFirstPass(LodData* data, int lodIndex)
+    {
         unsigned short submeshCount = data->mIndexBufferInfoList.size();
         assert(mTriangleCacheList.size() == data->mTriangleList.size());
         mLastIndexBufferID = lodIndex;
 
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        for (unsigned short i = 0; i < submeshCount; i++)
+        {
             data->mIndexBufferInfoList[i].prevIndexCount = data->mIndexBufferInfoList[i].indexCount;
             data->mIndexBufferInfoList[i].prevOnlyIndexCount = 0;
         }
 
         size_t triangleCount = mTriangleCacheList.size();
-        for (size_t i = 0; i < triangleCount; i++) {
+        for (size_t i = 0; i < triangleCount; i++)
+        {
             mTriangleCacheList[i].vertexChanged = false;
-            if (!data->mTriangleList[i].isRemoved) {
+            if (!data->mTriangleList[i].isRemoved)
+            {
                 mTriangleCacheList[i].vertexID[0] = data->mTriangleList[i].vertexID[0];
                 mTriangleCacheList[i].vertexID[1] = data->mTriangleList[i].vertexID[1];
                 mTriangleCacheList[i].vertexID[2] = data->mTriangleList[i].vertexID[2];
             }
         }
     }
-    void LodOutputProviderCompressedBuffer::bakeSecondPass(LodData* data, int lodIndex) {
+    void LodOutputProviderCompressedBuffer::bakeSecondPass(LodData* data, int lodIndex)
+    {
         LodOutputBuffer& buffer = static_cast<LodOutputProviderBuffer*>(fallback)->getBuffer();
         unsigned short submeshCount = data->mIndexBufferInfoList.size();
         assert(mTriangleCacheList.size() == data->mTriangleList.size());
         assert(lodIndex > mLastIndexBufferID); // Implementation limitation
 
         // Create buffers.
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        for (unsigned short i = 0; i < submeshCount; i++)
+        {
             vector<LodIndexBuffer>::type& lods = buffer.submesh[i].genIndexBuffers;
             lods.reserve(lods.size() + 2);
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount;
@@ -86,7 +92,8 @@ namespace Ogre
             data->mIndexBufferInfoList[i].buf.pshort = (unsigned short*)prevLod.indexBuffer.get();
 
             //Check if we should fill it with a "dummy" triangle.
-            if (indexCount == 3) {
+            if (indexCount == 3)
+            {
                 memset(data->mIndexBufferInfoList[i].buf.pshort, 0, 3 * data->mIndexBufferInfoList[i].indexSize);
             }
 
@@ -96,7 +103,8 @@ namespace Ogre
             curLod.indexCount = data->mIndexBufferInfoList[i].indexCount;
             curLod.indexBufferSize = prevLod.indexBufferSize;
             curLod.indexBuffer = prevLod.indexBuffer;
-            if(curLod.indexCount == 0){
+            if(curLod.indexCount == 0)
+            {
                 curLod.indexStart-=3;
                 curLod.indexCount=3;
             }
@@ -108,19 +116,26 @@ namespace Ogre
         // Filling will be done in 3 parts.
         // 1. prevLod only indices.
         size_t triangleCount = data->mTriangleList.size();
-        for (size_t i = 0; i < triangleCount; i++) {
-            if (mTriangleCacheList[i].vertexChanged) {
+        for (size_t i = 0; i < triangleCount; i++)
+        {
+            if (mTriangleCacheList[i].vertexChanged)
+            {
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].prevIndexCount != 0);
                 assert(mTriangleCacheList[i].vertexID[0] != mTriangleCacheList[i].vertexID[1]);
                 assert(mTriangleCacheList[i].vertexID[1] != mTriangleCacheList[i].vertexID[2]);
                 assert(mTriangleCacheList[i].vertexID[2] != mTriangleCacheList[i].vertexID[0]);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (int m = 0; m < 3; m++) {
+                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2)
+                {
+                    for (int m = 0; m < 3; m++)
+                    {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
                             static_cast<unsigned short>(mTriangleCacheList[i].vertexID[m]);
                     }
-                } else {
-                    for (int m = 0; m < 3; m++) {
+                }
+                else
+                {
+                    for (int m = 0; m < 3; m++)
+                    {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
                             static_cast<unsigned int>(mTriangleCacheList[i].vertexID[m]);
                     }
@@ -130,21 +145,28 @@ namespace Ogre
 
 
         // 2. shared indices.
-        for (size_t i = 0; i < triangleCount; i++) {
-            if (!data->mTriangleList[i].isRemoved && !mTriangleCacheList[i].vertexChanged) {
+        for (size_t i = 0; i < triangleCount; i++)
+        {
+            if (!data->mTriangleList[i].isRemoved && !mTriangleCacheList[i].vertexChanged)
+            {
                 assert(mTriangleCacheList[i].vertexID[0] == data->mTriangleList[i].vertexID[0]);
                 assert(mTriangleCacheList[i].vertexID[1] == data->mTriangleList[i].vertexID[1]);
                 assert(mTriangleCacheList[i].vertexID[2] == data->mTriangleList[i].vertexID[2]);
 
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].prevIndexCount != 0);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (int m = 0; m < 3; m++) {
+                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2)
+                {
+                    for (int m = 0; m < 3; m++)
+                    {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
                             static_cast<unsigned short>(data->mTriangleList[i].vertexID[m]);
                     }
-                } else {
-                    for (int m = 0; m < 3; m++) {
+                }
+                else
+                {
+                    for (int m = 0; m < 3; m++)
+                    {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
                             static_cast<unsigned int>(data->mTriangleList[i].vertexID[m]);
                     }
@@ -153,16 +175,23 @@ namespace Ogre
         }
 
         // 3. curLod indices only.
-        for (size_t i = 0; i < triangleCount; i++) {
-            if (!data->mTriangleList[i].isRemoved && mTriangleCacheList[i].vertexChanged) {
+        for (size_t i = 0; i < triangleCount; i++)
+        {
+            if (!data->mTriangleList[i].isRemoved && mTriangleCacheList[i].vertexChanged)
+            {
                 assert(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexCount != 0);
-                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2) {
-                    for (int m = 0; m < 3; m++) {
+                if (data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].indexSize == 2)
+                {
+                    for (int m = 0; m < 3; m++)
+                    {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pshort++) =
                             static_cast<unsigned short>(data->mTriangleList[i].vertexID[m]);
                     }
-                } else {
-                    for (int m = 0; m < 3; m++) {
+                }
+                else
+                {
+                    for (int m = 0; m < 3; m++)
+                    {
                         *(data->mIndexBufferInfoList[data->mTriangleList[i].submeshID].buf.pint++) =
                             static_cast<unsigned int>(data->mTriangleList[i].vertexID[m]);
                     }

@@ -41,24 +41,28 @@ namespace Ogre
             String tmp(argv[i]);
             if (StringUtil::startsWith(tmp, "-"))
             {
+                int indexIncrement = 0;
                 UnaryOptionList::iterator ui = unaryOptList.find(argv[i]);
                 if(ui != unaryOptList.end())
                 {
                     ui->second = true;
-                    ++startIndex;
-                    continue;
+                    indexIncrement = 1;
                 }
                 BinaryOptionList::iterator bi = binOptList.find(argv[i]);
                 if(bi != binOptList.end())
                 {
                     bi->second = argv[i+1];
-                    startIndex += 2;
+                    indexIncrement = 2;
                     ++i;
-                    continue;
                 }
 
-                // Invalid option
-                LogManager::getSingleton().logMessage("Invalid option " + tmp, LML_CRITICAL);
+                startIndex += indexIncrement;
+
+                if( !indexIncrement )
+                {
+                    // Invalid option
+                    LogManager::getSingleton().logMessage("Invalid option " + tmp, LML_CRITICAL);
+                }
 
             }
         }

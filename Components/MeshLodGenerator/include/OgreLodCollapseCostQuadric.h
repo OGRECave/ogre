@@ -38,23 +38,24 @@
 namespace Ogre
 {
 
-class _OgreLodExport LodCollapseCostQuadric :
-    public LodCollapseCost
-{
-public:
-    virtual void initCollapseCosts(LodData* data);
-    virtual void updateVertexCollapseCost(LodData* data, LodData::Vertex* vertex);
-    virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
-protected:
+    class _OgreLodExport LodCollapseCostQuadric :
+        public LodCollapseCost
+    {
+    public:
+        virtual void initCollapseCosts(LodData* data);
+        virtual void updateVertexCollapseCost(LodData* data, LodData::Vertex* vertex);
+        virtual Real computeEdgeCollapseCost(LodData* data, LodData::Vertex* src, LodData::Edge* dstEdge);
+    protected:
 
-    struct TriangleQuadricPlane {
-        Matrix4 quadric;
+        struct TriangleQuadricPlane
+        {
+            Matrix4 quadric;
+        };
+        vector<Matrix4>::type mTrianglePlaneQuadricList;
+        vector<Matrix4>::type mVertexQuadricList;
+        void computeTrianglePlaneQuadric(LodData* data, size_t triangleID);
+        void computeVertexQuadric(LodData* data, size_t vertexID);
     };
-    vector<Matrix4>::type mTrianglePlaneQuadricList;
-    vector<Matrix4>::type mVertexQuadricList;
-    void computeTrianglePlaneQuadric(LodData* data, size_t triangleID);
-    void computeVertexQuadric(LodData* data, size_t vertexID);
-};
 
 }
 #endif

@@ -300,9 +300,13 @@ namespace v1
         @note Only objects which use indexed geometry may be converted to a mesh.
         @param meshName The name to give the mesh
         @param groupName The resource group to create the mesh in
+        @param buildShadowMapBuffers
+            True to create an optimized copy of the vertex buffers for efficient
+            shadow mapping.
         */
         virtual MeshPtr convertToMesh(const String& meshName, 
-            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+            const String& groupName = ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+            bool buildShadowMapBuffers = true );
 
         /** Sets whether or not to use an 'identity' projection.
         @remarks
@@ -416,7 +420,7 @@ namespace v1
             /** @copydoc Renderable::getMaterial. */
             const MaterialPtr& getMaterial(void) const;
             /** @copydoc Renderable::getRenderOperation. */
-            void getRenderOperation(RenderOperation& op);
+            void getRenderOperation(RenderOperation& op, bool casterPass);
             /** @copydoc Renderable::getWorldTransforms. */
             void getWorldTransforms(Matrix4* xform) const;
             /** @copydoc Renderable::getSquaredViewDepth. */

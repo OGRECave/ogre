@@ -800,7 +800,8 @@ namespace v1 {
 
     }
     //-----------------------------------------------------------------------------
-    MeshPtr ManualObject::convertToMesh(const String& meshName, const String& groupName)
+    MeshPtr ManualObject::convertToMesh( const String& meshName, const String& groupName,
+                                         bool buildShadowMapBuffers )
     {
         if (mCurrentSection)
         {
@@ -826,15 +827,19 @@ namespace v1 {
             sm->operationType = rop->operationType;
             sm->setMaterialName(sec->getMaterialName(), groupName);
             // Copy vertex data; replicate buffers too
-            sm->vertexData = rop->vertexData->clone(true);
+            sm->vertexData[0] = rop->vertexData->clone(true);
             // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
 
             // check if index data is present
             if (rop->indexData)
             {
                 // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
-                OGRE_DELETE sm->indexData;
-                sm->indexData = rop->indexData->clone(true);
+                if( sm->indexData[0] == sm->indexData[1] )
+                    sm->indexData[1] = 0;
+                OGRE_DELETE sm->indexData[0];
+                OGRE_DELETE sm->indexData[1];
+                sm->indexData[0] = rop->indexData->clone(true);
+                sm->indexData[1] = sm->indexData[0];
             }
         }
         // update bounds
@@ -842,11 +847,11 @@ namespace v1 {
         m->_setBounds( AxisAlignedBox( aabb.getMinimum(), aabb.getMaximum() ) );
         m->_setBoundingSphereRadius( mObjectData.mLocalRadius[mObjectData.mIndex] );
 
+        m->prepareForShadowMapping( !buildShadowMapBuffers );
+
         m->load();
 
         return m;
-
-
     }
     //-----------------------------------------------------------------------------
     void ManualObject::setUseIdentityProjection(bool useIdentityProjection)
@@ -999,7 +1004,7 @@ namespace v1 {
         }
     }
     //-----------------------------------------------------------------------------
-    void ManualObject::ManualObjectSection::getRenderOperation(RenderOperation& op)
+    void ManualObject::ManualObjectSection::getRenderOperation(RenderOperation& op, bool casterPass)
     {
         // direct copy
         op = mRenderOperation;

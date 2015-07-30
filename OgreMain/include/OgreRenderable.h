@@ -92,7 +92,7 @@ namespace Ogre {
 
         /** Gets the render operation required to send this object to the frame buffer.
         */
-        virtual void getRenderOperation(v1::RenderOperation& op) = 0;
+        virtual void getRenderOperation(v1::RenderOperation& op, bool casterPass) = 0;
 
         /** Called just prior to the Renderable being rendered. 
         @remarks
@@ -424,7 +424,7 @@ namespace Ogre {
             mRenderSystemData = val; 
         }
 
-        const VertexArrayObjectArray& getVaos(void) const   { return mVaoPerLod; }
+        const VertexArrayObjectArray& getVaos( bool casterPass ) const  { return mVaoPerLod[casterPass]; }
 
         uint32 getHlmsHash(void) const          { return mHlmsHash; }
         uint32 getHlmsCasterHash(void) const    { return mHlmsCasterHash; }
@@ -471,7 +471,14 @@ namespace Ogre {
     protected:
         typedef map<size_t, Vector4>::type CustomParameterMap;
         CustomParameterMap mCustomParameters;
-        VertexArrayObjectArray  mVaoPerLod;
+        /// VAO to render the submesh. One per LOD level. Each LOD may or
+        /// may not share the vertex and index buffers the other levels
+        /// [0] = Used for regular rendering
+        /// [1] = Used for shadow map caster passes
+        /// Note that mVaoPerLod[1] = mVaoPerLod[0] is valid.
+        /// But if they're not exactly the same VertexArrayObject pointers,
+        /// then they won't share any pointer.
+        VertexArrayObjectArray  mVaoPerLod[2];
         uint32              mHlmsHash;
         uint32              mHlmsCasterHash;
         HlmsDatablock       *mHlmsDatablock;

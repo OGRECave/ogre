@@ -57,7 +57,7 @@ namespace v1 {
     MeshSerializerImpl::MeshSerializerImpl()
     {
         // Version number
-        mVersion = "[MeshSerializer_v1.100]";
+        mVersion = "[MeshSerializer_v2.1 R0 LEGACYV1]";
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()
@@ -125,24 +125,29 @@ namespace v1 {
             streamID = readChunk(stream);
         }
         popInnerChunk(stream);
+
+        if( !pMesh->hasValidShadowMappingBuffers() )
+            pMesh->prepareForShadowMapping( false );
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeMesh(const Mesh* pMesh)
     {
         exportedLodCount = 1; // generate edge data for original mesh
+        mNumBufferPasses = pMesh->hasIndependentShadowMappingBuffers() + 1;
 
         // Header
         writeChunkHeader(M_MESH, calcMeshSize(pMesh));
         {
-        // bool skeletallyAnimated
-        bool skelAnim = pMesh->hasSkeleton();
-        writeBools(&skelAnim, 1);
+        writeData( &mNumBufferPasses, 1, 1 ); //unsigned char numPasses
 
             pushInnerChunk(mStream);
             
         // Write shared geometry
-        if (pMesh->sharedVertexData)
-            writeGeometry(pMesh->sharedVertexData);
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
+        {
+            if (pMesh->sharedVertexData[i])
+                writeGeometry(pMesh->sharedVertexData[i]);
+        }
 
         // Write Submeshes
         for (unsigned short i = 0; i < pMesh->getNumSubMeshes(); ++i)
@@ -254,30 +259,33 @@ namespace v1 {
         // bool useSharedVertices
         writeBools(&s->useSharedVertices, 1);
 
-        unsigned int indexCount = static_cast<unsigned int>(s->indexData->indexCount);
-        writeInts(&indexCount, 1);
-
-        // bool indexes32Bit
-        bool idx32bit = (!s->indexData->indexBuffer.isNull() &&
-            s->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
-        writeBools(&idx32bit, 1);
-
-        if (indexCount > 0)
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
         {
-            // unsigned short* faceVertexIndices ((indexCount)
-            HardwareIndexBufferSharedPtr ibuf = s->indexData->indexBuffer;
-            void* pIdx = ibuf->lock(HardwareBuffer::HBL_READ_ONLY);
-            if (idx32bit)
+            unsigned int indexCount = static_cast<unsigned int>(s->indexData[i]->indexCount);
+            writeInts(&indexCount, 1);
+
+            // bool indexes32Bit
+            bool idx32bit = (!s->indexData[i]->indexBuffer.isNull() &&
+                    s->indexData[i]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+            writeBools(&idx32bit, 1);
+
+            if (indexCount > 0)
             {
-                unsigned int* pIdx32 = static_cast<unsigned int*>(pIdx);
-                writeInts(pIdx32, s->indexData->indexCount);
+                // unsigned short* faceVertexIndices ((indexCount)
+                HardwareIndexBufferSharedPtr ibuf = s->indexData[i]->indexBuffer;
+                void* pIdx = ibuf->lock(HardwareBuffer::HBL_READ_ONLY);
+                if (idx32bit)
+                {
+                    unsigned int* pIdx32 = static_cast<unsigned int*>(pIdx);
+                    writeInts(pIdx32, s->indexData[i]->indexCount);
+                }
+                else
+                {
+                    unsigned short* pIdx16 = static_cast<unsigned short*>(pIdx);
+                    writeShorts(pIdx16, s->indexData[i]->indexCount);
+                }
+                ibuf->unlock();
             }
-            else
-            {
-                unsigned short* pIdx16 = static_cast<unsigned short*>(pIdx);
-                writeShorts(pIdx16, s->indexData->indexCount);
-            }
-            ibuf->unlock();
         }
 
         pushInnerChunk(mStream);
@@ -285,7 +293,8 @@ namespace v1 {
         // M_GEOMETRY stream (Optional: present only if useSharedVertices = false)
         if (!s->useSharedVertices)
         {
-            writeGeometry(s->vertexData);
+            for( uint8 i=0; i<mNumBufferPasses; ++i )
+                writeGeometry(s->vertexData[i]);
         }
 
         // write out texture alias chunks
@@ -525,13 +534,14 @@ namespace v1 {
     {
         size_t size = MSTREAM_OVERHEAD_SIZE;
 
-        // bool hasSkeleton
-        size += sizeof(bool);
+        // bool hasSkeleton or uint8 numPasses
+        size += sizeof(uint8);
 
         // Geometry
-        if (pMesh->sharedVertexData)
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
         {
-            size += calcGeometrySize(pMesh->sharedVertexData);
+            if (pMesh->sharedVertexData[i])
+                size += calcGeometrySize(pMesh->sharedVertexData[i]);
         }
 
         // Submeshes
@@ -590,23 +600,30 @@ namespace v1 {
 
         // bool useSharedVertices
         size += sizeof(bool);
-        // unsigned int indexCount
-        size += sizeof(unsigned int);
-        // bool indexes32bit
-        size += sizeof(bool);
 
-        bool idx32bit = (!pSub->indexData->indexBuffer.isNull() &&
-            pSub->indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
-        // unsigned int* / unsigned short* faceVertexIndices
-        if (idx32bit)
-            size += sizeof(unsigned int) * pSub->indexData->indexCount;
-        else
-            size += sizeof(unsigned short) * pSub->indexData->indexCount;
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
+        {
+            // unsigned int indexCount
+            size += sizeof(unsigned int);
+            // bool indexes32bit
+            size += sizeof(bool);
+
+            bool idx32bit = (!pSub->indexData[i]->indexBuffer.isNull() &&
+                    pSub->indexData[i]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+            // unsigned int* / unsigned short* faceVertexIndices
+            if (idx32bit)
+                size += sizeof(unsigned int) * pSub->indexData[i]->indexCount;
+            else
+                size += sizeof(unsigned short) * pSub->indexData[i]->indexCount;
+        }
 
         // Geometry
-        if (!pSub->useSharedVertices)
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
         {
-            size += calcGeometrySize(pSub->vertexData);
+            if (!pSub->useSharedVertices)
+            {
+                size += calcGeometrySize(pSub->vertexData[i]);
+            }
         }
 
         size += calcSubMeshTextureAliasesSize(pSub);
@@ -899,9 +916,8 @@ namespace v1 {
         // expect them in the file or not at all
         pMesh->mAutoBuildEdgeLists = false;
 
-        // bool skeletallyAnimated
-        bool skeletallyAnimated;
-        readBools(stream, &skeletallyAnimated, 1);
+        readChar( stream, &mNumBufferPasses );
+        assert( mNumBufferPasses == 1 || mNumBufferPasses == 2 );
 
         // Find all substreams
         if (!stream->eof())
@@ -924,23 +940,31 @@ namespace v1 {
                 switch(streamID)
                 {
                 case M_GEOMETRY:
-                    pMesh->sharedVertexData = OGRE_NEW VertexData();
-                    try {
-                        readGeometry(stream, pMesh, pMesh->sharedVertexData);
-                    }
-                    catch (Exception& e)
+                    for( uint8 i=0; i<mNumBufferPasses; ++i )
                     {
-                        if (e.getNumber() == Exception::ERR_ITEM_NOT_FOUND)
-                        {
-                            // duff geometry data entry with 0 vertices
-                            OGRE_DELETE pMesh->sharedVertexData;
-                            pMesh->sharedVertexData = 0;
-                            // Skip this stream (pointer will have been returned to just after header)
-                            stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                        pMesh->sharedVertexData[i] = OGRE_NEW VertexData();
+                        try {
+                            readGeometry(stream, pMesh, pMesh->sharedVertexData[i]);
                         }
-                        else
+                        catch (Exception& e)
                         {
-                            throw;
+                            if (e.getNumber() == Exception::ERR_ITEM_NOT_FOUND)
+                            {
+                                if( pMesh->sharedVertexData[0] == pMesh->sharedVertexData[1] )
+                                    pMesh->sharedVertexData[1] = 0;
+
+                                // duff geometry data entry with 0 vertices
+                                OGRE_DELETE pMesh->sharedVertexData[0];
+                                OGRE_DELETE pMesh->sharedVertexData[1];
+                                pMesh->sharedVertexData[0] = 0;
+                                pMesh->sharedVertexData[1] = 0;
+                                // Skip this stream (pointer will have been returned to just after header)
+                                stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                            }
+                            else
+                            {
+                                throw;
+                            }
                         }
                     }
                     break;
@@ -1007,64 +1031,74 @@ namespace v1 {
         // bool useSharedVertices
         readBools(stream,&sm->useSharedVertices, 1);
 
-        sm->indexData->indexStart = 0;
-        unsigned int indexCount = 0;
-        readInts(stream, &indexCount, 1);
-        sm->indexData->indexCount = indexCount;
-
-        HardwareIndexBufferSharedPtr ibuf;
-        // bool indexes32Bit
-        bool idx32bit;
-        readBools(stream, &idx32bit, 1);
-        if (indexCount > 0)
+        for( uint8 i=0; i<mNumBufferPasses; ++i )
         {
-            if (idx32bit)
-            {
-                ibuf = HardwareBufferManager::getSingleton().
-                    createIndexBuffer(
-                        HardwareIndexBuffer::IT_32BIT,
-                        sm->indexData->indexCount,
-                        pMesh->mIndexBufferUsage,
-                        pMesh->mIndexBufferShadowBuffer);
-                // unsigned int* faceVertexIndices
-                unsigned int* pIdx = static_cast<unsigned int*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD)
-                    );
-                readInts(stream, pIdx, sm->indexData->indexCount);
-                ibuf->unlock();
+            if( !sm->indexData[i] )
+                sm->indexData[i] = OGRE_NEW IndexData();
 
-            }
-            else // 16-bit
+            sm->indexData[i]->indexStart = 0;
+            unsigned int indexCount = 0;
+            readInts(stream, &indexCount, 1);
+            sm->indexData[i]->indexCount = indexCount;
+
+            HardwareIndexBufferSharedPtr ibuf;
+            // bool indexes32Bit
+            bool idx32bit;
+            readBools(stream, &idx32bit, 1);
+            if (indexCount > 0)
             {
-                ibuf = HardwareBufferManager::getSingleton().
-                    createIndexBuffer(
-                        HardwareIndexBuffer::IT_16BIT,
-                        sm->indexData->indexCount,
-                        pMesh->mIndexBufferUsage,
-                        pMesh->mIndexBufferShadowBuffer);
-                // unsigned short* faceVertexIndices
-                unsigned short* pIdx = static_cast<unsigned short*>(
-                    ibuf->lock(HardwareBuffer::HBL_DISCARD)
-                    );
-                readShorts(stream, pIdx, sm->indexData->indexCount);
-                ibuf->unlock();
+                if (idx32bit)
+                {
+                    ibuf = HardwareBufferManager::getSingleton().
+                            createIndexBuffer(
+                                HardwareIndexBuffer::IT_32BIT,
+                                sm->indexData[i]->indexCount,
+                            pMesh->mIndexBufferUsage,
+                            pMesh->mIndexBufferShadowBuffer);
+                    // unsigned int* faceVertexIndices
+                    unsigned int* pIdx = static_cast<unsigned int*>(
+                                ibuf->lock(HardwareBuffer::HBL_DISCARD)
+                                );
+                    readInts(stream, pIdx, sm->indexData[i]->indexCount);
+                    ibuf->unlock();
+
+                }
+                else // 16-bit
+                {
+                    ibuf = HardwareBufferManager::getSingleton().
+                            createIndexBuffer(
+                                HardwareIndexBuffer::IT_16BIT,
+                                sm->indexData[i]->indexCount,
+                            pMesh->mIndexBufferUsage,
+                            pMesh->mIndexBufferShadowBuffer);
+                    // unsigned short* faceVertexIndices
+                    unsigned short* pIdx = static_cast<unsigned short*>(
+                                ibuf->lock(HardwareBuffer::HBL_DISCARD)
+                                );
+                    readShorts(stream, pIdx, sm->indexData[i]->indexCount);
+                    ibuf->unlock();
+                }
             }
+            sm->indexData[i]->indexBuffer = ibuf;
         }
-        sm->indexData->indexBuffer = ibuf;
 
         pushInnerChunk(stream);
         {
         // M_GEOMETRY stream (Optional: present only if useSharedVertices = false)
         if (!sm->useSharedVertices)
         {
-            streamID = readChunk(stream);
-            if (streamID != M_GEOMETRY)
+            for( uint8 i=0; i<mNumBufferPasses; ++i )
             {
-                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Missing geometry data in mesh file",
-                    "MeshSerializerImpl::readSubMesh");
+                streamID = readChunk(stream);
+                if (streamID != M_GEOMETRY)
+                {
+                    OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Missing geometry data in mesh file",
+                        "MeshSerializerImpl::readSubMesh");
+                }
+
+                sm->vertexData[i] = OGRE_NEW VertexData();
+                readGeometry(stream, pMesh, sm->vertexData[i]);
             }
-            sm->vertexData = OGRE_NEW VertexData();
-            readGeometry(stream, pMesh, sm->vertexData);
         }
 
 
@@ -1234,22 +1268,24 @@ namespace v1 {
         writeShorts(&exportedLodCount, 1); // unsigned short numLevels;
 
         pushInnerChunk(mStream);
-        // Loop from LOD 1 (not 0, this is full detail)
-        for (ushort i = 1; i < exportedLodCount; ++i)
+        for( size_t j=0; j<mNumBufferPasses; ++j )
         {
-            const MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
-            if (pMesh->_isManualLodLevel(i))
+            // Loop from LOD 1 (not 0, this is full detail)
+            for (ushort i = 1; i < exportedLodCount; ++i)
             {
-                writeLodUsageManual(usage);
-            }
-            else
-            {
-                writeLodUsageGenerated(pMesh, usage, i);
+                const MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
+                if (pMesh->_isManualLodLevel(i))
+                {
+                    writeLodUsageManual(usage);
+                }
+                else
+                {
+                    writeLodUsageGenerated(pMesh, usage, i, j);
+                }
             }
         }
         popInnerChunk(mStream);
     }
-
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeLodUsageManual(const MeshLodUsage& usage)
     {
@@ -1259,16 +1295,16 @@ namespace v1 {
         writeString(usage.manualName);
     }
 
-    void MeshSerializerImpl::writeLodUsageGeneratedSubmesh( const SubMesh* submesh, unsigned short lodNum )
+    void MeshSerializerImpl::writeLodUsageGeneratedSubmesh( const SubMesh* submesh, unsigned short lodNum, uint8 casterPass )
     {
-        const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        const IndexData* indexData = submesh->mLodFaceList[casterPass][lodNum-1];
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(!ibuf.isNull());
         unsigned int bufferIndex = -1;
         for(ushort i = 1; i < lodNum; i++){
             // it will check any previous Lod levels for the same buffer.
             // This will allow to use merged/shared/compressed buffers.
-            const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
+            const IndexData* prevIndexData = submesh->mLodFaceList[casterPass][i-1];
             if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
                 bufferIndex = i;
             }
@@ -1306,15 +1342,15 @@ namespace v1 {
             }
         }
     }
-    void MeshSerializerImpl::writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum)
+    void MeshSerializerImpl::writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass)
     {
-        writeChunkHeader(M_MESH_LOD_GENERATED, calcLodUsageGeneratedSize(pMesh, usage, lodNum));
+        writeChunkHeader(M_MESH_LOD_GENERATED, calcLodUsageGeneratedSize(pMesh, usage, lodNum, casterPass));
         float userValue = static_cast<float>(usage.userValue);
         writeFloats(&userValue, 1);
         for (ushort i = 0; i < pMesh->getNumSubMeshes(); i++)
         {
             SubMesh* submesh = pMesh->getSubMesh(i);
-            writeLodUsageGeneratedSubmesh(submesh, lodNum);
+            writeLodUsageGeneratedSubmesh(submesh, lodNum, casterPass);
         }
     }
     size_t MeshSerializerImpl::calcLodLevelSize(const Mesh* pMesh)
@@ -1325,17 +1361,20 @@ namespace v1 {
         size += sizeof(unsigned short); // unsigned short numLevels;
         //size += sizeof(bool); // bool manual; <== this is removed in v1_9
 
-        // Loop from LOD 1 (not 0, this is full detail)
-        for (ushort i = 1; i < exportedLodCount; ++i)
+        for( size_t j=0; j<mNumBufferPasses; ++j )
         {
-            const MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
-            if (pMesh->_isManualLodLevel(i))
+            // Loop from LOD 1 (not 0, this is full detail)
+            for (ushort i = 1; i < exportedLodCount; ++i)
             {
-                size += calcLodUsageManualSize(usage);
-            }
-            else
-            {
-                size += calcLodUsageGeneratedSize(pMesh, usage, i);
+                const MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
+                if (pMesh->_isManualLodLevel(i))
+                {
+                    size += calcLodUsageManualSize(usage);
+                }
+                else
+                {
+                    size += calcLodUsageGeneratedSize(pMesh, usage, i, j);
+                }
             }
         }
         return size;
@@ -1349,29 +1388,29 @@ namespace v1 {
         return size;
     }
 
-    size_t MeshSerializerImpl::calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum)
+    size_t MeshSerializerImpl::calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass)
     {
         size_t size = MSTREAM_OVERHEAD_SIZE;
         size += sizeof(float); // float usage.userValue;
         for (ushort i = 0; i < pMesh->getNumSubMeshes(); i++)
         {
             SubMesh* submesh = pMesh->getSubMesh(i);
-            size += calcLodUsageGeneratedSubmeshSize(submesh, lodNum);
+            size += calcLodUsageGeneratedSubmeshSize(submesh, lodNum, casterPass);
         }
         return size;
     }
-    size_t MeshSerializerImpl::calcLodUsageGeneratedSubmeshSize( const SubMesh* submesh, unsigned short lodNum )
+    size_t MeshSerializerImpl::calcLodUsageGeneratedSubmeshSize( const SubMesh* submesh, unsigned short lodNum, uint8 casterPass )
     {
         size_t size = 0;
         
-        const IndexData* indexData = submesh->mLodFaceList[lodNum-1];
+        const IndexData* indexData = submesh->mLodFaceList[casterPass][lodNum-1];
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(!ibuf.isNull());
         unsigned int bufferIndex = -1;
         for(ushort i = 1; i < lodNum; i++){
             // it will check any previous Lod levels for the same buffer.
             // This will allow to use merged/shared/compressed buffers.
-            const IndexData* prevIndexData = submesh->mLodFaceList[i-1];
+            const IndexData* prevIndexData = submesh->mLodFaceList[casterPass][i-1];
             if(prevIndexData->indexCount != 0 && prevIndexData->indexBuffer == indexData->indexBuffer){
                 bufferIndex = i;
             }
@@ -1433,6 +1472,7 @@ namespace v1 {
     }
     //---------------------------------------------------------------------
 
+    //---------------------------------------------------------------------
     void MeshSerializerImpl::readMeshLodLevel(DataStreamPtr& stream, Mesh* pMesh)
     {
 #if OGRE_NO_MESHLOD
@@ -1450,48 +1490,52 @@ namespace v1 {
         uint16 numLods;
         readShorts(stream, &numLods, 1);
         pushInnerChunk(stream);
-        for (int lodID = 1; lodID < numLods; lodID++){
-            unsigned short streamID = readChunk(stream);
-            Real usageValue;
-            readFloats(stream, &usageValue, 1);
-            switch (streamID){
-            case M_MESH_LOD_MANUAL:
+        for( uint8 j=0; j<mNumBufferPasses; ++j )
+        {
+            for (int lodID = 1; lodID < numLods; lodID++)
             {
-                                      String manualName = readString(stream);
-                                      break;
-            }
-            case M_MESH_LOD_GENERATED:
-                for (int i = 0; i < numSubs; ++i)
+                unsigned short streamID = readChunk(stream);
+                Real usageValue;
+                readFloats(stream, &usageValue, 1);
+                switch (streamID){
+                case M_MESH_LOD_MANUAL:
                 {
-                    unsigned int numIndexes;
-                    readInts(stream, &numIndexes, 1);
-
-                    unsigned int offset;
-                    readInts(stream, &offset, 1);
-
-                    // For merged buffers, you can pass the index of previous Lod.
-                    // To create buffer it should be -1.
-                    unsigned int bufferIndex;
-                    readInts(stream, &bufferIndex, 1);
-                    if (bufferIndex == (unsigned int)-1) {
-                        // generate buffers
-
-                        // bool indexes32Bit
-                        bool idx32Bit;
-                        readBools(stream, &idx32Bit, 1);
-
-                        unsigned int buffIndexCount;
-                        readInts(stream, &buffIndexCount, 1);
-
-                        size_t buffSize = buffIndexCount * (idx32Bit ? 4 : 2);
-                        stream->skip(buffSize);
-                    }
+                    String manualName = readString(stream);
+                    break;
                 }
-                break;
-            default:
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                    "Invalid Lod Usage type in " + pMesh->getName(),
-                    "MeshSerializerImpl::readMeshLodInfo");
+                case M_MESH_LOD_GENERATED:
+                    for (int i = 0; i < numSubs; ++i)
+                    {
+                        unsigned int numIndexes;
+                        readInts(stream, &numIndexes, 1);
+
+                        unsigned int offset;
+                        readInts(stream, &offset, 1);
+
+                        // For merged buffers, you can pass the index of previous Lod.
+                        // To create buffer it should be -1.
+                        unsigned int bufferIndex;
+                        readInts(stream, &bufferIndex, 1);
+                        if (bufferIndex == (unsigned int)-1) {
+                            // generate buffers
+
+                            // bool indexes32Bit
+                            bool idx32Bit;
+                            readBools(stream, &idx32Bit, 1);
+
+                            unsigned int buffIndexCount;
+                            readInts(stream, &buffIndexCount, 1);
+
+                            size_t buffSize = buffIndexCount * (idx32Bit ? 4 : 2);
+                            stream->skip(buffSize);
+                        }
+                    }
+                    break;
+                default:
+                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                        "Invalid Lod Usage type in " + pMesh->getName(),
+                        "MeshSerializerImpl::readMeshLodInfo");
+                }
             }
         }
         popInnerChunk(stream);
@@ -1509,31 +1553,39 @@ namespace v1 {
         numSubs = pMesh->getNumSubMeshes();
         for (i = 0; i < numSubs; ++i)
         {
-            SubMesh* sm = pMesh->getSubMesh(i);
-            assert(sm->mLodFaceList.empty());
-            sm->mLodFaceList.resize(pMesh->mNumLods-1);
-        }
-        pushInnerChunk(stream);
-        // lodID=0 is the original mesh. We need to skip it.
-        for(int lodID = 1; lodID < pMesh->mNumLods; lodID++){
-            // Read depth
-            MeshLodUsage& usage = pMesh->mMeshLodUsageList[lodID];
-            unsigned short streamID = readChunk(stream);
-            readFloats(stream, &(usage.userValue), 1);
-            switch(streamID){
-            case M_MESH_LOD_MANUAL:
-                readMeshLodUsageManual(stream, pMesh, lodID, usage);
-                break;
-            case M_MESH_LOD_GENERATED:
-                readMeshLodUsageGenerated(stream, pMesh, lodID, usage);
-                break;
-            default:
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Invalid Lod Usage type in " + pMesh->getName(),
-                    "MeshSerializerImpl::readMeshLodInfo");
+            for( size_t j=0; j<mNumBufferPasses; ++j )
+            {
+                SubMesh* sm = pMesh->getSubMesh(i);
+                assert(sm->mLodFaceList[j].empty());
+                sm->mLodFaceList[j].resize(pMesh->mNumLods-1);
             }
-            usage.manualMesh.setNull(); // will trigger load later with manual Lod
-            usage.edgeData = NULL;
+        }
+
+        pushInnerChunk(stream);
+        for( uint8 j=0; j<mNumBufferPasses; ++j )
+        {
+            // lodID=0 is the original mesh. We need to skip it.
+            for(int lodID = 1; lodID < pMesh->mNumLods; lodID++)
+            {
+                // Read depth
+                MeshLodUsage& usage = pMesh->mMeshLodUsageList[lodID];
+                unsigned short streamID = readChunk(stream);
+                readFloats(stream, &(usage.userValue), 1);
+                switch(streamID){
+                case M_MESH_LOD_MANUAL:
+                    readMeshLodUsageManual(stream, pMesh, lodID, usage);
+                    break;
+                case M_MESH_LOD_GENERATED:
+                    readMeshLodUsageGenerated(stream, pMesh, lodID, usage, j);
+                    break;
+                default:
+                    OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                                "Invalid Lod Usage type in " + pMesh->getName(),
+                                "MeshSerializerImpl::readMeshLodInfo");
+                }
+                usage.manualMesh.setNull(); // will trigger load later with manual Lod
+                usage.edgeData = NULL;
+            }
         }
         popInnerChunk(stream);
 #endif
@@ -1552,11 +1604,11 @@ namespace v1 {
         {
             
             SubMesh* sm = pMesh->getSubMesh(i);
-            sm->mLodFaceList[lodNum-1] = OGRE_NEW IndexData();
+            sm->mLodFaceList[0][lodNum-1] = OGRE_NEW IndexData();
         }
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl::readMeshLodUsageGenerated( DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage )
+    void MeshSerializerImpl::readMeshLodUsageGenerated(DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage, uint8 casterPass)
     {
         usage.manualName = "";
 
@@ -1566,8 +1618,8 @@ namespace v1 {
         for (i = 0; i < numSubs; ++i)
         {
             SubMesh* sm = pMesh->getSubMesh(i);
-            sm->mLodFaceList[lodNum-1] = OGRE_NEW IndexData();
-            IndexData* indexData = sm->mLodFaceList[lodNum-1];
+            sm->mLodFaceList[casterPass][lodNum-1] = OGRE_NEW IndexData();
+            IndexData* indexData = sm->mLodFaceList[casterPass][lodNum-1];
 
             unsigned int numIndexes;
             readInts(stream, &numIndexes, 1);
@@ -1583,7 +1635,7 @@ namespace v1 {
             readInts(stream, &bufferIndex, 1);
             if(bufferIndex != (unsigned int)-1) {
                 // copy buffer pointer
-                indexData->indexBuffer = sm->mLodFaceList[bufferIndex-1]->indexBuffer;
+                indexData->indexBuffer = sm->mLodFaceList[casterPass][bufferIndex-1]->indexBuffer;
                 assert(!indexData->indexBuffer.isNull());
             } else {
                 // generate buffers
@@ -1926,22 +1978,22 @@ namespace v1 {
                         // Populate edgeGroup.vertexData pointers
                         // If there is shared vertex data, vertexSet 0 is that,
                         // otherwise 0 is first dedicated
-                        if (pMesh->sharedVertexData)
+                        if (pMesh->sharedVertexData[0])
                         {
                             if (edgeGroup.vertexSet == 0)
                             {
-                                edgeGroup.vertexData = pMesh->sharedVertexData;
+                                edgeGroup.vertexData = pMesh->sharedVertexData[0];
                             }
                             else
                             {
                                 edgeGroup.vertexData = pMesh->getSubMesh(
-                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData;
+                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData[0];
                             }
                         }
                         else
                         {
                             edgeGroup.vertexData = pMesh->getSubMesh(
-                                (unsigned short)edgeGroup.vertexSet)->vertexData;
+                                (unsigned short)edgeGroup.vertexSet)->vertexData[0];
                         }
                     }
                 }
@@ -2753,7 +2805,235 @@ namespace v1 {
 #endif
     }
 
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    MeshSerializerImpl_v1_10::MeshSerializerImpl_v1_10()
+    {
+        // Version number
+        mVersion = "[MeshSerializer_v1.100]";
+    }
+    //---------------------------------------------------------------------
+    MeshSerializerImpl_v1_10::~MeshSerializerImpl_v1_10()
+    {
+    }
+    //---------------------------------------------------------------------
+    void MeshSerializerImpl_v1_10::readMesh(DataStreamPtr& stream, Mesh* pMesh, MeshSerializerListener *listener)
+    {
+        // Never automatically build edge lists for this version
+        // expect them in the file or not at all
+        pMesh->mAutoBuildEdgeLists = false;
 
+        // bool skeletallyAnimated
+        bool skeletallyAnimated;
+        readBools(stream, &skeletallyAnimated, 1);
+
+        mNumBufferPasses = 1;
+
+        // Find all substreams
+        if (!stream->eof())
+        {
+            pushInnerChunk(stream);
+            unsigned short streamID = readChunk(stream);
+            while(!stream->eof() &&
+                (streamID == M_GEOMETRY ||
+                 streamID == M_SUBMESH ||
+                 streamID == M_MESH_SKELETON_LINK ||
+                 streamID == M_MESH_BONE_ASSIGNMENT ||
+                 streamID == M_MESH_LOD_LEVEL ||
+                 streamID == M_MESH_BOUNDS ||
+                 streamID == M_SUBMESH_NAME_TABLE ||
+                 streamID == M_EDGE_LISTS ||
+                 streamID == M_POSES ||
+                 streamID == M_ANIMATIONS ||
+                 streamID == M_TABLE_EXTREMES))
+            {
+                switch(streamID)
+                {
+                case M_GEOMETRY:
+                    pMesh->sharedVertexData[0] = OGRE_NEW VertexData();
+                    try {
+                        readGeometry(stream, pMesh, pMesh->sharedVertexData[0]);
+                    }
+                    catch (Exception& e)
+                    {
+                        if (e.getNumber() == Exception::ERR_ITEM_NOT_FOUND)
+                        {
+                            if( pMesh->sharedVertexData[0] == pMesh->sharedVertexData[1] )
+                                pMesh->sharedVertexData[1] = 0;
+
+                            // duff geometry data entry with 0 vertices
+                            OGRE_DELETE pMesh->sharedVertexData[0];
+                            OGRE_DELETE pMesh->sharedVertexData[1];
+                            pMesh->sharedVertexData[0] = 0;
+                            pMesh->sharedVertexData[1] = 0;
+                            // Skip this stream (pointer will have been returned to just after header)
+                            stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    break;
+                case M_SUBMESH:
+                    readSubMesh(stream, pMesh, listener);
+                    break;
+                case M_MESH_SKELETON_LINK:
+                    readSkeletonLink(stream, pMesh, listener);
+                    break;
+                case M_MESH_BONE_ASSIGNMENT:
+                    readMeshBoneAssignment(stream, pMesh);
+                    break;
+                case M_MESH_LOD_LEVEL:
+                    readMeshLodLevel(stream, pMesh);
+                    break;
+                case M_MESH_BOUNDS:
+                    readBoundsInfo(stream, pMesh);
+                    break;
+                case M_SUBMESH_NAME_TABLE:
+                    readSubMeshNameTable(stream, pMesh);
+                    break;
+                case M_EDGE_LISTS:
+                    readEdgeList(stream, pMesh);
+                    break;
+                case M_POSES:
+                    readPoses(stream, pMesh);
+                    break;
+                case M_ANIMATIONS:
+                    readAnimations(stream, pMesh);
+                    break;
+                case M_TABLE_EXTREMES:
+                    readExtremes(stream, pMesh);
+                    break;
+                }
+
+                if (!stream->eof())
+                {
+                    streamID = readChunk(stream);
+                }
+
+            }
+            if (!stream->eof())
+            {
+                // Backpedal back to start of stream
+                backpedalChunkHeader(stream);
+            }
+            popInnerChunk(stream);
+        }
+
+    }
+    //---------------------------------------------------------------------
+    void MeshSerializerImpl_v1_10::writeMesh(const Mesh* pMesh)
+    {
+        exportedLodCount = 1; // generate edge data for original mesh
+
+        // Header
+        writeChunkHeader(M_MESH, calcMeshSize(pMesh));
+        {
+            pushInnerChunk(mStream);
+
+        // Write shared geometry
+        if (pMesh->sharedVertexData[0])
+            writeGeometry(pMesh->sharedVertexData[0]);
+
+        // Write Submeshes
+        for (unsigned short i = 0; i < pMesh->getNumSubMeshes(); ++i)
+        {
+            LogManager::getSingleton().logMessage("Writing submesh...");
+            writeSubMesh(pMesh->getSubMesh(i));
+            LogManager::getSingleton().logMessage("Submesh exported.");
+        }
+
+        // Write skeleton info if required
+        if (pMesh->hasSkeleton())
+        {
+            LogManager::getSingleton().logMessage("Exporting skeleton link...");
+            // Write skeleton link
+            writeSkeletonLink(pMesh->getSkeletonName());
+            LogManager::getSingleton().logMessage("Skeleton link exported.");
+
+            // Write bone assignments
+            if (!pMesh->mBoneAssignments.empty())
+            {
+                LogManager::getSingleton().logMessage("Exporting shared geometry bone assignments...");
+
+                Mesh::VertexBoneAssignmentList::const_iterator vi;
+                for (vi = pMesh->mBoneAssignments.begin();
+                vi != pMesh->mBoneAssignments.end(); ++vi)
+                {
+                    writeMeshBoneAssignment(vi->second);
+                }
+
+                LogManager::getSingleton().logMessage("Shared geometry bone assignments exported.");
+            }
+        }
+
+#if !OGRE_NO_MESHLOD
+        // Write LOD data if any
+        if (pMesh->getNumLodLevels() > 1)
+        {
+            LogManager::getSingleton().logMessage("Exporting LOD information....");
+                writeLodLevel(pMesh);
+            LogManager::getSingleton().logMessage("LOD information exported.");
+
+        }
+#endif
+
+        // Write bounds information
+        LogManager::getSingleton().logMessage("Exporting bounds information....");
+        writeBoundsInfo(pMesh);
+        LogManager::getSingleton().logMessage("Bounds information exported.");
+
+        // Write submesh name table
+        LogManager::getSingleton().logMessage("Exporting submesh name table...");
+        writeSubMeshNameTable(pMesh);
+        LogManager::getSingleton().logMessage("Submesh name table exported.");
+
+        // Write edge lists
+        if (pMesh->isEdgeListBuilt())
+        {
+            LogManager::getSingleton().logMessage("Exporting edge lists...");
+            writeEdgeList(pMesh);
+            LogManager::getSingleton().logMessage("Edge lists exported");
+        }
+
+        // Write morph animation
+        writePoses(pMesh);
+        if (pMesh->hasVertexAnimation())
+        {
+            writeAnimations(pMesh);
+        }
+
+        // Write submesh extremes
+        writeExtremes(pMesh);
+            popInnerChunk(mStream);
+        }
+    }
+    //---------------------------------------------------------------------
+    size_t MeshSerializerImpl_v1_10::calcLodLevelSize(const Mesh* pMesh)
+    {
+        exportedLodCount = pMesh->getNumLodLevels();
+        size_t size = MSTREAM_OVERHEAD_SIZE; // Header
+        size += calcStringSize(pMesh->getLodStrategyName()); // string strategyName;
+        size += sizeof(unsigned short); // unsigned short numLevels;
+        //size += sizeof(bool); // bool manual; <== this is removed in v1_9
+
+        // Loop from LOD 1 (not 0, this is full detail)
+        for (ushort i = 1; i < exportedLodCount; ++i)
+        {
+            const MeshLodUsage& usage = pMesh->mMeshLodUsageList[i];
+            if (pMesh->_isManualLodLevel(i))
+            {
+                size += calcLodUsageManualSize(usage);
+            }
+            else
+            {
+                size += calcLodUsageGeneratedSize(pMesh, usage, i, 0);
+            }
+        }
+        return size;
+    }
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
@@ -2804,7 +3084,7 @@ namespace v1 {
             }
             else
             {
-                size += calcLodUsageGeneratedSize(pMesh, usage, i);
+                size += calcLodUsageGeneratedSize(pMesh, usage, i, 0);
             }
         }
         return size;
@@ -2824,7 +3104,7 @@ namespace v1 {
         return size;
     }
 
-    size_t MeshSerializerImpl_v1_8::calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum)
+    size_t MeshSerializerImpl_v1_8::calcLodUsageGeneratedSize(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass)
     {
         // Usage Header
         size_t size = MSTREAM_OVERHEAD_SIZE;
@@ -2837,13 +3117,13 @@ namespace v1 {
         for (subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
         {
             SubMesh* submesh = pMesh->getSubMesh(subidx);
-            size += calcLodUsageGeneratedSubmeshSize(submesh, lodNum);
+            size += calcLodUsageGeneratedSubmeshSize(submesh, lodNum, casterPass);
         }
         return size;
     }
-    size_t MeshSerializerImpl_v1_8::calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum)
+    size_t MeshSerializerImpl_v1_8::calcLodUsageGeneratedSubmeshSize(const SubMesh* submesh, unsigned short lodNum, uint8 casterPass)
     {
-        const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        const IndexData* indexData = submesh->mLodFaceList[casterPass][lodNum - 1];
         const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
 
         size_t size = MSTREAM_OVERHEAD_SIZE; // M_MESH_LOD_GENERATED
@@ -2892,7 +3172,7 @@ namespace v1 {
                 }
                 else
                 {
-                    writeLodUsageGenerated(pMesh, usage, i);
+                    writeLodUsageGenerated(pMesh, usage, i, 0);
                 }
             }
             popInnerChunk(mStream);
@@ -2908,7 +3188,7 @@ namespace v1 {
         for (unsigned short subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
         {
             SubMesh* sm = pMesh->getSubMesh(subidx);
-            const IndexData* indexData = sm->mLodFaceList[lodNum-1];
+            const IndexData* indexData = sm->mLodFaceList[0][lodNum-1];
 
             // Lock index buffer to write
             HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
@@ -2941,26 +3221,26 @@ namespace v1 {
         popInnerChunk(mStream);
     }*/
     
-    void MeshSerializerImpl_v1_8::writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum)
+    void MeshSerializerImpl_v1_8::writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass)
     {
-        writeChunkHeader(M_MESH_LOD_USAGE, calcLodUsageGeneratedSize(pMesh, usage, lodNum));
+        writeChunkHeader(M_MESH_LOD_USAGE, calcLodUsageGeneratedSize(pMesh, usage, lodNum, casterPass));
         float userValue = static_cast<float>(usage.userValue);
         writeFloats(&userValue, 1);
         pushInnerChunk(mStream);
         for (ushort i = 0; i < pMesh->getNumSubMeshes(); i++)
         {
             SubMesh* submesh = pMesh->getSubMesh(i);
-            writeLodUsageGeneratedSubmesh(submesh, lodNum);
+            writeLodUsageGeneratedSubmesh(submesh, lodNum, casterPass);
         }
         popInnerChunk(mStream);
     }
-    void MeshSerializerImpl_v1_8::writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum)
+    void MeshSerializerImpl_v1_8::writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum, uint8 casterPass)
     {
-        const IndexData* indexData = submesh->mLodFaceList[lodNum - 1];
+        const IndexData* indexData = submesh->mLodFaceList[0][lodNum - 1];
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(!ibuf.isNull());
 
-        writeChunkHeader(M_MESH_LOD_GENERATED, calcLodUsageGeneratedSubmeshSize(submesh, lodNum));
+        writeChunkHeader(M_MESH_LOD_GENERATED, calcLodUsageGeneratedSubmeshSize(submesh, lodNum, casterPass));
         unsigned int indexCount = static_cast<unsigned int>(indexData->indexCount);
         writeInts(&indexCount, 1);
         bool is32BitIndices = (ibuf->getType() == HardwareIndexBuffer::IT_32BIT);
@@ -2993,7 +3273,8 @@ namespace v1 {
     }
     //---------------------------------------------------------------------
 
-    void MeshSerializerImpl_v1_8::readMeshLodUsageGenerated( DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum, MeshLodUsage& usage )
+    void MeshSerializerImpl_v1_8::readMeshLodUsageGenerated( DataStreamPtr& stream, Mesh* pMesh, unsigned short lodNum,
+                                                             MeshLodUsage& usage, uint8 casterPass )
     {
         usage.manualName = "";
         usage.manualMesh.setNull();
@@ -3014,7 +3295,7 @@ namespace v1 {
 
                 SubMesh* sm = pMesh->getSubMesh(i);
                 IndexData* indexData = OGRE_NEW IndexData();
-                sm->mLodFaceList[lodNum - 1] = indexData;
+                sm->mLodFaceList[casterPass][lodNum - 1] = indexData;
                 // unsigned int numIndexes
                 unsigned int numIndexes;
                 readInts(stream, &numIndexes, 1);
@@ -3166,8 +3447,8 @@ namespace v1 {
             for (i = 0; i < numsubs; ++i)
             {
                 SubMesh* sm = pMesh->getSubMesh(i);
-                assert(sm->mLodFaceList.empty());
-                sm->mLodFaceList.resize(pMesh->mNumLods - 1);
+                assert(sm->mLodFaceList[0].empty());
+                sm->mLodFaceList[0].resize(pMesh->mNumLods - 1);
             }
         }
 
@@ -3200,7 +3481,7 @@ namespace v1 {
             }
             else //(!pMesh->hasManualLodLevel())
             {
-                readMeshLodUsageGenerated(stream, pMesh, i, usage);
+                readMeshLodUsageGenerated(stream, pMesh, i, usage, 0);
             }
             usage.edgeData = NULL;
 
@@ -3413,7 +3694,7 @@ namespace v1 {
             }
             else
             {
-                size += calcLodUsageGeneratedSize(pMesh, usage, i);
+                size += calcLodUsageGeneratedSize(pMesh, usage, i, 0);
             }
         }
         return size;
@@ -3454,23 +3735,23 @@ namespace v1 {
                 {
                     /*readFloats(stream, &(usage.value), 1);
             usage.userValue = Math::Sqrt(usage.value);*/
-                    writeLodUsageGenerated(pMesh, usage, i);
+                    writeLodUsageGenerated(pMesh, usage, i, 0);
                 }
             }
             popInnerChunk(mStream);
         }
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl_v1_4::writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum)
+    void MeshSerializerImpl_v1_4::writeLodUsageGenerated(const Mesh* pMesh, const MeshLodUsage& usage, unsigned short lodNum, uint8 casterPass)
     {
-        writeChunkHeader(M_MESH_LOD_USAGE, calcLodUsageGeneratedSize(pMesh, usage, lodNum));
+        writeChunkHeader(M_MESH_LOD_USAGE, calcLodUsageGeneratedSize(pMesh, usage, lodNum, casterPass));
         float value = static_cast<float>(usage.value);
         writeFloats(&value, 1); // <== In v1_4 this is value instead of userValue
         pushInnerChunk(mStream);
         for (ushort i = 0; i < pMesh->getNumSubMeshes(); i++)
         {
             SubMesh* submesh = pMesh->getSubMesh(i);
-            writeLodUsageGeneratedSubmesh(submesh, lodNum);
+            writeLodUsageGeneratedSubmesh(submesh, lodNum, casterPass);
         }
         popInnerChunk(mStream);
     }
@@ -3563,13 +3844,12 @@ namespace v1 {
         // Preallocate submesh LOD face data if not manual
         if (!manual)
         {
-
             unsigned short numsubs = pMesh->getNumSubMeshes();
             for (i = 0; i < numsubs; ++i)
             {
                 SubMesh* sm = pMesh->getSubMesh(i);
-                assert(sm->mLodFaceList.empty());
-                sm->mLodFaceList.resize(pMesh->mNumLods-1);
+                assert( sm->mLodFaceList[0].empty() );
+                sm->mLodFaceList[0].resize(pMesh->mNumLods-1);
             }
         }
         pushInnerChunk(stream);
@@ -3601,7 +3881,7 @@ namespace v1 {
             }
             else //(!pMesh->isLodManual)
             {
-                readMeshLodUsageGenerated(stream, pMesh, i, usage);
+                readMeshLodUsageGenerated(stream, pMesh, i, usage, 0);
             }
             usage.edgeData = NULL;
 

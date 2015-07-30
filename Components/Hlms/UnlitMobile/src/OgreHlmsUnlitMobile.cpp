@@ -240,7 +240,7 @@ namespace Ogre
         setProperty( HlmsBaseProp::Skeleton, 0 );
 
         v1::RenderOperation op;
-        renderable->getRenderOperation( op );
+        renderable->getRenderOperation( op, false );
         v1::VertexDeclaration *vertexDecl = op.vertexData->vertexDeclaration;
         const v1::VertexDeclaration::VertexElementList &elementList = vertexDecl->getElements();
         v1::VertexDeclaration::VertexElementList::const_iterator itor = elementList.begin();

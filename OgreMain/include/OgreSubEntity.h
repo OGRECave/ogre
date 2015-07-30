@@ -135,7 +135,7 @@ namespace v1 {
 
         /** Overridden - see Renderable.
         */
-        void getRenderOperation(RenderOperation& op);
+        void getRenderOperation(RenderOperation& op, bool casterPass);
 
         /** Tells this SubEntity to draw a subset of the SubMesh by adjusting the index buffer extents.
          * Default value is zero so that the entire index buffer is used when drawing.
@@ -208,7 +208,7 @@ namespace v1 {
         TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void);
         const TempBlendedBufferInfo* _getVertexAnimTempBufferInfo(void) const;
         /// Retrieve the VertexData which should be used for GPU binding
-        VertexData* getVertexDataForBinding(void);
+        VertexData* getVertexDataForBinding( bool casterPass );
 
         /** Mark all vertex data as so far unanimated. 
         */

@@ -75,10 +75,10 @@ namespace v1 {
             0,0,1,
             0,0 
         };
-        mesh->sharedVertexData = OGRE_NEW VertexData();
-        mesh->sharedVertexData->vertexCount = 4;
-        VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
-        VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
+        mesh->sharedVertexData[0] = OGRE_NEW VertexData();
+        mesh->sharedVertexData[0]->vertexCount = 4;
+        VertexDeclaration* decl = mesh->sharedVertexData[0]->vertexDeclaration;
+        VertexBufferBinding* bind = mesh->sharedVertexData[0]->vertexBufferBinding;
 
         size_t offset = 0;
         decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
@@ -104,13 +104,15 @@ namespace v1 {
 
         unsigned short faces[6] = {0,1,2,
             0,2,3 };
-        sub->indexData->indexBuffer = ibuf;
-        sub->indexData->indexCount = 6;
-        sub->indexData->indexStart =0;
+        sub->indexData[0]->indexBuffer = ibuf;
+        sub->indexData[0]->indexCount = 6;
+        sub->indexData[0]->indexStart = 0;
         ibuf->writeData(0, ibuf->getSizeInBytes(), faces, true);
 
         mesh->_setBounds(AxisAlignedBox(-100,-100,0,100,100,0), true);
         mesh->_setBoundingSphereRadius(Math::Sqrt(100*100+100*100));
+
+        mesh->prepareForShadowMapping( true );
     }
     //---------------------------------------------------------------------
     void PrefabFactory::createCube(Mesh* mesh)
@@ -214,10 +216,10 @@ namespace v1 {
             0,0 
         };
 
-        mesh->sharedVertexData = OGRE_NEW VertexData();
-        mesh->sharedVertexData->vertexCount = NUM_VERTICES;
-        VertexDeclaration* decl = mesh->sharedVertexData->vertexDeclaration;
-        VertexBufferBinding* bind = mesh->sharedVertexData->vertexBufferBinding;
+        mesh->sharedVertexData[0] = OGRE_NEW VertexData();
+        mesh->sharedVertexData[0]->vertexCount = NUM_VERTICES;
+        VertexDeclaration* decl = mesh->sharedVertexData[0]->vertexDeclaration;
+        VertexBufferBinding* bind = mesh->sharedVertexData[0]->vertexBufferBinding;
 
         size_t offset = 0;
         decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
@@ -267,15 +269,17 @@ namespace v1 {
             20,22,23
         };
 
-        sub->indexData->indexBuffer = ibuf;
-        sub->indexData->indexCount = NUM_INDICES;
-        sub->indexData->indexStart = 0;
+        sub->indexData[0]->indexBuffer = ibuf;
+        sub->indexData[0]->indexCount = NUM_INDICES;
+        sub->indexData[0]->indexStart = 0;
         ibuf->writeData(0, ibuf->getSizeInBytes(), faces, true);
 
         mesh->_setBounds(AxisAlignedBox(-CUBE_HALF_SIZE, -CUBE_HALF_SIZE, -CUBE_HALF_SIZE,
             CUBE_HALF_SIZE, CUBE_HALF_SIZE, CUBE_HALF_SIZE), true);
 
         mesh->_setBoundingSphereRadius(CUBE_HALF_SIZE);
+
+        mesh->prepareForShadowMapping( true );
     }
     //---------------------------------------------------------------------
     void PrefabFactory::createSphere(Mesh* mesh)
@@ -287,8 +291,8 @@ namespace v1 {
         const int NUM_RINGS = 16;
         const Real SPHERE_RADIUS = 50.0;
 
-        mesh->sharedVertexData = OGRE_NEW VertexData();
-        VertexData* vertexData = mesh->sharedVertexData;
+        mesh->sharedVertexData[0] = OGRE_NEW VertexData();
+        VertexData* vertexData = mesh->sharedVertexData[0];
 
         // define the vertex format
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
@@ -310,9 +314,9 @@ namespace v1 {
         float* pVertex = static_cast<float*>(vBuf->lock(HardwareBuffer::HBL_DISCARD));
 
         // allocate index buffer
-        pSphereVertex->indexData->indexCount = 6 * NUM_RINGS * (NUM_SEGMENTS + 1);
-        pSphereVertex->indexData->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, pSphereVertex->indexData->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
-        HardwareIndexBufferSharedPtr iBuf = pSphereVertex->indexData->indexBuffer;
+        pSphereVertex->indexData[0]->indexCount = 6 * NUM_RINGS * (NUM_SEGMENTS + 1);
+        pSphereVertex->indexData[0]->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(HardwareIndexBuffer::IT_16BIT, pSphereVertex->indexData[0]->indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+        HardwareIndexBufferSharedPtr iBuf = pSphereVertex->indexData[0]->indexBuffer;
         unsigned short* pIndices = static_cast<unsigned short*>(iBuf->lock(HardwareBuffer::HBL_DISCARD));
 
         float fDeltaRingAngle = (Math::PI / NUM_RINGS);
@@ -366,6 +370,8 @@ namespace v1 {
             Vector3(SPHERE_RADIUS, SPHERE_RADIUS, SPHERE_RADIUS) ), false );
 
         mesh->_setBoundingSphereRadius(SPHERE_RADIUS);
+
+        mesh->prepareForShadowMapping( true );
     }
     //---------------------------------------------------------------------
 }
