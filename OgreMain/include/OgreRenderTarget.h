@@ -469,6 +469,8 @@ namespace Ogre {
         */
         virtual void _endUpdate();
 
+        /** Add Frame statistics*/
+        void addStats(unsigned int triangleCount, unsigned int batchCount);
     protected:
         /// The name of this target.
         String mName;
