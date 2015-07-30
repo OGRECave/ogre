@@ -3481,14 +3481,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 }
                 depthInc += pass->getPassIterationCount();
 
-                // Finalise GPU parameter bindings
-                updateGpuProgramParameters(pass);
-
-                rend->getRenderOperation(ro);
-
-                if (rend->preRender(this, mDestRenderSystem))
-                    mDestRenderSystem->_render(ro);
-                rend->postRender(this, mDestRenderSystem);
+               _issueRenderOp(pass, rend, passTransformState);
 
                 if (scissored == CLIPPED_SOME)
                     resetScissor();
@@ -3546,17 +3539,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 // don't bother rendering if clipped / scissored entirely
                 if (scissored != CLIPPED_ALL && clipped != CLIPPED_ALL)
                 {
-                    // issue the render op      
+                        
                     // nfz: set up multipass rendering
                     mDestRenderSystem->setCurrentPassIterationCount(pass->getPassIterationCount());
-                    // Finalise GPU parameter bindings
-                    updateGpuProgramParameters(pass);
-
-                    rend->getRenderOperation(ro);
-
-                    if (rend->preRender(this, mDestRenderSystem))
-                        mDestRenderSystem->_render(ro);
-                    rend->postRender(this, mDestRenderSystem);
+                    _issueRenderOp(pass, rend, passTransformState);
                 }
                 if (scissored == CLIPPED_SOME)
                     resetScissor();
@@ -7326,6 +7312,19 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 
 }
 //---------------------------------------------------------------------
+void SceneManager::_issueRenderOp(const Pass* pass, Renderable* rend, bool passTransformState)
+{
+        RenderOperation ro;
+        // Finalise GPU parameter bindings
+        updateGpuProgramParameters(pass);
+
+        rend->getRenderOperation(ro);
+
+        if (rend->preRender(this, mDestRenderSystem))
+            mDestRenderSystem->_render(ro);
+        
+        rend->postRender(this, mDestRenderSystem);
+}
 //---------------------------------------------------------------------
 VisibleObjectsBoundsInfo::VisibleObjectsBoundsInfo()
 {
