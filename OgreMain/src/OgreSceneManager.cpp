@@ -1462,14 +1462,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         }
 
         // Invert vertex winding?
-        if (camera->isReflected())
-        {
-            mDestRenderSystem->setInvertVertexWinding(true);
-        }
-        else
-        {
-            mDestRenderSystem->setInvertVertexWinding(false);
-        }
+        mDestRenderSystem->setInvertVertexWinding(camera->isReflected());
 
         // Tell params about viewport
         mAutoParamDataSource->setCurrentViewport(vp);
@@ -1587,14 +1580,11 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
-
-    if(sys)
+    if(sys && sys->getName().find("Direct3D11") != String::npos)
     {
-        if (sys->getName().find("Direct3D11") != String::npos)
-        {
-            UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
-        }
+        UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
     }
+
 }
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
