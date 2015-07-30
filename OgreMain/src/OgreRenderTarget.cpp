@@ -207,11 +207,9 @@ namespace Ogre {
 
         fireViewportPreUpdate(viewport);
         viewport->update();
-        if(updateStatistics)
-        {
-            mStats.triangleCount += viewport->_getNumRenderedFaces();
-            mStats.batchCount += viewport->_getNumRenderedBatches();
-        }
+        if (updateStatistics)
+            addStats(viewport->_getNumRenderedFaces(), viewport->_getNumRenderedBatches());
+        
         fireViewportPostUpdate(viewport);
     }
 
@@ -394,6 +392,11 @@ namespace Ogre {
 
     }
 
+    void RenderTarget::addStats(unsigned int triangleCount, unsigned int batchCount)
+    {
+            mStats.triangleCount += triangleCount; 
+            mStats.batchCount += batchCount; 
+    }
     void RenderTarget::getCustomAttribute(const String& name, void* pData)
     {
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found. " + name, " RenderTarget::getCustomAttribute");
