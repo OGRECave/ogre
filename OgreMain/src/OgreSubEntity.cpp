@@ -406,7 +406,7 @@ namespace Ogre {
             Vector4 val(0.0f,0.0f,0.0f,0.0f);
             const VertexData* vd = mHardwareVertexAnimVertexData ? mHardwareVertexAnimVertexData : mParentEntity->mHardwareVertexAnimVertexData;
             
-            size_t animIndex = constantEntry.data * 4;
+            size_t animIndex = constantEntry.data.iData * 4;
             for (size_t i = 0; i < 4 && 
                 animIndex < vd->hwAnimationDataList.size();
                 ++i, ++animIndex)

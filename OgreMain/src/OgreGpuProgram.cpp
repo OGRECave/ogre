@@ -208,6 +208,8 @@ namespace Ogre
             mFloatLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
         if (recreateIfExists || mIntLogicalToPhysical.isNull())
             mIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
+        if (recreateIfExists || mUIntLogicalToPhysical.isNull())
+            mUIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
     }
     //---------------------------------------------------------------------
     void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists) const

@@ -165,6 +165,23 @@ namespace Ogre {
         // Binding goes in logicalIndex, but where does offset go?
         //size_t offset;
 
+        const BaseConstantType getBaseContentType() const
+        {
+            if (isFloat() == true)
+                return BCT_FLOAT;
+            else if (isDouble() == true)
+                return BCT_DOUBLE;
+            else if (isInt() == true)
+                return BCT_INT;
+            else if (isUnsignedInt() == true)
+                return BCT_UINT;
+            else if (isBool() == true)
+                return BCT_BOOL;
+            else
+                return BCT_UNKNOWN;
+            
+        }
+
         bool isFloat() const
         {
             return isFloat(constType);
@@ -567,6 +584,8 @@ namespace Ogre {
     GpuLogicalIndexUse(size_t bufIdx, size_t curSz, uint16 v)
         : physicalIndex(bufIdx), currentSize(curSz), variability(v) {}
     };
+
+    typedef const GpuLogicalIndexUse* const GpuLogicalIndexUseConstPtr;
     typedef map<size_t, GpuLogicalIndexUse>::type GpuLogicalIndexUseMap;
     /// Container struct to allow params to safely & update shared list of logical buffer assignments
     struct _OgreExport GpuLogicalBufferStruct : public GpuParamsAlloc
@@ -1372,12 +1391,14 @@ namespace Ogre {
 
         /** Defines the base element type of the auto constant
          */
-        enum ElementType {
+        enum ElementType 
+        {
+            ET_UNKNOWN,
             ET_INT,
             // float or double, depending on 64-bit compiler flag
-            ET_REAL
-            // ET_UINT,
-            // ET_BOOL
+            ET_REAL,
+            ET_UINT,
+            ET_BOOL
         };
 
         /** Structure defining an auto constant that's available for use in
@@ -1404,9 +1425,24 @@ namespace Ogre {
         };
 
         /** Structure recording the use of an automatic parameter. */
-        class AutoConstantEntry
+        struct AutoConstantEntry
         {
-        public:
+#if OGRE_DOUBLE_PRECISION == 1
+            typedef uint64 Integer;
+#else
+            typedef uint32 Integer;
+#endif
+            union Data
+            {
+                Data(){ iData = 0; }
+                Data(Integer val){iData = val;}
+                Data(Real val){ fData = val; }
+
+        
+                Integer iData;
+                Real fData;
+            };
+
             /// The type of parameter
             AutoConstantType paramType;
             /// The target (physical) constant index
@@ -1416,27 +1452,17 @@ namespace Ogre {
                 and bind an auto which is 4-element packed to it */
             size_t elementCount;
             /// Additional information to go with the parameter
-            union{
-                size_t data;
-                Real fData;
-            };
+            
             /// The variability of this parameter (see GpuParamVariability)
             uint16 variability;
-
-        AutoConstantEntry(AutoConstantType theType, size_t theIndex, size_t theData,
-                          uint16 theVariability, size_t theElemCount = 4)
-            : paramType(theType), physicalIndex(theIndex), elementCount(theElemCount),
-                data(theData), variability(theVariability) {}
-
-        AutoConstantEntry(AutoConstantType theType, size_t theIndex, Real theData,
-                          uint16 theVariability, size_t theElemCount = 4)
-            : paramType(theType), physicalIndex(theIndex), elementCount(theElemCount),
-                fData(theData), variability(theVariability) {}
+            ElementType elementType;
+            Data data;
+  
 
         };
         // Auto parameter storage
         typedef vector<AutoConstantEntry>::type AutoConstantList;
-
+        
         typedef vector<GpuSharedParametersUsage>::type GpuSharedParamUsageList;
 
         // Map that store subroutines associated with slots
@@ -1475,20 +1501,24 @@ namespace Ogre {
         GpuLogicalBufferStructPtr mBoolLogicalToPhysical;
         /** Gets the low-level structure for a logical index.
          */
-        GpuLogicalIndexUse* _getFloatConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the low-level structure for a logical index.
-         */
-        GpuLogicalIndexUse* _getDoubleConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical int constant index.
-         */
-        GpuLogicalIndexUse* _getIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical uint constant index.
-         */
-        GpuLogicalIndexUse* _getUnsignedIntConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical bool constant index.
-         */
-        // GpuLogicalIndexUse* _getBoolConstantLogicalIndexUse(size_t logicalIndex, size_t requestedSize, uint16 variability);
+        GpuLogicalIndexUseConstPtr  _getConstantLogicalIndexUse(
+                const size_t logicalIndex,
+                const size_t requestedSize,
+                const GpuParamVariability variability,
+                const BaseConstantType baseContentType);
 
+
+         /** templated method helper to method '_getConstantLogicalIndexUse'.
+         */
+        template <typename T>
+        GpuLogicalIndexUseConstPtr _getConstantLogicalIndexUse(const size_t logicalIndex,
+            const int requestedSize,
+            GpuParamVariability variability,
+            const BaseConstantType baseContentType,
+            GpuLogicalBufferStructPtr logicalBuffer,
+            size_t* bufferSizePtr,
+            void* constantsPtr);
+    
         /// Mapping from parameter names to def - high-level programs are expected to populate this
         GpuNamedConstantsPtr mNamedConstants;
         /// List of automatically updated parameters
@@ -1947,20 +1977,16 @@ namespace Ogre {
         */
         void setAutoConstant(size_t index, AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2);
 
+        
         /** As setAutoConstant, but sets up the auto constant directly against a
             physical buffer index.
         */
-        void _setRawAutoConstant(size_t physicalIndex, AutoConstantType acType, size_t extraInfo,
-                                 uint16 variability, size_t elementSize = 4);
-        /** As setAutoConstantReal, but sets up the auto constant directly against a
-            physical buffer index.
-        */
-        void _setRawAutoConstantReal(size_t physicalIndex, AutoConstantType acType, Real rData,
-                                     uint16 variability, size_t elementSize = 4);
-
+        void _setRawAutoConstant(size_t physicalIndex, AutoConstantType acType, 
+                            AutoConstantEntry::Data data, uint16 variability, 
+                            size_t elementSize);
 
         /** Unbind an auto constant so that the constant is manually controlled again. */
-        void clearAutoConstant(size_t index);
+        void clearAutoConstant(const size_t Logicalindex, const GpuProgramParameters::ElementType elementType);
 
         /** Sets a named parameter up to track a derivation of the current time.
             @param index The index of the parameter
@@ -1983,28 +2009,12 @@ namespace Ogre {
         /** Returns true if this instance has any automatic constants. */
         bool hasAutoConstants(void) const { return !(mAutoConstants.empty()); }
         /** Finds an auto constant that's affecting a given logical parameter
-            index for floating-point values.
+            index for a type defiend by @elementType
             @note Only applicable for low-level programs.
         */
-        const AutoConstantEntry* findFloatAutoConstantEntry(size_t logicalIndex);
-        /** Finds an auto constant that's affecting a given logical parameter
-            index for double-point values.
-            @note Only applicable for low-level programs.
-        */
-        const AutoConstantEntry* findDoubleAutoConstantEntry(size_t logicalIndex);
-        /** Finds an auto constant that's affecting a given logical parameter
-            index for integer values.
-            @note Only applicable for low-level programs.
-        */
-        const AutoConstantEntry* findIntAutoConstantEntry(size_t logicalIndex);
-        /** Finds an auto constant that's affecting a given logical parameter
-            index for unsigned integer values.
-            @note Only applicable for low-level programs.
-        */
-        const AutoConstantEntry* findUnsignedIntAutoConstantEntry(size_t logicalIndex);
-        // /** Finds an auto constant that's affecting a given logical parameter
-        //     index for boolean values.
-        //     @note Only applicable for low-level programs.
+    
+        const GpuProgramParameters::AutoConstantEntry* findAutoConstantEntry(size_t logicalIndex, GpuProgramParameters::ElementType elementType);
+    
         // */
         // const AutoConstantEntry* findBoolAutoConstantEntry(size_t logicalIndex);
         /** Finds an auto constant that's affecting a given named parameter index.
@@ -2014,23 +2024,20 @@ namespace Ogre {
         /** Finds an auto constant that's affecting a given physical position in
             the floating-point buffer
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryFloat(size_t physicalIndex);
-        /** Finds an auto constant that's affecting a given physical position in
-            the double-point buffer
+
+         /** Finds an auto constant that's affecting a given physical position in
+            a buffer with a type defined by @elementType
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryDouble(size_t physicalIndex);
-        /** Finds an auto constant that's affecting a given physical position in
-            the integer buffer
-        */
-        const AutoConstantEntry* _findRawAutoConstantEntryInt(size_t physicalIndex);
-        /** Finds an auto constant that's affecting a given physical position in
-            the unsigned integer buffer
-        */
-        const AutoConstantEntry* _findRawAutoConstantEntryUnsignedInt(size_t physicalIndex);
-        /** Finds an auto constant that's affecting a given physical position in
-            the boolean buffer
-        */
-        const AutoConstantEntry* _findRawAutoConstantEntryBool(size_t physicalIndex);
+        const AutoConstantEntry* _findRawAutoConstantEntry(const size_t physicalIndex, const ElementType elementType);
+
+         /** Intermal method to translate a  a constant's logical index to physical index.
+         */
+        const size_t _findConstantPhysicalIndex(const size_t logicalIndex, const BaseConstantType baseContentType);
+         /** Internal method to find an auto constant by GpuConstantDefinition.
+         */
+        const AutoConstantEntry* _findRawAutoConstant(const GpuConstantDefinition& def);
+        
+
 
         /** Update automatic parameters.
             @param source The source of the parameters
@@ -2268,6 +2275,7 @@ namespace Ogre {
             @param extraInfo If the constant type needs more information (like a light index) put it here.
         */
         void setNamedAutoConstant(const String& name, AutoConstantType acType, size_t extraInfo = 0);
+        void setNamedAutoConstantT(const String& name, AutoConstantType acType, AutoConstantEntry::Data data);
         void setNamedAutoConstantReal(const String& name, AutoConstantType acType, Real rData);
 
         /** Sets up a constant which will automatically be updated by the system.
@@ -2310,40 +2318,18 @@ namespace Ogre {
         */
         const GpuConstantDefinition* _findNamedConstantDefinition(
             const String& name, bool throwExceptionIfMissing = false) const;
-        /** Gets the physical buffer index associated with a logical float constant index.
+
+
+
+            
+          /** Gets the physical buffer index associated with a logical constant index.
             @note Only applicable to low-level programs.
             @param logicalIndex The logical parameter index
             @param requestedSize The requested size - pass 0 to ignore missing entries
             and return std::numeric_limits<size_t>::max()
         */
-        size_t _getFloatConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical double constant index.
-            @note Only applicable to low-level programs.
-            @param logicalIndex The logical parameter index
-            @param requestedSize The requested size - pass 0 to ignore missing entries
-            and return std::numeric_limits<size_t>::max()
-        */
-        size_t _getDoubleConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical int constant index.
-            @note Only applicable to low-level programs.
-            @param logicalIndex The logical parameter index
-            @param requestedSize The requested size - pass 0 to ignore missing entries
-            and return std::numeric_limits<size_t>::max()
-        */
-        size_t _getIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical unsigned int constant index.
-            @note Only applicable to low-level programs.
-            @param logicalIndex The logical parameter index
-            @param requestedSize The requested size - pass 0 to ignore missing entries
-            and return std::numeric_limits<size_t>::max()
-        */
-        size_t _getUnsignedIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical bool constant index.
-            @note Only applicable to low-level programs.
-            @param logicalIndex The logical parameter index
-            @param requestedSize The requested size - pass 0 to ignore missing entries
-            and return std::numeric_limits<size_t>::max()
-        */
+        size_t _getConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability, BaseConstantType baseContentType);
+    
         //size_t _getBoolConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
 
         /** Sets whether or not we need to transpose the matrices passed in from the rest of OGRE.
@@ -2455,6 +2441,14 @@ namespace Ogre {
         /** Get map with
          */
         const SubroutineMap& getSubroutineMap() const { return mSubroutineMap; }
+
+        /** Translate BaseConstantType to auto constant ElementType
+         */
+        ElementType getElementTypeFromBaseContentType(BaseConstantType type);
+
+        /** Translate auto constant ElementType to BaseConstantType
+         */
+        BaseConstantType  getbaseContentTypeFromElementType(ElementType type);
     };
 
     /** @} */

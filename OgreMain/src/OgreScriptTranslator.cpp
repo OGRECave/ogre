@@ -112,13 +112,13 @@ namespace Ogre{
         if (node->type != ANT_ATOM)
             return false;
         AtomAbstractNode *atom = (AtomAbstractNode*)node.get();
-		 if (atom->id == 1 || atom->id == 2)
-		{
-			*result = atom->id == 1 ? true : false;
-			return true;
-		}
-        //     return false;
-		return false;
+        if (atom->id == 1 || atom->id == 2)
+        {
+            *result = atom->id == 1 ? true : false;
+            return true;
+        }
+
+        return false;
     }
     //-------------------------------------------------------------------------
     bool ScriptTranslator::getString(const AbstractNodePtr &node, String *result)
@@ -4945,7 +4945,7 @@ namespace Ogre{
                                     if (named)
                                         params->clearNamedAutoConstant(name);
                                     else
-                                        params->clearAutoConstant(index);
+                                        params->clearAutoConstant(index, GpuProgramParameters::ET_REAL);
 
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
@@ -4982,7 +4982,7 @@ namespace Ogre{
                                     if (named)
                                         params->clearNamedAutoConstant(name);
                                     else
-                                        params->clearAutoConstant(index);
+                                        params->clearAutoConstant(index, GpuProgramParameters::ET_UNKNOWN);
 
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
@@ -5019,7 +5019,7 @@ namespace Ogre{
                                     if (named)
                                         params->clearNamedAutoConstant(name);
                                     else
-                                        params->clearAutoConstant(index);
+                                        params->clearAutoConstant(index,GpuProgramParameters::ET_INT);
 
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
@@ -5056,7 +5056,7 @@ namespace Ogre{
                                     if (named)
                                         params->clearNamedAutoConstant(name);
                                     else
-                                        params->clearAutoConstant(index);
+                                        params->clearAutoConstant(index, GpuProgramParameters::ET_REAL);
 
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 
@@ -5093,7 +5093,7 @@ namespace Ogre{
                                     if (named)
                                         params->clearNamedAutoConstant(name);
                                     else
-                                        params->clearAutoConstant(index);
+                                        params->clearAutoConstant(index, GpuProgramParameters::ET_BOOL);
 
                                     int roundedCount = count%4 != 0 ? count + 4 - (count%4) : count;
 

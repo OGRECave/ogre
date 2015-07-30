@@ -76,7 +76,7 @@ namespace Ogre
                    )
                 {
                     const GpuProgramParameters::AutoConstantEntry *entry =
-                                    vertexParam->_findRawAutoConstantEntryFloat( constDef.physicalIndex );
+                                    vertexParam->_findRawAutoConstantEntry( constDef.physicalIndex,GpuProgramParameters::ET_REAL);
                     if( entry && (entry->paramType == GpuProgramParameters::ACT_WORLD_MATRIX_ARRAY_3x4 || entry->paramType == GpuProgramParameters::ACT_WORLD_DUALQUATERNION_ARRAY_2x4))
                     {
                         //Material is correctly done!

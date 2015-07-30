@@ -1949,6 +1949,7 @@ namespace Ogre
         bool isMatrix4x4 = false;
         bool isInt = false;
         bool isUnsignedInt = false;
+        bool isBool = false;
 
         StringUtil::toLowerCase(vecparams[1]);
 
@@ -1989,6 +1990,7 @@ namespace Ogre
             dims = parseParamDimensions(vecparams[1], 
                                         vecparams[1].find_first_not_of("bool"));
             isReal = false;
+            isBool = true;
         }
         else
         {
@@ -2010,7 +2012,13 @@ namespace Ogre
         if (isNamed)
             context.programParams->clearNamedAutoConstant(paramName);
         else
-            context.programParams->clearAutoConstant(index);
+        {
+            GpuProgramParameters::ElementType elementType;
+            elementType = isReal ? GpuProgramParameters::ET_REAL : isInt ? GpuProgramParameters::ET_INT : isUnsignedInt ?
+                GpuProgramParameters::ET_UINT : isBool ? GpuProgramParameters::ET_BOOL : GpuProgramParameters::ET_UNKNOWN;
+            
+            context.programParams->clearAutoConstant(index,elementType);
+        }
 
         // Round dims to multiple of 4
         if (dims %4 != 0)
@@ -5270,11 +5278,11 @@ namespace Ogre
                 const GpuLogicalIndexUse& logicalUse = i->second;
 
                 const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-                    params->findFloatAutoConstantEntry(logicalIndex);
+                    params->findAutoConstantEntry(logicalIndex, GpuProgramParameters::ET_REAL);
                 const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
                 if (defaultParams)
                 {
-                    defaultAutoEntry = defaultParams->findFloatAutoConstantEntry(logicalIndex);
+                    defaultAutoEntry = defaultParams->findAutoConstantEntry(logicalIndex, GpuProgramParameters::ET_REAL);
                 }
 
                 writeGpuProgramParameter("param_indexed", 
@@ -5298,11 +5306,11 @@ namespace Ogre
                 const GpuLogicalIndexUse& logicalUse = i->second;
 
                 const GpuProgramParameters::AutoConstantEntry* autoEntry =
-                    params->findDoubleAutoConstantEntry(logicalIndex);
+                    params->findAutoConstantEntry(logicalIndex, GpuProgramParameters::ET_REAL);
                 const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
                 if (defaultParams)
                 {
-                    defaultAutoEntry = defaultParams->findDoubleAutoConstantEntry(logicalIndex);
+                    defaultAutoEntry = defaultParams->findAutoConstantEntry(logicalIndex, GpuProgramParameters::ET_REAL);
                 }
 
                 writeGpuProgramParameter("param_indexed",
@@ -5326,11 +5334,11 @@ namespace Ogre
                 const GpuLogicalIndexUse& logicalUse = i->second;
 
                 const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-                    params->findIntAutoConstantEntry(logicalIndex);
+                    params->findAutoConstantEntry(logicalIndex, GpuProgramParameters::ET_INT);
                 const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
                 if (defaultParams)
                 {
-                    defaultAutoEntry = defaultParams->findIntAutoConstantEntry(logicalIndex);
+                    defaultAutoEntry = defaultParams->findAutoConstantEntry(logicalIndex, GpuProgramParameters::ET_INT);
                 }
 
                 writeGpuProgramParameter("param_indexed", 
@@ -5355,11 +5363,11 @@ namespace Ogre
                 const GpuLogicalIndexUse& logicalUse = i->second;
 
                 const GpuProgramParameters::AutoConstantEntry* autoEntry = 
-                    params->findUnsignedIntAutoConstantEntry(logicalIndex);
+                    params->findAutoConstantEntry(logicalIndex,GpuProgramParameters::ET_UINT);
                 const GpuProgramParameters::AutoConstantEntry* defaultAutoEntry = 0;
                 if (defaultParams)
                 {
-                    defaultAutoEntry = defaultParams->findUnsignedIntAutoConstantEntry(logicalIndex);
+                    defaultAutoEntry = defaultParams->findAutoConstantEntry(logicalIndex, GpuProgramParameters::ET_UINT);
                 }
 
                 writeGpuProgramParameter("param_indexed", 
@@ -5434,7 +5442,7 @@ namespace Ogre
                 // both must be auto
                 // compare the auto values
                 different = (autoEntry->paramType != defaultAutoEntry->paramType
-                             || autoEntry->data != defaultAutoEntry->data);
+                             || autoEntry->data.iData != defaultAutoEntry->data.iData);
             }
             else
             {
@@ -5508,11 +5516,11 @@ namespace Ogre
                 switch(autoConstDef->dataType)
                 {
                 case GpuProgramParameters::ACDT_REAL:
-                    writeValue(StringConverter::toString(autoEntry->fData), useMainBuffer);
+                    writeValue(StringConverter::toString(autoEntry->data.fData), useMainBuffer);
                     break;
 
                 case GpuProgramParameters::ACDT_INT:
-                    writeValue(StringConverter::toString(autoEntry->data), useMainBuffer);
+                    writeValue(StringConverter::toString(autoEntry->data.iData), useMainBuffer);
                     break;
 
                 default:

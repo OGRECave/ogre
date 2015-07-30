@@ -308,7 +308,7 @@ namespace Ogre {
             const GpuProgramParameters::AutoConstantEntry& constantEntry,
             GpuProgramParameters* params) const
         {
-            CustomParameterMap::const_iterator i = mCustomParameters.find(constantEntry.data);
+            CustomParameterMap::const_iterator i = mCustomParameters.find(constantEntry.data.iData);
             if (i != mCustomParameters.end())
             {
                 params->_writeRawConstant(constantEntry.physicalIndex, i->second, 
