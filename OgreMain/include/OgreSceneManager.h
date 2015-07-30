@@ -1828,6 +1828,9 @@ namespace Ogre {
         */
         virtual void _findVisibleObjects(Camera* cam, VisibleObjectsBoundsInfo* visibleBounds, bool onlyShadowCasters);
 
+          /** Internal method for issuing the render operation.*/
+        virtual void _issueRenderOp(Renderable* rend, const Pass* pass);
+        
         /** Internal method for applying animations to scene nodes.
         @remarks
             Uses the internally stored AnimationState objects to apply animation to SceneNodes.

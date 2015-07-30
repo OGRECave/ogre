@@ -3178,10 +3178,8 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                                       const LightList* manualLightList)
 {
     unsigned short numMatrices;
-    RenderOperation ro;
 
     OgreProfileBeginGPUEvent("Material: " + pass->getParent()->getParent()->getName());
-    ro.srcRenderable = rend;
 
     GpuProgram* vprog = pass->hasVertexProgram() ? pass->getVertexProgram().get() : 0;
 
@@ -3532,14 +3530,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 }
                 depthInc += pass->getPassIterationCount();
 
-                // Finalise GPU parameter bindings
-                updateGpuProgramParameters(pass);
-
-                rend->getRenderOperation(ro);
-
-                if (rend->preRender(this, mDestRenderSystem))
-                    mDestRenderSystem->_render(ro);
-                rend->postRender(this, mDestRenderSystem);
+               _issueRenderOp(rend, pass);
 
                 if (scissored == CLIPPED_SOME)
                     resetScissor();
@@ -3597,17 +3588,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 // don't bother rendering if clipped / scissored entirely
                 if (scissored != CLIPPED_ALL && clipped != CLIPPED_ALL)
                 {
-                    // issue the render op      
+                        
                     // nfz: set up multipass rendering
                     mDestRenderSystem->setCurrentPassIterationCount(pass->getPassIterationCount());
-                    // Finalise GPU parameter bindings
-                    updateGpuProgramParameters(pass);
-
-                    rend->getRenderOperation(ro);
-
-                    if (rend->preRender(this, mDestRenderSystem))
-                        mDestRenderSystem->_render(ro);
-                    rend->postRender(this, mDestRenderSystem);
+                    _issueRenderOp(rend, pass);
                 }
                 if (scissored == CLIPPED_SOME)
                     resetScissor();
@@ -3623,23 +3607,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         fireRenderSingleObject(rend, pass, mAutoParamDataSource, NULL, mSuppressRenderStateChanges);
         // Just render
         mDestRenderSystem->setCurrentPassIterationCount(1);
-        if (rend->preRender(this, mDestRenderSystem))
-        {
-            rend->getRenderOperation(ro);
-            try
-            {
-                mDestRenderSystem->_render(ro);
-            }
-            catch (RenderingAPIException& e)
-            {
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "Exception when rendering material: " + pass->getParent()->getParent()->getName() +
-                            "\nOriginal Exception description: " + e.getFullDescription() + "\n" ,
-                            "SceneManager::renderSingleObject");
-                
-            }
-        }
-        rend->postRender(this, mDestRenderSystem);
+        _issueRenderOp(rend, NULL);
     }
     
     // Reset view / projection changes if any
@@ -7388,6 +7356,24 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 
 }
 //---------------------------------------------------------------------
+void SceneManager::_issueRenderOp(Renderable* rend, const Pass* pass)
+{
+    if(rend->preRender(this, mDestRenderSystem))
+    {
+        // Finalise GPU parameter bindings
+        if(pass)
+            updateGpuProgramParameters(pass);
+        
+        RenderOperation ro;
+        ro.srcRenderable = rend;
+
+        rend->getRenderOperation(ro);
+
+        mDestRenderSystem->_render(ro);
+    }
+
+    rend->postRender(this, mDestRenderSystem);
+}
 //---------------------------------------------------------------------
 VisibleObjectsBoundsInfo::VisibleObjectsBoundsInfo()
 {
