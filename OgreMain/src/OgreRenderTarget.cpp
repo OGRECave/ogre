@@ -401,7 +401,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderTarget::addListener(RenderTargetListener* listener)
     {
-        mListeners.push_back(listener);
+        if (std::find(mListeners.begin(), mListeners.end(), listener) == mListeners.end())
+        {
+            mListeners.push_back(listener);
+        }
     }
     //-----------------------------------------------------------------------
     void RenderTarget::removeListener(RenderTargetListener* listener)
