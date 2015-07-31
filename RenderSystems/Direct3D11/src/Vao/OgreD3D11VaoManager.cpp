@@ -156,7 +156,8 @@ namespace Ogre
 
         while( itor != end )
         {
-            (*itor)->Release();
+            if( *itor )
+                (*itor)->Release();
             ++itor;
         }
     }
