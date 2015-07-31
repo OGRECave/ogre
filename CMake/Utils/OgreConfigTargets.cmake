@@ -379,7 +379,7 @@ function(ogre_config_sample_lib SAMPLENAME)
   ogre_config_sample_common(${SAMPLENAME})
   if (OGRE_INSTALL_PDB AND OGRE_INSTALL_SAMPLES)
 	  # install debug pdb files - with a _d on lib
-	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}_d.pdb
+	  install(FILES ${OGRE_BINARY_DIR}/bin${OGRE_DEBUG_PATH}/${SAMPLENAME}.pdb
 		  DESTINATION bin${OGRE_DEBUG_PATH}
 		  CONFIGURATIONS Debug
 		  )
