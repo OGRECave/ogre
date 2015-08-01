@@ -37,6 +37,11 @@ namespace Ogre
 {
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
 
+    /// When cloning Vaos, some vertex buffers are used multiple times for LOD'ing
+    /// purposes (only the IndexBuffer changes). This maps an old VertexBuffer
+    /// to a new VertexBuffer to know when to reuse an existing one while cloning.
+    typedef map<VertexBufferPacked*, VertexBufferPacked*>::type SharedVertexBufferMap;
+
     /** Vertex array objects (Vaos) are immutable objects that describe a
         combination of vertex buffers and index buffer with a given operation
         type. Once created, they can't be modified. You have to destroy them
@@ -122,6 +127,20 @@ namespace Ogre
         */
         const VertexElement2* findBySemantic( VertexElementSemantic semantic, size_t &outIndex,
                                               size_t &outOffset ) const;
+
+        /** Clones the vertex & index buffers and creates a new VertexArrayObject.
+            The only exception is when one of the vertex buffers is already in sharedBuffers,
+            in which case the buffer in sharedBuffers.find(vertexBuffer)->second will be
+            used without cloning (useful for cloning LODs).
+        @param vaoManager
+            The VaoManager needed to create the structures
+        @param sharedBuffers [in/out]
+            Maps old vertex buffers to new vertex buffers so that we can reuse them.
+            Optional. Use a null pointer to disable this feature.
+        @return
+            New cloned Vao.
+        */
+        VertexArrayObject* clone( VaoManager *vaoManager, SharedVertexBufferMap *sharedBuffers ) const;
     };
 }
 

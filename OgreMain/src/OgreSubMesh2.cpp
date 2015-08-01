@@ -199,21 +199,45 @@ namespace Ogre {
         }
     }*/
     //---------------------------------------------------------------------
-    /*SubMesh * SubMesh::clone(const String& newName, Mesh *parentMesh)
+    SubMesh* SubMesh::clone( Mesh *parentMesh )
     {
-        return 0;
-    }*/
-    //---------------------------------------------------------------------
-    struct SafeDelete
-    {
-        void *ptr;
-        SafeDelete( void *_ptr ) : ptr( _ptr ) {}
-        ~SafeDelete()
+        SubMesh* newSub;
+        if( !parentMesh )
+            parentMesh = mParent;
+
+        newSub = parentMesh->createSubMesh();
+
+        newSub->mBlendIndexToBoneIndexMap = mBlendIndexToBoneIndexMap;
+        newSub->mMaterialName = mMaterialName;
+        //newSub->mParent = parentMesh; //Not needed, already set
+        assert( newSub->mParent == parentMesh );
+
+        newSub->mBoneAssignments            = mBoneAssignments;
+        newSub->mBoneAssignmentsOutOfDate   = mBoneAssignmentsOutOfDate;
+
+        const uint8 numVaoPasses = mParent->hasIndependentShadowMappingVaos() + 1;
+        for( uint8 i=0; i<numVaoPasses; ++i )
         {
-            if( ptr )
-                OGRE_FREE_SIMD( ptr, MEMCATEGORY_GEOMETRY );
+            newSub->mVao[i].reserve( mVao[i].size() );
+
+            SharedVertexBufferMap sharedBuffers;
+            VertexArrayObjectArray::const_iterator itor = mVao[i].begin();
+            VertexArrayObjectArray::const_iterator end  = mVao[i].end();
+
+            while( itor != end )
+            {
+                VertexArrayObject *newVao = (*itor)->clone( parentMesh->mVaoManager, &sharedBuffers );
+                newSub->mVao[i].push_back( newVao );
+                ++itor;
+            }
         }
-    };
+
+        if( numVaoPasses == 1 )
+            newSub->mVao[1] = newSub->mVao[0];
+
+        return 0;
+    }
+    //---------------------------------------------------------------------
     void SubMesh::importFromV1( v1::SubMesh *subMesh, bool halfPos, bool halfTexCoords, bool qTangents )
     {
         mMaterialName = subMesh->getMaterialName();
@@ -265,7 +289,7 @@ namespace Ogre {
 
         //Wrap the ptrs around these, because the VaoManager's call
         //can throw thus causing a leak if we don't free them.
-        SafeDelete dataPtrContainer( data );
+        FreeOnDestructor dataPtrContainer( data );
 
         VaoManager *vaoManager = mParent->mVaoManager;
         VertexBufferPackedVec vertexBuffers;
@@ -316,7 +340,7 @@ namespace Ogre {
         void *indexDataPtr = OGRE_MALLOC_SIMD( indexData->indexCount *
                                                indexData->indexBuffer->getIndexSize(),
                                                MEMCATEGORY_GEOMETRY );
-        SafeDelete indexDataPtrContainer( indexDataPtr );
+        FreeOnDestructor indexDataPtrContainer( indexDataPtr );
         IndexBufferPacked::IndexType indexType = static_cast<IndexBufferPacked::IndexType>(
                                                         indexData->indexBuffer->getType() );
 
@@ -342,7 +366,7 @@ namespace Ogre {
         {
             VertexArrayObjectArray newVaos;
             newVaos.reserve( mVao[vaoPassIdx].size() );
-            map<VertexBufferPacked*, VertexBufferPacked*>::type sharedBuffers;
+            SharedVertexBufferMap sharedBuffers;
             VertexArrayObjectArray::const_iterator itor = mVao[vaoPassIdx].begin();
             VertexArrayObjectArray::const_iterator end  = mVao[vaoPassIdx].end();
 
@@ -366,15 +390,13 @@ namespace Ogre {
     //---------------------------------------------------------------------
     VertexArrayObject* SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents,
                                                   VertexArrayObject *vao,
-                                                  map<VertexBufferPacked*, VertexBufferPacked*>::type
-                                                  &sharedBuffers,
+                                                  SharedVertexBufferMap &sharedBuffers,
                                                   VaoManager *vaoManager )
     {
         const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
         VertexBufferPacked *newVertexBuffer = 0;
 
-        map<VertexBufferPacked*, VertexBufferPacked*>::type::const_iterator itShared =
-                                                            sharedBuffers.find( vertexBuffers[0] );
+        SharedVertexBufferMap::const_iterator itShared = sharedBuffers.find( vertexBuffers[0] );
         if( itShared != sharedBuffers.end() )
         {
             //Shared vertex buffer. We've already converted this one. Reuse.
@@ -453,7 +475,7 @@ namespace Ogre {
             }
 
             char *data = _arrangeEfficient( srcData, vertexElements, vertexBuffers[0]->getNumElements() );
-            SafeDelete dataPtrContainer( data );
+            FreeOnDestructor dataPtrContainer( data );
 
             //Cleanup the mappings, free some memory.
             for( size_t i=0; i<asyncTickets.size(); ++i )
@@ -837,7 +859,7 @@ namespace Ogre {
         {
             VertexArrayObjectArray newVaos;
             newVaos.reserve( mVao[vaoPassIdx].size() );
-            map<VertexBufferPacked*, VertexBufferPacked*>::type sharedBuffers;
+            SharedVertexBufferMap sharedBuffers;
             VertexArrayObjectArray::const_iterator itor = mVao[vaoPassIdx].begin();
             VertexArrayObjectArray::const_iterator end  = mVao[vaoPassIdx].end();
 
@@ -859,8 +881,8 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
     VertexArrayObject* SubMesh::dearrangeEfficient( const VertexArrayObject *vao,
-                                                    map<VertexBufferPacked*, VertexBufferPacked*>::type
-                                                    &sharedBuffers, VaoManager *vaoManager )
+                                                    SharedVertexBufferMap &sharedBuffers,
+                                                    VaoManager *vaoManager )
     {
         const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
 
@@ -877,7 +899,7 @@ namespace Ogre {
         {
             AsyncTicketPtr asyncTicket = (*itor)->readRequest( 0, (*itor)->getNumElements() );
 
-            map<VertexBufferPacked*, VertexBufferPacked*>::type::const_iterator itShared = sharedBuffers.find( *itor );
+            SharedVertexBufferMap::const_iterator itShared = sharedBuffers.find( *itor );
             if( itShared != sharedBuffers.end() )
             {
                 //Shared vertex buffer. We've already converted this one. Reuse.
@@ -891,7 +913,7 @@ namespace Ogre {
                                                   &(*itNewElementVec) );
                 asyncTicket->unmap();
 
-                SafeDelete dataPtrContainer( data );
+                FreeOnDestructor dataPtrContainer( data );
                 const bool keepAsShadow = (*itor)->getShadowCopy() != 0;
                 VertexBufferPacked *newVertexBuffer =
                         vaoManager->createVertexBuffer( *itNewElementVec,

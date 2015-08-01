@@ -204,7 +204,7 @@ namespace Ogre {
             if you leave this blank, the clone will be assigned to the same
             group as this Mesh.
         */
-        //MeshPtr clone(const String& newName, const String& newGroup = BLANKSTRING);
+        MeshPtr clone( const String& newName, const String& newGroup = BLANKSTRING );
 
         /** Get the axis-aligned bounding box for this mesh.
         */

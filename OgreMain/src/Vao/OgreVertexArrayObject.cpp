@@ -30,6 +30,10 @@ THE SOFTWARE.
 #include "Vao/OgreVertexArrayObject.h"
 #include "Vao/OgreIndexBufferPacked.h"
 
+//Needed by VertexArrayObject::clone
+#include "Vao/OgreAsyncTicket.h"
+#include "Vao/OgreVaoManager.h"
+
 namespace Ogre
 {
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
@@ -124,6 +128,87 @@ namespace Ogre
 
             ++itBuffers;
         }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    VertexArrayObject* VertexArrayObject::clone( VaoManager *vaoManager,
+                                                 SharedVertexBufferMap *sharedBuffers ) const
+    {
+        VertexBufferPackedVec newVertexBuffers;
+        newVertexBuffers.reserve( mVertexBuffers.size() );
+
+        VertexBufferPackedVec::const_iterator itBuffers = mVertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator enBuffers = mVertexBuffers.end();
+
+        while( itBuffers != enBuffers )
+        {
+            if( sharedBuffers )
+            {
+                SharedVertexBufferMap::const_iterator itShared = sharedBuffers->find( *itBuffers );
+                if( itShared != sharedBuffers->end() )
+                {
+                    //This buffer is shared. Reuse the one we created in a previous call.
+                    newVertexBuffers.push_back( itShared->second );
+                    ++itBuffers;
+                    continue;
+                }
+            }
+
+            AsyncTicketPtr asyncTicket = (*itBuffers)->readRequest( 0, (*itBuffers)->getNumElements() );
+
+            void *dstData = OGRE_MALLOC_SIMD( (*itBuffers)->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
+            FreeOnDestructor dataPtrContainer( dstData );
+
+            const void *srcData = asyncTicket->map();
+            memcpy( dstData, srcData, (*itBuffers)->getTotalSizeBytes() );
+            asyncTicket->unmap();
+
+            const bool keepAsShadow = (*itBuffers)->getShadowCopy() != 0;
+            VertexBufferPacked *newVertexBuffer = vaoManager->createVertexBuffer(
+                                                    (*itBuffers)->getVertexElements(),
+                                                    (*itBuffers)->getNumElements(),
+                                                    (*itBuffers)->getBufferType(),
+                                                    dstData, keepAsShadow );
+
+            if( keepAsShadow ) //Don't free the pointer ourselves
+                dataPtrContainer.ptr = 0;
+
+            newVertexBuffers.push_back( newVertexBuffer );
+
+            if( sharedBuffers )
+                (*sharedBuffers)[*itBuffers] = newVertexBuffer;
+
+            ++itBuffers;
+        }
+
+        IndexBufferPacked *newIndexBuffer = 0;
+        if( mIndexBuffer )
+        {
+            AsyncTicketPtr asyncTicket = mIndexBuffer->readRequest( 0, mIndexBuffer->getNumElements() );
+
+            void *dstData = OGRE_MALLOC_SIMD( mIndexBuffer->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
+            FreeOnDestructor dataPtrContainer( dstData );
+
+            const void *srcData = asyncTicket->map();
+            memcpy( dstData, srcData, (*itBuffers)->getTotalSizeBytes() );
+            asyncTicket->unmap();
+
+            const bool keepAsShadow = mIndexBuffer->getShadowCopy() != 0;
+            newIndexBuffer = vaoManager->createIndexBuffer( mIndexBuffer->getIndexType(),
+                                                            mIndexBuffer->getNumElements(),
+                                                            mIndexBuffer->getBufferType(),
+                                                            dstData, keepAsShadow );
+
+            if( keepAsShadow ) //Don't free the pointer ourselves
+                dataPtrContainer.ptr = 0;
+        }
+
+        VertexArrayObject *retVal = vaoManager->createVertexArrayObject( newVertexBuffers,
+                                                                         newIndexBuffer,
+                                                                         mOperationType );
+        retVal->mPrimStart = mPrimStart;
+        retVal->mPrimCount = mPrimCount;
 
         return retVal;
     }

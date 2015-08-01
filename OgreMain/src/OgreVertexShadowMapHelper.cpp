@@ -80,7 +80,7 @@ namespace Ogre
             VertexBufferPacked *shadowVertexBuffer = 0;
             const VertexBufferPackedVec &origVertexBuffers = vao->getVertexBuffers();
 
-            size_t bufferIdx[3] = { -1u, -1u, -1u };
+            size_t bufferIdx[3] = { ~0u, ~0u, ~0u };
             size_t srcOffset[3] = { 0u, 0u, 0u };
             VertexElement2 const *origElements[3];
             origElements[0] = vao->findBySemantic( VES_POSITION, bufferIdx[0], srcOffset[0] );
@@ -445,7 +445,7 @@ namespace v1
 
             VertexData *shadowVertexBuffer = 0;
 
-            size_t bufferIdx[3] = { -1u, -1u, -1u };
+            size_t bufferIdx[3] = { ~0u, ~0u, ~0u };
             VertexElement const *origElements[3];
             origElements[0] = geom.vertexData->vertexDeclaration->findElementBySemantic( VES_POSITION );
 

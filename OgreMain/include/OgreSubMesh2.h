@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreVertexBoneAssignment.h"
-#include "Vao/OgreVertexBufferPacked.h"
+#include "Vao/OgreVertexArrayObject.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -142,13 +142,13 @@ namespace Ogre {
         void _compileBoneAssignments(void);
 
         /** Makes a copy of this submesh object and gives it a new name.
-         @param newName
-         The name to give the clone.
-         @param parentMesh
-         Optional mesh to make the parent of the newly created clone.
-         If you leave this blank, the clone will be parented to the same Mesh as the original.
-         */
-        //SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
+        @param newName
+            The name to give the clone.
+        @param parentMesh
+            Optional mesh to make the parent of the newly created clone.
+            If you leave this blank, the clone will be parented to the same Mesh as the original.
+        */
+        SubMesh* clone( Mesh *parentMesh = 0 );
 
         void setMaterialName( const String &name )          { mMaterialName = name; }
         String getMaterialName(void) const                  { return mMaterialName; }
@@ -190,8 +190,7 @@ namespace Ogre {
         */
         static VertexArrayObject* arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents,
                                                     VertexArrayObject *vao,
-                                                    map<VertexBufferPacked*, VertexBufferPacked*>::type
-                                                    &sharedBuffers,
+                                                    SharedVertexBufferMap &sharedBuffers,
                                                     VaoManager *vaoManager );
 
         /** @see dearrangeEfficientToInefficient. Works on an individual VertexArrayObject.
@@ -209,10 +208,9 @@ namespace Ogre {
             New Vao containing the dearranged buffers. It will share the index buffers
             with the original vao.
         */
-        static VertexArrayObject* dearrangeEfficient(
-                const VertexArrayObject *vao,
-                map<VertexBufferPacked*, VertexBufferPacked*>::type &sharedBuffers,
-                VaoManager *vaoManager );
+        static VertexArrayObject* dearrangeEfficient( const VertexArrayObject *vao,
+                                                      SharedVertexBufferMap &sharedBuffers,
+                                                      VaoManager *vaoManager );
 
     public:
         struct SourceData

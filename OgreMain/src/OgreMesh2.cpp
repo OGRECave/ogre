@@ -195,105 +195,56 @@ namespace Ogre {
         setSkeletonName( BLANKSTRING );
     }
     //-----------------------------------------------------------------------
-    /*MeshPtr Mesh::clone(const String& newName, const String& newGroup)
+    MeshPtr Mesh::clone( const String& newName, const String& newGroup )
     {
-        // This is a bit like a copy constructor, but with the additional aspect of registering the clone with
-        //  the MeshManager
+        // This is a bit like a copy constructor, but with the additional
+        // aspect of registering the clone with the MeshManager
 
-        // New Mesh is assumed to be manually defined rather than loaded since you're cloning it for a reason
+        //New Mesh is assumed to be manually defined rather
+        //than loaded since you're cloning it for a reason
         String theGroup;
-        if (newGroup == BLANKSTRING)
-        {
+        if( newGroup.empty() )
             theGroup = this->getGroup();
-        }
         else
-        {
             theGroup = newGroup;
-        }
-        MeshPtr newMesh = MeshManager::getSingleton().createManual(newName, theGroup);
+        MeshPtr newMesh = MeshManager::getSingleton().createManual( newName, theGroup );
 
         // Copy submeshes first
-        vector<SubMesh*>::type::iterator subi;
-        for (subi = mSubMeshes.begin(); subi != mSubMeshes.end(); ++subi)
-        {
-            (*subi)->clone("", newMesh.get());
+        SubMeshVec::const_iterator itor = mSubMeshes.begin();
+        SubMeshVec::const_iterator end  = mSubMeshes.end();
 
+        while( itor != end )
+        {
+            (*itor)->clone( newMesh.get() );
+            ++itor;
         }
 
-        // Copy shared geometry and index map, if any
-        if (sharedVertexData[0])
-        {
-            newMesh->sharedVertexData = sharedVertexData->clone();
-            newMesh->sharedBlendIndexToBoneIndexMap = sharedBlendIndexToBoneIndexMap;
-        }
-
-        // Copy submesh names
-        newMesh->mSubMeshNameMap = mSubMeshNameMap ;
-        // Copy any bone assignments
-        newMesh->mBoneAssignments = mBoneAssignments;
-        newMesh->mBoneAssignmentsOutOfDate = mBoneAssignmentsOutOfDate;
         // Copy bounds
-        newMesh->mAABB = mAABB;
-        newMesh->mBoundRadius = mBoundRadius;
-        newMesh->mBoneBoundingRadius = mBoneBoundingRadius;
-        newMesh->mAutoBuildEdgeLists = mAutoBuildEdgeLists;
-        newMesh->mEdgeListsBuilt = mEdgeListsBuilt;
+        newMesh->mAabb          = mAabb;
+        newMesh->mBoundRadius   = mBoundRadius;
 
-		newMesh->mLodStrategyName = mLodStrategyName;
-		newMesh->mHasManualLodLevel = mHasManualLodLevel;
-        newMesh->mNumLods = mNumLods;
-        newMesh->mMeshLodUsageList  = mMeshLodUsageList;
+        newMesh->mSkeletonName  = mSkeletonName;
+        newMesh->mSkeleton      = mSkeleton;
+
+        newMesh->mLodStrategyName   = mLodStrategyName;
+        newMesh->mNumLods           = mNumLods;
         newMesh->mLodValues         = mLodValues;
 
-        // Unreference edge lists, otherwise we'll delete the same lot twice, build on demand
-        MeshLodUsageList::iterator lodi, lodOldi;
-        lodOldi = mMeshLodUsageList.begin();
-        for (lodi = newMesh->mMeshLodUsageList.begin(); lodi != newMesh->mMeshLodUsageList.end(); ++lodi, ++lodOldi)
-		{
-            MeshLodUsage& newLod = *lodi;
-            MeshLodUsage& lod = *lodOldi;
-            newLod.manualName = lod.manualName;
-            newLod.userValue = lod.userValue;
-            newLod.value = lod.value;
-            if (lod.edgeData)
-                newLod.edgeData = lod.edgeData->clone();
-        }
+        newMesh->mVaoManager = mVaoManager;
 
-        newMesh->mVertexBufferUsage = mVertexBufferUsage;
-        newMesh->mIndexBufferUsage = mIndexBufferUsage;
-        newMesh->mVertexBufferShadowBuffer = mVertexBufferShadowBuffer;
-        newMesh->mIndexBufferShadowBuffer = mIndexBufferShadowBuffer;
+        newMesh->mVertexBufferDefaultType   = mVertexBufferDefaultType;
+        newMesh->mIndexBufferDefaultType    = mIndexBufferDefaultType;
+        newMesh->mVertexBufferShadowBuffer  = mVertexBufferShadowBuffer;
+        newMesh->mIndexBufferShadowBuffer   = mIndexBufferShadowBuffer;
 
-        newMesh->mSkeletonName = mSkeletonName;
-        newMesh->mOldSkeleton = mOldSkeleton;
-        newMesh->mSkeleton    = mSkeleton;
-
-        // Keep prepared shadow volume info (buffers may already be prepared)
-        newMesh->mPreparedForShadowVolumes = mPreparedForShadowVolumes;
-
-        newMesh->mEdgeListsBuilt = mEdgeListsBuilt;
-        
-        // Clone vertex animation
-        for (AnimationList::iterator i = mAnimationsList.begin();
-            i != mAnimationsList.end(); ++i)
-        {
-            Animation *newAnim = i->second->clone(i->second->getName());
-            newMesh->mAnimationsList[i->second->getName()] = newAnim;
-        }
-        // Clone pose list
-        for (PoseList::iterator i = mPoseList.begin(); i != mPoseList.end(); ++i)
-        {
-            Pose* newPose = (*i)->clone();
-            newMesh->mPoseList.push_back(newPose);
-        }
-        newMesh->mSharedVertexDataAnimationType = mSharedVertexDataAnimationType;
-        newMesh->mAnimationTypesDirty = true;
+        // Copy submesh names
+        newMesh->mSubMeshNameMap = mSubMeshNameMap;
 
         newMesh->load();
         newMesh->touch();
 
         return newMesh;
-    }*/
+    }
     //-----------------------------------------------------------------------
     const Aabb& Mesh::getAabb(void) const
     {

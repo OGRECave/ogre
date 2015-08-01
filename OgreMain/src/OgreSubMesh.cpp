@@ -602,7 +602,7 @@ namespace v1 {
             VertexElement2VecVec newDeclaration;
             newDeclaration.resize( vertexData[i]->vertexDeclaration->getMaxSource()+1 );
 
-            for( size_t j=0; j<vertexData[i]->vertexDeclaration->getMaxSource()+1; ++j )
+            for( size_t j=0; j<vertexData[i]->vertexDeclaration->getMaxSource()+1u; ++j )
             {
                 const HardwareVertexBufferSharedPtr &vertexBuffer = vertexData[i]->
                                                                 vertexBufferBinding->getBuffer( j );

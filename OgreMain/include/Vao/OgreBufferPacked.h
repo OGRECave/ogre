@@ -89,6 +89,32 @@ namespace Ogre
         NUM_BUFFER_PACKED_TYPES
     };
 
+    /** Helper class to that will free the pointer on the destructor. Usage:
+            SafeDelete dataPtrContainer( data );
+            vaoManager->createVertexBuffer( vertexElements, vertexCount,
+                                            mVertexBufferDefaultType,
+                                            data, keepAsShadow );
+
+            if( !keepAsShadow )
+                dataPtrContainer.ptr = 0;
+
+        In this example, "data" wouln't normally be freed if createVertexBuffer
+        raises an exception according to BufferPacked's constructor rules, but
+        thanks to FreeOnDestructor, the pointer will be freed accordingly.
+        Once the BufferPacked has been created, we need to zero the ptr member
+        to avoid freeing it (since BufferPacked will do it).
+    */
+    struct FreeOnDestructor
+    {
+        void *ptr;
+        FreeOnDestructor( void *_ptr ) : ptr( _ptr ) {}
+        ~FreeOnDestructor()
+        {
+            if( ptr )
+                OGRE_FREE_SIMD( ptr, MEMCATEGORY_GEOMETRY );
+        }
+    };
+
     class _OgreExport BufferPacked : public BufferPackedAlloc
     {
         friend class BufferInterface;
@@ -140,6 +166,7 @@ namespace Ogre
             *must* have been allocated using OGRE_MALLOC_SIMD( MEMCATEGORY_GEOMETRY )
 
             If the constructor throws, then data will NOT be freed, and caller will have to do it.
+            @see FreeOnDestructor to help you with exceptions and correctly freeing the data.
 
             Must be false if bufferType >= BT_DYNAMIC
         */
