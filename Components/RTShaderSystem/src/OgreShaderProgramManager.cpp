@@ -92,22 +92,12 @@ ProgramManager::~ProgramManager()
 void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
 {
     // Create the CPU programs.
-    if (false == renderState->createCpuPrograms())
-    {
-        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Could not apply render state ", 
-            "ProgramManager::acquireGpuPrograms" ); 
-    }   
+    renderState->createCpuPrograms();
 
     ProgramSet* programSet = renderState->getProgramSet();
 
     // Create the GPU programs.
-    if (false == createGpuPrograms(programSet))
-    {
-        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
-            "Could not create gpu programs from render state ", 
-                        "ProgramManager::acquireGpuPrograms" );
-    }   
+    createGpuPrograms(programSet);
 
     // Bind the created GPU programs to the target pass.
     pass->setVertexProgram(programSet->getGpuProgram(GPT_VERTEX_PROGRAM)->getName());
@@ -275,7 +265,7 @@ void ProgramManager::destroyCpuProgram(Program* shaderProgram)
 }
 
 //-----------------------------------------------------------------------------
-bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
+void ProgramManager::createGpuPrograms(ProgramSet* programSet)
 {
     // Before we start we need to make sure that the pixel shader input
     //  parameters are the same as the vertex output, this required by 
@@ -320,8 +310,11 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
     
     // Call the pre creation of GPU programs method.
     success = programProcessor->preCreateGpuPrograms(programSet);
-    if (success == false)   
-        return false;   
+    if (success == false)
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Could not pre create gpu programs ",
+            "ProgramManager::createGpuPrograms");
+    
     
     // Create the vertex shader program.
     GpuProgramPtr vsGpuProgram;
@@ -334,7 +327,9 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
         ShaderGenerator::getSingleton().getShaderCachePath());
 
     if (vsGpuProgram.isNull())  
-        return false;
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+        "Could not create gpu vertex program",
+        "ProgramManager::createGpuPrograms");
 
     programSet->setGpuProgram(GPT_VERTEX_PROGRAM, vsGpuProgram);
 
@@ -354,7 +349,9 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
             ShaderGenerator::getSingleton().getShaderCachePath());
 
         if (gsGpuProgram.isNull())
-            return false;
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Could not create gpu geomerty program",
+            "ProgramManager::createGpuPrograms");
 
         programSet->setGpuProgram(GPT_GEOMETRY_PROGRAM, gsGpuProgram);
     }
@@ -369,18 +366,21 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
         ShaderGenerator::getSingleton().getShaderCachePath());
 
     if (psGpuProgram.isNull())  
-        return false;
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Could not create gpu fragment program",
+            "ProgramManager::createGpuPrograms");
+
 
     programSet->setGpuProgram(GPT_FRAGMENT_PROGRAM, psGpuProgram);
 
     // Call the post creation of GPU programs method.
     success = programProcessor->postCreateGpuPrograms(programSet);
     if (success == false)   
-        return false;   
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+        "Could not post process gpu programs",
+        "ProgramManager::createGpuPrograms");
 
-    
-    return true;
-    
+
 }
 
 
@@ -523,12 +523,12 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
         // Case an error occurred.
         if (pGpuProgram->hasCompileError())
         {
-            pGpuProgram.setNull();
-            return GpuProgramPtr(pGpuProgram);
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Could not create gpu programs from render state ",
+                "ProgramManager::acquireGpuPrograms");
         }
 
         // Add the created GPU program to local cache.
-        
         mShaderMap[pGpuProgram->getType()][programName] = pGpuProgram;
     }
     

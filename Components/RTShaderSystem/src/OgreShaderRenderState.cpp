@@ -162,7 +162,7 @@ void TargetRenderState::removeSubRenderStateInstance(SubRenderState* subRenderSt
 }
 
 //-----------------------------------------------------------------------
-bool TargetRenderState::createCpuPrograms()
+void TargetRenderState::createCpuPrograms()
 {
     sortSubRenderStates();
 
@@ -192,12 +192,13 @@ bool TargetRenderState::createCpuPrograms()
 
         if (false == srcSubRenderState->createCpuSubPrograms(programSet))
         {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                String("Could not create cpu programs for sub render state, ") +  srcSubRenderState->getType(),
+                "ProgramManager::acquireGpuPrograms");
+
             LogManager::getSingleton().stream() << "RTShader::TargetRenderState : Could not generate sub render program of type: " << srcSubRenderState->getType();
-            return false;
         }
     }
-
-    return true;
 }
 
 //-----------------------------------------------------------------------

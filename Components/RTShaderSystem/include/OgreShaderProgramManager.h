@@ -159,7 +159,7 @@ protected:
     /** Create GPU programs for the given program set based on the CPU programs it contains.
     @param programSet The program set container.
     */
-    bool createGpuPrograms(ProgramSet* programSet);
+    void createGpuPrograms(ProgramSet* programSet);
         
     /** 
     Generates a unique guid value from a string

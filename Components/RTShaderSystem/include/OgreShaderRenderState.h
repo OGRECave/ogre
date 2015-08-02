@@ -171,7 +171,7 @@ protected:
     
     /** Create CPU programs that represent this render state.   
     */
-    bool createCpuPrograms();
+    void createCpuPrograms();
 
     /** Create the program set of this render state.
     */
