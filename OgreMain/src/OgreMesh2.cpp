@@ -526,6 +526,8 @@ namespace Ogre {
             subMesh->importFromV1( mesh->getSubMesh( i ), halfPos, halfTexCoords, qTangents );
         }
 
+        mSubMeshNameMap = mesh->getSubMeshNameMap();
+
         v1::SkeletonPtr v1Skeleton = mesh->getOldSkeleton();
         if( !v1Skeleton.isNull() )
         {

@@ -132,6 +132,22 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    VertexElement2VecVec VertexArrayObject::getVertexDeclaration(void) const
+    {
+        VertexElement2VecVec retVal;
+        retVal.reserve( mVertexBuffers.size() );
+        VertexBufferPackedVec::const_iterator itBuffers = mVertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator enBuffers = mVertexBuffers.end();
+
+        while( itBuffers != enBuffers )
+        {
+            retVal.push_back( (*itBuffers)->getVertexElements() );
+            ++itBuffers;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     VertexArrayObject* VertexArrayObject::clone( VaoManager *vaoManager,
                                                  SharedVertexBufferMap *sharedBuffers ) const
     {

@@ -33,7 +33,9 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreSubMesh2.h"
+#include "OgreMesh2.h"
 
+#include "Vao/OgreAsyncTicket.h"
 #include "Vao/OgreVaoManager.h"
 
 namespace Ogre {
@@ -550,6 +552,94 @@ namespace v1 {
         }
 
         return newSub;
+    }
+    //---------------------------------------------------------------------
+    void SubMesh::importFromV2( Ogre::SubMesh *subMesh )
+    {
+        const Ogre::SubMesh::VertexBoneAssignmentVec &v2BoneAssignments = subMesh->getBoneAssignments();
+
+        {
+            Ogre::SubMesh::VertexBoneAssignmentVec::const_iterator itor = v2BoneAssignments.begin();
+            Ogre::SubMesh::VertexBoneAssignmentVec::const_iterator end  = v2BoneAssignments.end();
+
+            while( itor != end )
+            {
+                v1::VertexBoneAssignment assignment;
+                assignment.vertexIndex  = itor->vertexIndex;
+                assignment.boneIndex    = itor->boneIndex;
+                assignment.weight       = itor->weight;
+                mBoneAssignments.insert( VertexBoneAssignmentList::value_type( itor->vertexIndex,
+                                                                               assignment ) );
+                ++itor;
+            }
+        }
+        blendIndexToBoneIndexMap = subMesh->mBlendIndexToBoneIndexMap;
+        mBoneAssignmentsOutOfDate = false;
+        useSharedVertices = false;
+
+        const uint8 numVaoPasses = subMesh->mParent->hasIndependentShadowMappingVaos() + 1;
+        for( uint8 i=0; i<numVaoPasses; ++i )
+        {
+            VertexArrayObjectArray::const_iterator itor = subMesh->mVao[i].begin();
+            VertexArrayObjectArray::const_iterator end  = subMesh->mVao[i].end();
+
+            while( itor != end )
+            {
+                const VertexBufferPackedVec &vertexBuffers = (*itor)->getVertexBuffers();
+
+                vertexData[i] = OGRE_NEW VertexData();
+                HardwareBufferManagerBase *hwManager = vertexData[i]->_getHardwareBufferManager();
+
+                VertexBufferPackedVec::const_iterator itVertexBuffer = vertexBuffers.begin();
+                VertexBufferPackedVec::const_iterator enVertexBuffer = vertexBuffers.end();
+
+                while( itVertexBuffer != enVertexBuffer )
+                {
+                    AsyncTicketPtr asyncTicket =
+                            (*itVertexBuffer)->readRequest( 0, (*itVertexBuffer)->getNumElements() );
+                    const void *srcData = asyncTicket->map();
+                    HardwareVertexBufferSharedPtr v1VertexBuf = hwManager->createVertexBuffer(
+                                VaoManager::calculateVertexSize( (*itVertexBuffer)->getVertexElements() ),
+                                (*itVertexBuffer)->getNumElements(), parent->mVertexBufferUsage );
+                    void *dstData = v1VertexBuf->lock( HardwareBuffer::HBL_NO_OVERWRITE );
+                    memcpy( dstData, srcData, (*itVertexBuffer)->getTotalSizeBytes() );
+                    v1VertexBuf->unlock();
+                    asyncTicket->unmap();
+
+                    vertexData[i]->vertexBufferBinding->setBinding(
+                                (unsigned short)(itVertexBuffer - vertexBuffers.begin()), v1VertexBuf );
+
+                    ++itVertexBuffer;
+                }
+
+                vertexData[i]->vertexCount = vertexBuffers[0]->getNumElements();
+                vertexData[i]->vertexDeclaration->convertFromV2( (*itor)->getVertexDeclaration() );
+
+                IndexBufferPacked *indexBuffer = (*itor)->getIndexBuffer();
+                if( indexBuffer )
+                {
+                    if( !indexData[i] )
+                        indexData[i] = OGRE_NEW IndexData();
+
+                    indexData[i]->indexCount = indexBuffer->getNumElements();
+                    indexData[i]->indexBuffer = hwManager->createIndexBuffer(
+                                indexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT ?
+                                    HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
+                                indexBuffer->getNumElements(), parent->mIndexBufferUsage );
+
+                    AsyncTicketPtr asyncTicket = indexBuffer->readRequest( 0, indexBuffer->getNumElements() );
+                    const void *srcData = asyncTicket->map();
+                    void *dstData = indexData[i]->indexBuffer->lock( HardwareBuffer::HBL_NO_OVERWRITE );
+                    memcpy( dstData, srcData, indexBuffer->getTotalSizeBytes() );
+                    indexData[i]->indexBuffer->unlock();
+                    asyncTicket->unmap();
+                }
+
+                operationType = (*itor)->getOperationType();
+
+                ++itor;
+            }
+        }
     }
     //---------------------------------------------------------------------
     void SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )

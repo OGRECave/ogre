@@ -284,6 +284,9 @@ namespace v1 {
         SubMeshIterator getSubMeshIterator(void)
         { return SubMeshIterator(mSubMeshList.begin(), mSubMeshList.end()); }
 
+        /// Converts a v2 mesh back to v1.
+        void importV2( Ogre::Mesh *mesh );
+
         /** Rearranges the buffers in this Mesh so that they are more efficient for
             rendering with shaders. It's not recommended to use this option if
             you plan on using SW skinning or pose/morph animations.

@@ -81,7 +81,8 @@ void help(void)
     cout << "-b         = Recalculate bounding box (static meshes only)" << endl;
     cout << "-V version = Specify OGRE version format to write instead of latest" << endl;
     cout << "             Options are: 2.1, 1.10, 1.8, 1.7, 1.4, 1.0" << endl;
-    cout << "-v2          Export the mesh as a v2 object." << endl;
+    cout << "-v2          Force export the mesh as a v2 object. Keeps the original format otherwise." << endl;
+    cout << "-v1          Force export the mesh as a v1 object. Keeps the original format otherwise." << endl;
     cout << "-O puqs    = Optimize vertex buffers for shaders." << endl;
     cout << "             p converts POSITION to 16-bit floats" << endl;
     cout << "             q converts normal tangent and bitangent (28-36 bytes) to QTangents (8 bytes)." << endl;
@@ -136,6 +137,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.recalcBounds = false;
     opts.targetVersion  = v1::MESH_VERSION_LATEST;
     opts.targetVersionV2= MESH_VERSION_LATEST;
+    opts.exportAsV1     = false;
     opts.exportAsV2     = false;
     opts.unoptimizeBuffer = false;
     opts.optimizeBuffer = false;
@@ -191,9 +193,16 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     {
         opts.recalcBounds = true;
     }
+    ui = unOpts.find("-v1");
+    if (ui->second)
+    {
+        opts.exportAsV1 = true;
+        opts.exportAsV2 = false;
+    }
     ui = unOpts.find("-v2");
     if (ui->second)
     {
+        opts.exportAsV1 = false;
         opts.exportAsV2 = true;
     }
     ui = unOpts.find("-U");
@@ -276,7 +285,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
             opts.targetVersionV2= MESH_VERSION_2_1;
         }
 
-        if( opts.exportAsV2 )
+        if( !opts.exportAsV2 )
         {
             if (bi->second == "1.10")
             {
@@ -1045,6 +1054,7 @@ int main(int numargs, char** args)
         unOptList["-b"] = false;
         unOptList["-O"] = false;
         unOptList["-U"] = false;
+        unOptList["-v1"]= false;
         unOptList["-v2"]= false;
         binOptList["-l"] = "";
         binOptList["-d"] = "";
@@ -1134,8 +1144,16 @@ int main(int numargs, char** args)
             }
         }
 
-        if( !opts.exportAsV2 )
+        if( (!opts.exportAsV2 && !v1Mesh.isNull()) || opts.exportAsV1 )
         {
+            if( opts.exportAsV1 && v1Mesh.isNull() )
+            {
+                v1Mesh = v1::MeshManager::getSingleton().createManual(
+                                        "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+                v1Mesh->importV2( v2Mesh.get() );
+                mesh = v1Mesh.get();
+            }
+
             meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);
         }
         else

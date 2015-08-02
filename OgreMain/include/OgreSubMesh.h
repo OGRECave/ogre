@@ -268,6 +268,9 @@ namespace v1 {
          */
         SubMesh * clone(const String& newName, Mesh *parentMesh = 0);
 
+        /// Imports a v2 SubMesh @See Mesh::importV2.
+        void importFromV2( Ogre::SubMesh *subMesh );
+
         void arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents );
 
         void dearrangeToInefficient(void);

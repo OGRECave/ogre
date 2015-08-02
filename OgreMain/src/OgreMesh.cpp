@@ -51,6 +51,8 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonManager.h"
 
+#include "OgreMesh2.h"
+
 namespace Ogre {
 namespace v1 {
     bool Mesh::msOptimizeForShadowMapping = false;
@@ -321,6 +323,36 @@ namespace v1 {
 
         // Removes reference to skeleton
         setSkeletonName(BLANKSTRING);
+    }
+    //-----------------------------------------------------------------------
+    void Mesh::importV2( Ogre::Mesh *mesh )
+    {
+        if( mLoadingState.get() != LOADSTATE_UNLOADED )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "To import a v2 mesh, the v1 mesh must be in unloaded state!",
+                         "v1::Mesh::importV2" );
+        }
+
+        mAABB.setMinimum( mesh->getAabb().getMinimum() );
+        mAABB.setMaximum( mesh->getAabb().getMaximum() );
+        mBoundRadius = mesh->getBoundingSphereRadius();
+        mBoneBoundingRadius = mBoundRadius;
+
+        for( size_t i=0; i<mesh->getNumSubMeshes(); ++i )
+        {
+            SubMesh *subMesh = createSubMesh();
+            subMesh->importFromV2( mesh->getSubMesh( i ) );
+        }
+
+        mSubMeshNameMap = mesh->getSubMeshNameMap();
+
+        mLodValues = *mesh->_getLodValueArray();
+
+        mIsManual = true;
+
+        if( !mesh->hasIndependentShadowMappingVaos() )
+            prepareForShadowMapping( true );
     }
     //-----------------------------------------------------------------------
     void Mesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )

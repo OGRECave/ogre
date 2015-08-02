@@ -31,6 +31,8 @@ struct UpgradeOptions
     Ogre::v1::MeshVersion targetVersion;
     Ogre::MeshVersion targetVersionV2;
 
+    //Both can be false, only one can be true. Both can't be true at the same time.
+    bool exportAsV1;
     bool exportAsV2;
 
     bool unoptimizeBuffer;

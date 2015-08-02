@@ -128,6 +128,11 @@ namespace Ogre
         const VertexElement2* findBySemantic( VertexElementSemantic semantic, size_t &outIndex,
                                               size_t &outOffset ) const;
 
+        /// Gets the combined vertex declaration of all the vertex buffers. Note that we
+        /// iterate through all of them and allocate the vector. You should cache
+        /// the result rather than calling this function frequently.
+        VertexElement2VecVec getVertexDeclaration(void) const;
+
         /** Clones the vertex & index buffers and creates a new VertexArrayObject.
             The only exception is when one of the vertex buffers is already in sharedBuffers,
             in which case the buffer in sharedBuffers.find(vertexBuffer)->second will be

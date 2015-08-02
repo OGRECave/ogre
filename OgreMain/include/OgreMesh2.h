@@ -193,6 +193,9 @@ namespace Ogre {
         /// Removes a name from a SubMesh
         void unnameSubMesh(const String& name);
 
+        /// Gets a reference to the optional name assignments of the SubMeshes.
+        const SubMeshNameMap& getSubMeshNameMap(void) const { return mSubMeshNameMap; }
+
         /** Makes a copy of this mesh object and gives it a new name.
         @remarks
             This is useful if you want to tweak an existing mesh without affecting the original one. The
