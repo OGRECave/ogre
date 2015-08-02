@@ -686,6 +686,31 @@ namespace v1 {
 
         const uint8 numVaoPasses = parent->hasIndependentShadowMappingBuffers() + 1;
 
+        //First check if we need to do any conversion
+        for( uint8 i=0; i<numVaoPasses; ++i )
+        {
+            bool needsConversion = false;
+            const VertexDeclaration::VertexElementList &elements = vertexData[i]->vertexDeclaration->
+                                                                                        getElements();
+            VertexDeclaration::VertexElementList::const_iterator itor = elements.begin();
+            VertexDeclaration::VertexElementList::const_iterator end  = elements.end();
+
+            while( itor != end )
+            {
+                if( (itor->getSemantic() == VES_NORMAL && itor->getType() == VET_SHORT4_SNORM) ||
+                    VertexElement::getBaseType( itor->getType() ) == VET_HALF2 )
+                {
+                    needsConversion = true;
+                }
+
+                ++itor;
+            }
+
+            if( !needsConversion )
+                return;
+        }
+
+        //Perform actual conversion
         for( uint8 i=0; i<numVaoPasses; ++i )
         {
             VertexElement2VecVec vertexElements = vertexData[i]->vertexDeclaration->convertToV2();
@@ -709,8 +734,8 @@ namespace v1 {
                 HardwareVertexBufferSharedPtr vbuf = hwManager->createVertexBuffer(
                                                 VaoManager::calculateVertexSize( newDeclaration[j] ),
                                                 vertexData[i]->vertexCount,
-                                                parent->mVertexBufferUsage,
-                                                parent->mVertexBufferShadowBuffer );
+                                                vertexBuffer->getUsage(),
+                                                vertexBuffer->hasShadowBuffer() );
                 void *dstBuffer = vbuf->lock( HardwareBuffer::HBL_DISCARD );
                 memcpy( dstBuffer, newData, vbuf->getSizeInBytes() );
                 vbuf->unlock();
