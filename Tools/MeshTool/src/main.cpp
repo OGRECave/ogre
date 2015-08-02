@@ -59,14 +59,14 @@ void help(void)
     cout << endl << "OgreMeshTool: Upgrades or downgrades .mesh file versions." << endl;
     cout << "Provided for OGRE by Steve Streeting 2004-2014" << endl << endl;
     cout << "Usage: OgreMeshTool [opts] sourcefile [destfile] " << endl;
-    cout << "-i             = Interactive mode, prompt for options" << endl;
-    cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!" << endl;
+    cout << "-i             = Interactive mode, prompt for options. Implies -U" << endl;
+    cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!. Implies -U" << endl;
     cout << "-l lodlevels   = number of LOD levels" << endl;
     cout << "-d loddist     = distance increment to reduce LOD" << endl;
     cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
     cout << "-f lodnumtris  = Fixed vertex reduction per LOD" << endl;
     cout << "-e         = DON'T generate edge lists (for stencil shadows)" << endl;
-    cout << "-t         = Generate tangents (for normal mapping)" << endl;
+    cout << "-t         = Generate tangents (for normal mapping). Implies -U" << endl;
     cout << "-td [uvw|tangent]" << endl;
     cout << "           = Tangent vertex semantic destination (default tangent)" << endl;
     cout << "-ts [3|4]      = Tangent size (3 or 4 components, 4 includes parity, default 3)" << endl;
@@ -91,7 +91,8 @@ void help(void)
     cout << "             S strips the buffers for shadow mapping (consumes less space and memory)." << endl;
     cout << "-U         = Performs the opposite of -O puq: Converts 16-bit half to to float and " << endl;
     cout << "             converts QTangents to Normal + Tangent + Reflection. Needed by many" << endl;
-    cout << "             other options that have to read from position or UVs." << endl;
+    cout << "             other options that have to read from position, normals or UVs." << endl;
+    cout << "             '-o puq' can be used to optimize the buffers again right before saving to disk." << endl;
     cout << "sourcefile = name of file to convert" << endl;
     cout << "destfile   = optional name of file to write to. If you don't" << endl;
     cout << "             specify this OGRE overwrites the existing file." << endl;
@@ -341,6 +342,9 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
             opts.stripShadowMapping = true;
         }
     }
+
+    if( opts.interactive || opts.numLods || opts.lodAutoconfigure || opts.generateTangents )
+        opts.unoptimizeBuffer = true;
 }
 
 // Utility function to allow the user to modify the layout of vertex buffers.
@@ -404,6 +408,13 @@ void buildLod(v1::MeshPtr& mesh)
     bool askLodDtls = opts.interactive;
     if (genLod)
     {
+        if( mesh.isNull() )
+        {
+            cout << "LOD Generation only works on v1 meshes at the moment." << endl;
+            cout << "Export it as -v1, run the command again, and re-export it to -v2" << endl;
+            return;
+        }
+
         // otherwise only ask if not specified on command line
         if (mesh->getNumLodLevels() > 1)
         {
@@ -995,6 +1006,61 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
     return retVal;
 }
 
+void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
+               Ogre::MeshSerializer &meshSerializer2, v1::XMLMeshSerializer &xmlMeshSerializer,
+               v1::XMLSkeletonSerializer &xmlSkeletonSerializer )
+{
+    const String::size_type extPos = destination.find_last_of( '.' );
+    const String dstExt( destination.substr( extPos + 1, destination.size() ) );
+
+    if( dstExt == "mesh" )
+    {
+        if( (!opts.exportAsV2 && !v1Mesh.isNull()) || opts.exportAsV1 )
+        {
+            if( opts.exportAsV1 && v1Mesh.isNull() )
+            {
+                v1Mesh = v1::MeshManager::getSingleton().createManual( "conversion",
+                                                                       ResourceGroupManager::
+                                                                       DEFAULT_RESOURCE_GROUP_NAME );
+                v1Mesh->importV2( v2Mesh.get() );
+            }
+
+            cout << "Saving as a v1 mesh..." << endl;
+            meshSerializer->exportMesh( v1Mesh.get(), destination, opts.targetVersion, opts.endian );
+        }
+        else
+        {
+            if( v2Mesh.isNull() )
+            {
+                v2Mesh = MeshManager::getSingleton().createManual( "v2Mesh",
+                                                                   ResourceGroupManager::
+                                                                   DEFAULT_RESOURCE_GROUP_NAME );
+            }
+
+            if( !v1Mesh.isNull() )
+                v2Mesh->importV1( v1Mesh.get(), false, false, false );
+
+            cout << "Saving as a v2 mesh..." << endl;
+            meshSerializer2.exportMesh( v2Mesh.get(), destination, opts.targetVersionV2, opts.endian );
+        }
+    }
+    else if( dstExt == "xml" )
+    {
+        if( v1Mesh.isNull() && !v2Mesh.isNull() )
+        {
+            v1Mesh = v1::MeshManager::getSingleton().createManual(
+                                    "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+            v1Mesh->importV2( v2Mesh.get() );
+        }
+
+        if( !v1Mesh.isNull() )
+        {
+            cout << "Saving as a XML mesh..." << endl;
+            xmlMeshSerializer.exportMesh( v1Mesh.get(), destination );
+        }
+    }
+}
+
 int main(int numargs, char** args)
 {
     Root *root = 0;
@@ -1099,7 +1165,18 @@ int main(int numargs, char** args)
         }
         else
         {
-            dest = source;
+            const String::size_type extPos = source.find_last_of( '.' );
+            const String sourceExt( source.substr( extPos + 1, source.size() ) );
+
+            if( sourceExt == "xml" )
+            {
+                // dest is source minus .xml
+                dest = source.substr( 0, source.size() - 4 );
+            }
+            else
+            {
+                dest = source;
+            }
         }
 
         if( !v1Mesh.isNull() )
@@ -1144,33 +1221,7 @@ int main(int numargs, char** args)
             }
         }
 
-        if( (!opts.exportAsV2 && !v1Mesh.isNull()) || opts.exportAsV1 )
-        {
-            if( opts.exportAsV1 && v1Mesh.isNull() )
-            {
-                v1Mesh = v1::MeshManager::getSingleton().createManual(
-                                        "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
-                v1Mesh->importV2( v2Mesh.get() );
-                mesh = v1Mesh.get();
-            }
-
-            meshSerializer->exportMesh(mesh, dest, opts.targetVersion, opts.endian);
-        }
-        else
-        {
-            if( v2Mesh.isNull() )
-            {
-                v2Mesh = MeshManager::getSingleton().createManual( "v2Mesh",
-                                                                   ResourceGroupManager::
-                                                                   DEFAULT_RESOURCE_GROUP_NAME );
-            }
-
-            if( !v1Mesh.isNull() )
-                v2Mesh->importV1( mesh, false, false, false );
-
-            meshSerializer2.exportMesh( v2Mesh.get(), dest, opts.targetVersionV2, opts.endian );
-        }
-
+        saveMesh( dest, v1Mesh, v2Mesh, meshSerializer2, xmlMeshSerializer, xmlSkeletonSerializer );
     }
     catch (Exception& e)
     {

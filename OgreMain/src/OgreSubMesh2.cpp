@@ -420,7 +420,7 @@ namespace Ogre {
                 srcPtrs.push_back( reinterpret_cast<const char*>( asyncTicket->map() ) );
 
                 //Setup the VertexElement array and the srcData for the conversion.
-                size_t accumOffset = 0;
+                size_t accumOffset = 0, reorderedElements = 0;
                 VertexElement2Vec::const_iterator itor = vertexBuffers[i]->getVertexElements().begin();
                 VertexElement2Vec::const_iterator end  = vertexBuffers[i]->getVertexElements().end();
 
@@ -428,19 +428,24 @@ namespace Ogre {
                 {
                     const VertexElement2 &origElement = *itor;
 
+                    const SourceData sourceData( srcPtrs.back() + accumOffset,
+                                                 vertexBuffers[i]->getBytesPerElement(),
+                                                 *itor );
+
                     if( origElement.mSemantic == VES_TANGENT ||
                         origElement.mSemantic == VES_BINORMAL )
                     {
                         hasTangents = true;
+                        //Put VES_TANGENT & VES_BINORMAL at the bottom of the array.
+                        srcData.push_back( sourceData );
+                        ++reorderedElements;
                     }
                     else
                     {
                         vertexElements.push_back( origElement );
+                        srcData.insert( srcData.end() - reorderedElements, sourceData );
                     }
 
-                    srcData.push_back( SourceData( srcPtrs.back() + accumOffset,
-                                                   vertexBuffers[i]->getBytesPerElement(),
-                                                   *itor ) );
                     accumOffset += v1::VertexElement::getTypeSize( itor->mType );
 
                     //We can't convert to half if it wasn't in floating point
@@ -454,7 +459,8 @@ namespace Ogre {
                             VertexElementType type = v1::VertexElement::multiplyTypeCount(
                                         VET_HALF2, v1::VertexElement::getTypeCount( origElement.mType ) );
 
-                            VertexElement2 &lastInserted = vertexElements.back();
+                            VertexElement2 &lastInserted = *(vertexElements.end() -
+                                                             reorderedElements - 1);
                             lastInserted.mType = type;
                         }
                     }
@@ -696,6 +702,8 @@ namespace Ogre {
                         tangentSrc = &(*itor);
 
                         assert( (itor - srcData.begin() >= srcData.size() - 2) &&
+                                (srcData.back().element.mSemantic == VES_TANGENT ||
+                                 srcData.back().element.mSemantic == VES_BINORMAL ) &&
                                 "Tangent element must be at the end of srcData array!" );
                     }
                     else if( itor->element.mSemantic == VES_BINORMAL )
@@ -703,6 +711,8 @@ namespace Ogre {
                         binormalSrc = &(*itor);
 
                         assert( (itor - srcData.begin() >= srcData.size() - 2) &&
+                                (srcData.back().element.mSemantic == VES_TANGENT ||
+                                 srcData.back().element.mSemantic == VES_BINORMAL ) &&
                                 "Binormal element must be at the end of srcData array!" );
                     }
 
@@ -1004,9 +1014,6 @@ namespace Ogre {
                 else if( itElements->mSemantic == VES_NORMAL && itElements->mType == VET_SHORT4_SNORM )
                 {
                     //Dealing with QTangents.
-                    newVertexElements.push_back( VertexElement2( VET_FLOAT3, VES_NORMAL ) );
-                    newVertexElements.push_back( VertexElement2( VET_FLOAT4, VES_TANGENT ) );
-
                     Quaternion qTangent;
                     const int16 *srcData16 = reinterpret_cast<const int16*>( srcData );
                     qTangent.x = Bitwise::snorm16ToFloat( srcData16[0] );

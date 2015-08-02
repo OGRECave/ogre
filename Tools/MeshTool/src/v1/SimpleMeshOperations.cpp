@@ -74,7 +74,11 @@ void buildEdgeLists( v1::MeshPtr &mesh )
 void generateTangents( v1::MeshPtr &mesh )
 {
     if( mesh.isNull() )
+    {
+        cout << "Tangent Generation only works on v1 meshes at the moment." << endl;
+        cout << "Export it as -v1, run the command again, and re-export it to -v2" << endl;
         return;
+    }
 
     String response;
 

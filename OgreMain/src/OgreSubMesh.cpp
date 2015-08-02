@@ -707,11 +707,10 @@ namespace v1 {
 
                 HardwareBufferManagerBase *hwManager = vertexData[i]->_getHardwareBufferManager();
                 HardwareVertexBufferSharedPtr vbuf = hwManager->createVertexBuffer(
-                                                        vertexData[i]->
-                                                            vertexDeclaration->getVertexSize( j ),
-                                                        vertexData[i]->vertexCount,
-                                                        parent->mVertexBufferUsage,
-                                                        parent->mVertexBufferShadowBuffer );
+                                                VaoManager::calculateVertexSize( newDeclaration[j] ),
+                                                vertexData[i]->vertexCount,
+                                                parent->mVertexBufferUsage,
+                                                parent->mVertexBufferShadowBuffer );
                 void *dstBuffer = vbuf->lock( HardwareBuffer::HBL_DISCARD );
                 memcpy( dstBuffer, newData, vbuf->getSizeInBytes() );
                 vbuf->unlock();

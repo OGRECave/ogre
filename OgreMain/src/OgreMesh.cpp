@@ -1654,6 +1654,8 @@ namespace v1 {
         unsigned short sourceTexCoordSet, unsigned short index, 
         bool splitMirrored, bool splitRotated, bool storeParityInW)
     {
+        if( !sharedVertexData[0] )
+            dearrangeToInefficient();
 
         TangentSpaceCalc tangentsCalc;
         tangentsCalc.setSplitMirrored(splitMirrored);
