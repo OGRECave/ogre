@@ -1132,6 +1132,7 @@ int main(int numargs, char** args)
         unOptList["-tm"] = false;
         unOptList["-tr"] = false;
         unOptList["-r"] = false;
+        unOptList["-o"] = false;
         unOptList["-gl"] = false;
         unOptList["-d3d"] = false;
         unOptList["-srcgl"] = false;
