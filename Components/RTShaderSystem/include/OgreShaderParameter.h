@@ -439,6 +439,7 @@ public:
     */
     UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type);
 
+    void Init(GpuProgramParameters::AutoConstantType autoType, GpuProgramParameters::AutoConstantEntry::Data  data, size_t size, GpuConstantType type = GCT_UNKNOWN);
     
     GpuProgramParameters::AutoConstantEntry::Data mAutoConstantData;
     

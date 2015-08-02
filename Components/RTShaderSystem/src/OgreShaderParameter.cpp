@@ -435,111 +435,74 @@ UniformParameter::UniformParameter(GpuConstantType type, const String& name,
                  const Content& content,
                  uint16 variability, size_t size) : Parameter(type, name, semantic, index, content, size)
 {
+    mVariability            = variability;
     mIsAutoConstantReal     = false;    
     mIsAutoConstantInt      = false;
-    mAutoConstantData.iData    = 0;
-    mVariability            = variability;
+    mAutoConstantData = GpuProgramParameters::AutoConstantEntry::Data();
+    mAutoConstantType = GpuProgramParameters::ACT_UNKNOWN;
     mParamsPtr              = NULL;
     mPhysicalIndex          = -1;
-    mAutoConstantType       = GpuProgramParameters::ACT_UNKNOWN;
 }
 
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size)
 {
-    AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
-
-    String name = parameterDef->name;
-    if (fAutoConstantData != 0.0)
-    {
-        name += StringConverter::toString(fAutoConstantData);
-        //replace possible illegal point character in name
-        std::replace(name.begin(), name.end(), '.', '_');
-    }
-    mType               = parameterDef->type;
-    setName(name);
-    mSemantic           = SPS_UNKNOWN;
-    mIndex              = -1;
-    mContent            = SPC_UNKNOWN;
-    mIsAutoConstantReal = true; 
-    mIsAutoConstantInt  = false;
-    mAutoConstantType   = autoType;
-    mAutoConstantData.fData = fAutoConstantData;
-    mVariability        = (uint16)GPV_GLOBAL;
-    mParamsPtr           = NULL;
-    mPhysicalIndex       = -1;
-    mSize                = size;
+    Init(autoType, GpuProgramParameters::AutoConstantEntry::Data(fAutoConstantData), size);
+    mIsAutoConstantReal = true;
 }
 
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, Real fAutoConstantData, size_t size, GpuConstantType type)
 {
-    AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
 
-    String name               = parameterDef->name;
-    if (fAutoConstantData != 0.0)
-    {
-        name += StringConverter::toString(fAutoConstantData);
-        //replace possible illegal point character in name
-        std::replace(name.begin(), name.end(), '.', '_');
-    }
-    mType               = type;
-    mSemantic           = SPS_UNKNOWN;
-    mIndex              = -1;
-    mContent            = SPC_UNKNOWN;
-    mIsAutoConstantReal = true; 
-    mIsAutoConstantInt  = false;
-    mAutoConstantType   = autoType;
-    mAutoConstantData.iData = fAutoConstantData;
-    mVariability        = (uint16)GPV_GLOBAL;
-    mParamsPtr           = NULL;
-    mPhysicalIndex       = -1;
-    mSize                = size;
+    Init(autoType, GpuProgramParameters::AutoConstantEntry::Data(fAutoConstantData), size, type);
+    mIsAutoConstantReal = true;
 }
 
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
-    AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
-    String name = parameterDef->name;
+
+    Init(autoType, GpuProgramParameters::AutoConstantEntry::Data(nAutoConstantData), size);
     
-    if (nAutoConstantData != 0)
-        name += StringConverter::toString(nAutoConstantData);
-    mType               = parameterDef->type;
-    setName(name);
-    mSemantic           = SPS_UNKNOWN;
-    mIndex              = -1;
-    mContent            = SPC_UNKNOWN;
-    mIsAutoConstantReal = false;    
     mIsAutoConstantInt  = true;
-    mAutoConstantType   = autoType;
-    mAutoConstantData.iData = nAutoConstantData;
-    mVariability        = (uint16)GPV_GLOBAL;
-    mParamsPtr           = NULL;
-    mPhysicalIndex       = -1;
-    mSize                = size;
 }
 
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type)
 {
+    Init(autoType, GpuProgramParameters::AutoConstantEntry::Data(nAutoConstantData), size, type);
+    mIsAutoConstantInt = true;
+}
+
+void UniformParameter::Init(GpuProgramParameters::AutoConstantType autoType, GpuProgramParameters::AutoConstantEntry::Data data, size_t size, GpuConstantType type)
+{
     AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
-    String name = parameterDef->name;
-    if (nAutoConstantData != 0)
-        name += StringConverter::toString(nAutoConstantData);
-    mType               = type;
+
+    String name;
+    name = parameterDef->name;
+    if (data.iData != 0)
+    {
+        name += StringConverter::toString(data.iData);
+        //replace possible illegal point character in name
+        //std::replace(name.begin(), name.end(), '.', '_');
+    }
     setName(name);
-    mSemantic           = SPS_UNKNOWN;
-    mIndex              = -1;
-    mContent            = SPC_UNKNOWN;
+        
+    mType = type != GCT_UNKNOWN ? type : parameterDef->type;
+    mVariability = (uint16)GPV_GLOBAL;
+    mSemantic = SPS_UNKNOWN;
+    mIndex = -1;
+    mContent = SPC_UNKNOWN;
+
+    
     mIsAutoConstantReal = false;    
-    mIsAutoConstantInt  = true;
+    mIsAutoConstantInt = false;
+    mAutoConstantData = data;
     mAutoConstantType   = autoType;
-    mAutoConstantData.iData = nAutoConstantData;
-    mVariability        = (uint16)GPV_GLOBAL;
     mParamsPtr           = NULL;
     mPhysicalIndex       = -1;
-    mSize                = size;
+    
 }
 
 //-----------------------------------------------------------------------
