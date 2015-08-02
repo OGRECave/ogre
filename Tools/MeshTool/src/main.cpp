@@ -1179,6 +1179,19 @@ int main(int numargs, char** args)
             }
         }
 
+        {
+            const String::size_type extPos = dest.find_last_of( '.' );
+            const String dstExt( dest.substr( extPos + 1, dest.size() ) );
+            if( dstExt == "xml" )
+            {
+                if( opts.optimizeBuffer )
+                {
+                    cout << "-O is ignored when exporting to XML" << endl;
+                }
+                opts.optimizeBuffer = false;
+            }
+        }
+
         if( !v1Mesh.isNull() )
         {
             vertexBufferReorg(*mesh);
