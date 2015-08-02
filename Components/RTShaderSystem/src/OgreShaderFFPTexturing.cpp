@@ -507,12 +507,15 @@ void FFPTexturing::hlsl_GetSamplerWrapperType(ParameterPtr in_sampler, GpuConsta
         out_samplerType = GCT_SAMPLER_WRAPPERCUBE;
 
         break;
+                case GCT_SAMPLER2DARRAY:
+                    out_samplerType = GCT_SAMPLER_WRAPPER2DARRAY;
+                break;
     }
 
     if (out_samplerType == GCT_UNKNOWN)
     {
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "Sampler wrappers are valid only for GCT_SAMPLER1D, GCT_SAMPLER2D, GCT_SAMPLER3D and GCT_SAMPLERCUBE",
+                    "Sampler wrappers are valid only for GCT_SAMPLER1D, GCT_SAMPLER2D, GCT_SAMPLER3D, GCT_SAMPLERCUBE and GCT_SAMPLER2DARRAY",
             "FFPTexturing::GetSamplerWrapperParam");
     }
 }

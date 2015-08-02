@@ -64,6 +64,7 @@ void HLSLProgramWriter::initializeStringMaps()
     mGpuConstTypeMap[GCT_SAMPLER_WRAPPER2D]     = "SamplerData2D";
     mGpuConstTypeMap[GCT_SAMPLER_WRAPPER3D]     = "SamplerData3D";
     mGpuConstTypeMap[GCT_SAMPLER_WRAPPERCUBE]   = "SamplerDataCube";
+    mGpuConstTypeMap[GCT_SAMPLER_WRAPPER2DARRAY] = "SamplerData2DArray";
     mGpuConstTypeMap[GCT_SAMPLER_STATE]         = "SamplerState";
     
     mGpuConstTypeMap[GCT_MATRIX_2X2] = "float2x2";
