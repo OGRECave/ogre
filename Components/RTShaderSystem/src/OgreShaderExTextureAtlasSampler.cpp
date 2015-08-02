@@ -129,7 +129,7 @@ bool TextureAtlasSampler::resolveParameters(ProgramSet* programSet)
 bool TextureAtlasSampler::resolveDependencies(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     vsProgram->addDependency(FFP_LIB_COMMON);
     psProgram->addDependency(SGX_LIB_TEXTURE_ATLAS);
 
@@ -141,7 +141,7 @@ bool TextureAtlasSampler::addFunctionInvocations(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuVertexProgram();
     Function* vsMain   = vsProgram->getEntryPointFunction();    
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* psMain   = psProgram->getEntryPointFunction();    
     FunctionInvocation* curFuncInvocation = NULL;   
 

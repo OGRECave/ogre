@@ -54,37 +54,52 @@ public:
     /** Class destructor */
     ~ProgramSet();
 
-    /** Get the vertex shader CPU program. */
+    /** Return a GPU shader program. 
+    @param programType the gpu program type to get
+    */
+    GpuProgramPtr getGpuProgram(GpuProgramType programType);
+
+    /** Return a shader CPU progrm. 
+    @param programType The type of the program to get
+    */
+    Program* getCpuProgram(GpuProgramType programType);
+
+  /** Get the vertex shader CPU program. */
+    OGRE_DEPRECATED_EX("ProgramSet::getCpuVertexProgram is deprecated, Use ProgramSet::getCpuProgram(GpuProgramType) instead")
     Program* getCpuVertexProgram();
 
     /** Get the fragment shader CPU program. */
+    OGRE_DEPRECATED_EX("ProgramSet::getCpuFragmentProgram is deprecated, Use ProgramSet::getCpuProgram(GpuProgramType) instead")
     Program* getCpuFragmentProgram();
 
-    /** Get the vertex shader GPU program. */
-    GpuProgramPtr getGpuVertexProgram();
 
-    /** Get the fragment shader GPU program. */
-    GpuProgramPtr getGpuFragmentProgram();
+
 
     // Protected methods.
 protected:
-    void setCpuVertexProgram(Program* vsCpuProgram);
-    void setCpuFragmentProgram(Program* psCpuProgram);
 
-    void setGpuVertexProgram(GpuProgramPtr vsGpuProgram);
+    /** Set a CPU program 
+    @param programType the program type to set
+    @param cpuProgram the program to set
+    */
+
+    void setCpuProgram(GpuProgramType programType, Program* cpuProgram);
+    /** Set a GPU program 
+    @param programType the program type to set
+    @param gpuProgram the program to set
+    */
+    void setGpuProgram(GpuProgramType programType, GpuProgramPtr gpuProgram);
     void setGpuFragmentProgram(GpuProgramPtr psGpuProgram);
 
 
     // Attributes.
 protected:
-    // Vertex shader CPU program.
-    Program* mVSCpuProgram;
-    // Fragment shader CPU program.
-    Program* mPSCpuProgram;
-    // Vertex shader GPU program.
-    GpuProgramPtr mVSGpuProgram;
-    // Fragment shader CPU program.
-    GpuProgramPtr mPSGpuProgram;
+    //Shader's CPU program.
+    vector<Program *>::type mCpuPrograms;
+    
+    //Shader's GPU program.
+    vector<GpuProgramPtr>::type mGpuPrograms;
+
 
 private:
     friend class ProgramManager;

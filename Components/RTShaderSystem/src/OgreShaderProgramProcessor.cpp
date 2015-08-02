@@ -52,6 +52,9 @@ ProgramProcessor::~ProgramProcessor()
 //-----------------------------------------------------------------------------
 void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pGpuProgram)
 {
+    if (pCpuProgram == NULL || pGpuProgram.isNull())
+        return;
+
     GpuProgramParametersSharedPtr pGpuParams = pGpuProgram->getDefaultParameters();
     const UniformParameterList& progParams = pCpuProgram->getParameters();
     UniformParameterConstIterator itParams;

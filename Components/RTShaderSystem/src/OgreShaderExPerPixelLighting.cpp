@@ -224,7 +224,7 @@ bool PerPixelLighting::resolveParameters(ProgramSet* programSet)
 bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
     bool hasError = false;
@@ -339,7 +339,7 @@ bool PerPixelLighting::resolveGlobalParameters(ProgramSet* programSet)
 bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain = vsProgram->getEntryPointFunction();
     Function* psMain = psProgram->getEntryPointFunction();
     bool hasError = false;
@@ -441,7 +441,7 @@ bool PerPixelLighting::resolvePerLightParameters(ProgramSet* programSet)
 bool PerPixelLighting::resolveDependencies(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 
     vsProgram->addDependency(FFP_LIB_COMMON);
     vsProgram->addDependency(SGX_LIB_PERPIXELLIGHTING);
@@ -457,7 +457,7 @@ bool PerPixelLighting::addFunctionInvocations(ProgramSet* programSet)
 {
     Program* vsProgram = programSet->getCpuVertexProgram(); 
     Function* vsMain = vsProgram->getEntryPointFunction();  
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* psMain = psProgram->getEntryPointFunction();  
 
     int internalCounter = 0;

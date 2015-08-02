@@ -118,7 +118,7 @@ namespace RTShader {
     //-----------------------------------------------------------------------
     bool TriplanarTexturing::resolveDependencies(ProgramSet* programSet)
     {
-        Program* psProgram = programSet->getCpuFragmentProgram();
+        Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
         Program* vsProgram = programSet->getCpuVertexProgram();
 		psProgram->addDependency(FFP_LIB_TEXTURING);
         psProgram->addDependency("SGXLib_TriplanarTexturing");
@@ -129,7 +129,7 @@ namespace RTShader {
     //-----------------------------------------------------------------------
 	bool TriplanarTexturing::addFunctionInvocations(ProgramSet* programSet)
 	{
-		Program* psProgram = programSet->getCpuFragmentProgram();
+        Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
 		Function* psMain = psProgram->getEntryPointFunction();
 		Program* vsProgram = programSet->getCpuVertexProgram();
 		Function* vsMain = vsProgram->getEntryPointFunction();

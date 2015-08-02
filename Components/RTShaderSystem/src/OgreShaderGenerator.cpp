@@ -117,6 +117,7 @@ ShaderGenerator::ShaderGenerator() :
     }
 
     setVertexShaderProfiles("gpu_vp gp4vp vp40 vp30 arbvp1 vs_4_0 vs_4_0_level_9_3 vs_4_0_level_9_1 vs_3_0 vs_2_x vs_2_a vs_2_0 vs_1_1");
+    setGeometryShaderProfiles ("gs_4_0");
     setFragmentShaderProfiles("ps_4_0 ps_4_0_level_9_3 ps_4_0_level_9_1 ps_3_x ps_3_0 fp40 fp30 fp20 arbfp1 ps_2_x ps_2_a ps_2_b ps_2_0 ps_1_4 ps_1_3 ps_1_2 ps_1_1");
 }
 
@@ -652,6 +653,12 @@ void ShaderGenerator::setVertexShaderProfiles(const String& vertexShaderProfiles
 {
     mVertexShaderProfiles = vertexShaderProfiles;
     mVertexShaderProfilesList = StringUtil::split(vertexShaderProfiles);
+}
+//-----------------------------------------------------------------------------
+void ShaderGenerator::setGeometryShaderProfiles(const String& geometryShaderProfiles)
+{
+    mGeometryShaderProfiles = geometryShaderProfiles;
+    mGeometryShaderProfilesList = StringUtil::split(geometryShaderProfiles);
 }
 //-----------------------------------------------------------------------------
 void ShaderGenerator::setFragmentShaderProfiles(const String& fragmentShaderProfiles)
@@ -1365,6 +1372,11 @@ size_t ShaderGenerator::getVertexShaderCount() const
 size_t ShaderGenerator::getFragmentShaderCount() const
 {
     return mProgramManager->getFragmentShaderCount();
+}
+//-----------------------------------------------------------------------------
+size_t ShaderGenerator::getShaderCount(GpuProgramType programType) const
+{
+    return mProgramManager->getShaderCount(programType);
 }
 
 //-----------------------------------------------------------------------------

@@ -45,15 +45,26 @@ namespace Ogre {
      *  @{
      */
     /** Enumerates the types of programs which can run on the GPU. */
-    enum GpuProgramType
+	enum _OgreExport GpuProgramType
     {
-        GPT_VERTEX_PROGRAM,
+
+        GPT_VERTEX_PROGRAM = 0,
+        GPT_FIRST = 0,
+
         GPT_FRAGMENT_PROGRAM,
         GPT_GEOMETRY_PROGRAM,
         GPT_DOMAIN_PROGRAM,
         GPT_HULL_PROGRAM,
-        GPT_COMPUTE_PROGRAM
+        GPT_COMPUTE_PROGRAM,
+
+        GPT_COUNT
+
     };
+
+	 _OgreExport GpuProgramType& operator++(GpuProgramType &c);
+		
+	
+
 
     /** Defines a program which runs on the GPU such as a vertex or fragment program.
         @remarks

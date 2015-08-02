@@ -49,8 +49,8 @@ CGProgramProcessor::~CGProgramProcessor()
 //-----------------------------------------------------------------------------
 bool CGProgramProcessor::preCreateGpuPrograms( ProgramSet* programSet )
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* psProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* fsMain   = psProgram->getEntryPointFunction();    
     bool success;
@@ -67,10 +67,10 @@ bool CGProgramProcessor::preCreateGpuPrograms( ProgramSet* programSet )
 bool CGProgramProcessor::postCreateGpuPrograms( ProgramSet* programSet )
 {
     // Bind vertex shader auto parameters.
-    bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
+    bindAutoParameters(programSet->getCpuProgram(GPT_VERTEX_PROGRAM), programSet->getGpuProgram(GPT_VERTEX_PROGRAM));
 
     // Bind fragment shader auto parameters.
-    bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
+    bindAutoParameters(programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM), programSet->getGpuProgram(GPT_FRAGMENT_PROGRAM));
 
     return true;
 }

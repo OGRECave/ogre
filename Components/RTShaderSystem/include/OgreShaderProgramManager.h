@@ -206,10 +206,18 @@ protected:
     void flushGpuProgramsCache(GpuProgramsMap& gpuProgramsMap);
     
     /** Return the number of created vertex shaders. */
-    size_t getVertexShaderCount() const { return mVertexShaderMap.size(); }
-
+    OGRE_DEPRECATED_EX("ProgramManager::getVertexShaderCount is deprecated, Use ProgramManager::getShaderCount(GpuProgramType) instead")
+    size_t getVertexShaderCount() const;
+    
     /** Return the number of created fragment shaders. */
-    size_t getFragmentShaderCount() const { return mFragmentShaderMap.size(); }
+    OGRE_DEPRECATED_EX("ProgramManager::getFragmentShaderCount is deprecatedm,  Use ProgramManager::getShaderCount(GpuProgramType) instead")
+    size_t getFragmentShaderCount() const;
+
+
+    /** Return the number of created shaders of a requested type. */
+    size_t getShaderCount(GpuProgramType programType) const;
+
+
 
     /** Fix the input of the pixel shader to be the same as the output of the vertex shader */
     void synchronizePixelnToBeVertexOut(ProgramSet* programSet);
@@ -230,10 +238,9 @@ protected:
     ProgramProcessorMap mProgramProcessorsMap;
     // Holds standard shader writer factories
     ProgramWriterFactoryList mProgramWriterFactories;
-    // The generated vertex shaders.
-    GpuProgramsMap mVertexShaderMap;
-    // The generated fragment shaders.
-    GpuProgramsMap mFragmentShaderMap;
+    // The generated vertex, geometry and fragment shaders.
+    GpuProgramsMap mShaderMap[GPT_COUNT];
+
     // The default program processors.
     ProgramProcessorList mDefaultProgramProcessors;
     // map the source code of the shaders to a name for them

@@ -157,6 +157,17 @@ public:
     */
     void setVertexShaderProfiles(const String& vertexShaderProfiles);
 
+    /**
+    Set the output geomerty shader target profiles.
+    @param geometryShaderProfiles The target profiles for the geometry shader.
+    */
+    void setGeometryShaderProfiles(const String& geometryShaderProfiles);
+
+    //Get the output geometry shader target profiles.
+    const String& getGeometryShaderProfiles() const { return mGeometryShaderProfiles; }
+
+    //Get the output geometry shader target profiles as list of strings.
+    const StringVector& getGeometryShaderProfilesList() const { return mGeometryShaderProfilesList; }
     /** 
     Get the output vertex shader target profiles.   
     */
@@ -454,11 +465,15 @@ public:
 
 
     /** Return the current number of generated vertex shaders. */
+    OGRE_DEPRECATED_EX("ShaderGenerator::getVertexShaderCount is deprecated, Use ShaderGenerator::getShaderCount(GpuProgramType) instead")
     size_t getVertexShaderCount() const;
 
 
     /** Return the current number of generated fragment shaders. */
+    OGRE_DEPRECATED_EX("ShaderGenerator::getFragmentShaderCount is deprecated, Use ShaderGenerator::getShaderCount(GpuProgramType) instead")
     size_t getFragmentShaderCount() const;
+
+    size_t getShaderCount(GpuProgramType programType) const;
 
 
 
@@ -1040,6 +1055,10 @@ protected:
     float  mShaderLanguageVersion;
     // The target vertex shader profile. Will be used as argument for program compilation.
     String mVertexShaderProfiles;
+    // The target geometry shader profile. Will be used as argument for program compilation.
+    String mGeometryShaderProfiles;
+    // List of target geometry shader profiles.
+    StringVector mGeometryShaderProfilesList;
     // List of target vertex shader profiles.
     StringVector mVertexShaderProfilesList;
     // The target fragment shader profile. Will be used as argument for program compilation.

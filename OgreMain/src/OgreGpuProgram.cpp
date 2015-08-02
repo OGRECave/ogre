@@ -36,6 +36,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+
+	GpuProgramType& operator++(GpuProgramType &c)
+	{
+		c = static_cast<GpuProgramType>(static_cast<int>(c)+1);
+		return c;
+	}
     //-----------------------------------------------------------------------------
     GpuProgram::CmdType GpuProgram::msTypeCmd;
     GpuProgram::CmdSyntax GpuProgram::msSyntaxCmd;

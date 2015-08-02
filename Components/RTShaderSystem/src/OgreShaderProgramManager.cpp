@@ -110,12 +110,21 @@ void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
     }   
 
     // Bind the created GPU programs to the target pass.
-    pass->setVertexProgram(programSet->getGpuVertexProgram()->getName());
-    pass->setFragmentProgram(programSet->getGpuFragmentProgram()->getName());
+    pass->setVertexProgram(programSet->getGpuProgram(GPT_VERTEX_PROGRAM)->getName());
+    pass->setFragmentProgram(programSet->getGpuProgram(GPT_FRAGMENT_PROGRAM)->getName());
+
+    bool IsGeometryProgramExists = !programSet->getGpuProgram(GPT_GEOMETRY_PROGRAM).isNull();
+    
+    
+    if (IsGeometryProgramExists)
+        pass->setGeometryProgram(programSet->getGpuProgram(GPT_GEOMETRY_PROGRAM)->getName());
 
     // Bind uniform parameters to pass parameters.
-    bindUniformParameters(programSet->getCpuVertexProgram(), pass->getVertexProgramParameters());
-    bindUniformParameters(programSet->getCpuFragmentProgram(), pass->getFragmentProgramParameters());
+    bindUniformParameters(programSet->getCpuProgram(GPT_VERTEX_PROGRAM), pass->getVertexProgramParameters());
+    bindUniformParameters(programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM), pass->getFragmentProgramParameters());
+
+    if (IsGeometryProgramExists)
+        bindUniformParameters(programSet->getCpuProgram(GPT_GEOMETRY_PROGRAM), pass->getGeometryProgramParameters());
 
 }
 
@@ -128,39 +137,33 @@ void ProgramManager::releasePrograms(Pass* pass, TargetRenderState* renderState)
     {
         pass->setVertexProgram(BLANKSTRING);
         pass->setFragmentProgram(BLANKSTRING);
+        pass->setGeometryProgram(BLANKSTRING);
 
-        GpuProgramPtr vsProgram(programSet->getGpuVertexProgram());
-        GpuProgramPtr psProgram(programSet->getGpuFragmentProgram());
-
-        GpuProgramsMapIterator itVsGpuProgram = vsProgram.isNull() ? mVertexShaderMap.end() : mVertexShaderMap.find(vsProgram->getName());
-        GpuProgramsMapIterator itFsGpuProgram = psProgram.isNull() ? mFragmentShaderMap.end() : mFragmentShaderMap.find(psProgram->getName());
+        for (GpuProgramType i = GPT_FIRST; i < GPT_COUNT; i++)
+        {
+            GpuProgramPtr gpuProgram = programSet->getGpuProgram(i);
+            if (!gpuProgram.isNull())
+            {
+                GpuProgramsMap &map = mShaderMap[i];
+                GpuProgramsMap::iterator it = map.find(gpuProgram->getName());
+                if (it != map.end() && it->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+                {
+                    destroyGpuProgram(it->second);
+                    map.erase(it);
+                }
+            }
+        }
 
         renderState->destroyProgramSet();
-
-        if (itVsGpuProgram != mVertexShaderMap.end())
-        {
-            if (itVsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
-            {
-                destroyGpuProgram(itVsGpuProgram->second);
-                mVertexShaderMap.erase(itVsGpuProgram);
-            }
-        }
-
-        if (itFsGpuProgram != mFragmentShaderMap.end())
-        {
-            if (itFsGpuProgram->second.useCount() == ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
-            {
-                destroyGpuProgram(itFsGpuProgram->second);
-                mFragmentShaderMap.erase(itFsGpuProgram);
-            }
-        }
     }
 }
 //-----------------------------------------------------------------------------
 void ProgramManager::flushGpuProgramsCache()
 {
-    flushGpuProgramsCache(mVertexShaderMap);
-    flushGpuProgramsCache(mFragmentShaderMap);
+    for (int i = 0; i < GPT_COUNT; i++)
+    {
+        flushGpuProgramsCache(mShaderMap[i]);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -323,7 +326,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
     // Create the vertex shader program.
     GpuProgramPtr vsGpuProgram;
     
-    vsGpuProgram = createGpuProgram(programSet->getCpuVertexProgram(), 
+    vsGpuProgram = createGpuProgram(programSet->getCpuProgram(GPT_VERTEX_PROGRAM), 
         programWriter,
         language, 
         ShaderGenerator::getSingleton().getVertexShaderProfiles(),
@@ -333,15 +336,32 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
     if (vsGpuProgram.isNull())  
         return false;
 
-    programSet->setGpuVertexProgram(vsGpuProgram);
+    programSet->setGpuProgram(GPT_VERTEX_PROGRAM, vsGpuProgram);
 
     //update flags
-    programSet->getGpuVertexProgram()->setSkeletalAnimationIncluded(
-        programSet->getCpuVertexProgram()->getSkeletalAnimationIncluded());
+    programSet->getGpuProgram(GPT_VERTEX_PROGRAM)->setSkeletalAnimationIncluded(
+        programSet->getCpuProgram(GPT_VERTEX_PROGRAM)->getSkeletalAnimationIncluded());
+
+    if (programSet->getCpuProgram(GPT_GEOMETRY_PROGRAM) != NULL)
+    {
+        GpuProgramPtr gsGpuProgram;
+
+        gsGpuProgram = createGpuProgram(programSet->getCpuProgram(GPT_GEOMETRY_PROGRAM),
+            programWriter,
+            language,
+            ShaderGenerator::getSingleton().getGeometryShaderProfiles(),
+            ShaderGenerator::getSingleton().getGeometryShaderProfilesList(),
+            ShaderGenerator::getSingleton().getShaderCachePath());
+
+        if (gsGpuProgram.isNull())
+            return false;
+
+        programSet->setGpuProgram(GPT_GEOMETRY_PROGRAM, gsGpuProgram);
+    }
     // Create the fragment shader program.
     GpuProgramPtr psGpuProgram;
 
-    psGpuProgram = createGpuProgram(programSet->getCpuFragmentProgram(), 
+    psGpuProgram = createGpuProgram(programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM), 
         programWriter,
         language, 
         ShaderGenerator::getSingleton().getFragmentShaderProfiles(),
@@ -351,7 +371,7 @@ bool ProgramManager::createGpuPrograms(ProgramSet* programSet)
     if (psGpuProgram.isNull())  
         return false;
 
-    programSet->setGpuFragmentProgram(psGpuProgram);
+    programSet->setGpuProgram(GPT_FRAGMENT_PROGRAM, psGpuProgram);
 
     // Call the post creation of GPU programs method.
     success = programProcessor->postCreateGpuPrograms(programSet);
@@ -406,15 +426,21 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
    
 #endif
     
-    if (shaderProgram->getType() == GPT_VERTEX_PROGRAM)
+    GpuProgramType type = shaderProgram->getType();
+    switch (type)
     {
+    case GPT_VERTEX_PROGRAM:
         programName += "_VS";
-    }
-    else if (shaderProgram->getType() == GPT_FRAGMENT_PROGRAM)
-    {
+        break;
+    case GPT_FRAGMENT_PROGRAM:
         programName += "_FS";
+        break;
+    case GPT_GEOMETRY_PROGRAM:
+        programName += "_GS";
+        break;
     }
 
+    
     // Try to get program by name.
     HighLevelGpuProgramPtr pGpuProgram = HighLevelGpuProgramManager::getSingleton().getByName(programName);
 
@@ -502,14 +528,8 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
         }
 
         // Add the created GPU program to local cache.
-        if (pGpuProgram->getType() == GPT_VERTEX_PROGRAM)
-        {
-            mVertexShaderMap[programName] = pGpuProgram;            
-        }
-        else if (pGpuProgram->getType() == GPT_FRAGMENT_PROGRAM)
-        {
-            mFragmentShaderMap[programName] = pGpuProgram;  
-        }               
+        
+        mShaderMap[pGpuProgram->getType()][programName] = pGpuProgram;
     }
     
     return GpuProgramPtr(pGpuProgram);
@@ -684,6 +704,21 @@ void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
             }
         }
     }
+}
+//-----------------------------------------------------------------------
+size_t ProgramManager::getShaderCount(GpuProgramType programType) const
+{
+    return mShaderMap[programType].size();
+}
+//-----------------------------------------------------------------------
+size_t ProgramManager::getFragmentShaderCount()  const
+{
+    return getShaderCount(GPT_FRAGMENT_PROGRAM);
+}
+//-----------------------------------------------------------------------
+size_t ProgramManager::getVertexShaderCount()  const
+{
+    return getShaderCount(GPT_VERTEX_PROGRAM);
 }
 
 /** @} */

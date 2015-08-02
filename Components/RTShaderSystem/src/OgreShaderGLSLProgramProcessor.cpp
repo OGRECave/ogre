@@ -60,8 +60,8 @@ GLSLProgramProcessor::~GLSLProgramProcessor()
 //-----------------------------------------------------------------------------
 bool GLSLProgramProcessor::preCreateGpuPrograms(ProgramSet* programSet)
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* fsProgram = programSet->getCpuFragmentProgram();
+    Program* vsProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* fsProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
     Function* vsMain   = vsProgram->getEntryPointFunction();
     Function* fsMain   = fsProgram->getEntryPointFunction();    
     bool success;
@@ -77,10 +77,10 @@ bool GLSLProgramProcessor::preCreateGpuPrograms(ProgramSet* programSet)
 //-----------------------------------------------------------------------------
 bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
 {
-    Program* vsCpuProgram = programSet->getCpuVertexProgram();
-    Program* fsCpuProgram = programSet->getCpuFragmentProgram();
-    GpuProgramPtr vsGpuProgram = programSet->getGpuVertexProgram();
-    GpuProgramPtr fsGpuProgram = programSet->getGpuFragmentProgram();
+    Program* vsCpuProgram = programSet->getCpuProgram(GPT_VERTEX_PROGRAM);
+    Program* fsCpuProgram = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM);
+    GpuProgramPtr vsGpuProgram = programSet->getGpuProgram(GPT_VERTEX_PROGRAM);
+    GpuProgramPtr fsGpuProgram = programSet->getGpuProgram(GPT_FRAGMENT_PROGRAM);
     
     // Bind sub shaders for the vertex shader.
     bindSubShaders(vsCpuProgram, vsGpuProgram);
@@ -89,10 +89,10 @@ bool GLSLProgramProcessor::postCreateGpuPrograms(ProgramSet* programSet)
     bindSubShaders(fsCpuProgram, fsGpuProgram);
 
     // Bind vertex shader auto parameters.
-    bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
+    bindAutoParameters(programSet->getCpuProgram(GPT_VERTEX_PROGRAM), programSet->getGpuProgram(GPT_VERTEX_PROGRAM));
 
     // Bind fragment shader auto parameters.
-    bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
+    bindAutoParameters(programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM), programSet->getGpuProgram(GPT_FRAGMENT_PROGRAM));
 
     // Bind texture samplers for the vertex shader.
     bindTextureSamplers(vsCpuProgram, vsGpuProgram);
