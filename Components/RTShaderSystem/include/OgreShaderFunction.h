@@ -73,6 +73,17 @@ public:
     */
     ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
+    
+    /** Resolve output or input  parameter of this function
+    @param semantic The desired parameter semantic. 
+    @param index The index of the desired parameter.
+    @param content The content of the parameter.
+    @param type The type of the desired parameter.
+    @param direction The direction of the function parameter 'In' or 'Out'
+    Return parameter instance in case of that resolve operation succeeded.
+    @remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
+    */
+    ParameterPtr resolveParameter(Parameter::Semantic semantic, int index, Parameter::Content content, GpuConstantType type, Parameter::Direction direction);
 
     /** Resolve output parameter of this function
     @param semantic The desired parameter semantic. 
@@ -197,7 +208,8 @@ protected:
 
     /** Delete parameter from a given list */
     void deleteParameter(ShaderParameterList& parameterList, ParameterPtr parameter);
-
+    //** Returns function's input or output parameters/*
+    ShaderParameterList& getProgramParameters(Parameter::Direction direction);
 protected:
     // Function name.
     String mName;

@@ -993,11 +993,13 @@ void ProgramProcessor::MergeParameter::createDestinationParameter(int usage, int
 
     if (usage == Operand::OPS_IN)
     {
-        mDstParameter = ParameterFactory::createInTexcoord(dstParamType, index, Parameter::SPC_UNKNOWN);
+        mDstParameter = ParameterFactory::createTexcoord(dstParamType, index, Parameter::SPC_UNKNOWN);
+        mDstParameter->setDirection(Parameter::SPD_IN);
     }
     else if (usage == Operand::OPS_OUT)
     {
-        mDstParameter = ParameterFactory::createOutTexcoord(dstParamType, index, Parameter::SPC_UNKNOWN);
+        mDstParameter = ParameterFactory::createTexcoord(dstParamType, index, Parameter::SPC_UNKNOWN);
+        mDstParameter->setDirection(Parameter::SPD_OUT);
     }
 }
 

@@ -47,6 +47,14 @@ namespace RTShader {
 class _OgreRTSSExport Parameter : public RTShaderSystemAlloc
 {
 public:
+            enum Direction
+            {
+                SPD_NONE = 0,
+                SPD_GLOBAL = 0,
+                SPD_IN = 1,
+                SPD_OUT = 2,
+                SPD_IN_OUT = SPD_IN | SPD_OUT
+            };
     // Shader parameter semantic.
     enum Semantic
     {
@@ -317,11 +325,17 @@ public:
         const Content& content, size_t size = 0);
 
     /** Class destructor */
-    virtual ~Parameter() {};
+            virtual ~Parameter();
 
-    /** Get the name of this parameter. */
-    const String& getName() const { return mName; }
+    /** Set this parameter base name.*/
+    void setName(String name);
+    /** Rebuild the fully qualified name of this parameter.*/
+    void updateFullName();
+    /** Get the base name of this parameter.*/
+    const String& getRawName() const { return mName; }
 
+    /** Get the fully qualified name of this parameter. */
+    const String& getName() const { return mFullName; }
     /** Get the type of this parameter. */
     GpuConstantType getType() const { return mType; }
 
@@ -338,7 +352,7 @@ public:
     virtual bool isConstParameter() const { return false; }
 
     /** Returns the string representation of this parameter. */
-    virtual String toString() const { return mName; }
+            virtual String toString() const { return mFullName; }
     
     /** Returns Whether this parameter is an array. */
     bool isArray() const { return mSize > 0; }
@@ -349,10 +363,15 @@ public:
     /** Sets the number of elements in the parameter (for arrays). */
     void setSize(size_t size) { mSize = size; }
 
+            /** Sets the Shader stage direction of this parameter*/
+            void setDirection(Direction direction) { mDirection = direction; updateFullName(); }
+            /** Return the Shader stage direction of this parameter*/
+            Direction getDirection() { return  mDirection;}
 // Attributes.
 protected:
     // Name of this parameter.
     String mName;
+            String mFullName;
     // Type of this parameter.
     GpuConstantType mType;
     // Semantic of this parameter.
@@ -364,6 +383,7 @@ protected:
     // Number of elements in the parameter (for arrays)
     size_t mSize;
     
+            Direction mDirection;
 };
 
 typedef ShaderParameterList::iterator           ShaderParameterIterator;
@@ -610,30 +630,19 @@ class _OgreRTSSExport ParameterFactory
     // Interface.
 public:
 
-    static ParameterPtr createInPosition(int index);    
-    static ParameterPtr createOutPosition(int index);
-
-    static ParameterPtr createInNormal(int index);
-    static ParameterPtr createInWeights(int index);
-    static ParameterPtr createInIndices(int index);
-    static ParameterPtr createOutNormal(int index);
-    static ParameterPtr createInBiNormal(int index);
-    static ParameterPtr createOutBiNormal(int index);
-    static ParameterPtr createInTangent(int index);
-    static ParameterPtr createOutTangent(int index);
-    static ParameterPtr createInColor(int index);
-    static ParameterPtr createOutColor(int index);
-
-    static ParameterPtr createInTexcoord(GpuConstantType type, int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord(GpuConstantType type, int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord1(int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord1(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord2(int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord2(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord3(int index, Parameter::Content content);
-    static ParameterPtr createOutTexcoord3(int index, Parameter::Content content);
-    static ParameterPtr createInTexcoord4(int index, Parameter::Content content);           
-    static ParameterPtr createOutTexcoord4(int index, Parameter::Content content);
+            static ParameterPtr createPosition(int index, Parameter::Direction direction);
+            static ParameterPtr createNormal(int index);
+            static ParameterPtr createWeights(int index);
+            static ParameterPtr createIndices(int index);
+            /* Create custom paramter without semantic
+            */
+            static ParameterPtr createCustomInt(int index, Parameter::Content content);
+            static ParameterPtr createBiNormal(int index);
+            static ParameterPtr createTangent(int index);
+            static ParameterPtr createColor(int index);
+            static ParameterPtr createRenderTargetArrayIndex(int index);
+            static ParameterPtr createTexcoord(GpuConstantType type, int index, Parameter::Content content);
+            
 
     static ParameterPtr createConstParamVector2(Vector2 val);
     static ParameterPtr createConstParamVector3(Vector3 val);

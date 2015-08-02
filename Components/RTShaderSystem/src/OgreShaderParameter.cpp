@@ -332,7 +332,14 @@ namespace RTShader {
     };
 
 //-----------------------------------------------------------------------
-Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), mIndex(0), mContent(SPC_UNKNOWN), mSize(0)
+Parameter::Parameter() : 
+          mName("")
+        , mType(GCT_UNKNOWN)
+        , mSemantic(SPS_UNKNOWN)
+        , mIndex(0)
+        , mContent(SPC_UNKNOWN)
+        , mSize(0)
+        , mDirection(SPD_NONE)
 {
 }
 
@@ -340,10 +347,44 @@ Parameter::Parameter() : mName(""), mType(GCT_UNKNOWN), mSemantic(SPS_UNKNOWN), 
 Parameter::Parameter(GpuConstantType type, const String& name, 
             const Semantic& semantic, int index, 
             const Content& content, size_t size) :
-    mName(name), mType(type), mSemantic(semantic), mIndex(index), mContent(content), mSize(size)
+          mType(type)
+        , mSemantic(semantic)
+        , mIndex(index) 
+        , mContent(content)
+        , mSize(size)
+        , mDirection(SPD_NONE)
+{
+    setName(name);
+}
+  
+//-----------------------------------------------------------------------
+
+Parameter::~Parameter()
 {
 }
+void Parameter::setName(String name)
+{
+    mName = name;
+    updateFullName();
+}
+//-----------------------------------------------------------------------
+void Parameter::updateFullName()
+{
+    String prefix = BLANKSTRING;
 
+    switch (mDirection)
+    {
+    case SPD_IN:
+        prefix = "i";
+        break;
+    case SPD_OUT:
+        prefix = "o";
+        break;
+    default:
+        break;
+    }
+    mFullName = prefix + mName;
+}
 //-----------------------------------------------------------------------
 bool UniformParameter::isFloat() const
 {
@@ -408,14 +449,15 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 {
     AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
 
-    mName               = parameterDef->name;
+    String name = parameterDef->name;
     if (fAutoConstantData != 0.0)
     {
-        mName += StringConverter::toString(fAutoConstantData);
+        name += StringConverter::toString(fAutoConstantData);
         //replace possible illegal point character in name
-        std::replace(mName.begin(), mName.end(), '.', '_'); 
+        std::replace(name.begin(), name.end(), '.', '_');
     }
     mType               = parameterDef->type;
+    setName(name);
     mSemantic           = SPS_UNKNOWN;
     mIndex              = -1;
     mContent            = SPC_UNKNOWN;
@@ -434,12 +476,12 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 {
     AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
 
-    mName               = parameterDef->name;
+    String name               = parameterDef->name;
     if (fAutoConstantData != 0.0)
     {
-        mName += StringConverter::toString(fAutoConstantData);
+        name += StringConverter::toString(fAutoConstantData);
         //replace possible illegal point character in name
-        std::replace(mName.begin(), mName.end(), '.', '_'); 
+        std::replace(name.begin(), name.end(), '.', '_');
     }
     mType               = type;
     mSemantic           = SPS_UNKNOWN;
@@ -459,11 +501,12 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
     AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
-
-    mName               = parameterDef->name;
+    String name = parameterDef->name;
+    
     if (nAutoConstantData != 0)
-        mName += StringConverter::toString(nAutoConstantData);
+        name += StringConverter::toString(nAutoConstantData);
     mType               = parameterDef->type;
+    setName(name);
     mSemantic           = SPS_UNKNOWN;
     mIndex              = -1;
     mContent            = SPC_UNKNOWN;
@@ -481,11 +524,11 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type)
 {
     AutoShaderParameter* parameterDef = &g_AutoParameters[autoType];
-
-    mName               = parameterDef->name;
+    String name = parameterDef->name;
     if (nAutoConstantData != 0)
-        mName += StringConverter::toString(nAutoConstantData);
+        name += StringConverter::toString(nAutoConstantData);
     mType               = type;
+    setName(name);
     mSemantic           = SPS_UNKNOWN;
     mIndex              = -1;
     mContent            = SPC_UNKNOWN;
@@ -515,121 +558,92 @@ void UniformParameter::bind(GpuProgramParametersSharedPtr paramsPtr)
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInPosition(int index)
+ParameterPtr ParameterFactory::createPosition(int index, Parameter::Direction direction)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iPos_" + StringConverter::toString(index), 
+    Parameter::Content content = direction == Parameter::SPD_IN ? Parameter::SPC_POSITION_OBJECT_SPACE : Parameter::SPC_POSITION_PROJECTIVE_SPACE;
+    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "Pos_" + StringConverter::toString(index), 
         Parameter::SPS_POSITION, index, 
-        Parameter::SPC_POSITION_OBJECT_SPACE));
+        content));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutPosition(int index)
+ParameterPtr ParameterFactory::createNormal(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oPos_" + StringConverter::toString(index), 
-        Parameter::SPS_POSITION, index, 
-        Parameter::SPC_POSITION_PROJECTIVE_SPACE));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInNormal(int index)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iNormal_" + StringConverter::toString(index), 
+    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "Normal_" + StringConverter::toString(index), 
         Parameter::SPS_NORMAL, index, 
         Parameter::SPC_NORMAL_OBJECT_SPACE));
 }
 
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInWeights(int index)
+ParameterPtr ParameterFactory::createWeights(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iBlendWeights_" + StringConverter::toString(index), 
+    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "BlendWeights_" + StringConverter::toString(index), 
         Parameter::SPS_BLEND_WEIGHTS, index, 
         Parameter::SPC_BLEND_WEIGHTS));
 }
 
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInIndices(int index)
+ParameterPtr ParameterFactory::createIndices(int index)
 {
-	return ParameterPtr(OGRE_NEW Parameter(
-		GCT_UINT4 
-	, "iBlendIndices_" + StringConverter::toString(index), 
+    return ParameterPtr(OGRE_NEW Parameter(
+        GCT_UINT4 
+    , "BlendIndices_" + StringConverter::toString(index), 
         Parameter::SPS_BLEND_INDICES, index, 
         Parameter::SPC_BLEND_INDICES));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInBiNormal(int index)
+ParameterPtr ParameterFactory::createBiNormal(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iBiNormal_" + StringConverter::toString(index), 
+    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "BiNormal_" + StringConverter::toString(index), 
         Parameter::SPS_BINORMAL, index, 
         Parameter::SPC_BINORMAL_OBJECT_SPACE));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInTangent(int index)
+
+
+//-----------------------------------------------------------------------
+ParameterPtr ParameterFactory::createTangent(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iTangent_" + StringConverter::toString(index), 
+    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "Tangent_" + StringConverter::toString(index), 
         Parameter::SPS_TANGENT, index, 
         Parameter::SPC_TANGENT_OBJECT_SPACE));
 }
 
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutNormal(int index)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oNormal_" + StringConverter::toString(index), 
-        Parameter::SPS_NORMAL, index, 
-        Parameter::SPC_NORMAL_OBJECT_SPACE));
-}
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutBiNormal(int index)
+ParameterPtr ParameterFactory::createColor(int index)
 {
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oBiNormal_" + StringConverter::toString(index), 
-        Parameter::SPS_BINORMAL, index, 
-        Parameter::SPC_BINORMAL_OBJECT_SPACE));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutTangent(int index)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oTangent_" + StringConverter::toString(index), 
-        Parameter::SPS_TANGENT, index, 
-        Parameter::SPC_TANGENT_OBJECT_SPACE));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInColor(int index)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iColor_" + StringConverter::toString(index), 
+    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "Color_" + StringConverter::toString(index), 
         Parameter::SPS_COLOR, index, 
         index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR));
 }
 
 //-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutColor(int index)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oColor_" + StringConverter::toString(index), 
-        Parameter::SPS_COLOR, index, 
-        index == 0 ? Parameter::SPC_COLOR_DIFFUSE : Parameter::SPC_COLOR_SPECULAR));
-}
 
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index, Parameter::Content content)
+
+ParameterPtr ParameterFactory::createTexcoord(GpuConstantType type, int index, Parameter::Content content)
 {
     switch (type)
     {
+    case GCT_INT1:
+    case GCT_INT2:
+    case GCT_INT3:
+    case GCT_INT4:
+    case GCT_UINT1:
+    case GCT_UINT2:
+    case GCT_UINT3:
+    case GCT_UINT4:
     case GCT_FLOAT1:
-        return createInTexcoord1(index, content);
-        
     case GCT_FLOAT2:
-        return createInTexcoord2(index, content);
-        
     case GCT_FLOAT3:
-        return createInTexcoord3(index, content);
-        
     case GCT_FLOAT4:
-        return createInTexcoord4(index, content);       
+        return ParameterPtr(OGRE_NEW Parameter(type, "Texcoord_" + StringConverter::toString(index),
+            Parameter::SPS_TEXTURE_COORDINATES, index,
+            content));
     default:
     case GCT_SAMPLER1D:
     case GCT_SAMPLER2D:
@@ -647,134 +661,13 @@ ParameterPtr ParameterFactory::createInTexcoord(GpuConstantType type, int index,
     case GCT_MATRIX_4X2:
     case GCT_MATRIX_4X3:
     case GCT_MATRIX_4X4:
-    case GCT_INT1:
-    case GCT_INT2:
-    case GCT_INT3:
-    case GCT_INT4:
-    case GCT_UINT1:
-    case GCT_UINT2:
-    case GCT_UINT3:
-    case GCT_UINT4:
+  
     case GCT_UNKNOWN:
         break;
     }
 
     return ParameterPtr();
 }
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutTexcoord(GpuConstantType type, int index, Parameter::Content content)
-{
-    switch (type)
-    {
-    case GCT_FLOAT1:
-        return createOutTexcoord1(index, content);
-
-    case GCT_FLOAT2:
-        return createOutTexcoord2(index, content);
-
-    case GCT_FLOAT3:
-        return createOutTexcoord3(index, content);
-
-    case GCT_FLOAT4:
-        return createOutTexcoord4(index, content);      
-    
-    default:
-    case GCT_SAMPLER1D:
-    case GCT_SAMPLER2D:
-    case GCT_SAMPLER2DARRAY:
-    case GCT_SAMPLER3D:
-    case GCT_SAMPLERCUBE:
-    case GCT_SAMPLER1DSHADOW:
-    case GCT_SAMPLER2DSHADOW:
-    case GCT_MATRIX_2X2:
-    case GCT_MATRIX_2X3:
-    case GCT_MATRIX_2X4:
-    case GCT_MATRIX_3X2:
-    case GCT_MATRIX_3X3:
-    case GCT_MATRIX_3X4:
-    case GCT_MATRIX_4X2:
-    case GCT_MATRIX_4X3:
-    case GCT_MATRIX_4X4:
-    case GCT_INT1:
-    case GCT_INT2:
-    case GCT_INT3:
-    case GCT_INT4:
-    case GCT_UINT1:
-    case GCT_UINT2:
-    case GCT_UINT3:
-    case GCT_UINT4:
-    case GCT_UNKNOWN:
-        break;
-    }
-
-    return ParameterPtr();
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInTexcoord1(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT1, "iTexcoord1_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutTexcoord1(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT1, "oTexcoord1_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInTexcoord2(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT2, "iTexcoord2_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutTexcoord2(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT2, "oTexcoord2_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInTexcoord3(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "iTexcoord3_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutTexcoord3(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT3, "oTexcoord3_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createInTexcoord4(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "iTexcoord4_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
-//-----------------------------------------------------------------------
-ParameterPtr ParameterFactory::createOutTexcoord4(int index, Parameter::Content content)
-{
-    return ParameterPtr(OGRE_NEW Parameter(GCT_FLOAT4, "oTexcoord4_" + StringConverter::toString(index), 
-        Parameter::SPS_TEXTURE_COORDINATES, index, 
-        content));
-}
-
 //-----------------------------------------------------------------------
 UniformParameterPtr ParameterFactory::createSampler(GpuConstantType type, int index)
 {
