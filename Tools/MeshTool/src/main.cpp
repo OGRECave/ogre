@@ -55,9 +55,14 @@ using namespace Ogre;
 
 void help(void)
 {
+    // OgreMeshTool <Name> (2.1.0) unstable
+    cout << "OgreMeshTool " << OGRE_VERSION_NAME << " "
+         << "(" << OGRE_VERSION_MAJOR << "." << OGRE_VERSION_MINOR << "." << OGRE_VERSION_PATCH << ")"
+         << " " << OGRE_VERSION_SUFFIX << endl;
+
     // Print help message
-    cout << endl << "OgreMeshTool: Upgrades or downgrades .mesh file versions." << endl;
-    cout << "Provided for OGRE by Steve Streeting 2004-2014" << endl << endl;
+    cout << endl << "Upgrades or downgrades .mesh file versions." << endl;
+    cout << "Provided for OGRE by Steve Streeting 2004-2015" << endl << endl;
     cout << "Usage: OgreMeshTool [opts] sourcefile [destfile] " << endl;
     cout << "-i             = Interactive mode, prompt for options. Implies -U" << endl;
     cout << "-autogen       = Generate autoconfigured LOD. No more LOD options needed!. Implies -U" << endl;
@@ -65,14 +70,15 @@ void help(void)
     cout << "-d loddist     = distance increment to reduce LOD" << endl;
     cout << "-p lodpercent  = Percentage triangle reduction amount per LOD" << endl;
     cout << "-f lodnumtris  = Fixed vertex reduction per LOD" << endl;
-    cout << "-e         = DON'T generate edge lists (for stencil shadows)" << endl;
-    cout << "-t         = Generate tangents (for normal mapping). Implies -U" << endl;
+    cout << "-e             = DON'T generate edge lists (for stencil shadows)" << endl;
+    cout << "-t             = Generate tangents (for normal mapping). Implies -U" << endl;
     cout << "-td [uvw|tangent]" << endl;
     cout << "           = Tangent vertex semantic destination (default tangent)" << endl;
     cout << "-ts [3|4]      = Tangent size (3 or 4 components, 4 includes parity, default 3)" << endl;
     cout << "-tm            = Split tangent vertices at UV mirror points" << endl;
     cout << "-tr            = Split tangent vertices where basis is rotated > 90 degrees" << endl;
     cout << "-r         = DON'T reorganise buffers to recommended format" << endl;
+    cout << "-o         = DON'T optimise out redundant tracks & keyframes" << endl;
     cout << "-d3d       = Convert to D3D colour formats" << endl;
     cout << "-gl        = Convert to GL colour formats" << endl;
     cout << "-srcd3d    = Interpret ambiguous colours as D3D style" << endl;
@@ -125,6 +131,7 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.tangentSplitMirrored = false;
     opts.tangentSplitRotated = false;
     opts.dontReorganise = false;
+    opts.dontOptimiseAnimations = false;
     opts.endian = Serializer::ENDIAN_NATIVE;
     opts.destColourFormatSet = false;
     opts.srcColourFormatSet = false;
@@ -165,6 +172,8 @@ void parseOpts(UnaryOptionList& unOpts, BinaryOptionList& binOpts)
     opts.interactive = ui->second;
     ui = unOpts.find("-r");
     opts.dontReorganise = ui->second;
+    ui = unOpts.find("-o");
+    opts.dontOptimiseAnimations = ui->second;
     ui = unOpts.find("-d3d");
     if (ui->second)
     {
@@ -879,6 +888,7 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
     False on failure.
 */
 bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
+               v1::SkeletonPtr &v1Skeleton,
                Ogre::MeshSerializer &meshSerializer2, v1::XMLMeshSerializer &xmlMeshSerializer,
                v1::XMLSkeletonSerializer &xmlSkeletonSerializer )
 {
@@ -977,20 +987,9 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
             }
             else if( !stricmp(root->Value(), "skeleton") )
             {
-                delete doc;
-                v1::SkeletonPtr newSkel = v1::OldSkeletonManager::getSingleton().create(
+                v1Skeleton = v1::OldSkeletonManager::getSingleton().create(
                             "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
-                xmlSkeletonSerializer.importSkeleton( source, newSkel.get() );
-                /*TODO
-                if( opts.optimiseAnimations )
-                {
-                    newSkel->optimiseAllAnimations();
-                }
-                skeletonSerializer->exportSkeleton( newSkel.get(), opts.dest,
-                                                    v1::SKELETON_VERSION_LATEST, opts.endian );*/
-
-                // Clean up the conversion skeleton
-                v1::OldSkeletonManager::getSingleton().remove("conversion");
+                xmlSkeletonSerializer.importSkeleton( source, v1Skeleton.get() );
 
                 retVal = true;
             }
@@ -1007,6 +1006,7 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
 }
 
 void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
+               v1::SkeletonPtr &v1Skeleton,
                Ogre::MeshSerializer &meshSerializer2, v1::XMLMeshSerializer &xmlMeshSerializer,
                v1::XMLSkeletonSerializer &xmlSkeletonSerializer )
 {
@@ -1043,6 +1043,20 @@ void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
             cout << "Saving as a v2 mesh..." << endl;
             meshSerializer2.exportMesh( v2Mesh.get(), destination, opts.targetVersionV2, opts.endian );
         }
+
+        if( !v1Skeleton.isNull() )
+        {
+            skeletonSerializer->exportSkeleton( v1Skeleton.get(), destination + ".skeleton",
+                                                v1::SKELETON_VERSION_LATEST, opts.endian );
+        }
+    }
+    else if( dstExt == "skeleton" )
+    {
+        if( !v1Skeleton.isNull() )
+        {
+            skeletonSerializer->exportSkeleton( v1Skeleton.get(), destination,
+                                                v1::SKELETON_VERSION_LATEST, opts.endian );
+        }
     }
     else if( dstExt == "xml" )
     {
@@ -1057,6 +1071,12 @@ void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
         {
             cout << "Saving as a XML mesh..." << endl;
             xmlMeshSerializer.exportMesh( v1Mesh.get(), destination );
+        }
+
+        if( !v1Skeleton.isNull() )
+        {
+            cout << "Saving as a XML skeleton..." << endl;
+            xmlSkeletonSerializer.exportSkeleton( v1Skeleton.get(), destination );
         }
     }
 }
@@ -1139,9 +1159,11 @@ int main(int numargs, char** args)
 
         // Load the mesh
         v1::MeshPtr v1Mesh;
+        v1::SkeletonPtr v1Skeleton;
         MeshPtr v2Mesh;
 
-        if( !loadMesh( source, v1Mesh, v2Mesh, meshSerializer2, xmlMeshSerializer, xmlSkeletonSerializer ) )
+        if( !loadMesh( source, v1Mesh, v2Mesh, v1Skeleton, meshSerializer2,
+                       xmlMeshSerializer, xmlSkeletonSerializer ) )
         {
             OGRE_EXCEPT( Exception::ERR_FILE_NOT_FOUND, "Could not open '" + source + "'", "main" );
         }
@@ -1234,7 +1256,13 @@ int main(int numargs, char** args)
             }
         }
 
-        saveMesh( dest, v1Mesh, v2Mesh, meshSerializer2, xmlMeshSerializer, xmlSkeletonSerializer );
+        if( !opts.dontOptimiseAnimations && !v1Skeleton.isNull() )
+        {
+            v1Skeleton->optimiseAllAnimations();
+        }
+
+        saveMesh( dest, v1Mesh, v2Mesh, v1Skeleton, meshSerializer2,
+                  xmlMeshSerializer, xmlSkeletonSerializer );
     }
     catch (Exception& e)
     {

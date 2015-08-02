@@ -16,6 +16,7 @@ struct UpgradeOptions
     bool tangentSplitMirrored;
     bool tangentSplitRotated;
     bool dontReorganise;
+    bool dontOptimiseAnimations;
     bool destColourFormatSet;
     Ogre::VertexElementType destColourFormat;
     bool srcColourFormatSet;
