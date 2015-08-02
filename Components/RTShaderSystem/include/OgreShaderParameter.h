@@ -440,11 +440,16 @@ public:
     UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type);
 
     
+    GpuProgramParameters::AutoConstantEntry::Data mAutoConstantData;
+    
+    GpuProgramParameters::AutoConstantEntry::Data getAutoConstantDataT() const { return mAutoConstantData; }
+    
+    size_t getAutoConstantData() const { return mAutoConstantData.iData; }
     /** Get auto constant int data of this parameter, in case it is auto constant parameter. */
-    size_t getAutoConstantIntData() const { return mAutoConstantIntData; }  
+    size_t getAutoConstantIntData() const { return mAutoConstantData.iData; }
 
     /** Get auto constant real data of this parameter, in case it is auto constant parameter. */
-    Real getAutoConstantRealData() const { return mAutoConstantRealData; }  
+    Real getAutoConstantRealData() const { return mAutoConstantData.fData; }
 
     /** Return true if this parameter is a floating point type, false otherwise. */
     bool isFloat() const;
@@ -568,20 +573,15 @@ protected:
     // Is it auto constant int based parameter.
     bool mIsAutoConstantInt;
     GpuProgramParameters::AutoConstantType  mAutoConstantType;      // The auto constant type of this parameter.
-    union
-    {
-        // Auto constant int data.
-        size_t mAutoConstantIntData;
-        // Auto constant real data.
-        Real mAutoConstantRealData;
-    };      
-    // How this parameter varies (bitwise combination of GpuProgramVariability).
-    uint16 mVariability;
-    // The actual GPU parameters pointer.
-    GpuProgramParameters* mParamsPtr;
-    // The physical index of this parameter in the GPU program.
-    size_t mPhysicalIndex;
-};
+            
+        
+            // How this parameter varies (bitwise combination of GpuProgramVariability).
+            uint16 mVariability;
+            // The actual GPU parameters pointer.
+            GpuProgramParameters* mParamsPtr;
+            // The physical index of this parameter in the GPU program.
+            size_t mPhysicalIndex;
+        };
 
 typedef vector<UniformParameterPtr>::type       UniformParameterList;
 typedef UniformParameterList::iterator          UniformParameterIterator;

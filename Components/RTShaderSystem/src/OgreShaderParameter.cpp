@@ -437,7 +437,7 @@ UniformParameter::UniformParameter(GpuConstantType type, const String& name,
 {
     mIsAutoConstantReal     = false;    
     mIsAutoConstantInt      = false;
-    mAutoConstantIntData    = 0;
+    mAutoConstantData.iData    = 0;
     mVariability            = variability;
     mParamsPtr              = NULL;
     mPhysicalIndex          = -1;
@@ -464,7 +464,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     mIsAutoConstantReal = true; 
     mIsAutoConstantInt  = false;
     mAutoConstantType   = autoType;
-    mAutoConstantRealData = fAutoConstantData;
+    mAutoConstantData.fData = fAutoConstantData;
     mVariability        = (uint16)GPV_GLOBAL;
     mParamsPtr           = NULL;
     mPhysicalIndex       = -1;
@@ -490,7 +490,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     mIsAutoConstantReal = true; 
     mIsAutoConstantInt  = false;
     mAutoConstantType   = autoType;
-    mAutoConstantRealData = fAutoConstantData;
+    mAutoConstantData.iData = fAutoConstantData;
     mVariability        = (uint16)GPV_GLOBAL;
     mParamsPtr           = NULL;
     mPhysicalIndex       = -1;
@@ -513,7 +513,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     mIsAutoConstantReal = false;    
     mIsAutoConstantInt  = true;
     mAutoConstantType   = autoType;
-    mAutoConstantIntData = nAutoConstantData;
+    mAutoConstantData.iData = nAutoConstantData;
     mVariability        = (uint16)GPV_GLOBAL;
     mParamsPtr           = NULL;
     mPhysicalIndex       = -1;
@@ -535,7 +535,7 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
     mIsAutoConstantReal = false;    
     mIsAutoConstantInt  = true;
     mAutoConstantType   = autoType;
-    mAutoConstantIntData = nAutoConstantData;
+    mAutoConstantData.iData = nAutoConstantData;
     mVariability        = (uint16)GPV_GLOBAL;
     mParamsPtr           = NULL;
     mPhysicalIndex       = -1;

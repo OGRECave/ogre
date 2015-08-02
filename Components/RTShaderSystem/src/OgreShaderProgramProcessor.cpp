@@ -66,19 +66,11 @@ void ProgramProcessor::bindAutoParameters(Program* pCpuProgram, GpuProgramPtr pG
             // Handle auto parameters.
             if (pCurParam->isAutoConstantParameter())
             {
-                if (pCurParam->isAutoConstantRealParameter())
-                {                   
-                    pGpuParams->setNamedAutoConstantReal(pCurParam->getName(), 
+                pGpuParams->setNamedAutoConstantT(pCurParam->getName(), 
                         pCurParam->getAutoConstantType(), 
-                        pCurParam->getAutoConstantRealData());
+                    pCurParam->getAutoConstantDataT());
                                         
-                }
-                else if (pCurParam->isAutoConstantIntParameter())
-                {                   
-                    pGpuParams->setNamedAutoConstant(pCurParam->getName(), 
-                        pCurParam->getAutoConstantType(), 
-                        pCurParam->getAutoConstantIntData());                                   
-                }                       
+                
             }
 
             // Case this is not auto constant - we have to update its variability ourself.
