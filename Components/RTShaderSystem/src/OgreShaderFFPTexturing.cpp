@@ -71,9 +71,11 @@ bool FFPTexturing::resolveParameters(ProgramSet* programSet)
     {
         TextureUnitParams* curParams = &mTextureUnitParamsList[i];
 
+        if (false == resolveSamplerParams(curParams, programSet))
+            return false;
+            
         if (false == resolveUniformParams(curParams, programSet))
             return false;
-
 
         if (false == resolveFunctionsParams(curParams, programSet))
             return false;
@@ -89,16 +91,6 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
     Program* vsProgram = programSet->getCpuVertexProgram();
     Program* psProgram = programSet->getCpuFragmentProgram();
     bool hasError = false;
-    
-    // Resolve texture sampler parameter.       
-    textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
-
-    if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4()) 
-    {
-        //Resolve texture sampler state parameter for  hlsl 4.0
-		textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
-        hasError |= !(textureUnitParams->mTextureSamplerState.get());
-    }
     
     // Resolve texture matrix parameter.
     if (needsTextureMatrix(textureUnitParams->mTextureUnitState))
@@ -139,15 +131,18 @@ bool FFPTexturing::resolveUniformParams(TextureUnitParams* textureUnitParams, Pr
         
         hasError |= !(mWorldMatrix.get()) || !(textureUnitParams->mTextureViewProjImageMatrix.get());
         
-        const TextureUnitState::EffectMap&      effectMap = textureUnitParams->mTextureUnitState->getEffects(); 
-        TextureUnitState::EffectMap::const_iterator effi;
-
-        for (effi = effectMap.begin(); effi != effectMap.end(); ++effi)
+        if(textureUnitParams->mTextureUnitState != NULL)
         {
-            if (effi->second.type == TextureUnitState::ET_PROJECTIVE_TEXTURE)
+            const TextureUnitState::EffectMap&      effectMap = textureUnitParams->mTextureUnitState->getEffects(); 
+            TextureUnitState::EffectMap::const_iterator effi;
+
+            for (effi = effectMap.begin(); effi != effectMap.end(); ++effi)
             {
-                textureUnitParams->mTextureProjector = effi->second.frustum;
-                break;
+                if (effi->second.type == TextureUnitState::ET_PROJECTIVE_TEXTURE)
+                {
+                    textureUnitParams->mTextureProjector = effi->second.frustum;
+                    break;
+                }
             }
         }
 
@@ -490,34 +485,55 @@ bool FFPTexturing::addPSFunctionInvocations(TextureUnitParams* textureUnitParams
 }
 
 
-ParameterPtr FFPTexturing::GetSamplerWrapperParam(UniformParameterPtr sampler, Function* function)
+void FFPTexturing::hlsl_GetSamplerWrapperType(ParameterPtr in_sampler, GpuConstantType& out_samplerType)
 {
-	
-	Ogre::String paramName = sampler->getName(); // "lLocalSamplerWrapper_";
-	int samplerType = sampler->getType();
-	int samplerParamDim = samplerType - GCT_SAMPLER1D + 1;
-    if (samplerParamDim <= 3 )
-        paramName +=  StringConverter::toString(samplerParamDim) + "D";
-    else if (samplerParamDim == 4 )
-        paramName +=  "Cube";
-	else 
-		OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-		"Sampler wrappers are only for GCT_SAMPLER1D, GCT_SAMPLER2D, GCT_SAMPLER3D and GCT_SAMPLERCUBE",
-		"FFPTexturing::GetSamplerWrapperParam");
-	GpuConstantType margin =  (GpuConstantType)(GCT_SAMPLER_WRAPPER1D -  GCT_SAMPLER1D);
-    GpuConstantType samplerWrapperType = (GpuConstantType)(samplerType + margin);
+    out_samplerType = GCT_UNKNOWN;
 
-	ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::SPS_UNKNOWN,-1, paramName,samplerWrapperType);
+    switch (in_sampler->getType())
+    {
+    case GCT_SAMPLER1D:
+        out_samplerType = GCT_SAMPLER_WRAPPER1D;
+
+        break;
+    case GCT_SAMPLER2D:
+        out_samplerType = GCT_SAMPLER_WRAPPER2D;
+
+        break;
+    case GCT_SAMPLER3D:
+        out_samplerType = GCT_SAMPLER_WRAPPER3D;
+
+        break;
+    case GCT_SAMPLERCUBE:
+        out_samplerType = GCT_SAMPLER_WRAPPERCUBE;
+
+        break;
+    }
+
+    if (out_samplerType == GCT_UNKNOWN)
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+            "Sampler wrappers are valid only for GCT_SAMPLER1D, GCT_SAMPLER2D, GCT_SAMPLER3D and GCT_SAMPLERCUBE",
+            "FFPTexturing::GetSamplerWrapperParam");
+    }
+}
+
+ParameterPtr FFPTexturing::hlsl_GetSamplerWrapperParam(ParameterPtr sampler, Function* function)
+{
+
+    GpuConstantType samplerWrapperType;
+    hlsl_GetSamplerWrapperType(sampler, samplerWrapperType);
+
+    ParameterPtr samplerWrapperParam = function->resolveLocalParameter(Parameter::SPS_UNKNOWN,-1, sampler->getName()+"Wrapper", samplerWrapperType);
     return samplerWrapperParam;
 }
 
-void FFPTexturing::AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
-    GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter)
+void FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(ParameterPtr textureSampler, ParameterPtr textureSamplerState,
+        Function* function, int groupOrder, int& internalCounter)
 {
 
     FunctionInvocation* curFuncInvocation = NULL;
     
-	ParameterPtr samplerWrapperParam = GetSamplerWrapperParam(textureSampler, function);
+	ParameterPtr samplerWrapperParam = hlsl_GetSamplerWrapperParam(textureSampler, function);
     curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_CONSTRUCT_SAMPLER_WRAPPER, groupOrder, internalCounter++);
     curFuncInvocation->pushOperand(textureSampler, Operand::OPS_IN);
 
@@ -541,8 +557,8 @@ void FFPTexturing::addPSSampleTexelInvocation(TextureUnitParams* textureUnitPara
 		)
     {
         FunctionInvocation* curFuncInvocation = NULL;
-        ParameterPtr samplerWrapperParam =  GetSamplerWrapperParam(textureUnitParams->mTextureSampler,psMain);
-        AddTextureSampleWrapperInvocation(textureUnitParams->mTextureSampler,textureUnitParams->mTextureSamplerState,textureUnitParams->mTextureSamplerType,psMain,groupOrder,internalCounter);
+        ParameterPtr samplerWrapperParam =  hlsl_GetSamplerWrapperParam(textureUnitParams->mTextureSampler,psMain);
+        hlsl_AddTextureSampleWrapperInvocation(textureUnitParams->mTextureSampler,textureUnitParams->mTextureSamplerState,psMain,groupOrder,internalCounter);
 
             if (textureUnitParams->mTexCoordCalcMethod == TEXCALC_PROJECTIVE_TEXTURE)
                 curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE_PROJ, groupOrder, internalCounter++);
@@ -831,30 +847,33 @@ TexCoordCalcMethod FFPTexturing::getTexCalcMethod(TextureUnitState* textureUnitS
 //-----------------------------------------------------------------------
 bool FFPTexturing::needsTextureMatrix(TextureUnitState* textureUnitState)
 {
-    const TextureUnitState::EffectMap&      effectMap = textureUnitState->getEffects(); 
-    TextureUnitState::EffectMap::const_iterator effi;
-
-    for (effi = effectMap.begin(); effi != effectMap.end(); ++effi)
+    if(textureUnitState != NULL)
     {
-        switch (effi->second.type)
+        const TextureUnitState::EffectMap&      effectMap = textureUnitState->getEffects(); 
+        TextureUnitState::EffectMap::const_iterator effi;
+
+        for (effi = effectMap.begin(); effi != effectMap.end(); ++effi)
         {
+            switch (effi->second.type)
+            {
     
-        case TextureUnitState::ET_UVSCROLL:
-        case TextureUnitState::ET_USCROLL:
-        case TextureUnitState::ET_VSCROLL:
-        case TextureUnitState::ET_ROTATE:
-        case TextureUnitState::ET_TRANSFORM:
-        case TextureUnitState::ET_ENVIRONMENT_MAP:
-        case TextureUnitState::ET_PROJECTIVE_TEXTURE:
-            return true;        
+            case TextureUnitState::ET_UVSCROLL:
+            case TextureUnitState::ET_USCROLL:
+            case TextureUnitState::ET_VSCROLL:
+            case TextureUnitState::ET_ROTATE:
+            case TextureUnitState::ET_TRANSFORM:
+            case TextureUnitState::ET_ENVIRONMENT_MAP:
+            case TextureUnitState::ET_PROJECTIVE_TEXTURE:
+                return true;        
+            }
         }
+
+        const Ogre::Matrix4 matTexture = textureUnitState->getTextureTransform();
+
+        // Resolve texture matrix parameter.
+        if (matTexture != Matrix4::IDENTITY)
+            return true;
     }
-
-    const Ogre::Matrix4 matTexture = textureUnitState->getTextureTransform();
-
-    // Resolve texture matrix parameter.
-    if (matTexture != Matrix4::IDENTITY)
-        return true;
 
     return false;
 }
@@ -1035,6 +1054,27 @@ bool FFPTexturing::isProcessingNeeded(TextureUnitState* texUnitState)
 }
 
 
+bool FFPTexturing::resolveSamplerParams( TextureUnitParams* textureUnitParams, ProgramSet* programSet )
+{
+    bool hasError = false;
+    // Resolve texture sampler parameter.       
+    Program* psProgram = programSet->getCpuFragmentProgram();
+    textureUnitParams->mTextureSampler = psProgram->resolveParameter(textureUnitParams->mTextureSamplerType, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSampler");
+
+    if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4()) 
+    {
+        //Resolve texture sampler state parameter for  hlsl 4.0
+        textureUnitParams->mTextureSamplerState  = psProgram->resolveParameter(GCT_SAMPLER_STATE, textureUnitParams->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "gTextureSamplerState");
+        hasError |= !(textureUnitParams->mTextureSamplerState.get());
+    }
+
+    return hasError == false;
+}
+//-----------------------------------------------------------------------
+size_t FFPTexturing::getTextureUnitCount() const
+{
+    return mTextureUnitParamsList.size();
+}
 //-----------------------------------------------------------------------
 const String& FFPTexturingFactory::getType() const
 {

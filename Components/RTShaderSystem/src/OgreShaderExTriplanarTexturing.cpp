@@ -148,9 +148,9 @@ namespace RTShader {
 
 		if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
 		{
-			FFPTexturing::AddTextureSampleWrapperInvocation(mSamplerFromX, mSamplerFromXState, GCT_SAMPLER2D, psMain, FFP_PS_TEXTURING, internalCounter);
-			FFPTexturing::AddTextureSampleWrapperInvocation(mSamplerFromY, mSamplerFromYState, GCT_SAMPLER2D, psMain, FFP_PS_TEXTURING, internalCounter);
-			FFPTexturing::AddTextureSampleWrapperInvocation(mSamplerFromZ, mSamplerFromZState, GCT_SAMPLER2D, psMain, FFP_PS_TEXTURING, internalCounter);
+            FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mSamplerFromX, mSamplerFromXState, psMain, FFP_PS_TEXTURING, internalCounter);
+            FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mSamplerFromY, mSamplerFromYState, psMain, FFP_PS_TEXTURING, internalCounter);
+            FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mSamplerFromZ, mSamplerFromZState, psMain, FFP_PS_TEXTURING, internalCounter);
 		}
 
 		curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_TRIPLANAR_TEXTURING, FFP_PS_TEXTURING, internalCounter++);
@@ -163,9 +163,9 @@ namespace RTShader {
 		
 		if (isHLSL)
 		{
-			curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
-			curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
-			curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
+			curFuncInvocation->pushOperand(FFPTexturing::hlsl_GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
+			curFuncInvocation->pushOperand(FFPTexturing::hlsl_GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
+			curFuncInvocation->pushOperand(FFPTexturing::hlsl_GetSamplerWrapperParam(mSamplerFromX, psMain), Operand::OPS_IN);
 		}
 		else
 		{

@@ -265,7 +265,7 @@ bool NormalMapLighting::resolveGlobalParameters(ProgramSet* programSet)
     // Resolve normal map texture sampler parameter.        
     mNormalMapSampler = psProgram->resolveParameter(GCT_SAMPLER2D, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSampler");
 
-	if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+    if (RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
 		mNormalMapSamplerState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mNormalMapSamplerIndex, (uint16)GPV_PER_OBJECT, "gNormalMapSamplerState");
     
     // Get surface ambient colour if need to.
@@ -850,15 +850,15 @@ bool NormalMapLighting::addPSNormalFetchInvocation(Function* psMain, const int g
 {
     FunctionInvocation* curFuncInvocation = NULL;   
 
-	bool isHLSL = Ogre::RTShader::ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
+    bool isHLSL = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
 
 	if (isHLSL)
-		FFPTexturing::AddTextureSampleWrapperInvocation(mNormalMapSampler, mNormalMapSamplerState, GCT_SAMPLER2D, psMain, groupOrder, internalCounter);
+        FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mNormalMapSampler, mNormalMapSamplerState,psMain, groupOrder, internalCounter);
 
     curFuncInvocation = OGRE_NEW FunctionInvocation(SGX_FUNC_FETCHNORMAL, groupOrder, internalCounter++); 
 
 	if (isHLSL)
-		curFuncInvocation->pushOperand(FFPTexturing::GetSamplerWrapperParam(mNormalMapSampler, psMain), Operand::OPS_IN);
+		curFuncInvocation->pushOperand(FFPTexturing::hlsl_GetSamplerWrapperParam(mNormalMapSampler, psMain), Operand::OPS_IN);
 	else
 		curFuncInvocation->pushOperand(mNormalMapSampler, Operand::OPS_IN);
 

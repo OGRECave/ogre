@@ -83,12 +83,25 @@ public:
     @see SubRenderState::preAddToRenderState.
     */
     virtual bool preAddToRenderState(const RenderState* renderState, Pass* srcPass, Pass* dstPass);
-    
-    static void AddTextureSampleWrapperInvocation(UniformParameterPtr textureSampler,UniformParameterPtr textureSamplerState,
-        GpuConstantType samplerType, Function* function, int groupOrder, int& internalCounter);
 
+
+    //Direct3D HLSL specific methods
+    /**
+    @ Wraps a sampler with a SamplerData[x]D struct defined in FFPLib_Texturing.hlsl
+    */
+    static void hlsl_AddTextureSampleWrapperInvocation(ParameterPtr textureSampler, ParameterPtr textureSamplerState,
+        Function* function, int groupOrder, int& internalCounter);
+
+    /**
+    @ Get a sampler wrapper type according to the sampler type
+    */
+    static void hlsl_GetSamplerWrapperType(ParameterPtr sampler, GpuConstantType& out_samplerType);
     
-	static ParameterPtr GetSamplerWrapperParam(UniformParameterPtr sampler, Function* function);
+    /**
+    @ Get a unique sampler wrapper for a unique sampler.
+    */
+    static ParameterPtr hlsl_GetSamplerWrapperParam(ParameterPtr sampler, Function* function);
+
 
     static String Type;
 
@@ -139,19 +152,19 @@ protected:
     Set the number of texture units this texturing sub state has to handle.
     @param count The number of texture unit states.
     */
-    void setTextureUnitCount(size_t count);
+    virtual void setTextureUnitCount(size_t count);
 
     /** 
     Return the number of texture units this sub state handle. 
     */
-    size_t getTextureUnitCount() const { return mTextureUnitParamsList.size(); }
+    virtual size_t getTextureUnitCount() const;
 
     /** 
     Set texture unit of a given stage index.
     @param index The stage index of the given texture unit state.
     @param textureUnitState The texture unit state to bound the the stage index.
     */
-    void setTextureUnit(unsigned short index, TextureUnitState* textureUnitState);
+    virtual void setTextureUnit(unsigned short index, TextureUnitState* textureUnitState);
 
     /** 
     @see SubRenderState::resolveParameters.
@@ -161,8 +174,12 @@ protected:
     /** 
     Internal method that resolves uniform parameters of the given texture unit parameters.
     */
-    bool resolveUniformParams(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
+    virtual bool resolveUniformParams(TextureUnitParams* textureUnitParams, ProgramSet* programSet);
 
+    /** 
+    Internal method that resolves  texture sampler parameters of the given texture unit parameters.
+    */
+    virtual bool resolveSamplerParams( TextureUnitParams* textureUnitParams, ProgramSet* programSet );
     /** 
     Internal method that resolves functions parameters of the given texture unit parameters.
     */
@@ -182,12 +199,12 @@ protected:
     /** 
     Internal method that adds vertex shader functions invocations.
     */
-    bool addVSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* vsMain);
+    virtual bool addVSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* vsMain);
 
     /** 
     Internal method that adds pixel shader functions invocations.
     */
-    bool addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
+    virtual bool addPSFunctionInvocations(TextureUnitParams* textureUnitParams, Function* psMain, int& internalCounter);
 
     /** 
     Adds the fragment shader code which samples the texel color in the texture
