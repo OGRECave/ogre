@@ -2927,10 +2927,15 @@ namespace v1 {
     void MeshSerializerImpl_v1_10::writeMesh(const Mesh* pMesh)
     {
         exportedLodCount = 1; // generate edge data for original mesh
+        mNumBufferPasses = 1;
 
         // Header
         writeChunkHeader(M_MESH, calcMeshSize(pMesh));
         {
+        // bool skeletallyAnimated
+        bool skelAnim = pMesh->hasSkeleton();
+        writeBools(&skelAnim, 1);
+
             pushInnerChunk(mStream);
 
         // Write shared geometry

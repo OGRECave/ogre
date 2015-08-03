@@ -877,6 +877,29 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
     }
 }
 
+DataStreamPtr openFile( String source )
+{
+    struct stat tagStat;
+
+    FILE* pFile = fopen( source.c_str(), "rb" );
+    if (!pFile)
+    {
+        OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
+                    "File " + source + " not found.", "OgreMeshTool");
+    }
+    stat( source.c_str(), &tagStat );
+    MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
+    size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
+    if (result != tagStat.st_size)
+    {
+        OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                    "Unexpected error while reading file " + source, "OgreMeshTool");
+    }
+    fclose( pFile );
+
+    return DataStreamPtr( memstream );
+}
+
 /** Loads a mesh to either meshPtr or v2MeshPtr. Both may be empty if we just loaded
     an XML skeleton (in which case we just save it)
 @param source [in]
@@ -899,23 +922,7 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
 
     if( sourceExt == "mesh" )
     {
-        struct stat tagStat;
-
-        FILE* pFile = fopen( source.c_str(), "rb" );
-        if (!pFile)
-        {
-            OGRE_EXCEPT(Exception::ERR_FILE_NOT_FOUND,
-                        "File " + source + " not found.", "OgreMeshTool");
-        }
-        stat( source.c_str(), &tagStat );
-        MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
-        size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
-        if (result != tagStat.st_size)
-            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-                        "Unexpected error while reading file " + source, "OgreMeshTool");
-        fclose( pFile );
-
-        DataStreamPtr stream( memstream );
+        DataStreamPtr stream( openFile( source ) );
 
         try
         {
@@ -953,7 +960,14 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
     }
     else if( sourceExt == "skeleton" )
     {
-        //TODO
+        DataStreamPtr stream( openFile( source ) );
+
+        cout << "Trying to read " << source << " as a v1 skeleton..." << endl;
+        v1Skeleton = v1::OldSkeletonManager::getSingleton().create(
+                        "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+        skeletonSerializer->importSkeleton( stream, v1Skeleton.get() );
+        retVal = true;
+        cout << "Success!" << endl;
     }
     else if( sourceExt == "xml" )
     {
@@ -969,7 +983,6 @@ bool loadMesh( const String &source, v1::MeshPtr &v1MeshPtr, MeshPtr &v2MeshPtr,
             TiXmlElement* root = doc->RootElement();
             if( !stricmp(root->Value(), "mesh") )
             {
-                delete doc;
                 v1MeshPtr = v1::MeshManager::getSingleton().createManual(
                             "conversion", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
 
