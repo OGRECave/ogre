@@ -45,13 +45,9 @@ namespace Ogre {
                 OGRE_DELETE(*it);
             mAtomInstances.clear();
 
-            for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
-                (*it).setNull();
-            mInputParameters.clear();
+            deleteAllInputParameters();
 
-            for (ShaderParameterIterator it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
-                (*it).setNull();
-            mOutputParameters.clear();
+            deleteAllOutputParameters();
 
             for (ShaderParameterIterator it = mLocalParameters.begin(); it != mLocalParameters.end(); ++it)
                 (*it).setNull();
@@ -266,7 +262,21 @@ namespace Ogre {
         //-----------------------------------------------------------------------------
         void Function::deleteAllInputParameters()
         {
+            for (ShaderParameterIterator it = mInputParameters.begin(); it != mInputParameters.end(); ++it)
+            {
+                (*it).setNull();
+            }
             mInputParameters.clear();
+        }
+        
+        //-----------------------------------------------------------------------------
+        void Function::deleteAllOutputParameters()
+        {
+            for (ShaderParameterIterator it = mOutputParameters.begin(); it != mOutputParameters.end(); ++it)
+            {
+                (*it).setNull();
+            }
+            mOutputParameters.clear();
         }
         //-----------------------------------------------------------------------------
         void Function::addParameter(ShaderParameterList& parameterList, ParameterPtr parameter)
