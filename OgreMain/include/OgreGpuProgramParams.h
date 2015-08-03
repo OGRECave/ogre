@@ -118,6 +118,9 @@ namespace Ogre {
         GCT_SAMPLER_WRAPPERCUBE = 51,
         GCT_SAMPLER_WRAPPER2DARRAY = 52,
         GCT_SAMPLER_STATE = 53, //only for hlsl 4.0
+        //internal usage parameter types
+        GCT_SHADER_IN = 200,
+        GCT_SHADER_OUT = 206,
         GCT_UNKNOWN = 99
     };
 

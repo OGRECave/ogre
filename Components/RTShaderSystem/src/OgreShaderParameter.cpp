@@ -376,23 +376,55 @@ void Parameter::setName(String name)
     updateFullName();
 }
 //-----------------------------------------------------------------------
+bool Parameter::isValidSemantic()
+{
+    return mSemantic != SPS_CUSTOM && mSemantic != SPS_UNKNOWN;
+}
+//-----------------------------------------------------------------------
+bool Parameter::isShaderStruct()
+{
+    return mContent == SPC_SHADER_IN || mContent == SPC_SHADER_OUT;
+}
+//-----------------------------------------------------------------------
 void Parameter::updateFullName()
 {
     String prefix = BLANKSTRING;
 
-    switch (mDirection)
+    if (!this->isShaderStruct())
     {
-    case SPD_IN:
-        prefix = "i";
-        break;
-    case SPD_OUT:
-        prefix = "o";
-        break;
-    default:
-        break;
+        switch (mDirection)
+        {
+        case SPD_IN:
+            prefix = "i";
+            break;
+        case SPD_OUT:
+            prefix = "o";
+            break;
+        default:
+            break;
+        }
     }
-    mFullName = prefix + mName;
+        
+    if (mParentName != BLANKSTRING)
+    {
+        mFullName = mParentName + "." + prefix + mName;
+    }
+    else
+    {
+
+        mFullName = prefix + mName;
+    }
 }
+//-----------------------------------------------------------------------
+void Parameter::setParenttName(String name)
+{
+    if (isValidSemantic())
+    {
+        mParentName = name;
+        updateFullName();
+    }
+}
+
 //-----------------------------------------------------------------------
 bool UniformParameter::isFloat() const
 {

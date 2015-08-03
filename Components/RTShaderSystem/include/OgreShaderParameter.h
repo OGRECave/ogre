@@ -47,6 +47,7 @@ namespace RTShader {
 class _OgreRTSSExport Parameter : public RTShaderSystemAlloc
 {
 public:
+            
             enum Direction
             {
                 SPD_NONE = 0,
@@ -76,7 +77,8 @@ public:
         SPS_BINORMAL = 8,
         /// Tangent (X axis if normal is Z)
         SPS_TANGENT = 9,
-		SPS_TEXTURE_ARRAY = 10
+		SPS_TEXTURE_ARRAY = 10,
+        SPS_CUSTOM = 100
     };
 
     // Shader parameter content.
@@ -302,6 +304,8 @@ public:
         SPC_TEXTURE_COORDINATE6,
         SPC_TEXTURE_COORDINATE7,
 		SPC_TEXTURE_ARRAY,
+        SPC_SHADER_IN,
+        SPC_SHADER_OUT,
 		
         /// Reserved custom content range to be used by user custom shader extensions.
         SPC_CUSTOM_CONTENT_BEGIN    = 1000,
@@ -330,8 +334,16 @@ public:
     ParameterPtr clone();
     /** Set this parameter base name.*/
     void setName(String name);
+    /** Return true if this parameter has a valid GPU semantic.*/
+    bool isValidSemantic();
+    /** Return true if this parameter is a Shader_In/Shader_out. */
+    bool isShaderStruct();
     /** Rebuild the fully qualified name of this parameter.*/
     void updateFullName();
+    /** Set the parent struct name of this parameter.
+    @param name the name of the parent struct nesting this parameter.
+    */
+    void setParenttName(String name);
     /** Get the base name of this parameter.*/
     const String& getRawName() const { return mName; }
 
@@ -372,6 +384,8 @@ public:
 protected:
     // Name of this parameter.
     String mName;
+    // Parent struct name of this parameter.
+    String mParentName;
             String mFullName;
     // Type of this parameter.
     GpuConstantType mType;
@@ -459,6 +473,7 @@ public:
     /** Return true if this parameter is a texture sampler type, false otherwise. */
     bool isSampler() const;
 
+   
     /** Return true if this parameter is an auto constant parameter, false otherwise. */
     bool isAutoConstantParameter() const { return mIsAutoConstantReal || mIsAutoConstantInt; }
 
@@ -638,7 +653,6 @@ public:
             static ParameterPtr createIndices(int index);
             /* Create custom paramter without semantic
             */
-            static ParameterPtr createCustomInt(int index, Parameter::Content content);
             static ParameterPtr createBiNormal(int index);
             static ParameterPtr createTangent(int index);
             static ParameterPtr createColor(int index);

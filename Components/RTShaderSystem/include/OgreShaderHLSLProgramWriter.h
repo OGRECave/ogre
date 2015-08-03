@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreShaderProgramWriterManager.h"
 #include "OgreShaderProgramWriter.h"
 #include "OgreShaderParameter.h"
+#include "OgreShaderFunction.h"
 
 namespace Ogre {
     namespace RTShader {
@@ -66,6 +67,14 @@ public:
     @see ProgramWriter::writeSourceCode.
     */
     virtual void writeSourceCode(std::ostream& os, Program* program);
+    
+    /** Writes a function to the output stream
+    @param os The output stream to write to.
+    @param function The function to populate.
+    @param useInstanceViewport determines whether to add an index parameter for the uniform parameters to get the correct
+    "Instance viewport slice" gpu parameters
+    */
+    void writeFunction(std::ostream& os, Function* function);
 
     /** 
     @see ProgramWriter::getTargetLanguage.
@@ -91,12 +100,53 @@ protected:
 
     /** Write a local parameter. */
     void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
+    
+    /** Writes open and closed square bracket for an array parameter
+    @param os The output stream to write to.
+    @param parameter The parameter to process
+    */
+    void writeArrayParameterBrackets(std::ostream& os, ParameterPtr parameter);
 
     /** Write a function declaration. */
     void writeFunctionDeclaration(std::ostream& os, Function* function);
 
+    /** Writes Shader stage input and shader stage output structs for the GPU program
+    @param os The output stream to write to.
+    @param function The function to process
+    */
+    void writeShaderInAndOutStucts(std::ostream& os, Function* function);
+
     /** Write function atom instance. */
     void writeAtomInstance(std::ostream& os, FunctionAtom* atom);   
+    /** Assign/Clears parent input/output stage struct for the parameters used in 'function'.
+    @param function The function to process.
+    @param clear Determines whether to clear or to assign parent struct.
+    */
+    void assignFunctionParameterParents(Function* function,bool clear);
+    
+    /** Clears parent input/output stage struct from any shader stage main's function.
+    @param funtcionsList The functions list from which to find a main function.
+    */
+    void clearMainfunctionParentParameters(ShaderFunctionList& funtcionsList);
+
+    /** Sets a parent struct name for a list of shader parameter list.
+    @param ShaderParameterList The parameters list to modify.
+    @parentName The name of the parent struct name.
+    */
+    void setParentParameterName(const ShaderParameterList& params, String parentName);
+    
+    /** Assign indices to uniform parameters when using instance viewport.
+    @param os The output stream to write to.
+    @param function The function to process .
+    @param indexParameter The parameter used to index an array.
+    */
+    void assignUniformIndices(std::ostream& os, Function* function, ParameterPtr indexParameter);
+
+    /** Get the correct shader profile GPU parameter type name.
+    @param GpuConstantType The type of the desired parameter.
+    Return a string representing the parameter type.
+    */
+    const char* getParameterTypeName(GpuConstantType paramType);
 
 protected:
     typedef map<GpuConstantType, const char*>::type     GpuConstTypeToStringMap;

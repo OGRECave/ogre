@@ -72,6 +72,19 @@ public:
     @remarks Pass -1 as index parameter to create a new parameter with the desired semantic and type.
     */
     ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
+    
+    /** Add a struct to the function parameters contaning all the input or output parameters
+    @param type The desired parameter semantic.
+    @param content should be 'SPC_SHADER_IN' or 'SPC_SHADER_OUT'
+    Return parameter instance in case of that resolve operation succeeded.
+    */
+    ParameterPtr addShaderInOutParameter(GpuConstantType type, Parameter::Content content);
+    /** Create a parameter without semantic
+    @param type The type of the desired GPU parameter.
+    @param index The index of the desired GPU parameter.
+    Return parameter instance in case of that resolve operation succeeded.
+    */
+    ParameterPtr createCustomParameter(GpuConstantType type, int index, Parameter::Content content);
 
 
     /** Copies valid semantic output parameters from 'outFunction' to the input parameters of
@@ -79,6 +92,18 @@ public:
     @param outFunction The function used to copy parameters from.
     */
     void synchronizeInputParamsTo(Function* outFunction);
+    /** Clears all function's input parameters with a valid semantic
+    */
+    void clearSemanticInputParameters();
+
+    /** Clears all function's output parameters with a valid semantic
+    */
+    void clearSemanticOutputParameters();
+
+    /** Clears all valid semantic parameters for a specified parameters list
+    @param parameters The list of paramters to be cleansed.
+    */
+    void clearSemanticParameters(ShaderParameterList& parameters);
     
     /** Resolve output or input  parameter of this function
     @param semantic The desired parameter semantic. 
@@ -146,6 +171,10 @@ public:
     @remarks Return NULL if no matching parameter found.
     */
     ParameterPtr getParameterByContent(const ShaderParameterList& parameterList, const Parameter::Content content, GpuConstantType type);
+
+    ParameterPtr getParameterByContent(const Parameter::Content content, Parameter::Direction direction = Parameter::SPD_IN_OUT);
+    
+    ParameterPtr getParameterByContent(const Parameter::Content content, const ShaderParameterList& parameters);
 
     /** Return a list of input parameters. */
     const ShaderParameterList& getInputParameters() const { return mInputParameters; }  

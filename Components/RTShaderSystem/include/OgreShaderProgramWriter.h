@@ -85,6 +85,12 @@ protected:
 
     /** Write a function title. */
     void                writeFunctionTitle          (std::ostream& os, Function* function);
+
+    /** Write the title of the input struct of a program. */
+    void writeShaderInTitle(std::ostream& os);
+
+    /** Write the title of the output struct of a program. */
+    void writeShaderOutTitle(std::ostream& os);
 };
 
 /** @} */

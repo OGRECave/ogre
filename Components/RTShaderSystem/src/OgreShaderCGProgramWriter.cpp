@@ -251,27 +251,47 @@ void CGProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* funct
     size_t curParamIndex = 0;
 
     // Write input parameters.
+    bool firstParamFlag = false;
     for (it=inParams.begin(); it != inParams.end(); ++it)
-    {                   
+    {   
+
+        ParameterPtr param = *it;
+        //Currently Shader Input/Output structs are supported only in HLSL.
+        //TODO: Shader Input/Output structs functionality should be moved upward from 'HLSLProgramWriter' to 'ProgramWriter' in the class hierarchy
+
+        if (param->isShaderStruct() == true)
+            continue;
+
+        if (firstParamFlag == true)
+        {
+            os << ", " << std::endl;
+        }
+
+        firstParamFlag = true;
+
         os << "\t in ";
 
-        writeFunctionParameter(os, *it);
+        writeFunctionParameter(os, param);
 
-        if (curParamIndex + 1 != paramsCount)       
-            os << ", " << std::endl;
 
         curParamIndex++;
     }
 
-
     // Write output parameters.
     for (it=outParams.begin(); it != outParams.end(); ++it)
     {
-        os << "\t out ";
-        writeFunctionParameter(os, *it);
-
-        if (curParamIndex + 1 != paramsCount)               
+        ParameterPtr param = *it;
+        //Currently Shader Input/Output structs are supported only in HLSL.
+        //TODO: Shader Input/Output structs functionality should be moved upward from 'HLSLProgramWriter' to 'ProgramWriter' in the class hierarchy
+        if (param->isShaderStruct() == true)
+            continue;
+        if (firstParamFlag)
+        {
             os << ", " << std::endl;
+        }
+        firstParamFlag = true;
+        os << "\t out ";
+        writeFunctionParameter(os, param);
 
         curParamIndex++;
     }   

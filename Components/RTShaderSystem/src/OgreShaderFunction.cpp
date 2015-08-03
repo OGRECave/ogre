@@ -54,7 +54,63 @@ namespace Ogre {
             mLocalParameters.clear();
 
         }
+      //-----------------------------------------------------------------------------
+        void Function::clearSemanticInputParameters()
+        {
+            clearSemanticParameters(mInputParameters);
+        }
+        //-----------------------------------------------------------------------------
+        void Function::clearSemanticOutputParameters()
+        {
+            clearSemanticParameters(mOutputParameters);
+        }
+        //-----------------------------------------------------------------------------
+        void Function::clearSemanticParameters(ShaderParameterList& parameters)
+        {
+            //ShaderParameterList::iterator it_end = parameters.end();
+            for (ShaderParameterList::iterator it = parameters.begin(); it != parameters.end();)
+            {
+                ParameterPtr param = *it;
+                it = param->isValidSemantic() ? parameters.erase(it) : it + 1;
+            }
+        }
 
+        //-----------------------------------------------------------------------------
+        ParameterPtr Function::createCustomParameter(GpuConstantType type, int index, Parameter::Content content)
+        {
+            ParameterPtr param;
+            switch (type)
+            {
+            case GCT_SHADER_IN:
+
+
+
+            case GCT_SHADER_OUT:
+                param = addShaderInOutParameter(type, content);
+                break;
+            }
+
+            return param;
+        }
+        //-----------------------------------------------------------------------------
+        ParameterPtr Function::addShaderInOutParameter(GpuConstantType type, Parameter::Content content)
+        {
+            ParameterPtr param;
+            if (content == Parameter::SPC_SHADER_IN || content == Parameter::SPC_SHADER_OUT)
+            {
+                String paramerterName;
+                if (type == GCT_SHADER_IN)
+                    paramerterName = "input";
+                else
+                    paramerterName = "output";
+
+                param = ParameterPtr(new Parameter(type, paramerterName,
+                    Parameter::SPS_CUSTOM, -1,
+                    content));
+            }
+
+            return param;
+        }
         //-----------------------------------------------------------------------------
         ParameterPtr Function::resolveInputParameter(Parameter::Semantic semantic,
             int index,
@@ -157,6 +213,9 @@ namespace Ogre {
                 assert(type == GCT_FLOAT3);
                 param = ParameterFactory::createTangent(index);
                 break;
+            case Parameter::SPS_CUSTOM:
+                param = createCustomParameter(type, index, content);
+                break;
             case Parameter::SPS_UNKNOWN:
                 break;
 
@@ -221,9 +280,9 @@ namespace Ogre {
         //-----------------------------------------------------------------------------
         void Function::addInputParameter(ParameterPtr parameter)
         {
-
+            Parameter::Semantic semantic = parameter->getSemantic();
             // Check that parameter with the same semantic and index in input parameters list.
-            if (getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+            if (semantic != Parameter::SPS_CUSTOM &&  getParameterBySemantic(mInputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
             {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                     "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",
@@ -236,8 +295,9 @@ namespace Ogre {
         //-----------------------------------------------------------------------------
         void Function::addOutputParameter(ParameterPtr parameter)
         {
+            Parameter::Semantic semantic = parameter->getSemantic();
             // Check that parameter with the same semantic and index in output parameters list.
-            if (getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
+            if (semantic != Parameter::SPS_CUSTOM &&  getParameterBySemantic(mOutputParameters, parameter->getSemantic(), parameter->getIndex()).get() != NULL)
             {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                     "Parameter <" + parameter->getName() + "> has equal sematic parameter in function <" + getName() + ">",
@@ -379,6 +439,42 @@ namespace Ogre {
             return ParameterPtr();
         }
 
+        //-----------------------------------------------------------------------------
+        ParameterPtr Function::getParameterByContent(const Parameter::Content content, const ShaderParameterList& parameters)
+        {
+            ShaderParameterConstIterator it;
+            ParameterPtr result;
+            // Search only for known content.
+            if (content != Parameter::SPC_UNKNOWN)
+            {
+                for (it = parameters.begin(); it != parameters.end(); ++it)
+                {
+                    if ((*it)->getContent() == content)
+                    {
+                        result = *it;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        //-----------------------------------------------------------------------------
+        ParameterPtr Function::getParameterByContent(const Parameter::Content content, Parameter::Direction direction)
+        {
+            ParameterPtr result;
+            if ((direction & Parameter::SPD_IN) == Parameter::SPD_IN)
+            {
+                result = getParameterByContent(content, mInputParameters);
+            }
+            if (result.isNull() && (direction & Parameter::SPD_OUT) == Parameter::SPD_OUT)
+            {
+                result = getParameterByContent(content, mOutputParameters);
+            }
+
+            return result;
+        }
 
         //-----------------------------------------------------------------------------
         void Function::addAtomInstance(FunctionAtom* atomInstance)
@@ -434,7 +530,7 @@ namespace Ogre {
         {
             const ShaderParameterList InputFunctionOriginalInParams = mInputParameters;
             ShaderParameterList parameters;
-            deleteAllInputParameters();
+            clearSemanticInputParameters();
 
             // Loop the output function output parameters and make sure that
             //   all of them exist in the current function input parameters.
@@ -446,6 +542,9 @@ namespace Ogre {
                 for (it = outParams.begin(); it != outParams.end(); ++it)
                 {
                     ParameterPtr curOutParemter = *it;
+
+                    if (curOutParemter->isShaderStruct())
+                        continue;
 
                     ParameterPtr paramToAdd = Function::getParameterBySemantic(
                         InputFunctionOriginalInParams,

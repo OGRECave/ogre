@@ -52,6 +52,8 @@ HLSLProgramWriter::~HLSLProgramWriter()
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::initializeStringMaps()
 {
+    mGpuConstTypeMap[GCT_SHADER_IN] = "Shader_In";
+    mGpuConstTypeMap[GCT_SHADER_OUT] = "Shader_Out";
     mGpuConstTypeMap[GCT_FLOAT1] = "float";
     mGpuConstTypeMap[GCT_FLOAT2] = "float2";
     mGpuConstTypeMap[GCT_FLOAT3] = "float3";
@@ -104,9 +106,47 @@ void HLSLProgramWriter::initializeStringMaps()
 }
 
 //-----------------------------------------------------------------------
+void HLSLProgramWriter::writeFunction(std::ostream& os, Function* function)
+{
+    assignFunctionParameterParents(function, false);
+
+    writeFunctionTitle(os, function);
+
+    writeFunctionDeclaration(os, function);
+
+    os << "{" << std::endl;
+
+    // Write local parameters.
+    const ShaderParameterList& localParams = function->getLocalParameters();
+    ShaderParameterConstIterator itParam = localParams.begin();
+
+    for (; itParam != localParams.end(); ++itParam)
+    {
+        os << "\t";
+        writeLocalParameter(os, *itParam);
+        os << ";" << std::endl;
+    }
+        
+    // Sort and write function atoms.
+    function->sortAtomInstances();
+
+    const FunctionAtomInstanceList& atomInstances = function->getAtomInstances();
+    FunctionAtomInstanceConstIterator itAtom;
+
+    for (itAtom = atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
+    {
+        writeAtomInstance(os, *itAtom);
+    }
+    os << "}" << std::endl;
+
+    assignFunctionParameterParents(function, true);
+}
+
+//-----------------------------------------------------------------------
 void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
 {
-    const ShaderFunctionList& functionList = program->getFunctions();
+    const ShaderFunctionList& unsortedfunctionList = program->getFunctions();
+    ShaderFunctionList functionList;
     ShaderFunctionConstIterator itFunction;
 
     const UniformParameterList& parameterList = program->getParameters();
@@ -124,51 +164,84 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     writeUniformParametersTitle(os, program);
     os << std::endl;
 
+    //-----------------------------------------------------------------------
     for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
     {
-        writeUniformParameter(os, *itUniformParam);         
+    
+        writeUniformParameter(os, *itUniformParam);
         os << ";" << std::endl;             
     }
     os << std::endl;
+    
+    // Perform insertion sort on functions, making internal functions appear first
+    for (itFunction = unsortedfunctionList.begin(); itFunction != unsortedfunctionList.end(); ++itFunction)
+    {
+        if ((*itFunction)->getFunctionType() != Function::FFT_INTERNAL)
+            functionList.push_back(*itFunction);
+        else
+            functionList.insert(functionList.begin(), *itFunction);
+    }
+    
+    //Write program In and outs shaders
+    if (!functionList.empty())
+        writeShaderInAndOutStucts(os, *(functionList.end() - 1));
+        
 
     // Write program function(s).
-    for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
+    for (itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
     {
-        Function* curFunction = *itFunction;
-
-        writeFunctionTitle(os, curFunction);
-
-        writeFunctionDeclaration(os, curFunction);
-
-        os << "{" << std::endl;
-
-        // Write local parameters.
-        const ShaderParameterList& localParams = curFunction->getLocalParameters();
-        ShaderParameterConstIterator itParam = localParams.begin();
-
-        for (;  itParam != localParams.end(); ++itParam)
-        {
-            os << "\t";
-            writeLocalParameter(os, *itParam);          
-            os << ";" << std::endl;                     
-        }
-
-        // Sort and write function atoms.
-        curFunction->sortAtomInstances();
-
-        const FunctionAtomInstanceList& atomInstances = curFunction->getAtomInstances();
-        FunctionAtomInstanceConstIterator itAtom;
-
-        for (itAtom=atomInstances.begin(); itAtom != atomInstances.end(); ++itAtom)
-        {           
-            writeAtomInstance(os, *itAtom);
-        }
-
-
-        os << "}" << std::endl;
+        
+        writeFunction(os, *itFunction);
     }
 
     os << std::endl;
+}
+//-----------------------------------------------------------------------
+void HLSLProgramWriter::assignFunctionParameterParents(Function* function, bool clear)
+{
+    if (function == NULL)
+        return;
+
+    const ShaderParameterList& inParams = function->getInputParameters();
+    const ShaderParameterList& outParams = function->getOutputParameters();
+    ParameterPtr structIn = function->getParameterByContent(Parameter::SPC_SHADER_IN, Parameter::SPD_IN);
+    ParameterPtr structOut = function->getParameterByContent(Parameter::SPC_SHADER_OUT, Parameter::SPD_OUT);
+
+    if (!structIn.isNull() && !structOut.isNull())
+    {
+        const String shader_in_name = structIn->getName();
+        const String shader_out_name = structOut->getName();
+        setParentParameterName(inParams, clear ? BLANKSTRING : shader_in_name);
+        setParentParameterName(outParams, clear ? BLANKSTRING : shader_out_name);
+    }
+}
+
+void HLSLProgramWriter::setParentParameterName(const ShaderParameterList& params, String parentName)
+{
+    ShaderParameterConstIterator it;
+    for (it = params.begin(); it != params.end(); ++it)
+    {
+        (*it)->setParenttName(parentName);
+    }
+}
+
+void HLSLProgramWriter::clearMainfunctionParentParameters(ShaderFunctionList& functionList)
+{
+    ShaderFunctionConstIterator itFunction;
+    for (itFunction = functionList.begin(); itFunction != functionList.end(); ++itFunction)
+    {
+        Function* function = (*itFunction);
+        Function::FunctionType functionType = function->getFunctionType();
+        bool isMainFunction =
+            (
+             functionType == Function::FFT_PS_MAIN
+            || functionType == Function::FFT_VS_MAIN);
+
+        if (isMainFunction)
+        {
+            assignFunctionParameterParents(function, true);
+        }
+    }
 }
 
 
@@ -192,31 +265,34 @@ void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
 {
+    const int extraPadding = 5;
     bool isHlsl4 = Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4();
 
     GpuConstantType paramType = parameter->getType();
+    String uniformName = parameter->getName();
+    String uniformType = getParameterTypeName(paramType);
+    
+    os << uniformType;
+    os << "\t";
 
-	if (isHlsl4 && paramType >= GCT_SAMPLER1D && paramType <= GCT_SAMPLERCUBE)
-        os<<mGpuConstTypeMapV4[paramType];
-    else
-        os<<mGpuConstTypeMap[paramType];
+    os << uniformName;
 
-    os << "\t" << parameter->getName();
-
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
+    writeArrayParameterBrackets(os, parameter);
+    
     if (parameter->isSampler())
     {
+    
+
         if (isHlsl4)
             os << " : register(t" << parameter->getIndex() << ")";      
         else
             os << " : register(s" << parameter->getIndex() << ")";      
 
     }
-	else if (parameter->getType() == GCT_SAMPLER_STATE)
+    else if (parameter->getType() == GCT_SAMPLER_STATE)
     {
+    
+
         os << " : register(s" << parameter->getIndex() << ")";      
     }
 
@@ -225,21 +301,22 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic)
 {
+    const int extraPadding = 5;
 
-    os << mGpuConstTypeMap[parameter->getType()];
+    String gpuTypeName = mGpuConstTypeMap[parameter->getType()];
+    os << gpuTypeName;
+    os << " ";
     
-    os << "\t"; 
-    os << parameter->getName(); 
-    if (parameter->isArray() == true)
-    {
-        os << "[" << parameter->getSize() << "]";   
-    }
+
+    os << parameter->getName();
+    writeArrayParameterBrackets(os, parameter);
 
     if(forcedSemantic)
     {
+        
         os << " : " << forcedSemantic;
     }
-    else if (parameter->getSemantic() != Parameter::SPS_UNKNOWN)
+    else if (parameter->getSemantic() != Parameter::SPS_UNKNOWN && parameter->getSemantic() != Parameter::SPS_CUSTOM)
     {
         os << " : ";
         
@@ -258,15 +335,80 @@ void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr pa
 }
 
 //-----------------------------------------------------------------------
+void HLSLProgramWriter::writeArrayParameterBrackets(std::ostream& os, ParameterPtr parameter)
+{
+    if (parameter->isArray() == true)
+    {
+        os << "[" << parameter->getSize() << "]";
+    }
+}
+
+//-----------------------------------------------------------------------
 void HLSLProgramWriter::writeLocalParameter(std::ostream& os, ParameterPtr parameter)
 {
     os << mGpuConstTypeMap[parameter->getType()];
     os << "\t"; 
     os << parameter->getName();     
-    if (parameter->isArray() == true)
+    writeArrayParameterBrackets(os, parameter);
+}
+
+//-----------------------------------------------------------------------
+void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* function)
+{
+    
+    const ShaderParameterList& inParams = function->getInputParameters();
+    const ShaderParameterList& outParams = function->getOutputParameters();
+    Function::FunctionType functionType = function->getFunctionType();
+    bool isMainPS = functionType == Function::FFT_PS_MAIN;
+    bool isMainVS = functionType == Function::FFT_VS_MAIN;
+
+    bool isMainFunction = isMainVS || isMainPS;
+    bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+
+
+    //Build input struct
+    ShaderParameterConstIterator it;
+    writeShaderInTitle(os);
+    os << "struct Shader_In" << "\n{\n";
+
+    for (it = inParams.begin(); it != inParams.end(); ++it)
     {
-        os << "[" << parameter->getSize() << "]";   
+        if ((*it)->isShaderStruct())
+            continue;
+
+        const char* forcedSemantic =
+            (isVs4 && (isMainPS ) && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+
+        os << "\t";
+        //We use the function 'writeFunctionParameter' to write a 'struct parameter', it's the same functionality.
+        //TODO: change 'writeFunctionParameter' to 'writeFunctionOrStructParameter'
+        writeFunctionParameter(os, *it, forcedSemantic);
+        
+        //add prefix of the struct to the input parameter
+
+
+
+        os << ";\n";
     }
+
+    os << "};\n";
+    writeShaderOutTitle(os);
+    os << "struct Shader_Out" << "\n{\n";
+    //Build output struct
+    for (it = outParams.begin(); it != outParams.end(); ++it)
+    {
+        if ((*it)->isShaderStruct())
+            continue;
+
+        const char* forcedSemantic =
+            (isVs4 && isMainPS) ? "SV_Target" :
+            (isVs4 && (isMainVS ) && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+        os << "\t";
+        writeFunctionParameter(os, *it, forcedSemantic);
+
+        os << ";\n";
+    }
+    os << "};\n\n";
 }
 
 //-----------------------------------------------------------------------
@@ -275,53 +417,76 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
     const ShaderParameterList& inParams  = function->getInputParameters();
     const ShaderParameterList& outParams = function->getOutputParameters();
 
+    Function::FunctionType functionType = function->getFunctionType();
 
-    os << "void";
-    os << " ";
+    
+    bool isMainPS = functionType == Function::FFT_PS_MAIN;
+    bool isMainVS = functionType == Function::FFT_VS_MAIN;
 
-    os << function->getName();
-    os << std::endl << "\t(" << std::endl;
+    bool isMainFunction = isMainVS || isMainPS;
+    bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+
+    bool isShaderInAvailable = !function->getParameterByContent(Parameter::SPC_SHADER_IN, Parameter::SPD_IN).isNull();
+    bool isShaderOutAvailable = !function->getParameterByContent(Parameter::SPC_SHADER_OUT, Parameter::SPD_OUT).isNull();
+    
+
+
+    if (isMainFunction)
+    {
+        os << "void " << function->getName() << "(";
+    }
+    else
+    {
+        os << "void";
+        os << " ";
+
+        os << function->getName();
+        os << std::endl << "\t(" << std::endl;
+    }
 
     ShaderParameterConstIterator it;
     size_t paramsCount = inParams.size() + outParams.size();
     size_t curParamIndex = 0;
-
-    bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
-
-    // Write input parameters.
-    for (it=inParams.begin(); it != inParams.end(); ++it)
-    {                   
-        os << "\t in ";
-
-        const char* forcedSemantic = 
-            (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
-
-        writeFunctionParameter(os, *it, forcedSemantic);
-
-        if (curParamIndex + 1 != paramsCount)       
-            os << ", " << std::endl;
-
-        curParamIndex++;
-    }
-
-    // Write output parameters.
-    for (it=outParams.begin(); it != outParams.end(); ++it)
     {
-        os << "\t out ";
+        bool firstParamFlag = false;
+        // Write input parameters.
+        for (it = inParams.begin(); it != inParams.end(); ++it)
+        {
+            ParameterPtr parameter = *it;
+            if (isShaderInAvailable && parameter->isValidSemantic())
+                continue;
 
-        const char* forcedSemantic = 
-            (isVs4 && function->getFunctionType() == Function::FFT_PS_MAIN) ? "SV_Target" :
-            (isVs4 && function->getFunctionType() == Function::FFT_VS_MAIN && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+            if (firstParamFlag)
+                os << ", " << std::endl;
 
-        writeFunctionParameter(os, *it, forcedSemantic);
+            firstParamFlag = true;
 
-        if (curParamIndex + 1 != paramsCount)               
-            os << ", " << std::endl;
+            os << "\t in ";
 
-        curParamIndex++;
-    }   
+            writeFunctionParameter(os, *it, NULL);
+        }
+         
+        // Write output parameters.
+        for (it = outParams.begin(); it != outParams.end(); ++it)
+        {
+            
+            ParameterPtr parameter = *it;
+
+            if (isShaderOutAvailable && parameter->isValidSemantic())
+                continue;
+
+            if (firstParamFlag)
+                os << ", " << std::endl;
+
+            firstParamFlag = true;
+            os << "\t out ";
+
+            writeFunctionParameter(os, *it, NULL);
+            
+        }
+        os << std::endl << "\t)" << std::endl;
+    }
     
-    os << std::endl << "\t)" << std::endl;
 }
 
 //-----------------------------------------------------------------------
@@ -332,6 +497,14 @@ void HLSLProgramWriter::writeAtomInstance(std::ostream& os, FunctionAtom* atom)
     os << std::endl;
 }
 
+const char* HLSLProgramWriter::getParameterTypeName(GpuConstantType paramType)
+{
+    if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4() && paramType >= GCT_SAMPLER1D && paramType <= GCT_SAMPLERCUBE)
+        return mGpuConstTypeMapV4[paramType];
+    else
+        return mGpuConstTypeMap[paramType];
+    
+}
 /** @} */
 /** @} */
 }

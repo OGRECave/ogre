@@ -182,9 +182,13 @@ void TargetRenderState::createCpuPrograms()
     // Create entry point functions.
     vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
     vsProgram->setEntryPointFunction(vsMainFunc);
+    vsMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN);
 
+    vsMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT);
     psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
     psProgram->setEntryPointFunction(psMainFunc);
+    psMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN);
+    psMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT);
 
     for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
     {
