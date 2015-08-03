@@ -305,7 +305,7 @@ Function* Program::createFunction(const String& name, const String& desc, const 
             "Program::createFunction" );
     }
 
-    shaderFunction = OGRE_NEW Function(name, desc, functionType);
+    shaderFunction = OGRE_NEW Function(name, desc, functionType, mType);
     mFunctions.push_back(shaderFunction);
 
     return shaderFunction;

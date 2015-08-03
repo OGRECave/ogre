@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreShaderPrerequisites.h"
 #include "OgreShaderParameter.h"
 #include "OgreShaderFunctionAtom.h"
+#include "OgreGpuProgram.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -54,7 +55,9 @@ public:
         // Vertex program main
         FFT_VS_MAIN,
         // Pixel shader main
-        FFT_PS_MAIN
+        FFT_PS_MAIN,
+        // Geometry shader main
+        FFT_GS_MAIN
     };
 
     /** Get the name of this function */
@@ -222,9 +225,11 @@ public:
     /** Delete all output parameters from this function. */
     void deleteAllOutputParameters();
 
-    /** get function type. */
+    /** Get function type. */
     FunctionType getFunctionType() const;
 
+    /** Get the parent gpu program type. */
+    GpuProgramType getProgramType() const { return mProgramType; }
 
 protected:
 
@@ -233,7 +238,7 @@ protected:
     @param desc The description of this function.
     @remarks This class is allocated via an instance of Program class. 
     */
-    Function(const String& name, const String& desc, const FunctionType functionType);
+    Function(const String& name, const String& desc, const FunctionType functionType,GpuProgramType programType);
 
     /** Class destructor */
     ~Function();
@@ -260,6 +265,8 @@ protected:
     FunctionAtomInstanceList mAtomInstances;
     // Function type
     FunctionType mFunctionType;
+    // Parent program type
+    GpuProgramType mProgramType;
     
 private:
     friend class Program;

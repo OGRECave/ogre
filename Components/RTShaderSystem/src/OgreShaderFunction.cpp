@@ -31,11 +31,12 @@ THE SOFTWARE.
 namespace Ogre {
     namespace RTShader {
         //-----------------------------------------------------------------------------
-        Function::Function(const String& name, const String& desc, const FunctionType functionType)
+        Function::Function(const String& name, const String& desc, const FunctionType functionType, GpuProgramType programType)
         {
             mName = name;
             mDescription = desc;
             mFunctionType = functionType;
+            mProgramType = programType;
         }
 
         //-----------------------------------------------------------------------------
@@ -82,10 +83,15 @@ namespace Ogre {
             switch (type)
             {
             case GCT_SHADER_IN:
-
+            case GCT_SHADER_IN_GS_LINE:
+            case GCT_SHADER_IN_GS_POINT:
+            case GCT_SHADER_IN_GS_TRIANGLE:
+            case GCT_SHADER_IN_GS_LINE_ADJ:
+            case GCT_SHADER_IN_GS_TRIANGLE_ADJ:
 
 
             case GCT_SHADER_OUT:
+            case GCT_SHADER_OUT_TRIANGLE_STREAM:
                 param = addShaderInOutParameter(type, content);
                 break;
             }
@@ -99,7 +105,7 @@ namespace Ogre {
             if (content == Parameter::SPC_SHADER_IN || content == Parameter::SPC_SHADER_OUT)
             {
                 String paramerterName;
-                if (type == GCT_SHADER_IN)
+                if (type == GCT_SHADER_IN || type == GCT_SHADER_IN_GS_TRIANGLE)
                     paramerterName = "input";
                 else
                     paramerterName = "output";

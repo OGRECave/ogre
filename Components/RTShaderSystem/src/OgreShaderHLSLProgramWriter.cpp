@@ -53,7 +53,10 @@ HLSLProgramWriter::~HLSLProgramWriter()
 void HLSLProgramWriter::initializeStringMaps()
 {
     mGpuConstTypeMap[GCT_SHADER_IN] = "Shader_In";
+    mGpuConstTypeMap[GCT_SHADER_IN_GS_TRIANGLE] = "triangle Shader_In";
     mGpuConstTypeMap[GCT_SHADER_OUT] = "Shader_Out";
+    mGpuConstTypeMap[GCT_SHADER_OUT_TRIANGLE_STREAM] = "TriangleStream<Shader_Out>";
+
     mGpuConstTypeMap[GCT_FLOAT1] = "float";
     mGpuConstTypeMap[GCT_FLOAT2] = "float2";
     mGpuConstTypeMap[GCT_FLOAT3] = "float3";
@@ -234,8 +237,8 @@ void HLSLProgramWriter::clearMainfunctionParentParameters(ShaderFunctionList& fu
         Function* function = (*itFunction);
         Function::FunctionType functionType = function->getFunctionType();
         bool isMainFunction =
-            (
-             functionType == Function::FFT_PS_MAIN
+            (functionType == Function::FFT_GS_MAIN
+            || functionType == Function::FFT_PS_MAIN
             || functionType == Function::FFT_VS_MAIN);
 
         if (isMainFunction)
@@ -382,10 +385,11 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
     const ShaderParameterList& inParams = function->getInputParameters();
     const ShaderParameterList& outParams = function->getOutputParameters();
     Function::FunctionType functionType = function->getFunctionType();
+    bool isMainGS = functionType == Function::FFT_GS_MAIN;
     bool isMainPS = functionType == Function::FFT_PS_MAIN;
     bool isMainVS = functionType == Function::FFT_VS_MAIN;
 
-    bool isMainFunction = isMainVS || isMainPS;
+    bool isMainFunction = isMainVS || isMainGS || isMainPS;
     bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 
     ParameterNameMetrics metrics;
@@ -402,7 +406,7 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
             continue;
 
         const char* forcedSemantic =
-            (isVs4 && (isMainPS ) && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+            (isVs4 && (isMainPS || isMainGS) && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
 
         os << "\t";
         //We use the function 'writeFunctionParameter' to write a 'struct parameter', it's the same functionality.
@@ -428,7 +432,7 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
 
         const char* forcedSemantic =
             (isVs4 && isMainPS) ? "SV_Target" :
-            (isVs4 && (isMainVS ) && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
+            (isVs4 && (isMainVS || isMainGS) && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
         os << "\t";
         writeFunctionParameter(os, *it, forcedSemantic, &metrics);
 
@@ -440,17 +444,18 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
 //-----------------------------------------------------------------------
 void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* function)
 {
-    const ShaderParameterList& inParams  = function->getInputParameters();
+    const ShaderParameterList& inParams = function->getInputParameters();
     const ShaderParameterList& outParams = function->getOutputParameters();
 
     Function::FunctionType functionType = function->getFunctionType();
 
-    
+    bool isMainGS = functionType == Function::FFT_GS_MAIN;
     bool isMainPS = functionType == Function::FFT_PS_MAIN;
     bool isMainVS = functionType == Function::FFT_VS_MAIN;
 
-    bool isMainFunction = isMainVS || isMainPS;
+    bool isMainFunction = isMainVS || isMainGS || isMainPS;
     bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+    bool isGeometryShader = function->getProgramType() == GPT_GEOMETRY_PROGRAM;
 
     bool isShaderInAvailable = !function->getParameterByContent(Parameter::SPC_SHADER_IN, Parameter::SPD_IN).isNull();
     bool isShaderOutAvailable = !function->getParameterByContent(Parameter::SPC_SHADER_OUT, Parameter::SPD_OUT).isNull();
@@ -459,6 +464,14 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 
     if (isMainFunction)
     {
+        if (isMainGS)
+        {
+            ParameterPtr structIn = function->getParameterByContent(Parameter::SPC_SHADER_IN, Parameter::SPD_IN);
+            int verticesPerTriangle = structIn->getSize();
+            int totalVertices = 3;
+            os << "[maxvertexcount(" << totalVertices << ")]" << std::endl;
+            
+        }
         os << "void " << function->getName() << "(";
     }
     else
@@ -487,7 +500,10 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
 
             firstParamFlag = true;
 
-            os << "\t in ";
+            if (isGeometryShader && parameter->getContent() == Parameter::SPC_SHADER_OUT)
+                os << "\t inout ";
+            else
+                os << "\t in ";
 
             writeFunctionParameter(os, *it, NULL);
         }
@@ -505,7 +521,10 @@ void HLSLProgramWriter::writeFunctionDeclaration(std::ostream& os, Function* fun
                 os << ", " << std::endl;
 
             firstParamFlag = true;
-            os << "\t out ";
+            if (isGeometryShader && parameter->getContent() == Parameter::SPC_SHADER_OUT)
+                os << "\t inout ";
+            else
+                os << "\t out ";
 
             writeFunctionParameter(os, *it, NULL);
             

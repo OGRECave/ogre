@@ -189,6 +189,39 @@ void TargetRenderState::createCpuPrograms()
     psProgram->setEntryPointFunction(psMainFunc);
     psMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN);
     psMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT);
+    // This is a preperation for generating a geometry shader.
+    // currently dont create geometry shader until proper render states will be added. 
+    const bool generateGeometryShader = false;
+    if (generateGeometryShader == true)
+    {
+        gsMainFunc = gsProgram->createFunction("main", "Geometry Program Entry point", Function::FFT_GS_MAIN);
+        gsProgram->setEntryPointFunction(gsMainFunc);
+
+        ParameterPtr gsInput = gsMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN_GS_TRIANGLE);
+        int gsInputSize = -1;
+        switch (gsInput->getType())
+        {
+        case GCT_SHADER_IN_GS_POINT:
+            gsInputSize = 1;
+            break;
+        case GCT_SHADER_IN_GS_LINE:
+            gsInputSize = 2;
+            break;
+        case GCT_SHADER_IN_GS_TRIANGLE:
+            gsInputSize = 3;
+            break;
+        case GCT_SHADER_IN_GS_LINE_ADJ:
+            gsInputSize = 4;
+            break;
+        case GCT_SHADER_IN_GS_TRIANGLE_ADJ:
+            gsInputSize = 6;
+            break;
+        }
+
+        gsInput->setSize(gsInputSize);
+
+        gsMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT_TRIANGLE_STREAM);
+    }
 
     for (SubRenderStateListIterator it=mSubRenderStateList.begin(); it != mSubRenderStateList.end(); ++it)
     {

@@ -120,8 +120,15 @@ namespace Ogre {
         GCT_SAMPLER_STATE = 53, //only for hlsl 4.0
         //internal usage parameter types
         GCT_SHADER_IN = 200,
+        GCT_SHADER_IN_GS_POINT = 201,
+        GCT_SHADER_IN_GS_LINE = 202,
+        GCT_SHADER_IN_GS_TRIANGLE = 203,
+        GCT_SHADER_IN_GS_LINE_ADJ = 204,
+        GCT_SHADER_IN_GS_TRIANGLE_ADJ = 205,
         GCT_SHADER_OUT = 206,
-        GCT_UNKNOWN = 99
+        GCT_SHADER_OUT_TRIANGLE_STREAM = 207,
+
+        GCT_UNKNOWN = 1000
     };
 
     /** The variability of a GPU parameter, as derived from auto-params targeting it.
