@@ -164,11 +164,12 @@ void HLSLProgramWriter::writeSourceCode(std::ostream& os, Program* program)
     writeUniformParametersTitle(os, program);
     os << std::endl;
 
-    //-----------------------------------------------------------------------
+    ParameterNameMetrics metrics;
+    getParamsNameMetrics(parameterList, metrics);
     for (itUniformParam=parameterList.begin();  itUniformParam != parameterList.end(); ++itUniformParam)
     {
     
-        writeUniformParameter(os, *itUniformParam);
+        writeUniformParameter(os, *itUniformParam, &metrics);
         os << ";" << std::endl;             
     }
     os << std::endl;
@@ -224,7 +225,7 @@ void HLSLProgramWriter::setParentParameterName(const ShaderParameterList& params
         (*it)->setParenttName(parentName);
     }
 }
-
+//-----------------------------------------------------------------------
 void HLSLProgramWriter::clearMainfunctionParentParameters(ShaderFunctionList& functionList)
 {
     ShaderFunctionConstIterator itFunction;
@@ -263,7 +264,7 @@ void HLSLProgramWriter::writeProgramDependencies(std::ostream& os, Program* prog
 
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter)
+void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameterPtr parameter, ParameterNameMetrics* metrics)
 {
     const int extraPadding = 5;
     bool isHlsl4 = Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4();
@@ -273,7 +274,11 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
     String uniformType = getParameterTypeName(paramType);
     
     os << uniformType;
-    os << "\t";
+    
+    if (metrics != NULL)
+        writePadded(uniformType, metrics->MaxParameterTypeLength + extraPadding, os);
+    else
+        os << "\t";
 
     os << uniformName;
 
@@ -281,7 +286,8 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
     
     if (parameter->isSampler())
     {
-    
+        if (metrics != NULL)
+            writePadded(uniformName, metrics->MaxParameterLength + extraPadding, os);
 
         if (isHlsl4)
             os << " : register(t" << parameter->getIndex() << ")";      
@@ -291,7 +297,8 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
     }
     else if (parameter->getType() == GCT_SAMPLER_STATE)
     {
-    
+        if (metrics != NULL)
+            writePadded(uniformName, metrics->MaxParameterLength + extraPadding, os);
 
         os << " : register(s" << parameter->getIndex() << ")";      
     }
@@ -299,17 +306,23 @@ void HLSLProgramWriter::writeUniformParameter(std::ostream& os, UniformParameter
 }
 
 //-----------------------------------------------------------------------
-void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic)
+void HLSLProgramWriter::writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic, ParameterNameMetrics* nameMetrics)
 {
     const int extraPadding = 5;
 
     String gpuTypeName = mGpuConstTypeMap[parameter->getType()];
     os << gpuTypeName;
-    os << " ";
+    if (nameMetrics != NULL)
+        writePadded(gpuTypeName, nameMetrics->MaxParameterTypeLength + extraPadding, os);
+    else
+        os << " ";
     
 
     os << parameter->getName();
     writeArrayParameterBrackets(os, parameter);
+    if (nameMetrics != NULL)
+        writePadded(parameter->getName(), nameMetrics->MaxParameterLength + extraPadding, os);
+
 
     if(forcedSemantic)
     {
@@ -365,6 +378,8 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
     bool isMainFunction = isMainVS || isMainPS;
     bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
 
+    ParameterNameMetrics metrics;
+    getParamsNameMetrics(inParams, metrics);
 
     //Build input struct
     ShaderParameterConstIterator it;
@@ -382,7 +397,7 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
         os << "\t";
         //We use the function 'writeFunctionParameter' to write a 'struct parameter', it's the same functionality.
         //TODO: change 'writeFunctionParameter' to 'writeFunctionOrStructParameter'
-        writeFunctionParameter(os, *it, forcedSemantic);
+        writeFunctionParameter(os, *it, forcedSemantic, &metrics);
         
         //add prefix of the struct to the input parameter
 
@@ -391,6 +406,7 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
         os << ";\n";
     }
 
+    getParamsNameMetrics(outParams, metrics);
     os << "};\n";
     writeShaderOutTitle(os);
     os << "struct Shader_Out" << "\n{\n";
@@ -404,7 +420,7 @@ void HLSLProgramWriter::writeShaderInAndOutStucts(std::ostream& os, Function* fu
             (isVs4 && isMainPS) ? "SV_Target" :
             (isVs4 && (isMainVS ) && (*it)->getSemantic() == Parameter::SPS_POSITION) ? "SV_Position" : NULL;
         os << "\t";
-        writeFunctionParameter(os, *it, forcedSemantic);
+        writeFunctionParameter(os, *it, forcedSemantic, &metrics);
 
         os << ";\n";
     }
@@ -495,6 +511,70 @@ void HLSLProgramWriter::writeAtomInstance(std::ostream& os, FunctionAtom* atom)
     os << std::endl << "\t";
     atom->writeSourceCode(os, getTargetLanguage());
     os << std::endl;
+}
+//-----------------------------------------------------------------------
+void HLSLProgramWriter::writePadded(String nonPaddedString, const int maxParameterTypeLength, std::ostream& os)
+{
+    int paddingLength = maxParameterTypeLength - nonPaddedString.length();
+    if (paddingLength < 0)
+        paddingLength = 0;
+
+    for (int i = 0; i < paddingLength; i++)
+        os << " ";
+}
+//-----------------------------------------------------------------------
+void HLSLProgramWriter::getParamsNameMetrics(const ShaderParameterList& inParams, ParameterNameMetrics& metrics)
+{
+    metrics.MaxParameterLength = 0;
+    metrics.MaxParameterTypeLength = 0;
+    for (ShaderParameterList::const_iterator it = inParams.begin(); it != inParams.end(); ++it)
+    {
+        ParameterPtr param = *it;
+        if (param->isValidSemantic())
+        {
+            int paramNameLength = param->getName().length();
+            int paramTypeNameLength = strlen(mGpuConstTypeMap[param->getType()]);
+
+            if (metrics.MaxParameterLength < paramNameLength)
+                metrics.MaxParameterLength = paramNameLength;
+
+
+            if (metrics.MaxParameterTypeLength < paramTypeNameLength)
+                metrics.MaxParameterTypeLength = paramTypeNameLength;
+        }
+    }
+}
+//-----------------------------------------------------------------------
+void HLSLProgramWriter::getParamsNameMetrics(const UniformParameterList& inParams, ParameterNameMetrics& metrics)
+{
+    metrics.MaxParameterLength = 0;
+    metrics.MaxParameterTypeLength = 0;
+    for (UniformParameterConstIterator it = inParams.begin(); it != inParams.end(); ++it)
+    {
+        ParameterPtr param = *it;
+
+        int paramNameLength = param->getName().length();
+        int paramTypeNameLength = strlen(getParameterTypeName (param->getType()));
+
+        
+        int numArrayChars = 0;
+        int dim = 0;
+        int size = 0;
+        if (param->isArray() == true)
+        {
+            numArrayChars += 3;
+        }
+
+        paramNameLength += numArrayChars;
+
+        if (metrics.MaxParameterLength < paramNameLength)
+            metrics.MaxParameterLength = paramNameLength;
+
+
+        if (metrics.MaxParameterTypeLength < paramTypeNameLength)
+            metrics.MaxParameterTypeLength = paramTypeNameLength;
+
+    }
 }
 
 const char* HLSLProgramWriter::getParameterTypeName(GpuConstantType paramType)

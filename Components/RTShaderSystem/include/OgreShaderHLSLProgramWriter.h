@@ -53,6 +53,17 @@ namespace Ogre {
 class _OgreRTSSExport HLSLProgramWriter : public ProgramWriter
 {
 
+private:
+    struct ParameterNameMetrics
+    {
+        ParameterNameMetrics() : 
+            MaxParameterLength(0)
+        ,   MaxParameterTypeLength(0)
+        {
+        }
+        int MaxParameterLength;
+        int MaxParameterTypeLength;
+    };
     // Interface.
 public:
 
@@ -93,10 +104,10 @@ protected:
     void writeProgramDependencies(std::ostream& os, Program* program);
 
     /** Write a uniform parameter. */
-    void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter);
+    void writeUniformParameter(std::ostream& os, UniformParameterPtr parameter, ParameterNameMetrics* metrics);
 
     /** Write a function parameter. */
-    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic);
+    void writeFunctionParameter(std::ostream& os, ParameterPtr parameter, const char* forcedSemantic, ParameterNameMetrics* nameMetrics = NULL);
 
     /** Write a local parameter. */
     void writeLocalParameter(std::ostream& os, ParameterPtr parameter);
@@ -141,6 +152,25 @@ protected:
     @param indexParameter The parameter used to index an array.
     */
     void assignUniformIndices(std::ostream& os, Function* function, ParameterPtr indexParameter);
+
+    /** Writes space padded parameters to an output stream.
+    @param nonPaddedString The string to write padded
+    @param maxParameterTypeLength The number of characters 'gpuTypeName' is padded to.
+    @param os The output stream to write to.
+    */
+    void writePadded(String nonPaddedString, const int maxParameterTypeLength, std::ostream& os);
+
+    /** Calculates the metrics of shader parameter list
+    @param inParams The parameters to process.
+    @param metrics output result
+    */
+    void getParamsNameMetrics(const ShaderParameterList& inParams, ParameterNameMetrics& metrics);
+
+    /** Calculates the metrics of a group of uniform parameter list
+    @param inParams The parameters to process.
+    @param metrics output result
+    */
+    void getParamsNameMetrics(const UniformParameterList& inParams, ParameterNameMetrics& metrics);
 
     /** Get the correct shader profile GPU parameter type name.
     @param GpuConstantType The type of the desired parameter.
