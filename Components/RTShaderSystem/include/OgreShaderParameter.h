@@ -326,7 +326,8 @@ public:
 
     /** Class destructor */
             virtual ~Parameter();
-
+    /** Create a copy of this parameter.*/
+    ParameterPtr clone();
     /** Set this parameter base name.*/
     void setName(String name);
     /** Rebuild the fully qualified name of this parameter.*/

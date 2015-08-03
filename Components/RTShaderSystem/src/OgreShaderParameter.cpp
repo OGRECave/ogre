@@ -362,6 +362,14 @@ Parameter::Parameter(GpuConstantType type, const String& name,
 Parameter::~Parameter()
 {
 }
+//-----------------------------------------------------------------------
+Ogre::RTShader::ParameterPtr Parameter::clone()
+{
+    ParameterPtr param = ParameterPtr(new Parameter(mType, mName, mSemantic, mIndex, mContent));
+    param->setDirection(mDirection);
+    return param;
+}
+//-----------------------------------------------------------------------
 void Parameter::setName(String name)
 {
     mName = name;

@@ -275,7 +275,7 @@ void ProgramManager::createGpuPrograms(ProgramSet* programSet)
     bool isVs4 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
     if (isVs4)
     {
-        synchronizePixelnToBeVertexOut(programSet);
+        synchronizeShaderStagesVariables(programSet);
     }
 
     // Grab the matching writer.
@@ -629,80 +629,23 @@ void ProgramManager::destroyGpuProgram(GpuProgramPtr& gpuProgram)
 }
 
 //-----------------------------------------------------------------------
-void ProgramManager::synchronizePixelnToBeVertexOut( ProgramSet* programSet )
+void ProgramManager::synchronizeShaderStagesVariables( ProgramSet* programSet )
 {
-    Program* vsProgram = programSet->getCpuVertexProgram();
-    Program* psProgram = programSet->getCpuFragmentProgram();
+    Function* vertexMain = programSet->getCpuProgram(GPT_VERTEX_PROGRAM)->getEntryPointFunction();
+    Function* pixelMain = programSet->getCpuProgram(GPT_FRAGMENT_PROGRAM)->getEntryPointFunction();
 
-    // first find the vertex shader
-    ShaderFunctionConstIterator itFunction ;
-    Function* vertexMain = NULL;
-    Function* pixelMain = NULL;
+    
+    Program* gsProgram = programSet->getCpuProgram(GPT_GEOMETRY_PROGRAM);
+    Function* geometryMain = gsProgram == NULL ? NULL : gsProgram->getEntryPointFunction();
 
-    // find vertex shader main
+    if (geometryMain != NULL)
     {
-        const ShaderFunctionList& functionList = vsProgram->getFunctions();
-        for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
-        {
-            Function* curFunction = *itFunction;
-            if (curFunction->getFunctionType() == Function::FFT_VS_MAIN)
-            {
-                vertexMain = curFunction;
-                break;
-            }
-        }
+        geometryMain->synchronizeInputParamsTo(vertexMain);
+        pixelMain->synchronizeInputParamsTo(geometryMain);
     }
-
-    // find pixel shader main
+    else
     {
-        const ShaderFunctionList& functionList = psProgram->getFunctions();
-        for (itFunction=functionList.begin(); itFunction != functionList.end(); ++itFunction)
-        {
-            Function* curFunction = *itFunction;
-            if (curFunction->getFunctionType() == Function::FFT_PS_MAIN)
-            {
-                pixelMain = curFunction;
-                break;
-            }
-        }
-    }
-
-    if(pixelMain)
-    {
-        // save the pixel program original input parameters
-        const ShaderParameterList pixelOriginalInParams = pixelMain->getInputParameters();
-
-        // set the pixel Input to be the same as the vertex prog output
-        pixelMain->deleteAllInputParameters();
-
-        // Loop the vertex shader output parameters and make sure that
-        //   all of them exist in the pixel shader input.
-        // If the parameter type exist in the original output - use it
-        // If the parameter doesn't exist - use the parameter from the 
-        //   vertex shader input.
-        // The order will be based on the vertex shader parameters order 
-        // Write output parameters.
-        ShaderParameterConstIterator it;
-        if(vertexMain)
-        {
-            const ShaderParameterList& outParams = vertexMain->getOutputParameters();
-            for (it=outParams.begin(); it != outParams.end(); ++it)
-            {
-                ParameterPtr curOutParemter = *it;
-                ParameterPtr paramToAdd = Function::getParameterBySemantic(
-                    pixelOriginalInParams, 
-                    curOutParemter->getSemantic(), 
-                    curOutParemter->getIndex());
-
-                if (paramToAdd.isNull())
-                {
-                    // param not found - we will add the one from the vertex shader
-                    paramToAdd = curOutParemter; 
-                }
-
-                pixelMain->addInputParameter(paramToAdd);
-            }
-        }
+        pixelMain->synchronizeInputParamsTo(vertexMain);
     }
 }
 //-----------------------------------------------------------------------

@@ -73,6 +73,12 @@ public:
     */
     ParameterPtr resolveInputParameter(Parameter::Semantic semantic, int index,  const Parameter::Content content, GpuConstantType type);
 
+
+    /** Copies valid semantic output parameters from 'outFunction' to the input parameters of
+    // this function
+    @param outFunction The function used to copy parameters from.
+    */
+    void synchronizeInputParamsTo(Function* outFunction);
     
     /** Resolve output or input  parameter of this function
     @param semantic The desired parameter semantic. 

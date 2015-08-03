@@ -419,8 +419,42 @@ namespace Ogre {
         {
             return mFunctionType;
         }
+        //-----------------------------------------------------------------------------
+        void Function::synchronizeInputParamsTo(Function* outputFunction)
+        {
+            const ShaderParameterList InputFunctionOriginalInParams = mInputParameters;
+            ShaderParameterList parameters;
+            deleteAllInputParameters();
 
+            // Loop the output function output parameters and make sure that
+            //   all of them exist in the current function input parameters.
+            ShaderParameterConstIterator it;
 
+            if (outputFunction != NULL)
+            {
+                const ShaderParameterList& outParams = outputFunction->getOutputParameters();
+                for (it = outParams.begin(); it != outParams.end(); ++it)
+                {
+                    ParameterPtr curOutParemter = *it;
+
+                    ParameterPtr paramToAdd = Function::getParameterBySemantic(
+                        InputFunctionOriginalInParams,
+                        curOutParemter->getSemantic(),
+                        curOutParemter->getIndex());
+
+                    if (paramToAdd.isNull())
+                    {
+                        // param not found - we will add the one from the vertex shader
+                        paramToAdd = curOutParemter;
+                        paramToAdd = paramToAdd->clone();
+                    }
+
+                    paramToAdd->setDirection(Parameter::SPD_IN);
+
+                    addInputParameter(paramToAdd);
+                }
+            }
+        }
         //-----------------------------------------------------------------------------
         ShaderParameterList& Function::getProgramParameters(Parameter::Direction direction)
         {
