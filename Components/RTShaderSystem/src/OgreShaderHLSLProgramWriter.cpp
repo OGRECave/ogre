@@ -352,7 +352,17 @@ void HLSLProgramWriter::writeArrayParameterBrackets(std::ostream& os, ParameterP
 {
     if (parameter->isArray() == true)
     {
-        os << "[" << parameter->getSize() << "]";
+        for (int i = 0; i < Parameter::RTSHADER_PARAMETER_MAX_ARRAY_DIMENSIONS; i++)
+        {
+            if (parameter->getSize(i) > 0)
+            {
+                os << "[" << parameter->getSize(i) << "]";
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 }
 
@@ -562,7 +572,16 @@ void HLSLProgramWriter::getParamsNameMetrics(const UniformParameterList& inParam
         int size = 0;
         if (param->isArray() == true)
         {
-            numArrayChars += 3;
+            numArrayChars += 2;
+            while (dim < Parameter::RTSHADER_PARAMETER_MAX_ARRAY_DIMENSIONS && (size = param->getSize(dim)) > 0)
+            {
+                while (size > 0)
+                {
+                    numArrayChars++;
+                    size /= 10;
+                }
+                dim++;
+            }
         }
 
         paramNameLength += numArrayChars;

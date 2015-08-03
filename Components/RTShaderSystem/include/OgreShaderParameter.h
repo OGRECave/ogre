@@ -47,6 +47,7 @@ namespace RTShader {
 class _OgreRTSSExport Parameter : public RTShaderSystemAlloc
 {
 public:
+            static const int RTSHADER_PARAMETER_MAX_ARRAY_DIMENSIONS = 2;
             
             enum Direction
             {
@@ -366,20 +367,29 @@ public:
 
     /** Returns the string representation of this parameter. */
             virtual String toString() const { return mFullName; }
-    
+
     /** Returns Whether this parameter is an array. */
-    bool isArray() const { return mSize > 0; }
+    bool isArray() const { return mDimensionSize[0] > 0; }
+
+    const size_t getArrayDimension() const;
 
     /** Returns the number of elements in the parameter (for arrays). */
-    size_t getSize() const { return mSize; }
-    
-    /** Sets the number of elements in the parameter (for arrays). */
-    void setSize(size_t size) { mSize = size; }
+    size_t getSize() const { return getSize(0); }
 
-            /** Sets the Shader stage direction of this parameter*/
-            void setDirection(Direction direction) { mDirection = direction; updateFullName(); }
-            /** Return the Shader stage direction of this parameter*/
-            Direction getDirection() { return  mDirection;}
+    /** Returns the number of elements in the parameter (for arrays). for a specific dimension */
+    size_t getSize(int dimension) const { return mDimensionSize[dimension]; }
+
+    /** Sets the number of elements in the parameter (for arrays). */
+            
+    void setSize(size_t size) { setSize(size, 0);}
+            
+    /** Sets the number of elements in the parameter (for arrays) for a specific dimension. */
+    void setSize(size_t size,int dimension) { mDimensionSize[dimension] = size;}
+
+    /** Sets the Shader stage direction of this parameter*/
+    void setDirection(Direction direction) { mDirection = direction; updateFullName(); }
+    /** Return the Shader stage direction of this parameter*/
+    Direction getDirection() { return  mDirection;}
 // Attributes.
 protected:
     // Name of this parameter.
@@ -396,7 +406,7 @@ protected:
     // The content of this parameter.
     Content mContent;
     // Number of elements in the parameter (for arrays)
-    size_t mSize;
+    vector<size_t>::type mDimensionSize;
     
             Direction mDirection;
 };

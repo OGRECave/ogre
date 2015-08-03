@@ -338,8 +338,8 @@ Parameter::Parameter() :
         , mSemantic(SPS_UNKNOWN)
         , mIndex(0)
         , mContent(SPC_UNKNOWN)
-        , mSize(0)
         , mDirection(SPD_NONE)
+        , mDimensionSize(RTSHADER_PARAMETER_MAX_ARRAY_DIMENSIONS, 0)
 {
 }
 
@@ -351,9 +351,10 @@ Parameter::Parameter(GpuConstantType type, const String& name,
         , mSemantic(semantic)
         , mIndex(index) 
         , mContent(content)
-        , mSize(size)
         , mDirection(SPD_NONE)
-{
+        , mDimensionSize(RTSHADER_PARAMETER_MAX_ARRAY_DIMENSIONS, 0)
+{       
+    mDimensionSize[0] = size;
     setName(name);
 }
   
@@ -363,9 +364,21 @@ Parameter::~Parameter()
 {
 }
 //-----------------------------------------------------------------------
+const size_t Parameter::getArrayDimension() const
+{
+    size_t result = 0;
+    if (isArray() == true)
+    {
+        while (result < Parameter::RTSHADER_PARAMETER_MAX_ARRAY_DIMENSIONS && getSize(result) > 0)
+            result++;
+    }
+    return result;
+}
+//-----------------------------------------------------------------------
 Ogre::RTShader::ParameterPtr Parameter::clone()
 {
     ParameterPtr param = ParameterPtr(new Parameter(mType, mName, mSemantic, mIndex, mContent));
+    param->mDimensionSize = mDimensionSize;
     param->setDirection(mDirection);
     return param;
 }
@@ -531,6 +544,7 @@ void UniformParameter::Init(GpuProgramParameters::AutoConstantType autoType, Gpu
         
     mType = type != GCT_UNKNOWN ? type : parameterDef->type;
     mVariability = (uint16)GPV_GLOBAL;
+    mDimensionSize[0] = size;
     mSemantic = SPS_UNKNOWN;
     mIndex = -1;
     mContent = SPC_UNKNOWN;
