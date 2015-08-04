@@ -625,7 +625,7 @@ bail:
     void D3D11RenderSystem::refreshFSAAOptions(void)
     {
 
-        ConfigOptionMap::iterator it = mOptions.find( "FSAA" );
+        ConfigOptionMap::iterator it = mOptions.find("FSAA");
         ConfigOption* optFSAA = &it->second;
         optFSAA->possibleValues.clear();
 
@@ -638,8 +638,14 @@ bail:
             D3D11VideoMode* videoMode = driver->getVideoModeList()->item(it->second.currentValue); // Could be NULL if working over RDP/Simulator
             DXGI_FORMAT format = videoMode ? videoMode->getFormat() : DXGI_FORMAT_R8G8B8A8_UNORM;
             UINT numLevels = 0;
+
+            // Ogre's render systems are expected to interpret the value '0' for anti-aliasing 
+            // as NO anti-aliasing.
+            
+            optFSAA->possibleValues.push_back("0");
+
             // set maskable levels supported
-            for (unsigned int n = 1; n <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
+            for (unsigned int n = 2; n <= D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT; n++)
             {
                 HRESULT hr = device->CheckMultisampleQualityLevels(format, n, &numLevels);
                 if (SUCCEEDED(hr) && numLevels > 0)
@@ -665,11 +671,6 @@ bail:
                 }
             }
             SAFE_RELEASE(device);
-        }
-
-        if(optFSAA->possibleValues.empty())
-        {
-            optFSAA->possibleValues.push_back("1"); // D3D11 does not distinguish between noMSAA and 1xMSAA
         }
 
         // Reset FSAA to none if previous doesn't avail in new possible values
