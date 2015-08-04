@@ -2215,7 +2215,11 @@ bail:
 
             //Retrieve depth buffer again (it may have changed)
             depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
-
+            if (depthBuffer != NULL)
+            {
+                depthBuffer->adjustArrayTargetView(target);
+            }
+            
             // now switch to the new render target
             mDevice.GetImmediateContext()->OMSetRenderTargets(
                 numberOfViews,

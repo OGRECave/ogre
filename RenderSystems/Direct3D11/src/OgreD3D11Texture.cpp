@@ -63,7 +63,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11Texture::~D3D11Texture()
     {
-        // have to call this here reather than in Resource destructor
+        // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         if (isLoaded())
         {
@@ -1069,6 +1069,9 @@ namespace Ogre
         mWidth = (unsigned int) mBuffer->getWidth();
         mHeight = (unsigned int) mBuffer->getHeight();
         mDepth = (unsigned int)mBuffer->getDepth();
+        mRenderTargetArraysParams.ArraySize = mDepth;
+        mRenderTargetArraysParams.FirstArraySlice = 0;
+        mRenderTargetArraysParams.MipSlice = 0;
         mColourDepth = (unsigned int) PixelUtil::getNumElemBits(mBuffer->getFormat());
         updateRenderTargetView();
         
@@ -1236,8 +1239,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderTexture::updateRenderTargetView()
     {
+        if (mRenderTargetView == NULL || mRenderTargetArrayViewDirty == true)
+        {
             SAFE_RELEASE(mRenderTargetView);
             mRenderTargetView = createRenderTargetView();
+        }
+
+
     }
     //---------------------------------------------------------------------
     ID3D11RenderTargetView* D3D11RenderTexture::createRenderTargetView()
@@ -1258,6 +1266,16 @@ namespace Ogre
             case D3D_SRV_DIMENSION_TEXTURECUBE:
                 RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
                 break;
+            case D3D_SRV_DIMENSION_TEXTURE2DARRAY:
+                if (mRenderTargetArrayViewDirty == true)
+                {
+                    RTVDesc.Texture2DArray.ArraySize = mRenderTargetArraysParams.ArraySize;
+                    RTVDesc.Texture2DArray.MipSlice = mRenderTargetArraysParams.MipSlice;
+                    RTVDesc.Texture2DArray.FirstArraySlice = mRenderTargetArraysParams.FirstArraySlice;
+                    mRenderTargetArrayViewDirty = false;
+                }
+                break;
+
             }
         }
 

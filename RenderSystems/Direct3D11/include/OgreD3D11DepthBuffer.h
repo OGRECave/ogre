@@ -56,6 +56,8 @@ namespace Ogre
 
         /// @copydoc DepthBuffer::isCompatible
         virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        /** Sets depth buffer parameters to match a render target array*/
+        void adjustArrayTargetView(RenderTarget *renderTarget);
 
         /** Returns the last created depth stencil view */
         ID3D11DepthStencilView* getDepthStencilView() const;
@@ -87,6 +89,7 @@ namespace Ogre
         ID3D11ShaderResourceView*   mDepthStencilShaderResouceView;
         uint32                      mMultiSampleQuality;
         D3D11RenderSystem*          mRenderSystem;
+        RenderTarget::ArrayParams   mArrayParams;
         bool                        mUseAsShaderResource;
         bool                        mis2DArrayTextureCube;
         bool                        mDontBindToShader;

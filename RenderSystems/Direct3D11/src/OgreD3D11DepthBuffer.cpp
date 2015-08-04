@@ -199,6 +199,8 @@ namespace Ogre
         D3D11_TEXTURE2D_DESC BBDesc;
 		getTextureDescpritionFor(renderTarget,BBDesc);
 		
+        mTextureType = BBDesc.ArraySize > 1 ? TEX_TYPE_2D_ARRAY : TEX_TYPE_2D;
+
         
         mis2DArrayTextureCube = (BBDesc.MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) == D3D11_RESOURCE_MISC_TEXTURECUBE;
 
@@ -253,6 +255,10 @@ namespace Ogre
         mHeight = descDepth.Height;
         mDepth = descDepth.ArraySize;
         mFsaa = descDepth.SampleDesc.Count;
+
+        mArrayParams.ArraySize = mDepth;
+        mArrayParams.MipSlice = 0;
+        mArrayParams.FirstArraySlice = 0;
         
         mMultiSampleQuality = descDepth.SampleDesc.Quality;
     }
@@ -290,6 +296,12 @@ namespace Ogre
                 {
                     descDSV.Texture2DArray.FirstArraySlice = pBuffer->getFace();
                 }
+                else
+                {
+                    descDSV.Texture2DArray.ArraySize = mArrayParams.ArraySize;
+                    descDSV.Texture2DArray.FirstArraySlice = mArrayParams.FirstArraySlice;
+                    descDSV.Texture2DArray.MipSlice = mArrayParams.MipSlice;
+                }
             }
             descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
 
@@ -313,6 +325,16 @@ namespace Ogre
         }
         
         mBitDepth = PixelUtil::getNumElemBytes(D3D11Mappings::_getPF(descDSV.Format)) * 8;
+    }
+    //---------------------------------------------------------------------
+    void D3D11DepthBuffer::adjustArrayTargetView(RenderTarget *renderTarget)
+    {
+        D3D11RenderTexture* renderTexture = dynamic_cast <D3D11RenderTexture*>(renderTarget);
+        if (renderTexture != NULL && renderTarget->getArrayParams() != mArrayParams)
+        {
+            mArrayParams = renderTarget->getArrayParams();
+            updateDepthStencilView(renderTarget);
+        }
     }
     //---------------------------------------------------------------------
     bool D3D11DepthBuffer::isCompatible( RenderTarget *renderTarget ) const
