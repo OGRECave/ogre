@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreTechnique.h"
+#include "OgreShaderGenerator.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -222,6 +223,11 @@ bool IntegratedPSSM3::resolveParameters(ProgramSet* programSet)
             GCT_FLOAT4);    
 
         it->mTextureSampler = psProgram->resolveParameter(GCT_SAMPLER2D, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map");       
+        bool isHLSL4 = ShaderGenerator::getSingletonPtr()->IsHlsl4();
+
+        if (isHLSL4)
+            it->mTextureSamplerState = psProgram->resolveParameter(GCT_SAMPLER_STATE, it->mTextureSamplerIndex, (uint16)GPV_GLOBAL, "shadow_map_state");
+        
 
         it->mInvTextureSize = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_GLOBAL, "inv_shadow_texture_size");       
 
