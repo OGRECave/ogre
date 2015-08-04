@@ -5570,6 +5570,10 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
     {
         mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
     }
+    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_GEOMETRY_PROGRAM))
+    {
+        mDestRenderSystem->unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
+    }
 
     // Turn off colour writing and depth writing
     mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
