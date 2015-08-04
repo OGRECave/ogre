@@ -301,7 +301,7 @@ void Sample_ShaderSystem::setupContent()
     mSceneMgr->setAmbientLight(ColourValue(0.2, 0.2, 0.2));
 
     // Setup the sky box,
-    mSceneMgr->setSkyBox(true, "Examples/SceneCubeMap2");
+    mSceneMgr->setSkyBox(true, "Examples/SceneSkyBox2");
 
     MeshManager::getSingleton().createPlane("Myplane",
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Plane(Vector3::UNIT_Y, 0),
@@ -475,6 +475,14 @@ void Sample_ShaderSystem::setupUI()
         mLanguageMenu->addItem("hlsl");
         mShaderGenerator->setTargetLanguage("hlsl");                
     }
+
+    // Use HLSL in case of D3D11 render system.
+    else if (Ogre::Root::getSingletonPtr()->getRenderSystem()->getName().find("Direct3D11") != String::npos)
+    {
+        mLanguageMenu->addItem("hlsl 4.0");
+        mShaderGenerator->setTargetLanguage("hlsl",4.0);
+    }
+
     mLanguageMenu->addItem("cg");
 
     // create check boxes to toggle lights. 
