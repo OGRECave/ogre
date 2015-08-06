@@ -87,7 +87,7 @@ namespace RTShader {
 		if (mSamplerFromZ.get() == NULL)
 			return false;
 
-		if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+        if (ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl")
 		{
 			mSamplerFromXState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mTextureSamplerIndexFromX, (uint16)GPV_PER_OBJECT, "tp_sampler_from_xState");
 			mSamplerFromYState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mTextureSamplerIndexFromY, (uint16)GPV_PER_OBJECT, "tp_sampler_from_yState");
@@ -133,7 +133,7 @@ namespace RTShader {
 		Function* psMain = psProgram->getEntryPointFunction();
 		Program* vsProgram = programSet->getCpuVertexProgram();
 		Function* vsMain = vsProgram->getEntryPointFunction();
-
+        bool isHLSL = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
 		int internalCounter = 0;
 
 		FunctionInvocation *curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING, internalCounter++);
@@ -146,7 +146,7 @@ namespace RTShader {
 		curFuncInvocation->pushOperand(mVSOutPosition, Operand::OPS_OUT);
 		vsMain->addAtomInstance(curFuncInvocation);
 
-		if (Ogre::RTShader::ShaderGenerator::getSingletonPtr()->IsHlsl4())
+		if (isHLSL)
 		{
             FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mSamplerFromX, mSamplerFromXState, psMain, FFP_PS_TEXTURING, internalCounter);
             FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mSamplerFromY, mSamplerFromYState, psMain, FFP_PS_TEXTURING, internalCounter);
@@ -157,9 +157,7 @@ namespace RTShader {
 		curFuncInvocation->pushOperand(mPSInDiffuse, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSInNormal, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mPSInPosition, Operand::OPS_IN);
-
 		
-		bool isHLSL = Ogre::RTShader::ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
 		
 		if (isHLSL)
 		{
