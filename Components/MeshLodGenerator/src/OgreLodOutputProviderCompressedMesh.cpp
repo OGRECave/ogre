@@ -146,7 +146,7 @@ namespace Ogre
             prevLod->indexBuffer = v1::HardwareBufferManager::getSingleton().createIndexBuffer(
                                        data->mIndexBufferInfoList[i].indexSize == 2 ?
                                        v1::HardwareIndexBuffer::IT_16BIT : v1::HardwareIndexBuffer::IT_32BIT,
-                                       indexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+                                       indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
 
             data->mIndexBufferInfoList[i].buf.pshort =
                 static_cast<unsigned short*>(prevLod->indexBuffer->lock(0, prevLod->indexBuffer->getSizeInBytes(),

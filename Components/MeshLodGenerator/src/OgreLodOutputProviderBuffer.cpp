@@ -158,7 +158,7 @@ namespace Ogre
                         lods.back()->indexBuffer = v1::HardwareBufferManager::getSingleton().createIndexBuffer(
                                                        buff.indexSize == 2 ?
                                                        v1::HardwareIndexBuffer::IT_16BIT : v1::HardwareIndexBuffer::IT_32BIT,
-                                                       indexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+                                                       indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
                         size_t sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
                         void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, v1::HardwareBuffer::HBL_DISCARD);
                         memcpy(pOutBuff, buff.indexBuffer.get(), sizeInBytes);
