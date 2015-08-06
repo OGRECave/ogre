@@ -135,7 +135,7 @@ void LodOutputProviderBuffer::inject()
                     lods.back()->indexBuffer = HardwareBufferManager::getSingleton().createIndexBuffer(
                         buff.indexSize == 2 ?
                         HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT,
-                        indexCount, HardwareBuffer::HBU_STATIC_WRITE_ONLY, false);
+                        indexCount, mMesh->getIndexBufferUsage(), mMesh->isIndexBufferShadowed());
                     size_t sizeInBytes = lods.back()->indexBuffer->getSizeInBytes();
                     void* pOutBuff = lods.back()->indexBuffer->lock(0, sizeInBytes, HardwareBuffer::HBL_DISCARD);
                     memcpy(pOutBuff, buff.indexBuffer.get(), sizeInBytes);

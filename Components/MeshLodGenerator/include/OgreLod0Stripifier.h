@@ -133,7 +133,7 @@ namespace Ogre
 		HardwareIndexBuffer::IndexType indexType = indexData->indexBuffer->getType();
 		HardwareIndexBufferSharedPtr newIndexBuffer = 
 			HardwareBufferManager::getSingleton().createIndexBuffer(
-			indexType, indexCount, HardwareBuffer::HBU_STATIC);
+			indexType, indexCount, indexData->indexBuffer->getUsage(), indexData->indexBuffer->hasShadowBuffer());
 
 		void* pSrc = indexData->indexBuffer->lock(
 			indexData->indexStart * indexData->indexBuffer->getIndexSize(),
