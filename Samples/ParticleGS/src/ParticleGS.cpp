@@ -94,9 +94,10 @@ class _OgreSampleClassExport Sample_ParticleGS : public SdkSample
 
         // Apply the random texture.
         TexturePtr randomTexture = RandomTools::generateRandomVelocityTexture();
-        r2vb->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
-            getTextureUnitState("randomTexture")->setTextureName(
-                randomTexture->getName(), randomTexture->getTextureType());
+        TextureUnitState* ts = r2vb->getRenderToBufferMaterial()->getBestTechnique()->getPass(0)->
+            getTextureUnitState("RandomTexture");
+        ts->setTextureName(randomTexture->getName(), randomTexture->getTextureType());
+        ts->setBindingType(TextureUnitState::BT_GEOMETRY);
 
         // Bind the two together.
         mParticleSystem->setRenderToVertexBuffer(r2vb);

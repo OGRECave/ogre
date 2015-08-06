@@ -24,10 +24,11 @@
 
 struct VSParticleIn
 {
-	float3 pos   : POSITION;
-	float timer  : TIMER;
-	float type	 : TYPE;
-	float3 vel   : VELOCITY;
+	// Vertex input semantics should be exactly as declared in Sample_ParticleGS::createProceduralParticleSystem
+	float3 pos	: POSITION;
+	float timer	: TEXCOORD0;
+	float type	: TEXCOORD1;
+	float3 vel	: TEXCOORD2;
 };
 
 struct VSParticleDrawOut
