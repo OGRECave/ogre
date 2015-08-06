@@ -40,6 +40,7 @@ namespace Ogre
 	// (the same shader code could be used by many RenderSystems, directly or via Cg)
 	#define SUPPORT_SM2_0_HLSL_SHADERS  0
 
+
     class D3D11DriverList;
     class D3D11Driver;
 	class D3D11StereoDriverBridge;
@@ -144,8 +145,6 @@ namespace Ogre
         D3D11HLSLProgram* mBoundTessellationDomainProgram;
         D3D11HLSLProgram* mBoundComputeProgram;
 
-        TextureUnitState::BindingType mBindingType;
-
         ID3D11ShaderResourceView* mDSTResView;
         ID3D11BlendState * mBoundBlendState;
         ID3D11RasterizerState * mBoundRasterizer;
@@ -171,8 +170,8 @@ namespace Ogre
         StateManager mStateManager;
 #endif
 
-        /// structure holding texture unit settings for every stage
-        struct sD3DTextureStageDesc
+        /// structure holding a D3D11 texture/sampler settings for a single slot.
+        struct TextureSlotDesc
         {
             /// the type of the texture
             TextureType type;
@@ -183,12 +182,21 @@ namespace Ogre
             ID3D11ShaderResourceView  *pTex;
             D3D11_SAMPLER_DESC  samplerDesc;
             bool used;
-        } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
+        };
 
-        size_t     mLastTextureUnitState;
-		bool       mSamplerStatesChanged;
+        // structure holding a set of D3D11 texture slots settings for a specific pipeline stage
+        struct TextureStageGroup
+        {
+            TextureSlotDesc mTextureSlots[OGRE_MAX_TEXTURE_LAYERS];
+            size_t     mHighestSlotUsed;
+            
+        };
 
+        //An array holding a set of all texture settings for all the pipeline stages.
+        typedef TextureStageGroup TextureDesc[TextureUnitState::BT_SHIFT_COUNT];
 
+        TextureDesc mTextureDesc;
+        TextureUnitState::BindingType mDirtyTextureStages;
 
         /// Primary window, the one used to create the device
         D3D11RenderWindowBase* mPrimaryWindow;
@@ -206,6 +214,7 @@ namespace Ogre
 #endif
 
     protected:
+        void _disableTextureUnit(size_t texUnit, TextureUnitState::BindingType bindingType);
         void setClipPlanesImpl(const PlaneList& clipPlanes);
 
         /**
@@ -312,16 +321,17 @@ namespace Ogre
         void _setProjectionMatrix( const Matrix4 &m );
         void _setSurfaceParams( const ColourValue &ambient, const ColourValue &diffuse, const ColourValue &specular, const ColourValue &emissive, Real shininess, TrackVertexColourType tracking );
         void _setPointSpritesEnabled(bool enabled);
+        void _setTexture(size_t stage, bool enabled, const TexturePtr& tex, TextureUnitState::BindingType bindingType);
+        
         void _setPointParameters(Real size, bool attenuationEnabled, 
             Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
-        void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
-        void _setBindingType(TextureUnitState::BindingType bindingType);
+        
         void _setVertexTexture(size_t unit, const TexturePtr& tex);
         void _setGeometryTexture(size_t unit, const TexturePtr& tex);
         void _setComputeTexture(size_t unit, const TexturePtr& tex);
         void _setTesselationHullTexture(size_t unit, const TexturePtr& tex);
         void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
-        void _disableTextureUnit(size_t texUnit);
+        
         void _setTextureCoordSet( size_t unit, size_t index );
         void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, const Frustum* frustum = 0);
         void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
@@ -354,6 +364,8 @@ namespace Ogre
             Matrix4& dest, bool forGpuProgram = false);
         void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, bool forGpuProgram);
         void _setPolygonMode(PolygonMode level);
+        void _markDirtyTextureStage(TextureUnitState::BindingType binding_type);
+        void _clearDirtyTextureStage();
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
         void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
         void _setTextureUnitCompareEnabled(size_t unit, bool compare);

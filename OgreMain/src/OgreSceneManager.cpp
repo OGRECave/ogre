@@ -1246,7 +1246,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             ++unit;
         }
         // Disable remaining texture units
-        mDestRenderSystem->_disableTextureUnitsFrom(pass->getNumTextureUnitStates());
+        mDestRenderSystem->_disableTextureUnitsFrom(pass->getNumTextureUnitStates(), TextureUnitState::BT_ALL);
 
         // Set up non-texture related material settings
         // Depth buffer settings
@@ -5588,7 +5588,7 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
 
     // Turn off colour writing and depth writing
     mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
-    mDestRenderSystem->_disableTextureUnitsFrom(0);
+    mDestRenderSystem->_disableTextureUnitsFrom(0, TextureUnitState::BT_VERTEX_FRAGMENT);
     mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
     mDestRenderSystem->setStencilCheckEnabled(true);
 

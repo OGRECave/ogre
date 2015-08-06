@@ -27,6 +27,8 @@ THE SOFTWARE.
 */
 
 #include "OgreD3D11StateManager.h"
+#include <OgreTextureUnitState.h>
+
 namespace Ogre
 {
     D3D11RenderOperationState * D3D11RenderOperationStateGroup::getState(const RenderOperationStateDescriptor& renderOperationStateDescriptor)
@@ -77,16 +79,10 @@ namespace Ogre
         mBlendState(NULL)
         , mRasterizer(NULL)
         , mDepthStencilState(NULL)
-        , mSamplerStatesCount(0)
-        , mTexturesCount(0)
         , autoRelease(true)
         , autoReleaseBaseStates(true)
     {
-        for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
-        {
-            mSamplerStates[i] = NULL;
-            mTextures[i] = NULL;
-        }
+        memset(mSamplers, 0, sizeof(Samplers));
     }
 
     D3D11RenderOperationState::~D3D11RenderOperationState()
@@ -108,8 +104,11 @@ namespace Ogre
 
         for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
         {
-            SAFE_RELEASE( mSamplerStates[i] );
-            mTextures[i] = NULL;
+            for (size_t j = 0; j < TextureUnitState::BT_SHIFT_COUNT; j++)
+            {
+                SAFE_RELEASE(mSamplers[j].mSamplerStates[i] );
+                mSamplers[j].mTextures[i] = NULL;
+            }
         }
     }
 

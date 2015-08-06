@@ -971,7 +971,7 @@ namespace Ogre {
         mStateCacheManager->activateGLTextureUnit(0);
     }
 
-    void GLESRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
+    void GLESRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr, TextureUnitState::BindingType bindingType)
     {
         GLESTexturePtr tex = texPtr.staticCast<GLESTexture>();
 
@@ -2638,7 +2638,7 @@ namespace Ogre {
         mCurrentLights = 0;
 
         // Disable textures
-        _disableTextureUnitsFrom(0);
+        _disableTextureUnitsFrom(0, TextureUnitState::BT_ALL);
 
         // It's ready for switching
         if(mCurrentContext)

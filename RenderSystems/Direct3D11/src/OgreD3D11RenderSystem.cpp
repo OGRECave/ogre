@@ -40,21 +40,18 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareIndexBuffer.h"
 #include "OgreD3D11HardwareVertexBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
-#include "OgreD3D11GpuProgram.h"
 #include "OgreD3D11GpuProgramManager.h"
 #include "OgreD3D11HLSLProgramFactory.h"
-
 #include "OgreD3D11HardwareOcclusionQuery.h"
 #include "OgreFrustum.h"
 #include "OgreD3D11MultiRenderTarget.h"
 #include "OgreD3D11HLSLProgram.h"
-#include "OgreD3D11VertexDeclaration.h"
-
 #include "OgreD3D11DepthBuffer.h"
-#include "OgreD3D11HardwarePixelBuffer.h"
 #include "OgreException.h"
 
+
 #include "d3d11MultiDevice.h"
+
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
@@ -1766,87 +1763,99 @@ bail:
     void D3D11RenderSystem::_setPointSpritesEnabled(bool enabled)
     {
     }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
-    {
-        static D3D11TexturePtr dt;
-        dt = tex.staticCast<D3D11Texture>();
-        if (enabled && !dt.isNull() && dt->getSize() > 0)
-        {
-            // note used
-            dt->touch();
-            ID3D11ShaderResourceView * pTex = dt->getTexture();
-            mTexStageDesc[stage].pTex = pTex;
-            mTexStageDesc[stage].used = true;
-            mTexStageDesc[stage].type = dt->getTextureType();
 
-            mLastTextureUnitState = stage+1;
-        }
-        else
-        {
-            mTexStageDesc[stage].used = false;
-            // now we now what's the last texture unit set
-			mLastTextureUnitState = std::min(mLastTextureUnitState,stage);
-        }
-        mSamplerStatesChanged = true;
-    }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
+    void D3D11RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr& tex, TextureUnitState::BindingType bindingType)
     {
-        mBindingType = bindingType;
+        TextureUnitState::BindingType remainBindings = bindingType;
+
+        uint8 i = 0;
+        while (i < TextureUnitState::BT_SHIFT_COUNT && remainBindings != TextureUnitState::BT_NO_BINDING)
+        {
+            TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
+            
+            if ((bindingFlag & remainBindings) == bindingFlag)
+            {
+                TextureStageGroup& currentStage = mTextureDesc[i];
+                D3D11TexturePtr dt = tex.staticCast<D3D11Texture>();
+                TextureSlotDesc& desc = currentStage.mTextureSlots[stage];
+                if (enabled && !dt.isNull() && dt->getSize() > 0)
+                {
+                    // note used
+                    dt->touch();
+                    ID3D11ShaderResourceView * pTex = dt->getTexture();
+                    desc.pTex = pTex;
+                    desc.used = true;
+                    desc.type = dt->getTextureType();
+                    currentStage.mHighestSlotUsed = stage + 1;
+                }
+                else
+                {
+                    desc.used = false;
+                    //note: highest slot optimisation assumes that texture unit states are set from low to high
+                    // which is currently the case.
+                    currentStage.mHighestSlotUsed = std::min(currentStage.mHighestSlotUsed, stage);
+                }
+                _markDirtyTextureStage(bindingFlag);
+            }
+            remainBindings = static_cast<TextureUnitState::BindingType>(remainBindings & (~bindingFlag));
+            i++;
+        }
     }
+  
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setVertexTexture(size_t stage, const TexturePtr& tex)
     {
-        if (tex.isNull())
-            _setTexture(stage, false, tex);
+       /* if (tex.isNull())
+            _setTexture(stage, false, tex, BINDIN);
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex);  */
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setGeometryTexture(size_t stage, const TexturePtr& tex)
     {
-        if (tex.isNull())
+        /*if (tex.isNull())
             _setTexture(stage, false, tex);
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex);  */
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setComputeTexture(size_t stage, const TexturePtr& tex)
     {
-        if (tex.isNull())
+        /*if (tex.isNull())
             _setTexture(stage, false, tex);
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex);  */
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTesselationHullTexture(size_t stage, const TexturePtr& tex)
     {
-        if (tex.isNull())
+        /*if (tex.isNull())
             _setTexture(stage, false, tex);
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex);  */
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTesselationDomainTexture(size_t stage, const TexturePtr& tex)
     {
-        if (tex.isNull())
+        /*if (tex.isNull())
             _setTexture(stage, false, tex);
         else
-            _setTexture(stage, true, tex);  
+            _setTexture(stage, true, tex);  */
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_disableTextureUnit(size_t texUnit)
+    void D3D11RenderSystem::_disableTextureUnit(size_t texUnit,TextureUnitState::BindingType bindingType)
     {
-        RenderSystem::_disableTextureUnit(texUnit);
+        RenderSystem::_disableTextureUnit(texUnit, bindingType);
         // also disable vertex texture unit
-        static TexturePtr nullPtr;
-        _setVertexTexture(texUnit, nullPtr);
+        /*static TexturePtr nullPtr;
+        _setVertexTexture(texUnit, nullPtr);*/
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureCoordSet( size_t stage, size_t index )
     {
-        mTexStageDesc[stage].coordIndex = index;
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+            mTextureDesc[i].mTextureSlots[stage].coordIndex = index;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureCoordCalculation( size_t stage, TexCoordCalcMethod m,
@@ -1856,8 +1865,15 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMipmapBias(size_t unit, float bias)
     {
-        mTexStageDesc[unit].samplerDesc.MipLODBias = bias;
-        mSamplerStatesChanged = true;
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+        {
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            currentStage.mTextureSlots[unit].samplerDesc.MipLODBias = bias;
+        }
+        // TODO:
+        // For now, since we don't have the neccesary texture binding information assume that vertex, geometry and fragment
+        // samplers has changed.
+        _markDirtyTextureStage(static_cast<TextureUnitState::BindingType>(TextureUnitState::BT_VERTEX_GEOMETRY_FRAGMENT));
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureMatrix( size_t stage, const Matrix4& xForm )
@@ -1867,18 +1883,31 @@ bail:
     void D3D11RenderSystem::_setTextureAddressingMode( size_t stage, 
         const TextureUnitState::UVWAddressingMode& uvw )
     {
-        // record the stage state
-        mTexStageDesc[stage].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
-        mTexStageDesc[stage].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
-        mTexStageDesc[stage].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
-        mSamplerStatesChanged = true;
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+        {
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            // record the stage state
+            currentStage.mTextureSlots [stage].samplerDesc.AddressU = D3D11Mappings::get(uvw.u);
+            currentStage.mTextureSlots[stage].samplerDesc.AddressV = D3D11Mappings::get(uvw.v);
+            currentStage.mTextureSlots[stage].samplerDesc.AddressW = D3D11Mappings::get(uvw.w);
+            
+            
+        }
+
+        _markDirtyTextureStage(static_cast<TextureUnitState::BindingType>(TextureUnitState::BT_VERTEX_GEOMETRY_FRAGMENT));
+        
     }
     //-----------------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureBorderColour(size_t stage,
         const ColourValue& colour)
     {
-        D3D11Mappings::get(colour, mTexStageDesc[stage].samplerDesc.BorderColor);
-        mSamplerStatesChanged = true;
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+        {
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            D3D11Mappings::get(colour, currentStage.mTextureSlots[stage].samplerDesc.BorderColor);
+        }
+
+        _markDirtyTextureStage(static_cast<TextureUnitState::BindingType>(TextureUnitState::BT_VERTEX_GEOMETRY_FRAGMENT));
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureBlendMode( size_t stage, const LayerBlendModeEx& bm )
@@ -2013,6 +2042,17 @@ bail:
     void D3D11RenderSystem::_setFog( FogMode mode, const ColourValue& colour, Real densitiy, Real start, Real end )
     {
     }
+
+    void D3D11RenderSystem::_markDirtyTextureStage(TextureUnitState::BindingType binding_type)
+    {
+        mDirtyTextureStages = static_cast<TextureUnitState::BindingType>(mDirtyTextureStages | binding_type);
+    }
+
+    void D3D11RenderSystem::_clearDirtyTextureStage()
+    {
+        mDirtyTextureStages = TextureUnitState::BT_NO_BINDING;
+    }
+
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setPolygonMode(PolygonMode level)
     {
@@ -2079,31 +2119,52 @@ bail:
             break;
         }
 
-        mTexStageDesc[unit].samplerDesc.Filter = D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit],CompareEnabled);
-        mSamplerStatesChanged = true;
+
+
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+        {
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            currentStage.mTextureSlots[unit].samplerDesc.Filter = D3D11Mappings::get(FilterMinification[unit], FilterMagnification[unit], FilterMips[unit], CompareEnabled);
+        }
+
+        _markDirtyTextureStage(static_cast<TextureUnitState::BindingType>(TextureUnitState::BT_VERTEX_GEOMETRY_FRAGMENT));
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitCompareEnabled(size_t unit, bool compare)
     {
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+        {
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            
+        }
+        _markDirtyTextureStage(static_cast<TextureUnitState::BindingType>(TextureUnitState::BT_VERTEX_GEOMETRY_FRAGMENT));
         CompareEnabled = compare;
-        mSamplerStatesChanged = true;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureUnitCompareFunction(size_t unit, CompareFunction function)
     {
-        mTexStageDesc[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(function);
-        mSamplerStatesChanged = true;
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+        {
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            currentStage.mTextureSlots[unit].samplerDesc.ComparisonFunc = D3D11Mappings::get(function);
+            
+        }
+        _markDirtyTextureStage(static_cast<TextureUnitState::BindingType>(TextureUnitState::BT_VERTEX_GEOMETRY_FRAGMENT));
     }
     //---------------------------------------------------------------------
     DWORD D3D11RenderSystem::_getCurrentAnisotropy(size_t unit)
     {
-        return mTexStageDesc[unit].samplerDesc.MaxAnisotropy;;
+        return mTextureDesc[TextureUnitState::BT_SHIFT_FRAGMENT].mTextureSlots[unit].samplerDesc.MaxAnisotropy;;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setTextureLayerAnisotropy(size_t unit, unsigned int maxAnisotropy)
     {
-        mTexStageDesc[unit].samplerDesc.MaxAnisotropy = maxAnisotropy;
-        mSamplerStatesChanged = true;
+        for (int i = 0; i < TextureUnitState::BT_SHIFT_COUNT; i++)
+        {
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            currentStage.mTextureSlots[unit].samplerDesc.MaxAnisotropy = maxAnisotropy;
+        }
+        _markDirtyTextureStage(static_cast<TextureUnitState::BindingType>(TextureUnitState::BT_VERTEX_GEOMETRY_FRAGMENT));
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setRenderTarget(RenderTarget *target)
@@ -2355,59 +2416,73 @@ bail:
             opState->mDepthStencilState = mBoundDepthStencilState;
         }
 
-        if (mSamplerStatesChanged)
-        {
+        
             // samplers mapping
-            size_t numberOfSamplers = std::min(mLastTextureUnitState, (size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
-
-            opState->mSamplerStatesCount = numberOfSamplers;
-            opState->mTexturesCount = numberOfSamplers;
-
-            for (size_t n = 0; n < numberOfSamplers; n++)
+            
+        TextureUnitState::BindingType remainBindings = mDirtyTextureStages;
+        uint8 i = 0;
+        while (i < TextureUnitState::BT_SHIFT_COUNT && remainBindings != TextureUnitState::BT_NO_BINDING)
+        {
+            TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
+            if ((bindingFlag & remainBindings) == bindingFlag)
             {
-                ID3D11SamplerState * samplerState = NULL;
-                ID3D11ShaderResourceView *texture = NULL;
-                sD3DTextureStageDesc & stage = mTexStageDesc[n];
-                if (!stage.used)
+                TextureStageGroup& currentStage = mTextureDesc[i];
+                size_t numberOfSamplers = std::min(currentStage.mHighestSlotUsed, (size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
+
+                D3D11RenderOperationState::SamplersStageGroup&  samplerStage = opState->mSamplers[i];
+                samplerStage.mSamplerStatesCount = numberOfSamplers;
+                samplerStage.mTexturesCount = numberOfSamplers;
+
+                for (size_t n = 0; n < numberOfSamplers; n++)
                 {
-                    samplerState = NULL;
-                    texture = NULL;
-                }
-                else
-                {
-                    texture = stage.pTex;
-
-                    stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
-                        FilterMips[n], false);
-                    stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
-                    stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-                    stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
-                    stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
-
-
-                    HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState);
-                    if (FAILED(hr))
+                    ID3D11SamplerState * samplerState = NULL;
+                    ID3D11ShaderResourceView *texture = NULL;
+                    TextureSlotDesc& stage = currentStage.mTextureSlots[n];
+                    if (!stage.used)
                     {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                            "Failed to create sampler state\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
+                        samplerState = NULL;
+                        texture = NULL;
                     }
+                    else
+                    {
+                        texture = stage.pTex;
 
+                        stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
+                            FilterMips[n], false);
+                        stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
+                        stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+                        stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
+                        stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
+
+
+                        HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState);
+                        if (FAILED(hr))
+                        {
+                            String errorDescription = mDevice.getErrorDescription(hr);
+                            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                                "Failed to create sampler state\nError Description:" + errorDescription,
+                                "D3D11RenderSystem::_render");
+                        }
+
+                    }
+                    samplerStage.mSamplerStates[n] = samplerState;
+                    samplerStage.mTextures[n] = texture;
                 }
-                opState->mSamplerStates[n] = samplerState;
-                opState->mTextures[n] = texture;
-            }
 
-            // If no textures are bounded and stencil is enable, then reset texture unit 0,
-            // to prevent D3D error message where wrong texture type is bounded when reading
-            // from stencil buffer in a shader.
-                if (opState->mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
+                // If no textures are bounded and stencil is enable, then reset texture unit 0,
+                // to prevent D3D error message where wrong texture type is bounded when reading
+                // from stencil buffer in a shader.
+                if (samplerStage.mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
                 {
-                    opState->mTextures[0] = NULL;
-                    opState->mTexturesCount = 1;
+                    samplerStage.mTextures[0] = NULL;
+                    samplerStage.mTexturesCount = 1;
                 }
+
+                remainBindings = static_cast<TextureUnitState::BindingType>(remainBindings & (~bindingFlag));
+            }
+           i++;
         }
+        
 
         if (opState->mBlendState != mBoundBlendState)
         {
@@ -2451,11 +2526,8 @@ bail:
                     "D3D11RenderSystem::_render");
             }
         }
-        if (mSamplerStatesChanged && opState->mSamplerStatesCount > 0 || opState->mTexturesCount > 0) //  if the NumSamplers is 0, the operation effectively does nothing.
-        {
-            mSamplerStatesChanged = false; // now it's time to set it to false
-            _bindSamplersForStages(opState);
-        }
+
+         _bindSamplersForStages(opState);
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_render(const RenderOperation& op)
@@ -2851,174 +2923,92 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_bindSamplersForStages(D3D11RenderOperationState* opState)
     {
-        /// Vertex Shader binding
-
-        /*if (mBindingType == TextureUnitState::BindingType::BT_VERTEX)*/
+        TextureUnitState::BindingType remainBindings = mDirtyTextureStages;
+        uint8 i = 0;
+        while (i < TextureUnitState::BT_SHIFT_COUNT && remainBindings != TextureUnitState::BT_NO_BINDING)
         {
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
+            TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
+        
+            D3D11RenderOperationState::SamplersStageGroup&  samplerStage = opState->mSamplers[i];
+            TextureStageGroup& currentStage = mTextureDesc[i];
+            if ((bindingFlag & remainBindings) == bindingFlag && (samplerStage.mSamplerStatesCount > 0 || samplerStage.mTexturesCount > 0))
             {
-                //mBoundSamplerStatesCount = opState->mSamplerStatesCount;
-                //memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
-                mDevice.GetImmediateContext()->VSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
+                void(__stdcall ID3D11DeviceContextN::*SetSamplers)(UINT StartSlot, UINT NumSamplers, ID3D11SamplerState *const* ppSamplers);
+                void(__stdcall ID3D11DeviceContextN::*SetTextures)(UINT StartSlot, UINT NumSamplers, ID3D11ShaderResourceView *const* ppTextures);
+                
+                switch (i)
                 {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
+                case 0:
+                    SetSamplers = &ID3D11DeviceContextN::VSSetSamplers;
+                    SetTextures = &ID3D11DeviceContextN::VSSetShaderResources;
+                    break;
+                case 1:
+                    SetSamplers = &ID3D11DeviceContextN::GSSetSamplers;
+                    SetTextures = &ID3D11DeviceContextN::GSSetShaderResources;
+                    break;
+                case 2:
+                    SetSamplers = &ID3D11DeviceContextN::PSSetSamplers;
+                    SetTextures = &ID3D11DeviceContextN::PSSetShaderResources;
+                    break;
+                case 3:
+                    SetSamplers = &ID3D11DeviceContextN::HSSetSamplers;
+                    SetTextures = &ID3D11DeviceContextN::HSSetShaderResources;
+                    break;
+                case 4:
+                    SetSamplers = &ID3D11DeviceContextN::DSSetSamplers;
+                    SetTextures = &ID3D11DeviceContextN::DSSetShaderResources;
+                    break;
+                case 5:
+                    SetSamplers = &ID3D11DeviceContextN::CSSetSamplers;
+                    SetTextures = &ID3D11DeviceContextN::CSSetShaderResources;
+                    break;
+                default:
+                    OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                        "Unexpected binding type",
+                        "D3D11RenderSystem::_bindSamplersForStages");
                 }
+                if (samplerStage.mSamplerStates > 0)
+                {
+                    (*mDevice.GetImmediateContext().*SetSamplers)(static_cast<UINT>(0), static_cast<UINT>(samplerStage.mSamplerStatesCount), samplerStage.mSamplerStates);
+                    if (mDevice.isError())
+                    {
+                        String errorDescription = mDevice.getErrorDescription();
+                        StringStream ss;
+                        ss << "D3D11 device cannot set"
+                            << TextureUnitState::getNameofBindingType(static_cast<TextureUnitState::BindingType>(i + 1))
+                            << "shader samplers\nError Description:" << errorDescription;
+
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            ss.str(),
+                            "D3D11RenderSystem::_bindSamplersForStages");
+                    }
+                }
+
+                if (samplerStage.mTexturesCount > 0)
+                {
+                    (*mDevice.GetImmediateContext().*SetTextures)(static_cast<UINT>(0), static_cast<UINT>(samplerStage.mTexturesCount), samplerStage.mTextures);
+                    if (mDevice.isError())
+                    {
+                        String errorDescription = mDevice.getErrorDescription();
+                        StringStream ss;
+                        ss << "D3D11 device cannot set"
+                            << TextureUnitState::getNameofBindingType(static_cast<TextureUnitState::BindingType>(i + 1))
+                            << "shader resources\nError Description:" << errorDescription;
+
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                            ss.str(),
+                            "D3D11RenderSystem::_bindSamplersForStages");
+                    }
+                }
+            }
             
-                mDevice.GetImmediateContext()->VSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
+            remainBindings = static_cast<TextureUnitState::BindingType>(remainBindings & (~bindingFlag));
+            i++;
         }
 
-        // Geometry shader binding
-        if (mBoundGeometryProgram && mBindingType == TextureUnitState::BT_GEOMETRY)
-        {
-            mDevice.GetImmediateContext()->GSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-
-            mDevice.GetImmediateContext()->GSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-        }
-
-
-        /// Pixel Shader binding
-        // Assaf: seem I have better performance without this check... TODO - remove?
-        // if ((mBoundSamplerStatesCount != opState->mSamplerStatesCount) || ( 0 != memcmp(opState->mSamplerStates, mBoundSamplerStates, mBoundSamplerStatesCount) ) )
-        {
-            //mBoundSamplerStatesCount = opState->mSamplerStatesCount;
-            //memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
-            mDevice.GetImmediateContext()->PSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-
-
-            mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D11 device cannot set pixel shader resources\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-        }
-
-
-        /// Compute Shader binding
-        if (mBoundComputeProgram && mBindingType == TextureUnitState::BT_COMPUTE)
-        {
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                //mBoundSamplerStatesCount = opState->mSamplerStatesCount;
-                //memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
-                mDevice.GetImmediateContext()->CSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set compute shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
-
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
-        }
-
-        /// Hull Shader binding
-        if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
-        {
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                //mBoundSamplerStatesCount = opState->mSamplerStatesCount;
-                //memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
-                mDevice.GetImmediateContext()->HSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set hull shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
-
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                mDevice.GetImmediateContext()->HSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set hull shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
-        }
-
-        /// Domain Shader binding
-        if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BT_TESSELLATION_DOMAIN)
-        {
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                //mBoundSamplerStatesCount = opState->mSamplerStatesCount;
-                //memcpy(mBoundSamplerStates,opState->mSamplerStates, mBoundSamplerStatesCount);
-                mDevice.GetImmediateContext()->DSSetSamplers(static_cast<UINT>(0), static_cast<UINT>(opState->mSamplerStatesCount), opState->mSamplerStates);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set domain shader samplers\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
-
-            if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-            {
-                mDevice.GetImmediateContext()->DSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "D3D11 device cannot set domain shader resources\nError Description:" + errorDescription,
-                        "D3D11RenderSystem::_render");
-                }
-            }
-        }
+        _clearDirtyTextureStage();
     }
+
 #if SAVE_STATE_RENDERABLE  == 1
     void D3D11RenderSystem::_applyRenderStateForRenderable(D3D11RenderOperationState* &opState, const RenderOperation& op)
     {
@@ -3138,67 +3128,83 @@ bail:
                     mStateManager.getDepthStencilStateMap()[descCrc] = opState->mDepthStencilState;
                 }
             }
-            // samplers mapping
-            size_t numberOfSamplers = std::min(mLastTextureUnitState, (size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
 
-            opState->mSamplerStatesCount = numberOfSamplers;
-            opState->mTexturesCount = numberOfSamplers;
-
-            for (size_t n = 0; n < numberOfSamplers; n++)
+            TextureUnitState::BindingType remainBindings = TextureUnitState::BT_ALL;
+            uint8 i = 0;
+            while (i < TextureUnitState::BT_SHIFT_COUNT && remainBindings != TextureUnitState::BT_NO_BINDING)
             {
-                ID3D11SamplerState * samplerState = NULL;
-                ID3D11ShaderResourceView *texture = NULL;
-                sD3DTextureStageDesc & stage = mTexStageDesc[n];
-                if (!stage.used)
+                TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
+            
+                TextureStageGroup& currentStage = mTextureDesc[i];
+                if ((bindingFlag & remainBindings) == bindingFlag)
                 {
-                    samplerState = NULL;
-                    texture = NULL;
-                }
-                else
-                {
-                    texture = stage.pTex;
+                    size_t numberOfSamplers = std::min(currentStage.mHighestSlotUsed, (size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
+                    D3D11RenderOperationState::SamplersStageGroup&  samplerStage = opState->mSamplers[i];
+                    
 
-                    stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
-                        FilterMips[n], false);
-                    stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
-                    stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-                    stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
-                    stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
+                    samplerStage.mSamplerStatesCount = numberOfSamplers;
+                    samplerStage.mTexturesCount = numberOfSamplers;
+                    for (size_t n = 0; n < numberOfSamplers; n++)
                     {
-
-                        descCrc = crc32_8bytes((unsigned char  *)&stage.samplerDesc, sizeof(stage.samplerDesc));
-                        CRCClassMap<ID3D11SamplerState *>::iterator it = mStateManager.getSamplerMap().find(descCrc);
-                        if (it != mStateManager.getSamplerMap().end())
+                        ID3D11SamplerState * samplerState = NULL;
+                        ID3D11ShaderResourceView *texture = NULL;
+                        TextureSlotDesc& stage = currentStage.mTextureSlots[n];
+                        if (!stage.used)
                         {
-                            samplerState = it->second;
+                            samplerState = NULL;
+                            texture = NULL;
                         }
                         else
                         {
-                            HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState);
-                            if (FAILED(hr))
+                            texture = stage.pTex;
+
+                            stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
+                                FilterMips[n], false);
+                            stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
+                            stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+                            stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
+                            stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
                             {
-                                String errorDescription = mDevice.getErrorDescription(hr);
-                                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                                    "Failed to create sampler state\nError Description:" + errorDescription,
-                                    "D3D11RenderSystem::_render");
+
+                                descCrc = crc32_8bytes((unsigned char  *)&stage.samplerDesc, sizeof(stage.samplerDesc));
+                                CRCClassMap<ID3D11SamplerState *>::iterator it = mStateManager.getSamplerMap().find(descCrc);
+                                if (it != mStateManager.getSamplerMap().end())
+                                {
+                                    samplerState = it->second;
+                                }
+                                else
+                                {
+                                    HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState);
+                                    if (FAILED(hr))
+                                    {
+                                        String errorDescription = mDevice.getErrorDescription(hr);
+                                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                                            "Failed to create sampler state\nError Description:" + errorDescription,
+                                            "D3D11RenderSystem::_render");
+                                    }
+                                    mStateManager.getSamplerMap()[descCrc] = samplerState;
+                                }
                             }
-                            mStateManager.getSamplerMap()[descCrc] = samplerState;
+
                         }
+                        samplerStage.mSamplerStates[n] = samplerState;
+                        samplerStage.mTextures[n] = texture;
+
                     }
 
+                    // If no textures are bounded and stencil is enable, then reset texture unit 0,
+                    // to prevent D3D error message where wrong texture type is bounded when reading
+                    // from stencil buffer in a shader.
+                    if (samplerStage.mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
+                    {
+                        samplerStage.mTextures[0] = NULL;
+                        samplerStage.mTexturesCount = 1;
+                    }
+
+                    remainBindings = static_cast<TextureUnitState::BindingType>(remainBindings & (~bindingFlag));
                 }
-                opState->mSamplerStates[n] = samplerState;
-                opState->mTextures[n] = texture;
-            }
-
-            // If no textures are bounded and stencil is enable, then reset texture unit 0,
-            // to prevent D3D error message where wrong texture type is bounded when reading
-            // from stencil buffer in a shader.
-
-            if (opState->mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
-            {
-                opState->mTextures[0] = NULL;
-                opState->mTexturesCount = 1;
+                
+                i++;
             }
         }
 
@@ -3232,10 +3238,8 @@ bail:
                     "D3D11 device cannot set depth stencil state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
-            if (opState->mSamplerStatesCount > 0 || opState->mTexturesCount > 0) //  if the NumSamplers is 0, the operation effectively does nothing.
-            {
-                _bindSamplersForStages(opState);
-            }
+            
+            _bindSamplersForStages(opState);
      }
     
 #endif
@@ -4128,11 +4132,7 @@ bail:
         mBoundBlendState = NULL;
         mBoundDepthStencilState = NULL;
 
-        mBindingType = TextureUnitState::BT_FRAGMENT;
-
         mBlendDesc = mDefaultTargetBlend;
-
-
         ZeroMemory( &mRasterizerDesc, sizeof(mRasterizerDesc));
         mRasterizerDesc.FrontCounterClockwise = true;
 		mRasterizerDesc.DepthClipEnable = true;
@@ -4159,10 +4159,8 @@ bail:
         mBlendDescChanged = true;
 		mRasterizerDescChanged = true;
 		mDepthStencilDescChanged = true;
-		mSamplerStatesChanged = true;
-		mLastTextureUnitState = 0;
-
-        ZeroMemory(mTexStageDesc, OGRE_MAX_TEXTURE_LAYERS * sizeof(sD3DTextureStageDesc));
+        mDirtyTextureStages = TextureUnitState::BT_ALL;
+        ZeroMemory(mTextureDesc,sizeof(TextureDesc));
 
         mLastVertexSourceCount = 0;
         mReadBackAsTexture = false;

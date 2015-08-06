@@ -926,7 +926,7 @@ namespace Ogre {
         // Point sprites are always on in OpenGL 3.2 and up.
     }
 
-    void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
+    void GL3PlusRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr,TextureUnitState::BindingType bindingType)
     {
         GL3PlusTexturePtr tex = texPtr.staticCast<GL3PlusTexture>();
 
@@ -968,27 +968,27 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setVertexTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_ALL);
     }
 
     void GL3PlusRenderSystem::_setGeometryTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_ALL);
     }
 
     void GL3PlusRenderSystem::_setComputeTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_ALL);
     }
 
     void GL3PlusRenderSystem::_setTesselationHullTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_ALL);
     }
 
     void GL3PlusRenderSystem::_setTesselationDomainTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_ALL);
     }
 
     void GL3PlusRenderSystem::_setTextureCoordSet(size_t stage, size_t index)
@@ -2202,7 +2202,7 @@ namespace Ogre {
             mCurrentComputeShader->unbind();
 
         // Disable textures
-        _disableTextureUnitsFrom(0);
+        _disableTextureUnitsFrom(0, TextureUnitState::BT_ALL);
 
         // It's ready for switching
         if (mCurrentContext)

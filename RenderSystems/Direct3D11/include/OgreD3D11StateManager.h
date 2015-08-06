@@ -4,6 +4,7 @@
 #include "OgreD3D11Prerequisites.h"
 #include "OgreCRC.h"
 #include "OgreRenderable.h"
+#include <OgreTextureUnitState.h>
 
 
 namespace Ogre
@@ -100,15 +101,26 @@ namespace Ogre
     class D3D11RenderOperationState
     {
     public:
+        
+        // structure holding a set of D3D11 samplers and 'shader resource views' for a specific pipeline stage.
+        struct SamplersStageGroup
+        {
+            ID3D11SamplerState * mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
+            size_t mSamplerStatesCount;
+
+            ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
+            size_t mTexturesCount;
+        };
+
+        //An array holding a set of all D3D11 samplers and 'shader resource views' for all the pipeline stages.
+        typedef SamplersStageGroup Samplers[TextureUnitState::BT_SHIFT_COUNT];
+
         ID3D11BlendState * mBlendState;
         ID3D11RasterizerState * mRasterizer;
         ID3D11DepthStencilState * mDepthStencilState;
 
-        ID3D11SamplerState * mSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
-        size_t mSamplerStatesCount;
-
-        ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];
-        size_t mTexturesCount;
+        Samplers mSamplers;
+        
         RenderOperationStateDescriptor descriptor;
 
         bool autoRelease;

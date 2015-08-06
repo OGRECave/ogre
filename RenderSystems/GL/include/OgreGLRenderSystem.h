@@ -303,10 +303,11 @@ namespace Ogre {
         /** See
           RenderSystem
          */
-        void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
+        void _setTexture(size_t unit, bool enabled, const TexturePtr &tex, TextureUnitState::BindingType bindingType);
         /** See
           RenderSystem
          */
+      
         void _setVertexTexture(size_t unit, const TexturePtr &tex);     
         /** See
           RenderSystem

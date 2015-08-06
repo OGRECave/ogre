@@ -1558,7 +1558,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------------
-    void GLRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
+    void GLRenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr, TextureUnitState::BindingType bindingType)
     {
         GLTexturePtr tex = texPtr.staticCast<GLTexture>();
         GLenum lastTextureType = mTextureTypes[stage];
@@ -1618,27 +1618,27 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setVertexTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_NO_BINDING);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setGeometryTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_NO_BINDING);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setComputeTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_NO_BINDING);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTesselationHullTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_NO_BINDING);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTesselationDomainTexture( size_t unit, const TexturePtr &tex )
     {
-        _setTexture(unit, true, tex);
+        _setTexture(unit, true, tex, TextureUnitState::BT_NO_BINDING);
     }
     //-----------------------------------------------------------------------------
     void GLRenderSystem::_setTextureCoordSet(size_t stage, size_t index)
@@ -3518,7 +3518,7 @@ namespace Ogre {
         mCurrentLights = 0;
 
         // Disable textures
-        _disableTextureUnitsFrom(0);
+        _disableTextureUnitsFrom(0,TextureUnitState::BT_ALL);
 
         // It's ready for switching
         if (mCurrentContext)
