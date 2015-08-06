@@ -182,18 +182,35 @@ void TargetRenderState::createCpuPrograms()
     // Create entry point functions.
     vsMainFunc = vsProgram->createFunction("main", "Vertex Program Entry point", Function::FFT_VS_MAIN);
     vsProgram->setEntryPointFunction(vsMainFunc);
-    vsMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN);
 
-    vsMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT);
+    bool isHLSL = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
+
+    
+    
+     if (isHLSL)
+     {
+        vsMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN);
+        vsMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT);
+     }
+
     psMainFunc = psProgram->createFunction("main", "Pixel Program Entry point", Function::FFT_PS_MAIN);
     psProgram->setEntryPointFunction(psMainFunc);
-    psMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN);
-    psMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT);
+    if (isHLSL)
+    {
+        psMainFunc->resolveInputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_IN, GCT_SHADER_IN);
+        psMainFunc->resolveOutputParameter(Parameter::SPS_CUSTOM, -1, Parameter::SPC_SHADER_OUT, GCT_SHADER_OUT);
+    }
     // This is a preperation for generating a geometry shader.
-    // currently dont create geometry shader until proper render states will be added. 
+    // currently don't create geometry shader until proper render states will be added
+    // to the RTSS. 
     const bool generateGeometryShader = false;
     if (generateGeometryShader == true)
     {
+        if (!isHLSL || ShaderGenerator::getSingleton().getTargetLanguageVersion() < 4.0)
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                String("Geometery shaders in the RTSS are currently supported only for HLSL shader model 4.0 and above"),
+                "ProgramManager::createCpuPrograms");
+
         gsMainFunc = gsProgram->createFunction("main", "Geometry Program Entry point", Function::FFT_GS_MAIN);
         gsProgram->setEntryPointFunction(gsMainFunc);
 
@@ -231,7 +248,7 @@ void TargetRenderState::createCpuPrograms()
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 String("Could not create cpu programs for sub render state, ") +  srcSubRenderState->getType(),
-                "ProgramManager::acquireGpuPrograms");
+                "ProgramManager::createCpuPrograms");
 
             LogManager::getSingleton().stream() << "RTShader::TargetRenderState : Could not generate sub render program of type: " << srcSubRenderState->getType();
         }
