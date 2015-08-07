@@ -37,7 +37,9 @@ THE SOFTWARE.
 #elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
 #include <signal.h>
 #include <setjmp.h>
-#include <sys/sysctl.h>
+#if OGRE_PLATFORM != OGRE_PLATFORM_WIN32
+    #include <sys/sysctl.h>
+#endif
 
     #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         #include <cpu-features.h>
