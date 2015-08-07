@@ -244,9 +244,15 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void D3D11VertexDeclaration::bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
-        ID3D11InputLayout*  pVertexLayout = getILayoutByShader(boundVertexProgram, binding);
+        if(mNeedsRebuild)
+        {
+            mD3delems.clear();
+            mShaderToILayoutMap.clear();
+            mNeedsRebuild = false;
+        }
 
         // Set the input layout
+        ID3D11InputLayout*  pVertexLayout = getILayoutByShader(boundVertexProgram, binding);
         mlpD3DDevice.GetImmediateContext()->IASetInputLayout( pVertexLayout);
     }
 }
