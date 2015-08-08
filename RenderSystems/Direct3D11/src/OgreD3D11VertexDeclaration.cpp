@@ -38,6 +38,7 @@ namespace v1 {
     D3D11VertexDeclaration::D3D11VertexDeclaration(D3D11Device &  device) 
         : 
     mlpD3DDevice(device)
+    , mNeedsRebuild(true)
     {
 
     }
@@ -65,6 +66,48 @@ namespace v1 {
         }
 
 
+    }
+    //-----------------------------------------------------------------------
+    const VertexElement& D3D11VertexDeclaration::addElement(unsigned short source,
+        size_t offset, VertexElementType theType,
+        VertexElementSemantic semantic, unsigned short index)
+    {
+        mNeedsRebuild = true;
+        return VertexDeclaration::addElement(source, offset, theType, semantic, index);
+    }
+    //-----------------------------------------------------------------------------
+    const VertexElement& D3D11VertexDeclaration::insertElement(unsigned short atPosition,
+        unsigned short source, size_t offset, VertexElementType theType,
+        VertexElementSemantic semantic, unsigned short index)
+    {
+        mNeedsRebuild = true;
+        return VertexDeclaration::insertElement(atPosition, source, offset, theType, semantic, index);
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::removeElement(unsigned short elem_index)
+    {
+        VertexDeclaration::removeElement(elem_index);
+        mNeedsRebuild = true;
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
+    {
+        VertexDeclaration::removeElement(semantic, index);
+        mNeedsRebuild = true;
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::removeAllElements(void)
+    {
+        VertexDeclaration::removeAllElements();
+        mNeedsRebuild = true;
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::modifyElement(unsigned short elem_index,
+        unsigned short source, size_t offset, VertexElementType theType,
+        VertexElementSemantic semantic, unsigned short index)
+    {
+        VertexDeclaration::modifyElement(elem_index, source, offset, theType, semantic, index);
+        mNeedsRebuild = true;
     }
     //-----------------------------------------------------------------------
     D3D11_INPUT_ELEMENT_DESC * D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
@@ -143,7 +186,7 @@ namespace v1 {
                         "Unable to found a bound vertex for a slot that is used in the vertex declaration." , 
                         "D3D11VertexDeclaration::getD3DVertexDeclaration");
 
-                }               
+                }
             }
 
             mD3delems[boundVertexProgram] = D3delems;
@@ -157,7 +200,7 @@ namespace v1 {
     {
         ShaderToILayoutMapIterator foundIter = mShaderToILayoutMap.find(boundVertexProgram);
 
-        ID3D11InputLayout*  pVertexLayout = 0; 
+        ID3D11InputLayout*  pVertexLayout = 0;
 
         if (foundIter == mShaderToILayoutMap.end())
         {
@@ -171,20 +214,20 @@ namespace v1 {
             // bad bug tracing. see what will happen next.
             //if (pVertexDecl->Format == DXGI_FORMAT_R16G16_SINT)
             //  pVertexDecl->Format = DXGI_FORMAT_R16G16_FLOAT;
-            HRESULT hr = mlpD3DDevice->CreateInputLayout( 
-                pVertexDecl, 
-                boundVertexProgram->getNumInputs(), 
-                &vSBuf[0], 
+            HRESULT hr = mlpD3DDevice->CreateInputLayout(
+                pVertexDecl,
+                boundVertexProgram->getNumInputs(),
+                &vSBuf[0],
                 vSBuf.size(),
                 &pVertexLayout );
 
             if (FAILED(hr)|| mlpD3DDevice.isError())
             {
-				String errorDescription = mlpD3DDevice.getErrorDescription(hr);
+                String errorDescription = mlpD3DDevice.getErrorDescription(hr);
                 errorDescription += "\nBound shader name: " + boundVertexProgram->getName();
 
-				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-					"Unable to set D3D11 vertex declaration" + errorDescription,
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Unable to set D3D11 vertex declaration" + errorDescription,
                     "D3D11VertexDeclaration::getILayoutByShader");
             }
 
@@ -205,7 +248,7 @@ namespace v1 {
 
         // Set the input layout
         mlpD3DDevice.GetImmediateContext()->IASetInputLayout( pVertexLayout);
-    }   
+    }
 }
 }
 
