@@ -29,7 +29,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Phone Kits/8.0/lib/${MSVC_CXX_ARCHITECTURE_ID}/"
 
 	# Windows 8.1 SDK
-	elseif(MSVC12)
+	elseif(MSVC12 OR MSVC14)
 	    find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.1/include/um" "C:/Program Files/Windows Kits/8.1/include/um")
 		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/8.1/lib/winv6.3/um/${MSVC_CXX_ARCHITECTURE_ID}/"
 		
