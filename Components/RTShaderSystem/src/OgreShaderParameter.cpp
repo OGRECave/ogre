@@ -516,7 +516,9 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size)
 {
 
-    Init(autoType, GpuProgramParameters::AutoConstantEntry::Data(nAutoConstantData), size);
+    Init( autoType
+        , GpuProgramParameters::AutoConstantEntry::Data(static_cast<GpuProgramParameters::AutoConstantEntry::Integer>(nAutoConstantData))
+        , size);
     
     mIsAutoConstantInt  = true;
 }
@@ -524,7 +526,10 @@ UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoTy
 //-----------------------------------------------------------------------
 UniformParameter::UniformParameter(GpuProgramParameters::AutoConstantType autoType, size_t nAutoConstantData, size_t size, GpuConstantType type)
 {
-    Init(autoType, GpuProgramParameters::AutoConstantEntry::Data(nAutoConstantData), size, type);
+    Init( autoType
+        , GpuProgramParameters::AutoConstantEntry::Data(static_cast<GpuProgramParameters::AutoConstantEntry::Integer>(nAutoConstantData))
+        , size
+        , type);
     mIsAutoConstantInt = true;
 }
 

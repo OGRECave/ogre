@@ -127,6 +127,11 @@ namespace Ogre {
             unsigned short width = 0, char fill = ' ', 
             std::ios::fmtflags flags = std::ios::fmtflags(0));
 #endif
+        /** Convert a 64 bit fixed width unsigned int to a String */
+        static String toString(uint64 val,
+            unsigned short width = 0, char fill = ' ',
+            std::ios::fmtflags flags = std::ios::fmtflags(0));
+
         /** Converts a long to a String. */
         static String toString(long val, 
             unsigned short width = 0, char fill = ' ', 

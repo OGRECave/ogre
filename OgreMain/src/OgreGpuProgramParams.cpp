@@ -1851,7 +1851,13 @@ namespace Ogre
         GpuLogicalIndexUseConstPtr indexUse = _getConstantLogicalIndexUse(index, sz, (GpuParamVariability)deriveVariability(acType), BCT_FLOAT);
 
         if (indexUse)
-            _setRawAutoConstant(indexUse->physicalIndex, acType, GpuProgramParameters::AutoConstantEntry::Data(extraInfo), indexUse->variability, sz);
+            _setRawAutoConstant(
+            indexUse->physicalIndex
+            , acType
+            , AutoConstantEntry::Data(static_cast<AutoConstantEntry::Integer>(extraInfo))
+            , indexUse->variability
+            , sz);
+
     }
     //-----------------------------------------------------------------------------
     void GpuProgramParameters::_setRawAutoConstant(size_t physicalIndex, AutoConstantType acType, AutoConstantEntry::Data data, uint16 variability,size_t elementSize)
@@ -1913,7 +1919,12 @@ namespace Ogre
 
         GpuLogicalIndexUseConstPtr indexUse = _getConstantLogicalIndexUse(index, sz, (GpuParamVariability) deriveVariability(acType), BCT_FLOAT);
 
-        _setRawAutoConstant(indexUse->physicalIndex, acType, GpuProgramParameters::AutoConstantEntry::Data(extraInfo), indexUse->variability, sz);
+        _setRawAutoConstant(
+            indexUse->physicalIndex
+            , acType
+            , AutoConstantEntry::Data(static_cast<AutoConstantEntry::Integer>(extraInfo))
+            , indexUse->variability
+            , sz);
     }
     //-----------------------------------------------------------------------------
    
@@ -2844,7 +2855,7 @@ namespace Ogre
                                                     AutoConstantType acType, uint16 extraInfo1, uint16 extraInfo2)
     {
         size_t extraInfo = (size_t)extraInfo1 | ((size_t)extraInfo2) << 16;
-        setNamedAutoConstantT(name, acType, AutoConstantEntry::Data(extraInfo));
+        setNamedAutoConstantT(name, acType, AutoConstantEntry::Data(static_cast<AutoConstantEntry::Integer>(extraInfo)));
     }
     //---------------------------------------------------------------------------
     void GpuProgramParameters::setConstantFromTime(size_t index, Real factor)

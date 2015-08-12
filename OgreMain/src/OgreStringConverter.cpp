@@ -100,6 +100,20 @@ namespace Ogre {
         return stream.str();
     }
     //-----------------------------------------------------------------------
+    String StringConverter::toString(uint64 val,
+        unsigned short width, char fill, std::ios::fmtflags flags)
+    {
+        StringStream stream;
+        if (msUseLocale)
+            stream.imbue(msLocale);
+        stream.width(width);
+        stream.fill(fill);
+        if (flags)
+            stream.setf(flags);
+        stream << val;
+        return stream.str();
+    }
+    //-----------------------------------------------------------------------
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL &&  ( OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS )
     String StringConverter::toString(unsigned int val, 
         unsigned short width, char fill, std::ios::fmtflags flags)
