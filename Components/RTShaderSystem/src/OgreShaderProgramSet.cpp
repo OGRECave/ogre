@@ -79,16 +79,9 @@ namespace RTShader {
             return getCpuProgram(GPT_VERTEX_PROGRAM);
         }
         ////-----------------------------------------------------------------------------
-        void ProgramSet::setGpuFragmentProgram(GpuProgramPtr psGpuProgram)
-        {
-            setGpuProgram(GPT_FRAGMENT_PROGRAM, psGpuProgram);
-        }
-        ////-----------------------------------------------------------------------------
         void ProgramSet::setCpuProgram(GpuProgramType programType, Program* cpuProgram)
         {
             mCpuPrograms[programType] = cpuProgram;
-
-            
         }
 
         ////-----------------------------------------------------------------------------

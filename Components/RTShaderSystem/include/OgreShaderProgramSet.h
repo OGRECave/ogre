@@ -89,8 +89,6 @@ protected:
     @param gpuProgram the program to set
     */
     void setGpuProgram(GpuProgramType programType, GpuProgramPtr gpuProgram);
-    void setGpuFragmentProgram(GpuProgramPtr psGpuProgram);
-
 
     // Attributes.
 protected:
