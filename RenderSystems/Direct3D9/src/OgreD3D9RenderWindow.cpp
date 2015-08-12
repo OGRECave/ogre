@@ -524,7 +524,7 @@ namespace Ogre
 
         // http://msdn.microsoft.com/en-us/library/windows/desktop/bb172574%28v=vs.85%29.aspx
         // Multisampling is valid only on a swap chain that is being created or reset with the D3DSWAPEFFECT_DISCARD swap effect.       
-        bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && (isAA() == false);
+        bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && (isAA() == false) && mVSync;
             
         presentParams->SwapEffect               = useFlipSwap ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_DISCARD;
         // triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
