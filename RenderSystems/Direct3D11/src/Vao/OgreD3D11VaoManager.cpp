@@ -1087,6 +1087,8 @@ namespace Ogre
             itor = mVaos.begin() + mVaos.size() - 1;
         }
 
+        ++itor->refCount;
+
         return itor;
     }
     //-----------------------------------------------------------------------------------
@@ -1221,8 +1223,6 @@ namespace Ogre
                                                                           indexBuffer,
                                                                           opType,
                                                                           itor->sharedData );
-
-        ++itor->refCount;
 
         return retVal;
     }

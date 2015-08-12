@@ -234,6 +234,7 @@ namespace Ogre
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
 
         /// Finds the Vao. Calls createVao automatically if not found.
+        /// Increases refCount before returning the iterator.
         VaoVec::iterator findVao( const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
                                   v1::RenderOperation::OperationType opType );
