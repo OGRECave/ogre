@@ -1094,6 +1094,46 @@ void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
     }
 }
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    WCHAR gWorkingDir[MAX_PATH];
+#endif
+
+void setWorkingDirectory()
+{
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    GetCurrentDirectoryW( MAX_PATH, gWorkingDir );
+
+    HMODULE hModule = GetModuleHandleW(NULL);
+    WCHAR path[MAX_PATH];
+    GetModuleFileNameW( hModule, path, MAX_PATH );
+
+    std::wstring pathName( path );
+    std::wstring::size_type charPos = pathName.find_last_of( L"/\\" );
+
+    if( charPos != std::wstring::npos )
+        pathName = pathName.substr( 0, charPos );
+
+    SetCurrentDirectoryW( pathName.c_str() );
+#else
+    //This ought to work in Unix, but I didn't test it, otherwise try setenv()
+    //chdir( fullAppPath.GetPath().mb_str() );
+#endif
+    //Most Ogre materials assume floating point to use radix point, not comma.
+    //Prevent awfull number truncation in non-US systems
+    //(I love standarization...)
+    setlocale( LC_NUMERIC, "C" );
+}
+
+void restoreWorkingDir()
+{
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    SetCurrentDirectoryW( gWorkingDir );
+#else
+    //This ought to work in Unix, but I didn't test it, otherwise try setenv()
+    //chdir( fullAppPath.GetPath().mb_str() );
+#endif
+}
+
 int main(int numargs, char** args)
 {
     Root *root = 0;
@@ -1119,7 +1159,9 @@ int main(int numargs, char** args)
         logManager = OGRE_NEW LogManager();
         logManager->createLog( "OgreMeshTool.log", true, true );
         LogManager::getSingleton().getDefaultLog()->setLogDetail( LL_LOW );
+        setWorkingDirectory();
         root = OGRE_NEW Root( pluginsPath, "", "OgreMeshTool.log" ) ;
+        restoreWorkingDir();
         root->setRenderSystem( root->getRenderSystemByName( "NULL Rendering Subsystem" ) );
         root->initialise( true );
         LogManager::getSingleton().getDefaultLog()->setLogDetail( LL_NORMAL );

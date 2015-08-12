@@ -2002,6 +2002,11 @@ namespace Ogre
             mListener = listener;
     }
     //-----------------------------------------------------------------------------------
+    HlmsListener* Hlms::getListener(void) const
+    {
+        return mListener == &c_defaultListener ? 0 : mListener;
+    }
+    //-----------------------------------------------------------------------------------
     void Hlms::_notifyShadowMappingBackFaceSetting(void)
     {
         HlmsDatablockMap::const_iterator itor = mDatablocks.begin();

@@ -63,6 +63,9 @@ namespace Ogre
             mSharedData( sharedData )
         {
         }
+
+        void _updateImmutableResource( uint32 vaoName, uint32 renderQueueId,
+                                       D3D11VertexArrayObjectShared *sharedData );
     };
 }
 

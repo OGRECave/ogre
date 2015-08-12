@@ -677,12 +677,7 @@ namespace Ogre
 
                 const uint32 renderQueueId = generateRenderQueueId( itor->vaoName, uniqueVaoId );
 
-                *d3dVao = D3D11VertexArrayObject( itor->vaoName,
-                                                  renderQueueId,
-                                                  d3dVao->getVertexBuffers(),
-                                                  d3dVao->getIndexBuffer(),
-                                                  d3dVao->getOperationType(),
-                                                  itor->sharedData );
+                d3dVao->_updateImmutableResource( itor->vaoName, renderQueueId, itor->sharedData );
             }
 
             ++itor;

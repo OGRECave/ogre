@@ -3,6 +3,10 @@
 layout(std140) uniform;
 #define FRAG_COLOR		0
 
+@property( hlms_vpos )
+in vec4 gl_FragCoord;
+@end
+
 @property( !hlms_shadowcaster )
 layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
 @end @property( hlms_shadowcaster )

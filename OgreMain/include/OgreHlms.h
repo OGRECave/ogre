@@ -512,6 +512,12 @@ namespace Ogre
         */
         void setListener( HlmsListener *listener );
 
+        /** Returns the current listener. @see setListener();
+        @remarks
+            If the default listener is being used (that does nothing) then null is returned.
+        */
+        HlmsListener* getListener(void) const;
+
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
 
