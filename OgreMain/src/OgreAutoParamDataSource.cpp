@@ -145,6 +145,8 @@ namespace Ogre {
         mCurrentCamera = cam;
         mCameraRelativeRendering = useCameraRelative;
         mCameraRelativePosition = cam->getDerivedPosition();
+        mCameraScenePosition = static_cast<Vector4>(mCameraRelativePosition);
+        mCameraScenePosition[3] = 1;
         mViewMatrixDirty = true;
         mProjMatrixDirty = true;
         mWorldViewMatrixDirty = true;
@@ -461,6 +463,11 @@ namespace Ogre {
         }
         return mCameraPosition;
     }    
+    //-----------------------------------------------------------------------------
+    const Vector4& AutoParamDataSource::getCameraScenePosition() const
+    {
+        return mCameraScenePosition;
+    }
     //-----------------------------------------------------------------------------
     const Vector4& AutoParamDataSource::getCameraPositionObjectSpace(void) const
     {

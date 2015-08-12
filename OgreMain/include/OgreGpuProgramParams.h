@@ -1173,8 +1173,15 @@ namespace Ogre {
                 finite extrusion programs.
             */
             ACT_SHADOW_EXTRUSION_DISTANCE,
-            /// The current camera's position in world space
+            /// The current camera's coordinates in world space.
+            /// The graphic engine may change this value to Vector::Zero
+            /// when using camera relative rendering.
+            
             ACT_CAMERA_POSITION,
+
+            /// The current camera's position in world space as set by the user.
+            ///
+            ACT_CAMERA_SCENE_POSITION,
             /// The current camera's position in object space
             ACT_CAMERA_POSITION_OBJECT_SPACE,
             /// The view/projection matrix of the assigned texture projection frustum

@@ -131,6 +131,7 @@ namespace Ogre
 
         AutoConstantDefinition(ACT_SHADOW_EXTRUSION_DISTANCE,     "shadow_extrusion_distance",    1, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_CAMERA_POSITION,               "camera_position",              3, ET_REAL, ACDT_NONE),
+        AutoConstantDefinition(ACT_CAMERA_SCENE_POSITION,      "camera_scene_position", 3, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_CAMERA_POSITION_OBJECT_SPACE,  "camera_position_object_space", 3, ET_REAL, ACDT_NONE),
         AutoConstantDefinition(ACT_TEXTURE_VIEWPROJ_MATRIX,       "texture_viewproj_matrix",     16, ET_REAL, ACDT_INT),
         AutoConstantDefinition(ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY, "texture_viewproj_matrix_array", 16, ET_REAL, ACDT_INT),
@@ -2131,6 +2132,9 @@ namespace Ogre
 
                 case ACT_CAMERA_POSITION:
                     _writeRawConstant(i->physicalIndex, source->getCameraPosition(), i->elementCount);
+                    break;
+                case ACT_CAMERA_SCENE_POSITION:
+                    _writeRawConstant(i->physicalIndex, source->getCameraScenePosition(), i->elementCount);
                     break;
                 case ACT_TIME:
                     _writeRawConstant(i->physicalIndex, source->getTime() * i->data.fData);

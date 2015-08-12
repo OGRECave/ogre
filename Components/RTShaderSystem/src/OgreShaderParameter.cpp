@@ -275,6 +275,7 @@ namespace RTShader {
         AutoShaderParameter(GpuProgramParameters::ACT_LIGHT_CASTS_SHADOWS_ARRAY,                "light_casts_shadows_array",                GCT_FLOAT1),
         AutoShaderParameter(GpuProgramParameters::ACT_SHADOW_EXTRUSION_DISTANCE,                "shadow_extrusion_distance",                GCT_FLOAT1),
         AutoShaderParameter(GpuProgramParameters::ACT_CAMERA_POSITION,                          "camera_position",                          GCT_FLOAT3),
+        AutoShaderParameter(GpuProgramParameters::ACT_CAMERA_SCENE_POSITION,                    "camera_scene_position",                    GCT_FLOAT3),
         AutoShaderParameter(GpuProgramParameters::ACT_CAMERA_POSITION_OBJECT_SPACE,             "camera_position_object_space",             GCT_FLOAT3),
         AutoShaderParameter(GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX,                  "texture_viewproj_matrix",                  GCT_MATRIX_4X4),
         AutoShaderParameter(GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX_ARRAY,            "texture_viewproj_matrix_array",            GCT_MATRIX_4X4),

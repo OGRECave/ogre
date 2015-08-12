@@ -71,6 +71,8 @@ namespace Ogre {
         mutable Matrix4 mInverseTransposeWorldMatrix;
         mutable Matrix4 mInverseTransposeWorldViewMatrix;
         mutable Vector4 mCameraPosition;
+        mutable Vector4 mCameraScenePosition;
+        
         mutable Vector4 mCameraPositionObjectSpace;
         mutable Matrix4 mTextureViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
         mutable Matrix4 mTextureWorldViewProjMatrix[OGRE_MAX_SIMULTANEOUS_LIGHTS];
@@ -166,6 +168,7 @@ namespace Ogre {
         virtual const Matrix4& getInverseTransposeWorldMatrix(void) const;
         virtual const Matrix4& getInverseTransposeWorldViewMatrix(void) const;
         virtual const Vector4& getCameraPosition(void) const;
+        virtual const Vector4& getCameraScenePosition() const;
         virtual const Vector4& getCameraPositionObjectSpace(void) const;
         virtual const Vector4& getLodCameraPosition(void) const;
         virtual const Vector4& getLodCameraPositionObjectSpace(void) const;
