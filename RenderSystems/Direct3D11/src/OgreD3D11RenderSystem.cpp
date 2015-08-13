@@ -915,7 +915,6 @@ namespace Ogre
 			if (mHLSLProgramFactory == NULL)
 				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
 			mRealCapabilities = createRenderSystemCapabilities();
-			mRealCapabilities->addShaderProfile("hlsl");
 
 			// if we are using custom capabilities, then 
 			// mCurrentCapabilities has already been loaded
@@ -997,6 +996,7 @@ namespace Ogre
         convertHullShaderCaps(rsc);
         convertDomainShaderCaps(rsc);
         convertComputeShaderCaps(rsc);
+        rsc->addShaderProfile("hlsl");
 
         // Check support for dynamic linkage
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
