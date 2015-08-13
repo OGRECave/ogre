@@ -93,6 +93,8 @@ namespace Ogre
         static eExceptionsErrorLevel mExceptionsErrorLevel;
         static void setExceptionsErrorLevel(const eExceptionsErrorLevel exceptionsErrorLevel);
         static const eExceptionsErrorLevel getExceptionsErrorLevel();
+
+        static D3D_FEATURE_LEVEL parseFeatureLevel(const Ogre::String& value, D3D_FEATURE_LEVEL fallback);
     };
 }
 #endif

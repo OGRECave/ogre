@@ -269,7 +269,7 @@ namespace Ogre
             return false;
         }
     }
-
+    //---------------------------------------------------------------------
     void D3D11Device::clearStoredErrorMessages() const
     {
         if (mD3D11Device && D3D_NO_EXCEPTION != mExceptionsErrorLevel)
@@ -280,5 +280,15 @@ namespace Ogre
             }
         }
     }
-
+    //---------------------------------------------------------------------
+    D3D_FEATURE_LEVEL D3D11Device::parseFeatureLevel(const Ogre::String& value, D3D_FEATURE_LEVEL fallback)
+    {
+        if(value == "9.1")  return D3D_FEATURE_LEVEL_9_1;
+        if(value == "9.2")  return D3D_FEATURE_LEVEL_9_2;
+        if(value == "9.3")  return D3D_FEATURE_LEVEL_9_3;
+        if(value == "10.0") return D3D_FEATURE_LEVEL_10_0;
+        if(value == "10.1") return D3D_FEATURE_LEVEL_10_1;
+        if(value == "11.0") return D3D_FEATURE_LEVEL_11_0;
+        return fallback;
+    }
 }

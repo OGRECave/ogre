@@ -541,41 +541,15 @@ namespace Ogre
 
         if( name == "Min Requested Feature Levels" )
         {
-            if (value == "9.1")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
-            else if (value == "9.2")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_2;
-            else if (value == "9.3")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
-            else if (value == "10.0")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_0;
-            else if (value == "10.1")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_1;
-            else if (value == "11.0")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
-            else
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
+            mMinRequestedFeatureLevel = D3D11Device::parseFeatureLevel(value, D3D_FEATURE_LEVEL_9_1);
         }
 
         if( name == "Max Requested Feature Levels" )
         {
-            if (value == "9.1")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
-            else if (value == "9.2")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_2;
-            else if (value == "9.3")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
-            else if (value == "10.0")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_0;
-            else if (value == "10.1")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_1;
-            else if (value == "11.0")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
-            else
 #if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
+            mMaxRequestedFeatureLevel = D3D11Device::parseFeatureLevel(value, D3D_FEATURE_LEVEL_11_1);
 #else
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
+            mMaxRequestedFeatureLevel = D3D11Device::parseFeatureLevel(value, D3D_FEATURE_LEVEL_11_0);
 #endif
         }
 
