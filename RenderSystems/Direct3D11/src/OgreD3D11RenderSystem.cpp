@@ -258,9 +258,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::initConfigOptions()
     {
-        D3D11DriverList* driverList;
-        D3D11Driver* driver;
-
         ConfigOption optDevice;
         ConfigOption optVideoMode;
         ConfigOption optFullScreen;
@@ -279,8 +276,6 @@ namespace Ogre
 		ConfigOption optStereoMode;
 #endif
 
-        driverList = this->getDirect3DDrivers();
-
         optDevice.name = "Rendering Device";
         optDevice.currentValue.clear();
         optDevice.possibleValues.clear();
@@ -296,9 +291,10 @@ namespace Ogre
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
 
+        D3D11DriverList* driverList = getDirect3DDrivers();
         for( unsigned j=0; j < driverList->count(); j++ )
         {
-            driver = driverList->item(j);
+            D3D11Driver* driver = driverList->item(j);
             optDevice.possibleValues.push_back( driver->DriverDescription() );
             // Make first one default
             if( j==0 )
@@ -452,19 +448,12 @@ namespace Ogre
     void D3D11RenderSystem::refreshD3DSettings()
     {
         ConfigOption* optVideoMode;
-        D3D11Driver* driver = 0;
         D3D11VideoMode* videoMode;
 
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
         if( opt != mOptions.end() )
         {
-            for( unsigned j=0; j < getDirect3DDrivers()->count(); j++ )
-            {
-                driver = getDirect3DDrivers()->item(j);
-                if( driver->DriverDescription() == opt->second.currentValue )
-                    break;
-            }
-
+            D3D11Driver *driver = getDirect3DDrivers()->item(opt->second.currentValue);
             if (driver)
             {
                 opt = mOptions.find( "Video Mode" );
@@ -632,21 +621,11 @@ namespace Ogre
             return "A video mode must be selected.";
 
         it = mOptions.find( "Rendering Device" );
-        bool foundDriver = false;
-        D3D11DriverList* driverList = getDirect3DDrivers();
-        for( ushort j=0; j < driverList->count(); j++ )
-        {
-            if( driverList->item(j)->DriverDescription() == it->second.currentValue )
-            {
-                foundDriver = true;
-                break;
-            }
-        }
-
-        if (!foundDriver)
+        D3D11Driver *driver = getDirect3DDrivers()->item(it->second.currentValue);
+        if (driver == NULL)
         {
             // Just pick the first driver
-            setConfigOption("Rendering Device", driverList->item(0)->DriverDescription());
+            setConfigOption("Rendering Device", getDirect3DDrivers()->item(0)->DriverDescription());
             return "Your DirectX driver name has changed since the last time you ran OGRE; "
                 "the 'Rendering Device' has been changed.";
         }
@@ -669,17 +648,8 @@ namespace Ogre
 			LogManager::getSingleton().logMessage( "D3D11 : Nvidia Nsight found");
 
         // Init using current settings
-        mActiveD3DDriver = NULL;
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
-        for( unsigned j=0; j < getDirect3DDrivers()->count(); j++ )
-        {
-            if( getDirect3DDrivers()->item(j)->DriverDescription() == opt->second.currentValue )
-            {
-                mActiveD3DDriver = getDirect3DDrivers()->item(j);
-                break;
-            }
-        }
-
+        mActiveD3DDriver = getDirect3DDrivers()->item(opt->second.currentValue);
         if( !mActiveD3DDriver )
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Problems finding requested Direct3D driver!", "D3D11RenderSystem::initialise" );
 
