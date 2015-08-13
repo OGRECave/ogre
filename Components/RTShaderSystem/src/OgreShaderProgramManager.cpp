@@ -523,9 +523,12 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
         // Case an error occurred.
         if (pGpuProgram->hasCompileError())
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Could not create gpu programs from render state ",
-                "ProgramManager::acquireGpuPrograms");
+            StringStream ss;
+            ss << "RTSS has generated a gpu program from render states that caused a compilation error.\n"
+               << pGpuProgram->getCompileErrorMessage();
+        
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,ss.str(),
+                        "ProgramManager::acquireGpuPrograms");
         }
 
         // Add the created GPU program to local cache.
