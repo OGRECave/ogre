@@ -49,16 +49,7 @@ namespace Ogre
     class D3D11RenderSystem : public RenderSystem
     {
     private:
-
-        // an enum to define the driver type of d3d11
-        enum OGRE_D3D11_DRIVER_TYPE
-        {
-            DT_HARDWARE, // GPU based
-            DT_SOFTWARE, // microsoft original (slow) software driver
-            DT_WARP // microsoft new (faster) software driver - (Windows Advanced Rasterization Platform) - http://msdn.microsoft.com/en-us/library/dd285359.aspx
-        };
-
-        OGRE_D3D11_DRIVER_TYPE mDriverType; // d3d11 driver type
+        D3D_DRIVER_TYPE mDriverType; // should be XXX_HARDWARE, XXX_SOFTWARE or XXX_WARP, never XXX_UNKNOWN or XXX_NULL
         D3D_FEATURE_LEVEL mFeatureLevel;
         D3D_FEATURE_LEVEL mMinRequestedFeatureLevel;
         D3D_FEATURE_LEVEL mMaxRequestedFeatureLevel;
@@ -77,7 +68,7 @@ namespace Ogre
         bool mUseNVPerfHUD;
 		int mSwitchingFullscreenCounter;	// Are we switching from windowed to fullscreen 
 
-        static ID3D11DeviceN* createD3D11Device(D3D11Driver* d3dDriver, OGRE_D3D11_DRIVER_TYPE driverType,
+        static ID3D11DeviceN* createD3D11Device(D3D11Driver* d3dDriver, D3D_DRIVER_TYPE driverType,
                          D3D_FEATURE_LEVEL minFL, D3D_FEATURE_LEVEL maxFL, D3D_FEATURE_LEVEL* pFeatureLevel);
 
         D3D11DriverList* getDirect3DDrivers(void);

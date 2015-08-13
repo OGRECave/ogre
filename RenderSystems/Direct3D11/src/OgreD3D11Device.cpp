@@ -291,4 +291,12 @@ namespace Ogre
         if(value == "11.0") return D3D_FEATURE_LEVEL_11_0;
         return fallback;
     }
+    //---------------------------------------------------------------------
+    D3D_DRIVER_TYPE D3D11Device::parseDriverType(const Ogre::String& driverTypeName, D3D_DRIVER_TYPE fallback)
+    {
+        if("Hardware" == driverTypeName) return D3D_DRIVER_TYPE_HARDWARE;
+        if("Software" == driverTypeName) return D3D_DRIVER_TYPE_SOFTWARE;
+        if("Warp" == driverTypeName)     return D3D_DRIVER_TYPE_WARP;
+        return fallback;
+    }
 }

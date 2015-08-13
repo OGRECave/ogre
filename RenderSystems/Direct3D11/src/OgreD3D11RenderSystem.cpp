@@ -125,7 +125,7 @@ namespace Ogre
         mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
-        mDriverType = DT_HARDWARE;
+        mDriverType = D3D_DRIVER_TYPE_HARDWARE;
 
         initRenderSystem();
 
@@ -176,26 +176,18 @@ namespace Ogre
         return mDriverList;
     }
     //---------------------------------------------------------------------
-	ID3D11DeviceN* D3D11RenderSystem::createD3D11Device(D3D11Driver* d3dDriver, OGRE_D3D11_DRIVER_TYPE ogreDriverType,
+	ID3D11DeviceN* D3D11RenderSystem::createD3D11Device(D3D11Driver* d3dDriver, D3D_DRIVER_TYPE driverType,
 		D3D_FEATURE_LEVEL minFL, D3D_FEATURE_LEVEL maxFL, D3D_FEATURE_LEVEL* pFeatureLevel)
 	{
-		IDXGIAdapterN* pAdapter = (d3dDriver && ogreDriverType == DT_HARDWARE) ? d3dDriver->getDeviceAdapter() : NULL;
+		IDXGIAdapterN* pAdapter = (d3dDriver && driverType == D3D_DRIVER_TYPE_HARDWARE) ? d3dDriver->getDeviceAdapter() : NULL;
 
-		D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_UNKNOWN;
-		switch(ogreDriverType)
+		assert(driverType == D3D_DRIVER_TYPE_HARDWARE || driverType == D3D_DRIVER_TYPE_SOFTWARE || driverType == D3D_DRIVER_TYPE_WARP);
+		if(d3dDriver != NULL)
 		{
-		case DT_HARDWARE:
-			if(d3dDriver == NULL)
-				driverType = D3D_DRIVER_TYPE_HARDWARE;
-			else if(0 == wcscmp(d3dDriver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD"))
-					driverType = D3D_DRIVER_TYPE_REFERENCE;
-			break;
-		case DT_SOFTWARE:
-			driverType = D3D_DRIVER_TYPE_SOFTWARE;
-			break;
-		case DT_WARP:
-			driverType = D3D_DRIVER_TYPE_WARP;
-			break;
+			if(0 == wcscmp(d3dDriver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD"))
+				driverType = D3D_DRIVER_TYPE_REFERENCE;
+			else
+				driverType = D3D_DRIVER_TYPE_UNKNOWN;
 		}
 
 		// determine deviceFlags
@@ -731,21 +723,7 @@ namespace Ogre
             opt = mOptions.find( "Driver type" );
             if( opt == mOptions.end() )
                 OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find driver type!", "D3D11RenderSystem::initialise" );
-            String driverTypeName = opt->second.currentValue;
-
-            mDriverType = DT_HARDWARE;
-            if ("Hardware" == driverTypeName)
-            {
-                 mDriverType = DT_HARDWARE;
-            }
-            if ("Software" == driverTypeName)
-            {
-                mDriverType = DT_SOFTWARE;
-            }
-            if ("Warp" == driverTypeName)
-            {
-                mDriverType = DT_WARP;
-            }
+            mDriverType = D3D11Device::parseDriverType(opt->second.currentValue);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
             // Stereo driver must be created before device is created
@@ -754,7 +732,7 @@ namespace Ogre
 #endif
 
             D3D11Driver* d3dDriver = mActiveD3DDriver;
-            if(D3D11Driver* d3dDriverOverride = (mDriverType == DT_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
+            if(D3D11Driver* d3dDriverOverride = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
                 d3dDriver = d3dDriverOverride;
 
             ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
@@ -1094,7 +1072,7 @@ namespace Ogre
         const DXGI_ADAPTER_DESC1& adapterID = mActiveD3DDriver->getAdapterIdentifier();
 
         switch(mDriverType) {
-        case DT_HARDWARE:
+        case D3D_DRIVER_TYPE_HARDWARE:
             // determine vendor
             // Full list of vendors here: http://www.pcidatabase.com/vendors.php?sort=id
             switch(adapterID.VendorId)
@@ -1123,10 +1101,10 @@ namespace Ogre
                 break;
             };
             break;
-        case DT_SOFTWARE:
+        case D3D_DRIVER_TYPE_SOFTWARE:
             rsc->setVendor(GPU_MS_SOFTWARE);
             break;
-        case DT_WARP:
+        case D3D_DRIVER_TYPE_WARP:
             rsc->setVendor(GPU_MS_WARP);
             break;
         default:
@@ -3916,7 +3894,7 @@ namespace Ogre
         mLastVertexSourceCount = 0;
         mReadBackAsTexture = false;
 
-        ID3D11DeviceN * device = createD3D11Device(NULL, DT_HARDWARE, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, 0);
+        ID3D11DeviceN * device = createD3D11Device(NULL, D3D_DRIVER_TYPE_HARDWARE, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, 0);
         mDevice.TransferOwnership(device);
     }
     //---------------------------------------------------------------------
