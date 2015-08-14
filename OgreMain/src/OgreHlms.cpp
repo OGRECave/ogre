@@ -252,13 +252,23 @@ namespace Ogre
 
         while( itor != end )
         {
-            enumeratePieceFiles( itor->dataFolder, itor->pieceFiles );
+            bool foundPieceFiles = enumeratePieceFiles( itor->dataFolder, itor->pieceFiles );
+
+            if( !foundPieceFiles )
+            {
+                LogManager::getSingleton().logMessage(
+                            "HLMS Library path '" + itor->dataFolder->getName() +
+                            "' has no piece files. Are you sure you provided "
+                            "the right path with read access?" );
+            }
+
             ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
-    void Hlms::enumeratePieceFiles( Archive *dataFolder, StringVector *pieceFiles )
+    bool Hlms::enumeratePieceFiles( Archive *dataFolder, StringVector *pieceFiles )
     {
+        bool retVal = false;
         StringVectorPtr stringVectorPtr = dataFolder->list( false, false );
 
         StringVector stringVectorLowerCase( *stringVectorPtr );
@@ -284,6 +294,7 @@ namespace Ogre
                 if( itLowerCase->find( PieceFilePatterns[i] ) != String::npos ||
                     itLowerCase->find( "piece_all" ) != String::npos )
                 {
+                    retVal = true;
                     pieceFiles[i].push_back( *itor );
                 }
 
@@ -291,6 +302,8 @@ namespace Ogre
                 ++itor;
             }
         }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void Hlms::setProperty( IdString key, int32 value )

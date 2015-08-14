@@ -614,7 +614,10 @@ namespace Ogre
             }
         }
 
-        reorganizeImmutableVaos();
+        //We've populated the Vertex & Index buffers with their GPU/API pointers. Now we need
+        //to update the Vaos' internal structures that cache these GPU/API pointers.
+        if( totalBytes )
+            reorganizeImmutableVaos();
 
         for( size_t i=0; i<NumInternalBufferTypes; ++i )
             mDelayedBuffers[i].clear();
@@ -1191,12 +1194,24 @@ namespace Ogre
             while( itor != end && !hasImmutableDelayedBuffer )
             {
                 if( (*itor)->getBufferType() == BT_IMMUTABLE )
-                    hasImmutableDelayedBuffer = true;
+                {
+                    D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                                                    (*itor)->getBufferInterface() );
+
+                    if( bufferInterface->_getInitialData() != 0 )
+                        hasImmutableDelayedBuffer = true;
+                }
                 ++itor;
             }
 
             if( indexBuffer && indexBuffer->getBufferType() == BT_IMMUTABLE )
-                hasImmutableDelayedBuffer = true;
+            {
+                D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
+                                                                indexBuffer->getBufferInterface() );
+
+                if( bufferInterface->_getInitialData() != 0 )
+                    hasImmutableDelayedBuffer = true;
+            }
 
             if( hasImmutableDelayedBuffer )
             {

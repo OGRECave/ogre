@@ -183,7 +183,13 @@ namespace Ogre
         */
         void _beginUpdate( bool forceBeginFrame );
 
-        /// Updates the workspace's nodes.
+        /** Updates the workspace's nodes.
+        @remarks
+            If you're calling this manually, it may be possible you first need to call
+            RenderSystem::_beginFrameOnce if it wasn't called by OGRE already.
+            You might also need to enclose the _update calls with _beginUpdate( true )
+            and _endUpdate( true ) if you're having issues.
+        */
         void _update(void);
 
         /** Call after _update unless the final render target is not a render window

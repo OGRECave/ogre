@@ -156,7 +156,8 @@ namespace Ogre
             Case insensitive.
         */
         void enumeratePieceFiles(void);
-        static void enumeratePieceFiles( Archive *dataFolder, StringVector *pieceFiles );
+        /// Populates pieceFiles, returns true if found at least one piece file.
+        static bool enumeratePieceFiles( Archive *dataFolder, StringVector *pieceFiles );
 
         void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
