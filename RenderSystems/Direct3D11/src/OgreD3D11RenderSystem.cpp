@@ -166,13 +166,14 @@ namespace Ogre
 		return strName;
 	}
 	//---------------------------------------------------------------------
-    D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers()
+    D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers(bool refreshList /* = false*/)
     {
         if(!mDriverList)
-        {
             mDriverList = new D3D11DriverList();
+
+        if(refreshList || mDriverList->count() == 0)
             mDriverList->refresh();
-        }
+
         return mDriverList;
     }
     //---------------------------------------------------------------------
@@ -649,44 +650,29 @@ namespace Ogre
 
         // Init using current settings
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
-        mActiveD3DDriver = getDirect3DDrivers()->item(opt->second.currentValue);
-        if( !mActiveD3DDriver )
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Problems finding requested Direct3D driver!", "D3D11RenderSystem::initialise" );
+        if( opt == mOptions.end() )
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Can`t find requested Direct3D driver name!", "D3D11RenderSystem::initialise" );
+        mDriverName = opt->second.currentValue;
 
-        //AIZ:recreate the device for the selected adapter
-        {
-            mDevice.ReleaseAll();
+        // Driver type
+        opt = mOptions.find( "Driver type" );
+        if( opt == mOptions.end() )
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find driver type!", "D3D11RenderSystem::initialise" );
+        mDriverType = D3D11Device::parseDriverType(opt->second.currentValue);
 
-            opt = mOptions.find( "Information Queue Exceptions Bottom Level" );
-            if( opt == mOptions.end() )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue Exceptions Bottom Level option!", "D3D11RenderSystem::initialise" );
-            D3D11Device::setExceptionsErrorLevel(opt->second.currentValue);
-
-            // Driver type
-            opt = mOptions.find( "Driver type" );
-            if( opt == mOptions.end() )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find driver type!", "D3D11RenderSystem::initialise" );
-            mDriverType = D3D11Device::parseDriverType(opt->second.currentValue);
+        opt = mOptions.find( "Information Queue Exceptions Bottom Level" );
+        if( opt == mOptions.end() )
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue Exceptions Bottom Level option!", "D3D11RenderSystem::initialise" );
+        D3D11Device::setExceptionsErrorLevel(opt->second.currentValue);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-            // Stereo driver must be created before device is created
-            StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
-            D3D11StereoDriverBridge* stereoBridge = OGRE_NEW D3D11StereoDriverBridge(stereoMode);
+        // Stereo driver must be created before device is created
+        StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
+        D3D11StereoDriverBridge* stereoBridge = OGRE_NEW D3D11StereoDriverBridge(stereoMode);
 #endif
 
-            D3D11Driver* d3dDriver = mActiveD3DDriver;
-            if(D3D11Driver* d3dDriverOverride = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
-                d3dDriver = d3dDriverOverride;
-
-            ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
-            mDevice.TransferOwnership(device);
-
-            LARGE_INTEGER driverVersion = mDevice.GetDriverVersion();
-            mDriverVersion.major = HIWORD(driverVersion.HighPart);
-            mDriverVersion.minor = LOWORD(driverVersion.HighPart);
-            mDriverVersion.release = HIWORD(driverVersion.LowPart);
-            mDriverVersion.build = LOWORD(driverVersion.LowPart);
-        }
+        // create the device for the selected adapter
+        createDevice();
 
         if( autoCreateWindow )
         {
@@ -1529,8 +1515,32 @@ namespace Ogre
             */
             // Clean up depth stencil surfaces
             mDevice.ReleaseAll();
-            //mActiveD3DDriver->setDevice(D3D11Device(NULL));
         }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::createDevice()
+    {
+        mDevice.ReleaseAll();
+
+        mActiveD3DDriver = getDirect3DDrivers(true)->item(mDriverName);
+        if(!mActiveD3DDriver)
+        {
+            mActiveD3DDriver = getDirect3DDrivers()->item(0);
+            LogManager::getSingleton().logMessage("D3D11 : Requested Direct3D driver not found.");
+        }
+
+        D3D11Driver* d3dDriver = mActiveD3DDriver;
+        if(D3D11Driver* d3dDriverOverride = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
+            d3dDriver = d3dDriverOverride;
+
+        ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
+        mDevice.TransferOwnership(device);
+
+        LARGE_INTEGER driverVersion = mDevice.GetDriverVersion();
+        mDriverVersion.major = HIWORD(driverVersion.HighPart);
+        mDriverVersion.minor = LOWORD(driverVersion.HighPart);
+        mDriverVersion.release = HIWORD(driverVersion.LowPart);
+        mDriverVersion.build = LOWORD(driverVersion.LowPart);
     }
     //---------------------------------------------------------------------
     VertexElementType D3D11RenderSystem::getColourVertexElementType(void) const

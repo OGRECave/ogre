@@ -49,6 +49,7 @@ namespace Ogre
     class D3D11RenderSystem : public RenderSystem
     {
     private:
+        Ogre::String mDriverName;    // it`s hint rather than hard requirement, could be ignored if empty or device removed
         D3D_DRIVER_TYPE mDriverType; // should be XXX_HARDWARE, XXX_SOFTWARE or XXX_WARP, never XXX_UNKNOWN or XXX_NULL
         D3D_FEATURE_LEVEL mFeatureLevel;
         D3D_FEATURE_LEVEL mMinRequestedFeatureLevel;
@@ -71,10 +72,12 @@ namespace Ogre
         static ID3D11DeviceN* createD3D11Device(D3D11Driver* d3dDriver, D3D_DRIVER_TYPE driverType,
                          D3D_FEATURE_LEVEL minFL, D3D_FEATURE_LEVEL maxFL, D3D_FEATURE_LEVEL* pFeatureLevel);
 
-        D3D11DriverList* getDirect3DDrivers(void);
+        D3D11DriverList* getDirect3DDrivers(bool refreshList = false);
         void refreshD3DSettings(void);
         void refreshFSAAOptions(void);
+
         void freeDevice(void);
+        void createDevice();
 
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
