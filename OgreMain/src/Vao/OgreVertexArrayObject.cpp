@@ -228,4 +228,84 @@ namespace Ogre
 
         return retVal;
     }
+    //-----------------------------------------------------------------------------------
+    void VertexArrayObject::readRequests( ReadRequestsArray &requests )
+    {
+        set<VertexBufferPacked*>::type seenBuffers;
+
+        ReadRequestsArray::iterator itor = requests.begin();
+        ReadRequestsArray::iterator end  = requests.end();
+
+        while( itor != end )
+        {
+            size_t bufferIdx, offset;
+            const VertexElement2 *vElement = findBySemantic( itor->semantic, bufferIdx, offset );
+            if( !vElement )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find semantic in VertexArrayObject",
+                             "VertexArrayObject::readRequests" );
+            }
+
+            VertexBufferPacked *vertexBuffer = mVertexBuffers[bufferIdx];
+
+            itor->type = vElement->mType;
+            itor->offset = offset;
+            itor->vertexBuffer = vertexBuffer;
+
+            if( seenBuffers.find( vertexBuffer ) == seenBuffers.end() )
+            {
+                itor->asyncTicket = vertexBuffer->readRequest( 0, vertexBuffer->getNumElements() );
+                seenBuffers.insert( vertexBuffer );
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void VertexArrayObject::mapAsyncTickets( ReadRequestsArray &tickets )
+    {
+        map<VertexBufferPacked const *, size_t>::type seenBuffers;
+
+        ReadRequestsArray::iterator itor = tickets.begin();
+        ReadRequestsArray::iterator end  = tickets.end();
+
+        while( itor != end )
+        {
+            if( !itor->asyncTicket.isNull() )
+            {
+                itor->data = reinterpret_cast<const char*>( itor->asyncTicket->map() );
+                itor->data += itor->offset;
+                seenBuffers[itor->vertexBuffer] = itor - tickets.begin();
+            }
+            else
+            {
+                map<VertexBufferPacked const *, size_t>::type::const_iterator it = seenBuffers.find(
+                                                                                itor->vertexBuffer );
+                assert( it != seenBuffers.end() &&
+                        "These tickets are invalid or already been unmapped" );
+
+                itor->data = tickets[it->second].data - tickets[it->second].offset + itor->offset;
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void VertexArrayObject::unmapAsyncTickets( ReadRequestsArray &tickets )
+    {
+        ReadRequestsArray::iterator itor = tickets.begin();
+        ReadRequestsArray::iterator end  = tickets.end();
+
+        while( itor != end )
+        {
+            itor->data = 0;
+            if( !itor->asyncTicket.isNull() )
+            {
+                itor->asyncTicket->unmap();
+                itor->asyncTicket.setNull();
+            }
+
+            ++itor;
+        }
+    }
 }
