@@ -33,78 +33,54 @@ THE SOFTWARE.
 namespace Ogre
 {
     //---------------------------------------------------------------------
-    unsigned int D3D11Driver::driverCount = 0;
-    //---------------------------------------------------------------------
     D3D11Driver::D3D11Driver() 
     {
-        tempNo = ++driverCount;
         ZeroMemory( &mAdapterIdentifier, sizeof(mAdapterIdentifier) );
-        ZeroMemory( &mDesktopDisplayMode, sizeof(mDesktopDisplayMode) );
         mVideoModeList = NULL;
         mDXGIAdapter=NULL;
     }
     //---------------------------------------------------------------------
     D3D11Driver::D3D11Driver( const D3D11Driver &ob ) 
     {
-        tempNo = ++driverCount;
-        mAdapterNumber = ob.mAdapterNumber;
         mAdapterIdentifier = ob.mAdapterIdentifier;
-        mDesktopDisplayMode = ob.mDesktopDisplayMode;
         mVideoModeList = NULL;
-        mDXGIAdapter=ob.mDXGIAdapter;
 
+        mDXGIAdapter = ob.mDXGIAdapter;
         if(mDXGIAdapter)
             mDXGIAdapter->AddRef();
     }
     //---------------------------------------------------------------------
-    D3D11Driver::D3D11Driver( unsigned int adapterNumber, IDXGIAdapterN* pDXGIAdapter)
+    D3D11Driver::D3D11Driver(IDXGIAdapterN* pDXGIAdapter)
     {
-        tempNo = ++driverCount;
-        mAdapterNumber = adapterNumber;
+        ZeroMemory(&mAdapterIdentifier, sizeof(mAdapterIdentifier));
         mVideoModeList = NULL;
-        mDXGIAdapter=pDXGIAdapter;
+
+        mDXGIAdapter = pDXGIAdapter;
         if(mDXGIAdapter)
+        {
             mDXGIAdapter->AddRef();
-
-        // get the description of the adapter
-        pDXGIAdapter->GetDesc1( &mAdapterIdentifier );
-
+            mDXGIAdapter->GetDesc1(&mAdapterIdentifier);
+        }
     }
     //---------------------------------------------------------------------
     D3D11Driver::~D3D11Driver()
     {
         SAFE_DELETE( mVideoModeList );
         SAFE_RELEASE(mDXGIAdapter);
-        driverCount--;
     }
     //---------------------------------------------------------------------
     D3D11Driver& D3D11Driver::operator=(const D3D11Driver& ob)
     {
-        tempNo = ++driverCount;
-        mAdapterNumber = ob.mAdapterNumber;
-        mAdapterIdentifier = ob.mAdapterIdentifier;
-        mDesktopDisplayMode = ob.mDesktopDisplayMode;
-        mVideoModeList = NULL;
-        if(ob.mDXGIAdapter)
-            ob.mDXGIAdapter->AddRef();
+        SAFE_DELETE( mVideoModeList );
         SAFE_RELEASE(mDXGIAdapter);
-        mDXGIAdapter=ob.mDXGIAdapter;
+        mAdapterIdentifier = ob.mAdapterIdentifier;
+        mDXGIAdapter = ob.mDXGIAdapter;
+        if(mDXGIAdapter)
+            mDXGIAdapter->AddRef();
 
         return *this;
     }
     //--------------------------------------------------------------------- 
-    String D3D11Driver::DriverName() const
-    {
-        size_t size=wcslen(mAdapterIdentifier.Description);
-        char * str=new char[size+1];
-
-        wcstombs(str, mAdapterIdentifier.Description,size);
-        str[size]='\0';
-        String Description=str;
-        delete []str;
-        return String(Description );
-    }
-    //---------------------------------------------------------------------
     String D3D11Driver::DriverDescription() const
     {
         size_t size=wcslen(mAdapterIdentifier.Description);
@@ -127,19 +103,9 @@ namespace Ogre
         return mVideoModeList;
     }
     //---------------------------------------------------------------------
-    unsigned int D3D11Driver::getAdapterNumber() const
-    {
-        return mAdapterNumber;
-    }
-    //---------------------------------------------------------------------
     const DXGI_ADAPTER_DESC1& D3D11Driver::getAdapterIdentifier() const
     {
         return mAdapterIdentifier;
-    }
-    //---------------------------------------------------------------------
-    const DXGI_MODE_DESC& D3D11Driver::getDesktopMode() const
-    {
-        return mDesktopDisplayMode;
     }
     //---------------------------------------------------------------------
     IDXGIAdapterN* D3D11Driver::getDeviceAdapter() const

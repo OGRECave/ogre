@@ -64,7 +64,7 @@ namespace Ogre
                 return false;
             }
 
-            SharedPtr<D3D11Driver> driver(OGRE_NEW_T(D3D11Driver, MEMCATEGORY_GENERAL)(iAdapter, pDXGIAdapter.Get()), SPFM_DELETE_T);
+            SharedPtr<D3D11Driver> driver(OGRE_NEW_T(D3D11Driver, MEMCATEGORY_GENERAL)(pDXGIAdapter.Get()), SPFM_DELETE_T);
 
             // we don't want NVIDIA PerfHUD in the list, so place it to the hidden part of drivers list
             const bool isHidden = wcscmp(driver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD") == 0;
