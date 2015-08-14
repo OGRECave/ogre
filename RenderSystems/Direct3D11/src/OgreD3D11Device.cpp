@@ -192,16 +192,6 @@ namespace Ogre
         return res;
     }
     //---------------------------------------------------------------------
-    void D3D11Device::setExceptionsErrorLevel( const eExceptionsErrorLevel exceptionsErrorLevel )
-    {
-        mExceptionsErrorLevel = exceptionsErrorLevel;
-    }
-    //---------------------------------------------------------------------
-    const D3D11Device::eExceptionsErrorLevel D3D11Device::getExceptionsErrorLevel()
-    {
-        return mExceptionsErrorLevel;
-    }
-    //---------------------------------------------------------------------
     bool D3D11Device::_getErrorsFromQueue() const
     {
         if (mInfoQueue)
@@ -279,6 +269,27 @@ namespace Ogre
                 mInfoQueue->ClearStoredMessages();
             }
         }
+    }
+    //---------------------------------------------------------------------
+    const D3D11Device::eExceptionsErrorLevel D3D11Device::getExceptionsErrorLevel()
+    {
+        return mExceptionsErrorLevel;
+    }
+    //---------------------------------------------------------------------
+    void D3D11Device::setExceptionsErrorLevel( const eExceptionsErrorLevel exceptionsErrorLevel )
+    {
+        mExceptionsErrorLevel = exceptionsErrorLevel;
+    }
+    //---------------------------------------------------------------------
+    void D3D11Device::setExceptionsErrorLevel( const Ogre::String& exceptionsErrorLevel )
+    {
+        eExceptionsErrorLevel onlyIfDebugMode = OGRE_DEBUG_MODE ? D3D11Device::D3D_ERROR : D3D11Device::D3D_NO_EXCEPTION;
+        if("No information queue exceptions" == exceptionsErrorLevel)       setExceptionsErrorLevel(onlyIfDebugMode);
+        else if("Corruption" == exceptionsErrorLevel)                       setExceptionsErrorLevel(D3D11Device::D3D_CORRUPTION);
+        else if("Error" == exceptionsErrorLevel)                            setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
+        else if("Warning" == exceptionsErrorLevel)                          setExceptionsErrorLevel(D3D11Device::D3D_WARNING);
+        else if("Info (exception on any message)" == exceptionsErrorLevel)  setExceptionsErrorLevel(D3D11Device::D3D_INFO);
+        else                                                                setExceptionsErrorLevel(onlyIfDebugMode);
     }
     //---------------------------------------------------------------------
     D3D_FEATURE_LEVEL D3D11Device::parseFeatureLevel(const Ogre::String& value, D3D_FEATURE_LEVEL fallback)

@@ -91,8 +91,9 @@ namespace Ogre
         };
 
         static eExceptionsErrorLevel mExceptionsErrorLevel;
-        static void setExceptionsErrorLevel(const eExceptionsErrorLevel exceptionsErrorLevel);
         static const eExceptionsErrorLevel getExceptionsErrorLevel();
+        static void setExceptionsErrorLevel(const eExceptionsErrorLevel exceptionsErrorLevel);
+        static void setExceptionsErrorLevel(const Ogre::String& exceptionsErrorLevel);
 
         static D3D_FEATURE_LEVEL parseFeatureLevel(const Ogre::String& value, D3D_FEATURE_LEVEL fallback);
         static D3D_DRIVER_TYPE parseDriverType(const Ogre::String& value, D3D_DRIVER_TYPE fallback = D3D_DRIVER_TYPE_HARDWARE);
