@@ -310,4 +310,12 @@ namespace Ogre
         if("Warp" == driverTypeName)     return D3D_DRIVER_TYPE_WARP;
         return fallback;
     }
+    //---------------------------------------------------------------------
+    bool D3D11Device::IsDeviceLost()
+    {
+        HRESULT hr = mD3D11Device->GetDeviceRemovedReason();
+        if(FAILED(hr))
+            return true;
+        return false;
+    }
 }
