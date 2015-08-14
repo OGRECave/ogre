@@ -192,8 +192,6 @@ namespace Ogre
 
         bool mRenderSystemWasInited;
 
-        IDXGIFactoryN*  mpDXGIFactory;
-		
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		D3D11StereoDriverBridge* mStereoDriver;
 #endif

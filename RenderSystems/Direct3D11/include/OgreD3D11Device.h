@@ -40,6 +40,8 @@ namespace Ogre
         ComPtr<ID3D11DeviceContextN>    mImmediateContext;
         ComPtr<ID3D11ClassLinkage>      mClassLinkage;
         ComPtr<ID3D11InfoQueue>         mInfoQueue;
+        LARGE_INTEGER                   mDriverVersion;
+        ComPtr<IDXGIFactoryN>           mDXGIFactory;
 #if OGRE_D3D11_PROFILING
         ComPtr<ID3DUserDefinedAnnotation> mPerf;
 #endif
@@ -57,6 +59,8 @@ namespace Ogre
         ID3D11DeviceN* get()                         { return mD3D11Device.Get(); }
         ID3D11DeviceContextN* GetImmediateContext()  { return mImmediateContext.Get(); }
         ID3D11ClassLinkage* GetClassLinkage()        { return mClassLinkage.Get(); }
+        IDXGIFactoryN* GetDXGIFactory()              { return mDXGIFactory.Get(); }
+        LARGE_INTEGER GetDriverVersion()             { return mDriverVersion; }
 #if OGRE_D3D11_PROFILING
         ID3DUserDefinedAnnotation* GetProfiler()     { return mPerf.Get(); }
 #endif

@@ -48,7 +48,7 @@ namespace Ogre
         : public RenderWindow
     {
     public:
-        D3D11RenderWindowBase(D3D11Device& device, IDXGIFactoryN* pDXGIFactory);
+        D3D11RenderWindowBase(D3D11Device& device);
         ~D3D11RenderWindowBase();
         virtual void create(const String& name, unsigned widthPt, unsigned heightPt, bool fullScreen, const NameValuePairList *miscParams);
         virtual void destroy(void);
@@ -87,7 +87,6 @@ namespace Ogre
 
     protected:
         D3D11Device & mDevice;          // D3D11 driver
-        IDXGIFactoryN* mpDXGIFactory;
         bool    mIsExternal;            // window not created by Ogre
         bool    mSizing;
         bool    mClosed;
@@ -107,7 +106,7 @@ namespace Ogre
         : public D3D11RenderWindowBase
     {
     public:
-        D3D11RenderWindowSwapChainBased(D3D11Device& device, IDXGIFactoryN* pDXGIFactory);
+        D3D11RenderWindowSwapChainBased(D3D11Device& device);
         ~D3D11RenderWindowSwapChainBased()                      { destroy(); }
         virtual void destroy(void);
 
@@ -158,7 +157,7 @@ namespace Ogre
         : public D3D11RenderWindowSwapChainBased
     {
     public:
-        D3D11RenderWindowHwnd(D3D11Device& device, IDXGIFactoryN* pDXGIFactory);
+        D3D11RenderWindowHwnd(D3D11Device& device);
         ~D3D11RenderWindowHwnd()                                { destroy(); }
         virtual void create(const String& name, unsigned width, unsigned height, bool fullScreen, const NameValuePairList *miscParams);
         virtual void destroy(void);
@@ -207,7 +206,7 @@ namespace Ogre
         : public D3D11RenderWindowSwapChainBased
     {
     public:
-        D3D11RenderWindowCoreWindow(D3D11Device& device, IDXGIFactoryN* pDXGIFactory);
+        D3D11RenderWindowCoreWindow(D3D11Device& device);
         ~D3D11RenderWindowCoreWindow()                          { destroy(); }
 
         virtual float getViewPointToPixelScale();
@@ -234,7 +233,7 @@ namespace Ogre
         : public D3D11RenderWindowBase
     {
     public:
-        D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory);
+        D3D11RenderWindowImageSource(D3D11Device& device);
         ~D3D11RenderWindowImageSource()                         { destroy(); }
         virtual void create(const String& name, unsigned width, unsigned height, bool fullScreen, const NameValuePairList *miscParams);
         virtual void destroy(void);

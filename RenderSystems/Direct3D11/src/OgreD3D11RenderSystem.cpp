@@ -784,43 +784,13 @@ namespace Ogre
                 d3dDriver = d3dDriverOverride;
 
             ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
+            mDevice.TransferOwnership(device);
 
-            IDXGIDeviceN * pDXGIDevice;
-            device->QueryInterface(__uuidof(IDXGIDeviceN), (void **)&pDXGIDevice);
-
-            IDXGIAdapterN * pDXGIAdapter;
-            pDXGIDevice->GetParent(__uuidof(IDXGIAdapterN), (void **)&pDXGIAdapter);
-
-            if (mDriverType != DT_HARDWARE)
-            {
-                // get the IDXGIFactoryN from the device for software drivers
-                // Remark(dec-09):
-                //  Seems that IDXGIFactoryN::CreateSoftwareAdapter doesn't work with
-                // D3D11CreateDevice - so I needed to create with pSelectedAdapter = 0.
-                // If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
-                // the device - else CreateSwapChain fails later.
-                //  Update (Jun 12, 2012)
-                // If using WARP driver, get factory from created device
-                SAFE_RELEASE(mpDXGIFactory);
-                pDXGIAdapter->GetParent(__uuidof(IDXGIFactoryN), (void **)&mpDXGIFactory);
-            }
-
-            // We intentionally check for ID3D10Device support instead of ID3D11Device as CheckInterfaceSupport() is not supported for later.
-            // We hope, that there would be one UMD for both D3D10 and D3D11, or two different but with the same version number,
-            // or with different but correlated version numbers, so that blacklisting could be done with high confidence level.
-            LARGE_INTEGER driverVersion;
-            if(SUCCEEDED(pDXGIAdapter->CheckInterfaceSupport(IID_ID3D10Device /* intentionally D3D10, not D3D11 */, &driverVersion)))
-            {
-                mDriverVersion.major = HIWORD(driverVersion.HighPart);
-                mDriverVersion.minor = LOWORD(driverVersion.HighPart);
-                mDriverVersion.release = HIWORD(driverVersion.LowPart);
-                mDriverVersion.build = LOWORD(driverVersion.LowPart);
-            }
-
-            SAFE_RELEASE(pDXGIAdapter);
-            SAFE_RELEASE(pDXGIDevice);
-
-            mDevice.TransferOwnership(device) ;
+            LARGE_INTEGER driverVersion = mDevice.GetDriverVersion();
+            mDriverVersion.major = HIWORD(driverVersion.HighPart);
+            mDriverVersion.minor = LOWORD(driverVersion.HighPart);
+            mDriverVersion.release = HIWORD(driverVersion.LowPart);
+            mDriverVersion.build = LOWORD(driverVersion.LowPart);
         }
 
         if( autoCreateWindow )
@@ -950,7 +920,6 @@ namespace Ogre
         mPrimaryWindow = NULL; // primary window deleted by base class.
         freeDevice();
         SAFE_DELETE( mDriverList );
-        SAFE_RELEASE( mpDXGIFactory );
         mActiveD3DDriver = NULL;
         mDevice.ReleaseAll();
         LogManager::getSingleton().logMessage("D3D11 : Shutting down cleanly.");
@@ -1005,7 +974,7 @@ namespace Ogre
 		}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		D3D11RenderWindowBase* win = new D3D11RenderWindowHwnd(mDevice, mpDXGIFactory);
+		D3D11RenderWindowBase* win = new D3D11RenderWindowHwnd(mDevice);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 		String windowType;
 		if(miscParams)
@@ -1019,10 +988,10 @@ namespace Ogre
 		D3D11RenderWindowBase* win = NULL;
 #if !__OGRE_WINRT_PHONE_80
 		if(win == NULL && windowType == "SurfaceImageSource")
-			win = new D3D11RenderWindowImageSource(mDevice, mpDXGIFactory);
+			win = new D3D11RenderWindowImageSource(mDevice);
 #endif // !__OGRE_WINRT_PHONE_80
 		if(win == NULL)
-			win = new D3D11RenderWindowCoreWindow(mDevice, mpDXGIFactory);
+			win = new D3D11RenderWindowCoreWindow(mDevice);
 #endif
 		win->create(name, width, height, fullScreen, miscParams);
 
@@ -3906,16 +3875,6 @@ namespace Ogre
 
         mRenderSystemWasInited = true;
         // set pointers to NULL
-        mpDXGIFactory = NULL;
-        HRESULT hr;
-        hr = CreateDXGIFactory1( __uuidof(IDXGIFactoryN), (void**)&mpDXGIFactory );
-        if( FAILED(hr) )
-        {
-			OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr, 
-                "Failed to create Direct3D11 DXGIFactory1", 
-                "D3D11RenderSystem::D3D11RenderSystem" );
-        }
-
         mDriverList = NULL;
         mActiveD3DDriver = NULL;
         mTextureManager = NULL;

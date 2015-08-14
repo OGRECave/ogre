@@ -34,6 +34,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11Device::D3D11Device()
     {
+        mDriverVersion.QuadPart = 0;
     }
     //---------------------------------------------------------------------
     D3D11Device::~D3D11Device()
@@ -56,6 +57,8 @@ namespace Ogre
         mClassLinkage.Reset();
         mImmediateContext.Reset();
         mD3D11Device.Reset();
+        mDXGIFactory.Reset();
+        mDriverVersion.QuadPart = 0;
     }
     //---------------------------------------------------------------------
     void D3D11Device::TransferOwnership(ID3D11DeviceN* d3d11device)
@@ -68,6 +71,21 @@ namespace Ogre
             HRESULT hr = S_OK;
 
             mD3D11Device.Attach(d3d11device);
+
+            // get DXGI factory from device
+            ComPtr<IDXGIDeviceN> pDXGIDevice;
+            ComPtr<IDXGIAdapterN> pDXGIAdapter;
+            if(SUCCEEDED(mD3D11Device.As(&pDXGIDevice))
+            && SUCCEEDED(pDXGIDevice->GetParent(__uuidof(IDXGIAdapterN), (void **)pDXGIAdapter.GetAddressOf())))
+            {
+                pDXGIAdapter->GetParent(__uuidof(IDXGIFactoryN), (void **)mDXGIFactory.ReleaseAndGetAddressOf());
+
+                // We intentionally check for ID3D10Device support instead of ID3D11Device as CheckInterfaceSupport() is not supported for later.
+                // We hope, that there would be one UMD for both D3D10 and D3D11, or two different but with the same version number,
+                // or with different but correlated version numbers, so that blacklisting could be done with high confidence level.
+                if(FAILED(pDXGIAdapter->CheckInterfaceSupport(IID_ID3D10Device /* intentionally D3D10, not D3D11 */, &mDriverVersion)))
+                    mDriverVersion.QuadPart = 0;
+            }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
             mD3D11Device->GetImmediateContext(mImmediateContext.ReleaseAndGetAddressOf());

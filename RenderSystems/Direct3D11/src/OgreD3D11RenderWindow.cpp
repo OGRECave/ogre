@@ -48,9 +48,8 @@ namespace Ogre
     // class D3D11RenderWindowBase
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowBase
-    D3D11RenderWindowBase::D3D11RenderWindowBase(D3D11Device & device, IDXGIFactoryN* pDXGIFactory)
+    D3D11RenderWindowBase::D3D11RenderWindowBase(D3D11Device & device)
         : mDevice(device)
-        , mpDXGIFactory(pDXGIFactory)
     {
         mIsFullScreen = false;
         mIsExternal = false;
@@ -416,8 +415,8 @@ namespace Ogre
     // class D3D11RenderWindowSwapChainBased
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowSwapChainBased
-    D3D11RenderWindowSwapChainBased::D3D11RenderWindowSwapChainBased(D3D11Device & device, IDXGIFactoryN* pDXGIFactory)
-        : D3D11RenderWindowBase(device, pDXGIFactory)
+    D3D11RenderWindowSwapChainBased::D3D11RenderWindowSwapChainBased(D3D11Device & device)
+        : D3D11RenderWindowBase(device)
     {
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
         mUseFlipSequentialMode = false;
@@ -640,8 +639,8 @@ namespace Ogre
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowHwnd
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    D3D11RenderWindowHwnd::D3D11RenderWindowHwnd(D3D11Device & device, IDXGIFactoryN* pDXGIFactory)
-        : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
+    D3D11RenderWindowHwnd::D3D11RenderWindowHwnd(D3D11Device & device)
+        : D3D11RenderWindowSwapChainBased(device)
     {
         mHWnd = 0;
 		mWindowedWinStyle = 0;
@@ -875,7 +874,7 @@ namespace Ogre
 
         _createSwapChain();
         _createSizeDependedD3DResources();
-        mpDXGIFactory->MakeWindowAssociation(mHWnd, NULL);
+        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, NULL);
         setHidden(mHidden);
 
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -946,7 +945,7 @@ namespace Ogre
         }
 
         // Create swap chain            
-        HRESULT hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, mpSwapChain.ReleaseAndGetAddressOf());
+        HRESULT hr = mDevice.GetDXGIFactory()->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, mpSwapChain.ReleaseAndGetAddressOf());
 
         return hr;
     }
@@ -1242,8 +1241,8 @@ namespace Ogre
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowCoreWindow
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-    D3D11RenderWindowCoreWindow::D3D11RenderWindowCoreWindow(D3D11Device & device, IDXGIFactoryN*   pDXGIFactory)
-        : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
+    D3D11RenderWindowCoreWindow::D3D11RenderWindowCoreWindow(D3D11Device& device)
+        : D3D11RenderWindowSwapChainBased(device)
     {
         mUseFlipSequentialMode = true;
     }
@@ -1346,7 +1345,7 @@ namespace Ogre
         mSwapChainDesc.AlphaMode            = DXGI_ALPHA_MODE_UNSPECIFIED;
 
         // Create swap chain
-        HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, mpSwapChain.ReleaseAndGetAddressOf());
+        HRESULT hr = mDevice.GetDXGIFactory()->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, mpSwapChain.ReleaseAndGetAddressOf());
         if (FAILED(hr))
             return hr;
 
@@ -1383,8 +1382,8 @@ namespace Ogre
 #pragma region D3D11RenderWindowImageSource
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && !__OGRE_WINRT_PHONE_80
 
-    D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
-        : D3D11RenderWindowBase(device, pDXGIFactory)
+    D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device)
+        : D3D11RenderWindowBase(device)
     {
     }
     //---------------------------------------------------------------------
