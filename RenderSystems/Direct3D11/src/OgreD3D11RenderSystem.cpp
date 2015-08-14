@@ -168,9 +168,11 @@ namespace Ogre
 	//---------------------------------------------------------------------
     D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers()
     {
-        if( !mDriverList )
-            mDriverList = new D3D11DriverList( mpDXGIFactory );
-
+        if(!mDriverList)
+        {
+            mDriverList = new D3D11DriverList();
+            mDriverList->refresh();
+        }
         return mDriverList;
     }
     //---------------------------------------------------------------------

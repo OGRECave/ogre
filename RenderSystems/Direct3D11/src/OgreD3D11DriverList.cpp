@@ -26,29 +26,44 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D11DriverList.h"
-#include "OgreLogManager.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Driver.h"
+#include "OgreException.h"
+#include "OgreLogManager.h"
 
 namespace Ogre 
 {
     //-----------------------------------------------------------------------
-    D3D11DriverList::D3D11DriverList( IDXGIFactoryN* pDXGIFactory ) 
+    D3D11DriverList::D3D11DriverList() 
     {
         mHiddenDriversCount = 0;
-        enumerate(pDXGIFactory);
     }
     //-----------------------------------------------------------------------
     D3D11DriverList::~D3D11DriverList(void)
     {
+    }
+    //-----------------------------------------------------------------------
+    void D3D11DriverList::clear()
+    {
+        mHiddenDriversCount = 0;
         mDriverList.clear();
     }
     //-----------------------------------------------------------------------
-    BOOL D3D11DriverList::enumerate(IDXGIFactoryN*  pDXGIFactory)
+    void D3D11DriverList::refresh()
     {
-        assert(mDriverList.empty() && mHiddenDriversCount == 0);
+        clear();
 
         LogManager::getSingleton().logMessage( "D3D11: Driver Detection Starts" );
+
+        // We need fresh IDXGIFactory to get fresh driver list
+        ComPtr<IDXGIFactoryN> pDXGIFactory;
+        HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactoryN), (void**)pDXGIFactory.GetAddressOf());
+        if( FAILED(hr) )
+        {
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create Direct3D11 DXGIFactory1",
+                "D3D11DriverList::refresh");
+        }
 
         for( UINT iAdapter=0; ; iAdapter++ )
         {
@@ -61,7 +76,9 @@ namespace Ogre
             }
             if( FAILED(hr) )
             {
-                return false;
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Failed to enum adapters",
+                    "D3D11DriverList::refresh");
             }
 
             SharedPtr<D3D11Driver> driver(OGRE_NEW_T(D3D11Driver, MEMCATEGORY_GENERAL)(pDXGIAdapter.Get()), SPFM_DELETE_T);
@@ -80,8 +97,6 @@ namespace Ogre
         }
 
         LogManager::getSingleton().logMessage( "D3D11: Driver Detection Ends" );
-
-        return TRUE;
     }
     //-----------------------------------------------------------------------
     size_t D3D11DriverList::count() const 
