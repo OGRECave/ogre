@@ -31,7 +31,7 @@ in uint drawId;
 
 @insertpiece( custom_vs_attributes )
 
-@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture )
+@property( !hlms_shadowcaster || !hlms_shadow_uses_depth_texture || alpha_test )
 out block
 {
 @insertpiece( VStoPS_block )
@@ -165,8 +165,6 @@ void main()
 
 	@insertpiece( SkeletonTransform )
 	@insertpiece( VertexTransform )
-@foreach( hlms_uv_count, n )
-	outVs.uv@n = uv@n;@end
 
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
@@ -176,7 +174,6 @@ void main()
 
 @property( hlms_pssm_splits )	outVs.depth = gl_Position.z;@end
 
-    outVs.drawId = drawId;
 @end @property( hlms_shadowcaster )
     float shadowConstantBias = uintBitsToFloat( instance.worldMaterialIdx[drawId].y );
 
@@ -191,6 +188,13 @@ void main()
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	gl_Position.z = (gl_Position.z + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y * gl_Position.w;
 @end
+
+	/// hlms_uv_count will be 0 on shadow caster passes w/out alpha test
+@foreach( hlms_uv_count, n )
+	outVs.uv@n = uv@n;@end
+
+@property( !hlms_shadowcaster || alpha_test )
+	outVs.drawId = drawId;@end
 
 	@insertpiece( custom_vs_posExecution )
 }

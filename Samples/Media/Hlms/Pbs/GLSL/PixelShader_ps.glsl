@@ -16,10 +16,12 @@ in vec4 gl_FragCoord;
 @end
 
 // START UNIFORM DECLARATION
-@property( !hlms_shadowcaster )
-@insertpiece( PassDecl )
-@insertpiece( MaterialDecl )
-@insertpiece( InstanceDecl )
+@property( !hlms_shadowcaster || alpha_test )
+	@property( !hlms_shadowcaster )
+		@insertpiece( PassDecl )
+	@end
+	@insertpiece( MaterialDecl )
+	@insertpiece( InstanceDecl )
 @end
 @insertpiece( custom_ps_uniformDeclaration )
 // END UNIFORM DECLARATION
@@ -213,7 +215,7 @@ void main()
 {
     @insertpiece( custom_ps_preExecution )
 @property( hlms_normal || hlms_qtangent )
-        uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
+	uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
 	material = materialArray.m[materialId];
 @property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
 @property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16u;@end
@@ -233,6 +235,7 @@ void main()
 	@insertpiece( custom_ps_posMaterialLoad )
 
 @property( detail_maps_diffuse || detail_maps_normal )
+	//Prepare weight map for the detail maps.
 	@property( detail_weight_map )
 		vec4 detailWeights = @insertpiece( SamplerDetailWeightMap );
 		@property( detail_weights )detailWeights *= material.cDetailWeights;@end
@@ -242,6 +245,7 @@ void main()
 	@end
 @end
 
+	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
 	vec4 detailCol@n	= texture( textureMaps[@value(detail_map@n_idx)], vec3( inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ) );
 	@property( !hw_gamma_read )//Gamma to linear space
@@ -250,13 +254,35 @@ void main()
 	detailCol@n.w = detailWeights.@insertpiece(detail_swizzle@n);@end
 @end
 
-@property( alpha_test && !diffuse_map && detail_maps_diffuse )
-	if( material.kD.w @insertpiece( alpha_test_cmp_func ) detailCol0.a )
-		discard;@end
+@insertpiece( SampleDiffuseMap )
+
+	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
+	/// diffuse maps, we must initialize it to some value. If there are no diffuse or detail maps,
+	/// we must not access diffuseCol at all, but rather use material.kD directly (see piece( kD ) ).
+	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = vec4( 0.0, 0.0, 0.0, 0.0 );@end
+
+	/// Blend the detail diffuse maps with the main diffuse.
+@foreach( detail_maps_diffuse, n )
+	@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
+
+	/// Apply the material's diffuse over the textures
+@property( diffuse_map || detail_maps_diffuse )	diffuseCol.xyz *= material.kD.xyz;@end
+
+@property( alpha_test )
+	@property( diffuse_map || detail_maps_diffuse )
+	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
+		discard;
+	@end @property( !diffuse_map && !detail_maps_diffuse )
+	if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
+		discard;
+	@end
+@end
 
 @property( !normal_map )
+	// Geometric normal
 	nNormal = normalize( inPs.normal );
 @end @property( normal_map )
+	//Normal mapping.
 	vec3 geomNormal = normalize( inPs.normal );
 	vec3 vTangent = normalize( inPs.tangent );
 
@@ -265,7 +291,10 @@ void main()
 	mat3 TBN		= mat3( vTangent, vBinormal, geomNormal );
 
 	@property( normal_map_tex )nNormal = getTSNormal( vec3( inPs.uv@value(uv_normal).xy, normalIdx ) );@end
-	@property( normal_weight_tex )nNormal = mix( vec3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );@end
+	@property( normal_weight_tex )
+		// Apply the weight to the main normal map
+		nNormal = mix( vec3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );
+	@end
 @end
 
 @property( hlms_pssm_splits )
@@ -278,28 +307,11 @@ void main()
     float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end
 
-@insertpiece( SampleDiffuseMap )
-
-@property( alpha_test )
-	@property( diffuse_map )
-	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
-		discard;
-	@end @property( !diffuse_map && !detail_maps_diffuse )
-	if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
-		discard;
-	@end
-@end
-
 @insertpiece( SampleSpecularMap )
 @insertpiece( SampleRoughnessMap )
 
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = vec4( 0.0, 0.0, 0.0, 0.0 );@end
-
-@foreach( detail_maps_diffuse, n )
-	@insertpiece( blend_mode_idx@n ) @end
-
-@property( diffuse_map || detail_maps_diffuse )	diffuseCol.xyz *= material.kD.xyz;@end
-
+	/// If there is no normal map, the first iteration must
+	/// initialize nNormal instead of try to merge with it.
 @property( normal_map_tex )
 	@piece( detail_nm_op_sum )+=@end
 	@piece( detail_nm_op_mul )*=@end
@@ -308,6 +320,7 @@ void main()
 	@piece( detail_nm_op_mul )=@end
 @end
 
+	/// Blend the detail normal maps with the main normal.
 @foreach( second_valid_detail_map_nm, n, first_valid_detail_map_nm )
 	vec3 vDetail = @insertpiece( SampleDetailMapNm@n );
 	nNormal.xy	@insertpiece( detail_nm_op_sum ) vDetail.xy;
@@ -429,12 +442,73 @@ void main()
 }
 @end
 @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture )
+	@property( hlms_shadow_uses_depth_texture && !alpha_test )
 		@set( hlms_disable_stage, 1 )
 	@end
+
+@property( alpha_test )
+	Material material;
+	@property( diffuse_map || detail_maps_diffuse )float diffuseCol;@end
+	@property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
+	@property( diffuse_map )uint diffuseIdx;@end
+	@property( detail_weight_map )uint weightMapIdx;@end
+	@foreach( 4, n )
+		@property( detail_map@n )uint detailMapIdx@n;@end @end
+@end
+
 void main()
 {
 	@insertpiece( custom_ps_preExecution )
+
+@property( alpha_test )
+	uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
+	material = materialArray.m[materialId];
+@property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
+@property( detail_weight_map )	weightMapIdx		= material.indices0_3.z & 0x0000FFFFu;@end
+@property( detail_map0 )	detailMapIdx0		= material.indices0_3.z >> 16u;@end
+@property( detail_map1 )	detailMapIdx1		= material.indices0_3.w & 0x0000FFFFu;@end
+@property( detail_map2 )	detailMapIdx2		= material.indices0_3.w >> 16u;@end
+@property( detail_map3 )	detailMapIdx3		= material.indices4_7.x & 0x0000FFFFu;@end
+
+@property( detail_maps_diffuse || detail_maps_normal )
+	//Prepare weight map for the detail maps.
+	@property( detail_weight_map )
+		vec4 detailWeights = @insertpiece( SamplerDetailWeightMap );
+		@property( detail_weights )detailWeights *= material.cDetailWeights;@end
+	@end @property( !detail_weight_map )
+		@property( detail_weights )vec4 detailWeights = material.cDetailWeights;@end
+		@property( !detail_weights )vec4 detailWeights = vec4( 1.0, 1.0, 1.0, 1.0 );@end
+	@end
+@end
+
+	/// Sample detail maps and weight them against the weight map in the next foreach loop.
+@foreach( detail_maps_diffuse, n )@property( detail_map@n )
+	float detailCol@n	= texture( textureMaps[@value(detail_map@n_idx)], vec3( inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ) ).w;
+	detailCol@n = detailWeights.@insertpiece(detail_swizzle@n) * detailCol@n;@end
+@end
+
+@insertpiece( SampleDiffuseMap )
+
+	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
+	/// diffuse maps, we must initialize it to some value. If there are no diffuse or detail maps,
+	/// we must not access diffuseCol at all, but rather use material.kD directly (see piece( kD ) ).
+	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = 0.0;@end
+
+	/// Blend the detail diffuse maps with the main diffuse.
+@foreach( detail_maps_diffuse, n )
+	@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
+
+	/// Apply the material's alpha over the textures
+@property( TODO_REFACTOR_ACCOUNT_MATERIAL_ALPHA )	diffuseCol.xyz *= material.kD.xyz;@end
+
+	@property( diffuse_map || detail_maps_diffuse )
+	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol )
+		discard;
+	@end @property( !diffuse_map && !detail_maps_diffuse )
+	if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
+		discard;
+	@end
+@end /// !alpha_test
 
 @property( !hlms_shadow_uses_depth_texture )
 	@property( GL3+ )outColour = inPs.depth;@end

@@ -1767,11 +1767,12 @@ namespace Ogre
         //For shadow casters, turn normals off. UVs & diffuse also off unless there's alpha testing.
         setProperty( HlmsBaseProp::Normal, 0 );
         setProperty( HlmsBaseProp::QTangent, 0 );
+        PiecesMap piecesCaster[NumShaderTypes];
         if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {
-            setProperty( HlmsBaseProp::UvCount, 0 );
+            piecesCaster[PixelShader][HlmsBasePieces::AlphaTestCmpFunc] =
+                    pieces[PixelShader][HlmsBasePieces::AlphaTestCmpFunc];
         }
-        PiecesMap piecesCaster[NumShaderTypes];
         calculateHashForPreCaster( renderable, piecesCaster );
         uint32 renderableCasterHash = this->addRenderableCache( mSetProperties, piecesCaster );
 

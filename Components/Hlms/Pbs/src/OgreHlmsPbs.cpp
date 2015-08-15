@@ -510,8 +510,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbs::calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces )
     {
-        //HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(
-        //                                              renderable->getDatablock() );
+        HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>( renderable->getDatablock() );
+        const bool hasAlphaTest = datablock->getAlphaTest() != CMPF_ALWAYS_PASS;
 
         HlmsPropertyVec::iterator itor = mSetProperties.begin();
         HlmsPropertyVec::iterator end  = mSetProperties.end();
@@ -528,7 +528,8 @@ namespace Ogre
                      itor->keyName != HlmsBaseProp::Skeleton &&
                      itor->keyName != HlmsBaseProp::BonesPerVertex &&
                      itor->keyName != HlmsBaseProp::DualParaboloidMapping &&
-                     itor->keyName != HlmsBaseProp::AlphaTest )
+                     itor->keyName != HlmsBaseProp::AlphaTest &&
+                     (!hasAlphaTest || !requiredPropertyByAlphaTest( itor->keyName )) )
             {
                 itor = mSetProperties.erase( itor );
                 end  = mSetProperties.end();
@@ -539,9 +540,56 @@ namespace Ogre
             }
         }
 
+        if( hasAlphaTest )
+        {
+            //Keep GLSL happy by not declaring more textures than we'll actually need.
+            uint8 maxUsedTexture = 0;
+            for( int i=0; i<4; ++i )
+            {
+                if( datablock->mTexToBakedTextureIdx[PBSM_DETAIL0+i] < datablock->mBakedTextures.size() )
+                {
+                    maxUsedTexture = std::max( maxUsedTexture,
+                                               datablock->mTexToBakedTextureIdx[PBSM_DETAIL0+i] );
+                }
+            }
+
+            if( datablock->mTexToBakedTextureIdx[PBSM_DIFFUSE] < datablock->mBakedTextures.size() )
+            {
+                maxUsedTexture = std::max( maxUsedTexture,
+                                           datablock->mTexToBakedTextureIdx[PBSM_DIFFUSE] );
+            }
+
+            setProperty( PbsProperty::NumTextures, maxUsedTexture + 1 );
+        }
+
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
         inOutPieces[VertexShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
         inOutPieces[PixelShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsPbs::requiredPropertyByAlphaTest( IdString keyName )
+    {
+        bool retVal =
+                keyName == PbsProperty::NumTextures ||
+                keyName == PbsProperty::DiffuseMap ||
+                keyName == PbsProperty::DetailWeightMap ||
+                keyName == PbsProperty::DetailMap0 || keyName == PbsProperty::DetailMap1 ||
+                keyName == PbsProperty::DetailMap2 || keyName == PbsProperty::DetailMap3 ||
+                keyName == PbsProperty::DetailWeights ||
+                keyName == PbsProperty::DetailOffsetsD0 || keyName == PbsProperty::DetailOffsetsD1 ||
+                keyName == PbsProperty::DetailOffsetsD2 || keyName == PbsProperty::DetailOffsetsD3 ||
+                keyName == PbsProperty::UvDetailWeight ||
+                keyName == PbsProperty::UvDetail0 || keyName == PbsProperty::UvDetail1 ||
+                keyName == PbsProperty::UvDetail2 || keyName == PbsProperty::UvDetail3 ||
+                keyName == PbsProperty::BlendModeIndex0 || keyName == PbsProperty::BlendModeIndex1 ||
+                keyName == PbsProperty::BlendModeIndex2 || keyName == PbsProperty::BlendModeIndex3 ||
+                keyName == PbsProperty::DetailMapsDiffuse ||
+                keyName == HlmsBaseProp::UvCount;
+
+        for( int i=0; i<8 && !retVal; ++i )
+            retVal |= keyName == *HlmsBaseProp::UvCountPtrs[i];
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsPbs::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
@@ -1267,7 +1315,7 @@ namespace Ogre
         //                          ---- PIXEL SHADER ----
         //---------------------------------------------------------------------------
 
-        if( !casterPass )
+        if( !casterPass || datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {
             if( datablock->mTextureHash != mLastTextureHash )
             {
