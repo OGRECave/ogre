@@ -1,4 +1,3 @@
-@property( !false )
 @insertpiece( SetCrossPlatformSettings )
 @property( !GL430 )
 @property( hlms_tex_gather )#extension GL_ARB_texture_gather: require@end
@@ -8,7 +7,7 @@ layout(std140) uniform;
 #define FRAG_COLOR		0
 @property( !hlms_shadowcaster )
 layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
-@end @property( hlms_shadowcaster )
+@end @property( hlms_shadowcaster && !hlms_shadow_uses_depth_texture )
 layout(location = FRAG_COLOR, index = 0) out float outColour;
 @end
 
@@ -437,52 +436,11 @@ void main()
 {
 	@insertpiece( custom_ps_preExecution )
 
-@property( GL3+ )
-	outColour = inPs.depth;@end
-@property( !GL3+ )
-	gl_FragColor.x = inPs.depth;@end
+@property( !hlms_shadow_uses_depth_texture )
+	@property( GL3+ )outColour = inPs.depth;@end
+	@property( !GL3+ )gl_FragColor.x = inPs.depth;@end
+@end
 
 	@insertpiece( custom_ps_posExecution )
-}
-@end
-@end
-
-@property( false )
-#version 330
-#extension GL_ARB_shading_language_420pack: require
-layout(std140) uniform;
-#define FRAG_COLOR		0
-layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
-
-// START UNIFORM DECLARATION
-@insertpiece( PassDecl )
-@insertpiece( MaterialDecl )
-@insertpiece( InstanceDecl )
-in block
-{
-@insertpiece( VStoPS_block )
-} inPs;
-// END UNIFORM DECLARATION
-
-Material material;
-
-layout(binding=1) uniform sampler2DArray textureMaps[1];
-
-void main()
-{
-        //uint materialId	= instance.worldMaterialIdx[inPs.drawId].x & 0x1FFu;
-        //material = materialArray.m[materialId];
-	//material = materialArray.m[0];
-	//gl_FragColor = texture2D( tex, psUv0 );
-	//gl_FragColor = vec4( 0, 1, 0, 1 );
-        //float v = float(material.indices0_3.x & 0x0000FFFFu) * 0.000125f;
-	//float v = material.kD.x;
-        //float v = float(material.indices0_3.x >> 16u) * 0.25f;
-	//gl_FragColor = vec4( v, v, v, 1 );
-	//gl_FragColor = vec4( materialArray.m[1].kD.x, materialArray.m[1].kD.y, materialArray.m[1].kD.z, 1 );
-	//gl_FragColor = vec4( inPs.normal, 1.0f );
-
-        //outColour = texture( textureMaps[0], vec3( inPs.uv0.xy, material.indices0_3.x & 0x0000FFFFu ) );
-        outColour = vec4( 1.0f, 1.0f, 1.0f, 1.0f );
 }
 @end
