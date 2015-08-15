@@ -1,4 +1,3 @@
-@property( !false )
 @insertpiece( SetCrossPlatformSettings )
 
 out gl_PerVertex
@@ -195,37 +194,3 @@ void main()
 
 	@insertpiece( custom_vs_posExecution )
 }
-@end
-@property( false )
-#version 430 core
-#extension GL_ARB_shading_language_420pack: require
-
-layout(std140) uniform;
-
-@insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
-@insertpiece( Common_Matrix_DeclUnpackMatrix4x3 )
-
-in vec4 vertex;
-in uint drawId;
-uniform samplerBuffer worldMatBuf;
-
-void main()
-{
-	mat4 worldViewProj;
-	/*{
-                vec4 row0 = texelFetch( worldMatBuf, int(drawId * 2u) );
-                vec4 row1 = texelFetch( worldMatBuf, int(drawId * 2u + 1u) );
-                vec4 row2 = texelFetch( worldMatBuf, int(drawId * 2u + 2u) );
-                vec4 row3 = texelFetch( worldMatBuf, int(drawId * 2u + 3u) );
-
-		worldViewProj = mat4(
-					row0.x, row1.x, row2.x, row3.x,
-					row0.y, row1.y, row2.y, row3.y,
-					row0.z, row1.z, row2.z, row3.z,
-					row0.w, row1.w, row2.w, row3.w );
-	}*/
-        worldViewProj = UNPACK_MAT4( worldMatBuf, drawId << 1u );
-
-	gl_Position = worldViewProj * vertex;
-}
-@end
