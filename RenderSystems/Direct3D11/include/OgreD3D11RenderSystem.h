@@ -191,6 +191,17 @@ namespace Ogre
             size_t     mHighestSlotUsed;
             
         };
+        
+        // structure holding function pointers to ID3D11DeviceContextN methods for 
+        // settings samplers and shader resource views for a certain pipeline stage.
+        struct SamplerCallEntry
+        {
+            SamplerCallEntry() : SetSamplers(NULL), SetTextures(NULL){}
+            void(__stdcall ID3D11DeviceContextN::*SetSamplers)(UINT StartSlot, UINT NumSamplers, ID3D11SamplerState *const* ppSamplers);
+            void(__stdcall ID3D11DeviceContextN::*SetTextures)(UINT StartSlot, UINT NumSamplers, ID3D11ShaderResourceView *const* ppTextures);
+        };
+
+        SamplerCallEntry mSamplersCallsLUT[TextureUnitState::BT_SHIFT_COUNT];
 
         //An array holding a set of all texture settings for all the pipeline stages.
         typedef TextureStageGroup TextureDesc[TextureUnitState::BT_SHIFT_COUNT];
@@ -375,6 +386,7 @@ namespace Ogre
         void setVertexBufferBinding(VertexBufferBinding* binding);
         void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
         void _render(const RenderOperation& op);
+        void _setupSamplersCallsLUT();
         /** See
           RenderSystem
          */
