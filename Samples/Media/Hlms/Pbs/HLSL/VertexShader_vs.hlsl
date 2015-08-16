@@ -159,8 +159,6 @@ PS_INPUT main( VS_INPUT input )
 
 	@insertpiece( SkeletonTransform )
 	@insertpiece( VertexTransform )
-@foreach( hlms_uv_count, n )
-	outVs.uv@n = input.uv@n;@end
 
 @property( !hlms_shadowcaster )
 	@insertpiece( ShadowReceive )
@@ -169,7 +167,6 @@ PS_INPUT main( VS_INPUT input )
 
 @property( hlms_pssm_splits )	outVs.depth = outVs.gl_Position.z;@end
 
-	outVs.drawId = input.drawId;
 @end @property( hlms_shadowcaster )
 	float shadowConstantBias = asfloat( worldMaterialIdx[input.drawId].y );
 	
@@ -183,6 +180,14 @@ PS_INPUT main( VS_INPUT input )
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/
 	outVs.gl_Position.z = (outVs.gl_Position.z + shadowConstantBias * passBuf.depthRange.y) * passBuf.depthRange.y * outVs.gl_Position.w;
 @end
+
+	/// hlms_uv_count will be 0 on shadow caster passes w/out alpha test
+@foreach( hlms_uv_count, n )
+	outVs.uv@n = input.uv@n;@end
+
+@property( !hlms_shadowcaster || alpha_test )
+	outVs.drawId = input.drawId;@end
+
 	@insertpiece( custom_vs_posExecution )
 
 	return outVs;

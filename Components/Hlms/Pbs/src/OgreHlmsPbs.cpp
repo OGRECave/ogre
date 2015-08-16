@@ -543,23 +543,23 @@ namespace Ogre
         if( hasAlphaTest )
         {
             //Keep GLSL happy by not declaring more textures than we'll actually need.
-            uint8 maxUsedTexture = 0;
+            uint8 numTextures = 0;
             for( int i=0; i<4; ++i )
             {
                 if( datablock->mTexToBakedTextureIdx[PBSM_DETAIL0+i] < datablock->mBakedTextures.size() )
                 {
-                    maxUsedTexture = std::max( maxUsedTexture,
-                                               datablock->mTexToBakedTextureIdx[PBSM_DETAIL0+i] );
+                    numTextures = std::max<uint8>(
+                                numTextures, datablock->mTexToBakedTextureIdx[PBSM_DETAIL0+i] + 1 );
                 }
             }
 
             if( datablock->mTexToBakedTextureIdx[PBSM_DIFFUSE] < datablock->mBakedTextures.size() )
             {
-                maxUsedTexture = std::max( maxUsedTexture,
-                                           datablock->mTexToBakedTextureIdx[PBSM_DIFFUSE] );
+                numTextures = std::max<uint8>(
+                            numTextures, datablock->mTexToBakedTextureIdx[PBSM_DIFFUSE] + 1 );
             }
 
-            setProperty( PbsProperty::NumTextures, maxUsedTexture + 1 );
+            setProperty( PbsProperty::NumTextures, numTextures );
 
             //Set the blending mode as a piece again
             for( size_t i=0; i<4; ++i )

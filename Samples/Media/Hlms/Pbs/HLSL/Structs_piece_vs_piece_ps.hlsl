@@ -131,7 +131,20 @@ cbuffer InstanceBuffer : register(b2)
 
 		@foreach( hlms_num_shadow_maps, n )
 			float4 posL@n	: TEXCOORD@counter(texcoord);@end
+			
+		@property( hlms_pssm_splits )float depth	: TEXCOORD@counter(texcoord);@end
 	@end
-	@property( (hlms_shadowcaster && !hlms_shadow_uses_depth_texture) || hlms_pssm_splits )		float depth	: TEXCOORD@counter(texcoord);@end
+	
+	@property( hlms_shadowcaster )
+		@property( alpha_test )
+			nointerpolation uint drawId	: TEXCOORD@counter(texcoord);
+			@foreach( hlms_uv_count, n )
+				float@value( hlms_uv_count@n ) uv@n	: TEXCOORD@counter(texcoord);@end
+		@end
+		@property( !hlms_shadow_uses_depth_texture )
+			float depth	: TEXCOORD@counter(texcoord);
+		@end
+	@end
+
 	@insertpiece( custom_VStoPS )
 @end
