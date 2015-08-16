@@ -704,16 +704,17 @@ namespace Ogre
             if(opt != miscParams->end())
                 monitorIndex = StringConverter::parseInt(opt->second);
 
-#if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
-            // useFlipSequentialMode    [parseBool]
-            opt = miscParams->find("useFlipSequentialMode");
-            if(opt != miscParams->end())
-                mUseFlipSequentialMode = IsWindows8OrGreater() && StringConverter::parseBool(opt->second);
-#endif
             // vsync    [parseBool]
             opt = miscParams->find("vsync");
             if(opt != miscParams->end())
                 mVSync = StringConverter::parseBool(opt->second);
+
+#if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
+            // useFlipSequentialMode    [parseBool]
+            opt = miscParams->find("useFlipSequentialMode");
+            if (opt != miscParams->end())
+                mUseFlipSequentialMode = mVSync && IsWindows8OrGreater() && StringConverter::parseBool(opt->second);
+#endif
             // vsyncInterval    [parseUnsignedInt]
             opt = miscParams->find("vsyncInterval");
             if(opt != miscParams->end())
