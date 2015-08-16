@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreSubMesh2.h"
 #include "OgreLogManager.h"
-#include "OgreMesh.h"
+#include "OgreHlmsDatablock.h"
 #include "OgreException.h"
 
 namespace Ogre {
@@ -62,10 +62,27 @@ namespace Ogre {
     {
         return mSubMesh;
     }
-    //-----------------------------------------------------------------------
-    void SubItem::setMaterial( const MaterialPtr& material )
+    //-----------------------------------------------------------------------------
+    void SubItem::_setHlmsHashes( uint32 hash, uint32 casterHash )
     {
-        Renderable::setMaterial( material );
+        if( mHlmsDatablock->getAlphaTest() != CMPF_ALWAYS_PASS )
+        {
+            if( mVaoPerLod[1].empty() || mVaoPerLod[1][0] != mSubMesh->mVao[0][0] )
+            {
+                //Has alpha testing. Disable the optimized shadow mapping buffers.
+                mVaoPerLod[1] = mSubMesh->mVao[0];
+            }
+        }
+        else
+        {
+            if( mVaoPerLod[1].empty() || mVaoPerLod[1][0] != mSubMesh->mVao[1][0] )
+            {
+                //Restore the optimized shadow mapping buffers.
+                mVaoPerLod[1] = mSubMesh->mVao[1];
+            }
+        }
+
+        Renderable::_setHlmsHashes( hash, casterHash );
     }
     //-----------------------------------------------------------------------
     const LightList& SubItem::getLights(void) const

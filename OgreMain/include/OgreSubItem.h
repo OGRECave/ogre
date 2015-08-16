@@ -83,17 +83,11 @@ namespace Ogre {
         unsigned char   mMaterialLodIndex;
 
     public:
-        /** Sets a Material to be used.
-            @remarks
-                By default a SubItem uses the default Material that the SubMesh
-                uses. This call can alter that so that the Material is different
-                for this instance.
-        */
-        virtual void setMaterial( const MaterialPtr& material );
-
         /** Accessor method to read mesh data.
         */
         SubMesh* getSubMesh(void) const;
+
+        virtual void _setHlmsHashes( uint32 hash, uint32 casterHash );
 
         /** Accessor to get parent Item */
         Item* getParent(void) const { return mParentItem; }

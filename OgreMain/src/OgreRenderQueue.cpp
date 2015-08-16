@@ -243,7 +243,9 @@ namespace Ogre
         if( isV1 )
         {
             v1::RenderOperation op;
-            pRend->getRenderOperation( op, casterPass ); //TODO
+            //v2 objects cache the alpha testing information. v1 is evaluated in realtime.
+            pRend->getRenderOperation( op,
+                                       casterPass & (datablock->getAlphaTest() == CMPF_ALWAYS_PASS) );
             meshHash = op.meshIndex;
         }
         else
@@ -467,11 +469,12 @@ namespace Ogre
         while( itor != end )
         {
             const QueuedRenderable &queuedRenderable = *itor;
-            v1::RenderOperation op;
-            queuedRenderable.renderable->getRenderOperation( op, casterPass );
             /*uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                            queuedRenderable.renderable->getHlmsHash();*/
             const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
+            v1::RenderOperation op;
+            queuedRenderable.renderable->getRenderOperation(
+                        op, casterPass & (datablock->getAlphaTest() == CMPF_ALWAYS_PASS) );
 
             if( lastMacroblock != datablock->mMacroblock[casterPass] )
             {
@@ -703,10 +706,11 @@ namespace Ogre
         {
             const QueuedRenderable &queuedRenderable = *itor;
 
-            v1::RenderOperation renderOp;
-            queuedRenderable.renderable->getRenderOperation( renderOp, casterPass );
-
             const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
+
+            v1::RenderOperation renderOp;
+            queuedRenderable.renderable->getRenderOperation(
+                        renderOp, casterPass & (datablock->getAlphaTest() == CMPF_ALWAYS_PASS) );
 
             if( lastMacroblock != datablock->mMacroblock[casterPass] )
             {
@@ -838,7 +842,8 @@ namespace Ogre
 
         const QueuedRenderable queuedRenderable( 0, pRend, pMovableObject );
         v1::RenderOperation op;
-        queuedRenderable.renderable->getRenderOperation( op, casterPass );
+        queuedRenderable.renderable->getRenderOperation(
+                    op, casterPass & (datablock->getAlphaTest() == CMPF_ALWAYS_PASS) );
         /*uint32 hlmsHash = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                        queuedRenderable.renderable->getHlmsHash();*/
 

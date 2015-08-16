@@ -560,6 +560,17 @@ namespace Ogre
             }
 
             setProperty( PbsProperty::NumTextures, maxUsedTexture + 1 );
+
+            //Set the blending mode as a piece again
+            for( size_t i=0; i<4; ++i )
+            {
+                uint8 blendMode = datablock->mBlendModes[i];
+                if( !datablock->getTexture( PBSM_DETAIL0 + i ).isNull() )
+                {
+                    inOutPieces[PixelShader][*PbsProperty::BlendModes[i]] =
+                                                    "@insertpiece( " + c_pbsBlendModes[blendMode] + ")";
+                }
+            }
         }
 
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );

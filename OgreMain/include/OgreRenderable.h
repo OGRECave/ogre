@@ -445,7 +445,7 @@ namespace Ogre {
         virtual void setDatablock( HlmsDatablock *datablock );
 
         /// Manually sets the hlms hashes. Don't call this directly
-        void _setHlmsHashes( uint32 hash, uint32 casterHash );
+        virtual void _setHlmsHashes( uint32 hash, uint32 casterHash );
 
         uint8 getCurrentMaterialLod(void) const { return mCurrentMaterialLod; }
 

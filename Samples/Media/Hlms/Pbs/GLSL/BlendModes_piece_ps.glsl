@@ -90,7 +90,7 @@
 						  abs(diffuseCol.xyz - detailCol@value(t).xyz),
 						  detailCol@value(t).a );
 @end
-@end @property( !hlms_shadowcaster )
+@end @property( hlms_shadowcaster )
 
 @piece( NormalNonPremul )
 	//Normal Non Premultiplied @value(t)
