@@ -974,43 +974,12 @@ void FFPTexturing::setTextureUnit(unsigned short index, TextureUnitState* textur
             "FFPTexturing::setTextureUnit");
     }
 
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_VERTEX)
-    {
+    if (!isProcessingNeeded(textureUnitState))
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support vertex texture fetch !!!",
+            "FFP Texture unit does not support texture fetch for the requested shader.",
             "FFPTexturing::setTextureUnit");
-    }
-    
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_GEOMETRY)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support geometry texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_COMPUTE)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support comput texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support domain texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
-
-    if (textureUnitState->getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
-    {
-        OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-            "FFP Texture unit does not support hull texture fetch !!!",
-            "FFPTexturing::setTextureUnit");
-    }
 
     TextureUnitParams& curParams = mTextureUnitParamsList[index];
-
 
     curParams.mTextureSamplerIndex = index;
     curParams.mTextureUnitState    = textureUnitState;
@@ -1056,6 +1025,7 @@ bool FFPTexturing::isProcessingNeeded(TextureUnitState* texUnitState)
     return texUnitState->getBindingType() == TextureUnitState::BT_FRAGMENT;
 }
 
+//-----------------------------------------------------------------------
 
 bool FFPTexturing::resolveSamplerParams( TextureUnitParams* textureUnitParams, ProgramSet* programSet )
 {
