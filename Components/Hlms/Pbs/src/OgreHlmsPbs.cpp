@@ -1152,7 +1152,8 @@ namespace Ogre
 
         //Don't bind the material buffer on caster passes (important to keep
         //MDI & auto-instancing running on shadow map passes)
-        if( mLastBoundPool != datablock->getAssignedPool() && !casterPass )
+        if( mLastBoundPool != datablock->getAssignedPool() &&
+            (!casterPass || datablock->getAlphaTest() != CMPF_ALWAYS_PASS) )
         {
             //layout(binding = 1) uniform MaterialBuf {} materialArray
             const ConstBufferPool::BufferPool *newPool = datablock->getAssignedPool();
