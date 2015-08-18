@@ -93,6 +93,12 @@ protected:
 	/// Texture sampler stae for the z-direction planar mapping part.
 	UniformParameterPtr mSamplerFromZState;
     
+    /// Vertex shader input diffuse colour.
+    ParameterPtr mVSInDiffuse;
+
+    /// Vertex shader output diffuse colour.
+    ParameterPtr mVSOutDiffuse;
+
     /// Pixel shader input diffuse colour.
     ParameterPtr mPSInDiffuse;
 

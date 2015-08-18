@@ -48,8 +48,11 @@ namespace RTShader {
 		Function* vsMain = vsProgram->getEntryPointFunction();
 		Function* psMain = psProgram->getEntryPointFunction();
 
-		// Resolve pixel shader output diffuse color.
-		mPSInDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+        // Resolve input vertex shader diffuse color.
+        mVSInDiffuse = vsMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
+
+        // Resolve output vertex shader diffuse color.
+        mVSOutDiffuse = vsMain->resolveOutputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 
 		// Resolve input vertex shader normal.
 		mVSInNormal = vsMain->resolveInputParameter(Parameter::SPS_NORMAL, 0, Parameter::SPC_NORMAL_OBJECT_SPACE, GCT_FLOAT3);
@@ -57,7 +60,7 @@ namespace RTShader {
 		// Resolve output vertex shader normal.
 		mVSOutNormal = vsMain->resolveOutputParameter(Parameter::SPS_TEXTURE_COORDINATES, -1, Parameter::SPC_NORMAL_VIEW_SPACE, GCT_FLOAT3);
 
-		// Resolve pixel shader output diffuse color.
+		// Resolve input pixel shader diffuse color.
 		mPSInDiffuse = psMain->resolveInputParameter(Parameter::SPS_COLOR, 0, Parameter::SPC_COLOR_DIFFUSE, GCT_FLOAT4);
 
 		// Resolve input pixel shader normal.
@@ -136,7 +139,13 @@ namespace RTShader {
         bool isHLSL = ShaderGenerator::getSingleton().getTargetLanguage() == "hlsl";
 		int internalCounter = 0;
 
-		FunctionInvocation *curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING, internalCounter++);
+        FunctionInvocation *curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING, internalCounter++);
+        curFuncInvocation->pushOperand(mVSInDiffuse, Operand::OPS_IN);
+        curFuncInvocation->pushOperand(mVSOutDiffuse, Operand::OPS_OUT);
+        vsMain->addAtomInstance(curFuncInvocation);
+
+
+		curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_ASSIGN, FFP_VS_TEXTURING, internalCounter++);
 		curFuncInvocation->pushOperand(mVSInNormal, Operand::OPS_IN);
 		curFuncInvocation->pushOperand(mVSOutNormal, Operand::OPS_OUT);
 		vsMain->addAtomInstance(curFuncInvocation);
