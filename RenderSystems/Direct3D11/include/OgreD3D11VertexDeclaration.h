@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre { 
 
+
     /** Specialisation of VertexDeclaration for D3D11 */
     class D3D11VertexDeclaration : public VertexDeclaration
     {
@@ -41,10 +42,10 @@ namespace Ogre {
         D3D11Device & mlpD3DDevice;
 
         bool mNeedsRebuild;
-
+        typedef vector<D3D11_INPUT_ELEMENT_DESC>::type VecD3D11InputElementDesc;
         typedef map<D3D11HLSLProgram*, ID3D11InputLayout*>::type ShaderToILayoutMap;
         typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
-        typedef map<D3D11HLSLProgram*, D3D11_INPUT_ELEMENT_DESC*>::type ShaderToInputDesc;
+        typedef map<D3D11HLSLProgram*, VecD3D11InputElementDesc>::type ShaderToInputDesc;
         typedef ShaderToInputDesc::iterator ShaderToInputDescIterator;
 
         ShaderToInputDesc  mD3delems;
@@ -82,7 +83,7 @@ namespace Ogre {
             VertexElementSemantic semantic, unsigned short index = 0);
 
 
-        D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
+        const VecD3D11InputElementDesc& getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
         void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 
         /** Internal method to find a vertex element that matches a D3D11_SIGNATURE_PARAMETER_DESC*/

@@ -54,17 +54,6 @@ namespace Ogre {
             }
         }
 
-        {
-            ShaderToInputDescIterator iter = mD3delems.begin();
-            ShaderToInputDescIterator iterE = mD3delems.end();
-            for( ; iter != iterE ; iter++ )
-            {
-                SAFE_DELETE_ARRAY(iter->second);
-
-            }
-        }
-
-
     }
     //-----------------------------------------------------------------------
     const VertexElement& D3D11VertexDeclaration::addElement(unsigned short source, 
@@ -109,15 +98,14 @@ namespace Ogre {
         mNeedsRebuild = true;
     }
     //-----------------------------------------------------------------------
-    D3D11_INPUT_ELEMENT_DESC * D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
+    const D3D11VertexDeclaration::VecD3D11InputElementDesc& D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
         // Create D3D elements
         size_t iNumElements = boundVertexProgram->getNumInputs();
-        size_t iNumInputElements = boundVertexProgram->getNumOfVertexInputs();
         
         ShaderToInputDescIterator itElement = mD3delems.find(boundVertexProgram);
 
-        D3D11_INPUT_ELEMENT_DESC* d3delems = NULL;
+        VecD3D11InputElementDesc d3delems;
 
         if (itElement != mD3delems.end())
         {
@@ -126,12 +114,10 @@ namespace Ogre {
         }
         else
         {
-            d3delems = new D3D11_INPUT_ELEMENT_DESC[iNumInputElements];
-            ZeroMemory(d3delems, sizeof(D3D11_INPUT_ELEMENT_DESC) * iNumInputElements);
-
-            for (unsigned int idx = 0, elementIndex = 0; idx < iNumElements; idx++)
+            for (unsigned int idx = 0 ; idx < iNumElements; idx++)
             {
                 D3D11_SIGNATURE_PARAMETER_DESC inputDesc = boundVertexProgram->getInputParamDesc(idx);
+                
                 //If it's a system variable don't bind to vertex input.
                 if (inputDesc.SystemValueType != D3D_NAME_UNDEFINED)
                 {
@@ -161,24 +147,26 @@ namespace Ogre {
 
 					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,ss.str().c_str(),
                         "D3D11VertexDeclaration::getD3DVertexDeclaration");
-
                 }
 
-                fillInputElement(inputDesc, it, foundIter->second, d3delems[elementIndex]);
-                elementIndex++;
+                d3delems.push_back(D3D11_INPUT_ELEMENT_DESC());
+
+                fillInputElement(inputDesc, it, foundIter->second,  d3delems[d3delems.size() - 1]);
             }
-            
+
+            assert("Vertex decleration number fo elements must match the number of vertex shader inputs"
+                && d3delems.size() == boundVertexProgram->getNumOfVertexInputs());
             mD3delems[boundVertexProgram] = d3delems;
 
         }
-        return d3delems;
+        return mD3delems[boundVertexProgram];
     }
     //-----------------------------------------------------------------------
     ID3D11InputLayout*  D3D11VertexDeclaration::getILayoutByShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
         ShaderToILayoutMapIterator foundIter = mShaderToILayoutMap.find(boundVertexProgram);
 
-        ID3D11InputLayout*  pVertexLayout = 0; 
+        ID3D11InputLayout*  pVertexLayout = NULL;
 
         if (foundIter == mShaderToILayoutMap.end())
         {
@@ -187,14 +175,11 @@ namespace Ogre {
             DWORD dwShaderFlags = 0;
             const MicroCode &  vSBuf = boundVertexProgram->getMicroCode();
 
-            D3D11_INPUT_ELEMENT_DESC * pVertexDecl = getD3DVertexDeclaration(boundVertexProgram, binding);
-
-            // bad bug tracing. see what will happen next.
-            //if (pVertexDecl->Format == DXGI_FORMAT_R16G16_SINT)
-            //  pVertexDecl->Format = DXGI_FORMAT_R16G16_FLOAT;
+            const VecD3D11InputElementDesc& vertexDecl = getD3DVertexDeclaration(boundVertexProgram, binding);
+            
             HRESULT hr = mlpD3DDevice->CreateInputLayout(
-                pVertexDecl,
-                boundVertexProgram->getNumOfVertexInputs(),
+                &vertexDecl[0],
+                vertexDecl.size(),
                 &vSBuf[0], 
                 vSBuf.size(),
                 &pVertexLayout );
