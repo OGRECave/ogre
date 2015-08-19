@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreShaderGenerator.h"
 
 #define FFP_FUNC_PIXELFOG_POSITION_DEPTH                        "FFP_PixelFog_PositionDepth"
+#include <OgreShaderFFPTexturing.h>
 
 using namespace Ogre;
 using namespace RTShader;
@@ -180,6 +181,12 @@ bool RTShaderSRSTexturedFog::resolveParameters(ProgramSet* programSet)
     mBackgroundTextureSampler = psProgram->resolveParameter(GCT_SAMPLERCUBE, mBackgroundSamplerIndex, (uint16)GPV_GLOBAL, "FogBackgroundSampler");
     if (mBackgroundTextureSampler.get() == NULL)
         return false;
+
+    bool isHLSL4 = ShaderGenerator::getSingletonPtr()->IsHlsl4();
+
+    if (isHLSL4)
+        mBackgroundTextureSamplerState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mBackgroundSamplerIndex, (uint16)GPV_GLOBAL, "FogBackgroundSamplerState");
+
     
         
     return true;
@@ -223,11 +230,24 @@ bool RTShaderSRSTexturedFog::addFunctionInvocations(ProgramSet* programSet)
     curFuncInvocation->pushOperand(mVSInPos, Operand::OPS_IN);  
     curFuncInvocation->pushOperand(mVSOutPosView, Operand::OPS_OUT);    
     curFuncInvocation->pushOperand(mVSOutDepth, Operand::OPS_OUT);  
-    vsMain->addAtomInstance(curFuncInvocation);     
-    
+    vsMain->addAtomInstance(curFuncInvocation);
+
+
+
     internalCounter = 0;
+    bool isHlsl = ShaderGenerator::getSingletonPtr()->getTargetLanguage() == "hlsl";
+    if (isHlsl)
+    {
+        FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mBackgroundTextureSampler, mBackgroundTextureSamplerState, psMain, FFP_PS_FOG, internalCounter);
+    }
+    
     curFuncInvocation = OGRE_NEW FunctionInvocation(FFP_FUNC_SAMPLE_TEXTURE, FFP_PS_FOG, internalCounter++);
-    curFuncInvocation->pushOperand(mBackgroundTextureSampler, Operand::OPS_IN);
+
+        curFuncInvocation->pushOperand( isHlsl ?
+            FFPTexturing::hlsl_GetSamplerWrapperParam(mBackgroundTextureSampler,psMain)
+            : mBackgroundTextureSampler
+            , Operand::OPS_IN);
+    
     curFuncInvocation->pushOperand(mPSInPosView, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mFogColour, Operand::OPS_OUT);
     psMain->addAtomInstance(curFuncInvocation);

@@ -120,7 +120,7 @@ void SL_Light_Ambient_Diffuse(
 void SL_Light_Segment_Texture_Ambient_Diffuse(
 				    in float3 vNormal,
 				    in float3 vViewPos,
-				    in sampler2D dataTexture,
+				    in SamplerData2D dataTexture,
 				    in float2 lightIndexLimit,
 					in float4 lightBounds,
 					in float invWidth,
@@ -134,20 +134,19 @@ void SL_Light_Segment_Texture_Ambient_Diffuse(
 	indexes = clamp(indexes,0,8);
 	int index = (int)indexes.x + (int)(indexes.y) * 9;
 	widthOffset += invWidth * 3 * index;
-	
-	float4 indexBounds = tex2Dlod(dataTexture, float4(widthOffset,heightOffset,0,0));
+	float4 indexBounds = FFP_SampleTextureLOD(dataTexture,float2(widthOffset,heightOffset),0);
 	int toIndex = min(lightIndexLimit.y, indexBounds.x);
 	for(int i = lightIndexLimit.x; i <= toIndex; ++i)
 	{
 		float heightCoord = heightOffset + invHeight * i;
-		float4 dat1 = tex2Dlod(dataTexture, float4(widthOffset,heightCoord,0,0));
+		float4 dat1 = FFP_SampleTextureLOD(dataTexture, float2(widthOffset,heightCoord),0);
 		
 		float3 vLightView  = dat1.xyz - vViewPos;
 		float fLightDist = length(vLightView);
 		if (fLightDist * dat1.w < 1)
 		{
-			float4 dat2 = tex2Dlod(dataTexture, float4(widthOffset + invWidth,heightCoord,0,0));
-			float4 dat3 = tex2Dlod(dataTexture, float4(widthOffset + invWidth * 2,heightCoord,0,0));
+			float4 dat2 = FFP_SampleTextureLOD(dataTexture, float2(widthOffset + invWidth,heightCoord),0);
+			float4 dat3 = FFP_SampleTextureLOD(dataTexture, float2(widthOffset + invWidth * 2,heightCoord),0);
 			SL_Light_Ambient_Diffuse_Inner(vNormal, vLightView, fLightDist, dat2.xyz, float3(dat1.w, dat2.w, dat3.w), dat3.xyz, vColorOut);
 		}
 	}
@@ -157,7 +156,7 @@ void SL_Light_Segment_Texture_Ambient_Diffuse(
 void SL_Light_Segment_Debug(
 				    in float3 vNormal,
 				    in float3 vViewPos,
-				    in sampler2D dataTexture,
+				    in SamplerData2D dataTexture,
 				    in float2 lightIndexLimit,
 					in float4 lightBounds,
 					in float invWidth,
@@ -170,7 +169,7 @@ void SL_Light_Segment_Debug(
 	float2 indexes = (vViewPos.xz - lightBounds.xy) * lightBounds.zw;
 	indexes = clamp(indexes,0,8);
 	int index = (int)indexes.x + (int)(indexes.y) * 9;
-	float4 indexBounds = tex2Dlod(dataTexture, float4(widthOffset,heightOffset,0,0));
+	float4 indexBounds = FFP_SampleTextureLOD(dataTexture, float2(widthOffset,heightOffset),0);
 	
 	float2 debugColors = vColorOut.xy * 0.5 + ((fmod(floor(indexes.xy),2) == 0) ? 0.1 : 0.2);
 	vColorOut.xy =  debugColors;

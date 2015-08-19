@@ -143,6 +143,8 @@ protected:
     ParameterPtr mPSOutDiffuse;         
     //Background color texture parameter
     ParameterPtr mBackgroundTextureSampler; 
+    //Background color texture parameter
+    ParameterPtr mBackgroundTextureSamplerState;
     
 };
 

@@ -19,6 +19,7 @@
 #define SL_FUNC_LIGHT_AMBIENT_DIFFUSE               "SL_Light_Ambient_Diffuse"
 #define SL_FUNC_LIGHT_SEGMENT_TEXTURE_AMBIENT_DIFFUSE   "SL_Light_Segment_Texture_Ambient_Diffuse"
 #define SL_FUNC_LIGHT_SEGMENT_DEBUG             "SL_Light_Segment_Debug"
+#include <OgreShaderFFPTexturing.h>
 
 using namespace Ogre;
 using namespace Ogre::RTShader;
@@ -374,6 +375,12 @@ bool RTShaderSRSSegmentedLights::resolveGlobalParameters(ProgramSet* programSet)
     {
         mPSLightTextureIndexLimit = psProgram->resolveParameter(GCT_FLOAT2, -1, (uint16)GPV_PER_OBJECT, "LightTextureIndexLimits");
         mPSLightTextureLightBounds = psProgram->resolveParameter(GCT_FLOAT4, -1, (uint16)GPV_PER_OBJECT, "LightTextureBounds");
+        bool isHLSL4 = ShaderGenerator::getSingletonPtr()->IsHlsl4();
+
+        if (isHLSL4)
+        {
+            mPSSegmentedLightTextureState = psProgram->resolveParameter(GCT_SAMPLER_STATE, mLightSamplerIndex, (uint16)GPV_GLOBAL, "segmentedLightTextureState");
+        }
         mPSSegmentedLightTexture = psProgram->resolveParameter(Ogre::GCT_SAMPLER2D, mLightSamplerIndex, (Ogre::uint16)Ogre::GPV_GLOBAL, "segmentedLightTexture");
     }
 
@@ -456,9 +463,11 @@ bool RTShaderSRSSegmentedLights::resolveDependencies(ProgramSet* programSet)
     Program* psProgram = programSet->getCpuFragmentProgram();
 
     vsProgram->addDependency(FFP_LIB_COMMON);
+    vsProgram->addDependency(FFP_LIB_TEXTURING);
     vsProgram->addDependency(SL_LIB_PERPIXELLIGHTING);
 
     psProgram->addDependency(FFP_LIB_COMMON);
+    psProgram->addDependency(FFP_LIB_TEXTURING);
     psProgram->addDependency(SL_LIB_PERPIXELLIGHTING);
 
     return true;
@@ -746,11 +755,20 @@ bool RTShaderSRSSegmentedLights::addPSSegmentedTextureLightInvocation(Function* 
     ParameterPtr paramInvWidth = ParameterFactory::createConstParamFloat(invWidth);
     ParameterPtr paramInvHeight = ParameterFactory::createConstParamFloat(invHeight);
 
+    bool isHlsl = ShaderGenerator::getSingletonPtr()->getTargetLanguage() == "hlsl";
+    if (isHlsl)
+    {
+        FFPTexturing::hlsl_AddTextureSampleWrapperInvocation(mPSSegmentedLightTexture, mPSSegmentedLightTextureState, psMain, groupOrder, internalCounter);
+    }
+
     FunctionInvocation* curFuncInvocation = NULL;   
     curFuncInvocation = OGRE_NEW FunctionInvocation(SL_FUNC_LIGHT_SEGMENT_TEXTURE_AMBIENT_DIFFUSE, groupOrder, internalCounter++);                      
     curFuncInvocation->pushOperand(mPSLocalNormal, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSInWorldPos, Operand::OPS_IN);
-    curFuncInvocation->pushOperand(mPSSegmentedLightTexture, Operand::OPS_IN);
+    curFuncInvocation->pushOperand(isHlsl ?
+        FFPTexturing::hlsl_GetSamplerWrapperParam(mPSSegmentedLightTexture, psMain) :
+        mPSSegmentedLightTexture
+        , Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSLightTextureIndexLimit, Operand::OPS_IN);
     curFuncInvocation->pushOperand(mPSLightTextureLightBounds, Operand::OPS_IN);
     curFuncInvocation->pushOperand(paramInvWidth, Operand::OPS_IN);
@@ -766,7 +784,10 @@ bool RTShaderSRSSegmentedLights::addPSSegmentedTextureLightInvocation(Function* 
         curDebugFuncInvocation = OGRE_NEW FunctionInvocation(SL_FUNC_LIGHT_SEGMENT_DEBUG, FFP_PS_COLOUR_END + 1, internalCounter++);                        
         curDebugFuncInvocation->pushOperand(mPSLocalNormal, Operand::OPS_IN);
         curDebugFuncInvocation->pushOperand(mPSInWorldPos, Operand::OPS_IN);
-        curDebugFuncInvocation->pushOperand(mPSSegmentedLightTexture, Operand::OPS_IN);
+        curFuncInvocation->pushOperand(isHlsl ?
+            FFPTexturing::hlsl_GetSamplerWrapperParam(mPSSegmentedLightTexture, psMain) :
+            mPSSegmentedLightTexture
+            , Operand::OPS_IN);
         curDebugFuncInvocation->pushOperand(mPSLightTextureIndexLimit, Operand::OPS_IN);
         curDebugFuncInvocation->pushOperand(mPSLightTextureLightBounds, Operand::OPS_IN);
         curDebugFuncInvocation->pushOperand(paramInvWidth, Operand::OPS_IN);
