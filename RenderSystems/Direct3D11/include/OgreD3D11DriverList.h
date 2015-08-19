@@ -29,8 +29,7 @@ THE SOFTWARE.
 #define __D3D11DRIVERLIST_H__
 
 #include "OgreD3D11Prerequisites.h"
-
-
+#include "OgreSharedPtr.h"
 
 namespace Ogre 
 {
@@ -48,8 +47,8 @@ namespace Ogre
         BOOL enumerate(IDXGIFactoryN* pDXGIFactory);
 
     private:
-        vector<D3D11Driver*>::type mDriverList;
-        unsigned                   mHiddenDriversCount;
+        vector<SharedPtr<D3D11Driver> >::type mDriverList;
+        unsigned mHiddenDriversCount;
     };
 }
 #endif

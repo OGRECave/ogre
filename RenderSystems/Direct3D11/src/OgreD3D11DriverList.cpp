@@ -41,12 +41,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     D3D11DriverList::~D3D11DriverList(void)
     {
-        for(unsigned i = 0; i < mDriverList.size(); i++)
-        {
-            delete (mDriverList[i]);
-        }
         mDriverList.clear();
-
     }
     //-----------------------------------------------------------------------
     BOOL D3D11DriverList::enumerate(IDXGIFactoryN*  pDXGIFactory)
@@ -57,8 +52,8 @@ namespace Ogre
 
         for( UINT iAdapter=0; ; iAdapter++ )
         {
-            IDXGIAdapterN* pDXGIAdapter = NULL;
-            HRESULT hr = pDXGIFactory->EnumAdapters1( iAdapter, &pDXGIAdapter );
+            ComPtr<IDXGIAdapterN> pDXGIAdapter;
+            HRESULT hr = pDXGIFactory->EnumAdapters1(iAdapter, pDXGIAdapter.GetAddressOf());
             if( DXGI_ERROR_NOT_FOUND == hr )
             {
                 hr = S_OK;
@@ -66,13 +61,12 @@ namespace Ogre
             }
             if( FAILED(hr) )
             {
-                SAFE_RELEASE(pDXGIAdapter);
                 return false;
             }
 
-            // we don't want NVIDIA PerfHUD in the list, so place it to the hidden part of drivers list
-            D3D11Driver* driver = new D3D11Driver(iAdapter, pDXGIAdapter);
+            SharedPtr<D3D11Driver> driver(OGRE_NEW_T(D3D11Driver, MEMCATEGORY_GENERAL)(iAdapter, pDXGIAdapter.Get()), SPFM_DELETE_T);
 
+            // we don't want NVIDIA PerfHUD in the list, so place it to the hidden part of drivers list
             const bool isHidden = wcscmp(driver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD") == 0;
             if(isHidden)
             {
@@ -83,8 +77,6 @@ namespace Ogre
             {
                 mDriverList.insert(mDriverList.end() - mHiddenDriversCount, driver);
             }
-
-            SAFE_RELEASE(pDXGIAdapter);
         }
 
         LogManager::getSingleton().logMessage( "D3D11: Driver Detection Ends" );
@@ -99,19 +91,19 @@ namespace Ogre
     //-----------------------------------------------------------------------
     D3D11Driver* D3D11DriverList::item( size_t index )
     {
-        return mDriverList.at( index );
+        return mDriverList.at( index ).get();
     }
     //-----------------------------------------------------------------------
     D3D11Driver* D3D11DriverList::item( const String &name )
     {
-        vector<D3D11Driver*>::type::iterator it = mDriverList.begin();
+        vector<SharedPtr<D3D11Driver> >::type::iterator it = mDriverList.begin();
         if (it == mDriverList.end())
             return NULL;
 
         for (;it != mDriverList.end(); ++it)
         {
             if ((*it)->DriverDescription() == name)
-                return (*it);
+                return (*it).get();
         }
 
         return NULL;
