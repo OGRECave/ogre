@@ -88,32 +88,28 @@ namespace Ogre
         return D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        ID3D11Device * device = NULL;
-        ID3D11DeviceContext * context = NULL;
-        ID3D11DeviceN * deviceN = NULL;
-        ID3D11DeviceContextN * contextN = NULL;
+        ComPtr<ID3D11Device> device;
+        ComPtr<ID3D11DeviceContext> context;
+        ComPtr<ID3D11DeviceN> deviceN;
+        ComPtr<ID3D11DeviceContextN> contextN;
         D3D_FEATURE_LEVEL featureLevel;
+        HRESULT mainHr, hr;
 
-        HRESULT hr = D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, 
-                                        (ppDevice ? &device : NULL), &featureLevel, (ppImmediateContext ? &context : NULL));
-        if(FAILED(hr)) goto bail;
+        mainHr = hr = D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion,
+                                        (ppDevice ? device.GetAddressOf() : NULL), &featureLevel, (ppImmediateContext ? context.GetAddressOf() : NULL));
+        if(FAILED(hr)) return hr;
 
-        hr = device ? device->QueryInterface(__uuidof(ID3D11DeviceN), (void **)&deviceN) : hr;
-        if(FAILED(hr)) goto bail;
+        hr = device ? device.As(&deviceN) : S_OK;
+        if(FAILED(hr)) return hr;
 
-        hr = context ? context->QueryInterface(__uuidof(ID3D11DeviceContextN), (void **)&contextN) : hr;
-        if(FAILED(hr)) goto bail;
+        hr = context ? context.As(&contextN) : S_OK;
+        if(FAILED(hr)) return hr;
 
-        if(ppDevice)            { *ppDevice = deviceN; deviceN = NULL; }
-        if(pFeatureLevel)       { *pFeatureLevel = featureLevel; }
-        if(ppImmediateContext)  { *ppImmediateContext = contextN; contextN = NULL; }
+        if(ppDevice)            *ppDevice = deviceN.Detach();
+        if(pFeatureLevel)       *pFeatureLevel = featureLevel;
+        if(ppImmediateContext)  *ppImmediateContext = contextN.Detach();
 
-bail:
-        SAFE_RELEASE(deviceN);
-        SAFE_RELEASE(contextN);
-        SAFE_RELEASE(device);
-        SAFE_RELEASE(context);
-        return hr;
+        return mainHr;
 #endif
     }
 
@@ -608,7 +604,8 @@ bail:
         if (driver)
         {
             it = mOptions.find("Video Mode");
-            ID3D11DeviceN* device = createD3D11Device(driver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, NULL);
+            ComPtr<ID3D11DeviceN> device;
+            device.Attach(createD3D11Device(driver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, NULL));
             D3D11VideoMode* videoMode = driver->getVideoModeList()->item(it->second.currentValue); // Could be NULL if working over RDP/Simulator
             DXGI_FORMAT format = videoMode ? videoMode->getFormat() : DXGI_FORMAT_R8G8B8A8_UNORM;
             UINT numLevels = 0;
@@ -638,7 +635,6 @@ bail:
                         optFSAA->possibleValues.push_back("16 [Quality]");
                 }
             }
-            SAFE_RELEASE(device);
         }
 
         if(optFSAA->possibleValues.empty())
