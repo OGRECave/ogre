@@ -353,6 +353,8 @@ namespace v1 {
 
         if( !mesh->hasIndependentShadowMappingVaos() )
             prepareForShadowMapping( true );
+
+        setSkeletonName( mesh->getSkeletonName() );
     }
     //-----------------------------------------------------------------------
     void Mesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )

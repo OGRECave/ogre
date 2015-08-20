@@ -53,6 +53,7 @@ namespace Ogre
     {
         assert( mUploadOnly );
 
+        mMappingStart = 0;
         mMappingCount = sizeBytes;
 
         mMappedPtr = mNullDataPtr + mInternalBufferStart + mMappingStart;

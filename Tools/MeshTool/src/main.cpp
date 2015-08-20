@@ -1036,6 +1036,9 @@ void saveMesh( const String &destination, v1::MeshPtr &v1Mesh, MeshPtr &v2Mesh,
                                                                        ResourceGroupManager::
                                                                        DEFAULT_RESOURCE_GROUP_NAME );
                 v1Mesh->importV2( v2Mesh.get() );
+
+                if( v1Mesh->hasSkeleton() )
+                    vertexBufferReorg( *v1Mesh.get() );
             }
 
             cout << "Saving as a v1 mesh..." << endl;
