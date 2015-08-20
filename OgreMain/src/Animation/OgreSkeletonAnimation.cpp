@@ -110,6 +110,24 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void SkeletonAnimation::setFrame( Real frames )
+    {
+        mCurrentFrame = frames;
+        Real maxFrame = mDefinition->mNumFrames;
+
+        if( !mLoop )
+        {
+            mCurrentFrame = Ogre::max( mCurrentFrame, 0 );
+            mCurrentFrame = Ogre::min( mCurrentFrame, maxFrame );
+        }
+        else
+        {
+            mCurrentFrame = fmod( mCurrentFrame, maxFrame );
+            if( mCurrentFrame < 0 )
+                mCurrentFrame = maxFrame - mCurrentFrame;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     Real SkeletonAnimation::getNumFrames(void) const
     {
         return mDefinition->mNumFrames;
