@@ -115,7 +115,7 @@ namespace Ogre {
 
         bool mErrorsInCompile;
         MicroCode mMicroCode;
-        ID3D11Buffer* mConstantBuffer;
+        ComPtr<ID3D11Buffer> mConstantBuffer;
         
         D3D_SHADER_MACRO* mShaderMacros;
         bool shaderMacroSet;
@@ -124,12 +124,12 @@ namespace Ogre {
 
         D3D11VertexDeclaration mInputVertexDeclaration;
 
-        ID3D11VertexShader* mVertexShader;
-        ID3D11PixelShader* mPixelShader;
-        ID3D11GeometryShader* mGeometryShader;
-        ID3D11DomainShader* mDomainShader;
-        ID3D11HullShader* mHullShader;
-        ID3D11ComputeShader* mComputeShader;
+        ComPtr<ID3D11VertexShader> mVertexShader;
+        ComPtr<ID3D11PixelShader> mPixelShader;
+        ComPtr<ID3D11GeometryShader> mGeometryShader;
+        ComPtr<ID3D11DomainShader> mDomainShader;
+        ComPtr<ID3D11HullShader> mHullShader;
+        ComPtr<ID3D11ComputeShader> mComputeShader;
 
         struct ShaderVarWithPosInBuf
         {
