@@ -79,7 +79,8 @@ namespace Ogre
         mRenderSystem( renderSystem ),
         mSharedTriangleFS( 0 ),
         mSharedQuadFS( 0 ),
-        mDummyObjectMemoryManager( 0 )
+        mDummyObjectMemoryManager( 0 ),
+        mCompositorPassProvider( 0 )
     {
         mDummyObjectMemoryManager = new ObjectMemoryManager();
         mSharedTriangleFS   = OGRE_NEW v1::Rectangle2D( false, 0, mDummyObjectMemoryManager, 0 );
