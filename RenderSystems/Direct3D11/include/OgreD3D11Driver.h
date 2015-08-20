@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D11DRIVER_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre
 {
@@ -39,9 +40,9 @@ namespace Ogre
     class D3D11Driver
     {
     private:
+        ComPtr<IDXGIAdapterN> mDXGIAdapter;
         DXGI_ADAPTER_DESC1 mAdapterIdentifier;
-        D3D11VideoModeList* mVideoModeList;
-        IDXGIAdapterN*  mDXGIAdapter;
+        SharedPtr<D3D11VideoModeList> mVideoModeList;
 
     public:
         // Constructors
@@ -49,8 +50,6 @@ namespace Ogre
         D3D11Driver( const D3D11Driver &ob );   // Copy
         D3D11Driver( IDXGIAdapterN* pDXGIAdapter );
         ~D3D11Driver();
-
-        D3D11Driver& operator=(const D3D11Driver& r);
 
         // Information accessors
         String DriverDescription() const;
