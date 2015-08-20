@@ -96,7 +96,7 @@ namespace Ogre
         for( uint32 i=0; i<4096; ++i )
             drawIdPtr[i] = i;
         mDrawId = createVertexBuffer( vertexElements, 4096, BT_IMMUTABLE, drawIdPtr, true );
-        createDelayedImmutableBuffers();
+        createDelayedImmutableBuffers(); //Ensure mDrawId gets allocated before we continue
     }
     //-----------------------------------------------------------------------------------
     D3D11VaoManager::~D3D11VaoManager()
