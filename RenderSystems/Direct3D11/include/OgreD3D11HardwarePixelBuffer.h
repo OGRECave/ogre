@@ -52,7 +52,7 @@ namespace Ogre {
         size_t mSubresourceIndex;
 
         // if the usage is static - alloc at lock then use device UpdateSubresource when unlock and free memory
-        int8 * mDataForStaticUsageLock; 
+        vector<int8>::type mDataForStaticUsageLock; 
 
         size_t mFace;
 
@@ -68,7 +68,7 @@ namespace Ogre {
 
         void createStagingBuffer();
         bool mUsingStagingBuffer;
-        ID3D11Resource *mStagingBuffer;
+        ComPtr<ID3D11Resource> mStagingBuffer;
         
         void _map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box);
         void *_mapstagingbuffer(D3D11_MAP flags);
