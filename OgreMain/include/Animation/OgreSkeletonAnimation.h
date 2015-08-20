@@ -89,6 +89,18 @@ namespace Ogre
         */
         void addFrame( Real frames );
 
+        /** Sets the animation to a particular time.
+        @param time
+            Time to set to, in seconds
+        */
+        void setTime( Real time )                                   { setFrame( time * mFrameRate ); }
+
+        /** Sets the animation to a particular frame.
+        @param frames
+            Frame to set to, in frames
+        */
+        void setFrame( Real frame );
+
         /// Gets the current animation time, in seconds. Prefer using getCurrentFrame
         Real getCurrentTime( Real time ) const                      { return mCurrentFrame / mFrameRate; }
 
