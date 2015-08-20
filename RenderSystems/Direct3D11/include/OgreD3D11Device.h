@@ -36,12 +36,12 @@ namespace Ogre
     class D3D11Device
     {
     private:
-        ID3D11DeviceN*             mD3D11Device;
-        ID3D11DeviceContextN*      mImmediateContext;
-        ID3D11ClassLinkage*        mClassLinkage;
-        ID3D11InfoQueue*           mInfoQueue;
+        ComPtr<ID3D11DeviceN>           mD3D11Device;
+        ComPtr<ID3D11DeviceContextN>    mImmediateContext;
+        ComPtr<ID3D11ClassLinkage>      mClassLinkage;
+        ComPtr<ID3D11InfoQueue>         mInfoQueue;
 #if OGRE_D3D11_PROFILING
-        ID3DUserDefinedAnnotation* mPerf;
+        ComPtr<ID3DUserDefinedAnnotation> mPerf;
 #endif
 
         const D3D11Device& operator=(D3D11Device& device); /* intentionally not implemented */
@@ -53,12 +53,12 @@ namespace Ogre
         void ReleaseAll();
         void TransferOwnership(ID3D11DeviceN* device);
 
-        bool isNull()                                { return mD3D11Device == 0; }
-        ID3D11DeviceN* get()                         { return mD3D11Device; }
-        ID3D11DeviceContextN* GetImmediateContext()  { return mImmediateContext; }
-        ID3D11ClassLinkage* GetClassLinkage()        { return mClassLinkage; }
+        bool isNull()                                { return !mD3D11Device; }
+        ID3D11DeviceN* get()                         { return mD3D11Device.Get(); }
+        ID3D11DeviceContextN* GetImmediateContext()  { return mImmediateContext.Get(); }
+        ID3D11ClassLinkage* GetClassLinkage()        { return mClassLinkage.Get(); }
 #if OGRE_D3D11_PROFILING
-        ID3DUserDefinedAnnotation* GetProfiler()     { return mPerf; }
+        ID3DUserDefinedAnnotation* GetProfiler()     { return mPerf.Get(); }
 #endif
         
         ID3D11DeviceN* operator->() const
@@ -68,7 +68,7 @@ namespace Ogre
             {
                 clearStoredErrorMessages();
             }
-            return mD3D11Device;
+            return mD3D11Device.Get();
         }
 
         String getErrorDescription(const HRESULT hr = NO_ERROR) const;
