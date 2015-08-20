@@ -59,14 +59,14 @@ namespace Ogre {
 		/// @copydoc Texture::getBuffer
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
-		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
+		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex.Get(); }
 		/// retrieves a pointer to the actual texture
-		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView; }
+		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView.Get(); }
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
 
-		ID3D11Texture1D * GetTex1D() { return mp1DTex; };
-		ID3D11Texture2D * GetTex2D() { return mp2DTex; };
-		ID3D11Texture3D	* GetTex3D() { return mp3DTex; };
+		ID3D11Texture1D * GetTex1D() { return mp1DTex.Get(); };
+		ID3D11Texture2D * GetTex2D() { return mp2DTex.Get(); };
+		ID3D11Texture3D	* GetTex3D() { return mp3DTex.Get(); };
 
 		bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
 
@@ -81,22 +81,22 @@ namespace Ogre {
 		D3D11Device	&	mDevice;
 
         // 1D texture pointer
-        ID3D11Texture1D *mp1DTex;
+        ComPtr<ID3D11Texture1D> mp1DTex;
         // 2D texture pointer
-        ID3D11Texture2D *mp2DTex;
+        ComPtr<ID3D11Texture2D> mp2DTex;
         /// cubic texture pointer
-		ID3D11Texture3D	*mp3DTex;
+        ComPtr<ID3D11Texture3D> mp3DTex;
         /// actual texture pointer
-		ID3D11Resource 	*mpTex;
+        ComPtr<ID3D11Resource> mpTex;
 
-        ID3D11ShaderResourceView* mpShaderResourceView;
+        ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
 
         bool mAutoMipMapGeneration;
 
         template<typename fromtype, typename totype>
-        void _queryInterface(fromtype *from, totype **to)
+        void _queryInterface(const ComPtr<fromtype>& from, ComPtr<totype> *to)
         {
-            HRESULT hr = from->QueryInterface(__uuidof(totype), (void **)to);
+            HRESULT hr = from.As(to);
 
             if(FAILED(hr) || mDevice.isError())
             {

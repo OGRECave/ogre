@@ -51,11 +51,6 @@ namespace Ogre
         ManualResourceLoader* loader, D3D11Device & device)
         :Texture(creator, name, handle, group, isManual, loader),
         mDevice(device), 
-        mpTex(NULL),
-        mpShaderResourceView(NULL),
-        mp1DTex(NULL),
-        mp2DTex(NULL),
-        mp3DTex(NULL),
         mDynamicTextures(false),
         mAutoMipMapGeneration(false)
     {
@@ -92,7 +87,7 @@ namespace Ogre
         // get the target
         other = static_cast< D3D11Texture * >( target.get() );
 
-        mDevice.GetImmediateContext()->CopyResource(other->getTextureResource(), mpTex);
+        mDevice.GetImmediateContext()->CopyResource(other->getTextureResource(), mpTex.Get());
         if (mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription();
@@ -147,11 +142,11 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::freeInternalResourcesImpl()
     {
-        SAFE_RELEASE(mpTex);
-        SAFE_RELEASE(mpShaderResourceView);
-        SAFE_RELEASE(mp1DTex);
-        SAFE_RELEASE(mp2DTex);
-        SAFE_RELEASE(mp3DTex);
+        mpTex.Reset();
+        mpShaderResourceView.Reset();
+        mp1DTex.Reset();
+        mp2DTex.Reset();
+        mp3DTex.Reset();
     }
     //---------------------------------------------------------------------
     void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)
@@ -247,7 +242,7 @@ namespace Ogre
                 memoryptr->size(),
                 &loadInfo,
                 NULL, 
-                &mpTex, 
+                mpTex.ReleaseAndGetAddressOf(),
                 NULL );
         }
         else
@@ -257,7 +252,7 @@ namespace Ogre
                 memoryptr->size(),
                 NULL,
                 NULL, 
-                &mpTex, 
+                mpTex.ReleaseAndGetAddressOf(),
                 NULL );
         }
 
@@ -403,7 +398,7 @@ namespace Ogre
         hr = mDevice->CreateTexture1D(  
             &desc,
             NULL,
-            &mp1DTex);                      // data pointer
+            mp1DTex.ReleaseAndGetAddressOf());                      // data pointer
         // check result and except if failed
         if (FAILED(hr) || mDevice.isError())
         {
@@ -434,7 +429,7 @@ namespace Ogre
         mSRVDesc.Format = desc.Format;
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
         mSRVDesc.Texture1D.MipLevels = desc.MipLevels;
-        hr = mDevice->CreateShaderResourceView( mp1DTex, &mSRVDesc, &mpShaderResourceView );
+        hr = mDevice->CreateShaderResourceView(mp1DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf());
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
@@ -536,7 +531,7 @@ namespace Ogre
         hr = mDevice->CreateTexture2D(  
             &desc,
             NULL,// data pointer
-            &mp2DTex);                      
+            mp2DTex.ReleaseAndGetAddressOf());
         // check result and except if failed
         if (FAILED(hr) || mDevice.isError())
         {
@@ -605,7 +600,7 @@ namespace Ogre
             break;
         }
 
-        hr = mDevice->CreateShaderResourceView( mp2DTex, &mSRVDesc, &mpShaderResourceView );
+        hr = mDevice->CreateShaderResourceView(mp2DTex.Get(), &mSRVDesc,mpShaderResourceView.ReleaseAndGetAddressOf());
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
@@ -655,7 +650,7 @@ namespace Ogre
         hr = mDevice->CreateTexture3D(  
             &desc,
             NULL,
-            &mp3DTex);                      // data pointer
+            mp3DTex.ReleaseAndGetAddressOf());                      // data pointer
         // check result and except if failed
         if (FAILED(hr) || mDevice.isError())
         {
@@ -684,7 +679,7 @@ namespace Ogre
         mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
         mSRVDesc.Texture3D.MostDetailedMip = 0;
         mSRVDesc.Texture3D.MipLevels = desc.MipLevels;
-        hr = mDevice->CreateShaderResourceView( mp3DTex, &mSRVDesc, &mpShaderResourceView );
+        hr = mDevice->CreateShaderResourceView(mp3DTex.Get(), &mSRVDesc, mpShaderResourceView.ReleaseAndGetAddressOf());
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
