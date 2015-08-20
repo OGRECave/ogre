@@ -78,7 +78,9 @@ namespace Ogre
         void _createSizeDependedD3DResources();                 // assumes mpBackBuffer is already initialized
         void _destroySizeDependedD3DResources();
 
-        IDXGIDeviceN* _queryDxgiDevice();                       // release after use
+        ComPtr<IDXGIDeviceN> _queryDxgiDevice()                 { ComPtr<IDXGIDeviceN> res; _queryDxgiDeviceImpl(res.GetAddressOf()); return res; }
+        void _queryDxgiDeviceImpl(IDXGIDeviceN** dxgiDevice);   // release after use
+
         void _updateViewportsDimensions();
 
         static DXGI_FORMAT _getGammaFormat(DXGI_FORMAT format, bool appendSRGB);
@@ -94,10 +96,10 @@ namespace Ogre
         DXGI_SAMPLE_DESC mFSAAType;     // Effective FSAA mode, limited by hardware capabilities
 
         // Window size depended resources - must be released before swapchain resize and recreated later
-        ID3D11Texture2D*        mpBackBuffer;
-        ID3D11Texture2D*        mpBackBufferNoMSAA;             // optional, always holds up-to-date copy data from mpBackBuffer if not NULL
-        ID3D11RenderTargetView* mRenderTargetView;
-        ID3D11DepthStencilView* mDepthStencilView;
+        ComPtr<ID3D11Texture2D>         mpBackBuffer;
+        ComPtr<ID3D11Texture2D>         mpBackBufferNoMSAA;     // optional, always holds up-to-date copy data from mpBackBuffer if not NULL
+        ComPtr<ID3D11RenderTargetView>  mRenderTargetView;
+        ComPtr<ID3D11DepthStencilView>  mDepthStencilView;
     };
 
     
@@ -110,7 +112,7 @@ namespace Ogre
         virtual void destroy(void);
 
         /// Get the swapchain details.
-        IDXGISwapChainN* _getSwapChain()                        { return mpSwapChain; }
+        IDXGISwapChainN* _getSwapChain()                        { return mpSwapChain.Get(); }
         DXGI_SWAP_CHAIN_DESC_N* _getSwapChainDescription(void)  { return &mSwapChainDesc; }
         virtual bool _shouldRebindBackBuffer()                  { return mUseFlipSequentialMode; }
 
@@ -138,7 +140,7 @@ namespace Ogre
 
     protected:
         // Pointer to swap chain
-        IDXGISwapChainN*        mpSwapChain;
+        ComPtr<IDXGISwapChainN> mpSwapChain;
         DXGI_SWAP_CHAIN_DESC_N  mSwapChainDesc;
 
         bool                    mUseFlipSequentialMode;         // Flag to determine if the swapchain flip sequential model is enabled. Not supported before Win8.0, required for WinRT.
@@ -241,7 +243,7 @@ namespace Ogre
         virtual void update(bool swapBuffers = true);
         virtual void swapBuffers();
 
-        virtual bool isVisible() const                          { return mImageSourceNative != NULL; }
+        virtual bool isVisible() const                          { return mImageSourceNative.Get() != NULL; }
 
         Windows::UI::Xaml::Media::ImageBrush^ getImageBrush() const { return mBrush; }
         virtual void getCustomAttribute( const String& name, void* pData ); // "ImageBrush" -> Windows::UI::Xaml::Media::ImageBrush^
@@ -252,7 +254,7 @@ namespace Ogre
     protected:
         Windows::UI::Xaml::Media::ImageBrush^                   mBrush;             // size independed
         Windows::UI::Xaml::Media::Imaging::SurfaceImageSource^  mImageSource;       // size depended, can be NULL
-        ISurfaceImageSourceNative*                              mImageSourceNative; // size depended, can be NULL
+        ComPtr<ISurfaceImageSourceNative>                       mImageSourceNative; // size depended, can be NULL
     };
 #endif // !__OGRE_WINRT_PHONE_80
 
