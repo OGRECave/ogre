@@ -37,7 +37,6 @@ namespace Ogre {
         HardwareBuffer::Usage usage, D3D11Device & device, 
         bool useSystemMemory, bool useShadowBuffer, bool streamOut)
         : HardwareBuffer(usage, useSystemMemory,  useShadowBuffer),
-        mlpD3DBuffer(0),
         mpTempStagingBuffer(0),
         mUseTempStagingBuffer(false),
         mBufferType(btype),
@@ -86,7 +85,7 @@ namespace Ogre {
 
         // TODO: we can explicitly initialise the buffer contents here if we like
         // not doing this since OGRE doesn't support this model yet
-        HRESULT hr = device->CreateBuffer( &mDesc, NULL, &mlpD3DBuffer );
+        HRESULT hr = device->CreateBuffer( &mDesc, NULL, mlpD3DBuffer.ReleaseAndGetAddressOf() );
         if (FAILED(hr) || mDevice.isError())
         {
             String msg = device.getErrorDescription(hr);
@@ -106,7 +105,6 @@ namespace Ogre {
     //---------------------------------------------------------------------
     D3D11HardwareBuffer::~D3D11HardwareBuffer()
     {
-        SAFE_RELEASE(mlpD3DBuffer);
         SAFE_DELETE(mpTempStagingBuffer); // should never be nonzero unless destroyed while locked
         SAFE_DELETE(mShadowBuffer);
     }
@@ -118,8 +116,7 @@ namespace Ogre {
         {
             // need to realloc
             mDesc.ByteWidth = static_cast<UINT>(mSizeInBytes);
-            SAFE_RELEASE(mlpD3DBuffer);
-            HRESULT hr = mDevice->CreateBuffer( &mDesc, 0, &mlpD3DBuffer );
+            HRESULT hr = mDevice->CreateBuffer(&mDesc, 0, mlpD3DBuffer.ReleaseAndGetAddressOf());
             if (FAILED(hr) || mDevice.isError())
             {
                 String msg = mDevice.getErrorDescription(hr);
@@ -168,7 +165,7 @@ namespace Ogre {
             D3D11_MAPPED_SUBRESOURCE mappedSubResource;
             mappedSubResource.pData = NULL;
             mDevice.clearStoredErrorMessages();
-            HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer, 0, mapType, 0, &mappedSubResource);
+            HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer.Get(), 0, mapType, 0, &mappedSubResource);
             if (FAILED(hr) || mDevice.isError())
             {
                 String msg = mDevice.getErrorDescription(hr);
@@ -227,7 +224,7 @@ namespace Ogre {
         else
         {
             // unmap
-            mDevice.GetImmediateContext()->Unmap(mlpD3DBuffer, 0);
+            mDevice.GetImmediateContext()->Unmap(mlpD3DBuffer.Get(), 0);
         }
     }
     //---------------------------------------------------------------------
@@ -249,7 +246,7 @@ namespace Ogre {
             length == mSizeInBytes && mSizeInBytes == srcBuffer.getSizeInBytes())
         {
             // schedule hardware buffer copy
-            mDevice.GetImmediateContext()->CopyResource(mlpD3DBuffer, static_cast<D3D11HardwareBuffer&>(srcBuffer).getD3DBuffer());
+            mDevice.GetImmediateContext()->CopyResource(mlpD3DBuffer.Get(), static_cast<D3D11HardwareBuffer&>(srcBuffer).getD3DBuffer());
             if (mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription();
@@ -269,7 +266,7 @@ namespace Ogre {
             srcBox.front = 0;
             srcBox.back = 1;
 
-            mDevice.GetImmediateContext()->CopySubresourceRegion(mlpD3DBuffer, 0, (UINT)dstOffset, 0, 0, 
+            mDevice.GetImmediateContext()->CopySubresourceRegion(mlpD3DBuffer.Get(), 0, (UINT)dstOffset, 0, 0, 
                 static_cast<D3D11HardwareBuffer&>(srcBuffer).getD3DBuffer(), 0, &srcBox);
             if (mDevice.isError())
             {
@@ -314,7 +311,7 @@ namespace Ogre {
         this->unlock();
 
         //What if we try UpdateSubresource
-        //mDevice.GetImmediateContext()->UpdateSubresource(mlpD3DBuffer, 0, NULL, pSource, offset, length);
+        //mDevice.GetImmediateContext()->UpdateSubresource(mlpD3DBuffer.Get(), 0, NULL, pSource, offset, length);
     }
     //---------------------------------------------------------------------
 
