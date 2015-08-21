@@ -1366,7 +1366,7 @@ namespace Ogre
         static_cast<ID3D11Texture2D*>(pBuffer->getParentTexture()->getTextureResource())->GetDesc( &BBDesc );
 
         // Create depth stencil texture
-        ID3D11Texture2D* pDepthStencil = NULL;
+        ComPtr<ID3D11Texture2D> pDepthStencil;
         D3D11_TEXTURE2D_DESC descDepth;
 
         descDepth.Width                 = renderTarget->getWidth();
@@ -1398,7 +1398,7 @@ namespace Ogre
         }
 
 
-        HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
+        HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf() );
         if( FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
@@ -1418,8 +1418,7 @@ namespace Ogre
             viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
-            SAFE_RELEASE(mDSTResView);
-            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &mDSTResView);
+            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil.Get(), &viewDesc, mDSTResView.ReleaseAndGetAddressOf());
             if( FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
@@ -1443,8 +1442,7 @@ namespace Ogre
         descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
                                                                                             // TODO: Decide how to expose this feature
         descDSV.Texture2D.MipSlice = 0;
-        hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &depthStencilView );
-        SAFE_RELEASE( pDepthStencil );
+        hr = mDevice->CreateDepthStencilView( pDepthStencil.Get(), &descDSV, &depthStencilView );
         if( FAILED(hr) )
         {
 			String errorDescription = mDevice.getErrorDescription(hr);
@@ -3033,7 +3031,7 @@ namespace Ogre
                     pRTView,
                     NULL);
 
-                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), &mDSTResView);
+                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), 1, mDSTResView.GetAddressOf());
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
