@@ -27,7 +27,10 @@ namespace Demo
 {
     PbsMaterialsGameState::PbsMaterialsGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
-        mAnimateObjects( true )
+        mAnimateObjects( true ),
+        mNumSpheres( 0 ),
+        mTransparencyMode( Ogre::HlmsPbsDatablock::None ),
+        mTransparencyValue( 1.0f )
     {
         memset( mSceneNode, 0, sizeof(mSceneNode) );
     }
@@ -112,7 +115,7 @@ namespace Demo
         }
 
         {
-            size_t numItems = 0;
+            mNumSpheres = 0;
             Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
             Ogre::HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
 
@@ -131,7 +134,7 @@ namespace Demo
             {
                 for( int z=0; z<numZ; ++z )
                 {
-                    Ogre::String datablockName = "Test" + Ogre::StringConverter::toString( numItems++ );
+                    Ogre::String datablockName = "Test" + Ogre::StringConverter::toString( mNumSpheres++ );
                     Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
                                 hlmsPbs->createDatablock( datablockName,
                                                           datablockName,
@@ -234,6 +237,37 @@ namespace Demo
         outText += (visibilityMask & 0x000000001) ? "[On]" : "[Off]";
         outText += "\nPress F4 to show/hide palette of spheres. ";
         outText += (visibilityMask & 0x000000002) ? "[On]" : "[Off]";
+        outText += "\nPress F5 to toggle transparency mode. ";
+        outText += mTransparencyMode == Ogre::HlmsPbsDatablock::Fade ? "[Fade]" : "[Transparent]";
+        outText += "\n+/- to change transparency. [";
+        outText += Ogre::StringConverter::toString( mTransparencyValue ) + "]";
+    }
+    //-----------------------------------------------------------------------------------
+    void PbsMaterialsGameState::setTransparencyToMaterials(void)
+    {
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+
+        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+
+        Ogre::HlmsPbsDatablock::TransparencyModes mode =
+                static_cast<Ogre::HlmsPbsDatablock::TransparencyModes>( mTransparencyMode );
+
+        if( mTransparencyValue >= 1.0f )
+            mode = Ogre::HlmsPbsDatablock::None;
+
+        if( mTransparencyMode < 1.0f && mode == Ogre::HlmsPbsDatablock::None )
+            mode = Ogre::HlmsPbsDatablock::Transparent;
+
+        for( size_t i=0; i<mNumSpheres; ++i )
+        {
+            Ogre::String datablockName = "Test" + Ogre::StringConverter::toString( i );
+            Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                        hlmsPbs->getDatablock( datablockName ) );
+
+            datablock->setTransparency( mTransparencyValue, mode );
+        }
     }
     //-----------------------------------------------------------------------------------
     void PbsMaterialsGameState::keyReleased( const SDL_KeyboardEvent &arg )
@@ -265,6 +299,33 @@ namespace Demo
             visibilityMask &= ~0x00000002;
             visibilityMask |= (Ogre::uint32)(showPalette) << 1;
             mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
+        }
+        else if( arg.keysym.sym == SDLK_F5 )
+        {
+            mTransparencyMode = mTransparencyMode == Ogre::HlmsPbsDatablock::Fade ?
+                                                            Ogre::HlmsPbsDatablock::Transparent :
+                                                            Ogre::HlmsPbsDatablock::Fade;
+            if( mTransparencyValue != 1.0f )
+                setTransparencyToMaterials();
+        }
+        else if( arg.keysym.scancode == SDL_SCANCODE_KP_PLUS )
+        {
+            if( mTransparencyValue < 1.0f )
+            {
+                mTransparencyValue += 0.1f;
+                mTransparencyValue = Ogre::min( mTransparencyValue, 1.0f );
+                setTransparencyToMaterials();
+            }
+        }
+        else if( arg.keysym.scancode == SDL_SCANCODE_MINUS ||
+                 arg.keysym.scancode == SDL_SCANCODE_KP_MINUS )
+        {
+            if( mTransparencyValue > 0.0f )
+            {
+                mTransparencyValue -= 0.1f;
+                mTransparencyValue = Ogre::max( mTransparencyValue, 0.0f );
+                setTransparencyToMaterials();
+            }
         }
         else
         {

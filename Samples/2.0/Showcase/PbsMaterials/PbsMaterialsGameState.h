@@ -15,7 +15,13 @@ namespace Demo
 
         bool                mAnimateObjects;
 
+        size_t          mNumSpheres;
+        Ogre::uint8     mTransparencyMode;
+        float           mTransparencyValue;
+
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
+
+        void setTransparencyToMaterials(void);
 
     public:
         PbsMaterialsGameState( const Ogre::String &helpDescription );

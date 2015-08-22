@@ -219,7 +219,7 @@ float4 main( PS_INPUT inPs
 	@property( !transparent_mode )
 		diffuseCol.xyz *= material.kD.xyz;
 	@end @property( transparent_mode )
-		diffuseCol.xyz *= material.kD.xyz * diffuseCol.w;
+		diffuseCol.xyz *= material.kD.xyz * diffuseCol.w * diffuseCol.w;
 	@end
 @end
 

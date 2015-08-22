@@ -335,9 +335,9 @@ namespace Ogre
             mFresnelR *= mTransparencyValue;
             mFresnelG *= mTransparencyValue;
             mFresnelB *= mTransparencyValue;
-            mkDr *= mTransparencyValue;
-            mkDg *= mTransparencyValue;
-            mkDb *= mTransparencyValue;
+            mkDr *= mTransparencyValue * mTransparencyValue;
+            mkDg *= mTransparencyValue * mTransparencyValue;
+            mkDb *= mTransparencyValue * mTransparencyValue;
         }
 
         memcpy( dstPtr, &mkDr, MaterialSizeInGpu );
@@ -736,9 +736,16 @@ namespace Ogre
     void HlmsPbsDatablock::setTransparency( float transparency, TransparencyModes mode,
                                             bool useAlphaFromTextures, bool changeBlendblock )
     {
+        bool mustFlush = false;
+
         mTransparencyValue      = transparency;
-        mUseAlphaFromTextures   = useAlphaFromTextures;
-        mTransparencyMode       = mode;
+
+        if( mUseAlphaFromTextures != useAlphaFromTextures || mTransparencyMode != mode )
+        {
+            mUseAlphaFromTextures = useAlphaFromTextures;
+            mTransparencyMode = mode;
+            mustFlush = true;
+        }
 
         if( changeBlendblock )
         {
@@ -780,6 +787,10 @@ namespace Ogre
                             " alpha blending. Results may not look as expected." );
             }
         }
+
+        scheduleConstBufferUpdate();
+        if( mustFlush )
+            flushRenderables();
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setBrdf( PbsBrdf::PbsBrdf brdf )
