@@ -123,7 +123,7 @@ float3 qmul( float4 q, float3 v )
 	return tsNormal;
 }
 
-	@property( normal_weight_tex )#define normalMapWeight material.F0.w@end
+	@property( normal_weight_tex )#define normalMapWeight asfloat( material.indices4_7.w )@end
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
 			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )@end
@@ -215,7 +215,13 @@ float4 main( PS_INPUT inPs
 	@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
 
 	/// Apply the material's diffuse over the textures
-@property( diffuse_map || detail_maps_diffuse )	diffuseCol.xyz *= material.kD.xyz;@end
+@property( diffuse_map || detail_maps_diffuse )
+	@property( !transparent_mode )
+		diffuseCol.xyz *= material.kD.xyz;
+	@end @property( transparent_mode )
+		diffuseCol.xyz *= material.kD.xyz * diffuseCol.w;
+	@end
+@end
 
 @property( alpha_test )
 	@property( diffuse_map || detail_maps_diffuse )
@@ -383,7 +389,16 @@ float4 main( PS_INPUT inPs
 @end @property( hw_gamma_write )
 	outColour.xyz	= finalColour;
 @end
-	outColour.w		= 1.0;
+
+@property( hlms_alphablend )
+	@property( use_texture_alpha )
+		outColour.w		= material.F0.w * diffuseCol.w;
+	@end @property( !use_texture_alpha )
+		outColour.w		= material.F0.w;
+	@end
+@end @property( !hlms_alphablend )
+	outColour.w		= 1.0;@end
+	
 @end @property( !hlms_normal && !hlms_qtangent )
 	outColour = float4( 1.0, 1.0, 1.0, 1.0 );
 @end

@@ -79,7 +79,7 @@ struct Material
 	float4 kD; //kD.w is alpha_test_threshold
 	float4 kS; //kS.w is roughness
 	//Fresnel coefficient, may be per colour component (float3) or scalar (float)
-	//F0.w is mNormalMapWeight
+	//F0.w is transparency
 	float4 F0;
 	float4 normalWeights;
 	float4 cDetailWeights;
@@ -87,6 +87,7 @@ struct Material
 	float4 detailOffsetScaleN[4];
 
 	uint4 indices0_3;
+	//asfloat( indices4_7.w ) contains mNormalMapWeight.
 	uint4 indices4_7;
 };
 
