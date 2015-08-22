@@ -9,9 +9,9 @@
 
 @property( diffuse_map || detail_maps_diffuse )
     //diffuseCol is multiplied against material.kD in PixelShader_ps as it is influenced by the detail maps.
-    @piece( kD )diffuseCol@end
+	@piece( kD )diffuseCol@end
 @end @property( !diffuse_map && !detail_maps_diffuse )
-    @piece( kD )material.kD@end
+	@piece( kD )material.kD@end
 @end
 
 @property( specular_map )

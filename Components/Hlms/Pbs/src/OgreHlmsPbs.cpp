@@ -77,6 +77,8 @@ namespace Ogre
     const IdString PbsProperty::NormalMap         = IdString( "normal_map" );
 
     const IdString PbsProperty::FresnelScalar     = IdString( "fresnel_scalar" );
+    const IdString PbsProperty::UseTextureAlpha   = IdString( "use_texture_alpha" );
+    const IdString PbsProperty::TransparentMode   = IdString( "transparent_mode" );
 
     const IdString PbsProperty::NormalWeight          = IdString( "normal_weight" );
     const IdString PbsProperty::NormalWeightTex       = IdString( "normal_weight_tex" );
@@ -503,6 +505,18 @@ namespace Ogre
                          "datablock without normal maps.", "HlmsPbs::calculateHashForPreCreate" );
         }
 
+        if( datablock->mUseAlphaFromTextures && datablock->mBlendblock[0]->mIsTransparent &&
+            (getProperty( PbsProperty::DiffuseMap ) || getProperty( PbsProperty::DetailMapsDiffuse )) )
+        {
+            setProperty( PbsProperty::UseTextureAlpha, 1 );
+
+            //When we don't use the alpha in the texture, transparency still works but
+            //only at material level (i.e. what datablock->mTransparency says). The
+            //alpha from the texture will be ignored.
+            if( datablock->mTransparencyMode == HlmsPbsDatablock::Transparent )
+                setProperty( PbsProperty::TransparentMode, 1 );
+        }
+
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
         inOutPieces[VertexShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
         inOutPieces[PixelShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
@@ -529,6 +543,7 @@ namespace Ogre
                      itor->keyName != HlmsBaseProp::BonesPerVertex &&
                      itor->keyName != HlmsBaseProp::DualParaboloidMapping &&
                      itor->keyName != HlmsBaseProp::AlphaTest &&
+                     itor->keyName != HlmsBaseProp::AlphaBlend &&
                      (!hasAlphaTest || !requiredPropertyByAlphaTest( itor->keyName )) )
             {
                 itor = mSetProperties.erase( itor );

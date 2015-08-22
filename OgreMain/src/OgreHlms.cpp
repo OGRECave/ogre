@@ -96,6 +96,7 @@ namespace Ogre
 
     //Change per material (hash can be cached on the renderable)
     const IdString HlmsBaseProp::AlphaTest      = IdString( "alpha_test" );
+    const IdString HlmsBaseProp::AlphaBlend     = IdString( "hlms_alphablend" );
 
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
@@ -1745,6 +1746,7 @@ namespace Ogre
         HlmsDatablock *datablock = renderable->getDatablock();
 
         setProperty( HlmsBaseProp::AlphaTest, datablock->getAlphaTest() != CMPF_ALWAYS_PASS );
+        setProperty( HlmsBaseProp::AlphaBlend, datablock->getBlendblock(false)->mIsTransparent );
 
         if( renderable->getUseIdentityWorldMatrix() )
             setProperty( HlmsBaseProp::IdentityWorld, 1 );
@@ -1767,6 +1769,7 @@ namespace Ogre
         //For shadow casters, turn normals off. UVs & diffuse also off unless there's alpha testing.
         setProperty( HlmsBaseProp::Normal, 0 );
         setProperty( HlmsBaseProp::QTangent, 0 );
+        setProperty( HlmsBaseProp::AlphaBlend, datablock->getBlendblock(true)->mIsTransparent );
         PiecesMap piecesCaster[NumShaderTypes];
         if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {

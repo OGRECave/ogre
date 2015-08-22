@@ -201,6 +201,8 @@ namespace Ogre
         static const IdString NormalMap;
 
         static const IdString FresnelScalar;
+        static const IdString UseTextureAlpha;
+        static const IdString TransparentMode;
 
         static const IdString NormalWeight;
         static const IdString NormalWeightTex;

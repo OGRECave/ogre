@@ -127,6 +127,22 @@ namespace Ogre
     class _OgreHlmsPbsExport HlmsPbsDatablock : public HlmsDatablock, public ConstBufferPoolUser
     {
         friend class HlmsPbs;
+    public:
+        enum TransparencyModes
+        {
+            /// No alpha blending. Default.
+            None,
+
+            /// Realistic transparency that preserves lighting reflections
+            /// (particularly specular on the edges). Great for glass, transparent
+            /// plastic, most stuff. Note that at transparency = 0 the object may
+            /// not be fully invisible.
+            Transparent,
+
+            /// Good 'ol regular alpha blending. Ideal for just fading out an
+            /// object until it completely disappears.
+            Fade
+        };
     protected:
         /// [0] = Regular one.
         /// [1] = Used during shadow mapping
@@ -134,17 +150,20 @@ namespace Ogre
         uint8   mUvSource[NUM_PBSM_SOURCES];
         uint8   mBlendModes[4];
         uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
+        bool    mUseAlphaFromTextures;
+        TransparencyModes mTransparencyMode;
 
         float   mkDr, mkDg, mkDb;                   //kD
         float   _padding0;
         float   mkSr, mkSg, mkSb;                   //kS
         float   mRoughness;
         float   mFresnelR, mFresnelG, mFresnelB;    //F0
-        float   mNormalMapWeight;
+        float   mTransparencyValue;
         float   mDetailNormalWeight[4];
         float   mDetailWeight[4];
         Vector4 mDetailsOffsetScale[8];
         uint16  mTexIndices[NUM_PBSM_TEXTURE_TYPES];
+        float   mNormalMapWeight;
 
         PbsBakedTextureArray mBakedTextures;
         /// The way to read this variable is i.e. get diffuse texture,
@@ -433,6 +452,24 @@ namespace Ogre
             compared against the value 1.0
         */
         virtual void setAlphaTestThreshold( float threshold );
+
+        /** Makes the material transparent, and sets the amount of transparency
+        @param transparency
+            Value in range [0; 1] where 0 = full transparency and 1 = fully opaque.
+        @param mode
+            @see TransparencyModes
+        @param useAlphaFromTextures
+            When false, the alpha channel of the diffuse maps and detail maps will be
+            ignored. It's a GPU performance optimization.
+        @param changeBlendblock
+            When true, the routine prepares the ideal blendblock to use according to the
+            selected mode.
+            When false, the user is expected to change the blendblock manually before
+            calling this function to prevent false warnings. Useful for advanced experiments
+            or artistic license.
+        */
+        void setTransparency( float transparency, TransparencyModes mode = Transparent,
+                              bool useAlphaFromTextures = true, bool changeBlendblock = true );
 
         /// Changes the BRDF in use. Calling this function may trigger an
         /// HlmsDatablock::flushRenderables

@@ -393,7 +393,8 @@ namespace Ogre
                      itor->keyName != HlmsBaseProp::Skeleton &&
                      itor->keyName != HlmsBaseProp::BonesPerVertex &&
                      itor->keyName != HlmsBaseProp::DualParaboloidMapping &&
-                     itor->keyName != HlmsBaseProp::AlphaTest )
+                     itor->keyName != HlmsBaseProp::AlphaTest &&
+                     itor->keyName != HlmsBaseProp::AlphaBlend )
             {
                 itor = mSetProperties.erase( itor );
                 end  = mSetProperties.end();

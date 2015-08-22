@@ -1,3 +1,12 @@
+@property( !transparent_mode )
+	@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ))@end
+	@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle )@end
+@end @property( transparent_mode )
+	//Premultiply F0.xyz with the alpha from the texture, but only in transparent mode.
+	@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
+	@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w@end
+@end
+
 @property( BRDF_CookTorrance )
 @piece( DeclareBRDF )
 //Cook-Torrance
@@ -33,9 +42,9 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 	//Formula:
 	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
 	//	fresnelD = lerp( (1 - N*L)^5, 1, 1 - F0 ) [See s2010_course_note_practical_implementation_at_triace.pdf]
-	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
+	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
 @property( fresnel_separate_diffuse )
-	@insertpiece( FresnelType ) fresnelD = 1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle );
+	@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
 @end @property( !fresnel_separate_diffuse )
 	@insertpiece( FresnelType ) fresnelD = 1.0 - fresnelS;@end
 
@@ -81,7 +90,7 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 
 	//Formula:
 	//	fresnelS = lerp( (1 - V*H)^5, 1, F0 )
-	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
+	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
 
 	//We should divide Rs by PI, but it was done inside G for performance
 	vec3 Rs = ( fresnelS * (R * G) ) * @insertpiece( kS ).xyz * lightSpecular;
@@ -95,7 +104,7 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 	float viewScatter	= 1.0 + (fd90 - 1.0) * pow( 1.0 - NdotV, 5.0 );
 
 @property( fresnel_separate_diffuse )
-	@insertpiece( FresnelType ) fresnelD = 1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle );
+	@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
 @end @property( !fresnel_separate_diffuse )
 	@insertpiece( FresnelType ) fresnelD = 1.0 - fresnelS;@end
 
@@ -110,12 +119,12 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 @piece( BRDF_EnvMap )
 	float NdotL = clamp( dot( nNormal, reflDir ), 0.0, 1.0 );
 	float VdotH = clamp( dot( viewDir, normalize( reflDir + viewDir ) ), 0.0, 1.0 );
-	@insertpiece( FresnelType ) fresnelS = material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ));
+	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
 
 	@property( !fresnel_separate_diffuse )
 		finalColour += mix( envColourD * @insertpiece( kD ).xyz, envColourS * @insertpiece( kS ).xyz, fresnelS );
 	@end @property( fresnel_separate_diffuse )
-		@insertpiece( FresnelType ) fresnelD = 1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle );
+		@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
 		finalColour += envColourD * @insertpiece( kD ).xyz + envColourS * @insertpiece( kS ).xyz * fresnelS;
 	@end
 @end
