@@ -55,7 +55,7 @@ namespace Ogre
 #endif
     }
     //-----------------------------------------------------------------------------------
-    void SkeletonAnimation::initialize(void)
+    void SkeletonAnimation::_initialize(void)
     {
         const FastArray<size_t> &slotStarts = *mSlotStarts;
 

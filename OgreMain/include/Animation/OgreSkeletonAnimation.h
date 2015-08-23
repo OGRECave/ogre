@@ -74,8 +74,10 @@ namespace Ogre
         SkeletonAnimation( const SkeletonAnimationDef *definition, const FastArray<size_t> *slotStarts,
                             SkeletonInstance *owner );
 
-        /// Call this function before using the animation!
-        void initialize(void);
+        /// Internal function that initializes a lot of structures that can't be done in the
+        /// constructor due to how SkeletonInstance is created/pushed in a vector.
+        /// If you're not an Ogre dev, don't call this directly.
+        void _initialize(void);
 
         /** Plays the animation forward (or backwards if negative)
         @param time

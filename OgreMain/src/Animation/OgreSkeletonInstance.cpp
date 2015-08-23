@@ -178,7 +178,7 @@ namespace Ogre
         {
             SkeletonAnimation animation( &(*itor), &mSlotStarts, this );
             mAnimations.push_back( animation );
-            mAnimations.back().initialize();
+            mAnimations.back()._initialize();
             ++itor;
         }
     }
