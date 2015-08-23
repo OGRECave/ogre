@@ -113,7 +113,7 @@ namespace Ogre
         size_t index = -1;
         TextureSource textureSource = NUM_TEXTURES_SOURCES;
         {
-            NameToChannelMap::const_iterator it = mNameToChannelMap.find( name );
+            NameToChannelMap::iterator it = mNameToChannelMap.find( name );
             if( it == mNameToChannelMap.end() )
             {
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
