@@ -1,11 +1,16 @@
+//Reset t to 0 just in case (values are preserved from previous stages)
+@pset( t, 0 )
+
 @piece( NormalNonPremul )
 	//Normal Non Premultiplied @counter(t)
 	outColour.xyz = mix( outColour.xyz, topImage@value(t).xyz, topImage@value(t).a );
+	outColour.w = mix( outColour.w, 1.0, topImage@value(t).w );
 @end
 
 @piece( NormalPremul )
 	//Normal Premultiplied @counter(t)
 	outColour.xyz = (1.0 - topImage@value(t).a) * outColour.xyz + topImage@value(t).xyz;
+	outColour.w = mix( outColour.w, 1.0, topImage@value(t).w );
 @end
 
 @piece( Add )
