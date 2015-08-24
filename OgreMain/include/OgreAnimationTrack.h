@@ -344,6 +344,13 @@ namespace v1
 		*/
 		virtual TransformKeyFrame* createNodeKeyFrame(Real timePos);
 
+        /** Get the initial state of the node for this track
+        @remarks
+            Node tracks are based from an initial state, which the node is set to every frame before the node animation is applied
+            See NodeAnimationTrack::getInitialState for more information
+        */
+        void getInitialState(Vector3* outPosition, Quaternion* outOrientation, Vector3* outScale);
+
         /** Set the initial state of the node for this animation track
         @remarks
             Node tracks are based from an initial state, which the node is set to every frame before the node animation is applied
@@ -353,7 +360,7 @@ namespace v1
         @param orientation  The initial orientation to set
         @param scale        The initial scale to set
         */
-        void setInitialState(const Vector3& position, const Quaternion orientation, const Vector3& scale);
+        void setInitialState(const Vector3& position, const Quaternion& orientation, const Vector3& scale);
 
 		/** Resets the the target node to the initial state
 		@remarks 

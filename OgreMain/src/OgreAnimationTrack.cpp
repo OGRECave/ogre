@@ -468,7 +468,14 @@ namespace v1 {
 
 	}
     //---------------------------------------------------------------------
-    void NodeAnimationTrack::setInitialState(const Vector3& position, const Quaternion orientation, const Vector3& scale)
+    void NodeAnimationTrack::getInitialState(Vector3* outPosition, Quaternion* outOrientation, Vector3* outScale)
+    {
+        outPosition = &mInitialPosition;
+        outOrientation = &mInitialOrientation;
+        outScale = &mInitialScale;
+    }
+    //---------------------------------------------------------------------
+    void NodeAnimationTrack::setInitialState(const Vector3& position, const Quaternion& orientation, const Vector3& scale)
     {
         mInitialPosition = position;
         mInitialOrientation = orientation;
