@@ -86,6 +86,8 @@ namespace Ogre
         /// @See CompositorNode::_notifyCleared
         virtual void notifyCleared(void);
 
+        void resetNumPassesLeft(void);
+
         CompositorPassType getType() const  { return mDefinition->getType(); }
 
         Viewport* getViewport() const       { return mViewport; }

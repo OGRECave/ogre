@@ -209,4 +209,9 @@ namespace Ogre
     {
         mTarget = 0;
     }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::resetNumPassesLeft(void)
+    {
+        mNumPassesLeft = mDefinition->mNumInitialPasses;
+    }
 }

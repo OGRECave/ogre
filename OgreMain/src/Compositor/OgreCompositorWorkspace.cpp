@@ -404,6 +404,18 @@ namespace Ogre
         connectAllNodes();
     }
     //-----------------------------------------------------------------------------------
+    void CompositorWorkspace::resetAllNumPassesLeft(void)
+    {
+        CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
+        CompositorNodeVec::const_iterator end  = mNodeSequence.end();
+
+        while( itor != end )
+        {
+            (*itor)->resetAllNumPassesLeft();
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     Camera* CompositorWorkspace::findCamera( IdString cameraName ) const 
     {
         return mSceneManager->findCamera( cameraName );

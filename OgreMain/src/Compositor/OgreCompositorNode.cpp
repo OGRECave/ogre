@@ -511,4 +511,16 @@ namespace Ogre
                                                             finalTarget, mRenderSystem, mConnectedNodes,
                                                             &mPasses );
     }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::resetAllNumPassesLeft(void)
+    {
+        CompositorPassVec::const_iterator itor = mPasses.begin();
+        CompositorPassVec::const_iterator end  = mPasses.end();
+
+        while( itor != end )
+        {
+            (*itor)->resetNumPassesLeft();
+            ++itor;
+        }
+    }
 }

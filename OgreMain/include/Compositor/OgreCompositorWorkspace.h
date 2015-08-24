@@ -174,6 +174,11 @@ namespace Ogre
         */
         void reconnectAllNodes(void);
 
+        /** Resets the number of passes left for every pass (@see CompositorPassDef::mNumInitialPasses)
+            Useful when you have a few starting 'initialization' passes and you want to reset them.
+        */
+        void resetAllNumPassesLeft(void);
+
         /** Call before _update unless the final render target is not a render window
         @param forceBeginFrame
             Forces a beginFrame call to the D3D9 API, even if the final render target is not
