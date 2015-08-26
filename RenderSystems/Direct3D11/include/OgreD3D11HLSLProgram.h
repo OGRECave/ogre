@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D11HLSLProgram_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11DeviceResource.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
@@ -45,7 +46,9 @@ namespace Ogre {
     reason for not wanting to use the Cg plugin, I suggest you use Cg instead since that
     can produce programs for OpenGL too.
     */
-    class D3D11HLSLProgram : public HighLevelGpuProgram
+    class D3D11HLSLProgram
+        : public HighLevelGpuProgram
+        , protected D3D11DeviceResource
     {
     public:
         /// Command object for setting entry point
@@ -92,6 +95,9 @@ namespace Ogre {
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
         static CmdEnableBackwardsCompatibility msCmdEnableBackwardsCompatibility;
         
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
+
         /** Internal method for creating an appropriate low-level program from this
         high-level program, must be implemented by subclasses. */
         void createLowLevelImpl(void);

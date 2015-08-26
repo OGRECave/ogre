@@ -44,6 +44,22 @@ namespace Ogre {
     {
     }
     //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::notifyDeviceLost(D3D11Device* device)
+    {
+        clearCache();
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::notifyDeviceRestored(D3D11Device* device)
+    {
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::clearCache()
+    {
+        mD3delems.clear();
+        mShaderToILayoutMap.clear();
+        mNeedsRebuild = false;
+    }
+    //-----------------------------------------------------------------------
     const VertexElement& D3D11VertexDeclaration::addElement(unsigned short source, 
         size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
@@ -208,11 +224,7 @@ namespace Ogre {
     void D3D11VertexDeclaration::bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
         if(mNeedsRebuild)
-        {
-            mD3delems.clear();
-            mShaderToILayoutMap.clear();
-            mNeedsRebuild = false;
-        }
+            clearCache();
 
         // Set the input layout
         ID3D11InputLayout*  pVertexLayout = getILayoutByShader(boundVertexProgram, binding);

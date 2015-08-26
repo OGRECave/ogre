@@ -70,6 +70,29 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
+    void D3D11Texture::notifyDeviceLost(D3D11Device* device)
+    {
+        unloadImpl();
+    }
+    //---------------------------------------------------------------------
+    void D3D11Texture::notifyDeviceRestored(D3D11Device* device)
+    {
+        if(mIsManual)
+        {
+            preLoadImpl();
+            createInternalResourcesImpl();
+            if (mLoader != NULL)
+                mLoader->loadResource(this);
+            postLoadImpl();
+        }
+        else
+        {
+            preLoadImpl();
+            loadImpl();
+            postLoadImpl();
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11Texture::copyToTexture(TexturePtr& target)
     {
         // check if this & target are the same format and type
@@ -1099,14 +1122,19 @@ namespace Ogre
     RenderTexture(buffer, 0)
     {
         mName = name;
-
         rebind(buffer);
     }
-
     //---------------------------------------------------------------------
-
     D3D11RenderTexture::~D3D11RenderTexture()
     {
-
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderTexture::notifyDeviceLost(D3D11Device* device)
+    {
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderTexture::notifyDeviceRestored(D3D11Device* device)
+    {
+        rebind(static_cast<D3D11HardwarePixelBuffer*>(mBuffer));
     }
 }

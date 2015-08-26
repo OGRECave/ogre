@@ -53,6 +53,18 @@ namespace Ogre {
     D3D11HLSLProgram::CmdColumnMajorMatrices D3D11HLSLProgram::msCmdColumnMajorMatrices;
     D3D11HLSLProgram::CmdEnableBackwardsCompatibility D3D11HLSLProgram::msCmdEnableBackwardsCompatibility;
     //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::notifyDeviceLost(D3D11Device* device)
+    {
+        if(mHighLevelLoaded)
+            unloadHighLevelImpl();
+    }
+    //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::notifyDeviceRestored(D3D11Device* device)
+    {
+        if(mHighLevelLoaded)
+            loadHighLevelImpl();
+    }
+    //-----------------------------------------------------------------------
     void D3D11HLSLProgram::createConstantBuffer(const UINT ByteWidth)
     {
 

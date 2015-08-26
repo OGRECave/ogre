@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D11TEXTURE_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11DeviceResource.h"
 #include "OgreTexture.h"
 #include "OgreRenderTexture.h"
 #include "OgreSharedPtr.h"
@@ -40,7 +41,10 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    class D3D11Texture : public Texture
+	/** Specialisation of Texture for D3D11 */
+    class D3D11Texture
+        : public Texture
+        , protected D3D11DeviceResource
     {
 	public:
 		/// constructor 
@@ -161,6 +165,8 @@ namespace Ogre {
         /// mipmap level. This method must be called after the D3D texture object was created
         void _createSurfaceList(void);
 
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
 
         /// @copydoc Resource::prepareImpl
         void prepareImpl(void);
@@ -182,7 +188,9 @@ namespace Ogre {
     };
 
     /// RenderTexture implementation for D3D11
-    class D3D11RenderTexture : public RenderTexture
+    class D3D11RenderTexture
+        : public RenderTexture
+        , protected D3D11DeviceResource
     {
         D3D11Device & mDevice;
         ComPtr<ID3D11RenderTargetView> mRenderTargetView;
@@ -195,6 +203,10 @@ namespace Ogre {
         virtual void getCustomAttribute( const String& name, void *pData );
 
         bool requiresTextureFlipping() const { return false; }
+
+    protected:
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
     };
 
 }

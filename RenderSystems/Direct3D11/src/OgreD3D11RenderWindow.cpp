@@ -442,6 +442,18 @@ namespace Ogre
         D3D11RenderWindowBase::destroy();
     }
     //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainBased::notifyDeviceLost(D3D11Device* device)
+    {
+        _destroySizeDependedD3DResources();
+        _destroySwapChain();
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainBased::notifyDeviceRestored(D3D11Device* device)
+    {
+        _createSwapChain();
+        _createSizeDependedD3DResources();
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_destroySwapChain()
     {
         if(mIsFullScreen && mpSwapChain)
@@ -901,6 +913,12 @@ namespace Ogre
         }
 
         mHWnd = NULL;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowHwnd::notifyDeviceRestored(D3D11Device* device)
+    {
+        D3D11RenderWindowSwapChainBased::notifyDeviceRestored(device);
+        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, NULL);
     }
     //---------------------------------------------------------------------
 	HRESULT D3D11RenderWindowHwnd::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)
@@ -1427,6 +1445,16 @@ namespace Ogre
         mImageSourceNative.Reset();
         mImageSource = nullptr;
         mBrush = nullptr;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowImageSource::notifyDeviceLost(D3D11Device* device)
+    {
+        _destroySizeDependedD3DResources();
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowImageSource::notifyDeviceRestored(D3D11Device* device)
+    {
+        _createSizeDependedD3DResources();
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowImageSource::_createSizeDependedD3DResources()

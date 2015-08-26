@@ -30,6 +30,7 @@ THE SOFTWARE.
 #define __D3D11RENDERWINDOW_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11DeviceResource.h"
 #include "OgreRenderWindow.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT 
@@ -46,6 +47,7 @@ namespace Ogre
 {
     class D3D11RenderWindowBase 
         : public RenderWindow
+        , protected D3D11DeviceResource
     {
     public:
         D3D11RenderWindowBase(D3D11Device& device);
@@ -130,6 +132,9 @@ namespace Ogre
         void updateStats(void);
 
     protected:
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
+
         DXGI_FORMAT _getSwapChainFormat()                       { return _getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled() && !mUseFlipSequentialMode); }
         void _createSwapChain();
         virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice) = 0;
@@ -183,6 +188,8 @@ namespace Ogre
         void _beginUpdate();
 
     protected:
+        void notifyDeviceRestored(D3D11Device* device);
+
         DXGI_FORMAT _getBasicFormat()                           { return DXGI_FORMAT_R8G8B8A8_UNORM; } // be compatible with pre-Win8 D3D11
         virtual HRESULT _createSwapChainImpl(IDXGIDeviceN* pDXGIDevice);
 
@@ -251,6 +258,8 @@ namespace Ogre
         virtual void getCustomAttribute( const String& name, void* pData ); // "ImageBrush" -> Windows::UI::Xaml::Media::ImageBrush^
 
     protected:
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
         void _createSizeDependedD3DResources();                 // creates mpBackBuffer and optionally mpBackBufferNoMSAA
 
     protected:
