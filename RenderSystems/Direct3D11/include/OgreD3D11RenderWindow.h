@@ -73,6 +73,9 @@ namespace Ogre
 #endif
 
     protected:
+        /** Overridden - see RenderTarget. */
+        virtual void updateImpl();
+
         virtual DXGI_FORMAT _getBasicFormat()                   { return DXGI_FORMAT_B8G8R8A8_UNORM; } // preferred since Win8
         DXGI_FORMAT _getRenderFormat()                          { return _getGammaFormat(_getBasicFormat(), isHardwareGammaEnabled()); }
         void _createSizeDependedD3DResources();                 // assumes mpBackBuffer is already initialized
