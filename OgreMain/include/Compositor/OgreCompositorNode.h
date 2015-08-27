@@ -258,7 +258,7 @@ namespace Ogre
         */
         virtual void finalTargetResized( const RenderTarget *finalTarget );
 
-        /// @copydoc CompositorWorkspace::resetresetAllNumPassesLeft
+        /// @copydoc CompositorWorkspace::resetAllNumPassesLeft
         void resetAllNumPassesLeft(void);
 
         /// Returns our parent workspace

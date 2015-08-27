@@ -870,24 +870,5 @@ namespace Ogre {
         MovableObject* m = createInstanceImpl( id, objectMemoryManager, manager, params );
         return m;
     }
-
-
-    inline bool LightClosest::operator < (const LightClosest &right) const
-    {
-        /*
-        Shouldn't be necessary. distance is insanely low (big negative number)
-        if( light->getType() == Light::LT_DIRECTIONAL &&
-            right.light->getType() != Light::LT_DIRECTIONAL )
-        {
-            return true;
-        }
-        else if( light->getType() != Light::LT_DIRECTIONAL &&
-                 right.light->getType() == Light::LT_DIRECTIONAL )
-        {
-            return false;
-        }*/
-
-        return distance < right.distance;
-    }
 }
 

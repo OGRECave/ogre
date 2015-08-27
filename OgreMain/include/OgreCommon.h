@@ -571,7 +571,21 @@ namespace Ogre {
             light( _light ), globalIndex( _globalIndex ),
             distance( _distance ) {}
 
-        inline bool operator < ( const LightClosest &right ) const;
+        inline bool operator < ( const LightClosest &right ) const
+        {
+            /*Shouldn't be necessary. distance is insanely low (big negative number)
+            if( light->getType() == Light::LT_DIRECTIONAL &&
+                right.light->getType() != Light::LT_DIRECTIONAL )
+            {
+                return true;
+            }
+            else if( light->getType() != Light::LT_DIRECTIONAL &&
+                     right.light->getType() == Light::LT_DIRECTIONAL )
+            {
+                return false;
+            }*/
+            return distance < right.distance;
+        }
     };
     /// Holds all lights in SoA after being culled over all frustums
     struct LightListInfo
