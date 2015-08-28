@@ -51,8 +51,13 @@ namespace Ogre {
 
         images[imgIdx].load(dstream, ext);
 
-        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ||
-           (Root::getSingleton().getRenderSystem()->getCapabilities()->getNonPOW2TexturesLimited() && tex->getNumMipmaps() > 0))
+        const RenderSystemCapabilities *renderCaps =
+                Root::getSingleton().getRenderSystem()->getCapabilities();
+
+        const bool nonPowerOfTwoSupported = renderCaps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ||
+                                            ( renderCaps->getNonPOW2TexturesLimited() &&
+                                              tex->getNumMipmaps() == 0 );
+        if( !nonPowerOfTwoSupported )
         {
             size_t w = 0, h = 0;
             
@@ -108,8 +113,14 @@ namespace Ogre {
 
     void GLES2Texture::_createGLTexResource()
     {
-        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ||
-           (Root::getSingleton().getRenderSystem()->getCapabilities()->getNonPOW2TexturesLimited() && mNumRequestedMipmaps > 0))
+        const RenderSystemCapabilities *renderCaps =
+                Root::getSingleton().getRenderSystem()->getCapabilities();
+
+        const bool nonPowerOfTwoSupported = renderCaps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES) ||
+                                            ( renderCaps->getNonPOW2TexturesLimited() &&
+                                              mNumRequestedMipmaps == 0 );
+
+        if( !nonPowerOfTwoSupported )
         {
             // Convert to nearest power-of-two size if required
             mWidth = GLES2PixelUtil::optionalPO2(mWidth);
