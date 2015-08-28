@@ -857,6 +857,8 @@ namespace Ogre {
         */
         void notifyBillboardDataChanged(void) { mBillboardDataChanged = true; }
 
+        void _releaseManualHardwareResources() { _destroyBuffers(); }
+
     };
 
     /** Factory object for creating BillboardSet instances */
