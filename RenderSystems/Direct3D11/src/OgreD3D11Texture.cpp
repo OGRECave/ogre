@@ -879,8 +879,6 @@ namespace Ogre
             return;
         }
 
-        //D3D11_DEVICE_ACCESS_CRITICAL_SECTION
-        
         LoadedStreams loadedStreams;
 
         // prepare load based on tex.type
@@ -986,7 +984,6 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::postLoadImpl()
     {
-        //D3D11_DEVICE_ACCESS_CRITICAL_SECTION
         mLoadedStreams.setNull();   
     }
     //---------------------------------------------------------------------

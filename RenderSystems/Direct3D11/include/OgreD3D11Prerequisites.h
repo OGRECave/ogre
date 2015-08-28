@@ -34,24 +34,6 @@ THE SOFTWARE.
 #include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK
 #include "WIN32/OgreComPtr.h"       // too much resource leaks were caused without it by throwing constructors
 
-#if OGRE_THREAD_SUPPORT
-#define OGRE_LOCK_RECURSIVE_MUTEX(name)   name.lock();
-#define OGRE_UNLOCK_RECURSIVE_MUTEX(name) name.unlock();
-#else
-#define OGRE_LOCK_RECURSIVE_MUTEX(name) 
-#define OGRE_UNLOCK_RECURSIVE_MUTEX(name)
-#endif
-
-
-#if OGRE_THREAD_SUPPORT == 1
-#define D3D11_DEVICE_ACCESS_LOCK                OGRE_LOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#define D3D11_DEVICE_ACCESS_UNLOCK          OGRE_UNLOCK_RECURSIVE_MUTEX(msDeviceAccessMutex);
-#define D3D11_DEVICE_ACCESS_CRITICAL_SECTION    OGRE_LOCK_MUTEX(msDeviceAccessMutex)
-#else
-#define D3D11_DEVICE_ACCESS_LOCK    
-#define D3D11_DEVICE_ACCESS_UNLOCK
-#define D3D11_DEVICE_ACCESS_CRITICAL_SECTION
-#endif
 
 // some D3D commonly used macros
 #define SAFE_DELETE(p)       { if(p) { delete (p);     (p)=NULL; } }
