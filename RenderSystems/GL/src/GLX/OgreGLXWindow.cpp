@@ -691,6 +691,7 @@ namespace Ogre
             return;
         
         glXSwapBuffers(mGLSupport->getGLDisplay(), mContext->mDrawable);
+        RenderWindow::swapBuffers();
     }
     
     //-------------------------------------------------------------------------------------------------//

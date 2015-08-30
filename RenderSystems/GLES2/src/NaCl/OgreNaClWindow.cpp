@@ -178,6 +178,8 @@ namespace Ogre {
 
     void NaClWindow::swapBuffers()
     {
+        RenderWindow::swapBuffers();
+
         if (mClosed)
         {
             return;

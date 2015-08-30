@@ -194,6 +194,8 @@ void GTKWindow::swapBuffers()
 {
         Glib::RefPtr<Gdk::GL::Window> glwindow = ogre->get_gl_window();
         glwindow->swap_buffers();
+
+        RenderWindow::swapBuffers();
 }
 
 void GTKWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)

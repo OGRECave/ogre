@@ -309,6 +309,7 @@ namespace Ogre {
 
     void EGLWindow::swapBuffers()
     {
+        RenderWindow::swapBuffers();
         if (mClosed || mIsExternalGLControl)
         {
             return;

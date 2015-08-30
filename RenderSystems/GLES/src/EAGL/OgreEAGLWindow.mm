@@ -393,6 +393,7 @@ namespace Ogre {
 
     void EAGLWindow::swapBuffers()
     {
+        RenderWindow::swapBuffers();
         if (mClosed)
         {
             return;

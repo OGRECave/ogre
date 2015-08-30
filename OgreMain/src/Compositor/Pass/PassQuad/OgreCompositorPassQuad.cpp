@@ -166,6 +166,8 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
+        mTarget->setFsaaResolveDirty();
+
         sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
 
         //Call endUpdate if we're the last pass in a row to use this RT

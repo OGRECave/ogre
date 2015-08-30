@@ -106,5 +106,7 @@ namespace Ogre
             (*itor)->swapBuffers();
             ++itor;
         }
+
+        RenderTarget::swapBuffers();
     }
 }

@@ -621,6 +621,8 @@ namespace Ogre
             if( FAILED(hr) )
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error Presenting surfaces", "D3D11RenderWindowSwapChainBased::swapBuffers");
         }
+
+        D3D11RenderWindowBase::swapBuffers();
     }
 	//---------------------------------------------------------------------
 	int D3D11RenderWindowSwapChainBased::getVBlankMissCount()
@@ -1567,6 +1569,8 @@ namespace Ogre
                 "Drawing into SurfaceImageSource failed",
                 "D3D11RenderWindowImageSource::swapBuffers");
         }
+
+        D3D11RenderWindowBase::swapBuffers();
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowImageSource::resize(unsigned width, unsigned height)

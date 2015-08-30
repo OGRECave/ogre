@@ -622,6 +622,8 @@ namespace Ogre
             windowResized();
             mHasResized = false;
         }
+
+        RenderWindow::swapBuffers();
     }
 
     //-------------------------------------------------------------------------------------------------//

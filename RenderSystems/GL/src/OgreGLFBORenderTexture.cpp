@@ -69,7 +69,7 @@ namespace Ogre {
     {
         if( mFsaaResolveDirty )
             mFB.swapBuffers();
-        mFsaaResolveDirty = false;
+        GLRenderTexture::swapBuffers();
     }
     //-----------------------------------------------------------------------------
     bool GLFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
