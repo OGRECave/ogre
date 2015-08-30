@@ -389,6 +389,8 @@ namespace Ogre {
 
     void EAGL2Window::swapBuffers()
     {
+        RenderWindow::swapBuffers();
+
         if (mClosed)
         {
             return;

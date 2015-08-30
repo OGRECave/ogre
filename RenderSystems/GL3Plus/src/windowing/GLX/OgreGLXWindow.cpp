@@ -680,6 +680,8 @@ namespace Ogre
     //-------------------------------------------------------------------------------------------------//
     void GLXWindow::swapBuffers()
     {
+        RenderWindow::swapBuffers();
+
         if (mClosed || mIsExternalGLControl)
             return;
 

@@ -623,6 +623,8 @@ namespace Ogre {
 
         [mGLContext flushBuffer];
         CGLUnlockContext((CGLContextObj)[mGLContext CGLContextObj]);
+
+        RenderWindow::swapBuffers();
     }
 	
 	//-------------------------------------------------------------------------------------------------//

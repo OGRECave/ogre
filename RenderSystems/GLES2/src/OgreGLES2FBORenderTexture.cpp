@@ -62,6 +62,7 @@ namespace Ogre {
     void GLES2FBORenderTexture::swapBuffers()
     {
         mFB.swapBuffers();
+        GLES2RenderTexture::swapBuffers();
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN

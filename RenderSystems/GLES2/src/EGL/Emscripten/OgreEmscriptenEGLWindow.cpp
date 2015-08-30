@@ -367,6 +367,7 @@ namespace Ogre {
 
     void EmscriptenEGLWindow::swapBuffers()
     {
+        RenderWindow::swapBuffers();
         // Not used on emscripten
     }
 

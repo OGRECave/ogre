@@ -210,6 +210,8 @@ namespace Ogre {
         }
 
         SDL_GL_SwapBuffers();
+
+        RenderWindow::swapBuffers();
         // XXX More?
     }
 
