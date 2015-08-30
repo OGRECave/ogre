@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreViewport.h"
 #include "OgreSceneManager.h"
+#include "OgreRenderTarget.h"
 
 namespace Ogre
 {
@@ -73,6 +74,7 @@ namespace Ogre
         }
         else
         {
+            mTarget->setFsaaResolveDirty();
             mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
                               mDefinition->mDepthValue, mDefinition->mStencilValue );
         }
