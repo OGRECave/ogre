@@ -842,6 +842,8 @@ namespace Ogre {
       if (!mIsExternalGLControl) {
         SwapBuffers(mHDC);
       }
+
+        RenderWindow::swapBuffers();
     }
 
     void Win32Window::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)

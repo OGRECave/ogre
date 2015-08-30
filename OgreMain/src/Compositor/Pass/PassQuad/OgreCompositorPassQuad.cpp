@@ -208,6 +208,8 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
+        mTarget->setFsaaResolveDirty();
+
         //sceneManager->_injectRenderWithPass( mPass, mFsRect, mCamera, false, false );
         if( !mMaterial.isNull() )
             mFsRect->setMaterial( mMaterial ); //Low level material

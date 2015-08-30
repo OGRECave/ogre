@@ -69,6 +69,7 @@ namespace Ogre {
     void GL3PlusFBORenderTexture::swapBuffers()
     {
         mFB.swapBuffers();
+        GL3PlusRenderTexture::swapBuffers();
     }
     //-----------------------------------------------------------------------------
     bool GL3PlusFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch )
