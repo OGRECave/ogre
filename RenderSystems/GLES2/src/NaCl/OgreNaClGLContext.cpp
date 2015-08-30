@@ -108,7 +108,6 @@ namespace Ogre {
 
     void NaClGLContext::swapBuffers( )
     {
-        RenderWindow::swapBuffers();
         mContext.SwapBuffers(*mSwapCallback);
     }
 
