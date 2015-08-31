@@ -1040,7 +1040,7 @@ namespace Ogre
         default:
             assert(false);
         }
-        HRESULT hr = mDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &mRenderTargetView );
+        HRESULT hr = mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc, mRenderTargetView.ReleaseAndGetAddressOf());
 
         if (FAILED(hr) || mDevice.isError())
         {
@@ -1085,8 +1085,7 @@ namespace Ogre
         }
         else if(name == "ID3D11RenderTargetView")
         {
-            *static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView;
-            //*static_cast<ID3D11RenderTargetView***>(pData) = &mRenderTargetView;
+            *static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView.Get();
             return;
         }
         else if( name == "numberOfViews" )

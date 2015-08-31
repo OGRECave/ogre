@@ -185,8 +185,7 @@ namespace Ogre {
     class D3D11RenderTexture : public RenderTexture
     {
         D3D11Device & mDevice;
-        ID3D11RenderTargetView * mRenderTargetView;
-        ID3D11DepthStencilView * mDepthStencilView;
+        ComPtr<ID3D11RenderTargetView> mRenderTargetView;
     public:
         D3D11RenderTexture(const String &name, D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
         virtual ~D3D11RenderTexture();
