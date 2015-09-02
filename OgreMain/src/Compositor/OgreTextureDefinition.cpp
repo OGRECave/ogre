@@ -163,8 +163,8 @@ namespace Ogre
         decodeTexSource( it->second, index, textureSource );
 
         String::size_type findResult = newName.find( "global_" );
-        if( textureSource == TEXTURE_GLOBAL && findResult != 0 ||
-            textureSource != TEXTURE_GLOBAL && findResult == 0 )
+        if( (textureSource == TEXTURE_GLOBAL && findResult != 0) ||
+            (textureSource != TEXTURE_GLOBAL && findResult == 0) )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                          "Can't rename global texture without the global_ prefix,"
