@@ -83,6 +83,14 @@ namespace Ogre
         bool selectPixelFormat(HDC hdc, int colourDepth, int multisample, bool hwGamma);
 
         virtual unsigned int getDisplayMonitorCount() const;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        void setStereoModeType(StereoModeType stereoMode)
+        {
+            mStereoMode = stereoMode;
+        }
+#endif
+
     private:
         // Allowed video modes
         vector<DEVMODE>::type mDevModes;
@@ -92,6 +100,10 @@ namespace Ogre
         bool mHasMultisample;
         bool mHasHardwareGamma;
         PFNWGLCHOOSEPIXELFORMATARBPROC mWglChoosePixelFormat;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        StereoModeType mStereoMode;
+#endif
 
         struct DisplayMonitorInfo
         {
