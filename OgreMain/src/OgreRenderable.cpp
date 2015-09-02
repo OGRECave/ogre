@@ -95,6 +95,9 @@ namespace Ogre
             if( mHlmsDatablock )
                 mHlmsDatablock->_unlinkRenderable( this );
 
+            if( !datablock || datablock->getCreator()->getType() != HLMS_LOW_LEVEL )
+                mMaterial.setNull();
+
             mHlmsDatablock = datablock;
             try
             {

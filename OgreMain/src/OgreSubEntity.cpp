@@ -69,18 +69,18 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void SubEntity::setMaterial( const MaterialPtr& material )
     {
-        Renderable::setMaterial( material );
-
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
+
+        Renderable::setMaterial( material );
     }
     //-----------------------------------------------------------------------
     void SubEntity::setDatablock( HlmsDatablock *datablock )
     {
-        Renderable::setDatablock( datablock );
-
         // tell parent to reconsider material vertex processing options
         mParentEntity->reevaluateVertexProcessing();
+
+        Renderable::setDatablock( datablock );
     }
     //-----------------------------------------------------------------------
     void SubEntity::getRenderOperation(RenderOperation& op, bool casterPass)
