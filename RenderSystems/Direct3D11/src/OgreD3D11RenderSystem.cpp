@@ -2618,13 +2618,13 @@ namespace Ogre
             }
         }
 
-        ID3D11Buffer* pSOTarget=0;
+        ComPtr<ID3D11Buffer> pSOTarget;
         // Mustn't bind a emulated vertex, pixel shader (see below), if we are rendering to a stream out buffer
-        mDevice.GetImmediateContext()->SOGetTargets(1, &pSOTarget);
+        mDevice.GetImmediateContext()->SOGetTargets(1, pSOTarget.GetAddressOf());
 
         //check consistency of vertex-fragment shaders
         if (!mBoundVertexProgram ||
-             (!mBoundFragmentProgram && op.operationType != RenderOperation::OT_POINT_LIST && pSOTarget==0 ) 
+             (!mBoundFragmentProgram && op.operationType != RenderOperation::OT_POINT_LIST && !pSOTarget ) 
            ) 
         {
             
