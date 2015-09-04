@@ -299,7 +299,24 @@ namespace Ogre {
         // Removes reference to skeleton
         setSkeletonName(BLANKSTRING);
     }
+    //-----------------------------------------------------------------------
+    void Mesh::reload(LoadingFlags flags)
+    {
+        bool wasPreparedForShadowVolumes = mPreparedForShadowVolumes;
+        bool wasEdgeListsBuilt = mEdgeListsBuilt;
+        bool wasAutoBuildEdgeLists = mAutoBuildEdgeLists;
 
+        Resource::reload(flags);
+
+        if(flags & LF_PRESERVE_STATE)
+        {
+            if(wasPreparedForShadowVolumes)
+                prepareForShadowVolume();
+            if(wasEdgeListsBuilt)
+                buildEdgeList();
+            setAutoBuildEdgeLists(wasAutoBuildEdgeLists);
+        }
+    }
     //-----------------------------------------------------------------------
     MeshPtr Mesh::clone(const String& newName, const String& newGroup)
     {

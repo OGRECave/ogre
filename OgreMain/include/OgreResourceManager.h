@@ -210,7 +210,8 @@ namespace Ogre {
             manually later.
             @see Resource::isReloadable for resource is reloadable.
         */
-        virtual void unloadAll(bool reloadableOnly = true);
+        void unloadAll(bool reloadableOnly = true)
+            { unloadAll(reloadableOnly ? Resource::LF_DEFAULT : Resource::LF_INCLUDE_NON_RELOADABLE); }
 
         /** Caused all currently loaded resources to be reloaded.
         @remarks
@@ -223,7 +224,8 @@ namespace Ogre {
             manually later.
             @see Resource::isReloadable for resource is reloadable.
         */
-        virtual void reloadAll(bool reloadableOnly = true);
+        void reloadAll(bool reloadableOnly = true)
+            { reloadAll(reloadableOnly ? Resource::LF_DEFAULT : Resource::LF_INCLUDE_NON_RELOADABLE); }
 
         /** Unload all resources which are not referenced by any other object.
         @remarks
@@ -239,7 +241,8 @@ namespace Ogre {
         @param reloadableOnly If true (the default), only unloads resources
             which can be subsequently automatically reloaded.
         */
-        virtual void unloadUnreferencedResources(bool reloadableOnly = true);
+        void unloadUnreferencedResources(bool reloadableOnly = true)
+            { unloadAll(reloadableOnly ? Resource::LF_ONLY_UNREFERENCED : Resource::LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE); }
 
         /** Caused all currently loaded but not referenced by any other object
             resources to be reloaded.
@@ -254,7 +257,30 @@ namespace Ogre {
         @param reloadableOnly If true (the default), only reloads resources
             which can be subsequently automatically reloaded.
         */
-        virtual void reloadUnreferencedResources(bool reloadableOnly = true);
+        void reloadUnreferencedResources(bool reloadableOnly = true)
+            { reloadAll(reloadableOnly ? Resource::LF_ONLY_UNREFERENCED : Resource::LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE); }
+
+        /** Unloads all resources.
+        @remarks
+            Unloaded resources are not removed, they simply free up their memory
+            as much as they can and wait to be reloaded.
+            @see ResourceGroupManager for unloading of resource groups.
+        @param flags Allow to restrict processing to only reloadable and/or
+            unreferenced resources.
+            @see Resource::LoadingFlags for additional information.
+        */
+        virtual void unloadAll(Resource::LoadingFlags flags);
+
+        /** Caused all currently loaded resources to be reloaded.
+        @remarks
+            All resources currently being held in this manager which are also
+            marked as currently loaded will be unloaded, then loaded again.
+        @param flags Allow to restrict processing to only reloadable and/or
+            unreferenced resources. Additionally, reloading could be done with
+            preserving some selected resource states that could be used elsewhere.
+            @see Resource::LoadingFlags for additional information.
+        */
+        virtual void reloadAll(Resource::LoadingFlags flags);
 
         /** Remove a single resource.
         @remarks

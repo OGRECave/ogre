@@ -336,7 +336,7 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-    void Resource::reload(void) 
+    void Resource::reload(LoadingFlags flags)
     { 
             OGRE_LOCK_AUTO_MUTEX;
         if (mLoadingState.get() == LOADSTATE_LOADED)

@@ -137,6 +137,22 @@ namespace Ogre {
             /// Preparing is in progress
             LOADSTATE_PREPARING
         };
+
+        /// Enum that allow to choose subset of unloaded/reloaded resources and to adjust reloading behavior
+        enum LoadingFlags
+        {
+            /// Only reloadable resources are processed, reload restores initial state.
+            LF_DEFAULT = 0,
+            /// Process non-reloadable resources too.
+            LF_INCLUDE_NON_RELOADABLE = 1,
+            /// Process only resources which are not referenced by any other object. Usefull to reduce resource consumption.
+            LF_ONLY_UNREFERENCED = 2,
+            /// Combination of LF_ONLY_UNREFERENCED and LF_INCLUDE_NON_RELOADABLE
+            LF_ONLY_UNREFERENCED_INCLUDE_NON_RELOADABLE = 3,
+            /// Preserve some states during reloading, for example stencil shadows prepareness for Meshes
+            LF_PRESERVE_STATE = 4,
+        };
+
     protected:
         /// Creator
         ResourceManager* mCreator;
@@ -273,7 +289,7 @@ namespace Ogre {
             Calls unload() and then load() again, if the resource is already
             loaded. If it is not loaded already, then nothing happens.
         */
-        virtual void reload(void);
+        virtual void reload(LoadingFlags flags);
 
         /** Returns true if the Resource is reloadable, false otherwise.
         */
