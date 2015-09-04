@@ -3867,6 +3867,7 @@ void SceneManager::manualRender(RenderOperation* rend,
     // Do we need to update GPU program parameters?
     if (pass->isProgrammable())
     {
+        mAutoParamDataSource->setCurrentRenderable(0);
         if (vp)
         {
             mAutoParamDataSource->setCurrentViewport(vp);
