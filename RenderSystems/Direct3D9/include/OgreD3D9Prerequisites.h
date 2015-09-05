@@ -72,7 +72,12 @@ THE SOFTWARE.
 #endif
 #include <d3d9.h>
 #include <d3dx9.h>
+#ifdef __MINGW64_VERSION_MAJOR
+#include <dxerr9.h>
+#define DXGetErrorDescription DXGetErrorDescription9
+#else
 #include <DxErr.h>
+#endif
 
 
 namespace Ogre
