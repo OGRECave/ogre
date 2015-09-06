@@ -207,6 +207,7 @@ namespace Ogre {
     class HlmsLowLevelDatablock;
     struct HlmsMacroblock;
     class HlmsManager;
+    struct HlmsPso;
     struct HlmsSamplerblock;
     class HlmsTextureManager;
     struct HlmsTexturePack;

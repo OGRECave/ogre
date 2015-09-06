@@ -425,12 +425,15 @@ namespace Ogre
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 
+        PassCache passCache;
+        passCache.passPso = getPassPsoForScene( sceneManager );
+        passCache.properties = mSetProperties;
+
         assert( mPassCache.size() < 32768 );
-        HlmsPropertyVecVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(),
-                                                     mSetProperties );
+        PassCacheVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(), passCache );
         if( it == mPassCache.end() )
         {
-            mPassCache.push_back( mSetProperties );
+            mPassCache.push_back( passCache );
             it = mPassCache.end() - 1;
         }
 

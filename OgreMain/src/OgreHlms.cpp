@@ -46,6 +46,7 @@ THE SOFTWARE.
 //#include "OgreRenderable.h"
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
+#include "OgreDepthBuffer.h"
 
 #include "OgreHlmsListener.h"
 
@@ -1793,6 +1794,8 @@ namespace Ogre
     HlmsCache Hlms::preparePassHashBase( const CompositorShadowNode *shadowNode, bool casterPass,
                                          bool dualParaboloid, SceneManager *sceneManager )
     {
+        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+
         if( !casterPass )
         {
             if( shadowNode )
@@ -1949,19 +1952,22 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsPoint,       0 );
             setProperty( HlmsBaseProp::LightsSpot,        0 );
 
-            RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
             setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
                          renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         }
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 
-        assert( mPassCache.size() < 32768 );
-        HlmsPropertyVecVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(),
-                                                     mSetProperties );
+        PassCache passCache;
+        passCache.passPso = getPassPsoForScene( sceneManager );
+        passCache.properties = mSetProperties;
+
+        assert( mPassCache.size() < 32768 &&
+                "Too many passes combinations, we'll overflow the bits assigned in the hash." );
+        PassCacheVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(), passCache );
         if( it == mPassCache.end() )
         {
-            mPassCache.push_back( mSetProperties );
+            mPassCache.push_back( passCache );
             it = mPassCache.end() - 1;
         }
 
@@ -1971,6 +1977,27 @@ namespace Ogre
         retVal.setProperties = mSetProperties;
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    HlmsPassPso Hlms::getPassPsoForScene( SceneManager *sceneManager )
+    {
+        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+
+        //TODO: Get actual PixelFormat.
+        HlmsPassPso passPso;
+        for( int i=0; i<8; ++i )
+            passPso.colourFormat[i] = PF_NULL;
+
+        passPso.depthFormat = PF_NULL;
+        const DepthBuffer *depthBuffer = renderTarget->getDepthBuffer();
+        if( depthBuffer )
+            passPso.depthFormat = depthBuffer->getFormat();
+
+        passPso.multisampleCount   = std::max( renderTarget->getFSAA(), 1u );
+        passPso.multisampleQuality = StringConverter::parseInt( renderTarget->getFSAAHint() );
+        passPso.adapterId = 1; //TODO: Ask RenderSystem current adapter ID.
+
+        return passPso;
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getMaterial( HlmsCache const *lastReturnedValue,

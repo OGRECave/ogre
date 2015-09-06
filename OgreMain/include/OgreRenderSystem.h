@@ -742,6 +742,7 @@ namespace Ogre
         */
         virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
+        virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso ) {}
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock ) {}
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block ) {}
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock ) {}

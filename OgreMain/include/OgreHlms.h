@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreStringVector.h"
 #include "OgreHlmsCommon.h"
+#include "OgreHlmsPso.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -97,10 +98,21 @@ namespace Ogre
             }
         };
 
-        typedef vector<HlmsPropertyVec>::type HlmsPropertyVecVec;
+        struct PassCache
+        {
+            HlmsPropertyVec properties;
+            HlmsPassPso     passPso;
+
+            bool operator == ( const PassCache &_r ) const
+            {
+                return properties == _r.properties && passPso == _r.passPso;
+            }
+        };
+
+        typedef vector<PassCache>::type PassCacheVec;
         typedef vector<RenderableCache>::type RenderableCacheVec;
 
-        HlmsPropertyVecVec  mPassCache;
+        PassCacheVec        mPassCache;
         RenderableCacheVec  mRenderableCache;
         HlmsCacheVec        mShaderCache;
 
@@ -283,6 +295,8 @@ namespace Ogre
         HlmsCache preparePassHashBase( const Ogre::CompositorShadowNode *shadowNode,
                                        bool casterPass, bool dualParaboloid,
                                        SceneManager *sceneManager );
+
+        HlmsPassPso getPassPsoForScene( SceneManager *sceneManager );
 
     public:
         /**
