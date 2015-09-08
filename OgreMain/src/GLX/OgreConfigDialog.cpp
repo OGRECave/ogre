@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreImage.h"
 #include "OgreLogManager.h"
+#include "OgreRoot.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -488,7 +489,7 @@ void GLXConfigurator::SetConfigOption(const String &optionName, const String &va
 }
 
 //------------------------------------------------------------------------------------//
-ConfigDialog::ConfigDialog() : mSelectedRenderSystem(0)
+ConfigDialog::ConfigDialog() : mImpl(NULL)
 {
 }
 

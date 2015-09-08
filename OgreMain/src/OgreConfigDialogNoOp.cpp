@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2011 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,19 +25,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#include "OgreStableHeaders.h"
 #include "OgreConfigDialog.h"
+#include "OgreRoot.h"
+#include "OgreRenderSystem.h"
+#include "OgreException.h"
 
-namespace Ogre {
-
-//------------------------------------------------------------------------------------//
-ConfigDialog::ConfigDialog() : mSelectedRenderSystem(0)
+namespace Ogre
 {
-}
+    ConfigDialog::ConfigDialog() : mImpl(NULL) {
 
-//------------------------------------------------------------------------------------//
-bool ConfigDialog::display()
-{
-    return true;
-}
-};
+    }
 
+    bool ConfigDialog::display()
+    {
+        if(Root::getSingleton().getRenderSystem())
+        {
+            return true;
+        }
+
+        const RenderSystemList* lstRend;
+        RenderSystemList::const_iterator pRend;
+
+        lstRend = &Root::getSingleton().getAvailableRenderers();
+        pRend = lstRend->begin();
+
+        // just select the first available render system for now.
+        if (pRend != lstRend->end())
+        {
+            Root::getSingleton().setRenderSystem(*pRend);
+
+            return true;
+        }
+
+        return false;
+    }
+}
