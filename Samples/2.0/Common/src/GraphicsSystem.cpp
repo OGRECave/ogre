@@ -77,7 +77,7 @@ std::string macBundlePath()
     //-----------------------------------------------------------------------------------
     GraphicsSystem::~GraphicsSystem()
     {
-        assert( !mRoot && "deinitialize() not called!!!" );
+        //assert( !mRoot && "deinitialize() not called!!!" );
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::initialize( const Ogre::String &windowTitle )
@@ -102,7 +102,7 @@ std::string macBundlePath()
                                      mResourcePath + "ogre.cfg",
                                      mResourcePath + "Ogre.log" );
 
-        //if( !mRoot->restoreConfig() )
+        if( !mRoot->restoreConfig() )
         {
             if( !mRoot->showConfigDialog() )
             {

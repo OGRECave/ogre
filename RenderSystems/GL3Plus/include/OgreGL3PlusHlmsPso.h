@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreGL3PlusHlmsMacroblock_H_
-#define _OgreGL3PlusHlmsMacroblock_H_
+#ifndef _OgreGL3PlusHlmsPso_H_
+#define _OgreGL3PlusHlmsPso_H_
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHeaderPrefix.h"
@@ -40,14 +40,31 @@ namespace Ogre
     *  @{
     */
 
-    /// @See HlmsMacroblock. We cache some conversion values here
-    /// to avoid doing it every time we set the macroblock
-    struct _OgreGL3PlusExport GL3PlusHlmsMacroblock
+    /// @See HlmsPso. We cache some conversion values here
+    /// to avoid doing it every time we set the Pso
+    struct _OgreGL3PlusExport GL3PlusHlmsPso
     {
-        GLboolean   mDepthWrite;
-        GLenum      mDepthFunc;
-        GLenum      mCullMode[2];
-        GLenum      mPolygonMode;
+        //Macroblock data
+        GLboolean   depthWrite;
+        GLenum      depthFunc;
+        GLenum      cullMode[2];
+        GLenum      polygonMode;
+
+        //Blendblock data
+        bool    enableAlphaBlend;
+        GLenum sourceBlend;
+        GLenum destBlend;
+        GLenum sourceBlendAlpha;
+        GLenum destBlendAlpha;
+        GLenum blendFunc;
+        GLenum blendFuncAlpha;
+
+        //Shader
+        GLSLShader *vertexShader;
+        GLSLShader *geometryShader;
+        GLSLShader *hullShader;
+        GLSLShader *domainShader;
+        GLSLShader *pixelShader;
     };
 
     /** @} */

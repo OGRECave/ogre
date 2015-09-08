@@ -28,7 +28,6 @@ THE SOFTWARE.
 #ifndef _OgreHlmsPso_H_
 #define _OgreHlmsPso_H_
 
-#include "OgreHlmsCommon.h"
 #include "OgrePixelFormat.h"
 #include "Vao/OgreVertexBufferPacked.h"
 #include "OgreHeaderPrefix.h"
@@ -122,10 +121,21 @@ namespace Ogre
 
         bool operator == ( const HlmsPassPso &_r ) const
         {
+            //Warning! For this to work correctly, the struct must have been previously
+            //memset to zero (padded bytes would affect the results otherwise)
             return !memcmp( this, &_r, sizeof(HlmsPassPso) );
         }
     };
 
+    /** Defines a PipelineStateObject as required by Vulkan, Metal & DX12.
+    @remarks
+        Some RenderSystem-specific quirks:
+            In OpenGL, vertex-input data (vertexElements, operationType, enablePrimitiveRestart)
+            is ignored, and controlled via the VertexArrayObject pointer.
+
+            In the other APIs, vertex-input data is use, and VertexArrayObject pointers
+            only control which vertex and index buffers are bound to the device.
+    */
     struct HlmsPso
     {
         GpuProgramPtr   vertexShader;
@@ -134,12 +144,12 @@ namespace Ogre
         GpuProgramPtr   tesselationDomainShader;
         GpuProgramPtr   pixelShader;
 
-        HlmsMacroblock	*macroblock;
-        HlmsBlendblock	*blendblock;
-        //No independent block for now
-//        HlmsBlendblock	*blendblock[8];
-//        bool            independentBlend;
-        uint32			sampleMask; /// Fixed to 0xffffffff for now
+        HlmsMacroblock const    *macroblock;
+        HlmsBlendblock const    *blendblock;
+        //No independent blenblocks for now
+//      HlmsBlendblock const    *blendblock[8];
+//      bool                    independentBlend;
+        uint32                  sampleMask; /// Fixed to 0xffffffff for now
 
         //Computed from the VertexArrayObject (or v1 equivalent)
         VertexElement2Vec   vertexElements;
@@ -150,6 +160,10 @@ namespace Ogre
         HlmsPassPso     pass;
 
         void        *rsData;        /// Render-System specific data
+
+        //No constructor on purpose. Performance implications
+        //(could get called every object when looking up!)
+        HlmsPso();
     };
 
     /** @} */

@@ -240,19 +240,11 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
-    void NULLRenderSystem::_setHlmsMacroblock( const HlmsMacroblock *macroblock )
-    {
-    }
-    //-------------------------------------------------------------------------
-    void NULLRenderSystem::_setHlmsBlendblock( const HlmsBlendblock *blendblock )
-    {
-    }
-    //-------------------------------------------------------------------------
     void NULLRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock )
     {
     }
     //-------------------------------------------------------------------------
-    void NULLRenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )
+    void NULLRenderSystem::_setPipelineStateObject( const HlmsPso *pso )
     {
     }
     //-------------------------------------------------------------------------

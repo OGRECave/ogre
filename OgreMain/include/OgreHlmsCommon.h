@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreIdString.h"
 #include "OgreBlendMode.h"
 #include "OgreVector3.h"
+#include "OgreHlmsPso.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -180,14 +181,11 @@ namespace Ogre
         HlmsPropertyVec setProperties;
         HlmsTypes       type;
 
-        GpuProgramPtr   vertexShader;
-        GpuProgramPtr   geometryShader;
-        GpuProgramPtr   tesselationHullShader;
-        GpuProgramPtr   tesselationDomainShader;
-        GpuProgramPtr   pixelShader;
+        HlmsPso         *pso;
 
         HlmsCache() : hash( 0 ), type( HLMS_MAX ) {}
-        HlmsCache( uint32 _hash, HlmsTypes _type ) : hash( _hash ), type( _type ) {}
+        HlmsCache( uint32 _hash, HlmsTypes _type, HlmsPso *_pso ) :
+            hash( _hash ), type( _type ), pso( _pso ) {}
     };
 
     #define OGRE_EXTRACT_HLMS_TYPE_FROM_CACHE_HASH( x ) (x >> 29)

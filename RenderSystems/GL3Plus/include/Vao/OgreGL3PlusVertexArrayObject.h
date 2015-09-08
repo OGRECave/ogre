@@ -43,7 +43,7 @@ namespace Ogre
                                   const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
                                   v1::RenderOperation::OperationType opType ) :
-            VertexArrayObject( vaoName, renderQueueId, vertexBuffers, indexBuffer, opType )
+            VertexArrayObject( vaoName, renderQueueId, 0, vertexBuffers, indexBuffer, opType )
         {
             switch( opType )
             {

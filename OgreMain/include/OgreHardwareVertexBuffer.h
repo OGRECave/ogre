@@ -289,10 +289,14 @@ namespace v1 {
         static bool vertexElementLess(const VertexElement& e1, const VertexElement& e2);
     protected:
         VertexElementList mElementList;
+        /// @see VertexArrayObject::mInputLayoutId
+        uint8 mInputLayoutId;
     public:
         /// Standard constructor, not you should use HardwareBufferManager::createVertexDeclaration
         VertexDeclaration();
         virtual ~VertexDeclaration();
+
+        uint8 getInputLayoutId(void) const  { return mInputLayoutId; }
 
         /** Get the number of elements in the declaration. */
         size_t getElementCount(void) const { return mElementList.size(); }

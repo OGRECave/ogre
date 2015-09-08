@@ -112,6 +112,11 @@ namespace Ogre
         typedef vector<PassCache>::type PassCacheVec;
         typedef vector<RenderableCache>::type RenderableCacheVec;
 
+//        [OGRE_HLMS_NUM_MACROBLOCKS];
+//        [OGRE_HLMS_NUM_BLENDBLOCKS];
+        /// Used to return a valid pointer in preparePassHashBase with per-pass data
+        HlmsPso mDummyPso;
+
         PassCacheVec        mPassCache;
         RenderableCacheVec  mRenderableCache;
         HlmsCacheVec        mShaderCache;
@@ -244,11 +249,7 @@ namespace Ogre
         /// Retrieves a cache entry using the returned value from @addRenderableCache
         const RenderableCache& getRenderableCache( uint32 hash ) const;
 
-        const HlmsCache* addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
-                                         GpuProgramPtr &geometryShader,
-                                         GpuProgramPtr &tesselationHullShader,
-                                         GpuProgramPtr &tesselationDomainShader,
-                                         GpuProgramPtr &pixelShader );
+        const HlmsCache* addShaderCache( uint32 hash, HlmsPso *pso );
         const HlmsCache* getShaderCache( uint32 hash ) const;
         void clearShaderCache(void);
 
@@ -463,7 +464,8 @@ namespace Ogre
             Structure containing all necessary shaders
         */
         const HlmsCache* getMaterial( HlmsCache const *lastReturnedValue, const HlmsCache &passCache,
-                                      const QueuedRenderable &queuedRenderable, bool casterPass );
+                                      const QueuedRenderable &queuedRenderable, uint8 inputLayout,
+                                      bool casterPass );
 
         /** Fills the constant buffers. Gets executed right before drawing the mesh.
         @param cache
@@ -607,9 +609,34 @@ namespace Ogre
         static const IdString *UvCountPtrs[8];
     };
 
+    struct _OgreExport HlmsPsoProp
+    {
+        static const IdString Macroblock;
+        static const IdString Blendblock;
+    };
+
     struct _OgreExport HlmsBasePieces
     {
         static const IdString AlphaTestCmpFunc;
+    };
+
+    struct _OgreExport HlmsBits
+    {
+        static const int HlmsTypeBits;
+        static const int RenderableBits;
+        static const int PassBits;
+        static const int InputLayoutBits;
+
+        static const int HlmsTypeShift;
+        static const int RenderableShift;
+        static const int PassShift;
+        static const int InputLayoutShift;
+
+        static const int RendarebleHlmsTypeMask;
+        static const int HlmsTypeMask;
+        static const int RenderableMask;
+        static const int PassMask;
+        static const int InputLayoutMask;
     };
 
     /** @} */

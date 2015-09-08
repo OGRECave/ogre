@@ -83,9 +83,7 @@ namespace Ogre
         static CommandBufferExecuteFunc execute_setTextureBufferDS;
         static CommandBufferExecuteFunc execute_setTextureBufferCS;
         static CommandBufferExecuteFunc execute_setTextureBufferInvalid;
-        static CommandBufferExecuteFunc execute_setMacroblock;
-        static CommandBufferExecuteFunc execute_setBlendblock;
-        static CommandBufferExecuteFunc execute_setHlmsCache;
+        static CommandBufferExecuteFunc execute_setPso;
         static CommandBufferExecuteFunc execute_setTexture;
         static CommandBufferExecuteFunc execute_disableTextureUnitsFrom;
         static CommandBufferExecuteFunc execute_startV1LegacyRendering;

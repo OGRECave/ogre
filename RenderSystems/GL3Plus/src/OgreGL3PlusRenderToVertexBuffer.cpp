@@ -244,7 +244,7 @@ namespace v1 {
         Ogre::Pass* r2vbPass = mMaterial->getBestTechnique()->getPass(0);
 
         // Set pass before binding buffers to activate the GPU programs.
-        sceneMgr->_setPass(r2vbPass);
+        //sceneMgr->_setPass(r2vbPass); TODO
         if (mFirstUpdate)
         {
             bindVerticesOutput(r2vbPass);

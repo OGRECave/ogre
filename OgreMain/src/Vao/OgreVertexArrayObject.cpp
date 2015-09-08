@@ -38,12 +38,13 @@ namespace Ogre
 {
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
 
-    VertexArrayObject::VertexArrayObject( uint32 vaoName, uint32 renderQueueId,
+    VertexArrayObject::VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint8 inputLayoutId,
                                           const VertexBufferPackedVec &vertexBuffers,
                                           IndexBufferPacked *indexBuffer,
                                           v1::RenderOperation::OperationType operationType ) :
             mVaoName( vaoName ),
             mRenderQueueId( renderQueueId ),
+            mInputLayoutId( inputLayoutId ),
             mPrimStart( 0 ),
             mPrimCount( 0 ),
             mVertexBuffers( vertexBuffers ),

@@ -48,5 +48,14 @@ namespace Ogre
 //        mMaxLod( FLT_MAX )
 //    {
 //    }
+    HlmsPso::HlmsPso() :
+        macroblock( 0 ),
+        blendblock( 0 ),
+        sampleMask( 0xffffffff ),
+        operationType( OT_TRIANGLE_STRIP ),
+        enablePrimitiveRestart( true ),
+        rsData( 0 )
+    {
+    }
     //-----------------------------------------------------------------------------------
 }

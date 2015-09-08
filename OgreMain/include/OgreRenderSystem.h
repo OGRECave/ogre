@@ -743,6 +743,7 @@ namespace Ogre
         virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
         virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso ) {}
+        virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso ) {}
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock ) {}
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block ) {}
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock ) {}
@@ -873,18 +874,12 @@ namespace Ogre
         /** Get the current active viewport for rendering. */
         virtual Viewport* _getViewport(void);
 
-        /// @See HlmsMacroblock
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock ) = 0;
-
-        /// @See HlmsBlendblock
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock ) = 0;
-
         /// @See HlmsSamplerblock. This function MUST be called after _setTexture, not before.
         /// Otherwise not all APIs may see the change.
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock ) = 0;
 
-        /// @See HlmsCache
-        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache ) = 0;
+        /// @See HlmsPso
+        virtual void _setPipelineStateObject( const HlmsPso *pso );
 
         /** Sets the depth bias, NB you should use the Material version of this. 
         @remarks
@@ -1097,7 +1092,7 @@ namespace Ogre
             (i.e. Vertex Formats, buffers being bound, etc.)
             You don't need to rebind if the VAO's mRenderQueueId is the same as previous call.
         @remarks
-            Assumes _setProgramsFromHlms has already been called.
+            Assumes _setPipelineStateObject has already been called.
         */
         virtual void _setVertexArrayObject( const VertexArrayObject *vao ) = 0;
 
@@ -1135,12 +1130,6 @@ namespace Ogre
         */
         virtual const String& _getDefaultViewportMaterialScheme(void) const;
 
-        /** Binds a given GpuProgram (but not the parameters). 
-        @remarks Only one GpuProgram of each type can be bound at once, binding another
-        one will simply replace the existing one.
-        */
-        virtual void bindGpuProgram(GpuProgram* prg);
-
         /** Bind Gpu program parameters.
         @param gptype The type of program to bind the parameters to
         @param params The parameters to bind
@@ -1152,11 +1141,6 @@ namespace Ogre
         /** Only binds Gpu program parameters used for passes that have more than one iteration rendering
         */
         virtual void bindGpuProgramPassIterationParameters(GpuProgramType gptype) = 0;
-        /** Unbinds GpuPrograms of a given GpuProgramType.
-        @remarks
-        This returns the pipeline to fixed-function processing for this type.
-        */
-        virtual void unbindGpuProgram(GpuProgramType gptype);
 
         /** Returns whether or not a Gpu program of the given type is currently bound. */
         virtual bool isGpuProgramBound(GpuProgramType gptype);

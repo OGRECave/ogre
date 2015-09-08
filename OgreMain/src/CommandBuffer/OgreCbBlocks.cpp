@@ -35,41 +35,15 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    CbMacroblock::CbMacroblock( const HlmsMacroblock *_block ) :
-        CbBase( CB_SET_MACROBLOCK ),
-        block( _block ),
-        reserved( 0 )
+    CbPipelineStateObject::CbPipelineStateObject( const HlmsPso *_pso ) :
+        CbBase( CB_SET_PSO ),
+        pso( _pso )
     {
     }
 
-    void CommandBuffer::execute_setMacroblock( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
+    void CommandBuffer::execute_setPso( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
     {
-        const CbMacroblock *cmd = static_cast<const CbMacroblock*>( _cmd );
-        _this->mRenderSystem->_setHlmsMacroblock( cmd->block );
-    }
-
-    CbBlendblock::CbBlendblock( const HlmsBlendblock *_block ) :
-        CbBase( CB_SET_BLENDBLOCK ),
-        block( _block ),
-        reserved( 0 )
-    {
-    }
-
-    void CommandBuffer::execute_setBlendblock( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
-    {
-        const CbBlendblock *cmd = static_cast<const CbBlendblock*>( _cmd );
-        _this->mRenderSystem->_setHlmsBlendblock( cmd->block );
-    }
-
-    CbHlmsCache::CbHlmsCache( const HlmsCache *_hlmsCache ) :
-        CbBase( CB_SET_HLMS_BLOCK ),
-        hlmsCache( _hlmsCache )
-    {
-    }
-
-    void CommandBuffer::execute_setHlmsCache( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
-    {
-        const CbHlmsCache *cmd = static_cast<const CbHlmsCache*>( _cmd );
-        _this->mRenderSystem->_setProgramsFromHlms( cmd->hlmsCache );
+        const CbPipelineStateObject *cmd = static_cast<const CbPipelineStateObject*>( _cmd );
+        _this->mRenderSystem->_setPipelineStateObject( cmd->pso );
     }
 }

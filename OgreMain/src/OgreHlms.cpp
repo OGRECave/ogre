@@ -52,6 +52,22 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const int HlmsBits::HlmsTypeBits    = 3;
+    const int HlmsBits::RenderableBits  = 14;
+    const int HlmsBits::PassBits        = 8;
+    const int HlmsBits::InputLayoutBits = 7;
+
+    const int HlmsBits::HlmsTypeShift   = 32 - HlmsTypeBits;
+    const int HlmsBits::RenderableShift = HlmsTypeShift - RenderableBits;
+    const int HlmsBits::PassShift       = RenderableShift - PassBits;
+    const int HlmsBits::InputLayoutShift= PassShift - InputLayoutBits;
+
+    const int HlmsBits::RendarebleHlmsTypeMask = (1 << (HlmsTypeBits + RenderableBits)) - 1;
+    const int HlmsBits::HlmsTypeMask    = (1 << HlmsTypeBits) - 1;
+    const int HlmsBits::RenderableMask  = (1 << RenderableBits) - 1;
+    const int HlmsBits::PassMask        = (1 << PassBits) - 1;
+    const int HlmsBits::InputLayoutMask = (1 << InputLayoutBits) - 1;
+
     //Change per mesh (hash can be cached on the renderable)
     const IdString HlmsBaseProp::Skeleton           = IdString( "hlms_skeleton" );
     const IdString HlmsBaseProp::BonesPerVertex     = IdString( "hlms_bones_per_vertex" );
@@ -117,6 +133,9 @@ namespace Ogre
         &HlmsBaseProp::UvCount6,
         &HlmsBaseProp::UvCount7
     };
+
+    const IdString HlmsPsoProp::Macroblock      = IdString( "PsoMacroblock" );
+    const IdString HlmsPsoProp::Blendblock      = IdString( "PsoBlendblock" );
 
     const String ShaderFiles[] = { "VertexShader_vs", "PixelShader_ps", "GeometryShader_gs",
                                    "HullShader_hs", "DomainShader_ds" };
@@ -1244,7 +1263,7 @@ namespace Ogre
     size_t Hlms::addRenderableCache( const HlmsPropertyVec &renderableSetProperties,
                                      const PiecesMap *pieces )
     {
-        assert( mRenderableCache.size() < 8192 );
+        assert( mRenderableCache.size() <= HlmsBits::RenderableMask );
 
         RenderableCache cacheEntry( renderableSetProperties, pieces );
 
@@ -1256,13 +1275,14 @@ namespace Ogre
             it = mRenderableCache.end() - 1;
         }
 
-        //3 bits for mType (see getMaterial)
-        return (mType << 14) | (it - mRenderableCache.begin());
+        //3 bits for mType (see getMaterial)2
+        return (mType << HlmsBits::HlmsTypeShift) |
+                ((it - mRenderableCache.begin()) << HlmsBits::RenderableShift);
     }
     //-----------------------------------------------------------------------------------
     const Hlms::RenderableCache &Hlms::getRenderableCache( uint32 hash ) const
     {
-        return mRenderableCache[hash & 0x7f];
+        return mRenderableCache[(hash >> HlmsBits::RenderableShift) & HlmsBits::RenderableMask];
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDatablockImpl( IdString datablockName,
@@ -1428,24 +1448,14 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    const HlmsCache* Hlms::addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
-                                           GpuProgramPtr &geometryShader,
-                                           GpuProgramPtr &tesselationHullShader,
-                                           GpuProgramPtr &tesselationDomainShader,
-                                           GpuProgramPtr &pixelShader )
+    const HlmsCache* Hlms::addShaderCache( uint32 hash, HlmsPso *pso )
     {
-        HlmsCache cache( hash, mType );
+        HlmsCache cache( hash, mType, pso );
         HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
                                                       &cache, OrderCacheByHash );
 
         assert( (it == mShaderCache.end() || (*it)->hash != hash) &&
                 "Can't add the same shader to the cache twice! (or a hash collision happened)" );
-
-        cache.vertexShader              = vertexShader;
-        cache.geometryShader            = geometryShader;
-        cache.tesselationHullShader     = tesselationHullShader;
-        cache.tesselationDomainShader   = tesselationDomainShader;
-        cache.pixelShader               = pixelShader;
 
         HlmsCache *retVal = new HlmsCache( cache );
         mShaderCache.insert( it, retVal );
@@ -1455,7 +1465,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getShaderCache( uint32 hash ) const
     {
-        HlmsCache cache( hash, mType );
+        HlmsCache cache( hash, mType, 0 );
         HlmsCacheVec::const_iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
                                                             &cache, OrderCacheByHash );
 
@@ -1635,9 +1645,32 @@ namespace Ogre
             }
         }
 
-        const HlmsCache* retVal = addShaderCache( finalHash, shaders[VertexShader],
-                                                  shaders[GeometryShader], shaders[HullShader],
-                                                  shaders[DomainShader], shaders[PixelShader] );
+        HlmsPso *pso = new HlmsPso();
+        pso->vertexShader               = shaders[VertexShader];
+        pso->geometryShader             = shaders[GeometryShader];
+        pso->tesselationHullShader      = shaders[HullShader];
+        pso->tesselationDomainShader    = shaders[DomainShader];
+        pso->pixelShader                = shaders[PixelShader];
+
+        bool casterPass = getProperty( HlmsBaseProp::ShadowCaster ) != 0;
+
+        const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
+        pso->macroblock = datablock->getMacroblock( casterPass );
+        pso->blendblock = datablock->getBlendblock( casterPass );
+        pso->pass = passCache.pso->pass;
+
+        if( queuedRenderable.renderable )
+        {
+            //TODO
+            //mRenderSystem->getVaoManager();
+            //pso->vertexElements =
+            //pso->operationType = ;
+            pso->enablePrimitiveRestart = true;
+        }
+
+        mRenderSystem->_hlmsPipelineStateObjectCreated( pso );
+
+        const HlmsCache* retVal = addShaderCache( finalHash, pso );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -1757,6 +1790,9 @@ namespace Ogre
         else if( renderable->getUseIdentityProjection() )
             setProperty( HlmsBaseProp::IdentityViewProj, 1 );
 
+        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(false)->mId );
+        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(false)->mId );
+
         PiecesMap pieces[NumShaderTypes];
         if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {
@@ -1778,6 +1814,8 @@ namespace Ogre
                     pieces[PixelShader][HlmsBasePieces::AlphaTestCmpFunc];
         }
         calculateHashForPreCaster( renderable, piecesCaster );
+        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(true)->mId );
+        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(true)->mId );
         uint32 renderableCasterHash = this->addRenderableCache( mSetProperties, piecesCaster );
 
         outHash         = renderableHash;
@@ -1794,8 +1832,6 @@ namespace Ogre
     HlmsCache Hlms::preparePassHashBase( const CompositorShadowNode *shadowNode, bool casterPass,
                                          bool dualParaboloid, SceneManager *sceneManager )
     {
-        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
-
         if( !casterPass )
         {
             if( shadowNode )
@@ -1952,6 +1988,8 @@ namespace Ogre
             setProperty( HlmsBaseProp::LightsPoint,       0 );
             setProperty( HlmsBaseProp::LightsSpot,        0 );
 
+            RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+
             setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
                          renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         }
@@ -1962,8 +2000,8 @@ namespace Ogre
         passCache.passPso = getPassPsoForScene( sceneManager );
         passCache.properties = mSetProperties;
 
-        assert( mPassCache.size() < 32768 &&
-                "Too many passes combinations, we'll overflow the bits assigned in the hash." );
+        assert( mPassCache.size() <= HlmsBits::PassMask &&
+                "Too many passes combinations, we'll overflow the bits assigned in the hash!" );
         PassCacheVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(), passCache );
         if( it == mPassCache.end() )
         {
@@ -1971,10 +2009,11 @@ namespace Ogre
             it = mPassCache.end() - 1;
         }
 
-        const uint32 hash = it - mPassCache.begin();
+        const uint32 hash = (it - mPassCache.begin()) << HlmsBits::PassShift;
 
-        HlmsCache retVal( hash, mType );
+        HlmsCache retVal( hash, mType, &mDummyPso );
         retVal.setProperties = mSetProperties;
+        retVal.pso->pass = passCache.passPso;
 
         return retVal;
     }
@@ -1983,8 +2022,24 @@ namespace Ogre
     {
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
 
-        //TODO: Get actual PixelFormat.
         HlmsPassPso passPso;
+
+        //Needed so that memcmp in HlmsPassPso::operator == works correctly
+        memset( &passPso, 0, sizeof(HlmsPassPso) );
+
+        //TODO: Read data from RenderSystem.
+        passPso.enableStencil = false;
+        passPso.stencilReadMask     = 0xff;
+        passPso.stencilWriteMask    = 0xff;
+        passPso.stencilFront.compareOp = CMPF_ALWAYS_FAIL;
+        passPso.stencilFront.stencilFailOp      = SOP_KEEP;
+        passPso.stencilFront.stencilPassOp      = SOP_KEEP;
+        passPso.stencilFront.stencilDepthFailOp = SOP_KEEP;
+        passPso.stencilBack.compareOp  = CMPF_ALWAYS_FAIL;
+        passPso.stencilBack.stencilFailOp       = SOP_KEEP;
+        passPso.stencilBack.stencilPassOp       = SOP_KEEP;
+        passPso.stencilBack.stencilDepthFailOp  = SOP_KEEP;
+
         for( int i=0; i<8; ++i )
             passPso.colourFormat[i] = PF_NULL;
 
@@ -2002,10 +2057,11 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getMaterial( HlmsCache const *lastReturnedValue,
                                         const HlmsCache &passCache,
-                                        const QueuedRenderable &queuedRenderable, bool casterPass )
+                                        const QueuedRenderable &queuedRenderable,
+                                        uint8 inputLayout, bool casterPass )
     {
         uint32 finalHash;
-        uint32 hash[2];
+        uint32 hash[3];
         hash[0] = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                queuedRenderable.renderable->getHlmsHash();
         hash[1] = passCache.hash;
@@ -2013,10 +2069,14 @@ namespace Ogre
         //MurmurHash3_x86_32( hash, sizeof( hash ), IdString::Seed, &finalHash );
 
         //If this assert triggers, we've created too many shader variations (or bug)
-        assert( !(hash[0] & ~((1 << 17) - 1)) ); //Too many material / meshes variations
-        assert( !(hash[1] & ~((1 << 15) - 1)) ); //Too many pass conditions (extremely rare!!!).
+        assert( (hash[0] >> HlmsBits::RenderableShift) <= HlmsBits::RendarebleHlmsTypeMask &&
+                "Too many material / meshes variations" );
+        assert( (hash[1] >> HlmsBits::PassShift) <= HlmsBits::PassMask &&
+                "Should never happen (we assert in preparePassHash)" );
+        assert( (inputLayout >> HlmsBits::InputLayoutShift) <= HlmsBits::InputLayoutMask &&
+                "Too many vertex formats." );
 
-        finalHash = (hash[0] << 15) | hash[1];
+        finalHash = hash[0] | hash[1] | inputLayout;
 
         if( lastReturnedValue->hash != finalHash )
         {

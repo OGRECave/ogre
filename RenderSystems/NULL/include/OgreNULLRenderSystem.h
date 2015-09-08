@@ -111,10 +111,8 @@ namespace Ogre
         virtual void _endFrame(void);
         virtual void _setViewport(Viewport *vp);
 
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock );
-        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
+        virtual void _setPipelineStateObject( const HlmsPso *pso );
 
         virtual VertexElementType getColourVertexElementType(void) const;
         virtual void _convertProjectionMatrix(const Matrix4& matrix,

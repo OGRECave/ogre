@@ -326,10 +326,6 @@ namespace Ogre
         /** See
           RenderSystem
          */
-        void bindGpuProgram(GpuProgram* prg);
-        /** See
-          RenderSystem
-         */
         void unbindGpuProgram(GpuProgramType gptype);
         /** See
           RenderSystem

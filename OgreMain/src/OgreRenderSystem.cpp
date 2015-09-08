@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
+#include "OgreHlmsPso.h"
 #include "Vao/OgreVaoManager.h"
 #include "Vao/OgreVertexArrayObject.h"
 
@@ -269,6 +270,33 @@ namespace Ogre {
     Viewport* RenderSystem::_getViewport(void)
     {
         return mActiveViewport;
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::_setPipelineStateObject( const HlmsPso *pso )
+    {
+        assert( (!pso || pso->rsData) &&
+                "The PipelineStateObject must have been created via "
+                "HlmsManager::_hlmsPipelineStateObjectCreated!" );
+
+        //Disable previous state
+        mActiveVertexGpuProgramParameters.setNull();
+        mActiveGeometryGpuProgramParameters.setNull();
+        mActiveTessellationHullGpuProgramParameters.setNull();
+        mActiveTessellationDomainGpuProgramParameters.setNull();
+        mActiveFragmentGpuProgramParameters.setNull();
+        mActiveComputeGpuProgramParameters.setNull();
+
+        if( mVertexProgramBound && !mClipPlanes.empty() )
+            mClipPlanesDirty = true;
+
+        mVertexProgramBound             = false;
+        mGeometryProgramBound           = false;
+        mFragmentProgramBound           = false;
+        mTessellationHullProgramBound   = false;
+        mTessellationDomainProgramBound = false;
+        mComputeProgramBound            = false;
+
+        //Derived class must set new state
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_setTextureUnitSettings(size_t texUnit, TextureUnitState& tl)
@@ -950,63 +978,6 @@ namespace Ogre {
         {
             mHwOcclusionQueries.erase(i);
             OGRE_DELETE hq;
-        }
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::bindGpuProgram(GpuProgram* prg)
-    {
-        switch(prg->getType())
-        {
-        case GPT_VERTEX_PROGRAM:
-            // mark clip planes dirty if changed (programmable can change space)
-            if (!mVertexProgramBound && !mClipPlanes.empty())
-                mClipPlanesDirty = true;
-
-            mVertexProgramBound = true;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mGeometryProgramBound = true;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mFragmentProgramBound = true;
-            break;
-        case GPT_HULL_PROGRAM:
-            mTessellationHullProgramBound = true;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mTessellationDomainProgramBound = true;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mComputeProgramBound = true;
-            break;
-        }
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::unbindGpuProgram(GpuProgramType gptype)
-    {
-        switch(gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            // mark clip planes dirty if changed (programmable can change space)
-            if (mVertexProgramBound && !mClipPlanes.empty())
-                mClipPlanesDirty = true;
-            mVertexProgramBound = false;
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            mGeometryProgramBound = false;
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            mFragmentProgramBound = false;
-            break;
-        case GPT_HULL_PROGRAM:
-            mTessellationHullProgramBound = false;
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            mTessellationDomainProgramBound = false;
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            mComputeProgramBound = false;
-            break;
         }
     }
     //-----------------------------------------------------------------------

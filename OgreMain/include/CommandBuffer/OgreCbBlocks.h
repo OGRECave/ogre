@@ -32,26 +32,10 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    struct _OgreExport CbMacroblock : public CbBase
+    struct _OgreExport CbPipelineStateObject : CbBase
     {
-        HlmsMacroblock const    *block;
-        void                    *reserved; //For PipelineStateObjects?
-
-        CbMacroblock( const HlmsMacroblock *_block );
-    };
-
-    struct _OgreExport CbBlendblock : public CbBase
-    {
-        HlmsBlendblock const    *block;
-        void                    *reserved; //For PipelineStateObjects?
-
-        CbBlendblock( const HlmsBlendblock *_block );
-    };
-
-    struct _OgreExport CbHlmsCache : CbBase
-    {
-        HlmsCache const *hlmsCache;
-        CbHlmsCache( const HlmsCache *_hlmsCache );
+        HlmsPso const *pso;
+        CbPipelineStateObject( const HlmsPso *_pso );
     };
 }
 

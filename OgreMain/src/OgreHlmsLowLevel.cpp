@@ -75,30 +75,44 @@ namespace Ogre
                          "HlmsLowLevel::createShaderCacheEntry" );
         }
 
-        //We push into mShaderCache then clear each pass so that we can return unique references.
-        //This forces a new hash per renderable, and therefore forces HLMS to update the shaders & tex units for each renderable
-        //This will cause a performance hit if a pass has many objects with the same low level material, as it will
-        //cause a state change for each object. However currently there has not been devised a way of supporting low
-        //level materials without impacting the peformance of normal HLMS materials.
-        //Basically avoid low level materials as much as possible
-        HlmsCache *cache = new HlmsCache( mShaderCache.size() + 1, HLMS_LOW_LEVEL );
+        HlmsPso *pso = new HlmsPso();
         if( pass->hasVertexProgram() )
-            cache->vertexShader             = pass->getVertexProgram();
+            pso->vertexShader           = pass->getVertexProgram();
         if( pass->hasGeometryProgram() )
-            cache->geometryShader           = pass->getGeometryProgram();
+            pso->geometryShader         = pass->getGeometryProgram();
         if( pass->hasTessellationHullProgram() )
-            cache->tesselationHullShader    = pass->getTessellationHullProgram();
+            pso->tesselationHullShader  = pass->getTessellationHullProgram();
         if( pass->hasTessellationDomainProgram() )
-            cache->tesselationDomainShader  = pass->getTessellationDomainProgram();
+            pso->tesselationDomainShader= pass->getTessellationDomainProgram();
         if( pass->hasFragmentProgram() )
-            cache->pixelShader              = pass->getFragmentProgram();
-        mShaderCache.push_back( cache );
+            pso->pixelShader            = pass->getFragmentProgram();
 
-        return cache;
+        bool casterPass = getProperty( HlmsBaseProp::ShadowCaster ) != 0;
+
+        const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
+        pso->macroblock = datablock->getMacroblock( casterPass );
+        pso->blendblock = datablock->getBlendblock( casterPass );
+        pso->pass = passCache.pso->pass;
+
+        if( queuedRenderable.renderable )
+        {
+            //TODO
+            //mRenderSystem->getVaoManager();
+            //pso->vertexElements =
+            //pso->operationType = ;
+            pso->enablePrimitiveRestart = true;
+        }
+
+        mRenderSystem->_hlmsPipelineStateObjectCreated( pso );
+
+        const HlmsCache* retVal = addShaderCache( finalHash, pso );
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void HlmsLowLevel::calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash )
     {
+        mSetProperties.clear();
+
         const MaterialPtr &mat = renderable->getMaterial();
 
         Material::TechniqueIterator techniqueIt = mat->getTechniqueIterator();
@@ -121,19 +135,21 @@ namespace Ogre
             }
         }
 
-        //Each Renderable should use a different hash so that Hlms::getMaterial forces
-        //shaders to change. HlmsLowLevel::createShaderCacheEntry takes care of this, so 
-        //here we just set the hashes to the max value possible so no asserts are thrown in Hlms::getMaterial
-        //This will causes more state changes than is needed so avoid low level materials as much as possible!
-        outHash = 0x1FFFF;
-        outCasterHash = 0x1FFFF;
+        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(false)->mId );
+        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(false)->mId );
+
+        outHash = this->addRenderableCache( mSetProperties, (const PiecesMap*)0 );
+
+        setProperty( HlmsBaseProp::ShadowCaster, true );
+        setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(true)->mId );
+        setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(true)->mId );
+
+        outCasterHash = this->addRenderableCache( mSetProperties, (const PiecesMap*)0 );
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsLowLevel::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
                                              bool dualParaboloid, SceneManager *sceneManager )
     {
-        clearShaderCache();
-
         mCurrentSceneManager = sceneManager;
 
         HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );

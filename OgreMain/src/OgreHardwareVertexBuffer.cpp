@@ -41,7 +41,7 @@ namespace v1 {
     HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,  
         size_t numVertices, HardwareBuffer::Usage usage, 
         bool useSystemMemory, bool useShadowBuffer) 
-        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer), 
+        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
           mMgr(mgr),
           mNumVertices(numVertices),
           mVertexSize(vertexSize),
@@ -425,7 +425,8 @@ namespace v1 {
         return VET_FLOAT1;
     }
     //-----------------------------------------------------------------------------
-    VertexDeclaration::VertexDeclaration()
+    VertexDeclaration::VertexDeclaration() :
+        mInputLayoutId( 0 )
     {
     }
     //-----------------------------------------------------------------------------

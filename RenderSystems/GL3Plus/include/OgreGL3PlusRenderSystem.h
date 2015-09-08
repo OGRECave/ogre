@@ -163,17 +163,14 @@ namespace Ogre {
 
         unsigned char *mSwIndirectBufferPtr;
 
-        GLSLShader* mCurrentVertexShader;
-        GLSLShader* mCurrentFragmentShader;
-        GLSLShader* mCurrentGeometryShader;
-        GLSLShader* mCurrentHullShader;
-        GLSLShader* mCurrentDomainShader;
-        GLSLShader* mCurrentComputeShader;
+        GL3PlusHlmsPso const *mPso;
+        GLSLShader *mCurrentComputeShader;
 
         GLuint  mNullColourFramebuffer;
 
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
-        GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
+        static GLenum getBlendMode(SceneBlendFactor ogreBlend);
+        static GLenum getBlendOperation( SceneBlendOperation op );
 
         bool activateGLTextureUnit(size_t unit);
         void bindVertexElementToGpu( const v1::VertexElement &elem,
@@ -351,16 +348,18 @@ namespace Ogre {
             RenderSystem
         */
         void _setViewport(Viewport *vp);
+        virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso );
+        virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso );
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock );
         virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
+        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock, const GL3PlusHlmsPso *pso );
+        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock, const GL3PlusHlmsPso *pso );
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
-        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
+        virtual void _setPipelineStateObject( const HlmsPso *pso );
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
         /** See
@@ -497,8 +496,6 @@ namespace Ogre {
 
         const GL3PlusSupport* getGLSupport(void) const { return mGLSupport; }
 
-        void bindGpuProgram(GpuProgram* prg);
-        void unbindGpuProgram(GpuProgramType gptype);
         void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 
