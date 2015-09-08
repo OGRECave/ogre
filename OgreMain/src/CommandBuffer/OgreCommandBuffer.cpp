@@ -66,6 +66,7 @@ namespace Ogre
         &CommandBuffer::execute_setV1RenderOp,
         &CommandBuffer::execute_drawV1Indexed,
         &CommandBuffer::execute_drawV1Strip,
+        &CommandBuffer::execute_lowLevelMaterial,
         &CommandBuffer::execute_invalidCommand
     };
     //-----------------------------------------------------------------------------------

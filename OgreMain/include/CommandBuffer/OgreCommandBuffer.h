@@ -90,6 +90,7 @@ namespace Ogre
         static CommandBufferExecuteFunc execute_setV1RenderOp;
         static CommandBufferExecuteFunc execute_drawV1Indexed;
         static CommandBufferExecuteFunc execute_drawV1Strip;
+        static CommandBufferExecuteFunc execute_lowLevelMaterial;
         static CommandBufferExecuteFunc execute_invalidCommand;
 
         /// Executes all the commands in the command buffer. Clears the cmd buffer afterwards

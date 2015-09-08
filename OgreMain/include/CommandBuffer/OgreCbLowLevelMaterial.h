@@ -25,52 +25,22 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreCbCommon_H_
-#define _OgreCbCommon_H_
+#ifndef _OgreCbLowLevelMaterial_H_
+#define _OgreCbLowLevelMaterial_H_
 
-#include "OgrePrerequisites.h"
+#include "CommandBuffer/OgreCbCommon.h"
 
 namespace Ogre
 {
-    enum CbType
+    struct _OgreExport CbLowLevelMaterial : CbBase
     {
-        CB_INVALID,
-        CB_SET_VAO,
-        CB_SET_INDIRECT_BUFFER,
-        CB_DRAW_CALL_INDEXED_EMULATED,
-        CB_DRAW_CALL_INDEXED,
-        CB_DRAW_CALL_STRIP_EMULATED,
-        CB_DRAW_CALL_STRIP,
-        CB_SET_CONSTANT_BUFFER_VS,
-        CB_SET_CONSTANT_BUFFER_PS,
-        CB_SET_CONSTANT_BUFFER_GS,
-        CB_SET_CONSTANT_BUFFER_HS,
-        CB_SET_CONSTANT_BUFFER_DS,
-        CB_SET_CONSTANT_BUFFER_CS,
-        CB_SET_CONSTANT_BUFFER_INVALID,
-        CB_SET_TEXTURE_BUFFER_VS,
-        CB_SET_TEXTURE_BUFFER_PS,
-        CB_SET_TEXTURE_BUFFER_GS,
-        CB_SET_TEXTURE_BUFFER_HS,
-        CB_SET_TEXTURE_BUFFER_DS,
-        CB_SET_TEXTURE_BUFFER_CS,
-        CB_SET_TEXTURE_BUFFER_INVALID,
-        CB_SET_PSO,
-        CB_SET_TEXTURE,
-        CB_TEXTURE_DISABLE_FROM,
-        CB_START_V1_LEGACY_RENDERING,
-        CB_SET_V1_RENDER_OP,
-        CB_DRAW_V1_INDEXED,
-        CB_DRAW_V1_STRIP,
-        CB_LOW_LEVEL_MATERIAL,
-        MAX_COMMAND_BUFFER
-    };
+        bool                casterPass;
+        HlmsLowLevel        *hlmsLowLevel;
+        MovableObject const *movableObject;
+        Renderable          *renderable;
 
-    struct _OgreExport CbBase
-    {
-        uint16  commandType;
-
-        CbBase( uint16 cmdType ) : commandType( cmdType ) {}
+        CbLowLevelMaterial( bool _casterPass, HlmsLowLevel *_hlmsLowLevel,
+                            const MovableObject *_movableObject, Renderable *_renderable );
     };
 }
 

@@ -95,6 +95,9 @@ namespace Ogre
                                          const QueuedRenderable &queuedRenderable,
                                          bool casterPass, uint32 lastCacheHash,
                                          CommandBuffer *commandBuffer );
+
+        void executeCommand( const MovableObject *movableObject, Renderable *renderable,
+                             bool casterPass );
     };
 
     /** @} */

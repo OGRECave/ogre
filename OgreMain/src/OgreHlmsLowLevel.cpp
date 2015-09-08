@@ -41,6 +41,11 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 
+#include "Animation/OgreSkeletonInstance.h"
+
+#include "CommandBuffer/OgreCommandBuffer.h"
+#include "CommandBuffer/OgreCbLowLevelMaterial.h"
+
 namespace Ogre
 {
     HlmsLowLevel::HlmsLowLevel() :
@@ -169,9 +174,74 @@ namespace Ogre
                                          bool casterPass, uint32 lastCacheHash,
                                          uint32 lastTextureHash )
     {
-        Renderable *renderable = queuedRenderable.renderable;
-        unsigned short numMatrices = renderable->getNumWorldTransforms();
-        renderable->getWorldTransforms( mTempXform );
+        executeCommand( queuedRenderable.movableObject, queuedRenderable.renderable, casterPass );
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsLowLevel::fillBuffersForV1( const HlmsCache *cache,
+                                           const QueuedRenderable &queuedRenderable,
+                                           bool casterPass, uint32 lastCacheHash,
+                                           CommandBuffer *commandBuffer )
+    {
+        *commandBuffer->addCommand<CbLowLevelMaterial>() =
+                CbLowLevelMaterial( casterPass, this, queuedRenderable.movableObject,
+                                    queuedRenderable.renderable );
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 HlmsLowLevel::fillBuffersForV2( const HlmsCache *cache,
+                                           const QueuedRenderable &queuedRenderable,
+                                           bool casterPass, uint32 lastCacheHash,
+                                           CommandBuffer *commandBuffer )
+    {
+        *commandBuffer->addCommand<CbLowLevelMaterial>() =
+                CbLowLevelMaterial( casterPass, this, queuedRenderable.movableObject,
+                                    queuedRenderable.renderable );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsLowLevel::executeCommand( const MovableObject *movableObject, Renderable *renderable,
+                                       bool casterPass )
+    {
+        unsigned short numMatrices = 1;
+        if( renderable->getVaos( casterPass ).empty() )
+        {
+            numMatrices = renderable->getNumWorldTransforms();
+            renderable->getWorldTransforms( mTempXform );
+        }
+        else
+        {
+            if( !renderable->hasSkeletonAnimation() )
+            {
+                mTempXform[0] = movableObject->_getParentNodeFullTransform();
+            }
+            else
+            {
+                SkeletonInstance *skeleton = movableObject->getSkeletonInstance();
+#if OGRE_DEBUG_MODE
+                assert( dynamic_cast<const RenderableAnimated*>( renderable ) );
+#endif
+
+                const RenderableAnimated *renderableAnimated = static_cast<const RenderableAnimated*>(
+                                                                                            renderable );
+
+                const RenderableAnimated::IndexMap *indexMap = renderableAnimated->getBlendIndexToBoneIndexMap();
+
+                assert( indexMap->size() < 256 &&
+                        "Up to 256 bones per submesh are supported for low level materials!" );
+
+                RenderableAnimated::IndexMap::const_iterator itBone = indexMap->begin();
+                RenderableAnimated::IndexMap::const_iterator enBone = indexMap->end();
+
+                size_t matIdx = 0;
+                while( itBone != enBone )
+                {
+                    const SimpleMatrixAf4x3 &mat4x3 = skeleton->_getBoneFullTransform( *itBone );
+                    mat4x3.store( &mTempXform[matIdx++] );
+
+                    ++itBone;
+                }
+            }
+        }
 
         const MaterialPtr &mat = renderable->getMaterial();
         Technique *technique = mat->getBestTechnique( renderable->getCurrentMaterialLod(), renderable );
@@ -267,32 +337,6 @@ namespace Ogre
             mRenderSystem->bindGpuProgramParameters( GPT_FRAGMENT_PROGRAM,
                                                      pass->getFragmentProgramParameters(), GPV_ALL );
         }
-
-        return 0;
-    }
-    //-----------------------------------------------------------------------------------
-    uint32 HlmsLowLevel::fillBuffersForV1( const HlmsCache *cache,
-                                           const QueuedRenderable &queuedRenderable,
-                                           bool casterPass, uint32 lastCacheHash,
-                                           CommandBuffer *commandBuffer )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                     "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
-                     "Change the mode with RenderQueue::setRenderQueueMode, or place the "
-                     "object in a different RenderQueue",
-                     "HlmsLowLevel::fillBuffersFor" );
-    }
-    //-----------------------------------------------------------------------------------
-    uint32 HlmsLowLevel::fillBuffersForV2( const HlmsCache *cache,
-                                           const QueuedRenderable &queuedRenderable,
-                                           bool casterPass, uint32 lastCacheHash,
-                                           CommandBuffer *commandBuffer )
-    {
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                     "Low Level materials can only be used in RenderQueue mode V1_LEGACY. "
-                     "Change the mode with RenderQueue::setRenderQueueMode, or place the "
-                     "object in a different RenderQueue",
-                     "HlmsLowLevel::fillBuffersFor" );
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsLowLevel::createDatablockImpl( IdString datablockName,
