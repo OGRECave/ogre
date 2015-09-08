@@ -113,8 +113,8 @@ int mainApp()
 
     //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
     SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    //inputHandler->setGrabMousePointer( true );
-    //inputHandler->setMouseVisible( false );
+    inputHandler->setGrabMousePointer( true );
+    inputHandler->setMouseVisible( false );
 
     Ogre::Timer timer;
     unsigned long startTime = timer.getMicroseconds();
