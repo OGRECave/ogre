@@ -114,8 +114,6 @@ namespace Ogre
 
 //        [OGRE_HLMS_NUM_MACROBLOCKS];
 //        [OGRE_HLMS_NUM_BLENDBLOCKS];
-        /// Used to return a valid pointer in preparePassHashBase with per-pass data
-        HlmsPso mDummyPso;
 
         PassCacheVec        mPassCache;
         RenderableCacheVec  mRenderableCache;
@@ -249,7 +247,7 @@ namespace Ogre
         /// Retrieves a cache entry using the returned value from @addRenderableCache
         const RenderableCache& getRenderableCache( uint32 hash ) const;
 
-        const HlmsCache* addShaderCache( uint32 hash, HlmsPso *pso );
+        const HlmsCache* addShaderCache( uint32 hash, const HlmsPso &pso );
         const HlmsCache* getShaderCache( uint32 hash ) const;
         void clearShaderCache(void);
 

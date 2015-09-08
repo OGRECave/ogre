@@ -46,7 +46,7 @@ THE SOFTWARE.
 #include "Vao/OgreIndirectBufferPacked.h"
 
 #include "CommandBuffer/OgreCommandBuffer.h"
-#include "CommandBuffer/OgreCbBlocks.h"
+#include "CommandBuffer/OgreCbPipelineStateObject.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
 #include "CommandBuffer/OgreCbShaderBuffer.h"
 
@@ -55,7 +55,7 @@ namespace Ogre
 {
     AtomicScalar<uint32> v1::RenderOperation::MeshIndexId( 0 );
 
-    const HlmsCache c_dummyCache( 0, HLMS_MAX, 0 );
+    const HlmsCache c_dummyCache( 0, HLMS_MAX, HlmsPso() );
 
     const int RqBits::SubRqIdBits           = 3;
     const int RqBits::TransparencyBits      = 1;
@@ -489,7 +489,7 @@ namespace Ogre
                                                             getInputLayoutId(), casterPass );
             if( lastHlmsCacheHash != hlmsCache->hash )
             {
-                rs->_setPipelineStateObject( hlmsCache->pso );
+                rs->_setPipelineStateObject( &hlmsCache->pso );
                 lastHlmsCache = hlmsCache;
             }
 
@@ -549,7 +549,7 @@ namespace Ogre
             if( lastHlmsCacheHash != hlmsCache->hash )
             {
                 CbPipelineStateObject *psoCmd = mCommandBuffer->addCommand<CbPipelineStateObject>();
-                *psoCmd = CbPipelineStateObject( hlmsCache->pso );
+                *psoCmd = CbPipelineStateObject( &hlmsCache->pso );
                 lastHlmsCache = hlmsCache;
 
                 //Flush the Vao when changing shaders. Needed by D3D11/12 & possibly Vulkan
@@ -685,7 +685,7 @@ namespace Ogre
             if( lastHlmsCache != hlmsCache )
             {
                 CbPipelineStateObject *psoCmd = mCommandBuffer->addCommand<CbPipelineStateObject>();
-                *psoCmd = CbPipelineStateObject( hlmsCache->pso );
+                *psoCmd = CbPipelineStateObject( &hlmsCache->pso );
                 lastHlmsCache = hlmsCache;
 
                 //Flush the RenderOp when changing shaders. Needed by D3D11/12 & possibly Vulkan
@@ -807,7 +807,7 @@ namespace Ogre
                                                         queuedRenderable,
                                                         mLastVertexData->vertexDeclaration->
                                                         getInputLayoutId(), casterPass );
-        rs->_setPipelineStateObject( hlmsCache->pso );
+        rs->_setPipelineStateObject( &hlmsCache->pso );
 
         mLastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
                                                  0, mLastTextureHash );

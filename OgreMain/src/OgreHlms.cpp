@@ -1448,7 +1448,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    const HlmsCache* Hlms::addShaderCache( uint32 hash, HlmsPso *pso )
+    const HlmsCache* Hlms::addShaderCache( uint32 hash, const HlmsPso &pso )
     {
         HlmsCache cache( hash, mType, pso );
         HlmsCacheVec::iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
@@ -1465,7 +1465,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     const HlmsCache* Hlms::getShaderCache( uint32 hash ) const
     {
-        HlmsCache cache( hash, mType, 0 );
+        HlmsCache cache( hash, mType, HlmsPso() );
         HlmsCacheVec::const_iterator it = std::lower_bound( mShaderCache.begin(), mShaderCache.end(),
                                                             &cache, OrderCacheByHash );
 
@@ -1484,6 +1484,7 @@ namespace Ogre
 
         while( itor != end )
         {
+            mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
             delete *itor;
             ++itor;
         }
@@ -1645,30 +1646,34 @@ namespace Ogre
             }
         }
 
-        HlmsPso *pso = new HlmsPso();
-        pso->vertexShader               = shaders[VertexShader];
-        pso->geometryShader             = shaders[GeometryShader];
-        pso->tesselationHullShader      = shaders[HullShader];
-        pso->tesselationDomainShader    = shaders[DomainShader];
-        pso->pixelShader                = shaders[PixelShader];
+        HlmsPso pso;
+        memset( &pso, 0, sizeof(HlmsPso) );
+        pso.vertexShader                = shaders[VertexShader];
+        pso.geometryShader              = shaders[GeometryShader];
+        pso.tesselationHullShader       = shaders[HullShader];
+        pso.tesselationDomainShader     = shaders[DomainShader];
+        pso.pixelShader                 = shaders[PixelShader];
 
         bool casterPass = getProperty( HlmsBaseProp::ShadowCaster ) != 0;
 
         const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
-        pso->macroblock = datablock->getMacroblock( casterPass );
-        pso->blendblock = datablock->getBlendblock( casterPass );
-        pso->pass = passCache.pso->pass;
+        pso.macroblock = datablock->getMacroblock( casterPass );
+        pso.blendblock = datablock->getBlendblock( casterPass );
+        pso.pass = passCache.pso.pass;
+
+        //TODO: Configurable somehow (likely should be in datablock).
+        pso.sampleMask = 0xffffffff;
 
         if( queuedRenderable.renderable )
         {
             //TODO
             //mRenderSystem->getVaoManager();
-            //pso->vertexElements =
-            //pso->operationType = ;
-            pso->enablePrimitiveRestart = true;
+            //pso.vertexElements =
+            pso.operationType = OT_TRIANGLE_STRIP;
+            pso.enablePrimitiveRestart = true;
         }
 
-        mRenderSystem->_hlmsPipelineStateObjectCreated( pso );
+        mRenderSystem->_hlmsPipelineStateObjectCreated( &pso );
 
         const HlmsCache* retVal = addShaderCache( finalHash, pso );
         return retVal;
@@ -2011,9 +2016,9 @@ namespace Ogre
 
         const uint32 hash = (it - mPassCache.begin()) << HlmsBits::PassShift;
 
-        HlmsCache retVal( hash, mType, &mDummyPso );
+        HlmsCache retVal( hash, mType, HlmsPso() );
         retVal.setProperties = mSetProperties;
-        retVal.pso->pass = passCache.passPso;
+        retVal.pso.pass = passCache.passPso;
 
         return retVal;
     }

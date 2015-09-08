@@ -190,7 +190,7 @@ namespace Ogre
 
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
-        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pso->vertexShader->
+        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pso.vertexShader->
                                                        getConstantDefinitions() );
         for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
@@ -200,7 +200,7 @@ namespace Ogre
         }
 
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
-        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pso->pixelShader->
+        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pso.pixelShader->
                                                        getConstantDefinitions() );
         for( size_t i=0; i<sizeof( c_psPerObjectUniforms ) / sizeof( String ); ++i )
         {
@@ -214,7 +214,7 @@ namespace Ogre
                                                     queuedRenderable.renderable->getDatablock() );
 
         //Set samplers.
-        GpuProgramParametersSharedPtr psParams = retVal->pso->pixelShader->getDefaultParameters();
+        GpuProgramParametersSharedPtr psParams = retVal->pso.pixelShader->getDefaultParameters();
 
         if( datablock->mNumTextureUnits > 0 )
         {
@@ -365,8 +365,8 @@ namespace Ogre
                                             bool casterPass, uint32 lastCacheHash,
                                             uint32 lastTextureHash )
     {
-        GpuProgramParametersSharedPtr vpParams = cache->pso->vertexShader->getDefaultParameters();
-        GpuProgramParametersSharedPtr psParams = cache->pso->pixelShader->getDefaultParameters();
+        GpuProgramParametersSharedPtr vpParams = cache->pso.vertexShader->getDefaultParameters();
+        GpuProgramParametersSharedPtr psParams = cache->pso.pixelShader->getDefaultParameters();
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
 #if _SECURE_SCL
         float *psUniformBuffer = 0;

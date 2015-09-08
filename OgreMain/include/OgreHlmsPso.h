@@ -163,7 +163,8 @@ namespace Ogre
 
         //No constructor on purpose. Performance implications
         //(could get called every object when looking up!)
-        HlmsPso();
+        //see Hlms::getShaderCache
+        //HlmsPso();
     };
 
     /** @} */

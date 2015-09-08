@@ -80,35 +80,36 @@ namespace Ogre
                          "HlmsLowLevel::createShaderCacheEntry" );
         }
 
-        HlmsPso *pso = new HlmsPso();
+        HlmsPso pso;
+        memset( &pso, 0, sizeof(HlmsPso) );
         if( pass->hasVertexProgram() )
-            pso->vertexShader           = pass->getVertexProgram();
+            pso.vertexShader            = pass->getVertexProgram();
         if( pass->hasGeometryProgram() )
-            pso->geometryShader         = pass->getGeometryProgram();
+            pso.geometryShader          = pass->getGeometryProgram();
         if( pass->hasTessellationHullProgram() )
-            pso->tesselationHullShader  = pass->getTessellationHullProgram();
+            pso.tesselationHullShader   = pass->getTessellationHullProgram();
         if( pass->hasTessellationDomainProgram() )
-            pso->tesselationDomainShader= pass->getTessellationDomainProgram();
+            pso.tesselationDomainShader = pass->getTessellationDomainProgram();
         if( pass->hasFragmentProgram() )
-            pso->pixelShader            = pass->getFragmentProgram();
+            pso.pixelShader             = pass->getFragmentProgram();
 
         bool casterPass = getProperty( HlmsBaseProp::ShadowCaster ) != 0;
 
         const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();
-        pso->macroblock = datablock->getMacroblock( casterPass );
-        pso->blendblock = datablock->getBlendblock( casterPass );
-        pso->pass = passCache.pso->pass;
+        pso.macroblock = datablock->getMacroblock( casterPass );
+        pso.blendblock = datablock->getBlendblock( casterPass );
+        pso.pass = passCache.pso.pass;
 
         if( queuedRenderable.renderable )
         {
             //TODO
             //mRenderSystem->getVaoManager();
-            //pso->vertexElements =
-            //pso->operationType = ;
-            pso->enablePrimitiveRestart = true;
+            //pso.vertexElements =
+            pso.operationType = OT_TRIANGLE_STRIP;
+            pso.enablePrimitiveRestart = true;
         }
 
-        mRenderSystem->_hlmsPipelineStateObjectCreated( pso );
+        mRenderSystem->_hlmsPipelineStateObjectCreated( &pso );
 
         const HlmsCache* retVal = addShaderCache( finalHash, pso );
         return retVal;

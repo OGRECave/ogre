@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "CommandBuffer/OgreCommandBuffer.h"
-#include "CommandBuffer/OgreCbBlocks.h"
+#include "CommandBuffer/OgreCbPipelineStateObject.h"
 
 #include "OgreRenderSystem.h"
 
