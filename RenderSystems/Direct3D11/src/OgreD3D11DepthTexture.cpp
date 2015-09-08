@@ -243,6 +243,13 @@ namespace v1
         mUltimateTextureOwner->_setD3DShaderResourceView( 0 );
     }
     //-----------------------------------------------------------------------------------
+    void D3D11DepthTextureTarget::getFormatsForPso(
+            PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
+    {
+        for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+            outFormats[i] = PF_NULL;
+    }
+    //-----------------------------------------------------------------------------------
     void D3D11DepthTextureTarget::getCustomAttribute( const String& name, void* pData )
     {
         if( name == "ID3D11RenderTargetView" )

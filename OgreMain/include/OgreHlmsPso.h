@@ -108,7 +108,7 @@ namespace Ogre
         StencilStateOp  stencilBack;
 
         /// PF_NULL if no colour attachment is used.
-        PixelFormat colourFormat[8];
+        PixelFormat colourFormat[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         /// PF_NULL if no depth buffer is used.
         PixelFormat depthFormat;
 

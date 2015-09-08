@@ -2051,8 +2051,7 @@ namespace Ogre
         passPso.stencilBack.stencilPassOp       = SOP_KEEP;
         passPso.stencilBack.stencilDepthFailOp  = SOP_KEEP;
 
-        for( int i=0; i<8; ++i )
-            passPso.colourFormat[i] = PF_NULL;
+        renderTarget->getFormatsForPso( passPso.colourFormat );
 
         passPso.depthFormat = PF_NULL;
         const DepthBuffer *depthBuffer = renderTarget->getDepthBuffer();

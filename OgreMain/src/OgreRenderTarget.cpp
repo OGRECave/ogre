@@ -87,7 +87,7 @@ namespace Ogre {
     {
         width = mWidth;
         height = mHeight;
-        colourDepth = mColourDepth;
+        colourDepth = PixelUtil::getNumElemBits( mFormat );
     }
 
     unsigned int RenderTarget::getWidth(void) const
@@ -98,9 +98,16 @@ namespace Ogre {
     {
         return mHeight;
     }
-    unsigned int RenderTarget::getColourDepth(void) const
+    PixelFormat RenderTarget::getFormat(void) const
     {
-        return mColourDepth;
+        return mFormat;
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
+    {
+        outFormats[0] = mFormat;
+        for( size_t i=1; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+            outFormats[i] = PF_NULL;
     }
     //-----------------------------------------------------------------------
     void RenderTarget::setDepthBufferPool( uint16 poolId )

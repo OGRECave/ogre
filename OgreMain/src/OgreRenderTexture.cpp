@@ -41,8 +41,7 @@ namespace Ogre
         mPriority = OGRE_REND_TO_TEX_RT_GROUP;
         mWidth = mBuffer->getWidth();
         mHeight = mBuffer->getHeight();
-        mColourDepth = static_cast<unsigned int>(
-            Ogre::PixelUtil::getNumElemBits(mBuffer->getFormat()));
+        mFormat = mBuffer->getFormat();
     }
     RenderTexture::~RenderTexture()
     {
@@ -108,5 +107,21 @@ namespace Ogre
         }
 
         RenderTarget::swapBuffers();
+    }
+    //-----------------------------------------------------------------------
+    void MultiRenderTarget::getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
+    {
+        BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();
+        BoundSufaceList::const_iterator end  = mBoundSurfaces.end();
+
+        size_t idx = 0;
+        while( itor != end )
+        {
+            outFormats[idx++] = (*itor)->getFormat();
+            ++itor;
+        }
+
+        for( size_t i=mBoundSurfaces.size(); i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+            outFormats[i] = PF_NULL;
     }
 }

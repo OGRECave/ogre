@@ -197,7 +197,7 @@ namespace v1
         mName = name;
         mWidth      = ultimateTextureOwner->getWidth();
         mHeight     = ultimateTextureOwner->getHeight();
-        mColourDepth= PixelUtil::getNumElemBits( ultimateTextureOwner->getFormat() );
+        mFormat     = ultimateTextureOwner->getFormat();
         mFSAA       = ultimateTextureOwner->getFSAA();
         mFSAAHint   = ultimateTextureOwner->getFSAAHint();
         mFsaaResolveDirty = true; //Should be permanent true.
@@ -241,6 +241,13 @@ namespace v1
     {
         RenderTexture::detachDepthBuffer();
         mUltimateTextureOwner->_setGlTextureName( 0 );
+    }
+    //-----------------------------------------------------------------------------------
+    void GL3PlusDepthTextureTarget::getFormatsForPso(
+            PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
+    {
+        for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+            outFormats[i] = PF_NULL;
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusDepthTextureTarget::getCustomAttribute( const String& name, void* pData )
