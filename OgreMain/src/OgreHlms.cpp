@@ -136,6 +136,7 @@ namespace Ogre
 
     const IdString HlmsPsoProp::Macroblock      = IdString( "PsoMacroblock" );
     const IdString HlmsPsoProp::Blendblock      = IdString( "PsoBlendblock" );
+    const IdString HlmsPsoProp::OperationTypeV1 = IdString( "OperationTypeV1" );
 
     const String ShaderFiles[] = { "VertexShader_vs", "PixelShader_ps", "GeometryShader_gs",
                                    "HullShader_hs", "DomainShader_ds" };
@@ -1699,6 +1700,11 @@ namespace Ogre
             ++itor;
         }
 
+        //v1::VertexDeclaration doesn't hold op type information. Fortunately, v1 meshes
+        //do not allow LODs with different operation types (unlike v2 objects), so we
+        //save this information here instead of doing it at getMaterial time.
+        setProperty( HlmsPsoProp::OperationTypeV1, op.operationType );
+
         return numTexCoords;
     }
     //-----------------------------------------------------------------------------------
@@ -2127,6 +2133,48 @@ namespace Ogre
             datablock->setMacroblock( datablock->getMacroblock( false ), false );
 
             ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::_notifyMacroblockDestroyed( uint16 id )
+    {
+        HlmsCacheVec::iterator itor = mShaderCache.begin();
+        HlmsCacheVec::iterator end  = mShaderCache.end();
+
+        while( itor != end )
+        {
+            if( (*itor)->pso.macroblock->mId == id )
+            {
+                mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                delete *itor;
+                itor = mShaderCache.erase( itor );
+                end  = mShaderCache.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::_notifyBlendblockDestroyed( uint16 id )
+    {
+        HlmsCacheVec::iterator itor = mShaderCache.begin();
+        HlmsCacheVec::iterator end  = mShaderCache.end();
+
+        while( itor != end )
+        {
+            if( (*itor)->pso.blendblock->mId == id )
+            {
+                mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                delete *itor;
+                itor = mShaderCache.erase( itor );
+                end  = mShaderCache.end();
+            }
+            else
+            {
+                ++itor;
+            }
         }
     }
     //-----------------------------------------------------------------------------------

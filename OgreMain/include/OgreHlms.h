@@ -112,9 +112,6 @@ namespace Ogre
         typedef vector<PassCache>::type PassCacheVec;
         typedef vector<RenderableCache>::type RenderableCacheVec;
 
-//        [OGRE_HLMS_NUM_MACROBLOCKS];
-//        [OGRE_HLMS_NUM_BLENDBLOCKS];
-
         PassCacheVec        mPassCache;
         RenderableCacheVec  mRenderableCache;
         HlmsCacheVec        mShaderCache;
@@ -543,6 +540,14 @@ namespace Ogre
         /// Internal use. @see HlmsManager::setShadowMappingUseBackFaces
         void _notifyShadowMappingBackFaceSetting(void);
 
+        /// When a macroblock is destroyed, the PSO is no longer valid. We need to destroy it.
+        /// Otherwise when we try to reuse a macroblock with the same internal ID but different
+        /// settings, the old (wrong) PSO will be used.
+        void _notifyMacroblockDestroyed( uint16 id );
+
+        /// @copydoc _notifyMacroblockDestroyed
+        void _notifyBlendblockDestroyed( uint16 id );
+
         virtual void _changeRenderSystem( RenderSystem *newRs );
 
         RenderSystem* getRenderSystem(void) const           { return mRenderSystem; }
@@ -611,6 +616,7 @@ namespace Ogre
     {
         static const IdString Macroblock;
         static const IdString Blendblock;
+        static const IdString OperationTypeV1;
     };
 
     struct _OgreExport HlmsBasePieces

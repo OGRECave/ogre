@@ -197,6 +197,12 @@ namespace Ogre
 
         if( !mMacroblocks[macroblock->mId].mRefCount )
         {
+            for( size_t i=0; i<HLMS_MAX; ++i )
+            {
+                if( mRegisteredHlms[i] )
+                    mRegisteredHlms[i]->_notifyMacroblockDestroyed( macroblock->mId );
+            }
+
             mRenderSystem->_hlmsMacroblockDestroyed( &mMacroblocks[macroblock->mId] );
             destroyBasicBlock( &mMacroblocks[macroblock->mId] );
         }
@@ -263,6 +269,12 @@ namespace Ogre
 
         if( !mBlendblocks[blendblock->mId].mRefCount )
         {
+            for( size_t i=0; i<HLMS_MAX; ++i )
+            {
+                if( mRegisteredHlms[i] )
+                    mRegisteredHlms[i]->_notifyBlendblockDestroyed( blendblock->mId );
+            }
+
             mRenderSystem->_hlmsBlendblockDestroyed( &mBlendblocks[blendblock->mId] );
             destroyBasicBlock( &mBlendblocks[blendblock->mId] );
         }
