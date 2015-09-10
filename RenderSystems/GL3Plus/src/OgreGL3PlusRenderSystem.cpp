@@ -887,37 +887,14 @@ namespace Ogre {
             // val[2] = quadratic * correction;
             // val[3] = 1;
 
-            if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
-            {
-                if (mHasGL32)
-                {
-                    OGRE_CHECK_GL_ERROR(glEnable(GL_PROGRAM_POINT_SIZE));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glEnable(GL_VERTEX_PROGRAM_POINT_SIZE));
-                }
-            }
+            OGRE_CHECK_GL_ERROR(glEnable(GL_PROGRAM_POINT_SIZE));
         }
         else
         {
-            if (mCurrentCapabilities->hasCapability(RSC_VERTEX_PROGRAM))
-            {
-                if (mHasGL32)
-                {
-                    OGRE_CHECK_GL_ERROR(glDisable(GL_PROGRAM_POINT_SIZE));
-                }
-                else
-                {
-                    OGRE_CHECK_GL_ERROR(glDisable(GL_VERTEX_PROGRAM_POINT_SIZE));
-                }
-            }
+            OGRE_CHECK_GL_ERROR(glDisable(GL_PROGRAM_POINT_SIZE));
         }
 
-        //FIXME Points do not seem affected by setting this.
-        // OGRE_CHECK_GL_ERROR(glPointSize(size));
-        OGRE_CHECK_GL_ERROR(glPointSize(30.0));
-
+        OGRE_CHECK_GL_ERROR(glPointSize(size));
         //OGRE_CHECK_GL_ERROR(glPointParameterf(GL_POINT_FADE_THRESHOLD_SIZE, 64.0));
     }
 
