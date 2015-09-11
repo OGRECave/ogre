@@ -411,6 +411,11 @@ namespace Ogre {
         */
         void setMaterial(const MaterialPtr& material);
 
+        /** @copydoc MovableObject::_releaseManualHardwareResources. */
+        void _releaseManualHardwareResources();
+        /** @copydoc MovableObject::_restoreManualHardwareResources. */
+        void _restoreManualHardwareResources();
+
         /** @copydoc MovableObject::_notifyCurrentCamera.
         */
         void _notifyCurrentCamera(Camera* cam);

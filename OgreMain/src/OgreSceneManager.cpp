@@ -1602,20 +1602,15 @@ void SceneManager::_releaseManualHardwareResources()
     // release stencil shadows index buffer
     mShadowIndexBuffer.setNull();
 
-    // release hardware resources inside all billboard sets - would be recreated automatically
-    SceneManager::MovableObjectIterator it = getMovableObjectIterator(BillboardSetFactory::FACTORY_TYPE_NAME);
-    while(it.hasMoreElements())
+    // release hardware resources inside all movable objects
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
+    for(MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin(),
+        ci_end = mMovableObjectCollectionMap.end(); ci != ci_end; ++ci)
     {
-        BillboardSet* bs = static_cast<BillboardSet*>(it.getNext());
-        bs->_releaseManualHardwareResources();
-    }
-
-    // release hardware resources inside all manual objects - should be restored manually or will just disappear
-    it = getMovableObjectIterator(ManualObjectFactory::FACTORY_TYPE_NAME);
-    while(it.hasMoreElements())
-    {
-        ManualObject* mo = static_cast<ManualObject*>(it.getNext());
-        mo->clear();
+        MovableObjectCollection* coll = ci->second;
+        OGRE_LOCK_MUTEX(coll->mutex);
+        for(MovableObjectMap::iterator i = coll->map.begin(), i_end = coll->map.end(); i != i_end; ++i)
+            i->second->_releaseManualHardwareResources();
     }
 }
 //-----------------------------------------------------------------------
@@ -1629,6 +1624,17 @@ void SceneManager::_restoreManualHardwareResources()
                 mShadowIndexBufferSize,
                 HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                 false);
+    }
+
+    // restore hardware resources inside all movable objects
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
+    for(MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin(),
+        ci_end = mMovableObjectCollectionMap.end(); ci != ci_end; ++ci)
+    {
+        MovableObjectCollection* coll = ci->second;
+        OGRE_LOCK_MUTEX(coll->mutex);
+        for(MovableObjectMap::iterator i = coll->map.begin(), i_end = coll->map.end(); i != i_end; ++i)
+            i->second->_restoreManualHardwareResources();
     }
 }
 //-----------------------------------------------------------------------

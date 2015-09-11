@@ -323,6 +323,16 @@ namespace Ogre {
         mMesh->removeListener(this);
     }
     //-----------------------------------------------------------------------
+    void Entity::_releaseManualHardwareResources()
+    {
+        clearShadowRenderableList(mShadowRenderables);
+    }
+    //-----------------------------------------------------------------------
+    void Entity::_restoreManualHardwareResources()
+    {
+        // mShadowRenderables are lazy initialized
+    }
+    //-----------------------------------------------------------------------
     bool Entity::hasVertexAnimation(void) const
     {
         return mMesh->hasVertexAnimation();
