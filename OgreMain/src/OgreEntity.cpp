@@ -269,15 +269,8 @@ namespace Ogre {
         mLodEntityList.clear();
 #endif
         // Delete shadow renderables
-        ShadowRenderableList::iterator si, siend;
-        siend = mShadowRenderables.end();
-        for (si = mShadowRenderables.begin(); si != siend; ++si)
-        {
-            OGRE_DELETE *si;
-            *si = 0;
-        }
-        mShadowRenderables.clear();
-        
+        clearShadowRenderableList(mShadowRenderables);
+
         // Detach all child objects, do this manually to avoid needUpdate() call
         // which can fail because of deleted items
         detachAllObjectsImpl();

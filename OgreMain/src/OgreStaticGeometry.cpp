@@ -1037,12 +1037,7 @@ namespace Ogre {
     StaticGeometry::LODBucket::~LODBucket()
     {
         OGRE_DELETE mEdgeList;
-        for (ShadowCaster::ShadowRenderableList::iterator s = mShadowRenderables.begin();
-            s != mShadowRenderables.end(); ++s)
-        {
-            OGRE_DELETE *s;
-        }
-        mShadowRenderables.clear();
+        ShadowCaster::clearShadowRenderableList(mShadowRenderables);
         // delete
         for (MaterialBucketMap::iterator i = mMaterialBucketMap.begin();
             i != mMaterialBucketMap.end(); ++i)

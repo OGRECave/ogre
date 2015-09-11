@@ -41,6 +41,16 @@ namespace Ogre {
         return ll;
     }
     // ------------------------------------------------------------------------
+    void ShadowCaster::clearShadowRenderableList(ShadowRenderableList& shadowRenderables)
+    {
+        for(ShadowRenderableList::iterator si = shadowRenderables.begin(), siend = shadowRenderables.end(); si != siend; ++si)
+        {
+            OGRE_DELETE *si;
+            *si = 0;
+        }
+        shadowRenderables.clear();
+    }
+    // ------------------------------------------------------------------------
     void ShadowCaster::updateEdgeListLightFacing(EdgeData* edgeData, 
         const Vector4& lightPos)
     {
