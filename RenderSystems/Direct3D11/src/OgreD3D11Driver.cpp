@@ -65,6 +65,8 @@ namespace Ogre
         str[sizeof(str) - 1] = '\0';
         String driverDescription=str;
         StringUtil::trim(driverDescription);
+        if(mAdapterIdentifier.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+            driverDescription += " (software)";
         return driverDescription;
     }
     //---------------------------------------------------------------------
