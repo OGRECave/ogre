@@ -1547,47 +1547,52 @@ namespace Ogre
         mDriverVersion.build = LOWORD(driverVersion.LowPart);
     }
     //-----------------------------------------------------------------------
+    void D3D11RenderSystem::handleDeviceLost()
+    {
+        LogManager::getSingleton().logMessage("D3D11 : Device was lost, recreating.");
+
+        // release device depended resources
+        fireDeviceEvent(&mDevice, "DeviceLost");
+
+        SceneManagerEnumerator::SceneManagerIterator scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
+        while(scnIt.hasMoreElements())
+            scnIt.getNext()->_releaseManualHardwareResources();
+
+        notifyDeviceLost(&mDevice);
+
+        // Release all automatic temporary buffers and free unused
+        // temporary buffers, so we doesn't need to recreate them,
+        // and they will reallocate on demand.
+        HardwareBufferManager::getSingleton()._releaseBufferCopies(true);
+
+        // Cleanup depth stencils surfaces.
+        _cleanupDepthBuffers();
+
+        // recreate device
+        createDevice();
+
+        // recreate device depended resources
+        notifyDeviceRestored(&mDevice);
+
+        MeshManager::getSingleton().reloadAll(Resource::LF_PRESERVE_STATE);
+
+        scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
+        while(scnIt.hasMoreElements())
+            scnIt.getNext()->_restoreManualHardwareResources();
+
+        // Invalidate active view port.
+        mActiveViewport = NULL;
+
+        fireDeviceEvent(&mDevice, "DeviceRestored");
+
+        LogManager::getSingleton().logMessage("D3D11 : Device was restored.");
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::validateDevice()
     {
         if(!mDevice.isNull() && mDevice.IsDeviceLost())
         {
-            LogManager::getSingleton().logMessage("D3D11 : Device was lost, recreating.");
-
-            // release device depended resources
-            fireDeviceEvent(&mDevice, "DeviceLost");
-
-            SceneManagerEnumerator::SceneManagerIterator scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
-            while(scnIt.hasMoreElements())
-                scnIt.getNext()->_releaseManualHardwareResources();
-
-            notifyDeviceLost(&mDevice);
-
-            // Release all automatic temporary buffers and free unused
-            // temporary buffers, so we doesn't need to recreate them,
-            // and they will reallocate on demand.
-            HardwareBufferManager::getSingleton()._releaseBufferCopies(true);
-
-            // Cleanup depth stencils surfaces.
-            _cleanupDepthBuffers();
-
-            // recreate device
-            createDevice();
-
-            // recreate device depended resources
-            notifyDeviceRestored(&mDevice);
-
-            MeshManager::getSingleton().reloadAll(Resource::LF_PRESERVE_STATE);
-
-            scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
-            while(scnIt.hasMoreElements())
-                scnIt.getNext()->_restoreManualHardwareResources();
-
-            // Invalidate active view port.
-            mActiveViewport = NULL;
-
-            fireDeviceEvent(&mDevice, "DeviceRestored");
-
-            LogManager::getSingleton().logMessage("D3D11 : Device was restored.");
+            handleDeviceLost();
         }
     }
     //---------------------------------------------------------------------

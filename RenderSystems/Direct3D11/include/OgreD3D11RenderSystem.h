@@ -81,6 +81,7 @@ namespace Ogre
 
         void freeDevice(void);
         void createDevice();
+        void handleDeviceLost();
 
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
