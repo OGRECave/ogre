@@ -121,7 +121,7 @@ namespace Ogre
 		 ,mStereoDriver(NULL)
 #endif	
     {
-        LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
+        LogManager::getSingleton().logMessage( "D3D11: " + getName() + " created." );
 
         mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
@@ -155,7 +155,7 @@ namespace Ogre
             mHLSLProgramFactory = 0;
         }
 
-        LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " destroyed." );
+        LogManager::getSingleton().logMessage( "D3D11: " + getName() + " destroyed." );
     }
     //---------------------------------------------------------------------
     const String& D3D11RenderSystem::getName() const
@@ -493,7 +493,7 @@ namespace Ogre
         initRenderSystem();
 
         LogManager::getSingleton().stream()
-            << "D3D11 : RenderSystem Option: " << name << " = " << value;
+            << "D3D11: RenderSystem Option: " << name << " = " << value;
 
         bool viewModeChanged = false;
 
@@ -647,10 +647,10 @@ namespace Ogre
     RenderWindow* D3D11RenderSystem::_initialise( bool autoCreateWindow, const String& windowTitle )
     {
         RenderWindow* autoWindow = NULL;
-        LogManager::getSingleton().logMessage( "D3D11 : Subsystem Initialising" );
+        LogManager::getSingleton().logMessage( "D3D11: Subsystem Initialising" );
 
 		if(IsWorkingUnderNsight())
-			LogManager::getSingleton().logMessage( "D3D11 : Nvidia Nsight found");
+			LogManager::getSingleton().logMessage( "D3D11: Nvidia Nsight found");
 
         // Init using current settings
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
@@ -780,7 +780,7 @@ namespace Ogre
         }
 
         LogManager::getSingleton().logMessage("***************************************");
-        LogManager::getSingleton().logMessage("*** D3D11 : Subsystem Initialized OK ***");
+        LogManager::getSingleton().logMessage("*** D3D11: Subsystem Initialized OK ***");
         LogManager::getSingleton().logMessage("***************************************");
 
         // call superclass method
@@ -791,7 +791,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderSystem::reinitialise()
     {
-        LogManager::getSingleton().logMessage( "D3D11 : Reinitializing" );
+        LogManager::getSingleton().logMessage( "D3D11: Reinitializing" );
         this->shutdown();
     //  this->initialise( true );
     }
@@ -807,7 +807,7 @@ namespace Ogre
         SAFE_DELETE( mDriverList );
         mActiveD3DDriver = NULL;
         mDevice.ReleaseAll();
-        LogManager::getSingleton().logMessage("D3D11 : Shutting down cleanly.");
+        LogManager::getSingleton().logMessage("D3D11: Shutting down cleanly.");
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
         SAFE_DELETE( mGpuProgramManager );
@@ -1530,7 +1530,7 @@ namespace Ogre
         if(!mActiveD3DDriver)
         {
             mActiveD3DDriver = getDirect3DDrivers()->item(0);
-            LogManager::getSingleton().logMessage("D3D11 : Requested Direct3D driver not found.");
+            LogManager::getSingleton().logMessage("D3D11: Requested Direct3D driver not found.");
         }
 
         D3D11Driver* d3dDriver = mActiveD3DDriver;
@@ -1549,7 +1549,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void D3D11RenderSystem::handleDeviceLost()
     {
-        LogManager::getSingleton().logMessage("D3D11 : Device was lost, recreating.");
+        LogManager::getSingleton().logMessage("D3D11: Device was lost, recreating.");
 
         // release device depended resources
         fireDeviceEvent(&mDevice, "DeviceLost");
@@ -1585,7 +1585,7 @@ namespace Ogre
 
         fireDeviceEvent(&mDevice, "DeviceRestored");
 
-        LogManager::getSingleton().logMessage("D3D11 : Device was restored.");
+        LogManager::getSingleton().logMessage("D3D11: Device was restored.");
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::validateDevice()

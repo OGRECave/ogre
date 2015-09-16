@@ -281,7 +281,7 @@ namespace Ogre
 
         if( FAILED( hr ) )
         {
-            LogManager::getSingleton().logMessage("D3D11 : " + mName + " Could not be loaded");
+            LogManager::getSingleton().logMessage("D3D11: " + mName + " Could not be loaded");
             return;
         }   
 
@@ -732,9 +732,9 @@ namespace Ogre
         if (mWidth != mSrcWidth ||
             mHeight != mSrcHeight)
         {
-            LogManager::getSingleton().logMessage("D3D11 : ***** Dimensions altered by the render system");
-            LogManager::getSingleton().logMessage("D3D11 : ***** Source image dimensions : " + StringConverter::toString(mSrcWidth) + "x" + StringConverter::toString(mSrcHeight));
-            LogManager::getSingleton().logMessage("D3D11 : ***** Texture dimensions : " + StringConverter::toString(mWidth) + "x" + StringConverter::toString(mHeight));
+            LogManager::getSingleton().logMessage("D3D11: ***** Dimensions altered by the render system");
+            LogManager::getSingleton().logMessage("D3D11: ***** Source image dimensions : " + StringConverter::toString(mSrcWidth) + "x" + StringConverter::toString(mSrcHeight));
+            LogManager::getSingleton().logMessage("D3D11: ***** Texture dimensions : " + StringConverter::toString(mWidth) + "x" + StringConverter::toString(mHeight));
         }
 
         // Create list of subsurfaces for getBuffer()
@@ -754,33 +754,33 @@ namespace Ogre
         {
         case TEX_TYPE_1D:
             if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D11 : Creating 1D RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Creating 1D RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             else
-                LogManager::getSingleton().logMessage("D3D11 : Loading 1D Texture, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Loading 1D Texture, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             break;
         case TEX_TYPE_2D:
             if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D11 : Creating 2D RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Creating 2D RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             else
-                LogManager::getSingleton().logMessage("D3D11 : Loading 2D Texture, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Loading 2D Texture, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             break;
         case TEX_TYPE_2D_ARRAY:
             if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D11 : Creating 2D array RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Creating 2D array RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             else
-                LogManager::getSingleton().logMessage("D3D11 : Loading 2D Texture array, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Loading 2D Texture array, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             break;
         case TEX_TYPE_3D:
             if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D11 : Creating 3D RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Creating 3D RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             else
-                LogManager::getSingleton().logMessage("D3D11 : Loading 3D Texture, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Loading 3D Texture, image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             break;
         case TEX_TYPE_CUBE_MAP:
             if (mUsage & TU_RENDERTARGET)
-                LogManager::getSingleton().logMessage("D3D11 : Creating Cube map RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Creating Cube map RenderTarget, name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             else
-                LogManager::getSingleton().logMessage("D3D11 : Loading Cube Texture, base image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
+                LogManager::getSingleton().logMessage("D3D11: Loading Cube Texture, base image name : '" + this->getName() + "' with " + StringConverter::toString(mNumMipmaps) + " mip map levels");
             break;
         default:
             this->freeInternalResources();

@@ -889,7 +889,7 @@ namespace Ogre
         mHeight = rc.bottom;
 
         LogManager::getSingleton().stream()
-            << "D3D11 : Created D3D11 Rendering Window '"
+            << "D3D11: Created D3D11 Rendering Window '"
             << mName << "' : " << mWidth << "x" << mHeight 
             << ", " << mColourDepth << "bpp";
 
@@ -966,7 +966,7 @@ namespace Ogre
             // frame rates no matter what buffering modes are used (odd - perhaps a
             // timer issue in D3D11 since GL doesn't suffer from this) 
             // low is < 200fps in this context
-            LogManager::getSingleton().logMessage("D3D11 : WARNING - "
+            LogManager::getSingleton().logMessage("D3D11: WARNING - "
                 "disabling VSync in windowed mode can cause timing issues at lower "
                 "frame rates, turn VSync on if you observe this problem.");
         }
@@ -1320,7 +1320,7 @@ namespace Ogre
         mHeight = (int)(rc.Height * scale + 0.5f);
 
         LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
-            << "D3D11 : Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
+            << "D3D11: Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
             << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
             << "using content scaling factor " << scale;
 
