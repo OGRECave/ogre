@@ -70,6 +70,9 @@ THE SOFTWARE.
 #include <d3d10.h>
 #include <OgreNsightChecker.h>
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT &&  defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+#include <dxgi1_3.h> // for IDXGIDevice3::Trim
+#endif
 
 namespace Ogre 
 {
@@ -118,8 +121,12 @@ namespace Ogre
     D3D11RenderSystem::D3D11RenderSystem()
 		: mDevice()
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		 ,mStereoDriver(NULL)
+		, mStereoDriver(NULL)
 #endif	
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		, suspendingToken()
+		, surfaceContentLostToken()
+#endif
     {
         LogManager::getSingleton().logMessage( "D3D11: " + getName() + " created." );
 
@@ -138,11 +145,48 @@ namespace Ogre
         memset(mNumClassInstances, 0, sizeof(mNumClassInstances));
 
         mEventNames.push_back("DeviceLost");
-        mEventNames.push_back("DeviceRestored");            
+        mEventNames.push_back("DeviceRestored");
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+		suspendingToken = (Windows::ApplicationModel::Core::CoreApplication::Suspending +=
+			ref new Windows::Foundation::EventHandler<Windows::ApplicationModel::SuspendingEventArgs^>([this](Platform::Object ^sender, Windows::ApplicationModel::SuspendingEventArgs ^e)
+		{
+			// Hints to the driver that the app is entering an idle state and that its memory can be used temporarily for other apps.
+			ComPtr<IDXGIDevice3> pDXGIDevice;
+			if(mDevice.get() && SUCCEEDED(mDevice->QueryInterface(pDXGIDevice.GetAddressOf())))
+				pDXGIDevice->Trim();
+		}));
+
+		surfaceContentLostToken = (Windows::Graphics::Display::DisplayInformation::DisplayContentsInvalidated +=
+			ref new Windows::Foundation::TypedEventHandler<Windows::Graphics::Display::DisplayInformation^, Platform::Object^>(
+				[this](Windows::Graphics::Display::DisplayInformation^ sender, Platform::Object^ arg)
+		{
+			LogManager::getSingleton().logMessage("D3D11: DisplayContentsInvalidated.");
+			validateDevice(true);
+		}));
+#else // Win 8.0
+		surfaceContentLostToken = (Windows::Graphics::Display::DisplayProperties::DisplayContentsInvalidated +=
+			ref new Windows::Graphics::Display::DisplayPropertiesEventHandler([this](Platform::Object ^sender)
+		{
+			LogManager::getSingleton().logMessage("D3D11: DisplayContentsInvalidated.");
+			validateDevice(true);
+		}));
+#endif
+#endif
     }
     //---------------------------------------------------------------------
     D3D11RenderSystem::~D3D11RenderSystem()
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+		Windows::ApplicationModel::Core::CoreApplication::Suspending -= suspendingToken;
+		Windows::Graphics::Display::DisplayInformation::DisplayContentsInvalidated -= surfaceContentLostToken;
+#else // Win 8.0
+		Windows::Graphics::Display::DisplayProperties::DisplayContentsInvalidated -= surfaceContentLostToken;
+#endif
+#endif
+
         shutdown();
 
         // Deleting the HLSL program factory

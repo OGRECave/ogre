@@ -195,6 +195,10 @@ namespace Ogre
 		D3D11StereoDriverBridge* mStereoDriver;
 #endif
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		Windows::Foundation::EventRegistrationToken suspendingToken, surfaceContentLostToken;
+#endif
+
     protected:
         void setClipPlanesImpl(const PlaneList& clipPlanes);
 
