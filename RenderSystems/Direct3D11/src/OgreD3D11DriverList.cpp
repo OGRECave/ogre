@@ -113,15 +113,25 @@ namespace Ogre
     //-----------------------------------------------------------------------
     D3D11Driver* D3D11DriverList::item( const String &name )
     {
-        vector<SharedPtr<D3D11Driver> >::type::iterator it = mDriverList.begin();
-        if (it == mDriverList.end())
-            return NULL;
-
-        for (;it != mDriverList.end(); ++it)
+        for(vector<SharedPtr<D3D11Driver> >::type::iterator it = mDriverList.begin(), it_end = mDriverList.end(); it != mDriverList.end(); ++it)
         {
-            if ((*it)->DriverDescription() == name)
+            if((*it)->DriverDescription() == name)
                 return (*it).get();
         }
+
+        return NULL;
+    }
+    //-----------------------------------------------------------------------
+    D3D11Driver* D3D11DriverList::findByName(const String &name)
+    {
+        // return requested driver
+        if(!name.empty())
+            if(D3D11Driver* driver = item(name))
+                return driver;
+
+        // return default driver
+        if(!mDriverList.empty())
+            return mDriverList[0].get();
 
         return NULL;
     }

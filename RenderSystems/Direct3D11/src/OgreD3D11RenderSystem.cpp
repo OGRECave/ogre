@@ -282,8 +282,14 @@ namespace Ogre
 #endif
 
         optDevice.name = "Rendering Device";
-        optDevice.currentValue.clear();
-        optDevice.possibleValues.clear();
+        optDevice.currentValue = "(default)";
+        optDevice.possibleValues.push_back("(default)");
+        D3D11DriverList* driverList = getDirect3DDrivers();
+        for( unsigned j=0; j < driverList->count(); j++ )
+        {
+            D3D11Driver* driver = driverList->item(j);
+            optDevice.possibleValues.push_back( driver->DriverDescription() );
+        }
         optDevice.immutable = false;
 
         optVideoMode.name = "Video Mode";
@@ -295,16 +301,6 @@ namespace Ogre
         optFullScreen.possibleValues.push_back( "No" );
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
-
-        D3D11DriverList* driverList = getDirect3DDrivers();
-        for( unsigned j=0; j < driverList->count(); j++ )
-        {
-            D3D11Driver* driver = driverList->item(j);
-            optDevice.possibleValues.push_back( driver->DriverDescription() );
-            // Make first one default
-            if( j==0 )
-                optDevice.currentValue = driver->DriverDescription();
-        }
 
         optVSync.name = "VSync";
         optVSync.immutable = false;
@@ -458,7 +454,7 @@ namespace Ogre
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
         if( opt != mOptions.end() )
         {
-            D3D11Driver *driver = getDirect3DDrivers()->item(opt->second.currentValue);
+            D3D11Driver *driver = getDirect3DDrivers()->findByName(opt->second.currentValue);
             if (driver)
             {
                 opt = mOptions.find( "Video Mode" );
@@ -562,7 +558,7 @@ namespace Ogre
         optFSAA->possibleValues.clear();
 
         it = mOptions.find("Rendering Device");
-        D3D11Driver *driver = getDirect3DDrivers()->item(it->second.currentValue);
+        D3D11Driver *driver = getDirect3DDrivers()->findByName(it->second.currentValue);
         if (driver)
         {
             it = mOptions.find("Video Mode");
@@ -626,13 +622,12 @@ namespace Ogre
             return "A video mode must be selected.";
 
         it = mOptions.find( "Rendering Device" );
-        D3D11Driver *driver = getDirect3DDrivers()->item(it->second.currentValue);
-        if (driver == NULL)
+        String driverName = it->second.currentValue;
+        if(driverName != "(default)" && getDirect3DDrivers()->findByName(driverName)->DriverDescription() != driverName)
         {
-            // Just pick the first driver
-            setConfigOption("Rendering Device", getDirect3DDrivers()->item(0)->DriverDescription());
-            return "Your DirectX driver name has changed since the last time you ran OGRE; "
-                "the 'Rendering Device' has been changed.";
+            // Just pick default driver
+            setConfigOption("Rendering Device", "(default)");
+            return "Requested rendering device could not be found, default would be used instead.";
         }
 
         return BLANKSTRING;
@@ -1526,11 +1521,11 @@ namespace Ogre
     {
         mDevice.ReleaseAll();
 
-        mActiveD3DDriver = getDirect3DDrivers(true)->item(mDriverName);
-        if(!mActiveD3DDriver)
+        mActiveD3DDriver = getDirect3DDrivers(true)->findByName(mDriverName);
+        if(mDriverName != "(default)" && mActiveD3DDriver->DriverDescription() != mDriverName)
         {
-            mActiveD3DDriver = getDirect3DDrivers()->item(0);
-            LogManager::getSingleton().logMessage("D3D11: Requested Direct3D driver not found.");
+            LogManager::getSingleton().logMessage("D3D11: Requested Direct3D driver not found, \""
+                + mActiveD3DDriver->DriverDescription() + "\" is used instead of \"" + mDriverName  +  "\".");
         }
 
         D3D11Driver* d3dDriver = mActiveD3DDriver;
