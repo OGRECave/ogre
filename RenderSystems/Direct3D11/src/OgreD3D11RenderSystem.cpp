@@ -1582,9 +1582,27 @@ namespace Ogre
         LogManager::getSingleton().logMessage("D3D11: Device was restored.");
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::validateDevice()
+    void D3D11RenderSystem::validateDevice(bool forceDeviceElection)
     {
-        if(!mDevice.isNull() && mDevice.IsDeviceLost())
+        if(mDevice.isNull())
+            return;
+
+        // The D3D Device is no longer valid if the elected adapter changes or if
+        // the device has been removed.
+
+        bool anotherIsElected = false;
+        if(forceDeviceElection)
+        {
+            // elect new device
+            D3D11Driver* newDriver = getDirect3DDrivers(true)->findByName(mDriverName);
+
+            // check by LUID
+            LUID newLUID = newDriver->getAdapterIdentifier().AdapterLuid;
+            LUID prevLUID = mActiveD3DDriver.getAdapterIdentifier().AdapterLuid;
+            anotherIsElected = (newLUID.LowPart != prevLUID.LowPart) || (newLUID.HighPart != prevLUID.HighPart);
+        }
+
+        if(anotherIsElected || mDevice.IsDeviceLost())
         {
             handleDeviceLost();
         }
