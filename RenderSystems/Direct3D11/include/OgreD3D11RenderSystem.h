@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11DeviceResource.h"
+#include "OgreD3D11Driver.h"
 #include "OgreD3D11Mappings.h"
 
 namespace Ogre 
@@ -67,7 +68,7 @@ namespace Ogre
         /// List of D3D drivers installed (video cards)
         D3D11DriverList* mDriverList;
         /// Currently active driver
-        D3D11Driver* mActiveD3DDriver;
+        D3D11Driver mActiveD3DDriver;
         /// NVPerfHUD allowed?
         bool mUseNVPerfHUD;
 		int mSwitchingFullscreenCounter;	// Are we switching from windowed to fullscreen 

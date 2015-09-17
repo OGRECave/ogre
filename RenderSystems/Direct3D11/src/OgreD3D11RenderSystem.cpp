@@ -700,9 +700,10 @@ namespace Ogre
             width = StringConverter::parseInt(opt->second.currentValue.substr(0, widthEnd));
             height = StringConverter::parseInt(opt->second.currentValue.substr(widthEnd+3, heightEnd));
 
-            for( unsigned j=0; j < mActiveD3DDriver->getVideoModeList()->count(); j++ )
+            D3D11VideoModeList* videoModeList = mActiveD3DDriver.getVideoModeList();
+            for( unsigned j=0; j < videoModeList->count(); j++ )
             {
-                temp = mActiveD3DDriver->getVideoModeList()->item(j)->getDescription();
+                temp = videoModeList->item(j)->getDescription();
 
                 // In full screen we only want to allow supported resolutions, so temp and opt->second.currentValue need to 
                 // match exactly, but in windowed mode we can allow for arbitrary window sized, so we only need
@@ -710,7 +711,7 @@ namespace Ogre
                 if(fullScreen && (temp == opt->second.currentValue) ||
                   !fullScreen && (temp.substr(temp.rfind('@')+1) == colourDepth))
                 {
-                    videoMode = mActiveD3DDriver->getVideoModeList()->item(j);
+                    videoMode = videoModeList->item(j);
                     break;
                 }
             }
@@ -800,7 +801,7 @@ namespace Ogre
         mPrimaryWindow = NULL; // primary window deleted by base class.
         freeDevice();
         SAFE_DELETE( mDriverList );
-        mActiveD3DDriver = NULL;
+        mActiveD3DDriver = D3D11Driver();
         mDevice.ReleaseAll();
         LogManager::getSingleton().logMessage("D3D11: Shutting down cleanly.");
         SAFE_DELETE( mTextureManager );
@@ -933,7 +934,7 @@ namespace Ogre
     {
         RenderSystemCapabilities* rsc = new RenderSystemCapabilities();
         rsc->setDriverVersion(mDriverVersion);
-        rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
+        rsc->setDeviceName(mActiveD3DDriver.DriverDescription());
         rsc->setRenderSystemName(getName());
 
 		rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
@@ -997,7 +998,7 @@ namespace Ogre
 
 
         // Adapter details
-        const DXGI_ADAPTER_DESC1& adapterID = mActiveD3DDriver->getAdapterIdentifier();
+        const DXGI_ADAPTER_DESC1& adapterID = mActiveD3DDriver.getAdapterIdentifier();
 
         switch(mDriverType) {
         case D3D_DRIVER_TYPE_HARDWARE:
@@ -1521,18 +1522,16 @@ namespace Ogre
     {
         mDevice.ReleaseAll();
 
-        mActiveD3DDriver = getDirect3DDrivers(true)->findByName(mDriverName);
-        if(mDriverName != "(default)" && mActiveD3DDriver->DriverDescription() != mDriverName)
+        D3D11Driver* d3dDriver = getDirect3DDrivers(true)->findByName(mDriverName);
+        if(mDriverName != "(default)" && d3dDriver->DriverDescription() != mDriverName)
         {
             LogManager::getSingleton().logMessage("D3D11: Requested Direct3D driver not found, \""
-                + mActiveD3DDriver->DriverDescription() + "\" is used instead of \"" + mDriverName  +  "\".");
+                + d3dDriver->DriverDescription() + "\" is used instead of \"" + mDriverName  +  "\".");
         }
+        mActiveD3DDriver = *d3dDriver; // store copy of our 'official' used driver, so that it is not lost when drivers would be re-enumerated
 
-        D3D11Driver* d3dDriver = mActiveD3DDriver;
-        if(D3D11Driver* d3dDriverOverride = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
-            d3dDriver = d3dDriverOverride;
-
-        ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
+        D3D11Driver* nvPerfHudDriver = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL;
+        ID3D11DeviceN * device = createD3D11Device(nvPerfHudDriver ? nvPerfHudDriver : d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
         mDevice.TransferOwnership(device);
 
         LARGE_INTEGER driverVersion = mDevice.GetDriverVersion();
@@ -3827,7 +3826,6 @@ namespace Ogre
         mRenderSystemWasInited = true;
         // set pointers to NULL
         mDriverList = NULL;
-        mActiveD3DDriver = NULL;
         mTextureManager = NULL;
         mHardwareBufferManager = NULL;
         mGpuProgramManager = NULL;
