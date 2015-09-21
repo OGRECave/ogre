@@ -141,7 +141,7 @@ namespace Ogre
         mHlmsHash       = hash;
         mHlmsCasterHash = casterHash;
 
-        assert( (mHlmsDatablock->getAlphaTest() != CMPF_ALWAYS_PASS ||
+        assert( (mHlmsDatablock->getAlphaTest() == CMPF_ALWAYS_PASS ||
                 mVaoPerLod[0].empty() || mVaoPerLod[0][0] == mVaoPerLod[1][0])
                 && "v2 objects must overload _setHlmsHashes to disable special "
                 "shadow mapping buffers on objects with alpha testing materials" );

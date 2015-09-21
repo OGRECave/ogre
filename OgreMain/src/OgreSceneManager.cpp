@@ -2550,6 +2550,7 @@ void SceneManager::buildLightList()
 
     if( mForward3DImpl )
         return; //Don't do this on non-forward passes.
+    return;
 
     mRequestType = BUILD_LIGHT_LIST02;
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
