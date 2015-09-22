@@ -1973,6 +1973,14 @@ namespace Ogre {
         assert(indexBuffer && "Only external index buffers are supported right now");
         assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
             "Only 16-bit indexes supported for now");
+
+        // Check mesh state count, will be incremented if reloaded
+        if (mMesh->getStateCount() != mMeshStateCount)
+        {
+            // force reinitialise
+            _initialise(true);
+        }
+
 #if !OGRE_NO_MESHLOD
         // Potentially delegate to LOD entity
         if (mMesh->hasManualLodLevel() && mMeshLodIndex > 0)
