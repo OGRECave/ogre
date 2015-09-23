@@ -65,6 +65,11 @@ namespace Ogre {
         /** Initialise */
         virtual void initialise(void);
 
+        /** @copydoc OverlayElement::_releaseManualHardwareResources. */
+        virtual void _releaseManualHardwareResources();
+        /** @copydoc OverlayElement::_restoreManualHardwareResources. */
+        virtual void _restoreManualHardwareResources();
+
         /** Sets the number of times textures should repeat. 
         @param x The number of times the texture should repeat horizontally
         @param y The number of times the texture should repeat vertically

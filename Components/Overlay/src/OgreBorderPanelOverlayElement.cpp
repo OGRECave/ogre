@@ -85,10 +85,7 @@ namespace Ogre {
     {
         bool init = !mInitialised;
 
-        PanelOverlayElement::initialise();
-
-        // superclass will handle the interior panel area 
-
+        // init mRenderOp2 before calling superclass, as virtual _restoreManualHardwareResources would be called within
         if (init)
         {
             // Setup render op in advance
@@ -104,71 +101,100 @@ namespace Ogre {
             decl->addElement(POSITION_BINDING, 0, VET_FLOAT3, VES_POSITION);
             decl->addElement(TEXCOORD_BINDING, 0, VET_FLOAT2, VES_TEXTURE_COORDINATES, 0);
 
-            // Vertex buffer #1, position
-            HardwareVertexBufferSharedPtr vbuf = HardwareBufferManager::getSingleton()
-                .createVertexBuffer(
-                    decl->getVertexSize(POSITION_BINDING), 
-                    mRenderOp2.vertexData->vertexCount,
-                    HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-            // bind position
-            VertexBufferBinding* binding = mRenderOp2.vertexData->vertexBufferBinding;
-            binding->setBinding(POSITION_BINDING, vbuf);
-
-            // Vertex buffer #2, texcoords
-            vbuf = HardwareBufferManager::getSingleton()
-                .createVertexBuffer(
-                    decl->getVertexSize(TEXCOORD_BINDING), 
-                    mRenderOp2.vertexData->vertexCount,
-                    HardwareBuffer::HBU_STATIC_WRITE_ONLY, true);
-            // bind texcoord
-            binding->setBinding(TEXCOORD_BINDING, vbuf);
-
+            // Index data
             mRenderOp2.operationType = RenderOperation::OT_TRIANGLE_LIST;
             mRenderOp2.useIndexes = true;
-            // Index data
             mRenderOp2.indexData = OGRE_NEW IndexData();
             mRenderOp2.indexData->indexCount = 8 * 6;
             mRenderOp2.indexData->indexStart = 0;
             mRenderOp2.useGlobalInstancingVertexBufferIsAvailable = false;
 
-            /* Each cell is
-                0-----2
-                |    /|
-                |  /  |
-                |/    |
-                1-----3
-            */
-            mRenderOp2.indexData->indexBuffer = HardwareBufferManager::getSingleton().
-                createIndexBuffer(
-                    HardwareIndexBuffer::IT_16BIT, 
-                    mRenderOp2.indexData->indexCount, 
-                    HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-
-            ushort* pIdx = static_cast<ushort*>(
-                mRenderOp2.indexData->indexBuffer->lock(
-                    0, 
-                    mRenderOp2.indexData->indexBuffer->getSizeInBytes(), 
-                    HardwareBuffer::HBL_DISCARD) );
-
-            for (ushort cell = 0; cell < 8; ++cell)
-            {
-                ushort base = cell * 4;
-                *pIdx++ = base;
-                *pIdx++ = base + 1;
-                *pIdx++ = base + 2;
-
-                *pIdx++ = base + 2;
-                *pIdx++ = base + 1;
-                *pIdx++ = base + 3;
-            }
-
-            mRenderOp2.indexData->indexBuffer->unlock();
-
             // Create sub-object for rendering border
             mBorderRenderable = OGRE_NEW BorderRenderable(this);
-
-            mInitialised = true;
         }
+
+        // superclass will handle the interior panel area and call _restoreManualHardwareResources
+        PanelOverlayElement::initialise();
+    }
+    //---------------------------------------------------------------------
+    void BorderPanelOverlayElement::_restoreManualHardwareResources()
+    {
+        if(!mInitialised)
+            return;
+
+        PanelOverlayElement::_restoreManualHardwareResources();
+
+        // Vertex data
+
+        VertexDeclaration* decl = mRenderOp2.vertexData->vertexDeclaration;
+
+        // Vertex buffer #1, position
+        HardwareVertexBufferSharedPtr vbuf =
+            HardwareBufferManager::getSingleton().createVertexBuffer(
+                decl->getVertexSize(POSITION_BINDING), 
+                mRenderOp2.vertexData->vertexCount,
+                HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+        // bind position
+        VertexBufferBinding* binding = mRenderOp2.vertexData->vertexBufferBinding;
+        binding->setBinding(POSITION_BINDING, vbuf);
+
+        // Vertex buffer #2, texcoords
+        vbuf = HardwareBufferManager::getSingleton().createVertexBuffer(
+                decl->getVertexSize(TEXCOORD_BINDING), 
+                mRenderOp2.vertexData->vertexCount,
+                HardwareBuffer::HBU_STATIC_WRITE_ONLY, true);
+        // bind texcoord
+        binding->setBinding(TEXCOORD_BINDING, vbuf);
+
+
+        // Index data
+
+        /* Each cell is
+            0-----2
+            |    /|
+            |  /  |
+            |/    |
+            1-----3
+        */
+        mRenderOp2.indexData->indexBuffer =
+            HardwareBufferManager::getSingleton().createIndexBuffer(
+                HardwareIndexBuffer::IT_16BIT, 
+                mRenderOp2.indexData->indexCount, 
+                HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+        ushort* pIdx = static_cast<ushort*>(
+            mRenderOp2.indexData->indexBuffer->lock(
+                0, 
+                mRenderOp2.indexData->indexBuffer->getSizeInBytes(), 
+                HardwareBuffer::HBL_DISCARD) );
+
+        for (ushort cell = 0; cell < 8; ++cell)
+        {
+            ushort base = cell * 4;
+            *pIdx++ = base;
+            *pIdx++ = base + 1;
+            *pIdx++ = base + 2;
+
+            *pIdx++ = base + 2;
+            *pIdx++ = base + 1;
+            *pIdx++ = base + 3;
+        }
+
+        mRenderOp2.indexData->indexBuffer->unlock();
+    }
+    //---------------------------------------------------------------------
+    void BorderPanelOverlayElement::_releaseManualHardwareResources()
+    {
+        if(!mInitialised)
+            return;
+
+        VertexBufferBinding* bind = mRenderOp2.vertexData->vertexBufferBinding;
+        bind->unsetBinding(POSITION_BINDING);
+        bind->unsetBinding(TEXCOORD_BINDING);
+
+        mRenderOp2.indexData->indexBuffer.setNull();
+
+        PanelOverlayElement::_releaseManualHardwareResources();
     }
     //---------------------------------------------------------------------
     void BorderPanelOverlayElement::addBaseParameters(void)

@@ -56,6 +56,12 @@ namespace Ogre
         virtual ~TextAreaOverlayElement();
 
         virtual void initialise(void);
+
+        /** @copydoc OverlayElement::_releaseManualHardwareResources. */
+        virtual void _releaseManualHardwareResources();
+        /** @copydoc OverlayElement::_restoreManualHardwareResources. */
+        virtual void _restoreManualHardwareResources();
+
         virtual void setCaption(const DisplayString& text);
 
         void setCharHeight( Real height );
