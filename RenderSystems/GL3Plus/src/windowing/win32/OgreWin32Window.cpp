@@ -56,7 +56,7 @@ namespace Ogre {
         mGlrc = 0;
         mIsExternal = false;
         mIsExternalGLControl = false;
-        mIsExternalGLContext = false;
+        mOwnsGLContext = true;
         mSizing = false;
         mClosed = false;
         mHidden = false;
@@ -164,6 +164,8 @@ namespace Ogre {
 			}
 #endif
 
+
+
             if ((opt = miscParams->find("externalWindowHandle")) != end)
             {
                 mHWnd = (HWND)StringConverter::parseSizeT(opt->second);
@@ -177,11 +179,37 @@ namespace Ogre {
                   mIsExternalGLControl = StringConverter::parseBool(opt->second);
                 }
             }
+
+            if ((opt = miscParams->find("currentGLContext")) != end )
+            {
+                if( StringConverter::parseBool(opt->second) )
+                {
+                    mGlrc = wglGetCurrentContext();
+
+                    if ( mGlrc )
+                    {
+                        mOwnsGLContext = false;
+                    }
+                    else
+                    {
+                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "currentGLContext was specified with no current GL context", "Win32Window::create");
+                    }
+                }
+            }
             if ((opt = miscParams->find("externalGLContext")) != end)
             {
                 mGlrc = (HGLRC)StringConverter::parseUnsignedLong(opt->second);
+
                 if( mGlrc )
-                    mIsExternalGLContext = true;
+                {
+                    mOwnsGLContext = false;
+                }
+                else
+                {
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "parsing the value of 'externalGLContext' failed: " + translateWGLError(), "Win32Window::create");
+                }
             }
 
             // window border style
@@ -449,7 +477,7 @@ namespace Ogre {
             mHwGamma = testHwGamma;
             mFSAA = testFsaa;
         }
-        if (!mIsExternalGLContext)
+        if (mOwnsGLContext)
         {
             mGlrc = wglCreateContext(mHDC);
             if (!mGlrc)
@@ -639,7 +667,7 @@ namespace Ogre {
         delete mContext;
         mContext = 0;
 
-        if (!mIsExternalGLContext && mGlrc)
+        if (mOwnsGLContext)
         {
             wglDeleteContext(mGlrc);
             mGlrc = 0;
