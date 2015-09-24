@@ -260,7 +260,7 @@ namespace Ogre {
         typedef vector<GpuConstantDefinitionWithName>::type D3d11ShaderVariableSubparts;
         typedef D3d11ShaderVariableSubparts::iterator D3d11ShaderVariableSubpartsIter; 
 
-        typedef struct MemberTypeName
+        struct MemberTypeName
         {
             LPCSTR                  Name;           
         };

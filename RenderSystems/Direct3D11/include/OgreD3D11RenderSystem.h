@@ -82,7 +82,6 @@ namespace Ogre
 
         void freeDevice(void);
         void createDevice();
-        void handleDeviceLost();
 
         /// return anisotropy level
         DWORD _getCurrentAnisotropy(size_t unit);
@@ -230,6 +229,10 @@ namespace Ogre
         /// @copydoc RenderSystem::_createRenderWindow
         RenderWindow* _createRenderWindow(const String &name, unsigned int width, unsigned int height, 
             bool fullScreen, const NameValuePairList *miscParams = 0);
+        /// @copydoc RenderSystem::_updateAllRenderTargets
+        virtual void _updateAllRenderTargets(bool swapBuffers = true);
+        /// @copydoc RenderSystem::_swapAllRenderTargetBuffers
+        virtual void _swapAllRenderTargetBuffers();
 
         /// @copydoc RenderSystem::fireDeviceEvent
         void fireDeviceEvent( D3D11Device* device, const String & name, D3D11RenderWindowBase* sendingWindow = NULL);
@@ -267,6 +270,7 @@ namespace Ogre
         void reinitialise();
         void shutdown();
         void validateDevice(bool forceDeviceElection = false);
+        void handleDeviceLost();
         void setAmbientLight( float r, float g, float b );
         void setShadingType( ShadeOptions so );
         void setLightingEnabled( bool enabled );

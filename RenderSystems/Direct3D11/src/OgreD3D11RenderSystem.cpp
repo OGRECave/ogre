@@ -1567,15 +1567,16 @@ namespace Ogre
         mDevice.ReleaseAll();
 
         D3D11Driver* d3dDriver = getDirect3DDrivers(true)->findByName(mDriverName);
-        if(mDriverName != "(default)" && d3dDriver->DriverDescription() != mDriverName)
-        {
-            LogManager::getSingleton().logMessage("D3D11: Requested Direct3D driver not found, \""
-                + d3dDriver->DriverDescription() + "\" is used instead of \"" + mDriverName  +  "\".");
-        }
-        mActiveD3DDriver = *d3dDriver; // store copy of our 'official' used driver, so that it is not lost when drivers would be re-enumerated
+        mActiveD3DDriver = *d3dDriver; // store copy of selected driver, so that it is not lost when drivers would be re-enumerated
+        LogManager::getSingleton().stream() << "D3D11: Requested \"" << mDriverName << "\", selected \"" << d3dDriver->DriverDescription() << "\"";
 
-        D3D11Driver* nvPerfHudDriver = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL;
-        ID3D11DeviceN * device = createD3D11Device(nvPerfHudDriver ? nvPerfHudDriver : d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
+        if(D3D11Driver* nvPerfHudDriver = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
+        {
+            d3dDriver = nvPerfHudDriver;
+            LogManager::getSingleton().logMessage("D3D11: Actually \"NVIDIA PerfHUD\" is used");
+        }
+
+        ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
         mDevice.TransferOwnership(device);
 
         LARGE_INTEGER driverVersion = mDevice.GetDriverVersion();
@@ -1649,6 +1650,36 @@ namespace Ogre
         if(anotherIsElected || mDevice.IsDeviceLost())
         {
             handleDeviceLost();
+        }
+    }
+    //-----------------------------------------------------------------------
+    void D3D11RenderSystem::_updateAllRenderTargets(bool swapBuffers)
+    {
+        try
+        {
+            RenderSystem::_updateAllRenderTargets(swapBuffers);
+        }
+        catch(const RenderingAPIException& e)
+        {
+            if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
+                LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");
+            else
+                throw;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void D3D11RenderSystem::_swapAllRenderTargetBuffers()
+    {
+        try
+        {
+            RenderSystem::_swapAllRenderTargetBuffers();
+        }
+        catch(const RenderingAPIException& e)
+        {
+            if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
+                LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");
+            else
+                throw;
         }
     }
     //---------------------------------------------------------------------
