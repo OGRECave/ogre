@@ -52,7 +52,7 @@ material Ogre/Compositor/HDR/Downsample2x2Luminence
             depth_check off
             polygon_mode_overrideable false
 
-            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
             {
             }
             fragment_program_ref Ogre/Compositor/HDR/downscale2x2Luminence_fp
@@ -122,7 +122,7 @@ material Ogre/Compositor/HDR/Downsample3x3
             depth_check off
             polygon_mode_overrideable false
 
-            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
             {
             }
             fragment_program_ref Ogre/Compositor/HDR/downscale3x3_fp
@@ -201,7 +201,7 @@ material Ogre/Compositor/HDR/Downsample3x3Brightpass
             depth_check off
             polygon_mode_overrideable false
 
-            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
             {
             }
             fragment_program_ref Ogre/Compositor/HDR/downscale3x3brightpass_fp
@@ -274,7 +274,7 @@ material Ogre/Compositor/HDR/GaussianBloom
             depth_check off
             polygon_mode_overrideable false
 
-            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
             {
             }
             fragment_program_ref Ogre/Compositor/HDR/bloom_fp
@@ -349,7 +349,7 @@ material Ogre/Compositor/HDR/ToneMapping
             depth_check off
             polygon_mode_overrideable false
 
-            vertex_program_ref Ogre/Compositor/StdQuad_vp
+            vertex_program_ref Ogre/Compositor/StdQuad_NoCG_vp
             {
             }
             fragment_program_ref Ogre/Compositor/HDR/finaltonemapping_fp
