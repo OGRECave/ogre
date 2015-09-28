@@ -2260,8 +2260,9 @@ bail:
             }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			D3D11RenderWindowBase* d3d11Window = static_cast<D3D11RenderWindowBase*>(target);
-			d3d11Window->_validateStereo();
+			D3D11RenderWindowBase* d3d11Window = dynamic_cast<D3D11RenderWindowBase*>(target);
+			if(d3d11Window)
+				d3d11Window->_validateStereo();
 #endif
 
             vp->_clearUpdatedFlag();
@@ -2269,7 +2270,8 @@ bail:
         else
         {
             // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
-            if(static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer())
+            D3D11RenderWindowBase* d3d11Window = dynamic_cast<D3D11RenderWindowBase*>(vp->getTarget());
+            if(d3d11Window && d3d11Window->_shouldRebindBackBuffer())
                 _setRenderTargetViews();
         }
     }
