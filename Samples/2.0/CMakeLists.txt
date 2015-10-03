@@ -21,6 +21,7 @@ if( OGRE_BUILD_SAMPLES2 )
     add_subdirectory(ApiUsage/V1Interfaces)
     add_subdirectory(ApiUsage/V2Mesh)
     add_subdirectory(ApiUsage/V2ManualObject)
+	add_subdirectory(ApiUsage/StencilTest)
 	add_subdirectory(ApiUsage/StereoRendering)
 	add_subdirectory(ApiUsage/ShadowMapDebugging)
 

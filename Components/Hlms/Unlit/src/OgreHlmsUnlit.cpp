@@ -422,6 +422,8 @@ namespace Ogre
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
         setProperty( HlmsBaseProp::ShadowUsesDepthTexture,
                      renderTarget->getForceDisableColourWrites() ? 1 : 0 );
+        setProperty( HlmsBaseProp::RenderDepthOnly,
+                     renderTarget->getForceDisableColourWrites() ? 1 : 0 );
 
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 

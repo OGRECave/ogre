@@ -42,6 +42,8 @@ namespace Ogre
             CompositorPassDef( PASS_STENCIL, rtIndex ),
             mStencilRef( 0 )
     {
+        //Override default.
+        mStencilParams.enabled = true;
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------

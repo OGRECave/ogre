@@ -5,10 +5,12 @@
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
-@property( !hlms_shadowcaster )
-layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
-@end @property( hlms_shadowcaster && !hlms_shadow_uses_depth_texture )
-layout(location = FRAG_COLOR, index = 0) out float outColour;
+@property( !hlms_render_depth_only )
+	@property( !hlms_shadowcaster )
+	layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+	@end @property( hlms_shadowcaster )
+	layout(location = FRAG_COLOR, index = 0) out float outColour;
+	@end
 @end
 
 @property( hlms_vpos )
@@ -433,33 +435,33 @@ void main()
 
 	@insertpiece( BRDF_EnvMap )
 @end
-@property( !hw_gamma_write )
-	//Linear to Gamma space
-	outColour.xyz	= sqrt( finalColour );
-@end @property( hw_gamma_write )
-	outColour.xyz	= finalColour;
-@end
 
-@property( hlms_alphablend )
-	@property( use_texture_alpha )
-		outColour.w		= material.F0.w * diffuseCol.w;
-	@end @property( !use_texture_alpha )
-		outColour.w		= material.F0.w;
+@property( !hlms_render_depth_only )
+	@property( !hw_gamma_write )
+		//Linear to Gamma space
+		outColour.xyz	= sqrt( finalColour );
+	@end @property( hw_gamma_write )
+		outColour.xyz	= finalColour;
 	@end
-@end @property( !hlms_alphablend )
-	outColour.w		= 1.0;@end
 
-@end @property( !hlms_normal && !hlms_qtangent )
-	outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+	@property( hlms_alphablend )
+		@property( use_texture_alpha )
+			outColour.w		= material.F0.w * diffuseCol.w;
+		@end @property( !use_texture_alpha )
+			outColour.w		= material.F0.w;
+		@end
+	@end @property( !hlms_alphablend )
+		outColour.w		= 1.0;@end
+
+	@end @property( !hlms_normal && !hlms_qtangent )
+		outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+	@end
 @end
 
 	@insertpiece( custom_ps_posExecution )
 }
 @end
 @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture && !alpha_test )
-		@set( hlms_disable_stage, 1 )
-	@end
 
 @property( alpha_test )
 	Material material;
@@ -525,7 +527,7 @@ void main()
 	@end
 @end /// !alpha_test
 
-@property( !hlms_shadow_uses_depth_texture )
+@property( !hlms_render_depth_only )
 	@property( GL3+ )outColour = inPs.depth;@end
 	@property( !GL3+ )gl_FragColor.x = inPs.depth;@end
 @end

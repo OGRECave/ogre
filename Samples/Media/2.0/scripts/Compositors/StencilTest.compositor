@@ -1,0 +1,129 @@
+compositor_node StencilTestNode
+{
+	in 0 rt_renderwindow
+	
+	//We need to render to an RTT because otherwise we can't share the depth buffer between
+	//rtt_depthbuffer & rt_renderwindow in OpenGL (basically, an issue with GL)
+	//see RSC_RTT_MAIN_DEPTHBUFFER_ATTACHABLE
+	texture rtt				target_width target_height PF_R8G8B8 depth_format PF_D32_FLOAT_X24_S8_UINT depth_texture depth_pool 1
+	texture rtt_depthbuffer	target_width target_height PF_D32_FLOAT_X24_S8_UINT depth_pool 1
+
+	target rtt
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+	}
+	
+	//Write to depth/stencil with no colour
+	target rtt_depthbuffer
+	{	
+		//Enable stencil
+		pass stencil
+		{
+			check true
+			
+			mask		0xff
+			read_mask	0xff
+			
+			ref_value	1
+			
+			both
+			{
+				pass_op			replace
+				depth_fail_op	keep
+				fail_op			keep
+
+				comp_func		always_pass
+			}
+		}
+
+		//Render "sphere of truth"
+		pass render_scene
+		{
+			overlays	off
+			rq_first	0
+			rq_last		1
+		}
+	}
+	
+	//Regular draw
+	target rtt
+	{
+		//Set the stencil to only draw if it passes the stencil.
+		pass stencil
+		{
+			check true
+			
+			mask		0xff
+			read_mask	0xff
+			
+			ref_value	1
+			
+			//'both' is a shortcut for setting 'back' and 'front' at the same time
+			//to the same values. Here we do it explicitly just to show how it works.
+			front
+			{
+				pass_op			keep
+				depth_fail_op	keep
+				fail_op			keep
+
+				comp_func		equal
+			}
+			
+			back
+			{
+				pass_op			keep
+				depth_fail_op	keep
+				fail_op			keep
+
+				comp_func		equal
+			}
+		}
+
+		//Render objects affected by sphere of truth.
+		pass render_scene
+		{
+			overlays	off
+			rq_first	1
+			rq_last		255
+		}
+
+		//Disable stencil to render the overlays
+		pass stencil
+		{
+			check false
+		}
+		
+		//Render overlays last on the entire screen
+		pass render_scene
+		{
+		
+			rq_first	254
+			rq_last		255
+			
+			overlays	on
+		}
+	}
+	
+	//Copy results to render window
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+		
+		pass render_quad
+		{
+			material Ogre/Copy/3xFP32
+			input 0 rtt
+		}
+	}
+}
+
+workspace StencilTestWorkspace
+{
+	connect_output StencilTestNode 0
+}

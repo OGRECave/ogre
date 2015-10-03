@@ -8118,7 +8118,7 @@ namespace Ogre{
                         return;
                     }
                     uint32 mask = passStencil->mStencilParams.writeMask;
-                    if(!getUInt(prop->values.front(), &mask))
+                    if(!getHex(prop->values.front(), &mask))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     passStencil->mStencilParams.writeMask = static_cast<uint8>( mask );
                 }
@@ -8131,7 +8131,7 @@ namespace Ogre{
                         return;
                     }
                     uint32 mask = passStencil->mStencilParams.readMask;
-                    if(!getUInt(prop->values.front(), &mask))
+                    if(!getHex(prop->values.front(), &mask))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
 
                     passStencil->mStencilParams.readMask = static_cast<uint8>( mask );

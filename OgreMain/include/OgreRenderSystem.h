@@ -984,6 +984,8 @@ namespace Ogre
         */
         virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
 
+        const StencilParams& getStencilBufferParams(void) const         { return mStencilParams; }
+
         /**
         Render something to the active viewport.
 

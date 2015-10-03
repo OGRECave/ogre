@@ -138,8 +138,8 @@ float3 qmul( float4 q, float3 v )
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
-float4 main( PS_INPUT inPs
-@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) : SV_Target0
+@insertpiece( output_type ) main( PS_INPUT inPs
+@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) @insertpiece( output_type_sv )
 {
 	@insertpiece( custom_ps_preExecution )
 
@@ -405,22 +405,16 @@ float4 main( PS_INPUT inPs
 
 	@insertpiece( custom_ps_posExecution )
 
+@property( !hlms_render_depth_only )
 	return outColour;
+@end
 }
 @end
 @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture && !alpha_test )
-		@set( hlms_disable_stage, 1 )
-	@end
-
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 	
-@property( !hlms_shadow_uses_depth_texture )
-float main( PS_INPUT inPs ) : SV_Target0
-@end @property( hlms_shadow_uses_depth_texture )
-void main( PS_INPUT inPs )
-@end
+@insertpiece( output_type ) main( PS_INPUT inPs ) @insertpiece( output_type_sv )
 {
 	@insertpiece( custom_ps_preExecution )
 	
@@ -484,8 +478,9 @@ void main( PS_INPUT inPs )
 
 	@insertpiece( custom_ps_posExecution )
 
-@property( !hlms_shadow_uses_depth_texture )
+@property( !hlms_render_depth_only )
 	return inPs.depth;
 @end
 }
 @end
+

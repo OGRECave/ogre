@@ -1634,6 +1634,14 @@ bail:
             }
         }
 
+        {
+            UINT supported = 0;
+            mDevice->CheckFormatSupport( descDepth.Format, &supported );
+
+            if( !supported )
+                return 0;
+        }
+
         descDepth.SampleDesc.Count      = BBDesc.SampleDesc.Count;
         descDepth.SampleDesc.Quality    = BBDesc.SampleDesc.Quality;
         descDepth.Usage                 = D3D11_USAGE_DEFAULT;

@@ -107,6 +107,7 @@ namespace Ogre
     const IdString HlmsBaseProp::PssmSplits         = IdString( "hlms_pssm_splits" );
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
+    const IdString HlmsBaseProp::RenderDepthOnly    = IdString( "hlms_render_depth_only" );
     const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
     const IdString HlmsBaseProp::Forward3DDebug     = IdString( "hlms_forward3d_debug" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
@@ -2021,6 +2022,10 @@ namespace Ogre
                          renderTarget->getForceDisableColourWrites() ? 1 : 0 );
         }
 
+        RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+        setProperty( HlmsBaseProp::RenderDepthOnly,
+                     renderTarget->getForceDisableColourWrites() ? 1 : 0 );
+
         mListener->preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager, this );
 
         PassCache passCache;
@@ -2054,18 +2059,7 @@ namespace Ogre
         //Needed so that memcmp in HlmsPassPso::operator == works correctly
         memset( &passPso, 0, sizeof(HlmsPassPso) );
 
-        //TODO: Read data from RenderSystem.
-        passPso.stencilParams.enabled   = false;
-        passPso.stencilParams.readMask  = 0xff;
-        passPso.stencilParams.writeMask = 0xff;
-        passPso.stencilParams.stencilFront.compareOp            = CMPF_ALWAYS_FAIL;
-        passPso.stencilParams.stencilFront.stencilFailOp        = SOP_KEEP;
-        passPso.stencilParams.stencilFront.stencilPassOp        = SOP_KEEP;
-        passPso.stencilParams.stencilFront.stencilDepthFailOp   = SOP_KEEP;
-        passPso.stencilParams.stencilBack.compareOp             = CMPF_ALWAYS_FAIL;
-        passPso.stencilParams.stencilBack.stencilFailOp         = SOP_KEEP;
-        passPso.stencilParams.stencilBack.stencilPassOp         = SOP_KEEP;
-        passPso.stencilParams.stencilBack.stencilDepthFailOp    = SOP_KEEP;
+        passPso.stencilParams = mRenderSystem->getStencilBufferParams();
 
         renderTarget->getFormatsForPso( passPso.colourFormat );
 
