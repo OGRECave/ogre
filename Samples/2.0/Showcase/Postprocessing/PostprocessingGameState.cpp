@@ -438,7 +438,7 @@ namespace Demo
                 {
                     CompositorPassQuadDef *passQuad;
                     passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
-                    passQuad->mMaterialName = "Postprocess/BluHV";
+                    passQuad->mMaterialName = "Postprocess/BluH";
                     passQuad->addQuadTextureSource( 0, "rt1", 0 );
                 }
             }
@@ -450,7 +450,7 @@ namespace Demo
                     passQuad = static_cast<CompositorPassQuadDef*>( targetDef->addPass( PASS_QUAD ) );
                     passQuad->mMaterialName = "Postprocess/BloomBlend2";
                     passQuad->addQuadTextureSource( 0, "rt_input", 0 );
-                    passQuad->addQuadTextureSource( 0, "rt0", 0 );
+                    passQuad->addQuadTextureSource( 1, "rt0", 0 );
                 }
             }
 
