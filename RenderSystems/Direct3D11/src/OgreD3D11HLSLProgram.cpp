@@ -1936,10 +1936,10 @@ namespace Ogre {
             VertexElement2Vec::const_iterator it = vertexElements[i].begin();
             VertexElement2Vec::const_iterator en = vertexElements[i].end();
 
+            size_t bindAccumOffset = 0;
+
             while( it != en )
             {
-                size_t bindAccumOffset = 0;
-
                 inputDesc[currDesc].SemanticName    = D3D11Mappings::get( it->mSemantic );
                 inputDesc[currDesc].SemanticIndex   = 0;
                 if( it->mSemantic == VES_TEXTURE_COORDINATES )

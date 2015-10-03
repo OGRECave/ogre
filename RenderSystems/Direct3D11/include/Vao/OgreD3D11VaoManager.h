@@ -266,7 +266,7 @@ namespace Ogre
         D3D11RenderSystem* getD3D11RenderSystem(void) const              { return mD3D11RenderSystem; }
 
         /// Binds the Draw ID to the currently bound vertex array object.
-        void bindDrawId(void);
+        void bindDrawId( uint32 bindSlotId );
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

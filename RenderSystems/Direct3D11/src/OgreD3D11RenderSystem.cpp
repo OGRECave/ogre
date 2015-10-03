@@ -3367,6 +3367,7 @@ bail:
             deviceContext->IASetIndexBuffer( 0, DXGI_FORMAT_UNKNOWN, 0 );
         }
 
+        uint32 usedSlots = 0;
         const v1::VertexBufferBinding::VertexBufferBindingMap& binds =
                 cmd->vertexData->vertexBufferBinding->getBindings();
         v1::VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
@@ -3395,9 +3396,11 @@ bail:
                     "D3D11 device cannot set vertex buffers\nError Description:" + errorDescription,
                     "D3D11RenderSystem::setVertexBufferBinding");
             }
+
+            ++usedSlots;
         }
 
-        static_cast<D3D11VaoManager*>(mVaoManager)->bindDrawId();
+        static_cast<D3D11VaoManager*>(mVaoManager)->bindDrawId( usedSlots );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_render( const v1::CbDrawCallIndexed *cmd )

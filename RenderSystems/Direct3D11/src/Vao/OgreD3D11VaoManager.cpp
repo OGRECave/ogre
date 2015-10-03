@@ -1126,7 +1126,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void D3D11VaoManager::bindDrawId()
+    void D3D11VaoManager::bindDrawId( uint32 bindSlotId )
     {
         D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
                                                     mDrawId->getBufferInterface() );
@@ -1136,7 +1136,7 @@ namespace Ogre
         UINT offset = 0;
 
         mDevice.GetImmediateContext()->IASetVertexBuffers(
-                    15,
+                    bindSlotId,
                     1,
                     &vertexBuffer,
                     &stride,
