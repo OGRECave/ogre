@@ -1276,7 +1276,7 @@ namespace Ogre
             it = mRenderableCache.end() - 1;
         }
 
-        //3 bits for mType (see getMaterial)2
+        //3 bits for mType (see getMaterial)
         return (mType << HlmsBits::HlmsTypeShift) |
                 ((it - mRenderableCache.begin()) << HlmsBits::RenderableShift);
     }

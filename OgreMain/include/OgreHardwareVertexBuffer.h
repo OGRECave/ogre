@@ -441,6 +441,8 @@ namespace v1 {
         */
         virtual VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const;
 
+        bool isSorted(void) const;
+
         VertexElement2VecVec convertToV2(void);
         void convertFromV2( const VertexElement2Vec &v2Decl );
         void convertFromV2( const VertexElement2VecVec &v2Decl );

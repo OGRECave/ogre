@@ -48,6 +48,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const IdString LowLevelProp::PassId                     = IdString( "pass_id" );
+
     HlmsLowLevel::HlmsLowLevel() :
         Hlms( HLMS_LOW_LEVEL, IdString(), 0, 0 ),
         mAutoParamDataSource( 0 ),
@@ -63,9 +65,9 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     const HlmsCache* HlmsLowLevel::createShaderCacheEntry( uint32 renderableHash,
-                                                              const HlmsCache &passCache,
-                                                              uint32 finalHash,
-                                                              const QueuedRenderable &queuedRenderable )
+                                                           const HlmsCache &passCache,
+                                                           uint32 finalHash,
+                                                           const QueuedRenderable &queuedRenderable )
     {
         Renderable *renderable = queuedRenderable.renderable;
         const MaterialPtr &mat = renderable->getMaterial();
@@ -156,6 +158,11 @@ namespace Ogre
 
         setProperty( HlmsPsoProp::Macroblock, renderable->getDatablock()->getMacroblock(false)->mId );
         setProperty( HlmsPsoProp::Blendblock, renderable->getDatablock()->getBlendblock(false)->mId );
+
+        Technique *technique = mat->getBestTechnique( renderable->getCurrentMaterialLod(), renderable );
+        Pass *pass = technique->getPass( 0 );
+
+        setProperty( LowLevelProp::PassId, static_cast<Ogre::int32>( pass->getId() ) );
 
         outHash = this->addRenderableCache( mSetProperties, (const PiecesMap*)0 );
 

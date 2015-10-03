@@ -474,7 +474,8 @@ namespace v1 {
     uint8 VertexDeclaration::getInputLayoutId(void) const
     {
         assert( !mInputLayoutDirty &&
-                "Must call HardwareBufferManagerBase::_updateDirtyInputLayouts first!" );
+                "Must call HardwareBufferManagerBase::_updateDirtyInputLayouts first "
+                "or VertexDeclaration was altered inside the RenderQueue" );
         assert( mInputLayoutId <= std::numeric_limits<uint8>::max() );
         return static_cast<uint8>( mInputLayoutId );
     }
@@ -643,13 +644,42 @@ namespace v1 {
         return ret;
     }
     //-----------------------------------------------------------------------------------
+    bool VertexDeclaration::isSorted(void) const
+    {
+        bool retVal = true;
+
+        if( !mElementList.empty() )
+        {
+            VertexElementList::const_iterator currElement = mElementList.begin();
+            VertexElementList::const_iterator nextElement = mElementList.begin();
+            VertexElementList::const_iterator end  = mElementList.end();
+
+            ++nextElement;
+
+            while( nextElement != end &&
+                   VertexDeclaration::vertexElementLess( *currElement, *nextElement ) )
+            {
+                ++currElement;
+                ++nextElement;
+            }
+
+            retVal = nextElement == end;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     VertexElement2VecVec VertexDeclaration::convertToV2(void)
     {
         VertexElement2VecVec retVal;
         retVal.resize( getMaxSource() + 1 );
 
-        //Make sure the declaration is sorted
-        sort();
+        if( !isSorted() )
+        {
+            //Make sure the declaration is sorted. Don't sort if already sorted, otherwise
+            //the declaration will be tagged as dirty when creating the PSO.
+            sort();
+        }
 
         VertexElementList::const_iterator itor = mElementList.begin();
         VertexElementList::const_iterator end  = mElementList.end();

@@ -100,6 +100,11 @@ namespace Ogre
                              bool casterPass );
     };
 
+    struct _OgreExport LowLevelProp
+    {
+        static const IdString PassId;
+    };
+
     /** @} */
     /** @} */
 
