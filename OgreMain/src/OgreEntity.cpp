@@ -310,8 +310,10 @@ namespace Ogre {
                 OGRE_DELETE mAnimationState; mAnimationState = 0;
             }
         }
-        else if (hasVertexAnimation())
+        else
         {
+            //Non-skeletally animated objects don't share the mAnimationState. Always delete.
+            //See https://ogre3d.atlassian.net/browse/OGRE-504
             OGRE_DELETE mAnimationState;
             mAnimationState = 0;
         }
