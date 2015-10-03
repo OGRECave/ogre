@@ -180,6 +180,9 @@ namespace Ogre
 
         HlmsCache retVal = Hlms::preparePassHash( shadowNode, casterPass, dualParaboloid, sceneManager );
 
+        //Never produce a HlmsCache.hash of 0. Only affects LowLevel because HLMS_LOW_LEVEL = 0
+        retVal.hash += 1;
+
         //TODO: Update auto params here
         Camera *camera = sceneManager->getCameraInProgress();
         mAutoParamDataSource->setCurrentCamera( camera );

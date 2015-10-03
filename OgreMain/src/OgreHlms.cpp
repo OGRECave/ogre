@@ -2087,7 +2087,7 @@ namespace Ogre
                                         uint8 inputLayout, bool casterPass )
     {
         uint32 finalHash;
-        uint32 hash[3];
+        uint32 hash[2];
         hash[0] = casterPass ? queuedRenderable.renderable->getHlmsCasterHash() :
                                queuedRenderable.renderable->getHlmsHash();
         hash[1] = passCache.hash;
