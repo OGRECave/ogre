@@ -499,6 +499,9 @@ namespace Ogre
             lastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
                                                     lastHlmsCacheHash, lastTextureHash );
 
+            const v1::CbRenderOp cmd( op );
+            rs->_setRenderOperation( &cmd );
+
             rs->_render( op );
 
             ++itor;
@@ -814,6 +817,9 @@ namespace Ogre
 
         mLastTextureHash = hlms->fillBuffersFor( hlmsCache, queuedRenderable, casterPass,
                                                  0, mLastTextureHash );
+
+        const v1::CbRenderOp cmd( op );
+        rs->_setRenderOperation( &cmd );
 
         rs->_render( op );
 

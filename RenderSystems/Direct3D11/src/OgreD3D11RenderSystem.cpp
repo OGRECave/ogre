@@ -2776,6 +2776,8 @@ bail:
 
         D3D11HlmsPso *d3dPso = reinterpret_cast<D3D11HlmsPso*>( pso->rsData );
 
+        mPso = d3dPso;
+
         deviceContext->OMSetDepthStencilState( d3dPso->depthStencilState, mStencilRef );
         deviceContext->IASetPrimitiveTopology( d3dPso->topology );
         deviceContext->IASetInputLayout( d3dPso->inputLayout );
