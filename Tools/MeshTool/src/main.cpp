@@ -863,7 +863,7 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
 
     }
 
-    if (mesh->sharedVertexData && hasColour)
+    if (mesh->sharedVertexData[0] && hasColour)
     {
         mesh->sharedVertexData[0]->convertPackedColour(originalType, desiredType);
     }
