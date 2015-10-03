@@ -41,14 +41,6 @@ namespace Ogre
     *  @{
     */
 
-    struct StencilStateOp
-    {
-        StencilOperation stencilFailOp;
-        StencilOperation stencilPassOp;
-        StencilOperation stencilDepthFailOp;
-        CompareFunction compareOp;
-    };
-
     enum OperationType
     {
         /// A list of points, 1 vertex per point
@@ -101,11 +93,7 @@ namespace Ogre
     struct HlmsPassPso
     {
         /// Stencil support
-        bool            enableStencil;
-        uint8           stencilReadMask;
-        uint8           stencilWriteMask;
-        StencilStateOp  stencilFront;
-        StencilStateOp  stencilBack;
+        StencilParams   stencilParams;
 
         /// PF_NULL if no colour attachment is used.
         PixelFormat colourFormat[OGRE_MAX_MULTIPLE_RENDER_TARGETS];

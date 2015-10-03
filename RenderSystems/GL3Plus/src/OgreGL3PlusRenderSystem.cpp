@@ -137,7 +137,6 @@ namespace Ogre {
         : mBlendChannelMask( HlmsBlendblock::BlendChannelAll ),
           mDepthWrite(true),
           mScissorsEnabled(false),
-          mStencilWriteMask(0xFFFFFFFF),
           mGlobalVao( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
@@ -1979,64 +1978,38 @@ namespace Ogre {
         return ret;
     }
 
-    void GL3PlusRenderSystem::setStencilCheckEnabled(bool enabled)
+    void GL3PlusRenderSystem::setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams )
     {
-        if (enabled)
+        RenderSystem::setStencilBufferParams( refValue, stencilParams );
+
+        if( mStencilParams.enabled )
         {
-            OGRE_CHECK_GL_ERROR(glEnable(GL_STENCIL_TEST));
+            OCGE( glEnable(GL_STENCIL_TEST) );
+
+            OCGE( glStencilMask( mStencilParams.writeMask ) );
+
+            //OCGE( glStencilMaskSeparate( GL_BACK, mStencilParams.writeMask ) );
+            //OCGE( glStencilMaskSeparate( GL_FRONT, mStencilParams.writeMask ) );
+
+            OCGE( glStencilFuncSeparate( GL_BACK,
+                                         convertCompareFunction( stencilParams.stencilBack.compareOp ),
+                                         refValue, stencilParams.readMask ) );
+            OCGE( glStencilOpSeparate( GL_BACK,
+                                       convertStencilOp( stencilParams.stencilBack.stencilFailOp ),
+                                       convertStencilOp( stencilParams.stencilBack.stencilDepthFailOp ),
+                                       convertStencilOp( stencilParams.stencilBack.stencilPassOp ) ) );
+
+            OCGE( glStencilFuncSeparate( GL_FRONT,
+                                         convertCompareFunction( stencilParams.stencilFront.compareOp ),
+                                         refValue, stencilParams.readMask ) );
+            OCGE( glStencilOpSeparate( GL_FRONT,
+                                       convertStencilOp( stencilParams.stencilFront.stencilFailOp ),
+                                       convertStencilOp( stencilParams.stencilFront.stencilDepthFailOp ),
+                                       convertStencilOp( stencilParams.stencilFront.stencilPassOp ) ) );
         }
         else
         {
-            OGRE_CHECK_GL_ERROR(glDisable(GL_STENCIL_TEST));
-        }
-    }
-
-    void GL3PlusRenderSystem::setStencilBufferParams(CompareFunction func,
-                                                     uint32 refValue, uint32 compareMask, uint32 writeMask,
-                                                     StencilOperation stencilFailOp,
-                                                     StencilOperation depthFailOp,
-                                                     StencilOperation passOp,
-                                                     bool twoSidedOperation,
-                                                     bool readBackAsTexture)
-    {
-        bool flip;
-        mStencilWriteMask = writeMask;
-
-        if (twoSidedOperation)
-        {
-            if (!mCurrentCapabilities->hasCapability(RSC_TWO_SIDED_STENCIL))
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "2-sided stencils are not supported",
-                            "GL3PlusRenderSystem::setStencilBufferParams");
-
-            // NB: We should always treat CCW as front face for consistent with default
-            // culling mode. Therefore, we must take care with two-sided stencil settings.
-            flip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping()) ||
-                (!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
-            // Back
-            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_BACK, writeMask));
-            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_BACK, convertCompareFunction(func), refValue, compareMask));
-            OGRE_CHECK_GL_ERROR(glStencilOpSeparate(GL_BACK,
-                                                    convertStencilOp(stencilFailOp, !flip),
-                                                    convertStencilOp(depthFailOp, !flip),
-                                                    convertStencilOp(passOp, !flip)));
-
-            // Front
-            OGRE_CHECK_GL_ERROR(glStencilMaskSeparate(GL_FRONT, writeMask));
-            OGRE_CHECK_GL_ERROR(glStencilFuncSeparate(GL_FRONT, convertCompareFunction(func), refValue, compareMask));
-            OGRE_CHECK_GL_ERROR(glStencilOpSeparate(GL_FRONT,
-                                convertStencilOp(stencilFailOp, flip),
-                                convertStencilOp(depthFailOp, flip),
-                                convertStencilOp(passOp, flip)));
-        }
-        else
-        {
-            flip = false;
-            OGRE_CHECK_GL_ERROR(glStencilMask(writeMask));
-            OGRE_CHECK_GL_ERROR(glStencilFunc(convertCompareFunction(func), refValue, compareMask));
-            OGRE_CHECK_GL_ERROR(glStencilOp(
-                        convertStencilOp(stencilFailOp, flip),
-                        convertStencilOp(depthFailOp, flip),
-                        convertStencilOp(passOp, flip)));
+            OCGE( glDisable(GL_STENCIL_TEST) );
         }
     }
 
@@ -2744,7 +2717,7 @@ namespace Ogre {
 
         if (buffers & FBT_STENCIL)
         {
-            OGRE_CHECK_GL_ERROR(glStencilMask(mStencilWriteMask));
+            OGRE_CHECK_GL_ERROR(glStencilMask(mStencilParams.writeMask));
         }
     }
 
@@ -2871,7 +2844,7 @@ namespace Ogre {
             GLboolean a = (mBlendChannelMask & HlmsBlendblock::BlendChannelAlpha) != 0;
             OCGE( glColorMask( r, g, b, a ) );
         }
-        OGRE_CHECK_GL_ERROR(glStencilMask(mStencilWriteMask));
+        OGRE_CHECK_GL_ERROR(glStencilMask(mStencilParams.writeMask));
     }
 
     void GL3PlusRenderSystem::_unregisterContext(GL3PlusContext *context)
@@ -2949,7 +2922,7 @@ namespace Ogre {
             mCurrentContext->setCurrent();
 
         // Initialise GL3W
-		bool gl3wFailed = gl3wInit();
+		bool gl3wFailed = gl3wInit() != 0;
         if( gl3wFailed )
         {
             LogManager::getSingleton().logMessage("Failed to initialize GL3W", LML_CRITICAL);
@@ -3092,7 +3065,7 @@ namespace Ogre {
         return GL_ALWAYS;
     }
 
-    GLint GL3PlusRenderSystem::convertStencilOp(StencilOperation op, bool invert) const
+    GLint GL3PlusRenderSystem::convertStencilOp(StencilOperation op) const
     {
         switch(op)
         {
@@ -3103,13 +3076,13 @@ namespace Ogre {
         case SOP_REPLACE:
             return GL_REPLACE;
         case SOP_INCREMENT:
-            return invert ? GL_DECR : GL_INCR;
+            return GL_INCR;
         case SOP_DECREMENT:
-            return invert ? GL_INCR : GL_DECR;
+            return GL_DECR;
         case SOP_INCREMENT_WRAP:
-            return invert ? GL_DECR_WRAP : GL_INCR_WRAP;
+            return GL_INCR_WRAP;
         case SOP_DECREMENT_WRAP:
-            return invert ? GL_INCR_WRAP : GL_DECR_WRAP;
+            return GL_DECR_WRAP;
         case SOP_INVERT:
             return GL_INVERT;
         };

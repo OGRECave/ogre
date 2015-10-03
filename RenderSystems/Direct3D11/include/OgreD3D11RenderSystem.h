@@ -104,6 +104,7 @@ namespace Ogre
         bool checkVertexTextureFormats(void);
         void detachRenderTargetImpl(const String& name);
         
+        //TODO: Looks like dead code or useless now
         bool mReadBackAsTexture;
 
         ID3D11Buffer    *mBoundIndirectBuffer;
@@ -120,8 +121,6 @@ namespace Ogre
         ID3D11ShaderResourceView* mDSTResView;
 
         UINT                        mStencilRef;
-        D3D11_DEPTH_STENCIL_DESC    mDepthStencilDesc;
-        ID3D11DepthStencilState     *mBoundDepthStencilState;
 
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundTexturesCount;
@@ -172,8 +171,6 @@ namespace Ogre
 
     protected:
 
-        void setDepthStencilDefaults(void);
-
         void setClipPlanesImpl(const PlaneList& clipPlanes);
 
         /**
@@ -181,8 +178,6 @@ namespace Ogre
          * from us each Present(), and we need the way to reestablish connection.
          */
         void _setRenderTargetViews( bool colourWrite );
-
-        void updateDepthStencilView(void);
 
     public:
         // constructor
@@ -238,14 +233,7 @@ namespace Ogre
         void setLightingEnabled( bool enabled );
         void destroyRenderTarget(const String& name);
         VertexElementType getColourVertexElementType(void) const;
-        void setStencilCheckEnabled(bool enabled);
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
-            StencilOperation stencilFailOp = SOP_KEEP, 
-            StencilOperation depthFailOp = SOP_KEEP,
-            StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false,
-            bool readBackAsTexture = false);
+        virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
         void setNormaliseNormals(bool normalise);
 
         virtual String getErrorDescription(long errorNumber) const;

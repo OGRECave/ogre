@@ -40,13 +40,6 @@ namespace Ogre
 {
     CompositorPassStencilDef::CompositorPassStencilDef( uint32 rtIndex ) :
             CompositorPassDef( PASS_STENCIL, rtIndex ),
-            mStencilCheck( false ),
-            mTwoSided( false ),
-            mStencilPassOp( SOP_KEEP ),
-            mStencilFailOp( SOP_KEEP ),
-            mStencilDepthFailOp( SOP_KEEP ),
-            mCompareFunc( CMPF_ALWAYS_PASS ),
-            mStencilMask( 0xFFFFFFFF ),
             mStencilRef( 0 )
     {
     }
@@ -78,11 +71,7 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
-        mRenderSystem->setStencilCheckEnabled( mDefinition->mStencilCheck );
-        mRenderSystem->setStencilBufferParams( mDefinition->mCompareFunc, mDefinition->mStencilRef,
-                                    mDefinition->mStencilMask, 0xFFFFFFFF, mDefinition->mStencilFailOp,
-                                    mDefinition->mStencilDepthFailOp, mDefinition->mStencilPassOp,
-                                    mDefinition->mTwoSided );
+        mRenderSystem->setStencilBufferParams( mDefinition->mStencilRef, mDefinition->mStencilParams );
 
         if( listener )
             listener->passPosExecute( this );

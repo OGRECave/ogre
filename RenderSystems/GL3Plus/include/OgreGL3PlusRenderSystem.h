@@ -97,9 +97,6 @@ namespace Ogre {
         /// Store last scissor enable state
         bool mScissorsEnabled;
 
-        /// Store last stencil mask state
-        uint32 mStencilWriteMask;
-
         GLfloat mAutoTextureMatrix[16];
 
         bool mUseAutoTextureMatrix;
@@ -408,19 +405,9 @@ namespace Ogre {
         */
         void enableClipPlane (ushort index, bool enable);
         /** See
-            RenderSystem
-        */
-        void setStencilCheckEnabled(bool enabled);
-        /** See
             RenderSystem.
         */
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS,
-                                    uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
-                                    StencilOperation stencilFailOp = SOP_KEEP,
-                                    StencilOperation depthFailOp = SOP_KEEP,
-                                    StencilOperation passOp = SOP_KEEP,
-                    bool twoSidedOperation = false,
-                    bool readBackAsTexture = false);
+        virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
         /** See
             RenderSystem
         */
@@ -480,7 +467,7 @@ namespace Ogre {
         void _setRenderTarget(RenderTarget *target, bool colourWrite);
 
         GLint convertCompareFunction(CompareFunction func) const;
-        GLint convertStencilOp(StencilOperation op, bool invert = false) const;
+        GLint convertStencilOp(StencilOperation op) const;
 
         const GL3PlusSupport* getGLSupport(void) const { return mGLSupport; }
 

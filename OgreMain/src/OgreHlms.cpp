@@ -2055,17 +2055,17 @@ namespace Ogre
         memset( &passPso, 0, sizeof(HlmsPassPso) );
 
         //TODO: Read data from RenderSystem.
-        passPso.enableStencil = false;
-        passPso.stencilReadMask     = 0xff;
-        passPso.stencilWriteMask    = 0xff;
-        passPso.stencilFront.compareOp = CMPF_ALWAYS_FAIL;
-        passPso.stencilFront.stencilFailOp      = SOP_KEEP;
-        passPso.stencilFront.stencilPassOp      = SOP_KEEP;
-        passPso.stencilFront.stencilDepthFailOp = SOP_KEEP;
-        passPso.stencilBack.compareOp  = CMPF_ALWAYS_FAIL;
-        passPso.stencilBack.stencilFailOp       = SOP_KEEP;
-        passPso.stencilBack.stencilPassOp       = SOP_KEEP;
-        passPso.stencilBack.stencilDepthFailOp  = SOP_KEEP;
+        passPso.stencilParams.enabled   = false;
+        passPso.stencilParams.readMask  = 0xff;
+        passPso.stencilParams.writeMask = 0xff;
+        passPso.stencilParams.stencilFront.compareOp            = CMPF_ALWAYS_FAIL;
+        passPso.stencilParams.stencilFront.stencilFailOp        = SOP_KEEP;
+        passPso.stencilParams.stencilFront.stencilPassOp        = SOP_KEEP;
+        passPso.stencilParams.stencilFront.stencilDepthFailOp   = SOP_KEEP;
+        passPso.stencilParams.stencilBack.compareOp             = CMPF_ALWAYS_FAIL;
+        passPso.stencilParams.stencilBack.stencilFailOp         = SOP_KEEP;
+        passPso.stencilParams.stencilBack.stencilPassOp         = SOP_KEEP;
+        passPso.stencilParams.stencilBack.stencilDepthFailOp    = SOP_KEEP;
 
         renderTarget->getFormatsForPso( passPso.colourFormat );
 

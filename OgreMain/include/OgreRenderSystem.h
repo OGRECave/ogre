@@ -881,32 +881,6 @@ namespace Ogre
         /// @See HlmsPso
         virtual void _setPipelineStateObject( const HlmsPso *pso );
 
-        /** Sets the depth bias, NB you should use the Material version of this. 
-        @remarks
-        When polygons are coplanar, you can get problems with 'depth fighting' where
-        the pixels from the two polys compete for the same screen pixel. This is particularly
-        a problem for decals (polys attached to another surface to represent details such as
-        bulletholes etc.).
-        @par
-        A way to combat this problem is to use a depth bias to adjust the depth buffer value
-        used for the decal such that it is slightly higher than the true value, ensuring that
-        the decal appears on top.
-        @note
-        The final bias value is a combination of a constant bias and a bias proportional
-        to the maximum depth slope of the polygon being rendered. The final bias
-        is constantBias + slopeScaleBias * maxslope. Slope scale biasing is
-        generally preferable but is not available on older hardware.
-        @param constantBias The constant bias value, expressed as a value in 
-        homogeneous depth coordinates.
-        @param slopeScaleBias The bias value which is factored by the maximum slope
-        of the polygon, see the description above. This is not supported by all
-        cards.
-
-        Documentation TODO: This feature was moved to HlmsMacroblock
-
-        */
-        //virtual void _setDepthBias(float constantBias, float slopeScaleBias = 0.0f) = 0;
-
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
         virtual void _beginGeometryCount(void);
         /** Reports the number of tris rendered since the last _beginGeometryCount call. */
@@ -984,43 +958,6 @@ namespace Ogre
         virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, 
             bool forGpuProgram) = 0;
 
-        /** Turns depth-stencil buffer checking on or off. 
-        @remarks
-        An inactive depth-stencil buffer can be read by a shader as a texture. An 
-        application that reads a depth-stencil buffer as a texture renders in two
-        passes, the first pass writes to the depth-stencil buffer and the second
-        pass reads from the buffer. This allows a shader to compare depth or
-        stencil values previously written to the buffer against the value for
-        the pixel currrently being rendered. The result of the comparison can
-        be used to create effects such as shadow mapping or soft particles
-        in a particle system.
-        */
-        // virtual void setDepthCheckEnabled(bool enabled) = 0;
-
-        /** Turns stencil buffer checking on or off. 
-        @remarks
-        Stencilling (masking off areas of the rendering target based on the stencil 
-        buffer) can be turned on or off using this method. By default, stencilling is
-        disabled.
-        */
-        virtual void setStencilCheckEnabled(bool enabled) = 0;
-        /** Determines if this system supports hardware accelerated stencil buffer. 
-        @remarks
-        Note that the lack of this function doesn't mean you can't do stencilling, but
-        the stencilling operations will be provided in software, which will NOT be
-        fast.
-        @par
-        Generally hardware stencils are only supported in 32-bit colour modes, because
-        the stencil buffer shares the memory of the z-buffer, and in most cards the 
-        z-buffer has to be the same depth as the colour buffer. This means that in 32-bit
-        mode, 24 bits of the z-buffer are depth and 8 bits are stencil. In 16-bit mode there
-        is no room for a stencil (although some cards support a 15:1 depth:stencil option,
-        this isn't useful for very much) so 8 bits of stencil are provided in software.
-        This can mean that if you use stencilling, your applications may be faster in 
-        32-but colour than in 16-bit, which may seem odd to some people.
-        */
-        /*virtual bool hasHardwareStencil(void) = 0;*/
-
         /** This method allows you to set all the stencil buffer parameters in one call.
         @remarks
         The stencil buffer is used to mask out pixels in the render target, allowing
@@ -1039,33 +976,13 @@ namespace Ogre
         In order to batch things this way, you'll want to use OGRE's separate render queue
         groups (see RenderQueue) and register a RenderQueueListener to get notifications
         between batches.
-        @par
-        There are individual state change methods for each of the parameters set using 
-        this method. 
-        Note that the default values in this method represent the defaults at system 
-        start up too.
-        @param func The comparison function applied.
-        @param refValue The reference value used in the comparison
-        @param compareMask The bitmask applied to both the stencil value and the reference value 
-        before comparison
-        @param writeMask The bitmask the controls which bits from refValue will be written to 
-        stencil buffer (valid for operations such as SOP_REPLACE).
-        the stencil
-        @param stencilFailOp The action to perform when the stencil check fails
-        @param depthFailOp The action to perform when the stencil check passes, but the
-        depth buffer check still fails
-        @param passOp The action to take when both the stencil and depth check pass.
-        @param twoSidedOperation If set to true, then if you render both back and front faces 
-        (you'll have to turn off culling) then these parameters will apply for front faces, 
-        and the inverse of them will happen for back faces (keep remains the same).
+        @param refValue
+            The reference value used in the comparison (dynamic)
+        @param stencilParams
+            The static parameters that involve more expensive state changes.
+            Ogre dev implementors note: Should check if the stencilParams are different from before
         */
-        virtual void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
-            uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF, 
-            StencilOperation stencilFailOp = SOP_KEEP, 
-            StencilOperation depthFailOp = SOP_KEEP,
-            StencilOperation passOp = SOP_KEEP, 
-            bool twoSidedOperation = false,
-            bool readBackAsTexture = false) {};
+        virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
 
         /**
         Render something to the active viewport.
@@ -1398,6 +1315,8 @@ namespace Ogre
         RenderTargetMap mRenderTargets;
         /** The Active render target. */
         RenderTarget * mActiveRenderTarget;
+
+        StencilParams   mStencilParams;
 
         /** The Active GPU programs and gpu program parameters*/
         GpuProgramParametersSharedPtr mActiveVertexGpuProgramParameters;

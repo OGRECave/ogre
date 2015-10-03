@@ -8055,6 +8055,8 @@ namespace Ogre{
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
         obj->context = Any(mPassDef);
 
+        StencilStateOp *stencilStateOp = &passStencil->mStencilParams.stencilFront;
+
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
             if((*i)->type == ANT_OBJECT)
@@ -8072,16 +8074,7 @@ namespace Ogre{
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return;
                     }
-                    if(!getBoolean(prop->values.front(), &passStencil->mStencilCheck))
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    break;
-                case ID_COMP_FUNC:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    if(!getCompareFunction(prop->values.front(), &passStencil->mCompareFunc))
+                    if(!getBoolean(prop->values.front(), &passStencil->mStencilParams.enabled))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
                 case ID_REF_VALUE:
@@ -8094,30 +8087,39 @@ namespace Ogre{
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
                 case ID_MASK:
+                {
                     if(prop->values.empty())
                     {
                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
                         return;
                     }
-                    if(!getUInt(prop->values.front(), &passStencil->mStencilMask))
+                    uint32 mask = passStencil->mStencilParams.writeMask;
+                    if(!getUInt(prop->values.front(), &mask))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    passStencil->mStencilParams.writeMask = static_cast<uint8>( mask );
+                }
                     break;
-                case ID_FAIL_OP:
+                case ID_READ_MASK:
+                {
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    uint32 mask = passStencil->mStencilParams.readMask;
+                    if(!getUInt(prop->values.front(), &mask))
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+
+                    passStencil->mStencilParams.readMask = static_cast<uint8>( mask );
+                }
+                    break;
+                case ID_COMP_FUNC:
                     if(prop->values.empty())
                     {
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return;
                     }
-                    if(!getStencilOp(prop->values.front(), &passStencil->mStencilFailOp))
-                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    break;
-                case ID_DEPTH_FAIL_OP:
-                    if(prop->values.empty())
-                    {
-                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                        return;
-                    }
-                    if(!getStencilOp(prop->values.front(), &passStencil->mStencilDepthFailOp))
+                    if(!getCompareFunction(prop->values.front(), &stencilStateOp->compareOp))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
                 case ID_PASS_OP:
@@ -8126,16 +8128,25 @@ namespace Ogre{
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return;
                     }
-                    if(!getStencilOp(prop->values.front(), &passStencil->mStencilPassOp))
+                    if(!getStencilOp(prop->values.front(), &stencilStateOp->stencilPassOp))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
-                case ID_TWO_SIDED:
+                case ID_FAIL_OP:
                     if(prop->values.empty())
                     {
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return;
                     }
-                    if(!getBoolean(prop->values.front(), &passStencil->mTwoSided))
+                    if(!getStencilOp(prop->values.front(), &stencilStateOp->stencilFailOp))
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    break;
+                case ID_DEPTH_FAIL_OP:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    if(!getStencilOp(prop->values.front(), &stencilStateOp->stencilDepthFailOp))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
                 case ID_VIEWPORT:

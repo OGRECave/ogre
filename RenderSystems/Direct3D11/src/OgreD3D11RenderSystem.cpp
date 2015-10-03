@@ -150,7 +150,6 @@ bail:
           mPso( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
-          mBoundDepthStencilState(0),
           mpDXGIFactory(0),
           mDSTResView(0)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
@@ -162,8 +161,6 @@ bail:
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
         mDriverType = DT_HARDWARE;
-
-        setDepthStencilDefaults();
 
         initRenderSystem();
 
@@ -993,7 +990,6 @@ bail:
         mRenderSystemWasInited = false;
 
         SAFE_RELEASE(mDSTResView);
-        SAFE_RELEASE(mBoundDepthStencilState);
 
         mPrimaryWindow = NULL; // primary window deleted by base class.
         freeDevice();
@@ -1005,7 +1001,6 @@ bail:
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
         SAFE_DELETE( mGpuProgramManager );
-
     }
     //---------------------------------------------------------------------
 	RenderWindow* D3D11RenderSystem::_createRenderWindow(const String &name,
@@ -2103,75 +2098,11 @@ bail:
     {
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setStencilCheckEnabled(bool enabled)
+    void D3D11RenderSystem::setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams )
     {
-        if( mDepthStencilDesc.StencilEnable != (BOOL)enabled )
-        {
-            mDepthStencilDesc.StencilEnable = enabled;
-            updateDepthStencilView();
-        }
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setStencilBufferParams(CompareFunction func, 
-        uint32 refValue, uint32 compareMask, uint32 writeMask, StencilOperation stencilFailOp, 
-        StencilOperation depthFailOp, StencilOperation passOp, 
-        bool twoSidedOperation, bool readBackAsTexture)
-    {
-		// We honor user intent in case of one sided operation, and carefully tweak it in case of two sided operations.
-		bool flipFront = twoSidedOperation &&
-						(mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
-						!mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
-		bool flipBack = twoSidedOperation && !flipFront;
+        RenderSystem::setStencilBufferParams( refValue, stencilParams );
 
         mStencilRef = refValue;
-        mDepthStencilDesc.StencilReadMask = compareMask;
-        mDepthStencilDesc.StencilWriteMask = writeMask;
-
-		mDepthStencilDesc.FrontFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flipFront);
-		mDepthStencilDesc.BackFace.StencilFailOp = D3D11Mappings::get(stencilFailOp, flipBack);
-        
-		mDepthStencilDesc.FrontFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flipFront);
-		mDepthStencilDesc.BackFace.StencilDepthFailOp = D3D11Mappings::get(depthFailOp, flipBack);
-        
-		mDepthStencilDesc.FrontFace.StencilPassOp = D3D11Mappings::get(passOp, flipFront);
-		mDepthStencilDesc.BackFace.StencilPassOp = D3D11Mappings::get(passOp, flipBack);
-
-		mDepthStencilDesc.FrontFace.StencilFunc = D3D11Mappings::get(func);
-		mDepthStencilDesc.BackFace.StencilFunc = D3D11Mappings::get(func);
-        mReadBackAsTexture = readBackAsTexture;
-
-        updateDepthStencilView();
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::updateDepthStencilView(void)
-    {
-        ID3D11DepthStencilState *oldDepthStencilState = mBoundDepthStencilState;
-        mBoundDepthStencilState = 0;
-
-        HRESULT hr = mDevice->CreateDepthStencilState( &mDepthStencilDesc, &mBoundDepthStencilState );
-        if (FAILED(hr))
-        {
-            String errorDescription = mDevice.getErrorDescription(hr);
-            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                "Failed to create depth stencil state\nError Description: " + errorDescription,
-                "D3D11RenderSystem::updateDepthStencilView" );
-        }
-
-        if( oldDepthStencilState )
-            oldDepthStencilState->Release();
-
-        if( mBoundDepthStencilState != oldDepthStencilState )
-        {
-            mDevice.GetImmediateContext()->OMSetDepthStencilState( mBoundDepthStencilState,
-                                                                   mStencilRef );
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                            "D3D11 device cannot set depth stencil state\nError Description: " +
-                            errorDescription, "D3D11RenderSystem::updateDepthStencilView");
-            }
-        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setRenderTarget( RenderTarget *target, bool colourWrite )
@@ -2352,15 +2283,15 @@ bail:
                 block->macroblock->mDepthWrite ? D3D11_DEPTH_WRITE_MASK_ALL :
                                                   D3D11_DEPTH_WRITE_MASK_ZERO;
         depthStencilDesc.DepthFunc          = D3D11Mappings::get( block->macroblock->mDepthFunc );
-        depthStencilDesc.StencilEnable      = block->pass.enableStencil;
-        depthStencilDesc.StencilReadMask    = block->pass.stencilReadMask;
-        depthStencilDesc.StencilWriteMask   = block->pass.stencilWriteMask;
-        const StencilStateOp &stateFront = block->pass.stencilFront;
+        depthStencilDesc.StencilEnable      = block->pass.stencilParams.enabled;
+        depthStencilDesc.StencilReadMask    = block->pass.stencilParams.readMask;
+        depthStencilDesc.StencilWriteMask   = block->pass.stencilParams.writeMask;
+        const StencilStateOp &stateFront = block->pass.stencilParams.stencilFront;
         depthStencilDesc.FrontFace.StencilFunc          = D3D11Mappings::get( stateFront.compareOp );
         depthStencilDesc.FrontFace.StencilDepthFailOp   = D3D11Mappings::get( stateFront.stencilDepthFailOp );
         depthStencilDesc.FrontFace.StencilPassOp        = D3D11Mappings::get( stateFront.stencilPassOp );
         depthStencilDesc.FrontFace.StencilFailOp        = D3D11Mappings::get( stateFront.stencilFailOp );
-        const StencilStateOp &stateBack = block->pass.stencilBack;
+        const StencilStateOp &stateBack = block->pass.stencilParams.stencilBack;
         depthStencilDesc.BackFace.StencilFunc           = D3D11Mappings::get( stateBack.compareOp );
         depthStencilDesc.BackFace.StencilDepthFailOp    = D3D11Mappings::get( stateBack.stencilDepthFailOp );
         depthStencilDesc.BackFace.StencilPassOp         = D3D11Mappings::get( stateBack.stencilPassOp );
@@ -2500,6 +2431,8 @@ bail:
     void D3D11RenderSystem::_hlmsPipelineStateObjectDestroyed( HlmsPso *pso )
     {
         D3D11HlmsPso *d3dPso = reinterpret_cast<D3D11HlmsPso*>( pso->rsData );
+        d3dPso->depthStencilState->Release();
+        d3dPso->inputLayout->Release();
         delete d3dPso;
         pso->rsData = 0;
     }
@@ -2699,17 +2632,6 @@ bail:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                 "D3D11 device cannot set rasterizer state\nError Description: " + errorDescription,
                 "D3D11RenderSystem::_setHlmsMacroblock");
-        }
-
-        if( mDepthStencilDesc.DepthEnable != (BOOL)macroblock->mDepthCheck ||
-            mDepthStencilDesc.DepthFunc != D3D11Mappings::get( macroblock->mDepthFunc ) ||
-            (mDepthStencilDesc.DepthWriteMask == D3D11_DEPTH_WRITE_MASK_ALL) != macroblock->mDepthWrite )
-        {
-            mDepthStencilDesc.DepthEnable   = macroblock->mDepthCheck;
-            mDepthStencilDesc.DepthFunc     = D3D11Mappings::get( macroblock->mDepthFunc );
-            mDepthStencilDesc.DepthWriteMask= macroblock->mDepthWrite ? D3D11_DEPTH_WRITE_MASK_ALL :
-                                                                        D3D11_DEPTH_WRITE_MASK_ZERO;
-            updateDepthStencilView();
         }
     }
     //---------------------------------------------------------------------
@@ -3793,31 +3715,6 @@ bail:
         setSubroutine(gptype, slotIdx, subroutineName);
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::setDepthStencilDefaults(void)
-    {
-        ZeroMemory( &mDepthStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
-        mDepthStencilDesc.DepthEnable       = TRUE;
-        mDepthStencilDesc.DepthWriteMask    = D3D11_DEPTH_WRITE_MASK_ALL;
-        mDepthStencilDesc.DepthFunc         = D3D11_COMPARISON_LESS;
-        mDepthStencilDesc.StencilEnable     = FALSE;
-        mDepthStencilDesc.StencilReadMask   = D3D11_DEFAULT_STENCIL_READ_MASK;
-        mDepthStencilDesc.StencilWriteMask  = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-        mDepthStencilDesc.FrontFace.StencilFunc         = D3D11_COMPARISON_ALWAYS;
-        mDepthStencilDesc.FrontFace.StencilDepthFailOp  = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.FrontFace.StencilPassOp       = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.FrontFace.StencilFailOp       = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.BackFace.StencilFunc          = D3D11_COMPARISON_ALWAYS;
-        mDepthStencilDesc.BackFace.StencilDepthFailOp   = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.BackFace.StencilPassOp        = D3D11_STENCIL_OP_KEEP;
-        mDepthStencilDesc.BackFace.StencilFailOp        = D3D11_STENCIL_OP_KEEP;
-
-        if( mBoundDepthStencilState )
-        {
-            mBoundDepthStencilState->Release();
-            mBoundDepthStencilState = 0;
-        }
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::setClipPlanesImpl(const PlaneList& clipPlanes)
     {
     }
@@ -4166,8 +4063,6 @@ bail:
 
         mBindingType = TextureUnitState::BT_FRAGMENT;
 
-        ZeroMemory( &mDepthStencilDesc, sizeof(mDepthStencilDesc));
-
         //sets the modification trackers to true
 		mSamplerStatesChanged = true;
 		mLastTextureUnitState = 0;
@@ -4251,7 +4146,5 @@ bail:
     {
         mDevice.GetImmediateContext()->ClearState();
         mDevice.GetImmediateContext()->Flush();
-
-        setDepthStencilDefaults();
     }
 }

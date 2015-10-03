@@ -89,7 +89,6 @@ namespace Ogre {
     {
         mEventNames.push_back("RenderSystemCapabilitiesCreated");
     }
-
     //-----------------------------------------------------------------------
     RenderSystem::~RenderSystem()
     {
@@ -776,6 +775,22 @@ namespace Ogre {
 
         // Set hardware matrix to nothing
         _setWorldMatrix(Matrix4::IDENTITY);
+    }
+    //-----------------------------------------------------------------------
+    void RenderSystem::setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams )
+    {
+        mStencilParams = stencilParams;
+
+        // NB: We should always treat CCW as front face for consistent with default
+        // culling mode.
+        const bool mustFlip = (mInvertVertexWinding && !mActiveRenderTarget->requiresTextureFlipping() ||
+                               !mInvertVertexWinding && mActiveRenderTarget->requiresTextureFlipping());
+
+        if( mustFlip )
+        {
+            mStencilParams.stencilBack = stencilParams.stencilFront;
+            mStencilParams.stencilFront = stencilParams.stencilBack;
+        }
     }
     //-----------------------------------------------------------------------
     void RenderSystem::_render(const v1::RenderOperation& op)

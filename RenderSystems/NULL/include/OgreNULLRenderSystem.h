@@ -126,7 +126,6 @@ namespace Ogre
             Matrix4& dest, bool forGpuProgram = false) {}
         virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
             bool forGpuProgram) {}
-        virtual void setStencilCheckEnabled(bool enabled) {}
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
 

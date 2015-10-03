@@ -879,6 +879,7 @@ namespace Ogre
                     ID_COMP_FUNC,
                     ID_REF_VALUE,
                     ID_MASK,
+                    ID_READ_MASK,
                     ID_FAIL_OP,
                         ID_KEEP,
                         ID_INCREMENT,
@@ -888,7 +889,6 @@ namespace Ogre
                         ID_INVERT,
                     ID_DEPTH_FAIL_OP,
                     ID_PASS_OP,
-                    ID_TWO_SIDED,
             ID_READ_BACK_AS_TEXTURE,
 
         ID_SHADOW_NODE,
