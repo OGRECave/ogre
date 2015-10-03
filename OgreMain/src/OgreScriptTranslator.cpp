@@ -2244,7 +2244,7 @@ namespace Ogre{
                                             mPass->setIteratePerLight(true, false);
                                         }
                                     }
-                                    else if(ID_PER_N_LIGHTS)
+                                    else if(atom->id == ID_PER_N_LIGHTS)
                                     {
                                         AbstractNodeList::const_iterator i2 = getNodeAt(prop->values, 2);
                                         if(i2 != prop->values.end() && (*i2)->type == ANT_ATOM)
