@@ -1667,10 +1667,23 @@ namespace Ogre
 
         if( queuedRenderable.renderable )
         {
-            //TODO
-            //mRenderSystem->getVaoManager();
-            //pso.vertexElements =
-            pso.operationType = OT_TRIANGLE_STRIP;
+            const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos( casterPass );
+            if( !vaos.empty() )
+            {
+                //v2 object. TODO: LOD? Should we allow Vaos with different vertex formats on LODs?
+                //(also the datablock hash in the renderable would have to account for that)
+                pso.operationType = vaos.front()->getOperationType();
+                pso.vertexElements = vaos.front()->getVertexDeclaration();
+            }
+            else
+            {
+                //v1 object.
+                v1::RenderOperation renderOp;
+                queuedRenderable.renderable->getRenderOperation( renderOp, casterPass );
+                pso.operationType = renderOp.operationType;
+                pso.vertexElements = renderOp.vertexData->vertexDeclaration->convertToV2();
+            }
+
             pso.enablePrimitiveRestart = true;
         }
 
@@ -1700,9 +1713,12 @@ namespace Ogre
             ++itor;
         }
 
-        //v1::VertexDeclaration doesn't hold op type information. Fortunately, v1 meshes
-        //do not allow LODs with different operation types (unlike v2 objects), so we
-        //save this information here instead of doing it at getMaterial time.
+        //v1::VertexDeclaration doesn't hold opType information. We need to save it now so
+        //the PSO hash value ends up being unique (otherwise two identical vertex declarations
+        //but one with tri strips another with indexed tri lists will use the same PSO!).
+        //Fortunately, v1 meshes do not allow LODs with different operation types
+        //(unlike v2 objects), so we can save this information here instead of doing it at
+        //getMaterial time.
         setProperty( HlmsPsoProp::OperationTypeV1, op.operationType );
 
         return numTexCoords;
@@ -2169,6 +2185,68 @@ namespace Ogre
                 delete *itor;
                 itor = mShaderCache.erase( itor );
                 end  = mShaderCache.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::_notifyInputLayoutDestroyed( uint16 id )
+    {
+        HlmsCacheVec::iterator itor = mShaderCache.begin();
+        HlmsCacheVec::iterator end  = mShaderCache.end();
+
+        while( itor != end )
+        {
+            const uint8 inputLayout = ( (*itor)->hash >> HlmsBits::InputLayoutShift ) &
+                                        HlmsBits::InputLayoutMask;
+            if( inputLayout == id )
+            {
+                if( getProperty( (*itor)->setProperties, HlmsPsoProp::OperationTypeV1, -1 ) == -1 )
+                {
+                    //This is a v2 input layout.
+                    mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                    delete *itor;
+                    itor = mShaderCache.erase( itor );
+                    end  = mShaderCache.end();
+                }
+                else
+                {
+                    ++itor;
+                }
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void Hlms::_notifyV1InputLayoutDestroyed( uint16 id )
+    {
+        HlmsCacheVec::iterator itor = mShaderCache.begin();
+        HlmsCacheVec::iterator end  = mShaderCache.end();
+
+        while( itor != end )
+        {
+            const uint8 inputLayout = ( (*itor)->hash >> HlmsBits::InputLayoutShift ) &
+                                        HlmsBits::InputLayoutMask;
+            if( inputLayout == id )
+            {
+                if( getProperty( (*itor)->setProperties, HlmsPsoProp::OperationTypeV1, -1 ) != -1 )
+                {
+                    //This is a v1 input layout.
+                    mRenderSystem->_hlmsPipelineStateObjectDestroyed( &(*itor)->pso );
+                    delete *itor;
+                    itor = mShaderCache.erase( itor );
+                    end  = mShaderCache.end();
+                }
+                else
+                {
+                    ++itor;
+                }
             }
             else
             {

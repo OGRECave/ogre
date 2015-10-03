@@ -128,8 +128,6 @@ namespace Ogre
             bool forGpuProgram) {}
         virtual void setStencilCheckEnabled(bool enabled) {}
 
-        virtual void setVertexDeclaration(v1::VertexDeclaration* decl);
-        virtual void setVertexBufferBinding(v1::VertexBufferBinding* binding);
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
 
         virtual void _render( const CbDrawCallIndexed *cmd );

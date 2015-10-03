@@ -77,12 +77,12 @@ namespace v1 {
         /**
            What type of primitives does this object generate?
         */
-        RenderOperation::OperationType getOperationType() const { return mOperationType; }
+        OperationType getOperationType() const { return mOperationType; }
 
         /**
            Set the type of primitives that this object generates
         */
-        void setOperationType(RenderOperation::OperationType operationType) { mOperationType = operationType; }
+        void setOperationType(OperationType operationType) { mOperationType = operationType; }
 
         /**
            Set whether this object resets its buffers each time it updates.
@@ -135,7 +135,7 @@ namespace v1 {
         void setRenderToBufferMaterialName(const String& materialName);
 
     protected:
-        RenderOperation::OperationType mOperationType;
+        OperationType mOperationType;
         bool mResetsEveryUpdate;
         bool mResetRequested;
         MaterialPtr mMaterial;

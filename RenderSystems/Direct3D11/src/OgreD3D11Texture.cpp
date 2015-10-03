@@ -1009,7 +1009,7 @@ namespace Ogre
         mBuffer = buffer;
         mWidth = (unsigned int) mBuffer->getWidth();
         mHeight = (unsigned int) mBuffer->getHeight();
-        mColourDepth = (unsigned int) PixelUtil::getNumElemBits(mBuffer->getFormat());
+        mFormat = mBuffer->getFormat();
         
         ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
 

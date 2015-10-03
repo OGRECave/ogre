@@ -174,7 +174,7 @@ namespace v1 {
     }
     //-----------------------------------------------------------------------------
     void ManualObject::begin(const String& materialName,
-        RenderOperation::OperationType opType, const String & groupName)
+        OperationType opType, const String & groupName)
     {
         if (mCurrentSection)
         {
@@ -507,7 +507,7 @@ namespace v1 {
                 "ManualObject::index");
         }
         if (mCurrentSection->getRenderOperation()->operationType !=
-            RenderOperation::OT_TRIANGLE_LIST)
+            OT_TRIANGLE_LIST)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "This method is only valid on triangle lists",
@@ -935,9 +935,9 @@ namespace v1 {
                 RenderOperation* rop = (*i)->getRenderOperation();
                 // Only indexed triangle geometry supported for stencil shadows
                 if (rop->useIndexes && rop->indexData->indexCount != 0 && 
-                    (rop->operationType == RenderOperation::OT_TRIANGLE_FAN ||
-                     rop->operationType == RenderOperation::OT_TRIANGLE_LIST ||
-                     rop->operationType == RenderOperation::OT_TRIANGLE_STRIP))
+                    (rop->operationType == OT_TRIANGLE_FAN ||
+                     rop->operationType == OT_TRIANGLE_LIST ||
+                     rop->operationType == OT_TRIANGLE_STRIP))
                 {
                     eb.addVertexData(rop->vertexData);
                     eb.addIndexData(rop->indexData, vertexSet++);
@@ -960,7 +960,7 @@ namespace v1 {
     //-----------------------------------------------------------------------------
     //-----------------------------------------------------------------------------
     ManualObject::ManualObjectSection::ManualObjectSection(ManualObject* parent,
-        const String& materialName, RenderOperation::OperationType opType, const String & groupName)
+        const String& materialName, OperationType opType, const String & groupName)
         : mParent(parent), mMaterialName(materialName), mGroupName(groupName), m32BitIndices(false)
     {
         mRenderOperation.operationType = opType;

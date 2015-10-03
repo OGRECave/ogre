@@ -993,7 +993,7 @@ namespace Ogre {
     void Frustum::getRenderOperation(v1::RenderOperation& op, bool casterPass)
     {
         updateVertexData();
-        op.operationType = v1::RenderOperation::OT_LINE_LIST;
+        op.operationType = OT_LINE_LIST;
         op.useIndexes = false;
         op.useGlobalInstancingVertexBufferIsAvailable = false;
         op.vertexData = &mVertexData;

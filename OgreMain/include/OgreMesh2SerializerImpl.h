@@ -97,7 +97,7 @@ namespace Ogre {
             bool                    index32Bit;
             uint32                  numIndices;
             void                    *indexData;
-            v1::RenderOperation::OperationType operationType;
+            OperationType operationType;
 
             SubMeshLod();
         };

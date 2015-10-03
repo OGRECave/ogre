@@ -41,12 +41,18 @@ namespace Ogre
         /// The meaning of the element
         VertexElementSemantic mSemantic;
 
+        /// The number of instances to draw using the same per-instance data before
+        /// advancing in the buffer by one element. This value must be 0 for an
+        /// element that contains per-vertex data
+        uint32 mInstancingStepRate;
+
         VertexElement2( VertexElementType type, VertexElementSemantic semantic ) :
-            mType( type ), mSemantic( semantic ) {}
+            mType( type ), mSemantic( semantic ), mInstancingStepRate( 0 ) {}
 
         bool operator == ( const VertexElement2 _r ) const
         {
-            return mType == _r.mType && mSemantic == _r.mSemantic;
+            return mType == _r.mType && mSemantic == _r.mSemantic &&
+                    mInstancingStepRate == _r.mInstancingStepRate;
         }
 
         bool operator == ( VertexElementSemantic semantic ) const

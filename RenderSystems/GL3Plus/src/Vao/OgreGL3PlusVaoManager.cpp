@@ -784,7 +784,7 @@ namespace Ogre
     VertexArrayObject* GL3PlusVaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            v1::RenderOperation::OperationType opType )
+                                                            OperationType opType )
     {
         Vao vao;
 

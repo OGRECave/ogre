@@ -40,8 +40,8 @@
 
 namespace Ogre {
 
-    String operationTypeToString(v1::RenderOperation::OperationType val);
-    v1::RenderOperation::OperationType parseOperationType(const String& val);
+    String operationTypeToString(OperationType val);
+    OperationType parseOperationType(const String& val);
 
     GLSLShader::CmdPreprocessorDefines GLSLShader::msCmdPreprocessorDefines;
     GLSLShader::CmdAttach GLSLShader::msCmdAttach;
@@ -598,56 +598,56 @@ namespace Ogre {
     }
 
 
-    v1::RenderOperation::OperationType parseOperationType(const String& val)
+    OperationType parseOperationType(const String& val)
     {
         if (val == "point_list")
         {
-            return v1::RenderOperation::OT_POINT_LIST;
+            return OT_POINT_LIST;
         }
         else if (val == "line_list")
         {
-            return v1::RenderOperation::OT_LINE_LIST;
+            return OT_LINE_LIST;
         }
         else if (val == "line_strip")
         {
-            return v1::RenderOperation::OT_LINE_STRIP;
+            return OT_LINE_STRIP;
         }
         else if (val == "triangle_strip")
         {
-            return v1::RenderOperation::OT_TRIANGLE_STRIP;
+            return OT_TRIANGLE_STRIP;
         }
         else if (val == "triangle_fan")
         {
-            return v1::RenderOperation::OT_TRIANGLE_FAN;
+            return OT_TRIANGLE_FAN;
         }
         else
         {
             // Triangle list is the default fallback. Keep it this way?
-            return v1::RenderOperation::OT_TRIANGLE_LIST;
+            return OT_TRIANGLE_LIST;
         }
     }
 
 
-    String operationTypeToString(v1::RenderOperation::OperationType val)
+    String operationTypeToString(OperationType val)
     {
         switch (val)
         {
-        case v1::RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             return "point_list";
             break;
-        case v1::RenderOperation::OT_LINE_LIST:
+        case OT_LINE_LIST:
             return "line_list";
             break;
-        case v1::RenderOperation::OT_LINE_STRIP:
+        case OT_LINE_STRIP:
             return "line_strip";
             break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_STRIP:
             return "triangle_strip";
             break;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_FAN:
             return "triangle_fan";
             break;
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
         default:
             return "triangle_list";
             break;

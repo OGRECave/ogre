@@ -100,7 +100,7 @@ namespace v1 {
             // Colours - store these in a separate buffer because they change less often
             decl->addElement(COLOUR_BINDING, 0, VET_COLOUR, VES_DIFFUSE);
 
-            mRenderOp.operationType = RenderOperation::OT_TRIANGLE_LIST;
+            mRenderOp.operationType = OT_TRIANGLE_LIST;
             mRenderOp.useIndexes = false;
             mRenderOp.vertexData->vertexStart = 0;
             mRenderOp.useGlobalInstancingVertexBufferIsAvailable = false;

@@ -152,9 +152,9 @@ namespace Ogre
         uint32                  sampleMask; /// Fixed to 0xffffffff for now
 
         //Computed from the VertexArrayObject (or v1 equivalent)
-        VertexElement2Vec   vertexElements;
-        OperationType       operationType;
-        bool                enablePrimitiveRestart;
+        VertexElement2VecVec    vertexElements;
+        OperationType           operationType;
+        bool                    enablePrimitiveRestart;
         //TODO: Stream Out.
 
         HlmsPassPso     pass;

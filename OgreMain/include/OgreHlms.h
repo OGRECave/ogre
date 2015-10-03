@@ -548,6 +548,12 @@ namespace Ogre
         /// @copydoc _notifyMacroblockDestroyed
         void _notifyBlendblockDestroyed( uint16 id );
 
+        /// @copydoc _notifyMacroblockDestroyed
+        void _notifyInputLayoutDestroyed( uint16 id );
+
+        /// @copydoc _notifyMacroblockDestroyed
+        void _notifyV1InputLayoutDestroyed( uint16 id );
+
         virtual void _changeRenderSystem( RenderSystem *newRs );
 
         RenderSystem* getRenderSystem(void) const           { return mRenderSystem; }

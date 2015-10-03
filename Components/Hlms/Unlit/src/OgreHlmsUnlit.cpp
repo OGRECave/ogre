@@ -429,7 +429,7 @@ namespace Ogre
         passCache.passPso = getPassPsoForScene( sceneManager );
         passCache.properties = mSetProperties;
 
-        assert( mPassCache.size() <= HlmsBits::PassMask &&
+        assert( mPassCache.size() <= (size_t)HlmsBits::PassMask &&
                 "Too many passes combinations, we'll overflow the bits assigned in the hash!" );
         PassCacheVec::iterator it = std::find( mPassCache.begin(), mPassCache.end(), passCache );
         if( it == mPassCache.end() )

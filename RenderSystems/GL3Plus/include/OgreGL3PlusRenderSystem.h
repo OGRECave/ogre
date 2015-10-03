@@ -356,8 +356,8 @@ namespace Ogre {
         virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock, const GL3PlusHlmsPso *pso );
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock, const GL3PlusHlmsPso *pso );
+        void _setHlmsMacroblock( const HlmsMacroblock *macroblock, const GL3PlusHlmsPso *pso );
+        void _setHlmsBlendblock( const HlmsBlendblock *blendblock, const GL3PlusHlmsPso *pso );
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
         virtual void _setPipelineStateObject( const HlmsPso *pso );
 
@@ -421,18 +421,6 @@ namespace Ogre {
                                     StencilOperation passOp = SOP_KEEP,
                     bool twoSidedOperation = false,
                     bool readBackAsTexture = false);
-        /** See
-            RenderSystem
-        */
-        void setVertexDeclaration(v1::VertexDeclaration* decl) {}
-        /** See
-            RenderSystem
-        */
-        void setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding) {}
-        /** See
-            RenderSystem.
-        */
-        void setVertexBufferBinding(v1::VertexBufferBinding* binding) {}
         /** See
             RenderSystem
         */

@@ -244,7 +244,7 @@ namespace Ogre
     VertexArrayObject* NULLVaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            v1::RenderOperation::OperationType opType )
+                                                            OperationType opType )
     {
         size_t idx = mVertexArrayObjects.size();
 

@@ -1306,7 +1306,6 @@ namespace Ogre {
     void GL3PlusRenderSystem::_hlmsPipelineStateObjectCreated( HlmsPso *newBlock )
     {
         GL3PlusHlmsPso *pso = new GL3PlusHlmsPso();
-
         memset( pso, 0, sizeof(GL3PlusHlmsPso) );
 
         //
@@ -1806,6 +1805,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_beginFrame(void)
     {
+        mHardwareBufferManager->_updateDirtyInputLayouts();
     }
 
     void GL3PlusRenderSystem::_endFrame(void)
@@ -2198,23 +2198,23 @@ namespace Ogre {
         bool useAdjacency = (mGeometryProgramBound && mPso->geometryShader && mPso->geometryShader->isAdjacencyInfoRequired());
         switch (op.operationType)
         {
-        case v1::RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             primType = GL_POINTS;
             break;
-        case v1::RenderOperation::OT_LINE_LIST:
+        case OT_LINE_LIST:
             primType = useAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
             break;
-        case v1::RenderOperation::OT_LINE_STRIP:
+        case OT_LINE_STRIP:
             primType = useAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
             break;
         default:
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             primType = useAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
             break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_STRIP:
             primType = useAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
             break;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_FAN:
             primType = GL_TRIANGLE_FAN;
             break;
         }
@@ -2245,20 +2245,20 @@ namespace Ogre {
             // // Useful primitives for tessellation
             // switch( op.operationType )
             // {
-            // case RenderOperation::OT_LINE_LIST:
+            // case OT_LINE_LIST:
             //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
             //     break;
 
-            // case RenderOperation::OT_LINE_STRIP:
+            // case OT_LINE_STRIP:
             //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
             //     break;
 
-            // case RenderOperation::OT_TRIANGLE_LIST:
+            // case OT_TRIANGLE_LIST:
             //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount);
             //     //primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
             //     break;
 
-            // case RenderOperation::OT_TRIANGLE_STRIP:
+            // case OT_TRIANGLE_STRIP:
             //     primCount = (GLuint)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
             //     break;
             // default:
@@ -2585,23 +2585,23 @@ namespace Ogre {
         mCurrentPolygonMode = GL_TRIANGLES;
         switch( cmd->operationType )
         {
-        case v1::RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             mCurrentPolygonMode = GL_POINTS;
             break;
-        case v1::RenderOperation::OT_LINE_LIST:
+        case OT_LINE_LIST:
             mCurrentPolygonMode = mUseAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
             break;
-        case v1::RenderOperation::OT_LINE_STRIP:
+        case OT_LINE_STRIP:
             mCurrentPolygonMode = mUseAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINE_STRIP;
             break;
         default:
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             mCurrentPolygonMode = mUseAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
             break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_STRIP:
             mCurrentPolygonMode = mUseAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLE_STRIP;
             break;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_FAN:
             mCurrentPolygonMode = GL_TRIANGLE_FAN;
             break;
         }

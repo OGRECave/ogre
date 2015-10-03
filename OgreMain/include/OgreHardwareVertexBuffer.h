@@ -288,15 +288,25 @@ namespace v1 {
         /// Sort routine for vertex elements
         static bool vertexElementLess(const VertexElement& e1, const VertexElement& e2);
     protected:
+        HardwareBufferManagerBase *mCreator;
+
         VertexElementList mElementList;
         /// @see VertexArrayObject::mInputLayoutId
-        uint8 mInputLayoutId;
+        /// It's 16 bits so we can treat the range outside as [0; 255] as invalid.
+        uint16 mInputLayoutId;
+        bool mInputLayoutDirty;
+
+        void vertexLayoutDirty(void);
     public:
         /// Standard constructor, not you should use HardwareBufferManager::createVertexDeclaration
-        VertexDeclaration();
+        VertexDeclaration( HardwareBufferManagerBase *creator );
         virtual ~VertexDeclaration();
 
-        uint8 getInputLayoutId(void) const  { return mInputLayoutId; }
+        void _setInputLayoutId( uint8 layoutId );
+        uint16 _getInputLayoutId(void) const;
+        bool _isInputLayoutDirty(void) const;
+
+        uint8 getInputLayoutId(void) const;
 
         /** Get the number of elements in the declaration. */
         size_t getElementCount(void) const { return mElementList.size(); }

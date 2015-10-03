@@ -1067,13 +1067,6 @@ namespace Ogre
             bool twoSidedOperation = false,
             bool readBackAsTexture = false) {};
 
-
-
-        /** Sets the current vertex declaration, ie the source of vertex data. */
-        virtual void setVertexDeclaration(v1::VertexDeclaration* decl) = 0;
-        /** Sets the current vertex buffer binding state. */
-        virtual void setVertexBufferBinding(v1::VertexBufferBinding* binding) = 0;
-
         /**
         Render something to the active viewport.
 

@@ -253,14 +253,6 @@ namespace Ogre
         return VET_COLOUR_ARGB;
     }
     //-------------------------------------------------------------------------
-    void NULLRenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl)
-    {
-    }
-    //-------------------------------------------------------------------------
-    void NULLRenderSystem::setVertexBufferBinding(v1::VertexBufferBinding* binding)
-    {
-    }
-    //-------------------------------------------------------------------------
     void NULLRenderSystem::_setVertexArrayObject( const VertexArrayObject *vao )
     {
     }

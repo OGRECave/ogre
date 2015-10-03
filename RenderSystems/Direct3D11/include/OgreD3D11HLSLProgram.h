@@ -31,7 +31,6 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHardwareUniformBuffer.h"
-#include "OgreD3D11VertexDeclaration.h"
 
 
 namespace Ogre {
@@ -143,9 +142,6 @@ namespace Ogre {
         bool shaderMacroSet;
 
         D3D11Device & mDevice;
-
-        /// TODO: Looks like this is dead code.
-        v1::D3D11VertexDeclaration mInputVertexDeclaration;
 
         ID3D11VertexShader* mVertexShader;
         ID3D11PixelShader* mPixelShader;
@@ -364,7 +360,7 @@ namespace Ogre {
         // Get slot for a specific interface
         unsigned int getSubroutineSlot(const String& subroutineSlotName) const;
 
-        ID3D11InputLayout* getLayoutForVao( const VertexArrayObject *vao );
+        ID3D11InputLayout* getLayoutForPso( const VertexElement2VecVec &vertexElements );
 
         void CreateVertexShader();
         void CreatePixelShader();
@@ -376,8 +372,6 @@ namespace Ogre {
         /** Internal load implementation, must be implemented by subclasses.
         */
         void loadFromSource(void);
-
-        v1::D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
 
         void reinterpretGSForStreamOut(void);
         bool mReinterpretingGS;

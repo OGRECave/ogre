@@ -1012,7 +1012,7 @@ namespace Ogre
     D3D11VaoManager::VaoVec::iterator D3D11VaoManager::findVao(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        v1::RenderOperation::OperationType opType )
+                                                        OperationType opType )
     {
         Vao vao;
 
@@ -1185,8 +1185,12 @@ namespace Ogre
     VertexArrayObject* D3D11VaoManager::createVertexArrayObjectImpl(
                                                             const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            v1::RenderOperation::OperationType opType )
+                                                            OperationType opType )
     {
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        VertexElement2VecVec vertexElements = VertexArrayObject::getVertexDeclaration( vertexBuffers );
+        uint8 inputLayout = hlmsManager->_addInputLayoutId( vertexElements, opType );
+
         {
             bool hasImmutableDelayedBuffer = false;
             VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
@@ -1221,6 +1225,7 @@ namespace Ogre
                 //create the actual Vao yet. We'll modify the pointer later.
                 D3D11VertexArrayObject *retVal = OGRE_NEW D3D11VertexArrayObject( 0,
                                                                                   renderQueueId,
+                                                                                  inputLayout,
                                                                                   vertexBuffers,
                                                                                   indexBuffer,
                                                                                   opType,
@@ -1235,6 +1240,7 @@ namespace Ogre
 
         D3D11VertexArrayObject *retVal = OGRE_NEW D3D11VertexArrayObject( itor->vaoName,
                                                                           renderQueueId,
+                                                                          inputLayout,
                                                                           vertexBuffers,
                                                                           indexBuffer,
                                                                           opType,

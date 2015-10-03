@@ -98,11 +98,11 @@ namespace v1 {
     }
     //---------------------------------------------------------------------
     void EdgeListBuilder::addIndexData(const IndexData* indexData, 
-        size_t vertexSet, RenderOperation::OperationType opType)
+        size_t vertexSet, OperationType opType)
     {
-        if (opType != RenderOperation::OT_TRIANGLE_LIST &&
-            opType != RenderOperation::OT_TRIANGLE_FAN &&
-            opType != RenderOperation::OT_TRIANGLE_STRIP)
+        if (opType != OT_TRIANGLE_LIST &&
+            opType != OT_TRIANGLE_FAN &&
+            opType != OT_TRIANGLE_STRIP)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Only triangle list, fan and strip are supported to build edge list.",
@@ -209,17 +209,17 @@ namespace v1 {
         size_t indexSet = geometry.indexSet;
         size_t vertexSet = geometry.vertexSet;
         const IndexData* indexData = geometry.indexData;
-        RenderOperation::OperationType opType = geometry.opType;
+        OperationType opType = geometry.opType;
 
         size_t iterations;
         
         switch (opType)
         {
-        case RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             iterations = indexData->indexCount / 3;
             break;
-        case RenderOperation::OT_TRIANGLE_FAN:
-        case RenderOperation::OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_STRIP:
             iterations = indexData->indexCount - 2;
             break;
         default:
@@ -279,7 +279,7 @@ namespace v1 {
             tri.indexSet = indexSet;
             tri.vertexSet = vertexSet;
 
-            if (opType == RenderOperation::OT_TRIANGLE_LIST || t == 0)
+            if (opType == OT_TRIANGLE_LIST || t == 0)
             {
                 // Standard 3-index read for tri list or first tri in strip / fan
                 if (idx32bit)
@@ -305,7 +305,7 @@ namespace v1 {
                 // one index and the current one for triangles after the first.
                 // We also make sure that all the triangles are process in the
                 // _anti_ clockwise orientation
-                index[(opType == RenderOperation::OT_TRIANGLE_STRIP) && (t & 1) ? 0 : 1] = index[2];
+                index[(opType == OT_TRIANGLE_STRIP) && (t & 1) ? 0 : 1] = index[2];
                 // Read for the last tri index
                 if (idx32bit)
                     index[2] = *p32Idx++;
@@ -545,7 +545,7 @@ namespace v1 {
             {
                 if (iData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT)
                 {
-                    if (mGeometryList[i].opType == RenderOperation::OT_TRIANGLE_LIST
+                    if (mGeometryList[i].opType == OT_TRIANGLE_LIST
                         || j == 0)
                     {
                         unsigned int n1 = *p32Idx++;
@@ -566,7 +566,7 @@ namespace v1 {
                 }
                 else
                 {
-                    if (mGeometryList[i].opType == RenderOperation::OT_TRIANGLE_LIST
+                    if (mGeometryList[i].opType == OT_TRIANGLE_LIST
                         || j == 0)
                     {
                         unsigned short n1 = *p16Idx++;

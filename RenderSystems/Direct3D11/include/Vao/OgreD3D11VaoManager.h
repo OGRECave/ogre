@@ -116,7 +116,9 @@ namespace Ogre
 
             typedef vector<VertexBinding>::type VertexBindingVec;
 
-            v1::RenderOperation::OperationType operationType;
+            /// Not used anymore, however it's useful for sorting
+            /// purposes in the RenderQueue (using the Vao's ID).
+            OperationType operationType;
             VertexBindingVec    vertexBuffers;
             ID3D11Buffer        *indexBufferVbo;
             IndexBufferPacked::IndexType indexType;
@@ -237,7 +239,7 @@ namespace Ogre
         /// Increases refCount before returning the iterator.
         VaoVec::iterator findVao( const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
-                                  v1::RenderOperation::OperationType opType );
+                                  OperationType opType );
         uint32 createVao( const Vao &vaoRef );
         void releaseVao( VertexArrayObject *vao );
 
@@ -247,7 +249,7 @@ namespace Ogre
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        v1::RenderOperation::OperationType opType );
+                                                        OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 

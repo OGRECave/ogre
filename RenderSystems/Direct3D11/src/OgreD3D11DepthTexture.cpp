@@ -197,7 +197,7 @@ namespace v1
         mName = name;
         mWidth      = ultimateTextureOwner->getWidth();
         mHeight     = ultimateTextureOwner->getHeight();
-        mColourDepth= PixelUtil::getNumElemBits( ultimateTextureOwner->getFormat() );
+        mFormat     = ultimateTextureOwner->getFormat();
         mFSAA       = ultimateTextureOwner->getFSAA();
         mFSAAHint   = ultimateTextureOwner->getFSAAHint();
         mFsaaResolveDirty = true; //Should be permanent true.

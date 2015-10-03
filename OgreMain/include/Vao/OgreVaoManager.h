@@ -121,7 +121,7 @@ namespace Ogre
 
         virtual VertexArrayObject* createVertexArrayObjectImpl( const VertexBufferPackedVec &vertexBuffers,
                                                                 IndexBufferPacked *indexBuffer,
-                                                                v1::RenderOperation::OperationType opType ) = 0;
+                                                                OperationType opType ) = 0;
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao ) = 0;
 
@@ -277,7 +277,7 @@ namespace Ogre
         */
         VertexArrayObject* createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
                                                     IndexBufferPacked *indexBuffer,
-                                                    v1::RenderOperation::OperationType opType );
+                                                    OperationType opType );
 
         /** Destroys the input pointer. After this call, it's no longer valid
         @remarks

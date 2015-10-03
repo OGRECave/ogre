@@ -61,11 +61,11 @@ namespace v1
         mVData = v_in;
     }
     //---------------------------------------------------------------------
-    void TangentSpaceCalc::addIndexData(IndexData* i_in, RenderOperation::OperationType op)
+    void TangentSpaceCalc::addIndexData(IndexData* i_in, OperationType op)
     {
-        if (op != RenderOperation::OT_TRIANGLE_FAN && 
-            op != RenderOperation::OT_TRIANGLE_LIST && 
-            op != RenderOperation::OT_TRIANGLE_STRIP)
+        if (op != OT_TRIANGLE_FAN &&
+            op != OT_TRIANGLE_LIST &&
+            op != OT_TRIANGLE_STRIP)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Only indexed triangle (list, strip, fan) render operations are supported.",
@@ -248,7 +248,7 @@ namespace v1
         // Quick pre-check for triangle strips / fans
         for (OpTypeList::iterator ot = mOpTypes.begin(); ot != mOpTypes.end(); ++ot)
         {
-            if (*ot != RenderOperation::OT_TRIANGLE_LIST)
+            if (*ot != OT_TRIANGLE_LIST)
             {
                 // Can't split strips / fans
                 setSplitMirrored(false);
@@ -259,7 +259,7 @@ namespace v1
         for (size_t i = 0; i < mIDataList.size(); ++i)
         {
             IndexData* i_in = mIDataList[i];
-            RenderOperation::OperationType opType = mOpTypes[i];
+            OperationType opType = mOpTypes[i];
 
             // Read data from buffers
             uint16 *p16 = 0;
@@ -283,19 +283,19 @@ namespace v1
             // current triangle
             size_t vertInd[3] = { 0, 0, 0 };
             // loop through all faces to calculate the tangents and normals
-            size_t faceCount = opType == RenderOperation::OT_TRIANGLE_LIST ? 
+            size_t faceCount = opType == OT_TRIANGLE_LIST ?
                 i_in->indexCount / 3 : i_in->indexCount - 2;
             for (size_t f = 0; f < faceCount; ++f)
             {
                 bool invertOrdering = false;
                 // Read 1 or 3 indexes depending on type
-                if (f == 0 || opType == RenderOperation::OT_TRIANGLE_LIST)
+                if (f == 0 || opType == OT_TRIANGLE_LIST)
                 {
                     vertInd[0] = p32? *p32++ : *p16++;
                     vertInd[1] = p32? *p32++ : *p16++;
                     vertInd[2] = p32? *p32++ : *p16++;
                 }
-                else if (opType == RenderOperation::OT_TRIANGLE_FAN)
+                else if (opType == OT_TRIANGLE_FAN)
                 {
                     // Element 0 always remains the same
                     // Element 2 becomes element 1
@@ -303,7 +303,7 @@ namespace v1
                     // read new into element 2
                     vertInd[2] = p32? *p32++ : *p16++;
                 }
-                else if (opType == RenderOperation::OT_TRIANGLE_STRIP)
+                else if (opType == OT_TRIANGLE_STRIP)
                 {
                     // Shunt everything down one, but also invert the ordering on 
                     // odd numbered triangles (== even numbered i's)

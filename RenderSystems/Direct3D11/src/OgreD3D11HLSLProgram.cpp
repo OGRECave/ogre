@@ -1077,20 +1077,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::analizeMicrocode()
     {
-        // enum parameters
-        mInputVertexDeclaration.removeAllElements();
-
-        for (UINT i=0 ; i < mD3d11ShaderInputParameters.size() ; i++)
-        {
-            D3D11_SIGNATURE_PARAMETER_DESC  & paramDesc = mD3d11ShaderInputParameters[i];
-            mInputVertexDeclaration.addElement(
-                paramDesc.Register, 
-                -1, // we don't need the offset
-                VET_FLOAT1, // doesn't matter
-                D3D11Mappings::get(paramDesc.SemanticName),
-                paramDesc.SemanticIndex);
-        }
-
         UINT bufferCount = 0;
         UINT pointerCount = 0;
         UINT typeCount = 0;
@@ -1504,7 +1490,7 @@ namespace Ogre {
         , mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device)
         , mVertexShader(NULL), mConstantBufferSize(0)
         , mPixelShader(NULL),mGeometryShader(NULL), mHullShader(NULL), mDomainShader(NULL), mComputeShader(NULL)
-		, mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false), mInputVertexDeclaration(device)
+        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
 		mEnableBackwardsCompatibility = true;
@@ -1933,47 +1919,34 @@ namespace Ogre {
         return it->second;
     }
     //-----------------------------------------------------------------------------
-    ID3D11InputLayout* D3D11HLSLProgram::getLayoutForVao( const VertexArrayObject *vao )
+    ID3D11InputLayout* D3D11HLSLProgram::getLayoutForPso( const VertexElement2VecVec &vertexElements )
     {
-        InputLayoutVaoBindVec::iterator itLayout = std::lower_bound(
-                    mInputLayoutVaoBind.begin(), mInputLayoutVaoBind.end(),
-                    InputLayoutVaoBind( vao->getVaoName(), 0 ) );
-
-        //Already cached.
-        if( itLayout != mInputLayoutVaoBind.end() && itLayout->vaoName == vao->getVaoName() )
-            return itLayout->inputLayout;
-
         size_t numShaderInputs = getNumInputs();
         size_t numShaderInputsFound = 0;
-
-        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
 
         size_t currDesc = 0;
         size_t uvCount = 0;
         size_t colourCount = 0;
-        D3D11_INPUT_ELEMENT_DESC inputDesc[128];
 
+        D3D11_INPUT_ELEMENT_DESC inputDesc[128];
         ZeroMemory( &inputDesc, sizeof(D3D11_INPUT_ELEMENT_DESC) * 128 );
 
-        for( size_t i=0; i<vao->getVertexBuffers().size(); ++i )
+        for( size_t i=0; i<vertexElements.size(); ++i )
         {
-            size_t bindAccumOffset = 0;
-
-            VertexBufferPacked *vertexBuffer = vertexBuffers[i];
-            const VertexElement2Vec &vertexElements = vertexBuffer->getVertexElements();
-
-            VertexElement2Vec::const_iterator it = vertexElements.begin();
-            VertexElement2Vec::const_iterator en = vertexElements.end();
+            VertexElement2Vec::const_iterator it = vertexElements[i].begin();
+            VertexElement2Vec::const_iterator en = vertexElements[i].end();
 
             while( it != en )
             {
+                size_t bindAccumOffset = 0;
+
                 inputDesc[currDesc].SemanticName    = D3D11Mappings::get( it->mSemantic );
                 inputDesc[currDesc].SemanticIndex   = 0;
                 if( it->mSemantic == VES_TEXTURE_COORDINATES )
                 {
                     inputDesc[currDesc].SemanticIndex = uvCount++;
                 }
-                else if( it->mSemantic == VES_TEXTURE_COORDINATES )
+                else if( it->mSemantic == VES_DIFFUSE )
                 {
                     inputDesc[currDesc].SemanticIndex = colourCount++;
                 }
@@ -1982,16 +1955,10 @@ namespace Ogre {
                 inputDesc[currDesc].InputSlot           = i;
                 inputDesc[currDesc].AlignedByteOffset   = bindAccumOffset;
 
-                /*if( binding.instancingDivisor == 0 );
-                {*/
-                    inputDesc[currDesc].InputSlotClass          = D3D11_INPUT_PER_VERTEX_DATA;
-                    inputDesc[currDesc].InstanceDataStepRate    = 0;
-                /*}
-                else
-                {
-                    inputDesc[currDesc].InputSlotClass          = D3D11_INPUT_PER_INSTANCE_DATA;
-                    inputDesc[currDesc].InstanceDataStepRate    = 1;
-                }*/
+                inputDesc[currDesc].InputSlotClass          = it->mInstancingStepRate == 0 ?
+                                                                    D3D11_INPUT_PER_VERTEX_DATA :
+                                                                    D3D11_INPUT_PER_INSTANCE_DATA;
+                inputDesc[currDesc].InstanceDataStepRate    = it->mInstancingStepRate;
 
                 bool bFound = false;
                 for( size_t j=0; j<numShaderInputs && !bFound; ++j )
@@ -2015,11 +1982,11 @@ namespace Ogre {
             }
         }
 
-        //Bind the draw ID. Must always be present
+        //Bind the draw ID, if present
         inputDesc[currDesc].SemanticName            = "DRAWID";
         inputDesc[currDesc].SemanticIndex           = 0;
         inputDesc[currDesc].Format                  = DXGI_FORMAT_R32_UINT;
-        inputDesc[currDesc].InputSlot               = vao->getVertexBuffers().size();
+        inputDesc[currDesc].InputSlot               = vertexElements.size();
         inputDesc[currDesc].AlignedByteOffset       = 0;
         inputDesc[currDesc].InputSlotClass          = D3D11_INPUT_PER_INSTANCE_DATA;
         inputDesc[currDesc].InstanceDataStepRate    = 1;
@@ -2045,8 +2012,9 @@ namespace Ogre {
         if( numShaderInputsFound < numShaderInputs )
         {
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                         "Not all of the shader input semantics are set by the VertexArrayObject",
-                         "D3D11VertexDeclaration::getILayoutByShader");
+                         "The shader requires more input attributes/semantics than what the "
+                         "VertexArrayObject / v1::VertexDeclaration has to offer. You're "
+                         "missing a component", "D3D11HLSLProgram::getLayoutForPso" );
         }
 
         ID3D11DeviceN *d3dDevice = mDevice.get();
@@ -2067,10 +2035,8 @@ namespace Ogre {
 
             OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr,
                             "Unable to create D3D11 input layout: " + errorDescription,
-                            "D3D11HLSLProgram::bindVao" );
+                            "D3D11HLSLProgram::getLayoutForPso" );
         }
-
-        mInputLayoutVaoBind.insert( itLayout, InputLayoutVaoBind( vao->getVaoName(), d3dInputLayout ) );
 
         return d3dInputLayout;
     }

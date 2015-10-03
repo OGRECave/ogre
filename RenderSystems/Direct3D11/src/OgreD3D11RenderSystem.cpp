@@ -39,7 +39,6 @@ THE SOFTWARE.
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11HardwareIndexBuffer.h"
 #include "OgreD3D11HardwareVertexBuffer.h"
-#include "OgreD3D11VertexDeclaration.h"
 #include "OgreD3D11GpuProgram.h"
 #include "OgreD3D11GpuProgramManager.h"
 #include "OgreD3D11HLSLProgramFactory.h"
@@ -48,10 +47,10 @@ THE SOFTWARE.
 #include "OgreFrustum.h"
 #include "OgreD3D11MultiRenderTarget.h"
 #include "OgreD3D11HLSLProgram.h"
-#include "OgreD3D11VertexDeclaration.h"
 
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsSamplerblock.h"
+#include "OgreD3D11HlmsPso.h"
 
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11DepthTexture.h"
@@ -129,14 +128,26 @@ bail:
         return hr;
 #endif
     }
+#else
+    HRESULT WINAPI D3D11CreateDeviceN(
+        IDXGIAdapter* pAdapter,
+        D3D_DRIVER_TYPE DriverType,
+        HMODULE Software,
+        UINT Flags,
+        /*_In_reads_opt_( FeatureLevels )*/ CONST D3D_FEATURE_LEVEL* pFeatureLevels,
+        UINT FeatureLevels,
+        UINT SDKVersion,
+        ID3D11DeviceN** ppDevice,
+        D3D_FEATURE_LEVEL* pFeatureLevel,
+        ID3D11DeviceContextN** ppImmediateContext );
 #endif
 
     //---------------------------------------------------------------------
     D3D11RenderSystem::D3D11RenderSystem()
         : mDevice(),
-          mUseAdjacency( false ),
           mBoundIndirectBuffer( 0 ),
           mSwIndirectBufferPtr( 0 ),
+          mPso( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
           mBoundDepthStencilState(0),
@@ -948,7 +959,7 @@ bail:
 
             // If we have 16bit depth buffer enable w-buffering.
             assert( autoWindow );
-            if ( autoWindow->getColourDepth() == 16 ) 
+            if ( PixelUtil::getNumElemBits( autoWindow->getFormat() ) == 16 )
             { 
                 mWBuffer = true;
             } 
@@ -2328,6 +2339,171 @@ bail:
         }
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsPipelineStateObjectCreated( HlmsPso *block )
+    {
+        D3D11HlmsPso *pso = new D3D11HlmsPso();
+        memset( pso, 0, sizeof(D3D11HlmsPso) );
+
+        D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+
+        ZeroMemory( &depthStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
+        depthStencilDesc.DepthEnable        = block->macroblock->mDepthCheck;
+        depthStencilDesc.DepthWriteMask     =
+                block->macroblock->mDepthWrite ? D3D11_DEPTH_WRITE_MASK_ALL :
+                                                  D3D11_DEPTH_WRITE_MASK_ZERO;
+        depthStencilDesc.DepthFunc          = D3D11Mappings::get( block->macroblock->mDepthFunc );
+        depthStencilDesc.StencilEnable      = block->pass.enableStencil;
+        depthStencilDesc.StencilReadMask    = block->pass.stencilReadMask;
+        depthStencilDesc.StencilWriteMask   = block->pass.stencilWriteMask;
+        const StencilStateOp &stateFront = block->pass.stencilFront;
+        depthStencilDesc.FrontFace.StencilFunc          = D3D11Mappings::get( stateFront.compareOp );
+        depthStencilDesc.FrontFace.StencilDepthFailOp   = D3D11Mappings::get( stateFront.stencilDepthFailOp );
+        depthStencilDesc.FrontFace.StencilPassOp        = D3D11Mappings::get( stateFront.stencilPassOp );
+        depthStencilDesc.FrontFace.StencilFailOp        = D3D11Mappings::get( stateFront.stencilFailOp );
+        const StencilStateOp &stateBack = block->pass.stencilBack;
+        depthStencilDesc.BackFace.StencilFunc           = D3D11Mappings::get( stateBack.compareOp );
+        depthStencilDesc.BackFace.StencilDepthFailOp    = D3D11Mappings::get( stateBack.stencilDepthFailOp );
+        depthStencilDesc.BackFace.StencilPassOp         = D3D11Mappings::get( stateBack.stencilPassOp );
+        depthStencilDesc.BackFace.StencilFailOp         = D3D11Mappings::get( stateBack.stencilFailOp );
+
+        HRESULT hr = mDevice->CreateDepthStencilState( &depthStencilDesc, &pso->depthStencilState );
+        if( FAILED(hr) )
+        {
+            delete pso;
+            pso = 0;
+
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create depth stencil state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+        }
+
+        const bool useTesselation = !block->tesselationDomainShader.isNull();
+        const bool useAdjacency   = !block->geometryShader.isNull() &&
+                                    block->geometryShader->isAdjacencyInfoRequired();
+
+        switch( block->operationType )
+        {
+        case OT_POINT_LIST:
+            pso->topology = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+            break;
+        case OT_LINE_LIST:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+            break;
+        case OT_LINE_STRIP:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+            break;
+        default:
+        case OT_TRIANGLE_LIST:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+            break;
+        case OT_TRIANGLE_STRIP:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+            break;
+        case OT_TRIANGLE_FAN:
+            pso->topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+
+            delete pso;
+            pso = 0;
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Error - DX11 render - no support for triangle fan (OT_TRIANGLE_FAN)",
+                         "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+            break;
+        }
+
+        //No subroutines for now
+        if( !block->vertexShader.isNull() )
+        {
+            pso->vertexShader = static_cast<D3D11HLSLProgram*>( block->vertexShader->
+                                                                _getBindingDelegate() );
+        }
+        if( !block->geometryShader.isNull() )
+        {
+            pso->geometryShader = static_cast<D3D11HLSLProgram*>( block->geometryShader->
+                                                                  _getBindingDelegate() );
+        }
+        if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
+        {
+            if( !block->tesselationHullShader.isNull() )
+            {
+                pso->hullShader = static_cast<D3D11HLSLProgram*>( block->tesselationHullShader->
+                                                                  _getBindingDelegate() );
+            }
+            if( !block->tesselationDomainShader.isNull() )
+            {
+                pso->domainShader = static_cast<D3D11HLSLProgram*>( block->tesselationDomainShader->
+                                                                    _getBindingDelegate() );
+            }
+
+            // Check consistency of tessellation shaders
+            if( block->tesselationHullShader.isNull() != block->tesselationDomainShader.isNull() )
+            {
+                delete pso;
+                pso = 0;
+                if( block->tesselationHullShader.isNull() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Attempted to use tessellation, but domain shader is missing",
+                                 "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+                }
+                else
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Attempted to use tessellation, but hull shader is missing",
+                                 "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+                }
+            }
+        }
+        if( !block->pixelShader.isNull() )
+        {
+            pso->pixelShader = static_cast<D3D11HLSLProgram*>( block->pixelShader->
+                                                               _getBindingDelegate() );
+        }
+
+        if( pso->vertexShader )
+        {
+            try
+            {
+                pso->inputLayout = pso->vertexShader->getLayoutForPso( block->vertexElements );
+            }
+            catch( Exception &e )
+            {
+                delete pso;
+                pso = 0;
+                throw e;
+            }
+        }
+
+        block->rsData = pso;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsPipelineStateObjectDestroyed( HlmsPso *pso )
+    {
+        D3D11HlmsPso *d3dPso = reinterpret_cast<D3D11HlmsPso*>( pso->rsData );
+        delete d3dPso;
+        pso->rsData = 0;
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::_hlmsMacroblockCreated( HlmsMacroblock *newBlock )
     {
         D3D11_RASTERIZER_DESC rasterDesc;
@@ -2578,140 +2754,71 @@ bail:
         }
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_setProgramsFromHlms( const HlmsCache *hlmsCache )
+    void D3D11RenderSystem::_setPipelineStateObject( const HlmsPso *pso )
     {
-        mVertexProgramBound             = false;
-        mGeometryProgramBound           = false;
-        mFragmentProgramBound           = false;
-        mTessellationHullProgramBound   = false;
-        mTessellationDomainProgramBound = false;
-        mComputeProgramBound            = false;
-        mUseAdjacency                   = false;
-
-        //No subroutines for now
+        RenderSystem::_setPipelineStateObject( pso );
 
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 
-        if( !hlmsCache->vertexShader.isNull() )
-        {
-            mBoundVertexProgram = static_cast<D3D11HLSLProgram*>( hlmsCache->vertexShader->
-                                                                  _getBindingDelegate() );
+        //deviceContext->IASetInputLayout( 0 );
+        deviceContext->VSSetShader( 0, 0, 0 );
+        deviceContext->GSSetShader( 0, 0, 0 );
+        deviceContext->HSSetShader( 0, 0, 0 );
+        deviceContext->DSSetShader( 0, 0, 0 );
+        deviceContext->PSSetShader( 0, 0, 0 );
+        deviceContext->CSSetShader( 0, 0, 0 );
 
-            deviceContext->VSSetShader( mBoundVertexProgram->getVertexShader(), 0, 0 );
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "D3D11 device cannot set vertex shader\nError Description: " +
-                             errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
-            }
+        if( !pso )
+            return;
+
+        _setHlmsMacroblock( pso->macroblock );
+        _setHlmsBlendblock( pso->blendblock );
+
+        D3D11HlmsPso *d3dPso = reinterpret_cast<D3D11HlmsPso*>( pso->rsData );
+
+        deviceContext->OMSetDepthStencilState( d3dPso->depthStencilState, mStencilRef );
+        deviceContext->IASetPrimitiveTopology( d3dPso->topology );
+        deviceContext->IASetInputLayout( d3dPso->inputLayout );
+
+        if( d3dPso->vertexShader )
+        {
+            deviceContext->VSSetShader( d3dPso->vertexShader->getVertexShader(), 0, 0 );
             mVertexProgramBound = true;
         }
-        else
-        {
-            deviceContext->VSSetShader( 0, 0, 0 );
-        }
 
-        if( !hlmsCache->geometryShader.isNull() )
+        if( d3dPso->geometryShader )
         {
-            mBoundGeometryProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->geometryShader->
-                                                                      _getBindingDelegate() );
-            deviceContext->GSSetShader( mBoundGeometryProgram->getGeometryShader(), 0, 0 );
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "D3D11 device cannot set geometry shader\nError Description: " +
-                             errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
-            }
-
+            deviceContext->GSSetShader( d3dPso->geometryShader->getGeometryShader(), 0, 0 );
             mGeometryProgramBound = true;
-
-            mUseAdjacency = mBoundGeometryProgram->isAdjacencyInfoRequired();
-        }
-        else
-        {
-            deviceContext->GSSetShader( 0, 0, 0 );
         }
 
         if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
         {
-            if( !hlmsCache->tesselationHullShader.isNull() )
+            if( d3dPso->hullShader )
             {
-                mBoundTessellationHullProgram   = static_cast<D3D11HLSLProgram*>(
-                            hlmsCache->tesselationHullShader->_getBindingDelegate() );
-
-                deviceContext->HSSetShader( mBoundTessellationHullProgram->getHullShader(), 0, 0 );
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                                 "D3D11 device cannot set hull shader\nError Description: " +
-                                 errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
-                }
+                deviceContext->HSSetShader( d3dPso->hullShader->getHullShader(), 0, 0 );
                 mTessellationHullProgramBound = true;
             }
-            else
-            {
-                deviceContext->HSSetShader( 0, 0, 0 );
-            }
 
-            if( !hlmsCache->tesselationDomainShader.isNull() )
+            if( d3dPso->domainShader )
             {
-                mBoundTessellationDomainProgram = static_cast<D3D11HLSLProgram*>(
-                            hlmsCache->tesselationDomainShader->_getBindingDelegate() );
-
-                deviceContext->DSSetShader( mBoundTessellationDomainProgram->getDomainShader(), 0, 0 );
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                                 "D3D11 device cannot set domain shader\nError Description: " +
-                                 errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
-                }
+                deviceContext->DSSetShader( d3dPso->domainShader->getDomainShader(), 0, 0 );
                 mTessellationDomainProgramBound = true;
             }
-            else
-            {
-                deviceContext->DSSetShader( 0, 0, 0 );
-            }
         }
 
-        if( !hlmsCache->pixelShader.isNull() )
+        if( d3dPso->pixelShader )
         {
-            mBoundFragmentProgram   = static_cast<D3D11HLSLProgram*>( hlmsCache->pixelShader->
-                                                                      _getBindingDelegate() );
-            deviceContext->PSSetShader( mBoundFragmentProgram->getPixelShader(), 0, 0 );
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "D3D11 device cannot set pixel shader\nError Description: " +
-                             errorDescription, "D3D11RenderSystem::_setProgramsFromHlms" );
-            }
+            deviceContext->PSSetShader( d3dPso->pixelShader->getPixelShader(), 0, 0 );
             mFragmentProgramBound = true;
         }
-        else
-        {
-            deviceContext->PSSetShader( 0, 0, 0 );
-        }
 
-        // Check consistency of tessellation shaders
-        if( (mBoundTessellationHullProgram && !mBoundTessellationDomainProgram) ||
-            (!mBoundTessellationHullProgram && mBoundTessellationDomainProgram) )
+        if (mDevice.isError())
         {
-            if( mBoundTessellationHullProgram )
-            {
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "Attempted to use tessellation, but domain shader is missing",
-                             "D3D11RenderSystem::_setProgramsFromHlms" );
-            }
-            else
-            {
-                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                             "Attempted to use tessellation, but hull shader is missing",
-                             "D3D11RenderSystem::_setProgramsFromHlms" );
-            }
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "D3D11 device cannot set shaders\nError Description: " +
+                         errorDescription, "D3D11RenderSystem::_setPipelineStateObject" );
         }
     }
     //---------------------------------------------------------------------
@@ -2741,60 +2848,11 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
     {
+        mHardwareBufferManager->_updateDirtyInputLayouts();
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_endFrame()
     {
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl)
-    {
-            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, 
-                    "Cannot directly call setVertexDeclaration in the d3d11 render system - cast then use 'setVertexDeclaration(VertexDeclaration* decl, VertexBufferBinding* binding)' .", 
-                    "D3D11RenderSystem::setVertexDeclaration" );
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding)
-    {
-        v1::D3D11VertexDeclaration* d3ddecl =
-            static_cast<v1::D3D11VertexDeclaration*>(decl);
-
-        d3ddecl->bindToShader(mBoundVertexProgram, binding);
-    }
-    //---------------------------------------------------------------------
-    void D3D11RenderSystem::setVertexBufferBinding(v1::VertexBufferBinding* binding)
-    {
-        // TODO: attempt to detect duplicates
-        const v1::VertexBufferBinding::VertexBufferBindingMap& binds = binding->getBindings();
-        v1::VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
-        iend = binds.end();
-        for (i = binds.begin(); i != iend; ++i)
-        {
-            const v1::D3D11HardwareVertexBuffer* d3d11buf =
-                static_cast<const v1::D3D11HardwareVertexBuffer*>(i->second.get());
-
-            UINT stride = static_cast<UINT>(d3d11buf->getVertexSize());
-            UINT offset = 0; // no stream offset, this is handled in _render instead
-            UINT slot = static_cast<UINT>(i->first);
-            ID3D11Buffer * pVertexBuffers = d3d11buf->getD3DVertexBuffer();
-            mDevice.GetImmediateContext()->IASetVertexBuffers(
-                slot, // The first input slot for binding.
-                1, // The number of vertex buffers in the array.
-                &pVertexBuffers,
-                &stride,
-                &offset 
-                );
-
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                    "D3D11 device cannot set vertex buffers\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::setVertexBufferBinding");
-            }
-        }
-
-        static_cast<D3D11VaoManager*>(mVaoManager)->bindDrawId();
     }
     //---------------------------------------------------------------------
     // TODO: Move this class to the right place.
@@ -2928,7 +2986,7 @@ bail:
             }
 
             /// Hull Shader binding
-            if (mBoundTessellationHullProgram && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
+            if (mPso->hullShader && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -2944,7 +3002,7 @@ bail:
             }
             
             /// Domain Shader binding
-            if (mBoundTessellationDomainProgram && mBindingType == TextureUnitState::BT_TESSELLATION_DOMAIN)
+            if (mPso->domainShader && mBindingType == TextureUnitState::BT_TESSELLATION_DOMAIN)
             {
                 if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
                 {
@@ -2965,8 +3023,8 @@ bail:
         mDevice.GetImmediateContext()->SOGetTargets(1, &pSOTarget);
 
         //check consistency of vertex-fragment shaders
-        if (!mBoundVertexProgram ||
-             (!mBoundFragmentProgram && op.operationType != v1::RenderOperation::OT_POINT_LIST && pSOTarget==0 )
+        if (!mPso->vertexShader ||
+             (!mPso->pixelShader && op.operationType != OT_POINT_LIST && pSOTarget==0 )
            ) 
         {
             
@@ -2976,10 +3034,10 @@ bail:
         }
 
         // Check consistency of tessellation shaders
-        if( (mBoundTessellationHullProgram && !mBoundTessellationDomainProgram) ||
-            (!mBoundTessellationHullProgram && mBoundTessellationDomainProgram) )
+        if( (mPso->hullShader && !mPso->domainShader) ||
+            (!mPso->hullShader && mPso->domainShader) )
         {
-            if (mBoundTessellationHullProgram && !mBoundTessellationDomainProgram) {
+            if (mPso->hullShader && !mPso->domainShader) {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                 "Attempted to use tessellation, but domain shader is missing",
                 "D3D11RenderSystem::_render");
@@ -2999,9 +3057,6 @@ bail:
                 "D3D11RenderSystem::_render");
         }
 
-        setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
-        setVertexBufferBinding(op.vertexData->vertexBufferBinding);
-
         // Determine rendering operation
         D3D11_PRIMITIVE_TOPOLOGY primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
         DWORD primCount = 0;
@@ -3020,27 +3075,27 @@ bail:
 
             return;
         }
-        else if(mBoundTessellationHullProgram && mBoundTessellationDomainProgram)
+        else if(mPso->hullShader && mPso->domainShader)
         {
             // useful primitives for tessellation
             switch( op.operationType )
             {
-            case v1::RenderOperation::OT_LINE_LIST:
+            case OT_LINE_LIST:
                 primType = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
                 break;
 
-            case v1::RenderOperation::OT_LINE_STRIP:
+            case OT_LINE_STRIP:
                 primType = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
                 break;
 
-            case v1::RenderOperation::OT_TRIANGLE_LIST:
+            case OT_TRIANGLE_LIST:
                 primType = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
                 break;
 
-            case v1::RenderOperation::OT_TRIANGLE_STRIP:
+            case OT_TRIANGLE_STRIP:
                 primType = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
                 break;
@@ -3049,35 +3104,35 @@ bail:
         else
         {
             //rendering without tessellation.
-            bool useAdjacency = (mGeometryProgramBound && mBoundGeometryProgram && mBoundGeometryProgram->isAdjacencyInfoRequired());
+            bool useAdjacency = (mGeometryProgramBound && mPso->geometryShader && mPso->geometryShader->isAdjacencyInfoRequired());
             switch( op.operationType )
             {
-            case v1::RenderOperation::OT_POINT_LIST:
+            case OT_POINT_LIST:
                 primType = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount);
                 break;
 
-            case v1::RenderOperation::OT_LINE_LIST:
+            case OT_LINE_LIST:
                 primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 2;
                 break;
 
-            case v1::RenderOperation::OT_LINE_STRIP:
+            case OT_LINE_STRIP:
                 primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 1;
                 break;
 
-            case v1::RenderOperation::OT_TRIANGLE_LIST:
+            case OT_TRIANGLE_LIST:
                 primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) / 3;
                 break;
 
-            case v1::RenderOperation::OT_TRIANGLE_STRIP:
+            case OT_TRIANGLE_STRIP:
                 primType = useAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
                 break;
 
-            case v1::RenderOperation::OT_TRIANGLE_FAN:
+            case OT_TRIANGLE_FAN:
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error - DX11 render - no support for triangle fan (OT_TRIANGLE_FAN)", "D3D11RenderSystem::_render");
                 primType = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED; // todo - no TRIANGLE_FAN in DX 11
                 primCount = (DWORD)(op.useIndexes ? op.indexData->indexCount : op.vertexData->vertexCount) - 2;
@@ -3143,8 +3198,8 @@ bail:
                             String errorDescription = mDevice.getErrorDescription();
                             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                                 "D3D11 device cannot draw indexed\nError Description:" + errorDescription +
-                                "Active OGRE vertex shader name: " + mBoundVertexProgram->getName() +
-                                "\nActive OGRE fragment shader name: " + mBoundFragmentProgram->getName(),
+                                "Active OGRE vertex shader name: " + mPso->vertexShader->getName() +
+                                "\nActive OGRE fragment shader name: " + mPso->pixelShader->getName(),
                                 "D3D11RenderSystem::_render");
                         }
                     }
@@ -3222,21 +3277,13 @@ bail:
         const D3D11VertexArrayObject *vao = static_cast<const D3D11VertexArrayObject*>( _vao );
         D3D11VertexArrayObjectShared *sharedData = vao->mSharedData;
 
-        ID3D11InputLayout *inputLayout = mBoundVertexProgram->getLayoutForVao( vao );
-
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
-        deviceContext->IASetInputLayout( inputLayout );
 
         deviceContext->IASetVertexBuffers( 0, vao->mVertexBuffers.size() + 1, //+1 due to DrawId
                                            sharedData->mVertexBuffers,
                                            sharedData->mStrides,
                                            sharedData->mOffsets );
         deviceContext->IASetIndexBuffer( sharedData->mIndexBuffer, sharedData->mIndexFormat, 0 );
-
-        D3D11_PRIMITIVE_TOPOLOGY topology = mBoundTessellationDomainProgram ?
-                                                        sharedData->mPrimType[2] :
-                                                        sharedData->mPrimType[mUseAdjacency];
-        deviceContext->IASetPrimitiveTopology( topology );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_render( const CbDrawCallIndexed *cmd )
@@ -3305,9 +3352,6 @@ bail:
         mCurrentVertexBuffer    = cmd->vertexData;
         mCurrentIndexBuffer     = cmd->indexData;
 
-        setVertexDeclaration(cmd->vertexData->vertexDeclaration, cmd->vertexData->vertexBufferBinding);
-        setVertexBufferBinding(cmd->vertexData->vertexBufferBinding);
-
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 
         if( cmd->indexData )
@@ -3323,62 +3367,37 @@ bail:
             deviceContext->IASetIndexBuffer( 0, DXGI_FORMAT_UNKNOWN, 0 );
         }
 
-        D3D11_PRIMITIVE_TOPOLOGY primType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-        if( mBoundTessellationHullProgram && mBoundTessellationDomainProgram )
+        const v1::VertexBufferBinding::VertexBufferBindingMap& binds =
+                cmd->vertexData->vertexBufferBinding->getBindings();
+        v1::VertexBufferBinding::VertexBufferBindingMap::const_iterator i, iend;
+        iend = binds.end();
+        for (i = binds.begin(); i != iend; ++i)
         {
-            // useful primitives for tessellation
-            switch( cmd->operationType )
+            const v1::D3D11HardwareVertexBuffer* d3d11buf =
+                static_cast<const v1::D3D11HardwareVertexBuffer*>(i->second.get());
+
+            UINT stride = static_cast<UINT>(d3d11buf->getVertexSize());
+            UINT offset = 0; // no stream offset, this is handled in _render instead
+            UINT slot = static_cast<UINT>(i->first);
+            ID3D11Buffer * pVertexBuffers = d3d11buf->getD3DVertexBuffer();
+            mDevice.GetImmediateContext()->IASetVertexBuffers(
+                slot, // The first input slot for binding.
+                1, // The number of vertex buffers in the array.
+                &pVertexBuffers,
+                &stride,
+                &offset
+                );
+
+            if (mDevice.isError())
             {
-            case v1::RenderOperation::OT_LINE_LIST:
-                primType = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
-                break;
-
-            case v1::RenderOperation::OT_LINE_STRIP:
-                primType = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
-                break;
-
-            case v1::RenderOperation::OT_TRIANGLE_LIST:
-                primType = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
-                break;
-
-            case v1::RenderOperation::OT_TRIANGLE_STRIP:
-                primType = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
-                break;
+                String errorDescription = mDevice.getErrorDescription();
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                    "D3D11 device cannot set vertex buffers\nError Description:" + errorDescription,
+                    "D3D11RenderSystem::setVertexBufferBinding");
             }
         }
-        else
-        {
-            //rendering without tessellation.
-            switch( cmd->operationType )
-            {
-            case v1::RenderOperation::OT_POINT_LIST:
-                primType = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
-                break;
 
-            case v1::RenderOperation::OT_LINE_LIST:
-                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-                break;
-
-            case v1::RenderOperation::OT_LINE_STRIP:
-                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-                break;
-
-            case v1::RenderOperation::OT_TRIANGLE_LIST:
-                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-                break;
-
-            case v1::RenderOperation::OT_TRIANGLE_STRIP:
-                primType = mUseAdjacency ? D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ : D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-                break;
-
-            case v1::RenderOperation::OT_TRIANGLE_FAN:
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Error - DX11 render - no support for triangle fan (OT_TRIANGLE_FAN)",
-                            "D3D11RenderSystem::_setRenderOperation");
-                primType = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED; // no TRIANGLE_FAN in DX 11
-                break;
-            }
-        }
-        deviceContext->IASetPrimitiveTopology( primType );
+        static_cast<D3D11VaoManager*>(mVaoManager)->bindDrawId();
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
@@ -3513,62 +3532,6 @@ bail:
     {
     }
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::unbindGpuProgram(GpuProgramType gptype)
-    {
-
-        switch(gptype)
-        {
-        case GPT_VERTEX_PROGRAM:
-            {
-                mActiveVertexGpuProgramParameters.setNull();
-                mBoundVertexProgram = NULL;
-                //mDevice->VSSetShader(NULL);
-                mDevice.GetImmediateContext()->VSSetShader(NULL, NULL, 0);
-            }
-            break;
-        case GPT_FRAGMENT_PROGRAM:
-            {
-                mActiveFragmentGpuProgramParameters.setNull();
-                mBoundFragmentProgram = NULL;
-                //mDevice->PSSetShader(NULL);
-                mDevice.GetImmediateContext()->PSSetShader(NULL, NULL, 0);
-            }
-
-            break;
-        case GPT_GEOMETRY_PROGRAM:
-            {
-                mActiveGeometryGpuProgramParameters.setNull();
-                mBoundGeometryProgram = NULL;
-                mDevice.GetImmediateContext()->GSSetShader( NULL, NULL, 0 );
-            }
-            break;
-        case GPT_HULL_PROGRAM:
-            {
-                mActiveTessellationHullGpuProgramParameters.setNull();
-                mBoundTessellationHullProgram = NULL;
-                mDevice.GetImmediateContext()->HSSetShader( NULL, NULL, 0 );
-            }
-            break;
-        case GPT_DOMAIN_PROGRAM:
-            {
-                mActiveTessellationDomainGpuProgramParameters.setNull();
-                mBoundTessellationDomainProgram = NULL;
-                mDevice.GetImmediateContext()->DSSetShader( NULL, NULL, 0 );
-            }
-            break;
-        case GPT_COMPUTE_PROGRAM:
-            {
-                mActiveComputeGpuProgramParameters.setNull();
-                mBoundComputeProgram = NULL;
-                mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
-            }
-            break;
-        default:
-            assert(false && "Undefined Program Type!");
-        };
-        RenderSystem::unbindGpuProgram(gptype);
-    }
-    //---------------------------------------------------------------------
     void D3D11RenderSystem::bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask)
     {
         if (mask & (uint16)GPV_GLOBAL)
@@ -3588,9 +3551,9 @@ bail:
             {
                 //  if (params->getAutoConstantCount() > 0)
                 //{
-                if (mBoundVertexProgram)
+                if (mPso->vertexShader)
                 {
-                    pBuffers[0] = mBoundVertexProgram->getConstantBuffer(params, mask);
+                    pBuffers[0] = mPso->vertexShader->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->VSSetConstantBuffers( 0, 1, pBuffers );
                     if (mDevice.isError())
                     {
@@ -3607,9 +3570,9 @@ bail:
             {
                 //if (params->getAutoConstantCount() > 0)
                 //{
-                if (mBoundFragmentProgram)
+                if (mPso->pixelShader)
                 {
-                    pBuffers[0] = mBoundFragmentProgram->getConstantBuffer(params, mask);
+                    pBuffers[0] = mPso->pixelShader->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->PSSetConstantBuffers( 0, 1, pBuffers );
                     if (mDevice.isError())
                     {
@@ -3624,9 +3587,9 @@ bail:
             break;
         case GPT_GEOMETRY_PROGRAM:
             {
-                if (mBoundGeometryProgram)
+                if (mPso->geometryShader)
                 {
-                    pBuffers[0] = mBoundGeometryProgram->getConstantBuffer(params, mask);
+                    pBuffers[0] = mPso->geometryShader->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->GSSetConstantBuffers( 0, 1, pBuffers );
                     if (mDevice.isError())
                     {
@@ -3641,9 +3604,9 @@ bail:
             break;
         case GPT_HULL_PROGRAM:
             {
-                if (mBoundTessellationHullProgram)
+                if (mPso->hullShader)
                 {
-                    pBuffers[0] = mBoundTessellationHullProgram->getConstantBuffer(params, mask);
+                    pBuffers[0] = mPso->hullShader->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->HSSetConstantBuffers( 0, 1, pBuffers );
                     if (mDevice.isError())
                     {
@@ -3658,9 +3621,9 @@ bail:
             break;
         case GPT_DOMAIN_PROGRAM:
             {
-                if (mBoundTessellationDomainProgram)
+                if (mPso->domainShader)
                 {
-                    pBuffers[0] = mBoundTessellationDomainProgram->getConstantBuffer(params, mask);
+                    pBuffers[0] = mPso->domainShader->getConstantBuffer(params, mask);
                     mDevice.GetImmediateContext()->DSSetConstantBuffers( 0, 1, pBuffers );
                     if (mDevice.isError())
                     {
@@ -3773,41 +3736,41 @@ bail:
         {
         case GPT_VERTEX_PROGRAM:
             {
-                if (mBoundVertexProgram)
+                if (mPso->vertexShader)
                 {
-                    slotIdx = mBoundVertexProgram->getSubroutineSlot(slotName);
+                    slotIdx = mPso->vertexShader->getSubroutineSlot(slotName);
                 }
             }
             break;
         case GPT_FRAGMENT_PROGRAM:
             {
-                if (mBoundFragmentProgram)
+                if (mPso->pixelShader)
                 {
-                    slotIdx = mBoundFragmentProgram->getSubroutineSlot(slotName);
+                    slotIdx = mPso->pixelShader->getSubroutineSlot(slotName);
                 }
             }
             break;
         case GPT_GEOMETRY_PROGRAM:
             {
-                if (mBoundGeometryProgram)
+                if (mPso->geometryShader)
                 {
-                    slotIdx = mBoundGeometryProgram->getSubroutineSlot(slotName);
+                    slotIdx = mPso->geometryShader->getSubroutineSlot(slotName);
                 }
             }
             break;
         case GPT_HULL_PROGRAM:
             {
-                if (mBoundTessellationHullProgram)
+                if (mPso->hullShader)
                 {
-                    slotIdx = mBoundTessellationHullProgram->getSubroutineSlot(slotName);
+                    slotIdx = mPso->hullShader->getSubroutineSlot(slotName);
                 }
             }
             break;
         case GPT_DOMAIN_PROGRAM:
             {
-                if (mBoundTessellationDomainProgram)
+                if (mPso->domainShader)
                 {
-                    slotIdx = mBoundTessellationDomainProgram->getSubroutineSlot(slotName);
+                    slotIdx = mPso->domainShader->getSubroutineSlot(slotName);
                 }
             }
             break;
@@ -4193,11 +4156,7 @@ bail:
 		mStereoDriver = NULL;
 #endif
 
-        mBoundVertexProgram = NULL;
-        mBoundFragmentProgram = NULL;
-        mBoundGeometryProgram = NULL;
-        mBoundTessellationHullProgram = NULL;
-        mBoundTessellationDomainProgram = NULL;
+        mPso = NULL;
         mBoundComputeProgram = NULL;
 
         mBindingType = TextureUnitState::BT_FRAGMENT;
@@ -4235,31 +4194,6 @@ bail:
         }
 
         OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Attribute not found: " + name, "RenderSystem::getCustomAttribute");
-    }
-    //---------------------------------------------------------------------
-    D3D11HLSLProgram* D3D11RenderSystem::_getBoundVertexProgram() const
-    {
-        return mBoundVertexProgram;
-    }
-    //---------------------------------------------------------------------
-    D3D11HLSLProgram* D3D11RenderSystem::_getBoundFragmentProgram() const
-    {
-        return mBoundFragmentProgram;
-    }
-    //---------------------------------------------------------------------
-    D3D11HLSLProgram* D3D11RenderSystem::_getBoundGeometryProgram() const
-    {
-        return mBoundGeometryProgram;
-    }
-    //---------------------------------------------------------------------
-    D3D11HLSLProgram* D3D11RenderSystem::_getBoundTessellationHullProgram() const
-    {
-        return mBoundTessellationHullProgram;
-    }
-    //---------------------------------------------------------------------
-    D3D11HLSLProgram* D3D11RenderSystem::_getBoundTessellationDomainProgram() const
-    {
-        return mBoundTessellationDomainProgram;
     }
     //---------------------------------------------------------------------
     D3D11HLSLProgram* D3D11RenderSystem::_getBoundComputeProgram() const

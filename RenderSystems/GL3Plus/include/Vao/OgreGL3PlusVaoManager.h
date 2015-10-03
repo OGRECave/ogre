@@ -121,7 +121,7 @@ namespace Ogre
             /// Strictly speaking the opType is not part of a GL's "VAO", however
             /// we need to generate a different VAO to perform correct rendering
             /// by the RenderQueue (and also satisfy Direct3D 11)
-            v1::RenderOperation::OperationType operationType;
+            OperationType operationType;
             VertexBindingVec    vertexBuffers;
             GLuint              indexBufferVbo;
             IndexBufferPacked::IndexType indexType;
@@ -230,7 +230,7 @@ namespace Ogre
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        v1::RenderOperation::OperationType opType );
+                                                        OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 

@@ -1935,9 +1935,9 @@ namespace v1 {
                 for (i = mSubMeshList.begin(); i != iend; ++i)
                 {
                     SubMesh* s = *i;
-                    if (s->operationType != RenderOperation::OT_TRIANGLE_FAN && 
-                        s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
-                        s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
+                    if (s->operationType != OT_TRIANGLE_FAN &&
+                        s->operationType != OT_TRIANGLE_LIST &&
+                        s->operationType != OT_TRIANGLE_STRIP)
                     {
                         continue;
                     }
@@ -2012,9 +2012,9 @@ namespace v1 {
         for (i = mSubMeshList.begin(); i != iend; ++i)
         {
             SubMesh* s = *i;
-            if (s->operationType != RenderOperation::OT_TRIANGLE_FAN && 
-                s->operationType != RenderOperation::OT_TRIANGLE_LIST && 
-                s->operationType != RenderOperation::OT_TRIANGLE_STRIP)
+            if (s->operationType != OT_TRIANGLE_FAN &&
+                s->operationType != OT_TRIANGLE_LIST &&
+                s->operationType != OT_TRIANGLE_STRIP)
             {
                 continue;
             }
@@ -2090,9 +2090,9 @@ namespace v1 {
         {
             SubMesh* s = *i;
             if (!s->useSharedVertices && 
-                (s->operationType == RenderOperation::OT_TRIANGLE_FAN || 
-                s->operationType == RenderOperation::OT_TRIANGLE_LIST ||
-                s->operationType == RenderOperation::OT_TRIANGLE_STRIP))
+                (s->operationType == OT_TRIANGLE_FAN ||
+                s->operationType == OT_TRIANGLE_LIST ||
+                s->operationType == OT_TRIANGLE_STRIP))
             {
                 s->vertexData[0]->prepareForShadowVolume();
             }

@@ -43,6 +43,7 @@ namespace Ogre {
 
     RenderTarget::RenderTarget()
         : mPriority(OGRE_DEFAULT_RT_GROUP)
+        , mFormat( PF_UNKNOWN )
         , mDepthBufferPoolId( DepthBuffer::POOL_DEFAULT )
         , mPreferDepthTexture( false )
         , mDesiredDepthBufferFormat( DepthBuffer::DefaultDepthBufferFormat )

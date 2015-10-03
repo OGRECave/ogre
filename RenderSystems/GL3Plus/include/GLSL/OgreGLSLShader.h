@@ -107,11 +107,11 @@ namespace Ogre {
         /** Returns the operation type that this geometry program expects to
             receive as input
         */
-        virtual v1::RenderOperation::OperationType getInputOperationType(void) const
+        virtual OperationType getInputOperationType(void) const
         { return mInputOperationType; }
         /** Returns the operation type that this geometry program will emit
          */
-        virtual v1::RenderOperation::OperationType getOutputOperationType(void) const
+        virtual OperationType getOutputOperationType(void) const
         { return mOutputOperationType; }
         /** Returns the maximum number of vertices that this geometry program can
             output in a single run
@@ -120,11 +120,11 @@ namespace Ogre {
 
         /** Sets the operation type that this geometry program expects to receive
          */
-        virtual void setInputOperationType(v1::RenderOperation::OperationType operationType)
+        virtual void setInputOperationType(OperationType operationType)
         { mInputOperationType = operationType; }
         /** Set the operation type that this geometry program will emit
          */
-        virtual void setOutputOperationType(v1::RenderOperation::OperationType operationType)
+        virtual void setOutputOperationType(OperationType operationType)
         { mOutputOperationType = operationType; }
         /** Set the maximum number of vertices that a single run of this geometry program
             can emit.
@@ -266,9 +266,9 @@ namespace Ogre {
         /// Flag indicating if shader object successfully compiled.
         GLint mCompiled;
         /// The input operation type for this (geometry) program.
-        v1::RenderOperation::OperationType mInputOperationType;
+        OperationType mInputOperationType;
         /// The output operation type for this (geometry) program.
-        v1::RenderOperation::OperationType mOutputOperationType;
+        OperationType mOutputOperationType;
         /// The maximum amount of vertices that this (geometry) program can output.
         int mMaxOutputVertices;
         /// Attached shader names.

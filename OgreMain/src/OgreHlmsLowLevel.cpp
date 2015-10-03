@@ -102,10 +102,23 @@ namespace Ogre
 
         if( queuedRenderable.renderable )
         {
-            //TODO
-            //mRenderSystem->getVaoManager();
-            //pso.vertexElements =
-            pso.operationType = OT_TRIANGLE_STRIP;
+            const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos( casterPass );
+            if( !vaos.empty() )
+            {
+                //v2 object. TODO: LOD? Should we allow Vaos with different vertex formats on LODs?
+                //(also the datablock hash in the renderable would have to account for that)
+                pso.operationType = vaos.front()->getOperationType();
+                pso.vertexElements = vaos.front()->getVertexDeclaration();
+            }
+            else
+            {
+                //v1 object.
+                v1::RenderOperation renderOp;
+                queuedRenderable.renderable->getRenderOperation( renderOp, casterPass );
+                pso.operationType = renderOp.operationType;
+                pso.vertexElements = renderOp.vertexData->vertexDeclaration->convertToV2();
+            }
+
             pso.enablePrimitiveRestart = true;
         }
 
@@ -198,6 +211,8 @@ namespace Ogre
         *commandBuffer->addCommand<CbLowLevelMaterial>() =
                 CbLowLevelMaterial( casterPass, this, queuedRenderable.movableObject,
                                     queuedRenderable.renderable );
+
+        return 0;
     }
     //-----------------------------------------------------------------------------------
     void HlmsLowLevel::executeCommand( const MovableObject *movableObject, Renderable *renderable,
