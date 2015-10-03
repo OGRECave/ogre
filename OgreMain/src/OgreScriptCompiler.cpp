@@ -1276,6 +1276,9 @@ namespace Ogre
         mIds["ref_value"]       = ID_REF_VALUE;
         mIds["mask"]            = ID_MASK;
         mIds["read_mask"]       = ID_READ_MASK;
+        mIds["both"]            = ID_BOTH;
+        mIds["front"]           = ID_FRONT;
+        mIds["back"]            = ID_BACK;
         mIds["fail_op"]         = ID_FAIL_OP;
         mIds["keep"]            = ID_KEEP;
         mIds["increment"]       = ID_INCREMENT;

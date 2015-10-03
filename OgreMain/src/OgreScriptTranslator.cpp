@@ -8055,13 +8055,37 @@ namespace Ogre{
         ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
         obj->context = Any(mPassDef);
 
-        StencilStateOp *stencilStateOp = &passStencil->mStencilParams.stencilFront;
-
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
         {
             if((*i)->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+                if( !nodeObj->abstract && (nodeObj->id == ID_BOTH ||
+                     nodeObj->id == ID_FRONT || nodeObj->id == ID_BACK) )
+                {
+                    StencilStateOp *stencilStateOp = 0;
+                    switch ( nodeObj->id )
+                    {
+                    case ID_BOTH:
+                        stencilStateOp = &passStencil->mStencilParams.stencilFront;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        stencilStateOp = &passStencil->mStencilParams.stencilBack;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        break;
+                    case ID_FRONT:
+                        stencilStateOp = &passStencil->mStencilParams.stencilFront;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        break;
+                    case ID_BACK:
+                        stencilStateOp = &passStencil->mStencilParams.stencilBack;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        break;
+                    }
+                }
+                else
+                {
+                    processNode(compiler, *i);
+                }
             }
             else if((*i)->type == ANT_PROPERTY)
             {
@@ -8113,6 +8137,37 @@ namespace Ogre{
                     passStencil->mStencilParams.readMask = static_cast<uint8>( mask );
                 }
                     break;
+                case ID_VIEWPORT:
+                case ID_IDENTIFIER:
+                case ID_NUM_INITIAL:
+                case ID_OVERLAYS:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
+                    break;
+                default:
+                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+                        "token \"" + prop->name + "\" is not recognized");
+                }
+            }
+        }
+    }
+
+    void CompositorPassTranslator::translateStencilFace( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                                         StencilStateOp *stencilStateOp )
+    {
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_OBJECT)
+            {
+                processNode(compiler, *i);
+            }
+            else if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                switch(prop->id)
+                {
                 case ID_COMP_FUNC:
                     if(prop->values.empty())
                     {
@@ -8149,15 +8204,8 @@ namespace Ogre{
                     if(!getStencilOp(prop->values.front(), &stencilStateOp->stencilDepthFailOp))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
-                case ID_VIEWPORT:
-                case ID_IDENTIFIER:
-                case ID_NUM_INITIAL:
-                case ID_OVERLAYS:
-                case ID_EXECUTION_MASK:
-                case ID_VIEWPORT_MODIFIER_MASK:
-                    break;
                 default:
-                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
                         "token \"" + prop->name + "\" is not recognized");
                 }
             }

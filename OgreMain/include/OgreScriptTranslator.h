@@ -311,7 +311,10 @@ namespace Ogre{
         void translateScene( ScriptCompiler *compiler, const AbstractNodePtr &node,
                              CompositorTargetDef *targetDef );
         void translateStencil( ScriptCompiler *compiler, const AbstractNodePtr &node,
-                                CompositorTargetDef *targetDef );
+                               CompositorTargetDef *targetDef );
+
+        void translateStencilFace( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                   StencilStateOp *stencilStateOp );
 
     public:
         CompositorPassTranslator();
