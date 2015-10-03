@@ -374,8 +374,8 @@ namespace Ogre
         InputLayoutsIdVec::const_iterator end  = mActiveInputLayouts.end();
 
         while( itor != end &&
-               mInputLayouts[*itor].vertexElements == vertexElements &&
-               mInputLayouts[*itor].opType == opType )
+               (mInputLayouts[*itor].vertexElements != vertexElements ||
+                mInputLayouts[*itor].opType != opType) )
         {
             ++itor;
         }

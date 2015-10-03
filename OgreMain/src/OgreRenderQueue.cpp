@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreMovableObject.h"
 #include "OgreSceneManagerEnumerator.h"
+#include "OgreHardwareBufferManager.h"
 #include "OgreTechnique.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsManager.h"
@@ -354,6 +355,8 @@ namespace Ogre
 
             startIndirectDraw = indirectDraw;
         }
+
+        v1::HardwareBufferManager::getSingleton()._updateDirtyInputLayouts();
 
         for( size_t i=firstRq; i<lastRq; ++i )
         {
