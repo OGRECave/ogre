@@ -141,6 +141,8 @@ namespace Ogre {
         OGRE_DELETE mShadowCasterVertexProgramUsage;
         OGRE_DELETE mShadowCasterFragmentProgramUsage;
 
+        removeAllTextureUnitStates();
+
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         Hlms *hlms = hlmsManager->getHlms( HLMS_LOW_LEVEL );
         hlms->destroyDatablock( mDatablock->getName() );
