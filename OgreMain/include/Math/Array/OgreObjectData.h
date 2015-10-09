@@ -210,6 +210,7 @@ namespace Ogre
             mOwner              += ARRAY_PACKED_REALS;
             ++mWorldAabb;
             mWorldRadius        += ARRAY_PACKED_REALS;
+            mVisibilityFlags    += ARRAY_PACKED_REALS;
             mLightMask          += ARRAY_PACKED_REALS;
         }
 
