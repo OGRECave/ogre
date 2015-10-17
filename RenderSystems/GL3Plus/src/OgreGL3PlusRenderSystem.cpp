@@ -2789,17 +2789,20 @@ namespace Ogre {
     {
         // Unbind GPU programs and rebind to new context later, because
         // scene manager treat render system as ONE 'context' ONLY, and it
-        // cached the GPU programs using state.
-        if (mPso->vertexShader)
-            mPso->vertexShader->unbind();
-        if (mPso->geometryShader)
-            mPso->geometryShader->unbind();
-        if (mPso->pixelShader)
-            mPso->pixelShader->unbind();
-        if (mPso->hullShader)
-            mPso->hullShader->unbind();
-        if (mPso->domainShader)
-            mPso->domainShader->unbind();
+		// cached the GPU programs using state.
+        if( mPso )
+        {
+            if (mPso->vertexShader)
+                mPso->vertexShader->unbind();
+            if (mPso->geometryShader)
+                mPso->geometryShader->unbind();
+            if (mPso->pixelShader)
+                mPso->pixelShader->unbind();
+            if (mPso->hullShader)
+                mPso->hullShader->unbind();
+            if (mPso->domainShader)
+                mPso->domainShader->unbind();
+        }
         if (mCurrentComputeShader)
             mCurrentComputeShader->unbind();
 
@@ -2820,18 +2823,21 @@ namespace Ogre {
         }
 
         // Rebind GPU programs to new context
-        if (mPso->vertexShader)
-            mPso->vertexShader->bind();
-        if (mPso->geometryShader)
-            mPso->geometryShader->bind();
-        if (mPso->pixelShader)
-            mPso->pixelShader->bind();
-        if (mPso->hullShader)
-            mPso->hullShader->bind();
-        if (mPso->domainShader)
-            mPso->domainShader->bind();
-        if (mCurrentComputeShader)
-            mCurrentComputeShader->bind();
+        if( mPso )
+        {
+            if (mPso->vertexShader)
+                mPso->vertexShader->bind();
+            if (mPso->geometryShader)
+                mPso->geometryShader->bind();
+            if (mPso->pixelShader)
+                mPso->pixelShader->bind();
+            if (mPso->hullShader)
+                mPso->hullShader->bind();
+            if (mPso->domainShader)
+                mPso->domainShader->bind();
+            if (mCurrentComputeShader)
+                mCurrentComputeShader->bind();
+        }
 
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be
