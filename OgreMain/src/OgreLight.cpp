@@ -103,12 +103,13 @@ namespace Ogre {
         assert( dynamic_cast<SceneNode*>( mParentNode ) );
         assert( !static_cast<SceneNode*>( mParentNode )->isYawFixed() && "Attach Lights to a "
                 "SceneNode without a fixed yaw! (SceneNode::setFixedYawAxis(false))" );
-        static_cast<SceneNode*>( mParentNode )->setDirection( vec, Node::TS_PARENT, Vector3::UNIT_Z );
+        static_cast<SceneNode*>( mParentNode )->setDirection( vec, Node::TS_PARENT,
+                                                              Vector3::NEGATIVE_UNIT_Z );
     }
     //-----------------------------------------------------------------------
     Vector3 Light::getDirection(void) const
     {
-        return mParentNode->getOrientation().zAxis();
+        return -mParentNode->getOrientation().zAxis();
     }
     //-----------------------------------------------------------------------
     void Light::setAffectParentNode( bool bAffect )
@@ -244,12 +245,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Vector3 Light::getDerivedDirection(void) const
     {
-        return mParentNode->_getDerivedOrientation().zAxis();
+        return -mParentNode->_getDerivedOrientation().zAxis();
     }
     //-----------------------------------------------------------------------
     Vector3 Light::getDerivedDirectionUpdated(void) const
     {
-        return mParentNode->_getDerivedOrientationUpdated().zAxis();
+        return -mParentNode->_getDerivedOrientationUpdated().zAxis();
     }
     //-----------------------------------------------------------------------
     Vector4 Light::getAs4DVector(void) const
