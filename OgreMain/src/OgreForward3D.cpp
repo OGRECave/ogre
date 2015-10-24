@@ -471,8 +471,10 @@ namespace Ogre
                     itor = efficientVectorRemove( mCachedGrid, itor );
                     end  = mCachedGrid.end();
                 }
-
-                ++itor;
+                else
+                {
+                    ++itor;
+                }
             }
         }
     }
