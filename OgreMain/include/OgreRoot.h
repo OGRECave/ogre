@@ -143,6 +143,7 @@ namespace Ogre
         MovableObjectFactory* mManualObjectFactory;
         MovableObjectFactory* mBillboardChainFactory;
         MovableObjectFactory* mRibbonTrailFactory;
+        MovableObjectFactory* mWireAabbFactory;
 
         /// Are we initialised yet?
         bool mIsInitialised;

@@ -496,6 +496,9 @@ namespace Ogre {
         FrustumVec  mVisibleCameras;
         FrustumVec  mCubeMapCameras;
 
+        typedef vector<WireAabb*>::type WireAabbVec;
+        WireAabbVec mTrackingWireAabbs;
+
         typedef map<String, v1::StaticGeometry* >::type StaticGeometryList;
         StaticGeometryList mStaticGeometryList;
 
@@ -1328,6 +1331,18 @@ namespace Ogre {
 
         /// Removes & destroys all Items.
         virtual void destroyAllItems(void);
+
+        /// Create an WireAabb
+        virtual WireAabb* createWireAabb(void);
+
+        /// Removes & destroys an WireAabb from the SceneManager.
+        virtual void destroyWireAabb( WireAabb *wireAabb );
+
+        /// Removes & destroys all WireAabbs.
+        virtual void destroyAllWireAabbs(void);
+
+        void _addWireAabb( WireAabb *wireAabb );
+        void _removeWireAabb( WireAabb *wireAabb );
 
         /** Create an Entity (instance of a discrete mesh).
             @param

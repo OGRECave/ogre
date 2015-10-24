@@ -65,6 +65,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreFrameListener.h"
+#include "OgreWireAabb.h"
 #include "OgreNameGenerator.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsLowLevel.h"
@@ -279,6 +280,8 @@ namespace Ogre {
         addMovableObjectFactory(mBillboardChainFactory);
         mRibbonTrailFactory = OGRE_NEW v1::RibbonTrailFactory();
         addMovableObjectFactory(mRibbonTrailFactory);
+        mWireAabbFactory = OGRE_NEW WireAabbFactory();
+        addMovableObjectFactory(mWireAabbFactory);
 
         // Load plugins
         if (!pluginFileName.empty())
@@ -369,6 +372,7 @@ namespace Ogre {
         OGRE_DELETE mManualObjectFactory;
         OGRE_DELETE mBillboardChainFactory;
         OGRE_DELETE mRibbonTrailFactory;
+        OGRE_DELETE mWireAabbFactory;
 
         OGRE_DELETE mWorkQueue;
 

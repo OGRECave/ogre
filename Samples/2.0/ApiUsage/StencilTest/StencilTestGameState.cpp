@@ -8,6 +8,7 @@
 
 #include "OgreCamera.h"
 #include "OgreRenderWindow.h"
+#include "OgreRoot.h"
 
 #include "OgreHlmsUnlit.h"
 #include "OgreHlmsUnlitDatablock.h"

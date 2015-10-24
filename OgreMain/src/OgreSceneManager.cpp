@@ -67,6 +67,7 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreViewport.h"
+#include "OgreWireAabb.h"
 #include "OgreHlmsManager.h"
 #include "OgreForward3D.h"
 #include "Animation/OgreSkeletonDef.h"
@@ -432,6 +433,36 @@ void SceneManager::destroyItem( Item *i )
 void SceneManager::destroyAllItems(void)
 {
     destroyAllMovableObjectsByType(ItemFactory::FACTORY_TYPE_NAME);
+}
+//-----------------------------------------------------------------------
+WireAabb* SceneManager::createWireAabb(void)
+{
+    return static_cast<WireAabb*>( createMovableObject( WireAabbFactory::FACTORY_TYPE_NAME,
+                                                        &mEntityMemoryManager[SCENE_DYNAMIC], 0 ) );
+
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyWireAabb( WireAabb *i )
+{
+    destroyMovableObject( i );
+}
+//-----------------------------------------------------------------------
+void SceneManager::destroyAllWireAabbs(void)
+{
+    destroyAllMovableObjectsByType(WireAabbFactory::FACTORY_TYPE_NAME);
+}
+//-----------------------------------------------------------------------
+void SceneManager::_addWireAabb( WireAabb *wireAabb )
+{
+    mTrackingWireAabbs.push_back( wireAabb );
+}
+//-----------------------------------------------------------------------
+void SceneManager::_removeWireAabb( WireAabb *wireAabb )
+{
+    WireAabbVec::iterator itor = std::find( mTrackingWireAabbs.begin(),
+                                            mTrackingWireAabbs.end(), wireAabb );
+    assert( itor != mTrackingWireAabbs.end() );
+    efficientVectorRemove( mTrackingWireAabbs, itor );
 }
 //-----------------------------------------------------------------------
 v1::Entity* SceneManager::createEntity( PrefabType ptype, SceneMemoryMgrTypes sceneType )
@@ -2478,6 +2509,19 @@ void SceneManager::updateSceneGraph()
         }
     }
 
+    {
+        WireAabbVec::const_iterator itor = mTrackingWireAabbs.begin();
+        WireAabbVec::const_iterator end  = mTrackingWireAabbs.end();
+
+        while( itor != end )
+        {
+            (*itor)->_updateTracking();
+            (*itor)->getParentNode()->_getFullTransformUpdated();
+            (*itor)->getWorldAabbUpdated();
+            ++itor;
+        }
+    }
+
     buildLightList();
 
     //Reset the list of render RQs for all cameras that are in a PASS_SCENE (except shadow passes)
@@ -4459,6 +4503,25 @@ bool SceneManager::hasMovableObject( MovableObject *m )
 //---------------------------------------------------------------------
 void SceneManager::destroyMovableObject( MovableObject *m, const String& typeName )
 {
+    {
+        WireAabbVec::const_iterator itor = mTrackingWireAabbs.begin();
+        WireAabbVec::const_iterator end  = mTrackingWireAabbs.end();
+
+        while( itor != end )
+        {
+            if( (*itor)->getTrackedObject() == m )
+            {
+                (*itor)->track( (MovableObject*)0 );
+                //Iterators got invalidated. Also stop iterating
+                itor = end = mTrackingWireAabbs.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+    }
+
     // Nasty hack to make generalised Camera functions work without breaking add-on SMs
     if (typeName == "Camera")
     {
