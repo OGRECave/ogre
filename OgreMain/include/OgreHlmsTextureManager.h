@@ -252,14 +252,21 @@ namespace Ogre
         */
         TextureLocation createOrRetrieveTexture( const String &texName, TextureMapType mapType );
 
-        /// See other overload. This one allows aliasing a texture. If you have
-        /// "VERY_TECHNICAL_NAME_HASH_1234.png" as texName, you can make your first
-        /// call with aliasName as "Tree Wood", and the next calls to
-        /// createOrRetrieveTexture( "Tree Wood", mapType ) will refer to this texture
-        /// NOTE: aliasName cannot be blank/empty.
+        /** See other overload. This one allows aliasing a texture. If you have
+            "VERY_TECHNICAL_NAME_HASH_1234.png" as texName, you can make your first
+            call with aliasName as "Tree Wood", and the next calls to
+            createOrRetrieveTexture( "Tree Wood", mapType ) will refer to this texture
+            NOTE: aliasName cannot be blank/empty.
+        @param imgSource
+            When null, texture is loaded from texName as a file. When not null, texture is
+            loaded from imgSource and texName is ignored (still used in logging messages though).
+            Note imgSource may be modified (e.g. to generate mipmaps).
+            Note this pointer is ignored if the texture already exists and is just being retrieved.
+        */
         TextureLocation createOrRetrieveTexture( const String &aliasName,
                                                  const String &texName,
-                                                 TextureMapType mapType );
+                                                 TextureMapType mapType,
+                                                 Image *imgSource = 0 );
 
         /// Destroys a texture. If the array has multiple entries, the entry for this texture is
         /// sent back to a waiting list for a future new entry. Trying to read from this texture
