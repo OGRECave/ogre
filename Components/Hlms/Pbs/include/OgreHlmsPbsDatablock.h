@@ -471,6 +471,10 @@ namespace Ogre
         void setTransparency( float transparency, TransparencyModes mode = Transparent,
                               bool useAlphaFromTextures = true, bool changeBlendblock = true );
 
+        float getTransparency(void) const                           { return mTransparencyValue; }
+        TransparencyModes getTransparencyMode(void) const           { return mTransparencyMode; }
+        bool getUseAlphaFromTextures(void) const                    { return mUseAlphaFromTextures; }
+
         /// Changes the BRDF in use. Calling this function may trigger an
         /// HlmsDatablock::flushRenderables
         void setBrdf( PbsBrdf::PbsBrdf brdf );
