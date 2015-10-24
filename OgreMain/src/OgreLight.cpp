@@ -220,7 +220,7 @@ namespace Ogre {
                 //In local space, lights are centered at origin, facing towards +Z
                 Aabb aabb;
                 Real lenOpposite = Math::Tan( mSpotOuter * 0.5f ) * mRange;
-                aabb.mCenter    = Vector3( 0, 0, mRange * 0.5f );
+                aabb.mCenter    = Vector3( 0, 0, -mRange * 0.5f );
                 aabb.mHalfSize  = Vector3( lenOpposite, lenOpposite, mRange * 0.5f );
                 mObjectData.mLocalRadius[mObjectData.mIndex] = aabb.getRadius();
                 mObjectData.mLocalAabb->setFromAabb( aabb, mObjectData.mIndex );
