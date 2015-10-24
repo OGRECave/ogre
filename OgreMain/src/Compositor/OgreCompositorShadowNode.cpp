@@ -425,8 +425,7 @@ namespace Ogre
                 // set base
                 if( light->getType() != Light::LT_POINT )
                 {
-                    texCamera->setOrientation( light->getParentNode()->_getDerivedOrientation() *
-                                               Quaternion( Radian(Math::PI), Vector3::UNIT_Y ) );
+                    texCamera->setOrientation( light->getParentNode()->_getDerivedOrientation() );
                 }
                 if( light->getType() != Light::LT_DIRECTIONAL )
                 {

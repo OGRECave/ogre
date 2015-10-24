@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreBlendMode.h"
 #include "OgreVector3.h"
 #include "OgreHlmsPso.h"
+#include <stddef.h>
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
