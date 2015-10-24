@@ -15,7 +15,7 @@ namespace Ogre
     @par
         To get coloured lines, assign an Unlit material and change the colour.
     */
-    class WireAabb : public MovableObject, public Renderable
+    class _OgreExport WireAabb : public MovableObject, public Renderable
     {
         MovableObject const *mTrackedObject;
 
