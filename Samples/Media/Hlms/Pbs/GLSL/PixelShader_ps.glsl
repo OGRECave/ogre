@@ -181,6 +181,7 @@ vec3 qmul( vec4 q, vec3 v )
 	return tsNormal;
 }
 @end
+@property( normal_weight_tex )#define normalMapWeight uintBitsToFloat( material.indices4_7.w )@end
 @property( detail_maps_normal )vec3 getTSDetailNormal( sampler2DArray normalMap, vec3 uv )
 {
 	vec3 tsNormal;
@@ -195,8 +196,6 @@ vec3 qmul( vec4 q, vec3 v )
 
 	return tsNormal;
 }
-
-	@property( normal_weight_tex )#define normalMapWeight uintBitsToFloat( material.indices4_7.w )@end
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
 			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )@end
