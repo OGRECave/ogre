@@ -108,6 +108,7 @@ float3 qmul( float4 q, float3 v )
 	return tsNormal;
 }
 @end
+@property( normal_weight_tex )#define normalMapWeight asfloat( material.indices4_7.w )@end
 @property( detail_maps_normal )float3 getTSDetailNormal( SamplerState samplerState, Texture2D normalMap, float3 uv )
 {
 	float3 tsNormal;
@@ -122,8 +123,6 @@ float3 qmul( float4 q, float3 v )
 
 	return tsNormal;
 }
-
-	@property( normal_weight_tex )#define normalMapWeight asfloat( material.indices4_7.w )@end
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
 			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )@end
