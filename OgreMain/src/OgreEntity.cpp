@@ -2102,7 +2102,7 @@ namespace Ogre {
                     {
                         // Lock, we'll be locking the (suppressed hardware update) shadow buffer
                         float* pSrc = static_cast<float*>(
-                            esrPositionBuffer->lock(HardwareBuffer::HBL_NORMAL));
+                            esrPositionBuffer->lock(HardwareBuffer::HBL_NORMAL, HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE));
                         float* pDest = pSrc + (egi->vertexData->vertexCount * 3);
                         memcpy(pDest, pSrc, sizeof(float) * 3 * egi->vertexData->vertexCount);
                         esrPositionBuffer->unlock();
