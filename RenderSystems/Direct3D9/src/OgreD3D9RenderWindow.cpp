@@ -64,12 +64,12 @@ namespace Ogre
 		mDesiredWidth = 0;
 		mDesiredHeight = 0;
     }
-
+    //-----------------------------------------------------------------------------
     D3D9RenderWindow::~D3D9RenderWindow()
     {
         destroy();
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::create(const String& name, unsigned int width, unsigned int height,
         bool fullScreen, const NameValuePairList *miscParams)
     {
@@ -377,7 +377,7 @@ namespace Ogre
         mClosed = false;
         setHidden(mHidden);
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
     {
         if (fullScreen != mIsFullScreen || width != mWidth || height != mHeight)
@@ -449,7 +449,7 @@ namespace Ogre
                 (*it++).second->_updateDimensions();    
         }
     } 
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
         unsigned int* winWidth, unsigned int* winHeight)
     {
@@ -460,7 +460,7 @@ namespace Ogre
         *winWidth = rc.right - rc.left;
         *winHeight = rc.bottom - rc.top;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::_finishSwitchingFullscreen()
     {       
         if(mIsFullScreen)
@@ -503,7 +503,7 @@ namespace Ogre
         }
         mSwitchingFullscreen = false;
     }
-    
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::buildPresentParameters(D3DPRESENT_PARAMETERS* presentParams)
     {       
         // Set up the presentation parameters       
@@ -654,7 +654,7 @@ namespace Ogre
 
         }
     }
-    
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::destroy()
     {
         if (mDevice != NULL)
@@ -673,7 +673,7 @@ namespace Ogre
         mActive = false;
         mClosed = true;
     }
-
+    //-----------------------------------------------------------------------------
     bool D3D9RenderWindow::isActive() const
     {
         if (isFullScreen())
@@ -681,7 +681,7 @@ namespace Ogre
 
         return mActive && isVisible();
     }
-
+    //-----------------------------------------------------------------------------
     bool D3D9RenderWindow::isVisible() const
     {
         HWND currentWindowHandle = mHWnd;
@@ -693,7 +693,7 @@ namespace Ogre
         }
         return visible;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setHidden(bool hidden)
     {
         mHidden = hidden;
@@ -705,7 +705,7 @@ namespace Ogre
                 ShowWindow(mHWnd, SW_SHOWNORMAL);
         }
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setVSyncEnabled(bool vsync)
     {
         mVSync = vsync;
@@ -716,24 +716,24 @@ namespace Ogre
             mDevice->invalidate(this);
         }
     }
-
+    //-----------------------------------------------------------------------------
     bool D3D9RenderWindow::isVSyncEnabled() const
     {
         return mVSync;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setVSyncInterval(unsigned int interval)
     {
         mVSyncInterval = interval;
         if (mVSync)
             setVSyncEnabled(true);
     }
-
+    //-----------------------------------------------------------------------------
     unsigned int D3D9RenderWindow::getVSyncInterval() const
     {
         return mVSyncInterval;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::reposition(int top, int left)
     {
         if (mHWnd && !mIsFullScreen)
@@ -742,7 +742,7 @@ namespace Ogre
                 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
         }
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::resize(unsigned int width, unsigned int height)
     {
         if (!mIsExternal)
@@ -758,7 +758,7 @@ namespace Ogre
         else
             updateWindowRect();
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::windowMovedOrResized()
     {
         if (!mHWnd || IsIconic(mHWnd))
@@ -766,7 +766,7 @@ namespace Ogre
     
         updateWindowRect();
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::swapBuffers( )
     {
         if (mDeviceValid)
