@@ -684,7 +684,14 @@ namespace Ogre
 
     bool D3D9RenderWindow::isVisible() const
     {
-        return (mHWnd && !IsIconic(mHWnd));
+        HWND currentWindowHandle = mHWnd;
+        bool visible;
+        while ((visible = (IsIconic(currentWindowHandle) == false)) &&
+            (GetWindowLong(currentWindowHandle, GWL_STYLE) & WS_CHILD) != 0)
+        {
+            currentWindowHandle = GetParent(currentWindowHandle);
+        }
+        return visible;
     }
 
     void D3D9RenderWindow::setHidden(bool hidden)
@@ -765,7 +772,7 @@ namespace Ogre
         if (mDeviceValid)
             mDevice->present(this);     
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::getCustomAttribute( const String& name, void* pData )
     {
         // Valid attributes and their equvalent native functions:
@@ -810,7 +817,7 @@ namespace Ogre
             return;
         }
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
         mDevice->copyContentsToMemory(this, dst, buffer);
