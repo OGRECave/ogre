@@ -676,6 +676,22 @@ namespace Ogre {
                 downsamplerCubeFunc = downscale2x_sRGB_AXXX8888_cube;
             }
             break;
+        case PF_R8_SNORM: case PF_R8_SINT:
+            downsampler2DFunc   = downscale2x_Signed_X8;
+            downsamplerCubeFunc = downscale2x_Signed_X8_cube;
+            break;
+        case PF_R8G8_SNORM: case PF_R8G8_SINT:
+            downsampler2DFunc   = downscale2x_Signed_XX88;
+            downsamplerCubeFunc = downscale2x_Signed_XX88_cube;
+            break;
+        case PF_R8G8B8_SNORM: case PF_R8G8B8_SINT:
+            downsampler2DFunc   = downscale2x_Signed_XXX888;
+            downsamplerCubeFunc = downscale2x_Signed_XXX888_cube;
+            break;
+        case PF_R8G8B8A8_SNORM: case PF_R8G8B8A8_SINT:
+            downsampler2DFunc   = downscale2x_Signed_XXXA8888;
+            downsamplerCubeFunc = downscale2x_Signed_XXXA8888_cube;
+            break;
         default: //Keep compiler happy
             break;
         }
