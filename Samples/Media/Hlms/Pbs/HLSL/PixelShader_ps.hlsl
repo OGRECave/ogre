@@ -103,7 +103,7 @@ float3 qmul( float4 q, float3 v )
 	//Normal texture must be in LA format!
 	tsNormal.xy = textureMaps[@value( normal_map_tex_idx )].Sample( samplerStates[@value( normal_map_tex_idx )], uv ).xw * 2.0 - 1.0;
 @end
-	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
+	tsNormal.z	= sqrt( 1.0 - max( 0, tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
 	return tsNormal;
 }
@@ -119,7 +119,7 @@ float3 qmul( float4 q, float3 v )
 	//Normal texture must be in LA format!
 	tsNormal.xy = normalMap.Sample( samplerState, uv ).xw * 2.0 - 1.0;
 @end
-	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
+	tsNormal.z	= sqrt( 1.0 - max( 0, tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
 	return tsNormal;
 }

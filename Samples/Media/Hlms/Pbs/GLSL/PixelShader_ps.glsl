@@ -176,7 +176,7 @@ vec3 qmul( vec4 q, vec3 v )
 	//Normal texture must be in LA format!
 	tsNormal.xy = texture( textureMaps[@value( normal_map_tex_idx )], uv ).xw * 2.0 - 1.0;
 @end
-	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
+	tsNormal.z	= sqrt( 1.0 - max( 0, tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
 	return tsNormal;
 }
@@ -192,7 +192,7 @@ vec3 qmul( vec4 q, vec3 v )
 	//Normal texture must be in LA format!
 	tsNormal.xy = texture( normalMap, uv ).xw * 2.0 - 1.0;
 @end
-	tsNormal.z	= sqrt( 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y );
+	tsNormal.z	= sqrt( 1.0 - max( 0, tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
 	return tsNormal;
 }
