@@ -141,6 +141,8 @@ namespace Ogre {
     const uint32 DDPF_ALPHAPIXELS = 0x00000001;
     const uint32 DDPF_FOURCC = 0x00000004;
     const uint32 DDPF_RGB = 0x00000040;
+    //const uint32 DDPF_BUMPLUMINANCE = 0x00040000;
+    const uint32 DDPF_BUMPDUDV = 0x00080000;
     const uint32 DDSCAPS_COMPLEX = 0x00000008;
     const uint32 DDSCAPS_TEXTURE = 0x00001000;
     const uint32 DDSCAPS_MIPMAP = 0x00400000;
@@ -159,6 +161,7 @@ namespace Ogre {
 //    const uint32 DDSD_LINEARSIZE = 0x00080000;
 
     // Special FourCC codes
+    const uint32 D3DFMT_Q16W16V16U16    = 110;
     const uint32 D3DFMT_R16F            = 111;
     const uint32 D3DFMT_G16R16F         = 112;
     const uint32 D3DFMT_A16B16G16R16F   = 113;
@@ -483,6 +486,8 @@ namespace Ogre {
             return PF_BC5_UNORM;
         case FOURCC('B','C','5','S'):
             return PF_BC5_SNORM;
+        case D3DFMT_Q16W16V16U16:
+            return PF_R16G16B16A16_SNORM;
         case D3DFMT_R16F:
             return PF_FLOAT16_R;
         case D3DFMT_G16R16F:
@@ -504,8 +509,8 @@ namespace Ogre {
 
     }
     //---------------------------------------------------------------------
-    PixelFormat DDSCodec::convertPixelFormat(uint32 rgbBits, uint32 rMask, 
-        uint32 gMask, uint32 bMask, uint32 aMask) const
+    PixelFormat DDSCodec::convertPixelFormat(uint32 rgbBits, uint32 rMask,
+        uint32 gMask, uint32 bMask, uint32 aMask, bool isSigned) const
     {
         // General search through pixel formats
         for (int i = PF_UNKNOWN + 1; i < PF_COUNT; ++i)
@@ -517,10 +522,12 @@ namespace Ogre {
                 PixelUtil::getBitMasks(pf, testMasks);
                 int testBits[4];
                 PixelUtil::getBitDepths(pf, testBits);
+                bool sameSign = ((PixelUtil::getFlags( pf ) & PFF_SIGNED) != 0) == isSigned;
                 if (testMasks[0] == rMask && testMasks[1] == gMask &&
                     testMasks[2] == bMask && 
                     // for alpha, deal with 'X8' formats by checking bit counts
-                    (testMasks[3] == aMask || (aMask == 0 && testBits[3] == 0)))
+                    (testMasks[3] == aMask || (aMask == 0 && testBits[3] == 0)) &&
+                    sameSign)
                 {
                     return pf;
                 }
@@ -741,7 +748,8 @@ namespace Ogre {
                 header.pixelFormat.redMask, header.pixelFormat.greenMask, 
                 header.pixelFormat.blueMask, 
                 header.pixelFormat.flags & DDPF_ALPHAPIXELS ? 
-                header.pixelFormat.alphaMask : 0);
+                header.pixelFormat.alphaMask : 0,
+                (header.pixelFormat.flags & DDPF_BUMPDUDV) != 0);
         }
 
         if (PixelUtil::isCompressed(sourceFormat))

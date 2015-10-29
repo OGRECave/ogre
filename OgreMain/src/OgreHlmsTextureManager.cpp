@@ -99,17 +99,17 @@ namespace Ogre
                 // DXT5 is like BC5, using the "store only in green and alpha channels" method.
                 // The last one is lossless, using UV8 to store uncompressed,
                 // and retrieve z = sqrt(x²+y²)
-                /*if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
+                if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5) )
                 {
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat = PF_BC5_SNORM;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_BC5_SNORM;
                 }
-                else if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) )
+                /*else if( caps->hasCapability(RSC_TEXTURE_COMPRESSION_DXT) )
                 {
                     mDefaultTextureParameters[TEXTURE_TYPE_NORMALS].pixelFormat           = PF_DXT5;
                     mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat = PF_DXT5;
-                }
-                else*/
+                }*/
+                else
                 {
                     PixelFormat pf = caps->hasCapability( RSC_TEXTURE_SIGNED_INT ) ? PF_R8G8_SNORM :
                                                                                      PF_BYTE_LA;
@@ -312,10 +312,33 @@ namespace Ogre
             Image image;
             image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
 
+
             PixelFormat imageFormat = image.getFormat();
+            const RenderSystemCapabilities *caps = mRenderSystem->getCapabilities();
 
             if( mDefaultTextureParameters[mapType].pixelFormat != PF_UNKNOWN )
-                imageFormat = mDefaultTextureParameters[mapType].pixelFormat;
+            {
+                //Don't force non-compressed sources to be compressed when we can't do it
+                //automatically, but force them to a format we actually understand.
+                if( mDefaultTextureParameters[mapType].isNormalMap &&
+                    mDefaultTextureParameters[mapType].pixelFormat == PF_BC5_SNORM &&
+                    imageFormat != PF_BC5_SNORM )
+                {
+                    LogManager::getSingleton().logMessage(
+                                "Warning: normal map texture " + texName + " is not BC5S compressed. "
+                                "This is encouraged for lower memory usage. If you don't want to see "
+                                "this message without compressing to BC5, set "
+                                "getDefaultTextureParameters()[TEXTURE_TYPE_NORMALS].pixelFormat to "
+                                "PF_R8G8_SNORM (or PF_BYTE_LA if RSC_TEXTURE_SIGNED_INT is not "
+                                "supported)", LML_TRIVIAL );
+                    imageFormat = caps->hasCapability( RSC_TEXTURE_SIGNED_INT ) ? PF_R8G8_SNORM :
+                                                                                  PF_BYTE_LA;
+                }
+                else
+                {
+                    imageFormat = mDefaultTextureParameters[mapType].pixelFormat;
+                }
+            }
 
             if( imageFormat == PF_X8R8G8B8 || imageFormat == PF_R8G8B8 ||
                 imageFormat == PF_X8B8G8R8 || imageFormat == PF_B8G8R8 ||
@@ -352,7 +375,6 @@ namespace Ogre
             depth   = image.getDepth();
             faces   = image.getNumFaces();
 
-            const RenderSystemCapabilities *caps = mRenderSystem->getCapabilities();
             ushort maxResolution = caps->getMaximumResolution2D();
 
             if( image.hasFlag( IF_3D_TEXTURE ) )

@@ -85,6 +85,33 @@ namespace Ogre
     ImageDownsamplerCube downscale2x_AX88_cube;
 
     //-----------------------------------------------------------------------------------
+    //Signed versions
+    //-----------------------------------------------------------------------------------
+
+
+    ImageDownsampler2D downscale2x_Signed_XXXA8888;
+    ImageDownsampler2D downscale2x_Signed_AXXX8888;
+    ImageDownsampler2D downscale2x_Signed_XXX888;
+    ImageDownsampler2D downscale2x_Signed_XX88;
+    ImageDownsampler2D downscale2x_Signed_X8;
+    ImageDownsampler2D downscale2x_Signed_A8;
+    ImageDownsampler2D downscale2x_Signed_XA88;
+    ImageDownsampler2D downscale2x_Signed_AX88;
+
+    //
+    //  CUBEMAP Signed versions
+    //
+
+    ImageDownsamplerCube downscale2x_Signed_XXXA8888_cube;
+    ImageDownsamplerCube downscale2x_Signed_AXXX8888_cube;
+    ImageDownsamplerCube downscale2x_Signed_XXX888_cube;
+    ImageDownsamplerCube downscale2x_Signed_XX88_cube;
+    ImageDownsamplerCube downscale2x_Signed_X8_cube;
+    ImageDownsamplerCube downscale2x_Signed_A8_cube;
+    ImageDownsamplerCube downscale2x_Signed_XA88_cube;
+    ImageDownsamplerCube downscale2x_Signed_AX88_cube;
+
+    //-----------------------------------------------------------------------------------
     //sRGB versions
     //-----------------------------------------------------------------------------------
 

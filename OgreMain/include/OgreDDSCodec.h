@@ -58,7 +58,7 @@ namespace Ogre {
         PixelFormat convertFourCCFormat(uint32 fourcc) const;
         PixelFormat convertDXToOgreFormat(uint32 fourcc) const;
         PixelFormat convertPixelFormat(uint32 rgbBits, uint32 rMask,
-            uint32 gMask, uint32 bMask, uint32 aMask) const;
+            uint32 gMask, uint32 bMask, uint32 aMask, bool isSigned) const;
 
         /// Unpack DXT colours into array of 16 colour values
         void unpackDXTColour(PixelFormat pf, const DXTColourBlock& block, ColourValue* pCol) const;
