@@ -356,7 +356,8 @@ namespace Ogre {
 
                 for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
                 {
-                    (*it).second->_updateDimensions();
+                    Viewport *vp = *it;
+                    vp->_updateDimensions();
                 }
             }
         }
@@ -401,7 +402,8 @@ namespace Ogre {
 
         for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
         {
-            (*it).second->_updateDimensions();
+            Viewport *vp = *it;
+            vp->_updateDimensions();
         }
     }
     void X11EGLWindow::switchFullScreen(bool fullscreen)
