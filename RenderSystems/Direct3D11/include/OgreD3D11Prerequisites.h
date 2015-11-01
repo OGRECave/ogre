@@ -39,11 +39,23 @@ THE SOFTWARE.
 // with NV_DX_interop OpenGL extension.
 #define MULTI_DEVICE_WRAP_OPENGL_INTEROP 0
 
-// Performance optimisation flag - SAVE_STATE_RENDERABLE.
-// Caches the Direct3D11 render states instead of recreating them every frame.
-// Setting this flag may result in a significant performance boost.
 
+// SAVE_STATE_OBJECTS - Performance optimisation - caches Direct3D11 state objects.
+#define SAVE_STATE_OBJECTS 1
+
+// SAVE_STATE_RENDERABLE - Performance optimisation - caches Direct3D11 state objects and state object groups for a renderable.
+// This option would work well in most cases, it's dependant on the pass' render state hash value.
+// If your implementation include a non-standard behaviour that makes changes directly to the render system,
+// it may result in binding the wrong state object, in that case do not use this flag.
 #define SAVE_STATE_RENDERABLE 0
+
+
+
+#if SAVE_STATE_RENDERABLE == 1
+#define SAVE_STATE_OBJECTS 1
+#endif
+
+
 
 #include "OgrePrerequisites.h"
 #include "WIN32/OgreMinGWSupport.h" // extra defines for MinGW to deal with DX SDK

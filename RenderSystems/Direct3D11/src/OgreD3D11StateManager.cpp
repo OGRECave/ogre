@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const String StateManager::StateCreateMethodName = "StateManager::createOrRetrieveState";
+
     D3D11RenderOperationState * D3D11RenderOperationStateGroup::getState(const RenderOperationStateDescriptor& renderOperationStateDescriptor)
     {
         const RenderOperationStateDescriptor::Key key = renderOperationStateDescriptor.GetKey();
@@ -81,6 +83,7 @@ namespace Ogre
         , mDepthStencilState(NULL)
         , autoRelease(true)
         , autoReleaseBaseStates(true)
+        , autoReleaseSamplers(true)
     {
         memset(mSamplers, 0, sizeof(Samplers));
     }
@@ -100,19 +103,22 @@ namespace Ogre
             SAFE_RELEASE(mBlendState);
             SAFE_RELEASE(mRasterizer);
             SAFE_RELEASE(mDepthStencilState);
+
         }
 
-        for (size_t i = 0 ; i < OGRE_MAX_TEXTURE_LAYERS ; i++)
+        if (autoReleaseSamplers == true)
         {
-            for (size_t j = 0; j < TextureUnitState::BT_SHIFT_COUNT; j++)
+            for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; i++)
             {
-                SAFE_RELEASE(mSamplers[j].mSamplerStates[i] );
-                mSamplers[j].mTextures[i] = NULL;
+                for (size_t j = 0; j < TextureUnitState::BT_SHIFT_COUNT; j++)
+                {
+                    SAFE_RELEASE(mSamplers[j].mSamplerStates[i]);
+                }
             }
         }
     }
 
-    StateManager::StateManager()
+    StateManager::StateManager(D3D11Device& device) :  mDevice(device)
     {
         mVersion = 0;
     }
@@ -127,57 +133,133 @@ namespace Ogre
         return mVersion;
     }
 
-    CRCClassMap <ID3D11BlendState *> & StateManager::getBlendStateMap()
+
+    String StateManager::getCreateErrorMessage(const String& objectType)
     {
-        return mBlendStateMap;
+        return String("D3D11 device cannot create " + objectType +" state object");
     }
 
-    CRCClassMap <ID3D11DepthStencilState *> & StateManager::getDepthStencilStateMap()
+
+    ID3D11BlendState* StateManager::createOrRetrieveState(const D3D11_BLEND_DESC& blendDesc)
     {
-        return mDepthStencilStateMap;
+        return createOrRetrieveStateTemplated<ID3D11BlendState*, D3D11_BLEND_DESC, D3D11_REQ_BLEND_OBJECT_COUNT_PER_DEVICE>
+            (mBlendStateMap, blendDesc);
     }
 
-    CRCClassMap <ID3D11RasterizerState *> & StateManager::getRasterizerStateMap()
+    ID3D11BlendState* StateManager::createState(const D3D11_BLEND_DESC& blendDesc)
     {
-        return mRasterizerStateMap;
+        ID3D11BlendState* state = NULL;
+        HRESULT hr = mDevice->CreateBlendState(&blendDesc, &state);
+
+        if (FAILED(hr))
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                getCreateErrorMessage("blend") + "\n" + errorDescription,
+                StateCreateMethodName);
+        }
+
+        return state;
     }
 
-    CRCClassMap <ID3D11SamplerState *> & StateManager::getSamplerMap()
+    ID3D11RasterizerState* StateManager::createOrRetrieveState(const D3D11_RASTERIZER_DESC& rasterizerDesc)
     {
-        return mSamplerMap;
+        return createOrRetrieveStateTemplated<ID3D11RasterizerState*, D3D11_RASTERIZER_DESC, D3D11_REQ_RASTERIZER_OBJECT_COUNT_PER_DEVICE>
+            (mRasterizerStateMap, rasterizerDesc);
+    }
+
+    ID3D11RasterizerState* StateManager::createState(const D3D11_RASTERIZER_DESC& rasterizerDesc)
+    {
+        ID3D11RasterizerState* state = NULL;
+        HRESULT hr = mDevice->CreateRasterizerState(&rasterizerDesc, &state);
+
+        if (FAILED(hr))
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                getCreateErrorMessage("rasterizer") + "\n" + errorDescription,
+                StateCreateMethodName);
+        }
+
+
+        return state;
+    }
+
+    ID3D11DepthStencilState* StateManager::createOrRetrieveState(const D3D11_DEPTH_STENCIL_DESC& depthStencilDesc)
+    {
+        return createOrRetrieveStateTemplated<ID3D11DepthStencilState*, D3D11_DEPTH_STENCIL_DESC, D3D11_REQ_DEPTH_STENCIL_OBJECT_COUNT_PER_DEVICE>
+            (mDepthStencilStateMap, depthStencilDesc);
+    }
+
+    ID3D11DepthStencilState* StateManager::createState(const D3D11_DEPTH_STENCIL_DESC& depthStencilDesc)
+    {
+        ID3D11DepthStencilState* state = NULL;
+        HRESULT hr = mDevice->CreateDepthStencilState(&depthStencilDesc, &state);
+
+        if (FAILED(hr))
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                getCreateErrorMessage("depth-stencil") + "\n" + errorDescription,
+                StateCreateMethodName);
+        }
+        return state;
+    }
+
+
+    ID3D11SamplerState* StateManager::createOrRetrieveState(const D3D11_SAMPLER_DESC& samplerDesc)
+    {
+        return createOrRetrieveStateTemplated<ID3D11SamplerState*, D3D11_SAMPLER_DESC, D3D11_REQ_SAMPLER_OBJECT_COUNT_PER_DEVICE>
+            (mSamplerMap, samplerDesc);
+    }
+
+    ID3D11SamplerState* StateManager::createState(const D3D11_SAMPLER_DESC& samplerDesc)
+    {
+        ID3D11SamplerState* state = NULL;
+        HRESULT hr = mDevice->CreateSamplerState(&samplerDesc, &state);
+        if (FAILED(hr))
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+
+
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                getCreateErrorMessage("sampler") + "\n" + errorDescription,
+                "StateManager::createState");
+        }
+        return state;
     }
 
     StateManager::~StateManager()
     {
         {
-            CRCClassMap <ID3D11SamplerState *>::const_iterator it_end = mSamplerMap.end();
-            for (CRCClassMap <ID3D11SamplerState *>::iterator it = mSamplerMap.begin(); it != it_end; it++)
+            MapCRCSamplerState::const_iterator it_end = mSamplerMap.end();
+            for (MapCRCSamplerState::iterator it = mSamplerMap.begin(); it != it_end; it++)
             {
-                SAFE_RELEASE(it->second);
+                delete it->second;
             }
         }
 
         {
-            CRCClassMap <ID3D11BlendState *>::const_iterator it_end = mBlendStateMap.end();
-            for (CRCClassMap <ID3D11BlendState *>::iterator it = mBlendStateMap.begin(); it != it_end; it++)
+            MapCRCBlendState::const_iterator it_end = mBlendStateMap.end();
+            for (MapCRCBlendState::iterator it = mBlendStateMap.begin(); it != it_end; it++)
             {
-                SAFE_RELEASE(it->second);
+                delete it->second;
             }
         }
 
         {
-            CRCClassMap <ID3D11DepthStencilState *>::const_iterator it_end = mDepthStencilStateMap.end();
-            for (CRCClassMap <ID3D11DepthStencilState *>::iterator it = mDepthStencilStateMap.begin(); it != it_end; it++)
+            MapCRCDepthStencilState::const_iterator it_end = mDepthStencilStateMap.end();
+            for (MapCRCDepthStencilState::iterator it = mDepthStencilStateMap.begin(); it != it_end; it++)
             {
-                SAFE_RELEASE(it->second);
+                delete it->second;
             }
         }
 
         {
-            CRCClassMap <ID3D11RasterizerState*>::const_iterator it_end = mRasterizerStateMap.end();
-            for (CRCClassMap <ID3D11RasterizerState*>::iterator it = mRasterizerStateMap.begin(); it != it_end; it++)
+            MapCRCRasterizeState::const_iterator it_end = mRasterizerStateMap.end();
+            for (MapCRCRasterizeState::iterator it = mRasterizerStateMap.begin(); it != it_end; it++)
             {
-                SAFE_RELEASE(it->second);
+                delete it->second;
             }
         }
 
@@ -185,5 +267,68 @@ namespace Ogre
 
 
 
+
+    template<class D3D11STATE, class D3DDESC, int MAX_OBJECTS>
+    D3D11STATE StateManager::createOrRetrieveStateTemplated(std::map<crc, StateObjectEntry<D3D11STATE>* >& container, const D3DDESC& desc)
+    {
+        crc descCrc = crc32_8bytes((unsigned char  *)&desc, sizeof(desc));
+        typedef  D3D11STATE UnderlyingState;
+
+        typedef  StateObjectEntry<UnderlyingState> StateObject;
+        typedef  std::map< crc, StateObject* >StateObjectContainer;
+        typedef  StateObjectContainer::iterator StateObjectContainerIterator;
+
+
+
+        UnderlyingState state = NULL;
+        StateObjectContainerIterator it = container.find(descCrc);
+        if (it == container.end())
+        {
+            if (container.size() >= MAX_OBJECTS)
+            {
+
+#if SAVE_STATE_RENDERABLE == 1
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                    "can not free render state object while SAVE_STATE_RENDERABLE optimisation is enabled.", 
+                    "StateManager::createOrRetrieveStateTemplated");
+#else
+                std::vector<StateObject*> vec;
+                vec.reserve(MAX_OBJECTS);
+
+                StateObjectContainerIterator it_end = container.end();
+                for (StateObjectContainerIterator it = container.begin(); it != it_end; it++)
+                {
+                    vec.push_back(it->second);
+                }
+
+                std::sort(vec.begin(), vec.end(), StateObject::TimeStampComparer());
+
+                uint64 fillTime = vec[MAX_OBJECTS - 1]->getLastAccessTime() - vec[0]->getLastAccessTime();
+                assert("State object are being created too fast, check your code or disable SAVE_STATE_OBJECTS optimization" && fillTime > 3000);
+
+                // purge 15 percent of state objects
+                size_t count = MAX_OBJECTS * 0.15;
+
+                for (size_t i = 0; i < count; i++)
+                {
+                    StateObjectContainerIterator it = container.find(vec[i]->getCrc());
+                    assert(it != container.end());
+                    delete it->second;
+                    container.erase(it);
+                }
+
+#endif
+            }
+            // make sure state objects get destroyed by calling flush
+            mDevice.GetImmediateContext()->Flush();
+            state = createState(desc);
+            container.insert(std::make_pair(descCrc, new StateObject(state, descCrc)));
+        }
+        else
+        {
+            state = it->second->getStateObject();
+        }
+        return state;
+    }
 
 }

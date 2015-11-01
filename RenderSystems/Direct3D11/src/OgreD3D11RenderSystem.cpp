@@ -129,6 +129,7 @@ bail:
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
 #endif	
+        , mStateManager(mDevice)
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
@@ -1003,9 +1004,14 @@ bail:
     void D3D11RenderSystem::shutdown()
     {
         RenderSystem::shutdown();
+
+#if SAVE_STATE_OBJECTS == 0
+        //Release state objects only if not managed by the state manager  
         SAFE_RELEASE(mBoundBlendState);
         SAFE_RELEASE(mBoundRasterizer);
         SAFE_RELEASE(mBoundDepthStencilState)
+#endif
+
 
         mRenderSystemWasInited = false;
 
@@ -2358,140 +2364,201 @@ bail:
 
         mLastVertexSourceCount = binds.size();      
     }
-
     //---------------------------------------------------------------------
-    void D3D11RenderSystem::_applyRenderStates(D3D11RenderOperationState* opState)
+    void D3D11RenderSystem::_applyRenderStates(D3D11RenderOperationState* &opState, const RenderOperation& op)
     {
         opState->autoReleaseBaseStates = false;
-
-        if (mBlendDescChanged)
+        bool needToCreateState = true;
+        //Get state group for renderable
+#if SAVE_STATE_RENDERABLE == 1
+        if (op.srcRenderable != NULL)
         {
-            mBlendDescChanged = false;
-            SAFE_RELEASE(mBoundBlendState);
+            Renderable::RenderSystemDataPtr renderableRenderSystemData = op.srcRenderable->getRenderSystemData();
+            D3D11RenderOperationStateGroupPtr stateGroup;
 
-            HRESULT hr = mDevice->CreateBlendState(&mBlendDesc, &opState->mBlendState);
-            if (FAILED(hr))
+            if (renderableRenderSystemData.isNull())
             {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create blend state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
+                stateGroup = D3D11RenderOperationStateGroupPtr(new D3D11RenderOperationStateGroup());
+                op.srcRenderable->setRenderSystemData(stateGroup.staticCast<Renderable::RenderSystemData>());
+            }
+            else
+            {
+                stateGroup = renderableRenderSystemData.staticCast<D3D11RenderOperationStateGroup>();
+            }
+
+
+            //Sync states if needed
+            stateGroup->SyncToVersion(mStateManager.getVersion());
+
+
+            //Get  opstate from the group
+            RenderOperationStateDescriptor desc;
+            desc.setActiveRenderTarget(mActiveRenderTarget);
+            desc.setCamera(mActiveViewport->getCamera());
+            desc.setRenderStateHash(op.renderStateHash);
+
+
+            D3D11RenderOperationState * state = stateGroup->getState(desc);
+            if (state != NULL)
+            {
+                opState = state;
+                needToCreateState = false;
+            }
+            else
+            {
+                opState = new D3D11RenderOperationState;
+                opState->autoRelease = false;
+                stateGroup->addState(desc, opState);
             }
         }
-        else
-        {
-            opState->mBlendState = mBoundBlendState;
-        }
+#endif
 
-        if (mRasterizerDescChanged)
-        {
-            mRasterizerDescChanged = false;
-            SAFE_RELEASE(mBoundRasterizer);
 
-            HRESULT hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer);
-            if (FAILED(hr))
-            {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create rasterizer state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-        }
-        else
+        if (needToCreateState)
         {
-            opState->mRasterizer = mBoundRasterizer;
-        }
-
-        if (mDepthStencilDescChanged)
-        {
-            SAFE_RELEASE(mBoundDepthStencilState);
-            mDepthStencilDescChanged = false;
-
-            HRESULT hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, &opState->mDepthStencilState);
-            if (FAILED(hr))
-            {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Failed to create depth stencil state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-        }
-        else
-        {
-            opState->mDepthStencilState = mBoundDepthStencilState;
-        }
-
-        
-            // samplers mapping
+#if SAVE_STATE_OBJECTS == 1
+            opState->autoReleaseSamplers = false;
+            opState->mBlendState = mStateManager.createOrRetrieveState (mBlendDesc);
+            opState->mRasterizer = mStateManager.createOrRetrieveState(mRasterizerDesc);
+            opState->mDepthStencilState = mStateManager.createOrRetrieveState(mDepthStencilDesc);
+#else
             
-        TextureUnitState::BindingType remainBindings = mDirtyTextureStages;
-        uint8 i = 0;
-        while (remainBindings != TextureUnitState::BT_NO_BINDING && i < TextureUnitState::BT_SHIFT_COUNT)
-        {
-            TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
-            if ((bindingFlag & remainBindings) == bindingFlag)
+            if (mBlendDescChanged)
             {
-                TextureStageGroup& currentStage = mTextureDesc[i];
-                size_t numberOfSamplers = std::min(currentStage.mHighestSlotUsed, (size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
+                mBlendDescChanged = false;
+                SAFE_RELEASE(mBoundBlendState);
+                opState->mBlendState = mStateManager.createState(mBlendDesc);
+            }
+            else
+            {
+                opState->mBlendState = mBoundBlendState;
+            }
 
-                D3D11RenderOperationState::SamplersStageGroup&  samplerStage = opState->mSamplers[i];
-                samplerStage.mSamplerStatesCount = numberOfSamplers;
-                samplerStage.mTexturesCount = numberOfSamplers;
+            if (mRasterizerDescChanged)
+            {
+                mRasterizerDescChanged = false;
+                SAFE_RELEASE(mBoundRasterizer);
+                opState->mRasterizer = mStateManager.createState(mRasterizerDesc);
+            }
+            else
+            {
+                opState->mRasterizer = mBoundRasterizer;
+            }
 
-                for (size_t n = 0; n < numberOfSamplers; n++)
+            if (mDepthStencilDescChanged)
+            {
+                mDepthStencilDescChanged = false;
+                SAFE_RELEASE(mBoundDepthStencilState);
+                opState->mDepthStencilState = mStateManager.createState(mDepthStencilDesc);
+            }
+            else
+            {
+                opState->mDepthStencilState = mBoundDepthStencilState;
+            }
+
+
+
+#endif
+
+#if SAVE_STATE_RENDERABLE == 1
+            // solve the case where there are two or more renderables for the same pass.
+            TextureUnitState::BindingType remainBindings = TextureUnitState::BT_ALL;
+#else
+            TextureUnitState::BindingType remainBindings = mDirtyTextureStages;
+#endif
+
+            uint8 i = 0;
+            while (remainBindings != TextureUnitState::BT_NO_BINDING && i < TextureUnitState::BT_SHIFT_COUNT)
+            {
+                TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
+                if ((bindingFlag & remainBindings) == bindingFlag)
                 {
-                    ID3D11SamplerState * samplerState = NULL;
-                    ID3D11ShaderResourceView *texture = NULL;
-                    TextureSlotDesc& stage = currentStage.mTextureSlots[n];
-                    if (!stage.used)
+                    TextureStageGroup& currentStage = mTextureDesc[i];
+                    size_t numberOfSamplers = std::min(currentStage.mHighestSlotUsed, (size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
+                    D3D11RenderOperationState::SamplersStageGroup&  samplerStage = opState->mSamplers[i];
+
+
+                    samplerStage.mSamplerStatesCount = numberOfSamplers;
+                    samplerStage.mTexturesCount = numberOfSamplers;
+                    for (size_t n = 0; n < numberOfSamplers; n++)
                     {
-                        samplerState = NULL;
-                        texture = NULL;
-                    }
-                    else
-                    {
-                        texture = stage.pTex;
-
-                        stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
-                            FilterMips[n], false);
-                        stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
-                        stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-                        stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
-                        stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
-
-
-                        HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState);
-                        if (FAILED(hr))
+                        ID3D11SamplerState * samplerState = NULL;
+                        ID3D11ShaderResourceView *texture = NULL;
+                        TextureSlotDesc& stage = currentStage.mTextureSlots[n];
+                        if (stage.used)
                         {
-                            String errorDescription = mDevice.getErrorDescription(hr);
-                            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                                "Failed to create sampler state\nError Description:" + errorDescription,
-                                "D3D11RenderSystem::_render");
+                            texture = stage.pTex;
+
+                            stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
+                                FilterMips[n], false);
+                            stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
+                            stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+                            stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
+                            stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
+#if SAVE_STATE_OBJECTS == 1
+                            samplerState = mStateManager.createOrRetrieveState(stage.samplerDesc);
+#else
+                            samplerState = mStateManager.createState(stage.samplerDesc);
+#endif
                         }
 
+                        samplerStage.mSamplerStates[n] = samplerState;
+                        samplerStage.mTextures[n] = texture;
+
                     }
-                    samplerStage.mSamplerStates[n] = samplerState;
-                    samplerStage.mTextures[n] = texture;
+
+                    // If no textures are bound and stencil is enable, then reset texture unit 0,
+                    // to prevent Direct3D11 error message where wrong texture type is bound when reading
+                    // from stencil buffer in a shader.
+                    if (samplerStage.mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
+                    {
+                        samplerStage.mTextures[0] = NULL;
+                        samplerStage.mTexturesCount = 1;
+                    }
+
+                    remainBindings = static_cast<TextureUnitState::BindingType>(remainBindings & (~bindingFlag));
                 }
 
-                // If no textures are bounded and stencil is enable, then reset texture unit 0,
-                // to prevent D3D error message where wrong texture type is bounded when reading
-                // from stencil buffer in a shader.
-                if (samplerStage.mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
-                {
-                    samplerStage.mTextures[0] = NULL;
-                    samplerStage.mTexturesCount = 1;
-                }
-
-                remainBindings = static_cast<TextureUnitState::BindingType>(remainBindings & (~bindingFlag));
+                i++;
             }
-           i++;
         }
-        
 
+#if SAVE_STATE_RENDERABLE == 1
+        else
+        {
+            // No need to create state, but textures may have changed -  override textures 
+            TextureUnitState::BindingType remainBindings = mDirtyTextureStages;
+            uint8 i = 0;
+            while (remainBindings != TextureUnitState::BT_NO_BINDING && i < TextureUnitState::BT_SHIFT_COUNT)
+            {
+                TextureStageGroup& currentStage = mTextureDesc[i];
+                TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
+                if ((bindingFlag & remainBindings) == bindingFlag)
+                {
+                    int texturesCount = opState->mSamplers->mTexturesCount;
+                    D3D11RenderOperationState::SamplersStageGroup&  samplerStage = opState->mSamplers[i];
+                    for (int n = 0; n < texturesCount; n++)
+                    {
+                        TextureSlotDesc& stage = currentStage.mTextureSlots[n];
+
+                        // if a textue has been assigned to the sampler state then update it.
+                        if (samplerStage.mTextures[n] != NULL)
+                            samplerStage.mTextures[n] = stage.pTex;
+                    }
+                }
+                i++;
+            }
+        }
+#endif
+
+// When caching states using the SAVE_STATE_OBJECTS flag, the saved bound states seems to be not bound
+// to the render system any more, No purpose in using it.
+ 
+#if SAVE_STATE_OBJECTS == 0
         if (opState->mBlendState != mBoundBlendState)
         {
             mBoundBlendState = opState->mBlendState;
+#endif
             mDevice.GetImmediateContext()->OMSetBlendState(opState->mBlendState, 0, 0xffffffff); // TODO - find out where to get the parameters
             if (mDevice.isError())
             {
@@ -2500,12 +2567,16 @@ bail:
                     "D3D11 device cannot set blend state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
-
+#if SAVE_STATE_OBJECTS == 0
         }
+#endif
 
+#if SAVE_STATE_OBJECTS == 0
         if (opState->mRasterizer != mBoundRasterizer)
+
         {
             mBoundRasterizer = opState->mRasterizer;
+#endif
 
             mDevice.GetImmediateContext()->RSSetState(opState->mRasterizer);
             if (mDevice.isError())
@@ -2515,13 +2586,15 @@ bail:
                     "D3D11 device cannot set rasterizer state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
+#if SAVE_STATE_OBJECTS == 0
         }
+#endif
 
-
+#if SAVE_STATE_OBJECTS == 0
         if (opState->mDepthStencilState != mBoundDepthStencilState)
         {
             mBoundDepthStencilState = opState->mDepthStencilState;
-
+#endif
             mDevice.GetImmediateContext()->OMSetDepthStencilState(opState->mDepthStencilState, mStencilRef);
             if (mDevice.isError())
             {
@@ -2530,7 +2603,9 @@ bail:
                     "D3D11 device cannot set depth stencil state\nError Description:" + errorDescription,
                     "D3D11RenderSystem::_render");
             }
+#if SAVE_STATE_OBJECTS == 0
         }
+#endif
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_render(const RenderOperation& op)
@@ -2562,18 +2637,7 @@ bail:
         D3D11RenderOperationState stackOpState;
         D3D11RenderOperationState * opState = &stackOpState;
 
-#if SAVE_STATE_RENDERABLE == 1
-        // If there is no source renderable in the render operation
-        // fallback to non-optimised _applyRenderStates
-        if (op.srcRenderable != NULL)
-        {
-            _applyRenderStateForRenderable(opState, op);
-        }
-        else
-#endif
-        {
-            _applyRenderStates(opState);
-        }
+        _applyRenderStates(opState, op);
 
         _bindSamplersForStages(opState);
        
@@ -3020,237 +3084,6 @@ bail:
         _clearDirtyTextureStage();
     }
 
-#if SAVE_STATE_RENDERABLE  == 1
-    void D3D11RenderSystem::_applyRenderStateForRenderable(D3D11RenderOperationState* &opState, const RenderOperation& op)
-    {
-        //Get state group for renderable
-        Renderable::RenderSystemDataPtr renderableRenderSystemData = op.srcRenderable->getRenderSystemData();
-        D3D11RenderOperationStateGroupPtr stateGroup;
-
-        if (renderableRenderSystemData.isNull())
-        {
-            stateGroup = D3D11RenderOperationStateGroupPtr(new D3D11RenderOperationStateGroup());
-            op.srcRenderable->setRenderSystemData(stateGroup.staticCast<Renderable::RenderSystemData>());
-        }
-        else
-        {
-            stateGroup = renderableRenderSystemData.staticCast<D3D11RenderOperationStateGroup>();
-        }
-
-
-        //Sync states if needed
-        stateGroup->SyncToVersion(mStateManager.getVersion());
-
-
-        //Get  opstate from the group
-        RenderOperationStateDescriptor desc;
-        desc.setActiveRenderTarget(mActiveRenderTarget);
-        desc.setCamera(mActiveViewport->getCamera());
-        desc.setRenderStateHash(op.renderStateHash);
-
-
-        bool needToCreateState = true;
-
-        D3D11RenderOperationState * state = stateGroup->getState(desc);
-        if (state != NULL)
-        {
-            opState = state;
-            needToCreateState = false;
-        }
-        else
-        {
-            opState = new D3D11RenderOperationState;
-            opState->autoRelease = false;
-            stateGroup->addState(desc, opState);
-        }
-
-
-        if (needToCreateState)
-        {
-            crc descCrc = 0;
-            HRESULT hr;
-            {
-
-                descCrc = crc32_8bytes((unsigned char  *)&mBlendDesc, sizeof(mBlendDesc));
-
-                CRCClassMap<ID3D11BlendState*>::iterator it = mStateManager.getBlendStateMap().find(descCrc);
-
-                if (it != mStateManager.getBlendStateMap().end())
-                {
-                    opState->mBlendState = it->second;
-                }
-                else
-                {
-                    hr = mDevice->CreateBlendState(&mBlendDesc, &opState->mBlendState);
-                    if (FAILED(hr))
-                    {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                            "Failed to create blend state\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
-                    mStateManager.getBlendStateMap()[descCrc] = opState->mBlendState;
-
-                }
-
-            }
-
-            {
-                descCrc = crc32_8bytes((unsigned char  *)&mRasterizerDesc, sizeof(mRasterizerDesc));
-                CRCClassMap<ID3D11RasterizerState*>::iterator it = mStateManager.getRasterizerStateMap().find(descCrc);
-
-                if (it != mStateManager.getRasterizerStateMap().end())
-                {
-                    opState->mRasterizer = it->second;
-                }
-                else
-                {
-                    hr = mDevice->CreateRasterizerState(&mRasterizerDesc, &opState->mRasterizer);
-                    if (FAILED(hr))
-                    {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                            "Failed to create rasterizer state\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
-                    mStateManager.getRasterizerStateMap()[descCrc] = opState->mRasterizer;
-                }
-            }
-
-            {
-                descCrc = crc32_8bytes((unsigned char  *)&mDepthStencilDesc, sizeof(mDepthStencilDesc));
-                CRCClassMap<ID3D11DepthStencilState*>::iterator it = mStateManager.getDepthStencilStateMap().find(descCrc);
-
-                if (it != mStateManager.getDepthStencilStateMap().end())
-                {
-                    opState->mDepthStencilState = it->second;
-                }
-                else
-                {
-
-                    hr = mDevice->CreateDepthStencilState(&mDepthStencilDesc, &opState->mDepthStencilState);
-                    if (FAILED(hr))
-                    {
-                        String errorDescription = mDevice.getErrorDescription(hr);
-                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                            "Failed to create depth stencil state\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
-                    mStateManager.getDepthStencilStateMap()[descCrc] = opState->mDepthStencilState;
-                }
-            }
-
-            TextureUnitState::BindingType remainBindings = TextureUnitState::BT_ALL;
-            uint8 i = 0;
-            while (remainBindings != TextureUnitState::BT_NO_BINDING && i < TextureUnitState::BT_SHIFT_COUNT)
-            {
-                TextureUnitState::BindingType bindingFlag = static_cast<TextureUnitState::BindingType>(1 << i);
-                if ((bindingFlag & remainBindings) == bindingFlag)
-                {
-                    TextureStageGroup& currentStage = mTextureDesc[i];
-                    size_t numberOfSamplers = std::min(currentStage.mHighestSlotUsed, (size_t)(OGRE_MAX_TEXTURE_LAYERS + 1));
-                    D3D11RenderOperationState::SamplersStageGroup&  samplerStage = opState->mSamplers[i];
-                    
-
-                    samplerStage.mSamplerStatesCount = numberOfSamplers;
-                    samplerStage.mTexturesCount = numberOfSamplers;
-                    for (size_t n = 0; n < numberOfSamplers; n++)
-                    {
-                        ID3D11SamplerState * samplerState = NULL;
-                        ID3D11ShaderResourceView *texture = NULL;
-                        TextureSlotDesc& stage = currentStage.mTextureSlots[n];
-                        if (!stage.used)
-                        {
-                            samplerState = NULL;
-                            texture = NULL;
-                        }
-                        else
-                        {
-                            texture = stage.pTex;
-
-                            stage.samplerDesc.Filter = D3D11Mappings::get(FilterMinification[n], FilterMagnification[n],
-                                FilterMips[n], false);
-                            stage.samplerDesc.ComparisonFunc = D3D11Mappings::get(mSceneAlphaRejectFunc);
-                            stage.samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-                            stage.samplerDesc.MipLODBias = static_cast<float>(Math::Clamp(stage.samplerDesc.MipLODBias - 0.5, -16.00, 15.99));
-                            stage.samplerDesc.MinLOD = -D3D11_FLOAT32_MAX;
-                            {
-
-                                descCrc = crc32_8bytes((unsigned char  *)&stage.samplerDesc, sizeof(stage.samplerDesc));
-                                CRCClassMap<ID3D11SamplerState *>::iterator it = mStateManager.getSamplerMap().find(descCrc);
-                                if (it != mStateManager.getSamplerMap().end())
-                                {
-                                    samplerState = it->second;
-                                }
-                                else
-                                {
-                                    HRESULT hr = mDevice->CreateSamplerState(&stage.samplerDesc, &samplerState);
-                                    if (FAILED(hr))
-                                    {
-                                        String errorDescription = mDevice.getErrorDescription(hr);
-                                        OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                                            "Failed to create sampler state\nError Description:" + errorDescription,
-                                            "D3D11RenderSystem::_render");
-                                    }
-                                    mStateManager.getSamplerMap()[descCrc] = samplerState;
-                                }
-                            }
-
-                        }
-                        samplerStage.mSamplerStates[n] = samplerState;
-                        samplerStage.mTextures[n] = texture;
-
-                    }
-
-                    // If no textures are bounded and stencil is enable, then reset texture unit 0,
-                    // to prevent D3D error message where wrong texture type is bounded when reading
-                    // from stencil buffer in a shader.
-                    if (samplerStage.mSamplerStatesCount == 0 && mDepthStencilDesc.StencilEnable == TRUE)
-                    {
-                        samplerStage.mTextures[0] = NULL;
-                        samplerStage.mTexturesCount = 1;
-                    }
-
-                    remainBindings = static_cast<TextureUnitState::BindingType>(remainBindings & (~bindingFlag));
-                }
-                
-                i++;
-            }
-        }
-
-            mDevice.GetImmediateContext()->OMSetBlendState(opState->mBlendState, 0, 0xffffffff); // TODO - find out where to get the parameters
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D11 device cannot set blend state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-
-
-            mDevice.GetImmediateContext()->RSSetState(opState->mRasterizer);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D11 device cannot set rasterizer state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-
-
-
-
-            mDevice.GetImmediateContext()->OMSetDepthStencilState(opState->mDepthStencilState, mStencilRef);
-            if (mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription();
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                    "D3D11 device cannot set depth stencil state\nError Description:" + errorDescription,
-                    "D3D11RenderSystem::_render");
-            }
-     }
-    
-#endif
 
   
     //---------------------------------------------------------------------

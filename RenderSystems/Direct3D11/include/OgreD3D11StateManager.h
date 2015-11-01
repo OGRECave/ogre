@@ -4,6 +4,7 @@
 #include "OgreD3D11Prerequisites.h"
 #include "OgreCRC.h"
 #include "OgreRenderable.h"
+#include "OgreD3D11Device.h"
 #include <OgreTextureUnitState.h>
 
 
@@ -73,25 +74,97 @@ namespace Ogre
 
     };
 
+
+    template <class T>
+    class StateObjectEntry
+    {
+    public:
+
+        struct TimeStampComparer
+        {
+            bool operator() (StateObjectEntry* A, StateObjectEntry* B)
+            {
+                return A->getLastAccessTime() < B->getLastAccessTime();
+            }
+        };
+
+        StateObjectEntry(T stateObject, crc descCrc)
+        {
+            mStateObject = stateObject;
+            mCrc = descCrc;
+            mLastAccess = static_cast<uint64>(clock());
+        }
+        T getStateObject()
+        {
+            mLastAccess = static_cast<uint64>(clock());
+            return mStateObject;
+        }
+
+        uint64 getLastAccessTime() const 
+        {
+            return mLastAccess;
+        }
+
+        crc getCrc()
+        {
+            return mCrc;
+        }
+
+        ~StateObjectEntry()
+        {
+            SAFE_RELEASE(mStateObject);
+        
+        }
+
+
+    private:
+        T mStateObject;
+        uint64 mLastAccess;
+        crc mCrc;
+        
+    };
+
+
+   
+
+
+
     //---------------------------------------------------------------------
     
-    template <class T>  class CRCClassMap : public map< crc, T >::type  {};
-
+    class MapCRCBlendState: public std::map< crc, StateObjectEntry<ID3D11BlendState*> *>{};
+    class MapCRCDepthStencilState : public std::map< crc, StateObjectEntry<ID3D11DepthStencilState*> *>{};
+    class MapCRCRasterizeState : public std::map< crc, StateObjectEntry<ID3D11RasterizerState*>* >{};
+    class MapCRCSamplerState : public std::map< crc, StateObjectEntry<ID3D11SamplerState* >* >{};
+ 
     class StateManager
     {
     private:
+
+        static const String StateCreateMethodName;
         unsigned int mVersion;
-        CRCClassMap<ID3D11BlendState*> mBlendStateMap;
-        CRCClassMap<ID3D11DepthStencilState*> mDepthStencilStateMap;
-        CRCClassMap<ID3D11RasterizerState*> mRasterizerStateMap;
-        CRCClassMap<ID3D11SamplerState*> mSamplerMap;
+        MapCRCBlendState mBlendStateMap;
+        MapCRCDepthStencilState mDepthStencilStateMap;
+        MapCRCRasterizeState mRasterizerStateMap;
+        MapCRCSamplerState mSamplerMap;
+        D3D11Device& mDevice;
+
+        String getCreateErrorMessage(const String& objectType);
     public:
-        CRCClassMap<ID3D11BlendState*> & getBlendStateMap();;
-        CRCClassMap<ID3D11DepthStencilState*>& getDepthStencilStateMap();;
-        CRCClassMap<ID3D11RasterizerState*>& getRasterizerStateMap();;
-        CRCClassMap<ID3D11SamplerState*>& getSamplerMap();;
-        StateManager();
+        StateManager(D3D11Device& device);
         ~StateManager();
+
+        template<class D3D11STATE, class D3DDESC, int MAX_OBJECTS>
+        D3D11STATE createOrRetrieveStateTemplated(std::map<crc, StateObjectEntry<D3D11STATE>* >& container, const D3DDESC& desc);
+        
+        ID3D11BlendState* createOrRetrieveState(const D3D11_BLEND_DESC& blendDesc);
+        ID3D11BlendState* createState(const D3D11_BLEND_DESC& blendDesc);
+        ID3D11RasterizerState* createOrRetrieveState(const D3D11_RASTERIZER_DESC& rasterizerDesc);
+        ID3D11RasterizerState* createState(const D3D11_RASTERIZER_DESC& rasterizerDesc);
+        ID3D11DepthStencilState* createOrRetrieveState(const D3D11_DEPTH_STENCIL_DESC& depthStencilDesc);
+        ID3D11DepthStencilState* createState(const D3D11_DEPTH_STENCIL_DESC& depthStencilDesc);
+        ID3D11SamplerState* createOrRetrieveState(const D3D11_SAMPLER_DESC& samplerDesc);
+        ID3D11SamplerState* createState(const D3D11_SAMPLER_DESC& samplerDesc);
+    
 
         void increaseVersion();
         const unsigned int getVersion();
@@ -128,6 +201,7 @@ namespace Ogre
         // Set to false to exclude the release of ID3D11BlendState, ID3D11DepthStencilState and  ID3D11RasterizerState.
         // If set to false, the user must be responsible to release these.
         bool autoReleaseBaseStates;
+        bool autoReleaseSamplers;
         D3D11RenderOperationState();
 
         ~D3D11RenderOperationState();

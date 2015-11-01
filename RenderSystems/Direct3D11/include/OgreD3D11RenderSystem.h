@@ -165,10 +165,7 @@ namespace Ogre
         typedef std::map<String, ID3D11ClassInstance*> ClassInstanceMap;
         typedef std::map<String, ID3D11ClassInstance*>::iterator ClassInstanceIterator;
         ClassInstanceMap mInstanceMap;
-
-#if SAVE_STATE_RENDERABLE == 1
         StateManager mStateManager;
-#endif
 
         /// structure holding a D3D11 texture/sampler settings for a single slot.
         struct TextureSlotDesc
@@ -234,13 +231,8 @@ namespace Ogre
          */
         void _setRenderTargetViews();
 
-#if SAVE_STATE_RENDERABLE  == 1
-        /** Creates the render states and the sampler states and save them to the renderable
-        */
-        void _applyRenderStateForRenderable(D3D11RenderOperationState* &opState, const RenderOperation& op);
-#endif
         void _bindSamplersForStages(D3D11RenderOperationState* opState);
-        void _applyRenderStates(D3D11RenderOperationState* opState);
+        void _applyRenderStates(D3D11RenderOperationState* &opState, const RenderOperation& op);
 
     public:
         // constructor
