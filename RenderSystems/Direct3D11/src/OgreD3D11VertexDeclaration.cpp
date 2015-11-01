@@ -223,7 +223,12 @@ namespace Ogre {
             LPCSTR semanticName = D3D11Mappings::get(i->getSemantic());
             UINT semanticIndex = i->getIndex();
             if (
-                strcmp(semanticName, inputDesc.SemanticName) == 0
+                
+                (strcmp(semanticName, inputDesc.SemanticName) == 0
+                // treat SV_POSITION in the vertex shader input as POSITION
+                || (strcmp(semanticName, "POSITION") == 0
+                && (strcmp(inputDesc.SemanticName, "SV_POSITION") == 0)))
+                
                 && semanticIndex == inputDesc.SemanticIndex
                 )
             {
