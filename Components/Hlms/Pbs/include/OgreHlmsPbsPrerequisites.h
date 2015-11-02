@@ -55,6 +55,7 @@ namespace Ogre
         PBSM_DIFFUSE,
         PBSM_NORMAL,
         PBSM_SPECULAR,
+        PBSM_METALLIC = PBSM_SPECULAR,
         PBSM_ROUGHNESS,
         PBSM_DETAIL_WEIGHT,
         PBSM_DETAIL0,

@@ -58,6 +58,7 @@ namespace Ogre
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
         mFresnelTypeSizeBytes( 4 ),
         mUseAlphaFromTextures( true ),
+        mMetallicWorkflow( false ),
         mTransparencyMode( None ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 1 ),
@@ -332,9 +333,12 @@ namespace Ogre
         if( mTransparencyMode == Transparent )
         {
             //Precompute the transparency CPU-side.
-            mFresnelR *= mTransparencyValue;
-            mFresnelG *= mTransparencyValue;
-            mFresnelB *= mTransparencyValue;
+            if( !mMetallicWorkflow )
+            {
+                mFresnelR *= mTransparencyValue;
+                mFresnelG *= mTransparencyValue;
+                mFresnelB *= mTransparencyValue;
+            }
             mkDr *= mTransparencyValue * mTransparencyValue;
             mkDg *= mTransparencyValue * mTransparencyValue;
             mkDb *= mTransparencyValue * mTransparencyValue;
@@ -484,9 +488,36 @@ namespace Ogre
         return mRoughness;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setMetallicWorkflow( bool bEnableMetallic )
+    {
+        if( mMetallicWorkflow != bEnableMetallic )
+        {
+            mMetallicWorkflow = bEnableMetallic;
+            flushRenderables();
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsPbsDatablock::getMetallicWorkflow(void) const
+    {
+        return mMetallicWorkflow;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setMetallness( float metalness )
+    {
+        assert( mMetallicWorkflow );
+        mFresnelR = metalness;
+        scheduleConstBufferUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    float HlmsPbsDatablock::getMetallness(void) const
+    {
+        return mFresnelR;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setIndexOfRefraction( const Vector3 &refractionIdx,
                                                        bool separateFresnel )
     {
+        assert( !mMetallicWorkflow );
         Vector3 fresnel = (1.0f - refractionIdx) / (1.0f + refractionIdx);
         fresnel = fresnel * fresnel;
         setFresnel( fresnel, separateFresnel );
@@ -494,6 +525,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setFresnel( const Vector3 &fresnel, bool separateFresnel )
     {
+        assert( !mMetallicWorkflow );
         uint8 fresnelBytes = 4;
         mFresnelR = fresnel.x;
 
