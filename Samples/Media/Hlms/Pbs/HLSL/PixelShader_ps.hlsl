@@ -157,7 +157,8 @@ float4 main( PS_INPUT inPs
 @property( envprobe_map )	uint envMapIdx;@end
 
 @property( diffuse_map || detail_maps_diffuse )float4 diffuseCol;@end
-@property( specular_map )float3 specularCol;@end
+@property( specular_map && !metallic_workflow )float3 specularCol;@end
+@property( metallic_workflow )float3 F0;@end
 @property( roughness_map )float ROUGHNESS;@end
 	
 @property( hlms_normal || hlms_qtangent )	float3 nNormal;@end

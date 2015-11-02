@@ -1,10 +1,15 @@
-@property( !transparent_mode )
-	@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ))@end
-	@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle )@end
-@end @property( transparent_mode )
-	//Premultiply F0.xyz with the alpha from the texture, but only in transparent mode.
-	@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
-	@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w@end
+@property( !metallic_workflow )
+	@property( !transparent_mode )
+		@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ))@end
+		@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle )@end
+	@end @property( transparent_mode )
+		//Premultiply F0.xyz with the alpha from the texture, but only in transparent mode.
+		@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
+		@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w@end
+	@end
+@end @property( metallic_workflow )
+	@piece( getSpecularFresnel )F0 + pow( 1.0 - VdotH, 5.0 ) * (1.0 - F0)@end
+	@piece( getDiffuseFresnel )1.0 - F0 + pow( 1.0 - NdotL, 5.0 ) * F0@end
 @end
 
 @property( BRDF_CookTorrance )

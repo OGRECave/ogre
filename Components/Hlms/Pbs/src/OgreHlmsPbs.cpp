@@ -79,6 +79,7 @@ namespace Ogre
     const IdString PbsProperty::FresnelScalar     = IdString( "fresnel_scalar" );
     const IdString PbsProperty::UseTextureAlpha   = IdString( "use_texture_alpha" );
     const IdString PbsProperty::TransparentMode   = IdString( "transparent_mode" );
+    const IdString PbsProperty::MetallicWorkflow  = IdString( "metallic_workflow" );
 
     const IdString PbsProperty::NormalWeight          = IdString( "normal_weight" );
     const IdString PbsProperty::NormalWeightTex       = IdString( "normal_weight_tex" );
@@ -415,7 +416,9 @@ namespace Ogre
         assert( dynamic_cast<HlmsPbsDatablock*>( renderable->getDatablock() ) );
         HlmsPbsDatablock *datablock = static_cast<HlmsPbsDatablock*>(
                                                         renderable->getDatablock() );
-        setProperty( PbsProperty::FresnelScalar, datablock->hasSeparateFresnel() );
+        setProperty( PbsProperty::FresnelScalar, datablock->hasSeparateFresnel() ||
+                                                 datablock->getMetallicWorkflow() );
+        setProperty( PbsProperty::MetallicWorkflow, datablock->getMetallicWorkflow() );
 
         uint32 brdf = datablock->getBrdf();
         if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::Default )

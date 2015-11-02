@@ -151,6 +151,7 @@ namespace Ogre
         uint8   mBlendModes[4];
         uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
         bool    mUseAlphaFromTextures;
+		bool	mMetallicWorkflow;
         TransparencyModes mTransparencyMode;
 
         float   mkDr, mkDg, mkDb;                   //kD
@@ -286,6 +287,37 @@ namespace Ogre
         /// Sets the roughness
         void setRoughness( float roughness );
         float getRoughness(void) const;
+
+        /** Sets whether to use a specular workflow, or a metallic workflow.
+        @remarks
+            The texture types PBSM_SPECULAR & PBSM_METALLIC map to the same value.
+        @par
+            When in metal workflow, the texture is used as a metallic texture,
+            and is expected to be a monochrome texture. Global specularity's strength
+            can still be affected via setSpecular. The fresnel settings should not
+            be used (metalness is stored where fresnel used to).
+        @par
+            When in specular workflow, the texture is used as a specular texture,
+            and is expected to be either coloured or monochrome.
+            setMetalness should not be called in this mode.
+        @par
+            If "bEnableMetallic" was different from the current setting, it will call
+            @see HlmsDatablock::flushRenderables. If the another shader must be created,
+            it could cause a stall.
+        @param bEnableMetallic
+        */
+        void setMetallicWorkflow( bool bEnableMetallic );
+        bool getMetallicWorkflow(void) const;
+
+        /** Sets the metalness in a metallic workflow.
+        @remarks
+            Overrides any fresnel value.
+            Should be in Metallic mode. @see setMetallicWorkflow;
+        @param metalness
+            Value in range [0; 1]
+        */
+        void setMetallness( float metalness );
+        float getMetallness(void) const;
 
         /** Calculates fresnel (F0 in most books) based on the IOR.
             The formula used is ( (1 - idx) / 1 + idx )²
