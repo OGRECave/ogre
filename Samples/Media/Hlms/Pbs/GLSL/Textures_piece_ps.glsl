@@ -15,10 +15,14 @@
 @end
 
 @property( !metallic_workflow )
-	@property( specular_map )
+	@property( specular_map && !fresnel_workflow )
 		@piece( SampleSpecularMap )	specularCol = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz * material.kS.xyz;@end
 		@piece( kS )specularCol@end
-	@end @property( !specular_map )
+	@end
+	@property( specular_map && fresnel_workflow )
+		@piece( SampleSpecularMap )	F0 = texture( textureMaps[@value( specular_map_idx )], vec3(inPs.uv@value(uv_specular).xy, specularIdx) ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
+	@end
+	@property( !specular_map || fresnel_workflow )
 		@piece( kS )material.kS.xyz@end
 	@end
 @end @property( metallic_workflow )
