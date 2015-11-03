@@ -58,7 +58,7 @@ namespace Ogre
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
         mFresnelTypeSizeBytes( 4 ),
         mUseAlphaFromTextures( true ),
-        mMetallicWorkflow( false ),
+        mWorkflow( SpecularWorkflow ),
         mTransparencyMode( None ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 1 ),
@@ -333,7 +333,7 @@ namespace Ogre
         if( mTransparencyMode == Transparent )
         {
             //Precompute the transparency CPU-side.
-            if( !mMetallicWorkflow )
+            if( mWorkflow != MetallicWorkflow )
             {
                 mFresnelR *= mTransparencyValue;
                 mFresnelG *= mTransparencyValue;
@@ -488,23 +488,23 @@ namespace Ogre
         return mRoughness;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setMetallicWorkflow( bool bEnableMetallic )
+    void HlmsPbsDatablock::setWorkflow( Workflows workflow )
     {
-        if( mMetallicWorkflow != bEnableMetallic )
+        if( mWorkflow != workflow )
         {
-            mMetallicWorkflow = bEnableMetallic;
+            mWorkflow = static_cast<uint8>( workflow );
             flushRenderables();
         }
     }
     //-----------------------------------------------------------------------------------
-    bool HlmsPbsDatablock::getMetallicWorkflow(void) const
+    HlmsPbsDatablock::Workflows HlmsPbsDatablock::getWorkflow(void) const
     {
-        return mMetallicWorkflow;
+        return static_cast<Workflows>( mWorkflow );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setMetallness( float metalness )
     {
-        assert( mMetallicWorkflow );
+        assert( mWorkflow == MetallicWorkflow );
         mFresnelR = metalness;
         scheduleConstBufferUpdate();
     }
@@ -517,7 +517,7 @@ namespace Ogre
     void HlmsPbsDatablock::setIndexOfRefraction( const Vector3 &refractionIdx,
                                                        bool separateFresnel )
     {
-        assert( !mMetallicWorkflow );
+        assert( mWorkflow != MetallicWorkflow );
         Vector3 fresnel = (1.0f - refractionIdx) / (1.0f + refractionIdx);
         fresnel = fresnel * fresnel;
         setFresnel( fresnel, separateFresnel );
@@ -525,7 +525,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setFresnel( const Vector3 &fresnel, bool separateFresnel )
     {
-        assert( !mMetallicWorkflow );
+        assert( mWorkflow != MetallicWorkflow );
         uint8 fresnelBytes = 4;
         mFresnelR = fresnel.x;
 
@@ -839,14 +839,16 @@ namespace Ogre
         return mBrdf;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::importUnity( const Vector3 &diffuse, const Vector3 &specular, Real roughness,
-                                        bool changeBrdf )
+    void HlmsPbsDatablock::importUnity( const Vector3 &diffuse, const Vector3 &specular,
+                                        Real roughness, bool changeBrdf )
     {
         if( changeBrdf )
         {
             //Set the BRDF that matches Unity the closest.
             setBrdf( PbsBrdf::DefaultUncorrelated );
         }
+
+        setWorkflow( SpecularAsFresnelWorkflow );
 
         setDiffuse( diffuse );
 
@@ -864,10 +866,23 @@ namespace Ogre
         setRoughness( roughness );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::importUnity( const Vector3 &colour, Real metallic, Real roughness, bool changeBrdf )
+    void HlmsPbsDatablock::importUnity( const Vector3 &colour, Real metallic,
+                                        Real roughness, bool changeBrdf )
     {
-        Vector3 fresnel = Math::lerp( Vector3( 0.03f ), colour, metallic );
-        importUnity( colour, fresnel, roughness, changeBrdf );
+        if( changeBrdf )
+        {
+            //Set the BRDF that matches Unity the closest.
+            setBrdf( PbsBrdf::DefaultUncorrelated );
+        }
+
+        setWorkflow( MetallicWorkflow );
+
+        setDiffuse( colour );
+
+        setSpecular( Vector3::UNIT_SCALE );
+        setFresnel( Vector3::UNIT_SCALE, false );
+        setMetallness( metallic );
+        setRoughness( roughness );
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::TextureMapType HlmsPbsDatablock::suggestMapTypeBasedOnTextureType(

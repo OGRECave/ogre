@@ -41,12 +41,18 @@
 @end
 
 @property( !metallic_workflow )
-	@property( specular_map )
+	@property( specular_map && !fresnel_workflow )
 		@piece( SampleSpecularMap )	specularCol = textureMaps[@value( specular_map_idx )].Sample( samplerStates[@value(specular_map_idx)], float3(inPs.uv@value(uv_specular).xy, specularIdx) ).xyz * material.kS.xyz;@end
 		@piece( specularExtraParamDef ), float3 specularCol@end
 		@piece( specularExtraParam ), specularCol.xyz@end
 		@piece( kS )specularCol@end
-	@end @property( !specular_map )
+	@end
+	@property( specular_map && fresnel_workflow )
+		@piece( SampleSpecularMap )	F0 = textureMaps[@value( specular_map_idx )].Sample( samplerStates[@value(specular_map_idx)], float3(inPs.uv@value(uv_specular).xy, specularIdx) ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
+		@piece( specularExtraParamDef ), @insertpiece( FresnelType ) F0@end
+		@piece( specularExtraParam ), F0@end
+	@end
+	@property( !specular_map || fresnel_workflow )
 		@piece( kS )material.kS.xyz@end
 	@end
 @end @property( metallic_workflow )
