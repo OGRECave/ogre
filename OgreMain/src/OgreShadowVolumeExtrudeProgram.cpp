@@ -702,23 +702,24 @@ static const String glsles_prefix = "precision highp float;\
                                     precision lowp samplerCube;";
 
     String ShadowVolumeExtrudeProgram::mModulate_Fs_glsl =
-        "uniform sampler2D RT; \
-        uniform vec4 shadowColor; \
-        varying vec2 uv0; \
-        \
-        void main() {\
-            gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\
+        "uniform sampler2D RT;\n\
+        uniform vec4 shadowColor;\n\
+        in vec2 uv0;\n\
+        \n\
+        void main()\n\
+        {\n\
+            gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\n\
         }";
 
     String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl =
-        "uniform mat4 worldViewProj; \
-        attribute vec4 inPos; \
-        varying vec4 uv0; \
-        \
-        void main() {\
-            gl_Position = worldViewProj*inPos; \
-            inPos.xy = sign(inPos.xy); \
-            uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f; \
+        "uniform mat4 worldViewProj;\n\
+        in vec4 inPos;\n\
+        out vec2 uv0;\n\
+        \n\
+        void main()\n\
+        {\n\
+            gl_Position = worldViewProj * inPos;\n\
+            uv0 = (vec2(sign(inPos.x), - sign(inPos.y)) + 1.0f) * 0.5f;\n\
         }";
 
 
@@ -781,7 +782,7 @@ static const String glsles_prefix = "precision highp float;\
 			vsTarget = "glsl";
 			fsTarget = "glsl";
 			language = "glsl";
-			vsProgram = mModulate_Vs_glsl;
+			vsProgram = "#version 150\n\n" + mModulate_Vs_glsl;
 			fsProgram = mModulate_Fs_glsl;
 		}
 		else if (glsles)
@@ -789,8 +790,8 @@ static const String glsles_prefix = "precision highp float;\
             vsTarget = "glsles";
             fsTarget = "glsles";
             language = "glsles";
-            vsProgram = glsles_prefix+mModulate_Vs_glsl;
-            fsProgram = glsles_prefix+mModulate_Fs_glsl;
+            vsProgram = glsles_prefix + mModulate_Vs_glsl;
+            fsProgram = glsles_prefix + mModulate_Fs_glsl;
 		}
 		else
 		{
