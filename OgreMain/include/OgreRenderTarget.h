@@ -488,6 +488,7 @@ namespace Ogre {
         unsigned long mLastSecond;
         unsigned long mLastTime;
         size_t mFrameCount;
+        size_t mUpdateCount;
 
         bool mActive;
         bool mAutoUpdate;

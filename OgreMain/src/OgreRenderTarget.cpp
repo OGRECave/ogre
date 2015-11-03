@@ -345,11 +345,12 @@ namespace Ogre {
         mStats.batchCount = 0;
         mStats.bestFrameTime = 999999;
         mStats.worstFrameTime = 0;
-        mStats.vBlankMissCount = 0;
+        mStats.vBlankMissCount = -1;
 
         mLastTime = mTimer->getMilliseconds();
         mLastSecond = mLastTime;
         mFrameCount = 0;
+        mUpdateCount = 0;
     }
 
     void RenderTarget::updateStats(void)
@@ -367,16 +368,24 @@ namespace Ogre {
         // check if new second (update only once per second)
         if (thisTime - mLastSecond > 1000) 
         { 
+            ++mUpdateCount;
             // new second - not 100% precise
             mStats.lastFPS = (float)mFrameCount / (float)(thisTime - mLastSecond) * 1000.0f;
 
-            if (mStats.avgFPS == 0)
-                mStats.avgFPS = mStats.lastFPS;
-            else
-                mStats.avgFPS = (mStats.avgFPS + mStats.lastFPS) / 2; // not strictly correct, but good enough
+            // Update best, worst and average FPS after 5 seconds mark.
+            // eliminating initialization lags.
 
-            mStats.bestFPS = std::max(mStats.bestFPS, mStats.lastFPS);
-            mStats.worstFPS = std::min(mStats.worstFPS, mStats.lastFPS);
+            if (mUpdateCount >  5)
+            {
+                // Use Cumulative moving average recursive formula to calculate the average FPS.
+                mStats.avgFPS += (mStats.lastFPS - mStats.avgFPS) / (float)mUpdateCount;
+                mStats.bestFPS = std::max(mStats.bestFPS, mStats.lastFPS);
+                mStats.worstFPS = std::min(mStats.worstFPS, mStats.lastFPS);
+            }
+            else
+            {
+                mStats.avgFPS = mStats.lastFPS;
+            }
 
             mLastSecond = thisTime ;
             mFrameCount  = 0;
