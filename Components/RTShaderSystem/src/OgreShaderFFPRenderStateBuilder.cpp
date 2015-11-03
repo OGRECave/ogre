@@ -159,27 +159,42 @@ void FFPRenderStateBuilder::buildRenderState(ShaderGenerator::SGPass* sgPass, Ta
 
 //-----------------------------------------------------------------------------
 void FFPRenderStateBuilder::buildFFPSubRenderState(int subRenderStateOrder, const String& subRenderStateType,
-                                                ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState)
+    ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState)
 {
     SubRenderState* subRenderState;
-
+     ShaderGenerator& shaderGenerator = ShaderGenerator::getSingleton();
     subRenderState = sgPass->getCustomFFPSubState(subRenderStateOrder);
 
-    if (subRenderState == NULL) 
-    {
-        subRenderState = ShaderGenerator::getSingleton().createSubRenderState(subRenderStateType);      
-    }
-
-    if (subRenderState->preAddToRenderState(renderState, sgPass->getSrcPass(), sgPass->getDstPass()))
+    // try adding custom sub render state
+    if (subRenderState != NULL && subRenderState->preAddToRenderState(renderState, sgPass->getSrcPass(), sgPass->getDstPass()))
     {
         renderState->addSubRenderStateInstance(subRenderState);
     }
     else
-    {       
-        ShaderGenerator::getSingleton().destroySubRenderState(subRenderState);              
+    {
+        if (subRenderState != NULL)
+        {
+            shaderGenerator.destroySubRenderState(subRenderState);
+            subRenderState = NULL;
+        }
     }
-}
 
+    // if custom sub render state has not been added then 
+    // try adding standard ffp sub render state
+    if (subRenderState == NULL)
+    {
+        subRenderState = shaderGenerator.createSubRenderState(subRenderStateType);
+        if (subRenderState->preAddToRenderState(renderState, sgPass->getSrcPass(), sgPass->getDstPass()))
+        {
+            renderState->addSubRenderStateInstance(subRenderState);
+        }
+        else
+        {
+            shaderGenerator.destroySubRenderState(subRenderState);
+        }
+    }
+    
+}
 
 //-----------------------------------------------------------------------------
 void FFPRenderStateBuilder::resolveColourStageFlags( ShaderGenerator::SGPass* sgPass, TargetRenderState* renderState )
