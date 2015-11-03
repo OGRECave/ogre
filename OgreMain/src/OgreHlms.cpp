@@ -123,6 +123,9 @@ namespace Ogre
 
     const IdString HlmsBasePieces::AlphaTestCmpFunc = IdString( "alpha_test_cmp_func" );
 
+    //GL extensions
+    const IdString HlmsBaseProp::GlAmdTrinaryMinMax = IdString( "hlms_amd_trinary_minmax" );
+
     const IdString *HlmsBaseProp::UvCountPtrs[8] =
     {
         &HlmsBaseProp::UvCount0,
@@ -1543,6 +1546,15 @@ namespace Ogre
             }
         }
 
+        {
+            //Add RenderSystem-specific properties
+            IdStringVec::const_iterator itor = mRsSpecificExtensions.begin();
+            IdStringVec::const_iterator end  = mRsSpecificExtensions.end();
+
+            while( itor != end )
+                setProperty( *itor++, 1 );
+        }
+
         GpuProgramPtr shaders[NumShaderTypes];
         //Generate the shaders
         for( size_t i=0; i<NumShaderTypes; ++i )
@@ -2286,6 +2298,9 @@ namespace Ogre
             else
             {
                 mShaderFileExt = ".glsl";
+
+                if( mRenderSystem->checkExtension( "GL_AMD_shader_trinary_minmax" ) )
+                    mRsSpecificExtensions.push_back( HlmsBaseProp::GlAmdTrinaryMinMax );
             }
 
             if( !mDefaultDatablock )

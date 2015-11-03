@@ -158,6 +158,9 @@ namespace Ogre {
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
 #endif
 
+        /// @copydoc RenderSystem::checkExtension
+        virtual bool checkExtension( const String &ext ) const;
+
         unsigned char *mSwIndirectBufferPtr;
 
         GL3PlusHlmsPso const *mPso;
