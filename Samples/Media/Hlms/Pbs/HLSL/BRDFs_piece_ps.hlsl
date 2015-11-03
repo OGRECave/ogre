@@ -12,6 +12,12 @@
 	@piece( getDiffuseFresnel )1.0 - F0 + pow( 1.0 - NdotL, 5.0 ) * F0@end
 @end
 
+@property( !fresnel_scalar )
+	@piece( getMaxFresnelS )fresnelS@end
+@end @property( fresnel_scalar )
+	@piece( getMaxFresnelS )max( fresnelS.x, max( fresnelS.y, fresnelS.z ) )@end
+@end
+
 @property( BRDF_CookTorrance )
 @piece( DeclareBRDF )
 //Cook-Torrance
@@ -51,7 +57,7 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 @property( fresnel_separate_diffuse )
 	@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
 @end @property( !fresnel_separate_diffuse )
-	@insertpiece( FresnelType ) fresnelD = 1.0 - fresnelS;@end
+	float fresnelD = 1.0f - @insertpiece( getMaxFresnelS );@end
 
 	//Avoid very small denominators, they go to NaN or cause aliasing artifacts
 	@insertpiece( FresnelType ) Rs = ( fresnelS * (R * G)  ) / max( 4.0 * NdotV * NdotL, 0.01 );
@@ -111,7 +117,7 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 @property( fresnel_separate_diffuse )
 	@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
 @end @property( !fresnel_separate_diffuse )
-	@insertpiece( FresnelType ) fresnelD = 1.0 - fresnelS;@end
+	float fresnelD = 1.0f - @insertpiece( getMaxFresnelS );@end
 
 	//We should divide Rd by PI, but it is already included in kD
 	float3 Rd = (lightScatter * viewScatter * fresnelD) * @insertpiece( kD ).xyz * lightDiffuse;
@@ -126,10 +132,11 @@ float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDiffuse, 
 	float VdotH = saturate( dot( viewDir, normalize( reflDir + viewDir ) ) );
 	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
 
-	@property( !fresnel_separate_diffuse )
-		finalColour += lerp( envColourD * @insertpiece( kD ).xyz, envColourS * @insertpiece( kS ).xyz, fresnelS );
-	@end @property( fresnel_separate_diffuse )
+	@property( fresnel_separate_diffuse )
 		@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
-		finalColour += envColourD * @insertpiece( kD ).xyz + envColourS * @insertpiece( kS ).xyz * fresnelS;
-	@end
+	@end @property( !fresnel_separate_diffuse )
+		float fresnelD = 1.0f - @insertpiece( getMaxFresnelS );@end
+
+	finalColour += envColourD * @insertpiece( kD ).xyz * fresnelD +
+					envColourS * @insertpiece( kS ).xyz * fresnelS;
 @end
