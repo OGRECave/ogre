@@ -129,7 +129,10 @@ namespace Ogre
 
         HlmsDatablockMap mDatablocks;
 
+        typedef vector<IdString>::type IdStringVec;
+
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
+        IdStringVec     mRsSpecificExtensions;
         String const    *mShaderTargets[NumShaderTypes]; ///[0] = "vs_4_0", etc. Only used by D3D
         String          mShaderFileExt; /// Either glsl or hlsl
         String          mOutputPath;
@@ -589,6 +592,9 @@ namespace Ogre
         static const IdString HighQuality;
         static const IdString TexGather;
         static const IdString DisableStage;
+
+        //Useful GL Extensions
+        static const IdString GlAmdTrinaryMinMax;
 
         static const IdString *UvCountPtrs[8];
     };

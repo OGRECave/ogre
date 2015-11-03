@@ -15,7 +15,8 @@
 @property( !fresnel_scalar )
 	@piece( getMaxFresnelS )fresnelS@end
 @end @property( fresnel_scalar )
-	@piece( getMaxFresnelS )max( fresnelS.x, max( fresnelS.y, fresnelS.z ) )@end
+	@property(  hlms_amd_trinary_minmax )@piece( getMaxFresnelS )max3( fresnelS.x, fresnelS.y, fresnelS.z )@end @end
+	@property( !hlms_amd_trinary_minmax )@piece( getMaxFresnelS )max( fresnelS.x, max( fresnelS.y, fresnelS.z ) )@end @end
 @end
 
 @property( BRDF_CookTorrance )
@@ -47,7 +48,8 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 	float shared_geo = 2.0 * NdotH / VdotH;
 	float geo_b	= shared_geo * NdotV;
 	float geo_c	= shared_geo * NdotL;
-	float G	 	= min( 1.0, min( geo_b, geo_c ) );
+	@property( !hlms_amd_trinary_minmax )float G	 	= min( 1.0, min( geo_b, geo_c ) );@end
+	@property(  hlms_amd_trinary_minmax )float G	 	= min3( 1.0, geo_b, geo_c );@end
 
 	//Fresnel term (Schlick's approximation)
 	//Formula:
