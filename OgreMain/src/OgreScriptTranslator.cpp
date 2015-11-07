@@ -7830,6 +7830,7 @@ namespace Ogre{
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
                 case ID_USES_UAV:
+                case ID_EXPOSE:
                 case ID_COLOUR_WRITE:
                     break;
                 default:
@@ -8086,6 +8087,7 @@ namespace Ogre{
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
                 case ID_USES_UAV:
+                case ID_EXPOSE:
                 case ID_COLOUR_WRITE:
                     break;
                 default:
@@ -8650,6 +8652,30 @@ namespace Ogre{
                                     uavSlot, static_cast<ResourceAccess::ResourceAccess>(access),
                                     allowWriteAfterWrite );
                         mPassDef->mUavDependencies.push_back( uavDep );
+                    }
+                    break;
+                case ID_EXPOSE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "expose only supports 1 argument");
+                    }
+                    else
+                    {
+                        IdString val;
+                        if( !getIdString(prop->values.front(), &val) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "expose must be the name of a texture available in the local or global scope");
+                        }
+                        else
+                        {
+                            mPassDef->mExposedTextures.push_back( val );
+                        }
                     }
                     break;
                 case ID_COLOUR_WRITE:

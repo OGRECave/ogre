@@ -1250,6 +1250,7 @@ namespace Ogre
         mIds["viewport_modifier_mask"]   = ID_VIEWPORT_MODIFIER_MASK;
         mIds["uses_uav"]        = ID_USES_UAV;
         mIds["allow_write_after_write"] = ID_ALLOW_WRITE_AFTER_WRITE;
+        mIds["expose"]          = ID_EXPOSE;
         mIds["lod_bias"]        = ID_LOD_BIAS;
         mIds["lod_update_list"] = ID_LOD_UPDATE_LIST;
         mIds["lod_camera"]      = ID_LOD_CAMERA;
