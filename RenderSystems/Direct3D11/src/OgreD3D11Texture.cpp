@@ -434,7 +434,7 @@ namespace Ogre
 
         ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
 
-        if( !(mUsage & TU_UAV_NOT_TEXTURE) )
+        if( !(mUsage & TU_NOT_TEXTURE) )
         {
             mSRVDesc.Format = desc.Format;
             mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE1D;
@@ -570,7 +570,7 @@ namespace Ogre
         
         ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
 
-        if( !(mUsage & TU_UAV_NOT_TEXTURE) )
+        if( !(mUsage & TU_NOT_TEXTURE) )
         {
             mSRVDesc.Format = desc.Format;
 
@@ -694,7 +694,7 @@ namespace Ogre
 
         ZeroMemory( &mSRVDesc, sizeof(mSRVDesc) );
 
-        if( !(mUsage & TU_UAV_NOT_TEXTURE) )
+        if( !(mUsage & TU_NOT_TEXTURE) )
         {
             mSRVDesc.Format = desc.Format;
             mSRVDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE3D;
@@ -824,7 +824,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11Texture::_createSurfaceList(void)
     {
-        if( mUsage & TU_UAV_NOT_TEXTURE )
+        if( mUsage & TU_NOT_TEXTURE )
             return;
 
         unsigned int bufusage;

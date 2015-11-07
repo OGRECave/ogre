@@ -3,7 +3,7 @@ compositor_node TutorialUav01_SetupRenderingNode
 	in 0 rt_renderwindow
 
 	texture nullDummy target_width target_height PF_NULL
-	texture testTexture target_width target_height PF_R8G8B8A8 depth_pool 0 uav
+	texture testTexture target_width target_height PF_R8G8B8A8 depth_pool 0 no_gamma uav
 
 	//UAVs can be cleared
 	target testTexture

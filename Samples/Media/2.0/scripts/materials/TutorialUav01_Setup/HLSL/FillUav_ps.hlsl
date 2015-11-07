@@ -1,4 +1,4 @@
-RWTexture2D testTexture			: register(u1);
+RWTexture2D<float4> testTexture			: register(u1);
 
 struct PS_INPUT
 {
