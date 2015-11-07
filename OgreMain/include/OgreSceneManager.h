@@ -1423,6 +1423,8 @@ namespace Ogre {
         */
         void _addCompositorTexture( IdString name, const TextureVec *texs );
 
+        /// @see CompositorPassDef::mExposedTextures for the textures that are available
+        /// in the current compositor pass. The compositor script keyword is "expose".
         const CompositorTextureVec& getCompositorTextures(void) const   { return mCompositorTextures; }
 
         /// Gets the number of currently active compositor textures
