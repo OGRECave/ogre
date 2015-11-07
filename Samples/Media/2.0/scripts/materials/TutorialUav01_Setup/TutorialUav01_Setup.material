@@ -26,7 +26,7 @@ fragment_program FillUav_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
-fragment_program UseUavAsTexture_ps_HLSL glsl
+fragment_program UseUavAsTexture_ps_HLSL hlsl
 {
 	source UseUavAsTexture_ps.hlsl
 	entry_point main
