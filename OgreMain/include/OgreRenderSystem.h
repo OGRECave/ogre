@@ -1459,6 +1459,9 @@ namespace Ogre
 		*/
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer) { return false; };
 
+        /// Checks for the presense of an API-specific extension (eg. Vulkan, GL)
+        virtual bool checkExtension( const String &ext ) const      { return false; }
+
     protected:
 
         void cleanReleasedDepthBuffers(void);

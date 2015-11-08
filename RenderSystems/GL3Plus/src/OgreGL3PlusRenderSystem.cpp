@@ -3774,4 +3774,8 @@ namespace Ogre {
 		return result;
 	}
 #endif
+    bool GL3PlusRenderSystem::checkExtension( const String &ext ) const
+    {
+        return mGLSupport->checkExtension( ext );
+    }
 }

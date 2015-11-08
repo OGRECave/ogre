@@ -2,6 +2,7 @@
 @property( !GL430 )
 @property( hlms_tex_gather )#extension GL_ARB_texture_gather: require@end
 @end
+@property( hlms_amd_trinary_minmax )#extension GL_AMD_shader_trinary_minmax: require@end
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
@@ -51,8 +52,8 @@ in block
 @property( envprobe_map )	uint envMapIdx;@end
 
 @property( diffuse_map || detail_maps_diffuse )vec4 diffuseCol;@end
-@property( specular_map && !metallic_workflow )vec3 specularCol;@end
-@property( metallic_workflow )vec3 F0;@end
+@property( specular_map && !metallic_workflow && !fresnel_workflow )vec3 specularCol;@end
+@property( metallic_workflow || (specular_map && fresnel_workflow) )@insertpiece( FresnelType ) F0;@end
 @property( roughness_map )float ROUGHNESS;@end
 
 Material material;

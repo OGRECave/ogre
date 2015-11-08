@@ -143,6 +143,22 @@ namespace Ogre
             /// object until it completely disappears.
             Fade
         };
+
+        enum Workflows
+        {
+            /// Specular workflow. Many popular PBRs use SpecularAsFresnelWorkflow
+            /// though. @see setWorkflow
+            SpecularWorkflow,
+
+            /// Specular workflow where the specular texture is addressed to the fresnel
+            /// instead of kS. This is normally referred as simply Specular workflow
+            /// in many other PBRs. @see setWorkflow
+            SpecularAsFresnelWorkflow,
+
+            //// Metallic workflow. @see setWorkflow
+            MetallicWorkflow,
+        };
+
     protected:
         /// [0] = Regular one.
         /// [1] = Used during shadow mapping
@@ -151,7 +167,7 @@ namespace Ogre
         uint8   mBlendModes[4];
         uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
         bool    mUseAlphaFromTextures;
-		bool	mMetallicWorkflow;
+        uint8	mWorkflow;
         TransparencyModes mTransparencyMode;
 
         float   mkDr, mkDg, mkDb;                   //kD
@@ -301,18 +317,18 @@ namespace Ogre
             and is expected to be either coloured or monochrome.
             setMetalness should not be called in this mode.
         @par
-            If "bEnableMetallic" was different from the current setting, it will call
+            If "workflow" was different from the current setting, it will call
             @see HlmsDatablock::flushRenderables. If the another shader must be created,
             it could cause a stall.
         @param bEnableMetallic
         */
-        void setMetallicWorkflow( bool bEnableMetallic );
-        bool getMetallicWorkflow(void) const;
+        void setWorkflow( Workflows workflow );
+        Workflows getWorkflow(void) const;
 
         /** Sets the metalness in a metallic workflow.
         @remarks
             Overrides any fresnel value.
-            Should be in Metallic mode. @see setMetallicWorkflow;
+            Should be in Metallic mode. @see setWorkflow;
         @param metalness
             Value in range [0; 1]
         */

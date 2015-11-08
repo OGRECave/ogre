@@ -203,6 +203,7 @@ namespace Ogre
         static const IdString FresnelScalar;
         static const IdString UseTextureAlpha;
         static const IdString TransparentMode;
+        static const IdString FresnelWorkflow;
         static const IdString MetallicWorkflow;
 
         static const IdString NormalWeight;
