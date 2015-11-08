@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 #include "Compositor/OgreCompositorChannel.h"
+#include "OgreResourceTransition.h"
 
 namespace Ogre
 {
@@ -41,6 +42,8 @@ namespace Ogre
     /** \addtogroup Effects
     *  @{
     */
+
+    struct BoundUav;
 
     /** A compositor workspace is the main interface to render into an RT, be it a RenderWindow or an
         RTT (Render Texture Target). Whereas Ogre 1.x needed you to set a Viewport in order to render
@@ -126,6 +129,8 @@ namespace Ogre
             need the passes to have been already created
         */
         void setupPassesShadowNodes(void);
+
+        void analyzeHazardsAndPlaceBarriers(void);
 
     public:
         CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,

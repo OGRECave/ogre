@@ -438,8 +438,8 @@ namespace Ogre
         case DXGI_FORMAT_R32_TYPELESS:              return PF_UNKNOWN;
         case DXGI_FORMAT_D32_FLOAT:                 return PF_D32_FLOAT;
         case DXGI_FORMAT_R32_FLOAT:                 return PF_FLOAT32_R;
-        case DXGI_FORMAT_R32_UINT:                  return PF_UNKNOWN;
-        case DXGI_FORMAT_R32_SINT:                  return PF_UNKNOWN;
+        case DXGI_FORMAT_R32_UINT:                  return PF_R32_UINT;
+        case DXGI_FORMAT_R32_SINT:                  return PF_R32_SINT;
         case DXGI_FORMAT_R24G8_TYPELESS:            return PF_UNKNOWN;
         case DXGI_FORMAT_D24_UNORM_S8_UINT:         return PF_D24_UNORM_S8_UINT;
         case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:     return PF_D24_UNORM_X8;
@@ -547,6 +547,8 @@ namespace Ogre
         case PF_FLOAT32_R:      return DXGI_FORMAT_R32_FLOAT;
         case PF_FLOAT32_RGBA:   return DXGI_FORMAT_R32G32B32A32_FLOAT;
         case PF_SHORT_RGBA:     return DXGI_FORMAT_R16G16B16A16_UNORM;
+        case PF_R32_UINT:       return DXGI_FORMAT_R32_UINT;
+        case PF_R32_SINT:       return DXGI_FORMAT_R32_SINT;
         case PF_DXT1:           return DXGI_FORMAT_BC1_UNORM;
         case PF_DXT2:           return DXGI_FORMAT_BC1_UNORM;
         case PF_DXT3:           return DXGI_FORMAT_BC2_UNORM;
@@ -695,7 +697,17 @@ namespace Ogre
 			}
 		}
 
-		return isRenderTarget ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
+        UINT retVal = 0;
+        if( !(usage & TU_NOT_TEXTURE) )
+            retVal |= D3D11_BIND_SHADER_RESOURCE;
+
+        if( isRenderTarget )
+            retVal |= D3D11_BIND_RENDER_TARGET;
+
+        if( usage & TU_UAV )
+            retVal |= D3D11_BIND_UNORDERED_ACCESS;
+
+        return retVal;
 	}
 
     UINT D3D11Mappings::_getTextureMiscFlags(UINT bindflags, TextureType textype, bool isdynamic, int usage)

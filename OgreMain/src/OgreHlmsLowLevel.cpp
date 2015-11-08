@@ -198,9 +198,9 @@ namespace Ogre
 
             if( pTex->getContentType() == TextureUnitState::CONTENT_COMPOSITOR )
             {
-                const SceneManager::CompositorTextureVec &compositorTextures = mCurrentSceneManager->
+                const CompositorTextureVec &compositorTextures = mCurrentSceneManager->
                                                                                 getCompositorTextures();
-                SceneManager::CompositorTextureVec::const_iterator itor = std::find(
+                CompositorTextureVec::const_iterator itor = std::find(
                                                     compositorTextures.begin(), compositorTextures.end(),
                                                     pTex->getReferencedTextureName() );
 

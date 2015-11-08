@@ -78,6 +78,8 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
+        executeResourceTransitions();
+
         mRenderSystem->setStencilCheckEnabled( mDefinition->mStencilCheck );
         mRenderSystem->setStencilBufferParams( mDefinition->mCompareFunc, mDefinition->mStencilRef,
                                     mDefinition->mStencilMask, 0xFFFFFFFF, mDefinition->mStencilFailOp,

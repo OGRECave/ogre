@@ -137,4 +137,29 @@ namespace Ogre
 
         TextureDefinitionBase::removeTexture( name );
     }
+    //-----------------------------------------------------------------------------------
+    size_t CompositorNodeDef::getPassNumber( const CompositorPassDef *passDef ) const
+    {
+        size_t passCount = 0;
+        CompositorTargetDefVec::const_iterator itor = mTargetPasses.begin();
+        CompositorTargetDefVec::const_iterator end  = mTargetPasses.end();
+
+        while( itor != end )
+        {
+            CompositorPassDefVec::const_iterator itPassDef = itor->getCompositorPasses().begin();
+            CompositorPassDefVec::const_iterator enPassDef = itor->getCompositorPasses().end();
+
+            while( itPassDef != enPassDef )
+            {
+                if( passDef == *itPassDef )
+                    return passCount;
+
+                ++passCount;
+                ++itPassDef;
+            }
+            ++itor;
+        }
+
+        return -1;
+    }
 }

@@ -191,6 +191,16 @@ namespace Ogre
         /// @copydoc TextureDefinitionBase::removeTexture
         virtual void removeTexture( IdString name );
 
+        /** Returns the pass # of the given pass definition in this node.
+            This operation is O(N). Useful for debug output.
+        @param passDef
+            The pass definition to look for
+        @return
+            Value in range [0; total_numer_of_passes_in_this_node)
+            -1 if not found (pass doesn't belong to this node)
+        */
+        size_t getPassNumber( const CompositorPassDef *passDef ) const;
+
         CompositorManager2* getCompositorManager(void) const { return mCompositorManager; }
     };
 

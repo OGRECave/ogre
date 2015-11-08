@@ -296,8 +296,13 @@ namespace Ogre {
         /// Depth texture format. 8 bits for stencil
         PF_X32_X24_S8_UINT = 103,
 
+        /// Dummy, used for UAV-only rendering. D3D11 calls it
+        /// Target-independent rasterization / UAVOnlyRenderingForcedSampleCount
+        /// OpenGL is under GL_ARB_framebuffer_no_attachments
+        PF_NULL = 104,
+
         // Number of pixel formats currently defined
-        PF_COUNT = 104
+        PF_COUNT = 105
     };
     typedef vector<PixelFormat>::type PixelFormatList;
 

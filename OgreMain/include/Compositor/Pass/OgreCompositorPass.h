@@ -46,6 +46,30 @@ namespace Ogre
     *  @{
     */
 
+    typedef vector<TexturePtr>::type TextureVec;
+
+    struct CompositorTexture
+    {
+        IdString            name;
+        TextureVec const    *textures;
+
+        CompositorTexture( IdString _name, const TextureVec *_textures ) :
+                name( _name ), textures( _textures ) {}
+
+        bool operator == ( IdString right ) const
+        {
+            return name == right;
+        }
+    };
+
+    typedef vector<CompositorTexture>::type CompositorTextureVec;
+
+    struct BoundUav
+    {
+        RenderTarget                    *renderTarget;
+        ResourceAccess::ResourceAccess  boundAccess;
+    };
+
     /** Abstract class for compositor passes. A pass can be a fullscreen quad, a scene
         rendering, a clear. etc.
         Derived classes are responsible for performing an actual job.
@@ -67,6 +91,21 @@ namespace Ogre
 
         CompositorNode  *mParentNode;
 
+        CompositorTextureVec    mTextureDependencies;
+
+        typedef vector<ResourceTransition>::type ResourceTransitionVec;
+        ResourceTransitionVec   mResourceTransitions;
+        /// In OpenGL, only the first entry in mResourceTransitions contains a real
+        /// memory barrier. The rest is just kept for debugging purposes. So
+        /// mNumValidResourceTransitions is either 0 or 1.
+        /// In D3D12/Vulkan/Mantle however,
+        /// mNumValidResourceTransitions = mResourceTransitions.size()
+        uint32                  mNumValidResourceTransitions;
+
+        void populateTextureDependenciesFromExposedTextures(void);
+
+        void executeResourceTransitions(void);
+
         RenderTarget* calculateRenderTarget( size_t rtIndex, const CompositorChannel &source );
 
     public:
@@ -75,6 +114,34 @@ namespace Ogre
         virtual ~CompositorPass();
 
         virtual void execute( const Camera *lodCameraconst ) = 0;
+
+        void addResourceTransition( ResourceLayoutMap::iterator currentLayout,
+                                    ResourceLayout::Layout newLayout,
+                                    uint32 readBarrierBits );
+
+        /** Emulates the execution of a UAV to understand memory dependencies,
+            and adds a memory barrier / resource transition if we need to.
+        @remarks
+            Note that an UAV->UAV resource transition is just a memory barrier.
+        @param boundUavs [in/out]
+            An array of the currently bound UAVs by slot.
+            The derived class CompositorPassUav will write to them as part of the
+            emulation. The base implementation reads from this value.
+        @param uavsAccess [in/out]
+            A map with the last access flag used for each RenderTarget. We need it
+            to identify RaR situations, which are the only ones that don't need
+            a barrier (and also WaW hazards, when explicitly allowed by the pass).
+            Note: We will set the access to ResourceAccess::Undefined to signal other
+            passes  that the UAV hazard already has a barrier (just in case there was
+            one already created).
+        @param resourcesLayout [in/out]
+            A map with the current layout of every RenderTarget used so far.
+            Needed to identify if we need to change the resource layout
+            to an UAV.
+        */
+        virtual void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                           ResourceAccessMap &uavsAccess,
+                                                           ResourceLayoutMap &resourcesLayout );
 
         /// @See CompositorNode::notifyRecreated
         virtual void notifyRecreated( const CompositorChannel &oldChannel,
@@ -92,9 +159,13 @@ namespace Ogre
 
         Viewport* getViewport() const       { return mViewport; }
 
+        RenderTarget* getRenderTarget(void) const           { return mTarget; }
+
         const CompositorPassDef* getDefinition(void) const  { return mDefinition; }
 
 		const CompositorNode* getParentNode(void) const		{ return mParentNode; }
+
+        const CompositorTextureVec& getTextureDependencies(void) const  { return mTextureDependencies; }
     };
 
     /** @} */

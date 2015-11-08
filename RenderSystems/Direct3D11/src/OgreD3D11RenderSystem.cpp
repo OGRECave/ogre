@@ -141,12 +141,16 @@ bail:
           mCurrentIndexBuffer( 0 ),
           mBoundDepthStencilState(0),
           mpDXGIFactory(0),
+          mMaxModifiedUavPlusOne( 0 ),
+          mUavsDirty( false ),
           mDSTResView(0)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		 ,mStereoDriver(NULL)
 #endif	
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
+
+        memset( mUavs, 0, sizeof( mUavs ) );
 
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
@@ -2228,11 +2232,32 @@ bail:
             if( !colourWrite )
                 numberOfViews = 0;
 
-            // now switch to the new render target
-            mDevice.GetImmediateContext()->OMSetRenderTargets(
-                numberOfViews,
-                pRTView,
-                depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
+            if( mMaxModifiedUavPlusOne )
+            {
+                if( mUavStartingSlot < numberOfViews )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                        "mUavStartingSlot is lower than the number of RenderTargets attached.\n"
+                        "There are " + StringConverter::toString( numberOfViews ) + " RTs attached,\n"
+                        "and mUavStartingSlot = " + StringConverter::toString( mUavStartingSlot ) + "\n"
+                        "use setUavStartingSlot to fix this, or set a MRT with less RTs",
+                        "D3D11RenderSystem::_setRenderTargetViews" );
+                }
+
+                mDevice.GetImmediateContext()->OMSetRenderTargetsAndUnorderedAccessViews(
+                            numberOfViews,
+                            pRTView,
+                            depthBuffer ? depthBuffer->getDepthStencilView() : 0,
+                            mUavStartingSlot, mMaxModifiedUavPlusOne, mUavs, 0 );
+            }
+            else
+            {
+                // now switch to the new render target
+                mDevice.GetImmediateContext()->OMSetRenderTargets(
+                            numberOfViews,
+                            pRTView,
+                            depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
+            }
 
             if (mDevice.isError())
             {
@@ -2325,7 +2350,140 @@ bail:
                 if( static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer() )
                     _setRenderTargetViews( vp->getColourWrite() );
             }
+            else if( mUavsDirty )
+            {
+                flushUAVs();
+            }
         }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
+                                          ResourceAccess::ResourceAccess access,
+                                          int32 mipmapLevel, int32 textureArrayIndex,
+                                          PixelFormat pixelFormat )
+    {
+        assert( slot < 64 );
+
+        if( mUavTexPtr[slot].isNull() && texture.isNull() )
+            return;
+
+        mUavsDirty = true;
+
+        mUavTexPtr[slot] = texture;
+
+        //Release oldUav *after* we've created the new UAV (if D3D11 needs
+        //to return the same UAV, if we release it earlier we may cause
+        //unnecessary alloc/deallocations)
+        ID3D11UnorderedAccessView *oldUav = mUavs[slot];
+        mUavs[slot] = 0;
+
+        if( !texture.isNull() )
+        {
+            if( !(texture->getUsage() & TU_UAV) )
+            {
+                if( oldUav )
+                {
+                    oldUav->Release();
+                    oldUav = 0;
+                }
+
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Texture " + texture->getName() +
+                             "must have been created with TU_UAV to be bound as UAV",
+                             "D3D11RenderSystem::queueBindUAV" );
+            }
+
+            D3D11_UNORDERED_ACCESS_VIEW_DESC descUAV;
+            descUAV.Format = D3D11Mappings::_getPF( pixelFormat );
+
+            switch( texture->getTextureType() )
+            {
+            case TEX_TYPE_1D:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1D;
+                descUAV.Texture1D.MipSlice = static_cast<UINT>( mipmapLevel );
+                break;
+            case TEX_TYPE_2D:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+                descUAV.Texture2D.MipSlice = static_cast<UINT>( mipmapLevel );
+                break;
+            case TEX_TYPE_2D_ARRAY:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+                descUAV.Texture2DArray.MipSlice         = static_cast<UINT>( mipmapLevel );
+                descUAV.Texture2DArray.FirstArraySlice  = /*textureArrayIndex*/0;
+                descUAV.Texture2DArray.ArraySize        = static_cast<UINT>(texture->getDepth());
+                break;
+            case TEX_TYPE_3D:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
+                descUAV.Texture3D.MipSlice      = static_cast<UINT>( mipmapLevel );
+                descUAV.Texture3D.FirstWSlice   = 0;
+                descUAV.Texture3D.WSize         = static_cast<UINT>(texture->getDepth());
+                break;
+            default:
+                break;
+            }
+
+            D3D11Texture *dt = static_cast<D3D11Texture*>( texture.get() );
+
+            HRESULT hr = mDevice->CreateUnorderedAccessView( dt->getTextureResource(), &descUAV,
+                                                             &mUavs[slot] );
+            if( FAILED(hr) )
+            {
+                if( oldUav )
+                {
+                    oldUav->Release();
+                    oldUav = 0;
+                }
+
+                String errorDescription = mDevice.getErrorDescription(hr);
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Failed to create UAV state on texture '" + texture->getName() +
+                    "'\nError Description: " + errorDescription,
+                    "D3D11RenderSystem::queueBindUAV" );
+            }
+
+            mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+        }
+        else
+        {
+            if( slot + 1 == mMaxModifiedUavPlusOne )
+            {
+                --mMaxModifiedUavPlusOne;
+                while( mMaxModifiedUavPlusOne != 0 && !mUavs[mMaxModifiedUavPlusOne-1] )
+                    --mMaxModifiedUavPlusOne;
+            }
+        }
+
+        if( oldUav )
+        {
+            oldUav->Release();
+            oldUav = 0;
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::clearUAVs(void)
+    {
+        mUavsDirty = true;
+
+        for( size_t i=0; i<64; ++i )
+        {
+            mUavTexPtr[i].setNull();
+
+            if( mUavs[i] )
+            {
+                mUavs[i]->Release();
+                mUavs[i] = 0;
+            }
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::flushUAVs(void)
+    {
+        mUavsDirty = false;
+
+        bool colourWrite = true;
+        if( mActiveViewport )
+            colourWrite = mActiveViewport->getColourWrite();
+        _setRenderTargetViews( colourWrite );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_hlmsMacroblockCreated( HlmsMacroblock *newBlock )

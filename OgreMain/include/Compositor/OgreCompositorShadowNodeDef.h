@@ -55,12 +55,15 @@ namespace Ogre
     class ShadowTextureDefinition : public CompositorInstAlloc
     {
     public:
+        TextureType textureType;
         uint        width;
         uint        height;
+        uint        depth;
         float       widthFactor;
         float       heightFactor;
         PixelFormatList formatList; // more than one means MRT
         uint        fsaa;           // FSAA level
+        bool        uav;
         bool        hwGammaWrite;   // Do sRGB gamma correction on write (only 8-bit per channel formats)
         /// @see RenderTarget::setPreferDepthTexture
         bool        preferDepthTexture;
@@ -86,8 +89,9 @@ namespace Ogre
     public:
         ShadowTextureDefinition( ShadowMapTechniques t, IdString _name,
                                 size_t _light, size_t _split ) :
-                width(1024), height(1024), widthFactor(1.0f), heightFactor(1.0f),
-                fsaa(0), hwGammaWrite(false), preferDepthTexture(false),
+                textureType( TEX_TYPE_2D ),
+                width(1024), height(1024), depth(1), widthFactor(1.0f), heightFactor(1.0f),
+                fsaa(0), uav(false), hwGammaWrite(false), preferDepthTexture(false),
                 depthBufferId(2), depthBufferFormat( PF_UNKNOWN ),
                 light(_light), split(_split), shadowMapTechnique(t),
                 pssmLambda( 0.95f ), splitPadding( 1.0f ), numSplits( 3 ),

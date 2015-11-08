@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUav.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUavDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
 #include "Compositor/OgreCompositorManager2.h"
@@ -439,6 +441,11 @@ namespace Ogre
                                             static_cast<CompositorPassDepthCopyDef*>(*itPass),
                                             *channel, this );
                     break;
+                case PASS_UAV:
+                    newPass = OGRE_NEW CompositorPassUav(
+                                            static_cast<CompositorPassUavDef*>(*itPass),
+                                            this, *channel );
+                    break;
                 case PASS_CUSTOM:
                     {
                         CompositorPassProvider *passProvider = mWorkspace->getCompositorManager()->
@@ -462,6 +469,55 @@ namespace Ogre
 
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::fillResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                              const CompositorChannelVec &compositorChannels,
+                                              ResourceLayout::Layout layout )
+    {
+        CompositorChannelVec::const_iterator itor = compositorChannels.begin();
+        CompositorChannelVec::const_iterator end  = compositorChannels.end();
+
+        while( itor != end )
+        {
+            outResourcesLayout[itor->target] = layout;
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                               ResourceAccessMap &uavsAccess,
+                                                               ResourceLayoutMap &resourcesLayout )
+    {
+        //All locally defined textures start as 'undefined'.
+        fillResourcesLayout( resourcesLayout, mLocalTextures, ResourceLayout::Undefined );
+
+        CompositorPassVec::const_iterator itPasses = mPasses.begin();
+        CompositorPassVec::const_iterator enPasses = mPasses.end();
+
+        while( itPasses != enPasses )
+        {
+            CompositorPass *pass = *itPasses;
+            pass->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
+
+            ++itPasses;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::_setFinalTargetAsRenderTarget(
+                                                ResourceLayoutMap::iterator finalTargetCurrentLayout )
+    {
+        if( mPasses.empty() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Node " + mName.getFriendlyText() + "has no passes!",
+                         "CompositorNode::_setFinalTargetAsRenderTarget" );
+        }
+
+        CompositorPass *pass = mPasses.back();
+        pass->addResourceTransition( finalTargetCurrentLayout,
+                                     ResourceLayout::RenderTarget,
+                                     ReadBarrier::RenderTarget );
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::_update( const Camera *lodCamera, SceneManager *sceneManager )
@@ -522,5 +578,10 @@ namespace Ogre
             (*itor)->resetNumPassesLeft();
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    size_t CompositorNode::getPassNumber( CompositorPass *pass ) const
+    {
+        return mDefinition->getPassNumber( pass->getDefinition() );
     }
 }

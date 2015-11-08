@@ -202,6 +202,12 @@ namespace Ogre
         RSC_TEXTURE_CUBE_MAP_ARRAY = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 2),
         /// Hardware/API supports texture gather operation.
         RSC_TEXTURE_GATHER = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 3),
+        /// Supports UAVs (OpenGL: SSBOs and Image texture. D3D11: UAVs & structured buffers)
+        RSC_UAV = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 4),
+        /// API requires ResourceTransition for everything (e.g. D3D12, Vulkan, Mantle).
+        /// Not set for D3D11, and GL. Doesn't mean ResourceTransition aren't
+        /// required (i.e. GL needs them for UAVs and Compute Shaders)
+        RSC_EXPLICIT_API = OGRE_CAPS_VALUE(CAPS_CATEGORY_COMMON_3, 5),
 
         // ***** DirectX specific caps *****
         /// Is DirectX feature "per stage constants" supported

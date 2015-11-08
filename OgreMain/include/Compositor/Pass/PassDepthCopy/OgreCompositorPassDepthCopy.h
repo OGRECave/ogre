@@ -65,6 +65,10 @@ namespace Ogre
                                  CompositorNode *parentNode );
 
         virtual void execute( const Camera *lodCamera );
+
+        virtual void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                           ResourceAccessMap &uavsAccess,
+                                                           ResourceLayoutMap &resourcesLayout );
     };
 
     /** @} */

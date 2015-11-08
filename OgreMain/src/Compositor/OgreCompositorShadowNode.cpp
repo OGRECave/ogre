@@ -177,14 +177,24 @@ namespace Ogre
                 }
             }
 
+            uint32 texUsageFlags = TU_RENDERTARGET;
+
+            if( textureDef.uav )
+                texUsageFlags |= TU_UAV;
+
+            assert( textureDef.depth > 0 &&
+                    (textureDef.depth == 1 || textureDef.textureType > TEX_TYPE_2D) &&
+                    (textureDef.depth == 6 || textureDef.textureType != TEX_TYPE_CUBE_MAP) );
+
             String textureName = (textureDef.getName() + IdString( getId() )).getFriendlyText();
             if( textureDef.formatList.size() == 1 )
             {
                 //Normal RT
                 TexturePtr tex = TextureManager::getSingleton().createManual( textureName,
                                                 ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                                TEX_TYPE_2D, width, height, 0,
-                                                textureDef.formatList[0], TU_RENDERTARGET, 0,
+                                                textureDef.textureType, width, height,
+                                                textureDef.depth, 0,
+                                                textureDef.formatList[0], (int)texUsageFlags, 0,
                                                 textureDef.hwGammaWrite, textureDef.fsaa,
                                                 BLANKSTRING, false,
                                                 textureDef.depthBufferId !=
@@ -218,8 +228,9 @@ namespace Ogre
                     TexturePtr tex = TextureManager::getSingleton().createManual(
                                                 textureName + StringConverter::toString( rtNum ),
                                                 ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                                TEX_TYPE_2D, width, height, 0,
-                                                *pixIt, TU_RENDERTARGET, 0, textureDef.hwGammaWrite,
+                                                textureDef.textureType, width, height,
+                                                textureDef.depth, 0,
+                                                *pixIt, (int)texUsageFlags, 0, textureDef.hwGammaWrite,
                                                 textureDef.fsaa, BLANKSTRING, false,
                                                 textureDef.depthBufferId !=
                                                         DepthBuffer::POOL_NON_SHAREABLE );

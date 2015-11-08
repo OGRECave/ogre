@@ -170,7 +170,27 @@ namespace Ogre {
         GLSLShader* mCurrentDomainShader;
         GLSLShader* mCurrentComputeShader;
 
+        struct Uav
+        {
+            bool        dirty;
+            TexturePtr  texture;
+            GLuint      textureName;
+            GLint       mipmap;
+            GLboolean   isArrayTexture;
+            GLint       arrayIndex;
+            GLenum      access;
+            GLenum      format;
+
+            Uav() : dirty( false ) {}
+        };
+
         GLuint  mNullColourFramebuffer;
+
+        Uav     mUavs[64];
+        /// In range [0; 64]; note that a user may use
+        /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
+        /// and still mMaxUavIndexPlusOne = 3.
+        uint8   mMaxModifiedUavPlusOne;
 
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
         GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
@@ -347,10 +367,25 @@ namespace Ogre {
             RenderSystem
         */
         void _setTextureMatrix(size_t stage, const Matrix4& xform) { };   // Not supported
+
+        virtual void setUavStartingSlot( uint32 startingSlot );
+
+        virtual void queueBindUAV( uint32 slot, TexturePtr texture,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                   int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
+                                   PixelFormat pixelFormat = PF_UNKNOWN );
+
+        virtual void clearUAVs(void);
+
+        virtual void flushUAVs(void);
         /** See
             RenderSystem
         */
         void _setViewport(Viewport *vp);
+        virtual void _resourceTransitionCreated( ResourceTransition *resTransition );
+        virtual void _resourceTransitionDestroyed( ResourceTransition *resTransition );
+        virtual void _executeResourceTransition( ResourceTransition *resTransition );
+
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock );

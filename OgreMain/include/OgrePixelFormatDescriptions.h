@@ -1481,6 +1481,20 @@ namespace Ogre {
             /* Masks and shifts */
             0, 0x000000FF, 0, 0,
             0, 0, 0, 0
+        },
+        //-----------------------------------------------------------------------
+        {"PF_NULL",
+            /* Bytes per element */
+            0,
+            /* Flags */
+            0,
+            /* Component type and count */
+            PCT_BYTE, 0,
+            /* rbits, gbits, bbits, abits */
+            0, 0, 0, 0,
+            /* Masks and shifts */
+            0, 0, 0, 0,
+            0, 0, 0, 0
         }
     };
     /** @} */

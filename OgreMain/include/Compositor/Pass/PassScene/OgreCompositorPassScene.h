@@ -82,10 +82,16 @@ namespace Ogre
 
         virtual void execute( const Camera *lodCamera );
 
+        virtual void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                           ResourceAccessMap &uavsAccess,
+                                                           ResourceLayoutMap &resourcesLayout );
+
         CompositorShadowNode* getShadowNode() const             { return mShadowNode; }
         Camera* getCamera() const                               { return mCamera; }
         void _setCustomCamera( Camera *camera )                 { mCamera = camera; }
         void _setUpdateShadowNode( bool update )                { mUpdateShadowNode = update; }
+
+        bool getUpdateShadowNode(void) const                    { return mUpdateShadowNode; }
 
         virtual void notifyCleared(void);
 
