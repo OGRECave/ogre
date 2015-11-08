@@ -23,14 +23,14 @@ fragment_program FillUav_ps_HLSL hlsl
 {
 	source FillUav_ps.hlsl
 	entry_point main
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	target ps_5_0
 }
 
 fragment_program UseUavAsTexture_ps_HLSL hlsl
 {
 	source UseUavAsTexture_ps.hlsl
 	entry_point main
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	target ps_5_0
 }
 
 // Unified definitions

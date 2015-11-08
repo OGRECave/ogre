@@ -1,0 +1,64 @@
+compositor_node TutorialUav02_SetupRenderingNode
+{
+	in 0 rt_renderwindow
+
+	texture nullDummy target_width target_height PF_NULL
+	
+	//D3D11 doesn't support UAV typed loads until D3D 11.3. OpenGL does though, but
+	//we'll emulate the conversion on both for compatibility and simplicity (rather
+	//than having two separate paths)
+	texture testTexture target_width target_height PF_R32_UINT depth_pool 0 no_gamma uav
+
+	target nullDummy
+	{
+		//The bindings made by pass bind_uav PERSIST even after we're out of nullDummy.
+		pass bind_uav
+		{
+			starting_slot 1
+
+			// When true, we only affect the UAVs we're changing.
+			// When false, we clear all UAVs settings from all slots.
+			keep_previous_uavs	false
+
+			uav 0 testTexture			write
+		}
+
+		pass render_quad
+		{
+			material FillUav
+
+			//We need this to tell we will be using the UAV at that slot in
+			//this pass and let the Compositor issue the proper barriers
+			uses_uav 0 write
+		}
+	}
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		//We need to tell the Compositor we will be using the UAV
+		//at slot 0 for reading (from the last bind_uav).
+		//Note the shader addresses 0+1 = slot 1. (account the starting slot)
+		//The starting slot is because D3D11 makes the UAVs and RTTs
+		//to share the same bindings points.
+		pass render_quad
+		{
+			material DrawFromUav
+			uses_uav 0 read
+		}
+
+		pass render_scene
+		{
+			overlays	on
+		}
+	}
+}
+
+workspace TutorialUav02_SetupWorkspace
+{
+	connect_output TutorialUav02_SetupRenderingNode 0
+}
