@@ -82,6 +82,41 @@ namespace Ogre {
         mVertexArrayObject = 0;
     }
 
+    Ogre::String GLSLProgram::getCombinedSource() const
+    {
+        String retVal;
+        size_t memorySize = 0;
+
+        if( mVertexShader )
+            memorySize += mVertexShader->getSource().size();
+        if( mHullShader )
+            memorySize += mHullShader->getSource().size();
+        if( mDomainShader )
+            memorySize += mDomainShader->getSource().size();
+        if( mGeometryShader )
+            memorySize += mGeometryShader->getSource().size();
+        if( mFragmentShader )
+            memorySize += mFragmentShader->getSource().size();
+        if( mComputeShader )
+            memorySize += mComputeShader->getSource().size();
+
+        retVal.reserve( memorySize );
+
+        if( mVertexShader )
+            retVal += mVertexShader->getSource();
+        if( mHullShader )
+            retVal += mHullShader->getSource();
+        if( mDomainShader )
+            retVal += mDomainShader->getSource();
+        if( mGeometryShader )
+            retVal += mGeometryShader->getSource();
+        if( mFragmentShader )
+            retVal += mFragmentShader->getSource();
+        if( mComputeShader )
+            retVal += mComputeShader->getSource();
+
+        return retVal;
+    }
 
     Ogre::String GLSLProgram::getCombinedName()
     {
@@ -126,6 +161,41 @@ namespace Ogre {
         return name;
     }
 
+    Ogre::String GLSLProgram::getCombinedSource() const
+    {
+        String retVal;
+        size_t memorySize = 0;
+
+        if( mVertexShader )
+            memorySize += mVertexShader->getSource().size();
+        if( mHullShader )
+            memorySize += mHullShader->getSource().size();
+        if( mDomainShader )
+            memorySize += mDomainShader->getSource().size();
+        if( mGeometryShader )
+            memorySize += mGeometryShader->getSource().size();
+        if( mFragmentShader )
+            memorySize += mFragmentShader->getSource().size();
+        if( mComputeShader )
+            memorySize += mComputeShader->getSource().size();
+
+        retVal.reserve( memorySize );
+
+        if( mVertexShader )
+            retVal += mVertexShader->getSource();
+        if( mHullShader )
+            retVal += mHullShader->getSource();
+        if( mDomainShader )
+            retVal += mDomainShader->getSource();
+        if( mGeometryShader )
+            retVal += mGeometryShader->getSource();
+        if( mFragmentShader )
+            retVal += mFragmentShader->getSource();
+        if( mComputeShader )
+            retVal += mComputeShader->getSource();
+
+        return retVal;
+    }
 
     VertexElementSemantic GLSLProgram::getAttributeSemanticEnum(String type)
     {

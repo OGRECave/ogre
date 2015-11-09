@@ -28,10 +28,11 @@ THE SOFTWARE.
 #ifndef __D3D11HLSLProgram_H__
 #define __D3D11HLSLProgram_H__
 
-#include "OgreD3D11Prerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
+#include "OgreMicroCodeCacheStore.h"
+#include "OgreGpuProgramManager.h"
 
 
 namespace Ogre {
@@ -45,7 +46,7 @@ namespace Ogre {
     reason for not wanting to use the Cg plugin, I suggest you use Cg instead since that
     can produce programs for OpenGL too.
     */
-    class D3D11HLSLProgram : public HighLevelGpuProgram
+    class D3D11HLSLProgram : public HighLevelGpuProgram , public MicrocodeCacheStore
     {
     public:
         /// Command object for setting entry point
@@ -107,6 +108,8 @@ namespace Ogre {
 		
 		void getDefines(String& stringBuffer, vector<D3D_SHADER_MACRO>::type& defines, const String& definesString);
 		
+        const UINT getCompilerFlags() const;
+
         String mTarget;
         String mEntryPoint;
         String mPreprocessorDefines;
@@ -118,7 +121,7 @@ namespace Ogre {
         ID3D11Buffer* mConstantBuffer;
         
         D3D_SHADER_MACRO* mShaderMacros;
-        bool shaderMacroSet;
+        bool mShaderMacroSet;
 
         D3D11Device & mDevice;
 
@@ -284,8 +287,8 @@ namespace Ogre {
 
         void createConstantBuffer(const UINT ByteWidth);
         void analizeMicrocode();
-        void getMicrocodeFromCache(void);
-        void compileMicrocode(void);
+        const bool applyFromMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE; 
+        bool compileMicrocode() OGRE_OVERRIDE;
     public:
         D3D11HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader, D3D11Device & device);
@@ -360,10 +363,13 @@ namespace Ogre {
         unsigned int getNumInputs(void)const;
         unsigned int getNumOutputs(void)const;
 
-        String getNameForMicrocodeCache();
+        virtual String getStringForMicrocodeCacheHash() const OGRE_OVERRIDE;
 
         const D3D11_SIGNATURE_PARAMETER_DESC & getInputParamDesc(unsigned int index) const;
         const D3D11_SIGNATURE_PARAMETER_DESC & getOutputParamDesc(unsigned int index) const;    
+        void reflectShader();
+        const size_t getMicrocodeCacheSize() const OGRE_OVERRIDE;
+        void generateMicroCodeCache(GpuProgramManager::Microcode microCode) OGRE_OVERRIDE;
     };
 }
 

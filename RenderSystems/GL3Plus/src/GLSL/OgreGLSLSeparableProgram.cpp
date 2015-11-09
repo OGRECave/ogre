@@ -140,7 +140,7 @@ namespace Ogre
         {
             GLint linkStatus = 0;
 
-            String programName = program->getName();
+            String programSource = program->getSource();
 
             GLuint programHandle = program->getGLProgramHandle();
 
@@ -149,11 +149,11 @@ namespace Ogre
             OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
 
             // Use precompiled program if possible.
-            bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(programName);
+            bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(programSource);
             if (microcodeAvailableInCache)
             {
                 GpuProgramManager::Microcode cacheMicrocode =
-                    GpuProgramManager::getSingleton().getMicrocodeFromCache(programName);
+                    GpuProgramManager::getSingleton().getMicrocodeFromCache(programSource);
                 cacheMicrocode->seek(0);
 
                 GLenum binaryFormat = 0;
@@ -168,7 +168,7 @@ namespace Ogre
 
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
                 if (!linkStatus)
-                    logObjectInfo("Could not use cached binary " + programName, programHandle);
+                    logObjectInfo("Could not use cached binary " + program->getName(), programHandle);
             }
 
             // Compilation needed if precompiled program is
@@ -229,7 +229,7 @@ namespace Ogre
                 // newMicrocode->read(&binaryFormat, sizeof(GLenum));
                 // newMicrocode->read(&binaryData[0], binaryLength);
 
-                GpuProgramManager::getSingleton().addMicrocodeToCache(programName, newMicrocode);
+                GpuProgramManager::getSingleton().addMicrocodeToCache(programSource, newMicrocode);
             }
         }
     }

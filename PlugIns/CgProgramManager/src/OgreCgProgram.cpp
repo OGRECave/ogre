@@ -177,15 +177,8 @@ namespace Ogre {
 	void CgProgram::loadFromSource(void)
 	{
 		selectProfile();
-
-		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(String("CG_") + mName) )
-		{
-			getMicrocodeFromCache();
-		}
-		else
-		{
-			compileMicrocode();
-		}
+        
+        compileWithMicrocodeCacheSupport();
 
 		if (!mDelegate.isNull())
 		{
@@ -237,11 +230,8 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::getMicrocodeFromCache(void)
+    const bool CgProgram::applyFromMicroCodeCache(Microcode cacheMicrocode)
 	{
-		GpuProgramManager::Microcode cacheMicrocode = 
-			GpuProgramManager::getSingleton().getMicrocodeFromCache(String("CG_") + mName);
-		
 		cacheMicrocode->seek(0);
 
 		// get size of string
@@ -297,11 +287,11 @@ namespace Ogre {
 			cacheMicrocode->read(&mInputOp, sizeof(CGenum));
 			cacheMicrocode->read(&mOutputOp, sizeof(CGenum));
 		}
-
+        return true;
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::compileMicrocode(void)
-	{
+	bool CgProgram::compileMicrocode()
+{
 		// Create Cg Program
   
 		/// Program handle
@@ -312,7 +302,7 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage(
 				"Attempted to load Cg program '" + mName + "', but no supported "
 				"profile was found. ");
-			return;
+            return false;
 		}
 		buildArgs();
 		// deal with includes
@@ -361,29 +351,14 @@ namespace Ogre {
 			//  "Error while unloading Cg program " + mName + ": ", 
 			//  mCgContext);
 			cgProgram = 0;
-
-			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
-			{
-				addMicrocodeToCache();
-			}
 		}
 
-
+        return true;
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::addMicrocodeToCache()
-	{
-		String name = String("CG_") + mName;
-		size_t programStringSize = mProgramString.size();
-		uint32 sizeOfMicrocode = static_cast<uint32>(
-													 sizeof(size_t) +   // size of mProgramString
-													 programStringSize + // microcode - mProgramString
-													 sizeof(size_t) + // size of param map
-													 mParametersMapSizeAsBuffer);
-
-		// create microcode
-		GpuProgramManager::Microcode newMicrocode = 
-			GpuProgramManager::getSingleton().createMicrocode(sizeOfMicrocode);
+    void CgProgram::generateMicroCodeCache(Microcode newMicrocode)
+    {
+        size_t programStringSize = mProgramString.size();
 
 		newMicrocode->seek(0);
 
@@ -440,10 +415,7 @@ namespace Ogre {
 			newMicrocode->write(&mInputOp, sizeof(CGenum));
 			newMicrocode->write(&mOutputOp, sizeof(CGenum));
 		}
-
-		// add to the microcode to the cache
-		GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
-	}
+    }
 	//-----------------------------------------------------------------------
 	void CgProgram::createLowLevelImpl(void)
 	{
@@ -927,7 +899,19 @@ namespace Ogre {
 			mConstantDefs->generateConstantDefinitionArrayEntries(paramName, def);
 		}
 	}
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    String CgProgram::getStringForMicrocodeCacheHash() const
+    {
+        StringStream ss;
+        ss << resolveCgIncludes(mSource, const_cast<CgProgram*>(this), mFilename)
+            << "_" << mEntryPoint
+            << "_" << mSelectedCgProfile
+            << "_" << mCompileArgs;
+
+        return ss.str();
+    }
+
+    //---------------------------------------------------------------------
 	void CgProgram::recurseParams(CGparameter parameter, size_t contextArraySize)
 	{
 		while (parameter != 0)
@@ -1381,7 +1365,20 @@ namespace Ogre {
 
 		return outSource;
 	}
-	//-----------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------
+    const size_t CgProgram::getMicrocodeCacheSize() const
+    {
+        uint32 sizeOfMicrocode = static_cast<uint32>(
+            sizeof(size_t) +   // size of mProgramString
+            mProgramString.size() + // microcode - mProgramString
+            sizeof(size_t) + // size of param map
+            mParametersMapSizeAsBuffer);
+
+        return sizeOfMicrocode;
+    }
+
+    //-----------------------------------------------------------------------
 	const String& CgProgram::getLanguage(void) const
 	{
 		static const String language = "cg";

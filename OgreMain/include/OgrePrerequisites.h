@@ -352,6 +352,8 @@ namespace Ogre {
     typedef SharedPtr<ShadowCameraSetup> ShadowCameraSetupPtr;
     typedef SharedPtr<Skeleton> SkeletonPtr;
     typedef SharedPtr<Texture> TexturePtr;
+
+    typedef MemoryDataStreamPtr Microcode;
 }
 
 /* Include all the standard header *after* all the configuration

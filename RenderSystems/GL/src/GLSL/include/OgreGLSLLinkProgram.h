@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreGLUniformCache.h"
+#include "OgreMicroCodeCacheStore.h"
 
 namespace Ogre {
     namespace GLSL {
@@ -54,7 +55,7 @@ namespace Ogre {
 
     */
 
-    class _OgreGLExport GLSLLinkProgram
+    class _OgreGLExport GLSLLinkProgram  : public MicrocodeCacheStore
     {
     private:
         /// Container of uniform references that are active in the program object
@@ -99,11 +100,15 @@ namespace Ogre {
 
         static CustomAttribute msCustomAttributes[];
 
-        String getCombinedName();       
+        String getCombinedName() const;
         /// Compiles and links the the vertex and fragment programs
         void compileAndLink();
         /// Get the the binary data of a program from the microcode cache
         void getMicrocodeFromCache();
+
+    protected:
+        String getStringForMicrocodeCacheHash() const OGRE_OVERRIDE;
+
     public:
         /// Constructor should only be used by GLSLLinkProgramManager
         GLSLLinkProgram(GLSLGpuProgram* vertexProgram, GLSLGpuProgram* geometryProgram, GLSLGpuProgram* fragmentProgram);
@@ -145,6 +150,14 @@ namespace Ogre {
         GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
         /// Is a non-standard attribute bound in the linked code?
         bool isAttributeValid(VertexElementSemantic semantic, uint index);
+
+        virtual bool compileMicrocode() OGRE_OVERRIDE;
+
+        virtual const bool applyFromMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE;
+
+        virtual const size_t getMicrocodeCacheSize() const OGRE_OVERRIDE;
+
+        virtual void generateMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE;
 
     };
 
