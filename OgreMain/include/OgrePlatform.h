@@ -55,6 +55,12 @@ namespace Ogre {
 #define OGRE_ARCHITECTURE_32 1
 #define OGRE_ARCHITECTURE_64 2
 
+#define OGRE_CPP_VER_UNDEFINED 0L
+#define OGRE_CPP_VER_98 199711L
+#define OGRE_CPP_VER_11 201103L
+#define OGRE_CPP_VER_14 201402L
+
+
 /* Finds the compiler type and version.
 */
 #if (defined( __WIN32__ ) || defined( _WIN32 )) && defined(__ANDROID__) // We are using NVTegra
@@ -87,6 +93,29 @@ namespace Ogre {
 #else
 #   pragma error "No known compiler. Abort! Abort!"
 
+#endif
+
+#define OGRE_COMPILER_MIN_VERSION(COMPILER, VERSION) (OGRE_COMPILER == (COMPILER) && OGRE_COMP_VER >= (VERSION))
+
+/* Finds the c++ version.*/
+#ifdef  __cplusplus
+    #if __cplusplus >= OGRE_CPP_VER_14 
+        #define OGRE_CPP_VER OGRE_CPP_VER_14
+    #elif __cplusplus >= OGRE_CPP_VER_11
+        #define OGRE_CPP_VER OGRE_CPP_VER_11
+    #elif __cplusplus >= OGRE_CPP_VER_98
+        #define OGRE_CPP_VER OGRE_CPP_VER_98
+    #else
+        #define OGRE_CPP_VER OGRE_CPP_VER_UNDEFINED
+    #endif
+#endif
+
+
+/* define OGRE_OVERRIDE macro */
+#if OGRE_CPP_VER >= OGRE_CPP_VER_11 || OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1600)
+    #define OGRE_OVERRIDE override
+#else
+    #define OGRE_OVERRIDE 
 #endif
 
 /* See if we can use __forceinline or if we need to use __inline instead */
