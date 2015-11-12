@@ -158,7 +158,7 @@ namespace Ogre
             shaderID = mActiveGeometryShader->getShaderID();
             activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
         }
-        else if (mActiveFragmentShader)
+        if (mActiveFragmentShader)
         {
             shaderID = mActiveFragmentShader->getShaderID();
             activeKey = FastHash((const char *)(&shaderID), sizeof(GLuint), activeKey);
