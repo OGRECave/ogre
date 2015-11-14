@@ -1579,7 +1579,7 @@ namespace Ogre {
     String D3D11HLSLProgram::getStringForMicrocodeCacheHash() const
     {
         StringStream ss;
-        ss << mSource
+		ss << getFullSourceWithIncludes()
             << "_" << mEntryPoint
             << "_" << mTarget
             << "_" << mPreprocessorDefines

@@ -170,8 +170,6 @@ namespace Ogre {
         size_t getSize(void) const;
         void touch(void);
 
-        /// Scan the file for #include and replace with source from the OGRE resources
-        static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
 
         virtual const bool applyFromMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE;
 
