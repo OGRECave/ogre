@@ -35,9 +35,9 @@ namespace Ogre
 
     void MicrocodeCacheStore::compileAndSaveToCache()
     {
-        if (compileMicrocode())
+        GpuProgramManager& gpuMan = GpuProgramManager::getSingleton();
+        if (compileMicrocode() && gpuMan.getSaveMicrocodesToCache())
         {
-            GpuProgramManager& gpuMan = GpuProgramManager::getSingleton();
             size_t microCodeCacheSize = getMicrocodeCacheSize();
             GpuProgramManager::Microcode microCodeCache = gpuMan.createMicrocode(microCodeCacheSize);
             generateMicroCodeCache(microCodeCache);
