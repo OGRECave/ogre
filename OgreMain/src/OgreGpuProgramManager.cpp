@@ -47,6 +47,7 @@ namespace Ogre {
     {
         return msSingleton;
     }
+    //---------------------------------------------------------------------------
     GpuProgramManager& GpuProgramManager::getSingleton(void)
     {  
         assert( msSingleton );  return ( *msSingleton );  
@@ -65,7 +66,7 @@ namespace Ogre {
         mResourceType = "GpuProgram";
         mSaveMicrocodesToCache = false;
         mCacheDirty = false;
-
+        mEnableMicrocodeCache = false;
         // subclasses should register with resource group manager
     }
     //---------------------------------------------------------------------------
@@ -217,25 +218,24 @@ namespace Ogre {
     //---------------------------------------------------------------------
     bool GpuProgramManager::getSaveMicrocodesToCache()
     {
-        return mSaveMicrocodesToCache;
+        return  mSaveMicrocodesToCache && mEnableMicrocodeCache;
     }
     //---------------------------------------------------------------------
-    bool GpuProgramManager::canGetCompiledShaderBuffer()
+    void GpuProgramManager::setEnableMicrocodeCache(const bool enableMicrocodeCache)
     {
-        // Use the current render system
-        RenderSystem *rs = Root::getSingleton().getRenderSystem();
-
-        // Check if the supported  
-        return rs->getCapabilities()->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+        // Enable microcode cache only if the current render system supports it.
+        mEnableMicrocodeCache = enableMicrocodeCache
+            && Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
+    }
+    //---------------------------------------------------------------------
+    const bool GpuProgramManager::getEnableMicrocodeCache() const
+    {
+        return mEnableMicrocodeCache;
     }
     //---------------------------------------------------------------------
     void GpuProgramManager::setSaveMicrocodesToCache( const bool val )
     {
-        // Check that saving shader microcode is supported
-        if(!canGetCompiledShaderBuffer())
-            mSaveMicrocodesToCache = false;
-        else
-            mSaveMicrocodesToCache = val;
+        mSaveMicrocodesToCache = val;
     }
     //---------------------------------------------------------------------
     bool GpuProgramManager::isCacheDirty( void ) const
@@ -375,8 +375,6 @@ namespace Ogre {
 
         // if cache is not modified, mark it as clean.
         mCacheDirty = false;
-        
     }
     //---------------------------------------------------------------------
-
 }

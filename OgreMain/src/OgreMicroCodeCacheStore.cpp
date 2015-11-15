@@ -49,7 +49,7 @@ namespace Ogre
     {
         GpuProgramManager& gpuMan = GpuProgramManager::getSingleton();
 
-        if (gpuMan.canGetCompiledShaderBuffer())
+        if (gpuMan.getEnableMicrocodeCache())
         {
             GpuProgramManager::Microcode microCode = gpuMan.getMicrocodeFromCacheOrNull(getStringForMicrocodeCacheHash());
 

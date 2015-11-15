@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 
@@ -158,6 +159,8 @@ namespace Ogre {
         mTessellationHullProgramBound = false;
         mTessellationDomainProgramBound = false;
         mComputeProgramBound = false;
+
+        GpuProgramManager::getSingleton().setEnableMicrocodeCache(true);
 
         return 0;
     }

@@ -76,7 +76,8 @@ namespace Ogre {
         MicrocodeMap mMicrocodeCache;
         bool mSaveMicrocodesToCache;
         bool mCacheDirty;           // When this is true the cache is 'dirty' and should be resaved to disk.
-
+        
+        bool mEnableMicrocodeCache;
         static Hash computeHashWithRenderSystemName( const String &source );
 
         /// Specialised create method with specific parameters
@@ -209,11 +210,14 @@ namespace Ogre {
         */
         void setSaveMicrocodesToCache( const bool val );
 
-        /** Returns true if the microcodecache changed during the run.
+        /** Returns true if the microcode cache changed during the run.
         */
         bool isCacheDirty(void) const;
 
-        bool canGetCompiledShaderBuffer();
+        const bool getEnableMicrocodeCache() const;
+
+        void setEnableMicrocodeCache(const bool enableMicrocodeCache);
+        
         /** Check if a microcode is available for a program in the microcode cache.
         @param name The name of the program.
         */
