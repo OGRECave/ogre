@@ -332,7 +332,7 @@ namespace Ogre {
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
 
         /// Tells the API to let the HW autogenerate mipmaps.
-        virtual void _autogenerateMipmaps(void)     { mMipmapsDirty = true; }
+        virtual void _autogenerateMipmaps(void)     { mMipmapsDirty = false; }
 
         bool isMipmapsDirty(void) const             { return mMipmapsDirty; }
 
