@@ -1,4 +1,4 @@
-/*
+﻿/*
   -----------------------------------------------------------------------------
   This source file is part of OGRE
   (Object-oriented Graphics Rendering Engine)
@@ -91,6 +91,13 @@ namespace Ogre {
                         renderTarget->getCustomAttribute( "GL_MULTISAMPLEFBOID", &retVal );
                         isFsaa = true;
                     }
+                }
+
+                if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET)) == (TU_AUTOMIPMAP|TU_RENDERTARGET) )
+                {
+                    RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+                    if( renderTarget->isMipmapsDirty() )
+                        renderTarget->_autogenerateMipmaps();
                 }
 
                 outIsFsaa = isFsaa;

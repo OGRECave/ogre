@@ -171,7 +171,11 @@ namespace Ogre {
         */
         virtual void swapBuffers(void)                                      { mFsaaResolveDirty = false; }
 
-        virtual void setFsaaResolveDirty(void)                              { mFsaaResolveDirty = true; }
+        virtual void setFsaaResolveDirty(void)
+        {
+            mFsaaResolveDirty = true;
+            mMipmapsDirty = true;
+        }
 
         /** Adds a viewport to the rendering target.
             @remarks
@@ -327,6 +331,11 @@ namespace Ogre {
         */
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
 
+        /// Tells the API to let the HW autogenerate mipmaps.
+        virtual void _autogenerateMipmaps(void)     { mMipmapsDirty = true; }
+
+        bool isMipmapsDirty(void) const             { return mMipmapsDirty; }
+
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
         */
@@ -424,6 +433,7 @@ namespace Ogre {
         uint mFSAA;
         String mFSAAHint;
         bool mFsaaResolveDirty;
+        bool mMipmapsDirty;
         bool mStereoEnabled;
 
         typedef vector<Viewport*>::type ViewportList;

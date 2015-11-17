@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreRoot.h"
 
+#include "OgreGL3PlusTextureBuffer.h"
+
 namespace Ogre {
 
 
@@ -256,6 +258,17 @@ namespace Ogre {
             // Unbind
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, oldfb));
         }
+    }
+
+    void GL3PlusFrameBufferObject::_autogenerateMipmaps()
+    {
+        //Whoever designed this madness of Texture->HwPixelBufferObject->RenderTarget
+        //deserves a giant kick in the nuts.
+        assert( dynamic_cast<v1::GL3PlusTextureBuffer*>( mColour[0].buffer ) );
+        v1::GL3PlusTextureBuffer *texBuffer = static_cast<v1::GL3PlusTextureBuffer*>(
+                                                                    mColour[0].buffer );
+        OCGE( glBindTexture( texBuffer->getGlTarget(), texBuffer->getGlTextureId() ) );
+        OCGE( glGenerateMipmap( texBuffer->getGlTarget() ) );
     }
 
     void GL3PlusFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )

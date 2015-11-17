@@ -75,6 +75,9 @@ namespace v1 {
         void blitFromTexture(GL3PlusTextureBuffer *src,
                              const Image::Box &srcBox, const Image::Box &dstBox);
 
+        GLenum getGlTarget(void) const          { return mTarget; }
+        GLuint getGlTextureId(void) const       { return mTextureID; }
+
     protected:
         // In case this is a texture level.
         GLenum mTarget;

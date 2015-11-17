@@ -353,6 +353,10 @@ namespace Ogre {
         // Reset unpack alignment to defaults
         OGRE_CHECK_GL_ERROR(glPixelStorei(GL_UNPACK_ALIGNMENT, 4));
 
+        //Allocate internal buffers for automipmaps before we load anything into them
+        if(mUsage & TU_AUTOMIPMAP)
+            OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGL3PlusTextureTarget()));
+
         _createSurfaceList();
 
         // Generate mipmaps after all texture levels have been loaded

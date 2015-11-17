@@ -51,6 +51,7 @@ namespace Ogre {
         , mHwGamma(false)
         , mFSAA(0)
         , mFsaaResolveDirty(false)
+        , mMipmapsDirty(false)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		, mStereoEnabled(true)
 #else
