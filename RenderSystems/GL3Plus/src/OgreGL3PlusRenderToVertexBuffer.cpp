@@ -372,6 +372,8 @@ namespace Ogre {
             // better to use a custom variable name.
             // return "gl_Position";
             return "oPos";
+        case VES_NORMAL:
+            return "oNormal";
         case VES_TEXTURE_COORDINATES:
             return String("oUv") + StringConverter::toString(index);
         case VES_DIFFUSE:
