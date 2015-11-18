@@ -72,12 +72,6 @@ namespace Ogre {
         GL3PlusRenderTexture::swapBuffers();
     }
     //-----------------------------------------------------------------------------
-    void GL3PlusFBORenderTexture::_autogenerateMipmaps(void)
-    {
-        mFB._autogenerateMipmaps();
-        GL3PlusRenderTexture::_autogenerateMipmaps();
-    }
-    //-----------------------------------------------------------------------------
     bool GL3PlusFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch )
     {
         bool result;

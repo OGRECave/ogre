@@ -47,8 +47,6 @@ namespace Ogre {
         /// Override needed to deal with multisample buffers
         virtual void swapBuffers();
 
-        virtual void _autogenerateMipmaps(void);
-
         /// Override so we can attach the depth buffer to the FBO
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
         virtual void detachDepthBuffer();

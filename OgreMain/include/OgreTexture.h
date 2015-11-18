@@ -276,6 +276,10 @@ namespace Ogre {
         /** Frees internal texture resources for this texture. 
         */
         virtual void freeInternalResources(void);
+
+        /// Tells the API to let the HW autogenerate mipmaps. Assumes the
+        /// texture is of usage TU_RENDERTARGET & TU_AUTOMIPMAP
+        virtual void _autogenerateMipmaps(void) = 0;
         
         /** Copies (and maybe scales to fit) the contents of this texture to
             another texture. */

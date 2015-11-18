@@ -50,6 +50,8 @@ namespace Ogre
         /// @copydoc Resource::freeInternalResourcesImpl
         virtual void freeInternalResourcesImpl(void);
 
+        virtual void _autogenerateMipmaps(void) {}
+
         /// @copydoc Resource::prepareImpl
         virtual void prepareImpl(void);
         /// @copydoc Resource::unprepareImpl

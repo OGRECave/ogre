@@ -67,6 +67,7 @@ namespace Ogre
         /// mipmap level. This method must be called after the D3D texture object was created
         void _createSurfaceList(void);
 
+        virtual void _autogenerateMipmaps(void) {}
 
         /// @copydoc Resource::prepareImpl
         virtual void prepareImpl(void);

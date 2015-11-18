@@ -260,17 +260,6 @@ namespace Ogre {
         }
     }
 
-    void GL3PlusFrameBufferObject::_autogenerateMipmaps()
-    {
-        //Whoever designed this madness of Texture->HwPixelBufferObject->RenderTarget
-        //deserves a giant kick in the nuts.
-        assert( dynamic_cast<v1::GL3PlusTextureBuffer*>( mColour[0].buffer ) );
-        v1::GL3PlusTextureBuffer *texBuffer = static_cast<v1::GL3PlusTextureBuffer*>(
-                                                                    mColour[0].buffer );
-        OCGE( glBindTexture( texBuffer->getGlTarget(), texBuffer->getGlTextureId() ) );
-        OCGE( glGenerateMipmap( texBuffer->getGlTarget() ) );
-    }
-
     void GL3PlusFrameBufferObject::attachDepthBuffer( DepthBuffer *depthBuffer )
     {
         GL3PlusDepthBuffer *glDepthBuffer = static_cast<GL3PlusDepthBuffer*>(depthBuffer);

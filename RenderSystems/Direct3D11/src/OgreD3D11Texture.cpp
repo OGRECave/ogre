@@ -111,6 +111,20 @@ namespace Ogre
         _loadImages( imagePtrs );
     }
     //---------------------------------------------------------------------
+    ID3D11ShaderResourceView* D3D11Texture::getTexture()
+    {
+        assert(mpShaderResourceView);
+
+        if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET)) == (TU_AUTOMIPMAP|TU_RENDERTARGET) )
+        {
+            RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+            if( renderTarget->isMipmapsDirty() )
+                this->_autogenerateMipmaps();
+        }
+
+        return mpShaderResourceView;
+    }
+    //---------------------------------------------------------------------
     void D3D11Texture::loadImpl()
     {
         if (mUsage & TU_RENDERTARGET)
@@ -820,6 +834,12 @@ namespace Ogre
         }
         return dxFmt;
 
+    }
+    //---------------------------------------------------------------------
+    void D3D11Texture::_autogenerateMipmaps(void)
+    {
+        mDevice.GetImmediateContext()->GenerateMips( mpShaderResourceView );
+        mSurfaceList[0]->getRenderTarget()->_setMipmapsUpdated();
     }
     //---------------------------------------------------------------------
     void D3D11Texture::_createSurfaceList(void)

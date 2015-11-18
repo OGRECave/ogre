@@ -67,7 +67,7 @@ namespace Ogre {
             @return
                 The GLuint handle/id of the texture.
             */
-            GLuint getGLID( bool &outIsFsaa ) const
+            GLuint getGLID( bool &outIsFsaa )
             {
                 GLuint retVal = mTextureID;
                 bool isFsaa = false;
@@ -97,7 +97,7 @@ namespace Ogre {
                 {
                     RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
                     if( renderTarget->isMipmapsDirty() )
-                        renderTarget->_autogenerateMipmaps();
+                        this->_autogenerateMipmaps();
                 }
 
                 outIsFsaa = isFsaa;
@@ -124,6 +124,8 @@ namespace Ogre {
             actually allocate the buffer
         */
         void _createSurfaceList();
+
+        virtual void _autogenerateMipmaps(void);
 
         /// Used to hold images between calls to prepare and load.
         typedef SharedPtr<vector<Image>::type > LoadedImages;

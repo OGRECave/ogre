@@ -64,6 +64,8 @@ namespace Ogre
 
         /// internal method, create GL3PlusHardwarePixelBuffers for every face and mipmap level.
         void _createSurfaceList();
+
+        virtual void _autogenerateMipmaps(void) {}
     };
 
 namespace v1

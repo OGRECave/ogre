@@ -60,8 +60,6 @@ namespace Ogre {
         */
         void swapBuffers();
 
-        void _autogenerateMipmaps();
-
         /** This function acts very similar to @see GL3PlusFBORenderTexture::attachDepthBuffer
             The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
             while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to

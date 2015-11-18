@@ -61,7 +61,7 @@ namespace Ogre {
 
 		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
 		/// retrieves a pointer to the actual texture
-		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView; }
+        ID3D11ShaderResourceView *getTexture();
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
 
 		ID3D11Texture1D * GetTex1D() { return mp1DTex; };
@@ -157,10 +157,11 @@ namespace Ogre {
         /// internal method, the cube map face name for the spec. face index
 		String _getCubeFaceName(unsigned char face) const { assert(face < 6); return mCubeFaceNames[face]; }
 
+        virtual void _autogenerateMipmaps(void);
+
         /// internal method, create D3D11HardwarePixelBuffers for every face and
         /// mipmap level. This method must be called after the D3D texture object was created
         void _createSurfaceList(void);
-
 
         /// @copydoc Resource::prepareImpl
         void prepareImpl(void);

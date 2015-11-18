@@ -519,6 +519,15 @@ namespace Ogre {
         }
     }
 
+    void GL3PlusTexture::_autogenerateMipmaps(void)
+    {
+        const GLenum texTarget = getGL3PlusTextureTarget();
+        OCGE( glBindTexture( texTarget, mTextureID ) );
+        OCGE( glGenerateMipmap( texTarget ) );
+
+        mSurfaceList[0]->getRenderTarget()->_setMipmapsUpdated();
+    }
+
     v1::HardwarePixelBufferSharedPtr GL3PlusTexture::getBuffer(size_t face, size_t mipmap)
     {
         if (face >= getNumFaces())
