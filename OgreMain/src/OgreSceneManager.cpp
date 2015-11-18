@@ -136,7 +136,6 @@ mShadowTextureCustomCasterPass(0),
 mVisibilityMask(0xFFFFFFFF & VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
 mFindVisibleObjects(true),
 mNumWorkerThreads( numWorkerThreads ),
-mExitWorkerThreads( false ),
 mUpdateBoundsRequest( 0 ),
 mInstancingThreadedCullingMethod( threadedCullingMethod ),
 mUserTask( 0 ),
@@ -5448,9 +5447,9 @@ void SceneManager::startWorkerThreads()
 //---------------------------------------------------------------------
 void SceneManager::stopWorkerThreads()
 {
-    mExitWorkerThreads = true;
-    mWorkerThreadsBarrier->sync(); // Wake up worker threads so they stop
-    Threads::WaitForThreads( mWorkerThreads );
+    mRequestType = STOP_THREADS;
+    mWorkerThreadsBarrier->sync(); //Fire threads
+    mWorkerThreadsBarrier->sync(); //Wait them to complete
 
     delete mWorkerThreadsBarrier;
     mWorkerThreadsBarrier = 0;
@@ -5458,46 +5457,47 @@ void SceneManager::stopWorkerThreads()
 //---------------------------------------------------------------------
 unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
 {
+    bool exitThread = false;
     size_t threadIdx = threadHandle->getThreadIdx();
-    while( !mExitWorkerThreads )
+    while( !exitThread )
     {
         mWorkerThreadsBarrier->sync();
-        if( !mExitWorkerThreads )
+        switch( mRequestType )
         {
-            switch( mRequestType )
-            {
-            case CULL_FRUSTUM:
-                cullFrustum( mCurrentCullFrustumRequest, threadIdx );
-                break;
-            case UPDATE_ALL_ANIMATIONS:
-                updateAllAnimationsThread( threadIdx );
-                break;
-            case UPDATE_ALL_TRANSFORMS:
-                updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
-                break;
-            case UPDATE_ALL_BOUNDS:
-                updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
-                break;
-            case UPDATE_ALL_LODS:
-                updateAllLodsThread( mUpdateLodRequest, threadIdx );
-                break;
-            case UPDATE_INSTANCE_MANAGERS:
-                updateInstanceManagersThread( threadIdx );
-                break;
-            case BUILD_LIGHT_LIST01:
-                buildLightListThread01( mBuildLightListRequestPerThread[threadIdx], threadIdx );
-                break;
-            case BUILD_LIGHT_LIST02:
-                buildLightListThread02( threadIdx );
-                break;
-            case USER_UNIFORM_SCALABLE_TASK:
-                mUserTask->execute( threadIdx, mNumWorkerThreads );
-                break;
-            default:
-                break;
-            }
-            mWorkerThreadsBarrier->sync();
+        case CULL_FRUSTUM:
+            cullFrustum( mCurrentCullFrustumRequest, threadIdx );
+            break;
+        case UPDATE_ALL_ANIMATIONS:
+            updateAllAnimationsThread( threadIdx );
+            break;
+        case UPDATE_ALL_TRANSFORMS:
+            updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
+            break;
+        case UPDATE_ALL_BOUNDS:
+            updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
+            break;
+        case UPDATE_ALL_LODS:
+            updateAllLodsThread( mUpdateLodRequest, threadIdx );
+            break;
+        case UPDATE_INSTANCE_MANAGERS:
+            updateInstanceManagersThread( threadIdx );
+            break;
+        case BUILD_LIGHT_LIST01:
+            buildLightListThread01( mBuildLightListRequestPerThread[threadIdx], threadIdx );
+            break;
+        case BUILD_LIGHT_LIST02:
+            buildLightListThread02( threadIdx );
+            break;
+        case USER_UNIFORM_SCALABLE_TASK:
+            mUserTask->execute( threadIdx, mNumWorkerThreads );
+            break;
+        case STOP_THREADS:
+            exitThread = true;
+            break;
+        default:
+            break;
         }
+        mWorkerThreadsBarrier->sync();
     }
 
     return 0;
