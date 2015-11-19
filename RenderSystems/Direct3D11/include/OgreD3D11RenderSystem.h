@@ -46,7 +46,7 @@ namespace Ogre
     /**
     Implementation of DirectX11 as a rendering system.
     */
-    class D3D11RenderSystem : public RenderSystem
+    class _OgreD3D11Export D3D11RenderSystem : public RenderSystem
     {
     private:
 

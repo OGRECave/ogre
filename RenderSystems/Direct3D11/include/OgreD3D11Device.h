@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class D3D11Device
+    class _OgreD3D11Export D3D11Device
     {
     private:
         ID3D11DeviceN*             mD3D11Device;

@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class D3D11DriverList
+    class _OgreD3D11Export D3D11DriverList
     {
     public:
         D3D11DriverList( IDXGIFactoryN* pDXGIFactory );

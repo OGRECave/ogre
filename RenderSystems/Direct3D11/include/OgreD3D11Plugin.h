@@ -35,7 +35,7 @@ namespace Ogre
 {
 
     /** Plugin instance for D3D11 Manager */
-    class D3D11Plugin : public Plugin
+    class _OgreD3D11Export D3D11Plugin : public Plugin
     {
     public:
         D3D11Plugin();

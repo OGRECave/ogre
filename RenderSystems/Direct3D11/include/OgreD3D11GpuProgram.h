@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** Direct3D implementation of a few things common to low-level vertex & fragment programs. */
-    class D3D11GpuProgram : public GpuProgram
+    class _OgreD3D11Export D3D11GpuProgram : public GpuProgram
     {
     protected:
         D3D11Device & mDevice;
@@ -72,7 +72,7 @@ namespace Ogre {
     };
 
     /** Direct3D implementation of low-level fragment programs. */
-    class D3D11GpuFragmentProgram : public D3D11GpuProgram
+    class _OgreD3D11Export D3D11GpuFragmentProgram : public D3D11GpuProgram
     {
     protected:
         ID3D11PixelShader * mPixelShader;
@@ -89,7 +89,7 @@ namespace Ogre {
     };
 
     /** Direct3D implementation of low-level vertex programs. */
-    class D3D11GpuDomainProgram : public D3D11GpuProgram
+    class _OgreD3D11Export D3D11GpuDomainProgram : public D3D11GpuProgram
     {
     protected:
         ID3D11DomainShader * mDomainShader;
@@ -106,7 +106,7 @@ namespace Ogre {
     };
 
     /** Direct3D implementation of low-level vertex programs. */
-    class D3D11GpuHullProgram : public D3D11GpuProgram
+    class _OgreD3D11Export D3D11GpuHullProgram : public D3D11GpuProgram
     {
     protected:
         ID3D11HullShader * mHullShader;
@@ -127,7 +127,7 @@ namespace Ogre {
         Direct3D implementation of low-level geometry programs. 
         Added due to need to accept geometry programs came from other profiles (nvgp4, for example)
     */
-    class D3D11GpuGeometryProgram : public D3D11GpuProgram
+    class _OgreD3D11Export D3D11GpuGeometryProgram : public D3D11GpuProgram
     {
     protected:
         ID3D11GeometryShader * mGeometryShader;

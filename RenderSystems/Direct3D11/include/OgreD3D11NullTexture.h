@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class D3D11NullTexture : public D3D11Texture
+    class _OgreD3D11Export D3D11NullTexture : public D3D11Texture
     {
 	public:
 		/// constructor 
@@ -75,7 +75,7 @@ namespace Ogre
 
 namespace v1
 {
-    class D3D11NullPixelBuffer : public HardwarePixelBuffer
+    class _OgreD3D11Export D3D11NullPixelBuffer : public HardwarePixelBuffer
     {
     protected:
         RenderTexture   *mDummyRenderTexture;
@@ -97,7 +97,7 @@ namespace v1
     };
 }
 
-    class D3D11NullTextureTarget : public RenderTexture //D3D11RenderTexture
+    class _OgreD3D11Export D3D11NullTextureTarget : public RenderTexture //D3D11RenderTexture
     {
         D3D11NullTexture *mUltimateTextureOwner;
 

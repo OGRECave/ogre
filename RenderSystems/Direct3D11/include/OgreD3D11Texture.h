@@ -40,7 +40,7 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    class D3D11Texture : public Texture
+    class _OgreD3D11Export D3D11Texture : public Texture
     {
 	public:
 		/// constructor 
@@ -183,7 +183,7 @@ namespace Ogre {
     };
 
     /// RenderTexture implementation for D3D11
-    class D3D11RenderTexture : public RenderTexture
+    class _OgreD3D11Export D3D11RenderTexture : public RenderTexture
     {
         D3D11Device & mDevice;
         ID3D11RenderTargetView * mRenderTargetView;

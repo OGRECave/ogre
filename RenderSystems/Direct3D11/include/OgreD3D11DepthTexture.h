@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class D3D11DepthTexture : public D3D11Texture
+    class _OgreD3D11Export D3D11DepthTexture : public D3D11Texture
     {
     protected:
         bool mShareableDepthBuffer;
@@ -81,7 +81,7 @@ namespace Ogre
 
 namespace v1
 {
-    class D3D11DepthPixelBuffer : public HardwarePixelBuffer
+    class _OgreD3D11Export D3D11DepthPixelBuffer : public HardwarePixelBuffer
     {
     protected:
         RenderTexture   *mDummyRenderTexture;
@@ -103,7 +103,7 @@ namespace v1
     };
 }
 
-    class D3D11DepthTextureTarget : public RenderTexture //D3D11RenderTexture
+    class _OgreD3D11Export D3D11DepthTextureTarget : public RenderTexture //D3D11RenderTexture
     {
         D3D11DepthTexture *mUltimateTextureOwner;
 
