@@ -5,7 +5,7 @@
 namespace Ogre 
 {
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-	class MonitorInfo
+    class _OgreD3D11Export MonitorInfo
 	{
 	public :
 		MonitorInfo() : mCurrentMonitor(0) {}
