@@ -31,10 +31,11 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreD3D11Driver.h"
 #include "OgreRoot.h"
-#include "OgreLogManager.h"
-#include "OgreViewport.h"
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11Texture.h"
+#include "OgreViewport.h"
+#include "OgreLogManager.h"
+#include "OgreHardwarePixelBuffer.h"
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 #include "OgreD3D11StereoDriverBridge.h"
 #endif

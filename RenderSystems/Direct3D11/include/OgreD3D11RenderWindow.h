@@ -45,7 +45,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class D3D11RenderWindowBase 
+    class _OgreD3D11Export D3D11RenderWindowBase
         : public RenderWindow
         , protected D3D11DeviceResource
     {
@@ -107,7 +107,7 @@ namespace Ogre
     };
 
     
-    class D3D11RenderWindowSwapChainBased
+    class _OgreD3D11Export D3D11RenderWindowSwapChainBased
         : public D3D11RenderWindowBase
     {
     public:
@@ -161,7 +161,7 @@ namespace Ogre
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 
-    class D3D11RenderWindowHwnd 
+    class _OgreD3D11Export D3D11RenderWindowHwnd
         : public D3D11RenderWindowSwapChainBased
     {
     public:
@@ -212,7 +212,7 @@ namespace Ogre
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     
-    class D3D11RenderWindowCoreWindow
+    class _OgreD3D11Export D3D11RenderWindowCoreWindow
         : public D3D11RenderWindowSwapChainBased
     {
     public:

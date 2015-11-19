@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class D3D11Mappings
+    class _OgreD3D11Export D3D11Mappings
 	{
 	public:
 		/// return a D3D11 equivalent for a Ogre TextureAddressingMode value

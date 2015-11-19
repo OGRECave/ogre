@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class D3D11VideoModeList
+    class _OgreD3D11Export D3D11VideoModeList
     {
         vector<D3D11VideoMode>::type mModeList;
 

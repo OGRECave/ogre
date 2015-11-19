@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class D3D11DepthBuffer : public DepthBuffer
+    class _OgreD3D11Export D3D11DepthBuffer : public DepthBuffer
     {
     public:
         D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
