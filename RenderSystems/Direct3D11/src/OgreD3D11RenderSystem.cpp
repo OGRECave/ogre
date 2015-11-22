@@ -3042,7 +3042,7 @@ bail:
             TextureStageGroup& currentStage = mTextureDesc[i];
             if ((bindingFlag & remainBindings) == bindingFlag && (samplerStage.mSamplerStatesCount > 0 || samplerStage.mTexturesCount > 0))
             {
-                if (samplerStage.mSamplerStates > 0)
+                if (samplerStage.mSamplerStatesCount > 0)
                 {
                     (*mDevice.GetImmediateContext().*mSamplersCallsLUT[i].SetSamplers)(static_cast<UINT>(0), static_cast<UINT>(samplerStage.mSamplerStatesCount), samplerStage.mSamplerStates);
                     if (mDevice.isError())
