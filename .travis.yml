@@ -1,0 +1,28 @@
+language: cpp
+sudo: false
+addons:
+  apt:
+    packages:
+    - cmake
+    - libxaw7-dev
+    - libzzip-dev
+    - libxrandr-dev
+    - libfreetype6-dev
+    - libxt-dev
+    - libboost-all-dev
+    - libcppunit-dev
+    - libgles2-mesa-dev
+before_script:
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+    - sleep 3 # give xvfb some time to start
+env:
+    - TEST=ON
+    - GL3=ON
+script:
+    # we only need the legacy GL rendersystem so tests work on the headless system
+    - cmake -DOGRE_BUILD_TESTS=$TEST -DOGRE_BUILD_RENDERSYSTEM_GL=$TEST -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS=$GL3 -DOGRE_BUILD_RENDERSYSTEM_GLES2=$GL3 -DCMAKE_BUILD_TYPE=Debug .
+    - make
+    - if [ $TEST ]; then bin/Test_Ogre ; fi
+os: linux
+cache: apt

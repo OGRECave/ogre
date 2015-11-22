@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/paroj/ogre.svg?branch=master)](https://travis-ci.org/paroj/ogre)
+
 <p class="header" align="center"><img alt="" src="Docs/ogre-logo-wetfloor.gif" width="235" height="78"></p>
 
 ## Summary
