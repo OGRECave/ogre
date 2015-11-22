@@ -10,10 +10,10 @@ guide will explain to you how to use CMake to build Ogre from source.
 
 CMake is a cross-platform build system - or perhaps more accurately a
 build configurator. It is a program which, from a set of CMake scripts,
-creates a native build system for your platform that allows you to 
-build Ogre. 
+creates a native build system for your platform that allows you to
+build Ogre.
 The build process is configurable via CMake. Ogre provides several
-options which you can use to customise your build. 
+options which you can use to customise your build.
 
 
 2. Getting CMake
@@ -25,13 +25,14 @@ platforms. Furthermore, if you are on a Linux system, chances are high
 that your distributor offers a package for CMake. You need a CMake
 version >= 2.6.
 For Ubuntu, type the following in a console to install CMake:
-> sudo apt-get install cmake-gui
+
+    sudo apt-get install cmake-gui
 
 
 3. Getting dependencies
 -------------------------
 
-Ogre requires the freetype library, but there are other dependencies we 
+Ogre requires the freetype library, but there are other dependencies we
 strongly recommend you to use unless you know what you are doing. You
 can get source or binary packages for each from their respective websites
 listed below. We also offer precompiled dependencies or bundled source
@@ -39,10 +40,12 @@ packages for certain platforms, please refer to our download page:
   http://www.ogre3d.org/download/source
 Linux distributions usually offer packages for each dependency. On Ubuntu
 Karmic, the following command will install all of the dependencies:
-> sudo apt-get install libfreetype6-dev libboost-date-time-dev \
->   libboost-thread-dev nvidia-cg-toolkit libfreeimage-dev \
->   zlib1g-dev libzzip-dev libois-dev libcppunit-dev doxygen \
->   libxt-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libglu-dev
+
+     sudo apt-get install libfreetype6-dev libboost-date-time-dev \
+       libboost-thread-dev nvidia-cg-toolkit libfreeimage-dev \
+       zlib1g-dev libzzip-dev libois-dev libcppunit-dev doxygen \
+       libxt-dev libxaw7-dev libxxf86vm-dev libxrandr-dev libglu-dev
+
 If you cannot obtain prebuilt binaries of a dependency for your platform,
 please refer to the list below and get a source package from the website,
 then build it according to its documentation.
@@ -65,7 +68,7 @@ Optional dependencies:
 * POCO: http://pocoproject.org (+)
 * TBB: http://www.threadingbuildingblocks.org (+)
 
-(+) Boost is used to build threaded versions of Ogre. Only the 
+(+) Boost is used to build threaded versions of Ogre. Only the
 boost-thread and boost-date-time libraries are required. For Visual C++
 you can find binary installers at http://www.boostpro.com.
 Alternatively, you can use either POCO or TBB instead of Boost to
@@ -87,8 +90,8 @@ this directory you should have the subdirectories bin, lib and include
 where you place .dll, .lib and header files of the dependencies,
 respectively. (If you are using one of our precompiled binary packages,
 then this layout will already have been created for you.)
-This 'Dependencies' dir can then be placed either inside the Ogre 
-source directory or inside your chosen build directory. You can also 
+This 'Dependencies' dir can then be placed either inside the Ogre
+source directory or inside your chosen build directory. You can also
 put it somewhere else, but you will then need to tell CMake the location
 as described below.
 
@@ -117,7 +120,7 @@ the build system for you.
 you have successfully installed or compiled them in step 3, then you may
 need to tell CMake where to look. On Unix platforms CMake should usually
 be able to pick up all the dependencies if they are installed in standard
-locations. If you followed the advice of step 4 and put all dependencies 
+locations. If you followed the advice of step 4 and put all dependencies
 in a common directory, then you can specify that directory in the
 variable OGRE_DEPENDENCIES_DIR. Otherwise, you can specify the directory
 for each dependency individually. Click on 'Add entry' to add a new CMake
@@ -138,14 +141,17 @@ you should find the file OGRE.sln. Open it and compile the target
 on MacOS. If you are using a Makefile generator, then instead open a
 console and cd to your build directory, then call the appropriate make
 program. E. g. on Linux type
-> make
-to start the build process. 
+
+    make
+
+to start the build process.
 If you have doxygen installed and CMake picked it up, then there will
 be an additional build target called doc which you can optionally build.
 This will freshly generate the API documentation for Ogre's classes from
 the header files. In Visual Studio, just select and build the target
 'OgreDoc', on Linux type:
-> make OgreDoc
+
+     make OgreDoc
 
 
 7. Installing Ogre
@@ -156,9 +162,11 @@ copy the built libraries and headers to a clean location. This location
 will strongly resemble the layout of our prebuilt Ogre SDKs. We recommend
 you do this step as it will make it easier to use Ogre in your projects.
 In Visual Studio, just select and build the target 'INSTALL'. This will
-create the folder 'sdk' inside your build directory and copy all the 
+create the folder 'sdk' inside your build directory and copy all the
 required libraries there. For Makefile based generators, type:
-> make install  (or sudo make install, if root privileges are required)
+
+     make install  (or sudo make install, if root privileges are required)
+
 On Linux Ogre will by default be installed to /usr/local. You can change
 the install location by changing the variable CMAKE_INSTALL_PREFIX in
 CMake.
@@ -178,7 +186,7 @@ To run samples on your device you will need to have a valid iOS Developer
 certificate installed.  For each sample, double click on target in the Groups &
 Files list.  Ensure that a valid identity is selected in the Code Signing Identity
 drop menu.
-Also, because we can't tell CMake what Xcode project format you want, you will 
+Also, because we can't tell CMake what Xcode project format you want, you will
 have to change it yourself.  Open the Project Menu, choose Edit Project Settings.
 Click on the General tab in the settings window.  Change Project Format to
 Xcode 3.1-compatible.
@@ -198,12 +206,12 @@ You need Windows 8.0 or later, Windows 8.1 is recommended.
 You need Visual Studio 2012 or later, Visual Studio 2013 is recommended
 as it is bundled with WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
 
-Download and install CMake 3.1 (scheduled for release 2014-11-01) 
+Download and install CMake 3.1 (scheduled for release 2014-11-01)
 or CMakeMS from http://cmakems.codeplex.com/
 
 Patched dependencies must be used, compiled with appropriate WINAPI_FAMILY.
-Cg is not supported, and only headers from OIS are needed. 
-You can use https://bitbucket.org/eugene_gff/ogre-dependencies-winrt - 
+Cg is not supported, and only headers from OIS are needed.
+You can use https://bitbucket.org/eugene_gff/ogre-dependencies-winrt -
 has VS2012 and VS2013 projects for Win32, WinRT (can be reused for WinPhone)
 Compile dependencies for all configurations that you plan to use before
 running CMake. Dependencies for Win32 and for WinRT must be located in
