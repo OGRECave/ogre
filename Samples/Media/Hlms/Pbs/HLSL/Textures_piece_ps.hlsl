@@ -53,15 +53,17 @@
 		@piece( specularExtraParam ), F0@end
 	@end
 	@property( !specular_map || fresnel_workflow )
-		@piece( kS )material.kS.xyz@end
+		@piece( kS )material.kS@end
 	@end
 @end @property( metallic_workflow )
 @piece( SampleSpecularMap )
 	@property( specular_map )
 		float metalness = textureMaps[@value( specular_map_idx )].Sample( samplerStates[@value(specular_map_idx)], float3(inPs.uv@value(uv_specular).xy, specularIdx) ).x * material.F0.x;
 		F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, metalness );
+		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * metalness;
 	@end @property( !specular_map )
 		F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, material.F0.x );
+		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * material.F0.x;
 	@end
 	@property( hlms_alphablend )F0 *= material.F0.w;@end
 	@property( transparent_mode )F0 *= diffuseCol.w;@end
