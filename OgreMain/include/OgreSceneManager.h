@@ -889,12 +889,12 @@ namespace Ogre {
             BUILD_LIGHT_LIST01,
             BUILD_LIGHT_LIST02,
             USER_UNIFORM_SCALABLE_TASK,
+            STOP_THREADS,
             NUM_REQUESTS
         };
 
         size_t mNumWorkerThreads;
 
-        volatile bool       mExitWorkerThreads;
         CullFrustumRequest              mCurrentCullFrustumRequest;
         UpdateLodRequest                mUpdateLodRequest;
         UpdateTransformRequest          mUpdateTransformRequest;

@@ -37,7 +37,7 @@ namespace v1 {
     /** Base implementation of a D3D11 buffer, dealing with all the common
     aspects.
     */
-    class D3D11HardwareBuffer : public HardwareBuffer
+    class _OgreD3D11Export D3D11HardwareBuffer : public HardwareBuffer
     {
     public:
         enum BufferType

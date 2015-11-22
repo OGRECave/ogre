@@ -35,7 +35,7 @@ namespace Ogre {
 namespace v1 {
 
     /** Implementation of HardwareBufferManager for D3D11. */
-    class D3D11HardwareBufferManagerBase : public HardwareBufferManagerBase
+    class _OgreD3D11Export D3D11HardwareBufferManagerBase : public HardwareBufferManagerBase
     {
     protected:
         D3D11Device & mlpD3DDevice;
@@ -70,7 +70,7 @@ namespace v1 {
     };
 
     /// D3D11HardwareBufferManagerBase as a Singleton
-    class D3D11HardwareBufferManager : public HardwareBufferManager
+    class _OgreD3D11Export D3D11HardwareBufferManager : public HardwareBufferManager
     {
     public:
         D3D11HardwareBufferManager(D3D11Device & device)
