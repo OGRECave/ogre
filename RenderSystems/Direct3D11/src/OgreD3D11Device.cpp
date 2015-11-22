@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D11Device.h"
+#include "OgreException.h"
 
 namespace Ogre
 {
