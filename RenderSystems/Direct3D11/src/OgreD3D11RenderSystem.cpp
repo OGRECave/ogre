@@ -48,8 +48,6 @@ THE SOFTWARE.
 #include "OgreD3D11HLSLProgram.h"
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreException.h"
-
-
 #include "d3d11MultiDevice.h"
 
 
@@ -230,7 +228,8 @@ bail:
 		// This flag is required in order to enable compatibility with Direct2D.
 		deviceFlags |= D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 #endif
-		if(OGRE_DEBUG_MODE && !IsWorkingUnderNsight() && D3D11Device::D3D_NO_EXCEPTION != D3D11Device::getExceptionsErrorLevel())
+        
+		if(OGRE_DEBUG_MODE && !IsWorkingUnderNsight() && D3D11Device::DEL_NO_EXCEPTION != mDevice.getExceptionsErrorLevel())
 		{
 			deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 		}
@@ -308,6 +307,7 @@ bail:
         ConfigOption optMinFeatureLevels;
         ConfigOption optMaxFeatureLevels;
         ConfigOption optExceptionsErrorLevel;
+        ConfigOption optDebugOutputErrorLevel;
         ConfigOption optDriverType;
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		ConfigOption optStereoMode;
@@ -431,17 +431,28 @@ bail:
 
         // Exceptions Error Level
         optExceptionsErrorLevel.name = "Information Queue Exceptions Bottom Level";
-        optExceptionsErrorLevel.possibleValues.push_back("No information queue exceptions");
-        optExceptionsErrorLevel.possibleValues.push_back("Corruption");
-        optExceptionsErrorLevel.possibleValues.push_back("Error");
-        optExceptionsErrorLevel.possibleValues.push_back("Warning");
-        optExceptionsErrorLevel.possibleValues.push_back("Info (exception on any message)");
+        optExceptionsErrorLevel.possibleValues.push_back(D3D11Device::sDebugLevelNone);
+        optExceptionsErrorLevel.possibleValues.push_back(D3D11Device::sDebugLevelInfo);
+        optExceptionsErrorLevel.possibleValues.push_back(D3D11Device::sDebugLevelWarning);
+        optExceptionsErrorLevel.possibleValues.push_back(D3D11Device::sDebugLevelError);
+        optExceptionsErrorLevel.possibleValues.push_back(D3D11Device::sDebugLevelCorruption);
+        
+#ifdef _WIN32_WINNT_WIN8
+        optExceptionsErrorLevel.possibleValues.push_back(D3D11Device::sDebugLevelMessage);
+#endif
+
 #if OGRE_DEBUG_MODE
-        optExceptionsErrorLevel.currentValue = "Info (exception on any message)";
+        optExceptionsErrorLevel.currentValue = D3D11Device::sDebugLevelWarning;
 #else
         optExceptionsErrorLevel.currentValue = "No information queue exceptions";
 #endif
         optExceptionsErrorLevel.immutable = false;
+
+        //Direct3D11 calls debug output level
+        
+        optDebugOutputErrorLevel.name = "Debug output level";
+        optDebugOutputErrorLevel.possibleValues = optExceptionsErrorLevel.possibleValues;
+        optDebugOutputErrorLevel.currentValue = D3D11Device::sDebugLevelWarning;
         
 
         // Driver type
@@ -475,6 +486,7 @@ bail:
         mOptions[optMinFeatureLevels.name] = optMinFeatureLevels;
         mOptions[optMaxFeatureLevels.name] = optMaxFeatureLevels;
         mOptions[optExceptionsErrorLevel.name] = optExceptionsErrorLevel;
+        mOptions[optDebugOutputErrorLevel.name] = optDebugOutputErrorLevel;
         mOptions[optDriverType.name] = optDriverType;
 
 		mOptions[optBackBufferCount.name] = optBackBufferCount;
@@ -728,7 +740,7 @@ bail:
         LogManager::getSingleton().logMessage( "D3D11 : Subsystem Initialising" );
 
 		if(IsWorkingUnderNsight())
-			LogManager::getSingleton().logMessage( "D3D11 : Nvidia Nsight found");
+			LogManager::getSingleton().logMessage( "D3D11 : NVIDIA Nsight found" );
 
         // Init using current settings
         mActiveD3DDriver = NULL;
@@ -753,32 +765,14 @@ bail:
             if( opt == mOptions.end() )
                 OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue Exceptions Bottom Level option!", "D3D11RenderSystem::initialise" );
             String infoQType = opt->second.currentValue;
+            
+            mDevice.setExceptionsErrorLevel(infoQType);
 
-            if ("No information queue exceptions" == infoQType)
-            {
-#if OGRE_DEBUG_MODE
-                // a debug build should always enable the debug layer and report errors
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
-#else
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_NO_EXCEPTION);
-#endif
-            }
-            else if ("Corruption" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_CORRUPTION);
-            }
-            else if ("Error" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
-            }
-            else if ("Warning" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_WARNING);
-            }
-            else if ("Info (exception on any message)" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_INFO);
-            }
+            opt = mOptions.find("Debug output level");
+            if (opt == mOptions.end())
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue storage Bottom Level option!", "D3D11RenderSystem::initialise");
+            String debugOutput = opt->second.currentValue;
+            mDevice.setStorageErrorLevel(debugOutput);
 
 
             // Driver type
