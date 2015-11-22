@@ -39,14 +39,14 @@ namespace Ogre
         StateMapConstInterator it = states.find(key);
         return it != states.end() ? it->second : NULL;
     }
-
+    //---------------------------------------------------------------------
     void D3D11RenderOperationStateGroup::addState(const RenderOperationStateDescriptor& renderOperationStateDescriptor, D3D11RenderOperationState * opState)
     {
         const RenderOperationStateDescriptor::Key key = renderOperationStateDescriptor.GetKey();
         opState->descriptor = renderOperationStateDescriptor;
         states.insert(StateMapPair(key, opState));
     }
-
+    //---------------------------------------------------------------------
     void D3D11RenderOperationStateGroup::SyncToVersion(const unsigned int version)
     {
         if (mVersion < version)
@@ -55,7 +55,7 @@ namespace Ogre
             mVersion = version;
         }
     }
-
+    //---------------------------------------------------------------------
     void D3D11RenderOperationStateGroup::ClearAllStates()
     {
         StateMapConstInterator it_end = states.end();
@@ -65,18 +65,17 @@ namespace Ogre
         }
         states.clear();
     }
-
+    //---------------------------------------------------------------------
     D3D11RenderOperationStateGroup::D3D11RenderOperationStateGroup()
     {
         mVersion = 0;
     }
-
+    //---------------------------------------------------------------------
     D3D11RenderOperationStateGroup::~D3D11RenderOperationStateGroup()
     {
         ClearAllStates();
     }
-
-
+    //---------------------------------------------------------------------
     D3D11RenderOperationState::D3D11RenderOperationState() :
         mBlendState(NULL)
         , mRasterizer(NULL)
@@ -87,7 +86,7 @@ namespace Ogre
     {
         memset(mSamplers, 0, sizeof(Samplers));
     }
-
+    //---------------------------------------------------------------------
     D3D11RenderOperationState::~D3D11RenderOperationState()
     {
         if (autoRelease)
@@ -95,7 +94,7 @@ namespace Ogre
             release();
         }
     }
-
+    //---------------------------------------------------------------------
     void D3D11RenderOperationState::release()
     {
         if (autoReleaseBaseStates == true)
@@ -117,35 +116,35 @@ namespace Ogre
             }
         }
     }
-
+    //---------------------------------------------------------------------
     StateManager::StateManager(D3D11Device& device) :  mDevice(device)
     {
         mVersion = 0;
     }
-
+    //---------------------------------------------------------------------
     void StateManager::increaseVersion()
     {
         mVersion++;
     }
-
+    //---------------------------------------------------------------------
     const unsigned int StateManager::getVersion()
     {
         return mVersion;
     }
 
-
+    //---------------------------------------------------------------------
     String StateManager::getCreateErrorMessage(const String& objectType)
     {
         return String("D3D11 device cannot create " + objectType +" state object");
     }
 
-
+    //---------------------------------------------------------------------
     ID3D11BlendState* StateManager::createOrRetrieveState(const D3D11_BLEND_DESC& blendDesc)
     {
         return createOrRetrieveStateTemplated<ID3D11BlendState*, D3D11_BLEND_DESC, D3D11_REQ_BLEND_OBJECT_COUNT_PER_DEVICE>
             (mBlendStateMap, blendDesc);
     }
-
+    //---------------------------------------------------------------------
     ID3D11BlendState* StateManager::createState(const D3D11_BLEND_DESC& blendDesc)
     {
         ID3D11BlendState* state = NULL;
@@ -161,7 +160,7 @@ namespace Ogre
 
         return state;
     }
-
+    //---------------------------------------------------------------------
     ID3D11RasterizerState* StateManager::createOrRetrieveState(const D3D11_RASTERIZER_DESC& rasterizerDesc)
     {
         return createOrRetrieveStateTemplated<ID3D11RasterizerState*, D3D11_RASTERIZER_DESC, D3D11_REQ_RASTERIZER_OBJECT_COUNT_PER_DEVICE>
@@ -184,13 +183,13 @@ namespace Ogre
 
         return state;
     }
-
+    //---------------------------------------------------------------------
     ID3D11DepthStencilState* StateManager::createOrRetrieveState(const D3D11_DEPTH_STENCIL_DESC& depthStencilDesc)
     {
         return createOrRetrieveStateTemplated<ID3D11DepthStencilState*, D3D11_DEPTH_STENCIL_DESC, D3D11_REQ_DEPTH_STENCIL_OBJECT_COUNT_PER_DEVICE>
             (mDepthStencilStateMap, depthStencilDesc);
     }
-
+    //---------------------------------------------------------------------
     ID3D11DepthStencilState* StateManager::createState(const D3D11_DEPTH_STENCIL_DESC& depthStencilDesc)
     {
         ID3D11DepthStencilState* state = NULL;
@@ -206,13 +205,13 @@ namespace Ogre
         return state;
     }
 
-
+    //---------------------------------------------------------------------
     ID3D11SamplerState* StateManager::createOrRetrieveState(const D3D11_SAMPLER_DESC& samplerDesc)
     {
         return createOrRetrieveStateTemplated<ID3D11SamplerState*, D3D11_SAMPLER_DESC, D3D11_REQ_SAMPLER_OBJECT_COUNT_PER_DEVICE>
             (mSamplerMap, samplerDesc);
     }
-
+    //---------------------------------------------------------------------
     ID3D11SamplerState* StateManager::createState(const D3D11_SAMPLER_DESC& samplerDesc)
     {
         ID3D11SamplerState* state = NULL;
@@ -228,7 +227,7 @@ namespace Ogre
         }
         return state;
     }
-
+    //---------------------------------------------------------------------
     StateManager::~StateManager()
     {
         {
@@ -264,10 +263,19 @@ namespace Ogre
         }
 
     }
-
-
-
-
+    //---------------------------------------------------------------------
+    template<class MapType>
+    void  StateManager::insertWithoutDuplicates(MapType& container, 
+        const typename  MapType::key_type& key, const typename MapType::mapped_type& value)
+    {
+        if (container.insert(MapType::value_type(key, value)).second == false)
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                "Duplicate entries are not allowed",
+                "StateManager::insertWithoutDuplicates");
+        }
+    }
+    //---------------------------------------------------------------------
     template<class D3D11STATE, class D3DDESC, int MAX_OBJECTS>
     D3D11STATE StateManager::createOrRetrieveStateTemplated(std::map<crc, StateObjectEntry<D3D11STATE>* >& container, const D3DDESC& desc)
     {
@@ -322,7 +330,7 @@ namespace Ogre
             // make sure state objects get destroyed by calling flush
             mDevice.GetImmediateContext()->Flush();
             state = createState(desc);
-            container.insert(std::make_pair(descCrc, new StateObject(state, descCrc)));
+            insertWithoutDuplicates(container, descCrc, new StateObject(state, descCrc));
         }
         else
         {

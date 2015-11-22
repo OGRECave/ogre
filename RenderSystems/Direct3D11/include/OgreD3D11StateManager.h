@@ -149,6 +149,10 @@ namespace Ogre
         D3D11Device& mDevice;
 
         String getCreateErrorMessage(const String& objectType);
+
+        template<class MapType>
+        void  insertWithoutDuplicates(MapType& container,
+            const typename  MapType::key_type& key, const typename MapType::mapped_type& value);
     public:
         StateManager(D3D11Device& device);
         ~StateManager();
