@@ -102,43 +102,20 @@ static BOOL WINAPI GetParentPID(PROCESSENTRY32& procentry)
 	return pid ? TRUE : FALSE;
 }
 
-#ifdef _DEBUG
-#define PARENT "msdev.exe"
-const DWORD TIMEOUT = 5000;
-#else
-#define PARENT "idriver.exe"
-const DWORD TIMEOUT = 30000;
-#endif
-
 static std::string GetProcessFileName(DWORD processID)
 {
-		std::string result = "";
+    char buffer[MAX_PATH] = "";
 
-		HANDLE hProcess = OpenProcess(
-			SYNCHRONIZE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-			FALSE, processID);
-		if (hProcess != NULL)
-		{
-			// Here we call EnumProcessModules to get only the
-			// first module in the process this is important,
-			// because this will be the .EXE module for which we
-			// will retrieve the full path name in a second.
-			HMODULE        hMod;
-			char           szFileName[MAX_PATH];
-			DWORD dwSize2 = 0;
-			LPTSTR pszName = NULL;
-			if (EnumProcessModules(hProcess, &hMod,
-				sizeof(hMod), &dwSize2))
-			{
-				// Get Full pathname:
+    HANDLE hProcess = OpenProcess(SYNCHRONIZE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, processID);
+    if (hProcess != NULL)
+    {
+        if(0 == GetProcessImageFileName(hProcess, buffer, ARRAYSIZE(buffer)))
+            buffer[0] = 0;
 
-				if (GetModuleFileNameEx(hProcess, hMod,
-					szFileName, sizeof(szFileName)))
-					result = std::string(szFileName);
-			}
-		}
+        CloseHandle(hProcess);
+    }
 
-		return result;
+    return buffer;
 }
 
 static bool IsWorkingUnderNsightImpl()
