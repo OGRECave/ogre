@@ -94,8 +94,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
     {
-        mDevice.clearStoredErrorMessages();
-        
         mLockMappedSubResource.pData = NULL;
 
         switch(mParentTexture->getTextureType()) 

@@ -189,7 +189,7 @@ namespace Ogre {
             void * pRet = NULL;
 
             mLockMappedSubResource.pData = NULL;
-            mDevice.clearStoredErrorMessages();
+            
             HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer, 0, mapType, 0, &mLockMappedSubResource);
             if (FAILED(hr) || mDevice.isError())
             {
