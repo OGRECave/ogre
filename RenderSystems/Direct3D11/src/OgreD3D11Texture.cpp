@@ -866,8 +866,8 @@ namespace Ogre
                     mSurfaceList.push_back(
                         HardwarePixelBufferSharedPtr(buffer)
                         );
-                    width /= 2;
-                    height /= 2;
+                    width = std::max<size_t>(width / 2, 1);
+                    height = std::max<size_t>(height / 2, 1);
                 }
             }
         }
