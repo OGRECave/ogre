@@ -106,8 +106,9 @@ namespace Ogre {
     GLRenderSystem::GLRenderSystem()
     :   mStopRendering(false),
         mFixedFunctionTextureUnits(0),
-        mDepthWrite(true),
         mStencilWriteMask(0xFFFFFFFF),
+        mDepthWrite(true),
+        mScissorsEnabled(false),
         mUseAutoTextureMatrix(false),
         mHardwareBufferManager(0),
         mGpuProgramManager(0),
@@ -2092,6 +2093,7 @@ namespace Ogre {
         mCurrentContext->setCurrent();
 
         // Activate the viewport clipping
+        mScissorsEnabled = true;
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
     }
 
@@ -2099,6 +2101,7 @@ namespace Ogre {
     void GLRenderSystem::_endFrame(void)
     {
         // Deactivate the viewport clipping.
+        mScissorsEnabled = false;
         mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
         // unbind GPU programs at end of frame
         // this is mostly to avoid holding bound programs that might get deleted
@@ -3270,6 +3273,7 @@ namespace Ogre {
     void GLRenderSystem::setScissorTest(bool enabled, size_t left,
                                         size_t top, size_t right, size_t bottom)
     {
+        mScissorsEnabled = enabled;
         // If request texture flipping, use "upper-left", otherwise use "lower-left"
         bool flipping = mActiveRenderTarget->requiresTextureFlipping();
         //  GL measures from the bottom, not the top
@@ -3353,7 +3357,10 @@ namespace Ogre {
 
         // Should be enable scissor test due the clear region is
         // relied on scissor box bounds.
-        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+        if (!mScissorsEnabled)
+        {
+            mStateCacheManager->setEnabled(GL_SCISSOR_TEST, true);
+        }
 
         // Sets the scissor box as same as viewport
         GLint viewport[4];
@@ -3376,7 +3383,10 @@ namespace Ogre {
         }
 
         // Restore scissor test
-        mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
+        if (!mScissorsEnabled)
+        {
+           mStateCacheManager->setEnabled(GL_SCISSOR_TEST, false);
+        }
 
         // Reset buffer write state
         if (!mDepthWrite && (buffers & FBT_DEPTH))

@@ -89,12 +89,14 @@ namespace Ogre {
 
         void setLights();
 
-        /// Store last depth write state
-        bool mDepthWrite;
-        /// Store last stencil mask state
-        uint32 mStencilWriteMask;
         /// Store last colour write state
         bool mColourWrite[4];
+        /// Store last stencil mask state
+        uint32 mStencilWriteMask;
+        /// Store last depth write state
+        bool mDepthWrite;
+        /// Store last scissor enable state
+        bool mScissorsEnabled;
 
         /// Store scissor box
         int mScissorBox[4];

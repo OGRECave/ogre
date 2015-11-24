@@ -113,6 +113,7 @@ namespace Ogre {
 
     GL3PlusRenderSystem::GL3PlusRenderSystem()
         : mDepthWrite(true),
+          mScissorsEnabled(false),
           mStencilWriteMask(0xFFFFFFFF),
           mShaderManager(0),
           mGLSLShaderFactory(0),
@@ -1225,12 +1226,14 @@ namespace Ogre {
                         "Cannot begin frame - no viewport selected.",
                         "GL3PlusRenderSystem::_beginFrame");
 
+        mScissorsEnabled = true;
         OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
     }
 
     void GL3PlusRenderSystem::_endFrame(void)
     {
         // Deactivate the viewport clipping.
+        mScissorsEnabled = false;
         OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
 
         OGRE_CHECK_GL_ERROR(glDisable(GL_DEPTH_CLAMP));
@@ -2031,6 +2034,7 @@ namespace Ogre {
                                              size_t top, size_t right,
                                              size_t bottom)
     {
+        mScissorsEnabled = enabled;
         // If request texture flipping, use "upper-left", otherwise use "lower-left"
         bool flipping = mActiveRenderTarget->requiresTextureFlipping();
         //  GL measures from the bottom, not the top
@@ -2110,8 +2114,7 @@ namespace Ogre {
 
         // Should be enable scissor test due the clear region is
         // relied on scissor box bounds.
-        GLboolean scissorTestEnabled = glIsEnabled(GL_SCISSOR_TEST);
-        if (!scissorTestEnabled)
+        if (!mScissorsEnabled)
         {
             OGRE_CHECK_GL_ERROR(glEnable(GL_SCISSOR_TEST));
         }
@@ -2138,7 +2141,7 @@ namespace Ogre {
         }
 
         // Restore scissor test
-        if (!scissorTestEnabled)
+        if (!mScissorsEnabled)
         {
             OGRE_CHECK_GL_ERROR(glDisable(GL_SCISSOR_TEST));
         }
