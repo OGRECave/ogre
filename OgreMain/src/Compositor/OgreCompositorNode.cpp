@@ -47,6 +47,8 @@ THE SOFTWARE.
 
 #include "OgreRenderSystem.h"
 #include "OgreSceneManager.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderTexture.h"
 
 namespace Ogre
 {
@@ -481,6 +483,32 @@ namespace Ogre
         while( itor != end )
         {
             outResourcesLayout[itor->target] = layout;
+
+            TextureVec::const_iterator itTex = itor->textures.begin();
+            TextureVec::const_iterator enTex = itor->textures.end();
+
+            while( itTex != enTex )
+            {
+                const Ogre::TexturePtr tex = *itTex;
+                const size_t numFaces = tex->getNumFaces();
+                const uint8 numMips = tex->getNumMipmaps() + 1;
+                const uint32 numSlices = tex->getTextureType() == TEX_TYPE_CUBE_MAP ? 1u :
+                                                                                      tex->getDepth();
+                for( size_t face=0; face<numFaces; ++face )
+                {
+                    for( uint8 mip=0; mip<numMips; ++mip )
+                    {
+                        for( uint32 slice=0; slice<numSlices; ++slice )
+                        {
+                            RenderTarget *rt = tex->getBuffer( face, mip )->getRenderTarget( slice );
+                            outResourcesLayout[rt] = layout;
+                        }
+                    }
+                }
+
+                ++itTex;
+            }
+
             ++itor;
         }
     }
