@@ -45,6 +45,7 @@ THE SOFTWARE.
 #include "OgreParticleSystem.h"
 #include "OgreRoot.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreResourceTransition.h"
 
 #include "OgreHlms.h"
 #include "OgreHlmsManager.h"
@@ -57,6 +58,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassSceneDef.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencilDef.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUavDef.h"
 
 namespace Ogre{
 
@@ -6212,7 +6214,8 @@ namespace Ogre{
         // Save the first atom, should be name
         AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
-        uint width = 0, height = 0;
+        TextureType textureType = TEX_TYPE_2D;
+        uint width = 0, height = 0, depth = 1;
         float widthFactor = 1.0f, heightFactor = 1.0f;
         bool widthSet = false, heightSet = false, formatSet = false;
         TextureDefinitionBase::BoolSetting hwGammaWrite = TextureDefinitionBase::BoolUndefined;
@@ -6220,6 +6223,9 @@ namespace Ogre{
         bool fsaaExplicitResolve = false;
         uint16 depthBufferId = DepthBuffer::POOL_INVALID;
         PixelFormat depthBufferFormat = PF_UNKNOWN;
+        int numMipmaps = 0;
+        bool automipmaps = false;
+        bool isUav = false;
         bool preferDepthTexture = false;
         Ogre::PixelFormatList formats;
 
@@ -6334,6 +6340,35 @@ namespace Ogre{
                     }
                 }
                 break;
+            case ID_UAV:
+                isUav = true;
+                break;
+            case ID_MIPMAP:
+            case ID_MIPMAPS:
+                {
+                    // advance to next to get the number of mipmaps
+                    it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+                    if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    atom = (AtomAbstractNode*)(*it).get();
+                    if (!StringConverter::isNumber(atom->value))
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        return;
+                    }
+
+                    numMipmaps = StringConverter::parseInt(atom->value);
+                }
+                break;
+            case ID_AUTOMIPMAPS:
+                automipmaps = true;
+                break;
+            case ID_2D_ARRAY:   textureType = TEX_TYPE_2D_ARRAY; break;
+            case ID_3D:         textureType = TEX_TYPE_3D; break;
+            case ID_CUBEMAP:    textureType = TEX_TYPE_CUBE_MAP; break;
             default:
                 if (StringConverter::isNumber(atom->value))
                 {
@@ -6346,6 +6381,10 @@ namespace Ogre{
                     {
                         height = StringConverter::parseInt(atom->value);
                         heightSet = true;
+                    }
+                    else if (atomIndex == 4)
+                    {
+                        depth = StringConverter::parseInt(atom->value);
                     }
                     else
                     {
@@ -6369,6 +6408,8 @@ namespace Ogre{
                     {
                         if( PixelUtil::isDepth( format ) )
                             depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else if( format == PF_NULL )
+                            depthBufferId = DepthBuffer::POOL_NO_DEPTH;
                         else
                             depthBufferId = DepthBuffer::POOL_DEFAULT;
                     }
@@ -6382,15 +6423,24 @@ namespace Ogre{
             return;
         }
 
+        if( textureType == TEX_TYPE_2D )
+            depth = 1;
+        else if( textureType == TEX_TYPE_CUBE_MAP )
+            depth = 6;
 
         // No errors, create
         TextureDefinitionBase::TextureDefinition *td = defBase->addTextureDefinition( atom0->value );
+        td->textureType     = textureType;
         td->width           = width;
         td->height          = height;
+        td->depth           = depth;
+        td->numMipmaps      = numMipmaps;
         td->widthFactor     = widthFactor;
         td->heightFactor    = heightFactor;
         td->formatList      = formats;
         td->fsaa            = fsaa;
+        td->uav             = isUav;
+        td->automipmaps     = automipmaps;
         td->hwGammaWrite    = hwGammaWrite;
         td->depthBufferId   = depthBufferId;
         td->depthBufferFormat   = depthBufferFormat;
@@ -6792,11 +6842,13 @@ namespace Ogre{
         // Save the first atom, should be shadow map name.
         AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
 
-        uint width = 0, height = 0;
+        TextureType textureType = TEX_TYPE_2D;
+        uint width = 0, height = 0, depth = 1;
         float widthFactor = 1.0f, heightFactor = 1.0f;
         bool widthSet = false, heightSet = false, formatSet = false;
         bool hwGammaWrite = false;
         uint fsaa = 0;
+        bool isUav = false;
         bool preferDepthTexture = false;
         uint16 depthBufferId = DepthBuffer::POOL_INVALID;
         PixelFormat depthBufferFormat = PF_UNKNOWN;
@@ -6921,6 +6973,12 @@ namespace Ogre{
                     depthBufferId = StringConverter::parseInt(atom->value);
                 }
                 break;
+            case ID_UAV:
+                isUav = true;
+                break;
+            case ID_2D_ARRAY:   textureType = TEX_TYPE_2D_ARRAY; break;
+            case ID_3D:         textureType = TEX_TYPE_3D; break;
+            case ID_CUBEMAP:    textureType = TEX_TYPE_CUBE_MAP; break;
             case ID_LIGHT:
                 {
                     // advance to next to get the ID
@@ -6972,6 +7030,10 @@ namespace Ogre{
                         height = StringConverter::parseInt(atom->value);
                         heightSet = true;
                     }
+                    else if (atomIndex == 4)
+                    {
+                        depth = StringConverter::parseInt(atom->value);
+                    }
                     else
                     {
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
@@ -6997,6 +7059,8 @@ namespace Ogre{
                     {
                         if( PixelUtil::isDepth( format ) )
                             depthBufferId = DepthBuffer::POOL_NON_SHAREABLE;
+                        else if( format == PF_NULL )
+                            depthBufferId = DepthBuffer::POOL_NO_DEPTH;
                         else
                             depthBufferId = DepthBuffer::POOL_DEFAULT;
                     }
@@ -7010,15 +7074,23 @@ namespace Ogre{
             return;
         }
 
+        if( textureType == TEX_TYPE_2D )
+            depth = 1;
+        else if( textureType == TEX_TYPE_CUBE_MAP )
+            depth = 6;
+
         ShadowTextureDefinition *td = mShadowNodeDef->addShadowTextureDefinition( lightIdx, splitIdx,
                                                                                 atom0->value, isAtlas );
         // No errors, create
+        td->textureType     = textureType;
         td->width           = width;
         td->height          = height;
+        td->depth           = depth;
         td->widthFactor     = widthFactor;
         td->heightFactor    = heightFactor;
         td->formatList      = formats;
         td->fsaa            = fsaa;
+        td->uav             = isUav;
         td->hwGammaWrite    = hwGammaWrite;
         td->preferDepthTexture= preferDepthTexture;
         td->depthBufferId   = depthBufferId;
@@ -7548,6 +7620,8 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -7630,6 +7704,7 @@ namespace Ogre{
                 case ID_NUM_INITIAL:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
@@ -7783,6 +7858,9 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
+                case ID_EXPOSE:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8016,27 +8094,30 @@ namespace Ogre{
                         }
                     }
                     break;
-                    case ID_MATERIAL_SCHEME:
+                case ID_MATERIAL_SCHEME:
+                    {
+                        if (prop->values.empty())
                         {
-                            if (prop->values.empty())
-                            {
-                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                                return;
-                            }
-
-                            AbstractNodeList::const_iterator it0 = prop->values.begin();
-                            if (!getString(*it0, &passScene->mMaterialScheme))
-                            {
-                                compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
-                            }
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
                         }
-                        break;
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if (!getString(*it0, &passScene->mMaterialScheme))
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
                 case ID_VIEWPORT:
                 case ID_IDENTIFIER:
                 case ID_NUM_INITIAL:
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
+                case ID_EXPOSE:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
@@ -8059,33 +8140,7 @@ namespace Ogre{
         {
             if((*i)->type == ANT_OBJECT)
             {
-                ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
-                if( !nodeObj->abstract && (nodeObj->id == ID_BOTH ||
-                     nodeObj->id == ID_FRONT || nodeObj->id == ID_BACK) )
-                {
-                    StencilStateOp *stencilStateOp = 0;
-                    switch ( nodeObj->id )
-                    {
-                    case ID_BOTH:
-                        stencilStateOp = &passStencil->mStencilParams.stencilFront;
-                        translateStencilFace( compiler, *i, stencilStateOp );
-                        stencilStateOp = &passStencil->mStencilParams.stencilBack;
-                        translateStencilFace( compiler, *i, stencilStateOp );
-                        break;
-                    case ID_FRONT:
-                        stencilStateOp = &passStencil->mStencilParams.stencilFront;
-                        translateStencilFace( compiler, *i, stencilStateOp );
-                        break;
-                    case ID_BACK:
-                        stencilStateOp = &passStencil->mStencilParams.stencilBack;
-                        translateStencilFace( compiler, *i, stencilStateOp );
-                        break;
-                    }
-                }
-                else
-                {
-                    processNode(compiler, *i);
-                }
+                processNode(compiler, *i);
             }
             else if((*i)->type == ANT_PROPERTY)
             {
@@ -8098,7 +8153,16 @@ namespace Ogre{
                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return;
                     }
-                    if(!getBoolean(prop->values.front(), &passStencil->mStencilParams.enabled))
+                    if(!getBoolean(prop->values.front(), &passStencil->mStencilCheck))
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    break;
+                case ID_COMP_FUNC:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    if(!getCompareFunction(prop->values.front(), &passStencil->mCompareFunc))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
                 case ID_REF_VALUE:
@@ -8111,31 +8175,49 @@ namespace Ogre{
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
                 case ID_MASK:
-                {
                     if(prop->values.empty())
                     {
                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
                         return;
                     }
-                    uint32 mask = passStencil->mStencilParams.writeMask;
-                    if(!getHex(prop->values.front(), &mask))
+                    if(!getUInt(prop->values.front(), &passStencil->mStencilMask))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-                    passStencil->mStencilParams.writeMask = static_cast<uint8>( mask );
-                }
                     break;
-                case ID_READ_MASK:
-                {
+                case ID_FAIL_OP:
                     if(prop->values.empty())
                     {
-                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
                         return;
                     }
-                    uint32 mask = passStencil->mStencilParams.readMask;
-                    if(!getHex(prop->values.front(), &mask))
+                    if(!getStencilOp(prop->values.front(), &passStencil->mStencilFailOp))
                         compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
-
-                    passStencil->mStencilParams.readMask = static_cast<uint8>( mask );
-                }
+                    break;
+                case ID_DEPTH_FAIL_OP:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    if(!getStencilOp(prop->values.front(), &passStencil->mStencilDepthFailOp))
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    break;
+                case ID_PASS_OP:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    if(!getStencilOp(prop->values.front(), &passStencil->mStencilPassOp))
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    break;
+                case ID_TWO_SIDED:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    if(!getBoolean(prop->values.front(), &passStencil->mTwoSided))
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     break;
                 case ID_VIEWPORT:
                 case ID_IDENTIFIER:
@@ -8143,9 +8225,191 @@ namespace Ogre{
                 case ID_OVERLAYS:
                 case ID_EXECUTION_MASK:
                 case ID_VIEWPORT_MODIFIER_MASK:
+                case ID_USES_UAV:
+                case ID_COLOUR_WRITE:
                     break;
                 default:
                     compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line, 
+                        "token \"" + prop->name + "\" is not recognized");
+                }
+            }
+        }
+    }
+
+    void CompositorPassTranslator::translateUav( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                                                 CompositorTargetDef *targetDef )
+    {
+        mPassDef = targetDef->addPass( PASS_UAV );
+        CompositorPassUavDef *passUav = static_cast<CompositorPassUavDef*>( mPassDef );
+
+        ObjectAbstractNode *obj = reinterpret_cast<ObjectAbstractNode*>(node.get());
+        obj->context = Any(mPassDef);
+
+        for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)
+        {
+            if((*i)->type == ANT_OBJECT)
+            {
+                processNode(compiler, *i);
+            }
+            else if((*i)->type == ANT_PROPERTY)
+            {
+                PropertyAbstractNode *prop = reinterpret_cast<PropertyAbstractNode*>((*i).get());
+                switch(prop->id)
+                {
+                case ID_UAV:
+                case ID_UAV_EXTERNAL:
+                    if(prop->values.size() < 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    else if (prop->values.size() > 5)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    else if( prop->values.size() == 1 )
+                    {
+                        AbstractNodeList::const_iterator j = prop->values.begin();
+
+                        uint32 slot = ~0u;
+                        if( !getUInt( *j, &slot ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        // Clearing the UAV
+                        passUav->setUav( slot, false, "", 0, ResourceAccess::Read, 0, PF_UNKNOWN );
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator j = prop->values.begin();
+
+                        uint32 slot = ~0u;
+                        if( !getUInt( *j, &slot ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        ++j;
+
+                        String val;
+                        if(getString(*j, &val))
+                        {
+                            uint32 access = 0;
+                            uint32 mrtIndex = 0;
+                            PixelFormat format = PF_UNKNOWN;
+                            int32 mipmap = 0;
+                            bool mipmapFollows = false;
+
+                            bool isExternal = prop->id == ID_UAV_EXTERNAL;
+
+                            ++j;
+                            while(j != prop->values.end())
+                            {
+                                if((*j)->type == ANT_ATOM)
+                                {
+                                    AtomAbstractNode *atom = (AtomAbstractNode*)(*j).get();
+                                    switch(atom->id)
+                                    {
+                                    case ID_READ:
+                                        access |= ResourceAccess::Read;
+                                    case ID_WRITE:
+                                        access |= ResourceAccess::Write;
+                                        break;
+                                    case ID_MIPMAP:
+                                        mipmapFollows = true;
+                                        break;
+                                    default:
+                                        if(StringConverter::isNumber(atom->value))
+                                        {
+                                            if( mipmapFollows )
+                                            {
+                                                mipmap = StringConverter::parseInt(atom->value);
+                                                mipmapFollows = false;
+                                            }
+                                            else
+                                                mrtIndex = StringConverter::parseInt(atom->value);
+                                        }
+                                        else
+                                            format = PixelUtil::getFormatFromName(atom->value, true);
+                                    }
+                                }
+                                else
+                                {
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                       (*j)->getValue() + " is not a supported argument to the texture property");
+                                }
+                                ++j;
+                            }
+
+                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::UAV, val);
+                            compiler->_fireEvent(&evt, 0);
+
+                            if( !access )
+                            {
+                                compiler->addError( ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                    "UAV must have the 'read' and/or 'write' access tokens." );
+                            }
+
+                            passUav->setUav( slot, isExternal, evt.mName, mrtIndex,
+                                             static_cast<ResourceAccess::ResourceAccess>(access),
+                                             mipmap, format );
+                        }
+                        else
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               (*j)->getValue() + " is not a valid texture name");
+                    }
+                    break;
+                case ID_STARTING_SLOT:
+                {
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+
+                    uint32 val;
+                    AbstractNodeList::const_iterator it0 = prop->values.begin();
+                    if( getUInt( *it0, &val ) )
+                    {
+                        passUav->mStartingSlot = static_cast<uint8>( val );
+                    }
+                    else
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                    }
+                }
+                break;
+                break;
+            case ID_KEEP_PREVIOUS_UAV:
+                {
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+
+                    AbstractNodeList::const_iterator it0 = prop->values.begin();
+                    if( !getBoolean( *it0, &passUav->mKeepPreviousUavs ) )
+                    {
+                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                    }
+                }
+                break;
+                //case ID_VIEWPORT:
+                case ID_IDENTIFIER:
+                case ID_NUM_INITIAL:
+                //case ID_OVERLAYS:
+                case ID_EXECUTION_MASK:
+                case ID_VIEWPORT_MODIFIER_MASK:
+                //case ID_USES_UAV:
+                //case ID_COLOUR_WRITE:
+                    break;
+                default:
+                    compiler->addError(ScriptCompiler::CE_UNEXPECTEDTOKEN, prop->file, prop->line,
                         "token \"" + prop->name + "\" is not recognized");
                 }
             }
@@ -8235,6 +8499,8 @@ namespace Ogre{
             translateScene( compiler, node, target );
         else if(obj->name == "depth_copy")
             translateDepthCopy( compiler, node, target );
+        else if(obj->name == "bind_uav")
+            translateUav( compiler, node, target );
         else if(obj->name == "custom")
         {
             IdString customId;
@@ -8256,7 +8522,8 @@ namespace Ogre{
         else
         {
             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, obj->file, obj->line,
-                "pass types must be \"clear\", \"stencil\", \"render_quad\", \"render_scene\" or \"custom\".");
+                "pass types must be \"clear\", \"stencil\", \"render_quad\", "
+                "\"render_scene\", \"uav_queue\" or \"custom\".");
             return;
         }
 
@@ -8308,7 +8575,7 @@ namespace Ogre{
                             mPassDef->mVpScissorLeft    = mPassDef->mVpLeft;
                             mPassDef->mVpScissorTop     = mPassDef->mVpTop;
                             mPassDef->mVpScissorWidth   = mPassDef->mVpWidth;
-                            mPassDef->mVpScissorHeight  	= mPassDef->mVpHeight;
+                            mPassDef->mVpScissorHeight  = mPassDef->mVpHeight;
                         }
                     }
                     break;
@@ -8415,6 +8682,107 @@ namespace Ogre{
                         else
                         {
                             mPassDef->mViewportModifierMask = static_cast<uint8>( val & 0xFF );
+                        }
+                    }
+                    break;
+                case ID_USES_UAV:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() < 2 || prop->values.size() > 4)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                                           "uses_uav needs between 2 and 4 arguments");
+                    }
+                    else
+                    {
+                        uint32 uavSlot              = 0;
+                        uint32 access               = ResourceAccess::Undefined;
+                        bool   allowWriteAfterWrite = false;
+
+                        if(!getUInt( prop->values.front(), &uavSlot ))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "uses_uav should be 'uses_uav <number between 0 and 63> "
+                                "<[read] [write]> [allow_write_after_write]'");
+                        }
+
+                        //Skip the slot #
+                        AbstractNodeList::const_iterator it = ++prop->values.begin();
+                        AbstractNodeList::const_iterator en = prop->values.end();
+
+                        while( it != en )
+                        {
+                            if( (*it)->type == ANT_ATOM )
+                            {
+                                AtomAbstractNode *atom = (AtomAbstractNode*)(*it).get();
+                                switch( atom->id )
+                                {
+                                case ID_READ:
+                                    access |= ResourceAccess::Read;
+                                case ID_WRITE:
+                                    access |= ResourceAccess::Write;
+                                    break;
+                                case ID_ALLOW_WRITE_AFTER_WRITE:
+                                    allowWriteAfterWrite = true;
+                                    break;
+                                default:
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                        "unrecognized token in uses_uav: " + atom->getValue() );
+                                    break;
+                                }
+                            }
+
+                            ++it;
+                        }
+
+                        CompositorPassDef::UavDependency uavDep(
+                                    uavSlot, static_cast<ResourceAccess::ResourceAccess>(access),
+                                    allowWriteAfterWrite );
+                        mPassDef->mUavDependencies.push_back( uavDep );
+                    }
+                    break;
+                case ID_EXPOSE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "expose only supports 1 argument");
+                    }
+                    else
+                    {
+                        IdString val;
+                        if( !getIdString(prop->values.front(), &val) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "expose must be the name of a texture available in the local or global scope");
+                        }
+                        else
+                        {
+                            mPassDef->mExposedTextures.push_back( val );
+                        }
+                    }
+                    break;
+                case ID_COLOUR_WRITE:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() > 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "colour_write only supports 1 argument");
+                    }
+                    else
+                    {
+                        if(!getBoolean(prop->values.front(), &mPassDef->mColourWrite))
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "colour_write argument must be \"true\", \"false\", \"yes\", \"no\", \"on\", or \"off\"");
                         }
                     }
                     break;
