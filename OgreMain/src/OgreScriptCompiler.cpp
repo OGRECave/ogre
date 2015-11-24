@@ -1229,6 +1229,8 @@ namespace Ogre
         mIds["2d_array"]            = ID_2D_ARRAY;
         //mIds["3d"]                = ID_3D;
         mIds["cubemap"]             = ID_CUBEMAP;
+        mIds["mipmaps"]             = ID_MIPMAPS;
+        mIds["automipmaps"]         = ID_AUTOMIPMAPS;
 
         mIds["target"] = ID_TARGET;
 

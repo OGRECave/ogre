@@ -831,6 +831,8 @@ namespace Ogre
                 ID_2D_ARRAY,
                 //ID_3D,
                 ID_CUBEMAP,
+                ID_MIPMAPS,
+                ID_AUTOMIPMAPS,
             ID_TARGET,
         //  ID_PASS,
                 ID_CLEAR,

@@ -78,11 +78,15 @@ namespace Ogre
             uint width;       // 0 means adapt to target width
             uint height;      // 0 means adapt to target height
             uint depth;       // Must be 1 for textureType == TEX_TYPE_2D
+            int numMipmaps;     // 0 to disable mipmaps, Negative to generate until the max
+                                //(note it's inconsistent with MIP_UNLIMITED)
+                                //Will be set to -1 if value is 0 and automipmaps is true
             float widthFactor;  // multiple of target width to use (if width = 0)
             float heightFactor; // multiple of target height to use (if height = 0)
             PixelFormatList formatList; // more than one means MRT
             bool fsaa;          // FSAA enabled; True = Use main target's, False = disable
             bool uav;
+            bool automipmaps;
             BoolSetting hwGammaWrite;   // Do sRGB gamma correction on write (only 8-bit per channel formats) 
             uint16 depthBufferId;//Depth Buffer's pool ID.
 
@@ -114,8 +118,8 @@ namespace Ogre
             IdString getName(void) const        { return name; }
 
             TextureDefinition( IdString _name ) : name(_name), textureType( TEX_TYPE_2D ),
-                    width(0), height(0), depth(1), widthFactor(1.0f), heightFactor(1.0f),
-                    fsaa(true), uav(false), hwGammaWrite(BoolUndefined),
+                    width(0), height(0), depth(1), numMipmaps(0), widthFactor(1.0f), heightFactor(1.0f),
+                    fsaa(true), uav(false), automipmaps(false), hwGammaWrite(BoolUndefined),
                     depthBufferId(1), preferDepthTexture(false), depthBufferFormat(PF_UNKNOWN),
                     fsaaExplicitResolve(false) {}
         };

@@ -6223,6 +6223,8 @@ namespace Ogre{
         bool fsaaExplicitResolve = false;
         uint16 depthBufferId = DepthBuffer::POOL_INVALID;
         PixelFormat depthBufferFormat = PF_UNKNOWN;
+        int numMipmaps = 0;
+        bool automipmaps = false;
         bool isUav = false;
         bool preferDepthTexture = false;
         Ogre::PixelFormatList formats;
@@ -6341,6 +6343,29 @@ namespace Ogre{
             case ID_UAV:
                 isUav = true;
                 break;
+            case ID_MIPMAP:
+            case ID_MIPMAPS:
+                {
+                    // advance to next to get the number of mipmaps
+                    it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+                    if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    atom = (AtomAbstractNode*)(*it).get();
+                    if (!StringConverter::isNumber(atom->value))
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        return;
+                    }
+
+                    numMipmaps = StringConverter::parseInt(atom->value);
+                }
+                break;
+            case ID_AUTOMIPMAPS:
+                automipmaps = true;
+                break;
             case ID_2D_ARRAY:   textureType = TEX_TYPE_2D_ARRAY; break;
             case ID_3D:         textureType = TEX_TYPE_3D; break;
             case ID_CUBEMAP:    textureType = TEX_TYPE_CUBE_MAP; break;
@@ -6409,11 +6434,13 @@ namespace Ogre{
         td->width           = width;
         td->height          = height;
         td->depth           = depth;
+        td->numMipmaps      = numMipmaps;
         td->widthFactor     = widthFactor;
         td->heightFactor    = heightFactor;
         td->formatList      = formats;
         td->fsaa            = fsaa;
         td->uav             = isUav;
+        td->automipmaps     = automipmaps;
         td->hwGammaWrite    = hwGammaWrite;
         td->depthBufferId   = depthBufferId;
         td->depthBufferFormat   = depthBufferFormat;

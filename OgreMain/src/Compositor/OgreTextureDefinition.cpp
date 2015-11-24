@@ -266,10 +266,20 @@ namespace Ogre
                 height = static_cast<uint>( ceilf( finalTarget->getHeight() * textureDef.heightFactor ) );
         }
 
+        uint numMips = textureDef.numMipmaps;
+        if( textureDef.numMipmaps < 0 )
+            numMips = MIP_UNLIMITED;
+
         uint32 texUsageFlags = TU_RENDERTARGET;
 
         if( textureDef.uav )
             texUsageFlags |= TU_UAV;
+        if( textureDef.automipmaps )
+        {
+            texUsageFlags |= TU_AUTOMIPMAP;
+            if( numMips == 0 )
+                numMips = MIP_UNLIMITED;
+        }
 
         assert( textureDef.depth > 0 &&
                 (textureDef.depth == 1 || textureDef.textureType > TEX_TYPE_2D) &&
@@ -280,9 +290,9 @@ namespace Ogre
             //Normal RT
             TexturePtr tex = TextureManager::getSingleton().createManual( texName,
                                             ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                            textureDef.textureType, width, height, textureDef.depth, 0,
-                                            textureDef.formatList[0], (int)texUsageFlags, 0, hwGamma,
-                                            fsaa, fsaaHint, textureDef.fsaaExplicitResolve,
+                                            textureDef.textureType, width, height, textureDef.depth,
+                                            numMips, textureDef.formatList[0], (int)texUsageFlags, 0,
+                                            hwGamma, fsaa, fsaaHint, textureDef.fsaaExplicitResolve,
                                             textureDef.depthBufferId != DepthBuffer::POOL_NON_SHAREABLE );
             RenderTexture* rt = tex->getBuffer()->getRenderTarget();
             rt->setDepthBufferPool( textureDef.depthBufferId );
