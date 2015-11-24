@@ -197,6 +197,21 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void NULLRenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
+                                         ResourceAccess::ResourceAccess access,
+                                         int32 mipmapLevel, int32 textureArrayIndex,
+                                         PixelFormat pixelFormat )
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::clearUAVs(void)
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::flushUAVs(void)
+    {
+    }
+    //-------------------------------------------------------------------------
     void NULLRenderSystem::_setTexture(size_t unit, bool enabled,  Texture *texPtr)
     {
     }

@@ -34,7 +34,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     /** Factory class for D3D11 HLSL programs. */
-    class D3D11HLSLProgramFactory : public HighLevelGpuProgramFactory
+    class _OgreD3D11Export D3D11HLSLProgramFactory : public HighLevelGpuProgramFactory
     {
     protected:
         static String sLanguageName;

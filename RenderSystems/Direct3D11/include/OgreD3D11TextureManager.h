@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class D3D11TextureManager : public TextureManager
+    class _OgreD3D11Export D3D11TextureManager : public TextureManager
     {
     protected:
         D3D11Device & mDevice;

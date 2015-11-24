@@ -291,8 +291,10 @@ namespace v1 {
                 OGRE_DELETE mAnimationState; mAnimationState = 0;
             }
         }
-        else if (hasVertexAnimation())
+        else
         {
+            //Non-skeletally animated objects don't share the mAnimationState. Always delete.
+            //See https://ogre3d.atlassian.net/browse/OGRE-504
             OGRE_DELETE mAnimationState;
             mAnimationState = 0;
         }
@@ -689,7 +691,7 @@ namespace v1 {
     {
         // Do we still have temp buffers for software vertex animation bound?
         bool ret = true;
-        if (mMesh->sharedVertexData && mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
+        if (mMesh->sharedVertexData[0] && mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
         {
             ret = ret && mTempVertexAnimInfo.buffersCheckedOut(true, mMesh->getSharedVertexDataAnimationIncludesNormals());
         }
@@ -1080,7 +1082,7 @@ namespace v1 {
         //  We didn't apply any animation and
         //    We're morph animated (hardware binds keyframe, software is missing)
         //    or we're pose animated and software (hardware is fine, still bound)
-        if (mMesh->sharedVertexData &&
+        if (mMesh->sharedVertexData[0] &&
             !mVertexAnimationAppliedThisFrame &&
             (!hardwareAnimation || mMesh->getSharedVertexDataAnimationType() == VAT_MORPH))
         {
@@ -1103,7 +1105,7 @@ namespace v1 {
         // rebind any missing hardware pose buffers
         // Caused by not having any animations enabled, or keyframes which reference
         // no poses
-        if (mMesh->sharedVertexData && hardwareAnimation 
+        if (mMesh->sharedVertexData[0] && hardwareAnimation 
             && mMesh->getSharedVertexDataAnimationType() == VAT_POSE)
         {
             bindMissingHardwarePoseBuffers(mMesh->sharedVertexData[0], mHardwareVertexAnimVertexData);
@@ -1512,7 +1514,7 @@ namespace v1 {
         if (hasVertexAnimation())
         {
             // Shared data
-            if (mMesh->sharedVertexData
+            if (mMesh->sharedVertexData[0]
                 && mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
             {
                 // Create temporary vertex blend info

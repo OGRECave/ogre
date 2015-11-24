@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreRoot.h"
 
+#include "OgreGL3PlusTextureBuffer.h"
+
 namespace Ogre {
 
 

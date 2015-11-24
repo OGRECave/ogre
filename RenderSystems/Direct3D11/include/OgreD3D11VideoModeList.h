@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class D3D11VideoModeList
+    class _OgreD3D11Export D3D11VideoModeList
     {
     private:
         D3D11Driver* mDriver;

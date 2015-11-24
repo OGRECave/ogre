@@ -118,6 +118,27 @@ namespace Ogre
             mCamera = workspace->findCamera( mDefinition->mCameraName );
         else
             mCamera = defaultCamera;
+
+        //List all our RTT dependencies
+        const CompositorPassQuadDef::TextureSources &textureSources = mDefinition->getTextureSources();
+        CompositorPassQuadDef::TextureSources::const_iterator itor = textureSources.begin();
+        CompositorPassQuadDef::TextureSources::const_iterator end  = textureSources.end();
+        while( itor != end )
+        {
+            const CompositorChannel *channel = mParentNode->_getDefinedTexture( itor->textureName );
+            CompositorTextureVec::const_iterator it = mTextureDependencies.begin();
+            CompositorTextureVec::const_iterator en = mTextureDependencies.end();
+            while( it != en && it->name != itor->textureName )
+                ++it;
+
+            if( it != en )
+            {
+                mTextureDependencies.push_back( CompositorTexture( itor->textureName,
+                                                                   &channel->textures ) );
+            }
+
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     void CompositorPassQuad::execute( const Camera *lodCamera )
@@ -199,6 +220,8 @@ namespace Ogre
 
             mFsRect->setNormals( cameraDirs[0], cameraDirs[1], cameraDirs[2], cameraDirs[3] );
         }
+
+        executeResourceTransitions();
 
         SceneManager *sceneManager = mCamera->getSceneManager();
         sceneManager->_setViewport( mViewport );

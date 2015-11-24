@@ -1,0 +1,96 @@
+
+// GLSL shaders
+fragment_program FillUav_ps_GLSL glsl
+{
+	source FillUav_ps.glsl
+	default_params
+	{
+		param_named testTexture int 1
+	}
+}
+
+fragment_program UseUavAsTexture_ps_GLSL glsl
+{
+	source UseUavAsTexture_ps.glsl
+	default_params
+	{
+		param_named testTexture int 0
+	}
+}
+
+// HLSL shaders
+fragment_program FillUav_ps_HLSL hlsl
+{
+	source FillUav_ps.hlsl
+	entry_point main
+	target ps_5_0
+}
+
+fragment_program UseUavAsTexture_ps_HLSL hlsl
+{
+	source UseUavAsTexture_ps.hlsl
+	entry_point main
+	target ps_5_0
+}
+
+// Unified definitions
+fragment_program FillUav_ps unified
+{
+	delegate FillUav_ps_HLSL
+	delegate FillUav_ps_GLSL
+}
+
+fragment_program UseUavAsTexture_ps unified
+{
+	delegate UseUavAsTexture_ps_HLSL
+	delegate UseUavAsTexture_ps_GLSL
+}
+
+// Material definition
+material FillUav
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref FillUav_ps
+			{
+			}
+		}
+	}
+}
+
+material UseUavAsTexture
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref UseUavAsTexture_ps
+			{
+			}
+
+			texture_unit
+			{
+			}
+		}
+	}
+}

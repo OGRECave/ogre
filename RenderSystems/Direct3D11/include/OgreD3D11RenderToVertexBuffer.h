@@ -42,7 +42,7 @@ namespace v1 {
     that run on previous results of those shaders, creating stateful 
     shaders.
     */
-    class D3D11RenderToVertexBuffer :
+    class _OgreD3D11Export D3D11RenderToVertexBuffer :
         public RenderToVertexBuffer
     {
     public:

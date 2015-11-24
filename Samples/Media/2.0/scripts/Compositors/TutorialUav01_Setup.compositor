@@ -1,0 +1,86 @@
+compositor_node TutorialUav01_SetupRenderingNode
+{
+	in 0 rt_renderwindow
+
+	texture nullDummy target_width target_height PF_NULL
+	texture testTexture target_width target_height PF_R8G8B8A8 depth_pool 0 no_gamma uav
+
+	//UAVs can be cleared
+	target testTexture
+	{
+		pass clear
+		{
+			colour_value 0 0 0 0
+		}
+	}
+	
+	target nullDummy
+	{
+		//The bindings made by pass bind_uav PERSIST even after we're out of nullDummy.
+		pass bind_uav
+		{
+			//API-wise, all slots are relative to the starting slot.
+			//So testTexture will be at slot 0+1 = 1
+			//This means:
+			//	layout (rgba8) uniform restrict image2D testTexture; //Needs to point to 1
+			//	RWTexture2D<float4> testTexture : register(u1);
+			starting_slot 1
+
+			// When true, we only affect the UAVs we're changing.
+			// When false, we clear all UAVs settings from all slots.
+			keep_previous_uavs	false
+
+			uav 0 testTexture			write
+
+			//For textures that were defined via TextureManager::createManual
+			//The 3 is the MRT index (for MRT textures).
+			//uav_external	1 textureName	read write 3 mipmap 2
+			//uav			1 testTexture	read write 3 mipmap 2
+		}
+
+		pass render_quad
+		{
+			material FillUav
+
+			//We need this to tell we will be using the UAV at that slot in
+			//this pass and let the Compositor issue the proper barriers
+			uses_uav 0 write
+		}
+
+		//Remove all UAV bindings now.
+		//If we do it inside rt_renderwindow (eg. before or after the clear pass),
+		//D3D11 will be slower because OGRE will first bind
+		//rt_renderwindow + testTexture; then rebind again rt_renderwindow
+		//after finding out testTexture needs to be unbound.
+		pass bind_uav
+		{
+			keep_previous_uavs	false
+		}
+	}
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0.2 0.4 0.6 1
+		}
+
+		//Compositor will issue the appropiate barriers because
+		//it knows testTexture will be used as a texture.
+		pass render_quad
+		{
+			material UseUavAsTexture
+			input 0 testTexture
+		}
+
+		pass render_scene
+		{
+			overlays	on
+		}
+	}
+}
+
+workspace TutorialUav01_SetupWorkspace
+{
+	connect_output TutorialUav01_SetupRenderingNode 0
+}

@@ -73,6 +73,8 @@ namespace Ogre
                     mFormat, isHardwareGammaEnabled(), static_cast<v1::HardwareBuffer::Usage>(mUsage));
             return v1::HardwarePixelBufferSharedPtr(buf);
         }
+
+        virtual void _autogenerateMipmaps(void) {}
     };
 
 

@@ -735,6 +735,7 @@ namespace v1
         vbuf->unlock();
 
         // Generate face list
+        pSub->useSharedVertices = false;
         tesselate2DMesh(pSub, params.xsegments + 1, params.ysegments + 1, 
             false, params.indexBufferUsage, params.indexShadowBuffer);
 

@@ -50,6 +50,7 @@ Torus Knot Software Ltd.
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "Animation/OgreSkeletonAnimManager.h"
+#include "Compositor/Pass/OgreCompositorPass.h"
 #include "Threading/OgreThreads.h"
 #include "OgreHeaderPrefix.h"
 
@@ -852,22 +853,6 @@ namespace Ogre {
             RenderSystem::RenderSystemContext* rsContext;
         };
 
-        typedef vector<TexturePtr>::type TextureVec;
-
-        struct CompositorTexture
-        {
-            IdString            name;
-            TextureVec const    *textures;
-
-            CompositorTexture( IdString _name, const TextureVec *_textures ) :
-                    name( _name ), textures( _textures ) {}
-
-            bool operator == ( IdString right ) const
-            {
-                return name == right;
-            }
-        };
-
         /** Pause rendering of the frame. This has to be called when inside a renderScene call
             (Usually using a listener of some sort)
         */
@@ -876,8 +861,6 @@ namespace Ogre {
         @param context The rendring context, as returned by the _pauseRendering call
         */
         virtual void _resumeRendering(RenderContext* context);
-
-        typedef vector<CompositorTexture>::type CompositorTextureVec;
 
     protected:
         Real mDefaultShadowFarDist;
@@ -909,12 +892,12 @@ namespace Ogre {
             BUILD_LIGHT_LIST01,
             BUILD_LIGHT_LIST02,
             USER_UNIFORM_SCALABLE_TASK,
+            STOP_THREADS,
             NUM_REQUESTS
         };
 
         size_t mNumWorkerThreads;
 
-        volatile bool       mExitWorkerThreads;
         CullFrustumRequest              mCurrentCullFrustumRequest;
         UpdateLodRequest                mUpdateLodRequest;
         UpdateTransformRequest          mUpdateTransformRequest;
@@ -1455,6 +1438,8 @@ namespace Ogre {
         */
         void _addCompositorTexture( IdString name, const TextureVec *texs );
 
+        /// @see CompositorPassDef::mExposedTextures for the textures that are available
+        /// in the current compositor pass. The compositor script keyword is "expose".
         const CompositorTextureVec& getCompositorTextures(void) const   { return mCompositorTextures; }
 
         /// Gets the number of currently active compositor textures

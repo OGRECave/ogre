@@ -173,7 +173,11 @@ namespace Ogre {
         */
         virtual void swapBuffers(void)                                      { mFsaaResolveDirty = false; }
 
-        virtual void setFsaaResolveDirty(void)                              { mFsaaResolveDirty = true; }
+        virtual void setFsaaResolveDirty(void)
+        {
+            mFsaaResolveDirty = true;
+            mMipmapsDirty = true;
+        }
 
         /** Adds a viewport to the rendering target.
             @remarks
@@ -329,6 +333,9 @@ namespace Ogre {
         */
         virtual void setFSAA(uint fsaa, const String& fsaaHint) { }
 
+        void _setMipmapsUpdated(void)               { mMipmapsDirty = false; }
+        bool isMipmapsDirty(void) const             { return mMipmapsDirty; }
+
         /** RenderSystem specific interface for a RenderTarget;
             this should be subclassed by RenderSystems.
         */
@@ -398,6 +405,8 @@ namespace Ogre {
         virtual void _endUpdate();
 
         /// Used by depth texture views which need to disable colour writes when rendering to it
+        /// PF_NULL targets can be identified because they set this value to true and have
+        /// no depth buffers attached.
         virtual bool getForceDisableColourWrites(void) const    { return false; }
 
     protected:
@@ -424,6 +433,7 @@ namespace Ogre {
         uint mFSAA;
         String mFSAAHint;
         bool mFsaaResolveDirty;
+        bool mMipmapsDirty;
         bool mStereoEnabled;
 
         typedef vector<Viewport*>::type ViewportList;

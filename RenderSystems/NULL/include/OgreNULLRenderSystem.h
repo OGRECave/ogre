@@ -94,6 +94,13 @@ namespace Ogre
         virtual void _setPointParameters(Real size, bool attenuationEnabled,
             Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
 
+        virtual void queueBindUAV( uint32 slot, TexturePtr texture,
+                                           ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                           int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
+                                           PixelFormat pixelFormat = PF_UNKNOWN );
+        virtual void clearUAVs(void);
+        virtual void flushUAVs(void);
+
         virtual void _setTexture(size_t unit, bool enabled,  Texture *texPtr);
 
         virtual void _setTextureCoordSet(size_t unit, size_t index);

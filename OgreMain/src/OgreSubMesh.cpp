@@ -640,6 +640,8 @@ namespace v1 {
                 ++itor;
             }
         }
+        mMaterialName = subMesh->getMaterialName();
+        mMatInitialised = false;
     }
     //---------------------------------------------------------------------
     void SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )

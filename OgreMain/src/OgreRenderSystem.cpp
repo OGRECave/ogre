@@ -71,6 +71,7 @@ namespace Ogre {
         , mDerivedDepthBiasBase(0.0f)
         , mDerivedDepthBiasMultiplier(0.0f)
         , mDerivedDepthBiasSlopeScale(0.0f)
+        , mUavStartingSlot( 1 )
         , mGlobalInstanceVertexBufferVertexDeclaration(NULL)
         , mGlobalNumberOfInstances(1)
         , mVertexProgramBound(false)
@@ -552,6 +553,11 @@ namespace Ogre {
         {
             _disableTextureUnit(i);
         }
+    }
+    //---------------------------------------------------------------------
+    void RenderSystem::setUavStartingSlot( uint32 startingSlot )
+    {
+        mUavStartingSlot = startingSlot;
     }
     //---------------------------------------------------------------------
     void RenderSystem::_cleanupDepthBuffers( bool bCleanManualBuffers )

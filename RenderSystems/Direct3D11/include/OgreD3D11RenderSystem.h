@@ -46,7 +46,7 @@ namespace Ogre
     /**
     Implementation of DirectX11 as a rendering system.
     */
-    class D3D11RenderSystem : public RenderSystem
+    class _OgreD3D11Export D3D11RenderSystem : public RenderSystem
     {
     private:
 
@@ -111,6 +111,15 @@ namespace Ogre
         unsigned char   *mSwIndirectBufferPtr;
         D3D11HlmsPso    *mPso;
         D3D11HLSLProgram* mBoundComputeProgram;
+
+        TexturePtr                  mUavTexPtr[64];
+        ID3D11UnorderedAccessView   *mUavs[64];
+
+        /// In range [0; 64]; note that a user may use
+        /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
+        /// and still mMaxUavIndexPlusOne = 3.
+        uint8   mMaxModifiedUavPlusOne;
+        bool    mUavsDirty;
 
         /// For rendering legacy objects.
         v1::VertexData  *mCurrentVertexBuffer;
@@ -261,6 +270,15 @@ namespace Ogre
         void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
         void _setTextureMatrix( size_t unit, const Matrix4 &xform );
         void _setViewport( Viewport *vp );
+
+        virtual void queueBindUAV( uint32 slot, TexturePtr texture,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                   int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
+                                   PixelFormat pixelFormat = PF_UNKNOWN );
+
+        virtual void clearUAVs(void);
+
+        virtual void flushUAVs(void);
 
         virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso );
         virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso );

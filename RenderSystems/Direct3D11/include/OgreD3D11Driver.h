@@ -36,7 +36,7 @@ namespace Ogre
     class D3D11VideoModeList;
     class D3D11VideoMode;
 
-    class D3D11Driver
+    class _OgreD3D11Export D3D11Driver
     {
     private:
         // D3D only allows one device per adapter, so it can safely be stored

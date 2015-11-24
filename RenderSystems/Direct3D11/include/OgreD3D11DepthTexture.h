@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    class D3D11DepthTexture : public D3D11Texture
+    class _OgreD3D11Export D3D11DepthTexture : public D3D11Texture
     {
     protected:
         bool mShareableDepthBuffer;
@@ -67,6 +67,7 @@ namespace Ogre
         /// mipmap level. This method must be called after the D3D texture object was created
         void _createSurfaceList(void);
 
+        virtual void _autogenerateMipmaps(void) {}
 
         /// @copydoc Resource::prepareImpl
         virtual void prepareImpl(void);
@@ -80,7 +81,7 @@ namespace Ogre
 
 namespace v1
 {
-    class D3D11DepthPixelBuffer : public HardwarePixelBuffer
+    class _OgreD3D11Export D3D11DepthPixelBuffer : public HardwarePixelBuffer
     {
     protected:
         RenderTexture   *mDummyRenderTexture;
@@ -102,7 +103,7 @@ namespace v1
     };
 }
 
-    class D3D11DepthTextureTarget : public RenderTexture //D3D11RenderTexture
+    class _OgreD3D11Export D3D11DepthTextureTarget : public RenderTexture //D3D11RenderTexture
     {
         D3D11DepthTexture *mUltimateTextureOwner;
 

@@ -68,6 +68,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
+#include "OgreGL3PlusPixelFormat.h"
 
 #if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
@@ -147,7 +148,8 @@ namespace Ogre {
           mRTTManager(0),
           mActiveTextureUnit(0),
           mHasArbInvalidateSubdata( false ),
-          mNullColourFramebuffer( 0 )
+          mNullColourFramebuffer( 0 ),
+          mMaxModifiedUavPlusOne( 0 )
     {
         size_t i;
 
@@ -357,6 +359,12 @@ namespace Ogre {
         //if( mGLSupport->checkExtension("GL_ARB_texture_gather") || mHasGL40 )
         if( mHasGL43 )
             rsc->setCapability(RSC_TEXTURE_GATHER);
+
+        if( mHasGL43 || (mGLSupport->checkExtension("GL_ARB_shader_image_load_store") &&
+                         mGLSupport->checkExtension("GL_ARB_shader_storage_buffer_object")) )
+        {
+            rsc->setCapability(RSC_UAV);
+        }
 
         rsc->setCapability(RSC_FBO);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -1085,6 +1093,121 @@ namespace Ogre {
         mTextureCoordIndex[stage] = index;
     }
 
+    void GL3PlusRenderSystem::setUavStartingSlot( uint32 startingSlot )
+    {
+        if( startingSlot != mUavStartingSlot )
+        {
+            for( uint32 i=0; i<64; ++i )
+            {
+                if( !mUavs[i].texture.isNull() )
+                    mUavs[i].dirty = true;
+            }
+        }
+
+        RenderSystem::setUavStartingSlot( startingSlot );
+    }
+
+    void GL3PlusRenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
+                                            ResourceAccess::ResourceAccess access,
+                                            int32 mipmapLevel, int32 textureArrayIndex,
+                                            PixelFormat pixelFormat )
+    {
+        assert( slot < 64 );
+
+        // TODO
+        // * add memory barrier
+        // * compositor script access (can have multiple instances for a single texture_unit)
+        //     shader_access <binding point> [<access>] [<mipmap level>] [<texture array layer>] [<format>]
+        //     shader_access 2 read_write 0 0 PF_UINT32_R
+
+        if( mUavs[slot].texture.isNull() && texture.isNull() )
+            return;
+
+        mUavs[slot].dirty       = true;
+        mUavs[slot].texture     = texture;
+
+        if( !texture.isNull() )
+        {
+            if( !(texture->getUsage() & TU_UAV) )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Texture " + texture->getName() +
+                             " must have been created with TU_UAV to be bound as UAV",
+                             "GL3PlusRenderSystem::queueBindUAV" );
+            }
+
+            bool isFsaa;
+
+            if( pixelFormat == PF_UNKNOWN )
+                pixelFormat = texture->getFormat();
+
+            mUavs[slot].textureName = static_cast<GL3PlusTexture*>( texture.get() )->getGLID( isFsaa );
+            mUavs[slot].mipmap      = mipmapLevel;
+            mUavs[slot].isArrayTexture = texture->getTextureType() == TEX_TYPE_2D_ARRAY ? GL_TRUE :
+                                                                                          GL_FALSE;
+            mUavs[slot].arrayIndex  = textureArrayIndex;
+            mUavs[slot].format      = GL3PlusPixelUtil::getClosestGLImageInternalFormat( pixelFormat );
+
+            switch( access )
+            {
+            case ResourceAccess::Read:
+                mUavs[slot].access = GL_READ_ONLY;
+                break;
+            case ResourceAccess::Write:
+                mUavs[slot].access = GL_WRITE_ONLY;
+                break;
+            case ResourceAccess::ReadWrite:
+                mUavs[slot].access = GL_READ_WRITE;
+                break;
+            default:
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid ResourceAccess parameter '" +
+                             StringConverter::toString( access ) + "'",
+                             "GL3PlusRenderSystem::queueBindUAV" );
+                break;
+            }
+        }
+
+        mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+    }
+
+    void GL3PlusRenderSystem::clearUAVs(void)
+    {
+        for( size_t i=0; i<64; ++i )
+        {
+            if( !mUavs[i].texture.isNull() )
+            {
+                mUavs[i].dirty = true;
+                mUavs[i].texture.setNull();
+                mMaxModifiedUavPlusOne = i + 1;
+            }
+        }
+    }
+
+    void GL3PlusRenderSystem::flushUAVs(void)
+    {
+        for( uint32 i=0; i<mMaxModifiedUavPlusOne; ++i )
+        {
+            if( mUavs[i].dirty )
+            {
+                if( !mUavs[i].texture.isNull() )
+                {
+                    OCGE( glBindImageTexture( mUavStartingSlot + i, mUavs[i].textureName,
+                                              mUavs[i].mipmap, mUavs[i].isArrayTexture,
+                                              mUavs[i].arrayIndex, mUavs[i].access,
+                                              mUavs[i].format) );
+                }
+                else
+                {
+                    glBindImageTexture( 0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
+                }
+
+                mUavs[i].dirty = false;
+            }
+        }
+
+        mMaxModifiedUavPlusOne = 0;
+    }
+
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
     {
         switch (tam)
@@ -1300,6 +1423,85 @@ namespace Ogre {
 
             vp->_clearUpdatedFlag();
         }
+        else if( mMaxModifiedUavPlusOne )
+        {
+            flushUAVs();
+        }
+    }
+
+    void GL3PlusRenderSystem::_resourceTransitionCreated( ResourceTransition *resTransition )
+    {
+        assert( sizeof(void*) >= sizeof(GLbitfield) );
+
+        assert( (resTransition->readBarrierBits || resTransition->writeBarrierBits) &&
+                "A zero-bit memory barrier is invalid!" );
+
+        GLbitfield barriers = 0;
+
+        //TODO:
+        //GL_QUERY_BUFFER_BARRIER_BIT is nearly impossible to determine
+        //specifically
+        //Should be used in all barriers? Since we don't yet support them,
+        //we don't include it in case it brings performance down.
+        //Or should we use 'All' instead for these edge cases?
+
+        if( resTransition->readBarrierBits & ReadBarrier::CpuRead ||
+            resTransition->writeBarrierBits & WriteBarrier::CpuWrite )
+        {
+            barriers |= GL_PIXEL_BUFFER_BARRIER_BIT|GL_TEXTURE_UPDATE_BARRIER_BIT|
+                        GL_BUFFER_UPDATE_BARRIER_BIT|GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT;
+        }
+
+        if( resTransition->readBarrierBits & ReadBarrier::Indirect )
+            barriers |= GL_COMMAND_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::VertexBuffer )
+            barriers |= GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT|GL_TRANSFORM_FEEDBACK_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::IndexBuffer )
+            barriers |= GL_ELEMENT_ARRAY_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::ConstBuffer )
+            barriers |= GL_UNIFORM_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::Texture )
+            barriers |= GL_TEXTURE_FETCH_BARRIER_BIT;
+
+        if( resTransition->readBarrierBits & ReadBarrier::Uav ||
+            resTransition->writeBarrierBits & WriteBarrier::Uav )
+        {
+            barriers |= GL_SHADER_IMAGE_ACCESS_BARRIER_BIT|GL_SHADER_STORAGE_BARRIER_BIT|
+                        GL_ATOMIC_COUNTER_BARRIER_BIT;
+        }
+
+        if( resTransition->readBarrierBits & (ReadBarrier::RenderTarget|ReadBarrier::DepthStencil) ||
+            resTransition->writeBarrierBits & (WriteBarrier::RenderTarget|WriteBarrier::DepthStencil) )
+        {
+            barriers |= GL_FRAMEBUFFER_BARRIER_BIT;
+        }
+
+        if( resTransition->readBarrierBits == ReadBarrier::All ||
+            resTransition->writeBarrierBits == WriteBarrier::All )
+        {
+            barriers = GL_ALL_BARRIER_BITS;
+        }
+
+        resTransition->mRsData = reinterpret_cast<void*>( barriers );
+    }
+
+    void GL3PlusRenderSystem::_resourceTransitionDestroyed( ResourceTransition *resTransition )
+    {
+        assert( resTransition->mRsData ); //A zero-bit memory barrier is invalid
+        resTransition->mRsData = 0;
+    }
+
+    void GL3PlusRenderSystem::_executeResourceTransition( ResourceTransition *resTransition )
+    {
+        GLbitfield barriers = static_cast<GLbitfield>( reinterpret_cast<intptr_t>(
+                                                           resTransition->mRsData ) );
+
+        assert( barriers && "A zero-bit memory barrier is invalid" );
+        glMemoryBarrier( barriers );
     }
 
     void GL3PlusRenderSystem::_hlmsPipelineStateObjectCreated( HlmsPso *newBlock )
@@ -2960,7 +3162,18 @@ namespace Ogre {
 
         // Unbind frame buffer object
         if (mActiveRenderTarget)
+        {
             mRTTManager->unbind(mActiveRenderTarget);
+
+            if( mActiveRenderTarget->getForceDisableColourWrites() &&
+                !mActiveRenderTarget->getDepthBuffer() )
+            {
+                //Disable target independent rasterization to let the driver warn us
+                //of wrong behavior during regular rendering.
+                OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_WIDTH, 0 ) );
+                OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_HEIGHT, 0 ) );
+            }
+        }
 
         mActiveRenderTarget = target;
         if (target)
@@ -3010,6 +3223,14 @@ namespace Ogre {
                                                          GL_RENDERBUFFER, 0 ) );
                         OCGE( glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT,
                                                          GL_RENDERBUFFER, 0 ) );
+
+                        OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_WIDTH,
+                                                       target->getWidth() ) );
+                        OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_HEIGHT,
+                                                       target->getHeight() ) );
+
+                        OCGE( glFramebufferParameteri( GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_SAMPLES,
+                                                       target->getFSAA() > 1 ? target->getFSAA() : 0 ) );
                     }
                 }
 
@@ -3044,6 +3265,8 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glDisable(GL_FRAMEBUFFER_SRGB));
             }
         }
+
+        flushUAVs();
     }
 
     GLint GL3PlusRenderSystem::convertCompareFunction(CompareFunction func) const

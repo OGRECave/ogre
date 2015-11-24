@@ -1,4 +1,4 @@
-/*
+﻿/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -34,6 +34,9 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNode.h"
 
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
+
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderTexture.h"
 
 #include "OgreSceneManager.h"
 #include "OgreRenderTarget.h"
@@ -250,6 +253,8 @@ namespace Ogre
             mNodeSequence.insert( mNodeSequence.end(), unprocessedList.begin(), unprocessedList.end() );
 
             mValid = true;
+
+            analyzeHazardsAndPlaceBarriers();
         }
     }
     //-----------------------------------------------------------------------------------
@@ -362,6 +367,39 @@ namespace Ogre
                 ++itor;
             }
             ++itShadowNode;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspace::analyzeHazardsAndPlaceBarriers(void)
+    {
+        ResourceLayoutMap resourcesLayout;
+        ResourceAccessMap uavsAccess;
+
+        //Q: Include mListener in the constructor so that we can account for the listener?
+        //A: No. If the user overrides normal behavior, it's his responsability to clean
+        //   whatever he ends up doing.
+        BoundUav boundUavs[64];
+        memset( boundUavs, 0, sizeof(boundUavs) );
+
+        resourcesLayout[mRenderWindow.target] = ResourceLayout::RenderTarget;
+        CompositorNode::fillResourcesLayout( resourcesLayout, mGlobalTextures,
+                                             ResourceLayout::Undefined );
+
+        CompositorNodeVec::iterator itor = mNodeSequence.begin();
+        CompositorNodeVec::iterator end  = mNodeSequence.end();
+
+        while( itor != end )
+        {
+            (*itor)->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
+            ++itor;
+        }
+
+        //Check the output is still a RenderTarget at the end.
+        ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( mRenderWindow.target );
+        if( currentLayout->second != ResourceLayout::RenderTarget )
+        {
+            CompositorNode *node = mNodeSequence.back();
+            node->_setFinalTargetAsRenderTarget( currentLayout );
         }
     }
     //-----------------------------------------------------------------------------------

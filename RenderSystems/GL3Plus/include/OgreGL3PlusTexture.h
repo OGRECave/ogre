@@ -1,4 +1,4 @@
-/*
+﻿/*
   -----------------------------------------------------------------------------
   This source file is part of OGRE
   (Object-oriented Graphics Rendering Engine)
@@ -67,7 +67,7 @@ namespace Ogre {
             @return
                 The GLuint handle/id of the texture.
             */
-            GLuint getGLID( bool &outIsFsaa ) const
+            GLuint getGLID( bool &outIsFsaa )
             {
                 GLuint retVal = mTextureID;
                 bool isFsaa = false;
@@ -93,15 +93,18 @@ namespace Ogre {
                     }
                 }
 
+                if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET)) == (TU_AUTOMIPMAP|TU_RENDERTARGET) )
+                {
+                    RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+                    if( renderTarget->isMipmapsDirty() )
+                        this->_autogenerateMipmaps();
+                }
+
                 outIsFsaa = isFsaa;
                 return mTextureID;
             }
 
         virtual void getCustomAttribute(const String& name, void* pData);
-
-        void createShaderAccessPoint(uint bindPoint, TextureAccess access = TA_READ_WRITE,
-                                     int mipmapLevel = 0, int textureArrayIndex = 0,
-                                     PixelFormat* format = NULL);
 
     protected:
         /// @copydoc Texture::createInternalResourcesImpl
@@ -121,6 +124,8 @@ namespace Ogre {
             actually allocate the buffer
         */
         void _createSurfaceList();
+
+        virtual void _autogenerateMipmaps(void);
 
         /// Used to hold images between calls to prepare and load.
         typedef SharedPtr<vector<Image>::type > LoadedImages;

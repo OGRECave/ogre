@@ -35,7 +35,7 @@ namespace Ogre {
 namespace v1 {
 
     /// Specialisation of HardwareVertexBuffer for D3D11
-    class D3D11HardwareVertexBuffer : public HardwareVertexBuffer 
+    class _OgreD3D11Export D3D11HardwareVertexBuffer : public HardwareVertexBuffer
     {
     protected:
         D3D11HardwareBuffer* mBufferImpl;

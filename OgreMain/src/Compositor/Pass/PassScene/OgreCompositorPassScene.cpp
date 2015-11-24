@@ -166,6 +166,8 @@ namespace Ogre
             mTarget->_beginUpdate();
         }
 
+        executeResourceTransitions();
+
         mTarget->setFsaaResolveDirty();
         mTarget->_updateViewportRenderPhase02( mViewport, mCamera, usedLodCamera,
                                                mDefinition->mFirstRQ, mDefinition->mLastRQ, true );
@@ -185,6 +187,19 @@ namespace Ogre
         //Call endUpdate if we're the last pass in a row to use this RT
         if( mDefinition->mEndRtUpdate )
             mTarget->_endUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassScene::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                                    ResourceAccessMap &uavsAccess,
+                                                                    ResourceLayoutMap &resourcesLayout )
+    {
+        if( mShadowNode && mUpdateShadowNode )
+        {
+            mShadowNode->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess,
+                                                               resourcesLayout );
+        }
+
+        CompositorPass::_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
     }
     //-----------------------------------------------------------------------------------
     void CompositorPassScene::notifyCleared(void)

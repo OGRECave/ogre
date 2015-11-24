@@ -1226,6 +1226,11 @@ namespace Ogre
         mIds["depth_pool"]          = ID_DEPTH_POOL;
         mIds["depth_texture"]       = ID_DEPTH_TEXTURE;
         mIds["depth_format"]        = ID_DEPTH_FORMAT;
+        mIds["2d_array"]            = ID_2D_ARRAY;
+        //mIds["3d"]                = ID_3D;
+        mIds["cubemap"]             = ID_CUBEMAP;
+        mIds["mipmaps"]             = ID_MIPMAPS;
+        mIds["automipmaps"]         = ID_AUTOMIPMAPS;
 
         mIds["target"] = ID_TARGET;
 
@@ -1234,6 +1239,10 @@ namespace Ogre
         mIds["render_scene"]    = ID_RENDER_SCENE;
         mIds["render_quad"]     = ID_RENDER_QUAD;
         mIds["depth_copy"]      = ID_DEPTH_COPY;
+        mIds["bind_uav"]        = ID_BIND_UAV;
+        mIds["read"]            = ID_READ;
+        mIds["write"]           = ID_WRITE;
+        mIds["mipmap"]          = ID_MIPMAP;
 
         mIds["viewport"]        = ID_VIEWPORT;
         mIds["num_initial"]     = ID_NUM_INITIAL;
@@ -1241,7 +1250,9 @@ namespace Ogre
         mIds["overlays"]        = ID_OVERLAYS;
         mIds["execution_mask"]  = ID_EXECUTION_MASK;
         mIds["viewport_modifier_mask"]   = ID_VIEWPORT_MODIFIER_MASK;
-
+        mIds["uses_uav"]        = ID_USES_UAV;
+        mIds["allow_write_after_write"] = ID_ALLOW_WRITE_AFTER_WRITE;
+        mIds["expose"]          = ID_EXPOSE;
         mIds["lod_bias"]        = ID_LOD_BIAS;
         mIds["lod_update_list"] = ID_LOD_UPDATE_LIST;
         mIds["lod_camera"]      = ID_LOD_CAMERA;
@@ -1288,6 +1299,11 @@ namespace Ogre
         mIds["invert"]          = ID_INVERT;
         mIds["depth_fail_op"]   = ID_DEPTH_FAIL_OP;
         mIds["pass_op"]         = ID_PASS_OP;
+
+        mIds["uav"]             = ID_UAV;
+        mIds["uav_external"]    = ID_UAV_EXTERNAL;
+        mIds["starting_slot"]   = ID_STARTING_SLOT;
+        mIds["keep_previous_uavs"]= ID_KEEP_PREVIOUS_UAV;
 
         mIds["compositor_node_shadow"]  = ID_SHADOW_NODE;
         mIds["num_splits"]              = ID_NUM_SPLITS;

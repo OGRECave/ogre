@@ -185,6 +185,11 @@ namespace Ogre {
             if( shareableDepthBuffer )
                 params["shareableDepthBuffer"] = "";
         }
+        else if( format == PF_NULL )
+        {
+            paramsPtr = &params;
+            params["SpecialFormat"] = "PF_NULL";
+        }
 
         ret = createResource(name, group, true, loader, paramsPtr).staticCast<Texture>();
         ret->setTextureType(texType);

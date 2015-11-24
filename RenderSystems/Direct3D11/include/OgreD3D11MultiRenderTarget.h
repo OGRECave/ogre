@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderTexture.h"
 
 namespace Ogre {
-    class D3D11MultiRenderTarget : public MultiRenderTarget
+    class _OgreD3D11Export D3D11MultiRenderTarget : public MultiRenderTarget
     {
     public:
         D3D11MultiRenderTarget(const String &name);

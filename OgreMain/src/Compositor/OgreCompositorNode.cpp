@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
 #include "Compositor/Pass/PassStencil/OgreCompositorPassStencil.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUav.h"
+#include "Compositor/Pass/PassUav/OgreCompositorPassUavDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 
 #include "Compositor/OgreCompositorManager2.h"
@@ -45,6 +47,8 @@ THE SOFTWARE.
 
 #include "OgreRenderSystem.h"
 #include "OgreSceneManager.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderTexture.h"
 
 namespace Ogre
 {
@@ -439,6 +443,11 @@ namespace Ogre
                                             static_cast<CompositorPassDepthCopyDef*>(*itPass),
                                             *channel, this );
                     break;
+                case PASS_UAV:
+                    newPass = OGRE_NEW CompositorPassUav(
+                                            static_cast<CompositorPassUavDef*>(*itPass),
+                                            this, *channel );
+                    break;
                 case PASS_CUSTOM:
                     {
                         CompositorPassProvider *passProvider = mWorkspace->getCompositorManager()->
@@ -462,6 +471,81 @@ namespace Ogre
 
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::fillResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                              const CompositorChannelVec &compositorChannels,
+                                              ResourceLayout::Layout layout )
+    {
+        CompositorChannelVec::const_iterator itor = compositorChannels.begin();
+        CompositorChannelVec::const_iterator end  = compositorChannels.end();
+
+        while( itor != end )
+        {
+            outResourcesLayout[itor->target] = layout;
+
+            TextureVec::const_iterator itTex = itor->textures.begin();
+            TextureVec::const_iterator enTex = itor->textures.end();
+
+            while( itTex != enTex )
+            {
+                const Ogre::TexturePtr tex = *itTex;
+                const size_t numFaces = tex->getNumFaces();
+                const uint8 numMips = tex->getNumMipmaps() + 1;
+                const uint32 numSlices = tex->getTextureType() == TEX_TYPE_CUBE_MAP ? 1u :
+                                                                                      tex->getDepth();
+                for( size_t face=0; face<numFaces; ++face )
+                {
+                    for( uint8 mip=0; mip<numMips; ++mip )
+                    {
+                        for( uint32 slice=0; slice<numSlices; ++slice )
+                        {
+                            RenderTarget *rt = tex->getBuffer( face, mip )->getRenderTarget( slice );
+                            outResourcesLayout[rt] = layout;
+                        }
+                    }
+                }
+
+                ++itTex;
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                               ResourceAccessMap &uavsAccess,
+                                                               ResourceLayoutMap &resourcesLayout )
+    {
+        //All locally defined textures start as 'undefined'.
+        fillResourcesLayout( resourcesLayout, mLocalTextures, ResourceLayout::Undefined );
+
+        CompositorPassVec::const_iterator itPasses = mPasses.begin();
+        CompositorPassVec::const_iterator enPasses = mPasses.end();
+
+        while( itPasses != enPasses )
+        {
+            CompositorPass *pass = *itPasses;
+            pass->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
+
+            ++itPasses;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::_setFinalTargetAsRenderTarget(
+                                                ResourceLayoutMap::iterator finalTargetCurrentLayout )
+    {
+        if( mPasses.empty() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "Node " + mName.getFriendlyText() + "has no passes!",
+                         "CompositorNode::_setFinalTargetAsRenderTarget" );
+        }
+
+        CompositorPass *pass = mPasses.back();
+        pass->addResourceTransition( finalTargetCurrentLayout,
+                                     ResourceLayout::RenderTarget,
+                                     ReadBarrier::RenderTarget );
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::_update( const Camera *lodCamera, SceneManager *sceneManager )
@@ -522,5 +606,10 @@ namespace Ogre
             (*itor)->resetNumPassesLeft();
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    size_t CompositorNode::getPassNumber( CompositorPass *pass ) const
+    {
+        return mDefinition->getPassNumber( pass->getDefinition() );
     }
 }
