@@ -2307,6 +2307,302 @@ bail:
         }
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
+                                          ResourceAccess::ResourceAccess access,
+                                          int32 mipmapLevel, int32 textureArrayIndex,
+                                          PixelFormat pixelFormat )
+    {
+        assert( slot < 64 );
+
+        if( mUavTexPtr[slot].isNull() && texture.isNull() )
+            return;
+
+        mUavsDirty = true;
+
+        mUavTexPtr[slot] = texture;
+
+        //Release oldUav *after* we've created the new UAV (if D3D11 needs
+        //to return the same UAV, if we release it earlier we may cause
+        //unnecessary alloc/deallocations)
+        ID3D11UnorderedAccessView *oldUav = mUavs[slot];
+        mUavs[slot] = 0;
+
+        if( !texture.isNull() )
+        {
+            if( !(texture->getUsage() & TU_UAV) )
+            {
+                if( oldUav )
+                {
+                    oldUav->Release();
+                    oldUav = 0;
+                }
+
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Texture " + texture->getName() +
+                             "must have been created with TU_UAV to be bound as UAV",
+                             "D3D11RenderSystem::queueBindUAV" );
+            }
+
+            D3D11_UNORDERED_ACCESS_VIEW_DESC descUAV;
+            descUAV.Format = D3D11Mappings::_getPF( pixelFormat );
+
+            switch( texture->getTextureType() )
+            {
+            case TEX_TYPE_1D:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1D;
+                descUAV.Texture1D.MipSlice = static_cast<UINT>( mipmapLevel );
+                break;
+            case TEX_TYPE_2D:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+                descUAV.Texture2D.MipSlice = static_cast<UINT>( mipmapLevel );
+                break;
+            case TEX_TYPE_2D_ARRAY:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+                descUAV.Texture2DArray.MipSlice         = static_cast<UINT>( mipmapLevel );
+                descUAV.Texture2DArray.FirstArraySlice  = /*textureArrayIndex*/0;
+                descUAV.Texture2DArray.ArraySize        = static_cast<UINT>(texture->getDepth());
+                break;
+            case TEX_TYPE_3D:
+                descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
+                descUAV.Texture3D.MipSlice      = static_cast<UINT>( mipmapLevel );
+                descUAV.Texture3D.FirstWSlice   = 0;
+                descUAV.Texture3D.WSize         = static_cast<UINT>(texture->getDepth());
+                break;
+            default:
+                break;
+            }
+
+            D3D11Texture *dt = static_cast<D3D11Texture*>( texture.get() );
+
+            HRESULT hr = mDevice->CreateUnorderedAccessView( dt->getTextureResource(), &descUAV,
+                                                             &mUavs[slot] );
+            if( FAILED(hr) )
+            {
+                if( oldUav )
+                {
+                    oldUav->Release();
+                    oldUav = 0;
+                }
+
+                String errorDescription = mDevice.getErrorDescription(hr);
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Failed to create UAV state on texture '" + texture->getName() +
+                    "'\nError Description: " + errorDescription,
+                    "D3D11RenderSystem::queueBindUAV" );
+            }
+
+            mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+        }
+        else
+        {
+            if( slot + 1 == mMaxModifiedUavPlusOne )
+            {
+                --mMaxModifiedUavPlusOne;
+                while( mMaxModifiedUavPlusOne != 0 && !mUavs[mMaxModifiedUavPlusOne-1] )
+                    --mMaxModifiedUavPlusOne;
+            }
+        }
+
+        if( oldUav )
+        {
+            oldUav->Release();
+            oldUav = 0;
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::clearUAVs(void)
+    {
+        mUavsDirty = true;
+
+        for( size_t i=0; i<64; ++i )
+        {
+            mUavTexPtr[i].setNull();
+
+            if( mUavs[i] )
+            {
+                mUavs[i]->Release();
+                mUavs[i] = 0;
+            }
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::flushUAVs(void)
+    {
+        mUavsDirty = false;
+
+        bool colourWrite = true;
+        if( mActiveViewport )
+            colourWrite = mActiveViewport->getColourWrite();
+        _setRenderTargetViews( colourWrite );
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsPipelineStateObjectCreated( HlmsPso *block )
+    {
+        D3D11HlmsPso *pso = new D3D11HlmsPso();
+        memset( pso, 0, sizeof(D3D11HlmsPso) );
+
+        D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+
+        ZeroMemory( &depthStencilDesc, sizeof( D3D11_DEPTH_STENCIL_DESC ) );
+        depthStencilDesc.DepthEnable        = block->macroblock->mDepthCheck;
+        depthStencilDesc.DepthWriteMask     =
+                block->macroblock->mDepthWrite ? D3D11_DEPTH_WRITE_MASK_ALL :
+                                                  D3D11_DEPTH_WRITE_MASK_ZERO;
+        depthStencilDesc.DepthFunc          = D3D11Mappings::get( block->macroblock->mDepthFunc );
+        depthStencilDesc.StencilEnable      = block->pass.stencilParams.enabled;
+        depthStencilDesc.StencilReadMask    = block->pass.stencilParams.readMask;
+        depthStencilDesc.StencilWriteMask   = block->pass.stencilParams.writeMask;
+        const StencilStateOp &stateFront = block->pass.stencilParams.stencilFront;
+        depthStencilDesc.FrontFace.StencilFunc          = D3D11Mappings::get( stateFront.compareOp );
+        depthStencilDesc.FrontFace.StencilDepthFailOp   = D3D11Mappings::get( stateFront.stencilDepthFailOp );
+        depthStencilDesc.FrontFace.StencilPassOp        = D3D11Mappings::get( stateFront.stencilPassOp );
+        depthStencilDesc.FrontFace.StencilFailOp        = D3D11Mappings::get( stateFront.stencilFailOp );
+        const StencilStateOp &stateBack = block->pass.stencilParams.stencilBack;
+        depthStencilDesc.BackFace.StencilFunc           = D3D11Mappings::get( stateBack.compareOp );
+        depthStencilDesc.BackFace.StencilDepthFailOp    = D3D11Mappings::get( stateBack.stencilDepthFailOp );
+        depthStencilDesc.BackFace.StencilPassOp         = D3D11Mappings::get( stateBack.stencilPassOp );
+        depthStencilDesc.BackFace.StencilFailOp         = D3D11Mappings::get( stateBack.stencilFailOp );
+
+        HRESULT hr = mDevice->CreateDepthStencilState( &depthStencilDesc, &pso->depthStencilState );
+        if( FAILED(hr) )
+        {
+            delete pso;
+            pso = 0;
+
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create depth stencil state\nError Description: " + errorDescription,
+                "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+        }
+
+        const bool useTesselation = !block->tesselationDomainShader.isNull();
+        const bool useAdjacency   = !block->geometryShader.isNull() &&
+                                    block->geometryShader->isAdjacencyInfoRequired();
+
+        switch( block->operationType )
+        {
+        case OT_POINT_LIST:
+            pso->topology = D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+            break;
+        case OT_LINE_LIST:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+            break;
+        case OT_LINE_STRIP:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_2_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+            break;
+        default:
+        case OT_TRIANGLE_LIST:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+            break;
+        case OT_TRIANGLE_STRIP:
+            if( useTesselation )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST;
+            else if( useAdjacency )
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP_ADJ;
+            else
+                pso->topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+            break;
+        case OT_TRIANGLE_FAN:
+            pso->topology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+
+            delete pso;
+            pso = 0;
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Error - DX11 render - no support for triangle fan (OT_TRIANGLE_FAN)",
+                         "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+            break;
+        }
+
+        //No subroutines for now
+        if( !block->vertexShader.isNull() )
+        {
+            pso->vertexShader = static_cast<D3D11HLSLProgram*>( block->vertexShader->
+                                                                _getBindingDelegate() );
+        }
+        if( !block->geometryShader.isNull() )
+        {
+            pso->geometryShader = static_cast<D3D11HLSLProgram*>( block->geometryShader->
+                                                                  _getBindingDelegate() );
+        }
+        if( mFeatureLevel >= D3D_FEATURE_LEVEL_11_0 )
+        {
+            if( !block->tesselationHullShader.isNull() )
+            {
+                pso->hullShader = static_cast<D3D11HLSLProgram*>( block->tesselationHullShader->
+                                                                  _getBindingDelegate() );
+            }
+            if( !block->tesselationDomainShader.isNull() )
+            {
+                pso->domainShader = static_cast<D3D11HLSLProgram*>( block->tesselationDomainShader->
+                                                                    _getBindingDelegate() );
+            }
+
+            // Check consistency of tessellation shaders
+            if( block->tesselationHullShader.isNull() != block->tesselationDomainShader.isNull() )
+            {
+                delete pso;
+                pso = 0;
+                if( block->tesselationHullShader.isNull() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Attempted to use tessellation, but domain shader is missing",
+                                 "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+                }
+                else
+                {
+                    OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                 "Attempted to use tessellation, but hull shader is missing",
+                                 "D3D11RenderSystem::_hlmsPipelineStateObjectCreated" );
+                }
+            }
+        }
+        if( !block->pixelShader.isNull() )
+        {
+            pso->pixelShader = static_cast<D3D11HLSLProgram*>( block->pixelShader->
+                                                               _getBindingDelegate() );
+        }
+
+        if( pso->vertexShader )
+        {
+            try
+            {
+                pso->inputLayout = pso->vertexShader->getLayoutForPso( block->vertexElements );
+            }
+            catch( Exception &e )
+            {
+                delete pso;
+                pso = 0;
+                throw e;
+            }
+        }
+
+        block->rsData = pso;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsPipelineStateObjectDestroyed( HlmsPso *pso )
+    {
+        D3D11HlmsPso *d3dPso = reinterpret_cast<D3D11HlmsPso*>( pso->rsData );
+        d3dPso->depthStencilState->Release();
+        d3dPso->inputLayout->Release();
+        delete d3dPso;
+        pso->rsData = 0;
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::_hlmsMacroblockCreated( HlmsMacroblock *newBlock )
     {
         D3D11_RASTERIZER_DESC rasterDesc;
