@@ -5336,7 +5336,7 @@ void SceneManager::buildScissor(const Light* light, const Camera* cam, RealRect&
 {
     // Project the sphere onto the camera
     Sphere sphere(light->getDerivedPosition(), light->getAttenuationRange());
-    cam->projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
+    cam->Frustum::projectSphere(sphere, &(rect.left), &(rect.top), &(rect.right), &(rect.bottom));
 }
 //---------------------------------------------------------------------
 void SceneManager::resetScissor()
@@ -5347,7 +5347,12 @@ void SceneManager::resetScissor()
     mDestRenderSystem->setScissorTest(false);
 }
 //---------------------------------------------------------------------
-void SceneManager::checkCachedLightClippingInfo()
+void SceneManager::invalidatePerFrameScissorRectCache()
+{
+	checkCachedLightClippingInfo(true);
+}
+//---------------------------------------------------------------------
+void SceneManager::checkCachedLightClippingInfo(bool forceScissorRectsInvalidation)
 {
     unsigned long frame = Root::getSingleton().getNextFrameNumber();
     if (frame != mLightClippingInfoMapFrameNumber)
@@ -5355,6 +5360,11 @@ void SceneManager::checkCachedLightClippingInfo()
         // reset cached clip information
         mLightClippingInfoMap.clear();
         mLightClippingInfoMapFrameNumber = frame;
+    }
+    else if(forceScissorRectsInvalidation)
+    {
+        for(LightClippingInfoMap::iterator ci = mLightClippingInfoMap.begin(), ci_end = mLightClippingInfoMap.end(); ci != ci_end; ++ci)
+            ci->second.scissorValid = false;
     }
 }
 //---------------------------------------------------------------------

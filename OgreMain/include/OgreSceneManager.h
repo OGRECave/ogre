@@ -975,7 +975,7 @@ namespace Ogre {
         virtual ClipResult buildAndSetLightClip(const LightList& ll);
         virtual void buildLightClip(const Light* l, PlaneList& planes);
         virtual void resetLightClip();
-        virtual void checkCachedLightClippingInfo();
+        virtual void checkCachedLightClippingInfo(bool forceScissorRectsInvalidation = false);
 
         /// The active renderable visitor class - subclasses could override this
         SceneMgrQueuedRenderableVisitor* mActiveQueuedRenderableVisitor;
@@ -1147,6 +1147,12 @@ namespace Ogre {
         /** Retrieve a scissor rectangle for a given light and camera. 
         */
         virtual const RealRect& getLightScissorRect(Light* l, const Camera* cam);
+
+        /** Scissor rects are cached during frame, and this cache should be explicitly invalidated
+            if several renders are done during one frame using different projections matrices,
+            for example for tiled, stereo or multiview orthographic projection rendering.
+        */
+        virtual void invalidatePerFrameScissorRectCache();
 
         /** Removes the named light from the scene and destroys it.
             @remarks
