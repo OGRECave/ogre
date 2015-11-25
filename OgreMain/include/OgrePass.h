@@ -1219,6 +1219,9 @@ namespace Ogre {
             not just the names.
         */
         void setVertexProgram(const String& name, bool resetParams = true);
+
+        const GpuProgramPtr getGpuProgram(GpuProgramType programType) const;
+
         /** Sets the vertex program parameters.
             @remarks
             Only applicable to programmable passes, and this particular call is

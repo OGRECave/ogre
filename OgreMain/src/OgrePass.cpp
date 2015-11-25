@@ -1713,6 +1713,30 @@ namespace Ogre {
         }
         return mVertexProgramUsage->getParameters();
     }
+    const GpuProgramPtr Pass::getGpuProgram(GpuProgramType programType) const
+	{
+		switch (programType)
+		{
+		case GPT_VERTEX_PROGRAM:
+			return getVertexProgram();
+		case GPT_GEOMETRY_PROGRAM:
+			return getGeometryProgram();
+		case GPT_FRAGMENT_PROGRAM:
+			return getFragmentProgram();
+		case GPT_DOMAIN_PROGRAM:
+			return getTessellationDomainProgram();
+		case GPT_HULL_PROGRAM:
+			return getTessellationHullProgram();
+		case GPT_COMPUTE_PROGRAM:
+			return getComputeProgram();
+		default:
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+				"Unkown gpu program type",
+				"Pass::getGpuProgram");
+		}
+	}
+
+    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getVertexProgram(void) const
     {
