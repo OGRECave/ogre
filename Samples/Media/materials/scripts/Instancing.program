@@ -6,7 +6,14 @@
 //--------------------------------------------------------------
 // GLSL Programs
 //--------------------------------------------------------------
-fragment_program Ogre/Shadow/Utils glsl
+fragment_program Ogre/Shadow/Utils unified
+{
+	delegate Ogre/Shadow/Utils_glsl
+	delegate Ogre/Shadow/Utils_glsles
+}
+
+
+fragment_program Ogre/Shadow/Utils_glsl glsl
 {
 	source shadows.glsl
 }
@@ -35,7 +42,7 @@ fragment_program Ogre/Instancing/shadow_caster_glsl_ps glsl
 //--------------------------------------------------------------
 // GLSL ES Programs
 //--------------------------------------------------------------
-fragment_program Ogre/Shadow/Utils glsles
+fragment_program Ogre/Shadow/Utils_glsles glsles
 {
 	source shadows.glsles
 }
