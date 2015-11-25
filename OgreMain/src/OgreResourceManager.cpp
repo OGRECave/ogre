@@ -162,6 +162,11 @@ namespace Ogre {
                     }
                 }
             }
+            else
+            {
+                OGRE_EXCEPT(Exception::ERR_DUPLICATE_ITEM, "Resource with the name " + res->getName() +
+                    " already exists.", "ResourceManager::add");
+            }
         }
         else
         {

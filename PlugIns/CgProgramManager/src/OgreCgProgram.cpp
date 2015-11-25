@@ -469,6 +469,7 @@ namespace Ogre {
 				 )
 			{
 				// Create a high-level program, give it the same name as us
+                HighLevelGpuProgramManager::getSingleton().remove(mName);
 				HighLevelGpuProgramPtr vp = 
 					HighLevelGpuProgramManager::getSingleton().createProgram(
 					mName, mGroup, "hlsl", mType);
@@ -488,7 +489,8 @@ namespace Ogre {
 					mProgramString = StringUtil::replaceAll(mProgramString, "oDepth.z", "oDepth");
 				}
 				// Create a low-level program, give it the same name as us
-				mAssemblerProgram = 
+                GpuProgramManager::getSingleton().remove(mName);
+                mAssemblerProgram = 
 					GpuProgramManager::getSingleton().createProgramFromString(
 					mName, 
 					mGroup,
