@@ -64,6 +64,8 @@ void RenderSystemCapabilitiesTests::setUp()
     // Actual parsing happens here. The following test methods confirm parse results only.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive(macBundlePath() + "/Contents/Resources/Media/CustomCapabilities", "FileSystem", true);
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("./Tests/Media/CustomCapabilities", "FileSystem", true);
 #else
     mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("../../Tests/Media/CustomCapabilities", "FileSystem", true);
 #endif
