@@ -780,8 +780,8 @@ static const String glsles_prefix = "precision highp float;\
 
 	void ShadowVolumeExtrudeProgram::initialiseModulationPassPrograms(void)
 	{
-		bool vs_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0");
-		bool ps_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0");
+		bool vs_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+		bool ps_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0_level_9_1");
 		bool glsl = GpuProgramManager::getSingleton().isSyntaxSupported("glsl");
 		bool glsles = GpuProgramManager::getSingleton().isSyntaxSupported("glsles");
 
@@ -817,8 +817,8 @@ static const String glsles_prefix = "precision highp float;\
 		{
 			if (ps_4_0 && vs_4_0)
 			{
-				vsTarget = "vs_4_0";
-				fsTarget = "ps_4_0";
+				vsTarget = "vs_4_0_level_9_1";
+				fsTarget = "ps_4_0_level_9_1";
 				language = "hlsl";
 				vsProgram = mModulate_Vs_hlsl_4_0;
 				fsProgram = mModulate_Fs_hlsl_4_0;
