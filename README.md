@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/paroj/ogre.svg?branch=master)](https://travis-ci.org/paroj/ogre)
+Ubuntu [![Build Status](https://travis-ci.org/paroj/ogre.svg?branch=master)](https://travis-ci.org/paroj/ogre)
+Windows [![Build status](https://ci.appveyor.com/api/projects/status/h6q45yiqu7c8ly74/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre/branch/master)
 
 <p class="header" align="center"><img alt="" src="Docs/ogre-logo-wetfloor.gif" width="235" height="78"></p>
 

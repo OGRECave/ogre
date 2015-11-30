@@ -1,0 +1,15 @@
+platform: x64
+configuration: Release
+
+install:
+- hg clone https://bitbucket.org/cabalistic/ogredeps
+- cd ogredeps
+- cmake . -G "Visual Studio 12" -DOGREDEPS_BUILD_FREEIMAGE=FALSE -DOGREDEPS_BUILD_SDL2=FALSE -DOGREDEPS_BUILD_OIS=FALSE
+- cmake --build . --target install
+- cd ..
+
+build:
+
+build_script:
+ - cmake . -G "Visual Studio 12" -DOGRE_DEPENDENCIES_DIR=ogredeps/ogredeps -DOGRE_BUILD_RENDERSYSTEM_D3D9=FALSE -DOGRE_BUILD_RENDERSYSTEM_GL=FALSE -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS=TRUE -DOGREDEPS_BUILD_FREEIMAGE=FALSE -DOGREDEPS_BUILD_SDL2=FALSE -DOGREDEPS_BUILD_OIS=FALSE
+ - cmake --build .
