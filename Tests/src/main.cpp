@@ -74,5 +74,5 @@ int main(int argc, char *argv[])
     UnitTestSuite::getSingletonPtr()->tearDownSuite();
     delete UnitTestSuite::getSingletonPtr();
 
-    return 0;
+    return !result.wasSuccessful();
 }
