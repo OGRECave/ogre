@@ -40,10 +40,12 @@ namespace Ogre {
     GLES2FrameBufferObject::GLES2FrameBufferObject(GLES2FBOManager *manager, uint fsaa):
         mManager(manager), mNumSamples(fsaa)
     {
+        GLES2Support* glSupport = getGLES2SupportRef();
+
         // Generate framebuffer object
         OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mFB));
 
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        if(glSupport->checkExtension("GL_EXT_debug_label"))
         {
             OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mFB, 0, ("FBO #" + StringConverter::toString(mFB)).c_str()));
@@ -53,7 +55,7 @@ namespace Ogre {
         mMultisampleFB = 0;
 
         // Check multisampling if supported
-        if(gleswIsSupported(3, 0))
+        if(glSupport->hasMinGLVersion(3, 0))
         {
             // Check samples supported
             OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, mFB));
@@ -67,7 +69,7 @@ namespace Ogre {
         if (mNumSamples)
         {
             OGRE_CHECK_GL_ERROR(glGenFramebuffers(1, &mMultisampleFB));
-            if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+            if(glSupport->checkExtension("GL_EXT_debug_label"))
             {
                 OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                 OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mMultisampleFB, 0, ("MSAA FBO #" + StringConverter::toString(mMultisampleFB)).c_str()));

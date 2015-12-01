@@ -194,7 +194,8 @@ namespace Ogre {
         }
         else
         {
-            if(getGLES2SupportRef()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+            GLES2Support* glSupport = getGLES2SupportRef();
+            if(glSupport->checkExtension("GL_EXT_map_buffer_range") || glSupport->hasMinGLVersion(3, 0))
             {
                 // Map the buffer range then copy out of it into our destination buffer
                 void* srcData;
