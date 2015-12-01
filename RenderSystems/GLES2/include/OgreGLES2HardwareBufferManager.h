@@ -40,6 +40,7 @@ namespace Ogre {
     {
         protected:
             GLES2StateCacheManager* mStateCacheManager;
+            GLES2Support* mGLSupport;
             /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
             VertexDeclaration* createVertexDeclarationImpl(void);
             /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
