@@ -200,29 +200,13 @@ namespace Ogre {
         rsc->setDriverVersion(mDriverVersion);
 
         const char* deviceName = (const char*)glGetString(GL_RENDERER);
-        const char* vendorName = (const char*)glGetString(GL_VENDOR);        
         if (deviceName)
         {
             rsc->setDeviceName(deviceName);
         }
 
         rsc->setRenderSystemName(getName());
-
-        // Determine vendor
-        if (strstr(vendorName, "Imagination Technologies"))
-            rsc->setVendor(GPU_IMAGINATION_TECHNOLOGIES);
-        else if (strstr(vendorName, "Apple Computer, Inc."))
-            rsc->setVendor(GPU_APPLE);  // iOS Simulator
-        else if (strstr(vendorName, "NVIDIA"))
-            rsc->setVendor(GPU_NVIDIA);
-        else if (strstr(vendorName, "ARM"))
-            rsc->setVendor(GPU_ARM);
-        else if (strstr(vendorName, "Qualcomm"))
-            rsc->setVendor(GPU_QUALCOMM);
-        else if (strstr(vendorName, "Mozilla"))
-            rsc->setVendor(GPU_MOZILLA);
-        else
-            rsc->setVendor(GPU_UNKNOWN);
+        rsc->parseVendorFromString(mGLSupport->getGLVendor());
 
         // Multitexturing support and set number of texture units
         GLint units;
@@ -250,7 +234,7 @@ namespace Ogre {
             rsc->setCapability(RSC_32BIT_INDEX);
 
         // Check for hardware occlusion support
-        if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean") || mHasGLES30)
         {
             rsc->setCapability(RSC_HWOCCLUSION);
         }
@@ -285,7 +269,7 @@ namespace Ogre {
                mGLSupport->checkExtension("WEBGL_compressed_texture_etc1"))
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC1);
 
-            if(gleswIsSupported(3, 0))
+            if(mHasGLES30)
                 rsc->setCapability(RSC_TEXTURE_COMPRESSION_ETC2);
 
             if(mGLSupport->checkExtension("GL_AMD_compressed_ATC_texture") ||
@@ -400,7 +384,7 @@ namespace Ogre {
         rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Check for Float textures
-        if(mGLSupport->checkExtension("GL_OES_texture_float") || mGLSupport->checkExtension("GL_OES_texture_half_float") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_OES_texture_float") || mGLSupport->checkExtension("GL_OES_texture_half_float") || mHasGLES30)
             rsc->setCapability(RSC_TEXTURE_FLOAT);
 
         rsc->setCapability(RSC_TEXTURE_1D);
@@ -410,7 +394,7 @@ namespace Ogre {
 
         // ES 3 always supports NPOT textures
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
-        if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || mHasGLES30)
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
             rsc->setNonPOW2TexturesLimited(false);
@@ -430,15 +414,15 @@ namespace Ogre {
         
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
 #   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0) || emscripten_get_compiler_setting("LEGACY_GL_EMULATION"))
+        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30 || emscripten_get_compiler_setting("LEGACY_GL_EMULATION"))
 #   else
-            if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
+            if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30)
 #   endif
                 rsc->setCapability(RSC_VAO);
 #endif
 
 #if OGRE_NO_GLES3_SUPPORT == 0
-        if (mGLSupport->checkExtension("GL_OES_get_program_binary") || gleswIsSupported(3, 0))
+        if (mGLSupport->checkExtension("GL_OES_get_program_binary") || mHasGLES30)
         {
             // http://www.khronos.org/registry/gles/extensions/OES/OES_get_program_binary.txt
             GLint formats;
@@ -449,7 +433,7 @@ namespace Ogre {
         }
 #endif
 
-        if (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
+        if (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
         {
             rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
         }
@@ -601,21 +585,11 @@ namespace Ogre {
         if (!mGLInitialised)
         {
             initialiseContext(win);
-            
-            StringVector tokens = StringUtil::split(mGLSupport->getGLVersion(), ".");
-            if (!tokens.empty())
-            {
-                mDriverVersion.major = StringConverter::parseInt(tokens[0]);
-                if (tokens.size() > 1)
-                    mDriverVersion.minor = StringConverter::parseInt(tokens[1]);
-                if (tokens.size() > 2)
-                    mDriverVersion.release = StringConverter::parseInt(tokens[2]);
-            }
-            mDriverVersion.build = 0;
+            mDriverVersion = mGLSupport->getGLVersion();
 
             // Get the shader language version
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
-            tokens = StringUtil::split(shadingLangVersion, ". ");
+            StringVector tokens = StringUtil::split(shadingLangVersion, ". ");
             size_t i = 0;
 
             // iOS reports the GLSL version with a whole bunch of non-digit characters so we have to find where the version starts.
@@ -944,11 +918,11 @@ namespace Ogre {
             func = GL_FUNC_REVERSE_SUBTRACT;
             break;
         case SBO_MIN:
-            if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || gleswIsSupported(3, 0))
+            if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
                 func = GL_MIN_EXT;
             break;
         case SBO_MAX:
-            if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || gleswIsSupported(3, 0))
+            if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
                 func = GL_MAX_EXT;
             break;
         }
@@ -991,11 +965,11 @@ namespace Ogre {
                 func = GL_FUNC_REVERSE_SUBTRACT;
                 break;
             case SBO_MIN:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || gleswIsSupported(3, 0))
+                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
                     func = GL_MIN_EXT;
                 break;
             case SBO_MAX:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || gleswIsSupported(3, 0))
+                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
                     func = GL_MAX_EXT;
                 break;
         }
@@ -1012,11 +986,11 @@ namespace Ogre {
                 alphaFunc = GL_FUNC_REVERSE_SUBTRACT;
                 break;
             case SBO_MIN:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || gleswIsSupported(3, 0))
+                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
                     alphaFunc = GL_MIN_EXT;
                 break;
             case SBO_MAX:
-                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || gleswIsSupported(3, 0))
+                if(mGLSupport->checkExtension("GL_EXT_blend_minmax") || mHasGLES30)
                     alphaFunc = GL_MAX_EXT;
                 break;
         }
@@ -1365,7 +1339,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     HardwareOcclusionQuery* GLES2RenderSystem::createHardwareOcclusionQuery(void)
     {
-        if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_occlusion_query_boolean") || mHasGLES30)
         {
             GLES2HardwareOcclusionQuery* ret = new GLES2HardwareOcclusionQuery(); 
             mHwOcclusionQueries.push_back(ret);
@@ -1632,7 +1606,7 @@ namespace Ogre {
         VertexDeclaration* globalVertexDeclaration = 0;
         bool hasInstanceData = false;
         size_t numberOfInstances = 0;
-        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
         {
             globalInstanceVertexBuffer = getGlobalInstanceVertexBuffer();
             globalVertexDeclaration = getGlobalInstanceVertexBufferVertexDeclaration();
@@ -1681,7 +1655,7 @@ namespace Ogre {
                                    mRenderAttribsBound, mRenderInstanceAttribsBound, true);
         }
 
-        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
         {
             if( !globalInstanceVertexBuffer.isNull() && globalVertexDeclaration != NULL )
             {
@@ -1744,7 +1718,7 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 
-                if(hasInstanceData && (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0)))
+                if(hasInstanceData && (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30))
                 {
                     OGRE_CHECK_GL_ERROR(glDrawElementsInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, static_cast<GLsizei>(op.indexData->indexCount), indexType, pBufferData, static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -1772,7 +1746,7 @@ namespace Ogre {
                                   mDerivedDepthBiasSlopeScale);
                 }
 
-                if((mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0)) && hasInstanceData)
+                if((mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30) && hasInstanceData)
                 {
                     OGRE_CHECK_GL_ERROR(glDrawArraysInstancedEXT((polyMode == GL_FILL) ? primType : polyMode, 0, static_cast<GLsizei>(op.vertexData->vertexCount), static_cast<GLsizei>(numberOfInstances)));
                 }
@@ -1789,7 +1763,7 @@ namespace Ogre {
         }
 
 #if OGRE_NO_GLES2_VAO_SUPPORT == 0
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30)
             // Unbind the vertex array object.  Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
 #endif
@@ -2026,6 +2000,8 @@ namespace Ogre {
 
         // Setup GLSupport
         mGLSupport->initialiseExtensions();
+
+        mHasGLES30 = mGLSupport->hasMinGLVersion(3, 0);
 
         LogManager::getSingleton().logMessage("**************************************");
         LogManager::getSingleton().logMessage("*** OpenGL ES 2.x Renderer Started ***");
@@ -2412,7 +2388,7 @@ namespace Ogre {
                 attrib = (GLuint)linkProgram->getAttributeIndex(sem, elemIndex);
             }
 
-            if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || gleswIsSupported(3, 0))
+            if(mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
             {
                 if (mCurrentVertexProgram)
                 {

@@ -250,7 +250,7 @@ namespace Ogre {
     GLES2DefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                                  bool useShadowBuffer, const String& name)
     {
-        if(!gleswIsSupported(3, 0))
+        if(!getGLES2SupportRef()->hasMinGLVersion(3, 0))
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "GLES2 does not support uniform buffer objects",
