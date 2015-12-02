@@ -315,6 +315,9 @@ namespace Ogre {
     {
         extremityPoints.clear();
 
+		if (count == 0)
+			return;
+
         /* Currently this uses just one criteria: the points must be
          * as far as possible from each other. This at least ensures
          * that the extreme points characterise the submesh as
