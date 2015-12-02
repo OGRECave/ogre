@@ -1,0 +1,194 @@
+shared_params switches
+{
+        shared_param_named awesome bool true
+}
+
+shared_params colors
+{
+        shared_param_named R float 1.0
+        // shared_param_named GB float2 0.0 1.0
+}
+
+shared_params more_switches
+{
+        shared_param_named more_awesome bool false
+}
+
+//shared_params counters
+
+//////////
+// HLSL //
+//////////
+
+//TODO Implement me.
+// vertex_program Compute/VS_HLSL hlsl
+// {
+//         source Compute.hlsl
+//         entry_point mainVS
+//         target vs_4_0
+
+//         default_params
+//         {
+//                 param_named_auto WorldViewProj worldviewproj_matrix
+//         }
+// }
+
+// geometry_program Compute/GS_HLSL hlsl
+// {
+//         source Compute.hlsl
+//         entry_point mainGS
+//         target gs_4_0
+//         uses_adjacency_information true
+
+//         default_params
+//         {
+//                 param_named IsoValue float 1
+//         }
+// }
+
+// fragment_program Compute/PS_HLSL hlsl
+// {
+//         source Compute.hlsl
+//         entry_point mainPS
+//         target ps_4_0
+// }
+
+//////////
+//  CG  //
+//////////
+
+// As of CG 3.1, compute shaders are not yet supported.
+
+// vertex_program Compute/VS_CG cg
+// {
+//         source Compute.cg
+//         entry_point mainVS
+//         profiles vp40 arbvp1
+
+//         default_params
+//         {
+//                 param_named_auto WorldViewProj worldviewproj_matrix
+//         }
+// }
+
+// geometry_program Compute/GS_CG cg
+// {
+//         source Compute.cg
+//         entry_point mainGS
+//         profiles gpu_gp gp4_gp
+//         uses_adjacency_information true
+
+//         default_params
+//         {
+//             param_named IsoValue float 1
+//         }
+// }
+
+// fragment_program Compute/PS_CG cg
+// {
+//         source Compute.cg
+//         entry_point mainPS
+//         profiles fp40 arbfp1
+// }
+
+//////////
+// GLSL //
+//////////
+vertex_program AtomicCounters/VS_GLSL glsl
+{
+        source AtomicVS.glsl
+        syntax glsl150
+
+        default_params
+        {
+            param_named_auto WorldViewProj worldviewproj_matrix
+        }
+}
+
+geometry_program AtomicCounters/GS_GLSL glsl
+{
+        source AtomicGS.glsl
+        syntax glsl150
+
+        default_params
+        {
+            param_named_auto WorldViewProj worldviewproj_matrix
+        }
+}
+
+fragment_program AtomicCounters/PS_GLSL glsl
+{
+        source AtomicFS.glsl
+        syntax glsl430
+
+        default_params
+        {
+            shared_params_ref switches
+            shared_params_ref more_switches
+            param_named atom_counter uint 10
+            param_named pretty_colours bool false
+            param_named image_load_store bool false
+            param_named colour_factor uint[3] 50 50 100
+        }
+}
+
+vertex_program AtomicCounters/VS unified
+{
+        delegate AtomicCounters/VS_GLSL
+        // delegate Compute/VS_HLSL
+        // delegate Compute/VS_CG
+}
+
+geometry_program AtomicCounters/GS unified
+{
+        delegate AtomicCounters/GS_GLSL
+        // delegate Compute/GS_HLSL
+        // delegate Compute/GS_CG
+}
+
+fragment_program AtomicCounters/PS unified
+{
+        delegate AtomicCounters/PS_GLSL
+        // delegate Compute/PS_HLSL
+        // delegate Compute/PS_CG
+}
+
+material AtomicCounters
+{
+        technique
+        {
+                pass
+                {
+                    texture_unit
+                    {
+                      //texture data.csv
+                      //image_bind 0 read X8R8B8G8
+                    }
+
+                        vertex_program_ref AtomicCounters/VS
+                        {
+
+                        }
+
+                        // tesselation_hull_program_ref Compute/THS
+                        // {
+
+                        // }
+
+                        // tesselation_domain_program_ref Compute/TDS
+                        // {
+
+                        // }
+
+                        geometry_program_ref AtomicCounters/GS
+                        {
+
+                        }
+
+                        fragment_program_ref AtomicCounters/PS
+                        {
+
+                        }
+                }
+        }
+}

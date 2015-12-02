@@ -1,11 +1,10 @@
 # Configure AtomicCounters demo build
 
 set(SOURCE_FILES src/AtomicCounters.cpp)
-set(HEADER_FILES include/AtomicCounters.h)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(Sample_AtomicCounters ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+add_library(Sample_AtomicCounters ${OGRE_LIB_TYPE} ${SOURCE_FILES})
 
 target_link_libraries(Sample_AtomicCounters ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_AtomicCounters)
