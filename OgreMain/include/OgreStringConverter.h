@@ -274,6 +274,10 @@ namespace Ogre {
         /** Checks the String is a valid number value. */
         static bool isNumber(const String& val);
 
+        /** templated parse call that forwards to StringConverter::parse*(str)
+         useful for template metaprogramming */
+        template <typename T> static void parse(const String& str, T& v); // no implementation so we get compile time error for unknown types
+
 		/** Converts a ColourBufferType to a String.
 		@remarks
 			String output format is "Back", "Back Left", "Back Right", etc.
@@ -317,6 +321,49 @@ namespace Ogre {
         static std::locale msLocale;
         static bool msUseLocale;		
     };
+
+    template<> inline void StringConverter::parse(const String& str, ColourValue& v) {
+        v = Ogre::StringConverter::parseColourValue(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, Quaternion& v) {
+        v = Ogre::StringConverter::parseQuaternion(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, Matrix4& v) {
+        v = Ogre::StringConverter::parseMatrix4(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, Matrix3& v) {
+        v = Ogre::StringConverter::parseMatrix3(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, Vector4& v) {
+        v = Ogre::StringConverter::parseVector4(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, Vector3& v) {
+        v = Ogre::StringConverter::parseVector3(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, Vector2& v) {
+        v = Ogre::StringConverter::parseVector2(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, size_t& v) {
+        v = Ogre::StringConverter::parseSizeT(str);
+    }
+    /*possibly same as size_t template<> inline void StringConverter::parse(const String& str, unsigned int& v) {
+        v = Ogre::StringConverter::parseUnsignedInt(str);
+    }*/
+    template<> inline void StringConverter::parse(const String& str, long& v) {
+        v = Ogre::StringConverter::parseLong(str);
+    }
+    /*possibly same as size_t template<> inline void StringConverter::parse(const String& str, unsigned long& v) {
+        v = Ogre::StringConverter::parseUnsignedLong(str);
+    }*/
+    template<> inline void StringConverter::parse(const String& str, bool& v) {
+        v = Ogre::StringConverter::parseBool(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, int& v) {
+        v = Ogre::StringConverter::parseInt(str);
+    }
+    template<> inline void StringConverter::parse(const String& str, Real& v) {
+        v = Ogre::StringConverter::parseReal(str);
+    }
 
     /** @} */
     /** @} */
