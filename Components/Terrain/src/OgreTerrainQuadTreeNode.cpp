@@ -1210,13 +1210,11 @@ namespace Ogre
         mSelfOrChildRendered = false;
 
         // early-out
-        /* disable this, could cause 'jumps' in LOD as children go out of frustum
         if (!cam->isVisible(mMovable->getWorldBoundingBox(true)))
         {
             mCurrentLod = -1;
             return mSelfOrChildRendered;
         }
-        */
 
         // Check children first
         int childRenderedCount = 0;
