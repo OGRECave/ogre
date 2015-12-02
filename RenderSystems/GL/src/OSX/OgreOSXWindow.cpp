@@ -351,7 +351,7 @@ namespace Ogre
             cgErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
 #else
             GLint swapInterval = 1;
-            cgErr = CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
+            cgErr = (CGError)CGLSetParameter(mCGLContextObj, kCGLCPSwapInterval, &swapInterval);
 #endif
             CG_CHECK_ERROR(cgErr)
             
