@@ -104,7 +104,8 @@ namespace Ogre
 
         if( queuedRenderable.renderable )
         {
-            const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos( casterPass );
+            const VertexArrayObjectArray &vaos =
+                    queuedRenderable.renderable->getVaos( static_cast<VertexPass>(casterPass) );
             if( !vaos.empty() )
             {
                 //v2 object. TODO: LOD? Should we allow Vaos with different vertex formats on LODs?
@@ -229,7 +230,7 @@ namespace Ogre
                                        bool casterPass )
     {
         unsigned short numMatrices = 1;
-        if( renderable->getVaos( casterPass ).empty() )
+        if( renderable->getVaos( static_cast<VertexPass>(casterPass) ).empty() )
         {
             numMatrices = renderable->getNumWorldTransforms();
             renderable->getWorldTransforms( mTempXform );

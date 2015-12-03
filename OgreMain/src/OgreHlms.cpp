@@ -1680,7 +1680,8 @@ namespace Ogre
 
         if( queuedRenderable.renderable )
         {
-            const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos( casterPass );
+            const VertexArrayObjectArray &vaos =
+                    queuedRenderable.renderable->getVaos( static_cast<VertexPass>(casterPass) );
             if( !vaos.empty() )
             {
                 //v2 object. TODO: LOD? Should we allow Vaos with different vertex formats on LODs?
