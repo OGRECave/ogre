@@ -248,7 +248,7 @@ namespace Ogre
         else
         {
             uint8 meshLod = pMovableObject->getCurrentMeshLod();
-            const VertexArrayObjectArray &vaos = pRend->getVaos( casterPass );
+            const VertexArrayObjectArray &vaos = pRend->getVaos( static_cast<VertexPass>(casterPass) );
 
             VertexArrayObject *vao = vaos[meshLod];
             meshHash = vao->getRenderQueueId();
@@ -539,7 +539,8 @@ namespace Ogre
         {
             const QueuedRenderable &queuedRenderable = *itor;
             uint8 meshLod = queuedRenderable.movableObject->getCurrentMeshLod();
-            const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos( casterPass );
+            const VertexArrayObjectArray &vaos = queuedRenderable.renderable->getVaos(
+                        static_cast<VertexPass>(casterPass) );
 
             VertexArrayObject *vao = vaos[meshLod];
             const HlmsDatablock *datablock = queuedRenderable.renderable->getDatablock();

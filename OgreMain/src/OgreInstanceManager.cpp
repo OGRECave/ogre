@@ -63,7 +63,7 @@ namespace v1
     {
         mMeshReference = MeshManager::getSingleton().load( meshName, groupName );
 
-        if(mMeshReference->sharedVertexData[0])
+        if(mMeshReference->sharedVertexData[VpNormal])
             MeshManager::unshareVertices(mMeshReference.get());
 
         if( mMeshReference->hasSkeleton() && !mMeshReference->getSkeleton().isNull() )

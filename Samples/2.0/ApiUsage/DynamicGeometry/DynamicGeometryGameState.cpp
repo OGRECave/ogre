@@ -139,9 +139,9 @@ namespace Demo
 
         //Each Vao pushed to the vector refers to an LOD level.
         //Must be in sync with mesh->mLodValues & mesh->mNumLods if you use more than one level
-        subMesh->mVao[0].push_back( vao );
+        subMesh->mVao[Ogre::VpNormal].push_back( vao );
         //Use the same geometry for shadow casting.
-        subMesh->mVao[1].push_back( vao );
+        subMesh->mVao[Ogre::VpShadow].push_back( vao );
 
         //Set the bounds to get frustum culling and LOD to work correctly.
         mesh->_setBounds( Ogre::Aabb( Ogre::Vector3::ZERO, Ogre::Vector3::UNIT_SCALE ), false );
@@ -183,9 +183,9 @@ namespace Demo
         Ogre::VertexArrayObject *vao = vaoManager->createVertexArrayObject(
                     vertexBuffers, indexBuffer, Ogre::OT_TRIANGLE_LIST );
 
-        subMesh->mVao[0].push_back( vao );
+        subMesh->mVao[Ogre::VpNormal].push_back( vao );
         //Use the same geometry for shadow casting.
-        subMesh->mVao[1].push_back( vao );
+        subMesh->mVao[Ogre::VpShadow].push_back( vao );
 
         //Set the bounds to get frustum culling and LOD to work correctly.
         mesh->_setBounds( Ogre::Aabb( Ogre::Vector3::ZERO, Ogre::Vector3::UNIT_SCALE ), false );
@@ -297,8 +297,8 @@ namespace Demo
 
         {
             //Partial update the buffer's 2nd vertex.
-            Ogre::VertexBufferPacked *partialVertexBuffer = mPartialMesh->getSubMesh( 0 )->mVao[0][0]->
-                                                                                getVertexBuffers()[0];
+            Ogre::VertexBufferPacked *partialVertexBuffer = mPartialMesh->getSubMesh( 0 )->
+                    mVao[Ogre::VpNormal][0]->getVertexBuffers()[0];
             CubeVertices newVertex( c_originalVertices[2] );
             newVertex.px += cosAlpha;
             partialVertexBuffer->upload( &newVertex, 2, 1 );

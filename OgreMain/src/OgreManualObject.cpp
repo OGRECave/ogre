@@ -827,19 +827,19 @@ namespace v1 {
             sm->operationType = rop->operationType;
             sm->setMaterialName(sec->getMaterialName(), groupName);
             // Copy vertex data; replicate buffers too
-            sm->vertexData[0] = rop->vertexData->clone(true);
+            sm->vertexData[VpNormal] = rop->vertexData->clone(true);
             // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
 
             // check if index data is present
             if (rop->indexData)
             {
                 // Copy index data; replicate buffers too; delete the default, old one to avoid memory leaks
-                if( sm->indexData[0] == sm->indexData[1] )
-                    sm->indexData[1] = 0;
-                OGRE_DELETE sm->indexData[0];
-                OGRE_DELETE sm->indexData[1];
-                sm->indexData[0] = rop->indexData->clone(true);
-                sm->indexData[1] = sm->indexData[0];
+                if( sm->indexData[VpNormal] == sm->indexData[VpShadow] )
+                    sm->indexData[VpShadow] = 0;
+                OGRE_DELETE sm->indexData[VpNormal];
+                OGRE_DELETE sm->indexData[VpShadow];
+                sm->indexData[VpNormal] = rop->indexData->clone(true);
+                sm->indexData[VpShadow] = sm->indexData[VpNormal];
             }
         }
         // update bounds

@@ -267,19 +267,19 @@ void reorganiseVertexBuffers(v1::Mesh& mesh)
     // Make sure animation types up to date
     mesh._determineAnimationTypes();
 
-    if (mesh.sharedVertexData[0])
+    if (mesh.sharedVertexData[VpNormal])
     {
         if (opts.interactive)
         {
-            reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData[0]);
+            reorganiseVertexBuffers("Shared Geometry", mesh, 0, mesh.sharedVertexData[VpNormal]);
         }
         else
         {
             // Automatic
             v1::VertexDeclaration* newDcl =
-                mesh.sharedVertexData[0]->vertexDeclaration->getAutoOrganisedDeclaration(
+                mesh.sharedVertexData[VpNormal]->vertexDeclaration->getAutoOrganisedDeclaration(
                     mesh.hasSkeleton(), mesh.hasVertexAnimation(), mesh.getSharedVertexDataAnimationIncludesNormals());
-            if (*newDcl != *(mesh.sharedVertexData[0]->vertexDeclaration))
+            if (*newDcl != *(mesh.sharedVertexData[VpNormal]->vertexDeclaration))
             {
                 // Usages don't matter here since we're onlly exporting
                 v1::BufferUsageList bufferUsages;
@@ -287,7 +287,7 @@ void reorganiseVertexBuffers(v1::Mesh& mesh)
                 {
                     bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                 }
-                mesh.sharedVertexData[0]->reorganiseBuffers(newDcl, bufferUsages);
+                mesh.sharedVertexData[VpNormal]->reorganiseBuffers(newDcl, bufferUsages);
             }
 
         }
@@ -304,7 +304,7 @@ void reorganiseVertexBuffers(v1::Mesh& mesh)
             {
                 StringStream str;
                 str << "SubMesh " << idx++;
-                reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData[0]);
+                reorganiseVertexBuffers(str.str(), mesh, sm, sm->vertexData[VpNormal]);
             }
             else
             {
@@ -312,9 +312,9 @@ void reorganiseVertexBuffers(v1::Mesh& mesh)
 
                 // Automatic
                 v1::VertexDeclaration* newDcl =
-                    sm->vertexData[0]->vertexDeclaration->getAutoOrganisedDeclaration(
+                    sm->vertexData[VpNormal]->vertexDeclaration->getAutoOrganisedDeclaration(
                         mesh.hasSkeleton(), hasVertexAnim, sm->getVertexAnimationIncludesNormals() );
-                if (*newDcl != *(sm->vertexData[0]->vertexDeclaration))
+                if (*newDcl != *(sm->vertexData[VpNormal]->vertexDeclaration))
                 {
                     // Usages don't matter here since we're onlly exporting
                     v1::BufferUsageList bufferUsages;
@@ -322,7 +322,7 @@ void reorganiseVertexBuffers(v1::Mesh& mesh)
                     {
                         bufferUsages.push_back(v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
                     }
-                    sm->vertexData[0]->reorganiseBuffers(newDcl, bufferUsages);
+                    sm->vertexData[VpNormal]->reorganiseBuffers(newDcl, bufferUsages);
                 }
 
             }

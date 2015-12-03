@@ -691,7 +691,7 @@ namespace v1 {
     {
         // Do we still have temp buffers for software vertex animation bound?
         bool ret = true;
-        if (mMesh->sharedVertexData[0] && mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
+        if (mMesh->sharedVertexData[VpNormal] && mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
         {
             ret = ret && mTempVertexAnimInfo.buffersCheckedOut(true, mMesh->getSharedVertexDataAnimationIncludesNormals());
         }
@@ -821,7 +821,7 @@ namespace v1 {
                         // Blend, taking source from either mesh data or morph data
                         Mesh::softwareVertexBlend(
                             (mMesh->getSharedVertexDataAnimationType() != VAT_NONE) ?
-                                mSoftwareVertexAnimVertexData : mMesh->sharedVertexData[0],
+                                mSoftwareVertexAnimVertexData : mMesh->sharedVertexData[VpNormal],
                             mSkelAnimVertexData,
                             blendMatrices, mMesh->sharedBlendIndexToBoneIndexMap.size(),
                             blendNormals);
@@ -843,7 +843,7 @@ namespace v1 {
                             // Blend, taking source from either mesh data or morph data
                             Mesh::softwareVertexBlend(
                                 (se.getSubMesh()->getVertexAnimationType() != VAT_NONE)?
-                                    se.mSoftwareVertexAnimVertexData : se.mSubMesh->vertexData[0],
+                                    se.mSoftwareVertexAnimVertexData : se.mSubMesh->vertexData[VpNormal],
                                 se.mSkelAnimVertexData,
                                 blendMatrices, se.mSubMesh->blendIndexToBoneIndexMap.size(),
                                 blendNormals);
@@ -979,8 +979,9 @@ namespace v1 {
                     ->vertexBufferBinding->getBuffer(elem->getSource());
                 buf->suppressHardwareUpdate(true);
                 
-                initialisePoseVertexData(mMesh->sharedVertexData[0], mSoftwareVertexAnimVertexData,
-                    mMesh->getSharedVertexDataAnimationIncludesNormals());
+                initialisePoseVertexData(mMesh->sharedVertexData[VpNormal],
+                                         mSoftwareVertexAnimVertexData,
+                                         mMesh->getSharedVertexDataAnimationIncludesNormals());
             }
             for (SubEntityList::iterator si = mSubEntityList.begin();
                 si != mSubEntityList.end(); ++si)
@@ -996,7 +997,7 @@ namespace v1 {
                         ->vertexBufferBinding->getBuffer(elem->getSource());
                     buf->suppressHardwareUpdate(true);
                     // if we're animating normals, we need to start with zeros
-                    initialisePoseVertexData(sub.getSubMesh()->vertexData[0], data,
+                    initialisePoseVertexData(sub.getSubMesh()->vertexData[VpNormal], data,
                         sub.getSubMesh()->getVertexAnimationIncludesNormals());
                 }
             }
@@ -1029,7 +1030,7 @@ namespace v1 {
             {
                 // if we're animating normals, if pose influence < 1 need to use the base mesh
                 if (mMesh->getSharedVertexDataAnimationIncludesNormals())
-                    finalisePoseNormals(mMesh->sharedVertexData[0], mSoftwareVertexAnimVertexData);
+                    finalisePoseNormals(mMesh->sharedVertexData[VpNormal], mSoftwareVertexAnimVertexData);
             
                 const VertexElement* elem = mSoftwareVertexAnimVertexData
                     ->vertexDeclaration->findElementBySemantic(VES_POSITION);
@@ -1047,7 +1048,7 @@ namespace v1 {
                     VertexData* data = sub._getSoftwareVertexAnimVertexData();
                     // if we're animating normals, if pose influence < 1 need to use the base mesh
                     if (sub.getSubMesh()->getVertexAnimationIncludesNormals())
-                        finalisePoseNormals(sub.getSubMesh()->vertexData[0], data);
+                        finalisePoseNormals(sub.getSubMesh()->vertexData[VpNormal], data);
                     
                     const VertexElement* elem = data->vertexDeclaration
                         ->findElementBySemantic(VES_POSITION);
@@ -1082,16 +1083,17 @@ namespace v1 {
         //  We didn't apply any animation and
         //    We're morph animated (hardware binds keyframe, software is missing)
         //    or we're pose animated and software (hardware is fine, still bound)
-        if (mMesh->sharedVertexData[0] &&
+        if (mMesh->sharedVertexData[VpNormal] &&
             !mVertexAnimationAppliedThisFrame &&
             (!hardwareAnimation || mMesh->getSharedVertexDataAnimationType() == VAT_MORPH))
         {
             // Note, VES_POSITION is specified here but if normals are included in animation
             // then these will be re-bound too (buffers must be shared)
             const VertexElement* srcPosElem =
-                mMesh->sharedVertexData[0]->vertexDeclaration->findElementBySemantic(VES_POSITION);
+                mMesh->sharedVertexData[VpNormal]->vertexDeclaration->
+                    findElementBySemantic(VES_POSITION);
             HardwareVertexBufferSharedPtr srcBuf =
-                mMesh->sharedVertexData[0]->vertexBufferBinding->getBuffer(
+                mMesh->sharedVertexData[VpNormal]->vertexBufferBinding->getBuffer(
                     srcPosElem->getSource());
 
             // Bind to software
@@ -1105,10 +1107,11 @@ namespace v1 {
         // rebind any missing hardware pose buffers
         // Caused by not having any animations enabled, or keyframes which reference
         // no poses
-        if (mMesh->sharedVertexData[0] && hardwareAnimation 
+        if (mMesh->sharedVertexData[VpNormal] && hardwareAnimation
             && mMesh->getSharedVertexDataAnimationType() == VAT_POSE)
         {
-            bindMissingHardwarePoseBuffers(mMesh->sharedVertexData[0], mHardwareVertexAnimVertexData);
+            bindMissingHardwarePoseBuffers(mMesh->sharedVertexData[VpNormal],
+                                           mHardwareVertexAnimVertexData);
         }
 
 
@@ -1514,33 +1517,33 @@ namespace v1 {
         if (hasVertexAnimation())
         {
             // Shared data
-            if (mMesh->sharedVertexData[0]
+            if (mMesh->sharedVertexData[VpNormal]
                 && mMesh->getSharedVertexDataAnimationType() != VAT_NONE)
             {
                 // Create temporary vertex blend info
                 // Prepare temp vertex data if needed
                 // Clone without copying data, don't remove any blending info
                 // (since if we skeletally animate too, we need it)
-                mSoftwareVertexAnimVertexData = mMesh->sharedVertexData[0]->clone(false);
+                mSoftwareVertexAnimVertexData = mMesh->sharedVertexData[VpNormal]->clone(false);
                 extractTempBufferInfo(mSoftwareVertexAnimVertexData, &mTempVertexAnimInfo);
 
                 // Also clone for hardware usage, don't remove blend info since we'll
                 // need it if we also hardware skeletally animate
-                mHardwareVertexAnimVertexData = mMesh->sharedVertexData[0]->clone(false);
+                mHardwareVertexAnimVertexData = mMesh->sharedVertexData[VpNormal]->clone(false);
             }
         }
 
         if (hasSkeleton())
         {
             // Shared data
-            if (mMesh->sharedVertexData[0])
+            if (mMesh->sharedVertexData[VpNormal])
             {
                 // Create temporary vertex blend info
                 // Prepare temp vertex data if needed
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
                 mSkelAnimVertexData =
-                    cloneVertexDataRemoveBlendInfo(mMesh->sharedVertexData[0]);
+                    cloneVertexDataRemoveBlendInfo(mMesh->sharedVertexData[VpNormal]);
                 extractTempBufferInfo(mSkelAnimVertexData, &mTempSkelAnimInfo);
             }
 
@@ -1795,7 +1798,7 @@ namespace v1 {
     {
         bool skel = hasSkeleton();
 
-        if (orig == mMesh->sharedVertexData[0] || orig == mMesh->sharedVertexData[1])
+        if (orig == mMesh->sharedVertexData[VpNormal] || orig == mMesh->sharedVertexData[VpShadow])
         {
             return skel? mSkelAnimVertexData : mSoftwareVertexAnimVertexData;
         }
@@ -1803,7 +1806,8 @@ namespace v1 {
         iend = mSubEntityList.end();
         for (i = mSubEntityList.begin(); i != iend; ++i)
         {
-            if (orig == i->getSubMesh()->vertexData[0] || orig == i->getSubMesh()->vertexData[1])
+            if (orig == i->getSubMesh()->vertexData[VpNormal] ||
+                orig == i->getSubMesh()->vertexData[VpShadow])
             {
                 return skel? i->_getSkelAnimVertexData() : i->_getSoftwareVertexAnimVertexData();
             }
@@ -1816,7 +1820,7 @@ namespace v1 {
     //-----------------------------------------------------------------------
     SubEntity* Entity::findSubEntityForVertexData(const VertexData* orig)
     {
-        if (orig == mMesh->sharedVertexData[0] || orig == mMesh->sharedVertexData[1])
+        if (orig == mMesh->sharedVertexData[VpNormal] || orig == mMesh->sharedVertexData[VpShadow])
         {
             return 0;
         }
@@ -1825,7 +1829,8 @@ namespace v1 {
         iend = mSubEntityList.end();
         for (i = mSubEntityList.begin(); i != iend; ++i)
         {
-            if (orig == i->getSubMesh()->vertexData[0] || orig == i->getSubMesh()->vertexData[1])
+            if (orig == i->getSubMesh()->vertexData[VpNormal] ||
+                orig == i->getSubMesh()->vertexData[VpShadow])
             {
                 return &(*i);
             }

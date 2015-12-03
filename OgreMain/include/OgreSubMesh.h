@@ -88,10 +88,10 @@ namespace v1 {
                 The use of shared or non-shared buffers is determined when
                 model data is converted to the OGRE .mesh format.
         */
-        VertexData *vertexData[2];
+        VertexData *vertexData[NumVertexPass];
 
         /// Face index data
-        IndexData *indexData[2];
+        IndexData *indexData[NumVertexPass];
 
         /** Dedicated index map for translate blend index to bone index (only valid if useSharedVertices = false).
             @remarks
@@ -116,7 +116,7 @@ namespace v1 {
         IndexMap blendIndexToBoneIndexMap;
 
         typedef vector<IndexData*>::type LODFaceList;
-        LODFaceList mLodFaceList[2];
+        LODFaceList mLodFaceList[NumVertexPass];
 
         /** A list of extreme points on the submesh (optional).
             @remarks

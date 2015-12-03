@@ -295,10 +295,10 @@ namespace v1 {
             OGRE_DELETE *i;
         }
 
-        if( sharedVertexData[0] == sharedVertexData[1] )
-            sharedVertexData[1] = 0;
+        if( sharedVertexData[VpNormal] == sharedVertexData[VpShadow] )
+            sharedVertexData[VpShadow] = 0;
 
-        for( size_t i=0; i<2; ++i )
+        for( size_t i=0; i<NumVertexPass; ++i )
         {
             OGRE_DELETE sharedVertexData[i];
             sharedVertexData[i] = 0;
@@ -359,7 +359,7 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void Mesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
     {
-        if( sharedVertexData[0] )
+        if( sharedVertexData[VpNormal] )
         {
             LogManager::getSingleton().logMessage( "WARNING: Mesh '" + this->getName() +
                                                    "' has shared vertices. They're being "
@@ -379,7 +379,7 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void Mesh::dearrangeToInefficient(void)
     {
-        if( sharedVertexData[0] )
+        if( sharedVertexData[VpNormal] )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
                          "Meshes with shared vertex buffers can't be dearranged.",
@@ -422,13 +422,13 @@ namespace v1 {
         }
 
         // Copy shared geometry and index map, if any
-        if (sharedVertexData[0])
+        if (sharedVertexData[VpNormal])
         {
-            newMesh->sharedVertexData[0] = sharedVertexData[0]->clone();
-            if( sharedVertexData[0] == sharedVertexData[1] )
-                newMesh->sharedVertexData[1] = newMesh->sharedVertexData[0];
+            newMesh->sharedVertexData[VpNormal] = sharedVertexData[VpNormal]->clone();
+            if( sharedVertexData[VpNormal] == sharedVertexData[VpShadow] )
+                newMesh->sharedVertexData[VpShadow] = newMesh->sharedVertexData[VpNormal];
             else
-                newMesh->sharedVertexData[1] = sharedVertexData[1]->clone();
+                newMesh->sharedVertexData[VpShadow] = sharedVertexData[VpShadow]->clone();
 
             newMesh->sharedBlendIndexToBoneIndexMap = sharedBlendIndexToBoneIndexMap;
         }
@@ -540,13 +540,15 @@ namespace v1 {
     void Mesh::_updateBoundsFromVertexBuffers(bool pad)
     {
         bool extendOnly = false; // First time we need full AABB of the given submesh, but on the second call just extend that one.
-        if (sharedVertexData[1]){
-            _calcBoundsFromVertexBuffer(sharedVertexData[1], mAABB, mBoundRadius, extendOnly);
+        if (sharedVertexData[VpShadow]){
+            _calcBoundsFromVertexBuffer(sharedVertexData[VpShadow], mAABB, mBoundRadius, extendOnly);
             extendOnly = true;
         }
         for (size_t i = 0; i < mSubMeshList.size(); i++){
-            if (mSubMeshList[i]->vertexData[1]){
-                _calcBoundsFromVertexBuffer(mSubMeshList[i]->vertexData[1], mAABB, mBoundRadius, extendOnly);
+            if (mSubMeshList[i]->vertexData[VpShadow])
+            {
+                _calcBoundsFromVertexBuffer(mSubMeshList[i]->vertexData[VpShadow],
+                                            mAABB, mBoundRadius, extendOnly);
                 extendOnly = true;
             }
         }
@@ -837,14 +839,15 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void  Mesh::_compileBoneAssignments(void)
     {
-        if (sharedVertexData[0])
+        if (sharedVertexData[VpNormal])
         {
-            unsigned short maxBones = _rationaliseBoneAssignments(sharedVertexData[0]->vertexCount, mBoneAssignments);
+            unsigned short maxBones = _rationaliseBoneAssignments(
+                        sharedVertexData[VpNormal]->vertexCount, mBoneAssignments);
 
             if (maxBones != 0)
             {
                 compileBoneAssignments(mBoneAssignments, maxBones, 
-                    sharedBlendIndexToBoneIndexMap, sharedVertexData[0]);
+                    sharedBlendIndexToBoneIndexMap, sharedVertexData[VpNormal]);
             }
         }
         mBoneAssignmentsOutOfDate = false;
@@ -1117,10 +1120,11 @@ namespace v1 {
                     }
                 }
             }
-            if (sharedVertexData[0])
+            if (sharedVertexData[VpNormal])
             {
                 // check shared vertices
-                radius = _computeBoneBoundingRadiusHelper(sharedVertexData[0], mBoneAssignments, bonePositions, boneChildren);
+                radius = _computeBoneBoundingRadiusHelper(sharedVertexData[VpNormal], mBoneAssignments,
+                                                          bonePositions, boneChildren);
             }
 
             // check submesh vertices
@@ -1130,9 +1134,9 @@ namespace v1 {
             while( itor != end )
             {
                 SubMesh* submesh = *itor;
-                if (!submesh->useSharedVertices && submesh->vertexData[0])
+                if (!submesh->useSharedVertices && submesh->vertexData[VpNormal])
                 {
-                    Real r = _computeBoneBoundingRadiusHelper( submesh->vertexData[0], submesh->mBoneAssignments,
+                    Real r = _computeBoneBoundingRadiusHelper( submesh->vertexData[VpNormal], submesh->mBoneAssignments,
                                                                bonePositions, boneChildren );
                     radius = std::max( radius, r );
                 }
@@ -1238,8 +1242,8 @@ namespace v1 {
         // Resize submesh face data lists too
         for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
         {
-            (*i)->mLodFaceList[0].resize(numLevels - 1);
-            (*i)->mLodFaceList[1].resize(numLevels - 1);
+            (*i)->mLodFaceList[VpNormal].resize(numLevels - 1);
+            (*i)->mLodFaceList[VpShadow].resize(numLevels - 1);
         }
     }
     //---------------------------------------------------------------------
@@ -1348,8 +1352,8 @@ namespace v1 {
     void Mesh::mergeAdjacentTexcoords( unsigned short finalTexCoordSet,
                                         unsigned short texCoordSetToDestroy )
     {
-        if( sharedVertexData[0] )
-            mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, sharedVertexData[0] );
+        if( sharedVertexData[VpNormal] )
+            mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, sharedVertexData[VpNormal] );
 
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
@@ -1357,7 +1361,10 @@ namespace v1 {
         while( itor != end )
         {
             if( !(*itor)->useSharedVertices )
-                mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy, (*itor)->vertexData[0] );
+            {
+                mergeAdjacentTexcoords( finalTexCoordSet, texCoordSetToDestroy,
+                                        (*itor)->vertexData[VpNormal] );
+            }
             ++itor;
         }
     }
@@ -1411,34 +1418,34 @@ namespace v1 {
     //---------------------------------------------------------------------
     void Mesh::destroyShadowMappingGeom(void)
     {
-        if( sharedVertexData[1] != sharedVertexData[0] )
-            OGRE_DELETE sharedVertexData[1];
-        sharedVertexData[1] = 0;
+        if( sharedVertexData[VpShadow] != sharedVertexData[VpNormal] )
+            OGRE_DELETE sharedVertexData[VpShadow];
+        sharedVertexData[VpShadow] = 0;
 
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
 
         while( itor != end )
         {
-            if( (*itor)->vertexData[1] != (*itor)->vertexData[0] )
-                OGRE_DELETE (*itor)->vertexData[1];
-            (*itor)->vertexData[1] = 0;
+            if( (*itor)->vertexData[VpShadow] != (*itor)->vertexData[VpNormal] )
+                OGRE_DELETE (*itor)->vertexData[VpShadow];
+            (*itor)->vertexData[VpShadow] = 0;
 
-            if( (*itor)->indexData[1] != (*itor)->indexData[0] )
-                OGRE_DELETE (*itor)->indexData[1];
-            (*itor)->indexData[1] = 0;
+            if( (*itor)->indexData[VpShadow] != (*itor)->indexData[VpNormal] )
+                OGRE_DELETE (*itor)->indexData[VpShadow];
+            (*itor)->indexData[VpShadow] = 0;
 
-            if( (*itor)->mLodFaceList[0].empty() || (*itor)->mLodFaceList[1].empty() ||
-                (*itor)->mLodFaceList[0][0] != (*itor)->mLodFaceList[1][0] )
+            if( (*itor)->mLodFaceList[VpNormal].empty() || (*itor)->mLodFaceList[VpShadow].empty() ||
+                (*itor)->mLodFaceList[VpNormal][0] != (*itor)->mLodFaceList[VpShadow][0] )
             {
-                SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[1].begin();
-                SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[1].end();
+                SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[VpShadow].begin();
+                SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[VpShadow].end();
 
                 while( itLod != enLod )
                     OGRE_DELETE *itLod++;
             }
 
-            (*itor)->mLodFaceList[1].clear();
+            (*itor)->mLodFaceList[VpShadow].clear();
 
             ++itor;
         }
@@ -1450,20 +1457,20 @@ namespace v1 {
 
         if( !msOptimizeForShadowMapping || forceSameBuffers )
         {
-            sharedVertexData[1] = sharedVertexData[0];
+            sharedVertexData[VpShadow] = sharedVertexData[VpNormal];
 
             SubMeshList::const_iterator itor = mSubMeshList.begin();
             SubMeshList::const_iterator end  = mSubMeshList.end();
 
             while( itor != end )
             {
-                (*itor)->vertexData[1] = (*itor)->vertexData[0];
-                (*itor)->indexData[1] = (*itor)->indexData[0];
+                (*itor)->vertexData[VpShadow] = (*itor)->vertexData[VpNormal];
+                (*itor)->indexData[VpShadow] = (*itor)->indexData[VpNormal];
 
-                SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[0].begin();
-                SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[0].end();
+                SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[VpNormal].begin();
+                SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[VpNormal].end();
                 while( itLod != enLod )
-                    (*itor)->mLodFaceList[1].push_back( *itLod++ );
+                    (*itor)->mLodFaceList[VpShadow].push_back( *itLod++ );
 
                 ++itor;
             }
@@ -1481,16 +1488,16 @@ namespace v1 {
                 {
                     VertexShadowMapHelper::Geometry geom;
 
-                    if( (*itor)->vertexData[0] )
-                        geom.vertexData = (*itor)->vertexData[0];
+                    if( (*itor)->vertexData[VpNormal] )
+                        geom.vertexData = (*itor)->vertexData[VpNormal];
                     else
-                        geom.vertexData = sharedVertexData[0];
+                        geom.vertexData = sharedVertexData[VpNormal];
 
-                    geom.indexData = (*itor)->indexData[0];
+                    geom.indexData = (*itor)->indexData[VpNormal];
                     inGeom.push_back( geom );
 
-                    SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[0].begin();
-                    SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[0].end();
+                    SubMesh::LODFaceList::const_iterator itLod = (*itor)->mLodFaceList[VpNormal].begin();
+                    SubMesh::LODFaceList::const_iterator enLod = (*itor)->mLodFaceList[VpNormal].end();
 
                     while( itLod != enLod )
                     {
@@ -1510,18 +1517,18 @@ namespace v1 {
 
             for( size_t i=0; i<numSubMeshes; ++i )
             {
-                if( mSubMeshList[i]->vertexData[0] )
-                    mSubMeshList[i]->vertexData[1] = itGeom->vertexData;
+                if( mSubMeshList[i]->vertexData[VpNormal] )
+                    mSubMeshList[i]->vertexData[VpShadow] = itGeom->vertexData;
                 else
-                    sharedVertexData[1] = itGeom->vertexData;
+                    sharedVertexData[VpShadow] = itGeom->vertexData;
 
-                mSubMeshList[i]->indexData[1] = itGeom->indexData;
+                mSubMeshList[i]->indexData[VpShadow] = itGeom->indexData;
                 ++itGeom;
 
-                const size_t numLods = mSubMeshList[i]->mLodFaceList[0].size();
+                const size_t numLods = mSubMeshList[i]->mLodFaceList[VpNormal].size();
                 for( size_t j=0; j<numLods; ++j )
                 {
-                    mSubMeshList[i]->mLodFaceList[1].push_back( itGeom->indexData );
+                    mSubMeshList[i]->mLodFaceList[VpShadow].push_back( itGeom->indexData );
                     ++itGeom;
                 }
             }
@@ -1532,19 +1539,20 @@ namespace v1 {
     {
         bool retVal = true;
 
-        retVal &= (sharedVertexData[0] == 0) || (sharedVertexData[0] != 0 && sharedVertexData[1] != 0);
+        retVal &= (sharedVertexData[VpNormal] == 0) ||
+                (sharedVertexData[VpNormal] != 0 && sharedVertexData[VpShadow] != 0);
 
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
 
         while( itor != end && retVal )
         {
-            retVal &= ((*itor)->vertexData[0] == 0) || ((*itor)->vertexData[0] != 0 &&
-                                                        (*itor)->vertexData[1] != 0);
-            retVal &= ((*itor)->indexData[0] == 0) || ((*itor)->indexData[0] != 0 &&
-                                                       (*itor)->indexData[1] != 0);
+            retVal &= ((*itor)->vertexData[VpNormal] == 0) || ((*itor)->vertexData[VpNormal] != 0 &&
+                                                               (*itor)->vertexData[VpShadow] != 0);
+            retVal &= ((*itor)->indexData[VpNormal] == 0) || ((*itor)->indexData[VpNormal] != 0 &&
+                                                              (*itor)->indexData[VpShadow] != 0);
 
-            retVal &= (*itor)->mLodFaceList[0].size() == (*itor)->mLodFaceList[1].size();
+            retVal &= (*itor)->mLodFaceList[VpNormal].size() == (*itor)->mLodFaceList[VpShadow].size();
 
             ++itor;
         }
@@ -1557,14 +1565,14 @@ namespace v1 {
         if( !hasValidShadowMappingBuffers() )
             return false;
 
-        bool independent = sharedVertexData[0] != sharedVertexData[1];
+        bool independent = sharedVertexData[VpNormal] != sharedVertexData[VpShadow];
 
         SubMeshList::const_iterator itor = mSubMeshList.begin();
         SubMeshList::const_iterator end  = mSubMeshList.end();
 
         while( itor != end && !independent )
         {
-            independent |= (*itor)->vertexData[0] != (*itor)->vertexData[1];
+            independent |= (*itor)->vertexData[VpNormal] != (*itor)->vertexData[VpShadow];
             ++itor;
         }
 
@@ -1656,7 +1664,7 @@ namespace v1 {
         unsigned short sourceTexCoordSet, unsigned short index, 
         bool splitMirrored, bool splitRotated, bool storeParityInW)
     {
-        if( !sharedVertexData[0] )
+        if( !sharedVertexData[VpNormal] )
             dearrangeToInefficient();
 
         TangentSpaceCalc tangentsCalc;
@@ -1665,16 +1673,16 @@ namespace v1 {
         tangentsCalc.setStoreParityInW(storeParityInW);
 
         // shared geometry first
-        if (sharedVertexData[0])
+        if (sharedVertexData[VpNormal])
         {
-            tangentsCalc.setVertexData(sharedVertexData[0]);
+            tangentsCalc.setVertexData(sharedVertexData[VpNormal]);
             bool found = false;
             for (SubMeshList::iterator i = mSubMeshList.begin(); i != mSubMeshList.end(); ++i)
             {
                 SubMesh* sm = *i;
                 if (sm->useSharedVertices)
                 {
-                    tangentsCalc.addIndexData(sm->indexData[0]);
+                    tangentsCalc.addIndexData(sm->indexData[VpNormal]);
                     found = true;
                 }
             }
@@ -1738,8 +1746,8 @@ namespace v1 {
             if (!sm->useSharedVertices)
             {
                 tangentsCalc.clear();
-                tangentsCalc.setVertexData(sm->vertexData[0]);
-                tangentsCalc.addIndexData(sm->indexData[0], sm->operationType);
+                tangentsCalc.setVertexData(sm->vertexData[VpNormal]);
+                tangentsCalc.addIndexData(sm->indexData[VpNormal], sm->operationType);
                 TangentSpaceCalc::Result res = 
                     tangentsCalc.build(targetSemantic, sourceTexCoordSet, index);
 
@@ -1790,12 +1798,12 @@ namespace v1 {
             {
                 if (sharedGeometryDone)
                     continue;
-                vertexData = sharedVertexData[0];
+                vertexData = sharedVertexData[VpNormal];
                 sharedGeometryDone = true;
             }
             else
             {
-                vertexData = sm->vertexData[0];
+                vertexData = sm->vertexData[VpNormal];
             }
 
             const VertexElement *sourceElem = 0;
@@ -1923,9 +1931,9 @@ namespace v1 {
                 size_t vertexSetCount = 0;
                 bool atLeastOneIndexSet = false;
 
-                if (sharedVertexData[0])
+                if (sharedVertexData[VpNormal])
                 {
-                    eb.addVertexData(sharedVertexData[0]);
+                    eb.addVertexData(sharedVertexData[VpNormal]);
                     vertexSetCount++;
                 }
 
@@ -1946,28 +1954,28 @@ namespace v1 {
                         // Use shared vertex data, index as set 0
                         if (lodIndex == 0)
                         {
-                            eb.addIndexData(s->indexData[0], 0, s->operationType);
+                            eb.addIndexData(s->indexData[VpNormal], 0, s->operationType);
                         }
                         else
                         {
-                            eb.addIndexData(s->mLodFaceList[0][lodIndex-1], 0,
+                            eb.addIndexData(s->mLodFaceList[VpNormal][lodIndex-1], 0,
                                             s->operationType);
                         }
                     }
                     else if(s->isBuildEdgesEnabled())
                     {
                         // own vertex data, add it and reference it directly
-                        eb.addVertexData(s->vertexData[0]);
+                        eb.addVertexData(s->vertexData[VpNormal]);
                         if (lodIndex == 0)
                         {
                             // Base index data
-                            eb.addIndexData(s->indexData[0], vertexSetCount++,
+                            eb.addIndexData(s->indexData[VpNormal], vertexSetCount++,
                                 s->operationType);
                         }
                         else
                         {
                             // LOD index data
-                            eb.addIndexData(s->mLodFaceList[0][lodIndex-1],
+                            eb.addIndexData(s->mLodFaceList[VpNormal][lodIndex-1],
                                 vertexSetCount++, s->operationType);
                         }
 
@@ -2000,9 +2008,9 @@ namespace v1 {
         // Build
         EdgeListBuilder eb;
         size_t vertexSetCount = 0;
-        if (sharedVertexData[0])
+        if (sharedVertexData[VpNormal])
         {
-            eb.addVertexData(sharedVertexData[0]);
+            eb.addVertexData(sharedVertexData[VpNormal]);
             vertexSetCount++;
         }
 
@@ -2080,9 +2088,9 @@ namespace v1 {
         if (mPreparedForShadowVolumes)
             return;
 
-        if (sharedVertexData[0])
+        if (sharedVertexData[VpNormal])
         {
-            sharedVertexData[0]->prepareForShadowVolume();
+            sharedVertexData[VpNormal]->prepareForShadowVolume();
         }
         SubMeshList::iterator i, iend;
         iend = mSubMeshList.end();
@@ -2094,7 +2102,7 @@ namespace v1 {
                 s->operationType == OT_TRIANGLE_LIST ||
                 s->operationType == OT_TRIANGLE_STRIP))
             {
-                s->vertexData[0]->prepareForShadowVolume();
+                s->vertexData[VpNormal]->prepareForShadowVolume();
             }
         }
         mPreparedForShadowVolumes = true;
@@ -2402,23 +2410,23 @@ namespace v1 {
         size_t ret = 0;
         unsigned short i;
         // Shared vertices
-        if (sharedVertexData[0])
+        if (sharedVertexData[VpNormal])
         {
             for (i = 0;
-                i < sharedVertexData[0]->vertexBufferBinding->getBufferCount();
+                i < sharedVertexData[VpNormal]->vertexBufferBinding->getBufferCount();
                 ++i)
             {
-                ret += sharedVertexData[0]->vertexBufferBinding
+                ret += sharedVertexData[VpNormal]->vertexBufferBinding
                     ->getBuffer(i)->getSizeInBytes();
             }
 
-            if (sharedVertexData[0] != sharedVertexData[1])
+            if (sharedVertexData[VpNormal] != sharedVertexData[VpShadow])
             {
                 for (i = 0;
-                    i < sharedVertexData[1]->vertexBufferBinding->getBufferCount();
+                    i < sharedVertexData[VpShadow]->vertexBufferBinding->getBufferCount();
                     ++i)
                 {
-                    ret += sharedVertexData[1]->vertexBufferBinding
+                    ret += sharedVertexData[VpShadow]->vertexBufferBinding
                         ->getBuffer(i)->getSizeInBytes();
                 }
             }
@@ -2431,31 +2439,31 @@ namespace v1 {
             if (!(*si)->useSharedVertices)
             {
                 for (i = 0;
-                    i < (*si)->vertexData[0]->vertexBufferBinding->getBufferCount();
+                    i < (*si)->vertexData[VpNormal]->vertexBufferBinding->getBufferCount();
                     ++i)
                 {
-                    ret += (*si)->vertexData[0]->vertexBufferBinding
+                    ret += (*si)->vertexData[VpNormal]->vertexBufferBinding
                         ->getBuffer(i)->getSizeInBytes();
                 }
 
-                if( (*si)->vertexData[0] != (*si)->vertexData[1] )
+                if( (*si)->vertexData[VpNormal] != (*si)->vertexData[VpShadow] )
                 {
                     for (i = 0;
-                         i < (*si)->vertexData[1]->vertexBufferBinding->getBufferCount();
+                         i < (*si)->vertexData[VpShadow]->vertexBufferBinding->getBufferCount();
                          ++i)
                     {
-                        ret += (*si)->vertexData[1]->vertexBufferBinding
+                        ret += (*si)->vertexData[VpShadow]->vertexBufferBinding
                                 ->getBuffer(i)->getSizeInBytes();
                     }
                 }
             }
-            if (!(*si)->indexData[0]->indexBuffer.isNull())
+            if (!(*si)->indexData[VpNormal]->indexBuffer.isNull())
             {
                 // Index data
-                ret += (*si)->indexData[0]->indexBuffer->getSizeInBytes();
+                ret += (*si)->indexData[VpNormal]->indexBuffer->getSizeInBytes();
 
-                if( (*si)->indexData[0] != (*si)->indexData[1] )
-                    ret += (*si)->indexData[1]->indexBuffer->getSizeInBytes();
+                if( (*si)->indexData[VpNormal] != (*si)->indexData[VpShadow] )
+                    ret += (*si)->indexData[VpShadow]->indexBuffer->getSizeInBytes();
             }
 
         }
@@ -2667,11 +2675,11 @@ namespace v1 {
     {
         if (handle == 0)
         {
-            return sharedVertexData[0];
+            return sharedVertexData[VpNormal];
         }
         else
         {
-            return getSubMesh(handle-1)->vertexData[0];
+            return getSubMesh(handle-1)->vertexData[VpNormal];
         }
     }
     //---------------------------------------------------------------------

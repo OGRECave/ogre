@@ -78,8 +78,8 @@ namespace v1 {
             const char *claimedVertexCount_ = elem->Attribute("vertexcount");
             if(!claimedVertexCount_ || StringConverter::parseInt(claimedVertexCount_) > 0)
             {
-                mMesh->sharedVertexData[0] = new VertexData();
-                readGeometry(elem, mMesh->sharedVertexData[0]);
+                mMesh->sharedVertexData[VpNormal] = new VertexData();
+                readGeometry(elem, mMesh->sharedVertexData[VpNormal]);
             }
         }
 
@@ -167,11 +167,11 @@ namespace v1 {
     {
         TiXmlElement* rootNode = mXMLDoc->RootElement();
         // Write geometry
-        if (pMesh->sharedVertexData[0])
+        if (pMesh->sharedVertexData[VpNormal])
         {
             TiXmlElement* geomNode = 
                 rootNode->InsertEndChild(TiXmlElement("sharedgeometry"))->ToElement();
-            writeGeometry(geomNode, pMesh->sharedVertexData[0]);
+            writeGeometry(geomNode, pMesh->sharedVertexData[VpNormal]);
         }
 
         // Write Submeshes
@@ -238,54 +238,54 @@ namespace v1 {
         subMeshNode->SetAttribute("usesharedvertices", 
             StringConverter::toString(s->useSharedVertices) );
         // bool use32BitIndexes
-        bool use32BitIndexes = (!s->indexData[0]->indexBuffer.isNull() &&
-            s->indexData[0]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+        bool use32BitIndexes = (!s->indexData[VpNormal]->indexBuffer.isNull() &&
+            s->indexData[VpNormal]->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
         subMeshNode->SetAttribute("use32bitindexes", 
             StringConverter::toString( use32BitIndexes ));
 
         // Operation type
         switch(s->operationType)
         {
-        case OT_LINE_LIST:
+        case RenderOperation::OT_LINE_LIST:
             subMeshNode->SetAttribute("operationtype", "line_list");
             break;
-        case OT_LINE_STRIP:
+        case RenderOperation::OT_LINE_STRIP:
             subMeshNode->SetAttribute("operationtype", "line_strip");
             break;
-        case OT_POINT_LIST:
+        case RenderOperation::OT_POINT_LIST:
             subMeshNode->SetAttribute("operationtype", "point_list");
             break;
-        case OT_TRIANGLE_FAN:
+        case RenderOperation::OT_TRIANGLE_FAN:
             subMeshNode->SetAttribute("operationtype", "triangle_fan");
             break;
-        case OT_TRIANGLE_LIST:
+        case RenderOperation::OT_TRIANGLE_LIST:
             subMeshNode->SetAttribute("operationtype", "triangle_list");
             break;
-        case OT_TRIANGLE_STRIP:
+        case RenderOperation::OT_TRIANGLE_STRIP:
             subMeshNode->SetAttribute("operationtype", "triangle_strip");
             break;
         }
 
-        if (s->indexData[0]->indexCount > 0)
+        if (s->indexData[VpNormal]->indexCount > 0)
         {
             // Faces
             TiXmlElement* facesNode = 
                 subMeshNode->InsertEndChild(TiXmlElement("faces"))->ToElement();
             switch(s->operationType)
             {
-            case OT_TRIANGLE_LIST:
+            case RenderOperation::OT_TRIANGLE_LIST:
                 // tri list
-                numFaces = s->indexData[0]->indexCount / 3;
+                numFaces = s->indexData[VpNormal]->indexCount / 3;
 
                 break;
-            case OT_LINE_LIST:
-                numFaces = s->indexData[0]->indexCount / 2;
+            case RenderOperation::OT_LINE_LIST:
+                numFaces = s->indexData[VpNormal]->indexCount / 2;
 
                 break;
-            case OT_TRIANGLE_FAN:
-            case OT_TRIANGLE_STRIP:
+            case RenderOperation::OT_TRIANGLE_FAN:
+            case RenderOperation::OT_TRIANGLE_STRIP:
                 // triangle fan or triangle strip
-                numFaces = s->indexData[0]->indexCount - 2;
+                numFaces = s->indexData[VpNormal]->indexCount - 2;
 
                 break;
             default:
@@ -299,7 +299,7 @@ namespace v1 {
             size_t i;
             unsigned int* pInt = 0;
             unsigned short* pShort = 0;
-            HardwareIndexBufferSharedPtr ibuf = s->indexData[0]->indexBuffer;
+            HardwareIndexBufferSharedPtr ibuf = s->indexData[VpNormal]->indexBuffer;
             if (use32BitIndexes)
             {
                 pInt = static_cast<unsigned int*>(
@@ -317,12 +317,12 @@ namespace v1 {
                 if (use32BitIndexes)
                 {
                     faceNode->SetAttribute("v1", StringConverter::toString(*pInt++));
-                    if(s->operationType == OT_LINE_LIST)
+                    if(s->operationType == RenderOperation::OT_LINE_LIST)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
                     }
                     /// Only need all 3 vertex indices if trilist or first face
-                    else if (s->operationType == OT_TRIANGLE_LIST || i == 0)
+                    else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pInt++));
                         faceNode->SetAttribute("v3", StringConverter::toString(*pInt++));
@@ -331,12 +331,12 @@ namespace v1 {
                 else
                 {
                     faceNode->SetAttribute("v1", StringConverter::toString(*pShort++));
-                    if(s->operationType == OT_LINE_LIST)
+                    if(s->operationType == RenderOperation::OT_LINE_LIST)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
                     }
                     /// Only need all 3 vertex indices if trilist or first face
-                    else if (s->operationType == OT_TRIANGLE_LIST || i == 0)
+                    else if (s->operationType == RenderOperation::OT_TRIANGLE_LIST || i == 0)
                     {
                         faceNode->SetAttribute("v2", StringConverter::toString(*pShort++));
                         faceNode->SetAttribute("v3", StringConverter::toString(*pShort++));
@@ -351,7 +351,7 @@ namespace v1 {
         {
             TiXmlElement* geomNode = 
                 subMeshNode->InsertEndChild(TiXmlElement("geometry"))->ToElement();
-            writeGeometry(geomNode, s->vertexData[0]);
+            writeGeometry(geomNode, s->vertexData[VpNormal]);
         }
 
         // texture aliases
@@ -703,29 +703,29 @@ namespace v1 {
             {
                 if (!strcmp(optype, "triangle_list"))
                 {
-                    sm->operationType = OT_TRIANGLE_LIST;
+                    sm->operationType = RenderOperation::OT_TRIANGLE_LIST;
                 }
                 else if (!strcmp(optype, "triangle_fan"))
                 {
-                    sm->operationType = OT_TRIANGLE_FAN;
+                    sm->operationType = RenderOperation::OT_TRIANGLE_FAN;
                 }
                 else if (!strcmp(optype, "triangle_strip"))
                 {
-                    sm->operationType = OT_TRIANGLE_STRIP;
+                    sm->operationType = RenderOperation::OT_TRIANGLE_STRIP;
                 }
                 else if (!strcmp(optype, "line_strip"))
                 {
-                    sm->operationType = OT_LINE_STRIP;
+                    sm->operationType = RenderOperation::OT_LINE_STRIP;
                     readFaces = false;
                 }
                 else if (!strcmp(optype, "line_list"))
                 {
-                    sm->operationType = OT_LINE_LIST;
+                    sm->operationType = RenderOperation::OT_LINE_LIST;
                     readFaces = false;
                 }
                 else if (!strcmp(optype, "point_list"))
                 {
-                    sm->operationType = OT_POINT_LIST;
+                    sm->operationType = RenderOperation::OT_POINT_LIST;
                     readFaces = false;
                 }
 
@@ -762,19 +762,19 @@ namespace v1 {
                     // Faces
                     switch(sm->operationType)
                     {
-                    case OT_TRIANGLE_LIST:
+                    case RenderOperation::OT_TRIANGLE_LIST:
                         // tri list
-                        sm->indexData[0]->indexCount = actualCount * 3;
+                        sm->indexData[VpNormal]->indexCount = actualCount * 3;
 
                         break;
-                    case OT_LINE_LIST:
-                        sm->indexData[0]->indexCount = actualCount * 2;
+                    case RenderOperation::OT_LINE_LIST:
+                        sm->indexData[VpNormal]->indexCount = actualCount * 2;
 
                         break;
-                    case OT_TRIANGLE_FAN:
-                    case OT_TRIANGLE_STRIP:
+                    case RenderOperation::OT_TRIANGLE_FAN:
+                    case RenderOperation::OT_TRIANGLE_STRIP:
                         // triangle fan or triangle strip
-                        sm->indexData[0]->indexCount = actualCount + 2;
+                        sm->indexData[VpNormal]->indexCount = actualCount + 2;
 
                         break;
                     default:
@@ -786,10 +786,10 @@ namespace v1 {
                     HardwareIndexBufferSharedPtr ibuf = HardwareBufferManager::getSingleton().
                         createIndexBuffer(
                             use32BitIndexes? HardwareIndexBuffer::IT_32BIT : HardwareIndexBuffer::IT_16BIT, 
-                            sm->indexData[0]->indexCount,
+                            sm->indexData[VpNormal]->indexCount,
                             HardwareBuffer::HBU_DYNAMIC,
                             false);
-                    sm->indexData[0]->indexBuffer = ibuf;
+                    sm->indexData[VpNormal]->indexBuffer = ibuf;
                     unsigned int *pInt = 0;
                     unsigned short *pShort = 0;
                     if (use32BitIndexes)
@@ -810,12 +810,12 @@ namespace v1 {
                         if (use32BitIndexes)
                         {
                             *pInt++ = StringConverter::parseInt(faceElem->Attribute("v1"));
-                            if(sm->operationType == OT_LINE_LIST)
+                            if(sm->operationType == RenderOperation::OT_LINE_LIST)
                             {
                                 *pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                             }
                             // only need all 3 vertices if it's a trilist or first tri
-                            else if (sm->operationType == OT_TRIANGLE_LIST || firstTri)
+                            else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
                             {
                                 *pInt++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                                 *pInt++ = StringConverter::parseInt(faceElem->Attribute("v3"));
@@ -824,12 +824,12 @@ namespace v1 {
                         else
                         {
                             *pShort++ = StringConverter::parseInt(faceElem->Attribute("v1"));
-                            if(sm->operationType == OT_LINE_LIST)
+                            if(sm->operationType == RenderOperation::OT_LINE_LIST)
                             {
                                 *pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                             }
                             // only need all 3 vertices if it's a trilist or first tri
-                            else if (sm->operationType == OT_TRIANGLE_LIST || firstTri)
+                            else if (sm->operationType == RenderOperation::OT_TRIANGLE_LIST || firstTri)
                             {
                                 *pShort++ = StringConverter::parseInt(faceElem->Attribute("v2"));
                                 *pShort++ = StringConverter::parseInt(faceElem->Attribute("v3"));
@@ -847,8 +847,8 @@ namespace v1 {
                 TiXmlElement* geomNode = smElem->FirstChildElement("geometry");
                 if (geomNode)
                 {
-                    sm->vertexData[0] = new VertexData();
-                    readGeometry(geomNode, sm->vertexData[0]);
+                    sm->vertexData[VpNormal] = new VertexData();
+                    readGeometry(geomNode, sm->vertexData[VpNormal]);
                 }
             }
 
@@ -1485,7 +1485,7 @@ namespace v1 {
             SubMesh* sub = pMesh->getSubMesh(subi);
             subNode->SetAttribute("submeshindex", StringConverter::toString(subi));
             // NB level - 1 because SubMeshes don't store the first index in geometry
-            IndexData* facedata = sub->mLodFaceList[0][levelNum - 1];
+            IndexData* facedata = sub->mLodFaceList[VpNormal][levelNum - 1];
             subNode->SetAttribute("numfaces", StringConverter::toString(facedata->indexCount / 3));
 
             if (facedata->indexCount > 0)
@@ -1638,7 +1638,7 @@ namespace v1 {
         for (i = 0; i < numSubs; ++i)
         {
             SubMesh* sm = mMesh->getSubMesh(i);
-            sm->mLodFaceList[0][index - 1] = OGRE_NEW IndexData();
+            sm->mLodFaceList[VpNormal][index - 1] = OGRE_NEW IndexData();
         }
         mMesh->_setLodUsage(index, usage);
     }
@@ -1682,7 +1682,7 @@ namespace v1 {
             {
                 // use of 32bit indexes depends on submesh
                 HardwareIndexBuffer::IndexType itype = 
-                    mMesh->getSubMesh(subidx)->indexData[0]->indexBuffer->getType();
+                    mMesh->getSubMesh(subidx)->indexData[VpNormal]->indexBuffer->getType();
                 bool use32bitindexes = (itype == HardwareIndexBuffer::IT_32BIT);
 
                 // Assign memory: this will be deleted by the submesh 
@@ -1885,7 +1885,7 @@ namespace v1 {
             if(target == "mesh")
             {
                 targetID = 0;
-                vertexData = m->sharedVertexData[0];
+                vertexData = m->sharedVertexData[VpNormal];
             }
             else
             {
@@ -1901,7 +1901,7 @@ namespace v1 {
                     StringConverter::parseUnsignedInt(val));
 
                 targetID = submeshIndex + 1;
-                vertexData = m->getSubMesh(submeshIndex)->vertexData[0];
+                vertexData = m->getSubMesh(submeshIndex)->vertexData[VpNormal];
 
             }
 

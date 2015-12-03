@@ -328,7 +328,7 @@ namespace v1 {
             The use of shared or non-shared buffers is determined when
             model data is converted to the OGRE .mesh format.
         */
-        VertexData *sharedVertexData[2];
+        VertexData *sharedVertexData[NumVertexPass];
 
         /** Shared index map for translating blend index to bone index.
         @remarks

@@ -68,51 +68,51 @@ namespace v1 {
     {
         mSurface.defineSurface(controlPointBuffer, mDeclaration, width, height, PatchSurface::PST_BEZIER, uMaxSubdivisionLevel, vMaxSubdivisionLevel, visibleSide);
         SubMesh* sm = this->getSubMesh(0);
-        VertexData* vertex_data = sm->useSharedVertices ? this->sharedVertexData[0] : sm->vertexData[0];
+        VertexData* vertex_data = sm->useSharedVertices ? this->sharedVertexData[VpNormal] : sm->vertexData[VpNormal];
         const VertexElement* posElem = vertex_data->vertexDeclaration->findElementBySemantic(Ogre::VES_POSITION);
         HardwareVertexBufferSharedPtr vbuf = vertex_data->vertexBufferBinding->getBuffer(posElem->getSource());
 
         // Build patch with new control points
-        mSurface.build(vbuf, 0, sm->indexData[1]->indexBuffer, 0);
+        mSurface.build(vbuf, 0, sm->indexData[VpShadow]->indexBuffer, 0);
     }
     //-----------------------------------------------------------------------
     void PatchMesh::setSubdivision(Real factor)
     {
         mSurface.setSubdivisionFactor(factor);
         SubMesh* sm = this->getSubMesh(0);
-        sm->indexData[0]->indexCount = mSurface.getCurrentIndexCount();
+        sm->indexData[VpNormal]->indexCount = mSurface.getCurrentIndexCount();
     }
     //-----------------------------------------------------------------------
     void PatchMesh::loadImpl(void)
     {
         SubMesh* sm = this->createSubMesh();
-        sm->vertexData[0] = OGRE_NEW VertexData();
+        sm->vertexData[VpNormal] = OGRE_NEW VertexData();
         sm->useSharedVertices = false;
 
         // Set up vertex buffer
-        sm->vertexData[0]->vertexStart = 0;
-        sm->vertexData[0]->vertexCount = mSurface.getRequiredVertexCount();
-        sm->vertexData[0]->vertexDeclaration = mDeclaration;
+        sm->vertexData[VpNormal]->vertexStart = 0;
+        sm->vertexData[VpNormal]->vertexCount = mSurface.getRequiredVertexCount();
+        sm->vertexData[VpNormal]->vertexDeclaration = mDeclaration;
         HardwareVertexBufferSharedPtr vbuf = HardwareBufferManager::getSingleton().
             createVertexBuffer(
                 mDeclaration->getVertexSize(0), 
-                sm->vertexData[0]->vertexCount,
+                sm->vertexData[VpNormal]->vertexCount,
                 mVertexBufferUsage, 
                 mVertexBufferShadowBuffer);
-        sm->vertexData[0]->vertexBufferBinding->setBinding(0, vbuf);
+        sm->vertexData[VpNormal]->vertexBufferBinding->setBinding(0, vbuf);
 
         // Set up index buffer
-        sm->indexData[0]->indexStart = 0;
-        sm->indexData[0]->indexCount = mSurface.getRequiredIndexCount();
-        sm->indexData[0]->indexBuffer = HardwareBufferManager::getSingleton().
+        sm->indexData[VpNormal]->indexStart = 0;
+        sm->indexData[VpNormal]->indexCount = mSurface.getRequiredIndexCount();
+        sm->indexData[VpNormal]->indexBuffer = HardwareBufferManager::getSingleton().
             createIndexBuffer(
                 HardwareIndexBuffer::IT_16BIT, // only 16-bit indexes supported, patches shouldn't be bigger than that
-                sm->indexData[0]->indexCount,
+                sm->indexData[VpNormal]->indexCount,
                 mIndexBufferUsage, 
                 mIndexBufferShadowBuffer);
         
         // Build patch
-        mSurface.build(vbuf, 0, sm->indexData[0]->indexBuffer, 0);
+        mSurface.build(vbuf, 0, sm->indexData[VpNormal]->indexBuffer, 0);
 
         this->prepareForShadowMapping( true );
 
