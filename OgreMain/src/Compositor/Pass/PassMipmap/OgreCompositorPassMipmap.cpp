@@ -78,7 +78,12 @@ namespace Ogre
 
         while( itor != end )
         {
-            (*itor)->_autogenerateMipmaps();
+            if( (*itor)->getNumMipmaps() > 0 &&
+                    ((*itor)->getUsage() & (TU_AUTOMIPMAP|TU_RENDERTARGET) ==
+                     TU_AUTOMIPMAP|TU_RENDERTARGET) )
+            {
+                (*itor)->_autogenerateMipmaps();
+            }
             ++itor;
         }
 
