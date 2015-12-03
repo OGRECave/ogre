@@ -8474,6 +8474,10 @@ namespace Ogre{
             translateDepthCopy( compiler, node, target );
         else if(obj->name == "bind_uav")
             translateUav( compiler, node, target );
+        else if(obj->name == "generate_mipmaps")
+        {
+            mPassDef = target->addPass( PASS_MIPMAP );
+        }
         else if(obj->name == "custom")
         {
             IdString customId;

@@ -28,29 +28,35 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
+#include "Compositor/Pass/PassMipmap/OgreCompositorPassMipmap.h"
 #include "Compositor/OgreCompositorNode.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceListener.h"
 
-#include "OgreSceneManager.h"
-#include "OgreViewport.h"
-#include "OgreSceneManager.h"
-#include "OgreRenderTarget.h"
+#include "OgreRenderSystem.h"
+#include "OgreRenderTexture.h"
+#include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre
 {
-    CompositorPassClear::CompositorPassClear( const CompositorPassClearDef *definition,
-                                                SceneManager *sceneManager,
+    CompositorPassMipmap::CompositorPassMipmap( const CompositorPassMipmapDef *definition,
                                                 const CompositorChannel &target,
                                                 CompositorNode *parentNode ) :
                 CompositorPass( definition, target, parentNode ),
-                mSceneManager( sceneManager ),
                 mDefinition( definition )
     {
+        mTextures = target.textures;
+
+        if( mTextures.empty() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "PASS_MIPMAP can only be used with RenderTargets that can "
+                         "be interpreted as textures",
+                         "CompositorPassMipmap::CompositorPassMipmap" );
+        }
     }
     //-----------------------------------------------------------------------------------
-    void CompositorPassClear::execute( const Camera *lodCamera )
+    void CompositorPassMipmap::execute( const Camera *lodCamera )
     {
         //Execute a limited number of times?
         if( mNumPassesLeft != std::numeric_limits<uint32>::max() )
@@ -62,51 +68,69 @@ namespace Ogre
 
         executeResourceTransitions();
 
-        mSceneManager->_setViewport( mViewport );
-
         //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
             listener->passPreExecute( this );
 
-        if( mDefinition->mDiscardOnly )
+        TextureVec::const_iterator itor = mTextures.begin();
+        TextureVec::const_iterator end  = mTextures.end();
+
+        while( itor != end )
         {
-            mViewport->discard( mDefinition->mClearBufferFlags );
-        }
-        else
-        {
-            mTarget->setFsaaResolveDirty();
-            mViewport->clear( mDefinition->mClearBufferFlags, mDefinition->mColourValue,
-                              mDefinition->mDepthValue, mDefinition->mStencilValue );
+            if( (*itor)->getNumMipmaps() > 0 &&
+                    ((*itor)->getUsage() & (TU_AUTOMIPMAP|TU_RENDERTARGET) ==
+                     TU_AUTOMIPMAP|TU_RENDERTARGET) )
+            {
+                (*itor)->_autogenerateMipmaps();
+            }
+            ++itor;
         }
 
         if( listener )
             listener->passPosExecute( this );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorPassClear::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
-                                                                    ResourceAccessMap &uavsAccess,
-                                                                    ResourceLayoutMap &resourcesLayout )
+    void CompositorPassMipmap::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
+                                                                     ResourceAccessMap &uavsAccess,
+                                                                     ResourceLayoutMap &resourcesLayout )
     {
         RenderSystem *renderSystem = mParentNode->getRenderSystem();
         const RenderSystemCapabilities *caps = renderSystem->getCapabilities();
         const bool explicitApi = caps->hasCapability( RSC_EXPLICIT_API );
 
-        if( !explicitApi )
-            return;
+        //Check <anything> -> RT for every RTT in the textures we'll be generating mipmaps.
+        TextureVec::const_iterator itTex = mTextures.begin();
+        TextureVec::const_iterator enTex = mTextures.end();
 
-        //Check <anything> -> Clear
-        ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( mTarget );
-        if( currentLayout->second != ResourceLayout::Clear )
+        while( itTex != enTex )
         {
-            addResourceTransition( currentLayout,
-                                   ResourceLayout::Clear,
-                                   ReadBarrier::RenderTarget );
-        }
+            const Ogre::TexturePtr tex = *itTex;
+            const size_t numFaces = tex->getNumFaces();
+            const uint8 numMips = tex->getNumMipmaps() + 1;
+            const uint32 numSlices = tex->getTextureType() == TEX_TYPE_CUBE_MAP ? 1u :
+                                                                                  tex->getDepth();
+            for( size_t face=0; face<numFaces; ++face )
+            {
+                for( uint8 mip=0; mip<numMips; ++mip )
+                {
+                    for( uint32 slice=0; slice<numSlices; ++slice )
+                    {
+                        RenderTarget *rt = tex->getBuffer( face, mip )->getRenderTarget( slice );
+                        ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( rt );
+                        if( (currentLayout->second != ResourceLayout::RenderTarget && explicitApi) ||
+                            currentLayout->second == ResourceLayout::Uav )
+                        {
+                            addResourceTransition( currentLayout,
+                                                   ResourceLayout::RenderTarget,
+                                                   ReadBarrier::RenderTarget );
+                        }
+                    }
+                }
+            }
 
-        OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                     "D3D12/Vulkan/Mantle - Missing DepthBuffer ResourceTransition code",
-                     "CompositorPassDepthCopy::_placeBarriersAndEmulateUavExecution" );
+            ++itTex;
+        }
 
         //Do not use base class functionality at all.
         //CompositorPass::_placeBarriersAndEmulateUavExecution();

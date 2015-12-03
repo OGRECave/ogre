@@ -70,6 +70,10 @@ namespace Ogre {
         /// Texture can be used as an UAV, but not as a regular texture.
         TU_UAV_NOT_TEXTURE = TU_UAV|TU_NOT_TEXTURE,
 
+        /// Must be used with TU_AUTOMIPMAP. When this flag is present, writing to a RenderTexture
+        /// will automatically call _autogenerateMipmaps when it's used as a Texture again.
+        TU_AUTOMIPMAP_AUTO = 0x100,
+
         /// Default to automatic mipmap generation static textures
         TU_DEFAULT = TU_AUTOMIPMAP | TU_STATIC_WRITE_ONLY
     };
