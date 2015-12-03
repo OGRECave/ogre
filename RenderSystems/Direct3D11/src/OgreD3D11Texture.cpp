@@ -115,7 +115,8 @@ namespace Ogre
     {
         assert(mpShaderResourceView);
 
-        if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET)) == (TU_AUTOMIPMAP|TU_RENDERTARGET) )
+        if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO)) ==
+                (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO) )
         {
             RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
             if( renderTarget->isMipmapsDirty() )

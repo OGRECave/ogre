@@ -272,11 +272,14 @@ namespace Ogre
 
         uint32 texUsageFlags = TU_RENDERTARGET;
 
+        if( numMips != 0 ) //Allow calling _autogenerateMipmaps
+            texUsageFlags |= TU_AUTOMIPMAP;
+
         if( textureDef.uav )
             texUsageFlags |= TU_UAV;
         if( textureDef.automipmaps )
         {
-            texUsageFlags |= TU_AUTOMIPMAP;
+            texUsageFlags |= TU_AUTOMIPMAP|TU_AUTOMIPMAP_AUTO;
             if( numMips == 0 )
                 numMips = MIP_UNLIMITED;
         }

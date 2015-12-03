@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClear.h"
 #include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopy.h"
 #include "Compositor/Pass/PassDepthCopy/OgreCompositorPassDepthCopyDef.h"
+#include "Compositor/Pass/PassMipmap/OgreCompositorPassMipmap.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuad.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 #include "Compositor/Pass/PassScene/OgreCompositorPassScene.h"
@@ -447,6 +448,11 @@ namespace Ogre
                     newPass = OGRE_NEW CompositorPassUav(
                                             static_cast<CompositorPassUavDef*>(*itPass),
                                             this, *channel );
+                    break;
+                case PASS_MIPMAP:
+                    newPass = OGRE_NEW CompositorPassMipmap(
+                                            static_cast<CompositorPassMipmapDef*>(*itPass),
+                                            *channel, this );
                     break;
                 case PASS_CUSTOM:
                     {
