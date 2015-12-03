@@ -1678,7 +1678,7 @@ namespace Ogre
     uint16 Hlms::calculateHashForV2( Renderable *renderable )
     {
         //TODO: Account LOD
-        VertexArrayObject *vao = renderable->getVaos( false )[0];
+        VertexArrayObject *vao = renderable->getVaos( VpNormal )[0];
         const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
 
         uint numTexCoords = 0;
@@ -1748,7 +1748,7 @@ namespace Ogre
         setProperty( HlmsBaseProp::Skeleton, renderable->hasSkeletonAnimation() );
 
         uint16 numTexCoords = 0;
-        if( renderable->getVaos( false ).empty() )
+        if( renderable->getVaos( VpNormal ).empty() )
             numTexCoords = calculateHashForV1( renderable );
         else
             numTexCoords = calculateHashForV2( renderable );
