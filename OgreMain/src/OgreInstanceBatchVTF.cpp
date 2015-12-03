@@ -507,7 +507,7 @@ namespace v1
         mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
 
         VertexData *thisVertexData = mRenderOperation.vertexData;
-        VertexData *baseVertexData = baseSubMesh->vertexData[0];
+        VertexData *baseVertexData = baseSubMesh->vertexData[VpNormal];
 
         thisVertexData->vertexStart = 0;
         thisVertexData->vertexCount = baseVertexData->vertexCount * mInstancesPerBatch;
@@ -591,7 +591,7 @@ namespace v1
         mRemoveOwnIndexData = true; //Raise flag to remove our own index data in the end (not always needed)
 
         IndexData *thisIndexData = mRenderOperation.indexData;
-        IndexData *baseIndexData = baseSubMesh->indexData[0];
+        IndexData *baseIndexData = baseSubMesh->indexData[VpNormal];
 
         thisIndexData->indexStart = 0;
         thisIndexData->indexCount = baseIndexData->indexCount * mInstancesPerBatch;
@@ -620,7 +620,7 @@ namespace v1
             for( size_t j=0; j<baseIndexData->indexCount; ++j )
             {
                 uint32 originalVal;
-                if( baseSubMesh->indexData[0]->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT )
+                if( baseSubMesh->indexData[VpNormal]->indexBuffer->getType() == HardwareIndexBuffer::IT_16BIT )
                     originalVal = *initBuf16++;
                 else
                     originalVal = *initBuf32++;
@@ -755,8 +755,8 @@ namespace v1
 
             if( flags & IM_USE16BIT )
             {
-                if( baseSubMesh->vertexData[0]->vertexCount * retVal > 0xFFFF )
-                    retVal = 0xFFFF / baseSubMesh->vertexData[0]->vertexCount;
+                if( baseSubMesh->vertexData[VpNormal]->vertexCount * retVal > 0xFFFF )
+                    retVal = 0xFFFF / baseSubMesh->vertexData[VpNormal]->vertexCount;
             }
 
             if( flags & IM_VTFBESTFIT )

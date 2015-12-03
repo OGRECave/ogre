@@ -56,14 +56,14 @@ namespace Ogre
             const v1::SubMesh* submesh = mMesh->getSubMesh(i);
             if (!submesh->useSharedVertices)
             {
-                size_t count = submesh->vertexData[0]->vertexCount;
+                size_t count = submesh->vertexData[VpNormal]->vertexCount;
                 vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
                 vertexCount += count;
             }
             else if (!sharedVerticesAdded)
             {
                 sharedVerticesAdded = true;
-                sharedVertexLookupSize = mMesh->sharedVertexData[0]->vertexCount;
+                sharedVertexLookupSize = mMesh->sharedVertexData[VpNormal]->vertexCount;
                 vertexCount += sharedVertexLookupSize;
             }
         }
@@ -91,11 +91,11 @@ namespace Ogre
         for (unsigned short i = 0; i < submeshCount; ++i)
         {
             const v1::SubMesh* submesh = mMesh->getSubMesh(i);
-            v1::VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData[0] :
-                                          submesh->vertexData[0]);
+            v1::VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData[VpNormal] :
+                                          submesh->vertexData[VpNormal]);
             addVertexData(data, vertexData, submesh->useSharedVertices);
-            if(submesh->indexData[0]->indexCount > 0)
-                addIndexData(data, submesh->indexData[0], submesh->useSharedVertices, i);
+            if(submesh->indexData[VpNormal]->indexCount > 0)
+                addIndexData(data, submesh->indexData[VpNormal], submesh->useSharedVertices, i);
         }
 
         // These were only needed for addIndexData() and addVertexData().

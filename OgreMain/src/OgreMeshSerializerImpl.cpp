@@ -950,14 +950,17 @@ namespace v1 {
                         {
                             if (e.getNumber() == Exception::ERR_ITEM_NOT_FOUND)
                             {
-                                if( pMesh->sharedVertexData[0] == pMesh->sharedVertexData[1] )
-                                    pMesh->sharedVertexData[1] = 0;
+                                if( pMesh->sharedVertexData[VpNormal] ==
+                                    pMesh->sharedVertexData[VpShadow] )
+                                {
+                                    pMesh->sharedVertexData[VpShadow] = 0;
+                                }
 
                                 // duff geometry data entry with 0 vertices
-                                OGRE_DELETE pMesh->sharedVertexData[0];
-                                OGRE_DELETE pMesh->sharedVertexData[1];
-                                pMesh->sharedVertexData[0] = 0;
-                                pMesh->sharedVertexData[1] = 0;
+                                OGRE_DELETE pMesh->sharedVertexData[VpNormal];
+                                OGRE_DELETE pMesh->sharedVertexData[VpShadow];
+                                pMesh->sharedVertexData[VpNormal] = 0;
+                                pMesh->sharedVertexData[VpShadow] = 0;
                                 // Skip this stream (pointer will have been returned to just after header)
                                 stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
                             }
@@ -1604,7 +1607,7 @@ namespace v1 {
         {
             
             SubMesh* sm = pMesh->getSubMesh(i);
-            sm->mLodFaceList[0][lodNum-1] = OGRE_NEW IndexData();
+            sm->mLodFaceList[VpNormal][lodNum-1] = OGRE_NEW IndexData();
         }
     }
     //---------------------------------------------------------------------
@@ -1978,22 +1981,22 @@ namespace v1 {
                         // Populate edgeGroup.vertexData pointers
                         // If there is shared vertex data, vertexSet 0 is that,
                         // otherwise 0 is first dedicated
-                        if (pMesh->sharedVertexData[0])
+                        if (pMesh->sharedVertexData[VpNormal])
                         {
                             if (edgeGroup.vertexSet == 0)
                             {
-                                edgeGroup.vertexData = pMesh->sharedVertexData[0];
+                                edgeGroup.vertexData = pMesh->sharedVertexData[VpNormal];
                             }
                             else
                             {
                                 edgeGroup.vertexData = pMesh->getSubMesh(
-                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData[0];
+                                    (unsigned short)edgeGroup.vertexSet-1)->vertexData[VpNormal];
                             }
                         }
                         else
                         {
                             edgeGroup.vertexData = pMesh->getSubMesh(
-                                (unsigned short)edgeGroup.vertexSet)->vertexData[0];
+                                (unsigned short)edgeGroup.vertexSet)->vertexData[VpNormal];
                         }
                     }
                 }
@@ -2851,22 +2854,22 @@ namespace v1 {
                 switch(streamID)
                 {
                 case M_GEOMETRY:
-                    pMesh->sharedVertexData[0] = OGRE_NEW VertexData();
+                    pMesh->sharedVertexData[VpNormal] = OGRE_NEW VertexData();
                     try {
-                        readGeometry(stream, pMesh, pMesh->sharedVertexData[0]);
+                        readGeometry(stream, pMesh, pMesh->sharedVertexData[VpNormal]);
                     }
                     catch (Exception& e)
                     {
                         if (e.getNumber() == Exception::ERR_ITEM_NOT_FOUND)
                         {
-                            if( pMesh->sharedVertexData[0] == pMesh->sharedVertexData[1] )
-                                pMesh->sharedVertexData[1] = 0;
+                            if( pMesh->sharedVertexData[VpNormal] == pMesh->sharedVertexData[VpShadow] )
+                                pMesh->sharedVertexData[VpShadow] = 0;
 
                             // duff geometry data entry with 0 vertices
-                            OGRE_DELETE pMesh->sharedVertexData[0];
-                            OGRE_DELETE pMesh->sharedVertexData[1];
-                            pMesh->sharedVertexData[0] = 0;
-                            pMesh->sharedVertexData[1] = 0;
+                            OGRE_DELETE pMesh->sharedVertexData[VpNormal];
+                            OGRE_DELETE pMesh->sharedVertexData[VpShadow];
+                            pMesh->sharedVertexData[VpNormal] = 0;
+                            pMesh->sharedVertexData[VpShadow] = 0;
                             // Skip this stream (pointer will have been returned to just after header)
                             stream->skip(mCurrentstreamLen - MSTREAM_OVERHEAD_SIZE);
                         }
@@ -2939,8 +2942,8 @@ namespace v1 {
             pushInnerChunk(mStream);
 
         // Write shared geometry
-        if (pMesh->sharedVertexData[0])
-            writeGeometry(pMesh->sharedVertexData[0]);
+        if (pMesh->sharedVertexData[VpNormal])
+            writeGeometry(pMesh->sharedVertexData[VpNormal]);
 
         // Write Submeshes
         for (unsigned short i = 0; i < pMesh->getNumSubMeshes(); ++i)
@@ -3193,7 +3196,7 @@ namespace v1 {
         for (unsigned short subidx = 0; subidx < pMesh->getNumSubMeshes(); ++subidx)
         {
             SubMesh* sm = pMesh->getSubMesh(subidx);
-            const IndexData* indexData = sm->mLodFaceList[0][lodNum-1];
+            const IndexData* indexData = sm->mLodFaceList[VpNormal][lodNum-1];
 
             // Lock index buffer to write
             HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
@@ -3241,7 +3244,7 @@ namespace v1 {
     }
     void MeshSerializerImpl_v1_8::writeLodUsageGeneratedSubmesh(const SubMesh* submesh, unsigned short lodNum, uint8 casterPass)
     {
-        const IndexData* indexData = submesh->mLodFaceList[0][lodNum - 1];
+        const IndexData* indexData = submesh->mLodFaceList[VpNormal][lodNum - 1];
         HardwareIndexBufferSharedPtr ibuf = indexData->indexBuffer;
         assert(!ibuf.isNull());
 
@@ -3452,8 +3455,8 @@ namespace v1 {
             for (i = 0; i < numsubs; ++i)
             {
                 SubMesh* sm = pMesh->getSubMesh(i);
-                assert(sm->mLodFaceList[0].empty());
-                sm->mLodFaceList[0].resize(pMesh->mNumLods - 1);
+                assert(sm->mLodFaceList[VpNormal].empty());
+                sm->mLodFaceList[VpNormal].resize(pMesh->mNumLods - 1);
             }
         }
 
@@ -3853,8 +3856,8 @@ namespace v1 {
             for (i = 0; i < numsubs; ++i)
             {
                 SubMesh* sm = pMesh->getSubMesh(i);
-                assert( sm->mLodFaceList[0].empty() );
-                sm->mLodFaceList[0].resize(pMesh->mNumLods-1);
+                assert( sm->mLodFaceList[VpNormal].empty() );
+                sm->mLodFaceList[VpNormal].resize(pMesh->mNumLods-1);
             }
         }
         pushInnerChunk(stream);

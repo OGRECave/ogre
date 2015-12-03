@@ -127,7 +127,7 @@ namespace Ogre
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++)
         {
-            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[0];
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[VpNormal];
             lods.reserve(lods.size() + 2);
             size_t indexCount = data->mIndexBufferInfoList[i].indexCount + data->mIndexBufferInfoList[i].prevOnlyIndexCount;
             assert(data->mIndexBufferInfoList[i].prevIndexCount >= data->mIndexBufferInfoList[i].indexCount);
@@ -259,7 +259,7 @@ namespace Ogre
         // Close buffers.
         for (unsigned short i = 0; i < submeshCount; i++)
         {
-            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[0];
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[VpNormal];
             v1::IndexData* prevLod = lods[mLastIndexBufferID];
             v1::IndexData* curLod = lods[lodIndex];
             prevLod->indexBuffer->unlock();

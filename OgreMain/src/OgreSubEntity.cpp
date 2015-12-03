@@ -100,11 +100,11 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void SubEntity::setIndexDataStartIndex(size_t start_index)
     {
-        if(start_index < mSubMesh->indexData[0]->indexCount)
+        if(start_index < mSubMesh->indexData[VpNormal]->indexCount)
         {
             mIndexStart = start_index;
 
-            if( start_index && mSubMesh->indexData[0] != mSubMesh->indexData[1] )
+            if( start_index && mSubMesh->indexData[VpNormal] != mSubMesh->indexData[VpShadow] )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
                              "To call this function you will have to disable separate "
@@ -122,12 +122,12 @@ namespace v1 {
     //-----------------------------------------------------------------------
     void SubEntity::setIndexDataEndIndex(size_t end_index)
     {
-        if(end_index > 0 && end_index <= mSubMesh->indexData[0]->indexCount)
+        if(end_index > 0 && end_index <= mSubMesh->indexData[VpNormal]->indexCount)
         {
             mIndexEnd = end_index;
 
-            if( end_index != mSubMesh->indexData[0]->indexCount &&
-                mSubMesh->indexData[0] != mSubMesh->indexData[1] )
+            if( end_index != mSubMesh->indexData[VpNormal]->indexCount &&
+                mSubMesh->indexData[VpNormal] != mSubMesh->indexData[VpShadow] )
             {
                 OGRE_EXCEPT( Exception::ERR_INVALID_CALL,
                              "To call this function you will have to disable separate "
@@ -293,12 +293,12 @@ namespace v1 {
                 // Prepare temp vertex data if needed
                 // Clone without copying data, don't remove any blending info
                 // (since if we skeletally animate too, we need it)
-                mSoftwareVertexAnimVertexData = mSubMesh->vertexData[0]->clone(false);
+                mSoftwareVertexAnimVertexData = mSubMesh->vertexData[VpNormal]->clone(false);
                 mParentEntity->extractTempBufferInfo(mSoftwareVertexAnimVertexData, &mTempVertexAnimInfo);
 
                 // Also clone for hardware usage, don't remove blend info since we'll
                 // need it if we also hardware skeletally animate
-                mHardwareVertexAnimVertexData = mSubMesh->vertexData[0]->clone(false);
+                mHardwareVertexAnimVertexData = mSubMesh->vertexData[VpNormal]->clone(false);
             }
 
             if (mParentEntity->hasSkeleton())
@@ -308,7 +308,7 @@ namespace v1 {
                 // Clone without copying data, remove blending info
                 // (since blend is performed in software)
                 mSkelAnimVertexData = 
-                    mParentEntity->cloneVertexDataRemoveBlendInfo(mSubMesh->vertexData[0]);
+                    mParentEntity->cloneVertexDataRemoveBlendInfo(mSubMesh->vertexData[VpNormal]);
                 mParentEntity->extractTempBufferInfo(mSkelAnimVertexData, &mTempSkelAnimInfo);
 
             }
@@ -407,9 +407,9 @@ namespace v1 {
             // Note, VES_POSITION is specified here but if normals are included in animation
             // then these will be re-bound too (buffers must be shared)
             const VertexElement* srcPosElem = 
-                mSubMesh->vertexData[0]->vertexDeclaration->findElementBySemantic(VES_POSITION);
+                mSubMesh->vertexData[VpNormal]->vertexDeclaration->findElementBySemantic(VES_POSITION);
             HardwareVertexBufferSharedPtr srcBuf = 
-                mSubMesh->vertexData[0]->vertexBufferBinding->getBuffer(
+                mSubMesh->vertexData[VpNormal]->vertexBufferBinding->getBuffer(
                 srcPosElem->getSource());
 
             // Bind to software
@@ -427,7 +427,7 @@ namespace v1 {
             && mSubMesh->getVertexAnimationType() == VAT_POSE)
         {
             mParentEntity->bindMissingHardwarePoseBuffers(
-                mSubMesh->vertexData[0], mHardwareVertexAnimVertexData);
+                mSubMesh->vertexData[VpNormal], mHardwareVertexAnimVertexData);
         }
 
     }

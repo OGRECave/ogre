@@ -527,11 +527,11 @@ namespace Ogre
         }
 
         /// Create vertex data structure for 8 vertices shared between submeshes
-        mesh->sharedVertexData[0] = new v1::VertexData();
-        mesh->sharedVertexData[0]->vertexCount = mHull.size() * 3;
+        mesh->sharedVertexData[VpNormal] = new v1::VertexData();
+        mesh->sharedVertexData[VpNormal]->vertexCount = mHull.size() * 3;
 
         /// Create declaration (memory format) of vertex data
-        v1::VertexDeclaration* decl = mesh->sharedVertexData[0]->vertexDeclaration;
+        v1::VertexDeclaration* decl = mesh->sharedVertexData[VpNormal]->vertexDeclaration;
         size_t offset = 0;
         // 1st buffer
         decl->addElement(0, offset, VET_FLOAT3, VES_POSITION);
@@ -541,12 +541,13 @@ namespace Ogre
         /// and bytes per vertex (offset)
         v1::HardwareVertexBufferSharedPtr vbuf =
             v1::HardwareBufferManager::getSingleton().createVertexBuffer(
-                offset, mesh->sharedVertexData[0]->vertexCount, v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+                    offset, mesh->sharedVertexData[VpNormal]->vertexCount,
+                    v1::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
         /// Upload the vertex data to the card
         vbuf->writeData(0, vbuf->getSizeInBytes(), &vertexBuffer[0], true);
 
         /// Set vertex buffer binding so buffer 0 is bound to our vertex buffer
-        v1::VertexBufferBinding* bind = mesh->sharedVertexData[0]->vertexBufferBinding;
+        v1::VertexBufferBinding* bind = mesh->sharedVertexData[VpNormal]->vertexBufferBinding;
         bind->setBinding(0, vbuf);
 
         /// Allocate index buffer of the requested number of vertices (ibufCount)
@@ -561,9 +562,9 @@ namespace Ogre
 
         /// Set parameters of the submesh
         subMesh->useSharedVertices = true;
-        subMesh->indexData[0]->indexBuffer = ibuf;
-        subMesh->indexData[0]->indexCount = indexBuffer.size();
-        subMesh->indexData[0]->indexStart = 0;
+        subMesh->indexData[VpNormal]->indexBuffer = ibuf;
+        subMesh->indexData[VpNormal]->indexCount = indexBuffer.size();
+        subMesh->indexData[VpNormal]->indexStart = 0;
 
         /// Set bounding information (for culling)
         mesh->_setBounds(AxisAlignedBox(minBounds, maxBounds));

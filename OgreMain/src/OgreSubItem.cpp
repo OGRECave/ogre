@@ -44,8 +44,8 @@ namespace Ogre {
     {
         //mMaterialPtr = MaterialManager::getSingleton().getByName(mMaterialName, subMeshBasis->parent->getGroup());
         mMaterialLodIndex = 0;
-        mVaoPerLod[0] = subMeshBasis->mVao[0];
-        mVaoPerLod[1] = subMeshBasis->mVao[1];
+        mVaoPerLod[VpNormal] = subMeshBasis->mVao[VpNormal];
+        mVaoPerLod[VpShadow] = subMeshBasis->mVao[VpShadow];
 
         if( !subMeshBasis->mBlendIndexToBoneIndexMap.empty() )
         {
@@ -67,18 +67,18 @@ namespace Ogre {
     {
         if( mHlmsDatablock->getAlphaTest() != CMPF_ALWAYS_PASS )
         {
-            if( mVaoPerLod[1].empty() || mVaoPerLod[1][0] != mSubMesh->mVao[0][0] )
+            if( mVaoPerLod[VpShadow].empty() || mVaoPerLod[VpShadow][0] != mSubMesh->mVao[VpNormal][0] )
             {
                 //Has alpha testing. Disable the optimized shadow mapping buffers.
-                mVaoPerLod[1] = mSubMesh->mVao[0];
+                mVaoPerLod[VpShadow] = mSubMesh->mVao[VpNormal];
             }
         }
         else
         {
-            if( mVaoPerLod[1].empty() || mVaoPerLod[1][0] != mSubMesh->mVao[1][0] )
+            if( mVaoPerLod[VpShadow].empty() || mVaoPerLod[VpShadow][0] != mSubMesh->mVao[VpShadow][0] )
             {
                 //Restore the optimized shadow mapping buffers.
-                mVaoPerLod[1] = mSubMesh->mVao[1];
+                mVaoPerLod[VpShadow] = mSubMesh->mVao[VpShadow];
             }
         }
 

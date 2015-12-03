@@ -51,7 +51,7 @@ namespace Ogre {
     SubMesh::~SubMesh()
     {
         destroyShadowMappingVaos();
-        destroyVaos( mVao[0], mParent->mVaoManager );
+        destroyVaos( mVao[VpNormal], mParent->mVaoManager );
     }
     //-----------------------------------------------------------------------
     void SubMesh::addBoneAssignment(const VertexBoneAssignment& vertBoneAssign)
@@ -233,7 +233,7 @@ namespace Ogre {
         }
 
         if( numVaoPasses == 1 )
-            newSub->mVao[1] = newSub->mVao[0];
+            newSub->mVao[VpShadow] = newSub->mVao[VpNormal];
 
         return 0;
     }
@@ -267,8 +267,8 @@ namespace Ogre {
         assert( subMesh->parent->hasValidShadowMappingBuffers() );
 
         //Deal with shadow mapping optimized buffers
-        if( subMesh->vertexData[0] != subMesh->vertexData[1] ||
-            subMesh->indexData[0] != subMesh->indexData[1] )
+        if( subMesh->vertexData[VpNormal] != subMesh->vertexData[VpShadow] ||
+            subMesh->indexData[VpNormal] != subMesh->indexData[VpShadow] )
         {
             //Use the special version already built for v1
             importBuffersFromV1( subMesh, halfPos, halfTexCoords, qTangents, 1 );
@@ -385,7 +385,7 @@ namespace Ogre {
 
         //If we shared vaos, we need to share the new Vaos (and remove the dangling pointers)
         if( numVaoPasses == 1 )
-            mVao[1] = mVao[0];
+            mVao[VpShadow] = mVao[VpNormal];
     }
     //---------------------------------------------------------------------
     VertexArrayObject* SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents,
@@ -887,7 +887,7 @@ namespace Ogre {
 
         //If we shared vaos, we need to share the new Vaos (and remove the dangling pointers)
         if( numVaoPasses == 1 )
-            mVao[1] = mVao[0];
+            mVao[VpShadow] = mVao[VpNormal];
     }
     //---------------------------------------------------------------------
     VertexArrayObject* SubMesh::dearrangeEfficient( const VertexArrayObject *vao,
@@ -1095,12 +1095,12 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void SubMesh::destroyShadowMappingVaos(void)
     {
-        if( mVao[0].empty() || mVao[1].empty() || mVao[0][0] == mVao[1][0] )
-            mVao[1].clear(); //Using the same Vaos for both shadow mapping and regular rendering
+        if( mVao[VpNormal].empty() || mVao[VpShadow].empty() || mVao[VpNormal][0] == mVao[VpShadow][0] )
+            mVao[VpShadow].clear(); //Using the same Vaos for both shadow mapping and regular rendering
 
-        destroyVaos( mVao[1], mParent->mVaoManager );
+        destroyVaos( mVao[VpShadow], mParent->mVaoManager );
 
-        mVao[1].reserve( mVao[0].size() );
+        mVao[VpShadow].reserve( mVao[VpNormal].size() );
     }
     //---------------------------------------------------------------------
     void SubMesh::_prepareForShadowMapping( bool forceSameBuffers )
@@ -1108,8 +1108,13 @@ namespace Ogre {
         destroyShadowMappingVaos();
 
         if( !forceSameBuffers && Mesh::msOptimizeForShadowMapping )
-            VertexShadowMapHelper::optimizeForShadowMapping( mParent->mVaoManager, mVao[0], mVao[1] );
+        {
+            VertexShadowMapHelper::optimizeForShadowMapping( mParent->mVaoManager, mVao[VpNormal],
+                                                             mVao[VpShadow] );
+        }
         else
-            VertexShadowMapHelper::useSameVaos( mParent->mVaoManager, mVao[0], mVao[1] );
+        {
+            VertexShadowMapHelper::useSameVaos( mParent->mVaoManager, mVao[VpNormal], mVao[VpShadow] );
+        }
     }
 }

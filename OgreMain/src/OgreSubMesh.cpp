@@ -54,20 +54,20 @@ namespace v1 {
     {
         memset( vertexData, 0, sizeof(vertexData) );
 
-        indexData[0] = OGRE_NEW IndexData();
-        indexData[1] = 0;
+        indexData[VpNormal] = OGRE_NEW IndexData();
+        indexData[VpShadow] = 0;
     }
     //-----------------------------------------------------------------------
     SubMesh::~SubMesh()
     {
         removeLodLevels();
 
-        if( vertexData[1] == vertexData[0] )
-            vertexData[1] = 0;
-        if( indexData[1] == indexData[0] )
-            indexData[1] = 0;
+        if( vertexData[VpShadow] == vertexData[VpNormal] )
+            vertexData[VpShadow] = 0;
+        if( indexData[VpShadow] == indexData[VpNormal] )
+            indexData[VpShadow] = 0;
 
-        for( size_t i=0; i<2; ++i )
+        for( size_t i=0; i<NumVertexPass; ++i )
         {
             OGRE_DELETE vertexData[i];
             OGRE_DELETE indexData[i];
@@ -133,12 +133,12 @@ namespace v1 {
     void SubMesh::_compileBoneAssignments(void)
     {
         unsigned short maxBones =
-            parent->_rationaliseBoneAssignments(vertexData[0]->vertexCount, mBoneAssignments);
+            parent->_rationaliseBoneAssignments(vertexData[VpNormal]->vertexCount, mBoneAssignments);
 
         if (maxBones != 0)
         {
             parent->compileBoneAssignments(mBoneAssignments, maxBones,
-                blendIndexToBoneIndexMap, vertexData[0]);
+                blendIndexToBoneIndexMap, vertexData[VpNormal]);
         }
 
         mBoneAssignmentsOutOfDate = false;
@@ -231,10 +231,10 @@ namespace v1 {
     void SubMesh::removeLodLevels(void)
     {
         if( !parent->hasIndependentShadowMappingBuffers() )
-            mLodFaceList[1].clear();
+            mLodFaceList[VpShadow].clear();
 
-        removeLodLevel( mLodFaceList[1] );
-        removeLodLevel( mLodFaceList[0] );
+        removeLodLevel( mLodFaceList[VpShadow] );
+        removeLodLevel( mLodFaceList[VpNormal] );
     }
     //---------------------------------------------------------------------
     void SubMesh::removeLodLevel( LODFaceList &lodList )
@@ -350,7 +350,7 @@ namespace v1 {
          */
 
         VertexData *vert = useSharedVertices ?
-            parent->sharedVertexData[0] : vertexData[0];
+            parent->sharedVertexData[VpNormal] : vertexData[VpNormal];
         const VertexElement *poselem = vert->vertexDeclaration->
             findElementBySemantic (VES_POSITION);
         HardwareVertexBufferSharedPtr vbuf = vert->vertexBufferBinding->
@@ -364,27 +364,27 @@ namespace v1 {
         // First of all, find min and max bounding box of the submesh
         boxes.push_back (Cluster ());
 
-        if (indexData[0]->indexCount > 0)
+        if (indexData[VpNormal]->indexCount > 0)
         {
 
-            uint elsz = indexData[0]->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
-                4 : 2;
-            uint8 *idata = (uint8 *)indexData[0]->indexBuffer->lock (
-                indexData[0]->indexStart * elsz, indexData[0]->indexCount * elsz,
+            uint elsz = indexData[VpNormal]->indexBuffer->getType () == HardwareIndexBuffer::IT_32BIT ?
+                        4 : 2;
+            uint8 *idata = (uint8 *)indexData[VpNormal]->indexBuffer->lock (
+                indexData[VpNormal]->indexStart * elsz, indexData[VpNormal]->indexCount * elsz,
                 HardwareIndexBuffer::HBL_READ_ONLY);
 
-            for (size_t i = 0; i < indexData[0]->indexCount; i++)
+            for (size_t i = 0; i < indexData[VpNormal]->indexCount; i++)
             {
                 int idx = (elsz == 2) ? ((uint16 *)idata) [i] : ((uint32 *)idata) [i];
                 boxes [0].mIndices.insert (idx);
             }
-            indexData[0]->indexBuffer->unlock ();
+            indexData[VpNormal]->indexBuffer->unlock ();
 
         }
         else
         {
             // just insert all indexes
-            for (size_t i = vertexData[0]->vertexStart; i < vertexData[0]->vertexCount; i++)
+            for (size_t i=vertexData[VpNormal]->vertexStart; i<vertexData[VpNormal]->vertexCount; i++)
             {
                 boxes [0].mIndices.insert (static_cast<int>(i));
             }
@@ -500,28 +500,28 @@ namespace v1 {
         if (!this->useSharedVertices)
         {
             // Copy unique vertex data
-            newSub->vertexData[0] = this->vertexData[0]->clone();
+            newSub->vertexData[VpNormal] = this->vertexData[VpNormal]->clone();
 
-            if( this->vertexData[0] == this->vertexData[1] )
-                newSub->vertexData[0] = newSub->vertexData[1];
+            if( this->vertexData[VpNormal] == this->vertexData[VpShadow] )
+                newSub->vertexData[VpNormal] = newSub->vertexData[VpShadow];
             else
-                newSub->vertexData[1] = this->vertexData[1]->clone();
+                newSub->vertexData[VpShadow] = this->vertexData[VpShadow]->clone();
 
             // Copy unique index map
             newSub->blendIndexToBoneIndexMap = this->blendIndexToBoneIndexMap;
         }
 
         // Copy index data
-        if( newSub->indexData[0] == newSub->indexData[1] )
-            newSub->indexData[1] = 0;
-        OGRE_DELETE newSub->indexData[0];
-        OGRE_DELETE newSub->indexData[1];
-        newSub->indexData[0] = this->indexData[0]->clone();
+        if( newSub->indexData[VpNormal] == newSub->indexData[VpShadow] )
+            newSub->indexData[VpShadow] = 0;
+        OGRE_DELETE newSub->indexData[VpNormal];
+        OGRE_DELETE newSub->indexData[VpShadow];
+        newSub->indexData[VpNormal] = this->indexData[VpNormal]->clone();
 
-        if( this->indexData[0] == this->indexData[1] )
-            newSub->indexData[0] = newSub->indexData[1];
+        if( this->indexData[VpNormal] == this->indexData[VpShadow] )
+            newSub->indexData[VpNormal] = newSub->indexData[VpShadow];
         else
-            newSub->indexData[1] = this->indexData[1]->clone();
+            newSub->indexData[VpShadow] = this->indexData[VpShadow]->clone();
 
         // Copy any bone assignments
         newSub->mBoneAssignments = this->mBoneAssignments;
@@ -530,24 +530,24 @@ namespace v1 {
         newSub->mTextureAliases = this->mTextureAliases;
 
         // Copy lod face lists
-        newSub->mLodFaceList[0].reserve( this->mLodFaceList[0].size() );
-        newSub->mLodFaceList[1].reserve( this->mLodFaceList[1].size() );
+        newSub->mLodFaceList[VpNormal].reserve( this->mLodFaceList[VpNormal].size() );
+        newSub->mLodFaceList[VpShadow].reserve( this->mLodFaceList[VpShadow].size() );
 
-        assert( this->mLodFaceList[0].size() == this->mLodFaceList[1].size() );
+        assert( this->mLodFaceList[VpNormal].size() == this->mLodFaceList[VpShadow].size() );
 
-        for( size_t i=0; i<this->mLodFaceList[0].size(); ++i )
+        for( size_t i=0; i<this->mLodFaceList[VpNormal].size(); ++i )
         {
-            IndexData* newIndexData = this->mLodFaceList[0][i]->clone();
-            newSub->mLodFaceList[0].push_back( newIndexData );
+            IndexData* newIndexData = this->mLodFaceList[VpNormal][i]->clone();
+            newSub->mLodFaceList[VpNormal].push_back( newIndexData );
 
-            if( this->mLodFaceList[0][i] == this->mLodFaceList[1][i] )
+            if( this->mLodFaceList[VpNormal][i] == this->mLodFaceList[VpShadow][i] )
             {
-                newSub->mLodFaceList[1].push_back( newIndexData );
+                newSub->mLodFaceList[VpShadow].push_back( newIndexData );
             }
             else
             {
-                newIndexData = this->mLodFaceList[1][i]->clone();
-                newSub->mLodFaceList[1].push_back( newIndexData );
+                newIndexData = this->mLodFaceList[VpShadow][i]->clone();
+                newSub->mLodFaceList[VpShadow].push_back( newIndexData );
             }
         }
 

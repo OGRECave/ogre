@@ -449,8 +449,11 @@ namespace Ogre {
 
             size_t numExtraVaos = 2;
 
-            if( !s->mVao[0].empty() && !s->mVao[1].empty() && s->mVao[0][0] == s->mVao[1][0] )
+            if( !s->mVao[VpNormal].empty() && !s->mVao[VpShadow].empty() &&
+                s->mVao[VpNormal][0] == s->mVao[VpShadow][0] )
+            {
                 numExtraVaos = 1;
+            }
 
             for( size_t i=0; i<numExtraVaos; ++i )
             {
@@ -492,7 +495,7 @@ namespace Ogre {
                          "Mesh::importV1" );
         }
 
-        if( mesh->sharedVertexData[0] )
+        if( mesh->sharedVertexData[VpNormal] )
         {
             LogManager::getSingleton().logMessage( "WARNING: Mesh '" + mesh->getName() +
                                                    "' has shared vertices. They're being "
@@ -593,7 +596,7 @@ namespace Ogre {
 
         while( itor != end && retVal )
         {
-            retVal &= (*itor)->mVao[0].size() == (*itor)->mVao[1].size();
+            retVal &= (*itor)->mVao[VpNormal].size() == (*itor)->mVao[VpShadow].size();
             ++itor;
         }
 
@@ -612,8 +615,8 @@ namespace Ogre {
 
         while( itor != end && !independent )
         {
-            if( !(*itor)->mVao[0].empty() )
-                independent |= (*itor)->mVao[0][0] != (*itor)->mVao[1][0];
+            if( !(*itor)->mVao[VpNormal].empty() )
+                independent |= (*itor)->mVao[VpNormal][0] != (*itor)->mVao[VpShadow][0];
             ++itor;
         }
 

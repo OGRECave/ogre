@@ -134,7 +134,7 @@ namespace Ogre
         mMesh->removeLodLevels();
         for (unsigned short i = 0; i < submeshCount; i++)
         {
-            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[0];
+            v1::SubMesh::LODFaceList& lods = mMesh->getSubMesh(i)->mLodFaceList[VpNormal];
             typedef vector<LodIndexBuffer>::type GenBuffers;
             GenBuffers& buffers = mBuffer.submesh[i].genIndexBuffers;
 

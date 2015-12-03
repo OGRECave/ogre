@@ -338,11 +338,11 @@ namespace v1 {
             IndexData *lodIndexData;
             if (lod == 0)
             {
-                lodIndexData = sm->indexData[0];
+                lodIndexData = sm->indexData[VpNormal];
             }
             else
             {
-                lodIndexData = sm->mLodFaceList[0][lod - 1];
+                lodIndexData = sm->mLodFaceList[VpNormal][lod - 1];
             }
             // Can use the original mesh geometry?
             if (sm->useSharedVertices)
@@ -350,13 +350,13 @@ namespace v1 {
                 if (sm->parent->getNumSubMeshes() == 1)
                 {
                     // Ok, this is actually our own anyway
-                    geomLink.vertexData = sm->parent->sharedVertexData[0];
+                    geomLink.vertexData = sm->parent->sharedVertexData[VpNormal];
                     geomLink.indexData = lodIndexData;
                 }
                 else
                 {
                     // We have to split it
-                    splitGeometry(sm->parent->sharedVertexData[0],
+                    splitGeometry(sm->parent->sharedVertexData[VpNormal],
                         lodIndexData, &geomLink);
                 }
             }
@@ -366,13 +366,13 @@ namespace v1 {
                 {
                     // Ok, we can use the existing geometry; should be in full
                     // use by just this SubMesh
-                    geomLink.vertexData = sm->vertexData[0];
-                    geomLink.indexData = sm->indexData[0];
+                    geomLink.vertexData = sm->vertexData[VpNormal];
+                    geomLink.indexData = sm->indexData[VpNormal];
                 }
                 else
                 {
                     // We have to split it
-                    splitGeometry(sm->vertexData[0],
+                    splitGeometry(sm->vertexData[VpNormal],
                         lodIndexData, &geomLink);
                 }
             }

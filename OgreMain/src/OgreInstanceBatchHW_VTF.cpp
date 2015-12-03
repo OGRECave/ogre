@@ -63,7 +63,7 @@ namespace v1
         mRemoveOwnVertexData = true; //Raise flag to remove our own vertex data in the end (not always needed)
 
         VertexData *thisVertexData = mRenderOperation.vertexData;
-        VertexData *baseVertexData = baseSubMesh->vertexData[0];
+        VertexData *baseVertexData = baseSubMesh->vertexData[VpNormal];
 
         thisVertexData->vertexStart = 0;
         thisVertexData->vertexCount = baseVertexData->vertexCount;
@@ -137,7 +137,7 @@ namespace v1
     {
         //We could use just a reference, but the InstanceManager will in the end attampt to delete
         //the pointer, and we can't give it something that doesn't belong to us.
-        mRenderOperation.indexData = baseSubMesh->indexData[0]->clone( true );
+        mRenderOperation.indexData = baseSubMesh->indexData[VpNormal]->clone( true );
         mRemoveOwnIndexData = true; //Raise flag to remove our own index data in the end (not always needed)
     }
     //-----------------------------------------------------------------------
@@ -367,7 +367,8 @@ namespace v1
             //we need another 3 for the unique world transform of each instanced entity
             neededTextureCoord += 3;
         }
-        if( baseSubMesh->vertexData[0]->vertexDeclaration->getNextFreeTextureCoordinate() > 8 - neededTextureCoord )
+        if( baseSubMesh->vertexData[VpNormal]->vertexDeclaration->
+                getNextFreeTextureCoordinate() > 8 - neededTextureCoord )
         {
             OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
                     String("Given mesh must have at least ") + 

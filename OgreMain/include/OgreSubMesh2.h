@@ -72,7 +72,7 @@ namespace Ogre {
         /// Note that mVao[1] = mVao[0] is valid.
         /// But if they're not exactly the same VertexArrayObject pointers,
         /// then they won't share any pointer.
-        VertexArrayObjectArray  mVao[2];
+        VertexArrayObjectArray  mVao[NumVertexPass];
 
         /** Dedicated index map for translate blend index to bone index
             @par

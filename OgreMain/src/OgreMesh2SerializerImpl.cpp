@@ -94,7 +94,7 @@ namespace Ogre {
 
         for (uint16 i = 0; i < pMesh->getNumSubMeshes(); ++i)
         {
-            if( pMesh->getSubMesh(i)->mVao[0].empty() )
+            if( pMesh->getSubMesh(i)->mVao[VpNormal].empty() )
             {
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The Mesh you have supplied does not have all"
                     " of its submeshes properfly initialized. Initialize their vertex buffers "
@@ -155,7 +155,7 @@ namespace Ogre {
         {
             const SubMesh *s = pMesh->getSubMesh( i );
 
-            size_t numLodLevels = s->mVao[0].size();
+            size_t numLodLevels = s->mVao[VpNormal].size();
             lodVertexTable[i].reserve( numLodLevels );
             lodVertexTable[i].push_back( 0 );
 
@@ -164,8 +164,11 @@ namespace Ogre {
                 for( uint8 j=0; j<lodLevel && lodVertexTable[i].size() == lodLevel; ++j )
                 {
                     //Find if a previous LOD already uses these vertex buffers.
-                    if( s->mVao[0][lodLevel]->getVertexBuffers() == s->mVao[0][j]->getVertexBuffers() )
+                    if( s->mVao[VpNormal][lodLevel]->getVertexBuffers() ==
+                            s->mVao[VpNormal][j]->getVertexBuffers() )
+                    {
                         lodVertexTable[i].push_back( j );
+                    }
                 }
 
                 //Couldn't find a previous LOD sharing the vertex buffer with us.
@@ -264,7 +267,7 @@ namespace Ogre {
         // char* materialName
         writeString(s->getMaterialName());
 
-        uint8 numLodLevels = static_cast<uint8>( s->mVao[0].size() );
+        uint8 numLodLevels = static_cast<uint8>( s->mVao[VpNormal].size() );
         writeData( &numLodLevels, 1, 1 );
 
         uint8 numVaoPasses = s->mParent->hasIndependentShadowMappingVaos() + 1;
@@ -377,7 +380,7 @@ namespace Ogre {
         uint32 vertexCount = 0;
         uint8 numSources = static_cast<uint8>( vertexData.size() );
         if( !vertexData.empty() )
-            vertexCount = static_cast<uint32>( vertexData[0]->getNumElements() );
+            vertexCount = static_cast<uint32>( vertexData[VpNormal]->getNumElements() );
 
         writeInts(&vertexCount, 1);
         writeData(&numSources, 1, 1);
@@ -1467,7 +1470,7 @@ namespace Ogre {
                         // Populate edgeGroup.vertexData pointers
                         // If there is shared vertex data, vertexSet 0 is that,
                         // otherwise 0 is first dedicated
-                        if (pMesh->sharedVertexData[0])
+                        if (pMesh->sharedVertexData[VpNormal])
                         {
                             if (edgeGroup.vertexSet == 0)
                             {

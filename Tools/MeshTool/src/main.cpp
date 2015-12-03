@@ -772,16 +772,16 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
     bool hasColour = false;
     bool hasAmbiguousColour = false;
     VertexElementType originalType = VET_FLOAT1;
-    if (mesh->sharedVertexData[0])
+    if (mesh->sharedVertexData[VpNormal])
     {
-        checkColour(mesh->sharedVertexData[0], hasColour, hasAmbiguousColour, originalType);
+        checkColour(mesh->sharedVertexData[VpNormal], hasColour, hasAmbiguousColour, originalType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
     {
         v1::SubMesh* sm = mesh->getSubMesh(i);
         if (sm->useSharedVertices == false)
         {
-            checkColour(sm->vertexData[0], hasColour, hasAmbiguousColour, originalType);
+            checkColour(sm->vertexData[VpNormal], hasColour, hasAmbiguousColour, originalType);
         }
     }
 
@@ -863,16 +863,16 @@ void resolveColourAmbiguities(v1::Mesh* mesh)
 
     }
 
-    if (mesh->sharedVertexData[0] && hasColour)
+    if (mesh->sharedVertexData[VpNormal] && hasColour)
     {
-        mesh->sharedVertexData[0]->convertPackedColour(originalType, desiredType);
+        mesh->sharedVertexData[VpNormal]->convertPackedColour(originalType, desiredType);
     }
     for (unsigned short i = 0; i < mesh->getNumSubMeshes(); ++i)
     {
         v1::SubMesh* sm = mesh->getSubMesh(i);
         if (sm->useSharedVertices == false && hasColour)
         {
-            sm->vertexData[0]->convertPackedColour(originalType, desiredType);
+            sm->vertexData[VpNormal]->convertPackedColour(originalType, desiredType);
         }
     }
 }

@@ -281,14 +281,14 @@ namespace v1
 
         // Allocate memory for faces
         // Num faces, width*height*2 (2 tris per square), index count is * 3 on top
-        sm->indexData[0]->indexCount = (meshWidth-1) * (meshHeight-1) * 2 * iterations * 3;
-        sm->indexData[0]->indexBuffer = HardwareBufferManager::getSingleton().
+        sm->indexData[VpNormal]->indexCount = (meshWidth-1) * (meshHeight-1) * 2 * iterations * 3;
+        sm->indexData[VpNormal]->indexBuffer = HardwareBufferManager::getSingleton().
             createIndexBuffer(HardwareIndexBuffer::IT_16BIT,
-            sm->indexData[0]->indexCount, indexBufferUsage, indexShadowBuffer);
+            sm->indexData[VpNormal]->indexCount, indexBufferUsage, indexShadowBuffer);
 
         unsigned short v1, v2, v3;
         //bool firstTri = true;
-        HardwareIndexBufferSharedPtr ibuf = sm->indexData[0]->indexBuffer;
+        HardwareIndexBufferSharedPtr ibuf = sm->indexData[VpNormal]->indexBuffer;
         // Lock the whole buffer
         unsigned short* pIndexes = static_cast<unsigned short*>(
             ibuf->lock(HardwareBuffer::HBL_DISCARD) );
@@ -445,8 +445,8 @@ namespace v1
 
         // Set up vertex data
         // Use a single shared buffer
-        pSub->vertexData[0] = OGRE_NEW VertexData();
-        VertexData* vertexData = pSub->vertexData[0];
+        pSub->vertexData[VpNormal] = OGRE_NEW VertexData();
+        VertexData* vertexData = pSub->vertexData[VpNormal];
         // Set up Vertex Declaration
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
         size_t currOffset = 0;
@@ -594,8 +594,8 @@ namespace v1
         SubMesh *pSub = pMesh->createSubMesh();
 
         // Set options
-        pSub->vertexData[0] = OGRE_NEW VertexData();
-        VertexData* vertexData = pSub->vertexData[0];
+        pSub->vertexData[VpNormal] = OGRE_NEW VertexData();
+        VertexData* vertexData = pSub->vertexData[VpNormal];
         vertexData->vertexStart = 0;
         VertexBufferBinding* bind = vertexData->vertexBufferBinding;
         VertexDeclaration* decl = vertexData->vertexDeclaration;
@@ -757,8 +757,8 @@ namespace v1
 
         // Set up vertex data
         // Use a single shared buffer
-        pSub->vertexData[0] = OGRE_NEW VertexData();
-        VertexData* vertexData = pSub->vertexData[0];
+        pSub->vertexData[VpNormal] = OGRE_NEW VertexData();
+        VertexData* vertexData = pSub->vertexData[VpNormal];
         // Set up Vertex Declaration
         VertexDeclaration* vertexDecl = vertexData->vertexDeclaration;
         size_t currOffset = 0;
@@ -1028,13 +1028,13 @@ namespace v1
         size_t curVertexOffset = 0;
 
         // Access shared vertices
-        VertexData* sharedVertexData = mesh->sharedVertexData[0];
+        VertexData* sharedVertexData = mesh->sharedVertexData[VpNormal];
 
         for (size_t subMeshIdx = 0; subMeshIdx < mesh->getNumSubMeshes(); subMeshIdx++)
         {
             SubMesh *subMesh = mesh->getSubMesh(subMeshIdx);
 
-            IndexData *indexData = subMesh->indexData[0];
+            IndexData *indexData = subMesh->indexData[VpNormal];
             HardwareIndexBuffer::IndexType idxType = indexData->indexBuffer->getType();
             IndicesMap indicesMap = (idxType == HardwareIndexBuffer::IT_16BIT) ? getUsedIndices<uint16>(indexData) :
                                                                                  getUsedIndices<uint32>(indexData);
@@ -1079,7 +1079,7 @@ namespace v1
 
             // Store new attributes
             subMesh->useSharedVertices = false;
-            subMesh->vertexData[0] = newVertexData;
+            subMesh->vertexData[VpNormal] = newVertexData;
 
             // Transfer bone assignments to the submesh
             size_t offset = curVertexOffset + newVertexData->vertexCount;
@@ -1097,13 +1097,13 @@ namespace v1
         }
 
         // Release shared vertex data
-        if( mesh->sharedVertexData[0] == mesh->sharedVertexData[1] )
-            mesh->sharedVertexData[1] = 0;
+        if( mesh->sharedVertexData[VpNormal] == mesh->sharedVertexData[VpShadow] )
+            mesh->sharedVertexData[VpShadow] = 0;
 
-        delete mesh->sharedVertexData[0];
-        delete mesh->sharedVertexData[1];
-        mesh->sharedVertexData[0] = 0;
-        mesh->sharedVertexData[1] = 0;
+        delete mesh->sharedVertexData[VpNormal];
+        delete mesh->sharedVertexData[VpShadow];
+        mesh->sharedVertexData[VpNormal] = 0;
+        mesh->sharedVertexData[VpShadow] = 0;
         mesh->clearBoneAssignments();
 
         mesh->prepareForShadowMapping( false );

@@ -67,6 +67,13 @@ namespace Ogre {
         return FastHash((const char*)&data, sizeof(T), hashSoFar);
     }
 
+    enum VertexPass
+    {
+        VpNormal,
+        VpShadow,
+        NumVertexPass
+    };
+
 
     /** Comparison functions used for the depth/stencil buffer operations and 
         others. */
