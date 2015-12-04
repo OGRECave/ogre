@@ -408,7 +408,7 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 # WinRT can only use the standard allocator
 set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Forcing Standard Allocator for WinRT" FORCE)
 else ()
-set(OGRE_CONFIG_ALLOCATOR 4 CACHE STRING
+set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING
 "Specify the memory allocator to use. Possible values:
   1 - Standard allocator
   2 - nedmalloc
