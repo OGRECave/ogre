@@ -1,6 +1,9 @@
 set(GENERATOR)
 set(OTHER)
 set(BUILD_FREETYPE FALSE)
+
+set(CMAKE_BUILD_TYPE Debug)
+
 set(RENDERSYSTEMS
     # tests only run with the legacy GL rendersystem as MESA is too old on buildbot
     -DOGRE_BUILD_RENDERSYSTEM_GL=$ENV{TEST}
@@ -20,7 +23,7 @@ if(DEFINED ENV{APPVEYOR})
         -DOGRE_BUILD_RENDERSYSTEM_D3D9=FALSE
         -DOGRE_BUILD_RENDERSYSTEM_GL=FALSE
         -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS=TRUE)
-    set(OTHER -DOGRE_DEPENDENCIES_DIR=ogredeps)
+    set(OTHER -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
 
     if(NOT EXISTS ogredeps)
         set(BUILD_FREETYPE TRUE)
@@ -39,7 +42,7 @@ if(DEFINED ENV{ANDROID})
 
     set(OTHER
         ${ANDROID_FLAGS}
-        -DOGRE_DEPENDENCIES_DIR=ogredeps)
+        -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
 
     message(STATUS "Downloading Android NDK")
     file(DOWNLOAD
@@ -59,6 +62,7 @@ if(BUILD_FREETYPE)
     execute_process(COMMAND cmake -E tar xf freetype-2.6.2.tar.gz)
     execute_process(COMMAND cmake
         -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         ${ANDROID_FLAGS}
         ${GENERATOR}
         ..
@@ -67,7 +71,7 @@ if(BUILD_FREETYPE)
 endif()
 
 execute_process(COMMAND cmake
-    -DCMAKE_BUILD_TYPE=Debug
+    -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DOGRE_BUILD_TESTS=ON
     -DOGRE_CONFIG_ALLOCATOR=1 # disable nedalloc
     ${RENDERSYSTEMS}
