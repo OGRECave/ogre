@@ -48,14 +48,6 @@ namespace Ogre
     {
         HlmsManager *mHlmsManager;
 
-        struct PackedTexture
-        {
-            TexturePtr  texture;
-            uint16      xIdx;
-            HlmsSamplerblock const * samplerblock;
-            PackedTexture() : xIdx( 0 ), samplerblock( 0 ) {}
-        };
-
         static HlmsPbsDatablock::Workflows parseWorkflow( const char *value );
         static HlmsPbsDatablock::TransparencyModes parseTransparencyMode( const char *value );
         static PbsBlendModes parseBlendMode( const char *value );

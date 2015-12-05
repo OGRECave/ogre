@@ -571,6 +571,39 @@ namespace Ogre
         return mFresnelTypeSizeBytes != 4;
     }
     //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::_setTextures( PackedTexture packedTextures[NUM_PBSM_TEXTURE_TYPES] )
+    {
+        PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        for( int i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+        {
+            if( mSamplerblocks[i] )
+                hlmsManager->destroySamplerblock( mSamplerblocks[i] );
+
+            mTexToBakedTextureIdx[i] = packedTextures[i].xIdx;
+            textures[i] = PbsBakedTexture( packedTextures[i].texture, packedTextures[i].samplerblock );
+            mSamplerblocks[i] = packedTextures[i].samplerblock;
+
+            if( !textures[i].texture.isNull() && !mSamplerblocks[i] )
+            {
+                HlmsSamplerblock samplerBlockRef;
+                if( i >= PBSM_DETAIL0 && i <= PBSM_DETAIL3_NM )
+                {
+                    //Detail maps default to wrap mode.
+                    samplerBlockRef.mU = TAM_WRAP;
+                    samplerBlockRef.mV = TAM_WRAP;
+                    samplerBlockRef.mW = TAM_WRAP;
+                }
+
+                mSamplerblocks[i] = hlmsManager->getSamplerblock( samplerBlockRef );
+            }
+        }
+
+        bakeTextures( textures );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setTexture( PbsTextureTypes texType, uint16 arrayIndex,
                                        const TexturePtr &newTexture, const HlmsSamplerblock *refParams )
     {

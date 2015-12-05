@@ -383,7 +383,7 @@ namespace Ogre
             loadTexture( subobj, blocks, PBSM_REFLECTION, pbsDatablock, packedTextures );
         }
 
-        //pbsDatablock->setTextures()
+        pbsDatablock->_setTextures( packedTextures );
     }
 }
 
