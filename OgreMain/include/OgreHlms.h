@@ -30,6 +30,9 @@ THE SOFTWARE.
 
 #include "OgreStringVector.h"
 #include "OgreHlmsCommon.h"
+#ifdef OGRE_USE_JSON
+    #include "OgreHlmsJson.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -318,6 +321,20 @@ namespace Ogre
         */
         void setHighQuality( bool highQuality );
         bool getHighQuality(void) const                     { return mHighQuality; }
+
+#ifdef OGRE_USE_JSON
+        /** Loads datablock values from a JSON value. @see HlmsJson.
+        @param jsonValue
+            JSON Object containing the definition of this datablock.
+        @param blocks
+            All the loaded Macro-, Blend- & Samplerblocks the JSON has
+            defined and may be referenced by the datablock declaration.
+        @param datablock
+            Datablock to fill the values.
+        */
+        virtual void loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
+                               HlmsDatablock *datablock ) {}
+#endif
 
         /** Destroys all the cached shaders and in the next opportunity will recreate them
             from the new location. This is very useful for fast iteration and real-time

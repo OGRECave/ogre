@@ -502,5 +502,4 @@ namespace Ogre
                 mRegisteredHlms[i]->_changeRenderSystem( newRs );
         }
     }
-    //-----------------------------------------------------------------------------------
 }

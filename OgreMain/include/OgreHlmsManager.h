@@ -213,6 +213,10 @@ namespace Ogre
         bool getShadowMappingUseBackFaces(void)             { return mShadowMappingUseBackFaces; }
 
         void _changeRenderSystem( RenderSystem *newRs );
+
+#ifdef OGRE_USE_JSON
+        void loadMaterials( const char *jsonString );
+#endif
     };
     /** @} */
     /** @} */
