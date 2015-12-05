@@ -98,7 +98,7 @@ else ()
   set(OGRE_PLATFORM_X64 FALSE)
 endif ()
 
-if (NOT APPLE)
+if (NOT APPLE AND NOT ANDROID)
   # Create debug libraries with _d postfix
   set(CMAKE_DEBUG_POSTFIX "_d")
 endif ()
