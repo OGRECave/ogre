@@ -84,7 +84,6 @@
 #   include "Dot3Bump.h"
 #   include "Fresnel.h"
 #   include "Water.h"
-#   include "AtomicCounters.h"
 #   include "BezierPatch.h"
 #   include "CameraTrack.h"
 #   include "CharacterSample.h"
