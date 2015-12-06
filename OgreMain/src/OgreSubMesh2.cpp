@@ -335,17 +335,20 @@ namespace Ogre {
             return 0;
 
         //Create & copy the index buffer
+        const size_t indexSize = indexData->indexBuffer->getIndexSize();
         bool keepAsShadow = mParent->mIndexBufferShadowBuffer;
         VaoManager *vaoManager = mParent->mVaoManager;
-        void *indexDataPtr = OGRE_MALLOC_SIMD( indexData->indexCount *
-                                               indexData->indexBuffer->getIndexSize(),
+        void *indexDataPtr = OGRE_MALLOC_SIMD( indexData->indexCount * indexSize,
                                                MEMCATEGORY_GEOMETRY );
         FreeOnDestructor indexDataPtrContainer( indexDataPtr );
         IndexBufferPacked::IndexType indexType = static_cast<IndexBufferPacked::IndexType>(
                                                         indexData->indexBuffer->getType() );
 
-        memcpy( indexDataPtr, indexData->indexBuffer->lock( v1::HardwareBuffer::HBL_READ_ONLY ),
-                indexData->indexBuffer->getIndexSize() * indexData->indexCount );
+        const uint8 *srcIndexDataPtr = reinterpret_cast<uint8*>(
+                    indexData->indexBuffer->lock( v1::HardwareBuffer::HBL_READ_ONLY ) );
+
+        memcpy( indexDataPtr, srcIndexDataPtr + indexData->indexStart * indexSize,
+                indexSize * indexData->indexCount );
         indexData->indexBuffer->unlock();
 
         IndexBufferPacked *indexBuffer = vaoManager->createIndexBuffer( indexType, indexData->indexCount,
