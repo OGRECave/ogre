@@ -40,8 +40,7 @@ namespace Ogre
                 FastArray<Real>::const_iterator it = std::lower_bound( owner->mLodMesh->begin(),
                                                                         owner->mLodMesh->end(),
                                                                         lodValues[j] );
-                owner->mCurrentMeshLod = std::min<size_t>( it - owner->mLodMesh->begin(),
-                                                            owner->mLodMesh->size() - 1 );
+                owner->mCurrentMeshLod = std::max<int>( it - owner->mLodMesh->begin() - 1, 0 );
             }
 
             FastArray< FastArray<Real> const * >::const_iterator itor = owner->mLodMaterial.begin();
@@ -54,8 +53,7 @@ namespace Ogre
                 const FastArray<Real> *lodVec = *itor;
                 FastArray<Real>::const_iterator it = std::lower_bound( lodVec->begin(), lodVec->end(),
                                                                        lodValues[j] );
-                *itMatLodLevel++ = (unsigned char)std::min<size_t>( it - lodVec->begin(),
-                                                                    lodVec->size() - 1 );
+                *itMatLodLevel++ = (unsigned char)std::max<int>( it - lodVec->begin() - 1, 0 );
                 ++itor;
             }
         }
