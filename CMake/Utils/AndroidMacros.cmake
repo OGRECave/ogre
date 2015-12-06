@@ -59,7 +59,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	endif()
 
 	if(OGRE_CONFIG_ENABLE_FREEIMAGE)
-	    add_static_libs_from_paths(${FreeImage_LIBRARY_REL})
+	    add_static_libs_from_paths(${FreeImage_LIBRARIES})
     endif()
 
     if(OGRE_USE_BOOST)
@@ -67,7 +67,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	   add_static_libs_from_paths(${Boost_LIBRARIES})
     endif()
 
-    add_static_libs_from_paths(${OIS_LIBRARY_REL} ${FREETYPE_LIBRARY_REL} ${ZZip_LIBRARY_REL})
+    add_static_libs_from_paths(${OIS_LIBRARIES} ${FREETYPE_LIBRARIES} ${ZZip_LIBRARIES})
 
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")
