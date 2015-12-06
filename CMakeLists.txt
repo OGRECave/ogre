@@ -98,7 +98,7 @@ else ()
   set(OGRE_PLATFORM_X64 FALSE)
 endif ()
 
-if (NOT APPLE)
+if (NOT APPLE AND NOT ANDROID)
   # Create debug libraries with _d postfix
   set(CMAKE_DEBUG_POSTFIX "_d")
 endif ()
@@ -173,32 +173,22 @@ if (MINGW)
 endif ()
 
 if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
-  # Test for GCC visibility
-  include(CheckCXXCompilerFlag)
-  check_cxx_compiler_flag(-fvisibility=hidden OGRE_GCC_VISIBILITY)
-  if (OGRE_GCC_VISIBILITY)
-    # determine gcc version
-    execute_process(COMMAND ${CMAKE_CXX_COMPILER} -dumpversion
-      OUTPUT_VARIABLE OGRE_GCC_VERSION)
-    message(STATUS "Detected g++ ${OGRE_GCC_VERSION}")
-    message(STATUS "Enabling GCC visibility flags")
-    set(OGRE_GCC_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY -fvisibility=hidden")
+  include(GenerateExportHeader)
+  add_compiler_export_flags(OGRE_GCC_VISIBILITY_FLAGS)
+
+  if (OGRE_GCC_VISIBILITY_FLAGS)
+    set(OGRE_GCC_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY ${OGRE_GCC_VISIBILITY_FLAGS}")
     set(XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "YES")
 
-    # check if we can safely add -fvisibility-inlines-hidden
-    string(TOLOWER "${CMAKE_BUILD_TYPE}" OGRE_BUILD_TYPE)
-    if (OGRE_BUILD_TYPE STREQUAL "debug" AND OGRE_GCC_VERSION VERSION_LESS "4.2")
-      message(STATUS "Skipping -fvisibility-inlines-hidden due to possible bug in g++ < 4.2")
-    else ()
-      if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+      if(OGRE_GCC_VISIBILITY_FLAGS MATCHES -fvisibility-inlines-hidden)
         message(STATUS "Skipping -fvisibility-inlines-hidden due to linker issues")
         set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
       else()
-        set(OGRE_GCC_VISIBILITY_FLAGS "${OGRE_GCC_VISIBILITY_FLAGS} -fvisibility-inlines-hidden")
         set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "YES")
       endif()
     endif ()
-  endif (OGRE_GCC_VISIBILITY)
+  endif (OGRE_GCC_VISIBILITY_FLAGS)
 
   # Fix x64 issues on Linux
   if(OGRE_PLATFORM_X64 AND NOT APPLE)
@@ -386,7 +376,7 @@ endif()
 cmake_dependent_option(OGRE_STATIC "Static build" FALSE "" TRUE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D9 "Build Direct3D9 RenderSystem" TRUE "WIN32;DirectX9_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_D3D11 "Build Direct3D11 RenderSystem [EXPERIMENTAL]" TRUE "WIN32;DirectX11_FOUND OR WINDOWS_STORE OR WINDOWS_PHONE" FALSE)
-cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL3PLUS "Build OpenGL 3+ RenderSystem [EXPERIMENTAL]" FALSE "OPENGL_FOUND; NOT OGRE_BUILD_RENDERSYSTEM_GLES; NOT OGRE_BUILD_RENDERSYSTEM_GLES2;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
+cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL3PLUS "Build OpenGL 3+ RenderSystem [EXPERIMENTAL]" FALSE "OPENGL_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GL "Build OpenGL RenderSystem" TRUE "OPENGL_FOUND;NOT OGRE_BUILD_PLATFORM_APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES "Build OpenGL ES 1.x RenderSystem" FALSE "OPENGLES_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_RENDERSYSTEM_GLES2 "Build OpenGL ES 2.x RenderSystem" FALSE "OPENGLES2_FOUND;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
@@ -418,7 +408,7 @@ if (WINDOWS_STORE OR WINDOWS_PHONE)
 # WinRT can only use the standard allocator
 set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING "Forcing Standard Allocator for WinRT" FORCE)
 else ()
-set(OGRE_CONFIG_ALLOCATOR 4 CACHE STRING
+set(OGRE_CONFIG_ALLOCATOR 1 CACHE STRING
 "Specify the memory allocator to use. Possible values:
   1 - Standard allocator
   2 - nedmalloc
@@ -580,4 +570,3 @@ include(Packaging)
 
 # Show feature summary
 include(FeatureSummary)
-
