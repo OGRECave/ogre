@@ -29,12 +29,12 @@
 #ifndef __SampleBrowser_Android_H__
 #define __SampleBrowser_Android_H__
 
-#include "OIS.h"
 #include <android_native_app_glue.h>
 #include <android/log.h>
 #include <EGL/egl.h>
 #include "OgrePlatform.h"
 #include "SampleBrowser.h"
+#include "Input.h"
 #include "Android/OgreAndroidEGLWindow.h"
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
@@ -54,163 +54,7 @@
 
 namespace OgreBites
 {
-    class OgreAndroidBridge;
-    
-    /*=============================================================================
-     | Android input handling
-     =============================================================================*/
-    class AndroidMultiTouch : public OIS::MultiTouch
-    {
-    public:
-        AndroidMultiTouch():OIS::MultiTouch("Ogre", false, 0, 0){}
-        
-        /** @copydoc Object::setBuffered */
-        virtual void setBuffered(bool buffered){}
-        
-        /** @copydoc Object::capture */
-        virtual void capture(){}
-        
-        /** @copydoc Object::queryInterface */
-        virtual OIS::Interface* queryInterface(OIS::Interface::IType type) {return 0;}
-        
-        /** @copydoc Object::_initialize */
-        virtual void _initialize(){}
-        
-        OIS::MultiTouchState &getMultiTouchState(int i){
-            while(i >= mStates.size()){
-                Ogre::RenderWindow* pRenderWnd = static_cast<Ogre::RenderWindow*>(Ogre::Root::getSingleton().getRenderTarget("OgreWindow"));
-                if(pRenderWnd)
-                {
-                    OIS::MultiTouchState state;
-                    state.width = pRenderWnd->getWidth();
-                    state.height = pRenderWnd->getHeight();
-                    mStates.push_back(state);
-                }
-            }
-            return mStates[i];
-        }
-    };
-    
-    class AndroidKeyboard : public OIS::Keyboard
-    {
-    public:
-        AndroidKeyboard():OIS::Keyboard("Ogre", false, 1, 0){}
-        
-        /** @copydoc Object::setBuffered */
-        virtual void setBuffered(bool buffered){}
-        
-        /** @copydoc Object::capture */
-        virtual void capture(){}
-        
-        /** @copydoc Object::queryInterface */
-        virtual OIS::Interface* queryInterface(OIS::Interface::IType type) {return 0;}
-        
-        /** @copydoc Object::_initialize */
-        virtual void _initialize(){}
-        
-        virtual bool isKeyDown( OIS::KeyCode key ) const{
-            return false;
-        }
-        
-        virtual const std::string& getAsString( OIS::KeyCode kc ){
-            static std::string defstr = "";
-            return defstr;
-        }
-        
-        virtual void copyKeyStates( char keys[256] ) const{
-            
-        }
-    };
-    
-    /*=============================================================================
-     | Android input injection
-     =============================================================================*/
-    class AndroidInputInjector
-    {
-    private:
-        SampleBrowser* mBrowser;
-        AndroidMultiTouch* mTouch;
-        AndroidKeyboard* mKeyboard;
-        
-    public:
-        
-        AndroidInputInjector(SampleBrowser* browser, AndroidMultiTouch* touch, AndroidKeyboard* keyboard) 
-            : mBrowser(browser), mTouch(touch), mKeyboard(keyboard) {}
-        
-        void injectKeyEvent(int action, int32_t keyCode)
-        {
-            if(keyCode == AKEYCODE_BACK)
-            {
-                OIS::KeyEvent evt(mKeyboard, OIS::KC_ESCAPE, 0);
-                if(action == 0)
-                {
-                    mBrowser->keyPressed(evt);
-                }
-                else
-                {
-                    mBrowser->keyReleased(evt);
-                }
-            }
-        }
-        
-        void injectTouchEvent(int action, float x, float y, int pointerId = 0)
-        {
-            OIS::MultiTouchState &state = mTouch->getMultiTouchState(pointerId);
-            
-            switch(action)
-            {
-                case 0:
-                    state.touchType = OIS::MT_Pressed;
-                    break;
-                case 1:
-                    state.touchType = OIS::MT_Released;
-                    break;
-                case 2:
-                    state.touchType = OIS::MT_Moved;
-                    break;
-                case 3:
-                    state.touchType = OIS::MT_Cancelled;
-                    break;
-                default:
-                    state.touchType = OIS::MT_None;
-            }
-            
-            if(state.touchType != OIS::MT_None)
-            {
-                int last = state.X.abs;
-                state.X.abs =  (int)x;
-                state.X.rel = state.X.abs - last;
-                
-                last = state.Y.abs;
-                state.Y.abs = (int)y;
-                state.Y.rel = state.Y.abs - last;
-                
-                state.Z.abs = 0;
-                state.Z.rel = 0;
-                
-                OIS::MultiTouchEvent evt(mTouch, state);
-                
-                switch(state.touchType)
-                {
-                    case OIS::MT_Pressed:
-                        mBrowser->touchPressed(evt);
-                        break;
-                    case OIS::MT_Released:
-                        mBrowser->touchReleased(evt);
-                        break;
-                    case OIS::MT_Moved:
-                        mBrowser->touchMoved(evt);
-                        break;
-                    case OIS::MT_Cancelled:
-                        mBrowser->touchCancelled(evt);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    };
-    
+
     /*=============================================================================
      | Ogre Android bridge
      =============================================================================*/
@@ -221,10 +65,10 @@ namespace OgreBites
         {
             state->onAppCmd = &OgreAndroidBridge::handleCmd;
             state->onInputEvent = &OgreAndroidBridge::handleInput;
-            
+
             if(mInit)
                 return;
-         
+
             mRoot = new Ogre::Root();
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader = new Ogre::StaticPluginLoader();
@@ -234,62 +78,107 @@ namespace OgreBites
             mRoot->initialise(false);
             mInit = true;
         }
-        
+
         static void shutdown()
         {
             if(!mInit)
                 return;
-                
+
             mInit = false;
-            
+
             if(mBrowser)
             {
                 mBrowser->closeApp();
                 OGRE_DELETE mBrowser;
                 mBrowser = NULL;
             }
-      
+
             OGRE_DELETE mRoot;
             mRoot = NULL;
             mRenderWnd = NULL;
-            
-            delete mTouch;
-            mTouch = NULL;
-            
-            delete mKeyboard;
-            mKeyboard = NULL;
-            
-            delete mInputInjector;
-            mInputInjector = NULL;
-            
+
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader->unload();
             delete mStaticPluginLoader;
             mStaticPluginLoader = NULL;
 #endif
         }
+
+        static void injectKeyEvent(int action, int32_t keyCode)
+        {
+            if(keyCode != AKEYCODE_BACK)
+                return;
+
+            KeyboardEvent evt = {SDL_SCANCODE_ESCAPE, 0};
+
+            if(action == AKEY_EVENT_ACTION_DOWN){
+                mBrowser->keyPressed(evt);
+            } else {
+                mBrowser->keyReleased(evt);
+            }
+        }
+        
+        static void injectTouchEvent(int action, float x, float y, int pointerId = 0)
+        {
+            static TouchFingerEvent last = {0};
+            TouchFingerEvent evt = {0};
+
+            switch (action) {
+            case AMOTION_EVENT_ACTION_DOWN:
+                evt.type = SDL_FINGERDOWN;
+                break;
+            case AMOTION_EVENT_ACTION_UP:
+                evt.type = SDL_FINGERUP;
+                break;
+            case AMOTION_EVENT_ACTION_MOVE:
+                evt.type = SDL_FINGERMOTION;
+                break;
+            default:
+                return;
+            }
+
+            evt.x = x / mBrowser->getRenderWindow()->getWidth();
+            evt.y = y / mBrowser->getRenderWindow()->getHeight();
+
+            if(evt.type == SDL_FINGERMOTION) {
+                evt.dx = evt.x - last.x;
+                evt.dy = evt.y - last.y;
+            }
+
+            last = evt;
+
+            switch (evt.type) {
+            case SDL_FINGERDOWN:
+                // for finger down we have to move the pointer first
+                mBrowser->touchMoved(evt);
+                mBrowser->touchPressed(evt);
+                break;
+            case SDL_FINGERUP:
+                mBrowser->touchReleased(evt);
+                break;
+            case SDL_FINGERMOTION:
+                mBrowser->touchMoved(evt);
+                break;
+            }
+        }
         
         static int32_t handleInput(struct android_app* app, AInputEvent* event) 
         {
-            if (mInputInjector)
-            {
-                if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) 
-                {
-                    int action = (int)(AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event));
-                    
-                    if(action == 0)
-                        mInputInjector->injectTouchEvent(2, AMotionEvent_getRawX(event, 0), AMotionEvent_getRawY(event, 0) );
-                    
-                    mInputInjector->injectTouchEvent(action, AMotionEvent_getRawX(event, 0), AMotionEvent_getRawY(event, 0) );
-                }
-                else 
-                {
-                    mInputInjector->injectKeyEvent(AKeyEvent_getAction(event), AKeyEvent_getKeyCode(event));
-                }
+            if (!mBrowser)
+                return 0;
 
-                return 1;
+            if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION)
+            {
+                int32_t action = AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event);
+                injectTouchEvent(action, AMotionEvent_getRawX(event, 0),
+                                 AMotionEvent_getRawY(event, 0));
             }
-            return 0;
+            else
+            {
+                injectKeyEvent(AKeyEvent_getAction(event), AKeyEvent_getKeyCode(event));
+            }
+
+            return 1;
         }
         
         static void handleCmd(struct android_app* app, int32_t cmd)
@@ -312,20 +201,12 @@ namespace OgreBites
                             opt["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
                             
                             mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
-                            
-                            if(!mTouch)
-                                mTouch = new AndroidMultiTouch();
-                            
-                            if(!mKeyboard)
-                                mKeyboard = new AndroidKeyboard();
-                            
+
                             if(!mBrowser)
                             {
                                 mBrowser = OGRE_NEW SampleBrowser();
-                                mBrowser->initAppForAndroid(mRenderWnd, app, mTouch, mKeyboard);
+                                mBrowser->initAppForAndroid(mRenderWnd, app);
                                 mBrowser->initApp();
-                                
-                                mInputInjector = new AndroidInputInjector(mBrowser, mTouch, mKeyboard);
                             }
                         }
                         else
@@ -380,9 +261,6 @@ namespace OgreBites
             
     private:
         static SampleBrowser* mBrowser;
-        static AndroidInputInjector* mInputInjector;
-        static AndroidMultiTouch* mTouch;
-        static AndroidKeyboard* mKeyboard;
         static Ogre::RenderWindow* mRenderWnd;
         static Ogre::Root* mRoot;
         static bool mInit;

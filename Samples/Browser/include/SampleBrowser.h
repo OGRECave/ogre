@@ -222,7 +222,7 @@ namespace OgreBites
           | init pre-created window for android
           -----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app, OIS::MultiTouch *mouse, OIS::Keyboard *keyboard)
+        void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app)
         {
             mWindow = window;
 
@@ -904,6 +904,8 @@ namespace OgreBites
         // convert and redirect
         virtual bool touchMoved(const TouchFingerEvent& evt) {
             MouseMotionEvent e;
+            e.x = evt.x * mWindow->getWidth();
+            e.y = evt.y * mWindow->getHeight();
             e.xrel = evt.dx * mWindow->getWidth();
             e.yrel = evt.dy * mWindow->getHeight();
             return mouseMoved(e);

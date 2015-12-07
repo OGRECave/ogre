@@ -1,6 +1,8 @@
 # Configure Samples build
 
-if (OGRE_BUILD_SAMPLES AND NOT SDL2_FOUND AND NOT ((WINDOWS_STORE OR WINDOWS_PHONE) AND OIS_INCLUDE_DIRS))
+if(ANDROID)
+  # we actually do not need anything
+elseif (OGRE_BUILD_SAMPLES  AND NOT SDL2_FOUND AND NOT ((WINDOWS_STORE OR WINDOWS_PHONE) AND OIS_INCLUDE_DIRS))
   message(STATUS "Could not find dependency: SDL2")
   message(STATUS "Skipping samples build")
   set(OGRE_BUILD_SAMPLES 0)
