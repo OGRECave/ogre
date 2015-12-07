@@ -15,7 +15,7 @@ addons:
 before_script:
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
-    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 cppunit cmake ; fi
+    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 cppunit cmake && gem install xcpretty ; fi
 osx_image: xcode7.1
 env:
     - TEST=TRUE
@@ -36,7 +36,7 @@ matrix:
           env: ANDROID=TRUE
 script:
     - cmake -P ci-build.cmake
-    - cmake --build .
+    - if [ "$TRAVIS_OS_NAME" !=   "osx" ]; then cmake --build . ; else set -o pipefail && cmake --build . | xcpretty  ; fi
     - if [ $TEST ]; then bin/Test_Ogre ; fi
 os:
     - linux
