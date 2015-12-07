@@ -107,34 +107,38 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
 	configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
     
-	add_custom_command(
-	                    TARGET ${ANDROID_PROJECT_TARGET}
-                        POST_BUILD
-	                    COMMAND ${ANDROID_EXECUTABLE} update project  --target ${ANDROID_TARGET} --path "${NDKOUT}"
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
-	
-	if(DEBUG)	 
-	 	add_custom_command(
-							TARGET ${ANDROID_PROJECT_TARGET}
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	else()
-		add_custom_command(
-							TARGET ${ANDROID_PROJECT_TARGET}
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	endif()
-                  
-	add_custom_command(
-	                    TARGET ${ANDROID_PROJECT_TARGET}
-                        POST_BUILD
-	                    COMMAND ${ANT_EXECUTABLE} debug
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
+    if(DEBUG)    
+        add_custom_command(
+                            TARGET ${ANDROID_PROJECT_TARGET}
+                            POST_BUILD
+                            COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
+                            WORKING_DIRECTORY ${NDKOUT}
+                          )
+    else()
+        add_custom_command(
+                            TARGET ${ANDROID_PROJECT_TARGET}
+                            POST_BUILD
+                            COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1
+                            WORKING_DIRECTORY ${NDKOUT}
+                          )
+    endif()
+    
+    if(EXISTS ${ANDROID_EXECUTABLE})
+    	add_custom_command(
+    	                    TARGET ${ANDROID_PROJECT_TARGET}
+                            POST_BUILD
+    	                    COMMAND ${ANDROID_EXECUTABLE} update project  --target ${ANDROID_TARGET} --path "${NDKOUT}"
+    	                    WORKING_DIRECTORY ${NDKOUT}
+    	                  )
+    	                  
+    	add_custom_command(
+    	                    TARGET ${ANDROID_PROJECT_TARGET}
+                            POST_BUILD
+    	                    COMMAND ${ANT_EXECUTABLE} debug
+    	                    WORKING_DIRECTORY ${NDKOUT}
+    	                  )
+    else()
+        message(WARNING "Android executable not found. Not building ${ANDROID_PROJECT_TARGET} APK. Do you have the Android SDK installed?")
+    endif()
 endmacro(create_android_proj)
 
