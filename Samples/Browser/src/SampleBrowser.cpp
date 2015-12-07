@@ -25,7 +25,9 @@
  THE SOFTWARE.
  -----------------------------------------------------------------------------
  */
+#include <time.h>
 #include "OgrePlatform.h"
+#include <iostream>
 
 // Sadly we needed to add this #if to solve a NACL compiler bug...
 #if (OGRE_PLATFORM == OGRE_PLATFORM_NACL) 
@@ -46,9 +48,6 @@
 #include "SampleBrowser_Android.h"
 
 SampleBrowser* OgreAndroidBridge::mBrowser = NULL;
-AndroidInputInjector* OgreAndroidBridge::mInputInjector = NULL;
-AndroidMultiTouch* OgreAndroidBridge::mTouch = NULL;
-AndroidKeyboard* OgreAndroidBridge::mKeyboard = NULL;
 Ogre::RenderWindow* OgreAndroidBridge::mRenderWnd = NULL;
 Ogre::Root* OgreAndroidBridge::mRoot = NULL;
 bool OgreAndroidBridge::mInit = false;
@@ -60,7 +59,6 @@ StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
 #endif
 
 #include "SampleBrowser.h"
-#include <iostream>
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
 
