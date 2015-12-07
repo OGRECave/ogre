@@ -1,6 +1,6 @@
 set(GENERATOR)
 set(OTHER)
-set(BUILD_FREETYPE FALSE)
+set(BUILD_OGREDEPS FALSE)
 
 set(CMAKE_BUILD_TYPE Debug)
 
@@ -26,7 +26,7 @@ if(DEFINED ENV{APPVEYOR})
     set(OTHER -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
 
     if(NOT EXISTS ogredeps)
-        set(BUILD_FREETYPE TRUE)
+        set(BUILD_OGREDEPS TRUE)
     endif()
 endif()
 
@@ -51,10 +51,10 @@ if(DEFINED ENV{ANDROID})
     execute_process(COMMAND chmod +x android-ndk-r10e-linux-x86_64.bin)
     message(STATUS "Extracting Android NDK")
     execute_process(COMMAND ./android-ndk-r10e-linux-x86_64.bin OUTPUT_QUIET)
-    set(BUILD_FREETYPE TRUE)
+    set(BUILD_OGREDEPS TRUE)
 endif()
 
-if(BUILD_FREETYPE)
+if(BUILD_OGREDEPS)
     message(STATUS "Building freetype")
     file(DOWNLOAD
         http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.gz
@@ -68,6 +68,20 @@ if(BUILD_FREETYPE)
         ..
         WORKING_DIRECTORY freetype-2.6.2/objs)
     execute_process(COMMAND cmake --build freetype-2.6.2/objs --target install)
+
+    message(STATUS "Building ZZIPlib")
+    file(DOWNLOAD
+        https://github.com/paroj/ZZIPlib/archive/master.tar.gz
+        ./ZZIPlib-master.tar.gz)
+    execute_process(COMMAND cmake -E tar xf ZZIPlib-master.tar.gz)
+    execute_process(COMMAND cmake
+        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        ${ANDROID_FLAGS}
+        ${GENERATOR}
+        .
+        WORKING_DIRECTORY ZZIPlib-master)
+    execute_process(COMMAND cmake --build ZZIPlib-master --target install)
 endif()
 
 execute_process(COMMAND cmake
