@@ -445,6 +445,20 @@ namespace Ogre
                 }
             }
 
+            if (image.getNumMipmaps() - baseMipLevel != (numMipmaps - baseMipLevel))
+            {
+                if (image.generateMipmaps(mDefaultTextureParameters[mapType].hwGammaCorrection) == false)
+                {
+                    //unable to generate preferred number of mipmaps, so use mipmaps of the input tex
+                    numMipmaps = image.getNumMipmaps();
+
+                    LogManager::getSingleton().logMessage(
+                        "Warning: texture " + texName + " does not have the 'ideal' number or any mipmaps. "
+                        "This may have a negative affect on performance as the HlmsTextureManager "
+                        "may create more texture arrays than necessary", LML_NORMAL);
+                }
+            }
+
             //Find an array where we can put it. If there is none, we'll have have to create a new one
             TextureArrayVec::iterator dstArrayIt = findSuitableArray( mapType, width, height, depth,
                                                                       faces, imageFormat,
@@ -544,12 +558,6 @@ namespace Ogre
 
             uint16 entryIdx = dstArrayIt->createEntry();
             uint16 arrayIdx = dstArrayIt - mTextureArrays[mapType].begin();
-
-            if( image.getNumMipmaps() - baseMipLevel != dstArrayIt->texture->getNumMipmaps() )
-            {
-                image.generateMipmaps( mDefaultTextureParameters[mapType].
-                                       hwGammaCorrection );
-            }
 
             if( texType != TEX_TYPE_3D && texType != TEX_TYPE_CUBE_MAP )
             {
