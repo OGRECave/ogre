@@ -41,7 +41,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GLES2HardwareBufferManagerBase::GLES2HardwareBufferManagerBase()
     {
-        mStateCacheManager = dynamic_cast<GLES2RenderSystem*>(Root::getSingleton().getRenderSystem())->getGLES2Support()->getStateCacheManager();
+        mGLSupport = getGLES2SupportRef();
+        mStateCacheManager = mGLSupport->getStateCacheManager();
     }
 
     GLES2HardwareBufferManagerBase::~GLES2HardwareBufferManagerBase()
@@ -58,7 +59,7 @@ namespace Ogre {
     {
         GLES2HardwareVertexBuffer* buf = 0;
 
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_map_buffer_range") || mGLSupport->hasMinGLVersion(3, 0))
             buf = OGRE_NEW GLES2HardwareVertexBuffer(this, vertexSize, numVerts, usage, useShadowBuffer);
         else
             // always use shadowBuffer
@@ -77,7 +78,7 @@ namespace Ogre {
                                                                               bool useShadowBuffer)
     {
         GLES2HardwareIndexBuffer* buf = 0;
-        if(getGLES2SupportRef()->checkExtension("GL_EXT_map_buffer_range") || gleswIsSupported(3, 0))
+        if(mGLSupport->checkExtension("GL_EXT_map_buffer_range") || mGLSupport->hasMinGLVersion(3, 0))
             buf = OGRE_NEW GLES2HardwareIndexBuffer(this, itype, numIndexes, usage, useShadowBuffer);
         else
             // always use shadowBuffer

@@ -33,12 +33,12 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreMath.h"
 
-#ifndef GL_GLEXT_PROTOTYPES
-#  define  GL_GLEXT_PROTOTYPES
-#endif
-
 #if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#   include <GL/gl3w.h>
+#else
 #   include <GLES3/gles3w.h>
+#endif
 #else
 #   include <GLES2/gles2w.h>
 #endif
@@ -55,9 +55,6 @@ THE SOFTWARE.
 #       endif
 #   endif
 #elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL) || (OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
-#   ifndef GL_GLEXT_PROTOTYPES
-#       define GL_GLEXT_PROTOTYPES
-#   endif
 #   if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #       include <GLES3/gl3platform.h>
 #       include <GLES3/gl3.h>
@@ -67,9 +64,11 @@ THE SOFTWARE.
 #       include <GLES2/gl2ext.h>
 #   endif
 #   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+#       define GL_GLEXT_PROTOTYPES
 #       define gleswIsSupported(x,y) (false)
 #   endif
 #   if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#       define GL_GLEXT_PROTOTYPES
 #       include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
 #       include "ppapi/c/ppp_graphics_3d.h"
@@ -92,15 +91,58 @@ THE SOFTWARE.
 #           endif
 #       endif
 #   endif
-#   undef  GL_GLEXT_PROTOTYPES
 #   if OGRE_NO_GLES3_SUPPORT == 0
-#       include <GLES3/gl3platform.h>
-#       include <GLES3/gl3.h>
+#   include <GL/glext.h>
 #   else
 #       include <GLES2/gl2.h>
 #       include <GLES2/gl2ext.h>
 #   endif
 #   include <EGL/egl.h>
+#endif
+
+// Defines for ES 3 extensions that are core in GL3
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX && OGRE_NO_GLES3_SUPPORT == 0
+#define glIsProgramPipelineEXT glIsProgramPipeline
+#define glGetProgramPipelineivEXT glGetProgramPipelineiv
+#define glGetProgramPipelineInfoLogEXT glGetProgramPipelineInfoLog
+#define glValidateProgramPipelineEXT glValidateProgramPipeline
+#define GL_LUMINANCE GL_RED
+#define GL_LUMINANCE_ALPHA GL_RG
+
+#define GL_PROGRAM_SEPARABLE_EXT GL_PROGRAM_SEPARABLE
+#define GL_VERTEX_SHADER_BIT_EXT GL_VERTEX_SHADER_BIT
+#define GL_FRAGMENT_SHADER_BIT_EXT GL_FRAGMENT_SHADER_BIT
+#define glDeleteProgramPipelinesEXT glDeleteProgramPipelines
+#define glGenProgramPipelinesEXT glGenProgramPipelines
+#define glBindProgramPipelineEXT glBindProgramPipeline
+#define glProgramParameteriEXT glProgramParameteri
+#define glUseProgramStagesEXT glUseProgramStages
+#define glProgramUniform1fvEXT glProgramUniform1fv
+#define glProgramUniform2fvEXT glProgramUniform2fv
+#define glProgramUniform3fvEXT glProgramUniform3fv
+#define glProgramUniform4fvEXT glProgramUniform4fv
+#define glProgramUniform1ivEXT glProgramUniform1iv
+#define glProgramUniform2ivEXT glProgramUniform2iv
+#define glProgramUniform3ivEXT glProgramUniform3iv
+#define glProgramUniform4ivEXT glProgramUniform4iv
+#define glProgramUniformMatrix2fvEXT glProgramUniformMatrix2fv
+#define glProgramUniformMatrix3fvEXT glProgramUniformMatrix3fv
+#define glProgramUniformMatrix4fvEXT glProgramUniformMatrix4fv
+#define glProgramUniformMatrix2x3fvEXT glProgramUniformMatrix2x3fv
+#define glProgramUniformMatrix2x4fvEXT glProgramUniformMatrix2x4fv
+#define glProgramUniformMatrix3x2fvEXT glProgramUniformMatrix3x2fv
+#define glProgramUniformMatrix3x4fvEXT glProgramUniformMatrix3x4fv
+#define glProgramUniformMatrix4x2fvEXT glProgramUniformMatrix4x2fv
+#define glProgramUniformMatrix4x3fvEXT glProgramUniformMatrix4x3fv
+
+#define GL_ALIASED_POINT_SIZE_RANGE       0x846D
+#define GL_STENCIL_BITS                   0x0D57
+
+// not available in desktop GL
+#define glLabelObjectEXT(a, b, c, d) {}
+#define glInsertEventMarkerEXT(a, b) {}
+#define glPopGroupMarkerEXT(a) {}
+#define glPushGroupMarkerEXT(a, b) {}
 #endif
 
 #if (OGRE_NO_ETC_CODEC == 0)
@@ -131,6 +173,7 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
+    class GLES2Support;
     class GLES2GpuProgram;
     class GLES2Texture;
     typedef SharedPtr<GLES2GpuProgram> GLES2GpuProgramPtr;
@@ -150,28 +193,64 @@ namespace Ogre {
 
 // Defines for extensions that were made core in OpenGL ES 3
 #if OGRE_NO_GLES3_SUPPORT == 0
-#ifndef GL_OES_mapbuffer
+
+// first remove gl2ext definitions
+#undef GL_MAX_SAMPLES_APPLE
+#undef GL_ANY_SAMPLES_PASSED_EXT
+#undef GL_QUERY_RESULT_EXT
+#undef GL_QUERY_RESULT_AVAILABLE_EXT
+#undef GL_WRITE_ONLY_OES
+#undef GL_HALF_FLOAT_OES
+
+#undef GL_RGB8_OES
+#undef GL_RGBA8_OES
+
+#undef GL_RG8_EXT
+#undef GL_RED_EXT
+#undef GL_RG_EXT
+#undef GL_R8_EXT
+#undef GL_R16F_EXT
+#undef GL_R32F_EXT
+#undef GL_RG16F_EXT
+#undef GL_RG32F_EXT
+#undef GL_RGB16F_EXT
+#undef GL_RGB32F_EXT
+#undef GL_RGBA16F_EXT
+#undef GL_RGBA32F_EXT
+#undef GL_DEPTH_COMPONENT32_OES
+
+#undef GL_DEPTH_COMPONENT24_OES
+#undef GL_DEPTH24_STENCIL8_OES
+#undef GL_TEXTURE_MAX_LEVEL_APPLE
+
+#undef GL_MIN_EXT
+#undef GL_MAX_EXT
+
+#undef GL_MAP_WRITE_BIT_EXT
+#undef GL_MAP_FLUSH_EXPLICIT_BIT_EXT
+#undef GL_MAP_INVALIDATE_RANGE_BIT_EXT
+#undef GL_MAP_UNSYNCHRONIZED_BIT_EXT
+#undef GL_MAP_READ_BIT_EXT
+
+#undef GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE
+#undef GL_SYNC_FLUSH_COMMANDS_BIT_APPLE
+#undef GL_TIMEOUT_IGNORED_APPLE
+#undef GL_WAIT_FAILED_APPLE
+
+#undef GL_PROGRAM_BINARY_LENGTH_OES
+
+// redefine the extensions by their core name
 #define GL_WRITE_ONLY_OES GL_MAP_WRITE_BIT
 #define glUnmapBufferOES glUnmapBuffer
-#endif
 
-#ifndef GL_OES_texture_half_float
 #define GL_HALF_FLOAT_OES GL_HALF_FLOAT
-#endif
-
-#ifndef GL_OES_rgb8_rgba8
 #define GL_RGB8_OES GL_RGB8
 #define GL_RGBA8_OES GL_RGBA8
-#endif
 
-#ifndef GL_EXT_texture_rg
 #define GL_RG8_EXT GL_RG8
 #define GL_RED_EXT GL_RED
 #define GL_RG_EXT GL_RG
 #define GL_R8_EXT GL_R8
-#endif
-
-#ifndef GL_EXT_texture_storage
 #define GL_R16F_EXT GL_R16F
 #define GL_R32F_EXT GL_R32F
 #define GL_RG16F_EXT GL_RG16F
@@ -181,31 +260,17 @@ namespace Ogre {
 #define GL_RGBA16F_EXT GL_RGBA16F
 #define GL_RGBA32F_EXT GL_RGBA32F
 #define GL_DEPTH_COMPONENT32_OES GL_DEPTH_COMPONENT32F
-#endif
 
-#ifndef GL_EXT_blend_minmax
 #define GL_MIN_EXT GL_MIN
 #define GL_MAX_EXT GL_MAX
-#endif
 
-#ifndef GL_OES_depth24
 #define GL_DEPTH_COMPONENT24_OES GL_DEPTH_COMPONENT24
-#endif
-
-#ifndef GL_OES_packed_depth_stencil
 #define GL_DEPTH24_STENCIL8_OES GL_DEPTH24_STENCIL8
-#endif
-
-#ifndef GL_APPLE_texture_max_level
 #define GL_TEXTURE_MAX_LEVEL_APPLE GL_TEXTURE_MAX_LEVEL
-#endif
 
-#ifndef GL_APPLE_framebuffer_multisample
 #define GL_MAX_SAMPLES_APPLE GL_MAX_SAMPLES
 #define glRenderbufferStorageMultisampleAPPLE glRenderbufferStorageMultisample
-#endif
 
-#ifndef GL_EXT_occlusion_query_boolean
 #define GL_ANY_SAMPLES_PASSED_EXT GL_ANY_SAMPLES_PASSED
 #define GL_QUERY_RESULT_EXT GL_QUERY_RESULT
 #define GL_QUERY_RESULT_AVAILABLE_EXT GL_QUERY_RESULT_AVAILABLE
@@ -214,9 +279,7 @@ namespace Ogre {
 #define glBeginQueryEXT glBeginQuery
 #define glEndQueryEXT glEndQuery
 #define glGetQueryObjectuivEXT glGetQueryObjectuiv
-#endif
 
-#ifndef GL_EXT_map_buffer_range
 #define GL_MAP_WRITE_BIT_EXT GL_MAP_WRITE_BIT
 #define GL_MAP_FLUSH_EXPLICIT_BIT_EXT GL_MAP_FLUSH_EXPLICIT_BIT
 #define GL_MAP_INVALIDATE_RANGE_BIT_EXT GL_MAP_INVALIDATE_RANGE_BIT
@@ -224,9 +287,7 @@ namespace Ogre {
 #define GL_MAP_READ_BIT_EXT GL_MAP_READ_BIT
 #define glMapBufferRangeEXT glMapBufferRange
 #define glFlushMappedBufferRangeEXT glFlushMappedBufferRange
-#endif
 
-#ifndef GL_APPLE_sync
 #define GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE GL_SYNC_GPU_COMMANDS_COMPLETE
 #define GL_SYNC_FLUSH_COMMANDS_BIT_APPLE GL_SYNC_FLUSH_COMMANDS_BIT
 #define GL_TIMEOUT_IGNORED_APPLE GL_TIMEOUT_IGNORED
@@ -234,7 +295,6 @@ namespace Ogre {
 #define glFenceSyncAPPLE glFenceSync
 #define glClientWaitSyncAPPLE glClientWaitSync
 #define glDeleteSyncAPPLE glDeleteSync
-#endif
 
 #define GL_PROGRAM_BINARY_LENGTH_OES GL_PROGRAM_BINARY_LENGTH
 #define glProgramBinaryOES glProgramBinary
