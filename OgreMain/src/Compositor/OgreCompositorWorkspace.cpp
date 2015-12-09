@@ -382,6 +382,12 @@ namespace Ogre
         memset( boundUavs, 0, sizeof(boundUavs) );
 
         resourcesLayout[mRenderWindow.target] = ResourceLayout::RenderTarget;
+        {
+            Ogre::CompositorChannelVec renderTargetChannel;
+            renderTargetChannel.push_back( mRenderWindow );
+            CompositorNode::fillResourcesLayout( resourcesLayout, renderTargetChannel,
+                                                 ResourceLayout::RenderTarget );
+        }
         CompositorNode::fillResourcesLayout( resourcesLayout, mGlobalTextures,
                                              ResourceLayout::Undefined );
 
