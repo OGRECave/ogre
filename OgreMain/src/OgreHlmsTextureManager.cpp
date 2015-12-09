@@ -453,9 +453,12 @@ namespace Ogre
                     numMipmaps = image.getNumMipmaps();
 
                     LogManager::getSingleton().logMessage(
-                        "Warning: texture " + texName + " does not have the 'ideal' number or any mipmaps. "
-                        "This may have a negative affect on performance as the HlmsTextureManager "
-                        "may create more texture arrays than necessary", LML_NORMAL);
+                        "WARNING: Could not generate mipmaps for " + texName + ". "
+                        "This can negatively impact performance as the HlmsTextureManager "
+                        "will create more texture arrays than necessary, and the lower mips "
+                        "won't be available. Lack of mipmaps also contribute to aliasing. "
+                        "If this is a compressed DDS/PVR file, bake the mipmaps offline.",
+                        LML_NORMAL );
                 }
             }
 
