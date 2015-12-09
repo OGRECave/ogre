@@ -182,8 +182,8 @@ namespace Ogre
         void pop_back()
         {
             assert( mSize > 0 && "Can't pop a zero-sized array" );
-            mData[mSize].~T();
             --mSize;
+            mData[mSize].~T();
         }
 
         iterator insert( iterator where, const T& val )
