@@ -99,6 +99,15 @@ namespace Ogre {
     {       
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
         
+        if(mLockUploadOption & HBU_ONLY_ACTIVE_DEVICE)
+        {
+            IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9DeviceIfExists();
+            mSourceBuffer = mMapDeviceToBufferResources[d3d9Device];
+            mSourceBuffer->mLockOptions = options;
+            mSourceLockedBytes = _lockBuffer(mSourceBuffer, offset, length);
+            return mSourceLockedBytes;          
+        }
+
         DeviceToBufferResourcesIterator it = mMapDeviceToBufferResources.begin();
         IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9DeviceIfExists();
         
@@ -144,6 +153,13 @@ namespace Ogre {
     void D3D9HardwareVertexBuffer::unlockImpl(void)
     {
         D3D9_DEVICE_ACCESS_CRITICAL_SECTION
+
+        if(mLockUploadOption & HBU_ONLY_ACTIVE_DEVICE)
+        {
+            IDirect3DDevice9* d3d9Device = D3D9RenderSystem::getActiveD3D9DeviceIfExists();
+            _unlockBuffer(mMapDeviceToBufferResources[d3d9Device]);
+            return;
+        }
 
         //check if we can delay the update of secondary buffer resources
         //if the user requested it and we have a shadow buffer we can always recreate the buffer later

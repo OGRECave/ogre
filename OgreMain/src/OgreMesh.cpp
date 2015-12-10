@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -1943,7 +1944,7 @@ namespace Ogre {
         pBuffer = destPosBuf->lock(
             (destNormBuf != destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize()) ||
             (destNormBuf == destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize() + destElemNorm->getSize()) ?
-            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL);
+            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL, Root::getSingleton().getFreqUpdatedBuffersUploadOption());
         destElemPos->baseVertexPointerToElement(pBuffer, &pDestPos);
         if (includeNormals)
         {
@@ -1951,7 +1952,7 @@ namespace Ogre {
             {
                 pBuffer = destNormBuf->lock(
                     destNormBuf->getVertexSize() == destElemNorm->getSize() ?
-                    HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL);
+                    HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL, Root::getSingleton().getFreqUpdatedBuffersUploadOption());
             }
             destElemNorm->baseVertexPointerToElement(pBuffer, &pDestNorm);
         }

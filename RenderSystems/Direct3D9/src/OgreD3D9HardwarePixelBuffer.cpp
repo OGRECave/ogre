@@ -647,15 +647,15 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
         PixelUtil::bulkPixelConversion(src, converted);
     }
 
-    size_t rowWidth;
-    if (PixelUtil::isCompressed(converted.format))
+    size_t rowWidth = 0;
+    const bool isConvertedCompressed = PixelUtil::isCompressed(converted.format);
+    if (isConvertedCompressed == true)
     {
         // if the row doesn't divide by 4 - there is padding to 4
         if(converted.rowPitch  % 4 > 0)
         {
-            converted.rowPitch  += 4;
+            converted.rowPitch  += 4 - converted.rowPitch  % 4;
         }
-
         // D3D wants the width of one row of cells in bytes
         if (converted.format == PF_DXT1)
         {
@@ -680,7 +680,9 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
         srcRect = toD3DRECT(converted);
         destRect = toD3DRECT(dstBox);
 
-        if(converted.getWidth() != dstBox.getWidth() || converted.getHeight() != dstBox.getHeight() )
+        if (isConvertedCompressed == false &&
+            (converted.getWidth() != dstBox.getWidth() || converted.getHeight() != dstBox.getHeight() )
+            )
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Source and dest size are different",
                 "D3D9HardwarePixelBuffer::blitFromMemory");
@@ -698,10 +700,12 @@ void D3D9HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::B
     else if (dstBufferResources->volume)
     {
         D3DBOX destBox, srcBox;
+        ZeroMemory(&srcBox, sizeof(D3DBOX));
+
         srcBox = toD3DBOX(converted);
         destBox = toD3DBOX(dstBox);
         size_t sliceWidth;
-        if (PixelUtil::isCompressed(converted.format))
+        if (isConvertedCompressed == true)
         {
             // D3D wants the width of one slice of cells in bytes
             if (converted.format == PF_DXT1)

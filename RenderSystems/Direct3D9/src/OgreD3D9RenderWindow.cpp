@@ -64,12 +64,12 @@ namespace Ogre
 		mDesiredWidth = 0;
 		mDesiredHeight = 0;
     }
-
+    //-----------------------------------------------------------------------------
     D3D9RenderWindow::~D3D9RenderWindow()
     {
         destroy();
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::create(const String& name, unsigned int width, unsigned int height,
         bool fullScreen, const NameValuePairList *miscParams)
     {
@@ -377,7 +377,7 @@ namespace Ogre
         mClosed = false;
         setHidden(mHidden);
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
     {
         if (fullScreen != mIsFullScreen || width != mWidth || height != mHeight)
@@ -449,7 +449,7 @@ namespace Ogre
                 (*it++).second->_updateDimensions();    
         }
     } 
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::adjustWindow(unsigned int clientWidth, unsigned int clientHeight, 
         unsigned int* winWidth, unsigned int* winHeight)
     {
@@ -460,7 +460,7 @@ namespace Ogre
         *winWidth = rc.right - rc.left;
         *winHeight = rc.bottom - rc.top;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::_finishSwitchingFullscreen()
     {       
         if(mIsFullScreen)
@@ -503,7 +503,7 @@ namespace Ogre
         }
         mSwitchingFullscreen = false;
     }
-    
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::buildPresentParameters(D3DPRESENT_PARAMETERS* presentParams)
     {       
         // Set up the presentation parameters       
@@ -524,7 +524,7 @@ namespace Ogre
 
         // http://msdn.microsoft.com/en-us/library/windows/desktop/bb172574%28v=vs.85%29.aspx
         // Multisampling is valid only on a swap chain that is being created or reset with the D3DSWAPEFFECT_DISCARD swap effect.       
-        bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && (isAA() == false);
+        bool useFlipSwap =  D3D9RenderSystem::isDirectX9Ex() && isWindows7 && (isAA() == false) && mVSync;
             
         presentParams->SwapEffect               = useFlipSwap ? D3DSWAPEFFECT_FLIPEX : D3DSWAPEFFECT_DISCARD;
         // triple buffer if VSync is on or if flip swap is used. Otherwise we may get a performance penalty.
@@ -654,7 +654,7 @@ namespace Ogre
 
         }
     }
-    
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::destroy()
     {
         if (mDevice != NULL)
@@ -673,7 +673,7 @@ namespace Ogre
         mActive = false;
         mClosed = true;
     }
-
+    //-----------------------------------------------------------------------------
     bool D3D9RenderWindow::isActive() const
     {
         if (isFullScreen())
@@ -681,12 +681,19 @@ namespace Ogre
 
         return mActive && isVisible();
     }
-
+    //-----------------------------------------------------------------------------
     bool D3D9RenderWindow::isVisible() const
     {
-        return (mHWnd && !IsIconic(mHWnd));
+        HWND currentWindowHandle = mHWnd;
+        bool visible;
+        while ((visible = (IsIconic(currentWindowHandle) == false)) &&
+            (GetWindowLong(currentWindowHandle, GWL_STYLE) & WS_CHILD) != 0)
+        {
+            currentWindowHandle = GetParent(currentWindowHandle);
+        }
+        return visible;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setHidden(bool hidden)
     {
         mHidden = hidden;
@@ -698,7 +705,7 @@ namespace Ogre
                 ShowWindow(mHWnd, SW_SHOWNORMAL);
         }
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setVSyncEnabled(bool vsync)
     {
         mVSync = vsync;
@@ -709,24 +716,24 @@ namespace Ogre
             mDevice->invalidate(this);
         }
     }
-
+    //-----------------------------------------------------------------------------
     bool D3D9RenderWindow::isVSyncEnabled() const
     {
         return mVSync;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::setVSyncInterval(unsigned int interval)
     {
         mVSyncInterval = interval;
         if (mVSync)
             setVSyncEnabled(true);
     }
-
+    //-----------------------------------------------------------------------------
     unsigned int D3D9RenderWindow::getVSyncInterval() const
     {
         return mVSyncInterval;
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::reposition(int top, int left)
     {
         if (mHWnd && !mIsFullScreen)
@@ -735,7 +742,7 @@ namespace Ogre
                 SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
         }
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::resize(unsigned int width, unsigned int height)
     {
         if (!mIsExternal)
@@ -751,7 +758,7 @@ namespace Ogre
         else
             updateWindowRect();
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::windowMovedOrResized()
     {
         if (!mHWnd || IsIconic(mHWnd))
@@ -759,13 +766,13 @@ namespace Ogre
     
         updateWindowRect();
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::swapBuffers( )
     {
         if (mDeviceValid)
             mDevice->present(this);     
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::getCustomAttribute( const String& name, void* pData )
     {
         // Valid attributes and their equvalent native functions:
@@ -810,7 +817,7 @@ namespace Ogre
             return;
         }
     }
-
+    //-----------------------------------------------------------------------------
     void D3D9RenderWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
         mDevice->copyContentsToMemory(this, dst, buffer);

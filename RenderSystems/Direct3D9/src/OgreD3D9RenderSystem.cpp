@@ -1024,9 +1024,9 @@ namespace Ogre
             
 
             // Check for hardware stencil support
-            d3d9Device->GetDepthStencilSurface(&pSurf);
+            HRESULT hr = d3d9Device->GetDepthStencilSurface(&pSurf);
 
-            if (pSurf != NULL)
+            if (pSurf != NULL && SUCCEEDED(hr))
             {
                 D3DSURFACE_DESC surfDesc;
 
@@ -1041,7 +1041,7 @@ namespace Ogre
             }                                                                   
 
             // Check for hardware occlusion support
-            HRESULT hr = d3d9Device->CreateQuery(D3DQUERYTYPE_OCCLUSION,  NULL);
+            hr = d3d9Device->CreateQuery(D3DQUERYTYPE_OCCLUSION,  NULL);
 
             if (FAILED(hr))
                 rsc->unsetCapability(RSC_HWOCCLUSION);

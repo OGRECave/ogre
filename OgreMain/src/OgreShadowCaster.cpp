@@ -196,7 +196,7 @@ namespace Ogre {
         // Lock index buffer for writing, just enough length as we need
         unsigned short* pIdx = static_cast<unsigned short*>(
             indexBuffer->lock(sizeof(unsigned short) * indexBufferUsedSize, sizeof(unsigned short) * preCountIndexes,
-            indexBufferUsedSize == 0 ? HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NO_OVERWRITE));
+            indexBufferUsedSize == 0 ? HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NO_OVERWRITE,  HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE));
         size_t numIndices = indexBufferUsedSize;
         
         // Iterate over the groups and form renderables for each based on their
