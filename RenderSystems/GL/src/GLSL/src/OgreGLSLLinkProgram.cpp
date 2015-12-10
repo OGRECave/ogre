@@ -147,16 +147,8 @@ namespace Ogre {
                 reportGLSLError( glErr, "GLSLLinkProgram::activate", "Error Creating GLSL Program Object", 0 );
             }
 
-            if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
-                 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
-            {
-                getMicrocodeFromCache();
-            }
-            else
-            {
-                compileAndLink();
-
-            }
+            compileWithMicrocodeCacheSupport();
+            
             buildGLUniformReferences();
             extractAttributes();
         }
@@ -180,11 +172,8 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void GLSLLinkProgram::getMicrocodeFromCache(void)
+    const bool GLSLLinkProgram::applyFromMicroCodeCache(Microcode cacheMicrocode)
     {
-        GpuProgramManager::Microcode cacheMicrocode = 
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(getCombinedName());
-        
         GLenum binaryFormat = *((GLenum *)(cacheMicrocode->getPtr()));
         uint8 * programBuffer = cacheMicrocode->getPtr() + sizeof(GLenum);
         size_t sizeOfBuffer = cacheMicrocode->size() - sizeof(GLenum);
@@ -195,15 +184,14 @@ namespace Ogre {
                         );
 
         glGetProgramiv(mGLHandle, GL_LINK_STATUS, &mLinked);
-        if (!mLinked)
-        {
-            //
-            // Something must have changed since the program binaries
-            // were cached away.  Fallback to source shader loading path,
-            // and then retrieve and cache new program binaries once again.
-            //
-            compileAndLink();
-        }
+        // GL_LINK_STATUS may be set to GL_FALSE if there has been a change in hardware or 
+        // software configuration since the program binaries were cached away.
+        return mLinked == GL_TRUE;
+    }
+    //-----------------------------------------------------------------------
+    Ogre::String GLSLLinkProgram::getStringForMicrocodeCacheHash() const
+    {
+        return getCombinedName();
     }
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::extractAttributes(void)
@@ -230,6 +218,35 @@ namespace Ogre {
     bool GLSLLinkProgram::isAttributeValid(VertexElementSemantic semantic, uint index)
     {
         return mValidAttributes.find(getAttributeIndex(semantic, index)) != mValidAttributes.end();
+    }
+    //-----------------------------------------------------------------------
+    bool GLSLLinkProgram::compileMicrocode()
+    {
+        compileAndLink();
+        return mLinked == GL_TRUE;
+    }
+    //-----------------------------------------------------------------------
+    const size_t GLSLLinkProgram::getMicrocodeCacheSize() const
+    {
+        GLint binaryLength = 0;
+        glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
+        return binaryLength + sizeof(GLenum);
+    }
+    //-----------------------------------------------------------------------
+    void GLSLLinkProgram::generateMicroCodeCache(Microcode newMicrocode)
+    {
+        GLint binaryLength = 0;
+        glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
+        // turns out we need this param when loading
+        // it will be the first bytes of the array in the microcode
+        GLenum binaryFormat = 0;
+
+        // get binary
+        uint8 * programBuffer = newMicrocode->getPtr() + sizeof(GLenum);
+        glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, programBuffer);
+
+        // save binary format
+        memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
     }
     //-----------------------------------------------------------------------
     void GLSLLinkProgram::buildGLUniformReferences(void)
@@ -464,7 +481,7 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    Ogre::String GLSLLinkProgram::getCombinedName()
+    Ogre::String GLSLLinkProgram::getCombinedName() const
     {
         String name;
         if (mVertexProgram)
@@ -597,38 +614,6 @@ namespace Ogre {
         if(mLinked)
         {
             logObjectInfo(  getCombinedName() + String(" GLSL link result : "), mGLHandle );
-        }
-
-        if (mLinked)
-        {
-            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-            {
-                // add to the microcode to the cache
-                String name;
-                name = getCombinedName();
-
-                // get buffer size
-                GLint binaryLength = 0;
-                glGetProgramiv(mGLHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength);
-
-                // turns out we need this param when loading
-                // it will be the first bytes of the array in the microcode
-                GLenum binaryFormat = 0; 
-
-                // create microcode
-                GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode(binaryLength + sizeof(GLenum));
-
-                // get binary
-                uint8 * programBuffer = newMicrocode->getPtr() + sizeof(GLenum);
-                glGetProgramBinary(mGLHandle, binaryLength, NULL, &binaryFormat, programBuffer);
-
-                // save binary format
-                memcpy(newMicrocode->getPtr(), &binaryFormat, sizeof(GLenum));
-
-                // add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
-            }
         }
     }
     //-----------------------------------------------------------------------

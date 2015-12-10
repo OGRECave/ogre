@@ -2726,7 +2726,7 @@ namespace Ogre {
 
         MaterialPtr ogreMaterial = MaterialManager::getSingleton().create(stream->getName(), groupName);
 
-        String sourceToUse = CgProgram::resolveCgIncludes(streamAsString, ogreMaterial.getPointer(), stream->getName());
+        String sourceToUse = HighLevelGpuProgram::resolveIncludes(streamAsString, ogreMaterial.getPointer(), stream->getName());
 
         CGeffect cgEffect = cgCreateEffect(mCgContext, sourceToUse.c_str(), NULL);
         checkForCgError("CgFxScriptLoader::parseScript",

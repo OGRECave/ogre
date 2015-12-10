@@ -191,6 +191,7 @@ namespace Ogre {
 #define NOT_FOUND_CUSTOM_ATTRIBUTES_INDEX -1
 
         Ogre::String getCombinedName(void);
+        Ogre::String getCombinedSource(void) const;
         /// Get the the binary data of a program from the microcode cache
         void getMicrocodeFromCache(void);
         /// Compiles and links the vertex and fragment programs

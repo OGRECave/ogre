@@ -154,11 +154,18 @@ namespace Ogre {
             loadFromSource(d3d9Device);
         }
     }
+
+    Ogre::String D3D9GpuProgram::getStringForMicrocodeCacheHash() const
+    {
+        return mSource;
+    }
+
     //-----------------------------------------------------------------------------
     void D3D9GpuProgram::unloadImpl(void)
     {
         SAFE_RELEASE(mExternalMicrocode);
     }
+
     //-----------------------------------------------------------------------------
     void D3D9GpuProgram::loadFromSource(void)
     {
@@ -167,7 +174,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
    void D3D9GpuProgram::loadFromSource( IDirect3DDevice9* d3d9Device )
     {
-        if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(mName) )
+        if (GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getStringForMicrocodeCacheHash()))
         {
             getMicrocodeFromCache( d3d9Device );
         }
@@ -180,7 +187,7 @@ namespace Ogre {
     void D3D9GpuProgram::getMicrocodeFromCache( IDirect3DDevice9* d3d9Device )
     {
         GpuProgramManager::Microcode cacheMicrocode = 
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(mName);
+            GpuProgramManager::getSingleton().getMicrocodeFromCache(getStringForMicrocodeCacheHash());
         
         LPD3DXBUFFER microcode;
         HRESULT hr=D3DXCreateBuffer(cacheMicrocode->size(), &microcode); 
@@ -234,7 +241,7 @@ namespace Ogre {
                 memcpy(newMicrocode->getPtr(), microcode->GetBufferPointer(), microcode->GetBufferSize());
 
                 // add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(mName, newMicrocode);
+                GpuProgramManager::getSingleton().addMicrocodeToCache(getStringForMicrocodeCacheHash(), newMicrocode);
             }
         }
 

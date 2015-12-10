@@ -177,15 +177,8 @@ namespace Ogre {
 	void CgProgram::loadFromSource(void)
 	{
 		selectProfile();
-
-		if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(String("CG_") + mName) )
-		{
-			getMicrocodeFromCache();
-		}
-		else
-		{
-			compileMicrocode();
-		}
+        
+        compileWithMicrocodeCacheSupport();
 
 		if (!mDelegate.isNull())
 		{
@@ -237,11 +230,8 @@ namespace Ogre {
 		}
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::getMicrocodeFromCache(void)
+    const bool CgProgram::applyFromMicroCodeCache(Microcode cacheMicrocode)
 	{
-		GpuProgramManager::Microcode cacheMicrocode = 
-			GpuProgramManager::getSingleton().getMicrocodeFromCache(String("CG_") + mName);
-		
 		cacheMicrocode->seek(0);
 
 		// get size of string
@@ -297,11 +287,11 @@ namespace Ogre {
 			cacheMicrocode->read(&mInputOp, sizeof(CGenum));
 			cacheMicrocode->read(&mOutputOp, sizeof(CGenum));
 		}
-
+        return true;
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::compileMicrocode(void)
-	{
+	bool CgProgram::compileMicrocode()
+{
 		// Create Cg Program
   
 		/// Program handle
@@ -312,11 +302,11 @@ namespace Ogre {
 			LogManager::getSingleton().logMessage(
 				"Attempted to load Cg program '" + mName + "', but no supported "
 				"profile was found. ");
-			return;
+            return false;
 		}
 		buildArgs();
 		// deal with includes
-		String sourceToUse = resolveCgIncludes(mSource, this, mFilename);
+		String sourceToUse = getFullSourceWithIncludes();
 
 		cgProgram = cgCreateProgram(mCgContext, CG_SOURCE, sourceToUse.c_str(), 
 			mSelectedCgProfile, mEntryPoint.c_str(), const_cast<const char**>(mCgArguments));
@@ -361,29 +351,14 @@ namespace Ogre {
 			//  "Error while unloading Cg program " + mName + ": ", 
 			//  mCgContext);
 			cgProgram = 0;
-
-			if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
-			{
-				addMicrocodeToCache();
-			}
 		}
 
-
+        return true;
 	}
 	//-----------------------------------------------------------------------
-	void CgProgram::addMicrocodeToCache()
-	{
-		String name = String("CG_") + mName;
-		size_t programStringSize = mProgramString.size();
-		uint32 sizeOfMicrocode = static_cast<uint32>(
-													 sizeof(size_t) +   // size of mProgramString
-													 programStringSize + // microcode - mProgramString
-													 sizeof(size_t) + // size of param map
-													 mParametersMapSizeAsBuffer);
-
-		// create microcode
-		GpuProgramManager::Microcode newMicrocode = 
-			GpuProgramManager::getSingleton().createMicrocode(sizeOfMicrocode);
+    void CgProgram::generateMicroCodeCache(Microcode newMicrocode)
+    {
+        size_t programStringSize = mProgramString.size();
 
 		newMicrocode->seek(0);
 
@@ -440,10 +415,7 @@ namespace Ogre {
 			newMicrocode->write(&mInputOp, sizeof(CGenum));
 			newMicrocode->write(&mOutputOp, sizeof(CGenum));
 		}
-
-		// add to the microcode to the cache
-		GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
-	}
+    }
 	//-----------------------------------------------------------------------
 	void CgProgram::createLowLevelImpl(void)
 	{
@@ -927,7 +899,19 @@ namespace Ogre {
 			mConstantDefs->generateConstantDefinitionArrayEntries(paramName, def);
 		}
 	}
-	//---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    String CgProgram::getStringForMicrocodeCacheHash() const
+    {
+        StringStream ss;
+		ss << getFullSourceWithIncludes()
+            << "_" << mEntryPoint
+            << "_" << mSelectedCgProfile
+            << "_" << mCompileArgs;
+
+        return ss.str();
+    }
+
+    //---------------------------------------------------------------------
 	void CgProgram::recurseParams(CGparameter parameter, size_t contextArraySize)
 	{
 		while (parameter != 0)
@@ -1266,122 +1250,19 @@ namespace Ogre {
 		mProfiles = profiles;
 		selectProfile();
 	}
-	//-----------------------------------------------------------------------
-	String CgProgram::resolveCgIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName)
-	{
-		String outSource;
-		// output will be at least this big
-		outSource.reserve(inSource.length());
+    //-----------------------------------------------------------------------
+    const size_t CgProgram::getMicrocodeCacheSize() const
+    {
+        uint32 sizeOfMicrocode = static_cast<uint32>(
+            sizeof(size_t) +   // size of mProgramString
+            mProgramString.size() + // microcode - mProgramString
+            sizeof(size_t) + // size of param map
+            mParametersMapSizeAsBuffer);
 
-		size_t startMarker = 0;
-		size_t i = inSource.find("#include");
-		while (i != String::npos)
-		{
-			size_t includePos = i;
-			size_t afterIncludePos = includePos + 8;
-			size_t newLineBefore = inSource.rfind("\n", includePos);
+        return sizeOfMicrocode;
+    }
 
-			// check we're not in a comment
-			size_t lineCommentIt = inSource.rfind("//", includePos);
-			if (lineCommentIt != String::npos)
-			{
-				if (newLineBefore == String::npos || lineCommentIt > newLineBefore)
-				{
-					// commented
-					i = inSource.find("#include", afterIncludePos);
-					continue;
-				}
-
-			}
-			size_t blockCommentIt = inSource.rfind("/*", includePos);
-			if (blockCommentIt != String::npos)
-			{
-				size_t closeCommentIt = inSource.rfind("*/", includePos);
-				if (closeCommentIt == String::npos || closeCommentIt < blockCommentIt)
-				{
-					// commented
-					i = inSource.find("#include", afterIncludePos);
-					continue;
-				}
-
-			}
-
-			// find following newline (or EOF)
-			size_t newLineAfter = inSource.find("\n", afterIncludePos);
-			// find include file string container
-			String endDelimeter = "\"";
-			size_t startIt = inSource.find("\"", afterIncludePos);
-			if (startIt == String::npos || startIt > newLineAfter)
-			{
-				// try <>
-				startIt = inSource.find("<", afterIncludePos);
-				if (startIt == String::npos || startIt > newLineAfter)
-				{
-					OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-						"Badly formed #include directive (expected \" or <) in file "
-						+ fileName + ": " + inSource.substr(includePos, newLineAfter-includePos),
-						"CgProgram::preprocessor");
-				}
-				else
-				{
-					endDelimeter = ">";
-				}
-			}
-			size_t endIt = inSource.find(endDelimeter, startIt+1);
-			if (endIt == String::npos || endIt <= startIt)
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
-					"Badly formed #include directive (expected " + endDelimeter + ") in file "
-					+ fileName + ": " + inSource.substr(includePos, newLineAfter-includePos),
-					"CgProgram::preprocessor");
-			}
-
-			// extract filename
-			String filename(inSource.substr(startIt+1, endIt-startIt-1));
-
-			// open included file
-			DataStreamPtr resource = ResourceGroupManager::getSingleton().
-				openResource(filename, resourceBeingLoaded->getGroup(), true, resourceBeingLoaded);
-
-			// replace entire include directive line
-			// copy up to just before include
-			if (newLineBefore != String::npos && newLineBefore >= startMarker)
-				outSource.append(inSource.substr(startMarker, newLineBefore-startMarker+1));
-
-			size_t lineCount = 0;
-			size_t lineCountPos = 0;
-			
-			// Count the line number of #include statement
-			lineCountPos = outSource.find('\n');
-			while(lineCountPos != String::npos)
-			{
-				lineCountPos = outSource.find('\n', lineCountPos+1);
-				lineCount++;
-			}
-
-			// Add #line to the start of the included file to correct the line count
-			outSource.append("#line 1 \"" + filename + "\"\n");
-
-			outSource.append(resource->getAsString());
-
-			// Add #line to the end of the included file to correct the line count
-			outSource.append("\n#line " + Ogre::StringConverter::toString(lineCount) + 
-				"\"" + fileName + "\"\n");
-
-			startMarker = newLineAfter;
-
-			if (startMarker != String::npos)
-				i = inSource.find("#include", startMarker);
-			else
-				i = String::npos;
-
-		}
-		// copy any remaining characters
-		outSource.append(inSource.substr(startMarker));
-
-		return outSource;
-	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
 	const String& CgProgram::getLanguage(void) const
 	{
 		static const String language = "cg";

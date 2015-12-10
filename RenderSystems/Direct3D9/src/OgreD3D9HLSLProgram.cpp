@@ -32,6 +32,20 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 namespace Ogre {
+
+    String D3D9HLSLProgram::getStringForMicrocodeCacheHash() const
+    {
+        StringStream ss;
+		ss << getFullSourceWithIncludes()
+            << "_" << mEntryPoint
+            << "_" << mTarget
+            << "_" << mPreprocessorDefines
+            << "_" << getCompilerFlags();
+                
+                    
+        return ss.str();
+    }
+
     //-----------------------------------------------------------------------
     D3D9HLSLProgram::CmdEntryPoint D3D9HLSLProgram::msCmdEntryPoint;
     D3D9HLSLProgram::CmdTarget D3D9HLSLProgram::msCmdTarget;
@@ -88,20 +102,11 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::loadFromSource(void)
     {
-        if ( GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(String("D3D9_HLSL_") + mName) )
-        {
-            getMicrocodeFromCache();
-        }
-        else
-        {
-            compileMicrocode();
-        }
+        compileWithMicrocodeCacheSupport();
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::getMicrocodeFromCache(void)
+    const bool D3D9HLSLProgram::applyFromMicroCodeCache(Microcode cacheMicrocode)
     {
-        GpuProgramManager::Microcode cacheMicrocode = 
-            GpuProgramManager::getSingleton().getMicrocodeFromCache(String("D3D9_HLSL_") + mName);
         
         cacheMicrocode->seek(0);
 
@@ -136,10 +141,50 @@ namespace Ogre {
 
             mParametersMap.insert(GpuConstantDefinitionMap::value_type(paramName, def));
         }
+        
+        return true;
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::compileMicrocode(void)
+    const DWORD D3D9HLSLProgram::getCompilerFlags() const
     {
+        DWORD compileFlags = 0;
+        if (mColumnMajorMatrices)
+            compileFlags |= D3DXSHADER_PACKMATRIX_COLUMNMAJOR;
+        else
+            compileFlags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
+        if (mBackwardsCompatibility)
+            compileFlags |= D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY;
+
+#if OGRE_DEBUG_MODE
+        compileFlags |= D3DXSHADER_DEBUG;
+#endif
+        switch (mOptimisationLevel)
+        {
+        case OPT_DEFAULT:
+            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL1;
+            break;
+        case OPT_NONE:
+            compileFlags |= D3DXSHADER_SKIPOPTIMIZATION;
+            break;
+        case OPT_0:
+            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL0;
+            break;
+        case OPT_1:
+            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL1;
+            break;
+        case OPT_2:
+            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL2;
+            break;
+        case OPT_3:
+            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL3;
+            break;
+        }
+
+        return compileFlags;
+    }
+    //-----------------------------------------------------------------------
+    bool D3D9HLSLProgram::compileMicrocode()
+{
         // Populate preprocessor defines
         String stringBuffer;
 
@@ -216,40 +261,6 @@ namespace Ogre {
             pDefines = &defines[0];
         }
 
-        // Populate compile flags
-        DWORD compileFlags = 0;
-        if (mColumnMajorMatrices)
-            compileFlags |= D3DXSHADER_PACKMATRIX_COLUMNMAJOR;
-        else
-            compileFlags |= D3DXSHADER_PACKMATRIX_ROWMAJOR;
-        if (mBackwardsCompatibility)
-            compileFlags |= D3DXSHADER_ENABLE_BACKWARDS_COMPATIBILITY;
-
-#if OGRE_DEBUG_MODE
-        compileFlags |= D3DXSHADER_DEBUG;
-#endif
-        switch (mOptimisationLevel)
-        {
-        case OPT_DEFAULT:
-            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL1;
-            break;
-        case OPT_NONE:
-            compileFlags |= D3DXSHADER_SKIPOPTIMIZATION;
-            break;
-        case OPT_0:
-            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL0;
-            break;
-        case OPT_1:
-            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL1;
-            break;
-        case OPT_2:
-            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL2;
-            break;
-        case OPT_3:
-            compileFlags |= D3DXSHADER_OPTIMIZATION_LEVEL3;
-            break;
-        }
-
 
         LPD3DXBUFFER errors = 0;
 
@@ -266,7 +277,7 @@ namespace Ogre {
             &includeHandler, 
             mEntryPoint.c_str(),
             mTarget.c_str(),
-            compileFlags,
+            getCompilerFlags(),
             &mMicroCode,
             &errors,
             &pConstTable);
@@ -308,24 +319,13 @@ namespace Ogre {
 
 
             SAFE_RELEASE(pConstTable);
-
-            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-            {
-                addMicrocodeToCache();
-            }
         }
+
+        return true;
     }
     //-----------------------------------------------------------------------
-    void D3D9HLSLProgram::addMicrocodeToCache()
+    void D3D9HLSLProgram::generateMicroCodeCache(Microcode newMicrocode)
     {
-        // add to the microcode to the cache
-        String name = String("D3D9_HLSL_") + mName;
-
-        size_t sizeOfBuffer = sizeof(size_t) + mMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
-        
-        // create microcode
-        GpuProgramManager::Microcode newMicrocode = 
-            GpuProgramManager::getSingleton().createMicrocode(sizeOfBuffer);
 
         // save size of microcode
         size_t microcodeSize = mMicroCode->GetBufferSize();
@@ -357,10 +357,6 @@ namespace Ogre {
             // save def
             newMicrocode->write(&def, sizeof(GpuConstantDefinition));
         }
-
-
-        // add to the microcode to the cache
-        GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
     }
     //-----------------------------------------------------------------------
     void D3D9HLSLProgram::createLowLevelImpl(void)
@@ -749,11 +745,17 @@ namespace Ogre {
         return language;
     }
     //-----------------------------------------------------------------------
+    const size_t D3D9HLSLProgram::getMicrocodeCacheSize() const
+    {
+        size_t sizeOfBuffer = sizeof(size_t) + mMicroCode->GetBufferSize() + sizeof(size_t) + mParametersMapSizeAsBuffer;
+        return sizeOfBuffer;
+    }
     //-----------------------------------------------------------------------
     String D3D9HLSLProgram::CmdEntryPoint::doGet(const void *target) const
     {
         return static_cast<const D3D9HLSLProgram*>(target)->getEntryPoint();
     }
+    //-----------------------------------------------------------------------
     void D3D9HLSLProgram::CmdEntryPoint::doSet(void *target, const String& val)
     {
         static_cast<D3D9HLSLProgram*>(target)->setEntryPoint(val);

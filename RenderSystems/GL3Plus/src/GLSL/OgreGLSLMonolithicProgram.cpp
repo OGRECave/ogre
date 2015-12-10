@@ -225,8 +225,8 @@ namespace Ogre {
             if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
             {
                 // add to the microcode to the cache
-                String name;
-                name = getCombinedName();
+                String source;
+                source = getCombinedSource();
 
                 // get buffer size
                 GLint binaryLength = 0;
@@ -240,7 +240,7 @@ namespace Ogre {
                 OGRE_CHECK_GL_ERROR(glGetProgramBinary(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
 
                 // add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
+                GpuProgramManager::getSingleton().addMicrocodeToCache(source, newMicrocode);
             }
         }
     }

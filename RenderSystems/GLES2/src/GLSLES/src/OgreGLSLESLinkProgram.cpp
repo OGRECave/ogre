@@ -90,7 +90,7 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 
-            if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
+            if ( GpuProgramManager::getSingleton().getEnableMicrocodeCache() &&
                 GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
             {
                 getMicrocodeFromCache();
