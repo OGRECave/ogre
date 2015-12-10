@@ -1050,6 +1050,28 @@ namespace Ogre {
     {
         return mNumLods;
     }
+
+    //---------------------------------------------------------------------
+    void Mesh::createManualLodLevel(Real lodValue, const String& meshName)
+    {
+
+        // Basic prerequisites
+        assert((mHasManualLodLevel || mNumLods == 1) && "Generated LODs already in use!");
+
+        mHasManualLodLevel = true;
+        MeshLodUsage lod;
+        lod.userValue = lodValue;
+        lod.value = mLodStrategy->transformUserValue(lod.userValue);
+        lod.manualName = meshName;
+        
+        lod.manualMesh.setNull();
+        lod.edgeData = 0;
+        mMeshLodUsageList.push_back(lod);
+        ++mNumLods;
+
+        mLodStrategy->sort(mMeshLodUsageList);
+    }
+
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {

@@ -105,6 +105,12 @@ namespace Ogre {
         /** Constructor, should be used only by factory classes. */
         HighLevelGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
+        
+         /** Clone an High level GPU program.
+        @return HighLevelGpuProgramPtr A clone of this program.
+        @param cloneName The name of the cloned high level program.
+        */
+        HighLevelGpuProgramPtr clone(const String& cloneName);
         ~HighLevelGpuProgram();
 
 

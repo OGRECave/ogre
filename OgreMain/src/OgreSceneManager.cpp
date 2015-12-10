@@ -1462,14 +1462,7 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
         }
 
         // Invert vertex winding?
-        if (camera->isReflected())
-        {
-            mDestRenderSystem->setInvertVertexWinding(true);
-        }
-        else
-        {
-            mDestRenderSystem->setInvertVertexWinding(false);
-        }
+        mDestRenderSystem->setInvertVertexWinding(camera->isReflected());
 
         // Tell params about viewport
         mAutoParamDataSource->setCurrentViewport(vp);
@@ -1587,14 +1580,11 @@ void SceneManager::_renderScene(Camera* camera, Viewport* vp, bool includeOverla
 void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
-
-    if(sys)
+    if(sys && sys->getName().find("Direct3D11") != String::npos)
     {
-        if (sys->getName().find("Direct3D11") != String::npos)
-        {
-            UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
-        }
+        UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
     }
+
 }
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
@@ -3491,14 +3481,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 }
                 depthInc += pass->getPassIterationCount();
 
-                // Finalise GPU parameter bindings
-                updateGpuProgramParameters(pass);
-
-                rend->getRenderOperation(ro);
-                ro.renderStateHash = pass->getRenderStateHash();
-                if (rend->preRender(this, mDestRenderSystem))
-                    mDestRenderSystem->_render(ro);
-                rend->postRender(this, mDestRenderSystem);
+               _issueRenderOp(pass, rend, passTransformState);
 
                 if (scissored == CLIPPED_SOME)
                     resetScissor();
@@ -3556,17 +3539,10 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 // don't bother rendering if clipped / scissored entirely
                 if (scissored != CLIPPED_ALL && clipped != CLIPPED_ALL)
                 {
-                    // issue the render op      
+                        
                     // nfz: set up multipass rendering
                     mDestRenderSystem->setCurrentPassIterationCount(pass->getPassIterationCount());
-                    // Finalise GPU parameter bindings
-                    updateGpuProgramParameters(pass);
-
-                    rend->getRenderOperation(ro);
-                    ro.renderStateHash = pass->getRenderStateHash();
-                    if (rend->preRender(this, mDestRenderSystem))
-                        mDestRenderSystem->_render(ro);
-                    rend->postRender(this, mDestRenderSystem);
+                    _issueRenderOp(pass, rend, passTransformState);
                 }
                 if (scissored == CLIPPED_SOME)
                     resetScissor();
@@ -5596,6 +5572,10 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
     {
         mDestRenderSystem->unbindGpuProgram(GPT_VERTEX_PROGRAM);
     }
+    if (mDestRenderSystem->getCapabilities()->hasCapability(RSC_GEOMETRY_PROGRAM))
+    {
+        mDestRenderSystem->unbindGpuProgram(GPT_GEOMETRY_PROGRAM);
+    }
 
     // Turn off colour writing and depth writing
     mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
@@ -7349,6 +7329,20 @@ void SceneManager::updateGpuProgramParameters(const Pass* pass)
 
 }
 //---------------------------------------------------------------------
+void SceneManager::_issueRenderOp(const Pass* pass, Renderable* rend, bool passTransformState)
+{
+        RenderOperation ro;
+        // Finalise GPU parameter bindings
+        updateGpuProgramParameters(pass);
+
+        rend->getRenderOperation(ro);
+		 ro.renderStateHash = pass->getRenderStateHash();		 
+
+        if (rend->preRender(this, mDestRenderSystem))
+            mDestRenderSystem->_render(ro);
+        
+        rend->postRender(this, mDestRenderSystem);
+}
 //---------------------------------------------------------------------
 VisibleObjectsBoundsInfo::VisibleObjectsBoundsInfo()
 {

@@ -213,13 +213,29 @@ namespace Ogre {
 #define OGRE_WARN( x )  message( __FILE__ "(" QUOTE( __LINE__ ) ") : " x "\n" )
 
 // For marking functions as deprecated
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+/*********** OGRE_DEPRECATED *****************/
+#if  defined(__cplusplus) &&  __cplusplus > 201402L
+#define OGRE_DEPRECATED [[deprecated()]]
+#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   define OGRE_DEPRECATED __declspec(deprecated)
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
 #   define OGRE_DEPRECATED __attribute__ ((deprecated))
 #else
 #   pragma message("WARNING: You need to implement OGRE_DEPRECATED for this compiler")
 #   define OGRE_DEPRECATED
+#endif
+
+
+/*********** OGRE_DEPRECATED_EX *****************/
+#if defined(__cplusplus) &&  __cplusplus > 201402L
+    #define OGRE_DEPRECATED_EX(message) [[deprecated(message)]]
+#elif OGRE_COMPILER == OGRE_COMPILER_MSVC
+    #define OGRE_DEPRECATED_EX(message) __declspec(deprecated(message))
+#elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
+#   define OGRE_DEPRECATED_EX(message) __attribute__ ((deprecated))
+#else
+#   pragma message("WARNING: You need to implement OGRE_DEPRECATED_EX for this compiler")
+#   define OGRE_DEPRECATED_EX(message)
 #endif
 
 //----------------------------------------------------------------------------

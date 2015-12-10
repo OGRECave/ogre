@@ -60,7 +60,8 @@ namespace Ogre {
         , mRQSequence(0)
         , mMaterialSchemeName(MaterialManager::DEFAULT_SCHEME_NAME)
         , mIsAutoUpdated(true)
-		, mColourBuffer(CBT_BACK)
+        , mColourBuffer(CBT_BACK)
+        , mEnabled(true)
     {           
 #if OGRE_COMPILER != OGRE_COMPILER_GCCE && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
         LogManager::getSingleton().stream(LML_TRIVIAL)
@@ -218,7 +219,7 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::update(void)
     {
-        if (mCamera)
+        if (mCamera && mEnabled)
         {
             // Tell Camera to render into me
             mCamera->_renderScene(this, mShowOverlays);
@@ -361,12 +362,9 @@ namespace Ogre {
     //---------------------------------------------------------------------
     void Viewport::setCamera(Camera* cam)
     {
-        if(mCamera)
+        if (cam != NULL && mCamera != NULL && mCamera->getViewport() == this)
         {
-            if(mCamera->getViewport() == this)
-            {
-                mCamera->_notifyViewport(0);
-            }
+                mCamera->_notifyViewport(NULL);
         }
 
         mCamera = cam;
@@ -506,7 +504,16 @@ namespace Ogre {
 	{
 		return mColourBuffer;
 	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void Viewport::setMaterialScheme(const String& schemeName)
+    {
+        mMaterialSchemeName = schemeName;
+    }
+    //-----------------------------------------------------------------------
+    const String& Viewport::getMaterialScheme(void) const
+    {
+        return mMaterialSchemeName;
+    }
     //-----------------------------------------------------------------------
     void Viewport::Listener::viewportCameraChanged(Viewport*)
     {
@@ -521,5 +528,17 @@ namespace Ogre {
     void Viewport::Listener::viewportDestroyed(Viewport*)
     {
     }
-
+    //-----------------------------------------------------------------------
+    void Viewport::setEnabled(bool enabled)
+    {
+        mEnabled = enabled;
+    }
+    //-----------------------------------------------------------------------
+    bool Viewport::getEnabled()
+    {
+        return mEnabled;
+    }
+    
+    //-----------------------------------------------------------------------
+    
 }

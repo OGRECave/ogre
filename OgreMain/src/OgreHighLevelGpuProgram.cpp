@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreLogManager.h"
+#include "OgreHighLevelGpuProgramManager.h"
 
 namespace Ogre
 {
@@ -40,6 +41,28 @@ namespace Ogre
         : GpuProgram(creator, name, handle, group, isManual, loader), 
         mHighLevelLoaded(false), mAssemblerProgram(), mConstantDefsBuilt(false)
     {
+    }
+
+    //-----------------------------------------------------------------------------
+    HighLevelGpuProgramPtr HighLevelGpuProgram::clone(const String& cloneName)
+    {
+        HighLevelGpuProgramPtr program = HighLevelGpuProgramManager::getSingleton().createProgram
+            (cloneName
+                , this->mGroup
+                , this->mSyntaxCode
+                , this->mType);
+
+        program->setSource(this->mSource);
+
+        const ParameterList& params = this->getParameters();
+        ParameterList::const_iterator it_end = params.end();
+        for (ParameterList::const_iterator it = params.begin(); it != it_end; it++)
+        {
+            const ParameterDef& param = *it;
+            program->setParameter(param.name, this->getParameter(param.name));
+        }
+
+        return program;
     }
     //---------------------------------------------------------------------------
     void HighLevelGpuProgram::loadImpl()
@@ -147,6 +170,7 @@ namespace Ogre
                     << e.getFullDescription();
 
                 mCompileError = true;
+                mCompileErrorMessage = e.getFullDescription();
             }
         }
     }

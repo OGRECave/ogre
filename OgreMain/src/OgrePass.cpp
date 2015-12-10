@@ -1743,16 +1743,45 @@ namespace Ogre {
         }
         return mVertexProgramUsage->getParameters();
     }
+    const GpuProgramPtr Pass::getGpuProgram(GpuProgramType programType) const
+	{
+		switch (programType)
+		{
+		case GPT_VERTEX_PROGRAM:
+			return getVertexProgram();
+		case GPT_GEOMETRY_PROGRAM:
+			return getGeometryProgram();
+		case GPT_FRAGMENT_PROGRAM:
+			return getFragmentProgram();
+		case GPT_DOMAIN_PROGRAM:
+			return getTessellationDomainProgram();
+		case GPT_HULL_PROGRAM:
+			return getTessellationHullProgram();
+		case GPT_COMPUTE_PROGRAM:
+			return getComputeProgram();
+		default:
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+				"Unkown gpu program type",
+				"Pass::getGpuProgram");
+		}
+	}
+
+    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    const GpuProgramPtr& Pass::getProgram(GpuProgramUsage* const gpuProgramUsage) const
+    {
+        return gpuProgramUsage != NULL ? gpuProgramUsage->getProgram() : GpuProgramPtr::null_ptr;
+    }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getVertexProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mVertexProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mVertexProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getFragmentProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mFragmentProgramUsage)
             return BLANKSTRING;
         else
@@ -1761,19 +1790,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getFragmentProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mFragmentProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getFragmentProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mFragmentProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mFragmentProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getGeometryProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mGeometryProgramUsage)
             return BLANKSTRING;
         else
@@ -1782,19 +1811,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getGeometryProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mGeometryProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getGeometryProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mGeometryProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+		return getProgram(mGeometryProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationHullProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mTessellationHullProgramUsage)
             return BLANKSTRING;
         else
@@ -1803,19 +1832,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationHullProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mTessellationHullProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationHullProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mTessellationHullProgramUsage->getProgram();
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+		return getProgram(mTessellationHullProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationDomainProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mTessellationDomainProgramUsage)
             return BLANKSTRING;
         else
@@ -1824,19 +1853,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationDomainProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mTessellationDomainProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationDomainProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mTessellationDomainProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mTessellationDomainProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getComputeProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mComputeProgramUsage)
             return BLANKSTRING;
         else
@@ -1845,14 +1874,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getComputeProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mComputeProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getComputeProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mComputeProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mComputeProgramUsage);
     }
     //-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const

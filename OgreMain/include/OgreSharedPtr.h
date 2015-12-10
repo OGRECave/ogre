@@ -145,6 +145,8 @@ namespace Ogre {
         SharedPtr() : pRep(0), pInfo(0)
         {}
 
+        static const SharedPtr<T> null_ptr;
+
     private:
         static SharedPtrInfo* createInfoForMethod(T* rep, SharedPtrFreeMethod method)
         {
@@ -323,6 +325,8 @@ namespace Ogre {
             std::swap(pInfo, other.pInfo);
         }
     };
+    
+    template<class T> const SharedPtr<T> SharedPtr<T>::null_ptr;
 
     template<class T, class U> inline bool operator==(SharedPtr<T> const& a, SharedPtr<U> const& b)
     {

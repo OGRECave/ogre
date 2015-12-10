@@ -523,6 +523,8 @@ namespace Ogre {
         /** Gets whether this render target needs the use of a a stencil buffer */
         const bool getIsStencilBufferRequired() const;
 
+        /** Add Frame statistics*/
+        void addStats(unsigned int triangleCount, unsigned int batchCount);
     protected:
         /// The name of this target.
         String mName;
@@ -543,6 +545,7 @@ namespace Ogre {
         unsigned long mLastSecond;
         unsigned long mLastTime;
         size_t mFrameCount;
+        size_t mUpdateCount;
 
         bool mActive;
         bool mAutoUpdate;

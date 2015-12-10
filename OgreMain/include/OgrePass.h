@@ -1225,6 +1225,9 @@ namespace Ogre {
             not just the names.
         */
         void setVertexProgram(const String& name, bool resetParams = true);
+
+        const GpuProgramPtr getGpuProgram(GpuProgramType programType) const;
+
         /** Sets the vertex program parameters.
             @remarks
             Only applicable to programmable passes, and this particular call is
@@ -1850,6 +1853,9 @@ namespace Ogre {
         GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
         /** Gets the Tessellation EHull program used by this pass, only available after _load(). */
         const GpuProgramPtr& getComputeProgram(void) const;
+        
+     protected:
+        const GpuProgramPtr& getProgram(GpuProgramUsage* const gpuProgramUsage) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

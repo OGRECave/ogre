@@ -473,6 +473,8 @@ namespace Ogre {
         /** Gets details of the numbered level of detail entry. */
         const MeshLodUsage& getLodLevel(ushort index) const;
 
+        void createManualLodLevel(Real lodValue, const String& meshName);
+        
         /** Retrieves the level of detail index for the given LOD value. 
         @note
             The value passed in is the 'transformed' value. If you are dealing with

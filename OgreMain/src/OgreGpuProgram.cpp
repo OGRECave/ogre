@@ -75,7 +75,7 @@ namespace Ogre
         mFilename = filename;
         mSource.clear();
         mLoadFromFile = true;
-        mCompileError = false;
+        resetCompileError();
     }
     //-----------------------------------------------------------------------------
     void GpuProgram::setSource(const String& source)
@@ -83,7 +83,7 @@ namespace Ogre
         mSource = source;
         mFilename.clear();
         mLoadFromFile = false;
-        mCompileError = false;
+        resetCompileError();
     }
     size_t GpuProgram::calculateSize(void) const
     {
@@ -145,10 +145,13 @@ namespace Ogre
         }
         catch (const Exception&)
         {
-            // will already have been logged
-            LogManager::getSingleton().stream()
-                << "Gpu program " << mName << " encountered an error "
+            StringStream ss;
+            ss << "Gpu program " << mName << " encountered an error "
                 << "during loading and is thus not supported.";
+            
+            mCompileErrorMessage = ss.str();
+            // will already have been logged
+            LogManager::getSingleton().stream() << mCompileErrorMessage;
 
             mCompileError = true;
         }
@@ -311,6 +314,29 @@ namespace Ogre
         return mDefaultParams;
     }
     //-----------------------------------------------------------------------------
+    const String GpuProgram::getProgramTypeName(GpuProgramType programType)
+    {
+        switch (programType)
+        {
+        case GPT_VERTEX_PROGRAM:
+            return "vertex";
+        case GPT_GEOMETRY_PROGRAM:
+            return "geometry";
+        case GPT_FRAGMENT_PROGRAM:
+            return "fragment";
+        case GPT_DOMAIN_PROGRAM:
+            return "domain";
+        case GPT_HULL_PROGRAM:
+            return "hull";
+        case GPT_COMPUTE_PROGRAM:
+            return "compute";
+        default:
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Unexpected GPU program type",
+                "GpuProgram::GetName");
+        }
+    }
+    //-----------------------------------------------------------------------------
     void GpuProgram::setupBaseParamDictionary(void)
     {
         ParamDictionary* dict = getParamDictionary();
@@ -350,7 +376,12 @@ namespace Ogre
             &msComputeGroupDimsCmd);
             
     }
-
+    //-----------------------------------------------------------------------
+    void GpuProgram::resetCompileError(void)
+    {
+        mCompileError = false;
+        mCompileErrorMessage = BLANKSTRING;
+    }
     //-----------------------------------------------------------------------
     const String& GpuProgram::getLanguage(void) const
     {

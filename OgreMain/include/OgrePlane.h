@@ -72,7 +72,8 @@ namespace Ogre {
         Plane (const Vector3& rkNormal, const Vector3& rkPoint);
         Plane (const Vector3& rkPoint0, const Vector3& rkPoint1,
             const Vector3& rkPoint2);
-
+        /** Empty virtual destructor so this class will have polymorphic traits **/
+        virtual ~Plane(){}
         /** The "positive side" of the plane is the half space to which the
             plane normal points. The "negative side" is the other half
             space. The flag "no side" indicates the plane itself.
