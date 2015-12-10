@@ -122,7 +122,6 @@ namespace Ogre {
 
         D3D11Device & mDevice;
 
-        D3D11VertexDeclaration mInputVertexDeclaration;
 
         ID3D11VertexShader* mVertexShader;
         ID3D11PixelShader* mPixelShader;
@@ -352,13 +351,14 @@ namespace Ogre {
         */
         void loadFromSource(void);
 
-        D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
 
         void reinterpretGSForStreamOut(void);
         bool mReinterpretingGS;
         
         unsigned int getNumInputs(void)const;
         unsigned int getNumOutputs(void)const;
+        // Gets the expected number of inputs from the vertex buffer.
+        unsigned int getNumOfVertexInputs(void) const;
 
         String getNameForMicrocodeCache();
 

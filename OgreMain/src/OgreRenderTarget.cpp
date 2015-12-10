@@ -45,9 +45,12 @@ namespace Ogre {
         , mDepthBufferPoolId(DepthBuffer::POOL_DEFAULT)
         , mDepthBuffer(0)
         , mActive(true)
+        , mDepth(1)
         , mAutoUpdate(true)
         , mHwGamma(false)
         , mFSAA(0)
+        , mRenderTargetArrayViewDirty(false)
+        , mStencilBufferRequired(true)
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		, mStereoEnabled(true)
 #else
@@ -56,6 +59,7 @@ namespace Ogre {
     {
         mTimer = Root::getSingleton().getTimer();
         resetStatistics();
+        mRenderTargetArraysParams.ArraySize = mDepth;
     }
 
     RenderTarget::~RenderTarget()
@@ -101,6 +105,11 @@ namespace Ogre {
     unsigned int RenderTarget::getHeight(void) const
     {
         return mHeight;
+    }
+
+    unsigned int RenderTarget::getDepth(void) const
+    {
+        return mDepth;
     }
     unsigned int RenderTarget::getColourDepth(void) const
     {
@@ -632,5 +641,38 @@ namespace Ogre {
         OgreProfileEndGPUEvent("RenderTarget: " + getName());
     }
     
+    //-----------------------------------------------------------------------
+    const bool RenderTarget::getIsStencilBufferRequired() const
+    {
+        return mStencilBufferRequired;
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::setIsStencilBufferRequired(const bool stencilBufferRequired)
+    {
+        mStencilBufferRequired = stencilBufferRequired;
+        
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::assignAndMarkDitry(int &dest, const int source, int const defaultValue)
+    {
+        int val = source == std::numeric_limits<int>::min() ? defaultValue : source;
+        if (dest != val)
+        {
+            dest = val;
+            mRenderTargetArrayViewDirty = true;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::setSubRenderTarget(int firstArraySlice /*= MININT*/, int arraySize /*= MININT*/, int mipSlice /*= MININT*/)
+    {
+        assignAndMarkDitry(mRenderTargetArraysParams.FirstArraySlice, firstArraySlice, 0);
+        assignAndMarkDitry(mRenderTargetArraysParams.ArraySize, arraySize, mDepth);
+        assignAndMarkDitry(mRenderTargetArraysParams.MipSlice, mipSlice, 0);
+    }
+    //-----------------------------------------------------------------------
+    const RenderTarget::ArrayParams& RenderTarget::getArrayParams() const
+    {
+        return mRenderTargetArraysParams;
+    }
 
 }        

@@ -41,6 +41,7 @@ namespace Ogre {
     protected:
         /// Lock a box
         PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
+        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options, UploadOptions uploadOpt);
 
         /// Unlock a box
         void unlockImpl(void);
@@ -57,9 +58,10 @@ namespace Ogre {
         size_t mFace;
 
         Image::Box mLockBox;
-        PixelBox mCurrentLock;
+        UploadOptions mLockUploadOpt;
         LockOptions mCurrentLockOptions;
 
+        D3D11_MAPPED_SUBRESOURCE mLockMappedSubResource;
         D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
 
         /// Render targets
@@ -71,7 +73,8 @@ namespace Ogre {
         ID3D11Resource *mStagingBuffer;
         
         void _map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box);
-        void *_mapstagingbuffer(D3D11_MAP flags);
+        void _mapstagingbuffer(D3D11_MAP flags, PixelBox &box);
+
         void *_mapstaticbuffer(PixelBox lock);
         void _unmap(ID3D11Resource *res);
         void _unmapstagingbuffer(bool copyback = true);

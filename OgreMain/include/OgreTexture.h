@@ -272,6 +272,18 @@ namespace Ogre {
             another texture. */
         virtual void copyToTexture( TexturePtr& target );
 
+        /** Copies (no scales or fit - has to be the same size, format and mip count) 
+        the contents of this texture to\from (including mipmaps)
+        a texture array 
+
+            @param sourceArrayIndex index of texture in source array. (set to 0 if not array)
+            @param target texture to copy to.
+            @param targetArrayIndex index of texture in target array. (set to 0 if not array)       
+        */
+        virtual void copyToTexture( size_t sourceArrayIndex,
+            TexturePtr& target, size_t targetArrayIndex );
+
+
         /** Loads the data from an image.
         @note Important: only call this from outside the load() routine of a 
             Resource. Don't call it within (including ManualResourceLoader) - use

@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
+#include <limits>
 
 /* Define the number of priority groups for the render system's render targets. */
 #ifndef OGRE_NUM_RENDERTARGET_GROUPS
@@ -93,6 +94,40 @@ namespace Ogre {
             FB_AUTO
         };
 
+        struct ArrayParams
+        {
+            /** The index of the mipmap level to use mip slice.*/
+            int MipSlice;
+            /** The index of the first texture to use in an array of textures.*/
+            int FirstArraySlice;
+            /** Number of textures in the array to use in the render target view, starting from FirstArraySlice.*/
+            int ArraySize;
+
+            ArrayParams() :
+            MipSlice(0)
+            ,FirstArraySlice(0)
+            ,ArraySize(0)
+            {
+            }
+
+            const bool operator ==(const ArrayParams&  A) const
+            {
+                return memcmp(this, &A, sizeof(A)) == 0;
+            }
+
+            const bool operator !=(const ArrayParams&  A) const
+            {
+                return !(*this == A);
+            }
+
+            ArrayParams&  operator =(const ArrayParams&   A)
+            {
+                memcpy(this, &A, sizeof(A));
+                return *this;
+            }
+        };
+
+    
         RenderTarget();
         virtual ~RenderTarget();
 
@@ -104,6 +139,7 @@ namespace Ogre {
 
         virtual uint32 getWidth(void) const;
         virtual uint32 getHeight(void) const;
+        virtual uint32 getDepth(void) const;
         virtual uint32 getColourDepth(void) const;
 
         /**
@@ -468,6 +504,24 @@ namespace Ogre {
         @see _beginUpdate for more details.
         */
         virtual void _endUpdate();
+        
+        /** Sets whether this render target needs the use of a a stencil buffer 
+      @remarks
+        This flag acts as a hint to render system how to propetly manage the depth buffer.
+        */
+        void setIsStencilBufferRequired(const bool stencilBufferRequired);
+        
+       /** Change and mark a "render target array" view  parameter*/
+        void assignAndMarkDitry(int &dest, const int source,int const defaultValue);
+        
+        /** Change the value of one or more "render target array" view parameters  */
+        void setSubRenderTarget(int firstArraySlice = std::numeric_limits<int>::min(), int arraySize = std::numeric_limits<int>::min(), int mipSlice = std::numeric_limits<int>::min());
+
+        /** Gets the array parameters of a render target array */
+        const ArrayParams& getArrayParams() const;
+        
+        /** Gets whether this render target needs the use of a a stencil buffer */
+        const bool getIsStencilBufferRequired() const;
 
     protected:
         /// The name of this target.
@@ -477,6 +531,7 @@ namespace Ogre {
 
         uint32 mWidth;
         uint32 mHeight;
+        uint32 mDepth;
         uint32 mColourDepth;
         uint16       mDepthBufferPoolId;
         DepthBuffer *mDepthBuffer;
@@ -496,7 +551,12 @@ namespace Ogre {
         // FSAA performed?
         uint mFSAA;
         String mFSAAHint;
-		bool mStereoEnabled;
+        bool mStereoEnabled;
+        
+        /// Parameters used to create this render target array view.
+        ArrayParams mRenderTargetArraysParams;
+        /// Determines if render target array view need to be updated.
+        bool mRenderTargetArrayViewDirty;
 
         virtual void updateStats(void);
 
@@ -506,7 +566,8 @@ namespace Ogre {
 
         typedef vector<RenderTargetListener*>::type RenderTargetListenerList;
         RenderTargetListenerList mListeners;
-    
+        bool mStencilBufferRequired;
+
 
         /// internal method for firing events
         virtual void firePreUpdate(void);

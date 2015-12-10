@@ -48,6 +48,7 @@ namespace Ogre {
         StringStream name;
         name << "SimpleRenderable" << msGenNameCount++;
         mName = name.str();
+        mRenderOp.srcRenderable = this;
     }
 
     SimpleRenderable::SimpleRenderable(const String& name)
@@ -58,6 +59,7 @@ namespace Ogre {
     , mParentSceneManager(NULL)
     , mCamera(NULL)
     {
+        mRenderOp.srcRenderable = this;
     }
 
     void SimpleRenderable::setMaterial( const String& matName )
@@ -85,6 +87,7 @@ namespace Ogre {
     void SimpleRenderable::setRenderOperation( const RenderOperation& rend )
     {
         mRenderOp = rend;
+        mRenderOp.srcRenderable = this;
     }
 
     void SimpleRenderable::setWorldTransform( const Matrix4& xform )

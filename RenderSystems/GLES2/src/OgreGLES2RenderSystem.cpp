@@ -813,7 +813,7 @@ namespace Ogre {
             mClipPlanesDirty = true;
     }
 
-    void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr)
+    void GLES2RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr &texPtr, TextureUnitState::BindingType bindingType)
     {
         GLES2TexturePtr tex = texPtr.staticCast<GLES2Texture>();
 
@@ -1949,7 +1949,7 @@ namespace Ogre {
             mCurrentFragmentProgram->unbindProgram();
         
         // Disable textures
-        _disableTextureUnitsFrom(0);
+        _disableTextureUnitsFrom(0, TextureUnitState::BT_ALL);
 
         // It's ready for switching
         if(mCurrentContext)

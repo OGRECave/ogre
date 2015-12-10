@@ -50,16 +50,26 @@ namespace Ogre {
 		/// destructor
 		~D3D11Texture();
 
+        /// @copydoc Texture::copyToTexture
+        virtual void copyToTexture( size_t sourceArrayIndex, TexturePtr& target, 
+             size_t targetArrayIndex );
 		/// overridden from Texture
 		void copyToTexture(TexturePtr& target);
 		/// overridden from Texture
 		void loadImage(const Image &img);
-
+        /** Fills a "render target view" description struct with values matching this texture*/
+        void fillRTVDescription(D3D11_RENDER_TARGET_VIEW_DESC &rtvDesc);
+        
+        /** Fills a "depth stencil view" description struct with values 
+            matching this texture and a depth-stencil texture*/
+        void fillDSVDescription(ID3D11Texture2D * const depthTexture, D3D11_DEPTH_STENCIL_VIEW_DESC &dsvDesc); 
+        
+        
 
 		/// @copydoc Texture::getBuffer
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
-		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
+        ID3D11Resource *getTextureResource();
 		/// retrieves a pointer to the actual texture
 		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView; }
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
@@ -196,6 +206,12 @@ namespace Ogre {
         virtual void getCustomAttribute( const String& name, void *pData );
 
         bool requiresTextureFlipping() const { return false; }
+        
+        private:
+        //* Build a render target view accoring to current state*/
+            ID3D11RenderTargetView* createRenderTargetView();
+        //* Assign a newley created render target view as the active one
+            void updateRenderTargetView();
     };
 
 }

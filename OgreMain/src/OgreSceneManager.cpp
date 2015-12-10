@@ -1246,7 +1246,7 @@ const Pass* SceneManager::_setPass(const Pass* pass, bool evenIfSuppressed,
             ++unit;
         }
         // Disable remaining texture units
-        mDestRenderSystem->_disableTextureUnitsFrom(pass->getNumTextureUnitStates());
+        mDestRenderSystem->_disableTextureUnitsFrom(pass->getNumTextureUnitStates(), TextureUnitState::BT_ALL);
 
         // Set up non-texture related material settings
         // Depth buffer settings
@@ -3495,7 +3495,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                 updateGpuProgramParameters(pass);
 
                 rend->getRenderOperation(ro);
-
+                ro.renderStateHash = pass->getRenderStateHash();
                 if (rend->preRender(this, mDestRenderSystem))
                     mDestRenderSystem->_render(ro);
                 rend->postRender(this, mDestRenderSystem);
@@ -3563,7 +3563,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
                     updateGpuProgramParameters(pass);
 
                     rend->getRenderOperation(ro);
-
+                    ro.renderStateHash = pass->getRenderStateHash();
                     if (rend->preRender(this, mDestRenderSystem))
                         mDestRenderSystem->_render(ro);
                     rend->postRender(this, mDestRenderSystem);
@@ -3585,6 +3585,7 @@ void SceneManager::renderSingleObject(Renderable* rend, const Pass* pass,
         if (rend->preRender(this, mDestRenderSystem))
         {
             rend->getRenderOperation(ro);
+			ro.renderStateHash = pass->getRenderStateHash();
             try
             {
                 mDestRenderSystem->_render(ro);
@@ -3881,6 +3882,7 @@ void SceneManager::manualRender(RenderOperation* rend,
         mAutoParamDataSource->setCurrentCamera(&dummyCam, false);
         updateGpuProgramParameters(pass);
     }
+	rend->renderStateHash = pass->getRenderStateHash();
     mDestRenderSystem->_render(*rend);
 
     if (doBeginEndFrame)
@@ -5597,7 +5599,7 @@ void SceneManager::renderShadowVolumesToStencil(const Light* light,
 
     // Turn off colour writing and depth writing
     mDestRenderSystem->_setColourBufferWriteEnabled(false, false, false, false);
-    mDestRenderSystem->_disableTextureUnitsFrom(0);
+    mDestRenderSystem->_disableTextureUnitsFrom(0, TextureUnitState::BT_VERTEX_FRAGMENT);
     mDestRenderSystem->_setDepthBufferParams(true, false, CMPF_LESS);
     mDestRenderSystem->setStencilCheckEnabled(true);
 

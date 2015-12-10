@@ -142,7 +142,7 @@ namespace Ogre {
         mSubMesh->_getRenderOperation(op, mParentEntity->mMeshLodIndex);
         // Deal with any vertex data overrides
         op.vertexData = getVertexDataForBinding();
-
+        op.srcRenderable = this;
         // If we use custom index position the client is responsible to set meaningful values 
         if(mIndexStart != mIndexEnd)
         {

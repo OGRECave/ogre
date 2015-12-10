@@ -120,12 +120,18 @@ namespace Ogre {
         /** A flag to indicate that it is possible for this operation to use a global
             vertex instance buffer if available.*/
         bool useGlobalInstancingVertexBufferIsAvailable;
+        uint32 renderStateHash;
 
     RenderOperation() :
-        vertexData(0), operationType(OT_TRIANGLE_LIST), useIndexes(true),
-            indexData(0), srcRenderable(0), numberOfInstances(1),
-            renderToVertexBuffer(false),
-            useGlobalInstancingVertexBufferIsAvailable(true)
+          vertexData(0)
+        , operationType(OT_TRIANGLE_LIST)
+        , useIndexes(true)
+        , indexData(0)
+        , srcRenderable(0)
+        , numberOfInstances(1)
+        , renderToVertexBuffer(false)
+        , useGlobalInstancingVertexBufferIsAvailable(true)
+        , renderStateHash(0)
             {}
 
 

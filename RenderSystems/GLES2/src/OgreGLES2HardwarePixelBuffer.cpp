@@ -786,7 +786,7 @@ namespace Ogre {
         GLES2FBOManager *fboMan = static_cast<GLES2FBOManager *>(GLES2RTTManager::getSingletonPtr());
         
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-        rsys->_disableTextureUnitsFrom(0);
+        rsys->_disableTextureUnitsFrom(0, TextureUnitState::BT_ALL);
         glActiveTexture(GL_TEXTURE0);
 
         // Disable alpha, depth and scissor testing, disable blending, 

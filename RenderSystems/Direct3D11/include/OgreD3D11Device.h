@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2015 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,24 +35,60 @@ namespace Ogre
 {
     class D3D11Device
     {
+    public:
+        static const char* sDebugLevelUndefined;
+        static const char* sDebugLevelNone;
+        static const char* sDebugLevelMessage;
+        static const char* sDebugLevelInfo;
+        static const char* sDebugLevelWarning;
+        static const char* sDebugLevelError;
+        static const char* sDebugLevelCorruption;
+
+        enum eDebugErrorLevel
+        {
+            DEL_UNDEFINED,
+            DEL_NO_EXCEPTION,
+            DEL_CORRUPTION,
+            DEL_ERROR,
+            DEL_WARNING,
+            DEL_INFO,
+            DEL_MESSAGE
+        };
+
     private:
-        ID3D11DeviceN*             mD3D11Device;
-        ID3D11DeviceContextN*      mImmediateContext;
-        ID3D11ClassLinkage*        mClassLinkage;
-        ID3D11InfoQueue*           mInfoQueue;
+        ID3D11DeviceN*          mD3D11Device;
+        ID3D11DeviceContextN*   mImmediateContext;
+        ID3D11ClassLinkage*     mClassLinkage;
+        ID3D11InfoQueue*        mInfoQueue;
+        bool                    mInfoQueueDirty;
+        eDebugErrorLevel        mStorageErrorLevel;
+        eDebugErrorLevel        mExceptionsErrorLevel;
+
 #if OGRE_D3D11_PROFILING
         ID3DUserDefinedAnnotation* mPerf;
 #endif
 
-        const D3D11Device& operator=(D3D11Device& device); /* intentionally not implemented */
+        /*************************************************************************/
+        // Private abstract copy constructor and copy assignment operator intentionally not implemented,
+        // copying instances of D3D11Device is not allowed in D3D11Device class.
+        D3D11Device(const D3D11Device& device);
+        const D3D11Device& operator=(D3D11Device& device);
+        /*************************************************************************/
+
+        void clearStoredErrorMessages() const;
+        void refreshInfoQueue();
+        bool _getErrorsFromQueue() const;
+        void markInfoQueueDirty();
+        typedef std::vector<D3D11_MESSAGE_SEVERITY> SevrityList;
+        void generateSeverity(const eDebugErrorLevel severityLevel, SevrityList& severityList);
+        eDebugErrorLevel getDebugErrorLevelFromSeverity(const D3D11_MESSAGE_SEVERITY severity) const;
+        D3D11Device::eDebugErrorLevel parseErrorLevel(const String& errorLevel);
 
     public:
         D3D11Device();
         ~D3D11Device();
-
         void ReleaseAll();
         void TransferOwnership(ID3D11DeviceN* device);
-
         bool isNull()                                { return mD3D11Device == 0; }
         ID3D11DeviceN* get()                         { return mD3D11Device; }
         ID3D11DeviceContextN* GetImmediateContext()  { return mImmediateContext; }
@@ -61,34 +97,25 @@ namespace Ogre
         ID3DUserDefinedAnnotation* GetProfiler()     { return mPerf; }
 #endif
         
-        ID3D11DeviceN* operator->() const
-        {
-            assert(mD3D11Device); 
-            if (D3D_NO_EXCEPTION != mExceptionsErrorLevel)
-            {
-                clearStoredErrorMessages();
-            }
-            return mD3D11Device;
-        }
+        ID3D11DeviceN* operator->() const{return mD3D11Device;}
 
         String getErrorDescription(const HRESULT hr = NO_ERROR) const;
-        void clearStoredErrorMessages() const;
-        bool _getErrorsFromQueue() const;
 
-        bool isError() const                         { return (D3D_NO_EXCEPTION == mExceptionsErrorLevel) ? false : _getErrorsFromQueue(); }
+        bool isError() const { return (DEL_NO_EXCEPTION == mExceptionsErrorLevel) ? false : _getErrorsFromQueue(); }
 
-        enum eExceptionsErrorLevel
-        {
-            D3D_NO_EXCEPTION,
-            D3D_CORRUPTION,
-            D3D_ERROR,
-            D3D_WARNING,
-            D3D_INFO,
-        };
+        //Exception error level
+        void setExceptionsErrorLevel(const eDebugErrorLevel errorLevel);
+        void setExceptionsErrorLevel(const String& errorLevel);
+        const eDebugErrorLevel getExceptionsErrorLevel();
+        const String getExceptionErrorLevelAsString();
 
-        static eExceptionsErrorLevel mExceptionsErrorLevel;
-        static void setExceptionsErrorLevel(const eExceptionsErrorLevel exceptionsErrorLevel);
-        static const eExceptionsErrorLevel getExceptionsErrorLevel();
+        //storage (Debug output error level)
+        void setStorageErrorLevel(const eDebugErrorLevel errorLevel);
+        void setStorageErrorLevel(const String& errorLevel);
+        const eDebugErrorLevel getStorageErrorLevel();
+        const String getStorageErrorLevelAsString();
+
+        String errorLevelToString(const D3D11Device::eDebugErrorLevel errorLevel);
     };
 }
 #endif

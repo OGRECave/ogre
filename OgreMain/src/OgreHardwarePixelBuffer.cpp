@@ -59,12 +59,12 @@ namespace Ogre
         assert(offset == 0 && length == mSizeInBytes && "Cannot lock memory region, most lock box or entire buffer");
         
         Image::Box myBox(0, 0, 0, mWidth, mHeight, mDepth);
-        const PixelBox &rv = lock(myBox, options);
+        const PixelBox &rv = lock(myBox, options, uploadOpt);
         return rv.data;
     }
     
     //-----------------------------------------------------------------------------    
-    const PixelBox& HardwarePixelBuffer::lock(const Image::Box& lockBox, LockOptions options)
+    const PixelBox& HardwarePixelBuffer::lock(const Image::Box& lockBox, LockOptions options, UploadOptions uploadOpt)
     {
         if (mUseShadowBuffer)
         {
@@ -75,12 +75,12 @@ namespace Ogre
                 mShadowUpdated = true;
             }
 
-            mCurrentLock = static_cast<HardwarePixelBuffer*>(mShadowBuffer)->lock(lockBox, options);
+            mCurrentLock = static_cast<HardwarePixelBuffer*>(mShadowBuffer)->lock(lockBox, options, uploadOpt);
         }
         else
         {
             // Lock the real buffer if there is no shadow buffer 
-            mCurrentLock = lockImpl(lockBox, options);
+            mCurrentLock = lockImpl(lockBox, options, uploadOpt);
             mIsLocked = true;
         }
 
@@ -101,6 +101,12 @@ namespace Ogre
     {
         OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, "lockImpl(offset,length) is not valid for PixelBuffers and should never be called",
             "HardwarePixelBuffer::lockImpl");
+    }
+    //-----------------------------------------------------------------------------    
+
+    Ogre::PixelBox HardwarePixelBuffer::lockImpl(const Image::Box &lockBox, LockOptions options, UploadOptions uploadOpt)
+    {
+        return lockImpl(lockBox, options);
     }
 
     //-----------------------------------------------------------------------------    

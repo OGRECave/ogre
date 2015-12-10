@@ -593,7 +593,7 @@ void GLTextureBuffer::blitFromTexture(GLTextureBuffer *src, const Image::Box &sr
 
     // Important to disable all other texture units
     RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-    rsys->_disableTextureUnitsFrom(0);
+    rsys->_disableTextureUnitsFrom(0,TextureUnitState::BT_ALL);
     if (GLEW_VERSION_1_2)
     {
         mGLSupport.getStateCacheManager()->activateGLTextureUnit(0);

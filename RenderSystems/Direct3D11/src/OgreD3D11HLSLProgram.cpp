@@ -258,7 +258,7 @@ namespace Ogre {
         macro.Name = 0;
         macro.Definition = 0;
         defines.push_back(macro);
-    }       
+    }
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::loadFromSource(void)
     {
@@ -1070,19 +1070,6 @@ namespace Ogre {
     void D3D11HLSLProgram::analizeMicrocode()
     {
         // enum parameters
-        mInputVertexDeclaration.removeAllElements();
-
-        for (UINT i=0 ; i < mD3d11ShaderInputParameters.size() ; i++)
-        {
-            D3D11_SIGNATURE_PARAMETER_DESC  & paramDesc = mD3d11ShaderInputParameters[i];
-            mInputVertexDeclaration.addElement(
-                paramDesc.Register, 
-                -1, // we don't need the offset
-                VET_FLOAT1, // doesn't matter
-                D3D11Mappings::get(paramDesc.SemanticName),
-                paramDesc.SemanticIndex);
-        }
-
         UINT bufferCount = 0;
         UINT pointerCount = 0;
         UINT typeCount = 0;
@@ -1256,25 +1243,39 @@ namespace Ogre {
         {
             GpuConstantDefinitionWithName def = mD3d11ShaderVariableSubparts[i];
             int paramIndex = def.logicalIndex;
+            GpuLogicalBufferStructPtr currentBuffer;
+            size_t* currentBufferSize = NULL;
             if (def.isFloat())
             {
-                def.physicalIndex = mFloatLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mFloatLogicalToPhysical->mutex);
-                    mFloatLogicalToPhysical->map.insert(
-                    GpuLogicalIndexUseMap::value_type(paramIndex, 
+                currentBuffer = mFloatLogicalToPhysical;
+                currentBufferSize = &mConstantDefs->floatBufferSize;
+            }
+            else if (def.isInt())
+            {
+                currentBuffer = mIntLogicalToPhysical;
+                currentBufferSize = &mConstantDefs->intBufferSize;
+            }
+            else if (def.isUnsignedInt())
+            {
+                currentBuffer = mUIntLogicalToPhysical;
+                currentBufferSize = &mConstantDefs->uintBufferSize;
+            }
+
+            if (!currentBuffer.isNull() && currentBufferSize != NULL)
+            {
+                def.physicalIndex = currentBuffer->bufferSize;
+                OGRE_LOCK_MUTEX(currentBuffer->mutex);
+                currentBuffer->map.insert(
+                    GpuLogicalIndexUseMap::value_type(paramIndex,
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-                mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
+                currentBuffer->bufferSize += def.arraySize * def.elementSize;
+                *currentBufferSize = currentBuffer->bufferSize;
             }
             else
             {
-                def.physicalIndex = mIntLogicalToPhysical->bufferSize;
-                OGRE_LOCK_MUTEX(mIntLogicalToPhysical->mutex);
-                    mIntLogicalToPhysical->map.insert(
-                    GpuLogicalIndexUseMap::value_type(paramIndex, 
-                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
-                mIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
-                mConstantDefs->intBufferSize = mIntLogicalToPhysical->bufferSize;
+                OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+                            "Currently the only supported variables for Direct3D11 hlsl program are: 'float', 'int' and ' unsigned int'", 
+                            "D3D11HLSLProgram::getConstantBuffer");
             }
 
             mConstantDefs->map.insert(GpuConstantDefinitionMap::value_type(def.Name, def));
@@ -1355,7 +1356,10 @@ namespace Ogre {
         else
         {
             // Process params
-            if (varRefTypeDesc.Type == D3D_SVT_FLOAT || varRefTypeDesc.Type == D3D_SVT_INT || varRefTypeDesc.Type == D3D_SVT_BOOL)
+            if (   varRefTypeDesc.Type == D3D_SVT_FLOAT 
+                || varRefTypeDesc.Type == D3D_SVT_INT 
+                || varRefTypeDesc.Type == D3D_SVT_UINT 
+                || varRefTypeDesc.Type == D3D_SVT_BOOL)
             {
                 GpuConstantDefinitionWithName def;
                 String * name = new String(prefix + paramName);
@@ -1393,6 +1397,23 @@ namespace Ogre {
                 break;
             case 4:
                 def.constType = GCT_INT4;
+                break;
+            } // columns
+            break;
+        case D3D10_SVT_UINT:
+            switch (d3dDesc.Columns)
+            {
+            case 1:
+                def.constType = GCT_UINT1;
+                break;
+            case 2:
+                def.constType = GCT_UINT2;
+                break;
+            case 3:
+                def.constType = GCT_UINT3;
+                break;
+            case 4:
+                def.constType = GCT_UINT4;
                 break;
             } // columns
             break;
@@ -1484,7 +1505,7 @@ namespace Ogre {
         , mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device)
         , mVertexShader(NULL), mConstantBufferSize(0)
         , mPixelShader(NULL),mGeometryShader(NULL), mHullShader(NULL), mDomainShader(NULL), mComputeShader(NULL)
-		, mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false), mInputVertexDeclaration(device)
+        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
 		mEnableBackwardsCompatibility = true;
@@ -1923,7 +1944,7 @@ namespace Ogre {
             
             if (!it->mUniformBuffer.isNull())
             {
-                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
+                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD, Ogre::HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE);
 
                 // Only iterate through parsed variables (getting size of list)
                 void* src = 0;
@@ -1940,10 +1961,23 @@ namespace Ogre {
                         {
                             src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
                         }
-                        else
+                        else if (def.isInt())
                         {
                             src = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
                         }
+
+                        else if (def.isUnsignedInt())
+                        {
+                            src = (void *)&(*(params->getUnsignedIntConstantList().begin() + def.physicalIndex));
+                        }
+                        else
+                        {
+                            OGRE_EXCEPT(Exception::ERR_INVALID_STATE, 
+                                        "Currently the only supported variables for Direct3D11 hlsl program are: 'float', 'int' and ' unsigned int'", 
+                                        "D3D11HLSLProgram::getConstantBuffer");
+                        }
+                        
+
 
                         memcpy( &(((char *)(pMappedData))[iter->startOffset]), src , iter->size);
                     }
@@ -1969,7 +2003,7 @@ namespace Ogre {
         {
             if (!it->mUniformBuffer.isNull())
             {
-                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD);
+                void* pMappedData = it->mUniformBuffer->lock(HardwareBuffer::HBL_DISCARD, Ogre::HardwareBuffer::HBU_ONLY_ACTIVE_DEVICE);
 
                 // Only iterate through parsed variables (getting size of list)
                 void* src = 0;
@@ -2079,6 +2113,21 @@ namespace Ogre {
     {
         return mD3d11ShaderInputParameters.size();
     }
+    //-----------------------------------------------------------------------------
+    unsigned int D3D11HLSLProgram::getNumOfVertexInputs(void) const
+    {
+        int count = 0;
+        D3d11ShaderParameters::const_iterator it_end = mD3d11ShaderInputParameters.end();
+        for (D3d11ShaderParameters::const_iterator it = mD3d11ShaderInputParameters.begin(); it != it_end; it++)
+        {
+            const D3D11_SIGNATURE_PARAMETER_DESC& param = *it;
+            if (param.SystemValueType == D3D_NAME_UNDEFINED)
+
+                count++;
+        }
+        return count;
+    }
+
     //-----------------------------------------------------------------------------
     unsigned int D3D11HLSLProgram::getNumOutputs( void ) const
     {

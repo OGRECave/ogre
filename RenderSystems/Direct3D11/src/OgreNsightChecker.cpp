@@ -112,33 +112,16 @@ const DWORD TIMEOUT = 30000;
 
 static std::string GetProcessFileName(DWORD processID)
 {
-		std::string result = "";
+    HANDLE hProcess = OpenProcess(
+        SYNCHRONIZE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+        FALSE, processID);
+    if (hProcess != NULL)
+    {
+        char buffer[MAX_PATH];
+        return GetProcessImageFileName(hProcess, buffer, MAX_PATH) > 0 ? buffer : "";
+    }
 
-		HANDLE hProcess = OpenProcess(
-			SYNCHRONIZE | PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-			FALSE, processID);
-		if (hProcess != NULL)
-		{
-			// Here we call EnumProcessModules to get only the
-			// first module in the process this is important,
-			// because this will be the .EXE module for which we
-			// will retrieve the full path name in a second.
-			HMODULE        hMod;
-			char           szFileName[MAX_PATH];
-			DWORD dwSize2 = 0;
-			LPTSTR pszName = NULL;
-			if (EnumProcessModules(hProcess, &hMod,
-				sizeof(hMod), &dwSize2))
-			{
-				// Get Full pathname:
-
-				if (GetModuleFileNameEx(hProcess, hMod,
-					szFileName, sizeof(szFileName)))
-					result = std::string(szFileName);
-			}
-		}
-
-		return result;
+    return "";
 }
 
 static bool IsWorkingUnderNsightImpl()

@@ -154,7 +154,8 @@ namespace Ogre {
                     buffer is requested for rendering.
                 */
                 HBU_ON_DEMAND = 0x0001,
-                HBU_ONLY_ACTIVE_DEVICE = 0x0002             
+                
+                HBU_ONLY_ACTIVE_DEVICE = 0x0002
             };
 
         protected:
@@ -173,6 +174,10 @@ namespace Ogre {
             
             /// Internal implementation of lock()
             virtual void* lockImpl(size_t offset, size_t length, LockOptions options) = 0;
+            virtual void* lockImpl(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
+            {
+                return lockImpl(offset, length, options);
+            }
             /// Internal implementation of unlock()
             virtual void unlockImpl(void) = 0;
 
@@ -225,7 +230,7 @@ namespace Ogre {
                 else
                 {
                     // Lock the real buffer if there is no shadow buffer 
-                    ret = lockImpl(offset, length, options);
+                    ret = lockImpl(offset, length, options, uploadOpt);
                     mIsLocked = true;
                 }
                 mLockStart = offset;

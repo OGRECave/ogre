@@ -54,17 +54,6 @@ namespace Ogre {
             }
         }
 
-        {
-            ShaderToInputDescIterator iter = mD3delems.begin();
-            ShaderToInputDescIterator iterE = mD3delems.end();
-            for( ; iter != iterE ; iter++ )
-            {
-                SAFE_DELETE_ARRAY(iter->second);
-
-            }
-        }
-
-
     }
     //-----------------------------------------------------------------------
     const VertexElement& D3D11VertexDeclaration::addElement(unsigned short source, 
@@ -109,75 +98,67 @@ namespace Ogre {
         mNeedsRebuild = true;
     }
     //-----------------------------------------------------------------------
-    D3D11_INPUT_ELEMENT_DESC * D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
+    const D3D11VertexDeclaration::VecD3D11InputElementDesc& D3D11VertexDeclaration::getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
         // Create D3D elements
         size_t iNumElements = boundVertexProgram->getNumInputs();
+        
+        ShaderToInputDescIterator itElement = mD3delems.find(boundVertexProgram);
 
-        if (mD3delems.find(boundVertexProgram) == mD3delems.end())
+        VecD3D11InputElementDesc d3delems;
+
+        if (itElement != mD3delems.end())
         {
-            D3D11_INPUT_ELEMENT_DESC*  D3delems = new D3D11_INPUT_ELEMENT_DESC[iNumElements];
-            ZeroMemory(D3delems, sizeof(D3D11_INPUT_ELEMENT_DESC) * iNumElements);
-
-            unsigned int idx;
-            for (idx = 0; idx < iNumElements; ++idx)
+            //Fetch previously created input layout
+            d3delems = itElement->second;
+        }
+        else
+        {
+            for (unsigned int idx = 0 ; idx < iNumElements; idx++)
             {
                 D3D11_SIGNATURE_PARAMETER_DESC inputDesc = boundVertexProgram->getInputParamDesc(idx);
-                VertexElementList::const_iterator i, iend;
-                iend = mElementList.end();
-                bool found = false;
-                for (i = mElementList.begin(); i != iend; ++i)
+                
+                //If it's a system variable don't bind to vertex input.
+                if (inputDesc.SystemValueType != D3D_NAME_UNDEFINED)
                 {
-                    LPCSTR semanticName         = D3D11Mappings::get(i->getSemantic());
-                    UINT semanticIndex          = i->getIndex();
-                    if(
-                        strcmp(semanticName, inputDesc.SemanticName) == 0
-                        && semanticIndex == inputDesc.SemanticIndex
-                      )
-                    {
-                        found = true;
-                        break;
-                    }
+                    continue;
                 }
 
-                if(!found)
+                VertexElementList::const_iterator it;
+                if (!findElemment(inputDesc, it))
                 {
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Unable to set D3D11 vertex declaration" , 
-                                                "D3D11VertexDeclaration::getILayoutByShader");
-                }
+                    StringStream ss;
+                    ss << "Could not find a suitable vertex buffer element for '" <<
+                        inputDesc.SemanticName << ":" << inputDesc.SemanticIndex << "' in the vertex program '" <<
+                        boundVertexProgram->getName() << "'";
 
-                D3delems[idx].SemanticName          = inputDesc.SemanticName;
-                D3delems[idx].SemanticIndex         = inputDesc.SemanticIndex;
-                D3delems[idx].Format                = D3D11Mappings::get(i->getType());
-                D3delems[idx].InputSlot             = i->getSource();
-                D3delems[idx].AlignedByteOffset     = static_cast<WORD>(i->getOffset());
-                D3delems[idx].InputSlotClass        = D3D11_INPUT_PER_VERTEX_DATA;
-                D3delems[idx].InstanceDataStepRate  = 0;
+                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, ss.str().c_str(),
+                        "D3D11VertexDeclaration::getD3DVertexDeclaration");
+                }
 
                 VertexBufferBinding::VertexBufferBindingMap::const_iterator foundIter;
-                foundIter = binding->getBindings().find(i->getSource());
-                if ( foundIter != binding->getBindings().end() )
+				unsigned short vertextBindingSlot = it->getSource();
+				foundIter = binding->getBindings().find(vertextBindingSlot);
+                if (foundIter == binding->getBindings().end())
                 {
-                    HardwareVertexBufferSharedPtr bufAtSlot = foundIter->second;
-                    if ( bufAtSlot->getIsInstanceData() )
-                    {
-                        D3delems[idx].InputSlotClass        = D3D11_INPUT_PER_INSTANCE_DATA;
-                        D3delems[idx].InstanceDataStepRate  = bufAtSlot->getInstanceDataStepRate();
-                    }
-                }
-                else
-                {
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "Unable to found a bound vertex for a slot that is used in the vertex declaration." , 
-                        "D3D11VertexDeclaration::getD3DVertexDeclaration");
+					StringStream ss;
+					ss << "A reference to vertex buffer slot no. " << vertextBindingSlot << " is found in the vertex deceleration\n\
+	         				but could not be found in the  vertex bindings";
 
-                }               
+					OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,ss.str().c_str(),
+                        "D3D11VertexDeclaration::getD3DVertexDeclaration");
+                }
+
+                d3delems.push_back(D3D11_INPUT_ELEMENT_DESC());
+
+                fillInputElement(inputDesc, it, foundIter->second,  d3delems[d3delems.size() - 1]);
             }
 
-            mD3delems[boundVertexProgram] = D3delems;
+            assert("Vertex decleration number fo elements must match the number of vertex shader inputs"
+                && d3delems.size() == boundVertexProgram->getNumOfVertexInputs());
+            mD3delems[boundVertexProgram] = d3delems;
 
         }
-
         return mD3delems[boundVertexProgram];
     }
     //-----------------------------------------------------------------------
@@ -185,7 +166,7 @@ namespace Ogre {
     {
         ShaderToILayoutMapIterator foundIter = mShaderToILayoutMap.find(boundVertexProgram);
 
-        ID3D11InputLayout*  pVertexLayout = 0; 
+        ID3D11InputLayout*  pVertexLayout = NULL;
 
         if (foundIter == mShaderToILayoutMap.end())
         {
@@ -194,14 +175,11 @@ namespace Ogre {
             DWORD dwShaderFlags = 0;
             const MicroCode &  vSBuf = boundVertexProgram->getMicroCode();
 
-            D3D11_INPUT_ELEMENT_DESC * pVertexDecl=getD3DVertexDeclaration(boundVertexProgram, binding);
-
-            // bad bug tracing. see what will happen next.
-            //if (pVertexDecl->Format == DXGI_FORMAT_R16G16_SINT)
-            //  pVertexDecl->Format = DXGI_FORMAT_R16G16_FLOAT;
-            HRESULT hr = mlpD3DDevice->CreateInputLayout( 
-                pVertexDecl, 
-                boundVertexProgram->getNumInputs(), 
+            const VecD3D11InputElementDesc& vertexDecl = getD3DVertexDeclaration(boundVertexProgram, binding);
+            
+            HRESULT hr = mlpD3DDevice->CreateInputLayout(
+                &vertexDecl[0],
+                vertexDecl.size(),
                 &vSBuf[0], 
                 vSBuf.size(),
                 &pVertexLayout );
@@ -240,6 +218,57 @@ namespace Ogre {
         ID3D11InputLayout*  pVertexLayout = getILayoutByShader(boundVertexProgram, binding);
         mlpD3DDevice.GetImmediateContext()->IASetInputLayout( pVertexLayout);
     }   
+    //-----------------------------------------------------------------------
+    bool D3D11VertexDeclaration::findElemment(const D3D11_SIGNATURE_PARAMETER_DESC& inputDesc, VertexElementList::const_iterator& it)
+    {
+        VertexElementList::const_iterator i, iend;
+        iend = mElementList.end();
+
+        for (i = mElementList.begin(); i != iend; ++i)
+        {
+            LPCSTR semanticName = D3D11Mappings::get(i->getSemantic());
+            UINT semanticIndex = i->getIndex();
+            if (
+                
+                (strcmp(semanticName, inputDesc.SemanticName) == 0
+                // treat SV_POSITION in the vertex shader input as POSITION
+                || (strcmp(semanticName, "POSITION") == 0
+                && (strcmp(inputDesc.SemanticName, "SV_POSITION") == 0)))
+                
+                && semanticIndex == inputDesc.SemanticIndex
+                )
+            {
+                it = i;
+                return true;
+                break;
+            }
+        }
+
+        return false;
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::fillInputElement(const D3D11_SIGNATURE_PARAMETER_DESC& inputDesc , 
+        const VertexElementList::const_iterator& it, 
+        HardwareVertexBufferSharedPtr vertexBuffer,
+        D3D11_INPUT_ELEMENT_DESC& element)
+    {
+        element.SemanticName = inputDesc.SemanticName;
+        element.SemanticIndex = inputDesc.SemanticIndex;
+        element.Format = D3D11Mappings::get(it->getType());
+        element.InputSlot = it->getSource();
+        element.AlignedByteOffset = static_cast<WORD>(it->getOffset());
+        element.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+        element.InstanceDataStepRate = 0;
+
+
+        if (vertexBuffer->getIsInstanceData())
+        {
+            element.InputSlotClass = D3D11_INPUT_PER_INSTANCE_DATA;
+            element.InstanceDataStepRate = vertexBuffer->getInstanceDataStepRate();
+        }
+    
+    }
+
 }
 
 
