@@ -405,14 +405,14 @@ namespace Ogre
                                                                   HlmsParamVec() );
                 loadDatablockCommon( itor->value, blocks, datablock );
 
-                hlms->loadJson( json, blocks, datablock );
+                hlms->loadJson( itor->value, blocks, datablock );
             }
 
             ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJson::loadMaterials( const char *filename, const char *jsonString )
+    void HlmsJson::loadMaterials( const String &filename, const char *jsonString )
     {
         rapidjson::Document d;
         d.Parse( jsonString );
@@ -421,7 +421,7 @@ namespace Ogre
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                          "HlmsJson::loadMaterials",
-                         "Invalid JSON string in file " + std::string(filename) );
+                         "Invalid JSON string in file " + filename );
         }
 
         NamedBlocks blocks;
@@ -503,7 +503,7 @@ namespace Ogre
             {
                 Hlms *hlms = mHlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
 
-                if( typeName == hlms->getTypeName() )
+                if( hlms && typeName == hlms->getTypeName() )
                 {
                     loadDatablocks( itDatablock->value, blocks, hlms );
                 }

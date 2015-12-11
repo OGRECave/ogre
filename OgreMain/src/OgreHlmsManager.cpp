@@ -33,6 +33,9 @@ THE SOFTWARE.
 #include "OgreHlmsTextureManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
+#ifdef OGRE_USE_JSON
+    #include "OgreResourceGroupManager.h"
+#endif
 
 namespace Ogre
 {
@@ -74,10 +77,19 @@ namespace Ogre
             mBlocks[BLOCK_SAMPLER][i] = &mSamplerblocks[i];
             mFreeBlockIds[BLOCK_SAMPLER].push_back( (OGRE_HLMS_NUM_SAMPLERBLOCKS - 1) - i );
         }
+
+#ifdef OGRE_USE_JSON
+        mScriptPatterns.push_back( "*.material.json" );
+        ResourceGroupManager::getSingleton()._registerScriptLoader(this);
+#endif
     }
     //-----------------------------------------------------------------------------------
     HlmsManager::~HlmsManager()
     {
+#ifdef OGRE_USE_JSON
+        ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
+#endif
+
         renderSystemDestroyAllBlocks();
 
         OGRE_DELETE mTextureManager;
@@ -502,4 +514,31 @@ namespace Ogre
                 mRegisteredHlms[i]->_changeRenderSystem( newRs );
         }
     }
+#ifdef OGRE_USE_JSON
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::loadMaterials( const String &filename, const char *jsonString )
+    {
+        HlmsJson hlmsJson( this );
+        hlmsJson.loadMaterials( filename, jsonString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::parseScript(DataStreamPtr& stream, const String& groupName)
+    {
+        vector<char>::type fileData;
+        fileData.resize( stream->size() + 1 );
+        if( !fileData.empty() )
+        {
+            stream->read( &fileData[0], stream->size() );
+
+            //Add null terminator just in case (to prevent bad input)
+            fileData.back() = '\0';
+            loadMaterials( stream->getName(), &fileData[0] );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    Real HlmsManager::getLoadingOrder(void) const
+    {
+        return 100;
+    }
+#endif
 }

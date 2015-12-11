@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsSamplerblock.h"
+#ifdef OGRE_USE_JSON
+    #include "OgreScriptLoader.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -50,7 +53,11 @@ namespace Ogre
 #define OGRE_HLMS_MAX_BASIC_BLOCKS OGRE_HLMS_NUM_SAMPLERBLOCKS
 
     /** HLMS stands for "High Level Material System". */
-    class _OgreExport HlmsManager : public PassAlloc
+    class _OgreExport HlmsManager :
+        #ifdef OGRE_USE_JSON
+            public ScriptLoader,
+        #endif
+            public PassAlloc
     {
         Hlms    *mRegisteredHlms[HLMS_MAX];
         bool    mDeleteRegisteredOnExit[HLMS_MAX];
@@ -72,6 +79,10 @@ namespace Ogre
         HlmsDatablockMap mRegisteredDatablocks;
 
         HlmsTypes           mDefaultHlmsType;
+
+#ifdef OGRE_USE_JSON
+        StringVector mScriptPatterns;
+#endif
 
         void renderSystemDestroyAllBlocks(void);
         uint16 getFreeBasicBlock( uint8 type );
@@ -215,7 +226,12 @@ namespace Ogre
         void _changeRenderSystem( RenderSystem *newRs );
 
 #ifdef OGRE_USE_JSON
-        void loadMaterials( const char *jsonString );
+        void loadMaterials( const String &filename, const char *jsonString );
+
+        //ScriptLoader overloads
+        virtual void parseScript(DataStreamPtr& stream, const String& groupName);
+        virtual const StringVector& getScriptPatterns(void) const       { return mScriptPatterns; }
+        virtual Real getLoadingOrder(void) const;
 #endif
     };
     /** @} */

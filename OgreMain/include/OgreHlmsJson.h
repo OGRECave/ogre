@@ -91,7 +91,7 @@ namespace Ogre
         HlmsJson( HlmsManager *hlmsManager );
         ~HlmsJson();
 
-        void loadMaterials( const char *filename, const char *jsonString );
+        void loadMaterials( const String &filename, const char *jsonString );
     };
     /** @} */
     /** @} */

@@ -571,7 +571,7 @@ namespace Ogre
         return mFresnelTypeSizeBytes != 4;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::_setTextures( PackedTexture packedTextures[NUM_PBSM_TEXTURE_TYPES] )
+    void HlmsPbsDatablock::_setTextures( const PackedTexture packedTextures[NUM_PBSM_TEXTURE_TYPES] )
     {
         PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
 
@@ -584,9 +584,8 @@ namespace Ogre
 
             mTexToBakedTextureIdx[i] = packedTextures[i].xIdx;
             textures[i] = PbsBakedTexture( packedTextures[i].texture, packedTextures[i].samplerblock );
-            mSamplerblocks[i] = packedTextures[i].samplerblock;
 
-            if( !textures[i].texture.isNull() && !mSamplerblocks[i] )
+            if( !textures[i].texture.isNull() && !textures[i].samplerBlock )
             {
                 HlmsSamplerblock samplerBlockRef;
                 if( i >= PBSM_DETAIL0 && i <= PBSM_DETAIL3_NM )
@@ -597,8 +596,10 @@ namespace Ogre
                     samplerBlockRef.mW = TAM_WRAP;
                 }
 
-                mSamplerblocks[i] = hlmsManager->getSamplerblock( samplerBlockRef );
+                textures[i].samplerBlock = hlmsManager->getSamplerblock( samplerBlockRef );
             }
+
+            mSamplerblocks[i] = packedTextures[i].samplerblock;
         }
 
         bakeTextures( textures );

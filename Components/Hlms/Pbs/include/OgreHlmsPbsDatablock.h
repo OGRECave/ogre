@@ -388,7 +388,7 @@ namespace Ogre
             increased prior to calling this function. We will not increase.
             If null, a default samplerblock will be assigned
         */
-        void _setTextures( PackedTexture packedTextures[NUM_PBSM_TEXTURE_TYPES] );
+        void _setTextures( const PackedTexture packedTextures[] );
 
         /** Sets a new texture for rendering. Calling this function may trigger an
             HlmsDatablock::flushRenderables if the texture or the samplerblock changes.
