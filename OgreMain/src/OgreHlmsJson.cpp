@@ -324,8 +324,9 @@ namespace Ogre
         {
             if( itor->value.IsString() )
             {
-                map<const char*, const HlmsMacroblock*>::type::const_iterator it =
-                        blocks.macroblocks.find( itor->value.GetString() );
+                map<LwConstString, const HlmsMacroblock*>::type::const_iterator it =
+                        blocks.macroblocks.find( LwConstString::FromUnsafeCStr(
+                                                     itor->value.GetString() ) );
                 if( it != blocks.macroblocks.end() )
                     datablock->setMacroblock( it->second );
             }
@@ -337,8 +338,9 @@ namespace Ogre
                 {
                     if( array[i].IsString() )
                     {
-                        map<const char*, const HlmsMacroblock*>::type::const_iterator it =
-                                blocks.macroblocks.find( array[i].GetString() );
+                        map<LwConstString, const HlmsMacroblock*>::type::const_iterator it =
+                                blocks.macroblocks.find( LwConstString::FromUnsafeCStr(
+                                                             array[i].GetString() ) );
                         if( it != blocks.macroblocks.end() )
                             datablock->setMacroblock( it->second, i == 0 );
                     }
@@ -351,8 +353,9 @@ namespace Ogre
         {
             if( itor->value.IsString() )
             {
-                map<const char*, const HlmsBlendblock*>::type::const_iterator it =
-                        blocks.blendblocks.find( itor->value.GetString() );
+                map<LwConstString, const HlmsBlendblock*>::type::const_iterator it =
+                        blocks.blendblocks.find( LwConstString::FromUnsafeCStr(
+                                                     itor->value.GetString() ) );
                 if( it != blocks.blendblocks.end() )
                     datablock->setBlendblock( it->second );
             }
@@ -364,8 +367,9 @@ namespace Ogre
                 {
                     if( array[i].IsString() )
                     {
-                        map<const char*, const HlmsBlendblock*>::type::const_iterator it =
-                                blocks.blendblocks.find( array[i].GetString() );
+                        map<LwConstString, const HlmsBlendblock*>::type::const_iterator it =
+                                blocks.blendblocks.find( LwConstString::FromUnsafeCStr(
+                                                             array[i].GetString() ) );
                         if( it != blocks.blendblocks.end() )
                             datablock->setBlendblock( it->second, i == 0 );
                     }
@@ -440,7 +444,7 @@ namespace Ogre
                 HlmsSamplerblock samplerblock;
                 loadSampler( itSampler->value, samplerblock );
 
-                const char *keyName = itSampler->name.GetString();
+                LwConstString keyName( LwConstString::FromUnsafeCStr(itSampler->name.GetString()) );
 
                 blocks.samplerblocks[keyName] = mHlmsManager->getSamplerblock( samplerblock );
 
@@ -462,7 +466,7 @@ namespace Ogre
                 HlmsMacroblock macroblock;
                 loadMacroblock( itMacros->value, macroblock );
 
-                const char *keyName = itMacros->name.GetString();
+                LwConstString keyName( LwConstString::FromUnsafeCStr(itMacros->name.GetString()) );
 
                 blocks.macroblocks[keyName] = mHlmsManager->getMacroblock( macroblock );
 
@@ -484,7 +488,7 @@ namespace Ogre
                 HlmsBlendblock blendblock;
                 loadBlendblock( itBlends->value, blendblock );
 
-                const char *keyName = itBlends->name.GetString();
+                LwConstString keyName( LwConstString::FromUnsafeCStr(itBlends->name.GetString()) );
 
                 blocks.blendblocks[keyName] = mHlmsManager->getBlendblock( blendblock );
 
@@ -513,9 +517,9 @@ namespace Ogre
         }
 
         {
-            map<const char*, const HlmsMacroblock*>::type::const_iterator it =
+            map<LwConstString, const HlmsMacroblock*>::type::const_iterator it =
                     blocks.macroblocks.begin();
-            map<const char*, const HlmsMacroblock*>::type::const_iterator en =
+            map<LwConstString, const HlmsMacroblock*>::type::const_iterator en =
                     blocks.macroblocks.end();
 
             while( it != en )
@@ -527,9 +531,9 @@ namespace Ogre
             blocks.macroblocks.clear();
         }
         {
-            map<const char*, const HlmsBlendblock*>::type::const_iterator it =
+            map<LwConstString, const HlmsBlendblock*>::type::const_iterator it =
                     blocks.blendblocks.begin();
-            map<const char*, const HlmsBlendblock*>::type::const_iterator en =
+            map<LwConstString, const HlmsBlendblock*>::type::const_iterator en =
                     blocks.blendblocks.end();
 
             while( it != en )
@@ -541,9 +545,9 @@ namespace Ogre
             blocks.blendblocks.clear();
         }
         {
-            map<const char*, const HlmsSamplerblock*>::type::const_iterator it =
+            map<LwConstString, const HlmsSamplerblock*>::type::const_iterator it =
                     blocks.samplerblocks.begin();
-            map<const char*, const HlmsSamplerblock*>::type::const_iterator en =
+            map<LwConstString, const HlmsSamplerblock*>::type::const_iterator en =
                     blocks.samplerblocks.end();
 
             while( it != en )

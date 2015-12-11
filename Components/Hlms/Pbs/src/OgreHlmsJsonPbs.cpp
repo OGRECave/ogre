@@ -161,8 +161,8 @@ namespace Ogre
         itor = json.FindMember("sampler");
         if( itor != json.MemberEnd() && itor->value.IsString() )
         {
-            map<const char*, const HlmsSamplerblock*>::type::const_iterator it =
-                    blocks.samplerblocks.find( itor->value.GetString() );
+            map<LwConstString, const HlmsSamplerblock*>::type::const_iterator it =
+                    blocks.samplerblocks.find( LwConstString::FromUnsafeCStr(itor->value.GetString()) );
             if( it != blocks.samplerblocks.end() )
             {
                 textures[textureType].samplerblock = it->second;

@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsSamplerblock.h"
+#include "OgreLwConstString.h"
 #include "OgreHeaderPrefix.h"
 
 // Forward declaration for |Document|.
@@ -63,9 +64,9 @@ namespace Ogre
     public:
         struct NamedBlocks
         {
-            map<const char*, const HlmsMacroblock*>::type macroblocks;
-            map<const char*, const HlmsBlendblock*>::type blendblocks;
-            map<const char*, const HlmsSamplerblock*>::type samplerblocks;
+            map<LwConstString, const HlmsMacroblock*>::type macroblocks;
+            map<LwConstString, const HlmsBlendblock*>::type blendblocks;
+            map<LwConstString, const HlmsSamplerblock*>::type samplerblocks;
         };
 
     protected:
