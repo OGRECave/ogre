@@ -91,11 +91,11 @@ namespace Ogre
         {
         }
 
-        inline explicit Vector2::Vector2(const Vector3& vec3) : x(vec3.x), y(vec3.y)
+        inline explicit Vector2(const Vector3& vec3) : x(vec3.x), y(vec3.y)
         {
         }
         
-        inline explicit Vector2::Vector2(const Vector4& vec4) : x(vec4.x), y(vec4.y)
+        inline explicit Vector2(const Vector4& vec4) : x(vec4.x), y(vec4.y)
         {
 
         }
