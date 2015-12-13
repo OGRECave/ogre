@@ -39,7 +39,7 @@ THE SOFTWARE.
 #define STBI_NO_STDIO
 #define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_STATIC
-#include "stbi/stb_image.h"
+#include <stb_image.h>
 
 namespace Ogre {
 

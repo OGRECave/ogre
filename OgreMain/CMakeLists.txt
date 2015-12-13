@@ -244,9 +244,11 @@ endif ()
 
 list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})
 
-# Add needed definitions and nedmalloc include dir
-add_definitions(-DOGRE_NONCLIENT_BUILD -DFREEIMAGE_LIB -D_MT -D_USRDLL)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
+add_definitions(-DOGRE_NONCLIENT_BUILD)
+
+if(NOT OGRE_CONFIG_ALLOCATOR EQUAL 1)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/nedmalloc)
+endif()
 
 set(LIBRARIES ${PLATFORM_LIBS})
 
@@ -255,12 +257,15 @@ if (OGRE_CONFIG_THREADS)
 endif ()
 
 if (OGRE_CONFIG_ENABLE_FREEIMAGE)
+  add_definitions(-DFREEIMAGE_LIB)
   list(APPEND HEADER_FILES include/OgreFreeImageCodec.h)
   list(APPEND SOURCE_FILES src/OgreFreeImageCodec.cpp)
   list(APPEND LIBRARIES    "${FreeImage_LIBRARIES}")
 endif()
 
 if (OGRE_CONFIG_ENABLE_STBI)
+  # SYSTEM prevents warnings for code that we do not control
+  include_directories(SYSTEM src/stbi)
   list(APPEND HEADER_FILES include/OgreSTBICodec.h)
   list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
 endif ()

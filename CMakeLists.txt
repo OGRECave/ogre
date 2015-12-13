@@ -123,6 +123,8 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OGRE_WARNING_FLAGS}")
 endif ()
 if (MSVC)
+  add_definitions(-D_MT -D_USRDLL)
+
   if (CMAKE_BUILD_TOOL STREQUAL "nmake")
     # set variable to state that we are using nmake makefiles
 	set(NMAKE TRUE)

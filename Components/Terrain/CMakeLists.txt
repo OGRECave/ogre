@@ -25,7 +25,7 @@ list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreTerrainPagedW
 )
 
 # Add needed definitions 
-add_definitions(-DOGRE_TERRAIN_EXPORTS -D_MT -D_USRDLL)
+add_definitions(-DOGRE_TERRAIN_EXPORTS)
 
 if (OGRE_BUILD_COMPONENT_PAGING)
   list(APPEND HEADER_FILES
