@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
 #ifndef _OgreHlmsJsonPbs_H_
 #define _OgreHlmsJsonPbs_H_
 

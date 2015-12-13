@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreHlmsTextureManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
     #include "OgreResourceGroupManager.h"
 #endif
 
@@ -78,7 +78,7 @@ namespace Ogre
             mFreeBlockIds[BLOCK_SAMPLER].push_back( (OGRE_HLMS_NUM_SAMPLERBLOCKS - 1) - i );
         }
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
         mScriptPatterns.push_back( "*.material.json" );
         ResourceGroupManager::getSingleton()._registerScriptLoader(this);
 #endif
@@ -86,7 +86,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsManager::~HlmsManager()
     {
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
         ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
 #endif
 
@@ -514,7 +514,7 @@ namespace Ogre
                 mRegisteredHlms[i]->_changeRenderSystem( newRs );
         }
     }
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
     //-----------------------------------------------------------------------------------
     void HlmsManager::loadMaterials( const String &filename, const char *jsonString )
     {

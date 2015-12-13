@@ -435,6 +435,7 @@ option(OGRE_CONFIG_MEMTRACK_RELEASE "Enable Ogre's memory tracker in release mod
 include(PrepareThreadingOptions)
 cmake_dependent_option(OGRE_CONFIG_ENABLE_FREEIMAGE "Build FreeImage codec. If you disable this option, you need to provide your own image handling codecs." TRUE "FreeImage_FOUND" FALSE)
 option(OGRE_CONFIG_ENABLE_STBI "Enable STBI image codec." FALSE)
+cmake_dependent_option(OGRE_CONFIG_ENABLE_JSON "Use rapidjson (needed by Hlms JSON materials)" TRUE "Rapidjson_FOUND" FALSE)
 option(OGRE_CONFIG_ENABLE_MESHLOD "Enable Mesh Lod." TRUE)
 option(OGRE_CONFIG_ENABLE_DDS "Build DDS codec." TRUE)
 option(OGRE_CONFIG_ENABLE_PVRTC "Build PVRTC codec." FALSE)

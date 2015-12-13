@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef _OgreHlmsJson_H_
 #define _OgreHlmsJson_H_
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
 
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsDatablock.h"

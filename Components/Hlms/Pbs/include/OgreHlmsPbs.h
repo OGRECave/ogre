@@ -174,7 +174,7 @@ namespace Ogre
         void setAmbientLightMode( AmbientLightMode mode );
         AmbientLightMode getAmbientLightMode(void) const    { return mAmbientLightMode; }
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
         /// @copydoc Hlms::loadJson
         virtual void loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
                                HlmsDatablock *datablock );

@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsSamplerblock.h"
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
     #include "OgreScriptLoader.h"
 #endif
 #include "OgreHeaderPrefix.h"
@@ -54,7 +54,7 @@ namespace Ogre
 
     /** HLMS stands for "High Level Material System". */
     class _OgreExport HlmsManager :
-        #ifdef OGRE_USE_JSON
+        #if !OGRE_NO_JSON
             public ScriptLoader,
         #endif
             public PassAlloc
@@ -80,7 +80,7 @@ namespace Ogre
 
         HlmsTypes           mDefaultHlmsType;
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
         StringVector mScriptPatterns;
 #endif
 
@@ -225,7 +225,7 @@ namespace Ogre
 
         void _changeRenderSystem( RenderSystem *newRs );
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
         void loadMaterials( const String &filename, const char *jsonString );
 
         //ScriptLoader overloads

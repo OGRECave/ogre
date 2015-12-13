@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreHlmsManager.h"
 #include "OgreHlmsListener.h"
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
     #include "OgreHlmsJsonPbs.h"
 #endif
 
@@ -1421,7 +1421,7 @@ namespace Ogre
     {
         mAmbientLightMode = mode;
     }
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
     //-----------------------------------------------------------------------------------
     void HlmsPbs::loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
                             HlmsDatablock *datablock )

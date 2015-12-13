@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
 
 #include "OgreHlmsJson.h"
 #include "OgreHlmsManager.h"

@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 #include "OgreStringVector.h"
 #include "OgreHlmsCommon.h"
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
     #include "OgreHlmsJson.h"
 #endif
 #include "OgreHeaderPrefix.h"
@@ -322,7 +322,7 @@ namespace Ogre
         void setHighQuality( bool highQuality );
         bool getHighQuality(void) const                     { return mHighQuality; }
 
-#ifdef OGRE_USE_JSON
+#if !OGRE_NO_JSON
         /** Loads datablock values from a JSON value. @see HlmsJson.
         @param jsonValue
             JSON Object containing the definition of this datablock.
