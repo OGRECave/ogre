@@ -56,9 +56,9 @@ endif()
 
 if (UNIX AND NOT APPLE)
   # Separate GLSupport and Window out to fix Unity builds
-  ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES} SEPARATE "src/windowing/GLX/OgreGLXWindow.cpp" "src/windowing/GLX/OgreGLXGLSupport.cpp")
+  ogre_add_library_to_folder(RenderSystems RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES} SEPARATE "src/windowing/GLX/OgreGLXWindow.cpp" "src/windowing/GLX/OgreGLXGLSupport.cpp")
 else()
-  ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
+  ogre_add_library_to_folder(RenderSystems RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
 endif()
 target_link_libraries(RenderSystem_GL3Plus OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
 
