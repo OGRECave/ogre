@@ -15,7 +15,7 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 ogre_add_component_include_dir(RTShaderSystem)
 
-add_library(Sample_ShaderSystemMultiLight ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
+ogre_add_library_to_folder(Samples Sample_ShaderSystemMultiLight ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_ShaderSystemMultiLight ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_ShaderSystemMultiLight)
