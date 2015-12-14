@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramUsage.h"
 #include "OgreTextureUnitState.h"
 #include "OgreStringConverter.h"
-#include "OgreCrc.h"
+#include "OgreCRC.h"
 
 namespace Ogre {
 

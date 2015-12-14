@@ -107,7 +107,7 @@ namespace Ogre {
         #define OGRE_CPP_VER OGRE_CPP_VER_11
     #elif __cplusplus >= OGRE_CPP_VER_98
         #define OGRE_CPP_VER OGRE_CPP_VER_98
-    #elif
+    #else
         #define OGRE_CPP_VER OGRE_CPP_VER_UNDEFINED
     #endif
 #endif
