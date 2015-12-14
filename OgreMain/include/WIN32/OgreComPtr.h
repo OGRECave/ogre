@@ -96,7 +96,7 @@ namespace Ogre
         {
             if(T * temp = m_ptr)
             {
-                m_ptr = nullptr;
+                m_ptr = 0;
                 temp->Release();
             }
         }
@@ -210,7 +210,7 @@ namespace Ogre
         T* Detach() ASSUME_NOEXCEPT
         {
             T* temp = m_ptr;
-            m_ptr = nullptr;
+            m_ptr = 0;
             return temp;
         }
 
