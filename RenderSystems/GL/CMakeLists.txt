@@ -95,7 +95,7 @@ endif()
 
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
-ogre_add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
+ogre_add_library_to_folder(RenderSystems RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
 target_link_libraries(RenderSystem_GL OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)
