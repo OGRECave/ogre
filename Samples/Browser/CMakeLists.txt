@@ -224,7 +224,7 @@ if(ANDROID)
 	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
     
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
-    ADD_LIBRARY(SampleBrowserDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
+    ogre_add_library_to_folder(Samples SampleBrowserDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
     target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
     add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
     

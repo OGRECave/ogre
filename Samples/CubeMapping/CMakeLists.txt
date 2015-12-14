@@ -4,7 +4,7 @@ set(HEADER_FILES include/CubeMapping.h)
 set(SOURCE_FILES src/CubeMapping.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(Sample_CubeMapping ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+ogre_add_library_to_folder(Samples Sample_CubeMapping ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
 
 target_link_libraries(Sample_CubeMapping ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_CubeMapping)

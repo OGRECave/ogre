@@ -5,7 +5,7 @@ set(SOURCE_FILES src/DynTex.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(Sample_DynTex ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
+ogre_add_library_to_folder(Samples Sample_DynTex ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_DynTex ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_DynTex)

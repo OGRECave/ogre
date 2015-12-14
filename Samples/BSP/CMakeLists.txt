@@ -5,7 +5,7 @@ set(HEADER_FILES include/BSP.h)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(Sample_BSP ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
+ogre_add_library_to_folder(Samples Sample_BSP ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
 target_link_libraries(Sample_BSP ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_BSP)

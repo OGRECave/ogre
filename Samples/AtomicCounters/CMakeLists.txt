@@ -4,7 +4,7 @@ set(SOURCE_FILES src/AtomicCounters.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_library(Sample_AtomicCounters ${OGRE_LIB_TYPE} ${SOURCE_FILES})
+ogre_add_library_to_folder(Samples Sample_AtomicCounters ${OGRE_LIB_TYPE} ${SOURCE_FILES})
 
 target_link_libraries(Sample_AtomicCounters ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_AtomicCounters)
