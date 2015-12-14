@@ -289,7 +289,7 @@ namespace Ogre {
             Calls unload() and then load() again, if the resource is already
             loaded. If it is not loaded already, then nothing happens.
         */
-        virtual void reload(LoadingFlags flags);
+        virtual void reload(LoadingFlags flags = LF_DEFAULT);
 
         /** Returns true if the Resource is reloadable, false otherwise.
         */
