@@ -23,22 +23,21 @@ set (SOURCE_FILES
 	src/OgreProperty.cpp
 )
 
-
 # Add needed definitions 
 add_definitions(-DOGRE_PROPERTY_EXPORTS)
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
-include_directories(${Boost_INCLUDE_DIRS})
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
 
 # setup target
 ogre_add_library(OgreProperty ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADER_FILES} ${PLATFORM_SOURCE_FILES})
 set_target_properties(OgreProperty PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
 target_link_libraries(OgreProperty OgreMain)
-if (OGRE_CONFIG_THREADS)
-  target_link_libraries(OgreProperty ${OGRE_THREAD_LIBRARIES})
-endif ()
 
 # install 
 ogre_config_framework(OgreProperty)
