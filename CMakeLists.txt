@@ -136,6 +136,14 @@ if (MSVC)
 	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /bigobj")
 	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /bigobj")
   endif ()
+
+  if (OGRE_PROJECT_FOLDERS)  
+    # Turn on the ability to create folders to organize projects (.vcproj)
+    # It creates "CMakePredefinedTargets" folder by default and adds CMake
+    # defined projects like INSTALL.vcproj and ZERO_CHECK.vcproj
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  endif()
+
   if (OGRE_UNITY_BUILD)
     # object files can get large with Unity builds
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj")
@@ -456,6 +464,8 @@ if (WIN32)
 		install(FILES ${OGRE_BINARY_DIR}/OGRE.props DESTINATION "${CMAKE_INSTALL_PREFIX}")
 	endif ()
 endif ()
+
+option(OGRE_PROJECT_FOLDERS "Orginize project into project folders." FALSE)
 
 # Unity build options
 # A Unity build includes all sources files in just a few actual compilation units
