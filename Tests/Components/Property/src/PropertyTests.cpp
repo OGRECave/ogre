@@ -29,6 +29,13 @@ THE SOFTWARE.
 
 #include "UnitTestSuite.h"
 
+// use std::bind regardless of whether we are using boost or not
+#if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#include <functional>
+#else
+#include <tr1/functional>
+#endif
+
 // Register the test suite
 CPPUNIT_TEST_SUITE_REGISTRATION(PropertyTests);
 
@@ -53,6 +60,12 @@ public:
 //--------------------------------------------------------------------------
 void PropertyTests::testStringProp()
 {
+#if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+    using namespace std;
+#else
+    using namespace std::tr1;
+#endif
+
     UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     PropertyDefMap propertyDefs;
@@ -65,8 +78,8 @@ void PropertyTests::testStringProp()
 
     props.addProperty(
         OGRE_NEW Property<String>(&(defi->second),
-        boost::bind(&Foo::getName, &foo), 
-        boost::bind(&Foo::setName, &foo, _1)));
+        bind(&Foo::getName, &foo),
+        bind(&Foo::setName, &foo, placeholders::_1)));
 
     Ogre::String strName, strTest;
     strTest = "A simple name";

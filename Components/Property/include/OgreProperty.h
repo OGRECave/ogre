@@ -35,8 +35,15 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreQuaternion.h"
 #include "OgreMatrix4.h"
+
+#if OGRE_THREAD_PROVIDER == 1
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#elif __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#include <functional>
+#else
+#include <tr1/functional>
+#endif
 
 /** \addtogroup Optional Components
 *  @{
@@ -94,6 +101,14 @@ THE SOFTWARE.
 /** @} */
 namespace Ogre
 {
+#if OGRE_THREAD_PROVIDER == 1
+    using boost::function;
+#elif __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+    using std::function;
+#else
+    using std::tr1::function;
+#endif
+
     /** \addtogroup Optional Components
     *  @{
     */
@@ -217,8 +232,8 @@ namespace Ogre
     {
     public:
         typedef T value_type;
-        typedef boost::function< T (void) > getter_func;
-        typedef boost::function< void (T) > setter_func;
+        typedef function< T (void) > getter_func;
+        typedef function< void (T) > setter_func;
 
         /** Construct a property which is able to directly call a given 
         getter and setter on a specific object instance, via functors.
