@@ -32,11 +32,14 @@
 
 #pragma once
 
+#include "OgrePrerequisites.h"
 #include <assert.h>
 #include <string.h>
 #include <algorithm>
 
-#include <stdint.h>
+#if !defined( _MSC_VER ) || (_MSC_VER > 1600)
+    #include <stdint.h>
+#endif
 #include <stdio.h>
 
 #pragma warning( push ) // CRT deprecation
@@ -53,7 +56,7 @@ namespace Ogre
         however this base class *never* writes to this pointer or returns a non-const
         pointer.
     */
-    class LwConstString
+    class _OgreExport LwConstString
     {
     protected:
 #if _DEBUG || DEBUG
