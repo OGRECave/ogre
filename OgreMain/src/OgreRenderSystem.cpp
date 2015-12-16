@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreHardwareOcclusionQuery.h"
+#include "OgreGpuProgramManager.h"
 
 namespace Ogre {
 
@@ -158,6 +159,8 @@ namespace Ogre {
         mTessellationHullProgramBound = false;
         mTessellationDomainProgramBound = false;
         mComputeProgramBound = false;
+
+        GpuProgramManager::getSingleton().setEnableMicrocodeCache(true);
 
         return 0;
     }
@@ -318,111 +321,120 @@ namespace Ogre {
         bool isValidBinding = false;
         
         if (mCurrentCapabilities->hasCapability(RSC_COMPLETE_TEXTURE_BINDING))
-            _setBindingType(tl.getBindingType());
-
-        // Vertex texture binding?
-        if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
-            !mCurrentCapabilities->getVertexTextureUnitsShared())
         {
-            isValidBinding = true;
-            if (tl.getBindingType() == TextureUnitState::BT_VERTEX)
+            // Bind with binding type flags, currently implemented only in Direct3D11
+            _setTexture(texUnit, true, tex, tl.getBindingType());
+        }
+
+        else
+        {
+            // Vertex texture binding?
+            if (mCurrentCapabilities->hasCapability(RSC_VERTEX_TEXTURE_FETCH) &&
+                !mCurrentCapabilities->getVertexTextureUnitsShared())
             {
-                // Bind vertex texture
-                _setVertexTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
+                isValidBinding = true;
+                        //_setTexture(texUnit,)
+
+                if (tl.getBindingType() == TextureUnitState::BT_VERTEX)
+                {
+                    // Bind vertex texture
+                    _setVertexTexture(texUnit, tex);
+                    // bind nothing to fragment unit (hardware isn't shared but fragment
+                    // unit can't be using the same index
+                    _setTexture(texUnit, true, sNullTexPtr, TextureUnitState::BT_NO_BINDING);
+                }
+                else
+                {
+                    // vice versa
+                    _setVertexTexture(texUnit, sNullTexPtr);
+                    _setTexture(texUnit, true, tex, TextureUnitState::BT_NO_BINDING);
+                }
             }
-            else
+
+            if (mCurrentCapabilities->hasCapability(RSC_GEOMETRY_PROGRAM))
             {
-                // vice versa
-                _setVertexTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
+                isValidBinding = true;
+                if (tl.getBindingType() == TextureUnitState::BT_GEOMETRY)
+                {
+                    // Bind vertex texture
+                    _setGeometryTexture(texUnit, tex);
+                    // bind nothing to fragment unit (hardware isn't shared but fragment
+                    // unit can't be using the same index
+                    _setTexture(texUnit, true, sNullTexPtr, TextureUnitState::BT_NO_BINDING);
+                }
+                else
+                {
+                    // vice versa
+                    _setGeometryTexture(texUnit, sNullTexPtr);
+                    _setTexture(texUnit, true, tex, TextureUnitState::BT_NO_BINDING);
+                }
+            }
+
+            if (mCurrentCapabilities->hasCapability(RSC_COMPUTE_PROGRAM))
+            {
+                isValidBinding = true;
+                if (tl.getBindingType() == TextureUnitState::BT_COMPUTE)
+                {
+                    // Bind vertex texture
+                    _setComputeTexture(texUnit, tex);
+                    // bind nothing to fragment unit (hardware isn't shared but fragment
+                    // unit can't be using the same index
+                    _setTexture(texUnit, true, sNullTexPtr, TextureUnitState::BT_NO_BINDING);
+                }
+                else
+                {
+                    // vice versa
+                    _setComputeTexture(texUnit, sNullTexPtr);
+                    _setTexture(texUnit, true, tex, TextureUnitState::BT_NO_BINDING);
+                }
+            }
+
+            if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
+            {
+                isValidBinding = true;
+                if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
+                {
+                    // Bind vertex texture
+                    _setTesselationDomainTexture(texUnit, tex);
+                    // bind nothing to fragment unit (hardware isn't shared but fragment
+                    // unit can't be using the same index
+                    _setTexture(texUnit, true, sNullTexPtr, TextureUnitState::BT_NO_BINDING);
+                }
+                else
+                {
+                    // vice versa
+                    _setTesselationDomainTexture(texUnit, sNullTexPtr);
+                    _setTexture(texUnit, true, tex, TextureUnitState::BT_NO_BINDING);
+                }
+            }
+
+            if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_HULL_PROGRAM))
+            {
+                isValidBinding = true;
+                if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
+                {
+                    // Bind vertex texture
+                    _setTesselationHullTexture(texUnit, tex);
+                    // bind nothing to fragment unit (hardware isn't shared but fragment
+                    // unit can't be using the same index
+                    _setTexture(texUnit, true, sNullTexPtr, TextureUnitState::BT_NO_BINDING);
+                }
+                else
+                {
+                    // vice versa
+                    _setTesselationHullTexture(texUnit, sNullTexPtr);
+                    _setTexture(texUnit, true, tex, TextureUnitState::BT_NO_BINDING);
+                }
+            }
+            if (!isValidBinding)
+            {
+                // Shared vertex / fragment textures or no vertex texture support
+                // Bind texture (may be blank)
+                _setTexture(texUnit, true, tex, TextureUnitState::BT_NO_BINDING);
             }
         }
 
-        if (mCurrentCapabilities->hasCapability(RSC_GEOMETRY_PROGRAM))
-        {
-            isValidBinding = true;
-            if (tl.getBindingType() == TextureUnitState::BT_GEOMETRY)
-            {
-                // Bind vertex texture
-                _setGeometryTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
-            }
-            else
-            {
-                // vice versa
-                _setGeometryTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
-            }
-        }
-
-        if (mCurrentCapabilities->hasCapability(RSC_COMPUTE_PROGRAM))
-        {
-            isValidBinding = true;
-            if (tl.getBindingType() == TextureUnitState::BT_COMPUTE)
-            {
-                // Bind vertex texture
-                _setComputeTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
-            }
-            else
-            {
-                // vice versa
-                _setComputeTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
-            }
-        }
-
-        if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_DOMAIN_PROGRAM))
-        {
-            isValidBinding = true;
-            if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_DOMAIN)
-            {
-                // Bind vertex texture
-                _setTesselationDomainTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
-            }
-            else
-            {
-                // vice versa
-                _setTesselationDomainTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
-            }
-        }
-
-        if (mCurrentCapabilities->hasCapability(RSC_TESSELLATION_HULL_PROGRAM))
-        {
-            isValidBinding = true;
-            if (tl.getBindingType() == TextureUnitState::BT_TESSELLATION_HULL)
-            {
-                // Bind vertex texture
-                _setTesselationHullTexture(texUnit, tex);
-                // bind nothing to fragment unit (hardware isn't shared but fragment
-                // unit can't be using the same index
-                _setTexture(texUnit, true, sNullTexPtr);
-            }
-            else
-            {
-                // vice versa
-                _setTesselationHullTexture(texUnit, sNullTexPtr);
-                _setTexture(texUnit, true, tex);
-            }
-        }
-
-        if (!isValidBinding)
-        {
-            // Shared vertex / fragment textures or no vertex texture support
-            // Bind texture (may be blank)
-            _setTexture(texUnit, true, tex);
-        }
+        
 
         // Set texture coordinate set
         _setTextureCoordSet(texUnit, tl.getTextureCoordSet());
@@ -516,20 +528,6 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_setTexture(size_t unit, bool enabled, 
-        const String &texname)
-    {
-        TexturePtr t = TextureManager::getSingleton().getByName(texname);
-        _setTexture(unit, enabled, t);
-    }
-    //-----------------------------------------------------------------------
-    void RenderSystem::_setBindingType(TextureUnitState::BindingType bindingType)
-    {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-            "This rendersystem does not support binding texture to other shaders then fragment", 
-            "RenderSystem::_setBindingType");
-    }
-    //-----------------------------------------------------------------------
     void RenderSystem::_setVertexTexture(size_t unit, const TexturePtr& tex)
     {
         OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
@@ -575,12 +573,12 @@ namespace Ogre {
             "RenderSystem::_setTesselationDomainTexture");
     }
     //-----------------------------------------------------------------------
-    void RenderSystem::_disableTextureUnit(size_t texUnit)
+    void RenderSystem::_disableTextureUnit(size_t texUnit, TextureUnitState::BindingType bindingType)
     {
-        _setTexture(texUnit, false, sNullTexPtr);
+        _setTexture(texUnit, false, sNullTexPtr, bindingType);
     }
     //---------------------------------------------------------------------
-    void RenderSystem::_disableTextureUnitsFrom(size_t texUnit)
+    void RenderSystem::_disableTextureUnitsFrom(size_t texUnit, TextureUnitState::BindingType bindingType)
     {
         size_t disableTo = OGRE_MAX_TEXTURE_LAYERS;
         if (disableTo > mDisabledTexUnitsFrom)
@@ -588,7 +586,7 @@ namespace Ogre {
         mDisabledTexUnitsFrom = texUnit;
         for (size_t i = texUnit; i < disableTo; ++i)
         {
-            _disableTextureUnit(i);
+            _disableTextureUnit(i, bindingType);
         }
     }
     //-----------------------------------------------------------------------
@@ -686,6 +684,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderSystem::shutdown(void)
     {
+        _disableTextureUnitsFrom(0,TextureUnitState::BT_ALL);
+
         // Remove occlusion queries
         for (HardwareOcclusionQueryList::iterator i = mHwOcclusionQueries.begin();
             i != mHwOcclusionQueries.end(); ++i)

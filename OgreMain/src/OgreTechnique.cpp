@@ -79,11 +79,7 @@ namespace Ogre {
     {
         StringStream errors;
 
-        mIsSupported = checkGPURules(errors);
-        if (mIsSupported)
-        {
-            mIsSupported = checkHardwareSupport(autoManageTextureUnits, errors);
-        }
+        mIsSupported = checkGPURules(errors) && checkHardwareSupport(autoManageTextureUnits, errors);
 
         // Compile for categorised illumination on demand
         clearIlluminationPasses();
@@ -107,10 +103,11 @@ namespace Ogre {
             // Adjust pass index
             currPass->_notifyIndex(passNum);
             // Check for advanced blending operation support
-            if((currPass->getSceneBlendingOperation() != SBO_ADD || currPass->getSceneBlendingOperationAlpha() != SBO_ADD) && 
+            if ((currPass->getSceneBlendingOperation() != SBO_ADD || currPass->getSceneBlendingOperationAlpha() != SBO_ADD) &&
                 !caps->hasCapability(RSC_ADVANCED_BLEND_OPERATIONS))
             {
-                return false;       
+                compileErrors << "Pass " << passNum << ": Advanced blend operations are not supported." << std::endl;
+                return false;
             }
             // Check texture unit requirements
             size_t numTexUnitsRequested = currPass->getNumTextureUnitStates();
@@ -118,15 +115,14 @@ namespace Ogre {
             if(!currPass->hasFragmentProgram())
             {
 #if defined(OGRE_PRETEND_TEXTURE_UNITS) && OGRE_PRETEND_TEXTURE_UNITS > 0
-                if (numTexUnits > OGRE_PRETEND_TEXTURE_UNITS)
-                    numTexUnits = OGRE_PRETEND_TEXTURE_UNITS;
+                numTexUnits = std::min(numTexUnits, OGRE_PRETEND_TEXTURE_UNITS);
 #endif
                 if (numTexUnitsRequested > numTexUnits)
                 {
                     if (!autoManageTextureUnits)
                     {
                         // The user disabled auto pass split
-                        compileErrors << "Pass " << passNum << 
+                        compileErrors << "Pass " << passNum <<
                             ": Too many texture units for the current hardware and no splitting allowed."
                             << std::endl;
                         return false;
@@ -134,124 +130,14 @@ namespace Ogre {
                     else if (currPass->hasVertexProgram())
                     {
                         // Can't do this one, and can't split a programmable pass
-                        compileErrors << "Pass " << passNum << 
+                        compileErrors << "Pass " << passNum <<
                             ": Too many texture units for the current hardware and "
                             "cannot split programmable passes."
                             << std::endl;
                         return false;
                     }
                 }
-            }
-            if (currPass->hasComputeProgram())
-            {
-                // Check fragment program version
-                if (!currPass->getComputeProgram()->isSupported())
-                {
-                    // Can't do this one
-                    compileErrors << "Pass " << passNum << 
-                        ": Compute program " << currPass->getComputeProgram()->getName()
-                        << " cannot be used - ";
-                    if (currPass->getComputeProgram()->hasCompileError())
-                        compileErrors << "compile error.";
-                    else
-                        compileErrors << "not supported.";
 
-                    compileErrors << std::endl;
-                    return false;
-                }
-            }
-            if (currPass->hasVertexProgram())
-            {
-                // Check vertex program version
-                if (!currPass->getVertexProgram()->isSupported() )
-                {
-                    // Can't do this one
-                    compileErrors << "Pass " << passNum << 
-                        ": Vertex program " << currPass->getVertexProgram()->getName()
-                        << " cannot be used - ";
-                    if (currPass->getVertexProgram()->hasCompileError())
-                        compileErrors << "compile error.";
-                    else
-                        compileErrors << "not supported.";
-
-                    compileErrors << std::endl;
-                    return false;
-                }
-            }
-            if (currPass->hasTessellationHullProgram())
-            {
-                // Check tessellation control program version
-                if (!currPass->getTessellationHullProgram()->isSupported() )
-                {
-                    // Can't do this one
-                    compileErrors << "Pass " << passNum << 
-                        ": Tessellation Hull program " << currPass->getTessellationHullProgram()->getName()
-                        << " cannot be used - ";
-                    if (currPass->getTessellationHullProgram()->hasCompileError())
-                        compileErrors << "compile error.";
-                    else
-                        compileErrors << "not supported.";
-
-                    compileErrors << std::endl;
-                    return false;
-                }
-            }
-            if (currPass->hasTessellationDomainProgram())
-            {
-                // Check tessellation control program version
-                if (!currPass->getTessellationDomainProgram()->isSupported() )
-                {
-                    // Can't do this one
-                    compileErrors << "Pass " << passNum << 
-                        ": Tessellation Domain program " << currPass->getTessellationDomainProgram()->getName()
-                        << " cannot be used - ";
-                    if (currPass->getTessellationDomainProgram()->hasCompileError())
-                        compileErrors << "compile error.";
-                    else
-                        compileErrors << "not supported.";
-
-                    compileErrors << std::endl;
-                    return false;
-                }
-            }
-            if (currPass->hasGeometryProgram())
-            {
-                // Check geometry program version
-                if (!currPass->getGeometryProgram()->isSupported() )
-                {
-                    // Can't do this one
-                    compileErrors << "Pass " << passNum << 
-                        ": Geometry program " << currPass->getGeometryProgram()->getName()
-                        << " cannot be used - ";
-                    if (currPass->getGeometryProgram()->hasCompileError())
-                        compileErrors << "compile error.";
-                    else
-                        compileErrors << "not supported.";
-
-                    compileErrors << std::endl;
-                    return false;
-                }
-            }
-            if (currPass->hasFragmentProgram())
-            {
-                // Check fragment program version
-                if (!currPass->getFragmentProgram()->isSupported())
-                {
-                    // Can't do this one
-                    compileErrors << "Pass " << passNum << 
-                        ": Fragment program " << currPass->getFragmentProgram()->getName()
-                        << " cannot be used - ";
-                    if (currPass->getFragmentProgram()->hasCompileError())
-                        compileErrors << "compile error.";
-                    else
-                        compileErrors << "not supported.";
-
-                    compileErrors << std::endl;
-                    return false;
-                }
-            }
-            else
-            {
                 // Check a few fixed-function options in texture layers
                 Pass::TextureUnitStateIterator texi = currPass->getTextureUnitStateIterator();
                 size_t texUnit = 0;
@@ -264,7 +150,7 @@ namespace Ogre {
                     if (tex->is3D() && !caps->hasCapability(RSC_CUBEMAPPING))
                     {
                         // Fail
-                        compileErrors << "Pass " << passNum << 
+                        compileErrors << "Pass " << passNum <<
                             " Tex " << texUnit <<
                             ": Cube maps not supported by current environment."
                             << std::endl;
@@ -273,11 +159,11 @@ namespace Ogre {
                     // Any 3D textures? NB we make the assumption that any
                     // card capable of running fragment programs can support
                     // 3D textures, which has to be true, surely?
-                    if (((tex->getTextureType() == TEX_TYPE_3D) || (tex->getTextureType() == TEX_TYPE_2D_ARRAY)) && 
-                         !caps->hasCapability(RSC_TEXTURE_3D))
+                    if (((tex->getTextureType() == TEX_TYPE_3D) || (tex->getTextureType() == TEX_TYPE_2D_ARRAY)) &&
+                        !caps->hasCapability(RSC_TEXTURE_3D))
                     {
                         // Fail
-                        compileErrors << "Pass " << passNum << 
+                        compileErrors << "Pass " << passNum <<
                             " Tex " << texUnit <<
                             ": Volume textures not supported by current environment."
                             << std::endl;
@@ -288,7 +174,7 @@ namespace Ogre {
                         !caps->hasCapability(RSC_DOT3))
                     {
                         // Fail
-                        compileErrors << "Pass " << passNum << 
+                        compileErrors << "Pass " << passNum <<
                             " Tex " << texUnit <<
                             ": DOT3 blending not supported by current environment."
                             << std::endl;
@@ -298,29 +184,51 @@ namespace Ogre {
                 }
 
                 // We're ok on operations, now we need to check # texture units
-                if (!currPass->hasFragmentProgram())
-                {
+
                     // Keep splitting this pass so long as units requested > gpu units
-                    while (numTexUnitsRequested > numTexUnits)
-                    {
-                        // chop this pass into many passes
-                        currPass = currPass->_split(numTexUnits);
-                        numTexUnitsRequested = currPass->getNumTextureUnitStates();
-                        // Advance pass number
-                        ++passNum;
-                        // Reset iterator
-                        i = mPasses.begin() + passNum;
-                        // Move the new pass to the right place (will have been created
-                        // at the end, may be other passes in between)
-                        assert(mPasses.back() == currPass);
-                        std::copy_backward(i, (mPasses.end()-1), mPasses.end());
-                        *i = currPass;
-                        // Adjust pass index
-                        currPass->_notifyIndex(passNum);
-                    }
+                while (numTexUnitsRequested > numTexUnits)
+                {
+                    // chop this pass into many passes
+                    currPass = currPass->_split(numTexUnits);
+                    numTexUnitsRequested = currPass->getNumTextureUnitStates();
+                    // Advance pass number
+                    ++passNum;
+                    // Reset iterator
+                    i = mPasses.begin() + passNum;
+                    // Move the new pass to the right place (will have been created
+                    // at the end, may be other passes in between)
+                    assert(mPasses.back() == currPass);
+                    std::copy_backward(i, (mPasses.end() - 1), mPasses.end());
+                    *i = currPass;
+                    // Adjust pass index
+                    currPass->_notifyIndex(passNum);
                 }
             }
 
+            
+
+            //Check compilation errors for all program types.
+            for (int i = 0; i < 6; i++)
+            {
+                GpuProgramType programType = static_cast<GpuProgramType>(i);
+                GpuProgramPtr program = currPass->getGpuProgram(programType);
+                if (!program.isNull())
+                {
+                    if (program->isSupported() == false)
+                    {
+                        compileErrors << "Pass " << passNum <<
+                            ": " << GpuProgram::getProgramTypeName(programType) + " program " << program->getName()
+                            << " cannot be used - ";
+                        if (program->hasCompileError())
+                            compileErrors << "compile error.";
+                        else
+                            compileErrors << "not supported.";
+
+                        compileErrors << std::endl;
+                        return false;
+                    }
+                }
+            }
         }
         // If we got this far, we're ok
         return true;

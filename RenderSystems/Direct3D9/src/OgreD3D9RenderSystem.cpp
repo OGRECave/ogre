@@ -1024,9 +1024,9 @@ namespace Ogre
             
 
             // Check for hardware stencil support
-            d3d9Device->GetDepthStencilSurface(&pSurf);
+            HRESULT hr = d3d9Device->GetDepthStencilSurface(&pSurf);
 
-            if (pSurf != NULL)
+            if (pSurf != NULL && SUCCEEDED(hr))
             {
                 D3DSURFACE_DESC surfDesc;
 
@@ -1041,7 +1041,7 @@ namespace Ogre
             }                                                                   
 
             // Check for hardware occlusion support
-            HRESULT hr = d3d9Device->CreateQuery(D3DQUERYTYPE_OCCLUSION,  NULL);
+            hr = d3d9Device->CreateQuery(D3DQUERYTYPE_OCCLUSION,  NULL);
 
             if (FAILED(hr))
                 rsc->unsetCapability(RSC_HWOCCLUSION);
@@ -2029,7 +2029,7 @@ namespace Ogre
         }
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_setTexture( size_t stage, bool enabled, const TexturePtr& tex )
+    void D3D9RenderSystem::_setTexture(size_t stage, bool enabled, const TexturePtr& tex, TextureUnitState::BindingType bindingType)
     {
         HRESULT hr;
         D3D9TexturePtr dt = tex.staticCast<D3D9Texture>();
@@ -2133,9 +2133,9 @@ namespace Ogre
 
     }
     //---------------------------------------------------------------------
-    void D3D9RenderSystem::_disableTextureUnit(size_t texUnit)
+    void D3D9RenderSystem::_disableTextureUnit(size_t texUnit, TextureUnitState::BindingType bindingType)
     {
-        RenderSystem::_disableTextureUnit(texUnit);
+        RenderSystem::_disableTextureUnit(texUnit, bindingType);
         // also disable vertex texture unit
         static TexturePtr nullPtr;
         _setVertexTexture(texUnit, nullPtr);
@@ -3031,7 +3031,7 @@ namespace Ogre
 
         D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                 activeDevice, depthBufferSurface,
-                                                dsfmt, srfDesc.Width, srfDesc.Height,
+                                                dsfmt, srfDesc.Width, srfDesc.Height,1,
                                                 srfDesc.MultiSampleType, srfDesc.MultiSampleQuality, false );
 
         return newDepthBuffer;
@@ -3059,7 +3059,7 @@ namespace Ogre
 
         D3D9DepthBuffer *newDepthBuffer = OGRE_NEW D3D9DepthBuffer( DepthBuffer::POOL_DEFAULT, this,
                                                 depthSurfaceDevice, depthSurface,
-                                                dsDesc.Format, dsDesc.Width, dsDesc.Height,
+                                                dsDesc.Format, dsDesc.Width, dsDesc.Height,1,
                                                 dsDesc.MultiSampleType, dsDesc.MultiSampleQuality, true );
 
         //Add the 'main' depth buffer to the pool
@@ -4472,7 +4472,7 @@ namespace Ogre
 
         // Reset the texture stages, they will need to be rebound
         for (size_t i = 0; i < OGRE_MAX_TEXTURE_LAYERS; ++i)
-            _setTexture(i, false, TexturePtr());
+            _setTexture(i, false, TexturePtr(),TextureUnitState::BT_NO_BINDING);
 
         LogManager::getSingleton().logMessage("!!! Direct3D Device successfully restored.");
 

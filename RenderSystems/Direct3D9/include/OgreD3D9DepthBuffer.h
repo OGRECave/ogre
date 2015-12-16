@@ -38,7 +38,7 @@ namespace Ogre
     public:
         D3D9DepthBuffer( uint16 poolId, D3D9RenderSystem *renderSystem, IDirect3DDevice9 *creator,
                          IDirect3DSurface9 *depthBufferSurf,
-                         D3DFORMAT fmt, uint32 width, uint32 height,
+                         D3DFORMAT fmt, uint32 width, uint32 height, uint32 depth,
                          uint32 fsaa, uint32 multiSampleQuality, bool isManual );
         ~D3D9DepthBuffer();
 

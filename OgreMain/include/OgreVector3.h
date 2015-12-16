@@ -92,7 +92,7 @@ namespace Ogre
         {
         }
 
-
+        explicit Vector3(const Vector4& vec4);
         /** Exchange the contents of this vector with another. 
         */
         inline void swap(Vector3& other)

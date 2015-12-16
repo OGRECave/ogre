@@ -1,10 +1,10 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2015 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,24 +25,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#include "OgreStableHeaders.h"
-#include "OgreVector3.h"
-#include "OgreVector4.h"
+#ifndef __MicroCodeEnabledObject_H__
+#define __MicroCodeEnabledObject_H__
+
+#include "OgrePrerequisites.h"
 
 namespace Ogre
 {
-    const Vector3 Vector3::ZERO( 0, 0, 0 );
 
-    const Vector3 Vector3::UNIT_X( 1, 0, 0 );
-    const Vector3 Vector3::UNIT_Y( 0, 1, 0 );
-    const Vector3 Vector3::UNIT_Z( 0, 0, 1 );
-    const Vector3 Vector3::NEGATIVE_UNIT_X( -1,  0,  0 );
-    const Vector3 Vector3::NEGATIVE_UNIT_Y(  0, -1,  0 );
-    const Vector3 Vector3::NEGATIVE_UNIT_Z(  0,  0, -1 );
-    const Vector3 Vector3::UNIT_SCALE(1, 1, 1);
-
-    Vector3::Vector3(const Vector4& vec4) : x(vec4.x), y(vec4.y), z(vec4.z)
+    class _OgreExport  MicrocodeCacheStore
     {
+    private:
+        void compileAndSaveToCache();
+    protected:
+        
+        virtual String getStringForMicrocodeCacheHash() const = 0;
+        virtual bool compileMicrocode() = 0;
+        virtual const bool applyFromMicroCodeCache(Microcode cacheMicrocode) = 0;
+        virtual const size_t getMicrocodeCacheSize() const = 0;
+        virtual void generateMicroCodeCache(Microcode cacheMicrocode) = 0;
+    
+        void compileWithMicrocodeCacheSupport();
+    };
 
-    }
 }
+#endif

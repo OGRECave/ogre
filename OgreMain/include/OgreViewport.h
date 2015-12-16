@@ -271,13 +271,11 @@ namespace Ogre {
             involve using different techniques to render your materials.
         @see Technique::setSchemeName
         */
-        void setMaterialScheme(const String& schemeName)
-        { mMaterialSchemeName = schemeName; }
+        void setMaterialScheme(const String& schemeName);
         
         /** Get the material scheme which the viewport should use.
         */
-        const String& getMaterialScheme(void) const
-        { return mMaterialSchemeName; }
+        const String& getMaterialScheme(void) const;
 
         /** Access to actual dimensions (based on target size).
         */
@@ -398,6 +396,8 @@ namespace Ogre {
 		*/
 		void setDrawBuffer(ColourBufferType colourBuffer);
 
+        void setEnabled(bool enabled);
+        bool getEnabled();
 		/** Returns the current colour buffer type for this viewport.*/
 		ColourBufferType getDrawBuffer() const;
 
@@ -435,6 +435,7 @@ namespace Ogre {
         typedef vector<Listener*>::type ListenerList;
         ListenerList mListeners;
 		ColourBufferType mColourBuffer;
+        bool mEnabled;
     };
     /** @} */
     /** @} */

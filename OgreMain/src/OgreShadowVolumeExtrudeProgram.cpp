@@ -649,50 +649,50 @@ namespace Ogre {
 
 
 	 String ShadowVolumeExtrudeProgram::mModulate_Fs_hlsl_4_0 = 
-		"Texture2D RT : register(t0);\
-		SamplerState RTState : register(s0);\
-		uniform float4 shadowColor;\
-		float4 ShadowBlend_ps(float4 position : SV_POSITION, float2 iTexCoord : TEXCOORD0) : SV_Target\
-		{\
-		return float4(shadowColor.xyz, RT.Sample(RTState, iTexCoord).w);\
-		}";
+        "Texture2D RT : register(t0);\n"
+        "SamplerState RTState : register(s0); \n"
+        "uniform float4 shadowColor;\n"
+        "float4 ShadowBlend_ps(float4 position : SV_POSITION, float2 iTexCoord : TEXCOORD0) : SV_Target\n"
+        "{\n"
+        "   return float4(shadowColor.xyz, RT.Sample(RTState, iTexCoord).w);\n"
+        "}";
 
 
 	 String ShadowVolumeExtrudeProgram::mModulate_Vs_hlsl_4_0 =
-		"	void ShadowBlend_vs\
-		(\
-		in float4 inPos : POSITION,\
-		out float4 pos : SV_POSITION,\
-		out float2 uv0 : TEXCOORD0,\
-		uniform float4x4 worldViewProj\
-		)\
-		{\
-		pos = mul(worldViewProj, inPos);\
-		inPos.xy = sign(inPos.xy);\
-		uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
-				}";
+        "void ShadowBlend_vs\n"
+        "(\n"
+        "in float4 inPos : POSITION,\n"
+        "out float4 pos : SV_POSITION,\n"
+        "out float2 uv0 : TEXCOORD0,\n"
+        "uniform float4x4 worldViewProj\n"
+        ")\n"
+        "{\n"
+        "   pos = mul(worldViewProj, inPos);\n"
+        "   inPos.xy = sign(inPos.xy);\n"
+        "   uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\n"
+        "}";
 
 	 String ShadowVolumeExtrudeProgram::mModulate_Fs_cg =
 		 "sampler2D RT : register(s0);\n"
 		 "uniform float4 shadowColor; \n"
 		 "float4 ShadowBlend_ps(float2 iTexCoord : TEXCOORD0) : COLOR\n"
 		 "{\n"
-		 "return float4(shadowColor.xyz, tex2D(RT, iTexCoord).w);\n"
+         "   return float4(shadowColor.xyz, tex2D(RT, iTexCoord).w);\n"
 		"}\n";
 
 	 String ShadowVolumeExtrudeProgram::mModulate_Vs_cg =
-			"void ShadowBlend_vs\
-			(\
-			in float4 inPos : POSITION,\
-			out float4 pos : POSITION,\
-			out float2 uv0 : TEXCOORD0,\
-			uniform float4x4 worldViewProj\
-			)\
-			{\
-				pos = mul(worldViewProj, inPos);\
-				inPos.xy = sign(inPos.xy);\
-				uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\
-			}";
+            "void ShadowBlend_vs\n"
+            "(\n"
+            "in float4 inPos : POSITION,\n"
+            "out float4 pos : POSITION,\n"
+            "out float2 uv0 : TEXCOORD0,\n"
+            "uniform float4x4 worldViewProj\n"
+            ")\n"
+            "{\n"
+            "   pos = mul(worldViewProj, inPos);\n"
+            "   inPos.xy = sign(inPos.xy);\n"
+            "   uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\n"
+            "}";
 
 
 
@@ -702,23 +702,24 @@ static const String glsles_prefix = "precision highp float;\
                                     precision lowp samplerCube;";
 
     String ShadowVolumeExtrudeProgram::mModulate_Fs_glsl =
-        "uniform sampler2D RT; \
-        uniform vec4 shadowColor; \
-        varying vec2 uv0; \
-        \
-        void main() {\
-            gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\
+        "uniform sampler2D RT;\n\
+        uniform vec4 shadowColor;\n\
+        in vec2 uv0;\n\
+        \n\
+        void main()\n\
+        {\n\
+            gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\n\
         }";
 
     String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl =
-        "uniform mat4 worldViewProj; \
-        attribute vec4 inPos; \
-        varying vec4 uv0; \
-        \
-        void main() {\
-            gl_Position = worldViewProj*inPos; \
-            inPos.xy = sign(inPos.xy); \
-            uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f; \
+        "uniform mat4 worldViewProj;\n\
+        in vec4 inPos;\n\
+        out vec2 uv0;\n\
+        \n\
+        void main()\n\
+        {\n\
+            gl_Position = worldViewProj * inPos;\n\
+            uv0 = (vec2(sign(inPos.x), - sign(inPos.y)) + 1.0f) * 0.5f;\n\
         }";
 
 
@@ -739,27 +740,6 @@ static const String glsles_prefix = "precision highp float;\
     String ShadowVolumeExtrudeProgram::frgProgramName = "";
 
     bool ShadowVolumeExtrudeProgram::mInitialised = false;
-
-	//---------------------------------------------------------------------
-	// programs for Ogre/StencilShadowModulationPass material
-	//---------------------------------------------------------------------
-	const String gShadowModulativePassVs_Name = "Ogre/StencilShadowModulationPassVs"; // FIXME: unused?!
-	const String gShadowModulativePassPs_Name = "Ogre/StencilShadowModulationPassPs"; // FIXME: unused?!
-
-	const String gShadowModulativePassVs_4_0 = // FIXME: unused?!
-		"float4x4	worldviewproj_matrix;\n"
-		"void vs_main(in float4 iPos : POSITION, out float4 oPos : SV_Position)\n"
-		"{\n"
-		"    oPos = mul(worldviewproj_matrix, iPos);\n"
-		"}\n";
-
-	const String gShadowModulativePassPs_4_0 = // FIXME: unused?!
-		"float4 ambient_light_colour;\n"
-		"void fs_main(in float4 oPos : SV_Position, out float4 oColor : SV_Target)\n"
-		"{\n"
-		"    oColor = ambient_light_colour;\n"
-		"}\n";
-
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
 
@@ -802,7 +782,7 @@ static const String glsles_prefix = "precision highp float;\
 			vsTarget = "glsl";
 			fsTarget = "glsl";
 			language = "glsl";
-			vsProgram = mModulate_Vs_glsl;
+			vsProgram = "#version 150\n\n" + mModulate_Vs_glsl;
 			fsProgram = mModulate_Fs_glsl;
 		}
 		else if (glsles)
@@ -810,8 +790,8 @@ static const String glsles_prefix = "precision highp float;\
             vsTarget = "glsles";
             fsTarget = "glsles";
             language = "glsles";
-            vsProgram = glsles_prefix+mModulate_Vs_glsl;
-            fsProgram = glsles_prefix+mModulate_Fs_glsl;
+            vsProgram = glsles_prefix + mModulate_Vs_glsl;
+            fsProgram = glsles_prefix + mModulate_Fs_glsl;
 		}
 		else
 		{

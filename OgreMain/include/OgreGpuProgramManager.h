@@ -52,17 +52,33 @@ namespace Ogre {
         typedef set<String>::type SyntaxCodes;
         typedef map<String, GpuSharedParametersPtr>::type SharedParametersMap;
 
-        typedef MemoryDataStreamPtr Microcode;
-        typedef map<String, Microcode>::type MicrocodeMap;
+        struct Hash
+        {
+            uint64 hashVal[2];
+
+            bool operator < ( const Hash &_r ) const
+            {
+                if( hashVal[0] < _r.hashVal[0] ) return true;
+                if( hashVal[0] > _r.hashVal[0] ) return false;
+
+                if( hashVal[1] < _r.hashVal[1] ) return true;
+                //if( hashVal[1] > _r.hashVal[1] ) return false;
+
+                return false;
+            }
+        };
+
+        typedef Ogre::Microcode Microcode;
+        typedef map<Hash, Microcode>::type MicrocodeMap;
 
     protected:
-
         SharedParametersMap mSharedParametersMap;
         MicrocodeMap mMicrocodeCache;
         bool mSaveMicrocodesToCache;
         bool mCacheDirty;           // When this is true the cache is 'dirty' and should be resaved to disk.
-            
-        static String addRenderSystemToName( const String &  name );
+        
+        bool mEnableMicrocodeCache;
+        static Hash computeHashWithRenderSystemName( const String &source );
 
         /// Specialised create method with specific parameters
         virtual Resource* createImpl(const String& name, ResourceHandle handle, 
@@ -194,19 +210,23 @@ namespace Ogre {
         */
         void setSaveMicrocodesToCache( const bool val );
 
-        /** Returns true if the microcodecache changed during the run.
+        /** Returns true if the microcode cache changed during the run.
         */
         bool isCacheDirty(void) const;
 
-        bool canGetCompiledShaderBuffer();
+        const bool getEnableMicrocodeCache() const;
+
+        void setEnableMicrocodeCache(const bool enableMicrocodeCache);
+        
         /** Check if a microcode is available for a program in the microcode cache.
         @param name The name of the program.
         */
-        virtual bool isMicrocodeAvailableInCache( const String & name ) const;
+        virtual bool isMicrocodeAvailableInCache( const String &source ) const;
         /** Returns a microcode for a program from the microcode cache.
         @param name The name of the program.
         */
-        virtual const Microcode & getMicrocodeFromCache( const String & name ) const;
+        virtual const Microcode & getMicrocodeFromCache( const String &source ) const;
+        virtual const Microcode  getMicrocodeFromCacheOrNull(const String & source) const;
 
         /** Creates a microcode to be later added to the cache.
         @param size The size of the microcode in bytes
@@ -216,12 +236,12 @@ namespace Ogre {
         /** Adds a microcode for a program to the microcode cache.
         @param name The name of the program.
         */
-        virtual void addMicrocodeToCache( const String & name, const Microcode & microcode );
+        virtual void addMicrocodeToCache( const String & source, const Microcode & microcode );
 
         /** Removes a microcode for a program from the microcode cache.
         @param name The name of the program.
         */
-        virtual void removeMicrocodeFromCache( const String & name );
+        virtual void removeMicrocodeFromCache( const String & source );
 
         /** Saves the microcode cache to disk.
         @param stream The destination stream

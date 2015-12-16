@@ -1141,6 +1141,16 @@ namespace Ogre {
         //this->setCullingFrustum(cam->getCullingFrustum());
 
     }
+    //-----------------------------------------------------------------------
+    Viewport* Camera::getViewport(void) const
+    {
+        return mLastViewport;
+    }
+    //-----------------------------------------------------------------------
+    void Camera::_notifyViewport(Viewport* viewport)
+    {
+        mLastViewport = viewport;
+    }
 
 
 } // namespace Ogre

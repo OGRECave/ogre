@@ -97,10 +97,20 @@ namespace Ogre {
         void loadImpl();
         /** @copydoc Resource::unloadImpl */
         void unloadImpl();
+		
+		String getFullSourceWithIncludes() const;
     public:
+		/// Scan the file for #include and replace with source from the OGRE resources
+		static String resolveIncludes(const String& inSource, Resource* resourceBeingLoaded, const String& fileName);
         /** Constructor, should be used only by factory classes. */
         HighLevelGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
+        
+         /** Clone an High level GPU program.
+        @return HighLevelGpuProgramPtr A clone of this program.
+        @param cloneName The name of the cloned high level program.
+        */
+        HighLevelGpuProgramPtr clone(const String& cloneName);
         ~HighLevelGpuProgram();
 
 

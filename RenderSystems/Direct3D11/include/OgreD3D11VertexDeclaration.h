@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre { 
 
+
     /** Specialisation of VertexDeclaration for D3D11 */
     class D3D11VertexDeclaration : public VertexDeclaration
     {
@@ -41,10 +42,10 @@ namespace Ogre {
         D3D11Device & mlpD3DDevice;
 
         bool mNeedsRebuild;
-
+        typedef vector<D3D11_INPUT_ELEMENT_DESC>::type VecD3D11InputElementDesc;
         typedef map<D3D11HLSLProgram*, ID3D11InputLayout*>::type ShaderToILayoutMap;
         typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
-        typedef map<D3D11HLSLProgram*, D3D11_INPUT_ELEMENT_DESC*>::type ShaderToInputDesc;
+        typedef map<D3D11HLSLProgram*, VecD3D11InputElementDesc>::type ShaderToInputDesc;
         typedef ShaderToInputDesc::iterator ShaderToInputDescIterator;
 
         ShaderToInputDesc  mD3delems;
@@ -53,7 +54,6 @@ namespace Ogre {
 
         /** Gets the D3D11-specific vertex declaration. */
         ID3D11InputLayout   *  getILayoutByShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
-        D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 
     public:
         D3D11VertexDeclaration(D3D11Device &  device);
@@ -83,8 +83,17 @@ namespace Ogre {
             VertexElementSemantic semantic, unsigned short index = 0);
 
 
+        const VecD3D11InputElementDesc& getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
         void bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
 
+        /** Internal method to find a vertex element that matches a D3D11_SIGNATURE_PARAMETER_DESC*/
+        bool findElemment(const D3D11_SIGNATURE_PARAMETER_DESC& inputDesc, VertexElementList::const_iterator& it);
+
+        /** Internal method to Initialize a D3D11_INPUT_ELEMENT_DESC*/
+        void fillInputElement(const D3D11_SIGNATURE_PARAMETER_DESC& inputDesc, 
+            const VertexElementList::const_iterator& it, 
+            HardwareVertexBufferSharedPtr vertexBuffer,
+            D3D11_INPUT_ELEMENT_DESC& element);
     };
 
 }

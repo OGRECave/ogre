@@ -279,15 +279,47 @@ namespace Ogre
             return DXGI_FORMAT_R32G32B32_FLOAT;
         case VET_FLOAT4:
             return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+
+            //Signed short
+        case VET_SHORT1:
+            return DXGI_FORMAT_R16_SINT;
         case VET_SHORT2:
             return DXGI_FORMAT_R16G16_SINT;
         case VET_SHORT4:
             return DXGI_FORMAT_R16G16B16A16_SINT;
+        
+
+        //Signed int
+        case VET_INT1:
+            return DXGI_FORMAT_R32_SINT;
+        case VET_INT2:
+            return DXGI_FORMAT_R32G32_SINT;
+        case VET_INT3:
+            return DXGI_FORMAT_R32G32B32_SINT;
+        case VET_INT4:
+            return DXGI_FORMAT_R32G32B32A32_SINT;
+
+        //Unsigned int
+        case VET_UINT1:
+            return DXGI_FORMAT_R32_UINT;
+        case VET_UINT2:
+            return DXGI_FORMAT_R32G32_UINT;
+        case VET_UINT3:
+            return DXGI_FORMAT_R32G32B32_UINT;
+        case VET_UINT4:
+            return DXGI_FORMAT_R32G32B32A32_UINT;
+
         case VET_UBYTE4:
             return DXGI_FORMAT_R8G8B8A8_UINT;
         }
-        // to keep compiler happy
-        return DXGI_FORMAT_R32G32B32_FLOAT;
+
+
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+            "Vertex element mapping not found.",
+            "D3D11Mappings::get");
+            
+        return DXGI_FORMAT_UNKNOWN;
     }
     //---------------------------------------------------------------------
     VertexElementSemantic D3D11Mappings::get(LPCSTR sem)
@@ -313,8 +345,11 @@ namespace Ogre
         if( strcmp(sem, "TANGENT") == 0 )
             return VES_TANGENT;
 
-        // to keep compiler happy
-        return VES_POSITION;
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+            String("Could not find suitable vertex element semantic for: ") + sem ,
+            "D3D11Mappings::get");
+        
+        return VES_UNKNOWN;
     }
     //---------------------------------------------------------------------
     LPCSTR D3D11Mappings::get(VertexElementSemantic sem)
@@ -341,7 +376,11 @@ namespace Ogre
         case VES_TANGENT:
             return "TANGENT";
         }
-        // to keep compiler happy
+        
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+        "Could not find suitable semantic string for the requested vertex element",
+            "D3D11Mappings::get");
+
         return "";
     }
     //---------------------------------------------------------------------
@@ -373,7 +412,7 @@ namespace Ogre
         case DXGI_FORMAT_R16G16B16A16_SNORM:        return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16B16A16_SINT:         return PF_UNKNOWN;
         case DXGI_FORMAT_R32G32_TYPELESS:           return PF_UNKNOWN;
-        case DXGI_FORMAT_R32G32_FLOAT:              return PF_UNKNOWN;
+        case DXGI_FORMAT_R32G32_FLOAT:              return PF_FLOAT32_GR;
         case DXGI_FORMAT_R32G32_UINT:               return PF_UNKNOWN;
         case DXGI_FORMAT_R32G32_SINT:               return PF_UNKNOWN;
         case DXGI_FORMAT_R32G8X24_TYPELESS:         return PF_UNKNOWN;
@@ -393,7 +432,7 @@ namespace Ogre
         case DXGI_FORMAT_R16G16_TYPELESS:           return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_FLOAT:              return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_UNORM:              return PF_SHORT_GR;
-        case DXGI_FORMAT_R16G16_UINT:               return PF_UNKNOWN;
+        case DXGI_FORMAT_R16G16_UINT:               return PF_R16G16_UINT;
         case DXGI_FORMAT_R16G16_SNORM:              return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_SINT:               return PF_R16G16_SINT;
         case DXGI_FORMAT_R32_TYPELESS:              return PF_UNKNOWN;
@@ -497,7 +536,7 @@ namespace Ogre
         case PF_R8G8B8:         return DXGI_FORMAT_UNKNOWN;
         case PF_A8R8G8B8:       return DXGI_FORMAT_B8G8R8A8_UNORM;
         case PF_A8B8G8R8:       return DXGI_FORMAT_R8G8B8A8_UNORM;
-        case PF_X8R8G8B8:       return DXGI_FORMAT_UNKNOWN;
+        case PF_X8R8G8B8:       return DXGI_FORMAT_B8G8R8X8_UNORM;
         case PF_X8B8G8R8:       return DXGI_FORMAT_UNKNOWN;
         case PF_A2B10G10R10:    return DXGI_FORMAT_R10G10B10A2_TYPELESS;
         case PF_A2R10G10B10:    return DXGI_FORMAT_UNKNOWN;
@@ -520,6 +559,7 @@ namespace Ogre
         case PF_BC7_UNORM:      return DXGI_FORMAT_BC7_UNORM;
         case PF_BC7_UNORM_SRGB: return DXGI_FORMAT_BC7_UNORM_SRGB;
         case PF_R16G16_SINT:    return DXGI_FORMAT_R16G16_SINT;
+        case PF_FLOAT32_GR:     return DXGI_FORMAT_R32G32_FLOAT;         
         case PF_UNKNOWN:
         default:                return DXGI_FORMAT_UNKNOWN;
         }

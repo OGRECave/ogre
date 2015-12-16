@@ -46,6 +46,7 @@ THE SOFTWARE.
 #include "OgreTangentSpaceCalc.h"
 #include "OgreLodStrategyManager.h"
 #include "OgrePixelCountLodStrategy.h"
+#include "OgreRoot.h"
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -1049,6 +1050,28 @@ namespace Ogre {
     {
         return mNumLods;
     }
+
+    //---------------------------------------------------------------------
+    void Mesh::createManualLodLevel(Real lodValue, const String& meshName)
+    {
+
+        // Basic prerequisites
+        assert((mHasManualLodLevel || mNumLods == 1) && "Generated LODs already in use!");
+
+        mHasManualLodLevel = true;
+        MeshLodUsage lod;
+        lod.userValue = lodValue;
+        lod.value = mLodStrategy->transformUserValue(lod.userValue);
+        lod.manualName = meshName;
+        
+        lod.manualMesh.setNull();
+        lod.edgeData = 0;
+        mMeshLodUsageList.push_back(lod);
+        ++mNumLods;
+
+        mLodStrategy->sort(mMeshLodUsageList);
+    }
+
     //---------------------------------------------------------------------
     const MeshLodUsage& Mesh::getLodLevel(ushort index) const
     {
@@ -1943,7 +1966,7 @@ namespace Ogre {
         pBuffer = destPosBuf->lock(
             (destNormBuf != destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize()) ||
             (destNormBuf == destPosBuf && destPosBuf->getVertexSize() == destElemPos->getSize() + destElemNorm->getSize()) ?
-            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL);
+            HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL, Root::getSingleton().getFreqUpdatedBuffersUploadOption());
         destElemPos->baseVertexPointerToElement(pBuffer, &pDestPos);
         if (includeNormals)
         {
@@ -1951,7 +1974,7 @@ namespace Ogre {
             {
                 pBuffer = destNormBuf->lock(
                     destNormBuf->getVertexSize() == destElemNorm->getSize() ?
-                    HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL);
+                    HardwareBuffer::HBL_DISCARD : HardwareBuffer::HBL_NORMAL, Root::getSingleton().getFreqUpdatedBuffersUploadOption());
             }
             destElemNorm->baseVertexPointerToElement(pBuffer, &pDestNorm);
         }

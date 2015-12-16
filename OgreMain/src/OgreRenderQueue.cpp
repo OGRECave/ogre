@@ -102,7 +102,8 @@ namespace Ogre {
             pRend->getRenderOperation(op);
             bool useLighting = (NULL != op.vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL));
             MaterialPtr baseWhite = MaterialManager::getSingleton().getByName(useLighting ? "BaseWhite" : "BaseWhiteNoLighting");
-            pTech = baseWhite->getTechnique(0);
+            baseWhite->load();
+            pTech = baseWhite->getBestTechnique();
         }
         else
             pTech = pRend->getTechnique();

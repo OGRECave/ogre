@@ -90,6 +90,7 @@ namespace Ogre
         bool    mSizing;
         bool    mClosed;
         bool    mHidden;
+        bool    mAlwaysWindowedMode;
 
         DXGI_SAMPLE_DESC mFSAAType;     // Effective FSAA mode, limited by hardware capabilities
 
@@ -97,7 +98,6 @@ namespace Ogre
         ID3D11Texture2D*        mpBackBuffer;
         ID3D11Texture2D*        mpBackBufferNoMSAA;             // optional, always holds up-to-date copy data from mpBackBuffer if not NULL
         ID3D11RenderTargetView* mRenderTargetView;
-        ID3D11DepthStencilView* mDepthStencilView;
     };
 
     
@@ -120,7 +120,7 @@ namespace Ogre
         void setVSyncEnabled(bool vsync)                        { mVSync = vsync; }
         bool isVSyncEnabled() const                             { return mVSync || mUseFlipSequentialMode; }
         void setVSyncInterval(unsigned interval)                { mVSyncInterval = interval; }
-        unsigned getVSyncInterval() const                       { return mVSyncInterval; }
+        unsigned int  getVSyncInterval() const                  { return mVSyncInterval; }
 
         void swapBuffers();
         void updateStats(void);
@@ -177,6 +177,7 @@ namespace Ogre
         void adjustWindow(unsigned int clientWidth, unsigned int clientHeight, unsigned int* winWidth, unsigned int* winHeight);
         void updateWindowRect();
         void _beginUpdate();
+        int getContainingMonitorNumber();
 
     protected:
         DXGI_FORMAT _getBasicFormat()                           { return DXGI_FORMAT_R8G8B8A8_UNORM; } // be compatible with pre-Win8 D3D11

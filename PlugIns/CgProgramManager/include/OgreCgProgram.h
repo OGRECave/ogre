@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreCgPrerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreStringVector.h"
+#include "OgreMicroCodeCacheStore.h"
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for nVidia's CG language.
@@ -42,7 +43,7 @@ namespace Ogre {
         program will then negotiate with the renderer to compile the appropriate program
         for the API and graphics card capabilities.
     */
-    class CgProgram : public HighLevelGpuProgram
+    class CgProgram : public HighLevelGpuProgram, public MicrocodeCacheStore
     {
     public:
         /// Command object for setting entry point
@@ -86,6 +87,8 @@ namespace Ogre {
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
 
+        String getStringForMicrocodeCacheHash() const OGRE_OVERRIDE;
+
         /// Load the high-level part in a thread-safe way, required for delegate functionality
         void loadHighLevelSafe();
 
@@ -117,7 +120,7 @@ namespace Ogre {
         void freeCgArgs(void);
 
         void getMicrocodeFromCache(void);
-        void compileMicrocode(void);
+        bool compileMicrocode();
         void addMicrocodeToCache();
 
     private:
@@ -167,8 +170,13 @@ namespace Ogre {
         size_t getSize(void) const;
         void touch(void);
 
-        /// Scan the file for #include and replace with source from the OGRE resources
-        static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
+
+        virtual const bool applyFromMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE;
+
+        virtual const size_t getMicrocodeCacheSize() const OGRE_OVERRIDE;
+
+        virtual void generateMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE;
+
     };
 }
 

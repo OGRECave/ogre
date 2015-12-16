@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGpuProgramUsage.h"
 #include "OgreTextureUnitState.h"
 #include "OgreStringConverter.h"
+#include "OgreCRC.h"
 
 namespace Ogre {
 
@@ -214,6 +215,8 @@ namespace Ogre {
         , mLightScissoring(false)
         , mLightClipPlanes(false)
         , mIlluminationStage(IS_UNKNOWN)
+		, mRenderStateHashDirty(true)
+		, mRenderStateHash(0)
     {
         mPointAttenuationCoeffs[0] = 1.0f;
         mPointAttenuationCoeffs[1] = mPointAttenuationCoeffs[2] = 0.0f;
@@ -323,6 +326,8 @@ namespace Ogre {
         mLightClipPlanes = oth.mLightClipPlanes;
         mIlluminationStage = oth.mIlluminationStage;
         mLightMask = oth.mLightMask;
+		mRenderStateHashDirty = oth.mRenderStateHashDirty;
+		mRenderStateHash = oth.mRenderStateHash;
 
         OGRE_DELETE mVertexProgramUsage;
         if (oth.mVertexProgramUsage)
@@ -992,10 +997,18 @@ namespace Ogre {
             return true;
         }
     }
+
+	//-----------------------------------------------------------------------
+	void Pass::setRenderStateHashDirty()
+	{
+		mRenderStateHashDirty = true;
+	}
+
     //-----------------------------------------------------------------------
     void Pass::setDepthCheckEnabled(bool enabled)
     {
         mDepthCheck = enabled;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     bool Pass::getDepthCheckEnabled(void) const
@@ -1006,6 +1019,7 @@ namespace Ogre {
     void Pass::setDepthWriteEnabled(bool enabled)
     {
         mDepthWrite = enabled;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     bool Pass::getDepthWriteEnabled(void) const
@@ -1016,6 +1030,7 @@ namespace Ogre {
     void Pass::setDepthFunction( CompareFunction func)
     {
         mDepthFunc = func;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     CompareFunction Pass::getDepthFunction(void) const
@@ -1028,26 +1043,31 @@ namespace Ogre {
         mAlphaRejectFunc = func;
         mAlphaRejectVal = value;
         mAlphaToCoverageEnabled = alphaToCoverage;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void Pass::setAlphaRejectFunction(CompareFunction func)
     {
         mAlphaRejectFunc = func;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void Pass::setAlphaRejectValue(unsigned char val)
     {
         mAlphaRejectVal = val;
+		setRenderStateHashDirty();
     }
     //---------------------------------------------------------------------
     void Pass::setAlphaToCoverageEnabled(bool enabled)
     {
         mAlphaToCoverageEnabled = enabled;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void Pass::setTransparentSortingEnabled(bool enabled)
     {
         mTransparentSorting = enabled;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     bool Pass::getTransparentSortingEnabled(void) const
@@ -1058,6 +1078,7 @@ namespace Ogre {
     void Pass::setTransparentSortingForced(bool enabled)
     {
         mTransparentSortingForced = enabled;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     bool Pass::getTransparentSortingForced(void) const
@@ -1068,6 +1089,7 @@ namespace Ogre {
     void Pass::setColourWriteEnabled(bool enabled)
     {
         mColourWrite = enabled;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     bool Pass::getColourWriteEnabled(void) const
@@ -1078,6 +1100,7 @@ namespace Ogre {
     void Pass::setCullingMode( CullingMode mode)
     {
         mCullMode = mode;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     CullingMode Pass::getCullingMode(void) const
@@ -1088,6 +1111,7 @@ namespace Ogre {
     void Pass::setLightingEnabled(bool enabled)
     {
         mLightingEnabled = enabled;
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     bool Pass::getLightingEnabled(void) const
@@ -1220,6 +1244,7 @@ namespace Ogre {
     {
        mDepthBiasConstant = constantBias;
        mDepthBiasSlopeScale = slopeScaleBias;
+	   setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     float Pass::getDepthBiasConstant(void) const
@@ -1467,7 +1492,7 @@ namespace Ogre {
             {
                 _dirtyHash();
             }
-
+			setRenderStateHashDirty();
         }
     }
     //-----------------------------------------------------------------------
@@ -1510,6 +1535,7 @@ namespace Ogre {
             {
                 _dirtyHash();
             }
+			setRenderStateHashDirty();
         }
     }
     //-----------------------------------------------------------------------
@@ -1552,6 +1578,7 @@ namespace Ogre {
             {
                 _dirtyHash();
             }
+			setRenderStateHashDirty();
         }
     }
     //-----------------------------------------------------------------------
@@ -1594,6 +1621,7 @@ namespace Ogre {
             {
                 _dirtyHash();
             }
+			setRenderStateHashDirty();
         }
     }
     //-----------------------------------------------------------------------
@@ -1636,6 +1664,7 @@ namespace Ogre {
             {
                 _dirtyHash();
             }
+			setRenderStateHashDirty();
         }
     }
     //-----------------------------------------------------------------------
@@ -1678,6 +1707,7 @@ namespace Ogre {
             {
                 _dirtyHash();
             }
+			setRenderStateHashDirty();
         }
     }
     //-----------------------------------------------------------------------
@@ -1713,16 +1743,45 @@ namespace Ogre {
         }
         return mVertexProgramUsage->getParameters();
     }
+    const GpuProgramPtr Pass::getGpuProgram(GpuProgramType programType) const
+	{
+		switch (programType)
+		{
+		case GPT_VERTEX_PROGRAM:
+			return getVertexProgram();
+		case GPT_GEOMETRY_PROGRAM:
+			return getGeometryProgram();
+		case GPT_FRAGMENT_PROGRAM:
+			return getFragmentProgram();
+		case GPT_DOMAIN_PROGRAM:
+			return getTessellationDomainProgram();
+		case GPT_HULL_PROGRAM:
+			return getTessellationHullProgram();
+		case GPT_COMPUTE_PROGRAM:
+			return getComputeProgram();
+		default:
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+				"Unkown gpu program type",
+				"Pass::getGpuProgram");
+		}
+	}
+
+    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    const GpuProgramPtr& Pass::getProgram(GpuProgramUsage* const gpuProgramUsage) const
+    {
+        return gpuProgramUsage != NULL ? gpuProgramUsage->getProgram() : GpuProgramPtr::null_ptr;
+    }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getVertexProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mVertexProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mVertexProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getFragmentProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mFragmentProgramUsage)
             return BLANKSTRING;
         else
@@ -1731,19 +1790,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getFragmentProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mFragmentProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getFragmentProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mFragmentProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mFragmentProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getGeometryProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mGeometryProgramUsage)
             return BLANKSTRING;
         else
@@ -1752,19 +1811,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getGeometryProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mGeometryProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getGeometryProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mGeometryProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+		return getProgram(mGeometryProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationHullProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mTessellationHullProgramUsage)
             return BLANKSTRING;
         else
@@ -1773,19 +1832,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationHullProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mTessellationHullProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationHullProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mTessellationHullProgramUsage->getProgram();
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+		return getProgram(mTessellationHullProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationDomainProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mTessellationDomainProgramUsage)
             return BLANKSTRING;
         else
@@ -1794,19 +1853,19 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getTessellationDomainProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mTessellationDomainProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationDomainProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mTessellationDomainProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mTessellationDomainProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getComputeProgramName(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         if (!mComputeProgramUsage)
             return BLANKSTRING;
         else
@@ -1815,14 +1874,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     GpuProgramParametersSharedPtr Pass::getComputeProgramParameters(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
         return mComputeProgramUsage->getParameters();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getComputeProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mComputeProgramUsage->getProgram();
+		OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return getProgram(mComputeProgramUsage);
     }
     //-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const
@@ -1882,6 +1941,7 @@ namespace Ogre {
         {
             (*i)->setTextureFiltering(filterType);
         }
+		setRenderStateHashDirty();
     }
     // --------------------------------------------------------------------
     void Pass::setTextureAnisotropy(unsigned int maxAniso)
@@ -1893,6 +1953,7 @@ namespace Ogre {
         {
             (*i)->setTextureAnisotropy(maxAniso);
         }
+		setRenderStateHashDirty();
     }
     //-----------------------------------------------------------------------
     void Pass::_updateAutoParams(const AutoParamDataSource* source, uint16 mask) const
@@ -2337,4 +2398,15 @@ namespace Ogre {
         return static_cast<unsigned short>(mTextureUnitStates.size() + 1);
 
     }
+
+	const uint32 Pass::getRenderStateHash() const
+	{
+		if (mRenderStateHashDirty == true)
+		{
+			mRenderStateHash = crc32_8bytes(this, sizeof(*this), 0);
+			mRenderStateHashDirty = false;
+		}
+		return mRenderStateHash;
+	}
+
 }

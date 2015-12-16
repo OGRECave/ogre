@@ -378,6 +378,13 @@ namespace Ogre {
         }
     }
     //---------------------------------------------------------------------
+    void Texture::copyToTexture( size_t sourceArrayIndex, TexturePtr& target, size_t targetArrayIndex )
+    {
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+            "copy of texture array is yet to be supported in this render system.",
+            "Texture::copyToTexture" ) ;
+    }
+    //---------------------------------------------------------------------
     String Texture::getSourceFileType() const
     {
         if (mName.empty())

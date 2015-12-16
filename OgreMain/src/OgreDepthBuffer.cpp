@@ -31,12 +31,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    DepthBuffer::DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
+    DepthBuffer::DepthBuffer(uint16 poolId, uint16 bitDepth, uint32 width, uint32 height, uint32 depth,
                               uint32 fsaa, const String &fsaaHint, bool manual ) :
                 mPoolId(poolId),
                 mBitDepth(bitDepth),
                 mWidth(width),
                 mHeight(height),
+                mDepth(depth),
                 mFsaa(fsaa),
                 mFsaaHint(fsaaHint),
                 mManual(manual)
@@ -77,6 +78,11 @@ namespace Ogre
     {
         return mHeight;
     }
+    
+    uint32 DepthBuffer::getDepth() const
+    {
+        return mDepth;
+    }
     //-----------------------------------------------------------------------
     uint32 DepthBuffer::getFsaa() const
     {
@@ -91,6 +97,11 @@ namespace Ogre
     bool DepthBuffer::isManual() const
     {
         return mManual;
+    }
+    //-----------------------------------------------------------------------
+    const bool DepthBuffer::getHasAttachedRenderTargets() const
+    {
+        return !mAttachedRenderTargets.empty();
     }
     //-----------------------------------------------------------------------
     bool DepthBuffer::isCompatible( RenderTarget *renderTarget ) const

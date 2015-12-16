@@ -107,6 +107,7 @@ namespace Ogre {
             mRenderOp.useIndexes = false;
             mRenderOp.operationType = RenderOperation::OT_TRIANGLE_STRIP;
             mRenderOp.useGlobalInstancingVertexBufferIsAvailable = false;
+            mRenderOp.srcRenderable = this;
 
             mInitialised = true;
         }

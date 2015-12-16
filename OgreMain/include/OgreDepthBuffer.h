@@ -89,7 +89,7 @@ namespace Ogre
             POOL_DEFAULT        = 1
         };
 
-        DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height,
+        DepthBuffer( uint16 poolId, uint16 bitDepth, uint32 width, uint32 height, uint32 depth,
                      uint32 fsaa, const String &fsaaHint, bool manual );
         virtual ~DepthBuffer();
 
@@ -102,8 +102,10 @@ namespace Ogre
         virtual uint16 getBitDepth() const;
         virtual uint32 getWidth() const;
         virtual uint32 getHeight() const;
+        virtual uint32 getDepth() const;
         virtual uint32 getFsaa() const;
         virtual const String& getFsaaHint() const;
+        virtual const bool getHasAttachedRenderTargets() const;
 
         /** Manual DepthBuffers are cleared in RenderSystem's destructor. Non-manual ones are released
             with it's render target (aka, a backbuffer or similar) */
@@ -143,6 +145,7 @@ namespace Ogre
         uint16                      mBitDepth;
         uint32                      mWidth;
         uint32                      mHeight;
+        uint32                      mDepth;
         uint32                      mFsaa;
         String                      mFsaaHint;
 

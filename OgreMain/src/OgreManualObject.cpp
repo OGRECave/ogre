@@ -1081,6 +1081,7 @@ namespace Ogre {
         mRenderOperation.useGlobalInstancingVertexBufferIsAvailable = false;
         mRenderOperation.vertexData = OGRE_NEW VertexData();
         mRenderOperation.vertexData->vertexCount = 0;
+        mRenderOperation.srcRenderable = this;
 
     }
     //-----------------------------------------------------------------------------

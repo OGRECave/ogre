@@ -554,9 +554,9 @@ namespace Ogre {
             using this camera, just the last once which was created referring
             to it.
         */
-        Viewport* getViewport(void) const {return mLastViewport;}
+        Viewport* getViewport(void) const;
         /** Notifies this camera that a viewport is using it.*/
-        void _notifyViewport(Viewport* viewport) {mLastViewport = viewport;}
+        void _notifyViewport(Viewport* viewport);
 
         /** If set to true a viewport that owns this frustum will be able to 
             recalculate the aspect ratio whenever the frustum is resized.

@@ -462,24 +462,71 @@ namespace Ogre {
         unsigned int getNumFrames(void) const;
 
 
+        enum BindingTypeBitShift
+        {
+            BT_SHIFT_VERTEX = 0,
+            BT_SHIFT_FIRST = 0,
+            BT_SHIFT_GEOMETRY = 1,
+            BT_SHIFT_FRAGMENT = 2,
+            BT_SHIFT_TESSELLATION_HULL = 3,
+            BT_SHIFT_TESSELLATION_DOMAIN = 4,
+            BT_SHIFT_COMPUTE = 5,
+            BT_SHIFT_COUNT = 6
+        };
+
         /** The type of unit to bind the texture settings to. */
         enum BindingType
         {
-            /** Regular fragment processing unit - the default. */
-            BT_FRAGMENT = 0,
-            /** Vertex processing unit - indicates this unit will be used for 
-                a vertex texture fetch.
+            
+            // null binding
+            BT_NO_BINDING = 0,
+            /** Vertex processing unit - indicates this unit will be used for
+            a vertex texture fetch.
             */
-            BT_VERTEX = 1,          
-            /// Geometry processing unit        
-            BT_GEOMETRY = 2,
+            BT_VERTEX = 1 << BT_SHIFT_VERTEX,
+            /// Geometry processing unit
+            BT_GEOMETRY = 1 << BT_SHIFT_GEOMETRY,
+            /** Regular fragment processing unit. the default */
+            BT_FRAGMENT = 1 << BT_SHIFT_FRAGMENT,
+
             /// Tessellation control processing unit
-            BT_TESSELLATION_HULL = 3,
+            BT_TESSELLATION_HULL = 1 << BT_SHIFT_TESSELLATION_HULL,
             /// Tessellation evaluation processing unit
-            BT_TESSELLATION_DOMAIN = 4,
+            BT_TESSELLATION_DOMAIN = 1 << BT_SHIFT_TESSELLATION_DOMAIN,
             /// Compute processing unit
-            BT_COMPUTE = 5
+            BT_COMPUTE = 1 << BT_SHIFT_COMPUTE,
+
+            BT_ALL = (1 << BT_SHIFT_COUNT) - 1,
+
+            // Helper constants, for shortcuts and debugging.
+            BT_VERTEX_GEOMETRY = BT_VERTEX | BT_GEOMETRY,
+            BT_VERTEX_FRAGMENT = BT_VERTEX | BT_FRAGMENT,
+            BT_GEOMETRY_FRAGMENT = BT_GEOMETRY | BT_FRAGMENT,
+            BT_VERTEX_GEOMETRY_FRAGMENT = BT_VERTEX | BT_GEOMETRY | BT_FRAGMENT
         };
+
+        static String getNameofBindingType(BindingType bindingType)
+        {
+            switch (bindingType)
+            {
+            case BT_NO_BINDING:
+                return "No bindings";
+            case BT_VERTEX:
+                return "vertex";
+            case BT_GEOMETRY:
+                return "geometry";
+            case BT_FRAGMENT:
+                return "fragment";
+            case BT_TESSELLATION_HULL:
+                return "tesselation hull";
+            case BT_TESSELLATION_DOMAIN:
+                return "tesselation domain";
+            case BT_COMPUTE:
+                return "compute";
+            default:
+                return "Undefined";
+            }
+        }
         /** Enum identifying the type of content this texture unit contains.
         */
         enum ContentType

@@ -32,12 +32,14 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreD3D11StateManager.h"
 
 namespace Ogre 
 {
 	// Enable recognizing SM2.0 HLSL shaders.
 	// (the same shader code could be used by many RenderSystems, directly or via Cg)
 	#define SUPPORT_SM2_0_HLSL_SHADERS  0
+
 
     class D3D11DriverList;
     class D3D11Driver;
@@ -54,7 +56,8 @@ namespace Ogre
         enum OGRE_D3D11_DRIVER_TYPE
         {
             DT_HARDWARE, // GPU based
-            DT_SOFTWARE, // microsoft original (slow) software driver
+            DT_REFERENCE, // microsoft original (slow) software driver
+            DT_SOFTWARE, // Not clear what this is
             DT_WARP // microsoft new (faster) software driver - (Windows Advanced Rasterization Platform) - http://msdn.microsoft.com/en-us/library/dd285359.aspx
         };
 
@@ -77,7 +80,7 @@ namespace Ogre
         bool mUseNVPerfHUD;
 		int mSwitchingFullscreenCounter;	// Are we switching from windowed to fullscreen 
 
-        static ID3D11DeviceN* createD3D11Device(D3D11Driver* d3dDriver, OGRE_D3D11_DRIVER_TYPE driverType,
+        ID3D11DeviceN* createD3D11Device(D3D11Driver* d3dDriver, OGRE_D3D11_DRIVER_TYPE driverType,
                          D3D_FEATURE_LEVEL minFL, D3D_FEATURE_LEVEL maxFL, D3D_FEATURE_LEVEL* pFeatureLevel);
 
         D3D11DriverList* getDirect3DDrivers(void);
@@ -114,6 +117,7 @@ namespace Ogre
         bool mSceneAlphaToCoverage;
 
         D3D11_BLEND_DESC    mBlendDesc;
+        D3D11_BLEND_DESC mDefaultTargetBlend;
         bool                mBlendDescChanged;
 
         D3D11_RASTERIZER_DESC   mRasterizerDesc;
@@ -141,14 +145,9 @@ namespace Ogre
         D3D11HLSLProgram* mBoundTessellationDomainProgram;
         D3D11HLSLProgram* mBoundComputeProgram;
 
-        TextureUnitState::BindingType mBindingType;
-
-        ID3D11ShaderResourceView* mDSTResView;
         ID3D11BlendState * mBoundBlendState;
         ID3D11RasterizerState * mBoundRasterizer;
         ID3D11DepthStencilState * mBoundDepthStencilState;
-        ID3D11SamplerState * mBoundSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
-        size_t mBoundSamplerStatesCount;
 
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundTexturesCount;
@@ -163,9 +162,10 @@ namespace Ogre
         typedef std::map<String, ID3D11ClassInstance*> ClassInstanceMap;
         typedef std::map<String, ID3D11ClassInstance*>::iterator ClassInstanceIterator;
         ClassInstanceMap mInstanceMap;
+        StateManager mStateManager;
 
-        /// structure holding texture unit settings for every stage
-        struct sD3DTextureStageDesc
+        /// structure holding a D3D11 texture/sampler settings for a single slot.
+        struct TextureSlotDesc
         {
             /// the type of the texture
             TextureType type;
@@ -176,12 +176,32 @@ namespace Ogre
             ID3D11ShaderResourceView  *pTex;
             D3D11_SAMPLER_DESC  samplerDesc;
             bool used;
-        } mTexStageDesc[OGRE_MAX_TEXTURE_LAYERS];
+        };
 
-        size_t     mLastTextureUnitState;
-		bool       mSamplerStatesChanged;
+        // structure holding a set of D3D11 texture slots settings for a specific pipeline stage
+        struct TextureStageGroup
+        {
+            TextureSlotDesc mTextureSlots[OGRE_MAX_TEXTURE_LAYERS];
+            size_t     mHighestSlotUsed;
+            
+        };
+        
+        // structure holding function pointers to ID3D11DeviceContextN methods for 
+        // settings samplers and shader resource views for a certain pipeline stage.
+        struct SamplerCallEntry
+        {
+            SamplerCallEntry() : SetSamplers(NULL), SetTextures(NULL){}
+            void(__stdcall ID3D11DeviceContextN::*SetSamplers)(UINT StartSlot, UINT NumSamplers, ID3D11SamplerState *const* ppSamplers);
+            void(__stdcall ID3D11DeviceContextN::*SetTextures)(UINT StartSlot, UINT NumSamplers, ID3D11ShaderResourceView *const* ppTextures);
+        };
 
+        SamplerCallEntry mSamplersCallsLUT[TextureUnitState::BT_SHIFT_COUNT];
 
+        //An array holding a set of all texture settings for all the pipeline stages.
+        typedef TextureStageGroup TextureDesc[TextureUnitState::BT_SHIFT_COUNT];
+
+        TextureDesc mTextureDesc;
+        TextureUnitState::BindingType mDirtyTextureStages;
 
         /// Primary window, the one used to create the device
         D3D11RenderWindowBase* mPrimaryWindow;
@@ -199,6 +219,7 @@ namespace Ogre
 #endif
 
     protected:
+        void _disableTextureUnit(size_t texUnit, TextureUnitState::BindingType bindingType);
         void setClipPlanesImpl(const PlaneList& clipPlanes);
 
         /**
@@ -206,6 +227,9 @@ namespace Ogre
          * from us each Present(), and we need the way to reestablish connection.
          */
         void _setRenderTargetViews();
+
+        void _bindSamplersForStages(D3D11RenderOperationState* opState);
+        void _applyRenderStates(D3D11RenderOperationState* &opState, const RenderOperation& op);
 
     public:
         // constructor
@@ -248,9 +272,10 @@ namespace Ogre
          * is deleted. This is specially useful to put the Depth Buffer created along with the window's
          * back buffer into the pool. All depth buffers introduced with this method go to POOL_DEFAULT
          */
-        DepthBuffer* _addManualDepthBuffer( ID3D11DepthStencilView *depthSurface,
-                                            uint32 width, uint32 height, uint32 fsaa, uint32 fsaaQuality );
 
+        DepthBuffer* _addManualDepthBuffer(RenderTarget* renderTarget);
+
+      
         /// Reverts _addManualDepthBuffer actions
         void _removeManualDepthBuffer(DepthBuffer *depthBuffer);
         /// @copydoc RenderSystem::detachRenderTarget
@@ -269,6 +294,7 @@ namespace Ogre
         void setShadingType( ShadeOptions so );
         void setLightingEnabled( bool enabled );
         void destroyRenderTarget(const String& name);
+        void _notifyCameraRemoved(const Camera* cam);
         VertexElementType getColourVertexElementType(void) const;
         void setStencilCheckEnabled(bool enabled);
         void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS, 
@@ -295,16 +321,17 @@ namespace Ogre
         void _setProjectionMatrix( const Matrix4 &m );
         void _setSurfaceParams( const ColourValue &ambient, const ColourValue &diffuse, const ColourValue &specular, const ColourValue &emissive, Real shininess, TrackVertexColourType tracking );
         void _setPointSpritesEnabled(bool enabled);
+        void _setTexture(size_t stage, bool enabled, const TexturePtr& tex, TextureUnitState::BindingType bindingType);
+        
         void _setPointParameters(Real size, bool attenuationEnabled, 
             Real constant, Real linear, Real quadratic, Real minSize, Real maxSize);
-        void _setTexture(size_t unit, bool enabled, const TexturePtr &texPtr);
-        void _setBindingType(TextureUnitState::BindingType bindingType);
+        
         void _setVertexTexture(size_t unit, const TexturePtr& tex);
         void _setGeometryTexture(size_t unit, const TexturePtr& tex);
         void _setComputeTexture(size_t unit, const TexturePtr& tex);
         void _setTesselationHullTexture(size_t unit, const TexturePtr& tex);
         void _setTesselationDomainTexture(size_t unit, const TexturePtr& tex);
-        void _disableTextureUnit(size_t texUnit);
+        
         void _setTextureCoordSet( size_t unit, size_t index );
         void _setTextureCoordCalculation(size_t unit, TexCoordCalcMethod m, const Frustum* frustum = 0);
         void _setTextureBlendMode( size_t unit, const LayerBlendModeEx& bm );
@@ -337,6 +364,8 @@ namespace Ogre
             Matrix4& dest, bool forGpuProgram = false);
         void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, bool forGpuProgram);
         void _setPolygonMode(PolygonMode level);
+        void _markDirtyTextureStage(TextureUnitState::BindingType binding_type);
+        void _clearDirtyTextureStage();
         void _setTextureUnitFiltering(size_t unit, FilterType ftype, FilterOptions filter);
         void _setTextureUnitCompareFunction(size_t unit, CompareFunction function);
         void _setTextureUnitCompareEnabled(size_t unit, bool compare);
@@ -346,6 +375,7 @@ namespace Ogre
         void setVertexBufferBinding(VertexBufferBinding* binding);
         void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
         void _render(const RenderOperation& op);
+        void _setupSamplersCallsLUT();
         /** See
           RenderSystem
          */

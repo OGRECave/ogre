@@ -686,12 +686,10 @@ namespace Ogre
         unit, thus minimising render state changes.
         */
         virtual void _setTextureUnitSettings(size_t texUnit, TextureUnitState& tl);
-        /** Set texture unit binding type */
-        virtual void _setBindingType(TextureUnitState::BindingType bindigType);
-        /** Turns off a texture unit. */
-        virtual void _disableTextureUnit(size_t texUnit);
+        
+        
         /** Disables all texture units from the given unit upwards */
-        virtual void _disableTextureUnitsFrom(size_t texUnit);
+        virtual void _disableTextureUnitsFrom(size_t texUnit, TextureUnitState::BindingType bindingType);
         /** Sets the surface properties to be used for future rendering.
 
         This method sets the the properties of the surfaces of objects
@@ -757,14 +755,14 @@ namespace Ogre
         User processes would not normally call this direct unless rendering
         primitives themselves.
 
-        @param unit The index of the texture unit to modify. Multitexturing 
-        hardware can support multiple units (see 
+        @param unit The index of the texture unit to modify. Multitexturing
+        hardware can support multiple units (see
         RenderSystemCapabilites::getNumTextureUnits)
         @param enabled Boolean to turn the unit on/off
         @param texPtr Pointer to the texture to use.
         */
-        virtual void _setTexture(size_t unit, bool enabled, 
-            const TexturePtr &texPtr) = 0;
+        virtual void _setTexture(size_t unit, bool enabled,
+            const TexturePtr &texPtr,TextureUnitState::BindingType bindingType) = 0;
         /**
         Sets the texture to bind to a given texture unit.
 
@@ -778,7 +776,7 @@ namespace Ogre
         @param texname The name of the texture to use - this should have
         already been loaded with TextureManager::load.
         */
-        virtual void _setTexture(size_t unit, bool enabled, const String &texname);
+        //virtual void _setTexture(size_t unit, bool enabled, const String &texname);
 
         /** Binds a texture to a vertex, geometry, compute, tesselation hull
         or tessellation domain sampler.
@@ -1576,6 +1574,9 @@ namespace Ogre
 		*/
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer) { return false; };
 
+    protected:
+        /** Turns off a texture unit. */
+        virtual void _disableTextureUnit(size_t texUnit, TextureUnitState::BindingType bindingType);
     protected:
 
         /** DepthBuffers to be attached to render targets */

@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreD3D9Prerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreMicroCodeCacheStore.h"
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to provide support for D3D9 
@@ -40,7 +41,7 @@ namespace Ogre {
         reason for not wanting to use the Cg plugin, I suggest you use Cg instead since that
         can produce programs for OpenGL too.
     */
-    class _OgreD3D9Export D3D9HLSLProgram : public HighLevelGpuProgram
+    class _OgreD3D9Export D3D9HLSLProgram : public HighLevelGpuProgram , public MicrocodeCacheStore
     {
     public:
         /// Command object for setting entry point
@@ -124,11 +125,12 @@ namespace Ogre {
         void unloadHighLevelImpl(void);
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions() const;
+        String getStringForMicrocodeCacheHash() const OGRE_OVERRIDE;
 
         // Recursive utility method for buildParamNameMap
         void processParamElement(LPD3DXCONSTANTTABLE pConstTable, D3DXHANDLE parent, String prefix, unsigned int index);
         void populateDef(D3DXCONSTANT_DESC& d3dDesc, GpuConstantDefinition& def) const;
-
+        const DWORD getCompilerFlags() const;
         String mTarget;
         String mEntryPoint;
         String mPreprocessorDefines;
@@ -162,11 +164,10 @@ namespace Ogre {
     protected:
         OptimisationLevel mOptimisationLevel;
 
-        /** Gets the microcode from the microcode cache. */
-        void getMicrocodeFromCache(void);
-        /** Compiles the microcode from the program source. */
-        void compileMicrocode(void);
-        void addMicrocodeToCache();
+       /** Compiles the microcode from the program source. */
+        
+        bool compileMicrocode() OGRE_OVERRIDE;
+        
     public:
         D3D9HLSLProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
@@ -206,6 +207,13 @@ namespace Ogre {
         GpuProgramParametersSharedPtr createParameters(void);
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
+
+        virtual const bool applyFromMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE;
+
+        virtual const size_t getMicrocodeCacheSize() const OGRE_OVERRIDE;
+
+        virtual void generateMicroCodeCache(Microcode cacheMicrocode) OGRE_OVERRIDE;
+
     };
 }
 

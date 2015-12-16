@@ -63,7 +63,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     D3D11Texture::~D3D11Texture()
     {
-        // have to call this here reather than in Resource destructor
+        // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         if (isLoaded())
         {
@@ -101,6 +101,50 @@ namespace Ogre
                 "D3D11Texture::copyToTexture");
         }
 
+    }
+    //---------------------------------------------------------------------
+    void D3D11Texture::copyToTexture( size_t sourceArrayIndex, 
+        TexturePtr& target, size_t targetArrayIndex )
+    {
+        D3D11Texture *other;
+        other = static_cast< D3D11Texture * >( target.get() );
+
+        D3D11_TEXTURE2D_DESC desc;
+        mp2DTex->GetDesc(&desc);
+        UINT sourceMips = desc.MipLevels ;
+        other->GetTex2D()->GetDesc(&desc);
+        UINT destMips = desc.MipLevels;
+
+
+        if (target->getFormat() != this->getFormat() ||
+            target->getWidth() !=  this->getWidth() ||
+            target->getHeight() !=  this->getHeight() ||
+            sourceMips != destMips
+            )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, 
+                "Src. and dest. textures must be of same type and must have the same usage !!!", 
+                "D3D11Texture::copyToTexture" );
+        }
+
+        uint32 height = mHeight;
+        uint32 width = mWidth;
+        
+
+        for(UINT i = 0 ; i < sourceMips ; i++)
+        {
+
+            mDevice.GetImmediateContext()->CopySubresourceRegion(other->getTextureResource(), D3D11CalcSubresource(i ,targetArrayIndex, destMips), 
+                0, 0, 0, mpTex, 
+                D3D11CalcSubresource(i ,sourceArrayIndex, sourceMips), NULL );
+            if (mDevice.isError())
+            {
+                String errorDescription = mDevice.getErrorDescription();
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                    "D3D11 device cannot copy resource\nError Description:" + errorDescription,
+                    "D3D11Texture::copyToTexture");
+            }
+        }
     }
     //---------------------------------------------------------------------
     void D3D11Texture::loadImage( const Image &img )
@@ -471,8 +515,6 @@ namespace Ogre
 
         // determine total number of mipmaps including main one (d3d11 convention)
         UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED || (1U << mNumRequestedMipmaps) > std::max(mSrcWidth, mSrcHeight)) ? 0 : mNumRequestedMipmaps + 1;
-        if(isBinaryCompressedFormat && numMips > 1)
-            numMips = std::max(1U, numMips - 2);
 
         D3D11_TEXTURE2D_DESC desc;
         desc.Width          = static_cast<UINT>(mSrcWidth);
@@ -854,8 +896,8 @@ namespace Ogre
                     mSurfaceList.push_back(
                         HardwarePixelBufferSharedPtr(buffer)
                         );
-                    width /= 2;
-                    height /= 2;
+                    width = std::max<size_t>(width / 2, 1);
+                    height = std::max<size_t>(height / 2, 1);
                 }
             }
         }
@@ -995,6 +1037,30 @@ namespace Ogre
         mLoadedStreams.setNull();   
     }
     //---------------------------------------------------------------------
+    ID3D11Resource * D3D11Texture::getTextureResource()
+    {
+        // this is required for the multi device support - to save it from call GetDesc to know the resource type
+        ID3D11Resource * res = NULL;
+        switch(getTextureType())
+        {
+        case TEX_TYPE_1D:
+            res = GetTex1D();
+            break;
+        case TEX_TYPE_2D:
+        case TEX_TYPE_2D_RECT:
+        case TEX_TYPE_2D_ARRAY:
+		case TEX_TYPE_CUBE_MAP:
+            res = GetTex2D();
+            break;
+        case TEX_TYPE_3D:
+            res = GetTex3D();
+            break;
+        }
+
+		assert(res);
+        return res;
+    }
+    //---------------------------------------------------------------------
     // D3D11RenderTexture
     //---------------------------------------------------------------------
     void D3D11RenderTexture::rebind( D3D11HardwarePixelBuffer *buffer )
@@ -1002,57 +1068,124 @@ namespace Ogre
         mBuffer = buffer;
         mWidth = (unsigned int) mBuffer->getWidth();
         mHeight = (unsigned int) mBuffer->getHeight();
+        mDepth = (unsigned int)mBuffer->getDepth();
+        mRenderTargetArraysParams.ArraySize = mDepth;
+        mRenderTargetArraysParams.FirstArraySlice = 0;
+        mRenderTargetArraysParams.MipSlice = 0;
         mColourDepth = (unsigned int) PixelUtil::getNumElemBits(mBuffer->getFormat());
+        updateRenderTargetView();
         
-        ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
+    }
+    
+    //--------------------------------------------------------------------- 
 
-        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
-        ZeroMemory( &RTVDesc, sizeof(RTVDesc) );
 
-        RTVDesc.Format = buffer->getParentTexture()->getShaderResourceViewDesc().Format;
-        switch(buffer->getParentTexture()->getShaderResourceViewDesc().ViewDimension)
+    void D3D11Texture::fillDSVDescription(ID3D11Texture2D * const depthTexture, D3D11_DEPTH_STENCIL_VIEW_DESC &dsvDesc)
+    {
+
+        D3D11_TEXTURE2D_DESC BBDesc;
+        depthTexture->GetDesc(&BBDesc);
+        switch (BBDesc.Format)
         {
-        case D3D11_SRV_DIMENSION_BUFFER:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_BUFFER;
+        case DXGI_FORMAT_D24_UNORM_S8_UINT:
+            dsvDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
             break;
+        case DXGI_FORMAT_R32_TYPELESS:
+            dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+            break;
+        default:
+            OGRE_EXCEPT(Exception::ERR_INVALID_STATE,
+                "could not find a suitable depth stencil view format ",
+                "D3D11Texture::FillDSVDescription");
+            break;
+
+        }
+        
+        switch (mSRVDesc.ViewDimension)
+        {
+            
         case D3D11_SRV_DIMENSION_TEXTURE1D:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE1D;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE1DARRAY:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE1DARRAY;
             break;
         case D3D11_SRV_DIMENSION_TEXTURECUBE:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-            RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
-            RTVDesc.Texture2DArray.ArraySize = 1;
-            RTVDesc.Texture2DArray.MipSlice = 0;
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+            dsvDesc.Texture2DArray.ArraySize = 1;
+            dsvDesc.Texture2DArray.MipSlice = 0;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2D:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+            dsvDesc.Texture2DArray.FirstArraySlice = 0;
+            dsvDesc.Texture2DArray.ArraySize = mDepth;
+            dsvDesc.Texture2DArray.MipSlice = 0;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMS:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+            dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+            dsvDesc.Texture2DMSArray.FirstArraySlice = 0;
+            dsvDesc.Texture2DMSArray.ArraySize = mDepth;
+
             break;
         case D3D11_SRV_DIMENSION_TEXTURE3D:
-            RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
-            break;
+        case D3D11_SRV_DIMENSION_BUFFER:
         default:
             assert(false);
         }
-        HRESULT hr = mDevice->CreateRenderTargetView( pBackBuffer, &RTVDesc, &mRenderTargetView );
-
-        if (FAILED(hr) || mDevice.isError())
+    }
+    //--------------------------------------------------------------------- 
+    void D3D11Texture::fillRTVDescription(D3D11_RENDER_TARGET_VIEW_DESC &rtvDesc)
+    {
+        rtvDesc.Format = mSRVDesc.Format;
+        
+        switch (mSRVDesc.ViewDimension)
         {
-			String errorDescription = mDevice.getErrorDescription(hr);
-			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-				"Error creating Render Target View\nError Description:" + errorDescription,
-                "D3D11RenderTexture::rebind" );
+        case D3D11_SRV_DIMENSION_BUFFER:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_BUFFER;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE1D:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1D;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE1DARRAY:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURECUBE:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            rtvDesc.Texture2DArray.ArraySize = 1;
+            rtvDesc.Texture2DArray.MipSlice = 0;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2D:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            rtvDesc.Texture2DArray.FirstArraySlice = 0;
+            rtvDesc.Texture2DArray.ArraySize = mDepth;
+            rtvDesc.Texture2DArray.MipSlice = 0;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2DMS:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+            rtvDesc.Texture2DMSArray.FirstArraySlice = 0;
+            rtvDesc.Texture2DMSArray.ArraySize = mDepth;
+            
+            break;
+        case D3D11_SRV_DIMENSION_TEXTURE3D:
+            rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+            rtvDesc.Texture3D.FirstWSlice = 0;
+            rtvDesc.Texture3D.MipSlice = 0;
+            rtvDesc.Texture3D.WSize = mDepth;
+            break;
+        default:
+            assert(false);
         }
     }
     //---------------------------------------------------------------------
@@ -1104,8 +1237,70 @@ namespace Ogre
         RenderTexture::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
-    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : mDevice(device),
-    RenderTexture(buffer, 0)
+    void D3D11RenderTexture::updateRenderTargetView()
+    {
+        if (mRenderTargetView == NULL || mRenderTargetArrayViewDirty == true)
+        {
+            SAFE_RELEASE(mRenderTargetView);
+            mRenderTargetView = createRenderTargetView();
+        }
+
+
+    }
+    //---------------------------------------------------------------------
+    ID3D11RenderTargetView* D3D11RenderTexture::createRenderTargetView()
+    {
+        D3D11HardwarePixelBuffer *buffer = static_cast<D3D11HardwarePixelBuffer*>(mBuffer);
+        ID3D11Resource * pBackBuffer = buffer->getParentTexture()->getTextureResource();
+
+        D3D11_RENDER_TARGET_VIEW_DESC RTVDesc;
+        ZeroMemory(&RTVDesc, sizeof(RTVDesc));
+        D3D11Texture* parentTexture = static_cast<D3D11Texture*>(buffer->getParentTexture());
+        parentTexture->fillRTVDescription(RTVDesc);
+
+        if (RTVDesc.ViewDimension == D3D10_RTV_DIMENSION_TEXTURE2DARRAY)
+        {
+            D3D_SRV_DIMENSION srvDimension = parentTexture->getShaderResourceViewDesc().ViewDimension;
+            switch (srvDimension)
+            {
+            case D3D_SRV_DIMENSION_TEXTURECUBE:
+                RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
+                break;
+            case D3D_SRV_DIMENSION_TEXTURE2DARRAY:
+                if (mRenderTargetArrayViewDirty == true)
+                {
+                    RTVDesc.Texture2DArray.ArraySize = mRenderTargetArraysParams.ArraySize;
+                    RTVDesc.Texture2DArray.MipSlice = mRenderTargetArraysParams.MipSlice;
+                    RTVDesc.Texture2DArray.FirstArraySlice = mRenderTargetArraysParams.FirstArraySlice;
+                    mRenderTargetArrayViewDirty = false;
+                }
+                break;
+
+            }
+        }
+
+        ID3D11RenderTargetView* result = NULL;
+
+        HRESULT hr = mDevice->CreateRenderTargetView(pBackBuffer, &RTVDesc, &result);
+
+        if (FAILED(hr) || mDevice.isError())
+        {
+            String errorDescription = mDevice.getErrorDescription(hr);
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Error creating Render Target View\nError Description:" + errorDescription,
+                "D3D11RenderTexture::rebind");
+        }
+
+        
+
+        return result;
+    }
+    
+    //---------------------------------------------------------------------
+    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : 
+        mDevice(device),
+        mRenderTargetView(NULL),
+        RenderTexture(buffer, 0)
     {
         mName = name;
 
@@ -1116,6 +1311,6 @@ namespace Ogre
 
     D3D11RenderTexture::~D3D11RenderTexture()
     {
-
+        SAFE_RELEASE(mRenderTargetView);
     }
 }

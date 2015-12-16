@@ -153,7 +153,9 @@ namespace Ogre {
                     Data is updated in the currently active device. Any other device will only be updated once 
                     buffer is requested for rendering.
                 */
-                HBU_ON_DEMAND = 0x0001
+                HBU_ON_DEMAND = 0x0001,
+                
+                HBU_ONLY_ACTIVE_DEVICE = 0x0002
             };
 
         protected:
@@ -168,9 +170,14 @@ namespace Ogre {
             HardwareBuffer* mShadowBuffer;
             bool mShadowUpdated;
             bool mSuppressHardwareUpdate;
+            LockOptions mOptions;
             
             /// Internal implementation of lock()
             virtual void* lockImpl(size_t offset, size_t length, LockOptions options) = 0;
+            virtual void* lockImpl(size_t offset, size_t length, LockOptions options, UploadOptions uploadOpt)
+            {
+                return lockImpl(offset, length, options);
+            }
             /// Internal implementation of unlock()
             virtual void unlockImpl(void) = 0;
 
@@ -179,7 +186,7 @@ namespace Ogre {
             HardwareBuffer(Usage usage, bool systemMemory, bool useShadowBuffer) 
                 : mSizeInBytes(0), mUsage(usage), mIsLocked(false), mLockStart(0), mLockSize(0), mSystemMemory(systemMemory),
                 mUseShadowBuffer(useShadowBuffer), mShadowBuffer(NULL), mShadowUpdated(false), 
-                mSuppressHardwareUpdate(false) 
+                mSuppressHardwareUpdate(false), mOptions(HBL_NORMAL)
             {
                 // If use shadow buffer, upgrade to WRITE_ONLY on hardware side
                 if (useShadowBuffer && usage == HBU_DYNAMIC)
@@ -223,12 +230,13 @@ namespace Ogre {
                 else
                 {
                     // Lock the real buffer if there is no shadow buffer 
-                    ret = lockImpl(offset, length, options);
+                    ret = lockImpl(offset, length, options, uploadOpt);
                     mIsLocked = true;
                 }
                 mLockStart = offset;
                 mLockSize = length;
                 mLockUploadOption = uploadOpt;
+                mOptions = options;
                 return ret;
             }
 
@@ -329,11 +337,9 @@ namespace Ogre {
                     const void *srcData = mShadowBuffer->lockImpl(
                         mLockStart, mLockSize, HBL_READ_ONLY);
                     // Lock with discard if the whole buffer was locked, otherwise normal
-                    LockOptions lockOpt;
+                    LockOptions lockOpt = mOptions;
                     if (mLockStart == 0 && mLockSize == mSizeInBytes)
                         lockOpt = HBL_DISCARD;
-                    else
-                        lockOpt = HBL_NORMAL;
                     
                     void *destData = this->lockImpl(
                         mLockStart, mLockSize, lockOpt);

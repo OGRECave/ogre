@@ -30,29 +30,70 @@ THE SOFTWARE.
 
 #include "OgreD3D11Prerequisites.h"
 #include "OgreDepthBuffer.h"
+#include "OgreRenderTarget.h"
+#include "OgreTexture.h"
 
 namespace Ogre 
 {
     class D3D11DepthBuffer : public DepthBuffer
     {
     public:
-        D3D11DepthBuffer( uint16 poolId, D3D11RenderSystem *renderSystem,
-                            ID3D11DepthStencilView *depthBufferView,
-                            uint32 width, uint32 height,
-                            uint32 fsaa, uint32 multiSampleQuality, bool isManual );
+        D3D11DepthBuffer( uint16 poolId
+            , D3D11RenderSystem *renderSystem
+            , RenderTarget *rendertarget
+            , bool dontBindToShader
+            , uint32 width 
+            , uint32 height
+            , uint32 depth
+            , uint32 fsaa
+            , uint32 multiSampleQuality
+            , bool isManual );
+
+        D3D11DepthBuffer(uint16 poolId, D3D11RenderSystem *renderSystem,
+            RenderTarget *rendertarget,bool dontBindToShader, bool isManual);
+
         ~D3D11DepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible
         virtual bool isCompatible( RenderTarget *renderTarget ) const;
+        /** Sets depth buffer parameters to match a render target array*/
+        void adjustArrayTargetView(RenderTarget *renderTarget);
 
+        /** Returns the last created depth stencil view */
         ID3D11DepthStencilView* getDepthStencilView() const;
-        /// internal method, gets called when the renderwindow was resized
-        void _resized(ID3D11DepthStencilView *depthBufferView, uint32 width, uint32 height);
 
+        /** Returns the ShaderResourceView of the depth buffer texture.*/
+       
+        
+        ID3D11ShaderResourceView* getShaderResourceView();
+
+        TextureType getTextureType();
+    private:
+        ID3D11ShaderResourceView* createShaderResourceView();
+        /** Update depth stencil view parameters from the renderTarget and recreate.*/
+        void updateDepthStencilView(RenderTarget* renderTarget);
+
+        /** Create the depth stencil texture resource*/
+        void createDepthStencilTexture(RenderTarget* renderTarget);
+
+        void init(RenderTarget* renderTarget);
+        /** Internal method to get the depth buffer format from a render texture's back buffer*/
+        DXGI_FORMAT getFormatFor(RenderTarget* renderTarget) const;
+		/** Internal method to get the underlying texture pertaining to the render target */
+		ID3D11Texture2D* getTextureFor(RenderTarget* renderTarget) const;
+
+		void getTextureDescpritionFor(RenderTarget * renderTarget, D3D11_TEXTURE2D_DESC& BBDesc) const;
     protected:
-        ID3D11DepthStencilView      *mDepthStencilView; //aka. actual "DepthBuffer"
+        ID3D11Texture2D*            mDepthStencilTexture; 
+        ID3D11DepthStencilView*     mDepthStencilView; //aka. actual "DepthBuffer"
+        ID3D11ShaderResourceView*   mDepthStencilShaderResouceView;
         uint32                      mMultiSampleQuality;
-        D3D11RenderSystem           *mRenderSystem;
+        D3D11RenderSystem*          mRenderSystem;
+        RenderTarget::ArrayParams   mArrayParams;
+        bool                        mUseAsShaderResource;
+        bool                        mis2DArrayTextureCube;
+        bool                        mDontBindToShader;
+        TextureType                 mTextureType;
     };
 }
 #endif

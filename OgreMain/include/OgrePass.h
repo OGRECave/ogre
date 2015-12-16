@@ -240,6 +240,10 @@ namespace Ogre {
         IlluminationStage mIlluminationStage;
         /// User objects binding.
         UserObjectBindings      mUserObjectBindings;
+        // This value change if a change in the pass should affect a render system's render state. 
+        mutable uint32 mRenderStateHash;
+        // Tells whether to recalcualte render state hash
+        mutable bool mRenderStateHashDirty;
 
 
         /// Used to get scene blending flags from a blending type
@@ -293,6 +297,8 @@ namespace Ogre {
         bool hasShadowReceiverFragmentProgram(void) const { return mShadowReceiverFragmentProgramUsage != NULL; }
 
         size_t calculateSize(void) const;
+
+        const uint32 getRenderStateHash() const;
 
         /// Gets the index of this Pass in the parent Technique
         unsigned short getIndex(void) const { return mIndex; }
@@ -1219,6 +1225,9 @@ namespace Ogre {
             not just the names.
         */
         void setVertexProgram(const String& name, bool resetParams = true);
+
+        const GpuProgramPtr getGpuProgram(GpuProgramType programType) const;
+
         /** Sets the vertex program parameters.
             @remarks
             Only applicable to programmable passes, and this particular call is
@@ -1504,6 +1513,8 @@ namespace Ogre {
             recalculation of the has next time.
         */
         void _recalculateHash(void);
+
+		void setRenderStateHashDirty();
         /** Tells the pass that it needs recompilation. */
         void _notifyNeedsRecompile(void);
 
@@ -1842,6 +1853,9 @@ namespace Ogre {
         GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
         /** Gets the Tessellation EHull program used by this pass, only available after _load(). */
         const GpuProgramPtr& getComputeProgram(void) const;
+        
+     protected:
+        const GpuProgramPtr& getProgram(GpuProgramUsage* const gpuProgramUsage) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

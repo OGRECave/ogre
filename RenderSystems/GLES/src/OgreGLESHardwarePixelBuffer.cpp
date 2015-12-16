@@ -487,7 +487,7 @@ namespace Ogre {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT |  GL_STENCIL_BUFFER_BIT);
         
         RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-        rsys->_disableTextureUnitsFrom(0);
+        rsys->_disableTextureUnitsFrom(0, TextureUnitState::BT_ALL);
 
         // Disable alpha, depth and scissor testing, disable blending, 
         // disable culling, disble lighting, disable fog and reset foreground
