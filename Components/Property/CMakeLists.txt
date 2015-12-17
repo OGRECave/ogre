@@ -25,7 +25,7 @@ set (SOURCE_FILES
 
 
 # Add needed definitions 
-add_definitions(-DOGRE_PROPERTY_EXPORTS -D_MT -D_USRDLL)
+add_definitions(-DOGRE_PROPERTY_EXPORTS)
 
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
