@@ -203,6 +203,8 @@ namespace Ogre {
         /// Gets the parent Material
         Material* getParent(void) const { return mParent; }
 
+        String getFullyQualifiedName() const;
+
         /** Overloaded operator to copy on Technique to another. */
         Technique& operator=(const Technique& rhs);
 

@@ -94,7 +94,17 @@ void ProgramManager::acquirePrograms(Pass* pass, TargetRenderState* renderState)
     // Create the CPU programs.
     renderState->createCpuPrograms();
 
+
     ProgramSet* programSet = renderState->getProgramSet();
+
+    for (GpuProgramType i = GPT_FIRST; i < GPT_COUNT; ++i)
+    {
+        Program* p = programSet->getCpuProgram(i);
+        if (p != NULL)
+        {
+            p->setSourcePassName(pass->getFullyQualifiedName());
+        }
+    }
 
     // Create the GPU programs.
     createGpuPrograms(programSet);
@@ -129,7 +139,7 @@ void ProgramManager::releasePrograms(Pass* pass, TargetRenderState* renderState)
         pass->setFragmentProgram(BLANKSTRING);
         pass->setGeometryProgram(BLANKSTRING);
 
-        for (GpuProgramType i = GPT_FIRST; i < GPT_COUNT; i++)
+        for (GpuProgramType i = GPT_FIRST; i < GPT_COUNT; ++i)
         {
             GpuProgramPtr gpuProgram = programSet->getGpuProgram(i);
             if (!gpuProgram.isNull())
@@ -416,7 +426,18 @@ GpuProgramPtr ProgramManager::createGpuProgram(Program* shaderProgram,
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     
     // Generate program name.
-    programName = generateGUID(source);
+    String::size_type idx = source.find(ProgramWriter::msProgramStartToken);
+    
+    if (idx != String::npos)
+    {
+        String sourceWithoutHeader = source.substr(idx, source.length() - idx);
+        programName = generateGUID(sourceWithoutHeader);
+    }
+    else
+    {
+        OGRE_EXCEPT(Exception::ERR_INVALID_STATE,"Wrong program source detected",
+            "ProgramManager::createGpuProgram");
+    }
 
 #else // Disable caching on android devices 
 

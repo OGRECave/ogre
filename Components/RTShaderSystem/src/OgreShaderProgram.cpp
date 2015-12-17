@@ -351,6 +351,16 @@ const String& Program::getDependency(unsigned int index) const
 {
     return mDependencies[index];
 }
-
+//-----------------------------------------------------------------------------
+void Program::setSourcePassName(String passName)
+{
+    mSourcePassName = passName;
+}
+//-----------------------------------------------------------------------------
+const String& Program::getSourcePassName()
+{
+    return mSourcePassName;
+}
+//-----------------------------------------------------------------------------
 }
 }

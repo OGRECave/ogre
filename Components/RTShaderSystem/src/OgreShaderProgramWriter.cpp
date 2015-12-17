@@ -29,7 +29,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 namespace RTShader {
-
+    const String ProgramWriter::msProgramStartToken = "//[PROGRAM_START]";
 //-----------------------------------------------------------------------
 void ProgramWriter::writeProgramTitle(std::ostream& os, Program* program)
 {
@@ -53,6 +53,11 @@ void ProgramWriter::writeProgramTitle(std::ostream& os, Program* program)
     os << "// Language: " <<  getTargetLanguage() << std::endl;
     os << "// Created by Ogre RT Shader Generator. All rights reserved." << std::endl;
     os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << std::endl;
+    os << "//-------------------------SOURCE MATERIAL-------------------------------------" << std::endl;
+    os << "// " << program->getSourcePassName() << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << msProgramStartToken << std::endl;
 }
 
 //-----------------------------------------------------------------------

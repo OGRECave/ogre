@@ -961,6 +961,13 @@ namespace Ogre {
         mSeparateBlendOperation = true;
     }
     //-----------------------------------------------------------------------
+    Ogre::String Pass::getFullyQualifiedName() const
+    {
+        StringStream ss;
+        ss << getParent()->getFullyQualifiedName() << "[PASS](" << getName() << ")";
+        return  ss.str();
+    }
+    //-----------------------------------------------------------------------
     SceneBlendOperation Pass::getSceneBlendingOperation() const
     {
         return mBlendOperation;

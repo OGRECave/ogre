@@ -61,6 +61,7 @@ class _OgreRTSSExport ProgramWriter : public RTShaderSystemAlloc
 {
 // Interface.
 public:
+    static const String msProgramStartToken;
 
     /** Class destructor */
     virtual ~ProgramWriter  () {}

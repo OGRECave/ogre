@@ -1197,6 +1197,14 @@ namespace Ogre {
             mIlluminationPasses.end());
     }
     //-----------------------------------------------------------------------
+    Ogre::String Technique::getFullyQualifiedName() const
+    {
+        StringStream ss;
+        ss << "[MATERIAL](" << getParent()->getName() << ")[TECHNIQUE](" << this->getName() << ")";
+        return ss.str();
+    }
+
+    //-----------------------------------------------------------------------
     const String& Technique::getResourceGroup(void) const
     {
         return mParent->getGroup();

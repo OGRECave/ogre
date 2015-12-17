@@ -752,6 +752,8 @@ namespace Ogre {
         */
         void setSeparateSceneBlendingOperation(SceneBlendOperation op, SceneBlendOperation alphaOp);
 
+        String getFullyQualifiedName() const;
+
         /** Returns true if this pass uses separate scene blending operations. */
         bool hasSeparateSceneBlendingOperations() const;
 

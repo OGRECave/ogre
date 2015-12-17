@@ -189,6 +189,8 @@ public:
     */
     bool getUseColumnMajorMatrices() const { return mColumnMajorMatrices; }
 
+    const String& getSourcePassName();
+    void setSourcePassName(String passName);
 // Protected methods.
 protected:
 
@@ -211,8 +213,7 @@ protected:
         
     /** Remove parameter from this program. */
     void removeParameter(UniformParameterPtr parameter);
-
-
+    
 // Attributes.
 protected:
     // Program type. (Vertex, Fragment, Geometry).
@@ -230,6 +231,7 @@ protected:
     // Whether to pass matrices as column-major.
     bool mColumnMajorMatrices;
 private:
+    String mSourcePassName;
     friend class ProgramManager;
 };
 
