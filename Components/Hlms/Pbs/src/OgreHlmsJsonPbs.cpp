@@ -57,6 +57,22 @@ namespace Ogre
         return HlmsPbsDatablock::SpecularWorkflow;
     }
     //-----------------------------------------------------------------------------------
+    PbsBrdf::PbsBrdf HlmsJsonPbs::parseBrdf(const char *value)
+    {
+        if (!strcmp(value, "default"))
+            return PbsBrdf::Default;
+        if (!strcmp(value, "cook_torrance"))
+            return PbsBrdf::CookTorrance;
+        if (!strcmp(value, "default_uncorrelated"))
+            return PbsBrdf::DefaultUncorrelated;
+        if (!strcmp(value, "default_separate_diffuse_fresnel"))
+            return PbsBrdf::DefaultSeparateDiffuseFresnel;
+        if (!strcmp(value, "cook_torrance_separate_diffuse_fresnel"))
+            return PbsBrdf::CookTorranceSeparateDiffuseFresnel;
+
+        return PbsBrdf::Default;
+    }
+    //-----------------------------------------------------------------------------------
     HlmsPbsDatablock::TransparencyModes HlmsJsonPbs::parseTransparencyMode( const char *value )
     {
         if( !strcmp( value, "None" ) )
@@ -201,6 +217,10 @@ namespace Ogre
         rapidjson::Value::ConstMemberIterator itor = json.FindMember("workflow");
         if( itor != json.MemberEnd() && itor->value.IsString() )
             pbsDatablock->setWorkflow( parseWorkflow( itor->value.GetString() ) );
+
+        itor = json.FindMember("brdf");
+        if (itor != json.MemberEnd() && itor->value.IsString())
+            pbsDatablock->setBrdf(parseBrdf(itor->value.GetString()));
 
         itor = json.FindMember("transparency");
         if( itor != json.MemberEnd() && itor->value.IsObject() )

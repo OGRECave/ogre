@@ -49,6 +49,7 @@ namespace Ogre
         HlmsManager *mHlmsManager;
 
         static HlmsPbsDatablock::Workflows parseWorkflow( const char *value );
+        static PbsBrdf::PbsBrdf HlmsJsonPbs::parseBrdf(const char *value);
         static HlmsPbsDatablock::TransparencyModes parseTransparencyMode( const char *value );
         static PbsBlendModes parseBlendMode( const char *value );
         static void parseFresnelMode( const char *value, bool &outIsColoured, bool &outUseIOR );
