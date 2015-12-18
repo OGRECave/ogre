@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreHlmsJsonPbs.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsTextureManager.h"
+#include "OgreTextureManager.h"
 
 #include "rapidjson/document.h"
 
@@ -165,11 +166,29 @@ namespace Ogre
         rapidjson::Value::ConstMemberIterator itor = json.FindMember("texture");
         if( itor != json.MemberEnd() && itor->value.IsString() )
         {
-            HlmsTextureManager *hlmsTextureManager = mHlmsManager->getTextureManager();
-
             const char *textureName = itor->value.GetString();
-            HlmsTextureManager::TextureLocation texLocation =
-                    hlmsTextureManager->createOrRetrieveTexture( textureName, texMapTypes[textureType] );
+
+            HlmsTextureManager *hlmsTextureManager = mHlmsManager->getTextureManager();
+            HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
+                createOrRetrieveTexture(textureName,
+                texMapTypes[textureType]);
+
+            assert(texLocation.texture->isTextureTypeArray() || textureType == PBSM_REFLECTION);
+
+            //If HLMS texture manager failed to find a reflection texture, have look int standard texture manager
+            //NB we only do this for reflection textures as all other textures must be texture arrays for performance reasons
+            if (textureType == PBSM_REFLECTION && texLocation.texture == hlmsTextureManager->getBlankTexture().texture)
+            {
+                Ogre::TexturePtr tex = Ogre::TextureManager::getSingleton().getByName(textureName);
+                if (tex.isNull() == false)
+                {
+                    texLocation.texture = tex;
+                    texLocation.xIdx = 0;
+                    texLocation.yIdx = 0;
+                    texLocation.divisor = 1;
+                }
+            }
+
             textures[textureType].texture = texLocation.texture;
             textures[textureType].xIdx = texLocation.xIdx;
         }
