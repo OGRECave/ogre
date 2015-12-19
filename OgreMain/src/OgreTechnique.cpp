@@ -208,13 +208,13 @@ namespace Ogre {
             
 
             //Check compilation errors for all program types.
-            for (int i = 0; i < 6; i++)
+            for (int t = 0; t < 6; t++)
             {
-                GpuProgramType programType = static_cast<GpuProgramType>(i);
-                GpuProgramPtr program = currPass->getGpuProgram(programType);
-                if (!program.isNull())
+                GpuProgramType programType = GpuProgramType(t);
+                if (currPass->hasGpuProgram(programType))
                 {
-                    if (program->isSupported() == false)
+                    GpuProgramPtr program = currPass->getGpuProgram(programType);
+                    if (!program->isSupported())
                     {
                         compileErrors << "Pass " << passNum <<
                             ": " << GpuProgram::getProgramTypeName(programType) + " program " << program->getName()
