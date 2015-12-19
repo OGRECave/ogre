@@ -58,17 +58,17 @@ namespace Ogre
         return HlmsPbsDatablock::SpecularWorkflow;
     }
     //-----------------------------------------------------------------------------------
-    PbsBrdf::PbsBrdf HlmsJsonPbs::parseBrdf(const char *value)
+    PbsBrdf::PbsBrdf HlmsJsonPbs::parseBrdf( const char *value )
     {
-        if (!strcmp(value, "default"))
+        if( !strcmp( value, "default" ) )
             return PbsBrdf::Default;
-        if (!strcmp(value, "cook_torrance"))
+        if( !strcmp( value, "cook_torrance" ) )
             return PbsBrdf::CookTorrance;
-        if (!strcmp(value, "default_uncorrelated"))
+        if( !strcmp( value, "default_uncorrelated" ) )
             return PbsBrdf::DefaultUncorrelated;
-        if (!strcmp(value, "default_separate_diffuse_fresnel"))
+        if( !strcmp( value, "default_separate_diffuse_fresnel" ) )
             return PbsBrdf::DefaultSeparateDiffuseFresnel;
-        if (!strcmp(value, "cook_torrance_separate_diffuse_fresnel"))
+        if( !strcmp( value, "cook_torrance_separate_diffuse_fresnel" ) )
             return PbsBrdf::CookTorranceSeparateDiffuseFresnel;
 
         return PbsBrdf::Default;
