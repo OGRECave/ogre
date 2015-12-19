@@ -262,6 +262,55 @@ namespace Ogre
                                     _mm_add_ps( uv.mChunkBase[2], uuv.mChunkBase[2] ) );
     }
     //-----------------------------------------------------------------------------------
+    inline void ArrayQuaternion::FromOrthoDet1RotationMatrix(
+            ArrayReal m00, ArrayReal m01, ArrayReal m02,
+            ArrayReal m10, ArrayReal m11, ArrayReal m12,
+            ArrayReal m20, ArrayReal m21, ArrayReal m22 )
+    {
+        //To deal with matrices that don't have determinant = 1
+        //absQ2 = det( matrix )^(1/3)
+        // quaternion.w = sqrt( max( 0, absQ2 + m00 + m11 + m22 ) ) / 2; ... etc
+
+        //w = sqrt( max( 0, 1 + m00 + m11 + m22 ) ) / 2;
+        //x = sqrt( max( 0, 1 + m00 - m11 - m22 ) ) / 2;
+        //y = sqrt( max( 0, 1 - m00 + m11 - m22 ) ) / 2;
+        //z = sqrt( max( 0, 1 - m00 - m11 + m22 ) ) / 2;
+        //x = _copysign( x, m21 - m12 );
+        //y = _copysign( y, m02 - m20 );
+        //z = _copysign( z, m10 - m01 );
+        ArrayReal tmp;
+
+        //w = sqrt( max( 0, (1 + m00) + (m11 + m22) ) ) * 0.5f;
+        tmp = _mm_max_ps( _mm_setzero_ps(),
+                          _mm_add_ps( _mm_add_ps( MathlibSSE2::ONE, m00 ), _mm_add_ps( m11, m22 ) ) );
+        mChunkBase[0] = _mm_mul_ps( _mm_sqrt_ps( tmp ), MathlibSSE2::HALF );
+
+        //x = sqrt( max( 0, (1 + m00) - (m11 + m22) ) ) * 0.5f;
+        tmp = _mm_max_ps( _mm_setzero_ps(),
+                          _mm_sub_ps( _mm_add_ps( MathlibSSE2::ONE, m00 ), _mm_add_ps( m11, m22 ) ) );
+        mChunkBase[1] = _mm_mul_ps( _mm_sqrt_ps( tmp ), MathlibSSE2::HALF );
+
+        //y = sqrt( max( 0, (1 - m00) + (m11 - m22) ) ) * 0.5f;
+        tmp = _mm_max_ps( _mm_setzero_ps(),
+                          _mm_add_ps( _mm_sub_ps( MathlibSSE2::ONE, m00 ), _mm_sub_ps( m11, m22 ) ) );
+        mChunkBase[2] = _mm_mul_ps( _mm_sqrt_ps( tmp ), MathlibSSE2::HALF );
+
+        //z = sqrt( max( 0, (1 - m00) - (m11 - m22) ) ) * 0.5f;
+        tmp = _mm_max_ps( _mm_setzero_ps(),
+                          _mm_sub_ps( _mm_sub_ps( MathlibSSE2::ONE, m00 ), _mm_sub_ps( m11, m22 ) ) );
+        mChunkBase[3] = _mm_mul_ps( _mm_sqrt_ps( tmp ), MathlibSSE2::HALF );
+
+        //x = _copysign( x, m21 - m12 ); --> (x & 0x7FFFFFFF) | ((m21 - m12) & 0x80000000)
+        //y = _copysign( y, m02 - m20 ); --> (y & 0x7FFFFFFF) | ((m02 - m20) & 0x80000000)
+        //z = _copysign( z, m10 - m01 ); --> (z & 0x7FFFFFFF) | ((m10 - m01) & 0x80000000)
+        tmp = _mm_and_ps( _mm_sub_ps( m21, m12 ), MathlibSSE2::SIGN_MASK );
+        mChunkBase[1] = _mm_or_ps( _mm_andnot_ps( mChunkBase[1], MathlibSSE2::SIGN_MASK ), tmp );
+        tmp = _mm_and_ps( _mm_sub_ps( m02, m20 ), MathlibSSE2::SIGN_MASK );
+        mChunkBase[2] = _mm_or_ps( _mm_andnot_ps( mChunkBase[2], MathlibSSE2::SIGN_MASK ), tmp );
+        tmp = _mm_and_ps( _mm_sub_ps( m10, m01 ), MathlibSSE2::SIGN_MASK );
+        mChunkBase[3] = _mm_or_ps( _mm_andnot_ps( mChunkBase[3], MathlibSSE2::SIGN_MASK ), tmp );
+    }
+    //-----------------------------------------------------------------------------------
     inline void ArrayQuaternion::FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis )
     {
         // assert:  axis[] is unit length

@@ -58,9 +58,11 @@ namespace Ogre
         SimpleMatrixAf4x3 const * * RESTRICT_ALIAS mParentTransform;
 
         /// Caches the full transform into an affine 4x4 matrix. Note it's not Array form! (It's AoS)
+        /// mDerivedTransform is in object space
         SimpleMatrixAf4x3 * RESTRICT_ALIAS  mDerivedTransform;
 
         /// Caches mDerivedTransform in Bone space, used for rendering. It's not Array form! (It's AoS)
+        /// mFinalTransform is in "world-bone" space ready to be sent to the GPU.
         SimpleMatrixAf4x3 * RESTRICT_ALIAS  mFinalTransform;
 
         /// Stores whether this node inherits orientation from it's parent.

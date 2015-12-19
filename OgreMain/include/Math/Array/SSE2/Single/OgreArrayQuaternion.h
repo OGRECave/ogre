@@ -116,6 +116,14 @@ namespace Ogre
             mChunkBase[3] = _mm_set_ps1( v.z );
         }
 
+        /// @see Quaternion::FromRotationMatrix
+        /// This code assumes that:
+        ///     Quaternion is orthogonal
+        ///     Determinant of quaternion is 1.
+        inline void FromOrthoDet1RotationMatrix( ArrayReal m00, ArrayReal m01, ArrayReal m02,
+                                                 ArrayReal m10, ArrayReal m11, ArrayReal m12,
+                                                 ArrayReal m20, ArrayReal m21, ArrayReal m22 );
+
         /// @copydoc Quaternion::FromAngleAxis
         inline void FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis );
 

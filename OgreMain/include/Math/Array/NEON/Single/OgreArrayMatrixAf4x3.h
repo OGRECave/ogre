@@ -174,7 +174,7 @@ namespace Ogre
         */
         inline void loadFromAoS( const Matrix4 * RESTRICT_ALIAS src );
         inline void loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS src );
-        inline void loadFromAoS( const SimpleMatrixAf4x3 * * RESTRICT_ALIAS src );
+        inline void loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS * src );
 
         static const ArrayMatrixAf4x3 IDENTITY;
     };

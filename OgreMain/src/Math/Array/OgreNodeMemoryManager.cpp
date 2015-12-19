@@ -129,17 +129,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void NodeMemoryManager::nodeAttached( Transform &outTransform, size_t depth )
     {
-        growToDepth( depth );
-
-        Transform tmp;
-        mMemoryManagers[depth].createNewNode( tmp );
-
-        tmp.copy( outTransform );
-
-        NodeArrayMemoryManager &mgr = mMemoryManagers[0];
-        mgr.destroyNode( outTransform );
-
-        outTransform = tmp;
+        this->nodeMoved( outTransform, 0, depth );
     }
     //-----------------------------------------------------------------------------------
     void NodeMemoryManager::nodeDettached( Transform &outTransform, size_t depth )
@@ -180,11 +170,43 @@ namespace Ogre
     void NodeMemoryManager::migrateTo( Transform &inOutTransform, size_t depth,
                                         NodeMemoryManager *dstNodeMemoryManager )
     {
+        migrateTo( inOutTransform, depth, depth, dstNodeMemoryManager );
+    }
+    //-----------------------------------------------------------------------------------
+    void NodeMemoryManager::migrateTo( Transform &inOutTransform, size_t oldDepth, size_t newDepth,
+                                       NodeMemoryManager *dstNodeMemoryManager )
+    {
+        assert( (newDepth == oldDepth || newDepth != 0) &&
+                "When newDepth = 0, oldDepth must be 0 too!" );
+
         Transform tmp;
-        dstNodeMemoryManager->nodeCreated( tmp, depth );
+        dstNodeMemoryManager->nodeCreated( tmp, newDepth );
         tmp.copy( inOutTransform );
-        this->nodeDestroyed( inOutTransform, depth );
+        if( newDepth == 0 )
+            tmp.mParents[tmp.mIndex] = dstNodeMemoryManager->mDummyNode;
+        this->nodeDestroyed( inOutTransform, oldDepth );
         inOutTransform = tmp;
+    }
+    //-----------------------------------------------------------------------------------
+    void NodeMemoryManager::migrateToAndAttach( Transform &inOutTransform, size_t depth,
+                                                NodeMemoryManager *dstNodeMemoryManager )
+    {
+        migrateTo( inOutTransform, 0, depth, dstNodeMemoryManager );
+    }
+    //-----------------------------------------------------------------------------------
+    void NodeMemoryManager::migrateToAndDetach( Transform &outTransform, size_t depth,
+                                                NodeMemoryManager *dstNodeMemoryManager )
+    {
+        Transform tmp;
+        dstNodeMemoryManager->mMemoryManagers[0].createNewNode( tmp );
+
+        tmp.copy( outTransform );
+        tmp.mParents[tmp.mIndex] = dstNodeMemoryManager->mDummyNode;
+
+        NodeArrayMemoryManager &mgr = mMemoryManagers[depth];
+        mgr.destroyNode( outTransform );
+
+        outTransform = tmp;
     }
     //-----------------------------------------------------------------------------------
     size_t NodeMemoryManager::getNumDepths() const

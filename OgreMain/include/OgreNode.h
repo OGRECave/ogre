@@ -57,6 +57,7 @@ namespace Ogre {
     */
     class _OgreExport Node : public NodeAlloc, public IdObject
     {
+        friend class TagPoint;
     public:
         /** Enumeration denoting the spaces which a transform can be relative to.
         */
@@ -200,6 +201,13 @@ namespace Ogre {
 
         /** Gets this node's parent (NULL if this is the root). */
         Node* getParent(void) const;
+
+        /** Migrates the node and all of its children to the new memory manager,
+            at the same depth level.
+        @param nodeMemoryManager
+            New memory manager to migrate to.
+        */
+        void migrateTo( NodeMemoryManager *nodeMemoryManager );
 
         /// Checks whether this node is static. @See setStatic
         bool isStatic() const;
@@ -726,6 +734,8 @@ namespace Ogre {
             (i.e. Transform) may have changed (e.g. during cleanups, change of parent, etc)
         */
         virtual void _callMemoryChangeListeners(void) = 0;
+
+        virtual NodeMemoryManager* getDefaultNodeMemoryManager( SceneMemoryMgrTypes sceneType ) = 0;
 
 #ifndef NDEBUG
         virtual void _setCachedTransformOutOfDate(void);

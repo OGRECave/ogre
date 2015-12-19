@@ -426,6 +426,7 @@ namespace Ogre {
     protected:
         /// Subclasses can override this to ensure their specialised SceneNode is used.
         virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
+        virtual TagPoint* createTagPointImpl( SceneNode *parent );
 
         typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
         typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
@@ -443,8 +444,10 @@ namespace Ogre {
         ObjectMemoryManager     mEntityMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         ObjectMemoryManager     mLightMemoryManager;
         SkeletonAnimManager     mSkeletonAnimationManager;
+        NodeMemoryManager       mTagPointNodeMemoryManager;
         /// Filled and cleared every frame in HighLevelCull()
         NodeMemoryManagerVec    mNodeMemoryManagerUpdateList;
+        NodeMemoryManagerVec    mTagPointNodeMemoryManagerUpdateList;
         ObjectMemoryManagerVec  mEntitiesMemoryManagerCulledList;
         ObjectMemoryManagerVec  mEntitiesMemoryManagerUpdateList;
         ObjectMemoryManagerVec  mLightsMemoryManagerCulledList;
@@ -1174,6 +1177,9 @@ namespace Ogre {
         */
         virtual void destroyAllLights(void);
 
+        virtual TagPoint* _createTagPoint( SceneNode *parent );
+        virtual TagPoint* createTagPoint(void);
+
         /** @see createSceneNode. This functions exists to satisfy @see SceneNode::createChildImpl
             Don't call this function directly
             @par
@@ -1281,6 +1287,10 @@ namespace Ogre {
                            uint32 lightsPerCell, float minDistance, float maxDistance );
 
         Forward3D* getForward3D(void)                       { return mForward3DImpl; }
+
+        NodeMemoryManager& _getNodeMemoryManager(SceneMemoryMgrTypes sceneType)
+                                                                { return mNodeMemoryManager[sceneType]; }
+        NodeMemoryManager& _getTagPointNodeMemoryManager(void)  { return mTagPointNodeMemoryManager; }
 
         /** Retrieves the main entity memory manager.
         @remarks

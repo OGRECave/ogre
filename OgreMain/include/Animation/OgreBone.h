@@ -61,6 +61,7 @@ namespace Ogre {
     class _OgreExport Bone : public NodeAlloc, public IdObject
     {
         typedef vector<Bone*>::type BoneVec;
+        typedef vector<TagPoint*>::type TagPointVec;
     protected:
         ArrayMatrixAf4x3 const * RESTRICT_ALIAS mReverseBind;
         BoneTransform                           mTransform;
@@ -77,6 +78,8 @@ namespace Ogre {
         Bone    *mParent;
         /// Collection of pointers to direct children
         BoneVec mChildren;
+        /// TagPoints attached to us
+        TagPointVec mTagPointChildren;
 
         String  mName;
 
@@ -114,7 +117,7 @@ namespace Ogre {
 
         void _initialize( IdType id, BoneMemoryManager *boneMemoryManager,
                             Bone *parent, ArrayMatrixAf4x3 const * RESTRICT_ALIAS reverseBind );
-        void _deinitialize(void);
+        void _deinitialize( bool debugCheckLifoOrder=true );
 
         /// Returns how deep in the hierarchy we are (eg. 0 -> root node, 1 -> child of root)
         uint16 getDepthLevel() const                                { return mDepthLevel; }
@@ -135,6 +138,11 @@ namespace Ogre {
 
         /// Gets this Bones's parent (NULL if this is the root).
         Bone* getParent(void) const                                 { return mParent; }
+
+        /// Makes the TagPoint child of this Bone.
+        void addTagPoint( TagPoint *tagPoint );
+
+        void removeTagPoint( TagPoint *tagPoint );
 
         /** Sets a regular Node to be parent of this Bone.
             DO NOT USE THIS FUNCTION IF YOU DON'T KNOW WHAT YOU'RE DOING. If you want

@@ -81,6 +81,8 @@ namespace Ogre
         /// @See mMemoryManagerType
         void _setTwin( SceneMemoryMgrTypes memoryManagerType, NodeMemoryManager *twinMemoryManager );
 
+        SceneNode* _getDummyNode(void) const                        { return mDummyNode; }
+
         /// Note the return value can be null
         NodeMemoryManager* getTwin() const                          { return mTwinMemoryManager; }
         SceneMemoryMgrTypes getMemoryManagerType() const            { return mMemoryManagerType; }
@@ -150,6 +152,41 @@ namespace Ogre
         */
         void migrateTo( Transform &inOutTransform, size_t depth,
                         NodeMemoryManager *dstNodeMemoryManager );
+
+        /** Releases memory belonging to us, not before copying it into another manager.
+        @remarks
+            This function is useful when implementing multiple Memory Managers in Scene Managers
+            or when switching nodes from Static to/from Dynamic.
+        @param inOutTransform
+            Valid Transform that belongs to us. Output will belong to the other memory mgr.
+        @param oldDepth
+            Current hierarchy level depth it belongs to in this manager.
+        @param newDepth
+            New hierarchy level depth it will belong belongs in dstNodeMemoryManager.
+            If this value is zero, then oldDepth must be zero as well. Otherwise use
+            migrateToAndDetach instead.
+        @param dstNodeMemoryManager
+            NodeMemoryManager that will now own the transform.
+        */
+        void migrateTo( Transform &inOutTransform, size_t oldDepth, size_t newDepth,
+                        NodeMemoryManager *dstNodeMemoryManager );
+
+        /** It's the same as calling:
+                this->nodeAttached( transform, depth );
+                this->migrateTo( transform, depth, dstNodeMemoryManager );
+            Without unnecessary transfers.
+        */
+        void migrateToAndAttach( Transform &inOutTransform, size_t depth,
+                                 NodeMemoryManager *dstNodeMemoryManager );
+
+        /** It's _almost_ the same as calling:
+                this->nodeDettached( transform, depth );
+                this->migrateTo( transform, 0, dstNodeMemoryManager );
+            Without unnecessary transfers and setting the correct dstNodeMemoryManager->mDummyNode.
+            instead of this->mDummyNode.
+        */
+        void migrateToAndDetach( Transform &inOutTransform, size_t depth,
+                                 NodeMemoryManager *dstNodeMemoryManager );
 
         /** Retrieves the number of depth levels that have been created.
         @remarks

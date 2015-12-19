@@ -560,6 +560,11 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    NodeMemoryManager* SceneNode::getDefaultNodeMemoryManager( SceneMemoryMgrTypes sceneType )
+    {
+        return &mCreator->_getNodeMemoryManager( sceneType );
+    }
+    //-----------------------------------------------------------------------
 #ifndef NDEBUG
     void SceneNode::_setCachedTransformOutOfDate(void)
     {

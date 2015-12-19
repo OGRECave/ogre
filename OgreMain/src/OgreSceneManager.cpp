@@ -71,6 +71,7 @@ THE SOFTWARE.
 #include "OgreForward3D.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonInstance.h"
+#include "Animation/OgreTagPoint.h"
 #include "Compositor/OgreCompositorShadowNode.h"
 #include "Threading/OgreBarrier.h"
 #include "Threading/OgreUniformScalableTask.h"
@@ -648,6 +649,29 @@ SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrT
     if( sceneType == SCENE_STATIC )
         notifyStaticDirty( retVal );
     return retVal;
+}
+//-----------------------------------------------------------------------
+TagPoint* SceneManager::createTagPointImpl( SceneNode *parent )
+{
+    TagPoint *retVal = OGRE_NEW TagPoint( Id::generateNewId<Node>(), this,
+                                          &mNodeMemoryManager[SCENE_DYNAMIC], parent );
+    return retVal;
+}
+//-----------------------------------------------------------------------
+TagPoint* SceneManager::_createTagPoint( SceneNode *parent )
+{
+    TagPoint* sn = createTagPointImpl( parent );
+    mSceneNodes.push_back( sn );
+    sn->mGlobalIndex = mSceneNodes.size() - 1;
+    return sn;
+}
+//-----------------------------------------------------------------------
+TagPoint* SceneManager::createTagPoint(void)
+{
+    TagPoint* sn = createTagPointImpl( (SceneNode*)0 );
+    mSceneNodes.push_back( sn );
+    sn->mGlobalIndex = mSceneNodes.size() - 1;
+    return sn;
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::_createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType )
@@ -2655,6 +2679,7 @@ void SceneManager::highLevelCull()
     mEntitiesMemoryManagerUpdateList.clear();
     mLightsMemoryManagerCulledList.clear();
     mSkeletonAnimManagerCulledList.clear();
+    mTagPointNodeMemoryManagerUpdateList.clear();
 
     mNodeMemoryManagerUpdateList.push_back( &mNodeMemoryManager[SCENE_DYNAMIC] );
     mEntitiesMemoryManagerCulledList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
@@ -2662,6 +2687,7 @@ void SceneManager::highLevelCull()
     mEntitiesMemoryManagerUpdateList.push_back( &mEntityMemoryManager[SCENE_DYNAMIC] );
     mLightsMemoryManagerCulledList.push_back( &mLightMemoryManager );
     mSkeletonAnimManagerCulledList.push_back( &mSkeletonAnimationManager );
+    mTagPointNodeMemoryManagerUpdateList.push_back( &mTagPointNodeMemoryManager );
 
     if( mStaticEntitiesDirty )
     {

@@ -312,6 +312,7 @@ namespace Ogre {
     class StringInterface;
     class SubItem;
     class SubMesh;
+    class TagPoint;
     class Technique;
     class TempBlendedBufferInfo;
     class TexBufferPacked;

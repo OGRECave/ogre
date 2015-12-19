@@ -250,6 +250,118 @@ namespace Ogre
         chunkBase[11]=  posChunkBase[2];                                //m23 * pos.z
     }
     //-----------------------------------------------------------------------------------
+    inline void ArrayMatrixAf4x3::decomposition( ArrayVector3 &position, ArrayVector3 &scale,
+                                                 ArrayQuaternion &orientation ) const
+    {
+        const ArrayReal * RESTRICT_ALIAS chunkBase  = mChunkBase;
+        // build orthogonal matrix Q
+
+        ArrayReal m00 = mChunkBase[0], m01 = mChunkBase[1], m02 = mChunkBase[2];
+        ArrayReal m10 = mChunkBase[4], m11 = mChunkBase[5], m12 = mChunkBase[6];
+        ArrayReal m20 = mChunkBase[8], m21 = mChunkBase[9], m22 = mChunkBase[10];
+
+        //fInvLength = 1.0f / sqrt( m00 * m00 + m10 * m10 + m20 * m20 );
+        ArrayReal fInvLength = MathlibSSE2::InvSqrt4(
+                        _mm_madd_ps( m00, m00,
+                        _mm_madd_ps( m10, m10,
+                         _mm_mul_ps( m20, m20 ) ) ) );
+
+        ArrayReal q00, q01, q02,
+                  q10, q11, q12,
+                  q20, q21, q22; //3x3 matrix
+        q00 = _mm_mul_ps( m00, fInvLength ); //q00 = m00 * fInvLength
+        q10 = _mm_mul_ps( m10, fInvLength ); //q10 = m10 * fInvLength
+        q20 = _mm_mul_ps( m20, fInvLength ); //q20 = m20 * fInvLength
+
+        //fDot = q00*m01 + q10*m11 + q20*m21
+        ArrayReal fDot = _mm_madd_ps( q00, m00, _mm_madd_ps( q10, m11, _mm_mul_ps( q20, m21 ) ) );
+        q01 = _mm_sub_ps( m01, _mm_mul_ps( fDot, q00 ) ); //q01 = m01 - fDot * q00;
+        q11 = _mm_sub_ps( m11, _mm_mul_ps( fDot, q10 ) ); //q11 = m11 - fDot * q10;
+        q21 = _mm_sub_ps( m21, _mm_mul_ps( fDot, q20 ) ); //q21 = m21 - fDot * q20;
+
+        //fInvLength = 1.0f / sqrt( q01 * q01 + q11 * q11 + q21 * q21 );
+        fInvLength = MathlibSSE2::InvSqrt4(
+                        _mm_madd_ps( q01, q01,
+                        _mm_madd_ps( q11, q11,
+                         _mm_mul_ps( q21, q21 ) ) ) );
+
+        q01 = _mm_mul_ps( q01, fInvLength ); //q01 *= fInvLength;
+        q11 = _mm_mul_ps( q11, fInvLength ); //q11 *= fInvLength;
+        q21 = _mm_mul_ps( q21, fInvLength ); //q21 *= fInvLength;
+
+        //fDot = q00 * m02 + q10 * m12 + q20 * m22;
+        fDot = _mm_madd_ps( q00, m02, _mm_madd_ps( q10, m12, _mm_mul_ps( q20, m22 ) ) );
+        q02 = _mm_sub_ps( m02, _mm_mul_ps( fDot, q00 ) ); //q02 = m02 - fDot * q00;
+        q12 = _mm_sub_ps( m12, _mm_mul_ps( fDot, q10 ) ); //q12 = m12 - fDot * q10;
+        q22 = _mm_sub_ps( m22, _mm_mul_ps( fDot, q20 ) ); //q22 = m22 - fDot * q20;
+
+        //fDot = q01 * m02 + q11 * m12 + q21 * m22;
+        fDot = _mm_madd_ps( q01, m02, _mm_madd_ps( q11, m12, _mm_mul_ps( q21, m22 ) ) );
+        q02 = _mm_sub_ps( q02, _mm_mul_ps( fDot, q01 ) ); //q02 = q02 - fDot * q01;
+        q12 = _mm_sub_ps( q12, _mm_mul_ps( fDot, q11 ) ); //q12 = q12 - fDot * q11;
+        q22 = _mm_sub_ps( q22, _mm_mul_ps( fDot, q21 ) ); //q22 = q22 - fDot * q21;
+
+        //fInvLength = 1.0f / sqrt( q02 * q02 + q12 * q12 + q22 * q22 );
+        fInvLength = MathlibSSE2::InvSqrt4(
+                        _mm_madd_ps( q02, q02,
+                        _mm_madd_ps( q12, q12,
+                         _mm_mul_ps( q22, q22 ) ) ) );
+
+        q02 = _mm_mul_ps( q02, fInvLength ); //q02 *= fInvLength;
+        q12 = _mm_mul_ps( q12, fInvLength ); //q12 *= fInvLength;
+        q22 = _mm_mul_ps( q22, fInvLength ); //q22 *= fInvLength;
+
+        // guarantee that orthogonal matrix has determinant 1 (no reflections)
+        //fDet = q00*q11*q22 + q01*q12*q20 +
+        //       q02*q10*q21 - q02*q11*q20 -
+        //       q01*q10*q22 - q00*q12*q21;
+        //fDet = (q00*q11*q22 + q01*q12*q20 + q02*q10*q21) -
+        //       (q02*q11*q20 + q01*q10*q22 + q00*q12*q21);
+        ArrayReal fDet = _mm_add_ps(
+                    _mm_add_ps( _mm_mul_ps( _mm_mul_ps( q00, q11 ), q22 ),
+                                _mm_mul_ps( _mm_mul_ps( q01, q12 ), q20 ) ),
+                    _mm_mul_ps( _mm_mul_ps( q02, q10 ), q21 ) );
+        ArrayReal fTmp = _mm_add_ps(
+                    _mm_add_ps( _mm_mul_ps( _mm_mul_ps( q02, q11 ), q20 ),
+                                _mm_mul_ps( _mm_mul_ps( q01, q10 ), q22 ) ),
+                    _mm_mul_ps( _mm_mul_ps( q00, q12 ), q21 ) );
+        fDet = _mm_sub_ps( fDet, fTmp );
+
+        //if ( fDet < 0.0 )
+        //{
+        //    for (size_t iRow = 0; iRow < 3; iRow++)
+        //        for (size_t iCol = 0; iCol < 3; iCol++)
+        //            kQ[iRow][iCol] = -kQ[iRow][iCol];
+        //}
+        fDet = _mm_and_ps( fDet, MathlibSSE2::SIGN_MASK );
+        q00 = _mm_xor_ps( q00, fDet );
+        q01 = _mm_xor_ps( q01, fDet );
+        q02 = _mm_xor_ps( q02, fDet );
+        q10 = _mm_xor_ps( q10, fDet );
+        q11 = _mm_xor_ps( q11, fDet );
+        q12 = _mm_xor_ps( q12, fDet );
+        q20 = _mm_xor_ps( q20, fDet );
+        q21 = _mm_xor_ps( q21, fDet );
+        q22 = _mm_xor_ps( q22, fDet );
+
+        orientation.FromOrthoDet1RotationMatrix( m00, q01, q02,
+                                                 q10, q11, q12,
+                                                 q20, q21, q22 );
+
+        //scale.x = q00 * m00 + q10 * m10 + q20 * m20;
+        //scale.y = q01 * m01 + q11 * m11 + q21 * m21;
+        //scale.z = q02 * m02 + q12 * m12 + q22 * m22;
+        ArrayReal * RESTRICT_ALIAS scaleChunkBase = scale.mChunkBase;
+        scaleChunkBase[0] = _mm_madd_ps( q00, m00, _mm_madd_ps( q10, m10, _mm_mul_ps( q20, m20 ) ) );
+        scaleChunkBase[1] = _mm_madd_ps( q01, m01, _mm_madd_ps( q11, m11, _mm_mul_ps( q21, m21 ) ) );
+        scaleChunkBase[2] = _mm_madd_ps( q02, m02, _mm_madd_ps( q12, m12, _mm_mul_ps( q22, m21 ) ) );
+
+        ArrayReal * RESTRICT_ALIAS posChunkBase = position.mChunkBase;
+        posChunkBase[0] = chunkBase[3];
+        posChunkBase[1] = chunkBase[7];
+        posChunkBase[2] = chunkBase[11];
+    }
+    //-----------------------------------------------------------------------------------
     inline void ArrayMatrixAf4x3::setToInverse(void)
     {
         ArrayReal m10 = mChunkBase[4], m11 = mChunkBase[5], m12 = mChunkBase[6];
@@ -563,7 +675,7 @@ namespace Ogre
                             this->mChunkBase[10], this->mChunkBase[11] );
     }
     //-----------------------------------------------------------------------------------
-    inline void ArrayMatrixAf4x3::loadFromAoS( const SimpleMatrixAf4x3 * * RESTRICT_ALIAS src )
+    inline void ArrayMatrixAf4x3::loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS * src )
     {
         _MM_TRANSPOSE4_SRC_DST_PS(
                             src[0]->mChunkBase[0], src[1]->mChunkBase[0],
