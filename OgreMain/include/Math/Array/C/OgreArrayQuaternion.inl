@@ -209,6 +209,33 @@ namespace Ogre
         inOutVec.mChunkBase[2] = inOutVec.mChunkBase[2] + uv.mChunkBase[2] + uuv.mChunkBase[2];
     }
     //-----------------------------------------------------------------------------------
+    inline void ArrayQuaternion::FromOrthoDet1RotationMatrix(
+            ArrayReal m00, ArrayReal m01, ArrayReal m02,
+            ArrayReal m10, ArrayReal m11, ArrayReal m12,
+            ArrayReal m20, ArrayReal m21, ArrayReal m22 )
+    {
+        //To deal with matrices that don't have determinant = 1
+        //absQ2 = det( matrix )^(1/3)
+        // quaternion.w = sqrt( max( 0, absQ2 + m00 + m11 + m22 ) ) / 2; ... etc
+
+        //w = sqrt( max( 0, 1 + m00 + m11 + m22 ) ) / 2;
+        //x = sqrt( max( 0, 1 + m00 - m11 - m22 ) ) / 2;
+        //y = sqrt( max( 0, 1 - m00 + m11 - m22 ) ) / 2;
+        //z = sqrt( max( 0, 1 - m00 - m11 + m22 ) ) / 2;
+        //x = _copysign( x, m21 - m12 );
+        //y = _copysign( y, m02 - m20 );
+        //z = _copysign( z, m10 - m01 );
+
+        w = sqrt( Ogre::max( 0.0f, (1 + m00) + (m11 + m22) ) ) * 0.5f;
+        x = sqrt( Ogre::max( 0.0f, (1 + m00) - (m11 + m22) ) ) * 0.5f;
+        y = sqrt( Ogre::max( 0.0f, (1 - m00) + (m11 - m22) ) ) * 0.5f;
+        z = sqrt( Ogre::max( 0.0f, (1 - m00) - (m11 - m22) ) ) * 0.5f;
+
+        x = copysign( x, m21 - m12 );
+        y = copysign( y, m02 - m20 );
+        z = copysign( z, m10 - m01 );
+    }
+    //-----------------------------------------------------------------------------------
     inline void ArrayQuaternion::FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis )
     {
         // assert:  axis[] is unit length

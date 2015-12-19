@@ -344,7 +344,7 @@ namespace Ogre
         q21 = _mm_xor_ps( q21, fDet );
         q22 = _mm_xor_ps( q22, fDet );
 
-        orientation.FromOrthoDet1RotationMatrix( m00, q01, q02,
+        orientation.FromOrthoDet1RotationMatrix( q00, q01, q02,
                                                  q10, q11, q12,
                                                  q20, q21, q22 );
 
@@ -354,7 +354,7 @@ namespace Ogre
         ArrayReal * RESTRICT_ALIAS scaleChunkBase = scale.mChunkBase;
         scaleChunkBase[0] = _mm_madd_ps( q00, m00, _mm_madd_ps( q10, m10, _mm_mul_ps( q20, m20 ) ) );
         scaleChunkBase[1] = _mm_madd_ps( q01, m01, _mm_madd_ps( q11, m11, _mm_mul_ps( q21, m21 ) ) );
-        scaleChunkBase[2] = _mm_madd_ps( q02, m02, _mm_madd_ps( q12, m12, _mm_mul_ps( q22, m21 ) ) );
+        scaleChunkBase[2] = _mm_madd_ps( q02, m02, _mm_madd_ps( q12, m12, _mm_mul_ps( q22, m22 ) ) );
 
         ArrayReal * RESTRICT_ALIAS posChunkBase = position.mChunkBase;
         posChunkBase[0] = chunkBase[3];

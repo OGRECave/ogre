@@ -25,8 +25,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _SSE2_ArrayMatrixAf4x3_H_
-#define _SSE2_ArrayMatrixAf4x3_H_
+#ifndef _C_ArrayMatrixAf4x3_H_
+#define _C_ArrayMatrixAf4x3_H_
 
 #ifndef _ArrayMatrixAf4x3_H_
     #error "Don't include this file directly. include Math/Array/OgreArrayMatrix4.h"
@@ -136,6 +136,10 @@ namespace Ogre
         /// @copydoc Matrix4::makeTransform()
         inline void makeTransform( const ArrayVector3 &position, const ArrayVector3 &scale,
                                     const ArrayQuaternion &orientation );
+
+        /// @copydoc Matrix4::decomposition()
+        inline void decomposition( ArrayVector3 &position, ArrayVector3 &scale,
+                                   ArrayQuaternion &orientation ) const;
 
         /** Calculates the inverse of the matrix. If used against degenerate matrices,
             it may cause NaNs and Infs on those. Use @setToInverseDegeneratesAsIdentity
