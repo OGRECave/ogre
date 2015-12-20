@@ -466,7 +466,11 @@ if (WIN32)
 	endif ()
 endif ()
 
-option(OGRE_PROJECT_FOLDERS "Orginize project into project folders." FALSE)
+# For Visual studio enable project folders by default.
+# Hide option from other compilers.
+if (MSVC)
+	option(OGRE_PROJECT_FOLDERS "Organize project into project folders." TRUE)
+endif ()
 
 # Unity build options
 # A Unity build includes all sources files in just a few actual compilation units
