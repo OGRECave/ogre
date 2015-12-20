@@ -1865,6 +1865,9 @@ namespace Ogre {
         GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
         /** Gets the Tessellation EHull program used by this pass, only available after _load(). */
         const GpuProgramPtr& getComputeProgram(void) const;
+        
+     protected:
+        const GpuProgramPtr& getProgram(GpuProgramUsage* const gpuProgramUsage) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

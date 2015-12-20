@@ -1738,10 +1738,16 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
+    const GpuProgramPtr& Pass::getProgram(GpuProgramUsage* const gpuProgramUsage) const
+    {
+        OgreAssert(gpuProgramUsage, "check whether program is available using hasGpuProgram()");
+        OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
+        return gpuProgramUsage->getProgram();
+    }
+    //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getVertexProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mVertexProgramUsage->getProgram();
+        return getProgram(mVertexProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getFragmentProgramName(void) const
@@ -1761,8 +1767,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getFragmentProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mFragmentProgramUsage->getProgram();
+        return getProgram(mFragmentProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getGeometryProgramName(void) const
@@ -1782,8 +1787,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getGeometryProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mGeometryProgramUsage->getProgram();
+        return getProgram(mGeometryProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationHullProgramName(void) const
@@ -1803,8 +1807,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationHullProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mTessellationHullProgramUsage->getProgram();
+        return getProgram(mTessellationHullProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationDomainProgramName(void) const
@@ -1824,8 +1827,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationDomainProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mTessellationDomainProgramUsage->getProgram();
+        return getProgram(mTessellationDomainProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getComputeProgramName(void) const
@@ -1845,8 +1847,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getComputeProgram(void) const
     {
-            OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return mComputeProgramUsage->getProgram();
+        return getProgram(mComputeProgramUsage);
     }
     //-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const
