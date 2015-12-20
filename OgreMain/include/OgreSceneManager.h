@@ -885,6 +885,8 @@ namespace Ogre {
             CULL_FRUSTUM,
             UPDATE_ALL_ANIMATIONS,
             UPDATE_ALL_TRANSFORMS,
+            UPDATE_ALL_BONE_TO_TAG_TRANSFORMS,
+            UPDATE_ALL_TAG_ON_TAG_TRANSFORMS,
             UPDATE_ALL_BOUNDS,
             UPDATE_ALL_LODS,
             UPDATE_INSTANCE_MANAGERS,
@@ -997,6 +999,14 @@ namespace Ogre {
             Must be unique for each worker thread
         */
         void updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx );
+
+        /// @see TagPoint::updateAllTransformsBoneToTag
+        void updateAllTransformsBoneToTagThread( const UpdateTransformRequest &request,
+                                                 size_t threadIdx );
+
+        /// @see TagPoint::updateAllTransformsTagOnTag
+        void updateAllTransformsTagOnTagThread( const UpdateTransformRequest &request,
+                                                size_t threadIdx );
 
         /** Updates the world aabbs from the given request inside a thread. @See updateAllTransforms
         @param threadIdx
@@ -1807,6 +1817,13 @@ namespace Ogre {
             could deadlock in the best of cases).
         */
         void updateAllTransforms();
+
+        /** Updates all TagPoints, both TagPoints that are children of bones, and TagPoints that
+            are children of other TagPoints.
+        @remarks
+            mTagPointNodeMemoryManagerUpdateList must be set. @see updateAllTransforms remarks
+        */
+        void updateAllTagPoints(void);
 
         /** Updates the world aabbs from all entities in the scene. Ought to be called right after
             updateAllTransforms. @See updateAllTransforms

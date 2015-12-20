@@ -2142,11 +2142,14 @@ void SceneManager::updateAllTransforms()
             nodesPerThread        = ( (nodesPerThread + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
                                     ARRAY_PACKED_REALS;
 
-            //Send them to worker threads (dark_sylinc). We need to go depth by depth because
-            //we may depend on parents which could be processed by different threads.
-            mUpdateTransformRequest = UpdateTransformRequest( t, nodesPerThread, numNodes );
-            fireWorkerThreadsAndWait();
-            //Node::updateAllTransforms( numNodes, t );
+            if( numNodes )
+            {
+                //Send them to worker threads. We need to go depth by depth because
+                //we may depend on parents which could be processed by different threads.
+                mUpdateTransformRequest = UpdateTransformRequest( t, nodesPerThread, numNodes );
+                fireWorkerThreadsAndWait();
+                //Node::updateAllTransforms( numNodes, t );
+            }
         }
 
         ++it;
@@ -2161,6 +2164,73 @@ void SceneManager::updateAllTransforms()
         (*itor)->getListener()->nodeUpdated( *itor );
         ++itor;
     }
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllTagPoints()
+{
+    NodeMemoryManagerVec::const_iterator it = mTagPointNodeMemoryManagerUpdateList.begin();
+    NodeMemoryManagerVec::const_iterator en = mTagPointNodeMemoryManagerUpdateList.end();
+
+    while( it != en )
+    {
+        NodeMemoryManager *nodeMemoryManager = *it;
+        const size_t numDepths = nodeMemoryManager->getNumDepths();
+
+        //Start from the first level (not root) unless static (start from first dirty)
+        for( size_t i=0; i<numDepths; ++i )
+        {
+            mRequestType = i == 0 ? UPDATE_ALL_BONE_TO_TAG_TRANSFORMS :
+                                    UPDATE_ALL_TAG_ON_TAG_TRANSFORMS;
+
+            Transform t;
+            const size_t numNodes = nodeMemoryManager->getFirstNode( t, i );
+
+            //nodesPerThread must be multiple of ARRAY_PACKED_REALS
+            size_t nodesPerThread = ( numNodes + (mNumWorkerThreads-1) ) / mNumWorkerThreads;
+            nodesPerThread        = ( (nodesPerThread + ARRAY_PACKED_REALS - 1) / ARRAY_PACKED_REALS ) *
+                                    ARRAY_PACKED_REALS;
+
+            if( numNodes )
+            {
+                //Send them to worker threads. We need to go depth by depth because
+                //we may depend on parents which could be processed by different threads.
+                mUpdateTransformRequest = UpdateTransformRequest( t, nodesPerThread, numNodes );
+                fireWorkerThreadsAndWait();
+            }
+        }
+
+        ++it;
+    }
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllTransformsBoneToTagThread( const UpdateTransformRequest &request,
+                                                       size_t threadIdx )
+{
+    Transform t( request.t );
+    const size_t toAdvance = std::min( threadIdx * request.numNodesPerThread,
+                                        request.numTotalNodes );
+
+    //Prevent going out of bounds (usually in the last threadIdx, or
+    //when there are less nodes than ARRAY_PACKED_REALS
+    const size_t numNodes = std::min( request.numNodesPerThread, request.numTotalNodes - toAdvance );
+    t.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+    TagPoint::updateAllTransformsBoneToTag( numNodes, t );
+}
+//-----------------------------------------------------------------------
+void SceneManager::updateAllTransformsTagOnTagThread( const UpdateTransformRequest &request,
+                                                      size_t threadIdx )
+{
+    Transform t( request.t );
+    const size_t toAdvance = std::min( threadIdx * request.numNodesPerThread,
+                                        request.numTotalNodes );
+
+    //Prevent going out of bounds (usually in the last threadIdx, or
+    //when there are less nodes than ARRAY_PACKED_REALS
+    const size_t numNodes = std::min( request.numNodesPerThread, request.numTotalNodes - toAdvance );
+    t.advancePack( toAdvance / ARRAY_PACKED_REALS );
+
+    TagPoint::updateAllTransformsTagOnTag( numNodes, t );
 }
 //-----------------------------------------------------------------------
 void SceneManager::updateAllBoundsThread( const ObjectMemoryManagerVec &objectMemManager, size_t threadIdx )
@@ -2727,6 +2797,7 @@ void SceneManager::updateSceneGraph()
     _applySceneAnimations();
     updateAllTransforms();
     updateAllAnimations();
+    updateAllTagPoints();
 #ifdef OGRE_LEGACY_ANIMATIONS
     updateInstanceManagerAnimations();
 #endif
@@ -5373,6 +5444,12 @@ unsigned long SceneManager::_updateWorkerThread( ThreadHandle *threadHandle )
             break;
         case UPDATE_ALL_TRANSFORMS:
             updateAllTransformsThread( mUpdateTransformRequest, threadIdx );
+            break;
+        case UPDATE_ALL_BONE_TO_TAG_TRANSFORMS:
+            updateAllTransformsBoneToTagThread( mUpdateTransformRequest, threadIdx );
+            break;
+        case UPDATE_ALL_TAG_ON_TAG_TRANSFORMS:
+            updateAllTransformsTagOnTagThread( mUpdateTransformRequest, threadIdx );
             break;
         case UPDATE_ALL_BOUNDS:
             updateAllBoundsThread( *mUpdateBoundsRequest, threadIdx );
