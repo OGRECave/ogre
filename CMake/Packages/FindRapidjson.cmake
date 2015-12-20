@@ -41,9 +41,9 @@ set(CMAKE_FIND_FRAMEWORK "LAST")
 
 findpkg_framework(Rapidjson)
 
-find_path(Rapidjson_INCLUDE_DIR NAMES rapidjson.h rapidjson/rapidjson.h HINTS ${Rapidjson_INC_SEARCH_PATH} ${Rapidjson_PKGC_INCLUDE_DIRS} PATH_SUFFIXES Rapidjson)
+find_path(Rapidjson_INCLUDE_DIR NAMES rapidjson.h rapidjson/rapidjson.h HINTS ${Rapidjson_INC_SEARCH_PATH} ${Rapidjson_PKGC_INCLUDE_DIRS} PATH_SUFFIXES rapidjson)
 
-find_package_handle_standard_args( Rapidjson REQUIRED_VARS Rapidjson_INCLUDE_DIR )
+find_package_handle_standard_args( Rapidjson DEFAULT_MSG Rapidjson_INCLUDE_DIR )
 
 if( Rapidjson_INCLUDE_DIR )
     set( Rapidjson_FOUND TRUE )
@@ -53,8 +53,6 @@ findpkg_finish(Rapidjson)
 
 # add parent of Rapidjson folder to support rapidjson/rapidjson.h
 #add_parent_dir(Rapidjson_INCLUDE_DIRS Rapidjson_INCLUDE_DIR)
-# Set to same path
-set( Rapidjson_INCLUDE_DIRS ${Rapidjson_INCLUDE_DIR} )
 
 # Reset framework finding
 set(CMAKE_FIND_FRAMEWORK "FIRST")

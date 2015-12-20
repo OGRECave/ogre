@@ -104,8 +104,8 @@ namespace Ogre
         The compiler doesn't know whether the literal
         means 4294967295 (unsigned), or -1 (signed).
         To fix the compile error, perform an explicit cast:
-            myStr.a( (uint32_t)4294967295 );  //Prints 4294967295
-            myStr.a( (int32_t)4294967295 );   //Prints -1
+            myStr.a( (uint32)4294967295 );  //Prints 4294967295
+            myStr.a( (int32)4294967295 );   //Prints -1
     */
     class LwString : public LwConstString
     {
@@ -198,7 +198,7 @@ namespace Ogre
             return *this;
         }
 
-        LwString& a( int32_t a0 )
+        LwString& a( int32 a0 )
         {
             int written = _snprintf( mStrPtr + mSize,
                                      mCapacity - mSize,
@@ -209,7 +209,7 @@ namespace Ogre
             return *this;
         }
 
-        LwString& a( uint32_t a0 )
+        LwString& a( uint32 a0 )
         {
             int written = _snprintf( mStrPtr + mSize,
                                      mCapacity - mSize,

@@ -92,7 +92,7 @@ namespace Ogre {
         bool    mIsExternal;
         char*   mDeviceName;
         bool    mIsExternalGLControl;
-        bool    mIsExternalGLContext;
+        bool    mOwnsGLContext;
         bool    mSizing;
         bool    mClosed;
         bool    mHidden;

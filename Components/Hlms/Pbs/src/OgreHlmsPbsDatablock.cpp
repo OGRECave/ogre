@@ -582,7 +582,7 @@ namespace Ogre
             if( mSamplerblocks[i] )
                 hlmsManager->destroySamplerblock( mSamplerblocks[i] );
 
-            mTexToBakedTextureIdx[i] = packedTextures[i].xIdx;
+            mTexIndices[i] = packedTextures[i].xIdx;
             textures[i] = PbsBakedTexture( packedTextures[i].texture, packedTextures[i].samplerblock );
 
             if( !textures[i].texture.isNull() && !textures[i].samplerBlock )
