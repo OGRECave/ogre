@@ -262,11 +262,12 @@ namespace Ogre
                                     _mm_add_ps( uv.mChunkBase[2], uuv.mChunkBase[2] ) );
     }
     //-----------------------------------------------------------------------------------
-    inline void ArrayQuaternion::FromOrthoDet1RotationMatrix(
-            ArrayReal m00, ArrayReal m01, ArrayReal m02,
-            ArrayReal m10, ArrayReal m11, ArrayReal m12,
-            ArrayReal m20, ArrayReal m21, ArrayReal m22 )
+    inline void ArrayQuaternion::FromOrthoDet1RotationMatrix( const ArrayReal * RESTRICT_ALIAS matrix )
     {
+        ArrayReal m00 = matrix[0], m01 = matrix[1], m02 = matrix[2],
+                  m10 = matrix[3], m11 = matrix[4], m12 = matrix[5],
+                  m20 = matrix[6], m21 = matrix[7], m22 = matrix[8];
+
         //To deal with matrices that don't have determinant = 1
         //absQ2 = det( matrix )^(1/3)
         // quaternion.w = sqrt( max( 0, absQ2 + m00 + m11 + m22 ) ) / 2; ... etc

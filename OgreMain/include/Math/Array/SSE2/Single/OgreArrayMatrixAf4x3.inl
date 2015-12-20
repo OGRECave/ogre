@@ -344,9 +344,10 @@ namespace Ogre
         q21 = _mm_xor_ps( q21, fDet );
         q22 = _mm_xor_ps( q22, fDet );
 
-        orientation.FromOrthoDet1RotationMatrix( q00, q01, q02,
-                                                 q10, q11, q12,
-                                                 q20, q21, q22 );
+        const ArrayReal matrix[9] = { q00, q01, q02,
+                                      q10, q11, q12,
+                                      q20, q21, q22 };
+        orientation.FromOrthoDet1RotationMatrix( matrix );
 
         //scale.x = q00 * m00 + q10 * m10 + q20 * m20;
         //scale.y = q01 * m01 + q11 * m11 + q21 * m21;

@@ -293,9 +293,10 @@ namespace Ogre
         q21 = q21 * fDet;
         q22 = q22 * fDet;
 
-        orientation.FromOrthoDet1RotationMatrix( q00, q01, q02,
-                                                 q10, q11, q12,
-                                                 q20, q21, q22 );
+        const ArrayReal matrix[9] = { q00, q01, q02,
+                                      q10, q11, q12,
+                                      q20, q21, q22 };
+        orientation.FromOrthoDet1RotationMatrix( matrix );
 
         ArrayReal * RESTRICT_ALIAS scaleChunkBase = scale.mChunkBase;
         scaleChunkBase[0] = q00 * m00 + q10 * m10 + q20 * m20;
