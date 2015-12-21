@@ -274,7 +274,7 @@ namespace Ogre
         q20 = _mm_mul_ps( m20, fInvLength ); //q20 = m20 * fInvLength
 
         //fDot = q00*m01 + q10*m11 + q20*m21
-        ArrayReal fDot = _mm_madd_ps( q00, m00, _mm_madd_ps( q10, m11, _mm_mul_ps( q20, m21 ) ) );
+        ArrayReal fDot = _mm_madd_ps( q00, m01, _mm_madd_ps( q10, m11, _mm_mul_ps( q20, m21 ) ) );
         q01 = _mm_sub_ps( m01, _mm_mul_ps( fDot, q00 ) ); //q01 = m01 - fDot * q00;
         q11 = _mm_sub_ps( m11, _mm_mul_ps( fDot, q10 ) ); //q11 = m11 - fDot * q10;
         q21 = _mm_sub_ps( m21, _mm_mul_ps( fDot, q20 ) ); //q21 = m21 - fDot * q20;

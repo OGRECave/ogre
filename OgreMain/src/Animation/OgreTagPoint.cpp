@@ -124,14 +124,13 @@ namespace Ogre {
                 const BoneTransform &boneTransform = parentBone->_getTransform();
                 parentBoneParentNodeTransform[j] =
                         boneTransform.mParentNodeTransform[boneTransform.mIndex];
-                parentBoneTransform[j] = boneTransform.mParentTransform[boneTransform.mIndex];
+                parentBoneTransform[j] = &boneTransform.mDerivedTransform[boneTransform.mIndex];
             }
 
-            finalMat.loadFromAoS( *parentBoneParentNodeTransform );
-            parentBone.loadFromAoS( *parentBoneTransform );
+            finalMat.loadFromAoS( parentBoneParentNodeTransform );
+            parentBone.loadFromAoS( parentBoneTransform );
 
-            //finalMat = parentBoneParentNodeTransform * parentBone;
-            finalMat *= parentBone;
+            finalMat *= parentBone; //finalMat = parentBoneParentNodeTransform * parentBone;
 
             //ArrayMatrixAf4x3::retain is quite lengthy in instruction count, and the
             //general case is to inherit both attributes. This branch is justified.
@@ -145,8 +144,7 @@ namespace Ogre {
             ArrayMatrixAf4x3 baseTransform;
             baseTransform.makeTransform( *t.mPosition, *t.mScale, *t.mOrientation );
 
-            //finalMat = parentMat * baseTransform;
-            finalMat *= baseTransform;
+            finalMat *= baseTransform; //finalMat = parentMat * baseTransform;
 
             finalMat.streamToAoS( t.mDerivedTransform );
 

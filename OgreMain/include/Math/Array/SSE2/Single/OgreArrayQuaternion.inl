@@ -305,11 +305,11 @@ namespace Ogre
         //y = _copysign( y, m02 - m20 ); --> (y & 0x7FFFFFFF) | ((m02 - m20) & 0x80000000)
         //z = _copysign( z, m10 - m01 ); --> (z & 0x7FFFFFFF) | ((m10 - m01) & 0x80000000)
         tmp = _mm_and_ps( _mm_sub_ps( m21, m12 ), MathlibSSE2::SIGN_MASK );
-        mChunkBase[1] = _mm_or_ps( _mm_andnot_ps( mChunkBase[1], MathlibSSE2::SIGN_MASK ), tmp );
+        mChunkBase[1] = _mm_or_ps( _mm_andnot_ps( MathlibSSE2::SIGN_MASK, mChunkBase[1] ), tmp );
         tmp = _mm_and_ps( _mm_sub_ps( m02, m20 ), MathlibSSE2::SIGN_MASK );
-        mChunkBase[2] = _mm_or_ps( _mm_andnot_ps( mChunkBase[2], MathlibSSE2::SIGN_MASK ), tmp );
+        mChunkBase[2] = _mm_or_ps( _mm_andnot_ps( MathlibSSE2::SIGN_MASK, mChunkBase[2] ), tmp );
         tmp = _mm_and_ps( _mm_sub_ps( m10, m01 ), MathlibSSE2::SIGN_MASK );
-        mChunkBase[3] = _mm_or_ps( _mm_andnot_ps( mChunkBase[3], MathlibSSE2::SIGN_MASK ), tmp );
+        mChunkBase[3] = _mm_or_ps( _mm_andnot_ps( MathlibSSE2::SIGN_MASK, mChunkBase[3] ), tmp );
     }
     //-----------------------------------------------------------------------------------
     inline void ArrayQuaternion::FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis )
