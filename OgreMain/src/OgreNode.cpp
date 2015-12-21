@@ -173,6 +173,7 @@ namespace Ogre {
             {
                 mNodeMemoryManager->migrateToAndAttach( mTransform, mDepthLevel,
                                                         mParent->mNodeMemoryManager );
+                mNodeMemoryManager = mParent->mNodeMemoryManager;
             }
             else
             {
@@ -215,6 +216,7 @@ namespace Ogre {
             {
                 mNodeMemoryManager->migrateToAndDetach( mTransform, mDepthLevel,
                                                         defaultNodeMemoryManager );
+                mNodeMemoryManager = defaultNodeMemoryManager;
             }
             else
             {
@@ -248,6 +250,7 @@ namespace Ogre {
         {
             mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mParent->mDepthLevel + 1,
                                            mParent->mNodeMemoryManager );
+            mNodeMemoryManager = mParent->mNodeMemoryManager;
         }
         else
         {
