@@ -703,7 +703,9 @@ namespace Ogre {
         @see UserObjectBindings::setUserAny.        
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
-
+        
+        /** Checks if a given technique has passes with shaders. */
+        bool isProgrammable() const;
     };
 
     /** @} */

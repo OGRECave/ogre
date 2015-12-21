@@ -1326,6 +1326,14 @@ namespace Ogre {
         return GPUDeviceNameRuleIterator(mGPUDeviceNameRules.begin(), mGPUDeviceNameRules.end());
     }
     //---------------------------------------------------------------------
+    bool Technique::isProgrammable() const
+    {
+        Passes::const_iterator i_end = mPasses.end();
+        for (Passes::const_iterator it = mPasses.begin(); it != i_end; it++)
+            if ((*it)->isProgrammable())
+                return true;
 
-
+        return false;
+    }
+    //---------------------------------------------------------------------
 }

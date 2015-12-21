@@ -1052,7 +1052,7 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
      {
          Technique* curTechnique = itMatTechniques.getNext();
 
-         if (curTechnique->getSchemeName() == srcTechniqueSchemeName && (allowProgrammable || !isProgrammable(curTechnique)))
+         if (curTechnique->getSchemeName() == srcTechniqueSchemeName && (allowProgrammable || curTechnique->isProgrammable() == false))
          {
              return curTechnique;               
          }      
@@ -1060,24 +1060,6 @@ void ShaderGenerator::removeAllShaderBasedTechniques()
 
      return NULL;
  }
-
- //-----------------------------------------------------------------------------
- bool ShaderGenerator::isProgrammable(Technique* tech) const
- {
-     if (tech != NULL)
-     {
-         for (unsigned short i=0; i < tech->getNumPasses(); ++i)
-         {
-             if (tech->getPass(i)->isProgrammable() == true)
-             {
-                 return true;
-             }              
-         }
-     }
-     return false;
- }
-
-
 //-----------------------------------------------------------------------------
  void ShaderGenerator::notifyRenderSingleObject(Renderable* rend, 
      const Pass* pass,  
