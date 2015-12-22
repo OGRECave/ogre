@@ -160,7 +160,7 @@ namespace Ogre {
         return maxBonesPerVertex;
     }
     //---------------------------------------------------------------------
-    void SubMesh::buildBoneIndexMap(void)
+    void SubMesh::_buildBoneIndexMap(void)
     {
         assert( !mBoneAssignmentsOutOfDate );
 
@@ -251,6 +251,13 @@ namespace Ogre {
                          "SubMesh::_buildBoneAssignmentsFromVertexData" );
         }
 
+        if( mBlendIndexToBoneIndexMap.empty() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "mBlendIndexToBoneIndexMap MUST be up to date.",
+                         "SubMesh::mBlendIndexToBoneIndexMap" );
+        }
+
         const uint8 numWeightsPerVertex = v1::VertexElement::getTypeCount( weightElement->mType );
 
         const VertexBufferPacked *vertexBuffer = mVao[VpNormal][0]->getVertexBuffers()[indexSource];
@@ -271,8 +278,8 @@ namespace Ogre {
                 float const *blendWeight = reinterpret_cast<float const *>(vertexData + weightOffset);
                 for( uint8 j=0; j<numWeightsPerVertex; ++j )
                 {
-                    mBoneAssignments.push_back( VertexBoneAssignment( i, *blendIndex++,
-                                                                      *blendWeight++ ) );
+                    const uint16 boneIndex = mBlendIndexToBoneIndexMap[*blendIndex++];
+                    mBoneAssignments.push_back( VertexBoneAssignment( i, boneIndex, *blendWeight++ ) );
                 }
             }
             else if( weightBaseType == VET_USHORT2_NORM )
@@ -280,8 +287,9 @@ namespace Ogre {
                 uint16 const *blendWeight = reinterpret_cast<uint16 const *>(vertexData + weightOffset);
                 for( uint8 j=0; j<numWeightsPerVertex; ++j )
                 {
+                    const uint16 boneIndex = mBlendIndexToBoneIndexMap[*blendIndex++];
                     const float weight = *blendWeight++ * invMaxU16;
-                    mBoneAssignments.push_back( VertexBoneAssignment( i, *blendIndex++, weight ) );
+                    mBoneAssignments.push_back( VertexBoneAssignment( i, boneIndex, weight ) );
                 }
             }
             else if( weightBaseType == VET_UBYTE4_NORM )
@@ -289,8 +297,9 @@ namespace Ogre {
                 uint8 const *blendWeight = reinterpret_cast<uint8 const *>(vertexData + weightOffset);
                 for( uint8 j=0; j<numWeightsPerVertex; ++j )
                 {
+                    const uint16 boneIndex = mBlendIndexToBoneIndexMap[*blendIndex++];
                     const float weight = *blendWeight++ * invMaxU8;
-                    mBoneAssignments.push_back( VertexBoneAssignment( i, *blendIndex++, weight ) );
+                    mBoneAssignments.push_back( VertexBoneAssignment( i, boneIndex, weight ) );
                 }
             }
 
@@ -299,8 +308,6 @@ namespace Ogre {
 
         std::sort( mBoneAssignments.begin(), mBoneAssignments.end() );
         mBoneAssignmentsOutOfDate = false;
-
-        buildBoneIndexMap();
     }
     //---------------------------------------------------------------------
     SubMesh* SubMesh::clone( Mesh *parentMesh )

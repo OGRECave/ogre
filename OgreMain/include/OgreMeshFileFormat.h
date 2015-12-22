@@ -63,6 +63,8 @@ namespace Ogre {
             // string strategyName;
             M_SUBMESH             = 0x4000,
                 // char* materialName
+                // uint8 blendIndexToBoneIndexCount
+                // uint16 *blendIndexToBoneIndexTable
                 // uint8 numLodLevels
                 // Optional chunk that matches a texture name to an alias
                 // a texture alias is sent to the submesh material to use this texture name

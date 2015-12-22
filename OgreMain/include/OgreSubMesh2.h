@@ -109,10 +109,6 @@ namespace Ogre {
         /// if we need to strip, normalizes all weights to sum 1.
         uint8 rationaliseBoneAssignments(void);
 
-        /// Builds mBlendIndexToBoneIndexMap based on mBoneAssignments.
-        /// Necessary step for enabling skeletal animation.
-        void buildBoneIndexMap(void);
-
     public:
         SubMesh();
         ~SubMesh();
@@ -145,14 +141,19 @@ namespace Ogre {
         /// Must be called once to compile bone assignments into geometry buffer.
         //void _compileBoneAssignments(void);
 
-        /// Populates mBoneAssignments by reading the vertex data, then
-        /// calls buildBoneIndexMap to populate mBlendIndexToBoneIndexMap.
+        /// Builds mBlendIndexToBoneIndexMap based on mBoneAssignments.
+        /// mBlendIndexToBoneIndexMap is necessary for enabling skeletal animation.
+        void _buildBoneIndexMap(void);
+
+        /// Populates mBoneAssignments by reading the vertex data.
+        /// See the other overload.
         void _buildBoneAssignmentsFromVertexData(void);
 
-        /** Populates mBoneAssignments by reading the vertex data, then calls buildBoneIndexMap.
-            This version accepts an external buffer in case you already have the vertex data
-            on CPU (instead of having to bring it back from GPU)
+        /** Populates mBoneAssignments by reading the vertex data.
+            This version accepts an external buffer in case you already have
+            the vertex data on CPU (instead of having to bring it back from GPU)
         @remarks
+            mBlendIndexToBoneIndexMap MUST be up to date. OTHERWISE IT MAY CRASH.
             Despite accepting external vertexData, mVao must be correctly
             populated with information about vertexData
         @param vertexData

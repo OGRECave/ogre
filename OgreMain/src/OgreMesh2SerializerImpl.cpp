@@ -61,7 +61,7 @@ namespace Ogre {
         mVaoManager( vaoManager )
     {
         // Version number
-        mVersion = "[MeshSerializer_v2.1 R1]";
+        mVersion = "[MeshSerializer_v2.1 R2]";
     }
     //---------------------------------------------------------------------
     MeshSerializerImpl::~MeshSerializerImpl()
@@ -266,6 +266,10 @@ namespace Ogre {
 
         // char* materialName
         writeString(s->getMaterialName());
+
+        const uint8 blendIndexToBoneIndexCount = s->mBlendIndexToBoneIndexMap.size();
+        writeData( &blendIndexToBoneIndexCount, 1, 1 );
+        writeShorts( s->mBlendIndexToBoneIndexMap.begin(), blendIndexToBoneIndexCount );
 
         uint8 numLodLevels = static_cast<uint8>( s->mVao[VpNormal].size() );
         writeData( &numLodLevels, 1, 1 );
@@ -769,6 +773,14 @@ namespace Ogre {
         if(listener)
             listener->processMaterialName(pMesh, &materialName);
         sm->setMaterialName( materialName );
+
+        uint8 blendIndexToBoneIndexCount = 0;
+        readChar( stream, &blendIndexToBoneIndexCount );
+        if( blendIndexToBoneIndexCount )
+        {
+            sm->mBlendIndexToBoneIndexMap.resize( blendIndexToBoneIndexCount );
+            readShorts( stream, sm->mBlendIndexToBoneIndexMap.begin(), blendIndexToBoneIndexCount );
+        }
 
         uint8 numLodLevels = 0;
         readChar( stream, &numLodLevels );
@@ -2168,8 +2180,97 @@ namespace Ogre {
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
-    MeshSerializerImpl_v2_1_R0::MeshSerializerImpl_v2_1_R0( VaoManager *vaoManager ) :
+    MeshSerializerImpl_v2_1_R1::MeshSerializerImpl_v2_1_R1( VaoManager *vaoManager ) :
         MeshSerializerImpl( vaoManager )
+    {
+        // Version number
+        mVersion = "[MeshSerializer_v2.1 R1]";
+    }
+    //---------------------------------------------------------------------
+    MeshSerializerImpl_v2_1_R1::~MeshSerializerImpl_v2_1_R1()
+    {
+    }
+    //---------------------------------------------------------------------
+    void MeshSerializerImpl_v2_1_R1::readSubMesh( DataStreamPtr& stream, Mesh* pMesh,
+                                                  MeshSerializerListener *listener, uint8 numVaoPasses )
+    {
+        SubMesh* sm = pMesh->createSubMesh();
+
+        // char* materialName
+        String materialName = readString(stream);
+        if(listener)
+            listener->processMaterialName(pMesh, &materialName);
+        sm->setMaterialName( materialName );
+
+        uint8 numLodLevels = 0;
+        readChar( stream, &numLodLevels );
+
+        SubMeshLodVec totalSubmeshLods;
+        totalSubmeshLods.reserve( numLodLevels * numVaoPasses );
+
+        //M_SUBMESH_LOD
+        pushInnerChunk(stream);
+        try
+        {
+            SubMeshLodVec submeshLods;
+            submeshLods.reserve( numLodLevels );
+
+            for( uint8 i=0; i<numVaoPasses; ++i )
+            {
+                for( uint8 j=0; j<numLodLevels; ++j )
+                {
+                    uint16 streamID = readChunk(stream);
+                    assert( streamID == M_SUBMESH_LOD && !stream->eof() );
+
+                    totalSubmeshLods.push_back( SubMeshLod() );
+                    const uint8 currentLod = static_cast<uint8>( submeshLods.size() );
+                    readSubMeshLod( stream, pMesh, &totalSubmeshLods.back(), currentLod );
+
+                    submeshLods.push_back( totalSubmeshLods.back() );
+                }
+
+                createSubMeshVao( sm, submeshLods, i );
+                submeshLods.clear();
+            }
+        }
+        catch( Exception &e )
+        {
+            SubMeshLodVec::iterator itor = totalSubmeshLods.begin();
+            SubMeshLodVec::iterator end  = totalSubmeshLods.end();
+
+            while( itor != end )
+            {
+                Uint8Vec::iterator it = itor->vertexBuffers.begin();
+                Uint8Vec::iterator en = itor->vertexBuffers.end();
+
+                while( it != en )
+                    OGRE_FREE_SIMD( *it++, MEMCATEGORY_GEOMETRY );
+
+                itor->vertexBuffers.clear();
+
+                if( itor->indexData )
+                {
+                    OGRE_FREE_SIMD( itor->indexData, MEMCATEGORY_GEOMETRY );
+                    itor->indexData = 0;
+                }
+
+                ++itor;
+            }
+
+            //TODO: Delete created mVaos. Don't erase the data from those vaos?
+
+            throw e;
+        }
+
+        popInnerChunk(stream);
+    }
+
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    //---------------------------------------------------------------------
+    MeshSerializerImpl_v2_1_R0::MeshSerializerImpl_v2_1_R0( VaoManager *vaoManager ) :
+        MeshSerializerImpl_v2_1_R1( vaoManager )
     {
         // Version number
         mVersion = "[MeshSerializer_v2.1]";
