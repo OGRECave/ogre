@@ -66,6 +66,11 @@ namespace Ogre
         uint16  boneIndex;
         Real    weight;
 
+        VertexBoneAssignment( uint32 _vertexIndex,  uint16 _boneIndex, Real _weight ) :
+            vertexIndex( _vertexIndex ), boneIndex( _boneIndex ), weight( _weight )
+        {
+        }
+
         VertexBoneAssignment( const v1::VertexBoneAssignment &c ) :
             vertexIndex( c.vertexIndex ),
             boneIndex( c.boneIndex ),
@@ -78,7 +83,7 @@ namespace Ogre
             if( vertexIndex < _r.vertexIndex )
                 return true;
 
-            if( weight > weight )
+            if( weight > _r.weight )
                 return true;
 
             return false;

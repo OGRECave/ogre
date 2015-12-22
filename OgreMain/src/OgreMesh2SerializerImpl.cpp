@@ -800,6 +800,15 @@ namespace Ogre {
                 createSubMeshVao( sm, submeshLods, i );
                 submeshLods.clear();
             }
+
+            //Populate mBoneAssignments and mBlendIndexToBoneIndexMap;
+            size_t indexSource = 0;
+            size_t unusedVar = 0;
+
+            const VertexElement2 *indexElement =
+                    sm->mVao[VpNormal][0]->findBySemantic( VES_BLEND_INDICES, indexSource, unusedVar );
+            if( indexElement )
+                sm->_buildBoneAssignmentsFromVertexData( submeshLods[0].vertexBuffers[indexSource] );
         }
         catch( Exception &e )
         {
