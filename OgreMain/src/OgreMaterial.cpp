@@ -313,6 +313,19 @@ namespace Ogre {
         return mSupportedTechniques[index];
     }
     //-----------------------------------------------------------------------   
+    bool Material::getHasFFPTechnique(const String& materialScheme) const
+    {
+        Techniques::const_iterator iend = mTechniques.end();
+
+        for (Techniques::const_iterator i = mTechniques.begin(); i != iend; i++)
+        {
+            if ((materialScheme == BLANKSTRING || (*i)->getSchemeName() == materialScheme)
+                && (*i)->isProgrammable() == false)
+                return true;
+        }
+        return false;
+    }
+    //-----------------------------------------------------------------------   
     unsigned short Material::getNumSupportedTechniques(void) const
     {
         return static_cast<unsigned short>(mSupportedTechniques.size());

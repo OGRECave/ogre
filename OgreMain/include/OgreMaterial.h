@@ -237,6 +237,15 @@ namespace Ogre {
         
         /** Gets the indexed supported technique. */
         Technique* getSupportedTechnique(unsigned short index);
+        
+        /** Return true if a FFP technique is found.
+        @param materialScheme The material scheme defines which techniques to query.
+        if empty all techniques are checked.
+        */
+            
+        bool getHasFFPTechnique(const String& materialScheme) const;
+        
+
         /** Retrieves the number of supported techniques. */
         unsigned short getNumSupportedTechniques(void) const;
         /** Gets a string explaining why any techniques are not supported. */
@@ -260,7 +269,7 @@ namespace Ogre {
             This method returns the lowest-index supported Technique in this material
             (since lower-indexed Techniques are considered to be better than higher-indexed
             ones).
-        @par
+        @param
             The best supported technique is only available after this material has been compiled,
             which typically happens on loading the material. Therefore, if this method returns
             NULL, try calling Material::load.
