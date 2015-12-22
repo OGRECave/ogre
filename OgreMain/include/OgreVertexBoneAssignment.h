@@ -89,11 +89,19 @@ namespace Ogre
             return false;
         }
 
-        bool operator < ( uint32 _vertexIndex ) const
-        {
-            return vertexIndex < _vertexIndex;
-        }
+        friend bool operator < ( const VertexBoneAssignment &_l, uint32 _vertexIndex );
+        friend bool operator < ( uint32 _vertexIndex, const VertexBoneAssignment &_r );
     };
+
+    inline bool operator < ( const VertexBoneAssignment &_l, uint32 _vertexIndex )
+    {
+        return _l.vertexIndex < _vertexIndex;
+    }
+
+    inline bool operator < ( uint32 _vertexIndex, const VertexBoneAssignment &_r )
+    {
+        return _vertexIndex < _r.vertexIndex;
+    }
 
     /** @} */
     /** @} */
