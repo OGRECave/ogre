@@ -808,7 +808,10 @@ namespace Ogre {
             const VertexElement2 *indexElement =
                     sm->mVao[VpNormal][0]->findBySemantic( VES_BLEND_INDICES, indexSource, unusedVar );
             if( indexElement )
-                sm->_buildBoneAssignmentsFromVertexData( submeshLods[0].vertexBuffers[indexSource] );
+            {
+                const uint8 *vertexData = totalSubmeshLods[0].vertexBuffers[indexSource];
+                sm->_buildBoneAssignmentsFromVertexData( vertexData );
+            }
         }
         catch( Exception &e )
         {

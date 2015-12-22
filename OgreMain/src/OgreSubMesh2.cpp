@@ -297,6 +297,9 @@ namespace Ogre {
             vertexData += bytesPerVertex;
         }
 
+        std::sort( mBoneAssignments.begin(), mBoneAssignments.end() );
+        mBoneAssignmentsOutOfDate = false;
+
         buildBoneIndexMap();
     }
     //---------------------------------------------------------------------
@@ -359,6 +362,7 @@ namespace Ogre {
                 ++itor;
             }
         }
+
         std::sort( mBoneAssignments.begin(), mBoneAssignments.end() );
         mBlendIndexToBoneIndexMap = subMesh->blendIndexToBoneIndexMap;
         mBoneAssignmentsOutOfDate = false;
