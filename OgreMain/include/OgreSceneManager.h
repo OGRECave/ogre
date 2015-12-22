@@ -1189,7 +1189,11 @@ namespace Ogre {
         */
         virtual void destroyAllLights(void);
 
+        /// Don't call this function directly. @see TagPoint::createChildTagPoint
         virtual TagPoint* _createTagPoint( SceneNode *parent, NodeMemoryManager *nodeMemoryManager );
+
+        /// Creates a TagPoint that can be used like a SceneNode, or be used to be
+        /// attached to a Bone. @see Bone::addTagPoint
         virtual TagPoint* createTagPoint(void);
 
         /** @see createSceneNode. This functions exists to satisfy @see SceneNode::createChildImpl
