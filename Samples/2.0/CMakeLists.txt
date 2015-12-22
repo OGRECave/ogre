@@ -16,6 +16,7 @@ if( OGRE_BUILD_SAMPLES2 )
 
 	set( OGRE_SAMPLES_LIBRARIES "OgreSamplesCommon" "OgreOverlay" )
 
+	add_subdirectory(ApiUsage/AnimationTagPoint)
 	add_subdirectory(ApiUsage/CustomRenderable)
 	add_subdirectory(ApiUsage/DynamicGeometry)
     add_subdirectory(ApiUsage/V1Interfaces)

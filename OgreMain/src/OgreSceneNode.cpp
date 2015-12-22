@@ -307,7 +307,11 @@ namespace Ogre {
     Node* SceneNode::createChildImpl( SceneMemoryMgrTypes sceneType )
     {
         assert(mCreator);
-        return mCreator->_createSceneNode( this, sceneType );
+
+        NodeMemoryManager *nodeMemoryManager = mNodeMemoryManager;
+        if( mNodeMemoryManager->getTwin() && mNodeMemoryManager->getMemoryManagerType() != sceneType )
+            nodeMemoryManager = mNodeMemoryManager->getTwin();
+        return mCreator->_createSceneNode( this, nodeMemoryManager );
     }
     //-----------------------------------------------------------------------
     SceneNode::ObjectIterator SceneNode::getAttachedObjectIterator(void)

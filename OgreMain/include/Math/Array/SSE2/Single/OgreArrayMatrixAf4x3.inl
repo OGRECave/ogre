@@ -657,6 +657,25 @@ namespace Ogre
                             this->mChunkBase[10], this->mChunkBase[11] );
     }
     //-----------------------------------------------------------------------------------
+    inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * RESTRICT_ALIAS * src )
+    {
+        _MM_TRANSPOSE4_SRC_DST_PS(
+                            _mm_load_ps( src[0]->_m ), _mm_load_ps( src[1]->_m ),
+                            _mm_load_ps( src[2]->_m ), _mm_load_ps( src[3]->_m ),
+                            this->mChunkBase[0], this->mChunkBase[1],
+                            this->mChunkBase[2], this->mChunkBase[3] );
+        _MM_TRANSPOSE4_SRC_DST_PS(
+                            _mm_load_ps( src[0]->_m+4 ), _mm_load_ps( src[1]->_m+4 ),
+                            _mm_load_ps( src[2]->_m+4 ), _mm_load_ps( src[3]->_m+4 ),
+                            this->mChunkBase[4], this->mChunkBase[5],
+                            this->mChunkBase[6], this->mChunkBase[7] );
+        _MM_TRANSPOSE4_SRC_DST_PS(
+                            _mm_load_ps( src[0]->_m+8 ), _mm_load_ps( src[1]->_m+8 ),
+                            _mm_load_ps( src[2]->_m+8 ), _mm_load_ps( src[3]->_m+8 ),
+                            this->mChunkBase[8], this->mChunkBase[9],
+                            this->mChunkBase[10], this->mChunkBase[11] );
+    }
+    //-----------------------------------------------------------------------------------
     inline void ArrayMatrixAf4x3::loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS src )
     {
         _MM_TRANSPOSE4_SRC_DST_PS(

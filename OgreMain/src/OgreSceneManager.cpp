@@ -219,7 +219,7 @@ mGpuParamsDirty((uint16)GPV_ALL)
     for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
     {
         // Create root scene node
-        mSceneRoot[i] = createSceneNodeImpl( (SceneNode*)0, static_cast<SceneMemoryMgrTypes>( i ) );
+        mSceneRoot[i] = createSceneNodeImpl( (SceneNode*)0, &mNodeMemoryManager[i] );
         mSceneRoot[i]->setName( "Ogre/SceneRoot" + StringConverter::toString( i ) );
         mSceneRoot[i]->_getDerivedPositionUpdated();
     }
@@ -642,25 +642,25 @@ void SceneManager::clearScene(void)
 
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType )
+SceneNode* SceneManager::createSceneNodeImpl( SceneNode *parent, NodeMemoryManager *nodeMemoryManager )
 {
     SceneNode *retVal = OGRE_NEW SceneNode( Id::generateNewId<Node>(), this,
-                                            &mNodeMemoryManager[sceneType], parent );
-    if( sceneType == SCENE_STATIC )
+                                            nodeMemoryManager, parent );
+	if( nodeMemoryManager->getMemoryManagerType() == SCENE_STATIC )
         notifyStaticDirty( retVal );
     return retVal;
 }
 //-----------------------------------------------------------------------
-TagPoint* SceneManager::createTagPointImpl( SceneNode *parent )
+TagPoint* SceneManager::createTagPointImpl( SceneNode *parent, NodeMemoryManager *nodeMemoryManager )
 {
     TagPoint *retVal = OGRE_NEW TagPoint( Id::generateNewId<Node>(), this,
-                                          &mNodeMemoryManager[SCENE_DYNAMIC], parent );
+                                          nodeMemoryManager, parent );
     return retVal;
 }
 //-----------------------------------------------------------------------
-TagPoint* SceneManager::_createTagPoint( SceneNode *parent )
+TagPoint* SceneManager::_createTagPoint( SceneNode *parent, NodeMemoryManager *nodeMemoryManager )
 {
-    TagPoint* sn = createTagPointImpl( parent );
+    TagPoint* sn = createTagPointImpl( parent, nodeMemoryManager );
     mSceneNodes.push_back( sn );
     sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
@@ -668,15 +668,15 @@ TagPoint* SceneManager::_createTagPoint( SceneNode *parent )
 //-----------------------------------------------------------------------
 TagPoint* SceneManager::createTagPoint(void)
 {
-    TagPoint* sn = createTagPointImpl( (SceneNode*)0 );
+    TagPoint* sn = createTagPointImpl( (SceneNode*)0, &mNodeMemoryManager[SCENE_DYNAMIC] );
     mSceneNodes.push_back( sn );
     sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
 }
 //-----------------------------------------------------------------------
-SceneNode* SceneManager::_createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType )
+SceneNode* SceneManager::_createSceneNode( SceneNode *parent, NodeMemoryManager *nodeMemoryManager )
 {
-    SceneNode* sn = createSceneNodeImpl( parent, sceneType );
+    SceneNode* sn = createSceneNodeImpl( parent, nodeMemoryManager );
     mSceneNodes.push_back( sn );
     sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;
@@ -684,7 +684,7 @@ SceneNode* SceneManager::_createSceneNode( SceneNode *parent, SceneMemoryMgrType
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNode( SceneMemoryMgrTypes sceneType )
 {
-    SceneNode* sn = createSceneNodeImpl( (SceneNode*)0, sceneType );
+    SceneNode* sn = createSceneNodeImpl( (SceneNode*)0, &mNodeMemoryManager[sceneType] );
     mSceneNodes.push_back( sn );
     sn->mGlobalIndex = mSceneNodes.size() - 1;
     return sn;

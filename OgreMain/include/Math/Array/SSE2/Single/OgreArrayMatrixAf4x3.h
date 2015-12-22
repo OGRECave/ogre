@@ -177,6 +177,7 @@ namespace Ogre
             'src' must be aligned and assumed to have enough memory for ARRAY_PACKED_REALS matrices
         */
         inline void loadFromAoS( const Matrix4 * RESTRICT_ALIAS src );
+        inline void loadFromAoS( const Matrix4 * RESTRICT_ALIAS * src );
         inline void loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS src );
         inline void loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS * src );
 

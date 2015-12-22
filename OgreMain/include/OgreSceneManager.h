@@ -425,8 +425,10 @@ namespace Ogre {
 
     protected:
         /// Subclasses can override this to ensure their specialised SceneNode is used.
-        virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
-        virtual TagPoint* createTagPointImpl( SceneNode *parent );
+        virtual SceneNode* createSceneNodeImpl( SceneNode *parent,
+                                                NodeMemoryManager *nodeMemoryManager );
+        virtual TagPoint* createTagPointImpl( SceneNode *parent,
+                                              NodeMemoryManager *nodeMemoryManager );
 
         typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
         typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
@@ -1187,7 +1189,7 @@ namespace Ogre {
         */
         virtual void destroyAllLights(void);
 
-        virtual TagPoint* _createTagPoint( SceneNode *parent );
+        virtual TagPoint* _createTagPoint( SceneNode *parent, NodeMemoryManager *nodeMemoryManager );
         virtual TagPoint* createTagPoint(void);
 
         /** @see createSceneNode. This functions exists to satisfy @see SceneNode::createChildImpl
@@ -1195,7 +1197,7 @@ namespace Ogre {
             @par
                 Parent to the scene node we're creating.
         */
-        virtual SceneNode* _createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType );
+        virtual SceneNode* _createSceneNode( SceneNode *parent, NodeMemoryManager *nodeMemoryManager );
 
         /** Creates an instance of a SceneNode.
             @remarks

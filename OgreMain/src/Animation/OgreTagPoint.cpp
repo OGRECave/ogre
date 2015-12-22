@@ -109,22 +109,31 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void TagPoint::updateAllTransformsBoneToTag( const size_t numNodes, Transform t )
     {
+        SimpleMatrixAf4x3 const * RESTRICT_ALIAS parentBoneParentNodeTransform[ARRAY_PACKED_REALS];
+        SimpleMatrixAf4x3 const * RESTRICT_ALIAS parentBoneTransform[ARRAY_PACKED_REALS];
+
+        for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
+        {
+            parentBoneParentNodeTransform[j]    = &SimpleMatrixAf4x3::IDENTITY;
+            parentBoneTransform[j]              = &SimpleMatrixAf4x3::IDENTITY;
+        }
+
         for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
         {
             //Retrieve from parents. Unfortunately we need to do SoA -> AoS -> SoA conversion
             ArrayMatrixAf4x3 finalMat;
             ArrayMatrixAf4x3 parentBone;
 
-            SimpleMatrixAf4x3 const * RESTRICT_ALIAS parentBoneParentNodeTransform[ARRAY_PACKED_REALS];
-            SimpleMatrixAf4x3 const * RESTRICT_ALIAS parentBoneTransform[ARRAY_PACKED_REALS];
-
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
-                Bone *parentBone = static_cast<TagPoint*>( t.mOwner[j] )->mParentBone;
-                const BoneTransform &boneTransform = parentBone->_getTransform();
-                parentBoneParentNodeTransform[j] =
-                        boneTransform.mParentNodeTransform[boneTransform.mIndex];
-                parentBoneTransform[j] = &boneTransform.mDerivedTransform[boneTransform.mIndex];
+                if( t.mOwner[j] )
+                {
+                    Bone *parentBone = static_cast<TagPoint*>( t.mOwner[j] )->mParentBone;
+                    const BoneTransform &boneTransform = parentBone->_getTransform();
+                    parentBoneParentNodeTransform[j] =
+                            boneTransform.mParentNodeTransform[boneTransform.mIndex];
+                    parentBoneTransform[j] = &boneTransform.mDerivedTransform[boneTransform.mIndex];
+                }
             }
 
             finalMat.loadFromAoS( parentBoneParentNodeTransform );
@@ -176,7 +185,7 @@ namespace Ogre {
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
                 parentBoneTransform[j] = t.mParents[j]->_getTransform().mDerivedTransform;
 
-            finalMat.loadFromAoS( *parentBoneTransform );
+            finalMat.loadFromAoS( parentBoneTransform );
 
             //ArrayMatrixAf4x3::retain is quite lengthy in instruction count, and the
             //general case is to inherit both attributes. This branch is justified.
@@ -190,8 +199,7 @@ namespace Ogre {
             ArrayMatrixAf4x3 baseTransform;
             baseTransform.makeTransform( *t.mPosition, *t.mScale, *t.mOrientation );
 
-            //finalMat = parentMat * baseTransform;
-            finalMat *= baseTransform;
+            finalMat *= baseTransform; //finalMat = parentMat * baseTransform;
 
             finalMat.streamToAoS( t.mDerivedTransform );
 
@@ -213,7 +221,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     TagPoint* TagPoint::createChildTagPoint( const Vector3& vPos, const Quaternion& qRot )
     {
-        TagPoint *newNode = mCreator->_createTagPoint( this );
+        TagPoint *newNode = mCreator->_createTagPoint( this, mNodeMemoryManager );
         newNode->setPosition( vPos );
         newNode->setOrientation( qRot );
 
