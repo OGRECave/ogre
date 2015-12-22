@@ -33,6 +33,7 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_1weight_twophase_vs unifi
 vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs unified
 {
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg
+	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_hlsl
 	delegate Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_glsl
 }
 
@@ -52,6 +53,7 @@ fragment_program Ogre/RTShader/shadow_caster_dq_ps unified
 {
 	delegate Ogre/RTShader/shadow_caster_dq_ps_glsl
 	delegate Ogre/RTShader/shadow_caster_dq_ps_cg
+	delegate Ogre/RTShader/shadow_caster_dq_ps_hlsl
 }
 
 // declare the fragment shader (GLSL for the language)
@@ -67,6 +69,21 @@ fragment_program Ogre/RTShader/shadow_caster_dq_ps_cg cg
 	source DualQuaternionSkinning_Shadow.cg
 	// will run on pixel shader 2.0+
 	profiles ps_2_0 arbfp1
+	// entry function
+	entry_point shadow_caster_dq_ps
+
+ 	default_params
+	{
+		
+	}
+}
+
+fragment_program Ogre/RTShader/shadow_caster_dq_ps_hlsl hlsl
+{
+	// source file
+	source DualQuaternionSkinning_Shadow.hlsl
+	// will run on pixel shader 2.0+
+	target ps_4_0
 	// entry function
 	entry_point shadow_caster_dq_ps
 
@@ -220,6 +237,23 @@ vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_cg cg
 	source DualQuaternionSkinning_Shadow.cg
 	//will run on 3 to accommodate the amount of registers
 	profiles vs_3_0 vp40 arbvp1
+	entry_point shadow_caster_dq_skinning_2weight_twophase_vs
+	includes_skeletal_animation true
+
+	default_params
+	{
+		param_named_auto worldDualQuaternion2x4Array world_dualquaternion_array_2x4
+		param_named_auto scaleM world_scale_shear_matrix_array_3x4
+		param_named_auto viewProjectionMatrix viewproj_matrix
+		param_named_auto ambient ambient_light_colour
+	}
+}
+
+vertex_program Ogre/RTShader/shadow_caster_dq_skinning_2weight_twophase_vs_hlsl hlsl
+{
+	source DualQuaternionSkinning_Shadow.hlsl
+	//will run on 3 to accommodate the amount of registers
+	target vs_4_0
 	entry_point shadow_caster_dq_skinning_2weight_twophase_vs
 	includes_skeletal_animation true
 
