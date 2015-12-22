@@ -83,7 +83,7 @@ namespace Ogre
             if( vertexIndex < _r.vertexIndex )
                 return true;
 
-            if( weight > _r.weight )
+            if( vertexIndex == _r.vertexIndex && weight > _r.weight )
                 return true;
 
             return false;
