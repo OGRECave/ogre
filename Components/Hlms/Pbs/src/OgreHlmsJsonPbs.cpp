@@ -581,7 +581,7 @@ namespace Ogre
                 outString += HlmsJson::getName( samplerblock );
             }
 
-            if( datablock->getTextureUvSource( textureType ) != 0 )
+            if( textureType < NUM_PBSM_SOURCES && datablock->getTextureUvSource( textureType ) != 0 )
             {
                 outString += ",\n\t\t\t\t\"uv\" : ";
                 outString += StringConverter::toString( datablock->getTextureUvSource( textureType ) );
@@ -687,6 +687,9 @@ namespace Ogre
                              outString );
             }
         }
+
+        if( !pbsDatablock->getTexture( PBSM_REFLECTION ).isNull() )
+            saveTexture( "reflection", PBSM_REFLECTION, pbsDatablock, outString );
     }
     //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::collectSamplerblocks( const HlmsDatablock *datablock,
