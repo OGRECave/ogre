@@ -183,7 +183,10 @@ namespace Ogre {
             Matrix4 const * RESTRICT_ALIAS parentBoneTransform[ARRAY_PACKED_REALS];
 
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
-                parentBoneTransform[j] = t.mParents[j]->_getTransform().mDerivedTransform;
+            {
+                Transform &parentTransform = t.mParents[j]->_getTransform();
+                parentBoneTransform[j] = &parentTransform.mDerivedTransform[parentTransform.mIndex];
+            }
 
             finalMat.loadFromAoS( parentBoneTransform );
 
