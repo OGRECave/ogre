@@ -54,6 +54,9 @@ namespace Ogre
                                                 sizeof( ArrayQuaternion ), MEMCATEGORY_SCENE_OBJECTS ) );
         mDummyTransformPtrs.mDerivedScale       = reinterpret_cast<ArrayVector3*>( OGRE_MALLOC_SIMD(
                                                 sizeof( ArrayVector3 ), MEMCATEGORY_SCENE_OBJECTS ) );
+        mDummyTransformPtrs.mDerivedTransform   = reinterpret_cast<Matrix4*>( OGRE_MALLOC_SIMD(
+                                                sizeof( Matrix4 ) * ARRAY_PACKED_REALS,
+                                                MEMCATEGORY_SCENE_OBJECTS ) );
 
         /*mDummyTransformPtrs.mDerivedTransform = reinterpret_cast<ArrayMatrix4*>( OGRE_MALLOC_SIMD(
                                                 sizeof( ArrayMatrix4 ), MEMCATEGORY_SCENE_OBJECTS ) );
@@ -65,6 +68,8 @@ namespace Ogre
         *mDummyTransformPtrs.mDerivedPosition       = ArrayVector3::ZERO;
         *mDummyTransformPtrs.mDerivedOrientation    = ArrayQuaternion::IDENTITY;
         *mDummyTransformPtrs.mDerivedScale          = ArrayVector3::UNIT_SCALE;
+        for( int i=0; i<ARRAY_PACKED_REALS; ++i )
+            mDummyTransformPtrs.mDerivedTransform[i] = Matrix4::IDENTITY;
 
         mDummyNode = new SceneNode( mDummyTransformPtrs );
     }

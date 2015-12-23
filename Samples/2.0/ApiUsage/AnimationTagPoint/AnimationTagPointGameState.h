@@ -14,9 +14,9 @@ namespace Demo
 {
     class AnimationTagPointGameState : public TutorialGameState
     {
-        Ogre::SceneNode *mSphereNodes[4];
+        Ogre::SceneNode *mSphereNodes[5];
         Ogre::SceneNode *mCubesNode;
-        Ogre::SceneNode *mCubeNodes[4];
+        Ogre::SceneNode *mCubeNodes[5];
 
         Ogre::SkeletonAnimation *mWalkAnimation;
 
