@@ -148,7 +148,7 @@ namespace Ogre
 
     HlmsListener c_defaultListener;
 
-    Hlms::Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder,
+    Hlms::Hlms( HlmsTypes type, const String &typeName, Archive *dataFolder,
                 ArchiveVec *libraryFolders ) :
         mDataFolder( dataFolder ),
         mHlmsManager( 0 ),
@@ -162,7 +162,8 @@ namespace Ogre
         mHighQuality( false ),
         mDefaultDatablock( 0 ),
         mType( type ),
-        mTypeName( typeName )
+        mTypeName( typeName ),
+        mTypeNameStr( typeName )
     {
         memset( mShaderTargets, 0, sizeof(mShaderTargets) );
 

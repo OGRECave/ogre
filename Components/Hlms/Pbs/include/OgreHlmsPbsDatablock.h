@@ -411,6 +411,10 @@ namespace Ogre
         TexturePtr getTexture( PbsTextureTypes texType ) const;
         TexturePtr getTexture( size_t texType ) const;
 
+        /// Returns the internal index to the array in a texture array.
+        /// Note: If there is no texture assigned to the given texType, returned value is undefined
+        uint16 _getTextureIdx( PbsTextureTypes texType ) const          { return mTexIndices[texType]; }
+
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc). If the samplerblock changes,
             this function will always trigger a HlmsDatablock::flushRenderables
@@ -435,6 +439,8 @@ namespace Ogre
         */
         void setTextureUvSource( PbsTextureTypes sourceType, uint8 uvSet );
 
+        uint8 getTextureUvSource( PbsTextureTypes sourceType ) const;
+
         /** Changes the blend mode of the detail map. Calling this function triggers a
             HlmsDatablock::flushRenderables even if you never use detail maps (they
             affect the cache's hash)
@@ -446,6 +452,8 @@ namespace Ogre
             Blend mode
         */
         void setDetailMapBlendMode( uint8 detailMapIdx, PbsBlendModes blendMode );
+
+        PbsBlendModes getDetailMapBlendMode( uint8 detailMapIdx ) const;
 
         /** Sets the normal mapping weight. The range doesn't necessarily have to be in [0; 1]
         @remarks

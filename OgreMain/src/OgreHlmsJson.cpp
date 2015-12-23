@@ -1,4 +1,4 @@
-/*
+﻿/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -33,12 +33,81 @@ THE SOFTWARE.
 #include "OgreHlmsJson.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
+#include "OgreLwString.h"
 #include "OgreLogManager.h"
 
 #include "rapidjson/document.h"
 
 namespace Ogre
 {
+    const char* c_filterOptions[FO_ANISOTROPIC+1] =
+    {
+        "none",
+        "point",
+        "linear",
+        "anisotropic"
+    };
+
+    const char* c_textureAddressingMode[TAM_BORDER+1] =
+    {
+        "wrap",
+        "mirror",
+        "clamp",
+        "border"
+    };
+
+    const char* c_compareFunctions[NUM_COMPARE_FUNCTIONS+1] =
+    {
+        "never",
+        "always",
+        "less",
+        "less_equal",
+        "equal",
+        "not_equal",
+        "greater_equal",
+        "greater",
+        "disabled"
+    };
+
+    const char* c_cullModes[CULL_ANTICLOCKWISE+1] =
+    {
+        "INVALID_CULL_MODE",
+        "none",
+        "clockwise",
+        "anticlockwise"
+    };
+
+    const char* c_polygonModes[PM_SOLID+1] =
+    {
+        "INVALID_POLYGON_MODE",
+        "points",
+        "wireframe",
+        "solid"
+    };
+
+    const char* c_sceneBlendFactor[SBF_ONE_MINUS_SOURCE_ALPHA+1] =
+    {
+        "one",
+        "zero",
+        "dst_colour",
+        "src_colour",
+        "one_minus_dst_colour",
+        "one_minus_src_colour",
+        "dst_alpha",
+        "src_alpha",
+        "one_minus_dst_alpha",
+        "one_minus_src_alpha"
+    };
+
+    const char* c_sceneBlendOperation[SBO_MAX+1] =
+    {
+        "add",
+        "subtract",
+        "reverse_subtract",
+        "min",
+        "max"
+    };
+
     HlmsJson::HlmsJson( HlmsManager *hlmsManager ) :
         mHlmsManager( hlmsManager )
     {
@@ -409,7 +478,7 @@ namespace Ogre
                                                                   HlmsParamVec() );
                 loadDatablockCommon( itor->value, blocks, datablock );
 
-                hlms->loadJson( itor->value, blocks, datablock );
+                hlms->_loadJson( itor->value, blocks, datablock );
             }
 
             ++itor;
@@ -558,6 +627,432 @@ namespace Ogre
 
             blocks.samplerblocks.clear();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toQuotedStr( FilterOptions value, String &outString )
+    {
+        outString += '"';
+        outString += c_filterOptions[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toQuotedStr( TextureAddressingMode value, String &outString )
+    {
+        outString += '"';
+        if( value == TAM_UNKNOWN )
+            value = TAM_WRAP;
+        outString += c_textureAddressingMode[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toQuotedStr( CompareFunction value, String &outString )
+    {
+        outString += '"';
+        outString += c_compareFunctions[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toQuotedStr( CullingMode value, String &outString )
+    {
+        outString += '"';
+        outString += c_cullModes[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toQuotedStr( PolygonMode value, String &outString )
+    {
+        outString += '"';
+        outString += c_polygonModes[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toQuotedStr( SceneBlendFactor value, String &outString )
+    {
+        outString += '"';
+        outString += c_sceneBlendFactor[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toQuotedStr( SceneBlendOperation value, String &outString )
+    {
+        outString += '"';
+        outString += c_sceneBlendOperation[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toStr( const ColourValue &value, String &outString )
+    {
+        outString += '[';
+        outString += StringConverter::toString( value.r );
+        outString += ", ";
+        outString += StringConverter::toString( value.g );
+        outString += ", ";
+        outString += StringConverter::toString( value.b );
+        outString += ", ";
+        outString += StringConverter::toString( value.a );
+        outString += ']';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toStr( const Vector2 &value, String &outString )
+    {
+        outString += '[';
+        outString += StringConverter::toString( value.x );
+        outString += ", ";
+        outString += StringConverter::toString( value.y );
+        outString += ']';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::toStr( const Vector3 &value, String &outString )
+    {
+        outString += '[';
+        outString += StringConverter::toString( value.x );
+        outString += ", ";
+        outString += StringConverter::toString( value.y );
+        outString += ", ";
+        outString += StringConverter::toString( value.z );
+        outString += ']';
+    }
+    //-----------------------------------------------------------------------------------
+    String HlmsJson::getName( const HlmsMacroblock *macroblock ) const
+    {
+        return "\"Macroblock_" + StringConverter::toString( macroblock->mId ) + '"';
+    }
+    //-----------------------------------------------------------------------------------
+    String HlmsJson::getName( const HlmsBlendblock *blendblock ) const
+    {
+        return "\"Blendblock_" + StringConverter::toString( blendblock->mId ) + '"';
+    }
+    //-----------------------------------------------------------------------------------
+    String HlmsJson::getName( const HlmsSamplerblock *samplerblock )
+    {
+        return "\"Samplerblock_" + StringConverter::toString( samplerblock->mId ) + '"';
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsJson::hasCustomShadowMacroblock( const HlmsDatablock *datablock ) const
+    {
+        const HlmsMacroblock *macroblock0 = datablock->getMacroblock( false );
+        //Hard copy
+        HlmsMacroblock macroblock1 = *datablock->getMacroblock( true );
+
+        const bool useBackFaces = mHlmsManager->getShadowMappingUseBackFaces();
+
+        //Revert the flipping
+        if( useBackFaces && macroblock1.mCullMode != CULL_NONE )
+        {
+            macroblock1.mCullMode = macroblock1.mCullMode == CULL_CLOCKWISE ? CULL_ANTICLOCKWISE :
+                                                                              CULL_CLOCKWISE;
+        }
+
+        //Now compare if they're equal
+        return *macroblock0 != macroblock1;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::saveSamplerblock( const HlmsSamplerblock *samplerblock, String &outString )
+    {
+        outString += "\n\t\t";
+        outString += getName( samplerblock );
+        outString += " :\n\t\t{\n";
+
+        outString += "\t\t\t\"min\" : ";
+        toQuotedStr( samplerblock->mMinFilter, outString );
+
+        outString += ",\n\t\t\t\"mag\" : ";
+        toQuotedStr( samplerblock->mMagFilter, outString );
+
+        outString += ",\n\t\t\t\"mip\" : ";
+        toQuotedStr( samplerblock->mMipFilter, outString );
+
+        outString += ",\n\t\t\t\"u\" : ";
+        toQuotedStr( samplerblock->mU, outString );
+
+        outString += ",\n\t\t\t\"v\" : ";
+        toQuotedStr( samplerblock->mV, outString );
+
+        outString += ",\n\t\t\t\"w\" : ";
+        toQuotedStr( samplerblock->mW, outString );
+
+        outString += ",\n\t\t\t\"miplodbias\" : ";
+        outString += StringConverter::toString( samplerblock->mMipLodBias );
+
+        outString += ",\n\t\t\t\"max_anisotropic\" : ";
+        outString += StringConverter::toString( samplerblock->mMaxAnisotropy );
+
+        outString += ",\n\t\t\t\"compare_function\" : ";
+        toQuotedStr( samplerblock->mCompareFunction, outString );
+
+        outString += ",\n\t\t\t\"border\" :";
+        toStr( samplerblock->mBorderColour, outString );
+
+        outString += ",\n\t\t\t\"min_lod\" : ";
+        outString += StringConverter::toString( samplerblock->mMinLod );
+
+        outString += ",\n\t\t\t\"max_lod\" : ";
+        outString += StringConverter::toString( samplerblock->mMaxLod );
+
+        outString += "\n\t\t},";
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::saveMacroblock( const HlmsMacroblock *macroblock, String &outString )
+    {
+        outString += "\n\t\t";
+        outString += getName( macroblock );
+        outString += " :\n\t\t{\n";
+
+        outString += "\t\t\t\"scissor_test\" : ";
+        outString += macroblock->mScissorTestEnabled ? "true" : "false";
+
+        outString += ",\n\t\t\t\"depth_check\" : ";
+        outString += macroblock->mDepthCheck ? "true" : "false";
+
+        outString += ",\n\t\t\t\"depth_write\" : ";
+        outString += macroblock->mDepthWrite ? "true" : "false";
+
+        outString += ",\n\t\t\t\"depth_function\" : ";
+        toQuotedStr( macroblock->mDepthFunc, outString );
+
+        outString += ",\n\t\t\t\"depth_bias_constant\" : ";
+        outString += StringConverter::toString( macroblock->mDepthBiasConstant );
+
+        outString += ",\n\t\t\t\"depth_bias_slope_scale\" : ";
+        outString += StringConverter::toString( macroblock->mDepthBiasSlopeScale );
+
+        outString += ",\n\t\t\t\"cull_mode\" : ";
+        toQuotedStr( macroblock->mCullMode, outString );
+
+        outString += ",\n\t\t\t\"polygon_mode\" : ";
+        toQuotedStr( macroblock->mPolygonMode, outString );
+
+        outString += "\n\t\t},";
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::saveBlendblock( const HlmsBlendblock *blendblock, String &outString )
+    {
+        outString += "\n\t\t";
+        outString += getName( blendblock );
+        outString += " :\n\t\t{\n";
+
+        outString += "\t\t\t\"alpha_to_coverage\" : ";
+        outString += blendblock->mAlphaToCoverageEnabled ? "true" : "false";
+
+        outString += ",\n\t\t\t\"blendmask\" : \"";
+        if( blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelRed )
+            outString += 'r';
+        if( blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelGreen )
+            outString += 'g';
+        if( blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelBlue )
+            outString += 'b';
+        if( blendblock->mBlendChannelMask & HlmsBlendblock::BlendChannelAlpha )
+            outString += 'a';
+        outString += "\"";
+
+        outString += ",\n\t\t\t\"separate_blend\" : ";
+        outString += blendblock->mSeparateBlend ? "true" : "false";
+
+        outString += ",\n\t\t\t\"src_blend_factor\" : ";
+        toQuotedStr( blendblock->mSourceBlendFactor, outString );
+
+        outString += ",\n\t\t\t\"dst_blend_factor\" : ";
+        toQuotedStr( blendblock->mDestBlendFactor, outString );
+
+        if( blendblock->mSeparateBlend )
+        {
+            outString += ",\n\t\t\t\"src_alpha_blend_factor\" : ";
+            toQuotedStr( blendblock->mSourceBlendFactorAlpha, outString );
+
+            outString += ",\n\t\t\t\"dst_alpha_blend_factor\" : ";
+            toQuotedStr( blendblock->mDestBlendFactorAlpha, outString );
+        }
+
+        outString += ",\n\t\t\t\"blend_operation\" : ";
+        toQuotedStr( blendblock->mBlendOperation, outString );
+
+        if( blendblock->mSeparateBlend )
+        {
+            outString += ",\n\t\t\t\"blend_operation_alpha\" : ";
+            toQuotedStr( blendblock->mBlendOperationAlpha, outString );
+        }
+
+        outString += "\n\t\t},";
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::saveDatablock( const String &fullName, const HlmsDatablock *datablock,
+                                  String &outString )
+    {
+        outString += "\n\n\t\t\"";
+        outString += fullName;
+        outString += "\" :\n\t\t{\n";
+
+        outString += "\t\t\t\"macroblock\" : ";
+
+        if( hasCustomShadowMacroblock( datablock ) )
+        {
+            outString += '[';
+            outString += getName( datablock->getMacroblock(false) );
+            outString += ", ";
+            outString += getName( datablock->getMacroblock(true) );
+            outString += ']';
+        }
+        else
+        {
+            outString += getName( datablock->getMacroblock() );
+        }
+
+        outString += ",\n\t\t\t\"blendblock\" : ";
+
+        if( datablock->getBlendblock( false ) != datablock->getBlendblock( true ) )
+        {
+            outString += '[';
+            outString += getName( datablock->getBlendblock(false) );
+            outString += ", ";
+            outString += getName( datablock->getBlendblock(true) );
+            outString += ']';
+        }
+        else
+        {
+            outString += getName( datablock->getBlendblock() );
+        }
+
+        if( datablock->getAlphaTest() != CMPF_ALWAYS_PASS )
+        {
+            outString += ",\n\t\t\t\"alpha_test\" : ";
+            outString += '[';
+            toQuotedStr( datablock->getAlphaTest(), outString );
+            outString += ", ";
+            outString += StringConverter::toString( datablock->getAlphaTestThreshold() );
+            outString += ']';
+        }
+
+        outString += ",\n\t\t\t\"shadow_const_bias\" : ";
+        outString += StringConverter::toString( datablock->mShadowConstantBias );
+
+        const Hlms *hlms = datablock->getCreator();
+        hlms->_saveJson( datablock, outString );
+
+        outString += "\n\t\t},";
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::saveMaterials( const Hlms *hlms, String &outString )
+    {
+        outString += "{";
+
+        const Hlms::HlmsDatablockMap &datablockMap = hlms->getDatablockMap();
+
+        set<const HlmsMacroblock*>::type macroblocks;
+        set<const HlmsBlendblock*>::type blendblocks;
+        set<const HlmsSamplerblock*>::type samplerblocks;
+
+        {
+            Hlms::HlmsDatablockMap::const_iterator itor = datablockMap.begin();
+            Hlms::HlmsDatablockMap::const_iterator end  = datablockMap.end();
+
+            while( itor != end )
+            {
+                const HlmsDatablock *datablock = itor->second.datablock;
+
+                const HlmsMacroblock *macroblock = datablock->getMacroblock( false );
+                macroblocks.insert( macroblock );
+
+                if( hasCustomShadowMacroblock( datablock ) )
+                    macroblocks.insert( datablock->getMacroblock( true ) );
+
+                const HlmsBlendblock *blendblock = datablock->getBlendblock( false );
+                blendblocks.insert( blendblock );
+
+                const HlmsBlendblock *blendblockCaster = datablock->getBlendblock( true );
+                if( blendblock != blendblockCaster )
+                    blendblocks.insert( blendblockCaster );
+
+                hlms->_collectSamplerblocks( samplerblocks, datablock );
+
+                ++itor;
+            }
+        }
+
+        {
+            set<const HlmsSamplerblock*>::type::const_iterator itor = samplerblocks.begin();
+            set<const HlmsSamplerblock*>::type::const_iterator end  = samplerblocks.end();
+
+            if( !samplerblocks.empty() )
+                outString += "\n\t\"samplerblocks\" :\n\t{";
+
+            while( itor != end )
+                saveSamplerblock( *itor++, outString );
+
+            if( !samplerblocks.empty() )
+            {
+                outString.erase( outString.size() - 1 ); //Remove an extra comma
+                outString += "\n\t},";
+            }
+        }
+
+        {
+            set<const HlmsMacroblock*>::type::const_iterator itor = macroblocks.begin();
+            set<const HlmsMacroblock*>::type::const_iterator end  = macroblocks.end();
+
+            if( !macroblocks.empty() )
+                outString += "\n\n\t\"macroblocks\" :\n\t{";
+
+            while( itor != end )
+                saveMacroblock( *itor++, outString );
+
+            if( !macroblocks.empty() )
+            {
+                outString.erase( outString.size() - 1 ); //Remove an extra comma
+                outString += "\n\t},";
+            }
+        }
+
+        {
+            set<const HlmsBlendblock*>::type::const_iterator itor = blendblocks.begin();
+            set<const HlmsBlendblock*>::type::const_iterator end  = blendblocks.end();
+
+            if( !blendblocks.empty() )
+                outString += "\n\n\t\"blendblocks\" :\n\t{";
+
+            while( itor != end )
+                saveBlendblock( *itor++, outString );
+
+            if( !blendblocks.empty() )
+            {
+                outString.erase( outString.size() - 1 ); //Remove an extra comma
+                outString += "\n\t},";
+            }
+        }
+
+        {
+            if( !datablockMap.empty() )
+            {
+                outString += "\n\n\t\"";
+                outString += hlms->getTypeNameStr();
+                outString += "\" : \n\t{";
+            }
+
+            const HlmsDatablock *defaultDatablock = hlms->getDefaultDatablock();
+
+            Hlms::HlmsDatablockMap::const_iterator itor = datablockMap.begin();
+            Hlms::HlmsDatablockMap::const_iterator end  = datablockMap.end();
+
+            while( itor != end )
+            {
+                const HlmsDatablock *datablock = itor->second.datablock;
+
+                if( datablock != defaultDatablock )
+                    saveDatablock( itor->second.name, datablock, outString );
+                ++itor;
+            }
+
+            if( !datablockMap.empty() )
+            {
+                outString.erase( outString.size() - 1 ); //Remove an extra comma
+                outString += "\n\t},";
+            }
+        }
+
+        outString.erase( outString.size() - 1 ); //Remove an extra comma
+        if( !outString.empty() )
+            outString += "\n}";
+        else
+            outString += "{}";
     }
 }
 #endif

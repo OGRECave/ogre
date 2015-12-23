@@ -227,6 +227,7 @@ namespace Ogre
 
 #if !OGRE_NO_JSON
         void loadMaterials( const String &filename, const char *jsonString );
+        void saveMaterials( HlmsTypes hlmsType,const String &filename );
 
         //ScriptLoader overloads
         virtual void parseScript(DataStreamPtr& stream, const String& groupName);

@@ -73,7 +73,7 @@ namespace Ogre
     public:
         LwConstString( const char *inStr, size_t maxLength ) :
             mStrPtr( const_cast<char*>( inStr ) ),
-            mSize( strlen( inStr ) ),
+            mSize( strnlen( inStr, maxLength ) ),
             mCapacity( maxLength )
         {
             //mSize < mCapacity and not mSize <= mCapacity

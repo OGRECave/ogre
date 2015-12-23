@@ -665,6 +665,32 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    const String* HlmsTextureManager::findAliasName( const TextureLocation &textureLocation ) const
+    {
+        const String *retVal = 0;
+
+        for( size_t i=0; i<NUM_TEXTURE_TYPES && !retVal; ++i )
+        {
+            TextureArrayVec::const_iterator itor = mTextureArrays[i].begin();
+            TextureArrayVec::const_iterator end  = mTextureArrays[i].end();
+
+            while( itor != end && !retVal )
+            {
+                if( itor->texture == textureLocation.texture )
+                {
+                    size_t idx = textureLocation.yIdx * itor->sqrtMaxTextures + textureLocation.xIdx;
+
+                    if( idx < itor->entries.size() )
+                        retVal = &itor->entries[idx];
+                }
+
+                ++itor;
+            }
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     bool HlmsTextureManager::getTexturePackParameters( const HlmsTexturePack &pack, uint32 &outWidth,
                                                        uint32 &outHeight, uint32 &outDepth,
                                                        PixelFormat &outPixelFormat ) const

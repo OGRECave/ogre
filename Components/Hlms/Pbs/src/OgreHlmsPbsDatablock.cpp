@@ -470,7 +470,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Vector3 HlmsPbsDatablock::getDiffuse(void) const
     {
-        return Vector3( mkDr, mkDg, mkDb );
+        return Vector3( mkDr, mkDg, mkDb ) * Ogre::Math::PI;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setSpecular( const Vector3 &specularColour )
@@ -715,6 +715,12 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    uint8 HlmsPbsDatablock::getTextureUvSource( PbsTextureTypes sourceType ) const
+    {
+        assert( sourceType < NUM_PBSM_SOURCES );
+        return mUvSource[sourceType];
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDetailMapBlendMode( uint8 detailMapIdx, PbsBlendModes blendMode )
     {
         assert( detailMapIdx < 4 );
@@ -724,6 +730,12 @@ namespace Ogre
             mBlendModes[detailMapIdx] = blendMode;
             flushRenderables();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    PbsBlendModes HlmsPbsDatablock::getDetailMapBlendMode( uint8 detailMapIdx ) const
+    {
+        assert( detailMapIdx < 4 );
+        return static_cast<PbsBlendModes>( mBlendModes[detailMapIdx] );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDetailNormalWeight( uint8 detailNormalMapIdx, Real weight )

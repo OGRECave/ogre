@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -35,11 +35,26 @@ THE SOFTWARE.
 #include "OgreHlmsTextureManager.h"
 #include "OgreTextureManager.h"
 
+#include "OgreLwString.h"
+
 #include "rapidjson/document.h"
 
 namespace Ogre
 {
     extern const String c_pbsBlendModes[];
+
+    const char* c_workflows[HlmsPbsDatablock::MetallicWorkflow+1] =
+    {
+        "specular_ogre",
+        "specular_fresnel",
+        "metallic"
+    };
+    const char* c_transparencyModes[HlmsPbsDatablock::Fade+1] =
+    {
+        "None",
+        "Transparent",
+        "Fade"
+    };
 
     HlmsJsonPbs::HlmsJsonPbs( HlmsManager *hlmsManager ) :
         mHlmsManager( hlmsManager )
@@ -423,6 +438,270 @@ namespace Ogre
         }
 
         pbsDatablock->_setTextures( packedTextures );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::toQuotedStr( HlmsPbsDatablock::Workflows value, String &outString )
+    {
+        outString += '"';
+        outString += c_workflows[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::toQuotedStr( HlmsPbsDatablock::TransparencyModes value, String &outString )
+    {
+        outString += '"';
+        outString += c_transparencyModes[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveFresnel( const HlmsPbsDatablock *datablock, String &outString )
+    {
+        saveTexture( datablock->getFresnel(), "fresnel", PBSM_SPECULAR,
+                     true, true, true,
+                     datablock->getWorkflow() == HlmsPbsDatablock::SpecularAsFresnelWorkflow,
+                     datablock, outString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveTexture( const char *blockName,
+                                   PbsTextureTypes textureType,
+                                   const HlmsPbsDatablock *datablock, String &outString,
+                                   bool writeTexture )
+    {
+        saveTexture( Vector3( 0.0f ), blockName, textureType,
+                     false, false, false, writeTexture, datablock, outString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveTexture( float value, const char *blockName,
+                                   PbsTextureTypes textureType,
+                                   const HlmsPbsDatablock *datablock, String &outString,
+                                   bool writeTexture )
+    {
+        saveTexture( Vector3( value ), blockName, textureType,
+                     true, true, false, writeTexture, datablock, outString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveTexture( const Vector3 &value, const char *blockName,
+                                   PbsTextureTypes textureType,
+                                   const HlmsPbsDatablock *datablock, String &outString,
+                                   bool writeTexture )
+    {
+        saveTexture( value, blockName, textureType,
+                     true, false, false, writeTexture, datablock, outString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveTexture( const Vector3 &value, const char *blockName,
+                                   PbsTextureTypes textureType,
+                                   bool writeValue, bool scalarValue, bool isFresnel, bool writeTexture,
+                                   const HlmsPbsDatablock *datablock, String &outString )
+    {
+        outString += ",\n\t\t\t\"";
+        outString += blockName;
+        outString += "\" :\n\t\t\t{\n";
+
+        const size_t currentOffset = outString.size();
+
+        if( isFresnel )
+            scalarValue = !datablock->hasSeparateFresnel();
+
+        if( writeValue )
+        {
+            outString += "\t\t\t\t\"value\" : ";
+            if( scalarValue )
+                outString += StringConverter::toString( value.x );
+            else
+            {
+                HlmsJson::toStr( value, outString );
+            }
+        }
+
+        if( isFresnel )
+        {
+            if( datablock->hasSeparateFresnel() )
+                outString += ",\n\t\t\t\t\"mode\" : \"coloured\"";
+            else
+                outString += ",\n\t\t\t\t\"mode\" : \"coeff\"";
+        }
+
+        if( textureType >= PBSM_DETAIL0 && textureType <= PBSM_DETAIL3_NM )
+        {
+            if( textureType >= PBSM_DETAIL0 && textureType <= PBSM_DETAIL3 )
+            {
+                PbsBlendModes blendMode = datablock->getDetailMapBlendMode( textureType - PBSM_DETAIL0 );
+
+                if( blendMode != PBSM_BLEND_NORMAL_NON_PREMUL )
+                {
+                    outString += ",\n\t\t\t\t\"mode\" : \"";
+                    outString += c_pbsBlendModes[blendMode];
+                    outString += '"';
+                }
+            }
+
+            const Vector4 &offsetScale =
+                    datablock->getDetailMapOffsetScale( textureType - PBSM_DETAIL0 );
+            const Vector2 offset( offsetScale.x, offsetScale.y );
+            const Vector2 scale( offsetScale.z, offsetScale.w );
+
+            if( offset != Vector2::ZERO )
+            {
+                outString += ",\n\t\t\t\t\"offset\" : ";
+                HlmsJson::toStr( offset, outString );
+            }
+
+            if( scale != Vector2::UNIT_SCALE )
+            {
+                outString += ",\n\t\t\t\t\"scale\" : ";
+                HlmsJson::toStr( scale, outString );
+            }
+        }
+
+        if( writeTexture )
+        {
+            HlmsTextureManager::TextureLocation texLocation;
+            texLocation.texture = datablock->getTexture( textureType );
+            if( !texLocation.texture.isNull() )
+            {
+                texLocation.xIdx = datablock->_getTextureIdx( textureType );
+                texLocation.yIdx = 0;
+                texLocation.divisor = 1;
+
+                const String *texName = mHlmsManager->getTextureManager()->findAliasName( texLocation );
+
+                if( texName )
+                {
+                    outString += ",\n\t\t\t\t\"texture\" : \"";
+                    outString += *texName;
+                    outString += '"';
+                }
+            }
+
+            const HlmsSamplerblock *samplerblock = datablock->getSamplerblock( textureType );
+            if( samplerblock )
+            {
+                outString += ",\n\t\t\t\t\"sampler\" : ";
+                outString += HlmsJson::getName( samplerblock );
+            }
+
+            if( datablock->getTextureUvSource( textureType ) != 0 )
+            {
+                outString += ",\n\t\t\t\t\"uv\" : ";
+                outString += StringConverter::toString( datablock->getTextureUvSource( textureType ) );
+            }
+        }
+
+        if( !writeValue && outString.size() != currentOffset )
+        {
+            //Remove an extra comma and newline characters.
+            outString.erase( currentOffset, 2 );
+        }
+
+        outString += "\n\t\t\t}";
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveMaterial( const HlmsDatablock *datablock, String &outString )
+    {
+        assert( dynamic_cast<const HlmsPbsDatablock*>(datablock) );
+        const HlmsPbsDatablock *pbsDatablock = static_cast<const HlmsPbsDatablock*>(datablock);
+
+        outString += ",\n\t\t\t\"workflow\" : ";
+        toQuotedStr( pbsDatablock->getWorkflow(), outString );
+
+        if( pbsDatablock->getTransparencyMode() != HlmsPbsDatablock::None )
+        {
+            outString += "\n\t\t\t\"transparency\" :\n\t\t\t{";
+            outString += "\n\t\t\t\t\"value\" : ";
+            outString += StringConverter::toString( pbsDatablock->getTransparency() );
+            outString += "\n\t\t\t\t\"mode\" : ";
+            toQuotedStr( pbsDatablock->getTransparencyMode(), outString );
+            outString += "\n\t\t\t\t\"use_alpha_from_textures\" : ";
+            outString += pbsDatablock->getUseAlphaFromTextures() ? "true" : "false";
+            outString += "\n\t\t\t}";
+        }
+
+        saveTexture( pbsDatablock->getDiffuse(), "diffuse", PBSM_DIFFUSE,
+                     pbsDatablock, outString );
+        saveTexture( pbsDatablock->getSpecular(), "specular", PBSM_SPECULAR,
+                     pbsDatablock, outString,
+                     pbsDatablock->getWorkflow() == HlmsPbsDatablock::SpecularWorkflow );
+        saveFresnel( pbsDatablock, outString );
+        if( pbsDatablock->getWorkflow() == HlmsPbsDatablock::MetallicWorkflow )
+        {
+            saveTexture( pbsDatablock->getMetallness(), "metallness", PBSM_METALLIC,
+                         pbsDatablock, outString );
+        }
+
+        if( pbsDatablock->getNormalMapWeight() != 1.0f ||
+            !pbsDatablock->getTexture( PBSM_NORMAL ).isNull() )
+        {
+            saveTexture( pbsDatablock->getNormalMapWeight(), "normal", PBSM_NORMAL,
+                         pbsDatablock, outString );
+        }
+
+        saveTexture( pbsDatablock->getRoughness(), "roughness", PBSM_ROUGHNESS,
+                     pbsDatablock, outString );
+
+        if( !pbsDatablock->getTexture( PBSM_DETAIL_WEIGHT ).isNull() )
+            saveTexture( "detail_weight", PBSM_DETAIL_WEIGHT, pbsDatablock, outString );
+
+        for( int i=0; i<4; ++i )
+        {
+            PbsBlendModes blendMode = pbsDatablock->getDetailMapBlendMode( i );
+            const Vector4 &offsetScale = pbsDatablock->getDetailMapOffsetScale( i );
+            const Vector2 offset( offsetScale.x, offsetScale.y );
+            const Vector2 scale( offsetScale.z, offsetScale.w );
+
+            const PbsTextureTypes textureType = static_cast<PbsTextureTypes>(PBSM_DETAIL0 + i);
+
+            if( blendMode != PBSM_BLEND_NORMAL_NON_PREMUL || offset != Vector2::ZERO ||
+                scale != Vector2::UNIT_SCALE || pbsDatablock->getDetailMapWeight( i ) != 1.0f ||
+                !pbsDatablock->getTexture( textureType ).isNull() )
+            {
+                char tmpBuffer[64];
+                LwString blockName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+
+                blockName.a( "detail_diffuse", i );
+
+                saveTexture( pbsDatablock->getDetailMapWeight( i ), blockName.c_str(),
+                             static_cast<PbsTextureTypes>(PBSM_DETAIL0 + i), pbsDatablock,
+                             outString );
+            }
+        }
+
+        for( int i=0; i<4; ++i )
+        {
+            const Vector4 &offsetScale = pbsDatablock->getDetailMapOffsetScale( i + 4 );
+            const Vector2 offset( offsetScale.x, offsetScale.y );
+            const Vector2 scale( offsetScale.z, offsetScale.w );
+
+            const PbsTextureTypes textureType = static_cast<PbsTextureTypes>(PBSM_DETAIL0_NM + i);
+
+            if( offset != Vector2::ZERO || scale != Vector2::UNIT_SCALE ||
+                pbsDatablock->getDetailNormalWeight( i ) != 1.0f ||
+                !pbsDatablock->getTexture( textureType ).isNull() )
+            {
+                char tmpBuffer[64];
+                LwString blockName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+
+                blockName.a( "detail_normal", i );
+                saveTexture( pbsDatablock->getDetailNormalWeight( i ), blockName.c_str(),
+                             static_cast<PbsTextureTypes>(PBSM_DETAIL0_NM + i), pbsDatablock,
+                             outString );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::collectSamplerblocks( const HlmsDatablock *datablock,
+                                            set<const HlmsSamplerblock*>::type &outSamplerblocks )
+    {
+        assert( dynamic_cast<const HlmsPbsDatablock*>(datablock) );
+        const HlmsPbsDatablock *pbsDatablock = static_cast<const HlmsPbsDatablock*>(datablock);
+
+        for( int i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+        {
+            const PbsTextureTypes textureType = static_cast<PbsTextureTypes>( i );
+            const HlmsSamplerblock *samplerblock = pbsDatablock->getSamplerblock( textureType );
+            if( samplerblock )
+                outSamplerblocks.insert( samplerblock );
+        }
     }
 }
 

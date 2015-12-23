@@ -522,6 +522,19 @@ namespace Ogre
         hlmsJson.loadMaterials( filename, jsonString );
     }
     //-----------------------------------------------------------------------------------
+    void HlmsManager::saveMaterials( HlmsTypes hlmsType, const String &filename )
+    {
+        assert( hlmsType != HLMS_MAX );
+        String jsonString;
+        HlmsJson hlmsJson( this );
+        hlmsJson.saveMaterials( mRegisteredHlms[hlmsType], jsonString );
+
+        std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out );
+        if( file.is_open() )
+            file.write( jsonString.c_str(), jsonString.size() );
+        file.close();
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsManager::parseScript(DataStreamPtr& stream, const String& groupName)
     {
         vector<char>::type fileData;

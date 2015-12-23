@@ -116,6 +116,12 @@ namespace Ogre
             mStrPtr[mCapacity-1] = '\0';
         }
 
+        static LwString FromEmptyPointer( char *cStr, size_t maxLength )
+        {
+            cStr[0] = '\0';
+            return LwString( cStr, maxLength );
+        }
+
         /// Takes a subset from source in the range [_start; _start + size),
         /// and copies it to our string.
         void setToSubstr( const LwString &source, size_t _start, size_t size )
