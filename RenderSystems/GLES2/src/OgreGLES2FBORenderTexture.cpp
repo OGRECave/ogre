@@ -449,6 +449,10 @@ namespace Ogre {
         size_t bestmode = 0;
         int bestscore = -1;
         bool requestDepthOnly = internalFormat == PF_DEPTH;
+
+        GLES2Support* glSupport = getGLES2SupportRef();
+        bool hasPackedStencil = glSupport->checkExtension("GL_OES_packed_depth_stencil") || glSupport->hasMinGLVersion(3, 0);
+
         for(size_t mode = 0; mode < props.modes.size(); mode++)
         {
             int desirability = 0;
@@ -464,7 +468,7 @@ namespace Ogre {
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-            if (getGLES2SupportRef()->checkExtension("GL_OES_packed_depth_stencil") || gleswIsSupported(3, 0))
+            if (hasPackedStencil)
                 if(depthFormats[props.modes[mode].depth] == GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed
                     desirability += 5000;
 #if OGRE_NO_GLES3_SUPPORT == 0

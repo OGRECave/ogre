@@ -112,6 +112,9 @@ namespace Ogre {
             /// Check if the GL system has already been initialised
             bool mGLInitialised;
 
+            // check if GLES 3.0 is supported
+            bool mHasGLES30;
+
             // local data member of _render that were moved here to improve performance
             // (save allocations)
             vector<GLuint>::type mRenderAttribsBound;
