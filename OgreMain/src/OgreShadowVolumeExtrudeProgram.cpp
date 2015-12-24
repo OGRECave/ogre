@@ -711,15 +711,16 @@ static const String glsles_prefix = "precision highp float;\
         }";
 
     String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl =
-        "uniform mat4 worldViewProj; \
-        attribute vec4 inPos; \
-        varying vec4 uv0; \
-        \
-        void main() {\
-            gl_Position = worldViewProj*inPos; \
-            inPos.xy = sign(inPos.xy); \
-            uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f; \
-        }";
+        "uniform mat4 worldViewProj; \n"
+        "attribute vec4 inPos; \n"
+        "varying vec2 uv0; \n"
+        "\n"
+        "void main() {\n"
+        "    gl_Position = worldViewProj*inPos; \n"
+        "    uv0.x = inPos.x < 0.0 ? -1.0 :  1.0;\n"
+        "    uv0.y = inPos.y < 0.0 ?  1.0 : -1.0;\n"
+        "    uv0 = (uv0 + 1.0) * 0.5; \n"
+        "}";
 
 
 
