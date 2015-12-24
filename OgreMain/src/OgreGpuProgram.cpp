@@ -311,6 +311,29 @@ namespace Ogre
         return mDefaultParams;
     }
     //-----------------------------------------------------------------------------
+    const String GpuProgram::getProgramTypeName(GpuProgramType programType)
+    {
+        switch (programType)
+        {
+        case GPT_VERTEX_PROGRAM:
+            return "vertex";
+        case GPT_GEOMETRY_PROGRAM:
+            return "geometry";
+        case GPT_FRAGMENT_PROGRAM:
+            return "fragment";
+        case GPT_DOMAIN_PROGRAM:
+            return "domain";
+        case GPT_HULL_PROGRAM:
+            return "hull";
+        case GPT_COMPUTE_PROGRAM:
+            return "compute";
+        default:
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Unexpected GPU program type",
+                "GpuProgram::GetName");
+        }
+    }
+    //-----------------------------------------------------------------------------
     void GpuProgram::setupBaseParamDictionary(void)
     {
         ParamDictionary* dict = getParamDictionary();

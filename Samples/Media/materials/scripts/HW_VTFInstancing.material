@@ -250,21 +250,6 @@ vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_hlsl_vs hlsl
 		param_named			matrixTexture				int 2
 	}
 }
-
-vertex_program Ogre/Instancing/VTF/HW/shadow_caster_dq_two_weights_glsles_vs glsles
-{
-	source HW_VTFInstancing.vert
-
-	preprocessor_defines ST_DUAL_QUATERNION,BONE_TWO_WEIGHTS,DEPTH_SHADOWCASTER=1
-
-	uses_vertex_texture_fetch true
-
-	default_params
-	{
-		param_named			matrixTexture				int 0
-	}
-}
-
 //--------------------------------------------------------------
 // CG Programs
 //--------------------------------------------------------------
