@@ -120,9 +120,34 @@ namespace Ogre
         HlmsJson( HlmsManager *hlmsManager );
         ~HlmsJson();
 
+        /** Loads all Hlms datablocks from a JSON formatted string.
+        @remarks
+            Will throw ERR_INVALIDPARAMS if JSON is invalid.
+        @param filename
+            Name of the file. It's only used for providing additional
+            info on the log about where it is failing.
+        @param jsonString
+            Null-terminated C string (UTF8) containing
+            valid JSON with the Hlms definitions.
+        */
         void loadMaterials( const String &filename, const char *jsonString );
 
+        /** Saves all the Datablocks defined in the given
+            Hlms into a JSON formatted string.
+        @param hlms
+            Hlms from whose materials to save.
+        @param outString [out]
+            String with valid JSON output. String is appended to existing contents.
+        */
         void saveMaterials( const Hlms *hlms, String &outString );
+
+        /** Saves a single datablock to a string
+        @param datablock
+            Material to save.
+        @param outString [out]
+            String with valid JSON output. String is appended to existing contents.
+        */
+        void saveMaterial( const HlmsDatablock *datablock, String &outString );
     };
     /** @} */
     /** @} */

@@ -1054,5 +1054,109 @@ namespace Ogre
         else
             outString += "{}";
     }
+    //-----------------------------------------------------------------------------------
+    void HlmsJson::saveMaterial( const HlmsDatablock *datablock, String &outString )
+    {
+        outString += "{";
+
+        const Hlms *hlms = datablock->getCreator();
+
+        set<const HlmsMacroblock*>::type macroblocks;
+        set<const HlmsBlendblock*>::type blendblocks;
+        set<const HlmsSamplerblock*>::type samplerblocks;
+
+        {
+            const HlmsMacroblock *macroblock = datablock->getMacroblock( false );
+            macroblocks.insert( macroblock );
+
+            if( hasCustomShadowMacroblock( datablock ) )
+                macroblocks.insert( datablock->getMacroblock( true ) );
+
+            const HlmsBlendblock *blendblock = datablock->getBlendblock( false );
+            blendblocks.insert( blendblock );
+
+            const HlmsBlendblock *blendblockCaster = datablock->getBlendblock( true );
+            if( blendblock != blendblockCaster )
+                blendblocks.insert( blendblockCaster );
+
+            hlms->_collectSamplerblocks( samplerblocks, datablock );
+        }
+
+        {
+            set<const HlmsSamplerblock*>::type::const_iterator itor = samplerblocks.begin();
+            set<const HlmsSamplerblock*>::type::const_iterator end  = samplerblocks.end();
+
+            if( !samplerblocks.empty() )
+                outString += "\n\t\"samplerblocks\" :\n\t{";
+
+            while( itor != end )
+                saveSamplerblock( *itor++, outString );
+
+            if( !samplerblocks.empty() )
+            {
+                outString.erase( outString.size() - 1 ); //Remove an extra comma
+                outString += "\n\t},";
+            }
+        }
+
+        {
+            set<const HlmsMacroblock*>::type::const_iterator itor = macroblocks.begin();
+            set<const HlmsMacroblock*>::type::const_iterator end  = macroblocks.end();
+
+            if( !macroblocks.empty() )
+                outString += "\n\n\t\"macroblocks\" :\n\t{";
+
+            while( itor != end )
+                saveMacroblock( *itor++, outString );
+
+            if( !macroblocks.empty() )
+            {
+                outString.erase( outString.size() - 1 ); //Remove an extra comma
+                outString += "\n\t},";
+            }
+        }
+
+        {
+            set<const HlmsBlendblock*>::type::const_iterator itor = blendblocks.begin();
+            set<const HlmsBlendblock*>::type::const_iterator end  = blendblocks.end();
+
+            if( !blendblocks.empty() )
+                outString += "\n\n\t\"blendblocks\" :\n\t{";
+
+            while( itor != end )
+                saveBlendblock( *itor++, outString );
+
+            if( !blendblocks.empty() )
+            {
+                outString.erase( outString.size() - 1 ); //Remove an extra comma
+                outString += "\n\t},";
+            }
+        }
+
+        {
+            outString += "\n\n\t\"";
+            outString += hlms->getTypeNameStr();
+            outString += "\" : \n\t{";
+
+            String datablockName = "[Unnamed]";
+
+            {
+                const String *fullName = datablock->getFullName();
+                if( fullName )
+                    datablockName = *fullName;
+            }
+
+            saveDatablock( datablockName, datablock, outString );
+
+            outString.erase( outString.size() - 1 ); //Remove an extra comma
+            outString += "\n\t},";
+        }
+
+        outString.erase( outString.size() - 1 ); //Remove an extra comma
+        if( !outString.empty() )
+            outString += "\n}";
+        else
+            outString += "{}";
+    }
 }
 #endif

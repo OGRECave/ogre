@@ -227,7 +227,22 @@ namespace Ogre
 
 #if !OGRE_NO_JSON
         void loadMaterials( const String &filename, const char *jsonString );
+
+        /** Saves all materials of the registered Hlms at the given file location.
+        @param hlmsType
+            Hlms type. The type must be registered, otherwise it may crash.
+        @param filename
+            Valid file path.
+        */
         void saveMaterials( HlmsTypes hlmsType,const String &filename );
+
+        /** Saves a specific Hlms material at the given file location.
+        @param datablock
+            Datablock/Material to save
+        @param filename
+            Valid file path.
+        */
+        void saveMaterial( const HlmsDatablock *datablock, const String &filename );
 
         //ScriptLoader overloads
         virtual void parseScript(DataStreamPtr& stream, const String& groupName);
