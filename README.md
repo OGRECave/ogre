@@ -1,3 +1,6 @@
+Travis [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre)
+Appveyor [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
+
 <p class="header" align="center"><img alt="" src="Docs/ogre-logo-wetfloor.gif" width="235" height="78"></p>
 
 ## Summary
