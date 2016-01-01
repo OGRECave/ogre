@@ -64,12 +64,12 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     ResourcePtr BspResourceManager::load(const String& name, 
         const String& group, bool isManual, 
-        ManualResourceLoader* loader, const NameValuePairList* loadParams)
+        ManualResourceLoader* loader, const NameValuePairList* loadParams, bool backgroundThread)
     {
         // Only 1 BSP level allowed loaded at once
         removeAll();
 
-        return ResourceManager::load(name, group, isManual, loader, loadParams);
+        return ResourceManager::load(name, group, isManual, loader, loadParams, backgroundThread);
 
     }
     //-----------------------------------------------------------------------

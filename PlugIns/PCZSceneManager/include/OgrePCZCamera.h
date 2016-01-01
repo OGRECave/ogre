@@ -51,6 +51,7 @@ namespace Ogre
 
     class _OgrePCZPluginExport PCZCamera : public Camera
     {
+        using Camera::isVisible;
     public:
         /** Visibility types */
         enum Visibility
