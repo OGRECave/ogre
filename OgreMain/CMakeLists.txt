@@ -15,6 +15,11 @@ PROJECT(OgreMain)
 
 include(PrecompiledHeader)
 
+if(UNIX)
+    # this is abused way to much in OgreMain
+    add_definitions(-Wno-overloaded-virtual)
+endif()
+
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h" "${CMAKE_CURRENT_SOURCE_DIR}/include/Hash/*.h")
 list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h

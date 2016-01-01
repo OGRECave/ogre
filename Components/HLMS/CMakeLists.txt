@@ -13,6 +13,11 @@
 
 PROJECT(OgreHLMS)
 
+if(UNIX)
+    # this is abused way to much in OgreMain
+    add_definitions(-Wno-overloaded-virtual)
+endif()
+
 # define header and source files for the library
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
@@ -39,4 +44,3 @@ ogre_config_component(OgreHLMS)
 install(FILES ${HEADER_FILES}
   DESTINATION include/OGRE/HLMS
 )
-

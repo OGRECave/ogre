@@ -47,6 +47,10 @@ namespace Ogre {
     */
     class _OgreExport GpuProgramManager : public ResourceManager, public Singleton<GpuProgramManager>
     {
+        // silence warnings
+        using ResourceManager::createImpl;
+        using ResourceManager::load;
+        using ResourceManager::getResourceByName;
     public:
 
         typedef set<String>::type SyntaxCodes;

@@ -429,6 +429,9 @@ namespace Ogre
         */
         virtual const Plane& getFrustumPlane( unsigned short plane ) const;
 
+        /// @copydoc MovableObject::isVisible
+        using Ogre::MovableObject::isVisible;
+
         /** Tests whether the given container is visible in the Frustum.
         @param bound
             Bounding box to be checked (world space).

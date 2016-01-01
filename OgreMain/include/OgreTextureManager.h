@@ -59,6 +59,10 @@ namespace Ogre {
      */
     class _OgreExport TextureManager : public ResourceManager, public Singleton<TextureManager>
     {
+        // silence warnings
+        using ResourceManager::prepare;
+        using ResourceManager::load;
+        using ResourceManager::createOrRetrieve;
     public:
 
         TextureManager(void);

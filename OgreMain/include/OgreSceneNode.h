@@ -459,8 +459,8 @@ namespace Ogre {
         /// As Node::getDebugRenderable, except scaling is automatically determined
         virtual DebugRenderable* getDebugRenderable();
 
-
-
+        /// @copydoc Node::getDebugRenderable
+        using Node::getDebugRenderable;
 
     };
     /** @} */

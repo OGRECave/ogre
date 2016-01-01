@@ -8,6 +8,11 @@ if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT ((WINDOWS_STORE OR WINDOWS_PHON
 	include_directories(${OIS_INCLUDE_DIR})
 endif()
 
+if(UNIX)
+  # this is abused way to much in OgreMain
+  add_definitions(-Wno-overloaded-virtual)
+endif()
+
 if (OGRE_BUILD_SAMPLES)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 

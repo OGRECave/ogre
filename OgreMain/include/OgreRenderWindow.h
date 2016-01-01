@@ -203,6 +203,9 @@ namespace Ogre
         virtual void getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth, 
             int& left, int& top) const;
 
+        /// @copydoc RenderTarget::getMetrics
+        using RenderTarget::getMetrics;
+
         /// Override since windows don't usually have alpha
         PixelFormat suggestPixelFormat() const { return PF_BYTE_RGB; }
 
