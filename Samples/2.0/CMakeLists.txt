@@ -3,7 +3,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 include_directories(${CMAKE_SOURCE_DIR}/Components/Overlay/include)
 
-if (OGRE_BUILD_SAMPLES2 AND NOT OIS_FOUND)
+if (OGRE_BUILD_SAMPLES2 AND NOT SDL2_FOUND)
     message(STATUS "Could not find dependency: SDL2")
     message(STATUS "Skipping samples build")
     set(OGRE_BUILD_SAMPLES2 0)
