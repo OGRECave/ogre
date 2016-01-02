@@ -63,10 +63,6 @@ void PageCoreTests::tearDown()
     OGRE_DELETE mPageManager;
     OGRE_DELETE mRoot;
     OGRE_DELETE_T(mFSLayer, FileSystemLayer, Ogre::MEMCATEGORY_GENERAL);
-
-#if OGRE_STATIC_LIB
-    OGRE_DELETE mStaticPluginLoader;
-#endif
 }
 //--------------------------------------------------------------------------
 void PageCoreTests::testSimpleCreateSaveLoadWorld()

@@ -59,19 +59,10 @@ void UseCustomCapabilitiesTests::setUp()
         OGRE_DELETE Ogre::MaterialManager::getSingletonPtr();
     if(Ogre::ResourceGroupManager::getSingletonPtr())
         OGRE_DELETE Ogre::ResourceGroupManager::getSingletonPtr();
-
-#if OGRE_STATIC_LIB
-    mStaticPluginLoader = OGRE_NEW Ogre::StaticPluginLoader();
-#endif
 }
 //--------------------------------------------------------------------------
 void UseCustomCapabilitiesTests::tearDown()
 {
-    using namespace Ogre;
-
-#if OGRE_STATIC_LIB
-    OGRE_DELETE mStaticPluginLoader;
-#endif
 }
 //--------------------------------------------------------------------------
 void checkCaps(const Ogre::RenderSystemCapabilities* caps)
