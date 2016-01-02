@@ -111,7 +111,7 @@ appropriate version and platform (Win32 | Win64); on Apple use Xcode.
 Click 'Finish'. CMake will now gather some information about your
 build environment and try to locate the dependencies (+). It will then show
 a list of build options. You can adjust the settings to your liking; for
-example unchecking any of the OGRE_BUILD_XXX options will disable that
+example unchecking any of the `OGRE_BUILD_XXX` options will disable that
 particular component from being built. Once you are satisfied, hit
 'Configure' again and then click on 'Generate'. CMake will then create
 the build system for you.
@@ -122,7 +122,7 @@ need to tell CMake where to look. On Unix platforms CMake should usually
 be able to pick up all the dependencies if they are installed in standard
 locations. If you followed the advice of step 4 and put all dependencies
 in a common directory, then you can specify that directory in the
-variable OGRE_DEPENDENCIES_DIR. Otherwise, you can specify the directory
+variable `OGRE_DEPENDENCIES_DIR`. Otherwise, you can specify the directory
 for each dependency individually. Click on 'Add entry' to add a new CMake
 variable, then select 'PATH' as the type. The name of the variable is
 XXX_HOME, where XXX is to be replaced by the dependency package, e. g.
@@ -175,9 +175,11 @@ CMake.
 8. Building Ogre on Mac OS X for iOS OS
 --------------------------------------------
 
-To build Ogre for the iOS, you need to check the option
-OGRE_BUILD_PLATFORM_APPLE_IOS in cmake-gui before you generate the Xcode
-project. Unfortunately, you will now have to do a few manual steps to
+To build Ogre for iOS, you need to specify the ios cross toolchain to cmake as
+
+`cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/ios.toolchain.xcode.cmake -G Xcode .`
+
+Unfortunately, you will now have to do a few manual steps to
 make the generated build system work properly.
 
 A Xcode project has now been generated in the build directory, so
@@ -206,8 +208,7 @@ You need Windows 8.0 or later, Windows 8.1 is recommended.
 You need Visual Studio 2012 or later, Visual Studio 2013 is recommended
 as it is bundled with WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
 
-Download and install CMake 3.1 (scheduled for release 2014-11-01)
-or CMakeMS from http://cmakems.codeplex.com/
+Download and install CMake 3.1.
 
 Patched dependencies must be used, compiled with appropriate WINAPI_FAMILY.
 Cg is not supported, and only headers from OIS are needed.
@@ -247,3 +248,16 @@ file .vmx and add the parameter: hypervisor.cpuid.v0 = "FALSE"
 All versions of Visual Studio 2012 have a window refresh issue when running
 in VMware and the window is maximized, the solution is just to change the
 size of the Visual Studio window to be less the the screen width and height.
+
+10. Building Ogre on Ubuntu for Android
+--------------------------------------------
+
+To build Ogre for Android, you need to specify the ios cross toolchain to cmake as
+
+`cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/android.toolchain.cmake -DANDROID_NDK=path/to/android-ndk .`
+
+this will build the core Ogre libraries.
+
+To build the SampleBrowser, navigate your command prompt to the SampleBrowserNDK subfolder in your OGRE build folder and run:
+
+`ndk-build .`
