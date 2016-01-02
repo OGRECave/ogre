@@ -25,8 +25,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
-
 #include "TestContext.h"
 #include "SamplePlugin.h"
 #include "TestResultWriter.h"
@@ -108,6 +106,9 @@ TestContext::~TestContext()
 
 void TestContext::setup()
 {
+    NameValuePairList miscParams;
+    mRoot->initialise(false, "OGRE Sample Browser");
+
     // Standard setup.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     CGSize modeSize = [[UIScreen mainScreen] currentMode].size;
@@ -119,18 +120,24 @@ void TestContext::setup()
     if (UIInterfaceOrientationIsPortrait(orientation))
         std::swap(w, h);
 
-    mRoot->initialise(false, "OGRE Sample Browser");
-    NameValuePairList miscParams;
+
     miscParams["retainedBacking"] = StringConverter::toString(true);
     mWindow = mRoot->createRenderWindow("OGRE Sample Browser", w, h, true, &miscParams);
 #else
-    mWindow = createWindow();
+    Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
+
+    size_t w, h;
+
+    std::istringstream mode(ropts["Video Mode"].currentValue);
+    Ogre::String token;
+    mode >> w; // width
+    mode >> token; // 'x' as seperator between width and height
+    mode >> h; // height
+
+    mWindow = mRoot->createRenderWindow("OGRE Sample Browser", w, h, false);
 #endif
 
     mWindow->setDeactivateOnFocusChange(false);
-
-    // Grab input, since moving the window seemed to change the results (in Linux anyways).
-    setupInput(mNoGrabMouse);
     
     locateResources();
 
