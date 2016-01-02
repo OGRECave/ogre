@@ -34,7 +34,6 @@ void MeshLodTests::setUp()
     mFSLayer = OGRE_NEW_T(Ogre::FileSystemLayer, Ogre::MEMCATEGORY_GENERAL)(OGRE_VERSION_NAME);
 
 #ifdef OGRE_STATIC_LIB
-    mStaticPluginLoader = OGRE_NEW StaticPluginLoader();
     Root* root = OGRE_NEW Root(BLANKSTRING);        
     mStaticPluginLoader.load();
 #else
