@@ -15,9 +15,9 @@ if(APPLE)
 
   set(MIN_IOS_VERSION "6.0")
 
-  if(NOT OGRE_BUILD_PLATFORM_ANDROID AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if(NOT OGRE_BUILD_PLATFORM_ANDROID AND NOT APPLE_IOS)
     set(PLATFORM_NAME "macosx")
-  elseif(OGRE_BUILD_PLATFORM_APPLE_IOS)
+  elseif(APPLE_IOS)
     set(PLATFORM_NAME "$(PLATFORM_NAME)")
   endif()
 endif()
@@ -64,12 +64,12 @@ elseif (UNIX)
   set(OGRE_LIB_RELWDBG_PATH "")
   set(OGRE_LIB_MINSIZE_PATH "")
   set(OGRE_LIB_DEBUG_PATH "")
-  if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if(APPLE AND NOT APPLE_IOS)
     set(OGRE_RELEASE_PATH "/${PLATFORM_NAME}")
   endif()
-  if(APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if(APPLE AND APPLE_IOS)
     set(OGRE_LIB_RELEASE_PATH "/Release")
-  endif(APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+  endif(APPLE AND APPLE_IOS)
   if (APPLE)
     set(OGRE_PLUGIN_PATH "/")
   else()
@@ -171,7 +171,7 @@ function(ogre_config_common TARGETNAME)
     LIBRARY_OUTPUT_DIRECTORY ${OGRE_LIBRARY_OUTPUT}
     RUNTIME_OUTPUT_DIRECTORY ${OGRE_RUNTIME_OUTPUT}
   )
-  if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if(APPLE_IOS)
     set_xcode_property( ${TARGETNAME} IPHONEOS_DEPLOYMENT_TARGET ${MIN_IOS_VERSION} )
     set_property( TARGET ${TARGETNAME} PROPERTY XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET[arch=arm64] "7.0" )
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
@@ -179,7 +179,7 @@ function(ogre_config_common TARGETNAME)
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "iPhone Developer")
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf$<$<NOT:$<CONFIG:Debug>>:-with-dsym>")
-  endif(OGRE_BUILD_PLATFORM_APPLE_IOS)
+  endif(APPLE_IOS)
 
   if(NOT OGRE_STATIC AND (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
     set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH "NO")
@@ -207,7 +207,7 @@ function(ogre_config_lib LIBNAME EXPORT)
   endif (OGRE_STATIC)
   ogre_install_target(${LIBNAME} "" ${EXPORT})
   
-  if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if(APPLE_IOS)
     set_xcode_property( ${LIBNAME} IPHONEOS_DEPLOYMENT_TARGET ${MIN_IOS_VERSION} )
     set_property( TARGET ${LIBNAME} PROPERTY XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET[arch=arm64] "7.0" )
   endif()
@@ -241,7 +241,7 @@ function(ogre_config_component LIBNAME)
 endfunction(ogre_config_component)
 
 function(ogre_config_framework LIBNAME)
-  if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE AND NOT APPLE_IOS)
       set_target_properties(${LIBNAME} PROPERTIES FRAMEWORK TRUE)
 
       # Set the INSTALL_PATH so that frameworks can be installed in the application package
@@ -267,13 +267,13 @@ function(ogre_config_plugin PLUGINNAME)
     # add static prefix, if compiling static version
     set_target_properties(${PLUGINNAME} PROPERTIES OUTPUT_NAME ${PLUGINNAME}Static)
 
-    if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+    if(APPLE_IOS)
       set_xcode_property( ${PLUGINNAME} IPHONEOS_DEPLOYMENT_TARGET ${MIN_IOS_VERSION} )
       set_property( TARGET ${PLUGINNAME} PROPERTY XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET[arch=arm64] "7.0" )
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_THUMB_SUPPORT "NO")
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_UNROLL_LOOPS "YES")
       set_target_properties(${PLUGINNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
-    endif(OGRE_BUILD_PLATFORM_APPLE_IOS)
+    endif(APPLE_IOS)
   else (OGRE_STATIC)
     if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       # disable "lib" prefix on Unix
@@ -321,7 +321,7 @@ function(ogre_config_sample_common SAMPLENAME)
   if (APPLE)
     # On OS X, create .app bundle
     set_property(TARGET ${SAMPLENAME} PROPERTY MACOSX_BUNDLE TRUE)
-    if (NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    if (NOT APPLE_IOS)
       # Add the path where the Ogre framework was found
       if(${OGRE_FRAMEWORK_PATH})
         set_target_properties(${SAMPLENAME} PROPERTIES
@@ -365,7 +365,7 @@ function(ogre_config_sample_exe SAMPLENAME)
 		  )
   endif ()
 
-  if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND OGRE_SDK_BUILD)
+  if (APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
     # Add the path where the Ogre framework was found
     if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "")
       set_target_properties(${SAMPLENAME} PROPERTIES
@@ -373,7 +373,7 @@ function(ogre_config_sample_exe SAMPLENAME)
         LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
       )
     endif()
-  endif(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND OGRE_SDK_BUILD)
+  endif(APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
 endfunction(ogre_config_sample_exe)
 
 function(ogre_config_sample_lib SAMPLENAME)
@@ -390,7 +390,7 @@ function(ogre_config_sample_lib SAMPLENAME)
 		  )
   endif ()
 
-  if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND OGRE_SDK_BUILD)
+  if (APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
     # Add the path where the Ogre framework was found
     if(NOT ${OGRE_FRAMEWORK_PATH} STREQUAL "")
       set_target_properties(${SAMPLENAME} PROPERTIES
@@ -398,7 +398,7 @@ function(ogre_config_sample_lib SAMPLENAME)
         LINK_FLAGS "-F${OGRE_FRAMEWORK_PATH}"
       )
     endif()
-  endif(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS AND OGRE_SDK_BUILD)
+  endif(APPLE AND NOT APPLE_IOS AND OGRE_SDK_BUILD)
 
   # Add sample to the list of link targets
   # Global property so that we can build this up across entire sample tree

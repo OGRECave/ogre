@@ -12,7 +12,7 @@
 set(HEADER_FILES include/PCZTestApp.h include/RoomObject.h)
 set(SOURCE_FILES src/PCZTestApp.cpp src/RoomObject.cpp)
 
-if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE_IOS)
   set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/PCZTestApp.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
 endif ()
 
