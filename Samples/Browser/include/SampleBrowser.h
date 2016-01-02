@@ -1184,14 +1184,15 @@ namespace OgreBites
             mode >> token; // 'x' as seperator between width and height
             mode >> h; // height
 
+            miscParams["FSAA"] = ropts["FSAA"].currentValue;
+            miscParams["vsync"] = ropts["VSync"].currentValue;
+
+#ifdef HAVE_SDL
             mSDLWindow = SDL_CreateWindow("OGRE Sample Browser", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
 
             SDL_SysWMinfo wmInfo;
             SDL_VERSION(&wmInfo.version);
             SDL_GetWindowWMInfo(mSDLWindow, &wmInfo);
-
-            miscParams["FSAA"] = ropts["FSAA"].currentValue;
-            miscParams["vsync"] = ropts["VSync"].currentValue;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
             miscParams["parentWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
@@ -1199,6 +1200,7 @@ namespace OgreBites
             miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
             miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.cocoa.window));
+#endif
 #endif
             res = mRoot->createRenderWindow("OGRE Sample Browser Window", w, h, false, &miscParams);
 
