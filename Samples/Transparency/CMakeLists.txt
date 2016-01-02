@@ -10,7 +10,7 @@ ogre_add_library_to_folder(Samples Sample_Transparency ${OGRE_LIB_TYPE} ${SOURCE
 target_link_libraries(Sample_Transparency ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_Transparency)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(Sample_Transparency
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
