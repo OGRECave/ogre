@@ -15,12 +15,13 @@ addons:
 before_script:
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
-    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 cppunit cmake && gem install xcpretty ; fi
-osx_image: xcode7.1
+    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 cppunit cmake ; fi
+osx_image: xcode7.2
 env:
     - TEST=TRUE
     - GL3ES=TRUE # build GL3Plus and GLES2 Rendersystems
     - ANDROID=TRUE
+    - IOS=TRUE
 compiler:
     - clang
     - gcc
@@ -28,6 +29,8 @@ matrix:
     exclude:
         - os: linux
           compiler: clang
+        - os: linux
+          env: IOS=TRUE
         - os: osx
           compiler: gcc
         - os: osx
@@ -36,7 +39,9 @@ matrix:
           env: ANDROID=TRUE
 script:
     - cmake -P ci-build.cmake
-    - if [ "$TRAVIS_OS_NAME" !=   "osx" ]; then cmake --build . ; else set -o pipefail && cmake --build . | xcpretty  ; fi
+    - BUILD_CMD="cmake --build ."
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then BUILD_CMD="set -o pipefail && $BUILD_CMD | xcpretty" ; fi
+    - echo $BUILD_CMD && eval $BUILD_CMD
     - if [ $TEST ]; then bin/Test_Ogre ; fi
 os:
     - linux
