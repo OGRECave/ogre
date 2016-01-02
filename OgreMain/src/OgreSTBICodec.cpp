@@ -41,6 +41,9 @@ THE SOFTWARE.
 #define STB_IMAGE_STATIC
 #include "stbi/stb_image.h"
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stbi/stb_image_write.h"
+
 namespace Ogre {
 
     STBIImageCodec::RegisteredCodecList STBIImageCodec::msCodecList;
@@ -98,9 +101,24 @@ namespace Ogre {
     void STBIImageCodec::encodeToFile(MemoryDataStreamPtr& input,
         const String& outFileName, Codec::CodecDataPtr& pData) const
     {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
-                    "STBI encoding not supported",
-                    "STBIImageCodec::encodeToFile" ) ;
+        if(!StringUtil::endsWith(outFileName, "png")) {
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                        "currently only encoding to PNG supported",
+                        "STBIImageCodec::encodeToFile" ) ;
+        }
+
+        ImageData* pImgData = static_cast<ImageData*>(pData.getPointer());
+
+        int channels = PixelUtil::getComponentCount(pImgData->format);
+
+        int ret = stbi_write_png(outFileName.c_str(), pImgData->width, pImgData->height, channels,
+                           input->getPtr(), pImgData->width*channels);
+
+        if (!ret) {
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
+                "Error encoding image: " + String(stbi_failure_reason()),
+                "STBIImageCodec::encodeToFile");
+        }
     }
     //---------------------------------------------------------------------
     Codec::DecodeResult STBIImageCodec::decode(DataStreamPtr& input) const
