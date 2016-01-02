@@ -30,7 +30,7 @@ add_library(PlayPen ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
 target_link_libraries(PlayPen ${OGRE_LIBRARIES} ${OIS_LIBRARIES} OgreOverlay)
 ogre_config_sample_lib(PlayPen)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(PlayPen
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

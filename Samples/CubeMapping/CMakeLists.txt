@@ -9,7 +9,7 @@ add_library(Sample_CubeMapping ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} 
 target_link_libraries(Sample_CubeMapping ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_CubeMapping)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(Sample_CubeMapping
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

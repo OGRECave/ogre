@@ -164,7 +164,7 @@ if (OGRE_BUILD_TESTS)
     ogre_config_sample_exe(Test_Ogre)
     target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} ${CppUnit_LIBRARIES})
 
-    if(APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+    if(APPLE AND NOT APPLE_IOS)
       set(OGRE_BUILT_FRAMEWORK "$(PLATFORM_NAME)/$(CONFIGURATION)")
       set(OGRE_TEST_CONTENTS_PATH ${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/Test_Ogre.app/Contents)
       set_target_properties(Test_Ogre PROPERTIES

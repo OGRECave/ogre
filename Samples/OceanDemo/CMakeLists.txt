@@ -25,7 +25,7 @@ add_library(Sample_Ocean ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(Sample_Ocean ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_Ocean)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(Sample_Ocean
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

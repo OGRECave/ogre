@@ -27,7 +27,7 @@ if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
     "${OGRE_SOURCE_DIR}/../EmscriptenDependencies"
   )
   set(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} ${OGRE_DEP_SEARCH_PATH})
-elseif(OGRE_BUILD_PLATFORM_APPLE_IOS)
+elseif(APPLE_IOS)
   set(OGRE_DEP_SEARCH_PATH 
     ${OGRE_DEPENDENCIES_DIR}
     ${ENV_OGRE_DEPENDENCIES_DIR}
@@ -151,7 +151,7 @@ endif()
 #######################################################################
 
 # Find Cg
-if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
+if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE OR ANDROID OR EMSCRIPTEN))
   find_package(Cg)
   macro_log_feature(Cg_FOUND "cg" "C for graphics shader language" "http://developer.nvidia.com/object/cg_toolkit.html" FALSE "" "")
 endif ()
@@ -164,7 +164,7 @@ else ()
 	# Statically linking boost to a dynamic Ogre build doesn't work on Linux 64bit
 	set(Boost_USE_STATIC_LIBS ${OGRE_STATIC})
 endif ()
-if (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND APPLE_IOS)
     set(Boost_USE_MULTITHREADED OFF)
 endif()
 

@@ -15,7 +15,7 @@ ogre_add_library(Sample_TerrainTessellation ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${H
 target_link_libraries(Sample_TerrainTessellation ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_Terrain_LIBRARIES} ${OGRE_Paging_LIBRARIES})
 ogre_config_sample_lib(Sample_TerrainTessellation)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(Sample_TerrainTessellation
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1
