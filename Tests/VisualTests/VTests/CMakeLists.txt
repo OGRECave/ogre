@@ -37,7 +37,7 @@ add_library(VTests ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} )
 target_link_libraries(VTests ${OGRE_LIBRARIES} ${OIS_LIBRARIES} OgreOverlay OgreRTShaderSystem)
 ogre_config_sample_lib(VTests)
 
-if (APPLE AND NOT OGRE_BUILD_PLATFORM_APPLE_IOS)
+if (APPLE AND NOT APPLE_IOS)
     # Set the INSTALL_PATH so that Samples can be installed in the application package
     set_target_properties(VTests
        PROPERTIES BUILD_WITH_INSTALL_RPATH 1

@@ -96,7 +96,7 @@ endif ()
 add_dependencies(TestContext VTests PlayPenTests)
 
 if (APPLE)
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE_IOS)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE TRUE)
 	set_property(TARGET TestContext PROPERTY MACOSX_BUNDLE_INFO_PLIST ${OGRE_SOURCE_DIR}/Tests/VisualTests/Context/misc/Info.plist)
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "org.ogre3d.\${PRODUCT_NAME:rfc1034identifier}")

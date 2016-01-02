@@ -31,7 +31,7 @@ if (WIN32)
   set(OGRE_CFG_INSTALL_PATH "bin")
 elseif (APPLE)
   set(OGRE_MEDIA_PATH "Media")
-  if(OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if(APPLE_IOS)
     set(OGRE_MEDIA_DIR_REL "${OGRE_MEDIA_PATH}")
     set(OGRE_MEDIA_DIR_DBG "${OGRE_MEDIA_PATH}")
     set(OGRE_TEST_MEDIA_DIR_REL "../../Tests/${OGRE_MEDIA_PATH}")
@@ -169,7 +169,7 @@ if (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
   )
 
   # Need a special case here for the iOS SDK, configuration is not being matched, could be a CMake bug.
-  if (OGRE_BUILD_PLATFORM_APPLE_IOS)
+  if (APPLE_IOS)
     install(FILES 
       ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
       ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
@@ -184,7 +184,7 @@ endif (OGRE_INSTALL_SAMPLES OR OGRE_INSTALL_SAMPLES_SOURCE)
 
 
 # CREATE CONFIG FILES - BUILD DIR VERSIONS
-if (NOT (OGRE_BUILD_PLATFORM_APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE))
+if (NOT (APPLE_IOS OR WINDOWS_STORE OR WINDOWS_PHONE))
   set(OGRE_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_MEDIA_DIR_DBG "${OGRE_SOURCE_DIR}/Samples/Media")
   set(OGRE_TEST_MEDIA_DIR_REL "${OGRE_SOURCE_DIR}/Tests/Media")
