@@ -256,8 +256,14 @@ To build Ogre for Android, you need to specify the ios cross toolchain to cmake 
 
 `cmake -DCMAKE_TOOLCHAIN_FILE=CMake/toolchain/android.toolchain.cmake -DANDROID_NDK=path/to/android-ndk .`
 
-this will build the core Ogre libraries.
+this will build the core Ogre libraries. Also if your `PATH` contains the `ndk-build` and `android` executables it will generate the SampleBrowser APK.
 
-To build the SampleBrowser, navigate your command prompt to the SampleBrowserNDK subfolder in your OGRE build folder and run:
+To manually build the SampleBrowser, navigate your command prompt to the SampleBrowserNDK subfolder in your OGRE build folder and run:
 
 `ndk-build .`
+
+this will build the native library. Then run
+
+`ant debug install`
+
+to generate the APK and install it on your device.

@@ -31,15 +31,13 @@ classes.
 We welcome all contributions to OGRE, be that new
 plugins, bugfixes, extensions, tutorials, documentation, example
 applications, artwork or pretty much anything else! If you would like
-to contribute to the development of OGRE, please go to
-the <a href="http://www.ogre3d.org/">web site</a> and click on the
-'Developers' link.
+to contribute to the development of OGRE, please create a [pull request](https://github.com/OGRECave/ogre/pulls).
 
 ## Keeping Up To Date
 The best place to keep up to date with developments on
 OGRE is the <a href="http://www.ogre3d.org/">Official Web Site</a>.
 From there you can download the latest source code and documentation.
-You can choose between keeping bang up to date with Subversion
+You can choose between keeping bang up to date with Git
 or by just getting the regularly released snapshots.
 
 The changes included in this current version can be
