@@ -49,7 +49,7 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
-TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(BLANKSTRING), mCurrentTest(0), mBatch(0)
+TestContext::TestContext(int argc, char** argv) : mSuccess(true), mTimestep(0.01f), mOutputDir(BLANKSTRING), mCurrentTest(0), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
@@ -89,7 +89,7 @@ TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(B
 
     if(mReferenceSetPath == BLANKSTRING)
         mReferenceSetPath = mOutputDir;
-    
+
 #ifdef INCLUDE_RTSHADER_SYSTEM
     mShaderGenerator     = NULL;
     mMaterialMgrListener = NULL;
@@ -268,7 +268,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
 #endif
         }
         // if it fails, just return right away
-        catch (Ogre::Exception e)
+        catch (Ogre::Exception& e)
         {
             return 0;
         }
@@ -295,7 +295,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
             {
                 (*j)->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
             }
-            catch(Ogre::Exception e)
+            catch(Ogre::Exception& e)
             {
                 continue;
             }
@@ -585,7 +585,6 @@ void TestContext::finishedTests()
     {
         const TestBatch* compareTo = 0;
         TestBatchSetPtr batches;
-        TestBatchSet::iterator i;
 
         Ogre::ConfigFile info;
         bool foundReference = true;
@@ -596,12 +595,13 @@ void TestContext::finishedTests()
         {
             info.load(mReferenceSetPath + mCompareWith + "/info.cfg");
         }
-        catch (Ogre::FileNotFoundException e)
+        catch (Ogre::FileNotFoundException& e)
         {
             // if no luck, just grab the most recent compatible set
             foundReference = false;
             batches = TestBatch::loadTestBatches(mOutputDir);
             
+            TestBatchSet::iterator i;
             for (i = batches->begin(); i != batches->end(); ++i)
             {
                 if (mBatch->canCompareWith((*i)))
@@ -643,6 +643,10 @@ void TestContext::finishedTests()
 
                 CppUnitResultWriter cppunitWriter(*compareTo, *mBatch, results);
                 cppunitWriter.writeToFile(mSummaryOutputDir + "/TestResults_" + rs + ".xml");
+            }
+
+            for(size_t i = 0; i < results->size(); i++) {
+                mSuccess = mSuccess && results->at(i).passed;
             }
         }
 
@@ -817,10 +821,10 @@ int main(int argc, char *argv[])
 
     return retVal;
 #else
+    TestContext tc(argc, argv);
 
     try
     {
-        TestContext tc = TestContext(argc, argv);
         tc.go();
     }
     catch (Ogre::Exception& e)
@@ -829,9 +833,11 @@ int main(int argc, char *argv[])
         MessageBoxA(NULL, e.getFullDescription().c_str(), "An exception has occurred!", MB_ICONERROR | MB_TASKMODAL);
 #else
         std::cerr << "An exception has occurred: " << e.getFullDescription().c_str() << std::endl;
+
+        return -1;
 #endif
     }
 
+    return !tc.wasSuccessful();
 #endif
-    return 0;
 }
