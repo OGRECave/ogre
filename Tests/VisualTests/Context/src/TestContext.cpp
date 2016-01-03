@@ -51,6 +51,12 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
+struct NonRandomValueProvider : Math::RandomValueProvider {
+    Real getRandomUnit() {
+        return 0.5;
+    }
+} nonRV;
+
 TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(BLANKSTRING), mCurrentTest(0), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
@@ -92,6 +98,8 @@ TestContext::TestContext(int argc, char** argv) : mTimestep(0.01f), mOutputDir(B
     if(mReferenceSetPath == BLANKSTRING)
         mReferenceSetPath = mOutputDir;
     
+    Math::SetRandomValueProvider(&nonRV);
+
 #ifdef INCLUDE_RTSHADER_SYSTEM
     mShaderGenerator     = NULL;
     mMaterialMgrListener = NULL;
