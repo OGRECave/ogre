@@ -115,7 +115,13 @@ class TestContext : public OgreBites::SampleContext
 
     VisualTest* getCurrentTest() { return mCurrentTest; }
 
+    /// Returns whether the entire test was successful or not.
+    bool wasSuccessful() const {
+        return mSuccess;
+    }
+
  protected:
+    bool mSuccess;
 
     /// The timestep
     Real mTimestep;
