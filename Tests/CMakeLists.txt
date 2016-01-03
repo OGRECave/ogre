@@ -51,27 +51,6 @@ if (OGRE_BUILD_TESTS)
   endif ()
 
   if (OGRE_STATIC)
-
-    if (OGRE_BUILD_RENDERSYSTEM_D3D9)
-      add_definitions(-DOGRE_STATIC_Direct3D9)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_D3D11)
-      add_definitions(-DOGRE_STATIC_Direct3D11)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_GL)
-      add_definitions(-DOGRE_STATIC_GL)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_GLPLUS)
-      add_definitions(-DOGRE_STATIC_GL)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_GLES)
-      add_definitions(-DOGRE_STATIC_GLES)
-    endif ()
-    if (OGRE_BUILD_RENDERSYSTEM_GLES2)
-      add_definitions(-DOGRE_STATIC_GLES2)
-    endif ()
-
-
     # Static linking means we need to directly use plugins
     include_directories(${OGRE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)
     include_directories(${OGRE_SOURCE_DIR}/PlugIns/CgProgramManager/include)

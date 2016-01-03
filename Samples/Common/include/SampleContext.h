@@ -41,23 +41,21 @@
 #  ifdef OGRE_BUILD_RENDERSYSTEM_GL
 #    define OGRE_STATIC_GL
 #  endif
+#  ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
+#    define OGRE_STATIC_GL3Plus
+#  endif
 #  ifdef OGRE_BUILD_RENDERSYSTEM_GLES
 #    define OGRE_STATIC_GLES
-#    undef INCLUDE_RTSHADER_SYSTEM
 #  endif
 #  ifdef OGRE_BUILD_RENDERSYSTEM_GLES2
-#    undef OGRE_STATIC_GLES
-#    define INCLUDE_RTSHADER_SYSTEM
 #    define OGRE_STATIC_GLES2
 #  endif
-#  if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-#    ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
-#       define OGRE_STATIC_Direct3D9
-#    endif
+#  ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
+#     define OGRE_STATIC_Direct3D9
+#  endif
 // dx11 will only work on vista and above, so be careful about statically linking
-#    ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
-#      define OGRE_STATIC_Direct3D11
-#    endif
+#  ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
+#    define OGRE_STATIC_Direct3D11
 #  endif
 
 #  ifdef OGRE_BUILD_PLUGIN_BSP
