@@ -1,0 +1,207 @@
+body
+{
+	margin: 0px;
+	padding: 0px;
+	font-family: Verdana,Geneva,Arial,Helvetica,sans-serif;
+	background-color: #4f564b;
+}
+
+img, canvas
+{
+	max-width: 480px;
+	max-height: 360px;
+	padding: 0px;
+	margin: 0px;
+	text-align: center;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px #889767 solid;
+}
+
+.thumb, .thumb_fail
+{
+	max-width: 235px;
+	display: inline;
+}
+
+.thumb
+{
+	border: 3px #3f463b solid;
+}
+
+.thumb_fail
+{
+	border: 3px #FF4727 solid;
+}
+
+a
+{
+	text-decoration: none;
+}
+
+h1
+{
+	text-align: center;
+	background-color: #b2c3a7;
+	margin: 0px;
+	padding: 17px;
+}
+
+h2
+{
+	text-align: center;
+	background-color: #f8d797;
+	margin: 0px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-top: solid 2px #111111;
+	border-bottom: solid 2px #111111;
+}
+
+h3
+{
+	color: white;
+	text-align: center;
+	margin: 5px;
+}
+
+h4
+{
+	color: white;
+	text-align: center;
+	margin: 1px;
+	font-size: 13pt;
+	font-weight: bold;
+}
+
+.diffreport
+{
+	font-family: monospace;
+	font-size: 11pt;
+}
+
+#content
+{
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.img_column
+{
+	width: 480px;
+	float: left;
+	margin-right: 10px;
+	margin-left: 10px;
+	margin-bottom: 8px;
+}
+
+.centered_column
+{
+	width: 480px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.contentarea
+{
+	margin-left: auto;
+	margin-right: auto;
+	width: 1000px;
+	background-color: #3f463b;
+	overflow: hidden;
+	border-left: solid 1px #111111;
+	border-right: solid 1px #111111;
+	text-align: center;
+	padding-bottom: 5px;
+}
+
+.failed_test
+{
+	background-color: #5f463b !important;
+}
+
+.failed_test > img, .failed_test > canvas
+{
+	border: 1px #FF7747 solid;
+}
+
+.contentarea p
+{
+	text-align: center;
+	color: white;
+	font-weight: bold;
+	font-size: 11pt;
+	margin: 2px;
+	padding: 2px;
+	clear: both;
+	overflow: hidden;
+}
+
+table
+{
+	margin-left: auto;
+	margin-right: auto;
+	border-collapse: collapse;
+	border: solid 1px black;
+	width: 450px;
+}
+
+td, th
+{
+	padding: 10px;
+	padding-right: 20px;
+	border: solid 1px black;
+}
+
+tr
+{
+	background-color: #b2c3a7;
+}
+
+hr
+{
+	clear: both;
+	padding-top: 1px; 
+	border: none;
+	border-bottom: solid 1px #353535;
+}
+
+th
+{
+	font-weight: bold;
+}
+
+.failed
+{
+	color: red;
+}
+
+.passed
+{
+	color: green;
+}
+
+button
+{
+	background-color: #b2c3a7;
+	border: solid black 1px;
+}
+
+button:hover
+{
+	background-color: #f8d797;
+	border: solid black 1px;
+}
+
+ul
+{
+	list-style-type: none;
+	margin-right: 400px;
+}
+
+ul > li
+{
+	color: white;
+	text-align: right;
+}
