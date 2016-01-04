@@ -87,6 +87,7 @@ if(BUILD_OGREDEPS)
     execute_process(COMMAND cmake
         -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DWITH_BZip2=OFF # tries to use it on iOS otherwise
         # workaround for broken iOS toolchain in freetype
         -DPROJECT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.6.2
         ${CROSS}
