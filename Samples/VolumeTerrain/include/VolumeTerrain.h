@@ -101,19 +101,23 @@ public:
     
     /** Overridden from SdkSample.
     */
-    virtual bool keyPressed(const OIS::KeyEvent& evt);
-    
-    /** Overridden from SdkSample.
-    */
-    virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
+    virtual bool keyPressed(const KeyboardEvent& evt);
 
     /** Overridden from SdkSample.
     */
-    virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id);
+    virtual bool touchPressed(const TouchFingerEvent& evt);
 
     /** Overridden from SdkSample.
     */
-    virtual bool pointerMoved(const OIS::PointerEvent& evt);
+    virtual bool mousePressed(const MouseButtonEvent& evt);
+
+    /** Overridden from SdkSample.
+    */
+    virtual bool mouseReleased(const MouseButtonEvent& evt);
+
+    /** Overridden from SdkSample.
+    */
+    virtual bool mouseMoved(const MouseMotionEvent& evt);
     
     /** Overridden from SdkSample.
      */

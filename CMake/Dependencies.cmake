@@ -243,17 +243,12 @@ endif()
 # Samples dependencies
 #######################################################################
 
-# Find OIS
-if (WINDOWS_STORE OR WINDOWS_PHONE)
-	# for WinRT we need only includes
-	set(OIS_FIND_QUIETLY TRUE)
-        find_package(OIS)
-	set(OIS_INCLUDE_DIRS ${OIS_INCLUDE_DIR})
-	macro_log_feature(OIS_INCLUDE_DIRS "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
-else ()
-	find_package(OIS)
-	macro_log_feature(OIS_FOUND "OIS" "Input library needed for the samples" "http://sourceforge.net/projects/wgois" FALSE "" "")
-endif ()
+# Find sdl2
+if(NOT ANDROID)
+# find script does not work in cross compilation environment
+find_package(SDL2)
+macro_log_feature(SDL2_FOUND "SDL2" "Simple DirectMedia Library needed for input handling in samples" "https://www.libsdl.org/" FALSE "" "")
+endif()
 
 #######################################################################
 # Tools

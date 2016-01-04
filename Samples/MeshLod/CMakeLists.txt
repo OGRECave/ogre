@@ -8,7 +8,7 @@ ogre_add_component_include_dir(MeshLodGenerator)
 
 add_library(Sample_MeshLod ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_MeshLod ${OGRE_LIBRARIES} ${OIS_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
+target_link_libraries(Sample_MeshLod ${OGRE_LIBRARIES} ${SDL2_LIBRARY} ${OGRE_MeshLodGenerator_LIBRARIES})
 ogre_config_sample_lib(Sample_MeshLod)
 
 if (APPLE AND NOT APPLE_IOS)

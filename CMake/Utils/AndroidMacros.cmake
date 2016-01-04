@@ -67,7 +67,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	   add_static_libs_from_paths(${Boost_LIBRARIES})
     endif()
 
-    add_static_libs_from_paths(${OIS_LIBRARIES} ${FREETYPE_LIBRARIES} ${ZZip_LIBRARIES})
+    add_static_libs_from_paths(${FREETYPE_LIBRARIES} ${ZZip_LIBRARIES})
 
     if(APPLE OR WIN32)
       SET(ANDROID_EXECUTABLE "android")

@@ -1288,12 +1288,11 @@ void Sample_ShaderSystem::destroyPrivateResourceGroup()
 }
 
 //-----------------------------------------------------------------------
-void Sample_ShaderSystem::pickTargetObject( const OIS::PointerEvent &evt )
+void Sample_ShaderSystem::pickTargetObject( const MouseButtonEvent &evt )
 {
-    int xPos   = evt.state.X.abs;
-    int yPos   = evt.state.Y.abs;
-    int width  = evt.state.width;
-    int height = evt.state.height;
+    int xPos   = evt.x;
+    int yPos   = evt.y;
+    int width  = mWindow->getWidth(), height = mWindow->getHeight();
 
     Ray mouseRay = mCamera->getCameraToViewportRay(xPos / float(width), yPos/float(height));
     mRayQuery->setRay(mouseRay);
@@ -1520,42 +1519,41 @@ void Sample_ShaderSystem::updateLayerBlendingCaption( LayeredBlending::BlendMode
 }
 
 //-----------------------------------------------------------------------
-bool Sample_ShaderSystem::pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+bool Sample_ShaderSystem::mousePressed(const MouseButtonEvent& evt)
 {
-    if (mTrayMgr->injectPointerDown(evt, id)) 
+    if (mTrayMgr->injectMouseDown(evt)) 
         return true;
-    if (id == OIS::MB_Left)     
+    if (evt.button == BUTTON_LEFT)     
         mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
-    if (id == OIS::MB_Right) 
+    if (evt.button == BUTTON_RIGHT) 
         pickTargetObject(evt);
 
     return true;
 }
 
 //-----------------------------------------------------------------------
-bool Sample_ShaderSystem::pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+bool Sample_ShaderSystem::mouseReleased(const MouseButtonEvent& evt)
 {
-    if (mTrayMgr->injectPointerUp(evt, id)) 
+    if (mTrayMgr->injectMouseUp(evt)) 
         return true;
-    if (id == OIS::MB_Left) 
+    if (evt.button == BUTTON_LEFT) 
         mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
 
     return true;
 }
 
 //-----------------------------------------------------------------------
-bool Sample_ShaderSystem::pointerMoved( const OIS::PointerEvent& evt )
+bool Sample_ShaderSystem::mouseMoved(const MouseMotionEvent& evt)
 {
     // only rotate the camera if cursor is hidden
     if (mTrayMgr->isCursorVisible()) 
-        mTrayMgr->injectPointerMove(evt);
+        mTrayMgr->injectMouseMove(evt);
     else 
-        mCameraMan->injectPointerMove(evt);
+        mCameraMan->injectMouseMove(evt);
 
 
     return true;
 }
-
 //-----------------------------------------------------------------------
 
 void Sample_ShaderSystem::destroyInstancedViewports()

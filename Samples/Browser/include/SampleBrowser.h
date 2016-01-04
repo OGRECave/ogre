@@ -33,6 +33,10 @@
 #include "SamplePlugin.h"
 #include "SdkTrays.h"
 
+#ifdef HAVE_SDL
+#include <SDL_syswm.h>
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #endif
@@ -263,7 +267,6 @@ namespace OgreBites
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
             mNaClInstance = 0;
             mNaClSwapCallback = 0;
-            mOisFactory = 0;
             mInitWidth = 0;
             mInitHeight = 0;
 #endif
@@ -284,13 +287,11 @@ namespace OgreBites
         void initAppForWinRT( Windows::UI::Core::CoreWindow^ nativeWindow, InputContext inputContext)
         {
             mNativeWindow = nativeWindow;
-            mInputContext = inputContext;
         }
 #       if !__OGRE_WINRT_PHONE_80
         void initAppForWinRT( Windows::UI::Xaml::Shapes::Rectangle ^ nativeControl, InputContext inputContext)
         {
             mNativeControl = nativeControl;
-            mInputContext = inputContext;
         }
 #       endif
 #endif // (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
@@ -306,23 +307,15 @@ namespace OgreBites
             mInitWidth = initWidth;
             mInitHeight = initHeight;
         }
-
-        void createInputDevices()
-        {
-            mInputMgr->addFactoryCreator(mOisFactory);
-            SampleContext::createInputDevices();
-        }
 #endif
 
         /*-----------------------------------------------------------------------------
           | init pre-created window for android
           -----------------------------------------------------------------------------*/
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app, OIS::MultiTouch *mouse, OIS::Keyboard *keyboard)
+        void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app)
         {
             mWindow = window;
-            mInputContext.mMultiTouch = mouse;
-            mInputContext.mKeyboard = keyboard;
 
             if(app != NULL)
             {
@@ -763,11 +756,13 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
           | Handles keypresses.
           -----------------------------------------------------------------------------*/
-        virtual bool keyPressed(const OIS::KeyEvent& evt)
+        virtual bool keyPressed(const KeyboardEvent& evt)
         {
             if (mTrayMgr->isDialogVisible()) return true;  // ignore keypresses when dialog is showing
-
-            if (evt.key == OIS::KC_ESCAPE)
+			
+			Keycode key = evt.keysym.scancode;
+			
+            if (key == SDL_SCANCODE_ESCAPE)
             {
 #if __OGRE_WINRT_PHONE
                 // If there is a quit button, assume that we intended to press it via 'ESC'.
@@ -800,13 +795,13 @@ namespace OgreBites
                 }
                 else buttonHit((Button*)mTrayMgr->getWidget("Back"));  // if we're in config, just go back
             }
-            else if ((evt.key == OIS::KC_UP || evt.key == OIS::KC_DOWN) && mTitleLabel->getTrayLocation() != TL_NONE)
+            else if ((key == SDL_SCANCODE_UP || key == SDL_SCANCODE_DOWN) && mTitleLabel->getTrayLocation() != TL_NONE)
             {
                 // if we're in the main screen, use the up and down arrow keys to cycle through samples
-                int newIndex = mSampleMenu->getSelectionIndex() + (evt.key == OIS::KC_UP ? -1 : 1);
+                int newIndex = mSampleMenu->getSelectionIndex() + (key == SDL_SCANCODE_UP ? -1 : 1);
                 mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
             }
-            else if (evt.key == OIS::KC_RETURN)   // start or stop sample
+            else if (key == SDL_SCANCODE_RETURN)   // start or stop sample
             {
                 if (!mLoadedSamples.empty() && (mSamplePaused || mCurrentSample == 0))
                 {
@@ -815,7 +810,7 @@ namespace OgreBites
                 }
             }
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            else if (evt.key == OIS::KC_M)   // change orientation mode
+            else if (key == SDL_SCANCODE_M)   // change orientation mode
             {
                 unsigned int orientationMode = (unsigned int)mWindow->getViewport(0)->getOrientationMode();
                 orientationMode++;
@@ -824,7 +819,7 @@ namespace OgreBites
                 mWindow->getViewport(0)->setOrientationMode((Ogre::OrientationMode)orientationMode);
             }
 #endif
-            else if(evt.key == OIS::KC_F9)   // toggle full screen
+            else if(key == SDL_SCANCODE_F9)   // toggle full screen
             {
                 // Make sure we use the window size as originally requested, NOT the
                 // current window size (which may have altered to fit desktop)
@@ -835,13 +830,13 @@ namespace OgreBites
                 unsigned int h = Ogre::StringConverter::parseUnsignedInt(vmopts[1]);
                 mWindow->setFullscreen(!mWindow->isFullScreen(), w, h);
             }
-            else if(evt.key == OIS::KC_F11 || evt.key == OIS::KC_F12) // Decrease and increase FSAA level on the fly
+            else if(key == SDL_SCANCODE_F11 || key == SDL_SCANCODE_F12) // Decrease and increase FSAA level on the fly
             {
                 // current FSAA                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
                 unsigned decreasedFSAA[17] = { 0, 0, 1, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8 };
                 unsigned increasedFSAA[17] = { 2, 2, 4, 4, 8, 8, 8, 8,16,16,16,16,16,16,16,16, 0, };
                 unsigned FSAA = std::min(mWindow->getFSAA(), 16U);
-                unsigned newFSAA = (evt.key == OIS::KC_F12) ? increasedFSAA[FSAA] : decreasedFSAA[FSAA];
+                unsigned newFSAA = (key == SDL_SCANCODE_F12) ? increasedFSAA[FSAA] : decreasedFSAA[FSAA];
                 if(newFSAA != 0)
                     mWindow->setFSAA(newFSAA, mWindow->getFSAAHint());
             }
@@ -898,11 +893,12 @@ namespace OgreBites
           | Extends pointerPressed to inject mouse press into tray manager, and to check
           | for thumbnail clicks, just because we can.
           -----------------------------------------------------------------------------*/
-        virtual bool pointerPressed(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
-        {
-            OIS::PointerState state = evt.state;
-            transformInputState(state);
-            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
+        virtual bool mousePressed(const MouseButtonEvent& evt)
+		{
+            // FIXME: does SDL handle orientation for us already?
+            //OIS::PointerState state = evt.state;
+            //transformInputState(state);
+            //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
             if (mTitleLabel->getTrayLocation() != TL_NONE)
             {
@@ -917,11 +913,12 @@ namespace OgreBites
                 }
             }
 
-            if (mTrayMgr->injectPointerDown(orientedEvt, id)) return true;
+            if (mTrayMgr->injectMouseDown(evt)) return true;
 
             try
             {
-                return SampleContext::pointerPressed(orientedEvt, id);
+                // return SampleContext::mousePressed(orientedEvt);
+                return SampleContext::mousePressed(evt);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -932,20 +929,27 @@ namespace OgreBites
             return true;
         }
 
+        // convert and redirect
+        virtual bool touchPressed(const TouchFingerEvent& evt) {
+            MouseButtonEvent e;
+            e.button = BUTTON_LEFT;
+            return mousePressed(e);
+        }
+
         /*-----------------------------------------------------------------------------
           | Extends pointerReleased to inject mouse release into tray manager.
           -----------------------------------------------------------------------------*/
-        virtual bool pointerReleased(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
-        {
-            OIS::PointerState state = evt.state;
-            transformInputState(state);
-            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
+        virtual bool mouseReleased(const MouseButtonEvent& evt)
+         {
+            //OIS::PointerState state = evt.state;
+            //transformInputState(state);
+            //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-            if (mTrayMgr->injectPointerUp(orientedEvt, id)) return true;
+            if (mTrayMgr->injectMouseUp(evt)) return true;
 
             try
             {
-                return SampleContext::pointerReleased(orientedEvt, id);
+                return SampleContext::mouseReleased(evt);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -954,30 +958,30 @@ namespace OgreBites
             }
 
             return true;
+        }
+
+        // convert and redirect
+        virtual bool touchReleased(const TouchFingerEvent& evt) {
+            MouseButtonEvent e;
+            e.button = BUTTON_LEFT;
+            return mouseReleased(e);
         }
 
         /*-----------------------------------------------------------------------------
           | Extends pointerMoved to inject mouse position into tray manager, and checks
           | for mouse wheel movements to slide the carousel, because we can.
           -----------------------------------------------------------------------------*/
-        virtual bool pointerMoved(const OIS::PointerEvent& evt)
+        virtual bool mouseMoved(const MouseMotionEvent& evt)
         {
-            OIS::PointerState state = evt.state;
-            transformInputState(state);
-            OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
+            //OIS::PointerState state = evt.state;
+            //transformInputState(state);
+            //OIS::PointerEvent orientedEvt((OIS::Object*)evt.device, state);
 
-            if (mTrayMgr->injectPointerMove(orientedEvt)) return true;
-
-            if (!(mCurrentSample && !mSamplePaused) && mTitleLabel->getTrayLocation() != TL_NONE &&
-                orientedEvt.state.Z.rel != 0 && mSampleMenu->getNumItems() != 0)
-            {
-                int newIndex = mSampleMenu->getSelectionIndex() - orientedEvt.state.Z.rel / Ogre::Math::Abs(orientedEvt.state.Z.rel);
-                mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
-            }
+            if (mTrayMgr->injectMouseMove(evt)) return true;
 
             try
             {
-                return SampleContext::pointerMoved(orientedEvt);
+                return SampleContext::mouseMoved(evt);
             }
             catch (Ogre::Exception e)   // show error and fall back to menu
             {
@@ -988,13 +992,40 @@ namespace OgreBites
             return true;
         }
 
-        /*-----------------------------------------------------------------------------
-          | Extends pointerCancelled to inject an event that a touch was cancelled.
-          -----------------------------------------------------------------------------*/
-        virtual bool pointerCancelled(const OIS::PointerEvent& evt)
+        // convert and redirect
+        virtual bool touchMoved(const TouchFingerEvent& evt) {
+            MouseMotionEvent e;
+            e.x = evt.x * mWindow->getWidth();
+            e.y = evt.y * mWindow->getHeight();
+            e.xrel = evt.dx * mWindow->getWidth();
+            e.yrel = evt.dy * mWindow->getHeight();
+            return mouseMoved(e);
+        }
+
+        //TODO: Handle iOS and Android.
+        /** Mouse wheel scrolls the sample list.
+         */
+        virtual bool mouseWheelRolled(const MouseWheelEvent& evt)
+        {
+            if (!(mCurrentSample && !mSamplePaused) && mTitleLabel->getTrayLocation() != TL_NONE
+                && mSampleMenu->getNumItems() != 0)
+            {
+                int newIndex = mSampleMenu->getSelectionIndex() - evt.y / Ogre::Math::Abs(evt.y);
+                mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
+            }
+
+            return SampleContext::mouseWheelRolled(evt);
+        }
+
+        
+#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
+        /** Extends touchCancelled to inject an event that a touch was cancelled.
+         */
+        virtual bool touchCancelled(const TouchFingerEvent& evt)
         {
             return true;
         }
+#endif
 
         /*-----------------------------------------------------------------------------
           | Extends windowResized to best fit menus on screen. We basically move the
@@ -1109,7 +1140,7 @@ namespace OgreBites
 #endif
 
             Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-            mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, mInputContext, this);
+            mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, this);
             mTrayMgr->showBackdrop("SdkTrays/Bands");
             mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
@@ -1204,17 +1235,15 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual Ogre::RenderWindow* createWindow()
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
             Ogre::RenderWindow* res = mRoot->initialise(false, "OGRE Sample Browser");
             Ogre::NameValuePairList miscParams;
+#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
             miscParams["pp::Instance"] = Ogre::StringConverter::toString((unsigned long)mNaClInstance);
             miscParams["SwapCallback"] = Ogre::StringConverter::toString((unsigned long)mNaClSwapCallback);
             // create 1x1 window - we will resize later
             return mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
 
 #elif (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-            Ogre::RenderWindow* res = mRoot->initialise(false, "OGRE Sample Browser");
-            Ogre::NameValuePairList miscParams;
             if(mNativeWindow.Get())
             {
                 miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)reinterpret_cast<void*>(mNativeWindow.Get()));
@@ -1236,8 +1265,35 @@ namespace OgreBites
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             return NULL;
 #else
-            Ogre::RenderWindow* res = mRoot->initialise(true, "OGRE Sample Browser");
+            Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
 
+            size_t w, h;
+
+            std::istringstream mode(ropts["Video Mode"].currentValue);
+            Ogre::String token;
+            mode >> w; // width
+            mode >> token; // 'x' as seperator between width and height
+            mode >> h; // height
+
+            miscParams["FSAA"] = ropts["FSAA"].currentValue;
+            miscParams["vsync"] = ropts["VSync"].currentValue;
+
+#ifdef HAVE_SDL
+            mSDLWindow = SDL_CreateWindow("OGRE Sample Browser", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
+
+            SDL_SysWMinfo wmInfo;
+            SDL_VERSION(&wmInfo.version);
+            SDL_GetWindowWMInfo(mSDLWindow, &wmInfo);
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+            miscParams["parentWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+            miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
+#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+            miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.cocoa.window));
+#endif
+#endif
+            res = mRoot->createRenderWindow("OGRE Sample Browser Window", w, h, false, &miscParams);
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = [[SampleBrowserGestureView alloc] init];

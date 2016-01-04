@@ -18,7 +18,7 @@ public:
 
     bool frameRenderingQueued(const FrameEvent& evt);
 
-    bool keyPressed(const OIS::KeyEvent& evt);
+    bool keyPressed(const KeyboardEvent& evt);
     
 
 protected:

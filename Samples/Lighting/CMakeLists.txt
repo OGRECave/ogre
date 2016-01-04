@@ -6,7 +6,7 @@ set(SOURCE_FILES src/Lighting.cpp)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_Lighting ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(Sample_Lighting ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_Lighting ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_Lighting)
 
 if (APPLE AND NOT APPLE_IOS)

@@ -12,7 +12,7 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_Compute ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
-target_link_libraries(Sample_Compute ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_Compute ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_Compute)
 
 if (APPLE AND NOT APPLE_IOS)

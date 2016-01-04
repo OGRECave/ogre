@@ -33,6 +33,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "SampleContext.h"
 #include "SamplePlugin.h"
 
+#include <iostream> // for Apple
+
 // These need to be included prior to everything else to prevent name clashes.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
 
@@ -176,25 +178,6 @@ class TestContext : public OgreBites::SampleContext
     Real getTimestep();
 
     VisualTest* getCurrentTest() { return mCurrentTest; }
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    virtual bool touchCancelled(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchReleased(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchMoved(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-    virtual bool touchPressed(const OIS::MultiTouchEvent& evt)
-    {
-        return true;
-    }
-#endif
 
  protected:
 

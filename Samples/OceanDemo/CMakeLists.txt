@@ -22,7 +22,7 @@ set(SOURCE_FILES
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 add_library(Sample_Ocean ${OGRE_LIB_TYPE} ${SOURCE_FILES} ${HEADER_FILES})
 
-target_link_libraries(Sample_Ocean ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
+target_link_libraries(Sample_Ocean ${OGRE_LIBRARIES} ${SDL2_LIBRARY})
 ogre_config_sample_lib(Sample_Ocean)
 
 if (APPLE AND NOT APPLE_IOS)

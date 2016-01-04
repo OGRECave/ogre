@@ -73,17 +73,10 @@ class VisualTest : public OgreBites::Sample
     }
 
     /** Does some basic setup tasks */
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    virtual void _setup(Ogre::RenderWindow* window, OgreBites::InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
+    virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
     {
-        OgreBites::Sample::_setup(window, inputContext, fsLayer, overlaySys);
+        OgreBites::Sample::_setup(window, fsLayer, overlaySys);
     }
-#else
-    virtual void _setup(Ogre::RenderWindow* window, OgreBites::InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
-    {
-        OgreBites::Sample::_setup(window, inputContext, fsLayer, overlaySys);
-    }
-#endif
 
     /** Clean up */
     virtual void _shutdown()

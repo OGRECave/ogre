@@ -747,36 +747,36 @@ protected:
     
     // The following three methods are for mouse input
     /** @see Sample::pointerPressed. */
-    bool pointerPressed( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+    bool mousePressed(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerDown(evt, id)) 
+        if (mTrayMgr->injectMouseDown(evt)) 
             return true;
-        if (id == OIS::MB_Left)     
+        if (evt.button == BUTTON_LEFT)     
             mTrayMgr->hideCursor();  // hide the cursor if user left-clicks in the scene            
         
         return true;
     }
     
-    /** @see Sample::pointerReleased. */
-    bool pointerReleased( const OIS::PointerEvent& evt, OIS::MouseButtonID id )
+    /** @see Sample::mouseReleased. */
+    bool mouseReleased(const MouseButtonEvent& evt)
     {
-        if (mTrayMgr->injectPointerUp(evt, id)) 
+        if (mTrayMgr->injectMouseUp(evt)) 
             return true;
-        if (id == OIS::MB_Left) 
+        if (evt.button == BUTTON_LEFT) 
             mTrayMgr->showCursor();  // unhide the cursor if user lets go of LMB
         
         return true;
     }
     
-    /** @see Sample::pointerMoved. */
-    bool pointerMoved( const OIS::PointerEvent& evt )
+    /** @see Sample::mouseMoved. */
+    bool mouseMoved(const MouseMotionEvent& evt)
     {
         // only rotate the camera if cursor is hidden
         if (mTrayMgr->isCursorVisible())
-            mTrayMgr->injectPointerMove(evt);
+            mTrayMgr->injectMouseMove(evt);
         else 
         {
-            mCameraMan->injectPointerMove(evt);
+            mCameraMan->injectMouseMove(evt);
             static_cast<SelectMenu*>(mTrayMgr->getWidget(SSAO_CAMERA_MENU_NAME))->selectItem(SSAO_USER_CAMERA_ITEM);
         }
         

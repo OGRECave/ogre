@@ -159,9 +159,10 @@ Sample_VolumeCSG::Sample_VolumeCSG(void) : mVolumeRoot(0), mHideAll(false)
     
 //-----------------------------------------------------------------------
 
-bool Sample_VolumeCSG::keyPressed(const OIS::KeyEvent& evt)
+bool Sample_VolumeCSG::keyPressed(const KeyboardEvent& evt)
 {
-    if (evt.key == OIS::KC_H)
+	Keycode key = evt.keysym.scancode;
+    if (key == SDL_SCANCODE_H)
     {
         if (mHideAll)
         {

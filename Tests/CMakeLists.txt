@@ -296,15 +296,6 @@ if (OGRE_BUILD_TESTS)
     endif ()
   endif (CppUnit_FOUND)
 
-  # Configure interactive test build
-  if (OIS_FOUND)
-
-    # PlayPen gets included always
-    add_subdirectory(PlayPen)
-
-    # add VisualTests directory
-    add_subdirectory(VisualTests)
-
-  endif (OIS_FOUND)
-
+  add_subdirectory(PlayPen)
+  add_subdirectory(VisualTests)
 endif (OGRE_BUILD_TESTS)

@@ -38,7 +38,7 @@
 #include "OgreRoot.h"
 #include "OgreCamera.h"
 #include "OgreRenderWindow.h"
-#include "InputContext.h"
+
 #include <iomanip>
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
@@ -1733,8 +1733,8 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Creates backdrop, cursor, and trays.
         -----------------------------------------------------------------------------*/
-        SdkTrayManager(const Ogre::String& name, Ogre::RenderWindow* window, InputContext inputContext, SdkTrayListener* listener = 0) :
-          mName(name), mWindow(window), mInputContext(inputContext), mWidgetDeathRow(), mListener(listener), mWidgetPadding(8),
+        SdkTrayManager(const Ogre::String& name, Ogre::RenderWindow* window, SdkTrayListener* listener = 0) :
+          mName(name), mWindow(window), mWidgetDeathRow(), mListener(listener), mWidgetPadding(8),
                 mWidgetSpacing(2), mTrayPadding(0), mTrayDrag(false), mExpandedMenu(0), mDialog(0), mOk(0), mYes(0),
                 mNo(0), mCursorWasVisible(false), mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0),
                 mGroupInitProportion(0.0f), mGroupLoadProportion(0.0f), mLoadInc(0.0f)
@@ -1937,8 +1937,8 @@ namespace OgreBites
             // the position should be based on the orientation, for now simply return
             return;
 #endif
-            Ogre::Real x, y;
-            if(mInputContext.getCursorPosition(x, y))
+            int x, y;
+            if (SDL_GetMouseState(&x, &y))
                 mCursor->setPosition(x, y);
         }
 
@@ -2920,10 +2920,10 @@ namespace OgreBites
         | Processes mouse button down events. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-        bool injectPointerDown(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        bool injectMouseDown(const MouseButtonEvent& evt)
         {
-            // only process left button when stuff is visible
-            if (!mCursorLayer->isVisible() || id != OIS::MB_Left) return false;
+            // Only process mouse buttons when stuff is visible.
+            if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
 
             Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
@@ -2998,10 +2998,10 @@ namespace OgreBites
         | Processes mouse button up events. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-        bool injectPointerUp(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        bool injectMouseUp(const MouseButtonEvent& evt)
         {
-            // only process left button when stuff is visible
-            if (!mCursorLayer->isVisible() || id != OIS::MB_Left) return false;
+            // Only process mouse buttons when stuff is visible.
+            if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
 
             Ogre::Vector2 cursorPos(mCursor->getLeft(), mCursor->getTop());
 
@@ -3048,12 +3048,12 @@ namespace OgreBites
         | Updates cursor position. Returns true if the event was
         | consumed and should not be passed on to other handlers.
         -----------------------------------------------------------------------------*/
-        bool injectPointerMove(const OIS::PointerEvent& evt)
+        bool injectMouseMove(const MouseMotionEvent& evt)
         {
             if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 
-            Ogre::Vector2 cursorPos(evt.state.X.abs, evt.state.Y.abs);
-            float wheelDelta = evt.state.Z.rel;
+            Ogre::Vector2 cursorPos(evt.x, evt.y);
+            float wheelDelta = 0;//evt.state.Z.rel;
             mCursor->setPosition(cursorPos.x, cursorPos.y);
 
             if (mExpandedMenu)   // only check top priority widget until it passes on
@@ -3092,6 +3092,10 @@ namespace OgreBites
             return false;
         }
 
+        bool injectMouseWheel(const MouseWheelEvent& evt) {
+            // TODO: float wheelDelta = 0;
+            return false;
+        }
     protected:
 
         /*-----------------------------------------------------------------------------
@@ -3122,7 +3126,6 @@ namespace OgreBites
 
         Ogre::String mName;                   // name of this tray system
         Ogre::RenderWindow* mWindow;          // render window
-        InputContext mInputContext;
         Ogre::Overlay* mBackdropLayer;        // backdrop layer
         Ogre::Overlay* mTraysLayer;           // widget layer
         Ogre::Overlay* mPriorityLayer;        // top priority layer

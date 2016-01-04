@@ -226,41 +226,43 @@ namespace OgreBites
         /*-----------------------------------------------------------------------------
         | Processes key presses for free-look style movement.
         -----------------------------------------------------------------------------*/
-        virtual void injectKeyDown(const OIS::KeyEvent& evt)
+        virtual void injectKeyDown(const KeyboardEvent& evt)
         {
             if (mStyle == CS_FREELOOK)
             {
-                if (evt.key == OIS::KC_W || evt.key == OIS::KC_UP) mGoingForward = true;
-                else if (evt.key == OIS::KC_S || evt.key == OIS::KC_DOWN) mGoingBack = true;
-                else if (evt.key == OIS::KC_A || evt.key == OIS::KC_LEFT) mGoingLeft = true;
-                else if (evt.key == OIS::KC_D || evt.key == OIS::KC_RIGHT) mGoingRight = true;
-                else if (evt.key == OIS::KC_PGUP) mGoingUp = true;
-                else if (evt.key == OIS::KC_PGDOWN) mGoingDown = true;
-                else if (evt.key == OIS::KC_LSHIFT) mFastMove = true;
+                Keycode key = evt.keysym.scancode;
+                if (key == SDL_SCANCODE_W || key == SDL_SCANCODE_UP) mGoingForward = true;
+                else if (key == SDL_SCANCODE_S || key == SDL_SCANCODE_DOWN) mGoingBack = true;
+                else if (key == SDL_SCANCODE_A || key == SDL_SCANCODE_LEFT) mGoingLeft = true;
+                else if (key == SDL_SCANCODE_D || key == SDL_SCANCODE_RIGHT) mGoingRight = true;
+                else if (key == SDL_SCANCODE_PAGEUP) mGoingUp = true;
+                else if (key == SDL_SCANCODE_PAGEDOWN) mGoingDown = true;
+                else if (key == SDL_SCANCODE_LSHIFT) mFastMove = true;
             }
         }
 
         /*-----------------------------------------------------------------------------
         | Processes key releases for free-look style movement.
         -----------------------------------------------------------------------------*/
-        virtual void injectKeyUp(const OIS::KeyEvent& evt)
+        virtual void injectKeyUp(const KeyboardEvent& evt)
         {
             if (mStyle == CS_FREELOOK)
             {
-                if (evt.key == OIS::KC_W || evt.key == OIS::KC_UP) mGoingForward = false;
-                else if (evt.key == OIS::KC_S || evt.key == OIS::KC_DOWN) mGoingBack = false;
-                else if (evt.key == OIS::KC_A || evt.key == OIS::KC_LEFT) mGoingLeft = false;
-                else if (evt.key == OIS::KC_D || evt.key == OIS::KC_RIGHT) mGoingRight = false;
-                else if (evt.key == OIS::KC_PGUP) mGoingUp = false;
-                else if (evt.key == OIS::KC_PGDOWN) mGoingDown = false;
-                else if (evt.key == OIS::KC_LSHIFT) mFastMove = false;
+                Keycode key = evt.keysym.scancode;
+                if (key == SDL_SCANCODE_W || key == SDL_SCANCODE_UP) mGoingForward = false;
+                else if (key == SDL_SCANCODE_S || key == SDL_SCANCODE_DOWN) mGoingBack = false;
+                else if (key == SDL_SCANCODE_A || key == SDL_SCANCODE_LEFT) mGoingLeft = false;
+                else if (key == SDL_SCANCODE_D || key == SDL_SCANCODE_RIGHT) mGoingRight = false;
+                else if (key == SDL_SCANCODE_PAGEUP) mGoingUp = false;
+                else if (key == SDL_SCANCODE_PAGEDOWN) mGoingDown = false;
+                else if (key == SDL_SCANCODE_LSHIFT) mFastMove = false;
             }
         }
 
         /*-----------------------------------------------------------------------------
         | Processes mouse movement differently for each style.
         -----------------------------------------------------------------------------*/
-        virtual void injectPointerMove(const OIS::PointerEvent& evt)
+        virtual void injectMouseMove(const MouseMotionEvent& evt)
         {
             if (mStyle == CS_ORBIT)
             {
@@ -270,8 +272,8 @@ namespace OgreBites
                 {
                     mCamera->setPosition(mTarget->_getDerivedPosition());
 
-                    mCamera->yaw(Ogre::Degree(-evt.state.X.rel * 0.25f));
-                    mCamera->pitch(Ogre::Degree(-evt.state.Y.rel * 0.25f));
+                    mCamera->yaw(Ogre::Degree(-evt.xrel * 0.25f));
+                    mCamera->pitch(Ogre::Degree(-evt.yrel * 0.25f));
 
                     mCamera->moveRelative(Ogre::Vector3(0, 0, dist));
 
@@ -280,18 +282,21 @@ namespace OgreBites
                 else if (mZooming)  // move the camera toward or away from the target
                 {
                     // the further the camera is, the faster it moves
-                    mCamera->moveRelative(Ogre::Vector3(0, 0, evt.state.Y.rel * 0.004f * dist));
-                }
-                else if (evt.state.Z.rel != 0)  // move the camera toward or away from the target
-                {
-                    // the further the camera is, the faster it moves
-                    mCamera->moveRelative(Ogre::Vector3(0, 0, -evt.state.Z.rel * 0.0008f * dist));
+                    mCamera->moveRelative(Ogre::Vector3(0, 0, evt.yrel * 0.004f * dist));
                 }
             }
             else if (mStyle == CS_FREELOOK)
             {
-                mCamera->yaw(Ogre::Degree(-evt.state.X.rel * 0.15f));
-                mCamera->pitch(Ogre::Degree(-evt.state.Y.rel * 0.15f));
+                mCamera->yaw(Ogre::Degree(-evt.xrel * 0.15f));
+                mCamera->pitch(Ogre::Degree(-evt.yrel * 0.15f));
+            }
+        }
+
+        virtual void injectMouseWheel(const MouseWheelEvent& evt) {
+            if (mStyle == CS_ORBIT && evt.y != 0)
+            {
+                Ogre::Real dist = (mCamera->getPosition() - mTarget->_getDerivedPosition()).length();
+                mCamera->moveRelative(Ogre::Vector3(0, 0, -evt.y * 0.08f * dist));
             }
         }
 
@@ -299,12 +304,12 @@ namespace OgreBites
         | Processes mouse presses. Only applies for orbit style.
         | Left button is for orbiting, and right button is for zooming.
         -----------------------------------------------------------------------------*/
-        virtual void injectPointerDown(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        virtual void injectMouseDown(const MouseButtonEvent& evt)
         {
             if (mStyle == CS_ORBIT)
             {
-                if (id == OIS::MB_Left) mOrbiting = true;
-                else if (id == OIS::MB_Right) mZooming = true;
+                if (evt.button == BUTTON_LEFT) mOrbiting = true;
+                else if (evt.button == BUTTON_RIGHT) mZooming = true;
             }
         }
 
@@ -312,12 +317,12 @@ namespace OgreBites
         | Processes mouse releases. Only applies for orbit style.
         | Left button is for orbiting, and right button is for zooming.
         -----------------------------------------------------------------------------*/
-        virtual void injectPointerUp(const OIS::PointerEvent& evt, OIS::MouseButtonID id)
+        virtual void injectMouseUp(const MouseButtonEvent& evt)
         {
             if (mStyle == CS_ORBIT)
             {
-                if (id == OIS::MB_Left) mOrbiting = false;
-                else if (id == OIS::MB_Right) mZooming = false;
+                if (evt.button == BUTTON_LEFT) mOrbiting = false;
+                else if (evt.button == BUTTON_RIGHT) mZooming = false;
             }
         }
 
