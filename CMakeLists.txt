@@ -497,7 +497,7 @@ include(ConfigureBuild)
 # disable (useless) compiler warnings on project level
 ###################################################################
 if(MSVC)
-	add_definitions( /wd4786 /wd4503 /wd4251 /wd4275 /wd4290 /wd4661 /wd4996 /wd4127 /wd4100)
+	add_definitions( /wd4786 /wd4503 /wd4251 /wd4275 /wd4290 /wd4661 /wd4996 /wd4127 /wd4100 /wd4800)
 endif()
 
 ##################################################################
