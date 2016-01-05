@@ -290,7 +290,7 @@ float4 main( PS_INPUT inPs
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
