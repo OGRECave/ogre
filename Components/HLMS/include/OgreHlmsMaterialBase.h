@@ -61,7 +61,7 @@ namespace Ogre
 		// this is called for every renderable before it is renderd with the given pass
 		virtual void updateUniforms(const Pass* pass, const AutoParamDataSource* source, const LightList* pLightList) {}
 
-		bool IsDirty = true;
+		bool IsDirty;
 
 	protected:
 		HlmsDatablock mVertexDatablock;

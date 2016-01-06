@@ -253,7 +253,7 @@ namespace Ogre
 	{
 		if (!rend->getUserObjectBindings().getUserAny(HLMS_KEY).isEmpty())
 		{
-			auto hlmsMatMap = rend->getUserObjectBindings().getUserAny(HLMS_KEY).get<HlmsMatBindingMap*>();
+		    HlmsMatBindingMap* hlmsMatMap = rend->getUserObjectBindings().getUserAny(HLMS_KEY).get<HlmsMatBindingMap*>();
 			return hlmsMatMap->find(passName) != hlmsMatMap->end();
 		}
 

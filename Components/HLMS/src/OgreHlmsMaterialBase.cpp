@@ -32,7 +32,7 @@ namespace Ogre
 {
 	//-----------------------------------------------------------------------------------
 	HlmsMaterialBase::HlmsMaterialBase() : 
-		mVertexDatablock(GPT_VERTEX_PROGRAM, &mPropertyMap),
+		IsDirty(true), mVertexDatablock(GPT_VERTEX_PROGRAM, &mPropertyMap),
 		mFragmentDatablock(GPT_FRAGMENT_PROGRAM, &mPropertyMap)
 	{
 
