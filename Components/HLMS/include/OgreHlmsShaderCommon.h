@@ -136,7 +136,7 @@ namespace Ogre
         return _left.first < _right.first;
     }
 
-	inline uint32 calcHash(void* data, int size)
+	inline uint32 calcHash(const void* data, int size)
 	{
 		uint32 finalHash;
 		MurmurHash3_x86_32(data, size, IdString::Seed, &finalHash);
@@ -146,7 +146,7 @@ namespace Ogre
 	inline uint32 calcHash(String str)
 	{
 		const char* chars = str.c_str();
-		return calcHash((void*)chars, str.length() * sizeof(char));
+		return calcHash(chars, str.length() * sizeof(char));
 	}
 
 	inline uint32 calcHash(const StringVector& vec)
@@ -159,6 +159,6 @@ namespace Ogre
 		
 		String str = stream.str();
 		const char* chars = str.c_str();
-		return calcHash((void*)chars, str.length() * sizeof(char));
+		return calcHash(chars, str.length() * sizeof(char));
 	}
 }
