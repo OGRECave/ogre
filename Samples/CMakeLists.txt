@@ -49,6 +49,11 @@ if (OGRE_BUILD_SAMPLES)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreVolume)
   endif ()
   
+  if (OGRE_BUILD_COMPONENT_HLMS)
+	ogre_add_component_include_dir(HLMS)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreHLMS)
+  endif ()
+  
   if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR AND OGRE_CONFIG_ENABLE_MESHLOD)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreMeshLodGenerator)
   endif ()
@@ -188,6 +193,10 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(Isosurf)
   add_subdirectory(ParticleGS)
   add_subdirectory(SSAO)
+endif ()
+
+if (OGRE_BUILD_COMPONENT_HLMS)
+  add_subdirectory(HLMS)
 endif ()
 
 # Add browser last

@@ -3504,6 +3504,16 @@ namespace Ogre {
             }            
         }
 
+		if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map"))
+		{
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+			// Some Apple NVIDIA hardware can't handle seamless cubemaps
+			if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
+#endif
+				// Enable seamless cube maps
+				glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+		}
+
         static_cast<GLTextureManager*>(mTextureManager)->createWarningTexture();
     }
     //---------------------------------------------------------------------

@@ -1,0 +1,80 @@
+
+@piece( BlendFunctions )
+	// Alpha blending (NormalNonPremul)
+	vec4 blendFunc0(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, inColor2, inColor2.a * f );
+	}
+
+	// Alpha blending premul (NormalPremul)
+	vec4 blendFunc1(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return (1.0 - (inColor2.a * f)) * inColor1 + inColor2;
+	}
+
+	// Add
+	vec4 blendFunc2(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, inColor1 + inColor2, inColor2.a * f );
+	}
+
+	// Subtract
+	vec4 blendFunc3(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, inColor1 - inColor2, inColor2.a * f );
+	}
+
+	// Multiply
+	vec4 blendFunc4(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, inColor1 * inColor2, inColor2.a * f );
+	}
+
+	// Multiply2x
+	vec4 blendFunc5(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, min(inColor1 * inColor2 * 2.0, vec4(1.0, 1.0, 1.0, 1.0)), inColor2.a * f );
+	}
+
+	// Screen
+	vec4 blendFunc6(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, 1.0 - (1.0 - inColor1) * (1.0 - inColor2), inColor2.a * f );
+	}
+
+	// Overlay
+	vec4 blendFunc7(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, inColor1 * ( inColor1 + 2.0 * inColor2 * (1.0 - inColor1) ), inColor2.a * f );
+	}
+
+	// Lighten
+	vec4 blendFunc8(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, max(inColor1, inColor2), inColor2.a * f );
+	}
+
+	// Darken
+	vec4 blendFunc9(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, min(inColor1, inColor2), inColor2.a * f );
+	}
+
+	// GrainExtract
+	vec4 blendFunc10(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, (inColor1 - inColor2) + 0.5, inColor2.a * f );
+	}
+
+	// GrainMerge
+	vec4 blendFunc11(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, (inColor1 + inColor2) - 0.5, inColor2.a * f );
+	}
+
+	// Difference
+	vec4 blendFunc12(vec4 inColor1, vec4 inColor2, float f)
+	{
+		return mix( inColor1, abs(inColor1 - inColor2) - 0.5, inColor2.a * f );
+	}
+@end

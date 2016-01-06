@@ -48,3 +48,4 @@ SamplePlugin=Sample_Transparency
 @OGRE_COMMENT_COMPONENT_VOLUME@SamplePlugin=Sample_VolumeTerrain
 SamplePlugin=Sample_VolumeTex
 SamplePlugin=Sample_Water
+@OGRE_COMMENT_COMPONENT_HLMS@SamplePlugin=Sample_HLMS

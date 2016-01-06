@@ -45,38 +45,46 @@ namespace Ogre
 	{
 		delete mShaderPiecesManager;
 		mShaderPiecesManager = NULL;
+
+		ShaderCacheMap::iterator it = mShaderCache.begin();
+		ShaderCacheMap::iterator endIt = mShaderCache.end();
+		for (; it != endIt; ++it)
+		{
+			GpuProgramPtr gpuPrg = it->second;
+			HighLevelGpuProgramManager::getSingleton().unload(gpuPrg->getName());
+			HighLevelGpuProgramManager::getSingleton().remove(gpuPrg->getName());
+			gpuPrg.setNull();
+		}
+		mShaderCache.clear();
 	}
 	//-----------------------------------------------------------------------------------
 	GpuProgramPtr ShaderManager::getGpuProgram(HlmsDatablock* dataBlock)
 	{
 		uint32 hash = dataBlock->getHash();
-
 		map<uint32, GpuProgramPtr>::iterator it = mShaderCache.find(hash);
 		if (it != mShaderCache.end())
 		{
 			return (*it).second;
 		}
-		else
-		{
-			String typeStr = FilePatterns[dataBlock->getShaderType()];
 
-			std::stringstream sstream;
-			sstream << std::hex << hash;
-			std::string hashString = sstream.str();
+		String typeStr = FilePatterns[dataBlock->getShaderType()];
 
-			String name = hashString + typeStr;
+		std::stringstream sstream;
+		sstream << std::hex << hash;
+		std::string hashString = sstream.str();
 
-			// generate the shader code
-			String code = dataBlock->getTemplate()->getTemplate();
-			StringVectorPtr pieces = mShaderPiecesManager->getPieces(dataBlock->getLanguage(), dataBlock->getShaderType());
-			code = ShaderGenerator::parse(code, *(dataBlock->getPropertyMap()), pieces);
+		String name = hashString + typeStr;
 
-			GpuProgramPtr gpuProgram = createGpuProgram(name, code, dataBlock);
+		// generate the shader code
+		String code = dataBlock->getTemplate()->getTemplate();
+		StringVectorPtr pieces = mShaderPiecesManager->getPieces(dataBlock->getLanguage(), dataBlock->getShaderType());
+		code = ShaderGenerator::parse(code, *(dataBlock->getPropertyMap()), pieces);
 
-			mShaderCache[hash] = gpuProgram;
+		GpuProgramPtr gpuProgram = createGpuProgram(name, code, dataBlock);
 
-			return gpuProgram;
-		}
+		mShaderCache[hash] = gpuProgram;
+
+		return gpuProgram;
 	}
 	//-----------------------------------------------------------------------------------
 	GpuProgramPtr ShaderManager::createGpuProgram(const String& name, const String& code, HlmsDatablock* dataBlock)

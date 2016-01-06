@@ -494,8 +494,14 @@ namespace Ogre
             assert(loadedStreams->size()==1);
 
             DWORD usage = 0;
-            UINT numMips = (mNumRequestedMipmaps == MIP_UNLIMITED) ?
-                D3DX_DEFAULT : mNumRequestedMipmaps + 1;
+			UINT numMips;
+
+			if (mNumRequestedMipmaps == MIP_UNLIMITED)
+				numMips = D3DX_DEFAULT;
+			else if (mNumRequestedMipmaps == 0)
+				numMips = D3DX_FROM_FILE;
+			else
+				numMips = static_cast<UINT>(mNumRequestedMipmaps + 1);
             
             D3D9Device* device = D3D9RenderSystem::getDeviceManager()->getDeviceFromD3D9Device(d3d9Device);
             const D3DCAPS9& rkCurCaps = device->getD3D9DeviceCaps();            
