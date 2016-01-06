@@ -597,9 +597,9 @@ namespace Ogre
 					count = properties.getProperty(argValues[2], 0);
 				}
 
-				// Repead the block
-				for (int i = start; i < count; ++i)
-					repeat(outBuffer, blockSubString, blockSubString.getSize(), i, counterVar);
+				// Repeat the block
+				for (int i = 0; i < count; ++i)
+					repeat(outBuffer, blockSubString, blockSubString.getSize(), start + i, counterVar);
 			}
 
 			subString.setStart(blockSubString.getEnd() + sizeof("@end"));

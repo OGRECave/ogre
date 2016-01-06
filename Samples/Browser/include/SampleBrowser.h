@@ -1182,7 +1182,7 @@ namespace OgreBites
 
             Sample* startupSample = loadSamples();
 
-            Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
+            // Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
 
             // adds context as listener to process context-level (above the sample level) events
             mRoot->addFrameListener(this);

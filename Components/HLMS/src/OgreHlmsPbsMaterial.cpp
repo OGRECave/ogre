@@ -324,34 +324,55 @@ namespace Ogre
 			Matrix4 viewMatrix = source->getViewMatrix();
 			Quaternion viewMatrixQuat = viewMatrix.extractQuaternion();
 
+			int directionalLightIndex = 0;
+			int pointLightLightIndex = 0;
+			int spotLightIndex = 0;
+
 			for (unsigned int i = 0; i < count; i++)
 			{
 				Light* light = (*pLightList)[i];
 
+				int index;
+				if (light->getType() == Light::LT_DIRECTIONAL)
+				{
+					index = directionalLightIndex;
+					directionalLightIndex++;
+				}
+				else if (light->getType() == Light::LT_POINT)
+				{
+					index = mDirectionalLightCount + pointLightLightIndex;
+					pointLightLightIndex++;
+				}
+				else
+				{
+					index = mDirectionalLightCount + mPointLightCount + spotLightIndex;
+					spotLightIndex++;
+				}
+
 				Vector3 pos = viewMatrix * light->getDerivedPosition();
-				mLightPositions_es[i * 3 + 0] = pos.x;
-				mLightPositions_es[i * 3 + 1] = pos.y;
-				mLightPositions_es[i * 3 + 2] = pos.z;
+				mLightPositions_es[index * 4 + 0] = pos.x;
+				mLightPositions_es[index * 4 + 1] = pos.y;
+				mLightPositions_es[index * 4 + 2] = pos.z;
 
 				Vector3 dir = -(viewMatrixQuat * light->getDerivedDirection()).normalisedCopy();
-				mLightDirections_es[i * 3 + 0] = dir.x;
-				mLightDirections_es[i * 3 + 1] = dir.y;
-				mLightDirections_es[i * 3 + 2] = dir.z;
+				mLightDirections_es[index * 4 + 0] = dir.x;
+				mLightDirections_es[index * 4 + 1] = dir.y;
+				mLightDirections_es[index * 4 + 2] = dir.z;
 
 				ColourValue color = light->getDiffuseColour();
-				mLightColors[i * 3 + 0] = color.r;
-				mLightColors[i * 3 + 1] = color.g;
-				mLightColors[i * 3 + 2] = color.b;
+				mLightColors[index * 4 + 0] = color.r;
+				mLightColors[index* 4 + 1] = color.g;
+				mLightColors[index* 4 + 2] = color.b;
 
-				mLightParameters[i * 3 + 0] = light->getAttenuationRange();
-				mLightParameters[i * 3 + 1] = Math::Cos(light->getSpotlightOuterAngle() / 2.0);
-				mLightParameters[i * 3 + 2] = light->getSpotlightFalloff();
+				mLightParameters[index * 4 + 0] = light->getAttenuationRange();
+				mLightParameters[index * 4 + 1] = Math::Cos(light->getSpotlightOuterAngle() / 2.0);
+				mLightParameters[index * 4 + 2] = light->getSpotlightFalloff();
 			}
 
-			fragmentParams->setNamedConstant("lightPositions_es", &(mLightPositions_es[0]), count, 3);
-			fragmentParams->setNamedConstant("lightDirections_es", &(mLightDirections_es[0]), count, 3);
-			fragmentParams->setNamedConstant("lightColors", &(mLightColors[0]), count, 3);
-			fragmentParams->setNamedConstant("lightParameters", &(mLightParameters[0]), count, 3);
+			fragmentParams->setNamedConstant("lightPositions_es", &(mLightPositions_es[0]), count);
+			fragmentParams->setNamedConstant("lightDirections_es", &(mLightDirections_es[0]), count);
+			fragmentParams->setNamedConstant("lightColors", &(mLightColors[0]), count);
+			fragmentParams->setNamedConstant("lightParameters", &(mLightParameters[0]), count);
 		}
 
 		// update the textures

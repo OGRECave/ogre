@@ -76,6 +76,9 @@ namespace Ogre
 			TextureAddressing() : u(TextureUnitState::TAM_WRAP), v(TextureUnitState::TAM_WRAP)
 			{}
 
+			TextureAddressing(TextureUnitState::TextureAddressingMode inU, TextureUnitState::TextureAddressingMode  inV) : u(inU), v(inV)
+			{}
+
 			TextureUnitState::TextureAddressingMode u;
 			TextureUnitState::TextureAddressingMode v;
 			bool operator ==(TextureAddressing& b){ return u == b.u && v == b.v; }

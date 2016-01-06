@@ -2429,3 +2429,10 @@ material Examples/TransparentBlue50
 //         }
 //     }
 // }
+
+material DebugSphere1000
+{
+	technique
+	{			
+	}
+}

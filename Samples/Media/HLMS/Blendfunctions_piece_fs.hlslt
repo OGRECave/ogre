@@ -1,0 +1,79 @@
+@piece( BlendFunctions )
+	// Alpha blending (NormalNonPremul)
+	float4 blendFunc0(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, inColor2, inColor2.a * f );
+	}
+
+	// Alpha blending premul (NormalPremul)
+	float4 blendFunc1(float4 inColor1, float4 inColor2, float f)
+	{
+		return (1.0 - (inColor2.a * f)) * inColor1 + inColor2;
+	}
+
+	// Add
+	float4 blendFunc2(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, inColor1 + inColor2, inColor2.a * f );
+	}
+
+	// Subtract
+	float4 blendFunc3(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, inColor1 - inColor2, inColor2.a * f );
+	}
+
+	// Multiply
+	float4 blendFunc4(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, inColor1 * inColor2, inColor2.a * f );
+	}
+
+	// Multiply2x
+	float4 blendFunc5(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, min(inColor1 * inColor2 * 2.0, float4(1.0, 1.0, 1.0, 1.0)), inColor2.a * f );
+	}
+
+	// Screen
+	float4 blendFunc6(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, 1.0 - (1.0 - inColor1) * (1.0 - inColor2), inColor2.a * f );
+	}
+
+	// Overlay
+	float4 blendFunc7(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, inColor1 * ( inColor1 + 2.0 * inColor2 * (1.0 - inColor1) ), inColor2.a * f );
+	}
+
+	// Lighten
+	float4 blendFunc8(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, max(inColor1, inColor2), inColor2.a * f );
+	}
+
+	// Darken
+	float4 blendFunc9(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, min(inColor1, inColor2), inColor2.a * f );
+	}
+
+	// GrainExtract
+	float4 blendFunc10(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, (inColor1 - inColor2) + 0.5, inColor2.a * f );
+	}
+
+	// GrainMerge
+	float4 blendFunc11(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, (inColor1 + inColor2) - 0.5, inColor2.a * f );
+	}
+
+	// Difference
+	float4 blendFunc12(float4 inColor1, float4 inColor2, float f)
+	{
+		return lerp( inColor1, abs(inColor1 - inColor2) - 0.5, inColor2.a * f );
+	}
+@end

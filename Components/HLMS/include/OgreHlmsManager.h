@@ -60,6 +60,7 @@ namespace Ogre
 
 		void bind(Renderable* rend, HlmsMaterialBase* material, String passName);
 		void unbind(Renderable* rend, String passName);
+		void unbindAll(String passName);
 		bool hasBinding(Renderable* rend, String passName);
 
 	protected:
@@ -67,7 +68,7 @@ namespace Ogre
 		typedef vector<Renderable*>::type RenderableVector;
 
 		SceneManager* mSceneManager;
-		ShaderManager mShaderManager;
+		ShaderManager* mShaderManager;
 		RenderableVector mBindedRenderables;
     };
 }

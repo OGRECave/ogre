@@ -46,15 +46,16 @@ namespace Ogre
     {
     public:
 		ShaderManager(SceneManager* sceneManager, const String& pieseFilesResorceGroup);
-		virtual ~ShaderManager();
+		~ShaderManager();
 
 		GpuProgramPtr getGpuProgram(HlmsDatablock* dataBlock);
 		static GpuProgramPtr createGpuProgram(const String& name, const String& code, HlmsDatablock* dataBlock);
 
 	protected:
+		typedef map<uint32, GpuProgramPtr>::type ShaderCacheMap;
 
 		SceneManager* mSceneManager;
-		map<uint32, GpuProgramPtr>::type mShaderCache;
+		ShaderCacheMap mShaderCache;
 		ShaderPiecesManager* mShaderPiecesManager;
     };
 }
