@@ -231,8 +231,8 @@ bool Sample_VolumeTerrain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 #ifndef OGRE_STATIC_LIB
 
-SamplePlugin* sp;
-Sample* s;
+static SamplePlugin* sp;
+static Sample* s;
     
 //-----------------------------------------------------------------------
 
