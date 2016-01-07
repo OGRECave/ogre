@@ -20,8 +20,8 @@ using namespace OgreBites;
 
 #ifndef OGRE_STATIC_LIB
 
-SamplePlugin* sp;
-Sample* s;
+static SamplePlugin* sp;
+static Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {

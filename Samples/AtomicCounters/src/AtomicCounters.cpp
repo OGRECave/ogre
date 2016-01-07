@@ -17,8 +17,8 @@ same license as the rest of the engine.
 using namespace Ogre;
 using namespace OgreBites;
 
-SamplePlugin* sp;
-Sample* s;
+static SamplePlugin* sp;
+static Sample* s;
 
 class _OgreSampleClassExport Sample_AtomicCounters : public SdkSample
 {
