@@ -299,9 +299,6 @@ if (OGRE_BUILD_TESTS)
   # Configure interactive test build
   if (OIS_FOUND)
 
-    # PlayPen gets included always
-    add_subdirectory(PlayPen)
-
     # add VisualTests directory
     add_subdirectory(VisualTests)
 
