@@ -2,8 +2,8 @@
 
 #ifndef OGRE_STATIC_LIB
 
-OgreBites::SamplePlugin* sp;
-OgreBites::Sample* s;
+static OgreBites::SamplePlugin* sp;
+static OgreBites::Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
