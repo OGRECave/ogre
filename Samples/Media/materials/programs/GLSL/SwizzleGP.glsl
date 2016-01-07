@@ -18,6 +18,7 @@ void main(void)
     //  result => the line we want to draw, and the same line, but along the other axis
 
     //Pass-thru!
+    int i;
     for (i = 0; i < gl_VerticesIn; i++) {
         gl_Position = gl_PositionIn[i];
         gl_FrontColor = origColour;
@@ -33,5 +34,4 @@ void main(void)
         EmitVertex();
     }
     EndPrimitive();
-
 }
