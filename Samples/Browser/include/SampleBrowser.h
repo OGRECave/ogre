@@ -112,10 +112,8 @@
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   if SAMPLES_INCLUDE_PLAYPEN
-#    include "PlayPen.h"
 #    include "PlayPenTestPlugin.h"
-    PlayPenPlugin* playPenPlugin = 0;
-    PlaypenTestPlugin* playPenTestPlugin = 0;
+    static PlaypenTestPlugin* playPenTestPlugin = 0;
 #   endif
 #   ifdef INCLUDE_RTSHADER_SYSTEM
 #       include "OgreRTShaderSystem.h"
@@ -1450,30 +1448,9 @@ namespace OgreBites
 
 #ifdef SAMPLES_INCLUDE_PLAYPEN
 #  ifdef OGRE_STATIC_LIB
-            playPenPlugin = OGRE_NEW PlayPenPlugin();
-            mRoot->installPlugin(playPenPlugin);
-            SampleSet newSamples = playPenPlugin->getSamples();
-            for (SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
-            {
-                Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
-                Ogre::NameValuePairList::iterator k;
-
-                // give sample default title and category if none found
-                k= info.find("Title");
-                if (k == info.end() || k->second.empty()) info["Title"] = "Untitled";
-                k = info.find("Category");
-                if (k == info.end() || k->second.empty()) info["Category"] = "Unsorted";
-                k = info.find("Thumbnail");
-                if (k == info.end() || k->second.empty()) info["Thumbnail"] = "thumb_error.png";
-                mSampleCategories.insert(info["Category"]);   // add sample category
-                if (info["Title"] == startupSampleTitle) startupSample = *j;   // we found the startup sample
-                sampleList.push_back(info["Title"]);
-                mPluginNameMap[info["Title"]] = (OgreBites::SdkSample *)(*j);
-            }
-
             playPenTestPlugin = OGRE_NEW PlaypenTestPlugin();
             mRoot->installPlugin(playPenTestPlugin);
-            newSamples = playPenTestPlugin->getSamples();
+            SampleSet newSamples = playPenTestPlugin->getSamples();
             for (SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
             {
                 Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
@@ -1495,7 +1472,6 @@ namespace OgreBites
 #    if OGRE_DEBUG_MODE && !(OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
             sampleList.push_back("PlayPen_d");
 #    else
-            sampleList.push_back("PlayPen");
             sampleList.push_back("PlayPenTests");
 #    endif
 #  endif
@@ -1606,8 +1582,6 @@ namespace OgreBites
                     mRoot->uninstallPlugin(pluginList[i]);
             }
 #  ifdef SAMPLES_INCLUDE_PLAYPEN
-            mRoot->uninstallPlugin(playPenPlugin);
-            delete playPenPlugin;
             mRoot->uninstallPlugin(playPenTestPlugin);
             delete playPenTestPlugin;
 #  endif

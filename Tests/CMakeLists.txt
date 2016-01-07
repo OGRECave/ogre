@@ -296,6 +296,5 @@ if (OGRE_BUILD_TESTS)
     endif ()
   endif (CppUnit_FOUND)
 
-  add_subdirectory(PlayPen)
   add_subdirectory(VisualTests)
 endif (OGRE_BUILD_TESTS)
