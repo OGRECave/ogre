@@ -49,3 +49,4 @@ SamplePlugin=Sample_VolumeTerrain_d
 SamplePlugin=Sample_VolumeTex_d
 SamplePlugin=Sample_Water_d
 @OGRE_COMMENT_COMPONENT_HLMS@SamplePlugin=Sample_HLMS_d
+@OGRE_COMMENT_PLAYPENTESTS@SamplePlugin=PlayPenTests_d

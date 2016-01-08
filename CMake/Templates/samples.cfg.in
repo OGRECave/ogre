@@ -49,3 +49,4 @@ SamplePlugin=Sample_Transparency
 SamplePlugin=Sample_VolumeTex
 SamplePlugin=Sample_Water
 @OGRE_COMMENT_COMPONENT_HLMS@SamplePlugin=Sample_HLMS
+@OGRE_COMMENT_PLAYPENTESTS@SamplePlugin=PlayPenTests
