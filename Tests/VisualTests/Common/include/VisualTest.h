@@ -31,10 +31,6 @@ THE SOFTWARE.
 
 #include "OgreBuildSettings.h"
 
-#if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
-#  define INCLUDE_RTSHADER_SYSTEM
-#endif
-
 #ifdef INCLUDE_RTSHADER_SYSTEM
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.
@@ -63,19 +59,11 @@ class VisualTest : public OgreBites::Sample
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
     }
 
-    virtual ~VisualTest(){}
-
     /** Adds a screenshot frame to the list - this should
      *    be done during setup of the test. */
     void addScreenshotFrame(unsigned int frame)
     {
         mScreenshotFrames.insert(frame);
-    }
-
-    /** Does some basic setup tasks */
-    virtual void _setup(Ogre::RenderWindow* window, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
-    {
-        OgreBites::Sample::_setup(window, fsLayer, overlaySys);
     }
 
     /** Clean up */
