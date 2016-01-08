@@ -784,7 +784,7 @@ bool TestContext::initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
 #endif
         // Create and register the material manager listener if it doesn't exist yet.
         if (mMaterialMgrListener == NULL) {
-            mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
+            mMaterialMgrListener = new OgreBites::ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
             Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
         }
     }

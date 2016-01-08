@@ -125,6 +125,7 @@ typedef std::map<String, OgreBites::SdkSample *> PluginMap;
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.
 //#define _RTSS_WRITE_SHADERS_TO_DISK
+#include "ShaderGeneratorTechniqueResolverListener.h"
 #endif // INCLUDE_RTSHADER_SYSTEM   
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -146,98 +147,8 @@ namespace OgreBites
                    @end
 #endif
 
-                   namespace OgreBites
+namespace OgreBites
 {
-#ifdef INCLUDE_RTSHADER_SYSTEM
-
-    /** This class demonstrates basic usage of the RTShader system.
-        It sub class the material manager listener class and when a target scheme callback
-        is invoked with the shader generator scheme it tries to create an equivalent shader
-        based technique based on the default technique of the given material.
-    */
-    class ShaderGeneratorTechniqueResolverListener : public Ogre::MaterialManager::Listener
-    {
-    public:
-
-        ShaderGeneratorTechniqueResolverListener(Ogre::RTShader::ShaderGenerator* pShaderGenerator)
-        {
-            mShaderGenerator = pShaderGenerator;
-        }
-
-        /** This is the hook point where shader based technique will be created.
-            It will be called whenever the material manager won't find appropriate technique
-            that satisfy the target scheme name. If the scheme name is out target RT Shader System
-            scheme name we will try to create shader generated technique for it.
-        */
-        virtual Ogre::Technique* handleSchemeNotFound(unsigned short schemeIndex,
-                                                      const Ogre::String& schemeName, Ogre::Material* originalMaterial, unsigned short lodIndex,
-                                                      const Ogre::Renderable* rend)
-        {
-            if (schemeName != Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-            {
-                return NULL;
-            }
-            // Case this is the default shader generator scheme.
-
-            // Create shader generated technique for this material.
-            bool techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-                originalMaterial->getName(),
-                Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-                schemeName);
-
-            if (!techniqueCreated)
-            {
-                return NULL;
-            }
-            // Case technique registration succeeded.
-
-            // Force creating the shaders for the generated technique.
-            mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
-
-            // Grab the generated technique.
-            Ogre::Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
-
-            while (itTech.hasMoreElements())
-            {
-                Ogre::Technique* curTech = itTech.getNext();
-
-                if (curTech->getSchemeName() == schemeName)
-                {
-                    return curTech;
-                }
-            }
-
-            return NULL;
-        }
-
-	virtual bool afterIlluminationPassesCreated(Ogre::Technique* tech)
-	{
-		if(tech->getSchemeName() == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-		{
-			Ogre::Material* mat = tech->getParent();
-			mShaderGenerator->validateMaterialIlluminationPasses(tech->getSchemeName(), mat->getName(), mat->getGroup());
-			return true;
-		}
-		return false;
-	}
-
-	virtual bool beforeIlluminationPassesCleared(Ogre::Technique* tech)
-	{
-		if(tech->getSchemeName() == Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-		{
-			Ogre::Material* mat = tech->getParent();
-			mShaderGenerator->invalidateMaterialIlluminationPasses(tech->getSchemeName(), mat->getName(), mat->getGroup());
-			return true;
-		}
-		return false;
-	}
-
-    protected:
-        Ogre::RTShader::ShaderGenerator*        mShaderGenerator;                       // The shader generator instance.
-    };
-#endif // INCLUDE_RTSHADER_SYSTEM
-
-
     /*=============================================================================
       | The OGRE Sample Browser. Features a menu accessible from all samples,
       | dynamic configuration, resource reloading, node labeling, and more.
