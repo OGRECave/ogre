@@ -68,7 +68,7 @@ static void APIENTRY GLDebugCallback(GLenum source,
                                      const GLchar* message,
                                      GLvoid* userParam)
 {
-    char debSource[32], debType[32], debSev[32];
+    char debSource[32] = {0}, debType[32] = {0}, debSev[32] = {0};
 
     if (source == GL_DEBUG_SOURCE_API)
         strcpy(debSource, "OpenGL");
