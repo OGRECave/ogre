@@ -14,14 +14,21 @@ if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     ogre_add_component_include_dir(RTShaderSystem)
 endif ()
 
-# add Context directory
-add_subdirectory(Context)
+if(NOT ANDROID)
+    # add Context directory
+    add_subdirectory(Context)
+endif()
 
 # add the PlayPen test plugin's directory
 add_subdirectory(PlayPen)
 
 # add VTests plugin directory
 add_subdirectory(VTests)
+
+if(ANDROID)
+    # skip the CTest stuff
+    return()
+endif()
 
 # setup cmake scripts
 configure_file(RunVTests.cmake ${CMAKE_BINARY_DIR}/Tests/VisualTests/RunVTests.cmake COPYONLY)
