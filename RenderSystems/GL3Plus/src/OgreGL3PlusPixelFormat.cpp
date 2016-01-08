@@ -195,7 +195,7 @@ namespace Ogre  {
         switch(format)
         {
         case PF_DEPTH:
-            return GL_UNSIGNED_INT;
+            return GL_UNSIGNED_SHORT;
         case PF_BYTE_LA:
         case PF_A8:
         case PF_L8:
