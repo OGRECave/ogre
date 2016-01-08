@@ -49,12 +49,6 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
-struct NonRandomValueProvider : Math::RandomValueProvider {
-    Real getRandomUnit() {
-        return 0.5;
-    }
-} nonRV;
-
 TestContext::TestContext(int argc, char** argv) : mSuccess(true), mTimestep(0.01f), mOutputDir(BLANKSTRING), mCurrentTest(0), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
@@ -95,8 +89,6 @@ TestContext::TestContext(int argc, char** argv) : mSuccess(true), mTimestep(0.01
 
     if(mReferenceSetPath == BLANKSTRING)
         mReferenceSetPath = mOutputDir;
-    
-    Math::SetRandomValueProvider(&nonRV);
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
     mShaderGenerator     = NULL;
@@ -276,7 +268,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
 #endif
         }
         // if it fails, just return right away
-        catch (Ogre::Exception e)
+        catch (Ogre::Exception& e)
         {
             return 0;
         }
@@ -303,7 +295,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
             {
                 (*j)->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
             }
-            catch(Ogre::Exception e)
+            catch(Ogre::Exception& e)
             {
                 continue;
             }
