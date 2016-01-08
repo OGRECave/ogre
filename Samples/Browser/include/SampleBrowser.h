@@ -1322,8 +1322,7 @@ namespace OgreBites
             }
 #endif
 
-#ifdef SAMPLES_INCLUDE_PLAYPEN
-#  ifdef OGRE_STATIC_LIB
+#if defined(SAMPLES_INCLUDE_PLAYPEN) && defined(OGRE_STATIC_LIB)
             playPenTestPlugin = OGRE_NEW PlaypenTestPlugin();
             mRoot->installPlugin(playPenTestPlugin);
             SampleSet newSamples = playPenTestPlugin->getSamples();
@@ -1344,13 +1343,6 @@ namespace OgreBites
                 sampleList.push_back(info["Title"]);
                 mPluginNameMap[info["Title"]] = (OgreBites::SdkSample *)(*j);
             }
-#  else
-#    if OGRE_DEBUG_MODE && !(OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-            sampleList.push_back("PlayPenTests_d");
-#    else
-            sampleList.push_back("PlayPenTests");
-#    endif
-#  endif
 #endif
 
             // loop through all sample plugins...
