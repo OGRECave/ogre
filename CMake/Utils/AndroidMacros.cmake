@@ -39,6 +39,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     #    - HAS_CODE            Set this variable to "false" if no java code will be present 
     #                          (google android:hasCode for more info)
     #    - MAIN_ACTIVITY       Name of the main java activity ex "android.app.MainActivity" 
+    #    - OGRE_ANDROID_CFLAGS (optional) additional CFLAGS to use
     ##################################################################    
     	
 	if(OGRE_BUILD_RENDERSYSTEM_GLES2)
@@ -63,7 +64,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     endif()
 
     if(OGRE_USE_BOOST)
-       set(OGRE_BOOST_INCLUDES ${Boost_INCLUDE_DIRS})       
+       list(OGRE_ANDROID_INCLUDES APPEND ${Boost_INCLUDE_DIRS})       
 	   add_static_libs_from_paths(${Boost_LIBRARIES})
     endif()
 
