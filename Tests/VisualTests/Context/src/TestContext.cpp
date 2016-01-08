@@ -670,49 +670,11 @@ void TestContext::createDummyScene()
 #ifdef INCLUDE_RTSHADER_SYSTEM
     // Initialize shader generator.
     // Must be before resource loading in order to allow parsing extended material attributes.
-    bool success = initialiseRTShaderSystem(sm);
-    if (!success)
+    if (!initialiseRTShaderSystem(sm))
     {
         OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
                     "Shader Generator Initialization failed - Core shader libs path not found",
                     "SampleBrowser::createDummyScene");
-    }
-    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
-    {
-        //newViewport->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-
-        // creates shaders for base material BaseWhite using the RTSS
-        Ogre::MaterialPtr baseWhite = Ogre::MaterialManager::getSingleton().getByName("BaseWhite", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-        baseWhite->setLightingEnabled(false);
-        mShaderGenerator->createShaderBasedTechnique(
-            "BaseWhite",
-            Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-            Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                                           "BaseWhite");
-        if(baseWhite->getNumTechniques() > 1)
-        {
-            baseWhite->getTechnique(0)->getPass(0)->setVertexProgram(
-                baseWhite->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
-            baseWhite->getTechnique(0)->getPass(0)->setFragmentProgram(
-                baseWhite->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
-        }
-
-        // creates shaders for base material BaseWhiteNoLighting using the RTSS
-        mShaderGenerator->createShaderBasedTechnique(
-            "BaseWhiteNoLighting",
-            Ogre::MaterialManager::DEFAULT_SCHEME_NAME,
-            Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
-        mShaderGenerator->validateMaterial(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
-                                           "BaseWhiteNoLighting");
-        Ogre::MaterialPtr baseWhiteNoLighting = Ogre::MaterialManager::getSingleton().getByName("BaseWhiteNoLighting", Ogre::ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME);
-        if(baseWhite->getNumTechniques() > 1)
-        {
-            baseWhiteNoLighting->getTechnique(0)->getPass(0)->setVertexProgram(
-                baseWhiteNoLighting->getTechnique(1)->getPass(0)->getVertexProgram()->getName());
-            baseWhiteNoLighting->getTechnique(0)->getPass(0)->setFragmentProgram(
-                baseWhiteNoLighting->getTechnique(1)->getPass(0)->getFragmentProgram()->getName());
-        }
     }
 #endif // INCLUDE_RTSHADER_SYSTEM
 }
