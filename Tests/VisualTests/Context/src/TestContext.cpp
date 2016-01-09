@@ -506,26 +506,38 @@ bool TestContext::oneTimeConfig()
     {
         bool temp = mRoot->showConfigDialog();
         if(!temp)
-            mRoot->setRenderSystem(0);
+            mRoot->setRenderSystem(NULL);
         return temp;
     }
 
     // try restore
-    bool success = mRoot->restoreConfig();
-
-    // if restoring failed, show the dialog
-    if(!success)
-        success = mRoot->showConfigDialog();
+    bool restore = mRoot->restoreConfig();
 
     // set render system if user-defined
-    if(success && mRenderSystemName != "SAVED" && mRoot->getRenderSystemByName(mRenderSystemName))
+    if(restore && mRenderSystemName != "SAVED" && mRoot->getRenderSystemByName(mRenderSystemName)) {
         mRoot->setRenderSystem(mRoot->getRenderSystemByName(mRenderSystemName));
-    else if(!success)
-        mRoot->setRenderSystem(0);
+    }
+    else if(!restore) {
+        // just select the first available render system
+        const RenderSystemList lstRend = Root::getSingleton().getAvailableRenderers();
+        RenderSystemList::const_iterator pRend = lstRend.begin();
+
+        mRoot->setRenderSystem(pRend != lstRend.end() ? *pRend : NULL);
+
+        RenderSystem* rs = mRoot->getRenderSystem();
+
+        if(rs) {
+            // set sane defaults
+            rs->setConfigOption("VSync", "Yes");
+            rs->setConfigOption("Full Screen", "No");
+            rs->setConfigOption("Fixed Pipeline Enabled", "No");
+            rs->setConfigOption("Video Mode", "640x 480");
+        }
+    }
 
     mRenderSystemName = mRoot->getRenderSystem() ? mRoot->getRenderSystem()->getName() : "";
 
-    return success;
+    return mRoot->getRenderSystem();
 }
 //-----------------------------------------------------------------------
 
