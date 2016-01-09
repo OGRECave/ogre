@@ -12,6 +12,7 @@ addons:
     - libboost-all-dev
     - libcppunit-dev
     - libgles2-mesa-dev
+    - nvidia-cg-toolkit
 before_script:
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
@@ -43,6 +44,7 @@ script:
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then BUILD_CMD="set -o pipefail && $BUILD_CMD | xcpretty" ; fi
     - echo $BUILD_CMD && eval $BUILD_CMD
     - if [ $TEST ]; then bin/Test_Ogre ; fi
+    - if [ $TEST ]; then cd bin && ./TestContext ; fi
 os:
     - linux
     - osx
