@@ -179,24 +179,24 @@ if (MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-error=cast-qual -Wno-unused-local-typedefs")
 endif ()
 
-if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
-  include(GenerateExportHeader)
-  add_compiler_export_flags(OGRE_GCC_VISIBILITY_FLAGS)
+include(GenerateExportHeader)
+add_compiler_export_flags(OGRE_VISIBILITY_FLAGS)
 
-  if (OGRE_GCC_VISIBILITY_FLAGS)
-    set(OGRE_GCC_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY ${OGRE_GCC_VISIBILITY_FLAGS}")
+if (OGRE_VISIBILITY_FLAGS)
+    set(OGRE_VISIBILITY_FLAGS "-DOGRE_GCC_VISIBILITY ${OGRE_VISIBILITY_FLAGS}")
     set(XCODE_ATTRIBUTE_GCC_SYMBOLS_PRIVATE_EXTERN "YES")
-
+    
     if(APPLE AND NOT APPLE_IOS)
-      if(OGRE_GCC_VISIBILITY_FLAGS MATCHES -fvisibility-inlines-hidden)
+      if(OGRE_VISIBILITY_FLAGS MATCHES -fvisibility-inlines-hidden)
         message(STATUS "Skipping -fvisibility-inlines-hidden due to linker issues")
         set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
       else()
         set(XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN "YES")
       endif()
     endif ()
-  endif (OGRE_GCC_VISIBILITY_FLAGS)
+endif()
 
+if ((CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_CLANGXX) AND NOT MINGW)
   # Fix x64 issues on Linux
   if(OGRE_PLATFORM_X64 AND NOT APPLE)
     add_definitions(-fPIC)
