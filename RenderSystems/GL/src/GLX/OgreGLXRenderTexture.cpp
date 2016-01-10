@@ -36,7 +36,6 @@ THE SOFTWARE.
 
 #include "OgreGLXRenderTexture.h"
 #include "OgreGLXContext.h"
-#include "OgreGLXUtils.h"
 #include "OgreGLXGLSupport.h"
 #include <iostream>
 #include <climits>

@@ -33,7 +33,6 @@
 #include "OgreGL3PlusRenderSystem.h"
 
 #include "OgreGLXGLSupport.h"
-#include "OgreGLXUtils.h"
 #include "OgreGLXWindow.h"
 
 #ifndef Status

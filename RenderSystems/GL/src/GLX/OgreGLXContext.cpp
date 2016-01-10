@@ -29,7 +29,6 @@ THE SOFTWARE.
 #include "OgreGLRenderSystem.h"
 #include "OgreRoot.h"
 #include "OgreGLXContext.h"
-#include "OgreGLXUtils.h"
 #include "OgreGLXGLSupport.h"
 
 namespace Ogre 

@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 
 #include "OgreGLXGLSupport.h"
-#include "OgreGLXUtils.h"
 #include "OgreGLXWindow.h"
 #include "OgreGLXRenderTexture.h"
 

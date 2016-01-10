@@ -33,7 +33,6 @@
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreGLXUtils.h"
 #include "OgreGLXGLSupport.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreWindowEventUtilities.h"
