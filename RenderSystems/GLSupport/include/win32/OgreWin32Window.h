@@ -33,7 +33,7 @@ THE SOFTWARE.
 #include "OgreRenderWindow.h"
 
 namespace Ogre {
-    class _OgreGL3PlusExport Win32Window : public RenderWindow
+    class _OgreGLExport Win32Window : public RenderWindow
     {
     public:
         Win32Window(Win32GLSupport &glsupport);

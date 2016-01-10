@@ -28,12 +28,12 @@ THE SOFTWARE.
 #ifndef __OgreOSXCocoaContext_H__
 #define __OgreOSXCocoaContext_H__
 
-#include "OgreGL3PlusContext.h"
+#include "OgreGLContext.h"
 #import <AppKit/NSOpenGL.h>
 
 namespace Ogre {
 
-    class _OgreGL3PlusExport CocoaContext : public GL3PlusContext, public GeneralAllocatedObject
+    class _OgreGLExport CocoaContext : public GLContext, public GeneralAllocatedObject
     {
     public:
         CocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat);
@@ -51,7 +51,7 @@ namespace Ogre {
             context - mostly useful for additional threads.
         @note The caller is responsible for deleting the returned context.
         */
-        virtual GL3PlusContext* clone() const;
+        virtual GLContext* clone() const;
 
         /** Grab the NSOpenGLContext if it exists */
         NSOpenGLContext* getContext();
