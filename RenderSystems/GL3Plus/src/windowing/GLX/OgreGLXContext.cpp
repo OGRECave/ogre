@@ -29,7 +29,6 @@
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreRoot.h"
 #include "OgreGLXContext.h"
-#include "OgreGLXUtils.h"
 #include "OgreGLXGLSupport.h"
 
 namespace Ogre
