@@ -29,13 +29,12 @@ THE SOFTWARE.
 #ifndef OGRE_OSXGLSupport_H
 #define OGRE_OSXGLSupport_H
 
-#include "OgreGL3PlusSupport.h"
+#include "OgreGLNativeSupport.h"
 
 namespace Ogre
 {
-    class GL3PlusPBuffer;
     
-class OSXGL3PlusSupport : public GL3PlusSupport
+class OSXGL3PlusSupport : public GLNativeSupport
 {
 public:
     OSXGL3PlusSupport();
@@ -54,7 +53,7 @@ public:
     String validateConfig( void );
 
     /// @copydoc GL3PlusSupport::createWindow
-    RenderWindow* createWindow( bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle );
+    RenderWindow* createWindow( bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle );
     
     /// @copydoc RenderSystem::createRenderWindow
     virtual RenderWindow* newWindow( const String &name, unsigned int width, unsigned int height, 
@@ -75,8 +74,6 @@ public:
     */
     void* getProcAddress( const char *name );
     void* getProcAddress( const String& procname );
-
-    virtual bool supportsPBuffers();
     
     // Core Foundation Array callback function for sorting, must be static for the function ptr
     static CFComparisonResult _compareModes (const void *val1, const void *val2, void *context);
@@ -84,7 +81,7 @@ public:
     static Boolean _getDictionaryBoolean(CFDictionaryRef dict, const void* key);
     static long _getDictionaryLong(CFDictionaryRef dict, const void* key);
 
-}; // class OSXGL3PlusSupport
+};
 
 } // namespace Ogre
 

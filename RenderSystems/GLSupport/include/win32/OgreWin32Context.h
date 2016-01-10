@@ -29,11 +29,11 @@ THE SOFTWARE.
 #define __OgreW32Context_H__
 
 #include "OgreWin32Prerequisites.h"
-#include "OgreGL3PlusContext.h"
+#include "OgreGLContext.h"
 
 namespace Ogre {
 
-    class _OgreGL3PlusExport Win32Context: public GL3PlusContext
+    class _OgreGLExport Win32Context: public GLContext
     {
     public:
         Win32Context(HDC     HDC,
@@ -45,7 +45,7 @@ namespace Ogre {
         /** See GL3PlusContext */
         virtual void endCurrent();
         /// @copydoc GL3PlusContext::clone
-        GL3PlusContext* clone() const;
+        GLContext* clone() const;
 
         virtual void releaseContext();
 

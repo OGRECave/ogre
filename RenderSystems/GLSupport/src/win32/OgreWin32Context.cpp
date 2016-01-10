@@ -59,7 +59,7 @@ namespace Ogre {
         wglMakeCurrent(NULL, NULL);
     }
 
-    GL3PlusContext* Win32Context::clone() const
+    GLContext* Win32Context::clone() const
     {
         // Create new context based on own HDC
         HGLRC newCtx = wglCreateContext(mHDC);

@@ -30,12 +30,11 @@
 
 #include "OgreWin32Prerequisites.h"
 #include "OgreGL3PlusSupport.h"
-#include "OgreGL3PlusRenderSystem.h"
 
 namespace Ogre
 {
     
-    class _OgreGL3PlusExport Win32GLSupport : public GL3PlusSupport
+    class _OgreGLExport Win32GLSupport : public GL3PlusSupport
     {
     public:
         Win32GLSupport();
@@ -53,7 +52,7 @@ namespace Ogre
         */
         String validateConfig();
 
-        virtual RenderWindow* createWindow(bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle = "OGRE Render Window");
+        virtual RenderWindow* createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle = "OGRE Render Window");
         
         /// @copydoc RenderSystem::_createRenderWindow
         virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 

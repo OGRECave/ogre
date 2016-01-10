@@ -31,11 +31,9 @@ THE SOFTWARE.
 #import "OgreStringConverter.h"
 #import "OgreRoot.h"
 
-#import "OgreGL3PlusSupport.h"
-#import "OgreOSXGL3PlusSupport.h"
+#import "OgreGLNativeSupport.h"
+#import "OgreOSXGLSupport.h"
 #import "OgreOSXCocoaWindow.h"
-#import "OgreGL3PlusTexture.h"
-#import "OgreGL3PlusRenderSystem.h"
 
 #import "macUtils.h"
 #import <dlfcn.h>
@@ -248,7 +246,7 @@ String OSXGL3PlusSupport::validateConfig( void )
 	return String( "" );
 }
 
-RenderWindow* OSXGL3PlusSupport::createWindow( bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle ) 
+RenderWindow* OSXGL3PlusSupport::createWindow( bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle ) 
 {
 	if( autoCreateWindow )
 	{

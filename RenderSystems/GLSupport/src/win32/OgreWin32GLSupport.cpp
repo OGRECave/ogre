@@ -33,7 +33,6 @@
 #include <algorithm>
 
 #include "OgreWin32GLSupport.h"
-#include "OgreGL3PlusTexture.h"
 #include "OgreWin32Window.h"
 #include <GL/wglext.h>
 
@@ -268,7 +267,7 @@ namespace Ogre {
         return BLANKSTRING;
     }
 
-    RenderWindow* Win32GLSupport::createWindow(bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle)
+    RenderWindow* Win32GLSupport::createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle)
     {
         if (autoCreateWindow)
         {
@@ -445,6 +444,7 @@ namespace Ogre {
     void Win32GLSupport::start()
     {
         LogManager::getSingleton().logMessage("*** Starting Win32GL Subsystem ***");
+        initialiseExtensions();
     }
 
     void Win32GLSupport::stop()
@@ -456,8 +456,6 @@ namespace Ogre {
     void Win32GLSupport::initialiseExtensions()
     {
         assert(mInitialWindow);
-        // First, initialise the normal extensions
-        GL3PlusSupport::initialiseExtensions();
 
         // Check for W32 specific extensions probe function
         PFNWGLGETEXTENSIONSSTRINGARBPROC _wglGetExtensionsStringARB = 
