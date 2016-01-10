@@ -43,7 +43,7 @@ THE SOFTWARE.
 @end
 
 namespace Ogre {
-    class _OgreGL3PlusExport CocoaWindow : public RenderWindow
+    class _OgreGLExport CocoaWindow : public RenderWindow
     {
     private:
         NSWindow *mWindow;

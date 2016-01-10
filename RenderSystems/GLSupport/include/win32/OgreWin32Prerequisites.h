@@ -29,8 +29,10 @@ THE SOFTWARE.
 #define __OgreWin32Prerequisites_H__
 
 #include <windows.h>
+#include <wingdi.h>
+#include <GL/wglext.h>
 
-#include <OgreGL3PlusPrerequisites.h>
+#include <OgreGLSupportPrerequisites.h>
 
 
 namespace Ogre {

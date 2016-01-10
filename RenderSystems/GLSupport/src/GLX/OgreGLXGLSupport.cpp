@@ -341,7 +341,7 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    RenderWindow* GLXGLSupport::createWindow(bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle)
+    RenderWindow* GLXGLSupport::createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle)
     {
         RenderWindow *window = 0;
 
