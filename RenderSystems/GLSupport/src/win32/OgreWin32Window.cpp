@@ -87,9 +87,9 @@ namespace Ogre {
         		hInst = GetModuleHandle( NULL );
 			#else
 				#if OGRE_DEBUG_MODE == 1
-					hInst = GetModuleHandle("RenderSystem_GL3Plus_d.dll");
+					hInst = GetModuleHandle("GLSupport_d.dll");
 				#else
-					hInst = GetModuleHandle("RenderSystem_GL3Plus.dll");
+					hInst = GetModuleHandle("GLSupport.dll");
 				#endif
 			#endif
 		#else
@@ -907,7 +907,7 @@ namespace Ogre {
     void Win32Window::getCustomAttribute( const String& name, void* pData )
     {
         if( name == "GLCONTEXT" ) {
-            *static_cast<GL3PlusContext**>(pData) = mContext;
+            *static_cast<Win32Context**>(pData) = mContext;
             return;
         } else if( name == "WINDOW" )
         {

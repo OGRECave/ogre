@@ -59,7 +59,7 @@ namespace Ogre
         [NSOpenGLContext clearCurrentContext]; 
 	}
 
-	GL3PlusContext* CocoaContext::clone() const
+	GLContext* CocoaContext::clone() const
 	{
 		NSOpenGLContext *cloneCtx = [[NSOpenGLContext alloc] initWithFormat:mNSGLPixelFormat shareContext:mNSGLContext];
 		[cloneCtx copyAttributesFromContext:mNSGLContext withMask:0];

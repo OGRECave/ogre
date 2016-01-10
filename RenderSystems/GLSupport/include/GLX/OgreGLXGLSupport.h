@@ -45,32 +45,32 @@ namespace Ogre {
         Atom mAtomFullScreen;
         Atom mAtomState;
 
-        /** @copydoc see GL3PlusSupport::addConfig */
+        /** @copydoc see GLNativeSupport::addConfig */
         void addConfig(void);
 
-        /** @copydoc see GL3PlusSupport::validateConfig */
+        /** @copydoc see GLNativeSupport::validateConfig */
         String validateConfig(void);
 
-        /** @copydoc see GL3PlusSupport::setConfigOption */
+        /** @copydoc see GLNativeSupport::setConfigOption */
         void setConfigOption(const String &name, const String &value);
 
-        /// @copydoc GL3PlusSupport::createWindow
-        RenderWindow* createWindow(bool autoCreateWindow, GL3PlusRenderSystem* renderSystem, const String& windowTitle);
+        /// @copydoc GLNativeSupport::createWindow
+        RenderWindow* createWindow(bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle);
 
         /// @copydoc RenderSystem::createRenderWindow
         RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height,
                                 bool fullScreen, const NameValuePairList *miscParams = 0);
 
-        /** @copydoc see GL3PlusSupport::start */
+        /** @copydoc see GLNativeSupport::start */
         void start();
 
-        /** @copydoc see GL3PlusSupport::stop */
+        /** @copydoc see GLNativeSupport::stop */
         void stop();
 
-        /** @copydoc see GL3PlusSupport::initialiseExtensions */
+        /** @copydoc see GLNativeSupport::initialiseExtensions */
         void initialiseExtensions();
 
-        /** @copydoc see GL3PlusSupport::getProcAddress */
+        /** @copydoc see GLNativeSupport::getProcAddress */
         void* getProcAddress(const String& procname);
 
         // The remaining functions are internal to the GLX Rendersystem:
