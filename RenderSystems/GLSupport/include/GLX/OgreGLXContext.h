@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class _OgrePrivate GLXContext: public GL3PlusContext
+    class _OgrePrivate GLXContext: public GLContext
     {
     public:
         GLXContext(GLXGLSupport* glsupport, ::GLXFBConfig fbconfig, ::GLXDrawable drawable, ::GLXContext context = 0);
@@ -47,7 +47,7 @@ namespace Ogre {
         virtual void endCurrent();
         
         /// @copydoc GL3PlusContext::clone
-        GL3PlusContext* clone() const;
+        GLContext* clone() const;
         
         ::GLXDrawable  mDrawable;
         ::GLXContext   mContext;
