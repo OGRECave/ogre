@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __OgreGLContext_H__
 #define __OgreGLContext_H__
 
-#include "OgreGLPrerequisites.h"
+#include "OgreGLSupportPrerequisites.h"
 
 namespace Ogre {
 
@@ -41,8 +41,8 @@ namespace Ogre {
     class _OgreGLExport GLContext
     {
     public:
-        GLContext();
-        virtual ~GLContext();
+        GLContext() : initialized(false) {}
+        virtual ~GLContext() {}
 
         /**
          * Enable the context. All subsequent rendering commands will go here.
@@ -53,7 +53,7 @@ namespace Ogre {
          * nothing is done here.
          */
         virtual void endCurrent() = 0;
-        
+
         bool getInitialized() { return initialized; };
         void setInitialized() { initialized = true; };
 
