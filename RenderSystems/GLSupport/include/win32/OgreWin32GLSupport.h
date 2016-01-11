@@ -37,7 +37,7 @@ namespace Ogre
     class _OgreGLExport Win32GLSupport : public GLNativeSupport
     {
     public:
-        Win32GLSupport();
+        Win32GLSupport(int profile);
         /**
         * Add any special config values to the system.
         * Must have a "Full Screen" value that is a bool and a "Video Mode" value
