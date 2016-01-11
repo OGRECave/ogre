@@ -34,13 +34,19 @@
 
 #include "OgreWin32GLSupport.h"
 #include "OgreWin32Window.h"
+#include "OgreGLUtil.h"
+
 #include <GL/wglext.h>
 
-using namespace Ogre;
-
 namespace Ogre {
-    Win32GLSupport::Win32GLSupport()
-        : mInitialWindow(0)
+    GLNativeSupport* getGLSupport(int profile)
+    {
+        return new Win32GLSupport(profile);
+    }
+
+    Win32GLSupport::Win32GLSupport(int profile)
+        : GLNativeSupport(profile)
+        , mInitialWindow(0)
         , mHasPixelFormatARB(false)
         , mHasMultisample(false)
         , mHasHardwareGamma(false)
@@ -236,7 +242,7 @@ namespace Ogre {
 
         if( name == "Full Screen" )
         {
-            it = mOptions.find( "Display Frequency" );
+            ConfigOptionMap::iterator it = mOptions.find( "Display Frequency" );
             if( value == "No" )
             {
                 it->second.currentValue = "N/A";
@@ -569,10 +575,10 @@ namespace Ogre {
             {
                 // enumerate all formats w/ multisampling
                 static const int iattr[] = {
-                    WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-                    WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-                    WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-                    WGL_SAMPLE_BUFFERS_ARB, GL_TRUE,
+                    WGL_DRAW_TO_WINDOW_ARB, true,
+                    WGL_SUPPORT_OPENGL_ARB, true,
+                    WGL_DOUBLE_BUFFER_ARB, true,
+                    WGL_SAMPLE_BUFFERS_ARB, true,
                     WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
                     /* We are no matter about the colour, depth and stencil buffers here
                     WGL_COLOR_BITS_ARB, 24,
@@ -641,7 +647,7 @@ namespace Ogre {
 
         int format = 0;
 
-        int useHwGamma = hwGamma? GL_TRUE : GL_FALSE;
+        int useHwGamma = hwGamma;
 
         if (multisample && (!mHasMultisample || !mHasPixelFormatARB))
             return false;
@@ -654,10 +660,10 @@ namespace Ogre {
 
             // Use WGL to test extended caps (multisample, sRGB)
             vector<int>::type attribList;
-            attribList.push_back(WGL_DRAW_TO_WINDOW_ARB); attribList.push_back(GL_TRUE);
-            attribList.push_back(WGL_SUPPORT_OPENGL_ARB); attribList.push_back(GL_TRUE);
-            attribList.push_back(WGL_DOUBLE_BUFFER_ARB); attribList.push_back(GL_TRUE);
-            attribList.push_back(WGL_SAMPLE_BUFFERS_ARB); attribList.push_back(GL_TRUE);
+            attribList.push_back(WGL_DRAW_TO_WINDOW_ARB); attribList.push_back(true);
+            attribList.push_back(WGL_SUPPORT_OPENGL_ARB); attribList.push_back(true);
+            attribList.push_back(WGL_DOUBLE_BUFFER_ARB); attribList.push_back(true);
+            attribList.push_back(WGL_SAMPLE_BUFFERS_ARB); attribList.push_back(true);
             attribList.push_back(WGL_ACCELERATION_ARB); attribList.push_back(WGL_FULL_ACCELERATION_ARB);
             attribList.push_back(WGL_COLOR_BITS_ARB); attribList.push_back(pfd.cColorBits);
             attribList.push_back(WGL_ALPHA_BITS_ARB); attribList.push_back(pfd.cAlphaBits);
@@ -667,12 +673,12 @@ namespace Ogre {
 			
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			if (SMT_FRAME_SEQUENTIAL == mStereoMode)
-				attribList.push_back(WGL_STEREO_ARB); attribList.push_back(GL_TRUE);
+				attribList.push_back(WGL_STEREO_ARB); attribList.push_back(true);
 #endif
 
             if (useHwGamma && mHasHardwareGamma)
             {
-                attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(GL_TRUE);
+                attribList.push_back(WGL_FRAMEBUFFER_SRGB_CAPABLE_EXT); attribList.push_back(true);
             }
             // terminator
             attribList.push_back(0);
