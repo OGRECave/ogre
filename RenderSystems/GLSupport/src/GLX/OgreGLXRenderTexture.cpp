@@ -32,13 +32,14 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
 
-#include "OgreGLRenderSystem.h"
-
 #include "OgreGLXRenderTexture.h"
 #include "OgreGLXContext.h"
 #include "OgreGLXGLSupport.h"
-#include <iostream>
+
 #include <climits>
+
+#define GLX_RGBA_FLOAT_ATI_BIT 0x00000100
+#define GLX_RGBA_FLOAT_BIT     0x00000004
 
 namespace Ogre
 {
@@ -79,19 +80,19 @@ namespace Ogre
         
         if (mFormat == PCT_FLOAT16 || mFormat == PCT_FLOAT32)
         {
-            if (GLXEW_NV_float_buffer)
+            if (glsupport->checkExtension("GLX_NV_float_buffer"))
             {
                 renderAttrib = GLX_FLOAT_COMPONENTS_NV;
                 renderValue  = GL_TRUE;
             }
             
-            if (GLXEW_ATI_pixel_format_float)
+            if (glsupport->checkExtension("GLX_ATI_pixel_format_float"))
             {
                 renderAttrib = GLX_RENDER_TYPE;
                 renderValue  = GLX_RGBA_FLOAT_ATI_BIT;
             }
             
-            if (GLXEW_ARB_fbconfig_float)
+            if (glsupport->checkExtension("GLX_ARB_fbconfig_float"))
             {
                 renderAttrib = GLX_RENDER_TYPE;
                 renderValue  = GLX_RGBA_FLOAT_BIT;
