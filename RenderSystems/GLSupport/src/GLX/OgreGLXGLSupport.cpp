@@ -34,6 +34,9 @@
 
 #include "OgreGLXGLSupport.h"
 #include "OgreGLXWindow.h"
+#include "OgreGLXRenderTexture.h"
+
+#include "OgreGLUtil.h"
 
 #ifndef Status
 #define Status int
@@ -43,14 +46,24 @@
 #include <X11/extensions/Xrandr.h>
 
 static bool ctxErrorOccurred = false;
+static Ogre::String ctxErrorMessage;
 static int ctxErrorHandler( Display *dpy, XErrorEvent *ev )
 {
+    char buffer[512] = {0};
     ctxErrorOccurred = true;
+
+    XGetErrorText(dpy, ev->error_code, buffer, 512);
+    ctxErrorMessage = Ogre::String(buffer);
     return 0;
 }
 
 namespace Ogre
 {
+    GLNativeSupport* getGLSupport(int profile)
+    {
+        return new GLXGLSupport(profile);
+    }
+
     //-------------------------------------------------------------------------------------------------//
     template<class C> void remove_duplicates(C& c)
     {
@@ -60,7 +73,7 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    GLXGLSupport::GLXGLSupport() : mGLDisplay(0), mXDisplay(0)
+    GLXGLSupport::GLXGLSupport(int profile) : GLNativeSupport(profile), mGLDisplay(0), mXDisplay(0)
     {
         // A connection that might be shared with the application for GL rendering:
         mGLDisplay = getGLDisplay();
@@ -229,6 +242,8 @@ namespace Ogre
         optVSync.currentValue = optVSync.possibleValues[0];
 
         optRTTMode.possibleValues.push_back("FBO");
+        optRTTMode.possibleValues.push_back("PBuffer");
+        optRTTMode.possibleValues.push_back("Copy");
         optRTTMode.currentValue = optRTTMode.possibleValues[0];
 
         if (! mSampleLevels.empty())
@@ -315,11 +330,10 @@ namespace Ogre
 
         if (name == "Video Mode")
         {
-            ConfigOptionMap::iterator opt;
-            if((opt = mOptions.find("Full Screen")) != mOptions.end())
+            ConfigOptionMap::iterator opt = mOptions.find("Full Screen");
+            if(opt != mOptions.end() && opt->second.currentValue == "Yes")
             {
-                if (opt->second.currentValue == "Yes")
-                    refreshConfig();
+                refreshConfig();
             }
         }
     }
@@ -402,12 +416,19 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    void GLXGLSupport::start()
+    GLPBuffer *GLXGLSupport::createPBuffer(PixelComponentType format, size_t width, size_t height)
+    {
+        return new GLXPBuffer(this, format, width, height);
+    }
+
+    //-------------------------------------------------------------------------------------------------//
+    void GLXGLSupport::start() 
     {
         LogManager::getSingleton().logMessage(
             "******************************\n"
             "*** Starting GLX Subsystem ***\n"
             "******************************");
+        initialiseExtensions();
     }
 
     //-------------------------------------------------------------------------------------------------//
@@ -425,16 +446,22 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    void GLXGLSupport::initialiseExtensions(ExtensionList& extensionList)
+    void GLXGLSupport::initialiseExtensions()
     {
         assert (mGLDisplay);
+
+        mGLXVerMajor = mGLXVerMinor = 0;
+        glXQueryVersion(mGLDisplay, &mGLXVerMajor, &mGLXVerMinor);
+
+        const char* verStr = glXGetClientString(mGLDisplay, GLX_VERSION);
+        LogManager::getSingleton().stream() << "GLX_VERSION = " << verStr;
 
         const char* extensionsString;
 
         // This is more realistic than using glXGetClientString:
-        extensionsString = glXQueryExtensionsString(mGLDisplay, DefaultScreen(mGLDisplay));
+        extensionsString = glXGetClientString(mGLDisplay, GLX_EXTENSIONS);
 
-        LogManager::getSingleton().stream() << "Supported GLX extensions: " << extensionsString;
+        LogManager::getSingleton().stream() << "GLX_EXTENSIONS = " << extensionsString;
 
         StringStream ext;
         String instr;
@@ -831,13 +858,33 @@ namespace Ogre
     ::GLXContext GLXGLSupport::createNewContext(GLXFBConfig fbConfig, GLint renderType, ::GLXContext shareList, GLboolean direct) const
     {
         ::GLXContext glxContext = NULL;
-        int context_attribs[] =
-            {
-                GLX_CONTEXT_MAJOR_VERSION_ARB, 5,
+
+        int profile;
+        int minVersion;
+        int maxVersion = 5;
+
+        switch(mContextProfile) {
+        case CONTEXT_COMPATIBILITY:
+            profile = GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
+            minVersion = 1;
+            maxVersion = 3; // requesting 3.1 might return 3.2 core profile
+            break;
+        case CONTEXT_ES:
+            profile = GLX_CONTEXT_ES2_PROFILE_BIT_EXT;
+            minVersion = 2;
+            break;
+        default:
+            profile = GLX_CONTEXT_CORE_PROFILE_BIT_ARB;
+            minVersion = 3;
+            break;
+        }
+
+        int context_attribs[] = {
+                GLX_CONTEXT_MAJOR_VERSION_ARB, maxVersion,
                 GLX_CONTEXT_MINOR_VERSION_ARB, 0,
-                GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+                GLX_CONTEXT_PROFILE_MASK_ARB, profile,
                 None
-            };
+        };
 
         ctxErrorOccurred = false;
         int (*oldHandler)(Display*, XErrorEvent*) =
@@ -846,7 +893,7 @@ namespace Ogre
         PFNGLXCREATECONTEXTATTRIBSARBPROC _glXCreateContextAttribsARB;
         _glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)const_cast<GLXGLSupport*>(this)->getProcAddress("glXCreateContextAttribsARB");
 
-        while(!glxContext && (context_attribs[1] >= 3))
+        while(!glxContext && (context_attribs[1] >= minVersion))
         {
             ctxErrorOccurred = false;
             glxContext = _glXCreateContextAttribsARB(mGLDisplay, fbConfig, shareList, direct, context_attribs);
@@ -869,14 +916,31 @@ namespace Ogre
                 }
             }
         }
+
+        if (!glxContext) {
+            ctxErrorOccurred = false;
+
+            // try old style context creation as a last resort
+            // Needed at least by MESA 8.0.4 on Ubuntu 12.04.
+            if (mContextProfile != CONTEXT_COMPATIBILITY) {
+                ctxErrorMessage = "Can not set a context profile";
+            } else {
+                glxContext =
+                    glXCreateNewContext(mGLDisplay, fbConfig, renderType, shareList, direct);
+            }
+        }
+
         // Sync to ensure any errors generated are processed.
         XSync( mGLDisplay, False );
 
         // Restore the original error handler
         XSetErrorHandler( oldHandler );
 
-        if ( ctxErrorOccurred || !glxContext )
-            LogManager::getSingleton().logMessage("Failed to create an OpenGL 3+ context", LML_CRITICAL);
+        if (ctxErrorOccurred || !glxContext) {
+          LogManager::getSingleton().logMessage(
+              "Failed to create an OpenGL context. " + ctxErrorMessage,
+              LML_CRITICAL);
+        }
 
         return glxContext;
     }

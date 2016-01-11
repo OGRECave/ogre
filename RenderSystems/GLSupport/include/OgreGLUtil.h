@@ -29,15 +29,10 @@ THE SOFTWARE.
 #ifndef INCL_OGRE_GLUTIL_H
 #define INCL_OGRE_GLUTIL_H
 
-#include "OgreWin32GLSupport.h"
+#include "OgreGLNativeSupport.h"
 
 namespace Ogre {
-    
-inline GL3PlusSupport* getGLSupport()
-{
-    return new Win32GLSupport();
+_OgreGLExport GLNativeSupport* getGLSupport(int profile = GLNativeSupport::CONTEXT_CORE);
 }
-
-};
 
 #endif // INCL_OGRE_GLUTIL_H

@@ -37,8 +37,8 @@ namespace Ogre
 class OSXGL3PlusSupport : public GLNativeSupport
 {
 public:
-    OSXGL3PlusSupport();
-    ~OSXGL3PlusSupport();
+    OSXGL3PlusSupport(int profile) : GLNativeSupport(profile) {}
+    ~OSXGL3PlusSupport() {}
 
     /**
     * Add any special config values to the system.
@@ -52,7 +52,7 @@ public:
     */
     String validateConfig( void );
 
-    /// @copydoc GL3PlusSupport::createWindow
+    /// @copydoc GLNativeSupport::createWindow
     RenderWindow* createWindow( bool autoCreateWindow, RenderSystem* renderSystem, const String& windowTitle );
     
     /// @copydoc RenderSystem::createRenderWindow

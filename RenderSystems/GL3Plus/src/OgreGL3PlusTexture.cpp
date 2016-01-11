@@ -32,7 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
 #include "OgreGL3PlusTextureBuffer.h"
-#include "OgreGL3PlusUtil.h"
+#include "OgreGLUtil.h"
 #include "OgreRoot.h"
 #include "OgreBitwise.h"
 #include "OgreTextureManager.h"

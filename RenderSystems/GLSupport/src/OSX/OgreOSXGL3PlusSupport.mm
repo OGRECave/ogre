@@ -34,6 +34,7 @@ THE SOFTWARE.
 #import "OgreGLNativeSupport.h"
 #import "OgreOSXGLSupport.h"
 #import "OgreOSXCocoaWindow.h"
+#import "OgreGLUtil.h"
 
 #import "macUtils.h"
 #import <dlfcn.h>
@@ -43,12 +44,9 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-OSXGL3PlusSupport::OSXGL3PlusSupport()
+GLNativeSupport* getGLSupport(int profile)
 {
-}
-
-OSXGL3PlusSupport::~OSXGL3PlusSupport()
-{
+    return new OSXGL3PlusSupport(profile);
 }
 
 void OSXGL3PlusSupport::addConfig( void )
@@ -235,10 +233,9 @@ void OSXGL3PlusSupport::addConfig( void )
 	mOptions[optVsync.name] = optVsync;
 	mOptions[optSRGB.name] = optSRGB;
 
-    setShaderCachePath(Ogre::macCachePath() + "/org.ogre3d.RTShaderCache");
-    
-    // Set the shader library path
-    setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Resources/RTShaderLib/GLSL150");
+    // FIXME: not available here. unsused anyway?
+    //setShaderCachePath(Ogre::macCachePath() + "/org.ogre3d.RTShaderCache");
+    //setShaderLibraryPath(Ogre::macBundlePath() + "/Contents/Resources/RTShaderLib/GLSL150");
 }
 
 String OSXGL3PlusSupport::validateConfig( void )
@@ -309,6 +306,8 @@ RenderWindow* OSXGL3PlusSupport::createWindow( bool autoCreateWindow, RenderSyst
 		winOptions["stereoMode"] = opt->second.currentValue;
 #endif
 
+        winOptions["contextProfile"] = StringConverter::toString(int(mContextProfile));
+
 		return renderSystem->_createRenderWindow( windowTitle, w, h, fullscreen, &winOptions );
 	}
 	else
@@ -363,11 +362,6 @@ void* OSXGL3PlusSupport::getProcAddress( const char* name )
 void* OSXGL3PlusSupport::getProcAddress( const String& procname )
 {
 	return getProcAddress( procname.c_str() );
-}
-
-bool OSXGL3PlusSupport::supportsPBuffers()
-{
-	return false;
 }
 
 CFComparisonResult OSXGL3PlusSupport::_compareModes (const void *val1, const void *val2, void *context)

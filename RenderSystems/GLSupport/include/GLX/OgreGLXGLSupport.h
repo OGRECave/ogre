@@ -39,7 +39,7 @@ namespace Ogre {
     class _OgreGLExport GLXGLSupport : public GLNativeSupport
     {
     public:
-        GLXGLSupport();
+        GLXGLSupport(int profile);
         ~GLXGLSupport();
 
         Atom mAtomDeleteWindow;
@@ -62,6 +62,9 @@ namespace Ogre {
         RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height,
                                 bool fullScreen, const NameValuePairList *miscParams = 0);
 
+        /// @copydoc GLNativeSupport::createPBuffer
+        GLPBuffer* createPBuffer(PixelComponentType format, size_t width, size_t height);
+
         /** @copydoc see GLNativeSupport::start */
         void start();
 
@@ -69,7 +72,7 @@ namespace Ogre {
         void stop();
 
         /** @copydoc see GLNativeSupport::initialiseExtensions */
-        void initialiseExtensions(ExtensionList& extensionList);
+        void initialiseExtensions();
 
         /** @copydoc see GLNativeSupport::getProcAddress */
         void* getProcAddress(const String& procname);
@@ -215,6 +218,7 @@ namespace Ogre {
         VideoMode  mCurrentMode;
 
         StringVector mSampleLevels;
+        int mGLXVerMajor, mGLXVerMinor;
     };
 }
 

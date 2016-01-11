@@ -158,7 +158,7 @@ namespace Ogre
             /// @copydoc RenderSystem::getDisplayMonitorCount
             virtual unsigned int getDisplayMonitorCount() const
             {
-                return 1;
+                return mNative->getDisplayMonitorCount();
             }
 
             /**
