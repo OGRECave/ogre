@@ -33,6 +33,7 @@ THE SOFTWARE.
 #import "OgreWindowEventUtilities.h"
 
 #import "OgreGLRenderSystemCommon.h"
+#import "OgreGLNativeSupport.h"
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
@@ -187,6 +188,8 @@ namespace Ogre {
 
         if(miscParams->find("externalGLContext") == miscParams->end())
         {
+            int profile = StringConverter::parseInt(miscParams->find("contextProfile")->second);
+
             NSOpenGLPixelFormatAttribute attribs[30];
             int i = 0;
             
@@ -197,7 +200,7 @@ namespace Ogre {
 
             // Specify that we want to use the OpenGL 3.2 Core profile
             attribs[i++] = NSOpenGLPFAOpenGLProfile;
-            attribs[i++] = NSOpenGLProfileVersion3_2Core;
+            attribs[i++] = profile == GLNativeSupport::CONTEXT_CORE ? NSOpenGLProfileVersion3_2Core : NSOpenGLProfileVersionLegacy;
 
             // Specifying "NoRecovery" gives us a context that cannot fall back to the software renderer.
             // This makes the View-based context a compatible with the fullscreen context, enabling us to use

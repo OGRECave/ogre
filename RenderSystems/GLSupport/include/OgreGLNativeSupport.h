@@ -31,15 +31,22 @@ THE SOFTWARE.
 
 #include "OgreGLSupportPrerequisites.h"
 #include "OgreConfigOptionMap.h"
+#include "OgrePixelFormat.h"
 
 namespace Ogre
 {
-    class GLPBuffer;
-
     class _OgreGLExport GLNativeSupport
     {
         public:
             typedef set<String>::type ExtensionList;
+
+            enum ContextProfile {
+                CONTEXT_CORE = 1,
+                CONTEXT_COMPATIBILITY = 2,
+                CONTEXT_ES = 4
+            };
+
+            GLNativeSupport(int profile) : mContextProfile(ContextProfile(profile)) {}
             virtual ~GLNativeSupport() {}
 
             /**
@@ -64,7 +71,7 @@ namespace Ogre
             * @return string with error message
             */
             virtual String validateConfig() = 0;
-            //virtual ConfigOptionMap& getConfigOptions() = 0;
+
             virtual RenderWindow* createWindow(bool autoCreateWindow,
                                                RenderSystem *renderSystem,
                                                const String& windowTitle) = 0;
@@ -75,23 +82,18 @@ namespace Ogre
                                             bool fullScreen,
                                             const NameValuePairList *miscParams = 0) = 0;
 
-            virtual bool supportsPBuffers() const {
-                return false;
+            virtual GLPBuffer* createPBuffer(PixelComponentType format, size_t width, size_t height) {
+                return NULL;
             }
-
-            //virtual GLPBuffer* createPBuffer(PixelComponentType format, size_t width, size_t height) {
-            //    return NULL;
-            //}
 
             /**
             * Get the address of a function
             */
             virtual void *getProcAddress(const String& procname) = 0;
 
-            /** Initialises GL extensions, must be done AFTER the GL context has been
-               established.
-            */
-            virtual void initialiseExtensions(ExtensionList& extensionList) = 0;
+            bool checkExtension(const String& ext) const {
+                return extensionList.find(ext) != extensionList.end();
+            }
 
             /// @copydoc RenderSystem::getDisplayMonitorCount
             virtual unsigned int getDisplayMonitorCount() const
@@ -117,6 +119,11 @@ namespace Ogre
 
             // Stored options
             ConfigOptionMap mOptions;
+
+            // Supported platform extensions (e.g EGL_*, GLX_*)
+            ExtensionList extensionList;
+
+            ContextProfile mContextProfile;
     };
 
 }

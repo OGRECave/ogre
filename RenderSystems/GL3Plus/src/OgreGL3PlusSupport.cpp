@@ -67,8 +67,6 @@ namespace Ogre {
             LogManager::getSingleton().logMessage(str);
             extensionList.insert(str);
         }
-
-        mNative->initialiseExtensions(extensionList);
     }
 
     bool GL3PlusSupport::hasMinGLVersion(int major, int minor) const
@@ -81,7 +79,7 @@ namespace Ogre {
 
     bool GL3PlusSupport::checkExtension(const String& ext) const
     {
-        return extensionList.find(ext) != extensionList.end();
+        return extensionList.find(ext) != extensionList.end() || mNative->checkExtension(ext);
     }
 
 
