@@ -8,3 +8,6 @@ build_script:
  - cmake --build .
 cache:
 - ogredeps -> ci-build.cmake
+branches:
+  only:
+    - master
