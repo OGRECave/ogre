@@ -79,7 +79,7 @@ namespace Ogre
         
         GLint vs = aglGetVirtualScreen( mAGLContext );
         aglSetPBuffer( mAGLContext, mPBuffer, 0, 0, vs );
-        mContext = OGRE_NEW OSXCarbonContext(mAGLContext, pixelFormat);
+        mContext = OGRE_NEW OSXCocoaContext(mAGLContext, pixelFormat);
     }
     
     void OSXPBuffer::destroyPBuffer()

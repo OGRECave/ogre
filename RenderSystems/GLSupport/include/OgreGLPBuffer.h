@@ -25,35 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __GLSupportPrerequisites_H__
-#define __GLSupportPrerequisites_H__
 
-#include "OgrePrerequisites.h"
+#ifndef __GLPBUFFER_H__
+#define __GLPBUFFER_H__
+
+#include "OgreGLSupportPrerequisites.h"
 
 namespace Ogre {
-    class GLContext;
-    class GLPBuffer;
+    /** An off-screen rendering context. These contexts are always RGBA for simplicity, speed and
+        convience, but the component format is configurable.
+    */
+    class _OgreGLExport GLPBuffer
+    {
+    public:
+        GLPBuffer(PixelComponentType format, uint32 width, uint32 height)
+            : mFormat(format), mWidth(width), mHeight(height) {}
+        virtual ~GLPBuffer() {}
+        
+        /** Get the GL context that needs to be active to render to this PBuffer.
+        */
+        virtual GLContext *getContext() = 0;
+        
+        PixelComponentType getFormat() { return mFormat; }
+        uint32 getWidth() { return mWidth; }
+        uint32 getHeight() { return mHeight; }
+        
+    protected:
+        PixelComponentType mFormat;
+        uint32 mWidth, mHeight;
+    };
+    
 }
 
-/// Lots of generated code in here which triggers the new VC CRT security warnings
-#if !defined( _CRT_SECURE_NO_DEPRECATE )
-#define _CRT_SECURE_NO_DEPRECATE
-#endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
-#   ifdef GLSupport_EXPORTS
-#       define _OgreGLExport __declspec(dllexport)
-#   else
-#       if defined( __MINGW32__ )
-#           define _OgreGLExport
-#       else
-#           define _OgreGLExport __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreGLExport  __attribute__ ((visibility("default")))
-#else
-#    define _OgreGLExport
-#endif
-
-#endif //#ifndef __GLSupportPrerequisites_H__
+#endif // __GLPBRENDERTEXTURE_H__

@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreGLPBuffer.h"
-#include "OgreOSXCarbonContext.h"
+#include "OgreOSXCocoaContext.h"
 
 namespace Ogre
 {
@@ -50,7 +50,7 @@ namespace Ogre
     private:
         AGLPbuffer mPBuffer;
         AGLContext mAGLContext;
-        OSXCarbonContext* mContext;
+        OSXCocoaContext* mContext;
     };
 }
 #endif
