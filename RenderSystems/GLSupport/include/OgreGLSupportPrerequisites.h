@@ -25,26 +25,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __GLSupportPrerequisites_H__
+#define __GLSupportPrerequisites_H__
 
-#include "OgreSharedPtr.h"
-#include "OgreThreadHeaders.h"
+#include "OgrePrerequisites.h"
 
-#if OGRE_THREAD_SUPPORT == 1
-
-// declared in OgreGLPrerequisites.h 
-GLEWContext * glewGetContext()
-{
-    using namespace Ogre;
-    static OGRE_THREAD_POINTER_VAR(GLEWContext, GLEWContextsPtr);
-
-    GLEWContext * currentGLEWContextsPtr =  OGRE_THREAD_POINTER_GET(GLEWContextsPtr);
-    if (currentGLEWContextsPtr == NULL)
-    {
-        currentGLEWContextsPtr = new GLEWContext();
-        OGRE_THREAD_POINTER_SET(GLEWContextsPtr, currentGLEWContextsPtr);
-        memset(currentGLEWContextsPtr, 0, sizeof(GLEWContext));
-        glewInit();
-    }
-    return currentGLEWContextsPtr;
-}
+/// Lots of generated code in here which triggers the new VC CRT security warnings
+#if !defined( _CRT_SECURE_NO_DEPRECATE )
+#define _CRT_SECURE_NO_DEPRECATE
 #endif
+
+#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
+#   ifdef OGRE_GLPLUGIN_EXPORTS
+#       define _OgreGLExport __declspec(dllexport)
+#   else
+#       if defined( __MINGW32__ )
+#           define _OgreGLExport
+#       else
+#           define _OgreGLExport __declspec(dllimport)
+#       endif
+#   endif
+#elif defined ( OGRE_GCC_VISIBILITY )
+#    define _OgreGLExport  __attribute__ ((visibility("default")))
+#else
+#    define _OgreGLExport
+#endif
+
+#endif //#ifndef __GLSupportPrerequisites_H__
