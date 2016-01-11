@@ -1,5 +1,8 @@
 language: cpp
 sudo: false
+branches:
+  only:
+    - master
 addons:
   apt:
     packages:
