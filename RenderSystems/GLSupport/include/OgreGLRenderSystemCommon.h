@@ -25,34 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __GLSupportPrerequisites_H__
-#define __GLSupportPrerequisites_H__
+#ifndef __OgreGLRenderSystemCommon_H__
+#define __OgreGLRenderSystemCommon_H__
 
-#include "OgrePrerequisites.h"
+#include "OgreGLSupportPrerequisites.h"
+#include "OgreRenderSystem.h"
+#include "OgreRenderWindow.h"
 
 namespace Ogre {
-    class GLContext;
+
+    class _OgreGLExport GLRenderSystemCommon : public RenderSystem
+    {
+    public:
+        virtual ~GLRenderSystemCommon() {}
+
+        /** @copydoc RenderTarget::copyContentsToMemory */
+        virtual void _copyContentsToMemory(Viewport* src, const PixelBox& dst,
+                                           RenderWindow::FrameBuffer buffer) = 0;
+
+        /** Returns the main context */
+        virtual GLContext* _getMainContext() = 0;
+
+        /** Unregister a render target->context mapping. If the context of target
+            is the current context, change the context to the main context so it
+            can be destroyed safely.
+
+            @note This is automatically called by the destructor of
+            GLContext.
+        */
+        virtual void _unregisterContext(GLContext *context) = 0;
+    };
 }
 
-/// Lots of generated code in here which triggers the new VC CRT security warnings
-#if !defined( _CRT_SECURE_NO_DEPRECATE )
-#define _CRT_SECURE_NO_DEPRECATE
 #endif
-
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
-#   ifdef GLSupport_EXPORTS
-#       define _OgreGLExport __declspec(dllexport)
-#   else
-#       if defined( __MINGW32__ )
-#           define _OgreGLExport
-#       else
-#           define _OgreGLExport __declspec(dllimport)
-#       endif
-#   endif
-#elif defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreGLExport  __attribute__ ((visibility("default")))
-#else
-#    define _OgreGLExport
-#endif
-
-#endif //#ifndef __GLSupportPrerequisites_H__

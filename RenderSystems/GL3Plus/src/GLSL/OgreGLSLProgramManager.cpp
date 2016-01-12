@@ -33,7 +33,7 @@
 #include "OgreGpuProgramManager.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreRoot.h"
-#include "OgreGL3PlusUtil.h"
+#include "OgreGL3PlusSupport.h"
 
 #include <iostream>
 
