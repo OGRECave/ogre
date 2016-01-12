@@ -42,6 +42,7 @@ endif ()
 
 set(HEADER_FILES ${HEADER_FILES} ${GLSL_HEADERS})
 
+include_directories(${OGRE_GLCONTEXT_INCLUDES})
 include_directories(
   BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

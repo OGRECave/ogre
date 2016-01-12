@@ -30,7 +30,8 @@ THE SOFTWARE.
 #ifndef __EGLContext_H__
 #define __EGLContext_H__
 
-#include "OgreGLES2Context.h"
+#include "OgreGLES2Prerequisites.h"
+#include "OgreGLContext.h"
 #include <EGL/egl.h>
 
 namespace Ogre {

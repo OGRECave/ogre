@@ -36,7 +36,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGLSLShader.h"
 
 namespace Ogre {
-    class GL3PlusContext;
     class GL3PlusSupport;
     class GL3PlusRTTManager;
     class GLSLShaderManager;
