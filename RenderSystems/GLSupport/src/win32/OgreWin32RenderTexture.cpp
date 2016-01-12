@@ -155,6 +155,8 @@ namespace Ogre {
         int format;
         unsigned int count;
 
+        PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
+
         // Choose suitable pixel format
         wglChoosePixelFormatARB(old_hdc,attrib,NULL,1,&format,&count);
         if(count == 0)
@@ -166,7 +168,9 @@ namespace Ogre {
                 WGL_DEPTH_BITS_ARB,WGL_STENCIL_BITS_ARB
         };
         int piValues[sizeof(piAttributes)/sizeof(const int)];
-        wglGetPixelFormatAttribivARB(old_hdc,format,0,sizeof(piAttributes)/sizeof(const int),piAttributes,piValues);
+
+        PFNWGLGETPIXELFORMATATTRIBIVARBPROC wglGetPixelFormatAttribiv = (PFNWGLGETPIXELFORMATATTRIBIVARBPROC)wglGetProcAddress("wglGetPixelFormatAttribivARB");
+        wglGetPixelFormatAttribiv(old_hdc,format,0,sizeof(piAttributes)/sizeof(const int),piAttributes,piValues);
 
         LogManager::getSingleton().stream()
             << " Win32PBuffer::PBuffer -- Chosen pixel format rgba="
@@ -176,11 +180,11 @@ namespace Ogre {
             << piValues[3] 
             << " depth=" << piValues[4]
             << " stencil=" << piValues[5];
-
-        mPBuffer = wglCreatePbufferARB(old_hdc,format,mWidth,mHeight,pattrib_default);
+        // FIXME lookup procaddress
+        mPBuffer = 0;//wglCreatePbufferARB(old_hdc,format,mWidth,mHeight,pattrib_default);
         if(!mPBuffer)
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglCreatePbufferARB() failed", " Win32PBuffer::createPBuffer");
-
+#if 0
         mHDC = wglGetPbufferDCARB(mPBuffer);
         if(!mHDC) {
             wglDestroyPbufferARB(mPBuffer);
@@ -210,12 +214,16 @@ namespace Ogre {
         LogManager::getSingleton().stream()
             << "Win32RenderTexture::PBuffer created -- Real dimensions "
             << mWidth << "x" << mHeight;
+#endif
     }
     void Win32PBuffer::destroyPBuffer() 
     {
         wglDeleteContext(mGlrc);
+        // FIXME lookup procaddress
+#if 0
         wglReleasePbufferDCARB(mPBuffer,mHDC);
         wglDestroyPbufferARB(mPBuffer);
+#endif
     }
 
 
