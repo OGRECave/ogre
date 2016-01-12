@@ -28,7 +28,7 @@ THE SOFTWARE.
 #ifndef __OgreGLXContext_H__
 #define __OgreGLXContext_H__
 
-#include "OgreGL3PlusContext.h"
+#include "OgreGLContext.h"
 #include "OgreGLXGLSupport.h"
 
 namespace Ogre {
