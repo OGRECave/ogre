@@ -29,7 +29,8 @@ THE SOFTWARE.
 #ifndef __EAGLES2Context_H__
 #define __EAGLES2Context_H__
 
-#include "OgreGLES2Context.h"
+#include "OgreGLES2Prerequisites.h"
+#include "OgreGLContext.h"
 
 #ifdef __OBJC__
 #   import <QuartzCore/CAEAGLLayer.h>
