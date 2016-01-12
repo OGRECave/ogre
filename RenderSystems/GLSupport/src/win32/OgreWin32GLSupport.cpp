@@ -229,17 +229,7 @@ namespace Ogre {
 
     void Win32GLSupport::setConfigOption(const String &name, const String &value)
     {
-        ConfigOptionMap::iterator it = mOptions.find(name);
-
-        // Update
-        if(it != mOptions.end())
-            it->second.currentValue = value;
-        else
-        {
-            StringStream str;
-            str << "Option named '" << name << "' does not exist.";
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, str.str(), "Win32GLSupport::setConfigOption" );
-        }
+        GLNativeSupport::setConfigOption(name, value);
 
         if( name == "Video Mode" )
             refreshConfig();

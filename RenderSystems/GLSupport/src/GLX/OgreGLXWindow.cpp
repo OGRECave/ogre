@@ -28,23 +28,25 @@
 
 #include "OgreGLXWindow.h"
 #include "OgreRoot.h"
-#include "OgreGL3PlusRenderSystem.h"
+#include "OgreRenderSystem.h"
 #include "OgreImageCodec.h"
 #include "OgreException.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
-#include "OgreGLXGLSupport.h"
-#include "OgreGL3PlusPixelFormat.h"
 #include "OgreWindowEventUtilities.h"
 #include "OgreViewport.h"
 
-#include <iostream>
+#include "OgreGLXContext.h"
+#include "OgreGLXGLSupport.h"
+
 #include <algorithm>
 #include <sys/time.h>
 #include <climits>
 
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+
+#include "OgreGLRenderSystemCommon.h"
 
 extern "C"
 {
@@ -737,33 +739,8 @@ namespace Ogre
             buffer = mIsFullScreen? FB_FRONT : FB_BACK;
         }
 
-        GLenum format = Ogre::GL3PlusPixelUtil::getGLOriginFormat(dst.format);
-        GLenum type = Ogre::GL3PlusPixelUtil::getGLOriginDataType(dst.format);
-
-        if ((format == GL_NONE) || (type == 0))
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format.", "GLXWindow::copyContentsToMemory" );
-        }
-
-        // Switch context if different from current one
-        RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-        rsys->_setViewport(this->getViewport(0));
-
-        if(dst.getWidth() != dst.rowPitch)
-            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
-        // Must change the packing to ensure no overruns!
-        glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
-                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.getTopLeftFrontPixelPtr());
-
-        // restore default alignment
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
-        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-
-        PixelUtil::bulkPixelVerticalFlip(dst);
+        static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem())
+                ->_copyContentsToMemory(getViewport(0), dst, buffer);
     }
 
     //-------------------------------------------------------------------------------------------------//

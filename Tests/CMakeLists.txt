@@ -66,6 +66,7 @@ if (OGRE_BUILD_TESTS)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D9/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
     include_directories(
       ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include
       ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/src/GLSLES/include

@@ -31,27 +31,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre {
 
-    void GL3PlusSupport::setConfigOption(const String &name, const String &value)
-    {
-        ConfigOptionMap::iterator it = mOptions.find(name);
-
-        if (it == mOptions.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Option named " + name +  " does not exist.",
-                        "GL3PlusSupport::setConfigOption");
-        }
-        else
-        {
-            it->second.currentValue = value;
-        }
-    }
-
-    ConfigOptionMap& GL3PlusSupport::getConfigOptions(void)
-    {
-        return mOptions;
-    }
-
     void GL3PlusSupport::initialiseExtensions(void)
     {
         // get driver version.
@@ -88,6 +67,8 @@ namespace Ogre {
             LogManager::getSingleton().logMessage(str);
             extensionList.insert(str);
         }
+
+        mNative->initialiseExtensions(extensionList);
     }
 
     bool GL3PlusSupport::hasMinGLVersion(int major, int minor) const

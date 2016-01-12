@@ -29,12 +29,12 @@
 #define __OgreWin32GLSupport_H__
 
 #include "OgreWin32Prerequisites.h"
-#include "OgreGL3PlusSupport.h"
+#include "OgreGLNativeSupport.h"
 
 namespace Ogre
 {
     
-    class _OgreGLExport Win32GLSupport : public GL3PlusSupport
+    class _OgreGLExport Win32GLSupport : public GLNativeSupport
     {
     public:
         Win32GLSupport();

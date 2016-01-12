@@ -30,7 +30,7 @@
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
-#include "OgreGL3PlusRenderSystem.h"
+#include "OgreRenderSystem.h"
 
 #include "OgreGLXGLSupport.h"
 #include "OgreGLXWindow.h"
@@ -311,16 +311,7 @@ namespace Ogre
     //-------------------------------------------------------------------------------------------------//
     void GLXGLSupport::setConfigOption(const String &name, const String &value)
     {
-        ConfigOptionMap::iterator option = mOptions.find(name);
-
-        if(option == mOptions.end())
-        {
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Option named " + name + " does not exist.", "GLXGLSupport::setConfigOption" );
-        }
-        else
-        {
-            option->second.currentValue = value;
-        }
+        GLNativeSupport::setConfigOption(name, value);
 
         if (name == "Video Mode")
         {
@@ -434,11 +425,9 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    void GLXGLSupport::initialiseExtensions(void)
+    void GLXGLSupport::initialiseExtensions(ExtensionList& extensionList)
     {
         assert (mGLDisplay);
-
-        GL3PlusSupport::initialiseExtensions();
 
         const char* extensionsString;
 

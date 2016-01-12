@@ -30,12 +30,14 @@ THE SOFTWARE.
 #define __GLXWindow_H__
 
 #include "OgreRenderWindow.h"
-#include "OgreGLXContext.h"
-#include "OgreGLXGLSupport.h"
-#include <X11/Xlib.h>
+
+#include <X11/X.h>
 
 namespace Ogre 
 {
+    class GLXContext;
+    class GLXGLSupport;
+
     class _OgrePrivate GLXWindow : public RenderWindow
     {
     public:

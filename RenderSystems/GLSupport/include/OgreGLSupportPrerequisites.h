@@ -30,13 +30,17 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+namespace Ogre {
+    class GLContext;
+}
+
 /// Lots of generated code in here which triggers the new VC CRT security warnings
 #if !defined( _CRT_SECURE_NO_DEPRECATE )
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
 
 #if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
-#   ifdef OGRE_GLPLUGIN_EXPORTS
+#   ifdef GLSupport_EXPORTS
 #       define _OgreGLExport __declspec(dllexport)
 #   else
 #       if defined( __MINGW32__ )

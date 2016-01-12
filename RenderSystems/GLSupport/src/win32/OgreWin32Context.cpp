@@ -31,7 +31,7 @@ THE SOFTWARE.
 #endif
 #include "OgreWin32Context.h"
 #include "OgreException.h"
-#include "OgreGL3PlusRenderSystem.h"
+#include "OgreGLRenderSystemCommon.h"
 #include "OgreRoot.h"
 
 namespace Ogre {
@@ -46,7 +46,7 @@ namespace Ogre {
     {
         // NB have to do this is subclass to ensure any methods called back
         // are on this subclass and not half-destructed superclass
-        GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        GLRenderSystemCommon *rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
         rs->_unregisterContext(this);
     }
         

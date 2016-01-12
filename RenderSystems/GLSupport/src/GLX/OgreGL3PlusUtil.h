@@ -33,7 +33,7 @@
 
 namespace Ogre {
 
-    inline GL3PlusSupport* getGLSupport()
+    inline GLNativeSupport* getGLSupport()
     {
         return new GLXGLSupport();
     }

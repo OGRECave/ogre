@@ -332,17 +332,17 @@ RenderWindow* OSXGL3PlusSupport::newWindow( const String &name, unsigned int wid
 void OSXGL3PlusSupport::start()
 {
 	LogManager::getSingleton().logMessage(
-			"***********************************************\n"
-			"***  Starting Mac OS X OpenGL 3+ Subsystem  ***\n"
-			"***********************************************");
+			"********************************************\n"
+			"***  Starting Mac OS X OpenGL Subsystem  ***\n"
+			"********************************************");
 }
 
 void OSXGL3PlusSupport::stop()
 {
 	LogManager::getSingleton().logMessage(
-			"***********************************************\n"
-			"***  Stopping Mac OS X OpenGL 3+ Subsystem  ***\n"
-			"***********************************************");
+			"********************************************\n"
+			"***  Stopping Mac OS X OpenGL Subsystem  ***\n"
+			"********************************************");
 }
 
 void* OSXGL3PlusSupport::getProcAddress( const char* name )
@@ -350,7 +350,7 @@ void* OSXGL3PlusSupport::getProcAddress( const char* name )
     void *symbol;
     symbol = NULL;
     
-    String fullPath = macPluginPath() + "RenderSystem_GL3Plus.dylib";
+    String fullPath = macPluginPath() + "GLSupport.dylib";
     void *handle = dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
     if(handle) {
         symbol = dlsym (handle, name);
