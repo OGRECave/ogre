@@ -32,8 +32,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusPrerequisites.h"
 
 #include "OgreMaterialManager.h"
-#include "OgreRenderSystem.h"
 #include "OgreGLSLShader.h"
+#include "OgreRenderWindow.h"
+#include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
     class GL3PlusSupport;
@@ -45,7 +46,7 @@ namespace Ogre {
     /**
        Implementation of GL 3 as a rendering system.
     */
-    class _OgreGL3PlusExport GL3PlusRenderSystem : public RenderSystem
+    class _OgreGL3PlusExport GL3PlusRenderSystem : public GLRenderSystemCommon
     {
     private:
         /// Rendering loop control
@@ -570,6 +571,9 @@ namespace Ogre {
 
         /// @copydoc RenderSystem::markProfileEvent
         virtual void markProfileEvent( const String &eventName );
+
+        /** @copydoc RenderTarget::copyContentsToMemory */
+        void _copyContentsToMemory(Viewport* src, const PixelBox &dst, RenderWindow::FrameBuffer buffer);
     };
 }
 

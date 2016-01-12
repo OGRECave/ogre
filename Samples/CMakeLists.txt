@@ -96,6 +96,7 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
+  	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
     if (OGRE_BUILD_RENDERSYSTEM_GL)
       	include_directories(
 	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/include

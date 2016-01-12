@@ -31,9 +31,8 @@ THE SOFTWARE.
 #import "OgreLogManager.h"
 #import "OgreStringConverter.h"
 #import "OgreWindowEventUtilities.h"
-#import "OgreGL3PlusPixelFormat.h"
 
-#import "OgreGL3PlusRenderSystem.h"
+#import "OgreGLRenderSystemCommon.h"
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
@@ -241,7 +240,7 @@ namespace Ogre {
             mGLPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
         }
 
-        GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        GLRenderSystemCommon *rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
         CocoaContext *mainContext = (CocoaContext*)rs->_getMainContext();
         NSOpenGLContext *shareContext = mainContext == 0 ? nil : mainContext->getContext();
 
@@ -462,35 +461,8 @@ namespace Ogre {
             buffer = mIsFullScreen? FB_FRONT : FB_BACK;
         }
         
-        GLenum format = GL3PlusPixelUtil::getGLOriginFormat(dst.format);
-        GLenum type = GL3PlusPixelUtil::getGLOriginDataType(dst.format);
-        
-        if ((format == GL_NONE) || (type == 0))
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Unsupported format.",
-                        "CocoaWindow::copyContentsToMemory" );
-        }
-        
-        if(dst.getWidth() != dst.rowPitch)
-        {
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, static_cast<GLint>(dst.rowPitch)));
-        }
-        if((dst.getWidth()*Ogre::PixelUtil::getNumElemBytes(dst.format)) & 3)
-        {
-            // Standard alignment of 4 is not right
-            OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 1));
-        }
-        
-        OGRE_CHECK_GL_ERROR(glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK));
-        OGRE_CHECK_GL_ERROR(glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
-                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.getTopLeftFrontPixelPtr()));
-        
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ALIGNMENT, 4));
-        OGRE_CHECK_GL_ERROR(glPixelStorei(GL_PACK_ROW_LENGTH, 0));
-        
-        PixelUtil::bulkPixelVerticalFlip(dst);
+        static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem())
+                ->_copyContentsToMemory(getViewport(0), dst, buffer);
     }
 
     float CocoaWindow::getViewPointToPixelScale()

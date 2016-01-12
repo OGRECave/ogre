@@ -25,54 +25,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+#ifndef __OgreGLRenderSystemCommon_H__
+#define __OgreGLRenderSystemCommon_H__
 
-#import "OgreOSXCocoaContext.h"
-#include "OgreGLRenderSystemCommon.h"
-#include "OgreRoot.h"
+#include "OgreGLSupportPrerequisites.h"
+#include "OgreRenderSystem.h"
+#include "OgreRenderWindow.h"
 
-namespace Ogre
-{
+namespace Ogre {
 
-    CocoaContext::CocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat)
-      : mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
-	{
-        if(mNSGLPixelFormat)
-            [mNSGLPixelFormat retain];
-	}
+    class _OgreGLExport GLRenderSystemCommon : public RenderSystem
+    {
+    public:
+        virtual ~GLRenderSystemCommon() {}
 
-	CocoaContext::~CocoaContext()
-	{
-	    GLRenderSystemCommon *rs = static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem());
-        rs->_unregisterContext(this);
+        /** @copydoc RenderTarget::copyContentsToMemory */
+        virtual void _copyContentsToMemory(Viewport* src, const PixelBox& dst,
+                                           RenderWindow::FrameBuffer buffer) = 0;
 
-        if(mNSGLPixelFormat)
-            [mNSGLPixelFormat release];
-    }
+        /** Returns the main context */
+        virtual GLContext* _getMainContext() = 0;
 
-    void CocoaContext::setCurrent()
-	{
-		[mNSGLContext makeCurrentContext];
-    }
+        /** Unregister a render target->context mapping. If the context of target
+            is the current context, change the context to the main context so it
+            can be destroyed safely.
 
-	void CocoaContext::endCurrent()
-	{
-        [NSOpenGLContext clearCurrentContext]; 
-	}
-
-	GLContext* CocoaContext::clone() const
-	{
-		NSOpenGLContext *cloneCtx = [[NSOpenGLContext alloc] initWithFormat:mNSGLPixelFormat shareContext:mNSGLContext];
-		[cloneCtx copyAttributesFromContext:mNSGLContext withMask:0];
-		return OGRE_NEW CocoaContext(cloneCtx, mNSGLPixelFormat);
-	}
-
-	NSOpenGLContext* CocoaContext::getContext()
-	{
-		return mNSGLContext;
-    }
-
-	NSOpenGLPixelFormat* CocoaContext::getPixelFormat()
-	{
-		return mNSGLPixelFormat;
-	}
+            @note This is automatically called by the destructor of
+            GLContext.
+        */
+        virtual void _unregisterContext(GLContext *context) = 0;
+    };
 }
+
+#endif
