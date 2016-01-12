@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class GL3PlusContext;
     class GL3PlusRenderBuffer;
     class GL3PlusRenderSystem;
     /**
@@ -51,7 +50,7 @@ namespace Ogre
     class _OgreGL3PlusExport GL3PlusDepthBuffer : public DepthBuffer
     {
     public:
-        GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GL3PlusContext *creatorContext,
+        GL3PlusDepthBuffer( uint16 poolId, GL3PlusRenderSystem *renderSystem, GLContext *creatorContext,
                         GL3PlusRenderBuffer *depth, GL3PlusRenderBuffer *stencil,
                         uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
                         bool manual );

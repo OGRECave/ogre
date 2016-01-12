@@ -29,7 +29,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #define __OgreGL3PlusFBORTT_H__
 
 #include "OgreGL3PlusRenderTexture.h"
-#include "OgreGL3PlusContext.h"
+#include "OgreGLContext.h"
 #include "OgreGL3PlusFrameBufferObject.h"
 
 namespace Ogre {
