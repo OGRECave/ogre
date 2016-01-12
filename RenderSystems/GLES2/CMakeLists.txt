@@ -123,6 +123,7 @@ endif ()
 # Add support for the RT Shader System
 add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
 
+include_directories(${OGRE_GLCONTEXT_INCLUDES})
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL

@@ -34,11 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre {
     // Forward declarations
+    class GLContext;
+    typedef GLContext GL3PlusContext;
     class GL3PlusSupport;
     class GL3PlusRenderSystem;
     class GL3PlusTexture;
     class GL3PlusTextureManager;
-    class GL3PlusContext;
     class GL3PlusRTTManager;
     class GL3PlusFBOManager;
     class GL3PlusHardwarePixelBuffer;

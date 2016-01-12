@@ -33,6 +33,11 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreMath.h"
 
+namespace Ogre {
+    class GLContext;
+    typedef GLContext GLES2Context;
+}
+
 #ifndef GL_GLEXT_PROTOTYPES
 #  define  GL_GLEXT_PROTOTYPES
 #endif
