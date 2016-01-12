@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __OgreGLES2FBO_H__
 
 #include "OgreGLES2RenderTexture.h"
-#include "OgreGLES2Context.h"
+#include "OgreGLContext.h"
 #include "OgreGLES2ManagedResource.h"
 
 namespace Ogre {

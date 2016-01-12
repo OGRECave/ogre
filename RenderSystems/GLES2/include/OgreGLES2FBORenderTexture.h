@@ -29,7 +29,7 @@ THE SOFTWARE.
 #define __OgreGLES2FBORTT_H__
 
 #include "OgreGLES2RenderTexture.h"
-#include "OgreGLES2Context.h"
+#include "OgreGLContext.h"
 #include "OgreGLES2FrameBufferObject.h"
 #include "OgreGLES2ManagedResource.h"
 

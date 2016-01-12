@@ -33,6 +33,11 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 #include "OgreMath.h"
 
+namespace Ogre {
+    class GLContext;
+    typedef GLContext GLES2Context;
+}
+
 #if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
 #   include <GLES3/gles3w.h>
 #else

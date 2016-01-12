@@ -34,7 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class GLES2Context;
     class GLES2RenderBuffer;
     class GLES2RenderSystem;
     /**
