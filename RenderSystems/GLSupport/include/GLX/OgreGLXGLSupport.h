@@ -28,14 +28,15 @@
 #ifndef OGRE_GLXGLSupport_H
 #define OGRE_GLXGLSupport_H
 
-#include "OgreGL3PlusSupport.h"
+#include "OgreGLNativeSupport.h"
+
 #define GLX_GLXEXT_PROTOTYPES
 #include <GL/glx.h>
 #include <GL/glxext.h>
 
 namespace Ogre {
 
-    class _OgrePrivate GLXGLSupport : public GL3PlusSupport
+    class _OgreGLExport GLXGLSupport : public GLNativeSupport
     {
     public:
         GLXGLSupport();
@@ -68,7 +69,7 @@ namespace Ogre {
         void stop();
 
         /** @copydoc see GLNativeSupport::initialiseExtensions */
-        void initialiseExtensions();
+        void initialiseExtensions(ExtensionList& extensionList);
 
         /** @copydoc see GLNativeSupport::getProcAddress */
         void* getProcAddress(const String& procname);

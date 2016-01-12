@@ -59,12 +59,10 @@ namespace Ogre {
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #endif
-#   define WGL_WGLEXT_PROTOTYPES
 #   include <windows.h>
 #   include <wingdi.h>
 #   include <GL/gl3w.h>
 #   include <GL/glext.h>
-#   include <GL/wglext.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #   include <GL/gl3w.h>
 #   include <GL/glext.h>
