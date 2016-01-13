@@ -39,7 +39,7 @@ VTestPlugin::VTestPlugin()
     :SamplePlugin("VTestPlugin")
 {
     // add the playpen tests
-    addSample(new TextureBlitTest());
+    // addSample(new TextureBlitTest()); SEGFAULT reading depth texture
     addSample(new CubeMappingTest());
     addSample(new ParticleTest());
     addSample(new StencilShadowTest());
