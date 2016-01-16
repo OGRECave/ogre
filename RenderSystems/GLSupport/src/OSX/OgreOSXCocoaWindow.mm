@@ -186,7 +186,7 @@ namespace Ogre {
 #endif
         }
 
-        if(miscParams->find("externalGLContext") == miscParams->end())
+        if(miscParams && miscParams->find("externalGLContext") == miscParams->end())
         {
             int profile = StringConverter::parseInt(miscParams->find("contextProfile")->second);
 
@@ -249,7 +249,7 @@ namespace Ogre {
         if(miscParams)
             opt = miscParams->find("externalGLContext");
 
-        if(opt != miscParams->end())
+        if(miscParams && opt != miscParams->end())
         {
             NSOpenGLContext *openGLContext = (NSOpenGLContext*)StringConverter::parseUnsignedLong(opt->second);
             mGLContext = openGLContext;
