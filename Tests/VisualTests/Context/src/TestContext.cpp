@@ -528,10 +528,15 @@ bool TestContext::oneTimeConfig()
 
         if(rs) {
             // set sane defaults
-            rs->setConfigOption("VSync", "Yes");
             rs->setConfigOption("Full Screen", "No");
-            rs->setConfigOption("Fixed Pipeline Enabled", "No");
             rs->setConfigOption("Video Mode", "640x 480");
+
+            try {
+                rs->setConfigOption("Fixed Pipeline Enabled", "No");
+            } catch(...) {}
+            try {
+                rs->setConfigOption("VSync", "Yes");
+            } catch(...) {}
         }
     }
 
