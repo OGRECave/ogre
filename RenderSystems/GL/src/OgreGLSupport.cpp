@@ -51,8 +51,6 @@ namespace Ogre {
     {
         // Set version string
         const GLubyte* pcVer = glGetString(GL_VERSION);
-
-
         assert(pcVer && "Problems getting GL version string using glGetString");
        
         String tmpStr = (const char*)pcVer;
@@ -75,9 +73,8 @@ namespace Ogre {
         String str;
 
         const GLubyte* pcExt = glGetString(GL_EXTENSIONS);
-        LogManager::getSingleton().logMessage("GL_EXTENSIONS = " + String((const char*)pcExt));
-
         assert(pcExt && "Problems getting GL extension string using glGetString");
+        LogManager::getSingleton().logMessage("GL_EXTENSIONS = " + String((const char*)pcExt));
 
         ext << pcExt;
 
