@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreGLGpuProgramManager.h"
 #include "OgreVector4.h"
 
+#include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
 
@@ -48,7 +49,7 @@ namespace Ogre {
     /**
       Implementation of GL as a rendering system.
      */
-    class _OgreGLExport GLRenderSystem : public RenderSystem
+    class _OgreGLExport GLRenderSystem : public GLRenderSystemCommon
     {
     private:
         /// Rendering loop control
@@ -574,6 +575,9 @@ namespace Ogre {
 
         /// @copydoc RenderSystem::markProfileEvent
         virtual void markProfileEvent( const String &eventName );
+
+        /** @copydoc RenderTarget::copyContentsToMemory */
+        void _copyContentsToMemory(Viewport* src, const PixelBox &dst, RenderWindow::FrameBuffer buffer);
     };
 }
 #endif
