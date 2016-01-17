@@ -34,19 +34,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    void GLSupport::setConfigOption(const String &name, const String &value)
-    {
-        ConfigOptionMap::iterator it = mOptions.find(name);
-
-        if (it != mOptions.end())
-            it->second.currentValue = value;
-    }
-
-    ConfigOptionMap& GLSupport::getConfigOptions(void)
-    {
-        return mOptions;
-    }
-
     void GLSupport::initialiseExtensions(void)
     {
         // Set version string
@@ -125,20 +112,12 @@ namespace Ogre {
     {
         assert(!extensionList.empty() && "ExtensionList is empty!" );
 
-        if(extensionList.find(ext) == extensionList.end())
-            return false; 
-        
-        return true;
+        return extensionList.find(ext) != extensionList.end() || mNative->checkExtension(ext);
     }
     
     bool GLSupport::supportsPBuffers()
     {
         return (GLEW_ARB_pixel_buffer_object || GLEW_EXT_pixel_buffer_object) != GL_FALSE;
-    }
-
-    GLPBuffer* GLSupport::createPBuffer(PixelComponentType format, size_t width, size_t height)
-    {
-        return 0;
     }
 
 }

@@ -35,6 +35,8 @@ THE SOFTWARE.
 #include "OgreConfigOptionMap.h"
 #include "OgreGLPBuffer.h"
 
+#include "OgreGLNativeSupport.h"
+
 namespace Ogre
 {
 
@@ -43,34 +45,51 @@ class GLStateCacheManager;
 class _OgreGLExport GLSupport
 {
 public:
-    GLSupport() { }
-    virtual ~GLSupport() { }
+    GLSupport(GLNativeSupport* native) : mStateCacheManager(0), mNative(native) { }
+    virtual ~GLSupport() {
+        delete mNative;
+    }
 
     /**
     * Add any special config values to the system.
     * Must have a "Full Screen" value that is a bool and a "Video Mode" value
     * that is a string in the form of wxh
     */
-    virtual void addConfig() = 0;
+    void addConfig() {
+        mNative->addConfig();
+    }
 
-    virtual void setConfigOption(const String &name, const String &value);
+    void setConfigOption(const String &name, const String &value) {
+        mNative->setConfigOption(name, value);
+    }
 
     /**
     * Make sure all the extra options are valid
     * @return string with error message
     */
-    virtual String validateConfig() = 0;
+    String validateConfig() {
+        return mNative->validateConfig();
+    }
 
-    virtual ConfigOptionMap& getConfigOptions(void);
+    ConfigOptionMap& getConfigOptions(void) {
+        return mNative->getConfigOptions();
+    }
 
-    virtual RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle) = 0;
+    RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle) {
+        return mNative->createWindow(autoCreateWindow, renderSystem, windowTitle);
+    }
 
     /// @copydoc RenderSystem::_createRenderWindow
-    virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 
-        bool fullScreen, const NameValuePairList *miscParams = 0) = 0;
+    RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height,
+        bool fullScreen, const NameValuePairList *miscParams = 0) {
+        return mNative->newWindow(name, width, height, fullScreen, miscParams);
+    }
 
-    virtual bool supportsPBuffers();
-    virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
+    bool supportsPBuffers();
+
+    GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height) {
+        return mNative->createPBuffer(format, width, height);
+    }
 
     GLStateCacheManager* getStateCacheManager() const
     {
@@ -85,11 +104,15 @@ public:
     /**
     * Start anything special
     */
-    virtual void start() = 0;
+    void start() {
+        mNative->start();
+    }
     /**
     * Stop anything special
     */
-    virtual void stop() = 0;
+    void stop() {
+        mNative->stop();
+    }
 
     /**
     * Get vendor information
@@ -115,21 +138,23 @@ public:
     /**
     * Check if an extension is available
     */
-    virtual bool checkExtension(const String& ext) const;
+    bool checkExtension(const String& ext) const;
     /**
     * Get the address of a function
     */
-    virtual void* getProcAddress(const String& procname) = 0;
+    void* getProcAddress(const String& procname) {
+        return mNative->getProcAddress(procname);
+    }
 
     /** Initialises GL extensions, must be done AFTER the GL context has been
         established.
     */
-    virtual void initialiseExtensions();
+    void initialiseExtensions();
 
     /// @copydoc RenderSystem::getDisplayMonitorCount
     virtual unsigned int getDisplayMonitorCount() const
     {
-        return 1;
+        return mNative->getDisplayMonitorCount();
     }
 
 protected:
@@ -143,6 +168,8 @@ private:
     String mVendor;
 
     GLStateCacheManager* mStateCacheManager;
+
+    GLNativeSupport* mNative;
 
 }; // class GLSupport
 
