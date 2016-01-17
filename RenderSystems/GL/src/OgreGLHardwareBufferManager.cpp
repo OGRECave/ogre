@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreGLHardwareIndexBuffer.h"
 #include "OgreGLRenderSystem.h"
 #include "OgreGLRenderToVertexBuffer.h"
-#include "OgreGLUtil.h"
+#include "OgreGLSupport.h"
 #include "OgreHardwareBuffer.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystemCapabilities.h"
