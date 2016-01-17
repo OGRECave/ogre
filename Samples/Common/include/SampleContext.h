@@ -290,6 +290,7 @@ namespace OgreBites
                 OGRE_DELETE mOverlaySystem;
                 OGRE_DELETE mRoot;
             }
+
 #ifdef OGRE_STATIC_LIB
             mStaticPluginLoader.unload();
 #endif
@@ -297,6 +298,11 @@ namespace OgreBites
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
             if (mTaskScheduler.is_active())
                 mTaskScheduler.terminate();
+#endif
+
+#ifdef HAVE_SDL
+            SDL_DestroyWindow(mSDLWindow);
+            mSDLWindow = 0;
 #endif
         }
 

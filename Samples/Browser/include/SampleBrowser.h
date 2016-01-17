@@ -1629,6 +1629,8 @@ namespace OgreBites
 
             if (!mCurrentSample && mRoot->getRenderSystem() != NULL) destroyDummyScene();
 
+            SampleContext::shutdown();
+
             mCategoryMenu = 0;
             mSampleMenu = 0;
             mSampleSlider = 0;
@@ -1639,8 +1641,6 @@ namespace OgreBites
             mThumbs.clear();
             mCarouselPlace = 0;
             mWindow = 0;
-
-            SampleContext::shutdown();
 
             unloadSamples();
 
