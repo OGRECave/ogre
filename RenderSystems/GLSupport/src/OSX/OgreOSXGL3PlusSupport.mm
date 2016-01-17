@@ -346,17 +346,7 @@ void OSXGL3PlusSupport::stop()
 
 void* OSXGL3PlusSupport::getProcAddress( const char* name )
 {
-    void *symbol;
-    symbol = NULL;
-    
-    String fullPath = macPluginPath() + "GLSupport.dylib";
-    void *handle = dlopen(fullPath.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-    if(handle) {
-        symbol = dlsym (handle, name);
-    }
-    dlclose(handle);
-    
-    return symbol;
+    return dlsym (RTLD_DEFAULT, name);
 }
 
 void* OSXGL3PlusSupport::getProcAddress( const String& procname )
