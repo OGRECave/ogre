@@ -136,7 +136,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJsonPbs::parseOffset( const rapidjson::Value &jsonArray, Vector4 offsetScale )
+    void HlmsJsonPbs::parseOffset( const rapidjson::Value &jsonArray, Vector4 &offsetScale )
     {
         const rapidjson::SizeType arraySize = std::min( 2u, jsonArray.Size() );
         for( rapidjson::SizeType i=0; i<arraySize; ++i )
@@ -146,7 +146,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJsonPbs::parseScale( const rapidjson::Value &jsonArray, Vector4 offsetScale )
+    void HlmsJsonPbs::parseScale( const rapidjson::Value &jsonArray, Vector4 &offsetScale )
     {
         const rapidjson::SizeType arraySize = std::min( 2u, jsonArray.Size() );
         for( rapidjson::SizeType i=0; i<arraySize; ++i )

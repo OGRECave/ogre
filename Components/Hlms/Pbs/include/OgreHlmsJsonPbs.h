@@ -53,8 +53,8 @@ namespace Ogre
         static HlmsPbsDatablock::TransparencyModes parseTransparencyMode( const char *value );
         static PbsBlendModes parseBlendMode( const char *value );
         static void parseFresnelMode( const char *value, bool &outIsColoured, bool &outUseIOR );
-        static void parseOffset( const rapidjson::Value &jsonArray, Vector4 offsetScale );
-        static void parseScale( const rapidjson::Value &jsonArray, Vector4 offsetScale );
+        static void parseOffset( const rapidjson::Value &jsonArray, Vector4 &offsetScale );
+        static void parseScale( const rapidjson::Value &jsonArray, Vector4 &offsetScale );
 
         static inline Vector3 parseVector3Array( const rapidjson::Value &jsonArray );
 
