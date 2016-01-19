@@ -725,7 +725,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     String HlmsJson::getName( const HlmsSamplerblock *samplerblock )
     {
-        return "\"Samplerblock_" + StringConverter::toString( samplerblock->mId ) + '"';
+        return "\"Sampler_" + StringConverter::toString( samplerblock->mId ) + '"';
     }
     //-----------------------------------------------------------------------------------
     bool HlmsJson::hasCustomShadowMacroblock( const HlmsDatablock *datablock ) const
@@ -973,7 +973,7 @@ namespace Ogre
             set<const HlmsSamplerblock*>::type::const_iterator end  = samplerblocks.end();
 
             if( !samplerblocks.empty() )
-                outString += "\n\t\"samplerblocks\" :\n\t{";
+                outString += "\n\t\"samplers\" :\n\t{";
 
             while( itor != end )
                 saveSamplerblock( *itor++, outString );
@@ -1087,7 +1087,7 @@ namespace Ogre
             set<const HlmsSamplerblock*>::type::const_iterator end  = samplerblocks.end();
 
             if( !samplerblocks.empty() )
-                outString += "\n\t\"samplerblocks\" :\n\t{";
+                outString += "\n\t\"samplers\" :\n\t{";
 
             while( itor != end )
                 saveSamplerblock( *itor++, outString );
