@@ -110,12 +110,13 @@ elseif (APPLE)
   link_directories(${OPENGLES2_LIBRARY_PATH})
   set(PLATFORM_HEADER_INSTALL "APPLE")
 elseif (UNIX)
-  file(GLOB PLATFORM_HEADERS "include/EGL/X11/*.h" "include/EGL/*.h")
-  file(GLOB PLATFORM_SOURCES "src/EGL/X11/*.cpp" "src/EGL/*.cpp")
+  option(OGRE_GLSUPPORT_USE_EGL "use EGL for GL Context Creation instead of GLX/ WGL" FALSE)
+  if(OGRE_GLSUPPORT_USE_EGL)
+    file(GLOB PLATFORM_HEADERS "include/EGL/X11/*.h" "include/EGL/*.h")
+    file(GLOB PLATFORM_SOURCES "src/EGL/X11/*.cpp" "src/EGL/*.cpp")
 
-  include_directories(src/EGL/X11 include/EGL/X11)
-  set(PLATFORM_HEADER_INSTALL "X11")
-  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
+    include_directories(src/EGL/X11 include/EGL/X11)
+  endif()
 endif ()
 
 include_directories(

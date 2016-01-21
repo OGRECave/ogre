@@ -26,6 +26,7 @@ extern "C" {
 
 /* glesw api */
 int gleswInit(void);
+int gleswInitWithGetProc(void* (*getproc)(const char*));
 int gleswIsSupported(int major, int minor);
 void *gleswGetProcAddress(const char *proc);
 
