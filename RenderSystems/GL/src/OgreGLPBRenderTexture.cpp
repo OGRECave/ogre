@@ -35,17 +35,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 //-----------------------------------------------------------------------------  
-    GLPBuffer::GLPBuffer(PixelComponentType format, uint32 width, uint32 height):
-        mFormat(format),
-        mWidth(width),
-        mHeight(height)
-    {
-    }
-    GLPBuffer::~GLPBuffer()
-    {
-    }
-
-//-----------------------------------------------------------------------------  
     GLPBRenderTexture::GLPBRenderTexture(GLPBRTTManager *manager, const String &name, 
         const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
         GLRenderTexture(name, target, writeGamma, fsaa),

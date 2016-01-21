@@ -29,7 +29,8 @@ THE SOFTWARE.
 #ifndef __NaClGLContext_H__
 #define __NaClGLContext_H__
 
-#include "OgreGLES2Context.h"
+#include "OgreGLES2Prerequisites.h"
+#include "OgreGLContext.h"
 #include "OgreNaClWindow.h"
 #include "OgreNaClGLContext.h"
 

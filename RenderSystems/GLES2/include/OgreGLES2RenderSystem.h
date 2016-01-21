@@ -36,7 +36,6 @@ THE SOFTWARE.
 #include "OgreGLES2GpuProgram.h"
 
 namespace Ogre {
-    class GLES2Context;
     class GLES2Support;
     class GLES2RTTManager;
     class GLES2GpuProgramManager;

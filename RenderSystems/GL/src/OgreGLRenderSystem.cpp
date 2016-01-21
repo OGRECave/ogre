@@ -56,6 +56,8 @@ THE SOFTWARE.
 #include "OgreConfig.h"
 #include "OgreViewport.h"
 
+#include "OgreGLPixelFormat.h"
+
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -127,7 +129,7 @@ namespace Ogre {
         mStateCacheManager = OGRE_NEW GLStateCacheManager();
 
         // Get our GLSupport
-        mGLSupport = getGLSupport();
+        mGLSupport = new GLSupport(getGLSupport(GLNativeSupport::CONTEXT_COMPATIBILITY));
         mGLSupport->setStateCacheManager(mStateCacheManager);
 
         for( i=0; i<MAX_LIGHTS; i++ )
@@ -3914,5 +3916,38 @@ namespace Ogre {
 		return result;
 	}
 #endif
+
+    void GLRenderSystem::_copyContentsToMemory(Viewport* src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
+    {
+        GLenum format = GLPixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = GLPixelUtil::getGLOriginDataType(dst.format);
+
+        if ((format == GL_NONE) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format.", "GLXWindow::copyContentsToMemory" );
+        }
+
+        // Switch context if different from current one
+        _setViewport(src);
+
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+        // Must change the packing to ensure no overruns!
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+        glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
+
+        uint32_t height = src->getTarget()->getHeight();
+
+        glReadPixels((GLint)0, (GLint)(height - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
+
+        // restore default alignment
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+
+        PixelUtil::bulkPixelVerticalFlip(dst);
+    }
 	//---------------------------------------------------------------------
 }

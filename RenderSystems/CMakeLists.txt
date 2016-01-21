@@ -29,6 +29,9 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D11)
   endif ()
 endif ()
 
+# always add as it does not build anything
+add_subdirectory(GLSupport)
+
 if (OGRE_BUILD_RENDERSYSTEM_GL)
   if (NOT OPENGL_FOUND)
     MESSAGE(STATUS "Could not find dependency: GL")

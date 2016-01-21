@@ -49,34 +49,13 @@ else()
   )
 endif()
 
-# Add system specific settings
-if (WIN32)
-  file(GLOB PLATFORM_HEADERS "include/Win32/*.h" "src/Win32/*.h")
-  file(GLOB PLATFORM_SOURCES "src/Win32/*.cpp")
-
-  include_directories(src/nvparse/winheaders include/Win32 src/Win32)
-  set(PLATFORM_HEADER_INSTALL "")
-elseif (APPLE)
-  file(GLOB PLATFORM_HEADERS "include/OSX/*.h" "src/OSX/*.h")
-  file(GLOB PLATFORM_SOURCES "src/OSX/*.cpp" "src/OSX/*.mm")
-
-  include_directories(src/OSX include/OSX "${OGRE_SOURCE_DIR}/OgreMain/include/OSX")
-  set(PLATFORM_HEADER_INSTALL "OSX")
-elseif (UNIX)
-  file(GLOB PLATFORM_HEADERS "include/GLX/*.h" "src/GLX/*.h")
-  file(GLOB PLATFORM_SOURCES "src/GLX/*.cpp")
-
-  include_directories(src/GLX include/GLX)
-  set(PLATFORM_HEADER_INSTALL "GLX")
-  set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
-endif ()
-
 list(APPEND HEADER_FILES
   ${GLSL_HEADERS}
   ${NVPARSE_HEADERS}
   ${ATIFS_HEADERS}
 )
 
+include_directories(${OGRE_GLSUPPORT_INCLUDES})
 include_directories(
   BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
