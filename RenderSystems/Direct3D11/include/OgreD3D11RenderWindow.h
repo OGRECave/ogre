@@ -187,6 +187,10 @@ namespace Ogre
 
         static bool IsWindows8OrGreater();
 
+        typedef vector<HMONITOR>::type DisplayMonitorList;
+
+        static BOOL CALLBACK sCreateMonitorsInfoEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
+
     protected:
         HWND                    mHWnd;                          // Win32 window handle
         DWORD                   mWindowedWinStyle;              // Windowed mode window style flags.

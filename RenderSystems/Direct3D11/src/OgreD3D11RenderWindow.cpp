@@ -635,6 +635,18 @@ namespace Ogre
         return (major > 6) || ((major == 6) && (minor >= 2));
     }
     //---------------------------------------------------------------------
+    BOOL CALLBACK D3D11RenderWindowHwnd::sCreateMonitorsInfoEnumProc(
+        HMONITOR hMonitor,  // handle to display monitor
+        HDC hdcMonitor,     // handle to monitor DC
+        LPRECT lprcMonitor, // monitor intersection rectangle
+        LPARAM dwData       // data
+        )
+    {
+        DisplayMonitorList* pArrMonitors = (DisplayMonitorList*)dwData;
+        pArrMonitors->push_back(hMonitor);
+        return TRUE;
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::create(const String& name, unsigned int width, unsigned int height,
         bool fullScreen, const NameValuePairList *miscParams)
     {
@@ -721,22 +733,36 @@ namespace Ogre
 		
 		mIsFullScreen = fullScreen;
 		
-
         // Destroy current window if any
         if( mHWnd )
             destroy();
 
-		if (!externalHandle)
-		{
-			DWORD		dwStyleEx = 0;
-			HMONITOR    hMonitor = NULL;		
-			MONITORINFO monitorInfo;
-			RECT		rc;
-            POINT windowAnchorPoint;
-            windowAnchorPoint.x = left == INT_MAX ? 0 : left;
-            windowAnchorPoint.y = top == INT_MAX ? 0 : top;
+        if (!externalHandle)
+        {
+            DWORD		dwStyleEx = 0;
+            HMONITOR    hMonitor = NULL;
+            MONITORINFO monitorInfo;
+            RECT		rc;
 
-			hMonitor = MonitorFromPoint(windowAnchorPoint, MONITOR_DEFAULTTONEAREST);
+            // If monitor index found, try to assign the monitor handle based on it.
+            if (monitorIndex != -1)
+            {
+                DisplayMonitorList monitorList;
+                EnumDisplayMonitors( NULL, NULL, sCreateMonitorsInfoEnumProc, (LPARAM)&monitorList );
+                if (monitorIndex < (int)monitorList.size())
+                {
+                    hMonitor = monitorList[monitorIndex];
+                }
+            }
+            
+            if (hMonitor == NULL)
+            {
+                POINT windowAnchorPoint;
+                windowAnchorPoint.x = left == INT_MAX ? 0 : left;
+                windowAnchorPoint.y = top == INT_MAX ? 0 : top;
+
+                hMonitor = MonitorFromPoint( windowAnchorPoint, MONITOR_DEFAULTTONEAREST );
+            }
 
 			memset(&monitorInfo, 0, sizeof(MONITORINFO));
 			monitorInfo.cbSize = sizeof(MONITORINFO);
