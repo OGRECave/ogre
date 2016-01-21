@@ -118,6 +118,11 @@ static void APIENTRY GLDebugCallback(GLenum source,
 
 namespace Ogre {
 
+    static GL3PlusSupport* glsupport;
+    static void* get_proc(const char* proc) {
+        return glsupport->getProcAddress(proc);
+    }
+
     GL3PlusRenderSystem::GL3PlusRenderSystem()
         : mDepthWrite(true),
           mScissorsEnabled(false),
@@ -137,6 +142,7 @@ namespace Ogre {
 
         // Get our GLSupport
         mGLSupport = new GL3PlusSupport(getGLSupport());
+        glsupport = mGLSupport;
 
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
@@ -2285,7 +2291,7 @@ namespace Ogre {
             mCurrentContext->setCurrent();
 
         // Initialise GL3W
-        if (gl3wInit()) { // gl3wInit() fails if GL3.0 is not supported
+        if (gl3wInitWithGetProc(get_proc)) { // gl3wInit() fails if GL3.0 is not supported
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "OpenGL 3.0 is not supported",
                         "GL3PlusRenderSystem::initialiseContext");

@@ -13,6 +13,7 @@ extern "C" {
 
 /* gl3w api */
 int gl3wInit(void);
+int gl3wInitWithGetProc(void* (*getproc)(const char*));
 int gl3wIsSupported(int major, int minor);
 void *gl3wGetProcAddress(const char *proc);
 

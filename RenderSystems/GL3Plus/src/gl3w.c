@@ -16,7 +16,7 @@ static void close_libgl(void)
     FreeLibrary(libgl);
 }
 
-static void *get_proc(const char *proc)
+static void *_get_proc(const char *proc)
 {
     void *res;
 
@@ -47,7 +47,7 @@ static void close_libgl(void)
     CFRelease(bundleURL);
 }
 
-static void *get_proc(const char *proc)
+static void *_get_proc(const char *proc)
 {
     void *res;
 
@@ -73,7 +73,7 @@ static void close_libgl(void)
     dlclose(libgl);
 }
 
-static void *get_proc(const char *proc)
+static void *_get_proc(const char *proc)
 {
     void *res = glXGetProcAddress((const GLubyte *)proc);
     if (!res)
@@ -81,6 +81,8 @@ static void *get_proc(const char *proc)
     return res;
 }
 #endif
+
+static void* (*get_proc)(const char*) = _get_proc;
 
 static struct {
     int major, minor;
@@ -106,6 +108,13 @@ int gl3wInit(void)
     open_libgl();
     load_procs();
     close_libgl();
+    return parse_version();
+}
+
+int gl3wInitWithGetProc(void* (*getproc)(const char*))
+{
+    get_proc = getproc;
+    load_procs();
     return parse_version();
 }
 

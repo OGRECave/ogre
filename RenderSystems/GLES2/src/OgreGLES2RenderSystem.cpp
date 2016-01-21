@@ -69,6 +69,11 @@ using namespace std;
 
 namespace Ogre {
 
+    static GLES2Support* glsupport;
+    static void* get_proc(const char* proc) {
+        return glsupport->getProcAddress(proc);
+    }
+
     GLES2RenderSystem::GLES2RenderSystem()
         : mGpuProgramManager(0),
           mGLSLESProgramFactory(0),
@@ -95,6 +100,8 @@ namespace Ogre {
         mGLSupport = new GLES2Support(getGLSupport(GLNativeSupport::CONTEXT_ES));
         mGLSupport->setStateCacheManager(mStateCacheManager);
         
+        glsupport = mGLSupport;
+
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
 
@@ -1984,6 +1991,14 @@ namespace Ogre {
         // Set primary context as active
         if (mCurrentContext)
             mCurrentContext->setCurrent();
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 // OSX does not support GLES contexts
+        if (gleswInitWithGetProc(get_proc)) {
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Could not initialize glesw",
+                        "GLES2RenderSystem::initialiseContext");
+        }
+#endif
 
         // Setup GLSupport
         mGLSupport->initialiseExtensions();
