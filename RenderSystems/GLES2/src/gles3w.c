@@ -29,24 +29,7 @@ static void *get_proc(const char *proc)
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
 #import <CoreFoundation/CoreFoundation.h>
 #import <UIKit/UIDevice.h>
-#import <string>
-#import <iostream>
 #import <stdio.h>
-
-// Routine to run a system command and retrieve the output.
-// From http://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c
-std::string exec(const char* cmd) {
-    FILE* pipe = popen(cmd, "r");
-    if (!pipe) return "ERROR";
-    char buffer[128];
-    std::string result = "";
-    while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL)
-            result += buffer;
-    }
-    pclose(pipe);
-    return result;
-}
 
 CFBundleRef bundle;
 CFURLRef bundleURL;
@@ -61,16 +44,12 @@ static void open_libgl(void)
     if(isSimulator)
     {
         // Ask where Xcode is installed
-        std::string xcodePath = "/Applications/Xcode.app/Contents/Developer\n";
-
-        // The result contains an end line character. Remove it.
-        size_t pos = xcodePath.find("\n");
-        xcodePath.erase(pos);
+        const char* xcodePath = "/Applications/Xcode.app/Contents/Developer";
 
         char tempPath[PATH_MAX];
         sprintf(tempPath,
                 "%s/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.%s.sdk/System/Library/Frameworks/OpenGLES.framework",
-                xcodePath.c_str(),
+                xcodePath,
                 [[sysVersionComponents objectAtIndex:0] cStringUsingEncoding:NSUTF8StringEncoding],
                 [[sysVersionComponents objectAtIndex:1] cStringUsingEncoding:NSUTF8StringEncoding]);
         frameworkPath = CFStringCreateWithCString(kCFAllocatorDefault, tempPath, kCFStringEncodingUTF8);
@@ -105,7 +84,6 @@ static void *get_proc(const char *proc)
 }
 #else
 #include <dlfcn.h>
-#include <EGL/egl.h>
 
 static void *libgl;
 
