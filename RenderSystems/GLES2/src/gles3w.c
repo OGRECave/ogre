@@ -1,4 +1,4 @@
-#include <GLES2/gles2w.h>
+#include <GLES3/gles3w.h>
 
 #if defined(_WIN32) && !defined(ANDROID)
 #define WIN32_LEAN_AND_MEAN 1
@@ -29,24 +29,7 @@ static void *get_proc(const char *proc)
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
 #import <CoreFoundation/CoreFoundation.h>
 #import <UIKit/UIDevice.h>
-#import <string>
-#import <iostream>
 #import <stdio.h>
-
-// Routine to run a system command and retrieve the output.
-// From http://stackoverflow.com/questions/478898/how-to-execute-a-command-and-get-output-of-command-within-c
-std::string exec(const char* cmd) {
-    FILE* pipe = popen(cmd, "r");
-    if (!pipe) return "ERROR";
-    char buffer[128];
-    std::string result = "";
-    while(!feof(pipe)) {
-        if(fgets(buffer, 128, pipe) != NULL)
-            result += buffer;
-    }
-    pclose(pipe);
-    return result;
-}
 
 CFBundleRef bundle;
 CFURLRef bundleURL;
@@ -61,16 +44,12 @@ static void open_libgl(void)
     if(isSimulator)
     {
         // Ask where Xcode is installed
-        std::string xcodePath = "/Applications/Xcode.app/Contents/Developer\n";
-
-        // The result contains an end line character. Remove it.
-        size_t pos = xcodePath.find("\n");
-        xcodePath.erase(pos);
+        const char* xcodePath = "/Applications/Xcode.app/Contents/Developer";
 
         char tempPath[PATH_MAX];
         sprintf(tempPath,
                 "%s/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator%s.%s.sdk/System/Library/Frameworks/OpenGLES.framework",
-                xcodePath.c_str(),
+                xcodePath,
                 [[sysVersionComponents objectAtIndex:0] cStringUsingEncoding:NSUTF8StringEncoding],
                 [[sysVersionComponents objectAtIndex:1] cStringUsingEncoding:NSUTF8StringEncoding]);
         frameworkPath = CFStringCreateWithCString(kCFAllocatorDefault, tempPath, kCFStringEncodingUTF8);
@@ -83,7 +62,7 @@ static void open_libgl(void)
     CFRelease(frameworkPath);
 
     bundle = CFBundleCreate(kCFAllocatorDefault, bundleURL);
-
+    
     assert(bundle != NULL);
 }
 
@@ -103,17 +82,8 @@ static void *get_proc(const char *proc)
     CFRelease(procname);
     return res;
 }
-#elif defined(__EMSCRIPTEN__)
-#include <EGL/egl.h>
-static void open_libgl() {}
-static void close_libgl() {}
-static void *get_proc(const char *proc)
-{
-    return (void*)eglGetProcAddress(proc);
-}
 #else
 #include <dlfcn.h>
-#include <EGL/egl.h>
 
 static void *libgl;
 
@@ -141,9 +111,14 @@ static struct {
 
 static int parse_version(void)
 {
-    version.major = 2;
-    version.minor = 0;
+    if (!glGetIntegerv)
+        return -1;
 
+    glGetIntegerv(GL_MAJOR_VERSION, &version.major);
+    glGetIntegerv(GL_MINOR_VERSION, &version.minor);
+
+    if (version.major < 3)
+        return -1;
     return 0;
 }
 
@@ -159,7 +134,7 @@ int gleswInit(void)
 
 int gleswIsSupported(int major, int minor)
 {
-    if (major < 2)
+    if (major < 3)
         return 0;
     if (version.major == major)
         return version.minor >= minor;
@@ -313,94 +288,110 @@ PFNGLVERTEXATTRIB4FPROC gleswVertexAttrib4f;
 PFNGLVERTEXATTRIB4FVPROC gleswVertexAttrib4fv;
 PFNGLVERTEXATTRIBPOINTERPROC gleswVertexAttribPointer;
 PFNGLVIEWPORTPROC gleswViewport;
-PFNGLEGLIMAGETARGETTEXTURE2DOESPROC gleswEGLImageTargetTexture2DOES;
-PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC gleswEGLImageTargetRenderbufferStorageOES;
-PFNGLGETPROGRAMBINARYOESPROC gleswGetProgramBinaryOES;
-PFNGLPROGRAMBINARYOESPROC gleswProgramBinaryOES;
-PFNGLMAPBUFFEROESPROC gleswMapBufferOES;
-PFNGLUNMAPBUFFEROESPROC gleswUnmapBufferOES;
-PFNGLGETBUFFERPOINTERVOESPROC gleswGetBufferPointervOES;
-PFNGLTEXIMAGE3DOESPROC gleswTexImage3DOES;
-PFNGLTEXSUBIMAGE3DOESPROC gleswTexSubImage3DOES;
-PFNGLCOPYTEXSUBIMAGE3DOESPROC gleswCopyTexSubImage3DOES;
-PFNGLCOMPRESSEDTEXIMAGE3DOESPROC gleswCompressedTexImage3DOES;
-PFNGLCOMPRESSEDTEXSUBIMAGE3DOESPROC gleswCompressedTexSubImage3DOES;
-PFNGLFRAMEBUFFERTEXTURE3DOESPROC gleswFramebufferTexture3DOES;
-PFNGLBINDVERTEXARRAYOESPROC gleswBindVertexArrayOES;
-PFNGLDELETEVERTEXARRAYSOESPROC gleswDeleteVertexArraysOES;
-PFNGLGENVERTEXARRAYSOESPROC gleswGenVertexArraysOES;
-PFNGLISVERTEXARRAYOESPROC gleswIsVertexArrayOES;
-PFNGLDEBUGMESSAGECONTROLKHRPROC gleswDebugMessageControlKHR;
-PFNGLDEBUGMESSAGEINSERTKHRPROC gleswDebugMessageInsertKHR;
-PFNGLDEBUGMESSAGECALLBACKKHRPROC gleswDebugMessageCallbackKHR;
-PFNGLGETDEBUGMESSAGELOGKHRPROC gleswGetDebugMessageLogKHR;
-PFNGLPUSHDEBUGGROUPKHRPROC gleswPushDebugGroupKHR;
-PFNGLPOPDEBUGGROUPKHRPROC gleswPopDebugGroupKHR;
-PFNGLOBJECTLABELKHRPROC gleswObjectLabelKHR;
-PFNGLGETOBJECTLABELKHRPROC gleswGetObjectLabelKHR;
-PFNGLOBJECTPTRLABELKHRPROC gleswObjectPtrLabelKHR;
-PFNGLGETOBJECTPTRLABELKHRPROC gleswGetObjectPtrLabelKHR;
-PFNGLGETPOINTERVKHRPROC gleswGetPointervKHR;
-PFNGLGETPERFMONITORGROUPSAMDPROC gleswGetPerfMonitorGroupsAMD;
-PFNGLGETPERFMONITORCOUNTERSAMDPROC gleswGetPerfMonitorCountersAMD;
-PFNGLGETPERFMONITORGROUPSTRINGAMDPROC gleswGetPerfMonitorGroupStringAMD;
-PFNGLGETPERFMONITORCOUNTERSTRINGAMDPROC gleswGetPerfMonitorCounterStringAMD;
-PFNGLGETPERFMONITORCOUNTERINFOAMDPROC gleswGetPerfMonitorCounterInfoAMD;
-PFNGLGENPERFMONITORSAMDPROC gleswGenPerfMonitorsAMD;
-PFNGLDELETEPERFMONITORSAMDPROC gleswDeletePerfMonitorsAMD;
-PFNGLSELECTPERFMONITORCOUNTERSAMDPROC gleswSelectPerfMonitorCountersAMD;
-PFNGLBEGINPERFMONITORAMDPROC gleswBeginPerfMonitorAMD;
-PFNGLENDPERFMONITORAMDPROC gleswEndPerfMonitorAMD;
-PFNGLGETPERFMONITORCOUNTERDATAAMDPROC gleswGetPerfMonitorCounterDataAMD;
-PFNGLBLITFRAMEBUFFERANGLEPROC gleswBlitFramebufferANGLE;
-PFNGLRENDERBUFFERSTORAGEMULTISAMPLEANGLEPROC gleswRenderbufferStorageMultisampleANGLE;
-PFNGLDRAWARRAYSINSTANCEDANGLEPROC gleswDrawArraysInstancedANGLE;
-PFNGLDRAWELEMENTSINSTANCEDANGLEPROC gleswDrawElementsInstancedANGLE;
-PFNGLVERTEXATTRIBDIVISORANGLEPROC gleswVertexAttribDivisorANGLE;
-PFNGLGETTRANSLATEDSHADERSOURCEANGLEPROC gleswGetTranslatedShaderSourceANGLE;
-PFNGLDRAWARRAYSINSTANCEDEXTPROC gleswDrawArraysInstancedEXT;
-PFNGLDRAWELEMENTSINSTANCEDEXTPROC gleswDrawElementsInstancedEXT;
-PFNGLVERTEXATTRIBDIVISOREXTPROC gleswVertexAttribDivisorEXT;
-PFNGLCOPYTEXTURELEVELSAPPLEPROC gleswCopyTextureLevelsAPPLE;
-PFNGLRENDERBUFFERSTORAGEMULTISAMPLEAPPLEPROC gleswRenderbufferStorageMultisampleAPPLE;
-PFNGLRESOLVEMULTISAMPLEFRAMEBUFFERAPPLEPROC gleswResolveMultisampleFramebufferAPPLE;
-PFNGLFENCESYNCAPPLEPROC gleswFenceSyncAPPLE;
-PFNGLISSYNCAPPLEPROC gleswIsSyncAPPLE;
-PFNGLDELETESYNCAPPLEPROC gleswDeleteSyncAPPLE;
-PFNGLCLIENTWAITSYNCAPPLEPROC gleswClientWaitSyncAPPLE;
-PFNGLWAITSYNCAPPLEPROC gleswWaitSyncAPPLE;
-PFNGLGETINTEGER64VAPPLEPROC gleswGetInteger64vAPPLE;
-PFNGLGETSYNCIVAPPLEPROC gleswGetSyncivAPPLE;
-PFNGLLABELOBJECTEXTPROC gleswLabelObjectEXT;
-PFNGLGETOBJECTLABELEXTPROC gleswGetObjectLabelEXT;
-PFNGLINSERTEVENTMARKEREXTPROC gleswInsertEventMarkerEXT;
-PFNGLPUSHGROUPMARKEREXTPROC gleswPushGroupMarkerEXT;
-PFNGLPOPGROUPMARKEREXTPROC gleswPopGroupMarkerEXT;
-PFNGLDISCARDFRAMEBUFFEREXTPROC gleswDiscardFramebufferEXT;
-PFNGLGENQUERIESEXTPROC gleswGenQueriesEXT;
-PFNGLDELETEQUERIESEXTPROC gleswDeleteQueriesEXT;
-PFNGLISQUERYEXTPROC gleswIsQueryEXT;
-PFNGLBEGINQUERYEXTPROC gleswBeginQueryEXT;
-PFNGLENDQUERYEXTPROC gleswEndQueryEXT;
-PFNGLQUERYCOUNTEREXTPROC gleswQueryCounterEXT;
-PFNGLGETQUERYIVEXTPROC gleswGetQueryivEXT;
-PFNGLGETQUERYOBJECTIVEXTPROC gleswGetQueryObjectivEXT;
-PFNGLGETQUERYOBJECTUIVEXTPROC gleswGetQueryObjectuivEXT;
-PFNGLGETQUERYOBJECTI64VEXTPROC gleswGetQueryObjecti64vEXT;
-PFNGLGETQUERYOBJECTUI64VEXTPROC gleswGetQueryObjectui64vEXT;
-PFNGLMAPBUFFERRANGEEXTPROC gleswMapBufferRangeEXT;
-PFNGLFLUSHMAPPEDBUFFERRANGEEXTPROC gleswFlushMappedBufferRangeEXT;
-PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC gleswRenderbufferStorageMultisampleEXT;
-PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC gleswFramebufferTexture2DMultisampleEXT;
-PFNGLREADBUFFERINDEXEDEXTPROC gleswReadBufferIndexedEXT;
-PFNGLDRAWBUFFERSINDEXEDEXTPROC gleswDrawBuffersIndexedEXT;
-PFNGLGETINTEGERI_VEXTPROC gleswGetIntegeri_vEXT;
-PFNGLMULTIDRAWARRAYSEXTPROC gleswMultiDrawArraysEXT;
-PFNGLMULTIDRAWELEMENTSEXTPROC gleswMultiDrawElementsEXT;
-PFNGLGETGRAPHICSRESETSTATUSEXTPROC gleswGetGraphicsResetStatusEXT;
-PFNGLREADNPIXELSEXTPROC gleswReadnPixelsEXT;
-PFNGLGETNUNIFORMFVEXTPROC gleswGetnUniformfvEXT;
-PFNGLGETNUNIFORMIVEXTPROC gleswGetnUniformivEXT;
+PFNGLREADBUFFERPROC gleswReadBuffer;
+PFNGLDRAWRANGEELEMENTSPROC gleswDrawRangeElements;
+PFNGLTEXIMAGE3DPROC gleswTexImage3D;
+PFNGLTEXSUBIMAGE3DPROC gleswTexSubImage3D;
+PFNGLCOPYTEXSUBIMAGE3DPROC gleswCopyTexSubImage3D;
+PFNGLCOMPRESSEDTEXIMAGE3DPROC gleswCompressedTexImage3D;
+PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC gleswCompressedTexSubImage3D;
+PFNGLGENQUERIESPROC gleswGenQueries;
+PFNGLDELETEQUERIESPROC gleswDeleteQueries;
+PFNGLISQUERYPROC gleswIsQuery;
+PFNGLBEGINQUERYPROC gleswBeginQuery;
+PFNGLENDQUERYPROC gleswEndQuery;
+PFNGLGETQUERYIVPROC gleswGetQueryiv;
+PFNGLGETQUERYOBJECTUIVPROC gleswGetQueryObjectuiv;
+PFNGLUNMAPBUFFERPROC gleswUnmapBuffer;
+PFNGLGETBUFFERPOINTERVPROC gleswGetBufferPointerv;
+PFNGLDRAWBUFFERSPROC gleswDrawBuffers;
+PFNGLUNIFORMMATRIX2X3FVPROC gleswUniformMatrix2x3fv;
+PFNGLUNIFORMMATRIX3X2FVPROC gleswUniformMatrix3x2fv;
+PFNGLUNIFORMMATRIX2X4FVPROC gleswUniformMatrix2x4fv;
+PFNGLUNIFORMMATRIX4X2FVPROC gleswUniformMatrix4x2fv;
+PFNGLUNIFORMMATRIX3X4FVPROC gleswUniformMatrix3x4fv;
+PFNGLUNIFORMMATRIX4X3FVPROC gleswUniformMatrix4x3fv;
+PFNGLBLITFRAMEBUFFERPROC gleswBlitFramebuffer;
+PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC gleswRenderbufferStorageMultisample;
+PFNGLFRAMEBUFFERTEXTURELAYERPROC gleswFramebufferTextureLayer;
+PFNGLMAPBUFFERRANGEPROC gleswMapBufferRange;
+PFNGLFLUSHMAPPEDBUFFERRANGEPROC gleswFlushMappedBufferRange;
+PFNGLBINDVERTEXARRAYPROC gleswBindVertexArray;
+PFNGLDELETEVERTEXARRAYSPROC gleswDeleteVertexArrays;
+PFNGLGENVERTEXARRAYSPROC gleswGenVertexArrays;
+PFNGLISVERTEXARRAYPROC gleswIsVertexArray;
+PFNGLGETINTEGERI_VPROC gleswGetIntegeri_v;
+PFNGLBEGINTRANSFORMFEEDBACKPROC gleswBeginTransformFeedback;
+PFNGLENDTRANSFORMFEEDBACKPROC gleswEndTransformFeedback;
+PFNGLBINDBUFFERRANGEPROC gleswBindBufferRange;
+PFNGLBINDBUFFERBASEPROC gleswBindBufferBase;
+PFNGLTRANSFORMFEEDBACKVARYINGSPROC gleswTransformFeedbackVaryings;
+PFNGLGETTRANSFORMFEEDBACKVARYINGPROC gleswGetTransformFeedbackVarying;
+PFNGLVERTEXATTRIBIPOINTERPROC gleswVertexAttribIPointer;
+PFNGLGETVERTEXATTRIBIIVPROC gleswGetVertexAttribIiv;
+PFNGLGETVERTEXATTRIBIUIVPROC gleswGetVertexAttribIuiv;
+PFNGLVERTEXATTRIBI4IPROC gleswVertexAttribI4i;
+PFNGLVERTEXATTRIBI4UIPROC gleswVertexAttribI4ui;
+PFNGLVERTEXATTRIBI4IVPROC gleswVertexAttribI4iv;
+PFNGLVERTEXATTRIBI4UIVPROC gleswVertexAttribI4uiv;
+PFNGLGETUNIFORMUIVPROC gleswGetUniformuiv;
+PFNGLGETFRAGDATALOCATIONPROC gleswGetFragDataLocation;
+PFNGLUNIFORM1UIPROC gleswUniform1ui;
+PFNGLUNIFORM2UIPROC gleswUniform2ui;
+PFNGLUNIFORM3UIPROC gleswUniform3ui;
+PFNGLUNIFORM4UIPROC gleswUniform4ui;
+PFNGLUNIFORM1UIVPROC gleswUniform1uiv;
+PFNGLUNIFORM2UIVPROC gleswUniform2uiv;
+PFNGLUNIFORM3UIVPROC gleswUniform3uiv;
+PFNGLUNIFORM4UIVPROC gleswUniform4uiv;
+PFNGLCLEARBUFFERIVPROC gleswClearBufferiv;
+PFNGLCLEARBUFFERUIVPROC gleswClearBufferuiv;
+PFNGLCLEARBUFFERFVPROC gleswClearBufferfv;
+PFNGLCLEARBUFFERFIPROC gleswClearBufferfi;
+PFNGLGETSTRINGIPROC gleswGetStringi;
+PFNGLCOPYBUFFERSUBDATAPROC gleswCopyBufferSubData;
+PFNGLGETUNIFORMINDICESPROC gleswGetUniformIndices;
+PFNGLGETACTIVEUNIFORMSIVPROC gleswGetActiveUniformsiv;
+PFNGLGETUNIFORMBLOCKINDEXPROC gleswGetUniformBlockIndex;
+PFNGLGETACTIVEUNIFORMBLOCKIVPROC gleswGetActiveUniformBlockiv;
+PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC gleswGetActiveUniformBlockName;
+PFNGLUNIFORMBLOCKBINDINGPROC gleswUniformBlockBinding;
+PFNGLDRAWARRAYSINSTANCEDPROC gleswDrawArraysInstanced;
+PFNGLDRAWELEMENTSINSTANCEDPROC gleswDrawElementsInstanced;
+PFNGLFENCESYNCPROC gleswFenceSync;
+PFNGLISSYNCPROC gleswIsSync;
+PFNGLDELETESYNCPROC gleswDeleteSync;
+PFNGLCLIENTWAITSYNCPROC gleswClientWaitSync;
+PFNGLWAITSYNCPROC gleswWaitSync;
+PFNGLGETINTEGER64VPROC gleswGetInteger64v;
+PFNGLGETSYNCIVPROC gleswGetSynciv;
+PFNGLGETINTEGER64I_VPROC gleswGetInteger64i_v;
+PFNGLGETBUFFERPARAMETERI64VPROC gleswGetBufferParameteri64v;
+PFNGLGENSAMPLERSPROC gleswGenSamplers;
+PFNGLDELETESAMPLERSPROC gleswDeleteSamplers;
+PFNGLISSAMPLERPROC gleswIsSampler;
+PFNGLBINDSAMPLERPROC gleswBindSampler;
+PFNGLSAMPLERPARAMETERIPROC gleswSamplerParameteri;
+PFNGLSAMPLERPARAMETERIVPROC gleswSamplerParameteriv;
+PFNGLSAMPLERPARAMETERFPROC gleswSamplerParameterf;
+PFNGLSAMPLERPARAMETERFVPROC gleswSamplerParameterfv;
+PFNGLGETSAMPLERPARAMETERIVPROC gleswGetSamplerParameteriv;
+PFNGLGETSAMPLERPARAMETERFVPROC gleswGetSamplerParameterfv;
+PFNGLVERTEXATTRIBDIVISORPROC gleswVertexAttribDivisor;
+PFNGLBINDTRANSFORMFEEDBACKPROC gleswBindTransformFeedback;
+PFNGLDELETETRANSFORMFEEDBACKSPROC gleswDeleteTransformFeedbacks;
+PFNGLGENTRANSFORMFEEDBACKSPROC gleswGenTransformFeedbacks;
+PFNGLISTRANSFORMFEEDBACKPROC gleswIsTransformFeedback;
+PFNGLPAUSETRANSFORMFEEDBACKPROC gleswPauseTransformFeedback;
+PFNGLRESUMETRANSFORMFEEDBACKPROC gleswResumeTransformFeedback;
+PFNGLGETPROGRAMBINARYPROC gleswGetProgramBinary;
+PFNGLPROGRAMBINARYPROC gleswProgramBinary;
+PFNGLPROGRAMPARAMETERIPROC gleswProgramParameteri;
+PFNGLINVALIDATEFRAMEBUFFERPROC gleswInvalidateFramebuffer;
+PFNGLINVALIDATESUBFRAMEBUFFERPROC gleswInvalidateSubFramebuffer;
+PFNGLTEXSTORAGE2DPROC gleswTexStorage2D;
+PFNGLTEXSTORAGE3DPROC gleswTexStorage3D;
+PFNGLGETINTERNALFORMATIVPROC gleswGetInternalformativ;
 PFNGLUSEPROGRAMSTAGESEXTPROC gleswUseProgramStagesEXT;
 PFNGLACTIVESHADERPROGRAMEXTPROC gleswActiveShaderProgramEXT;
 PFNGLCREATESHADERPROGRAMVEXTPROC gleswCreateShaderProgramvEXT;
@@ -429,51 +420,19 @@ PFNGLPROGRAMUNIFORM4FVEXTPROC gleswProgramUniform4fvEXT;
 PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC gleswProgramUniformMatrix2fvEXT;
 PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC gleswProgramUniformMatrix3fvEXT;
 PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC gleswProgramUniformMatrix4fvEXT;
+PFNGLPROGRAMUNIFORMMATRIX2X3FVEXTPROC gleswProgramUniformMatrix2x3fvEXT;
+PFNGLPROGRAMUNIFORMMATRIX3X2FVEXTPROC gleswProgramUniformMatrix3x2fvEXT;
+PFNGLPROGRAMUNIFORMMATRIX2X4FVEXTPROC gleswProgramUniformMatrix2x4fvEXT;
+PFNGLPROGRAMUNIFORMMATRIX4X2FVEXTPROC gleswProgramUniformMatrix4x2fvEXT;
+PFNGLPROGRAMUNIFORMMATRIX3X4FVEXTPROC gleswProgramUniformMatrix3x4fvEXT;
+PFNGLPROGRAMUNIFORMMATRIX4X3FVEXTPROC gleswProgramUniformMatrix4x3fvEXT;
 PFNGLVALIDATEPROGRAMPIPELINEEXTPROC gleswValidateProgramPipelineEXT;
 PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC gleswGetProgramPipelineInfoLogEXT;
-PFNGLTEXSTORAGE1DEXTPROC gleswTexStorage1DEXT;
-PFNGLTEXSTORAGE2DEXTPROC gleswTexStorage2DEXT;
-PFNGLTEXSTORAGE3DEXTPROC gleswTexStorage3DEXT;
-PFNGLTEXTURESTORAGE1DEXTPROC gleswTextureStorage1DEXT;
-PFNGLTEXTURESTORAGE2DEXTPROC gleswTextureStorage2DEXT;
-PFNGLTEXTURESTORAGE3DEXTPROC gleswTextureStorage3DEXT;
-PFNGLRENDERBUFFERSTORAGEMULTISAMPLEIMGPROC gleswRenderbufferStorageMultisampleIMG;
-PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEIMGPROC gleswFramebufferTexture2DMultisampleIMG;
-PFNGLCOVERAGEMASKNVPROC gleswCoverageMaskNV;
-PFNGLCOVERAGEOPERATIONNVPROC gleswCoverageOperationNV;
-PFNGLDRAWBUFFERSNVPROC gleswDrawBuffersNV;
-PFNGLDRAWARRAYSINSTANCEDNVPROC gleswDrawArraysInstancedNV;
-PFNGLDRAWELEMENTSINSTANCEDNVPROC gleswDrawElementsInstancedNV;
-PFNGLDELETEFENCESNVPROC gleswDeleteFencesNV;
-PFNGLGENFENCESNVPROC gleswGenFencesNV;
-PFNGLISFENCENVPROC gleswIsFenceNV;
-PFNGLTESTFENCENVPROC gleswTestFenceNV;
-PFNGLGETFENCEIVNVPROC gleswGetFenceivNV;
-PFNGLFINISHFENCENVPROC gleswFinishFenceNV;
-PFNGLSETFENCENVPROC gleswSetFenceNV;
-PFNGLBLITFRAMEBUFFERNVPROC gleswBlitFramebufferNV;
-PFNGLRENDERBUFFERSTORAGEMULTISAMPLENVPROC gleswRenderbufferStorageMultisampleNV;
-PFNGLVERTEXATTRIBDIVISORNVPROC gleswVertexAttribDivisorNV;
-PFNGLREADBUFFERNVPROC gleswReadBufferNV;
-PFNGLALPHAFUNCQCOMPROC gleswAlphaFuncQCOM;
-PFNGLGETDRIVERCONTROLSQCOMPROC gleswGetDriverControlsQCOM;
-PFNGLGETDRIVERCONTROLSTRINGQCOMPROC gleswGetDriverControlStringQCOM;
-PFNGLENABLEDRIVERCONTROLQCOMPROC gleswEnableDriverControlQCOM;
-PFNGLDISABLEDRIVERCONTROLQCOMPROC gleswDisableDriverControlQCOM;
-PFNGLEXTGETTEXTURESQCOMPROC gleswExtGetTexturesQCOM;
-PFNGLEXTGETBUFFERSQCOMPROC gleswExtGetBuffersQCOM;
-PFNGLEXTGETRENDERBUFFERSQCOMPROC gleswExtGetRenderbuffersQCOM;
-PFNGLEXTGETFRAMEBUFFERSQCOMPROC gleswExtGetFramebuffersQCOM;
-PFNGLEXTGETTEXLEVELPARAMETERIVQCOMPROC gleswExtGetTexLevelParameterivQCOM;
-PFNGLEXTTEXOBJECTSTATEOVERRIDEIQCOMPROC gleswExtTexObjectStateOverrideiQCOM;
-PFNGLEXTGETTEXSUBIMAGEQCOMPROC gleswExtGetTexSubImageQCOM;
-PFNGLEXTGETBUFFERPOINTERVQCOMPROC gleswExtGetBufferPointervQCOM;
-PFNGLEXTGETSHADERSQCOMPROC gleswExtGetShadersQCOM;
-PFNGLEXTGETPROGRAMSQCOMPROC gleswExtGetProgramsQCOM;
-PFNGLEXTISPROGRAMBINARYQCOMPROC gleswExtIsProgramBinaryQCOM;
-PFNGLEXTGETPROGRAMBINARYSOURCEQCOMPROC gleswExtGetProgramBinarySourceQCOM;
-PFNGLSTARTTILINGQCOMPROC gleswStartTilingQCOM;
-PFNGLENDTILINGQCOMPROC gleswEndTilingQCOM;
+PFNGLLABELOBJECTEXTPROC gleswLabelObjectEXT;
+PFNGLGETOBJECTLABELEXTPROC gleswGetObjectLabelEXT;
+PFNGLINSERTEVENTMARKEREXTPROC gleswInsertEventMarkerEXT;
+PFNGLPUSHGROUPMARKEREXTPROC gleswPushGroupMarkerEXT;
+PFNGLPOPGROUPMARKEREXTPROC gleswPopGroupMarkerEXT;
 
 static void load_procs(void)
 {
@@ -619,94 +578,115 @@ static void load_procs(void)
     gleswVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC) get_proc("glVertexAttrib4fv");
     gleswVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC) get_proc("glVertexAttribPointer");
     gleswViewport = (PFNGLVIEWPORTPROC) get_proc("glViewport");
-    gleswEGLImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC) get_proc("glEGLImageTargetTexture2DOES");
-    gleswEGLImageTargetRenderbufferStorageOES = (PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC) get_proc("glEGLImageTargetRenderbufferStorageOES");
-    gleswGetProgramBinaryOES = (PFNGLGETPROGRAMBINARYOESPROC) get_proc("glGetProgramBinaryOES");
-    gleswProgramBinaryOES = (PFNGLPROGRAMBINARYOESPROC) get_proc("glProgramBinaryOES");
-    gleswMapBufferOES = (PFNGLMAPBUFFEROESPROC) get_proc("glMapBufferOES");
-    gleswUnmapBufferOES = (PFNGLUNMAPBUFFEROESPROC) get_proc("glUnmapBufferOES");
-    gleswGetBufferPointervOES = (PFNGLGETBUFFERPOINTERVOESPROC) get_proc("glGetBufferPointervOES");
-    gleswTexImage3DOES = (PFNGLTEXIMAGE3DOESPROC) get_proc("glTexImage3DOES");
-    gleswTexSubImage3DOES = (PFNGLTEXSUBIMAGE3DOESPROC) get_proc("glTexSubImage3DOES");
-    gleswCopyTexSubImage3DOES = (PFNGLCOPYTEXSUBIMAGE3DOESPROC) get_proc("glCopyTexSubImage3DOES");
-    gleswCompressedTexImage3DOES = (PFNGLCOMPRESSEDTEXIMAGE3DOESPROC) get_proc("glCompressedTexImage3DOES");
-    gleswCompressedTexSubImage3DOES = (PFNGLCOMPRESSEDTEXSUBIMAGE3DOESPROC) get_proc("glCompressedTexSubImage3DOES");
-    gleswFramebufferTexture3DOES = (PFNGLFRAMEBUFFERTEXTURE3DOESPROC) get_proc("glFramebufferTexture3DOES");
-    gleswBindVertexArrayOES = (PFNGLBINDVERTEXARRAYOESPROC) get_proc("glBindVertexArrayOES");
-    gleswDeleteVertexArraysOES = (PFNGLDELETEVERTEXARRAYSOESPROC) get_proc("glDeleteVertexArraysOES");
-    gleswGenVertexArraysOES = (PFNGLGENVERTEXARRAYSOESPROC) get_proc("glGenVertexArraysOES");
-    gleswIsVertexArrayOES = (PFNGLISVERTEXARRAYOESPROC) get_proc("glIsVertexArrayOES");
-    gleswDebugMessageControlKHR = (PFNGLDEBUGMESSAGECONTROLKHRPROC) get_proc("glDebugMessageControlKHR");
-    gleswDebugMessageInsertKHR = (PFNGLDEBUGMESSAGEINSERTKHRPROC) get_proc("glDebugMessageInsertKHR");
-    gleswDebugMessageCallbackKHR = (PFNGLDEBUGMESSAGECALLBACKKHRPROC) get_proc("glDebugMessageCallbackKHR");
-    gleswGetDebugMessageLogKHR = (PFNGLGETDEBUGMESSAGELOGKHRPROC) get_proc("glGetDebugMessageLogKHR");
-    gleswPushDebugGroupKHR = (PFNGLPUSHDEBUGGROUPKHRPROC) get_proc("glPushDebugGroupKHR");
-    gleswPopDebugGroupKHR = (PFNGLPOPDEBUGGROUPKHRPROC) get_proc("glPopDebugGroupKHR");
-    gleswObjectLabelKHR = (PFNGLOBJECTLABELKHRPROC) get_proc("glObjectLabelKHR");
-    gleswGetObjectLabelKHR = (PFNGLGETOBJECTLABELKHRPROC) get_proc("glGetObjectLabelKHR");
-    gleswObjectPtrLabelKHR = (PFNGLOBJECTPTRLABELKHRPROC) get_proc("glObjectPtrLabelKHR");
-    gleswGetObjectPtrLabelKHR = (PFNGLGETOBJECTPTRLABELKHRPROC) get_proc("glGetObjectPtrLabelKHR");
-    gleswGetPointervKHR = (PFNGLGETPOINTERVKHRPROC) get_proc("glGetPointervKHR");
-    gleswGetPerfMonitorGroupsAMD = (PFNGLGETPERFMONITORGROUPSAMDPROC) get_proc("glGetPerfMonitorGroupsAMD");
-    gleswGetPerfMonitorCountersAMD = (PFNGLGETPERFMONITORCOUNTERSAMDPROC) get_proc("glGetPerfMonitorCountersAMD");
-    gleswGetPerfMonitorGroupStringAMD = (PFNGLGETPERFMONITORGROUPSTRINGAMDPROC) get_proc("glGetPerfMonitorGroupStringAMD");
-    gleswGetPerfMonitorCounterStringAMD = (PFNGLGETPERFMONITORCOUNTERSTRINGAMDPROC) get_proc("glGetPerfMonitorCounterStringAMD");
-    gleswGetPerfMonitorCounterInfoAMD = (PFNGLGETPERFMONITORCOUNTERINFOAMDPROC) get_proc("glGetPerfMonitorCounterInfoAMD");
-    gleswGenPerfMonitorsAMD = (PFNGLGENPERFMONITORSAMDPROC) get_proc("glGenPerfMonitorsAMD");
-    gleswDeletePerfMonitorsAMD = (PFNGLDELETEPERFMONITORSAMDPROC) get_proc("glDeletePerfMonitorsAMD");
-    gleswSelectPerfMonitorCountersAMD = (PFNGLSELECTPERFMONITORCOUNTERSAMDPROC) get_proc("glSelectPerfMonitorCountersAMD");
-    gleswBeginPerfMonitorAMD = (PFNGLBEGINPERFMONITORAMDPROC) get_proc("glBeginPerfMonitorAMD");
-    gleswEndPerfMonitorAMD = (PFNGLENDPERFMONITORAMDPROC) get_proc("glEndPerfMonitorAMD");
-    gleswGetPerfMonitorCounterDataAMD = (PFNGLGETPERFMONITORCOUNTERDATAAMDPROC) get_proc("glGetPerfMonitorCounterDataAMD");
-    gleswBlitFramebufferANGLE = (PFNGLBLITFRAMEBUFFERANGLEPROC) get_proc("glBlitFramebufferANGLE");
-    gleswRenderbufferStorageMultisampleANGLE = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEANGLEPROC) get_proc("glRenderbufferStorageMultisampleANGLE");
-    gleswDrawArraysInstancedANGLE = (PFNGLDRAWARRAYSINSTANCEDANGLEPROC) get_proc("glDrawArraysInstancedANGLE");
-    gleswDrawElementsInstancedANGLE = (PFNGLDRAWELEMENTSINSTANCEDANGLEPROC) get_proc("glDrawElementsInstancedANGLE");
-    gleswVertexAttribDivisorANGLE = (PFNGLVERTEXATTRIBDIVISORANGLEPROC) get_proc("glVertexAttribDivisorANGLE");
-    gleswGetTranslatedShaderSourceANGLE = (PFNGLGETTRANSLATEDSHADERSOURCEANGLEPROC) get_proc("glGetTranslatedShaderSourceANGLE");
-    gleswDrawArraysInstancedEXT = (PFNGLDRAWARRAYSINSTANCEDEXTPROC) get_proc("glDrawArraysInstancedEXT");
-    gleswDrawElementsInstancedEXT = (PFNGLDRAWELEMENTSINSTANCEDEXTPROC) get_proc("glDrawElementsInstancedEXT");
-    gleswVertexAttribDivisorEXT = (PFNGLVERTEXATTRIBDIVISOREXTPROC) get_proc("glVertexAttribDivisorEXT");
-    gleswCopyTextureLevelsAPPLE = (PFNGLCOPYTEXTURELEVELSAPPLEPROC) get_proc("glCopyTextureLevelsAPPLE");
-    gleswRenderbufferStorageMultisampleAPPLE = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEAPPLEPROC) get_proc("glRenderbufferStorageMultisampleAPPLE");
-    gleswResolveMultisampleFramebufferAPPLE = (PFNGLRESOLVEMULTISAMPLEFRAMEBUFFERAPPLEPROC) get_proc("glResolveMultisampleFramebufferAPPLE");
-    gleswFenceSyncAPPLE = (PFNGLFENCESYNCAPPLEPROC) get_proc("glFenceSyncAPPLE");
-    gleswIsSyncAPPLE = (PFNGLISSYNCAPPLEPROC) get_proc("glIsSyncAPPLE");
-    gleswDeleteSyncAPPLE = (PFNGLDELETESYNCAPPLEPROC) get_proc("glDeleteSyncAPPLE");
-    gleswClientWaitSyncAPPLE = (PFNGLCLIENTWAITSYNCAPPLEPROC) get_proc("glClientWaitSyncAPPLE");
-    gleswWaitSyncAPPLE = (PFNGLWAITSYNCAPPLEPROC) get_proc("glWaitSyncAPPLE");
-    gleswGetInteger64vAPPLE = (PFNGLGETINTEGER64VAPPLEPROC) get_proc("glGetInteger64vAPPLE");
-    gleswGetSyncivAPPLE = (PFNGLGETSYNCIVAPPLEPROC) get_proc("glGetSyncivAPPLE");
+    gleswReadBuffer = (PFNGLREADBUFFERPROC) get_proc("glReadBuffer");
+    gleswDrawRangeElements = (PFNGLDRAWRANGEELEMENTSPROC) get_proc("glDrawRangeElements");
+    gleswTexImage3D = (PFNGLTEXIMAGE3DPROC) get_proc("glTexImage3D");
+    gleswTexSubImage3D = (PFNGLTEXSUBIMAGE3DPROC) get_proc("glTexSubImage3D");
+    gleswCopyTexSubImage3D = (PFNGLCOPYTEXSUBIMAGE3DPROC) get_proc("glCopyTexSubImage3D");
+    gleswCompressedTexImage3D = (PFNGLCOMPRESSEDTEXIMAGE3DPROC) get_proc("glCompressedTexImage3D");
+    gleswCompressedTexSubImage3D = (PFNGLCOMPRESSEDTEXSUBIMAGE3DPROC) get_proc("glCompressedTexSubImage3D");
+    gleswGenQueries = (PFNGLGENQUERIESPROC) get_proc("glGenQueries");
+    gleswDeleteQueries = (PFNGLDELETEQUERIESPROC) get_proc("glDeleteQueries");
+    gleswIsQuery = (PFNGLISQUERYPROC) get_proc("glIsQuery");
+    gleswBeginQuery = (PFNGLBEGINQUERYPROC) get_proc("glBeginQuery");
+    gleswEndQuery = (PFNGLENDQUERYPROC) get_proc("glEndQuery");
+    gleswGetQueryiv = (PFNGLGETQUERYIVPROC) get_proc("glGetQueryiv");
+    gleswGetQueryObjectuiv = (PFNGLGETQUERYOBJECTUIVPROC) get_proc("glGetQueryObjectuiv");
+    gleswUnmapBuffer = (PFNGLUNMAPBUFFERPROC) get_proc("glUnmapBuffer");
+    gleswGetBufferPointerv = (PFNGLGETBUFFERPOINTERVPROC) get_proc("glGetBufferPointerv");
+    gleswDrawBuffers = (PFNGLDRAWBUFFERSPROC) get_proc("glDrawBuffers");
+    gleswUniformMatrix2x3fv = (PFNGLUNIFORMMATRIX2X3FVPROC) get_proc("glUniformMatrix2x3fv");
+    gleswUniformMatrix3x2fv = (PFNGLUNIFORMMATRIX3X2FVPROC) get_proc("glUniformMatrix3x2fv");
+    gleswUniformMatrix2x4fv = (PFNGLUNIFORMMATRIX2X4FVPROC) get_proc("glUniformMatrix2x4fv");
+    gleswUniformMatrix4x2fv = (PFNGLUNIFORMMATRIX4X2FVPROC) get_proc("glUniformMatrix4x2fv");
+    gleswUniformMatrix3x4fv = (PFNGLUNIFORMMATRIX3X4FVPROC) get_proc("glUniformMatrix3x4fv");
+    gleswUniformMatrix4x3fv = (PFNGLUNIFORMMATRIX4X3FVPROC) get_proc("glUniformMatrix4x3fv");
+    gleswBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC) get_proc("glBlitFramebuffer");
+    gleswRenderbufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC) get_proc("glRenderbufferStorageMultisample");
+    gleswFramebufferTextureLayer = (PFNGLFRAMEBUFFERTEXTURELAYERPROC) get_proc("glFramebufferTextureLayer");
+    gleswMapBufferRange = (PFNGLMAPBUFFERRANGEPROC) get_proc("glMapBufferRange");
+    gleswFlushMappedBufferRange = (PFNGLFLUSHMAPPEDBUFFERRANGEPROC) get_proc("glFlushMappedBufferRange");
+    gleswBindVertexArray = (PFNGLBINDVERTEXARRAYPROC) get_proc("glBindVertexArray");
+    gleswDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC) get_proc("glDeleteVertexArrays");
+    gleswGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC) get_proc("glGenVertexArrays");
+    gleswIsVertexArray = (PFNGLISVERTEXARRAYPROC) get_proc("glIsVertexArray");
+    gleswGetIntegeri_v = (PFNGLGETINTEGERI_VPROC) get_proc("glGetIntegeri_v");
+    gleswBeginTransformFeedback = (PFNGLBEGINTRANSFORMFEEDBACKPROC) get_proc("glBeginTransformFeedback");
+    gleswEndTransformFeedback = (PFNGLENDTRANSFORMFEEDBACKPROC) get_proc("glEndTransformFeedback");
+    gleswBindBufferRange = (PFNGLBINDBUFFERRANGEPROC) get_proc("glBindBufferRange");
+    gleswBindBufferBase = (PFNGLBINDBUFFERBASEPROC) get_proc("glBindBufferBase");
+    gleswTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC) get_proc("glTransformFeedbackVaryings");
+    gleswGetTransformFeedbackVarying = (PFNGLGETTRANSFORMFEEDBACKVARYINGPROC) get_proc("glGetTransformFeedbackVarying");
+    gleswVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC) get_proc("glVertexAttribIPointer");
+    gleswGetVertexAttribIiv = (PFNGLGETVERTEXATTRIBIIVPROC) get_proc("glGetVertexAttribIiv");
+    gleswGetVertexAttribIuiv = (PFNGLGETVERTEXATTRIBIUIVPROC) get_proc("glGetVertexAttribIuiv");
+    gleswVertexAttribI4i = (PFNGLVERTEXATTRIBI4IPROC) get_proc("glVertexAttribI4i");
+    gleswVertexAttribI4ui = (PFNGLVERTEXATTRIBI4UIPROC) get_proc("glVertexAttribI4ui");
+    gleswVertexAttribI4iv = (PFNGLVERTEXATTRIBI4IVPROC) get_proc("glVertexAttribI4iv");
+    gleswVertexAttribI4uiv = (PFNGLVERTEXATTRIBI4UIVPROC) get_proc("glVertexAttribI4uiv");
+    gleswGetUniformuiv = (PFNGLGETUNIFORMUIVPROC) get_proc("glGetUniformuiv");
+    gleswGetFragDataLocation = (PFNGLGETFRAGDATALOCATIONPROC) get_proc("glGetFragDataLocation");
+    gleswUniform1ui = (PFNGLUNIFORM1UIPROC) get_proc("glUniform1ui");
+    gleswUniform2ui = (PFNGLUNIFORM2UIPROC) get_proc("glUniform2ui");
+    gleswUniform3ui = (PFNGLUNIFORM3UIPROC) get_proc("glUniform3ui");
+    gleswUniform4ui = (PFNGLUNIFORM4UIPROC) get_proc("glUniform4ui");
+    gleswUniform1uiv = (PFNGLUNIFORM1UIVPROC) get_proc("glUniform1uiv");
+    gleswUniform2uiv = (PFNGLUNIFORM2UIVPROC) get_proc("glUniform2uiv");
+    gleswUniform3uiv = (PFNGLUNIFORM3UIVPROC) get_proc("glUniform3uiv");
+    gleswUniform4uiv = (PFNGLUNIFORM4UIVPROC) get_proc("glUniform4uiv");
+    gleswClearBufferiv = (PFNGLCLEARBUFFERIVPROC) get_proc("glClearBufferiv");
+    gleswClearBufferuiv = (PFNGLCLEARBUFFERUIVPROC) get_proc("glClearBufferuiv");
+    gleswClearBufferfv = (PFNGLCLEARBUFFERFVPROC) get_proc("glClearBufferfv");
+    gleswClearBufferfi = (PFNGLCLEARBUFFERFIPROC) get_proc("glClearBufferfi");
+    gleswGetStringi = (PFNGLGETSTRINGIPROC) get_proc("glGetStringi");
+    gleswCopyBufferSubData = (PFNGLCOPYBUFFERSUBDATAPROC) get_proc("glCopyBufferSubData");
+    gleswGetUniformIndices = (PFNGLGETUNIFORMINDICESPROC) get_proc("glGetUniformIndices");
+    gleswGetActiveUniformsiv = (PFNGLGETACTIVEUNIFORMSIVPROC) get_proc("glGetActiveUniformsiv");
+    gleswGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC) get_proc("glGetUniformBlockIndex");
+    gleswGetActiveUniformBlockiv = (PFNGLGETACTIVEUNIFORMBLOCKIVPROC) get_proc("glGetActiveUniformBlockiv");
+    gleswGetActiveUniformBlockName = (PFNGLGETACTIVEUNIFORMBLOCKNAMEPROC) get_proc("glGetActiveUniformBlockName");
+    gleswUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC) get_proc("glUniformBlockBinding");
+    gleswDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC) get_proc("glDrawArraysInstanced");
+    gleswDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC) get_proc("glDrawElementsInstanced");
+    gleswFenceSync = (PFNGLFENCESYNCPROC) get_proc("glFenceSync");
+    gleswIsSync = (PFNGLISSYNCPROC) get_proc("glIsSync");
+    gleswDeleteSync = (PFNGLDELETESYNCPROC) get_proc("glDeleteSync");
+    gleswClientWaitSync = (PFNGLCLIENTWAITSYNCPROC) get_proc("glClientWaitSync");
+    gleswWaitSync = (PFNGLWAITSYNCPROC) get_proc("glWaitSync");
+    gleswGetInteger64v = (PFNGLGETINTEGER64VPROC) get_proc("glGetInteger64v");
+    gleswGetSynciv = (PFNGLGETSYNCIVPROC) get_proc("glGetSynciv");
+    gleswGetInteger64i_v = (PFNGLGETINTEGER64I_VPROC) get_proc("glGetInteger64i_v");
+    gleswGetBufferParameteri64v = (PFNGLGETBUFFERPARAMETERI64VPROC) get_proc("glGetBufferParameteri64v");
+    gleswGenSamplers = (PFNGLGENSAMPLERSPROC) get_proc("glGenSamplers");
+    gleswDeleteSamplers = (PFNGLDELETESAMPLERSPROC) get_proc("glDeleteSamplers");
+    gleswIsSampler = (PFNGLISSAMPLERPROC) get_proc("glIsSampler");
+    gleswBindSampler = (PFNGLBINDSAMPLERPROC) get_proc("glBindSampler");
+    gleswSamplerParameteri = (PFNGLSAMPLERPARAMETERIPROC) get_proc("glSamplerParameteri");
+    gleswSamplerParameteriv = (PFNGLSAMPLERPARAMETERIVPROC) get_proc("glSamplerParameteriv");
+    gleswSamplerParameterf = (PFNGLSAMPLERPARAMETERFPROC) get_proc("glSamplerParameterf");
+    gleswSamplerParameterfv = (PFNGLSAMPLERPARAMETERFVPROC) get_proc("glSamplerParameterfv");
+    gleswGetSamplerParameteriv = (PFNGLGETSAMPLERPARAMETERIVPROC) get_proc("glGetSamplerParameteriv");
+    gleswGetSamplerParameterfv = (PFNGLGETSAMPLERPARAMETERFVPROC) get_proc("glGetSamplerParameterfv");
+    gleswVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC) get_proc("glVertexAttribDivisor");
+    gleswBindTransformFeedback = (PFNGLBINDTRANSFORMFEEDBACKPROC) get_proc("glBindTransformFeedback");
+    gleswDeleteTransformFeedbacks = (PFNGLDELETETRANSFORMFEEDBACKSPROC) get_proc("glDeleteTransformFeedbacks");
+    gleswGenTransformFeedbacks = (PFNGLGENTRANSFORMFEEDBACKSPROC) get_proc("glGenTransformFeedbacks");
+    gleswIsTransformFeedback = (PFNGLISTRANSFORMFEEDBACKPROC) get_proc("glIsTransformFeedback");
+    gleswPauseTransformFeedback = (PFNGLPAUSETRANSFORMFEEDBACKPROC) get_proc("glPauseTransformFeedback");
+    gleswResumeTransformFeedback = (PFNGLRESUMETRANSFORMFEEDBACKPROC) get_proc("glResumeTransformFeedback");
+    gleswGetProgramBinary = (PFNGLGETPROGRAMBINARYPROC) get_proc("glGetProgramBinary");
+    gleswProgramBinary = (PFNGLPROGRAMBINARYPROC) get_proc("glProgramBinary");
+    gleswProgramParameteri = (PFNGLPROGRAMPARAMETERIPROC) get_proc("glProgramParameteri");
+    gleswInvalidateFramebuffer = (PFNGLINVALIDATEFRAMEBUFFERPROC) get_proc("glInvalidateFramebuffer");
+    gleswInvalidateSubFramebuffer = (PFNGLINVALIDATESUBFRAMEBUFFERPROC) get_proc("glInvalidateSubFramebuffer");
+    gleswTexStorage2D = (PFNGLTEXSTORAGE2DPROC) get_proc("glTexStorage2D");
+    gleswTexStorage3D = (PFNGLTEXSTORAGE3DPROC) get_proc("glTexStorage3D");
+    gleswGetInternalformativ = (PFNGLGETINTERNALFORMATIVPROC) get_proc("glGetInternalformativ");
     gleswLabelObjectEXT = (PFNGLLABELOBJECTEXTPROC) get_proc("glLabelObjectEXT");
     gleswGetObjectLabelEXT = (PFNGLGETOBJECTLABELEXTPROC) get_proc("glGetObjectLabelEXT");
     gleswInsertEventMarkerEXT = (PFNGLINSERTEVENTMARKEREXTPROC) get_proc("glInsertEventMarkerEXT");
     gleswPushGroupMarkerEXT = (PFNGLPUSHGROUPMARKEREXTPROC) get_proc("glPushGroupMarkerEXT");
     gleswPopGroupMarkerEXT = (PFNGLPOPGROUPMARKEREXTPROC) get_proc("glPopGroupMarkerEXT");
-    gleswDiscardFramebufferEXT = (PFNGLDISCARDFRAMEBUFFEREXTPROC) get_proc("glDiscardFramebufferEXT");
-    gleswGenQueriesEXT = (PFNGLGENQUERIESEXTPROC) get_proc("glGenQueriesEXT");
-    gleswDeleteQueriesEXT = (PFNGLDELETEQUERIESEXTPROC) get_proc("glDeleteQueriesEXT");
-    gleswIsQueryEXT = (PFNGLISQUERYEXTPROC) get_proc("glIsQueryEXT");
-    gleswBeginQueryEXT = (PFNGLBEGINQUERYEXTPROC) get_proc("glBeginQueryEXT");
-    gleswEndQueryEXT = (PFNGLENDQUERYEXTPROC) get_proc("glEndQueryEXT");
-    gleswQueryCounterEXT = (PFNGLQUERYCOUNTEREXTPROC) get_proc("glQueryCounterEXT");
-    gleswGetQueryivEXT = (PFNGLGETQUERYIVEXTPROC) get_proc("glGetQueryivEXT");
-    gleswGetQueryObjectivEXT = (PFNGLGETQUERYOBJECTIVEXTPROC) get_proc("glGetQueryObjectivEXT");
-    gleswGetQueryObjectuivEXT = (PFNGLGETQUERYOBJECTUIVEXTPROC) get_proc("glGetQueryObjectuivEXT");
-    gleswGetQueryObjecti64vEXT = (PFNGLGETQUERYOBJECTI64VEXTPROC) get_proc("glGetQueryObjecti64vEXT");
-    gleswGetQueryObjectui64vEXT = (PFNGLGETQUERYOBJECTUI64VEXTPROC) get_proc("glGetQueryObjectui64vEXT");
-    gleswMapBufferRangeEXT = (PFNGLMAPBUFFERRANGEEXTPROC) get_proc("glMapBufferRangeEXT");
-    gleswFlushMappedBufferRangeEXT = (PFNGLFLUSHMAPPEDBUFFERRANGEEXTPROC) get_proc("glFlushMappedBufferRangeEXT");
-    gleswRenderbufferStorageMultisampleEXT = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEEXTPROC) get_proc("glRenderbufferStorageMultisampleEXT");
-    gleswFramebufferTexture2DMultisampleEXT = (PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEEXTPROC) get_proc("glFramebufferTexture2DMultisampleEXT");
-    gleswReadBufferIndexedEXT = (PFNGLREADBUFFERINDEXEDEXTPROC) get_proc("glReadBufferIndexedEXT");
-    gleswDrawBuffersIndexedEXT = (PFNGLDRAWBUFFERSINDEXEDEXTPROC) get_proc("glDrawBuffersIndexedEXT");
-    gleswGetIntegeri_vEXT = (PFNGLGETINTEGERI_VEXTPROC) get_proc("glGetIntegeri_vEXT");
-    gleswMultiDrawArraysEXT = (PFNGLMULTIDRAWARRAYSEXTPROC) get_proc("glMultiDrawArraysEXT");
-    gleswMultiDrawElementsEXT = (PFNGLMULTIDRAWELEMENTSEXTPROC) get_proc("glMultiDrawElementsEXT");
-    gleswGetGraphicsResetStatusEXT = (PFNGLGETGRAPHICSRESETSTATUSEXTPROC) get_proc("glGetGraphicsResetStatusEXT");
-    gleswReadnPixelsEXT = (PFNGLREADNPIXELSEXTPROC) get_proc("glReadnPixelsEXT");
-    gleswGetnUniformfvEXT = (PFNGLGETNUNIFORMFVEXTPROC) get_proc("glGetnUniformfvEXT");
-    gleswGetnUniformivEXT = (PFNGLGETNUNIFORMIVEXTPROC) get_proc("glGetnUniformivEXT");
     gleswUseProgramStagesEXT = (PFNGLUSEPROGRAMSTAGESEXTPROC) get_proc("glUseProgramStagesEXT");
     gleswActiveShaderProgramEXT = (PFNGLACTIVESHADERPROGRAMEXTPROC) get_proc("glActiveShaderProgramEXT");
     gleswCreateShaderProgramvEXT = (PFNGLCREATESHADERPROGRAMVEXTPROC) get_proc("glCreateShaderProgramvEXT");
@@ -735,49 +715,12 @@ static void load_procs(void)
     gleswProgramUniformMatrix2fvEXT = (PFNGLPROGRAMUNIFORMMATRIX2FVEXTPROC) get_proc("glProgramUniformMatrix2fvEXT");
     gleswProgramUniformMatrix3fvEXT = (PFNGLPROGRAMUNIFORMMATRIX3FVEXTPROC) get_proc("glProgramUniformMatrix3fvEXT");
     gleswProgramUniformMatrix4fvEXT = (PFNGLPROGRAMUNIFORMMATRIX4FVEXTPROC) get_proc("glProgramUniformMatrix4fvEXT");
+    gleswProgramUniformMatrix2x3fvEXT = (PFNGLPROGRAMUNIFORMMATRIX2X3FVEXTPROC) get_proc("glProgramUniformMatrix2x3fvEXT");
+    gleswProgramUniformMatrix4x2fvEXT = (PFNGLPROGRAMUNIFORMMATRIX3X2FVEXTPROC) get_proc("glProgramUniformMatrix3x2fvEXT");
+    gleswProgramUniformMatrix2x4fvEXT = (PFNGLPROGRAMUNIFORMMATRIX2X4FVEXTPROC) get_proc("glProgramUniformMatrix2x4fvEXT");
+    gleswProgramUniformMatrix4x2fvEXT = (PFNGLPROGRAMUNIFORMMATRIX4X2FVEXTPROC) get_proc("glProgramUniformMatrix4x2fvEXT");
+    gleswProgramUniformMatrix3x4fvEXT = (PFNGLPROGRAMUNIFORMMATRIX3X4FVEXTPROC) get_proc("glProgramUniformMatrix3x4fvEXT");
+    gleswProgramUniformMatrix4x3fvEXT = (PFNGLPROGRAMUNIFORMMATRIX4X3FVEXTPROC) get_proc("glProgramUniformMatrix4x3fvEXT");
     gleswValidateProgramPipelineEXT = (PFNGLVALIDATEPROGRAMPIPELINEEXTPROC) get_proc("glValidateProgramPipelineEXT");
     gleswGetProgramPipelineInfoLogEXT = (PFNGLGETPROGRAMPIPELINEINFOLOGEXTPROC) get_proc("glGetProgramPipelineInfoLogEXT");
-    gleswTexStorage1DEXT = (PFNGLTEXSTORAGE1DEXTPROC) get_proc("glTexStorage1DEXT");
-    gleswTexStorage2DEXT = (PFNGLTEXSTORAGE2DEXTPROC) get_proc("glTexStorage2DEXT");
-    gleswTexStorage3DEXT = (PFNGLTEXSTORAGE3DEXTPROC) get_proc("glTexStorage3DEXT");
-    gleswTextureStorage1DEXT = (PFNGLTEXTURESTORAGE1DEXTPROC) get_proc("glTextureStorage1DEXT");
-    gleswTextureStorage2DEXT = (PFNGLTEXTURESTORAGE2DEXTPROC) get_proc("glTextureStorage2DEXT");
-    gleswTextureStorage3DEXT = (PFNGLTEXTURESTORAGE3DEXTPROC) get_proc("glTextureStorage3DEXT");
-    gleswRenderbufferStorageMultisampleIMG = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEIMGPROC) get_proc("glRenderbufferStorageMultisampleIMG");
-    gleswFramebufferTexture2DMultisampleIMG = (PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEIMGPROC) get_proc("glFramebufferTexture2DMultisampleIMG");
-    gleswCoverageMaskNV = (PFNGLCOVERAGEMASKNVPROC) get_proc("glCoverageMaskNV");
-    gleswCoverageOperationNV = (PFNGLCOVERAGEOPERATIONNVPROC) get_proc("glCoverageOperationNV");
-    gleswDrawBuffersNV = (PFNGLDRAWBUFFERSNVPROC) get_proc("glDrawBuffersNV");
-    gleswDrawArraysInstancedNV = (PFNGLDRAWARRAYSINSTANCEDNVPROC) get_proc("glDrawArraysInstancedNV");
-    gleswDrawElementsInstancedNV = (PFNGLDRAWELEMENTSINSTANCEDNVPROC) get_proc("glDrawElementsInstancedNV");
-    gleswDeleteFencesNV = (PFNGLDELETEFENCESNVPROC) get_proc("glDeleteFencesNV");
-    gleswGenFencesNV = (PFNGLGENFENCESNVPROC) get_proc("glGenFencesNV");
-    gleswIsFenceNV = (PFNGLISFENCENVPROC) get_proc("glIsFenceNV");
-    gleswTestFenceNV = (PFNGLTESTFENCENVPROC) get_proc("glTestFenceNV");
-    gleswGetFenceivNV = (PFNGLGETFENCEIVNVPROC) get_proc("glGetFenceivNV");
-    gleswFinishFenceNV = (PFNGLFINISHFENCENVPROC) get_proc("glFinishFenceNV");
-    gleswSetFenceNV = (PFNGLSETFENCENVPROC) get_proc("glSetFenceNV");
-    gleswBlitFramebufferNV = (PFNGLBLITFRAMEBUFFERNVPROC) get_proc("glBlitFramebufferNV");
-    gleswRenderbufferStorageMultisampleNV = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLENVPROC) get_proc("glRenderbufferStorageMultisampleNV");
-    gleswVertexAttribDivisorNV = (PFNGLVERTEXATTRIBDIVISORNVPROC) get_proc("glVertexAttribDivisorNV");
-    gleswReadBufferNV = (PFNGLREADBUFFERNVPROC) get_proc("glReadBufferNV");
-    gleswAlphaFuncQCOM = (PFNGLALPHAFUNCQCOMPROC) get_proc("glAlphaFuncQCOM");
-    gleswGetDriverControlsQCOM = (PFNGLGETDRIVERCONTROLSQCOMPROC) get_proc("glGetDriverControlsQCOM");
-    gleswGetDriverControlStringQCOM = (PFNGLGETDRIVERCONTROLSTRINGQCOMPROC) get_proc("glGetDriverControlStringQCOM");
-    gleswEnableDriverControlQCOM = (PFNGLENABLEDRIVERCONTROLQCOMPROC) get_proc("glEnableDriverControlQCOM");
-    gleswDisableDriverControlQCOM = (PFNGLDISABLEDRIVERCONTROLQCOMPROC) get_proc("glDisableDriverControlQCOM");
-    gleswExtGetTexturesQCOM = (PFNGLEXTGETTEXTURESQCOMPROC) get_proc("glExtGetTexturesQCOM");
-    gleswExtGetBuffersQCOM = (PFNGLEXTGETBUFFERSQCOMPROC) get_proc("glExtGetBuffersQCOM");
-    gleswExtGetRenderbuffersQCOM = (PFNGLEXTGETRENDERBUFFERSQCOMPROC) get_proc("glExtGetRenderbuffersQCOM");
-    gleswExtGetFramebuffersQCOM = (PFNGLEXTGETFRAMEBUFFERSQCOMPROC) get_proc("glExtGetFramebuffersQCOM");
-    gleswExtGetTexLevelParameterivQCOM = (PFNGLEXTGETTEXLEVELPARAMETERIVQCOMPROC) get_proc("glExtGetTexLevelParameterivQCOM");
-    gleswExtTexObjectStateOverrideiQCOM = (PFNGLEXTTEXOBJECTSTATEOVERRIDEIQCOMPROC) get_proc("glExtTexObjectStateOverrideiQCOM");
-    gleswExtGetTexSubImageQCOM = (PFNGLEXTGETTEXSUBIMAGEQCOMPROC) get_proc("glExtGetTexSubImageQCOM");
-    gleswExtGetBufferPointervQCOM = (PFNGLEXTGETBUFFERPOINTERVQCOMPROC) get_proc("glExtGetBufferPointervQCOM");
-    gleswExtGetShadersQCOM = (PFNGLEXTGETSHADERSQCOMPROC) get_proc("glExtGetShadersQCOM");
-    gleswExtGetProgramsQCOM = (PFNGLEXTGETPROGRAMSQCOMPROC) get_proc("glExtGetProgramsQCOM");
-    gleswExtIsProgramBinaryQCOM = (PFNGLEXTISPROGRAMBINARYQCOMPROC) get_proc("glExtIsProgramBinaryQCOM");
-    gleswExtGetProgramBinarySourceQCOM = (PFNGLEXTGETPROGRAMBINARYSOURCEQCOMPROC) get_proc("glExtGetProgramBinarySourceQCOM");
-    gleswStartTilingQCOM = (PFNGLSTARTTILINGQCOMPROC) get_proc("glStartTilingQCOM");
-    gleswEndTilingQCOM = (PFNGLENDTILINGQCOMPROC) get_proc("glEndTilingQCOM");
 }
