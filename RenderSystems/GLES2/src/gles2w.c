@@ -17,7 +17,7 @@ static void close_libgl(void)
     FreeLibrary(libgl);
 }
 
-static void *get_proc(const char *proc)
+static void *_get_proc(const char *proc)
 {
     void *res;
 
@@ -49,7 +49,7 @@ static void close_libgl(void)
     CFRelease(bundleURL);
 }
 
-static void *get_proc(const char *proc)
+static void *_get_proc(const char *proc)
 {
     void *res;
 
@@ -63,7 +63,7 @@ static void *get_proc(const char *proc)
 #include <EGL/egl.h>
 static void open_libgl() {}
 static void close_libgl() {}
-static void *get_proc(const char *proc)
+static void *_get_proc(const char *proc)
 {
     return (void*)eglGetProcAddress(proc);
 }
@@ -82,13 +82,15 @@ static void close_libgl(void)
     dlclose(libgl);
 }
 
-static void *get_proc(const char *proc)
+static void *_get_proc(const char *proc)
 {
     void *res;
     res = dlsym(libgl, proc);
     return res;
 }
 #endif
+
+static void* (*get_proc)(const char*) = _get_proc;
 
 static struct {
     int major, minor;
@@ -109,6 +111,13 @@ int gleswInit(void)
     open_libgl();
     load_procs();
     close_libgl();
+    return parse_version();
+}
+
+int gleswInitWithGetProc(void* (*getproc)(const char*))
+{
+    get_proc = getproc;
+    load_procs();
     return parse_version();
 }
 
