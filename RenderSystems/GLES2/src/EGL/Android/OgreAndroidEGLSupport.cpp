@@ -33,7 +33,6 @@ THE SOFTWARE.
 
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
-#include "OgreAndroidEGLContext.h"
 #include "OgreGLUtil.h"
 
 namespace Ogre {

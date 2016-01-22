@@ -38,7 +38,6 @@ THE SOFTWARE.
 
 #include "OgreEmscriptenEGLSupport.h"
 #include "OgreEmscriptenEGLWindow.h"
-#include "OgreEmscriptenEGLContext.h"
 #include "OgreViewport.h"
 
 #include <iostream>
@@ -67,11 +66,6 @@ namespace Ogre {
         emscripten_set_resize_callback(NULL, NULL, 0, NULL);
         emscripten_set_webglcontextlost_callback(NULL, NULL, 0, NULL);
         emscripten_set_webglcontextrestored_callback(NULL, NULL, 0, NULL);
-    }
-
-    EGLContext* EmscriptenEGLWindow::createEGLContext() const
-    {
-        return new EmscriptenEGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
     }
 
     void EmscriptenEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )

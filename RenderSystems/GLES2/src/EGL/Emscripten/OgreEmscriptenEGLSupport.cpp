@@ -36,7 +36,6 @@ THE SOFTWARE.
 
 #include "OgreEmscriptenEGLSupport.h"
 #include "OgreEmscriptenEGLWindow.h"
-#include "OgreEmscriptenEGLContext.h"
 
 #include "OgreGLUtil.h"
 

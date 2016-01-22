@@ -91,6 +91,21 @@ namespace Ogre {
             LogManager::getSingleton().logMessage("Failed to initialize GL3W");
     }
     
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    void EGLContext::_updateInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable)
+    {
+        mDrawable = drawable;
+        mConfig = glconfig;
+        mEglDisplay = eglDisplay;
+
+        setCurrent();
+
+        // Initialise GL3W
+        if (gleswInit())
+            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
+    }
+#endif
+
     void EGLContext::_destroyInternalResources()
     {
         endCurrent();
