@@ -37,7 +37,6 @@ THE SOFTWARE.
 
 #include "OgreWin32EGLSupport.h"
 #include "OgreWin32EGLWindow.h"
-#include "OgreWin32EGLContext.h"
 
 #include <iostream>
 #include <algorithm>
@@ -50,15 +49,6 @@ namespace Ogre {
     {
         mGLSupport = glsupport;
         mNativeDisplay = glsupport->getNativeDisplay();
-    }
-
-    Win32EGLWindow::~Win32EGLWindow()
-    {
-    }
-
-    EGLContext * Win32EGLWindow::createEGLContext() const
-    {
-        return new Win32EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
     }
 
     void Win32EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )

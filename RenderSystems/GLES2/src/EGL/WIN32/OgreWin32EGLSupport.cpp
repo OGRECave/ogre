@@ -38,7 +38,6 @@ THE SOFTWARE.
 #include "OgreWin32EGLSupport.h"
 #include "OgreWin32EGLWindow.h"
 #include "OgreWin32EGLRenderTexture.h"
-#include "OgreWin32EGLContext.h"
 
 #include "OgreGLUtil.h"
 
