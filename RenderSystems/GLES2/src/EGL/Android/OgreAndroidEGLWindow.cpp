@@ -36,7 +36,6 @@ THE SOFTWARE.
 
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
-#include "OgreAndroidEGLContext.h"
 #include "OgreGLES2ManagedResourceManager.h"
 #include "OgreViewport.h"
 
@@ -55,15 +54,6 @@ namespace Ogre {
           mCSAA(0),
           mPreserveContext(false)
     {
-    }
-
-    AndroidEGLWindow::~AndroidEGLWindow()
-    {
-    }
-
-    EGLContext* AndroidEGLWindow::createEGLContext() const
-    {
-        return new AndroidEGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
     }
 
     void AndroidEGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
@@ -278,7 +268,7 @@ namespace Ogre {
         {
             mEglDisplay = mGLSupport->getGLDisplay();
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
-            static_cast<AndroidEGLContext*>(mContext)->_updateInternalResources(mEglDisplay, mEglConfig, mEglSurface);
+            static_cast<EGLContext*>(mContext)->_updateInternalResources(mEglDisplay, mEglConfig, mEglSurface);
         }
         else
         {
@@ -362,7 +352,7 @@ namespace Ogre {
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
             EGL_CHECK_ERROR
 
-                ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
 
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 

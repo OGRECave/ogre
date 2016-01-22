@@ -35,7 +35,6 @@ THE SOFTWARE.
 #include "OgreX11EGLSupport.h"
 #include "OgreX11EGLWindow.h"
 #include "OgreX11EGLRenderTexture.h"
-#include "OgreX11EGLContext.h"
 
 
 #if (OGRE_PLATFORM != OGRE_PLATFORM_LINUX)

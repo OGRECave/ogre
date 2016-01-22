@@ -43,7 +43,6 @@ namespace Ogre {
         //it seems they are not used outside this class.
         Window mParentWindow;
         Window mExternalWindow;
-        virtual EGLContext * createEGLContext() const;
         virtual void getLeftAndTopFromNativeWindow(int & left, int & top, uint width, uint height);
         virtual void initNativeCreatedWindow(const NameValuePairList *miscParams);
         virtual void createNativeWindow( int &left, int &top, uint &width, uint &height, String &title );
