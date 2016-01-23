@@ -1491,19 +1491,23 @@ namespace Ogre
 
         while( itor != end )
         {
-            DataStreamPtr inFile = archive->open( *itor );
+            //only open piece files with current render system extention
+            if (itor->find(mShaderFileExt) != String::npos)
+            {
+                DataStreamPtr inFile = archive->open(*itor);
 
-            String inString;
-            String outString;
+                String inString;
+                String outString;
 
-            inString.resize( inFile->size() );
-            inFile->read( &inString[0], inFile->size() );
+                inString.resize(inFile->size());
+                inFile->read(&inString[0], inFile->size());
 
-            this->parseMath( inString, outString );
-            this->parseForEach( outString, inString );
-            this->parseProperties( inString, outString );
-            this->collectPieces( outString, inString );
-            this->parseCounter( inString, outString );
+                this->parseMath(inString, outString);
+                this->parseForEach(outString, inString);
+                this->parseProperties(inString, outString);
+                this->collectPieces(outString, inString);
+                this->parseCounter(inString, outString);
+            }
             ++itor;
         }
     }
