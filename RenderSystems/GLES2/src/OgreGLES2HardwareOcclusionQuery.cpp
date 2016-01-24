@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 
 namespace Ogre {
 

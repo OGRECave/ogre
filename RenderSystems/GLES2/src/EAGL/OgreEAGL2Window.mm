@@ -47,7 +47,7 @@ namespace Ogre {
             mIsExternal(false),
             mUsingExternalView(false),
             mUsingExternalViewController(false),
-            mIsContentScalingSupported(false),
+            mIsContentScalingSupported(EAGLCurrentOSVersion >= 4.0),
             mContentScalingFactor(1.0),
             mGLSupport(glsupport),
             mContext(NULL),
@@ -58,10 +58,6 @@ namespace Ogre {
         mIsFullScreen = true;
         mActive = true;
         mHwGamma = false;
-
-        // Check for content scaling.  iOS 4 or later
-        if(mGLSupport->getCurrentOSVersion() >= 4.0)
-            mIsContentScalingSupported = true;
     }
 
     EAGL2Window::~EAGL2Window()

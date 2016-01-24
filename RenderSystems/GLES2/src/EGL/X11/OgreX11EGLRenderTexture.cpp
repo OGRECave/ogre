@@ -35,9 +35,6 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreStringConverter.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-
 #include "OgreX11EGLRenderTexture.h"
 #include "OgreX11EGLContext.h"
 #include "OgreX11EGLSupport.h"

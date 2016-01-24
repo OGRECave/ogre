@@ -32,7 +32,8 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     GLES2HardwareUniformBuffer::GLES2HardwareUniformBuffer(HardwareBufferManagerBase* mgr, 

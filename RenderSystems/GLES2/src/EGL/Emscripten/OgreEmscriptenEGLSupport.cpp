@@ -38,9 +38,15 @@ THE SOFTWARE.
 #include "OgreEmscriptenEGLWindow.h"
 #include "OgreEmscriptenEGLContext.h"
 
-namespace Ogre {
+#include "OgreGLUtil.h"
 
-    EmscriptenEGLSupport::EmscriptenEGLSupport()
+namespace Ogre {
+    GLNativeSupport* getGLSupport(int)
+    {
+        return new EmscriptenEGLSupport();
+    }
+
+    EmscriptenEGLSupport::EmscriptenEGLSupport() : EGLSupport(GLNativeSupport::CONTEXT_ES)
     {        
         mNativeDisplay = EGL_DEFAULT_DISPLAY;
         mGLDisplay = getGLDisplay();

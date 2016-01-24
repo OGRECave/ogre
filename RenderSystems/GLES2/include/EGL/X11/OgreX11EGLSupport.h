@@ -146,10 +146,10 @@ namespace Ogre {
             //virtual EGLWindow* createEGLWindow( EGLSupport * support);
 
         public:
-            X11EGLSupport();
+            X11EGLSupport(int profile);
             virtual ~X11EGLSupport();
 
-//          virtual GLES2PBuffer* createPBuffer(PixelComponentType format,
+//          virtual GLPBuffer* createPBuffer(PixelComponentType format,
 //              size_t width, size_t height);
 
             virtual void switchMode(uint& width, uint& height, short& frequency);

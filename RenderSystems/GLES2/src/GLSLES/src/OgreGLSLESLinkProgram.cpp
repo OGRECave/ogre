@@ -35,8 +35,9 @@ THE SOFTWARE.
 #include "OgreGpuProgramManager.h"
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
 

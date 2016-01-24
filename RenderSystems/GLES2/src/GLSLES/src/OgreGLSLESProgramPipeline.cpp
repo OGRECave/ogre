@@ -36,8 +36,9 @@
 #include "OgreGLES2UniformCache.h"
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreRoot.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre
 {

@@ -29,7 +29,8 @@ THE SOFTWARE.
 #include "OgreGLES2DefaultHardwareBufferManager.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     GLES2DefaultHardwareVertexBuffer::GLES2DefaultHardwareVertexBuffer(size_t vertexSize,
