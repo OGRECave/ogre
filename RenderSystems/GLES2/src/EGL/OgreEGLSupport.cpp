@@ -174,8 +174,6 @@ namespace Ogre {
 
     EGLDisplay EGLSupport::getGLDisplay(void)
     {
-        EGLint major = 0, minor = 0;
-
         mGLDisplay = eglGetDisplay(mNativeDisplay);
         EGL_CHECK_ERROR
 
@@ -186,13 +184,14 @@ namespace Ogre {
                         "EGLSupport::getGLDisplay");
         }
 
-        if (eglInitialize(mGLDisplay, &major, &minor) == EGL_FALSE)
+        if (eglInitialize(mGLDisplay, &mEGLMajor, &mEGLMinor) == EGL_FALSE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Couldn`t initialize EGLDisplay ",
                         "EGLSupport::getGLDisplay");
         }
         EGL_CHECK_ERROR
+
         return mGLDisplay;
     }
 
@@ -480,15 +479,12 @@ namespace Ogre {
                                               ::EGLContext shareList) const 
     {
         EGLint contextAttrs[] = {
-#if OGRE_NO_GLES3_SUPPORT == 0
-            EGL_CONTEXT_CLIENT_VERSION, 3,
-#else
-            EGL_CONTEXT_CLIENT_VERSION, 2,
-#endif
-            EGL_NONE, EGL_NONE
+            EGL_CONTEXT_CLIENT_VERSION, OGRE_NO_GLES3_SUPPORT ? 2 : 3,
+            EGL_NONE
         };
-        ::EGLContext context = ((::EGLContext) 0);
-        if (eglDisplay == ((EGLDisplay) 0))
+
+        ::EGLContext context = 0;
+        if (!eglDisplay)
         {
             context = eglCreateContext(mGLDisplay, glconfig, shareList, contextAttrs);
             EGL_CHECK_ERROR
@@ -499,7 +495,7 @@ namespace Ogre {
             EGL_CHECK_ERROR
         }
 
-        if (context == ((::EGLContext) 0))
+        if (!context)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Fail to create New context",
@@ -512,12 +508,41 @@ namespace Ogre {
 
     void EGLSupport::start()
     {
+        LogManager::getSingleton().logMessage(
+            "******************************\n"
+            "*** Starting EGL Subsystem ***\n"
+            "******************************");
+        initialiseExtensions();
     }
 
     void EGLSupport::stop()
     {
         eglTerminate(mGLDisplay);
         EGL_CHECK_ERROR
+    }
+
+    void EGLSupport::initialiseExtensions() {
+        assert (mGLDisplay);
+
+        const char* verStr = eglQueryString(mGLDisplay, EGL_VERSION);
+        LogManager::getSingleton().stream() << "EGL_VERSION = " << verStr;
+
+        const char* extensionsString;
+
+        // This is more realistic than using glXGetClientString:
+        extensionsString = eglQueryString(mGLDisplay, EGL_EXTENSIONS);
+
+        LogManager::getSingleton().stream() << "EGL_EXTENSIONS = " << extensionsString;
+
+        StringStream ext;
+        String instr;
+
+        ext << extensionsString;
+
+        while(ext >> instr)
+        {
+            extensionList.insert(instr);
+        }
     }
 
     void EGLSupport::setGLDisplay( EGLDisplay val )
