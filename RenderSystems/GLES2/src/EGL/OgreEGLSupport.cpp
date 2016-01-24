@@ -32,8 +32,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
+#include "OgreRenderSystem.h"
 
 #include "OgreEGLSupport.h"
 #include "OgreEGLWindow.h"
@@ -43,14 +42,10 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-    EGLSupport::EGLSupport()
-        : mGLDisplay(0),
+    EGLSupport::EGLSupport(int profile)
+        : GLNativeSupport(profile), mGLDisplay(0),
           mNativeDisplay(0),
       mRandr(false)
-    {
-    }
-
-    EGLSupport::~EGLSupport()
     {
     }
 
@@ -164,7 +159,7 @@ namespace Ogre {
 
     void EGLSupport::setConfigOption(const String &name, const String &value)
     {
-        GLES2Support::setConfigOption(name, value);
+        GLNativeSupport::setConfigOption(name, value);
         if (name == "Video Mode")
         {
             refreshConfig();
@@ -207,7 +202,7 @@ namespace Ogre {
         return "todo";
     }
 
-    EGLConfig* EGLSupport::chooseGLConfig(const GLint *attribList, GLint *nElements)
+    EGLConfig* EGLSupport::chooseGLConfig(const EGLint *attribList, EGLint *nElements)
     {
         EGLConfig *configs;
 
@@ -236,7 +231,7 @@ namespace Ogre {
         return configs;
     }
 
-    EGLConfig* EGLSupport::getConfigs(GLint *nElements)
+    EGLConfig* EGLSupport::getConfigs(EGLint *nElements)
     {
         EGLConfig *configs;
 
@@ -265,7 +260,7 @@ namespace Ogre {
         return configs;
     }
 
-    EGLBoolean EGLSupport::getGLConfigAttrib(EGLConfig glConfig, GLint attribute, GLint *value)
+    EGLBoolean EGLSupport::getGLConfigAttrib(EGLConfig glConfig, EGLint attribute, EGLint *value)
     {
         EGLBoolean status;
 
@@ -274,9 +269,9 @@ namespace Ogre {
         return status;
     }
 
-    void* EGLSupport::getProcAddress(const Ogre::String& name)
+    void* EGLSupport::getProcAddress(const char* name)
     {
-        return (void*)eglGetProcAddress((const char*) name.c_str());
+        return (void*)eglGetProcAddress(name);
     }
 
     ::EGLConfig EGLSupport::getGLConfigFromContext(::EGLContext context)
@@ -433,7 +428,7 @@ namespace Ogre {
     }
 
     RenderWindow* EGLSupport::createWindow(bool autoCreateWindow,
-                                           GLES2RenderSystem* renderSystem,
+                                           RenderSystem* renderSystem,
                                            const String& windowTitle)
     {
         RenderWindow *window = 0;

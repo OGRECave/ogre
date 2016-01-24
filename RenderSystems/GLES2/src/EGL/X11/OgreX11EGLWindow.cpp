@@ -33,9 +33,6 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreViewport.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-
 #include "OgreX11EGLSupport.h"
 #include "OgreX11EGLWindow.h"
 #include "OgreX11EGLContext.h"

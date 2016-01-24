@@ -31,16 +31,19 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
 #include "OgreAndroidEGLContext.h"
+#include "OgreGLUtil.h"
 
 namespace Ogre {
 
-    AndroidEGLSupport::AndroidEGLSupport()
+    GLNativeSupport* getGLSupport(int)
+    {
+        return new AndroidEGLSupport();
+    }
+
+    AndroidEGLSupport::AndroidEGLSupport() : EGLSupport(CONTEXT_ES)
     {        
         mNativeDisplay = EGL_DEFAULT_DISPLAY;
         mGLDisplay = getGLDisplay();

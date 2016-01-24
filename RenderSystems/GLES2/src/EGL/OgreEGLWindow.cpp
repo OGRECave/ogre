@@ -31,13 +31,11 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
+#include "OgreGLRenderSystemCommon.h"
 
 #include "OgreEGLSupport.h"
 #include "OgreEGLWindow.h"
 #include "OgreEGLContext.h"
-#include "OgreGLES2PixelFormat.h"
 
 #include <iostream>
 #include <algorithm>
@@ -202,44 +200,8 @@ namespace Ogre {
             buffer = mIsFullScreen? FB_FRONT : FB_BACK;
         }
 
-        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
-        GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
-
-        if ((format == 0) || (type == 0))
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Unsupported format.",
-                "EGLWindow::copyContentsToMemory" );
-        }
-
-
-        // Switch context if different from current one
-        RenderSystem* rsys = Root::getSingleton().getRenderSystem();
-        rsys->_setViewport(this->getViewport(0));
-
-		OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
-
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if(dst.getWidth() != dst.rowPitch)
-            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
-#endif
-        // Must change the packing to ensure no overruns!
-        glPixelStorei(GL_PACK_ALIGNMENT, 1);
-
-#if OGRE_NO_GLES3_SUPPORT == 0
-        glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-#endif
-        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
-                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
-                     format, type, dst.getTopLeftFrontPixelPtr());
-
-        // restore default alignment
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
-#if OGRE_NO_GLES3_SUPPORT == 0
-        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-#endif
-
-        PixelUtil::bulkPixelVerticalFlip(dst);
+        static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem())
+                ->_copyContentsToMemory(getViewport(0), dst, buffer);
     }
 
 
