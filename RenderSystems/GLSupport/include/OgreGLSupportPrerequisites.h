@@ -40,7 +40,8 @@ namespace Ogre {
 #define _CRT_SECURE_NO_DEPRECATE
 #endif
 
-#if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
+// we always build this static regardless of OGRE_STATIC_LIB
+#if 0 //(OGRE_PLATFORM == OGRE_PLATFORM_WIN32) && !defined(__MINGW32__) && !defined(OGRE_STATIC_LIB)
 #   ifdef GLSupport_EXPORTS
 #       define _OgreGLExport __declspec(dllexport)
 #   else
