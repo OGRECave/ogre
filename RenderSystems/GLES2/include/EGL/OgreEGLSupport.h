@@ -63,7 +63,11 @@ namespace Ogre {
             VideoMode mCurrentMode;
             StringVector mSampleLevels;
 
+            EGLint mEGLMajor, mEGLMinor;
+
             //virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
+
+            void initialiseExtensions();
         public:
             EGLSupport();
             virtual ~EGLSupport();
