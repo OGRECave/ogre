@@ -55,7 +55,7 @@ list(APPEND HEADER_FILES
   ${ATIFS_HEADERS}
 )
 
-include_directories(${OGRE_GLSUPPORT_INCLUDES})
+include_directories(${GLSUPPORT_INCLUDE_DIR})
 include_directories(
   BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
@@ -74,8 +74,8 @@ endif()
 
 #Note that in the next row SOURCE_FILES are added last. This is to prevent compilation problems of unity build found on Windows Visual Studio. 
 #In this situation any file added after the "glew.cpp" file, which belongs to the SOURCE_FILES package, does not compile
-ogre_add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
+ogre_add_library(RenderSystem_GL ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${ATIFS_SOURCE} ${NVPARSE_SOURCE} ${SOURCE_FILES})
+target_link_libraries(RenderSystem_GL OgreMain ${OPENGL_LIBRARIES} ${GLSUPPORT_LIBS})
 
 if (NOT OGRE_STATIC)
   set_target_properties(RenderSystem_GL PROPERTIES
@@ -94,7 +94,6 @@ endif ()
 ogre_config_framework(RenderSystem_GL)
 
 ogre_config_plugin(RenderSystem_GL)
-install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GL)
-install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GL/${PLATFORM_HEADER_INSTALL})
+install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GL)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GL DESTINATION include/OGRE/RenderSystems/GL)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/include/ DESTINATION include/OGRE/RenderSystems/GL)

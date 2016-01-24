@@ -118,16 +118,12 @@ elseif (UNIX)
   set(PLATFORM_LIBS ${X11_LIBRARIES} ${X11_Xrandr_LIB})
 endif ()
 
-# Add support for the RT Shader System
-add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
-
-include_directories(${OGRE_GLSUPPORT_INCLUDES})
 include_directories(
+  ${GLSUPPORT_INCLUDE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/include
   ${CMAKE_CURRENT_SOURCE_DIR}/include/EGL
   ${CMAKE_CURRENT_SOURCE_DIR}/include/EAGL
   ${CMAKE_CURRENT_SOURCE_DIR}/src/GLSLES/include
-  ${CMAKE_SOURCE_DIR}/Components/RTShaderSystem/include
   ${OPENGLES3_INCLUDE_DIR} ${OPENGLES2_INCLUDE_DIR} ${EGL_INCLUDE_DIR}
 )
 
@@ -146,7 +142,7 @@ endif ()
 
 ogre_config_plugin(RenderSystem_GLES2)
 
-install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GLES2)
+install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2)
 install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${PLATFORM_HEADER_INSTALL})
 install(FILES ${GLESW_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/${GLESW_HEADER_INSTALL})
 install(FILES ${KHR_HEADERS} DESTINATION include/OGRE/RenderSystems/GLES2/KHR)

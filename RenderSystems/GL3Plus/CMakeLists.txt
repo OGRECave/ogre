@@ -18,7 +18,7 @@ file(GLOB GLSL_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/GLSL/*.cpp")
 
 set(HEADER_FILES ${HEADER_FILES} ${GLSL_HEADERS})
 
-include_directories(${OGRE_GLSUPPORT_INCLUDES})
+include_directories(${GLSUPPORT_INCLUDE_DIR})
 include_directories(
   BEFORE ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
@@ -33,8 +33,8 @@ if(NOT APPLE)
 endif()
 
 
-ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${SOURCE_FILES})
-target_link_libraries(RenderSystem_GL3Plus OgreMain ${OPENGL_LIBRARIES} ${PLATFORM_LIBS})
+ogre_add_library(RenderSystem_GL3Plus ${OGRE_LIB_TYPE} ${HEADER_FILES} ${GLSL_SOURCE} ${SOURCE_FILES})
+target_link_libraries(RenderSystem_GL3Plus OgreMain ${OPENGL_LIBRARIES} ${GLSUPPORT_LIBS})
 
 if (OGRE_CONFIG_THREADS)
   target_link_libraries(RenderSystem_GL3Plus ${OGRE_THREAD_LIBRARIES})
@@ -46,9 +46,8 @@ if (APPLE)
 endif ()
 
 ogre_config_framework(RenderSystem_GL3Plus)
-
 ogre_config_plugin(RenderSystem_GL3Plus)
-install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/GL3Plus)
-install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/GL3Plus/${PLATFORM_HEADER_INSTALL})
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION include/OGRE/RenderSystems/GL3Plus)
+
+install(FILES ${HEADER_FILES} ${GLSUPPORT_HEADERS} DESTINATION include/OGRE/RenderSystems/GL3Plus)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GL DESTINATION include/OGRE/RenderSystems/GL3Plus)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/ DESTINATION include/OGRE/RenderSystems/GL3Plus)
