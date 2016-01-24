@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareIndexBuffer.h"
 #include "OgreGLES2HardwareVertexBuffer.h"
 #include "OgreGLES2GpuProgramManager.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2HardwareOcclusionQuery.h"
 #include "OgreGLES2VertexDeclaration.h"
@@ -50,17 +50,11 @@ THE SOFTWARE.
 #include "OgreGLSLESProgramPipelineManager.h"
 #include "OgreGLSLESProgramPipeline.h"
 #include "OgreGLES2StateCacheManager.h"
+#include "OgreRenderWindow.h"
+#include "OgreGLES2PixelFormat.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   include "OgreEAGL2Window.h"
-#   include "OgreEAGLES2Context.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-#   include "OgreAndroidEGLWindow.h"
-#   include "OgreAndroidEGLContext.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL
-#   include "OgreNaClWindow.h"
-#else
-#   include "OgreEGLWindow.h"
+#include "OgreEAGLES2Context.h"
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
@@ -98,7 +92,7 @@ namespace Ogre {
 #endif
         
         mStateCacheManager = OGRE_NEW GLES2StateCacheManager();
-        mGLSupport = getGLSupport();
+        mGLSupport = new GLES2Support(getGLSupport(GLNativeSupport::CONTEXT_ES));
         mGLSupport->setStateCacheManager(mStateCacheManager);
         
         mWorldMatrix = Matrix4::IDENTITY;
@@ -2420,4 +2414,48 @@ namespace Ogre {
             attribsBound.push_back(attrib);
         }
     }
-}
+
+    void GLES2RenderSystem::_copyContentsToMemory(Viewport* src, const PixelBox& dst,
+                                                  RenderWindow::FrameBuffer buffer) {
+        GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
+
+        if ((format == 0) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Unsupported format.",
+                "GLES2RenderSystem::_copyContentsToMemory" );
+        }
+
+
+        // Switch context if different from current one
+        _setViewport(src);
+
+        OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+#if OGRE_NO_GLES3_SUPPORT == 0
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+#endif
+        // Must change the packing to ensure no overruns!
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+#if OGRE_NO_GLES3_SUPPORT == 0
+        glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
+#endif
+        uint32_t height = src->getTarget()->getHeight();
+
+        glReadPixels((GLint)0, (GLint)(height - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
+
+        // restore default alignment
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+#if OGRE_NO_GLES3_SUPPORT == 0
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+#endif
+
+        PixelUtil::bulkPixelVerticalFlip(dst);
+    }
+
+    }

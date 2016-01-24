@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
 
-#include "OgreGLES2Prerequisites.h"
 #include "OgreGLES2RenderSystem.h"
 
 #include "OgreAndroidEGLSupport.h"

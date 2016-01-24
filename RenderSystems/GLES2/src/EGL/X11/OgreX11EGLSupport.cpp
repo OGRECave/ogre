@@ -32,9 +32,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-
 #include "OgreX11EGLSupport.h"
 #include "OgreX11EGLWindow.h"
 #include "OgreX11EGLRenderTexture.h"
@@ -82,9 +79,15 @@ THE SOFTWARE.
     void XSendEvent(Display* nativeDisplayType, Window nativeWindowType, int dummy1, int mask, XEvent* xevent){};
 #endif
 
-namespace Ogre {
+#include "OgreGLUtil.h"
 
-    X11EGLSupport::X11EGLSupport()
+namespace Ogre {
+    GLNativeSupport* getGLSupport(int profile)
+    {
+        return new X11EGLSupport(profile);
+    }
+
+    X11EGLSupport::X11EGLSupport(int profile) : EGLSupport(profile)
     {
         // A connection that might be shared with the application for GL rendering:
         mGLDisplay = getGLDisplay();
