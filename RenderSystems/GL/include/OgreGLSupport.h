@@ -142,7 +142,7 @@ public:
     /**
     * Get the address of a function
     */
-    void* getProcAddress(const String& procname) {
+    void* getProcAddress(const char* procname) {
         return mNative->getProcAddress(procname);
     }
 

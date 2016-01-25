@@ -349,11 +349,6 @@ void* OSXGL3PlusSupport::getProcAddress( const char* name )
     return dlsym (RTLD_DEFAULT, name);
 }
 
-void* OSXGL3PlusSupport::getProcAddress( const String& procname )
-{
-	return getProcAddress( procname.c_str() );
-}
-
 CFComparisonResult OSXGL3PlusSupport::_compareModes (const void *val1, const void *val2, void *context)
 {
 	// These are the values we will be interested in...

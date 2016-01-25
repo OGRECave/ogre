@@ -435,8 +435,8 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    void* GLXGLSupport::getProcAddress(const String& procname) {
-        return (void*)glXGetProcAddressARB((const GLubyte*)procname.c_str());
+    void* GLXGLSupport::getProcAddress(const char* procname) {
+        return (void*)glXGetProcAddressARB((const GLubyte*)procname);
     }
 
     //-------------------------------------------------------------------------------------------------//
