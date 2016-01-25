@@ -1,6 +1,3 @@
-Travis [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre)
-Appveyor [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
-
 <p class="header" align="center"><img alt="" src="Docs/ogre-logo.png"></p>
 
 ## Summary
@@ -11,6 +8,13 @@ utilising 3D hardware. The class library abstracts all the details of
 using the underlying system libraries like Direct3D and OpenGL and
 provides an interface based on world objects and other intuitive
 classes.
+
+### Attention: this is a Fork
+
+This is not a pure mirror of the [OGRE Project at Bitbucket](https://bitbucket.org/sinbad/ogre/) but a fork with a diverged codebase. If you wonder what is different, see [git-ChangeLog](git-ChangeLog.md).
+
+The current CI status is: Ubuntu/ OSX/ Android/ iOS [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre)
+MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
 
 ## Index Of Contents
 * <a href="Docs/ChangeLog.md">What's New?</a>
