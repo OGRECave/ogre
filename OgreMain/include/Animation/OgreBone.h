@@ -37,6 +37,7 @@ THE SOFTWARE.
     #include "OgreNode.h"
 #endif
 
+#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -60,6 +61,7 @@ namespace Ogre {
     */
     class _OgreExport Bone : public NodeAlloc, public IdObject
     {
+    public:
         typedef vector<Bone*>::type BoneVec;
         typedef VectorIterator<BoneVec> BoneVecIterator;
         typedef ConstVectorIterator<BoneVec> ConstBoneVecIterator;
