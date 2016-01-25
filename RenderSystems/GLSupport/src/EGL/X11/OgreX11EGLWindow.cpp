@@ -434,6 +434,8 @@ namespace Ogre {
         int left = 0;
         int top  = 0;
 
+        unsigned int vsyncInterval = 1;
+
         getLeftAndTopFromNativeWindow(left, top, width, height);
 
         mIsFullScreen = fullScreen;
@@ -573,12 +575,10 @@ namespace Ogre {
 
     mContext = createEGLContext();
 
-        ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
-        EGL_CHECK_ERROR
-        ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
-        EGL_CHECK_ERROR
-        ::EGLContext oldContext  = eglGetCurrentContext();
-        EGL_CHECK_ERROR
+    // apply vsync settings. call setVSyncInterval first to avoid
+    // setting vsync more than once.
+    setVSyncInterval(vsyncInterval);
+    setVSyncEnabled(vsync);
 
         int glConfigID;
 
