@@ -38,6 +38,8 @@ THE SOFTWARE.
 
 #include "OgreGLUtil.h"
 
+#include <X11/extensions/Xrandr.h>
+
 namespace Ogre {
     GLNativeSupport* getGLSupport(int profile)
     {
@@ -52,16 +54,59 @@ namespace Ogre {
         // A connection that is NOT shared to enable independent event processing:
         mNativeDisplay = getNativeDisplay();
 
-        int dummy = 0;
+        int dummy;
 
-    // TODO: Probe video modes
-        mCurrentMode.first.first = DisplayWidth(mNativeDisplay, DefaultScreen(mNativeDisplay));
-        mCurrentMode.first.second = DisplayHeight(mNativeDisplay, DefaultScreen(mNativeDisplay));
-        mCurrentMode.second = 0;
+        if (XQueryExtension(mNativeDisplay, "RANDR", &dummy, &dummy, &dummy))
+        {
+            XRRScreenConfiguration *screenConfig;
 
-        mOriginalMode = mCurrentMode;
+            screenConfig = XRRGetScreenInfo(mNativeDisplay, DefaultRootWindow(mNativeDisplay));
 
-        mVideoModes.push_back(mCurrentMode);
+            if (screenConfig)
+            {
+                XRRScreenSize *screenSizes;
+                int nSizes = 0;
+                Rotation currentRotation;
+                int currentSizeID = XRRConfigCurrentConfiguration(screenConfig, &currentRotation);
+
+                screenSizes = XRRConfigSizes(screenConfig, &nSizes);
+
+                mCurrentMode.first.first = screenSizes[currentSizeID].width;
+                mCurrentMode.first.second = screenSizes[currentSizeID].height;
+                mCurrentMode.second = XRRConfigCurrentRate(screenConfig);
+
+                mOriginalMode = mCurrentMode;
+
+                for (int sizeID = 0; sizeID < nSizes; sizeID++)
+                {
+                    short *rates;
+                    int nRates = 0;
+
+                    rates = XRRConfigRates(screenConfig, sizeID, &nRates);
+
+                    for (int rate = 0; rate < nRates; rate++)
+                    {
+                        VideoMode mode;
+
+                        mode.first.first = screenSizes[sizeID].width;
+                        mode.first.second = screenSizes[sizeID].height;
+                        mode.second = rates[rate];
+
+                        mVideoModes.push_back(mode);
+                    }
+                }
+                XRRFreeScreenConfigInfo(screenConfig);
+            }
+        } else
+        {
+            mCurrentMode.first.first = DisplayWidth(mNativeDisplay, DefaultScreen(mNativeDisplay));
+            mCurrentMode.first.second = DisplayHeight(mNativeDisplay, DefaultScreen(mNativeDisplay));
+            mCurrentMode.second = 0;
+
+            mOriginalMode = mCurrentMode;
+
+            mVideoModes.push_back(mCurrentMode);
+        }
 
         EGLConfig *glConfigs;
         int config, nConfigs = 0;
