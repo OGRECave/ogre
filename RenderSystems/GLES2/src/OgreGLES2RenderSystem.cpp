@@ -354,7 +354,7 @@ namespace Ogre {
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
         // Separate shader objects
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL && 0
         if(mGLSupport->checkExtension("GL_EXT_separate_shader_objects"))
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
 #endif
@@ -1992,13 +1992,11 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 // OSX does not support GLES contexts
         if (gleswInitWithGetProc(get_proc)) {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Could not initialize glesw",
                         "GLES2RenderSystem::initialiseContext");
         }
-#endif
 
         // Setup GLSupport
         mGLSupport->initialiseExtensions();

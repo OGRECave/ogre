@@ -483,6 +483,18 @@ namespace Ogre {
             EGL_NONE
         };
 
+        if(mContextProfile != CONTEXT_ES) {
+            if (!eglBindAPI(EGL_OPENGL_API))
+            {
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Couldn`t initialize API ",
+                        "EGLSupport::getGLDisplay");
+            }
+            EGL_CHECK_ERROR
+
+            contextAttrs[0] = EGL_NONE;
+        }
+
         ::EGLContext context = 0;
         if (!eglDisplay)
         {
