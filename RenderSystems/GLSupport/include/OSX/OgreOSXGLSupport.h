@@ -73,7 +73,6 @@ public:
     * Get the address of a function
     */
     void* getProcAddress( const char *name );
-    void* getProcAddress( const String& procname );
     
     // Core Foundation Array callback function for sorting, must be static for the function ptr
     static CFComparisonResult _compareModes (const void *val1, const void *val2, void *context);
