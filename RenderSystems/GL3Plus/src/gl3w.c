@@ -75,9 +75,7 @@ static void close_libgl(void)
 
 static void *get_proc(const char *proc)
 {
-    void *res;
-
-    res = (void*)glXGetProcAddress((const GLubyte *) proc);
+    void *res = glXGetProcAddress((const GLubyte *)proc);
     if (!res)
         res = dlsym(libgl, proc);
     return res;
