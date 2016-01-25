@@ -1,6 +1,3 @@
-Travis [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre)
-Appveyor [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
-
 <p class="header" align="center"><img alt="" src="Docs/ogre-logo.png"></p>
 
 ## Summary
@@ -11,6 +8,17 @@ utilising 3D hardware. The class library abstracts all the details of
 using the underlying system libraries like Direct3D and OpenGL and
 provides an interface based on world objects and other intuitive
 classes.
+
+### Attention: this is a Fork
+
+This is not a pure mirror of the [OGRE Project at Bitbucket](https://bitbucket.org/sinbad/ogre/) but a Fork with a diverged codebase. The last common commit is [f2196368d4](https://github.com/OGRECave/ogre/commit/f2196368d417310af2cba1bc1facae2017688e54). After this several pull requests were merged at Bitbucket that were only tested on MSVC with the D3D RenderSystem and consequently introduced problems for all other platforms.
+
+This fork on the other hand concentrates on keeping OGRE cross platform and stable. The existing Testsuite was brought back to shape and is run for each change. See below for the current status.
+
+Ubuntu/ OSX/ Android/ iOS [![Build Status](https://travis-ci.org/OGRECave/ogre.svg?branch=master)](https://travis-ci.org/OGRECave/ogre)
+MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrggdw/branch/master?svg=true)](https://ci.appveyor.com/project/paroj/ogre-bsrh7/branch/master)
+
+However stability does not mean that no new features are being integrated. On the contrary - having a CI allows large changes that would not be possible otherwise. See [git-ChangeLog](git-ChangeLog.md) for details.
 
 ## Index Of Contents
 * <a href="Docs/ChangeLog.md">What's New?</a>
