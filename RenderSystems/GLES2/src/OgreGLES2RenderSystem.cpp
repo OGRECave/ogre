@@ -1991,13 +1991,17 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 // OSX does not support GLES contexts
-        if (gleswInitWithGetProc(get_proc)) {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        // EAGL2Support redirects to glesw for get_proc. Overwriting it there would create an infinite loop.
+        if (gleswInit())
+#else
+        if (gleswInitWithGetProc(get_proc))
+#endif
+        {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                         "Could not initialize glesw",
                         "GLES2RenderSystem::initialiseContext");
         }
-#endif
 
         // Setup GLSupport
         mGLSupport->initialiseExtensions();

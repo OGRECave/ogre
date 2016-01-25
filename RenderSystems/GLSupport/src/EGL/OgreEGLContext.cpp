@@ -85,10 +85,6 @@ namespace Ogre {
         }
 
         setCurrent();
-
-        // Initialise GL3W
-        if (gleswInit())
-            LogManager::getSingleton().logMessage("Failed to initialize GL3W");
     }
     
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
