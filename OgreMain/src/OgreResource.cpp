@@ -117,6 +117,10 @@ namespace Ogre
         catch (...)
         {
             mLoadingState.set(LOADSTATE_UNLOADED);
+
+            OGRE_LOCK_AUTO_MUTEX;
+            unloadImpl();
+
             throw;
         }
 
@@ -249,6 +253,10 @@ namespace Ogre
             // old == PREPARED in which case the loadImpl should wipe out
             // any prepared data since it might be invalid.
             mLoadingState.set(LOADSTATE_UNLOADED);
+
+            OGRE_LOCK_AUTO_MUTEX;
+            unloadImpl();
+
             // Re-throw
             throw;
         }
