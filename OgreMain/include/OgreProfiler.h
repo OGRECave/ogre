@@ -170,7 +170,7 @@ namespace Ogre {
     };
 
     /// Represents an individual profile call
-    class ProfileInstance : public ProfilerAlloc
+    class _OgreExport ProfileInstance : public ProfilerAlloc
     {
         friend class Profiler;
     public:
