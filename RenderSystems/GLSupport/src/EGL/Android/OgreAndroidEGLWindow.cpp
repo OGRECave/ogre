@@ -352,7 +352,7 @@ namespace Ogre {
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
             EGL_CHECK_ERROR
 
-            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+                ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
 
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 
