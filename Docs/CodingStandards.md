@@ -60,7 +60,7 @@ THE SOFTWARE
 
             <li>Use overloaded methods not varargs.</li>
         </ul></li>
-    <li>Minimum C++ compiler level is MSVC 7.1 or gcc 3.1. Compilers which do not support things like partial template specialisation properly (such as older versions of MSVC) are not supported.</li>
+    <li>The target C++ level C++03. Do not use C++11 features.</li>
     <li>Use the <a href="http://www.boost.org/libs/serialization/doc/pimpl.html">PImpl idiom</a> to reduce dependencies between classes.</li>
 
     <li>Always use <a href="http://www.cprogramming.com/tutorial/const_correctness.html">const-correctness</a>. Methods taking non-primitive types as parameters should generally take them as const references, methods returning non-primitive types should generally return them as const references. Declare all methods that do not modify internal state `const`. For lazy-update getter methods, declare the internal state which is lazy-updated `mutable`.</li>
@@ -91,28 +91,11 @@ THE SOFTWARE
 
 <h3>Memory Management</h3>
 <ol>
-    <li>Full virtual classes should derive from an AllocatedObject
-        template instantiation typedef'ed in OgreMemoryAllocatorConfig.h. This
-        will define custom new/delete operators on the class. Small,
-        non-virtual value classes like Vector3 should not.</li>
-    <li>Never use new/delete directly.&nbsp;</li>
-    <ol>
-        <li>For&nbsp;classes derived from AllocatedObject, use OGRE_NEW / OGRE_DELETE as drop-in replacements for new/delete</li>
-        <li>For &nbsp;other classes which need a constructor / destructor,
-            use OGRE_NEW_T and OGRE_DELETE_T. If you know there is no destructor,
-            you may use OGRE_NEW_T and free with&nbsp;OGRE_FREE for speed</li>
-        <li>For primitive types, use OGRE_ALLOC_T and OGRE_FREE</li>
-    </ol>
-    <li>Be aware of allocator issues when using SharedPtr</li>
-    <ol>
-        <li>Classes derived from AllocatedObject can just be constructed using OGRE_NEW and wrapped, no special behaviour</li>
-        <li>Classes constructed using OGRE_NEW_T must be allocated using
-            MEMCATEGORY_GENERAL, and you must set the SharedPtrFreeMethod parameter
-            to SPFM_DELETE_T</li>
-        <li>Instances constructed using OGRE_ALLOC_T must be allocated using MEMCATEGORY_GENERAL, and you must set the SharedPtrFreeMethod parameter to SPFM_FREE</li>
-    </ol>
-    <li>When defining STL containers, instead of using std::vector<T> or std::list<T> etc, use the memory-manager enabled versions vector<T>::type and list<T>::type respectively (most containers have this equivalent). This defaults the memory manager to the General type, but you can override the last parameter to the template if you want an alternate type.</li>
+    <li>Do not derive from `AllocatedObject`</li>
+    <li>use `new` / `delete` directly instead of `OGRE_NEW`/ `OGRE_DELETE` (However first consider using a SharedPtr instead)</li>
+    <li>When defining STL containers, just use `std::vector<T>` or `std::list<T>` etc, instead of using the memory-manager versions `vector<T>::type` and `list<T>::type` respectively.</li>
 </ol>
+You will find usages of these throughout the codebase - these come from a time where using nedmalloc was up to 125x faster than using the default Windows XP allocator. However today nedmalloc is unmaintained, Windows XP is history and the approach of using Macros/ Inheritance to make the allocator configurable has proven to be overly complicated.
 <h3>Style issues</h3>
 
 <ol>
