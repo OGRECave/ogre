@@ -76,14 +76,8 @@ namespace Ogre {
         OGRE_DELETE mEdgeList;
         mEdgeList = 0;
         mAnyIndexed = false;
-        for (ShadowRenderableList::iterator s = mShadowRenderables.begin();
-            s != mShadowRenderables.end(); ++s)
-        {
-            OGRE_DELETE *s;
-        }
-        mShadowRenderables.clear();
 
-
+        clearShadowRenderableList(mShadowRenderables);
     }
     //-----------------------------------------------------------------------------
     void ManualObject::resetTempAreas(void)

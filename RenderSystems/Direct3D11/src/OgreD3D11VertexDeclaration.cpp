@@ -35,36 +35,29 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     D3D11VertexDeclaration::D3D11VertexDeclaration(D3D11Device &  device) 
-        : 
-    mlpD3DDevice(device)
-    , mNeedsRebuild(true)
+        : mlpD3DDevice(device)
+        , mNeedsRebuild(true)
     {
-
     }
     //-----------------------------------------------------------------------
     D3D11VertexDeclaration::~D3D11VertexDeclaration()
     {
-        {
-            ShaderToILayoutMapIterator iter = mShaderToILayoutMap.begin();
-            ShaderToILayoutMapIterator iterE = mShaderToILayoutMap.end();
-
-            for ( ; iter != iterE ; iter++)
-            {
-                iter->second->Release();
-            }
-        }
-
-        {
-            ShaderToInputDescIterator iter = mD3delems.begin();
-            ShaderToInputDescIterator iterE = mD3delems.end();
-            for( ; iter != iterE ; iter++ )
-            {
-                SAFE_DELETE_ARRAY(iter->second);
-
-            }
-        }
-
-
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::notifyDeviceLost(D3D11Device* device)
+    {
+        clearCache();
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::notifyDeviceRestored(D3D11Device* device)
+    {
+    }
+    //-----------------------------------------------------------------------
+    void D3D11VertexDeclaration::clearCache()
+    {
+        mD3delems.clear();
+        mShaderToILayoutMap.clear();
+        mNeedsRebuild = false;
     }
     //-----------------------------------------------------------------------
     const VertexElement& D3D11VertexDeclaration::addElement(unsigned short source, 
@@ -116,8 +109,7 @@ namespace Ogre {
 
         if (mD3delems.find(boundVertexProgram) == mD3delems.end())
         {
-            D3D11_INPUT_ELEMENT_DESC*  D3delems = new D3D11_INPUT_ELEMENT_DESC[iNumElements];
-            ZeroMemory(D3delems, sizeof(D3D11_INPUT_ELEMENT_DESC) * iNumElements);
+            vector<D3D11_INPUT_ELEMENT_DESC>::type D3delems;
 
             unsigned int idx;
             for (idx = 0; idx < iNumElements; ++idx)
@@ -146,13 +138,14 @@ namespace Ogre {
                                                 "D3D11VertexDeclaration::getILayoutByShader");
                 }
 
-                D3delems[idx].SemanticName          = inputDesc.SemanticName;
-                D3delems[idx].SemanticIndex         = inputDesc.SemanticIndex;
-                D3delems[idx].Format                = D3D11Mappings::get(i->getType());
-                D3delems[idx].InputSlot             = i->getSource();
-                D3delems[idx].AlignedByteOffset     = static_cast<WORD>(i->getOffset());
-                D3delems[idx].InputSlotClass        = D3D11_INPUT_PER_VERTEX_DATA;
-                D3delems[idx].InstanceDataStepRate  = 0;
+                D3D11_INPUT_ELEMENT_DESC elem = {};
+                elem.SemanticName          = inputDesc.SemanticName;
+                elem.SemanticIndex         = inputDesc.SemanticIndex;
+                elem.Format                = D3D11Mappings::get(i->getType());
+                elem.InputSlot             = i->getSource();
+                elem.AlignedByteOffset     = static_cast<WORD>(i->getOffset());
+                elem.InputSlotClass        = D3D11_INPUT_PER_VERTEX_DATA;
+                elem.InstanceDataStepRate  = 0;
 
                 VertexBufferBinding::VertexBufferBindingMap::const_iterator foundIter;
                 foundIter = binding->getBindings().find(i->getSource());
@@ -161,8 +154,8 @@ namespace Ogre {
                     HardwareVertexBufferSharedPtr bufAtSlot = foundIter->second;
                     if ( bufAtSlot->getIsInstanceData() )
                     {
-                        D3delems[idx].InputSlotClass        = D3D11_INPUT_PER_INSTANCE_DATA;
-                        D3delems[idx].InstanceDataStepRate  = bufAtSlot->getInstanceDataStepRate();
+                        elem.InputSlotClass        = D3D11_INPUT_PER_INSTANCE_DATA;
+                        elem.InstanceDataStepRate  = bufAtSlot->getInstanceDataStepRate();
                     }
                 }
                 else
@@ -171,21 +164,22 @@ namespace Ogre {
                         "Unable to found a bound vertex for a slot that is used in the vertex declaration." , 
                         "D3D11VertexDeclaration::getD3DVertexDeclaration");
 
-                }               
+                }
+                D3delems.push_back(elem);
             }
 
-            mD3delems[boundVertexProgram] = D3delems;
+            mD3delems[boundVertexProgram].swap(D3delems);
 
         }
 
-        return mD3delems[boundVertexProgram];
+        return mD3delems[boundVertexProgram].data();
     }
     //-----------------------------------------------------------------------
     ID3D11InputLayout*  D3D11VertexDeclaration::getILayoutByShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
         ShaderToILayoutMapIterator foundIter = mShaderToILayoutMap.find(boundVertexProgram);
 
-        ID3D11InputLayout*  pVertexLayout = 0; 
+        ComPtr<ID3D11InputLayout> pVertexLayout;
 
         if (foundIter == mShaderToILayoutMap.end())
         {
@@ -204,7 +198,7 @@ namespace Ogre {
                 boundVertexProgram->getNumInputs(), 
                 &vSBuf[0], 
                 vSBuf.size(),
-                &pVertexLayout );
+                pVertexLayout.ReleaseAndGetAddressOf() );
 
             if (FAILED(hr)|| mlpD3DDevice.isError())
             {
@@ -224,17 +218,13 @@ namespace Ogre {
             pVertexLayout = foundIter->second;
         }
 
-        return pVertexLayout;
+        return pVertexLayout.Get(); // lifetime is determined by map
     }
     //-----------------------------------------------------------------------
     void D3D11VertexDeclaration::bindToShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding)
     {
         if(mNeedsRebuild)
-        {
-            mD3delems.clear();
-            mShaderToILayoutMap.clear();
-            mNeedsRebuild = false;
-        }
+            clearCache();
 
         // Set the input layout
         ID3D11InputLayout*  pVertexLayout = getILayoutByShader(boundVertexProgram, binding);

@@ -1587,6 +1587,47 @@ void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 
 }
 //-----------------------------------------------------------------------
+void SceneManager::_releaseManualHardwareResources()
+{
+    // release stencil shadows index buffer
+    mShadowIndexBuffer.setNull();
+
+    // release hardware resources inside all movable objects
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
+    for(MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin(),
+        ci_end = mMovableObjectCollectionMap.end(); ci != ci_end; ++ci)
+    {
+        MovableObjectCollection* coll = ci->second;
+        OGRE_LOCK_MUTEX(coll->mutex);
+        for(MovableObjectMap::iterator i = coll->map.begin(), i_end = coll->map.end(); i != i_end; ++i)
+            i->second->_releaseManualHardwareResources();
+    }
+}
+//-----------------------------------------------------------------------
+void SceneManager::_restoreManualHardwareResources()
+{
+    // restore stencil shadows index buffer
+    if(isShadowTechniqueStencilBased())
+    {
+        mShadowIndexBuffer = HardwareBufferManager::getSingleton().
+            createIndexBuffer(HardwareIndexBuffer::IT_16BIT,
+                mShadowIndexBufferSize,
+                HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
+                false);
+    }
+
+    // restore hardware resources inside all movable objects
+    OGRE_LOCK_MUTEX(mMovableObjectCollectionMapMutex);
+    for(MovableObjectCollectionMap::iterator ci = mMovableObjectCollectionMap.begin(),
+        ci_end = mMovableObjectCollectionMap.end(); ci != ci_end; ++ci)
+    {
+        MovableObjectCollection* coll = ci->second;
+        OGRE_LOCK_MUTEX(coll->mutex);
+        for(MovableObjectMap::iterator i = coll->map.begin(), i_end = coll->map.end(); i != i_end; ++i)
+            i->second->_restoreManualHardwareResources();
+    }
+}
+//-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
 {
     // This default implementation cannot handle world geometry

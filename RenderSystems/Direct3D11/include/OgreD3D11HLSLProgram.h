@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D11HLSLProgram_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11DeviceResource.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHardwareUniformBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
@@ -45,7 +46,9 @@ namespace Ogre {
     reason for not wanting to use the Cg plugin, I suggest you use Cg instead since that
     can produce programs for OpenGL too.
     */
-    class D3D11HLSLProgram : public HighLevelGpuProgram
+    class D3D11HLSLProgram
+        : public HighLevelGpuProgram
+        , protected D3D11DeviceResource
     {
     public:
         /// Command object for setting entry point
@@ -92,6 +95,9 @@ namespace Ogre {
         static CmdColumnMajorMatrices msCmdColumnMajorMatrices;
         static CmdEnableBackwardsCompatibility msCmdEnableBackwardsCompatibility;
         
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
+
         /** Internal method for creating an appropriate low-level program from this
         high-level program, must be implemented by subclasses. */
         void createLowLevelImpl(void);
@@ -115,7 +121,7 @@ namespace Ogre {
 
         bool mErrorsInCompile;
         MicroCode mMicroCode;
-        ID3D11Buffer* mConstantBuffer;
+        ComPtr<ID3D11Buffer> mConstantBuffer;
         
         D3D_SHADER_MACRO* mShaderMacros;
         bool shaderMacroSet;
@@ -124,12 +130,12 @@ namespace Ogre {
 
         D3D11VertexDeclaration mInputVertexDeclaration;
 
-        ID3D11VertexShader* mVertexShader;
-        ID3D11PixelShader* mPixelShader;
-        ID3D11GeometryShader* mGeometryShader;
-        ID3D11DomainShader* mDomainShader;
-        ID3D11HullShader* mHullShader;
-        ID3D11ComputeShader* mComputeShader;
+        ComPtr<ID3D11VertexShader> mVertexShader;
+        ComPtr<ID3D11PixelShader> mPixelShader;
+        ComPtr<ID3D11GeometryShader> mGeometryShader;
+        ComPtr<ID3D11DomainShader> mDomainShader;
+        ComPtr<ID3D11HullShader> mHullShader;
+        ComPtr<ID3D11ComputeShader> mComputeShader;
 
         struct ShaderVarWithPosInBuf
         {
@@ -254,7 +260,7 @@ namespace Ogre {
         typedef vector<GpuConstantDefinitionWithName>::type D3d11ShaderVariableSubparts;
         typedef D3d11ShaderVariableSubparts::iterator D3d11ShaderVariableSubpartsIter; 
 
-        typedef struct MemberTypeName
+        struct MemberTypeName
         {
             LPCSTR                  Name;           
         };

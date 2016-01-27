@@ -739,6 +739,19 @@ namespace Ogre {
         // no need to delete queued meshes, these are managed in StaticGeometry
 
     }
+    //-----------------------------------------------------------------------
+    void StaticGeometry::Region::_releaseManualHardwareResources()
+    {
+        for (LODBucketList::iterator i = mLodBucketList.begin(); i != mLodBucketList.end(); ++i)
+        {
+            clearShadowRenderableList((*i)->getShadowRenderableList());
+        }
+    }
+    //-----------------------------------------------------------------------
+    void StaticGeometry::Region::_restoreManualHardwareResources()
+    {
+        // shadow renderables are lazy initialized
+    }
     //--------------------------------------------------------------------------
     uint32 StaticGeometry::Region::getTypeFlags(void) const
     {
@@ -1037,12 +1050,7 @@ namespace Ogre {
     StaticGeometry::LODBucket::~LODBucket()
     {
         OGRE_DELETE mEdgeList;
-        for (ShadowCaster::ShadowRenderableList::iterator s = mShadowRenderables.begin();
-            s != mShadowRenderables.end(); ++s)
-        {
-            OGRE_DELETE *s;
-        }
-        mShadowRenderables.clear();
+        ShadowCaster::clearShadowRenderableList(mShadowRenderables);
         // delete
         for (MaterialBucketMap::iterator i = mMaterialBucketMap.begin();
             i != mMaterialBucketMap.end(); ++i)

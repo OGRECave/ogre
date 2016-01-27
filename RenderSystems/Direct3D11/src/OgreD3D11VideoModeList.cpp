@@ -33,38 +33,21 @@ THE SOFTWARE.
 namespace Ogre 
 {
     //---------------------------------------------------------------------
-    D3D11VideoModeList::D3D11VideoModeList( D3D11Driver* pDriver )
+    D3D11VideoModeList::D3D11VideoModeList(IDXGIAdapterN* pAdapter)
     {
-        if( NULL == pDriver )
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "pDriver parameter is NULL", "D3D11VideoModeList::D3D11VideoModeList" );
+        if( NULL == pAdapter)
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "pAdapter parameter is NULL", "D3D11VideoModeList::D3D11VideoModeList" );
 
-        mDriver = pDriver;
-        enumerate();
-    }
-    //---------------------------------------------------------------------
-    D3D11VideoModeList::~D3D11VideoModeList()
-    {
-        mDriver = NULL;
-        mModeList.clear();
-    }
-    //---------------------------------------------------------------------
-    BOOL D3D11VideoModeList::enumerate()
-    {
-        //      int pD3D = mDriver->getD3D();
-        UINT adapter = mDriver->getAdapterNumber();
-        HRESULT hr;
-        IDXGIOutput *pOutput;
         for( int iOutput = 0; ; ++iOutput )
         {
             //AIZTODO: one output for a single monitor ,to be handled for mulimon       
-            hr = mDriver->getDeviceAdapter()->EnumOutputs( iOutput, &pOutput );
+            ComPtr<IDXGIOutput> pOutput;
+            HRESULT hr = pAdapter->EnumOutputs( iOutput, pOutput.ReleaseAndGetAddressOf());
             if( DXGI_ERROR_NOT_FOUND == hr )
-            {
-                return false;
-            }
+                break;
             else if (FAILED(hr))
             {
-                return false;   //Something bad happened.
+                break;   //Something bad happened.
             }
             else //Success!
             {
@@ -96,18 +79,18 @@ namespace Ogre
 					if (NumModes > 0)
 					{
 						// Create an array to store Display Mode information
-						DXGI_MODE_DESC *pDesc = new DXGI_MODE_DESC[NumModes];
-						ZeroMemory(pDesc, sizeof(DXGI_MODE_DESC)* NumModes);
+						vector<DXGI_MODE_DESC>::type modes;
+						modes.resize(NumModes);
 
 						// Populate our array with information
 						hr = pOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
 							0,
 							&NumModes,
-							pDesc);
+							modes.data());
 
 						for (UINT m = 0; m < NumModes; m++)
 						{
-							DXGI_MODE_DESC displayMode = pDesc[m];
+							DXGI_MODE_DESC displayMode = modes[m];
 							// Filter out low-resolutions
 							if (displayMode.Width < 640 || displayMode.Height < 400)
 								continue;
@@ -137,78 +120,10 @@ namespace Ogre
 								mModeList.push_back(D3D11VideoMode(OutputDesc, displayMode));
 
 						}
-						delete[] pDesc;
 					}
 				}
-
-				SAFE_RELEASE(pOutput);
             }
         }
-        /*  
-        UINT iMode;
-        for( iMode=0; iMode < pD3D->GetAdapterModeCount( adapter, D3DFMT_R5G6B5 ); iMode++ )
-        {
-        DXGI_OUTPUT_DESC displayMode;
-        pD3D->EnumAdapterModes( adapter, D3DFMT_R5G6B5, iMode, &displayMode );
-
-        // Filter out low-resolutions
-        if( displayMode.Width < 640 || displayMode.Height < 400 )
-        continue;
-
-        // Check to see if it is already in the list (to filter out refresh rates)
-        BOOL found = FALSE;
-        vector<D3D11VideoMode>::type::iterator it;
-        for( it = mModeList.begin(); it != mModeList.end(); it++ )
-        {
-        DXGI_OUTPUT_DESC oldDisp = it->getDisplayMode();
-        if( oldDisp.Width == displayMode.Width &&
-        oldDisp.Height == displayMode.Height &&
-        oldDisp.Format == displayMode.Format )
-        {
-        // Check refresh rate and favour higher if poss
-        if (oldDisp.RefreshRate < displayMode.RefreshRate)
-        it->increaseRefreshRate(displayMode.RefreshRate);
-        found = TRUE;
-        break;
-        }
-        }
-
-        if( !found )
-        mModeList.push_back( D3D11VideoMode( displayMode ) );
-        }
-
-        for( iMode=0; iMode < pD3D->GetAdapterModeCount( adapter, D3DFMT_X8R8G8B8 ); iMode++ )
-        {
-        DXGI_OUTPUT_DESC displayMode;
-        pD3D->EnumAdapterModes( adapter, D3DFMT_X8R8G8B8, iMode, &displayMode );
-
-        // Filter out low-resolutions
-        if( displayMode.Width < 640 || displayMode.Height < 400 )
-        continue;
-
-        // Check to see if it is already in the list (to filter out refresh rates)
-        BOOL found = FALSE;
-        vector<D3D11VideoMode>::type::iterator it;
-        for( it = mModeList.begin(); it != mModeList.end(); it++ )
-        {
-        DXGI_OUTPUT_DESC oldDisp = it->getDisplayMode();
-        if( oldDisp.Width == displayMode.Width &&
-        oldDisp.Height == displayMode.Height &&
-        oldDisp.Format == displayMode.Format )
-        {
-        // Check refresh rate and favour higher if poss
-        if (oldDisp.RefreshRate < displayMode.RefreshRate)
-        it->increaseRefreshRate(displayMode.RefreshRate);
-        found = TRUE;
-        break;
-        }
-        }
-
-        if( !found )
-        mModeList.push_back( D3D11VideoMode( displayMode ) );
-        }
-        */
-        return TRUE;
     }
     //---------------------------------------------------------------------
     size_t D3D11VideoModeList::count()

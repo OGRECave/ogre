@@ -47,7 +47,7 @@ namespace Ogre {
             CONSTANT_BUFFER
         };
     protected:
-        ID3D11Buffer* mlpD3DBuffer;
+        ComPtr<ID3D11Buffer> mlpD3DBuffer;
         bool mUseTempStagingBuffer;
         D3D11HardwareBuffer* mpTempStagingBuffer;
         bool mStagingUploadNeeded;
@@ -80,7 +80,7 @@ namespace Ogre {
 		virtual void _updateFromShadow(void);
 
         /// Get the D3D-specific buffer
-        ID3D11Buffer* getD3DBuffer(void) { return mlpD3DBuffer; }
+        ID3D11Buffer* getD3DBuffer(void) { return mlpD3DBuffer.Get(); }
     };
 
 

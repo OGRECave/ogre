@@ -185,6 +185,22 @@ namespace Ogre {
         /** Get the manager of this object, if any (internal use only) */
         virtual SceneManager* _getManager(void) const { return mManager; }
 
+        /** Notifies the movable object that hardware resources were lost
+            @remarks
+                Called automatically by RenderSystem if hardware resources
+                were lost and can not be restored using some internal mechanism.
+                Among affected resources are nested shadow renderables, ManualObjects, etc.
+        */
+        virtual void _releaseManualHardwareResources() {}
+
+        /** Notifies the movable object that hardware resources should be restored
+            @remarks
+                Called automatically by RenderSystem if hardware resources
+                were lost and can not be restored using some internal mechanism.
+                Among affected resources are nested shadow renderables, ManualObjects, etc.
+        */
+        virtual void _restoreManualHardwareResources() {}
+
         /** Returns the name of this object. */
         virtual const String& getName(void) const { return mName; }
 

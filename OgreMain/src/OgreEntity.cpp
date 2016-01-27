@@ -269,15 +269,8 @@ namespace Ogre {
         mLodEntityList.clear();
 #endif
         // Delete shadow renderables
-        ShadowRenderableList::iterator si, siend;
-        siend = mShadowRenderables.end();
-        for (si = mShadowRenderables.begin(); si != siend; ++si)
-        {
-            OGRE_DELETE *si;
-            *si = 0;
-        }
-        mShadowRenderables.clear();
-        
+        clearShadowRenderableList(mShadowRenderables);
+
         // Detach all child objects, do this manually to avoid needUpdate() call
         // which can fail because of deleted items
         detachAllObjectsImpl();
@@ -330,6 +323,16 @@ namespace Ogre {
         _deinitialise();
         // Unregister our listener
         mMesh->removeListener(this);
+    }
+    //-----------------------------------------------------------------------
+    void Entity::_releaseManualHardwareResources()
+    {
+        clearShadowRenderableList(mShadowRenderables);
+    }
+    //-----------------------------------------------------------------------
+    void Entity::_restoreManualHardwareResources()
+    {
+        // mShadowRenderables are lazy initialized
     }
     //-----------------------------------------------------------------------
     bool Entity::hasVertexAnimation(void) const
@@ -1972,6 +1975,14 @@ namespace Ogre {
         assert(indexBuffer && "Only external index buffers are supported right now");
         assert((*indexBuffer)->getType() == HardwareIndexBuffer::IT_16BIT &&
             "Only 16-bit indexes supported for now");
+
+        // Check mesh state count, will be incremented if reloaded
+        if (mMesh->getStateCount() != mMeshStateCount)
+        {
+            // force reinitialise
+            _initialise(true);
+        }
+
 #if !OGRE_NO_MESHLOD
         // Potentially delegate to LOD entity
         if (mMesh->hasManualLodLevel() && mMeshLodIndex > 0)

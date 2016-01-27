@@ -84,7 +84,7 @@ namespace Ogre {
         // private members
         //--
     private:    
-        ID3D11Query*    mQuery;
+        ComPtr<ID3D11Query> mQuery;
         D3D11Device &   mDevice;
     };
 

@@ -36,11 +36,11 @@ THE SOFTWARE.
 #include "OgreD3D11Texture.h"
 #include "OgreViewport.h"
 #include "OgreLogManager.h"
+#include "OgreMeshManager.h"
 #include "OgreD3D11HardwareBufferManager.h"
 #include "OgreD3D11HardwareIndexBuffer.h"
 #include "OgreD3D11HardwareVertexBuffer.h"
 #include "OgreD3D11VertexDeclaration.h"
-#include "OgreD3D11GpuProgram.h"
 #include "OgreD3D11GpuProgramManager.h"
 #include "OgreD3D11HLSLProgramFactory.h"
 
@@ -70,6 +70,9 @@ THE SOFTWARE.
 #include <d3d10.h>
 #include <OgreNsightChecker.h>
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT &&  defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+#include <dxgi1_3.h> // for IDXGIDevice3::Trim
+#endif
 
 namespace Ogre 
 {
@@ -89,32 +92,28 @@ namespace Ogre
         return D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, ppDevice, pFeatureLevel, ppImmediateContext);
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-        ID3D11Device * device = NULL;
-        ID3D11DeviceContext * context = NULL;
-        ID3D11DeviceN * deviceN = NULL;
-        ID3D11DeviceContextN * contextN = NULL;
+        ComPtr<ID3D11Device> device;
+        ComPtr<ID3D11DeviceContext> context;
+        ComPtr<ID3D11DeviceN> deviceN;
+        ComPtr<ID3D11DeviceContextN> contextN;
         D3D_FEATURE_LEVEL featureLevel;
+        HRESULT mainHr, hr;
 
-        HRESULT hr = D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion, 
-                                        (ppDevice ? &device : NULL), &featureLevel, (ppImmediateContext ? &context : NULL));
-        if(FAILED(hr)) goto bail;
+        mainHr = hr = D3D11CreateDevice(pAdapter, DriverType, Software, Flags, pFeatureLevels, FeatureLevels, SDKVersion,
+                                        (ppDevice ? device.GetAddressOf() : NULL), &featureLevel, (ppImmediateContext ? context.GetAddressOf() : NULL));
+        if(FAILED(hr)) return hr;
 
-        hr = device ? device->QueryInterface(__uuidof(ID3D11DeviceN), (void **)&deviceN) : hr;
-        if(FAILED(hr)) goto bail;
+        hr = device ? device.As(&deviceN) : S_OK;
+        if(FAILED(hr)) return hr;
 
-        hr = context ? context->QueryInterface(__uuidof(ID3D11DeviceContextN), (void **)&contextN) : hr;
-        if(FAILED(hr)) goto bail;
+        hr = context ? context.As(&contextN) : S_OK;
+        if(FAILED(hr)) return hr;
 
-        if(ppDevice)            { *ppDevice = deviceN; deviceN = NULL; }
-        if(pFeatureLevel)       { *pFeatureLevel = featureLevel; }
-        if(ppImmediateContext)  { *ppImmediateContext = contextN; contextN = NULL; }
+        if(ppDevice)            *ppDevice = deviceN.Detach();
+        if(pFeatureLevel)       *pFeatureLevel = featureLevel;
+        if(ppImmediateContext)  *ppImmediateContext = contextN.Detach();
 
-bail:
-        SAFE_RELEASE(deviceN);
-        SAFE_RELEASE(contextN);
-        SAFE_RELEASE(device);
-        SAFE_RELEASE(context);
-        return hr;
+        return mainHr;
 #endif
     }
 
@@ -122,15 +121,19 @@ bail:
     D3D11RenderSystem::D3D11RenderSystem()
 		: mDevice()
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-		 ,mStereoDriver(NULL)
+		, mStereoDriver(NULL)
 #endif	
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+		, suspendingToken()
+		, surfaceContentLostToken()
+#endif
     {
-        LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
+        LogManager::getSingleton().logMessage( "D3D11: " + getName() + " created." );
 
         mEnableFixedPipeline = false;
         mRenderSystemWasInited = false;
         mSwitchingFullscreenCounter = 0;
-        mDriverType = DT_HARDWARE;
+        mDriverType = D3D_DRIVER_TYPE_HARDWARE;
 
         initRenderSystem();
 
@@ -140,10 +143,50 @@ bail:
         // Clear class instance storage
         memset(mClassInstances, 0, sizeof(mClassInstances));
         memset(mNumClassInstances, 0, sizeof(mNumClassInstances));
+
+        mEventNames.push_back("DeviceLost");
+        mEventNames.push_back("DeviceRestored");
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+		suspendingToken = (Windows::ApplicationModel::Core::CoreApplication::Suspending +=
+			ref new Windows::Foundation::EventHandler<Windows::ApplicationModel::SuspendingEventArgs^>([this](Platform::Object ^sender, Windows::ApplicationModel::SuspendingEventArgs ^e)
+		{
+			// Hints to the driver that the app is entering an idle state and that its memory can be used temporarily for other apps.
+			ComPtr<IDXGIDevice3> pDXGIDevice;
+			if(mDevice.get() && SUCCEEDED(mDevice->QueryInterface(pDXGIDevice.GetAddressOf())))
+				pDXGIDevice->Trim();
+		}));
+
+		surfaceContentLostToken = (Windows::Graphics::Display::DisplayInformation::DisplayContentsInvalidated +=
+			ref new Windows::Foundation::TypedEventHandler<Windows::Graphics::Display::DisplayInformation^, Platform::Object^>(
+				[this](Windows::Graphics::Display::DisplayInformation^ sender, Platform::Object^ arg)
+		{
+			LogManager::getSingleton().logMessage("D3D11: DisplayContentsInvalidated.");
+			validateDevice(true);
+		}));
+#else // Win 8.0
+		surfaceContentLostToken = (Windows::Graphics::Display::DisplayProperties::DisplayContentsInvalidated +=
+			ref new Windows::Graphics::Display::DisplayPropertiesEventHandler([this](Platform::Object ^sender)
+		{
+			LogManager::getSingleton().logMessage("D3D11: DisplayContentsInvalidated.");
+			validateDevice(true);
+		}));
+#endif
+#endif
     }
     //---------------------------------------------------------------------
     D3D11RenderSystem::~D3D11RenderSystem()
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+#if defined(_WIN32_WINNT_WINBLUE) && _WIN32_WINNT >= _WIN32_WINNT_WINBLUE
+		Windows::ApplicationModel::Core::CoreApplication::Suspending -= suspendingToken;
+		Windows::Graphics::Display::DisplayInformation::DisplayContentsInvalidated -= surfaceContentLostToken;
+#else // Win 8.0
+		Windows::Graphics::Display::DisplayProperties::DisplayContentsInvalidated -= surfaceContentLostToken;
+#endif
+#endif
+
         shutdown();
 
         // Deleting the HLSL program factory
@@ -156,7 +199,7 @@ bail:
             mHLSLProgramFactory = 0;
         }
 
-        LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " destroyed." );
+        LogManager::getSingleton().logMessage( "D3D11: " + getName() + " destroyed." );
     }
     //---------------------------------------------------------------------
     const String& D3D11RenderSystem::getName() const
@@ -171,34 +214,29 @@ bail:
 		return strName;
 	}
 	//---------------------------------------------------------------------
-    D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers()
+    D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers(bool refreshList /* = false*/)
     {
-        if( !mDriverList )
-            mDriverList = new D3D11DriverList( mpDXGIFactory );
+        if(!mDriverList)
+            mDriverList = new D3D11DriverList();
+
+        if(refreshList || mDriverList->count() == 0)
+            mDriverList->refresh();
 
         return mDriverList;
     }
     //---------------------------------------------------------------------
-	ID3D11DeviceN* D3D11RenderSystem::createD3D11Device(D3D11Driver* d3dDriver, OGRE_D3D11_DRIVER_TYPE ogreDriverType,
+	ID3D11DeviceN* D3D11RenderSystem::createD3D11Device(D3D11Driver* d3dDriver, D3D_DRIVER_TYPE driverType,
 		D3D_FEATURE_LEVEL minFL, D3D_FEATURE_LEVEL maxFL, D3D_FEATURE_LEVEL* pFeatureLevel)
 	{
-		IDXGIAdapterN* pAdapter = (d3dDriver && ogreDriverType == DT_HARDWARE) ? d3dDriver->getDeviceAdapter() : NULL;
+		IDXGIAdapterN* pAdapter = (d3dDriver && driverType == D3D_DRIVER_TYPE_HARDWARE) ? d3dDriver->getDeviceAdapter() : NULL;
 
-		D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_UNKNOWN;
-		switch(ogreDriverType)
+		assert(driverType == D3D_DRIVER_TYPE_HARDWARE || driverType == D3D_DRIVER_TYPE_SOFTWARE || driverType == D3D_DRIVER_TYPE_WARP);
+		if(d3dDriver != NULL)
 		{
-		case DT_HARDWARE:
-			if(d3dDriver == NULL)
-				driverType = D3D_DRIVER_TYPE_HARDWARE;
-			else if(0 == wcscmp(d3dDriver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD"))
-					driverType = D3D_DRIVER_TYPE_REFERENCE;
-			break;
-		case DT_SOFTWARE:
-			driverType = D3D_DRIVER_TYPE_SOFTWARE;
-			break;
-		case DT_WARP:
-			driverType = D3D_DRIVER_TYPE_WARP;
-			break;
+			if(0 == wcscmp(d3dDriver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD"))
+				driverType = D3D_DRIVER_TYPE_REFERENCE;
+			else
+				driverType = D3D_DRIVER_TYPE_UNKNOWN;
 		}
 
 		// determine deviceFlags
@@ -269,9 +307,6 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::initConfigOptions()
     {
-        D3D11DriverList* driverList;
-        D3D11Driver* driver;
-
         ConfigOption optDevice;
         ConfigOption optVideoMode;
         ConfigOption optFullScreen;
@@ -290,11 +325,15 @@ bail:
 		ConfigOption optStereoMode;
 #endif
 
-        driverList = this->getDirect3DDrivers();
-
         optDevice.name = "Rendering Device";
-        optDevice.currentValue.clear();
-        optDevice.possibleValues.clear();
+        optDevice.currentValue = "(default)";
+        optDevice.possibleValues.push_back("(default)");
+        D3D11DriverList* driverList = getDirect3DDrivers();
+        for( unsigned j=0; j < driverList->count(); j++ )
+        {
+            D3D11Driver* driver = driverList->item(j);
+            optDevice.possibleValues.push_back( driver->DriverDescription() );
+        }
         optDevice.immutable = false;
 
         optVideoMode.name = "Video Mode";
@@ -306,15 +345,6 @@ bail:
         optFullScreen.possibleValues.push_back( "No" );
         optFullScreen.currentValue = "Yes";
         optFullScreen.immutable = false;
-
-        for( unsigned j=0; j < driverList->count(); j++ )
-        {
-            driver = driverList->item(j);
-            optDevice.possibleValues.push_back( driver->DriverDescription() );
-            // Make first one default
-            if( j==0 )
-                optDevice.currentValue = driver->DriverDescription();
-        }
 
         optVSync.name = "VSync";
         optVSync.immutable = false;
@@ -463,19 +493,12 @@ bail:
     void D3D11RenderSystem::refreshD3DSettings()
     {
         ConfigOption* optVideoMode;
-        D3D11Driver* driver = 0;
         D3D11VideoMode* videoMode;
 
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
         if( opt != mOptions.end() )
         {
-            for( unsigned j=0; j < getDirect3DDrivers()->count(); j++ )
-            {
-                driver = getDirect3DDrivers()->item(j);
-                if( driver->DriverDescription() == opt->second.currentValue )
-                    break;
-            }
-
+            D3D11Driver *driver = getDirect3DDrivers()->findByName(opt->second.currentValue);
             if (driver)
             {
                 opt = mOptions.find( "Video Mode" );
@@ -510,7 +533,7 @@ bail:
         initRenderSystem();
 
         LogManager::getSingleton().stream()
-            << "D3D11 : RenderSystem Option: " << name << " = " << value;
+            << "D3D11: RenderSystem Option: " << name << " = " << value;
 
         bool viewModeChanged = false;
 
@@ -544,41 +567,15 @@ bail:
 
         if( name == "Min Requested Feature Levels" )
         {
-            if (value == "9.1")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
-            else if (value == "9.2")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_2;
-            else if (value == "9.3")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
-            else if (value == "10.0")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_0;
-            else if (value == "10.1")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_1;
-            else if (value == "11.0")
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
-            else
-                mMinRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
+            mMinRequestedFeatureLevel = D3D11Device::parseFeatureLevel(value, D3D_FEATURE_LEVEL_9_1);
         }
 
         if( name == "Max Requested Feature Levels" )
         {
-            if (value == "9.1")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_1;
-            else if (value == "9.2")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_2;
-            else if (value == "9.3")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_9_3;
-            else if (value == "10.0")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_0;
-            else if (value == "10.1")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_10_1;
-            else if (value == "11.0")
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
-            else
 #if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_1;
+            mMaxRequestedFeatureLevel = D3D11Device::parseFeatureLevel(value, D3D_FEATURE_LEVEL_11_1);
 #else
-                mMaxRequestedFeatureLevel = D3D_FEATURE_LEVEL_11_0;
+            mMaxRequestedFeatureLevel = D3D11Device::parseFeatureLevel(value, D3D_FEATURE_LEVEL_11_0);
 #endif
         }
 
@@ -605,11 +602,12 @@ bail:
         optFSAA->possibleValues.clear();
 
         it = mOptions.find("Rendering Device");
-        D3D11Driver *driver = getDirect3DDrivers()->item(it->second.currentValue);
+        D3D11Driver *driver = getDirect3DDrivers()->findByName(it->second.currentValue);
         if (driver)
         {
             it = mOptions.find("Video Mode");
-            ID3D11DeviceN* device = createD3D11Device(driver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, NULL);
+            ComPtr<ID3D11DeviceN> device;
+            device.Attach(createD3D11Device(driver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, NULL));
             D3D11VideoMode* videoMode = driver->getVideoModeList()->item(it->second.currentValue); // Could be NULL if working over RDP/Simulator
             DXGI_FORMAT format = videoMode ? videoMode->getFormat() : DXGI_FORMAT_R8G8B8A8_UNORM;
             UINT numLevels = 0;
@@ -639,7 +637,6 @@ bail:
                         optFSAA->possibleValues.push_back("16 [Quality]");
                 }
             }
-            SAFE_RELEASE(device);
         }
 
         if(optFSAA->possibleValues.empty())
@@ -669,23 +666,12 @@ bail:
             return "A video mode must be selected.";
 
         it = mOptions.find( "Rendering Device" );
-        bool foundDriver = false;
-        D3D11DriverList* driverList = getDirect3DDrivers();
-        for( ushort j=0; j < driverList->count(); j++ )
+        String driverName = it->second.currentValue;
+        if(driverName != "(default)" && getDirect3DDrivers()->findByName(driverName)->DriverDescription() != driverName)
         {
-            if( driverList->item(j)->DriverDescription() == it->second.currentValue )
-            {
-                foundDriver = true;
-                break;
-            }
-        }
-
-        if (!foundDriver)
-        {
-            // Just pick the first driver
-            setConfigOption("Rendering Device", driverList->item(0)->DriverDescription());
-            return "Your DirectX driver name has changed since the last time you ran OGRE; "
-                "the 'Rendering Device' has been changed.";
+            // Just pick default driver
+            setConfigOption("Rendering Device", "(default)");
+            return "Requested rendering device could not be found, default would be used instead.";
         }
 
         return BLANKSTRING;
@@ -700,131 +686,36 @@ bail:
     RenderWindow* D3D11RenderSystem::_initialise( bool autoCreateWindow, const String& windowTitle )
     {
         RenderWindow* autoWindow = NULL;
-        LogManager::getSingleton().logMessage( "D3D11 : Subsystem Initialising" );
+        LogManager::getSingleton().logMessage( "D3D11: Subsystem Initialising" );
 
 		if(IsWorkingUnderNsight())
-			LogManager::getSingleton().logMessage( "D3D11 : Nvidia Nsight found");
+			LogManager::getSingleton().logMessage( "D3D11: Nvidia Nsight found");
 
         // Init using current settings
-        mActiveD3DDriver = NULL;
         ConfigOptionMap::iterator opt = mOptions.find( "Rendering Device" );
-        for( unsigned j=0; j < getDirect3DDrivers()->count(); j++ )
-        {
-            if( getDirect3DDrivers()->item(j)->DriverDescription() == opt->second.currentValue )
-            {
-                mActiveD3DDriver = getDirect3DDrivers()->item(j);
-                break;
-            }
-        }
+        if( opt == mOptions.end() )
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Can`t find requested Direct3D driver name!", "D3D11RenderSystem::initialise" );
+        mDriverName = opt->second.currentValue;
 
-        if( !mActiveD3DDriver )
-            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Problems finding requested Direct3D driver!", "D3D11RenderSystem::initialise" );
+        // Driver type
+        opt = mOptions.find( "Driver type" );
+        if( opt == mOptions.end() )
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find driver type!", "D3D11RenderSystem::initialise" );
+        mDriverType = D3D11Device::parseDriverType(opt->second.currentValue);
 
-        //AIZ:recreate the device for the selected adapter
-        {
-            mDevice.ReleaseAll();
-
-            opt = mOptions.find( "Information Queue Exceptions Bottom Level" );
-            if( opt == mOptions.end() )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue Exceptions Bottom Level option!", "D3D11RenderSystem::initialise" );
-            String infoQType = opt->second.currentValue;
-
-            if ("No information queue exceptions" == infoQType)
-            {
-#if OGRE_DEBUG_MODE
-                // a debug build should always enable the debug layer and report errors
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
-#else
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_NO_EXCEPTION);
-#endif
-            }
-            else if ("Corruption" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_CORRUPTION);
-            }
-            else if ("Error" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
-            }
-            else if ("Warning" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_WARNING);
-            }
-            else if ("Info (exception on any message)" == infoQType)
-            {
-                D3D11Device::setExceptionsErrorLevel(D3D11Device::D3D_INFO);
-            }
-
-
-            // Driver type
-            opt = mOptions.find( "Driver type" );
-            if( opt == mOptions.end() )
-                OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find driver type!", "D3D11RenderSystem::initialise" );
-            String driverTypeName = opt->second.currentValue;
-
-            mDriverType = DT_HARDWARE;
-            if ("Hardware" == driverTypeName)
-            {
-                 mDriverType = DT_HARDWARE;
-            }
-            if ("Software" == driverTypeName)
-            {
-                mDriverType = DT_SOFTWARE;
-            }
-            if ("Warp" == driverTypeName)
-            {
-                mDriverType = DT_WARP;
-            }
+        opt = mOptions.find( "Information Queue Exceptions Bottom Level" );
+        if( opt == mOptions.end() )
+            OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR, "Can't find Information Queue Exceptions Bottom Level option!", "D3D11RenderSystem::initialise" );
+        D3D11Device::setExceptionsErrorLevel(opt->second.currentValue);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-            // Stereo driver must be created before device is created
-            StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
-            D3D11StereoDriverBridge* stereoBridge = OGRE_NEW D3D11StereoDriverBridge(stereoMode);
+        // Stereo driver must be created before device is created
+        StereoModeType stereoMode = StringConverter::parseStereoMode(mOptions["Stereo Mode"].currentValue);
+        D3D11StereoDriverBridge* stereoBridge = OGRE_NEW D3D11StereoDriverBridge(stereoMode);
 #endif
 
-            D3D11Driver* d3dDriver = mActiveD3DDriver;
-            if(D3D11Driver* d3dDriverOverride = (mDriverType == DT_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
-                d3dDriver = d3dDriverOverride;
-
-            ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
-
-            IDXGIDeviceN * pDXGIDevice;
-            device->QueryInterface(__uuidof(IDXGIDeviceN), (void **)&pDXGIDevice);
-
-            IDXGIAdapterN * pDXGIAdapter;
-            pDXGIDevice->GetParent(__uuidof(IDXGIAdapterN), (void **)&pDXGIAdapter);
-
-            if (mDriverType != DT_HARDWARE)
-            {
-                // get the IDXGIFactoryN from the device for software drivers
-                // Remark(dec-09):
-                //  Seems that IDXGIFactoryN::CreateSoftwareAdapter doesn't work with
-                // D3D11CreateDevice - so I needed to create with pSelectedAdapter = 0.
-                // If pSelectedAdapter == 0 then you have to get the IDXGIFactory1 from
-                // the device - else CreateSwapChain fails later.
-                //  Update (Jun 12, 2012)
-                // If using WARP driver, get factory from created device
-                SAFE_RELEASE(mpDXGIFactory);
-                pDXGIAdapter->GetParent(__uuidof(IDXGIFactoryN), (void **)&mpDXGIFactory);
-            }
-
-            // We intentionally check for ID3D10Device support instead of ID3D11Device as CheckInterfaceSupport() is not supported for later.
-            // We hope, that there would be one UMD for both D3D10 and D3D11, or two different but with the same version number,
-            // or with different but correlated version numbers, so that blacklisting could be done with high confidence level.
-            LARGE_INTEGER driverVersion;
-            if(SUCCEEDED(pDXGIAdapter->CheckInterfaceSupport(IID_ID3D10Device /* intentionally D3D10, not D3D11 */, &driverVersion)))
-            {
-                mDriverVersion.major = HIWORD(driverVersion.HighPart);
-                mDriverVersion.minor = LOWORD(driverVersion.HighPart);
-                mDriverVersion.release = HIWORD(driverVersion.LowPart);
-                mDriverVersion.build = LOWORD(driverVersion.LowPart);
-            }
-
-            SAFE_RELEASE(pDXGIAdapter);
-            SAFE_RELEASE(pDXGIDevice);
-
-            mDevice.TransferOwnership(device) ;
-        }
+        // create the device for the selected adapter
+        createDevice();
 
         if( autoCreateWindow )
         {
@@ -853,9 +744,10 @@ bail:
             width = StringConverter::parseInt(opt->second.currentValue.substr(0, widthEnd));
             height = StringConverter::parseInt(opt->second.currentValue.substr(widthEnd+3, heightEnd));
 
-            for( unsigned j=0; j < mActiveD3DDriver->getVideoModeList()->count(); j++ )
+            D3D11VideoModeList* videoModeList = mActiveD3DDriver.getVideoModeList();
+            for( unsigned j=0; j < videoModeList->count(); j++ )
             {
-                temp = mActiveD3DDriver->getVideoModeList()->item(j)->getDescription();
+                temp = videoModeList->item(j)->getDescription();
 
                 // In full screen we only want to allow supported resolutions, so temp and opt->second.currentValue need to 
                 // match exactly, but in windowed mode we can allow for arbitrary window sized, so we only need
@@ -863,7 +755,7 @@ bail:
                 if(fullScreen && (temp == opt->second.currentValue) ||
                   !fullScreen && (temp.substr(temp.rfind('@')+1) == colourDepth))
                 {
-                    videoMode = mActiveD3DDriver->getVideoModeList()->item(j);
+                    videoMode = videoModeList->item(j);
                     break;
                 }
             }
@@ -928,7 +820,7 @@ bail:
         }
 
         LogManager::getSingleton().logMessage("***************************************");
-        LogManager::getSingleton().logMessage("*** D3D11 : Subsystem Initialized OK ***");
+        LogManager::getSingleton().logMessage("*** D3D11: Subsystem Initialized OK ***");
         LogManager::getSingleton().logMessage("***************************************");
 
         // call superclass method
@@ -939,7 +831,7 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::reinitialise()
     {
-        LogManager::getSingleton().logMessage( "D3D11 : Reinitializing" );
+        LogManager::getSingleton().logMessage( "D3D11: Reinitializing" );
         this->shutdown();
     //  this->initialise( true );
     }
@@ -953,10 +845,9 @@ bail:
         mPrimaryWindow = NULL; // primary window deleted by base class.
         freeDevice();
         SAFE_DELETE( mDriverList );
-        SAFE_RELEASE( mpDXGIFactory );
-        mActiveD3DDriver = NULL;
+        mActiveD3DDriver = D3D11Driver();
         mDevice.ReleaseAll();
-        LogManager::getSingleton().logMessage("D3D11 : Shutting down cleanly.");
+        LogManager::getSingleton().logMessage("D3D11: Shutting down cleanly.");
         SAFE_DELETE( mTextureManager );
         SAFE_DELETE( mHardwareBufferManager );
         SAFE_DELETE( mGpuProgramManager );
@@ -1008,7 +899,7 @@ bail:
 		}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		D3D11RenderWindowBase* win = new D3D11RenderWindowHwnd(mDevice, mpDXGIFactory);
+		D3D11RenderWindowBase* win = new D3D11RenderWindowHwnd(mDevice);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 		String windowType;
 		if(miscParams)
@@ -1022,10 +913,10 @@ bail:
 		D3D11RenderWindowBase* win = NULL;
 #if !__OGRE_WINRT_PHONE_80
 		if(win == NULL && windowType == "SurfaceImageSource")
-			win = new D3D11RenderWindowImageSource(mDevice, mpDXGIFactory);
+			win = new D3D11RenderWindowImageSource(mDevice);
 #endif // !__OGRE_WINRT_PHONE_80
 		if(win == NULL)
-			win = new D3D11RenderWindowCoreWindow(mDevice, mpDXGIFactory);
+			win = new D3D11RenderWindowCoreWindow(mDevice);
 #endif
 		win->create(name, width, height, fullScreen, miscParams);
 
@@ -1049,12 +940,11 @@ bail:
 			mHardwareBufferManager = new D3D11HardwareBufferManager(mDevice);
 
 			// Create the GPU program manager
-			mGpuProgramManager = new D3D11GpuProgramManager(mDevice);
+			mGpuProgramManager = new D3D11GpuProgramManager();
 			// create & register HLSL factory
 			if (mHLSLProgramFactory == NULL)
 				mHLSLProgramFactory = new D3D11HLSLProgramFactory(mDevice);
 			mRealCapabilities = createRenderSystemCapabilities();
-			mRealCapabilities->addShaderProfile("hlsl");
 
 			// if we are using custom capabilities, then 
 			// mCurrentCapabilities has already been loaded
@@ -1088,7 +978,7 @@ bail:
     {
         RenderSystemCapabilities* rsc = new RenderSystemCapabilities();
         rsc->setDriverVersion(mDriverVersion);
-        rsc->setDeviceName(mActiveD3DDriver->DriverDescription());
+        rsc->setDeviceName(mActiveD3DDriver.DriverDescription());
         rsc->setRenderSystemName(getName());
 
 		rsc->setCapability(RSC_ADVANCED_BLEND_OPERATIONS);
@@ -1136,6 +1026,7 @@ bail:
         convertHullShaderCaps(rsc);
         convertDomainShaderCaps(rsc);
         convertComputeShaderCaps(rsc);
+        rsc->addShaderProfile("hlsl");
 
         // Check support for dynamic linkage
         if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
@@ -1151,10 +1042,10 @@ bail:
 
 
         // Adapter details
-        const DXGI_ADAPTER_DESC1& adapterID = mActiveD3DDriver->getAdapterIdentifier();
+        const DXGI_ADAPTER_DESC1& adapterID = mActiveD3DDriver.getAdapterIdentifier();
 
         switch(mDriverType) {
-        case DT_HARDWARE:
+        case D3D_DRIVER_TYPE_HARDWARE:
             // determine vendor
             // Full list of vendors here: http://www.pcidatabase.com/vendors.php?sort=id
             switch(adapterID.VendorId)
@@ -1183,10 +1074,10 @@ bail:
                 break;
             };
             break;
-        case DT_SOFTWARE:
+        case D3D_DRIVER_TYPE_SOFTWARE:
             rsc->setVendor(GPU_MS_SOFTWARE);
             break;
-        case DT_WARP:
+        case D3D_DRIVER_TYPE_WARP:
             rsc->setVendor(GPU_MS_WARP);
             break;
         default:
@@ -1475,7 +1366,7 @@ bail:
         static_cast<ID3D11Texture2D*>(pBuffer->getParentTexture()->getTextureResource())->GetDesc( &BBDesc );
 
         // Create depth stencil texture
-        ID3D11Texture2D* pDepthStencil = NULL;
+        ComPtr<ID3D11Texture2D> pDepthStencil;
         D3D11_TEXTURE2D_DESC descDepth;
 
         descDepth.Width                 = renderTarget->getWidth();
@@ -1507,7 +1398,7 @@ bail:
         }
 
 
-        HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
+        HRESULT hr = mDevice->CreateTexture2D( &descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf() );
         if( FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
@@ -1527,8 +1418,7 @@ bail:
             viewDesc.ViewDimension = D3D10_SRV_DIMENSION_TEXTURE2D;
             viewDesc.Texture2D.MostDetailedMip = 0;
             viewDesc.Texture2D.MipLevels = 1;
-            SAFE_RELEASE(mDSTResView);
-            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil, &viewDesc, &mDSTResView);
+            HRESULT hr = mDevice->CreateShaderResourceView( pDepthStencil.Get(), &viewDesc, mDSTResView.ReleaseAndGetAddressOf());
             if( FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
@@ -1552,8 +1442,7 @@ bail:
         descDSV.Flags = 0 /* D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL */;    // TODO: Allows bind depth buffer as depth view AND texture simultaneously.
                                                                                             // TODO: Decide how to expose this feature
         descDSV.Texture2D.MipSlice = 0;
-        hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &depthStencilView );
-        SAFE_RELEASE( pDepthStencil );
+        hr = mDevice->CreateDepthStencilView( pDepthStencil.Get(), &descDSV, &depthStencilView );
         if( FAILED(hr) )
         {
 			String errorDescription = mDevice.getErrorDescription(hr);
@@ -1670,7 +1559,127 @@ bail:
             */
             // Clean up depth stencil surfaces
             mDevice.ReleaseAll();
-            //mActiveD3DDriver->setDevice(D3D11Device(NULL));
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::createDevice()
+    {
+        mDevice.ReleaseAll();
+
+        D3D11Driver* d3dDriver = getDirect3DDrivers(true)->findByName(mDriverName);
+        mActiveD3DDriver = *d3dDriver; // store copy of selected driver, so that it is not lost when drivers would be re-enumerated
+        LogManager::getSingleton().stream() << "D3D11: Requested \"" << mDriverName << "\", selected \"" << d3dDriver->DriverDescription() << "\"";
+
+        if(D3D11Driver* nvPerfHudDriver = (mDriverType == D3D_DRIVER_TYPE_HARDWARE && mUseNVPerfHUD) ? getDirect3DDrivers()->item("NVIDIA PerfHUD") : NULL)
+        {
+            d3dDriver = nvPerfHudDriver;
+            LogManager::getSingleton().logMessage("D3D11: Actually \"NVIDIA PerfHUD\" is used");
+        }
+
+        ID3D11DeviceN * device = createD3D11Device(d3dDriver, mDriverType, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, &mFeatureLevel);
+        mDevice.TransferOwnership(device);
+
+        LARGE_INTEGER driverVersion = mDevice.GetDriverVersion();
+        mDriverVersion.major = HIWORD(driverVersion.HighPart);
+        mDriverVersion.minor = LOWORD(driverVersion.HighPart);
+        mDriverVersion.release = HIWORD(driverVersion.LowPart);
+        mDriverVersion.build = LOWORD(driverVersion.LowPart);
+    }
+    //-----------------------------------------------------------------------
+    void D3D11RenderSystem::handleDeviceLost()
+    {
+        LogManager::getSingleton().logMessage("D3D11: Device was lost, recreating.");
+
+        // release device depended resources
+        fireDeviceEvent(&mDevice, "DeviceLost");
+
+        SceneManagerEnumerator::SceneManagerIterator scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
+        while(scnIt.hasMoreElements())
+            scnIt.getNext()->_releaseManualHardwareResources();
+
+        notifyDeviceLost(&mDevice);
+
+        // Release all automatic temporary buffers and free unused
+        // temporary buffers, so we doesn't need to recreate them,
+        // and they will reallocate on demand.
+        HardwareBufferManager::getSingleton()._releaseBufferCopies(true);
+
+        // Cleanup depth stencils surfaces.
+        _cleanupDepthBuffers();
+
+        // recreate device
+        createDevice();
+
+        // recreate device depended resources
+        notifyDeviceRestored(&mDevice);
+
+        MeshManager::getSingleton().reloadAll(Resource::LF_PRESERVE_STATE);
+
+        scnIt = SceneManagerEnumerator::getSingleton().getSceneManagerIterator();
+        while(scnIt.hasMoreElements())
+            scnIt.getNext()->_restoreManualHardwareResources();
+
+        // Invalidate active view port.
+        mActiveViewport = NULL;
+
+        fireDeviceEvent(&mDevice, "DeviceRestored");
+
+        LogManager::getSingleton().logMessage("D3D11: Device was restored.");
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::validateDevice(bool forceDeviceElection)
+    {
+        if(mDevice.isNull())
+            return;
+
+        // The D3D Device is no longer valid if the elected adapter changes or if
+        // the device has been removed.
+
+        bool anotherIsElected = false;
+        if(forceDeviceElection)
+        {
+            // elect new device
+            D3D11Driver* newDriver = getDirect3DDrivers(true)->findByName(mDriverName);
+
+            // check by LUID
+            LUID newLUID = newDriver->getAdapterIdentifier().AdapterLuid;
+            LUID prevLUID = mActiveD3DDriver.getAdapterIdentifier().AdapterLuid;
+            anotherIsElected = (newLUID.LowPart != prevLUID.LowPart) || (newLUID.HighPart != prevLUID.HighPart);
+        }
+
+        if(anotherIsElected || mDevice.IsDeviceLost())
+        {
+            handleDeviceLost();
+        }
+    }
+    //-----------------------------------------------------------------------
+    void D3D11RenderSystem::_updateAllRenderTargets(bool swapBuffers)
+    {
+        try
+        {
+            RenderSystem::_updateAllRenderTargets(swapBuffers);
+        }
+        catch(const RenderingAPIException& e)
+        {
+            if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
+                LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");
+            else
+                throw;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void D3D11RenderSystem::_swapAllRenderTargetBuffers()
+    {
+        try
+        {
+            RenderSystem::_swapAllRenderTargetBuffers();
+        }
+        catch(const RenderingAPIException& e)
+        {
+            if(e.getNumber() == DXGI_ERROR_DEVICE_REMOVED || e.getNumber() == DXGI_ERROR_DEVICE_RESET)
+                LogManager::getSingleton().logMessage("D3D11: Device was lost while rendering.");
+            else
+                throw;
         }
     }
     //---------------------------------------------------------------------
@@ -2260,8 +2269,9 @@ bail:
             }
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
-			D3D11RenderWindowBase* d3d11Window = static_cast<D3D11RenderWindowBase*>(target);
-			d3d11Window->_validateStereo();
+			D3D11RenderWindowBase* d3d11Window = dynamic_cast<D3D11RenderWindowBase*>(target);
+			if(d3d11Window)
+				d3d11Window->_validateStereo();
 #endif
 
             vp->_clearUpdatedFlag();
@@ -2269,7 +2279,8 @@ bail:
         else
         {
             // if swapchain was created with DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL we need to reestablish render target views
-            if(static_cast<D3D11RenderWindowBase*>(vp->getTarget())->_shouldRebindBackBuffer())
+            D3D11RenderWindowBase* d3d11Window = dynamic_cast<D3D11RenderWindowBase*>(vp->getTarget());
+            if(d3d11Window && d3d11Window->_shouldRebindBackBuffer())
                 _setRenderTargetViews();
         }
     }
@@ -2729,13 +2740,13 @@ bail:
             }
         }
 
-        ID3D11Buffer* pSOTarget=0;
+        ComPtr<ID3D11Buffer> pSOTarget;
         // Mustn't bind a emulated vertex, pixel shader (see below), if we are rendering to a stream out buffer
-        mDevice.GetImmediateContext()->SOGetTargets(1, &pSOTarget);
+        mDevice.GetImmediateContext()->SOGetTargets(1, pSOTarget.GetAddressOf());
 
         //check consistency of vertex-fragment shaders
         if (!mBoundVertexProgram ||
-             (!mBoundFragmentProgram && op.operationType != RenderOperation::OT_POINT_LIST && pSOTarget==0 ) 
+             (!mBoundFragmentProgram && op.operationType != RenderOperation::OT_POINT_LIST && !pSOTarget ) 
            ) 
         {
             
@@ -3142,7 +3153,7 @@ bail:
                     pRTView,
                     NULL);
 
-                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), static_cast<UINT>(numberOfViews), &mDSTResView);
+                mDevice.GetImmediateContext()->PSSetShaderResources(static_cast<UINT>(StartSlot), 1, mDSTResView.GetAddressOf());
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -3909,18 +3920,7 @@ bail:
 
         mRenderSystemWasInited = true;
         // set pointers to NULL
-        mpDXGIFactory = NULL;
-        HRESULT hr;
-        hr = CreateDXGIFactory1( __uuidof(IDXGIFactoryN), (void**)&mpDXGIFactory );
-        if( FAILED(hr) )
-        {
-			OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr, 
-                "Failed to create Direct3D11 DXGIFactory1", 
-                "D3D11RenderSystem::D3D11RenderSystem" );
-        }
-
         mDriverList = NULL;
-        mActiveD3DDriver = NULL;
         mTextureManager = NULL;
         mHardwareBufferManager = NULL;
         mGpuProgramManager = NULL;
@@ -3986,7 +3986,7 @@ bail:
         mLastVertexSourceCount = 0;
         mReadBackAsTexture = false;
 
-        ID3D11DeviceN * device = createD3D11Device(NULL, DT_HARDWARE, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, 0);
+        ID3D11DeviceN * device = createD3D11Device(NULL, D3D_DRIVER_TYPE_HARDWARE, mMinRequestedFeatureLevel, mMaxRequestedFeatureLevel, 0);
         mDevice.TransferOwnership(device);
     }
     //---------------------------------------------------------------------
