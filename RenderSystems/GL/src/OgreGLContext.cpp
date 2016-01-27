@@ -26,23 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OgreGLContext.h"
 #include "OgreSharedPtr.h"
 #include "OgreThreadHeaders.h"
-
-namespace Ogre {
-    // Empty base class
-    GLContext::GLContext():
-        initialized(false) {
-    }
-    
-    GLContext::~GLContext() {        
-    }
-    
-    void GLContext::endCurrent() {
-    }
-    
-}
 
 #if OGRE_THREAD_SUPPORT == 1
 

@@ -27,6 +27,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreGL3PlusRenderSystem.h"
+
+#include "OgreGLUtil.h"
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
 #include "OgreStringConverter.h"
@@ -39,7 +41,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareVertexBuffer.h"
 #include "OgreGL3PlusHardwareIndexBuffer.h"
 #include "OgreGL3PlusDefaultHardwareBufferManager.h"
-#include "OgreGL3PlusUtil.h"
 #include "OgreGLSLShader.h"
 #include "OgreGLSLShaderManager.h"
 #include "OgreException.h"
@@ -47,7 +48,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreGL3PlusHardwareOcclusionQuery.h"
 #include "OgreGL3PlusDepthBuffer.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
-#include "OgreGL3PlusContext.h"
+#include "OgreGLContext.h"
 #include "OgreGLSLShaderFactory.h"
 #include "OgreGL3PlusFBORenderTexture.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
@@ -58,6 +59,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRoot.h"
 #include "OgreConfig.h"
 #include "OgreViewport.h"
+#include "OgreGL3PlusPixelFormat.h"
 
 #if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
@@ -129,7 +131,7 @@ namespace Ogre {
         mRenderInstanceAttribsBound.reserve(100);
 
         // Get our GLSupport
-        mGLSupport = getGLSupport();
+        mGLSupport = new GL3PlusSupport(getGLSupport());
 
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
@@ -2886,4 +2888,36 @@ namespace Ogre {
 		return result;
 	}
 #endif
+
+    void GL3PlusRenderSystem::_copyContentsToMemory(Viewport* src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
+    {
+        GLenum format = GL3PlusPixelUtil::getGLOriginFormat(dst.format);
+        GLenum type = GL3PlusPixelUtil::getGLOriginDataType(dst.format);
+
+        if ((format == GL_NONE) || (type == 0))
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format", "GL3PlusRenderSystem::_copyContentsToMemory");
+        }
+
+        // Switch context if different from current one
+        _setViewport(src);
+
+        if(dst.getWidth() != dst.rowPitch)
+            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
+        // Must change the packing to ensure no overruns!
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
+
+        uint32_t height = src->getTarget()->getHeight();
+
+        glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
+        glReadPixels((GLint)0, (GLint)(height - dst.getHeight()),
+                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+                     format, type, dst.getTopLeftFrontPixelPtr());
+
+        // restore default alignment
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+
+        PixelUtil::bulkPixelVerticalFlip(dst);
+    }
 }
