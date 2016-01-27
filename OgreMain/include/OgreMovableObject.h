@@ -144,7 +144,10 @@ namespace Ogre {
         /// @copydoc mGlobalIndex
         size_t mParentIndex;
 
-        /// Constructor
+        /** Constructor
+        @remarks
+            Valid render queue Id is between 0 & 254 inclusive
+        */
         MovableObject( IdType id, ObjectMemoryManager *objectMemoryManager,
                        SceneManager* manager, uint8 renderQueueId );
 
@@ -365,6 +368,8 @@ namespace Ogre {
             See RenderQueue for more details.
         @param queueID Enumerated value of the queue group to use. See the
             enum RenderQueueGroupID for what kind of values can be used here.
+        @par
+            Valid render queue ids are between 0 & 254 inclusive
         */
         virtual void setRenderQueueGroup(uint8 queueID);
 
