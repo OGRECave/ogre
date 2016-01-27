@@ -64,6 +64,9 @@ namespace Ogre {
             case PF_BYTE_LA:
             case PF_SHORT_GR:
                 return GL_LUMINANCE_ALPHA;
+            case PF_L8:
+            case PF_L16:
+                return GL_LUMINANCE;
 #endif
 
 #if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL)
@@ -149,17 +152,14 @@ namespace Ogre {
 #else
                 return GL_RGBA;
 #endif
-
+#ifdef GL_EXT_texture_compression_dxt1
             case PF_DXT1:
-#if GL_EXT_texture_compression_dxt1
                 return GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 #endif
+#ifdef GL_EXT_texture_compression_s3tc
             case PF_DXT3:
-#if GL_EXT_texture_compression_s3tc
                 return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-#endif
             case PF_DXT5:
-#if GL_EXT_texture_compression_s3tc
                 return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 #endif
 #if OGRE_NO_GLES3_SUPPORT == 0
@@ -204,10 +204,6 @@ namespace Ogre {
                 return GL_RGB8_SNORM;
             case PF_R8G8B8A8_SNORM:
                 return GL_RGBA8_SNORM;
-#else
-            case PF_L8:
-            case PF_L16:
-                return GL_LUMINANCE;
 #endif
             default:
                 return 0;
@@ -790,7 +786,7 @@ namespace Ogre {
 #endif
 
             default:
-                LogManager::getSingleton().logMessage("Unhandled Pixel format: " + StringConverter::toString(fmt));
+                LogManager::getSingleton().stream() << "Unhandled Pixel format: 0x" << std::hex << fmt;
                 return PF_A8B8G8R8;
         };
     }
