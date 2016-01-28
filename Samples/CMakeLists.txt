@@ -5,6 +5,11 @@ if(SDL2_FOUND)
   add_definitions(-DHAVE_SDL)
 endif()
 
+if(UNIX)
+  # this is abused way to much in OgreMain
+  add_definitions(-Wno-overloaded-virtual)
+endif()
+
 if (OGRE_BUILD_SAMPLES)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
