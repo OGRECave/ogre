@@ -74,7 +74,7 @@ namespace Ogre {
         if (mVersion.major == major) {
             return mVersion.minor >= minor;
         }
-        return mVersion.major >= major;
+        return mVersion.major > major;
     }
 
     bool GL3PlusSupport::checkExtension(const String& ext) const
