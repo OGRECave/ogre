@@ -6,13 +6,6 @@
 //--------------------------------------------------------------
 // GLSL Programs
 //--------------------------------------------------------------
-fragment_program Ogre/Shadow/Utils unified
-{
-	delegate Ogre/Shadow/Utils_glsl
-	delegate Ogre/Shadow/Utils_glsles
-}
-
-
 fragment_program Ogre/Shadow/Utils_glsl glsl
 {
 	source shadows.glsl
@@ -21,7 +14,7 @@ fragment_program Ogre/Shadow/Utils_glsl glsl
 fragment_program Ogre/Instancing_glsl_ps glsl
 {
 	source Instancing.frag
-	attach Ogre/Shadow/Utils
+	attach Ogre/Shadow/Utils_glsl
 
 	preprocessor_defines DEPTH_SHADOWRECEIVER=1
 
