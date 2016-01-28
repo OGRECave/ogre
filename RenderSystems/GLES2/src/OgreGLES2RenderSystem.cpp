@@ -692,24 +692,17 @@ namespace Ogre {
         return retval;
     }
 
-    void GLES2RenderSystem::destroyRenderWindow(RenderWindow* pWin)
+    void GLES2RenderSystem::destroyRenderWindow(const String& name)
     {
-        // Find it to remove from list
-        RenderTargetMap::iterator i = mRenderTargets.begin();
+        // Find it to remove from list.
+        RenderTarget* pWin = detachRenderTarget(name);
+        OgreAssert(pWin, "unknown RenderWindow name");
 
-        while (i != mRenderTargets.end())
-        {
-            if (i->second == pWin)
-            {
-                _destroyDepthBuffer(pWin);
-                mRenderTargets.erase(i);
-                OGRE_DELETE pWin;
-                break;
-            }
-        }
+        _destroyDepthBuffer(pWin);
+        OGRE_DELETE pWin;
     }
 
-    void GLES2RenderSystem::_destroyDepthBuffer(RenderWindow* pWin)
+    void GLES2RenderSystem::_destroyDepthBuffer(RenderTarget* pWin)
     {
         GLES2Context *windowContext = 0;
         pWin->getCustomAttribute("GLCONTEXT", &windowContext);
