@@ -56,6 +56,8 @@ namespace Ogre {
     class BspLevel : public Resource
     {
         friend class BspSceneManager;
+
+        using Resource::load;
     public:
         /** Default constructor - used by BspResourceManager (do not call directly) */
         BspLevel(ResourceManager* creator, const String& name, ResourceHandle handle,
