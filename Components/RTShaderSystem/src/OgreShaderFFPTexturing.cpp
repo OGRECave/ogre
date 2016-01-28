@@ -648,7 +648,7 @@ void FFPTexturing::addPSArgumentInvocations(Function* psMain,
             curFuncInvocation->pushOperand(ParameterFactory::createConstParamFloat(colourValue.a), Operand::OPS_IN);        
         }
         
-        curFuncInvocation->pushOperand(arg, Operand::OPS_IN);   
+        curFuncInvocation->pushOperand(arg, Operand::OPS_OUT);
         psMain->addAtomInstance(curFuncInvocation); 
         break;
     }
