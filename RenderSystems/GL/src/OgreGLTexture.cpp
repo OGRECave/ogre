@@ -160,10 +160,13 @@ namespace Ogre {
         
         // Allocate internal buffer so that glTexSubImageXD can be used
         // Internal format
-        GLenum format = GLPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
+        GLenum internalformat = GLPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
         uint32 width = mWidth;
         uint32 height = mHeight;
         uint32 depth = mDepth;
+
+        GLenum format = GLPixelUtil::getGLOriginFormat(mFormat);
+        GLenum datatype = GLPixelUtil::getGLOriginDataType(mFormat);
 
         if(PixelUtil::isCompressed(mFormat))
         {
@@ -181,24 +184,24 @@ namespace Ogre {
                 switch(mTextureType)
                 {
                     case TEX_TYPE_1D:
-                        glCompressedTexImage1DARB(GL_TEXTURE_1D, mip, format, 
+                        glCompressedTexImage1DARB(GL_TEXTURE_1D, mip, internalformat, 
                             width, 0, 
                             size, tmpdata);
                         break;
                     case TEX_TYPE_2D:
-                        glCompressedTexImage2DARB(GL_TEXTURE_2D, mip, format,
+                        glCompressedTexImage2DARB(GL_TEXTURE_2D, mip, internalformat,
                             width, height, 0, 
                             size, tmpdata);
                         break;
                     case TEX_TYPE_2D_ARRAY:
                     case TEX_TYPE_3D:
-                        glCompressedTexImage3DARB(getGLTextureTarget(), mip, format,
+                        glCompressedTexImage3DARB(getGLTextureTarget(), mip, internalformat,
                             width, height, depth, 0, 
                             size, tmpdata);
                         break;
                     case TEX_TYPE_CUBE_MAP:
                         for(int face=0; face<6; face++) {
-                            glCompressedTexImage2DARB(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+                            glCompressedTexImage2DARB(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
                                 width, height, 0, 
                                 size, tmpdata);
                         }
@@ -224,27 +227,27 @@ namespace Ogre {
                 switch(mTextureType)
                 {
                     case TEX_TYPE_1D:
-                        glTexImage1D(GL_TEXTURE_1D, mip, format,
+                        glTexImage1D(GL_TEXTURE_1D, mip, internalformat,
                             width, 0, 
-                            GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                            format, datatype, 0);
     
                         break;
                     case TEX_TYPE_2D:
-                        glTexImage2D(GL_TEXTURE_2D, mip, format,
+                        glTexImage2D(GL_TEXTURE_2D, mip, internalformat,
                             width, height, 0, 
-                            GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                            format, datatype, 0);
                         break;
                     case TEX_TYPE_2D_ARRAY:
                     case TEX_TYPE_3D:
-                        glTexImage3D(getGLTextureTarget(), mip, format,
+                        glTexImage3D(getGLTextureTarget(), mip, internalformat,
                             width, height, depth, 0, 
-                            GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                            format, datatype, 0);
                         break;
                     case TEX_TYPE_CUBE_MAP:
                         for(int face=0; face<6; face++) {
-                            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, format,
+                            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, mip, internalformat,
                                 width, height, 0, 
-                                GL_RGBA, GL_UNSIGNED_BYTE, 0);
+                                format, datatype, 0);
                         }
                         break;
                     case TEX_TYPE_2D_RECT:
