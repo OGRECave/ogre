@@ -218,7 +218,7 @@ namespace Ogre {
             /** See
               RenderSystem
              */
-            void destroyRenderWindow(RenderWindow* pWin);
+            void destroyRenderWindow(const String& name);
             /** See
               RenderSystem
              */
@@ -513,7 +513,7 @@ namespace Ogre {
 
             unsigned int getDiscardBuffers(void);
 
-            void _destroyDepthBuffer(RenderWindow* pRenderWnd);
+            void _destroyDepthBuffer(RenderTarget* pRenderWnd);
         
             /// @copydoc RenderSystem::beginProfileEvent
             virtual void beginProfileEvent( const String &eventName );

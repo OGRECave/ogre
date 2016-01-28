@@ -1241,58 +1241,51 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void GLRenderSystem::destroyRenderWindow(RenderWindow* pWin)
+    void GLRenderSystem::destroyRenderWindow(const String& name)
     {
-        // Find it to remove from list
-        RenderTargetMap::iterator i = mRenderTargets.begin();
+        // Find it to remove from list.
+        RenderTarget* pWin = detachRenderTarget(name);
+        OgreAssert(pWin, "unknown RenderWindow name");
 
-        while (i != mRenderTargets.end())
+        GLContext *windowContext = 0;
+        pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+
+        //1 Window <-> 1 Context, should be always true
+        assert( windowContext );
+
+        bool bFound = false;
+        //Find the depth buffer from this window and remove it.
+        DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
+        DepthBufferMap::iterator enMap = mDepthBufferPool.end();
+
+        while( itMap != enMap && !bFound )
         {
-            if (i->second == pWin)
+            DepthBufferVec::iterator itor = itMap->second.begin();
+            DepthBufferVec::iterator end  = itMap->second.end();
+
+            while( itor != end )
             {
-                GLContext *windowContext = 0;
-                pWin->getCustomAttribute(GLRenderTexture::CustomAttributeString_GLCONTEXT, &windowContext);
+                //A DepthBuffer with no depth & stencil pointers is a dummy one,
+                //look for the one that matches the same GL context
+                GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(*itor);
+                GLContext *glContext = depthBuffer->getGLContext();
 
-                //1 Window <-> 1 Context, should be always true
-                assert( windowContext );
-
-                bool bFound = false;
-                //Find the depth buffer from this window and remove it.
-                DepthBufferMap::iterator itMap = mDepthBufferPool.begin();
-                DepthBufferMap::iterator enMap = mDepthBufferPool.end();
-
-                while( itMap != enMap && !bFound )
+                if( glContext == windowContext &&
+                    (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
                 {
-                    DepthBufferVec::iterator itor = itMap->second.begin();
-                    DepthBufferVec::iterator end  = itMap->second.end();
+                    bFound = true;
 
-                    while( itor != end )
-                    {
-                        //A DepthBuffer with no depth & stencil pointers is a dummy one,
-                        //look for the one that matches the same GL context
-                        GLDepthBuffer *depthBuffer = static_cast<GLDepthBuffer*>(*itor);
-                        GLContext *glContext = depthBuffer->getGLContext();
-
-                        if( glContext == windowContext &&
-                            (depthBuffer->getDepthBuffer() || depthBuffer->getStencilBuffer()) )
-                        {
-                            bFound = true;
-
-                            delete *itor;
-                            itMap->second.erase( itor );
-                            break;
-                        }
-                        ++itor;
-                    }
-
-                    ++itMap;
+                    delete *itor;
+                    itMap->second.erase( itor );
+                    break;
                 }
-
-                mRenderTargets.erase(i);
-                delete pWin;
-                break;
+                ++itor;
             }
+
+            ++itMap;
         }
+
+        delete pWin;
     }
 
     //---------------------------------------------------------------------
