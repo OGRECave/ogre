@@ -108,7 +108,7 @@ namespace Ogre {
         if (mVersion.major == major) {
             return mVersion.minor >= minor;
         }
-        return mVersion.major >= major;
+        return mVersion.major > major;
     }
 
     bool GLES2Support::checkExtension(const String& ext) const
