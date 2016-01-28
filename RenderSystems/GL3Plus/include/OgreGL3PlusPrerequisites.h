@@ -59,18 +59,13 @@ namespace Ogre {
 #   define NOMINMAX // required to stop windows.h messing up std::min
 #  endif
 #endif
-#   define WGL_WGLEXT_PROTOTYPES
 #   include <windows.h>
 #   include <wingdi.h>
 #   include <GL/gl3w.h>
-#   include <GL/glext.h>
-#   include <GL/wglext.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #   include <GL/gl3w.h>
-#   include <GL/glext.h>
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #   include <GL/gl3w.h>
-#   include <OpenGL/gl3ext.h>
 #endif
 
 // Lots of generated code in here which triggers the new VC CRT security warnings
