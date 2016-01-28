@@ -249,7 +249,7 @@ namespace Ogre {
         /** See
           RenderSystem
          */
-        void destroyRenderWindow(RenderWindow* pWin);
+        void destroyRenderWindow(const String& name);
         /** See
           RenderSystem
          */
