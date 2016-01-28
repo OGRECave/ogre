@@ -61,6 +61,11 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreViewport.h"
 #include "OgreGL3PlusPixelFormat.h"
 
+#ifndef GL_EXT_texture_filter_anisotropic
+#define GL_TEXTURE_MAX_ANISOTROPY_EXT     0x84FE
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
+#endif
+
 #if OGRE_DEBUG_MODE
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
