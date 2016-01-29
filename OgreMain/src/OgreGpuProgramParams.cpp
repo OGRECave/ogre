@@ -3348,7 +3348,7 @@ namespace Ogre
     // }
     //---------------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantEntry*
-    GpuProgramParameters::findAutoConstantEntry(const String& paramName)
+    GpuProgramParameters::findAutoConstantEntry(const String& paramName) const
     {
         if (mNamedConstants.isNull())
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
@@ -3367,12 +3367,12 @@ namespace Ogre
     }
     //---------------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantEntry*
-    GpuProgramParameters::_findRawAutoConstantEntryFloat(size_t physicalIndex)
+    GpuProgramParameters::_findRawAutoConstantEntryFloat(size_t physicalIndex) const
     {
-        for(AutoConstantList::iterator i = mAutoConstants.begin();
+        for(AutoConstantList::const_iterator i = mAutoConstants.begin();
             i != mAutoConstants.end(); ++i)
         {
-            AutoConstantEntry& ac = *i;
+            const AutoConstantEntry& ac = *i;
             // should check that auto is float and not int so that physicalIndex
             // doesn't have any ambiguity
             // However, all autos are float I think so no need
@@ -3385,12 +3385,12 @@ namespace Ogre
     }
     //---------------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantEntry*
-    GpuProgramParameters::_findRawAutoConstantEntryDouble(size_t physicalIndex)
+    GpuProgramParameters::_findRawAutoConstantEntryDouble(size_t physicalIndex) const
     {
-        for(AutoConstantList::iterator i = mAutoConstants.begin();
+        for(AutoConstantList::const_iterator i = mAutoConstants.begin();
             i != mAutoConstants.end(); ++i)
         {
-            AutoConstantEntry& ac = *i;
+            const AutoConstantEntry& ac = *i;
             // should check that auto is double and not int or float so that physicalIndex
             // doesn't have any ambiguity
             // However, all autos are float I think so no need
@@ -3403,21 +3403,21 @@ namespace Ogre
     }
     //---------------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantEntry*
-    GpuProgramParameters::_findRawAutoConstantEntryInt(size_t physicalIndex)
+    GpuProgramParameters::_findRawAutoConstantEntryInt(size_t physicalIndex) const
     {
         // No autos are float?
         return 0;
     }
     //---------------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantEntry*
-    GpuProgramParameters::_findRawAutoConstantEntryUnsignedInt(size_t physicalIndex)
+    GpuProgramParameters::_findRawAutoConstantEntryUnsignedInt(size_t physicalIndex) const
     {
         //TODO  No autos are float?
         return 0;
     }
     //---------------------------------------------------------------------------
     const GpuProgramParameters::AutoConstantEntry*
-    GpuProgramParameters::_findRawAutoConstantEntryBool(size_t physicalIndex)
+    GpuProgramParameters::_findRawAutoConstantEntryBool(size_t physicalIndex) const
     {
         //TODO No autos are float?
         return 0;
@@ -3493,7 +3493,7 @@ namespace Ogre
                     }
                     // we'll use this map to resolve autos later
                     // ignore the [0] aliases
-                    if (!StringUtil::endsWith(paramName, "[0]") && this->getAutoConstantDefinition(paramName))
+                    if (!StringUtil::endsWith(paramName, "[0]") && source.findAutoConstantEntry(paramName))
                         srcToDestNamedMap[olddef.physicalIndex] = paramName;
                 }
             }
@@ -3506,7 +3506,7 @@ namespace Ogre
                 std::map<size_t, String>::iterator mi = srcToDestNamedMap.find(autoEntry.physicalIndex);
                 if (mi != srcToDestNamedMap.end())
                 {
-                    if (autoEntry.fData)
+                    if (getAutoConstantDefinition(autoEntry.paramType)->dataType == ACDT_REAL)
                     {
                         setNamedAutoConstantReal(mi->second, autoEntry.paramType, autoEntry.fData);
                     }
