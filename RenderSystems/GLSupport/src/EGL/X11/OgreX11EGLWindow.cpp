@@ -302,7 +302,7 @@ namespace Ogre {
 
     void X11EGLWindow::setFullscreen( bool fullscreen, uint width, uint height )
     {
-        if (mIsFullScreen != fullscreen && &mGLSupport->mAtomFullScreen == None)
+        if (mIsFullScreen != fullscreen && mGLSupport->mAtomFullScreen == None)
         {
             // Without WM support it is best to give up.
             LogManager::getSingleton().logMessage("EGLWindow::switchFullScreen: Your WM has no fullscreen support");
@@ -381,7 +381,7 @@ namespace Ogre {
 
         XGetWindowAttributes((Display*)mNativeDisplay, (Window)mWindow, &windowAttrib);
 
-        if (mWidth == windowAttrib.width && mHeight == windowAttrib.height)
+        if (mWidth == uint32(windowAttrib.width) && mHeight == uint32(windowAttrib.height))
         {
             return;
         }
@@ -396,7 +396,7 @@ namespace Ogre {
     }
     void X11EGLWindow::switchFullScreen(bool fullscreen)
     { 
-        if (&mGLSupport->mAtomFullScreen != None)
+        if (mGLSupport->mAtomFullScreen != None)
         {
             NativeDisplayType mNativeDisplay = mGLSupport->getNativeDisplay();
             XClientMessageEvent xMessage;
@@ -502,9 +502,9 @@ namespace Ogre {
             {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
-    }
+        }
 
-    initNativeCreatedWindow(miscParams);
+        initNativeCreatedWindow(miscParams);
 
         if (mEglSurface)
         {
@@ -567,22 +567,25 @@ namespace Ogre {
             mGLSupport->switchMode (width, height, frequency);
         }
 
-    if (!mIsExternal)
+        if (!mIsExternal)
         {
-        createNativeWindow(left, top, width, height, title);
-    }
+            createNativeWindow(left, top, width, height, title);
+        }
 
-    mContext = createEGLContext();
+        mContext = createEGLContext();
 
-    // apply vsync settings. call setVSyncInterval first to avoid
-    // setting vsync more than once.
-    setVSyncInterval(vsyncInterval);
-    setVSyncEnabled(vsync);
+        // apply vsync settings. call setVSyncInterval first to avoid
+        // setting vsync more than once.
+        setVSyncInterval(vsyncInterval);
+        setVSyncEnabled(vsync);
 
-        int glConfigID;
-
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_CONFIG_ID, &glConfigID);
-        LogManager::getSingleton().logMessage("EGLWindow::create used FBConfigID = " + StringConverter::toString(glConfigID));
+        int Rsz, Gsz, Bsz, Asz;
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_RED_SIZE, &Rsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_BLUE_SIZE, &Gsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_GREEN_SIZE, &Bsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_ALPHA_SIZE, &Asz);
+        LogManager::getSingleton().stream() << "X11EGLWindow::create used FBConfig = " <<
+                Rsz << "/" << Bsz << "/" << Gsz << "/" << Asz;
 
         mName = name;
         mWidth = width;
