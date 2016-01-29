@@ -109,19 +109,18 @@ namespace Ogre {
 
     void X11EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
     {
+        mExternalWindow = 0;
+        mNativeDisplay = mGLSupport->getNativeDisplay();
+        mParentWindow = DefaultRootWindow((Display*)mNativeDisplay);
+
         if (miscParams)
         {
             NameValuePairList::const_iterator opt;
             NameValuePairList::const_iterator end = miscParams->end();
 
-            mExternalWindow = 0;
-            mNativeDisplay = mGLSupport->getNativeDisplay();
-            mParentWindow = DefaultRootWindow((Display*)mNativeDisplay);
-
             if ((opt = miscParams->find("parentWindowHandle")) != end)
             {
-                //vector<String>::type tokens = StringUtil::split(opt->second, " :");
-                        StringVector tokens = StringUtil::split(opt->second, " :");
+                StringVector tokens = StringUtil::split(opt->second, " :");
 
                 if (tokens.size() == 3)
                 {
