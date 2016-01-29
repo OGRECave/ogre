@@ -431,20 +431,22 @@ namespace Ogre {
         rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
 
         // Geometry Program Properties
-        rsc->setCapability(RSC_GEOMETRY_PROGRAM);
+        if(mHasGL32 || mGLSupport->checkExtension("ARB_geometry_shader4")) {
+            rsc->setCapability(RSC_GEOMETRY_PROGRAM);
 
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
+            rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
 
-        GLint maxOutputVertices;
-        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
-        rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
+            GLint maxOutputVertices;
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
+            rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
 
-        //FIXME Is this correct?
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
-        rsc->setGeometryProgramConstantBoolCount(floatConstantCount);
-        rsc->setGeometryProgramConstantIntCount(floatConstantCount);
+            //FIXME Is this correct?
+            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
+            rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
+            rsc->setGeometryProgramConstantBoolCount(floatConstantCount);
+            rsc->setGeometryProgramConstantIntCount(floatConstantCount);
+        }
 
         // Tessellation Program Properties
         if (mGLSupport->checkExtension("GL_ARB_tessellation_shader") || hasGL40)
