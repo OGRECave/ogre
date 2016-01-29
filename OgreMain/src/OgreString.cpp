@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreString.h"
 
 namespace Ogre {
+    const String& StringUtil::BLANK = BLANKSTRING;
 
     //-----------------------------------------------------------------------
     void StringUtil::trim(String& str, bool left, bool right)
