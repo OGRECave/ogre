@@ -2010,27 +2010,27 @@ namespace Ogre {
         /** Finds an auto constant that's affecting a given named parameter index.
             @note Only applicable to high-level programs.
         */
-        const AutoConstantEntry* findAutoConstantEntry(const String& paramName);
+        const AutoConstantEntry* findAutoConstantEntry(const String& paramName) const;
         /** Finds an auto constant that's affecting a given physical position in
             the floating-point buffer
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryFloat(size_t physicalIndex);
+        const AutoConstantEntry* _findRawAutoConstantEntryFloat(size_t physicalIndex) const;
         /** Finds an auto constant that's affecting a given physical position in
             the double-point buffer
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryDouble(size_t physicalIndex);
+        const AutoConstantEntry* _findRawAutoConstantEntryDouble(size_t physicalIndex) const;
         /** Finds an auto constant that's affecting a given physical position in
             the integer buffer
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryInt(size_t physicalIndex);
+        const AutoConstantEntry* _findRawAutoConstantEntryInt(size_t physicalIndex) const;
         /** Finds an auto constant that's affecting a given physical position in
             the unsigned integer buffer
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryUnsignedInt(size_t physicalIndex);
+        const AutoConstantEntry* _findRawAutoConstantEntryUnsignedInt(size_t physicalIndex) const;
         /** Finds an auto constant that's affecting a given physical position in
             the boolean buffer
         */
-        const AutoConstantEntry* _findRawAutoConstantEntryBool(size_t physicalIndex);
+        const AutoConstantEntry* _findRawAutoConstantEntryBool(size_t physicalIndex) const;
 
         /** Update automatic parameters.
             @param source The source of the parameters
