@@ -1,6 +1,8 @@
 # Changes in master but not on Bitbucket
 
 ## Tests
+[see the results of the Visual Tests for the GL RenderSystems here](https://ogrecave.github.io/ogre/gl_status/)
+
 * Visual Tests can be built on Android
 * Visual Tests can be built without OIS
 * Unit Tests are run and enforced on each commit on Linux
@@ -12,12 +14,12 @@
 * fixed RenderSystemCapabilites tests on Linux
 * fixed Memory Leak in Unit Test Suite
 * Test Suite returns non-null for easy CI integration
-* deleted dead PlayPen Tests
 
 ## OgreMain
-* fix GLSLES Shaders for ShadowVolumeExtrudeProgram
+* restored compatibility with 1.9 (`StringUtil::BLANK`, `StringUtil::StrStreamType`)
 * STBImageCodec: add support for saving PNG files
 * fix build on iOS using cross-toolchain/ add instructions
+* fix GLSLES Shaders for ShadowVolumeExtrudeProgram
 * backed out [bad commits of PRs #588, #577](https://bitbucket.org/sinbad/ogre/pull-requests/599/backed-out-merged-in-liorl-ogre-main-pull/diff#comment-12710605)
 
 ## SampleBrowser
@@ -27,9 +29,13 @@
 * improved input handling on Android
 
 ## RTShaderSystem
-* fix FFP_GenerateTexCoord_EnvMap_Reflect on GLSL. Environment Maps are no longer flipped.
+* fix flipped Environment Maps using GLSL (GLSES) shaders
+* fix TextureBlending when specifying the color manually
 
-## GLNativeSupport (new component)
+## Direct3D11
+* Handle device lost event (merged PR #562)
+
+## GLSupport (new component)
 * Factored out GL Support classes that handle GL context creation
 * Defines new GLNativeSupport interface. Platform specific classes (e.g. GLX, WGL) no longer directly accessible.
 * Shared between all GL RenderSystems
@@ -39,14 +45,15 @@
 
 ## GLES2: use ES context profile on Desktop ([PR](https://github.com/OGRECave/ogre/pull/183))
 * run and test the GLES2/3 RenderSystem on Desktop
-* uses GLSupport Module instead of EGL for Extensions/ Context
+* optionally uses GLSupport Module instead of EGL for Extensions/ Context
 
 ## EGL in GLNativeSupport (WIP, [PR](https://github.com/OGRECave/ogre/pull/185))
+* all supported RenderSystems ported to GLNativeSupport 
 * allow EGL to create "full" GL Contexts as well
 * needed for [real headless rendering](http://devblogs.nvidia.com/parallelforall/egl-eye-opengl-visualization-without-x-server/)
-* already can start GL3Plus on Linux (however uses Mesa EGL instead of Nvidia)
+* allows running GL3Plus on EGL (Linux / Mesa EGL)
 
 # Changes on Bitbucket but not in master
-* Organize projects into project folders in MSVC projects
-* Improved microcode cache
-* Direct3D11 Fixes and improvements
+* Organize projects into project folders in MSVC projects (PR #601)
+* Improved microcode cache (PR #580)
+* Direct3D11 Fixes and improvements (PR #579)
