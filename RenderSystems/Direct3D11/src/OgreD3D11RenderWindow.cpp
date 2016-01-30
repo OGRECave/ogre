@@ -973,6 +973,7 @@ namespace Ogre
         mSwapChainDesc.BufferUsage          = DXGI_USAGE_RENDER_TARGET_OUTPUT;
         mSwapChainDesc.OutputWindow         = mHWnd;
         mSwapChainDesc.Windowed             = !mIsFullScreen;
+        mSwapChainDesc.Flags                = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
         if (!mVSync && !mIsFullScreen)
         {
@@ -1043,7 +1044,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowHwnd::windowMovedOrResized()
     {
-        if (!mHWnd || IsIconic(mHWnd))
+        if (!mHWnd || IsIconic(mHWnd) || !mpSwapChain)
             return;
 
 		updateWindowRect();		
