@@ -74,7 +74,7 @@ namespace Ogre {
         static GLenum getGLUsage(unsigned int usage);
 
         /// Utility function to get the correct GL type based on VET's
-        static GLenum getGLType(unsigned int type);
+        static GLenum getGLType(VertexElementType type);
 
         /** Allocator method to allow us to use a pool of memory as a scratch
             area for hardware buffers. This is because glMapBuffer is incredibly
@@ -117,7 +117,7 @@ namespace Ogre {
         { return GL3PlusHardwareBufferManagerBase::getGLUsage(usage); }
 
         /// Utility function to get the correct GL type based on VET's.
-        static GLenum getGLType(unsigned int type)
+        static GLenum getGLType(VertexElementType type)
         { return GL3PlusHardwareBufferManagerBase::getGLType(type); }
 
         /** Allocator method to allow us to use a pool of memory as a scratch
