@@ -114,22 +114,28 @@ namespace Ogre {
 
     GLenum GLES2HardwareBufferManagerBase::getGLUsage(unsigned int usage)
     {
-        switch(usage)
+        // this is also used with Textures, so unset non HBU related flags
+        usage = usage & ~(TU_AUTOMIPMAP | TU_RENDERTARGET);
+
+        switch(HardwareBuffer::Usage(usage))
         {
-            case HardwareBuffer::HBU_STATIC:
-            case HardwareBuffer::HBU_STATIC_WRITE_ONLY:
-                return GL_STATIC_DRAW;
-            case HardwareBuffer::HBU_DYNAMIC:
-            case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
-                return GL_DYNAMIC_DRAW;
-            case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
-                return GL_STREAM_DRAW;
-            default:
-                return GL_DYNAMIC_DRAW;
+        case HardwareBuffer::HBU_STATIC:
+        case HardwareBuffer::HBU_WRITE_ONLY:
+        case HardwareBuffer::HBU_STATIC_WRITE_ONLY:
+            return GL_STATIC_DRAW;
+        case HardwareBuffer::HBU_DYNAMIC:
+        case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY:
+            return GL_DYNAMIC_DRAW;
+        case HardwareBuffer::HBU_DISCARDABLE:
+        case HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE:
+            return GL_STREAM_DRAW;
         };
+
+        OgreAssert(false, "unknown usage flags");
+        return GL_DYNAMIC_DRAW;
     }
 
-    GLenum GLES2HardwareBufferManagerBase::getGLType(unsigned int type)
+    GLenum GLES2HardwareBufferManagerBase::getGLType(VertexElementType type)
     {
         switch(type)
         {
@@ -148,26 +154,36 @@ namespace Ogre {
             case VET_COLOUR_ARGB:
             case VET_UBYTE4:
                 return GL_UNSIGNED_BYTE;
-#if OGRE_NO_GLES3_SUPPORT == 0
             case VET_INT1:
             case VET_INT2:
             case VET_INT3:
             case VET_INT4:
+#if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_INT;
+#endif
             case VET_UINT1:
             case VET_UINT2:
             case VET_UINT3:
             case VET_UINT4:
+#if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_UNSIGNED_INT;
+#endif
             case VET_USHORT1:
             case VET_USHORT2:
             case VET_USHORT3:
             case VET_USHORT4:
+#if OGRE_NO_GLES3_SUPPORT == 0
                 return GL_UNSIGNED_SHORT;
 #endif
-            default:
+            case VET_DOUBLE1:
+            case VET_DOUBLE2:
+            case VET_DOUBLE3:
+            case VET_DOUBLE4:
                 return 0;
         };
+
+        OgreAssert(false, "unknown Vertex Element Type");
+        return 0;
     }
 
     //---------------------------------------------------------------------
