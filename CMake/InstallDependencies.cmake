@@ -16,7 +16,7 @@ endif()
 
 # TODO - most of this file assumes a common dependencies root folder
 # This is not robust, we should instead source dependencies from their individual locations
-get_filename_component(OGRE_DEP_DIR ${OIS_INCLUDE_DIR}/../../ ABSOLUTE)
+get_filename_component(OGRE_DEP_DIR ${FREETYPE_INCLUDE_DIR}/../../ ABSOLUTE)
 
 option(OGRE_INSTALL_DEPENDENCIES "Install dependency libs needed for samples" TRUE)
 option(OGRE_COPY_DEPENDENCIES "Copy dependency libs to the build directory" TRUE)
@@ -91,53 +91,16 @@ if (OGRE_INSTALL_DEPENDENCIES)
     if (EXISTS ${OGRE_DEP_DIR}/lib/)
         install(DIRECTORY ${OGRE_DEP_DIR}/lib/ DESTINATION lib)
     endif ()
-  else ()
-	    # for non-static builds, we only need OIS for the samples
-	if (EXISTS ${OGRE_DEP_DIR}/include/OIS/)
-    install(DIRECTORY ${OGRE_DEP_DIR}/include/OIS   DESTINATION include)
-	endif () # OGRE_STATIC
-  
-	if(WIN32)
-	  if (EXISTS ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib)
-      install(FILES
-        ${OGRE_DEP_DIR}/lib/debug/OIS_d.lib
-        DESTINATION lib/debug CONFIGURATIONS Debug
-      )
-	  endif ()
-    
-	  if (EXISTS ${OGRE_DEP_DIR}/lib/release/OIS.lib)
-      install(FILES
-        ${OGRE_DEP_DIR}/lib/release/OIS.lib
-        DESTINATION lib/release CONFIGURATIONS Release RelWithDebInfo MinSizeRel None ""
-      )
-	  endif ()
-    
-	  if (MINGW)
-		if (EXISTS ${OIS_LIBRARY_DBG})
-			install(FILES ${OIS_LIBRARY_DBG} DESTINATION lib/debug CONFIGURATIONS Debug)
-		else()	
-			install(FILES DESTINATION lib/debug CONFIGURATIONS Debug)
-		endif ()
-		if (EXISTS ${OIS_LIBRARY_REL})
-			install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-			install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/release CONFIGURATIONS Release)
-			install(FILES ${OIS_LIBRARY_REL} DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
-		else()
-			install(FILES DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
-			install(FILES DESTINATION lib/release CONFIGURATIONS Release)
-			install(FILES DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
-		endif ()
-	  endif () # MINGW
+  else ()  
+	if(WIN32 AND MINGW)    
+		install(FILES DESTINATION lib/debug CONFIGURATIONS Debug)
+		install(FILES DESTINATION lib/relwithdebinfo CONFIGURATIONS RelWithDebInfo)
+		install(FILES DESTINATION lib/release CONFIGURATIONS Release)
+		install(FILES DESTINATION lib/minsizerel CONFIGURATIONS MinSizeRel)
 	endif () # WIN32
 endif () # OGRE_INSTALL_DEPENDENCIES
     
   if(WIN32)
-    # copy the dependency DLLs to the right places
-    if(NOT (WINDOWS_STORE OR WINDOWS_PHONE))
-      install_debug(OIS_d.dll)
-      install_release(OIS.dll)
-    endif ()
-
     if (OGRE_BUILD_PLUGIN_CG)
       # if MinGW or NMake, the release/debug cg.dll's would conflict, so just pick one
       if (MINGW OR (CMAKE_GENERATOR STREQUAL "NMake Makefiles"))
