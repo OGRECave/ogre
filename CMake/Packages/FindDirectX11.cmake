@@ -47,9 +47,9 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 	elseif(MSVC11)
 		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/8.0/include/um" "C:/Program Files/Windows Kits/8.0/include/um")
 		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/8.0/lib/win8/um/${MSVC_CXX_ARCHITECTURE_ID}/"
-
+	endif()
 	# Legacy Direct X SDK
-	else() 
+	if(NOT DirectX11_INCLUDE_DIR) 
 
 	# Get path, convert backslashes as ${ENV_DXSDK_DIR}
 	getenv_path(DXSDK_DIR)
