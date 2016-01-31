@@ -71,7 +71,7 @@ namespace Ogre {
             static GLenum getGLUsage(unsigned int usage);
 
             /// Utility function to get the correct GL type based on VET's
-            static GLenum getGLType(unsigned int type);
+            static GLenum getGLType(VertexElementType type);
 
             GLES2StateCacheManager * getStateCacheManager() { return mStateCacheManager; }
     };
@@ -95,7 +95,7 @@ namespace Ogre {
             { return GLES2HardwareBufferManagerBase::getGLUsage(usage); }
 
         /// Utility function to get the correct GL type based on VET's
-        static GLenum getGLType(unsigned int type)
+        static GLenum getGLType(VertexElementType type)
             { return GLES2HardwareBufferManagerBase::getGLType(type); }
     };
 
