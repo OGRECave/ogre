@@ -271,6 +271,11 @@ namespace Ogre {
                     // It should contain 3 parts, i.e. "attribute vec4 vertex".
                     break;
                 }
+                if(parts[0] == "out")
+                {
+                    // This is an output attribute, skip it
+                    continue;
+                }
 
                 String attrName = parts[2];
 
