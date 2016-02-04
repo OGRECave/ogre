@@ -144,8 +144,9 @@ namespace Ogre
         ArrayQuaternion interpRot;
         //Interpolate keyframes' rotation not using shortestPath to respect the original animation
         interpPos   = Math::lerp( prevTransf->mPosition, nextTransf->mPosition, fTimeW );
-        interpRot   = ArrayQuaternion::nlerp( fTimeW, prevTransf->mOrientation,
-                                                        nextTransf->mOrientation );
+        interpRot   = ArrayQuaternion::nlerpShortest( fTimeW,
+                                                      prevTransf->mOrientation,
+                                                      nextTransf->mOrientation );
         interpScale = Math::lerp( prevTransf->mScale, nextTransf->mScale, fTimeW );
 
         //Combine our internal flag (that prevents blending
