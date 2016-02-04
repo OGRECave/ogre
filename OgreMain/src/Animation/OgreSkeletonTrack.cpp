@@ -155,7 +155,8 @@ namespace Ogre
         //When mixing, also interpolate rotation not using shortest path; as this is usually desired
         *finalPos   += interpPos * fW;
         *finalScale *= Math::lerp( ArrayVector3::UNIT_SCALE, interpScale, fW );
-        *finalRot   = (*finalRot) * ArrayQuaternion::nlerp( fW, ArrayQuaternion::IDENTITY, interpRot );
+        *finalRot   = (*finalRot) * ArrayQuaternion::nlerpShortest( fW, ArrayQuaternion::IDENTITY,
+                                                                    interpRot );
 
         inOutLastKnownKeyFrameRig = prevFrame;
     }
