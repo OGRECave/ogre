@@ -89,7 +89,7 @@ namespace Ogre
         ~SkeletonAnimationDef();
 
         void setName( const String &name )                              { mName = name; }
-        String getNameStr(void) const                                   { return mName; }
+        const String& getNameStr(void) const                            { return mName; }
         void _setSkeletonDef( const SkeletonDef *skeletonDef )          { mSkeletonDef = skeletonDef; }
 
         void build( const v1::Skeleton *skeleton, const v1::Animation *animation, Real frameRate );
