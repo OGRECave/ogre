@@ -128,8 +128,10 @@ namespace Ogre
                                                     const HlmsParamVec &paramVec );
 
         void setDetailMapProperties( HlmsPbsDatablock *datablock, PiecesMap *inOutPieces );
-        void setTextureProperty( IdString propertyName, HlmsPbsDatablock *datablock,
+        void setTextureProperty( const char *propertyName, HlmsPbsDatablock *datablock,
                                  PbsTextureTypes texType );
+        void setDetailTextureProperty( const char *propertyName, HlmsPbsDatablock *datablock,
+                                       PbsTextureTypes baseTexType, uint8 detailIdx );
 
         virtual void calculateHashForPreCreate( Renderable *renderable, PiecesMap *inOutPieces );
         virtual void calculateHashForPreCaster( Renderable *renderable, PiecesMap *inOutPieces );
@@ -195,20 +197,19 @@ namespace Ogre
         static const IdString MaterialsPerBuffer;
 
         static const IdString NumTextures;
-        static const IdString DiffuseMap;
-        static const IdString NormalMapTex;
-        static const IdString SpecularMap;
-        static const IdString RoughnessMap;
-        static const IdString EnvProbeMap;
-        static const IdString DetailWeightMap;
+        static const char *DiffuseMap;
+        static const char *NormalMapTex;
+        static const char *SpecularMap;
+        static const char *RoughnessMap;
+        static const char *EnvProbeMap;
+        static const char *DetailWeightMap;
+        static const char *DetailMapN;
+        static const char *DetailMapNmN;
+
         static const IdString DetailMap0;
         static const IdString DetailMap1;
         static const IdString DetailMap2;
         static const IdString DetailMap3;
-        static const IdString DetailMapNm0;
-        static const IdString DetailMapNm1;
-        static const IdString DetailMapNm2;
-        static const IdString DetailMapNm3;
 
         static const IdString NormalMap;
 
@@ -278,8 +279,6 @@ namespace Ogre
         static const IdString *DetailNormalWeights[4];
         static const IdString *DetailOffsetsDPtrs[4];
         static const IdString *DetailOffsetsNPtrs[4];
-        static const IdString *DetailMaps[4];
-        static const IdString *DetailMapsNm[4];
     };
 
     /** @} */

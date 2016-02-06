@@ -149,6 +149,12 @@ namespace Ogre
             this->setToSubstr( source, _start - source.mStrPtr, _end - _start );
         }
 
+        void clear()
+        {
+            mStrPtr[0] = '\0';
+            mSize = 0;
+        }
+
         // Assignment.
         LwString& operator = ( const LwString &other )
         {

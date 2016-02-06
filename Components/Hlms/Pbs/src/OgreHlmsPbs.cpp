@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHlmsPbsDatablock.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsListener.h"
+#include "OgreLwString.h"
 
 #if !OGRE_NO_JSON
     #include "OgreHlmsJsonPbs.h"
@@ -62,21 +63,20 @@ namespace Ogre
     const IdString PbsProperty::SignedIntTex      = IdString( "signed_int_textures" );
     const IdString PbsProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
 
-    const IdString PbsProperty::NumTextures       = IdString( "num_textures" );
-    const IdString PbsProperty::DiffuseMap        = IdString( "diffuse_map" );
-    const IdString PbsProperty::NormalMapTex      = IdString( "normal_map_tex" );
-    const IdString PbsProperty::SpecularMap       = IdString( "specular_map" );
-    const IdString PbsProperty::RoughnessMap      = IdString( "roughness_map" );
-    const IdString PbsProperty::EnvProbeMap       = IdString( "envprobe_map" );
-    const IdString PbsProperty::DetailWeightMap   = IdString( "detail_weight_map" );
-    const IdString PbsProperty::DetailMap0        = IdString( "detail_map0" );
-    const IdString PbsProperty::DetailMap1        = IdString( "detail_map1" );
-    const IdString PbsProperty::DetailMap2        = IdString( "detail_map2" );
-    const IdString PbsProperty::DetailMap3        = IdString( "detail_map3" );
-    const IdString PbsProperty::DetailMapNm0     = IdString( "detail_map_nm0" );
-    const IdString PbsProperty::DetailMapNm1     = IdString( "detail_map_nm1" );
-    const IdString PbsProperty::DetailMapNm2     = IdString( "detail_map_nm2" );
-    const IdString PbsProperty::DetailMapNm3     = IdString( "detail_map_nm3" );
+    const IdString PbsProperty::NumTextures     = IdString( "num_textures" );
+    const char *PbsProperty::DiffuseMap         = "diffuse_map";
+    const char *PbsProperty::NormalMapTex       = "normal_map_tex";
+    const char *PbsProperty::SpecularMap        = "specular_map";
+    const char *PbsProperty::RoughnessMap       = "roughness_map";
+    const char *PbsProperty::EnvProbeMap        = "envprobe_map";
+    const char *PbsProperty::DetailWeightMap    = "detail_weight_map";
+    const char *PbsProperty::DetailMapN         = "detail_map";     //detail_map0-4
+    const char *PbsProperty::DetailMapNmN       = "detail_map_nm";  //detail_map_nm0-4
+
+    const IdString PbsProperty::DetailMap0      = "detail_map0";
+    const IdString PbsProperty::DetailMap1      = "detail_map1";
+    const IdString PbsProperty::DetailMap2      = "detail_map2";
+    const IdString PbsProperty::DetailMap3      = "detail_map3";
 
     const IdString PbsProperty::NormalMap         = IdString( "normal_map" );
 
@@ -186,22 +186,6 @@ namespace Ogre
         &PbsProperty::BlendModeIndex1,
         &PbsProperty::BlendModeIndex2,
         &PbsProperty::BlendModeIndex3
-    };
-
-    const IdString *PbsProperty::DetailMaps[4] =
-    {
-        &PbsProperty::DetailMap0,
-        &PbsProperty::DetailMap1,
-        &PbsProperty::DetailMap2,
-        &PbsProperty::DetailMap3,
-    };
-
-    const IdString *PbsProperty::DetailMapsNm[4] =
-    {
-        &PbsProperty::DetailMapNm0,
-        &PbsProperty::DetailMapNm1,
-        &PbsProperty::DetailMapNm2,
-        &PbsProperty::DetailMapNm3,
     };
 
     extern const String c_pbsBlendModes[];
@@ -359,10 +343,8 @@ namespace Ogre
         {
             uint8 blendMode = datablock->mBlendModes[i];
 
-            setTextureProperty( *PbsProperty::DetailMaps[i], datablock,
-                                static_cast<PbsTextureTypes>( PBSM_DETAIL0 + i ) );
-            setTextureProperty( *PbsProperty::DetailMapsNm[i], datablock,
-                                static_cast<PbsTextureTypes>( PBSM_DETAIL0_NM + i ) );
+            setDetailTextureProperty( PbsProperty::DetailMapN,   datablock, PBSM_DETAIL0, i );
+            setDetailTextureProperty( PbsProperty::DetailMapNmN, datablock, PBSM_DETAIL0_NM, i );
 
             if( !datablock->getTexture( PBSM_DETAIL0 + i ).isNull() )
             {
@@ -403,16 +385,46 @@ namespace Ogre
             setProperty( PbsProperty::DetailWeights, 1 );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbs::setTextureProperty( IdString propertyName, HlmsPbsDatablock *datablock,
+    void HlmsPbs::setTextureProperty( const char *propertyName, HlmsPbsDatablock *datablock,
                                       PbsTextureTypes texType )
     {
         uint8 idx = datablock->getBakedTextureIdx( texType );
         if( idx != NUM_PBSM_TEXTURE_TYPES )
         {
+            char tmpData[64];
+            LwString propName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
+
+            propName = propertyName; //diffuse_map
+
             //In the template the we subtract the "+1" for the index.
             //We need to increment it now otherwise @property( diffuse_map )
             //can translate to @property( 0 ) which is not what we want.
             setProperty( propertyName, idx + 1 );
+
+            propName.a( "_idx" ); //diffuse_map_idx
+            setProperty( propName.c_str(), idx );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::setDetailTextureProperty( const char *propertyName, HlmsPbsDatablock *datablock,
+                                            PbsTextureTypes baseTexType, uint8 detailIdx )
+    {
+        const PbsTextureTypes texType = static_cast<PbsTextureTypes>( baseTexType + detailIdx );
+        const uint8 idx = datablock->getBakedTextureIdx( texType );
+        if( idx != NUM_PBSM_TEXTURE_TYPES )
+        {
+            char tmpData[64];
+            LwString propName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
+
+            propName.a( propertyName, detailIdx ); //detail_map0
+
+            //In the template the we subtract the "+1" for the index.
+            //We need to increment it now otherwise @property( diffuse_map )
+            //can translate to @property( 0 ) which is not what we want.
+            setProperty( propName.c_str(), idx + 1 );
+
+            propName.a( "_idx" ); //detail_map0_idx
+            setProperty( propName.c_str(), idx );
         }
     }
     //-----------------------------------------------------------------------------------
