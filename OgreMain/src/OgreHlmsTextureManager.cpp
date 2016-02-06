@@ -451,6 +451,23 @@ namespace Ogre
                 }
             }
 
+            if (image->getNumMipmaps() - baseMipLevel != (numMipmaps - baseMipLevel))
+            {
+                if (image->generateMipmaps(mDefaultTextureParameters[mapType].hwGammaCorrection) == false)
+                {
+                    //unable to generate preferred number of mipmaps, so use mipmaps of the input tex
+                    numMipmaps = image->getNumMipmaps();
+
+                    LogManager::getSingleton().logMessage(
+                        "WARNING: Could not generate mipmaps for " + texName + ". "
+                        "This can negatively impact performance as the HlmsTextureManager "
+                        "will create more texture arrays than necessary, and the lower mips "
+                        "won't be available. Lack of mipmaps also contribute to aliasing. "
+                        "If this is a compressed DDS/PVR file, bake the mipmaps offline.",
+                        LML_NORMAL );
+                }
+            }
+
             //Find an array where we can put it. If there is none, we'll have have to create a new one
             TextureArrayVec::iterator dstArrayIt = findSuitableArray( mapType, width, height, depth,
                                                                       faces, imageFormat,
@@ -550,12 +567,6 @@ namespace Ogre
 
             uint16 entryIdx = dstArrayIt->createEntry();
             uint16 arrayIdx = dstArrayIt - mTextureArrays[mapType].begin();
-
-            if( image->getNumMipmaps() - baseMipLevel != dstArrayIt->texture->getNumMipmaps() )
-            {
-                image->generateMipmaps( mDefaultTextureParameters[mapType].
-                                       hwGammaCorrection );
-            }
 
             if( texType != TEX_TYPE_3D && texType != TEX_TYPE_CUBE_MAP )
             {
@@ -658,6 +669,32 @@ namespace Ogre
 
             mEntries.erase( it );
         }
+    }
+    //-----------------------------------------------------------------------------------
+    const String* HlmsTextureManager::findAliasName( const TextureLocation &textureLocation ) const
+    {
+        const String *retVal = 0;
+
+        for( size_t i=0; i<NUM_TEXTURE_TYPES && !retVal; ++i )
+        {
+            TextureArrayVec::const_iterator itor = mTextureArrays[i].begin();
+            TextureArrayVec::const_iterator end  = mTextureArrays[i].end();
+
+            while( itor != end && !retVal )
+            {
+                if( itor->texture == textureLocation.texture )
+                {
+                    size_t idx = textureLocation.yIdx * itor->sqrtMaxTextures + textureLocation.xIdx;
+
+                    if( idx < itor->entries.size() )
+                        retVal = &itor->entries[idx];
+                }
+
+                ++itor;
+            }
+        }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     bool HlmsTextureManager::getTexturePackParameters( const HlmsTexturePack &pack, uint32 &outWidth,

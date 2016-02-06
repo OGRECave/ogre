@@ -51,7 +51,7 @@ namespace Ogre
     const IdString LowLevelProp::PassId                     = IdString( "pass_id" );
 
     HlmsLowLevel::HlmsLowLevel() :
-        Hlms( HLMS_LOW_LEVEL, IdString(), 0, 0 ),
+        Hlms( HLMS_LOW_LEVEL, "", 0, 0 ),
         mAutoParamDataSource( 0 ),
         mCurrentSceneManager( 0 )
     {

@@ -165,6 +165,9 @@ namespace Ogre
         /// Returns the requested animations. Throws if not found. O(N) Linear search
         SkeletonAnimation* getAnimation( IdString name );
 
+        ///Return all animations associated with this skeleton
+        const SkeletonAnimationVec& getAnimations() const { return mAnimations; }
+
         /// Internal use. Enables given animation. Input should belong to us and not already animated.
         void _enableAnimation( SkeletonAnimation *animation );
 

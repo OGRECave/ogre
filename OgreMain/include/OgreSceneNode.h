@@ -315,6 +315,8 @@ namespace Ogre {
         /// As Node::getDebugRenderable, except scaling is automatically determined
         //virtual DebugRenderable* getDebugRenderable();
 
+        virtual NodeMemoryManager* getDefaultNodeMemoryManager( SceneMemoryMgrTypes sceneType );
+
 #ifndef NDEBUG
         virtual void _setCachedTransformOutOfDate(void);
 #endif

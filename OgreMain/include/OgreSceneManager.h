@@ -425,7 +425,10 @@ namespace Ogre {
 
     protected:
         /// Subclasses can override this to ensure their specialised SceneNode is used.
-        virtual SceneNode* createSceneNodeImpl( SceneNode *parent, SceneMemoryMgrTypes sceneType );
+        virtual SceneNode* createSceneNodeImpl( SceneNode *parent,
+                                                NodeMemoryManager *nodeMemoryManager );
+        virtual TagPoint* createTagPointImpl( SceneNode *parent,
+                                              NodeMemoryManager *nodeMemoryManager );
 
         typedef vector<NodeMemoryManager*>::type NodeMemoryManagerVec;
         typedef vector<ObjectMemoryManager*>::type ObjectMemoryManagerVec;
@@ -443,8 +446,10 @@ namespace Ogre {
         ObjectMemoryManager     mEntityMemoryManager[NUM_SCENE_MEMORY_MANAGER_TYPES];
         ObjectMemoryManager     mLightMemoryManager;
         SkeletonAnimManager     mSkeletonAnimationManager;
+        NodeMemoryManager       mTagPointNodeMemoryManager;
         /// Filled and cleared every frame in HighLevelCull()
         NodeMemoryManagerVec    mNodeMemoryManagerUpdateList;
+        NodeMemoryManagerVec    mTagPointNodeMemoryManagerUpdateList;
         ObjectMemoryManagerVec  mEntitiesMemoryManagerCulledList;
         ObjectMemoryManagerVec  mEntitiesMemoryManagerUpdateList;
         ObjectMemoryManagerVec  mLightsMemoryManagerCulledList;
@@ -885,6 +890,8 @@ namespace Ogre {
             CULL_FRUSTUM,
             UPDATE_ALL_ANIMATIONS,
             UPDATE_ALL_TRANSFORMS,
+            UPDATE_ALL_BONE_TO_TAG_TRANSFORMS,
+            UPDATE_ALL_TAG_ON_TAG_TRANSFORMS,
             UPDATE_ALL_BOUNDS,
             UPDATE_ALL_LODS,
             UPDATE_INSTANCE_MANAGERS,
@@ -996,6 +1003,14 @@ namespace Ogre {
             Must be unique for each worker thread
         */
         void updateAllTransformsThread( const UpdateTransformRequest &request, size_t threadIdx );
+
+        /// @see TagPoint::updateAllTransformsBoneToTag
+        void updateAllTransformsBoneToTagThread( const UpdateTransformRequest &request,
+                                                 size_t threadIdx );
+
+        /// @see TagPoint::updateAllTransformsTagOnTag
+        void updateAllTransformsTagOnTagThread( const UpdateTransformRequest &request,
+                                                size_t threadIdx );
 
         /** Updates the world aabbs from the given request inside a thread. @See updateAllTransforms
         @param threadIdx
@@ -1176,12 +1191,19 @@ namespace Ogre {
         */
         virtual void destroyAllLights(void);
 
+        /// Don't call this function directly. @see TagPoint::createChildTagPoint
+        virtual TagPoint* _createTagPoint( SceneNode *parent, NodeMemoryManager *nodeMemoryManager );
+
+        /// Creates a TagPoint that can be used like a SceneNode, or be used to be
+        /// attached to a Bone. @see Bone::addTagPoint
+        virtual TagPoint* createTagPoint(void);
+
         /** @see createSceneNode. This functions exists to satisfy @see SceneNode::createChildImpl
             Don't call this function directly
             @par
                 Parent to the scene node we're creating.
         */
-        virtual SceneNode* _createSceneNode( SceneNode *parent, SceneMemoryMgrTypes sceneType );
+        virtual SceneNode* _createSceneNode( SceneNode *parent, NodeMemoryManager *nodeMemoryManager );
 
         /** Creates an instance of a SceneNode.
             @remarks
@@ -1283,6 +1305,10 @@ namespace Ogre {
                            uint32 lightsPerCell, float minDistance, float maxDistance );
 
         Forward3D* getForward3D(void)                       { return mForward3DImpl; }
+
+        NodeMemoryManager& _getNodeMemoryManager(SceneMemoryMgrTypes sceneType)
+                                                                { return mNodeMemoryManager[sceneType]; }
+        NodeMemoryManager& _getTagPointNodeMemoryManager(void)  { return mTagPointNodeMemoryManager; }
 
         /** Retrieves the main entity memory manager.
         @remarks
@@ -1811,6 +1837,13 @@ namespace Ogre {
             could deadlock in the best of cases).
         */
         void updateAllTransforms();
+
+        /** Updates all TagPoints, both TagPoints that are children of bones, and TagPoints that
+            are children of other TagPoints.
+        @remarks
+            mTagPointNodeMemoryManagerUpdateList must be set. @see updateAllTransforms remarks
+        */
+        void updateAllTagPoints(void);
 
         /** Updates the world aabbs from all entities in the scene. Ought to be called right after
             updateAllTransforms. @See updateAllTransforms

@@ -95,7 +95,8 @@ namespace Ogre
 
     public:
         HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders );
-        HlmsUnlit(Archive *dataFolder, ArchiveVec *libraryFolders, HlmsTypes type,  IdString typeName);
+        HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders,
+                   HlmsTypes type, const String &typeName );
         ~HlmsUnlit();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );

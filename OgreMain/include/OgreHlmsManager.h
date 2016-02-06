@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsDatablock.h"
 #include "OgreHlmsSamplerblock.h"
+#if !OGRE_NO_JSON
+    #include "OgreScriptLoader.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -51,7 +54,11 @@ namespace Ogre
 #define OGRE_HLMS_MAX_BASIC_BLOCKS OGRE_HLMS_NUM_SAMPLERBLOCKS
 
     /** HLMS stands for "High Level Material System". */
-    class _OgreExport HlmsManager : public PassAlloc
+    class _OgreExport HlmsManager :
+        #if !OGRE_NO_JSON
+            public ScriptLoader,
+        #endif
+            public PassAlloc
     {
         Hlms    *mRegisteredHlms[HLMS_MAX];
         bool    mDeleteRegisteredOnExit[HLMS_MAX];
@@ -86,6 +93,10 @@ namespace Ogre
         HlmsDatablockMap mRegisteredDatablocks;
 
         HlmsTypes           mDefaultHlmsType;
+
+#if !OGRE_NO_JSON
+        StringVector mScriptPatterns;
+#endif
 
         void renderSystemDestroyAllBlocks(void);
         uint16 getFreeBasicBlock( uint8 type );
@@ -232,6 +243,31 @@ namespace Ogre
         bool getShadowMappingUseBackFaces(void)             { return mShadowMappingUseBackFaces; }
 
         void _changeRenderSystem( RenderSystem *newRs );
+
+#if !OGRE_NO_JSON
+        void loadMaterials( const String &filename, const char *jsonString );
+
+        /** Saves all materials of the registered Hlms at the given file location.
+        @param hlmsType
+            Hlms type. The type must be registered, otherwise it may crash.
+        @param filename
+            Valid file path.
+        */
+        void saveMaterials( HlmsTypes hlmsType,const String &filename );
+
+        /** Saves a specific Hlms material at the given file location.
+        @param datablock
+            Datablock/Material to save
+        @param filename
+            Valid file path.
+        */
+        void saveMaterial( const HlmsDatablock *datablock, const String &filename );
+
+        //ScriptLoader overloads
+        virtual void parseScript(DataStreamPtr& stream, const String& groupName);
+        virtual const StringVector& getScriptPatterns(void) const       { return mScriptPatterns; }
+        virtual Real getLoadingOrder(void) const;
+#endif
     };
     /** @} */
     /** @} */

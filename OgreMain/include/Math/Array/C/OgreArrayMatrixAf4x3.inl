@@ -223,6 +223,92 @@ namespace Ogre
         chunkBase[11]= posChunkBase[2];                     //m23 * pos.z
     }
     //-----------------------------------------------------------------------------------
+    inline void ArrayMatrixAf4x3::decomposition( ArrayVector3 &position, ArrayVector3 &scale,
+                                                 ArrayQuaternion &orientation ) const
+    {
+        const ArrayReal * RESTRICT_ALIAS chunkBase  = mChunkBase;
+        // build orthogonal matrix Q
+
+        ArrayReal m00 = mChunkBase[0], m01 = mChunkBase[1], m02 = mChunkBase[2];
+        ArrayReal m10 = mChunkBase[4], m11 = mChunkBase[5], m12 = mChunkBase[6];
+        ArrayReal m20 = mChunkBase[8], m21 = mChunkBase[9], m22 = mChunkBase[10];
+
+        ArrayReal fInvLength = 1.0f / sqrt( m00 * m00 + m10 * m10 + m20 * m20 );
+
+        ArrayReal q00, q01, q02,
+                  q10, q11, q12,
+                  q20, q21, q22; //3x3 matrix
+        q00 = m00 * fInvLength;
+        q10 = m10 * fInvLength;
+        q20 = m20 * fInvLength;
+
+        ArrayReal fDot = q00 * m01 + q10 * m11 + q20 * m21;
+        q01 = m01 - fDot * q00;
+        q11 = m11 - fDot * q10;
+        q21 = m21 - fDot * q20;
+
+        fInvLength = 1.0f / sqrt( q01 * q01 + q11 * q11 + q21 * q21 );
+
+        q01 *= fInvLength;
+        q11 *= fInvLength;
+        q21 *= fInvLength;
+
+        fDot = q00 * m02 + q10 * m12 + q20 * m22;
+        q02 = m02 - fDot * q00;
+        q12 = m12 - fDot * q10;
+        q22 = m22 - fDot * q20;
+
+        fDot = q01 * m02 + q11 * m12 + q21 * m22;
+        q02 = q02 - fDot * q01;
+        q12 = q12 - fDot * q11;
+        q22 = q22 - fDot * q21;
+
+        fInvLength = 1.0f / sqrt( q02 * q02 + q12 * q12 + q22 * q22 );
+
+        q02 *= fInvLength;
+        q12 *= fInvLength;
+        q22 *= fInvLength;
+
+        // guarantee that orthogonal matrix has determinant 1 (no reflections)
+        //fDet = q00*q11*q22 + q01*q12*q20 +
+        //       q02*q10*q21 - q02*q11*q20 -
+        //       q01*q10*q22 - q00*q12*q21;
+        ArrayReal fDet = (q00*q11*q22 + q01*q12*q20 + q02*q10*q21) -
+                         (q02*q11*q20 + q01*q10*q22 + q00*q12*q21);
+
+        //if ( fDet < 0.0 )
+        //{
+        //    for (size_t iRow = 0; iRow < 3; iRow++)
+        //        for (size_t iCol = 0; iCol < 3; iCol++)
+        //            kQ[iRow][iCol] = -kQ[iRow][iCol];
+        //}
+        fDet = fDet < 0 ? -1.0f : 1.0f;
+        q00 = q00 * fDet;
+        q01 = q01 * fDet;
+        q02 = q02 * fDet;
+        q10 = q10 * fDet;
+        q11 = q11 * fDet;
+        q12 = q12 * fDet;
+        q20 = q20 * fDet;
+        q21 = q21 * fDet;
+        q22 = q22 * fDet;
+
+        const ArrayReal matrix[9] = { q00, q01, q02,
+                                      q10, q11, q12,
+                                      q20, q21, q22 };
+        orientation.FromOrthoDet1RotationMatrix( matrix );
+
+        ArrayReal * RESTRICT_ALIAS scaleChunkBase = scale.mChunkBase;
+        scaleChunkBase[0] = q00 * m00 + q10 * m10 + q20 * m20;
+        scaleChunkBase[1] = q01 * m01 + q11 * m11 + q21 * m21;
+        scaleChunkBase[2] = q02 * m02 + q12 * m12 + q22 * m22;
+
+        ArrayReal * RESTRICT_ALIAS posChunkBase = position.mChunkBase;
+        posChunkBase[0] = chunkBase[3];
+        posChunkBase[1] = chunkBase[7];
+        posChunkBase[2] = chunkBase[11];
+    }
+    //-----------------------------------------------------------------------------------
     inline void ArrayMatrixAf4x3::setToInverse(void)
     {
         ArrayReal m10 = mChunkBase[4], m11 = mChunkBase[5], m12 = mChunkBase[6];
@@ -441,6 +527,17 @@ namespace Ogre
             mChunkBase[i+1] = src->_m[i+1];
             mChunkBase[i+2] = src->_m[i+2];
             mChunkBase[i+3] = src->_m[i+3];
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * * RESTRICT_ALIAS src )
+    {
+        for( int i=0; i<12; i+= 4 )
+        {
+            mChunkBase[i  ] = src[0]->_m[i  ];
+            mChunkBase[i+1] = src[0]->_m[i+1];
+            mChunkBase[i+2] = src[0]->_m[i+2];
+            mChunkBase[i+3] = src[0]->_m[i+3];
         }
     }
     //-----------------------------------------------------------------------------------

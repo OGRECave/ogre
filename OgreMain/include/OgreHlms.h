@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 #include "OgreHlmsCommon.h"
 #include "OgreHlmsPso.h"
+#if !OGRE_NO_JSON
+    #include "OgreHlmsJson.h"
+#endif
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -156,6 +159,7 @@ namespace Ogre
 
         HlmsTypes       mType;
         IdString        mTypeName;
+        String          mTypeNameStr;
 
         /** Inserts common properties about the current Renderable,
             such as hlms_skeleton hlms_uv_count, etc
@@ -303,12 +307,13 @@ namespace Ogre
             Path to folders to be processed first for collecting pieces. Will be processed in order.
             Pointer can be null.
         */
-        Hlms( HlmsTypes type, IdString typeName, Archive *dataFolder,
+        Hlms(HlmsTypes type, const String &typeName, Archive *dataFolder,
               ArchiveVec *libraryFolders );
         virtual ~Hlms();
 
         HlmsTypes getType(void) const                       { return mType; }
         IdString getTypeName(void) const                    { return mTypeName; }
+        const String& getTypeNameStr(void) const            { return mTypeNameStr; }
         void _notifyManager( HlmsManager *manager )         { mHlmsManager = manager; }
         HlmsManager* getHlmsManager(void) const             { return mHlmsManager; }
 
@@ -328,6 +333,24 @@ namespace Ogre
         */
         void setHighQuality( bool highQuality );
         bool getHighQuality(void) const                     { return mHighQuality; }
+
+#if !OGRE_NO_JSON
+        /** Loads datablock values from a JSON value. @see HlmsJson.
+        @param jsonValue
+            JSON Object containing the definition of this datablock.
+        @param blocks
+            All the loaded Macro-, Blend- & Samplerblocks the JSON has
+            defined and may be referenced by the datablock declaration.
+        @param datablock
+            Datablock to fill the values.
+        */
+        virtual void _loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
+                                HlmsDatablock *datablock ) const {}
+        virtual void _saveJson( const HlmsDatablock *datablock, String &outString ) const {}
+
+        virtual void _collectSamplerblocks( set<const HlmsSamplerblock*>::type &outSamplerblocks,
+                                            const HlmsDatablock *datablock ) const {}
+#endif
 
         /** Destroys all the cached shaders and in the next opportunity will recreate them
             from the new location. This is very useful for fast iteration and real-time

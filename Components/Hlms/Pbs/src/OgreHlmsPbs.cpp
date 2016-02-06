@@ -33,6 +33,10 @@ THE SOFTWARE.
 #include "OgreHlmsManager.h"
 #include "OgreHlmsListener.h"
 
+#if !OGRE_NO_JSON
+    #include "OgreHlmsJsonPbs.h"
+#endif
+
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
 #include "OgreHighLevelGpuProgramManager.h"
@@ -1417,6 +1421,27 @@ namespace Ogre
     {
         mAmbientLightMode = mode;
     }
+#if !OGRE_NO_JSON
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::_loadJson( const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
+                             HlmsDatablock *datablock ) const
+    {
+        HlmsJsonPbs jsonPbs( mHlmsManager );
+        jsonPbs.loadMaterial( jsonValue, blocks, datablock );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::_saveJson( const HlmsDatablock *datablock, String &outString ) const
+    {
+        HlmsJsonPbs jsonPbs( mHlmsManager );
+        jsonPbs.saveMaterial( datablock, outString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbs::_collectSamplerblocks( set<const HlmsSamplerblock*>::type &outSamplerblocks,
+                                         const HlmsDatablock *datablock ) const
+    {
+        HlmsJsonPbs::collectSamplerblocks( datablock, outSamplerblocks );
+    }
+#endif
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsPbs::createDatablockImpl( IdString datablockName,
                                                        const HlmsMacroblock *macroblock,

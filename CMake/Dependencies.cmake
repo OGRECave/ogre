@@ -101,6 +101,10 @@ if (UNIX AND NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
   mark_as_advanced(XAW_LIBRARY)
 endif ()
 
+# Find rapidjson
+find_package(Rapidjson)
+macro_log_feature(Rapidjson_FOUND "rapidjson" "C++ JSON parser" "http://rapidjson.org/" FALSE "" "")
+
 
 #######################################################################
 # RenderSystem dependencies
@@ -301,6 +305,7 @@ include_directories(
   ${ZZip_INCLUDE_DIRS}
   ${FreeImage_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS}
+  ${Rapidjson_INCLUDE_DIRS}
   ${OPENGL_INCLUDE_DIRS}
   ${OPENGLES_INCLUDE_DIRS}
   ${OPENGLES2_INCLUDE_DIRS}

@@ -45,10 +45,14 @@ namespace Ogre {
         // Note MUST be added in reverse order so latest is first in the list
 
         mVersionData.push_back(OGRE_NEW MeshVersionData(
-            MESH_VERSION_2_1, "[MeshSerializer_v2.1 R1]",
+            MESH_VERSION_2_1, "[MeshSerializer_v2.1 R2]",
             OGRE_NEW MeshSerializerImpl( vaoManager )));
 
-        //This format will be removed on release
+        //These formats will be removed on release
+        mVersionData.push_back(OGRE_NEW MeshVersionData(
+            MESH_VERSION_LEGACY, "[MeshSerializer_v2.1 R1]",
+            OGRE_NEW MeshSerializerImpl_v2_1_R1( vaoManager )));
+
         mVersionData.push_back(OGRE_NEW MeshVersionData(
             MESH_VERSION_LEGACY, "[MeshSerializer_v2.1]",
             OGRE_NEW MeshSerializerImpl_v2_1_R0( vaoManager )));

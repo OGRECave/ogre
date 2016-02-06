@@ -1023,9 +1023,6 @@ namespace v1
     {
         // Retrieve data to copy bone assignments
         const Mesh::VertexBoneAssignmentList& boneAssignments = mesh->getBoneAssignments();
-        Mesh::VertexBoneAssignmentList::const_iterator it = boneAssignments.begin();
-        Mesh::VertexBoneAssignmentList::const_iterator end = boneAssignments.end();
-        size_t curVertexOffset = 0;
 
         // Access shared vertices
         VertexData* sharedVertexData = mesh->sharedVertexData[VpNormal];
@@ -1082,18 +1079,22 @@ namespace v1
             subMesh->vertexData[VpNormal] = newVertexData;
 
             // Transfer bone assignments to the submesh
-            size_t offset = curVertexOffset + newVertexData->vertexCount;
-            for (; it != end; ++it)
+            Mesh::VertexBoneAssignmentList::const_iterator itor = boneAssignments.begin();
+            Mesh::VertexBoneAssignmentList::const_iterator end  = boneAssignments.end();
+            IndicesMap::const_iterator enVertIdx = indicesMap.end();
+            while( itor != end )
             {
-                size_t vertexIdx = (*it).first;
-                if (vertexIdx > offset)
-                    break;
+                VertexBoneAssignment boneAssignment = (*itor).second;
+                IndicesMap::const_iterator itVertIdx = indicesMap.find( boneAssignment.vertexIndex );
 
-                VertexBoneAssignment boneAssignment = (*it).second;
-                boneAssignment.vertexIndex = static_cast<unsigned int>(boneAssignment.vertexIndex - curVertexOffset);
-                subMesh->addBoneAssignment(boneAssignment);
+                if( itVertIdx != enVertIdx )
+                {
+                    boneAssignment.vertexIndex = itVertIdx->second;
+                    subMesh->addBoneAssignment(boneAssignment);
+                }
+
+                ++itor;
             }
-            curVertexOffset = newVertexData->vertexCount + 1;
         }
 
         // Release shared vertex data

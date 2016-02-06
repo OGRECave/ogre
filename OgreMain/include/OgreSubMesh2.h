@@ -105,8 +105,9 @@ namespace Ogre {
         /// Flag indicating that bone assignments need to be recompiled
         bool    mBoneAssignmentsOutOfDate;
 
-        uint8 rationaliseBoneAssignments( size_t vertexCount );
-
+        /// Limits mBoneAssignments to OGRE_MAX_BLEND_WEIGHTS and
+        /// if we need to strip, normalizes all weights to sum 1.
+        uint8 rationaliseBoneAssignments(void);
 
     public:
         SubMesh();
@@ -137,9 +138,28 @@ namespace Ogre {
         */
         const VertexBoneAssignmentVec& getBoneAssignments() { return mBoneAssignments; }
 
+        /// Must be called once to compile bone assignments into geometry buffer.
+        //void _compileBoneAssignments(void);
 
-        /** Must be called once to compile bone assignments into geometry buffer. */
-        void _compileBoneAssignments(void);
+        /// Builds mBlendIndexToBoneIndexMap based on mBoneAssignments.
+        /// mBlendIndexToBoneIndexMap is necessary for enabling skeletal animation.
+        void _buildBoneIndexMap(void);
+
+        /// Populates mBoneAssignments by reading the vertex data.
+        /// See the other overload.
+        void _buildBoneAssignmentsFromVertexData(void);
+
+        /** Populates mBoneAssignments by reading the vertex data.
+            This version accepts an external buffer in case you already have
+            the vertex data on CPU (instead of having to bring it back from GPU)
+        @remarks
+            mBlendIndexToBoneIndexMap MUST be up to date. OTHERWISE IT MAY CRASH.
+            Despite accepting external vertexData, mVao must be correctly
+            populated with information about vertexData
+        @param vertexData
+            Vertex data with blend indices and weights.
+        */
+        void _buildBoneAssignmentsFromVertexData( uint8 const *vertexData );
 
         /** Makes a copy of this submesh object and gives it a new name.
         @param newName

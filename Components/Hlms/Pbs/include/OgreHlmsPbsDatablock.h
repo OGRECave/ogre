@@ -43,6 +43,16 @@ namespace Ogre
     *  @{
     */
 
+    /// Used by JSON serialization, but can also be used outside of it.
+    /// @see HlmsPbsDatablock::_setTextures
+    struct PackedTexture
+    {
+        TexturePtr  texture;
+        uint16      xIdx;
+        HlmsSamplerblock const * samplerblock;
+        PackedTexture() : xIdx( NUM_PBSM_TEXTURE_TYPES ), samplerblock( 0 ) {}
+    };
+
     struct PbsBakedTexture
     {
         TexturePtr              texture;
@@ -371,6 +381,15 @@ namespace Ogre
         /// Whether the same fresnel term is used for RGB, or individual ones for each channel
         bool hasSeparateFresnel(void) const;
 
+        /** Advanced function for setting all textures at once,
+            instead of one by one, for performance reasons.
+        @param packedTextures
+            The reference count in packedTextures[i].samplerblock is assumed to have already been
+            increased prior to calling this function. We will not increase.
+            If null, a default samplerblock will be assigned
+        */
+        void _setTextures( const PackedTexture packedTextures[] );
+
         /** Sets a new texture for rendering. Calling this function may trigger an
             HlmsDatablock::flushRenderables if the texture or the samplerblock changes.
             Won't be called if only the arrayIndex changes
@@ -391,6 +410,10 @@ namespace Ogre
 
         TexturePtr getTexture( PbsTextureTypes texType ) const;
         TexturePtr getTexture( size_t texType ) const;
+
+        /// Returns the internal index to the array in a texture array.
+        /// Note: If there is no texture assigned to the given texType, returned value is undefined
+        uint16 _getTextureIdx( PbsTextureTypes texType ) const          { return mTexIndices[texType]; }
 
         /** Sets a new sampler block to be associated with the texture
             (i.e. filtering mode, addressing modes, etc). If the samplerblock changes,
@@ -416,6 +439,8 @@ namespace Ogre
         */
         void setTextureUvSource( PbsTextureTypes sourceType, uint8 uvSet );
 
+        uint8 getTextureUvSource( PbsTextureTypes sourceType ) const;
+
         /** Changes the blend mode of the detail map. Calling this function triggers a
             HlmsDatablock::flushRenderables even if you never use detail maps (they
             affect the cache's hash)
@@ -427,6 +452,8 @@ namespace Ogre
             Blend mode
         */
         void setDetailMapBlendMode( uint8 detailMapIdx, PbsBlendModes blendMode );
+
+        PbsBlendModes getDetailMapBlendMode( uint8 detailMapIdx ) const;
 
         /** Sets the normal mapping weight. The range doesn't necessarily have to be in [0; 1]
         @remarks

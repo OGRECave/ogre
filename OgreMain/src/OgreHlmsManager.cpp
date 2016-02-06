@@ -33,6 +33,9 @@ THE SOFTWARE.
 #include "OgreHlmsTextureManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreLogManager.h"
+#if !OGRE_NO_JSON
+    #include "OgreResourceGroupManager.h"
+#endif
 
 namespace Ogre
 {
@@ -82,10 +85,19 @@ namespace Ogre
             mInputLayouts[i].refCount = 0;
             mFreeInputLayouts.push_back( (OGRE_HLMS_NUM_INPUT_LAYOUTS - 1) - i );
         }
+
+#if !OGRE_NO_JSON
+        mScriptPatterns.push_back( "*.material.json" );
+        ResourceGroupManager::getSingleton()._registerScriptLoader(this);
+#endif
     }
     //-----------------------------------------------------------------------------------
     HlmsManager::~HlmsManager()
     {
+#if !OGRE_NO_JSON
+        ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
+#endif
+
         renderSystemDestroyAllBlocks();
 
         OGRE_DELETE mTextureManager;
@@ -597,5 +609,58 @@ namespace Ogre
                 mRegisteredHlms[i]->_changeRenderSystem( newRs );
         }
     }
+#if !OGRE_NO_JSON
     //-----------------------------------------------------------------------------------
+    void HlmsManager::loadMaterials( const String &filename, const char *jsonString )
+    {
+        HlmsJson hlmsJson( this );
+        hlmsJson.loadMaterials( filename, jsonString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::saveMaterials( HlmsTypes hlmsType, const String &filename )
+    {
+        assert( hlmsType != HLMS_MAX );
+        assert( hlmsType != HLMS_LOW_LEVEL );
+
+        String jsonString;
+        HlmsJson hlmsJson( this );
+        hlmsJson.saveMaterials( mRegisteredHlms[hlmsType], jsonString );
+
+        std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out );
+        if( file.is_open() )
+            file.write( jsonString.c_str(), jsonString.size() );
+        file.close();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::saveMaterial( const HlmsDatablock *datablock, const String &filename )
+    {
+        String jsonString;
+        HlmsJson hlmsJson( this );
+        hlmsJson.saveMaterial( datablock, jsonString );
+
+        std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out );
+        if( file.is_open() )
+            file.write( jsonString.c_str(), jsonString.size() );
+        file.close();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::parseScript(DataStreamPtr& stream, const String& groupName)
+    {
+        vector<char>::type fileData;
+        fileData.resize( stream->size() + 1 );
+        if( !fileData.empty() )
+        {
+            stream->read( &fileData[0], stream->size() );
+
+            //Add null terminator just in case (to prevent bad input)
+            fileData.back() = '\0';
+            loadMaterials( stream->getName(), &fileData[0] );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    Real HlmsManager::getLoadingOrder(void) const
+    {
+        return 100;
+    }
+#endif
 }

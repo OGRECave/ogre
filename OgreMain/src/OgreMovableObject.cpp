@@ -69,6 +69,8 @@ namespace Ogre {
         , mGlobalIndex( -1 )
         , mParentIndex( -1 )
     {
+        assert(renderQueueId >= 0 && renderQueueId <= 254);
+
         if (Root::getSingletonPtr())
             mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
 
@@ -272,6 +274,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MovableObject::setRenderQueueGroup(uint8 queueID)
     {
+        assert(queueID >= 0 && queueID <= 254);
+
         if( mRenderQueueID != queueID )
             mObjectMemoryManager->objectMoved( mObjectData, mRenderQueueID, queueID );
 

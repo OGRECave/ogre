@@ -64,7 +64,8 @@ namespace Ogre
         //Override defaults
         mLightGatheringMode = LightGatherNone;
     }
-    HlmsUnlit::HlmsUnlit(Archive *dataFolder, ArchiveVec *libraryFolders, HlmsTypes type, IdString typeName) :
+    HlmsUnlit::HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders,
+                          HlmsTypes type, const String &typeName ) :
         HlmsBufferManager(type, typeName, dataFolder, libraryFolders),
         ConstBufferPool(HlmsUnlitDatablock::MaterialSizeInGpuAligned,
         ExtraBufferParams(64 * NUM_UNLIT_TEXTURE_TYPES)),

@@ -302,7 +302,9 @@ namespace Ogre
             vector<Bone>::type::iterator end  = boneNodes.end();
             while( boneNodeItor != end )
             {
-                boneNodeItor->_deinitialize();
+                //Don't check LIFO Order since the BoneMemoryManager dies with us.
+                const bool debugCheckLifoOrder = false;
+                boneNodeItor->_deinitialize( debugCheckLifoOrder );
                 ++boneNodeItor;
             }
         }

@@ -44,7 +44,7 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-    class _OgreD3D11Export D3D11RenderWindowBase
+    class _OgreD3D11Export D3D11RenderWindowBase 
         : public RenderWindow
     {
     public:
@@ -90,6 +90,7 @@ namespace Ogre
         bool    mSizing;
         bool    mClosed;
         bool    mHidden;
+        bool    mAlwaysWindowedMode;
 
         DXGI_SAMPLE_DESC mFSAAType;     // Effective FSAA mode, limited by hardware capabilities
 
@@ -119,7 +120,7 @@ namespace Ogre
         void setVSyncEnabled(bool vsync)                        { mVSync = vsync; }
         bool isVSyncEnabled() const                             { return mVSync || mUseFlipSequentialMode; }
         void setVSyncInterval(unsigned interval)                { mVSyncInterval = interval; }
-        unsigned getVSyncInterval() const                       { return mVSyncInterval; }
+        unsigned int  getVSyncInterval() const                  { return mVSyncInterval; }
 
         void swapBuffers();
 
@@ -150,7 +151,7 @@ namespace Ogre
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 
-    class _OgreD3D11Export D3D11RenderWindowHwnd
+    class _OgreD3D11Export D3D11RenderWindowHwnd 
         : public D3D11RenderWindowSwapChainBased
     {
     public:
@@ -185,6 +186,10 @@ namespace Ogre
         void setActive(bool state);
 
         static bool IsWindows8OrGreater();
+
+        typedef vector<HMONITOR>::type DisplayMonitorList;
+
+        static BOOL CALLBACK sCreateMonitorsInfoEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMonitor, LPARAM dwData);
 
     protected:
         HWND                    mHWnd;                          // Win32 window handle
@@ -236,7 +241,7 @@ namespace Ogre
         virtual void destroy(void);
 
         virtual void resize(unsigned int width, unsigned int height);
-        virtual void update();
+        virtual void update(bool swapBuffers = true);
         virtual void swapBuffers();
 
         virtual bool isVisible() const                          { return mImageSourceNative != NULL; }

@@ -273,6 +273,11 @@ namespace Ogre
         /// after this call may result in garbage.
         void destroyTexture( IdString aliasName );
 
+        /// Finds the alias name of a texture given its TextureLocation. Useful for retrieving
+        /// back the name of a texture as it was called via createOrRetrieveTexture.
+        /// Returns null if not found.
+        const String* findAliasName( const TextureLocation &textureLocation ) const;
+
         void createFromTexturePack( const HlmsTexturePack &pack );
 
         /// Returns the precreated blank texture

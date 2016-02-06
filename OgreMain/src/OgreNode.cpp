@@ -111,6 +111,22 @@ namespace Ogre {
         return mParent;
     }
     //-----------------------------------------------------------------------
+    void Node::migrateTo( NodeMemoryManager *nodeMemoryManager )
+    {
+        NodeVec::const_iterator itor = mChildren.begin();
+        NodeVec::const_iterator end  = mChildren.end();
+
+        while( itor != end )
+        {
+            (*itor)->migrateTo( nodeMemoryManager );
+            ++itor;
+        }
+
+        mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, nodeMemoryManager );
+        mNodeMemoryManager = nodeMemoryManager;
+        _callMemoryChangeListeners();
+    }
+    //-----------------------------------------------------------------------
     bool Node::isStatic() const
     {
         return mNodeMemoryManager->getMemoryManagerType() == SCENE_STATIC;
@@ -150,9 +166,21 @@ namespace Ogre {
 
             mDepthLevel = mParent->mDepthLevel + 1;
             mTransform.mParents[mTransform.mIndex] = parent;
-            mNodeMemoryManager->nodeAttached( mTransform, mDepthLevel );
 
-            if( oldDepthLevel != mDepthLevel )
+            const bool differentNodeMemoryManager = mParent->mNodeMemoryManager != mNodeMemoryManager;
+
+            if( differentNodeMemoryManager )
+            {
+                mNodeMemoryManager->migrateToAndAttach( mTransform, mDepthLevel,
+                                                        mParent->mNodeMemoryManager );
+                mNodeMemoryManager = mParent->mNodeMemoryManager;
+            }
+            else
+            {
+                mNodeMemoryManager->nodeAttached( mTransform, mDepthLevel );
+            }
+
+            if( oldDepthLevel != mDepthLevel || differentNodeMemoryManager )
             {
                 //Propagate the change to our children
                 NodeVec::const_iterator itor = mChildren.begin();
@@ -179,11 +207,25 @@ namespace Ogre {
 
             mParent = 0;
 
-            //NodeMemoryManager will set mTransform.mParents to a dummy parent node
-            //(as well as transfering the memory)
-            mNodeMemoryManager->nodeDettached( mTransform, mDepthLevel );
+            NodeMemoryManager *defaultNodeMemoryManager =
+                    getDefaultNodeMemoryManager( mNodeMemoryManager->getMemoryManagerType() );
 
-            if( mDepthLevel != 0 )
+            const bool differentNodeMemoryManager = defaultNodeMemoryManager != mNodeMemoryManager;
+
+            if( differentNodeMemoryManager )
+            {
+                mNodeMemoryManager->migrateToAndDetach( mTransform, mDepthLevel,
+                                                        defaultNodeMemoryManager );
+                mNodeMemoryManager = defaultNodeMemoryManager;
+            }
+            else
+            {
+                //NodeMemoryManager will set mTransform.mParents to a dummy parent node
+                //(as well as transfering the memory)
+                mNodeMemoryManager->nodeDettached( mTransform, mDepthLevel );
+            }
+
+            if( mDepthLevel != 0 || differentNodeMemoryManager )
             {
                 mDepthLevel = 0;
 
@@ -204,8 +246,20 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Node::parentDepthLevelChanged(void)
     {
-        mNodeMemoryManager->nodeMoved( mTransform, mDepthLevel, mParent->mDepthLevel + 1 );
+        if( mNodeMemoryManager != mParent->mNodeMemoryManager )
+        {
+            mNodeMemoryManager->migrateTo( mTransform, mDepthLevel, mParent->mDepthLevel + 1,
+                                           mParent->mNodeMemoryManager );
+            mNodeMemoryManager = mParent->mNodeMemoryManager;
+        }
+        else
+        {
+            mNodeMemoryManager->nodeMoved( mTransform, mDepthLevel, mParent->mDepthLevel + 1 );
+        }
+
         mDepthLevel = mParent->mDepthLevel + 1;
+
+        _callMemoryChangeListeners();
 
         //Keep propagating changes to our children
         NodeVec::const_iterator itor = mChildren.begin();

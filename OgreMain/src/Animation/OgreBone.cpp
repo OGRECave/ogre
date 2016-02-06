@@ -27,6 +27,7 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "Animation/OgreBone.h"
+#include "Animation/OgreTagPoint.h"
 #include "OgreNode.h"
 #include "OgreLogManager.h"
 
@@ -96,12 +97,28 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Bone::_deinitialize(void)
+    void Bone::_deinitialize( bool debugCheckLifoOrder )
     {
-#ifdef NDEBUG
+        TagPointVec::const_iterator itor = mTagPointChildren.begin();
+        TagPointVec::const_iterator end  = mTagPointChildren.end();
+
+        while( itor != end )
+        {
+            (*itor)->_unsetParentBone();
+            (*itor)->mParentIndex = -1;
+            ++itor;
+        }
+
+        mTagPointChildren.clear();
+
+#ifndef NDEBUG
+        //Calling mParent->removeChild() is not necessary during Release mode at all,
+        //However we need to call this->_deinitialize in LIFO order (children first,
+        //then parents). We check that here via this assert.
+        //And for the assert to work, we need to call removeChild.
         if( mParent )
             mParent->removeChild( this );
-        assert( mChildren.empty() );
+        assert( mChildren.empty() || !debugCheckLifoOrder );
 #endif
 
         if( mBoneMemoryManager )
@@ -156,6 +173,37 @@ namespace Ogre {
         {
             (*itor)->resetParentTransformPtr();
             ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void Bone::addTagPoint( TagPoint *tagPoint )
+    {
+        tagPoint->_setParentBone( this );
+        mTagPointChildren.push_back( tagPoint );
+        tagPoint->mParentIndex = mTagPointChildren.size() - 1u;
+    }
+    //-----------------------------------------------------------------------
+    void Bone::removeTagPoint( TagPoint *child )
+    {
+        assert( child->getParentBone() == this && "TagPoint says it's not our child (We're Bone)" );
+        assert( child->mParentIndex < mTagPointChildren.size() && "mParentIndex was out of date!!!" );
+
+        if( child->mParentIndex < mChildren.size() )
+        {
+            TagPointVec::iterator itor = mTagPointChildren.begin() + child->mParentIndex;
+
+            assert( child == *itor && "mParentIndex was out of date!!!" );
+
+            if( child == *itor )
+            {
+                itor = efficientVectorRemove( mTagPointChildren, itor );
+                child->_unsetParentBone();
+                child->mParentIndex = -1;
+
+                //The node that was at the end got swapped and has now a different index
+                if( itor != mTagPointChildren.end() )
+                    (*itor)->mParentIndex = itor - mTagPointChildren.begin();
+            }
         }
     }
     //-----------------------------------------------------------------------

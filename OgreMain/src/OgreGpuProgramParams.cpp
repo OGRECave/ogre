@@ -3496,7 +3496,7 @@ namespace Ogre
                     }
                     // we'll use this map to resolve autos later
                     // ignore the [0] aliases
-                    if (!StringUtil::endsWith(paramName, "[0]"))
+                    if (!StringUtil::endsWith(paramName, "[0]") && this->getAutoConstantDefinition(paramName))
                         srcToDestNamedMap[olddef.physicalIndex] = paramName;
                 }
             }

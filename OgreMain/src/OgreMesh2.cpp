@@ -531,12 +531,10 @@ namespace Ogre {
 
         mSubMeshNameMap = mesh->getSubMeshNameMap();
 
+        mSkeletonName = mesh->getSkeletonName();
         v1::SkeletonPtr v1Skeleton = mesh->getOldSkeleton();
         if( !v1Skeleton.isNull() )
-        {
             mSkeleton = SkeletonManager::getSingleton().getSkeletonDef( v1Skeleton.get() );
-            mSkeletonName = mSkeleton->getName();
-        }
 
         //So far we only import manual LOD levels. If the mesh had manual LOD levels,
         //mLodValues will have more entries than Vaos, causing an out of bounds exception.

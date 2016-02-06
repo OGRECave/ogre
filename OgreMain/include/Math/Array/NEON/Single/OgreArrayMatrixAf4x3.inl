@@ -667,7 +667,7 @@ namespace Ogre
                             this->mChunkBase[10], this->mChunkBase[11] );
     }
     //-----------------------------------------------------------------------------------
-    inline void ArrayMatrixAf4x3::loadFromAoS( const SimpleMatrixAf4x3 * * RESTRICT_ALIAS src )
+    inline void ArrayMatrixAf4x3::loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS * src )
     {
         _MM_TRANSPOSE4_SRC_DST_PS(
                             src[0]->mChunkBase[0], src[1]->mChunkBase[0],

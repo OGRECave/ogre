@@ -470,7 +470,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     Vector3 HlmsPbsDatablock::getDiffuse(void) const
     {
-        return Vector3( mkDr, mkDg, mkDb );
+        return Vector3( mkDr, mkDg, mkDb ) * Ogre::Math::PI;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setSpecular( const Vector3 &specularColour )
@@ -569,6 +569,40 @@ namespace Ogre
     bool HlmsPbsDatablock::hasSeparateFresnel(void) const
     {
         return mFresnelTypeSizeBytes != 4;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::_setTextures( const PackedTexture packedTextures[NUM_PBSM_TEXTURE_TYPES] )
+    {
+        PbsBakedTexture textures[NUM_PBSM_TEXTURE_TYPES];
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        for( int i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
+        {
+            if( mSamplerblocks[i] )
+                hlmsManager->destroySamplerblock( mSamplerblocks[i] );
+
+            mTexIndices[i] = packedTextures[i].xIdx;
+            textures[i] = PbsBakedTexture( packedTextures[i].texture, packedTextures[i].samplerblock );
+
+            if( !textures[i].texture.isNull() && !textures[i].samplerBlock )
+            {
+                HlmsSamplerblock samplerBlockRef;
+                if( i >= PBSM_DETAIL0 && i <= PBSM_DETAIL3_NM )
+                {
+                    //Detail maps default to wrap mode.
+                    samplerBlockRef.mU = TAM_WRAP;
+                    samplerBlockRef.mV = TAM_WRAP;
+                    samplerBlockRef.mW = TAM_WRAP;
+                }
+
+                textures[i].samplerBlock = hlmsManager->getSamplerblock( samplerBlockRef );
+            }
+
+            mSamplerblocks[i] = packedTextures[i].samplerblock;
+        }
+
+        bakeTextures( textures );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setTexture( PbsTextureTypes texType, uint16 arrayIndex,
@@ -681,6 +715,12 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    uint8 HlmsPbsDatablock::getTextureUvSource( PbsTextureTypes sourceType ) const
+    {
+        assert( sourceType < NUM_PBSM_SOURCES );
+        return mUvSource[sourceType];
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDetailMapBlendMode( uint8 detailMapIdx, PbsBlendModes blendMode )
     {
         assert( detailMapIdx < 4 );
@@ -690,6 +730,12 @@ namespace Ogre
             mBlendModes[detailMapIdx] = blendMode;
             flushRenderables();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    PbsBlendModes HlmsPbsDatablock::getDetailMapBlendMode( uint8 detailMapIdx ) const
+    {
+        assert( detailMapIdx < 4 );
+        return static_cast<PbsBlendModes>( mBlendModes[detailMapIdx] );
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDetailNormalWeight( uint8 detailNormalMapIdx, Real weight )
