@@ -55,19 +55,6 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 	@piece( SamplerDetailWeightMap )texture( textureMaps[@value(detail_weight_map_idx)], vec3(inPs.uv@value(uv_detail_weight).xy, weightMapIdx) )@end
 @end
 
-
-// Get the indexes to the textureMaps[] array using template code. We had to add 1
-// to the actual value otherwise property( diffuse_map ) fails when the index is 0
-@sub( diffuse_map_idx, diffuse_map, 1 )
-@sub( normal_map_tex_idx, normal_map_tex, 1 )
-@sub( specular_map_idx, specular_map, 1 )
-@sub( roughness_map_idx, roughness_map, 1 )
-@sub( detail_weight_map_idx, detail_weight_map, 1 )
-@foreach( 4, n )
-	@sub( detail_map@n_idx, detail_map@n, 1 )@end
-@foreach( 4, n )
-	@sub( detail_map_nm@n_idx, detail_map_nm@n, 1 )@end
-
 @property( envmap_scale )
 	@piece( ApplyEnvMapScale )* pass.ambientUpperHemi.w@end
 @end
