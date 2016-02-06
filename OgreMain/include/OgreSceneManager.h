@@ -3220,6 +3220,7 @@ namespace Ogre {
 
         /** See SceneQuery. */
         void execute(SceneQueryListener* listener);
+        bool execute(ObjectData objData, size_t numNodes, SceneQueryListener* listener);
     };
     /** Default implementation of AxisAlignedBoxSceneQuery. */
     class _OgreExport DefaultAxisAlignedBoxSceneQuery : public AxisAlignedBoxSceneQuery
