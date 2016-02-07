@@ -471,6 +471,32 @@ namespace Ogre {
     {
         assert(mFirstRq < mLastRq && "This query will never hit any result!");
 
+        //Create a SIMD friendly version of all our planes
+        size_t totalPlanes = 0;
+        for (size_t i = 0; i < mVolumes.size(); ++i)
+        {
+            totalPlanes += mVolumes[i].planes.size();
+        }
+
+        mSimdPlaneList = RawSimdUniquePtr<ArrayPlane, MEMCATEGORY_GENERAL>(totalPlanes);
+        {
+            ArrayPlane * RESTRICT_ALIAS planes = mSimdPlaneList.get();
+            totalPlanes = 0;
+            for (size_t i = 0; i < mVolumes.size(); ++i)
+            {
+                for (size_t j = 0; j < mVolumes[i].planes.size(); ++j)
+                {
+                    Plane plane = mVolumes[i].planes[j];
+                    ArrayPlane arrayPlane;
+                    arrayPlane.planeNormal.setAll(plane.normal);
+                    arrayPlane.signFlip.setAll(plane.normal);
+                    arrayPlane.signFlip.setToSign();
+                    arrayPlane.planeNegD = Mathlib::SetAll(-plane.d);
+                    planes[totalPlanes++] = arrayPlane;
+                }
+            }
+        }
+
         for (size_t i = 0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i)
         {
             ObjectMemoryManager &memoryManager = mParentSceneMgr->_getEntityMemoryManager(
@@ -494,33 +520,7 @@ namespace Ogre {
     bool DefaultPlaneBoundedVolumeListSceneQuery::execute(ObjectData objData, size_t numNodes, SceneQueryListener* listener)
     {
         ArrayInt ourQueryMask = Mathlib::SetAll(mQueryMask);
-
-        //create SIMD friendly version of the volumes
-        struct ArrayPlane
-        {
-            ArrayVector3    planeNormal;
-            ArrayVector3    signFlip;
-            ArrayReal       planeNegD;
-        };
-
-        std::vector<std::vector<ArrayPlane>> volumeList;
-        for (size_t i = 0; i < mVolumes.size(); ++i)
-        {
-            assert(mVolumes[i].planes.size() > 0 && "Its assumed that a volume will always have at least one plane");
-
-            std::vector<ArrayPlane> volume;
-            for (size_t j = 0; j < mVolumes[i].planes.size(); j++)
-            {
-                Plane plane = mVolumes[i].planes[j];
-                ArrayPlane arrayPlane;
-                arrayPlane.planeNormal.setAll(plane.normal);
-                arrayPlane.signFlip.setAll(plane.normal);
-                arrayPlane.signFlip.setToSign();
-                arrayPlane.planeNegD = Mathlib::SetAll(-plane.d);
-                volume.push_back(arrayPlane);
-            }
-            volumeList.push_back(volume);
-        }
+        const ArrayPlane * RESTRICT_ALIAS planes = mSimdPlaneList.get();
 
         for (size_t n = 0; n<numNodes; n += ARRAY_PACKED_REALS)
         {
@@ -529,26 +529,21 @@ namespace Ogre {
             ArrayInt * RESTRICT_ALIAS queryFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
                 (objData.mQueryFlags);
 
-
-            for (size_t v = 0; v < volumeList.size(); ++v)
+            ArrayMaskR allVolumesMask = BooleanMask4::getMask(false, false, false, false);
+            size_t planeCounter = 0;
+            for (size_t v = 0; v < mVolumes.size(); ++v)
             {
                 //For each volume test all planes and AND the dot product. If one is false, then we dont intersect with this volume
+                ArrayMaskR singleVolumeMask = BooleanMask4::getMask(true, true, true, true);
                 ArrayReal dotResult;
-                ArrayMaskR mask;
                 ArrayVector3 centerPlusFlippedHS;
-                ArrayMaskI hitMask;
-
-                centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
-                    volumeList[v][0].signFlip;
-                dotResult = volumeList[v][0].planeNormal.dotProduct(centerPlusFlippedHS);
-                mask = Mathlib::CompareGreater(dotResult, volumeList[v][0].planeNegD);
-
-                for (size_t p = 1; p < volumeList[v].size(); ++p)
+    
+                for (size_t p = 0; p < mVolumes[v].planes.size(); ++p)
                 {
                     centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
-                        volumeList[v][p].signFlip;
-                    dotResult = volumeList[v][p].planeNormal.dotProduct(centerPlusFlippedHS);
-                    mask = Mathlib::And(mask, Mathlib::CompareGreater(dotResult, volumeList[v][p].planeNegD));
+                        planes[planeCounter].signFlip;
+                    dotResult = planes[planeCounter].planeNormal.dotProduct(centerPlusFlippedHS);
+                    singleVolumeMask = Mathlib::And(singleVolumeMask, Mathlib::CompareGreater(dotResult, planes[planeCounter++].planeNegD));
                 }
 
                 //Always pass the test if any of the components were
@@ -556,45 +551,46 @@ namespace Ogre {
                 ArrayMaskR tmpMask = Mathlib::Or(
                     Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[0]),
                     Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[1]));
-                mask = Mathlib::Or(Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[2]),
-                    mask);
+                singleVolumeMask = Mathlib::Or(Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[2]),
+                    singleVolumeMask);
 
-                hitMask = CastRealToInt(mask);
-                hitMask = Mathlib::And(hitMask, Mathlib::TestFlags4(*queryFlags, ourQueryMask));
-                hitMask = Mathlib::And(hitMask,
-                    Mathlib::TestFlags4(*visibilityFlags,
-                    Mathlib::SetAll(VisibilityFlags::LAYER_VISIBILITY)));
+                //Our query passes if just one of the volumes interests with the object
+                allVolumesMask = Mathlib::Or(allVolumesMask, singleVolumeMask);
 
-                const uint32 scalarMask = BooleanMask4::getScalarMask(hitMask);
-
-                for (size_t j = 0; j < ARRAY_PACKED_REALS; ++j)
-                {
-                    //Decompose the result for analyzing each MovableObject's
-                    //There's no need to check objData.mOwner[j] is null because
-                    //we set mVisibilityFlags to 0 on slot removals
-                    if (IS_BIT_SET(j, scalarMask))
-                    {
-                        if (!listener->queryResult(objData.mOwner[j]))
-                            return false;
-                    }
-
-#ifndef NDEBUG
-                    //Queries must be performed after all bounds have been updated
-                    //(i.e. SceneManager::updateSceneGraph does this for you), and don't
-                    //move the objects between that call and this query.
-                    //Ignore out of date Aabbs from objects that have been
-                    //explicitly disabled or fail the query mask.
-                    assert((!(objData.mVisibilityFlags[objData.mIndex] & VisibilityFlags::LAYER_VISIBILITY) ||
-                        !(objData.mQueryFlags[objData.mIndex] & mQueryMask) ||
-                        !objData.mOwner[j]->isCachedAabbOutOfDate()) &&
-                        "Perform the queries after MovableObject::updateAllBounds has been called!");
-#endif
-                }
             }
 
+            ArrayMaskI hitMask = CastRealToInt(allVolumesMask);
+            hitMask = Mathlib::And(hitMask, Mathlib::TestFlags4(*queryFlags, ourQueryMask));
+            hitMask = Mathlib::And(hitMask,
+                Mathlib::TestFlags4(*visibilityFlags,
+                Mathlib::SetAll(VisibilityFlags::LAYER_VISIBILITY)));
+
+            const uint32 scalarMask = BooleanMask4::getScalarMask(hitMask);
+            for (size_t j = 0; j < ARRAY_PACKED_REALS; ++j)
+            {
+                //Decompose the result for analyzing each MovableObject's
+                //There's no need to check objData.mOwner[j] is null because
+                //we set mVisibilityFlags to 0 on slot removals
+                if (IS_BIT_SET(j, scalarMask))
+                {
+                    if (!listener->queryResult(objData.mOwner[j]))
+                        return false;
+                }
+
+#ifndef NDEBUG
+                //Queries must be performed after all bounds have been updated
+                //(i.e. SceneManager::updateSceneGraph does this for you), and don't
+                //move the objects between that call and this query.
+                //Ignore out of date Aabbs from objects that have been
+                //explicitly disabled or fail the query mask.
+                assert((!(objData.mVisibilityFlags[objData.mIndex] & VisibilityFlags::LAYER_VISIBILITY) ||
+                    !(objData.mQueryFlags[objData.mIndex] & mQueryMask) ||
+                    !objData.mOwner[j]->isCachedAabbOutOfDate()) &&
+                    "Perform the queries after MovableObject::updateAllBounds has been called!");
+#endif
+            }
             objData.advancePack();
         }
-
         return true;
     }
 }
