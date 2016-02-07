@@ -132,16 +132,6 @@ namespace Ogre {
 #endif
     }
     //-----------------------------------------------------------------------
-    Bone::BoneVecIterator Bone::getChildIterator(void)
-    {
-        return BoneVecIterator(mChildren.begin(), mChildren.end());
-    }
-    //-----------------------------------------------------------------------
-    Bone::ConstBoneVecIterator Bone::getChildIterator(void) const
-    {
-        return ConstBoneVecIterator(mChildren.begin(), mChildren.end());
-    }
-    //-----------------------------------------------------------------------
     void Bone::setCachedTransformOutOfDate(void) const
     {
 #ifndef NDEBUG

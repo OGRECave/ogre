@@ -37,7 +37,6 @@ THE SOFTWARE.
     #include "OgreNode.h"
 #endif
 
-#include "OgreIteratorWrappers.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
@@ -63,9 +62,8 @@ namespace Ogre {
     {
     public:
         typedef vector<Bone*>::type BoneVec;
-        typedef VectorIterator<BoneVec> BoneVecIterator;
-        typedef ConstVectorIterator<BoneVec> ConstBoneVecIterator;
         typedef vector<TagPoint*>::type TagPointVec;
+
     protected:
         ArrayMatrixAf4x3 const * RESTRICT_ALIAS mReverseBind;
         BoneTransform                           mTransform;
@@ -143,37 +141,19 @@ namespace Ogre {
         /// Gets this Bones's parent (NULL if this is the root).
         Bone* getParent(void) const                                 { return mParent; }
 
-        /** Reports the number of child nodes under this one.
-        */
-        size_t numChildren(void) const                                      { return mChildren.size(); }
+        /// Reports the number of child nodes under this one.
+        size_t getNumChildren(void) const                           { return mChildren.size(); }
 
-        /** Gets a pointer to a child node. */
-        Bone* getChild(size_t index)                                      { return mChildren[index]; }
-        const Bone* getChild(size_t index) const                          { return mChildren[index]; }
+        /// Gets a pointer to a child node.
+        Bone* getChild(size_t index)                                { return mChildren[index]; }
+        const Bone* getChild(size_t index) const                    { return mChildren[index]; }
 
-        /** Retrieves an iterator for efficiently looping through all children of this bone.
+        /** Retrieves the container for efficiently iterating through all children of this bone.
         @remarks
-        Using this is faster than repeatedly calling getChild if you want to go through
-        all (or most of) the children of this bone.
-        Note that the returned iterator is only valid whilst no children are added or
-        removed from this bone. Thus you should not store this returned iterator for
-        later use, nor should you add / remove children whilst iterating through it;
-        store up changes for later. Note that calling methods on returned items in
-        the iterator IS allowed and does not invalidate the iterator.
+            Using this is faster than repeatedly calling getChild if you want to go through
+            all (or most of) the children of this bone.
         */
-        BoneVecIterator getChildIterator(void);
-
-        /** Retrieves an iterator for efficiently looping through all children of this bone.
-        @remarks
-        Using this is faster than repeatedly calling getChild if you want to go through
-        all (or most of) the children of this bone.
-        Note that the returned iterator is only valid whilst no children are added or
-        removed from this bone. Thus you should not store this returned iterator for
-        later use, nor should you add / remove children whilst iterating through it;
-        store up changes for later. Note that calling methods on returned items in
-        the iterator IS allowed and does not invalidate the iterator.
-        */
-        ConstBoneVecIterator getChildIterator(void) const;
+        const BoneVec& getChildren(void)                            { return mChildren; }
 
         /// Makes the TagPoint child of this Bone.
         void addTagPoint( TagPoint *tagPoint );
