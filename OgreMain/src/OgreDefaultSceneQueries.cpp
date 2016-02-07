@@ -473,7 +473,7 @@ namespace Ogre {
 
         //Create a SIMD friendly version of all our planes
         size_t totalPlanes = 0;
-        for (size_t i = 0; i < mVolumes.size(); ++i)
+        for( size_t i=0; i<mVolumes.size(); ++i )
         {
             totalPlanes += mVolumes[i].planes.size();
         }
@@ -482,9 +482,9 @@ namespace Ogre {
         {
             ArrayPlane * RESTRICT_ALIAS planes = mSimdPlaneList.get();
             totalPlanes = 0;
-            for (size_t i = 0; i < mVolumes.size(); ++i)
+            for( size_t i=0; i<mVolumes.size(); ++i )
             {
-                for (size_t j = 0; j < mVolumes[i].planes.size(); ++j)
+                for( size_t j=0; j<mVolumes[i].planes.size(); ++j )
                 {
                     Plane plane = mVolumes[i].planes[j];
                     ArrayPlane arrayPlane;
@@ -497,7 +497,7 @@ namespace Ogre {
             }
         }
 
-        for (size_t i = 0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i)
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
         {
             ObjectMemoryManager &memoryManager = mParentSceneMgr->_getEntityMemoryManager(
                 static_cast<SceneMemoryMgrTypes>(i) );
@@ -522,58 +522,65 @@ namespace Ogre {
         ArrayInt ourQueryMask = Mathlib::SetAll(mQueryMask);
         const ArrayPlane * RESTRICT_ALIAS planes = mSimdPlaneList.get();
 
-        for (size_t n = 0; n<numNodes; n += ARRAY_PACKED_REALS)
+        for( size_t n=0; n<numNodes; n += ARRAY_PACKED_REALS )
         {
             ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
                 (objData.mVisibilityFlags);
             ArrayInt * RESTRICT_ALIAS queryFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
                 (objData.mQueryFlags);
 
-            ArrayMaskR allVolumesMask = BooleanMask4::getMask(false, false, false, false);
+            ArrayMaskR allVolumesMask = ARRAY_REAL_ZERO;
             size_t planeCounter = 0;
-            for (size_t v = 0; v < mVolumes.size(); ++v)
+            for( size_t v=0; v<mVolumes.size(); ++v )
             {
-                //For each volume test all planes and AND the dot product. If one is false, then we dont intersect with this volume
-                ArrayMaskR singleVolumeMask = BooleanMask4::getMask(true, true, true, true);
+                //For each volume test all planes and AND the dot product.
+                //If one is false, then we dont intersect with this volume
+                ArrayMaskR singleVolumeMask = Mathlib::SetAll( 0xffffffff );
                 ArrayReal dotResult;
                 ArrayVector3 centerPlusFlippedHS;
     
-                for (size_t p = 0; p < mVolumes[v].planes.size(); ++p)
+                for( size_t p=0; p<mVolumes[v].planes.size(); ++p )
                 {
-                    centerPlusFlippedHS = objData.mWorldAabb->mCenter + objData.mWorldAabb->mHalfSize *
-                        planes[planeCounter].signFlip;
+                    centerPlusFlippedHS = objData.mWorldAabb->mCenter +
+                            objData.mWorldAabb->mHalfSize * planes[planeCounter].signFlip;
                     dotResult = planes[planeCounter].planeNormal.dotProduct(centerPlusFlippedHS);
-                    singleVolumeMask = Mathlib::And(singleVolumeMask, Mathlib::CompareGreater(dotResult, planes[planeCounter++].planeNegD));
+                    singleVolumeMask =
+                            Mathlib::And( singleVolumeMask,
+                                          Mathlib::CompareGreater( dotResult,
+                                                                   planes[planeCounter].planeNegD) );
+                    ++planeCounter;
                 }
 
                 //Always pass the test if any of the components were
                 //Infinity (dot product above could've caused nans)
                 ArrayMaskR tmpMask = Mathlib::Or(
                     Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[0]),
-                    Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[1]));
-                singleVolumeMask = Mathlib::Or(Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[2]),
-                    singleVolumeMask);
+                    Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[1]) );
+                tmpMask = Mathlib::Or( Mathlib::isInfinity(objData.mWorldAabb->mHalfSize.mChunkBase[2]),
+                                       tmpMask );
+                singleVolumeMask = Mathlib::Or( tmpMask, singleVolumeMask );
 
-                //Our query passes if just one of the volumes interests with the object
-                allVolumesMask = Mathlib::Or(allVolumesMask, singleVolumeMask);
+                //Our query passes if just one of the volumes intersects with the object
+                allVolumesMask = Mathlib::Or( allVolumesMask, singleVolumeMask );
 
             }
 
             ArrayMaskI hitMask = CastRealToInt(allVolumesMask);
-            hitMask = Mathlib::And(hitMask, Mathlib::TestFlags4(*queryFlags, ourQueryMask));
-            hitMask = Mathlib::And(hitMask,
-                Mathlib::TestFlags4(*visibilityFlags,
-                Mathlib::SetAll(VisibilityFlags::LAYER_VISIBILITY)));
+            hitMask = Mathlib::And( hitMask, Mathlib::TestFlags4(*queryFlags, ourQueryMask) );
+            hitMask = Mathlib::And( hitMask,
+                                    Mathlib::TestFlags4(
+                                        *visibilityFlags,
+                                        Mathlib::SetAll(VisibilityFlags::LAYER_VISIBILITY) ) );
 
-            const uint32 scalarMask = BooleanMask4::getScalarMask(hitMask);
-            for (size_t j = 0; j < ARRAY_PACKED_REALS; ++j)
+            const uint32 scalarMask = BooleanMask4::getScalarMask( hitMask );
+            for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
                 //Decompose the result for analyzing each MovableObject's
                 //There's no need to check objData.mOwner[j] is null because
                 //we set mVisibilityFlags to 0 on slot removals
-                if (IS_BIT_SET(j, scalarMask))
+                if( IS_BIT_SET( j, scalarMask ) )
                 {
-                    if (!listener->queryResult(objData.mOwner[j]))
+                    if( !listener->queryResult(objData.mOwner[j]) )
                         return false;
                 }
 
