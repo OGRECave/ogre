@@ -47,6 +47,7 @@ Torus Knot Software Ltd.
 #include "OgreInstanceManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreLodListener.h"
+#include "OgreRawPtr.h"
 #include "Math/Array/OgreNodeMemoryManager.h"
 #include "Math/Array/OgreObjectMemoryManager.h"
 #include "Animation/OgreSkeletonAnimManager.h"
@@ -3279,6 +3280,17 @@ namespace Ogre {
         /** See SceneQuery. */
         void execute(SceneQueryListener* listener);
         bool execute(ObjectData objData, size_t numNodes, SceneQueryListener* listener);
+    private:
+        //SIMD friendly version of a plane
+        struct ArrayPlane
+        {
+            ArrayVector3    planeNormal;
+            ArrayVector3    signFlip;
+            ArrayReal       planeNegD;
+        };
+
+        //List to store SIMD friendly planes and ensure that the memory is properly aligned
+        RawSimdUniquePtr<ArrayPlane, MEMCATEGORY_GENERAL> mSimdPlaneList;
     };
     /** Default implementation of AxisAlignedBoxSceneQuery. */
     class _OgreExport DefaultAxisAlignedBoxSceneQuery : public AxisAlignedBoxSceneQuery
