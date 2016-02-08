@@ -369,9 +369,8 @@ namespace Ogre
             itor->slotIdx = slotIdx;
             itor->buffer = 0;
 
-            if( mInformHlmsOfTextureData &&
-                (!itor->texture.isNull() ||
-                itor->texture->getWidth() != texture->getWidth() ||
+            if( mInformHlmsOfTextureData && itor->texture != texture &&
+                (itor->texture->getWidth() != texture->getWidth() ||
                 itor->texture->getHeight() != texture->getHeight() ||
                 itor->texture->getDepth() != texture->getDepth() ||
                 itor->texture->getNumFaces() != texture->getNumFaces() ||
