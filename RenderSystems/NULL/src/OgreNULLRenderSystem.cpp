@@ -263,9 +263,17 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void NULLRenderSystem::_setComputePso( const HlmsComputePso *pso )
+    {
+    }
+    //-------------------------------------------------------------------------
     VertexElementType NULLRenderSystem::getColourVertexElementType(void) const
     {
         return VET_COLOUR_ARGB;
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::_dispatch( const HlmsComputePso &pso )
+    {
     }
     //-------------------------------------------------------------------------
     void NULLRenderSystem::_setVertexArrayObject( const VertexArrayObject *vao )

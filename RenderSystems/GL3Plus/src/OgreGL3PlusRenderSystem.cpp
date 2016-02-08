@@ -1980,6 +1980,49 @@ namespace Ogre {
         }
     }
 
+    void GL3PlusRenderSystem::_setComputePso( const HlmsComputePso *pso )
+    {
+        GLSLShader *newComputeShader = 0;
+
+        if( pso )
+        {
+            GLSLShader *newComputeShader = reinterpret_cast<GLSLShader*>( pso->rsData );
+
+            if( mCurrentComputeShader == newComputeShader )
+                return;
+        }
+
+        //Disable previous state
+        GLSLShader::unbindAll();
+
+        RenderSystem::_setPipelineStateObject( (HlmsPso*)0 );
+
+        mUseAdjacency   = false;
+        mPso            = 0;
+
+        if( !pso )
+            return;
+
+        mCurrentComputeShader = newComputeShader;
+        mCurrentComputeShader->bind();
+        mActiveComputeGpuProgramParameters = mCurrentComputeShader->getDefaultParameters();
+        mComputeProgramBound = true;
+
+        GLSLSeparableProgramManager* separableProgramMgr =
+                GLSLSeparableProgramManager::getSingletonPtr();
+
+        if( separableProgramMgr )
+        {
+            GLSLSeparableProgram* separableProgram = separableProgramMgr->getCurrentSeparableProgram();
+            if (separableProgram)
+                separableProgram->activate();
+        }
+        else
+        {
+            GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+        }
+    }
+
     void GL3PlusRenderSystem::_setIndirectBuffer( IndirectBufferPacked *indirectBuffer )
     {
         if( mVaoManager->supportsIndirectBuffers() )
@@ -2002,6 +2045,17 @@ namespace Ogre {
             else
                 mSwIndirectBufferPtr = 0;
         }
+    }
+
+    void GL3PlusRenderSystem::_hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso )
+    {
+        newPso->rsData = reinterpret_cast<void*>( static_cast<GLSLShader*>(
+                                                      newPso->computeShader->_getBindingDelegate() ) );
+    }
+
+    void GL3PlusRenderSystem::_hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso )
+    {
+        newPso->rsData = 0;
     }
 
     void GL3PlusRenderSystem::_beginFrame(void)
@@ -2553,6 +2607,11 @@ namespace Ogre {
         mRenderInstanceAttribsBound.clear();
     }
 
+    void GL3PlusRenderSystem::_dispatch( const HlmsComputePso &pso )
+    {
+        glDispatchCompute( pso.mNumThreads[0], pso.mNumThreads[1], pso.mNumThreads[2] );
+    }
+
     void GL3PlusRenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )
     {
         if( _vao )
@@ -3037,9 +3096,10 @@ namespace Ogre {
                 mPso->hullShader->bind();
             if (mPso->domainShader)
                 mPso->domainShader->bind();
-            if (mCurrentComputeShader)
-                mCurrentComputeShader->bind();
         }
+
+        if (mCurrentComputeShader)
+            mCurrentComputeShader->bind();
 
         // Must reset depth/colour write mask to according with user desired, otherwise,
         // clearFrameBuffer would be wrong because the value we are recorded may be

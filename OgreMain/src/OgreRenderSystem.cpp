@@ -276,7 +276,7 @@ namespace Ogre {
     {
         assert( (!pso || pso->rsData) &&
                 "The PipelineStateObject must have been created via "
-                "HlmsManager::_hlmsPipelineStateObjectCreated!" );
+                "RenderSystem::_hlmsPipelineStateObjectCreated!" );
 
         //Disable previous state
         mActiveVertexGpuProgramParameters.setNull();

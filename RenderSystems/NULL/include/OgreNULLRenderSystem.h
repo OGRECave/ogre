@@ -120,6 +120,7 @@ namespace Ogre
 
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock );
         virtual void _setPipelineStateObject( const HlmsPso *pso );
+        virtual void _setComputePso( const HlmsComputePso *pso );
 
         virtual VertexElementType getColourVertexElementType(void) const;
         virtual void _convertProjectionMatrix(const Matrix4& matrix,
@@ -133,6 +134,8 @@ namespace Ogre
             Matrix4& dest, bool forGpuProgram = false) {}
         virtual void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane,
             bool forGpuProgram) {}
+
+        virtual void _dispatch( const HlmsComputePso &pso );
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
 

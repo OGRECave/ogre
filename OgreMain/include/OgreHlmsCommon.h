@@ -173,7 +173,9 @@ namespace Ogre
         HLMS_USER2,
         HLMS_USER3,
 
-        HLMS_MAX = 8
+        HLMS_MAX = 8,
+
+        HLMS_COMPUTE,
     };
 
     struct HlmsCache

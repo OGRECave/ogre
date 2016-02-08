@@ -253,7 +253,7 @@ namespace Ogre
 
         const HlmsCache* addShaderCache( uint32 hash, const HlmsPso &pso );
         const HlmsCache* getShaderCache( uint32 hash ) const;
-        void clearShaderCache(void);
+        virtual void clearShaderCache(void);
 
         void processPieces( Archive *archive, const StringVector &pieceFiles );
 

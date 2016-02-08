@@ -804,6 +804,9 @@ namespace Ogre
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer ) = 0;
 
+        virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso ) {}
+        virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso ) {}
+
         /** Binds a texture to a vertex, geometry, compute, tessellation hull
         or tessellation domain sampler.
         @remarks
@@ -932,6 +935,11 @@ namespace Ogre
         /// @See HlmsPso
         virtual void _setPipelineStateObject( const HlmsPso *pso );
 
+        /// Unlike _setPipelineStateObject, the RenderSystem will check if the PSO
+        /// has changed to avoid redundant state changes (since it's hard to do it
+        /// at Hlms level)
+        virtual void _setComputePso( const HlmsComputePso *pso ) = 0;
+
         /** The RenderSystem will keep a count of tris rendered, this resets the count. */
         virtual void _beginGeometryCount(void);
         /** Reports the number of tris rendered since the last _beginGeometryCount call. */
@@ -1050,6 +1058,8 @@ namespace Ogre
         details of the operation to be performed.
         */
         virtual void _render(const v1::RenderOperation& op);
+
+        virtual void _dispatch( const HlmsComputePso &pso ) = 0;
 
         /** Part of the low level rendering interface. Tells the RS which VAO will be bound now.
             (i.e. Vertex Formats, buffers being bound, etc.)

@@ -83,7 +83,7 @@ namespace Ogre
         }
 
         HlmsPso pso;
-        memset( &pso, 0, sizeof(HlmsPso) );
+        pso.initialize();
         if( pass->hasVertexProgram() )
             pso.vertexShader            = pass->getVertexProgram();
         if( pass->hasGeometryProgram() )

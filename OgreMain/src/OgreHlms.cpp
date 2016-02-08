@@ -1666,7 +1666,7 @@ namespace Ogre
         }
 
         HlmsPso pso;
-        memset( &pso, 0, sizeof(HlmsPso) );
+        pso.initialize();
         pso.vertexShader                = shaders[VertexShader];
         pso.geometryShader              = shaders[GeometryShader];
         pso.tesselationHullShader       = shaders[HullShader];

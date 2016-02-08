@@ -126,7 +126,7 @@ namespace Ogre
         /// and copies it to our string.
         void setToSubstr( const LwString &source, size_t _start, size_t size )
         {
-            assert( (size + 1) <= this->mCapacity );
+            assert( (size + 1u) <= this->mCapacity );
             assert( _start <= source.mSize );
             assert( _start + size <= source.mSize );
 
@@ -153,6 +153,20 @@ namespace Ogre
         {
             mStrPtr[0] = '\0';
             mSize = 0;
+        }
+
+        /// Resizes the string. Unlike std::string, the new
+        /// size MUST be lower or equal than current size.
+        /// (i.e. we can only shrink)
+        void resize( size_t newSize )
+        {
+            assert( newSize <= this->mSize );
+
+            if( newSize < this->mSize )
+            {
+                mStrPtr[newSize + 1u] = '\0';
+                mSize = newSize;
+            }
         }
 
         // Assignment.

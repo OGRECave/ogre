@@ -397,6 +397,10 @@ namespace Ogre {
         virtual void _setPipelineStateObject( const HlmsPso *pso );
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
+
+        virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso );
+        virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso );
+        virtual void _setComputePso( const HlmsComputePso *pso );
         /** See
             RenderSystem
         */
@@ -450,6 +454,8 @@ namespace Ogre {
             RenderSystem
         */
         void _render(const v1::RenderOperation& op);
+
+        virtual void _dispatch( const HlmsComputePso &pso );
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd );
