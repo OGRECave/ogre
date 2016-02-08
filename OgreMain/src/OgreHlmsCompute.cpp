@@ -54,13 +54,16 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const IdString ComputeProperty::NumThreadsX     = IdString( "num_threads_x" );
-    const IdString ComputeProperty::NumThreadsY     = IdString( "num_threads_y" );
-    const IdString ComputeProperty::NumThreadsZ     = IdString( "num_threads_z" );
+    const IdString ComputeProperty::ThreadsPerGroupX    = IdString( "threads_per_group_x" );
+    const IdString ComputeProperty::ThreadsPerGroupY    = IdString( "threads_per_group_y" );
+    const IdString ComputeProperty::ThreadsPerGroupZ    = IdString( "threads_per_group_z" );
+    const IdString ComputeProperty::NumThreadGroupsX    = IdString( "num_thread_groups_x" );
+    const IdString ComputeProperty::NumThreadGroupsY    = IdString( "num_thread_groups_y" );
+    const IdString ComputeProperty::NumThreadGroupsZ    = IdString( "num_thread_groups_z" );
 
-    const IdString ComputeProperty::NumTextureSlots = IdString( "num_texture_slots" );
-    const IdString ComputeProperty::MaxTextureSlot  = IdString( "max_texture_slot" );
-    const char *ComputeProperty::Texture            = "texture";
+    const IdString ComputeProperty::NumTextureSlots     = IdString( "num_texture_slots" );
+    const IdString ComputeProperty::MaxTextureSlot      = IdString( "max_texture_slot" );
+    const char *ComputeProperty::Texture                = "texture";
 
     //Must be sorted from best to worst
     const String BestD3DComputeShaderTargets[3] =
@@ -142,10 +145,6 @@ namespace Ogre
     {
         //Assumes mSetProperties is already set
         //mSetProperties.clear();
-        setProperty( ComputeProperty::NumThreadsX, job->mNumThreads[0] );
-        setProperty( ComputeProperty::NumThreadsY, job->mNumThreads[1] );
-        setProperty( ComputeProperty::NumThreadsZ, job->mNumThreads[2] );
-
         {
             //Add RenderSystem-specific properties
             IdStringVec::const_iterator itor = mRsSpecificExtensions.begin();
@@ -262,17 +261,22 @@ namespace Ogre
         HlmsComputePso pso;
         pso.initialize();
         pso.computeShader = shader;
-        pso.mNumThreads[0] = getProperty( ComputeProperty::NumThreadsX );
-        pso.mNumThreads[1] = getProperty( ComputeProperty::NumThreadsY );
-        pso.mNumThreads[2] = getProperty( ComputeProperty::NumThreadsZ );
+        pso.mThreadsPerGroup[0] = getProperty( ComputeProperty::ThreadsPerGroupX );
+        pso.mThreadsPerGroup[1] = getProperty( ComputeProperty::ThreadsPerGroupY );
+        pso.mThreadsPerGroup[2] = getProperty( ComputeProperty::ThreadsPerGroupZ );
+        pso.mNumThreadGroups[0] = getProperty( ComputeProperty::NumThreadGroupsX );
+        pso.mNumThreadGroups[1] = getProperty( ComputeProperty::NumThreadGroupsY );
+        pso.mNumThreadGroups[2] = getProperty( ComputeProperty::NumThreadGroupsZ );
 
-        if( pso.mNumThreads[0] * pso.mNumThreads[1] * pso.mNumThreads[2] == 0u )
+        if( pso.mThreadsPerGroup[0] * pso.mThreadsPerGroup[1] * pso.mThreadsPerGroup[2] == 0u ||
+            pso.mNumThreadGroups[0] * pso.mNumThreadGroups[1] * pso.mNumThreadGroups[2] == 0u )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                         "Shader or C++ must set num_threads_x, num_threads_y & num_threads_z"
-                         " otherwise we can't run on Metal & OpenGL. Use @pset( num_threads_x, 512 );"
-                         " or read the value using @value( num_threads_x ) if you've already set it "
-                         "from C++ or the JSON material", "HlmsCompute::compileShader" );
+                         "Shader or C++ must set threads_per_group_x, threads_per_group_y & "
+                         "threads_per_group_z and num_thread_groups_x through num_thread_groups_z."
+                         " Otherwise we can't run on Metal. Use @pset( threads_per_group_x, 512 );"
+                         " or read the value using @value( threads_per_group_x ) if you've already"
+                         " set it from C++ or the JSON material", "HlmsCompute::compileShader" );
         }
 
         mRenderSystem->_hlmsComputePipelineStateObjectCreated( &pso );

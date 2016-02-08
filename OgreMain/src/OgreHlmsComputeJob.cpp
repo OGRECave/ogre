@@ -49,7 +49,8 @@ namespace Ogre
         mMaxTexUnitReached( 0 ),
         mPsoCacheHash( -1 )
     {
-        memset( mNumThreads, 0, sizeof( mNumThreads ) );
+        memset( mThreadsPerGroup, 0, sizeof( mThreadsPerGroup ) );
+        memset( mNumThreadGroups, 0, sizeof( mNumThreadGroups ) );
     }
     //-----------------------------------------------------------------------------------
     HlmsComputeJob::~HlmsComputeJob()
@@ -61,6 +62,13 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::_updateAutoProperties(void)
     {
+        setProperty( ComputeProperty::ThreadsPerGroupX, mThreadsPerGroup[0] );
+        setProperty( ComputeProperty::ThreadsPerGroupY, mThreadsPerGroup[1] );
+        setProperty( ComputeProperty::ThreadsPerGroupZ, mThreadsPerGroup[2] );
+        setProperty( ComputeProperty::NumThreadGroupsX, mNumThreadGroups[0] );
+        setProperty( ComputeProperty::NumThreadGroupsY, mNumThreadGroups[1] );
+        setProperty( ComputeProperty::NumThreadGroupsZ, mNumThreadGroups[2] );
+
         char tmpData[64];
         LwString propName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
 
@@ -211,13 +219,28 @@ namespace Ogre
         mPsoCacheHash = -1;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsComputeJob::setNumThreads( uint32 x, uint32 y, uint32 z )
+    void HlmsComputeJob::setThreadsPerGroup( uint32 threadsPerGroupX, uint32 threadsPerGroupY, uint32 threadsPerGroupZ )
     {
-        if( mNumThreads[0] != x || mNumThreads[1] != y || mNumThreads[2] != z )
+        if( mThreadsPerGroup[0] != threadsPerGroupX ||
+            mThreadsPerGroup[1] != threadsPerGroupY ||
+            mThreadsPerGroup[2] != threadsPerGroupZ )
         {
-            mNumThreads[0] = x;
-            mNumThreads[1] = y;
-            mNumThreads[2] = z;
+            mThreadsPerGroup[0] = threadsPerGroupX;
+            mThreadsPerGroup[1] = threadsPerGroupY;
+            mThreadsPerGroup[2] = threadsPerGroupZ;
+            mPsoCacheHash = -1;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::setNumThreadGroups( uint32 numThreadGroupsX, uint32 numThreadGroupsY, uint32 numThreadGroupsZ )
+    {
+        if( mNumThreadGroups[0] != numThreadGroupsX ||
+            mNumThreadGroups[1] != numThreadGroupsY ||
+            mNumThreadGroups[2] != numThreadGroupsZ )
+        {
+            mNumThreadGroups[0] = numThreadGroupsX;
+            mNumThreadGroups[1] = numThreadGroupsY;
+            mNumThreadGroups[2] = numThreadGroupsZ;
             mPsoCacheHash = -1;
         }
     }
@@ -351,7 +374,10 @@ namespace Ogre
                 itor->texture->getWidth() != texture->getWidth() ||
                 itor->texture->getHeight() != texture->getHeight() ||
                 itor->texture->getDepth() != texture->getDepth() ||
-                itor->texture->getNumFaces() != texture->getNumFaces()) )
+                itor->texture->getNumFaces() != texture->getNumFaces() ||
+                itor->texture->getNumMipmaps() != texture->getNumMipmaps() ||
+                itor->texture->getFSAA() != texture->getFSAA() ||
+                itor->texture->getTextureType() != texture->getTextureType()) )
             {
                 mPsoCacheHash = -1;
             }

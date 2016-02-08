@@ -97,8 +97,10 @@ namespace Ogre
         String          mSourceFilename;
         StringVector    mIncludedPieceFiles;
 
-        /// @copydoc HlmsComputePso::mNumThreads
-        uint32  mNumThreads[3];
+        /// @see setThreadsPerGroup
+        uint32  mThreadsPerGroup[3];
+        /// @see setNumThreadGroups
+        uint32  mNumThreadGroups[3];
 
         ConstBufferSlotVec  mConstBuffers;
         TextureSlotVec      mTextureSlots;
@@ -131,19 +133,37 @@ namespace Ogre
         */
         void setInformHlmsOfTextureData( bool bInformHlms );
 
-        /** Sets the number of threads to dispatch. Note the actual value may be
+        /** Sets the number of threads per group. Note the actual value may be
             changed by the shader template using the @pset() function.
             These values are passed to the template as:
-                * num_threads_x
-                * num_threads_y
-                * num_threads_z
+                * threads_per_group_x
+                * threads_per_group_y
+                * threads_per_group_z
         @remarks
             May trigger a recompilation if the value changes, regardless of
             what setInformHlmsOfTextureData says.
             There may be API / HW limitations on the max values for each
             dimension.
         */
-        void setNumThreads( uint32 x, uint32 y, uint32 z );
+        void setThreadsPerGroup( uint32 threadsPerGroupX, uint32 threadsPerGroupY, uint32 threadsPerGroupZ );
+
+        /** Sets the number of groups of threads to dispatch. Note the actual value may be
+            changed by the shader template using the @pset() function.
+            These values are passed to the template as:
+                * num_thread_groups_x
+                * num_thread_groups_y
+                * num_thread_groups_z
+        @remarks
+            As an example, it's typical to do:
+                numThreadGroupsX = ceil( threadsPerGroupX / image.width );
+                numThreadGroupsY = ceil( threadsPerGroupY / image.height );
+        @par
+            May trigger a recompilation if the value changes, regardless of
+            what setInformHlmsOfTextureData says.
+            There may be API / HW limitations on the max values for each
+            dimension.
+        */
+        void setNumThreadGroups( uint32 numThreadGroupsX, uint32 numThreadGroupsY, uint32 numThreadGroupsZ );
 
         /** Sets an arbitrary property to pass to the shader.
         @remarks

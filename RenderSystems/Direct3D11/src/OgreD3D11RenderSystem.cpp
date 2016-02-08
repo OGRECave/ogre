@@ -3417,7 +3417,9 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_dispatch( const HlmsComputePso &pso )
     {
-        mDevice.GetImmediateContext()->Dispatch( 1, 1, 1 );
+        mDevice.GetImmediateContext()->Dispatch( pso.mNumThreadGroups[0],
+                                                 pso.mNumThreadGroups[1],
+                                                 pso.mNumThreadGroups[2] );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )

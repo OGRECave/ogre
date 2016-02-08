@@ -170,13 +170,21 @@ namespace Ogre
     {
         GpuProgramPtr   computeShader;
 
-        /// XYZ. Metal needs the thread count on C++ side. HLSL & GLSL want
+        /// XYZ. Metal needs the threads per group on C++ side. HLSL & GLSL want
         /// the thread count on shader side, thus we allow users to tell us
         /// the thread count to C++, and send it to the shaders via
-        /// @value( num_threads_x ); OR let the shader tell C++ the threadcount
-        /// via @pset( num_threads_x, 512 )
-        /// (there's also num_threads_y & num_threads_z)
-        uint32  mNumThreads[3];
+        /// @value( threads_per_group_x ); OR let the shader tell C++ the threadcount
+        /// via @pset( threads_per_group_x, 64 )
+        /// (there's also threads_per_group_y & threads_per_group_z)
+        /// @see HlmsComputeJob::setThreadsPerGroup
+        uint32  mThreadsPerGroup[3];
+
+        /// The number of thread groups to dispatch.
+        /// eg. Typically:
+        ///     mNumThreadGroups[0] = ceil( mThreadsPerGroup[0] / image.width );
+        ///     mNumThreadGroups[1] = ceil( mThreadsPerGroup[1] / image.height );
+        /// @see HlmsComputeJob::setNumThreadGroups
+        uint32  mNumThreadGroups[3];
 
         void        *rsData;    /// Render-System specific data
 
@@ -187,7 +195,8 @@ namespace Ogre
 
         void initialize()
         {
-            memset( mNumThreads, 0, sizeof(mNumThreads) );
+            memset( mThreadsPerGroup, 0, sizeof(mThreadsPerGroup) );
+            memset( mNumThreadGroups, 0, sizeof(mNumThreadGroups) );
             rsData = 0;
         }
     };

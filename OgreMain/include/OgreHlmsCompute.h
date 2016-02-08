@@ -152,9 +152,12 @@ namespace Ogre
 
     struct _OgreExport ComputeProperty
     {
-        static const IdString NumThreadsX;
-        static const IdString NumThreadsY;
-        static const IdString NumThreadsZ;
+        static const IdString ThreadsPerGroupX;
+        static const IdString ThreadsPerGroupY;
+        static const IdString ThreadsPerGroupZ;
+        static const IdString NumThreadGroupsX;
+        static const IdString NumThreadGroupsY;
+        static const IdString NumThreadGroupsZ;
 
         static const IdString NumTextureSlots;
         static const IdString MaxTextureSlot;

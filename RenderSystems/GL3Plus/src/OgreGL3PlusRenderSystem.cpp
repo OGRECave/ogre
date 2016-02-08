@@ -2609,7 +2609,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_dispatch( const HlmsComputePso &pso )
     {
-        glDispatchCompute( pso.mNumThreads[0], pso.mNumThreads[1], pso.mNumThreads[2] );
+        glDispatchCompute( pso.mNumThreadGroups[0], pso.mNumThreadGroups[1], pso.mNumThreadGroups[2] );
     }
 
     void GL3PlusRenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )
