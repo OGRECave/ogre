@@ -63,7 +63,7 @@ namespace Ogre
     const char *ComputeProperty::Texture            = "texture";
 
     //Must be sorted from best to worst
-    const String BestD3DShaderTargets[3] =
+    const String BestD3DComputeShaderTargets[3] =
     {
         "cs_5_0", "cs_4_1", "cs_4_0"
     };
@@ -100,8 +100,8 @@ namespace Ogre
             {
                 for( size_t j=0; j<3 && !mComputeShaderTarget; ++j )
                 {
-                    if( capabilities->isShaderProfileSupported( BestD3DShaderTargets[j] ) )
-                        mComputeShaderTarget = &BestD3DShaderTargets[j];
+                    if( capabilities->isShaderProfileSupported( BestD3DComputeShaderTargets[j] ) )
+                        mComputeShaderTarget = &BestD3DComputeShaderTargets[j];
                 }
             }
         }

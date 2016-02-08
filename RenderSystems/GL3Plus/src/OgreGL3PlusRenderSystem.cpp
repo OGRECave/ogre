@@ -1986,7 +1986,7 @@ namespace Ogre {
 
         if( pso )
         {
-            GLSLShader *newComputeShader = reinterpret_cast<GLSLShader*>( pso->rsData );
+            newComputeShader = reinterpret_cast<GLSLShader*>( pso->rsData );
 
             if( mCurrentComputeShader == newComputeShader )
                 return;

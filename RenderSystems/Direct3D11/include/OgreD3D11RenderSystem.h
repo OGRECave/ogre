@@ -295,6 +295,10 @@ namespace Ogre
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
 
+        virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso );
+        virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso );
+        virtual void _setComputePso( const HlmsComputePso *pso );
+
         void _beginFrame(void);
         void _endFrame(void);
         void _setFog( FogMode mode = FOG_NONE, const ColourValue& colour = ColourValue::White, Real expDensity = 1.0, Real linearStart = 0.0, Real linearEnd = 1.0 );
@@ -308,6 +312,8 @@ namespace Ogre
         void _applyObliqueDepthProjection(Matrix4& matrix, const Plane& plane, bool forGpuProgram);
         void _renderUsingReadBackAsTexture(unsigned int passNr, Ogre::String variableName,unsigned int StartSlot);
         void _render(const v1::RenderOperation& op);
+
+        virtual void _dispatch( const HlmsComputePso &pso );
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd );

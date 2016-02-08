@@ -135,7 +135,6 @@ namespace Ogre
 
             while( itor != end )
             {
-                TextureSlot *itor = 0;
                 propName.resize( texturePropSize );
                 propName.a( itor->slotIdx );            //texture0
                 setProperty( propName.c_str(), 1 );
@@ -144,7 +143,7 @@ namespace Ogre
 
                 if( !itor->texture.isNull() )
                 {
-                    TexturePtr &texture = itor->texture;
+                    const TexturePtr &texture = itor->texture;
 
                     propName.a( "_width" );                 //texture0_width
                     setProperty( propName.c_str(), texture->getWidth() );

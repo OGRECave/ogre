@@ -2936,6 +2936,59 @@ bail:
         }
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso )
+    {
+        newPso->rsData = reinterpret_cast<void*>( static_cast<D3D11HLSLProgram*>(
+                                                      newPso->computeShader->_getBindingDelegate() ) );
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso )
+    {
+        newPso->rsData = 0;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setComputePso( const HlmsComputePso *pso )
+    {
+        D3D11HLSLProgram *newComputeShader = 0;
+
+        if( pso )
+        {
+            newComputeShader = reinterpret_cast<D3D11HLSLProgram*>( pso->rsData );
+
+            if( mBoundComputeProgram == newComputeShader )
+                return;
+        }
+
+        RenderSystem::_setPipelineStateObject( (HlmsPso*)0 );
+
+        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
+
+        //deviceContext->IASetInputLayout( 0 );
+        deviceContext->VSSetShader( 0, 0, 0 );
+        deviceContext->GSSetShader( 0, 0, 0 );
+        deviceContext->HSSetShader( 0, 0, 0 );
+        deviceContext->DSSetShader( 0, 0, 0 );
+        deviceContext->PSSetShader( 0, 0, 0 );
+        deviceContext->CSSetShader( 0, 0, 0 );
+
+        if( !pso )
+            return;
+
+        mBoundComputeProgram = newComputeShader;
+
+        deviceContext->CSSetShader( mBoundComputeProgram->getComputeShader(), 0, 0 );
+        mActiveComputeGpuProgramParameters = mBoundComputeProgram->getDefaultParameters();
+        mComputeProgramBound = true;
+
+        if (mDevice.isError())
+        {
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "D3D11 device cannot set shaders\nError Description: " +
+                         errorDescription, "D3D11RenderSystem::_setComputePso" );
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::_beginFrame()
     {
         mHardwareBufferManager->_updateDirtyInputLayouts();
@@ -3360,6 +3413,11 @@ bail:
             memset(mNumClassInstances, 0, sizeof(mNumClassInstances));      
         }*/
 
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_dispatch( const HlmsComputePso &pso )
+    {
+        mDevice.GetImmediateContext()->Dispatch( 1, 1, 1 );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )
