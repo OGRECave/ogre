@@ -3161,7 +3161,9 @@ namespace Ogre {
         // Read the strategy to be used for this mesh
         String strategyName = readString(stream);
         LodStrategy *strategy = LodStrategyManager::getSingleton().getStrategy(strategyName);
-        pMesh->setLodStrategy(strategy);
+        
+        if (strategy)
+            pMesh->setLodStrategy(strategy);
 
         // unsigned short numLevels;
         readShorts(stream, &(pMesh->mNumLods), 1);
