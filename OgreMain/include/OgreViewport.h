@@ -348,7 +348,7 @@ namespace Ogre {
 			The visibility mask is a way to exclude objects from rendering for
 			a given viewport. For each object in the frustum, a check is made
 			between this mask and the objects visibility flags 
-			(@see MovableObject::setVisibilityFlags), and if a binary 'and'
+			(MovableObject::setVisibilityFlags). If a binary 'and'
 			returns zero, the object will not be rendered.
 		*/
 		void setVisibilityMask(uint32 mask) { mVisibilityMask = mask; }
