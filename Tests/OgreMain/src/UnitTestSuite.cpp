@@ -62,9 +62,6 @@ void UnitTestSuite::tearDownSuite()
         delete Ogre::MaterialManager::getSingletonPtr();
     if(Ogre::ResourceGroupManager::getSingletonPtr())
         delete Ogre::ResourceGroupManager::getSingletonPtr();
-
-    if(Ogre::ResourceGroupManager::getSingletonPtr())
-        delete Ogre::ResourceGroupManager::getSingletonPtr();
     if(Ogre::LodStrategyManager::getSingletonPtr())
         delete Ogre::LodStrategyManager::getSingletonPtr();
 
