@@ -23,7 +23,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 		if(VS_TARGET_PLATFORM_VERSION)
 			set(W10SDK_VER VS_TARGET_PLATFORM_VERSION)
 		else()
-			set(W10SDK_VER 10.0.10069.0)
+			set(W10SDK_VER 10.0.10240.0)
 		endif()
 		find_path(DirectX11_INCLUDE_DIR NAMES d3d11.h HINTS "C:/Program Files (x86)/Windows Kits/10/include/${W10SDK_VER}/um" "C:/Program Files/Windows Kits/10/include/${W10SDK_VER}/um")
 		set(DirectX11_LIBRARY d3d11.lib dxgi.lib dxguid.lib) # in "C:/Program Files (x86)/Windows Kits/10/lib/${W10SDK_VER}/um/${MSVC_CXX_ARCHITECTURE_ID}/"
