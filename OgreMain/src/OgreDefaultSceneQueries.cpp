@@ -533,7 +533,7 @@ namespace Ogre {
             {
                 //For each volume test all planes and AND the dot product.
                 //If one is false, then we dont intersect with this volume
-                ArrayMaskR singleVolumeMask = Mathlib::SetAll( 0xffffffff );
+                ArrayMaskR singleVolumeMask = CastIntToReal( Mathlib::SetAll( 0xffffffff ) );
                 ArrayReal dotResult;
                 ArrayVector3 centerPlusFlippedHS;
     
