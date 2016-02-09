@@ -604,6 +604,8 @@ namespace Ogre {
         // Tell scene managers
         SceneManagerEnumerator::getSingleton().setRenderSystem(system);
 
+        if(RenderSystem::Listener* ls = RenderSystem::getSharedListener())
+            ls->eventOccurred("RenderSystemChanged");
     }
     //-----------------------------------------------------------------------
     void Root::addRenderSystem(RenderSystem *newRend)

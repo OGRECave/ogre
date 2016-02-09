@@ -29,6 +29,7 @@ THE SOFTWARE.
 #define __D3D11TEXTURE_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11DeviceResource.h"
 #include "OgreTexture.h"
 #include "OgreRenderTexture.h"
 #include "OgreSharedPtr.h"
@@ -40,7 +41,10 @@ THE SOFTWARE.
 #endif
 
 namespace Ogre {
-    class D3D11Texture : public Texture
+	/** Specialisation of Texture for D3D11 */
+    class D3D11Texture
+        : public Texture
+        , protected D3D11DeviceResource
     {
 	public:
 		/// constructor 
@@ -59,14 +63,14 @@ namespace Ogre {
 		/// @copydoc Texture::getBuffer
 		HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
-		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
+		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex.Get(); }
 		/// retrieves a pointer to the actual texture
-		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView; }
+		ID3D11ShaderResourceView *getTexture() { assert(mpShaderResourceView); return mpShaderResourceView.Get(); }
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
 
-		ID3D11Texture1D * GetTex1D() { return mp1DTex; };
-		ID3D11Texture2D * GetTex2D() { return mp2DTex; };
-		ID3D11Texture3D	* GetTex3D() { return mp3DTex; };
+		ID3D11Texture1D * GetTex1D() { return mp1DTex.Get(); };
+		ID3D11Texture2D * GetTex2D() { return mp2DTex.Get(); };
+		ID3D11Texture3D	* GetTex3D() { return mp3DTex.Get(); };
 
 		bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
 
@@ -81,22 +85,22 @@ namespace Ogre {
 		D3D11Device	&	mDevice;
 
         // 1D texture pointer
-        ID3D11Texture1D *mp1DTex;
+        ComPtr<ID3D11Texture1D> mp1DTex;
         // 2D texture pointer
-        ID3D11Texture2D *mp2DTex;
+        ComPtr<ID3D11Texture2D> mp2DTex;
         /// cubic texture pointer
-		ID3D11Texture3D	*mp3DTex;
+        ComPtr<ID3D11Texture3D> mp3DTex;
         /// actual texture pointer
-		ID3D11Resource 	*mpTex;
+        ComPtr<ID3D11Resource> mpTex;
 
-        ID3D11ShaderResourceView* mpShaderResourceView;
+        ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
 
         bool mAutoMipMapGeneration;
 
         template<typename fromtype, typename totype>
-        void _queryInterface(fromtype *from, totype **to)
+        void _queryInterface(const ComPtr<fromtype>& from, ComPtr<totype> *to)
         {
-            HRESULT hr = from->QueryInterface(__uuidof(totype), (void **)to);
+            HRESULT hr = from.As(to);
 
             if(FAILED(hr) || mDevice.isError())
             {
@@ -161,6 +165,8 @@ namespace Ogre {
         /// mipmap level. This method must be called after the D3D texture object was created
         void _createSurfaceList(void);
 
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
 
         /// @copydoc Resource::prepareImpl
         void prepareImpl(void);
@@ -182,11 +188,12 @@ namespace Ogre {
     };
 
     /// RenderTexture implementation for D3D11
-    class D3D11RenderTexture : public RenderTexture
+    class D3D11RenderTexture
+        : public RenderTexture
+        , protected D3D11DeviceResource
     {
         D3D11Device & mDevice;
-        ID3D11RenderTargetView * mRenderTargetView;
-        ID3D11DepthStencilView * mDepthStencilView;
+        ComPtr<ID3D11RenderTargetView> mRenderTargetView;
     public:
         D3D11RenderTexture(const String &name, D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
         virtual ~D3D11RenderTexture();
@@ -196,6 +203,10 @@ namespace Ogre {
         virtual void getCustomAttribute( const String& name, void *pData );
 
         bool requiresTextureFlipping() const { return false; }
+
+    protected:
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
     };
 
 }

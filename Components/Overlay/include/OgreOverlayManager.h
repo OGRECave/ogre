@@ -99,6 +99,11 @@ namespace Ogre {
         OverlayManager();
         virtual ~OverlayManager();
 
+        /** Notifies that hardware resources were lost */
+        void _releaseManualHardwareResources();
+        /** Notifies that hardware resources should be restored */
+        void _restoreManualHardwareResources();
+
         /// @copydoc ScriptLoader::getScriptPatterns
         const StringVector& getScriptPatterns(void) const;
         /// @copydoc ScriptLoader::parseScript

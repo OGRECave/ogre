@@ -51,9 +51,7 @@ namespace Ogre {
         mParentTexture(parentTexture),
         mDevice(device),
         mSubresourceIndex(subresourceIndex),
-        mFace(face),
-        mDataForStaticUsageLock(0),
-        mStagingBuffer(NULL)
+        mFace(face)
     {
         if(mUsage & TU_RENDERTARGET)
         {
@@ -84,12 +82,6 @@ namespace Ogre {
                     Root::getSingleton().getRenderSystem()->destroyRenderTarget(mSliceTRT[zoffset]->getName());
             }
         }
-
-        //if (mDataForStaticUsageLock != NULL)
-        {
-            SAFE_DELETE_ARRAY(mDataForStaticUsageLock) ;
-        }
-        SAFE_RELEASE(mStagingBuffer);
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
@@ -163,10 +155,8 @@ namespace Ogre {
     void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
     {
         // for static usage just alloc
-        size_t sizeOfImage = lock.getConsecutiveSize();
-        
-        mDataForStaticUsageLock = new int8[sizeOfImage];
-        return mDataForStaticUsageLock;
+        mDataForStaticUsageLock.resize(lock.getConsecutiveSize());
+        return mDataForStaticUsageLock.data();
     }
     //-----------------------------------------------------------------------------  
     void *D3D11HardwarePixelBuffer::_mapstagingbuffer(D3D11_MAP flags)
@@ -177,7 +167,7 @@ namespace Ogre {
         if(flags == D3D11_MAP_READ_WRITE || flags == D3D11_MAP_READ || flags == D3D11_MAP_WRITE)  
         {
             if(mLockBox.getHeight() == mParentTexture->getHeight() && mLockBox.getWidth() == mParentTexture->getWidth())
-                mDevice.GetImmediateContext()->CopyResource(mStagingBuffer, mParentTexture->getTextureResource());
+                mDevice.GetImmediateContext()->CopyResource(mStagingBuffer.Get(), mParentTexture->getTextureResource());
             else
             {
                 D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(mLockBox);
@@ -185,14 +175,14 @@ namespace Ogre {
                 dstBoxDx11.back = mLockBox.getDepth();
 
                 unsigned int subresource = D3D11CalcSubresource(mSubresourceIndex, mLockBox.front, mParentTexture->getNumMipmaps()+1);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer, subresource, mLockBox.left, mLockBox.top, mSubresourceIndex, mParentTexture->getTextureResource(), subresource, &dstBoxDx11);
+                mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer.Get(), subresource, mLockBox.left, mLockBox.top, mSubresourceIndex, mParentTexture->getTextureResource(), subresource, &dstBoxDx11);
             }
         }
         else if(flags == D3D11_MAP_WRITE_DISCARD)
             flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
 
         PixelBox box;
-        _map(mStagingBuffer, flags, box);
+        _map(mStagingBuffer.Get(), flags, box);
         return box.data;
     }
     //-----------------------------------------------------------------------------  
@@ -248,9 +238,8 @@ namespace Ogre {
         }
         else
         {
-            size_t sizeOfImage = rval.getConsecutiveSize();
-            mDataForStaticUsageLock = new int8[sizeOfImage];
-            rval.data = mDataForStaticUsageLock;
+            mDataForStaticUsageLock.resize(rval.getConsecutiveSize());
+            rval.data = mDataForStaticUsageLock.data();
         }
         // save without offset
         mCurrentLock = rval;
@@ -311,7 +300,7 @@ namespace Ogre {
 
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex1D(), 
                     static_cast<UINT>(mSubresourceIndex), &dstBoxDx11, 
-                    mDataForStaticUsageLock, rowWidth, 0);
+                    mDataForStaticUsageLock.data(), rowWidth, 0);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -327,7 +316,7 @@ namespace Ogre {
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex2D(), 
                     D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1),
                     &dstBoxDx11, 
-                    mDataForStaticUsageLock, rowWidth, 0);
+                    mDataForStaticUsageLock.data(), rowWidth, 0);
 
                 if (mDevice.isError())
                 {
@@ -342,7 +331,7 @@ namespace Ogre {
             {
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex2D(), 
                     D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1),
-                    &dstBoxDx11, mDataForStaticUsageLock, rowWidth, 0);
+                    &dstBoxDx11, mDataForStaticUsageLock.data(), rowWidth, 0);
 
                 if (mDevice.isError())
                 {
@@ -358,7 +347,7 @@ namespace Ogre {
 				size_t sliceWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format);
 
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex3D(), static_cast<UINT>(mSubresourceIndex), 
-                    &dstBoxDx11, mDataForStaticUsageLock, rowWidth, sliceWidth);
+                    &dstBoxDx11, mDataForStaticUsageLock.data(), rowWidth, sliceWidth);
                 if (mDevice.isError())
                 {
                     String errorDescription = mDevice.getErrorDescription();
@@ -370,17 +359,17 @@ namespace Ogre {
             break;
         }
 
-        SAFE_DELETE_ARRAY(mDataForStaticUsageLock) ;
+        mDataForStaticUsageLock.swap(vector<int8>::type()); // i.e. shrink_to_fit
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_unmapstagingbuffer(bool copyback)
     {
-        _unmap(mStagingBuffer);
+        _unmap(mStagingBuffer.Get());
 
         if(copyback)
         {
             if(mLockBox.getHeight() == mParentTexture->getHeight() && mLockBox.getWidth() == mParentTexture->getWidth())
-                mDevice.GetImmediateContext()->CopyResource(mParentTexture->getTextureResource(), mStagingBuffer);
+                mDevice.GetImmediateContext()->CopyResource(mParentTexture->getTextureResource(), mStagingBuffer.Get());
             else
             {
                 D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(mLockBox);
@@ -388,7 +377,7 @@ namespace Ogre {
                 dstBoxDx11.back = mLockBox.getDepth();
 
                 unsigned int subresource = D3D11CalcSubresource(mSubresourceIndex, mLockBox.front, mParentTexture->getNumMipmaps()+1);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, mLockBox.left, mLockBox.top, mSubresourceIndex, mStagingBuffer, subresource, &dstBoxDx11);
+                mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, mLockBox.left, mLockBox.top, mSubresourceIndex, mStagingBuffer.Get(), subresource, &dstBoxDx11);
             }
         }
     }
@@ -861,7 +850,7 @@ namespace Ogre {
                 desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
                 desc.Usage = D3D11_USAGE_STAGING;
 
-                mDevice->CreateTexture1D(&desc, NULL, (ID3D11Texture1D**)(&mStagingBuffer));
+                mDevice->CreateTexture1D(&desc, NULL, (ID3D11Texture1D**)mStagingBuffer.ReleaseAndGetAddressOf());
             }                   
             break;
         case TEX_TYPE_2D:
@@ -876,7 +865,7 @@ namespace Ogre {
                 desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
                 desc.Usage = D3D11_USAGE_STAGING;
 
-                mDevice->CreateTexture2D(&desc, NULL, (ID3D11Texture2D**)(&mStagingBuffer));
+                mDevice->CreateTexture2D(&desc, NULL, (ID3D11Texture2D**)mStagingBuffer.ReleaseAndGetAddressOf());
             }
             break;
         case TEX_TYPE_3D:
@@ -889,7 +878,7 @@ namespace Ogre {
                 desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
                 desc.Usage = D3D11_USAGE_STAGING;
 
-                mDevice->CreateTexture3D(&desc, NULL, (ID3D11Texture3D**)(&mStagingBuffer));
+                mDevice->CreateTexture3D(&desc, NULL, (ID3D11Texture3D**)mStagingBuffer.ReleaseAndGetAddressOf());
             }
             break;
         }

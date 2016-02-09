@@ -53,6 +53,18 @@ namespace Ogre {
     D3D11HLSLProgram::CmdColumnMajorMatrices D3D11HLSLProgram::msCmdColumnMajorMatrices;
     D3D11HLSLProgram::CmdEnableBackwardsCompatibility D3D11HLSLProgram::msCmdEnableBackwardsCompatibility;
     //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::notifyDeviceLost(D3D11Device* device)
+    {
+        if(mHighLevelLoaded)
+            unloadHighLevelImpl();
+    }
+    //-----------------------------------------------------------------------
+    void D3D11HLSLProgram::notifyDeviceRestored(D3D11Device* device)
+    {
+        if(mHighLevelLoaded)
+            loadHighLevelImpl();
+    }
+    //-----------------------------------------------------------------------
     void D3D11HLSLProgram::createConstantBuffer(const UINT ByteWidth)
     {
 
@@ -63,7 +75,7 @@ namespace Ogre {
         cbDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
         cbDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         cbDesc.MiscFlags = 0;
-        HRESULT hr = mDevice->CreateBuffer( &cbDesc, NULL, &mConstantBuffer );
+        HRESULT hr = mDevice->CreateBuffer( &cbDesc, NULL, mConstantBuffer.ReleaseAndGetAddressOf() );
         if (FAILED(hr) || mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription(hr);
@@ -456,7 +468,6 @@ namespace Ogre {
         // include handler
         HLSLIncludeHandler includeHandler(this);
 
-        ID3DBlob * errors = 0;
         String stringBuffer;
         vector<D3D_SHADER_MACRO>::type defines;
         const D3D_SHADER_MACRO* pDefines = NULL;
@@ -499,7 +510,8 @@ namespace Ogre {
 
         const char* target = getCompatibleTarget().c_str();
 
-        ID3DBlob * pMicroCode;
+        ComPtr<ID3DBlob> pMicroCode;
+        ComPtr<ID3DBlob> errors;
 
         HRESULT hr = D3DCompile(
             mSource.c_str(),      // [in] Pointer to the shader in memory. 
@@ -511,18 +523,18 @@ namespace Ogre {
             target,               // [in] A string that specifies the shader model; can be any profile in shader model 4 or higher. 
             compileFlags,         // [in] Effect compile flags - no D3DCOMPILE_ENABLE_BACKWARDS_COMPATIBILITY at the first try...
             NULL,                 // [in] Effect compile flags
-            &pMicroCode,          // [out] A pointer to an ID3DBlob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
-            &errors               // [out] A pointer to an ID3DBlob Interface which contains a listing of errors and warnings that occurred during compilation. These errors and warnings are identical to the the debug output from a debugger.
+            pMicroCode.GetAddressOf(),// [out] A pointer to an ID3DBlob Interface which contains the compiled shader, as well as any embedded debug and symbol-table information. 
+            errors.GetAddressOf() // [out] A pointer to an ID3DBlob Interface which contains a listing of errors and warnings that occurred during compilation. These errors and warnings are identical to the the debug output from a debugger.
             );
 
 #if 0 // this is how you disassemble
         LPCSTR commentString = NULL;
-        ID3DBlob* pIDisassembly = NULL;
+        ComPtr<ID3DBlob> pIDisassembly;
         const char* pDisassembly = NULL;
         if( pMicroCode )
         {
             D3DDisassemble( (UINT*) pMicroCode->GetBufferPointer(), 
-                pMicroCode->GetBufferSize(), D3D_DISASM_ENABLE_COLOR_CODE, commentString, &pIDisassembly );
+                pMicroCode->GetBufferSize(), D3D_DISASM_ENABLE_COLOR_CODE, commentString, pIDisassembly.GetAddressOf() );
         }
 
         if (pIDisassembly)
@@ -535,7 +547,6 @@ namespace Ogre {
             mErrorsInCompile = true;
             String message = "Cannot compile D3D11 high-level shader " + mName + " Errors:\n" +
                 static_cast<const char*>(errors ? errors->GetBufferPointer() : "<null>");
-            SAFE_RELEASE(errors);
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, message,
                 "D3D11HLSLProgram::compileMicrocode");
         }
@@ -550,18 +561,15 @@ namespace Ogre {
                 LogManager::getSingleton().logMessage(message, LML_NORMAL);
             }
 #endif
-            SAFE_RELEASE(errors);
-
             mMicroCode.resize(pMicroCode->GetBufferSize());
             memcpy(&mMicroCode[0], pMicroCode->GetBufferPointer(), pMicroCode->GetBufferSize());
-            SAFE_RELEASE(pMicroCode);
 
             // get the parameters and variables from the shader reflection
             SIZE_T BytecodeLength = mMicroCode.size();
-            ID3D11ShaderReflection* shaderReflection;
+            ComPtr<ID3D11ShaderReflection> shaderReflection;
             HRESULT hr = D3DReflect( (void*) &mMicroCode[0], BytecodeLength,
                 IID_ID3D11ShaderReflection, // can't do __uuidof(ID3D11ShaderReflection) here...
-                (void**) &shaderReflection );
+                (void**)shaderReflection.GetAddressOf() );
 
             if (FAILED(hr))
             {
@@ -744,8 +752,6 @@ namespace Ogre {
                     }
                 }
             }
-
-            SAFE_RELEASE(shaderReflection);
 
             if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
             {
@@ -1238,13 +1244,13 @@ namespace Ogre {
         mSlotMap.clear();
         mBufferInfoMap.clear();
 
-        SAFE_RELEASE(mVertexShader);
-        SAFE_RELEASE(mPixelShader);
-        SAFE_RELEASE(mGeometryShader);
-        SAFE_RELEASE(mDomainShader);
-        SAFE_RELEASE(mHullShader);
-        SAFE_RELEASE(mComputeShader);
-        SAFE_RELEASE(mConstantBuffer);
+        mVertexShader.Reset();
+        mPixelShader.Reset();
+        mGeometryShader.Reset();
+        mDomainShader.Reset();
+        mHullShader.Reset();
+        mComputeShader.Reset();
+        mConstantBuffer.Reset();
     }
 
     //-----------------------------------------------------------------------
@@ -1481,9 +1487,7 @@ namespace Ogre {
         ResourceHandle handle, const String& group, bool isManual, 
         ManualResourceLoader* loader, D3D11Device & device)
         : HighLevelGpuProgram(creator, name, handle, group, isManual, loader)
-        , mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device)
-        , mVertexShader(NULL), mConstantBufferSize(0)
-        , mPixelShader(NULL),mGeometryShader(NULL), mHullShader(NULL), mDomainShader(NULL), mComputeShader(NULL)
+        , mErrorsInCompile(false), mDevice(device), mConstantBufferSize(0)
 		, mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false), mInputVertexDeclaration(device)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
@@ -1516,10 +1520,10 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     D3D11HLSLProgram::~D3D11HLSLProgram()
     {
-        //SAFE_RELEASE(mConstantBuffer);
+        //mConstantBuffer.Reset();
         mBufferInfoMap.clear();
 
-        // have to call this here reather than in Resource destructor
+        // have to call this here rather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
         if ( isLoaded() )
         {
@@ -1670,7 +1674,7 @@ namespace Ogre {
                 &mMicroCode[0],
                 mMicroCode.size(),
                 mDevice.GetClassLinkage(),
-                &mVertexShader);
+                mVertexShader.ReleaseAndGetAddressOf());
 
             assert(mVertexShader);
 
@@ -1679,7 +1683,7 @@ namespace Ogre {
                 String errorDescription = mDevice.getErrorDescription(hr);
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, 
                     "Cannot create D3D11 vertex shader " + mName + " from microcode.\nError Description:" + errorDescription,
-                    "D3D11GpuVertexProgram::loadFromMicrocode");
+                    "D3D11HLSLProgram::CreateVertexShader");
             }
         }
         else
@@ -1700,14 +1704,14 @@ namespace Ogre {
                 &mMicroCode[0], 
                 mMicroCode.size(),
                 mDevice.GetClassLinkage(),
-                &mPixelShader);
+                mPixelShader.ReleaseAndGetAddressOf());
 
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                     "Cannot create D3D11 Pixel shader " + mName + " from microcode.\nError Description:" + errorDescription,
-                    "D3D11GpuPixelProgram::loadFromMicrocode");
+                    "D3D11HLSLProgram::CreatePixelShader");
             }
         }
         else
@@ -1789,7 +1793,7 @@ namespace Ogre {
                     1,
                     0,
                     mDevice.GetClassLinkage(),
-                    &mGeometryShader);
+                    mGeometryShader.ReleaseAndGetAddressOf());
 
                 delete [] soDeclarations;
 
@@ -1801,7 +1805,7 @@ namespace Ogre {
                     &mMicroCode[0], 
                     mMicroCode.size(),
                     mDevice.GetClassLinkage(),
-                    &mGeometryShader);
+                    mGeometryShader.ReleaseAndGetAddressOf());
             }
 
 
@@ -1812,7 +1816,7 @@ namespace Ogre {
                 String errorDescription = mDevice.getErrorDescription(hr);
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, 
                     "Cannot create D3D11 Geometry shader " + mName + " from microcode.\nError Description:" + errorDescription,
-                    "D3D11GpuPixelProgram::loadFromMicrocode");
+                    "D3D11HLSLProgram::CreateGeometryShader");
             }
         }
         else
@@ -1831,14 +1835,14 @@ namespace Ogre {
                 &mMicroCode[0], 
                 mMicroCode.size(),
                 mDevice.GetClassLinkage(),
-                &mHullShader);
+                mHullShader.ReleaseAndGetAddressOf());
 
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
 				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Cannot create D3D11 Hull shader " + mName + " from microcode.\nError Description:" + errorDescription,
-                    "D3D11GpuPixelProgram::loadFromMicrocode");
+                    "D3D11HLSLProgram::CreateHullShader");
             }
         }
         else
@@ -1857,14 +1861,14 @@ namespace Ogre {
                 &mMicroCode[0], 
                 mMicroCode.size(),
                 mDevice.GetClassLinkage(),
-                &mDomainShader);
+                mDomainShader.ReleaseAndGetAddressOf());
 
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
 				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Cannot create D3D11 Domain shader " + mName + " from microcode.\nError Description:" + errorDescription,
-                    "D3D11GpuPixelProgram::loadFromMicrocode");
+                    "D3D11HLSLProgram::CreateDomainShader");
             }
         }
         else
@@ -1883,14 +1887,14 @@ namespace Ogre {
                 &mMicroCode[0], 
                 mMicroCode.size(),
                 mDevice.GetClassLinkage(),
-                &mComputeShader);
+                mComputeShader.ReleaseAndGetAddressOf());
 
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
 				OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
 					"Cannot create D3D11 Compute shader " + mName + " from microcode.\nError Description:" + errorDescription,
-                    "D3D11GpuPixelProgram::loadFromMicrocode");
+                    "D3D11HLSLProgram::CreateComputeShader");
             }
         }
         else
@@ -2024,42 +2028,42 @@ namespace Ogre {
     { 
         assert(mType == GPT_VERTEX_PROGRAM);
         assert(mVertexShader);
-        return mVertexShader; 
+        return mVertexShader.Get(); 
     }
     //-----------------------------------------------------------------------------
     ID3D11PixelShader* D3D11HLSLProgram::getPixelShader(void) const 
     { 
         assert(mType == GPT_FRAGMENT_PROGRAM);
         assert(mPixelShader);
-        return mPixelShader; 
+        return mPixelShader.Get(); 
     }
     //-----------------------------------------------------------------------------
     ID3D11GeometryShader* D3D11HLSLProgram::getGeometryShader(void) const 
     { 
         assert(mType == GPT_GEOMETRY_PROGRAM);
         assert(mGeometryShader);
-        return mGeometryShader; 
+        return mGeometryShader.Get(); 
     }
     //-----------------------------------------------------------------------------
     ID3D11DomainShader* D3D11HLSLProgram::getDomainShader(void) const 
     { 
         assert(mType == GPT_DOMAIN_PROGRAM);
         assert(mDomainShader);
-        return mDomainShader; 
+        return mDomainShader.Get(); 
     }
     //-----------------------------------------------------------------------------
     ID3D11HullShader* D3D11HLSLProgram::getHullShader(void) const 
     { 
         assert(mType == GPT_HULL_PROGRAM);
         assert(mHullShader);
-        return mHullShader; 
+        return mHullShader.Get(); 
     }
     //-----------------------------------------------------------------------------
     ID3D11ComputeShader* D3D11HLSLProgram::getComputeShader(void) const 
     { 
         assert(mType == GPT_COMPUTE_PROGRAM);
         assert(mComputeShader);
-        return mComputeShader; 
+        return mComputeShader.Get(); 
     }
     //-----------------------------------------------------------------------------
     const MicroCode & D3D11HLSLProgram::getMicroCode(void) const 

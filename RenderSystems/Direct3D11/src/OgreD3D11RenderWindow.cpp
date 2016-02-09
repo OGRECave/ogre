@@ -48,9 +48,8 @@ namespace Ogre
     // class D3D11RenderWindowBase
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowBase
-    D3D11RenderWindowBase::D3D11RenderWindowBase(D3D11Device & device, IDXGIFactoryN* pDXGIFactory)
+    D3D11RenderWindowBase::D3D11RenderWindowBase(D3D11Device & device)
         : mDevice(device)
-        , mpDXGIFactory(pDXGIFactory)
     {
         mIsFullScreen = false;
         mIsExternal = false;
@@ -58,10 +57,6 @@ namespace Ogre
         mSizing = false;
         mClosed = false;
         mHidden = false;
-        mpBackBuffer = 0;
-        mpBackBufferNoMSAA = 0;
-        mRenderTargetView = 0;
-        mDepthStencilView = 0;
     }
     //---------------------------------------------------------------------
     D3D11RenderWindowBase::~D3D11RenderWindowBase()
@@ -168,7 +163,7 @@ namespace Ogre
 
         RTVDesc.Format = _getRenderFormat(); // if BB is from swapchain than RTV format can have extra _SRGB suffix not present in BB format
         RTVDesc.ViewDimension = mFSAAType.Count > 1 ? D3D11_RTV_DIMENSION_TEXTURE2DMS : D3D11_RTV_DIMENSION_TEXTURE2D;
-        hr = mDevice->CreateRenderTargetView( mpBackBuffer, &RTVDesc, &mRenderTargetView );
+        hr = mDevice->CreateRenderTargetView( mpBackBuffer.Get(), &RTVDesc, mRenderTargetView.ReleaseAndGetAddressOf() );
 
         if( FAILED(hr) )
         {
@@ -182,7 +177,7 @@ namespace Ogre
         if( mDepthBufferPoolId != DepthBuffer::POOL_NO_DEPTH )
         {
             // Create depth stencil texture
-            ID3D11Texture2D* pDepthStencil = NULL;
+            ComPtr<ID3D11Texture2D> pDepthStencil;
             D3D11_TEXTURE2D_DESC descDepth;
 
             descDepth.Width = BBDesc.Width;
@@ -197,7 +192,7 @@ namespace Ogre
             descDepth.CPUAccessFlags = 0;
             descDepth.MiscFlags = 0;
 
-            hr = mDevice->CreateTexture2D( &descDepth, NULL, &pDepthStencil );
+            hr = mDevice->CreateTexture2D( &descDepth, NULL, pDepthStencil.ReleaseAndGetAddressOf() );
             if( FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
@@ -212,10 +207,8 @@ namespace Ogre
 
             descDSV.Format =  descDepth.Format;
             descDSV.ViewDimension = mFSAAType.Count > 1 ? D3D11_DSV_DIMENSION_TEXTURE2DMS : D3D11_DSV_DIMENSION_TEXTURE2D;
-            hr = mDevice->CreateDepthStencilView( pDepthStencil, &descDSV, &mDepthStencilView );
+            hr = mDevice->CreateDepthStencilView( pDepthStencil.Get(), &descDSV, mDepthStencilView.ReleaseAndGetAddressOf() );
 
-            SAFE_RELEASE(pDepthStencil);
-                
             if( FAILED(hr) )
             {
 				String errorDescription = mDevice.getErrorDescription(hr);
@@ -225,7 +218,7 @@ namespace Ogre
             }
 
             D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-            DepthBuffer *depthBuf = rsys->_addManualDepthBuffer( mDepthStencilView, mWidth, mHeight,
+            DepthBuffer *depthBuf = rsys->_addManualDepthBuffer( mDepthStencilView.Get(), mWidth, mHeight,
                                                                  mFSAAType.Count, mFSAAType.Quality );
 
             //Don't forget we want this window to use _this_ depth buffer
@@ -235,9 +228,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::_destroySizeDependedD3DResources()
     {
-        SAFE_RELEASE(mpBackBuffer);
-        SAFE_RELEASE(mpBackBufferNoMSAA);
-        SAFE_RELEASE(mRenderTargetView);
+        mpBackBuffer.Reset();
+        mpBackBufferNoMSAA.Reset();
+        mRenderTargetView.Reset();
 
         // delete manual depth buffer (depth buffer view non-owning wrapper)
         DepthBuffer* depthBuf = this->getDepthBuffer();
@@ -246,7 +239,7 @@ namespace Ogre
         rsys->_removeManualDepthBuffer(depthBuf);
         delete depthBuf;
 
-        SAFE_RELEASE(mDepthStencilView);
+        mDepthStencilView.Reset();
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::destroy()
@@ -257,6 +250,14 @@ namespace Ogre
         mClosed = true;
     }
     //---------------------------------------------------------------------
+    void D3D11RenderWindowBase::updateImpl()
+	{
+		D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+		rsys->validateDevice();
+
+		RenderWindow::updateImpl();
+	}
+    //---------------------------------------------------------------------
     void D3D11RenderWindowBase::_updateViewportsDimensions()
     {
         // Notify viewports of resize
@@ -265,7 +266,7 @@ namespace Ogre
             (*it++).second->_updateDimensions();            
     }
     //---------------------------------------------------------------------
-    IDXGIDeviceN* D3D11RenderWindowBase::_queryDxgiDevice()
+    void D3D11RenderWindowBase::_queryDxgiDeviceImpl(IDXGIDeviceN** dxgiDevice)
     {
         if (mDevice.isNull())
         {
@@ -274,16 +275,13 @@ namespace Ogre
                 "D3D11RenderWindowBase::_queryDxgiDevice");
         }
 
-        IDXGIDeviceN* pDXGIDevice = NULL;
-        HRESULT hr = mDevice->QueryInterface( __uuidof(IDXGIDeviceN), (void**)&pDXGIDevice );
+        HRESULT hr = mDevice->QueryInterface( __uuidof(IDXGIDeviceN), (void**)dxgiDevice );
         if( FAILED(hr) )
         {
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
                 "Unable to query a DXGIDevice",
                 "D3D11RenderWindowBase::_queryDxgiDevice");
         }
-
-        return pDXGIDevice;
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowBase::getCustomAttribute( const String& name, void* pData )
@@ -306,13 +304,13 @@ namespace Ogre
         }
         else if( name == "ID3D11RenderTargetView" )
         {
-            *static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView;
+            *static_cast<ID3D11RenderTargetView**>(pData) = mRenderTargetView.Get();
             return;
         }
         else if( name == "ID3D11Texture2D" )
         {
             ID3D11Texture2D **pBackBuffer = (ID3D11Texture2D**)pData;
-            *pBackBuffer = mpBackBuffer;
+            *pBackBuffer = mpBackBuffer.Get();
             return;
         }
         else if( name == "numberOfViews" )
@@ -340,7 +338,7 @@ namespace Ogre
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "D3D11RenderWindowBase::copyContentsToMemory" );
         }
 
-        if(mpBackBuffer == NULL)
+        if(!mpBackBuffer)
             return;
 
         // get the backbuffer desc
@@ -348,18 +346,15 @@ namespace Ogre
         mpBackBuffer->GetDesc( &BBDesc );
 
         // We need data from backbuffer without MSAA
-        ID3D11Texture2D *backbufferNoMSAA = NULL;
+        ComPtr<ID3D11Texture2D> backbufferNoMSAA;
         if(BBDesc.SampleDesc.Count == 1)
         {
             backbufferNoMSAA = mpBackBuffer;
-            backbufferNoMSAA->AddRef();
         }
         else if(mpBackBufferNoMSAA)
         {
             backbufferNoMSAA = mpBackBufferNoMSAA;
-            backbufferNoMSAA->AddRef();
-
-            mDevice.GetImmediateContext()->ResolveSubresource(backbufferNoMSAA, 0, mpBackBuffer, 0, BBDesc.Format);
+            mDevice.GetImmediateContext()->ResolveSubresource(backbufferNoMSAA.Get(), 0, mpBackBuffer.Get(), 0, BBDesc.Format);
         }
         else
         {
@@ -370,7 +365,7 @@ namespace Ogre
             desc.BindFlags = 0;
             desc.CPUAccessFlags = 0;
 
-            HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, &backbufferNoMSAA);
+            HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, backbufferNoMSAA.ReleaseAndGetAddressOf());
             if (FAILED(hr) || mDevice.isError())
             {
                 String errorDescription = mDevice.getErrorDescription(hr);
@@ -379,7 +374,7 @@ namespace Ogre
                     "D3D11RenderWindow::copyContentsToMemory" );
             }
 
-            mDevice.GetImmediateContext()->ResolveSubresource(backbufferNoMSAA, 0, mpBackBuffer, 0, BBDesc.Format);
+            mDevice.GetImmediateContext()->ResolveSubresource(backbufferNoMSAA.Get(), 0, mpBackBuffer.Get(), 0, BBDesc.Format);
         }
 
 
@@ -391,8 +386,8 @@ namespace Ogre
         BBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
         // create a temp buffer to copy to
-        ID3D11Texture2D* backbufferStaging = NULL;
-        HRESULT hr = mDevice->CreateTexture2D(&BBDesc, NULL, &backbufferStaging);
+        ComPtr<ID3D11Texture2D> backbufferStaging;
+        HRESULT hr = mDevice->CreateTexture2D(&BBDesc, NULL, backbufferStaging.ReleaseAndGetAddressOf());
 
         if (FAILED(hr) || mDevice.isError())
         {
@@ -402,22 +397,18 @@ namespace Ogre
                         "D3D11RenderWindow::copyContentsToMemory" );
         }
         // copy the back buffer
-        mDevice.GetImmediateContext()->CopyResource(backbufferStaging, backbufferNoMSAA);
+        mDevice.GetImmediateContext()->CopyResource(backbufferStaging.Get(), backbufferNoMSAA.Get());
 
         // map the copied texture
         D3D11_MAPPED_SUBRESOURCE mappedTex2D;
-        mDevice.GetImmediateContext()->Map(backbufferStaging, 0, D3D11_MAP_READ, 0, &mappedTex2D);
+        mDevice.GetImmediateContext()->Map(backbufferStaging.Get(), 0, D3D11_MAP_READ, 0, &mappedTex2D);
 
         // copy the texture to the dest
         PixelBox src = D3D11Mappings::getPixelBoxWithMapping(dst.getWidth(), dst.getHeight(), 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
         PixelUtil::bulkPixelConversion(src, dst);
 
         // unmap the temp buffer
-        mDevice.GetImmediateContext()->Unmap(backbufferStaging, 0);
-
-        // Release temp buffers
-        SAFE_RELEASE(backbufferStaging);
-        SAFE_RELEASE(backbufferNoMSAA);
+        mDevice.GetImmediateContext()->Unmap(backbufferStaging.Get(), 0);
     }
 	//---------------------------------------------------------------------
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
@@ -432,9 +423,8 @@ namespace Ogre
     // class D3D11RenderWindowSwapChainBased
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowSwapChainBased
-    D3D11RenderWindowSwapChainBased::D3D11RenderWindowSwapChainBased(D3D11Device & device, IDXGIFactoryN* pDXGIFactory)
-        : D3D11RenderWindowBase(device, pDXGIFactory)
-        , mpSwapChain(NULL)
+    D3D11RenderWindowSwapChainBased::D3D11RenderWindowSwapChainBased(D3D11Device & device)
+        : D3D11RenderWindowBase(device)
     {
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
         mUseFlipSequentialMode = false;
@@ -452,25 +442,32 @@ namespace Ogre
         D3D11RenderWindowBase::destroy();
     }
     //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainBased::notifyDeviceLost(D3D11Device* device)
+    {
+        _destroySizeDependedD3DResources();
+        _destroySwapChain();
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowSwapChainBased::notifyDeviceRestored(D3D11Device* device)
+    {
+        _createSwapChain();
+        _createSizeDependedD3DResources();
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_destroySwapChain()
     {
-        if(mIsFullScreen && mpSwapChain != NULL)
+        if(mIsFullScreen && mpSwapChain)
             mpSwapChain->SetFullscreenState(false, NULL); // get back from fullscreen
 
-        SAFE_RELEASE(mpSwapChain);
+        mpSwapChain.Reset();
     }
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_createSwapChain(void)
     {
         ZeroMemory( &mSwapChainDesc, sizeof(DXGI_SWAP_CHAIN_DESC_N) );
 
-        // get the dxgi device
-        IDXGIDeviceN* pDXGIDevice = _queryDxgiDevice();
         // here the mSwapChainDesc and mpSwapChain are initialized
-        HRESULT hr = _createSwapChainImpl(pDXGIDevice);
-
-        SAFE_RELEASE(pDXGIDevice);
-
+        HRESULT hr = _createSwapChainImpl(_queryDxgiDevice().Get());
         if (FAILED(hr))
         {
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
@@ -481,8 +478,8 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowSwapChainBased::_createSizeDependedD3DResources()
     {
-        SAFE_RELEASE(mpBackBuffer);
-        SAFE_RELEASE(mpBackBufferNoMSAA);
+        mpBackBuffer.Reset();
+        mpBackBufferNoMSAA.Reset();
 
         HRESULT hr = S_OK;
         if(mUseFlipSequentialMode && mFSAAType.Count > 1)
@@ -502,7 +499,7 @@ namespace Ogre
             desc.CPUAccessFlags      = 0;
             desc.MiscFlags           = 0;
 
-            hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+            hr = mDevice->CreateTexture2D(&desc, NULL, mpBackBuffer.ReleaseAndGetAddressOf());
 
             if(SUCCEEDED(hr) && isHardwareGammaEnabled())
             {
@@ -511,13 +508,13 @@ namespace Ogre
                 desc.SampleDesc.Count    = 1;
                 desc.SampleDesc.Quality  = 0;
 
-                hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBufferNoMSAA);
+                hr = mDevice->CreateTexture2D(&desc, NULL, mpBackBufferNoMSAA.ReleaseAndGetAddressOf());
             }
         }
         else
         {
             // Obtain back buffer from swapchain
-            hr = mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&mpBackBuffer);
+            hr = mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)mpBackBuffer.ReleaseAndGetAddressOf());
         }
 
         if(FAILED(hr))
@@ -560,6 +557,7 @@ namespace Ogre
     void D3D11RenderWindowSwapChainBased::_resizeSwapChainBuffers(unsigned width, unsigned height)
     {
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->validateDevice();
         rsys->fireDeviceEvent(&mDevice,"RenderWindowBeforeResize",this);
 
         _destroySizeDependedD3DResources();
@@ -570,7 +568,14 @@ namespace Ogre
 
         // width and height can be zero to autodetect size, therefore do not rely on them
         HRESULT hr = mpSwapChain->ResizeBuffers(mSwapChainDesc.BufferCount, width, height, _getSwapChainFormat(), 0);
-        if(FAILED(hr))
+        if(hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+        {
+            rsys->handleDeviceLost();
+            // Everything is set up now. Do not continue execution of this method. HandleDeviceLost will reenter this method 
+            // and correctly set up the new device.
+            return;
+        }
+        else if(FAILED(hr))
             OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Unable to resize swap chain", "D3D11RenderWindowSwapChainBased::_resizeSwapChainBuffers");
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -602,22 +607,21 @@ namespace Ogre
             // Step of resolving MSAA resource for swap chains in FlipSequentialMode should be done by application rather than by OS.
             if(mUseFlipSequentialMode && mFSAAType.Count > 1)
             {
-                ID3D11Texture2D* swapChainBackBuffer = NULL;
-                HRESULT hr = mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&swapChainBackBuffer);
+                ComPtr<ID3D11Texture2D> swapChainBackBuffer;
+                HRESULT hr = mpSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)swapChainBackBuffer.ReleaseAndGetAddressOf());
                 if(FAILED(hr))
                     OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, "Error obtaining backbuffer", "D3D11RenderWindowSwapChainBased::swapBuffers");
                 if(!isHardwareGammaEnabled())
                 {
                     assert(_getRenderFormat() == _getSwapChainFormat());
-                    mDevice.GetImmediateContext()->ResolveSubresource(swapChainBackBuffer, 0, mpBackBuffer, 0, _getRenderFormat());
+                    mDevice.GetImmediateContext()->ResolveSubresource(swapChainBackBuffer.Get(), 0, mpBackBuffer.Get(), 0, _getRenderFormat());
 				}
 				else
                 {
                     assert(mpBackBufferNoMSAA);
-                    mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, _getRenderFormat());
-                    mDevice.GetImmediateContext()->CopyResource(swapChainBackBuffer, mpBackBufferNoMSAA);
+                    mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA.Get(), 0, mpBackBuffer.Get(), 0, _getRenderFormat());
+                    mDevice.GetImmediateContext()->CopyResource(swapChainBackBuffer.Get(), mpBackBufferNoMSAA.Get());
                 }
-                SAFE_RELEASE(swapChainBackBuffer);
 			}
 
             // flip presentation model swap chains have another semantic for first parameter
@@ -670,8 +674,8 @@ namespace Ogre
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowHwnd
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    D3D11RenderWindowHwnd::D3D11RenderWindowHwnd(D3D11Device & device, IDXGIFactoryN* pDXGIFactory)
-        : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
+    D3D11RenderWindowHwnd::D3D11RenderWindowHwnd(D3D11Device & device)
+        : D3D11RenderWindowSwapChainBased(device)
     {
         mHWnd = 0;
 		mWindowedWinStyle = 0;
@@ -899,13 +903,13 @@ namespace Ogre
         mHeight = rc.bottom;
 
         LogManager::getSingleton().stream()
-            << "D3D11 : Created D3D11 Rendering Window '"
+            << "D3D11: Created D3D11 Rendering Window '"
             << mName << "' : " << mWidth << "x" << mHeight 
             << ", " << mColourDepth << "bpp";
 
         _createSwapChain();
         _createSizeDependedD3DResources();
-        mpDXGIFactory->MakeWindowAssociation(mHWnd, NULL);
+        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, NULL);
         setHidden(mHidden);
 
         D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
@@ -923,6 +927,12 @@ namespace Ogre
         }
 
         mHWnd = NULL;
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowHwnd::notifyDeviceRestored(D3D11Device* device)
+    {
+        D3D11RenderWindowSwapChainBased::notifyDeviceRestored(device);
+        mDevice.GetDXGIFactory()->MakeWindowAssociation(mHWnd, NULL);
     }
     //---------------------------------------------------------------------
 	HRESULT D3D11RenderWindowHwnd::_createSwapChainImpl(IDXGIDeviceN* pDXGIDevice)
@@ -970,13 +980,13 @@ namespace Ogre
             // frame rates no matter what buffering modes are used (odd - perhaps a
             // timer issue in D3D11 since GL doesn't suffer from this) 
             // low is < 200fps in this context
-            LogManager::getSingleton().logMessage("D3D11 : WARNING - "
+            LogManager::getSingleton().logMessage("D3D11: WARNING - "
                 "disabling VSync in windowed mode can cause timing issues at lower "
                 "frame rates, turn VSync on if you observe this problem.");
         }
 
         // Create swap chain            
-        HRESULT hr = mpDXGIFactory->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, &mpSwapChain);
+        HRESULT hr = mDevice.GetDXGIFactory()->CreateSwapChain(pDXGIDevice, &mSwapChainDesc, mpSwapChain.ReleaseAndGetAddressOf());
 
         return hr;
     }
@@ -1231,7 +1241,6 @@ namespace Ogre
 			mWidth  = rc.right - rc.left;
 			mHeight = rc.bottom - rc.top;
 			_resizeSwapChainBuffers(mWidth, mHeight);
-			_updateViewportsDimensions();		
 		}	
 	}
 	void D3D11RenderWindowHwnd::_beginUpdate()
@@ -1279,8 +1288,8 @@ namespace Ogre
     //---------------------------------------------------------------------
 #pragma region D3D11RenderWindowCoreWindow
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-    D3D11RenderWindowCoreWindow::D3D11RenderWindowCoreWindow(D3D11Device & device, IDXGIFactoryN*   pDXGIFactory)
-        : D3D11RenderWindowSwapChainBased(device, pDXGIFactory)
+    D3D11RenderWindowCoreWindow::D3D11RenderWindowCoreWindow(D3D11Device& device)
+        : D3D11RenderWindowSwapChainBased(device)
     {
         mUseFlipSequentialMode = true;
     }
@@ -1332,7 +1341,7 @@ namespace Ogre
         mHeight = (int)(rc.Height * scale + 0.5f);
 
         LogManager::getSingleton().stream() << std::fixed << std::setprecision(1) 
-            << "D3D11 : Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
+            << "D3D11: Created D3D11 Rendering Window \"" << mName << "\", " << rc.Width << " x " << rc.Height
             << ", with backing store " << mWidth << "x" << mHeight << ", " << mColourDepth << "bpp, "
             << "using content scaling factor " << scale;
 
@@ -1383,7 +1392,7 @@ namespace Ogre
         mSwapChainDesc.AlphaMode            = DXGI_ALPHA_MODE_UNSPECIFIED;
 
         // Create swap chain
-        HRESULT hr = mpDXGIFactory->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, &mpSwapChain);
+        HRESULT hr = mDevice.GetDXGIFactory()->CreateSwapChainForCoreWindow(pDXGIDevice, reinterpret_cast<IUnknown*>(mCoreWindow.Get()), &mSwapChainDesc, NULL, mpSwapChain.ReleaseAndGetAddressOf());
         if (FAILED(hr))
             return hr;
 
@@ -1420,9 +1429,8 @@ namespace Ogre
 #pragma region D3D11RenderWindowImageSource
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT && !__OGRE_WINRT_PHONE_80
 
-    D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device, IDXGIFactoryN* pDXGIFactory)
-        : D3D11RenderWindowBase(device, pDXGIFactory)
-        , mImageSourceNative(NULL)
+    D3D11RenderWindowImageSource::D3D11RenderWindowImageSource(D3D11Device& device)
+        : D3D11RenderWindowBase(device)
     {
     }
     //---------------------------------------------------------------------
@@ -1455,16 +1463,26 @@ namespace Ogre
     {
         D3D11RenderWindowBase::destroy();
 
-        SAFE_RELEASE(mImageSourceNative);
+        mImageSourceNative.Reset();
         mImageSource = nullptr;
         mBrush = nullptr;
     }
     //---------------------------------------------------------------------
+    void D3D11RenderWindowImageSource::notifyDeviceLost(D3D11Device* device)
+    {
+        _destroySizeDependedD3DResources();
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderWindowImageSource::notifyDeviceRestored(D3D11Device* device)
+    {
+        _createSizeDependedD3DResources();
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderWindowImageSource::_createSizeDependedD3DResources()
     {
-        SAFE_RELEASE(mpBackBuffer);
-        SAFE_RELEASE(mpBackBufferNoMSAA);
-        SAFE_RELEASE(mImageSourceNative);
+        mpBackBuffer.Reset();
+        mpBackBufferNoMSAA.Reset();
+        mImageSourceNative.Reset();
 
         if(mWidth <= 0 || mHeight <= 0)
         {
@@ -1491,14 +1509,14 @@ namespace Ogre
         desc.MiscFlags = 0;
 
         // Create back buffer, maybe with FSAA
-        HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+        HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, mpBackBuffer.ReleaseAndGetAddressOf());
         if(FAILED(hr) && mFSAAType.Count > 1)
         {
             // Second chance - try without FSAA, keep mFSAAType synchronized.
             LogManager::getSingleton().logMessage("Unable to Create MSAA Back Buffer, retry without MSAA support");
             desc.SampleDesc.Count = mFSAAType.Count = 1;
             desc.SampleDesc.Quality = mFSAAType.Quality = 0;
-            hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBuffer);
+            hr = mDevice->CreateTexture2D(&desc, NULL, mpBackBuffer.ReleaseAndGetAddressOf());
         }
         if( FAILED(hr) )
         {
@@ -1512,7 +1530,7 @@ namespace Ogre
         {
             desc.SampleDesc.Count = 1;
             desc.SampleDesc.Quality = 0;
-            hr = mDevice->CreateTexture2D(&desc, NULL, &mpBackBufferNoMSAA);
+            hr = mDevice->CreateTexture2D(&desc, NULL, mpBackBufferNoMSAA.ReleaseAndGetAddressOf());
             if( FAILED(hr) )
             {
                 OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
@@ -1523,12 +1541,10 @@ namespace Ogre
 
         // create front buffer - SurfaceImageSource
         mImageSource = ref new Windows::UI::Xaml::Media::Imaging::SurfaceImageSource(mWidth, mHeight, true);
-        reinterpret_cast<IUnknown*>(mImageSource)->QueryInterface(__uuidof(ISurfaceImageSourceNative), (void **)&mImageSourceNative);
+        reinterpret_cast<IUnknown*>(mImageSource)->QueryInterface(__uuidof(ISurfaceImageSourceNative), (void **)mImageSourceNative.ReleaseAndGetAddressOf());
 
         // set DXGI device for the front buffer
-        IDXGIDeviceN* pDXGIDevice = _queryDxgiDevice();
-        mImageSourceNative->SetDevice(pDXGIDevice);
-        SAFE_RELEASE(pDXGIDevice);
+        mImageSourceNative->SetDevice(_queryDxgiDevice().Get());
 
         // create all other size depended resources
         D3D11RenderWindowBase::_createSizeDependedD3DResources();
@@ -1538,7 +1554,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowImageSource::update(bool swapBuffers)
     {
-        if(mImageSourceNative == NULL)
+        if(!mImageSourceNative)
             return;
 
         D3D11RenderWindowBase::update(swapBuffers);
@@ -1546,14 +1562,14 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowImageSource::swapBuffers()
     {
-        if(mImageSourceNative == NULL)
+        if(!mImageSourceNative)
             return;
 
-        IDXGISurface* dxgiSurface = NULL;
+        ComPtr<IDXGISurface> dxgiSurface;
         RECT updateRect = { 0, 0, mWidth, mHeight };
         POINT offset = { 0, 0 };
 
-        HRESULT hr = mImageSourceNative->BeginDraw(updateRect, &dxgiSurface, &offset);
+        HRESULT hr = mImageSourceNative->BeginDraw(updateRect, dxgiSurface.ReleaseAndGetAddressOf(), &offset);
         if(hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
             return;
 
@@ -1564,9 +1580,8 @@ namespace Ogre
                 "D3D11RenderWindowImageSource::swapBuffers");
         }
 
-        ID3D11Texture2D* destTexture = NULL;
-        hr = dxgiSurface->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&destTexture);
-        SAFE_RELEASE(dxgiSurface);
+        ComPtr<ID3D11Texture2D> destTexture;
+        hr = dxgiSurface.As(&destTexture);
         if(FAILED(hr))
         {
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
@@ -1577,16 +1592,13 @@ namespace Ogre
         // resolve multi-sample texture into single-sample texture if needed
         if(mpBackBufferNoMSAA)
         {
-		mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA, 0, mpBackBuffer, 0, _getRenderFormat());
-		mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBufferNoMSAA, 0, NULL, 0);
+            mDevice.GetImmediateContext()->ResolveSubresource(mpBackBufferNoMSAA.Get(), 0, mpBackBuffer.Get(), 0, _getRenderFormat());
+            mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture.Get(), 0, offset.x, offset.y, 0, mpBackBufferNoMSAA.Get(), 0, NULL, 0);
         }
         else
-            mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture, 0, offset.x, offset.y, 0, mpBackBuffer, 0, NULL, 0);
+            mDevice.GetImmediateContext()->CopySubresourceRegion1(destTexture.Get(), 0, offset.x, offset.y, 0, mpBackBuffer.Get(), 0, NULL, 0);
 
         hr = mImageSourceNative->EndDraw();
-
-        SAFE_RELEASE(destTexture);
-
         if( FAILED(hr) )
         {
 			OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
@@ -1597,6 +1609,9 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderWindowImageSource::resize(unsigned width, unsigned height)
     {
+        D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
+        rsys->validateDevice();
+
         _destroySizeDependedD3DResources();
 
         mWidth = width;

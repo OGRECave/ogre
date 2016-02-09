@@ -76,6 +76,26 @@ namespace Ogre {
         ResourceGroupManager::getSingleton()._unregisterScriptLoader(this);
     }
     //---------------------------------------------------------------------
+    void OverlayManager::_releaseManualHardwareResources()
+    {
+        for(int iTemplate = 0; iTemplate <= 1; ++iTemplate)
+        {
+            ElementMap& elementMap = getElementMap(iTemplate != 0);
+            for(ElementMap::iterator i = elementMap.begin(), i_end = elementMap.end(); i != i_end; ++i)
+                i->second->_releaseManualHardwareResources();
+        }
+    }
+    //---------------------------------------------------------------------
+    void OverlayManager::_restoreManualHardwareResources()
+    {
+        for(int iTemplate = 0; iTemplate <= 1; ++iTemplate)
+        {
+            ElementMap& elementMap = getElementMap(iTemplate != 0);
+            for(ElementMap::iterator i = elementMap.begin(), i_end = elementMap.end(); i != i_end; ++i)
+                i->second->_restoreManualHardwareResources();
+        }
+    }
+    //---------------------------------------------------------------------
     const StringVector& OverlayManager::getScriptPatterns(void) const
     {
         return mScriptPatterns;

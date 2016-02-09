@@ -45,6 +45,8 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    RenderSystem::Listener* RenderSystem::msSharedEventListener = 0;
+
     static const TexturePtr sNullTexPtr;
 
     //-----------------------------------------------------------------------
@@ -924,6 +926,17 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
+    void RenderSystem::setSharedListener(Listener* listener)
+    {
+        assert(msSharedEventListener == NULL || listener == NULL); // you can set or reset, but for safety not directly override
+        msSharedEventListener = listener;
+    }
+    //-----------------------------------------------------------------------
+    RenderSystem::Listener* RenderSystem::getSharedListener(void)
+    {
+        return msSharedEventListener;
+    }
+    //-----------------------------------------------------------------------
     void RenderSystem::addListener(Listener* l)
     {
         mEventListeners.push_back(l);
@@ -941,6 +954,9 @@ namespace Ogre {
         {
             (*i)->eventOccurred(name, params);
         }
+
+        if(msSharedEventListener)
+            msSharedEventListener->eventOccurred(name, params);
     }
     //-----------------------------------------------------------------------
     void RenderSystem::destroyHardwareOcclusionQuery( HardwareOcclusionQuery *hq)

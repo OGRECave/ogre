@@ -29,22 +29,25 @@ THE SOFTWARE.
 #define __D3D11VERTEXDECLARATION_H__
 
 #include "OgreD3D11Prerequisites.h"
+#include "OgreD3D11DeviceResource.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHighLevelGpuProgramManager.h"
 
 namespace Ogre { 
 
     /** Specialisation of VertexDeclaration for D3D11 */
-    class D3D11VertexDeclaration : public VertexDeclaration
+    class D3D11VertexDeclaration
+        : public VertexDeclaration
+        , protected D3D11DeviceResource
     {
     protected:
         D3D11Device & mlpD3DDevice;
 
         bool mNeedsRebuild;
 
-        typedef map<D3D11HLSLProgram*, ID3D11InputLayout*>::type ShaderToILayoutMap;
+        typedef map<D3D11HLSLProgram*, ComPtr<ID3D11InputLayout>>::type ShaderToILayoutMap;
         typedef ShaderToILayoutMap::iterator ShaderToILayoutMapIterator;
-        typedef map<D3D11HLSLProgram*, D3D11_INPUT_ELEMENT_DESC*>::type ShaderToInputDesc;
+        typedef map<D3D11HLSLProgram*, vector<D3D11_INPUT_ELEMENT_DESC>::type>::type ShaderToInputDesc;
         typedef ShaderToInputDesc::iterator ShaderToInputDescIterator;
 
         ShaderToInputDesc  mD3delems;
@@ -54,6 +57,10 @@ namespace Ogre {
         /** Gets the D3D11-specific vertex declaration. */
         ID3D11InputLayout   *  getILayoutByShader(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
         D3D11_INPUT_ELEMENT_DESC * getD3DVertexDeclaration(D3D11HLSLProgram* boundVertexProgram, VertexBufferBinding* binding);
+        void clearCache();
+
+        void notifyDeviceLost(D3D11Device* device);
+        void notifyDeviceRestored(D3D11Device* device);
 
     public:
         D3D11VertexDeclaration(D3D11Device &  device);

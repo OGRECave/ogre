@@ -26,14 +26,35 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D11GpuProgramManager.h"
-#include "OgreD3D11GpuProgram.h"
 #include "OgreD3D11Device.h"
 #include "OgreException.h"
 
 namespace Ogre {
+
+    class D3D11UnsupportedGpuProgram : public GpuProgram
+    {
+    public:
+        D3D11UnsupportedGpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader)
+            : GpuProgram(creator, name, handle, group, isManual, loader) { }
+
+        void throwException()
+        {
+            String message = "D3D11 dosn't support assembly shaders. Shader name:" + mName + "\n";
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, message,
+                "D3D11UnsupportedGpuProgram::loadFromSource");
+        }
+
+    protected:
+        void loadImpl(void)         { throwException(); }
+        void loadFromSource(void)   { throwException(); }
+        void unloadImpl(void)       { }
+    };
+
+
     //-----------------------------------------------------------------------------
-    D3D11GpuProgramManager::D3D11GpuProgramManager(D3D11Device & device)
-        :GpuProgramManager(), mDevice(device)
+    D3D11GpuProgramManager::D3D11GpuProgramManager()
+        :GpuProgramManager()
     {
         // Superclass sets up members 
 
@@ -62,60 +83,13 @@ namespace Ogre {
                 "D3D11GpuProgramManager::createImpl");
         }
 
-        if (paramIt->second == "vertex_program")
-        {
-            return new D3D11GpuVertexProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
-        else if (paramIt->second == "domain_program")
-        {
-            return new D3D11GpuDomainProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
-        else if (paramIt->second == "hull_program")
-        {
-            return new D3D11GpuHullProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
-        else if (paramIt->second == "geometry_program")
-        {
-            return new D3D11GpuGeometryProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
-        else
-        {
-            return new D3D11GpuFragmentProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
+        return new D3D11UnsupportedGpuProgram(this, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------------
     Resource* D3D11GpuProgramManager::createImpl(const String& name, ResourceHandle handle, 
         const String& group, bool isManual, ManualResourceLoader* loader,
         GpuProgramType gptype, const String& syntaxCode)
     {
-        if (gptype == GPT_VERTEX_PROGRAM)
-        {
-            return new D3D11GpuVertexProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
-        else if (gptype == GPT_DOMAIN_PROGRAM)
-        {
-            return new D3D11GpuDomainProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
-        else if (gptype == GPT_HULL_PROGRAM)
-        {
-            return new D3D11GpuHullProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
-        else if (gptype == GPT_GEOMETRY_PROGRAM)
-        {
-            return new D3D11GpuGeometryProgram(this, name, handle, group,
-                isManual, loader, mDevice);
-        }
-        {
-            return new D3D11GpuFragmentProgram(this, name, handle, group, 
-                isManual, loader, mDevice);
-        }
+        return new D3D11UnsupportedGpuProgram(this, name, handle, group, isManual, loader);
     }
 }

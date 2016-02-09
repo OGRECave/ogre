@@ -587,7 +587,7 @@ void Sample_MeshLod::buttonHit( OgreBites::Button* button )
             mSceneMgr->destroyEntity(mMeshEntity);
             mMeshEntity = 0;
         }
-        mLodConfig.mesh->reload();
+        mLodConfig.mesh->reload(Resource::LF_DEFAULT);
         mMeshEntity = mSceneMgr->createEntity(mLodConfig.mesh->getName(), mLodConfig.mesh);
         mMeshNode->attachObject(mMeshEntity);
         forceLodLevel(-1); // disable Lod level forcing

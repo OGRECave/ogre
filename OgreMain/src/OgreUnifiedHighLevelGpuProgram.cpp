@@ -289,10 +289,10 @@ namespace Ogre
             _getDelegate()->load(backgroundThread);
     }
     //-----------------------------------------------------------------------
-    void UnifiedHighLevelGpuProgram::reload(void)
+    void UnifiedHighLevelGpuProgram::reload(LoadingFlags flags)
     {
         if (!_getDelegate().isNull())
-            _getDelegate()->reload();
+            _getDelegate()->reload(flags);
     }
     //-----------------------------------------------------------------------
     bool UnifiedHighLevelGpuProgram::isReloadable(void) const

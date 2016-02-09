@@ -104,50 +104,71 @@ namespace Ogre {
             mRenderOp.useGlobalInstancingVertexBufferIsAvailable = false;
             // Vertex buffer will be created in checkMemoryAllocation
 
-            checkMemoryAllocation( DEFAULT_INITIAL_CHARS );
-
             mInitialised = true;
+
+            checkMemoryAllocation( DEFAULT_INITIAL_CHARS );
         }
 
     }
-
+    //---------------------------------------------------------------------
     void TextAreaOverlayElement::checkMemoryAllocation( size_t numChars )
     {
         if( mAllocSize < numChars)
         {
+            mAllocSize = numChars;
+
             // Create and bind new buffers
             // Note that old buffers will be deleted automatically through reference counting
-            
-            // 6 verts per char since we're doing tri lists without indexes
-            // Allocate space for positions & texture coords
-            VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
-            VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
-
-            mRenderOp.vertexData->vertexCount = numChars * 6;
-
-            // Create dynamic since text tends to change a lot
-            // positions & texcoords
-            HardwareVertexBufferSharedPtr vbuf = 
-                HardwareBufferManager::getSingleton().
-                    createVertexBuffer(
-                        decl->getVertexSize(POS_TEX_BINDING), 
-                        mRenderOp.vertexData->vertexCount,
-                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
-            bind->setBinding(POS_TEX_BINDING, vbuf);
-
-            // colours
-            vbuf = HardwareBufferManager::getSingleton().
-                    createVertexBuffer(
-                        decl->getVertexSize(COLOUR_BINDING), 
-                        mRenderOp.vertexData->vertexCount,
-                        HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
-            bind->setBinding(COLOUR_BINDING, vbuf);
-
-            mAllocSize = numChars;
-            mColoursChanged = true; // force colour buffer regeneration
+            _restoreManualHardwareResources();
         }
-
     }
+    //---------------------------------------------------------------------
+    void TextAreaOverlayElement::_restoreManualHardwareResources()
+    {
+        if(!mInitialised)
+            return;
+
+        // 6 verts per char since we're doing tri lists without indexes
+        // Allocate space for positions & texture coords
+        // Note - mRenderOp.vertexData->vertexCount will be less than allocatedVertexCount
+        size_t allocatedVertexCount = mAllocSize * 6;
+        VertexDeclaration* decl = mRenderOp.vertexData->vertexDeclaration;
+        VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
+
+        // Create dynamic since text tends to change a lot
+        // positions & texcoords
+        HardwareVertexBufferSharedPtr vbuf = 
+            HardwareBufferManager::getSingleton().
+                createVertexBuffer(
+                    decl->getVertexSize(POS_TEX_BINDING), 
+                    allocatedVertexCount,
+                    HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        bind->setBinding(POS_TEX_BINDING, vbuf);
+
+        // colours
+        vbuf = HardwareBufferManager::getSingleton().
+                createVertexBuffer(
+                    decl->getVertexSize(COLOUR_BINDING), 
+                    allocatedVertexCount,
+                    HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY);
+        bind->setBinding(COLOUR_BINDING, vbuf);
+
+        // Buffers are restored, but with trash within
+        mGeomPositionsOutOfDate = true;
+        mGeomUVsOutOfDate = true;
+        mColoursChanged = true;
+    }
+    //---------------------------------------------------------------------
+    void TextAreaOverlayElement::_releaseManualHardwareResources()
+    {
+        if(!mInitialised)
+            return;
+
+        VertexBufferBinding* bind = mRenderOp.vertexData->vertexBufferBinding;
+        bind->unsetBinding(POS_TEX_BINDING);
+        bind->unsetBinding(COLOUR_BINDING);
+    }
+    //---------------------------------------------------------------------
 
     void TextAreaOverlayElement::updatePositionGeometry()
     {

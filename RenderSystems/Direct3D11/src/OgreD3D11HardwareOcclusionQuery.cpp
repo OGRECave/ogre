@@ -51,7 +51,7 @@ namespace Ogre {
         queryDesc.Query = D3D11_QUERY_OCCLUSION;
         queryDesc.MiscFlags = 0;
         // create the occlusion query
-        const HRESULT hr = mDevice->CreateQuery(&queryDesc, &mQuery);
+        const HRESULT hr = mDevice->CreateQuery(&queryDesc, mQuery.ReleaseAndGetAddressOf());
 
         if (FAILED(hr) || mDevice.isError()) 
         {   
@@ -67,7 +67,6 @@ namespace Ogre {
     */
     D3D11HardwareOcclusionQuery::~D3D11HardwareOcclusionQuery() 
     { 
-        SAFE_RELEASE(mQuery); 
     }
 
     //------------------------------------------------------------------
@@ -75,14 +74,14 @@ namespace Ogre {
     //--
     void D3D11HardwareOcclusionQuery::beginOcclusionQuery() 
     {           
-        mDevice.GetImmediateContext()->Begin(mQuery);//Issue(D3DISSUE_BEGIN); 
+        mDevice.GetImmediateContext()->Begin(mQuery.Get());//Issue(D3DISSUE_BEGIN); 
         mIsQueryResultStillOutstanding = true;
         mPixelCount = 0;
     }
 
     void D3D11HardwareOcclusionQuery::endOcclusionQuery() 
     { 
-        mDevice.GetImmediateContext()->End(mQuery);//Issue(D3DISSUE_END); 
+        mDevice.GetImmediateContext()->End(mQuery.Get());//Issue(D3DISSUE_END); 
     }
 
     //------------------------------------------------------------------
@@ -96,7 +95,7 @@ namespace Ogre {
             const size_t dataSize = sizeof( UINT64 );
             while (1)
             {
-                const HRESULT hr = mDevice.GetImmediateContext()->GetData(mQuery, (void *)&pixels, dataSize, 0);//D3DGETDATA_FLUSH
+                const HRESULT hr = mDevice.GetImmediateContext()->GetData(mQuery.Get(), (void *)&pixels, dataSize, 0);//D3DGETDATA_FLUSH
 
                 if  (hr == S_FALSE)
                     continue;
@@ -113,7 +112,7 @@ namespace Ogre {
                     mPixelCount = 100000;
                     D3D11_QUERY_DESC queryDesc;
                     queryDesc.Query = D3D11_QUERY_OCCLUSION;
-                    mDevice->CreateQuery(%queryDesc, &mQuery);
+                    mDevice->CreateQuery(%queryDesc, mQuery.ReleaseAndGetAddressOf());
                     break;
                 }
                 */
@@ -135,7 +134,7 @@ namespace Ogre {
             return false;
 
         UINT64 pixels;
-        const HRESULT hr = mDevice.GetImmediateContext()->GetData(mQuery, (void *) &pixels, sizeof( UINT64 ), 0);
+        const HRESULT hr = mDevice.GetImmediateContext()->GetData(mQuery.Get(), (void *) &pixels, sizeof( UINT64 ), 0);
 
         if (hr  == S_FALSE)
             return true;
@@ -145,7 +144,7 @@ namespace Ogre {
             mPixelCount = 100000;
             D3D11_QUERY_DESC queryDesc;
             queryDesc.Query = D3D11_QUERY_OCCLUSION;
-            mDevice->CreateQuery(&queryDesc, &mQuery);
+            mDevice->CreateQuery(&queryDesc, mQuery.ReleaseAndGetAddressOf());
         }
         */
         mPixelCount = (unsigned)pixels;

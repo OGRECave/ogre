@@ -163,6 +163,9 @@ namespace Ogre {
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,
             bool extrudeVertices, Real extrusionDistance, unsigned long flags = 0 ) = 0;
 
+        /** Common implementation of releasing shadow renderables.*/
+        static void clearShadowRenderableList(ShadowRenderableList& shadowRenderables);
+
         /** Utility method for extruding vertices based on a light. 
         @remarks
             Unfortunately, because D3D cannot handle homogeneous (4D) position

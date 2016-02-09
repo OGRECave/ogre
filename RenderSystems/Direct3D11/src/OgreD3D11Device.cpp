@@ -33,14 +33,8 @@ namespace Ogre
     D3D11Device::eExceptionsErrorLevel D3D11Device::mExceptionsErrorLevel = D3D11Device::D3D_NO_EXCEPTION;
     //---------------------------------------------------------------------
     D3D11Device::D3D11Device()
-        : mD3D11Device(NULL)
-        , mImmediateContext(NULL)
-        , mClassLinkage(NULL)
-        , mInfoQueue(NULL)
-#if OGRE_D3D11_PROFILING
-        , mPerf(NULL)
-#endif
     {
+        mDriverVersion.QuadPart = 0;
     }
     //---------------------------------------------------------------------
     D3D11Device::~D3D11Device()
@@ -57,38 +51,55 @@ namespace Ogre
             mImmediateContext->ClearState();
         }
 #if OGRE_D3D11_PROFILING
-        SAFE_RELEASE(mPerf);
+        mPerf.Reset();
 #endif
-        SAFE_RELEASE(mInfoQueue);
-        SAFE_RELEASE(mClassLinkage);
-        SAFE_RELEASE(mImmediateContext);
-        SAFE_RELEASE(mD3D11Device);
+        mInfoQueue.Reset();
+        mClassLinkage.Reset();
+        mImmediateContext.Reset();
+        mD3D11Device.Reset();
+        mDXGIFactory.Reset();
+        mDriverVersion.QuadPart = 0;
     }
     //---------------------------------------------------------------------
     void D3D11Device::TransferOwnership(ID3D11DeviceN* d3d11device)
     {
-        assert(mD3D11Device != d3d11device);
+        assert(mD3D11Device.Get() != d3d11device);
         ReleaseAll();
 
         if (d3d11device)
         {
             HRESULT hr = S_OK;
 
-            mD3D11Device = d3d11device;
+            mD3D11Device.Attach(d3d11device);
+
+            // get DXGI factory from device
+            ComPtr<IDXGIDeviceN> pDXGIDevice;
+            ComPtr<IDXGIAdapterN> pDXGIAdapter;
+            if(SUCCEEDED(mD3D11Device.As(&pDXGIDevice))
+            && SUCCEEDED(pDXGIDevice->GetParent(__uuidof(IDXGIAdapterN), (void **)pDXGIAdapter.GetAddressOf())))
+            {
+                pDXGIAdapter->GetParent(__uuidof(IDXGIFactoryN), (void **)mDXGIFactory.ReleaseAndGetAddressOf());
+
+                // We intentionally check for ID3D10Device support instead of ID3D11Device as CheckInterfaceSupport() is not supported for later.
+                // We hope, that there would be one UMD for both D3D10 and D3D11, or two different but with the same version number,
+                // or with different but correlated version numbers, so that blacklisting could be done with high confidence level.
+                if(FAILED(pDXGIAdapter->CheckInterfaceSupport(IID_ID3D10Device /* intentionally D3D10, not D3D11 */, &mDriverVersion)))
+                    mDriverVersion.QuadPart = 0;
+            }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            mD3D11Device->GetImmediateContext(&mImmediateContext);
+            mD3D11Device->GetImmediateContext(mImmediateContext.ReleaseAndGetAddressOf());
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WINRT
-            mD3D11Device->GetImmediateContext1(&mImmediateContext);
+            mD3D11Device->GetImmediateContext1(mImmediateContext.ReleaseAndGetAddressOf());
 #endif
 
 #if OGRE_D3D11_PROFILING
-            hr = mImmediateContext->QueryInterface(__uuidof(ID3DUserDefinedAnnotation), (LPVOID*)&mPerf);
-            if(!mPerf->GetStatus())
-                SAFE_RELEASE(mPerf);
+            hr = mImmediateContext.As(&mPerf);
+            if(FAILED(hr) || !mPerf->GetStatus())
+                mPerf.Reset();
 #endif
 
-            hr = mD3D11Device->QueryInterface(__uuidof(ID3D11InfoQueue), (LPVOID*)&mInfoQueue);
+            hr = mD3D11Device.As(&mInfoQueue);
             if (SUCCEEDED(hr))
             {
                 mInfoQueue->ClearStoredMessages();
@@ -97,7 +108,7 @@ namespace Ogre
 
                 D3D11_INFO_QUEUE_FILTER filter;
                 ZeroMemory(&filter, sizeof(D3D11_INFO_QUEUE_FILTER));
-                std::vector<D3D11_MESSAGE_SEVERITY> severityList;
+                vector<D3D11_MESSAGE_SEVERITY>::type severityList;
 
                 switch(mExceptionsErrorLevel)
                 {
@@ -128,7 +139,7 @@ namespace Ogre
             // If feature level is 11, create class linkage
             if (mD3D11Device->GetFeatureLevel() == D3D_FEATURE_LEVEL_11_0)
             {
-                hr = mD3D11Device->CreateClassLinkage(&mClassLinkage);
+                hr = mD3D11Device->CreateClassLinkage(mClassLinkage.ReleaseAndGetAddressOf());
             }
         }
     }
@@ -162,7 +173,7 @@ namespace Ogre
             }
         }
 
-        if (mInfoQueue != NULL)
+        if (mInfoQueue)
         {
             UINT64 numStoredMessages = mInfoQueue->GetNumStoredMessages();
             for (UINT64 i = 0 ; i < numStoredMessages ; i++ )
@@ -181,19 +192,9 @@ namespace Ogre
         return res;
     }
     //---------------------------------------------------------------------
-    void D3D11Device::setExceptionsErrorLevel( const eExceptionsErrorLevel exceptionsErrorLevel )
-    {
-        mExceptionsErrorLevel = exceptionsErrorLevel;
-    }
-    //---------------------------------------------------------------------
-    const D3D11Device::eExceptionsErrorLevel D3D11Device::getExceptionsErrorLevel()
-    {
-        return mExceptionsErrorLevel;
-    }
-    //---------------------------------------------------------------------
     bool D3D11Device::_getErrorsFromQueue() const
     {
-        if (mInfoQueue != NULL)
+        if (mInfoQueue)
         {
             UINT64 numStoredMessages = mInfoQueue->GetNumStoredMessages();
 
@@ -258,16 +259,63 @@ namespace Ogre
             return false;
         }
     }
-
+    //---------------------------------------------------------------------
     void D3D11Device::clearStoredErrorMessages() const
     {
         if (mD3D11Device && D3D_NO_EXCEPTION != mExceptionsErrorLevel)
         {
-            if (mInfoQueue != NULL)
+            if (mInfoQueue)
             {
                 mInfoQueue->ClearStoredMessages();
             }
         }
     }
-
+    //---------------------------------------------------------------------
+    const D3D11Device::eExceptionsErrorLevel D3D11Device::getExceptionsErrorLevel()
+    {
+        return mExceptionsErrorLevel;
+    }
+    //---------------------------------------------------------------------
+    void D3D11Device::setExceptionsErrorLevel( const eExceptionsErrorLevel exceptionsErrorLevel )
+    {
+        mExceptionsErrorLevel = exceptionsErrorLevel;
+    }
+    //---------------------------------------------------------------------
+    void D3D11Device::setExceptionsErrorLevel( const Ogre::String& exceptionsErrorLevel )
+    {
+        eExceptionsErrorLevel onlyIfDebugMode = OGRE_DEBUG_MODE ? D3D11Device::D3D_ERROR : D3D11Device::D3D_NO_EXCEPTION;
+        if("No information queue exceptions" == exceptionsErrorLevel)       setExceptionsErrorLevel(onlyIfDebugMode);
+        else if("Corruption" == exceptionsErrorLevel)                       setExceptionsErrorLevel(D3D11Device::D3D_CORRUPTION);
+        else if("Error" == exceptionsErrorLevel)                            setExceptionsErrorLevel(D3D11Device::D3D_ERROR);
+        else if("Warning" == exceptionsErrorLevel)                          setExceptionsErrorLevel(D3D11Device::D3D_WARNING);
+        else if("Info (exception on any message)" == exceptionsErrorLevel)  setExceptionsErrorLevel(D3D11Device::D3D_INFO);
+        else                                                                setExceptionsErrorLevel(onlyIfDebugMode);
+    }
+    //---------------------------------------------------------------------
+    D3D_FEATURE_LEVEL D3D11Device::parseFeatureLevel(const Ogre::String& value, D3D_FEATURE_LEVEL fallback)
+    {
+        if(value == "9.1")  return D3D_FEATURE_LEVEL_9_1;
+        if(value == "9.2")  return D3D_FEATURE_LEVEL_9_2;
+        if(value == "9.3")  return D3D_FEATURE_LEVEL_9_3;
+        if(value == "10.0") return D3D_FEATURE_LEVEL_10_0;
+        if(value == "10.1") return D3D_FEATURE_LEVEL_10_1;
+        if(value == "11.0") return D3D_FEATURE_LEVEL_11_0;
+        return fallback;
+    }
+    //---------------------------------------------------------------------
+    D3D_DRIVER_TYPE D3D11Device::parseDriverType(const Ogre::String& driverTypeName, D3D_DRIVER_TYPE fallback)
+    {
+        if("Hardware" == driverTypeName) return D3D_DRIVER_TYPE_HARDWARE;
+        if("Software" == driverTypeName) return D3D_DRIVER_TYPE_SOFTWARE;
+        if("Warp" == driverTypeName)     return D3D_DRIVER_TYPE_WARP;
+        return fallback;
+    }
+    //---------------------------------------------------------------------
+    bool D3D11Device::IsDeviceLost()
+    {
+        HRESULT hr = mD3D11Device->GetDeviceRemovedReason();
+        if(FAILED(hr))
+            return true;
+        return false;
+    }
 }
