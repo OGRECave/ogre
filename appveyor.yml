@@ -1,0 +1,10 @@
+platform: x64
+configuration: Release
+
+build:
+
+build_script:
+ - cmake -P ci-build.cmake
+ - cmake --build .
+cache:
+- ogredeps -> ci-build.cmake
