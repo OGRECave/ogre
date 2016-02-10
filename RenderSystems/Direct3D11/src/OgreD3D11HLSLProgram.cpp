@@ -292,7 +292,7 @@ namespace Ogre {
         cacheMicrocode->seek(0);
 
 #define READ_START(curlist, memberType) {                           \
-    uint16 listSize = curlist.size();                               \
+    uint16 listSize = (uint16)curlist.size();                       \
     cacheMicrocode->read(&listSize, sizeof(uint16));                \
     if(listSize > 0){                                               \
         curlist.resize(listSize);                                   \
@@ -916,7 +916,7 @@ namespace Ogre {
 
 
 #define WRITE_START(curlist, memberType) {                          \
-    uint16 listSize = curlist.size();                               \
+    uint16 listSize = (uint16)curlist.size();                       \
     newMicrocode->write(&listSize, sizeof(uint16));                 \
     if(listSize > 0){                                               \
     for(unsigned i = 0 ; i < curlist.size() ; i++){                 \
@@ -939,7 +939,7 @@ namespace Ogre {
 #define WRITE_NAME(member) {                         \
     uint16 length = 0;                               \
     if(curItem.member != NULL)                       \
-        length = strlen(curItem.member);             \
+        length = (uint16)strlen(curItem.member);     \
     newMicrocode->write(&length, sizeof(uint16));    \
     if(length != 0)                                  \
     newMicrocode->write(curItem.member, length);     \
@@ -1055,7 +1055,7 @@ namespace Ogre {
                 WRITE_NAME(Name)
                 WRITE_END
 
-                uint16 mInterfaceSlotsSize = mInterfaceSlots.size();
+                uint16 mInterfaceSlotsSize = (uint16)mInterfaceSlots.size();
                 newMicrocode->write(&mInterfaceSlotsSize, sizeof(uint16));
                 if(mInterfaceSlotsSize > 0)
                 {

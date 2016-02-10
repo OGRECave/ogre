@@ -203,7 +203,7 @@ namespace Ogre
 
                 images[i].load(stream, ext);
 
-                size_t imageMips = images[i].getNumMipmaps();
+                uint8 imageMips = images[i].getNumMipmaps();
 
                 if(imageMips < mNumMipmaps) {
                     mNumMipmaps = imageMips;
