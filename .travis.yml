@@ -1,0 +1,49 @@
+language: cpp
+sudo: false
+addons:
+  apt:
+    packages:
+    - cmake
+    - libxaw7-dev
+    - libzzip-dev
+    - libxrandr-dev
+    - libfreetype6-dev
+    - libxt-dev
+    - libboost-all-dev
+    - libcppunit-dev
+    - libgles2-mesa-dev
+before_script:
+    # we start compilation afterwards anyway, so no need to sleep
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
+    - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 cppunit cmake ; fi
+osx_image: xcode7.2
+env:
+    - TEST=TRUE
+    - GL3ES=TRUE # build GL3Plus and GLES2 Rendersystems
+    - ANDROID=TRUE
+    - IOS=TRUE
+compiler:
+    - clang
+    - gcc
+matrix:
+    exclude:
+        - os: linux
+          compiler: clang
+        - os: linux
+          env: IOS=TRUE
+        - os: osx
+          compiler: gcc
+        - os: osx
+          env: TEST=TRUE
+        - os: osx
+          env: ANDROID=TRUE
+script:
+    - cmake -P ci-build.cmake
+    - BUILD_CMD="cmake --build ."
+    - if [ "$TRAVIS_OS_NAME" == "osx" ]; then BUILD_CMD="set -o pipefail && $BUILD_CMD | xcpretty" ; fi
+    - echo $BUILD_CMD && eval $BUILD_CMD
+    - if [ $TEST ]; then bin/Test_Ogre ; fi
+os:
+    - linux
+    - osx
+cache: apt
