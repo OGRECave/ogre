@@ -164,7 +164,6 @@ namespace Ogre {
             void * pRet = NULL;
             D3D11_MAPPED_SUBRESOURCE mappedSubResource;
             mappedSubResource.pData = NULL;
-            mDevice.clearStoredErrorMessages();
             HRESULT hr = mDevice.GetImmediateContext()->Map(mlpD3DBuffer.Get(), 0, mapType, 0, &mappedSubResource);
             if (FAILED(hr) || mDevice.isError())
             {
