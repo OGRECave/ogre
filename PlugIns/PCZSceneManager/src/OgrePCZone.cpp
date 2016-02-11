@@ -119,7 +119,9 @@ namespace Ogre
     {
         if (removePortal)
         {
-            mPortals.erase(std::find(mPortals.begin(), mPortals.end(), removePortal));
+            PortalList::iterator it = std::find(mPortals.begin(), mPortals.end(), removePortal);
+            if(it != mPortals.end())
+                mPortals.erase(it);
         }
     }
 
@@ -151,7 +153,9 @@ namespace Ogre
     {
         if (removeAntiPortal)
         {
-            mAntiPortals.erase(std::find(mAntiPortals.begin(), mAntiPortals.end(), removeAntiPortal));
+            AntiPortalList::iterator it = std::find(mAntiPortals.begin(), mAntiPortals.end(), removeAntiPortal);
+            if(it != mAntiPortals.end())
+                mAntiPortals.erase(it);
         }
     }
 

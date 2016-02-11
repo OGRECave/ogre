@@ -1227,12 +1227,15 @@ void CompositorInstance::queueRenderSystemOp(TargetOperation &finalState, Render
 //-----------------------------------------------------------------------
 void CompositorInstance::addListener(Listener *l)
 {
-    mListeners.push_back(l);
+    if (std::find(mListeners.begin(), mListeners.end(), l) == mListeners.end())
+        mListeners.push_back(l);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::removeListener(Listener *l)
 {
-    mListeners.erase(std::find(mListeners.begin(), mListeners.end(), l));
+    Listeners::iterator i = std::find(mListeners.begin(), mListeners.end(), l);
+    if (i != mListeners.end())
+        mListeners.erase(i);
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::_fireNotifyMaterialSetup(uint32 pass_id, MaterialPtr &mat)

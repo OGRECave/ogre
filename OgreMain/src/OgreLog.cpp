@@ -150,14 +150,17 @@ namespace Ogre
     void Log::addListener(LogListener* listener)
     {
         OGRE_LOCK_AUTO_MUTEX;
-        mListeners.push_back(listener);
+        if (std::find(mListeners.begin(), mListeners.end(), listener) == mListeners.end())
+            mListeners.push_back(listener);
     }
 
     //-----------------------------------------------------------------------
     void Log::removeListener(LogListener* listener)
     {
         OGRE_LOCK_AUTO_MUTEX;
-        mListeners.erase(std::find(mListeners.begin(), mListeners.end(), listener));
+        mtLogListener::iterator i = std::find(mListeners.begin(), mListeners.end(), listener);
+        if (i != mListeners.end())
+            mListeners.erase(i);
     }
     //---------------------------------------------------------------------
     Log::Stream Log::stream(LogMessageLevel lml, bool maskDebug) 

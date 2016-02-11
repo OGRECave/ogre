@@ -2628,7 +2628,10 @@ namespace OgreBites
             mTrays[widget->getTrayLocation()]->removeChild(widget->getName());
 
             WidgetList& wList = mWidgets[widget->getTrayLocation()];
-            wList.erase(std::find(wList.begin(), wList.end(), widget));
+            WidgetList::iterator it = std::find(wList.begin(), wList.end(), widget);
+            if(it != wList.end())
+                wList.erase(it);
+
             if (widget == mExpandedMenu) setExpandedMenu(0);
 
             widget->cleanup();

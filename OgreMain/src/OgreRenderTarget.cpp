@@ -388,21 +388,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void RenderTarget::addListener(RenderTargetListener* listener)
     {
-        mListeners.push_back(listener);
+        if (std::find(mListeners.begin(), mListeners.end(), listener) == mListeners.end())
+            mListeners.push_back(listener);
     }
     //-----------------------------------------------------------------------
     void RenderTarget::removeListener(RenderTargetListener* listener)
     {
-        RenderTargetListenerList::iterator i;
-        for (i = mListeners.begin(); i != mListeners.end(); ++i)
-        {
-            if (*i == listener)
-            {
-                mListeners.erase(i);
-                break;
-            }
-        }
-
+        RenderTargetListenerList::iterator i = std::find(mListeners.begin(), mListeners.end(), listener);
+        if (i != mListeners.end())
+            mListeners.erase(i);
     }
     //-----------------------------------------------------------------------
     void RenderTarget::removeAllListeners(void)

@@ -603,12 +603,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Profiler::addListener(ProfileSessionListener* listener)
     {
-        mListeners.push_back(listener);
+        if (std::find(mListeners.begin(), mListeners.end(), listener) == mListeners.end())
+            mListeners.push_back(listener);
     }
     //-----------------------------------------------------------------------
     void Profiler::removeListener(ProfileSessionListener* listener)
     {
-        mListeners.erase(std::find(mListeners.begin(), mListeners.end(), listener));
+        TProfileSessionListener::iterator i = std::find(mListeners.begin(), mListeners.end(), listener);
+        if (i != mListeners.end())
+            mListeners.erase(i);
     }
     //-----------------------------------------------------------------------
 }

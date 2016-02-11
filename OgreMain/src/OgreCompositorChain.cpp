@@ -213,7 +213,9 @@ void CompositorChain::removeAllCompositors()
 //-----------------------------------------------------------------------
 void CompositorChain::_removeInstance(CompositorInstance *i)
 {
-    mInstances.erase(std::find(mInstances.begin(), mInstances.end(), i));
+    Instances::iterator it = std::find(mInstances.begin(), mInstances.end(), i);
+    assert(it != mInstances.end());
+    mInstances.erase(it);
     OGRE_DELETE i;
 }
 //-----------------------------------------------------------------------

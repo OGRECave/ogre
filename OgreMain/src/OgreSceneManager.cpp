@@ -4085,7 +4085,8 @@ void SceneManager::removeRenderObjectListener(RenderObjectListener* delListener)
 }
 void SceneManager::addListener(Listener* newListener)
 {
-    mListeners.push_back(newListener);
+    if (std::find(mListeners.begin(), mListeners.end(), newListener) == mListeners.end())
+        mListeners.push_back(newListener);
 }
 //---------------------------------------------------------------------
 void SceneManager::removeListener(Listener* delListener)
