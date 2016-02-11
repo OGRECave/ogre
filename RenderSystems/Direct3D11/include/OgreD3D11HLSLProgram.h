@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreD3D11DeviceResource.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHardwareUniformBuffer.h"
-#include "OgreD3D11VertexDeclaration.h"
 
 
 namespace Ogre {
@@ -127,8 +126,6 @@ namespace Ogre {
         bool shaderMacroSet;
 
         D3D11Device & mDevice;
-
-        D3D11VertexDeclaration mInputVertexDeclaration;
 
         ComPtr<ID3D11VertexShader> mVertexShader;
         ComPtr<ID3D11PixelShader> mPixelShader;
@@ -357,8 +354,6 @@ namespace Ogre {
         /** Internal load implementation, must be implemented by subclasses.
         */
         void loadFromSource(void);
-
-        D3D11VertexDeclaration & getInputVertexDeclaration() { return mInputVertexDeclaration; }
 
         void reinterpretGSForStreamOut(void);
         bool mReinterpretingGS;

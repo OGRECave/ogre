@@ -48,7 +48,6 @@ THE SOFTWARE.
 #include "OgreFrustum.h"
 #include "OgreD3D11MultiRenderTarget.h"
 #include "OgreD3D11HLSLProgram.h"
-#include "OgreD3D11VertexDeclaration.h"
 
 #include "OgreD3D11DepthBuffer.h"
 #include "OgreD3D11HardwarePixelBuffer.h"
