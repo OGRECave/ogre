@@ -46,6 +46,7 @@ namespace Ogre
         ComPtr<ID3DUserDefinedAnnotation> mPerf;
 #endif
 
+        D3D11Device(const D3D11Device& device); /* intentionally not implemented */
         const D3D11Device& operator=(D3D11Device& device); /* intentionally not implemented */
 
     public:
