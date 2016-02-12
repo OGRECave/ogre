@@ -150,14 +150,7 @@ namespace Ogre {
         box.slicePitch = pMappedResource.DepthPitch;
     }
     //-----------------------------------------------------------------------------  
-    void *D3D11HardwarePixelBuffer::_mapstaticbuffer(PixelBox lock)
-    {
-        // for static usage just alloc
-        mDataForStaticUsageLock.resize(lock.getConsecutiveSize());
-        return mDataForStaticUsageLock.data();
-    }
-    //-----------------------------------------------------------------------------  
-    void *D3D11HardwarePixelBuffer::_mapstagingbuffer(D3D11_MAP flags)
+    void D3D11HardwarePixelBuffer::_mapstagingbuffer(D3D11_MAP flags, PixelBox &box)
     {
         if(!mStagingBuffer)
             createStagingBuffer();
@@ -179,9 +172,7 @@ namespace Ogre {
         else if(flags == D3D11_MAP_WRITE_DISCARD)
             flags = D3D11_MAP_WRITE; // stagingbuffer doesn't support discarding
 
-        PixelBox box;
         _map(mStagingBuffer.Get(), flags, box);
-        return box.data;
     }
     //-----------------------------------------------------------------------------  
     PixelBox D3D11HardwarePixelBuffer::lockImpl(const Image::Box &lockBox, LockOptions options)
@@ -225,7 +216,7 @@ namespace Ogre {
         if(mUsage == HBU_STATIC || mUsage & HBU_DYNAMIC)
         {
             if(mUsage == HBU_STATIC || options == HBL_READ_ONLY || options == HBL_NORMAL || options == HBL_WRITE_ONLY)
-                rval.data = _mapstagingbuffer(flags);
+                _mapstagingbuffer(flags, rval);
             else
                 _map(mParentTexture->getTextureResource(), flags, rval);
 
