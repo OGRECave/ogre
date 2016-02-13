@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreQuaternion.h"
+#include "OgreVector2.h"
 
 namespace Ogre
 {
@@ -92,6 +93,12 @@ namespace Ogre
         {
         }
 
+        /** Swizzle-like narrowing operations
+        */
+        inline Vector2 xy() const
+        {
+            return Vector2(x, y);
+        }
 
         /** Exchange the contents of this vector with another. 
         */

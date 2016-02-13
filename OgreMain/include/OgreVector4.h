@@ -95,6 +95,17 @@ namespace Ogre
         {
         }
 
+        /** Swizzle-like narrowing operations
+        */
+        inline Vector3 xyz() const
+        {
+            return Vector3(x, y, z);
+        }
+        inline Vector2 xy() const
+        {
+            return Vector2(x, y);
+        }
+
         /** Exchange the contents of this vector with another. 
         */
         inline void swap(Vector4& other)
