@@ -611,10 +611,21 @@ namespace Ogre
     }
 #if !OGRE_NO_JSON
     //-----------------------------------------------------------------------------------
-    void HlmsManager::loadMaterials( const String &filename, const char *jsonString )
+    void HlmsManager::loadMaterials( const String &filename, const String &groupName )
     {
-        HlmsJson hlmsJson( this );
-        hlmsJson.loadMaterials( filename, jsonString );
+        DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource( filename, groupName );
+
+        vector<char>::type fileData;
+        fileData.resize( stream->size() + 1 );
+        if( !fileData.empty() )
+        {
+            stream->read( &fileData[0], stream->size() );
+
+            //Add null terminator just in case (to prevent bad input)
+            fileData.back() = '\0';
+            HlmsJson hlmsJson( this );
+            hlmsJson.loadMaterials( stream->getName(), &fileData[0] );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsManager::saveMaterials( HlmsTypes hlmsType, const String &filename )
@@ -654,7 +665,8 @@ namespace Ogre
 
             //Add null terminator just in case (to prevent bad input)
             fileData.back() = '\0';
-            loadMaterials( stream->getName(), &fileData[0] );
+            HlmsJson hlmsJson( this );
+            hlmsJson.loadMaterials( stream->getName(), &fileData[0] );
         }
     }
     //-----------------------------------------------------------------------------------
