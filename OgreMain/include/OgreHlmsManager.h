@@ -226,7 +226,18 @@ namespace Ogre
         void _changeRenderSystem( RenderSystem *newRs );
 
 #if !OGRE_NO_JSON
-        void loadMaterials( const String &filename, const char *jsonString );
+        /** Opens a file containing a JSON string to load all Hlms materials from.
+        @remarks
+            You can do:
+                HlmsJson hlmsJson( this );
+                const char *string = ...;
+                hlmsJson.loadMaterials( "Filename for debug purposes", string );
+            To load materials from an arbitrary JSON string.
+            @see HlmsJson::loadMaterials
+        @param filename
+        @param groupName
+        */
+        void loadMaterials( const String &filename, const String &groupName );
 
         /** Saves all materials of the registered Hlms at the given file location.
         @param hlmsType
