@@ -851,16 +851,10 @@ namespace Ogre
                 { 
 
                     D3D11HardwarePixelBuffer *buffer;
-                    size_t subresourceIndex = D3D11CalcSubresource(mip, face, mNumMipmaps);
-                    if (getNumFaces() > 0)
-                    {
-                        subresourceIndex = mip;
-
-                    }
                     buffer = new D3D11HardwarePixelBuffer(
                         this, // parentTexture
                         mDevice, // device
-                        subresourceIndex, // subresourceIndex
+                        mip, 
                         width, 
                         height, 
                         depth,

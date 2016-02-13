@@ -45,13 +45,13 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------------  
 
-    D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
-        size_t width, size_t height, size_t depth, size_t face, PixelFormat format, HardwareBuffer::Usage usage):
+    D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, UINT mipLevel,
+        size_t width, size_t height, size_t depth, UINT face, PixelFormat format, HardwareBuffer::Usage usage):
     HardwarePixelBuffer(width, height, depth, format, usage, false, false),
         mParentTexture(parentTexture),
         mDevice(device),
-        mSubresourceIndex(subresourceIndex),
-        mFace(face)
+        mFace(face),
+        mMipLevel(mipLevel)
     {
         if(mUsage & TU_RENDERTARGET)
         {
@@ -60,7 +60,7 @@ namespace Ogre {
             for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
-                name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" + StringConverter::toString(mSubresourceIndex) + "/" + parentTexture->getName();
+                name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" + StringConverter::toString(mMipLevel) + "/" + parentTexture->getName();
 
                 RenderTexture *trt = new D3D11RenderTexture(name, this, zoffset, mDevice);
                 mSliceTRT.push_back(trt);
@@ -93,7 +93,7 @@ namespace Ogre {
         {
         case TEX_TYPE_1D:
             {  
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, mMipLevel, flags, 0, &pMappedResource);
                 if (mDevice.isError())
                 {
 					String errorDescription = mDevice.getErrorDescription(hr);
@@ -106,7 +106,7 @@ namespace Ogre {
         case TEX_TYPE_CUBE_MAP:
         case TEX_TYPE_2D:
             {
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1), 
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps()+1),
                     flags, 0, &pMappedResource);
                 if (mDevice.isError())
                 {
@@ -119,7 +119,7 @@ namespace Ogre {
             break;
         case TEX_TYPE_2D_ARRAY:
             {
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1), 
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1),
                     flags, 0, &pMappedResource);
                 if (mDevice.isError())
                 {
@@ -132,7 +132,7 @@ namespace Ogre {
             break;
         case TEX_TYPE_3D:
             {
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, static_cast<UINT>(mSubresourceIndex), flags, 0, &pMappedResource);
+				HRESULT hr = mDevice.GetImmediateContext()->Map(res, mMipLevel, flags, 0, &pMappedResource);
 
                 if (mDevice.isError())
                 {
@@ -165,8 +165,8 @@ namespace Ogre {
                 dstBoxDx11.front = 0;
                 dstBoxDx11.back = mLockBox.getDepth();
 
-                unsigned int subresource = D3D11CalcSubresource(mSubresourceIndex, mLockBox.front, mParentTexture->getNumMipmaps()+1);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer.Get(), subresource, mLockBox.left, mLockBox.top, mSubresourceIndex, mParentTexture->getTextureResource(), subresource, &dstBoxDx11);
+                unsigned int subresource = D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1);
+                mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer.Get(), subresource, mLockBox.left, mLockBox.top, mMipLevel, mParentTexture->getTextureResource(), subresource, &dstBoxDx11);
             }
         }
         else if(flags == D3D11_MAP_WRITE_DISCARD)
@@ -245,23 +245,23 @@ namespace Ogre {
         switch(mParentTexture->getTextureType()) {
         case TEX_TYPE_1D:
             {
-                mDevice.GetImmediateContext()->Unmap(res, mSubresourceIndex);
+                mDevice.GetImmediateContext()->Unmap(res, mMipLevel);
             }
             break;
         case TEX_TYPE_CUBE_MAP:
         case TEX_TYPE_2D:
             {                             
-                mDevice.GetImmediateContext()->Unmap(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1));
+                mDevice.GetImmediateContext()->Unmap(res, D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps()+1));
             }
             break;
         case TEX_TYPE_2D_ARRAY:
             {
-                mDevice.GetImmediateContext()->Unmap(res, D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1));
+                mDevice.GetImmediateContext()->Unmap(res, D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1));
             }
             break;
         case TEX_TYPE_3D:
             {
-                mDevice.GetImmediateContext()->Unmap(res, mSubresourceIndex);
+                mDevice.GetImmediateContext()->Unmap(res, mMipLevel);
             }
             break;
         }
@@ -287,8 +287,7 @@ namespace Ogre {
         case TEX_TYPE_1D:
             {
 
-                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex1D(), 
-                    static_cast<UINT>(mSubresourceIndex), &dstBoxDx11, 
+                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex1D(), mMipLevel, &dstBoxDx11, 
                     mDataForStaticUsageLock.data(), rowWidth, 0);
                 if (mDevice.isError())
                 {
@@ -303,8 +302,7 @@ namespace Ogre {
         case TEX_TYPE_2D:
             {
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex2D(), 
-                    D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1),
-                    &dstBoxDx11, 
+                    D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps() + 1), &dstBoxDx11, 
                     mDataForStaticUsageLock.data(), rowWidth, 0);
 
                 if (mDevice.isError())
@@ -319,7 +317,7 @@ namespace Ogre {
         case TEX_TYPE_2D_ARRAY:
             {
                 mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex2D(), 
-                    D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mLockBox.front, mParentTexture->getNumMipmaps()+1),
+                    D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps() + 1),
                     &dstBoxDx11, mDataForStaticUsageLock.data(), rowWidth, 0);
 
                 if (mDevice.isError())
@@ -335,7 +333,7 @@ namespace Ogre {
             {
 				size_t sliceWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format);
 
-                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex3D(), static_cast<UINT>(mSubresourceIndex), 
+                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex3D(), mMipLevel,
                     &dstBoxDx11, mDataForStaticUsageLock.data(), rowWidth, sliceWidth);
                 if (mDevice.isError())
                 {
@@ -365,8 +363,8 @@ namespace Ogre {
                 dstBoxDx11.front = 0;
                 dstBoxDx11.back = mLockBox.getDepth();
 
-                unsigned int subresource = D3D11CalcSubresource(mSubresourceIndex, mLockBox.front, mParentTexture->getNumMipmaps()+1);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, mLockBox.left, mLockBox.top, mSubresourceIndex, mStagingBuffer.Get(), subresource, &dstBoxDx11);
+                unsigned int subresource = D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1);
+                mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, mLockBox.left, mLockBox.top, mMipLevel, mStagingBuffer.Get(), subresource, &dstBoxDx11);
             }
         }
     }
@@ -434,13 +432,10 @@ namespace Ogre {
             {
 
                 mDevice.GetImmediateContext()->CopySubresourceRegion(
-                    mParentTexture->GetTex1D(), 
-                    static_cast<UINT>(mSubresourceIndex),
-                    static_cast<UINT>(dstBox.left),
-                    0,
-                    0,
+                    mParentTexture->GetTex1D(), mMipLevel,
+                    static_cast<UINT>(dstBox.left), 0, 0,
                     rsrcDx11->mParentTexture->GetTex1D(),
-                    static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                    static_cast<UINT>(rsrcDx11->mMipLevel),
                     &srcBoxDx11);
                 if (mDevice.isError())
                 {
@@ -456,12 +451,12 @@ namespace Ogre {
             {
                 mDevice.GetImmediateContext()->CopySubresourceRegion(
                     mParentTexture->GetTex2D(), 
-                    D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1),
+                    D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps()+1),
                     static_cast<UINT>(dstBox.left),
                     static_cast<UINT>(dstBox.top),
                     mFace,
                     rsrcDx11->mParentTexture->GetTex2D(),
-                    static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                    static_cast<UINT>(rsrcDx11->mMipLevel),
                     &srcBoxDx11);
                 if (mDevice.isError())
                 {
@@ -476,12 +471,12 @@ namespace Ogre {
             {
                 mDevice.GetImmediateContext()->CopySubresourceRegion(
                     mParentTexture->GetTex2D(), 
-                    D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), srcBox.front, mParentTexture->getNumMipmaps()+1),
+                    D3D11CalcSubresource(mMipLevel, srcBox.front, mParentTexture->getNumMipmaps()+1),
                     static_cast<UINT>(dstBox.left),
                     static_cast<UINT>(dstBox.top),
                     srcBox.front,
                     rsrcDx11->mParentTexture->GetTex2D(),
-                    static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                    static_cast<UINT>(rsrcDx11->mMipLevel),
                     &srcBoxDx11);
                 if (mDevice.isError())
                 {
@@ -496,12 +491,12 @@ namespace Ogre {
             {
                 mDevice.GetImmediateContext()->CopySubresourceRegion(
                     mParentTexture->GetTex3D(), 
-                    static_cast<UINT>(mSubresourceIndex),
+                    static_cast<UINT>(mMipLevel),
                     static_cast<UINT>(dstBox.left),
                     static_cast<UINT>(dstBox.top),
                     static_cast<UINT>(dstBox.front),
                     rsrcDx11->mParentTexture->GetTex3D(),
-                    static_cast<UINT>(rsrcDx11->mSubresourceIndex),
+                    static_cast<UINT>(rsrcDx11->mMipLevel),
                     &srcBoxDx11);
                 if (mDevice.isError())
                 {
@@ -662,7 +657,7 @@ namespace Ogre {
                 {
                     mDevice.GetImmediateContext()->UpdateSubresource( 
                         mParentTexture->GetTex2D(), 
-                        D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), mFace, mParentTexture->getNumMipmaps()+1),
+                        D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps()+1),
                         &dstBoxDx11,
                         converted.data,
                         rowWidth,
@@ -680,7 +675,7 @@ namespace Ogre {
                 {
                     mDevice.GetImmediateContext()->UpdateSubresource( 
                         mParentTexture->GetTex2D(), 
-                        D3D11CalcSubresource(static_cast<UINT>(mSubresourceIndex), src.front, mParentTexture->getNumMipmaps()+1),
+                        D3D11CalcSubresource(mMipLevel, src.front, mParentTexture->getNumMipmaps()+1),
                         &dstBoxDx11,
                         converted.data,
                         rowWidth,
@@ -720,7 +715,7 @@ namespace Ogre {
  
                     mDevice.GetImmediateContext()->UpdateSubresource( 
                         mParentTexture->GetTex3D(), 
-                        static_cast<UINT>(mSubresourceIndex),
+                        mMipLevel,
                         &dstBoxDx11,
                         converted.data,
                         rowWidth,
@@ -813,12 +808,17 @@ namespace Ogre {
         return mParentTexture;
     }
     //-----------------------------------------------------------------------------    
-    size_t D3D11HardwarePixelBuffer::getSubresourceIndex() const
+    UINT D3D11HardwarePixelBuffer::getSubresourceIndex(size_t box_front) const
     {
-        return mSubresourceIndex;
+        switch(mParentTexture->getTextureType())
+        {
+        case TEX_TYPE_CUBE_MAP: return D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps() + 1);
+        case TEX_TYPE_2D_ARRAY: return D3D11CalcSubresource(mMipLevel, box_front, mParentTexture->getNumMipmaps() + 1);
+        }
+        return mMipLevel;
     }
     //-----------------------------------------------------------------------------    
-    size_t D3D11HardwarePixelBuffer::getFace() const
+    UINT D3D11HardwarePixelBuffer::getFace() const
     {
         return mFace;
     }
