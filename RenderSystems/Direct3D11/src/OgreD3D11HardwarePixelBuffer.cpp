@@ -43,6 +43,22 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+	namespace
+	{
+		const char* toString(TextureType textureType)
+		{
+			switch(textureType)
+			{
+			case TEX_TYPE_1D:       return "1D texture";
+			case TEX_TYPE_CUBE_MAP: return "cube map texture";
+			case TEX_TYPE_2D:       return "2D texture";
+			case TEX_TYPE_2D_ARRAY: return "2D texture array";
+			case TEX_TYPE_3D:       return "3D texture";
+			default:                return "texture";
+			}
+		}
+	}
+
     //-----------------------------------------------------------------------------  
 
     D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, UINT mipLevel,
@@ -86,63 +102,17 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_map(ID3D11Resource *res, D3D11_MAP flags, PixelBox & box)
     {
-        D3D11_MAPPED_SUBRESOURCE pMappedResource;
-        pMappedResource.pData = NULL;
+        assert(mLockBox.getDepth() == 1 || mParentTexture->getTextureType() == TEX_TYPE_3D);
 
-        switch(mParentTexture->getTextureType()) 
+        D3D11_MAPPED_SUBRESOURCE pMappedResource = { 0 };
+
+        HRESULT hr = mDevice.GetImmediateContext()->Map(res, getSubresourceIndex(mLockBox.front), flags, 0, &pMappedResource);
+        if(FAILED(hr) || mDevice.isError())
         {
-        case TEX_TYPE_1D:
-            {  
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, mMipLevel, flags, 0, &pMappedResource);
-                if (mDevice.isError())
-                {
-					String errorDescription = mDevice.getErrorDescription(hr);
-					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                        "D3D11 device cannot map 1D texture\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::_map");
-                }
-            }
-            break;
-        case TEX_TYPE_CUBE_MAP:
-        case TEX_TYPE_2D:
-            {
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps()+1),
-                    flags, 0, &pMappedResource);
-                if (mDevice.isError())
-                {
-					String errorDescription = mDevice.getErrorDescription(hr);
-					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                        "D3D11 device cannot map 2D texture\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::_map");
-                }
-            }
-            break;
-        case TEX_TYPE_2D_ARRAY:
-            {
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1),
-                    flags, 0, &pMappedResource);
-                if (mDevice.isError())
-                {
-					String errorDescription = mDevice.getErrorDescription(hr);
-					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                        "D3D11 device cannot map 2D texture array\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::_map");
-                }
-            }
-            break;
-        case TEX_TYPE_3D:
-            {
-				HRESULT hr = mDevice.GetImmediateContext()->Map(res, mMipLevel, flags, 0, &pMappedResource);
-
-                if (mDevice.isError())
-                {
-					String errorDescription = mDevice.getErrorDescription(hr);
-					OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                        "D3D11 device cannot map 3D texture\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::lockImpl");
-                }
-            }
-            break;
+            String errorDescription; errorDescription
+                .append("D3D11 device cannot map ").append(toString(mParentTexture->getTextureType()))
+                .append("\nError Description:").append(mDevice.getErrorDescription(hr));
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, errorDescription, "D3D11HardwarePixelBuffer::_map");
         }
 
         box.data = pMappedResource.pData;
