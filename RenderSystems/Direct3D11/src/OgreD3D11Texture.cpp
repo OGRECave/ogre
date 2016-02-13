@@ -1040,19 +1040,22 @@ namespace Ogre
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
             RTVDesc.Texture2DArray.FirstArraySlice = buffer->getFace();
             RTVDesc.Texture2DArray.ArraySize = 1;
-            RTVDesc.Texture2DArray.MipSlice = 0;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2D:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DARRAY:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+            RTVDesc.Texture2DArray.FirstArraySlice = mZOffset;
+            RTVDesc.Texture2DArray.ArraySize = 1;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMS:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+            RTVDesc.Texture2DArray.FirstArraySlice = mZOffset;
+            RTVDesc.Texture2DArray.ArraySize = 1;
             break;
         case D3D11_SRV_DIMENSION_TEXTURE3D:
             RTVDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
@@ -1118,8 +1121,9 @@ namespace Ogre
         RenderTexture::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
-    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer,  D3D11Device & device ) : mDevice(device),
-    RenderTexture(buffer, 0)
+    D3D11RenderTexture::D3D11RenderTexture( const String &name, D3D11HardwarePixelBuffer *buffer, uint32 zoffset, D3D11Device & device )
+        : RenderTexture(buffer, zoffset)
+        , mDevice(device)
     {
         mName = name;
         rebind(buffer);

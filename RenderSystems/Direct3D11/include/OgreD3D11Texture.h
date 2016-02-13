@@ -195,7 +195,7 @@ namespace Ogre {
         D3D11Device & mDevice;
         ComPtr<ID3D11RenderTargetView> mRenderTargetView;
     public:
-        D3D11RenderTexture(const String &name, D3D11HardwarePixelBuffer *buffer, D3D11Device & device );
+        D3D11RenderTexture(const String &name, D3D11HardwarePixelBuffer *buffer, uint32 zoffset, D3D11Device & device);
         virtual ~D3D11RenderTexture();
 
         void rebind(D3D11HardwarePixelBuffer *buffer);
