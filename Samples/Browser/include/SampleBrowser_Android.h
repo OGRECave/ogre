@@ -37,6 +37,11 @@
 #include "Input.h"
 #include "Android/OgreAndroidEGLWindow.h"
 
+#include <gestureDetector.h>
+
+#undef LOGI
+#undef LOGW
+
 #ifdef INCLUDE_RTSHADER_SYSTEM
 #   include "OgreRTShaderSystem.h"
 #endif
@@ -58,9 +63,8 @@ namespace OgreBites
     /*=============================================================================
      | Ogre Android bridge
      =============================================================================*/
-    class OgreAndroidBridge
+    struct OgreAndroidBridge
     {
-    public:
         static void init(struct android_app* state)
         {
             state->onAppCmd = &OgreAndroidBridge::handleCmd;
@@ -120,7 +124,6 @@ namespace OgreBites
         
         static void injectTouchEvent(int action, float x, float y, int pointerId = 0)
         {
-            static TouchFingerEvent last = {0};
             TouchFingerEvent evt = {0};
 
             switch (action) {
@@ -137,15 +140,19 @@ namespace OgreBites
                 return;
             }
 
+            evt.fingerId = pointerId;
             evt.x = x / mBrowser->getRenderWindow()->getWidth();
             evt.y = y / mBrowser->getRenderWindow()->getHeight();
 
             if(evt.type == SDL_FINGERMOTION) {
-                evt.dx = evt.x - last.x;
-                evt.dy = evt.y - last.y;
+                if(evt.fingerId != mLastTouch.fingerId)
+                    return; // wrong finger
+
+                evt.dx = evt.x - mLastTouch.x;
+                evt.dy = evt.y - mLastTouch.y;
             }
 
-            last = evt;
+            mLastTouch = evt;
 
             switch (evt.type) {
             case SDL_FINGERDOWN:
@@ -167,11 +174,38 @@ namespace OgreBites
             if (!mBrowser)
                 return 0;
 
+            static float len = 0;
+
             if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION)
             {
+
+                ndk_helper::GESTURE_STATE s = mPinchGesture.Detect(event);
+
+                if(s & ndk_helper::GESTURE_STATE_START) {
+                    ndk_helper::Vec2 p1, p2;
+                    mPinchGesture.GetPointers(p1, p2);
+                    len = (p1 - p2).Length();
+                } else if (s & ndk_helper::GESTURE_STATE_MOVE) {
+                    ndk_helper::Vec2 p1, p2;
+                    mPinchGesture.GetPointers(p1, p2);
+                    float curr = (p1 - p2).Length();
+
+                    if(fabs(curr - len)/mBrowser->getRenderWindow()->getWidth() > 0.01) {
+                        MouseWheelEvent e;
+                        e.y = (curr - len) > 0 ? 1 : -1;
+                        mBrowser->mouseWheelRolled(e);
+                        len = curr;
+                    }
+                }
+
+                if(s != ndk_helper::GESTURE_STATE_NONE) {
+                    mLastTouch.fingerId = -1; // prevent move-jump after pinch is over
+                    return 1;
+                }
+
                 int32_t action = AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event);
-                injectTouchEvent(action, AMotionEvent_getRawX(event, 0),
-                                 AMotionEvent_getRawY(event, 0));
+                injectTouchEvent(action, AMotionEvent_getRawX(event, 0), AMotionEvent_getRawY(event, 0),
+                        AMotionEvent_getPointerId(event, 0));
             }
             else
             {
@@ -265,6 +299,9 @@ namespace OgreBites
         static Ogre::Root* mRoot;
         static bool mInit;
         
+        static TouchFingerEvent mLastTouch;
+        static ndk_helper::PinchDetector mPinchGesture;
+
 #ifdef OGRE_STATIC_LIB
         static Ogre::StaticPluginLoader* mStaticPluginLoader;
 #endif

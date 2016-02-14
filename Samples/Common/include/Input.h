@@ -54,6 +54,7 @@ struct MouseWheelEvent {
 
 struct TouchFingerEvent {
     int type;
+    int fingerId;
     float x, y;
     float dx, dy;
 };
