@@ -221,73 +221,18 @@ namespace Ogre {
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_unmapstaticbuffer()
     {
-        D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(mLockBox);
-        dstBoxDx11.front = 0;
-        dstBoxDx11.back = mLockBox.getDepth();
+        D3D11_BOX box = getSubresourceBox(mLockBox);
+        UINT subresource = getSubresourceIndex(mLockBox.front);
+        UINT srcRowPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
+        UINT srcDepthPitch = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format); // H * rowPitch is invalid for compressed formats
 
-		size_t rowWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), 1, 1, mCurrentLock.format);
-
-        switch(mParentTexture->getTextureType()) {
-        case TEX_TYPE_1D:
-            {
-
-                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex1D(), mMipLevel, &dstBoxDx11, 
-                    mDataForStaticUsageLock.data(), rowWidth, 0);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot map 1D texture\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::_unmapstaticbuffer");
-                }
-            }
-            break;
-        case TEX_TYPE_CUBE_MAP:
-        case TEX_TYPE_2D:
-            {
-                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex2D(), 
-                    D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps() + 1), &dstBoxDx11, 
-                    mDataForStaticUsageLock.data(), rowWidth, 0);
-
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot map 2D texture\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::_unmapstaticbuffer");
-                }
-            }
-            break;
-        case TEX_TYPE_2D_ARRAY:
-            {
-                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex2D(), 
-                    D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps() + 1),
-                    &dstBoxDx11, mDataForStaticUsageLock.data(), rowWidth, 0);
-
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot map 2D texture array\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::_unmapstaticbuffer");
-                }
-            }
-            break;
-        case TEX_TYPE_3D:
-            {
-				size_t sliceWidth = PixelUtil::getMemorySize(mCurrentLock.getWidth(), mCurrentLock.getHeight(), 1, mCurrentLock.format);
-
-                mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->GetTex3D(), mMipLevel,
-                    &dstBoxDx11, mDataForStaticUsageLock.data(), rowWidth, sliceWidth);
-                if (mDevice.isError())
-                {
-                    String errorDescription = mDevice.getErrorDescription();
-                    OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                        "D3D11 device cannot map 3D texture\nError Description:" + errorDescription,
-                        "D3D11HardwarePixelBuffer::_unmapstaticbuffer");
-                }
-            }
-            break;
+        mDevice.GetImmediateContext()->UpdateSubresource(mParentTexture->getTextureResource(), subresource, &box, mDataForStaticUsageLock.data(), srcRowPitch, srcDepthPitch);
+        if (mDevice.isError())
+        {
+            String errorDescription; errorDescription
+                .append("D3D11 device cannot update staging ").append(toString(mParentTexture->getTextureType()))
+                .append("\nError Description:").append(mDevice.getErrorDescription());
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, errorDescription, "D3D11HardwarePixelBuffer::_unmapstaticbuffer");
         }
 
         mDataForStaticUsageLock.swap(vector<int8>::type()); // i.e. shrink_to_fit
