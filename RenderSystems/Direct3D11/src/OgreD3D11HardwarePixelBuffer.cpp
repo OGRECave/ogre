@@ -242,30 +242,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void D3D11HardwarePixelBuffer::_unmap(ID3D11Resource *res)
     {
-        switch(mParentTexture->getTextureType()) {
-        case TEX_TYPE_1D:
-            {
-                mDevice.GetImmediateContext()->Unmap(res, mMipLevel);
-            }
-            break;
-        case TEX_TYPE_CUBE_MAP:
-        case TEX_TYPE_2D:
-            {                             
-                mDevice.GetImmediateContext()->Unmap(res, D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps()+1));
-            }
-            break;
-        case TEX_TYPE_2D_ARRAY:
-            {
-                mDevice.GetImmediateContext()->Unmap(res, D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1));
-            }
-            break;
-        case TEX_TYPE_3D:
-            {
-                mDevice.GetImmediateContext()->Unmap(res, mMipLevel);
-            }
-            break;
-        }
-
+        mDevice.GetImmediateContext()->Unmap(res, getSubresourceIndex(mLockBox.front));
         if (mDevice.isError())
         {
             String errorDescription = mDevice.getErrorDescription();
