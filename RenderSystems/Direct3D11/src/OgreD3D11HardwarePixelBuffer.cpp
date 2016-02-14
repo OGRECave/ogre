@@ -131,12 +131,9 @@ namespace Ogre {
                 mDevice.GetImmediateContext()->CopyResource(mStagingBuffer.Get(), mParentTexture->getTextureResource());
             else
             {
-                D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(mLockBox);
-                dstBoxDx11.front = 0;
-                dstBoxDx11.back = mLockBox.getDepth();
-
-                unsigned int subresource = D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer.Get(), subresource, mLockBox.left, mLockBox.top, mMipLevel, mParentTexture->getTextureResource(), subresource, &dstBoxDx11);
+                D3D11_BOX box = getSubresourceBox(mLockBox);
+                UINT subresource = getSubresourceIndex(mLockBox.front);
+                mDevice.GetImmediateContext()->CopySubresourceRegion(mStagingBuffer.Get(), subresource, box.left, box.top, box.front, mParentTexture->getTextureResource(), subresource, &box);
             }
         }
         else if(flags == D3D11_MAP_WRITE_DISCARD)
@@ -306,12 +303,9 @@ namespace Ogre {
                 mDevice.GetImmediateContext()->CopyResource(mParentTexture->getTextureResource(), mStagingBuffer.Get());
             else
             {
-                D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(mLockBox);
-                dstBoxDx11.front = 0;
-                dstBoxDx11.back = mLockBox.getDepth();
-
-                unsigned int subresource = D3D11CalcSubresource(mMipLevel, mLockBox.front, mParentTexture->getNumMipmaps()+1);
-                mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, mLockBox.left, mLockBox.top, mMipLevel, mStagingBuffer.Get(), subresource, &dstBoxDx11);
+                D3D11_BOX box = getSubresourceBox(mLockBox);
+                UINT subresource = getSubresourceIndex(mLockBox.front);
+                mDevice.GetImmediateContext()->CopySubresourceRegion(mParentTexture->getTextureResource(), subresource, box.left, box.top, box.front, mStagingBuffer.Get(), subresource, &box);
             }
         }
     }
@@ -763,6 +757,22 @@ namespace Ogre {
         case TEX_TYPE_2D_ARRAY: return D3D11CalcSubresource(mMipLevel, box_front, mParentTexture->getNumMipmaps() + 1);
         }
         return mMipLevel;
+    }
+    //-----------------------------------------------------------------------------  
+    D3D11_BOX D3D11HardwarePixelBuffer::getSubresourceBox(const Image::Box &inBox) const
+    {
+        // Ogre index Tex2DArray using Z component of the box, but Direct3D expect 
+        // this index to be in subresource, and Z component should be sanitized
+        bool is2DArray = (mParentTexture->getTextureType() == TEX_TYPE_2D_ARRAY);
+
+        D3D11_BOX res;
+        res.left    = static_cast<UINT>(inBox.left);
+        res.top     = static_cast<UINT>(inBox.top);
+        res.front   = is2DArray ? 0 : static_cast<UINT>(inBox.front);
+        res.right   = static_cast<UINT>(inBox.right);
+        res.bottom  = static_cast<UINT>(inBox.bottom);
+        res.back    = is2DArray ? 1 : static_cast<UINT>(inBox.back);
+        return res;
     }
     //-----------------------------------------------------------------------------    
     UINT D3D11HardwarePixelBuffer::getFace() const
