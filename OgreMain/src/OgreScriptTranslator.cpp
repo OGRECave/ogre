@@ -3102,7 +3102,7 @@ namespace Ogre{
             mUnit->setName(obj->name);
 
         HlmsSamplerblock samplerblock;
-        samplerblock.setAddressinMode( TAM_WRAP );
+        samplerblock.setAddressingMode( TAM_WRAP );
 
         // Set the properties for the material
         for(AbstractNodeList::iterator i = obj->children.begin(); i != obj->children.end(); ++i)

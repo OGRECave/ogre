@@ -78,7 +78,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsSamplerblock::setAddressinMode( TextureAddressingMode addressingMode )
+    void HlmsSamplerblock::setAddressingMode( TextureAddressingMode addressingMode )
     {
         mU = addressingMode;
         mV = addressingMode;
