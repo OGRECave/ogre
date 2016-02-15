@@ -115,7 +115,8 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow ) = 0;
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer ) = 0;
 
-        virtual UavBufferPacked* createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+        virtual UavBufferPacked* createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                      uint32 bindFlags,
                                                       void *initialData, bool keepAsShadow ) = 0;
         virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer ) = 0;
 
@@ -269,7 +270,7 @@ namespace Ogre
         @return
             The desired UAV buffer pointer
         */
-        UavBufferPacked* createUavBuffer( size_t sizeBytes, uint32 bindFlags,
+        UavBufferPacked* createUavBuffer( size_t numElements, uint32 bytesPerElement, uint32 bindFlags,
                                           void *initialData, bool keepAsShadow );
 
         /** Destroys the given UAV buffer created with createUavBuffer.

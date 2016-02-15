@@ -777,10 +777,9 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    D3D11CompatBufferInterface* D3D11VaoManager::createShaderBufferInterface( uint32 bindFlags,
-                                                                              size_t sizeBytes,
-                                                                              BufferType bufferType,
-                                                                              void *initialData )
+    D3D11CompatBufferInterface* D3D11VaoManager::createShaderBufferInterface(
+            uint32 bindFlags, size_t sizeBytes, BufferType bufferType,
+            void *initialData, uint32_t structureByteStride )
     {
         ID3D11DeviceN *d3dDevice = mDevice.get();
 
@@ -807,6 +806,7 @@ namespace Ogre
             desc.Usage = D3D11_USAGE_DYNAMIC;
             desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         }
+        desc.StructureByteStride = structureByteStride;
 
         D3D11_SUBRESOURCE_DATA subResData;
         ZeroMemory( &subResData, sizeof(D3D11_SUBRESOURCE_DATA) );
@@ -943,18 +943,18 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    UavBufferPacked* D3D11VaoManager::createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
-                                                           void *initialData, bool keepAsShadow )
+    UavBufferPacked* D3D11VaoManager::createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                           uint32 bindFlags, void *initialData,
+                                                           bool keepAsShadow )
     {
         size_t bufferOffset = 0;
 
         const BufferType bufferType = BT_DEFAULT;
 
-        BufferInterface *bufferInterface = createShaderBufferInterface( bindFlags|BB_FLAG_UAV, sizeBytes,
-                                                                        bufferType, initialData );
-
-        const size_t numElements        = sizeBytes;
-        const size_t bytesPerElement    = 1;
+        BufferInterface *bufferInterface = createShaderBufferInterface( bindFlags|BB_FLAG_UAV,
+                                                                        numElements * bytesPerElement,
+                                                                        bufferType, initialData,
+                                                                        bytesPerElement );
 
         D3D11UavBufferPacked *retVal = OGRE_NEW D3D11UavBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,

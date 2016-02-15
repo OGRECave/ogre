@@ -231,7 +231,8 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
-        virtual UavBufferPacked* createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+        virtual UavBufferPacked* createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                      uint32 bindFlags,
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer );
 
@@ -260,7 +261,8 @@ namespace Ogre
         D3D11CompatBufferInterface* createShaderBufferInterface( uint32 bindFlags,
                                                                  size_t sizeBytes,
                                                                  BufferType bufferType,
-                                                                 void *initialData );
+                                                                 void *initialData,
+                                                                 uint32_t structureByteStride = 0 );
 
     public:
         D3D11VaoManager( bool supportsIndirectBuffers, D3D11Device &device,

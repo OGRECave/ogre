@@ -599,7 +599,8 @@ namespace Ogre
                        texBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
-    UavBufferPacked* GL3PlusVaoManager::createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+    UavBufferPacked* GL3PlusVaoManager::createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                             uint32 bindFlags,
                                                              void *initialData, bool keepAsShadow )
     {
         size_t vboIdx;
@@ -610,18 +611,18 @@ namespace Ogre
         const BufferType bufferType = BT_DEFAULT;
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
-        allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
+        allocateVbo( numElements * bytesPerElement, alignment, bufferType, vboIdx, bufferOffset );
 
         Vbo &vbo = mVbos[vboFlag][vboIdx];
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         UavBufferPacked *retVal = OGRE_NEW GL3PlusUavBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, numElements, bytesPerElement,
                                                         bindFlags, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
         if( initialData )
-            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+            bufferInterface->_firstUpload( initialData, 0, numElements );
 
         return retVal;
     }

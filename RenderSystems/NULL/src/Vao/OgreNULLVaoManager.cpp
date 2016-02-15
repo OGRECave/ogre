@@ -192,17 +192,18 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    UavBufferPacked* NULLVaoManager::createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+    UavBufferPacked* NULLVaoManager::createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                          uint32 bindFlags,
                                                           void *initialData, bool keepAsShadow )
     {
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         UavBufferPacked *retVal = OGRE_NEW NULLUavBufferPacked(
-                                                        0, sizeBytes, 1,
+                                                        0, numElements, bytesPerElement,
                                                         bindFlags, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
         if( initialData )
-            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+            bufferInterface->_firstUpload( initialData, 0, numElements );
 
         return retVal;
     }

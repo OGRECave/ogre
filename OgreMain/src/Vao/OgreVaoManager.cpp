@@ -270,11 +270,13 @@ namespace Ogre
         efficientVectorRemove( mBuffers[BP_TYPE_TEX], itor );
     }
     //-----------------------------------------------------------------------------------
-    UavBufferPacked* VaoManager::createUavBuffer( size_t sizeBytes, uint32 bindFlags,
+    UavBufferPacked* VaoManager::createUavBuffer( size_t numElements, uint32 bytesPerElement,
+                                                  uint32 bindFlags,
                                                   void *initialData, bool keepAsShadow )
     {
         UavBufferPacked *retVal;
-        retVal = createUavBufferImpl( sizeBytes, bindFlags, initialData, keepAsShadow );
+        retVal = createUavBufferImpl( numElements, bytesPerElement, bindFlags,
+                                      initialData, keepAsShadow );
         mBuffers[BP_TYPE_UAV].push_back( retVal );
         return retVal;
     }
