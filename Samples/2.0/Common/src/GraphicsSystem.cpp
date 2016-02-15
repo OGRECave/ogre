@@ -171,7 +171,7 @@ std::string macBundlePath()
     #ifdef WIN32
         case SDL_SYSWM_WINDOWS:
             // Windows code
-            winHandle = Ogre::StringConverter::toString( (unsigned long)wmInfo.info.win.window );
+            winHandle = Ogre::StringConverter::toString( (uintptr_t)wmInfo.info.win.window );
             break;
     #elif __MACOSX__
         case SDL_SYSWM_COCOA:
@@ -183,7 +183,7 @@ std::string macBundlePath()
             break;
     #else
         case SDL_SYSWM_X11:
-            winHandle = Ogre::StringConverter::toString( (unsigned long)wmInfo.info.x11.window );
+            winHandle = Ogre::StringConverter::toString( (uintptr_t)wmInfo.info.x11.window );
             break;
     #endif
         default:
