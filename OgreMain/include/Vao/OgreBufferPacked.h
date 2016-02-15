@@ -85,8 +85,19 @@ namespace Ogre
         BP_TYPE_INDEX,
         BP_TYPE_CONST,
         BP_TYPE_TEX,
+        BP_TYPE_UAV,
         BP_TYPE_INDIRECT,
         NUM_BUFFER_PACKED_TYPES
+    };
+
+    enum BufferBindFlags
+    {
+        BB_FLAG_VERTEX      = 1u << BP_TYPE_VERTEX,
+        BB_FLAG_INDEX       = 1u << BP_TYPE_INDEX,
+        BB_FLAG_CONST       = 1u << BP_TYPE_CONST,
+        BB_FLAG_TEX         = 1u << BP_TYPE_TEX,
+        BB_FLAG_UAV         = 1u << BP_TYPE_UAV,
+        BB_FLAG_INDIRECT    = 1u << BP_TYPE_INDIRECT
     };
 
     /** Helper class to that will free the pointer on the destructor. Usage:
@@ -177,6 +188,9 @@ namespace Ogre
 
         /// Useful to query which one is the derived class.
         virtual BufferPackedTypes getBufferPackedType(void) const = 0;
+
+        /// For internal use.
+        void _setBufferInterface( BufferInterface *bufferInterface );
 
         BufferType getBufferType(void) const                    { return mBufferType; }
         BufferInterface* getBufferInterface(void) const         { return mBufferInterface; }

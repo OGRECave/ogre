@@ -160,6 +160,10 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+        virtual UavBufferPacked* createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+                                                      void *initialData, bool keepAsShadow );
+        virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer );
+
         virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes, BufferType bufferType,
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );

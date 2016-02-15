@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Vao/OgreNULLBufferInterface.h"
 #include "Vao/OgreNULLConstBufferPacked.h"
 #include "Vao/OgreNULLTexBufferPacked.h"
+#include "Vao/OgreNULLUavBufferPacked.h"
 #include "Vao/OgreNULLMultiSourceVertexBufferPool.h"
 #include "Vao/OgreNULLAsyncTicket.h"
 
@@ -188,6 +189,25 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void NULLVaoManager::destroyTexBufferImpl( TexBufferPacked *texBuffer )
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    UavBufferPacked* NULLVaoManager::createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+                                                          void *initialData, bool keepAsShadow )
+    {
+        NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
+        UavBufferPacked *retVal = OGRE_NEW NULLUavBufferPacked(
+                                                        0, sizeBytes, 1,
+                                                        bindFlags, initialData, keepAsShadow,
+                                                        this, bufferInterface );
+
+        if( initialData )
+            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void NULLVaoManager::destroyUavBufferImpl( UavBufferPacked *uavBuffer )
     {
     }
     //-----------------------------------------------------------------------------------

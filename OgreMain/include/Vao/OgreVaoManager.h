@@ -80,8 +80,10 @@ namespace Ogre
 
         uint32 mConstBufferAlignment;
         uint32 mTexBufferAlignment;
+        uint32 mUavBufferAlignment;
         size_t mConstBufferMaxSize;
         size_t mTexBufferMaxSize;
+        size_t mUavBufferMaxSize;
 
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
                                                             uint32 bytesPerElement,
@@ -112,6 +114,10 @@ namespace Ogre
                                                       BufferType bufferType,
                                                       void *initialData, bool keepAsShadow ) = 0;
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer ) = 0;
+
+        virtual UavBufferPacked* createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+                                                      void *initialData, bool keepAsShadow ) = 0;
+        virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer ) = 0;
 
         virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes,
                                                                 BufferType bufferType,
@@ -250,6 +256,28 @@ namespace Ogre
         */
         void destroyTexBuffer( TexBufferPacked *texBuffer );
 
+        /** Creates an UAV buffer based on the given parameters. Behind the scenes, the buffer
+            is actually part of much larger buffer, in order to reduce bindings at runtime.
+            (depends on the RenderSystem, on D3D11 we're forced to give its own buffer)
+        @remarks
+            @See createVertexBuffer for the remaining parameters not documented here.
+            There is no BufferType option as the only available one is BT_DEFAULT
+        @param sizeBytes
+            The size in bytes of the given constant buffer. API restrictions may apply.
+        @param bindFlags
+            A combination of BufferBindFlags. BB_FLAG_UAV is implicit.
+        @return
+            The desired UAV buffer pointer
+        */
+        UavBufferPacked* createUavBuffer( size_t sizeBytes, uint32 bindFlags,
+                                          void *initialData, bool keepAsShadow );
+
+        /** Destroys the given UAV buffer created with createUavBuffer.
+        @param constBuffer
+            Uav Buffer created with createUavBuffer
+        */
+        void destroyUavBuffer( UavBufferPacked *uavBuffer );
+
         /** Creates an indirect buffer.
         @remarks
             @See createVertexBuffer for the remaining parameters not documented here.
@@ -328,8 +356,10 @@ namespace Ogre
 
         uint32 getConstBufferAlignment(void) const      { return mConstBufferAlignment; }
         uint32 getTexBufferAlignment(void) const        { return mTexBufferAlignment; }
+        uint32 getUavBufferAlignment(void) const        { return mUavBufferAlignment; }
         size_t getConstBufferMaxSize(void) const        { return mConstBufferMaxSize; }
         size_t getTexBufferMaxSize(void) const          { return mTexBufferMaxSize; }
+        size_t getUavBufferMaxSize(void) const          { return mUavBufferMaxSize; }
 
         bool supportsPersistentMapping(void) const      { return mSupportsPersistentMapping; }
 

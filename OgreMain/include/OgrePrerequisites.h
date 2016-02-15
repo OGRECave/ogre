@@ -325,6 +325,7 @@ namespace Ogre {
     class TextureManager;
     struct Transform;
     class Timer;
+    class UavBufferPacked;
     class UserObjectBindings;
     class VaoManager;
     class Vector2;

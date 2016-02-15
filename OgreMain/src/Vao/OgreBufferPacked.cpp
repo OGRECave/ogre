@@ -104,6 +104,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void BufferPacked::_setBufferInterface( BufferInterface *bufferInterface )
+    {
+        mBufferInterface = bufferInterface;
+    }
+    //-----------------------------------------------------------------------------------
     AsyncTicketPtr BufferPacked::readRequest( size_t elementStart, size_t elementCount )
     {
         StagingBuffer *stagingBuffer = mVaoManager->getStagingBuffer( elementCount * mBytesPerElement,

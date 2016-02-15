@@ -221,6 +221,10 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+        virtual UavBufferPacked* createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+                                                      void *initialData, bool keepAsShadow );
+        virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer );
+
         virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes, BufferType bufferType,
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
@@ -237,7 +241,8 @@ namespace Ogre
         static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 
     public:
-        GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers );
+        GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers,
+                           bool supportsSsbo );
         virtual ~GL3PlusVaoManager();
 
         /// Binds the Draw ID to the currently bound vertex array object.

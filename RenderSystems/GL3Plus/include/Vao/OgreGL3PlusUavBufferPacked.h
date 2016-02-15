@@ -26,35 +26,36 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_GL3PlusTexBufferPacked_H_
-#define _Ogre_GL3PlusTexBufferPacked_H_
+#ifndef _Ogre_GL3PlusUavBufferPacked_H_
+#define _Ogre_GL3PlusUavBufferPacked_H_
 
 #include "OgreGL3PlusPrerequisites.h"
-#include "Vao/OgreTexBufferPacked.h"
+#include "Vao/OgreUavBufferPacked.h"
 
 namespace Ogre
 {
     class GL3PlusBufferInterface;
 
-    class _OgreGL3PlusExport GL3PlusTexBufferPacked : public TexBufferPacked
+    class _OgreGL3PlusExport GL3PlusUavBufferPacked : public UavBufferPacked
     {
         GLuint mTexName;
         GLenum mInternalFormat;
 
+        virtual TexBufferPacked* getAsTexBufferImpl( PixelFormat pixelFormat );
+
         inline void bindBuffer( uint16 slot, size_t offset, size_t sizeBytes );
 
     public:
-        GL3PlusTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                                BufferType bufferType, void *initialData, bool keepAsShadow,
-                                VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface,
-                                Ogre::PixelFormat pf );
-        virtual ~GL3PlusTexBufferPacked();
+        GL3PlusUavBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
+                                uint32 bindFlags, void *initialData, bool keepAsShadow,
+                                VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface );
+        virtual ~GL3PlusUavBufferPacked();
 
-        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferGS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferDS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferHS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferGS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferDS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferHS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
         virtual void bindBufferCS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
     };
 }

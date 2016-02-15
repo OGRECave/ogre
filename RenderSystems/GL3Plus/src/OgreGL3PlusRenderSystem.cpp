@@ -750,7 +750,8 @@ namespace Ogre {
             assert( !mVaoManager );
             mVaoManager = OGRE_NEW GL3PlusVaoManager(
                                             mGLSupport->checkExtension("GL_ARB_buffer_storage"),
-                                            mGLSupport->checkExtension("GL_ARB_multi_draw_indirect") );
+                                            mGLSupport->checkExtension("GL_ARB_multi_draw_indirect"),
+                                            mGLSupport->checkExtension("GL_ARB_shader_storage_buffer_object") );
 
             //Bind the Draw ID
             OCGE( glGenVertexArrays( 1, &mGlobalVao ) );
