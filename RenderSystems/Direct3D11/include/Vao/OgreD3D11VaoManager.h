@@ -231,6 +231,10 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+        virtual UavBufferPacked* createUavBufferImpl( size_t sizeBytes, uint32 bindFlags,
+                                                      void *initialData, bool keepAsShadow );
+        virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer );
+
         virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes, BufferType bufferType,
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
@@ -253,7 +257,7 @@ namespace Ogre
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 
-        D3D11CompatBufferInterface* createShaderBufferInterface( bool constantBuffer,
+        D3D11CompatBufferInterface* createShaderBufferInterface( uint32 bindFlags,
                                                                  size_t sizeBytes,
                                                                  BufferType bufferType,
                                                                  void *initialData );

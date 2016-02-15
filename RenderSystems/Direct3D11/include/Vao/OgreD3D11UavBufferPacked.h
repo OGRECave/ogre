@@ -26,24 +26,24 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_D3D11TexBufferPacked_H_
-#define _Ogre_D3D11TexBufferPacked_H_
+#ifndef _Ogre_D3D11UavBufferPacked_H_
+#define _Ogre_D3D11UavBufferPacked_H_
 
 #include "OgreD3D11Prerequisites.h"
-#include "Vao/OgreTexBufferPacked.h"
+#include "Vao/OgreUavBufferPacked.h"
 
 namespace Ogre
 {
     class D3D11BufferInterface;
 
-    class _OgreD3D11Export D3D11TexBufferPacked : public TexBufferPacked
+    class _OgreD3D11Export D3D11UavBufferPacked : public UavBufferPacked
     {
-        DXGI_FORMAT mInternalFormat;
+    protected:
         D3D11Device &mDevice;
 
         struct CachedResourceView
         {
-            ID3D11ShaderResourceView    *mResourceView;
+            ID3D11UnorderedAccessView   *mResourceView;
             uint32                      mOffset;
             uint32                      mSize;
         };
@@ -51,21 +51,23 @@ namespace Ogre
         CachedResourceView  mCachedResourceViews[16];
         uint8               mCurrentCacheCursor;
 
-        ID3D11ShaderResourceView* createResourceView( int cacheIdx, uint32 offset, uint32 sizeBytes );
-        ID3D11ShaderResourceView* bindBufferCommon( size_t offset, size_t sizeBytes );
+        virtual TexBufferPacked* getAsTexBufferImpl( PixelFormat pixelFormat );
+
+        ID3D11UnorderedAccessView* createResourceView( int cacheIdx, uint32 offset, uint32 sizeBytes );
+        ID3D11UnorderedAccessView* bindBufferCommon( size_t offset, size_t sizeBytes );
 
     public:
-        D3D11TexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                              BufferType bufferType, void *initialData, bool keepAsShadow,
+        D3D11UavBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
+                              uint32 bindFlags, void *initialData, bool keepAsShadow,
                               VaoManager *vaoManager, BufferInterface *bufferInterface,
-                              Ogre::PixelFormat pf, D3D11Device &device );
-        virtual ~D3D11TexBufferPacked();
+                              D3D11Device &device );
+        virtual ~D3D11UavBufferPacked();
 
-        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferGS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferDS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
-        virtual void bindBufferHS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferGS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferDS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+//        virtual void bindBufferHS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
         virtual void bindBufferCS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
     };
 }
