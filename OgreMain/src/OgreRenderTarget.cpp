@@ -60,9 +60,12 @@ namespace Ogre {
 
     RenderTarget::~RenderTarget()
     {
+        // make a copy of the list to avoid crashes, the viewport destructor change the list
+        ViewportList vlist = mViewportList;
+        
         // Delete viewports
-        for (ViewportList::iterator i = mViewportList.begin();
-            i != mViewportList.end(); ++i)
+        for (ViewportList::iterator i = vlist.begin();
+            i != vlist.end(); ++i)
         {
             fireViewportRemoved(i->second);
             OGRE_DELETE (*i).second;
@@ -256,17 +259,18 @@ namespace Ogre {
 
         if (it != mViewportList.end())
         {
-            fireViewportRemoved((*it).second);
-            OGRE_DELETE (*it).second;
+            fireViewportRemoved(it->second);
+            OGRE_DELETE (*it)->second;
             mViewportList.erase(ZOrder);
         }
     }
 
     void RenderTarget::removeAllViewports(void)
     {
+        // make a copy of the list to avoid crashes, the viewport destructor change the list
+        ViewportList vlist = mViewportList;
 
-
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it)
+        for (ViewportList::iterator it = vlist.begin(); it != vlist.end(); ++it)
         {
             fireViewportRemoved(it->second);
             OGRE_DELETE (*it).second;
@@ -390,6 +394,15 @@ namespace Ogre {
     {
         if (std::find(mListeners.begin(), mListeners.end(), listener) == mListeners.end())
             mListeners.push_back(listener);
+    }
+    //-----------------------------------------------------------------------
+    void RenderTarget::insertListener(RenderTargetListener* listener, const unsigned int pos)
+    {
+        // if the position is larger than the list size we just set the listener at the end of the list
+        if (pos > mListeners.size())
+            mListeners.push_back(listener);
+        else
+            mListeners.insert(mListeners.begin() + pos, listener);
     }
     //-----------------------------------------------------------------------
     void RenderTarget::removeListener(RenderTargetListener* listener)

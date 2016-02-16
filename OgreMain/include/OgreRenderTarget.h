@@ -283,6 +283,8 @@ namespace Ogre {
         @par NB this should not be used for frame-based scene updates, use Root::addFrameListener for that.
         */
         virtual void addListener(RenderTargetListener* listener);
+        /** same as addListener, but force the position in the vector, so we can control the call order */
+        virtual void insertListener(RenderTargetListener* listener, const unsigned int pos = 0);
         /** Removes a RenderTargetListener previously registered using addListener. */
         virtual void removeListener(RenderTargetListener* listener);
         /** Removes all listeners from this instance. */
