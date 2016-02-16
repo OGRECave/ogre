@@ -252,7 +252,7 @@ void Compositor::createGlobalTextures()
             RenderTarget* rendTarget;
             if (def->formatList.size() > 1)
             {
-                String MRTbaseName = "c" + StringConverter::toString(dummyCounter++) + 
+                String MRTbaseName = "mrt/c" + StringConverter::toString(dummyCounter++) + 
                     "/" + mName + "/" + def->name;
                 MultiRenderTarget* mrt = 
                     Root::getSingleton().getRenderSystem()->createMultiRenderTarget(MRTbaseName);

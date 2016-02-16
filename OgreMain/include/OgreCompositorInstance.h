@@ -91,6 +91,10 @@ namespace Ogre {
             */
             virtual void notifyResourcesCreated(bool forResizeOnly);
 
+            /** Notification before resources have been destructed.
+              @param resizeOnly Was the creation because the viewport was resized?
+             */
+            virtual void notifyResourcesReleased(bool forResizeOnly);
         };
         /** Specific render system operation. A render target operation does special operations
             between render queues like rendering a quad, clearing the frame buffer or 
@@ -304,6 +308,10 @@ namespace Ogre {
         /** Notify listeners of a material render.
         */
         void _fireNotifyResourcesCreated(bool forResizeOnly);
+        
+        /** Notify listeners ressources
+        */
+        void _fireNotifyResourcesReleased(bool forResizeOnly);
     private:
         /// Compositor of which this is an instance.
         Compositor *mCompositor;

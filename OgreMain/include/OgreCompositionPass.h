@@ -137,6 +137,14 @@ namespace Ogre {
             @note applies when PassType is CLEAR
          */
         const ColourValue &getClearColour() const;
+        /** Set the clear colour to be the background colour of the original viewport
+        @note applies when PassType is CLEAR
+        */
+        void setAutomaticColour(bool val);
+        /** Retrieves if the clear colour is automatically setted to the background colour of the original viewport
+        @note applies when PassType is CLEAR
+        */
+        bool getAutomaticColour() const;
         /** Set the viewport clear depth (defaults to 1.0) 
             @note applies when PassType is CLEAR
         */
@@ -329,6 +337,8 @@ namespace Ogre {
         uint32 mClearBuffers;
         /// Clear colour (in case of PT_CLEAR)
         ColourValue mClearColour;
+        /// Clear colour with the colour of the original viewport. Overrides mClearColour (in case of PT_CLEAR)
+        bool mAutomaticColour;
         /// Clear depth (in case of PT_CLEAR)
         Real mClearDepth;
         /// Clear stencil value (in case of PT_CLEAR)

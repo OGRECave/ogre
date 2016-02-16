@@ -41,6 +41,7 @@ CompositionPass::CompositionPass(CompositionTargetPass *parent):
     mMaterialScheme(BLANKSTRING),
     mClearBuffers(FBT_COLOUR|FBT_DEPTH),
     mClearColour(0.0,0.0,0.0,0.0),
+    mAutomaticColour(false),
     mClearDepth(1.0f),
     mClearStencil(0),
     mStencilCheck(false),
@@ -119,6 +120,16 @@ void CompositionPass::setClearColour(const ColourValue &val)
 const ColourValue &CompositionPass::getClearColour() const
 {
     return mClearColour;
+}
+//-----------------------------------------------------------------------
+void CompositionPass::setAutomaticColour(bool val)
+{
+    mAutomaticColour = val;
+}
+//-----------------------------------------------------------------------
+bool CompositionPass::getAutomaticColour() const
+{
+    return mAutomaticColour;
 }
 //-----------------------------------------------------------------------
 void CompositionPass::setInput(size_t id, const String &input, size_t mrtIndex)
