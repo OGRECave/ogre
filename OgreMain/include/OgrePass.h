@@ -1222,25 +1222,7 @@ namespace Ogre {
 
         const GpuProgramPtr getGpuProgram(GpuProgramType programType) const;
 
-        bool hasGpuProgram(GpuProgramType programType) {
-            switch (programType)
-            {
-            case GPT_VERTEX_PROGRAM:
-                return mVertexProgramUsage;
-            case GPT_GEOMETRY_PROGRAM:
-                return mGeometryProgramUsage;
-            case GPT_FRAGMENT_PROGRAM:
-                return mFragmentProgramUsage;
-            case GPT_DOMAIN_PROGRAM:
-                return mTessellationDomainProgramUsage;
-            case GPT_HULL_PROGRAM:
-                return mTessellationHullProgramUsage;
-            case GPT_COMPUTE_PROGRAM:
-                return mComputeProgramUsage;
-            }
-
-            return false;
-        }
+        bool hasGpuProgram(GpuProgramType programType);
 
         /** Sets the vertex program parameters.
             @remarks
@@ -1867,7 +1849,7 @@ namespace Ogre {
         const GpuProgramPtr& getComputeProgram(void) const;
         
      protected:
-        const GpuProgramPtr& getProgram(GpuProgramUsage* const gpuProgramUsage) const;
+        const GpuProgramPtr& getProgram(GpuProgramUsage* const* gpuProgramUsage) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

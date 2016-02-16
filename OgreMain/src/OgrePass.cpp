@@ -1713,6 +1713,25 @@ namespace Ogre {
         }
         return mVertexProgramUsage->getParameters();
     }
+    bool Pass::hasGpuProgram(GpuProgramType programType) {
+        switch (programType)
+        {
+        case GPT_VERTEX_PROGRAM:
+            return mVertexProgramUsage != NULL;
+        case GPT_GEOMETRY_PROGRAM:
+            return mGeometryProgramUsage != NULL;
+        case GPT_FRAGMENT_PROGRAM:
+            return mFragmentProgramUsage != NULL;
+        case GPT_DOMAIN_PROGRAM:
+            return mTessellationDomainProgramUsage != NULL;
+        case GPT_HULL_PROGRAM:
+            return mTessellationHullProgramUsage != NULL;
+        case GPT_COMPUTE_PROGRAM:
+            return mComputeProgramUsage != NULL;
+        }
+
+        return false;
+    }
     const GpuProgramPtr Pass::getGpuProgram(GpuProgramType programType) const
 	{
 		switch (programType)
@@ -1738,16 +1757,16 @@ namespace Ogre {
 
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    const GpuProgramPtr& Pass::getProgram(GpuProgramUsage* const gpuProgramUsage) const
+    const GpuProgramPtr& Pass::getProgram(GpuProgramUsage* const* gpuProgramUsage) const
     {
-        OgreAssert(gpuProgramUsage, "check whether program is available using hasGpuProgram()");
         OGRE_LOCK_MUTEX(mGpuProgramChangeMutex);
-        return gpuProgramUsage->getProgram();
+        OgreAssert(*gpuProgramUsage, "check whether program is available using hasGpuProgram()");
+        return (*gpuProgramUsage)->getProgram();
     }
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getVertexProgram(void) const
     {
-        return getProgram(mVertexProgramUsage);
+        return getProgram(&mVertexProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getFragmentProgramName(void) const
@@ -1767,7 +1786,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getFragmentProgram(void) const
     {
-        return getProgram(mFragmentProgramUsage);
+        return getProgram(&mFragmentProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getGeometryProgramName(void) const
@@ -1787,7 +1806,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getGeometryProgram(void) const
     {
-        return getProgram(mGeometryProgramUsage);
+        return getProgram(&mGeometryProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationHullProgramName(void) const
@@ -1807,7 +1826,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationHullProgram(void) const
     {
-        return getProgram(mTessellationHullProgramUsage);
+        return getProgram(&mTessellationHullProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getTessellationDomainProgramName(void) const
@@ -1827,7 +1846,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getTessellationDomainProgram(void) const
     {
-        return getProgram(mTessellationDomainProgramUsage);
+        return getProgram(&mTessellationDomainProgramUsage);
     }
     //-----------------------------------------------------------------------
     const String& Pass::getComputeProgramName(void) const
@@ -1847,7 +1866,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     const GpuProgramPtr& Pass::getComputeProgram(void) const
     {
-        return getProgram(mComputeProgramUsage);
+        return getProgram(&mComputeProgramUsage);
     }
     //-----------------------------------------------------------------------
     bool Pass::isLoaded(void) const
