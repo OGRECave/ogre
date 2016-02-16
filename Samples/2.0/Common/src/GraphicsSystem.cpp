@@ -122,8 +122,10 @@ std::string macBundlePath()
         Ogre::ConfigOptionMap::iterator opt = cfgOpts.find( "Video Mode" );
         if( opt != cfgOpts.end() )
         {
+            //Ignore leading space
+            const Ogre::String::size_type start = opt->second.currentValue.find_first_of("012356789");
             //Get the width and height
-            Ogre::String::size_type widthEnd = opt->second.currentValue.find(' ');
+            Ogre::String::size_type widthEnd = opt->second.currentValue.find(' ', start);
             // we know that the height starts 3 characters after the width and goes until the next space
             Ogre::String::size_type heightEnd = opt->second.currentValue.find(' ', widthEnd+3);
             // Now we can parse out the values
