@@ -87,8 +87,11 @@ namespace Ogre
 
         for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
         {
-            HighLevelGpuProgramPtr deleg = 
-                HighLevelGpuProgramManager::getSingleton().getByName(*i);
+            HighLevelGpuProgramPtr deleg = HighLevelGpuProgramManager::getSingleton().getByName(*i, mGroup);
+
+            //recheck with auto resource group
+            if (deleg.isNull())
+              deleg = HighLevelGpuProgramManager::getSingleton().getByName(*i);
 
             // Silently ignore missing links
             if(!deleg.isNull() && deleg->isSupported())

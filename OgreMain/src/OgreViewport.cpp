@@ -220,6 +220,9 @@ namespace Ogre {
     {
         if (mCamera)
         {
+            if (mCamera->getViewport() != this)
+                mCamera->_notifyViewport(this);
+
             // Tell Camera to render into me
             mCamera->_renderScene(this, mShowOverlays);
         }
