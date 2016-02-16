@@ -31,7 +31,7 @@
 #  RenderSystem_GL, RenderSystem_GL3Plus,
 #  RenderSystem_GLES, RenderSystem_GLES2,
 #  RenderSystem_Direct3D9, RenderSystem_Direct3D11
-#  Paging, Terrain, Volume, Overlay
+#  Paging, Terrain, Volume, Overlay, MeshLodGenerator, HLMS
 #
 # For each of these components, the following variables are defined:
 #
@@ -148,7 +148,7 @@ else()
 endif ()
 
 # redo search if any of the environmental hints changed
-set(OGRE_COMPONENTS Paging Terrain Volume Overlay 
+set(OGRE_COMPONENTS Paging Terrain Volume Overlay MeshLodGenerator HLMS
   Plugin_BSPSceneManager Plugin_CgProgramManager Plugin_OctreeSceneManager
   Plugin_OctreeZone Plugin_PCZSceneManager Plugin_ParticleFX
   RenderSystem_Direct3D11 RenderSystem_Direct3D9 RenderSystem_GL RenderSystem_GL3Plus RenderSystem_GLES RenderSystem_GLES2)
@@ -264,6 +264,7 @@ if (OGRE_STATIC)
   set(OGRE_DEPS_FOUND TRUE)
   find_package(Cg QUIET)
   find_package(DirectX QUIET)
+  find_package(DirectX11 QUIET)
   find_package(FreeImage QUIET)
   find_package(Freetype QUIET)
   find_package(OpenGL QUIET)
@@ -422,6 +423,10 @@ ogre_find_component(RTShaderSystem OgreRTShaderSystem.h)
 ogre_find_component(Volume OgreVolumePrerequisites.h)
 # look for Overlay component
 ogre_find_component(Overlay OgreOverlaySystem.h)
+# look for MeshLodGenerator component
+ogre_find_component(MeshLodGenerator OgreMeshLodGenerator.h)
+# look for HLMS component
+ogre_find_component(HLMS OgreHlmsManager.h)
 
 #########################################################
 # Find Ogre plugins
@@ -521,7 +526,7 @@ ogre_find_plugin(RenderSystem_Direct3D11 OgreD3D11RenderSystem.h RenderSystems/D
         
 if (OGRE_STATIC)
   # check if dependencies for plugins are met
-  if (NOT DirectX_FOUND)
+  if (NOT DirectX9_FOUND)
     set(OGRE_RenderSystem_Direct3D9_FOUND FALSE)
   endif ()
   if (NOT DirectX_D3D11_FOUND)
@@ -544,7 +549,7 @@ if (OGRE_STATIC)
   endif ()
   
   set(OGRE_RenderSystem_Direct3D9_LIBRARIES ${OGRE_RenderSystem_Direct3D9_LIBRARIES}
-    ${DirectX_LIBRARIES}
+    ${DirectX9_LIBRARIES}
   )
 
   set(OGRE_RenderSystem_Direct3D11_LIBRARIES ${OGRE_RenderSystem_Direct3D11_LIBRARIES}
