@@ -79,7 +79,6 @@ if (OGRE_BUILD_TESTS)
       set(RESOURCE_FILES
         ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/resource.h
         ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreWin32Resources.rc
-        ${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/winres.h
         )
       source_group(Resources FILES ${RESOURCE_FILES})
     endif ()
