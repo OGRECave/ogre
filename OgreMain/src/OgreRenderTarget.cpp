@@ -260,7 +260,7 @@ namespace Ogre {
         if (it != mViewportList.end())
         {
             fireViewportRemoved(it->second);
-            OGRE_DELETE (*it)->second;
+            OGRE_DELETE (*it).second;
             mViewportList.erase(ZOrder);
         }
     }
