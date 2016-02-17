@@ -116,13 +116,15 @@ void CompositorInstance::setAlive(bool value)
 class RSClearOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
-    RSClearOperation(uint32 inBuffers, ColourValue inColour, Real inDepth, unsigned short inStencil):
-        buffers(inBuffers), colour(inColour), depth(inDepth), stencil(inStencil)
+    RSClearOperation(uint32 inBuffers, ColourValue inColour, Real inDepth, unsigned short inStencil, bool inAutomaticColour):
+        buffers(inBuffers), colour(inColour), depth(inDepth), stencil(inStencil), automaticColour(inAutomaticColour)
     {}
     /// Which buffers to clear (FrameBufferType)
     uint32 buffers;
     /// Colour to clear in case FBT_COLOUR is set
     ColourValue colour;
+    /// Automatic colour from original viewport background colour
+    bool automaticColour;
     /// Depth to set in case FBT_DEPTH is set
     Real depth;
     /// Stencil value to set in case FBT_STENCIL is set
@@ -130,6 +132,9 @@ public:
 
     virtual void execute(SceneManager *sm, RenderSystem *rs)
     {
+        // _getViewport returns the viewport currently rendered, while getViewport returns lastViewport!
+        if((buffers & FBT_COLOUR) && automaticColour)
+          colour = rs->_getViewport()->getCamera()->getViewport()->getBackgroundColour();
         rs->clearFrameBuffer(buffers, colour, depth, stencil);
     }
 };
@@ -312,7 +317,8 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
                 pass->getClearBuffers(),
                 pass->getClearColour(),
                 pass->getClearDepth(),
-                (ushort)pass->getClearStencil()
+                (ushort)pass->getClearStencil(),
+                pass->getAutomaticColour()
                 ));
             break;
         case CompositionPass::PT_STENCIL:
@@ -677,7 +683,7 @@ void CompositorInstance::createResources(bool forResizeOnly)
             /// Make the tetxure
             if (def->formatList.size() > 1)
             {
-                String MRTbaseName = "c" + StringConverter::toString(dummyCounter++) + 
+                String MRTbaseName = "mrt/c" + StringConverter::toString(dummyCounter++) + 
                 "/" + def->name + "/" + mChain->getViewport()->getTarget()->getName();
                 MultiRenderTarget* mrt = 
                 Root::getSingleton().getRenderSystem()->createMultiRenderTarget(MRTbaseName);
@@ -870,6 +876,10 @@ String CompositorInstance::getMRTTexLocalName(const String& baseName, size_t att
 //-----------------------------------------------------------------------
 void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveTextures)
 {
+    // send notification, this is usefull when a RTT is used and need
+    // to free other resources before the destruction 
+    _fireNotifyResourcesReleased(forResizeOnly);
+  
     // Remove temporary textures 
     // We only remove those that are not shared, shared textures are dealt with
     // based on their reference count.
@@ -888,7 +898,7 @@ void CompositorInstance::freeResources(bool forResizeOnly, bool clearReserveText
         }
         
         // potentially only remove this one if based on size
-        if (!forResizeOnly || def->width == 0 || def->height == 0)
+        if (!forResizeOnly || (def->width == 0) || (def->height == 0))
         {
             size_t subSurf = def->formatList.size();
 
@@ -1259,6 +1269,13 @@ void CompositorInstance::_fireNotifyResourcesCreated(bool forResizeOnly)
         (*i)->notifyResourcesCreated(forResizeOnly);
 }
 //-----------------------------------------------------------------------
+void CompositorInstance::_fireNotifyResourcesReleased(bool forResizeOnly)
+{
+    Listeners::iterator i, iend=mListeners.end();
+    for(i=mListeners.begin(); i!=iend; ++i)
+        (*i)->notifyResourcesReleased(forResizeOnly);
+}
+//-----------------------------------------------------------------------
 void CompositorInstance::notifyCameraChanged(Camera* camera)
 {
     // update local texture's viewports.
@@ -1300,6 +1317,9 @@ void CompositorInstance::Listener::notifyMaterialRender(uint32 pass_id, Material
 {
 }
 void CompositorInstance::Listener::notifyResourcesCreated(bool forResizeOnly)
+{
+}
+void CompositorInstance::Listener::notifyResourcesReleased(bool forResizeOnly)
 {
 }
 
