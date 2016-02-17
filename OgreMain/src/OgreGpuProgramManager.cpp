@@ -44,9 +44,9 @@ namespace Ogre {
         assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
-    GpuProgramPtr GpuProgramManager::getByName(const String& name, bool preferHighLevelPrograms)
+    GpuProgramPtr GpuProgramManager::getByName(const String& name, const String& group, bool preferHighLevelPrograms)
     {
-        return getResourceByName(name, preferHighLevelPrograms).staticCast<GpuProgram>();
+        return getResourceByName(name, group, preferHighLevelPrograms).staticCast<GpuProgram>();
     }
     //---------------------------------------------------------------------------
     GpuProgramManager::GpuProgramManager()
@@ -72,8 +72,8 @@ namespace Ogre {
     {
         GpuProgramPtr prg;
         {
-                    OGRE_LOCK_AUTO_MUTEX;
-            prg = getByName(name);
+            OGRE_LOCK_AUTO_MUTEX;
+            prg = getByName(name, groupName);
             if (prg.isNull())
             {
                 prg = createProgram(name, groupName, filename, gptype, syntaxCode);
@@ -91,7 +91,7 @@ namespace Ogre {
         GpuProgramPtr prg;
         {
                     OGRE_LOCK_AUTO_MUTEX;
-            prg = getByName(name);
+            prg = getByName(name, groupName);
             if (prg.isNull())
             {
                 prg = createProgramFromString(name, groupName, code, gptype, syntaxCode);
@@ -159,12 +159,12 @@ namespace Ogre {
         return rs->getCapabilities()->isShaderProfileSupported(syntaxCode);
     }
     //---------------------------------------------------------------------------
-    ResourcePtr GpuProgramManager::getResourceByName(const String& name, bool preferHighLevelPrograms)
+    ResourcePtr GpuProgramManager::getResourceByName(const String& name, const String& group, bool preferHighLevelPrograms)
     {
         ResourcePtr ret;
         if (preferHighLevelPrograms)
         {
-            ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name);
+            ret = HighLevelGpuProgramManager::getSingleton().getResourceByName(name, group);
             if (!ret.isNull())
                 return ret;
         }

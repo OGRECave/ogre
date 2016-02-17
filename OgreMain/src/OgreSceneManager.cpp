@@ -807,6 +807,9 @@ void SceneManager::clearScene(void)
     if (mRenderQueue)
         mRenderQueue->clear(true);
 
+    // Reset ParamDataSource, when a resource is removed the mAutoParamDataSource keep bad references
+    OGRE_DELETE mAutoParamDataSource;
+    mAutoParamDataSource = createAutoParamDataSource();
 }
 //-----------------------------------------------------------------------
 SceneNode* SceneManager::createSceneNodeImpl(void)

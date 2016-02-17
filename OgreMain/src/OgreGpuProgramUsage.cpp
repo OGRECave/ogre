@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgramUsage.h"
 #include "OgreGpuProgramManager.h"
+#include "OgrePass.h"
 #include "OgreException.h"
 
 namespace Ogre
@@ -62,8 +63,12 @@ namespace Ogre
             mRecreateParams = true;
         }
 
-        mProgram = GpuProgramManager::getSingleton().getByName(name);
-
+        mProgram = GpuProgramManager::getSingleton().getByName(name, mParent->getResourceGroup());
+        
+        //Look again without the group if not found
+        if (mProgram.isNull())
+            mProgram = GpuProgramManager::getSingleton().getByName(name);
+        
         if (mProgram.isNull())
         {
             String progType = "fragment";

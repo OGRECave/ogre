@@ -2527,10 +2527,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2553,10 +2557,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2579,10 +2587,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2605,10 +2617,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2631,10 +2647,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2657,10 +2677,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2683,10 +2707,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2709,10 +2737,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2735,10 +2767,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
@@ -2761,10 +2797,14 @@ namespace Ogre{
         ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::GPU_PROGRAM, node->name);
         compiler->_fireEvent(&evt, 0);
 
-        if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+        if (GpuProgramManager::getSingleton().getByName(evt.mName, compiler->getResourceGroup()).isNull())
         {
-            compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
-            return;
+            //recheck with auto resource group
+            if (GpuProgramManager::getSingleton().getByName(evt.mName).isNull())
+            {
+              compiler->addError(ScriptCompiler::CE_REFERENCETOANONEXISTINGOBJECT, node->file, node->line);
+              return;
+            }
         }
 
         Pass *pass = any_cast<Pass*>(node->parent->context);
