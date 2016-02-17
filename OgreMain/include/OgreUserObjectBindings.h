@@ -137,7 +137,7 @@ namespace Ogre {
                 mUserObjectsMap(NULL)
             {
                 if (other.mUserObjectsMap != NULL)
-                    mUserObjectsMap = new UserObjectsMap(*other.mUserObjectsMap);
+                    mUserObjectsMap = OGRE_NEW_T(UserObjectsMap, MEMCATEGORY_GENERAL) (*other.mUserObjectsMap);
             }
 
             /** Attribute storage dtor. */
@@ -145,7 +145,7 @@ namespace Ogre {
             {
                 if (mUserObjectsMap != NULL)
                 {
-                    delete mUserObjectsMap;
+                    OGRE_DELETE_T(mUserObjectsMap, UserObjectsMap, MEMCATEGORY_GENERAL);
                     mUserObjectsMap = NULL;
                 }
             }

@@ -82,7 +82,7 @@ namespace Ogre {
 
         // Case map doesn't exists.
         if (mAttributes->mUserObjectsMap == NULL)
-            mAttributes->mUserObjectsMap = new UserObjectsMap;
+            mAttributes->mUserObjectsMap = OGRE_NEW_T(UserObjectsMap, MEMCATEGORY_GENERAL) ();
 
         (*mAttributes->mUserObjectsMap)[key] = anything;
     }
