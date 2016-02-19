@@ -105,7 +105,7 @@ if (OGRE_BUILD_SAMPLES)
     if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
       	include_directories(
 	    	${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
-		    ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/src/GLSL/include
+	        ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include/GLSL
     		)
     endif()
 
