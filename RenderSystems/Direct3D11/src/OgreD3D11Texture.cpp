@@ -863,11 +863,11 @@ namespace Ogre
                         (HardwareBuffer::Usage)bufusage // usage
                         ); 
 
-                    mSurfaceList.push_back(
-                        HardwarePixelBufferSharedPtr(buffer)
-                        );
-                    width = std::max<size_t>(width / 2, 1);
-                    height = std::max<size_t>(height / 2, 1);
+                    mSurfaceList.push_back(HardwarePixelBufferSharedPtr(buffer));
+
+                    if(width > 1) width /= 2;
+                    if(height > 1) height /= 2;
+                    if(depth > 1 && getTextureType() != TEX_TYPE_2D_ARRAY) depth /= 2;
                 }
             }
         }
