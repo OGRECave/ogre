@@ -607,12 +607,12 @@ namespace Ogre
 
         if( pbsDatablock->getTransparencyMode() != HlmsPbsDatablock::None )
         {
-            outString += "\n\t\t\t\"transparency\" :\n\t\t\t{";
+            outString += ",\n\t\t\t\"transparency\" :\n\t\t\t{";
             outString += "\n\t\t\t\t\"value\" : ";
             outString += StringConverter::toString( pbsDatablock->getTransparency() );
-            outString += "\n\t\t\t\t\"mode\" : ";
+            outString += ",\n\t\t\t\t\"mode\" : ";
             toQuotedStr( pbsDatablock->getTransparencyMode(), outString );
-            outString += "\n\t\t\t\t\"use_alpha_from_textures\" : ";
+            outString += ",\n\t\t\t\t\"use_alpha_from_textures\" : ";
             outString += pbsDatablock->getUseAlphaFromTextures() ? "true" : "false";
             outString += "\n\t\t\t}";
         }
