@@ -58,8 +58,6 @@ namespace Ogre {
         Image::Box mLockBox;
         LockOptions mCurrentLockOptions;
 
-        D3D11_BOX OgreImageBoxToDx11Box(const Image::Box &inBox) const;
-
         /// Render targets
         typedef vector<RenderTexture*>::type SliceTRT;
         SliceTRT mSliceTRT;

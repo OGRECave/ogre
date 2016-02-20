@@ -279,21 +279,6 @@ namespace Ogre {
         _genMipmaps();
     }
     //-----------------------------------------------------------------------------  
-    D3D11_BOX D3D11HardwarePixelBuffer::OgreImageBoxToDx11Box(const Image::Box &inBox) const
-    {
-        D3D11_BOX res;
-        res.left    = static_cast<UINT>(inBox.left);
-        res.top     = static_cast<UINT>(inBox.top);
-        res.front   = static_cast<UINT>(inBox.front);
-        res.right   = static_cast<UINT>(inBox.right);
-        res.bottom  = static_cast<UINT>(inBox.bottom);
-        res.back    = static_cast<UINT>(inBox.back);
-
-        return res;
-    }
-
-    //-----------------------------------------------------------------------------  
-
     void D3D11HardwarePixelBuffer::blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
         if (srcBox.getWidth() != dstBox.getWidth()
@@ -345,232 +330,72 @@ namespace Ogre {
         _genMipmaps();
     }
     //-----------------------------------------------------------------------------  
-    void D3D11HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dstBox)
+    void D3D11HardwarePixelBuffer::blitFromMemory(const PixelBox &src, const Image::Box &dst)
     {
-        bool isDds = false;
-        switch(mFormat)
+        if (src.getWidth() != dst.getWidth()
+            || src.getHeight() != dst.getHeight()
+            || src.getDepth() != dst.getDepth())
         {
-        case PF_DXT1:
-        case PF_DXT2:
-        case PF_DXT3:
-        case PF_DXT4:
-        case PF_DXT5:
-            isDds = true;
-            break;
-        default:
-
-            break;
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "D3D11 device cannot copy a subresource - source and dest size are not the same and they have to be the same in DX11.",
+                "D3D11HardwarePixelBuffer::blitFromMemory");
         }
-
-        // for scoped deletion of conversion buffer
-        MemoryDataStreamPtr buf;
-        PixelBox converted = src;
-
-        D3D11_BOX dstBoxDx11 = OgreImageBoxToDx11Box(dstBox);
-		if (isDds)
-		{
-			if(dstBox.getWidth() % 4 > 0)
-			{
-				dstBoxDx11.right += 4 - dstBox.getWidth() % 4 ;
-			}
-			if(dstBox.getHeight() % 4 > 0)
-			{
-				dstBoxDx11.bottom += 4 - dstBox.getHeight() % 4 ;
-			}
-		}
-
-        dstBoxDx11.front = 0;
-        dstBoxDx11.back = converted.getDepth();
 
         // convert to pixelbuffer's native format if necessary
-        if (src.format != mFormat)
+        if(src.format != mFormat)
         {
-            buf.bind(new MemoryDataStream(
-                PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(),
-                mFormat)));
-            converted = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), mFormat, buf->getPtr());
+            vector<uint8>::type buffer;
+            buffer.resize(PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), src.getDepth(), mFormat));
+            PixelBox converted = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), mFormat, buffer.data());
             PixelUtil::bulkPixelConversion(src, converted);
+            blitFromMemory(converted, dst); // recursive call
+            return;
         }
 
-        if (mUsage & HBU_DYNAMIC)
+        // We should blit TEX_TYPE_2D_ARRAY with depth > 1 by iterating over subresources.
+        if (src.getDepth() > 1 && mParentTexture->getTextureType() == TEX_TYPE_2D_ARRAY)
         {
-            size_t sizeinbytes;
-            if (PixelUtil::isCompressed(converted.format))
+            PixelBox srcSlice = src;
+            Image::Box dstSlice = dst;
+            srcSlice.back = srcSlice.front + 1;
+            dstSlice.back = dstSlice.front + 1;
+            for(uint32 slice = src.front; slice < src.back; ++slice)
             {
-				if(converted.rowPitch  % 4 > 0)
-				{
-					converted.rowPitch  += 4 - converted.rowPitch  % 4;
-				}
-				
-                // D3D wants the width of one row of cells in bytes
-                if (converted.format == PF_DXT1)
-                {
-                    // 64 bits (8 bytes) per 4x4 block
-                    sizeinbytes = std::max<size_t>(1, converted.getWidth() / 4) * std::max<size_t>(1, converted.getHeight() / 4) * 8;
-                }
-                else
-                {
-                    // 128 bits (16 bytes) per 4x4 block
-                    sizeinbytes = std::max<size_t>(1, converted.getWidth() / 4) * std::max<size_t>(1, converted.getHeight() / 4) * 16;
-                }
+                blitFromMemory(srcSlice, dstSlice); // recursive call
+                ++srcSlice.front; ++srcSlice.back;
+                ++dstSlice.front; ++dstSlice.back;
             }
-            else
-            {
-                sizeinbytes = converted.getHeight() * converted.getWidth() * PixelUtil::getNumElemBytes(converted.format);
-            }
-            
-            const Ogre::PixelBox &locked = lock(dstBox, HBL_DISCARD);
+            return;
+        }
 
-            int srcRowPitch = converted.rowPitch * PixelUtil::getNumElemBytes(converted.format);
-            int destRowPitch = locked.rowPitch;
-
-            byte *src = (byte*)converted.data;
-            byte *dst = (byte*)locked.data;
-
-            for (unsigned int row = 0 ; row < converted.getHeight() ; row ++)
-            {
-                memcpy((void*)dst, (void*)src, srcRowPitch);
-                src += srcRowPitch;
-                dst += destRowPitch;
-            }
+        // Do the real work
+        if (mUsage & HBU_DYNAMIC) // i.e. UpdateSubresource can not be used
+        {
+            Ogre::PixelBox locked = lock(dst, HBL_DISCARD);
+            PixelUtil::bulkPixelConversion(src, locked); // compressed formats are handled using per slice granularity, pitches are honoured
             unlock();
         }
         else
         {
-            size_t rowWidth;
-            if (PixelUtil::isCompressed(converted.format))
-            {
-				if(converted.rowPitch  % 4 > 0)
-				{
-					converted.rowPitch  += 4 - converted.rowPitch  % 4;
-				}
-				
-                // D3D wants the width of one row of cells in bytes
-                if (converted.format == PF_DXT1)
-                {
-                    // 64 bits (8 bytes) per 4x4 block
-                    rowWidth = (converted.rowPitch / 4) * 8;
-                }
-                else
-                {
-                    // 128 bits (16 bytes) per 4x4 block
-                    rowWidth = (converted.rowPitch / 4) * 16;
-                }
-            }
-            else
-            {
-                rowWidth = converted.rowPitch * PixelUtil::getNumElemBytes(converted.format);
-            }
+            D3D11_BOX dstBox = getSubresourceBox(dst);
+            UINT dstSubresource = getSubresourceIndex(dst.front);
+            UINT srcRowPitch = PixelUtil::getMemorySize(src.getWidth(), 1, 1, src.format);
+            UINT srcDepthPitch = PixelUtil::getMemorySize(src.getWidth(), src.getHeight(), 1, src.format); // H * rowPitch is invalid for compressed formats
 
-            switch(mParentTexture->getTextureType()) {
-            case TEX_TYPE_1D:
-                {
-                    D3D11RenderSystem* rsys = static_cast<D3D11RenderSystem*>(Root::getSingleton().getRenderSystem());
-                    if (rsys->_getFeatureLevel() >= D3D_FEATURE_LEVEL_10_0)
-                    {
-                        mDevice.GetImmediateContext()->UpdateSubresource( 
-                            mParentTexture->GetTex1D(), 
-                            0,
-                            &dstBoxDx11,
-                            converted.data,
-                            rowWidth,
-                            0 );
-                        if (mDevice.isError())
-                        {
-                            String errorDescription = mDevice.getErrorDescription();
-                            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                                "D3D11 device cannot update 1d subresource\nError Description:" + errorDescription,
-                                "D3D11HardwarePixelBuffer::blitFromMemory");
-                        }
-                        break; // For Feature levels that do not support 1D textures, revert to creating a 2D texture.
-                    }
-                }
-            case TEX_TYPE_CUBE_MAP:
-            case TEX_TYPE_2D:
-                {
-                    mDevice.GetImmediateContext()->UpdateSubresource( 
-                        mParentTexture->GetTex2D(), 
-                        D3D11CalcSubresource(mMipLevel, mFace, mParentTexture->getNumMipmaps()+1),
-                        &dstBoxDx11,
-                        converted.data,
-                        rowWidth,
-                        0 );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot update 2d subresource\nError Description:" + errorDescription,
-                            "D3D11HardwarePixelBuffer::blitFromMemory");
-                    }
-                }
-                break;
-            case TEX_TYPE_2D_ARRAY:
-                {
-                    mDevice.GetImmediateContext()->UpdateSubresource( 
-                        mParentTexture->GetTex2D(), 
-                        D3D11CalcSubresource(mMipLevel, src.front, mParentTexture->getNumMipmaps()+1),
-                        &dstBoxDx11,
-                        converted.data,
-                        rowWidth,
-                        0 );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot update 2d array subresource\nError Description:" + errorDescription,
-                            "D3D11HardwarePixelBuffer::blitFromMemory");
-                }
-                }
-                break;
-            case TEX_TYPE_3D:
-                {
-                    // copied from dx9
-                    size_t sliceWidth;
-                    if (PixelUtil::isCompressed(converted.format))
-                    {
-                        // D3D wants the width of one slice of cells in bytes
-                        if (converted.format == PF_DXT1)
-                        {
-                            // 64 bits (8 bytes) per 4x4 block
-                            sliceWidth = (converted.slicePitch / 16) * 8;
-                        }
-                        else
-                        {
-                            // 128 bits (16 bytes) per 4x4 block
-                            sliceWidth = (converted.slicePitch / 16) * 16;
-                        }
+            mDevice.GetImmediateContext()->UpdateSubresource(
+                mParentTexture->getTextureResource(), dstSubresource, &dstBox,
+                src.getTopLeftFrontPixelPtr(), srcRowPitch, srcDepthPitch);
+        }
 
-                    }
-                    else
-                    {
-                        sliceWidth = converted.slicePitch * PixelUtil::getNumElemBytes(converted.format);
-                    }
- 
-                    mDevice.GetImmediateContext()->UpdateSubresource( 
-                        mParentTexture->GetTex3D(), 
-                        mMipLevel,
-                        &dstBoxDx11,
-                        converted.data,
-                        rowWidth,
-                        sliceWidth
-                        );
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot update 3d subresource\nError Description:" + errorDescription,
-                            "D3D11HardwarePixelBuffer::blitFromMemory");
-                    }
-                }
-                break;
-            }
- 
-            if (!isDds)
-            {
-                _genMipmaps();
-            }
-        }   
+        if(mDevice.isError())
+        {
+            String errorDescription; errorDescription
+                .append("D3D11 device cannot update ").append(toString(mParentTexture->getTextureType()))
+                .append("\nError Description:").append(mDevice.getErrorDescription());
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, errorDescription, "D3D11HardwarePixelBuffer::blitFromMemory");
+        }
 
+        _genMipmaps();
     }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::blitToMemory(const Image::Box &srcBox, const PixelBox &dst)
