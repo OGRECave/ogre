@@ -417,35 +417,34 @@ namespace Ogre {
         rsc->setCapability(RSC_VERTEX_PROGRAM);
         rsc->setCapability(RSC_FRAGMENT_PROGRAM);
 
-        GLfloat floatConstantCount = 0;
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setVertexProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
-        rsc->setVertexProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
-        rsc->setVertexProgramConstantIntCount((Ogre::ushort)floatConstantCount);
+        GLint constantCount = 0;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &constantCount));
+        rsc->setVertexProgramConstantFloatCount((Ogre::ushort)constantCount);
+        rsc->setVertexProgramConstantBoolCount((Ogre::ushort)constantCount);
+        rsc->setVertexProgramConstantIntCount((Ogre::ushort)constantCount);
 
         // Fragment Program Properties
-        floatConstantCount = 0;
-        OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &floatConstantCount));
-        rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)floatConstantCount);
-        rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)floatConstantCount);
-        rsc->setFragmentProgramConstantIntCount((Ogre::ushort)floatConstantCount);
+        constantCount = 0;
+        OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_FRAGMENT_UNIFORM_COMPONENTS, &constantCount));
+        rsc->setFragmentProgramConstantFloatCount((Ogre::ushort)constantCount);
+        rsc->setFragmentProgramConstantBoolCount((Ogre::ushort)constantCount);
+        rsc->setFragmentProgramConstantIntCount((Ogre::ushort)constantCount);
 
         // Geometry Program Properties
         if(mHasGL32 || mGLSupport->checkExtension("ARB_geometry_shader4")) {
             rsc->setCapability(RSC_GEOMETRY_PROGRAM);
 
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
-            rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
+            rsc->setGeometryProgramConstantFloatCount(constantCount);
 
-            GLint maxOutputVertices;
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &maxOutputVertices));
-            rsc->setGeometryProgramNumOutputVertices(maxOutputVertices);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_OUTPUT_VERTICES, &constantCount));
+            rsc->setGeometryProgramNumOutputVertices(constantCount);
 
             //FIXME Is this correct?
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &floatConstantCount));
-            rsc->setGeometryProgramConstantFloatCount(floatConstantCount);
-            rsc->setGeometryProgramConstantBoolCount(floatConstantCount);
-            rsc->setGeometryProgramConstantIntCount(floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_GEOMETRY_UNIFORM_COMPONENTS, &constantCount));
+            rsc->setGeometryProgramConstantFloatCount(constantCount);
+            rsc->setGeometryProgramConstantBoolCount(constantCount);
+            rsc->setGeometryProgramConstantIntCount(constantCount);
         }
 
         // Tessellation Program Properties
@@ -454,21 +453,21 @@ namespace Ogre {
             rsc->setCapability(RSC_TESSELLATION_HULL_PROGRAM);
             rsc->setCapability(RSC_TESSELLATION_DOMAIN_PROGRAM);
 
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &floatConstantCount));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TESS_CONTROL_UNIFORM_COMPONENTS, &constantCount));
             // 16 boolean params allowed
-            rsc->setTessellationHullProgramConstantBoolCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantBoolCount(constantCount);
             // 16 integer params allowed, 4D
-            rsc->setTessellationHullProgramConstantIntCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantIntCount(constantCount);
             // float params, always 4D
-            rsc->setTessellationHullProgramConstantFloatCount(floatConstantCount);
+            rsc->setTessellationHullProgramConstantFloatCount(constantCount);
 
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &floatConstantCount));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TESS_EVALUATION_UNIFORM_COMPONENTS, &constantCount));
             // 16 boolean params allowed
-            rsc->setTessellationDomainProgramConstantBoolCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantBoolCount(constantCount);
             // 16 integer params allowed, 4D
-            rsc->setTessellationDomainProgramConstantIntCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantIntCount(constantCount);
             // float params, always 4D
-            rsc->setTessellationDomainProgramConstantFloatCount(floatConstantCount);
+            rsc->setTessellationDomainProgramConstantFloatCount(constantCount);
         }
 
         // Compute Program Properties
@@ -477,19 +476,19 @@ namespace Ogre {
             rsc->setCapability(RSC_COMPUTE_PROGRAM);
 
             //FIXME Is this correct?
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &floatConstantCount));
-            rsc->setComputeProgramConstantFloatCount(floatConstantCount);
-            rsc->setComputeProgramConstantBoolCount(floatConstantCount);
-            rsc->setComputeProgramConstantIntCount(floatConstantCount);
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_UNIFORM_COMPONENTS, &constantCount));
+            rsc->setComputeProgramConstantFloatCount(constantCount);
+            rsc->setComputeProgramConstantBoolCount(constantCount);
+            rsc->setComputeProgramConstantIntCount(constantCount);
 
             //TODO we should also check max workgroup count & size
-            // OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &workgroupCount));
-            // OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
+            // OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_SIZE, &workgroupCount));
+            // OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS, &workgroupInvocations));
         }
 
         if (mGLSupport->checkExtension("GL_ARB_get_program_binary") || hasGL41)
         {
-            GLint formats;
+            GLint formats = 0;
             OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
 
             if (formats > 0)
@@ -508,10 +507,7 @@ namespace Ogre {
         units = std::max<GLint>(16, units);
 
         rsc->setNumVertexTextureUnits(static_cast<ushort>(units));
-        if (units > 0)
-        {
-            rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
-        }
+        rsc->setCapability(RSC_VERTEX_TEXTURE_FETCH);
 
         // Mipmap LOD biasing?
         rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
@@ -1707,7 +1703,7 @@ namespace Ogre {
 
         maxAnisotropy = std::min<uint>(mLargestSupportedAnisotropy, maxAnisotropy);
         if (_getCurrentAnisotropy(unit) != maxAnisotropy)
-            OGRE_CHECK_GL_ERROR(glTexParameterf(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
+            OGRE_CHECK_GL_ERROR(glTexParameteri(mTextureTypes[unit], GL_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy));
 
         activateGLTextureUnit(0);
     }
@@ -2247,7 +2243,7 @@ namespace Ogre {
 
      	if (mGLSupport->checkExtension("GL_EXT_texture_filter_anisotropic"))
         {
-            OGRE_CHECK_GL_ERROR(glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &mLargestSupportedAnisotropy));
         }
 
         if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || mHasGL32)
