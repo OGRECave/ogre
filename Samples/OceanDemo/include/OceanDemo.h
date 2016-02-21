@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -18,6 +18,7 @@ same license as the rest of the engine.
 #include "SdkSample.h"
 #include "SamplePlugin.h"
 #include "MaterialControls.h"
+#include "OgreBillboard.h"
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -29,56 +30,56 @@ using namespace OgreBites;
 #define CONTROLS_PER_PAGE 5
 
 enum OceanMaterial {
-	OCEAN1_CG,
-	OCEAN1_NATIVE,
-	OCEAN2_CG,
-	OCEAN2_NATIVE
+    OCEAN1_CG,
+    OCEAN1_NATIVE,
+    OCEAN2_CG,
+    OCEAN2_NATIVE
 };
 
 class _OgreSampleClassExport Sample_Ocean : public SdkSample
 {
 public:
-	Sample_Ocean();
+    Sample_Ocean();
 protected:
-	//Things from the frame listener
-	Ogre::Vector3 mTranslateVector;
+    //Things from the frame listener
+    Ogre::Vector3 mTranslateVector;
     int mSceneDetailIndex;
     float mUpdateFreq;
-	bool mSpinLight;
+    bool mSpinLight;
     // just to stop toggles flipping too fast
     Ogre::TextureFilterOptions mFiltering;
     int mAniso;
 
-	Ogre::SceneNode*	  mMainNode;
-	Ogre::Entity*         mOceanSurfaceEnt;
+    Ogre::SceneNode*      mMainNode;
+    Ogre::Entity*         mOceanSurfaceEnt;
 
-	size_t				  mCurrentMaterial;
-	size_t				  mCurrentPage;
-	size_t				  mNumPages;
-	Ogre::MaterialPtr	  mActiveMaterial;
-	Ogre::Pass*			  mActivePass;
-	Ogre::GpuProgramPtr	  mActiveFragmentProgram;
-	Ogre::GpuProgramPtr	  mActiveVertexProgram;
-	Ogre::GpuProgramParametersSharedPtr mActiveFragmentParameters;
-	Ogre::GpuProgramParametersSharedPtr mActiveVertexParameters;
-	Real				  mRotateSpeed;
-	Slider* mShaderControls[CONTROLS_PER_PAGE];
-	
-	ShaderControlsContainer    mShaderControlContainer;
-    MaterialControlsContainer mMaterialControlsContainer;
-	
-	void setupGUI();
-	void setupScene();
-	virtual void setupContent();
-	virtual void cleanupContent();
+    size_t                mCurrentMaterial;
+    size_t                mCurrentPage;
+    size_t                mNumPages;
+    Ogre::MaterialPtr     mActiveMaterial;
+    Ogre::Pass*           mActivePass;
+    Ogre::GpuProgramPtr   mActiveFragmentProgram;
+    Ogre::GpuProgramPtr   mActiveVertexProgram;
+    Ogre::GpuProgramParametersSharedPtr mActiveFragmentParameters;
+    Ogre::GpuProgramParametersSharedPtr mActiveVertexParameters;
+    Real                  mRotateSpeed;
+    Slider* mShaderControls[CONTROLS_PER_PAGE];
     
-	void sliderMoved(Slider* slider);
-	void buttonHit(OgreBites::Button* button);
-	void checkBoxToggled(CheckBox* box);
-	void selectOceanMaterial(OceanMaterial newMaterial);
-	void itemSelected(SelectMenu* menu);
-	void changePage(int nextPage = -1);
-	virtual bool frameRenderingQueued(const FrameEvent& evt);
+    ShaderControlsContainer    mShaderControlContainer;
+    MaterialControlsContainer mMaterialControlsContainer;
+    
+    void setupGUI();
+    void setupScene();
+    virtual void setupContent();
+    virtual void cleanupContent();
+    
+    void sliderMoved(Slider* slider);
+    void buttonHit(OgreBites::Button* button);
+    void checkBoxToggled(CheckBox* box);
+    void selectOceanMaterial(OceanMaterial newMaterial);
+    void itemSelected(SelectMenu* menu);
+    void changePage(int nextPage = -1);
+    virtual bool frameRenderingQueued(const FrameEvent& evt);
 };
 
 /**********************************************************************
@@ -95,7 +96,7 @@ Ogre::Billboard* mLightFlares[NUM_LIGHTS];
 // Positions for lights
 Ogre::Vector3 mLightPositions[NUM_LIGHTS] =
 {
-	Ogre::Vector3(00, 400, 00)
+    Ogre::Vector3(00, 400, 00)
 };
 // Base orientations of the lights
 Ogre::Real mLightRotationAngles[NUM_LIGHTS] = { 35 };
@@ -108,18 +109,18 @@ Ogre::Real mLightSpeeds[NUM_LIGHTS] = { 30};
 // Colours for the lights
 Ogre::ColourValue mDiffuseLightColours[NUM_LIGHTS] =
 {
-	Ogre::ColourValue(0.6, 0.6, 0.6)
+    Ogre::ColourValue(0.6, 0.6, 0.6)
 };
 
 Ogre::ColourValue mSpecularLightColours[NUM_LIGHTS] =
 {
-	Ogre::ColourValue(0.5, 0.5, 0.5)
+    Ogre::ColourValue(0.5, 0.5, 0.5)
 };
 
 // Which lights are enabled
 bool mLightState[NUM_LIGHTS] =
 {
-	true
+    true
 };
 
 // the light nodes
@@ -130,19 +131,19 @@ Ogre::SceneNode* mLightPivots[NUM_LIGHTS];
 
 Sample_Ocean::Sample_Ocean()
 {
-	mInfo["Title"] = "Ocean";
-	mInfo["Description"] = "An example demonstrating ocean rendering using shaders.";
-	mInfo["Thumbnail"] = "thumb_ocean.png";
-	mInfo["Category"] = "Environment";
+    mInfo["Title"] = "Ocean";
+    mInfo["Description"] = "An example demonstrating ocean rendering using shaders.";
+    mInfo["Thumbnail"] = "thumb_ocean.png";
+    mInfo["Category"] = "Environment";
 }
 /*************************************************************************
-	                    Sample_Ocean Methods
+                        Sample_Ocean Methods
 *************************************************************************/
 void Sample_Ocean::cleanupContent()
 {
     MeshManager::getSingleton().remove("OceanSurface");
 
-	// get rid of the shared pointers before shutting down ogre or exceptions occur
+    // get rid of the shared pointers before shutting down ogre or exceptions occur
     mActiveFragmentProgram.setNull();
     mActiveFragmentParameters.setNull();
     mActiveVertexProgram.setNull();
@@ -153,36 +154,36 @@ void Sample_Ocean::cleanupContent()
 //--------------------------------------------------------------------------
 void Sample_Ocean::setupGUI(void)
 {
-	SelectMenu* selectMenu = mTrayMgr->createLongSelectMenu(
-		TL_TOPLEFT, "MaterialSelectMenu", "Material", 300, 200, 5);
-	
-	for (size_t i=0; i<mMaterialControlsContainer.size(); i++)
-	{
-		selectMenu->addItem(mMaterialControlsContainer[i].getDisplayName());
-	}
+    SelectMenu* selectMenu = mTrayMgr->createLongSelectMenu(
+        TL_TOPLEFT, "MaterialSelectMenu", "Material", 300, 200, 5);
+    
+    for (size_t i=0; i<mMaterialControlsContainer.size(); i++)
+    {
+        selectMenu->addItem(mMaterialControlsContainer[i].getDisplayName());
+    }
 
-	mTrayMgr->createCheckBox(TL_TOPLEFT, "SpinLightButton", "Spin Light", 175)->setChecked(true);
-	
-	mTrayMgr->createButton(TL_TOPRIGHT, "PageButtonControl", "Page", 175);
+    mTrayMgr->createCheckBox(TL_TOPLEFT, "SpinLightButton", "Spin Light", 175)->setChecked(true);
+    
+    mTrayMgr->createButton(TL_TOPRIGHT, "PageButtonControl", "Page", 175);
 
-	for (size_t i=0; i<CONTROLS_PER_PAGE; i++)
-	{
-		mShaderControls[i] = mTrayMgr->createThickSlider(TL_TOPRIGHT, 
-			"ShaderControlSlider" + StringConverter::toString(i), "Control", 256, 80, 0, 1, 100);
-	}
+    for (size_t i=0; i<CONTROLS_PER_PAGE; i++)
+    {
+        mShaderControls[i] = mTrayMgr->createThickSlider(TL_TOPRIGHT, 
+            "ShaderControlSlider" + StringConverter::toString(i), "Control", 256, 80, 0, 1, 100);
+    }
 
-	selectMenu->selectItem(0);
-	mTrayMgr->showCursor();
+    selectMenu->selectItem(0);
+    mTrayMgr->showCursor();
 
 }
 //--------------------------------------------------------------------------
 void Sample_Ocean::setupContent(void)
 {
-	loadAllMaterialControlFiles(mMaterialControlsContainer);
-	setupScene();
-	setupGUI();
-	
-	// Position it at 500 in Z direction
+    loadAllMaterialControlFiles(mMaterialControlsContainer);
+    setupScene();
+    setupGUI();
+    
+    // Position it at 500 in Z direction
     mCamera->setPosition(Ogre::Vector3(0,0,0));
     // Look back along -Z
     mCamera->lookAt(Ogre::Vector3(0,0,-300));
@@ -195,9 +196,9 @@ void Sample_Ocean::setupContent(void)
 
 void Sample_Ocean::setupScene()
 {
-	// Set ambient light
+    // Set ambient light
     mSceneMgr->setAmbientLight(Ogre::ColourValue(0.3, 0.3, 0.3));
-	mSceneMgr->setSkyBox(true, "SkyBox", 1000);
+    mSceneMgr->setSkyBox(true, "SkyBox", 1000);
 
     mMainNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 
@@ -208,25 +209,25 @@ void Sample_Ocean::setupScene()
         mLightPivots[i]->rotate(mLightRotationAxes[i], Ogre::Angle(mLightRotationAngles[i]));
         // Create a light, use default parameters
         mLights[i] = mSceneMgr->createLight("Light" + Ogre::StringConverter::toString(i));
-		mLights[i]->setPosition(mLightPositions[i]);
-		mLights[i]->setDiffuseColour(mDiffuseLightColours[i]);
-		mLights[i]->setSpecularColour(mSpecularLightColours[i]);
-		mLights[i]->setVisible(mLightState[i]);
-		//mLights[i]->setAttenuation(400, 0.1 , 1 , 0);
+        mLights[i]->setPosition(mLightPositions[i]);
+        mLights[i]->setDiffuseColour(mDiffuseLightColours[i]);
+        mLights[i]->setSpecularColour(mSpecularLightColours[i]);
+        mLights[i]->setVisible(mLightState[i]);
+        //mLights[i]->setAttenuation(400, 0.1 , 1 , 0);
         // Attach light
         mLightPivots[i]->attachObject(mLights[i]);
-		// Create billboard for light
+        // Create billboard for light
         mLightFlareSets[i] = mSceneMgr->createBillboardSet("Flare" + Ogre::StringConverter::toString(i));
-		mLightFlareSets[i]->setMaterialName("LightFlare");
-		mLightPivots[i]->attachObject(mLightFlareSets[i]);
-		mLightFlares[i] = mLightFlareSets[i]->createBillboard(mLightPositions[i]);
-		mLightFlares[i]->setColour(mDiffuseLightColours[i]);
-		mLightFlareSets[i]->setVisible(mLightState[i]);
+        mLightFlareSets[i]->setMaterialName("LightFlare");
+        mLightPivots[i]->attachObject(mLightFlareSets[i]);
+        mLightFlares[i] = mLightFlareSets[i]->createBillboard(mLightPositions[i]);
+        mLightFlares[i]->setColour(mDiffuseLightColours[i]);
+        mLightFlareSets[i]->setVisible(mLightState[i]);
     }
 
     // move the camera a bit right and make it look at the knot
-	mCamera->moveRelative(Ogre::Vector3(50, 0, 100));
-	mCamera->lookAt(0, 0, 0);
+    mCamera->moveRelative(Ogre::Vector3(50, 0, 100));
+    mCamera->lookAt(0, 0, 0);
 
     // Define a plane mesh that will be used for the ocean surface
     Ogre::Plane oceanSurface;
@@ -245,245 +246,245 @@ void Sample_Ocean::setupScene()
 //--------------------------------------------------------------------------
 void Sample_Ocean::sliderMoved(Slider* slider)
 {
-	using namespace Ogre;
+    using namespace Ogre;
 
-	int sliderIndex = -1;
-	for (int i=0; i<CONTROLS_PER_PAGE; i++)
-	{
-		if (mShaderControls[i] == slider)
-		{
-			sliderIndex = i;
-			break;
-		}
-	}
-	assert(sliderIndex != -1);
+    int sliderIndex = -1;
+    for (int i=0; i<CONTROLS_PER_PAGE; i++)
+    {
+        if (mShaderControls[i] == slider)
+        {
+            sliderIndex = i;
+            break;
+        }
+    }
+    assert(sliderIndex != -1);
 
-	size_t index = mCurrentPage * CONTROLS_PER_PAGE + sliderIndex;
+    size_t index = mCurrentPage * CONTROLS_PER_PAGE + sliderIndex;
     const ShaderControl& ActiveShaderDef = mMaterialControlsContainer[mCurrentMaterial].getShaderControl(index);
 
-	float val = slider->getValue();
-	
-	if(mActivePass)
-	{
-		switch(ActiveShaderDef.ValType)
-		{
-			case GPU_VERTEX:
-			case GPU_FRAGMENT:
-				{
-					GpuProgramParametersSharedPtr activeParameters =
-						(ActiveShaderDef.ValType == GPU_VERTEX) ?
-							mActiveVertexParameters : mActiveFragmentParameters;
+    float val = slider->getValue();
+    
+    if(mActivePass)
+    {
+        switch(ActiveShaderDef.ValType)
+        {
+            case GPU_VERTEX:
+            case GPU_FRAGMENT:
+                {
+                    GpuProgramParametersSharedPtr activeParameters =
+                        (ActiveShaderDef.ValType == GPU_VERTEX) ?
+                            mActiveVertexParameters : mActiveFragmentParameters;
 
-					if(!activeParameters.isNull())
-					{
-						activeParameters->_writeRawConstant(
-							ActiveShaderDef.PhysicalIndex + ActiveShaderDef.ElementIndex, val);
-					}
-				}
-				break;
+                    if(!activeParameters.isNull())
+                    {
+                        activeParameters->_writeRawConstant(
+                            ActiveShaderDef.PhysicalIndex + ActiveShaderDef.ElementIndex, val);
+                    }
+                }
+                break;
 
-			case MAT_SPECULAR:
-				{
-					// get the specular values from the material pass
-					ColourValue OldSpec(mActivePass->getSpecular());
-					OldSpec[ActiveShaderDef.ElementIndex] = val;
-					mActivePass->setSpecular( OldSpec );
-				}
+            case MAT_SPECULAR:
+                {
+                    // get the specular values from the material pass
+                    ColourValue OldSpec(mActivePass->getSpecular());
+                    OldSpec[ActiveShaderDef.ElementIndex] = val;
+                    mActivePass->setSpecular( OldSpec );
+                }
 
-				break;
+                break;
 
-			case MAT_DIFFUSE:
-				{
-					// get the specular values from the material pass
-					ColourValue OldSpec(mActivePass->getDiffuse());
-					OldSpec[ActiveShaderDef.ElementIndex] = val;
-					mActivePass->setDiffuse( OldSpec );
-				}
-				break;
+            case MAT_DIFFUSE:
+                {
+                    // get the specular values from the material pass
+                    ColourValue OldSpec(mActivePass->getDiffuse());
+                    OldSpec[ActiveShaderDef.ElementIndex] = val;
+                    mActivePass->setDiffuse( OldSpec );
+                }
+                break;
 
-			case MAT_AMBIENT:
-				{
-					// get the specular values from the material pass
-					ColourValue OldSpec(mActivePass->getAmbient());
-					OldSpec[ActiveShaderDef.ElementIndex] = val;
-					mActivePass->setAmbient( OldSpec );
-				}
-				break;
+            case MAT_AMBIENT:
+                {
+                    // get the specular values from the material pass
+                    ColourValue OldSpec(mActivePass->getAmbient());
+                    OldSpec[ActiveShaderDef.ElementIndex] = val;
+                    mActivePass->setAmbient( OldSpec );
+                }
+                break;
 
-			case MAT_SHININESS:
-				// get the specular values from the material pass
-				mActivePass->setShininess( val );
-				break;
+            case MAT_SHININESS:
+                // get the specular values from the material pass
+                mActivePass->setShininess( val );
+                break;
 
             case MAT_EMISSIVE:
                 break;
-		}
-	}
+        }
+    }
 }
 
 //--------------------------------------------------------------------------
 void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
 {
-	if (mMaterialControlsContainer.empty()) return;
-	mCurrentPage = (pageNum == -1) ? (mCurrentPage+1) % mNumPages : pageNum;
+    if (mMaterialControlsContainer.empty()) return;
+    mCurrentPage = (pageNum == -1) ? (mCurrentPage+1) % mNumPages : pageNum;
 
-	static char pageText[64];
-	sprintf(pageText, "Parameters %lu / %d", mCurrentPage+1, (int)mNumPages);
-	static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
+    static char pageText[64];
+    sprintf(pageText, "Parameters %lu / %d", mCurrentPage+1, (int)mNumPages);
+    static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
 
     if(!mActiveMaterial.isNull() && mActiveMaterial->getNumSupportedTechniques())
-	{
+    {
         Ogre::Technique* currentTechnique = mActiveMaterial->getSupportedTechnique(0);
-		if(currentTechnique)
-		{
-			mActivePass = currentTechnique->getPass(0);
-			if(mActivePass)
-			{
+        if(currentTechnique)
+        {
+            mActivePass = currentTechnique->getPass(0);
+            if(mActivePass)
+            {
                 if (mActivePass->hasFragmentProgram())
                 {
-				    mActiveFragmentProgram = mActivePass->getFragmentProgram();
-    				mActiveFragmentParameters = mActivePass->getFragmentProgramParameters();
+                    mActiveFragmentProgram = mActivePass->getFragmentProgram();
+                    mActiveFragmentParameters = mActivePass->getFragmentProgramParameters();
                 }
                 if (mActivePass->hasVertexProgram())
                 {
-				    mActiveVertexProgram = mActivePass->getVertexProgram();
-				    mActiveVertexParameters = mActivePass->getVertexProgramParameters();
+                    mActiveVertexProgram = mActivePass->getVertexProgram();
+                    mActiveVertexParameters = mActivePass->getVertexProgramParameters();
                 }
 
                 size_t activeControlCount = mMaterialControlsContainer[mCurrentMaterial].getShaderControlCount();
-				
-				size_t startControlIndex = mCurrentPage * CONTROLS_PER_PAGE;
-				int numControls = static_cast<int>(activeControlCount - startControlIndex);
-				if (numControls <= 0)
-				{
-					mCurrentPage = 0;
-					startControlIndex = 0;
-					numControls = (int)activeControlCount;
-				}
-				
-				for (size_t i=0; i<CONTROLS_PER_PAGE; i++)
-				{
-					Slider* shaderControlSlider = mShaderControls[i];
-					if (i < (size_t)numControls)
-					{
-						shaderControlSlider->show();
-						size_t controlIndex = startControlIndex + i;
-						const ShaderControl& ActiveShaderDef = mMaterialControlsContainer[mCurrentMaterial].getShaderControl(controlIndex);
-						shaderControlSlider->setRange(ActiveShaderDef.MinVal, ActiveShaderDef.MaxVal, 50, false);
-						shaderControlSlider->setCaption(ActiveShaderDef.Name);
+                
+                size_t startControlIndex = mCurrentPage * CONTROLS_PER_PAGE;
+                int numControls = static_cast<int>(activeControlCount - startControlIndex);
+                if (numControls <= 0)
+                {
+                    mCurrentPage = 0;
+                    startControlIndex = 0;
+                    numControls = (int)activeControlCount;
+                }
+                
+                for (size_t i=0; i<CONTROLS_PER_PAGE; i++)
+                {
+                    Slider* shaderControlSlider = mShaderControls[i];
+                    if (i < (size_t)numControls)
+                    {
+                        shaderControlSlider->show();
+                        size_t controlIndex = startControlIndex + i;
+                        const ShaderControl& ActiveShaderDef = mMaterialControlsContainer[mCurrentMaterial].getShaderControl(controlIndex);
+                        shaderControlSlider->setRange(ActiveShaderDef.MinVal, ActiveShaderDef.MaxVal, 50, false);
+                        shaderControlSlider->setCaption(ActiveShaderDef.Name);
 
-						float uniformVal = 0.0;
-						switch(ActiveShaderDef.ValType)
-						{
-							case GPU_VERTEX:
-							case GPU_FRAGMENT:
-								{
-									Ogre::GpuProgramParametersSharedPtr activeParameters =
-										(ActiveShaderDef.ValType == GPU_VERTEX) ?
-											mActiveVertexParameters : mActiveFragmentParameters;
-									if(!activeParameters.isNull())
-									{
-										// use param name to get index : use appropriate parameters ptr
-										const Ogre::GpuConstantDefinition& def = 
-											activeParameters->getConstantDefinition(ActiveShaderDef.ParamName);
-										ActiveShaderDef.PhysicalIndex = def.physicalIndex;
-										// use index to get RealConstantEntry
-										const float* pFloat = activeParameters->getFloatPointer(ActiveShaderDef.PhysicalIndex);
-										// set position of ScrollWidget as param value
-										uniformVal = pFloat[ActiveShaderDef.ElementIndex];
-									}
-								}
-								break;
+                        float uniformVal = 0.0;
+                        switch(ActiveShaderDef.ValType)
+                        {
+                            case GPU_VERTEX:
+                            case GPU_FRAGMENT:
+                                {
+                                    Ogre::GpuProgramParametersSharedPtr activeParameters =
+                                        (ActiveShaderDef.ValType == GPU_VERTEX) ?
+                                            mActiveVertexParameters : mActiveFragmentParameters;
+                                    if(!activeParameters.isNull())
+                                    {
+                                        // use param name to get index : use appropriate parameters ptr
+                                        const Ogre::GpuConstantDefinition& def = 
+                                            activeParameters->getConstantDefinition(ActiveShaderDef.ParamName);
+                                        ActiveShaderDef.PhysicalIndex = def.physicalIndex;
+                                        // use index to get RealConstantEntry
+                                        const float* pFloat = activeParameters->getFloatPointer(ActiveShaderDef.PhysicalIndex);
+                                        // set position of ScrollWidget as param value
+                                        uniformVal = pFloat[ActiveShaderDef.ElementIndex];
+                                    }
+                                }
+                                break;
 
-							case MAT_SPECULAR:
-								{
-									// get the specular values from the material pass
+                            case MAT_SPECULAR:
+                                {
+                                    // get the specular values from the material pass
 
-									Ogre::ColourValue OldSpec(mActivePass->getSpecular());
-									uniformVal = OldSpec[ActiveShaderDef.ElementIndex];
-								}
-								break;
+                                    Ogre::ColourValue OldSpec(mActivePass->getSpecular());
+                                    uniformVal = OldSpec[ActiveShaderDef.ElementIndex];
+                                }
+                                break;
 
-							case MAT_DIFFUSE:
-								{
-									// get the diffuse values from the material pass
+                            case MAT_DIFFUSE:
+                                {
+                                    // get the diffuse values from the material pass
 
-									Ogre::ColourValue OldSpec(mActivePass->getDiffuse());
-									uniformVal = OldSpec[ActiveShaderDef.ElementIndex];
-								}
-								break;
+                                    Ogre::ColourValue OldSpec(mActivePass->getDiffuse());
+                                    uniformVal = OldSpec[ActiveShaderDef.ElementIndex];
+                                }
+                                break;
 
-							case MAT_AMBIENT:
-								{
-									// get the ambient values from the material pass
+                            case MAT_AMBIENT:
+                                {
+                                    // get the ambient values from the material pass
 
-									Ogre::ColourValue OldSpec(mActivePass->getAmbient());
-									uniformVal = OldSpec[ActiveShaderDef.ElementIndex];
-								}
-								break;
+                                    Ogre::ColourValue OldSpec(mActivePass->getAmbient());
+                                    uniformVal = OldSpec[ActiveShaderDef.ElementIndex];
+                                }
+                                break;
 
-							case MAT_SHININESS:
-								{
-									// get the ambient values from the material pass
-									uniformVal = mActivePass->getShininess();
-								}
+                            case MAT_SHININESS:
+                                {
+                                    // get the ambient values from the material pass
+                                    uniformVal = mActivePass->getShininess();
+                                }
 
-								break;
+                                break;
 
-							case MAT_EMISSIVE:
-								{
-									// get the ambient values from the material pass
+                            case MAT_EMISSIVE:
+                                {
+                                    // get the ambient values from the material pass
 
-									//ColourValue OldSpec(mActivePass->gete());
-									//activeScrollWidget->setScrollPosition( OldSpec.val[ActiveShaderDef->ElementIndex] );
-								}
-								break;
-						}
-						shaderControlSlider->setValue(uniformVal);
-						
-					}
-					else
-					{
-						shaderControlSlider->hide();
-					}
-				}
-			}
-		}
-	}
+                                    //ColourValue OldSpec(mActivePass->gete());
+                                    //activeScrollWidget->setScrollPosition( OldSpec.val[ActiveShaderDef->ElementIndex] );
+                                }
+                                break;
+                        }
+                        shaderControlSlider->setValue(uniformVal);
+                        
+                    }
+                    else
+                    {
+                        shaderControlSlider->hide();
+                    }
+                }
+            }
+        }
+    }
 
 }
 void Sample_Ocean::itemSelected(SelectMenu *menu)
 {
-	//Only one selection menu - the material one
-	mCurrentMaterial = menu->getSelectionIndex();
-	mActiveMaterial = Ogre::MaterialManager::getSingleton().getByName( mMaterialControlsContainer[mCurrentMaterial].getMaterialName() );
-	mActiveMaterial->load();
-	size_t numShaders = mMaterialControlsContainer[mCurrentMaterial].getShaderControlCount();
-	mNumPages = (numShaders / CONTROLS_PER_PAGE) + (numShaders % CONTROLS_PER_PAGE == 0 ? 0 : 1);
-	changePage(0);
+    //Only one selection menu - the material one
+    mCurrentMaterial = menu->getSelectionIndex();
+    mActiveMaterial = Ogre::MaterialManager::getSingleton().getByName( mMaterialControlsContainer[mCurrentMaterial].getMaterialName() );
+    mActiveMaterial->load();
+    size_t numShaders = mMaterialControlsContainer[mCurrentMaterial].getShaderControlCount();
+    mNumPages = (numShaders / CONTROLS_PER_PAGE) + (numShaders % CONTROLS_PER_PAGE == 0 ? 0 : 1);
+    changePage(0);
 
-	if (mOceanSurfaceEnt)
-	    mOceanSurfaceEnt->setMaterialName(mMaterialControlsContainer[mCurrentMaterial].getMaterialName());
+    if (mOceanSurfaceEnt)
+        mOceanSurfaceEnt->setMaterialName(mMaterialControlsContainer[mCurrentMaterial].getMaterialName());
 }
 bool Sample_Ocean::frameRenderingQueued(const FrameEvent& evt)
 {
-	mRotateSpeed = evt.timeSinceLastFrame * 20;
-	if(mSpinLight)
-	{
-		mLightPivots[0]->rotate(mLightRotationAxes[0], Ogre::Angle(mRotateSpeed * 2.0f));
-	}
-	return SdkSample::frameRenderingQueued(evt);
+    mRotateSpeed = evt.timeSinceLastFrame * 20;
+    if(mSpinLight)
+    {
+        mLightPivots[0]->rotate(mLightRotationAxes[0], Ogre::Angle(mRotateSpeed * 2.0f));
+    }
+    return SdkSample::frameRenderingQueued(evt);
 }
 void Sample_Ocean::buttonHit(OgreBites::Button* button)
 {
-	//Only one button - change page
-	changePage();
+    //Only one button - change page
+    changePage();
 }
 
 void Sample_Ocean::checkBoxToggled(CheckBox* cb)
 {
-	//Only one checkbox
-	mSpinLight = cb->isChecked();
+    //Only one checkbox
+    mSpinLight = cb->isChecked();
 }
 
-#endif	// end _Sample_Ocean_H_
+#endif  // end _Sample_Ocean_H_

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,16 +27,14 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreEdgeListBuilder.h"
-#include "OgreLogManager.h"
-#include "OgreStringConverter.h"
 #include "OgreVertexIndexData.h"
 #include "OgreException.h"
 #include "OgreOptimisedUtil.h"
 
 namespace Ogre {
 
-	EdgeData::EdgeData() : isClosed(false){}
-	
+    EdgeData::EdgeData() : isClosed(false){}
+    
     void EdgeData::log(Log* l)
     {
         EdgeGroupList::iterator i, iend;
@@ -230,23 +228,23 @@ namespace Ogre {
         // The edge group now we are dealing with.
         EdgeData::EdgeGroup& eg = mEdgeData->edgeGroups[vertexSet];
 
-		// locate position element & the buffer to go with it
+        // locate position element & the buffer to go with it
         const VertexData* vertexData = mVertexDataList[vertexSet];
-		const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
-		HardwareVertexBufferSharedPtr vbuf = 
-			vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
-		// lock the buffer for reading
-		unsigned char* pBaseVertex = static_cast<unsigned char*>(
-			vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
+        const VertexElement* posElem = vertexData->vertexDeclaration->findElementBySemantic(VES_POSITION);
+        HardwareVertexBufferSharedPtr vbuf = 
+            vertexData->vertexBufferBinding->getBuffer(posElem->getSource());
+        // lock the buffer for reading
+        unsigned char* pBaseVertex = static_cast<unsigned char*>(
+            vbuf->lock(HardwareBuffer::HBL_READ_ONLY));
 
         // Get the indexes ready for reading
-		bool idx32bit = (indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
-		size_t indexSize = idx32bit ? sizeof(uint32) : sizeof(uint16);
+        bool idx32bit = (indexData->indexBuffer->getType() == HardwareIndexBuffer::IT_32BIT);
+        size_t indexSize = idx32bit ? sizeof(uint32) : sizeof(uint16);
 #if defined(_MSC_VER) && _MSC_VER <= 1300
         // NB: Can't use un-named union with VS.NET 2002 when /RTC1 compile flag enabled.
         void* pIndex = indexData->indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
-		pIndex = static_cast<void*>(
-			static_cast<char*>(pIndex) + indexData->indexStart * indexSize);
+        pIndex = static_cast<void*>(
+            static_cast<char*>(pIndex) + indexData->indexStart * indexSize);
         unsigned short* p16Idx = static_cast<unsigned short*>(pIndex);
         unsigned int* p32Idx = static_cast<unsigned int*>(pIndex);
 #else
@@ -256,8 +254,8 @@ namespace Ogre {
             unsigned int* p32Idx;
         };
         pIndex = indexData->indexBuffer->lock(HardwareBuffer::HBL_READ_ONLY);
-		pIndex = static_cast<void*>(
-			static_cast<char*>(pIndex) + indexData->indexStart * indexSize);
+        pIndex = static_cast<void*>(
+            static_cast<char*>(pIndex) + indexData->indexStart * indexSize);
 #endif
 
         // Iterate over all the groups of 3 indexes
@@ -433,14 +431,14 @@ namespace Ogre {
         assert(triangleFaceNormals.size() == triangleLightFacings.size());
 
         // Use optimised util to determine if triangle's face normal are light facing
-		if(!triangleFaceNormals.empty())
-		{
-			OptimisedUtil::getImplementation()->calculateLightFacing(
-				lightPos,
-				&triangleFaceNormals.front(),
-				&triangleLightFacings.front(),
-				triangleLightFacings.size());
-		}
+        if(!triangleFaceNormals.empty())
+        {
+            OptimisedUtil::getImplementation()->calculateLightFacing(
+                lightPos,
+                &triangleFaceNormals.front(),
+                &triangleLightFacings.front(),
+                triangleLightFacings.size());
+        }
     }
     //---------------------------------------------------------------------
     void EdgeData::updateFaceNormals(size_t vertexSet, 
@@ -458,17 +456,28 @@ namespace Ogre {
 
         // Calculate triangles which are using this vertex set
         const EdgeData::EdgeGroup& eg = edgeGroups[vertexSet];
-		if (eg.triCount != 0) 
-		{
-			OptimisedUtil::getImplementation()->calculateFaceNormals(
-				pVert,
-				&triangles[eg.triStart],
-				&triangleFaceNormals[eg.triStart],
-				eg.triCount);
-		}
+        if (eg.triCount != 0) 
+        {
+            OptimisedUtil::getImplementation()->calculateFaceNormals(
+                pVert,
+                &triangles[eg.triStart],
+                &triangleFaceNormals[eg.triStart],
+                eg.triCount);
+        }
 
         // unlock the buffer
         positionBuffer->unlock();
+    }
+    //---------------------------------------------------------------------
+    EdgeData* EdgeData::clone()
+    {
+        EdgeData* newEdgeData = OGRE_NEW EdgeData();
+        newEdgeData->triangles = triangles;
+        newEdgeData->triangleFaceNormals = triangleFaceNormals;
+        newEdgeData->triangleLightFacings = triangleLightFacings;
+        newEdgeData->edgeGroups = edgeGroups;
+        newEdgeData->isClosed = isClosed;
+        return newEdgeData;
     }
     //---------------------------------------------------------------------
     void EdgeListBuilder::log(Log* l)
@@ -538,10 +547,10 @@ namespace Ogre {
                     if (mGeometryList[i].opType == RenderOperation::OT_TRIANGLE_LIST
                         || j == 0)
                     {
-		    	unsigned int n1 = *p32Idx++;
-		    	unsigned int n2 = *p32Idx++;
-		    	unsigned int n3 = *p32Idx++;
-                        l->logMessage("Triangle " + StringConverter::toString(j) + 
+                        unsigned int n1 = *p32Idx++;
+                        unsigned int n2 = *p32Idx++;
+                        unsigned int n3 = *p32Idx++;
+                        l->logMessage("Triangle " + StringConverter::toString(j) +
                             ": (" + StringConverter::toString(n1) + 
                             ", " + StringConverter::toString(n2) + 
                             ", " + StringConverter::toString(n3) + ")");
@@ -559,10 +568,10 @@ namespace Ogre {
                     if (mGeometryList[i].opType == RenderOperation::OT_TRIANGLE_LIST
                         || j == 0)
                     {
-		    	unsigned short n1 = *p16Idx++;
-		    	unsigned short n2 = *p16Idx++;
-		    	unsigned short n3 = *p16Idx++;
-                        l->logMessage("Index " + StringConverter::toString(j) + 
+                        unsigned short n1 = *p16Idx++;
+                        unsigned short n2 = *p16Idx++;
+                        unsigned short n3 = *p16Idx++;
+                        l->logMessage("Index " + StringConverter::toString(j) +
                             ": (" + StringConverter::toString(n1) + 
                             ", " + StringConverter::toString(n2) + 
                             ", " + StringConverter::toString(n3) + ")");

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,25 +41,25 @@ namespace Ogre
     namespace GLSL {
 
     // forward declarations
-	class GLSLProgram;
-	class GLSLGpuProgram;
-	class GLSLLinkProgram;
-	class GLSLLinkProgramManager;
-	class GLSLProgramFactory;
+    class GLSLProgram;
+    class GLSLGpuProgram;
+    class GLSLLinkProgram;
+    class GLSLLinkProgramManager;
+    class GLSLProgramFactory;
 
 
-	/** Check for GL errors and report them in the Ogre Log.
+    /** Check for GL errors and report them in the Ogre Log.
 
-	@param forceInfoLog if true then message from GL info log is obtained
-	@param forceException if true then exception is generated if a GL error found
-	*/
+    @param forceInfoLog if true then message from GL info log is obtained
+    @param forceException if true then exception is generated if a GL error found
+    */
     void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog = false, const bool forceException = false);
 
-	/** if there is a message in GL info log then post it in the Ogre Log
-	@param msg the info log message string is appended to this string
-	@param obj the GL object that is used to retrieve the info log
-	*/
-	String logObjectInfo(const String& msg, const GLhandleARB obj);
+    /** if there is a message in GL info log then post it in the Ogre Log
+    @param msg the info log message string is appended to this string
+    @param obj the GL object that is used to retrieve the info log
+    */
+    String logObjectInfo(const String& msg, const GLhandleARB obj);
 
     }
 } // namespace Ogre

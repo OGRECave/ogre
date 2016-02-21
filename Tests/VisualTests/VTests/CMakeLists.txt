@@ -10,11 +10,13 @@
 set(HEADER_FILES
     include/StencilShadowTest.h
     include/ParticleTest.h
+    include/TextureBlitTest.h
     include/VTestPlugin.h)
 
 set(SOURCE_FILES
     src/StencilShadowTest.cpp
     src/TextureEffectsTest.cpp
+    src/TextureBlitTest.cpp
     src/CubeMappingTest.cpp
     src/TransparencyTest.cpp
     src/ParticleTest.cpp
@@ -27,6 +29,7 @@ include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
 
 ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
+ogre_add_component_include_dir(MeshLodGenerator)
 ogre_add_component_include_dir(RTShaderSystem)
 ogre_add_component_include_dir(Overlay)
 

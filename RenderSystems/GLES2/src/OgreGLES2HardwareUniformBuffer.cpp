@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareUniformBuffer.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
+#include "OgreGLES2Util.h"
 
 namespace Ogre {
     GLES2HardwareUniformBuffer::GLES2HardwareUniformBuffer(HardwareBufferManagerBase* mgr, 
@@ -41,6 +42,12 @@ namespace Ogre {
     : HardwareUniformBuffer(mgr, bufferSize, usage, useShadowBuffer, name)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
+
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+            OGRE_CHECK_GL_ERROR(glLabelObjectEXT(GL_BUFFER_OBJECT_EXT, mBufferId, 0, ("Uniform Buffer #" + StringConverter::toString(mBufferId)).c_str()));
+        }
 
         if (!mBufferId)
         {
@@ -116,7 +123,7 @@ namespace Ogre {
         // return offsetted
         retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);
 
-		mIsLocked = true;
+        mIsLocked = true;
         return retPtr;
     }
     
@@ -147,7 +154,7 @@ namespace Ogre {
         // Get data from the real buffer
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_UNIFORM_BUFFER, mBufferId));
 
-		OGRE_CHECK_GL_ERROR(glGetBufferPointerv(GL_UNIFORM_BUFFER, GL_BUFFER_MAP_POINTER, &pDest));
+        OGRE_CHECK_GL_ERROR(glGetBufferPointerv(GL_UNIFORM_BUFFER, GL_BUFFER_MAP_POINTER, &pDest));
     }
     
     void GLES2HardwareUniformBuffer::writeData(size_t offset,
@@ -180,7 +187,7 @@ namespace Ogre {
         // If the buffer is not in system memory we can use ARB_copy_buffers to do an optimised copy.
         if (srcBuffer.isSystemMemory())
         {
-			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
         }
         else
         {

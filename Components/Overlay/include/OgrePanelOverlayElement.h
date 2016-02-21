@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,17 +30,17 @@ THE SOFTWARE.
 #define __PanelOverlayElement_H__
 
 #include "OgreOverlayContainer.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre {
 
-
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Overlays
-	*  @{
-	*/
-	/** OverlayElement representing a flat, single-material (or transparent) panel which can contain other elements.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Overlays
+    *  @{
+    */
+    /** OverlayElement representing a flat, single-material (or transparent) panel which can contain other elements.
     @remarks
         This class subclasses OverlayContainer because it can contain other elements. Like other
         containers, if hidden it's contents are also hidden, if moved it's contents also move etc. 
@@ -64,6 +64,11 @@ namespace Ogre {
 
         /** Initialise */
         virtual void initialise(void);
+
+        /** @copydoc OverlayElement::_releaseManualHardwareResources. */
+        virtual void _releaseManualHardwareResources();
+        /** @copydoc OverlayElement::_restoreManualHardwareResources. */
+        virtual void _restoreManualHardwareResources();
 
         /** Sets the number of times textures should repeat. 
         @param x The number of times the texture should repeat horizontally
@@ -153,8 +158,8 @@ namespace Ogre {
         static CmdUVCoords msCmdUVCoords;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

@@ -1,6 +1,6 @@
 # Configure Samples build
 
-if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT ((OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE) AND OIS_INCLUDE_DIRS))
+if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT ((WINDOWS_STORE OR WINDOWS_PHONE) AND OIS_INCLUDE_DIRS))
   message(STATUS "Could not find dependency: OIS")
   message(STATUS "Skipping samples build")
   set(OGRE_BUILD_SAMPLES 0)
@@ -47,6 +47,15 @@ if (OGRE_BUILD_SAMPLES)
 
   if (OGRE_BUILD_COMPONENT_VOLUME)
   	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreVolume)
+  endif ()
+  
+  if (OGRE_BUILD_COMPONENT_HLMS)
+	ogre_add_component_include_dir(HLMS)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreHLMS)
+  endif ()
+  
+  if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR AND OGRE_CONFIG_ENABLE_MESHLOD)
+  	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} OgreMeshLodGenerator)
   endif ()
 
   if (OGRE_BUILD_RENDERSYSTEM_D3D9)
@@ -96,7 +105,7 @@ if (OGRE_BUILD_SAMPLES)
     if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
       	include_directories(
 	    	${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
-		    ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/src/GLSL/include
+	        ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include/GLSL
     		)
     endif()
 
@@ -108,7 +117,6 @@ if (OGRE_BUILD_SAMPLES)
 		set(RESOURCE_FILES
     		${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/resource.h
 	    	${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/OgreWin32Resources.rc
-    		${OGRE_SOURCE_DIR}/OgreMain/src/WIN32/winres.h
 		)
 		source_group(Resources FILES ${RESOURCE_FILES})
 	endif ()
@@ -123,18 +131,21 @@ if (OGRE_BUILD_SAMPLES)
   endif ()
   
   add_subdirectory(AtomicCounters)
-  add_subdirectory(Basic)
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)
   add_subdirectory(Character)
   add_subdirectory(Compositor)
+  add_subdirectory(Compute)
   add_subdirectory(DualQuaternion)
   add_subdirectory(DynTex)
   add_subdirectory(FacialAnimation)
   add_subdirectory(Grass)
   add_subdirectory(Instancing)
   add_subdirectory(Lighting)
-  add_subdirectory(MeshLod)
+  if (OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
+    add_subdirectory(MeshLod)
+  endif ()
+
   add_subdirectory(NewInstancing)
   add_subdirectory(OceanDemo)
   add_subdirectory(ParticleFX)
@@ -155,13 +166,18 @@ if (OGRE_BUILD_COMPONENT_TERRAIN)
   add_subdirectory(Terrain)
   add_subdirectory(EndlessWorld)
 endif ()
-  add_subdirectory(Tesselation)
+  add_subdirectory(Tessellation)
+  add_subdirectory(Hair)
+  add_subdirectory(Island)
+  add_subdirectory(TerrainTessellation)
   add_subdirectory(TextureFX)
   add_subdirectory(TextureArray)
   add_subdirectory(Transparency)
   add_subdirectory(VolumeTex)
 if (OGRE_BUILD_COMPONENT_VOLUME)
-  add_subdirectory(VolumeCSG)
+  if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+    add_subdirectory(VolumeCSG)
+  endif()
   add_subdirectory(VolumeTerrain)
 endif ()
   add_subdirectory(Water)
@@ -178,17 +194,12 @@ if (NOT OGRE_BUILD_RENDERSYSTEM_GLES OR OGRE_BUILD_RENDERSYSTEM_GLES2)
   add_subdirectory(SSAO)
 endif ()
 
-if (NOT (OGRE_BUILD_PLATFORM_WINRT OR OGRE_BUILD_PLATFORM_WINDOWS_PHONE))
-  # Add browser last
-  add_subdirectory(Browser)
-else ()
-  # create link to dependencies in well known place for SampleBrowserWinRT
-  if (NOT EXISTS "${OGRE_BINARY_DIR}/Dependencies" AND NOT OGRE_BINARY_DIR STREQUAL OGRE_SOURCE_DIR)
-    file(TO_NATIVE_PATH "${OGRE_BINARY_DIR}/Dependencies" OGRE_BINARY_DEPENDENCIES_DIR_NATIVE )
-	file(TO_NATIVE_PATH "${OGRE_DEPENDENCIES_DIR}" OGRE_DEPENDENCIES_DIR_NATIVE )
-	execute_process(COMMAND cmd /c mklink /J "${OGRE_BINARY_DEPENDENCIES_DIR_NATIVE}" "${OGRE_DEPENDENCIES_DIR_NATIVE}" )
-  endif ()
+if (OGRE_BUILD_COMPONENT_HLMS)
+  add_subdirectory(HLMS)
 endif ()
+
+# Add browser last
+add_subdirectory(Browser)
 
 endif ()
 

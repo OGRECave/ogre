@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,18 +29,19 @@ THE SOFTWARE.
 #define __EdgeListBuilder_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreVector4.h"
-#include "OgreHardwareVertexBuffer.h"
 #include "OgreRenderOperation.h"
+#include "OgreVector3.h"
+#include "OgreVector4.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
+
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
 
 
     /** This class contains the information required to describe the edge connectivity of a
@@ -49,12 +50,12 @@ namespace Ogre {
         This information is built using the EdgeListBuilder class. Note that for a given mesh,
         which can be made up of multiple submeshes, there are separate edge lists for when 
     */
-	class _OgreExport EdgeData : public EdgeDataAlloc
+    class _OgreExport EdgeData : public EdgeDataAlloc
     {
     public:
-		
-		EdgeData();
-		
+        
+        EdgeData();
+        
         /** Basic triangle structure. */
         struct Triangle {
             /** The set of indexes this triangle came from (NB it is possible that the triangles on 
@@ -68,7 +69,7 @@ namespace Ogre {
                 duplicates eliminated (this buffer is not exposed) */
             size_t sharedVertIndex[3];
 
-			Triangle() :indexSet(0), vertexSet(0) {}
+            Triangle() :indexSet(0), vertexSet(0) {}
         };
         /** Edge data. */
         struct Edge {
@@ -150,6 +151,7 @@ namespace Ogre {
         */
         void updateFaceNormals(size_t vertexSet, const HardwareVertexBufferSharedPtr& positionBuffer);
 
+        EdgeData* clone();
 
 
         /// Debugging method
@@ -202,13 +204,13 @@ namespace Ogre {
     protected:
 
         /** A vertex can actually represent several vertices in the final model, because
-		vertices along texture seams etc will have been duplicated. In order to properly
-		evaluate the surface properties, a single common vertex is used for these duplicates,
-		and the faces hold the detail of the duplicated vertices.
-		*/
+        vertices along texture seams etc will have been duplicated. In order to properly
+        evaluate the surface properties, a single common vertex is used for these duplicates,
+        and the faces hold the detail of the duplicated vertices.
+        */
         struct CommonVertex {
             Vector3  position;  /// Location of point in euclidean space
-	        size_t index;       /// Place of vertex in common vertex list
+            size_t index;       /// Place of vertex in common vertex list
             size_t vertexSet;   /// The vertex set this came from
             size_t indexSet;    /// The index set this was referenced (first) from
             size_t originalIndex; /// Place of vertex in original vertex set
@@ -249,9 +251,9 @@ namespace Ogre {
         VertexDataList mVertexDataList;
         CommonVertexList mVertices;
         EdgeData* mEdgeData;
-		/// Map for identifying common vertices
-		typedef map<Vector3, size_t, vectorLess>::type CommonVertexMap;
-		CommonVertexMap mCommonVertexMap;
+        /// Map for identifying common vertices
+        typedef map<Vector3, size_t, vectorLess>::type CommonVertexMap;
+        CommonVertexMap mCommonVertexMap;
         /** Edge map, used to connect edges. Note we allow many triangles on an edge,
         after connected an existing edge, we will remove it and never used again.
         */
@@ -267,8 +269,8 @@ namespace Ogre {
         void connectOrCreateEdge(size_t vertexSet, size_t triangleIndex, size_t vertIndex0, size_t vertIndex1, 
             size_t sharedVertIndex0, size_t sharedVertIndex1);
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -39,25 +39,25 @@ EventContainer::~EventContainer()
 
 void EventContainer::subscribe(int eventId, EventHandler handler)
 {
-	DelegateMap::iterator it = mDelegates.find(eventId);
-	it->second->connect(handler);
+    DelegateMap::iterator it = mDelegates.find(eventId);
+    it->second->connect(handler);
 }
 
 // TODO: Implement unsubscribe
 void EventContainer::unsubscribe(int eventId,EventHandler handler)
 {
-	DelegateMap::iterator it = mDelegates.find(eventId);
-	//it->second->disconnect(handler);
+    DelegateMap::iterator it = mDelegates.find(eventId);
+    //it->second->disconnect(handler);
 }
 
 // Should we throw an exception on duplicate event IDs?
 void EventContainer::registerEvent(int eventId)
 {
-	mDelegates[eventId] = new Delegate();
+    mDelegates[eventId] = new Delegate();
 }
 
 void EventContainer::fireEvent(int eventId, EventArgs& args)
 {
-	DelegateMap::iterator it = mDelegates.find(eventId);
-	(*(it->second))(args);
+    DelegateMap::iterator it = mDelegates.find(eventId);
+    (*(it->second))(args);
 }

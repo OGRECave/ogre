@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ namespace Ogre {
         virtual void getCustomAttribute(const String& name, void* pData);
 
         /// Override needed to deal with multisample buffers
-		virtual void swapBuffers();
+        virtual void swapBuffers();
 
         /// Override so we can attach the depth buffer to the FBO
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer );
@@ -61,7 +61,7 @@ namespace Ogre {
     class _OgreGL3PlusExport GL3PlusFBOManager: public GL3PlusRTTManager
     {
     public:
-        GL3PlusFBOManager();
+        GL3PlusFBOManager(const GL3PlusSupport& support);
         ~GL3PlusFBOManager();
 
         /** Bind a certain render target if it is a FBO. If it is not a FBO, bind the
@@ -103,7 +103,7 @@ namespace Ogre {
 
         /** Get a FBO without depth/stencil for temporary use, like blitting between textures.
          */
-        GLuint getTemporaryFBO() { return mTempFBO; }
+        GLuint getTemporaryFBO(size_t i);
     private:
         /** Frame Buffer Object properties for a certain texture format.
          */
@@ -180,7 +180,9 @@ namespace Ogre {
 
         /** Temporary FBO identifier
          */
-        GLuint mTempFBO;
+        std::vector<GLuint> mTempFBO;
+
+        const GL3PlusSupport& mGLSupport;
 
         /** Detect allowed FBO formats */
         void detectFBOFormats();

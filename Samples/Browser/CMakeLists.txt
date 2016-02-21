@@ -20,7 +20,12 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
 )
 
-set(SOURCE_FILES src/SampleBrowser.cpp)
+if (WINDOWS_STORE OR WINDOWS_PHONE)
+	set(SOURCE_FILES src/SampleBrowser_WinRT.cpp)
+else()
+	set(SOURCE_FILES src/SampleBrowser.cpp)
+endif()
+
 # Get the list of configured samples
 get_property(OGRE_SAMPLES_LIST GLOBAL PROPERTY "OGRE_SAMPLES_LIST")
 
@@ -51,16 +56,21 @@ elseif (OGRE_BUILD_PLATFORM_NACL)
   set(HEADER_FILES ${HEADER_FILES}
     include/SampleBrowser_NaCl.h
   )
-else ()
+elseif (WINDOWS_STORE OR WINDOWS_PHONE)
+  set(HEADER_FILES ${HEADER_FILES}
+    include/SampleBrowser_WinRT.h
+    include/InputManagerWinRT.h
+  )
+elseif (APPLE)
   set(HEADER_FILES ${HEADER_FILES}
     include/SampleBrowser_OSX.h
 	${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns
   )
+elseif (ANDROID)
+  set(HEADER_FILES ${HEADER_FILES}
+    include/SampleBrowser_Android.h)
 endif (APPLE AND OGRE_BUILD_PLATFORM_APPLE_IOS)
 
-if(ANDROID)
-  set(HEADER_FILES ${HEADER_FILES} include/SampleBrowser_Android.h)
-endif(ANDROID)
 
 if (OGRE_STATIC)
   # Find all samples headers, and copy them to a single include folder
@@ -74,64 +84,133 @@ if (OGRE_STATIC)
   include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 	${OGRE_BINARY_DIR}/Samples/include)
-	
+
+  # Fix for static build with MinGW
+  if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
+    include_directories(${DirectX9_INCLUDE_DIR})
+  endif() 
+  
 	ogre_add_component_include_dir(Paging)
 	ogre_add_component_include_dir(Terrain)
 	ogre_add_component_include_dir(Volume)
+	ogre_add_component_include_dir(MeshLodGenerator)
 else()
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)  
 endif()
 
-if(ANDROID)
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
-    ADD_LIBRARY(SampleBrowserDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
-    target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
-    add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
 
-    if(APPLE OR WIN32)
-      SET(ANDROID_EXECUTABLE "android")
-      SET(NDK_BUILD_EXECUTABLE "ndk-build")
-    else()
-      SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
-      SET(NDK_BUILD_EXECUTABLE "$ENV{ANDROID_NDK}/ndk-build")
+if (WINDOWS_STORE OR WINDOWS_PHONE)
+
+    # Inspired by http://cmakems.codeplex.com/SourceControl/latest#Tests/VSWinStorePhone/CMakeLists.txt
+
+    # Generate manifest.
+    set(EXE_NAME SampleBrowser)
+    set(SHORT_NAME ${EXE_NAME})
+    set(PACKAGE_GUID "ef31484f-4f23-4b9f-8748-af5482696ae5")
+    set(APP_MANIFEST_NAME Package.appxmanifest)
+    if(WINDOWS_PHONE AND "${CMAKE_SYSTEM_VERSION}" STREQUAL "8.0")
+        set(APP_MANIFEST_NAME WMAppManifest.xml)
+    endif()
+    configure_file(
+        ${OGRE_TEMPLATES_DIR}/Package_vc${MSVC_VERSION}.${CMAKE_SYSTEM_NAME}.appxmanifest.in
+        ${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
+        @ONLY)
+
+    # Make symlink to Media folder
+    if( NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/Media")
+        # Get OS dependent path to use in `execute_process`
+        file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/Media" link)
+        file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Samples/Media" target)
+        execute_process( COMMAND cmd.exe /c mklink /J ${link} ${target})
     endif()
 
-    SET(ANT_EXECUTABLE "ant")
-	if(${ANDROID_NATIVE_API_LEVEL} LESS 14)
-		MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
-	else()
-		SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
-		SET(SCREEN_SIZE "|screenSize")
-	endif()
-	
-	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
-		SET(GLES_OPTIMISER "-lglsl_optimizer -lmesa -lglcpp-library")
-	endif()
+    # Copy other resources
+    file(COPY
+        ${OGRE_BINARY_DIR}/inst/bin/debug/resources_d.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/debug/plugins_d.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/debug/quakemap_d.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/debug/samples_d.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/debug/tests_d.cfg
 
-    SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
+        ${OGRE_BINARY_DIR}/inst/bin/release/resources.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/release/plugins.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/release/quakemap.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/release/samples.cfg
+        ${OGRE_BINARY_DIR}/inst/bin/release/tests.cfg
+
+        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/Logo.png
+        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/SmallLogo.png
+        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/StoreLogo.png
+        ${CMAKE_SOURCE_DIR}/Samples/Common/misc.winrt/SplashScreen.png
+
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+    # Mark resources as deployment content, so that it would be packaged
+    set(CONTENT_FILES ${CONTENT_FILES}
+        ${CMAKE_CURRENT_BINARY_DIR}/${APP_MANIFEST_NAME}
+        ${CMAKE_CURRENT_BINARY_DIR}/Media
+        ${CMAKE_CURRENT_BINARY_DIR}/Logo.png
+        ${CMAKE_CURRENT_BINARY_DIR}/SmallLogo.png
+        ${CMAKE_CURRENT_BINARY_DIR}/StoreLogo.png
+        ${CMAKE_CURRENT_BINARY_DIR}/SplashScreen.png
+    )
+    set(DEBUG_CONTENT_FILES ${DEBUG_CONTENT_FILES}
+        ${CMAKE_CURRENT_BINARY_DIR}/resources_d.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/plugins_d.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/quakemap_d.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/samples_d.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/tests_d.cfg
+    )
+    set(RELEASE_CONTENT_FILES ${RELEASE_CONTENT_FILES}
+        ${CMAKE_CURRENT_BINARY_DIR}/resources.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/plugins.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/quakemap.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/samples.cfg
+        ${CMAKE_CURRENT_BINARY_DIR}/tests.cfg
+    )
+    set_property(SOURCE ${CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT 1)
+    set_property(SOURCE ${DEBUG_CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT $<CONFIG:Debug>)
+    set_property(SOURCE ${RELEASE_CONTENT_FILES} PROPERTY VS_DEPLOYMENT_CONTENT $<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>)
+
+    set(RESOURCE_FILES ${CONTENT_FILES} ${DEBUG_CONTENT_FILES} ${RELEASE_CONTENT_FILES})
+    source_group("Resource Files" FILES ${RESOURCE_FILES})
+
+endif()
+
+
+if(ANDROID)
+    include(AndroidMacros)
+    
+    SET(ANDROID_MOD_NAME "OgreSampleBrowser")
+    SET(JNI_PATH "${CMAKE_SOURCE_DIR}/Samples/Browser/src")
+    SET(JNI_SRC_FILES "SampleBrowser.cpp")
     
     SET(NDKOUT "${CMAKE_BINARY_DIR}/SampleBrowserNDK")
-    file(MAKE_DIRECTORY "${NDKOUT}")
-    file(MAKE_DIRECTORY "${NDKOUT}/jni")
-    file(MAKE_DIRECTORY "${NDKOUT}/assets")	
-    file(MAKE_DIRECTORY "${NDKOUT}/res")
-    file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static ")
-    configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
-
-	SET(ANDROID_MOD_NAME "OgreSampleBrowser")
-	SET(JNI_SRC "LOCAL_PATH := @CMAKE_SOURCE_DIR@/Samples/Browser/src\n")
-    SET(JNI_SRC "${JNI_SRC}\tLOCAL_SRC_FILES := SampleBrowser.cpp\n")
-	
+    
+    
+    SET(PKG_NAME "org.ogre.browser")
+    # Set this variable to false if no java code will be present (google android:hasCode for more info)
+    SET(HAS_CODE "false")
+    
+    SET(MAIN_ACTIVITY "android.app.NativeActivity")
+    SET(HEADERS "")
+    SET(SAMPLE_LDLIBS "")
+    
+    add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_Water" "Sample_Ocean" "Sample_NewInstancing" "Sample_ShaderSystem" "Sample_DeferredShading" "Sample_EndlessWorld" "Sample_VolumeCSG" "Sample_VolumeTerrain" "Sample_Terrain")
     if(NOT ANDROID_GLES_ONLY)
-	 SET(SAMPLE_LDLIBS "LOCAL_LDLIBS += -lSample_CameraTrack -lSample_CelShading -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_CubeMapping -lSample_DynTex\n")
-     SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_FacialAnimation -lSample_Fresnel -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_MeshLod -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke\n")
-     SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_Water -lSample_Ocean -lSample_NewInstancing -lSample_ShaderSystem -lSample_DeferredShading -lSample_EndlessWorld -lSample_VolumeCSG -lSample_VolumeTerrain -lSample_Terrain\n")
-	 configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Fresnel" "Sample_Grass" "Sample_ParticleFX" "Sample_MeshLod" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack" "Sample_CelShading" "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_CubeMapping" "Sample_DynTex")
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_TerrainTessellation")
     else()
-     SET(SAMPLE_LDLIBS "LOCAL_LDLIBS += -lSample_CameraTrack -lSample_Character -lSample_Compositor -lSample_Lighting -lSample_BezierPatch -lSample_DynTex\n")
-	 SET(SAMPLE_LDLIBS "${SAMPLE_LDLIBS}\tLOCAL_LDLIBS += -lSample_FacialAnimation -lSample_Grass -lSample_ParticleFX -lSample_Lighting -lSample_SkyBox -lSample_SkyPlane -lSample_SkyDome -lSample_Smoke\n")
-     configure_file("${OGRE_TEMPLATES_DIR}/AndroidGLES1.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_FacialAnimation" "Sample_Grass" "Sample_ParticleFX" "Sample_SkyBox" "Sample_SkyPlane" "Sample_SkyDome" "Sample_Smoke")
+		add_static_libs("${OGRE_BINARY_DIR}/lib" "Sample_CameraTrack"  "Sample_Character" "Sample_Compositor" "Sample_Lighting" "Sample_BezierPatch" "Sample_DynTex")
+    endif()
+
+    if(OGRE_BUILD_TESTS)
+        set(OGRE_ANDROID_CFLAGS -DSAMPLES_INCLUDE_PLAYPEN)
+        set(OGRE_ANDROID_INCLUDES ${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
+        add_static_libs("${OGRE_BINARY_DIR}/lib" PlayPenTests)
     endif()
 
     configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
@@ -149,35 +228,12 @@ if(ANDROID)
 	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/res")
 	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
     
-	add_custom_command(
-	                    TARGET SampleBrowserDummy
-                        POST_BUILD
-	                    COMMAND ${ANDROID_EXECUTABLE} update project --target ${ANDROID_TARGET} --path "${NDKOUT}"
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
-	
-	if(DEBUG)	 
-	 	add_custom_command(
-							TARGET SampleBrowserDummy
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	else()
-		add_custom_command(
-							TARGET SampleBrowserDummy
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	endif()
-	                  
-	add_custom_command(
-	                    TARGET SampleBrowserDummy
-                        POST_BUILD
-	                    COMMAND ${ANT_EXECUTABLE} debug
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp "int x = 0;")
+    ogre_add_library_to_folder(Samples SampleBrowserDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummy.cpp)
+    target_link_libraries(SampleBrowserDummy ${SAMPLE_LIBRARIES})
+    add_dependencies(SampleBrowserDummy ${OGRE_SAMPLES_LIST})
+    
+    create_android_proj(SampleBrowserDummy)
 
 else()
 
@@ -186,7 +242,18 @@ if (OGRE_BUILD_TESTS)
 	include_directories(${OGRE_SOURCE_DIR}/Tests/PlayPen/include
 	${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
 endif()
+
+# Fix for static build with MinGW
+if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
+    link_directories(${DirectX9_LIBRARY_DIR})
+endif()
+
 ogre_add_executable(SampleBrowser WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES})
+
+# Fix for static build with MinGW
+if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
+   target_link_libraries(SampleBrowser ${DirectX9_LIBRARIES})
+endif()
 
 target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${OIS_LIBRARIES} ${SAMPLE_LIBRARIES})
 
@@ -208,7 +275,7 @@ endif ()
 ogre_config_common(SampleBrowser)
 
 # append _d for debug builds
-if (NOT APPLE)
+if (NOT (APPLE OR WINDOWS_STORE OR WINDOWS_PHONE))
 	set_property(TARGET SampleBrowser APPEND PROPERTY DEBUG_POSTFIX "_d")
 endif ()
 
@@ -218,6 +285,10 @@ if (UNIX AND OGRE_FULL_RPATH)
 		INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/${OGRE_LIB_DIRECTORY})
 	set_property(TARGET SampleBrowser PROPERTY INSTALL_RPATH_USE_LINK_PATH TRUE)
 endif ()
+
+if (WINDOWS_STORE OR WINDOWS_PHONE)
+	set_target_properties(SampleBrowser PROPERTIES VS_WINRT_COMPONENT "true")
+endif()
 
 if (APPLE)
 	set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/SampleBrowser.cpp PROPERTIES COMPILE_FLAGS "-x objective-c++")
@@ -276,43 +347,29 @@ if (APPLE)
 		${OGRE_BINARY_DIR}/bin/$(CONFIGURATION)/SampleBrowser.app/Contents)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
-		COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
-		${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_BUILT_FRAMEWORK}/Ogre.framework ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
+		COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}                                             ${OGRE_SAMPLE_CONTENTS_PATH}/Frameworks/
 		)
 	# now cfg files
 	if(OGRE_SDK_BUILD)
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/plugins.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/resources.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/samples.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/quakemap.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Media
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-        COMMAND ditto 
-		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/plugins.cfg   ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/resources.cfg ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/samples.cfg   ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/macosx/quakemap.cfg  ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Media                    ${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
 	else()
 	add_custom_command(TARGET SampleBrowser POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/plugins.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/resources.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/samples.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg 
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media
-		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
-        COMMAND ditto 
-		${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/plugins.cfg 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/resources.cfg 		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/samples.cfg   		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/bin/quakemap.cfg  		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ln ARGS -s -f ${OGRE_SOURCE_DIR}/Samples/Media     		${OGRE_SAMPLE_CONTENTS_PATH}/Resources/
+		COMMAND ditto ${OGRE_SOURCE_DIR}/Samples/Common/misc/SampleBrowser_OSX.icns ${OGRE_SAMPLE_CONTENTS_PATH}/Resources
 		)
 	endif()
 
@@ -358,6 +415,7 @@ if (APPLE)
 		)
 	endif()
   endif()
+
 endif (APPLE)
 
 if (OGRE_INSTALL_SAMPLES)
@@ -371,7 +429,6 @@ if (OGRE_INSTALL_SAMPLES)
 			DESTINATION bin${OGRE_RELWDBG_PATH} CONFIGURATIONS RelWithDebInfo
 			)
 	endif ()
-endif ()	
+endif ()
 endif(ANDROID)
-
 

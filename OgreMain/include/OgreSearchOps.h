@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,21 +30,12 @@ THE SOFTWARE.
 
 // Emulate _findfirst, _findnext on non-Windows platforms
 
-
-
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-
 #include "OgrePlatform.h"
 
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_WIN32 && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
 
-#include <dirent.h>
 #include <unistd.h>
-#include <fnmatch.h>
 
 /* Our simplified data entry structure */
 struct _finddata_t

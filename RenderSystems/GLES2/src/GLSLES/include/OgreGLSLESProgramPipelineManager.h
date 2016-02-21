@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@
 
 namespace Ogre
 {
-	/** Ogre assumes that there are separate vertex and fragment programs to deal with but
+    /** Ogre assumes that there are separate vertex and fragment programs to deal with but
      GLSL ES has one program pipeline object that represents the active vertex and fragment program objects
      during a rendering state.  GLSL vertex and fragment program objects are compiled separately
      and then attached to a program object and then the program pipeline object is linked.
@@ -47,36 +47,36 @@ namespace Ogre
      */
     class _OgreGLES2Export GLSLESProgramPipelineManager : public GLSLESProgramManagerCommon, public Singleton<GLSLESProgramPipelineManager>
     {
-	private:
+    private:
 
-		typedef map<uint64, GLSLESProgramPipeline*>::type ProgramPipelineMap;
-		typedef ProgramPipelineMap::iterator ProgramPipelineIterator;
+        typedef map<uint64, GLSLESProgramPipeline*>::type ProgramPipelineMap;
+        typedef ProgramPipelineMap::iterator ProgramPipelineIterator;
 
-		/// Container holding previously created program pipeline objects 
-		ProgramPipelineMap mProgramPipelines;
+        /// Container holding previously created program pipeline objects 
+        ProgramPipelineMap mProgramPipelines;
 
-		/// Active objects defining the active rendering gpu state
-		GLSLESProgramPipeline* mActiveProgramPipeline;
+        /// Active objects defining the active rendering gpu state
+        GLSLESProgramPipeline* mActiveProgramPipeline;
 
-	public:
+    public:
 
-		GLSLESProgramPipelineManager(void);
-		~GLSLESProgramPipelineManager(void);
+        GLSLESProgramPipelineManager(void);
+        ~GLSLESProgramPipelineManager(void);
 
-		/**
+        /**
          Get the program object that links the two active program objects together.
          If a program pipeline object was not already created and linked a new one is created and linked.
          */
-		GLSLESProgramPipeline* getActiveProgramPipeline(void);
+        GLSLESProgramPipeline* getActiveProgramPipeline(void);
 
-		/** Set the active vertex and fragment link programs for the next rendering state.
+        /** Set the active vertex and fragment link programs for the next rendering state.
          The active program pipeline object will be cleared.
          Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
          */
         void setActiveVertexLinkProgram(GLSLESGpuProgram* vertexGpuProgram);
         void setActiveFragmentLinkProgram(GLSLESGpuProgram* fragmentGpuProgram);
 
-		static GLSLESProgramPipelineManager& getSingleton(void);
+        static GLSLESProgramPipelineManager& getSingleton(void);
         static GLSLESProgramPipelineManager* getSingletonPtr(void);
     };
 }

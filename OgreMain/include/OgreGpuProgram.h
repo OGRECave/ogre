@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,13 +31,10 @@ THE SOFTWARE.
 // Precompiler options
 #include "OgrePrerequisites.h"
 #include "OgreResource.h"
-#include "OgreSharedPtr.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreSerializer.h"
-#include "OgreRenderOperation.h"
 #include "OgreGpuProgramParams.h"
 #include "OgreHeaderPrefix.h"
 #include "OgreVector3.h"
+#include "OgreSharedPtr.h"
 
 namespace Ogre {
 
@@ -224,6 +221,8 @@ namespace Ogre {
 
     GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
                const String& group, bool isManual = false, ManualResourceLoader* loader = 0);
+
+    static const String getProgramTypeName(GpuProgramType programType);
 
     virtual ~GpuProgram() {}
 
@@ -417,9 +416,6 @@ namespace Ogre {
         @see setManualNamedConstantsFile
     */
     virtual void setManualNamedConstants(const GpuNamedConstants& namedConstants);
-
-    /// Get a read-only reference to the named constants registered for this program (manually or automatically)
-    virtual const GpuNamedConstants& getNamedConstants() const { return *mConstantDefs.get(); }
 
     /** Specifies the name of a file from which to load named parameters mapping
         for a program which would not be able to derive named parameters itself.

@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -125,7 +125,8 @@ namespace Ogre
             }
 
             // Validate pipeline
-            logObjectInfo( getCombinedName() + String("GLSL program pipeline result: "), mGLProgramPipelineHandle );
+            OGRE_CHECK_GL_ERROR(glValidateProgramPipeline(mGLProgramPipelineHandle));
+            logObjectInfo( getCombinedName() + String("GLSL program pipeline validation result: "), mGLProgramPipelineHandle );
 
             //            if (getGLSupport()->checkExtension("GL_KHR_debug") || gl3wIsSupported(4, 3))
             //                glObjectLabel(GL_PROGRAM_PIPELINE, mGLProgramPipelineHandle, 0,
@@ -135,111 +136,120 @@ namespace Ogre
 
     void GLSLSeparableProgram::loadIndividualProgram(GLSLShader *program)
     {
-        if (program && !program->isLinked())
+        if (program)
         {
-            GLint linkStatus = 0;
-
-            String programName = program->getName();
-
-            GLuint programHandle = program->getGLProgramHandle();
-
-            OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_SEPARABLE, GL_TRUE));
-            //if (GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
-            OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
-
-            // Use precompiled program if possible.
-            bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(programName);
-            if (microcodeAvailableInCache)
+            if(!program->isLinked())
             {
-                GpuProgramManager::Microcode cacheMicrocode =
-                    GpuProgramManager::getSingleton().getMicrocodeFromCache(programName);
-                cacheMicrocode->seek(0);
+                GLint linkStatus = 0;
 
-                GLenum binaryFormat = 0;
-                cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
+                String programName = program->getName();
 
-                GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+                GLuint programHandle = program->getGLProgramHandle();
 
-                OGRE_CHECK_GL_ERROR(glProgramBinary(programHandle,
-                                                    binaryFormat,
-                                                    cacheMicrocode->getPtr() + sizeof(GLenum),
-                                                    binaryLength));
+                OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_SEPARABLE, GL_TRUE));
+                //if (GpuProgramManager::getSingleton().getSaveMicrocodesToCache())
+                OGRE_CHECK_GL_ERROR(glProgramParameteri(programHandle, GL_PROGRAM_BINARY_RETRIEVABLE_HINT, GL_TRUE));
 
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+                // Use precompiled program if possible.
+                bool microcodeAvailableInCache = GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(programName);
+                if (microcodeAvailableInCache)
+                {
+                    GpuProgramManager::Microcode cacheMicrocode =
+                        GpuProgramManager::getSingleton().getMicrocodeFromCache(programName);
+                    cacheMicrocode->seek(0);
+
+                    GLenum binaryFormat = 0;
+                    cacheMicrocode->read(&binaryFormat, sizeof(GLenum));
+
+                    GLint binaryLength = cacheMicrocode->size() - sizeof(GLenum);
+
+                    OGRE_CHECK_GL_ERROR(glProgramBinary(programHandle,
+                                                        binaryFormat,
+                                                        cacheMicrocode->getPtr() + sizeof(GLenum),
+                                                        binaryLength));
+
+                    OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+                    if (!linkStatus)
+                        logObjectInfo("Could not use cached binary " + programName, programHandle);
+                }
+
+                // Compilation needed if precompiled program is
+                // unavailable or failed to link.
                 if (!linkStatus)
-                    logObjectInfo("Could not use cached binary " + programName, programHandle);
-            }
-
-            // Compilation needed if precompiled program is
-            // unavailable or failed to link.
-            if (!linkStatus)
-            {
-                try
                 {
-                    program->compile(true);
+                    try
+                    {
+                        program->compile(true);
+                    }
+                    catch (Exception& e)
+                    {
+                        LogManager::getSingleton().stream() << e.getDescription();
+                        mTriedToLinkAndFailed = true;
+                        return;
+                    }
+
+                    program->attachToProgramObject(programHandle);
+                    OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
+                    OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
+
+                    // Binary cache needs an update.
+                    microcodeAvailableInCache = false;
                 }
-                catch (Exception& e)
+
+                program->setLinked(linkStatus);
+                mLinked = linkStatus;
+
+                mTriedToLinkAndFailed = !linkStatus;
+
+                logObjectInfo( getCombinedName() + String("GLSL program result : "), programHandle );
+
+                if (program->getType() == GPT_VERTEX_PROGRAM)
+                    setSkeletalAnimationIncluded(program->isSkeletalAnimationIncluded());
+
+                // Add the microcode to the cache.
+                if (!microcodeAvailableInCache && mLinked &&
+                    GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
                 {
-                    LogManager::getSingleton().stream() << e.getDescription();
-                    mTriedToLinkAndFailed = true;
-                    return;
+                    // Get buffer size.
+                    GLint binaryLength = 0;
+
+                    OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
+
+                    // Create microcode.
+                    GpuProgramManager::Microcode newMicrocode =
+                        GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
+
+                    // Get binary.
+                    OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
+
+                    // std::vector<uchar> buffer(binaryLength);
+                    // GLenum format(0);
+                    // OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL, &format, &buffer[0]));
+
+                    // GLenum binaryFormat = 0;
+                    // std::vector<uchar> binaryData(binaryLength);
+                    // newMicrocode->read(&binaryFormat, sizeof(GLenum));
+                    // newMicrocode->read(&binaryData[0], binaryLength);
+
+                    GpuProgramManager::getSingleton().addMicrocodeToCache(programName, newMicrocode);
                 }
-
-                program->attachToProgramObject(programHandle);
-                OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-
-                // Binary cache needs an update.
-                microcodeAvailableInCache = false;
             }
-
-            program->setLinked(linkStatus);
-            mLinked = linkStatus;
-
-            mTriedToLinkAndFailed = !linkStatus;
-
-            logObjectInfo( getCombinedName() + String("GLSL program result : "), programHandle );
-
-            if (program->getType() == GPT_VERTEX_PROGRAM)
-                setSkeletalAnimationIncluded(program->isSkeletalAnimationIncluded());
-
-            // Add the microcode to the cache.
-            if (!microcodeAvailableInCache && mLinked &&
-                GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
+            else
             {
-                // Get buffer size.
-                GLint binaryLength = 0;
-
-                OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_PROGRAM_BINARY_LENGTH, &binaryLength));
-
-                // Create microcode.
-                GpuProgramManager::Microcode newMicrocode =
-                    GpuProgramManager::getSingleton().createMicrocode((unsigned long)binaryLength + sizeof(GLenum));
-
-                // Get binary.
-                OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(), newMicrocode->getPtr() + sizeof(GLenum)));
-
-                // std::vector<uchar> buffer(binaryLength);
-                // GLenum format(0);
-                // OGRE_CHECK_GL_ERROR(glGetProgramBinary(programHandle, binaryLength, NULL, &format, &buffer[0]));
-
-                // GLenum binaryFormat = 0;
-                // std::vector<uchar> binaryData(binaryLength);
-                // newMicrocode->read(&binaryFormat, sizeof(GLenum));
-                // newMicrocode->read(&binaryData[0], binaryLength);
-
-                GpuProgramManager::getSingleton().addMicrocodeToCache(programName, newMicrocode);
+                // This is for the case where all individual programs have been compiled before (in an another separable program).
+                // If we don't do that the program will remain unlinked although all individual programs are actually linked.
+                mLinked = true;
             }
         }
     }
 
-    void GLSLSeparableProgram::_useProgram(void)
-    {
-        if (mLinked)
-        {
-            OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
-        }
-    }
+    // void GLSLSeparableProgram::_useProgram(void)
+    // {
+    //     if (mLinked)
+    //     {
+    //        OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
+    //     }
+    // }
 
 
     GLint GLSLSeparableProgram::getAttributeIndex(VertexElementSemantic semantic, uint index)
@@ -285,7 +295,13 @@ namespace Ogre
             buildGLUniformReferences();
         }
 
-        _useProgram();
+        // _useProgram();
+
+
+        if (mLinked)
+        {
+            OGRE_CHECK_GL_ERROR(glBindProgramPipeline(mGLProgramPipelineHandle));
+        }
     }
 
 
@@ -559,8 +575,7 @@ namespace Ogre
                         OGRE_CHECK_GL_ERROR(glProgramUniform1iv(progID, currentUniform->mLocation, 1,
                                                                 params->getIntPointer(def->physicalIndex)));
                         break;
-                    case GCT_UNKNOWN:
-                    case GCT_SUBROUTINE:
+                    default:
                         break;
 
                     } // End switch
@@ -624,39 +639,6 @@ namespace Ogre
         // }
     }
 
-
-    // void GLSLSeparableProgram::updateShaderStorageBlocks(GpuProgramParametersSharedPtr params,
-    //                                                     uint16 mask, GpuProgramType fromProgType)
-    // {
-    //     // Iterate through the list of uniform buffers and update them as needed
-    //     GLShaderStorageBufferIterator currentBuffer = mGLShaderStorageBufferReferences.begin();
-    //     GLShaderStorageBufferIterator endBuffer = mGLShaderStorageBufferReferences.end();
-
-    //     const GpuProgramParameters::GpuSharedParamUsageList& sharedParams = params->getSharedParameters();
-
-    //     GpuProgramParameters::GpuSharedParamUsageList::const_iterator it, end = sharedParams.end();
-    //     for (it = sharedParams.begin(); it != end; ++it)
-    //     {
-    //         for (;currentBuffer != endBuffer; ++currentBuffer)
-    //         {
-    //             GL3PlusHardwareShaderStorageBuffer* hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(currentBuffer->get());
-    //             GpuSharedParametersPtr paramsPtr = it->getSharedParams();
-
-    //             // Block name is stored in mSharedParams->mName of GpuSharedParamUsageList items
-    //             GLint blockIndex;
-    //             OGRE_CHECK_GL_ERROR(blockIndex = glGetProgramResourceIndex(mGLProgramHandle, GL_SHADER_STORAGE_BLOCK, it->getName().c_str()));
-    //             OGRE_CHECK_GL_ERROR(glShaderStorageBlockBinding(mGLProgramHandle, blockIndex, hwGlBuffer->getGLBufferBinding()));
-
-    //             //FIXME does not check if current progrtype, or if shared param is active
-
-    //             //FIXME This seems to only support copying float data.
-    //             // What about int, uint, double, etc?
-    //             hwGlBuffer->writeData(0, hwGlBuffer->getSizeInBytes(), &paramsPtr->getFloatConstantList().front());
-    //         }
-    //     }
-    // }
-
-
     void GLSLSeparableProgram::updateUniformBlocks(GpuProgramParametersSharedPtr params,
                                                    uint16 mask, GpuProgramType fromProgType)
     {
@@ -676,7 +658,7 @@ namespace Ogre
             GpuSharedParametersPtr paramsPtr = currentPair->first;
 
             //FIXME Possible buffer does not exist if no associated uniform block.
-            GL3PlusHardwareUniformBuffer* hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(currentPair->second.get());
+            HardwareUniformBuffer* hwGlBuffer = currentPair->second.get();
 
             if (!paramsPtr->isDirty()) continue;
 
@@ -696,6 +678,7 @@ namespace Ogre
 
                 void* dataPtr;
 
+                // NOTE: the naming is backward. this is the logical index
                 size_t index =  param->physicalIndex;
 
                 //TODO Maybe move to GpuSharedParams?  Otherwise create bool buffer.
@@ -724,7 +707,9 @@ namespace Ogre
 
                 // in bytes
                 size_t length = param->arraySize * param->elementSize * 4;
-                size_t offset = hwGlBuffer->mBufferParamsLayout.offsets[i];
+
+                // NOTE: the naming is backward. this is the physical offset in bytes
+                size_t offset = param->logicalIndex;
                 hwGlBuffer->writeData(offset, length, dataPtr);
             }
 

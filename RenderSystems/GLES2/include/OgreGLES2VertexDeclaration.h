@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,21 +33,21 @@ THE SOFTWARE.
 
 namespace Ogre { 
 
-	/** Specialisation of VertexDeclaration for OpenGL ES 2 Vertex Array Object usage */
-	class GLES2VertexDeclaration : public VertexDeclaration
-	{
-	protected:
+    /** Specialisation of VertexDeclaration for OpenGL ES 2 Vertex Array Object usage */
+    class GLES2VertexDeclaration : public VertexDeclaration
+    {
+    protected:
         /// OpenGL id for the vertex array object
         GLuint mVAO;
         bool mIsInitialised;
 
-	public:
-		GLES2VertexDeclaration();
-		~GLES2VertexDeclaration();
+    public:
+        GLES2VertexDeclaration();
+        ~GLES2VertexDeclaration();
         void bind(void);
         bool isInitialised(void) { return mIsInitialised; }
         void setInitialised(bool flag) { mIsInitialised = flag; }
-	};
+    };
 
 }
 

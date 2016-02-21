@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,64 +35,64 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	GLFBOMultiRenderTarget::GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name):
-		MultiRenderTarget(name),
-		fbo(manager, 0 /* TODO: multisampling on MRTs? */)
-	{
-	}
+    GLFBOMultiRenderTarget::GLFBOMultiRenderTarget(GLFBOManager *manager, const String &name):
+        MultiRenderTarget(name),
+        fbo(manager, 0 /* TODO: multisampling on MRTs? */)
+    {
+    }
 
-	GLFBOMultiRenderTarget::~GLFBOMultiRenderTarget()
-	{
-	}
+    GLFBOMultiRenderTarget::~GLFBOMultiRenderTarget()
+    {
+    }
 
-	void GLFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
-	{
-		/// Check if the render target is in the rendertarget->FBO map
+    void GLFBOMultiRenderTarget::bindSurfaceImpl(size_t attachment, RenderTexture *target)
+    {
+        /// Check if the render target is in the rendertarget->FBO map
         GLFrameBufferObject *fbobj = 0;
         target->getCustomAttribute(GLRenderTexture::CustomAttributeString_FBO, &fbobj);
-		assert(fbobj);
-		fbo.bindSurface(attachment, fbobj->getSurface(0));
+        assert(fbobj);
+        fbo.bindSurface(attachment, fbobj->getSurface(0));
 
-		// Set width and height
-		mWidth = fbo.getWidth();
-		mHeight = fbo.getHeight();
-	}
+        // Set width and height
+        mWidth = fbo.getWidth();
+        mHeight = fbo.getHeight();
+    }
 
-	void GLFBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
-	{
-		fbo.unbindSurface(attachment);
+    void GLFBOMultiRenderTarget::unbindSurfaceImpl(size_t attachment)
+    {
+        fbo.unbindSurface(attachment);
 
-		// Set width and height
-		mWidth = fbo.getWidth();
-		mHeight = fbo.getHeight();
-	}
+        // Set width and height
+        mWidth = fbo.getWidth();
+        mHeight = fbo.getHeight();
+    }
 
-	void GLFBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
-	{
-		if( name == GLRenderTexture::CustomAttributeString_FBO )
+    void GLFBOMultiRenderTarget::getCustomAttribute( const String& name, void *pData )
+    {
+        if( name == GLRenderTexture::CustomAttributeString_FBO )
         {
             *static_cast<GLFrameBufferObject **>(pData) = &fbo;
         }
-	}
-	//-----------------------------------------------------------------------------
-	bool GLFBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
-	{
-		bool result;
-		if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
-			fbo.attachDepthBuffer( depthBuffer );
+    }
+    //-----------------------------------------------------------------------------
+    bool GLFBOMultiRenderTarget::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        bool result;
+        if( (result = MultiRenderTarget::attachDepthBuffer( depthBuffer )) )
+            fbo.attachDepthBuffer( depthBuffer );
 
-		return result;
-	}
-	//-----------------------------------------------------------------------------
-	void GLFBOMultiRenderTarget::detachDepthBuffer()
-	{
-		fbo.detachDepthBuffer();
-		MultiRenderTarget::detachDepthBuffer();
-	}
-	//-----------------------------------------------------------------------------
-	void GLFBOMultiRenderTarget::_detachDepthBuffer()
-	{
-		fbo.detachDepthBuffer();
-		MultiRenderTarget::_detachDepthBuffer();
-	}
+        return result;
+    }
+    //-----------------------------------------------------------------------------
+    void GLFBOMultiRenderTarget::detachDepthBuffer()
+    {
+        fbo.detachDepthBuffer();
+        MultiRenderTarget::detachDepthBuffer();
+    }
+    //-----------------------------------------------------------------------------
+    void GLFBOMultiRenderTarget::_detachDepthBuffer()
+    {
+        fbo.detachDepthBuffer();
+        MultiRenderTarget::_detachDepthBuffer();
+    }
 }

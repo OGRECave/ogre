@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,9 +41,9 @@ namespace Ogre
     class _OgreGLES2Export GLES2StateCacheManagerImp : public StateCacheAlloc
     {
     private:
-        typedef HashMap<GLenum, GLuint> BindBufferMap;
-        typedef HashMap<GLenum, GLint> TexParameteriMap;
-        typedef HashMap<GLenum, GLfloat> TexParameterfMap;
+        typedef OGRE_HashMap<GLenum, GLuint> BindBufferMap;
+        typedef OGRE_HashMap<GLenum, GLint> TexParameteriMap;
+        typedef OGRE_HashMap<GLenum, GLfloat> TexParameterfMap;
 
         struct TextureUnitParams
         {
@@ -57,7 +57,7 @@ namespace Ogre
             TexParameterfMap mTexParameterfMap;
         };
 
-        typedef HashMap<GLuint, TextureUnitParams> TexUnitsMap;
+        typedef OGRE_HashMap<GLuint, TextureUnitParams> TexUnitsMap;
 
         /* These variables are used for caching OpenGL state.
          They are cached because state changes can be quite expensive,
@@ -92,7 +92,7 @@ namespace Ogre
         GLenum mDepthFunc;
         /// Stores the current stencil mask
         GLuint mStencilMask;
-		/// Stores the last bound texture id
+        /// Stores the last bound texture id
         GLuint mLastBoundTexID;
         /// Stores the currently active texture unit
         GLenum mActiveTextureUnit;
@@ -110,7 +110,7 @@ namespace Ogre
         
         /// See GLES2StateCacheManager.clearCache.
         void clearCache();
-		
+        
         /// See GLES2StateCacheManager.bindGLBuffer.
         void bindGLBuffer(GLenum target, GLuint buffer, GLenum attach = 0, bool force = false);
         

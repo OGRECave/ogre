@@ -80,7 +80,7 @@ endif ()
 
 # create vcproj.user file for Visual Studio to set debug working directory
 function(ogre_create_vcproj_userfile TARGETNAME)
-  if (MSVC)
+  if (MSVC AND NOT WINDOWS_STORE AND NOT WINDOWS_PHONE)
     configure_file(
 	  ${OGRE_TEMPLATES_DIR}/VisualStudioUserFile.vcproj.user.in
 	  ${CMAKE_CURRENT_BINARY_DIR}/${TARGETNAME}.vcproj.user
@@ -189,17 +189,6 @@ function(ogre_config_common TARGETNAME)
     #set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
   endif()
 
-  if(OGRE_BUILD_PLATFORM_WINRT)
-    # enable WinRT features, support available since CMake 2.8.8
-    set_target_properties(${TARGETNAME} PROPERTIES VS_WINRT_EXTENSIONS "YES")
-    set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "/bigobj")
-
-    # WinRT uses precompiled headers by default, that needs to be overriden, but unfortunately CMake can`t do this
-    #if(NOT ${TARGET_NAME} STREQUAL "OgreMain")
-    #  set_target_properties(${TARGETNAME} PROPERTIES COMPILE_FLAGS "/Y-")
-    #endif(NOT ${TARGET_NAME} STREQUAL "OgreMain")
-  endif(OGRE_BUILD_PLATFORM_WINRT)
-
   ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_common)
 
@@ -259,7 +248,7 @@ function(ogre_config_framework LIBNAME)
          PROPERTIES BUILD_WITH_INSTALL_RPATH 1
          INSTALL_NAME_DIR "@executable_path/../Frameworks"
       )
-      set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES} ${PLATFORM_HEADERS}")
+      set_target_properties(${LIBNAME} PROPERTIES PUBLIC_HEADER "${HEADER_FILES};${PLATFORM_HEADERS};" )
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
       set_target_properties(${LIBNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${OGRE_SOURCE_DIR}/OgreMain/include/OgreStableHeaders.h")
       set_target_properties(${LIBNAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")

@@ -100,6 +100,15 @@ function(ogre_add_library TARGETNAME LIBTYPE)
   add_library(${TARGETNAME} ${LIBTYPE} ${_SOURCES})
 endfunction(ogre_add_library)
 
+# add a new library to a project folder
+# usage: ogre_add_library(FOLDER TARGETNAME LIBTYPE SOURCE_FILES [SEPARATE SOURCE_FILES])
+function(ogre_add_library_to_folder FOLDER TARGETNAME LIBTYPE )
+  create_unity_build_files(${TARGETNAME} ${ARGN})
+  add_library(${TARGETNAME} ${LIBTYPE} ${_SOURCES})
+  if (OGRE_PROJECT_FOLDERS)
+    set_property(TARGET ${TARGETNAME} PROPERTY FOLDER ${FOLDER})
+  endif ()
+endfunction(ogre_add_library_to_folder)
 
 # add a new executable target
 # usage: ogre_add_executable(TARGETNAME [WIN32] [MACOSX_BUNDLE] SOURCE_FILES [SEPARATE SOURCE_FILES])

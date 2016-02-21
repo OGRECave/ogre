@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,13 +34,13 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
-	/** Patch specialisation of Mesh. 
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
+    /** Patch specialisation of Mesh. 
     @remarks
         Instances of this class should be created by calling MeshManager::createBezierPatch.
     */
@@ -56,7 +56,7 @@ namespace Ogre {
         PatchMesh(ResourceManager* creator, const String& name, ResourceHandle handle,
             const String& group);
         /// Update the mesh with new control points positions.
-		void update(void* controlPointBuffer, size_t width, size_t height, 
+        void update(void* controlPointBuffer, size_t width, size_t height, 
                     size_t uMaxSubdivisionLevel, size_t vMaxSubdivisionLevel, 
                     PatchSurface::VisibleSide visibleSide);
         /// Define the patch, as defined in MeshManager::createBezierPatch
@@ -76,12 +76,12 @@ namespace Ogre {
     protected:
         /// Overridden from Resource
         void loadImpl(void);
-		/// Overridden from Resource - do nothing (no disk caching)
-		void prepareImpl(void) {}
+        /// Overridden from Resource - do nothing (no disk caching)
+        void prepareImpl(void) {}
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

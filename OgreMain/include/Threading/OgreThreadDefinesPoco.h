@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -49,8 +49,8 @@ THE SOFTWARE
 #define OGRE_THREAD_NOTIFY_ALL(sync) sync.broadcast()
 // Read-write mutex
 #define OGRE_RW_MUTEX(name) mutable Poco::RWLock name
-#define OGRE_LOCK_RW_MUTEX_READ(name) Poco::RWLock::ScopedLock ogrenameLock(name, false)
-#define OGRE_LOCK_RW_MUTEX_WRITE(name) Poco::RWLock::ScopedLock ogrenameLock(name, true)
+#define OGRE_LOCK_RW_MUTEX_READ(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, false)
+#define OGRE_LOCK_RW_MUTEX_WRITE(name) Poco::RWLock::ScopedLock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, true)
 // Thread-local pointer
 #define OGRE_THREAD_POINTER(T, var) Poco::ThreadLocal<SharedPtr<T> > var
 #define OGRE_THREAD_POINTER_INIT(var) var()

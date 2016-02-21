@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/B&W_Cg_FP cg
 {
 	source GrayScale.cg
 	entry_point GrayScale_ps
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Compositor/B&W_GLSLES_FP glsles
@@ -31,7 +31,7 @@ material Ogre/Compositor/BlackAndWhite
 		pass
 		{
 			depth_check off
-            polygon_mode_overrideable false
+                        polygon_mode_overrideable false
 
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
@@ -43,7 +43,6 @@ material Ogre/Compositor/BlackAndWhite
 
 			texture_unit
 			{
-				texture RT
 				tex_coord_set 0
 				tex_address_mode clamp
 				filtering linear linear linear

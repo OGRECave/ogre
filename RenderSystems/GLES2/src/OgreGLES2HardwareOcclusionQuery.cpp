@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -55,7 +55,7 @@ GLES2HardwareOcclusionQuery::~GLES2HardwareOcclusionQuery()
 //------------------------------------------------------------------
 void GLES2HardwareOcclusionQuery::createQuery()
 {
-	// Check for hardware occlusion support
+    // Check for hardware occlusion support
     
     if(getGLES2SupportRef()->checkExtension("GL_EXT_occlusion_query_boolean") || gleswIsSupported(3, 0))
     {
@@ -78,7 +78,7 @@ void GLES2HardwareOcclusionQuery::destroyQuery()
     }
 }
 //------------------------------------------------------------------
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
 void GLES2HardwareOcclusionQuery::notifyOnContextLost()
 {
     destroyQuery();
@@ -127,7 +127,7 @@ bool GLES2HardwareOcclusionQuery::isStillOutstanding(void)
         OGRE_CHECK_GL_ERROR(glGetQueryObjectuivEXT(mQueryID, GL_QUERY_RESULT_AVAILABLE_EXT, &available));
     }
 
-	// GL_TRUE means a wait would occur
+    // GL_TRUE means a wait would occur
     return !(available == GL_TRUE);  
 } 
 

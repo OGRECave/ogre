@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -46,29 +46,29 @@ namespace RTShader {
 class _OgreRTSSExport HLSLProgramProcessor : public ProgramProcessor
 {
 
-	// Interface.
-public:	
+    // Interface.
+public: 
 
-	/** Class constructor.
-	*/
-	HLSLProgramProcessor();
+    /** Class constructor.
+    */
+    HLSLProgramProcessor();
 
-	/** Class destructor */
-	virtual ~HLSLProgramProcessor();
+    /** Class destructor */
+    virtual ~HLSLProgramProcessor();
 
-	/** Return the target language of this processor. */
-	virtual const String& getTargetLanguage() const { return TargetLanguage; }
+    /** Return the target language of this processor. */
+    virtual const String& getTargetLanguage() const { return TargetLanguage; }
 
-	/** 
-	@see ProgramProcessor::preCreateGpuPrograms
-	*/
-	virtual bool preCreateGpuPrograms(ProgramSet* programSet);
-	/** 
-	@see ProgramProcessor::postCreateGpuPrograms
-	*/
-	virtual bool postCreateGpuPrograms(ProgramSet* programSet);
+    /** 
+    @see ProgramProcessor::preCreateGpuPrograms
+    */
+    virtual bool preCreateGpuPrograms(ProgramSet* programSet);
+    /** 
+    @see ProgramProcessor::postCreateGpuPrograms
+    */
+    virtual bool postCreateGpuPrograms(ProgramSet* programSet);
 
-	static String TargetLanguage;
+    static String TargetLanguage;
 
 };
 

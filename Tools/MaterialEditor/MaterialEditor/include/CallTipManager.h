@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -41,23 +41,23 @@ typedef list<wxString> TriggerList;
 class CallTipManager
 {
 public:
-	CallTipManager();
-	virtual ~CallTipManager();
+    CallTipManager();
+    virtual ~CallTipManager();
 
-	void load(wxString& path);
+    void load(wxString& path);
 
-	void addTip(wxString& key, wxString& tip);
-	void removeTip(wxString& key);
+    void addTip(wxString& key, wxString& tip);
+    void removeTip(wxString& key);
 
-	void addTrigger(wxChar& trigger);
-	void removeTrigger(wxChar& trigger);
-	bool isTrigger(wxChar& ch);
+    void addTrigger(wxChar& trigger);
+    void removeTrigger(wxChar& trigger);
+    bool isTrigger(wxChar& ch);
 
-	wxString* find(wxString& s);
+    wxString* find(wxString& s);
 
 protected:
-	CallTipMap mCallTips;
-	TriggerList mTriggers;
+    CallTipMap mCallTips;
+    TriggerList mTriggers;
 };
 
 #endif // _CALLTIPMANAGER_H_

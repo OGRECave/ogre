@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,12 +29,8 @@ THE SOFTWARE.
 
 #include "OgreTagPoint.h"
 #include "OgreMatrix4.h"
-#include "OgreMatrix3.h"
 #include "OgreEntity.h"
-#include "OgreSceneNode.h"
-#include "OgreSkeleton.h"
 #include "OgreQuaternion.h"
-
 
 namespace Ogre {
 
@@ -107,7 +103,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     void TagPoint::needUpdate(bool forceParentUpdate)
     {
-		Bone::needUpdate(forceParentUpdate);
+        Bone::needUpdate(forceParentUpdate);
 
         // We need to tell parent entities node
         if (mParentEntity)

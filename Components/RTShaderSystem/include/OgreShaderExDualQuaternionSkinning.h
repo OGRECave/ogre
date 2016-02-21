@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -31,9 +31,6 @@ THE SOFTWARE.
 
 #ifdef RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 #include "OgreShaderExHardwareSkinningTechnique.h"
-#include "OgreShaderParameter.h"
-#include "OgreRenderSystem.h"
-#include "OgreShaderFunctionAtom.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -65,20 +62,20 @@ public:
     /** Class default constructor */
     DualQuaternionSkinning();
 
-	/**
-	@see SubRenderState::resolveParameters.
-	*/
-	virtual bool resolveParameters(ProgramSet* programSet);
+    /**
+    @see SubRenderState::resolveParameters.
+    */
+    virtual bool resolveParameters(ProgramSet* programSet);
 
-	/**
-	@see SubRenderState::resolveDependencies.
-	*/
-	virtual bool resolveDependencies(ProgramSet* programSet);
+    /**
+    @see SubRenderState::resolveDependencies.
+    */
+    virtual bool resolveDependencies(ProgramSet* programSet);
 
-	/**
-	@see SubRenderState::addFunctionInvocations.
-	*/
-	virtual bool addFunctionInvocations(ProgramSet* programSet);
+    /**
+    @see SubRenderState::addFunctionInvocations.
+    */
+    virtual bool addFunctionInvocations(ProgramSet* programSet);
 
 // Protected methods
 protected:

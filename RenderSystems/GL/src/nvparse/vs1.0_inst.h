@@ -46,12 +46,12 @@ class VS10Reg {
 public:
 //    VS10Reg();
 //    VS10Reg(const VS10Reg &r);
-//	VS10Reg& operator=(const VS10Reg &r);
-	void Init();
+//  VS10Reg& operator=(const VS10Reg &r);
+    void Init();
     void Translate();
     int type;
     int index;
-	int sign;
+    int sign;
     char mask[4];
 
     int ValidateIndex();
@@ -59,19 +59,19 @@ public:
 
 typedef class VS10Inst {
 public:
-	~VS10Inst();
-	VS10Inst();
-	VS10Inst(int currline);
-	VS10Inst(const VS10Inst &inst);
+    ~VS10Inst();
+    VS10Inst();
+    VS10Inst(int currline);
+    VS10Inst(const VS10Inst &inst);
     VS10Inst& operator=(const VS10Inst &inst);
-	VS10Inst(int currline, int inst);
-	VS10Inst(int currline, int inst, char *cmt);
-	VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0);
-	VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0, VS10Reg src1);
-	VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0, VS10Reg src1, VS10Reg src2);
+    VS10Inst(int currline, int inst);
+    VS10Inst(int currline, int inst, char *cmt);
+    VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0);
+    VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0, VS10Reg src1);
+    VS10Inst(int currline, int inst, VS10Reg dreg, VS10Reg src0, VS10Reg src1, VS10Reg src2);
     void Validate( int &vsflag );
-	int Translate();
-	VS10Reg dst;
+    int Translate();
+    VS10Reg dst;
     VS10Reg src[3];
 private:
     int line;

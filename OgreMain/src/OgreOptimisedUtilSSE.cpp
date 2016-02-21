@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -100,9 +100,9 @@ namespace Ogre {
             Real t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
-			size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
+            size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
             size_t numVertices,
-			bool morphNormals);
+            bool morphNormals);
 
         /// @copydoc OptimisedUtil::concatenateAffineMatrices
         virtual void __OGRE_SIMD_ALIGN_ATTRIBUTE concatenateAffineMatrices(
@@ -191,9 +191,9 @@ namespace Ogre {
             Real t,
             const float *srcPos1, const float *srcPos2,
             float *dstPos,
-			size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
+            size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
             size_t numVertices,
-			bool morphNormals)
+            bool morphNormals)
         {
             __OGRE_SIMD_ALIGN_STACK();
 
@@ -201,9 +201,9 @@ namespace Ogre {
                 t,
                 srcPos1, srcPos2,
                 dstPos,
-				pos1VSize, pos2VSize, dstVSize, 
+                pos1VSize, pos2VSize, dstVSize, 
                 numVertices,
-				morphNormals);
+                morphNormals);
         }
 
         /// @copydoc OptimisedUtil::concatenateAffineMatrices
@@ -1048,7 +1048,7 @@ namespace Ogre {
         // slight performance loss than general version.
         //
 
-		if (PlatformInformation::getCpuIdentifier().find("AuthenticAMD") != String::npos)
+        if (PlatformInformation::getCpuIdentifier().find("AuthenticAMD") != String::npos)
         {
             // How can I check it's an Athlon XP but not Althon 64?
             // Ok, just test whether supports SSE2/SSE3 or not, if not,
@@ -1286,10 +1286,10 @@ namespace Ogre {
         Real t,
         const float *pSrc1, const float *pSrc2,
         float *pDst,
-		size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
+        size_t pos1VSize, size_t pos2VSize, size_t dstVSize, 
         size_t numVertices,
-		bool morphNormals)
-    {	
+        bool morphNormals)
+    {   
         __OGRE_CHECK_STACK_ALIGNED_FOR_SSE();
 
         __m128 src01, src02, src11, src12, src21, src22;
@@ -1298,18 +1298,18 @@ namespace Ogre {
         __m128 t4 = _mm_load_ps1(&t);
 
 
-		// If we're morphing normals, we have twice the number of floats to process
-		// Positions are interleaved with normals, so we'll have to separately
-		// normalise just the normals later; we'll just lerp in the first pass
-		// We can't normalise as we go because normals & positions are only 3 floats
-		// each so are not aligned for SSE, we'd mix the data up
-		size_t normalsMultiplier = morphNormals ? 2 : 1;
+        // If we're morphing normals, we have twice the number of floats to process
+        // Positions are interleaved with normals, so we'll have to separately
+        // normalise just the normals later; we'll just lerp in the first pass
+        // We can't normalise as we go because normals & positions are only 3 floats
+        // each so are not aligned for SSE, we'd mix the data up
+        size_t normalsMultiplier = morphNormals ? 2 : 1;
         size_t numIterations = (numVertices*normalsMultiplier) / 4;
-		size_t numVerticesRemainder = (numVertices*normalsMultiplier) & 3;
-		
-		// Save for later
-		float *pStartDst = pDst;
-						
+        size_t numVerticesRemainder = (numVertices*normalsMultiplier) & 3;
+        
+        // Save for later
+        float *pStartDst = pDst;
+                        
         // Never use meta-function technique to accessing memory because looks like
         // VC7.1 generate a bit inefficient binary code when put following code into
         // inline function.
@@ -1419,7 +1419,7 @@ namespace Ogre {
                 _mm_storeu_ps(pDst + 4, dst1);
                 _mm_storeu_ps(pDst + 8, dst2);
                 pDst += 12;
-				
+                
             }
 
             // Morph remaining vertices
@@ -1470,59 +1470,59 @@ namespace Ogre {
                 _mm_store_ss(pDst + 2, dst0);
                 break;
             }
-			
+            
         }
-		
-		if (morphNormals)
-		{
-			
-			// Now we need to do and unaligned normalise on the normals data we just
-			// lerped; because normals are 3 elements each they're always unaligned
-			float *pNorm = pStartDst;
-			
-			// Offset past first position
-			pNorm += 3;
-			
-			// We'll do one normal each iteration, but still use SSE
-			for (size_t n = 0; n < numVertices; ++n)
-			{
-				// normalise function
-				__m128 norm;
-				
-				// load 3 floating-point normal values
-				// This loads into [0] and clears the rest
+        
+        if (morphNormals)
+        {
+            
+            // Now we need to do and unaligned normalise on the normals data we just
+            // lerped; because normals are 3 elements each they're always unaligned
+            float *pNorm = pStartDst;
+            
+            // Offset past first position
+            pNorm += 3;
+            
+            // We'll do one normal each iteration, but still use SSE
+            for (size_t n = 0; n < numVertices; ++n)
+            {
+                // normalise function
+                __m128 norm;
+                
+                // load 3 floating-point normal values
+                // This loads into [0] and clears the rest
                 norm = _mm_load_ss(pNorm + 2);
-				// This loads into [2,3]. [1] is unused
+                // This loads into [2,3]. [1] is unused
                 norm = _mm_loadh_pi(norm, (__m64*)(pNorm + 0));
-				
-				// Fill a 4-vec with vector length
-				// square
-				__m128 tmp = _mm_mul_ps(norm, norm);
-				// Add - for this we want this effect:
-				// orig   3 | 2 | 1 | 0
-				// add1   0 | 0 | 0 | 2
-				// add2   2 | 3 | 0 | 3
-				// This way elements 0, 2 and 3 have the sum of all entries (except 1 which is unused)
-				
-				tmp = _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(0,0,0,2)));
-				// Add final combination & sqrt 
-				// bottom 3 elements of l will have length, we don't care about 4
-				tmp = _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2,3,0,3)));
-				// Then divide to normalise
-				norm = _mm_div_ps(norm, _mm_sqrt_ps(tmp));
-				
-				// Store back in the same place
-				_mm_storeh_pi((__m64*)(pNorm + 0), norm);
+                
+                // Fill a 4-vec with vector length
+                // square
+                __m128 tmp = _mm_mul_ps(norm, norm);
+                // Add - for this we want this effect:
+                // orig   3 | 2 | 1 | 0
+                // add1   0 | 0 | 0 | 2
+                // add2   2 | 3 | 0 | 3
+                // This way elements 0, 2 and 3 have the sum of all entries (except 1 which is unused)
+                
+                tmp = _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(0,0,0,2)));
+                // Add final combination & sqrt 
+                // bottom 3 elements of l will have length, we don't care about 4
+                tmp = _mm_add_ps(tmp, _mm_shuffle_ps(tmp, tmp, _MM_SHUFFLE(2,3,0,3)));
+                // Then divide to normalise
+                norm = _mm_div_ps(norm, _mm_sqrt_ps(tmp));
+                
+                // Store back in the same place
+                _mm_storeh_pi((__m64*)(pNorm + 0), norm);
                 _mm_store_ss(pNorm + 2, norm);
-				
-				// Skip to next vertex (3x normal components, 3x position components)
-				pNorm += 6;
+                
+                // Skip to next vertex (3x normal components, 3x position components)
+                pNorm += 6;
 
-				
-			}
-			
+                
+            }
+            
 
-		}
+        }
     }
     //---------------------------------------------------------------------
     void OptimisedUtilSSE::concatenateAffineMatrices(

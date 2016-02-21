@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,24 +30,21 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreSingleton.h"
-#include "OgreStringVector.h"
-
-#include "OgreRenderSystemCapabilities.h"
 #include "OgreHeaderPrefix.h"
 
 
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** Class for managing RenderSystemCapabilities database for Ogre.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** Class for managing RenderSystemCapabilities database for Ogre.
         @remarks This class behaves similarly to other ResourceManager, although .rendercaps are not resources.
-						It contains and abstract a .rendercaps Serializer
+                        It contains and abstract a .rendercaps Serializer
     */
     class _OgreExport RenderSystemCapabilitiesManager :  public Singleton<RenderSystemCapabilitiesManager>, public RenderSysAlloc
     {
@@ -66,14 +63,14 @@ namespace Ogre {
         /** @see ScriptLoader::parseScript
         */
         void parseCapabilitiesFromArchive(const String& filename, const String& archiveType, bool recursive = true);
-		
-		/** Returns a capability loaded with RenderSystemCapabilitiesManager::parseCapabilitiesFromArchive method
-		* @return NULL if the name is invalid, a parsed RenderSystemCapabilities otherwise.
-		*/
+        
+        /** Returns a capability loaded with RenderSystemCapabilitiesManager::parseCapabilitiesFromArchive method
+        * @return NULL if the name is invalid, a parsed RenderSystemCapabilities otherwise.
+        */
         RenderSystemCapabilities* loadParsedCapabilities(const String& name);
 
-		/** Access to the internal map of loaded capabilities */
-		const map<String, RenderSystemCapabilities*>::type &getCapabilities() const;
+        /** Access to the internal map of loaded capabilities */
+        const map<String, RenderSystemCapabilities*>::type &getCapabilities() const;
 
         /** Method used by RenderSystemCapabilitiesSerializer::parseScript */
         void _addRenderSystemCapabilities(const String& name, RenderSystemCapabilities* caps);
@@ -122,8 +119,8 @@ namespace Ogre {
 
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

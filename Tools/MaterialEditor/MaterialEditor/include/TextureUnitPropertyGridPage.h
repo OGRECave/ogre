@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,54 +37,54 @@ class EventArgs;
 class TextureUnitPropertyGridPage : public wxPropertyGridPage
 {
 public:
-	TextureUnitPropertyGridPage(TextureUnitController* controller);
-	virtual ~TextureUnitPropertyGridPage();
+    TextureUnitPropertyGridPage(TextureUnitController* controller);
+    virtual ~TextureUnitPropertyGridPage();
 
-	virtual void populate();
+    virtual void populate();
 
-	void textureNameChanged(EventArgs& args);
-	void cubicTextureNameChanged(EventArgs& args);
-	void animatedTextureNameChanged(EventArgs& args);
-	void textureDimensionsChanged(EventArgs& args);
-	void currentFrameChanged(EventArgs& args);
-	void frameTextureNameChanged(EventArgs& args);
-	void frameTextureNameAdded(EventArgs& args);
-	void frameTextureNameRemoved(EventArgs& args);
-	void bindingTypeChanged(EventArgs& args);
-	void contentTypeChanged(EventArgs& args);
-	void pixelFormatChanged(EventArgs& args);
-	void numMipmapsChanged(EventArgs& args);
-	void alphaChanged(EventArgs& args);
-	void textureCoordSetChanged(EventArgs& args);
-	void textureTransformChanged(EventArgs& args);
-	void textureScrollChanged(EventArgs& args);
-	void textureUScrollChanged(EventArgs& args);
-	void textureVScrollChanged(EventArgs& args);
-	void textureUScaleChanged(EventArgs& args);
-	void textureVScaleChanged(EventArgs& args);
-	void textureRotateChanged(EventArgs& args);
-	void textureAddressingModeChanged(EventArgs& args);
-	void textureBorderColourChanged(EventArgs& args);
-	void colourOperationExChanged(EventArgs& args);
-	void colourOpMultipassFallbackChanged(EventArgs& args);
-	void alphaOperationChanged(EventArgs& args);
-	void environmentMapChanged(EventArgs& args);
-	void scrollAnimationChanged(EventArgs& args);
-	void rotateAnimationChanged(EventArgs& args);
-	void transformAnimationChanged(EventArgs& args);
-	void projectiveTexturingChanged(EventArgs& args);
-	void textureFilteringChanged(EventArgs& args);
-	void textureAnisotropyChanged(EventArgs& args);
-	void textureMipMapBiasChanged(EventArgs& args);
-	void nameChanged(EventArgs& args);
-	void textureNameAliasChanged(EventArgs& args);
+    void textureNameChanged(EventArgs& args);
+    void cubicTextureNameChanged(EventArgs& args);
+    void animatedTextureNameChanged(EventArgs& args);
+    void textureDimensionsChanged(EventArgs& args);
+    void currentFrameChanged(EventArgs& args);
+    void frameTextureNameChanged(EventArgs& args);
+    void frameTextureNameAdded(EventArgs& args);
+    void frameTextureNameRemoved(EventArgs& args);
+    void bindingTypeChanged(EventArgs& args);
+    void contentTypeChanged(EventArgs& args);
+    void pixelFormatChanged(EventArgs& args);
+    void numMipmapsChanged(EventArgs& args);
+    void alphaChanged(EventArgs& args);
+    void textureCoordSetChanged(EventArgs& args);
+    void textureTransformChanged(EventArgs& args);
+    void textureScrollChanged(EventArgs& args);
+    void textureUScrollChanged(EventArgs& args);
+    void textureVScrollChanged(EventArgs& args);
+    void textureUScaleChanged(EventArgs& args);
+    void textureVScaleChanged(EventArgs& args);
+    void textureRotateChanged(EventArgs& args);
+    void textureAddressingModeChanged(EventArgs& args);
+    void textureBorderColourChanged(EventArgs& args);
+    void colourOperationExChanged(EventArgs& args);
+    void colourOpMultipassFallbackChanged(EventArgs& args);
+    void alphaOperationChanged(EventArgs& args);
+    void environmentMapChanged(EventArgs& args);
+    void scrollAnimationChanged(EventArgs& args);
+    void rotateAnimationChanged(EventArgs& args);
+    void transformAnimationChanged(EventArgs& args);
+    void projectiveTexturingChanged(EventArgs& args);
+    void textureFilteringChanged(EventArgs& args);
+    void textureAnisotropyChanged(EventArgs& args);
+    void textureMipMapBiasChanged(EventArgs& args);
+    void nameChanged(EventArgs& args);
+    void textureNameAliasChanged(EventArgs& args);
 
 protected:
-	virtual void propertyChanged(wxPropertyGridEvent& event);
+    virtual void propertyChanged(wxPropertyGridEvent& event);
 
-	TextureUnitController* mController;
+    TextureUnitController* mController;
 
-	wxPGId mTextureNameId;
+    wxPGId mTextureNameId;
     wxPGId mCubicTextureNameId;
     wxPGId mAnimatedTextureNameId;
     wxPGId mTextureDimensionsId;
@@ -120,7 +120,7 @@ protected:
     wxPGId mTextureNameAliasId;
 
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif // _TEXTUREUNITPROPERTYGRIDPAGE_H_

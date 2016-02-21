@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,36 +46,36 @@ namespace Ogre {
         D3D9HardwareBufferManagerBase();
         ~D3D9HardwareBufferManagerBase();
         /// Creates a vertex buffer
-		HardwareVertexBufferSharedPtr 
+        HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Create a hardware vertex buffer
-		HardwareIndexBufferSharedPtr 
+        /// Create a hardware vertex buffer
+        HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Create a render to vertex buffer
-		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
-		
-		HardwareUniformBufferSharedPtr 
-			createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
+        /// Create a render to vertex buffer
+        RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+        
+        HardwareUniformBufferSharedPtr 
+            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
 
-		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "");
     };
 
-	/// D3D9HardwareBufferManagerBase as a Singleton
-	class _OgreD3D9Export D3D9HardwareBufferManager : public HardwareBufferManager
-	{
-	public:
-		D3D9HardwareBufferManager()
-			: HardwareBufferManager(OGRE_NEW D3D9HardwareBufferManagerBase()) 
-		{
+    /// D3D9HardwareBufferManagerBase as a Singleton
+    class _OgreD3D9Export D3D9HardwareBufferManager : public HardwareBufferManager
+    {
+    public:
+        D3D9HardwareBufferManager()
+            : HardwareBufferManager(OGRE_NEW D3D9HardwareBufferManagerBase()) 
+        {
 
-		}
-		~D3D9HardwareBufferManager()
-		{
-			OGRE_DELETE mImpl;
-		}
-	};
+        }
+        ~D3D9HardwareBufferManager()
+        {
+            OGRE_DELETE mImpl;
+        }
+    };
 
 }
 

@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,12 @@
 #include "SampleContext.h"
 #include "SamplePlugin.h"
 
+#include <iostream> // for Apple
+
+#ifdef INCLUDE_RTSHADER_SYSTEM
+#include "ShaderGeneratorTechniqueResolverListener.h"
+#endif
+
 // These need to be included prior to everything else to prevent name clashes.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
 
@@ -47,74 +53,6 @@ class TestBatch;
 using namespace Ogre;
 
 typedef std::map<String, OgreBites::SamplePlugin *> PluginMap;
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-
-/** This class demonstrates basic usage of the RTShader system.
-    It sub class the material manager listener class and when a target scheme callback
-    is invoked with the shader generator scheme it tries to create an equivalent shader
-    based technique based on the default technique of the given material.
-*/
-class ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
-{
- public:
-
-    ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
-    {
-        mShaderGenerator = pShaderGenerator;
-    }
-
-    /** This is the hook point where shader based technique will be created.
-        It will be called whenever the material manager won't find appropriate technique
-        that satisfy the target scheme name. If the scheme name is out target RT Shader System
-        scheme name we will try to create shader generated technique for it.
-    */
-    virtual Technique* handleSchemeNotFound(unsigned short schemeIndex,
-                                            const String& schemeName, Material* originalMaterial, unsigned short lodIndex,
-                                            const Renderable* rend)
-    {
-        Technique* generatedTech = NULL;
-
-        // Case this is the default shader generator scheme.
-        if (schemeName == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-        {
-            bool techniqueCreated;
-
-            // Create shader generated technique for this material.
-            techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-                originalMaterial->getName(),
-                MaterialManager::DEFAULT_SCHEME_NAME,
-                schemeName);
-
-            // Case technique registration succeeded.
-            if (techniqueCreated)
-            {
-                // Force creating the shaders for the generated technique.
-                mShaderGenerator->validateMaterial(schemeName, originalMaterial->getName());
-
-                // Grab the generated technique.
-                Material::TechniqueIterator itTech = originalMaterial->getTechniqueIterator();
-
-                while (itTech.hasMoreElements())
-                {
-                    Technique* curTech = itTech.getNext();
-
-                    if (curTech->getSchemeName() == schemeName)
-                    {
-                        generatedTech = curTech;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return generatedTech;
-    }
-
- protected:
-    RTShader::ShaderGenerator* mShaderGenerator; // The shader generator instance.
-};
-#endif // INCLUDE_RTSHADER_SYSTEM
 
 /** The common environment that all of the tests run in */
 class TestContext : public OgreBites::SampleContext
@@ -213,11 +151,14 @@ class TestContext : public OgreBites::SampleContext
     /// Path to the output directory for the running test
     String mOutputDir;
 
+    /// Path to the reference set location
+    String mReferenceSetPath;
+
     /// The active test (0 if none is active)
     VisualTest* mCurrentTest;
 #ifdef INCLUDE_RTSHADER_SYSTEM
     RTShader::ShaderGenerator* mShaderGenerator; // The Shader generator instance.
-    ShaderGeneratorTechniqueResolverListener* mMaterialMgrListener;             // Shader generator material manager listener.
+    OgreBites::ShaderGeneratorTechniqueResolverListener* mMaterialMgrListener; // Shader generator material manager listener.
 #endif // INCLUDE_RTSHADER_SYSTEM
 
     /// The current frame of a running test

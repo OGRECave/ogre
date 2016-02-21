@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,25 +33,25 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	class _OgreD3D9Export D3D9TextureManager : public TextureManager
-	{
-	protected:		
+    class _OgreD3D9Export D3D9TextureManager : public TextureManager
+    {
+    protected:      
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
 
-	public:
-		D3D9TextureManager();
-		~D3D9TextureManager();
+    public:
+        D3D9TextureManager();
+        ~D3D9TextureManager();
 
 
-		/// @copydoc TextureManager::getNativeFormat
-		PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+        /// @copydoc TextureManager::getNativeFormat
+        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
 
         /// @copydoc TextureManager::isHardwareFilteringSupported
         bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
-            bool preciseFormatOnly = false);		
-	};
+            bool preciseFormatOnly = false);        
+    };
 }
 #endif

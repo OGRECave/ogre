@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +33,8 @@ copyright            : (C) 2002 by Jon Anderson
 email                : janders@users.sf.net
 
 ***************************************************************************/
-#include <OgreMath.h>
-#include <OgreAxisAlignedBox.h>
-#include <OgreRoot.h>
-
-#include <OgreOctreeCamera.h>
+#include "OgreAxisAlignedBox.h"
+#include "OgreOctreeCamera.h"
 
 namespace Ogre
 {
@@ -71,7 +68,7 @@ OctreeCamera::Visibility OctreeCamera::getVisibility( const AxisAlignedBox &boun
         if (plane == FRUSTUM_PLANE_FAR && mFarDist == 0)
             continue;
 
-		// This updates frustum planes and deals with cull frustum
+        // This updates frustum planes and deals with cull frustum
         Plane::Side side = getFrustumPlane(plane).getSide(centre, halfSize);
         if(side == Plane::NEGATIVE_SIDE) return NONE;
         // We can't return now as the box could be later on the negative side of a plane.

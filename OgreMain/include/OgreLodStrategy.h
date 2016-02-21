@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,27 +31,26 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgreMesh.h"
+#include "OgreMaterial.h"
 
-#include "OgreMovableObject.h"
-#include "OgreCamera.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
-	/** Strategy for determining level of detail.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
+    /** Strategy for determining level of detail.
     @remarks
         Generally, to create a new LOD strategy, all of the following will
         need to be implemented: getValueImpl, getBaseValue, transformBias,
         getIndex, sort, and isSorted.
         In addition, transformUserValue may be overridden.
     */
-	class _OgreExport LodStrategy : public LodAlloc
+    class _OgreExport LodStrategy : public LodAlloc
     {
     protected:
         /** Name of this strategy. */
@@ -125,8 +124,8 @@ namespace Ogre {
         static ushort getIndexDescending(Real value, const Material::LodValueList& materialLodValueList);
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

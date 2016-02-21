@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -91,7 +91,7 @@ String GTKGLSupport::validateConfig()
 
 RenderWindow* GTKGLSupport::createWindow(bool autoCreateWindow, 
                                          GLRenderSystem* renderSystem, 
-					 const String& windowTitle)
+                     const String& windowTitle)
 {
     if (autoCreateWindow)
     {
@@ -130,7 +130,7 @@ RenderWindow* GTKGLSupport::newWindow(const String& name, unsigned int width,
                    depthBuffer, parentWindowHandle);
 
     //if(!_ogre_widget)
-    //	_ogre_widget = window->get_ogre_widget();
+    //  _ogre_widget = window->get_ogre_widget();
 
     // Copy some important information for future reference, for example
     // for when the context is needed
@@ -161,33 +161,33 @@ void GTKGLSupport::stop()
 
 void GTKGLSupport::begin_context(RenderTarget *_target)
 {
-	// Support nested contexts, in which case.. nothing happens
-    	++_context_ref;
-    	if (_context_ref == 1) {
-		if(_target) {
-			// Begin a specific context
-			OGREWidget *_ogre_widget = static_cast<GTKWindow*>(_target)->get_ogre_widget();
+    // Support nested contexts, in which case.. nothing happens
+        ++_context_ref;
+        if (_context_ref == 1) {
+        if(_target) {
+            // Begin a specific context
+            OGREWidget *_ogre_widget = static_cast<GTKWindow*>(_target)->get_ogre_widget();
 
-	        	_ogre_widget->get_gl_window()->gl_begin(_ogre_widget->get_gl_context());
-		} else {
-			// Begin a generic main context
-			_main_window->gl_begin(_main_context);
-		}
-    	}
+                _ogre_widget->get_gl_window()->gl_begin(_ogre_widget->get_gl_context());
+        } else {
+            // Begin a generic main context
+            _main_window->gl_begin(_main_context);
+        }
+        }
 }
 
 void GTKGLSupport::end_context()
 {
-    	--_context_ref;
-    	if(_context_ref < 0)
-        	OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Too many contexts destroyed!", "GTKGLSupport::end_context");
-    	if (_context_ref == 0)
-    	{
-		// XX is this enough? (_main_window might not be the current window,
- 		// but we can never be sure the previous rendering window 
-		// even still exists)
-		_main_window->gl_end();
-    	}
+        --_context_ref;
+        if(_context_ref < 0)
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "Too many contexts destroyed!", "GTKGLSupport::end_context");
+        if (_context_ref == 0)
+        {
+        // XX is this enough? (_main_window might not be the current window,
+        // but we can never be sure the previous rendering window 
+        // even still exists)
+        _main_window->gl_end();
+        }
 }
  
 void GTKGLSupport::initialiseExtensions(void)
@@ -209,14 +209,14 @@ bool GTKGLSupport::checkMinGLVersion(const String& v) const
 
 bool GTKGLSupport::checkExtension(const String& ext) const
 {
-	// query_gl_extension needs an active context, doesn't matter which one
-	if (_context_ref == 0)
-		_main_window->gl_begin(_main_context);
+    // query_gl_extension needs an active context, doesn't matter which one
+    if (_context_ref == 0)
+        _main_window->gl_begin(_main_context);
 
-	bool result = Gdk::GL::query_gl_extension(ext.c_str());
+    bool result = Gdk::GL::query_gl_extension(ext.c_str());
 
-	if (_context_ref == 0)
-		_main_window->gl_end();
+    if (_context_ref == 0)
+        _main_window->gl_end();
 }
 
 void* GTKGLSupport::getProcAddress(const String& procname)
@@ -225,6 +225,6 @@ void* GTKGLSupport::getProcAddress(const String& procname)
 }
 
 Glib::RefPtr<const Gdk::GL::Context> GTKGLSupport::getMainContext() const {
-	return _main_context;
+    return _main_context;
 }
 

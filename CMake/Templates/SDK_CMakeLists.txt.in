@@ -195,7 +195,7 @@ if (APPLE)
   if (OGRE_BUILD_PLATFORM_APPLE_IOS)
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/iOS")
   else ()
-    # Set 10.6 as the base SDK by default
+    # Set 10.7 as the base SDK by default
     set(XCODE_ATTRIBUTE_SDKROOT macosx)
     if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
       execute_process(COMMAND xcodebuild -version -sdk "${XCODE_ATTRIBUTE_SDKROOT}" Path | head -n 1 OUTPUT_VARIABLE CMAKE_OSX_SYSROOT)
@@ -204,7 +204,7 @@ if (APPLE)
       set(CMAKE_OSX_SYSROOT macosx)
     endif()
 
-    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.6)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.7)
     set(CMAKE_OSX_ARCHITECTURES ${ARCHS_STANDARD_32_64_BIT})
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/OSX"
       "${CMAKE_CURRENT_SOURCE_DIR}/include/OGRE/RenderSystems/GL"
@@ -213,7 +213,7 @@ if (APPLE)
 endif (APPLE)
 
 if (OGRE_RTShaderSystem_FOUND)
-	add_definitions(-DUSE_RTSHADER_SYSTEM)
+	add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
 	ogre_add_component_include_dir(RTShaderSystem)
 		# Link to RT Shader System if enabled.
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${OGRE_RTShaderSystem_LIBRARIES})

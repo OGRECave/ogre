@@ -34,6 +34,7 @@ Zip=@OGRE_MEDIA_DIR_DBG@/volumeTerrain/volumeTerrainBig.zip
 
 [General]
 FileSystem=@OGRE_MEDIA_DIR_DBG@
+FileSystem=@OGRE_MEDIA_DIR_REL@/HLMS
 
 # Materials for visual tests
 [Tests]

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,15 +35,15 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String GLSLProgramFactory::sLanguageName = "glsl";
     //-----------------------------------------------------------------------
-	GLSLProgramFactory::GLSLProgramFactory(void)
+    GLSLProgramFactory::GLSLProgramFactory(void)
     {
-		mLinkProgramManager = new GLSLLinkProgramManager();
+        mLinkProgramManager = new GLSLLinkProgramManager();
     }
     //-----------------------------------------------------------------------
     GLSLProgramFactory::~GLSLProgramFactory(void)
     {
-		if (mLinkProgramManager)
-			delete mLinkProgramManager;
+        if (mLinkProgramManager)
+            delete mLinkProgramManager;
     }
     //-----------------------------------------------------------------------
     const String& GLSLProgramFactory::getLanguage(void) const
@@ -58,7 +58,7 @@ namespace Ogre {
         return new GLSLProgram(creator, name, handle, group, isManual, loader);
     }
     //-----------------------------------------------------------------------
-	void GLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
+    void GLSLProgramFactory::destroy(HighLevelGpuProgram* prog)
     {
         delete prog;
     }

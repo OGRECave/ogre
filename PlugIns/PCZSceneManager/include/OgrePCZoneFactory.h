@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,54 +30,56 @@ OgrePCZoneFactory.h  -  PCZone Factory & Factory Manager
 begin                : Mon Apr 16 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
 #ifndef PCZONE_FACTORY_H
 #define PCZONE_FACTORY_H
 
-#include <OgreSingleton.h>
-#include "OgrePCZone.h"
+#include "OgrePCZPrerequisites.h"
+#include "OgreSingleton.h"
+#include "OgreIteratorWrappers.h"
 
 namespace Ogre
 {
-	class PCZSceneManager;
+    class PCZSceneManager;
+    class PCZone;
 
-	/// Factory for PCZones
-	class _OgrePCZPluginExport PCZoneFactory : public SceneCtlAllocatedObject
+    /// Factory for PCZones
+    class _OgrePCZPluginExport PCZoneFactory : public SceneCtlAllocatedObject
     {
-	public:
-		PCZoneFactory(const String & typeName);
-		virtual ~PCZoneFactory();
-		virtual bool supportsPCZoneType(const String& zoneType) = 0;
-		virtual PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName) = 0;
-		const String& getFactoryTypeName() const { return mFactoryTypeName; }
-		/// Factory type name
-		String mFactoryTypeName;
+    public:
+        PCZoneFactory(const String & typeName);
+        virtual ~PCZoneFactory();
+        virtual bool supportsPCZoneType(const String& zoneType) = 0;
+        virtual PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName) = 0;
+        const String& getFactoryTypeName() const { return mFactoryTypeName; }
+        /// Factory type name
+        String mFactoryTypeName;
     };
 
-	// Factory for default zone
-	class _OgrePCZPluginExport DefaultZoneFactory : public PCZoneFactory
-	{
-	public:
-		DefaultZoneFactory();
-		virtual ~DefaultZoneFactory();
-		bool supportsPCZoneType(const String& zoneType);
-		PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
-	};
+    // Factory for default zone
+    class _OgrePCZPluginExport DefaultZoneFactory : public PCZoneFactory
+    {
+    public:
+        DefaultZoneFactory();
+        virtual ~DefaultZoneFactory();
+        bool supportsPCZoneType(const String& zoneType);
+        PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
+    };
 
-	// PCZoneFactory manager class
-	class _OgrePCZPluginExport PCZoneFactoryManager : public Singleton<PCZoneFactoryManager>, public SceneCtlAllocatedObject
-	{
-	public:
-		PCZoneFactoryManager();	
-		~PCZoneFactoryManager();
-		void registerPCZoneFactory(PCZoneFactory* factory);
-		void unregisterPCZoneFactory(PCZoneFactory* factory);
-		PCZone* createPCZone(PCZSceneManager * pczsm,
-							 const String& zoneType, 
-							 const String& zoneName);
+    // PCZoneFactory manager class
+    class _OgrePCZPluginExport PCZoneFactoryManager : public Singleton<PCZoneFactoryManager>, public SceneCtlAllocatedObject
+    {
+    public:
+        PCZoneFactoryManager(); 
+        ~PCZoneFactoryManager();
+        void registerPCZoneFactory(PCZoneFactory* factory);
+        void unregisterPCZoneFactory(PCZoneFactory* factory);
+        PCZone* createPCZone(PCZSceneManager * pczsm,
+                             const String& zoneType, 
+                             const String& zoneName);
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
@@ -110,17 +112,17 @@ namespace Ogre
         preventing link errors.
         */
         static PCZoneFactoryManager* getSingletonPtr(void);
-		/* PCZoneFactory Iterator - for querying what types of PCZone
-		factories are available */
-		typedef map<String, PCZoneFactory*>::type PCZoneFactoryMap;
-		typedef MapIterator<PCZoneFactoryMap> PCZoneFactoryIterator;
-		/** Return an iterator over the PCZone factories currently registered */
-		PCZoneFactoryIterator getPCZoneFactoryIterator(void);
+        /* PCZoneFactory Iterator - for querying what types of PCZone
+        factories are available */
+        typedef map<String, PCZoneFactory*>::type PCZoneFactoryMap;
+        typedef MapIterator<PCZoneFactoryMap> PCZoneFactoryIterator;
+        /** Return an iterator over the PCZone factories currently registered */
+        PCZoneFactoryIterator getPCZoneFactoryIterator(void);
 
-	protected:
-		PCZoneFactoryMap mPCZoneFactories;
-		DefaultZoneFactory mDefaultFactory;
-	};
+    protected:
+        PCZoneFactoryMap mPCZoneFactories;
+        DefaultZoneFactory mDefaultFactory;
+    };
 }
 
 #endif

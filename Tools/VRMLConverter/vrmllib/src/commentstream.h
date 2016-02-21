@@ -11,9 +11,9 @@ namespace utillib {
   *       character. */
 class commentstream : public std::istream {
 public:
-	explicit commentstream(std::istream &, char start = '#',
-		char end = '\n');
-	~commentstream();
+    explicit commentstream(std::istream &, char start = '#',
+        char end = '\n');
+    ~commentstream();
 };
 
 } // namespace utillib

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,11 +38,11 @@ namespace Ogre {
         mOwnDimensions(false),
         mUseTexcoordRect(false),
         mTexcoordIndex(0),
-		mPosition(Vector3::ZERO),
+        mPosition(Vector3::ZERO),
         mDirection(Vector3::ZERO),        
         mParentSet(0),
         mColour(ColourValue::White),
-		mRotation(0)
+        mRotation(0)
     {
     }
     //-----------------------------------------------------------------------

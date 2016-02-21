@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ public:
     /// Execute the unbinding functions for this program
     void unbindProgram(void);
     /// Execute the param binding functions for this program
-	void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+    void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
 
     /// Get the assigned GL program id
     GLuint getProgramID(void) const

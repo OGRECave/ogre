@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,18 +43,18 @@ typedef std::map<int, Delegate*> DelegateMap;
 class EventContainer
 {
 public:
-	EventContainer();
-	virtual ~EventContainer();
+    EventContainer();
+    virtual ~EventContainer();
 
-	void subscribe(int eventId, EventHandler handler);
-	void unsubscribe(int eventId, EventHandler handler);
-	
+    void subscribe(int eventId, EventHandler handler);
+    void unsubscribe(int eventId, EventHandler handler);
+    
 protected:
-	void registerEvent(int eventId);
-	void fireEvent(int eventId, EventArgs& args);
-	
+    void registerEvent(int eventId);
+    void fireEvent(int eventId, EventArgs& args);
+    
 private:
-	DelegateMap mDelegates;
+    DelegateMap mDelegates;
 };
 
 #endif // _EVENTCONTAINER_H_

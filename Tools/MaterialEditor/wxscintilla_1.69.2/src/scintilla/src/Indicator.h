@@ -12,11 +12,11 @@
  */
 class Indicator {
 public:
-	int style;
-	ColourPair fore;
-	Indicator() : style(INDIC_PLAIN), fore(ColourDesired(0,0,0)) {
-	}
-	void Draw(Surface *surface, const PRectangle &rc, const PRectangle &rcLine);
+    int style;
+    ColourPair fore;
+    Indicator() : style(INDIC_PLAIN), fore(ColourDesired(0,0,0)) {
+    }
+    void Draw(Surface *surface, const PRectangle &rc, const PRectangle &rcLine);
 };
 
 #endif

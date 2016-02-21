@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,31 +37,31 @@ namespace Ogre {
     class OSXCGLContext: public OSXContext, public GeneralAllocatedObject
     {
     public:
-		OSXCGLContext(CGLContextObj cglContext, CGLPixelFormatObj pixelFormat);
+        OSXCGLContext(CGLContextObj cglContext, CGLPixelFormatObj pixelFormat);
         virtual ~OSXCGLContext();
 
         /** See GLContext */
         virtual void setCurrent();
-		/**
+        /**
          * This is called before another context is made current. By default,
          * nothing is done here.
          */
         virtual void endCurrent();
-		/** Create a new context based on the same window/pbuffer as this
-			context - mostly useful for additional threads.
-		@note The caller is responsible for deleting the returned context.
-		*/
-		virtual GLContext* clone() const;
-		/**
-		 * Return value will be "CGL"
-		 */
-		virtual String getContextType();
+        /** Create a new context based on the same window/pbuffer as this
+            context - mostly useful for additional threads.
+        @note The caller is responsible for deleting the returned context.
+        */
+        virtual GLContext* clone() const;
+        /**
+         * Return value will be "CGL"
+         */
+        virtual String getContextType();
 
-		/** Grab the CGLContext if it exists */
-		CGLContextObj getContext() { return mCGLContext; }
+        /** Grab the CGLContext if it exists */
+        CGLContextObj getContext() { return mCGLContext; }
 
-	private:
-		CGLContextObj mCGLContext;
+    private:
+        CGLContextObj mCGLContext;
         CGLPixelFormatObj mPixelFormat;
     };
 }

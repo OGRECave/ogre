@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,8 @@ email                : ericc@xenopi.com
 -----------------------------------------------------------------------------
 */
 
-#include <OgreRoot.h>
+#include "OgreOctreeZonePrerequisites.h"
+#include "OgreRoot.h"
 #include "OgreOctreeZonePlugin.h"
 
 #ifndef OGRE_STATIC_LIB
@@ -52,8 +53,8 @@ namespace Ogre
     }
     extern "C" void _OgreOctreeZonePluginExport dllStopPlugin( void )
     {
-	    Root::getSingleton().uninstallPlugin(OZPlugin);
-	    OGRE_DELETE OZPlugin;
+        Root::getSingleton().uninstallPlugin(OZPlugin);
+        OGRE_DELETE OZPlugin;
     }
 }
 

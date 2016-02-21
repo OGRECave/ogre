@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,49 +28,50 @@ THE SOFTWARE.
 
 #include "OgreOctreePlugin.h"
 #include "OgreRoot.h"
+#include "OgreOctreeSceneManager.h"
 
 namespace Ogre 
 {
-	const String sPluginName = "Octree Scene Manager";
-	//---------------------------------------------------------------------
-	OctreePlugin::OctreePlugin()
-		:mOctreeSMFactory(0)
-	{
+    const String sPluginName = "Octree Scene Manager";
+    //---------------------------------------------------------------------
+    OctreePlugin::OctreePlugin()
+        :mOctreeSMFactory(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	const String& OctreePlugin::getName() const
-	{
-		return sPluginName;
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::install()
-	{
-		// Create objects
-		mOctreeSMFactory = OGRE_NEW OctreeSceneManagerFactory();
+    }
+    //---------------------------------------------------------------------
+    const String& OctreePlugin::getName() const
+    {
+        return sPluginName;
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::install()
+    {
+        // Create objects
+        mOctreeSMFactory = OGRE_NEW OctreeSceneManagerFactory();
 
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::initialise()
-	{
-		// Register
-		Root::getSingleton().addSceneManagerFactory(mOctreeSMFactory);
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::shutdown()
-	{
-		// Unregister
-		Root::getSingleton().removeSceneManagerFactory(mOctreeSMFactory);
-	}
-	//---------------------------------------------------------------------
-	void OctreePlugin::uninstall()
-	{
-		// destroy 
-		OGRE_DELETE mOctreeSMFactory;
-		mOctreeSMFactory = 0;
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::initialise()
+    {
+        // Register
+        Root::getSingleton().addSceneManagerFactory(mOctreeSMFactory);
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::shutdown()
+    {
+        // Unregister
+        Root::getSingleton().removeSceneManagerFactory(mOctreeSMFactory);
+    }
+    //---------------------------------------------------------------------
+    void OctreePlugin::uninstall()
+    {
+        // destroy 
+        OGRE_DELETE mOctreeSMFactory;
+        mOctreeSMFactory = 0;
 
 
-	}
+    }
 
 
 }

@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -92,7 +92,7 @@ namespace Ogre {
         }
     }
 
-    PixelBox GLESHardwarePixelBuffer::lockImpl(const Image::Box lockBox,  LockOptions options)
+    PixelBox GLESHardwarePixelBuffer::lockImpl(const Image::Box &lockBox,  LockOptions options)
     {
         allocateBuffer();
         if (options != HardwareBuffer::HBL_DISCARD &&
@@ -469,12 +469,12 @@ namespace Ogre {
     // @author W.J. van der Laan
     void GLESTextureBuffer::blitFromTexture(GLESTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox)
     {
-		if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FBO) == false)
-		{
-			// the following code depends on FBO support, it crashes if FBO is not supported.
-			// TODO - write PBUFFER version of this function or a version that doesn't require FBO
-			return; // for now - do nothing.
-		}
+        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_FBO) == false)
+        {
+            // the following code depends on FBO support, it crashes if FBO is not supported.
+            // TODO - write PBUFFER version of this function or a version that doesn't require FBO
+            return; // for now - do nothing.
+        }
 
 //        std::cerr << "GLESTextureBuffer::blitFromTexture " <<
 //        src->mTextureID << ":" << srcBox.left << "," << srcBox.top << "," << srcBox.right << "," << srcBox.bottom << " " << 
@@ -722,7 +722,7 @@ namespace Ogre {
         GL_CHECK_ERROR;
 
         // GL texture buffer
-        GLESTextureBuffer tex(StringUtil::BLANK, target, id, width, height, format, src.format,
+        GLESTextureBuffer tex(BLANKSTRING, target, id, width, height, format, src.format,
                               0, 0, (Usage)(TU_AUTOMIPMAP|HBU_STATIC_WRITE_ONLY), false, false, 0);
         
         // Upload data to 0,0,0 in temporary texture

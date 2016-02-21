@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,23 +42,23 @@ using Ogre::String;
 class MaterialDescriptor
 {
 public:
-	MaterialDescriptor();
-	MaterialDescriptor(const String& name);
-	virtual ~MaterialDescriptor();
-	
-	const String& getName() const;
-	const String& getScript() const;
-	MaterialController* getMaterialController();
-	MaterialPtr& getMaterial();
-	void setMaterial(MaterialPtr& mp);
-		
-	void OnRootInitialized(EventArgs& args);
-	void OnRootShutdown(EventArgs& args);
-	
+    MaterialDescriptor();
+    MaterialDescriptor(const String& name);
+    virtual ~MaterialDescriptor();
+    
+    const String& getName() const;
+    const String& getScript() const;
+    MaterialController* getMaterialController();
+    MaterialPtr& getMaterial();
+    void setMaterial(MaterialPtr& mp);
+        
+    void OnRootInitialized(EventArgs& args);
+    void OnRootShutdown(EventArgs& args);
+    
 protected:
-	String mName;
-	String mScript;
-	MaterialController* mMaterialController;
+    String mName;
+    String mScript;
+    MaterialController* mMaterialController;
 };
 
 #endif _MATERIALDESCRIPTOR_H_

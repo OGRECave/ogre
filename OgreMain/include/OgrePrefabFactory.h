@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,40 +33,40 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Resources
-	*  @{
-	*/
-	/** A factory class that can create various mesh prefabs. 
-	@remarks
-		This class is used by OgreMeshManager to offload the loading of various prefab types 
-		to a central location.
-	*/
-	class _OgreExport PrefabFactory
-	{
-	public:
-		/** If the given mesh has a known prefab resource name (e.g "Prefab_Plane") 
-		    then this prefab will be created as a submesh of the given mesh.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Resources
+    *  @{
+    */
+    /** A factory class that can create various mesh prefabs. 
+    @remarks
+        This class is used by OgreMeshManager to offload the loading of various prefab types 
+        to a central location.
+    */
+    class _OgreExport PrefabFactory
+    {
+    public:
+        /** If the given mesh has a known prefab resource name (e.g "Prefab_Plane") 
+            then this prefab will be created as a submesh of the given mesh.
 
-			@param mesh The mesh that the potential prefab will be created in.
-			@return true if a prefab has been created, otherwise false.
-		*/
-		static bool createPrefab(Mesh* mesh);
+            @param mesh The mesh that the potential prefab will be created in.
+            @return true if a prefab has been created, otherwise false.
+        */
+        static bool createPrefab(Mesh* mesh);
 
-	private:
-		/// Creates a plane as a submesh of the given mesh
-		static void createPlane(Mesh* mesh);
+    private:
+        /// Creates a plane as a submesh of the given mesh
+        static void createPlane(Mesh* mesh);
 
-		/// Creates a 100x100x100 cube as a submesh of the given mesh
-		static void createCube(Mesh* mesh);
+        /// Creates a 100x100x100 cube as a submesh of the given mesh
+        static void createCube(Mesh* mesh);
 
-		/// Creates a sphere with a diameter of 100 units as a submesh of the given mesh
-		static void createSphere(Mesh* mesh);
-	};
-	/** @} */
-	/** @} */
+        /// Creates a sphere with a diameter of 100 units as a submesh of the given mesh
+        static void createSphere(Mesh* mesh);
+    };
+    /** @} */
+    /** @} */
 
 } // namespace Ogre
 

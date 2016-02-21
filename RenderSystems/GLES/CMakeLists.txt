@@ -40,7 +40,7 @@ if (WIN32)
 # Add system specific settings
 elseif (APPLE)
   file(GLOB PLATFORM_HEADERS "include/EAGL/*.h")
-  file(GLOB PLATFORM_SOURCES "include/EAGL/*.mm")
+  file(GLOB PLATFORM_SOURCES "src/EAGL/*.mm")
 
   include_directories(src/EAGL include/EAGL)
   link_directories(${OPENGLES_LIBRARY_PATH})
@@ -51,7 +51,7 @@ elseif(ANDROID)
 
   include_directories(src/EGL/Android include/EGL/Android)
   link_directories(${OPENGLES_LIBRARY_PATH})
-  set(PLATFORM_HEADER_INSTALL "ANDROID")
+  set(PLATFORM_HEADER_INSTALL "Android")
 elseif (UNIX)
   file(GLOB PLATFORM_HEADERS "include/EGL/X11/*.h" "include/EGL/*.h")
   file(GLOB PLATFORM_SOURCES "src/EGL/X11/*.cpp" "src/EGL/*.cpp")
@@ -68,7 +68,7 @@ include_directories(
   ${OPENGLES_INCLUDE_DIR}
 )
 
-ogre_add_library(RenderSystem_GLES ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
+ogre_add_library_to_folder(RenderSystems RenderSystem_GLES ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
 target_link_libraries(RenderSystem_GLES OgreMain ${OPENGLES_LIBRARIES} ${PLATFORM_LIBS})
 
 if (NOT OGRE_STATIC)

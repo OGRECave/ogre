@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,12 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 #include "OgreMaterialManager.h"
-#include "OgreTexture.h"
 #include "OgreRenderQueue.h"
 #include "OgreCompositionTechnique.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
+
     /** \addtogroup Core
     *  @{
     */
@@ -91,6 +91,10 @@ namespace Ogre {
             */
             virtual void notifyResourcesCreated(bool forResizeOnly);
 
+            /** Notification before resources have been destructed.
+              @param resizeOnly Was the creation because the viewport was resized?
+             */
+            virtual void notifyResourcesReleased(bool forResizeOnly);
         };
         /** Specific render system operation. A render target operation does special operations
             between render queues like rendering a quad, clearing the frame buffer or 
@@ -268,7 +272,7 @@ namespace Ogre {
         void setScheme(const String& schemeName, bool reuseTextures = true);
 
         /// Returns the name of the scheme this compositor is using.
-        const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : StringUtil::BLANK; }
+        const String& getScheme() const { return mTechnique ? mTechnique->getSchemeName() : BLANKSTRING; }
 
         /** Notify this instance that the primary surface has been resized. 
         @remarks
@@ -304,6 +308,10 @@ namespace Ogre {
         /** Notify listeners of a material render.
         */
         void _fireNotifyResourcesCreated(bool forResizeOnly);
+        
+        /** Notify listeners ressources
+        */
+        void _fireNotifyResourcesReleased(bool forResizeOnly);
     private:
         /// Compositor of which this is an instance.
         Compositor *mCompositor;

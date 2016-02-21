@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -22,17 +22,17 @@ same license as the rest of the engine.
 
 inline Ogre::String operator +(const Ogre::String& l,const CEGUI::String& o)
 {
-	return l+o.c_str();
+    return l+o.c_str();
 }
 /*
 inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 {
-	return l+o.c_str();
+    return l+o.c_str();
 }
 */
 
 /*************************************************************************
-	CompositorDemo_FrameListener methods that handle all input for this Compositor demo.
+    CompositorDemo_FrameListener methods that handle all input for this Compositor demo.
 *************************************************************************/
 
     CompositorDemo_FrameListener::CompositorDemo_FrameListener(CompositorDemo* main)
@@ -66,41 +66,41 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
         , mMoveBck(false)
         , mMoveLeft(false)
         , mMoveRight(false)
-		, mSpinny(0)
+        , mSpinny(0)
         , mCompositorSelectorViewManager(0)
-		, mMouse(0)
-		, mKeyboard(0)
+        , mMouse(0)
+        , mKeyboard(0)
 
     {
 
         Ogre::Root::getSingleton().addFrameListener(this);
 
         // using buffered input
-		OIS::ParamList pl;
-		size_t windowHnd = 0;
-		std::ostringstream windowHndStr;
+        OIS::ParamList pl;
+        size_t windowHnd = 0;
+        std::ostringstream windowHndStr;
 
-		mMain->getRenderWindow()->getCustomAttribute("WINDOW", &windowHnd);
-		windowHndStr << windowHnd;
-		pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+        mMain->getRenderWindow()->getCustomAttribute("WINDOW", &windowHnd);
+        windowHndStr << windowHnd;
+        pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
 
-		mInputManager = OIS::InputManager::createInputSystem( pl );
+        mInputManager = OIS::InputManager::createInputSystem( pl );
 
-		//Create all devices (We only catch joystick exceptions here, as, most people have Key/Mouse)
-		mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject( OIS::OISKeyboard, true ));
-		mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject( OIS::OISMouse, true ));
+        //Create all devices (We only catch joystick exceptions here, as, most people have Key/Mouse)
+        mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject( OIS::OISKeyboard, true ));
+        mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject( OIS::OISMouse, true ));
 
-		unsigned int width, height, depth;
-		int left, top;
-		mMain->getRenderWindow()->getMetrics(width, height, depth, left, top);
+        unsigned int width, height, depth;
+        int left, top;
+        mMain->getRenderWindow()->getMetrics(width, height, depth, left, top);
 
-		//Set Mouse Region.. if window resizes, we should alter this to reflect as well
-		const OIS::MouseState &ms = mMouse->getMouseState();
-		ms.width = width;
-		ms.height = height;
+        //Set Mouse Region.. if window resizes, we should alter this to reflect as well
+        const OIS::MouseState &ms = mMouse->getMouseState();
+        ms.width = width;
+        ms.height = height;
 
-		mMouse->setEventCallback(this);
-		mKeyboard->setEventCallback(this);
+        mMouse->setEventCallback(this);
+        mKeyboard->setEventCallback(this);
 
         mGuiRenderer = CEGUI::System::getSingleton().getRenderer();
 
@@ -110,22 +110,22 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
         mGuiWorst = CEGUI::WindowManager::getSingleton().getWindow("OPWorstFPS");
         mGuiTris  = CEGUI::WindowManager::getSingleton().getWindow("OPTriCount");
         mGuiDbg   = CEGUI::WindowManager::getSingleton().getWindow("OPDebugMsg");
-        mRoot	  = CEGUI::WindowManager::getSingleton().getWindow("root");
+        mRoot     = CEGUI::WindowManager::getSingleton().getWindow("root");
 
         registerCompositors();
-		initDebugRTTWindow();
+        initDebugRTTWindow();
         connectEventHandlers();
     }
 //--------------------------------------------------------------------------
     CompositorDemo_FrameListener::~CompositorDemo_FrameListener()
     {
-		if(mInputManager)
-		{
-			mInputManager->destroyInputObject(mKeyboard);
-			mInputManager->destroyInputObject(mMouse);
-			OIS::InputManager::destroyInputSystem(mInputManager);
-			mInputManager = 0;
-		}
+        if(mInputManager)
+        {
+            mInputManager->destroyInputObject(mKeyboard);
+            mInputManager->destroyInputObject(mMouse);
+            OIS::InputManager::destroyInputSystem(mInputManager);
+            mInputManager = 0;
+        }
 
         delete mCompositorSelectorViewManager;
     }
@@ -147,11 +147,11 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
 //--------------------------------------------------------------------------
     bool CompositorDemo_FrameListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
     {
-	mMouse->capture();
-	mKeyboard->capture();
+    mMouse->capture();
+    mKeyboard->capture();
 
-	if( mMain->getRenderWindow()->isClosed() )
-		return false;
+    if( mMain->getRenderWindow()->isClosed() )
+        return false;
 
         if (mQuit)
             return false;
@@ -187,8 +187,8 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
                     Ogre::StringConverter::toString(++mNumScreenShots) + ".png");
             }
 
-			if (mSpinny)
-				mSpinny->yaw(Ogre::Degree(10 * evt.timeSinceLastFrame));
+            if (mSpinny)
+                mSpinny->yaw(Ogre::Degree(10 * evt.timeSinceLastFrame));
 
             return true;
         }
@@ -198,71 +198,71 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
     bool CompositorDemo_FrameListener::mouseMoved (const OIS::MouseEvent &e)
     {
         CEGUI::System::getSingleton().injectMouseMove( e.state.X.rel, e.state.Y.rel );
-		CEGUI::System::getSingleton().injectMouseWheelChange(e.state.Z.rel);
-		return true;
+        CEGUI::System::getSingleton().injectMouseWheelChange(e.state.Z.rel);
+        return true;
     }
 
 //--------------------------------------------------------------------------
-	bool CompositorDemo_FrameListener::keyPressed (const OIS::KeyEvent &e)
+    bool CompositorDemo_FrameListener::keyPressed (const OIS::KeyEvent &e)
     {
         // give 'quitting' priority
-		if (e.key == OIS::KC_ESCAPE)
+        if (e.key == OIS::KC_ESCAPE)
         {
             mQuit = true;
             return false;
         }
 
-		if (e.key == OIS::KC_V)
-			mMain->getRenderWindow()->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0,1,0));
+        if (e.key == OIS::KC_V)
+            mMain->getRenderWindow()->getViewport(0)->setBackgroundColour(Ogre::ColourValue(0,1,0));
 
         if (e.key == OIS::KC_SYSRQ )
         {
-			Ogre::StringStream ss;
+            Ogre::StringStream ss;
             ss << "screenshot_" << ++mNumScreenShots << ".png";
             mMain->getRenderWindow()->writeContentsToFile(ss.str());
             mDebugText = "Saved: " + ss.str();
-			//mTimeUntilNextToggle = 0.5;
+            //mTimeUntilNextToggle = 0.5;
         }
 
         // do event injection
         CEGUI::System& cegui = CEGUI::System::getSingleton();
         cegui.injectKeyDown(e.key);
-		cegui.injectChar(e.text);
-		return true;
+        cegui.injectChar(e.text);
+        return true;
     }
 
 //--------------------------------------------------------------------------
     bool CompositorDemo_FrameListener::keyReleased (const OIS::KeyEvent &e)
     {
         CEGUI::System::getSingleton().injectKeyUp(e.key);
-		return true;
+        return true;
     }
 
 //--------------------------------------------------------------------------
-	bool CompositorDemo_FrameListener::mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id)
+    bool CompositorDemo_FrameListener::mousePressed (const OIS::MouseEvent &e, OIS::MouseButtonID id)
     {
         CEGUI::System::getSingleton().injectMouseButtonDown(convertOISButtonToCegui(id));
-		return true;
-	}
+        return true;
+    }
 
 //--------------------------------------------------------------------------
-	bool CompositorDemo_FrameListener::mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id)
+    bool CompositorDemo_FrameListener::mouseReleased (const OIS::MouseEvent &e, OIS::MouseButtonID id)
     {
         CEGUI::System::getSingleton().injectMouseButtonUp(convertOISButtonToCegui(id));
-		return true;
+        return true;
     }
 
 //--------------------------------------------------------------------------
     CEGUI::MouseButton CompositorDemo_FrameListener::convertOISButtonToCegui(int ois_button_id)
     {
         switch (ois_button_id)
-		{
-		case 0: return CEGUI::LeftButton;
-		case 1: return CEGUI::RightButton;
-		case 2:	return CEGUI::MiddleButton;
-		case 3: return CEGUI::X1Button;
-		default: return CEGUI::LeftButton;
-		}
+        {
+        case 0: return CEGUI::LeftButton;
+        case 1: return CEGUI::RightButton;
+        case 2: return CEGUI::MiddleButton;
+        case 3: return CEGUI::X1Button;
+        default: return CEGUI::LeftButton;
+        }
     }
 
 //--------------------------------------------------------------------------
@@ -457,7 +457,7 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
         // get the item text and tell compositor manager to set enable state
         Ogre::CompositorManager::getSingleton().setCompositorEnabled(mMain->getRenderWindow()->getViewport(0),
             mCompositorSelectorViewManager->getItemSelectorText(index), state);
-		updateDebugRTTWindow();
+        updateDebugRTTWindow();
     }
 //-----------------------------------------------------------------------------------
     void CompositorDemo_FrameListener::registerCompositors(void)
@@ -479,118 +479,118 @@ inline CEGUI::String operator +(const CEGUI::String& l,const Ogre::String& o)
             // Don't add base Ogre/Scene compositor to view
             if (compositorName == "Ogre/Scene")
                 continue;
-			// Don't add the deferred shading compositors, thats a different demo.
-			if (Ogre::StringUtil::startsWith(compositorName, "DeferredShading", false))
-				continue;
+            // Don't add the deferred shading compositors, thats a different demo.
+            if (Ogre::StringUtil::startsWith(compositorName, "DeferredShading", false))
+                continue;
 
             mCompositorSelectorViewManager->addItemSelector(compositorName);
-			int addPosition = -1;
-			if (compositorName == "HDR")
-			{
-				// HDR must be first in the chain
-				addPosition = 0;
-			}
-			try 
-			{
-				Ogre::CompositorInstance *instance = Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
-				Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
-			} catch (...) {
-			}
+            int addPosition = -1;
+            if (compositorName == "HDR")
+            {
+                // HDR must be first in the chain
+                addPosition = 0;
+            }
+            try 
+            {
+                Ogre::CompositorInstance *instance = Ogre::CompositorManager::getSingleton().addCompositor(vp, compositorName, addPosition);
+                Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, compositorName, false);
+            } catch (...) {
+            }
             
         }
     }
-	//---------------------------------------------------------------------
-	void CompositorDemo_FrameListener::initDebugRTTWindow(void)
-	{
-		mDebugRTTStaticImage = CEGUI::WindowManager::getSingleton().getWindow((CEGUI::utf8*)"DebugRTTImage");
-		mDebugRTTListbox = static_cast<CEGUI::Listbox*>(
-			CEGUI::WindowManager::getSingleton().getWindow((CEGUI::utf8*)"DebugRTTListbox"));
-		mDebugRTTListbox->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
-			CEGUI::Event::Subscriber(&CompositorDemo_FrameListener::handleRttSelection, this));
-	}
-	//---------------------------------------------------------------------
-	bool CompositorDemo_FrameListener::handleRttSelection(const CEGUI::EventArgs& e)
-	{
-		if (mDebugRTTListbox->getSelectedCount() > 0)
-		{
-			// image set is in user data
-			CEGUI::Imageset* imgSet = (CEGUI::Imageset*)mDebugRTTListbox->getFirstSelectedItem()->getUserData();
+    //---------------------------------------------------------------------
+    void CompositorDemo_FrameListener::initDebugRTTWindow(void)
+    {
+        mDebugRTTStaticImage = CEGUI::WindowManager::getSingleton().getWindow((CEGUI::utf8*)"DebugRTTImage");
+        mDebugRTTListbox = static_cast<CEGUI::Listbox*>(
+            CEGUI::WindowManager::getSingleton().getWindow((CEGUI::utf8*)"DebugRTTListbox"));
+        mDebugRTTListbox->subscribeEvent(CEGUI::Listbox::EventSelectionChanged,
+            CEGUI::Event::Subscriber(&CompositorDemo_FrameListener::handleRttSelection, this));
+    }
+    //---------------------------------------------------------------------
+    bool CompositorDemo_FrameListener::handleRttSelection(const CEGUI::EventArgs& e)
+    {
+        if (mDebugRTTListbox->getSelectedCount() > 0)
+        {
+            // image set is in user data
+            CEGUI::Imageset* imgSet = (CEGUI::Imageset*)mDebugRTTListbox->getFirstSelectedItem()->getUserData();
 
-			mDebugRTTStaticImage->setProperty("Image",
+            mDebugRTTStaticImage->setProperty("Image",
                 CEGUI::PropertyHelper::imageToString(&imgSet->getImage("RttImage")));
 
-		}
-		else
-		{
-			mDebugRTTStaticImage->setProperty("Image", "");
+        }
+        else
+        {
+            mDebugRTTStaticImage->setProperty("Image", "");
 
-		}
-		return true;
-	}
-	//---------------------------------------------------------------------
-	void CompositorDemo_FrameListener::updateDebugRTTWindow(void)
-	{
-		// Clear listbox
-		mDebugRTTListbox->resetList();
-		// Clear imagesets
-		mDebugRTTStaticImage->setProperty("Image", "");
-		for (ImageSetList::iterator isIt = mDebugRTTImageSets.begin();
-			isIt != mDebugRTTImageSets.end(); ++isIt)
-		{
-			CEGUI::ImagesetManager::getSingleton().destroyImageset(*isIt);
-		}
-		mDebugRTTImageSets.clear();
-		Ogre::set<Ogre::String>::type uniqueTextureNames;
-		// Add an entry for each render texture for all active compositors
-		Ogre::Viewport* vp = mMain->getRenderWindow()->getViewport(0);
-		Ogre::CompositorChain* chain = Ogre::CompositorManager::getSingleton().getCompositorChain(vp);
-		Ogre::CompositorChain::InstanceIterator it = chain->getCompositors();
-		while (it.hasMoreElements())
-		{
-			Ogre::CompositorInstance* inst = it.getNext();
-			if (inst->getEnabled())
-			{
-				Ogre::CompositionTechnique::TextureDefinitionIterator texIt =
-					inst->getTechnique()->getTextureDefinitionIterator();
-				while (texIt.hasMoreElements())
-				{
-					Ogre::CompositionTechnique::TextureDefinition* texDef = texIt.getNext();
+        }
+        return true;
+    }
+    //---------------------------------------------------------------------
+    void CompositorDemo_FrameListener::updateDebugRTTWindow(void)
+    {
+        // Clear listbox
+        mDebugRTTListbox->resetList();
+        // Clear imagesets
+        mDebugRTTStaticImage->setProperty("Image", "");
+        for (ImageSetList::iterator isIt = mDebugRTTImageSets.begin();
+            isIt != mDebugRTTImageSets.end(); ++isIt)
+        {
+            CEGUI::ImagesetManager::getSingleton().destroyImageset(*isIt);
+        }
+        mDebugRTTImageSets.clear();
+        Ogre::set<Ogre::String>::type uniqueTextureNames;
+        // Add an entry for each render texture for all active compositors
+        Ogre::Viewport* vp = mMain->getRenderWindow()->getViewport(0);
+        Ogre::CompositorChain* chain = Ogre::CompositorManager::getSingleton().getCompositorChain(vp);
+        Ogre::CompositorChain::InstanceIterator it = chain->getCompositors();
+        while (it.hasMoreElements())
+        {
+            Ogre::CompositorInstance* inst = it.getNext();
+            if (inst->getEnabled())
+            {
+                Ogre::CompositionTechnique::TextureDefinitionIterator texIt =
+                    inst->getTechnique()->getTextureDefinitionIterator();
+                while (texIt.hasMoreElements())
+                {
+                    Ogre::CompositionTechnique::TextureDefinition* texDef = texIt.getNext();
 
-					// Get instance name of texture (NB only index 0 if MRTs for now)
-					const Ogre::String& instName = inst->getTextureInstanceName(texDef->name, 0);
-					// Create CEGUI texture from name of OGRE texture
-					CEGUI::Texture* tex = mMain->getGuiRenderer()->createTexture(instName.c_str());
-					// Create imageset
-					// Note that if we use shared textures in compositor, the same texture name
-					// will occur more than once, so we have to cater for this
-					if (uniqueTextureNames.find(instName) == uniqueTextureNames.end())
-					{
-						CEGUI::Imageset* imgSet =
-							CEGUI::ImagesetManager::getSingleton().createImageset(
-								instName.c_str(), tex);
-						mDebugRTTImageSets.push_back(imgSet);
-						imgSet->defineImage((CEGUI::utf8*)"RttImage",
-							CEGUI::Point(0.0f, 0.0f),
-							CEGUI::Size(tex->getWidth(), tex->getHeight()),
-							CEGUI::Point(0.0f,0.0f));
-
-
-						CEGUI::ListboxTextItem *item = new CEGUI::ListboxTextItem(texDef->name.c_str(), 0, imgSet);
-						item->setSelectionBrushImage("TaharezLook", "ListboxSelectionBrush");
-						item->setSelectionColours(CEGUI::colour(0,0,1));
-						mDebugRTTListbox->addItem(item);
-
-						uniqueTextureNames.insert(instName);
-					}
-
-				}
-
-			}
-
-		}
+                    // Get instance name of texture (NB only index 0 if MRTs for now)
+                    const Ogre::String& instName = inst->getTextureInstanceName(texDef->name, 0);
+                    // Create CEGUI texture from name of OGRE texture
+                    CEGUI::Texture* tex = mMain->getGuiRenderer()->createTexture(instName.c_str());
+                    // Create imageset
+                    // Note that if we use shared textures in compositor, the same texture name
+                    // will occur more than once, so we have to cater for this
+                    if (uniqueTextureNames.find(instName) == uniqueTextureNames.end())
+                    {
+                        CEGUI::Imageset* imgSet =
+                            CEGUI::ImagesetManager::getSingleton().createImageset(
+                                instName.c_str(), tex);
+                        mDebugRTTImageSets.push_back(imgSet);
+                        imgSet->defineImage((CEGUI::utf8*)"RttImage",
+                            CEGUI::Point(0.0f, 0.0f),
+                            CEGUI::Size(tex->getWidth(), tex->getHeight()),
+                            CEGUI::Point(0.0f,0.0f));
 
 
+                        CEGUI::ListboxTextItem *item = new CEGUI::ListboxTextItem(texDef->name.c_str(), 0, imgSet);
+                        item->setSelectionBrushImage("TaharezLook", "ListboxSelectionBrush");
+                        item->setSelectionColours(CEGUI::colour(0,0,1));
+                        mDebugRTTListbox->addItem(item);
 
-	}
+                        uniqueTextureNames.insert(instName);
+                    }
+
+                }
+
+            }
+
+        }
+
+
+
+    }
 
 

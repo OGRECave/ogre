@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,7 @@ THE SOFTWARE.
 #define __Animation_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreString.h"
 #include "OgreIteratorWrappers.h"
-#include "OgreAnimable.h"
 #include "OgreAnimationTrack.h"
 #include "OgreAnimationState.h"
 #include "OgreHeaderPrefix.h"
@@ -487,7 +485,7 @@ namespace Ogre {
         @param keyframeTime The time corresponding to the base keyframe, if any
         @param baseAnimName Optionally a different base animation (must contain the same tracks)
         */
-        void setUseBaseKeyFrame(bool useBaseKeyFrame, Real keyframeTime = 0.0f, const String& baseAnimName = StringUtil::BLANK);
+        void setUseBaseKeyFrame(bool useBaseKeyFrame, Real keyframeTime = 0.0f, const String& baseAnimName = BLANKSTRING);
         /** Whether a base keyframe is being used for this Animation. */
         bool getUseBaseKeyFrame() const;
         /** If a base keyframe is being used, the time of that keyframe. */

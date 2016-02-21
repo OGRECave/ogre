@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,66 +38,66 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     void reportGLSLError(GLenum glErr, const String& ogreMethod, const String& errorTextPrefix, const GLhandleARB obj, const bool forceInfoLog, const bool forceException)
     {
-		bool errorsFound = false;
-		String msg = errorTextPrefix;
+        bool errorsFound = false;
+        String msg = errorTextPrefix;
 
-		// get all the GL errors
-		while (glErr != GL_NO_ERROR)
+        // get all the GL errors
+        while (glErr != GL_NO_ERROR)
         {
-			const char* glerrStr = (const char*)gluErrorString(glErr);
-			if (glerrStr)
-			{
-				msg += String(glerrStr);
-			}
-			glErr = glGetError();
-			errorsFound = true;
+            const char* glerrStr = (const char*)gluErrorString(glErr);
+            if (glerrStr)
+            {
+                msg += String(glerrStr);
+            }
+            glErr = glGetError();
+            errorsFound = true;
         }
 
 
-		// if errors were found then put them in the Log and raise and exception
-		if (errorsFound || forceInfoLog)
-		{
-			// if shader or program object then get the log message and send to the log manager
-			msg += logObjectInfo( msg, obj );
+        // if errors were found then put them in the Log and raise and exception
+        if (errorsFound || forceInfoLog)
+        {
+            // if shader or program object then get the log message and send to the log manager
+            msg += logObjectInfo( msg, obj );
 
             if (forceException) 
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msg, ogreMethod);
-			}
-		}
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msg, ogreMethod);
+            }
+        }
     }
 
     //-----------------------------------------------------------------------------
-	String logObjectInfo(const String& msg, const GLhandleARB obj)
-	{
-		String logMessage = msg;
+    String logObjectInfo(const String& msg, const GLhandleARB obj)
+    {
+        String logMessage = msg;
 
-		if (obj > 0)
-		{
-			GLint infologLength = 0;
+        if (obj > 0)
+        {
+            GLint infologLength = 0;
 
             if(glIsProgram(obj))
                 glValidateProgram(obj);
 
-			glGetObjectParameterivARB(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, &infologLength);
+            glGetObjectParameterivARB(obj, GL_OBJECT_INFO_LOG_LENGTH_ARB, &infologLength);
 
-			if (infologLength > 0)
-			{
-				GLint charsWritten  = 0;
+            if (infologLength > 0)
+            {
+                GLint charsWritten  = 0;
 
-				GLcharARB * infoLog = new GLcharARB[infologLength];
+                GLcharARB * infoLog = new GLcharARB[infologLength];
 
-				glGetInfoLogARB(obj, infologLength, &charsWritten, infoLog);
-				logMessage += String(infoLog);
-				LogManager::getSingleton().logMessage(logMessage);
+                glGetInfoLogARB(obj, infologLength, &charsWritten, infoLog);
+                logMessage += String(infoLog);
+                LogManager::getSingleton().logMessage(logMessage);
 
-				delete [] infoLog;
-			}
-		}
+                delete [] infoLog;
+            }
+        }
 
-		return logMessage;
+        return logMessage;
 
-	}
+    }
 
     } // namespace GLSL
 } // namespace Ogre

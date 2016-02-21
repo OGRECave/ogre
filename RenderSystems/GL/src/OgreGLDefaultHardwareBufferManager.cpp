@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,166 +30,167 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	GLDefaultHardwareVertexBuffer::GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
-																 HardwareBuffer::Usage usage)
-	: HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
-	{
+    GLDefaultHardwareVertexBuffer::GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, 
+                                                                 HardwareBuffer::Usage usage)
+    : HardwareVertexBuffer(0, vertexSize, numVertices, usage, true, false) // always software, never shadowed
+    {
         mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
-	}
-	//-----------------------------------------------------------------------
-	GLDefaultHardwareVertexBuffer::GLDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
-		HardwareBuffer::Usage usage)
+    }
+    //-----------------------------------------------------------------------
+    GLDefaultHardwareVertexBuffer::GLDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
+        HardwareBuffer::Usage usage)
         : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, true, false) // always software, never shadowed
-	{
+    {
         mData = static_cast<unsigned char*>(OGRE_MALLOC_SIMD(mSizeInBytes, MEMCATEGORY_GEOMETRY));
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
     GLDefaultHardwareVertexBuffer::~GLDefaultHardwareVertexBuffer()
-	{
-		OGRE_FREE_SIMD(mData, MEMCATEGORY_GEOMETRY);
-	}
-	//-----------------------------------------------------------------------
+    {
+        OGRE_FREE_SIMD(mData, MEMCATEGORY_GEOMETRY);
+    }
+    //-----------------------------------------------------------------------
     void* GLDefaultHardwareVertexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
-	{
+    {
         // Only for use internally, no 'locking' as such
-		return mData + offset;
-	}
-	//-----------------------------------------------------------------------
-	void GLDefaultHardwareVertexBuffer::unlockImpl(void)
-	{
+        return mData + offset;
+    }
+    //-----------------------------------------------------------------------
+    void GLDefaultHardwareVertexBuffer::unlockImpl(void)
+    {
         // Nothing to do
-	}
-	//-----------------------------------------------------------------------
-    void* GLDefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options)
-	{
+    }
+    //-----------------------------------------------------------------------
+    void* GLDefaultHardwareVertexBuffer::lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt)
+    {
         mIsLocked = true;
-		return mData + offset;
-	}
-	//-----------------------------------------------------------------------
-	void GLDefaultHardwareVertexBuffer::unlock(void)
-	{
+        return mData + offset;
+    }
+    //-----------------------------------------------------------------------
+    void GLDefaultHardwareVertexBuffer::unlock(void)
+    {
         mIsLocked = false;
         // Nothing to do
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
     void GLDefaultHardwareVertexBuffer::readData(size_t offset, size_t length, void* pDest)
-	{
-		assert((offset + length) <= mSizeInBytes);
-		memcpy(pDest, mData + offset, length);
-	}
-	//-----------------------------------------------------------------------
+    {
+        assert((offset + length) <= mSizeInBytes);
+        memcpy(pDest, mData + offset, length);
+    }
+    //-----------------------------------------------------------------------
     void GLDefaultHardwareVertexBuffer::writeData(size_t offset, size_t length, const void* pSource,
-			bool discardWholeBuffer)
-	{
-		assert((offset + length) <= mSizeInBytes);
-		// ignore discard, memory is not guaranteed to be zeroised
-		memcpy(mData + offset, pSource, length);
+            bool discardWholeBuffer)
+    {
+        assert((offset + length) <= mSizeInBytes);
+        // ignore discard, memory is not guaranteed to be zeroised
+        memcpy(mData + offset, pSource, length);
 
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
 
-	GLDefaultHardwareIndexBuffer::GLDefaultHardwareIndexBuffer(IndexType idxType, 
-		size_t numIndexes, HardwareBuffer::Usage usage) 
-		: HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false) // always software, never shadowed
-	{
-		mData = new unsigned char[mSizeInBytes];
-	}
-	//-----------------------------------------------------------------------
+    GLDefaultHardwareIndexBuffer::GLDefaultHardwareIndexBuffer(IndexType idxType, 
+        size_t numIndexes, HardwareBuffer::Usage usage) 
+        : HardwareIndexBuffer(0, idxType, numIndexes, usage, true, false) // always software, never shadowed
+    {
+        mData = new unsigned char[mSizeInBytes];
+    }
+    //-----------------------------------------------------------------------
     GLDefaultHardwareIndexBuffer::~GLDefaultHardwareIndexBuffer()
-	{
-		delete [] mData;
-	}
-	//-----------------------------------------------------------------------
+    {
+        delete [] mData;
+    }
+    //-----------------------------------------------------------------------
     void* GLDefaultHardwareIndexBuffer::lockImpl(size_t offset, size_t length, LockOptions options)
-	{
+    {
         // Only for use internally, no 'locking' as such
-		return mData + offset;
-	}
-	//-----------------------------------------------------------------------
-	void GLDefaultHardwareIndexBuffer::unlockImpl(void)
-	{
+        return mData + offset;
+    }
+    //-----------------------------------------------------------------------
+    void GLDefaultHardwareIndexBuffer::unlockImpl(void)
+    {
         // Nothing to do
-	}
-	//-----------------------------------------------------------------------
-    void* GLDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
-	{
+    }
+    //-----------------------------------------------------------------------
+    void* GLDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt)
+    {
+        
         mIsLocked = true;
-		return mData + offset;
-	}
-	//-----------------------------------------------------------------------
-	void GLDefaultHardwareIndexBuffer::unlock(void)
-	{
+        return mData + offset;
+    }
+    //-----------------------------------------------------------------------
+    void GLDefaultHardwareIndexBuffer::unlock(void)
+    {
         mIsLocked = false;
         // Nothing to do
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
     void GLDefaultHardwareIndexBuffer::readData(size_t offset, size_t length, void* pDest)
-	{
-		assert((offset + length) <= mSizeInBytes);
-		memcpy(pDest, mData + offset, length);
-	}
-	//-----------------------------------------------------------------------
+    {
+        assert((offset + length) <= mSizeInBytes);
+        memcpy(pDest, mData + offset, length);
+    }
+    //-----------------------------------------------------------------------
     void GLDefaultHardwareIndexBuffer::writeData(size_t offset, size_t length, const void* pSource,
-			bool discardWholeBuffer)
-	{
-		assert((offset + length) <= mSizeInBytes);
-		// ignore discard, memory is not guaranteed to be zeroised
-		memcpy(mData + offset, pSource, length);
+            bool discardWholeBuffer)
+    {
+        assert((offset + length) <= mSizeInBytes);
+        // ignore discard, memory is not guaranteed to be zeroised
+        memcpy(mData + offset, pSource, length);
 
-	}
-	//-----------------------------------------------------------------------
-	
-	
+    }
+    //-----------------------------------------------------------------------
+    
+    
     //-----------------------------------------------------------------------
     GLDefaultHardwareBufferManagerBase::GLDefaultHardwareBufferManagerBase()
-	{
-	}
+    {
+    }
     //-----------------------------------------------------------------------
     GLDefaultHardwareBufferManagerBase::~GLDefaultHardwareBufferManagerBase()
-	{
+    {
         destroyAllDeclarations();
         destroyAllBindings();
-	}
+    }
     //-----------------------------------------------------------------------
-	HardwareVertexBufferSharedPtr 
+    HardwareVertexBufferSharedPtr 
         GLDefaultHardwareBufferManagerBase::createVertexBuffer(size_t vertexSize, 
-		size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
-	{
-		return HardwareVertexBufferSharedPtr(
-			new GLDefaultHardwareVertexBuffer(this, vertexSize, numVerts, usage));
-	}
+        size_t numVerts, HardwareBuffer::Usage usage, bool useShadowBuffer)
+    {
+        return HardwareVertexBufferSharedPtr(
+            new GLDefaultHardwareVertexBuffer(this, vertexSize, numVerts, usage));
+    }
     //-----------------------------------------------------------------------
-	HardwareIndexBufferSharedPtr 
+    HardwareIndexBufferSharedPtr 
         GLDefaultHardwareBufferManagerBase::createIndexBuffer(HardwareIndexBuffer::IndexType itype, 
-		size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
-	{
-		return HardwareIndexBufferSharedPtr(
-			new GLDefaultHardwareIndexBuffer(itype, numIndexes, usage) );
-	}
+        size_t numIndexes, HardwareBuffer::Usage usage, bool useShadowBuffer)
+    {
+        return HardwareIndexBufferSharedPtr(
+            new GLDefaultHardwareIndexBuffer(itype, numIndexes, usage) );
+    }
     //-----------------------------------------------------------------------
-	RenderToVertexBufferSharedPtr 
-		GLDefaultHardwareBufferManagerBase::createRenderToVertexBuffer()
-	{
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Cannot create RenderToVertexBuffer in GLDefaultHardwareBufferManagerBase", 
-				"GLDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
-	}
-	//-----------------------------------------------------------------------
-	HardwareUniformBufferSharedPtr 
-		GLDefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name)
-	{
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-				"Cannot create UniformBuffer in GLDefaultHardwareBufferManagerBase", 
-				"GLDefaultHardwareBufferManagerBase::createUniformBuffer");
-	}
-	//-----------------------------------------------------------------------
+    RenderToVertexBufferSharedPtr 
+        GLDefaultHardwareBufferManagerBase::createRenderToVertexBuffer()
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "Cannot create RenderToVertexBuffer in GLDefaultHardwareBufferManagerBase", 
+                "GLDefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
+    }
+    //-----------------------------------------------------------------------
+    HardwareUniformBufferSharedPtr 
+        GLDefaultHardwareBufferManagerBase::createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name)
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
+                "Cannot create UniformBuffer in GLDefaultHardwareBufferManagerBase", 
+                "GLDefaultHardwareBufferManagerBase::createUniformBuffer");
+    }
+    //-----------------------------------------------------------------------
     HardwareCounterBufferSharedPtr
         GLDefaultHardwareBufferManagerBase::createCounterBuffer(size_t sizeBytes,
                                                                 HardwareBuffer::Usage usage,
                                                                 bool useShadowBuffer, const String& name)
-	{
-		OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+    {
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                     "Counter buffers not supported in OpenGL RenderSystem.",
                     "GLDefaultHardwareBufferManagerBase::createCounterBuffer");
-	}
+    }
 }

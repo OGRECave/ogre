@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,14 +42,14 @@ namespace Ogre {
 
         /** See GL3PlusContext */
         virtual void setCurrent();
-		/** See GL3PlusContext */
-		virtual void endCurrent();
-		/// @copydoc GL3PlusContext::clone
-		GL3PlusContext* clone() const;
+        /** See GL3PlusContext */
+        virtual void endCurrent();
+        /// @copydoc GL3PlusContext::clone
+        GL3PlusContext* clone() const;
 
-		virtual void releaseContext();
+        virtual void releaseContext();
 
-	protected:
+    protected:
         HDC     mHDC;
         HGLRC   mGlrc;
     };

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,6 @@ email                : ericc@xenopi.com
 */
 
 #include "OgrePCPlane.h"
-#include "OgrePortal.h"
 
 namespace Ogre
 {
@@ -42,11 +41,11 @@ namespace Ogre
     {
         mPortal = 0;
     }
-	PCPlane::PCPlane(const Plane & plane) 
-			: Plane(plane)
-	{
-		mPortal = 0;
-	}
+    PCPlane::PCPlane(const Plane & plane) 
+            : Plane(plane)
+    {
+        mPortal = 0;
+    }
     PCPlane::PCPlane(const Vector3& rkNormal, const Vector3& rkPoint) 
             : Plane(rkNormal, rkPoint)
     {
@@ -57,16 +56,16 @@ namespace Ogre
     {
         mPortal = 0;
     }
-	void PCPlane::setFromOgrePlane(Plane & ogrePlane)
-	{
-		d = ogrePlane.d;
-		normal = ogrePlane.normal;
-		mPortal = 0;
-	}
+    void PCPlane::setFromOgrePlane(Plane & ogrePlane)
+    {
+        d = ogrePlane.d;
+        normal = ogrePlane.normal;
+        mPortal = 0;
+    }
 
     PCPlane::~PCPlane()
     {
-		mPortal = 0;
+        mPortal = 0;
     }
 
 }

@@ -60,14 +60,14 @@ make_library_set(Cg_LIBRARY)
 
 if (WIN32)
 	if (CMAKE_CL_64)
-		set(Cg_BIN_SEARCH_PATH ${Cg_HOME}/bin.x64 ${ENV_Cg_BIN64_PATH} ${ENV_Cg_HOME}/bin.x64
-			${OGRE_DEPENDENCIES_DIR}/bin ${ENV_OGRE_DEPENDENCIES_DIR}/bin
+		set(Cg_BIN_SEARCH_PATH ${OGRE_DEPENDENCIES_DIR}/bin ${CMAKE_SOURCE_DIR}/Dependencies/bin ${Cg_HOME}/bin.x64
+			${ENV_Cg_BIN64_PATH} ${ENV_Cg_HOME}/bin.x64 ${ENV_OGRE_DEPENDENCIES_DIR}/bin
 			${OGRE_SOURCE}/Dependencies/bin ${ENV_OGRE_SOURCE}/Dependencies/bin
 			${OGRE_SDK}/bin ${ENV_OGRE_SDK}/bin
 			${OGRE_HOME}/bin ${ENV_OGRE_HOME}/bin)
 	else()
-		set(Cg_BIN_SEARCH_PATH ${Cg_HOME}/bin ${ENV_Cg_BIN_PATH} ${ENV_Cg_HOME}/bin
-			${OGRE_DEPENDENCIES_DIR}/bin ${ENV_OGRE_DEPENDENCIES_DIR}/bin
+		set(Cg_BIN_SEARCH_PATH ${OGRE_DEPENDENCIES_DIR}/bin ${CMAKE_SOURCE_DIR}/Dependencies/bin ${Cg_HOME}/bin
+			${ENV_Cg_BIN_PATH} ${ENV_Cg_HOME}/bin ${ENV_OGRE_DEPENDENCIES_DIR}/bin
 			${OGRE_SOURCE}/Dependencies/bin ${ENV_OGRE_SOURCE}/Dependencies/bin
 			${OGRE_SDK}/bin ${ENV_OGRE_SDK}/bin
 			${OGRE_HOME}/bin ${ENV_OGRE_HOME}/bin)

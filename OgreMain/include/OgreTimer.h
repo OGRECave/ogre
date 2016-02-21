@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,24 +28,15 @@ THE SOFTWARE.
 #ifndef __OgreCommonTimer_H__
 #define __OgreCommonTimer_H__
 
-#include "OgrePrerequisites.h"
 #include "OgrePlatform.h"
 
 //Bring in the specific platform's header file
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 # include "WIN32/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-# include "GLX/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_NACL  
-# include "NaCl/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-# include "OSX/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-# include "iOS/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-# include "Android/OgreTimerImp.h"
-#elif OGRE_PLATFORM == OGRE_PLATFORM_FLASHCC
-# include "FlashCC/OgreTimerImp.h"
+#elif OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+# include "Emscripten/OgreTimerImp.h"
+#else
+# include "OgrePOSIXTimerImp.h"
 #endif
 
 #endif

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,8 @@ namespace Ogre {
 
     void* GL3PlusDefaultHardwareVertexBuffer::lock(size_t offset,
                                                    size_t length,
-                                                   LockOptions options)
+                                                   LockOptions options,
+                                                   HardwareBuffer::UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -120,7 +121,7 @@ namespace Ogre {
         // Nothing to do
     }
 
-    void* GL3PlusDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options)
+    void* GL3PlusDefaultHardwareIndexBuffer::lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -182,7 +183,8 @@ namespace Ogre {
 
     void* GL3PlusDefaultHardwareUniformBuffer::lock(size_t offset,
                                                     size_t length,
-                                                    LockOptions options)
+                                                    LockOptions options,
+                                                    HardwareBuffer::UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;
@@ -244,7 +246,8 @@ namespace Ogre {
 
     void* GL3PlusDefaultHardwareCounterBuffer::lock(size_t offset,
                                                     size_t length,
-                                                    LockOptions options)
+                                                    LockOptions options,
+                                                    HardwareBuffer::UploadOptions uploadOpt)
     {
         mIsLocked = true;
         return mData + offset;

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,19 +39,19 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	// forward declarations
-	class GLSLESProgram;
-	class GLSLESGpuProgram;
-	class GLSLESLinkProgram;
-	class GLSLESLinkProgramManager;
-	class GLSLESProgramPipelineManager;
-	class GLSLESProgramFactory;
+    // forward declarations
+    class GLSLESProgram;
+    class GLSLESGpuProgram;
+    class GLSLESLinkProgram;
+    class GLSLESLinkProgramManager;
+    class GLSLESProgramPipelineManager;
+    class GLSLESProgramFactory;
 
-	/** If there is a message in GL info log then post it in the Ogre Log
-	@param msg The info log message string is appended to this string
-	@param obj The GL object that is used to retrieve the info log
-	*/
-	String logObjectInfo(const String& msg, const GLuint obj);
+    /** If there is a message in GL info log then post it in the Ogre Log
+    @param msg The info log message string is appended to this string
+    @param obj The GL object that is used to retrieve the info log
+    */
+    String logObjectInfo(const String& msg, const GLuint obj);
 
 
 } // namespace Ogre

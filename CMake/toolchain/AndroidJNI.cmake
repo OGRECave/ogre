@@ -7,94 +7,56 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
+# Include the CreateAndroidProj macro to create a basic android setup
+# and add_static_libs macro to define additional target static libs
+include(AndroidMacros)
+
 if(ANDROID)
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
-    ADD_LIBRARY(OgreJNIDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
-	
-	if(OGRE_BUILD_RENDERSYSTEM_GLES2)
-		add_dependencies(OgreJNIDummy OgreMain RenderSystem_GLES2)
-	else()		
-		add_dependencies(OgreJNIDummy OgreMain RenderSystem_GLES)
-	endif()
-	
-	add_dependencies(OgreJNIDummy OgreTerrain OgreRTShaderSystem OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)	
-
-    if(APPLE OR WIN32)
-      SET(ANDROID_EXECUTABLE "android")
-      SET(NDK_BUILD_EXECUTABLE "ndk-build")
-    else()
-      SET(ANDROID_EXECUTABLE "$ENV{ANDROID_SDK}/tools/android")
-      SET(NDK_BUILD_EXECUTABLE "$ENV{ANDROID_NDK}/ndk-build")
-    endif()
-
-	SET(ANDROID_MOD_NAME "OgreJNI")
-	SET(JNI_SRC "LOCAL_PATH := @CMAKE_SOURCE_DIR@/OgreMain/src/Android/JNI\n")
-    SET(JNI_SRC "${JNI_SRC}\tLOCAL_SRC_FILES := OgreActivityJNI.cpp\n")
-    SET(ANT_EXECUTABLE "ant")
-	
-	if(${ANDROID_NATIVE_API_LEVEL} LESS 14)
-		MATH(EXPR ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}+1")
-	else()
-		SET(ANDROID_SDK_API_LEVEL "${ANDROID_NATIVE_API_LEVEL}")
-		SET(SCREEN_SIZE "|screenSize")
-	endif()
-	
-	if(OGRE_CONFIG_ENABLE_GLES2_GLSL_OPTIMISER)
-		SET(GLES_OPTIMISER "-lglsl_optimizer -lmesa -lglcpp-library")
-	endif()
-
-    SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
+    # Setup create_android_proj macro requirements
+    SET(ANDROID_MOD_NAME "OgreJNI")
+    SET(JNI_PATH "${CMAKE_SOURCE_DIR}/OgreMain/src/Android/JNI")
+    SET(JNI_SRC_FILES "OgreActivityJNI.cpp")
     
-    SET(NDKOUT "${CMAKE_BINARY_DIR}/OgreJNI")
-    file(MAKE_DIRECTORY "${NDKOUT}")
-    file(MAKE_DIRECTORY "${NDKOUT}/jni")
-    file(MAKE_DIRECTORY "${NDKOUT}/assets")	
-    file(MAKE_DIRECTORY "${NDKOUT}/res")	
-	file(MAKE_DIRECTORY "${NDKOUT}/src")
+    SET(NDKOUT "${CMAKE_BINARY_DIR}/${ANDROID_MOD_NAME}")
+    
+    SET(PKG_NAME "org.ogre.jni")
+    
+    # Set this variable to false if no java code will be present (google android:hasCode for more info)
+    SET(HAS_CODE "true")
+    
+    SET(MAIN_ACTIVITY "org.ogre3d.android.MainActivity")
+    SET(HEADERS "")
+    SET(SAMPLE_LDLIBS "")
+    
+    # Copy and create resource files
     file(MAKE_DIRECTORY "${NDKOUT}/src/org")
     file(MAKE_DIRECTORY "${NDKOUT}/src/org/ogre3d")
 	file(MAKE_DIRECTORY "${NDKOUT}/src/org/ogre3d/android")	
-	file(COPY "@CMAKE_SOURCE_DIR@/OgreMain/src/Android/JNI/OgreActivityJNI.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
-	file(COPY "@CMAKE_SOURCE_DIR@/OgreMain/src/Android/JNI/MainActivity.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
-		
-    file(WRITE "${NDKOUT}/default.properties" "target=${ANDROID_TARGET}")
-    file(WRITE "${NDKOUT}/jni/Application.mk" "APP_ABI := ${ANDROID_ABI}\nAPP_STL := gnustl_static ")
-    configure_file("${OGRE_TEMPLATES_DIR}/AndroidManifest_JNI.xml.in" "${NDKOUT}/AndroidManifest.xml" @ONLY)
-
-    if(NOT ANDROID_GLES_ONLY)
-	  configure_file("${OGRE_TEMPLATES_DIR}/Android.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
-    else()
-      configure_file("${OGRE_TEMPLATES_DIR}/AndroidGLES1.mk.in" "${NDKOUT}/jni/Android.mk" @ONLY)
-    endif()
-    
-	add_custom_command(
-	                    TARGET OgreJNIDummy
-                        POST_BUILD
-	                    COMMAND ${ANDROID_EXECUTABLE} update project --target ${ANDROID_TARGET} --path "${NDKOUT}"
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
+	file(COPY "${JNI_PATH}/OgreActivityJNI.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
+	file(COPY "${JNI_PATH}/MainActivity.java" DESTINATION "${NDKOUT}/src/org/ogre3d/android")
+	file(COPY "${JNI_PATH}/OgreActivityJNI.cpp" DESTINATION "${NDKOUT}/jni")
 	
-	if(DEBUG)	 
-	 	add_custom_command(
-							TARGET OgreJNIDummy
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2 V=1 NDK_DEBUG=1
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	else()
-		add_custom_command(
-							TARGET OgreJNIDummy
-						    POST_BUILD
-					        COMMAND ${NDK_BUILD_EXECUTABLE} all -j2
-				            WORKING_DIRECTORY ${NDKOUT}
-			              )
-	endif()
-	                  
-	add_custom_command(
-	                    TARGET OgreJNIDummy
-                        POST_BUILD
-	                    COMMAND ${ANT_EXECUTABLE} debug
-	                    WORKING_DIRECTORY ${NDKOUT}
-	                  )
-
+    configure_file("${OGRE_TEMPLATES_DIR}/Android_resources.cfg.in" "${NDKOUT}/assets/resources.cfg" @ONLY)
+    configure_file("${OGRE_TEMPLATES_DIR}/samples.cfg.in" "${NDKOUT}/assets/samples.cfg" @ONLY)
+    
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/models" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/particle" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/RTShaderLib" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/thumbnails" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/packs" DESTINATION "${NDKOUT}/assets")
+    file(COPY "${CMAKE_SOURCE_DIR}/Samples/Media/materials" DESTINATION "${NDKOUT}/assets")
+    
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-hdpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-ldpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-mdpi" DESTINATION "${NDKOUT}/res")
+	file(COPY "${CMAKE_SOURCE_DIR}/SDK/Android/drawable-xhdpi" DESTINATION "${NDKOUT}/res")
+    
+    # Create CMake target
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp "int x = 23;")
+    ADD_LIBRARY(OgreJNIDummy MODULE ${CMAKE_CURRENT_BINARY_DIR}/dummyJNI.cpp)
+    
+    set(JNI_PATH "${NDKOUT}/jni")
+    create_android_proj(OgreJNIDummy)
+    
+    
 endif()

@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -41,10 +41,10 @@
 #define GL_RGBA16_SNORM                   0x8F9B
 
 namespace Ogre  {
-    
-    GLenum GL3PlusPixelUtil::getGLOriginFormat(PixelFormat mFormat)
+
+    GLenum GL3PlusPixelUtil::getGLOriginFormat(PixelFormat format)
     {
-        switch(mFormat)
+        switch(format)
         {
         case PF_DEPTH:
             return GL_DEPTH_COMPONENT;
@@ -189,18 +189,18 @@ namespace Ogre  {
             return 0;
         }
     }
-    
-    GLenum GL3PlusPixelUtil::getGLOriginDataType(PixelFormat mFormat)
+
+    GLenum GL3PlusPixelUtil::getGLOriginDataType(PixelFormat format)
     {
-        switch(mFormat)
+        switch(format)
         {
         case PF_DEPTH:
             return GL_UNSIGNED_INT;
+        case PF_BYTE_LA:
         case PF_A8:
         case PF_L8:
         case PF_R8G8B8:
         case PF_B8G8R8:
-        case PF_BYTE_LA:
         case PF_R8_SNORM:
         case PF_R8G8_SNORM:
         case PF_R8G8B8_SNORM:
@@ -299,9 +299,9 @@ namespace Ogre  {
         }
     }
 
-    GLenum GL3PlusPixelUtil::getGLInternalFormat(PixelFormat mFormat, bool hwGamma)
+    GLenum GL3PlusPixelUtil::getGLInternalFormat(PixelFormat format, bool hwGamma)
     {
-        switch(mFormat)
+        switch(format)
         {
         case PF_DEPTH:
             return GL_DEPTH_COMPONENT16;
@@ -473,10 +473,10 @@ namespace Ogre  {
         }
     }
 
-    GLenum GL3PlusPixelUtil::getClosestGLInternalFormat(PixelFormat mFormat, bool hwGamma)
+    GLenum GL3PlusPixelUtil::getClosestGLInternalFormat(PixelFormat format, bool hwGamma)
     {
-        GLenum format = getGLInternalFormat(mFormat, hwGamma);
-        if (format == GL_NONE)
+        GLenum GLformat = getGLInternalFormat(format, hwGamma);
+        if (GLformat == GL_NONE)
         {
             if (hwGamma)
                 return GL_SRGB8;
@@ -484,12 +484,13 @@ namespace Ogre  {
                 return GL_RGBA8;
         }
         else
-            return format;
+            return GLformat;
     }
 
-    GLenum GL3PlusPixelUtil::getGLImageInternalFormat(PixelFormat mFormat)
+
+    GLenum GL3PlusPixelUtil::getGLImageInternalFormat(PixelFormat format)
     {
-        switch(mFormat)
+        switch(format)
         {
         case PF_L8:
         case PF_A8:
@@ -577,16 +578,17 @@ namespace Ogre  {
         }
     }
 
-    GLenum GL3PlusPixelUtil::getClosestGLImageInternalFormat(PixelFormat mFormat)
+
+    GLenum GL3PlusPixelUtil::getClosestGLImageInternalFormat(PixelFormat format)
     {
-        GLenum format = getGLImageInternalFormat(mFormat);
-        return (format == GL_NONE ? GL_RGBA8 : format);
+        GLenum GLformat = getGLImageInternalFormat(format);
+        return (format == GL_NONE ? GL_RGBA8 : GLformat);
     }
 
-    
-    PixelFormat GL3PlusPixelUtil::getClosestOGREFormat(GLenum fmt)
+
+    PixelFormat GL3PlusPixelUtil::getClosestOGREFormat(GLenum format)
     {
-        switch(fmt)
+        switch(format)
         {
         case GL_DEPTH_COMPONENT16:
         case GL_DEPTH_COMPONENT24:
@@ -598,6 +600,7 @@ namespace Ogre  {
             return PF_L8;
         case GL_R16:
             return PF_L16;
+        case GL_RG: //TODO Is there a better OGRE format?
         case GL_RG8:
             return PF_BYTE_LA;
         case GL_R3_G3_B2:
@@ -746,7 +749,7 @@ namespace Ogre  {
             return PF_A8R8G8B8;
         };
     }
-    
+
 
     size_t GL3PlusPixelUtil::getMaxMipmaps(size_t width, size_t height, size_t depth, PixelFormat format)
     {

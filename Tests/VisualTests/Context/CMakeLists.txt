@@ -11,6 +11,7 @@ set(HEADER_FILES
     include/TestContext.h
 	../Common/include/ImageValidator.h
 	../Common/include/TestBatch.h
+	../Common/include/CppUnitResultWriter.h
 	../Common/include/TestResultWriter.h
 	../Common/include/SimpleResultWriter.h
 	../Common/include/HTMLWriter.h
@@ -33,6 +34,12 @@ include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/Common/include)
 if (OGRE_STATIC)
   include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/VTests/include)
   include_directories(${OGRE_SOURCE_DIR}/Tests/VisualTests/PlayPen/include)
+  
+  # Fix for static build with MinGW
+  if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND MINGW AND OGRE_STATIC)
+	include_directories(${DirectX9_INCLUDE_DIR})
+  endif() 
+  
   list(APPEND SAMPLE_LIBRARIES VTests)
   list(APPEND SAMPLE_LIBRARIES PlayPenTests)
 endif()
@@ -40,6 +47,7 @@ endif()
 ogre_add_component_include_dir(Terrain)
 ogre_add_component_include_dir(Paging)
 ogre_add_component_include_dir(RTShaderSystem)
+ogre_add_component_include_dir(MeshLodGenerator)
 ogre_add_component_include_dir(Overlay)
 ogre_add_component_include_dir(Volume)
 
@@ -119,6 +127,8 @@ if (APPLE)
 	add_custom_command(TARGET TestContext POST_BUILD
 		COMMAND mkdir ARGS -p ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks
 		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/Ogre.framework
+		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
+		COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreMeshLodGenerator.framework
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
 		COMMAND ln ARGS -s -f ${Cg_LIBRARY_REL}
 		${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/

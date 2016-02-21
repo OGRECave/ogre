@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,9 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRenderSystemCapabilitiesSerializer.h"
 #include "OgreArchiveManager.h"
+#include "OgreLogManager.h"
+
+#include "UnitTestSuite.h"
 
 #include <fstream>
 #include <algorithm>
@@ -40,43 +43,45 @@ THE SOFTWARE.
 #include "macUtils.h"
 #endif
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( RenderSystemCapabilitiesTests );
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(RenderSystemCapabilitiesTests);
 
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+    
     using namespace Ogre;
 
-    if(LogManager::getSingletonPtr() == 0)
-        mLogManager = OGRE_NEW LogManager();
-
-    LogManager::getSingleton().setLogDetail(LL_LOW);
-
-    // we need to be able to create FileSystem archives to load .rendercaps
+    // We need to be able to create FileSystem archives to load .rendercaps
     mFileSystemArchiveFactory = OGRE_NEW FileSystemArchiveFactory();
 
     mArchiveManager = OGRE_NEW ArchiveManager();
-    ArchiveManager::getSingleton().addArchiveFactory( mFileSystemArchiveFactory );
+    ArchiveManager::getSingleton().addArchiveFactory(mFileSystemArchiveFactory);
 
     mRenderSystemCapabilitiesManager = OGRE_NEW RenderSystemCapabilitiesManager();
-    // actual parsing happens here. test methods confirm parse results only
+
+    // Actual parsing happens here. The following test methods confirm parse results only.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive(macBundlePath() + "/Contents/Resources/Media/CustomCapabilities", "FileSystem", true);
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("./Tests/Media/CustomCapabilities", "FileSystem", true);
 #else
-    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("../Tests/Media/CustomCapabilities", "FileSystem", true);
+    mRenderSystemCapabilitiesManager->parseCapabilitiesFromArchive("../../Tests/Media/CustomCapabilities", "FileSystem", true);
 #endif
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::tearDown()
 {
     OGRE_DELETE mRenderSystemCapabilitiesManager;
     OGRE_DELETE mArchiveManager;
     OGRE_DELETE mFileSystemArchiveFactory;
-    OGRE_DELETE mLogManager;
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testIsShaderProfileSupported(void)
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     // create a new RSC
     Ogre::RenderSystemCapabilities rsc;
 
@@ -100,10 +105,10 @@ void RenderSystemCapabilitiesTests::testIsShaderProfileSupported(void)
     // check that empty string is not supported
     CPPUNIT_ASSERT(!rsc.isShaderProfileSupported(""));
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testHasCapability()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilities rsc;
 
@@ -129,6 +134,7 @@ void RenderSystemCapabilitiesTests::testHasCapability()
     CPPUNIT_ASSERT(rsc.hasCapability(RSC_FRAGMENT_PROGRAM));
     CPPUNIT_ASSERT(rsc.hasCapability(RSC_TEXTURE_COMPRESSION));
     CPPUNIT_ASSERT(rsc.hasCapability(RSC_FBO_ATI));
+
     // check that the non-set caps are NOT supported
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_BLENDING));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TWO_SIDED_STENCIL));
@@ -136,10 +142,10 @@ void RenderSystemCapabilitiesTests::testHasCapability()
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_TEXTURE_COMPRESSION_VTC));
     CPPUNIT_ASSERT(!rsc.hasCapability(RSC_PBUFFER));
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testSerializeBlank()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
@@ -148,44 +154,46 @@ void RenderSystemCapabilitiesTests::testSerializeBlank()
     // if we have a non-NULL it's good enough
     CPPUNIT_ASSERT(rsc != 0);
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testSerializeEnumCapability()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps enum Capabilities");
+
     // confirm that RSC was loaded
     CPPUNIT_ASSERT(rsc != 0);
 
-    // confirm that the contents are rhe same as in .rendercaps file
+    // confirm that the contents are the same as in .rendercaps file
     CPPUNIT_ASSERT(rsc->hasCapability(RSC_AUTOMIPMAP));
     CPPUNIT_ASSERT(rsc->hasCapability(RSC_FBO_ARB));
 }
-
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testSerializeStringCapability()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps set String");
+
     // confirm that RSC was loaded
     CPPUNIT_ASSERT(rsc != 0);
 
     CPPUNIT_ASSERT(rsc->isShaderProfileSupported("vs99"));
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testSerializeBoolCapability()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rscTrue = rscManager->loadParsedCapabilities("TestCaps set bool (true)");
     RenderSystemCapabilities* rscFalse = rscManager->loadParsedCapabilities("TestCaps set bool (false)");
+
     // confirm that RSC was loaded
     CPPUNIT_ASSERT(rscTrue != 0);
     CPPUNIT_ASSERT(rscFalse != 0);
@@ -193,41 +201,44 @@ void RenderSystemCapabilitiesTests::testSerializeBoolCapability()
     CPPUNIT_ASSERT(rscTrue->getVertexTextureUnitsShared() == true);
     CPPUNIT_ASSERT(rscFalse->getVertexTextureUnitsShared() == false);
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testSerializeIntCapability()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps set int");
+
     // confirm that RSC was loaded
     CPPUNIT_ASSERT(rsc != 0);
 
     // TODO: why no get?
     CPPUNIT_ASSERT(rsc->getNumMultiRenderTargets() == 99);
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testSerializeRealCapability()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps set Real");
+
     // confirm that RSC was loaded
     CPPUNIT_ASSERT(rsc != 0);
 
     CPPUNIT_ASSERT(rsc->getMaxPointSize() == 99.5);
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testSerializeShaderCapability()
 {
-    using namespace Ogre;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     RenderSystemCapabilitiesManager* rscManager = RenderSystemCapabilitiesManager::getSingletonPtr();
 
     RenderSystemCapabilities* rsc = rscManager->loadParsedCapabilities("TestCaps addShaderProfile");
+
     // confirm that RSC was loaded
     CPPUNIT_ASSERT(rsc != 0);
 
@@ -235,11 +246,13 @@ void RenderSystemCapabilitiesTests::testSerializeShaderCapability()
     CPPUNIT_ASSERT(rsc->isShaderProfileSupported("vs_1_1"));
     CPPUNIT_ASSERT(rsc->isShaderProfileSupported("ps_99"));
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
 {
     using namespace Ogre;
-	using namespace std;
+    using namespace std;
+
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     String name = "simple caps";
     String filename = "simpleCapsTest.rendercaps";
@@ -266,8 +279,9 @@ void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
 
     capsfile.getline(buff, 255);
     CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
+
     // scan every line and find the set capabilities it them
-	std::vector <String> lines;
+    std::vector <String> lines;
     while(capsfile.good())
     {
         capsfile.getline(buff, 255);
@@ -286,11 +300,13 @@ void RenderSystemCapabilitiesTests::testWriteSimpleCapabilities()
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tnum_world_matrices 777") != lines.end());
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
 {
     using namespace Ogre;
     using namespace std;
+
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     String name = "all false caps";
     String filename = "allFalseCapsTest.rendercaps";
@@ -314,6 +330,7 @@ void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
 
     capsfile.getline(buff, 255);
     CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
+
     // scan every line and find the set capabilities it them
     std::vector <String> lines;
     while(capsfile.good())
@@ -373,13 +390,14 @@ void RenderSystemCapabilitiesTests::testWriteAllFalseCapabilities()
 
     // bool caps
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared false") != lines.end());
-
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
 {
     using namespace Ogre;
     using namespace std;
+
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     String name = "all false caps";
     String filename = "allFalseCapsTest.rendercaps";
@@ -446,6 +464,7 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
 
     capsfile.getline(buff, 255);
     CPPUNIT_ASSERT_EQUAL(String("{"), String(buff));
+
     // scan every line and find the set capabilities it them
     std::vector <String> lines;
     while(capsfile.good())
@@ -454,7 +473,7 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
         lines.push_back(String(buff));
     }
 
-      // check that the file is closed nicely
+    // check that the file is closed nicely
     String closeBracket = *(lines.end() - 2);
     CPPUNIT_ASSERT_EQUAL(String("}"), closeBracket);
     CPPUNIT_ASSERT_EQUAL(String(""), lines.back());
@@ -505,13 +524,14 @@ void RenderSystemCapabilitiesTests::testWriteAllTrueCapabilities()
 
     // bool caps
     CPPUNIT_ASSERT(find(lines.begin(), lines.end(), "\tvertex_texture_units_shared true") != lines.end());
-
 }
-
+//--------------------------------------------------------------------------
 void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
 {
     using namespace Ogre;
     using namespace std;
+
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
     String name = "complex caps";
     String filename = "complexCapsTest.rendercaps";
@@ -556,6 +576,7 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     caps.setNumMultiRenderTargets(23);
 
     caps.addShaderProfile("99foo100");
+
     // try out stranger names
     caps.addShaderProfile("..f(_)specialsymbolextravaganza!@#$%^&*_but_no_spaces");
 
@@ -571,17 +592,17 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     caps.setNonPOW2TexturesLimited(true);
     caps.setVertexTextureUnitsShared(true);
 
-	DriverVersion driverversion;
-	driverversion.major = 11;
-	driverversion.minor = 13;
-	driverversion.release = 17;
-	driverversion.build = 0;
+    DriverVersion driverversion;
+    driverversion.major = 11;
+    driverversion.minor = 13;
+    driverversion.release = 17;
+    driverversion.build = 0;
 
-	caps.setDriverVersion(driverversion);
+    caps.setDriverVersion(driverversion);
     caps.setDeviceName("Dummy Device");
     caps.setRenderSystemName("Dummy RenderSystem");
 
-     // write them to file
+    // write them to file
     serializer.writeScript(&caps, name, filename);
 
     FileStreamDataStream* fdatastream = new FileStreamDataStream(filename,
@@ -598,7 +619,7 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     // confirm that RSC was loaded
     CPPUNIT_ASSERT(rsc != 0);
 
-    // create a reference, so that were're working with two refs
+    // create a reference, so that were are working with two refs
     RenderSystemCapabilities& caps2 = *rsc;
 
     CPPUNIT_ASSERT_EQUAL(caps.hasCapability(RSC_AUTOMIPMAP), caps2.hasCapability(RSC_AUTOMIPMAP));
@@ -661,14 +682,14 @@ void RenderSystemCapabilitiesTests::testWriteAndReadComplexCapabilities()
     CPPUNIT_ASSERT_EQUAL(caps.getMaxPointSize(), caps2.getMaxPointSize());
     CPPUNIT_ASSERT_EQUAL(caps.getNonPOW2TexturesLimited(), caps2.getNonPOW2TexturesLimited());
     CPPUNIT_ASSERT_EQUAL(caps.getVertexTextureUnitsShared(), caps2.getVertexTextureUnitsShared());
-	
-	// test versions
-	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().major, caps2.getDriverVersion().major);
-	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().minor, caps2.getDriverVersion().minor);
-	CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().release, caps2.getDriverVersion().release);
-	CPPUNIT_ASSERT_EQUAL(0, caps2.getDriverVersion().build);
+    
+    // test versions
+    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().major, caps2.getDriverVersion().major);
+    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().minor, caps2.getDriverVersion().minor);
+    CPPUNIT_ASSERT_EQUAL(caps.getDriverVersion().release, caps2.getDriverVersion().release);
+    CPPUNIT_ASSERT_EQUAL(0, caps2.getDriverVersion().build);
 
     dataStreamPtr.setNull();
 }
-
+//--------------------------------------------------------------------------
 

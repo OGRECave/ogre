@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,18 +31,17 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreVector3.h"
 #include "OgreColourValue.h"
 #include "OgreCommon.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
 
     /** A billboard is a primitive which always faces the camera in every frame.
         @remarks
@@ -64,7 +63,7 @@ namespace Ogre {
             BillboardSet
     */
 
-	class _OgreExport Billboard : public FXAlloc
+    class _OgreExport Billboard : public FXAlloc
     {
         friend class BillboardSet;
         friend class BillboardParticleRenderer;
@@ -218,8 +217,8 @@ namespace Ogre {
         const FloatRect& getTexcoordRect(void) const { return mTexcoordRect; }
     };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

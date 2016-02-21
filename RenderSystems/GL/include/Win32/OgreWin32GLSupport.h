@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -35,82 +35,94 @@
 namespace Ogre
 {
     
-	class _OgreGLExport Win32GLSupport : public GLSupport
-	{
-	public:
+    class _OgreGLExport Win32GLSupport : public GLSupport
+    {
+    public:
         Win32GLSupport();
-		/**
-		* Add any special config values to the system.
-		* Must have a "Full Screen" value that is a bool and a "Video Mode" value
-		* that is a string in the form of wxhxb
-		*/
-		void addConfig();
+        /**
+        * Add any special config values to the system.
+        * Must have a "Full Screen" value that is a bool and a "Video Mode" value
+        * that is a string in the form of wxhxb
+        */
+        void addConfig();
 
-		void setConfigOption(const String &name, const String &value);
+        void setConfigOption(const String &name, const String &value);
 
-		/**
-		* Make sure all the extra options are valid
-		*/
-		String validateConfig();
+        /**
+        * Make sure all the extra options are valid
+        */
+        String validateConfig();
 
-		virtual RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle = "OGRE Render Window");
-		
-		/// @copydoc RenderSystem::_createRenderWindow
-		virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 
-			bool fullScreen, const NameValuePairList *miscParams = 0);
+        virtual RenderWindow* createWindow(bool autoCreateWindow, GLRenderSystem* renderSystem, const String& windowTitle = "OGRE Render Window");
+        
+        /// @copydoc RenderSystem::_createRenderWindow
+        virtual RenderWindow* newWindow(const String &name, unsigned int width, unsigned int height, 
+            bool fullScreen, const NameValuePairList *miscParams = 0);
 
-		
-		/**
-		* Start anything special
-		*/
-		void start();
-		/**
-		* Stop anything special
-		*/
-		void stop();
+        
+        /**
+        * Start anything special
+        */
+        void start();
+        /**
+        * Stop anything special
+        */
+        void stop();
 
-		/**
-		* Get the address of a function
-		*/
-		void* getProcAddress(const String& procname);
+        /**
+        * Get the address of a function
+        */
+        void* getProcAddress(const String& procname);
 
-		/**
-		 * Initialise extensions
-		 */
-		virtual void initialiseExtensions();
-		
+        /**
+         * Initialise extensions
+         */
+        virtual void initialiseExtensions();
+        
 
-		bool selectPixelFormat(HDC hdc, int colourDepth, int multisample, bool hwGamma);
+        bool selectPixelFormat(HDC hdc, int colourDepth, int multisample, bool hwGamma);
 
-		virtual bool supportsPBuffers();
-		virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
-		virtual unsigned int getDisplayMonitorCount() const;
-	private:
-		// Allowed video modes
-		vector<DEVMODE>::type mDevModes;
-		Win32Window *mInitialWindow;
-		vector<int>::type mFSAALevels;
-		bool mHasPixelFormatARB;
+        virtual bool supportsPBuffers();
+        virtual GLPBuffer *createPBuffer(PixelComponentType format, size_t width, size_t height);
+        virtual unsigned int getDisplayMonitorCount() const;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+        void setStereoModeType(StereoModeType stereoMode)
+        {
+          mStereoMode = stereoMode;
+        }
+#endif
+
+    private:
+        // Allowed video modes
+        vector<DEVMODE>::type mDevModes;
+        Win32Window *mInitialWindow;
+        vector<int>::type mFSAALevels;
+        bool mHasPixelFormatARB;
         bool mHasMultisample;
-		bool mHasHardwareGamma;
+        bool mHasHardwareGamma;
+		
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		StereoModeType mStereoMode;
+#endif
 
-		struct DisplayMonitorInfo
-		{
-			HMONITOR		hMonitor;
-			MONITORINFOEX	monitorInfoEx;
-		};
+        struct DisplayMonitorInfo
+        {
+            HMONITOR        hMonitor;
+            MONITORINFOEX   monitorInfoEx;
+        };
 
-		typedef vector<DisplayMonitorInfo>::type DisplayMonitorInfoList;
-		typedef DisplayMonitorInfoList::iterator DisplayMonitorInfoIterator;
+        typedef vector<DisplayMonitorInfo>::type DisplayMonitorInfoList;
+        typedef DisplayMonitorInfoList::iterator DisplayMonitorInfoIterator;
 
-		DisplayMonitorInfoList mMonitorInfoList;
+        DisplayMonitorInfoList mMonitorInfoList;
 
-		void refreshConfig();
-		void initialiseWGL();
-		static LRESULT CALLBACK dummyWndProc(HWND hwnd, UINT umsg, WPARAM wp, LPARAM lp);
-		static BOOL CALLBACK sCreateMonitorsInfoEnumProc(HMONITOR hMonitor, HDC hdcMonitor, 
-			LPRECT lprcMonitor, LPARAM dwData);
-	};
+        void refreshConfig();
+        void initialiseWGL();
+        static LRESULT CALLBACK dummyWndProc(HWND hwnd, UINT umsg, WPARAM wp, LPARAM lp);
+        static BOOL CALLBACK sCreateMonitorsInfoEnumProc(HMONITOR hMonitor, HDC hdcMonitor, 
+            LPRECT lprcMonitor, LPARAM dwData);
+    };
 
 }
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,6 @@ THE SOFTWARE.
 */
 #include "OgreStableHeaders.h"
 #include "OgreTextureManager.h"
-#include "OgreException.h"
 #include "OgrePixelFormat.h"
 #include "OgreRoot.h"
 #include "OgreRenderSystem.h"
@@ -78,19 +77,19 @@ namespace Ogre {
             const NameValuePairList* createParams, TextureType texType, int numMipmaps, Real gamma,
             bool isAlpha, PixelFormat desiredFormat, bool hwGamma)
     {
-		ResourceCreateOrRetrieveResult res =
+        ResourceCreateOrRetrieveResult res =
             Ogre::ResourceManager::createOrRetrieve(name, group, isManual, loader, createParams);
-		// Was it created?
-		if(res.second)
+        // Was it created?
+        if(res.second)
         {
             TexturePtr tex = res.first.staticCast<Texture>();
             tex->setTextureType(texType);
             tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-				static_cast<size_t>(numMipmaps));
+                static_cast<size_t>(numMipmaps));
             tex->setGamma(gamma);
             tex->setTreatLuminanceAsAlpha(isAlpha);
             tex->setFormat(desiredFormat);
-			tex->setHardwareGammaEnabled(hwGamma);
+            tex->setHardwareGammaEnabled(hwGamma);
         }
         return res;
     }
@@ -99,10 +98,10 @@ namespace Ogre {
                                        int numMipmaps, Real gamma, bool isAlpha,
                                        PixelFormat desiredFormat, bool hwGamma)
     {
-		ResourceCreateOrRetrieveResult res =
+        ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
         TexturePtr tex = res.first.staticCast<Texture>();
-		tex->prepare();
+        tex->prepare();
         return tex;
     }
     //-----------------------------------------------------------------------
@@ -110,27 +109,27 @@ namespace Ogre {
                                     int numMipmaps, Real gamma, bool isAlpha, PixelFormat desiredFormat,
                                     bool hwGamma)
     {
-		ResourceCreateOrRetrieveResult res =
+        ResourceCreateOrRetrieveResult res =
             createOrRetrieve(name,group,false,0,0,texType,numMipmaps,gamma,isAlpha,desiredFormat,hwGamma);
         TexturePtr tex = res.first.staticCast<Texture>();
-		tex->load();
+        tex->load();
         return tex;
     }
 
     //-----------------------------------------------------------------------
     TexturePtr TextureManager::loadImage( const String &name, const String& group,
         const Image &img, TextureType texType, int numMipmaps, Real gamma, bool isAlpha, 
-		PixelFormat desiredFormat, bool hwGamma)
+        PixelFormat desiredFormat, bool hwGamma)
     {
         TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-			static_cast<size_t>(numMipmaps));
+            static_cast<size_t>(numMipmaps));
         tex->setGamma(gamma);
         tex->setTreatLuminanceAsAlpha(isAlpha);
         tex->setFormat(desiredFormat);
-		tex->setHardwareGammaEnabled(hwGamma);
+        tex->setHardwareGammaEnabled(hwGamma);
         tex->loadImage(img);
 
         return tex;
@@ -140,29 +139,29 @@ namespace Ogre {
         DataStreamPtr& stream, ushort uWidth, ushort uHeight, 
         PixelFormat format, TextureType texType, 
         int numMipmaps, Real gamma, bool hwGamma)
-	{
-		TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
+    {
+        TexturePtr tex = createResource(name, group, true).staticCast<Texture>();
 
         tex->setTextureType(texType);
         tex->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-			static_cast<size_t>(numMipmaps));
+            static_cast<size_t>(numMipmaps));
         tex->setGamma(gamma);
-		tex->setHardwareGammaEnabled(hwGamma);
-		tex->loadRawData(stream, uWidth, uHeight, format);
-		
+        tex->setHardwareGammaEnabled(hwGamma);
+        tex->loadRawData(stream, uWidth, uHeight, format);
+        
         return tex;
-	}
+    }
     //-----------------------------------------------------------------------
     TexturePtr TextureManager::createManual(const String & name, const String& group,
         TextureType texType, uint width, uint height, uint depth, int numMipmaps,
         PixelFormat format, int usage, ManualResourceLoader* loader, bool hwGamma, 
-		uint fsaa, const String& fsaaHint)
+        uint fsaa, const String& fsaaHint)
     {
         TexturePtr ret;
         ret.setNull();
 
         // Check for 3D texture support
-		const RenderSystemCapabilities* caps =
+        const RenderSystemCapabilities* caps =
             Root::getSingleton().getRenderSystem()->getCapabilities();
         if (((texType == TEX_TYPE_3D) || (texType == TEX_TYPE_2D_ARRAY)) &&
             !caps->hasCapability(RSC_TEXTURE_3D))
@@ -176,15 +175,15 @@ namespace Ogre {
         ret->setTextureType(texType);
         ret->setWidth(width);
         ret->setHeight(height);
-		ret->setDepth(depth);
+        ret->setDepth(depth);
         ret->setNumMipmaps((numMipmaps == MIP_DEFAULT)? mDefaultNumMipmaps :
-			static_cast<size_t>(numMipmaps));
+            static_cast<size_t>(numMipmaps));
         ret->setFormat(format);
         ret->setUsage(usage);
-		ret->setHardwareGammaEnabled(hwGamma);
-		ret->setFSAA(fsaa, fsaaHint);
-		ret->createInternalResources();
-		return ret;
+        ret->setHardwareGammaEnabled(hwGamma);
+        ret->setFSAA(fsaa, fsaaHint);
+        ret->createInternalResources();
+        return ret;
     }
     //-----------------------------------------------------------------------
     void TextureManager::setPreferredIntegerBitDepth(ushort bits, bool reloadTextures)
@@ -278,17 +277,17 @@ namespace Ogre {
         mDefaultNumMipmaps = num;
     }
     //-----------------------------------------------------------------------
-	bool TextureManager::isFormatSupported(TextureType ttype, PixelFormat format, int usage)
-	{
-		return getNativeFormat(ttype, format, usage) == format;
-	}
+    bool TextureManager::isFormatSupported(TextureType ttype, PixelFormat format, int usage)
+    {
+        return getNativeFormat(ttype, format, usage) == format;
+    }
     //-----------------------------------------------------------------------
-	bool TextureManager::isEquivalentFormatSupported(TextureType ttype, PixelFormat format, int usage)
-	{
-		PixelFormat supportedFormat = getNativeFormat(ttype, format, usage);
+    bool TextureManager::isEquivalentFormatSupported(TextureType ttype, PixelFormat format, int usage)
+    {
+        PixelFormat supportedFormat = getNativeFormat(ttype, format, usage);
 
-		// Assume that same or greater number of bits means quality not degraded
-		return PixelUtil::getNumElemBits(supportedFormat) >= PixelUtil::getNumElemBits(format);
-		
-	}
+        // Assume that same or greater number of bits means quality not degraded
+        return PixelUtil::getNumElemBits(supportedFormat) >= PixelUtil::getNumElemBits(format);
+        
+    }
 }

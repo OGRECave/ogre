@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -46,14 +46,16 @@ namespace Ogre {
         , mGeometryShader(geometryShader)
         , mFragmentShader(fragmentShader)
         , mComputeShader(computeShader)
+        , mVertexArrayObject(0)
         , mUniformRefsBuilt(false)
         , mLinked(false)
         , mTriedToLinkAndFailed(false)
+        , mSkeletalAnimation(false)
     {
         // init mCustomAttributesIndexes
-        for (size_t i = 0 ; i < VES_COUNT; i++)
+        for (size_t i = 0; i < VES_COUNT; i++)
         {
-            for (size_t j = 0 ; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
+            for (size_t j = 0; j < OGRE_MAX_TEXTURE_COORD_SETS; j++)
             {
                 mCustomAttributesIndexes[i][j] = NULL_CUSTOM_ATTRIBUTES_INDEX;
             }

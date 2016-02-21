@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,6 +63,11 @@ namespace Ogre {
         virtual ~BorderPanelOverlayElement();
 
         virtual void initialise(void);
+
+        /** @copydoc OverlayElement::_releaseManualHardwareResources. */
+        virtual void _releaseManualHardwareResources();
+        /** @copydoc OverlayElement::_restoreManualHardwareResources. */
+        virtual void _restoreManualHardwareResources();
 
         const String& getTypeName(void) const;
         /** Sets the size of the border.
@@ -278,9 +283,9 @@ namespace Ogre {
 
         static String msTypeName;
 
-        /// internal method for setting up geometry, called by OverlayElement::update
+        /// Internal method for setting up geometry, called by OverlayElement::update
         void updatePositionGeometry(void);
-        /// internal method for setting up geometry, called by OverlayElement::update
+        /// Internal method for setting up geometry, called by OverlayElement::update
         void updateTextureGeometry(void);
         /// Internal method for setting up parameters
         void addBaseParameters(void);

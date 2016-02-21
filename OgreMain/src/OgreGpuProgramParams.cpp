@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -27,19 +27,12 @@
 */
 #include "OgreStableHeaders.h"
 #include "OgreGpuProgramParams.h"
-#include "OgreHighLevelGpuProgram.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreVector3.h"
 #include "OgreVector4.h"
 #include "OgreDualQuaternion.h"
-#include "OgreAutoParamDataSource.h"
-#include "OgreLight.h"
 #include "OgreRoot.h"
-#include "OgreRenderSystem.h"
-#include "OgreRenderSystemCapabilities.h"
-#include "OgreStringConverter.h"
-#include "OgreLogManager.h"
-
+#include "OgreRenderTarget.h"
 
 namespace Ogre
 {
@@ -295,7 +288,6 @@ namespace Ogre
         // Decide on endian mode
         determineEndianness(endianMode);
 
-        String msg;
         mStream =stream;
         if (!stream->isWriteable())
         {
@@ -2209,9 +2201,18 @@ namespace Ogre
         if (i == mNamedConstants->map.end())
         {
             if (throwExceptionIfNotFound)
+			{
+				String knownNames;
+#if OGRE_DEBUG_MODE
+				// make it easy to catch typo and/or unused shader parameter elimination made by some drivers
+				knownNames = "Known names are: ";
+				for (i = mNamedConstants->map.begin(); i != mNamedConstants->map.end(); ++i)
+					knownNames.append(i->first).append(" ");
+#endif
                 OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                            "Parameter called " + name + " does not exist.",
+				"Parameter called " + name + " does not exist. " + knownNames,
                             "GpuProgramParameters::_findNamedConstantDefinition");
+			}
             return 0;
         }
         else
@@ -2665,7 +2666,7 @@ namespace Ogre
                     break;
                 case ACT_SPOTLIGHT_WORLDVIEWPROJ_MATRIX_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getSpotlightWorldViewProjMatrix(l), i->elementCount);
                     break;
                 case ACT_LIGHT_POSITION_OBJECT_SPACE:
                     _writeRawConstant(i->physicalIndex,
@@ -2878,7 +2879,7 @@ namespace Ogre
                     break;
                 case ACT_SHADOW_SCENE_DEPTH_RANGE_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getShadowSceneDepthRange(l), i->elementCount);
                     break;
                 case ACT_SHADOW_COLOUR:
                     _writeRawConstant(i->physicalIndex, source->getShadowColour(), i->elementCount);
@@ -2900,7 +2901,7 @@ namespace Ogre
                     break;
                 case ACT_LIGHT_CASTS_SHADOWS_ARRAY:
                     for (size_t l = 0; l < i->data; ++l)
-                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getLightCastsShadows(i->data), i->elementCount);
+                        _writeRawConstant(i->physicalIndex + l*i->elementCount, source->getLightCastsShadows(l), i->elementCount);
                     break;
                 case ACT_LIGHT_ATTENUATION:
                     _writeRawConstant(i->physicalIndex, source->getLightAttenuation(i->data), i->elementCount);
@@ -3492,7 +3493,7 @@ namespace Ogre
                     }
                     // we'll use this map to resolve autos later
                     // ignore the [0] aliases
-                    if (!StringUtil::endsWith(paramName, "[0]"))
+                    if (!StringUtil::endsWith(paramName, "[0]") && this->getAutoConstantDefinition(paramName))
                         srcToDestNamedMap[olddef.physicalIndex] = paramName;
                 }
             }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,44 +34,44 @@ THE SOFTWARE.
 #include "OgreSharedPtr.h"
 
 namespace Ogre {
-	class HardwareBufferManagerBase;
+    class HardwareBufferManagerBase;
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** Specialisation of HardwareBuffer for vertex index buffers, still abstract. */
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** Specialisation of HardwareBuffer for vertex index buffers, still abstract. */
     class _OgreExport HardwareIndexBuffer : public HardwareBuffer
     {
-	    public:
-		    enum IndexType {
-			    IT_16BIT,
-			    IT_32BIT
-		    };
+        public:
+            enum IndexType {
+                IT_16BIT,
+                IT_32BIT
+            };
 
-	    protected:
-			HardwareBufferManagerBase* mMgr;
-		    IndexType mIndexType;
-		    size_t mNumIndexes;
+        protected:
+            HardwareBufferManagerBase* mMgr;
+            IndexType mIndexType;
+            size_t mNumIndexes;
             size_t mIndexSize;
 
-	    public:
-		    /// Should be called by HardwareBufferManager
-		    HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage,
+        public:
+            /// Should be called by HardwareBufferManager
+            HardwareIndexBuffer(HardwareBufferManagerBase* mgr, IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage,
                 bool useSystemMemory, bool useShadowBuffer);
             ~HardwareIndexBuffer();
-			/// Return the manager of this buffer, if any
-			HardwareBufferManagerBase* getManager() const { return mMgr; }
-    		/// Get the type of indexes used in this buffer
+            /// Return the manager of this buffer, if any
+            HardwareBufferManagerBase* getManager() const { return mMgr; }
+            /// Get the type of indexes used in this buffer
             IndexType getType(void) const { return mIndexType; }
             /// Get the number of indexes in this buffer
             size_t getNumIndexes(void) const { return mNumIndexes; }
             /// Get the size in bytes of each index
             size_t getIndexSize(void) const { return mIndexSize; }
 
-		    // NB subclasses should override lock, unlock, readData, writeData
+            // NB subclasses should override lock, unlock, readData, writeData
     };
 
 
@@ -86,8 +86,8 @@ namespace Ogre {
     /** Locking helper. */    
     typedef HardwareBufferLockGuard<HardwareIndexBufferSharedPtr> HardwareIndexBufferLockGuard;
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 #endif
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -49,9 +49,9 @@ namespace Ogre {
         virtual void unbindProgram(void) {}
 
         /// Execute the param binding functions for this program
-		virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
-		/// Bind just the pass iteration parameters
-		virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
+        virtual void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask) {}
+        /// Bind just the pass iteration parameters
+        virtual void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
 
         /// @copydoc Resource::calculateSize
         virtual size_t calculateSize(void) const;
@@ -60,22 +60,22 @@ namespace Ogre {
         GLuint getProgramID(void) const
         { return mProgramID; }
 
-		/** Get the attribute index for a given semantic. 
-		@remarks
-			This can be used to identify the attribute index to bind non-builtin
-			attributes like tangent and binormal.
-		*/
-		virtual GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
-		/** Test whether attribute index for a given semantic is valid. 
-		*/
-		virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);
+        /** Get the attribute index for a given semantic. 
+        @remarks
+            This can be used to identify the attribute index to bind non-builtin
+            attributes like tangent and binormal.
+        */
+        virtual GLuint getAttributeIndex(VertexElementSemantic semantic, uint index);
+        /** Test whether attribute index for a given semantic is valid. 
+        */
+        virtual bool isAttributeValid(VertexElementSemantic semantic, uint index);
 
-		/** Get the fixed attribute bindings normally used by GL for a semantic. */
-		static GLuint getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
+        /** Get the fixed attribute bindings normally used by GL for a semantic. */
+        static GLuint getFixedAttributeIndex(VertexElementSemantic semantic, uint index);
 
     protected:
-		/** Overridden from GpuProgram, do nothing */
-		void loadFromSource(void) {}
+        /** Overridden from GpuProgram, do nothing */
+        void loadFromSource(void) {}
         /// @copydoc Resource::unloadImpl
         void unloadImpl(void) {}
 
@@ -100,9 +100,9 @@ namespace Ogre {
         /// Execute the unbinding functions for this program
         void unbindProgram(void);
         /// Execute the param binding functions for this program
-		void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-		/// Bind just the pass iteration parameters
-		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
+        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Bind just the pass iteration parameters
+        void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
         /// Get the GL type for the program
         GLuint getProgramType(void) const

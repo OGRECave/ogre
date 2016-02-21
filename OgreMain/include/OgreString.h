@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -75,7 +75,6 @@ namespace Ogre {
     class _OgreExport StringUtil
     {
     public:
-        typedef StringStream StrStreamType;
 
         /** Removes any whitespace characters, be it standard space or
             TABs and so on.
@@ -188,16 +187,13 @@ namespace Ogre {
         static bool match(const String& str, const String& pattern, bool caseSensitive = true);
 
 
-        /** replace all instances of a sub-string with a another sub-string.
+        /** Replace all instances of a sub-string with a another sub-string.
             @param source Source string
             @param replaceWhat Sub-string to find and replace
             @param replaceWithWhat Sub-string to replace with (the new sub-string)
             @return An updated string with the sub-string replaced
         */
         static const String replaceAll(const String& source, const String& replaceWhat, const String& replaceWithWhat);
-
-        /// Constant blank string, useful for returning by ref where local does not exist
-        static const String BLANK;
     };
 
 
@@ -226,17 +222,5 @@ namespace Ogre {
 } // namespace Ogre
 
 #include "OgreHeaderSuffix.h"
-
-#if defined(_DEBUG) && (OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-#   pragma push_macro("NOMINMAX")
-#   define NOMINMAX
-#   include <windows.h>
-#   pragma pop_macro("NOMINMAX")
-#       define Ogre_OutputCString(str) ::OutputDebugStringA(str)
-#       define Ogre_OutputWString(str) ::OutputDebugStringW(str)
-#else
-#       define Ogre_OutputCString(str) std::cerr << str
-#       define Ogre_OutputWString(str) std::cerr << str
-#endif
 
 #endif // _String_H__

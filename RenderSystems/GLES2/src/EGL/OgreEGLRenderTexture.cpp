@@ -5,7 +5,7 @@ This source file is part of OGRE
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2008 Renato Araujo Oliveira Filho <renatox@gmail.com>
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,21 +47,21 @@ THE SOFTWARE.
 #include <climits>
 
 namespace Ogre {
-	EGLPBuffer::EGLPBuffer(EGLSupport* glsupport, PixelComponentType format,
+    EGLPBuffer::EGLPBuffer(EGLSupport* glsupport, PixelComponentType format,
                            size_t width, size_t height)
         : GLESPBuffer(format, width, height)
     {
 
     }
 
-	//Changed the constructor to a member function so that the
-	//native constructor would be called first. This member
-	//function is then called from the native constructor.
+    //Changed the constructor to a member function so that the
+    //native constructor would be called first. This member
+    //function is then called from the native constructor.
     void EGLPBuffer::initEGLPBuffer()
     {
 
-//	These are now initialized in the native constructors.
-//	mGLSupport = glsupport;
+//  These are now initialized in the native constructors.
+//  mGLSupport = glsupport;
 //        mGlDisplay = mGLSupport->getGLDisplay();
         mEglDrawable = 0;
         ::EGLConfig glConfig = 0;
@@ -111,17 +111,17 @@ namespace Ogre {
         };
 
         int pBufferAttribs[] = {
-			// First we specify the width of the surface...
+            // First we specify the width of the surface...
             EGL_WIDTH, mWidth,
-			// ...then the height of the surface...
+            // ...then the height of the surface...
             EGL_HEIGHT, mHeight,
-			/* ... then we specify the target for the texture
-			that will be created when the pbuffer is created...*/
-			EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
-			/*..then the format of the texture that will be created
-			when the pBuffer is bound to a texture...*/
+            /* ... then we specify the target for the texture
+            that will be created when the pbuffer is created...*/
+            EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
+            /*..then the format of the texture that will be created
+            when the pBuffer is bound to a texture...*/
             EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGB,
-			// The final thing is EGL_NONE which signifies the end.
+            // The final thing is EGL_NONE which signifies the end.
             EGL_NONE
         };
 
@@ -157,7 +157,7 @@ namespace Ogre {
 
     EGLPBuffer::~EGLPBuffer()
     {
-		eglDestroySurface(mGlDisplay, mEglDrawable);
+        eglDestroySurface(mGlDisplay, mEglDrawable);
         LogManager::getSingleton().logMessage(LML_NORMAL, "EGLPBuffer::PBuffer destroyed");
     }
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,18 +36,18 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgreGLExport Win32PBuffer : public GLPBuffer
     {
-	public:
-		Win32PBuffer(PixelComponentType format, size_t width, size_t height);
-		~Win32PBuffer();
-	    
-		virtual GLContext *getContext() { return mContext; }
+    public:
+        Win32PBuffer(PixelComponentType format, size_t width, size_t height);
+        ~Win32PBuffer();
+        
+        virtual GLContext *getContext() { return mContext; }
     protected:
         void createPBuffer();
-		void destroyPBuffer();
+        void destroyPBuffer();
 
-		HDC		mHDC;
-		HGLRC	mGlrc;
-		HPBUFFERARB mPBuffer;
+        HDC     mHDC;
+        HGLRC   mGlrc;
+        HPBUFFERARB mPBuffer;
         Win32Context *mContext;
     };
 }

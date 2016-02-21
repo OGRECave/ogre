@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -25,6 +25,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreShaderProgramWriter.h"
+#include "OgreShaderProgram.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -32,42 +33,42 @@ namespace RTShader {
 //-----------------------------------------------------------------------
 void ProgramWriter::writeProgramTitle(std::ostream& os, Program* program)
 {
-	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "// Program Type: ";
-	switch(program->getType())
-	{
-	case GPT_VERTEX_PROGRAM:
-		os << "Vertex shader";
-		break;
-	case GPT_FRAGMENT_PROGRAM:
-		os << "Fragment shader";
-		break;
-	case GPT_GEOMETRY_PROGRAM:
-		os << "Geometry shader";
-		break;	
-	default:
-		break;
-	}
-	os << std::endl;
-	os << "// Language: " <<  getTargetLanguage() << std::endl;
-	os << "// Created by Ogre RT Shader Generator. All rights reserved." << std::endl;
-	os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "// Program Type: ";
+    switch(program->getType())
+    {
+    case GPT_VERTEX_PROGRAM:
+        os << "Vertex shader";
+        break;
+    case GPT_FRAGMENT_PROGRAM:
+        os << "Fragment shader";
+        break;
+    case GPT_GEOMETRY_PROGRAM:
+        os << "Geometry shader";
+        break;  
+    default:
+        break;
+    }
+    os << std::endl;
+    os << "// Language: " <<  getTargetLanguage() << std::endl;
+    os << "// Created by Ogre RT Shader Generator. All rights reserved." << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 
 //-----------------------------------------------------------------------
 void ProgramWriter::writeUniformParametersTitle(std::ostream& os, Program* program)
 {
-	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "//                         GLOBAL PARAMETERS" << std::endl;
-	os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "//                         GLOBAL PARAMETERS" << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 //-----------------------------------------------------------------------
 void ProgramWriter::writeFunctionTitle(std::ostream& os, Function* function)
 {
-	os << "//-----------------------------------------------------------------------------" << std::endl;
-	os << "// Function Name: " <<  function->getName() << std::endl;
-	os << "// Function Desc: " <<  function->getDescription() << std::endl;
-	os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
+    os << "// Function Name: " <<  function->getName() << std::endl;
+    os << "// Function Desc: " <<  function->getDescription() << std::endl;
+    os << "//-----------------------------------------------------------------------------" << std::endl;
 }
 
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,38 +31,38 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Effects
-	*  @{
-	*/
-	/** Interface for compositor logics, which can be automatically binded to compositors,
-	*	allowing per-compositor logic (such as attaching a relevant listener) to happen
-	*	automatically.
-	*	@remarks All methods have empty implementations to not force an implementer into
-	*		extending all of them.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Effects
+    *  @{
+    */
+    /** Interface for compositor logics, which can be automatically binded to compositors,
+    *   allowing per-compositor logic (such as attaching a relevant listener) to happen
+    *   automatically.
+    *   @remarks All methods have empty implementations to not force an implementer into
+    *       extending all of them.
     */
     class _OgreExport CompositorLogic
     {
-	public:
-		/** Called when a compositor instance has been created.
-			@remarks
-			This happens after its setup was finished, so the chain is also accessible.
-			This is an ideal method to automatically attach a compositor listener.
+    public:
+        /** Called when a compositor instance has been created.
+            @remarks
+            This happens after its setup was finished, so the chain is also accessible.
+            This is an ideal method to automatically attach a compositor listener.
         */
-		virtual void compositorInstanceCreated(CompositorInstance* newInstance) {}
+        virtual void compositorInstanceCreated(CompositorInstance* newInstance) {}
 
-		/** Called when a compositor instance has been destroyed
-			@remarks
-			The chain that contained the compositor is still alive during this call.
+        /** Called when a compositor instance has been destroyed
+            @remarks
+            The chain that contained the compositor is still alive during this call.
         */
-		virtual void compositorInstanceDestroyed(CompositorInstance* destroyedInstance) {}
+        virtual void compositorInstanceDestroyed(CompositorInstance* destroyedInstance) {}
 
-		virtual ~CompositorLogic() {}
-	};
-	/** @} */
-	/** @} */
+        virtual ~CompositorLogic() {}
+    };
+    /** @} */
+    /** @} */
 }
 
 #endif

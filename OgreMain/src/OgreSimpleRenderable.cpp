@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreSimpleRenderable.h"
 #include "OgreException.h"
-#include "OgreSceneNode.h"
-
+#include "OgreRenderQueue.h"
 #include "OgreMaterialManager.h"
 
 namespace Ogre {
@@ -37,37 +36,37 @@ namespace Ogre {
     uint SimpleRenderable::msGenNameCount = 0;
 
     SimpleRenderable::SimpleRenderable()
- 	: MovableObject()
- 	, mWorldTransform(Matrix4::IDENTITY)
- 	, mMatName("BaseWhite")
+    : MovableObject()
+    , mWorldTransform(Matrix4::IDENTITY)
+    , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
- 	, mParentSceneManager(NULL)
- 	, mCamera(NULL)
+    , mParentSceneManager(NULL)
+    , mCamera(NULL)
 
     {
         // Generate name
-		StringUtil::StrStreamType name;
-		name << "SimpleRenderable" << msGenNameCount++;
-		mName = name.str();
+        StringStream name;
+        name << "SimpleRenderable" << msGenNameCount++;
+        mName = name.str();
     }
 
- 	SimpleRenderable::SimpleRenderable(const String& name)
- 	: MovableObject(name)
- 	, mWorldTransform(Matrix4::IDENTITY)
- 	, mMatName("BaseWhite")
+    SimpleRenderable::SimpleRenderable(const String& name)
+    : MovableObject(name)
+    , mWorldTransform(Matrix4::IDENTITY)
+    , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
- 	, mParentSceneManager(NULL)
- 	, mCamera(NULL)
- 	{
- 	}
+    , mParentSceneManager(NULL)
+    , mCamera(NULL)
+    {
+    }
 
     void SimpleRenderable::setMaterial( const String& matName )
     {
         mMatName = matName;
         mMaterial = MaterialManager::getSingleton().getByName(mMatName);
-		if (mMaterial.isNull())
-			OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + mMatName,
-				"SimpleRenderable::setMaterial" );
+        if (mMaterial.isNull())
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Could not find material " + mMatName,
+                "SimpleRenderable::setMaterial" );
     
         // Won't load twice anyway
         mMaterial->load();
@@ -100,7 +99,7 @@ namespace Ogre {
 
     void SimpleRenderable::_notifyCurrentCamera(Camera* cam)
     {
-		MovableObject::_notifyCurrentCamera(cam);
+        MovableObject::_notifyCurrentCamera(cam);
 
         mCamera = cam;
     }
@@ -120,11 +119,11 @@ namespace Ogre {
         queue->addRenderable( this, mRenderQueueID, OGRE_RENDERABLE_DEFAULT_PRIORITY); 
     }
 
-	void SimpleRenderable::visitRenderables(Renderable::Visitor* visitor, 
-		bool debugRenderables)
-	{
-		visitor->visit(this, 0, false);
-	}
+    void SimpleRenderable::visitRenderables(Renderable::Visitor* visitor, 
+        bool debugRenderables)
+    {
+        visitor->visit(this, 0, false);
+    }
 
     SimpleRenderable::~SimpleRenderable()
     {

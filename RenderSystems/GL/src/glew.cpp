@@ -154,7 +154,7 @@ void* NSGLGetProcAddress (const GLubyte *name)
   symbolName[0] = '_';
   symbol = NULL;
   /* if (NSIsSymbolNameDefined(symbolName))
-	 symbol = NSLookupAndBindSymbol(symbolName); */
+     symbol = NSLookupAndBindSymbol(symbolName); */
   symbol = image ? NSLookupSymbolInImage(image, symbolName, NSLOOKUPSYMBOLINIMAGE_OPTION_BIND | NSLOOKUPSYMBOLINIMAGE_OPTION_RETURN_ON_ERROR) : NULL;
   free(symbolName);
   if( symbol ) return NSAddressOfSymbol(symbol);
@@ -11238,12 +11238,12 @@ static GLboolean _glewInit_GLX_VERSION_1_2 (GLXEW_CONTEXT_ARG_DEF_INIT)
   GLboolean r = GL_FALSE;
 
     // SJS
-	// FB: Patched to allow Ogre to overload glXGetCurrentDisplay
-	if (glXGetCurrentDisplay == NULL)
-	{
-		r = ((glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)glewGetProcAddress((const GLubyte*)"glXGetCurrentDisplay")) == NULL) || r;
-	}
-	//r = ((glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)glewGetProcAddress((const GLubyte*)"glXGetCurrentDisplay")) == NULL) || r;
+    // FB: Patched to allow Ogre to overload glXGetCurrentDisplay
+    if (glXGetCurrentDisplay == NULL)
+    {
+        r = ((glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)glewGetProcAddress((const GLubyte*)"glXGetCurrentDisplay")) == NULL) || r;
+    }
+    //r = ((glXGetCurrentDisplay = (PFNGLXGETCURRENTDISPLAYPROC)glewGetProcAddress((const GLubyte*)"glXGetCurrentDisplay")) == NULL) || r;
     // SJS
 
   return r;

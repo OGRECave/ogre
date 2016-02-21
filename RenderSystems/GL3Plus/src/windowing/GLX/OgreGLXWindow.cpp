@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,7 @@
 #include "OgreGLXGLSupport.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreWindowEventUtilities.h"
+#include "OgreViewport.h"
 
 #include <iostream>
 #include <algorithm>
@@ -178,6 +179,15 @@ namespace Ogre
 
             if ((opt = miscParams->find("externalGLControl")) != end)
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
+            
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			if ((opt = miscParams->find("stereoMode")) != end)
+			{
+				StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
+				if (SMT_NONE != stereoMode)
+					mStereoEnabled = true;
+			}
+#endif
 
             if((opt = miscParams->find("parentWindowHandle")) != end)
             {
@@ -279,6 +289,9 @@ namespace Ogre
                 GLX_RED_SIZE,      1,
                 GLX_BLUE_SIZE,    1,
                 GLX_GREEN_SIZE,  1,
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+				GLX_STEREO, mStereoEnabled ? True : False,
+#endif
                 None
             };
 
@@ -566,9 +579,12 @@ namespace Ogre
 
         mContext->setCurrent();
 
+        PFNGLXSWAPINTERVALSGIPROC _glXSwapIntervalSGI;
+        _glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)mGLSupport->getProcAddress("glXSwapIntervalSGI");
+
         if (! mIsExternalGLControl )
         {
-            glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
+            _glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
         }
 
         mContext->endCurrent();
@@ -710,9 +726,9 @@ namespace Ogre
         if (mClosed)
             return;
 
-        if ((dst.right > mWidth) ||
-            (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "GLXWindow::copyContentsToMemory" );
         }

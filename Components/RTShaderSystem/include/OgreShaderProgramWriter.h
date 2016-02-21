@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -28,11 +28,10 @@ THE SOFTWARE.
 #define _ShaderProgramWriter_
 
 #include "OgreShaderPrerequisites.h"
+#include "OgreCommon.h"
+#include "OgreGpuProgramParams.h"
 #include "OgreGpuProgram.h"
-#include "OgreString.h"
-#include "OgreShaderProgram.h"
 #include "OgreShaderParameter.h"
-#include "OgreShaderFunction.h"
 
 namespace Ogre {
 namespace RTShader {
@@ -44,6 +43,15 @@ namespace RTShader {
 *  @{
 */
 
+// Uniform comparer
+struct CompareUniformByName : std::binary_function<UniformParameterPtr, String, bool>
+{
+    bool operator()( const UniformParameterPtr& uniform, const String& name ) const
+    {
+        return uniform->getName() == name;
+    }
+};
+
 /** Base class interface for shader program writers.
 The main usage of this class is to generate a shader source code from the given CPU program.
 In order to support specific shader language one should subclass this interface and implement the pure methods.
@@ -54,29 +62,29 @@ class _OgreRTSSExport ProgramWriter : public RTShaderSystemAlloc
 // Interface.
 public:
 
-	/** Class destructor */
-	virtual ~ProgramWriter	() {}
+    /** Class destructor */
+    virtual ~ProgramWriter  () {}
 
 
-	/** Write the program shader source code.
-	@param os The output stream to write to code into.
-	@param program The source CPU program for the GPU program code.
-	*/
-	virtual void				writeSourceCode			(std::ostream& os, Program* program) = 0;
+    /** Write the program shader source code.
+    @param os The output stream to write to code into.
+    @param program The source CPU program for the GPU program code.
+    */
+    virtual void                writeSourceCode         (std::ostream& os, Program* program) = 0;
     
-	/** Return the target language of this writer. */
-	virtual const String&		getTargetLanguage	() const = 0;
+    /** Return the target language of this writer. */
+    virtual const String&       getTargetLanguage   () const = 0;
 
 // Protected methods.
 protected:
-	/** Write the program title. */
-	void				writeProgramTitle			(std::ostream& os, Program* program);
+    /** Write the program title. */
+    void                writeProgramTitle           (std::ostream& os, Program* program);
 
-	/** Write the uniform parameters title. */
-	void				writeUniformParametersTitle	(std::ostream& os, Program* program);
+    /** Write the uniform parameters title. */
+    void                writeUniformParametersTitle (std::ostream& os, Program* program);
 
-	/** Write a function title. */
-	void				writeFunctionTitle			(std::ostream& os, Function* function);
+    /** Write a function title. */
+    void                writeFunctionTitle          (std::ostream& os, Function* function);
 };
 
 /** @} */

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,43 +39,43 @@ namespace Ogre
     {
         return msSingleton;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     DynLibManager& DynLibManager::getSingleton(void)
     {  
         assert( msSingleton );  return ( *msSingleton );  
     }
     //-----------------------------------------------------------------------
-	DynLibManager::DynLibManager()
-	{
-	}
-	//-----------------------------------------------------------------------
+    DynLibManager::DynLibManager()
+    {
+    }
+    //-----------------------------------------------------------------------
     DynLib* DynLibManager::load( const String& filename)
     {
-		DynLibList::iterator i = mLibList.find(filename);
-		if (i != mLibList.end())
-		{
-			return i->second;
-		}
-		else
-		{
-	        DynLib* pLib = OGRE_NEW DynLib(filename);
-			pLib->load();        
-        	mLibList[filename] = pLib;
-	        return pLib;
-		}
+        DynLibList::iterator i = mLibList.find(filename);
+        if (i != mLibList.end())
+        {
+            return i->second;
+        }
+        else
+        {
+            DynLib* pLib = OGRE_NEW DynLib(filename);
+            pLib->load();        
+            mLibList[filename] = pLib;
+            return pLib;
+        }
     }
-	//-----------------------------------------------------------------------
-	void DynLibManager::unload(DynLib* lib)
-	{
-		DynLibList::iterator i = mLibList.find(lib->getName());
-		if (i != mLibList.end())
-		{
-			mLibList.erase(i);
-		}
-		lib->unload();
-		OGRE_DELETE lib;
-	}
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    void DynLibManager::unload(DynLib* lib)
+    {
+        DynLibList::iterator i = mLibList.find(lib->getName());
+        if (i != mLibList.end())
+        {
+            mLibList.erase(i);
+        }
+        lib->unload();
+        OGRE_DELETE lib;
+    }
+    //-----------------------------------------------------------------------
     DynLibManager::~DynLibManager()
     {
         // Unload & delete resources in turn

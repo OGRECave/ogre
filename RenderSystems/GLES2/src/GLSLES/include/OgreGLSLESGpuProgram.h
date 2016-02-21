@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,47 +36,47 @@ THE SOFTWARE.
 namespace Ogre {
 
     /** GLSL ES low level compiled shader object - this class is used to get at the linked program object 
-		and provide an interface for GLES2RenderSystem calls.  GLSL ES does not provide access to the
-		low level code of the shader so this class is really just a dummy place holder.
-		GLSL ES uses a program object to represent the active vertex and fragment programs used
-		but Ogre materials maintain separate instances of the active vertex and fragment programs
-		which creates a small problem for GLSL integration.  The GLSLESGpuProgram class provides the
-		interface between the GLSLESLinkProgramManager, GLSLESProgramPipelineManager , GLES2RenderSystem,
+        and provide an interface for GLES2RenderSystem calls.  GLSL ES does not provide access to the
+        low level code of the shader so this class is really just a dummy place holder.
+        GLSL ES uses a program object to represent the active vertex and fragment programs used
+        but Ogre materials maintain separate instances of the active vertex and fragment programs
+        which creates a small problem for GLSL integration.  The GLSLESGpuProgram class provides the
+        interface between the GLSLESLinkProgramManager, GLSLESProgramPipelineManager , GLES2RenderSystem,
         and the active GLSLESProgram instances.
-	*/
+    */
     class _OgreGLES2Export GLSLESGpuProgram : public GLES2GpuProgram
     {
     private:
-		/// GL Handle for the shader object
-		GLSLESProgram* mGLSLProgram;
+        /// GL Handle for the shader object
+        GLSLESProgram* mGLSLProgram;
 
-		/// Keep track of the number of vertex shaders created
-		static GLuint mVertexShaderCount;
-		/// Keep track of the number of fragment shaders created
-		static GLuint mFragmentShaderCount;
+        /// Keep track of the number of vertex shaders created
+        static GLuint mVertexShaderCount;
+        /// Keep track of the number of fragment shaders created
+        static GLuint mFragmentShaderCount;
 
         /** Flag indicating that the program object has been successfully linked.
             Only used when programs are linked separately with GL_EXT_separate_shader_objects.
          */
-		GLint mLinked;
+        GLint mLinked;
 
-	public:
+    public:
         GLSLESGpuProgram(GLSLESProgram* parent);
-		~GLSLESGpuProgram();
+        ~GLSLESGpuProgram();
 
-		/// Execute the binding functions for this program
-		void bindProgram(void);
-		/// Execute the unbinding functions for this program
-		void unbindProgram(void);
-		/// Execute the param binding functions for this program
-		void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-		/// Execute the shared param binding functions for this program
-		void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
-		/// Execute the pass iteration param binding functions for this program
-		void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
+        /// Execute the binding functions for this program
+        void bindProgram(void);
+        /// Execute the unbinding functions for this program
+        void unbindProgram(void);
+        /// Execute the param binding functions for this program
+        void bindProgramParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Execute the shared param binding functions for this program
+        void bindProgramSharedParameters(GpuProgramParametersSharedPtr params, uint16 mask);
+        /// Execute the pass iteration param binding functions for this program
+        void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params);
 
-		/// Get the GLSLESProgram for the shader object
-		GLSLESProgram* getGLSLProgram(void) const { return mGLSLProgram; }		
+        /// Get the GLSLESProgram for the shader object
+        GLSLESProgram* getGLSLProgram(void) const { return mGLSLProgram; }      
 
         /** Return the programs link status
             Only used when programs are linked separately with GL_EXT_separate_shader_objects.
@@ -91,10 +91,10 @@ namespace Ogre {
     protected:
         /// Overridden from GpuProgram
         void loadFromSource(void);
-		/// @copydoc Resource::unloadImpl
-		void unloadImpl(void);
-		/// @copydoc Resource::loadImpl
-		void loadImpl(void);
+        /// @copydoc Resource::unloadImpl
+        void unloadImpl(void);
+        /// @copydoc Resource::loadImpl
+        void loadImpl(void);
     };
 }
 

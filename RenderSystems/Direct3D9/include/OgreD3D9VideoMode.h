@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,31 +33,31 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	static unsigned int modeCount = 0;
+    static unsigned int modeCount = 0;
 
-	class _OgreD3D9Export D3D9VideoMode
-	{
-	private:
-		D3DDISPLAYMODE mDisplayMode;
-		unsigned int modeNumber;
+    class _OgreD3D9Export D3D9VideoMode
+    {
+    private:
+        D3DDISPLAYMODE mDisplayMode;
+        unsigned int modeNumber;
 
-	public:
-		D3D9VideoMode() { modeNumber = ++modeCount; ZeroMemory( &mDisplayMode, sizeof(D3DDISPLAYMODE) ); }
-		D3D9VideoMode( const D3D9VideoMode &ob ) { modeNumber = ++modeCount; mDisplayMode = ob.mDisplayMode; }
-		D3D9VideoMode( D3DDISPLAYMODE d3ddm ) { modeNumber = ++modeCount; mDisplayMode = d3ddm; }
-		~D3D9VideoMode()
-		{
-			modeCount--;
-		}
+    public:
+        D3D9VideoMode() { modeNumber = ++modeCount; ZeroMemory( &mDisplayMode, sizeof(D3DDISPLAYMODE) ); }
+        D3D9VideoMode( const D3D9VideoMode &ob ) { modeNumber = ++modeCount; mDisplayMode = ob.mDisplayMode; }
+        D3D9VideoMode( D3DDISPLAYMODE d3ddm ) { modeNumber = ++modeCount; mDisplayMode = d3ddm; }
+        ~D3D9VideoMode()
+        {
+            modeCount--;
+        }
 
-		unsigned int getWidth() const { return mDisplayMode.Width; }
-		unsigned int getHeight() const { return mDisplayMode.Height; }
-		D3DFORMAT getFormat() const { return mDisplayMode.Format; }
-		unsigned int getRefreshRate() const { return mDisplayMode.RefreshRate; }
-		unsigned int getColourDepth() const;
-		D3DDISPLAYMODE getDisplayMode() const { return mDisplayMode; }
-		void increaseRefreshRate(unsigned int rr) { mDisplayMode.RefreshRate = rr; } 
-		String getDescription() const;
-	};
+        unsigned int getWidth() const { return mDisplayMode.Width; }
+        unsigned int getHeight() const { return mDisplayMode.Height; }
+        D3DFORMAT getFormat() const { return mDisplayMode.Format; }
+        unsigned int getRefreshRate() const { return mDisplayMode.RefreshRate; }
+        unsigned int getColourDepth() const;
+        D3DDISPLAYMODE getDisplayMode() const { return mDisplayMode; }
+        void increaseRefreshRate(unsigned int rr) { mDisplayMode.RefreshRate = rr; } 
+        String getDescription() const;
+    };
 }
 #endif

@@ -43,6 +43,7 @@ endif ()
 set(STATIC_INST_FILES
   Packages/FindCg.cmake
   Packages/FindDirectX.cmake
+  Packages/FindDirectX11.cmake
   Packages/FindFreeImage.cmake
   Packages/FindFreetype.cmake
   Packages/FindOpenGLES.cmake
@@ -50,6 +51,8 @@ set(STATIC_INST_FILES
   Packages/FindZLIB.cmake
   Packages/FindZZip.cmake
   Packages/FindSoftimage.cmake
+  Packages/FindGLSLOptimizer.cmake
+  Packages/FindHLSL2GLSL.cmake
 )
 if (WIN32)
   set(INST_FILES ${INST_FILES}

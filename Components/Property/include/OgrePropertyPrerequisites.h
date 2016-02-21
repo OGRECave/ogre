@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,28 +34,28 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	typedef GeneralAllocatedObject PropertyAlloc;
+    typedef GeneralAllocatedObject PropertyAlloc;
 
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#	if defined( OGRE_STATIC_LIB )
-#   	define _OgrePropertyExport
+#   if defined( OGRE_STATIC_LIB )
+#       define _OgrePropertyExport
 #   else
-#   	if defined( OGRE_PROPERTY_EXPORTS )
-#       	define _OgrePropertyExport __declspec( dllexport )
-#   	else
+#       if defined( OGRE_PROPERTY_EXPORTS )
+#           define _OgrePropertyExport __declspec( dllexport )
+#       else
 #           if defined( __MINGW32__ )
 #               define _OgrePropertyExport
 #           else
-#       	    define _OgrePropertyExport __declspec( dllimport )
+#               define _OgrePropertyExport __declspec( dllimport )
 #           endif
-#   	endif
-#	endif
+#       endif
+#   endif
 #elif defined ( OGRE_GCC_VISIBILITY )
 #   define _OgrePropertyExport __attribute__ ((visibility("default")))
 #else
-#	define _OgrePropertyExport
+#   define _OgrePropertyExport
 #endif 
 
 

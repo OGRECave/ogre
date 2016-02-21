@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,53 +50,53 @@ using namespace Imf;
 namespace Ogre {
 
 void writeEXRHalf(OStream *ost, const float *pixels,
-	      int width, int height, int components) 
+          int width, int height, int components) 
 {
-	//assert(components==3 || components==4);
-	// TODO: throw std::exception if invalid number of components
+    //assert(components==3 || components==4);
+    // TODO: throw std::exception if invalid number of components
 
-	Header header (width, height);
-	header.channels().insert ("R", Channel (HALF));
-	header.channels().insert ("G", Channel (HALF));
-	header.channels().insert ("B", Channel (HALF));
-	if(components==4)
-		header.channels().insert ("A", Channel (HALF));
+    Header header (width, height);
+    header.channels().insert ("R", Channel (HALF));
+    header.channels().insert ("G", Channel (HALF));
+    header.channels().insert ("B", Channel (HALF));
+    if(components==4)
+        header.channels().insert ("A", Channel (HALF));
 
-	// Convert data to half
-	half *data = new half [width*height*components];
-	
-	std::copy(pixels, pixels+(width*height*components), data);
-	
-	// And save it
-	OutputFile file (*ost, header);
-	FrameBuffer frameBuffer;
+    // Convert data to half
+    half *data = new half [width*height*components];
+    
+    std::copy(pixels, pixels+(width*height*components), data);
+    
+    // And save it
+    OutputFile file (*ost, header);
+    FrameBuffer frameBuffer;
 
-	frameBuffer.insert("R",				// name
-			    Slice (HALF,		// type
-				   ((char *) data)+0,	// base
-				   2 * components,		// xStride
-				   2 * components * width));	// yStride
-	frameBuffer.insert("G",				// name
-			    Slice (HALF,		// type
-				   ((char *) data)+2,	// base
-				   2 * components,		// xStride
-				   2 * components * width));	// yStride
-	frameBuffer.insert("B",				// name
-			    Slice (HALF,		// type
-				   ((char *) data)+4,	// base
-				   2 * components,		// xStride
-				   2 * components * width));	// yStride
-	if(components==4) {
-		frameBuffer.insert("A",					// name
-				    Slice (HALF,			// type
-					   ((char *) data)+6,		// base
-					   2 * components,		// xStride
-					   2 * components * width));	// yStride
-	}
+    frameBuffer.insert("R",             // name
+                Slice (HALF,        // type
+                   ((char *) data)+0,   // base
+                   2 * components,      // xStride
+                   2 * components * width));    // yStride
+    frameBuffer.insert("G",             // name
+                Slice (HALF,        // type
+                   ((char *) data)+2,   // base
+                   2 * components,      // xStride
+                   2 * components * width));    // yStride
+    frameBuffer.insert("B",             // name
+                Slice (HALF,        // type
+                   ((char *) data)+4,   // base
+                   2 * components,      // xStride
+                   2 * components * width));    // yStride
+    if(components==4) {
+        frameBuffer.insert("A",                 // name
+                    Slice (HALF,            // type
+                       ((char *) data)+6,       // base
+                       2 * components,      // xStride
+                       2 * components * width));    // yStride
+    }
 
-	file.setFrameBuffer(frameBuffer);
-	file.writePixels(height);
-	delete data;
+    file.setFrameBuffer(frameBuffer);
+    file.writePixels(height);
+    delete data;
 }
 
 

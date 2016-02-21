@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,47 +45,47 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	OSXPBuffer::OSXPBuffer( PixelComponentType format, uint32 width, uint32 height ) : GLPBuffer( format, width, height ), mContext( NULL )
-	{
-		LogManager::getSingleton().logMessage( "OSXPBuffer::OSXPBuffer()" );
-		createPBuffer();
-		// Create context
-		//mContext = OGRE_NEW OSXCarbonContext(mAGLContext);
+    OSXPBuffer::OSXPBuffer( PixelComponentType format, uint32 width, uint32 height ) : GLPBuffer( format, width, height ), mContext( NULL )
+    {
+        LogManager::getSingleton().logMessage( "OSXPBuffer::OSXPBuffer()" );
+        createPBuffer();
+        // Create context
+        //mContext = OGRE_NEW OSXCarbonContext(mAGLContext);
     }
-	
-	OSXPBuffer::~OSXPBuffer()
-	{
-		LogManager::getSingleton().logMessage( "OSXPBuffer::~OSXPBuffer()" );
-		OGRE_DELETE mContext;
-		destroyPBuffer();
-	}
+    
+    OSXPBuffer::~OSXPBuffer()
+    {
+        LogManager::getSingleton().logMessage( "OSXPBuffer::~OSXPBuffer()" );
+        OGRE_DELETE mContext;
+        destroyPBuffer();
+    }
 
-	GLContext* OSXPBuffer::getContext()
-	{
-		LogManager::getSingleton().logMessage( "OSXPBuffer::getContext()" );
-		return mContext;
-	}
-	
-	void OSXPBuffer::createPBuffer()
-	{
-		LogManager::getSingleton().logMessage( "OSXPBuffer::createPBuffer()" );
-		
-		GLint attrib[] = { AGL_NO_RECOVERY, GL_TRUE, AGL_ACCELERATED, GL_TRUE, AGL_RGBA, AGL_NONE };
-		AGLPixelFormat pixelFormat = aglChoosePixelFormat(NULL, 0, attrib);
-		mAGLContext = aglCreateContext(pixelFormat, NULL);
-		
-		//mAGLContext = aglGetCurrentContext();
-		aglCreatePBuffer( mWidth, mHeight, GL_TEXTURE_2D, GL_RGBA, 0, &mPBuffer );
-		
-		GLint vs = aglGetVirtualScreen( mAGLContext );
-		aglSetPBuffer( mAGLContext, mPBuffer, 0, 0, vs );
+    GLContext* OSXPBuffer::getContext()
+    {
+        LogManager::getSingleton().logMessage( "OSXPBuffer::getContext()" );
+        return mContext;
+    }
+    
+    void OSXPBuffer::createPBuffer()
+    {
+        LogManager::getSingleton().logMessage( "OSXPBuffer::createPBuffer()" );
+        
+        GLint attrib[] = { AGL_NO_RECOVERY, GL_TRUE, AGL_ACCELERATED, GL_TRUE, AGL_RGBA, AGL_NONE };
+        AGLPixelFormat pixelFormat = aglChoosePixelFormat(NULL, 0, attrib);
+        mAGLContext = aglCreateContext(pixelFormat, NULL);
+        
+        //mAGLContext = aglGetCurrentContext();
+        aglCreatePBuffer( mWidth, mHeight, GL_TEXTURE_2D, GL_RGBA, 0, &mPBuffer );
+        
+        GLint vs = aglGetVirtualScreen( mAGLContext );
+        aglSetPBuffer( mAGLContext, mPBuffer, 0, 0, vs );
         mContext = OGRE_NEW OSXCarbonContext(mAGLContext, pixelFormat);
-	}
-	
-	void OSXPBuffer::destroyPBuffer()
-	{
-		LogManager::getSingleton().logMessage( "OSXPBuffer::destroyPBuffer()" );
-		aglDestroyPBuffer( mPBuffer );
-	}
+    }
+    
+    void OSXPBuffer::destroyPBuffer()
+    {
+        LogManager::getSingleton().logMessage( "OSXPBuffer::destroyPBuffer()" );
+        aglDestroyPBuffer( mPBuffer );
+    }
 }
 

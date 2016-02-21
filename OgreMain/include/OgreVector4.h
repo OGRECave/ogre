@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,13 +34,13 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** 4-dimensional homogeneous vector.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** 4-dimensional homogeneous vector.
     */
     class _OgreExport Vector4
     {
@@ -48,12 +48,16 @@ namespace Ogre
         Real x, y, z, w;
 
     public:
+        /** Default constructor.
+            @note
+                It does <b>NOT</b> initialize the vector for efficiency.
+        */
         inline Vector4()
         {
         }
 
         inline Vector4( const Real fX, const Real fY, const Real fZ, const Real fW )
-            : x( fX ), y( fY ), z( fZ ), w( fW)
+            : x( fX ), y( fY ), z( fZ ), w( fW )
         {
         }
 
@@ -91,40 +95,51 @@ namespace Ogre
         {
         }
 
-		/** Exchange the contents of this vector with another. 
-		*/
-		inline void swap(Vector4& other)
-		{
-			std::swap(x, other.x);
-			std::swap(y, other.y);
-			std::swap(z, other.z);
-			std::swap(w, other.w);
-		}
-	
-		inline Real operator [] ( const size_t i ) const
+        /** Swizzle-like narrowing operations
+        */
+        inline Vector3 xyz() const
+        {
+            return Vector3(x, y, z);
+        }
+        inline Vector2 xy() const
+        {
+            return Vector2(x, y);
+        }
+
+        /** Exchange the contents of this vector with another. 
+        */
+        inline void swap(Vector4& other)
+        {
+            std::swap(x, other.x);
+            std::swap(y, other.y);
+            std::swap(z, other.z);
+            std::swap(w, other.w);
+        }
+    
+        inline Real operator [] ( const size_t i ) const
         {
             assert( i < 4 );
 
             return *(&x+i);
         }
 
-		inline Real& operator [] ( const size_t i )
+        inline Real& operator [] ( const size_t i )
         {
             assert( i < 4 );
 
             return *(&x+i);
         }
 
-		/// Pointer accessor for direct copying
-		inline Real* ptr()
-		{
-			return &x;
-		}
-		/// Pointer accessor for direct copying
-		inline const Real* ptr() const
-		{
-			return &x;
-		}
+        /// Pointer accessor for direct copying
+        inline Real* ptr()
+        {
+            return &x;
+        }
+        /// Pointer accessor for direct copying
+        inline const Real* ptr() const
+        {
+            return &x;
+        }
 
         /** Assigns the value of the other vector.
             @param
@@ -140,14 +155,14 @@ namespace Ogre
             return *this;
         }
 
-		inline Vector4& operator = ( const Real fScalar)
-		{
-			x = fScalar;
-			y = fScalar;
-			z = fScalar;
-			w = fScalar;
-			return *this;
-		}
+        inline Vector4& operator = ( const Real fScalar)
+        {
+            x = fScalar;
+            y = fScalar;
+            z = fScalar;
+            w = fScalar;
+            return *this;
+        }
 
         inline bool operator == ( const Vector4& rkVector ) const
         {
@@ -390,11 +405,11 @@ namespace Ogre
         {
             return x * vec.x + y * vec.y + z * vec.z + w * vec.w;
         }
-		/// Check whether this vector contains valid values
-		inline bool isNaN() const
-		{
-			return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w);
-		}
+        /// Check whether this vector contains valid values
+        inline bool isNaN() const
+        {
+            return Math::isNaN(x) || Math::isNaN(y) || Math::isNaN(z) || Math::isNaN(w);
+        }
         /** Function for writing to a stream.
         */
         inline _OgreExport friend std::ostream& operator <<
@@ -406,8 +421,8 @@ namespace Ogre
         // special
         static const Vector4 ZERO;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 #endif

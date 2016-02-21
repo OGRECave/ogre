@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -19,23 +19,23 @@ same license as the rest of the engine.
 
 enum ShaderValType
 {
-	GPU_VERTEX, GPU_FRAGMENT, MAT_SPECULAR, MAT_DIFFUSE, MAT_AMBIENT, MAT_SHININESS, MAT_EMISSIVE
+    GPU_VERTEX, GPU_FRAGMENT, MAT_SPECULAR, MAT_DIFFUSE, MAT_AMBIENT, MAT_SHININESS, MAT_EMISSIVE
 };
 
 //---------------------------------------------------------------------------
 struct ShaderControl
 {
     Ogre::String Name;
-	Ogre::String ParamName;
-	ShaderValType ValType;
-	float MinVal;
-	float MaxVal;
-	size_t ElementIndex;
-	mutable size_t PhysicalIndex;
+    Ogre::String ParamName;
+    ShaderValType ValType;
+    float MinVal;
+    float MaxVal;
+    size_t ElementIndex;
+    mutable size_t PhysicalIndex;
 
-	float getRange(void) const { return MaxVal - MinVal; }
-	float convertParamToScrollPosition(const float val) const { return val - MinVal; }
-	float convertScrollPositionToParam(const float val) const { return val + MinVal; }
+    float getRange(void) const { return MaxVal - MinVal; }
+    float convertParamToScrollPosition(const float val) const { return val - MinVal; }
+    float convertScrollPositionToParam(const float val) const { return val + MinVal; }
 };
 
 typedef Ogre::vector<ShaderControl>::type ShaderControlsContainer;

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,61 +38,76 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** Ogre assumes that there are separate vertex and fragment programs to deal with but
-		GLSL ES has one program object that represents the active vertex and fragment shader objects
-		during a rendering state.  GLSL Vertex and fragment 
-		shader objects are compiled separately and then attached to a program object and then the
-		program object is linked.  Since Ogre can only handle one vertex program and one fragment
-		program being active in a pass, the GLSL ES Link Program Manager does the same.  The GLSL ES Link
-		program manager acts as a state machine and activates a program object based on the active
-		vertex and fragment program.  Previously created program objects are stored along with a unique
-		key in a hash_map for quick retrieval the next time the program object is required.
-	*/
+    /** Ogre assumes that there are separate vertex and fragment programs to deal with but
+        GLSL ES has one program object that represents the active vertex and fragment shader objects
+        during a rendering state.  GLSL Vertex and fragment 
+        shader objects are compiled separately and then attached to a program object and then the
+        program object is linked.  Since Ogre can only handle one vertex program and one fragment
+        program being active in a pass, the GLSL ES Link Program Manager does the same.  The GLSL ES Link
+        program manager acts as a state machine and activates a program object based on the active
+        vertex and fragment program.  Previously created program objects are stored along with a unique
+        key in a hash_map for quick retrieval the next time the program object is required.
+    */
 
-	class _OgreGLES2Export GLSLESLinkProgramManager : public GLSLESProgramManagerCommon, public Singleton<GLSLESLinkProgramManager>
-	{
+    class _OgreGLES2Export GLSLESLinkProgramManager : public GLSLESProgramManagerCommon, public Singleton<GLSLESLinkProgramManager>
+    {
 
-	private:
-	
-		typedef map<uint64, GLSLESLinkProgram*>::type LinkProgramMap;
-		typedef LinkProgramMap::iterator LinkProgramIterator;
+    private:
+    
+        typedef map<uint64, GLSLESLinkProgram*>::type LinkProgramMap;
+        typedef LinkProgramMap::iterator LinkProgramIterator;
 
-		/// Container holding previously created program objects 
-		LinkProgramMap mLinkPrograms; 
+        /// Container holding previously created program objects 
+        LinkProgramMap mLinkPrograms; 
 
-		/// Active objects defining the active rendering gpu state
-		GLSLESLinkProgram* mActiveLinkProgram;
+        /// Active objects defining the active rendering gpu state
+        GLSLESLinkProgram* mActiveLinkProgram;
 
-		typedef map<String, GLenum>::type StringToEnumMap;
-		StringToEnumMap mTypeEnumMap;
+        typedef map<String, GLenum>::type StringToEnumMap;
+        StringToEnumMap mTypeEnumMap;
 
-	public:
+    public:
 
-		GLSLESLinkProgramManager(void);
+        GLSLESLinkProgramManager(void);
 
-		~GLSLESLinkProgramManager(void);
+        ~GLSLESLinkProgramManager(void);
+
+        /**
+            Get the program object that links the two active shader objects together
+            if a program object was not already created and linked a new one is created and linked
+        */
+        GLSLESLinkProgram* getActiveLinkProgram(void);
 
 		/**
-			Get the program object that links the two active shader objects together
-			if a program object was not already created and linked a new one is created and linked
+			Get the linker program by a gpu program
 		*/
-		GLSLESLinkProgram* getActiveLinkProgram(void);
+		GLSLESLinkProgram* getByProgram(GLSLESGpuProgram* gpuProgram);
 
-		/** Set the active fragment shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
+		/**
+			Destroy and remove the linker program from the local cache
 		*/
-		void setActiveFragmentShader(GLSLESGpuProgram* fragmentGpuProgram);
-		/** Set the active vertex shader for the next rendering state.
-			The active program object will be cleared.
-			Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
-		*/
-		void setActiveVertexShader(GLSLESGpuProgram* vertexGpuProgram);
+		bool destroyLinkProgram(GLSLESLinkProgram* linkProgram);
 
-		static GLSLESLinkProgramManager& getSingleton(void);
+		/**
+			Destroy all linker programs which referencing this gpu program
+		*/
+		void destroyAllByProgram(GLSLESGpuProgram* gpuProgram);
+
+        /** Set the active fragment shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveFragmentShader(GLSLESGpuProgram* fragmentGpuProgram);
+        /** Set the active vertex shader for the next rendering state.
+            The active program object will be cleared.
+            Normally called from the GLSLESGpuProgram::bindProgram and unbindProgram methods
+        */
+        void setActiveVertexShader(GLSLESGpuProgram* vertexGpuProgram);
+
+        static GLSLESLinkProgramManager& getSingleton(void);
         static GLSLESLinkProgramManager* getSingletonPtr(void);
 
-	};
+    };
 
 }
 

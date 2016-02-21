@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,11 +47,11 @@ namespace Ogre {
         are more likely to call SceneManager::setWorldGeometry which will
         automatically arrange the loading of the level. Note that this assumes
         that you have asked for an indoor-specialised SceneManager (specify
-        ST_INDOOR when calling Root::getSceneManager).</p>
+        ST_INDOOR when calling Root::getSceneManager).
         Ogre currently only supports loading from Quake3 Arena level files,
         although any source that can be converted into this classes structure
         could also be used. The Quake3 level load process is in a different
-        class called Quake3Level to keep the specifics separate.</p>
+        class called Quake3Level to keep the specifics separate.
     */
     class BspLevel : public Resource
     {
@@ -78,8 +78,8 @@ namespace Ogre {
         */
         void _notifyObjectMoved(const MovableObject* mov, 
             const Vector3& pos);
-		/** Internal method, makes sure an object is removed from the leaves when detached from a node. */
-		void _notifyObjectDetached(const MovableObject* mov);
+        /** Internal method, makes sure an object is removed from the leaves when detached from a node. */
+        void _notifyObjectDetached(const MovableObject* mov);
         /** Gets a pointer to the start of the leaf nodes. */
         BspNode* getLeafStart(void) {return &mRootNode[mLeafStart]; }
         /** Gets the number of leaf nodes */
@@ -90,15 +90,15 @@ namespace Ogre {
         /** Calculate the number of loading stages required for a given level */
         static size_t calculateLoadingStages(DataStreamPtr& stream);
 
-		/** Load direct from stream */
-		void load(DataStreamPtr& stream);
+        /** Load direct from stream */
+        void load(DataStreamPtr& stream);
 
-		/** Is sky enabled? */
-		bool isSkyEnabled(void) const;
-		/** Get Sky material name */
-		const String& getSkyMaterialName(void) const;
-		/** Get sky curvature */
-		Real getSkyCurvature(void) const;
+        /** Is sky enabled? */
+        bool isSkyEnabled(void) const;
+        /** Get Sky material name */
+        const String& getSkyMaterialName(void) const;
+        /** Get sky curvature */
+        Real getSkyCurvature(void) const;
 
         /** Utility class just to enable queueing of patches */
     protected:
@@ -117,7 +117,7 @@ namespace Ogre {
         BspNode* mRootNode;
         int mNumNodes;
         int mNumLeaves;
-		int mNumBrushes;
+        int mNumBrushes;
         int mLeafStart; /// The index at which leaf nodes begin
 
         /** Vertex format for fixed geometry.
@@ -158,7 +158,7 @@ namespace Ogre {
         BspNode::Brush *mBrushes;
 
         /** Vector of player start points */
-		vector<ViewPoint>::type mPlayerStarts;
+        vector<ViewPoint>::type mPlayerStarts;
 
         /** Internal utility function for loading data from Quake3. */
         void loadQuake3Level(const Quake3Level& q3lvl);
@@ -171,10 +171,10 @@ namespace Ogre {
             up to the nearest byte obviously, which uses far less space than 4-bytes per linked node per source
             node). Of course the limitation here is that you have to each leaf in turn to determine if it is visible
             rather than just following a list, but since this is only done once per frame this is not such a big
-            overhead.</p>
+            overhead.
             Each row in the table is a 'from' cluster, with each bit in the row corresponding to a 'to' cluster,
             both ordered based on cluster index. A 0 in the bit indicates the 'to' cluster is not visible from the
-            'from' cluster, whilst a 1 indicates it is.</p>
+            'from' cluster, whilst a 1 indicates it is.
             As many will notice, this is lifted directly from the Quake implementation of PVS.
         */
         struct VisData
@@ -190,25 +190,25 @@ namespace Ogre {
         /** Internal method for parsing chosen entities. */
         void loadEntities(const Quake3Level& q3lvl);
 
-		typedef map<const MovableObject*, list<BspNode*>::type >::type MovableToNodeMap;
+        typedef map<const MovableObject*, list<BspNode*>::type >::type MovableToNodeMap;
         /// Map for locating the nodes a movable is currently a member of
         MovableToNodeMap mMovableToNodeMap;
 
         void tagNodesWithMovable(BspNode* node, const MovableObject* mov, const Vector3& pos);
 
         /// Storage of patches
-		typedef map<int, PatchSurface*>::type PatchMap;
+        typedef map<int, PatchSurface*>::type PatchMap;
         PatchMap mPatches;
         /// Total number of vertices required for all patches
         size_t mPatchVertexCount;
         /// Total number of indexes required for all patches
         size_t mPatchIndexCount;
-		/// Sky enabled?
-		bool mSkyEnabled;
-		/// Sky material
-		String mSkyMaterial;
-		/// Sky details
-		Real mSkyCurvature;
+        /// Sky enabled?
+        bool mSkyEnabled;
+        /// Sky material
+        String mSkyMaterial;
+        /// Sky details
+        Real mSkyCurvature;
 
 
         void initQuake3Patches(const Quake3Level & q3lvl, VertexDeclaration* decl);

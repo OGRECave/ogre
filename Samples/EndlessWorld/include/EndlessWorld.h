@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -28,7 +28,9 @@ same license as the rest of the engine.
 #include "OgreTerrainQuadTreeNode.h"
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPagedWorldSection.h"
+#include "OgreTerrainAutoUpdateLod.h"
 #include "OgreTerrainPaging.h"
+#include "OgrePageManager.h"
 #include "PerlinNoiseTerrainGenerator.h"
 
 #define ENDLESS_TERRAIN_FILE_PREFIX String("EndlessWorldTerrain")
@@ -36,6 +38,7 @@ same license as the rest of the engine.
 #define TERRAIN_WORLD_SIZE 12000.0f
 #define TERRAIN_SIZE 513
 #define HOLD_LOD_DISTANCE 3000.0
+#define USE_PERLIN_DEFINER 1
 
 using namespace Ogre;
 using namespace OgreBites;
@@ -45,7 +48,8 @@ class _OgreSampleClassExport Sample_EndlessWorld : public SdkSample
 public:
 
 	Sample_EndlessWorld()
-		: mTerrainGroup(0)
+		: mTerrainGlobals(0)
+        , mTerrainGroup(0)
 		, mTerrainPaging(0)
 		, mPageManager(0)
 		, mPagedWorld(0)
@@ -56,6 +60,8 @@ public:
 		, mFly(true)
 		, mFallVelocity(0)
         , mTerrainPos(0,0,0)
+        , mLodInfoOverlay(0)
+        , mLodInfoOverlayContainer(0)
 
 	{
 		mInfo["Title"] = "Endless World";
@@ -79,7 +85,9 @@ public:
 	StringVector getRequiredPlugins()
 	{
 		StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsles") && !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsles")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             names.push_back("Cg Program Manager");
 		return names;
 	}
@@ -411,7 +419,7 @@ protected:
 		mTerrainGroup = OGRE_NEW TerrainGroup(mSceneMgr, Terrain::ALIGN_X_Z, TERRAIN_SIZE, TERRAIN_WORLD_SIZE);
 		mTerrainGroup->setFilenameConvention(ENDLESS_TERRAIN_FILE_PREFIX, ENDLESS_TERRAIN_FILE_SUFFIX);
 		mTerrainGroup->setOrigin(mTerrainPos);
-		mTerrainGroup->setAutoUpdateLod( TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE) );
+		mTerrainGroup->setAutoUpdateLod(TerrainAutoUpdateLodFactory::getAutoUpdateLod(BY_DISTANCE));
 
 		configureTerrainDefaults(l);
 
@@ -428,9 +436,12 @@ protected:
 			ENDLESS_PAGE_MIN_X, ENDLESS_PAGE_MIN_Y, 
 			ENDLESS_PAGE_MAX_X, ENDLESS_PAGE_MAX_Y);
 
+#if USE_PERLIN_DEFINER == 1
 		mPerlinNoiseTerrainGenerator = OGRE_NEW PerlinNoiseTerrainGenerator;
-		mTerrainPagedWorldSection->setDefiner( mPerlinNoiseTerrainGenerator );
-//		mTerrainPagedWorldSection->setDefiner( OGRE_NEW SimpleTerrainDefiner );
+		mTerrainPagedWorldSection->setDefiner(mPerlinNoiseTerrainGenerator);
+#else
+		mTerrainPagedWorldSection->setDefiner(OGRE_NEW SimpleTerrainDefiner);
+#endif
 
 		mTerrainGroup->freeTemporaryResources();
 
@@ -456,17 +467,24 @@ protected:
 			mPageManager->destroyWorld( mPagedWorld );
 			OGRE_DELETE mPageManager;
 		}
-		OGRE_DELETE mTerrainGlobals;
-		
-		for(LabelList::iterator li = mLodStatusLabelList.begin(); li != mLodStatusLabelList.end(); li++)
-		{
-			mLodInfoOverlayContainer->_removeChild(*li);
-			OverlayManager::getSingleton().destroyOverlayElement(*li);
-		}
-		mLodStatusLabelList.clear();
 
-		OverlayManager::getSingleton().destroy(mLodInfoOverlay);
-		OverlayManager::getSingleton().destroyOverlayElement(mLodInfoOverlayContainer);
+        if(mTerrainGlobals)
+            OGRE_DELETE mTerrainGlobals;
+
+        if(mLodInfoOverlay)
+            OverlayManager::getSingleton().destroy(mLodInfoOverlay);
+
+        if(mLodInfoOverlayContainer)
+        {
+            for(LabelList::iterator li = mLodStatusLabelList.begin(); li != mLodStatusLabelList.end(); li++)
+            {
+                mLodInfoOverlayContainer->_removeChild(*li);
+                OverlayManager::getSingleton().destroyOverlayElement(*li);
+            }
+            mLodStatusLabelList.clear();
+
+            OverlayManager::getSingleton().destroyOverlayElement(mLodInfoOverlayContainer);
+        }
 
 		SdkSample::_shutdown();
 	}

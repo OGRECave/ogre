@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,37 +31,37 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	//---------------------------------------------------------------------
-	PageContent::PageContent(PageContentFactory* creator)
-		: mCreator(creator), mParent(0)
-	{
+    //---------------------------------------------------------------------
+    PageContent::PageContent(PageContentFactory* creator)
+        : mCreator(creator), mParent(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	PageContent::~PageContent()
-	{
-		// don't call destroy(), we're not the final subclass
-	}
-	//---------------------------------------------------------------------
-	PageManager* PageContent::getManager() const
-	{
-		return mParent->getManager();
-	}
-	//---------------------------------------------------------------------
-	SceneManager* PageContent::getSceneManager() const
-	{
-		return mParent->getSceneManager();
-	}
-	//---------------------------------------------------------------------
-	const String& PageContent::getType() const
-	{
-		return mCreator->getName();
-	}
-	//---------------------------------------------------------------------
-	void PageContent::_notifyAttached(PageContentCollection* parent)
-	{
-		mParent = parent;
-	}
+    }
+    //---------------------------------------------------------------------
+    PageContent::~PageContent()
+    {
+        // don't call destroy(), we're not the final subclass
+    }
+    //---------------------------------------------------------------------
+    PageManager* PageContent::getManager() const
+    {
+        return mParent->getManager();
+    }
+    //---------------------------------------------------------------------
+    SceneManager* PageContent::getSceneManager() const
+    {
+        return mParent->getSceneManager();
+    }
+    //---------------------------------------------------------------------
+    const String& PageContent::getType() const
+    {
+        return mCreator->getName();
+    }
+    //---------------------------------------------------------------------
+    void PageContent::_notifyAttached(PageContentCollection* parent)
+    {
+        mParent = parent;
+    }
 
 }
 

@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,11 @@
 #include "OgreGL3PlusRenderSystem.h"
 #include "OgreGL3PlusHardwareBufferManager.h"
 #include "OgreGL3PlusHardwarePixelBuffer.h"
+#include "OgreGL3PlusTextureBuffer.h"
 #include "OgreGL3PlusUtil.h"
 #include "OgreRoot.h"
 #include "OgreBitwise.h"
+#include "OgreTextureManager.h"
 
 namespace Ogre {
 
@@ -141,8 +143,11 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget,
                                             GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
+        bool hasGL33 = mGLSupport.hasMinGLVersion(3, 3);
+        bool hasGL42 = mGLSupport.hasMinGLVersion(4, 2);
+
         // Set up texture swizzling.
-        if (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || gl3wIsSupported(3, 3))
+        if (mGLSupport.checkExtension("GL_ARB_texture_swizzle") || hasGL33)
         {
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_R, GL_RED));
             OGRE_CHECK_GL_ERROR(glTexParameteri(texTarget, GL_TEXTURE_SWIZZLE_G, GL_GREEN));
@@ -165,14 +170,14 @@ namespace Ogre {
             }
         }
 
-        // Allocate internal buffer so that glTexSubImageXD can be used.
-        // Internal format
         GLenum format = GL3PlusPixelUtil::getClosestGLInternalFormat(mFormat, mHwGamma);
         GLenum datatype = GL3PlusPixelUtil::getGLOriginDataType(mFormat);
         width = mWidth;
         height = mHeight;
         depth = mDepth;
 
+        // Allocate texture storage so that glTexSubImageXD can be
+        // used to upload the texture.
         if (PixelUtil::isCompressed(mFormat))
         {
             // Compressed formats
@@ -181,17 +186,17 @@ namespace Ogre {
             for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
-                //                std::stringstream str;
-                //                str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
-                //                << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
-                //                << " Mip: " + StringConverter::toString(mip)
-                //                << " Width: " << StringConverter::toString(width)
-                //                << " Height: " << StringConverter::toString(height)
-                //                << " Format " << PixelUtil::getFormatName(mFormat)
-                //                << " Internal Format: 0x" << std::hex << format
-                //                << " Origin Format: 0x" << std::hex << GL3PlusPixelUtil::getGLOriginFormat(mFormat)
-                //                << " Data type: 0x" << std::hex << datatype;
-                //                LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
+                // std::stringstream str;
+                // str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
+                // << " bytes: " << StringConverter::toString(PixelUtil::getMemorySize(mWidth, mHeight, mDepth, mFormat))
+                // << " Mip: " + StringConverter::toString(mip)
+                // << " Width: " << StringConverter::toString(width)
+                // << " Height: " << StringConverter::toString(height)
+                // << " Format " << PixelUtil::getFormatName(mFormat)
+                // << " Internal Format: 0x" << std::hex << format
+                // << " Origin Format: 0x" << std::hex << GL3PlusPixelUtil::getGLOriginFormat(mFormat)
+                // << " Data type: 0x" << std::hex << datatype;
+                // LogManager::getSingleton().logMessage(LML_NORMAL, str.str());
 
                 switch(mTextureType)
                 {
@@ -251,7 +256,7 @@ namespace Ogre {
         }
         else
         {
-            if (mGLSupport.checkExtension("GL_ARB_texture_storage") || gl3wIsSupported(4, 2))
+            if (mGLSupport.checkExtension("GL_ARB_texture_storage") || hasGL42)
             {
                 switch(mTextureType)
                 {
@@ -361,7 +366,7 @@ namespace Ogre {
             OGRE_CHECK_GL_ERROR(glGenerateMipmap(getGL3PlusTextureTarget()));
         }
 
-        // Get final internal format
+        // Get final internal format.
         mFormat = getBuffer(0,0)->getFormat();
     }
 
@@ -604,7 +609,7 @@ namespace Ogre {
         //         mLayered.find('all') != str::npos ? GL_TRUE : GL_FALSE, mLayer,
         //         mImageAccess (READ, WRITE, READ_WRITE), 
         //         toImageFormat(mFormatInShader))); //GL_RGBA8)); //GL_R32UI)); GL_READ_WRITE
-        if (mGLSupport.checkExtension("GL_ARB_shader_image_load_store") || gl3wIsSupported(4, 2))
+        if (mGLSupport.checkExtension("GL_ARB_shader_image_load_store") || mGLSupport.hasMinGLVersion(4, 2))
         {
             OGRE_CHECK_GL_ERROR(glBindImageTexture(bindPoint, mTextureID, mipmapLevel, isArrayTexture, textureArrayIndex, GlAccess, GlFormat));
         }

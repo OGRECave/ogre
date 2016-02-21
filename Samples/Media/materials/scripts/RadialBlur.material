@@ -2,7 +2,7 @@
 fragment_program Radial_Blur_Cg_ps cg
 {
 	source Radial_Blur_FP.cg
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 	entry_point main
 }
 

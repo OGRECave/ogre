@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,47 +27,65 @@ THE SOFTWARE.
 */
 #include "PropertyTests.h"
 
-CPPUNIT_TEST_SUITE_REGISTRATION( PropertyTests );
+#include "UnitTestSuite.h"
 
+// use std::bind regardless of whether we are using boost or not
+#if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#include <functional>
+#else
+#include <tr1/functional>
+#endif
+
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(PropertyTests);
+
+//--------------------------------------------------------------------------
 void PropertyTests::setUp()
 {
-
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
-
+//--------------------------------------------------------------------------
 void PropertyTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 class Foo
 {
 protected:
-	String mName;
+    String mName;
 public:
-	void setName(const String& name) { mName = name; }
-	const String& getName() const { return mName; }
+    void setName(const String& name) { mName = name; }
+    const String& getName() const { return mName; }
 };
-
+//--------------------------------------------------------------------------
 void PropertyTests::testStringProp()
 {
-	PropertyDefMap propertyDefs;
-	Foo foo;
-	PropertySet props;
+#if __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+    using namespace std;
+#else
+    using namespace std::tr1;
+#endif
 
-	PropertyDefMap::iterator defi = propertyDefs.insert(PropertyDefMap::value_type("name", 
-			PropertyDef("name", 
-			"The name of the object.", PROP_STRING))).first;
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
-	props.addProperty(
-		OGRE_NEW Property<String>(&(defi->second),
-		boost::bind(&Foo::getName, &foo), 
-		boost::bind(&Foo::setName, &foo, _1)));
+    PropertyDefMap propertyDefs;
+    Foo foo;
+    PropertySet props;
 
-	Ogre::String strName, strTest;
-	strTest = "A simple name";
-	props.setValue("name", strTest);
-	props.getValue("name", strName);
+    PropertyDefMap::iterator defi = propertyDefs.insert(PropertyDefMap::value_type("name", 
+            PropertyDef("name", 
+            "The name of the object.", PROP_STRING))).first;
 
-	CPPUNIT_ASSERT_EQUAL(strTest, strName);
+    props.addProperty(
+        OGRE_NEW Property<String>(&(defi->second),
+        bind(&Foo::getName, &foo),
+        bind(&Foo::setName, &foo, placeholders::_1)));
 
+    Ogre::String strName, strTest;
+    strTest = "A simple name";
+    props.setValue("name", strTest);
+    props.getValue("name", strName);
+
+    CPPUNIT_ASSERT_EQUAL(strTest, strName);
 }
-
+//--------------------------------------------------------------------------

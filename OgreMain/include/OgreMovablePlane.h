@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,13 +37,13 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Scene
-	*  @{
-	*/
-	/** Definition of a Plane that may be attached to a node, and the derived
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Scene
+    *  @{
+    */
+    /** Definition of a Plane that may be attached to a node, and the derived
         details of it retrieved simply.
     @remarks
         This plane is not here for rendering purposes, it's to allow you to attach
@@ -82,9 +82,9 @@ namespace Ogre {
         const String& getMovableType(void) const;
         /// Get the derived plane as transformed by its parent node. 
         const Plane& _getDerivedPlane(void) const;
-		/// @copydoc MovableObject::visitRenderables
-		void visitRenderables(Renderable::Visitor* visitor, 
-			bool debugRenderables = false)
+        /// @copydoc MovableObject::visitRenderables
+        void visitRenderables(Renderable::Visitor* visitor, 
+            bool debugRenderables = false)
                 {
                     /* do nothing */
                     (void)visitor;
@@ -92,8 +92,8 @@ namespace Ogre {
                 }
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

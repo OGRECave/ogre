@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -38,11 +38,11 @@ namespace Ogre {
     /** This class defines a ParticleAffector which applies randomness to the movement of the particles.
     @remarks
         This affector (see ParticleAffector) applies randomness to the movement of the particles by
-		changing the direction vectors.
+        changing the direction vectors.
     @par
         The most important parameter to control the effect is randomness. It controls the range in which changes
         are applied to each axis of the direction vector.
-		The parameter scope can be used to limit the effect to a certain percentage of the particles.
+        The parameter scope can be used to limit the effect to a certain percentage of the particles.
     */
     class _OgreParticleFXExport DirectionRandomiserAffector : public ParticleAffector
     {
@@ -55,7 +55,7 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
-		/** Command object for scope (see ParamCommand).*/
+        /** Command object for scope (see ParamCommand).*/
         class CmdScope : public ParamCommand
         {
         public:
@@ -63,7 +63,7 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
-		/** Command object for keep_velocity (see ParamCommand).*/
+        /** Command object for keep_velocity (see ParamCommand).*/
         class CmdKeepVelocity : public ParamCommand
         {
         public:
@@ -80,27 +80,27 @@ namespace Ogre {
 
         /** Sets the randomness to apply to the particles in a system. */
         void setRandomness(Real force);
-		/** Sets the scope (percentage of particles which are randomised). */
+        /** Sets the scope (percentage of particles which are randomised). */
         void setScope(Real force);
-		/** Set flag which detemines whether particle speed is changed. */
+        /** Set flag which detemines whether particle speed is changed. */
         void setKeepVelocity(bool keepVelocity);
 
         /** Gets the randomness to apply to the particles in a system. */
         Real getRandomness(void) const;
-		/** Gets the scope (percentage of particles which are randomised). */
+        /** Gets the scope (percentage of particles which are randomised). */
         Real getScope(void) const;
-		/** Gets flag which detemines whether particle speed is changed. */
+        /** Gets flag which detemines whether particle speed is changed. */
         bool getKeepVelocity(void) const;
 
         /// Command objects
         static CmdRandomness msRandomnessCmd;
-		static CmdScope msScopeCmd;
-		static CmdKeepVelocity msKeepVelocityCmd;
+        static CmdScope msScopeCmd;
+        static CmdKeepVelocity msKeepVelocityCmd;
 
     protected:
         Real mRandomness;
-		Real mScope;
-		bool mKeepVelocity;
+        Real mScope;
+        bool mKeepVelocity;
 
     };
 

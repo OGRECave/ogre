@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,11 +31,11 @@ THE SOFTWARE.
 
 #include "OgreBuildSettings.h"
 
-#if defined(OGRE_BUILD_RENDERSYSTEM_GLES2) || defined(OGRE_BUILD_RENDERSYSTEM_GL3PLUS) || defined(OGRE_BUILD_RENDERSYSTEM_D3D11)
-#  define INCLUDE_RTSHADER_SYSTEM
-#endif
-
+#ifdef INCLUDE_RTSHADER_SYSTEM
+// Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
+// If cache path is not set - all shaders are generated to system memory.
 //#define _RTSS_WRITE_SHADERS_TO_DISK
+#endif // INCLUDE_RTSHADER_SYSTEM   
 
 #include "SdkSample.h"
 
@@ -59,27 +59,12 @@ class VisualTest : public OgreBites::Sample
             rgm.createResourceGroup(TRANSIENT_RESOURCE_GROUP);
     }
 
-    virtual ~VisualTest(){}
-
     /** Adds a screenshot frame to the list - this should
      *    be done during setup of the test. */
     void addScreenshotFrame(unsigned int frame)
     {
         mScreenshotFrames.insert(frame);
     }
-
-    /** Does some basic setup tasks */
-#if (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS) || (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID)
-    virtual void _setup(Ogre::RenderWindow* window, OgreBites::InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
-    {
-        OgreBites::Sample::_setup(window, inputContext, fsLayer, overlaySys);
-    }
-#else
-    virtual void _setup(Ogre::RenderWindow* window, OgreBites::InputContext inputContext, Ogre::FileSystemLayer* fsLayer, Ogre::OverlaySystem* overlaySys)
-    {
-        OgreBites::Sample::_setup(window, inputContext, fsLayer, overlaySys);
-    }
-#endif
 
     /** Clean up */
     virtual void _shutdown()

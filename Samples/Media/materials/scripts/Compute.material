@@ -1,0 +1,82 @@
+//////////
+// GLSL //
+//////////
+shared_params DataBlock {
+    shared_param_named roll float 1.0
+}
+
+compute_program Compute/CS_GLSL glsl
+{
+        source ComputeCS.glsl
+        syntax glsl430
+
+        // the texture size is 256x256x1 and the group size is 16x16x1
+        // so we have to launch 16x16x1 groups
+        compute_group_dimensions 16 16 1
+        //TODO is this necessary?
+        // placement postrender
+        //TODO how to handle glMemoryBarrier?
+        // do other programs need to support this?
+        // should be able to handle multiple barriers via bit ops
+        // pre_memory_barrier texture
+        // post_memory_barrier texture
+}
+
+vertex_program Compute/VS_GLSL glsl
+{
+        source ComputeVS.glsl
+        syntax glsl150
+
+        default_params
+        {
+            param_named_auto WorldViewProj worldviewproj_matrix
+        }
+}
+
+fragment_program Compute/PS_GLSL glsl
+{
+        source ComputeFS.glsl
+        syntax glsl430
+}
+
+compute_program Compute/CS unified
+{
+        delegate Compute/CS_GLSL
+        // delegate Compute/CS_HLSL
+        // delegate Compute/CS_CG
+}
+
+vertex_program Compute/VS unified
+{
+        delegate Compute/VS_GLSL
+        // delegate Compute/VS_HLSL
+        // delegate Compute/VS_CG
+}
+
+fragment_program Compute/PS unified
+{
+        delegate Compute/PS_GLSL
+        // delegate Compute/PS_HLSL
+        // delegate Compute/PS_CG
+}
+
+material Compute
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+              //texture data.csv
+              // FIXME not implemented in script parser
+              //image_bind 0 read X8R8B8G8
+            }
+
+            compute_program_ref Compute/CS {}
+
+            vertex_program_ref Compute/VS {}
+            fragment_program_ref Compute/PS {}
+        }
+    }
+}

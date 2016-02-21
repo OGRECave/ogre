@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -38,7 +38,7 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
     bool frameRenderingQueued(const FrameEvent& evt)
     {
         if (mPlayAnimation) mSpeakAnimState->addTime(evt.timeSinceLastFrame);
-        std::cout << "Time since last frame: " << evt.timeSinceLastFrame << std::endl;
+        // std::cout << "Time since last frame: " << evt.timeSinceLastFrame << std::endl;
         return SdkSample::frameRenderingQueued(evt);  // don't forget the parent class updates!
     }
 
@@ -62,10 +62,6 @@ class _OgreSampleClassExport Sample_FacialAnimation : public SdkSample
 
         // create a head entity from the mesh and attach it to a node with a vertical offset to center it
         Entity* head = mSceneMgr->createEntity("Head", "facial.mesh");
-
-        //JAJ
-        //FIXME
-        std::cout << "DR BUNSEN IS KING: " << head->getSubEntity(0)->getMaterialName() << std::endl;
 
         mSceneMgr->getRootSceneNode()->createChildSceneNode(Vector3(0, -30, 0))->attachObject(head);
 

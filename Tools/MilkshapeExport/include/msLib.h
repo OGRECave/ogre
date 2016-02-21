@@ -40,11 +40,11 @@ extern "C" {
 #define MS_MAX_NAME             32
 #define MS_MAX_PATH             256
 
-#define MAX_VERTICES	65534
-#define MAX_TRIANGLES	65534
-#define MAX_GROUPS		255
-#define MAX_MATERIALS	128
-#define MAX_JOINTS		128
+#define MAX_VERTICES    65534
+#define MAX_TRIANGLES   65534
+#define MAX_GROUPS      255
+#define MAX_MATERIALS   128
+#define MAX_JOINTS      128
 
 
 
@@ -94,9 +94,9 @@ typedef struct msVertex
 /* msVertexEx: used internally only, DO NOT USE DIRECTLY, USE API INSTEAD */
 typedef struct msVertexEx
 {
-	char		nBoneIndices[3];
-	byte		nBoneWeights[3];
-	unsigned int nExtra;
+    char        nBoneIndices[3];
+    byte        nBoneWeights[3];
+    unsigned int nExtra;
 } msVertexEx;
 
 /* msTriangle: used internally only, DO NOT USE DIRECTLY, USE API INSTEAD */
@@ -112,8 +112,8 @@ typedef struct msTriangle
 /* msTriangleEx: used internally only, DO NOT USE DIRECTLY, USE API INSTEAD */
 typedef struct msTriangleEx
 {
-	msVec3		Normals[3];
-	msVec2		TexCoords[3];
+    msVec3      Normals[3];
+    msVec2      TexCoords[3];
 } msTriangleEx;
 
 /* msMesh: used internally only, DO NOT USE DIRECTLY, USE API INSTEAD */
@@ -135,9 +135,9 @@ typedef struct msMesh
     word        nNumAllocedTriangles;
     msTriangle* pTriangles;
 
-	char*       pszComment;
-	msVertexEx *pVertexExs;
-	msTriangleEx *pTriangleExs;
+    char*       pszComment;
+    msVertexEx *pVertexExs;
+    msTriangleEx *pTriangleExs;
 } msMesh;
 
 /* msMaterial: used internally only, DO NOT USE DIRECTLY, USE API INSTEAD */
@@ -154,7 +154,7 @@ typedef struct msMaterial
     char        szDiffuseTexture[MS_MAX_PATH];
     char        szAlphaTexture[MS_MAX_PATH];
     int         nName;
-	char*       pszComment;
+    char*       pszComment;
 } msMaterial;
 
 /* msPositionKey */
@@ -187,7 +187,7 @@ typedef struct msBone
     int             nNumRotationKeys;
     int             nNumAllocedRotationKeys;
     msRotationKey*  pRotationKeys;
-	char*			pszComment;
+    char*           pszComment;
 } msBone;
 
 /* msModel: used internally only, DO NOT USE DIRECTLY, USE API INSTEAD */
@@ -211,10 +211,10 @@ typedef struct msModel
     msVec3      Position;
     msVec3      Rotation;
 
-	msVec3		CameraPosition;
-	msVec2		CameraRotationXY;
+    msVec3      CameraPosition;
+    msVec2      CameraRotationXY;
 
-	char*       pszComment;
+    char*       pszComment;
 } msModel;
 
 

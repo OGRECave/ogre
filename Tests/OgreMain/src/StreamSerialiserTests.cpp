@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,74 +31,77 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include "OgreVector3.h"
 
+#include "UnitTestSuite.h"
+
 using namespace Ogre;
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( StreamSerialiserTests );
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(StreamSerialiserTests);
 
+//--------------------------------------------------------------------------
 void StreamSerialiserTests::setUp()
 {
+    UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
 }
+//--------------------------------------------------------------------------
 void StreamSerialiserTests::tearDown()
 {
 }
-
+//--------------------------------------------------------------------------
 void StreamSerialiserTests::testWriteBasic()
 {
-	FileSystemArchive arch("./", "FileSystem", false);
-	arch.load();
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
 
-	String fileName = "testSerialiser.dat";
-	Vector3 aTestVector(0.3, 15.2, -12.0);
-	String aTestString = "Some text here";
-	int aTestValue = 99;
-	uint32 chunkID = StreamSerialiser::makeIdentifier("TEST");
-	// write the data
-	{
+    FileSystemArchive arch("./", "FileSystem", false);
+    arch.load();
 
-		DataStreamPtr stream = arch.create(fileName);
+    String fileName = "testSerialiser.dat";
+    Vector3 aTestVector(0.3, 15.2, -12.0);
+    String aTestString = "Some text here";
+    int aTestValue = 99;
+    uint32 chunkID = StreamSerialiser::makeIdentifier("TEST");
 
-		StreamSerialiser serialiser(stream);
+    // write the data
+    {
+        DataStreamPtr stream = arch.create(fileName);
 
-		serialiser.writeChunkBegin(chunkID);
+        StreamSerialiser serialiser(stream);
 
+        serialiser.writeChunkBegin(chunkID);
 
-		serialiser.write(&aTestVector);
-		serialiser.write(&aTestString);
-		serialiser.write(&aTestValue);
-		serialiser.writeChunkEnd(chunkID);
-	}
+        serialiser.write(&aTestVector);
+        serialiser.write(&aTestString);
+        serialiser.write(&aTestValue);
+        serialiser.writeChunkEnd(chunkID);
+    }
 
-	// read it back
-	{
+    // read it back
+    {
+        DataStreamPtr stream = arch.open(fileName);
 
-		DataStreamPtr stream = arch.open(fileName);
+        StreamSerialiser serialiser(stream);
 
-		StreamSerialiser serialiser(stream);
+        const StreamSerialiser::Chunk* c = serialiser.readChunkBegin();
 
-		const StreamSerialiser::Chunk* c = serialiser.readChunkBegin();
+        CPPUNIT_ASSERT_EQUAL(chunkID, c->id);
+        CPPUNIT_ASSERT_EQUAL(sizeof(Vector3) + sizeof(int) + aTestString.size() + 4, (size_t)c->length);
 
-		CPPUNIT_ASSERT_EQUAL(chunkID, c->id);
-		CPPUNIT_ASSERT_EQUAL(sizeof(Vector3) + sizeof(int) + aTestString.size() + 4, (size_t)c->length);
+        Vector3 inVector;
+        String inString;
+        int inValue;
 
-		Vector3 inVector;
-		String inString;
-		int inValue;
+        serialiser.read(&inVector);
+        serialiser.read(&inString);
+        serialiser.read(&inValue);
+        serialiser.readChunkEnd(chunkID);
 
-		serialiser.read(&inVector);
-		serialiser.read(&inString);
-		serialiser.read(&inValue);
-		serialiser.readChunkEnd(chunkID);
+        CPPUNIT_ASSERT_EQUAL(aTestVector, inVector);
+        CPPUNIT_ASSERT_EQUAL(aTestString, inString);
+        CPPUNIT_ASSERT_EQUAL(aTestValue, inValue);
+    }
 
-		CPPUNIT_ASSERT_EQUAL(aTestVector, inVector);
-		CPPUNIT_ASSERT_EQUAL(aTestString, inString);
-		CPPUNIT_ASSERT_EQUAL(aTestValue, inValue);
+    arch.remove(fileName);
 
-	}
-
-
-
-	arch.remove(fileName);
-
-	CPPUNIT_ASSERT(!arch.exists(fileName));
+    CPPUNIT_ASSERT(!arch.exists(fileName));
 }
+//--------------------------------------------------------------------------

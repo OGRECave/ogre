@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,6 +37,8 @@ THE SOFTWARE.
 #import <AppKit/NSScreen.h>
 #import <AppKit/NSOpenGLView.h>
 #import <QuartzCore/CVDisplayLink.h>
+#import "OgreViewport.h"
+#import <iomanip>
 
 @implementation OgreGL3PlusWindow
 
@@ -172,7 +174,17 @@ namespace Ogre {
             opt = miscParams->find("contentScalingFactor");
             if(opt != miscParams->end())
                 mContentScalingFactor = StringConverter::parseReal(opt->second);
-        }		
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			opt = miscParams->find("stereoMode");
+			if (opt != miscParams->end())
+			{
+				StereoModeType stereoMode = StringConverter::parseStereoMode(opt->second);
+				if (SMT_NONE != stereoMode)
+					mStereoEnabled = true;
+			}
+#endif
+        }
 
         if(miscParams->find("externalGLContext") == miscParams->end())
         {
@@ -217,7 +229,12 @@ namespace Ogre {
                 attribs[i++] = NSOpenGLPFASamples;
                 attribs[i++] = (NSOpenGLPixelFormatAttribute) fsaa_samples;
             }
-            
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+			if (mStereoEnabled)
+				attribs[i++] = NSOpenGLPFAStereo;
+#endif
+
             attribs[i++] = (NSOpenGLPixelFormatAttribute) 0;
 
             mGLPixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
@@ -434,9 +451,9 @@ namespace Ogre {
 
     void CocoaWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
     {
-        if ((dst.right > mWidth) ||
-            (dst.bottom > mHeight) ||
-            (dst.front != 0) || (dst.back != 1))
+        if (dst.getWidth() > mWidth ||
+            dst.getHeight() > mHeight ||
+            dst.front != 0 || dst.back != 1)
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                         "Invalid box.",

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -45,53 +45,53 @@ using Ogre::String;
 class Editor : public EventContainer
 {
 public:
-	enum EditorEvent
-	{
-		NameChanged,
-		DirtyStateChanged
-	};
+    enum EditorEvent
+    {
+        NameChanged,
+        DirtyStateChanged
+    };
 
-	Editor();
-	Editor(EditorInput* input);
-	virtual ~Editor();
+    Editor();
+    Editor(EditorInput* input);
+    virtual ~Editor();
 
-	wxControl* getControl() const;
-	void setControl(wxControl* control);
+    wxControl* getControl() const;
+    void setControl(wxControl* control);
 
-	EditorInput* getEditorInput() const;
-	void setEditorInput(EditorInput* input);
-	
-	EditorContributor* getEditorContributor() const;
+    EditorInput* getEditorInput() const;
+    void setEditorInput(EditorInput* input);
+    
+    EditorContributor* getEditorContributor() const;
 
-	const wxString& getName() const;
-	void setName(const wxString& name);
+    const wxString& getName() const;
+    void setName(const wxString& name);
 
-	virtual void activate();
-	virtual void deactivate();
+    virtual void activate();
+    virtual void deactivate();
 
-	virtual bool isDirty();
-	virtual void save();
-	virtual void saveAs();
-	virtual bool isSaveAsAllowed();
+    virtual bool isDirty();
+    virtual void save();
+    virtual void saveAs();
+    virtual bool isSaveAsAllowed();
 
-	virtual bool isRedoable();
-	virtual void redo();
-	virtual bool isUndoable();
-	virtual void undo();
+    virtual bool isRedoable();
+    virtual void redo();
+    virtual bool isUndoable();
+    virtual void undo();
 
-	virtual bool isCuttable();
-	virtual void cut();
-	virtual bool isCopyable();
-	virtual void copy();
-	virtual bool isPastable();
-	virtual void paste();
+    virtual bool isCuttable();
+    virtual void cut();
+    virtual bool isCopyable();
+    virtual void copy();
+    virtual bool isPastable();
+    virtual void paste();
 
 private:
-	void registerEvents();
+    void registerEvents();
 
-	EditorInput* mEditorInput;
-	wxControl* mControl;
-	wxString mName;
+    EditorInput* mEditorInput;
+    wxControl* mControl;
+    wxString mName;
 };
 
 #endif // _EDITOR_H_

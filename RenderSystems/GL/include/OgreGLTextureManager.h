@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -42,28 +42,28 @@ namespace Ogre {
         GLTextureManager(GLSupport& support);
         virtual ~GLTextureManager();
 
-		GLuint getWarningTextureID() { return mWarningTextureID; }
+        GLuint getWarningTextureID() { return mWarningTextureID; }
 
-		/// @copydoc TextureManager::getNativeFormat
-		PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
+        /// @copydoc TextureManager::getNativeFormat
+        PixelFormat getNativeFormat(TextureType ttype, PixelFormat format, int usage);
 
         /// @copydoc TextureManager::isHardwareFilteringSupported
         bool isHardwareFilteringSupported(TextureType ttype, PixelFormat format, int usage,
             bool preciseFormatOnly = false);
 
     protected:
-		friend class GLRenderSystem;
+        friend class GLRenderSystem;
 
         /// @copydoc ResourceManager::createImpl
         Resource* createImpl(const String& name, ResourceHandle handle, 
             const String& group, bool isManual, ManualResourceLoader* loader, 
             const NameValuePairList* createParams);
 
-		/// Internal method to create a warning texture (bound when a texture unit is blank)
-		void createWarningTexture();
+        /// Internal method to create a warning texture (bound when a texture unit is blank)
+        void createWarningTexture();
 
         GLSupport& mGLSupport;
-		GLuint mWarningTextureID;
+        GLuint mWarningTextureID;
     };
 }
 #endif

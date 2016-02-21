@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -31,45 +31,47 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	/** Implementation of a general purpose request / response style background work queue.
-	@remarks
-		This implementation utilises tbb's task system for the WorkQueue implementation.
-	*/
-	class _OgreExport DefaultWorkQueue : public DefaultWorkQueueBase
-	{
-	public:
-		DefaultWorkQueue(const String& name = StringUtil::BLANK);
-		virtual ~DefaultWorkQueue();
-		/** Process the next request on the queue. 
-		@remarks
-			This method is public, but only intended for advanced users to call. 
-			The only reason you would call this, is if you were using your 
-			own thread to drive the worker processing. The thread calling this
-			method will be the thread used to call the RequestHandler.
-		*/
+    /** Implementation of a general purpose request / response style background work queue.
+    @remarks
+        This implementation utilises tbb's task system for the WorkQueue implementation.
+    */
+    class _OgreExport DefaultWorkQueue : public DefaultWorkQueueBase
+    {
+    public:
+        DefaultWorkQueue(const String& name = BLANKSTRING);
+        virtual ~DefaultWorkQueue();
+        /** Process the next request on the queue. 
+        @remarks
+            This method is public, but only intended for advanced users to call. 
+            The only reason you would call this, is if you were using your 
+            own thread to drive the worker processing. The thread calling this
+            method will be the thread used to call the RequestHandler.
+        */
 
-		/// Main function for each thread spawned.
-		virtual void _threadMain();
+        /// Main function for each thread spawned.
+        virtual void _threadMain();
 
-		/// @copydoc WorkQueue::shutdown
-		virtual void shutdown();
+        /// @copydoc WorkQueue::shutdown
+        virtual void shutdown();
 
-		/// @copydoc WorkQueue::startup
-		virtual void startup(bool forceRestart = true);
+        /// @copydoc WorkQueue::startup
+        virtual void startup(bool forceRestart = true);
 
-		/// Register the current thread with the rendersystem
-		void _registerThreadWithRenderSystem();
+        /// Register the current thread with the rendersystem
+        void _registerThreadWithRenderSystem();
 
-	protected:
-		virtual void notifyWorkers();
+    protected:
+        virtual void notifyWorkers();
 
-	private:
-		tbb::task_scheduler_init mTaskScheduler;
-		tbb::task_group mTaskGroup;
-		/// Synchronise registering threads with the RenderSystem
-		OGRE_MUTEX(mRegisterRSMutex);
-		std::set<tbb::tbb_thread::id> mRegisteredThreads;
-	};
+    private:
+#if OGRE_NO_TBB_SCHEDULER == 0
+        tbb::task_scheduler_init mTaskScheduler;
+#endif
+        tbb::task_group mTaskGroup;
+        /// Synchronise registering threads with the RenderSystem
+        OGRE_MUTEX(mRegisterRSMutex);
+        std::set<tbb::tbb_thread::id> mRegisteredThreads;
+    };
 
 
 }

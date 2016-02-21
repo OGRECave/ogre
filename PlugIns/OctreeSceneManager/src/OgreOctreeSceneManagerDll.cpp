@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,9 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include <OgreRoot.h>
-#include <OgreOctreePlugin.h>
+#include "OgreOctreePrerequisites.h"
+#include "OgreRoot.h"
+#include "OgreOctreePlugin.h"
 
 #ifndef OGRE_STATIC_LIB
 
@@ -46,8 +47,8 @@ extern "C" void _OgreOctreePluginExport dllStartPlugin( void )
 }
 extern "C" void _OgreOctreePluginExport dllStopPlugin( void )
 {
-	Root::getSingleton().uninstallPlugin(octreePlugin);
-	OGRE_DELETE octreePlugin;
+    Root::getSingleton().uninstallPlugin(octreePlugin);
+    OGRE_DELETE octreePlugin;
 }
 }
 

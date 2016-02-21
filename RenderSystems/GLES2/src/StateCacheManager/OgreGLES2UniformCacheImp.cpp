@@ -27,6 +27,7 @@
  */
 
 #include "OgreStableHeaders.h"
+#include "OgreCommon.h"
 #include "OgreGLES2UniformCacheImp.h"
 
 namespace Ogre {
@@ -38,7 +39,6 @@ namespace Ogre {
     
     void GLES2UniformCacheImp::clearCache()
     {
-        mUniformValueMap.reserve(16);
         mUniformValueMap.clear();
     }
     
@@ -56,7 +56,7 @@ namespace Ogre {
         {
             // Haven't cached this state yet or the value has changed
             mUniformValueMap[location] = hash;
-			return true;
+            return true;
         }
 
         return false;

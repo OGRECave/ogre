@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -45,8 +45,8 @@ THE SOFTWARE
 #define OGRE_MUTEX_CONDITIONAL(mutex) if (mutex)
 // Read-write mutex
 #define OGRE_RW_MUTEX(name) mutable tbb::queuing_rw_mutex name
-#define OGRE_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock ogrenameLock(name, false)
-#define OGRE_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock ogrenameLock(name, true)
+#define OGRE_LOCK_RW_MUTEX_READ(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, false)
+#define OGRE_LOCK_RW_MUTEX_WRITE(name) tbb::queuing_rw_mutex::scoped_lock OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name, true)
 // Thread-local pointer
 #define OGRE_THREAD_POINTER(T, var) tbb::enumerable_thread_specific<SharedPtr<T> > var
 #define OGRE_THREAD_POINTER_INIT(var) var()

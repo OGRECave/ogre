@@ -4,7 +4,7 @@ set(HEADER_FILES include/SkeletalAnimation.h)
 set(SOURCE_FILES src/SkeletalAnimation.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-add_library(Sample_SkeletalAnimation ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
+ogre_add_library_to_folder(Samples Sample_SkeletalAnimation ${OGRE_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 
 target_link_libraries(Sample_SkeletalAnimation ${OGRE_LIBRARIES} ${OIS_LIBRARIES})
 ogre_config_sample_lib(Sample_SkeletalAnimation)

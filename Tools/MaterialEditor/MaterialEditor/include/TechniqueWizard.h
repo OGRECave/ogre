@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -35,19 +35,19 @@ THE SOFTWARE
 class TechniqueWizard : public wxWizard
 {
 public:
-	TechniqueWizard();
-	virtual ~TechniqueWizard();
+    TechniqueWizard();
+    virtual ~TechniqueWizard();
 
-	bool Create(wxWindow* parent, int id = -1, const wxString& title = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap, const wxPoint& pos = wxDefaultPosition, long style = wxDEFAULT_DIALOG_STYLE);
+    bool Create(wxWindow* parent, int id = -1, const wxString& title = wxEmptyString, const wxBitmap& bitmap = wxNullBitmap, const wxPoint& pos = wxDefaultPosition, long style = wxDEFAULT_DIALOG_STYLE);
 
-	TechniquePage* getTechniquePage() const;
+    TechniquePage* getTechniquePage() const;
 
-	void OnFinish(wxWizardEvent& event);
+    void OnFinish(wxWizardEvent& event);
 
 protected:
-	TechniquePage* mTechniquePage;
+    TechniquePage* mTechniquePage;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _TECHNIQUEWIZARD_H_

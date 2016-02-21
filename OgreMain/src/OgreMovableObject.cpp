@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,12 +36,13 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreLodListener.h"
+#include "OgreTechnique.h"
 
 namespace Ogre {
-	//-----------------------------------------------------------------------
-	//-----------------------------------------------------------------------
-	uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
-	uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF;
+    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    uint32 MovableObject::msDefaultQueryFlags = 0xFFFFFFFF;
+    uint32 MovableObject::msDefaultVisibilityFlags = 0xFFFFFFFF;
     //-----------------------------------------------------------------------
     MovableObject::MovableObject()
         : mCreator(0)
@@ -49,25 +50,25 @@ namespace Ogre {
         , mParentNode(0)
         , mParentIsTagPoint(false)
         , mVisible(true)
-		, mDebugDisplay(false)
+        , mDebugDisplay(false)
         , mUpperDistance(0)
         , mSquaredUpperDistance(0)
-		, mMinPixelSize(0)
+        , mMinPixelSize(0)
         , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueueIDSet(false)
-		, mRenderQueuePriority(100)
-		, mRenderQueuePrioritySet(false)
-		, mQueryFlags(msDefaultQueryFlags)
+        , mRenderQueuePriority(100)
+        , mRenderQueuePrioritySet(false)
+        , mQueryFlags(msDefaultQueryFlags)
         , mVisibilityFlags(msDefaultVisibilityFlags)
         , mCastShadows(true)
         , mRenderingDisabled(false)
         , mListener(0)
         , mLightListUpdated(0)
-		, mLightMask(0xFFFFFFFF)
+        , mLightMask(0xFFFFFFFF)
     {
-		if (Root::getSingletonPtr())
-			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
+        if (Root::getSingletonPtr())
+            mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }
     //-----------------------------------------------------------------------
     MovableObject::MovableObject(const String& name)
@@ -77,25 +78,25 @@ namespace Ogre {
         , mParentNode(0)
         , mParentIsTagPoint(false)
         , mVisible(true)
-		, mDebugDisplay(false)
+        , mDebugDisplay(false)
         , mUpperDistance(0)
         , mSquaredUpperDistance(0)
-		, mMinPixelSize(0)
+        , mMinPixelSize(0)
         , mBeyondFarDistance(false)
         , mRenderQueueID(RENDER_QUEUE_MAIN)
         , mRenderQueueIDSet(false)
-		, mRenderQueuePriority(100)
-		, mRenderQueuePrioritySet(false)
-		, mQueryFlags(msDefaultQueryFlags)
+        , mRenderQueuePriority(100)
+        , mRenderQueuePrioritySet(false)
+        , mQueryFlags(msDefaultQueryFlags)
         , mVisibilityFlags(msDefaultVisibilityFlags)
         , mCastShadows(true)
         , mRenderingDisabled(false)
         , mListener(0)
         , mLightListUpdated(0)
-		, mLightMask(0xFFFFFFFF)
+        , mLightMask(0xFFFFFFFF)
     {
-		if (Root::getSingletonPtr())
-			mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
+        if (Root::getSingletonPtr())
+            mMinPixelSize = Root::getSingleton().getDefaultMinPixelSize();
     }
     //-----------------------------------------------------------------------
     MovableObject::~MovableObject()
@@ -170,44 +171,44 @@ namespace Ogre {
         return (mParentNode != 0);
 
     }
-	//---------------------------------------------------------------------
-	void MovableObject::detachFromParent(void)
-	{
-		if (isAttached())
-		{
-			if (mParentIsTagPoint)
-			{
-				TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-				tp->getParentEntity()->detachObjectFromBone(this);
-			}
-			else
-			{
-				SceneNode* sn = static_cast<SceneNode*>(mParentNode);
-				sn->detachObject(this);
-			}
-		}
-	}
+    //---------------------------------------------------------------------
+    void MovableObject::detachFromParent(void)
+    {
+        if (isAttached())
+        {
+            if (mParentIsTagPoint)
+            {
+                TagPoint* tp = static_cast<TagPoint*>(mParentNode);
+                tp->getParentEntity()->detachObjectFromBone(this);
+            }
+            else
+            {
+                SceneNode* sn = static_cast<SceneNode*>(mParentNode);
+                sn->detachObject(this);
+            }
+        }
+    }
     //-----------------------------------------------------------------------
-	bool MovableObject::isInScene(void) const
-	{
-		if (mParentNode != 0)
-		{
-			if (mParentIsTagPoint)
-			{
-				TagPoint* tp = static_cast<TagPoint*>(mParentNode);
-				return tp->getParentEntity()->isInScene();
-			}
-			else
-			{
-				SceneNode* sn = static_cast<SceneNode*>(mParentNode);
-				return sn->isInSceneGraph();
-			}
-		}
-		else
-		{
-			return false;
-		}
-	}
+    bool MovableObject::isInScene(void) const
+    {
+        if (mParentNode != 0)
+        {
+            if (mParentIsTagPoint)
+            {
+                TagPoint* tp = static_cast<TagPoint*>(mParentNode);
+                return tp->getParentEntity()->isInScene();
+            }
+            else
+            {
+                SceneNode* sn = static_cast<SceneNode*>(mParentNode);
+                return sn->isInSceneGraph();
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
     //-----------------------------------------------------------------------
     void MovableObject::_notifyMoved(void)
     {
@@ -243,65 +244,65 @@ namespace Ogre {
 
         return true;
     }
-	//-----------------------------------------------------------------------
-	void MovableObject::_notifyCurrentCamera(Camera* cam)
-	{
-		if (mParentNode)
-		{
-			mBeyondFarDistance = false;
+    //-----------------------------------------------------------------------
+    void MovableObject::_notifyCurrentCamera(Camera* cam)
+    {
+        if (mParentNode)
+        {
+            mBeyondFarDistance = false;
 
-			if (cam->getUseRenderingDistance() && mUpperDistance > 0)
-			{
-				Real rad = getBoundingRadius();
-				Real squaredDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
+            if (cam->getUseRenderingDistance() && mUpperDistance > 0)
+            {
+                Real rad = getBoundingRadius();
+                Real squaredDepth = mParentNode->getSquaredViewDepth(cam->getLodCamera());
 
-				const Vector3& scl = mParentNode->_getDerivedScale();
-				Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+                const Vector3& scl = mParentNode->_getDerivedScale();
+                Real factor = std::max(std::max(scl.x, scl.y), scl.z);
 
-				// Max distance to still render
-				Real maxDist = mUpperDistance + rad * factor;
-				if (squaredDepth > Math::Sqr(maxDist))
-				{
-					mBeyondFarDistance = true;
-				}
-			}
+                // Max distance to still render
+                Real maxDist = mUpperDistance + rad * factor;
+                if (squaredDepth > Math::Sqr(maxDist))
+                {
+                    mBeyondFarDistance = true;
+                }
+            }
 
-			if (!mBeyondFarDistance && cam->getUseMinPixelSize() && mMinPixelSize > 0)
-			{
+            if (!mBeyondFarDistance && cam->getUseMinPixelSize() && mMinPixelSize > 0)
+            {
 
-				Real pixelRatio = cam->getPixelDisplayRatio();
-				
-				//if ratio is relative to distance than the distance at which the object should be displayed
-				//is the size of the radius divided by the ratio
-				//get the size of the entity in the world
-				Ogre::Vector3 objBound = getBoundingBox().getSize() * 
-							getParentNode()->_getDerivedScale();
-				
-				//We object are projected from 3 dimensions to 2. The shortest displayed dimension of 
-				//as object will always be at most the second largest dimension of the 3 dimensional
-				//bounding box.
-				//The square calculation come both to get rid of minus sign and for improve speed
-				//in the final calculation
-				objBound.x = Math::Sqr(objBound.x);
-				objBound.y = Math::Sqr(objBound.y);
-				objBound.z = Math::Sqr(objBound.z);
-				float sqrObjMedianSize = std::max(std::max(
-									std::min(objBound.x,objBound.y),
-									std::min(objBound.x,objBound.z)),
-									std::min(objBound.y,objBound.z));
+                Real pixelRatio = cam->getPixelDisplayRatio();
+                
+                //if ratio is relative to distance than the distance at which the object should be displayed
+                //is the size of the radius divided by the ratio
+                //get the size of the entity in the world
+                Ogre::Vector3 objBound = getBoundingBox().getSize() * 
+                            getParentNode()->_getDerivedScale();
+                
+                //We object are projected from 3 dimensions to 2. The shortest displayed dimension of 
+                //as object will always be at most the second largest dimension of the 3 dimensional
+                //bounding box.
+                //The square calculation come both to get rid of minus sign and for improve speed
+                //in the final calculation
+                objBound.x = Math::Sqr(objBound.x);
+                objBound.y = Math::Sqr(objBound.y);
+                objBound.z = Math::Sqr(objBound.z);
+                float sqrObjMedianSize = std::max(std::max(
+                                    std::min(objBound.x,objBound.y),
+                                    std::min(objBound.x,objBound.z)),
+                                    std::min(objBound.y,objBound.z));
 
-				//If we have a perspective camera calculations are done relative to distance
-				Real sqrDistance = 1;
-				if (cam->getProjectionType() == PT_PERSPECTIVE)
-				{
-					sqrDistance = mParentNode->getSquaredViewDepth(cam->getLodCamera());
-				}
+                //If we have a perspective camera calculations are done relative to distance
+                Real sqrDistance = 1;
+                if (cam->getProjectionType() == PT_PERSPECTIVE)
+                {
+                    sqrDistance = mParentNode->getSquaredViewDepth(cam->getLodCamera());
+                }
 
-				//Final Calculation to tell whether the object is to small
-				mBeyondFarDistance =  sqrObjMedianSize < 
-							sqrDistance * Math::Sqr(pixelRatio * mMinPixelSize); 
-			}
-			
+                //Final Calculation to tell whether the object is to small
+                mBeyondFarDistance =  sqrObjMedianSize < 
+                            sqrDistance * Math::Sqr(pixelRatio * mMinPixelSize); 
+            }
+            
             // Construct event object
             MovableObjectLodChangedEvent evt;
             evt.movableObject = this;
@@ -310,26 +311,26 @@ namespace Ogre {
             // Notify LOD event listeners
             cam->getSceneManager()->_notifyMovableObjectLodChanged(evt);
 
-		}
+        }
 
         mRenderingDisabled = mListener && !mListener->objectRendering(this, cam);
-	}
+    }
     //-----------------------------------------------------------------------
     void MovableObject::setRenderQueueGroup(uint8 queueID)
     {
-		assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
+        assert(queueID <= RENDER_QUEUE_MAX && "Render queue out of range!");
         mRenderQueueID = queueID;
         mRenderQueueIDSet = true;
     }
 
-	//-----------------------------------------------------------------------
-	void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
-	{
-		setRenderQueueGroup(queueID);
-		mRenderQueuePriority = priority;
-		mRenderQueuePrioritySet = true;
+    //-----------------------------------------------------------------------
+    void MovableObject::setRenderQueueGroupAndPriority(uint8 queueID, ushort priority)
+    {
+        setRenderQueueGroup(queueID);
+        mRenderQueuePriority = priority;
+        mRenderQueuePrioritySet = true;
 
-	}
+    }
 
     //-----------------------------------------------------------------------
     uint8 MovableObject::getRenderQueueGroup(void) const
@@ -337,17 +338,17 @@ namespace Ogre {
         return mRenderQueueID;
     }
     //-----------------------------------------------------------------------
-	const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
-	{
-		
-		if(mParentNode)
-		{
-			// object attached to a sceneNode
-			return mParentNode->_getFullTransform();
-		}
+    const Matrix4& MovableObject::_getParentNodeFullTransform(void) const
+    {
+        
+        if(mParentNode)
+        {
+            // object attached to a sceneNode
+            return mParentNode->_getFullTransform();
+        }
         // fallback
         return Matrix4::IDENTITY;
-	}
+    }
     //-----------------------------------------------------------------------
     const AxisAlignedBox& MovableObject::getWorldBoundingBox(bool derive) const
     {
@@ -361,17 +362,17 @@ namespace Ogre {
 
     }
     //-----------------------------------------------------------------------
-	const Sphere& MovableObject::getWorldBoundingSphere(bool derive) const
-	{
-		if (derive)
-		{
-			const Vector3& scl = mParentNode->_getDerivedScale();
-			Real factor = std::max(std::max(scl.x, scl.y), scl.z);
-			mWorldBoundingSphere.setRadius(getBoundingRadius() * factor);
-			mWorldBoundingSphere.setCenter(mParentNode->_getDerivedPosition());
-		}
-		return mWorldBoundingSphere;
-	}
+    const Sphere& MovableObject::getWorldBoundingSphere(bool derive) const
+    {
+        if (derive)
+        {
+            const Vector3& scl = mParentNode->_getDerivedScale();
+            Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+            mWorldBoundingSphere.setRadius(getBoundingRadius() * factor);
+            mWorldBoundingSphere.setCenter(mParentNode->_getDerivedPosition());
+        }
+        return mWorldBoundingSphere;
+    }
     //-----------------------------------------------------------------------
     const LightList& MovableObject::queryLights(void) const
     {
@@ -403,8 +404,8 @@ namespace Ogre {
             {
                 mLightListUpdated = frame;
 
-				const Vector3& scl = mParentNode->_getDerivedScale();
-				Real factor = std::max(std::max(scl.x, scl.y), scl.z);
+                const Vector3& scl = mParentNode->_getDerivedScale();
+                Real factor = std::max(std::max(scl.x, scl.y), scl.z);
 
                 sn->findLights(mLightList, this->getBoundingRadius() * factor, this->getLightMask());
             }
@@ -453,62 +454,62 @@ namespace Ogre {
             return 0;
         }
     }
-	//-----------------------------------------------------------------------
-	uint32 MovableObject::getTypeFlags(void) const
-	{
-		if (mCreator)
-		{
-			return mCreator->getTypeFlags();
-		}
-		else
-		{
-			return 0xFFFFFFFF;
-		}
-	}
-	//---------------------------------------------------------------------
-	void MovableObject::setLightMask(uint32 lightMask)
-	{
-		this->mLightMask = lightMask;
-		//make sure to request a new light list from the scene manager if mask changed
-		mLightListUpdated = 0;
-	}
-	//---------------------------------------------------------------------
-	class MORecvShadVisitor : public Renderable::Visitor
-	{
-	public:
-		bool anyReceiveShadows;
-		MORecvShadVisitor() : anyReceiveShadows(false)
-		{
+    //-----------------------------------------------------------------------
+    uint32 MovableObject::getTypeFlags(void) const
+    {
+        if (mCreator)
+        {
+            return mCreator->getTypeFlags();
+        }
+        else
+        {
+            return 0xFFFFFFFF;
+        }
+    }
+    //---------------------------------------------------------------------
+    void MovableObject::setLightMask(uint32 lightMask)
+    {
+        this->mLightMask = lightMask;
+        //make sure to request a new light list from the scene manager if mask changed
+        mLightListUpdated = 0;
+    }
+    //---------------------------------------------------------------------
+    class MORecvShadVisitor : public Renderable::Visitor
+    {
+    public:
+        bool anyReceiveShadows;
+        MORecvShadVisitor() : anyReceiveShadows(false)
+        {
 
-		}
-		void visit(Renderable* rend, ushort lodIndex, bool isDebug, 
-			Any* pAny = 0)
-		{
-			Technique* tech = rend->getTechnique();
-			bool techReceivesShadows = tech && tech->getParent()->getReceiveShadows();
-			anyReceiveShadows = anyReceiveShadows || 
-				techReceivesShadows || !tech;
-		}
-	};
-	//---------------------------------------------------------------------
-	bool MovableObject::getReceivesShadows()
-	{
-		MORecvShadVisitor visitor;
-		visitRenderables(&visitor);
-		return visitor.anyReceiveShadows;		
+        }
+        void visit(Renderable* rend, ushort lodIndex, bool isDebug, 
+            Any* pAny = 0)
+        {
+            Technique* tech = rend->getTechnique();
+            bool techReceivesShadows = tech && tech->getParent()->getReceiveShadows();
+            anyReceiveShadows = anyReceiveShadows || 
+                techReceivesShadows || !tech;
+        }
+    };
+    //---------------------------------------------------------------------
+    bool MovableObject::getReceivesShadows()
+    {
+        MORecvShadVisitor visitor;
+        visitRenderables(&visitor);
+        return visitor.anyReceiveShadows;       
 
-	}
-	//-----------------------------------------------------------------------
-	//-----------------------------------------------------------------------
-	MovableObject* MovableObjectFactory::createInstance(
-		const String& name, SceneManager* manager, 
-		const NameValuePairList* params)
-	{
-		MovableObject* m = createInstanceImpl(name, params);
-		m->_notifyCreator(this);
-		m->_notifyManager(manager);
-		return m;
-	}
+    }
+    //-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
+    MovableObject* MovableObjectFactory::createInstance(
+        const String& name, SceneManager* manager, 
+        const NameValuePairList* params)
+    {
+        MovableObject* m = createInstanceImpl(name, params);
+        m->_notifyCreator(this);
+        m->_notifyManager(manager);
+        return m;
+    }
 
 
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -57,16 +57,16 @@ namespace Ogre {
         bool getInitialized() { return initialized; };
         void setInitialized() { initialized = true; };
 
-		/** Create a new context based on the same window/pbuffer as this
-			context - mostly useful for additional threads.
-		@note The caller is responsible for deleting the returned context.
-		*/
-		virtual GLContext* clone() const = 0;
+        /** Create a new context based on the same window/pbuffer as this
+            context - mostly useful for additional threads.
+        @note The caller is responsible for deleting the returned context.
+        */
+        virtual GLContext* clone() const = 0;
 
-		/**
-		* Release the render context.
-		*/
-		virtual void releaseContext() {}
+        /**
+        * Release the render context.
+        */
+        virtual void releaseContext() {}
     protected:
         bool initialized;
     };

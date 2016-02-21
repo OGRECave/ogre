@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = 0;
     }
     MultiRenderTarget* GLRTTManager::createMultiRenderTarget(const String & name)
     {
-    	OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "MultiRenderTarget can only be used with GL_EXT_framebuffer_object extension", "GLRTTManager::createMultiRenderTarget");
+        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "MultiRenderTarget can only be used with GL_EXT_framebuffer_object extension", "GLRTTManager::createMultiRenderTarget");
     }
     PixelFormat GLRTTManager::getSupportedAlternative(PixelFormat format)
     {
@@ -74,15 +74,15 @@ template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = 0;
         RenderTexture(target.buffer, target.zoffset)
     {
         mName = name;
-		mHwGamma = writeGamma;
-		mFSAA = fsaa;
+        mHwGamma = writeGamma;
+        mFSAA = fsaa;
     }
     GLRenderTexture::~GLRenderTexture()
     {
     }
 //-----------------------------------------------------------------------------  
     GLCopyingRenderTexture::GLCopyingRenderTexture(GLCopyingRTTManager *manager, 
-		const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
+        const String &name, const GLSurfaceDesc &target, bool writeGamma, uint fsaa):
         GLRenderTexture(name, target, writeGamma, fsaa)
     {
     }
@@ -90,9 +90,9 @@ template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = 0;
     {
         if( name == GLRenderTexture::CustomAttributeString_TARGET )
         {
-			GLSurfaceDesc &target = *static_cast<GLSurfaceDesc*>(pData);
-			target.buffer = static_cast<GLHardwarePixelBuffer*>(mBuffer);
-			target.zoffset = mZOffset;
+            GLSurfaceDesc &target = *static_cast<GLSurfaceDesc*>(pData);
+            target.buffer = static_cast<GLHardwarePixelBuffer*>(mBuffer);
+            target.zoffset = mZOffset;
         }
     }
 //-----------------------------------------------------------------------------  
@@ -104,7 +104,7 @@ template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = 0;
     }
 
     RenderTexture *GLCopyingRTTManager::createRenderTexture(const String &name, const GLSurfaceDesc &target, 
-		bool writeGamma, uint fsaa)
+        bool writeGamma, uint fsaa)
     {
         return new GLCopyingRenderTexture(this, name, target, writeGamma, fsaa);
     }
@@ -123,12 +123,12 @@ template<> GLRTTManager* Singleton<GLRTTManager>::msSingleton = 0;
     {
         // Copy on unbind
         GLSurfaceDesc surface;
-		surface.buffer = 0;
+        surface.buffer = 0;
         target->getCustomAttribute(GLRenderTexture::CustomAttributeString_TARGET, &surface);
         if(surface.buffer)
             static_cast<GLTextureBuffer*>(surface.buffer)->copyFromFramebuffer(surface.zoffset);
     }
-	//---------------------------------------------------------------------------------------------
+    //---------------------------------------------------------------------------------------------
 
 }
 

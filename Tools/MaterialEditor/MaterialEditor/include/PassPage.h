@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -43,48 +43,48 @@ class TechniqueController;
 class PassPage : public wxWizardPageSimple
 {
 public:
-	PassPage(wxWizard* parent);
-	PassPage(wxWizard* parent, Project* project);
-	PassPage(wxWizard* parent, Project* project, MaterialController* mc);
-	PassPage(wxWizard* parent, Project* project, MaterialController* mc, TechniqueController* tc);
-	virtual ~PassPage();
+    PassPage(wxWizard* parent);
+    PassPage(wxWizard* parent, Project* project);
+    PassPage(wxWizard* parent, Project* project, MaterialController* mc);
+    PassPage(wxWizard* parent, Project* project, MaterialController* mc, TechniqueController* tc);
+    virtual ~PassPage();
 
-	void getName(wxString& name) const;
+    void getName(wxString& name) const;
 
-	Project* getProject() const;
-	void setProject(Project* project);
+    Project* getProject() const;
+    void setProject(Project* project);
 
-	MaterialController* getMaterial() const;
-	void setMaterial(MaterialController* mc);
+    MaterialController* getMaterial() const;
+    void setMaterial(MaterialController* mc);
 
-	TechniqueController* getTechnique() const;
-	void setTechnique(TechniqueController* mc);
+    TechniqueController* getTechnique() const;
+    void setTechnique(TechniqueController* mc);
 
-	void populateMaterials(const MaterialControllerList* materials);
-	void populateTechniques(const TechniqueControllerList* techniques);
+    void populateMaterials(const MaterialControllerList* materials);
+    void populateTechniques(const TechniqueControllerList* techniques);
 
-	void OnProjectSelected(wxCommandEvent& event);
-	void OnMaterialSelected(wxCommandEvent& event);
-	//void OnTechniqueSelected(wxCommandEvent& event);
+    void OnProjectSelected(wxCommandEvent& event);
+    void OnMaterialSelected(wxCommandEvent& event);
+    //void OnTechniqueSelected(wxCommandEvent& event);
 
 protected:
-	void createPage();
+    void createPage();
 
-	wxBoxSizer* mSizer;
-	wxStaticText* mProjectLabel;
-	wxComboBox* mProjectComboBox;
-	wxStaticText* mMaterialLabel;
-	wxComboBox* mMaterialComboBox;
-	wxStaticText* mTechniqueLabel;
-	wxComboBox* mTechniqueComboBox;
-	wxStaticText* mNameLabel;
-	wxTextCtrl* mNameText;
+    wxBoxSizer* mSizer;
+    wxStaticText* mProjectLabel;
+    wxComboBox* mProjectComboBox;
+    wxStaticText* mMaterialLabel;
+    wxComboBox* mMaterialComboBox;
+    wxStaticText* mTechniqueLabel;
+    wxComboBox* mTechniqueComboBox;
+    wxStaticText* mNameLabel;
+    wxTextCtrl* mNameText;
 
-	Project* mProject;
-	MaterialController* mMaterial;
-	TechniqueController* mTechnique;
+    Project* mProject;
+    MaterialController* mMaterial;
+    TechniqueController* mTechnique;
 
-	DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif // _PASSPAGE_H_

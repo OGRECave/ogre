@@ -4,7 +4,7 @@
  (Object-oriented Graphics Rendering Engine)
  For the latest info, see http://www.ogre3d.org/
  
- Copyright (c) 2000-2013 Torus Knot Software Ltd
+ Copyright (c) 2000-2014 Torus Knot Software Ltd
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -56,50 +56,50 @@ namespace Ogre
     class _OgreGLES2Export GLSLESProgramPipeline : public GLSLESProgramCommon
     {
     public:
-		/// Constructor should only be used by GLSLESProgramPipelineManager
-		GLSLESProgramPipeline(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram);
-		virtual ~GLSLESProgramPipeline();
+        /// Constructor should only be used by GLSLESProgramPipelineManager
+        GLSLESProgramPipeline(GLSLESGpuProgram* vertexProgram, GLSLESGpuProgram* fragmentProgram);
+        virtual ~GLSLESProgramPipeline();
 
         /// GL Program Pipeline Handle
-		GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
+        GLuint getGLProgramPipelineHandle() const { return mGLProgramPipelineHandle; }
 
         /** Updates program pipeline object uniforms using data from GpuProgramParameters.
          normally called by GLSLESGpuProgram::bindParameters() just before rendering occurs.
          */
-		virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-		/** Updates program object uniform blocks using data from GpuProgramParameters.
+        virtual void updateUniforms(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program object uniform blocks using data from GpuProgramParameters.
          normally called by GLSLGpuProgram::bindParameters() just before rendering occurs.
          */
-		virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
-		/** Updates program pipeline object uniforms using data from pass iteration GpuProgramParameters.
+        virtual void updateUniformBlocks(GpuProgramParametersSharedPtr params, uint16 mask, GpuProgramType fromProgType);
+        /** Updates program pipeline object uniforms using data from pass iteration GpuProgramParameters.
          normally called by GLSLESGpuProgram::bindMultiPassParameters() just before multi pass rendering occurs.
          */
-		virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
+        virtual void updatePassIterationUniforms(GpuProgramParametersSharedPtr params);
 
         /** Makes a program pipeline object active by making sure it is linked and then putting it in use.
          */
-		void activate(void);
+        void activate(void);
 
         /// Get the index of a non-standard attribute bound in the linked code
-		virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
+        virtual GLint getAttributeIndex(VertexElementSemantic semantic, uint index);
 
-	protected:
+    protected:
         enum {
             VERTEX_PROGRAM_LINKED = 1,
             FRAGMENT_PROGRAM_LINKED = 2,
             ALL_PROGRAMS_LINKED = 3
         };
-		/// GL handle for pipeline object
+        /// GL handle for pipeline object
         GLuint mGLProgramPipelineHandle;
 
-		/// Compiles and links the separate vertex and fragment programs
+        /// Compiles and links the separate vertex and fragment programs
         virtual void compileAndLink(void);
         /// Put a program pipeline in use
         virtual void _useProgram(void);
         /// Finds layout qualifiers in the shader source and sets attribute indices appropriately
         virtual void extractLayoutQualifiers(void);
         /// Build uniform references from active named uniforms
-		virtual void buildGLUniformReferences(void);
+        virtual void buildGLUniformReferences(void);
     };
 }
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,18 @@ THE SOFTWARE.
 
 #include "OgreLodStrategy.h"
 #include "OgreSingleton.h"
-#include "OgreNode.h"
 
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
+
+    class DistanceLodBoxStrategy;
+    /// Backward compatible name for Distance_Box strategy.
+    typedef DistanceLodBoxStrategy DistanceLodStrategy;
 
     /** Level of detail strategy based on distance from camera. This is an abstract base class for DistanceLodBoxStrategy and DistanceLodSphereStrategy.
         @remarks
@@ -52,7 +55,7 @@ namespace Ogre {
         @par
             If all your testers had varying resolutions or you just didn't care, then this feature is useless for you and should be disabled (default: disabled).
      */
-    class _OgreExport DistanceLodStrategy : public LodStrategy
+    class _OgreExport DistanceLodStrategyBase : public LodStrategy
     {
     protected:
         /// @copydoc LodStrategy::getValueImpl
@@ -60,7 +63,7 @@ namespace Ogre {
 
     public:
         /** Default constructor. */
-        DistanceLodStrategy(const String& name);
+        DistanceLodStrategyBase(const String& name);
 
         /// @copydoc LodStrategy::getBaseValue
         virtual Real getBaseValue() const;
@@ -108,15 +111,15 @@ namespace Ogre {
         Real mReferenceViewValue;
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
     /** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
     /** Level of detail strategy based on distance from camera to an object's bounding sphere.
         @remarks
@@ -128,7 +131,7 @@ namespace Ogre {
         @par
             If all your testers had varying resolutions or you just didn't care, then this feature is useless for you and should be disabled (default: disabled).
      */
-    class _OgreExport DistanceLodSphereStrategy : public DistanceLodStrategy, public Singleton<DistanceLodSphereStrategy>
+    class _OgreExport DistanceLodSphereStrategy : public DistanceLodStrategyBase, public Singleton<DistanceLodSphereStrategy>
     {
     public:
         /** Default constructor. */
@@ -174,11 +177,11 @@ namespace Ogre {
     /** @} */
 
     /** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup LOD
-	*  @{
-	*/
+    *  @{
+    */
+    /** \addtogroup LOD
+    *  @{
+    */
 
     /** Level of detail strategy based on distance from camera to an object's bounding box.
         @remarks
@@ -190,7 +193,7 @@ namespace Ogre {
         @par
             If all your testers had varying resolutions or you just didn't care, then this feature is useless for you and should be disabled (default: disabled).
      */
-    class _OgreExport DistanceLodBoxStrategy : public DistanceLodStrategy, public Singleton<DistanceLodBoxStrategy>
+    class _OgreExport DistanceLodBoxStrategy : public DistanceLodStrategyBase, public Singleton<DistanceLodBoxStrategy>
     {
     public:
         /** Default constructor. */
@@ -232,6 +235,7 @@ namespace Ogre {
         */
         static DistanceLodBoxStrategy* getSingletonPtr(void);
     };
+
     /** @} */
     /** @} */
 

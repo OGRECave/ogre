@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,25 +37,25 @@ class EventArgs;
 class TechniquePropertyGridPage : public wxPropertyGridPage
 {
 public:
-	TechniquePropertyGridPage(TechniqueController* controller);
-	virtual ~TechniquePropertyGridPage();
+    TechniquePropertyGridPage(TechniqueController* controller);
+    virtual ~TechniquePropertyGridPage();
 
-	virtual void populate();
+    virtual void populate();
 
-	void nameChanged(EventArgs& args);
-	void schemeNameChanged(EventArgs& args);
-	void lodIndexChanged(EventArgs& args);
+    void nameChanged(EventArgs& args);
+    void schemeNameChanged(EventArgs& args);
+    void lodIndexChanged(EventArgs& args);
 
 protected:
-	virtual void propertyChanged(wxPropertyGridEvent& event);
-	
-	TechniqueController* mController;
+    virtual void propertyChanged(wxPropertyGridEvent& event);
+    
+    TechniqueController* mController;
 
-	wxPGId mNameId;
-	wxPGId mSchemeNameId;
-	wxPGId mLodIndexId;
+    wxPGId mNameId;
+    wxPGId mSchemeNameId;
+    wxPGId mLodIndexId;
 
-	DECLARE_EVENT_TABLE();
+    DECLARE_EVENT_TABLE();
 };
 
 #endif // _TECHNIQUEPROPERTYGRIDPAGE_H_

@@ -2,7 +2,7 @@ fragment_program Ogre/Compositor/OldTV_FPCg cg
 {
 	source OldTV.cg
 	entry_point OldTV_ps
-	profiles ps_4_0 ps_2_0 arbfp1
+	profiles ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3 ps_2_0 arbfp1
 }
 
 fragment_program Ogre/Compositor/OldTV_FPGLSL glsl
@@ -33,7 +33,7 @@ fragment_program Ogre/Compositor/OldTV_FPHLSL hlsl
 {
 	source OldTV.hlsl
 	entry_point OldTV_ps
-	target ps_4_0
+	target ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 fragment_program Ogre/Compositor/OldTV_FP unified
@@ -53,7 +53,6 @@ material Ogre/Compositor/OldTV
 		{
 			depth_check off
             polygon_mode_overrideable false
-
 			vertex_program_ref Ogre/Compositor/StdQuad_Tex2a_vp
 			{
 			}

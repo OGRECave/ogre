@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,15 +37,20 @@ namespace Ogre
 {
     ErrorDialog::ErrorDialog()
     {
-#ifdef OGRE_STATIC_LIB
-		mHInstance = GetModuleHandle( NULL );
-#else
-#  if OGRE_DEBUG_MODE == 1
-        mHInstance = GetModuleHandle("OgreMain_d.dll");
-#  else
-        mHInstance = GetModuleHandle("OgreMain.dll");
-#  endif
-#endif
+		#ifdef __MINGW32__
+			#ifdef OGRE_STATIC_LIB
+        		mHInstance = GetModuleHandle( NULL );
+			#else
+				#if OGRE_DEBUG_MODE == 1
+					mHInstance = GetModuleHandle("OgreMain_d.dll");
+				#else
+					mHInstance = GetModuleHandle("OgreMain.dll");
+				#endif
+			#endif
+		#else
+			static const TCHAR staticVar;
+			GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, &staticVar, &mHInstance);
+		#endif
     }
 
 #if OGRE_ARCHITECTURE_64 == OGRE_ARCH_TYPE

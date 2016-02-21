@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre {
     /** Specialisation of HighLevelGpuProgram to encapsulate shader
@@ -143,8 +144,8 @@ namespace Ogre {
 
         GLuint getGLShaderHandle() const { return mGLShaderHandle; }
         GLuint getGLProgramHandle();
-        void attachToProgramObject( const GLuint programObject );
-        void detachFromProgramObject( const GLuint programObject );
+        void attachToProgramObject(const GLuint programObject);
+        void detachFromProgramObject(const GLuint programObject);
         String getAttachedShaderNames() const { return mAttachedShaderNames; }
         /// Get OpenGL GLSL shader type from OGRE GPU program type.
         GLenum getGLShaderType(GpuProgramType programType);
@@ -261,39 +262,28 @@ namespace Ogre {
         GLuint mGLProgramHandle;
 
 
-        /// Flag indicating if shader object successfully compiled
+        /// Flag indicating if shader object successfully compiled.
         GLint mCompiled;
-        /// The input operation type for this (geometry) program
+        /// The input operation type for this (geometry) program.
         RenderOperation::OperationType mInputOperationType;
-        /// The output operation type for this (geometry) program
+        /// The output operation type for this (geometry) program.
         RenderOperation::OperationType mOutputOperationType;
-        /// The maximum amount of vertices that this (geometry) program can output
+        /// The maximum amount of vertices that this (geometry) program can output.
         int mMaxOutputVertices;
-        /// Attached Shader names
+        /// Attached shader names.
         String mAttachedShaderNames;
-        /// Preprocessor options
+        /// Preprocessor options.
         String mPreprocessorDefines;
         /// Matrix in column major pack format?
         bool mColumnMajorMatrices;
 
         typedef vector< GLSLShader* >::type GLSLShaderContainer;
         typedef GLSLShaderContainer::iterator GLSLShaderContainerIterator;
-        /// Container of attached programs
+        /// Container of attached shaders.
         GLSLShaderContainer mAttachedGLSLShaders;
 
-
-        /// Keep track of the number of vertex shaders created.
-        static GLuint mVertexShaderCount;
-        /// Keep track of the number of fragment shaders created.
-        static GLuint mFragmentShaderCount;
-        /// Keep track of the number of geometry shaders created.
-        static GLuint mGeometryShaderCount;
-        /// Keep track of the number of tesselation hull (control) shaders created.
-        static GLuint mHullShaderCount;
-        /// Keep track of the number of tesselation domain (evaluation) shaders created.
-        static GLuint mDomainShaderCount;
-        /// Keep track of the number of compute shaders created.
-        static GLuint mComputeShaderCount;
+        /// Keep track of the number of shaders created.
+        static GLuint mShaderCount;
 
         /** Flag indicating that the shader has been successfully
             linked.

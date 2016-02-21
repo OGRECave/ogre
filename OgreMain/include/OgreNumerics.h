@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,32 +34,32 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
-	/** Real type for numeric solvers */
-	typedef double PreciseReal;
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
+    /** Real type for numeric solvers */
+    typedef double PreciseReal;
 
 
     /** Provides numeric solvers for Ogre
         @remarks
             Handles linear algebra numerics.
     */
-	class _OgreExport NumericSolver
-	{
-	public:
-		/** Solves a full rank NxN linear system of equations 
-		    @remarks
-			   This implements a naive Gaussian elimination algorithm.
-			   The algorithm is destructive, so there are side effects in coeff and col.
-	    */
-		static bool solveNxNLinearSysDestr(int n, PreciseReal **coeff, PreciseReal *col);
-	};
-	/** @} */
-	/** @} */
+    class _OgreExport NumericSolver
+    {
+    public:
+        /** Solves a full rank NxN linear system of equations 
+            @remarks
+               This implements a naive Gaussian elimination algorithm.
+               The algorithm is destructive, so there are side effects in coeff and col.
+        */
+        static bool solveNxNLinearSysDestr(int n, PreciseReal **coeff, PreciseReal *col);
+    };
+    /** @} */
+    /** @} */
 
 }
 

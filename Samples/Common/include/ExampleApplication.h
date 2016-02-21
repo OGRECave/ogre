@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -71,43 +71,43 @@ class ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listene
 {
 public:
 
-	ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
-	{
-		mShaderGenerator = pShaderGenerator;
-	}
+    ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
+    {
+        mShaderGenerator = pShaderGenerator;
+    }
 
-	virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
-		const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
-		const Renderable* rend)
-	{		
-		// Case this is the default shader generator scheme.
-		if (schemeName == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-		{
-			MaterialRegisterIterator itFind = mRegisteredMaterials.find(originalMaterial);
-			bool techniqueCreated = false;
+    virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
+        const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
+        const Renderable* rend)
+    {       
+        // Case this is the default shader generator scheme.
+        if (schemeName == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
+        {
+            MaterialRegisterIterator itFind = mRegisteredMaterials.find(originalMaterial);
+            bool techniqueCreated = false;
 
-			// This material was not registered before.
-			if (itFind == mRegisteredMaterials.end())
-			{
-				techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-					originalMaterial->getName(), 
-					MaterialManager::DEFAULT_SCHEME_NAME, 
-					schemeName);				
-			}
-			mRegisteredMaterials[originalMaterial] = techniqueCreated;
-		}
+            // This material was not registered before.
+            if (itFind == mRegisteredMaterials.end())
+            {
+                techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
+                    originalMaterial->getName(), 
+                    MaterialManager::DEFAULT_SCHEME_NAME, 
+                    schemeName);                
+            }
+            mRegisteredMaterials[originalMaterial] = techniqueCreated;
+        }
 
-		return NULL;
-	}
-
-protected:
-	typedef std::map<Material*, bool>		MaterialRegisterMap;
-	typedef MaterialRegisterMap::iterator	MaterialRegisterIterator;
-
+        return NULL;
+    }
 
 protected:
-	MaterialRegisterMap				mRegisteredMaterials;		// Registered material map.
-	RTShader::ShaderGenerator*		mShaderGenerator;			// The shader generator instance.
+    typedef std::map<Material*, bool>       MaterialRegisterMap;
+    typedef MaterialRegisterMap::iterator   MaterialRegisterIterator;
+
+
+protected:
+    MaterialRegisterMap             mRegisteredMaterials;       // Registered material map.
+    RTShader::ShaderGenerator*      mShaderGenerator;           // The shader generator instance.
 };
 #endif
 
@@ -124,25 +124,25 @@ public:
     {
         mFrameListener = 0;
         mRoot = 0;
-		mOverlaySystem=0;
+        mOverlaySystem=0;
 
-		// Provide a nice cross platform solution for locating the configuration files
-		// On windows files are searched for in the current working directory, on OS X however
-		// you must provide the full path, the helper function macBundlePath does this for us.
+        // Provide a nice cross platform solution for locating the configuration files
+        // On windows files are searched for in the current working directory, on OS X however
+        // you must provide the full path, the helper function macBundlePath does this for us.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-		mResourcePath = macBundlePath() + "/Contents/Resources/";
+        mResourcePath = macBundlePath() + "/Contents/Resources/";
         mConfigPath = mResourcePath;
 #elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         mResourcePath = macBundlePath() + "/";
         mConfigPath = mResourcePath;
 #else
-		mResourcePath = "";
+        mResourcePath = "";
         mConfigPath = mResourcePath;
 #endif
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-		mShaderGenerator	 = NULL;		
-		mMaterialMgrListener = NULL;
+        mShaderGenerator     = NULL;        
+        mMaterialMgrListener = NULL;
 #endif
     }
     /// Standard destructor
@@ -150,17 +150,17 @@ public:
     {
         if (mFrameListener)
             delete mFrameListener;
-		if (mOverlaySystem)
-		{
-			if(mSceneMgr) mSceneMgr->removeRenderQueueListener(mOverlaySystem);
+        if (mOverlaySystem)
+        {
+            if(mSceneMgr) mSceneMgr->removeRenderQueueListener(mOverlaySystem);
             OGRE_DELETE mOverlaySystem;
-		}
+        }
 
         if (mRoot)
             OGRE_DELETE mRoot;
 
 #ifdef OGRE_STATIC_LIB
-		mStaticPluginLoader.unload();
+        mStaticPluginLoader.unload();
 #endif
     }
 
@@ -173,30 +173,30 @@ public:
         mRoot->startRendering();
 
         // clean up
-        destroyScene();	
+        destroyScene(); 
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-		// Finalize shader generator.
-		finalizeShaderGenerator();
+        // Finalize shader generator.
+        finalizeShaderGenerator();
 #endif
 
     }
 
 protected:
     Root *mRoot;
-	OverlaySystem* mOverlaySystem;
+    OverlaySystem* mOverlaySystem;
 #ifdef OGRE_STATIC_LIB
-	StaticPluginLoader mStaticPluginLoader;
+    StaticPluginLoader mStaticPluginLoader;
 #endif
     Camera* mCamera;
     SceneManager* mSceneMgr;
     ExampleFrameListener* mFrameListener;
     RenderWindow* mWindow;
-	Ogre::String mResourcePath;
-	Ogre::String mConfigPath;
+    Ogre::String mResourcePath;
+    Ogre::String mConfigPath;
 #ifdef INCLUDE_RTSHADER_SYSTEM
-	RTShader::ShaderGenerator*					mShaderGenerator;			// The Shader generator instance.
-	ShaderGeneratorTechniqueResolverListener*	mMaterialMgrListener;		// Material manager listener.	
+    RTShader::ShaderGenerator*                  mShaderGenerator;           // The Shader generator instance.
+    ShaderGeneratorTechniqueResolverListener*   mMaterialMgrListener;       // Material manager listener.   
 #endif
 
     // These internal methods package up the stages in the startup process
@@ -204,47 +204,47 @@ protected:
     virtual bool setup(void)
     {
 
-		String pluginsPath;
-		// only use plugins.cfg if not static
+        String pluginsPath;
+        // only use plugins.cfg if not static
 #ifndef OGRE_STATIC_LIB
 #if OGRE_DEBUG_MODE
-		pluginsPath = mResourcePath + "plugins_d.cfg";
+        pluginsPath = mResourcePath + "plugins_d.cfg";
 #else
-		pluginsPath = mResourcePath + "plugins.cfg";
+        pluginsPath = mResourcePath + "plugins.cfg";
 #endif
 #endif
-		
+        
         mRoot = OGRE_NEW Root(pluginsPath, 
             mConfigPath + "ogre.cfg", mResourcePath + "Ogre.log");
-		mOverlaySystem = OGRE_NEW OverlaySystem();
+        mOverlaySystem = OGRE_NEW OverlaySystem();
 #ifdef OGRE_STATIC_LIB
-		mStaticPluginLoader.load();
+        mStaticPluginLoader.load();
 #endif
         setupResources();
 
         bool carryOn = configure();
         if (!carryOn) 
-			return false;
+            return false;
 
         chooseSceneManager();
         createCamera();
         createViewports();
 #ifdef INCLUDE_RTSHADER_SYSTEM
-		// Initialize shader generator.
-		carryOn = initializeShaderGenerator(mSceneMgr);
-		if (!carryOn) 
-			return false;
+        // Initialize shader generator.
+        carryOn = initializeShaderGenerator(mSceneMgr);
+        if (!carryOn) 
+            return false;
 #endif
 
         // Set default mipmap level (NB some APIs ignore this)
         TextureManager::getSingleton().setDefaultNumMipmaps(5);
 
-		// Create any resource listeners (for loading screens)
-		createResourceListener();
-		// Load resources
-		loadResources();
+        // Create any resource listeners (for loading screens)
+        createResourceListener();
+        // Load resources
+        loadResources();
 
-		// Create the scene
+        // Create the scene
         createScene();
 
         createFrameListener();
@@ -253,74 +253,74 @@ protected:
 
     }
 #ifdef INCLUDE_RTSHADER_SYSTEM
-	virtual bool initializeShaderGenerator(SceneManager* sceneMgr)
-	{	
-		if (RTShader::ShaderGenerator::initialize())
-		{
-			mShaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();
+    virtual bool initializeShaderGenerator(SceneManager* sceneMgr)
+    {   
+        if (RTShader::ShaderGenerator::initialize())
+        {
+            mShaderGenerator = RTShader::ShaderGenerator::getSingletonPtr();
 
-			// Set the scene manager.
-			mShaderGenerator->addSceneManager(sceneMgr);
+            // Set the scene manager.
+            mShaderGenerator->addSceneManager(sceneMgr);
 
-			// Setup core libraries and shader cache path.
-			ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList("Popular");
-			ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
-			ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
-			String shaderCoreLibsPath;
-			String shaderCachePath;
+            // Setup core libraries and shader cache path.
+            ResourceGroupManager::LocationList resLocationsList = ResourceGroupManager::getSingleton().getResourceLocationList("Popular");
+            ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
+            ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
+            String shaderCoreLibsPath;
+            String shaderCachePath;
 
-			// Default cache path is current directory;
-			shaderCachePath = "./";
+            // Default cache path is current directory;
+            shaderCachePath = "./";
 
-			// Try to find the location of the core shader lib functions and use it
-			// as shader cache path as well - this will reduce the number of generated files
-			// when running from different directories.
-			for (; it != itEnd; ++it)
-			{
+            // Try to find the location of the core shader lib functions and use it
+            // as shader cache path as well - this will reduce the number of generated files
+            // when running from different directories.
+            for (; it != itEnd; ++it)
+            {
 
-				if ((*it)->archive->getName().find("RTShaderLib") != String::npos)
-				{
-					shaderCoreLibsPath = (*it)->archive->getName() + "/";
-					shaderCachePath    = shaderCoreLibsPath;
-					break;
-				}
-			}
+                if ((*it)->archive->getName().find("RTShaderLib") != String::npos)
+                {
+                    shaderCoreLibsPath = (*it)->archive->getName() + "/";
+                    shaderCachePath    = shaderCoreLibsPath;
+                    break;
+                }
+            }
 
-			// Core shader libs not found -> shader generating will fail.
-			if (shaderCoreLibsPath.empty())			
-				return false;			
+            // Core shader libs not found -> shader generating will fail.
+            if (shaderCoreLibsPath.empty())         
+                return false;           
 
-			// Add resource location for the core shader libs. 
-			ResourceGroupManager::getSingleton().addResourceLocation(shaderCoreLibsPath , "FileSystem");
-				
-			// Set shader cache path.
-			mShaderGenerator->setShaderCachePath(shaderCachePath);		
-									
-			// Create and register the material manager listener.
-			mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);				
-			MaterialManager::getSingleton().addListener(mMaterialMgrListener);
-		}
+            // Add resource location for the core shader libs. 
+            ResourceGroupManager::getSingleton().addResourceLocation(shaderCoreLibsPath , "FileSystem");
+                
+            // Set shader cache path.
+            mShaderGenerator->setShaderCachePath(shaderCachePath);      
+                                    
+            // Create and register the material manager listener.
+            mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);              
+            MaterialManager::getSingleton().addListener(mMaterialMgrListener);
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	virtual void finalizeShaderGenerator()
-	{
-		// Unregister the material manager listener.
-		if (mMaterialMgrListener != NULL)
-		{			
-			MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
-			delete mMaterialMgrListener;
-			mMaterialMgrListener = NULL;
-		}
+    virtual void finalizeShaderGenerator()
+    {
+        // Unregister the material manager listener.
+        if (mMaterialMgrListener != NULL)
+        {           
+            MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
+            delete mMaterialMgrListener;
+            mMaterialMgrListener = NULL;
+        }
 
-		// Finalize CRTShader system.
-		if (mShaderGenerator != NULL)
-		{
-			RTShader::ShaderGenerator::finalize();
-			mShaderGenerator = NULL;
-		}
-	}
+        // Finalize CRTShader system.
+        if (mShaderGenerator != NULL)
+        {
+            RTShader::ShaderGenerator::finalize();
+            mShaderGenerator = NULL;
+        }
+    }
 #endif
     /** Configures the application - returns false if the user chooses to abandon configuration. */
     virtual bool configure(void)
@@ -346,8 +346,8 @@ protected:
         // Create the SceneManager, in this case a generic one
         mSceneMgr = mRoot->createSceneManager(ST_GENERIC, "ExampleSMInstance");
 
-		if(mOverlaySystem)
-			 mSceneMgr->addRenderQueueListener(mOverlaySystem);
+        if(mOverlaySystem)
+             mSceneMgr->addRenderQueueListener(mOverlaySystem);
     }
     virtual void createCamera(void)
     {
@@ -395,7 +395,7 @@ protected:
 #if OGRE_DEBUG_MODE
         cf.load(mResourcePath + "resources_d.cfg");
 #else
-		cf.load(mResourcePath + "resources.cfg");
+        cf.load(mResourcePath + "resources.cfg");
 #endif
 
         // Go through all sections & settings in the file
@@ -415,8 +415,8 @@ protected:
                 // OS X does not set the working directory relative to the app,
                 // In order to make things portable on OS X we need to provide
                 // the loading with it's own bundle path location
-				if (!StringUtil::startsWith(archName, "/", false)) // only adjust relative dirs
-					archName = String(macBundlePath() + "/" + archName);
+                if (!StringUtil::startsWith(archName, "/", false)) // only adjust relative dirs
+                    archName = String(macBundlePath() + "/" + archName);
 #endif
                 ResourceGroupManager::getSingleton().addResourceLocation(
                     archName, typeName, secName);
@@ -425,20 +425,20 @@ protected:
         }
     }
 
-	/// Optional override method where you can create resource listeners (e.g. for loading screens)
-	virtual void createResourceListener(void)
-	{
+    /// Optional override method where you can create resource listeners (e.g. for loading screens)
+    virtual void createResourceListener(void)
+    {
 
-	}
+    }
 
-	/// Optional override method where you can perform resource group loading
-	/// Must at least do ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-	virtual void loadResources(void)
-	{
-		// Initialise, parse scripts etc
-		ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    /// Optional override method where you can perform resource group loading
+    /// Must at least do ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+    virtual void loadResources(void)
+    {
+        // Initialise, parse scripts etc
+        ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	}
+    }
 
 };
 

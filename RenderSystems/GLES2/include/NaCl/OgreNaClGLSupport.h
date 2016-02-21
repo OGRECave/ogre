@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,34 +32,34 @@ THE SOFTWARE.
 #include "OgreGLES2Support.h"
 
 namespace Ogre {
-	class GLES2PBuffer;
-	
+    class GLES2PBuffer;
+    
     class _OgrePrivate NaClGLSupport : public GLES2Support
     {
         public:
             NaClGLSupport();
             virtual ~NaClGLSupport();
 
-			void switchMode(uint& width, uint& height, short& frequency);
-			String getDisplayName(void);
+            void switchMode(uint& width, uint& height, short& frequency);
+            String getDisplayName(void);
 
-			RenderWindow* createWindow(bool autoCreateWindow,
+            RenderWindow* createWindow(bool autoCreateWindow,
                                        GLES2RenderSystem *renderSystem,
                                        const String& windowTitle);
-									   
-	        RenderWindow* newWindow(const String& name,
-            	                    unsigned int width, unsigned int height,
-            	                    bool fullScreen,
-            	                    const NameValuePairList *miscParams = 0);
-									
-			void start(void);
+                                       
+            RenderWindow* newWindow(const String& name,
+                                    unsigned int width, unsigned int height,
+                                    bool fullScreen,
+                                    const NameValuePairList *miscParams = 0);
+                                    
+            void start(void);
             void stop(void);
             void addConfig(void);
-			void refreshConfig(void);
+            void refreshConfig(void);
             String validateConfig(void);
             void setConfigOption(const String &name, const String &value);
             void* getProcAddress(const Ogre::String& name);
-	};
+    };
 }
 
 #endif

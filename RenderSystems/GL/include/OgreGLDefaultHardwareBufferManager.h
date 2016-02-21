@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,22 +33,23 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreHardwareVertexBuffer.h"
 #include "OgreHardwareIndexBuffer.h"
+#include "OgreHardwareBuffer.h"
 
 namespace Ogre {
 
     /// Specialisation of HardwareVertexBuffer for emulation
     class _OgreGLExport GLDefaultHardwareVertexBuffer : public HardwareVertexBuffer 
     {
-	protected:
-		unsigned char* mData;
+    protected:
+        unsigned char* mData;
         /// @copydoc HardwareBuffer::lock
         void* lockImpl(size_t offset, size_t length, LockOptions options);
         /// @copydoc HardwareBuffer::unlock
         void unlockImpl(void);
 
     public:
-		GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, HardwareBuffer::Usage usage);
-		GLDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
+        GLDefaultHardwareVertexBuffer(size_t vertexSize, size_t numVertices, HardwareBuffer::Usage usage);
+        GLDefaultHardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize, size_t numVertices, 
             HardwareBuffer::Usage usage);
         ~GLDefaultHardwareVertexBuffer();
         /// @copydoc HardwareBuffer::readData
@@ -56,85 +57,85 @@ namespace Ogre {
         /// @copydoc HardwareBuffer::writeData
 
         void writeData(size_t offset, size_t length, const void* pSource,
-				bool discardWholeBuffer = false);
+                bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
-		void unlock(void);
+        void unlock(void);
 
         //void* getDataPtr(void) const { return (void*)mData; }
         void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
-	/// Specialisation of HardwareIndexBuffer for emulation
+    /// Specialisation of HardwareIndexBuffer for emulation
     class _OgreGLExport GLDefaultHardwareIndexBuffer : public HardwareIndexBuffer
     {
-	protected:
-		unsigned char* mData;
+    protected:
+        unsigned char* mData;
         /// @copydoc HardwareBuffer::lock
         void* lockImpl(size_t offset, size_t length, LockOptions options);
         /// @copydoc HardwareBuffer::unlock
         void unlockImpl(void);
     public:
-		GLDefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage);
+        GLDefaultHardwareIndexBuffer(IndexType idxType, size_t numIndexes, HardwareBuffer::Usage usage);
         ~GLDefaultHardwareIndexBuffer();
         /// @copydoc HardwareBuffer::readData
         void readData(size_t offset, size_t length, void* pDest);
         /// @copydoc HardwareBuffer::writeData
         void writeData(size_t offset, size_t length, const void* pSource,
-				bool discardWholeBuffer = false);
+                bool discardWholeBuffer = false);
         /** Override HardwareBuffer to turn off all shadowing. */
-        void* lock(size_t offset, size_t length, LockOptions options);
+        void* lock(size_t offset, size_t length, LockOptions options, HardwareBuffer::UploadOptions uploadOpt = HBU_DEFAULT);
         /** Override HardwareBuffer to turn off all shadowing. */
         void unlock(void);
 
         void* getDataPtr(size_t offset) const { return (void*)(mData + offset); }
     };
 
-	/** Specialisation of HardwareBufferManager to emulate hardware buffers.
-	@remarks
-		You might want to instantiate this class if you want to utilise
-		classes like MeshSerializer without having initialised the 
-		rendering system (which is required to create a 'real' hardware
-		buffer manager.
-	*/
-	class _OgreGLExport GLDefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
-	{
+    /** Specialisation of HardwareBufferManager to emulate hardware buffers.
+    @remarks
+        You might want to instantiate this class if you want to utilise
+        classes like MeshSerializer without having initialised the 
+        rendering system (which is required to create a 'real' hardware
+        buffer manager.
+    */
+    class _OgreGLExport GLDefaultHardwareBufferManagerBase : public HardwareBufferManagerBase
+    {
     public:
         GLDefaultHardwareBufferManagerBase();
         ~GLDefaultHardwareBufferManagerBase();
         /// Creates a vertex buffer
-		HardwareVertexBufferSharedPtr 
+        HardwareVertexBufferSharedPtr 
             createVertexBuffer(size_t vertexSize, size_t numVerts, 
-				HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Create a hardware index buffer
-		HardwareIndexBufferSharedPtr 
+                HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+        /// Create a hardware index buffer
+        HardwareIndexBufferSharedPtr 
             createIndexBuffer(HardwareIndexBuffer::IndexType itype, size_t numIndexes, 
-				HardwareBuffer::Usage usage, bool useShadowBuffer = false);
-		/// Create a render to vertex buffer
-		RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
-		/// Create a uniform buffer
-		HardwareUniformBufferSharedPtr 
-			createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
-		HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
+                HardwareBuffer::Usage usage, bool useShadowBuffer = false);
+        /// Create a render to vertex buffer
+        RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
+        /// Create a uniform buffer
+        HardwareUniformBufferSharedPtr 
+            createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,bool useShadowBuffer, const String& name = "");
+        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes,
                                                            HardwareBuffer::Usage usage = HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE,
                                                            bool useShadowBuffer = false, const String& name = "");
     };
 
-	/// GLDefaultHardwareBufferManagerBase as a Singleton
-	class _OgreGLExport GLDefaultHardwareBufferManager : public HardwareBufferManager
-	{
-	public:
-		GLDefaultHardwareBufferManager()
-			: HardwareBufferManager(OGRE_NEW GLDefaultHardwareBufferManagerBase()) 
-		{
+    /// GLDefaultHardwareBufferManagerBase as a Singleton
+    class _OgreGLExport GLDefaultHardwareBufferManager : public HardwareBufferManager
+    {
+    public:
+        GLDefaultHardwareBufferManager()
+            : HardwareBufferManager(OGRE_NEW GLDefaultHardwareBufferManagerBase()) 
+        {
 
-		}
-		~GLDefaultHardwareBufferManager()
-		{
-			OGRE_DELETE mImpl;
-		}
-	};
+        }
+        ~GLDefaultHardwareBufferManager()
+        {
+            OGRE_DELETE mImpl;
+        }
+    };
 }
 
 #endif

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,15 +37,24 @@ THE SOFTWARE.
 #include "OgreArchive.h"
 #include "OgreArchiveManager.h"
 #include "OgreAxisAlignedBox.h"
+#include "OgreBillboard.h"
 #include "OgreBillboardChain.h"
 #include "OgreBillboardSet.h"
 #include "OgreBone.h"
 #include "OgreCamera.h"
+#include "OgreCompositor.h"
+#include "OgreCompositorManager.h"
+#include "OgreCompositorChain.h"
+#include "OgreCompositorInstance.h"
+#include "OgreCompositionTechnique.h"
+#include "OgreCompositionPass.h"
+#include "OgreCompositionTargetPass.h"
 #include "OgreConfigFile.h"
 #include "OgreControllerManager.h"
 #include "OgreDataStream.h"
 #include "OgreEntity.h"
 #include "OgreException.h"
+#include "OgreFrameListener.h"
 #include "OgreFrustum.h"
 #include "OgreGpuProgram.h"
 #include "OgreGpuProgramManager.h"
@@ -72,9 +81,11 @@ THE SOFTWARE.
 #include "OgreMatrix4.h"
 #include "OgreMesh.h"
 #include "OgreMeshManager.h"
+#include "OgreMovablePlane.h"
 #include "OgreMeshSerializer.h"
 #include "OgreParticleAffector.h"
 #include "OgreParticleEmitter.h"
+#include "OgreParticleSystem.h"
 #include "OgreParticleSystemManager.h"
 #include "OgrePass.h"
 #include "OgrePatchMesh.h"
@@ -95,6 +106,11 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreSceneManagerEnumerator.h"
 #include "OgreSceneNode.h"
+#include "OgreShadowCameraSetup.h"
+#include "OgreShadowCameraSetupFocused.h"
+#include "OgreShadowCameraSetupLiSPSM.h"
+#include "OgreShadowCameraSetupPlaneOptimal.h"
+#include "OgreShadowCameraSetupPSSM.h"
 #include "OgreSimpleRenderable.h"
 #include "OgreSkeleton.h"
 #include "OgreSkeletonInstance.h"
@@ -109,21 +125,10 @@ THE SOFTWARE.
 #include "OgreTechnique.h"
 #include "OgreTextureManager.h"
 #include "OgreTextureUnitState.h"
+#include "OgreTimer.h"
 #include "OgreVector2.h"
 #include "OgreViewport.h"
-#include "OgreCompositor.h"
-#include "OgreCompositorManager.h"
-#include "OgreCompositorChain.h"
-#include "OgreCompositorInstance.h"
-#include "OgreCompositionTechnique.h"
-#include "OgreCompositionPass.h"
-#include "OgreCompositionTargetPass.h"
 #include "OgreWindowEventUtilities.h"
-#include "OgreShadowCameraSetup.h"
-#include "OgreShadowCameraSetupFocused.h"
-#include "OgreShadowCameraSetupLiSPSM.h"
-#include "OgreShadowCameraSetupPlaneOptimal.h"
-#include "OgreShadowCameraSetupPSSM.h"
 // .... more to come
 
 #endif

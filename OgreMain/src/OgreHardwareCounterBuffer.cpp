@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,16 +30,15 @@ THE SOFTWARE.
 #include "OgreHardwareCounterBuffer.h"
 #include "OgreHardwareBufferManager.h"
 #include "OgreDefaultHardwareBufferManager.h"
-#include "OgreException.h"
 
 namespace Ogre {
 
-	HardwareCounterBuffer::HardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
-									HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
-		: HardwareBuffer(usage, false, useShadowBuffer)
-		, mName(name)
-	{
-		// Calculate the size of the vertices
+    HardwareCounterBuffer::HardwareCounterBuffer(HardwareBufferManagerBase* mgr, size_t sizeBytes, 
+                                    HardwareBuffer::Usage usage, bool useShadowBuffer, const String& name)
+        : HardwareBuffer(usage, false, useShadowBuffer)
+        , mMgr(mgr), mName(name)
+    {
+        // Calculate the size of the vertices
         mSizeInBytes = sizeBytes;
 
         // Create a shadow buffer if required
@@ -47,21 +46,18 @@ namespace Ogre {
         {
             mShadowBuffer = OGRE_NEW DefaultHardwareCounterBuffer(mMgr, sizeBytes, HardwareBuffer::HBU_DYNAMIC, false);
         }
-	}
-	
-	HardwareCounterBuffer::~HardwareCounterBuffer()
-	{
-		if (mMgr)
-		{
-			mMgr->_notifyCounterBufferDestroyed(this);
-		}
-        if (mShadowBuffer)
+    }
+    
+    HardwareCounterBuffer::~HardwareCounterBuffer()
+    {
+        if (mMgr)
         {
-            OGRE_DELETE mShadowBuffer;
+            mMgr->_notifyCounterBufferDestroyed(this);
         }
-	}
+        OGRE_DELETE mShadowBuffer;
+    }
 
-	//-----------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------
     HardwareCounterBufferSharedPtr::HardwareCounterBufferSharedPtr(HardwareCounterBuffer* buf)
         : SharedPtr<HardwareCounterBuffer>(buf)
     {

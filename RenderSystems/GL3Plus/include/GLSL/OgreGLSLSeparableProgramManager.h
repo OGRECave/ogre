@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ namespace Ogre
 
     public:
 
-        GLSLSeparableProgramManager(void);
+        GLSLSeparableProgramManager(const GL3PlusSupport& support);
         ~GLSLSeparableProgramManager(void);
 
         /** Get the program pipeline that combines the current program
@@ -74,16 +74,6 @@ namespace Ogre
             NOT link the program.
         */
         GLSLSeparableProgram* getCurrentSeparableProgram(void);
-
-        /** Get the program pipeline that combines the current program
-            objects.  If the program pipeline object was not
-            already created and linked a new one is created and
-            linked.
-        */
-        GLSLSeparableProgram* getActiveSeparableProgram(void);
-        //TODO Replace the above method with the one below, and rename
-        // mActiveSeparableProgram -> mCurrentSeparableProgram.
-        //void activateCurrentSeparableProgram(void);
 
         /** Set the active link programs for the next rendering state.
             The active program pipeline object will be cleared.

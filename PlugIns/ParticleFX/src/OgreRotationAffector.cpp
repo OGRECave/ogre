@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,20 +34,20 @@ THE SOFTWARE.
 namespace Ogre {
     
     // init statics
-	RotationAffector::CmdRotationSpeedRangeStart	RotationAffector::msRotationSpeedRangeStartCmd;
-    RotationAffector::CmdRotationSpeedRangeEnd		RotationAffector::msRotationSpeedRangeEndCmd;
-    RotationAffector::CmdRotationRangeStart			RotationAffector::msRotationRangeStartCmd;
-    RotationAffector::CmdRotationRangeEnd			RotationAffector::msRotationRangeEndCmd;
+    RotationAffector::CmdRotationSpeedRangeStart    RotationAffector::msRotationSpeedRangeStartCmd;
+    RotationAffector::CmdRotationSpeedRangeEnd      RotationAffector::msRotationSpeedRangeEndCmd;
+    RotationAffector::CmdRotationRangeStart         RotationAffector::msRotationRangeStartCmd;
+    RotationAffector::CmdRotationRangeEnd           RotationAffector::msRotationRangeEndCmd;
     
     //-----------------------------------------------------------------------
-	RotationAffector::RotationAffector(ParticleSystem* psys) :
+    RotationAffector::RotationAffector(ParticleSystem* psys) :
         ParticleAffector(psys),
-		mRotationSpeedRangeStart(0),
-		mRotationSpeedRangeEnd(0),
-		mRotationRangeStart(0),
-		mRotationRangeEnd(0)
+        mRotationSpeedRangeStart(0),
+        mRotationSpeedRangeEnd(0),
+        mRotationRangeStart(0),
+        mRotationRangeEnd(0)
     {
-		mType = "Rotator";
+        mType = "Rotator";
 
         // Init parameters
         if (createParamDictionary("RotationAffector"))
@@ -55,37 +55,37 @@ namespace Ogre {
             ParamDictionary* dict = getParamDictionary();
 
             dict->addParameter(ParameterDef("rotation_speed_range_start", 
-				"The start of a range of rotation speed to be assigned to emitted particles.", PT_REAL),
-				&msRotationSpeedRangeStartCmd);
+                "The start of a range of rotation speed to be assigned to emitted particles.", PT_REAL),
+                &msRotationSpeedRangeStartCmd);
 
-			dict->addParameter(ParameterDef("rotation_speed_range_end", 
-				"The end of a range of rotation speed to be assigned to emitted particles.", PT_REAL),
-				&msRotationSpeedRangeEndCmd);
+            dict->addParameter(ParameterDef("rotation_speed_range_end", 
+                "The end of a range of rotation speed to be assigned to emitted particles.", PT_REAL),
+                &msRotationSpeedRangeEndCmd);
 
-			dict->addParameter(ParameterDef("rotation_range_start", 
-				"The start of a range of rotation angles to be assigned to emitted particles.", PT_REAL),
-				&msRotationRangeStartCmd);
+            dict->addParameter(ParameterDef("rotation_range_start", 
+                "The start of a range of rotation angles to be assigned to emitted particles.", PT_REAL),
+                &msRotationRangeStartCmd);
 
-			dict->addParameter(ParameterDef("rotation_range_end", 
-				"The end of a range of rotation angles to be assigned to emitted particles.", PT_REAL),
-				&msRotationRangeEndCmd);
+            dict->addParameter(ParameterDef("rotation_range_end", 
+                "The end of a range of rotation angles to be assigned to emitted particles.", PT_REAL),
+                &msRotationRangeEndCmd);
         }
     }
 
     //-----------------------------------------------------------------------
-	void RotationAffector::_initParticle(Particle* pParticle)
-	{
-		pParticle->setRotation(
+    void RotationAffector::_initParticle(Particle* pParticle)
+    {
+        pParticle->setRotation(
             mRotationRangeStart + 
             (Math::UnitRandom() * 
                 (mRotationRangeEnd - mRotationRangeStart)));
-        pParticle->rotationSpeed =
+        pParticle->mRotationSpeed =
             mRotationSpeedRangeStart + 
             (Math::UnitRandom() * 
                 (mRotationSpeedRangeEnd - mRotationSpeedRangeStart));
         
-	}
-	//-----------------------------------------------------------------------
+    }
+    //-----------------------------------------------------------------------
     void RotationAffector::_affectParticles(ParticleSystem* pSystem, Real timeElapsed)
     {
         ParticleIterator pi = pSystem->_getIterator();
@@ -95,14 +95,14 @@ namespace Ogre {
         // Rotation adjustments by time
         ds = timeElapsed;
 
-		Radian NewRotation;
+        Radian NewRotation;
 
         while (!pi.end())
         {
             p = pi.getNext();
 
-			NewRotation = p->rotation + (ds * p->rotationSpeed);
-			p->setRotation( NewRotation );
+            NewRotation = p->mRotation + (ds * p->mRotationSpeed);
+            p->setRotation( NewRotation );
         }
 
     }
@@ -146,7 +146,7 @@ namespace Ogre {
     {
         mRotationRangeEnd = val;
     }
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
 
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
@@ -173,7 +173,7 @@ namespace Ogre {
         static_cast<RotationAffector*>(target)->setRotationSpeedRangeStart(StringConverter::parseAngle(val));
     }
     
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     String RotationAffector::CmdRotationRangeEnd::doGet(const void* target) const
     {
         return StringConverter::toString(

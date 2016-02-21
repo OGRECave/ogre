@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "OgrePass.h"
 #include "OgreTextureUnitState.h"
 #include "OgreResourceGroupManager.h"
+#include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre {
 
@@ -62,7 +63,7 @@ namespace Ogre {
         mLeafFaceGroups(0),
         mFaceGroups(0), 
         mBrushes(0),
-		mSkyEnabled(false)
+        mSkyEnabled(false)
     {
         mVisData.tableData = 0;
 
@@ -84,34 +85,34 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void BspLevel::loadImpl()
     {
-		mSkyEnabled = false;
+        mSkyEnabled = false;
 
         // Use Quake3 file loader
         Quake3Level q3;
         DataStreamPtr stream = 
-			ResourceGroupManager::getSingleton().openResource(mName, 
-				ResourceGroupManager::getSingleton().getWorldResourceGroupName());
+            ResourceGroupManager::getSingleton().openResource(mName, 
+                ResourceGroupManager::getSingleton().getWorldResourceGroupName());
 
         q3.loadFromStream(stream);
 
         loadQuake3Level(q3);
 
     }
-	//-----------------------------------------------------------------------
-	bool BspLevel::isSkyEnabled(void) const
-	{
-		return mSkyEnabled;
-	}
-	//-----------------------------------------------------------------------
-	const String& BspLevel::getSkyMaterialName(void) const
-	{
-		return mSkyMaterial;
-	}
-	//-----------------------------------------------------------------------
-	Real BspLevel::getSkyCurvature(void) const
-	{
-		return mSkyCurvature;
-	}
+    //-----------------------------------------------------------------------
+    bool BspLevel::isSkyEnabled(void) const
+    {
+        return mSkyEnabled;
+    }
+    //-----------------------------------------------------------------------
+    const String& BspLevel::getSkyMaterialName(void) const
+    {
+        return mSkyMaterial;
+    }
+    //-----------------------------------------------------------------------
+    Real BspLevel::getSkyCurvature(void) const
+    {
+        return mSkyCurvature;
+    }
     //-----------------------------------------------------------------------
     void BspLevel::load(DataStreamPtr& stream)
     {
@@ -137,7 +138,7 @@ namespace Ogre {
         if (mVisData.tableData)
             OGRE_FREE(mVisData.tableData, MEMCATEGORY_GEOMETRY);
         if (mBrushes)
-			OGRE_DELETE_ARRAY_T(mBrushes, Brush, (size_t)mNumBrushes, MEMCATEGORY_GEOMETRY);
+            OGRE_DELETE_ARRAY_T(mBrushes, Brush, (size_t)mNumBrushes, MEMCATEGORY_GEOMETRY);
 
         mVertexData = 0;
         mRootNode = 0;
@@ -157,8 +158,8 @@ namespace Ogre {
         DataStreamPtr stream = 
             ResourceGroupManager::getSingleton().openResource(levelName, 
             ResourceGroupManager::getSingleton().getWorldResourceGroupName());
-		return calculateLoadingStages(stream);
-	}
+        return calculateLoadingStages(stream);
+    }
     //-----------------------------------------------------------------------
     size_t BspLevel::calculateLoadingStages(DataStreamPtr& stream)
     {
@@ -325,7 +326,7 @@ namespace Ogre {
             if (progressCountdown == NUM_FACES_PER_PROGRESS_REPORT)
             {
                 ++progressCount;
-                StringUtil::StrStreamType str;
+                StringStream str;
                 str << "Loading materials (phase " << progressCount << ")"; 
                 rgm._notifyWorldGeometryStageStarted(str.str());
             }
@@ -340,9 +341,9 @@ namespace Ogre {
             // Check to see if existing material
             // Format shader#lightmap
             int shadIdx = q3lvl.mFaces[face].shader;
-			StringUtil::StrStreamType tmp;
-			tmp << q3lvl.mShaders[shadIdx].name << "#" << q3lvl.mFaces[face].lm_texture;
-			shaderName = tmp.str();
+            StringStream tmp;
+            tmp << q3lvl.mShaders[shadIdx].name << "#" << q3lvl.mFaces[face].lm_texture;
+            shaderName = tmp.str();
 
             MaterialPtr shadMat = MaterialManager::getSingleton().getByName(shaderName);
             if (shadMat.isNull())
@@ -357,13 +358,13 @@ namespace Ogre {
                 if (pShad)
                 {
                     shadMat = pShad->createAsMaterial(q3lvl.mFaces[face].lm_texture);
-					// Do skydome (use this material)
-					if (pShad->skyDome)
-					{
-						mSkyEnabled = true;
-						mSkyMaterial = shadMat->getName();
-						mSkyCurvature = 20 - (pShad->cloudHeight / 256 * 18);
-					}
+                    // Do skydome (use this material)
+                    if (pShad->skyDome)
+                    {
+                        mSkyEnabled = true;
+                        mSkyMaterial = shadMat->getName();
+                        mSkyCurvature = 20 - (pShad->cloudHeight / 256 * 18);
+                    }
                 }
                 else
                 {
@@ -391,7 +392,7 @@ namespace Ogre {
                     if (q3lvl.mFaces[face].lm_texture >= 0)
                     {
                         // Add lightmap, additive blending
-						StringUtil::StrStreamType lightmapName;
+                        StringStream lightmapName;
                         lightmapName << "@lightmap" << q3lvl.mFaces[face].lm_texture;
                         tex = shadPass->createTextureUnitState(lightmapName.str());
                         // Blend
@@ -437,7 +438,7 @@ namespace Ogre {
                 // Assign plane
                 dest->plane.normal = Vector3(src->normal[0], src->normal[1], src->normal[2]);
                 dest->plane.d = -dest->plane.normal.dotProduct(
-					Vector3(src->org[0], src->org[1], src->org[2]));
+                    Vector3(src->org[0], src->org[1], src->org[2]));
 
                 // Don't rebase indexes here - Quake3 re-uses some indexes for multiple vertex
                 // groups eg repeating small details have the same relative vertex data but
@@ -471,18 +472,18 @@ namespace Ogre {
 
 
             }
-			else if (src->type == BSP_FACETYPE_MESH)
-			{
-				dest->fType = FGT_FACE_LIST;
-				// Assign plane
-				dest->plane.normal = Vector3(src->normal[0], src->normal[1], src->normal[2]);
-				dest->plane.d = -dest->plane.normal.dotProduct(
-					Vector3(src->org[0], src->org[1], src->org[2]));                
-			}
-			else
-			{
-				LogManager::getSingleton().logMessage("!!! Unknown Face Type !!!", LML_CRITICAL);
-			}
+            else if (src->type == BSP_FACETYPE_MESH)
+            {
+                dest->fType = FGT_FACE_LIST;
+                // Assign plane
+                dest->plane.normal = Vector3(src->normal[0], src->normal[1], src->normal[2]);
+                dest->plane.d = -dest->plane.normal.dotProduct(
+                    Vector3(src->org[0], src->org[1], src->org[2]));                
+            }
+            else
+            {
+                LogManager::getSingleton().logMessage("!!! Unknown Face Type !!!", LML_CRITICAL);
+            }
 
             // progress reporting
             --progressCountdown;
@@ -511,7 +512,7 @@ namespace Ogre {
             if (progressCountdown == NUM_NODES_PER_PROGRESS_REPORT)
             {
                 ++progressCount;
-                StringUtil::StrStreamType str;
+                StringStream str;
                 str << "Loading nodes (phase " << progressCount << ")"; 
                     rgm._notifyWorldGeometryStageStarted(str.str());
             }
@@ -576,7 +577,7 @@ namespace Ogre {
         // Brushes
         //-----------------------------------------------------------------------
         // Reserve enough memory for all brushes, solid or not (need to maintain indexes)
-		mNumBrushes = q3lvl.mNumBrushes;
+        mNumBrushes = q3lvl.mNumBrushes;
         mBrushes = OGRE_NEW_ARRAY_T(BspNode::Brush, mNumBrushes, MEMCATEGORY_GEOMETRY);
         progressCountdown = NUM_BRUSHES_PER_PROGRESS_REPORT;
         progressCount = 0;
@@ -587,7 +588,7 @@ namespace Ogre {
             if (progressCountdown == NUM_BRUSHES_PER_PROGRESS_REPORT)
             {
                 ++progressCount;
-                StringUtil::StrStreamType str;
+                StringStream str;
                 str << "Loading brushes (phase " << progressCount << ")"; 
                     rgm._notifyWorldGeometryStageStarted(str.str());
             }
@@ -613,11 +614,11 @@ namespace Ogre {
                 // Notice how we normally invert Q3A plane distances, but here we do not
                 // Because we want plane normals pointing out of solid brushes, not in
                 Plane brushSide(
-					Vector3(
-						q3brushplane->normal[0], 
-						q3brushplane->normal[1], 
-						q3brushplane->normal[2]), 
-					q3brushplane->dist);
+                    Vector3(
+                        q3brushplane->normal[0], 
+                        q3brushplane->normal[1], 
+                        q3brushplane->normal[2]), 
+                    q3brushplane->dist);
                 pBrush->planes.push_back(brushSide);
                 ++brushSideIdx;
             }
@@ -644,7 +645,7 @@ namespace Ogre {
             if (progressCountdown == NUM_LEAVES_PER_PROGRESS_REPORT)
             {
                 ++progressCount;
-                StringUtil::StrStreamType str;
+                StringStream str;
                 str << "Loading leaves (phase " << progressCount << ")"; 
                     rgm._notifyWorldGeometryStageStarted(str.str());
             }
@@ -879,7 +880,7 @@ namespace Ogre {
             {
                 StringUtil::toLowerCase(line);
                 // Remove quotes
-				while( ( pos = line.find("\"",0) ) != String::npos )
+                while( ( pos = line.find("\"",0) ) != String::npos )
                 {
                     line = line.substr(0,pos) + line.substr(pos+1,line.length()-(pos+1));
                 }
@@ -928,7 +929,7 @@ namespace Ogre {
         MovableToNodeMap::iterator i = mMovableToNodeMap.find(mov);
         if (i != mMovableToNodeMap.end())
         {
-			list<BspNode*>::type::iterator nodeit, nodeitend;
+            list<BspNode*>::type::iterator nodeit, nodeitend;
             nodeitend = i->second.end();
             for (nodeit = i->second.begin(); nodeit != nodeitend; ++nodeit)
             {
@@ -951,7 +952,7 @@ namespace Ogre {
             // Insert all the time, will get current if already there
             std::pair<MovableToNodeMap::iterator, bool> p = 
                 mMovableToNodeMap.insert(
-				MovableToNodeMap::value_type(mov, list<BspNode*>::type()));
+                MovableToNodeMap::value_type(mov, list<BspNode*>::type()));
 
             p.first->second.push_back(node);
 
@@ -983,13 +984,13 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-	void BspLevel::_notifyObjectDetached(const MovableObject* mov)	
-	{
+    void BspLevel::_notifyObjectDetached(const MovableObject* mov)  
+    {
         // Locate any current nodes the object is supposed to be attached to
         MovableToNodeMap::iterator i = mMovableToNodeMap.find(mov);
         if (i != mMovableToNodeMap.end())
         {
-			list<BspNode*>::type::iterator nodeit, nodeitend;
+            list<BspNode*>::type::iterator nodeit, nodeitend;
             nodeitend = i->second.end();
             for (nodeit = i->second.begin(); nodeit != nodeitend; ++nodeit)
             {
@@ -999,7 +1000,7 @@ namespace Ogre {
             // delete the entry for this MovableObject
             mMovableToNodeMap.erase(i);
         }
-	}
+    }
     //-----------------------------------------------------------------------
     void BspLevel::quakeVertexToBspVertex(const bsp_vertex_t* src, BspVertex* dest)
     {

@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -60,22 +60,13 @@ namespace Ogre {
         /// Create a uniform buffer
         HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                            bool useShadowBuffer, const String& name = "");
-        /// Create a uniform buffer
-        HardwareUniformBufferSharedPtr createUniformBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                           bool useShadowBuffer, size_t binding, const String& name = "");
 
         /// Create a shader storage buffer.
         HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                                  bool useShadowBuffer, const String& name = "");
-        /// Create a shader storage buffer.
-        HardwareUniformBufferSharedPtr createShaderStorageBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                                 bool useShadowBuffer, size_t binding, const String& name = "");
         /// Create a counter buffer
         HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
                                                            bool useShadowBuffer, const String& name = "");
-        /// Create a counter buffer
-        HardwareCounterBufferSharedPtr createCounterBuffer(size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                           bool useShadowBuffer, size_t binding, const String& name = "");
         /// Create a render to vertex buffer
         RenderToVertexBufferSharedPtr createRenderToVertexBuffer();
 

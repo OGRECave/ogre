@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,30 +34,30 @@ THE SOFTWARE.
 namespace Ogre
 {
 
-	/** Plugin instance for GL3Plus Manager */
-	class GL3PlusPlugin : public Plugin
-	{
-	public:
-		GL3PlusPlugin();
+    /** Plugin instance for GL3Plus Manager */
+    class GL3PlusPlugin : public Plugin
+    {
+    public:
+        GL3PlusPlugin();
 
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		GL3PlusRenderSystem* mRenderSystem;
-	};
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        GL3PlusRenderSystem* mRenderSystem;
+    };
 }
 
 #endif

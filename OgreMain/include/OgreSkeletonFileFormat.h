@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,12 +32,12 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
 /** Definition of the OGRE .skeleton file format 
 
     .skeleton files are binary files (for read efficiency at runtime) and are arranged into chunks 
@@ -55,9 +55,9 @@ namespace Ogre {
     enum SkeletonChunkID {
         SKELETON_HEADER            = 0x1000,
             // char* version           : Version number check
-			SKELETON_BLENDMODE		   = 0x1010, // optional
-				// unsigned short blendmode		: SkeletonAnimationBlendMode
-		
+            SKELETON_BLENDMODE         = 0x1010, // optional
+                // unsigned short blendmode     : SkeletonAnimationBlendMode
+        
         SKELETON_BONE              = 0x2000,
         // Repeating section defining each bone in the system. 
         // Bones are assigned indexes automatically based on their order of declaration
@@ -81,11 +81,11 @@ namespace Ogre {
 
             // char* name                       : Name of the animation
             // float length                      : Length of the animation in seconds
-		
-			SKELETON_ANIMATION_BASEINFO = 0x4010,
-			// [Optional] base keyframe information
-			// char* baseAnimationName (blank for self)
-			// float baseKeyFrameTime
+        
+            SKELETON_ANIMATION_BASEINFO = 0x4010,
+            // [Optional] base keyframe information
+            // char* baseAnimationName (blank for self)
+            // float baseKeyFrameTime
 
             SKELETON_ANIMATION_TRACK = 0x4100,
             // A single animation track (relates to a single bone)
@@ -101,15 +101,15 @@ namespace Ogre {
                     // Quaternion rotate            : Rotation to apply at this keyframe
                     // Vector3 translate            : Translation to apply at this keyframe
                     // Vector3 scale                : Scale to apply at this keyframe
-		SKELETON_ANIMATION_LINK         = 0x5000
-		// Link to another skeleton, to re-use its animations
+        SKELETON_ANIMATION_LINK         = 0x5000
+        // Link to another skeleton, to re-use its animations
 
-			// char* skeletonName					: name of skeleton to get animations from
-			// float scale							: scale to apply to trans/scale keys
+            // char* skeletonName                   : name of skeleton to get animations from
+            // float scale                          : scale to apply to trans/scale keys
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // namespace
 

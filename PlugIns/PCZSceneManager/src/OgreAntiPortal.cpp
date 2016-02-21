@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ AntiPortal.cpp  -
 using namespace Ogre;
 
 AntiPortal::AntiPortal(const String& name, const PORTAL_TYPE type)
-	: PortalBase(name, type)
+    : PortalBase(name, type)
 {
 }
 
@@ -44,7 +44,7 @@ AntiPortal::~AntiPortal()
 /** @copydoc MovableObject::getMovableType. */
 const String& AntiPortal::getMovableType() const
 {
-	return AntiPortalFactory::FACTORY_TYPE_NAME;
+    return AntiPortalFactory::FACTORY_TYPE_NAME;
 }
 
 //-----------------------------------------------------------------------
@@ -54,10 +54,10 @@ unsigned long AntiPortalFactory::FACTORY_TYPE_FLAG = 0xFFFFFFFF;
 
 MovableObject* AntiPortalFactory::createInstanceImpl(const String& name, const NameValuePairList* params)
 {
-	return OGRE_NEW AntiPortal(name, getPortalType(params));
+    return OGRE_NEW AntiPortal(name, getPortalType(params));
 }
 
 void AntiPortalFactory::destroyInstance(MovableObject* obj)
 {
-	OGRE_DELETE obj;
+    OGRE_DELETE obj;
 }

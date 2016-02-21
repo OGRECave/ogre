@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -53,16 +53,16 @@ namespace Ogre {
         yOff = Math::SymmetricRandom() * mYRange;
         zOff = Math::SymmetricRandom() * mZRange;
 
-        pParticle->position = mPosition + xOff + yOff + zOff;
+        pParticle->mPosition = mPosition + xOff + yOff + zOff;
         
 
         // Generate complex data by reference
-        genEmissionColour(pParticle->colour);
-        genEmissionDirection( pParticle->position, pParticle->direction );
-        genEmissionVelocity(pParticle->direction);
+        genEmissionColour(pParticle->mColour);
+        genEmissionDirection( pParticle->mPosition, pParticle->mDirection );
+        genEmissionVelocity(pParticle->mDirection);
 
         // Generate simpler data
-        pParticle->timeToLive = pParticle->totalTimeToLive = genEmissionTTL();
+        pParticle->mTimeToLive = pParticle->mTotalTimeToLive = genEmissionTTL();
         
     }
 

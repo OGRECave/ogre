@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,9 +46,9 @@ namespace Ogre
     const Real Math::PI = Real( 4.0 * atan( 1.0 ) );
     const Real Math::TWO_PI = Real( 2.0 * PI );
     const Real Math::HALF_PI = Real( 0.5 * PI );
-	const Real Math::fDeg2Rad = PI / Real(180.0);
-	const Real Math::fRad2Deg = Real(180.0) / PI;
-	const Real Math::LOG2 = log(Real(2.0));
+    const Real Math::fDeg2Rad = PI / Real(180.0);
+    const Real Math::fRad2Deg = Real(180.0) / PI;
+    const Real Math::LOG2 = log(Real(2.0));
 
     int Math::mTrigTableSize;
    Math::AngleUnit Math::msAngleUnit;
@@ -94,8 +94,8 @@ namespace Ogre
             mTanTable[i] = tan(angle);
         }
     }
-	//-----------------------------------------------------------------------	
-	Real Math::SinTable (Real fValue)
+    //-----------------------------------------------------------------------   
+    Real Math::SinTable (Real fValue)
     {
         // Convert range to index values, wrap if required
         int idx;
@@ -110,12 +110,12 @@ namespace Ogre
 
         return mSinTable[idx];
     }
-	//-----------------------------------------------------------------------
-	Real Math::TanTable (Real fValue)
+    //-----------------------------------------------------------------------
+    Real Math::TanTable (Real fValue)
     {
         // Convert range to index values, wrap if required
-		int idx = int(fValue *= mTrigTableFactor) % mTrigTableSize;
-		return mTanTable[idx];
+        int idx = int(fValue *= mTrigTableFactor) % mTrigTableSize;
+        return mTanTable[idx];
     }
     //-----------------------------------------------------------------------
     int Math::ISign (int iValue)
@@ -242,101 +242,101 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------
-	bool Math::pointInTri2D(const Vector2& p, const Vector2& a, 
-		const Vector2& b, const Vector2& c)
+    bool Math::pointInTri2D(const Vector2& p, const Vector2& a, 
+        const Vector2& b, const Vector2& c)
     {
-		// Winding must be consistent from all edges for point to be inside
-		Vector2 v1, v2;
-		Real dot[3];
-		bool zeroDot[3];
-
-		v1 = b - a;
-		v2 = p - a;
-
-		// Note we don't care about normalisation here since sign is all we need
-		// It means we don't have to worry about magnitude of cross products either
-		dot[0] = v1.crossProduct(v2);
-		zeroDot[0] = Math::RealEqual(dot[0], 0.0f, 1e-3);
-
-
-		v1 = c - b;
-		v2 = p - b;
-
-		dot[1] = v1.crossProduct(v2);
-		zeroDot[1] = Math::RealEqual(dot[1], 0.0f, 1e-3);
-
-		// Compare signs (ignore colinear / coincident points)
-		if(!zeroDot[0] && !zeroDot[1] 
-		&& Math::Sign(dot[0]) != Math::Sign(dot[1]))
-		{
-			return false;
-		}
-
-		v1 = a - c;
-		v2 = p - c;
-
-		dot[2] = v1.crossProduct(v2);
-		zeroDot[2] = Math::RealEqual(dot[2], 0.0f, 1e-3);
-		// Compare signs (ignore colinear / coincident points)
-		if((!zeroDot[0] && !zeroDot[2] 
-			&& Math::Sign(dot[0]) != Math::Sign(dot[2])) ||
-			(!zeroDot[1] && !zeroDot[2] 
-			&& Math::Sign(dot[1]) != Math::Sign(dot[2])))
-		{
-			return false;
-		}
-
-
-		return true;
-    }
-	//-----------------------------------------------------------------------
-	bool Math::pointInTri3D(const Vector3& p, const Vector3& a, 
-		const Vector3& b, const Vector3& c, const Vector3& normal)
-	{
         // Winding must be consistent from all edges for point to be inside
-		Vector3 v1, v2;
-		Real dot[3];
-		bool zeroDot[3];
+        Vector2 v1, v2;
+        Real dot[3];
+        bool zeroDot[3];
 
         v1 = b - a;
         v2 = p - a;
 
-		// Note we don't care about normalisation here since sign is all we need
-		// It means we don't have to worry about magnitude of cross products either
-        dot[0] = v1.crossProduct(v2).dotProduct(normal);
-		zeroDot[0] = Math::RealEqual(dot[0], 0.0f, 1e-3);
+        // Note we don't care about normalisation here since sign is all we need
+        // It means we don't have to worry about magnitude of cross products either
+        dot[0] = v1.crossProduct(v2);
+        zeroDot[0] = Math::RealEqual(dot[0], 0.0f, 1e-3);
 
 
         v1 = c - b;
         v2 = p - b;
 
-		dot[1] = v1.crossProduct(v2).dotProduct(normal);
-		zeroDot[1] = Math::RealEqual(dot[1], 0.0f, 1e-3);
+        dot[1] = v1.crossProduct(v2);
+        zeroDot[1] = Math::RealEqual(dot[1], 0.0f, 1e-3);
 
-		// Compare signs (ignore colinear / coincident points)
-		if(!zeroDot[0] && !zeroDot[1] 
-			&& Math::Sign(dot[0]) != Math::Sign(dot[1]))
-		{
+        // Compare signs (ignore colinear / coincident points)
+        if(!zeroDot[0] && !zeroDot[1] 
+        && Math::Sign(dot[0]) != Math::Sign(dot[1]))
+        {
             return false;
-		}
+        }
 
         v1 = a - c;
         v2 = p - c;
 
-		dot[2] = v1.crossProduct(v2).dotProduct(normal);
-		zeroDot[2] = Math::RealEqual(dot[2], 0.0f, 1e-3);
-		// Compare signs (ignore colinear / coincident points)
-		if((!zeroDot[0] && !zeroDot[2] 
-			&& Math::Sign(dot[0]) != Math::Sign(dot[2])) ||
-			(!zeroDot[1] && !zeroDot[2] 
-			&& Math::Sign(dot[1]) != Math::Sign(dot[2])))
-		{
-			return false;
-		}
+        dot[2] = v1.crossProduct(v2);
+        zeroDot[2] = Math::RealEqual(dot[2], 0.0f, 1e-3);
+        // Compare signs (ignore colinear / coincident points)
+        if((!zeroDot[0] && !zeroDot[2] 
+            && Math::Sign(dot[0]) != Math::Sign(dot[2])) ||
+            (!zeroDot[1] && !zeroDot[2] 
+            && Math::Sign(dot[1]) != Math::Sign(dot[2])))
+        {
+            return false;
+        }
 
 
         return true;
-	}
+    }
+    //-----------------------------------------------------------------------
+    bool Math::pointInTri3D(const Vector3& p, const Vector3& a, 
+        const Vector3& b, const Vector3& c, const Vector3& normal)
+    {
+        // Winding must be consistent from all edges for point to be inside
+        Vector3 v1, v2;
+        Real dot[3];
+        bool zeroDot[3];
+
+        v1 = b - a;
+        v2 = p - a;
+
+        // Note we don't care about normalisation here since sign is all we need
+        // It means we don't have to worry about magnitude of cross products either
+        dot[0] = v1.crossProduct(v2).dotProduct(normal);
+        zeroDot[0] = Math::RealEqual(dot[0], 0.0f, 1e-3);
+
+
+        v1 = c - b;
+        v2 = p - b;
+
+        dot[1] = v1.crossProduct(v2).dotProduct(normal);
+        zeroDot[1] = Math::RealEqual(dot[1], 0.0f, 1e-3);
+
+        // Compare signs (ignore colinear / coincident points)
+        if(!zeroDot[0] && !zeroDot[1] 
+            && Math::Sign(dot[0]) != Math::Sign(dot[1]))
+        {
+            return false;
+        }
+
+        v1 = a - c;
+        v2 = p - c;
+
+        dot[2] = v1.crossProduct(v2).dotProduct(normal);
+        zeroDot[2] = Math::RealEqual(dot[2], 0.0f, 1e-3);
+        // Compare signs (ignore colinear / coincident points)
+        if((!zeroDot[0] && !zeroDot[2] 
+            && Math::Sign(dot[0]) != Math::Sign(dot[2])) ||
+            (!zeroDot[1] && !zeroDot[2] 
+            && Math::Sign(dot[1]) != Math::Sign(dot[2])))
+        {
+            return false;
+        }
+
+
+        return true;
+    }
     //-----------------------------------------------------------------------
     bool Math::RealEqual( Real a, Real b, Real tolerance )
     {
@@ -368,95 +368,95 @@ namespace Ogre
     std::pair<bool, Real> Math::intersects(const Ray& ray, 
         const vector<Plane>::type& planes, bool normalIsOutside)
     {
-		list<Plane>::type planesList;
-		for (vector<Plane>::type::const_iterator i = planes.begin(); i != planes.end(); ++i)
-		{
-			planesList.push_back(*i);
-		}
-		return intersects(ray, planesList, normalIsOutside);
+        list<Plane>::type planesList;
+        for (vector<Plane>::type::const_iterator i = planes.begin(); i != planes.end(); ++i)
+        {
+            planesList.push_back(*i);
+        }
+        return intersects(ray, planesList, normalIsOutside);
     }
     //-----------------------------------------------------------------------
     std::pair<bool, Real> Math::intersects(const Ray& ray, 
         const list<Plane>::type& planes, bool normalIsOutside)
     {
-		list<Plane>::type::const_iterator planeit, planeitend;
-		planeitend = planes.end();
-		bool allInside = true;
-		std::pair<bool, Real> ret;
-		std::pair<bool, Real> end;
-		ret.first = false;
-		ret.second = 0.0f;
-		end.first = false;
-		end.second = 0;
+        list<Plane>::type::const_iterator planeit, planeitend;
+        planeitend = planes.end();
+        bool allInside = true;
+        std::pair<bool, Real> ret;
+        std::pair<bool, Real> end;
+        ret.first = false;
+        ret.second = 0.0f;
+        end.first = false;
+        end.second = 0;
 
 
-		// derive side
-		// NB we don't pass directly since that would require Plane::Side in 
-		// interface, which results in recursive includes since Math is so fundamental
-		Plane::Side outside = normalIsOutside ? Plane::POSITIVE_SIDE : Plane::NEGATIVE_SIDE;
+        // derive side
+        // NB we don't pass directly since that would require Plane::Side in 
+        // interface, which results in recursive includes since Math is so fundamental
+        Plane::Side outside = normalIsOutside ? Plane::POSITIVE_SIDE : Plane::NEGATIVE_SIDE;
 
-		for (planeit = planes.begin(); planeit != planeitend; ++planeit)
-		{
-			const Plane& plane = *planeit;
-			// is origin outside?
-			if (plane.getSide(ray.getOrigin()) == outside)
-			{
-				allInside = false;
-				// Test single plane
-				std::pair<bool, Real> planeRes = 
-					ray.intersects(plane);
-				if (planeRes.first)
-				{
-					// Ok, we intersected
-					ret.first = true;
-					// Use the most distant result since convex volume
-					ret.second = std::max(ret.second, planeRes.second);
-				}
-				else
-				{
-					ret.first =false;
-					ret.second=0.0f;
-					return ret;
-				}
-			}
-			else
-			{
-				std::pair<bool, Real> planeRes = 
-					ray.intersects(plane);
-				if (planeRes.first)
-				{
-					if( !end.first )
-					{
-						end.first = true;
-						end.second = planeRes.second;
-					}
-					else
-					{
-						end.second = std::min( planeRes.second, end.second );
-					}
+        for (planeit = planes.begin(); planeit != planeitend; ++planeit)
+        {
+            const Plane& plane = *planeit;
+            // is origin outside?
+            if (plane.getSide(ray.getOrigin()) == outside)
+            {
+                allInside = false;
+                // Test single plane
+                std::pair<bool, Real> planeRes = 
+                    ray.intersects(plane);
+                if (planeRes.first)
+                {
+                    // Ok, we intersected
+                    ret.first = true;
+                    // Use the most distant result since convex volume
+                    ret.second = std::max(ret.second, planeRes.second);
+                }
+                else
+                {
+                    ret.first =false;
+                    ret.second=0.0f;
+                    return ret;
+                }
+            }
+            else
+            {
+                std::pair<bool, Real> planeRes = 
+                    ray.intersects(plane);
+                if (planeRes.first)
+                {
+                    if( !end.first )
+                    {
+                        end.first = true;
+                        end.second = planeRes.second;
+                    }
+                    else
+                    {
+                        end.second = std::min( planeRes.second, end.second );
+                    }
 
-				}
+                }
 
-			}
-		}
+            }
+        }
 
-		if (allInside)
-		{
-			// Intersecting at 0 distance since inside the volume!
-			ret.first = true;
-			ret.second = 0.0f;
-			return ret;
-		}
+        if (allInside)
+        {
+            // Intersecting at 0 distance since inside the volume!
+            ret.first = true;
+            ret.second = 0.0f;
+            return ret;
+        }
 
-		if( end.first )
-		{
-			if( end.second < ret.second )
-			{
-				ret.first = false;
-				return ret;
-			}
-		}
-		return ret;
+        if( end.first )
+        {
+            if( end.second < ret.second )
+            {
+                ret.first = false;
+                return ret;
+            }
+        }
+        return ret;
     }
     //-----------------------------------------------------------------------
     std::pair<bool, Real> Math::intersects(const Ray& ray, const Sphere& sphere, 
@@ -501,133 +501,133 @@ namespace Ogre
 
     }
     //-----------------------------------------------------------------------
-	std::pair<bool, Real> Math::intersects(const Ray& ray, const AxisAlignedBox& box)
-	{
-		if (box.isNull()) return std::pair<bool, Real>(false, (Real)0);
-		if (box.isInfinite()) return std::pair<bool, Real>(true, (Real)0);
+    std::pair<bool, Real> Math::intersects(const Ray& ray, const AxisAlignedBox& box)
+    {
+        if (box.isNull()) return std::pair<bool, Real>(false, (Real)0);
+        if (box.isInfinite()) return std::pair<bool, Real>(true, (Real)0);
 
-		Real lowt = 0.0f;
-		Real t;
-		bool hit = false;
-		Vector3 hitpoint;
-		const Vector3& min = box.getMinimum();
-		const Vector3& max = box.getMaximum();
-		const Vector3& rayorig = ray.getOrigin();
-		const Vector3& raydir = ray.getDirection();
+        Real lowt = 0.0f;
+        Real t;
+        bool hit = false;
+        Vector3 hitpoint;
+        const Vector3& min = box.getMinimum();
+        const Vector3& max = box.getMaximum();
+        const Vector3& rayorig = ray.getOrigin();
+        const Vector3& raydir = ray.getDirection();
 
-		// Check origin inside first
-		if ( rayorig > min && rayorig < max )
-		{
-			return std::pair<bool, Real>(true, (Real)0);
-		}
+        // Check origin inside first
+        if ( rayorig > min && rayorig < max )
+        {
+            return std::pair<bool, Real>(true, (Real)0);
+        }
 
-		// Check each face in turn, only check closest 3
-		// Min x
-		if (rayorig.x <= min.x && raydir.x > 0)
-		{
-			t = (min.x - rayorig.x) / raydir.x;
-			if (t >= 0)
-			{
-				// Substitute t back into ray and check bounds and dist
-				hitpoint = rayorig + raydir * t;
-				if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
-					hitpoint.z >= min.z && hitpoint.z <= max.z &&
+        // Check each face in turn, only check closest 3
+        // Min x
+        if (rayorig.x <= min.x && raydir.x > 0)
+        {
+            t = (min.x - rayorig.x) / raydir.x;
+            if (t >= 0)
+            {
+                // Substitute t back into ray and check bounds and dist
+                hitpoint = rayorig + raydir * t;
+                if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
 					(!hit || t < lowt))
-				{
-					hit = true;
-					lowt = t;
-				}
-			}
-		}
-		// Max x
-		if (rayorig.x >= max.x && raydir.x < 0)
-		{
-			t = (max.x - rayorig.x) / raydir.x;
-			if (t >= 0)
-			{
-				// Substitute t back into ray and check bounds and dist
-				hitpoint = rayorig + raydir * t;
-				if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
-					hitpoint.z >= min.z && hitpoint.z <= max.z &&
-					(!hit || t < lowt))
-				{
-					hit = true;
-					lowt = t;
-				}
-			}
-		}
-		// Min y
-		if (rayorig.y <= min.y && raydir.y > 0)
-		{
-			t = (min.y - rayorig.y) / raydir.y;
-			if (t >= 0)
-			{
-				// Substitute t back into ray and check bounds and dist
-				hitpoint = rayorig + raydir * t;
-				if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-					hitpoint.z >= min.z && hitpoint.z <= max.z &&
-					(!hit || t < lowt))
-				{
-					hit = true;
-					lowt = t;
-				}
-			}
-		}
-		// Max y
-		if (rayorig.y >= max.y && raydir.y < 0)
-		{
-			t = (max.y - rayorig.y) / raydir.y;
-			if (t >= 0)
-			{
-				// Substitute t back into ray and check bounds and dist
-				hitpoint = rayorig + raydir * t;
-				if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-					hitpoint.z >= min.z && hitpoint.z <= max.z &&
-					(!hit || t < lowt))
-				{
-					hit = true;
-					lowt = t;
-				}
-			}
-		}
-		// Min z
-		if (rayorig.z <= min.z && raydir.z > 0)
-		{
-			t = (min.z - rayorig.z) / raydir.z;
-			if (t >= 0)
-			{
-				// Substitute t back into ray and check bounds and dist
-				hitpoint = rayorig + raydir * t;
-				if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-					hitpoint.y >= min.y && hitpoint.y <= max.y &&
-					(!hit || t < lowt))
-				{
-					hit = true;
-					lowt = t;
-				}
-			}
-		}
-		// Max z
-		if (rayorig.z >= max.z && raydir.z < 0)
-		{
-			t = (max.z - rayorig.z) / raydir.z;
-			if (t >= 0)
-			{
-				// Substitute t back into ray and check bounds and dist
-				hitpoint = rayorig + raydir * t;
-				if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-					hitpoint.y >= min.y && hitpoint.y <= max.y &&
-					(!hit || t < lowt))
-				{
-					hit = true;
-					lowt = t;
-				}
-			}
-		}
+                {
+                    hit = true;
+                    lowt = t;
+                }
+            }
+        }
+        // Max x
+        if (rayorig.x >= max.x && raydir.x < 0)
+        {
+            t = (max.x - rayorig.x) / raydir.x;
+            if (t >= 0)
+            {
+                // Substitute t back into ray and check bounds and dist
+                hitpoint = rayorig + raydir * t;
+                if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
+                    (!hit || t < lowt))
+                {
+                    hit = true;
+                    lowt = t;
+                }
+            }
+        }
+        // Min y
+        if (rayorig.y <= min.y && raydir.y > 0)
+        {
+            t = (min.y - rayorig.y) / raydir.y;
+            if (t >= 0)
+            {
+                // Substitute t back into ray and check bounds and dist
+                hitpoint = rayorig + raydir * t;
+                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
+                    (!hit || t < lowt))
+                {
+                    hit = true;
+                    lowt = t;
+                }
+            }
+        }
+        // Max y
+        if (rayorig.y >= max.y && raydir.y < 0)
+        {
+            t = (max.y - rayorig.y) / raydir.y;
+            if (t >= 0)
+            {
+                // Substitute t back into ray and check bounds and dist
+                hitpoint = rayorig + raydir * t;
+                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
+                    (!hit || t < lowt))
+                {
+                    hit = true;
+                    lowt = t;
+                }
+            }
+        }
+        // Min z
+        if (rayorig.z <= min.z && raydir.z > 0)
+        {
+            t = (min.z - rayorig.z) / raydir.z;
+            if (t >= 0)
+            {
+                // Substitute t back into ray and check bounds and dist
+                hitpoint = rayorig + raydir * t;
+                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                    hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                    (!hit || t < lowt))
+                {
+                    hit = true;
+                    lowt = t;
+                }
+            }
+        }
+        // Max z
+        if (rayorig.z >= max.z && raydir.z < 0)
+        {
+            t = (max.z - rayorig.z) / raydir.z;
+            if (t >= 0)
+            {
+                // Substitute t back into ray and check bounds and dist
+                hitpoint = rayorig + raydir * t;
+                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                    hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                    (!hit || t < lowt))
+                {
+                    hit = true;
+                    lowt = t;
+                }
+            }
+        }
 
-		return std::pair<bool, Real>(hit, (Real)lowt);
+        return std::pair<bool, Real>(hit, (Real)lowt);
 
-	} 
+    } 
     //-----------------------------------------------------------------------
     bool Math::intersects(const Ray& ray, const AxisAlignedBox& box,
         Real* d1, Real* d2)
@@ -829,22 +829,22 @@ namespace Ogre
         const Vector3& min = box.getMinimum();
         const Vector3& max = box.getMaximum();
 
-		// Arvo's algorithm
-		Real s, d = 0;
-		for (int i = 0; i < 3; ++i)
-		{
-			if (center.ptr()[i] < min.ptr()[i])
-			{
-				s = center.ptr()[i] - min.ptr()[i];
-				d += s * s; 
-			}
-			else if(center.ptr()[i] > max.ptr()[i])
-			{
-				s = center.ptr()[i] - max.ptr()[i];
-				d += s * s; 
-			}
-		}
-		return d <= radius * radius;
+        // Arvo's algorithm
+        Real s, d = 0;
+        for (int i = 0; i < 3; ++i)
+        {
+            if (center.ptr()[i] < min.ptr()[i])
+            {
+                s = center.ptr()[i] - min.ptr()[i];
+                d += s * s; 
+            }
+            else if(center.ptr()[i] > max.ptr()[i])
+            {
+                s = center.ptr()[i] - max.ptr()[i];
+                d += s * s; 
+            }
+        }
+        return d <= radius * radius;
 
     }
     //-----------------------------------------------------------------------
@@ -864,35 +864,35 @@ namespace Ogre
         const Vector3& position1, const Vector3& position2, const Vector3& position3,
         Real u1, Real v1, Real u2, Real v2, Real u3, Real v3)
     {
-	    //side0 is the vector along one side of the triangle of vertices passed in, 
-	    //and side1 is the vector along another side. Taking the cross product of these returns the normal.
-	    Vector3 side0 = position1 - position2;
-	    Vector3 side1 = position3 - position1;
-	    //Calculate face normal
-	    Vector3 normal = side1.crossProduct(side0);
-	    normal.normalise();
-	    //Now we use a formula to calculate the tangent. 
-	    Real deltaV0 = v1 - v2;
-	    Real deltaV1 = v3 - v1;
-	    Vector3 tangent = deltaV1 * side0 - deltaV0 * side1;
-	    tangent.normalise();
-	    //Calculate binormal
-	    Real deltaU0 = u1 - u2;
-	    Real deltaU1 = u3 - u1;
-	    Vector3 binormal = deltaU1 * side0 - deltaU0 * side1;
-	    binormal.normalise();
-	    //Now, we take the cross product of the tangents to get a vector which 
-	    //should point in the same direction as our normal calculated above. 
-	    //If it points in the opposite direction (the dot product between the normals is less than zero), 
-	    //then we need to reverse the s and t tangents. 
-	    //This is because the triangle has been mirrored when going from tangent space to object space.
-	    //reverse tangents if necessary
-	    Vector3 tangentCross = tangent.crossProduct(binormal);
-	    if (tangentCross.dotProduct(normal) < 0.0f)
-	    {
-		    tangent = -tangent;
-		    binormal = -binormal;
-	    }
+        //side0 is the vector along one side of the triangle of vertices passed in, 
+        //and side1 is the vector along another side. Taking the cross product of these returns the normal.
+        Vector3 side0 = position1 - position2;
+        Vector3 side1 = position3 - position1;
+        //Calculate face normal
+        Vector3 normal = side1.crossProduct(side0);
+        normal.normalise();
+        //Now we use a formula to calculate the tangent. 
+        Real deltaV0 = v1 - v2;
+        Real deltaV1 = v3 - v1;
+        Vector3 tangent = deltaV1 * side0 - deltaV0 * side1;
+        tangent.normalise();
+        //Calculate binormal
+        Real deltaU0 = u1 - u2;
+        Real deltaU1 = u3 - u1;
+        Vector3 binormal = deltaU1 * side0 - deltaU0 * side1;
+        binormal.normalise();
+        //Now, we take the cross product of the tangents to get a vector which 
+        //should point in the same direction as our normal calculated above. 
+        //If it points in the opposite direction (the dot product between the normals is less than zero), 
+        //then we need to reverse the s and t tangents. 
+        //This is because the triangle has been mirrored when going from tangent space to object space.
+        //reverse tangents if necessary
+        Vector3 tangentCross = tangent.crossProduct(binormal);
+        if (tangentCross.dotProduct(normal) < 0.0f)
+        {
+            tangent = -tangent;
+            binormal = -binormal;
+        }
 
         return tangent;
 
@@ -933,67 +933,67 @@ namespace Ogre
         Vector3 normal = (v2 - v1).crossProduct(v3 - v1);
         return normal;
     }
-	//-----------------------------------------------------------------------
-	Real Math::gaussianDistribution(Real x, Real offset, Real scale)
-	{
-		Real nom = Math::Exp(
-			-Math::Sqr(x - offset) / (2 * Math::Sqr(scale)));
-		Real denom = scale * Math::Sqrt(2 * Math::PI);
+    //-----------------------------------------------------------------------
+    Real Math::gaussianDistribution(Real x, Real offset, Real scale)
+    {
+        Real nom = Math::Exp(
+            -Math::Sqr(x - offset) / (2 * Math::Sqr(scale)));
+        Real denom = scale * Math::Sqrt(2 * Math::PI);
 
-		return nom / denom;
+        return nom / denom;
 
-	}
-	//---------------------------------------------------------------------
-	Matrix4 Math::makeViewMatrix(const Vector3& position, const Quaternion& orientation, 
-		const Matrix4* reflectMatrix)
-	{
-		Matrix4 viewMatrix;
+    }
+    //---------------------------------------------------------------------
+    Matrix4 Math::makeViewMatrix(const Vector3& position, const Quaternion& orientation, 
+        const Matrix4* reflectMatrix)
+    {
+        Matrix4 viewMatrix;
 
-		// View matrix is:
-		//
-		//  [ Lx  Uy  Dz  Tx  ]
-		//  [ Lx  Uy  Dz  Ty  ]
-		//  [ Lx  Uy  Dz  Tz  ]
-		//  [ 0   0   0   1   ]
-		//
-		// Where T = -(Transposed(Rot) * Pos)
+        // View matrix is:
+        //
+        //  [ Lx  Uy  Dz  Tx  ]
+        //  [ Lx  Uy  Dz  Ty  ]
+        //  [ Lx  Uy  Dz  Tz  ]
+        //  [ 0   0   0   1   ]
+        //
+        // Where T = -(Transposed(Rot) * Pos)
 
-		// This is most efficiently done using 3x3 Matrices
-		Matrix3 rot;
-		orientation.ToRotationMatrix(rot);
+        // This is most efficiently done using 3x3 Matrices
+        Matrix3 rot;
+        orientation.ToRotationMatrix(rot);
 
-		// Make the translation relative to new axes
-		Matrix3 rotT = rot.Transpose();
-		Vector3 trans = -rotT * position;
+        // Make the translation relative to new axes
+        Matrix3 rotT = rot.Transpose();
+        Vector3 trans = -rotT * position;
 
-		// Make final matrix
-		viewMatrix = Matrix4::IDENTITY;
-		viewMatrix = rotT; // fills upper 3x3
-		viewMatrix[0][3] = trans.x;
-		viewMatrix[1][3] = trans.y;
-		viewMatrix[2][3] = trans.z;
+        // Make final matrix
+        viewMatrix = Matrix4::IDENTITY;
+        viewMatrix = rotT; // fills upper 3x3
+        viewMatrix[0][3] = trans.x;
+        viewMatrix[1][3] = trans.y;
+        viewMatrix[2][3] = trans.z;
 
-		// Deal with reflections
-		if (reflectMatrix)
-		{
-			viewMatrix = viewMatrix * (*reflectMatrix);
-		}
+        // Deal with reflections
+        if (reflectMatrix)
+        {
+            viewMatrix = viewMatrix * (*reflectMatrix);
+        }
 
-		return viewMatrix;
+        return viewMatrix;
 
-	}
-	//---------------------------------------------------------------------
-	Real Math::boundingRadiusFromAABB(const AxisAlignedBox& aabb)
-	{
-		Vector3 max = aabb.getMaximum();
-		Vector3 min = aabb.getMinimum();
+    }
+    //---------------------------------------------------------------------
+    Real Math::boundingRadiusFromAABB(const AxisAlignedBox& aabb)
+    {
+        Vector3 max = aabb.getMaximum();
+        Vector3 min = aabb.getMinimum();
 
-		Vector3 magnitude = max;
-		magnitude.makeCeil(-max);
-		magnitude.makeCeil(min);
-		magnitude.makeCeil(-min);
+        Vector3 magnitude = max;
+        magnitude.makeCeil(-max);
+        magnitude.makeCeil(min);
+        magnitude.makeCeil(-min);
 
-		return magnitude.length();
-	}
+        return magnitude.length();
+    }
 
 }

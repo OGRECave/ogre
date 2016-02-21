@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,28 +28,26 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "OgreRectangle2D.h"
 
-#include "OgreSimpleRenderable.h"
 #include "OgreHardwareBufferManager.h"
-#include "OgreCamera.h"
 
 namespace Ogre {
 #define POSITION_BINDING 0
 #define NORMAL_BINDING 1
 #define TEXCOORD_BINDING 2
 
-	Rectangle2D::Rectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
-	: SimpleRenderable()
-	{
-		_initRectangle2D(includeTextureCoords, vBufUsage);
-	}
+    Rectangle2D::Rectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
+    : SimpleRenderable()
+    {
+        _initRectangle2D(includeTextureCoords, vBufUsage);
+    }
 
-	Rectangle2D::Rectangle2D(const String& name, bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
-	: SimpleRenderable(name)
-	{
-		_initRectangle2D(includeTextureCoords, vBufUsage);
-	}
+    Rectangle2D::Rectangle2D(const String& name, bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage)
+    : SimpleRenderable(name)
+    {
+        _initRectangle2D(includeTextureCoords, vBufUsage);
+    }
 
-	void Rectangle2D::_initRectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage) 
+    void Rectangle2D::_initRectangle2D(bool includeTextureCoords, Ogre::HardwareBuffer::Usage vBufUsage) 
     {
         // use identity projection and view matrices
         mUseIdentityProjection = true;
@@ -79,34 +77,34 @@ namespace Ogre {
         // Bind buffer
         bind->setBinding(POSITION_BINDING, vbuf);
 
-		decl->addElement(NORMAL_BINDING, 0, VET_FLOAT3, VES_NORMAL);
+        decl->addElement(NORMAL_BINDING, 0, VET_FLOAT3, VES_NORMAL);
 
-		vbuf = 
-			HardwareBufferManager::getSingleton().createVertexBuffer(
+        vbuf = 
+            HardwareBufferManager::getSingleton().createVertexBuffer(
             decl->getVertexSize(NORMAL_BINDING),
             mRenderOp.vertexData->vertexCount,
             vBufUsage);
 
-		bind->setBinding(NORMAL_BINDING, vbuf);
+        bind->setBinding(NORMAL_BINDING, vbuf);
 
-		float *pNorm = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+        float *pNorm = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
+        *pNorm++ = 0.0f;
+        *pNorm++ = 0.0f;
+        *pNorm++ = 1.0f;
 
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+        *pNorm++ = 0.0f;
+        *pNorm++ = 0.0f;
+        *pNorm++ = 1.0f;
 
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+        *pNorm++ = 0.0f;
+        *pNorm++ = 0.0f;
+        *pNorm++ = 1.0f;
 
-		*pNorm++ = 0.0f;
-		*pNorm++ = 0.0f;
-		*pNorm++ = 1.0f;
+        *pNorm++ = 0.0f;
+        *pNorm++ = 0.0f;
+        *pNorm++ = 1.0f;
 
-		vbuf->unlock();
+        vbuf->unlock();
 
         if (includeTextureCoords)
         {
@@ -159,17 +157,17 @@ namespace Ogre {
 
         vbuf->unlock();
 
-		if(updateAABB)
-		{
-			mBox.setExtents(
-				std::min(left, right), std::min(top, bottom), 0,
-				std::max(left, right), std::max(top, bottom), 0);
-		}
+        if(updateAABB)
+        {
+            mBox.setExtents(
+                std::min(left, right), std::min(top, bottom), 0,
+                std::max(left, right), std::max(top, bottom), 0);
+        }
     }
 
-	void Rectangle2D::setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight)
-	{
-		HardwareVertexBufferSharedPtr vbuf = 
+    void Rectangle2D::setNormals(const Ogre::Vector3 &topLeft, const Ogre::Vector3 &bottomLeft, const Ogre::Vector3 &topRight, const Ogre::Vector3 &bottomRight)
+    {
+        HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(NORMAL_BINDING);
         float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
 
@@ -190,15 +188,15 @@ namespace Ogre {
         *pFloat++ = bottomRight.z;
 
         vbuf->unlock();
-	}
+    }
 
-	void Rectangle2D::setUVs( const Ogre::Vector2 &topLeft, const Ogre::Vector2 &bottomLeft,
-								const Ogre::Vector2 &topRight, const Ogre::Vector2 &bottomRight)
-	{
-		if( mRenderOp.vertexData->vertexDeclaration->getElementCount() <= TEXCOORD_BINDING )
-			return; //Vertex data wasn't built with UV buffer
+    void Rectangle2D::setUVs( const Ogre::Vector2 &topLeft, const Ogre::Vector2 &bottomLeft,
+                                const Ogre::Vector2 &topRight, const Ogre::Vector2 &bottomRight)
+    {
+        if( mRenderOp.vertexData->vertexDeclaration->getElementCount() <= TEXCOORD_BINDING )
+            return; //Vertex data wasn't built with UV buffer
 
-		HardwareVertexBufferSharedPtr vbuf = 
+        HardwareVertexBufferSharedPtr vbuf = 
             mRenderOp.vertexData->vertexBufferBinding->getBuffer(TEXCOORD_BINDING);
         float* pFloat = static_cast<float*>(vbuf->lock(HardwareBuffer::HBL_DISCARD));
 
@@ -215,12 +213,12 @@ namespace Ogre {
         *pFloat++ = bottomRight.y;
 
         vbuf->unlock();
-	}
+    }
 
-	void Rectangle2D::setDefaultUVs()
-	{
-		setUVs( Vector2::ZERO, Vector2::UNIT_Y, Vector2::UNIT_X, Vector2::UNIT_SCALE );
-	}
+    void Rectangle2D::setDefaultUVs()
+    {
+        setUVs( Vector2::ZERO, Vector2::UNIT_Y, Vector2::UNIT_X, Vector2::UNIT_SCALE );
+    }
 
     // Override this method to prevent parent transforms (rotation,translation,scale)
     void Rectangle2D::getWorldTransforms( Matrix4* xform ) const

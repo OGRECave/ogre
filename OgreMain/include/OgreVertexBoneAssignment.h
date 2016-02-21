@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,13 @@ THE SOFTWARE.
 namespace Ogre 
 {
     
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Animation
-	*  @{
-	*/
-	/** Records the assignment of a single vertex to a single bone with the corresponding weight.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Animation
+    *  @{
+    */
+    /** Records the assignment of a single vertex to a single bone with the corresponding weight.
     @remarks
         This simple struct simply holds a vertex index, bone index and weight representing the
         assignment of a vertex to a bone for skeletal animation. There may be many of these
@@ -55,8 +55,8 @@ namespace Ogre
 
     } VertexBoneAssignment;
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

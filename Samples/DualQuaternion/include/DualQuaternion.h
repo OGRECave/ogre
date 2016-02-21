@@ -2,6 +2,7 @@
 #define __DualQuaternion_Sample_H__
 
 #include "SdkSample.h"
+#include "OgreBillboard.h"
 
 #if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
 #include "OgreShaderExHardwareSkinning.h"
@@ -26,9 +27,11 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {
-        OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, 
-                    "Sample currently out of order.  Try again soon!",
-                    "Sample_DualQuaternion::testCapabilities");
+        if (Root::getSingleton().getRenderSystem()->getName().find("OpenGL 3+") != String::npos)
+            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED,
+                        "Sample currently out of order in the OpenGL 3+ render system."
+                        "  Try again soon!",
+                        "Sample_DualQuaternion::testCapabilities");
     }
 
     bool frameRenderingQueued(const FrameEvent& evt)
@@ -46,13 +49,14 @@ class _OgreSampleClassExport Sample_DualQuaternion : public SdkSample
     }
 
  protected:
-	StringVector getRequiredPlugins()
-	{
-		StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
+    StringVector getRequiredPlugins()
+    {
+        StringVector names;
+		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsl")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             names.push_back("Cg Program Manager");
-		return names;
-	}
+        return names;
+    }
 
     void setupContent()
     {

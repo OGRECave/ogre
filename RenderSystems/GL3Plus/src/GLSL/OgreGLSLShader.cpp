@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -49,15 +49,8 @@ namespace Ogre {
     GLSLShader::CmdInputOperationType GLSLShader::msInputOperationTypeCmd;
     GLSLShader::CmdOutputOperationType GLSLShader::msOutputOperationTypeCmd;
     GLSLShader::CmdMaxOutputVertices GLSLShader::msMaxOutputVerticesCmd;
-
-
-    GLuint GLSLShader::mVertexShaderCount = 0;
-    GLuint GLSLShader::mFragmentShaderCount = 0;
-    GLuint GLSLShader::mGeometryShaderCount = 0;
-    GLuint GLSLShader::mHullShaderCount = 0;
-    GLuint GLSLShader::mDomainShaderCount = 0;
-    GLuint GLSLShader::mComputeShaderCount = 0;
-
+    
+    GLuint GLSLShader::mShaderCount = 0;
 
     GLSLShader::GLSLShader(
         ResourceManager* creator,
@@ -104,41 +97,14 @@ namespace Ogre {
                              "of this geometry program can output",
                              PT_INT), &msMaxOutputVerticesCmd);
         }
-        // Manually assign language now since we use it immediately.
-        //mSyntaxCode = "glsl";
 
-
-
-        mType = getType();
+        mType = GPT_VERTEX_PROGRAM; // default value, to be corrected after the constructor with GpuProgram::setType()
         mSyntaxCode = "glsl" + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion());
 
         mLinked = 0;
-
-        if (getType() == GPT_VERTEX_PROGRAM)
-        {
-            mShaderID = ++mVertexShaderCount;
-        }
-        else if (getType() == GPT_FRAGMENT_PROGRAM)
-        {
-            mShaderID = ++mFragmentShaderCount;
-        }
-        else if (getType() == GPT_GEOMETRY_PROGRAM)
-        {
-            mShaderID = ++mGeometryShaderCount;
-        }
-        else if (getType() == GPT_HULL_PROGRAM)
-        {
-            mShaderID = ++mHullShaderCount;
-        }
-        else if (getType() == GPT_COMPUTE_PROGRAM)
-        {
-            mShaderID = ++mComputeShaderCount;
-        }
-        else
-        {
-            mShaderID = ++mDomainShaderCount;
-        }
-
+        // Increase shader counter and use as ID
+        mShaderID = ++mShaderCount;        
+        
         // Transfer skeletal animation status from parent
         mSkeletalAnimation = isSkeletalAnimationIncluded();
         // There is nothing to load
@@ -543,7 +509,6 @@ namespace Ogre {
             childShader->attachToProgramObject(programObject);
         }
         OGRE_CHECK_GL_ERROR(glAttachShader(programObject, mGLShaderHandle));
-        logObjectInfo( "Error attaching " + mName + " shader object to GLSL Program Object", programObject);
     }
 
 
@@ -708,6 +673,9 @@ namespace Ogre {
         case GPT_COMPUTE_PROGRAM:
             return GL_COMPUTE_SHADER;
         }
+
+        //TODO add warning or error
+        return 0;
     }
 
     String GLSLShader::getShaderTypeLabel(GpuProgramType programType)
@@ -716,17 +684,26 @@ namespace Ogre {
         {
         case GPT_VERTEX_PROGRAM:
             return "vertex";
+            break;
         case GPT_DOMAIN_PROGRAM:
             return "tessellation evaluation";
+            break;
         case GPT_HULL_PROGRAM:
             return "tessellation control";
+            break;
         case GPT_GEOMETRY_PROGRAM:
             return "geometry";
+            break;
         case GPT_FRAGMENT_PROGRAM:
             return "fragment";
+            break;
         case GPT_COMPUTE_PROGRAM:
             return "compute";
+            break;
         }
+
+        //TODO add warning or error
+        return 0;
     }
 
 
@@ -871,22 +848,22 @@ namespace Ogre {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object.
-                GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
+                GLSLSeparableProgram* separableProgram = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
                 // Pass on parameters from params to program object uniforms.
-                programPipeline->updateUniforms(params, mask, mType);
-                programPipeline->updateAtomicCounters(params, mask, mType);
+                separableProgram->updateUniforms(params, mask, mType);
+                separableProgram->updateAtomicCounters(params, mask, mType);
             }
             else
             {
                 // Activate the link program object.
-                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
                 // Pass on parameters from params to program object uniforms.
-                linkProgram->updateUniforms(params, mask, mType);
+                monolithicProgram->updateUniforms(params, mask, mType);
                 //TODO add atomic counter support
-                //linkProgram->updateAtomicCounters(params, mask, mType);
+                //monolithicProgram->updateAtomicCounters(params, mask, mType);
             }
         }
-        catch (Exception& e) {}
+        catch (Exception&) {}
     }
 
 
@@ -895,16 +872,16 @@ namespace Ogre {
         if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             // Activate the program pipeline object.
-            GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
+            GLSLSeparableProgram* separableProgram = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
             // Pass on parameters from params to program object uniforms.
-            programPipeline->updatePassIterationUniforms(params);
+            separableProgram->updatePassIterationUniforms(params);
         }
         else
         {
             // Activate the link program object.
-            GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+            GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
             // Pass on parameters from params to program object uniforms.
-            linkProgram->updatePassIterationUniforms(params);
+            monolithicProgram->updatePassIterationUniforms(params);
         }
     }
 
@@ -917,20 +894,20 @@ namespace Ogre {
             if (Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
             {
                 // Activate the program pipeline object.
-                GLSLSeparableProgram* programPipeline = GLSLSeparableProgramManager::getSingleton().getActiveSeparableProgram();
+                GLSLSeparableProgram* separableProgram = GLSLSeparableProgramManager::getSingleton().getCurrentSeparableProgram();
                 // Pass on parameters from params to program object uniforms.
-                programPipeline->updateUniformBlocks(params, mask, mType);
-                // programPipeline->updateShaderStorageBlock(params, mask, mType);
+                separableProgram->updateUniformBlocks(params, mask, mType);
+                // separableProgram->updateShaderStorageBlock(params, mask, mType);
             }
             else
             {
                 // Activate the link program object.
-                GLSLMonolithicProgram* linkProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
+                GLSLMonolithicProgram* monolithicProgram = GLSLMonolithicProgramManager::getSingleton().getActiveMonolithicProgram();
                 // Pass on parameters from params to program object uniforms.
-                linkProgram->updateUniformBlocks(params, mask, mType);
+                monolithicProgram->updateUniformBlocks(params, mask, mType);
             }
         }
-        catch (Exception& e) {}
+        catch (Exception&) {}
     }
 
 

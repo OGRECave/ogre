@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,7 @@ THE SOFTWARE.
 #define __Pass_H__
 
 #include "OgrePrerequisites.h"
-#include "OgreGpuProgram.h"
 #include "OgreColourValue.h"
-#include "OgreBlendMode.h"
 #include "OgreCommon.h"
 #include "OgreLight.h"
 #include "OgreTextureUnitState.h"
@@ -212,10 +210,10 @@ namespace Ogre {
         GpuProgramUsage *mShadowReceiverFragmentProgramUsage;
         /// Geometry program details
         GpuProgramUsage *mGeometryProgramUsage;
-        /// Tesselation hull program details
-        GpuProgramUsage *mTesselationHullProgramUsage;
-        /// Tesselation domain program details
-        GpuProgramUsage *mTesselationDomainProgramUsage;
+        /// Tessellation hull program details
+        GpuProgramUsage *mTessellationHullProgramUsage;
+        /// Tessellation domain program details
+        GpuProgramUsage *mTessellationDomainProgramUsage;
         /// Compute program details
         GpuProgramUsage *mComputeProgramUsage;
         /// Is this pass queued for deletion?
@@ -271,7 +269,7 @@ namespace Ogre {
 
         /// Returns true if this pass is programmable i.e. includes either a vertex or fragment program.
         bool isProgrammable(void) const { return mVertexProgramUsage || mFragmentProgramUsage || mGeometryProgramUsage ||
-                mTesselationHullProgramUsage || mTesselationDomainProgramUsage || mComputeProgramUsage; }
+                                                 mTessellationHullProgramUsage || mTessellationDomainProgramUsage || mComputeProgramUsage; }
 
         /// Returns true if this pass uses a programmable vertex pipeline
         bool hasVertexProgram(void) const { return mVertexProgramUsage != NULL; }
@@ -279,10 +277,10 @@ namespace Ogre {
         bool hasFragmentProgram(void) const { return mFragmentProgramUsage != NULL; }
         /// Returns true if this pass uses a programmable geometry pipeline
         bool hasGeometryProgram(void) const { return mGeometryProgramUsage != NULL; }
-        /// Returns true if this pass uses a programmable tesselation control pipeline
-        bool hasTesselationHullProgram(void) const { return mTesselationHullProgramUsage != NULL; }
-        /// Returns true if this pass uses a programmable tesselation control pipeline
-        bool hasTesselationDomainProgram(void) const { return mTesselationDomainProgramUsage != NULL; }
+        /// Returns true if this pass uses a programmable tessellation control pipeline
+        bool hasTessellationHullProgram(void) const { return mTessellationHullProgramUsage != NULL; }
+        /// Returns true if this pass uses a programmable tessellation control pipeline
+        bool hasTessellationDomainProgram(void) const { return mTessellationDomainProgramUsage != NULL; }
         /// Returns true if this pass uses a programmable compute pipeline
         bool hasComputeProgram(void) const { return mComputeProgramUsage != NULL; }
         /// Returns true if this pass uses a shadow caster vertex program
@@ -473,24 +471,24 @@ namespace Ogre {
         */
         bool getPointSpritesEnabled(void) const;
 
-		/** Sets how points are attenuated with distance.
-		@remarks
-			When performing point rendering or point sprite rendering,
-			point size can be attenuated with distance. The equation for
-			doing this is attenuation = 1 / (constant + linear * dist + quadratic * d^2).
-		@par
-			For example, to disable distance attenuation (constant screensize)
-			you would set constant to 1, and linear and quadratic to 0. A
-			standard perspective attenuation would be 0, 1, 0 respectively.
-		@note
-			The resulting size is clamped to the minimum and maximum point
-			size.
-		@param enabled Whether point attenuation is enabled
-		@param constant, linear, quadratic Parameters to the attenuation
-			function defined above
-		*/
-		void setPointAttenuation(bool enabled,
-			Real constant = 0.0f, Real linear = 1.0f, Real quadratic = 0.0f);
+        /** Sets how points are attenuated with distance.
+        @remarks
+            When performing point rendering or point sprite rendering,
+            point size can be attenuated with distance. The equation for
+            doing this is attenuation = 1 / (constant + linear * dist + quadratic * d^2).
+        @par
+            For example, to disable distance attenuation (constant screensize)
+            you would set constant to 1, and linear and quadratic to 0. A
+            standard perspective attenuation would be 0, 1, 0 respectively.
+        @note
+            The resulting size is clamped to the minimum and maximum point
+            size.
+        @param enabled Whether point attenuation is enabled
+        @param constant, linear, quadratic Parameters to the attenuation
+            function defined above
+        */
+        void setPointAttenuation(bool enabled,
+            Real constant = 0.0f, Real linear = 1.0f, Real quadratic = 0.0f);
 
         /** Returns whether points are attenuated with distance. */
         bool isPointAttenuationEnabled(void) const;
@@ -1221,6 +1219,11 @@ namespace Ogre {
             not just the names.
         */
         void setVertexProgram(const String& name, bool resetParams = true);
+
+        const GpuProgramPtr getGpuProgram(GpuProgramType programType) const;
+
+        bool hasGpuProgram(GpuProgramType programType);
+
         /** Sets the vertex program parameters.
             @remarks
             Only applicable to programmable passes, and this particular call is
@@ -1758,14 +1761,14 @@ namespace Ogre {
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
         /// Support for shader model 5.0, hull and domain shaders
-        /** Sets the details of the tesselation control program to use.
+        /** Sets the details of the tessellation control program to use.
             @remarks
             Only applicable to programmable passes, this sets the details of
-            the Tesselation Hull program to use in this pass. The program will not be
+            the Tessellation Hull program to use in this pass. The program will not be
             loaded until the parent Material is loaded.
             @param name The name of the program - this must have been
             created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any Tesselation Hull program in this pass is disabled.
+            is loaded. If this parameter is blank, any Tessellation Hull program in this pass is disabled.
             @param resetParams
             If true, this will create a fresh set of parameters from the
             new program being linked, so if you had previously set parameters
@@ -1774,27 +1777,27 @@ namespace Ogre {
             case of named parameters refers to the indexes underlying them,
             not just the names.
         */
-        void setTesselationHullProgram(const String& name, bool resetParams = true);
-        /** Sets the Tesselation Hull program parameters.
+        void setTessellationHullProgram(const String& name, bool resetParams = true);
+        /** Sets the Tessellation Hull program parameters.
             @remarks
             Only applicable to programmable passes.
         */
-        void setTesselationHullProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the Tesselation Hull program used by this pass. */
-        const String& getTesselationHullProgramName(void) const;
-        /** Gets the Tesselation Hull program parameters used by this pass. */
-        GpuProgramParametersSharedPtr getTesselationHullProgramParameters(void) const;
-        /** Gets the Tesselation Hull program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getTesselationHullProgram(void) const;
+        void setTessellationHullProgramParameters(GpuProgramParametersSharedPtr params);
+        /** Gets the name of the Tessellation Hull program used by this pass. */
+        const String& getTessellationHullProgramName(void) const;
+        /** Gets the Tessellation Hull program parameters used by this pass. */
+        GpuProgramParametersSharedPtr getTessellationHullProgramParameters(void) const;
+        /** Gets the Tessellation Hull program used by this pass, only available after _load(). */
+        const GpuProgramPtr& getTessellationHullProgram(void) const;
 
-        /** Sets the details of the tesselation domain program to use.
+        /** Sets the details of the tessellation domain program to use.
             @remarks
             Only applicable to programmable passes, this sets the details of
-            the Tesselation domain program to use in this pass. The program will not be
+            the Tessellation domain program to use in this pass. The program will not be
             loaded until the parent Material is loaded.
             @param name The name of the program - this must have been
             created using GpuProgramManager by the time that this Pass
-            is loaded. If this parameter is blank, any Tesselation domain program in this pass is disabled.
+            is loaded. If this parameter is blank, any Tessellation domain program in this pass is disabled.
             @param resetParams
             If true, this will create a fresh set of parameters from the
             new program being linked, so if you had previously set parameters
@@ -1803,18 +1806,18 @@ namespace Ogre {
             case of named parameters refers to the indexes underlying them,
             not just the names.
         */
-        void setTesselationDomainProgram(const String& name, bool resetParams = true);
-        /** Sets the Tesselation Domain program parameters.
+        void setTessellationDomainProgram(const String& name, bool resetParams = true);
+        /** Sets the Tessellation Domain program parameters.
             @remarks
             Only applicable to programmable passes.
         */
-        void setTesselationDomainProgramParameters(GpuProgramParametersSharedPtr params);
+        void setTessellationDomainProgramParameters(GpuProgramParametersSharedPtr params);
         /** Gets the name of the Domain Evaluation program used by this pass. */
-        const String& getTesselationDomainProgramName(void) const;
-        /** Gets the Tesselation Domain program parameters used by this pass. */
-        GpuProgramParametersSharedPtr getTesselationDomainProgramParameters(void) const;
-        /** Gets the Tesselation Domain program used by this pass, only available after _load(). */
-        const GpuProgramPtr& getTesselationDomainProgram(void) const;
+        const String& getTessellationDomainProgramName(void) const;
+        /** Gets the Tessellation Domain program parameters used by this pass. */
+        GpuProgramParametersSharedPtr getTessellationDomainProgramParameters(void) const;
+        /** Gets the Tessellation Domain program used by this pass, only available after _load(). */
+        const GpuProgramPtr& getTessellationDomainProgram(void) const;
 
         /** Sets the details of the compute program to use.
             @remarks
@@ -1833,17 +1836,20 @@ namespace Ogre {
             not just the names.
         */
         void setComputeProgram(const String& name, bool resetParams = true);
-        /** Sets the Tesselation Evaluation program parameters.
+        /** Sets the Tessellation Evaluation program parameters.
             @remarks
             Only applicable to programmable passes.
         */
         void setComputeProgramParameters(GpuProgramParametersSharedPtr params);
-        /** Gets the name of the Tesselation Hull program used by this pass. */
+        /** Gets the name of the Tessellation Hull program used by this pass. */
         const String& getComputeProgramName(void) const;
-        /** Gets the Tesselation Hull program parameters used by this pass. */
+        /** Gets the Tessellation Hull program parameters used by this pass. */
         GpuProgramParametersSharedPtr getComputeProgramParameters(void) const;
-        /** Gets the Tesselation EHull program used by this pass, only available after _load(). */
+        /** Gets the Tessellation EHull program used by this pass, only available after _load(). */
         const GpuProgramPtr& getComputeProgram(void) const;
+        
+     protected:
+        const GpuProgramPtr& getProgram(GpuProgramUsage* const* gpuProgramUsage) const;
     };
 
     /** Struct recording a pass which can be used for a specific illumination stage.

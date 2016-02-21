@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,27 +29,28 @@ THE SOFTWARE.
 #define __D3D11DRIVERLIST_H__
 
 #include "OgreD3D11Prerequisites.h"
-
-
+#include "OgreSharedPtr.h"
 
 namespace Ogre 
 {
-	class D3D11DriverList
-	{
-	private:
-		vector<D3D11Driver*>::type mDriverList;
+    class D3D11DriverList
+    {
+    public:
+        D3D11DriverList(); // does nothing, call refresh() to initialize
+        ~D3D11DriverList();
 
-	public:
-		D3D11DriverList( IDXGIFactoryN*	pDXGIFactory );
-		~D3D11DriverList();
+        void refresh();
+        void clear();
 
-		BOOL enumerate(IDXGIFactoryN*	pDXGIFactory);
-		size_t count() const;
-		D3D11Driver* item( size_t index );
+        size_t count() const; /// does not include hidden drivers like NVPerfHUD
+        D3D11Driver* item( size_t index );
+        D3D11Driver* item( const String &name );
 
-		D3D11Driver* item( const String &name );
+        D3D11Driver* findByName( const String &name ); // never fail but can return default driver if requested is not found
 
-
-	};
+    private:
+        vector<SharedPtr<D3D11Driver> >::type mDriverList;
+        unsigned mHiddenDriversCount;
+    };
 }
 #endif

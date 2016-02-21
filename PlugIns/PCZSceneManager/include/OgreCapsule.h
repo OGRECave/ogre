@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ Some algorithms based off code from the Wild Magic library by Dave Eberly
 begin                : Mon Apr 02 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
@@ -42,27 +42,27 @@ Code Style Update	 :
 namespace Ogre
 {
 
-	class Capsule
-	{
-	public:
-		// construction
-		Capsule ();  // uninitialized
-		Capsule (const Segment&, Real);
+    class Capsule
+    {
+    public:
+        // construction
+        Capsule ();  // uninitialized
+        Capsule (const Segment&, Real);
 
-		// set values
-		void set(const Vector3& newOrigin, const Vector3& newEnd, Real newRadius);
-		void setOrigin(const Vector3& newOrigin);
-		void setEndPoint(const Vector3& newEndpoint);
-		void setRadius(Real newRadius);
+        // set values
+        void set(const Vector3& newOrigin, const Vector3& newEnd, Real newRadius);
+        void setOrigin(const Vector3& newOrigin);
+        void setEndPoint(const Vector3& newEndpoint);
+        void setRadius(Real newRadius);
 
-		// intersection tests
-		bool intersects(const Capsule&) const;
-		bool intersects(const Segment&) const;
+        // intersection tests
+        bool intersects(const Capsule&) const;
+        bool intersects(const Segment&) const;
 
-		// defining members
-		Segment	mSegment;
-		Real	mRadius;
-	};
+        // defining members
+        Segment mSegment;
+        Real    mRadius;
+    };
 }
 
 #endif //CAPSULE3_H

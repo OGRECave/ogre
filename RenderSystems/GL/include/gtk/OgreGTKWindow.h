@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ public:
                 bool fullScreen, int left, int top, bool depthBuffer, 
                 void* miscParam, ...);
 
-	void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
+    void setFullscreen(bool fullScreen, unsigned int width, unsigned int height);
     void destroy(void);
     bool isActive(void) const;
     bool isClosed(void) const;
@@ -77,12 +77,12 @@ public:
 
     bool requiresTextureFlipping() const { return false; }
 
-	/**
-	 * Get a custom, GTK specific attribute. The specific attributes
-	 * are:
-	 * GTKMMWINDOW		The Gtk::Window instance (Rendering window)
-	 * GTKGLMMWIDGET	The Gtk::GL::DrawingArea instance (Ogre widget)
-	 */
+    /**
+     * Get a custom, GTK specific attribute. The specific attributes
+     * are:
+     * GTKMMWINDOW      The Gtk::Window instance (Rendering window)
+     * GTKGLMMWIDGET    The Gtk::GL::DrawingArea instance (Ogre widget)
+     */
     void getCustomAttribute( const String& name, void* pData );
 protected:
     // Signal handlers

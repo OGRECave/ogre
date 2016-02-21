@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -48,17 +48,12 @@ namespace Ogre {
         case RenderOperation::OT_LINE_LIST:
             return requiresAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
         case RenderOperation::OT_LINE_STRIP:
-            if(gl3wIsSupported(3, 2))
-                return requiresAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINES;
-            else
-                return requiresAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
+            return requiresAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINES;
         default:
         case RenderOperation::OT_TRIANGLE_LIST:
+            return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
         case RenderOperation::OT_TRIANGLE_STRIP:
-            if(gl3wIsSupported(3, 2))
-                return requiresAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLES;
-            else
-                return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
+            return requiresAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLES;
         case RenderOperation::OT_TRIANGLE_FAN:
             return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
         }
@@ -483,8 +478,7 @@ namespace Ogre {
                         OGRE_CHECK_GL_ERROR(glUniform1iv(currentUniform->mLocation, 1,
                                                          (GLint*)params->getIntPointer(def->physicalIndex)));
                         break;
-                    case GCT_SUBROUTINE:
-                    case GCT_UNKNOWN:
+                    default:
                         break;
 
                     } // End switch

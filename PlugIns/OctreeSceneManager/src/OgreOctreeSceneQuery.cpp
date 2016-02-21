@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,10 +36,11 @@ email                : janders@users.sf.net
  
 ***************************************************************************/
 
-#include <OgreOctreeSceneQuery.h>
-#include <OgreOctreeSceneManager.h>
-#include <OgreEntity.h>
-#include <OgreRoot.h>
+#include "OgreOctreeSceneQuery.h"
+#include "OgreRoot.h"
+#include "OgreSceneNode.h"
+#include "OgreOctreeSceneManager.h"
+#include "OgreEntity.h"
 
 namespace Ogre
 {
@@ -62,64 +63,64 @@ void OctreeIntersectionSceneQuery::execute(IntersectionSceneQueryListener* liste
 
     MovableSet set;
 
-	// Iterate over all movable types
-	Root::MovableObjectFactoryIterator factIt = 
-		Root::getSingleton().getMovableObjectFactoryIterator();
-	while(factIt.hasMoreElements())
-	{
-		SceneManager::MovableObjectIterator it = 
-			mParentSceneMgr->getMovableObjectIterator(
-			factIt.getNext()->getType());
-		while( it.hasMoreElements() )
-		{
+    // Iterate over all movable types
+    Root::MovableObjectFactoryIterator factIt = 
+        Root::getSingleton().getMovableObjectFactoryIterator();
+    while(factIt.hasMoreElements())
+    {
+        SceneManager::MovableObjectIterator it = 
+            mParentSceneMgr->getMovableObjectIterator(
+            factIt.getNext()->getType());
+        while( it.hasMoreElements() )
+        {
 
-			MovableObject * e = it.getNext();
+            MovableObject * e = it.getNext();
 
-			Ogre::list< SceneNode * >::type list;
-			//find the nodes that intersect the AAB
-			static_cast<OctreeSceneManager*>( mParentSceneMgr ) -> findNodesIn( e->getWorldBoundingBox(), list, 0 );
-			//grab all moveables from the node that intersect...
-			Ogre::list< SceneNode * >::type::iterator nit = list.begin();
-			while( nit != list.end() )
-			{
-				SceneNode::ObjectIterator oit = (*nit) -> getAttachedObjectIterator();
-				while( oit.hasMoreElements() )
-				{
-					MovableObject * m = oit.getNext();
+            Ogre::list< SceneNode * >::type list;
+            //find the nodes that intersect the AAB
+            static_cast<OctreeSceneManager*>( mParentSceneMgr ) -> findNodesIn( e->getWorldBoundingBox(), list, 0 );
+            //grab all moveables from the node that intersect...
+            Ogre::list< SceneNode * >::type::iterator nit = list.begin();
+            while( nit != list.end() )
+            {
+                SceneNode::ObjectIterator oit = (*nit) -> getAttachedObjectIterator();
+                while( oit.hasMoreElements() )
+                {
+                    MovableObject * m = oit.getNext();
 
-					if( m != e &&
-							set.find( MovablePair(e,m)) == set.end() &&
-							set.find( MovablePair(m,e)) == set.end() &&
-							(m->getQueryFlags() & mQueryMask) &&
-							(m->getTypeFlags() & mQueryTypeMask) &&
-							m->isInScene() && 
-							e->getWorldBoundingBox().intersects( m->getWorldBoundingBox() ) )
-					{
-						listener -> queryResult( e, m );
-						// deal with attached objects, since they are not directly attached to nodes
-						if (m->getMovableType() == "Entity")
-						{
-							Entity* e2 = static_cast<Entity*>(m);
-							Entity::ChildObjectListIterator childIt = e2->getAttachedObjectIterator();
-							while(childIt.hasMoreElements())
-							{
-								MovableObject* c = childIt.getNext();
-								if (c->getQueryFlags() & mQueryMask && 
-									e->getWorldBoundingBox().intersects( c->getWorldBoundingBox() ))
-								{
-									listener->queryResult(e, c);
-								}
-							}
-						}
-					}
-					set.insert( MovablePair(e,m) );
+                    if( m != e &&
+                            set.find( MovablePair(e,m)) == set.end() &&
+                            set.find( MovablePair(m,e)) == set.end() &&
+                            (m->getQueryFlags() & mQueryMask) &&
+                            (m->getTypeFlags() & mQueryTypeMask) &&
+                            m->isInScene() && 
+                            e->getWorldBoundingBox().intersects( m->getWorldBoundingBox() ) )
+                    {
+                        listener -> queryResult( e, m );
+                        // deal with attached objects, since they are not directly attached to nodes
+                        if (m->getMovableType() == "Entity")
+                        {
+                            Entity* e2 = static_cast<Entity*>(m);
+                            Entity::ChildObjectListIterator childIt = e2->getAttachedObjectIterator();
+                            while(childIt.hasMoreElements())
+                            {
+                                MovableObject* c = childIt.getNext();
+                                if (c->getQueryFlags() & mQueryMask && 
+                                    e->getWorldBoundingBox().intersects( c->getWorldBoundingBox() ))
+                                {
+                                    listener->queryResult(e, c);
+                                }
+                            }
+                        }
+                    }
+                    set.insert( MovablePair(e,m) );
 
-				}
-				++nit;
-			}
+                }
+                ++nit;
+            }
 
-		}
-	}
+        }
+    }
 }
 /** Creates a custom Octree AAB query */
 OctreeAxisAlignedBoxSceneQuery::OctreeAxisAlignedBoxSceneQuery(SceneManager* creator)
@@ -146,25 +147,25 @@ void OctreeAxisAlignedBoxSceneQuery::execute(SceneQueryListener* listener)
         {
             MovableObject * m = oit.getNext();
             if( (m->getQueryFlags() & mQueryMask) && 
-				(m->getTypeFlags() & mQueryTypeMask) && 
-				m->isInScene() &&
-				mAABB.intersects( m->getWorldBoundingBox() ) )
+                (m->getTypeFlags() & mQueryTypeMask) && 
+                m->isInScene() &&
+                mAABB.intersects( m->getWorldBoundingBox() ) )
             {
                 listener -> queryResult( m );
-				// deal with attached objects, since they are not directly attached to nodes
-				if (m->getMovableType() == "Entity")
-				{
-					Entity* e = static_cast<Entity*>(m);
-					Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-					while(childIt.hasMoreElements())
-					{
-						MovableObject* c = childIt.getNext();
-						if (c->getQueryFlags() & mQueryMask)
-						{
-							listener->queryResult(c);
-						}
-					}
-				}
+                // deal with attached objects, since they are not directly attached to nodes
+                if (m->getMovableType() == "Entity")
+                {
+                    Entity* e = static_cast<Entity*>(m);
+                    Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
+                    while(childIt.hasMoreElements())
+                    {
+                        MovableObject* c = childIt.getNext();
+                        if (c->getQueryFlags() & mQueryMask)
+                        {
+                            listener->queryResult(c);
+                        }
+                    }
+                }
             }
 
         }
@@ -197,31 +198,31 @@ void OctreeRaySceneQuery::execute(RaySceneQueryListener* listener)
         {
             MovableObject * m = oit.getNext();
             if( (m->getQueryFlags() & mQueryMask) && 
-				(m->getTypeFlags() & mQueryTypeMask) && m->isInScene() )
+                (m->getTypeFlags() & mQueryTypeMask) && m->isInScene() )
             {
                 std::pair<bool, Real> result = mRay.intersects(m->getWorldBoundingBox());
 
                 if( result.first )
                 {
                     listener -> queryResult( m, result.second );
-					// deal with attached objects, since they are not directly attached to nodes
-					if (m->getMovableType() == "Entity")
-					{
-						Entity* e = static_cast<Entity*>(m);
-						Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-						while(childIt.hasMoreElements())
-						{
-							MovableObject* c = childIt.getNext();
-							if (c->getQueryFlags() & mQueryMask)
-							{
-								result = mRay.intersects(c->getWorldBoundingBox());
-								if (result.first)
-								{
-									listener->queryResult(c, result.second);
-								}
-							}
-						}
-					}
+                    // deal with attached objects, since they are not directly attached to nodes
+                    if (m->getMovableType() == "Entity")
+                    {
+                        Entity* e = static_cast<Entity*>(m);
+                        Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
+                        while(childIt.hasMoreElements())
+                        {
+                            MovableObject* c = childIt.getNext();
+                            if (c->getQueryFlags() & mQueryMask)
+                            {
+                                result = mRay.intersects(c->getWorldBoundingBox());
+                                if (result.first)
+                                {
+                                    listener->queryResult(c, result.second);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -256,26 +257,26 @@ void OctreeSphereSceneQuery::execute(SceneQueryListener* listener)
         {
             MovableObject * m = oit.getNext();
             if( (m->getQueryFlags() & mQueryMask) && 
-				(m->getTypeFlags() & mQueryTypeMask) && 
-				m->isInScene() && 
-				mSphere.intersects( m->getWorldBoundingBox() ) )
+                (m->getTypeFlags() & mQueryTypeMask) && 
+                m->isInScene() && 
+                mSphere.intersects( m->getWorldBoundingBox() ) )
             {
                 listener -> queryResult( m );
-				// deal with attached objects, since they are not directly attached to nodes
-				if (m->getMovableType() == "Entity")
-				{
-					Entity* e = static_cast<Entity*>(m);
-					Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-					while(childIt.hasMoreElements())
-					{
-						MovableObject* c = childIt.getNext();
-						if (c->getQueryFlags() & mQueryMask &&
-							mSphere.intersects( c->getWorldBoundingBox()))
-						{
-							listener->queryResult(c);
-						}
-					}
-				}
+                // deal with attached objects, since they are not directly attached to nodes
+                if (m->getMovableType() == "Entity")
+                {
+                    Entity* e = static_cast<Entity*>(m);
+                    Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
+                    while(childIt.hasMoreElements())
+                    {
+                        MovableObject* c = childIt.getNext();
+                        if (c->getQueryFlags() & mQueryMask &&
+                            mSphere.intersects( c->getWorldBoundingBox()))
+                        {
+                            listener->queryResult(c);
+                        }
+                    }
+                }
             }
         }
 
@@ -318,26 +319,26 @@ void OctreePlaneBoundedVolumeListSceneQuery::execute(SceneQueryListener* listene
             {
                 MovableObject * m = oit.getNext();
                 if( (m->getQueryFlags() & mQueryMask) && 
-					(m->getTypeFlags() & mQueryTypeMask) && 
-					m->isInScene() &&
-					(*pi).intersects( m->getWorldBoundingBox() ) )
+                    (m->getTypeFlags() & mQueryTypeMask) && 
+                    m->isInScene() &&
+                    (*pi).intersects( m->getWorldBoundingBox() ) )
                 {
                     listener -> queryResult( m );
-					// deal with attached objects, since they are not directly attached to nodes
-					if (m->getMovableType() == "Entity")
-					{
-						Entity* e = static_cast<Entity*>(m);
-						Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
-						while(childIt.hasMoreElements())
-						{
-							MovableObject* c = childIt.getNext();
-							if (c->getQueryFlags() & mQueryMask &&
-								(*pi).intersects( c->getWorldBoundingBox()))
-							{
-								listener->queryResult(c);
-							}
-						}
-					}
+                    // deal with attached objects, since they are not directly attached to nodes
+                    if (m->getMovableType() == "Entity")
+                    {
+                        Entity* e = static_cast<Entity*>(m);
+                        Entity::ChildObjectListIterator childIt = e->getAttachedObjectIterator();
+                        while(childIt.hasMoreElements())
+                        {
+                            MovableObject* c = childIt.getNext();
+                            if (c->getQueryFlags() & mQueryMask &&
+                                (*pi).intersects( c->getWorldBoundingBox()))
+                            {
+                                listener->queryResult(c);
+                            }
+                        }
+                    }
                 }
             }
         }

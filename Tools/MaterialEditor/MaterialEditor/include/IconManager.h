@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -52,37 +52,37 @@ THE SOFTWARE
 class IconManager : public Ogre::Singleton<IconManager>
 {
 public:
-	IconManager();
-	~IconManager();
+    IconManager();
+    ~IconManager();
 
-	enum IconType
-	{
-		CLOSE,
-		COPY,
-		CUT,
-		MATERIAL,
-		MATERIAL_SCRIPT,
-		OGRE,
-		PASS,
-		PASTE,
-		PROGRAM_SCRIPT,
-		PROJECT,
-		PROJECT_NEW,
-		PROJECT_SAVE,
-		SAVE,
-		SAVE_AS,
-		SHADER,
-		TECHNIQUE,
-		WORKSPACE
-	};
+    enum IconType
+    {
+        CLOSE,
+        COPY,
+        CUT,
+        MATERIAL,
+        MATERIAL_SCRIPT,
+        OGRE,
+        PASS,
+        PASTE,
+        PROGRAM_SCRIPT,
+        PROJECT,
+        PROJECT_NEW,
+        PROJECT_SAVE,
+        SAVE,
+        SAVE_AS,
+        SHADER,
+        TECHNIQUE,
+        WORKSPACE
+    };
 
-	const wxBitmap& getIcon(IconType type) const;
+    const wxBitmap& getIcon(IconType type) const;
 
-	static IconManager& getSingleton(void);
-	static IconManager* getSingletonPtr(void);
+    static IconManager& getSingleton(void);
+    static IconManager* getSingletonPtr(void);
 
 private:
-	typedef std::map<IconType, wxBitmap> IconMap;
-	IconMap mIconMap;
+    typedef std::map<IconType, wxBitmap> IconMap;
+    IconMap mIconMap;
 };
 #endif

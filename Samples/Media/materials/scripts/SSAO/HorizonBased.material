@@ -2,7 +2,7 @@ fragment_program SSAO/HorizonBased_fp_hlsl hlsl
 {
     source HorizonBased.hlsl
     entry_point HorizonBased_fp
-    target ps_3_0 
+    target ps_4_0 
 }
 
 fragment_program SSAO/HorizonBased_fp_cg cg

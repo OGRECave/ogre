@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,52 +31,52 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
-	const String sPluginName = "BSP Scene Manager";
-	//---------------------------------------------------------------------
-	BspSceneManagerPlugin::BspSceneManagerPlugin()
-		:mBspFactory(0), mBspResourceManager(0)
-	{
+    const String sPluginName = "BSP Scene Manager";
+    //---------------------------------------------------------------------
+    BspSceneManagerPlugin::BspSceneManagerPlugin()
+        :mBspFactory(0), mBspResourceManager(0)
+    {
 
-	}
-	//---------------------------------------------------------------------
-	const String& BspSceneManagerPlugin::getName() const
-	{
-		return sPluginName;
-	}
-	//---------------------------------------------------------------------
-	void BspSceneManagerPlugin::install()
-	{
-		// Create new scene manager
-		mBspFactory = OGRE_NEW BspSceneManagerFactory();
+    }
+    //---------------------------------------------------------------------
+    const String& BspSceneManagerPlugin::getName() const
+    {
+        return sPluginName;
+    }
+    //---------------------------------------------------------------------
+    void BspSceneManagerPlugin::install()
+    {
+        // Create new scene manager
+        mBspFactory = OGRE_NEW BspSceneManagerFactory();
 
-	}
-	//---------------------------------------------------------------------
-	void BspSceneManagerPlugin::initialise()
-	{
-		// Register (factory not dependent on rsys resources)
-		Root::getSingleton().addSceneManagerFactory(mBspFactory);
-		// Create resource manager (registers itself)
-		mBspResourceManager = OGRE_NEW BspResourceManager();
-	}
-	//---------------------------------------------------------------------
-	void BspSceneManagerPlugin::shutdown()
-	{
-		// Unregister SM factory
-		Root::getSingleton().removeSceneManagerFactory(mBspFactory);
+    }
+    //---------------------------------------------------------------------
+    void BspSceneManagerPlugin::initialise()
+    {
+        // Register (factory not dependent on rsys resources)
+        Root::getSingleton().addSceneManagerFactory(mBspFactory);
+        // Create resource manager (registers itself)
+        mBspResourceManager = OGRE_NEW BspResourceManager();
+    }
+    //---------------------------------------------------------------------
+    void BspSceneManagerPlugin::shutdown()
+    {
+        // Unregister SM factory
+        Root::getSingleton().removeSceneManagerFactory(mBspFactory);
 
-		// delete resource manager, will unregister itself
-		OGRE_DELETE mBspResourceManager;
-		mBspResourceManager = 0;
+        // delete resource manager, will unregister itself
+        OGRE_DELETE mBspResourceManager;
+        mBspResourceManager = 0;
 
-	}
-	//---------------------------------------------------------------------
-	void BspSceneManagerPlugin::uninstall()
-	{
+    }
+    //---------------------------------------------------------------------
+    void BspSceneManagerPlugin::uninstall()
+    {
 
-		OGRE_DELETE mBspFactory;
-		mBspFactory = 0;
+        OGRE_DELETE mBspFactory;
+        mBspFactory = 0;
 
-	}
+    }
 
 
 }

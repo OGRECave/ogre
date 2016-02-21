@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace Ogre {
     /** Manages the locating and loading of BSP-based indoor levels.
     Like other ResourceManager specialisations it manages the location and loading
     of a specific type of resource, in this case files containing Binary
-    Space Partition (BSP) based level files e.g. Quake3 levels.</p>
+    Space Partition (BSP) based level files e.g. Quake3 levels.
     However, note that unlike other ResourceManager implementations,
     only 1 BspLevel resource is allowed to be loaded at one time. Loading
     another automatically unloads the currently loaded level if any.

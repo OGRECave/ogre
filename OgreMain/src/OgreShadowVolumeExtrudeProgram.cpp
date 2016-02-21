@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,10 +28,9 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreShadowVolumeExtrudeProgram.h"
-#include "OgreString.h"
 #include "OgreGpuProgramManager.h"
 #include "OgreHighLevelGpuProgramManager.h"
-#include "OgreGpuProgram.h"
+#include "OgreHighLevelGpuProgram.h"
 #include "OgreException.h"
 
 namespace Ogre {
@@ -67,29 +66,29 @@ namespace Ogre {
         "dp4 oPos.z, c2, r0\n"
         "dp4 oPos.w, c3, r0\n";
 
-	String ShadowVolumeExtrudeProgram::mPointVs_4_0 = 
-		"// Point light shadow volume extrude\n"
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"\tfloat4 Pos : SV_POSITION;\n"
-		"};\n"
-		"VS_OUTPUT vs_main (\n"
-		"    float4 position			: POSITION,\n"
-		"    float  wcoord			: TEXCOORD0,\n"
-		"    uniform float4x4 worldviewproj_matrix,\n"
-		"    uniform float4   light_position_object_space // homogeneous, object space\n"
-		"    )\n"
-		"{\n"
-		"    // extrusion in object space\n"
-		"    // vertex unmodified if w==1, extruded if w==0\n"
-		"    float4 newpos = \n"
-		"        (wcoord.xxxx * light_position_object_space) + \n"
-		"        float4(position.xyz - light_position_object_space.xyz, 0);\n"
-		"\n"
-		"    VS_OUTPUT output = (VS_OUTPUT)0;\n"
-		"    output.Pos = mul(worldviewproj_matrix, newpos);\n"
-		"    return output;\n"
-		"}\n";
+    String ShadowVolumeExtrudeProgram::mPointVs_4_0 = 
+        "// Point light shadow volume extrude\n"
+        "struct VS_OUTPUT\n"
+        "{\n"
+        "\tfloat4 Pos : SV_POSITION;\n"
+        "};\n"
+        "VS_OUTPUT vs_main (\n"
+        "    float4 position            : POSITION,\n"
+        "    float  wcoord          : TEXCOORD0,\n"
+        "    uniform float4x4 worldviewproj_matrix,\n"
+        "    uniform float4   light_position_object_space // homogeneous, object space\n"
+        "    )\n"
+        "{\n"
+        "    // extrusion in object space\n"
+        "    // vertex unmodified if w==1, extruded if w==0\n"
+        "    float4 newpos = \n"
+        "        (wcoord.xxxx * light_position_object_space) + \n"
+        "        float4(position.xyz - light_position_object_space.xyz, 0);\n"
+        "\n"
+        "    VS_OUTPUT output = (VS_OUTPUT)0;\n"
+        "    output.Pos = mul(worldviewproj_matrix, newpos);\n"
+        "    return output;\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mPointVs_glsl = 
         "#version 150\n"
@@ -115,21 +114,21 @@ namespace Ogre {
         "precision highp int;\n"
         "precision lowp sampler2D;\n"
         "precision lowp samplerCube;\n\n"
-		"// Point light shadow volume extrude\n"
+        "// Point light shadow volume extrude\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
         "uniform mat4 worldviewproj_matrix;\n"
         "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
-		"void main()\n"
-		"{\n"
-		"    // Extrusion in object space\n"
-		"    // Vertex unmodified if w==1, extruded if w==0\n"
-		"    vec4 newpos = \n"
-		"        (uv0.xxxx * light_position_object_space) + \n"
-		"        vec4(position.xyz - light_position_object_space.xyz, 0.0);\n"
-		"\n"
-		"    gl_Position = worldviewproj_matrix * newpos;\n"
-		"}\n";
+        "void main()\n"
+        "{\n"
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+        "    vec4 newpos = \n"
+        "        (uv0.xxxx * light_position_object_space) + \n"
+        "        vec4(position.xyz - light_position_object_space.xyz, 0.0);\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1 = 
         "!!ARBvp1.0\n"
@@ -157,29 +156,29 @@ namespace Ogre {
         "dp4 oPos.z, c2, r0\n"
         "dp4 oPos.w, c3, r0\n";
 
-	String ShadowVolumeExtrudeProgram::mDirVs_4_0 = 
-		"// Directional light extrude\n"
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"\tfloat4 Pos : SV_POSITION;\n"
-		"};\n"
-		"VS_OUTPUT vs_main (\n"
-		"    float4 position			: POSITION,\n"
-		"    float  wcoord			: TEXCOORD0,\n"
-		"\n"
-		"    uniform float4x4 worldviewproj_matrix,\n"
-		"    uniform float4   light_position_object_space // homogenous, object space\n"
-		"    )\n"
-		"{\n"
-		"    // extrusion in object space\n"
-		"    // vertex unmodified if w==1, extruded if w==0\n"
-		"    float4 newpos = \n"
-		"        (wcoord.xxxx * (position + light_position_object_space)) - light_position_object_space;\n"
-		"\n"
-		"    VS_OUTPUT output = (VS_OUTPUT)0;\n"
-		"    output.Pos = mul(worldviewproj_matrix, newpos);\n"
-		"    return output;\n"
-		"}\n";
+    String ShadowVolumeExtrudeProgram::mDirVs_4_0 = 
+        "// Directional light extrude\n"
+        "struct VS_OUTPUT\n"
+        "{\n"
+        "\tfloat4 Pos : SV_POSITION;\n"
+        "};\n"
+        "VS_OUTPUT vs_main (\n"
+        "    float4 position            : POSITION,\n"
+        "    float  wcoord          : TEXCOORD0,\n"
+        "\n"
+        "    uniform float4x4 worldviewproj_matrix,\n"
+        "    uniform float4   light_position_object_space // homogenous, object space\n"
+        "    )\n"
+        "{\n"
+        "    // extrusion in object space\n"
+        "    // vertex unmodified if w==1, extruded if w==0\n"
+        "    float4 newpos = \n"
+        "        (wcoord.xxxx * (position + light_position_object_space)) - light_position_object_space;\n"
+        "\n"
+        "    VS_OUTPUT output = (VS_OUTPUT)0;\n"
+        "    output.Pos = mul(worldviewproj_matrix, newpos);\n"
+        "    return output;\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mDirVs_glsl = 
         "#version 150\n"
@@ -204,20 +203,20 @@ namespace Ogre {
         "precision highp int;\n"
         "precision lowp sampler2D;\n"
         "precision lowp samplerCube;\n\n"
-		"// Directional light extrude\n"
+        "// Directional light extrude\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
         "uniform mat4 worldviewproj_matrix;\n"
         "uniform vec4 light_position_object_space; // homogenous, object space\n\n"
         "void main()\n"
-		"{\n"
-		"    // Extrusion in object space\n"
-		"    // Vertex unmodified if w==1, extruded if w==0\n"
-		"    vec4 newpos = \n"
-		"        (uv0.xxxx * (position + light_position_object_space)) - light_position_object_space;\n"
-		"\n"
-		"    gl_Position = worldviewproj_matrix * newpos;\n"
-		"}\n";
+        "{\n"
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+        "    vec4 newpos = \n"
+        "        (uv0.xxxx * (position + light_position_object_space)) - light_position_object_space;\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "}\n";
 
 
     String ShadowVolumeExtrudeProgram::mPointArbvp1Debug = 
@@ -254,9 +253,9 @@ namespace Ogre {
         "dp4 oPos.w, c3, r0\n"
         "mov oD0, c6.x\n";
 
-	String ShadowVolumeExtrudeProgram::mPointVs_4_0Debug = mPointVs_4_0;
-	String ShadowVolumeExtrudeProgram::mPointVs_glslDebug = mPointVs_glsl;
-	String ShadowVolumeExtrudeProgram::mPointVs_glslesDebug = mPointVs_glsles;
+    String ShadowVolumeExtrudeProgram::mPointVs_4_0Debug = mPointVs_4_0;
+    String ShadowVolumeExtrudeProgram::mPointVs_glslDebug = mPointVs_glsl;
+    String ShadowVolumeExtrudeProgram::mPointVs_glslesDebug = mPointVs_glsles;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1Debug = 
         "!!ARBvp1.0\n"
@@ -288,9 +287,9 @@ namespace Ogre {
         "dp4 oPos.w, c3, r0\n"
         "mov oD0, c5.x\n";
 
-	String ShadowVolumeExtrudeProgram::mDirVs_4_0Debug = mDirVs_4_0;
-	String ShadowVolumeExtrudeProgram::mDirVs_glslDebug = mDirVs_glsl;
-	String ShadowVolumeExtrudeProgram::mDirVs_glslesDebug = mDirVs_glsles;
+    String ShadowVolumeExtrudeProgram::mDirVs_4_0Debug = mDirVs_4_0;
+    String ShadowVolumeExtrudeProgram::mDirVs_glslDebug = mDirVs_glsl;
+    String ShadowVolumeExtrudeProgram::mDirVs_glslesDebug = mDirVs_glsles;
 
 
     // c4 is the light position/direction in these
@@ -302,14 +301,14 @@ namespace Ogre {
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
-        "PARAM c5 = program.local[5];\n"
-        "PARAM c4 = program.local[4];\n"
+        "PARAM c4 = program.local[4];\n"    // c4.xyz = lightPos
+        "PARAM c5 = program.local[5];\n"    // c5.x = extrudeDist
         "ADD R0.x, c6.x, -v24.x;\n"
-        "MUL R0.w, R0.x, c5.x;\n"
-        "ADD R0.xyz, v16.xyzx, -c4.xyzx;\n"
-        "DP3 R1.w, R0.xyzx, R0.xyzx;\n"     // R1.w = Vector3(vertex - lightpos).sqrLength()
-        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / Vector3(vertex - lightpos).length()
-        "MUL R0.xyz, R1.w, R0.xyzx;\n"      // R0.xyz = Vector3(vertex - lightpos).normalisedCopy()
+        "MUL R0.w, R0.x, c5.x;\n"           // R0.w = (1 - wcoord) * extrudeDist
+        "ADD R0.xyz, v16.xyzx, -c4.xyzx;\n" // R0.xyz = extrusionDir = Vector3(vertex - lightPos)
+        "DP3 R1.w, R0.xyzx, R0.xyzx;\n"     // R1.w = extrusionDir.sqrLength()
+        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / extrusionDir.length()
+        "MUL R0.xyz, R1.w, R0.xyzx;\n"      // R0.xyz = extrusionDir.normalisedCopy()
         "MAD R0.xyz, R0.w, R0.xyzx, v16.xyzx;\n"
         "DPH result.position.x, R0.xyzz, c0[0];\n"
         "DPH result.position.y, R0.xyzz, c0[1];\n"
@@ -323,11 +322,11 @@ namespace Ogre {
         "dcl_texcoord0 v7\n"
         "dcl_position v0\n"
         "add r0.x, c6.x, -v7.x\n"
-        "mul r1.x, r0.x, c5.x\n"
+        "mul r1.x, r0.x, c5.x\n"            // r1.x = (1 - wcoord) * extrudeDist
         "add r0.yzw, v0.xxyz, -c4.xxyz\n"
-        "dp3 r0.x, r0.yzw, r0.yzw\n"
-        "rsq r0.x, r0.x\n"
-        "mul r0.xyz, r0.x, r0.yzw\n"
+        "dp3 r0.x, r0.yzw, r0.yzw\n"        // r0.x = extrusionDir.sqrLength()
+        "rsq r0.x, r0.x\n"                  // r0.x = 1 / extrusionDir.length()
+        "mul r0.xyz, r0.x, r0.yzw\n"        // r0.xyz = extrusionDir.normalisedCopy()
         "mad r0.xyz, r1.x, r0.xyz, v0.xyz\n"
         "mov r0.w, c6.x\n"
         "dp4 oPos.x, c0, r0\n"
@@ -335,35 +334,34 @@ namespace Ogre {
         "dp4 oPos.z, c2, r0\n"
         "dp4 oPos.w, c3, r0\n";
 
-	String ShadowVolumeExtrudeProgram::mPointVs_4_0Finite = 
-		"// Point light shadow volume extrude - FINITE\n"
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"\tfloat4 Pos : SV_POSITION;\n"
-		"};\n"
-		"VS_OUTPUT vs_main (\n"
-		"    float4 position			: POSITION,\n"
-		"    float  wcoord			: TEXCOORD0,\n"
+    String ShadowVolumeExtrudeProgram::mPointVs_4_0Finite = 
+        "// Point light shadow volume extrude - FINITE\n"
+        "struct VS_OUTPUT\n"
+        "{\n"
+        "\tfloat4 Pos : SV_POSITION;\n"
+        "};\n"
+        "VS_OUTPUT vs_main (\n"
+        "    float4 position            : POSITION,\n"
+        "    float  wcoord          : TEXCOORD0,\n"
+        "\n"
+        "    uniform float4x4 worldviewproj_matrix,\n"
+        "    uniform float4   light_position_object_space, // homogeneous, object space\n"
+        "   uniform float    shadow_extrusion_distance // how far to extrude\n"
+        "    )\n"
+        "{\n"
+        "    // extrusion in object space\n"
+        "    // vertex unmodified if w==1, extruded if w==0\n"
+		"    float3 extrusionDir = position.xyz - light_position_object_space.xyz;\n"
+		"    extrusionDir = normalize(extrusionDir);\n"
 		"\n"
-		"    uniform float4x4 worldviewproj_matrix,\n"
-		"    uniform float4   light_position_object_space, // homogeneous, object space\n"
-		"	uniform float    shadow_extrusion_distance // how far to extrude\n"
-		"    )\n"
-		"{\n"
-		"    // extrusion in object space\n"
-		"    // vertex unmodified if w==1, extruded if w==0\n"
-		"	float3 extrusionDir = position.xyz - light_position_object_space.xyz;\n"
-		"	extrusionDir = normalize(extrusionDir);\n"
-		"	\n"
-		"    float4 newpos = float4(position.xyz +  \n"
-		"        ((1 - wcoord.x) * shadow_extrusion_distance * extrusionDir), 1);\n"
-		"\n"
-		"    VS_OUTPUT output = (VS_OUTPUT)0;\n"
-		"    output.Pos = mul(worldviewproj_matrix, newpos);\n"
-		"    return output;\n"
-
-		"\n"
-		"}\n";
+        "    float4 newpos = float4(position.xyz +  \n"
+        "        ((1 - wcoord.x) * shadow_extrusion_distance * extrusionDir), 1);\n"
+        "\n"
+        "    VS_OUTPUT output = (VS_OUTPUT)0;\n"
+        "    output.Pos = mul(worldviewproj_matrix, newpos);\n"
+        "    return output;\n"
+        "\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mPointVs_glslFinite = 
         "#version 150\n"
@@ -377,9 +375,9 @@ namespace Ogre {
         "{\n"
         "    // Extrusion in object space\n"
         "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "	vec3 extrusionDir = vertex.xyz - light_position_object_space.xyz;\n"
-        "	extrusionDir = normalize(extrusionDir);\n"
-        "	\n"
+        "   vec3 extrusionDir = vertex.xyz - light_position_object_space.xyz;\n"
+        "   extrusionDir = normalize(extrusionDir);\n"
+        "   \n"
         "    vec4 newpos = vec4(vertex.xyz +  \n"
         "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
         "\n"
@@ -392,37 +390,40 @@ namespace Ogre {
         "precision highp int;\n"
         "precision lowp sampler2D;\n"
         "precision lowp samplerCube;\n\n"
-		"// Point light shadow volume extrude - FINITE\n"
+        "// Point light shadow volume extrude - FINITE\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
         "uniform mat4 worldviewproj_matrix;\n"
         "uniform vec4 light_position_object_space; // homogenous, object space\n"
-		"uniform float shadow_extrusion_distance; // how far to extrude\n\n"
+        "uniform float shadow_extrusion_distance; // how far to extrude\n\n"
         "void main()\n"
-		"{\n"
-		"    // Extrusion in object space\n"
-		"    // Vertex unmodified if w==1, extruded if w==0\n"
-		"	vec3 extrusionDir = position.xyz - light_position_object_space.xyz;\n"
-		"	extrusionDir = normalize(extrusionDir);\n"
-		"	\n"
-		"    vec4 newpos = vec4(position.xyz +  \n"
-		"        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
-		"\n"
-		"    gl_Position = worldviewproj_matrix * newpos;\n"
-		"}\n";
+        "{\n"
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+        "   vec3 extrusionDir = position.xyz - light_position_object_space.xyz;\n"
+        "   extrusionDir = normalize(extrusionDir);\n"
+        "   \n"
+        "    vec4 newpos = vec4(position.xyz +  \n"
+        "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1Finite = 
         "!!ARBvp1.0\n"
         "PARAM c6 = { 1, 0, 0, 0 };\n"
-        "TEMP R0;\n"
+        "TEMP R0, R1;\n"
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
-        "PARAM c4 = program.local[4];\n"
-        "PARAM c5 = program.local[5];\n"
+        "PARAM c4 = program.local[4];\n"    // c4.xyz = lightDir = -extrusionDir
+        "PARAM c5 = program.local[5];\n"    // c5.x = extrudeDist
         "ADD R0.x, c6.x, -v24.x;\n"
-        "MUL R0.x, R0.x, c5.x;\n"
-        "MAD R0.xyz, -R0.x, c4.xyzx, v16.xyzx;\n"
+        "MUL R0.w, R0.x, c5.x;\n"           // R0.w = (1 - wcoord) * extrudeDist
+        "DP3 R1.w, c4.xyzx, c4.xyzx;\n"     // R1.w = extrusionDir.sqrLength()
+        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / extrusionDir.length()
+        "MUL R0.xyz, R1.w, -c4.xyzx;\n"     // R0.xyz = extrusionDir.normalisedCopy()
+        "MAD R0.xyz, R0.w, R0.xyzx, v16.xyzx;\n"
         "DPH result.position.x, R0.xyzz, c0[0];\n"
         "DPH result.position.y, R0.xyzz, c0[1];\n"
         "DPH result.position.z, R0.xyzz, c0[2];\n"
@@ -435,40 +436,45 @@ namespace Ogre {
         "dcl_texcoord0 v7\n"
         "dcl_position v0\n"
         "add r0.x, c6.x, -v7.x\n"
-        "mul r0.x, r0.x, c5.x\n"
-        "mad r0.xyz, -r0.x, c4.xyz, v0.xyz\n"
+        "mul r0.w, r0.x, c5.x\n"            // r0.w = (1 - wcoord) * extrudeDist
+        "dp3 r1.w, c4.xyz, c4.xyz\n"        // r1.w = extrusionDir.sqrLength()
+        "rsq r1.w, r1.w\n"                  // r1.w = 1 / extrusionDir.length()
+        "mul r0.xyz, r1.w, -c4.xyz\n"       // r0.xyz = extrusionDir.normalisedCopy()
+        "mad r0.xyz, r0.w, r0.xyz, v0.xyz;\n"
         "mov r0.w, c6.x\n"
         "dp4 oPos.x, c0, r0\n"
         "dp4 oPos.y, c1, r0\n"
         "dp4 oPos.z, c2, r0\n"
         "dp4 oPos.w, c3, r0\n";
 
-	String ShadowVolumeExtrudeProgram::mDirVs_4_0Finite = 
-		"// Directional light extrude - FINITE\n"
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"\tfloat4 Pos : SV_POSITION;\n"
-		"};\n"
-		"VS_OUTPUT vs_main (\n"
-		"    float4 position			: POSITION,\n"
-		"    float  wcoord			: TEXCOORD0,\n"
+    String ShadowVolumeExtrudeProgram::mDirVs_4_0Finite = 
+        "// Directional light extrude - FINITE\n"
+        "struct VS_OUTPUT\n"
+        "{\n"
+        "\tfloat4 Pos : SV_POSITION;\n"
+        "};\n"
+        "VS_OUTPUT vs_main (\n"
+        "    float4 position            : POSITION,\n"
+        "    float  wcoord          : TEXCOORD0,\n"
+        "\n"
+        "    uniform float4x4 worldviewproj_matrix,\n"
+        "    uniform float4   light_position_object_space, // homogeneous, object space\n"
+        "   uniform float    shadow_extrusion_distance // how far to extrude\n"
+        "    )\n"
+        "{\n"
+        "    // extrusion in object space\n"
+        "    // vertex unmodified if w==1, extruded if w==0\n"
+		"    float3 extrusionDir = - light_position_object_space.xyz;\n"
+		"    extrusionDir = normalize(extrusionDir);\n"
 		"\n"
-		"    uniform float4x4 worldviewproj_matrix,\n"
-		"    uniform float4   light_position_object_space, // homogeneous, object space\n"
-		"	uniform float    shadow_extrusion_distance // how far to extrude\n"
-		"    )\n"
-		"{\n"
-		"    // extrusion in object space\n"
-		"    // vertex unmodified if w==1, extruded if w==0\n"
-		"	// -ve light_position_object_space is direction\n"
-		"    float4 newpos = float4(position.xyz - \n"
-		"        (wcoord.x * shadow_extrusion_distance * light_position_object_space.xyz), 1);\n"
-		"\n"
-		"    VS_OUTPUT output = (VS_OUTPUT)0;\n"
-		"    output.Pos = mul(worldviewproj_matrix, newpos);\n"
-		"    return output;\n"
-		"\n"
-		"}\n";
+		"    float4 newpos = float4(position.xyz + \n"
+		"        ((1 - wcoord.x) * shadow_extrusion_distance * extrusionDir), 1);\n"
+        "\n"
+        "    VS_OUTPUT output = (VS_OUTPUT)0;\n"
+        "    output.Pos = mul(worldviewproj_matrix, newpos);\n"
+        "    return output;\n"
+        "\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mDirVs_glslFinite = 
         "#version 150\n"
@@ -482,21 +488,23 @@ namespace Ogre {
         "{\n"
         "    // Extrusion in object space\n"
         "    // Vertex unmodified if w==1, extruded if w==0\n"
-        "	 // -ve light_position_object_space is direction\n"
-        "    vec4 newpos = vec4(vertex.xyz - \n"
-        "        (uv0.x * shadow_extrusion_distance * light_position_object_space.xyz), 1.0);\n"
+        "	vec3 extrusionDir = - light_position_object_space.xyz;\n"
+        "	extrusionDir = normalize(extrusionDir);\n"
+        "	\n"
+        "    vec4 newpos = vec4(vertex.xyz +  \n"
+        "        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
         "\n"
         "    gl_Position = worldviewproj_matrix * newpos;\n"
         "\n"
         "}\n";
 
-	String ShadowVolumeExtrudeProgram::mDirVs_glslesFinite = 
+    String ShadowVolumeExtrudeProgram::mDirVs_glslesFinite = 
         "#version 100\n"
         "precision highp float;\n"
         "precision highp int;\n"
         "precision lowp sampler2D;\n"
         "precision lowp samplerCube;\n\n"
-		"// Directional light extrude - FINITE\n"
+        "// Directional light extrude - FINITE\n"
         "attribute vec4 uv0;\n"
         "attribute vec4 position;\n\n"
         "uniform mat4 worldviewproj_matrix;\n"
@@ -504,15 +512,17 @@ namespace Ogre {
         "uniform float shadow_extrusion_distance;  // how far to extrude\n\n"
         "void main()\n"
         "{\n"
-		"    // Extrusion in object space\n"
-		"    // Vertex unmodified if w==1, extruded if w==0\n"
-		"	 // -ve light_position_object_space is direction\n"
-		"    vec4 newpos = vec4(position.xyz - \n"
-		"        (uv0.x * shadow_extrusion_distance * light_position_object_space.xyz), 1.0);\n"
-		"\n"
-		"    gl_Position = worldviewproj_matrix * newpos;\n"
-		"\n"
-		"}\n";
+        "    // Extrusion in object space\n"
+        "    // Vertex unmodified if w==1, extruded if w==0\n"
+		"	vec3 extrusionDir = - light_position_object_space.xyz;\n"
+		"	extrusionDir = normalize(extrusionDir);\n"
+		"	\n"
+		"    vec4 newpos = vec4(position.xyz +  \n"
+		"        ((1.0 - uv0.x) * shadow_extrusion_distance * extrusionDir), 1.0);\n"
+        "\n"
+        "    gl_Position = worldviewproj_matrix * newpos;\n"
+        "\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mPointArbvp1FiniteDebug = 
         "!!ARBvp1.0\n"
@@ -537,7 +547,7 @@ namespace Ogre {
         "DPH result.position.w, R0.xyzz, c0[3];\n"
         "END\n";
 
-	String ShadowVolumeExtrudeProgram::mPointVs_1_1FiniteDebug = 
+    String ShadowVolumeExtrudeProgram::mPointVs_1_1FiniteDebug = 
         "vs_1_1\n"
         "def c6, 1, 0, 0, 0\n"
         "dcl_texcoord0 v7\n"
@@ -556,23 +566,26 @@ namespace Ogre {
         "dp4 oPos.z, c2, r0\n"
         "dp4 oPos.w, c3, r0\n";
 
-	String ShadowVolumeExtrudeProgram::mPointVs_4_0FiniteDebug = mPointVs_4_0Finite;
-	String ShadowVolumeExtrudeProgram::mPointVs_glslFiniteDebug = mPointVs_glslFinite;
-	String ShadowVolumeExtrudeProgram::mPointVs_glslesFiniteDebug = mPointVs_glslesFinite;
+    String ShadowVolumeExtrudeProgram::mPointVs_4_0FiniteDebug = mPointVs_4_0Finite;
+    String ShadowVolumeExtrudeProgram::mPointVs_glslFiniteDebug = mPointVs_glslFinite;
+    String ShadowVolumeExtrudeProgram::mPointVs_glslesFiniteDebug = mPointVs_glslesFinite;
 
     String ShadowVolumeExtrudeProgram::mDirArbvp1FiniteDebug = 
         "!!ARBvp1.0\n"
         "PARAM c6 = { 1, 0, 0, 0 };\n"
-        "TEMP R0;\n"
+        "TEMP R0, R1;\n"
         "ATTRIB v24 = vertex.texcoord[0];\n"
         "ATTRIB v16 = vertex.position;\n"
         "PARAM c0[4] = { program.local[0..3] };\n"
-        "PARAM c4 = program.local[4];\n"
-        "PARAM c5 = program.local[5];\n"
+        "PARAM c4 = program.local[4];\n"    // c4.xyz = lightDir = -extrusionDir
+        "PARAM c5 = program.local[5];\n"    // c5.x = extrudeDist
         "MOV result.color.front.primary, c6.x;\n"
         "ADD R0.x, c6.x, -v24.x;\n"
-        "MUL R0.x, R0.x, c5.x;\n"
-        "MAD R0.xyz, -R0.x, c4.xyzx, v16.xyzx;\n"
+        "MUL R0.w, R0.x, c5.x;\n"           // R0.w = (1 - wcoord) * extrudeDist
+        "DP3 R1.w, c4.xyzx, c4.xyzx;\n"     // R1.w = extrusionDir.sqrLength()
+        "RSQ R1.w, R1.w;\n"                 // R1.w = 1 / extrusionDir.length()
+        "MUL R0.xyz, R1.w, -c4.xyzx;\n"     // R0.xyz = extrusionDir.normalisedCopy()
+        "MAD R0.xyz, R0.w, R0.xyzx, v16.xyzx;\n"
         "DPH result.position.x, R0.xyzz, c0[0];\n"
         "DPH result.position.y, R0.xyzz, c0[1];\n"
         "DPH result.position.z, R0.xyzz, c0[2];\n"
@@ -586,8 +599,11 @@ namespace Ogre {
         "dcl_position v0\n"
         "mov oD0, c6.x\n"
         "add r0.x, c6.x, -v7.x\n"
-        "mul r0.x, r0.x, c5.x\n"
-        "mad r0.xyz, -r0.x, c4.xyz, v0.xyz\n"
+        "mul r0.w, r0.x, c5.x\n"            // r0.w = (1 - wcoord) * extrudeDist
+        "dp3 r1.w, c4.xyz, c4.xyz\n"        // r1.w = extrusionDir.sqrLength()
+        "rsq r1.w, r1.w\n"                  // r1.w = 1 / extrusionDir.length()
+        "mul r0.xyz, r1.w, -c4.xyz\n"       // r0.xyz = extrusionDir.normalisedCopy()
+        "mad r0.xyz, r0.w, r0.xyz, v0.xyz;\n"
         "mov r0.w, c6.x\n"
         "dp4 oPos.x, c0, r0\n"
         "dp4 oPos.y, c1, r0\n"
@@ -595,21 +611,21 @@ namespace Ogre {
         "dp4 oPos.w, c3, r0\n";
 
 
-	String ShadowVolumeExtrudeProgram::mDirVs_4_0FiniteDebug = mDirVs_4_0Finite;
-	String ShadowVolumeExtrudeProgram::mDirVs_glslFiniteDebug = mDirVs_glslFinite;
-	String ShadowVolumeExtrudeProgram::mDirVs_glslesFiniteDebug = mDirVs_glslesFinite;
+    String ShadowVolumeExtrudeProgram::mDirVs_4_0FiniteDebug = mDirVs_4_0Finite;
+    String ShadowVolumeExtrudeProgram::mDirVs_glslFiniteDebug = mDirVs_glslFinite;
+    String ShadowVolumeExtrudeProgram::mDirVs_glslesFiniteDebug = mDirVs_glslesFinite;
 
 
-	String ShadowVolumeExtrudeProgram::mGeneralFs_4_0 = 
-		"struct VS_OUTPUT\n"
-		"{\n"
-		"\tfloat4 Pos : SV_POSITION;\n"
-		"};\n"
-		"float4 fs_main (VS_OUTPUT input): SV_Target\n"
-		"{\n"
-		"    float4 finalColor = float4(1,1,1,1);\n"
-		"    return finalColor;\n"
-		"}\n";
+    String ShadowVolumeExtrudeProgram::mGeneralFs_4_0 = 
+        "struct VS_OUTPUT\n"
+        "{\n"
+        "\tfloat4 Pos : SV_POSITION;\n"
+        "};\n"
+        "float4 fs_main (VS_OUTPUT input): SV_Target\n"
+        "{\n"
+        "    float4 finalColor = float4(1,1,1,1);\n"
+        "    return finalColor;\n"
+        "}\n";
 
     String ShadowVolumeExtrudeProgram::mGeneralFs_glsl = 
         "#version 150\n"
@@ -625,49 +641,205 @@ namespace Ogre {
         "precision highp int;\n"
         "precision lowp sampler2D;\n"
         "precision lowp samplerCube;\n\n"
-		"void main()\n"
-		"{\n"
-		"    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
+        "void main()\n"
+        "{\n"
+        "    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
+        "}\n";
+
+
+
+	 String ShadowVolumeExtrudeProgram::mModulate_Fs_hlsl_4_0 = 
+        "Texture2D RT : register(t0);\n"
+        "SamplerState RTState : register(s0); \n"
+        "uniform float4 shadowColor;\n"
+        "float4 ShadowBlend_ps(float4 position : SV_POSITION, float2 iTexCoord : TEXCOORD0) : SV_Target\n"
+        "{\n"
+        "   return float4(shadowColor.xyz, RT.Sample(RTState, iTexCoord).w);\n"
+        "}";
+
+
+	 String ShadowVolumeExtrudeProgram::mModulate_Vs_hlsl_4_0 =
+        "void ShadowBlend_vs\n"
+        "(\n"
+        "in float4 inPos : POSITION,\n"
+        "out float4 pos : SV_POSITION,\n"
+        "out float2 uv0 : TEXCOORD0,\n"
+        "uniform float4x4 worldViewProj\n"
+        ")\n"
+        "{\n"
+        "   pos = mul(worldViewProj, inPos);\n"
+        "   inPos.xy = sign(inPos.xy);\n"
+        "   uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\n"
+        "}";
+
+	 String ShadowVolumeExtrudeProgram::mModulate_Fs_cg =
+		 "sampler2D RT : register(s0);\n"
+		 "uniform float4 shadowColor; \n"
+		 "float4 ShadowBlend_ps(float2 iTexCoord : TEXCOORD0) : COLOR\n"
+		 "{\n"
+         "   return float4(shadowColor.xyz, tex2D(RT, iTexCoord).w);\n"
 		"}\n";
+
+	 String ShadowVolumeExtrudeProgram::mModulate_Vs_cg =
+            "void ShadowBlend_vs\n"
+            "(\n"
+            "in float4 inPos : POSITION,\n"
+            "out float4 pos : POSITION,\n"
+            "out float2 uv0 : TEXCOORD0,\n"
+            "uniform float4x4 worldViewProj\n"
+            ")\n"
+            "{\n"
+            "   pos = mul(worldViewProj, inPos);\n"
+            "   inPos.xy = sign(inPos.xy);\n"
+            "   uv0 = (float2(inPos.x, -inPos.y) + 1.0f) * 0.5f;\n"
+            "}";
+
+
+
+static const String glsles_prefix = "precision highp float;\
+                                    precision highp int; \
+                                    precision lowp sampler2D; \
+                                    precision lowp samplerCube;";
+
+    String ShadowVolumeExtrudeProgram::mModulate_Fs_glsl =
+        "uniform sampler2D RT; \
+        uniform vec4 shadowColor; \
+        varying vec2 uv0; \
+        \
+        void main() {\
+            gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\
+        }";
+
+    String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl =
+        "uniform mat4 worldViewProj; \
+        attribute vec4 inPos; \
+        varying vec4 uv0; \
+        \
+        void main() {\
+            gl_Position = worldViewProj*inPos; \
+            inPos.xy = sign(inPos.xy); \
+            uv0 = (vec2(inPos.x, -inPos.y) + 1.0f) * 0.5f; \
+        }";
+
+
+
 
     const String ShadowVolumeExtrudeProgram::programNames[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
     {
-        "Ogre/ShadowExtrudePointLight",
-            "Ogre/ShadowExtrudePointLightDebug",
-            "Ogre/ShadowExtrudeDirLight",
-            "Ogre/ShadowExtrudeDirLightDebug",
-            "Ogre/ShadowExtrudePointLightFinite",
-            "Ogre/ShadowExtrudePointLightFiniteDebug",
-            "Ogre/ShadowExtrudeDirLightFinite",
-            "Ogre/ShadowExtrudeDirLightFiniteDebug"
+		"Ogre/ShadowExtrudePointLight",
+        "Ogre/ShadowExtrudePointLightDebug",
+        "Ogre/ShadowExtrudeDirLight",
+        "Ogre/ShadowExtrudeDirLightDebug",
+        "Ogre/ShadowExtrudePointLightFinite",
+        "Ogre/ShadowExtrudePointLightFiniteDebug",
+        "Ogre/ShadowExtrudeDirLightFinite",
+        "Ogre/ShadowExtrudeDirLightFiniteDebug"
     };
 
-	String ShadowVolumeExtrudeProgram::frgProgramName = "";
+    String ShadowVolumeExtrudeProgram::frgProgramName = "";
 
-	bool ShadowVolumeExtrudeProgram::mInitialised = false;
+    bool ShadowVolumeExtrudeProgram::mInitialised = false;
     //---------------------------------------------------------------------
     //---------------------------------------------------------------------
+
+	void ShadowVolumeExtrudeProgram::AddInternalProgram(String name, String source, String language, String entryPoint, String target, GpuProgramType type)
+	{
+		HighLevelGpuProgramPtr program = HighLevelGpuProgramManager::getSingleton()
+			.createProgram(name, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME, language, type);
+
+		program->setSource(source);
+		program->setParameter("entry_point", entryPoint);
+		if (language == "cg")
+			program->setParameter("profiles", target);
+		else
+			program->setParameter("target", target);
+
+		program->load();
+	}
+
+	void ShadowVolumeExtrudeProgram::initialiseModulationPassPrograms(void)
+	{
+		bool vs_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1");
+		bool ps_4_0 = GpuProgramManager::getSingleton().isSyntaxSupported("ps_4_0_level_9_1");
+		bool glsl = GpuProgramManager::getSingleton().isSyntaxSupported("glsl");
+		bool glsles = GpuProgramManager::getSingleton().isSyntaxSupported("glsles");
+
+		const String vsProgramName = "Ogre/ShadowBlendVP";
+		const String fsProgramName = "Ogre/ShadowBlendFP";
+
+		const String vsEntryPoint = "ShadowBlend_vs";
+		const String fsEntryPoint = "ShadowBlend_ps";
+
+		String language;
+		String fsTarget;
+		String vsTarget;
+		String vsProgram;
+		String fsProgram;
+
+		if (glsl)
+		{
+			vsTarget = "glsl";
+			fsTarget = "glsl";
+			language = "glsl";
+			vsProgram = mModulate_Vs_glsl;
+			fsProgram = mModulate_Fs_glsl;
+		}
+		else if (glsles)
+		{
+            vsTarget = "glsles";
+            fsTarget = "glsles";
+            language = "glsles";
+            vsProgram = glsles_prefix+mModulate_Vs_glsl;
+            fsProgram = glsles_prefix+mModulate_Fs_glsl;
+		}
+		else
+		{
+			if (ps_4_0 && vs_4_0)
+			{
+				vsTarget = "vs_4_0_level_9_1";
+				fsTarget = "ps_4_0_level_9_1";
+				language = "hlsl";
+				vsProgram = mModulate_Vs_hlsl_4_0;
+				fsProgram = mModulate_Fs_hlsl_4_0;
+			}
+			else
+			{
+				vsTarget = "vs_2_0";
+				fsTarget = "ps_2_0";
+				language = "cg";
+				vsProgram = mModulate_Vs_cg;
+				fsProgram = mModulate_Fs_cg;
+			}
+		}
+
+		//Add vertex program
+		AddInternalProgram(vsProgramName, vsProgram, language, vsEntryPoint, vsTarget, GPT_VERTEX_PROGRAM);
+
+		//Add fragment program
+		AddInternalProgram(fsProgramName, fsProgram, language, fsEntryPoint, fsTarget, GPT_FRAGMENT_PROGRAM);
+	}
+
     void ShadowVolumeExtrudeProgram::initialise(void)
     {
 		if (!mInitialised)
 		{
 			String syntax;
-			bool vertexProgramFinite[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
+			bool vertexProgramFinite[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] =
 			{
 				false, false, false, false,
 				true, true, true, true
 			};
-			bool vertexProgramDebug[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
+			bool vertexProgramDebug[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] =
 			{
 				false, true, false, true,
 				false, true, false, true
 			};
-			Light::LightTypes vertexProgramLightTypes[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] = 
+			Light::LightTypes vertexProgramLightTypes[OGRE_NUM_SHADOW_EXTRUDER_PROGRAMS] =
 			{
+				Light::LT_POINT, Light::LT_POINT,
+				Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL, 
 				Light::LT_POINT, Light::LT_POINT, 
-					Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL, 
-					Light::LT_POINT, Light::LT_POINT, 
-					Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL 
+				Light::LT_DIRECTIONAL, Light::LT_DIRECTIONAL 
 			};
 
 			// load hardware extrusion programs for point & dir lights
@@ -680,11 +852,9 @@ namespace Ogre {
 			{
 				syntax = "vs_1_1";
 			}
-			else if (
-                        (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0"))
-                     || (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1"))
-                     || (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
-                    )
+			else if (GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0")
+                  || GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_1")
+                  || GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
 			{
 				syntax = "vs_4_0";
 			}
@@ -698,9 +868,9 @@ namespace Ogre {
 			}
 			else
 			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
 					"Vertex programs are supposedly supported, but neither "
-					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
+					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.",
 					"SceneManager::initShadowVolumeMaterials");
 			}
 			// Create all programs
@@ -712,52 +882,39 @@ namespace Ogre {
 				{
 					if (syntax == "vs_4_0")
 					{
-						HighLevelGpuProgramPtr vp = 
+						HighLevelGpuProgramPtr vp =
 							HighLevelGpuProgramManager::getSingleton().createProgram(
 							programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 							"hlsl", GPT_VERTEX_PROGRAM);
 						vp->setSource(ShadowVolumeExtrudeProgram::getProgramSource(
-							vertexProgramLightTypes[v], syntax, 
+							vertexProgramLightTypes[v], syntax,
 							vertexProgramFinite[v], vertexProgramDebug[v]));
 
-                        String targetSuffix = "s_4_0";
-                        if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0") == false)
-                        {
-                            if(GpuProgramManager::getSingleton().isSyntaxSupported("vs_4_0_level_9_3"))
-                            {
-                                targetSuffix = "s_4_0_level_9_3";
-                            }
-                            else
-                            {
-                                targetSuffix = "s_4_0_level_9_1";
-                            }
-                        }
-
-						vp->setParameter("target", "v" + targetSuffix);
-						vp->setParameter("entry_point", "vs_main");			
+						vp->setParameter("target", "vs_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
+						vp->setParameter("entry_point", "vs_main");
 						vp->load();
 
 						if (frgProgramName.empty())
 						{
 							frgProgramName = "Ogre/ShadowFrgProgram";
-							HighLevelGpuProgramPtr fp = 
+							HighLevelGpuProgramPtr fp =
 								HighLevelGpuProgramManager::getSingleton().createProgram(
 								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"hlsl", GPT_FRAGMENT_PROGRAM);
 							fp->setSource(mGeneralFs_4_0);
-							fp->setParameter("target", "p" + targetSuffix);
-							fp->setParameter("entry_point", "fs_main");			
+							fp->setParameter("target", "ps_4_0_level_9_1"); // shared subset, to be usable from microcode cache on all devices
+							fp->setParameter("entry_point", "fs_main");
 							fp->load();
 						}
 					}
 					else if (syntax == "glsles")
 					{
-						HighLevelGpuProgramPtr vp = 
+						HighLevelGpuProgramPtr vp =
 							HighLevelGpuProgramManager::getSingleton().createProgram(
 							programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 							"glsles", GPT_VERTEX_PROGRAM);
 						vp->setSource(ShadowVolumeExtrudeProgram::getProgramSource(
-							vertexProgramLightTypes[v], syntax, 
+							vertexProgramLightTypes[v], syntax,
 							vertexProgramFinite[v], vertexProgramDebug[v]));
 						vp->setParameter("target", syntax);
 						vp->load();
@@ -765,7 +922,7 @@ namespace Ogre {
 						if (frgProgramName.empty())
 						{
 							frgProgramName = "Ogre/ShadowFrgProgram";
-							HighLevelGpuProgramPtr fp = 
+							HighLevelGpuProgramPtr fp =
 								HighLevelGpuProgramManager::getSingleton().createProgram(
 								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 								"glsles", GPT_FRAGMENT_PROGRAM);
@@ -776,23 +933,23 @@ namespace Ogre {
 					}
 					else if (syntax == "glsl")
 					{
-						HighLevelGpuProgramPtr vp = 
-                        HighLevelGpuProgramManager::getSingleton().createProgram(
-                             programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                             "glsl", GPT_VERTEX_PROGRAM);
+						HighLevelGpuProgramPtr vp =
+							HighLevelGpuProgramManager::getSingleton().createProgram(
+							programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+							"glsl", GPT_VERTEX_PROGRAM);
 						vp->setSource(ShadowVolumeExtrudeProgram::getProgramSource(
-                               vertexProgramLightTypes[v], syntax, 
-                               vertexProgramFinite[v], vertexProgramDebug[v]));
+							vertexProgramLightTypes[v], syntax,
+							vertexProgramFinite[v], vertexProgramDebug[v]));
 						vp->setParameter("target", syntax);
 						vp->load();
-                        
+
 						if (frgProgramName.empty())
 						{
 							frgProgramName = "Ogre/ShadowFrgProgram";
-							HighLevelGpuProgramPtr fp = 
-                            HighLevelGpuProgramManager::getSingleton().createProgram(
-                                 frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
-                                 "glsl", GPT_FRAGMENT_PROGRAM);
+							HighLevelGpuProgramPtr fp =
+								HighLevelGpuProgramManager::getSingleton().createProgram(
+								frgProgramName, ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
+								"glsl", GPT_FRAGMENT_PROGRAM);
 							fp->setSource(mGeneralFs_glsl);
 							fp->setParameter("target", "glsl");
 							fp->load();
@@ -800,19 +957,21 @@ namespace Ogre {
 					}
 					else
 					{
-						GpuProgramPtr vp = 
+						GpuProgramPtr vp =
 							GpuProgramManager::getSingleton().createProgramFromString(
 							programNames[v], ResourceGroupManager::INTERNAL_RESOURCE_GROUP_NAME,
 							ShadowVolumeExtrudeProgram::getProgramSource(
-							vertexProgramLightTypes[v], syntax, 
+							vertexProgramLightTypes[v], syntax,
 							vertexProgramFinite[v], vertexProgramDebug[v]),
 							GPT_VERTEX_PROGRAM, syntax);
 						vp->load();
 					}
 				}
 			}
-			mInitialised = true;
-		}
+
+			initialiseModulationPassPrograms();
+            mInitialised = true;
+        }
     }
     //---------------------------------------------------------------------
     void ShadowVolumeExtrudeProgram::shutdown(void)
@@ -825,11 +984,12 @@ namespace Ogre {
                 GpuProgramManager::getSingleton().remove(programNames[v]);
             }
             mInitialised = false;
+			frgProgramName = "";
         }
     }
     //---------------------------------------------------------------------
     const String& ShadowVolumeExtrudeProgram::getProgramSource(
-        Light::LightTypes lightType, const String syntax, bool finite, bool debug)
+        Light::LightTypes lightType, const String &syntax, bool finite, bool debug)
     {
         if (lightType == Light::LT_DIRECTIONAL)
         {
@@ -837,135 +997,64 @@ namespace Ogre {
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderArbvp1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderArbvp1Finite();
-                    }
+                    return debug ? getDirectionalLightExtruderArbvp1FiniteDebug() : getDirectionalLightExtruderArbvp1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderArbvp1Debug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderArbvp1();
-                    }
+                    return debug ? getDirectionalLightExtruderArbvp1Debug() : getDirectionalLightExtruderArbvp1();
                 }
             } 
             else if (syntax == "vs_1_1")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_1_1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_1_1Finite();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_1_1FiniteDebug() : getDirectionalLightExtruderVs_1_1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_1_1Debug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_1_1();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_1_1Debug() : getDirectionalLightExtruderVs_1_1();
                 }
             }
-			else if (syntax == "vs_4_0")
-			{
-				if (finite)
-				{
-					if (debug)
-					{
-						return getDirectionalLightExtruderVs_4_0FiniteDebug();
-					}
-					else
-					{
-						return getDirectionalLightExtruderVs_4_0Finite();
-					}
+            else if (syntax == "vs_4_0")
+            {
+                if (finite)
+                {
+					return debug ? getDirectionalLightExtruderVs_4_0FiniteDebug() : getDirectionalLightExtruderVs_4_0Finite();
 				}
 				else
 				{
-					if (debug)
-					{
-						return getDirectionalLightExtruderVs_4_0Debug();
-					}
-					else
-					{
-						return getDirectionalLightExtruderVs_4_0();
-					}
+					return debug ? getDirectionalLightExtruderVs_4_0Debug() : getDirectionalLightExtruderVs_4_0();
 				}
 			}
             else if (syntax == "glsl")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslFiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glslFinite();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslFiniteDebug() : getDirectionalLightExtruderVs_glslFinite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glsl();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslDebug() : getDirectionalLightExtruderVs_glsl();
                 }
             }
             else if (syntax == "glsles")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslesFiniteDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glslesFinite();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslesFiniteDebug() : getDirectionalLightExtruderVs_glslesFinite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getDirectionalLightExtruderVs_glslesDebug();
-                    }
-                    else
-                    {
-                        return getDirectionalLightExtruderVs_glsles();
-                    }
+                    return debug ? getDirectionalLightExtruderVs_glslesDebug() : getDirectionalLightExtruderVs_glsles();
                 }
             }
-			else
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Vertex programs are supposedly supported, but neither "
-					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
-					"SceneManager::getProgramSource");
-			}
-
+            else
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Vertex programs are supposedly supported, but neither "
+                    "arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
+                    "SceneManager::getProgramSource");
+            }
         }
         else
         {
@@ -973,135 +1062,64 @@ namespace Ogre {
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderArbvp1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderArbvp1Finite();
-                    }
+                    return debug ? getPointLightExtruderArbvp1FiniteDebug() : getPointLightExtruderArbvp1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderArbvp1Debug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderArbvp1();
-                    }
+                    return debug ? getPointLightExtruderArbvp1Debug() : getPointLightExtruderArbvp1();
                 }
             }
             else if (syntax == "vs_1_1")
             {
                 if (finite)
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_1_1FiniteDebug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_1_1Finite();
-                    }
+                    return debug ? getPointLightExtruderVs_1_1FiniteDebug() : getPointLightExtruderVs_1_1Finite();
                 }
                 else
                 {
-                    if (debug)
-                    {
-                        return getPointLightExtruderVs_1_1Debug();
-                    }
-                    else
-                    {
-                        return getPointLightExtruderVs_1_1();
-                    }
+                    return debug ? getPointLightExtruderVs_1_1Debug() : getPointLightExtruderVs_1_1();
                 }
             }
-			else if (syntax == "vs_4_0")
-			{
-				if (finite)
-				{
-					if (debug)
-					{
-						return getPointLightExtruderVs_4_0FiniteDebug();
-					}
-					else
-					{
-						return getPointLightExtruderVs_4_0Finite();
-					}
+            else if (syntax == "vs_4_0")
+            {
+                if (finite)
+                {
+					return debug ? getPointLightExtruderVs_4_0FiniteDebug() : getPointLightExtruderVs_4_0Finite();
 				}
 				else
 				{
-					if (debug)
-					{
-						return getPointLightExtruderVs_4_0Debug();
-					}
-					else
-					{
-						return getPointLightExtruderVs_4_0();
-					}
+					return debug ? getPointLightExtruderVs_4_0Debug() : getPointLightExtruderVs_4_0();
 				}
 			}
-			else if (syntax == "glsl")
-			{
-				if (finite)
-				{
-					if (debug)
-					{
-						return getPointLightExtruderVs_glslFiniteDebug();
-					}
-					else
-					{
-						return getPointLightExtruderVs_glslFinite();
-					}
+            else if (syntax == "glsl")
+            {
+                if (finite)
+                {
+					return debug ? getPointLightExtruderVs_glslFiniteDebug() : getPointLightExtruderVs_glslFinite();
 				}
 				else
 				{
-					if (debug)
-					{
-						return getPointLightExtruderVs_glslDebug();
-					}
-					else
-					{
-						return getPointLightExtruderVs_glsl();
-					}
+					return debug ? getPointLightExtruderVs_glslDebug() : getPointLightExtruderVs_glsl();
 				}
 			}
-			else if (syntax == "glsles")
-			{
-				if (finite)
-				{
-					if (debug)
-					{
-						return getPointLightExtruderVs_glslesFiniteDebug();
-					}
-					else
-					{
-						return getPointLightExtruderVs_glslesFinite();
-					}
+            else if (syntax == "glsles")
+            {
+                if (finite)
+                {
+					return debug ? getPointLightExtruderVs_glslesFiniteDebug() : getPointLightExtruderVs_glslesFinite();
 				}
 				else
 				{
-					if (debug)
-					{
-						return getPointLightExtruderVs_glslesDebug();
-					}
-					else
-					{
-						return getPointLightExtruderVs_glsles();
-					}
+					return debug ? getPointLightExtruderVs_glslesDebug() : getPointLightExtruderVs_glsles();
 				}
 			}
-			else
-			{
-				OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
-					"Vertex programs are supposedly supported, but neither "
-					"arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
-					"SceneManager::getProgramSource");
-			}
-
+            else
+            {
+                OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, 
+                    "Vertex programs are supposedly supported, but neither "
+                    "arbvp1, glsl, glsles, vs_1_1 nor vs_4_0 syntaxes are present.", 
+                    "SceneManager::getProgramSource");
+            }
         }
     }
     //---------------------------------------------------------------------
@@ -1112,54 +1130,24 @@ namespace Ogre {
         {
             if (finite)
             {
-                if (debug)
-                {
-                    return programNames[DIRECTIONAL_LIGHT_FINITE_DEBUG];
-                }
-                else
-                {
-                    return programNames[DIRECTIONAL_LIGHT_FINITE];
-                }
+                return programNames[debug ? DIRECTIONAL_LIGHT_FINITE_DEBUG : DIRECTIONAL_LIGHT_FINITE];
             }
             else
             {
-                if (debug)
-                {
-                    return programNames[DIRECTIONAL_LIGHT_DEBUG];
-                }
-                else
-                {
-                    return programNames[DIRECTIONAL_LIGHT];
-                }
+                return programNames[debug ? DIRECTIONAL_LIGHT_DEBUG : DIRECTIONAL_LIGHT];
             }
         }
         else
         {
             if (finite)
             {
-                if (debug)
-                {
-                    return programNames[POINT_LIGHT_FINITE_DEBUG];
-                }
-                else
-                {
-                    return programNames[POINT_LIGHT_FINITE];
-                }
+                return programNames[debug ? POINT_LIGHT_FINITE_DEBUG : POINT_LIGHT_FINITE];
             }
             else
             {
-                if (debug)
-                {
-                    return programNames[POINT_LIGHT_DEBUG];
-                }
-                else
-                {
-                    return programNames[POINT_LIGHT];
-                }
+                return programNames[debug ? POINT_LIGHT_DEBUG : POINT_LIGHT];
             }
         }
     }
-
-
 
 }

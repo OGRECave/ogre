@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreGL3PlusPrerequisites.h"
 #include "OgreRenderWindow.h"
 #include "OgreConfigOptionMap.h"
+#include "OgreRenderSystemCapabilities.h"
 
 namespace Ogre
 {
@@ -78,7 +79,7 @@ namespace Ogre
             /**
             * Get version information
             */
-            const String& getGLVersion(void) const
+            const DriverVersion& getGLVersion(void) const
             {
                 return mVersion;
             }
@@ -116,9 +117,9 @@ namespace Ogre
             }
 
             /**
-            * Compare GL version numbers
+            * Check if GL Version is supported
             */
-            bool checkMinGLVersion(const String& v) const;
+            bool hasMinGLVersion(int major, int minor) const;
 
             /**
             * Get the address of a function
@@ -151,7 +152,8 @@ namespace Ogre
             virtual void stop() = 0;
 
         private:
-            String mVersion;
+            DriverVersion mVersion;
+
             String mVendor;
             String mShaderCachePath;
             String mShaderLibraryPath;

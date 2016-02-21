@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,29 +30,34 @@ THE SOFTWARE.
 #include "OgreVertexIndexData.h"
 #include "OgreEdgeListBuilder.h"
 
-// Register the suite
-CPPUNIT_TEST_SUITE_REGISTRATION( EdgeBuilderTests );
+#include "UnitTestSuite.h"
 
+// Register the test suite
+CPPUNIT_TEST_SUITE_REGISTRATION(EdgeBuilderTests);
+
+//--------------------------------------------------------------------------
 void EdgeBuilderTests::setUp()
 {
-    mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
-    mLogMgr = OGRE_NEW LogManager();
-    LogManager::getSingleton().createLog("EdgeBuilderTests.log", true);
-    LogManager::getSingleton().setLogDetail(LL_LOW);
+   UnitTestSuite::getSingletonPtr()->startTestSetup(__FUNCTION__);
+   
+   mBufMgr = OGRE_NEW DefaultHardwareBufferManager();
 }
+//--------------------------------------------------------------------------
 void EdgeBuilderTests::tearDown()
 {
     OGRE_DELETE mBufMgr;
-    OGRE_DELETE mLogMgr;
 }
-
+//--------------------------------------------------------------------------
 void EdgeBuilderTests::testSingleIndexBufSingleVertexBuf()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     /* This tests the edge builders ability to find shared edges in the simple case
     of a single index buffer referencing a single vertex buffer
     */
     VertexData vd;
     IndexData id;
+
     // Test pyramid
     vd.vertexCount = 4;
     vd.vertexStart = 0;
@@ -85,24 +90,25 @@ void EdgeBuilderTests::testSingleIndexBufSingleVertexBuf()
 
     // Should be only one group, since only one vertex buffer
     CPPUNIT_ASSERT(edgeData->edgeGroups.size() == 1);
-    // 4 tris
+    // 4 triangles
     CPPUNIT_ASSERT(edgeData->triangles.size() == 4);
     EdgeData::EdgeGroup& eg = edgeData->edgeGroups[0];
     // 6 edges
     CPPUNIT_ASSERT(eg.edges.size() == 6);
 
     delete edgeData;
-
-
 }
-
+//--------------------------------------------------------------------------
 void EdgeBuilderTests::testMultiIndexBufSingleVertexBuf()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     /* This tests the edge builders ability to find shared edges when there are
     multiple index sets (submeshes) using a single vertex buffer.
     */
     VertexData vd;
     IndexData id[4];
+
     // Test pyramid
     vd.vertexCount = 4;
     vd.vertexStart = 0;
@@ -159,27 +165,27 @@ void EdgeBuilderTests::testMultiIndexBufSingleVertexBuf()
 
     // Should be only one group, since only one vertex buffer
     CPPUNIT_ASSERT(edgeData->edgeGroups.size() == 1);
-    // 4 tris
+    // 4 triangles
     CPPUNIT_ASSERT(edgeData->triangles.size() == 4);
     EdgeData::EdgeGroup& eg = edgeData->edgeGroups[0];
     // 6 edges
     CPPUNIT_ASSERT(eg.edges.size() == 6);
 
     delete edgeData;
-
-
 }
-
-
+//--------------------------------------------------------------------------
 void EdgeBuilderTests::testMultiIndexBufMultiVertexBuf()
 {
+    UnitTestSuite::getSingletonPtr()->startTestMethod(__FUNCTION__);
+
     /* This tests the edge builders ability to find shared edges when there are
     both multiple index sets (submeshes) each using a different vertex buffer
-    (not using shared geoemtry).
+    (not using shared geometry).
     */
 
     VertexData vd[4];
     IndexData id[4];
+
     // Test pyramid
     vd[0].vertexCount = 3;
     vd[0].vertexStart = 0;
@@ -274,7 +280,7 @@ void EdgeBuilderTests::testMultiIndexBufMultiVertexBuf()
 
     // Should be 4 groups
     CPPUNIT_ASSERT(edgeData->edgeGroups.size() == 4);
-    // 4 tris
+    // 4 triangles
     CPPUNIT_ASSERT(edgeData->triangles.size() == 4);
     // 6 edges in total
     CPPUNIT_ASSERT(
@@ -285,6 +291,5 @@ void EdgeBuilderTests::testMultiIndexBufMultiVertexBuf()
                     == 6);
 
     delete edgeData;
-
-
 }
+//--------------------------------------------------------------------------

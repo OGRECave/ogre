@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,18 +30,95 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
+#ifndef __has_builtin
+    // Compatibility with non-clang compilers
+    #define __has_builtin(x) 0
+#endif
+
 namespace Ogre {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup Math
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup Math
+    *  @{
+    */
 
     /** Class for manipulating bit patterns.
     */
     class Bitwise {
     public:
+        /** Returns value with reversed bytes order.
+        */
+        static FORCEINLINE uint16 bswap16(uint16 arg)
+        {
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
+            return _byteswap_ushort(arg);
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap16)) || (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 480)
+            return __builtin_bswap16(arg);
+#else
+            return ((arg << 8) & 0xFF00) | ((arg >> 8) & 0x00FF);
+#endif
+        }
+        /** Returns value with reversed bytes order.
+        */
+        static FORCEINLINE uint32 bswap32(uint32 arg)
+        {
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
+            return _byteswap_ulong(arg);
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap32)) || (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 430)
+            return __builtin_bswap32(arg);
+#else
+            return ((arg & 0x000000FF) << 24) | ((arg & 0x0000FF00) << 8) | ((arg >> 8) & 0x0000FF00) | ((arg >> 24) & 0x000000FF);
+#endif
+        }
+        /** Returns value with reversed bytes order.
+        */
+        static FORCEINLINE uint64 bswap64(uint64 arg)
+        {
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
+            return _byteswap_uint64(arg);
+#elif (OGRE_COMPILER == OGRE_COMPILER_CLANG && __has_builtin(__builtin_bswap64)) || (OGRE_COMPILER == OGRE_COMPILER_GNUC && OGRE_COMP_VER >= 430)
+            return __builtin_bswap64(arg);
+#else
+            union { 
+                uint64 sv;
+                uint32 ul[2];
+            } tmp, result;
+            tmp.sv = arg;
+            result.ul[0] = bswap32(tmp.ul[1]);
+            result.ul[1] = bswap32(tmp.ul[0]);
+            return result.sv; 
+#endif
+        }
+
+        /** Reverses byte order of buffer. Use bswap16/32/64 instead if possible.
+        */
+        static inline void bswapBuffer(void * pData, size_t size)
+        {
+            char swapByte;
+            for(char *p0 = (char*)pData, *p1 = p0 + size - 1; p0 < p1; ++p0, --p1)
+            {
+                swapByte = *p0;
+                *p0 = *p1;
+                *p1 = swapByte;
+            }
+        }
+        /** Reverses byte order of chunks in buffer, where 'size' is size of one chunk.
+        */
+        static inline void bswapChunks(void * pData, size_t size, size_t count)
+        {
+            for(size_t c = 0; c < count; ++c)
+            {
+                char swapByte;
+                for(char *p0 = (char*)pData + c * size, *p1 = p0 + size - 1; p0 < p1; ++p0, --p1)
+                {
+                    swapByte = *p0;
+                    *p0 = *p1;
+                    *p1 = swapByte;
+                }
+            }
+        }
+
         /** Returns the most significant bit set in a value.
         */
         static FORCEINLINE unsigned int mostSignificantBitSet(unsigned int value)
@@ -79,46 +156,46 @@ namespace Ogre {
         /** Returns the number of bits a pattern must be shifted right by to
             remove right-hand zeros.
         */
-		template<typename T>
+        template<typename T>
         static FORCEINLINE unsigned int getBitShift(T mask)
-		{
-			if (mask == 0)
-				return 0;
+        {
+            if (mask == 0)
+                return 0;
 
-			unsigned int result = 0;
-			while ((mask & 1) == 0) {
-				++result;
-				mask >>= 1;
-			}
-			return result;
-		}
+            unsigned int result = 0;
+            while ((mask & 1) == 0) {
+                ++result;
+                mask >>= 1;
+            }
+            return result;
+        }
 
         /** Takes a value with a given src bit mask, and produces another
             value with a desired bit mask.
             @remarks
                 This routine is useful for colour conversion.
         */
-		template<typename SrcT, typename DestT>
+        template<typename SrcT, typename DestT>
         static inline DestT convertBitPattern(SrcT srcValue, SrcT srcBitMask, DestT destBitMask)
-		{
-			// Mask off irrelevant source value bits (if any)
-			srcValue = srcValue & srcBitMask;
+        {
+            // Mask off irrelevant source value bits (if any)
+            srcValue = srcValue & srcBitMask;
 
-			// Shift source down to bottom of DWORD
-			const unsigned int srcBitShift = getBitShift(srcBitMask);
-			srcValue >>= srcBitShift;
+            // Shift source down to bottom of DWORD
+            const unsigned int srcBitShift = getBitShift(srcBitMask);
+            srcValue >>= srcBitShift;
 
-			// Get max value possible in source from srcMask
-			const SrcT srcMax = srcBitMask >> srcBitShift;
+            // Get max value possible in source from srcMask
+            const SrcT srcMax = srcBitMask >> srcBitShift;
 
-			// Get max available in dest
-			const unsigned int destBitShift = getBitShift(destBitMask);
-			const DestT destMax = destBitMask >> destBitShift;
+            // Get max available in dest
+            const unsigned int destBitShift = getBitShift(destBitMask);
+            const DestT destMax = destBitMask >> destBitShift;
 
-			// Scale source value into destination, and shift back
-			DestT destValue = (srcValue * destMax) / srcMax;
-			return (destValue << destBitShift);
-		}
+            // Scale source value into destination, and shift back
+            DestT destValue = (srcValue * destMax) / srcMax;
+            return (destValue << destBitShift);
+        }
 
         /**
          * Convert N bit colour channel value to P bits. It fills P bits with the
@@ -217,7 +294,7 @@ namespace Ogre {
         }
 
         /** Convert a float32 to a float16 (NV_half_float)
-         	Courtesy of OpenEXR
+            Courtesy of OpenEXR
         */
         static inline uint16 floatToHalf(float i)
         {
@@ -225,8 +302,8 @@ namespace Ogre {
             v.f = i;
             return floatToHalfI(v.i);
         }
-		/** Converts float in uint32 format to a a half in uint16 format
-		*/
+        /** Converts float in uint32 format to a a half in uint16 format
+        */
         static inline uint16 floatToHalfI(uint32 i)
         {
             register int s =  (i >> 16) & 0x00008000;
@@ -276,9 +353,9 @@ namespace Ogre {
             v.i = halfToFloatI(y);
             return v.f;
         }
-		/** Converts a half in uint16 format to a float
-		 	in uint32 format
-		 */
+        /** Converts a half in uint16 format to a float
+            in uint32 format
+         */
         static inline uint32 halfToFloatI(uint16 y)
         {
             register int s = (y >> 15) & 0x00000001;
@@ -323,8 +400,8 @@ namespace Ogre {
          
 
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

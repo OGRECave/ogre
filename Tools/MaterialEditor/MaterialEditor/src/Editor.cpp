@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,13 @@ THE SOFTWARE.
 Editor::Editor()
 : mEditorInput(NULL), mName("Editor")
 {
-	registerEvents();
+    registerEvents();
 }
 
 Editor::Editor(EditorInput* input)
 : mEditorInput(input)
 {
-	registerEvents();
+    registerEvents();
 }
 
 Editor::~Editor()
@@ -50,124 +50,124 @@ Editor::~Editor()
 
 wxControl* Editor::getControl() const
 {
-	return mControl;
+    return mControl;
 }
 
 void Editor::setControl(wxControl* control)
 {
-	mControl = control;
+    mControl = control;
 }
 
 void Editor::registerEvents()
 {
-	registerEvent(NameChanged);
-	registerEvent(DirtyStateChanged);
+    registerEvent(NameChanged);
+    registerEvent(DirtyStateChanged);
 }
 
 
 EditorInput* Editor::getEditorInput() const
 {
-	return mEditorInput;
+    return mEditorInput;
 }
 
 void Editor::setEditorInput(EditorInput* input)
 {
-	mEditorInput = input;
+    mEditorInput = input;
 }
 
 EditorContributor* Editor::getEditorContributor() const
 {
-	return NULL;
+    return NULL;
 }
 
 const wxString& Editor::getName() const
 {
-	return mName;
+    return mName;
 }
 
 void Editor::setName(const wxString& name)
 {
-	mName = name;
+    mName = name;
 
-	fireEvent(NameChanged, EditorEventArgs(this));
+    fireEvent(NameChanged, EditorEventArgs(this));
 }
 
 void Editor::activate()
 {
-	// Do nothing
+    // Do nothing
 }
 
 void Editor::deactivate()
 {
-	// Do nothing
+    // Do nothing
 }
 
 bool Editor::isDirty()
 {
-	return false;
+    return false;
 }
 
 void Editor::save()
 {
-	// Do nothing
+    // Do nothing
 }
 
 void Editor::saveAs()
 {
-	// Do nothing
+    // Do nothing
 }
 
 bool Editor::isSaveAsAllowed()
 {
-	return false;
+    return false;
 }
 
 bool Editor::isRedoable()
 {
-	return false;
+    return false;
 }
 
 void Editor::redo()
 {
-	// Do nothing
+    // Do nothing
 }
 
 bool Editor::isUndoable()
 {
-	return false;
+    return false;
 }
 
 void Editor::undo()
 {
-	// Do nothing
+    // Do nothing
 }
 
 bool Editor::isCuttable()
 {
-	return false;
+    return false;
 }
 
 void Editor::cut()
 {
-	// Do nothing
+    // Do nothing
 }
 
 bool Editor::isCopyable()
 {
-	return false;
+    return false;
 }
 
 void Editor::copy()
 {
-	// Do nothing
+    // Do nothing
 }
 
 bool Editor::isPastable()
 {
-	return false;
+    return false;
 }
 
 void Editor::paste()
 {
-	// Do nothing
+    // Do nothing
 }

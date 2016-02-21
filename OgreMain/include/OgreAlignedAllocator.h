@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,21 +28,17 @@ THE SOFTWARE.
 #ifndef __AlignedAllocator_H__
 #define __AlignedAllocator_H__
 
-// Now we're only including this within OgreMemoryAllocatorConfig.h which is already in
-// the prerequisites header (circlar reference)
-//#include "OgrePrerequisites.h"
-
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
 
-	/** \addtogroup Memory
-	*  @{
-	*/
+    /** \addtogroup Memory
+    *  @{
+    */
 
-	/** Class to provide aligned memory allocate functionality.
+    /** Class to provide aligned memory allocate functionality.
     @remarks
         All SIMD processing are friendly with aligned memory, and some SIMD routines
         are designed for working with aligned memory only. If the data are intended to
@@ -60,9 +56,9 @@ namespace Ogre {
     @note
         This class intended to use by advanced user only.
     */
-	class _OgreExport AlignedMemory
-	{
-	public:
+    class _OgreExport AlignedMemory
+    {
+    public:
         /** Allocate memory with given alignment.
             @param
                 size The size of memory need to allocate.
@@ -97,10 +93,10 @@ namespace Ogre {
                 On <b>NULL</b> pointer, nothing happen.
         */
         static void deallocate(void* p);
-	};
+    };
 
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 }
 

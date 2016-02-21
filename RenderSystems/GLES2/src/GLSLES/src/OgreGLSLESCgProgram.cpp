@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -87,7 +87,7 @@ namespace Ogre {
         "blendIndices"
     };
     //-----------------------------------------------------------------------
-	//-----------------------------------------------------------------------
+    //-----------------------------------------------------------------------
     GLSLESCgProgram::GLSLESCgProgram(ResourceManager* creator, 
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
@@ -373,15 +373,11 @@ namespace Ogre {
         // set the user attribute to be ogre's
         Hlsl2Glsl_SetUserAttributeNames (parser, gAttribSemantic, gAttribString, gNumberOfAttribSemantic);
 
-        // we want user varyings in this case (and not opengl's)
-        Hlsl2Glsl_UseUserVaryings(parser, true);
-
-
         int res = 0;
         // parse the file
-        res = Hlsl2Glsl_Parse (parser, sourceToUse.c_str(), options);
+        res = Hlsl2Glsl_Parse(parser, sourceToUse.c_str(), ETargetGLSL_ES_100, nullptr, options);
         // convert from cg to glsl
-        res = res && Hlsl2Glsl_Translate( parser,  mEntryPoint.c_str(), options);
+        res = res && Hlsl2Glsl_Translate(parser,  mEntryPoint.c_str(), ETargetGLSL_ES_100, options);
 
         // check for error
         if (res == 0)

@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ namespace Ogre {
         /// Rendering loop control
         bool mStopRendering;
 
-        typedef HashMap<GLenum, GLuint>  BindBufferMap;
+        typedef OGRE_HashMap<GLenum, GLuint>  BindBufferMap;
 
         /// View matrix to set world against
         Matrix4 mViewMatrix;
@@ -76,6 +76,8 @@ namespace Ogre {
         /// Holds texture type settings for every stage
         GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
+        GLfloat mLargestSupportedAnisotropy;
+
         /// Number of fixed-function texture units
         unsigned short mFixedFunctionTextureUnits;
 
@@ -86,6 +88,9 @@ namespace Ogre {
 
         /// Store last depth write state
         bool mDepthWrite;
+
+        /// Store last scissor enable state
+        bool mScissorsEnabled;
 
         /// Store last stencil mask state
         uint32 mStencilWriteMask;
@@ -128,10 +133,21 @@ namespace Ogre {
         /// Check if the GL system has already been initialised
         bool mGLInitialised;
 
+        // check if GL 4.3 is supported
+        bool mHasGL43;
+
+        // check if GL 3.2 is supported
+        bool mHasGL32;
+
         // local data members of _render that were moved here to improve performance
         // (save allocations)
         vector<GLuint>::type mRenderAttribsBound;
         vector<GLuint>::type mRenderInstanceAttribsBound;
+
+#if OGRE_NO_QUAD_BUFFER_STEREO == 0
+		/// @copydoc RenderSystem::setDrawBuffer
+		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+#endif
 
         /**
             Cache the polygon mode value
@@ -171,6 +187,10 @@ namespace Ogre {
             RenderSystem
         */
         const String& getName(void) const;
+        /** See
+            RenderSystem
+        */
+            const String& getFriendlyName(void) const;
         /** See
             RenderSystem
         */
@@ -291,6 +311,26 @@ namespace Ogre {
         */
         void _setPointSpritesEnabled(bool enabled);
         /** See
+         RenderSystem
+         */
+        void _setVertexTexture(size_t unit, const TexturePtr &tex);
+        /** See
+         RenderSystem
+         */
+        void _setGeometryTexture(size_t unit, const TexturePtr &tex);
+        /** See
+         RenderSystem
+         */
+        void _setComputeTexture(size_t unit, const TexturePtr &tex);
+        /** See
+         RenderSystem
+         */
+        void _setTesselationHullTexture(size_t unit, const TexturePtr &tex);
+        /** See
+         RenderSystem
+         */
+        void _setTesselationDomainTexture(size_t unit, const TexturePtr &tex);
+        /** See
             RenderSystem
         */
         void _setTexture(size_t unit, bool enabled, const TexturePtr &tex);
@@ -366,7 +406,7 @@ namespace Ogre {
         /** See
             RenderSystem
         */
-        void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end);
+        void _setFog(FogMode mode, const ColourValue& colour, Real density, Real start, Real end) {}
         /** See
             RenderSystem
         */
@@ -416,7 +456,8 @@ namespace Ogre {
                                     StencilOperation stencilFailOp = SOP_KEEP,
                                     StencilOperation depthFailOp = SOP_KEEP,
                                     StencilOperation passOp = SOP_KEEP,
-                                    bool twoSidedOperation = false);
+                    bool twoSidedOperation = false,
+                    bool readBackAsTexture = false);
         /** See
             RenderSystem
         */

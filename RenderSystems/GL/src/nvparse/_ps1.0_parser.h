@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -79,14 +79,14 @@ THE SOFTWARE.
 #if ! defined (YYSTYPE) && ! defined (YYSTYPE_IS_DECLARED)
 #line 43 "ps1.0_grammar.y"
 typedef union YYSTYPE {
-	int ival;
-	float fval;
-	
-	string * sval;
-	constdef * cdef;
-	vector<constdef> * consts;
-	vector<string> * line;
-	list<vector<string> > * lines;
+    int ival;
+    float fval;
+    
+    string * sval;
+    constdef * cdef;
+    vector<constdef> * consts;
+    vector<string> * line;
+    list<vector<string> > * lines;
 } YYSTYPE;
 /* Line 1240 of yacc.c.  */
 #line 65 "_ps1.0_parser.h"

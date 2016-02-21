@@ -54,15 +54,15 @@
 /* yyunput is never used */
 #define YY_NO_UNPUT
 
-#else	/* ! __cplusplus */
+#else   /* ! __cplusplus */
 
 #if __STDC__
 
 #define YY_USE_PROTOS
 #define YY_USE_CONST
 
-#endif	/* __STDC__ */
-#endif	/* ! __cplusplus */
+#endif  /* __STDC__ */
+#endif  /* ! __cplusplus */
 
 #ifdef __TURBOC__
  #pragma warn -rch
@@ -133,10 +133,10 @@ extern FILE *yyin, *yyout;
  * int a single C statement (which needs a semi-colon terminator).  This
  * avoids problems with code like:
  *
- * 	if ( condition_holds )
- *		yyless( 5 );
- *	else
- *		do_something_else();
+ *  if ( condition_holds )
+ *      yyless( 5 );
+ *  else
+ *      do_something_else();
  *
  * Prior to using the do-while the compiler would get upset at the
  * "else" because it interpreted the "if" statement as being all
@@ -146,15 +146,15 @@ extern FILE *yyin, *yyout;
 /* Return all but the first 'n' matched characters back to the input stream. */
 
 #define yyless(n) \
-	do \
-		{ \
-		/* Undo effects of setting up yytext. */ \
-		*yy_cp = yy_hold_char; \
-		YY_RESTORE_YY_MORE_OFFSET \
-		yy_c_buf_p = yy_cp = yy_bp + n - YY_MORE_ADJ; \
-		YY_DO_BEFORE_ACTION; /* set up yytext again */ \
-		} \
-	while ( 0 )
+    do \
+        { \
+        /* Undo effects of setting up yytext. */ \
+        *yy_cp = yy_hold_char; \
+        YY_RESTORE_YY_MORE_OFFSET \
+        yy_c_buf_p = yy_cp = yy_bp + n - YY_MORE_ADJ; \
+        YY_DO_BEFORE_ACTION; /* set up yytext again */ \
+        } \
+    while ( 0 )
 
 #define unput(c) yyunput( c, yytext_ptr )
 
@@ -166,61 +166,61 @@ typedef unsigned int yy_size_t;
 
 
 struct yy_buffer_state
-	{
-	FILE *yy_input_file;
+    {
+    FILE *yy_input_file;
 
-	char *yy_ch_buf;		/* input buffer */
-	char *yy_buf_pos;		/* current position in input buffer */
+    char *yy_ch_buf;        /* input buffer */
+    char *yy_buf_pos;       /* current position in input buffer */
 
-	/* Size of input buffer in bytes, not including room for EOB
-	 * characters.
-	 */
-	yy_size_t yy_buf_size;
+    /* Size of input buffer in bytes, not including room for EOB
+     * characters.
+     */
+    yy_size_t yy_buf_size;
 
-	/* Number of characters read into yy_ch_buf, not including EOB
-	 * characters.
-	 */
-	int yy_n_chars;
+    /* Number of characters read into yy_ch_buf, not including EOB
+     * characters.
+     */
+    int yy_n_chars;
 
-	/* Whether we "own" the buffer - i.e., we know we created it,
-	 * and can realloc() it to grow it, and should free() it to
-	 * delete it.
-	 */
-	int yy_is_our_buffer;
+    /* Whether we "own" the buffer - i.e., we know we created it,
+     * and can realloc() it to grow it, and should free() it to
+     * delete it.
+     */
+    int yy_is_our_buffer;
 
-	/* Whether this is an "interactive" input source; if so, and
-	 * if we're using stdio for input, then we want to use getc()
-	 * instead of fread(), to make sure we stop fetching input after
-	 * each newline.
-	 */
-	int yy_is_interactive;
+    /* Whether this is an "interactive" input source; if so, and
+     * if we're using stdio for input, then we want to use getc()
+     * instead of fread(), to make sure we stop fetching input after
+     * each newline.
+     */
+    int yy_is_interactive;
 
-	/* Whether we're considered to be at the beginning of a line.
-	 * If so, '^' rules will be active on the next match, otherwise
-	 * not.
-	 */
-	int yy_at_bol;
+    /* Whether we're considered to be at the beginning of a line.
+     * If so, '^' rules will be active on the next match, otherwise
+     * not.
+     */
+    int yy_at_bol;
 
-	/* Whether to try to fill the input buffer when we reach the
-	 * end of it.
-	 */
-	int yy_fill_buffer;
+    /* Whether to try to fill the input buffer when we reach the
+     * end of it.
+     */
+    int yy_fill_buffer;
 
-	int yy_buffer_status;
+    int yy_buffer_status;
 #define YY_BUFFER_NEW 0
 #define YY_BUFFER_NORMAL 1
-	/* When an EOF's been seen but there's still some text to process
-	 * then we mark the buffer as YY_EOF_PENDING, to indicate that we
-	 * shouldn't try reading from the input source any more.  We might
-	 * still have a bunch of tokens to match, though, because of
-	 * possible backing-up.
-	 *
-	 * When we actually see the EOF, we change the status to "new"
-	 * (via yyrestart()), so that the user can continue scanning by
-	 * just pointing yyin at a new input file.
-	 */
+    /* When an EOF's been seen but there's still some text to process
+     * then we mark the buffer as YY_EOF_PENDING, to indicate that we
+     * shouldn't try reading from the input source any more.  We might
+     * still have a bunch of tokens to match, though, because of
+     * possible backing-up.
+     *
+     * When we actually see the EOF, we change the status to "new"
+     * (via yyrestart()), so that the user can continue scanning by
+     * just pointing yyin at a new input file.
+     */
 #define YY_BUFFER_EOF_PENDING 2
-	};
+    };
 
 static YY_BUFFER_STATE yy_current_buffer = 0;
 
@@ -234,15 +234,15 @@ static YY_BUFFER_STATE yy_current_buffer = 0;
 /* yy_hold_char holds the character lost when yytext is formed. */
 static char yy_hold_char;
 
-static int yy_n_chars;		/* number of characters read into yy_ch_buf */
+static int yy_n_chars;      /* number of characters read into yy_ch_buf */
 
 
 int yyleng;
 
 /* Points to current character in buffer. */
 static char *yy_c_buf_p = (char *) 0;
-static int yy_init = 1;		/* whether we need to initialize */
-static int yy_start = 0;	/* start state number */
+static int yy_init = 1;     /* whether we need to initialize */
+static int yy_start = 0;    /* start state number */
 
 /* Flag which is used to allow yywrap()'s to do buffer switches
  * instead of setting up a fresh yyin.  A bit of a hack ...
@@ -272,18 +272,18 @@ static void yy_flex_free YY_PROTO(( void * ));
 #define yy_new_buffer yy_create_buffer
 
 #define yy_set_interactive(is_interactive) \
-	{ \
-	if ( ! yy_current_buffer ) \
-		yy_current_buffer = yy_create_buffer( yyin, YY_BUF_SIZE ); \
-	yy_current_buffer->yy_is_interactive = is_interactive; \
-	}
+    { \
+    if ( ! yy_current_buffer ) \
+        yy_current_buffer = yy_create_buffer( yyin, YY_BUF_SIZE ); \
+    yy_current_buffer->yy_is_interactive = is_interactive; \
+    }
 
 #define yy_set_bol(at_bol) \
-	{ \
-	if ( ! yy_current_buffer ) \
-		yy_current_buffer = yy_create_buffer( yyin, YY_BUF_SIZE ); \
-	yy_current_buffer->yy_at_bol = at_bol; \
-	}
+    { \
+    if ( ! yy_current_buffer ) \
+        yy_current_buffer = yy_create_buffer( yyin, YY_BUF_SIZE ); \
+    yy_current_buffer->yy_at_bol = at_bol; \
+    }
 
 #define YY_AT_BOL() (yy_current_buffer->yy_at_bol)
 
@@ -304,11 +304,11 @@ static void yy_fatal_error YY_PROTO(( yyconst char msg[] ));
  * corresponding action - sets up yytext.
  */
 #define YY_DO_BEFORE_ACTION \
-	yytext_ptr = yy_bp; \
-	yyleng = (int) (yy_cp - yy_bp); \
-	yy_hold_char = *yy_cp; \
-	*yy_cp = '\0'; \
-	yy_c_buf_p = yy_cp;
+    yytext_ptr = yy_bp; \
+    yyleng = (int) (yy_cp - yy_bp); \
+    yy_hold_char = *yy_cp; \
+    *yy_cp = '\0'; \
+    yy_c_buf_p = yy_cp;
 
 #define YY_NUM_RULES 72
 #define YY_END_OF_BUFFER 73
@@ -795,16 +795,16 @@ unsigned int FindSwizzleValue(char *swizzleText);
 
 
 enum ERROR_VALUES {
-	ERROR_NONE = 0,
-	ERROR_MEMORY_ALLOC,
-	ERROR_FILE_OPEN,
-	ERROR_UNSUCCESSFUL_ASSEMBLE,
-	ERROR_TOO_MANY_PARMS,
-	ERROR_DEST_WRITE,
-	ERROR_LIST_OPEN,
-	ERROR_DEST_OPEN,
-	ERROR_NO_ARGUMENTS,
-	ERROR_MACRO_OVERRUN
+    ERROR_NONE = 0,
+    ERROR_MEMORY_ALLOC,
+    ERROR_FILE_OPEN,
+    ERROR_UNSUCCESSFUL_ASSEMBLE,
+    ERROR_TOO_MANY_PARMS,
+    ERROR_DEST_WRITE,
+    ERROR_LIST_OPEN,
+    ERROR_DEST_OPEN,
+    ERROR_NO_ARGUMENTS,
+    ERROR_MACRO_OVERRUN
 };
 
 
@@ -815,14 +815,14 @@ unsigned int gLinesAssembled;
 
 #define YY_INPUT(buf,result,max_size) \
 { \
-	int c = *myin++; \
-	result = (c == 0) ? YY_NULL : (buf[0] = c, 1); \
+    int c = *myin++; \
+    result = (c == 0) ? YY_NULL : (buf[0] = c, 1); \
 }
 
 #define SAFEDELETEARRAY(x) if ((x) != NULL) \
-						delete [] (x)
+                        delete [] (x)
 #define SAFEFREE(x) if ((x) != NULL) \
-						free((x))
+                        free((x))
 
 #define MAXREPLACESTRING 255
 
@@ -837,10 +837,10 @@ void MacroAddFunction(char *, unsigned int *, char **);
 void MacroSubFunction(char *, unsigned int *, char **);
 
 MACROFUNCTIONS gMacroFunctions[] = { 
-	{ "inc(", MacroIncFunction },
-	{ "dec(", MacroDecFunction },
-	{ "add(", MacroAddFunction },
-	{ "sub(", MacroSubFunction }
+    { "inc(", MacroIncFunction },
+    { "dec(", MacroDecFunction },
+    { "add(", MacroAddFunction },
+    { "sub(", MacroSubFunction }
 };
 
 #define NUM_MACRO_FUNCTIONS (sizeof(gMacroFunctions) / sizeof(MACROFUNCTIONS))
@@ -848,19 +848,19 @@ MACROFUNCTIONS gMacroFunctions[] = {
 #define MAX_INCLUDE_DEPTH 1024
 typedef struct INCLUDEINFO
 {
-	char	*fileName;
-	unsigned int lineNo;
-	YY_BUFFER_STATE buffer;
-	MACROENTRY *lastInvokeMacro;				// save off in case nested macros.
-	MACROENTRY *lastParseMacro;				// recursive macros
-	MACROTEXT *lastMacroLineParse;			// save off for recursive lines of macros working on.
-	bool lastbInsideMacro;					// save off for recursive macros
-	bool lastbInsideDefine;					// save off for recursive macros/defines
-	bool lastbInsideInclude;
-	bool lastbProcessingIFDEF; 				// save off #define information
-//	FILE *fileHandle;
-	char *prevString;
-	char *nextString;
+    char    *fileName;
+    unsigned int lineNo;
+    YY_BUFFER_STATE buffer;
+    MACROENTRY *lastInvokeMacro;                // save off in case nested macros.
+    MACROENTRY *lastParseMacro;             // recursive macros
+    MACROTEXT *lastMacroLineParse;          // save off for recursive lines of macros working on.
+    bool lastbInsideMacro;                  // save off for recursive macros
+    bool lastbInsideDefine;                 // save off for recursive macros/defines
+    bool lastbInsideInclude;
+    bool lastbProcessingIFDEF;              // save off #define information
+//  FILE *fileHandle;
+    char *prevString;
+    char *nextString;
 } INCLUDEINFO;
 
 INCLUDEINFO gIncludeStack[MAX_INCLUDE_DEPTH];
@@ -884,23 +884,23 @@ unsigned int gIfDefStartLine;
 
 MACROENTRY *gLastMacro;
 MACROENTRY *gInvokeMacro;
-MACROENTRY *gTempMacro;					// until all the parameters are read
+MACROENTRY *gTempMacro;                 // until all the parameters are read
 MACROENTRY *FindMacro(char *macroName);
 MACROENTRY *FindNMacro(char *macroName, unsigned int sLen);
 
 MACROFUNCTIONPTR gMacroCallFunction;
 
-const char *builtInMacros =	"macro m3x2 reg1, reg2, reg3\n"
-						"	dp3	%reg1.x, %reg2, %reg3\n"
-						"	dp3 %reg1.y, %reg2, %inc(%reg3)\n"
-						"endm";
+const char *builtInMacros = "macro m3x2 reg1, reg2, reg3\n"
+                        "   dp3 %reg1.x, %reg2, %reg3\n"
+                        "   dp3 %reg1.y, %reg2, %inc(%reg3)\n"
+                        "endm";
 
 //
 // local prototypes
 //
 void CleanUp();
 void ReplaceMacroParms(char *srcLine, char *destLine, 
-							MACROENTRY *srcParms, MACROENTRY *invParms);
+                            MACROENTRY *srcParms, MACROENTRY *invParms);
 
 MACROTEXT *SaveMacroText(char *srcText, MACROTEXT *lastMacroText);
 void FreeMacroEntry(MACROENTRY *macEntry);
@@ -927,30 +927,30 @@ char gMacroLine[MAXSAVELINE+1];
 #endif
 #endif
 
-bool gbInsideMacro = false;		// flag if we are doing a macro replace or not.
+bool gbInsideMacro = false;     // flag if we are doing a macro replace or not.
 bool gbTempInsideMacro = false;
 unsigned int gInvokeState = INITIAL;
 
 
-MACROENTRY *gParseMacro;		// which source macro entry we are using
-MACROENTRY *gTempParseMacro;	// temporary holder until parameters are received.
-MACROTEXT *gMacroLineParse;		// which line we are currently parsing inside the macro invocation
+MACROENTRY *gParseMacro;        // which source macro entry we are using
+MACROENTRY *gTempParseMacro;    // temporary holder until parameters are received.
+MACROTEXT *gMacroLineParse;     // which line we are currently parsing inside the macro invocation
 
 enum OPCODETYPE
 {
-	TYPE_NONE = 0,
-	TYPE_VERTEX_SHADER = 1,
-	TYPE_PIXEL_SHADER = 2
+    TYPE_NONE = 0,
+    TYPE_VERTEX_SHADER = 1,
+    TYPE_PIXEL_SHADER = 2
 };
 typedef struct OPCODEMAP
 {
-	const char *string;				// string for opcode
-	int tokenName;              // name of the corresponding token
-	int numArguments;			// number of arguments for opcode
-	float version;				// minimum version supported in.
-	int opcodeTypeFlags;		// whether opcode can be used in vertex shader or pixel shader
-	bool opcodeModify;			// if opcode modifiers can be used
-	bool textureOpcode;			// only outputs to the texture unit
+    const char *string;             // string for opcode
+    int tokenName;              // name of the corresponding token
+    int numArguments;           // number of arguments for opcode
+    float version;              // minimum version supported in.
+    int opcodeTypeFlags;        // whether opcode can be used in vertex shader or pixel shader
+    bool opcodeModify;          // if opcode modifiers can be used
+    bool textureOpcode;         // only outputs to the texture unit
 } OPCODEMAP;
 
 #ifndef TRUE
@@ -961,32 +961,32 @@ typedef struct OPCODEMAP
 #endif
 
 OPCODEMAP theOpcodes[] = {
-	{ "add",  ADD_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
-	{ "dp3",  DP3_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
-	{ "dp4",  DP4_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "dst",  DST_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "exp",  EXP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "expp", EXPP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "frc",  FRC_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "lit",  LIT_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "log",  LOG_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "logp", LOGP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "m3x2", M3X2_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "m3x3", M3X3_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "m3x4", M3X4_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "m4x3", M4X3_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "m4x4", M4X4_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "mad",  MAD_INSTR, 4, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
-	{ "max",  MAX_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "min",  MIN_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "mov",  MOV_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
-	{ "mul",  MUL_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
-	{ "nop",  NOP_INSTR, 0, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
-	{ "rcp",  RCP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "rsq",  RSQ_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "sge",  SGE_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "slt",  SLT_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
-	{ "sub",  SUB_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
+    { "add",  ADD_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
+    { "dp3",  DP3_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
+    { "dp4",  DP4_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "dst",  DST_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "exp",  EXP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "expp", EXPP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "frc",  FRC_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "lit",  LIT_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "log",  LOG_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "logp", LOGP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "m3x2", M3X2_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "m3x3", M3X3_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "m3x4", M3X4_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "m4x3", M4X3_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "m4x4", M4X4_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "mad",  MAD_INSTR, 4, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
+    { "max",  MAX_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "min",  MIN_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "mov",  MOV_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
+    { "mul",  MUL_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
+    { "nop",  NOP_INSTR, 0, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
+    { "rcp",  RCP_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "rsq",  RSQ_INSTR, 2, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "sge",  SGE_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "slt",  SLT_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER, FALSE, FALSE },
+    { "sub",  SUB_INSTR, 3, 1.0f, TYPE_VERTEX_SHADER | TYPE_PIXEL_SHADER, TRUE, FALSE },
 };
 
 #define NUMOPCODES (sizeof(theOpcodes) / sizeof(OPCODEMAP))
@@ -1081,21 +1081,21 @@ YY_MALLOC_DECL
  */
 #ifndef YY_INPUT
 #define YY_INPUT(buf,result,max_size) \
-	if ( yy_current_buffer->yy_is_interactive ) \
-		{ \
-		int c = '*', n; \
-		for ( n = 0; n < max_size && \
-			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
-			buf[n] = (char) c; \
-		if ( c == '\n' ) \
-			buf[n++] = (char) c; \
-		if ( c == EOF && ferror( yyin ) ) \
-			YY_FATAL_ERROR( "input in flex scanner failed" ); \
-		result = n; \
-		} \
-	else if ( ((result = fread( buf, 1, max_size, yyin )) == 0) \
-		  && ferror( yyin ) ) \
-		YY_FATAL_ERROR( "input in flex scanner failed" );
+    if ( yy_current_buffer->yy_is_interactive ) \
+        { \
+        int c = '*', n; \
+        for ( n = 0; n < max_size && \
+                 (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
+            buf[n] = (char) c; \
+        if ( c == '\n' ) \
+            buf[n++] = (char) c; \
+        if ( c == EOF && ferror( yyin ) ) \
+            YY_FATAL_ERROR( "input in flex scanner failed" ); \
+        result = n; \
+        } \
+    else if ( ((result = fread( buf, 1, max_size, yyin )) == 0) \
+          && ferror( yyin ) ) \
+        YY_FATAL_ERROR( "input in flex scanner failed" );
 #endif
 
 /* No semi-colon after return; correct usage is to write "yyterminate();" -
@@ -1136,1652 +1136,1652 @@ YY_MALLOC_DECL
 #endif
 
 #define YY_RULE_SETUP \
-	if ( yyleng > 0 ) \
-		yy_current_buffer->yy_at_bol = \
-				(yytext[yyleng - 1] == '\n'); \
-	YY_USER_ACTION
+    if ( yyleng > 0 ) \
+        yy_current_buffer->yy_at_bol = \
+                (yytext[yyleng - 1] == '\n'); \
+    YY_USER_ACTION
 
 YY_DECL
-	{
-	register yy_state_type yy_current_state;
-	register char *yy_cp = NULL, *yy_bp = NULL;
-	register int yy_act;
+    {
+    register yy_state_type yy_current_state;
+    register char *yy_cp = NULL, *yy_bp = NULL;
+    register int yy_act;
 
 #line 261 "vs1.0_tokens.l"
 
 
 #line 1147 "_vs1.0_lexer.cpp"
 
-	if ( yy_init )
-		{
-		yy_init = 0;
+    if ( yy_init )
+        {
+        yy_init = 0;
 
 #ifdef YY_USER_INIT
-		YY_USER_INIT;
+        YY_USER_INIT;
 #endif
 
-		if ( ! yy_start )
-			yy_start = 1;	/* first start state */
+        if ( ! yy_start )
+            yy_start = 1;   /* first start state */
 
-		if ( ! yyin )
-			yyin = stdin;
+        if ( ! yyin )
+            yyin = stdin;
 
-		if ( ! yyout )
-			yyout = stdout;
+        if ( ! yyout )
+            yyout = stdout;
 
-		if ( ! yy_current_buffer )
-			yy_current_buffer =
-				yy_create_buffer( yyin, YY_BUF_SIZE );
+        if ( ! yy_current_buffer )
+            yy_current_buffer =
+                yy_create_buffer( yyin, YY_BUF_SIZE );
 
-		yy_load_buffer_state();
-		}
+        yy_load_buffer_state();
+        }
 
-	while ( 1 )		/* loops until end-of-file is reached */
-		{
-		yy_cp = yy_c_buf_p;
+    while ( 1 )     /* loops until end-of-file is reached */
+        {
+        yy_cp = yy_c_buf_p;
 
-		/* Support of yytext. */
-		*yy_cp = yy_hold_char;
+        /* Support of yytext. */
+        *yy_cp = yy_hold_char;
 
-		/* yy_bp points to the position in yy_ch_buf of the start of
-		 * the current run.
-		 */
-		yy_bp = yy_cp;
+        /* yy_bp points to the position in yy_ch_buf of the start of
+         * the current run.
+         */
+        yy_bp = yy_cp;
 
-		yy_current_state = yy_start;
-		yy_current_state += YY_AT_BOL();
-		yy_state_ptr = yy_state_buf;
-		*yy_state_ptr++ = yy_current_state;
+        yy_current_state = yy_start;
+        yy_current_state += YY_AT_BOL();
+        yy_state_ptr = yy_state_buf;
+        *yy_state_ptr++ = yy_current_state;
 yy_match:
-		do
-			{
-			register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
-			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-				{
-				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 329 )
-					yy_c = yy_meta[(unsigned int) yy_c];
-				}
-			yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-			*yy_state_ptr++ = yy_current_state;
-			++yy_cp;
-			}
-		while ( yy_base[yy_current_state] != 767 );
+        do
+            {
+            register YY_CHAR yy_c = yy_ec[YY_SC_TO_UI(*yy_cp)];
+            while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+                {
+                yy_current_state = (int) yy_def[yy_current_state];
+                if ( yy_current_state >= 329 )
+                    yy_c = yy_meta[(unsigned int) yy_c];
+                }
+            yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+            *yy_state_ptr++ = yy_current_state;
+            ++yy_cp;
+            }
+        while ( yy_base[yy_current_state] != 767 );
 
 yy_find_action:
-		yy_current_state = *--yy_state_ptr;
-		yy_lp = yy_accept[yy_current_state];
+        yy_current_state = *--yy_state_ptr;
+        yy_lp = yy_accept[yy_current_state];
 find_rule: /* we branch to this label when backing up */
-		for ( ; ; ) /* until we find what rule we matched */
-			{
-			if ( yy_lp && yy_lp < yy_accept[yy_current_state + 1] )
-				{
-				yy_act = yy_acclist[yy_lp];
-					{
-					yy_full_match = yy_cp;
-					break;
-					}
-				}
-			--yy_cp;
-			yy_current_state = *--yy_state_ptr;
-			yy_lp = yy_accept[yy_current_state];
-			}
+        for ( ; ; ) /* until we find what rule we matched */
+            {
+            if ( yy_lp && yy_lp < yy_accept[yy_current_state + 1] )
+                {
+                yy_act = yy_acclist[yy_lp];
+                    {
+                    yy_full_match = yy_cp;
+                    break;
+                    }
+                }
+            --yy_cp;
+            yy_current_state = *--yy_state_ptr;
+            yy_lp = yy_accept[yy_current_state];
+            }
 
-		YY_DO_BEFORE_ACTION;
-
-
-do_action:	/* This label is used only to access EOF actions. */
+        YY_DO_BEFORE_ACTION;
 
 
-		switch ( yy_act )
-	{ /* beginning of action switch */
+do_action:  /* This label is used only to access EOF actions. */
+
+
+        switch ( yy_act )
+    { /* beginning of action switch */
 case 1:
 YY_RULE_SETUP
 #line 263 "vs1.0_tokens.l"
 {
-	gbProcessingDefine = false;
-	gSaveLine[0] = '\0';
-	strncat(gSaveLine, yytext, MAXSAVELINE);
-//	GenDebugLine();
-	if (gbProcessingIFDEF && (gbCompareDefine != gbIFDEF))
-	{
-		BEGIN(IFDEFBODY);
-	}
-	else
-	{
-		BEGIN(INITIAL);
-	}
-	yyless(0);
+    gbProcessingDefine = false;
+    gSaveLine[0] = '\0';
+    strncat(gSaveLine, yytext, MAXSAVELINE);
+//  GenDebugLine();
+    if (gbProcessingIFDEF && (gbCompareDefine != gbIFDEF))
+    {
+        BEGIN(IFDEFBODY);
+    }
+    else
+    {
+        BEGIN(INITIAL);
+    }
+    yyless(0);
 }
-	YY_BREAK
+    YY_BREAK
 case 2:
 YY_RULE_SETUP
 #line 279 "vs1.0_tokens.l"
 {
-	gbProcessingDefine = false;
-	gSaveLine[0] = '\0';
-	strncat(gSaveLine, yytext, MAXSAVELINE);
-//	GenDebugLine();
-	if (gbProcessingIFDEF && (gbCompareDefine != gbIFDEF))
-	{
-		BEGIN(IFDEFBODY);
-	}
-	else
-	{
-		BEGIN(INITIAL);
-	}
-	yyless(0);
+    gbProcessingDefine = false;
+    gSaveLine[0] = '\0';
+    strncat(gSaveLine, yytext, MAXSAVELINE);
+//  GenDebugLine();
+    if (gbProcessingIFDEF && (gbCompareDefine != gbIFDEF))
+    {
+        BEGIN(IFDEFBODY);
+    }
+    else
+    {
+        BEGIN(INITIAL);
+    }
+    yyless(0);
 }
-	YY_BREAK
+    YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 295 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_ADDRESS_REG;
-	vs10_lval.reg.index = atoi(&yytext[1]);
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_ADDRESS_REG;
+    vs10_lval.reg.index = atoi(&yytext[1]);
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 4:
 YY_RULE_SETUP
 #line 304 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_VERTEX_ATTRIB_REG;
-	vs10_lval.reg.index = atoi(&yytext[1]);
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_VERTEX_ATTRIB_REG;
+    vs10_lval.reg.index = atoi(&yytext[1]);
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 5:
 YY_RULE_SETUP
 #line 313 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_TEMPORARY_REG;
-	vs10_lval.reg.index = atoi(&yytext[1]);
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_TEMPORARY_REG;
+    vs10_lval.reg.index = atoi(&yytext[1]);
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 6:
 YY_RULE_SETUP
 #line 322 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_CONSTANT_MEM_REG;
-	vs10_lval.reg.index = atoi(&yytext[1]);
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_CONSTANT_MEM_REG;
+    vs10_lval.reg.index = atoi(&yytext[1]);
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 7:
 YY_RULE_SETUP
 #line 331 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_TEXTURE_RESULT_REG;
-	vs10_lval.reg.index = atoi(&yytext[2]);
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_TEXTURE_RESULT_REG;
+    vs10_lval.reg.index = atoi(&yytext[2]);
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 8:
 YY_RULE_SETUP
 #line 340 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_COLOR_RESULT_REG;
-	vs10_lval.reg.index = atoi(&yytext[2]);
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_COLOR_RESULT_REG;
+    vs10_lval.reg.index = atoi(&yytext[2]);
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 349 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_FOG_RESULT_REG;
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_FOG_RESULT_REG;
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 10:
 YY_RULE_SETUP
 #line 357 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_POSITION_RESULT_REG;
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_POSITION_RESULT_REG;
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 365 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.reg.type = TYPE_POINTS_RESULT_REG;
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return REGISTER;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.reg.type = TYPE_POINTS_RESULT_REG;
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return REGISTER;
 }
-	YY_BREAK
+    YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 373 "vs1.0_tokens.l"
 {
 
-	unsigned int offset;
-	
+    unsigned int offset;
+    
     offset = strcspn(yytext, " \t\n_");
-	yyless(offset);
+    yyless(offset);
 
-	OPCODEMAP *opcodeMap = FindOpcode(yytext);
-	if ( opcodeMap != NULL )
-	{
-//		fprintf( stderr, "%s\t", opcodeMap->string );
-		return( opcodeMap->tokenName );
-	}
-	else
-	{
-		gTempParseMacro = FindMacro(yytext);
+    OPCODEMAP *opcodeMap = FindOpcode(yytext);
+    if ( opcodeMap != NULL )
+    {
+//      fprintf( stderr, "%s\t", opcodeMap->string );
+        return( opcodeMap->tokenName );
+    }
+    else
+    {
+        gTempParseMacro = FindMacro(yytext);
 
-		if (gTempParseMacro != NULL)
-		{
-			if (gIncludeStackIndex >= MAX_INCLUDE_DEPTH )
-			{
-				LexError("macros nested too deeply");
-				exit( 1 );
-			}
+        if (gTempParseMacro != NULL)
+        {
+            if (gIncludeStackIndex >= MAX_INCLUDE_DEPTH )
+            {
+                LexError("macros nested too deeply");
+                exit( 1 );
+            }
 
-			if (gTempParseMacro->firstMacroLines != NULL)
-			{
+            if (gTempParseMacro->firstMacroLines != NULL)
+            {
 
-				gTempMacro = (MACROENTRY *)malloc(sizeof(MACROENTRY));
-				if (gTempMacro == NULL)
-				{
-					LexError("Out of memory allocating MACROENTRY structure.\n");
-				}
-				else
-				{
+                gTempMacro = (MACROENTRY *)malloc(sizeof(MACROENTRY));
+                if (gTempMacro == NULL)
+                {
+                    LexError("Out of memory allocating MACROENTRY structure.\n");
+                }
+                else
+                {
 
-					gTempMacro->next = NULL;
-					gTempMacro->prev = NULL;
-					gTempMacro->macroName = NULL;
-					gTempMacro->firstMacroParms = NULL;
-					gTempMacro->lastMacroParms = NULL;
-					gTempMacro->firstMacroLines = NULL;
-					gTempMacro->lastMacroLines = NULL;
-					gTempMacro->numParms = 0;
-					gTempMacro->nLines = 0;
+                    gTempMacro->next = NULL;
+                    gTempMacro->prev = NULL;
+                    gTempMacro->macroName = NULL;
+                    gTempMacro->firstMacroParms = NULL;
+                    gTempMacro->lastMacroParms = NULL;
+                    gTempMacro->firstMacroLines = NULL;
+                    gTempMacro->lastMacroLines = NULL;
+                    gTempMacro->numParms = 0;
+                    gTempMacro->nLines = 0;
 
-					gbTempInsideMacro = true;		// flag we are currently doing a macro replace.
-					gInvokeState = YYSTATE;
-					if (gTempParseMacro->numParms > 0)
-					{
-						BEGIN(MACROPARMSTART);
-					}
-					else
-					{
-						EndMacroParms();
-						gbTempInsideMacro = false;	// no longer waiting for macro invocation
-					}
+                    gbTempInsideMacro = true;       // flag we are currently doing a macro replace.
+                    gInvokeState = YYSTATE;
+                    if (gTempParseMacro->numParms > 0)
+                    {
+                        BEGIN(MACROPARMSTART);
+                    }
+                    else
+                    {
+                        EndMacroParms();
+                        gbTempInsideMacro = false;  // no longer waiting for macro invocation
+                    }
 
-					
-				}
-			}
-		}
-		else
-		{
-//			fprintf( stderr, "Opcode: \"%s\" not found\n", yytext );
-			REJECT;
-		}
-	}
+                    
+                }
+            }
+        }
+        else
+        {
+//          fprintf( stderr, "Opcode: \"%s\" not found\n", yytext );
+            REJECT;
+        }
+    }
 
-	//unsigned int offset;
-	//
-	//INSTRMAP *opcodeMap;
-	//
-	//offset = strcspn(yytext, " \t\n_");
-	//yyless(offset);	
-	//opcodeMap = FindInstruction(yytext);
-	//if (opcodeMap == NULL)
-	//{
-	//	REJECT;
-	//}
-	//
-	//yylval.opcodeInfo.opcodeMap = opcodeMap;
-	//
-	//return OPCODE;
+    //unsigned int offset;
+    //
+    //INSTRMAP *opcodeMap;
+    //
+    //offset = strcspn(yytext, " \t\n_");
+    //yyless(offset);   
+    //opcodeMap = FindInstruction(yytext);
+    //if (opcodeMap == NULL)
+    //{
+    //  REJECT;
+    //}
+    //
+    //yylval.opcodeInfo.opcodeMap = opcodeMap;
+    //
+    //return OPCODE;
 }
-	YY_BREAK
+    YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 460 "vs1.0_tokens.l"
 {
-//	fprintf( stderr, "%s", yytext );
-	char *cmt = new char[yyleng+1];
-	strncpy( cmt, yytext, yyleng );
-	cmt[0] = '#';
-	cmt[yyleng] = '\0';
-	vs10_lval.comment = cmt;
-	return COMMENT;
+//  fprintf( stderr, "%s", yytext );
+    char *cmt = new char[yyleng+1];
+    strncpy( cmt, yytext, yyleng );
+    cmt[0] = '#';
+    cmt[yyleng] = '\0';
+    vs10_lval.comment = cmt;
+    return COMMENT;
 }
-	YY_BREAK
+    YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 470 "vs1.0_tokens.l"
 {
-//	fprintf( stderr, "%s", yytext );
-	char *cmt = new char[yyleng+1];
-	strncpy( cmt+1, yytext+1, yyleng-1 );
-	cmt[0] = '#';
-	cmt[1] = ' ';
-	cmt[yyleng] = '\0';
-	vs10_lval.comment = cmt;
-	return COMMENT;
+//  fprintf( stderr, "%s", yytext );
+    char *cmt = new char[yyleng+1];
+    strncpy( cmt+1, yytext+1, yyleng-1 );
+    cmt[0] = '#';
+    cmt[1] = ' ';
+    cmt[yyleng] = '\0';
+    vs10_lval.comment = cmt;
+    return COMMENT;
 }
-	YY_BREAK
+    YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 481 "vs1.0_tokens.l"
 {
-	fprintf( stderr, "COISSUE found\n" );
-	yyless(yyleng-1);
-	//return COISSUE;
+    fprintf( stderr, "COISSUE found\n" );
+    yyless(yyleng-1);
+    //return COISSUE;
 }
-	YY_BREAK
+    YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 487 "vs1.0_tokens.l"
 {
-	fprintf( stderr, "COISSUE found\n" );
-	//return COISSUE;
+    fprintf( stderr, "COISSUE found\n" );
+    //return COISSUE;
 }
-	YY_BREAK
+    YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 492 "vs1.0_tokens.l"
 {
-	gCommentStartLine = yylineno;
-	yyless(0);
-	BEGIN(EATCOMMENT);
+    gCommentStartLine = yylineno;
+    yyless(0);
+    BEGIN(EATCOMMENT);
 }
-	YY_BREAK
+    YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 498 "vs1.0_tokens.l"
 { 
-	BEGIN(INCLUDE);
+    BEGIN(INCLUDE);
 }
-	YY_BREAK
+    YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 502 "vs1.0_tokens.l"
-{	/* got the include file name */
+{   /* got the include file name */
 
-//	FILE *newyyin;
+//  FILE *newyyin;
 char *newyyin;
-	char incFileName[1024];
-	unsigned long sLen;
-	bool validFileName;
+    char incFileName[1024];
+    unsigned long sLen;
+    bool validFileName;
 
-	if ( gIncludeStackIndex >= MAX_INCLUDE_DEPTH )
-	{
-		LexError("Includes nested too deeply, aborting\n");
-		exit( 1 );
-	}
+    if ( gIncludeStackIndex >= MAX_INCLUDE_DEPTH )
+    {
+        LexError("Includes nested too deeply, aborting\n");
+        exit( 1 );
+    }
 
-//	GenDebugLine();
-//	GenListString();
-	yylineno++;
-	gLinesAssembled++;
+//  GenDebugLine();
+//  GenListString();
+    yylineno++;
+    gLinesAssembled++;
 
-	validFileName = true;
-	// zap "" and <>
-	if ((yytext[0] == '"') || (yytext[0] == '<'))
-	{
-		char *endQuote;
-		endQuote = strchr(&yytext[1], yytext[0]);
-		sLen = (endQuote - yytext)-1;
-		if (endQuote == NULL)
-		{
-			LexError("Unable to open include file %s\n", incFileName);
-			BEGIN(INITIAL);
-			validFileName = false;
-		}
-		else
-		{
-			incFileName[0] ='\0';
-			strncat(incFileName, &yytext[1], sLen);
-		}
-	}
-	else
-	{
-		strcpy(incFileName, yytext);
-	}
+    validFileName = true;
+    // zap "" and <>
+    if ((yytext[0] == '"') || (yytext[0] == '<'))
+    {
+        char *endQuote;
+        endQuote = strchr(&yytext[1], yytext[0]);
+        sLen = (endQuote - yytext)-1;
+        if (endQuote == NULL)
+        {
+            LexError("Unable to open include file %s\n", incFileName);
+            BEGIN(INITIAL);
+            validFileName = false;
+        }
+        else
+        {
+            incFileName[0] ='\0';
+            strncat(incFileName, &yytext[1], sLen);
+        }
+    }
+    else
+    {
+        strcpy(incFileName, yytext);
+    }
 
-	if (validFileName)
-	{
-		sLen = strlen(incFileName);
-		if ((incFileName[sLen-1] == '"') || (incFileName[sLen-1] == '>'))
-		{
-			incFileName[sLen-1] = '\0';
-		}
+    if (validFileName)
+    {
+        sLen = strlen(incFileName);
+        if ((incFileName[sLen-1] == '"') || (incFileName[sLen-1] == '>'))
+        {
+            incFileName[sLen-1] = '\0';
+        }
 
 
-		newyyin = ReadTextFile( incFileName );
-//		newyyin = fopen( incFileName, "r" );
+        newyyin = ReadTextFile( incFileName );
+//      newyyin = fopen( incFileName, "r" );
 
-		if ( ! newyyin )
-		{
-			LexError("Unable to open include file %s\n", incFileName);
-			BEGIN(SAVELINE);
-		}
-		else
-		{
-			gIncludeStack[gIncludeStackIndex].fileName = gCurFileName;
-			gIncludeStack[gIncludeStackIndex].lineNo = yylineno;
-//			gIncludeStack[gIncludeStackIndex].fileHandle = yyin;
-			gIncludeStack[gIncludeStackIndex].prevString = myin;
-			gIncludeStack[gIncludeStackIndex].nextString = newyyin;
-			gIncludeStack[gIncludeStackIndex].lastInvokeMacro = gInvokeMacro;
-			gIncludeStack[gIncludeStackIndex].lastParseMacro = gParseMacro;
-			gIncludeStack[gIncludeStackIndex].lastMacroLineParse = gMacroLineParse;
-			gIncludeStack[gIncludeStackIndex].lastbInsideMacro = gbInsideMacro;
-			gIncludeStack[gIncludeStackIndex].lastbInsideInclude = gbInsideInclude;
-			gIncludeStack[gIncludeStackIndex].buffer = YY_CURRENT_BUFFER;
-			gIncludeStack[gIncludeStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
-			gIncludeStackIndex++;
+        if ( ! newyyin )
+        {
+            LexError("Unable to open include file %s\n", incFileName);
+            BEGIN(SAVELINE);
+        }
+        else
+        {
+            gIncludeStack[gIncludeStackIndex].fileName = gCurFileName;
+            gIncludeStack[gIncludeStackIndex].lineNo = yylineno;
+//          gIncludeStack[gIncludeStackIndex].fileHandle = yyin;
+            gIncludeStack[gIncludeStackIndex].prevString = myin;
+            gIncludeStack[gIncludeStackIndex].nextString = newyyin;
+            gIncludeStack[gIncludeStackIndex].lastInvokeMacro = gInvokeMacro;
+            gIncludeStack[gIncludeStackIndex].lastParseMacro = gParseMacro;
+            gIncludeStack[gIncludeStackIndex].lastMacroLineParse = gMacroLineParse;
+            gIncludeStack[gIncludeStackIndex].lastbInsideMacro = gbInsideMacro;
+            gIncludeStack[gIncludeStackIndex].lastbInsideInclude = gbInsideInclude;
+            gIncludeStack[gIncludeStackIndex].buffer = YY_CURRENT_BUFFER;
+            gIncludeStack[gIncludeStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
+            gIncludeStackIndex++;
 
-			gbProcessingIFDEF = false;
+            gbProcessingIFDEF = false;
 
-			gCurFileName = strdup(incFileName);
-//			yyin = newyyin;
-			myin = newyyin;
+            gCurFileName = strdup(incFileName);
+//          yyin = newyyin;
+            myin = newyyin;
 
-//			GenSwitchFileNames(gCurFileName);
+//          GenSwitchFileNames(gCurFileName);
 
-			yylineno = 1;
+            yylineno = 1;
 
-			yy_switch_to_buffer(yy_create_buffer( yyin, YY_BUF_SIZE ) );
+            yy_switch_to_buffer(yy_create_buffer( yyin, YY_BUF_SIZE ) );
 
-			gbInsideInclude = true;
+            gbInsideInclude = true;
 
-			BEGIN(SAVELINE);
-		}
-	}
+            BEGIN(SAVELINE);
+        }
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(EATCOMMENT):
 #line 597 "vs1.0_tokens.l"
 {
-	LexError("End of file reached before end of comment started on line %d.\n", gCommentStartLine);
-	BEGIN(INITIAL);
+    LexError("End of file reached before end of comment started on line %d.\n", gCommentStartLine);
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 602 "vs1.0_tokens.l"
 {
-	char *endComment;
-	unsigned int keepSize;
+    char *endComment;
+    unsigned int keepSize;
 
-	strcpy(gSaveLine, yytext);
-	endComment = strstr(yytext, "*/");
+    strcpy(gSaveLine, yytext);
+    endComment = strstr(yytext, "*/");
 
-	char *cmt;
-	if (endComment != NULL)
-	{
-		keepSize = (endComment - yytext+2);
-		yyless(keepSize);
-		BEGIN(INITIAL);
+    char *cmt;
+    if (endComment != NULL)
+    {
+        keepSize = (endComment - yytext+2);
+        yyless(keepSize);
+        BEGIN(INITIAL);
 
-		if ( yytext[0] == '/' && yytext[1] == '*' )
-		{
-			cmt = new char[yyleng];
-			strncpy( cmt+3, yytext+2, yyleng-2 );
-			cmt[0] = '#';
-			cmt[1] = ' ';
-			cmt[2] = ' ';
-			cmt[yyleng-1] = '\0';
-		}
-		else
-		{
-			cmt = new char[yyleng];
-			strncpy( cmt+1, yytext, yyleng-2 );
-			cmt[0] = '#';
-			cmt[yyleng-1] = '\0';
-		}
-		vs10_lval.comment = cmt;
-		return COMMENT;
-	}
-	else
-	{
-//		GenDebugLine();
-//		GenListString();
-		gLinesAssembled++;
-		yylineno++;
+        if ( yytext[0] == '/' && yytext[1] == '*' )
+        {
+            cmt = new char[yyleng];
+            strncpy( cmt+3, yytext+2, yyleng-2 );
+            cmt[0] = '#';
+            cmt[1] = ' ';
+            cmt[2] = ' ';
+            cmt[yyleng-1] = '\0';
+        }
+        else
+        {
+            cmt = new char[yyleng];
+            strncpy( cmt+1, yytext, yyleng-2 );
+            cmt[0] = '#';
+            cmt[yyleng-1] = '\0';
+        }
+        vs10_lval.comment = cmt;
+        return COMMENT;
+    }
+    else
+    {
+//      GenDebugLine();
+//      GenListString();
+        gLinesAssembled++;
+        yylineno++;
 
-		if ( yytext[0] == '/' && yytext[1] == '*' )
-		{
-			cmt = new char[yyleng+2];
-			strncpy( cmt+3, yytext+2, yyleng-2 );
-			cmt[0] = '#';
-			cmt[1] = ' ';
-			cmt[2] = ' ';
-			cmt[yyleng+1] = '\0';
-		}
-		else
-		{
-			cmt = new char[yyleng+2];
-			strncpy( cmt+1, yytext, yyleng );
-			cmt[0] = '#';
-			cmt[yyleng+1] = '\0';
-		}
-		vs10_lval.comment = cmt;
-		return COMMENT;
-	}
+        if ( yytext[0] == '/' && yytext[1] == '*' )
+        {
+            cmt = new char[yyleng+2];
+            strncpy( cmt+3, yytext+2, yyleng-2 );
+            cmt[0] = '#';
+            cmt[1] = ' ';
+            cmt[2] = ' ';
+            cmt[yyleng+1] = '\0';
+        }
+        else
+        {
+            cmt = new char[yyleng+2];
+            strncpy( cmt+1, yytext, yyleng );
+            cmt[0] = '#';
+            cmt[yyleng+1] = '\0';
+        }
+        vs10_lval.comment = cmt;
+        return COMMENT;
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(DEFSTR):
 #line 663 "vs1.0_tokens.l"
 {
-	LexError("#define was incomplete before end of file\n");
-	BEGIN(INITIAL);
+    LexError("#define was incomplete before end of file\n");
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(DEFINE):
 #line 668 "vs1.0_tokens.l"
 {
-	LexError("#define was incomplete before end of file\n");
-	BEGIN(INITIAL);
+    LexError("#define was incomplete before end of file\n");
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(DEFSPACE):
 #line 673 "vs1.0_tokens.l"
 {
-	LexError("#define was incomplete before end of file\n");
-	BEGIN(INITIAL);
+    LexError("#define was incomplete before end of file\n");
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(INCLUDE):
 #line 678 "vs1.0_tokens.l"
 {
-	LexError("#include was incomplete before end of file\n");
-	BEGIN(INITIAL);
+    LexError("#include was incomplete before end of file\n");
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(MACROBODY):
 #line 683 "vs1.0_tokens.l"
 {
-	LexError("End of file reached before end of #define or endm was found, macro started on line %d.\n", gMacroStartLine);
-	BEGIN(INITIAL);
+    LexError("End of file reached before end of #define or endm was found, macro started on line %d.\n", gMacroStartLine);
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(IFDEFBODY):
 #line 688 "vs1.0_tokens.l"
 {
-	LexError("End of file reached before #endif found, macro started on line %d.\n", gIfDefStartLine);
-	BEGIN(INITIAL);
+    LexError("End of file reached before #endif found, macro started on line %d.\n", gIfDefStartLine);
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 693 "vs1.0_tokens.l"
 {
-	LexError("#define was incomplete before end of line\n");
-	BEGIN(SAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+    LexError("#define was incomplete before end of line\n");
+    BEGIN(SAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 702 "vs1.0_tokens.l"
 {
-	LexError("#define was incomplete before end of line\n");
-	BEGIN(SAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+    LexError("#define was incomplete before end of line\n");
+    BEGIN(SAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 711 "vs1.0_tokens.l"
 {
-	LexError("#define was incomplete before end of line\n");
-	BEGIN(SAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+    LexError("#define was incomplete before end of line\n");
+    BEGIN(SAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 720 "vs1.0_tokens.l"
 {
-	if (gIfDefStackIndex >= MAX_IFDEF_DEPTH)
-	{
-		LexError("Out of stack space for #ifdef, aborting.\n");
-		exit( 1 );
-	}
-	else
-	{
-		gIfDefStack[gIfDefStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
-		gIfDefStack[gIfDefStackIndex].lastbIFDEF = gbIFDEF;
-		gIfDefStack[gIfDefStackIndex].lastbCompareDefine = gbCompareDefine;
-		gIfDefStack[gIfDefStackIndex].lastIfDefStartLine = gIfDefStartLine;
-		gIfDefStackIndex++;
-		gIfDefStartLine = yylineno;
+    if (gIfDefStackIndex >= MAX_IFDEF_DEPTH)
+    {
+        LexError("Out of stack space for #ifdef, aborting.\n");
+        exit( 1 );
+    }
+    else
+    {
+        gIfDefStack[gIfDefStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
+        gIfDefStack[gIfDefStackIndex].lastbIFDEF = gbIFDEF;
+        gIfDefStack[gIfDefStackIndex].lastbCompareDefine = gbCompareDefine;
+        gIfDefStack[gIfDefStackIndex].lastIfDefStartLine = gIfDefStartLine;
+        gIfDefStackIndex++;
+        gIfDefStartLine = yylineno;
 
-		gbCompareDefine = true;
-		BEGIN(IFDEFNAME);
-	}
+        gbCompareDefine = true;
+        BEGIN(IFDEFNAME);
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 740 "vs1.0_tokens.l"
 {
-	if (gIfDefStackIndex >= MAX_IFDEF_DEPTH)
-	{
-		LexError("Out of stack space for #ifdef, aborting.\n");
-		exit( 1 );
-	}
-	else
-	{
-		gIfDefStack[gIfDefStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
-		gIfDefStack[gIfDefStackIndex].lastbIFDEF = gbIFDEF;
-		gIfDefStack[gIfDefStackIndex].lastbCompareDefine = gbCompareDefine;
-		gIfDefStack[gIfDefStackIndex].lastIfDefStartLine = gIfDefStartLine;
-		gIfDefStackIndex++;
-		gIfDefStartLine = yylineno;
+    if (gIfDefStackIndex >= MAX_IFDEF_DEPTH)
+    {
+        LexError("Out of stack space for #ifdef, aborting.\n");
+        exit( 1 );
+    }
+    else
+    {
+        gIfDefStack[gIfDefStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
+        gIfDefStack[gIfDefStackIndex].lastbIFDEF = gbIFDEF;
+        gIfDefStack[gIfDefStackIndex].lastbCompareDefine = gbCompareDefine;
+        gIfDefStack[gIfDefStackIndex].lastIfDefStartLine = gIfDefStartLine;
+        gIfDefStackIndex++;
+        gIfDefStartLine = yylineno;
 
-		gbCompareDefine = false;
-		BEGIN(IFDEFNAME);
-	}
+        gbCompareDefine = false;
+        BEGIN(IFDEFNAME);
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 760 "vs1.0_tokens.l"
 {
-	if (!gbProcessingIFDEF)
-	{
-		LexError("Unexpected #else found at line %d, skipping.\n", yylineno);
-	}
-	else
-	{
-		gbCompareDefine = !gbCompareDefine;
-		BEGIN(INITIAL);
-	}
+    if (!gbProcessingIFDEF)
+    {
+        LexError("Unexpected #else found at line %d, skipping.\n", yylineno);
+    }
+    else
+    {
+        gbCompareDefine = !gbCompareDefine;
+        BEGIN(INITIAL);
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 772 "vs1.0_tokens.l"
 {
-	char *defineName;
-	unsigned int sLen;
+    char *defineName;
+    unsigned int sLen;
 
 
-	defineName = FindAlphaNum(yytext, &sLen);
-	if (defineName == NULL)
-	{
-		defineName = strdup(yytext);
-		defineName[yyleng-1] = '\0';	// kill \n
-		LexWarning("Mangled name (%s) for #ifdef, assuming not defined.\n", defineName);
-		free(defineName);
-		gbIFDEF = false;
-	}
-	else
-	{
-		if (FindNMacro(defineName, sLen) != NULL)
-		{
-			gbIFDEF = true;
-		}
-		else
-		{
-			gbIFDEF = false;
-		}
-	}
+    defineName = FindAlphaNum(yytext, &sLen);
+    if (defineName == NULL)
+    {
+        defineName = strdup(yytext);
+        defineName[yyleng-1] = '\0';    // kill \n
+        LexWarning("Mangled name (%s) for #ifdef, assuming not defined.\n", defineName);
+        free(defineName);
+        gbIFDEF = false;
+    }
+    else
+    {
+        if (FindNMacro(defineName, sLen) != NULL)
+        {
+            gbIFDEF = true;
+        }
+        else
+        {
+            gbIFDEF = false;
+        }
+    }
 
-	gbProcessingIFDEF = true;
-	if (gbIFDEF != gbCompareDefine)
-	{
-		BEGIN(IFDEFBODY);
-	}
-	else
-	{
-		BEGIN(SAVELINE);
-	}
+    gbProcessingIFDEF = true;
+    if (gbIFDEF != gbCompareDefine)
+    {
+        BEGIN(IFDEFBODY);
+    }
+    else
+    {
+        BEGIN(SAVELINE);
+    }
 
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 814 "vs1.0_tokens.l"
 {
-	if (!gbProcessingIFDEF)
-	{
-		LexError("Unexpected #endif found at line %d, skipping.\n", yylineno);
-	}
-	else
-	{
-		gIfDefStackIndex--;
-		gbProcessingIFDEF = gIfDefStack[gIfDefStackIndex].lastbProcessingIFDEF;
-		gbIFDEF = gIfDefStack[gIfDefStackIndex].lastbIFDEF;
-		gbCompareDefine = gIfDefStack[gIfDefStackIndex].lastbCompareDefine;
-		gIfDefStartLine = gIfDefStack[gIfDefStackIndex].lastIfDefStartLine;
+    if (!gbProcessingIFDEF)
+    {
+        LexError("Unexpected #endif found at line %d, skipping.\n", yylineno);
+    }
+    else
+    {
+        gIfDefStackIndex--;
+        gbProcessingIFDEF = gIfDefStack[gIfDefStackIndex].lastbProcessingIFDEF;
+        gbIFDEF = gIfDefStack[gIfDefStackIndex].lastbIFDEF;
+        gbCompareDefine = gIfDefStack[gIfDefStackIndex].lastbCompareDefine;
+        gIfDefStartLine = gIfDefStack[gIfDefStackIndex].lastIfDefStartLine;
 
-	}
+    }
 
-	if (YYSTATE == IFDEFBODY)
-	{
-		strncpy(gSaveLine, yytext, MAXSAVELINE);
-	}
+    if (YYSTATE == IFDEFBODY)
+    {
+        strncpy(gSaveLine, yytext, MAXSAVELINE);
+    }
 
-	BEGIN(ENDMACRO);
+    BEGIN(ENDMACRO);
 
 }
-	YY_BREAK
+    YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 838 "vs1.0_tokens.l"
 {
-	LexWarning("Garbage at end of #endif or endm will be ignored.\n");
+    LexWarning("Garbage at end of #endif or endm will be ignored.\n");
 }
-	YY_BREAK
+    YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 842 "vs1.0_tokens.l"
 {
-	BEGIN(SAVELINE);
-	return '\n';
+    BEGIN(SAVELINE);
+    return '\n';
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(ENDMACRO):
 #line 847 "vs1.0_tokens.l"
 {
-	BEGIN(INITIAL);
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 851 "vs1.0_tokens.l"
 {
-	// eat line, because we are not in a TRUE #ifdef, or FALSE #ifndef
-	strncpy(gSaveLine, yytext, MAXSAVELINE);
+    // eat line, because we are not in a TRUE #ifdef, or FALSE #ifndef
+    strncpy(gSaveLine, yytext, MAXSAVELINE);
 }
-	YY_BREAK
+    YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 856 "vs1.0_tokens.l"
 {
-	strcat(gSaveLine, yytext);
-//	GenDebugLine();
-//	GenListString();
-	yylineno++;
-	gLinesAssembled++;
+    strcat(gSaveLine, yytext);
+//  GenDebugLine();
+//  GenListString();
+    yylineno++;
+    gLinesAssembled++;
 }
-	YY_BREAK
+    YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 864 "vs1.0_tokens.l"
 { 
-	gbProcessingDefine = true;
-	gMacroStartLine = yylineno;
-	gCountParen = 0;
-	BEGIN(MACRONAME); 
+    gbProcessingDefine = true;
+    gMacroStartLine = yylineno;
+    gCountParen = 0;
+    BEGIN(MACRONAME); 
 } 
-	YY_BREAK
+    YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 871 "vs1.0_tokens.l"
 {
-	BEGIN(SAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+    BEGIN(SAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 879 "vs1.0_tokens.l"
 {
-//	unsigned int majorVersion;
-//	unsigned int minorVersion;
-//	int minorOffset;
-//	
+//  unsigned int majorVersion;
+//  unsigned int minorVersion;
+//  int minorOffset;
+//  
 //
-//	majorVersion = (unsigned int)(atoi(&yytext[3]));
-//	// skip "ps." + second '.'
-//	minorOffset = strcspn(&yytext[3], ".")+4;
-//	minorVersion = (unsigned int)(atoi(&yytext[minorOffset]));
-//	yylval.ival = D3DVS_VERSION(majorVersion, minorVersion);
+//  majorVersion = (unsigned int)(atoi(&yytext[3]));
+//  // skip "ps." + second '.'
+//  minorOffset = strcspn(&yytext[3], ".")+4;
+//  minorVersion = (unsigned int)(atoi(&yytext[minorOffset]));
+//  yylval.ival = D3DVS_VERSION(majorVersion, minorVersion);
 //
 
-//	fprintf( stderr, "%s", yytext );
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
-	return VERTEX_SHADER;
+//  fprintf( stderr, "%s", yytext );
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
+    return VERTEX_SHADER;
 }
-	YY_BREAK
+    YY_BREAK
 case 36:
 YY_RULE_SETUP
 #line 898 "vs1.0_tokens.l"
 { 
-//	fprintf( stderr, "%s", yytext );
-	vs10_lval.ival = atoi(yytext);
-	return INTVAL;
+//  fprintf( stderr, "%s", yytext );
+    vs10_lval.ival = atoi(yytext);
+    return INTVAL;
 }
-	YY_BREAK
+    YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 905 "vs1.0_tokens.l"
 { 
-		BEGIN(MODIFIER);
+        BEGIN(MODIFIER);
 //fprintf( stderr, "." );
-		return yytext[0];
+        return yytext[0];
 }
-	YY_BREAK
+    YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 911 "vs1.0_tokens.l"
 {
-//	fprintf( stderr, "%s", yytext );
-	BEGIN(INITIAL);
+//  fprintf( stderr, "%s", yytext );
+    BEGIN(INITIAL);
 
-	vs10_lval.mask[0] = tolower(yytext[0]);
-	vs10_lval.mask[1] = tolower(yytext[1]);
-	vs10_lval.mask[2] = tolower(yytext[2]);
-	vs10_lval.mask[3] = tolower(yytext[3]);
+    vs10_lval.mask[0] = tolower(yytext[0]);
+    vs10_lval.mask[1] = tolower(yytext[1]);
+    vs10_lval.mask[2] = tolower(yytext[2]);
+    vs10_lval.mask[3] = tolower(yytext[3]);
 
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
 
-	return XYZW_MODIFIER;
+    return XYZW_MODIFIER;
 
 #if 0
- 	char temp[6];
+    char temp[6];
 
-	temp[0] = '\0';
-	strncat(temp, yytext, 4);
-	strlwr(temp);
-	vs10_lval.lval = FindSwizzleValue(temp);
+    temp[0] = '\0';
+    strncat(temp, yytext, 4);
+    strlwr(temp);
+    vs10_lval.lval = FindSwizzleValue(temp);
 
-	BEGIN(INITIAL);
-	return SWIZZLE_MODIFIER;
+    BEGIN(INITIAL);
+    return SWIZZLE_MODIFIER;
 #endif
 
 }
-	YY_BREAK
+    YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 939 "vs1.0_tokens.l"
 {
-//	fprintf( stderr, "%s", yytext );
-	BEGIN(INITIAL);
+//  fprintf( stderr, "%s", yytext );
+    BEGIN(INITIAL);
 
-	int validLen = strspn(yytext, "xyzw");
+    int validLen = strspn(yytext, "xyzw");
         int i;
-	for ( i = 0; i < validLen; i++ )
-		vs10_lval.mask[i] = tolower( yytext[i] );
-	while ( i < 4 )
-	{
-		vs10_lval.mask[i] = 0;
-		i++;
-	}
+    for ( i = 0; i < validLen; i++ )
+        vs10_lval.mask[i] = tolower( yytext[i] );
+    while ( i < 4 )
+    {
+        vs10_lval.mask[i] = 0;
+        i++;
+    }
 
-	if ( yytext[yyleng-1] == '\n' )
-		line_incr = 1;
+    if ( yytext[yyleng-1] == '\n' )
+        line_incr = 1;
 
-	return XYZW_MODIFIER;
+    return XYZW_MODIFIER;
 
 #if 0
- 	//char temp[6];
- 	char *temp = new char[6];
-	unsigned int registerMask;
-	unsigned int validLen;
+    //char temp[6];
+    char *temp = new char[6];
+    unsigned int registerMask;
+    unsigned int validLen;
 
-	temp[0] = '\0';
-	validLen = strspn(yytext, "xyzw");
-	strncat(temp, yytext,  validLen);
-	for ( int i = 0; i < validLen; i++ )
-		temp[i] = tolower( temp[i] );
-	registerMask = MakeRegisterMask(temp);
+    temp[0] = '\0';
+    validLen = strspn(yytext, "xyzw");
+    strncat(temp, yytext,  validLen);
+    for ( int i = 0; i < validLen; i++ )
+        temp[i] = tolower( temp[i] );
+    registerMask = MakeRegisterMask(temp);
 
-	if (registerMask != 0)
-	{
-		//vs10_lval.sval = temp;
-		vs10_lval.lval = registerMask;
-		BEGIN(INITIAL);
-		return XYZW_MODIFIER;
-	}
-	else
-	{
-		//vs10_lval.sval = temp;
-		vs10_lval.lval = FindSwizzleValue(temp);
-		BEGIN(INITIAL);
-		return SWIZZLE_MODIFIER;	
-	}
+    if (registerMask != 0)
+    {
+        //vs10_lval.sval = temp;
+        vs10_lval.lval = registerMask;
+        BEGIN(INITIAL);
+        return XYZW_MODIFIER;
+    }
+    else
+    {
+        //vs10_lval.sval = temp;
+        vs10_lval.lval = FindSwizzleValue(temp);
+        BEGIN(INITIAL);
+        return SWIZZLE_MODIFIER;    
+    }
 #endif
 }
-	YY_BREAK
+    YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 988 "vs1.0_tokens.l"
 {
-		BEGIN(INITIAL);
-		yyless(0);
+        BEGIN(INITIAL);
+        yyless(0);
 }
-	YY_BREAK
+    YY_BREAK
 case 41:
 YY_RULE_SETUP
 #line 993 "vs1.0_tokens.l"
 {
-	/* setup and save off #define/macro name */
-	if (FindMacro(yytext) != NULL)
-	{
-		LexWarning("Redefinition of #define/macro %s, ignoring.\n", yytext);
-		if (gbProcessingDefine)
-		{
-			BEGIN(EATDEFINE);
-		}
-		else
-		{
-			BEGIN(EATMACRO);
-		}
-	}
-	else
-	{
+    /* setup and save off #define/macro name */
+    if (FindMacro(yytext) != NULL)
+    {
+        LexWarning("Redefinition of #define/macro %s, ignoring.\n", yytext);
+        if (gbProcessingDefine)
+        {
+            BEGIN(EATDEFINE);
+        }
+        else
+        {
+            BEGIN(EATMACRO);
+        }
+    }
+    else
+    {
 
-		BEGIN(MACROPARMSTART);
-		// %%%%% This should be setup to use memory pools
-		gTempMacro = (MACROENTRY *)malloc(sizeof(MACROENTRY));
-		if (gTempMacro == NULL)
-		{
-			LexError("Out of memory for macro table.\n");
-			if (gbProcessingDefine)
-			{
-				BEGIN(EATDEFINE);
-			}
-			else
-			{
-				BEGIN(EATMACRO);
-			}
-		}
-		else
-		{
-			gTempMacro->prev = gLastMacro;
-			gTempMacro->next = NULL;
+        BEGIN(MACROPARMSTART);
+        // %%%%% This should be setup to use memory pools
+        gTempMacro = (MACROENTRY *)malloc(sizeof(MACROENTRY));
+        if (gTempMacro == NULL)
+        {
+            LexError("Out of memory for macro table.\n");
+            if (gbProcessingDefine)
+            {
+                BEGIN(EATDEFINE);
+            }
+            else
+            {
+                BEGIN(EATMACRO);
+            }
+        }
+        else
+        {
+            gTempMacro->prev = gLastMacro;
+            gTempMacro->next = NULL;
 
-			gTempMacro->firstMacroParms = NULL;
-			gTempMacro->lastMacroParms = NULL;
-			gTempMacro->firstMacroLines = NULL;
-			gTempMacro->lastMacroLines = NULL;
-			gTempMacro->numParms = 0;
-			gTempMacro->bIsDefine = gbProcessingDefine;
-			gTempMacro->nLines = 0;
+            gTempMacro->firstMacroParms = NULL;
+            gTempMacro->lastMacroParms = NULL;
+            gTempMacro->firstMacroLines = NULL;
+            gTempMacro->lastMacroLines = NULL;
+            gTempMacro->numParms = 0;
+            gTempMacro->bIsDefine = gbProcessingDefine;
+            gTempMacro->nLines = 0;
 
-			if (gCurFileName != NULL)
-			{
-				gTempMacro->fileName = strdup(gCurFileName);
-			}
-			else
-			{
-				gTempMacro->fileName = NULL;
-			}
+            if (gCurFileName != NULL)
+            {
+                gTempMacro->fileName = strdup(gCurFileName);
+            }
+            else
+            {
+                gTempMacro->fileName = NULL;
+            }
 
-			gTempMacro->lineNo = yylineno;
+            gTempMacro->lineNo = yylineno;
 
-			/* %%%%% this should be set up in memory pools. */
-			gTempMacro->macroName = (char *)malloc(strlen(yytext)+1);
-			if (gTempMacro->macroName == NULL)
-			{
-				LexError("Out of memory for string table.\n");
-				SAFEFREE(gTempMacro);
-				if (gbProcessingDefine)
-				{
-					BEGIN(EATDEFINE);
-				}
-				else
-				{
-					BEGIN(EATMACRO);
-				}
-			}
-			else
-			{
-				strcpy(gTempMacro->macroName, yytext);
-			}
-		}
-	}
+            /* %%%%% this should be set up in memory pools. */
+            gTempMacro->macroName = (char *)malloc(strlen(yytext)+1);
+            if (gTempMacro->macroName == NULL)
+            {
+                LexError("Out of memory for string table.\n");
+                SAFEFREE(gTempMacro);
+                if (gbProcessingDefine)
+                {
+                    BEGIN(EATDEFINE);
+                }
+                else
+                {
+                    BEGIN(EATMACRO);
+                }
+            }
+            else
+            {
+                strcpy(gTempMacro->macroName, yytext);
+            }
+        }
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 42:
 YY_RULE_SETUP
 #line 1072 "vs1.0_tokens.l"
 {
-	LexError("No macro name specified, skipping macro definition.\n");
-	SAFEFREE(gTempMacro->fileName);
-	SAFEFREE(gTempMacro);
-	if (gbProcessingDefine)
-	{
-		BEGIN(EATDEFINE);
-	}
-	else
-	{
-		BEGIN(EATMACRO);
-	}
+    LexError("No macro name specified, skipping macro definition.\n");
+    SAFEFREE(gTempMacro->fileName);
+    SAFEFREE(gTempMacro);
+    if (gbProcessingDefine)
+    {
+        BEGIN(EATDEFINE);
+    }
+    else
+    {
+        BEGIN(EATMACRO);
+    }
 
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 43:
 YY_RULE_SETUP
 #line 1091 "vs1.0_tokens.l"
 {
-	gCountParen++; 
+    gCountParen++; 
 }
-	YY_BREAK
+    YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 1095 "vs1.0_tokens.l"
 {}
-	YY_BREAK
+    YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 1097 "vs1.0_tokens.l"
 {
-	if (gbProcessingDefine && (gCountParen == 0))
-	{
-		EndMacroParms();
-	}
-	else
-	{
-		BEGIN(MACROPARM);
-	}
-	yyless(0);
+    if (gbProcessingDefine && (gCountParen == 0))
+    {
+        EndMacroParms();
+    }
+    else
+    {
+        BEGIN(MACROPARM);
+    }
+    yyless(0);
 }
-	YY_BREAK
+    YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 1109 "vs1.0_tokens.l"
 { 
-	if ((gCountParen == 0) && gbProcessingDefine)
-	{
-		EndMacroParms();
-	}
+    if ((gCountParen == 0) && gbProcessingDefine)
+    {
+        EndMacroParms();
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 1116 "vs1.0_tokens.l"
 {
-	if (gCountParen == 0)
-	{
-		EndMacroParms();
-	}	
+    if (gCountParen == 0)
+    {
+        EndMacroParms();
+    }   
 }
-	YY_BREAK
+    YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 1123 "vs1.0_tokens.l"
 {}
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(MACROPARM):
 #line 1125 "vs1.0_tokens.l"
 {
-	EndMacroParms();
-//	GenDebugLine();
-//	GenListString();
-	yylineno++;
-	gLinesAssembled++;
-	BEGIN(INITIAL);
+    EndMacroParms();
+//  GenDebugLine();
+//  GenListString();
+    yylineno++;
+    gLinesAssembled++;
+    BEGIN(INITIAL);
 }
-	YY_BREAK
+    YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 1134 "vs1.0_tokens.l"
 {
-	if (gbProcessingDefine && (gCountParen > 0))
-	{
-		LexError("Malformed #define, skipping.\n");
-		BEGIN(SAVELINE);
-	}
-	else
-	{
-		EndMacroParms();
-//		GenDebugLine();
-//		GenListString();
-		yylineno++;
-		gLinesAssembled++;
-		if (gbProcessingDefine)
-		{
-			gbProcessingDefine = false;
-			BEGIN(SAVELINE);
-		}
-	}
+    if (gbProcessingDefine && (gCountParen > 0))
+    {
+        LexError("Malformed #define, skipping.\n");
+        BEGIN(SAVELINE);
+    }
+    else
+    {
+        EndMacroParms();
+//      GenDebugLine();
+//      GenListString();
+        yylineno++;
+        gLinesAssembled++;
+        if (gbProcessingDefine)
+        {
+            gbProcessingDefine = false;
+            BEGIN(SAVELINE);
+        }
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 1156 "vs1.0_tokens.l"
 { 
 
-	MACROTEXT *tMacro;
-	char *macroParmEnd;
-	unsigned int startOffset;
-	unsigned int leftParenCount;
-	unsigned int rightParenCount;
+    MACROTEXT *tMacro;
+    char *macroParmEnd;
+    unsigned int startOffset;
+    unsigned int leftParenCount;
+    unsigned int rightParenCount;
 
-	// sheesh, we gotta count the parenthesis....
-	macroParmEnd = yytext;
-	leftParenCount = 0;
-	rightParenCount = 0;
-	while (*macroParmEnd)
-	{
-		if (*macroParmEnd == ')')
-		{
-			rightParenCount++;
-		}
-		if (*macroParmEnd == '(')
-		{
-			leftParenCount++;
-		}
+    // sheesh, we gotta count the parenthesis....
+    macroParmEnd = yytext;
+    leftParenCount = 0;
+    rightParenCount = 0;
+    while (*macroParmEnd)
+    {
+        if (*macroParmEnd == ')')
+        {
+            rightParenCount++;
+        }
+        if (*macroParmEnd == '(')
+        {
+            leftParenCount++;
+        }
 
-		macroParmEnd++;
-	}
+        macroParmEnd++;
+    }
 
-	// if we found the last right parenthesis.
-	if (rightParenCount == leftParenCount+1)
-	{
-		// find if we got the last parenthesis on this line
-		macroParmEnd = strrchr(yytext, ')');
-		yyless((macroParmEnd - yytext));
-		BEGIN(MACROPARMEND);
-	}
+    // if we found the last right parenthesis.
+    if (rightParenCount == leftParenCount+1)
+    {
+        // find if we got the last parenthesis on this line
+        macroParmEnd = strrchr(yytext, ')');
+        yyless((macroParmEnd - yytext));
+        BEGIN(MACROPARMEND);
+    }
 
-	startOffset = strspn(yytext, " \t");
+    startOffset = strspn(yytext, " \t");
 
-	tMacro = SaveMacroText(&yytext[startOffset], gTempMacro->lastMacroParms);
-	if (tMacro == NULL)
-	{
-		LexError("Out of memory for string table for macro parameter(s).\n");
-		FreeMacroEntry(gTempMacro);
-		BEGIN(EATMACRO);
-	}
-	else
-	{
-		// if first one wasn't set then set it
-		if (gTempMacro->firstMacroParms == NULL)
-		{
-			gTempMacro->firstMacroParms = tMacro;
-		}
+    tMacro = SaveMacroText(&yytext[startOffset], gTempMacro->lastMacroParms);
+    if (tMacro == NULL)
+    {
+        LexError("Out of memory for string table for macro parameter(s).\n");
+        FreeMacroEntry(gTempMacro);
+        BEGIN(EATMACRO);
+    }
+    else
+    {
+        // if first one wasn't set then set it
+        if (gTempMacro->firstMacroParms == NULL)
+        {
+            gTempMacro->firstMacroParms = tMacro;
+        }
 
-		gTempMacro->lastMacroParms = tMacro;
+        gTempMacro->lastMacroParms = tMacro;
 
-		gTempMacro->numParms++;
-	}
+        gTempMacro->numParms++;
+    }
 
 }
-	YY_BREAK
+    YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 1218 "vs1.0_tokens.l"
 {
-	if (!gbProcessingDefine && !gbTempInsideMacro)
-	{
-		LexError("Malformed  macro, skipping.\n");
-		BEGIN(EATMACRO);
-	}
-	else
-	{
-		gCountParen--;
+    if (!gbProcessingDefine && !gbTempInsideMacro)
+    {
+        LexError("Malformed  macro, skipping.\n");
+        BEGIN(EATMACRO);
+    }
+    else
+    {
+        gCountParen--;
 
-		// we can get multiple \n's here
-		while (yytext[yyleng-2] == '\n')
-		{
-			yyleng--;
-		}
-		yyless(yyleng);
+        // we can get multiple \n's here
+        while (yytext[yyleng-2] == '\n')
+        {
+            yyleng--;
+        }
+        yyless(yyleng);
 
-		// if there isn't a \n on this line, macro starts on this line,
-		// not next, like in a macro definition
-		if (yytext[yyleng-1] != '\n')
-		{
-			EndMacroParms();
-		}
-		else
-		{
-			if (yytext[yyleng-1] == '\n')
-			{
-				gTempMacro->lineNo++;
-			}
-			// count this line
-			gTempMacro->nLines++;
-//			GenDebugLine();
-//			GenListString();
-			EndMacroParms();
-			if (!gbInsideMacro)
-			{
-				yylineno++;
-			}
+        // if there isn't a \n on this line, macro starts on this line,
+        // not next, like in a macro definition
+        if (yytext[yyleng-1] != '\n')
+        {
+            EndMacroParms();
+        }
+        else
+        {
+            if (yytext[yyleng-1] == '\n')
+            {
+                gTempMacro->lineNo++;
+            }
+            // count this line
+            gTempMacro->nLines++;
+//          GenDebugLine();
+//          GenListString();
+            EndMacroParms();
+            if (!gbInsideMacro)
+            {
+                yylineno++;
+            }
 
-			gLinesAssembled++;
-		}
+            gLinesAssembled++;
+        }
 
-	}
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 52:
 YY_RULE_SETUP
 #line 1263 "vs1.0_tokens.l"
 {
-	if (!gbProcessingDefine && !gbTempInsideMacro)
-	{
-		LexError("Malformed  macro, skipping.\n");
-		BEGIN(EATMACRO);
-	}
-	else
-	{
+    if (!gbProcessingDefine && !gbTempInsideMacro)
+    {
+        LexError("Malformed  macro, skipping.\n");
+        BEGIN(EATMACRO);
+    }
+    else
+    {
 
-		// no matter what count this line
-		gTempMacro->nLines++;
-		gCountParen--;
-		EndMacroParms();
-		if (!gbInsideMacro)
-		{
-			yylineno++;
-		}
+        // no matter what count this line
+        gTempMacro->nLines++;
+        gCountParen--;
+        EndMacroParms();
+        if (!gbInsideMacro)
+        {
+            yylineno++;
+        }
 
-		gLinesAssembled++;
-	}
+        gLinesAssembled++;
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 1285 "vs1.0_tokens.l"
 {
-	if (!gbProcessingDefine && !gbTempInsideMacro)
-	{
-		LexError("Malformed  macro, skipping.\n");
-		BEGIN(EATMACRO);
-	}
-	else
-	{
-		gCountParen--;
-		if (gCountParen == 0)
-		{
-			// no matter what count this line
-			gTempMacro->nLines++;
-			EndMacroParms();
-			if (!gbInsideMacro)
-			{
-				yylineno++;
-			}
+    if (!gbProcessingDefine && !gbTempInsideMacro)
+    {
+        LexError("Malformed  macro, skipping.\n");
+        BEGIN(EATMACRO);
+    }
+    else
+    {
+        gCountParen--;
+        if (gCountParen == 0)
+        {
+            // no matter what count this line
+            gTempMacro->nLines++;
+            EndMacroParms();
+            if (!gbInsideMacro)
+            {
+                yylineno++;
+            }
 
-			gLinesAssembled++;
-		}
-		else
-		{
-			REJECT;
-		}
-	}
+            gLinesAssembled++;
+        }
+        else
+        {
+            REJECT;
+        }
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 1313 "vs1.0_tokens.l"
 {
-	MACROTEXT *tMacro;
-	unsigned int copyLen;
-	char *endLine;
+    MACROTEXT *tMacro;
+    unsigned int copyLen;
+    char *endLine;
 
-	gSaveLine[0] ='\0';
-	endLine = strchr(yytext, '\\');
-	copyLen = (endLine - yytext);
-	if (copyLen > MAXSAVELINE)
-	{
-		copyLen = MAXSAVELINE;
-	}
+    gSaveLine[0] ='\0';
+    endLine = strchr(yytext, '\\');
+    copyLen = (endLine - yytext);
+    if (copyLen > MAXSAVELINE)
+    {
+        copyLen = MAXSAVELINE;
+    }
 
-	strncat(gSaveLine, yytext, copyLen);
-	strcat(gSaveLine, "\n");
-	tMacro = SaveMacroText(gSaveLine, gLastMacro->lastMacroLines);
-	if (tMacro == NULL)
-	{
-		LexError("Out of memory for string table for macro parameter(s).\n");
-		BEGIN(EATDEFINE);
-	}
-	else
-	{
-		gLastMacro->nLines++;
-		// if first one wasn't set then set it
-		if (gLastMacro->firstMacroLines == NULL)
-		{
-			gLastMacro->firstMacroLines = tMacro;
-		}
+    strncat(gSaveLine, yytext, copyLen);
+    strcat(gSaveLine, "\n");
+    tMacro = SaveMacroText(gSaveLine, gLastMacro->lastMacroLines);
+    if (tMacro == NULL)
+    {
+        LexError("Out of memory for string table for macro parameter(s).\n");
+        BEGIN(EATDEFINE);
+    }
+    else
+    {
+        gLastMacro->nLines++;
+        // if first one wasn't set then set it
+        if (gLastMacro->firstMacroLines == NULL)
+        {
+            gLastMacro->firstMacroLines = tMacro;
+        }
 
-		gLastMacro->lastMacroLines = tMacro;
-	}
+        gLastMacro->lastMacroLines = tMacro;
+    }
 
-//	GenDebugLine();
-//	GenListString();
-	yylineno++;
-	gLinesAssembled++;
+//  GenDebugLine();
+//  GenListString();
+    yylineno++;
+    gLinesAssembled++;
 }
-	YY_BREAK
+    YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 1352 "vs1.0_tokens.l"
 {
 
-	strncpy(gSaveLine, yytext, MAXSAVELINE);
-	if (gbProcessingDefine)
-	{
-		LexError("Malformed #define, skipping.\n");
-	}
+    strncpy(gSaveLine, yytext, MAXSAVELINE);
+    if (gbProcessingDefine)
+    {
+        LexError("Malformed #define, skipping.\n");
+    }
 
-	BEGIN(ENDMACRO);
+    BEGIN(ENDMACRO);
 }
-	YY_BREAK
+    YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 1363 "vs1.0_tokens.l"
 {
-		MACROTEXT *tMacro;
+        MACROTEXT *tMacro;
 
-		// check if processing #define and only one line, if not then append \n
-		if (!gbProcessingDefine || (gLastMacro->nLines >= 1))
-		{
-			gSaveLine[0] = '\0';
-			strncat(gSaveLine, yytext, MAXSAVELINE);
-			strcat(gSaveLine, "\n");
-			tMacro = SaveMacroText(gSaveLine, gLastMacro->lastMacroLines);
-			gLastMacro->nLines++;
-		}
-		else if (gLastMacro->numParms > 0)	// check if parameters were there
-		{
-			// if so, we need the '\n' appended
-			gMacroLine[0] = '\0';
-			strncat(gMacroLine, yytext, MAXSAVELINE);
-			strcat(gMacroLine, "\n");
-			tMacro = SaveMacroText(gMacroLine, gLastMacro->lastMacroLines);
-			gLastMacro->nLines++;
-		}
-		else	// straight no newline macro replace
-		{
-			tMacro = SaveMacroText(yytext, gLastMacro->lastMacroLines);
-		}
+        // check if processing #define and only one line, if not then append \n
+        if (!gbProcessingDefine || (gLastMacro->nLines >= 1))
+        {
+            gSaveLine[0] = '\0';
+            strncat(gSaveLine, yytext, MAXSAVELINE);
+            strcat(gSaveLine, "\n");
+            tMacro = SaveMacroText(gSaveLine, gLastMacro->lastMacroLines);
+            gLastMacro->nLines++;
+        }
+        else if (gLastMacro->numParms > 0)  // check if parameters were there
+        {
+            // if so, we need the '\n' appended
+            gMacroLine[0] = '\0';
+            strncat(gMacroLine, yytext, MAXSAVELINE);
+            strcat(gMacroLine, "\n");
+            tMacro = SaveMacroText(gMacroLine, gLastMacro->lastMacroLines);
+            gLastMacro->nLines++;
+        }
+        else    // straight no newline macro replace
+        {
+            tMacro = SaveMacroText(yytext, gLastMacro->lastMacroLines);
+        }
 
-		if (tMacro == NULL)
-		{
-			LexError("Out of memory for string table for macro parameter(s).\n");
-			BEGIN(EATMACRO);
-		}
-		else
-		{
-			// if first one wasn't set then set it
-			if (gLastMacro->firstMacroLines == NULL)
-			{
-				gLastMacro->firstMacroLines = tMacro;
-			}
+        if (tMacro == NULL)
+        {
+            LexError("Out of memory for string table for macro parameter(s).\n");
+            BEGIN(EATMACRO);
+        }
+        else
+        {
+            // if first one wasn't set then set it
+            if (gLastMacro->firstMacroLines == NULL)
+            {
+                gLastMacro->firstMacroLines = tMacro;
+            }
 
-			gLastMacro->lastMacroLines = tMacro;
-		}
+            gLastMacro->lastMacroLines = tMacro;
+        }
 }
-	YY_BREAK
+    YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 1406 "vs1.0_tokens.l"
 {
 
-	MACROTEXT *tMacro;
-//	GenDebugLine();
-//	GenListString();
-	yylineno++;
-	gLinesAssembled++;
-	if (gbProcessingDefine)
-	{
-		gbProcessingDefine = false;
-		BEGIN(SAVELINE);
-	}
-	else
-	{
-		// this means \n by itself inside macro body
-		if (((yylineno-1) - gLastMacro->lineNo) !=  gLastMacro->nLines)
-		{
-			strcpy(gMacroLine, "\n");
-			tMacro = SaveMacroText(gMacroLine, gLastMacro->lastMacroLines);
-			gLastMacro->nLines++;
+    MACROTEXT *tMacro;
+//  GenDebugLine();
+//  GenListString();
+    yylineno++;
+    gLinesAssembled++;
+    if (gbProcessingDefine)
+    {
+        gbProcessingDefine = false;
+        BEGIN(SAVELINE);
+    }
+    else
+    {
+        // this means \n by itself inside macro body
+        if (((yylineno-1) - gLastMacro->lineNo) !=  gLastMacro->nLines)
+        {
+            strcpy(gMacroLine, "\n");
+            tMacro = SaveMacroText(gMacroLine, gLastMacro->lastMacroLines);
+            gLastMacro->nLines++;
 
-			if (tMacro == NULL)
-			{
-				LexError("Out of memory for string table for macro parameter(s).\n");
-				BEGIN(EATMACRO);
-			}
-			else
-			{
-				// if first one wasn't set then set it
-				if (gLastMacro->firstMacroLines == NULL)
-				{
-					gLastMacro->firstMacroLines = tMacro;
-				}
+            if (tMacro == NULL)
+            {
+                LexError("Out of memory for string table for macro parameter(s).\n");
+                BEGIN(EATMACRO);
+            }
+            else
+            {
+                // if first one wasn't set then set it
+                if (gLastMacro->firstMacroLines == NULL)
+                {
+                    gLastMacro->firstMacroLines = tMacro;
+                }
 
-				gLastMacro->lastMacroLines = tMacro;
-			}
-		}
-	}
+                gLastMacro->lastMacroLines = tMacro;
+            }
+        }
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 1446 "vs1.0_tokens.l"
 {
-	BEGIN(SAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+    BEGIN(SAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 59:
 YY_RULE_SETUP
 #line 1454 "vs1.0_tokens.l"
 {
-	strncpy(gSaveLine, yytext, MAXSAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+    strncpy(gSaveLine, yytext, MAXSAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 60:
 YY_RULE_SETUP
 #line 1462 "vs1.0_tokens.l"
 {
-	strncpy(gSaveLine, yytext, MAXSAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
+    strncpy(gSaveLine, yytext, MAXSAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
 }
-	YY_BREAK
+    YY_BREAK
 case 61:
 YY_RULE_SETUP
 #line 1470 "vs1.0_tokens.l"
 {
-	strncpy(gSaveLine, yytext, MAXSAVELINE);
-//	GenDebugLine();
-//	GenListString();
-	gLinesAssembled++;
-	yylineno++;
-	BEGIN(SAVELINE);
+    strncpy(gSaveLine, yytext, MAXSAVELINE);
+//  GenDebugLine();
+//  GenListString();
+    gLinesAssembled++;
+    yylineno++;
+    BEGIN(SAVELINE);
 }
-	YY_BREAK
+    YY_BREAK
 case 62:
 YY_RULE_SETUP
 #line 1479 "vs1.0_tokens.l"
 {
 
-	gTempParseMacro = FindMacro(yytext);
+    gTempParseMacro = FindMacro(yytext);
 
-	if (gTempParseMacro != NULL)
-	{
-		if (gIncludeStackIndex >= MAX_INCLUDE_DEPTH )
-		{
-			LexError("macros nested too deeply");
-			exit( 1 );
-		}
+    if (gTempParseMacro != NULL)
+    {
+        if (gIncludeStackIndex >= MAX_INCLUDE_DEPTH )
+        {
+            LexError("macros nested too deeply");
+            exit( 1 );
+        }
 
-		if (gTempParseMacro->firstMacroLines != NULL)
-		{
+        if (gTempParseMacro->firstMacroLines != NULL)
+        {
 
-			gTempMacro = (MACROENTRY *)malloc(sizeof(MACROENTRY));
-			if (gTempMacro == NULL)
-			{
-				LexError("Out of memory allocating MACROENTRY structure.\n");
-			}
-			else
-			{
+            gTempMacro = (MACROENTRY *)malloc(sizeof(MACROENTRY));
+            if (gTempMacro == NULL)
+            {
+                LexError("Out of memory allocating MACROENTRY structure.\n");
+            }
+            else
+            {
 
-				gTempMacro->next = NULL;
-				gTempMacro->prev = NULL;
-				gTempMacro->macroName = NULL;
-				gTempMacro->firstMacroParms = NULL;
-				gTempMacro->lastMacroParms = NULL;
-				gTempMacro->firstMacroLines = NULL;
-				gTempMacro->lastMacroLines = NULL;
-				gTempMacro->numParms = 0;
-				gTempMacro->nLines = 0;
+                gTempMacro->next = NULL;
+                gTempMacro->prev = NULL;
+                gTempMacro->macroName = NULL;
+                gTempMacro->firstMacroParms = NULL;
+                gTempMacro->lastMacroParms = NULL;
+                gTempMacro->firstMacroLines = NULL;
+                gTempMacro->lastMacroLines = NULL;
+                gTempMacro->numParms = 0;
+                gTempMacro->nLines = 0;
 
-				gbTempInsideMacro = true;		// flag we are currently doing a macro replace.
-				gInvokeState = YYSTATE;
-				if (gTempParseMacro->numParms > 0)
-				{
-					BEGIN(MACROPARMSTART);
-				}
-				else
-				{
-					EndMacroParms();
-					gbTempInsideMacro = false;	// no longer waiting for macro invocation
-				}				
-			}
-		}
-	}
-	else
-	{
-		BEGIN(INITIAL);
-		REJECT;
-	}
+                gbTempInsideMacro = true;       // flag we are currently doing a macro replace.
+                gInvokeState = YYSTATE;
+                if (gTempParseMacro->numParms > 0)
+                {
+                    BEGIN(MACROPARMSTART);
+                }
+                else
+                {
+                    EndMacroParms();
+                    gbTempInsideMacro = false;  // no longer waiting for macro invocation
+                }               
+            }
+        }
+    }
+    else
+    {
+        BEGIN(INITIAL);
+        REJECT;
+    }
 }
-	YY_BREAK
+    YY_BREAK
 case 63:
 YY_RULE_SETUP
 #line 1533 "vs1.0_tokens.l"
 { 
 //    fprintf( stderr, "%c ", yytext[0] );
-	return yytext[0];
+    return yytext[0];
 }
-	YY_BREAK
+    YY_BREAK
 case 64:
 YY_RULE_SETUP
 #line 1539 "vs1.0_tokens.l"
 {}
-	YY_BREAK
+    YY_BREAK
 case 65:
 YY_RULE_SETUP
 #line 1541 "vs1.0_tokens.l"
 {
-	LexError("Didn't find label string for #define.\n");
-	BEGIN(SAVELINE);
-//	return '\n';
+    LexError("Didn't find label string for #define.\n");
+    BEGIN(SAVELINE);
+//  return '\n';
 }
-	YY_BREAK
+    YY_BREAK
 case 66:
 YY_RULE_SETUP
 #line 1547 "vs1.0_tokens.l"
 {
 //fprintf(stderr, "\n");
-//	line_incr = 1;
-	line_incr++;
-	BEGIN(SAVELINE);
-	return '\n';
+//  line_incr = 1;
+    line_incr++;
+    BEGIN(SAVELINE);
+    return '\n';
 }
-	YY_BREAK
+    YY_BREAK
 case 67:
 YY_RULE_SETUP
 #line 1555 "vs1.0_tokens.l"
 {
-	BEGIN(INITIAL);
-//	fprintf( stderr, "%s", yytext );
-	if (yyleng == 1)
-		return yytext[0];
-	else
-		LexError("Unrecognized Token: %s\n", yytext);
-	return UNKNOWN_STRING;
+    BEGIN(INITIAL);
+//  fprintf( stderr, "%s", yytext );
+    if (yyleng == 1)
+        return yytext[0];
+    else
+        LexError("Unrecognized Token: %s\n", yytext);
+    return UNKNOWN_STRING;
 }
-	YY_BREAK
+    YY_BREAK
 case 68:
 YY_RULE_SETUP
 #line 1565 "vs1.0_tokens.l"
 {
-//	vs10_lval.ival = yytext[0];
-	LexError("Illegal character: %d decimal.\n", yytext[0]);
-	return(ILLEGAL);
+//  vs10_lval.ival = yytext[0];
+    LexError("Illegal character: %d decimal.\n", yytext[0]);
+    return(ILLEGAL);
 }
-	YY_BREAK
+    YY_BREAK
 case 69:
 YY_RULE_SETUP
 #line 1571 "vs1.0_tokens.l"
 {
-//	vs10_lval.ival = yytext[0];
-	LexError("Illegal character: %d decimal.\n", yytext[0]);
-	return(ILLEGAL); 
+//  vs10_lval.ival = yytext[0];
+    LexError("Illegal character: %d decimal.\n", yytext[0]);
+    return(ILLEGAL); 
 }
-	YY_BREAK
+    YY_BREAK
 case 70:
 YY_RULE_SETUP
 #line 1577 "vs1.0_tokens.l"
 {
-	return yytext[0];
+    return yytext[0];
 }
-	YY_BREAK
+    YY_BREAK
 case 71:
 YY_RULE_SETUP
 #line 1581 "vs1.0_tokens.l"
 {
-	BEGIN(EATSTRING);
-	yyless(0);
+    BEGIN(EATSTRING);
+    yyless(0);
 }
-	YY_BREAK
+    YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(SKIPLINE):
 case YY_STATE_EOF(EATSTRING):
@@ -2795,422 +2795,422 @@ case YY_STATE_EOF(IFDEFNAME):
 case YY_STATE_EOF(MACROPARMEND):
 #line 1586 "vs1.0_tokens.l"
 {
-	bool wasInMacro;
-	bool oneLiner;
-	char *macroText;
+    bool wasInMacro;
+    bool oneLiner;
+    char *macroText;
 
-	wasInMacro = gbInsideMacro;
-	oneLiner = false;
+    wasInMacro = gbInsideMacro;
+    oneLiner = false;
 
 
-	// if we are inside the macro then do next line until their are no more
-	if (gbInsideMacro)
-	{
-		oneLiner = (gParseMacro->nLines == 0);
+    // if we are inside the macro then do next line until their are no more
+    if (gbInsideMacro)
+    {
+        oneLiner = (gParseMacro->nLines == 0);
 
-		// free the temporary parameter replaced line we were working on.
-		// get next line in macro text, if any
-		gMacroLineParse = gMacroLineParse->next;
-		// more lines to parse?
-		if (gMacroLineParse != NULL)
-		{
-			macroText = gMacroLine;
-			// if no replacement text, just use source line
-			if (gParseMacro->firstMacroParms == NULL)
-			{
-				macroText = gMacroLineParse->macroText;
-			}
-			else
-			{
-				// replace the macro parameters
-				ReplaceMacroParms(gMacroLineParse->macroText, gMacroLine, gParseMacro, gInvokeMacro);
-			}
+        // free the temporary parameter replaced line we were working on.
+        // get next line in macro text, if any
+        gMacroLineParse = gMacroLineParse->next;
+        // more lines to parse?
+        if (gMacroLineParse != NULL)
+        {
+            macroText = gMacroLine;
+            // if no replacement text, just use source line
+            if (gParseMacro->firstMacroParms == NULL)
+            {
+                macroText = gMacroLineParse->macroText;
+            }
+            else
+            {
+                // replace the macro parameters
+                ReplaceMacroParms(gMacroLineParse->macroText, gMacroLine, gParseMacro, gInvokeMacro);
+            }
 
-//			if (gExpandMacros)
-//			{
-//				strcpy(gSaveLine, macroText);
-//			}
+//          if (gExpandMacros)
+//          {
+//              strcpy(gSaveLine, macroText);
+//          }
 
-			BEGIN(INITIAL);
-			// and lex it.
-			yy_scan_string(macroText);
-		}
-		else
-		{
-			// no more lines in this macro, so free the working macro
-			SAFEFREE(gInvokeMacro);
-			// shut off flag for inside a macro replacement state.
-			gbInsideMacro = false;
-		}
-	}
+            BEGIN(INITIAL);
+            // and lex it.
+            yy_scan_string(macroText);
+        }
+        else
+        {
+            // no more lines in this macro, so free the working macro
+            SAFEFREE(gInvokeMacro);
+            // shut off flag for inside a macro replacement state.
+            gbInsideMacro = false;
+        }
+    }
 
-	if (gbProcessingIFDEF && !wasInMacro)
-	{
-		LexError("End of file reached before #endif found, macro started on line %d.\n", gIfDefStartLine);
-	}
+    if (gbProcessingIFDEF && !wasInMacro)
+    {
+        LexError("End of file reached before #endif found, macro started on line %d.\n", gIfDefStartLine);
+    }
 
-	if (!gbInsideMacro)
-	{
-		if ( gIncludeStackIndex == 0 )
-		{
-			if (!gbProcessingBuiltIn)
-				CleanUp();
-			return 0;
-//			return TOKEN_EOF;
-		}
-		else
-		{
-			yy_delete_buffer( YY_CURRENT_BUFFER );
-			SAFEFREE(gCurFileName);
-//			SAFEDELETE(myin);
-//			SAFECLOSE(yyin);
-		}
+    if (!gbInsideMacro)
+    {
+        if ( gIncludeStackIndex == 0 )
+        {
+            if (!gbProcessingBuiltIn)
+                CleanUp();
+            return 0;
+//          return TOKEN_EOF;
+        }
+        else
+        {
+            yy_delete_buffer( YY_CURRENT_BUFFER );
+            SAFEFREE(gCurFileName);
+//          SAFEDELETE(myin);
+//          SAFECLOSE(yyin);
+        }
 
-		gIncludeStackIndex--;
-		SAFEDELETEARRAY( gIncludeStack[gIncludeStackIndex].nextString );
-		yy_switch_to_buffer(gIncludeStack[gIncludeStackIndex].buffer );
-		gCurFileName = gIncludeStack[gIncludeStackIndex].fileName;
-//		yyin = gIncludeStack[gIncludeStackIndex].fileHandle;
-		myin = gIncludeStack[gIncludeStackIndex].prevString;
-		yylineno = gIncludeStack[gIncludeStackIndex].lineNo;
-		gInvokeMacro = gIncludeStack[gIncludeStackIndex].lastInvokeMacro;
-		gParseMacro = gIncludeStack[gIncludeStackIndex].lastParseMacro;
-		gMacroLineParse = gIncludeStack[gIncludeStackIndex].lastMacroLineParse;
-		gbInsideInclude = gIncludeStack[gIncludeStackIndex].lastbInsideInclude;
-		gbInsideMacro = gIncludeStack[gIncludeStackIndex].lastbInsideMacro;
-		gbProcessingIFDEF = gIncludeStack[gIncludeStackIndex].lastbProcessingIFDEF;
+        gIncludeStackIndex--;
+        SAFEDELETEARRAY( gIncludeStack[gIncludeStackIndex].nextString );
+        yy_switch_to_buffer(gIncludeStack[gIncludeStackIndex].buffer );
+        gCurFileName = gIncludeStack[gIncludeStackIndex].fileName;
+//      yyin = gIncludeStack[gIncludeStackIndex].fileHandle;
+        myin = gIncludeStack[gIncludeStackIndex].prevString;
+        yylineno = gIncludeStack[gIncludeStackIndex].lineNo;
+        gInvokeMacro = gIncludeStack[gIncludeStackIndex].lastInvokeMacro;
+        gParseMacro = gIncludeStack[gIncludeStackIndex].lastParseMacro;
+        gMacroLineParse = gIncludeStack[gIncludeStackIndex].lastMacroLineParse;
+        gbInsideInclude = gIncludeStack[gIncludeStackIndex].lastbInsideInclude;
+        gbInsideMacro = gIncludeStack[gIncludeStackIndex].lastbInsideMacro;
+        gbProcessingIFDEF = gIncludeStack[gIncludeStackIndex].lastbProcessingIFDEF;
 
-		if (!gbInsideMacro && !oneLiner)
-		{
-//			GenSwitchFileNames(gCurFileName);
-			BEGIN(SAVELINE);
-		}
-		else
-		{
-			BEGIN(INITIAL);
-		}
+        if (!gbInsideMacro && !oneLiner)
+        {
+//          GenSwitchFileNames(gCurFileName);
+            BEGIN(SAVELINE);
+        }
+        else
+        {
+            BEGIN(INITIAL);
+        }
 
-		// gSaveLine was last line saved, before macro invocation
-		if (wasInMacro && !gbInsideMacro && !oneLiner)
-		{
-//			GenDebugLine();
-//			GenListString();
-			gLinesAssembled++;
-			yylineno++;
-		}
+        // gSaveLine was last line saved, before macro invocation
+        if (wasInMacro && !gbInsideMacro && !oneLiner)
+        {
+//          GenDebugLine();
+//          GenListString();
+            gLinesAssembled++;
+            yylineno++;
+        }
 
-	}
+    }
 
 }
-	YY_BREAK
+    YY_BREAK
 case 72:
 YY_RULE_SETUP
 #line 1695 "vs1.0_tokens.l"
 ECHO;
-	YY_BREAK
+    YY_BREAK
 #line 2908 "_vs1.0_lexer.cpp"
 
-	case YY_END_OF_BUFFER:
-		{
-		/* Amount of text matched not including the EOB char. */
-		int yy_amount_of_matched_text = (int) (yy_cp - yytext_ptr) - 1;
+    case YY_END_OF_BUFFER:
+        {
+        /* Amount of text matched not including the EOB char. */
+        int yy_amount_of_matched_text = (int) (yy_cp - yytext_ptr) - 1;
 
-		/* Undo the effects of YY_DO_BEFORE_ACTION. */
-		*yy_cp = yy_hold_char;
-		YY_RESTORE_YY_MORE_OFFSET
+        /* Undo the effects of YY_DO_BEFORE_ACTION. */
+        *yy_cp = yy_hold_char;
+        YY_RESTORE_YY_MORE_OFFSET
 
-		if ( yy_current_buffer->yy_buffer_status == YY_BUFFER_NEW )
-			{
-			/* We're scanning a new file or input source.  It's
-			 * possible that this happened because the user
-			 * just pointed yyin at a new source and called
-			 * yylex().  If so, then we have to assure
-			 * consistency between yy_current_buffer and our
-			 * globals.  Here is the right place to do so, because
-			 * this is the first action (other than possibly a
-			 * back-up) that will match for the new input source.
-			 */
-			yy_n_chars = yy_current_buffer->yy_n_chars;
-			yy_current_buffer->yy_input_file = yyin;
-			yy_current_buffer->yy_buffer_status = YY_BUFFER_NORMAL;
-			}
+        if ( yy_current_buffer->yy_buffer_status == YY_BUFFER_NEW )
+            {
+            /* We're scanning a new file or input source.  It's
+             * possible that this happened because the user
+             * just pointed yyin at a new source and called
+             * yylex().  If so, then we have to assure
+             * consistency between yy_current_buffer and our
+             * globals.  Here is the right place to do so, because
+             * this is the first action (other than possibly a
+             * back-up) that will match for the new input source.
+             */
+            yy_n_chars = yy_current_buffer->yy_n_chars;
+            yy_current_buffer->yy_input_file = yyin;
+            yy_current_buffer->yy_buffer_status = YY_BUFFER_NORMAL;
+            }
 
-		/* Note that here we test for yy_c_buf_p "<=" to the position
-		 * of the first EOB in the buffer, since yy_c_buf_p will
-		 * already have been incremented past the NUL character
-		 * (since all states make transitions on EOB to the
-		 * end-of-buffer state).  Contrast this with the test
-		 * in input().
-		 */
-		if ( yy_c_buf_p <= &yy_current_buffer->yy_ch_buf[yy_n_chars] )
-			{ /* This was really a NUL. */
-			yy_state_type yy_next_state;
+        /* Note that here we test for yy_c_buf_p "<=" to the position
+         * of the first EOB in the buffer, since yy_c_buf_p will
+         * already have been incremented past the NUL character
+         * (since all states make transitions on EOB to the
+         * end-of-buffer state).  Contrast this with the test
+         * in input().
+         */
+        if ( yy_c_buf_p <= &yy_current_buffer->yy_ch_buf[yy_n_chars] )
+            { /* This was really a NUL. */
+            yy_state_type yy_next_state;
 
-			yy_c_buf_p = yytext_ptr + yy_amount_of_matched_text;
+            yy_c_buf_p = yytext_ptr + yy_amount_of_matched_text;
 
-			yy_current_state = yy_get_previous_state();
+            yy_current_state = yy_get_previous_state();
 
-			/* Okay, we're now positioned to make the NUL
-			 * transition.  We couldn't have
-			 * yy_get_previous_state() go ahead and do it
-			 * for us because it doesn't know how to deal
-			 * with the possibility of jamming (and we don't
-			 * want to build jamming into it because then it
-			 * will run more slowly).
-			 */
+            /* Okay, we're now positioned to make the NUL
+             * transition.  We couldn't have
+             * yy_get_previous_state() go ahead and do it
+             * for us because it doesn't know how to deal
+             * with the possibility of jamming (and we don't
+             * want to build jamming into it because then it
+             * will run more slowly).
+             */
 
-			yy_next_state = yy_try_NUL_trans( yy_current_state );
+            yy_next_state = yy_try_NUL_trans( yy_current_state );
 
-			yy_bp = yytext_ptr + YY_MORE_ADJ;
+            yy_bp = yytext_ptr + YY_MORE_ADJ;
 
-			if ( yy_next_state )
-				{
-				/* Consume the NUL. */
-				yy_cp = ++yy_c_buf_p;
-				yy_current_state = yy_next_state;
-				goto yy_match;
-				}
+            if ( yy_next_state )
+                {
+                /* Consume the NUL. */
+                yy_cp = ++yy_c_buf_p;
+                yy_current_state = yy_next_state;
+                goto yy_match;
+                }
 
-			else
-				{
-				yy_cp = yy_c_buf_p;
-				goto yy_find_action;
-				}
-			}
+            else
+                {
+                yy_cp = yy_c_buf_p;
+                goto yy_find_action;
+                }
+            }
 
-		else switch ( yy_get_next_buffer() )
-			{
-			case EOB_ACT_END_OF_FILE:
-				{
-				yy_did_buffer_switch_on_eof = 0;
+        else switch ( yy_get_next_buffer() )
+            {
+            case EOB_ACT_END_OF_FILE:
+                {
+                yy_did_buffer_switch_on_eof = 0;
 
-				if ( yywrap() )
-					{
-					/* Note: because we've taken care in
-					 * yy_get_next_buffer() to have set up
-					 * yytext, we can now set up
-					 * yy_c_buf_p so that if some total
-					 * hoser (like flex itself) wants to
-					 * call the scanner after we return the
-					 * YY_NULL, it'll still work - another
-					 * YY_NULL will get returned.
-					 */
-					yy_c_buf_p = yytext_ptr + YY_MORE_ADJ;
+                if ( yywrap() )
+                    {
+                    /* Note: because we've taken care in
+                     * yy_get_next_buffer() to have set up
+                     * yytext, we can now set up
+                     * yy_c_buf_p so that if some total
+                     * hoser (like flex itself) wants to
+                     * call the scanner after we return the
+                     * YY_NULL, it'll still work - another
+                     * YY_NULL will get returned.
+                     */
+                    yy_c_buf_p = yytext_ptr + YY_MORE_ADJ;
 
-					yy_act = YY_STATE_EOF(YY_START);
-					goto do_action;
-					}
+                    yy_act = YY_STATE_EOF(YY_START);
+                    goto do_action;
+                    }
 
-				else
-					{
-					if ( ! yy_did_buffer_switch_on_eof )
-						YY_NEW_FILE;
-					}
-				break;
-				}
+                else
+                    {
+                    if ( ! yy_did_buffer_switch_on_eof )
+                        YY_NEW_FILE;
+                    }
+                break;
+                }
 
-			case EOB_ACT_CONTINUE_SCAN:
-				yy_c_buf_p =
-					yytext_ptr + yy_amount_of_matched_text;
+            case EOB_ACT_CONTINUE_SCAN:
+                yy_c_buf_p =
+                    yytext_ptr + yy_amount_of_matched_text;
 
-				yy_current_state = yy_get_previous_state();
+                yy_current_state = yy_get_previous_state();
 
-				yy_cp = yy_c_buf_p;
-				yy_bp = yytext_ptr + YY_MORE_ADJ;
-				goto yy_match;
+                yy_cp = yy_c_buf_p;
+                yy_bp = yytext_ptr + YY_MORE_ADJ;
+                goto yy_match;
 
-			case EOB_ACT_LAST_MATCH:
-				yy_c_buf_p =
-				&yy_current_buffer->yy_ch_buf[yy_n_chars];
+            case EOB_ACT_LAST_MATCH:
+                yy_c_buf_p =
+                &yy_current_buffer->yy_ch_buf[yy_n_chars];
 
-				yy_current_state = yy_get_previous_state();
+                yy_current_state = yy_get_previous_state();
 
-				yy_cp = yy_c_buf_p;
-				yy_bp = yytext_ptr + YY_MORE_ADJ;
-				goto yy_find_action;
-			}
-		break;
-		}
+                yy_cp = yy_c_buf_p;
+                yy_bp = yytext_ptr + YY_MORE_ADJ;
+                goto yy_find_action;
+            }
+        break;
+        }
 
-	default:
-		YY_FATAL_ERROR(
-			"fatal flex scanner internal error--no action found" );
-	} /* end of action switch */
-		} /* end of scanning one token */
-	} /* end of yylex */
+    default:
+        YY_FATAL_ERROR(
+            "fatal flex scanner internal error--no action found" );
+    } /* end of action switch */
+        } /* end of scanning one token */
+    } /* end of yylex */
 
 
 /* yy_get_next_buffer - try to read in a new buffer
  *
  * Returns a code representing an action:
- *	EOB_ACT_LAST_MATCH -
- *	EOB_ACT_CONTINUE_SCAN - continue scanning from current position
- *	EOB_ACT_END_OF_FILE - end of file
+ *  EOB_ACT_LAST_MATCH -
+ *  EOB_ACT_CONTINUE_SCAN - continue scanning from current position
+ *  EOB_ACT_END_OF_FILE - end of file
  */
 
 static int yy_get_next_buffer()
-	{
-	register char *dest = yy_current_buffer->yy_ch_buf;
-	register char *source = yytext_ptr;
-	register int number_to_move, i;
-	int ret_val;
+    {
+    register char *dest = yy_current_buffer->yy_ch_buf;
+    register char *source = yytext_ptr;
+    register int number_to_move, i;
+    int ret_val;
 
-	if ( yy_c_buf_p > &yy_current_buffer->yy_ch_buf[yy_n_chars + 1] )
-		YY_FATAL_ERROR(
-		"fatal flex scanner internal error--end of buffer missed" );
+    if ( yy_c_buf_p > &yy_current_buffer->yy_ch_buf[yy_n_chars + 1] )
+        YY_FATAL_ERROR(
+        "fatal flex scanner internal error--end of buffer missed" );
 
-	if ( yy_current_buffer->yy_fill_buffer == 0 )
-		{ /* Don't try to fill the buffer, so this is an EOF. */
-		if ( yy_c_buf_p - yytext_ptr - YY_MORE_ADJ == 1 )
-			{
-			/* We matched a single character, the EOB, so
-			 * treat this as a final EOF.
-			 */
-			return EOB_ACT_END_OF_FILE;
-			}
+    if ( yy_current_buffer->yy_fill_buffer == 0 )
+        { /* Don't try to fill the buffer, so this is an EOF. */
+        if ( yy_c_buf_p - yytext_ptr - YY_MORE_ADJ == 1 )
+            {
+            /* We matched a single character, the EOB, so
+             * treat this as a final EOF.
+             */
+            return EOB_ACT_END_OF_FILE;
+            }
 
-		else
-			{
-			/* We matched some text prior to the EOB, first
-			 * process it.
-			 */
-			return EOB_ACT_LAST_MATCH;
-			}
-		}
+        else
+            {
+            /* We matched some text prior to the EOB, first
+             * process it.
+             */
+            return EOB_ACT_LAST_MATCH;
+            }
+        }
 
-	/* Try to read more data. */
+    /* Try to read more data. */
 
-	/* First move last chars to start of buffer. */
-	number_to_move = (int) (yy_c_buf_p - yytext_ptr) - 1;
+    /* First move last chars to start of buffer. */
+    number_to_move = (int) (yy_c_buf_p - yytext_ptr) - 1;
 
-	for ( i = 0; i < number_to_move; ++i )
-		*(dest++) = *(source++);
+    for ( i = 0; i < number_to_move; ++i )
+        *(dest++) = *(source++);
 
-	if ( yy_current_buffer->yy_buffer_status == YY_BUFFER_EOF_PENDING )
-		/* don't do the read, it's not guaranteed to return an EOF,
-		 * just force an EOF
-		 */
-		yy_current_buffer->yy_n_chars = yy_n_chars = 0;
+    if ( yy_current_buffer->yy_buffer_status == YY_BUFFER_EOF_PENDING )
+        /* don't do the read, it's not guaranteed to return an EOF,
+         * just force an EOF
+         */
+        yy_current_buffer->yy_n_chars = yy_n_chars = 0;
 
-	else
-		{
-		int num_to_read =
-			yy_current_buffer->yy_buf_size - number_to_move - 1;
+    else
+        {
+        int num_to_read =
+            yy_current_buffer->yy_buf_size - number_to_move - 1;
 
-		while ( num_to_read <= 0 )
-			{ /* Not enough room in the buffer - grow it. */
+        while ( num_to_read <= 0 )
+            { /* Not enough room in the buffer - grow it. */
 #ifdef YY_USES_REJECT
-			YY_FATAL_ERROR(
+            YY_FATAL_ERROR(
 "input buffer overflow, can't enlarge buffer because scanner uses REJECT" );
 #else
 
-			/* just a shorter name for the current buffer */
-			YY_BUFFER_STATE b = yy_current_buffer;
+            /* just a shorter name for the current buffer */
+            YY_BUFFER_STATE b = yy_current_buffer;
 
-			int yy_c_buf_p_offset =
-				(int) (yy_c_buf_p - b->yy_ch_buf);
+            int yy_c_buf_p_offset =
+                (int) (yy_c_buf_p - b->yy_ch_buf);
 
-			if ( b->yy_is_our_buffer )
-				{
-				int new_size = b->yy_buf_size * 2;
+            if ( b->yy_is_our_buffer )
+                {
+                int new_size = b->yy_buf_size * 2;
 
-				if ( new_size <= 0 )
-					b->yy_buf_size += b->yy_buf_size / 8;
-				else
-					b->yy_buf_size *= 2;
+                if ( new_size <= 0 )
+                    b->yy_buf_size += b->yy_buf_size / 8;
+                else
+                    b->yy_buf_size *= 2;
 
-				b->yy_ch_buf = (char *)
-					/* Include room in for 2 EOB chars. */
-					yy_flex_realloc( (void *) b->yy_ch_buf,
-							 b->yy_buf_size + 2 );
-				}
-			else
-				/* Can't grow it, we don't own it. */
-				b->yy_ch_buf = 0;
+                b->yy_ch_buf = (char *)
+                    /* Include room in for 2 EOB chars. */
+                    yy_flex_realloc( (void *) b->yy_ch_buf,
+                             b->yy_buf_size + 2 );
+                }
+            else
+                /* Can't grow it, we don't own it. */
+                b->yy_ch_buf = 0;
 
-			if ( ! b->yy_ch_buf )
-				YY_FATAL_ERROR(
-				"fatal error - scanner input buffer overflow" );
+            if ( ! b->yy_ch_buf )
+                YY_FATAL_ERROR(
+                "fatal error - scanner input buffer overflow" );
 
-			yy_c_buf_p = &b->yy_ch_buf[yy_c_buf_p_offset];
+            yy_c_buf_p = &b->yy_ch_buf[yy_c_buf_p_offset];
 
-			num_to_read = yy_current_buffer->yy_buf_size -
-						number_to_move - 1;
+            num_to_read = yy_current_buffer->yy_buf_size -
+                        number_to_move - 1;
 #endif
-			}
+            }
 
-		if ( num_to_read > YY_READ_BUF_SIZE )
-			num_to_read = YY_READ_BUF_SIZE;
+        if ( num_to_read > YY_READ_BUF_SIZE )
+            num_to_read = YY_READ_BUF_SIZE;
 
-		/* Read in more data. */
-		YY_INPUT( (&yy_current_buffer->yy_ch_buf[number_to_move]),
-			yy_n_chars, num_to_read );
+        /* Read in more data. */
+        YY_INPUT( (&yy_current_buffer->yy_ch_buf[number_to_move]),
+            yy_n_chars, num_to_read );
 
-		yy_current_buffer->yy_n_chars = yy_n_chars;
-		}
+        yy_current_buffer->yy_n_chars = yy_n_chars;
+        }
 
-	if ( yy_n_chars == 0 )
-		{
-		if ( number_to_move == YY_MORE_ADJ )
-			{
-			ret_val = EOB_ACT_END_OF_FILE;
-			yyrestart( yyin );
-			}
+    if ( yy_n_chars == 0 )
+        {
+        if ( number_to_move == YY_MORE_ADJ )
+            {
+            ret_val = EOB_ACT_END_OF_FILE;
+            yyrestart( yyin );
+            }
 
-		else
-			{
-			ret_val = EOB_ACT_LAST_MATCH;
-			yy_current_buffer->yy_buffer_status =
-				YY_BUFFER_EOF_PENDING;
-			}
-		}
+        else
+            {
+            ret_val = EOB_ACT_LAST_MATCH;
+            yy_current_buffer->yy_buffer_status =
+                YY_BUFFER_EOF_PENDING;
+            }
+        }
 
-	else
-		ret_val = EOB_ACT_CONTINUE_SCAN;
+    else
+        ret_val = EOB_ACT_CONTINUE_SCAN;
 
-	yy_n_chars += number_to_move;
-	yy_current_buffer->yy_ch_buf[yy_n_chars] = YY_END_OF_BUFFER_CHAR;
-	yy_current_buffer->yy_ch_buf[yy_n_chars + 1] = YY_END_OF_BUFFER_CHAR;
+    yy_n_chars += number_to_move;
+    yy_current_buffer->yy_ch_buf[yy_n_chars] = YY_END_OF_BUFFER_CHAR;
+    yy_current_buffer->yy_ch_buf[yy_n_chars + 1] = YY_END_OF_BUFFER_CHAR;
 
-	yytext_ptr = &yy_current_buffer->yy_ch_buf[0];
+    yytext_ptr = &yy_current_buffer->yy_ch_buf[0];
 
-	return ret_val;
-	}
+    return ret_val;
+    }
 
 
 /* yy_get_previous_state - get the state just before the EOB char was reached */
 
 static yy_state_type yy_get_previous_state()
-	{
-	register yy_state_type yy_current_state;
-	register char *yy_cp;
+    {
+    register yy_state_type yy_current_state;
+    register char *yy_cp;
 
-	yy_current_state = yy_start;
-	yy_current_state += YY_AT_BOL();
-	yy_state_ptr = yy_state_buf;
-	*yy_state_ptr++ = yy_current_state;
+    yy_current_state = yy_start;
+    yy_current_state += YY_AT_BOL();
+    yy_state_ptr = yy_state_buf;
+    *yy_state_ptr++ = yy_current_state;
 
-	for ( yy_cp = yytext_ptr + YY_MORE_ADJ; yy_cp < yy_c_buf_p; ++yy_cp )
-		{
-		register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 4);
-		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-			{
-			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 329 )
-				yy_c = yy_meta[(unsigned int) yy_c];
-			}
-		yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-		*yy_state_ptr++ = yy_current_state;
-		}
+    for ( yy_cp = yytext_ptr + YY_MORE_ADJ; yy_cp < yy_c_buf_p; ++yy_cp )
+        {
+        register YY_CHAR yy_c = (*yy_cp ? yy_ec[YY_SC_TO_UI(*yy_cp)] : 4);
+        while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+            {
+            yy_current_state = (int) yy_def[yy_current_state];
+            if ( yy_current_state >= 329 )
+                yy_c = yy_meta[(unsigned int) yy_c];
+            }
+        yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+        *yy_state_ptr++ = yy_current_state;
+        }
 
-	return yy_current_state;
-	}
+    return yy_current_state;
+    }
 
 
 /* yy_try_NUL_trans - try to make a transition on the NUL character
  *
  * synopsis
- *	next_state = yy_try_NUL_trans( current_state );
+ *  next_state = yy_try_NUL_trans( current_state );
  */
 
 #ifdef YY_USE_PROTOS
@@ -3219,23 +3219,23 @@ static yy_state_type yy_try_NUL_trans( yy_state_type yy_current_state )
 static yy_state_type yy_try_NUL_trans( yy_current_state )
 yy_state_type yy_current_state;
 #endif
-	{
-	register int yy_is_jam;
+    {
+    register int yy_is_jam;
 
-	register YY_CHAR yy_c = 4;
-	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
-		{
-		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 329 )
-			yy_c = yy_meta[(unsigned int) yy_c];
-		}
-	yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
-	yy_is_jam = (yy_current_state == 328);
-	if ( ! yy_is_jam )
-		*yy_state_ptr++ = yy_current_state;
+    register YY_CHAR yy_c = 4;
+    while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
+        {
+        yy_current_state = (int) yy_def[yy_current_state];
+        if ( yy_current_state >= 329 )
+            yy_c = yy_meta[(unsigned int) yy_c];
+        }
+    yy_current_state = yy_nxt[yy_base[yy_current_state] + (unsigned int) yy_c];
+    yy_is_jam = (yy_current_state == 328);
+    if ( ! yy_is_jam )
+        *yy_state_ptr++ = yy_current_state;
 
-	return yy_is_jam ? 0 : yy_current_state;
-	}
+    return yy_is_jam ? 0 : yy_current_state;
+    }
 
 
 #ifndef YY_NO_UNPUT
@@ -3246,41 +3246,41 @@ static void yyunput( c, yy_bp )
 int c;
 register char *yy_bp;
 #endif
-	{
-	register char *yy_cp = yy_c_buf_p;
+    {
+    register char *yy_cp = yy_c_buf_p;
 
-	/* undo effects of setting up yytext */
-	*yy_cp = yy_hold_char;
+    /* undo effects of setting up yytext */
+    *yy_cp = yy_hold_char;
 
-	if ( yy_cp < yy_current_buffer->yy_ch_buf + 2 )
-		{ /* need to shift things up to make room */
-		/* +2 for EOB chars. */
-		register int number_to_move = yy_n_chars + 2;
-		register char *dest = &yy_current_buffer->yy_ch_buf[
-					yy_current_buffer->yy_buf_size + 2];
-		register char *source =
-				&yy_current_buffer->yy_ch_buf[number_to_move];
+    if ( yy_cp < yy_current_buffer->yy_ch_buf + 2 )
+        { /* need to shift things up to make room */
+        /* +2 for EOB chars. */
+        register int number_to_move = yy_n_chars + 2;
+        register char *dest = &yy_current_buffer->yy_ch_buf[
+                    yy_current_buffer->yy_buf_size + 2];
+        register char *source =
+                &yy_current_buffer->yy_ch_buf[number_to_move];
 
-		while ( source > yy_current_buffer->yy_ch_buf )
-			*--dest = *--source;
+        while ( source > yy_current_buffer->yy_ch_buf )
+            *--dest = *--source;
 
-		yy_cp += (int) (dest - source);
-		yy_bp += (int) (dest - source);
-		yy_current_buffer->yy_n_chars =
-			yy_n_chars = yy_current_buffer->yy_buf_size;
+        yy_cp += (int) (dest - source);
+        yy_bp += (int) (dest - source);
+        yy_current_buffer->yy_n_chars =
+            yy_n_chars = yy_current_buffer->yy_buf_size;
 
-		if ( yy_cp < yy_current_buffer->yy_ch_buf + 2 )
-			YY_FATAL_ERROR( "flex scanner push-back overflow" );
-		}
+        if ( yy_cp < yy_current_buffer->yy_ch_buf + 2 )
+            YY_FATAL_ERROR( "flex scanner push-back overflow" );
+        }
 
-	*--yy_cp = (char) c;
+    *--yy_cp = (char) c;
 
 
-	yytext_ptr = yy_bp;
-	yy_hold_char = *yy_cp;
-	yy_c_buf_p = yy_cp;
-	}
-#endif	/* ifndef YY_NO_UNPUT */
+    yytext_ptr = yy_bp;
+    yy_hold_char = *yy_cp;
+    yy_c_buf_p = yy_cp;
+    }
+#endif  /* ifndef YY_NO_UNPUT */
 
 
 #ifdef __cplusplus
@@ -3288,73 +3288,73 @@ static int yyinput()
 #else
 static int input()
 #endif
-	{
-	int c;
+    {
+    int c;
 
-	*yy_c_buf_p = yy_hold_char;
+    *yy_c_buf_p = yy_hold_char;
 
-	if ( *yy_c_buf_p == YY_END_OF_BUFFER_CHAR )
-		{
-		/* yy_c_buf_p now points to the character we want to return.
-		 * If this occurs *before* the EOB characters, then it's a
-		 * valid NUL; if not, then we've hit the end of the buffer.
-		 */
-		if ( yy_c_buf_p < &yy_current_buffer->yy_ch_buf[yy_n_chars] )
-			/* This was really a NUL. */
-			*yy_c_buf_p = '\0';
+    if ( *yy_c_buf_p == YY_END_OF_BUFFER_CHAR )
+        {
+        /* yy_c_buf_p now points to the character we want to return.
+         * If this occurs *before* the EOB characters, then it's a
+         * valid NUL; if not, then we've hit the end of the buffer.
+         */
+        if ( yy_c_buf_p < &yy_current_buffer->yy_ch_buf[yy_n_chars] )
+            /* This was really a NUL. */
+            *yy_c_buf_p = '\0';
 
-		else
-			{ /* need more input */
-			int offset = yy_c_buf_p - yytext_ptr;
-			++yy_c_buf_p;
+        else
+            { /* need more input */
+            int offset = yy_c_buf_p - yytext_ptr;
+            ++yy_c_buf_p;
 
-			switch ( yy_get_next_buffer() )
-				{
-				case EOB_ACT_LAST_MATCH:
-					/* This happens because yy_g_n_b()
-					 * sees that we've accumulated a
-					 * token and flags that we need to
-					 * try matching the token before
-					 * proceeding.  But for input(),
-					 * there's no matching to consider.
-					 * So convert the EOB_ACT_LAST_MATCH
-					 * to EOB_ACT_END_OF_FILE.
-					 */
+            switch ( yy_get_next_buffer() )
+                {
+                case EOB_ACT_LAST_MATCH:
+                    /* This happens because yy_g_n_b()
+                     * sees that we've accumulated a
+                     * token and flags that we need to
+                     * try matching the token before
+                     * proceeding.  But for input(),
+                     * there's no matching to consider.
+                     * So convert the EOB_ACT_LAST_MATCH
+                     * to EOB_ACT_END_OF_FILE.
+                     */
 
-					/* Reset buffer status. */
-					yyrestart( yyin );
+                    /* Reset buffer status. */
+                    yyrestart( yyin );
 
-					/* fall through */
+                    /* fall through */
 
-				case EOB_ACT_END_OF_FILE:
-					{
-					if ( yywrap() )
-						return EOF;
+                case EOB_ACT_END_OF_FILE:
+                    {
+                    if ( yywrap() )
+                        return EOF;
 
-					if ( ! yy_did_buffer_switch_on_eof )
-						YY_NEW_FILE;
+                    if ( ! yy_did_buffer_switch_on_eof )
+                        YY_NEW_FILE;
 #ifdef __cplusplus
-					return yyinput();
+                    return yyinput();
 #else
-					return input();
+                    return input();
 #endif
-					}
+                    }
 
-				case EOB_ACT_CONTINUE_SCAN:
-					yy_c_buf_p = yytext_ptr + offset;
-					break;
-				}
-			}
-		}
+                case EOB_ACT_CONTINUE_SCAN:
+                    yy_c_buf_p = yytext_ptr + offset;
+                    break;
+                }
+            }
+        }
 
-	c = *(unsigned char *) yy_c_buf_p;	/* cast for 8-bit char's */
-	*yy_c_buf_p = '\0';	/* preserve yytext */
-	yy_hold_char = *++yy_c_buf_p;
+    c = *(unsigned char *) yy_c_buf_p;  /* cast for 8-bit char's */
+    *yy_c_buf_p = '\0'; /* preserve yytext */
+    yy_hold_char = *++yy_c_buf_p;
 
-	yy_current_buffer->yy_at_bol = (c == '\n');
+    yy_current_buffer->yy_at_bol = (c == '\n');
 
-	return c;
-	}
+    return c;
+    }
 
 
 #ifdef YY_USE_PROTOS
@@ -3363,13 +3363,13 @@ void yyrestart( FILE *input_file )
 void yyrestart( input_file )
 FILE *input_file;
 #endif
-	{
-	if ( ! yy_current_buffer )
-		yy_current_buffer = yy_create_buffer( yyin, YY_BUF_SIZE );
+    {
+    if ( ! yy_current_buffer )
+        yy_current_buffer = yy_create_buffer( yyin, YY_BUF_SIZE );
 
-	yy_init_buffer( yy_current_buffer, input_file );
-	yy_load_buffer_state();
-	}
+    yy_init_buffer( yy_current_buffer, input_file );
+    yy_load_buffer_state();
+    }
 
 
 #ifdef YY_USE_PROTOS
@@ -3378,28 +3378,28 @@ void yy_switch_to_buffer( YY_BUFFER_STATE new_buffer )
 void yy_switch_to_buffer( new_buffer )
 YY_BUFFER_STATE new_buffer;
 #endif
-	{
-	if ( yy_current_buffer == new_buffer )
-		return;
+    {
+    if ( yy_current_buffer == new_buffer )
+        return;
 
-	if ( yy_current_buffer )
-		{
-		/* Flush out information for old buffer. */
-		*yy_c_buf_p = yy_hold_char;
-		yy_current_buffer->yy_buf_pos = yy_c_buf_p;
-		yy_current_buffer->yy_n_chars = yy_n_chars;
-		}
+    if ( yy_current_buffer )
+        {
+        /* Flush out information for old buffer. */
+        *yy_c_buf_p = yy_hold_char;
+        yy_current_buffer->yy_buf_pos = yy_c_buf_p;
+        yy_current_buffer->yy_n_chars = yy_n_chars;
+        }
 
-	yy_current_buffer = new_buffer;
-	yy_load_buffer_state();
+    yy_current_buffer = new_buffer;
+    yy_load_buffer_state();
 
-	/* We don't actually know whether we did this switch during
-	 * EOF (yywrap()) processing, but the only time this flag
-	 * is looked at is after yywrap() is called, so it's safe
-	 * to go ahead and always set it.
-	 */
-	yy_did_buffer_switch_on_eof = 1;
-	}
+    /* We don't actually know whether we did this switch during
+     * EOF (yywrap()) processing, but the only time this flag
+     * is looked at is after yywrap() is called, so it's safe
+     * to go ahead and always set it.
+     */
+    yy_did_buffer_switch_on_eof = 1;
+    }
 
 
 #ifdef YY_USE_PROTOS
@@ -3407,12 +3407,12 @@ void yy_load_buffer_state( void )
 #else
 void yy_load_buffer_state()
 #endif
-	{
-	yy_n_chars = yy_current_buffer->yy_n_chars;
-	yytext_ptr = yy_c_buf_p = yy_current_buffer->yy_buf_pos;
-	yyin = yy_current_buffer->yy_input_file;
-	yy_hold_char = *yy_c_buf_p;
-	}
+    {
+    yy_n_chars = yy_current_buffer->yy_n_chars;
+    yytext_ptr = yy_c_buf_p = yy_current_buffer->yy_buf_pos;
+    yyin = yy_current_buffer->yy_input_file;
+    yy_hold_char = *yy_c_buf_p;
+    }
 
 
 #ifdef YY_USE_PROTOS
@@ -3422,28 +3422,28 @@ YY_BUFFER_STATE yy_create_buffer( file, size )
 FILE *file;
 int size;
 #endif
-	{
-	YY_BUFFER_STATE b;
+    {
+    YY_BUFFER_STATE b;
 
-	b = (YY_BUFFER_STATE) yy_flex_alloc( sizeof( struct yy_buffer_state ) );
-	if ( ! b )
-		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
+    b = (YY_BUFFER_STATE) yy_flex_alloc( sizeof( struct yy_buffer_state ) );
+    if ( ! b )
+        YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-	b->yy_buf_size = size;
+    b->yy_buf_size = size;
 
-	/* yy_ch_buf has to be 2 characters longer than the size given because
-	 * we need to put in 2 end-of-buffer characters.
-	 */
-	b->yy_ch_buf = (char *) yy_flex_alloc( b->yy_buf_size + 2 );
-	if ( ! b->yy_ch_buf )
-		YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
+    /* yy_ch_buf has to be 2 characters longer than the size given because
+     * we need to put in 2 end-of-buffer characters.
+     */
+    b->yy_ch_buf = (char *) yy_flex_alloc( b->yy_buf_size + 2 );
+    if ( ! b->yy_ch_buf )
+        YY_FATAL_ERROR( "out of dynamic memory in yy_create_buffer()" );
 
-	b->yy_is_our_buffer = 1;
+    b->yy_is_our_buffer = 1;
 
-	yy_init_buffer( b, file );
+    yy_init_buffer( b, file );
 
-	return b;
-	}
+    return b;
+    }
 
 
 #ifdef YY_USE_PROTOS
@@ -3452,18 +3452,18 @@ void yy_delete_buffer( YY_BUFFER_STATE b )
 void yy_delete_buffer( b )
 YY_BUFFER_STATE b;
 #endif
-	{
-	if ( ! b )
-		return;
+    {
+    if ( ! b )
+        return;
 
-	if ( b == yy_current_buffer )
-		yy_current_buffer = (YY_BUFFER_STATE) 0;
+    if ( b == yy_current_buffer )
+        yy_current_buffer = (YY_BUFFER_STATE) 0;
 
-	if ( b->yy_is_our_buffer )
-		yy_flex_free( (void *) b->yy_ch_buf );
+    if ( b->yy_is_our_buffer )
+        yy_flex_free( (void *) b->yy_ch_buf );
 
-	yy_flex_free( (void *) b );
-	}
+    yy_flex_free( (void *) b );
+    }
 
 
 
@@ -3476,22 +3476,22 @@ FILE *file;
 #endif
 
 
-	{
-	yy_flush_buffer( b );
+    {
+    yy_flush_buffer( b );
 
-	b->yy_input_file = file;
-	b->yy_fill_buffer = 1;
+    b->yy_input_file = file;
+    b->yy_fill_buffer = 1;
 
 #if YY_ALWAYS_INTERACTIVE
-	b->yy_is_interactive = 1;
+    b->yy_is_interactive = 1;
 #else
 #if YY_NEVER_INTERACTIVE
-	b->yy_is_interactive = 0;
+    b->yy_is_interactive = 0;
 #else
-	b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
+    b->yy_is_interactive = file ? (isatty( fileno(file) ) > 0) : 0;
 #endif
 #endif
-	}
+    }
 
 
 #ifdef YY_USE_PROTOS
@@ -3501,27 +3501,27 @@ void yy_flush_buffer( b )
 YY_BUFFER_STATE b;
 #endif
 
-	{
-	if ( ! b )
-		return;
+    {
+    if ( ! b )
+        return;
 
-	b->yy_n_chars = 0;
+    b->yy_n_chars = 0;
 
-	/* We always need two end-of-buffer characters.  The first causes
-	 * a transition to the end-of-buffer state.  The second causes
-	 * a jam in that state.
-	 */
-	b->yy_ch_buf[0] = YY_END_OF_BUFFER_CHAR;
-	b->yy_ch_buf[1] = YY_END_OF_BUFFER_CHAR;
+    /* We always need two end-of-buffer characters.  The first causes
+     * a transition to the end-of-buffer state.  The second causes
+     * a jam in that state.
+     */
+    b->yy_ch_buf[0] = YY_END_OF_BUFFER_CHAR;
+    b->yy_ch_buf[1] = YY_END_OF_BUFFER_CHAR;
 
-	b->yy_buf_pos = &b->yy_ch_buf[0];
+    b->yy_buf_pos = &b->yy_ch_buf[0];
 
-	b->yy_at_bol = 1;
-	b->yy_buffer_status = YY_BUFFER_NEW;
+    b->yy_at_bol = 1;
+    b->yy_buffer_status = YY_BUFFER_NEW;
 
-	if ( b == yy_current_buffer )
-		yy_load_buffer_state();
-	}
+    if ( b == yy_current_buffer )
+        yy_load_buffer_state();
+    }
 
 
 #ifndef YY_NO_SCAN_BUFFER
@@ -3532,33 +3532,33 @@ YY_BUFFER_STATE yy_scan_buffer( base, size )
 char *base;
 yy_size_t size;
 #endif
-	{
-	YY_BUFFER_STATE b;
+    {
+    YY_BUFFER_STATE b;
 
-	if ( size < 2 ||
-	     base[size-2] != YY_END_OF_BUFFER_CHAR ||
-	     base[size-1] != YY_END_OF_BUFFER_CHAR )
-		/* They forgot to leave room for the EOB's. */
-		return 0;
+    if ( size < 2 ||
+         base[size-2] != YY_END_OF_BUFFER_CHAR ||
+         base[size-1] != YY_END_OF_BUFFER_CHAR )
+        /* They forgot to leave room for the EOB's. */
+        return 0;
 
-	b = (YY_BUFFER_STATE) yy_flex_alloc( sizeof( struct yy_buffer_state ) );
-	if ( ! b )
-		YY_FATAL_ERROR( "out of dynamic memory in yy_scan_buffer()" );
+    b = (YY_BUFFER_STATE) yy_flex_alloc( sizeof( struct yy_buffer_state ) );
+    if ( ! b )
+        YY_FATAL_ERROR( "out of dynamic memory in yy_scan_buffer()" );
 
-	b->yy_buf_size = size - 2;	/* "- 2" to take care of EOB's */
-	b->yy_buf_pos = b->yy_ch_buf = base;
-	b->yy_is_our_buffer = 0;
-	b->yy_input_file = 0;
-	b->yy_n_chars = b->yy_buf_size;
-	b->yy_is_interactive = 0;
-	b->yy_at_bol = 1;
-	b->yy_fill_buffer = 0;
-	b->yy_buffer_status = YY_BUFFER_NEW;
+    b->yy_buf_size = size - 2;  /* "- 2" to take care of EOB's */
+    b->yy_buf_pos = b->yy_ch_buf = base;
+    b->yy_is_our_buffer = 0;
+    b->yy_input_file = 0;
+    b->yy_n_chars = b->yy_buf_size;
+    b->yy_is_interactive = 0;
+    b->yy_at_bol = 1;
+    b->yy_fill_buffer = 0;
+    b->yy_buffer_status = YY_BUFFER_NEW;
 
-	yy_switch_to_buffer( b );
+    yy_switch_to_buffer( b );
 
-	return b;
-	}
+    return b;
+    }
 #endif
 
 
@@ -3569,13 +3569,13 @@ YY_BUFFER_STATE yy_scan_string( yyconst char *yy_str )
 YY_BUFFER_STATE yy_scan_string( yy_str )
 yyconst char *yy_str;
 #endif
-	{
-	int len;
-	for ( len = 0; yy_str[len]; ++len )
-		;
+    {
+    int len;
+    for ( len = 0; yy_str[len]; ++len )
+        ;
 
-	return yy_scan_bytes( yy_str, len );
-	}
+    return yy_scan_bytes( yy_str, len );
+    }
 #endif
 
 
@@ -3587,34 +3587,34 @@ YY_BUFFER_STATE yy_scan_bytes( bytes, len )
 yyconst char *bytes;
 int len;
 #endif
-	{
-	YY_BUFFER_STATE b;
-	char *buf;
-	yy_size_t n;
-	int i;
+    {
+    YY_BUFFER_STATE b;
+    char *buf;
+    yy_size_t n;
+    int i;
 
-	/* Get memory for full buffer, including space for trailing EOB's. */
-	n = len + 2;
-	buf = (char *) yy_flex_alloc( n );
-	if ( ! buf )
-		YY_FATAL_ERROR( "out of dynamic memory in yy_scan_bytes()" );
+    /* Get memory for full buffer, including space for trailing EOB's. */
+    n = len + 2;
+    buf = (char *) yy_flex_alloc( n );
+    if ( ! buf )
+        YY_FATAL_ERROR( "out of dynamic memory in yy_scan_bytes()" );
 
-	for ( i = 0; i < len; ++i )
-		buf[i] = bytes[i];
+    for ( i = 0; i < len; ++i )
+        buf[i] = bytes[i];
 
-	buf[len] = buf[len+1] = YY_END_OF_BUFFER_CHAR;
+    buf[len] = buf[len+1] = YY_END_OF_BUFFER_CHAR;
 
-	b = yy_scan_buffer( buf, n );
-	if ( ! b )
-		YY_FATAL_ERROR( "bad buffer in yy_scan_bytes()" );
+    b = yy_scan_buffer( buf, n );
+    if ( ! b )
+        YY_FATAL_ERROR( "bad buffer in yy_scan_bytes()" );
 
-	/* It's okay to grow etc. this buffer, and we should throw it
-	 * away when we're done.
-	 */
-	b->yy_is_our_buffer = 1;
+    /* It's okay to grow etc. this buffer, and we should throw it
+     * away when we're done.
+     */
+    b->yy_is_our_buffer = 1;
 
-	return b;
-	}
+    return b;
+    }
 #endif
 
 
@@ -3625,49 +3625,49 @@ static void yy_push_state( int new_state )
 static void yy_push_state( new_state )
 int new_state;
 #endif
-	{
-	if ( yy_start_stack_ptr >= yy_start_stack_depth )
-		{
-		yy_size_t new_size;
+    {
+    if ( yy_start_stack_ptr >= yy_start_stack_depth )
+        {
+        yy_size_t new_size;
 
-		yy_start_stack_depth += YY_START_STACK_INCR;
-		new_size = yy_start_stack_depth * sizeof( int );
+        yy_start_stack_depth += YY_START_STACK_INCR;
+        new_size = yy_start_stack_depth * sizeof( int );
 
-		if ( ! yy_start_stack )
-			yy_start_stack = (int *) yy_flex_alloc( new_size );
+        if ( ! yy_start_stack )
+            yy_start_stack = (int *) yy_flex_alloc( new_size );
 
-		else
-			yy_start_stack = (int *) yy_flex_realloc(
-					(void *) yy_start_stack, new_size );
+        else
+            yy_start_stack = (int *) yy_flex_realloc(
+                    (void *) yy_start_stack, new_size );
 
-		if ( ! yy_start_stack )
-			YY_FATAL_ERROR(
-			"out of memory expanding start-condition stack" );
-		}
+        if ( ! yy_start_stack )
+            YY_FATAL_ERROR(
+            "out of memory expanding start-condition stack" );
+        }
 
-	yy_start_stack[yy_start_stack_ptr++] = YY_START;
+    yy_start_stack[yy_start_stack_ptr++] = YY_START;
 
-	BEGIN(new_state);
-	}
+    BEGIN(new_state);
+    }
 #endif
 
 
 #ifndef YY_NO_POP_STATE
 static void yy_pop_state()
-	{
-	if ( --yy_start_stack_ptr < 0 )
-		YY_FATAL_ERROR( "start-condition stack underflow" );
+    {
+    if ( --yy_start_stack_ptr < 0 )
+        YY_FATAL_ERROR( "start-condition stack underflow" );
 
-	BEGIN(yy_start_stack[yy_start_stack_ptr]);
-	}
+    BEGIN(yy_start_stack[yy_start_stack_ptr]);
+    }
 #endif
 
 
 #ifndef YY_NO_TOP_STATE
 static int yy_top_state()
-	{
-	return yy_start_stack[yy_start_stack_ptr - 1];
-	}
+    {
+    return yy_start_stack[yy_start_stack_ptr - 1];
+    }
 #endif
 
 #ifndef YY_EXIT_FAILURE
@@ -3680,10 +3680,10 @@ static void yy_fatal_error( yyconst char msg[] )
 static void yy_fatal_error( msg )
 char msg[];
 #endif
-	{
-	(void) fprintf( stderr, "%s\n", msg );
-	exit( YY_EXIT_FAILURE );
-	}
+    {
+    (void) fprintf( stderr, "%s\n", msg );
+    exit( YY_EXIT_FAILURE );
+    }
 
 
 
@@ -3691,16 +3691,16 @@ char msg[];
 
 #undef yyless
 #define yyless(n) \
-	do \
-		{ \
-		/* Undo effects of setting up yytext. */ \
-		yytext[yyleng] = yy_hold_char; \
-		yy_c_buf_p = yytext + n; \
-		yy_hold_char = *yy_c_buf_p; \
-		*yy_c_buf_p = '\0'; \
-		yyleng = n; \
-		} \
-	while ( 0 )
+    do \
+        { \
+        /* Undo effects of setting up yytext. */ \
+        yytext[yyleng] = yy_hold_char; \
+        yy_c_buf_p = yytext + n; \
+        yy_hold_char = *yy_c_buf_p; \
+        *yy_c_buf_p = '\0'; \
+        yyleng = n; \
+        } \
+    while ( 0 )
 
 
 /* Internal utility routines. */
@@ -3714,11 +3714,11 @@ char *s1;
 yyconst char *s2;
 int n;
 #endif
-	{
-	register int i;
-	for ( i = 0; i < n; ++i )
-		s1[i] = s2[i];
-	}
+    {
+    register int i;
+    for ( i = 0; i < n; ++i )
+        s1[i] = s2[i];
+    }
 #endif
 
 #ifdef YY_NEED_STRLEN
@@ -3728,13 +3728,13 @@ static int yy_flex_strlen( yyconst char *s )
 static int yy_flex_strlen( s )
 yyconst char *s;
 #endif
-	{
-	register int n;
-	for ( n = 0; s[n]; ++n )
-		;
+    {
+    register int n;
+    for ( n = 0; s[n]; ++n )
+        ;
 
-	return n;
-	}
+    return n;
+    }
 #endif
 
 
@@ -3744,9 +3744,9 @@ static void *yy_flex_alloc( yy_size_t size )
 static void *yy_flex_alloc( size )
 yy_size_t size;
 #endif
-	{
-	return (void *) malloc( size );
-	}
+    {
+    return (void *) malloc( size );
+    }
 
 // This function is never referenced under these specific conditions
 // Removes a warning
@@ -3758,16 +3758,16 @@ static void *yy_flex_realloc( ptr, size )
 void *ptr;
 yy_size_t size;
 #endif
-	{
-	/* The cast to (char *) in the following accommodates both
-	 * implementations that use char* generic pointers, and those
-	 * that use void* generic pointers.  It works with the latter
-	 * because both ANSI C and C++ allow castless assignment from
-	 * any pointer type to void*, and deal with argument conversions
-	 * as though doing an assignment.
-	 */
-	return (void *) realloc( (char *) ptr, size );
-	}
+    {
+    /* The cast to (char *) in the following accommodates both
+     * implementations that use char* generic pointers, and those
+     * that use void* generic pointers.  It works with the latter
+     * because both ANSI C and C++ allow castless assignment from
+     * any pointer type to void*, and deal with argument conversions
+     * as though doing an assignment.
+     */
+    return (void *) realloc( (char *) ptr, size );
+    }
 #endif
 
 #ifdef YY_USE_PROTOS
@@ -3776,1200 +3776,1200 @@ static void yy_flex_free( void *ptr )
 static void yy_flex_free( ptr )
 void *ptr;
 #endif
-	{
-	free( ptr );
-	}
+    {
+    free( ptr );
+    }
 
 #if YY_MAIN
 int main()
-	{
-	yylex();
-	return 0;
-	}
+    {
+    yylex();
+    return 0;
+    }
 #endif
 #line 1695 "vs1.0_tokens.l"
 
 
 
 //=====================================================================
-// Function:	FindNMacro
-// Description:	Look through macros and see if it had been predefined
-// Parameters:	findName = name to lookup
-//				sLen = # characters valid in source (findName)
-// Returns:		MACROENTRY * = pointer to macro entry if found
+// Function:    FindNMacro
+// Description: Look through macros and see if it had been predefined
+// Parameters:  findName = name to lookup
+//              sLen = # characters valid in source (findName)
+// Returns:     MACROENTRY * = pointer to macro entry if found
 //=====================================================================
 MACROENTRY *FindNMacro(char *findName, unsigned int sLen)
 {
-	MACROENTRY *curEntry;
+    MACROENTRY *curEntry;
 
-	curEntry = gLastMacro;
-	while (curEntry != NULL)
-	{
-		if (strlen(curEntry->macroName) == sLen)
-		{
-			if (!strncmp(curEntry->macroName, findName, sLen))
-			{
-				break;
-			}
-		}
+    curEntry = gLastMacro;
+    while (curEntry != NULL)
+    {
+        if (strlen(curEntry->macroName) == sLen)
+        {
+            if (!strncmp(curEntry->macroName, findName, sLen))
+            {
+                break;
+            }
+        }
 
-		curEntry = curEntry->prev;
-	}
+        curEntry = curEntry->prev;
+    }
 
-	return curEntry;
-	
+    return curEntry;
+    
 }
 
 //=====================================================================
-// Function:	FindMacro
-// Description:	Look through macros and see if it had been predefined
-// Parameters:	findName = name to lookup
-// Returns:		MACROENTRY * = pointer to macro entry if found
+// Function:    FindMacro
+// Description: Look through macros and see if it had been predefined
+// Parameters:  findName = name to lookup
+// Returns:     MACROENTRY * = pointer to macro entry if found
 //=====================================================================
 MACROENTRY *FindMacro(char *findName)
 {
-	MACROENTRY *curEntry;
+    MACROENTRY *curEntry;
 
-	curEntry = gLastMacro;
-	while (curEntry != NULL)
-	{
-		if (!strcmp(curEntry->macroName, findName))
-		{
-			break;
-		}
+    curEntry = gLastMacro;
+    while (curEntry != NULL)
+    {
+        if (!strcmp(curEntry->macroName, findName))
+        {
+            break;
+        }
 
-		curEntry = curEntry->prev;
-	}
+        curEntry = curEntry->prev;
+    }
 
-	return curEntry;
-	
+    return curEntry;
+    
 }
 
 //=====================================================================
-// Function:	CleanUp
-// Description:	Clean up the #define strings
-// Parameters:	.
-// Returns:		.
+// Function:    CleanUp
+// Description: Clean up the #define strings
+// Parameters:  .
+// Returns:     .
 //=====================================================================
 void CleanUp()
 {
-	void *tPtr;
+    void *tPtr;
 
-	// free up the macros that were alloced
-	while (gLastMacro != NULL)
-	{
+    // free up the macros that were alloced
+    while (gLastMacro != NULL)
+    {
 
-		FreeMacroEntry(gLastMacro);
+        FreeMacroEntry(gLastMacro);
 
-		tPtr = gLastMacro;
-		gLastMacro = gLastMacro->prev;
-		SAFEFREE(tPtr);
-	}
+        tPtr = gLastMacro;
+        gLastMacro = gLastMacro->prev;
+        SAFEFREE(tPtr);
+    }
 
 }
 
 //=====================================================================
-// Function:	FreeMacroEntry
-// Description:	Frees up the macro entry data, (parms, lines of text)
-// Parameters:	macEntry = pointer to the MACROENTRY structure
-// Returns:		.
+// Function:    FreeMacroEntry
+// Description: Frees up the macro entry data, (parms, lines of text)
+// Parameters:  macEntry = pointer to the MACROENTRY structure
+// Returns:     .
 //=====================================================================
 void FreeMacroEntry(MACROENTRY *macEntry)
 {
-	MACROTEXT *tText;
-	MACROTEXT *tNext;
+    MACROTEXT *tText;
+    MACROTEXT *tNext;
 
-	SAFEFREE(macEntry->macroName);
-	SAFEFREE(macEntry->fileName);
-	// free the macro lines that were alloced
-	tText = macEntry->lastMacroLines;
-	while (tText != NULL)
-	{
-		tNext = tText->prev;
-		SAFEFREE(tText);
-		tText = tNext;
-	}
+    SAFEFREE(macEntry->macroName);
+    SAFEFREE(macEntry->fileName);
+    // free the macro lines that were alloced
+    tText = macEntry->lastMacroLines;
+    while (tText != NULL)
+    {
+        tNext = tText->prev;
+        SAFEFREE(tText);
+        tText = tNext;
+    }
 
-	// free the text of the macro parms that were alloced
-	tText = macEntry->lastMacroParms;
-	while (tText != NULL)
-	{
-		tNext = tText->prev;
-		SAFEFREE(tText);
-		tText = tNext;
-	}
+    // free the text of the macro parms that were alloced
+    tText = macEntry->lastMacroParms;
+    while (tText != NULL)
+    {
+        tNext = tText->prev;
+        SAFEFREE(tText);
+        tText = tNext;
+    }
 }
 
 //=====================================================================
-// Function:	CheckMacroFunctions
-// Description:	Find if this text is a builtin macro function
-// Parameters:	lookString = non-null terminated string of possible
-//				and if found set global macro function call
-// Returns:		.
+// Function:    CheckMacroFunctions
+// Description: Find if this text is a builtin macro function
+// Parameters:  lookString = non-null terminated string of possible
+//              and if found set global macro function call
+// Returns:     .
 //=====================================================================
 void CheckMacroFunctions(char *lookString, unsigned int *recognizedLen, char **invString)
 {
 
-	unsigned int i;
-	unsigned int sLen;
-	
-	for (i=0; i< NUM_MACRO_FUNCTIONS; i++)
-	{
-		sLen = strlen(gMacroFunctions[i].name);
-		if (!strncmp(gMacroFunctions[i].name, lookString, sLen))
-		{
-			gMacroCallFunction = gMacroFunctions[i].function;
-			*recognizedLen = sLen;
-			*invString = NULL;
-			return;
-		}
-	}
+    unsigned int i;
+    unsigned int sLen;
+    
+    for (i=0; i< NUM_MACRO_FUNCTIONS; i++)
+    {
+        sLen = strlen(gMacroFunctions[i].name);
+        if (!strncmp(gMacroFunctions[i].name, lookString, sLen))
+        {
+            gMacroCallFunction = gMacroFunctions[i].function;
+            *recognizedLen = sLen;
+            *invString = NULL;
+            return;
+        }
+    }
 }
 
 //=====================================================================
-// Function:	FindAlphaNum
-// Description:	Find a whole alpha numeric string, ie consists of
-//				[A-Za-z0-9_] only
-// Parameters:	srcStr = source string to search through.
-//				sLen = unsinged int pointer to length of string found
-// Returns:		pointer to found start of string.
-//				NULL if none.
+// Function:    FindAlphaNum
+// Description: Find a whole alpha numeric string, ie consists of
+//              [A-Za-z0-9_] only
+// Parameters:  srcStr = source string to search through.
+//              sLen = unsinged int pointer to length of string found
+// Returns:     pointer to found start of string.
+//              NULL if none.
 //=====================================================================
 char *FindAlphaNum(char *srcStr, unsigned int *sLen)
 {
-	char curChar;
-	char *foundStr;
+    char curChar;
+    char *foundStr;
 
-	while (*srcStr != '\0')
-	{
-		curChar = toupper(*srcStr);
-		if ((curChar >= 'A') && (curChar <= 'Z'))
-			break;
+    while (*srcStr != '\0')
+    {
+        curChar = toupper(*srcStr);
+        if ((curChar >= 'A') && (curChar <= 'Z'))
+            break;
 
-		if ((curChar >= '0') && (curChar <='9'))
-			break;
+        if ((curChar >= '0') && (curChar <='9'))
+            break;
 
-		if (curChar == '_')
-			break;
+        if (curChar == '_')
+            break;
 
-		srcStr++;
-	}
+        srcStr++;
+    }
 
-	if (*srcStr == '\0')
-	{
-		return NULL;
-	}
+    if (*srcStr == '\0')
+    {
+        return NULL;
+    }
 
-	foundStr = srcStr;
+    foundStr = srcStr;
 
-	*sLen = 0;
-	// now search for end of string of [A-Za-z0-9_]
-	while (*srcStr != '\0')
-	{
-		curChar = toupper(*srcStr);
-		if ((curChar < 'A') || (curChar > 'Z'))
-		{
-			if ((curChar < '0') || (curChar > '9'))
-			{
-				if (curChar != '_')
-					break;
-			}
-		}
+    *sLen = 0;
+    // now search for end of string of [A-Za-z0-9_]
+    while (*srcStr != '\0')
+    {
+        curChar = toupper(*srcStr);
+        if ((curChar < 'A') || (curChar > 'Z'))
+        {
+            if ((curChar < '0') || (curChar > '9'))
+            {
+                if (curChar != '_')
+                    break;
+            }
+        }
 
-		(*sLen)++;
-		srcStr++;
-	}
+        (*sLen)++;
+        srcStr++;
+    }
 
-	return foundStr;
+    return foundStr;
 
 }
 
 //=====================================================================
-// Function:	FindDefineParm
-// Description:	Find if the MACROENTRY->macroText linked list contains
-//				replaceable parameters.
-// Parameters:	srcParms = pointer to MACROENTRY structure for source
-//						parameters
-//				invParms = MACROENTRY pointer to invocation parameters
-//				lookString = non-null terminated string of possible
-//							replaceable string
-//				recognizedLen = replacement string matched length
-//				invString = invocation string to replace with
-// Returns:		pointer to first character found in lookstring
+// Function:    FindDefineParm
+// Description: Find if the MACROENTRY->macroText linked list contains
+//              replaceable parameters.
+// Parameters:  srcParms = pointer to MACROENTRY structure for source
+//                      parameters
+//              invParms = MACROENTRY pointer to invocation parameters
+//              lookString = non-null terminated string of possible
+//                          replaceable string
+//              recognizedLen = replacement string matched length
+//              invString = invocation string to replace with
+// Returns:     pointer to first character found in lookstring
 //=====================================================================
 char *FindDefineParm(MACROENTRY *srcParms, MACROENTRY *invParms, 
-						char *lookString, unsigned int *recognizedLen, char **invString)
+                        char *lookString, unsigned int *recognizedLen, char **invString)
 {
-	MACROTEXT *srcText;
-	MACROTEXT *invText;
-	char *checkStr;
-	unsigned int checkLen = 0;
-	unsigned int sLen;
+    MACROTEXT *srcText;
+    MACROTEXT *invText;
+    char *checkStr;
+    unsigned int checkLen = 0;
+    unsigned int sLen;
 
-	checkStr = lookString;
-	*invString = NULL;
+    checkStr = lookString;
+    *invString = NULL;
 
-	// first search for first [A-Za-z0-9_] only string
-	checkStr = FindAlphaNum(lookString, &checkLen);
+    // first search for first [A-Za-z0-9_] only string
+    checkStr = FindAlphaNum(lookString, &checkLen);
 
-	while (checkStr != NULL)
-	{
-		// check all the #define parameters for match
-		srcText = srcParms->firstMacroParms;
-		invText = invParms->firstMacroParms;
-		while (srcText)
-		{
-			sLen = strlen(srcText->macroText);
-			// lengths should match
-			if (sLen == checkLen)
-			{
-				if (!strncmp(checkStr, srcText->macroText, checkLen))
-				{
-					// it matched so return replacement text
-					*invString = invText->macroText;
-					// and length that we recognized
-					*recognizedLen = checkLen;
-					return checkStr;
-				}
-			}
+    while (checkStr != NULL)
+    {
+        // check all the #define parameters for match
+        srcText = srcParms->firstMacroParms;
+        invText = invParms->firstMacroParms;
+        while (srcText)
+        {
+            sLen = strlen(srcText->macroText);
+            // lengths should match
+            if (sLen == checkLen)
+            {
+                if (!strncmp(checkStr, srcText->macroText, checkLen))
+                {
+                    // it matched so return replacement text
+                    *invString = invText->macroText;
+                    // and length that we recognized
+                    *recognizedLen = checkLen;
+                    return checkStr;
+                }
+            }
 
-			srcText = srcText->next;
-			invText = invText->next;
-		}
+            srcText = srcText->next;
+            invText = invText->next;
+        }
 
-		// not found yet, so go to next string.
-		checkStr = FindAlphaNum(checkStr+checkLen, &checkLen);
-	}
+        // not found yet, so go to next string.
+        checkStr = FindAlphaNum(checkStr+checkLen, &checkLen);
+    }
 
-	return NULL;
+    return NULL;
 }
 
 //=====================================================================
-// Function:	FindReplaceParm
-// Description:	Find if the MACROENTRY->macroText linked list contains
-//				a replaceable parameters.
-// Parameters:	srcParms = pointer to MACROENTRY structure for source
-//						parameters
-//				invParms = MACROENTRY pointer to invocation parameters
-//				lookString = non-null terminated string of possible
-//							replaceable string
-//				recognizedLen = replacement string matched length
-//				invString = invocation string to replace with
-// Returns:		.
+// Function:    FindReplaceParm
+// Description: Find if the MACROENTRY->macroText linked list contains
+//              a replaceable parameters.
+// Parameters:  srcParms = pointer to MACROENTRY structure for source
+//                      parameters
+//              invParms = MACROENTRY pointer to invocation parameters
+//              lookString = non-null terminated string of possible
+//                          replaceable string
+//              recognizedLen = replacement string matched length
+//              invString = invocation string to replace with
+// Returns:     .
 //=====================================================================
 void FindReplaceParm(MACROENTRY *srcParms, MACROENTRY *invParms, 
-						char *lookString, unsigned int *recognizedLen, char **invString)
+                        char *lookString, unsigned int *recognizedLen, char **invString)
 {
-	unsigned int sLen;
-	MACROTEXT *srcText;
-	MACROTEXT *invText;
+    unsigned int sLen;
+    MACROTEXT *srcText;
+    MACROTEXT *invText;
 
-	*recognizedLen = 0;
-	*invString = NULL;
+    *recognizedLen = 0;
+    *invString = NULL;
 
-	srcText = srcParms->firstMacroParms;
-	invText = invParms->firstMacroParms;
+    srcText = srcParms->firstMacroParms;
+    invText = invParms->firstMacroParms;
 
-	if (srcText != NULL)
-	{
-		// go until srcText # strings ends
-		while (srcText != NULL)
-		{
-			sLen = strlen(srcText->macroText);
-			if (!strncmp(srcText->macroText, lookString, sLen))
-			{
-				// found it so return src, replacement string
-				*recognizedLen = strlen(srcText->macroText);
-				*invString = invText->macroText;
-				// call function macro if it was invoked prior.
-				if (gMacroCallFunction != NULL)
-				{
-					gMacroCallFunction(lookString, recognizedLen, invString);
-					gMacroCallFunction = NULL;
-				}
-				return;
-			}
+    if (srcText != NULL)
+    {
+        // go until srcText # strings ends
+        while (srcText != NULL)
+        {
+            sLen = strlen(srcText->macroText);
+            if (!strncmp(srcText->macroText, lookString, sLen))
+            {
+                // found it so return src, replacement string
+                *recognizedLen = strlen(srcText->macroText);
+                *invString = invText->macroText;
+                // call function macro if it was invoked prior.
+                if (gMacroCallFunction != NULL)
+                {
+                    gMacroCallFunction(lookString, recognizedLen, invString);
+                    gMacroCallFunction = NULL;
+                }
+                return;
+            }
 
-			srcText = srcText->next;
-			invText = invText->next;
-		}
-	}
+            srcText = srcText->next;
+            invText = invText->next;
+        }
+    }
 
-	// ok, it wasn't found, look through builtin macro functions
-	CheckMacroFunctions(lookString, recognizedLen, invString);
+    // ok, it wasn't found, look through builtin macro functions
+    CheckMacroFunctions(lookString, recognizedLen, invString);
 }
 
 //=====================================================================
-// Function:	ReplaceMacroParms
-// Description:	Replace macro parameters when macro was defined, with
-//				those specified on the macro invocation line
-// Parameters:	srcLine = source line to replace src macro parms with
-//				destLine = destination line save to.
-//				invocation macro parameters.
-//				parseMacro = currently parsing macro entry
-//				invParms = invocation macro entry
-// Returns:		.
+// Function:    ReplaceMacroParms
+// Description: Replace macro parameters when macro was defined, with
+//              those specified on the macro invocation line
+// Parameters:  srcLine = source line to replace src macro parms with
+//              destLine = destination line save to.
+//              invocation macro parameters.
+//              parseMacro = currently parsing macro entry
+//              invParms = invocation macro entry
+// Returns:     .
 //=====================================================================
 void ReplaceMacroParms(char *srcLine, char *destLine, 
-							MACROENTRY *srcParms, MACROENTRY *invParms)
+                            MACROENTRY *srcParms, MACROENTRY *invParms)
 {
-	char *findReplace;
-	char *invString;
-	unsigned int sLen;
-	unsigned int dLen;
-	unsigned int copyLen;
-	unsigned int subLen;
-	unsigned int recognizedLen;
+    char *findReplace;
+    char *invString;
+    unsigned int sLen;
+    unsigned int dLen;
+    unsigned int copyLen;
+    unsigned int subLen;
+    unsigned int recognizedLen;
 
-	destLine[0]= '\0';
+    destLine[0]= '\0';
 
-	sLen = strlen(srcLine);
-	dLen = 0;
+    sLen = strlen(srcLine);
+    dLen = 0;
 
-	while (sLen > 0)
-	{
-		// strtok might work better except it modifies the string, so
-		// kind of do my own....
-		if (!srcParms->bIsDefine)
-		{
-			findReplace = strchr(srcLine, '%');
-			if (findReplace != NULL)
-			{
-				// bypass % sign in findReplacement
-				findReplace++;
-				// figure out length of source before %
-				copyLen = (findReplace - srcLine)-1;
-				// check if there is a replacement string
-				FindReplaceParm(srcParms, invParms, findReplace, &recognizedLen, &invString);
-			}
-			else
-			{
-				strcat(destLine, srcLine);
-				return;
-			}
-		}
-		else
-		{
-			findReplace = FindDefineParm(srcParms, invParms, srcLine, &recognizedLen, &invString);
-			if (findReplace != NULL)
-			{
-				// figure out length of source before %
-				copyLen = findReplace - srcLine;
-			}
-			else
-			{
-				strcat(destLine, srcLine);
-				return;
-			}
-		}
+    while (sLen > 0)
+    {
+        // strtok might work better except it modifies the string, so
+        // kind of do my own....
+        if (!srcParms->bIsDefine)
+        {
+            findReplace = strchr(srcLine, '%');
+            if (findReplace != NULL)
+            {
+                // bypass % sign in findReplacement
+                findReplace++;
+                // figure out length of source before %
+                copyLen = (findReplace - srcLine)-1;
+                // check if there is a replacement string
+                FindReplaceParm(srcParms, invParms, findReplace, &recognizedLen, &invString);
+            }
+            else
+            {
+                strcat(destLine, srcLine);
+                return;
+            }
+        }
+        else
+        {
+            findReplace = FindDefineParm(srcParms, invParms, srcLine, &recognizedLen, &invString);
+            if (findReplace != NULL)
+            {
+                // figure out length of source before %
+                copyLen = findReplace - srcLine;
+            }
+            else
+            {
+                strcat(destLine, srcLine);
+                return;
+            }
+        }
 
 
-		if (invString != NULL)
-		{
-			// figure out how much we are going to substitute
-			subLen = strlen(invString);
-		}
-		else
-		{
-			subLen = 0;
-		}
+        if (invString != NULL)
+        {
+            // figure out how much we are going to substitute
+            subLen = strlen(invString);
+        }
+        else
+        {
+            subLen = 0;
+        }
 
-		if ((dLen + copyLen + subLen) > MAXSAVELINE)
-		{
-			LexError("Macro string overrun.\n");
-			CleanUp();
-			exit(ERROR_MACRO_OVERRUN);
-		}
+        if ((dLen + copyLen + subLen) > MAXSAVELINE)
+        {
+            LexError("Macro string overrun.\n");
+            CleanUp();
+            exit(ERROR_MACRO_OVERRUN);
+        }
 
-		if (copyLen > 0)
-		{
-			strncat(destLine, srcLine, copyLen);
-			dLen += copyLen;
-		}
+        if (copyLen > 0)
+        {
+            strncat(destLine, srcLine, copyLen);
+            dLen += copyLen;
+        }
 
-		srcLine += copyLen;
-		sLen -= copyLen;
-		// in macro so skip % part of variable
-		if (!srcParms->bIsDefine)
-		{
-			// skip %, also
-			srcLine++;
-			sLen--;
-		}
+        srcLine += copyLen;
+        sLen -= copyLen;
+        // in macro so skip % part of variable
+        if (!srcParms->bIsDefine)
+        {
+            // skip %, also
+            srcLine++;
+            sLen--;
+        }
 
-		if (invString != NULL)
-		{
-			strcat(destLine, invString);
-			dLen += strlen(invString);
-		}
+        if (invString != NULL)
+        {
+            strcat(destLine, invString);
+            dLen += strlen(invString);
+        }
 
-		srcLine += recognizedLen;
-		sLen -= recognizedLen;
-	}
+        srcLine += recognizedLen;
+        sLen -= recognizedLen;
+    }
 
 }
 
 //=====================================================================
-// Function:	SaveMacroText
-// Description:	Adds a string to a linked list of MACROTEXT structures
-// Parameters:	srcText = pointer to source text to save
-//				lastMacroText = last allocated, or NULL
-// Returns:		newly allocated MACROTEXT structure, or NULL
+// Function:    SaveMacroText
+// Description: Adds a string to a linked list of MACROTEXT structures
+// Parameters:  srcText = pointer to source text to save
+//              lastMacroText = last allocated, or NULL
+// Returns:     newly allocated MACROTEXT structure, or NULL
 //=====================================================================
 MACROTEXT *SaveMacroText(char *srcText, MACROTEXT *lastMacroText)
 {
-	MACROTEXT *curMacroText;
+    MACROTEXT *curMacroText;
 
-	curMacroText = (MACROTEXT *)malloc(sizeof(MACROTEXT));
-	if (curMacroText == NULL)
-	{
-		return NULL;
-	}
-	else
-	{
-		// no next entry but set up previous with previously alloced macro parameter
-		curMacroText->next = NULL;
-		curMacroText->prev = lastMacroText;
+    curMacroText = (MACROTEXT *)malloc(sizeof(MACROTEXT));
+    if (curMacroText == NULL)
+    {
+        return NULL;
+    }
+    else
+    {
+        // no next entry but set up previous with previously alloced macro parameter
+        curMacroText->next = NULL;
+        curMacroText->prev = lastMacroText;
 
-		// if the macroParm pointer is null then we are the first allocated
-		// so if not set the last one allocate next pointer to newly allocated structure
-		if (lastMacroText != NULL)
-		{
-			lastMacroText->next = curMacroText;
-		}
+        // if the macroParm pointer is null then we are the first allocated
+        // so if not set the last one allocate next pointer to newly allocated structure
+        if (lastMacroText != NULL)
+        {
+            lastMacroText->next = curMacroText;
+        }
 
-		/* %%%%% this should be set up in memory pools. */
-		curMacroText->macroText = strdup(srcText);
-		if (curMacroText->macroText == NULL)
-		{
-			SAFEFREE(curMacroText);
-			return NULL;
-		}
-	}
+        /* %%%%% this should be set up in memory pools. */
+        curMacroText->macroText = strdup(srcText);
+        if (curMacroText->macroText == NULL)
+        {
+            SAFEFREE(curMacroText);
+            return NULL;
+        }
+    }
 
-	return curMacroText;
+    return curMacroText;
 }
 
 //=====================================================================
-// Function:	ParseBuiltInMacroParms
-// Description:	parse parameters of string and fill in MACROENTRY
-//				structure.
-// Parameters:	parsedMacro = pointer to MACROENTRY structure that gets
-//				filled in with parameter pointers and count
-//				parmStr = string to parse parameters from
-// Returns:		false if error
+// Function:    ParseBuiltInMacroParms
+// Description: parse parameters of string and fill in MACROENTRY
+//              structure.
+// Parameters:  parsedMacro = pointer to MACROENTRY structure that gets
+//              filled in with parameter pointers and count
+//              parmStr = string to parse parameters from
+// Returns:     false if error
 //=====================================================================
 bool ParseBuiltInMacroParms(MACROENTRY *parsedMacro, char *parmStr)
 {
-	char *endStr;
-	char *foundParm;
-	MACROTEXT *prevMT;
-	MACROTEXT *curMT;
+    char *endStr;
+    char *foundParm;
+    MACROTEXT *prevMT;
+    MACROTEXT *curMT;
 
-	parsedMacro->numParms = 0;
-	parsedMacro->firstMacroParms = NULL;
-	
-	foundParm = strdup(parmStr);
-	if (foundParm == NULL)
-	{
-		LexError("Out of memory parsing bultin macro parameters.\n");
-		return false;
-	}
+    parsedMacro->numParms = 0;
+    parsedMacro->firstMacroParms = NULL;
+    
+    foundParm = strdup(parmStr);
+    if (foundParm == NULL)
+    {
+        LexError("Out of memory parsing bultin macro parameters.\n");
+        return false;
+    }
 
-	// assume a ')' is on the end.
-	endStr = strrchr(foundParm, ')');
-	if (endStr == NULL)
-	{
-		LexWarning("Ending parenthesis not found for macro %s.\n", parsedMacro->macroName);
-		endStr = foundParm + strlen(foundParm);
-	}
+    // assume a ')' is on the end.
+    endStr = strrchr(foundParm, ')');
+    if (endStr == NULL)
+    {
+        LexWarning("Ending parenthesis not found for macro %s.\n", parsedMacro->macroName);
+        endStr = foundParm + strlen(foundParm);
+    }
 
-	prevMT = NULL;
-	// strip out and separate parameters
-	while (foundParm < endStr)
-	{
-		// allocate a macro text structure
-		curMT = (MACROTEXT *)malloc(sizeof(MACROTEXT));
-		if (curMT == NULL)
-		{
-			free(parmStr);
-			LexError("Out of memory parsing bultin macro parameters.\n");
-			return false;
-		} 
-		curMT->next = NULL;
-		curMT->prev = prevMT;
-		parsedMacro->numParms++;
+    prevMT = NULL;
+    // strip out and separate parameters
+    while (foundParm < endStr)
+    {
+        // allocate a macro text structure
+        curMT = (MACROTEXT *)malloc(sizeof(MACROTEXT));
+        if (curMT == NULL)
+        {
+            free(parmStr);
+            LexError("Out of memory parsing bultin macro parameters.\n");
+            return false;
+        } 
+        curMT->next = NULL;
+        curMT->prev = prevMT;
+        parsedMacro->numParms++;
 
-		if (prevMT != NULL)
-		{
-			prevMT->next = curMT;
-		}
-		else
-		{
-			parsedMacro->firstMacroParms = curMT;
-		}
+        if (prevMT != NULL)
+        {
+            prevMT->next = curMT;
+        }
+        else
+        {
+            parsedMacro->firstMacroParms = curMT;
+        }
 
-		curMT->macroText = foundParm;
-		// search for next parameters, delimited by comma
-		foundParm = strchr(foundParm, ',');
-		if (foundParm == NULL)
-		{
-			foundParm = endStr;
-			*foundParm = '\0';
-		}
-		else
-		{
-			// skip comma
-			*foundParm = '\0';
-			foundParm++;
-		}
-		prevMT = curMT;
-	}
+        curMT->macroText = foundParm;
+        // search for next parameters, delimited by comma
+        foundParm = strchr(foundParm, ',');
+        if (foundParm == NULL)
+        {
+            foundParm = endStr;
+            *foundParm = '\0';
+        }
+        else
+        {
+            // skip comma
+            *foundParm = '\0';
+            foundParm++;
+        }
+        prevMT = curMT;
+    }
 
-	return true;
+    return true;
 }
 
 //=====================================================================
-// Function:	MacroMathFunction
-// Description:	Comes here after macro replacement is done to perform
-//				some mathematic function on parameter (macro replacement
-//				 string (ie, register))
-// Parameters:	invMacro = macroentry pointer containing macro information
-//				recognizedLen = # characters recoginized so far
-//				invStr = invoked replacement string so far
-//				mathStr = "-", "+", etc for mathematic function
-// Returns:		new recognizedLen, invStr, with incremented #
+// Function:    MacroMathFunction
+// Description: Comes here after macro replacement is done to perform
+//              some mathematic function on parameter (macro replacement
+//               string (ie, register))
+// Parameters:  invMacro = macroentry pointer containing macro information
+//              recognizedLen = # characters recoginized so far
+//              invStr = invoked replacement string so far
+//              mathStr = "-", "+", etc for mathematic function
+// Returns:     new recognizedLen, invStr, with incremented #
 //=====================================================================
 void MacroMathFunction(MACROENTRY *invMacro, unsigned int *recognizedLen, char **invStr,
-						const char *mathStr)
+                        const char *mathStr)
 {
-	char *numStartStr;
-	unsigned int sLen;
-	char numberStr[256];
-	unsigned int number = 0;
-	char *operand;
+    char *numStartStr;
+    unsigned int sLen;
+    char numberStr[256];
+    unsigned int number = 0;
+    char *operand;
 
 
-	// verify enough paramters to complete operation
-	if (invMacro->numParms != 2)
-	{
-		LexError("Two parameters are required for %s macro\n", invMacro->macroName);
-		return;
-	}
+    // verify enough paramters to complete operation
+    if (invMacro->numParms != 2)
+    {
+        LexError("Two parameters are required for %s macro\n", invMacro->macroName);
+        return;
+    }
 
-	// get second macro parm, which is add by amount.
-	operand = invMacro->firstMacroParms->next->macroText;
+    // get second macro parm, which is add by amount.
+    operand = invMacro->firstMacroParms->next->macroText;
 
-	// first find inner most bracket if any
-	numStartStr = strrchr(*invStr, ']');
-	if (numStartStr == NULL)
-	{
-		numStartStr = strrchr(*invStr, ')');
-	}
+    // first find inner most bracket if any
+    numStartStr = strrchr(*invStr, ']');
+    if (numStartStr == NULL)
+    {
+        numStartStr = strrchr(*invStr, ')');
+    }
 
-	if (numStartStr != NULL)
-	{
-		if ((strlen(*invStr)+strlen(operand)+1) > MAXREPLACESTRING)
-		{
-			LexError("Out of Temporary string replacement memory inside builtin macro %s\n",
-					invMacro->macroName);
-		}
-		else
-		{
-			sLen = (numStartStr - *invStr);
-			gReplaceText[0] = '\0';
-			strncat(gReplaceText, *invStr, sLen);
-			strcat(gReplaceText, mathStr);
-			strcat(gReplaceText, operand);
-			strcat(gReplaceText, numStartStr);
-			*invStr = gReplaceText;
-		}
-	}
-	else
-	{
-		numStartStr = strpbrk(*invStr, "0123456789");
-		if (numStartStr != NULL)
-		{
-			// put up to number we found
-			sLen = numStartStr - *invStr;
-			if (sLen > MAXREPLACESTRING)
-				goto ErrOut;
+    if (numStartStr != NULL)
+    {
+        if ((strlen(*invStr)+strlen(operand)+1) > MAXREPLACESTRING)
+        {
+            LexError("Out of Temporary string replacement memory inside builtin macro %s\n",
+                    invMacro->macroName);
+        }
+        else
+        {
+            sLen = (numStartStr - *invStr);
+            gReplaceText[0] = '\0';
+            strncat(gReplaceText, *invStr, sLen);
+            strcat(gReplaceText, mathStr);
+            strcat(gReplaceText, operand);
+            strcat(gReplaceText, numStartStr);
+            *invStr = gReplaceText;
+        }
+    }
+    else
+    {
+        numStartStr = strpbrk(*invStr, "0123456789");
+        if (numStartStr != NULL)
+        {
+            // put up to number we found
+            sLen = numStartStr - *invStr;
+            if (sLen > MAXREPLACESTRING)
+                goto ErrOut;
 
-			gReplaceText[0] = '\0';
-			strncat(gReplaceText, *invStr, sLen);
+            gReplaceText[0] = '\0';
+            strncat(gReplaceText, *invStr, sLen);
 
-			switch (mathStr[0])
-			{
-				case '-':
-					number = atoi(numStartStr)-atoi(operand);
-					break;
-				case '+':
-					number = atoi(numStartStr)+atoi(operand);
-					break;
-			}
-			sprintf(numberStr, "%d", number);
+            switch (mathStr[0])
+            {
+                case '-':
+                    number = atoi(numStartStr)-atoi(operand);
+                    break;
+                case '+':
+                    number = atoi(numStartStr)+atoi(operand);
+                    break;
+            }
+            sprintf(numberStr, "%d", number);
 
-			if ((strlen(gReplaceText) + strlen(numberStr)) > MAXREPLACESTRING)
-				goto ErrOut;
+            if ((strlen(gReplaceText) + strlen(numberStr)) > MAXREPLACESTRING)
+                goto ErrOut;
 
-			strcat(gReplaceText, numberStr);
+            strcat(gReplaceText, numberStr);
 
-			while ((*numStartStr != '\0') && (*numStartStr >= '0' && *numStartStr <= '9'))
-				numStartStr++;
+            while ((*numStartStr != '\0') && (*numStartStr >= '0' && *numStartStr <= '9'))
+                numStartStr++;
 
-			if ((strlen(gReplaceText) + strlen(numStartStr)) > MAXREPLACESTRING)
-				goto ErrOut;
+            if ((strlen(gReplaceText) + strlen(numStartStr)) > MAXREPLACESTRING)
+                goto ErrOut;
 
-			strcat(gReplaceText, numStartStr);
+            strcat(gReplaceText, numStartStr);
 
-			*invStr = gReplaceText;
-		}
-		else
-		{
-			if ((strlen(*invStr)+strlen(operand)+1) > MAXREPLACESTRING)
-			{
-				LexError("Out of Temporary string replacement memory inside builtin macro %s\n",
-					invMacro->macroName);
-			}
-			else
-			{
-				sprintf(gReplaceText, "%s%s%s", *invStr, mathStr, operand);
-				*invStr = gReplaceText;
-			}
-		}
-	}
+            *invStr = gReplaceText;
+        }
+        else
+        {
+            if ((strlen(*invStr)+strlen(operand)+1) > MAXREPLACESTRING)
+            {
+                LexError("Out of Temporary string replacement memory inside builtin macro %s\n",
+                    invMacro->macroName);
+            }
+            else
+            {
+                sprintf(gReplaceText, "%s%s%s", *invStr, mathStr, operand);
+                *invStr = gReplaceText;
+            }
+        }
+    }
 
 
-	return;
+    return;
 
 ErrOut:
-	LexError("Out of Temporary string replacement memory inside builtin macro %s\n",
-				invMacro->macroName);
-	// skip ')'
-	(*recognizedLen)++;
+    LexError("Out of Temporary string replacement memory inside builtin macro %s\n",
+                invMacro->macroName);
+    // skip ')'
+    (*recognizedLen)++;
 }
 
 //=====================================================================
-// Function:	MacroIncFunction
-// Description:	Comes here after macro replacement is done to increment
-//				macro replacement string (ie, register)
-// Parameters:	lookStr = string after '(', so we can get parameters
-//				recognizedLen = # characters recoginized so far
-//				invStr = invoked replacement string so far
-// Returns:		new recognizedLen, invStr, with incremented #
+// Function:    MacroIncFunction
+// Description: Comes here after macro replacement is done to increment
+//              macro replacement string (ie, register)
+// Parameters:  lookStr = string after '(', so we can get parameters
+//              recognizedLen = # characters recoginized so far
+//              invStr = invoked replacement string so far
+// Returns:     new recognizedLen, invStr, with incremented #
 //=====================================================================
 void MacroIncFunction(char *lookStr, unsigned int *recognizedLen, char **invStr)
 {
-	MACROENTRY tMEntry;
-	MACROTEXT parm1;
-	MACROTEXT parm2;
+    MACROENTRY tMEntry;
+    MACROTEXT parm1;
+    MACROTEXT parm2;
 
-	tMEntry.macroName = (char *)"%inc()";
-	tMEntry.numParms = 2;
-	tMEntry.firstMacroParms = &parm1;
-	parm1.prev = NULL;
-	parm1.next = &parm2;
-	parm1.macroText = *invStr;
-	parm2.prev = &parm1;
-	parm2.next = NULL;
-	parm2.macroText = (char *)"1";
+    tMEntry.macroName = (char *)"%inc()";
+    tMEntry.numParms = 2;
+    tMEntry.firstMacroParms = &parm1;
+    parm1.prev = NULL;
+    parm1.next = &parm2;
+    parm1.macroText = *invStr;
+    parm2.prev = &parm1;
+    parm2.next = NULL;
+    parm2.macroText = (char *)"1";
 
-	MacroMathFunction(&tMEntry, recognizedLen, invStr, "+");
-	// skip ')'
-	(*recognizedLen)++;
+    MacroMathFunction(&tMEntry, recognizedLen, invStr, "+");
+    // skip ')'
+    (*recognizedLen)++;
 }
 
 //=====================================================================
-// Function:	MacroDecFunction
-// Description:	Comes here after macro replacement is done to decrement
-//				macro replacement string (ie, register)
-// Parameters:	lookStr = string after '(', so we can get parameters
-//				recognizedLen = # characters recoginized so far
-//				invStr = invoked replacement string so far
-// Returns:		new recognizedLen, invStr, with decremented #
+// Function:    MacroDecFunction
+// Description: Comes here after macro replacement is done to decrement
+//              macro replacement string (ie, register)
+// Parameters:  lookStr = string after '(', so we can get parameters
+//              recognizedLen = # characters recoginized so far
+//              invStr = invoked replacement string so far
+// Returns:     new recognizedLen, invStr, with decremented #
 //=====================================================================
 void MacroDecFunction(char *lookStr, unsigned int *recognizedLen, char **invStr)
 {
-	MACROENTRY tMEntry;
-	MACROTEXT parm1;
-	MACROTEXT parm2;
+    MACROENTRY tMEntry;
+    MACROTEXT parm1;
+    MACROTEXT parm2;
 
-	tMEntry.macroName = (char *)"%dec()";
-	tMEntry.numParms = 2;
-	tMEntry.firstMacroParms = &parm1;
-	parm1.prev = NULL;
-	parm1.next = &parm2;
-	parm1.macroText = *invStr;
-	parm2.prev = &parm1;
-	parm2.next = NULL;
-	parm2.macroText = (char *)"1";
+    tMEntry.macroName = (char *)"%dec()";
+    tMEntry.numParms = 2;
+    tMEntry.firstMacroParms = &parm1;
+    parm1.prev = NULL;
+    parm1.next = &parm2;
+    parm1.macroText = *invStr;
+    parm2.prev = &parm1;
+    parm2.next = NULL;
+    parm2.macroText = (char *)"1";
 
-	MacroMathFunction(&tMEntry, recognizedLen, invStr, "-");
-	// skip ')'
-	(*recognizedLen)++;
+    MacroMathFunction(&tMEntry, recognizedLen, invStr, "-");
+    // skip ')'
+    (*recognizedLen)++;
 }
 
 //=====================================================================
-// Function:	MacroAddFunction
-// Description:	Comes here after macro replacement is done to add
-//				macro replacement string (ie, register)
-// Parameters:	lookStr = string after '(', so we can get parameters
-//				recognizedLen = # characters recoginized so far
-//				invStr = invoked replacement string so far
-// Returns:		new recognizedLen, invStr, with incremented #
+// Function:    MacroAddFunction
+// Description: Comes here after macro replacement is done to add
+//              macro replacement string (ie, register)
+// Parameters:  lookStr = string after '(', so we can get parameters
+//              recognizedLen = # characters recoginized so far
+//              invStr = invoked replacement string so far
+// Returns:     new recognizedLen, invStr, with incremented #
 //=====================================================================
 void MacroAddFunction(char *lookStr, unsigned int *recognizedLen, char **invStr)
 {
-	MACROENTRY tMEntry;
-	MACROTEXT *curMT;
-	MACROTEXT *nextMT;
-	unsigned int i;
+    MACROENTRY tMEntry;
+    MACROTEXT *curMT;
+    MACROTEXT *nextMT;
+    unsigned int i;
 
-	tMEntry.macroName = (char *)"%add()";
-	if (strlen(lookStr) > MAXREPLACESTRING)
-	{
-		LexError("Out of Temporary string replacement memory inside builtin macro %add()\n");
-		return;
-	}
-	if (ParseBuiltInMacroParms(&tMEntry, lookStr))
-	{
-		MacroMathFunction(&tMEntry, recognizedLen, invStr, "+");
-		// skip ',' strlen(parm2)+ ')'
-		(*recognizedLen) += strlen(tMEntry.firstMacroParms->next->macroText)+2;
-	}
+    tMEntry.macroName = (char *)"%add()";
+    if (strlen(lookStr) > MAXREPLACESTRING)
+    {
+        LexError("Out of Temporary string replacement memory inside builtin macro %add()\n");
+        return;
+    }
+    if (ParseBuiltInMacroParms(&tMEntry, lookStr))
+    {
+        MacroMathFunction(&tMEntry, recognizedLen, invStr, "+");
+        // skip ',' strlen(parm2)+ ')'
+        (*recognizedLen) += strlen(tMEntry.firstMacroParms->next->macroText)+2;
+    }
 
-	curMT = tMEntry.firstMacroParms;
-	// in this case only one string was allocated
-	free(curMT->macroText);
-	for (i=0; i<tMEntry.numParms; i++)
-	{
-		nextMT = curMT->next;
-		free(curMT);
-		curMT = nextMT;
-	}
+    curMT = tMEntry.firstMacroParms;
+    // in this case only one string was allocated
+    free(curMT->macroText);
+    for (i=0; i<tMEntry.numParms; i++)
+    {
+        nextMT = curMT->next;
+        free(curMT);
+        curMT = nextMT;
+    }
 }
 
 //=====================================================================
-// Function:	MacroSubFunction
-// Description:	Comes here after macro replacement is done to subtract
-//				macro replacement string (ie, register)
-// Parameters:	invParms, parameters that macro was invoked with
-//				recognizedLen = # characters recoginized so far
-//				invStr = invoked replacement string so far
-// Returns:		new recognizedLen, invStr, with incremented #
+// Function:    MacroSubFunction
+// Description: Comes here after macro replacement is done to subtract
+//              macro replacement string (ie, register)
+// Parameters:  invParms, parameters that macro was invoked with
+//              recognizedLen = # characters recoginized so far
+//              invStr = invoked replacement string so far
+// Returns:     new recognizedLen, invStr, with incremented #
 //=====================================================================
 void MacroSubFunction(char *lookStr, unsigned int *recognizedLen, char **invStr)
 {
-	MACROENTRY tMEntry;
-	MACROTEXT *curMT;
-	MACROTEXT *nextMT;
-	unsigned int i;
+    MACROENTRY tMEntry;
+    MACROTEXT *curMT;
+    MACROTEXT *nextMT;
+    unsigned int i;
 
-	tMEntry.macroName = (char *)"%sub()";
-	if (ParseBuiltInMacroParms(&tMEntry, lookStr))
-	{
-		MacroMathFunction(&tMEntry, recognizedLen, invStr, "-");
-		// skip ',' strlen(parm2)+ ')'
-		(*recognizedLen) += strlen(tMEntry.firstMacroParms->next->macroText)+2;
-	}
-	curMT = tMEntry.firstMacroParms;
-	// in this case only one string was allocated
-	free(curMT->macroText);
-	for (i=0; i<tMEntry.numParms; i++)
-	{
-		nextMT = curMT->next;
-		free(curMT);
-		curMT = nextMT;
-	}
+    tMEntry.macroName = (char *)"%sub()";
+    if (ParseBuiltInMacroParms(&tMEntry, lookStr))
+    {
+        MacroMathFunction(&tMEntry, recognizedLen, invStr, "-");
+        // skip ',' strlen(parm2)+ ')'
+        (*recognizedLen) += strlen(tMEntry.firstMacroParms->next->macroText)+2;
+    }
+    curMT = tMEntry.firstMacroParms;
+    // in this case only one string was allocated
+    free(curMT->macroText);
+    for (i=0; i<tMEntry.numParms; i++)
+    {
+        nextMT = curMT->next;
+        free(curMT);
+        curMT = nextMT;
+    }
 }
 
 //=====================================================================
-// Function:	EndMacroParms
-// Description:	Does update and cleanup one end of macro parameters
-//				is reached
-// Parameters:	.
-// Returns:		.
+// Function:    EndMacroParms
+// Description: Does update and cleanup one end of macro parameters
+//              is reached
+// Parameters:  .
+// Returns:     .
 //=====================================================================
 void EndMacroParms()
 {
-	char *curFileName;
-	char *macroFileName;
-	char tempStr[1024];
-	char *macroText;
+    char *curFileName;
+    char *macroFileName;
+    char tempStr[1024];
+    char *macroText;
 
-	if (gbTempInsideMacro)
-	{
-		if (gTempParseMacro->numParms != gTempMacro->numParms)
-		{
-			LexError("Macro invocation number of parameters do not match macro definition, skipping\n");
-			BEGIN(INITIAL);
-			SAFEFREE(gTempMacro);
-		}
-		else
-		{
-			// we got all the parameters for the MACRO invocation, so start inside
-			// the macro now, by saving off current state on stack
-			gIncludeStack[gIncludeStackIndex].lineNo = yylineno;
-			gIncludeStack[gIncludeStackIndex].fileName = gCurFileName;
-//			gIncludeStack[gIncludeStackIndex].fileHandle = yyin;
+    if (gbTempInsideMacro)
+    {
+        if (gTempParseMacro->numParms != gTempMacro->numParms)
+        {
+            LexError("Macro invocation number of parameters do not match macro definition, skipping\n");
+            BEGIN(INITIAL);
+            SAFEFREE(gTempMacro);
+        }
+        else
+        {
+            // we got all the parameters for the MACRO invocation, so start inside
+            // the macro now, by saving off current state on stack
+            gIncludeStack[gIncludeStackIndex].lineNo = yylineno;
+            gIncludeStack[gIncludeStackIndex].fileName = gCurFileName;
+//          gIncludeStack[gIncludeStackIndex].fileHandle = yyin;
 //fprintf( stderr, "Chris fix this code with myin stuff\n" );
-			gIncludeStack[gIncludeStackIndex].prevString = myin;
-			gIncludeStack[gIncludeStackIndex].nextString = NULL;
-			gIncludeStack[gIncludeStackIndex].lastInvokeMacro = gInvokeMacro;
-			gIncludeStack[gIncludeStackIndex].lastParseMacro = gParseMacro;
-			gIncludeStack[gIncludeStackIndex].lastMacroLineParse = gMacroLineParse;
-			gIncludeStack[gIncludeStackIndex].lastbInsideMacro = gbInsideMacro;
-			gIncludeStack[gIncludeStackIndex].lastbInsideInclude = gbInsideInclude;
-			gIncludeStack[gIncludeStackIndex].buffer = YY_CURRENT_BUFFER;
-			gIncludeStack[gIncludeStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
-			gIncludeStackIndex++;
+            gIncludeStack[gIncludeStackIndex].prevString = myin;
+            gIncludeStack[gIncludeStackIndex].nextString = NULL;
+            gIncludeStack[gIncludeStackIndex].lastInvokeMacro = gInvokeMacro;
+            gIncludeStack[gIncludeStackIndex].lastParseMacro = gParseMacro;
+            gIncludeStack[gIncludeStackIndex].lastMacroLineParse = gMacroLineParse;
+            gIncludeStack[gIncludeStackIndex].lastbInsideMacro = gbInsideMacro;
+            gIncludeStack[gIncludeStackIndex].lastbInsideInclude = gbInsideInclude;
+            gIncludeStack[gIncludeStackIndex].buffer = YY_CURRENT_BUFFER;
+            gIncludeStack[gIncludeStackIndex].lastbProcessingIFDEF = gbProcessingIFDEF;
+            gIncludeStackIndex++;
 
-			gParseMacro = gTempParseMacro;
-			gInvokeMacro = gTempMacro;
-			gbInsideMacro = gbTempInsideMacro;
+            gParseMacro = gTempParseMacro;
+            gInvokeMacro = gTempMacro;
+            gbInsideMacro = gbTempInsideMacro;
 
-			gbTempInsideMacro = false;
+            gbTempInsideMacro = false;
 
-//			yyin = NULL;
-			myin = NULL;
-			curFileName = gCurFileName;
-			if (curFileName == NULL)
-				curFileName = (char *)"";
+//          yyin = NULL;
+            myin = NULL;
+            curFileName = gCurFileName;
+            if (curFileName == NULL)
+                curFileName = (char *)"";
 
-			macroFileName = gParseMacro->fileName;
-			if (macroFileName == NULL)
-				macroFileName = (char *)"";
+            macroFileName = gParseMacro->fileName;
+            if (macroFileName == NULL)
+                macroFileName = (char *)"";
 
-			sprintf(tempStr, "%s(%d) : References ->\n%s", curFileName, yylineno, macroFileName); 
-			gCurFileName = strdup(tempStr);
-			gMacroLineParse = gParseMacro->firstMacroLines;
+            sprintf(tempStr, "%s(%d) : References ->\n%s", curFileName, yylineno, macroFileName); 
+            gCurFileName = strdup(tempStr);
+            gMacroLineParse = gParseMacro->firstMacroLines;
 
-			macroText = gMacroLine;
-			// if no replacement text, just use source line
-			if (gParseMacro->firstMacroParms == NULL)
-			{
-				macroText = gMacroLineParse->macroText;
-			}
-			else
-			{
-				// replace the macro parameters
-				ReplaceMacroParms(gMacroLineParse->macroText, gMacroLine, gParseMacro, gInvokeMacro);
-			}
+            macroText = gMacroLine;
+            // if no replacement text, just use source line
+            if (gParseMacro->firstMacroParms == NULL)
+            {
+                macroText = gMacroLineParse->macroText;
+            }
+            else
+            {
+                // replace the macro parameters
+                ReplaceMacroParms(gMacroLineParse->macroText, gMacroLine, gParseMacro, gInvokeMacro);
+            }
 
-			yylineno = gParseMacro->lineNo;
-			if (gParseMacro->nLines >= 1)
-			{
-				strcpy(gSaveLine, macroText);
-			}
+            yylineno = gParseMacro->lineNo;
+            if (gParseMacro->nLines >= 1)
+            {
+                strcpy(gSaveLine, macroText);
+            }
 
-//			if (gExpandMacros && (gParseMacro->nLines >= 1))
-//			{
-//				// in case there is anything there dump it out
-//				GenDebugLine();
-//				GenListString();			
-//				if (gInvokeMacro->nLines >= 1)
-//					GenSwitchFileNames(macroFileName);
-//			}
+//          if (gExpandMacros && (gParseMacro->nLines >= 1))
+//          {
+//              // in case there is anything there dump it out
+//              GenDebugLine();
+//              GenListString();            
+//              if (gInvokeMacro->nLines >= 1)
+//                  GenSwitchFileNames(macroFileName);
+//          }
 
-			BEGIN(gInvokeState);
-			yy_scan_string(macroText);
-			gInvokeState = INITIAL;
-		}
-	}
-	else
-	{
-		if (gLastMacro != NULL)
-		{
-			gLastMacro->next = gTempMacro;
-		}
-		gLastMacro = gTempMacro;
-		BEGIN(MACROBODY);
-	}
+            BEGIN(gInvokeState);
+            yy_scan_string(macroText);
+            gInvokeState = INITIAL;
+        }
+    }
+    else
+    {
+        if (gLastMacro != NULL)
+        {
+            gLastMacro->next = gTempMacro;
+        }
+        gLastMacro = gTempMacro;
+        BEGIN(MACROBODY);
+    }
 }
 
 //=====================================================================
-// Function:	FindSwizzleValue
-// Description:	see if valid swizzle value and return the bits
-// Parameters:	swizzleTex = pointer to characters to analyze
-// Returns:		unsigned int = bits for swizzle values, or 0 for error
+// Function:    FindSwizzleValue
+// Description: see if valid swizzle value and return the bits
+// Parameters:  swizzleTex = pointer to characters to analyze
+// Returns:     unsigned int = bits for swizzle values, or 0 for error
 //=====================================================================
 unsigned int FindSwizzleValue(char *swizzleText)
 {
-	unsigned int swizzleBits;
-	unsigned int sLen;
-	unsigned int i;
-	unsigned int lastMask;
+    unsigned int swizzleBits;
+    unsigned int sLen;
+    unsigned int i;
+    unsigned int lastMask;
 
-	sLen = strlen(swizzleText);
-	swizzleBits = 0;
-	lastMask = 0;
+    sLen = strlen(swizzleText);
+    swizzleBits = 0;
+    lastMask = 0;
 
-	for (i=0; i<sLen; i++)
-	{
-		switch (swizzleText[i])
-		{
-		case 'x':
-			swizzleBits |= (WRITEMASK_X << (4*(3-i)));
-			lastMask = WRITEMASK_X;
-			break;
-		case 'y':
-			swizzleBits |= (WRITEMASK_Y << (4*(3-i)));
-			lastMask = WRITEMASK_Y;
-			break;
-		case 'z':
-			swizzleBits |= (WRITEMASK_Z << (4*(3-i)));
-			lastMask = WRITEMASK_Z;
-			break;
-		case 'w':
-			swizzleBits |= (WRITEMASK_W << (4*(3-i)));
-			lastMask = WRITEMASK_W;
-			break;
-		}
-	}
+    for (i=0; i<sLen; i++)
+    {
+        switch (swizzleText[i])
+        {
+        case 'x':
+            swizzleBits |= (WRITEMASK_X << (4*(3-i)));
+            lastMask = WRITEMASK_X;
+            break;
+        case 'y':
+            swizzleBits |= (WRITEMASK_Y << (4*(3-i)));
+            lastMask = WRITEMASK_Y;
+            break;
+        case 'z':
+            swizzleBits |= (WRITEMASK_Z << (4*(3-i)));
+            lastMask = WRITEMASK_Z;
+            break;
+        case 'w':
+            swizzleBits |= (WRITEMASK_W << (4*(3-i)));
+            lastMask = WRITEMASK_W;
+            break;
+        }
+    }
 
-	for (; i<4; i++)
-	{
-		swizzleBits |= (lastMask << (4*(3-i)));
-	}
+    for (; i<4; i++)
+    {
+        swizzleBits |= (lastMask << (4*(3-i)));
+    }
 
-	return swizzleBits;
+    return swizzleBits;
 }
 
 #if 0
 unsigned int FindSwizzleValue(char *swizzleText)
 {
 
-	DWORD swizzleBits;
-	DWORD sLen;
-	DWORD i;
-	DWORD lastIndex;
+    DWORD swizzleBits;
+    DWORD sLen;
+    DWORD i;
+    DWORD lastIndex;
 
-	sLen = strlen(swizzleText);
-	swizzleBits = 0;
-	lastIndex = 0;
+    sLen = strlen(swizzleText);
+    swizzleBits = 0;
+    lastIndex = 0;
 
-	for (i=0; i<sLen; i++)
-	{
-		switch (swizzleText[i])
-		{
-		case 'x':
-			swizzleBits |= (0 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
-			lastIndex = 0;
-			break;
-		case 'y':
-			swizzleBits |= (1 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
-			lastIndex = 1;
-			break;
-		case 'z':
-			swizzleBits |= (2 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
-			lastIndex = 2;
-			break;
-		case 'w':
-			swizzleBits |= (3 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
-			lastIndex = 3;
-			break;
-		}
-	}
+    for (i=0; i<sLen; i++)
+    {
+        switch (swizzleText[i])
+        {
+        case 'x':
+            swizzleBits |= (0 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
+            lastIndex = 0;
+            break;
+        case 'y':
+            swizzleBits |= (1 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
+            lastIndex = 1;
+            break;
+        case 'z':
+            swizzleBits |= (2 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
+            lastIndex = 2;
+            break;
+        case 'w':
+            swizzleBits |= (3 << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
+            lastIndex = 3;
+            break;
+        }
+    }
 
-	for (; i<4; i++)
-	{
-		swizzleBits |= (lastIndex << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
-	}
+    for (; i<4; i++)
+    {
+        swizzleBits |= (lastIndex << (D3DVS_SWIZZLE_SHIFT + (i * 2)));
+    }
 
-	return swizzleBits;
+    return swizzleBits;
 
-	
+    
 }
 #endif
 
 //=====================================================================
-// Function:	FindRegisterMask
-// Description:	Look through register mask strings
-// Parameters:	findName = name to lookup
-// Returns:		unsigned int with token value
+// Function:    FindRegisterMask
+// Description: Look through register mask strings
+// Parameters:  findName = name to lookup
+// Returns:     unsigned int with token value
 //=====================================================================
 unsigned int MakeRegisterMask(char *findName)
 {
 
-	unsigned int regMask;
-	char *findFirst;
+    unsigned int regMask;
+    char *findFirst;
 
-	regMask = 0;
+    regMask = 0;
 
-	findFirst = strchr(findName, 'x');
-	if (findFirst != NULL)
-	{
-		if (strchr(findFirst+1, 'x') != NULL)
-		{
-			return 0;
-		}
+    findFirst = strchr(findName, 'x');
+    if (findFirst != NULL)
+    {
+        if (strchr(findFirst+1, 'x') != NULL)
+        {
+            return 0;
+        }
 
-		regMask |= WRITEMASK_X;
-	}
+        regMask |= WRITEMASK_X;
+    }
 
-	findFirst = strchr(findName, 'y');
-	if (findFirst != NULL)
-	{
-		regMask |= WRITEMASK_Y;
-		// invalide write mask, must be swizzle
-		if (strchr(findFirst+1, 'x') != NULL)
-		{
-			return 0;
-		}
+    findFirst = strchr(findName, 'y');
+    if (findFirst != NULL)
+    {
+        regMask |= WRITEMASK_Y;
+        // invalide write mask, must be swizzle
+        if (strchr(findFirst+1, 'x') != NULL)
+        {
+            return 0;
+        }
 
-		if (strchr(findFirst+1, 'y') != NULL)
-		{
-			return 0;
-		}
+        if (strchr(findFirst+1, 'y') != NULL)
+        {
+            return 0;
+        }
 
-	}
+    }
 
-	findFirst = strchr(findName, 'z');
-	if (findFirst != NULL)
-	{
-		regMask |= WRITEMASK_Z;
-		if (strchr(findFirst+1, 'x') != NULL)
-		{
-			return 0;
-		}
+    findFirst = strchr(findName, 'z');
+    if (findFirst != NULL)
+    {
+        regMask |= WRITEMASK_Z;
+        if (strchr(findFirst+1, 'x') != NULL)
+        {
+            return 0;
+        }
 
-		if (strchr(findFirst+1, 'y') != NULL)
-		{
-			return 0;
-		}
+        if (strchr(findFirst+1, 'y') != NULL)
+        {
+            return 0;
+        }
 
-		if (strchr(findFirst+1, 'z') != NULL)
-		{
-			return 0;
-		}
-	}
+        if (strchr(findFirst+1, 'z') != NULL)
+        {
+            return 0;
+        }
+    }
 
-	findFirst = strchr(findName, 'w');
-	if (findFirst != NULL)
-	{
+    findFirst = strchr(findName, 'w');
+    if (findFirst != NULL)
+    {
 
-		regMask |= WRITEMASK_W;
-		if (strchr(findFirst+1, 'x') != NULL)
-		{
-			return 0;
-		}
+        regMask |= WRITEMASK_W;
+        if (strchr(findFirst+1, 'x') != NULL)
+        {
+            return 0;
+        }
 
-		if (strchr(findFirst+1, 'y') != NULL)
-		{
-			return 0;
-		}
+        if (strchr(findFirst+1, 'y') != NULL)
+        {
+            return 0;
+        }
 
-		if (strchr(findFirst+1, 'z') != NULL)
-		{
-			return 0;
-		}
+        if (strchr(findFirst+1, 'z') != NULL)
+        {
+            return 0;
+        }
 
-		if (strchr(findFirst+1, 'w') != NULL)
-		{
-			return 0;
-		}
-	}
+        if (strchr(findFirst+1, 'w') != NULL)
+        {
+            return 0;
+        }
+    }
 
-	return regMask;
-	
+    return regMask;
+    
 }
 
 //=====================================================================
-// Function:	LexError
-// Description:	output an error to the stdout
-// Parameters:	typical printf like format
-// Returns:		.
+// Function:    LexError
+// Description: output an error to the stdout
+// Parameters:  typical printf like format
+// Returns:     .
 //=====================================================================
 void LexError(const char *format, ...)
 {
-	char errstring[4096];
-	va_list marker;
+    char errstring[4096];
+    va_list marker;
 
-//	fprintf( stderr,"(%d) : Error : ", yylineno);
-	if ( gbInsideInclude )
-		{
-		sprintf( errstring, "%s", gCurFileName );
-		sprintf( errstring+strlen(errstring),"(%d) : Error : ", yylineno);
-		}
-	else
-		{
-		sprintf( errstring,"(%d) : Error : ", yylineno);
-		}
+//  fprintf( stderr,"(%d) : Error : ", yylineno);
+    if ( gbInsideInclude )
+        {
+        sprintf( errstring, "%s", gCurFileName );
+        sprintf( errstring+strlen(errstring),"(%d) : Error : ", yylineno);
+        }
+    else
+        {
+        sprintf( errstring,"(%d) : Error : ", yylineno);
+        }
 
-	va_start(marker, format);
-//	vprintf(format, marker);
-	vsprintf(errstring+strlen(errstring), format, marker);
-	va_end(marker);
-	errors.set( errstring );
+    va_start(marker, format);
+//  vprintf(format, marker);
+    vsprintf(errstring+strlen(errstring), format, marker);
+    va_end(marker);
+    errors.set( errstring );
 }
 
 //=====================================================================
-// Function:	LexWarning
-// Description:	output a warning to the stdout
-// Parameters:	typical printf like format
-// Returns:		.
+// Function:    LexWarning
+// Description: output a warning to the stdout
+// Parameters:  typical printf like format
+// Returns:     .
 //=====================================================================
 void LexWarning(const char *format, ...)
 {
-	char errstring[4096];
-	va_list marker;
+    char errstring[4096];
+    va_list marker;
 
-//	fprintf( stderr,"(%d) : warning : ", yylineno);
-	if ( gbInsideInclude )
-		sprintf( errstring, "%s", gCurFileName );
-	sprintf( errstring+strlen(errstring),"(%d) : Warning : ", yylineno);
-//	sprintf( errstring,"(%d) : Warning : ", yylineno);
+//  fprintf( stderr,"(%d) : warning : ", yylineno);
+    if ( gbInsideInclude )
+        sprintf( errstring, "%s", gCurFileName );
+    sprintf( errstring+strlen(errstring),"(%d) : Warning : ", yylineno);
+//  sprintf( errstring,"(%d) : Warning : ", yylineno);
 
-	va_start(marker, format);
-//	vprintf(format, marker);
-	vsprintf(errstring+strlen(errstring), format, marker);
-	va_end(marker);
-	errors.set( errstring );
+    va_start(marker, format);
+//  vprintf(format, marker);
+    vsprintf(errstring+strlen(errstring), format, marker);
+    va_end(marker);
+    errors.set( errstring );
 }
 
 //=====================================================================
-// Function:	DebugUnhandledState
-// Description:	Come here in debug mode, when a state isn't handled
-//				for the Lexer
-// Parameters:	.
-// Returns:		.
+// Function:    DebugUnhandledState
+// Description: Come here in debug mode, when a state isn't handled
+//              for the Lexer
+// Parameters:  .
+// Returns:     .
 //=====================================================================
 void DebugUnhandledState()
 {
-	fprintf( stderr,"Unhandled state reached, with %s text.\n", yytext);
+    fprintf( stderr,"Unhandled state reached, with %s text.\n", yytext);
 }
 
 //=====================================================================
-// Function:	FindOpcode
-// Description:	Look through opcodes and see if in the table
-// Parameters:	findName = name to lookup
-// Returns:		OPCODEMAP * = pointer to opcode map entry, if found
+// Function:    FindOpcode
+// Description: Look through opcodes and see if in the table
+// Parameters:  findName = name to lookup
+// Returns:     OPCODEMAP * = pointer to opcode map entry, if found
 //=====================================================================
 OPCODEMAP *FindOpcode(char *findName)
 {
 
-	unsigned i;
+    unsigned i;
 
-	// just do linear search for now
-	for (i=0; i<NUMOPCODES; i++)
-	{
-		if (!stricmp(theOpcodes[i].string, findName))
-		{
-			return &theOpcodes[i];
-		}
+    // just do linear search for now
+    for (i=0; i<NUMOPCODES; i++)
+    {
+        if (!stricmp(theOpcodes[i].string, findName))
+        {
+            return &theOpcodes[i];
+        }
 
-	}
+    }
 
-	return NULL;
+    return NULL;
 }
 
 char *ReadTextFile(const char * filename)
 {
-	char path[3][32] = { ".\0",
-					     "../../data/programs\0",
-					     "../../../data/programs\0" };
-	char name[8192];
-	int i;
+    char path[3][32] = { ".\0",
+                         "../../data/programs\0",
+                         "../../../data/programs\0" };
+    char name[8192];
+    int i;
 
     if (!filename) return 0;
 
@@ -4977,11 +4977,11 @@ char *ReadTextFile(const char * filename)
     int found = 0;
     for ( i = 0; i < 3; i++ )
     {
-	sprintf( name, "%s/%s", path[i], filename );
+    sprintf( name, "%s/%s", path[i], filename );
 
-	int fh = ::_open(name, _O_RDONLY);
+    int fh = ::_open(name, _O_RDONLY);
 
-	if(fh != -1)
+    if(fh != -1)
         {
             int result = _fstat( fh, &status );
             if( result != 0 )
@@ -4990,44 +4990,44 @@ char *ReadTextFile(const char * filename)
                 break;
             }
             ::_close( fh );
-	    found = i+1;
+        found = i+1;
             break;
         }
     }
 
     if ( 0 == found )
-	{
-		fprintf(stderr,"Cannot open \"%s\" for stat read!\n", filename);
-		return NULL;
-	}
+    {
+        fprintf(stderr,"Cannot open \"%s\" for stat read!\n", filename);
+        return NULL;
+    }
     long size = status.st_size;
 
     char * buf = new char[size+1];
 
-	FILE *fp = 0;
+    FILE *fp = 0;
     if (!(fp = fopen(name, "r")))
-	{
-		fprintf(stderr,"Cannot open \"%s\" for read!\n", name);
-		return NULL;
-	}
+    {
+        fprintf(stderr,"Cannot open \"%s\" for read!\n", name);
+        return NULL;
+    }
 
-	int bytes;
-	bytes = fread(buf, 1, size, fp);
+    int bytes;
+    bytes = fread(buf, 1, size, fp);
 
     buf[bytes] = 0;
 
-	fclose(fp);
-	return buf;
+    fclose(fp);
+    return buf;
 }
 
 bool vs10_init_more();
 
 bool vs10_init(char* inputString)
 {
-	BEGIN(SAVELINE);
+    BEGIN(SAVELINE);
     myin = inputString;
-	line_incr = 0;
-	return vs10_init_more();
+    line_incr = 0;
+    return vs10_init_more();
 }
 
 #ifndef vs10_wrap

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,93 +26,114 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D11DriverList.h"
-#include "OgreLogManager.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Driver.h"
+#include "OgreException.h"
+#include "OgreLogManager.h"
 
 namespace Ogre 
 {
-	//-----------------------------------------------------------------------
-	D3D11DriverList::D3D11DriverList( IDXGIFactoryN*	pDXGIFactory ) 
-	{
-		enumerate(pDXGIFactory);
-	}
-	//-----------------------------------------------------------------------
-	D3D11DriverList::~D3D11DriverList(void)
-	{
-		for(unsigned i = 0; i < mDriverList.size(); i++)
-		{
-			delete (mDriverList[i]);
-		}
-		mDriverList.clear();
+    //-----------------------------------------------------------------------
+    D3D11DriverList::D3D11DriverList() 
+    {
+        mHiddenDriversCount = 0;
+    }
+    //-----------------------------------------------------------------------
+    D3D11DriverList::~D3D11DriverList(void)
+    {
+    }
+    //-----------------------------------------------------------------------
+    void D3D11DriverList::clear()
+    {
+        mHiddenDriversCount = 0;
+        mDriverList.clear();
+    }
+    //-----------------------------------------------------------------------
+    void D3D11DriverList::refresh()
+    {
+        clear();
 
-	}
-	//-----------------------------------------------------------------------
-	BOOL D3D11DriverList::enumerate(IDXGIFactoryN*	pDXGIFactory)
-	{
-		LogManager::getSingleton().logMessage( "D3D11: Driver Detection Starts" );
-		// Create the DXGI Factory
+        LogManager::getSingleton().logMessage( "D3D11: Driver Detection Starts" );
 
-		for( UINT iAdapter=0; ; iAdapter++ )
-		{
-			IDXGIAdapterN* pDXGIAdapter = NULL;
-			HRESULT hr = pDXGIFactory->EnumAdapters1( iAdapter, &pDXGIAdapter );
-			if( DXGI_ERROR_NOT_FOUND == hr )
-			{
-				hr = S_OK;
-				break;
-			}
-			if( FAILED(hr) )
-			{
-				SAFE_RELEASE(pDXGIAdapter);
-				return false;
-			}
+        // We need fresh IDXGIFactory to get fresh driver list
+        ComPtr<IDXGIFactoryN> pDXGIFactory;
+        HRESULT hr = CreateDXGIFactory1(__uuidof(IDXGIFactoryN), (void**)pDXGIFactory.GetAddressOf());
+        if( FAILED(hr) )
+        {
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                "Failed to create Direct3D11 DXGIFactory1",
+                "D3D11DriverList::refresh");
+        }
 
-			// we don't want NVIDIA PerfHUD in the list - so - here we filter it out
-			DXGI_ADAPTER_DESC1 adaptDesc;
-			if ( SUCCEEDED( pDXGIAdapter->GetDesc1( &adaptDesc ) ) )
-			{
-				const bool isPerfHUD = wcscmp( adaptDesc.Description, L"NVIDIA PerfHUD" ) == 0;
+        for( UINT iAdapter=0; ; iAdapter++ )
+        {
+            ComPtr<IDXGIAdapterN> pDXGIAdapter;
+            HRESULT hr = pDXGIFactory->EnumAdapters1(iAdapter, pDXGIAdapter.GetAddressOf());
+            if( DXGI_ERROR_NOT_FOUND == hr )
+            {
+                hr = S_OK;
+                break;
+            }
+            if( FAILED(hr) )
+            {
+                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
+                    "Failed to enum adapters",
+                    "D3D11DriverList::refresh");
+            }
 
-				if (isPerfHUD)
-				{
-					continue;
-				}
-			}
+            SharedPtr<D3D11Driver> driver(OGRE_NEW_T(D3D11Driver, MEMCATEGORY_GENERAL)(pDXGIAdapter.Get()), SPFM_DELETE_T);
 
-			mDriverList.push_back(new D3D11Driver(iAdapter,pDXGIAdapter) );
+            LogManager::getSingleton().logMessage("D3D11: \"" + driver->DriverDescription() + "\"");
 
-			SAFE_RELEASE(pDXGIAdapter);
-		}
+            // we don't want NVIDIA PerfHUD in the list, so place it to the hidden part of drivers list
+            const bool isHidden = wcscmp(driver->getAdapterIdentifier().Description, L"NVIDIA PerfHUD") == 0;
+            if(isHidden)
+            {
+                mDriverList.push_back(driver);
+                ++mHiddenDriversCount;
+            }
+            else
+            {
+                mDriverList.insert(mDriverList.end() - mHiddenDriversCount, driver);
+            }
+        }
 
-		LogManager::getSingleton().logMessage( "D3D11: Driver Detection Ends" );
+        LogManager::getSingleton().logMessage( "D3D11: Driver Detection Ends" );
+    }
+    //-----------------------------------------------------------------------
+    size_t D3D11DriverList::count() const 
+    {
+        return mDriverList.size() - mHiddenDriversCount;
+    }
+    //-----------------------------------------------------------------------
+    D3D11Driver* D3D11DriverList::item( size_t index )
+    {
+        return mDriverList.at( index ).get();
+    }
+    //-----------------------------------------------------------------------
+    D3D11Driver* D3D11DriverList::item( const String &name )
+    {
+        for(vector<SharedPtr<D3D11Driver> >::type::iterator it = mDriverList.begin(), it_end = mDriverList.end(); it != mDriverList.end(); ++it)
+        {
+            if((*it)->DriverDescription() == name)
+                return (*it).get();
+        }
 
-		return TRUE;
-	}
-	//-----------------------------------------------------------------------
-	size_t D3D11DriverList::count() const 
-	{
-		return mDriverList.size();
-	}
-	//-----------------------------------------------------------------------
-	D3D11Driver* D3D11DriverList::item( size_t index )
-	{
-		return mDriverList.at( index );
-	}
-	//-----------------------------------------------------------------------
-	D3D11Driver* D3D11DriverList::item( const String &name )
-	{
-		vector<D3D11Driver*>::type::iterator it = mDriverList.begin();
-		if (it == mDriverList.end())
-			return NULL;
+        return NULL;
+    }
+    //-----------------------------------------------------------------------
+    D3D11Driver* D3D11DriverList::findByName(const String &name)
+    {
+        // return requested driver
+        if(!name.empty())
+            if(D3D11Driver* driver = item(name))
+                return driver;
 
-		for (;it != mDriverList.end(); ++it)
-		{
-			if ((*it)->DriverDescription() == name)
-				return (*it);
-		}
+        // return default driver
+        if(!mDriverList.empty())
+            return mDriverList[0].get();
 
-		return NULL;
-	}
-	//-----------------------------------------------------------------------
+        return NULL;
+    }
+    //-----------------------------------------------------------------------
 }

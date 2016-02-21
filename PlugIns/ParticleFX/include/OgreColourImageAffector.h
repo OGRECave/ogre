@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,10 @@ namespace Ogre {
     class _OgreParticleFXExport ColourImageAffector : public ParticleAffector
     {
     public:
-		/** Command object for red adjust (see ParamCommand).*/
+        /** Command object for red adjust (see ParamCommand).*/
         class CmdImageAdjust : public ParamCommand
         {
-		public:
+        public:
             String doGet(const void* target) const;
             void doSet(void* target, const String& val);
         };
@@ -52,21 +52,21 @@ namespace Ogre {
         ColourImageAffector(ParticleSystem* psys);
 
         /** See ParticleAffector. */
-		void _initParticle(Particle* pParticle);
+        void _initParticle(Particle* pParticle);
 
         /** See ParticleAffector. */
         void _affectParticles(ParticleSystem* pSystem, Real timeElapsed);
 
-		void setImageAdjust(String name);
-		String getImageAdjust(void) const;
+        void setImageAdjust(String name);
+        String getImageAdjust(void) const;
         
         
-        static CmdImageAdjust	msImageCmd;
+        static CmdImageAdjust   msImageCmd;
 
     protected:
-        Image					mColourImage;
+        Image                   mColourImage;
         bool                    mColourImageLoaded;
-		String					mColourImageName;
+        String                  mColourImageName;
 
         /** Internal method to load the image */
         void _loadImage(void);

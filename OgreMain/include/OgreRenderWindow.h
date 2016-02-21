@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -32,13 +32,13 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup RenderSystem
-	*  @{
-	*/
-	/** Manages the target rendering window.
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup RenderSystem
+    *  @{
+    */
+    /** Manages the target rendering window.
         @remarks
             This class handles a window into which the contents
             of a scene are rendered. There is a many-to-1 relationship
@@ -67,11 +67,34 @@ namespace Ogre
         */
         RenderWindow();
 
+        /** Many windowing systems that support HiDPI displays use special points to specify
+            size of the windows and controls, so that windows and controls with hardcoded
+            sizes does not become too small on HiDPI displays. Such points have constant density
+            ~ 100 points per inch (probably 96 on Windows and 72 on Mac), that is independent
+            of pixel density of real display, and are used through the all windowing system.
+
+            Sometimes, such view points are choosen bigger for output devices that are viewed
+            from larger distances, like 30" TV comparing to 30" monitor, therefore maintaining
+            constant points angular density rather than constant linear density.
+
+            In any case, all such windowing system provides the way to convert such view points
+            to pixels, be it DisplayProperties::LogicalDpi on WinRT or backingScaleFactor on MacOSX.
+            We use pixels consistently through the Ogre, but window/view management functions
+            takes view points for convenience, as does the rest of windowing system. Such parameters
+            are named using xxxxPt pattern, and should not be mixed with pixels without being
+            converted using getViewPointToPixelScale() function.
+
+            Sometimes such scale factor can change on-the-fly, for example if window is dragged
+            to monitor with different DPI. In such situation, window size in view points is usually
+            preserved by windowing system, and Ogre should adjust pixel size of RenderWindow.
+        */
+        virtual float getViewPointToPixelScale() { return 1.0f; }
+
         /** Creates & displays the new window.
             @param
-                width The width of the window in pixels.
+                width The width of the window in view points.
             @param
-                height The height of the window in pixels.
+                height The height of the window in view points.
             @param
                 fullScreen If true, the window fills the screen,
                 with no title bar or border.
@@ -79,18 +102,18 @@ namespace Ogre
                 miscParams A variable number of pointers to platform-specific arguments. The
                 actual requirements must be defined by the implementing subclasses.
         */
-		virtual void create(const String& name, unsigned int width, unsigned int height,
-	            bool fullScreen, const NameValuePairList *miscParams) = 0;
+        virtual void create(const String& name, unsigned int widthPt, unsigned int heightPt,
+                bool fullScreen, const NameValuePairList *miscParams) = 0;
 
-		/** Alter fullscreen mode options. 
-		@note Nothing will happen unless the settings here are different from the
-			current settings.
-		@param fullScreen Whether to use fullscreen mode or not. 
-		@param width The new width to use
-		@param height The new height to use
-		*/
-		virtual void setFullscreen(bool fullScreen, unsigned int width, unsigned int height)
-                { (void)fullScreen; (void)width; (void)height; }
+        /** Alter fullscreen mode options. 
+        @note Nothing will happen unless the settings here are different from the
+            current settings.
+        @param fullScreen Whether to use fullscreen mode or not. 
+        @param width The new width to use
+        @param height The new height to use
+        */
+        virtual void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt)
+                { (void)fullScreen; (void)widthPt; (void)heightPt; }
         
         /** Destroys the window.
         */
@@ -98,7 +121,7 @@ namespace Ogre
 
         /** Alter the size of the window.
         */
-        virtual void resize(unsigned int width, unsigned int height) = 0;
+        virtual void resize(unsigned int widthPt, unsigned int heightPt) = 0;
 
         /** Notify that the window has been resized
         @remarks
@@ -108,7 +131,7 @@ namespace Ogre
 
         /** Reposition the window.
         */
-        virtual void reposition(int left, int top) = 0;
+        virtual void reposition(int leftPt, int topPt) = 0;
 
         /** Indicates whether the window is visible (not minimized or obscured)
         */
@@ -119,40 +142,40 @@ namespace Ogre
         virtual void setVisible(bool visible)
         { (void)visible; }
 
-		/** Indicates whether the window was set to hidden (not displayed)
-		*/
-		virtual bool isHidden(void) const { return false; }
+        /** Indicates whether the window was set to hidden (not displayed)
+        */
+        virtual bool isHidden(void) const { return false; }
 
-		/** Hide (or show) the window. If called with hidden=true, this
-			will make the window completely invisible to the user.
-		@remarks
-			Setting a window to hidden is useful to create a dummy primary
-			RenderWindow hidden from the user so that you can create and
-			recreate your actual RenderWindows without having to recreate
-			all your resources.
-		*/
-		virtual void setHidden(bool hidden)
-		{ (void)hidden; }
+        /** Hide (or show) the window. If called with hidden=true, this
+            will make the window completely invisible to the user.
+        @remarks
+            Setting a window to hidden is useful to create a dummy primary
+            RenderWindow hidden from the user so that you can create and
+            recreate your actual RenderWindows without having to recreate
+            all your resources.
+        */
+        virtual void setHidden(bool hidden)
+        { (void)hidden; }
 
-		/** Enable or disable vertical sync for the RenderWindow.
-		*/
-		virtual void setVSyncEnabled(bool vsync)
-		{ (void)vsync; }
+        /** Enable or disable vertical sync for the RenderWindow.
+        */
+        virtual void setVSyncEnabled(bool vsync)
+        { (void)vsync; }
 
-		/** Indicates whether vertical sync is activated for the window.
-		*/
-		virtual bool isVSyncEnabled() const { return false; }
+        /** Indicates whether vertical sync is activated for the window.
+        */
+        virtual bool isVSyncEnabled() const { return false; }
 
-		/** Set the vertical sync interval. This indicates the number of vertical retraces to wait for
-		  	before swapping buffers. A value of 1 is the default.
-		*/
-		virtual void setVSyncInterval(unsigned int interval)
-		{ (void)interval; }
+        /** Set the vertical sync interval. This indicates the number of vertical retraces to wait for
+            before swapping buffers. A value of 1 is the default.
+        */
+        virtual void setVSyncInterval(unsigned int interval)
+        { (void)interval; }
 
-		/** Returns the vertical sync interval. 
-		*/
-		virtual unsigned int getVSyncInterval() const { return 1; }
-	    
+        /** Returns the vertical sync interval. 
+        */
+        virtual unsigned int getVSyncInterval() const { return 1; }
+        
 
         /** Overridden from RenderTarget, flags invisible windows as inactive
         */
@@ -163,10 +186,10 @@ namespace Ogre
         virtual bool isClosed(void) const = 0;
         
         /** Indicates whether the window is the primary window. The
-        	primary window is special in that it is destroyed when 
-        	ogre is shut down, and cannot be destroyed directly.
-        	This is the case because it holds the context for vertex,
-        	index buffers and textures.
+            primary window is special in that it is destroyed when 
+            ogre is shut down, and cannot be destroyed directly.
+            This is the case because it holds the context for vertex,
+            index buffers and textures.
         */
         virtual bool isPrimary(void) const;
 
@@ -175,13 +198,13 @@ namespace Ogre
         virtual bool isFullScreen(void) const;
 
         /** Overloaded version of getMetrics from RenderTarget, including extra details
-            specific to windowing systems.
+            specific to windowing systems. Result is in pixels.
         */
         virtual void getMetrics(unsigned int& width, unsigned int& height, unsigned int& colourDepth, 
-			int& left, int& top);
+            int& left, int& top) const;
 
-		/// Override since windows don't usually have alpha
-		PixelFormat suggestPixelFormat() const { return PF_BYTE_RGB; }
+        /// Override since windows don't usually have alpha
+        PixelFormat suggestPixelFormat() const { return PF_BYTE_RGB; }
 
         /** Returns true if the window will automatically de-activate itself when it loses focus.
         */
@@ -207,8 +230,8 @@ namespace Ogre
         
         friend class Root;
     };
-	/** @} */
-	/** @} */
+    /** @} */
+    /** @} */
 
 } // Namespace
 #endif

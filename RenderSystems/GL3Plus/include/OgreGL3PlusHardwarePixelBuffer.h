@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ namespace Ogre {
     {
     protected:
         /// Lock a box
-        PixelBox lockImpl(const Image::Box lockBox,  LockOptions options);
+        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
 
         /// Unlock a box
         void unlockImpl(void);
@@ -77,57 +77,6 @@ namespace Ogre {
          */
             virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
         GLenum getGLFormat() { return mGLInternalFormat; }
-    };
-
-    /** Texture surface.
-     */
-    class _OgreGL3PlusExport GL3PlusTextureBuffer: public GL3PlusHardwarePixelBuffer
-    {
-    public:
-        /** Texture constructor */
-        GL3PlusTextureBuffer(const String &baseName, GLenum target, GLuint id, GLint face,
-                             GLint level, Usage usage, bool writeGamma, uint fsaa);
-        ~GL3PlusTextureBuffer();
-
-        /// @copydoc HardwarePixelBuffer::bindToFramebuffer
-            virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
-
-        /// @copydoc HardwarePixelBuffer::getRenderTarget
-        RenderTexture* getRenderTarget(size_t);
-
-        /// Upload a box of pixels to this buffer on the card
-        virtual void upload(const PixelBox &data, const Image::Box &dest);
-
-        /// Download a box of pixels from the card
-        virtual void download(const PixelBox &data);
-
-        /// Hardware implementation of blitFromMemory
-        virtual void blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox);
-
-        /// Notify TextureBuffer of destruction of render target
-        void _clearSliceRTT(size_t zoffset)
-        {
-            mSliceTRT[zoffset] = 0;
-        }
-
-        /// Copy from framebuffer
-            void copyFromFramebuffer(uint32 zoffset);
-
-        /// @copydoc HardwarePixelBuffer::blit
-        void blit(const HardwarePixelBufferSharedPtr &src, const Image::Box &srcBox, const Image::Box &dstBox);
-        // Blitting implementation
-        void blitFromTexture(GL3PlusTextureBuffer *src, const Image::Box &srcBox, const Image::Box &dstBox);
-    protected:
-        // In case this is a texture level
-        GLenum mTarget;
-        GLenum mFaceTarget; // same as mTarget in case of GL_TEXTURE_xD, but cubemap face for cubemaps
-        GLuint mTextureID;
-        GLuint mBufferId;
-        GLint mFace;
-        GLint mLevel;
-
-        typedef vector<RenderTexture*>::type SliceTRT;
-        SliceTRT mSliceTRT;
     };
 
     /** Renderbuffer surface.  Needs FBO extension.

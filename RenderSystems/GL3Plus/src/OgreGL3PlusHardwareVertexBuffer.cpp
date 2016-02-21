@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,8 @@ namespace Ogre {
         size_t numVertices,
         HardwareBuffer::Usage usage,
         bool useShadowBuffer)
-        : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, false)
+    : HardwareVertexBuffer(mgr, vertexSize, numVertices, usage, false, false), mLockedToScratch(false),
+        mScratchOffset(0), mScratchSize(0), mScratchPtr(0), mScratchUploadOnUnlock(false)
     {
         OGRE_CHECK_GL_ERROR(glGenBuffers(1, &mBufferId));
 
@@ -55,21 +56,12 @@ namespace Ogre {
                                          GL3PlusHardwareBufferManager::getGLUsage(usage)));
         OGRE_CHECK_GL_ERROR(glBindBuffer(GL_ARRAY_BUFFER, 0));
 
-        mFence = 0;
         //        std::cerr << "creating vertex buffer = " << mBufferId << std::endl;
     }
 
     GL3PlusHardwareVertexBuffer::~GL3PlusHardwareVertexBuffer()
     {
         OGRE_CHECK_GL_ERROR(glDeleteBuffers(1, &mBufferId));
-    }
-
-    void GL3PlusHardwareVertexBuffer::setFence(void)
-    {
-        if(!mFence)
-        {
-            OGRE_CHECK_GL_ERROR(mFence = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0));
-        }
     }
 
     void* GL3PlusHardwareVertexBuffer::lockImpl(size_t offset,
@@ -117,20 +109,6 @@ namespace Ogre {
                         "GL3PlusHardwareVertexBuffer::lock");
         }
 
-        if(mFence)
-        {
-            GLenum result;
-            OGRE_CHECK_GL_ERROR(result = glClientWaitSync(mFence, GL_SYNC_FLUSH_COMMANDS_BIT, GL_TIMEOUT_IGNORED));
-            if(result == GL_WAIT_FAILED)
-            {
-                // Some error
-                //FIXME
-                printf("FAILED TO WAIT WHILE FENCED\n");
-                printf("OgreGL3PlusHardwareVertexBuffer\n");
-            }
-            OGRE_CHECK_GL_ERROR(glDeleteSync(mFence));
-            mFence = 0;
-        }
 
         // return offsetted
         retPtr = static_cast<void*>(static_cast<unsigned char*>(pBuffer) + offset);

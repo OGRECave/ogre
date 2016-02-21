@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -58,10 +58,10 @@ namespace Ogre {
         }
     }
 
-	void GLESFBORenderTexture::swapBuffers()
-	{
-		mFB.swapBuffers();
-	}
+    void GLESFBORenderTexture::swapBuffers()
+    {
+        mFB.swapBuffers();
+    }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     void GLESFBORenderTexture::notifyOnContextLost()
@@ -82,26 +82,26 @@ namespace Ogre {
 #endif
     
     //-----------------------------------------------------------------------------
-	bool GLESFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
-	{
-		bool result;
-		if( (result = GLESRenderTexture::attachDepthBuffer( depthBuffer )) )
-			mFB.attachDepthBuffer( depthBuffer );
+    bool GLESFBORenderTexture::attachDepthBuffer( DepthBuffer *depthBuffer )
+    {
+        bool result;
+        if( (result = GLESRenderTexture::attachDepthBuffer( depthBuffer )) )
+            mFB.attachDepthBuffer( depthBuffer );
 
-		return result;
-	}
-	//-----------------------------------------------------------------------------
-	void GLESFBORenderTexture::detachDepthBuffer()
-	{
-		mFB.detachDepthBuffer();
-		GLESRenderTexture::detachDepthBuffer();
-	}
-	//-----------------------------------------------------------------------------
-	void GLESFBORenderTexture::_detachDepthBuffer()
-	{
-		mFB.detachDepthBuffer();
-		GLESRenderTexture::_detachDepthBuffer();
-	}
+        return result;
+    }
+    //-----------------------------------------------------------------------------
+    void GLESFBORenderTexture::detachDepthBuffer()
+    {
+        mFB.detachDepthBuffer();
+        GLESRenderTexture::detachDepthBuffer();
+    }
+    //-----------------------------------------------------------------------------
+    void GLESFBORenderTexture::_detachDepthBuffer()
+    {
+        mFB.detachDepthBuffer();
+        GLESRenderTexture::_detachDepthBuffer();
+    }
 
     /// Size of probe texture
     #define PROBE_SIZE 16
@@ -131,8 +131,8 @@ namespace Ogre {
     };
     #define DEPTHFORMAT_COUNT (sizeof(depthFormats)/sizeof(GLenum))
 
-	GLESFBOManager::GLESFBOManager() 
-		: mTempFBO(0)
+    GLESFBOManager::GLESFBOManager() 
+        : mTempFBO(0)
     {
         detectFBOFormats();
         
@@ -140,16 +140,16 @@ namespace Ogre {
         GL_CHECK_ERROR;
     }
 
-	GLESFBOManager::~GLESFBOManager()
-	{
-		if(!mRenderBufferMap.empty())
-		{
-			LogManager::getSingleton().logMessage("GL ES: Warning! GLESFBOManager destructor called, but not all renderbuffers were released.");
-		}
+    GLESFBOManager::~GLESFBOManager()
+    {
+        if(!mRenderBufferMap.empty())
+        {
+            LogManager::getSingleton().logMessage("GL ES: Warning! GLESFBOManager destructor called, but not all renderbuffers were released.");
+        }
         
         glDeleteFramebuffersOES(1, &mTempFBO);      
         GL_CHECK_ERROR;
-	}
+    }
 
     void GLESFBOManager::_reload()
     {
@@ -271,8 +271,8 @@ namespace Ogre {
         {
             mProps[x].valid = false;
 
-			// Fetch GL format token
-			GLenum fmt = GLESPixelUtil::getGLInternalFormat((PixelFormat)x);
+            // Fetch GL format token
+            GLenum fmt = GLESPixelUtil::getGLInternalFormat((PixelFormat)x);
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
             if(fmt == GL_NONE)
                 continue;
@@ -281,42 +281,42 @@ namespace Ogre {
                 continue;
 #endif
 
-			// No test for compressed formats
-			if(PixelUtil::isCompressed((PixelFormat)x))
-				continue;
+            // No test for compressed formats
+            if(PixelUtil::isCompressed((PixelFormat)x))
+                continue;
 
             // Create and attach framebuffer
             glGenFramebuffersOES(1, &fb);
             glBindFramebufferOES(GL_FRAMEBUFFER_OES, fb);
             if (fmt!=GL_NONE)
             {
-				// Create and attach texture
-				glGenTextures(1, &tid);
-				glBindTexture(target, tid);
-				
+                // Create and attach texture
+                glGenTextures(1, &tid);
+                glBindTexture(target, tid);
+                
                 // Set some default parameters
                 glTexParameteri(target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
                 glTexParameteri(target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                             
-				glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, GL_UNSIGNED_BYTE, 0);
-				glFramebufferTexture2DOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES,
+                glTexImage2D(target, 0, fmt, PROBE_SIZE, PROBE_SIZE, 0, fmt, GL_UNSIGNED_BYTE, 0);
+                glFramebufferTexture2DOES(GL_FRAMEBUFFER_OES, GL_COLOR_ATTACHMENT0_OES,
                                 target, tid, 0);
             }
 
             // Check status
             GLuint status = glCheckFramebufferStatusOES(GL_FRAMEBUFFER_OES);
 
-			// Ignore status in case of fmt==GL_NONE, because no implementation will accept
-			// a buffer without *any* attachment. Buffers with only stencil and depth attachment
-			// might still be supported, so we must continue probing.
+            // Ignore status in case of fmt==GL_NONE, because no implementation will accept
+            // a buffer without *any* attachment. Buffers with only stencil and depth attachment
+            // might still be supported, so we must continue probing.
             if(fmt == GL_NONE || status == GL_FRAMEBUFFER_COMPLETE_OES)
             {
                 mProps[x].valid = true;
-				StringUtil::StrStreamType str;
-				str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
-					<< " depth/stencil support: ";
+                StringStream str;
+                str << "FBO " << PixelUtil::getFormatName((PixelFormat)x) 
+                    << " depth/stencil support: ";
 
                 // For each depth/stencil formats
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
@@ -327,10 +327,10 @@ namespace Ogre {
 
                         for (size_t stencil = 0; stencil < STENCILFORMAT_COUNT; ++stencil)
                         {
-                            //StringUtil::StrStreamType l;
+                            //StringStream l;
                             //l << "Trying " << PixelUtil::getFormatName((PixelFormat)x) 
-                            //	<< " D" << depthBits[depth] 
-                            //	<< "S" << stencilBits[stencil];
+                            //  << " D" << depthBits[depth] 
+                            //  << "S" << stencilBits[stencil];
                             //LogManager::getSingleton().logMessage(l.str());
 
                             if (_tryFormat(depthFormats[depth], stencilFormats[stencil]))
@@ -364,12 +364,12 @@ namespace Ogre {
             // Delete texture and framebuffer
             glBindFramebufferOES(GL_FRAMEBUFFER_OES, 0);
             glDeleteFramebuffersOES(1, &fb);
-			
+            
             if (fmt!=GL_NONE)
                 glDeleteTextures(1, &tid);
         }
 
-		String fmtstring;
+        String fmtstring;
         for(size_t x=0; x<PF_COUNT; ++x)
         {
             if(mProps[x].valid)
@@ -400,8 +400,8 @@ namespace Ogre {
                 desirability += 2000;
             if(depthBits[props.modes[mode].depth]==24) // Prefer 24 bit for now
                 desirability += 500;
-			if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed 
-				desirability += 5000;
+            if(depthFormats[props.modes[mode].depth]==GL_DEPTH24_STENCIL8_OES) // Prefer 24/8 packed 
+                desirability += 5000;
             desirability += stencilBits[props.modes[mode].stencil] + depthBits[props.modes[mode].depth];
             
             if(desirability>bestscore)
@@ -415,15 +415,15 @@ namespace Ogre {
     }
 
     GLESFBORenderTexture *GLESFBOManager::createRenderTexture(const String &name, 
-		const GLESSurfaceDesc &target, bool writeGamma, uint fsaa)
+        const GLESSurfaceDesc &target, bool writeGamma, uint fsaa)
     {
         GLESFBORenderTexture *retval = OGRE_NEW GLESFBORenderTexture(this, name, target, writeGamma, fsaa);
         return retval;
     }
-	MultiRenderTarget *GLESFBOManager::createMultiRenderTarget(const String & name)
-	{
-		return OGRE_NEW GLESFBOMultiRenderTarget(this, name);
-	}
+    MultiRenderTarget *GLESFBOManager::createMultiRenderTarget(const String & name)
+    {
+        return OGRE_NEW GLESFBOMultiRenderTarget(this, name);
+    }
 
     void GLESFBOManager::bind(RenderTarget *target)
     {
@@ -455,7 +455,7 @@ namespace Ogre {
             {
                 retval.buffer = it->second.buffer;
                 retval.zoffset = 0;
-				retval.numSamples = fsaa;
+                retval.numSamples = fsaa;
                 // Increase refcount
                 ++it->second.refcount;
             }
@@ -466,7 +466,7 @@ namespace Ogre {
                 mRenderBufferMap[key] = RBRef(rb);
                 retval.buffer = rb;
                 retval.zoffset = 0;
-				retval.numSamples = fsaa;
+                retval.numSamples = fsaa;
             }
         }
 //        std::cerr << "Requested renderbuffer with format " << std::hex << format << std::dec << " of " << width << "x" << height << " :" << retval.buffer << std::endl;
@@ -495,17 +495,17 @@ namespace Ogre {
         RBFormat key(surface.buffer->getGLFormat(), surface.buffer->getWidth(), surface.buffer->getHeight(), surface.numSamples);
         RenderBufferMap::iterator it = mRenderBufferMap.find(key);
         if(it != mRenderBufferMap.end())
-		{
-			// Decrease refcount
-			--it->second.refcount;
-			if(it->second.refcount==0)
-			{
-				// If refcount reaches zero, delete buffer and remove from map
-				OGRE_DELETE it->second.buffer;
-				mRenderBufferMap.erase(it);
-				//std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
-				//        << " of " << key.width << "x" << key.height << std::endl;
-			}
-		}
+        {
+            // Decrease refcount
+            --it->second.refcount;
+            if(it->second.refcount==0)
+            {
+                // If refcount reaches zero, delete buffer and remove from map
+                OGRE_DELETE it->second.buffer;
+                mRenderBufferMap.erase(it);
+                //std::cerr << "Destroyed renderbuffer of format " << std::hex << key.format << std::dec
+                //        << " of " << key.width << "x" << key.height << std::endl;
+            }
+        }
     }
 }

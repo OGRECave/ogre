@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Also see acknowledgements in Readme.html
 
 You may use this sample code for anything you like, it is not covered by the
@@ -47,12 +47,13 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
     }
 
     StringVector getRequiredPlugins()
-	{
-		StringVector names;
-        if (!GpuProgramManager::getSingleton().isSyntaxSupported("glsl150"))
+    {
+        StringVector names;
+		if(!GpuProgramManager::getSingleton().isSyntaxSupported("glsl150")
+		&& !GpuProgramManager::getSingleton().isSyntaxSupported("hlsl"))
             names.push_back("Cg Program Manager");
-		return names;
-	}
+        return names;
+    }
 
     void testCapabilities(const RenderSystemCapabilities* caps)
     {

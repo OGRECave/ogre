@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -57,28 +57,28 @@ namespace Ogre {
         */
         void bind();
 
-		/** Swap buffers - only useful when using multisample buffers.
-		*/
-		void swapBuffers();
+        /** Swap buffers - only useful when using multisample buffers.
+        */
+        void swapBuffers();
 
         /** This function acts very similar to @see GLES2FBORenderTexture::attachDepthBuffer
-			The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
-			while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
-			be attached for OGL.
-		*/
-		void attachDepthBuffer( DepthBuffer *depthBuffer );
-		void detachDepthBuffer();
+            The difference between D3D & OGL is that D3D setups the DepthBuffer before rendering,
+            while OGL setups the DepthBuffer per FBO. So the DepthBuffer (RenderBuffer) needs to
+            be attached for OGL.
+        */
+        void attachDepthBuffer( DepthBuffer *depthBuffer );
+        void detachDepthBuffer();
 
         /// Accessors
         uint32 getWidth();
         uint32 getHeight();
         PixelFormat getFormat();
-		GLsizei getFSAA();
+        GLsizei getFSAA();
         
         GLES2FBOManager *getManager() { return mManager; }
-		const GLES2SurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
+        const GLES2SurfaceDesc &getSurface(size_t attachment) { return mColour[attachment]; }
         
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         /** See AndroidResource. */
         void notifyOnContextLost();
         
@@ -88,17 +88,17 @@ namespace Ogre {
         
     private:
         GLES2FBOManager *mManager;
-		GLsizei mNumSamples;
+        GLsizei mNumSamples;
         GLuint mFB;
-		GLuint mMultisampleFB;
-		GLES2SurfaceDesc mMultisampleColourBuffer;
+        GLuint mMultisampleFB;
+        GLES2SurfaceDesc mMultisampleColourBuffer;
         GLES2SurfaceDesc mDepth;
         GLES2SurfaceDesc mStencil;
         // Arbitrary number of texture surfaces
         GLES2SurfaceDesc mColour[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
 
 
-		/** Initialise object (find suitable depth and stencil format).
+        /** Initialise object (find suitable depth and stencil format).
             Must be called every time the bindings change.
             It fails with an exception (ERR_INVALIDPARAMS) if:
             - Attachment point 0 has no binding

@@ -4,14 +4,14 @@ precision mediump int;
 precision mediump float;
 
 uniform sampler2D RT;
-uniform sampler2D pattern;
-varying vec2 uv0;
-varying vec2 uv1;
+uniform sampler2D noise;
+varying vec2 oUv0;
+//varying vec2 oUv1;
 
 void main()
 {
-	float c = dot(texture2D(RT, uv0), vec4(0.30, 0.11, 0.59, 0.00));
-	float n = texture2D(pattern, uv0).a*2.0 - 1.0;
+	float c = dot(texture2D(RT, oUv0), vec4(0.30, 0.11, 0.59, 0.00));
+	float n = texture2D(noise, oUv0).r*2.0 - 1.0;
 	c += n;
 	if (c > 0.5)
 	{

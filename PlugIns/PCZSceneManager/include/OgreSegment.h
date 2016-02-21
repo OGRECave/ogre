@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ Some algorithms based off code from the Wild Magic library by Dave Eberly
 begin                : Mon Apr 02 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 : Apr 5, 2007
+Code Style Update    : Apr 5, 2007
 -----------------------------------------------------------------------------
 */
 
@@ -41,41 +41,41 @@ Code Style Update	 : Apr 5, 2007
 
 namespace Ogre
 {
-	class Capsule;
+    class Capsule;
 
-	class Segment
-	{
-	public:
-		// The segment is represented as P+t*D, where P is the segment origin,
-		// D is a unit-length direction vector and |t| <= e.  The value e is
-		// referred to as the extent of the segment.  The end points of the
-		// segment are P-e*D and P+e*D.  The user must ensure that the direction
-		// vector is unit-length.  The representation for a segment is analogous
-		// to that for an oriented bounding box.  P is the center, D is the
-		// axis direction, and e is the extent.
+    class Segment
+    {
+    public:
+        // The segment is represented as P+t*D, where P is the segment origin,
+        // D is a unit-length direction vector and |t| <= e.  The value e is
+        // referred to as the extent of the segment.  The end points of the
+        // segment are P-e*D and P+e*D.  The user must ensure that the direction
+        // vector is unit-length.  The representation for a segment is analogous
+        // to that for an oriented bounding box.  P is the center, D is the
+        // axis direction, and e is the extent.
 
 
-		// construction
-		Segment ();  // uninitialized
-		Segment (const Vector3&, const Vector3&, Real);
+        // construction
+        Segment ();  // uninitialized
+        Segment (const Vector3&, const Vector3&, Real);
 
-		// set values
-		void set(const Vector3& newOrigin, const Vector3& newEnd);
-		void setOrigin(const Vector3& newOrigin);
-		void setEndPoint(const Vector3& newEndpoint);
+        // set values
+        void set(const Vector3& newOrigin, const Vector3& newEnd);
+        void setOrigin(const Vector3& newOrigin);
+        void setEndPoint(const Vector3& newEndpoint);
 
-		// functions to calculate distance to another segment
-		Real distance(const Segment& otherSegment) const;
-		Real squaredDistance(const Segment& otherSegment) const;
+        // functions to calculate distance to another segment
+        Real distance(const Segment& otherSegment) const;
+        Real squaredDistance(const Segment& otherSegment) const;
 
-		// intersect check between segment & capsule 
-		bool intersects(const Capsule&) const;
+        // intersect check between segment & capsule 
+        bool intersects(const Capsule&) const;
 
-		// defining variables
-		Vector3 mOrigin;
-		Vector3 mDirection;
-		Real	mExtent;
-	};
+        // defining variables
+        Vector3 mOrigin;
+        Vector3 mDirection;
+        Real    mExtent;
+    };
 }
 
 #endif //SEGMENT_H

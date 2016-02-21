@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -37,42 +37,42 @@ String CGProgramProcessor::TargetLanguage = "cg";
 //-----------------------------------------------------------------------------
 CGProgramProcessor::CGProgramProcessor()
 {
-	
+    
 }
 
 //-----------------------------------------------------------------------------
 CGProgramProcessor::~CGProgramProcessor()
 {
-	
+    
 }
 
 //-----------------------------------------------------------------------------
 bool CGProgramProcessor::preCreateGpuPrograms( ProgramSet* programSet )
 {
-	Program* vsProgram = programSet->getCpuVertexProgram();
-	Program* psProgram = programSet->getCpuFragmentProgram();
-	Function* vsMain   = vsProgram->getEntryPointFunction();
-	Function* fsMain   = psProgram->getEntryPointFunction();	
-	bool success;
+    Program* vsProgram = programSet->getCpuVertexProgram();
+    Program* psProgram = programSet->getCpuFragmentProgram();
+    Function* vsMain   = vsProgram->getEntryPointFunction();
+    Function* fsMain   = psProgram->getEntryPointFunction();    
+    bool success;
 
-	// Compact vertex shader outputs.
-	success = ProgramProcessor::compactVsOutputs(vsMain, fsMain);
-	if (success == false)	
-		return false;	
+    // Compact vertex shader outputs.
+    success = ProgramProcessor::compactVsOutputs(vsMain, fsMain);
+    if (success == false)   
+        return false;   
 
-	return true;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 bool CGProgramProcessor::postCreateGpuPrograms( ProgramSet* programSet )
 {
-	// Bind vertex shader auto parameters.
-	bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
+    // Bind vertex shader auto parameters.
+    bindAutoParameters(programSet->getCpuVertexProgram(), programSet->getGpuVertexProgram());
 
-	// Bind fragment shader auto parameters.
-	bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
+    // Bind fragment shader auto parameters.
+    bindAutoParameters(programSet->getCpuFragmentProgram(), programSet->getGpuFragmentProgram());
 
-	return true;
+    return true;
 }
 }
 }

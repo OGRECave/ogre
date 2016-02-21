@@ -4,7 +4,7 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
+  Copyright (c) 2000-2014 Torus Knot Software Ltd
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -35,16 +35,19 @@
 #include "OgreRoot.h"
 #include "OgreGL3PlusUtil.h"
 
+#include <iostream>
+
 namespace Ogre {
 
     
-    GLSLProgramManager::GLSLProgramManager(void) :
+    GLSLProgramManager::GLSLProgramManager(const GL3PlusSupport& support) :
         mActiveVertexShader(NULL),
-        mActiveGeometryShader(NULL),
-        mActiveFragmentShader(NULL),
         mActiveHullShader(NULL),
         mActiveDomainShader(NULL),
-        mActiveComputeShader(NULL)
+        mActiveGeometryShader(NULL),
+        mActiveFragmentShader(NULL),
+        mActiveComputeShader(NULL),
+        mGLSupport(support)
     {
         // Fill in the relationship between type names and enums
         mTypeEnumMap.insert(StringToEnumMap::value_type("float", GL_FLOAT));
@@ -178,11 +181,6 @@ namespace Ogre {
 
         // GL 4.2
         mTypeEnumMap.insert(StringToEnumMap::value_type("atomic_uint", GL_UNSIGNED_INT_ATOMIC_COUNTER));
-    }
-
-    
-    GLSLProgramManager::~GLSLProgramManager(void)
-    {
     }
     
     void GLSLProgramManager::convertGLUniformtoOgreType(GLenum gltype,
@@ -552,7 +550,7 @@ namespace Ogre {
 
         // Loop over each active uniform and add it to the reference
         // container.
-        for (GLuint index = 0; index < uniformCount; index++)
+        for (GLuint index = 0; index < (GLuint)uniformCount; index++)
         {
             GLint arraySize;
             GLenum glType;
@@ -717,9 +715,6 @@ namespace Ogre {
                 sharedParamsBufferMap.insert(newPair);
 
                 // Get active block parameter properties.
-                //GpuNamedConstants namedParams = blockSharedParams->getNamed;
-                //GpuConstantDefinitionIterator sharedParam = namedParams.map.begin();
-                //GpuConstantDefinitionIterator endParam = namedParams.map.end();
                 GpuConstantDefinitionIterator sharedParamDef = blockSharedParams->getConstantDefinitionIterator();
                 std::vector<const char*> sharedParamNames;
                 for (; sharedParamDef.current() != sharedParamDef.end(); sharedParamDef.moveNext())
@@ -727,8 +722,9 @@ namespace Ogre {
                     sharedParamNames.push_back(sharedParamDef.current()->first.c_str());
                 }
 
-                std::vector<GLuint> uniformParamIndices (sharedParamNames.size(), 0);
-                std::vector<GLint> uniformParamOffsets (sharedParamNames.size(), -2);
+                std::vector<GLuint> uniformParamIndices(sharedParamNames.size());
+                std::vector<GLint> uniformParamOffsets(sharedParamNames.size());
+
                 OGRE_CHECK_GL_ERROR(glGetUniformIndices(programObject, sharedParamNames.size(), &sharedParamNames[0], &uniformParamIndices[0]));
                 //FIXME debug this (see stdout)
                 OGRE_CHECK_GL_ERROR(glGetActiveUniformsiv(programObject, uniformParamIndices.size(), &uniformParamIndices[0], GL_UNIFORM_OFFSET, &uniformParamOffsets[0]));
@@ -737,16 +733,14 @@ namespace Ogre {
                 //TODO handle matrices
                 //GL_UNIFORM_MATRIX_STRIDE
 
-                //const GpuConstantDefinitionMap& sharedParamDefs = blockSharedParams->getConstantDefinitions().map;
-                // sharedParamDef.begin();
-                // for (int i = 0; sharedParamDef.current() != sharedParamDef.end(); sharedParamDef.moveNext(), ++i)
-                // {
-                //     sharedParamDef.current()->second.logicalIndex = uniformParamOffsets[i];
-                // }
-                //sharedParam->logicalIndex = ;
-
-                hwGlBuffer->mBufferParamsLayout.indices = uniformParamIndices;
-                hwGlBuffer->mBufferParamsLayout.offsets = uniformParamOffsets;
+                GpuNamedConstants& consts = const_cast<GpuNamedConstants&>(blockSharedParams->getConstantDefinitions());
+                MapIterator<GpuConstantDefinitionMap> sharedParamDefMut(consts.map);
+                for (size_t i = 0; sharedParamDefMut.current() != sharedParamDefMut.end(); sharedParamDefMut.moveNext(), i++)
+                {
+                    // NOTE: the naming in GL3Plus is backward. logicalIndex is actually the physical index of the parameter
+                    // while the physicalIndex is the logical array offset..
+                    sharedParamDefMut.current()->second.logicalIndex = uniformParamOffsets[i];
+                }
             }
 
             GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
@@ -760,7 +754,7 @@ namespace Ogre {
 
         //TODO Need easier, more robust feature checking.
         // if (mGLSupport.checkExtension("GL_ARB_program_interface_query") || gl3wIsSupported(4, 3))
-        if (gl3wIsSupported(4, 3))
+        if (mGLSupport.hasMinGLVersion(4, 3))
         {
             OGRE_CHECK_GL_ERROR(glGetProgramInterfaceiv(programObject, GL_SHADER_STORAGE_BLOCK, GL_ACTIVE_RESOURCES, &blockCount));
 
@@ -791,19 +785,11 @@ namespace Ogre {
                 else
                 {
                     // Create buffer and add entry to buffer map.
-                    // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
-                    // HardwareUniformBufferSharedPtr newUniformBuffer = HardwareBufferManager::getSingleton().createUniformBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC_WRITE_ONLY_DISCARDABLE, false, uniformName);
                     // bufferMapi->second() = newUniformBuffer;
-                    // hwGlBuffer = static_cast<GL3PlusHardwareUniformBuffer*>(newUniformBuffer.get());
-                    // GLint bufferBinding = sharedParamsBufferMap.size();
-                    // hwGlBuffer->setGLBufferBinding(bufferBinding);
-                    // std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newUniformBuffer);
-                    // sharedParamsBufferMap.insert(newPair);
 
                     GLint blockSize;
-                    //GLint parameters [2];
                     // const GLenum properties [2] = {GL_BUFFER_DATA_SIZE, GL_BUFFER_BINDING};
-                    const GLenum properties [1] = {GL_BUFFER_DATA_SIZE};
+                    GLenum properties[] = {GL_BUFFER_DATA_SIZE};
                     OGRE_CHECK_GL_ERROR(glGetProgramResourceiv(programObject, GL_SHADER_STORAGE_BLOCK, index, 1, properties, 1, NULL, &blockSize));
                     //blockSize = properties[0];
                     //TODO Implement shared param access param in materials (R, W, R+W)
@@ -811,17 +797,23 @@ namespace Ogre {
                     HardwareUniformBufferSharedPtr newShaderStorageBuffer = static_cast<GL3PlusHardwareBufferManager*>(HardwareBufferManager::getSingletonPtr())->createShaderStorageBuffer(blockSize, HardwareBuffer::HBU_DYNAMIC, false, uniformName);
                     hwGlBuffer = static_cast<GL3PlusHardwareShaderStorageBuffer*>(newShaderStorageBuffer.get());
 
-                    // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_DATA_SIZE, &blockSize));
-                    // OGRE_CHECK_GL_ERROR(glGetActiveUniformBlockiv(programObject, index, GL_UNIFORM_BLOCK_BINDING, &blockBinding));
                     //FIXME check parameters
-
                     GLint bufferBinding = sharedParamsBufferMap.size();
                     hwGlBuffer->setGLBufferBinding(bufferBinding);
 
                     std::pair<GpuSharedParametersPtr, HardwareUniformBufferSharedPtr> newPair (blockSharedParams, newShaderStorageBuffer);
-                    //sharedParamsBufferMap.insert(newPair);
+                    sharedParamsBufferMap.insert(newPair);
 
                     // Get active block parameter properties.
+                    properties[0] = GL_OFFSET;
+                    GpuNamedConstants& consts = const_cast<GpuNamedConstants&>(blockSharedParams->getConstantDefinitions());
+                    MapIterator<GpuConstantDefinitionMap> sharedParamDef(consts.map);
+                    for (size_t i = 0; sharedParamDef.current() != sharedParamDef.end(); sharedParamDef.moveNext(), i++) {
+                        GLuint varIndex = glGetProgramResourceIndex(programObject, GL_BUFFER_VARIABLE, sharedParamDef.current()->first.c_str());
+                        GLint offset;
+                        glGetProgramResourceiv(programObject, GL_BUFFER_VARIABLE, varIndex, 1, properties, 1, NULL, &offset);
+                        sharedParamDef.current()->second.logicalIndex = offset;
+                    }
                 }
 
                 GLint bufferBinding = hwGlBuffer->getGLBufferBinding();
@@ -830,7 +822,7 @@ namespace Ogre {
             }
         }
         // if (mGLSupport.checkExtension("GL_ARB_shader_atomic_counters") || gl3wIsSupported(4, 2))
-        if (gl3wIsSupported(4, 2))
+        if (mGLSupport.hasMinGLVersion(4, 2))
         {
             // Now deal with atomic counters buffers
             OGRE_CHECK_GL_ERROR(glGetProgramiv(programObject, GL_ACTIVE_ATOMIC_COUNTER_BUFFERS, &blockCount));

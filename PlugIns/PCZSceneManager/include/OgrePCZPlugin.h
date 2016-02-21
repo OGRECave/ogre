@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,48 +30,50 @@ OgrePCZPlugin.h  -  Portal Connected Zone Scene Manager Plugin class
 begin                : Mon Feb 19 2007
 author               : Eric Cha
 email                : ericc@xenopi.com
-Code Style Update	 :
+Code Style Update    :
 -----------------------------------------------------------------------------
 */
 
 #ifndef PCZPLUGIN_H
 #define PCZPLUGIN_H
 
-#include <OgrePlugin.h>
-#include "OgrePCZSceneManager.h"
-#include "OgrePCZoneFactory.h"
-#include "OgrePCZLight.h"
+#include "OgrePlugin.h"
 
 namespace Ogre
 {
+    class PCZSceneManagerFactory;
+    class PCZoneFactoryManager;
+    class PCZLightFactory;
+    class PortalFactory;
+    class AntiPortalFactory;
 
-	/** Plugin instance for PCZ Manager */
-	class PCZPlugin : public Plugin
-	{
-	public:
-		PCZPlugin();
+    /** Plugin instance for PCZ Manager */
+    class PCZPlugin : public Plugin
+    {
+    public:
+        PCZPlugin();
 
-		/// @copydoc Plugin::getName
-		const String& getName() const;
+        /// @copydoc Plugin::getName
+        const String& getName() const;
 
-		/// @copydoc Plugin::install
-		void install();
+        /// @copydoc Plugin::install
+        void install();
 
-		/// @copydoc Plugin::initialise
-		void initialise();
+        /// @copydoc Plugin::initialise
+        void initialise();
 
-		/// @copydoc Plugin::shutdown
-		void shutdown();
+        /// @copydoc Plugin::shutdown
+        void shutdown();
 
-		/// @copydoc Plugin::uninstall
-		void uninstall();
-	protected:
-		PCZSceneManagerFactory* mPCZSMFactory;
-		PCZoneFactoryManager* mPCZoneFactoryManager;
-		PCZLightFactory* mPCZLightFactory;
-		PortalFactory* mPortalFactory;
-		AntiPortalFactory* mAntiPortalFactory;
-	};
+        /// @copydoc Plugin::uninstall
+        void uninstall();
+    protected:
+        PCZSceneManagerFactory* mPCZSMFactory;
+        PCZoneFactoryManager* mPCZoneFactoryManager;
+        PCZLightFactory* mPCZLightFactory;
+        PortalFactory* mPortalFactory;
+        AntiPortalFactory* mAntiPortalFactory;
+    };
 }
 
 #endif

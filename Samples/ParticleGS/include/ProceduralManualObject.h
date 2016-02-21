@@ -4,8 +4,8 @@
   (Object-oriented Graphics Rendering Engine)
   For the latest info, see http://www.ogre3d.org/
 
-  Copyright (c) 2000-2013 Torus Knot Software Ltd
-  Also see acknowledgements in Readme.html
+Copyright (c) 2000-2014 Torus Knot Software Ltd
+Also see acknowledgements in Readme.html
 
   You may use this sample code for anything you like, it is not covered by the
   same license as the rest of the engine.
@@ -15,9 +15,9 @@
 #ifndef __PROCEDURAL_MANUAL_OBJECT_H__
 #define __PROCEDURAL_MANUAL_OBJECT_H__
 
-#include <OgreManualObject.h>
-#include <OgreSimpleRenderable.h>
-#include <OgreRenderToVertexBuffer.h>
+#include "OgreManualObject.h"
+#include "OgreSimpleRenderable.h"
+#include "OgreRenderToVertexBuffer.h"
 
 namespace Ogre
 {

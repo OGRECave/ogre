@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -36,28 +36,28 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-	/** \addtogroup Core
-	*  @{
-	*/
-	/** \addtogroup General
-	*  @{
-	*/
+    /** \addtogroup Core
+    *  @{
+    */
+    /** \addtogroup General
+    *  @{
+    */
 
-	class _OgreExport ScriptParser : public ScriptCompilerAlloc
-	{
-	public:
-		ScriptParser();
-		virtual ~ScriptParser() {}
+    class _OgreExport ScriptParser : public ScriptCompilerAlloc
+    {
+    public:
+        ScriptParser();
+        virtual ~ScriptParser() {}
 
-		ConcreteNodeListPtr parse(const ScriptTokenListPtr &tokens);
-		ConcreteNodeListPtr parseChunk(const ScriptTokenListPtr &tokens);
-	private:
-		ScriptToken *getToken(ScriptTokenList::iterator i, ScriptTokenList::iterator end, int offset);
-		ScriptTokenList::iterator skipNewlines(ScriptTokenList::iterator i, ScriptTokenList::iterator end);
-	};
-	
-	/** @} */
-	/** @} */
+        ConcreteNodeListPtr parse(const ScriptTokenListPtr &tokens);
+        ConcreteNodeListPtr parseChunk(const ScriptTokenListPtr &tokens);
+    private:
+        ScriptToken *getToken(ScriptTokenList::iterator i, ScriptTokenList::iterator end, int offset);
+        ScriptTokenList::iterator skipNewlines(ScriptTokenList::iterator i, ScriptTokenList::iterator end);
+    };
+    
+    /** @} */
+    /** @} */
 }
 
 #include "OgreHeaderSuffix.h"

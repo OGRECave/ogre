@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include "OgreRenderTargetListener.h"
 #include "OgreRenderQueueListener.h"
 #include "OgreCompositorInstance.h"
-#include "OgreCompositor.h"
 #include "OgreViewport.h"
 #include "OgreHeaderPrefix.h"
 
@@ -71,7 +70,7 @@ namespace Ogre {
         @param scheme
             Scheme to use (blank means default).
         */
-        CompositorInstance* addCompositor(CompositorPtr filter, size_t addPosition=LAST, const String& scheme = StringUtil::BLANK);
+        CompositorInstance* addCompositor(CompositorPtr filter, size_t addPosition=LAST, const String& scheme = BLANKSTRING);
 
         /** Remove a compositor.
         @param position
@@ -134,6 +133,9 @@ namespace Ogre {
         /** Get viewport that is the target of this chain
         */
         Viewport *getViewport();
+        /** Set viewport that is the target of this chain
+        */
+        void _notifyViewport(Viewport* vp);
 
         /** Remove a compositor by pointer. This is internally used by CompositionTechnique to
             "weak" remove any instanced of a deleted technique.
@@ -197,11 +199,18 @@ namespace Ogre {
 
         /// destroy internal resources
         void destroyResources(void);
+        
+        /** Internal method to get a unique name of a compositor
+        @param viewport Pointer to a viewport used for generating the compositor name.
+        */
+        const String getCompositorName() const;
 
         /** Render queue listener used to set up rendering events. */
         class _OgreExport RQListener: public RenderQueueListener
         {
         public:
+            RQListener() : mOperation(0), mSceneManager(0), mRenderSystem(0), mViewport(0) {}
+
             /** @copydoc RenderQueueListener::renderQueueStarted
             */
             virtual void renderQueueStarted(uint8 queueGroupId, const String& invocation, bool& skipThisInvocation);

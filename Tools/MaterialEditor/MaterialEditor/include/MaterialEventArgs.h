@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -36,15 +36,15 @@ class TechniqueController;
 class MaterialEventArgs : public EventArgs
 {
 public:
-	MaterialEventArgs(MaterialController* mc);
-	MaterialEventArgs(MaterialController* mc, TechniqueController* tc);
+    MaterialEventArgs(MaterialController* mc);
+    MaterialEventArgs(MaterialController* mc, TechniqueController* tc);
 
-	MaterialController* getMaterialController() const;
-	TechniqueController* getTechniqueController() const;
+    MaterialController* getMaterialController() const;
+    TechniqueController* getTechniqueController() const;
 
 protected:
-	MaterialController* mMaterialController;
-	TechniqueController* mTechniqueController;
+    MaterialController* mMaterialController;
+    TechniqueController* mTechniqueController;
 };
 
 #endif // _MATERIALEVENTARGS_H_

@@ -39,6 +39,7 @@ if(WIN32) # The only platform it makes sense to check for DirectX9 SDK
   )
 
   create_search_paths(DirectX9)
+
   # redo search if prefix path changed
   clear_if_changed(DirectX9_PREFIX_PATH
     DirectX9_LIBRARY
@@ -55,18 +56,15 @@ if(WIN32) # The only platform it makes sense to check for DirectX9 SDK
   endif(CMAKE_CL_64)
   find_library(DirectX9_LIBRARY NAMES d3d9 HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
   find_library(DirectX9_D3DX9_LIBRARY NAMES d3dx9 HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
-  find_library(DirectX9_DXERR_LIBRARY NAMES DxErr HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
   find_library(DirectX9_DXGUID_LIBRARY NAMES dxguid HINTS ${DirectX9_LIB_SEARCH_PATH} PATH_SUFFIXES ${DirectX9_LIBPATH_SUFFIX})
   
   findpkg_finish(DirectX9)
   set(DirectX9_LIBRARIES ${DirectX9_LIBRARIES} 
     ${DirectX9_D3DX9_LIBRARY}
-    ${DirectX9_DXERR_LIBRARY}
     ${DirectX9_DXGUID_LIBRARY}
   )
   
-  mark_as_advanced(DirectX9_D3DX9_LIBRARY DirectX9_DXERR_LIBRARY DirectX9_DXGUID_LIBRARY
+  mark_as_advanced(DirectX9_D3DX9_LIBRARY DirectX9_DXGUID_LIBRARY
     DirectX9_DXGI_LIBRARY DirectX9_D3DCOMPILER_LIBRARY) 
 
-  
 endif(WIN32)

@@ -5,7 +5,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -33,7 +33,7 @@ THE SOFTWARE
 #include "Workspace.h"
 
 BEGIN_EVENT_TABLE(ProjectWizard, wxWizard)
-	EVT_WIZARD_FINISHED(wxID_ANY, ProjectWizard::OnFinish)
+    EVT_WIZARD_FINISHED(wxID_ANY, ProjectWizard::OnFinish)
 END_EVENT_TABLE()
 
 ProjectWizard::ProjectWizard()
@@ -46,28 +46,28 @@ ProjectWizard::~ProjectWizard()
 
 bool ProjectWizard::Create(wxWindow* parent, int id /* = -1 */, const wxString& title /* = wxEmptyString */, const wxBitmap& bitmap /* = wxNullBitmap */, const wxPoint& pos /* = wxDefaultPosition */, long style /* = wxDEFAULT_DIALOG_STYLE */)
 {
-	bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
+    bool result = wxWizard::Create(parent, id, title, bitmap, pos, style);
 
-	mProjectPage = new ProjectPage(this);
+    mProjectPage = new ProjectPage(this);
 
-	GetPageAreaSizer()->Add(mProjectPage);
+    GetPageAreaSizer()->Add(mProjectPage);
 
-	return result;
+    return result;
 }
 
 ProjectPage* ProjectWizard::getProjectPage() const
 {
-	return mProjectPage;
+    return mProjectPage;
 }
 
 void ProjectWizard::OnFinish(wxWizardEvent& event)
 {
-	wxString name;
-	mProjectPage->getName(name);
+    wxString name;
+    mProjectPage->getName(name);
 
-	wxString location;
-	mProjectPage->getLocation(location);
+    wxString location;
+    mProjectPage->getLocation(location);
 
-	Project* project = new Project(name.c_str());
-	Workspace::getSingletonPtr()->addProject(project);
+    Project* project = new Project(name.c_str());
+    Workspace::getSingletonPtr()->addProject(project);
 }

@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,19 +28,20 @@ THE SOFTWARE.
 
 #include "OgreStableHeaders.h"
 #include "OgreDistanceLodStrategy.h"
+#include "OgreCamera.h"
+#include "OgreNode.h"
+#include "OgreViewport.h"
 
 #include <limits>
 
-#include "OgreViewport.h"
-
 namespace Ogre {
-    DistanceLodStrategy::DistanceLodStrategy(const String& name)
+    DistanceLodStrategyBase::DistanceLodStrategyBase(const String& name)
         : LodStrategy(name)
         , mReferenceViewEnabled(false)
         , mReferenceViewValue(-1)
     { }
     //-----------------------------------------------------------------------
-    Real DistanceLodStrategy::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
+    Real DistanceLodStrategyBase::getValueImpl(const MovableObject *movableObject, const Ogre::Camera *camera) const
     {
         Real squaredDepth = getSquaredDepth(movableObject, camera);
 
@@ -73,48 +74,48 @@ namespace Ogre {
         return squaredDepth * camera->_getLodBiasInverse();
     }
     //-----------------------------------------------------------------------
-    Real DistanceLodStrategy::getBaseValue() const
+    Real DistanceLodStrategyBase::getBaseValue() const
     {
         return Real(0);
     }
     //---------------------------------------------------------------------
-    Real DistanceLodStrategy::transformBias(Real factor) const
+    Real DistanceLodStrategyBase::transformBias(Real factor) const
     {
         assert(factor > 0.0f && "Bias factor must be > 0!");
         return 1.0f / factor;
     }
     //-----------------------------------------------------------------------
-    Real DistanceLodStrategy::transformUserValue(Real userValue) const
+    Real DistanceLodStrategyBase::transformUserValue(Real userValue) const
     {
         // Square user-supplied distance
         return Math::Sqr(userValue);
     }
     //-----------------------------------------------------------------------
-    ushort DistanceLodStrategy::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const
+    ushort DistanceLodStrategyBase::getIndex(Real value, const Mesh::MeshLodUsageList& meshLodUsageList) const
     {
         // Get index assuming ascending values
         return getIndexAscending(value, meshLodUsageList);
     }
     //-----------------------------------------------------------------------
-    ushort DistanceLodStrategy::getIndex(Real value, const Material::LodValueList& materialLodValueList) const
+    ushort DistanceLodStrategyBase::getIndex(Real value, const Material::LodValueList& materialLodValueList) const
     {
         // Get index assuming ascending values
         return getIndexAscending(value, materialLodValueList);
     }
     //---------------------------------------------------------------------
-    bool DistanceLodStrategy::isSorted(const Mesh::LodValueList& values) const
+    bool DistanceLodStrategyBase::isSorted(const Mesh::LodValueList& values) const
     {
         // Determine if sorted ascending
         return isSortedAscending(values);
     }
         //---------------------------------------------------------------------
-    void DistanceLodStrategy::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
+    void DistanceLodStrategyBase::sort(Mesh::MeshLodUsageList& meshLodUsageList) const
     {
         // Sort ascending
         return sortAscending(meshLodUsageList);
     }
     //---------------------------------------------------------------------
-    void DistanceLodStrategy::setReferenceView(Real viewportWidth, Real viewportHeight, Radian fovY)
+    void DistanceLodStrategyBase::setReferenceView(Real viewportWidth, Real viewportHeight, Radian fovY)
     {
         // Determine x FOV based on aspect ratio
         Radian fovX = fovY * (viewportWidth / viewportHeight);
@@ -129,7 +130,7 @@ namespace Ogre {
         mReferenceViewEnabled = true;
     }
     //---------------------------------------------------------------------
-    void DistanceLodStrategy::setReferenceViewEnabled(bool value)
+    void DistanceLodStrategyBase::setReferenceViewEnabled(bool value)
     {
         // Ensure reference value has been set before being enabled
         if (value)
@@ -138,7 +139,7 @@ namespace Ogre {
         mReferenceViewEnabled = value;
     }
     //---------------------------------------------------------------------
-    bool DistanceLodStrategy::isReferenceViewEnabled() const
+    bool DistanceLodStrategyBase::isReferenceViewEnabled() const
     {
         return mReferenceViewEnabled;
     }
@@ -159,7 +160,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     DistanceLodSphereStrategy::DistanceLodSphereStrategy()
-        : DistanceLodStrategy("distance_sphere")
+        : DistanceLodStrategyBase("distance_sphere")
     { }
     //-----------------------------------------------------------------------
     Real DistanceLodSphereStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const
@@ -189,7 +190,7 @@ namespace Ogre {
     }
     //-----------------------------------------------------------------------
     DistanceLodBoxStrategy::DistanceLodBoxStrategy()
-        : DistanceLodStrategy("distance_box")
+        : DistanceLodStrategyBase("distance_box")
     { }
     //-----------------------------------------------------------------------
     Real DistanceLodBoxStrategy::getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const

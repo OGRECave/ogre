@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2013 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,14 +30,8 @@ THE SOFTWARE.
 
 #include "OgrePrerequisites.h"
 
-#include "OgreCommon.h"
-#include "OgreMatrix3.h"
 #include "OgreMatrix4.h"
-#include "OgreQuaternion.h"
-#include "OgreString.h"
 #include "OgreRenderable.h"
-#include "OgreIteratorWrappers.h"
-#include "OgreMesh.h"
 #include "OgreUserObjectBindings.h"
 #include "OgreHeaderPrefix.h"
 
@@ -75,7 +69,7 @@ namespace Ogre {
             /// Transform is relative to world space
             TS_WORLD
         };
-        typedef HashMap<String, Node*> ChildNodeMap;
+        typedef OGRE_HashMap<String, Node*> ChildNodeMap;
         typedef MapIterator<ChildNodeMap> ChildNodeIterator;
         typedef ConstMapIterator<ChildNodeMap> ConstChildNodeIterator;
 
@@ -698,6 +692,13 @@ namespace Ogre {
             useful for simple transforms that don't require a child node.*/
         virtual Vector3 convertLocalToWorldPosition( const Vector3 &localPos );
 
+        /** Gets the local direction, relative to this node, of the given world-space direction */
+        virtual Vector3 convertWorldToLocalDirection( const Vector3 &worldDir, bool useScale );
+
+        /** Gets the world direction of a point in the node local space
+            useful for simple transforms that don't require a child node.*/
+        virtual Vector3 convertLocalToWorldDirection( const Vector3 &localDir, bool useScale );
+
         /** Gets the local orientation, relative to this node, of the given world-space orientation */
         virtual Quaternion convertWorldToLocalOrientation( const Quaternion &worldOrientation );
 
@@ -752,18 +753,18 @@ namespace Ogre {
             this Node. This can be a pointer back to one of your own
             classes for instance.
         */
-        virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
+        OGRE_DEPRECATED virtual void setUserAny(const Any& anything) { getUserObjectBindings().setUserAny(anything); }
 
         /** @deprecated use UserObjectBindings::getUserAny via getUserObjectBindings() instead.
             Retrieves the custom user value associated with this object.
         */
-        virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
+        OGRE_DEPRECATED virtual const Any& getUserAny(void) const { return getUserObjectBindings().getUserAny(); }
 
         /** Return an instance of user objects binding associated with this class.
             You can use it to associate one or more custom objects with this class instance.
         @see UserObjectBindings::setUserAny.
         */
-        UserObjectBindings&	getUserObjectBindings() { return mUserObjectBindings; }
+        UserObjectBindings& getUserObjectBindings() { return mUserObjectBindings; }
 
         /** Return an instance of user objects binding associated with this class.
             You can use it to associate one or more custom objects with this class instance.
