@@ -57,8 +57,10 @@ namespace Ogre
         mp2DTex(NULL),
         mp3DTex(NULL),
         mDynamicTextures(false),
+        mCurrentCacheCursor( 0 ),
         mAutoMipMapGeneration(false)
     {
+        memset( mCachedUavViews, 0, sizeof( mCachedUavViews ) );
     }
     //---------------------------------------------------------------------
     D3D11Texture::~D3D11Texture()
@@ -125,6 +127,90 @@ namespace Ogre
 
         return mpShaderResourceView;
     }
+    //-----------------------------------------------------------------------------------
+    ID3D11UnorderedAccessView* D3D11Texture::createUavView( int cacheIdx, int32 mipmapLevel,
+                                                            int32 textureArrayIndex,
+                                                            PixelFormat pixelFormat )
+    {
+        assert( cacheIdx < 16 );
+
+        if( mCachedUavViews[cacheIdx].uavView )
+            mCachedUavViews[cacheIdx].uavView->Release();
+
+        mCachedUavViews[cacheIdx].mipmapLevel       = mipmapLevel;
+        mCachedUavViews[cacheIdx].textureArrayIndex = textureArrayIndex;
+        mCachedUavViews[cacheIdx].pixelFormat       = pixelFormat;
+
+        D3D11_UNORDERED_ACCESS_VIEW_DESC descUAV;
+
+        descUAV.Format = D3D11Mappings::_getPF( pixelFormat );
+
+        switch( this->getTextureType() )
+        {
+        case TEX_TYPE_1D:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE1D;
+            descUAV.Texture1D.MipSlice = static_cast<UINT>( mipmapLevel );
+            break;
+        case TEX_TYPE_2D:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+            descUAV.Texture2D.MipSlice = static_cast<UINT>( mipmapLevel );
+            break;
+        case TEX_TYPE_2D_ARRAY:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
+            descUAV.Texture2DArray.MipSlice         = static_cast<UINT>( mipmapLevel );
+            descUAV.Texture2DArray.FirstArraySlice  = textureArrayIndex;
+            descUAV.Texture2DArray.ArraySize        = static_cast<UINT>( this->getDepth() -
+                                                                         textureArrayIndex );
+            break;
+        case TEX_TYPE_3D:
+            descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
+            descUAV.Texture3D.MipSlice      = static_cast<UINT>( mipmapLevel );
+            descUAV.Texture3D.FirstWSlice   = 0;
+            descUAV.Texture3D.WSize         = static_cast<UINT>( this->getDepth() );
+            break;
+        default:
+            break;
+        }
+
+        mDevice.get()->CreateUnorderedAccessView( mpTex, &descUAV, &mCachedUavViews[cacheIdx].uavView );
+
+        mCurrentCacheCursor = (cacheIdx + 1) % 4;
+
+        return mCachedUavViews[cacheIdx].uavView;
+    }
+    //---------------------------------------------------------------------
+    ID3D11UnorderedAccessView* D3D11Texture::getUavView( int32 mipmapLevel,
+                                                         int32 textureArrayIndex,
+                                                         PixelFormat pixelFormat )
+    {
+        ID3D11UnorderedAccessView *uavView = 0;
+
+        for( int i=0; i<4; ++i )
+        {
+            //Reuse resource views. Reuse res. views that are bigger than what's requested too.
+            if( mipmapLevel == mCachedUavViews[i].mipmapLevel &&
+                textureArrayIndex == mCachedUavViews[i].textureArrayIndex &&
+                pixelFormat == mCachedUavViews[i].pixelFormat )
+            {
+                uavView = mCachedUavViews[i].uavView;
+                break;
+            }
+            else if( !mCachedUavViews[i].uavView )
+            {
+                //We create in-order. If we hit here, the next ones are also null pointers.
+                uavView = createUavView( i, mipmapLevel, textureArrayIndex, pixelFormat );
+                break;
+            }
+        }
+
+        if( !uavView )
+        {
+            //If we hit here, the cache is full and couldn't find a match.
+            uavView = createUavView( mCurrentCacheCursor, mipmapLevel, textureArrayIndex, pixelFormat );
+        }
+
+        return uavView;
+    }
     //---------------------------------------------------------------------
     void D3D11Texture::loadImpl()
     {
@@ -168,6 +254,15 @@ namespace Ogre
         SAFE_RELEASE(mp1DTex);
         SAFE_RELEASE(mp2DTex);
         SAFE_RELEASE(mp3DTex);
+
+        for( int i=0; i<4; ++i )
+        {
+            if( mCachedUavViews[i].uavView )
+            {
+                mCachedUavViews[i].uavView->Release();
+                mCachedUavViews[i].uavView = 0;
+            }
+        }
     }
     //---------------------------------------------------------------------
     void D3D11Texture::_loadTex(LoadedStreams & loadedStreams)

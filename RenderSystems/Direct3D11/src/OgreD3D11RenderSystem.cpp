@@ -2359,8 +2359,9 @@ bail:
             case TEX_TYPE_2D_ARRAY:
                 descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2DARRAY;
                 descUAV.Texture2DArray.MipSlice         = static_cast<UINT>( mipmapLevel );
-                descUAV.Texture2DArray.FirstArraySlice  = /*textureArrayIndex*/0;
-                descUAV.Texture2DArray.ArraySize        = static_cast<UINT>(texture->getDepth());
+                descUAV.Texture2DArray.FirstArraySlice  = textureArrayIndex;
+                descUAV.Texture2DArray.ArraySize        = static_cast<UINT>( texture->getDepth() -
+                                                                             textureArrayIndex );
                 break;
             case TEX_TYPE_3D:
                 descUAV.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE3D;
@@ -2434,6 +2435,23 @@ bail:
         if( mActiveViewport )
             colourWrite = mActiveViewport->getColourWrite();
         _setRenderTargetViews( colourWrite );
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_bindTextureUavCS( uint32 slot, Texture *texture,
+                                               ResourceAccess::ResourceAccess access,
+                                               int32 mipmapLevel, int32 textureArrayIndex,
+                                               PixelFormat pixelFormat )
+    {
+        if( texture )
+        {
+            D3D11Texture *dt = static_cast<D3D11Texture*>( texture );
+            ID3D11UnorderedAccessView *uavView = dt->getUavView( mipmapLevel, textureArrayIndex, pixelFormat );
+            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, &uavView, NULL );
+        }
+        else
+        {
+            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, NULL, NULL );
+        }
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_hlmsPipelineStateObjectCreated( HlmsPso *block )
