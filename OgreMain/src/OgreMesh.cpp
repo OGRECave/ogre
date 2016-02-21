@@ -997,18 +997,18 @@ namespace Ogre {
             vector< vector<ushort>::type >::type boneChildren;  // for each bone, a list of children
             {
                 // extract binding pose bone positions, and also indices for child bones
-                size_t numBones = mSkeleton->getNumBones();
+                uint16 numBones = mSkeleton->getNumBones();
                 mSkeleton->setBindingPose();
                 mSkeleton->_updateTransforms();
                 bonePositions.resize( numBones );
                 boneChildren.resize( numBones );
                 // for each bone,
-                for (size_t iBone = 0; iBone < numBones; ++iBone)
+                for (uint16 iBone = 0; iBone < numBones; ++iBone)
                 {
                     Bone* bone = mSkeleton->getBone( iBone );
                     bonePositions[ iBone ] = bone->_getDerivedPosition();
                     boneChildren[ iBone ].reserve( bone->numChildren() );
-                    for (size_t iChild = 0; iChild < bone->numChildren(); ++iChild)
+                    for (uint16 iChild = 0; iChild < bone->numChildren(); ++iChild)
                     {
                         Bone* child = static_cast<Bone*>( bone->getChild( iChild ) );
                         boneChildren[ iBone ].push_back( child->getHandle() );

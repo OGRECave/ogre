@@ -229,7 +229,7 @@ namespace Ogre {
             DataStreamPtr& stream, 
             uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
-            size_t numFaces = 1, size_t numMipMaps = 0);
+            size_t numFaces = 1, uint8 numMipMaps = 0);
         /** Loads raw data from a stream. The pixel format has to be specified. 
             @remarks This function is deprecated; one should really use the
                 Image::loadRawData(stream, width, height, depth, format, ...) to be compatible
