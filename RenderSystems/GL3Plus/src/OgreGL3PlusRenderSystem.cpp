@@ -1115,12 +1115,6 @@ namespace Ogre {
     {
         assert( slot < 64 );
 
-        // TODO
-        // * add memory barrier
-        // * compositor script access (can have multiple instances for a single texture_unit)
-        //     shader_access <binding point> [<access>] [<mipmap level>] [<texture array layer>] [<format>]
-        //     shader_access 2 read_write 0 0 PF_UINT32_R
-
         if( mUavs[slot].texture.isNull() && texture.isNull() )
             return;
 
@@ -1207,6 +1201,52 @@ namespace Ogre {
         }
 
         mMaxModifiedUavPlusOne = 0;
+    }
+
+    void GL3PlusRenderSystem::_bindTextureUavCS( uint32 slot, Texture *texture,
+                                                 ResourceAccess::ResourceAccess _access,
+                                                 int32 mipmapLevel, int32 textureArrayIndex,
+                                                 PixelFormat pixelFormat )
+    {
+        //Tag as dirty so next flushUAVs will get called when regular rendering resumes.
+        mMaxModifiedUavPlusOne = std::max( static_cast<uint8>(mUavStartingSlot + slot + 1u),
+                                           mMaxModifiedUavPlusOne );
+        mUavs[mUavStartingSlot + slot].dirty = true;
+
+        if( texture )
+        {
+            GLenum access;
+            switch( _access )
+            {
+            case ResourceAccess::Read:
+                access = GL_READ_ONLY;
+                break;
+            case ResourceAccess::Write:
+                access = GL_WRITE_ONLY;
+                break;
+            case ResourceAccess::ReadWrite:
+                access = GL_READ_WRITE;
+                break;
+            default:
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "Invalid ResourceAccess parameter '" +
+                             StringConverter::toString( _access ) + "'",
+                             "GL3PlusRenderSystem::_bindTextureUavCS" );
+                break;
+            }
+
+            bool isFsaa;
+            const GLuint    textureName = static_cast<GL3PlusTexture*>( texture )->getGLID( isFsaa );
+            const GLboolean isArrayTexture = texture->getTextureType() == TEX_TYPE_2D_ARRAY ? GL_TRUE :
+                                                                                              GL_FALSE;
+            const GLenum    format = GL3PlusPixelUtil::getClosestGLImageInternalFormat( pixelFormat );
+
+            OCGE( glBindImageTexture( slot, textureName, mipmapLevel, isArrayTexture,
+                                      textureArrayIndex, access, format ) );
+        }
+        else
+        {
+            glBindImageTexture( 0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
+        }
     }
 
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const

@@ -774,6 +774,22 @@ namespace Ogre
         /// You don't need to call this if you're going to set the render target next.
         virtual void flushUAVs(void) = 0;
 
+        /** Binds an UAV texture to a Compute Shader.
+        @remarks
+            @see queueBindUAV param description.
+        @par
+            Internal Developer Notes:
+            D3D11 keeps UAVs that affect rendering separate from UAVs that affect Compute Shaders.
+            Hence queueBindUAV & _bindTextureUavCS are independent.
+
+            OpenGL however, does not make this distinction. Hence once we switch back to
+            3D rendering, we need to restore UAVs set via queueBindUAV.
+        */
+        virtual void _bindTextureUavCS( uint32 slot, Texture *texture,
+                                        ResourceAccess::ResourceAccess access,
+                                        int32 mipmapLevel, int32 textureArrayIndex,
+                                        PixelFormat pixelFormat ) = 0;
+
         /**
         Sets the texture to bind to a given texture unit.
 

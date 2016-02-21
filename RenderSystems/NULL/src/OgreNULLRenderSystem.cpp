@@ -212,6 +212,13 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void NULLRenderSystem::_bindTextureUavCS( uint32 slot, Texture *texture,
+                                              ResourceAccess::ResourceAccess access,
+                                              int32 mipmapLevel, int32 textureArrayIndex,
+                                              PixelFormat pixelFormat )
+    {
+    }
+    //-------------------------------------------------------------------------
     void NULLRenderSystem::_setTexture(size_t unit, bool enabled,  Texture *texPtr)
     {
     }

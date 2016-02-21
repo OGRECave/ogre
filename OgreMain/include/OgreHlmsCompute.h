@@ -162,6 +162,10 @@ namespace Ogre
         static const IdString NumTextureSlots;
         static const IdString MaxTextureSlot;
         static const char *Texture;
+
+        static const IdString NumUavSlots;
+        static const IdString MaxUavSlot;
+        static const char *Uav;
     };
 
     /** @} */

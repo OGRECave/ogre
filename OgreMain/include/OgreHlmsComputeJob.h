@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreHlmsDatablock.h"
 #include "OgreMatrix4.h"
+#include "OgreResourceTransition.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -68,11 +69,20 @@ namespace Ogre
         struct TextureSlot
         {
             uint8 slotIdx;
-            TexBufferPacked *buffer;
+            BufferPacked *buffer;
             size_t offset;
             size_t sizeBytes;
             TexturePtr texture;
             HlmsSamplerblock const *samplerblock;
+
+            //Used by UAVs:
+
+            /// Index in case of MRT. Ignored if textureSource isn't mrt
+            uint32      mrtIndex;
+
+            ResourceAccess::ResourceAccess access;
+            int32           mipmapLevel;
+            PixelFormat     pixelFormat;
 
             bool operator () ( const TextureSlot &left, uint8 right ) const
             {
@@ -104,13 +114,25 @@ namespace Ogre
 
         ConstBufferSlotVec  mConstBuffers;
         TextureSlotVec      mTextureSlots;
+        TextureSlotVec      mUavSlots;
 
         bool mInformHlmsOfTextureData;
         uint8 mMaxTexUnitReached;
+        uint8 mMaxUavUnitReached;
         HlmsPropertyVec mSetProperties;
         size_t          mPsoCacheHash;
 
+        void updateAutoProperties( const TextureSlotVec &textureSlots,
+                                   uint8 &outMaxTexUnitReached,
+                                   const char *propTexture,
+                                   const IdString &propNumTextureSlots,
+                                   const IdString &propMaxTextureSlot );
+
         void removeProperty( IdString key );
+
+        void setBuffer( uint8 slotIdx, BufferPacked *buffer,
+                        size_t offset, size_t sizeBytes,
+                        ResourceAccess::ResourceAccess access, TextureSlotVec &container );
 
     public:
         HlmsComputeJob( IdString name, Hlms *creator, const String &sourceFilename,
@@ -217,11 +239,9 @@ namespace Ogre
             function will remove the settings from previous setTexBuffer
             calls to the same slot index.
         @par
-            To use UAVs, they must be set via uav passes in the compositor.
-            UAVs and Textures share the same slots; and UAVs always take
-            precedence.
-            @see CompositorPassUavDef. Refer to TutorialUav01 and TutorialUav02
-            in the samples to know how to do this.
+            UAVs and Textures share the same slots in OpenGL, but don't in
+            D3D11. For best compatibility, assume they're shared and put
+            the UAVs in the first slots.
         @par
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
@@ -238,6 +258,53 @@ namespace Ogre
         */
         void setTexture( uint8 slotIdx, TexturePtr &texture,
                          const HlmsSamplerblock &refParams );
+
+        /** Sets an UAV buffer at the given slot ID.
+        @remarks
+            UAV slots are shared with setUavTexture. Calling this
+            function will remove the settings from previous setUavTexture calls
+            to the same slot index.
+        @par
+            May trigger a recompilation if @see setInformHlmsOfTextureData
+            is enabled.
+        @param slotIdx
+            The slot index to bind this UAV buffer.
+        @param access
+            Access. Should match what the shader expects. Needed by Ogre to
+            resolve memory barrier dependencies.
+        @param uavBuffer
+            UAV buffer to bind.
+        @param offset
+            0-based offset. It is possible to bind a region of the buffer.
+            Offset needs to be aligned. You can query the RS capabilities for
+            the alignment, however 256 bytes is the maximum allowed alignment
+            per the OpenGL specification, making it a safe bet to hardcode.
+        @param sizeBytes
+            Size in bytes to bind the tex buffer. When zero,
+            binds from offset until the end of the buffer.
+        */
+        void setUavBuffer( uint8 slotIdx, UavBufferPacked *uavBuffer,
+                           ResourceAccess::ResourceAccess access,
+                           size_t offset=0, size_t sizeBytes=0 );
+
+        /** Sets an UAV texture.
+        @remarks
+            UAV buffer slots are shared with setUavTexture's. Calling this
+            function will remove the settings from previous setUavBuffer calls
+            to the same slot index.
+        @par
+            May trigger a recompilation if @see setInformHlmsOfTextureData
+            is enabled.
+        @param slot
+        @param texture
+        @param mrtIndex
+        @param access
+        @param mipmapLevel
+        @param pixelFormat
+        */
+        void setUavTexture( uint32 slotIdx, TexturePtr &texture, uint32 mrtIndex,
+                            ResourceAccess::ResourceAccess access, int32 mipmapLevel,
+                            PixelFormat pixelFormat );
     };
 
     /** @} */

@@ -101,6 +101,11 @@ namespace Ogre
         virtual void clearUAVs(void);
         virtual void flushUAVs(void);
 
+        virtual void _bindTextureUavCS( uint32 slot, Texture *texture,
+                                        ResourceAccess::ResourceAccess access,
+                                        int32 mipmapLevel, int32 textureArrayIndex,
+                                        PixelFormat pixelFormat );
+
         virtual void _setTexture(size_t unit, bool enabled,  Texture *texPtr);
 
         virtual void _setTextureCoordSet(size_t unit, size_t index);

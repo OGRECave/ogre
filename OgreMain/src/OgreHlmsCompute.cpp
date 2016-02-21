@@ -41,6 +41,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreConstBufferPacked.h"
 #include "Vao/OgreTexBufferPacked.h"
+#include "Vao/OgreUavBufferPacked.h"
 
 #include "OgreLogManager.h"
 
@@ -64,6 +65,10 @@ namespace Ogre
     const IdString ComputeProperty::NumTextureSlots     = IdString( "num_texture_slots" );
     const IdString ComputeProperty::MaxTextureSlot      = IdString( "max_texture_slot" );
     const char *ComputeProperty::Texture                = "texture";
+
+    const IdString ComputeProperty::NumUavSlots         = IdString( "num_uav_slots" );
+    const IdString ComputeProperty::MaxUavSlot          = IdString( "max_uav_slot" );
+    const char *ComputeProperty::Uav                    = "uav";
 
     //Must be sorted from best to worst
     const String BestD3DComputeShaderTargets[3] =
@@ -378,7 +383,8 @@ namespace Ogre
         {
             if( itTex->buffer )
             {
-                itTex->buffer->bindBufferCS( itTex->slotIdx, itTex->offset, itTex->sizeBytes );
+                static_cast<TexBufferPacked*>( itTex->buffer )->bindBufferCS(
+                            itTex->slotIdx, itTex->offset, itTex->sizeBytes );
             }
             else
             {
@@ -387,6 +393,26 @@ namespace Ogre
             }
 
             ++itTex;
+        }
+
+        HlmsComputeJob::TextureSlotVec::const_iterator itUav = job->mUavSlots.begin();
+        HlmsComputeJob::TextureSlotVec::const_iterator enUav = job->mUavSlots.end();
+
+        while( itUav != enUav )
+        {
+            if( itUav->buffer )
+            {
+                static_cast<UavBufferPacked*>( itUav->buffer )->bindBufferCS(
+                            itUav->slotIdx, itUav->offset, itUav->sizeBytes );
+            }
+            else
+            {
+                mRenderSystem->_bindTextureUavCS( itUav->slotIdx, itUav->texture.get(),
+                                                  itUav->access, itUav->mipmapLevel,
+                                                  itUav->mrtIndex, itUav->pixelFormat );
+            }
+
+            ++itUav;
         }
 
         mRenderSystem->_setComputePso( &psoCache.pso );
