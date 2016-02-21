@@ -76,7 +76,7 @@ namespace Ogre {
         /// Holds texture type settings for every stage
         GLenum mTextureTypes[OGRE_MAX_TEXTURE_LAYERS];
 
-        GLfloat mLargestSupportedAnisotropy;
+        GLint mLargestSupportedAnisotropy;
 
         /// Number of fixed-function texture units
         unsigned short mFixedFunctionTextureUnits;
