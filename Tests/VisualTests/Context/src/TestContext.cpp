@@ -268,7 +268,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
 #endif
         }
         // if it fails, just return right away
-        catch (Ogre::Exception& e)
+        catch (Ogre::Exception&)
         {
             return 0;
         }
@@ -295,7 +295,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
             {
                 (*j)->testCapabilities(mRoot->getRenderSystem()->getCapabilities());
             }
-            catch(Ogre::Exception& e)
+            catch(Ogre::Exception&)
             {
                 continue;
             }
@@ -542,7 +542,7 @@ bool TestContext::oneTimeConfig()
 
     mRenderSystemName = mRoot->getRenderSystem() ? mRoot->getRenderSystem()->getName() : "";
 
-    return mRoot->getRenderSystem();
+    return mRoot->getRenderSystem() != NULL;
 }
 //-----------------------------------------------------------------------
 
@@ -595,7 +595,7 @@ void TestContext::finishedTests()
         {
             info.load(mReferenceSetPath + mCompareWith + "/info.cfg");
         }
-        catch (Ogre::FileNotFoundException& e)
+        catch (Ogre::FileNotFoundException&)
         {
             // if no luck, just grab the most recent compatible set
             foundReference = false;
