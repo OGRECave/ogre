@@ -486,12 +486,13 @@ namespace Ogre
         yAxis = params.upVector;
         yAxis.normalise();
         xAxis = yAxis.crossProduct(zAxis);
-        if (xAxis.length() == 0)
+        if (xAxis.squaredLength() == 0)
         {
             //upVector must be wrong
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The upVector you supplied is parallel to the plane normal, so is not valid.",
                 "MeshManager::createPlane");
         }
+        xAxis.normalise();
 
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
@@ -633,12 +634,13 @@ namespace Ogre
         yAxis = params.upVector;
         yAxis.normalise();
         xAxis = yAxis.crossProduct(zAxis);
-        if (xAxis.length() == 0)
+        if (xAxis.squaredLength() == 0)
         {
             //upVector must be wrong
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The upVector you supplied is parallel to the plane normal, so is not valid.",
                 "MeshManager::createPlane");
         }
+        xAxis.normalise();
 
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
@@ -796,12 +798,13 @@ namespace Ogre
         yAxis = params.upVector;
         yAxis.normalise();
         xAxis = yAxis.crossProduct(zAxis);
-        if (xAxis.length() == 0)
+        if (xAxis.squaredLength() == 0)
         {
             //upVector must be wrong
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "The upVector you supplied is parallel to the plane normal, so is not valid.",
                 "MeshManager::createPlane");
         }
+        xAxis.normalise();
 
         rot3.FromAxes(xAxis, yAxis, zAxis);
         rot = rot3;
