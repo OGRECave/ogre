@@ -5289,7 +5289,7 @@ namespace Ogre
         GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
         if( !doubleLogical.isNull() )
         {
-            OGRE_LOCK_MUTEX(floatLogical->mutex);
+            OGRE_LOCK_MUTEX(doubleLogical->mutex);
 
             for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
                 i != doubleLogical->map.end(); ++i)
