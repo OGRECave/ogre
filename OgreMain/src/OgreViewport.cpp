@@ -334,7 +334,7 @@ namespace Ogre {
             Viewport* currentvp = rs->_getViewport();
             if (currentvp && currentvp == this)
                 rs->clearFrameBuffer(buffers, col, depth, stencil);
-            else if (currentvp)
+            else
             {
                 rs->_setViewport(this);
                 rs->clearFrameBuffer(buffers, col, depth, stencil);
