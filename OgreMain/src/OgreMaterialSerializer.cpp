@@ -4407,7 +4407,7 @@ namespace Ogre
                 writeTesselationHullProgramRef(pPass);
             }
 
-            if(pPass->hasTessellationHullProgram())
+            if(pPass->hasTessellationDomainProgram())
             {
                 writeTesselationDomainProgramRef(pPass);
             }
