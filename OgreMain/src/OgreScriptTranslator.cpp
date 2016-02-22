@@ -8140,7 +8140,33 @@ namespace Ogre{
         {
             if((*i)->type == ANT_OBJECT)
             {
-                processNode(compiler, *i);
+                ObjectAbstractNode *nodeObj = reinterpret_cast<ObjectAbstractNode*>( i->get() );
+                if( !nodeObj->abstract && (nodeObj->id == ID_BOTH ||
+                    nodeObj->id == ID_FRONT || nodeObj->id == ID_BACK) )
+                {
+                    StencilStateOp *stencilStateOp = 0;
+                    switch ( nodeObj->id )
+                    {
+                    case ID_BOTH:
+                        stencilStateOp = &passStencil->mStencilParams.stencilFront;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        stencilStateOp = &passStencil->mStencilParams.stencilBack;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        break;
+                    case ID_FRONT:
+                        stencilStateOp = &passStencil->mStencilParams.stencilFront;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        break;
+                    case ID_BACK:
+                        stencilStateOp = &passStencil->mStencilParams.stencilBack;
+                        translateStencilFace( compiler, *i, stencilStateOp );
+                        break;
+                    }
+                }
+                else
+                {
+                    processNode(compiler, *i);
+                }
             }
             else if((*i)->type == ANT_PROPERTY)
             {
