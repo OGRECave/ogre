@@ -394,9 +394,9 @@ namespace Ogre {
         @remarks
             This should only be used by a RenderSystem
         */
-        virtual RenderSystemData * getRenderSystemData() const 
+        virtual const RenderSystemDataPtr& getRenderSystemData() const 
         { 
-            return mRenderSystemData.get(); 
+            return mRenderSystemData; 
         }
         /** Sets RenderSystem private data
         @remarks
