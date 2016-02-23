@@ -74,10 +74,7 @@ namespace Ogre {
     public:
         Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false){}
         /** Virtual destructor needed as class has virtual methods. */
-        virtual ~Renderable() 
-        {
-            mRenderSystemData.setNull();
-        }
+        virtual ~Renderable() {}
         /** Retrieves a weak reference to the material this renderable object uses.
         @remarks
             Note that the Renderable also has the option to override the getTechnique method

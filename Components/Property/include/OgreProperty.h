@@ -39,7 +39,7 @@ THE SOFTWARE.
 #if OGRE_THREAD_PROVIDER == 1
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#elif __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#elif __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
 #include <functional>
 #else
 #include <tr1/functional>
@@ -103,7 +103,7 @@ namespace Ogre
 {
 #if OGRE_THREAD_PROVIDER == 1
     using boost::function;
-#elif __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#elif __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
     using std::function;
 #else
     using std::tr1::function;
