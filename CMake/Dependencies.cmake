@@ -14,6 +14,8 @@
 # OGRE_DEPENDENCIES_DIR can be used to specify a single base
 # folder where the required dependencies may be found.
 set(OGRE_DEPENDENCIES_DIR "" CACHE PATH "Path to prebuilt OGRE dependencies")
+option(OGRE_BUILD_DEPENDENCIES "automaitcally build Ogre Dependencies (freetype, zzip)" TRUE)
+
 include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
 if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
@@ -57,6 +59,23 @@ else()
 endif()
 
 message(STATUS "Search path: ${OGRE_DEP_SEARCH_PATH}")
+list(GET OGRE_DEP_SEARCH_PATH 0 OGREDEPS_PATH)
+
+if(CMAKE_CROSSCOMPILING)
+    set(CROSS -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
+    
+    if(ANDROID)
+        set(CROSS ${CROSS}
+            -DANDROID_NATIVE_API_LEVEL=${ANDROID_NATIVE_API_LEVEL}
+            -DANDROID_ABI=${ANDROID_ABI}
+            -DANDROID_NDK=${ANDROID_NDK})
+    endif()
+    
+    if(APPLE_IOS)
+        set(CROSS ${CROSS}
+            -DIOS_PLATFORM=${IOS_PLATFORM})
+    endif()
+endif()
 
 # Set hardcoded path guesses for various platforms
 if (UNIX AND NOT EMSCRIPTEN)
@@ -68,6 +87,60 @@ endif ()
 # give guesses as hints to the find_package calls
 set(CMAKE_PREFIX_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
 set(CMAKE_FRAMEWORK_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_FRAMEWORK_PATH})
+
+if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
+    if(MSVC) # the only platform that does not ship zlib
+        message(STATUS "Building zlib")
+        file(DOWNLOAD
+            http://zlib.net/zlib-1.2.8.tar.gz
+            ./zlib-1.2.8.tar.gz)
+        execute_process(COMMAND cmake -E tar xf zlib-1.2.8.tar.gz)
+        execute_process(COMMAND cmake
+            -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -G ${CMAKE_GENERATOR}
+            ${CROSS}
+            .
+            WORKING_DIRECTORY zlib-1.2.8)
+        execute_process(COMMAND cmake --build zlib-1.2.8 --target install)
+    endif()
+
+    message(STATUS "Building ZZIPlib")
+    file(DOWNLOAD
+        https://github.com/paroj/ZZIPlib/archive/master.tar.gz
+        ./ZZIPlib-master.tar.gz)
+    execute_process(COMMAND cmake -E tar xf ZZIPlib-master.tar.gz)
+    execute_process(COMMAND cmake
+        -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DZLIB_ROOT=${OGREDEPS_PATH}
+        -G ${CMAKE_GENERATOR}
+        ${CROSS}
+        .
+        WORKING_DIRECTORY ZZIPlib-master)
+    execute_process(COMMAND cmake --build ZZIPlib-master --target install)
+    
+    message(STATUS "Building freetype")
+    file(DOWNLOAD
+        http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.gz
+        ./freetype-2.6.2.tar.gz)
+    execute_process(COMMAND cmake -E tar xf freetype-2.6.2.tar.gz)
+    # patch toolchain for iOS
+    execute_process(COMMAND cmake -E copy
+        ${CMAKE_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
+        freetype-2.6.2/builds/cmake/iOS.cmake)
+    execute_process(COMMAND cmake
+        -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
+        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DWITH_BZip2=OFF # tries to use it on iOS otherwise
+        # workaround for broken iOS toolchain in freetype
+        -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.6.2
+        ${CROSS}
+        -G ${CMAKE_GENERATOR}
+        ..
+        WORKING_DIRECTORY freetype-2.6.2/objs)
+    execute_process(COMMAND cmake --build freetype-2.6.2/objs --target install)
+endif()
 
 #######################################################################
 # Core dependencies
