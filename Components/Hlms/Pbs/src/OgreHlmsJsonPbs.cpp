@@ -447,6 +447,33 @@ namespace Ogre
         outString += '"';
     }
     //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::toQuotedStr( uint32 value, String &outString )
+    {
+        outString += '"';
+        switch( value )
+        {
+        case PbsBrdf::Default:
+            outString += "default";
+            break;
+        case PbsBrdf::CookTorrance:
+            outString += "cook_torrance";
+            break;
+        case PbsBrdf::DefaultUncorrelated:
+            outString += "default_uncorrelated";
+            break;
+        case PbsBrdf::DefaultSeparateDiffuseFresnel:
+            outString += "default_separate_diffuse_fresnel";
+            break;
+        case PbsBrdf::CookTorranceSeparateDiffuseFresnel:
+            outString += "cook_torrance_separate_diffuse_fresnel";
+            break;
+        default:
+            outString += "unknown / custom";
+            break;
+        }
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::toQuotedStr( HlmsPbsDatablock::TransparencyModes value, String &outString )
     {
         outString += '"';
@@ -604,6 +631,12 @@ namespace Ogre
 
         outString += ",\n\t\t\t\"workflow\" : ";
         toQuotedStr( pbsDatablock->getWorkflow(), outString );
+
+        if( pbsDatablock->getBrdf() != PbsBrdf::Default )
+        {
+            outString += ",\n\t\t\t\"brdf\" : ";
+            toQuotedStr( pbsDatablock->getBrdf(), outString );
+        }
 
         if( pbsDatablock->getTransparencyMode() != HlmsPbsDatablock::None )
         {
