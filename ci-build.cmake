@@ -1,10 +1,9 @@
 set(GENERATOR)
 set(OTHER)
-set(BUILD_OGREDEPS FALSE)
-
 set(CROSS)
 
 set(CMAKE_BUILD_TYPE Debug)
+set(BUILD_DEPS FALSE)
 
 set(RENDERSYSTEMS
     # tests only run with the legacy GL rendersystem as MESA is too old on buildbot
@@ -24,8 +23,7 @@ if(DEFINED ENV{IOS})
     set(OTHER
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
         ${CROSS})
-
-    set(BUILD_OGREDEPS TRUE)
+    set(BUILD_DEPS TRUE)
 elseif("$ENV{TRAVIS_OS_NAME}" STREQUAL "osx")
     set(GENERATOR -G Xcode)
     set(RENDERSYSTEMS
@@ -43,13 +41,13 @@ if(DEFINED ENV{APPVEYOR})
         -DOGRE_BUILD_RENDERSYSTEM_D3D9=FALSE
         -DOGRE_BUILD_RENDERSYSTEM_GL=FALSE
         -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS=TRUE)
+        
     set(OTHER 
+        -DOGRE_BUILD_DEPENDENCIES=TRUE
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
         -DOGRE_BUILD_SAMPLES=FALSE)
 
-    if(NOT EXISTS ogredeps)
-        set(BUILD_OGREDEPS TRUE)
-    endif()
+    set(BUILD_DEPS TRUE)
 endif()
 
 if(DEFINED ENV{ANDROID})
@@ -65,7 +63,8 @@ if(DEFINED ENV{ANDROID})
     set(OTHER
         ${CROSS}
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
-
+    set(BUILD_DEPS TRUE)
+    
     message(STATUS "Downloading Android NDK")
     file(DOWNLOAD
         http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin
@@ -73,50 +72,13 @@ if(DEFINED ENV{ANDROID})
     execute_process(COMMAND chmod +x android-ndk-r10e-linux-x86_64.bin)
     message(STATUS "Extracting Android NDK")
     execute_process(COMMAND ./android-ndk-r10e-linux-x86_64.bin OUTPUT_QUIET)
-    set(BUILD_OGREDEPS TRUE)
-endif()
-
-if(BUILD_OGREDEPS)
-    message(STATUS "Building freetype")
-    file(DOWNLOAD
-        http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.gz
-        ./freetype-2.6.2.tar.gz)
-    execute_process(COMMAND cmake -E tar xf freetype-2.6.2.tar.gz)
-    # patch toolchain for iOS
-    execute_process(COMMAND cmake -E copy
-        ${CMAKE_CURRENT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-        freetype-2.6.2/builds/cmake/iOS.cmake)
-    execute_process(COMMAND cmake
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DWITH_BZip2=OFF # tries to use it on iOS otherwise
-        # workaround for broken iOS toolchain in freetype
-        -DPROJECT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/freetype-2.6.2
-        ${CROSS}
-        ${GENERATOR}
-        ..
-        WORKING_DIRECTORY freetype-2.6.2/objs)
-    execute_process(COMMAND cmake --build freetype-2.6.2/objs --target install)
-
-    message(STATUS "Building ZZIPlib")
-    file(DOWNLOAD
-        https://github.com/paroj/ZZIPlib/archive/master.tar.gz
-        ./ZZIPlib-master.tar.gz)
-    execute_process(COMMAND cmake -E tar xf ZZIPlib-master.tar.gz)
-    execute_process(COMMAND cmake
-        -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        ${CROSS}
-        ${GENERATOR}
-        .
-        WORKING_DIRECTORY ZZIPlib-master)
-    execute_process(COMMAND cmake --build ZZIPlib-master --target install)
 endif()
 
 execute_process(COMMAND cmake
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DOGRE_BUILD_TESTS=ON
     -DOGRE_CONFIG_ALLOCATOR=1 # disable nedalloc
+    -DOGRE_BUILD_DEPENDENCIES=${BUILD_DEPS}
     ${RENDERSYSTEMS}
     ${OTHER}
     ${GENERATOR}
