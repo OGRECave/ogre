@@ -144,7 +144,13 @@ namespace Ogre {
         if(LogManager::getSingletonPtr() == 0)
         {
             mLogManager = OGRE_NEW LogManager();
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+            // suppress writing log to Emscripten virtual FS, improves performance
+            mLogManager->createLog(logFileName, true, true, true);
+#else
             mLogManager->createLog(logFileName, true, true);
+#endif
         }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
