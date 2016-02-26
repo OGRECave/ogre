@@ -1103,7 +1103,7 @@ namespace Ogre {
                          "PixelUtil::convertForNormalMapping" );
         }
 
-        uint8 shiftOffset = 0x7F;
+        uint8 shiftOffset = 0x80;
 
         if( dst.format == PF_BYTE_LA || dst.format == PF_RG8 )
             shiftOffset = 0x00;
