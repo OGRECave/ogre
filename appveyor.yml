@@ -7,7 +7,7 @@ build_script:
  - cmake -P ci-build.cmake
  - cmake --build .
 cache:
-- ogredeps -> ci-build.cmake
+- ogredeps -> CMake/Dependencies.cmake
 branches:
   only:
     - master
