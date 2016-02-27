@@ -330,12 +330,18 @@ namespace Ogre
                 parseFresnelMode( itor->value.GetString(), isColoured, useIOR );
 
             itor = subobj.FindMember( "value" );
-            if( itor != subobj.MemberEnd() && itor->value.IsArray() )
+            if( itor != subobj.MemberEnd() && (itor->value.IsArray() || itor->value.IsNumber()) )
             {
-                if( !useIOR )
-                    pbsDatablock->setFresnel( parseVector3Array( itor->value ), isColoured );
+                Vector3 value;
+                if( itor->value.IsArray() )
+                    value = parseVector3Array( itor->value );
                 else
-                    pbsDatablock->setIndexOfRefraction( parseVector3Array( itor->value ), isColoured );
+                    value = static_cast<Real>( itor->value.GetDouble() );
+
+                if( !useIOR )
+                    pbsDatablock->setFresnel( value, isColoured );
+                else
+                    pbsDatablock->setIndexOfRefraction( value, isColoured );
             }
         }
 
