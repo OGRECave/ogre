@@ -376,11 +376,11 @@ namespace Ogre
                 FT_Pos y_bearing = ( mTtfMaxBearingY >> 6 ) - ( face->glyph->metrics.horiBearingY >> 6 );
                 FT_Pos x_bearing = face->glyph->metrics.horiBearingX >> 6;
 
-                for(int j = 0; j < face->glyph->bitmap.rows; j++ )
+                for(unsigned int j = 0; j < face->glyph->bitmap.rows; j++ )
                 {
                     size_t row = j + m + y_bearing;
                     uchar* pDest = &imageData[(row * data_width) + (l + x_bearing) * pixel_bytes];
-                    for(int k = 0; k < face->glyph->bitmap.width; k++ )
+                    for(unsigned int k = 0; k < face->glyph->bitmap.width; k++ )
                     {
                         if (mAntialiasColour)
                         {

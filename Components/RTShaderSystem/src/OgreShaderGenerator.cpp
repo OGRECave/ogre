@@ -1686,8 +1686,6 @@ void ShaderGenerator::SGTechnique::createIlluminationSGPasses()
 		if(p->pass == p->originalPass)
 			continue;
 
-		Pass* dstPass = p->pass;
-
 		SGPass* passEntry = OGRE_NEW SGPass(this, p->originalPass, p->pass, p->stage);
 
 		const Any& origPassUserData = p->originalPass->getUserObjectBindings().getUserAny(SGPass::UserKey);

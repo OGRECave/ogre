@@ -30,7 +30,7 @@ THE SOFTWARE.
 
 /* GIMP RGB C-Source image dump (image.c) */
 
-static const struct {
+static struct {
   unsigned int 	 width;
   unsigned int 	 height;
   unsigned int 	 bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */
@@ -73,7 +73,7 @@ static const struct {
 
 /* GIMP RGB C-Source image dump (depth.c) */
 
-static const struct {
+static struct {
   unsigned int 	 width;
   unsigned int 	 height;
   unsigned int 	 bytes_per_pixel; /* 2:RGB16, 3:RGB, 4:RGBA */
