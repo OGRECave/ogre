@@ -1039,6 +1039,8 @@ namespace v1
 
             VertexData *newVertexData = new VertexData();
             newVertexData->vertexCount = indicesMap.size();
+            HardwareBufferManager::getSingleton().
+                    destroyVertexDeclaration( newVertexData->vertexDeclaration );
             newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
 
             for (size_t bufIdx = 0; bufIdx < sharedVertexData->vertexBufferBinding->getBufferCount(); bufIdx++)
