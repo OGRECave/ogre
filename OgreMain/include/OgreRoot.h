@@ -116,6 +116,7 @@ namespace Ogre
         ExternalTextureSourceManager* mExternalTextureSourceManager;
         HlmsManager         *mHlmsManager;
         HlmsLowLevel        *mHlmsLowLevelProxy;
+        HlmsCompute         *mHlmsCompute;
         CompositorManager2 *mCompositorManager2;
         unsigned long mNextFrame;
         Real mFrameSmoothingTime;

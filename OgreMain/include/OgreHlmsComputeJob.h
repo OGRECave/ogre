@@ -142,6 +142,8 @@ namespace Ogre
                         const StringVector &includedPieceFiles );
         virtual ~HlmsComputeJob();
 
+        Hlms* getCreator(void) const                { return mCreator; }
+
         void _updateAutoProperties(void);
 
         /** The Hlms has the ability to pass data to the shader source

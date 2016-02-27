@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHlms.h"
 #include "OgreHlmsTextureManager.h"
 #include "OgreRenderSystem.h"
+#include "OgreHlmsCompute.h"
 #include "OgreLogManager.h"
 #if !OGRE_NO_JSON
     #include "OgreResourceGroupManager.h"
@@ -40,6 +41,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     HlmsManager::HlmsManager() :
+        mComputeHlms( 0 ),
         mRenderSystem( 0 ),
         mShadowMappingUseBackFaces( true ),
         mTextureManager( 0 ),
@@ -540,6 +542,28 @@ namespace Ogre
             if( mDeleteRegisteredOnExit[type] )
                 OGRE_DELETE mRegisteredHlms[type];
             mRegisteredHlms[type] = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::registerComputeHlms( HlmsCompute *provider )
+    {
+        if( mComputeHlms )
+        {
+            OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM, "Provider for HLMS type 'Compute'"
+                         " has already been set!", "HlmsManager::registerComputeHlms" );
+        }
+
+        mComputeHlms = provider;
+        mComputeHlms->_notifyManager( this );
+        mComputeHlms->_changeRenderSystem( mRenderSystem );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsManager::unregisterComputeHlms(void)
+    {
+        if( mComputeHlms )
+        {
+            mComputeHlms->_notifyManager( 0 );
+            mComputeHlms = 0;
         }
     }
     //-----------------------------------------------------------------------------------

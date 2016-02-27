@@ -462,6 +462,35 @@ namespace Ogre
 
         return retVal;
     }
+    //----------------------------------------------------------------------------------
+    HlmsDatablock* HlmsCompute::createDefaultDatablock(void)
+    {
+        return 0;
+    }
+    //----------------------------------------------------------------------------------
+    uint32 HlmsCompute::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                   bool casterPass, uint32 lastCacheHash,
+                                   uint32 lastTextureHash )
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALID_CALL, "This is a Compute Hlms",
+                     "HlmsCompute::fillBuffersFor" );
+    }
+    uint32 HlmsCompute::fillBuffersForV1( const HlmsCache *cache,
+                                     const QueuedRenderable &queuedRenderable,
+                                     bool casterPass, uint32 lastCacheHash,
+                                     CommandBuffer *commandBuffer )
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALID_CALL, "This is a Compute Hlms",
+                     "HlmsCompute::fillBuffersForV1" );
+    }
+    uint32 HlmsCompute::fillBuffersForV2( const HlmsCache *cache,
+                                     const QueuedRenderable &queuedRenderable,
+                                     bool casterPass, uint32 lastCacheHash,
+                                     CommandBuffer *commandBuffer )
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALID_CALL, "This is a Compute Hlms",
+                     "HlmsCompute::fillBuffersForV2" );
+    }
 }
 
 #undef OGRE_HASH128_FUNC

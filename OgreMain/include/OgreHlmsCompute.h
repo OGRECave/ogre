@@ -117,7 +117,7 @@ namespace Ogre
 
     public:
         HlmsCompute( AutoParamDataSource *autoParamDataSource );
-        ~HlmsCompute();
+        virtual ~HlmsCompute();
 
         /** An HlmsComputeJob is very similar to an HlmsDatablock, except it
             contains a compute job instead. If multiple HlmsComputeJob end up
@@ -154,6 +154,22 @@ namespace Ogre
         void dispatch( HlmsComputeJob *job );
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
+
+        virtual HlmsDatablock* createDefaultDatablock(void);
+
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, uint32 lastCacheHash,
+                                       uint32 lastTextureHash );
+
+        virtual uint32 fillBuffersForV1( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
+
+        virtual uint32 fillBuffersForV2( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
     };
 
     struct _OgreExport ComputeProperty

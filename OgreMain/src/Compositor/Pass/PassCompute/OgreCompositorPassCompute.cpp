@@ -81,11 +81,8 @@ namespace Ogre
         CompositorPass( definition, target, parentNode ),
         mDefinition( definition )
     {
-        const CompositorWorkspace *workspace = parentNode->getWorkspace();
-
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-        //hlmsManager->getHlms()
-        HlmsCompute *hlmsCompute = 0;
+        HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
 
         mComputeJob = hlmsCompute->findComputeJob( mDefinition->mJobName );
 
@@ -155,7 +152,9 @@ namespace Ogre
         if( listener )
             listener->passPreExecute( this );
 
-        HlmsCompute *hlmsCompute = 0;
+        assert( dynamic_cast<HlmsCompute*>( mComputeJob->getCreator() ) );
+
+        HlmsCompute *hlmsCompute = static_cast<HlmsCompute*>( mComputeJob->getCreator() );
         hlmsCompute->dispatch( mComputeJob );
 
         if( listener )

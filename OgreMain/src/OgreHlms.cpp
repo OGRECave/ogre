@@ -212,7 +212,7 @@ namespace Ogre
 
         _destroyAllDatablocks();
 
-        if( mHlmsManager )
+        if( mHlmsManager && mType < HLMS_MAX )
         {
             mHlmsManager->unregisterHlms( mType );
             mHlmsManager = 0;
