@@ -697,7 +697,6 @@ namespace v1 {
     }
     void VertexDeclaration::sortForV2(void)
     {
-        vertexLayoutDirty();
         mElementList.sort(VertexDeclaration::vertexElementLessForV2);
     }
     //-----------------------------------------------------------------------------
