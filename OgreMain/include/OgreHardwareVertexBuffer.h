@@ -287,6 +287,7 @@ namespace v1 {
         typedef list<VertexElement>::type VertexElementList;
         /// Sort routine for vertex elements
         static bool vertexElementLess(const VertexElement& e1, const VertexElement& e2);
+        static bool vertexElementLessForV2(const VertexElement& e1, const VertexElement& e2);
     protected:
         VertexElementList mElementList;
     public:
@@ -310,6 +311,8 @@ namespace v1 {
             declaration must list all the elements for each source in turn.
         */
         void sort(void);
+
+        void sortForV2(void);
 
         /** Remove any gaps in the source buffer list used by this declaration.
         @remarks

@@ -595,7 +595,7 @@ namespace v1 {
         retVal.resize( getMaxSource() + 1 );
 
         //Make sure the declaration is sorted
-        sort();
+        sortForV2();
 
         VertexElementList::const_iterator itor = mElementList.begin();
         VertexElementList::const_iterator end  = mElementList.end();
@@ -684,6 +684,21 @@ namespace v1 {
     void VertexDeclaration::sort(void)
     {
         mElementList.sort(VertexDeclaration::vertexElementLess);
+    }
+    //-----------------------------------------------------------------------------
+    // Sort routine for VertexElement
+    bool VertexDeclaration::vertexElementLessForV2(const VertexElement& e1, const VertexElement& e2)
+    {
+        // Sort by source first, then by offset
+        if( e1.getSource() != e2.getSource() )
+            return e1.getSource() < e2.getSource();
+        else
+            return e1.getOffset() < e2.getOffset();
+    }
+    void VertexDeclaration::sortForV2(void)
+    {
+        vertexLayoutDirty();
+        mElementList.sort(VertexDeclaration::vertexElementLessForV2);
     }
     //-----------------------------------------------------------------------------
     void VertexDeclaration::closeGapsInSource(void)
