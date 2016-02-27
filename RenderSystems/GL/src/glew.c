@@ -29,10 +29,6 @@
 ** THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// SJS
-#include "OgreGLSupport.h"
-// SJS
-
 #include <GL/glew.h>
 
 #if defined(_WIN32)
@@ -61,21 +57,13 @@
 #  endif /* _WIN32 */
 #  define GLEW_CONTEXT_ARG_DEF_LIST GLEWContext* ctx
 #else /* GLEW_MX */
-// SJS
-#  define GLEW_CONTEXT_ARG_DEF_INIT Ogre::GLSupport *glSupport
-#  define GLEW_CONTEXT_ARG_VAR_INIT glSupport
-#  define GLEW_CONTEXT_ARG_DEF_LIST Ogre::GLSupport *glSupport
-#  define WGLEW_CONTEXT_ARG_DEF_INIT Ogre::GLSupport *glSupport
-#  define WGLEW_CONTEXT_ARG_DEF_LIST Ogre::GLSupport *glSupport
-#  define GLXEW_CONTEXT_ARG_DEF_INIT Ogre::GLSupport *glSupport
-#  define GLXEW_CONTEXT_ARG_DEF_LIST Ogre::GLSupport *glSupport
-//#  define GLEW_CONTEXT_ARG_DEF_INIT void
-//#  define GLEW_CONTEXT_ARG_VAR_INIT
-//#  define GLEW_CONTEXT_ARG_DEF_LIST void
-//#  define WGLEW_CONTEXT_ARG_DEF_INIT void
-//#  define WGLEW_CONTEXT_ARG_DEF_LIST void
-//#  define GLXEW_CONTEXT_ARG_DEF_INIT void
-//#  define GLXEW_CONTEXT_ARG_DEF_LIST void
+#  define GLEW_CONTEXT_ARG_DEF_INIT void* ctx
+#  define GLEW_CONTEXT_ARG_VAR_INIT NULL
+#  define GLEW_CONTEXT_ARG_DEF_LIST void* ctx
+#  define WGLEW_CONTEXT_ARG_DEF_INIT void* ctx
+#  define WGLEW_CONTEXT_ARG_DEF_LIST void* ctx
+#  define GLXEW_CONTEXT_ARG_DEF_INIT void* ctx
+#  define GLXEW_CONTEXT_ARG_DEF_LIST void* ctx
 #endif /* GLEW_MX */
 
 #if defined(__sgi) || defined (__sun) || defined(GLEW_APPLE_GLX)
@@ -12124,12 +12112,6 @@ const GLubyte * GLEWAPIENTRY glewGetString (GLenum name)
 GLboolean glewExperimental = GL_FALSE;
 
 #if !defined(GLEW_MX)
-
-#if defined(_WIN32)
-extern GLenum GLEWAPIENTRY wglewContextInit (void);
-#elif !defined(__ANDROID__) && (!defined(__APPLE__) || defined(GLEW_APPLE_GLX))
-extern GLenum GLEWAPIENTRY glxewContextInit (void);
-#endif /* _WIN32 */
 
 // SJS
 //GLenum GLEWAPIENTRY glewInit (void)
