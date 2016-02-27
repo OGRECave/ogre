@@ -201,6 +201,7 @@ namespace Ogre {
     class Hlms;
     struct HlmsBlendblock;
     struct HlmsCache;
+    class HlmsCompute;
     class HlmsComputeJob;
     struct HlmsComputePso;
     class HlmsDatablock;

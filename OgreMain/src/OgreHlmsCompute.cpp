@@ -409,7 +409,7 @@ namespace Ogre
             {
                 mRenderSystem->_bindTextureUavCS( itUav->slotIdx, itUav->texture.get(),
                                                   itUav->access, itUav->mipmapLevel,
-                                                  itUav->mrtIndex, itUav->pixelFormat );
+                                                  itUav->textureArrayIndex, itUav->pixelFormat );
             }
 
             ++itUav;
@@ -434,6 +434,31 @@ namespace Ogre
         HlmsComputeJob *retVal = OGRE_NEW HlmsComputeJob( datablockName, this,
                                                           sourceFilename, includedPieceFiles );
         mComputeJobs[datablockName] = ComputeJobEntry( retVal, refName );
+
+        return retVal;
+    }
+    //----------------------------------------------------------------------------------
+    HlmsComputeJob* HlmsCompute::findComputeJob( IdString datablockName ) const
+    {
+        HlmsComputeJob *retVal = findComputeJobNoThrow( datablockName );
+
+        if( !retVal )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "Compute Job with name " + datablockName.getFriendlyText() + " not found",
+                         "HlmsCompute::findComputeJob" );
+        }
+
+        return retVal;
+    }
+    //----------------------------------------------------------------------------------
+    HlmsComputeJob* HlmsCompute::findComputeJobNoThrow( IdString datablockName ) const
+    {
+        HlmsComputeJob *retVal = 0;
+
+        HlmsComputeJobMap::const_iterator itor = mComputeJobs.find( datablockName );
+        if( itor != mComputeJobs.end() )
+            retVal = itor->second.computeJob;
 
         return retVal;
     }

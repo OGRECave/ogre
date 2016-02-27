@@ -77,12 +77,15 @@ namespace Ogre
 
             //Used by UAVs:
 
-            /// Index in case of MRT. Ignored if textureSource isn't mrt
-            uint32      mrtIndex;
-
             ResourceAccess::ResourceAccess access;
             int32           mipmapLevel;
+            int32           textureArrayIndex;
             PixelFormat     pixelFormat;
+
+            TextureSlot() :
+                slotIdx( 0 ), buffer( 0 ), offset( 0 ), sizeBytes( 0 ), samplerblock( 0 ),
+                access( ResourceAccess::Undefined ), mipmapLevel( 0 ), textureArrayIndex( 0 ),
+                pixelFormat( PF_UNKNOWN ) {}
 
             bool operator () ( const TextureSlot &left, uint8 right ) const
             {
@@ -254,10 +257,12 @@ namespace Ogre
         @param texture
             Texture to bind.
         @param samplerblock
-            Samplerblock to use.
+            Optional. We'll create (or retrieve an existing) samplerblock based on the input parameters.
+            When null, we leave the previously set samplerblock (if a texture is being set, and if no
+            samplerblock was set, we'll create a default one)
         */
         void setTexture( uint8 slotIdx, TexturePtr &texture,
-                         const HlmsSamplerblock &refParams );
+						 const HlmsSamplerblock *refParams=0 );
 
         /** Sets an UAV buffer at the given slot ID.
         @remarks
@@ -297,12 +302,12 @@ namespace Ogre
             is enabled.
         @param slot
         @param texture
-        @param mrtIndex
+        @param textureArrayIndex
         @param access
         @param mipmapLevel
         @param pixelFormat
         */
-        void setUavTexture( uint32 slotIdx, TexturePtr &texture, uint32 mrtIndex,
+        void setUavTexture( uint32 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
                             ResourceAccess::ResourceAccess access, int32 mipmapLevel,
                             PixelFormat pixelFormat );
     };

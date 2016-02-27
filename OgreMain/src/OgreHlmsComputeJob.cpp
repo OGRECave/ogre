@@ -378,7 +378,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setTexture( uint8 slotIdx, TexturePtr &texture,
-                                     const HlmsSamplerblock &refParams )
+                                     const HlmsSamplerblock *refParams )
     {
         TextureSlotVec::iterator itor = std::lower_bound( mTextureSlots.begin(),
                                                           mTextureSlots.end(), slotIdx,
@@ -427,13 +427,19 @@ namespace Ogre
 
             HlmsManager *hlmsManager = mCreator->getHlmsManager();
 
-            const HlmsSamplerblock *oldSamplerblock = itor->samplerblock;
-            itor->samplerblock = hlmsManager->getSamplerblock( refParams );
+            if( refParams || !itor->samplerblock )
+            {
+                const HlmsSamplerblock *oldSamplerblock = itor->samplerblock;
+                if( refParams )
+                    itor->samplerblock = hlmsManager->getSamplerblock( *refParams );
+                else
+                    itor->samplerblock = hlmsManager->getSamplerblock( HlmsSamplerblock() );
 
-            if( oldSamplerblock )
-                hlmsManager->destroySamplerblock( oldSamplerblock );
+                if( oldSamplerblock )
+                    hlmsManager->destroySamplerblock( oldSamplerblock );
+            }
 
-            itor->mrtIndex      = 0;
+            itor->textureArrayIndex      = 0;
             itor->access        = ResourceAccess::Undefined;
             itor->mipmapLevel   = 0;
             itor->pixelFormat   = texture->getFormat();
@@ -447,7 +453,7 @@ namespace Ogre
         setBuffer( slotIdx, uavBuffer, offset, sizeBytes, access, mUavSlots );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsComputeJob::setUavTexture( uint32 slotIdx, TexturePtr &texture, uint32 mrtIndex,
+    void HlmsComputeJob::setUavTexture( uint32 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
                                         ResourceAccess::ResourceAccess access, int32 mipmapLevel,
                                         PixelFormat pixelFormat )
     {
@@ -475,6 +481,7 @@ namespace Ogre
 
             itor->slotIdx = slotIdx;
             itor->buffer = 0;
+            itor->samplerblock = 0;
 
             if( mInformHlmsOfTextureData && itor->texture != texture &&
                 (itor->texture->getWidth() != texture->getWidth() ||
@@ -489,7 +496,7 @@ namespace Ogre
             }
 
             itor->texture       = texture;
-            itor->mrtIndex      = mrtIndex;
+            itor->textureArrayIndex = textureArrayIndex;
             itor->access        = access;
             itor->mipmapLevel   = mipmapLevel;
             itor->pixelFormat   = pixelFormat;

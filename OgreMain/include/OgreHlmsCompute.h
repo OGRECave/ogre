@@ -138,6 +138,12 @@ namespace Ogre
                                           const String &sourceFilename,
                                           const StringVector &includedPieceFiles );
 
+        /// Finds an existing Compute Job. If none found, throws an exception.
+        HlmsComputeJob* findComputeJob( IdString datablockName ) const;
+
+        /// Finds an existing Compute Job. If none found, returns null.
+        HlmsComputeJob* findComputeJobNoThrow( IdString datablockName ) const;
+
         /// Destroys all jobs created via @see createComputeJob
         void destroyAllComputeJobs(void);
 
