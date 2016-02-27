@@ -29,10 +29,6 @@
 ** THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// SJS
-#include "OgreGLSupport.h"
-// SJS
-
 #include <GL/glew.h>
 
 #if defined(_WIN32)
@@ -61,21 +57,13 @@
 #  endif /* _WIN32 */
 #  define GLEW_CONTEXT_ARG_DEF_LIST GLEWContext* ctx
 #else /* GLEW_MX */
-// SJS
-#  define GLEW_CONTEXT_ARG_DEF_INIT Ogre::GLSupport *glSupport
-#  define GLEW_CONTEXT_ARG_VAR_INIT glSupport
-#  define GLEW_CONTEXT_ARG_DEF_LIST Ogre::GLSupport *glSupport
-#  define WGLEW_CONTEXT_ARG_DEF_INIT Ogre::GLSupport *glSupport
-#  define WGLEW_CONTEXT_ARG_DEF_LIST Ogre::GLSupport *glSupport
-#  define GLXEW_CONTEXT_ARG_DEF_INIT Ogre::GLSupport *glSupport
-#  define GLXEW_CONTEXT_ARG_DEF_LIST Ogre::GLSupport *glSupport
-//#  define GLEW_CONTEXT_ARG_DEF_INIT void
-//#  define GLEW_CONTEXT_ARG_VAR_INIT
-//#  define GLEW_CONTEXT_ARG_DEF_LIST void
-//#  define WGLEW_CONTEXT_ARG_DEF_INIT void
-//#  define WGLEW_CONTEXT_ARG_DEF_LIST void
-//#  define GLXEW_CONTEXT_ARG_DEF_INIT void
-//#  define GLXEW_CONTEXT_ARG_DEF_LIST void
+#  define GLEW_CONTEXT_ARG_DEF_INIT void
+#  define GLEW_CONTEXT_ARG_VAR_INIT
+#  define GLEW_CONTEXT_ARG_DEF_LIST void
+#  define WGLEW_CONTEXT_ARG_DEF_INIT void
+#  define WGLEW_CONTEXT_ARG_DEF_LIST void
+#  define GLXEW_CONTEXT_ARG_DEF_INIT void
+#  define GLXEW_CONTEXT_ARG_DEF_LIST void
 #endif /* GLEW_MX */
 
 #if defined(__sgi) || defined (__sun) || defined(GLEW_APPLE_GLX)
