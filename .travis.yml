@@ -1,5 +1,6 @@
 language: cpp
-sudo: false
+sudo: required
+dist: trusty
 branches:
   only:
     - master
@@ -15,8 +16,8 @@ addons:
     - libboost-all-dev
     - libcppunit-dev
     - libgles2-mesa-dev
-    - nvidia-cg-toolkit
 before_script:
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse" && sudo apt-get update -qq && sudo apt-get install -qq nvidia-cg-dev ; fi
     # we start compilation afterwards anyway, so no need to sleep
     - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export DISPLAY=:99.0 && sh -e /etc/init.d/xvfb start ; fi
     - if [ "$TRAVIS_OS_NAME" =   "osx" ]; then brew install freetype libzzip sdl2 cppunit cmake ; fi
