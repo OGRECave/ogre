@@ -287,6 +287,7 @@ namespace v1 {
         typedef list<VertexElement>::type VertexElementList;
         /// Sort routine for vertex elements
         static bool vertexElementLess(const VertexElement& e1, const VertexElement& e2);
+        static bool vertexElementLessForV2(const VertexElement& e1, const VertexElement& e2);
     protected:
         HardwareBufferManagerBase *mCreator;
 
@@ -324,6 +325,8 @@ namespace v1 {
             declaration must list all the elements for each source in turn.
         */
         void sort(void);
+
+        void sortForV2(void);
 
         /** Remove any gaps in the source buffer list used by this declaration.
         @remarks
@@ -441,7 +444,7 @@ namespace v1 {
         */
         virtual VertexDeclaration* clone(HardwareBufferManagerBase* mgr = 0) const;
 
-        bool isSorted(void) const;
+        bool isSortedForV2(void) const;
 
         VertexElement2VecVec convertToV2(void);
         void convertFromV2( const VertexElement2Vec &v2Decl );

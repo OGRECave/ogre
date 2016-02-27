@@ -644,7 +644,7 @@ namespace v1 {
         return ret;
     }
     //-----------------------------------------------------------------------------------
-    bool VertexDeclaration::isSorted(void) const
+    bool VertexDeclaration::isSortedForV2(void) const
     {
         bool retVal = true;
 
@@ -657,7 +657,7 @@ namespace v1 {
             ++nextElement;
 
             while( nextElement != end &&
-                   VertexDeclaration::vertexElementLess( *currElement, *nextElement ) )
+                   VertexDeclaration::vertexElementLessForV2( *currElement, *nextElement ) )
             {
                 ++currElement;
                 ++nextElement;
@@ -674,11 +674,11 @@ namespace v1 {
         VertexElement2VecVec retVal;
         retVal.resize( getMaxSource() + 1 );
 
-        if( !isSorted() )
+        if( !isSortedForV2() )
         {
             //Make sure the declaration is sorted. Don't sort if already sorted, otherwise
             //the declaration will be tagged as dirty when creating the PSO.
-            sort();
+            sortForV2();
         }
 
         VertexElementList::const_iterator itor = mElementList.begin();
@@ -769,6 +769,21 @@ namespace v1 {
     {
         vertexLayoutDirty();
         mElementList.sort(VertexDeclaration::vertexElementLess);
+    }
+    //-----------------------------------------------------------------------------
+    // Sort routine for VertexElement
+    bool VertexDeclaration::vertexElementLessForV2(const VertexElement& e1, const VertexElement& e2)
+    {
+        // Sort by source first, then by offset
+        if( e1.getSource() != e2.getSource() )
+            return e1.getSource() < e2.getSource();
+        else
+            return e1.getOffset() < e2.getOffset();
+    }
+    void VertexDeclaration::sortForV2(void)
+    {
+        vertexLayoutDirty();
+        mElementList.sort(VertexDeclaration::vertexElementLessForV2);
     }
     //-----------------------------------------------------------------------------
     void VertexDeclaration::closeGapsInSource(void)
