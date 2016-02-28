@@ -144,6 +144,14 @@ namespace Ogre
         /// Finds an existing Compute Job. If none found, returns null.
         HlmsComputeJob* findComputeJobNoThrow( IdString datablockName ) const;
 
+        /// Returns the string name associated with its hashed name (this was
+        /// passed as refName in @createComputeJob). Returns null ptr if
+        /// not found.
+        /// The reason this String doesn't live in HlmsComputeJob is to prevent
+        /// cache trashing (jobs are hot iterated every frame, and the
+        /// full name is rarely ever used)
+        const String* getJobNameStr( IdString name ) const;
+
         /// Destroys all jobs created via @see createComputeJob
         void destroyAllComputeJobs(void);
 

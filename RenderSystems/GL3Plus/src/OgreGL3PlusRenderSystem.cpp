@@ -1912,7 +1912,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
-        assert( samplerblock->mRsData &&
+        assert( (!samplerblock || samplerblock->mRsData) &&
                 "The block must have been created via HlmsManager::getSamplerblock!" );
 
         if( !samplerblock )

@@ -246,6 +246,37 @@ namespace Ogre
             return *this;
         }
 
+        LwString& a( int64 a0 )
+        {
+            int written = _snprintf( mStrPtr + mSize,
+                                     mCapacity - mSize,
+                                     "%lli", a0 );
+            assert( ( written >= 0 ) && ( (size_t)written < mCapacity ) );
+            mStrPtr[mCapacity - 1] = '\0';
+            mSize = std::min<size_t>( mSize + std::max( written, 0 ), mCapacity - 1 );
+            return *this;
+        }
+
+        LwString& a( uint64 a0 )
+        {
+            int written = _snprintf( mStrPtr + mSize,
+                                     mCapacity - mSize,
+                                     "%llu", a0 );
+            assert( ( written >= 0 ) && ( (size_t)written < mCapacity ) );
+            mStrPtr[mCapacity - 1] = '\0';
+            mSize = std::min<size_t>( mSize + std::max( written, 0 ), mCapacity - 1 );
+            return *this;
+        }
+
+        LwString& a( size_t a0 )
+        {
+#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32
+            return a( (uint32)a0 );
+#else
+            return a( (uint64)a0 );
+#endif
+        }
+
         struct Float
         {
             float   mValue;

@@ -132,22 +132,23 @@ namespace Ogre
             propName.resize( texturePropSize + 1u );
         }
 
-        maxTexUnitReached = 0;
+        //Set the new value.
+        maxTexUnitReached = static_cast<uint8>( textureSlots.size() );
 
         if( mInformHlmsOfTextureData )
         {
-            setProperty( propNumTextureSlots, textureSlots.size() );
+            setProperty( propNumTextureSlots, static_cast<int32>( textureSlots.size() ) );
 
+            TextureSlotVec::const_iterator begin= textureSlots.begin();
             TextureSlotVec::const_iterator itor = textureSlots.begin();
             TextureSlotVec::const_iterator end  = textureSlots.end();
 
             while( itor != end )
             {
+                const size_t slotIdx = itor - begin;
                 propName.resize( texturePropSize );
-                propName.a( itor->slotIdx );            //texture0 or uav0
+                propName.a( slotIdx );                      //texture0 or uav0
                 setProperty( propName.c_str(), 1 );
-
-                maxTexUnitReached = std::max( itor->slotIdx, maxTexUnitReached );
 
                 if( !itor->texture.isNull() )
                 {
@@ -198,7 +199,7 @@ namespace Ogre
                     setProperty( propName.c_str(), texture->getTextureType() == TEX_TYPE_2D_ARRAY );
                     propName.resize( texturePropSize + 1u );
                 }
-                else
+                else if( itor->buffer )
                 {
                     propName.a( "_is_buffer" );             //texture0_is_buffer
                     setProperty( propName.c_str(), 1 );
@@ -332,43 +333,54 @@ namespace Ogre
                                     ResourceAccess::ResourceAccess access,
                                     TextureSlotVec &container )
     {
-        TextureSlotVec::iterator itor = std::lower_bound( container.begin(),
-                                                          container.end(), slotIdx,
-                                                          TextureSlot() );
+        assert( slotIdx < container.size() );
 
-        if( !buffer )
+        TextureSlot &texSlot = container[slotIdx];
+
+        texSlot.buffer      = buffer;
+        texSlot.offset      = offset;
+        texSlot.sizeBytes   = sizeBytes;
+        texSlot.access      = access;
+
+        if( mInformHlmsOfTextureData && !texSlot.texture.isNull() )
+            mPsoCacheHash = -1;
+
+        texSlot.texture.setNull();
+
+        if( texSlot.samplerblock )
         {
-            if( itor != container.end() && itor->slotIdx == slotIdx )
-            {
-                container.erase( itor );
-                if( mInformHlmsOfTextureData )
-                    mPsoCacheHash = -1;
-            }
-        }
-        else
-        {
-            if( itor == container.end() || itor->slotIdx != slotIdx )
-            {
-                itor = container.insert( itor, TextureSlot() );
-                if( mInformHlmsOfTextureData )
-                    mPsoCacheHash = -1;
-            }
-
-            itor->slotIdx   = slotIdx;
-            itor->buffer    = buffer;
-            itor->offset    = offset;
-            itor->sizeBytes = sizeBytes;
-            itor->access    = access;
-
-            if( mInformHlmsOfTextureData && !itor->texture.isNull() )
-                mPsoCacheHash = -1;
-
-            itor->texture.setNull();
-
             HlmsManager *hlmsManager = mCreator->getHlmsManager();
-            hlmsManager->destroySamplerblock( itor->samplerblock );
-            itor->samplerblock = 0;
+            hlmsManager->destroySamplerblock( texSlot.samplerblock );
+            texSlot.samplerblock = 0;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::setNumTexUnits( uint8 numSlots )
+    {
+        mTextureSlots.resize( numSlots );
+        if( mInformHlmsOfTextureData )
+            mPsoCacheHash = -1;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::removeTexUnit( uint8 slotIdx )
+    {
+        mTextureSlots.erase( mTextureSlots.begin() + slotIdx );
+        if( mInformHlmsOfTextureData )
+            mPsoCacheHash = -1;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::setNumUavUnits( uint8 numSlots )
+    {
+        mUavSlots.resize( numSlots );
+        if( mInformHlmsOfTextureData )
+            mPsoCacheHash = -1;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::removeUavUnit( uint8 slotIdx )
+    {
+        mUavSlots.erase( mUavSlots.begin() + slotIdx );
+        if( mInformHlmsOfTextureData )
+            mPsoCacheHash = -1;
     }
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setTexBuffer( uint8 slotIdx, TexBufferPacked *texBuffer,
@@ -380,70 +392,73 @@ namespace Ogre
     void HlmsComputeJob::setTexture( uint8 slotIdx, TexturePtr &texture,
                                      const HlmsSamplerblock *refParams )
     {
-        TextureSlotVec::iterator itor = std::lower_bound( mTextureSlots.begin(),
-                                                          mTextureSlots.end(), slotIdx,
-                                                          TextureSlot() );
+        assert( slotIdx < mTextureSlots.size() );
 
-        if( texture.isNull() )
+        TextureSlot &texSlot = mTextureSlots[slotIdx];
+        texSlot.buffer = 0;
+
+        if( mInformHlmsOfTextureData && texSlot.texture != texture &&
+            (texture.isNull() || texSlot.texture.isNull() ||
+            texSlot.texture->getWidth() != texture->getWidth() ||
+            texSlot.texture->getHeight() != texture->getHeight() ||
+            texSlot.texture->getDepth() != texture->getDepth() ||
+            texSlot.texture->getNumFaces() != texture->getNumFaces() ||
+            texSlot.texture->getNumMipmaps() != texture->getNumMipmaps() ||
+            texSlot.texture->getFSAA() != texture->getFSAA() ||
+            texSlot.texture->getTextureType() != texture->getTextureType()) )
         {
-            if( itor != mTextureSlots.end() && itor->slotIdx == slotIdx )
-            {
-                if( itor->samplerblock )
-                {
-                    HlmsManager *hlmsManager = mCreator->getHlmsManager();
-                    hlmsManager->destroySamplerblock( itor->samplerblock );
-                }
-
-                mTextureSlots.erase( itor );
-                if( mInformHlmsOfTextureData )
-                    mPsoCacheHash = -1;
-            }
+            mPsoCacheHash = -1;
         }
-        else
+
+        texSlot.texture = texture;
+
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        if( refParams || !texSlot.samplerblock )
         {
-            if( itor == mTextureSlots.end() || itor->slotIdx != slotIdx )
-            {
-                itor = mTextureSlots.insert( itor, TextureSlot() );
-                if( mInformHlmsOfTextureData )
-                    mPsoCacheHash = -1;
-            }
+            const HlmsSamplerblock *oldSamplerblock = texSlot.samplerblock;
+            if( refParams )
+                texSlot.samplerblock = hlmsManager->getSamplerblock( *refParams );
+            else
+                texSlot.samplerblock = hlmsManager->getSamplerblock( HlmsSamplerblock() );
 
-            itor->slotIdx = slotIdx;
-            itor->buffer = 0;
-
-            if( mInformHlmsOfTextureData && itor->texture != texture &&
-                (itor->texture->getWidth() != texture->getWidth() ||
-                itor->texture->getHeight() != texture->getHeight() ||
-                itor->texture->getDepth() != texture->getDepth() ||
-                itor->texture->getNumFaces() != texture->getNumFaces() ||
-                itor->texture->getNumMipmaps() != texture->getNumMipmaps() ||
-                itor->texture->getFSAA() != texture->getFSAA() ||
-                itor->texture->getTextureType() != texture->getTextureType()) )
-            {
-                mPsoCacheHash = -1;
-            }
-
-            itor->texture = texture;
-
-            HlmsManager *hlmsManager = mCreator->getHlmsManager();
-
-            if( refParams || !itor->samplerblock )
-            {
-                const HlmsSamplerblock *oldSamplerblock = itor->samplerblock;
-                if( refParams )
-                    itor->samplerblock = hlmsManager->getSamplerblock( *refParams );
-                else
-                    itor->samplerblock = hlmsManager->getSamplerblock( HlmsSamplerblock() );
-
-                if( oldSamplerblock )
-                    hlmsManager->destroySamplerblock( oldSamplerblock );
-            }
-
-            itor->textureArrayIndex      = 0;
-            itor->access        = ResourceAccess::Undefined;
-            itor->mipmapLevel   = 0;
-            itor->pixelFormat   = texture->getFormat();
+            if( oldSamplerblock )
+                hlmsManager->destroySamplerblock( oldSamplerblock );
         }
+
+        texSlot.textureArrayIndex   = 0;
+        texSlot.access              = ResourceAccess::Undefined;
+        texSlot.mipmapLevel         = 0;
+        if( !texture.isNull() )
+            texSlot.pixelFormat = texture->getFormat();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::setSamplerblock( uint8 slotIdx, const HlmsSamplerblock &refParams )
+    {
+        assert( slotIdx < mTextureSlots.size() );
+
+        TextureSlot &texSlot = mTextureSlots[slotIdx];
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        const HlmsSamplerblock *oldSamplerblock = texSlot.samplerblock;
+        texSlot.samplerblock = hlmsManager->getSamplerblock( refParams );
+
+        if( oldSamplerblock )
+            hlmsManager->destroySamplerblock( oldSamplerblock );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::_setSamplerblock( uint8 slotIdx, const HlmsSamplerblock *refParams )
+    {
+        assert( slotIdx < mTextureSlots.size() );
+
+        TextureSlot &texSlot = mTextureSlots[slotIdx];
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+
+        const HlmsSamplerblock *oldSamplerblock = texSlot.samplerblock;
+        texSlot.samplerblock = refParams;
+
+        if( oldSamplerblock )
+            hlmsManager->destroySamplerblock( oldSamplerblock );
     }
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setUavBuffer( uint8 slotIdx, UavBufferPacked *uavBuffer,
@@ -453,53 +468,33 @@ namespace Ogre
         setBuffer( slotIdx, uavBuffer, offset, sizeBytes, access, mUavSlots );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsComputeJob::setUavTexture( uint32 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
+    void HlmsComputeJob::setUavTexture( uint8 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
                                         ResourceAccess::ResourceAccess access, int32 mipmapLevel,
                                         PixelFormat pixelFormat )
     {
-        TextureSlotVec::iterator itor = std::lower_bound( mUavSlots.begin(),
-                                                          mUavSlots.end(), slotIdx,
-                                                          TextureSlot() );
+        assert( slotIdx < mUavSlots.size() );
 
-        if( texture.isNull() )
+        TextureSlot &texSlot = mUavSlots[slotIdx];
+        texSlot.buffer = 0;
+        texSlot.samplerblock = 0;
+
+        if( mInformHlmsOfTextureData && texSlot.texture != texture &&
+            (texture.isNull() || texSlot.texture.isNull() ||
+            texSlot.texture->getWidth() != texture->getWidth() ||
+            texSlot.texture->getHeight() != texture->getHeight() ||
+            texSlot.texture->getDepth() != texture->getDepth() ||
+            texSlot.texture->getNumFaces() != texture->getNumFaces() ||
+            texSlot.texture->getNumMipmaps() != texture->getNumMipmaps() ||
+            texSlot.texture->getFSAA() != texture->getFSAA() ||
+            texSlot.texture->getTextureType() != texture->getTextureType()) )
         {
-            if( itor != mUavSlots.end() && itor->slotIdx == slotIdx )
-            {
-                mUavSlots.erase( itor );
-                if( mInformHlmsOfTextureData )
-                    mPsoCacheHash = -1;
-            }
+            mPsoCacheHash = -1;
         }
-        else
-        {
-            if( itor == mUavSlots.end() || itor->slotIdx != slotIdx )
-            {
-                itor = mUavSlots.insert( itor, TextureSlot() );
-                if( mInformHlmsOfTextureData )
-                    mPsoCacheHash = -1;
-            }
 
-            itor->slotIdx = slotIdx;
-            itor->buffer = 0;
-            itor->samplerblock = 0;
-
-            if( mInformHlmsOfTextureData && itor->texture != texture &&
-                (itor->texture->getWidth() != texture->getWidth() ||
-                itor->texture->getHeight() != texture->getHeight() ||
-                itor->texture->getDepth() != texture->getDepth() ||
-                itor->texture->getNumFaces() != texture->getNumFaces() ||
-                itor->texture->getNumMipmaps() != texture->getNumMipmaps() ||
-                itor->texture->getFSAA() != texture->getFSAA() ||
-                itor->texture->getTextureType() != texture->getTextureType()) )
-            {
-                mPsoCacheHash = -1;
-            }
-
-            itor->texture       = texture;
-            itor->textureArrayIndex = textureArrayIndex;
-            itor->access        = access;
-            itor->mipmapLevel   = mipmapLevel;
-            itor->pixelFormat   = pixelFormat;
-        }
+        texSlot.texture             = texture;
+        texSlot.textureArrayIndex   = textureArrayIndex;
+        texSlot.access              = access;
+        texSlot.mipmapLevel         = mipmapLevel;
+        texSlot.pixelFormat         = pixelFormat;
     }
 }

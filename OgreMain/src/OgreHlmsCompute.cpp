@@ -376,6 +376,7 @@ namespace Ogre
             ++itConst;
         }
 
+        size_t slotIdx = 0u;
         HlmsComputeJob::TextureSlotVec::const_iterator itTex = job->mTextureSlots.begin();
         HlmsComputeJob::TextureSlotVec::const_iterator enTex = job->mTextureSlots.end();
 
@@ -384,17 +385,19 @@ namespace Ogre
             if( itTex->buffer )
             {
                 static_cast<TexBufferPacked*>( itTex->buffer )->bindBufferCS(
-                            itTex->slotIdx, itTex->offset, itTex->sizeBytes );
+                            slotIdx, itTex->offset, itTex->sizeBytes );
             }
             else
             {
-                mRenderSystem->_setTexture( itTex->slotIdx, true, itTex->texture.get() );
-                mRenderSystem->_setHlmsSamplerblock( itTex->slotIdx, itTex->samplerblock );
+                mRenderSystem->_setTexture( slotIdx, !itTex->texture.isNull(), itTex->texture.get() );
+                mRenderSystem->_setHlmsSamplerblock( slotIdx, itTex->samplerblock );
             }
 
+            ++slotIdx;
             ++itTex;
         }
 
+        slotIdx = 0u;
         HlmsComputeJob::TextureSlotVec::const_iterator itUav = job->mUavSlots.begin();
         HlmsComputeJob::TextureSlotVec::const_iterator enUav = job->mUavSlots.end();
 
@@ -403,15 +406,16 @@ namespace Ogre
             if( itUav->buffer )
             {
                 static_cast<UavBufferPacked*>( itUav->buffer )->bindBufferCS(
-                            itUav->slotIdx, itUav->offset, itUav->sizeBytes );
+                            slotIdx, itUav->offset, itUav->sizeBytes );
             }
             else
             {
-                mRenderSystem->_bindTextureUavCS( itUav->slotIdx, itUav->texture.get(),
+                mRenderSystem->_bindTextureUavCS( slotIdx, itUav->texture.get(),
                                                   itUav->access, itUav->mipmapLevel,
                                                   itUav->textureArrayIndex, itUav->pixelFormat );
             }
 
+            ++slotIdx;
             ++itUav;
         }
 
@@ -459,6 +463,16 @@ namespace Ogre
         HlmsComputeJobMap::const_iterator itor = mComputeJobs.find( datablockName );
         if( itor != mComputeJobs.end() )
             retVal = itor->second.computeJob;
+
+        return retVal;
+    }
+    //----------------------------------------------------------------------------------
+    const String* HlmsCompute::getJobNameStr( IdString name ) const
+    {
+        String const *retVal = 0;
+        HlmsComputeJobMap::const_iterator itor = mComputeJobs.find( name );
+        if( itor != mComputeJobs.end() )
+            retVal = &itor->second.name;
 
         return retVal;
     }
