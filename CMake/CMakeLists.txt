@@ -47,7 +47,6 @@ set(STATIC_INST_FILES
   Packages/FindFreetype.cmake
   Packages/FindOpenGLES.cmake
   Packages/FindOpenGLES2.cmake
-  Packages/FindZLIB.cmake
   Packages/FindZZip.cmake
   Packages/FindSoftimage.cmake
   Packages/FindGLSLOptimizer.cmake
