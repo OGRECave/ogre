@@ -61,54 +61,7 @@ Description: Base class for all the OGRE examples
 #endif
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
-
-/** This class simply demonstrates basic usage of the CRTShader system.
-It sub class the material manager listener class and when a target scheme callback
-is invoked with the shader generator scheme it tries to create an equvialent shader
-based technique based on the default technique of the given material.
-*/
-class ShaderGeneratorTechniqueResolverListener : public MaterialManager::Listener
-{
-public:
-
-    ShaderGeneratorTechniqueResolverListener(RTShader::ShaderGenerator* pShaderGenerator)
-    {
-        mShaderGenerator = pShaderGenerator;
-    }
-
-    virtual Technique* handleSchemeNotFound(unsigned short schemeIndex, 
-        const String& schemeName, Material* originalMaterial, unsigned short lodIndex, 
-        const Renderable* rend)
-    {       
-        // Case this is the default shader generator scheme.
-        if (schemeName == RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME)
-        {
-            MaterialRegisterIterator itFind = mRegisteredMaterials.find(originalMaterial);
-            bool techniqueCreated = false;
-
-            // This material was not registered before.
-            if (itFind == mRegisteredMaterials.end())
-            {
-                techniqueCreated = mShaderGenerator->createShaderBasedTechnique(
-                    originalMaterial->getName(), 
-                    MaterialManager::DEFAULT_SCHEME_NAME, 
-                    schemeName);                
-            }
-            mRegisteredMaterials[originalMaterial] = techniqueCreated;
-        }
-
-        return NULL;
-    }
-
-protected:
-    typedef std::map<Material*, bool>       MaterialRegisterMap;
-    typedef MaterialRegisterMap::iterator   MaterialRegisterIterator;
-
-
-protected:
-    MaterialRegisterMap             mRegisteredMaterials;       // Registered material map.
-    RTShader::ShaderGenerator*      mShaderGenerator;           // The shader generator instance.
-};
+#include "ShaderGeneratorTechniqueResolverListener.h"
 #endif
 
 using namespace Ogre;
@@ -196,7 +149,7 @@ protected:
     Ogre::String mConfigPath;
 #ifdef INCLUDE_RTSHADER_SYSTEM
     RTShader::ShaderGenerator*                  mShaderGenerator;           // The Shader generator instance.
-    ShaderGeneratorTechniqueResolverListener*   mMaterialMgrListener;       // Material manager listener.   
+    OgreBites::ShaderGeneratorTechniqueResolverListener*   mMaterialMgrListener; // Material manager listener.
 #endif
 
     // These internal methods package up the stages in the startup process
@@ -297,7 +250,7 @@ protected:
             mShaderGenerator->setShaderCachePath(shaderCachePath);      
                                     
             // Create and register the material manager listener.
-            mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);              
+            mMaterialMgrListener = new OgreBites::ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
             MaterialManager::getSingleton().addListener(mMaterialMgrListener);
         }
 
