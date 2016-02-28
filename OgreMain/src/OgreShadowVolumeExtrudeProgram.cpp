@@ -696,19 +696,19 @@ namespace Ogre {
 
 
 
-static const String glsles_prefix = "precision highp float;\
-                                    precision highp int; \
-                                    precision lowp sampler2D; \
-                                    precision lowp samplerCube;";
+static const String glsles_prefix = "precision highp float;\n"
+                                    "precision highp int;\n"
+                                    "precision lowp sampler2D;\n"
+                                    "precision lowp samplerCube;\n";
 
     String ShadowVolumeExtrudeProgram::mModulate_Fs_glsl =
-        "uniform sampler2D RT; \
-        uniform vec4 shadowColor; \
-        varying vec2 uv0; \
-        \
-        void main() {\
-            gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\
-        }";
+        "uniform sampler2D RT;\n"
+        "uniform vec4 shadowColor;\n"
+        "varying vec2 uv0;\n"
+        "\n"
+        "void main() {\n"
+        "    gl_FragColor = vec4(shadowColor.xyz, texture2D(RT, uv0).w);\n"
+        "}";
 
     String ShadowVolumeExtrudeProgram::mModulate_Vs_glsl =
         "uniform mat4 worldViewProj; \n"
