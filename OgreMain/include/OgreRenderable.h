@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -69,17 +69,12 @@ namespace Ogre {
             The need for this class started when the DX10 render system needed to save state objects.
         */
         class RenderSystemData {}; 
+        typedef SharedPtr<RenderSystemData> RenderSystemDataPtr;
+        
     public:
-        Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false), mRenderSystemData(NULL) {}
+        Renderable() : mPolygonModeOverrideable(true), mUseIdentityProjection(false), mUseIdentityView(false){}
         /** Virtual destructor needed as class has virtual methods. */
-        virtual ~Renderable() 
-        {
-            if (mRenderSystemData)
-            {
-                delete mRenderSystemData;
-                mRenderSystemData = NULL;
-            }
-        }
+        virtual ~Renderable() {}
         /** Retrieves a weak reference to the material this renderable object uses.
         @remarks
             Note that the Renderable also has the option to override the getTechnique method
@@ -396,7 +391,7 @@ namespace Ogre {
         @remarks
             This should only be used by a RenderSystem
         */
-        virtual RenderSystemData * getRenderSystemData() const 
+        virtual const RenderSystemDataPtr& getRenderSystemData() const 
         { 
             return mRenderSystemData; 
         }
@@ -404,7 +399,7 @@ namespace Ogre {
         @remarks
             This should only be used by a RenderSystem
         */
-        virtual void setRenderSystemData(RenderSystemData * val) const
+        virtual void setRenderSystemData(RenderSystemDataPtr val) const
         { 
             mRenderSystemData = val; 
         }
@@ -417,7 +412,7 @@ namespace Ogre {
         bool mUseIdentityProjection;
         bool mUseIdentityView;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
-        mutable RenderSystemData * mRenderSystemData;/// This should be used only by a render system for internal use
+        mutable RenderSystemDataPtr mRenderSystemData;/// This should be used only by a render system for internal use
     };
 
     /** @} */

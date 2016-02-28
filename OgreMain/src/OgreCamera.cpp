@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -313,9 +313,9 @@ namespace Ogre {
         // Note the order of the mult, i.e. q comes after
 
         // Normalise the quat to avoid cumulative problems with precision
-        Quaternion qnorm = q;
-        qnorm.normalise();
-        mOrientation = qnorm * mOrientation;
+        Quaternion qres = q * mOrientation;
+        qres.normalise();
+        mOrientation = qres;
 
         invalidateView();
 

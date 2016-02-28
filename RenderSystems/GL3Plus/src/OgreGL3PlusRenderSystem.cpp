@@ -1358,8 +1358,8 @@ namespace Ogre {
 
         // record this
         mColourWrite[0] = red;
-        mColourWrite[1] = blue;
-        mColourWrite[2] = green;
+        mColourWrite[1] = green;
+        mColourWrite[2] = blue;
         mColourWrite[3] = alpha;
     }
 

@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -4407,7 +4407,7 @@ namespace Ogre
                 writeTesselationHullProgramRef(pPass);
             }
 
-            if(pPass->hasTessellationHullProgram())
+            if(pPass->hasTessellationDomainProgram())
             {
                 writeTesselationDomainProgramRef(pPass);
             }
@@ -5289,7 +5289,7 @@ namespace Ogre
         GpuLogicalBufferStructPtr doubleLogical = params->getDoubleLogicalBufferStruct();
         if( !doubleLogical.isNull() )
         {
-            OGRE_LOCK_MUTEX(floatLogical->mutex);
+            OGRE_LOCK_MUTEX(doubleLogical->mutex);
 
             for(GpuLogicalIndexUseMap::const_iterator i = doubleLogical->map.begin();
                 i != doubleLogical->map.end(); ++i)

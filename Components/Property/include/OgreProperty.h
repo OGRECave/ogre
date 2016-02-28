@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ THE SOFTWARE.
 #if OGRE_THREAD_PROVIDER == 1
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
-#elif __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#elif __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
 #include <functional>
 #else
 #include <tr1/functional>
@@ -103,7 +103,7 @@ namespace Ogre
 {
 #if OGRE_THREAD_PROVIDER == 1
     using boost::function;
-#elif __cplusplus > 201100L || (defined(_MSC_VER) && _MSC_VER >= 1800)
+#elif __cplusplus >= 201103L || (defined(_MSC_VER) && _MSC_VER >= 1800)
     using std::function;
 #else
     using std::tr1::function;
