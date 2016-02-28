@@ -11,6 +11,12 @@
 ## Batteries Included
 * by default Ogre will now automatically fetch and build its core dependencies
 
+## Emscripten
+* added minimal Sample to repository
+* added build instructions
+
+[the Emscipten Demo is available online here](https://ogrecave.github.io/ogre/emscripten/)
+
 ## OgreMain
 * restored compatibility with 1.9 (`StringUtil::BLANK`, `StringUtil::StrStreamType`)
 * fix build on iOS using cross-toolchain/ add instructions
