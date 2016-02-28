@@ -1290,7 +1290,7 @@ namespace OgreBites
             }
 #  else
 #    if OGRE_DEBUG_MODE && !(OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
-            sampleList.push_back("PlayPen_d");
+            sampleList.push_back("PlayPenTests_d");
 #    else
             sampleList.push_back("PlayPenTests");
 #    endif
