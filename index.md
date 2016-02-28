@@ -14,7 +14,7 @@ The latest release is [![GitHub release](https://img.shields.io/github/release/o
 * [API/ ABI changes](https://ogrecave.github.io/ogre/abi_tracker/timeline/ogre) (since v1.8)
 
 ## Try it
-* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/)
+* [Online Emscripten Demo](https://ogrecave.github.io/ogre/emscripten/) - [Web Assembly & WebGL2](https://ogrecave.github.io/ogre/wasm/)
 * Ubuntu Snap package: `sudo snap install ogre`
 * [Android App on F-Droid](https://f-droid.org/packages/org.ogre.browser/)
 
