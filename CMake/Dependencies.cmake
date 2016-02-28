@@ -89,7 +89,7 @@ set(CMAKE_PREFIX_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
 set(CMAKE_FRAMEWORK_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_FRAMEWORK_PATH})
 
 if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
-    if(MSVC) # the only platform that does not ship zlib
+    if(MSVC OR EMSCRIPTEN) # others platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD
             http://zlib.net/zlib-1.2.8.tar.gz
