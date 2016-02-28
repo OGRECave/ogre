@@ -31,9 +31,6 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreRoot.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-
 #include "OgreEmscriptenEGLSupport.h"
 #include "OgreEmscriptenEGLWindow.h"
 
@@ -74,7 +71,7 @@ namespace Ogre {
         return window;
     }
 
-    EGLConfig* EmscriptenEGLSupport::chooseGLConfig(const GLint *attribList, GLint *nElements)
+    EGLConfig* EmscriptenEGLSupport::chooseGLConfig(const EGLint *attribList, EGLint *nElements)
     {
         // Emscripten eglChooseConfig: Implemented as a stub, but this function does not do searching/filtering,
         // and is at the moment identical to eglGetConfigs

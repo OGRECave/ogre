@@ -32,9 +32,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-#include "OgreGLES2ManagedResourceManager.h"
+#include "OgreGLRenderSystemCommon.h"
 
 #include "OgreEmscriptenEGLSupport.h"
 #include "OgreEmscriptenEGLWindow.h"
@@ -245,7 +243,7 @@ namespace Ogre {
     {
         mContext->setCurrent();
         
-        GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
+        static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem())->notifyOnContextLost();
         mContext->_destroyInternalResources();
         
         eglDestroySurface(mEglDisplay, mEglSurface);
@@ -355,7 +353,7 @@ namespace Ogre {
             
             mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, nullptr);
             
-            static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
+            static_cast<GLRenderSystemCommon*>(Ogre::Root::getSingleton().getRenderSystem())->resetRenderer(this);
         }
     }
 
@@ -364,7 +362,7 @@ namespace Ogre {
         // Not used on emscripten
     }
 
-    EM_BOOL EmscriptenEGLWindow::canvasWindowResized(int eventType, const EmscriptenUiEvent *uiEvent, void *userData)
+    EM_BOOL EmscriptenEGLWindow::canvasWindowResized(int eventType, const EmscriptenUiEvent *event, void *userData)
     {
         EmscriptenEGLWindow* thiz = static_cast<EmscriptenEGLWindow*>(userData);
         //thiz->resize(event->documentBodyClientWidth, event->documentBodyClientHeight);

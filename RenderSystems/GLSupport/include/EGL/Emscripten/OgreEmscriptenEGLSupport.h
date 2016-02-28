@@ -45,8 +45,8 @@ namespace Ogre {
                                         bool fullScreen,
                                         const NameValuePairList *miscParams = 0);
 
-	virtual EGLConfig* chooseGLConfig(const GLint* attribList,
-					  GLint *nElements);
+	virtual EGLConfig* chooseGLConfig(const EGLint* attribList,
+					  EGLint *nElements);
     };
 }
 
