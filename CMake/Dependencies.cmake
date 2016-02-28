@@ -270,11 +270,6 @@ if(Boost_FOUND AND Boost_VERSION GREATER 104900)
     find_package(Boost COMPONENTS ${OGRE_BOOST_COMPONENTS} QUIET)
 endif()
 
-if(Boost_VERSION GREATER 105200)
-	# Use boost threading version 4 for boost 1.53 and above
-	add_definitions( -DBOOST_THREAD_VERSION=4 )
-endif()
-
 if(Boost_FOUND AND NOT WIN32)
   list(REMOVE_DUPLICATES Boost_LIBRARIES)
 endif()
