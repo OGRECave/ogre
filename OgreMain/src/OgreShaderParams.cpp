@@ -37,12 +37,10 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void ShaderParams::updateParameters( GpuProgramPtr &gpuProgram )
+    void ShaderParams::updateParameters( GpuProgramParametersSharedPtr params )
     {
         ShaderParamVec::const_iterator itor = mParams.begin();
         ShaderParamVec::const_iterator end  = mParams.end();
-
-        GpuProgramParametersSharedPtr params = gpuProgram->getDefaultParameters();
 
         while( itor != end )
         {
@@ -71,7 +69,7 @@ namespace Ogre
                 }
                 else
                 {
-                    if( itor->mp.elementType != ElementFloat )
+                    if( itor->ap.extraParamType != ElementFloat )
                     {
                         params->setNamedAutoConstant( itor->name, itor->ap.acType,
                                                       static_cast<size_t>(itor->ap.extraParamValue) );

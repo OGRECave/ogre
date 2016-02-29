@@ -328,6 +328,39 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::createShaderParams( IdString key )
+    {
+        if( mShaderParams.find( key ) == mShaderParams.end() )
+            mShaderParams[key] = ShaderParams();
+    }
+    //-----------------------------------------------------------------------------------
+    ShaderParams& HlmsComputeJob::getShaderParams( IdString key )
+    {
+        ShaderParams *retVal = 0;
+
+        map<IdString, ShaderParams>::type::iterator itor = mShaderParams.find( key );
+        if( itor == mShaderParams.end() )
+        {
+            createShaderParams( key );
+            itor = mShaderParams.find( key );
+        }
+
+        retVal = &itor->second;
+
+        return *retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    ShaderParams* HlmsComputeJob::_getShaderParams( IdString key )
+    {
+        ShaderParams *retVal = 0;
+
+        map<IdString, ShaderParams>::type::iterator itor = mShaderParams.find( key );
+        if( itor != mShaderParams.end() )
+            retVal = &itor->second;
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setBuffer( uint8 slotIdx, BufferPacked *buffer,
                                     size_t offset, size_t sizeBytes,
                                     ResourceAccess::ResourceAccess access,

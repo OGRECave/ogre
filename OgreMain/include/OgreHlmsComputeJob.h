@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define _OgreHlmsComputeJob_H_
 
 #include "OgreHlmsDatablock.h"
-#include "OgreMatrix4.h"
 #include "OgreResourceTransition.h"
+#include "OgreShaderParams.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -110,6 +110,8 @@ namespace Ogre
         uint8 mMaxUavUnitReached;
         HlmsPropertyVec mSetProperties;
         size_t          mPsoCacheHash;
+
+        map<IdString, ShaderParams>::type mShaderParams;
 
         void updateAutoProperties( const TextureSlotVec &textureSlots,
                                    uint8 &outMaxTexUnitReached,
@@ -191,6 +193,19 @@ namespace Ogre
         */
         void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
+
+        /// Creates a set of shader paramters with a given key,
+        /// e.g. "Default" "glsl" "hlsl".
+        /// Does nothing if parameters already exist.
+        void createShaderParams( IdString key );
+
+        /// Gets a shader parameter with the given key.
+        /// Creates if does not exist.
+        ShaderParams& getShaderParams( IdString key );
+
+        /// Gets a shader parameter with the given key.
+        /// Returns null if doesn't exist. @see createShaderParams
+        ShaderParams* _getShaderParams( IdString key );
 
         /** Sets a const/uniform bufferat the given slot ID.
         @param slotIdx

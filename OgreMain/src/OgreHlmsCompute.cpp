@@ -254,6 +254,14 @@ namespace Ogre
 
                 gp->load();
 
+                ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+                if( shaderParams )
+                    shaderParams->updateParameters( gp->getDefaultParameters() );
+
+                shaderParams = job->_getShaderParams( mShaderFileExt );
+                if( shaderParams )
+                    shaderParams->updateParameters( gp->getDefaultParameters() );
+
                 shader = gp;
 
                 mCompiledShaderCache[hashVal] = shader;

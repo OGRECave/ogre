@@ -61,7 +61,7 @@ namespace Ogre
 
         struct AutoParam
         {
-            ElementType                             extreParamType;
+            ElementType                             extraParamType;
             double                                  extraParamValue;
             GpuProgramParameters::AutoConstantType  acType;
         };
@@ -74,7 +74,7 @@ namespace Ogre
             /// Gets reinterpret_cast'ed based on elementType
             uint8       dataBytes[64];
         };
-        struct ShaderParam
+        struct Param
         {
             String  name;
             bool    isAutomatic;
@@ -86,7 +86,7 @@ namespace Ogre
             };
         };
 
-        typedef vector<ShaderParam>::type ShaderParamVec;
+        typedef vector<Param>::type ShaderParamVec;
 
         /// Don't log exceptions about missing parameters
         bool mSilenceMissingParameterWarnings;
@@ -94,7 +94,7 @@ namespace Ogre
 
         ShaderParams();
 
-        void updateParameters( GpuProgramPtr &gpuProgram );
+        void updateParameters( GpuProgramParametersSharedPtr params );
     };
 
     /** @} */

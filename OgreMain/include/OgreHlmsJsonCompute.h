@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    class ShaderParams;
+
     /** \addtogroup Core
     *  @{
     */
@@ -45,11 +47,14 @@ namespace Ogre
     class _OgreExport HlmsJsonCompute : public PassAlloc
     {
         HlmsManager *mHlmsManager;
+
+        void loadParams( const rapidjson::Value &jsonArray, ShaderParams &shaderParams,
+                         const String &jobName );
     public:
         HlmsJsonCompute( HlmsManager *hlmsManager );
 
         void loadJob( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
-                      HlmsComputeJob *job , const String &jobName );
+                      HlmsComputeJob *job, const String &jobName );
         void saveJob( const HlmsComputeJob *job, String &outString );
     };
     /** @} */
