@@ -48,6 +48,37 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
+    uint8 HlmsJsonCompute::parseAccess( const char *value )
+    {
+        if( !strcmp( value, "read" ) )
+            return ResourceAccess::Read;
+        if( !strcmp( value, "write" ) )
+            return ResourceAccess::Write;
+        if( !strcmp( value, "readwrite" ) )
+            return ResourceAccess::ReadWrite;
+
+        return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    ResourceAccess::ResourceAccess HlmsJsonCompute::parseAccess( const rapidjson::Value &json )
+    {
+        uint8 access = 0;
+        if( json.IsArray() )
+        {
+            for( rapidjson::SizeType i=0; i<json.Size(); ++i )
+            {
+                if( json[i].IsString() )
+                    access |= parseAccess( json[i].GetString() );
+            }
+        }
+        else if( json.IsString() )
+        {
+            access = parseAccess( json.GetString() );
+        }
+
+        return static_cast<ResourceAccess::ResourceAccess>( access );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsJsonCompute::loadParams( const rapidjson::Value &jsonArray, ShaderParams &shaderParams,
                                       const String &jobName )
     {
@@ -210,6 +241,121 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsJsonCompute::loadTexture( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
+                                       HlmsComputeJob *job, uint8 slotIdx )
+    {
+        rapidjson::Value::ConstMemberIterator itor = json.FindMember( "sampler" );
+        if( itor != json.MemberEnd() && itor->value.IsString() )
+        {
+            map<LwConstString, const HlmsSamplerblock*>::type::const_iterator it =
+                    blocks.samplerblocks.find(
+                        LwConstString( itor->value.GetString(),
+                                       itor->value.GetStringLength() + 1u ) );
+            if( it != blocks.samplerblocks.end() )
+            {
+                job->_setSamplerblock( slotIdx, it->second );
+                mHlmsManager->addReference( it->second );
+            }
+        }
+
+        itor = json.FindMember( "texture" );
+        if( itor != json.MemberEnd() && itor->value.IsString() )
+        {
+            const char *textureName = itor->value.GetString();
+
+            TexturePtr texture = TextureManager::getSingleton().getByName(
+                        textureName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+            job->setTexture( slotIdx, texture );
+        }
+
+        itor = json.FindMember( "texture_hlms" );
+        if( itor != json.MemberEnd() && itor->value.IsArray() &&
+            itor->value.Size() >= 1u && itor->value.Size() <= 2u &&
+            itor->value[0].IsString() )
+        {
+            const rapidjson::Value &jsonArray = itor->value;
+
+            const char *textureName = jsonArray[0].GetString();
+            HlmsTextureManager *hlmsTextureManager = mHlmsManager->getTextureManager();
+            HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
+                    createOrRetrieveTexture( textureName,
+                                             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
+            job->setTexture( slotIdx, texLocation.texture );
+
+            if( jsonArray.Size() >= 2u && jsonArray[1].IsString() )
+            {
+                ShaderParams &shaderParams = job->getShaderParams( "Default" );
+                ShaderParams::Param param;
+                param.name = jsonArray[1].GetString();
+                param.isAutomatic = false;
+                param.mp.elementType    = ShaderParams::ElementInt;
+                param.mp.dataSizeBytes  = sizeof(int32);
+                memcpy( param.mp.dataBytes, &texLocation.xIdx, sizeof(int32) );
+                shaderParams.mParams.push_back( param );
+            }
+        }
+
+        //TODO: Implement named buffers
+//        itor = json.FindMember( "buffer" );
+//        if( itor != json.MemberEnd() && itor->value.IsString() )
+//        {
+//            const char *bufferName = itor->value.GetString();
+
+//            size_t bufferOffset = 0, bufferSize = 0;
+//            itor = json.FindMember( "offset" );
+//            if( itor != json.MemberEnd() && itor->value.IsUint() )
+//                bufferOffset = itor->value.GetUint();
+
+//            itor = json.FindMember( "size" );
+//            if( itor != json.MemberEnd() && itor->value.IsUint() ){}
+//                bufferSize = itor->value.GetUint();
+//        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonCompute::loadUav( const rapidjson::Value &json, HlmsComputeJob *job, uint8 slotIdx )
+    {
+        PixelFormat pixelFormat = PF_UNKNOWN;
+        int32 slice = 0;
+        int32 mipmap = 0;
+        ResourceAccess::ResourceAccess access = ResourceAccess::Undefined;
+
+        rapidjson::Value::ConstMemberIterator itor = json.FindMember( "access" );
+        if( itor != json.MemberEnd() && itor->value.IsString() || itor->value.IsArray() )
+            access = parseAccess( itor->value );
+
+        itor = json.FindMember( "slice" );
+        if( itor != json.MemberEnd() && itor->value.IsUint() )
+            slice = itor->value.GetUint();
+
+        itor = json.FindMember( "mipmap" );
+        if( itor != json.MemberEnd() && itor->value.IsUint() )
+            mipmap = itor->value.GetUint();
+
+        itor = json.FindMember( "format" );
+        if( itor != json.MemberEnd() && itor->value.IsString() )
+        {
+            const String formatName = String( itor->value.GetString(),
+                                              itor->value.GetStringLength() );
+            pixelFormat = PixelUtil::getFormatFromName( formatName );
+        }
+
+        itor = json.FindMember( "texture" );
+        if( itor != json.MemberEnd() && itor->value.IsString() )
+        {
+            const char *textureName = itor->value.GetString();
+
+            TexturePtr texture = TextureManager::getSingleton().getByName(
+                        textureName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+            if( pixelFormat == PF_UNKNOWN )
+                pixelFormat = texture->getFormat();
+
+            job->setUavTexture( slotIdx, texture, slice, access, mipmap, pixelFormat );
+        }
+
+        //TODO: Implement named buffers
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsJsonCompute::loadJob( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                                    HlmsComputeJob *job, const String &jobName )
     {
@@ -327,75 +473,24 @@ namespace Ogre
             for( uint8 i=0; i<arraySize; ++i )
             {
                 if( jsonArray[i].IsObject() )
-                {
-                    const rapidjson::Value &subobj = jsonArray[i];
+                    loadTexture( jsonArray[i], blocks, job, i );
+            }
+        }
 
-                    itor = subobj.FindMember( "sampler" );
-                    if( itor != subobj.MemberEnd() && itor->value.IsString() )
-                    {
-                        map<LwConstString, const HlmsSamplerblock*>::type::const_iterator it =
-                                blocks.samplerblocks.find(
-                                    LwConstString::FromUnsafeCStr(itor->value.GetString()) );
-                        if( it != blocks.samplerblocks.end() )
-                        {
-                            job->_setSamplerblock( i, it->second );
-                            mHlmsManager->addReference( it->second );
-                        }
-                    }
+        itor = json.FindMember( "uav" );
+        if( itor != json.MemberEnd() && itor->value.IsArray() )
+        {
+            const rapidjson::Value &jsonArray = itor->value;
 
-                    itor = subobj.FindMember( "texture" );
-                    if( itor != subobj.MemberEnd() && itor->value.IsString() )
-                    {
-                        const char *textureName = itor->value.GetString();
+            assert( jsonArray.Size() < 256u && "Exceeding max limit!" );
 
-                        TexturePtr texture = TextureManager::getSingleton().getByName(
-                                    textureName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-                        job->setTexture( i, texture );
-                    }
+            const uint8 arraySize = std::min( jsonArray.Size(), 255u );
+            job->setNumUavUnits( arraySize );
 
-                    itor = subobj.FindMember( "texture_hlms" );
-                    if( itor != subobj.MemberEnd() && itor->value.IsArray() &&
-                        itor->value.Size() >= 1u && itor->value.Size() <= 2u &&
-                        itor->value[0].IsString() )
-                    {
-                        const rapidjson::Value &jsonArray = itor->value;
-
-                        const char *textureName = jsonArray[0].GetString();
-                        HlmsTextureManager *hlmsTextureManager = mHlmsManager->getTextureManager();
-                        HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
-                                createOrRetrieveTexture( textureName,
-                                                         HlmsTextureManager::TEXTURE_TYPE_DIFFUSE );
-                        job->setTexture( i, texLocation.texture );
-
-                        if( jsonArray.Size() >= 2u && jsonArray[1].IsString() )
-                        {
-                            ShaderParams &shaderParams = job->getShaderParams( "Default" );
-                            ShaderParams::Param param;
-                            param.name = jsonArray[1].GetString();
-                            param.isAutomatic = false;
-                            param.mp.elementType    = ShaderParams::ElementInt;
-                            param.mp.dataSizeBytes  = sizeof(int32);
-                            memcpy( param.mp.dataBytes, &texLocation.xIdx, sizeof(int32) );
-                            shaderParams.mParams.push_back( param );
-                        }
-                    }
-
-                    //TODO: Implement named buffers
-//                    itor = subobj.FindMember( "buffer" );
-//                    if( itor != subobj.MemberEnd() && itor->value.IsString() )
-//                    {
-//                        const char *bufferName = itor->value.GetString();
-
-//                        size_t bufferOffset = 0, bufferSize = 0;
-//                        itor = subobj.FindMember( "offset" );
-//                        if( itor != subobj.MemberEnd() && itor->value.IsUint() )
-//                            bufferOffset = itor->value.GetUint();
-
-//                        itor = subobj.FindMember( "size" );
-//                        if( itor != subobj.MemberEnd() && itor->value.IsUint() ){}
-//                            bufferSize = itor->value.GetUint();
-//                    }
-                }
+            for( uint8 i=0; i<arraySize; ++i )
+            {
+                if( jsonArray[i].IsObject() )
+                    loadUav( jsonArray[i], job, i );
             }
         }
     }

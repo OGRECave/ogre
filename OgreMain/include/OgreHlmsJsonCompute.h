@@ -31,6 +31,7 @@ THE SOFTWARE.
 #if !OGRE_NO_JSON
 
 #include "OgreHlmsJson.h"
+#include "OgreResourceTransition.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -48,8 +49,14 @@ namespace Ogre
     {
         HlmsManager *mHlmsManager;
 
+        static uint8 parseAccess( const char *value );
+        static ResourceAccess::ResourceAccess parseAccess( const rapidjson::Value &json );
+
         void loadParams( const rapidjson::Value &jsonArray, ShaderParams &shaderParams,
                          const String &jobName );
+        void loadTexture( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
+                          HlmsComputeJob *job, uint8 slotIdx );
+        void loadUav( const rapidjson::Value &json, HlmsComputeJob *job, uint8 slotIdx );
     public:
         HlmsJsonCompute( HlmsManager *hlmsManager );
 
