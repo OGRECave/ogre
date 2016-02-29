@@ -359,9 +359,6 @@ namespace Ogre
     void HlmsJsonCompute::loadJob( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                                    HlmsComputeJob *job, const String &jobName )
     {
-        assert( dynamic_cast<HlmsCompute*>( job->getCreator() ) );
-        HlmsCompute *hlmsCompute = static_cast<HlmsCompute*>( job->getCreator() );
-
         rapidjson::Value::ConstMemberIterator itor = json.FindMember( "threads_per_group" );
         if( itor != json.MemberEnd() && itor->value.IsArray() )
         {
@@ -492,6 +489,49 @@ namespace Ogre
                 if( jsonArray[i].IsObject() )
                     loadUav( jsonArray[i], job, i );
             }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonCompute::loadJobs( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks )
+    {
+        HlmsCompute *hlmsCompute = mHlmsManager->getComputeHlms();
+
+        StringVector pieceFiles;
+
+        rapidjson::Value::ConstMemberIterator itJob = json.MemberBegin();
+        rapidjson::Value::ConstMemberIterator enJob = json.MemberEnd();
+
+        while( itJob != enJob )
+        {
+            if( itJob->value.IsObject() )
+            {
+                const String jobName( itJob->name.GetString(), itJob->name.GetStringLength() );
+                pieceFiles.clear();
+
+                rapidjson::Value::ConstMemberIterator itor = itJob->value.FindMember( "pieces" );
+                if( itor != itJob->value.MemberEnd() && itor->value.IsString() )
+                    pieceFiles.push_back( itor->value.GetString() );
+                else if( itor != itJob->value.MemberEnd() && itor->value.IsArray() )
+                {
+                    const rapidjson::Value &jsonArray = itor->value;
+                    for( rapidjson::SizeType i=0; i<jsonArray.Size(); ++i )
+                    {
+                        if( jsonArray[i].IsString() )
+                            pieceFiles.push_back( jsonArray[i].GetString() );
+                    }
+                }
+
+                itor = itJob->value.FindMember( "source" );
+                if( itor != itJob->value.MemberEnd() && itor->value.IsString() )
+                {
+                    HlmsComputeJob *job = hlmsCompute->createComputeJob( jobName, jobName,
+                                                                         itor->value.GetString(),
+                                                                         pieceFiles );
+                    loadJob( itJob->value, blocks, job, jobName );
+                }
+            }
+
+            ++itJob;
         }
     }
 }

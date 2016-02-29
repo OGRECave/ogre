@@ -60,6 +60,8 @@ namespace Ogre
     public:
         HlmsJsonCompute( HlmsManager *hlmsManager );
 
+        void loadJobs( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks );
+
         void loadJob( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                       HlmsComputeJob *job, const String &jobName );
         void saveJob( const HlmsComputeJob *job, String &outString );
