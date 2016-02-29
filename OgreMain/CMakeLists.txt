@@ -103,6 +103,7 @@ elseif (WIN32)
       include/WIN32/OgreErrorDialogImp.h
       include/WIN32/OgreTimerImp.h
       include/WIN32/OgreMinGWSupport.h
+      include/WIN32/OgreComPtr.h
     )
     
     list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/OgreErrorDialogNoOp.cpp")
