@@ -211,34 +211,37 @@ namespace Ogre {
 
         /** Calculate the local roll element of this quaternion.
         @param reprojectAxis By default the method returns the 'intuitive' result
-            that is, if you projected the local Y of the quaternion onto the X and
-            Y axes, the angle between them is returned. If set to false though, the
-            result is the actual yaw that will be used to implement the quaternion,
-            which is the shortest possible path to get to the same orientation and 
-             may involve less axial rotation.  The co-domain of the returned value is 
-             from -180 to 180 degrees.
+            that is, if you projected the local X of the quaternion onto the XY plane,
+            the angle between it and global X is returned. The co-domain of the returned
+            value is from -180 to 180 degrees. If set to false though, the result is
+            the rotation around Z axis that could be used to implement the quaternion
+            using some non-intuitive order of rotations. This behavior is preserved for
+            backward compatibility, to decompose quaternion into yaw, pitch and roll use
+            q.ToRotationMatrix().ToEulerAnglesYXZ(yaw, pitch, roll) instead.
         */
         Radian getRoll(bool reprojectAxis = true) const;
         /** Calculate the local pitch element of this quaternion
         @param reprojectAxis By default the method returns the 'intuitive' result
-            that is, if you projected the local Z of the quaternion onto the X and
-            Y axes, the angle between them is returned. If set to true though, the
-            result is the actual yaw that will be used to implement the quaternion,
-            which is the shortest possible path to get to the same orientation and 
-            may involve less axial rotation.  The co-domain of the returned value is 
-            from -180 to 180 degrees.
+            that is, if you projected the local Y of the quaternion onto the YZ plane,
+            the angle between it and global Y is returned. The co-domain of the returned
+            value is from -180 to 180 degrees. If set to false though, the result is
+            the rotation around X axis that could be used to implement the quaternion
+            using some non-intuitive order of rotations. This behavior is preserved for
+            backward compatibility, to decompose quaternion into yaw, pitch and roll use
+            q.ToRotationMatrix().ToEulerAnglesYXZ(yaw, pitch, roll) instead.
         */
         Radian getPitch(bool reprojectAxis = true) const;
         /** Calculate the local yaw element of this quaternion
         @param reprojectAxis By default the method returns the 'intuitive' result
-            that is, if you projected the local Y of the quaternion onto the X and
-            Z axes, the angle between them is returned. If set to true though, the
-            result is the actual yaw that will be used to implement the quaternion,
-            which is the shortest possible path to get to the same orientation and 
-            may involve less axial rotation. The co-domain of the returned value is 
-            from -180 to 180 degrees.
+            that is, if you projected the local Z of the quaternion onto the ZX plane,
+            the angle between it and global Z is returned. The co-domain of the returned
+            value is from -180 to 180 degrees. If set to false though, the result is
+            the rotation around Y axis that could be used to implement the quaternion 
+            using some non-intuitive order of rotations. This behavior is preserved for
+            backward compatibility, to decompose quaternion into yaw, pitch and roll use
+            q.ToRotationMatrix().ToEulerAnglesYXZ(yaw, pitch, roll) instead.
         */
-        Radian getYaw(bool reprojectAxis = true) const;        
+        Radian getYaw(bool reprojectAxis = true) const;
         
         /** Equality with tolerance (tolerance is max angle difference)
         @remark Both equals() and orientationEquals() measure the exact same thing.
