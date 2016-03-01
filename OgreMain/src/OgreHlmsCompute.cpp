@@ -227,7 +227,7 @@ namespace Ogre
             OGRE_HASH128_FUNC( outString.c_str(), outString.size(), IdString::Seed, &hashVal );
 
             CompiledShaderMap::const_iterator itor = mCompiledShaderCache.find( hashVal );
-            if( itor == mCompiledShaderCache.end() )
+            if( itor != mCompiledShaderCache.end() )
             {
                 shader = itor->second;
             }

@@ -303,7 +303,7 @@ namespace Ogre
         HlmsProperty p( key, 0 );
         HlmsPropertyVec::iterator it = std::lower_bound( mSetProperties.begin(), mSetProperties.end(),
                                                          p, OrderPropertyByIdString );
-        if( it == mSetProperties.end() || it->keyName != p.keyName )
+        if( it != mSetProperties.end() && it->keyName == p.keyName )
             mSetProperties.erase( it );
     }
     //-----------------------------------------------------------------------------------
