@@ -59,9 +59,19 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     HlmsComputeJob::~HlmsComputeJob()
     {
-        //If you get a crash inside this destructor (as part of the callstack, the
-        //actual crash can end up somewhere on Resource::unload), then you're leaking
-        //a MaterialPtr outside of Ogre.
+        HlmsManager *hlmsManager = mCreator->getHlmsManager();
+        TextureSlotVec::iterator itor = mTextureSlots.begin();
+        TextureSlotVec::iterator end  = mTextureSlots.end();
+
+        while( itor != end )
+        {
+            if( itor->samplerblock )
+            {
+                hlmsManager->destroySamplerblock( itor->samplerblock );
+                itor->samplerblock = 0;
+            }
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::updateAutoProperties( const TextureSlotVec &textureSlots,

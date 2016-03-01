@@ -268,15 +268,6 @@ namespace Ogre
             return *this;
         }
 
-        LwString& a( size_t a0 )
-        {
-#if OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32
-            return a( (uint32)a0 );
-#else
-            return a( (uint64)a0 );
-#endif
-        }
-
         struct Float
         {
             float   mValue;

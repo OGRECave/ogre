@@ -2040,6 +2040,7 @@ namespace Ogre {
 
         mUseAdjacency   = false;
         mPso            = 0;
+        mCurrentComputeShader = 0;
 
         if( !pso )
             return;
@@ -2112,6 +2113,7 @@ namespace Ogre {
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
         _setPipelineStateObject( 0 );
+        _setComputePso( 0 );
 
         glBindProgramPipeline( 0 );
     }
@@ -2444,23 +2446,6 @@ namespace Ogre {
         }
 
         activateGLTextureUnit(0);
-
-        // Launch compute shader job(s).
-        if (mCurrentComputeShader) // && mComputeProgramPosition == CP_PRERENDER && mComputeProgramExecutions <= compute_execution_cap)
-        {
-            //FIXME give user control over when and what memory barriers are created
-            // if (mPreComputeMemoryBarrier)
-            OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
-            Vector3 workgroupDim = mCurrentComputeShader->getComputeGroupDimensions();
-            OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0],
-                                                  workgroupDim[1],
-                                                  workgroupDim[2]));
-            // if (mPostComputeMemoryBarrier)
-            //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
-            // if (compute_execution_cap > 0)
-            //     mComputeProgramExecutions++;
-        }
-
 
         // Determine the correct primitive type to render.
         GLint primType;

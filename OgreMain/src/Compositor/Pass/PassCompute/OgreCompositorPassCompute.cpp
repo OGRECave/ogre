@@ -147,6 +147,30 @@ namespace Ogre
 
         executeResourceTransitions();
 
+        //Set textures/uavs every frame
+        const CompositorPassComputeDef::TextureSources &textureSources = mDefinition->getTextureSources();
+        CompositorPassComputeDef::TextureSources::const_iterator itor = textureSources.begin();
+        CompositorPassComputeDef::TextureSources::const_iterator end  = textureSources.end();
+        while( itor != end )
+        {
+            //Pass a null samplerblock to keep the previous one we
+            //set in the constructor (avoids the lookup every call)
+            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+            mComputeJob->setTexture( itor->texUnitIdx, texture, (const HlmsSamplerblock*)0 );
+            ++itor;
+        }
+
+        const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
+        itor = uavSources.begin();
+        end  = uavSources.end();
+        while( itor != end )
+        {
+            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+            mComputeJob->setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
+                                        itor->access, itor->mipmapLevel, itor->pixelFormat );
+            ++itor;
+        }
+
         //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
