@@ -905,7 +905,7 @@ namespace Ogre
                     ID_PASS_OP,
                     ID_TWO_SIDED,
 
-                    //Used by PASS_UAV
+                    //Used by PASS_UAV (& PASS_COMPUTE)
                     ID_UAV,
                     ID_UAV_EXTERNAL,
                     ID_STARTING_SLOT,
@@ -913,6 +913,9 @@ namespace Ogre
                     ID_READ,
                     ID_WRITE,
                     ID_MIPMAP,
+
+                    //Used by PASS_COMPUTE
+                    ID_JOB,
 
             ID_READ_BACK_AS_TEXTURE,
 

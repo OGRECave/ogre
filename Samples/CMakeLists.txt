@@ -220,6 +220,6 @@ if (MSVC)
   endif()
 endif()
 
-if( OGRE_BUILD_SAMPLES2 )
+if( OGRE_BUILD_SAMPLES2 OR OGRE_BUILD_TESTS2 )
     add_subdirectory(2.0)
 endif ()

@@ -165,8 +165,10 @@ namespace Ogre
         //Collect pieces
         mPieces.clear();
 
+        const String sourceFilename = job->mSourceFilename + mShaderFileExt;
+
         ResourceGroupManager &resourceGroupMgr = ResourceGroupManager::getSingleton();
-        DataStreamPtr inFile = resourceGroupMgr.openResource( job->mSourceFilename );
+        DataStreamPtr inFile = resourceGroupMgr.openResource( sourceFilename );
 
         if( mShaderProfile == "glsl" ) //TODO: String comparision
             setProperty( HlmsBaseProp::GL3Plus, 330 );

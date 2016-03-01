@@ -97,6 +97,13 @@ namespace Ogre
         for( rapidjson::SizeType i=0; i<jsonArray.Size(); ++i )
         {
             const rapidjson::Value &subArray = jsonArray[i];
+
+            if( !subArray.IsArray() )
+            {
+                //Not an array. Could be a comment. Skip it.
+                continue;
+            }
+
             if( subArray.Size() < 2u || subArray.Size() > 3u )
             {
                 LogManager::getSingleton().logMessage( "Error parsing JSON '" + jobName +
@@ -320,7 +327,7 @@ namespace Ogre
         ResourceAccess::ResourceAccess access = ResourceAccess::Undefined;
 
         rapidjson::Value::ConstMemberIterator itor = json.FindMember( "access" );
-        if( itor != json.MemberEnd() && itor->value.IsString() || itor->value.IsArray() )
+        if( itor != json.MemberEnd() && (itor->value.IsString() || itor->value.IsArray()) )
             access = parseAccess( itor->value );
 
         itor = json.FindMember( "slice" );
@@ -413,16 +420,6 @@ namespace Ogre
             }
             else
                 job->setNumThreadGroups( val[0], val[1], val[2] );
-        }
-
-        itor = json.FindMember( "shaders" );
-        if( itor != json.MemberEnd() && itor->value.IsObject() )
-        {
-            const rapidjson::Value &subobj = itor->value;
-
-//            itor = subobj.FindMember( "source" );
-//            if( itor != subobj.MemberEnd() && itor->value.IsString() )
-//                job->getName() = static_cast<float>( itor->value.GetDouble() );
         }
 
         itor = json.FindMember( "properties" );

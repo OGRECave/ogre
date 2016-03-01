@@ -316,6 +316,8 @@ namespace Ogre{
                                    StencilStateOp *stencilStateOp );
         void translateUav( ScriptCompiler *compiler, const AbstractNodePtr &node,
                            CompositorTargetDef *targetDef );
+        void translateCompute( ScriptCompiler *compiler, const AbstractNodePtr &node,
+                               CompositorTargetDef *targetDef );
 
     public:
         CompositorPassTranslator();

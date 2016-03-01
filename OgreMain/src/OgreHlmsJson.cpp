@@ -31,6 +31,7 @@ THE SOFTWARE.
 #if !OGRE_NO_JSON
 
 #include "OgreHlmsJson.h"
+#include "OgreHlmsJsonCompute.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
 #include "OgreLwString.h"
@@ -584,6 +585,12 @@ namespace Ogre
                 {
                     loadDatablocks( itDatablock->value, blocks, hlms );
                 }
+            }
+
+            if( typeName == "compute" )
+            {
+                HlmsJsonCompute jsonCompute( mHlmsManager );
+                jsonCompute.loadJobs( itDatablock->value, blocks );
             }
 
             ++itDatablock;

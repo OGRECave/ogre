@@ -91,7 +91,7 @@ namespace Ogre
         IdString mJobName;
 
 		CompositorPassComputeDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
-            CompositorPassDef( PASS_QUAD, rtIndex ),
+            CompositorPassDef( PASS_COMPUTE, rtIndex ),
             mParentNodeDef( parentNodeDef )
         {
         }

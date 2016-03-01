@@ -1305,6 +1305,8 @@ namespace Ogre
         mIds["starting_slot"]   = ID_STARTING_SLOT;
         mIds["keep_previous_uavs"]= ID_KEEP_PREVIOUS_UAV;
 
+        mIds["job"]             = ID_JOB;
+
         mIds["compositor_node_shadow"]  = ID_SHADOW_NODE;
         mIds["num_splits"]              = ID_NUM_SPLITS;
         mIds["pssm_split_padding"]      = ID_PSSM_SPLIT_PADDING;

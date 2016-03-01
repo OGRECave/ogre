@@ -1,0 +1,48 @@
+{
+    "compute" :
+    {
+        "TestJob" :
+        {
+            "threads_per_group" : [16, 16, 1],
+            "thread_groups" : [16, 16, 1],
+
+            "source" : "ComputeTest",
+
+            "textures   " :
+            [
+                {
+                    "texture_hlms" : ["texture0.png", "variableNameHoldingSliceIdx"],
+                    "sampler" : "unique_name"
+                }
+            ],
+
+            "uav" :
+            [
+                {
+                }
+            ],
+
+            "params" :
+            [
+                {
+                    "Comment0" :
+                    [
+                    "If 2nd parameter is a string, it's an auto parameter. If it's an array,",
+                    "it's manual. The 3rd parameter is optional. For auto params it's the",
+                    "extra param needed, for manual params valid options are int uint float"
+                    ]
+                },
+
+                ["arbitraryParam",  [5.0, 7.0, 8.0]],
+                ["cameraPos",       "camera_position"],
+                ["integerVar",      [0], "int"],
+                ["texProj0",        "texture_viewproj_matrix", 0]
+            ],
+
+            "params_glsl" :
+            [
+                ["rtt0",     [0], "int"]
+            ]
+        }
+    }
+}

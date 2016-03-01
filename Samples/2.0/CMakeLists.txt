@@ -3,17 +3,20 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 include_directories(${CMAKE_SOURCE_DIR}/Components/Overlay/include)
 
-if (OGRE_BUILD_SAMPLES2 AND NOT SDL2_FOUND)
+if (OGRE_BUILD_SAMPLES2 OR OGRE_BUILD_TESTS2 AND NOT SDL2_FOUND)
     message(STATUS "Could not find dependency: SDL2")
-    message(STATUS "Skipping samples build")
+    message(STATUS "Skipping samples & tests build")
     set(OGRE_BUILD_SAMPLES2 0)
+    set(OGRE_BUILD_TESTS2 0)
 else()
     include_directories(${SDL2_INCLUDE_DIR})
 endif()
 
-if( OGRE_BUILD_SAMPLES2 )
+if( OGRE_BUILD_SAMPLES2 OR OGRE_BUILD_TESTS2 )
     add_subdirectory(Common)
+endif()
 
+if( OGRE_BUILD_SAMPLES2 )
 	set( OGRE_SAMPLES_LIBRARIES "OgreSamplesCommon" "OgreOverlay" )
 
 	add_subdirectory(ApiUsage/AnimationTagPoint)
@@ -41,4 +44,9 @@ if( OGRE_BUILD_SAMPLES2 )
 	add_subdirectory(Tutorials/TutorialSky_Postprocess)
 	add_subdirectory(Tutorials/TutorialUav01_Setup)
 	add_subdirectory(Tutorials/TutorialUav02_Setup)
+endif()
+
+if( OGRE_BUILD_TESTS2 )
+	set( OGRE_SAMPLES_LIBRARIES "OgreSamplesCommon" "OgreOverlay" )
+	add_subdirectory(Tests/Compute01)
 endif()
