@@ -48,6 +48,7 @@ void FFP_Light_Directional_Diffuse(in mat4 mWorldViewIT,
 	float nDotL = dot(vNormalView, vNegLightDirView);
 	
 	vOut = vBaseColour + vDiffuseColour * clamp(nDotL, 0.0, 1.0);
+	vOut = clamp(vOut, 0.0, 1.0);
 }
 
 
@@ -79,6 +80,7 @@ void FFP_Light_Directional_DiffuseSpecular(in mat4 mWorldView,
 		vOutDiffuse  += vDiffuseColour * nDotL;		
 		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower);						
 	}
+	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
 }
 
 
@@ -106,7 +108,8 @@ void FFP_Light_Point_Diffuse(in mat4 mWorldView,
 		float fAtten	   = 1.0 / (vAttParams.y + vAttParams.z*fLightD + vAttParams.w*fLightD*fLightD);
 			
 		vOut += vDiffuseColour * nDotL * fAtten;
-	}		
+	}
+	vOut = clamp(vOut, 0.0, 1.0);	
 }
 
 //-----------------------------------------------------------------------------
@@ -144,7 +147,8 @@ void FFP_Light_Point_DiffuseSpecular(in mat4 mWorldView,
 		
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten;
 		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten;					
-	}		
+	}
+	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);	
 }
 
 //-----------------------------------------------------------------------------
@@ -177,7 +181,9 @@ void FFP_Light_Spot_Diffuse(in mat4 mWorldView,
 		float fSpotT	= pow(fSpotE, vSpotParams.z);	
 						
 		vOut += vDiffuseColour * nDotL * fAtten * fSpotT;
-	}		
+	}
+	
+	vOut = clamp(vOut, 0.0, 1.0);
 }
 
 //-----------------------------------------------------------------------------
@@ -221,5 +227,7 @@ void FFP_Light_Spot_DiffuseSpecular(in mat4 mWorldView,
 						
 		vOutDiffuse  += vDiffuseColour * nDotL * fAtten * fSpotT;
 		vOutSpecular += vSpecularColour * pow(clamp(nDotH, 0.0, 1.0), fSpecularPower) * fAtten * fSpotT;
-	}		
+	}
+	
+	vOutSpecular = clamp(vOutSpecular, 0.0, 1.0);
 }
