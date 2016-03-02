@@ -1,16 +1,30 @@
 @property( !metallic_workflow && (!specular_map || !fresnel_workflow) )
 	@property( !transparent_mode )
-		@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ))@end
-		@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle )@end
+		@piece( F0 )material.F0@end
 	@end @property( transparent_mode )
 		//Premultiply F0.xyz with the alpha from the texture, but only in transparent mode.
-		@piece( getSpecularFresnel )material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - VdotH, 5.0 ) * (1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
-		@piece( getDiffuseFresnel )1.0 - material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w + pow( 1.0 - NdotL, 5.0 ) * material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w@end
+		@piece( F0 )(material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
 	@end
 @end @property( metallic_workflow || (specular_map && fresnel_workflow) )
-	@piece( getSpecularFresnel )F0 + pow( 1.0 - VdotH, 5.0 ) * (1.0 - F0)@end
-	@piece( getDiffuseFresnel )1.0 - F0 + pow( 1.0 - NdotL, 5.0 ) * F0@end
+	@piece( F0 )F0@end
 @end
+
+@property( !fresnel_scalar )
+	@piece( maxR1F0 )max( 1.0 - ROUGHNESS, @insertpiece( F0 ).x )@end
+@end @property( fresnel_scalar )
+	@piece( maxR1F0 )max( (1.0 - ROUGHNESS).xxx, @insertpiece( F0 ).xyz )@end
+@end
+
+//For mortals:
+//	getSpecularFresnel	= F0 + pow( 1.0 - VdotH, 5.0 ) * (1.0 - F0)
+//	getDiffuseFresnel	= 1.0 - F0 + pow( 1.0 - NdotL, 5.0 ) * F0
+//	getSpecularFresnelWithRoughness = F0 + pow( 1.0 - VdotH, 5.0 ) * (max(ROUGHNESS, (1.0 - F0)) - F0)
+//	getDiffuseFresnelWithRoughness = max(ROUGHNESS, (1.0 - F0) - F0 + pow( 1.0 - NdotL, 5.0 ) * F0
+@piece( getSpecularFresnel )@insertpiece( F0 ).@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (1.0 - @insertpiece( F0 ).@insertpiece( FresnelSwizzle ))@end
+@piece( getDiffuseFresnel )1.0 - @insertpiece( F0 ).@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * @insertpiece( F0 ).@insertpiece( FresnelSwizzle )@end
+
+@piece( getSpecularFresnelWithRoughness )@insertpiece( F0 ).@insertpiece( FresnelSwizzle ) + pow( 1.0 - VdotH, 5.0 ) * (@insertpiece( maxR1F0 ) - @insertpiece( F0 ).@insertpiece( FresnelSwizzle ))@end
+@piece( getDiffuseFresnelWithRoughness )@insertpiece( maxR1F0 ) - @insertpiece( F0 ).@insertpiece( FresnelSwizzle ) + pow( 1.0 - NdotL, 5.0 ) * @insertpiece( F0 ).@insertpiece( FresnelSwizzle )@end
 
 @property( !fresnel_scalar )
 	@piece( getMaxFresnelS )fresnelS@end
@@ -129,13 +143,23 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 @end
 @end
 
+/// Applying Fresnel term to prefiltered cubemap has a bad effect of always showing high specular
+/// color at edge, even for rough surface. See https://seblagarde.wordpress.com/2011/08/17/hello-world/
+/// and see http://www.ogre3d.org/forums/viewtopic.php?f=25&p=523550#p523544
+/// "The same Fresnel term which is appropriate for unfiltered environment maps (i.e. perfectly smooth
+/// mirror surfaces) is not appropriate for filtered environment maps since there you are averaging
+/// incoming light colors from many directions, but using a single Fresnel value computed for the
+///	reflection direction. The correct function has similar values as the regular Fresnel expression
+/// at v=n, but at glancing angle it behaves differently. In particular, the lerp(from base specular
+/// to white) does not go all the way to white at glancing angles in the case of rough surfaces."
+/// So we use getSpecularFresnelWithRoughness instead.
 @piece( BRDF_EnvMap )
 	float NdotL = clamp( dot( nNormal, reflDir ), 0.0, 1.0 );
 	float VdotH = clamp( dot( viewDir, normalize( reflDir + viewDir ) ), 0.0, 1.0 );
-	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnel );
+	@insertpiece( FresnelType ) fresnelS = @insertpiece( getSpecularFresnelWithRoughness );
 
 	@property( fresnel_separate_diffuse )
-		@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
+		@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnelWithRoughness );
 	@end @property( !fresnel_separate_diffuse )
 		float fresnelD = 1.0f - @insertpiece( getMaxFresnelS );@end
 
