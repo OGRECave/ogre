@@ -332,6 +332,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsCompute::dispatch( HlmsComputeJob *job, SceneManager *sceneManager, Camera *camera )
     {
+        job->_calculateNumThreadGroupsBasedOnSetting();
+
         if( job->mPsoCacheHash >= mComputeShaderCache.size() )
         {
             //Potentially needs to recompile.
@@ -431,6 +433,7 @@ namespace Ogre
             ++itUav;
         }
 
+        mAutoParamDataSource->setCurrentJob( job );
         mAutoParamDataSource->setCurrentCamera( camera );
         mAutoParamDataSource->setCurrentSceneManager( sceneManager );
         //mAutoParamDataSource->setCurrentShadowNode( shadowNode );

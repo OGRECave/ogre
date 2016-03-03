@@ -47,6 +47,18 @@ namespace Ogre
     {
         friend class HlmsCompute;
 
+    public:
+        enum ThreadGroupsBasedOn
+        {
+            /// Disabled. (obey @see setNumThreadGroups)
+            ThreadGroupsBasedOnNothing,
+            /// Based the number of thread groups on a texture. @see setNumThreadGroupsBasedOn
+            ThreadGroupsBasedOnTexture,
+            /// Based the number of thread groups on a UAV. @see setNumThreadGroupsBasedOn
+            ThreadGroupsBasedOnUav,
+        };
+
+    protected:
         struct ConstBufferSlot
         {
             uint8 slotIdx;
@@ -100,6 +112,9 @@ namespace Ogre
         uint32  mThreadsPerGroup[3];
         /// @see setNumThreadGroups
         uint32  mNumThreadGroups[3];
+
+        ThreadGroupsBasedOn mThreadGroupsBasedOnTexture;
+        uint8               mThreadGroupsBasedOnTexSlot;
 
         ConstBufferSlotVec  mConstBuffers;
         TextureSlotVec      mTextureSlots;
@@ -182,6 +197,27 @@ namespace Ogre
         */
         void setNumThreadGroups( uint32 numThreadGroupsX, uint32 numThreadGroupsY, uint32 numThreadGroupsZ );
 
+        /** Instead of calling setNumThreadGroups, Ogre can automatically deduce
+            them based on the Texture resolution and the threads per group.
+            It is calculated as follows:
+                numThreadGroupsX = (textureWidth + threadsPerGroupX - 1u) / threadsPerGroupX;
+        @remarks
+            Unless disabled, this will overwrite your setNumThreadGroups based on the
+            texture bound at the time the job is dispatched.
+        @par
+            If no texture/uav is bound at the given slot (or no such slot exists), we
+            will log a warning.
+        @param source
+            What to use as source for the calculations. @see ThreadGroupsBasedOn
+        @param texSlot
+            Index of the texture/uav unit.
+        */
+        void setNumThreadGroupsBasedOn( ThreadGroupsBasedOn source, uint8 texSlot );
+
+        /// INTERNAL USE. Calculates the number of thread groups as specified
+        /// in @see setNumThreadGroupsBasedOn, overriding setNumThreadGroups.
+        void _calculateNumThreadGroupsBasedOnSetting();
+
         /** Sets an arbitrary property to pass to the shader.
         @remarks
             Will trigger a recompilation if the value changes, regardless of
@@ -220,6 +256,8 @@ namespace Ogre
         /// Destroys a given texture unit, displacing all the higher tex units.
         void removeTexUnit( uint8 slotIdx );
         size_t getNumTexUnits(void) const               { return mTextureSlots.size(); }
+
+        const TexturePtr& getTexture( uint8 slotIdx ) const;
 
         /// @copydoc setNumTexUnits
         void setNumUavUnits( uint8 numSlots );

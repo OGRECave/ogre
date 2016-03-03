@@ -424,6 +424,24 @@ namespace Ogre
                 job->setNumThreadGroups( val[0], val[1], val[2] );
         }
 
+        itor = json.FindMember( "inform_shader_of_texture_data_change" );
+        if( itor != json.MemberEnd() && itor->value.IsBool() )
+            job->setInformHlmsOfTextureData( itor->value.GetBool() );
+
+        itor = json.FindMember( "thread_groups_based_on_texture" );
+        if( itor != json.MemberEnd() && itor->value.IsUint() )
+        {
+            job->setNumThreadGroupsBasedOn( HlmsComputeJob::ThreadGroupsBasedOnTexture,
+                                            static_cast<uint8>( itor->value.GetUint() ) );
+        }
+
+        itor = json.FindMember( "thread_groups_based_on_uav" );
+        if( itor != json.MemberEnd() && itor->value.IsUint() )
+        {
+            job->setNumThreadGroupsBasedOn( HlmsComputeJob::ThreadGroupsBasedOnUav,
+                                            static_cast<uint8>( itor->value.GetUint() ) );
+        }
+
         itor = json.FindMember( "properties" );
         if( itor != json.MemberEnd() && itor->value.IsObject() )
         {

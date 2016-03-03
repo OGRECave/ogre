@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreLwString.h"
 
+#include "OgreLogManager.h"
+
 namespace Ogre
 {
     //-----------------------------------------------------------------------------------
@@ -48,6 +50,8 @@ namespace Ogre
         mName( name ),
         mSourceFilename( sourceFilename ),
         mIncludedPieceFiles( includedPieceFiles ),
+        mThreadGroupsBasedOnTexture( ThreadGroupsBasedOnNothing ),
+        mThreadGroupsBasedOnTexSlot( 0 ),
         mInformHlmsOfTextureData( false ),
         mMaxTexUnitReached( 0 ),
         mMaxUavUnitReached( 0 ),
@@ -283,6 +287,58 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::setNumThreadGroupsBasedOn( ThreadGroupsBasedOn source, uint8 texSlot )
+    {
+        mThreadGroupsBasedOnTexture = source;
+        mThreadGroupsBasedOnTexSlot = texSlot;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::_calculateNumThreadGroupsBasedOnSetting()
+    {
+        bool hasChanged = false;
+
+        if( mThreadGroupsBasedOnTexture != ThreadGroupsBasedOnNothing )
+        {
+            const TextureSlotVec &texSlots = mThreadGroupsBasedOnTexture == ThreadGroupsBasedOnTexture ?
+                        mTextureSlots : mUavSlots;
+
+            if( mThreadGroupsBasedOnTexSlot < texSlots.size() &&
+                !texSlots[mThreadGroupsBasedOnTexSlot].texture.isNull() )
+            {
+                const TexturePtr &tex = texSlots[mThreadGroupsBasedOnTexSlot].texture;
+
+                uint32 resolution[3];
+                resolution[0] = tex->getWidth();
+                resolution[1] = tex->getHeight();
+                resolution[2] = tex->getDepth();
+
+                if( tex->getTextureType() == TEX_TYPE_CUBE_MAP )
+                    resolution[2] = tex->getNumFaces();
+
+                for( uint32 i=0; i<3u; ++i )
+                {
+                    uint32 numThreadGroups = (resolution[i] + mThreadsPerGroup[i] - 1u) /
+                            mThreadsPerGroup[i];
+                    if( mNumThreadGroups[i] != numThreadGroups )
+                    {
+                        mNumThreadGroups[i] = numThreadGroups;
+                        hasChanged = true;
+                    }
+                }
+            }
+            else
+            {
+                LogManager::getSingleton().logMessage(
+                            "WARNING: No texture/uav bound to compute job '" + mName.getFriendlyText() +
+                            "' at slot " + StringConverter::toString(mThreadGroupsBasedOnTexSlot) +
+                            " while calculating number of thread groups based on texture");
+            }
+        }
+
+        if( hasChanged )
+            mPsoCacheHash = -1;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setProperty( IdString key, int32 value )
     {
         HlmsProperty p( key, value );
@@ -410,6 +466,11 @@ namespace Ogre
         mTextureSlots.erase( mTextureSlots.begin() + slotIdx );
         if( mInformHlmsOfTextureData )
             mPsoCacheHash = -1;
+    }
+    //-----------------------------------------------------------------------------------
+    const TexturePtr& HlmsComputeJob::getTexture( uint8 slotIdx ) const
+    {
+        return mTextureSlots[slotIdx].texture;
     }
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setNumUavUnits( uint8 numSlots )

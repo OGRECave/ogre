@@ -4,7 +4,8 @@
         "TestJob" :
         {
             "threads_per_group" : [16, 16, 1],
-            "thread_groups" : [16, 16, 1],
+            "thread_groups" : [32, 32, 1],
+            "thread_groups_based_on_uav" : 0,
 
             "source" : "ComputeTest",
 
