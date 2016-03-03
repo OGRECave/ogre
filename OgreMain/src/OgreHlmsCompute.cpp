@@ -260,7 +260,7 @@ namespace Ogre
                 if( shaderParams )
                     shaderParams->updateParameters( gp->getDefaultParameters() );
 
-                shaderParams = job->_getShaderParams( mShaderFileExt );
+                shaderParams = job->_getShaderParams( mShaderProfile );
                 if( shaderParams )
                     shaderParams->updateParameters( gp->getDefaultParameters() );
 
@@ -330,7 +330,7 @@ namespace Ogre
         mComputeShaderCache.clear();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsCompute::dispatch( HlmsComputeJob *job )
+    void HlmsCompute::dispatch( HlmsComputeJob *job, SceneManager *sceneManager, Camera *camera )
     {
         if( job->mPsoCacheHash >= mComputeShaderCache.size() )
         {
@@ -374,6 +374,8 @@ namespace Ogre
         }
 
         const ComputePsoCache &psoCache = mComputeShaderCache[job->mPsoCacheHash];
+
+        mRenderSystem->_setComputePso( &psoCache.pso );
 
         HlmsComputeJob::ConstBufferSlotVec::const_iterator itConst =
                 job->mConstBuffers.begin();
@@ -429,7 +431,15 @@ namespace Ogre
             ++itUav;
         }
 
-        mRenderSystem->_setComputePso( &psoCache.pso );
+        mAutoParamDataSource->setCurrentCamera( camera );
+        mAutoParamDataSource->setCurrentSceneManager( sceneManager );
+        //mAutoParamDataSource->setCurrentShadowNode( shadowNode );
+        //mAutoParamDataSource->setCurrentViewport( sceneManager->getCurrentViewport() );
+
+        GpuProgramParametersSharedPtr csParams = psoCache.pso.computeShader->getDefaultParameters();
+        csParams->_updateAutoParams( mAutoParamDataSource, GPV_ALL );
+        mRenderSystem->bindGpuProgramParameters( GPT_COMPUTE_PROGRAM, csParams, GPV_ALL );
+
         mRenderSystem->_dispatch( psoCache.pso );
     }
     //----------------------------------------------------------------------------------

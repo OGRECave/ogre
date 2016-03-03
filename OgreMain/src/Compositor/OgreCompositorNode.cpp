@@ -459,7 +459,7 @@ namespace Ogre
                 case PASS_COMPUTE:
                     newPass = OGRE_NEW CompositorPassCompute(
                                             static_cast<CompositorPassComputeDef*>(*itPass),
-                                            this, *channel );
+                                            mWorkspace->getDefaultCamera(),  this, *channel );
                     break;
                 case PASS_CUSTOM:
                     {

@@ -159,7 +159,7 @@ namespace Ogre
         virtual void clearShaderCache(void);
 
         /// Main function for dispatching a compute job.
-        void dispatch( HlmsComputeJob *job );
+        void dispatch( HlmsComputeJob *job, SceneManager *sceneManager, Camera *camera );
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
 

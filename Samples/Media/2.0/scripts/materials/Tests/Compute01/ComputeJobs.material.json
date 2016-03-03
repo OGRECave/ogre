@@ -33,15 +33,12 @@
                     ]
                 },
 
-                ["arbitraryParam",  [5.0, 7.0, 8.0]],
-                ["cameraPos",       "camera_position"],
-                ["integerVar",      [0], "int"],
-                ["texProj0",        "texture_viewproj_matrix", 0]
+                ["cameraPos",       "camera_position"]
             ],
 
             "params_glsl" :
             [
-                ["rtt0",     [0], "int"]
+                ["testTexture",     [0], "int"]
             ]
         }
     }

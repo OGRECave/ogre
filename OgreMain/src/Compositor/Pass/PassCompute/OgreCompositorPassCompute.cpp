@@ -76,10 +76,12 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     CompositorPassCompute::CompositorPassCompute( const CompositorPassComputeDef *definition,
+                                                  Camera *defaultCamera,
                                                   CompositorNode *parentNode,
                                                   const CompositorChannel &target ) :
         CompositorPass( definition, target, parentNode ),
-        mDefinition( definition )
+        mDefinition( definition ),
+        mCamera( 0 )
     {
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
         HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
@@ -129,6 +131,12 @@ namespace Ogre
                                         itor->access, itor->mipmapLevel, itor->pixelFormat );
             ++itor;
         }
+
+        const CompositorWorkspace *workspace = parentNode->getWorkspace();
+        if( mDefinition->mCameraName != IdString() )
+            mCamera = workspace->findCamera( mDefinition->mCameraName );
+        else
+            mCamera = defaultCamera;
     }
     //-----------------------------------------------------------------------------------
 	void CompositorPassCompute::execute( const Camera *lodCamera )
@@ -178,8 +186,12 @@ namespace Ogre
 
         assert( dynamic_cast<HlmsCompute*>( mComputeJob->getCreator() ) );
 
+        SceneManager *sceneManager = 0;
+        if( mCamera )
+            sceneManager = mCamera->getSceneManager();
+
         HlmsCompute *hlmsCompute = static_cast<HlmsCompute*>( mComputeJob->getCreator() );
-        hlmsCompute->dispatch( mComputeJob );
+        hlmsCompute->dispatch( mComputeJob, sceneManager, mCamera );
 
         if( listener )
             listener->passPosExecute( this );

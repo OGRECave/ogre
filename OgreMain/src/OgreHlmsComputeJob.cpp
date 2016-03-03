@@ -157,7 +157,7 @@ namespace Ogre
             {
                 const size_t slotIdx = itor - begin;
                 propName.resize( texturePropSize );
-                propName.a( slotIdx );                      //texture0 or uav0
+                propName.a( static_cast<uint32>(slotIdx) ); //texture0 or uav0
                 setProperty( propName.c_str(), 1 );
 
                 if( !itor->texture.isNull() )

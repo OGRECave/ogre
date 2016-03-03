@@ -12,8 +12,12 @@ layout( local_size_x = @value( threads_per_group_x ),
 //in uvec3 gl_GlobalInvocationID;
 //in uint  gl_LocalInvocationIndex;
 
+//uniform vec3 cameraPos;
+
 void main()
 {
     imageStore( testTexture, ivec2(gl_GlobalInvocationID.xy),
                 vec4( vec2(gl_LocalInvocationID.xy) / 16.0f, 0.0f, 1.0f ) );
+//    imageStore( testTexture, ivec2(gl_GlobalInvocationID.xy),
+//                vec4( cameraPos.xyz, 1.0f ) );
 }

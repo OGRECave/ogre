@@ -89,6 +89,7 @@ namespace Ogre
     public:
         /// Name of the HlmsComputeJob to run.
         IdString mJobName;
+        IdString mCameraName;
 
 		CompositorPassComputeDef( CompositorNodeDef *parentNodeDef, uint32 rtIndex ) :
             CompositorPassDef( PASS_COMPUTE, rtIndex ),

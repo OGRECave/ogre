@@ -244,6 +244,8 @@ namespace Ogre
                         dataUint32[j] = paramArray[j].GetUint();
                     }
                 }
+
+                shaderParams.mParams.push_back( param );
             }
         }
     }

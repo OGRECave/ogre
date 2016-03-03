@@ -8453,6 +8453,21 @@ namespace Ogre{
                     passCompute->mJobName = jobName;
                 }
                     break;
+                case ID_CAMERA:
+                {
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+
+                    AbstractNodeList::const_iterator it0 = prop->values.begin();
+                    if( !getIdString( *it0, &passCompute->mCameraName ) )
+                    {
+                         compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                }
+                break;
                 case ID_UAV:
                     if(prop->values.size() < 3)
                     {
