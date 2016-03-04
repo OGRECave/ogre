@@ -390,7 +390,7 @@ namespace Ogre
             ++itConst;
         }
 
-        size_t slotIdx = 0u;
+        uint32 slotIdx = 0u;
         HlmsComputeJob::TextureSlotVec::const_iterator itTex = job->mTextureSlots.begin();
         HlmsComputeJob::TextureSlotVec::const_iterator enTex = job->mTextureSlots.end();
 
@@ -403,8 +403,9 @@ namespace Ogre
             }
             else
             {
-                mRenderSystem->_setTexture( slotIdx, !itTex->texture.isNull(), itTex->texture.get() );
-                mRenderSystem->_setHlmsSamplerblock( slotIdx, itTex->samplerblock );
+                mRenderSystem->_setTextureCS( slotIdx, !itTex->texture.isNull(), itTex->texture.get() );
+                if( itTex->samplerblock )
+                    mRenderSystem->_setHlmsSamplerblock( slotIdx, itTex->samplerblock );
             }
 
             ++slotIdx;

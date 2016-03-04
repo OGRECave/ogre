@@ -148,6 +148,8 @@ bail:
           mBoundIndirectBuffer( 0 ),
           mSwIndirectBufferPtr( 0 ),
           mPso( 0 ),
+          mBoundComputeProgram( 0 ),
+          mMaxBoundUavCS( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
           mpDXGIFactory(0),
@@ -2447,10 +2449,49 @@ bail:
             D3D11Texture *dt = static_cast<D3D11Texture*>( texture );
             ID3D11UnorderedAccessView *uavView = dt->getUavView( mipmapLevel, textureArrayIndex, pixelFormat );
             mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, &uavView, NULL );
+
+            mMaxBoundUavCS = std::max( mMaxBoundUavCS, slot );
         }
         else
         {
-            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, NULL, NULL );
+            ID3D11UnorderedAccessView *nullUavView = NULL;
+            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, &nullUavView, NULL );
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
+    {
+        D3D11Texture *dt = static_cast<D3D11Texture*>( texPtr );
+        if (enabled && dt && dt->getSize() > 0)
+        {
+            // note used
+            dt->touch();
+            ID3D11ShaderResourceView * pTex = dt->getTexture();
+
+            mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(slot), static_cast<UINT>(1), &pTex);
+        }
+        else
+        {
+            ID3D11ShaderResourceView *nullSrv = NULL;
+            mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(slot), static_cast<UINT>(1), &nullSrv);
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock )
+    {
+        assert( samplerblock->mRsData &&
+                "The block must have been created via HlmsManager::getSamplerblock!" );
+
+        ID3D11SamplerState *samplerState = reinterpret_cast<ID3D11SamplerState*>( samplerblock->mRsData );
+
+        mDevice.GetImmediateContext()->CSSetSamplers( static_cast<UINT>(texUnit), static_cast<UINT>(1),
+                                                      &samplerState );
+        if( mDevice.isError() )
+        {
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+                "D3D11RenderSystem::_render");
         }
     }
     //---------------------------------------------------------------------
@@ -3014,6 +3055,9 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_endFrame()
     {
+        mBoundComputeProgram = 0;
+        mActiveComputeGpuProgramParameters.setNull();
+        mComputeProgramBound = false;
     }
     //---------------------------------------------------------------------
     // TODO: Move this class to the right place.
@@ -3130,22 +3174,6 @@ bail:
                 }
             }
 
-            /// Compute Shader binding
-            if (mBoundComputeProgram && mBindingType == TextureUnitState::BT_COMPUTE)
-            {
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-                {
-                    mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
-                }
-            }
-
             /// Hull Shader binding
             if (mPso->hullShader && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
             {
@@ -3223,20 +3251,7 @@ bail:
         DWORD primCount = 0;
 
         // Handle computing
-        if(mBoundComputeProgram)
-        {
-            // Bound unordered access views
-            mDevice.GetImmediateContext()->Dispatch(1, 1, 1);
-
-            ID3D11UnorderedAccessView* views[] = { 0 };
-            ID3D11ShaderResourceView* srvs[] = { 0 };
-            mDevice.GetImmediateContext()->CSSetShaderResources( 0, 1, srvs );
-            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( 0, 1, views, NULL );
-            mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
-
-            return;
-        }
-        else if(mPso->hullShader && mPso->domainShader)
+        if(mPso->hullShader && mPso->domainShader)
         {
             // useful primitives for tessellation
             switch( op.operationType )
@@ -3438,6 +3453,12 @@ bail:
         mDevice.GetImmediateContext()->Dispatch( pso.mNumThreadGroups[0],
                                                  pso.mNumThreadGroups[1],
                                                  pso.mNumThreadGroups[2] );
+
+        assert( mMaxBoundUavCS < 8u );
+        ID3D11UnorderedAccessView *nullUavViews[8];
+        memset( nullUavViews, 0, sizeof( nullUavViews ) );
+        mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( 0, mMaxBoundUavCS + 1u,
+                                                                  nullUavViews, NULL );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )

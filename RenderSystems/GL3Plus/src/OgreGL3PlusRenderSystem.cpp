@@ -1249,6 +1249,16 @@ namespace Ogre {
         }
     }
 
+    void GL3PlusRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
+    {
+        this->_setTexture( slot, enabled, texPtr );
+    }
+
+    void GL3PlusRenderSystem::_setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock )
+    {
+        this->_setHlmsSamplerblock( texUnit, samplerblock );
+    }
+
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
     {
         switch (tam)

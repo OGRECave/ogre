@@ -9,14 +9,6 @@
 
             "source" : "ComputeTest",
 
-            "textures   " :
-            [
-                {
-                    "texture_hlms" : ["texture0.png", "variableNameHoldingSliceIdx"],
-                    "sampler" : "unique_name"
-                }
-            ],
-
             "uav" :
             [
                 {

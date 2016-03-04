@@ -111,6 +111,7 @@ namespace Ogre
         unsigned char   *mSwIndirectBufferPtr;
         D3D11HlmsPso    *mPso;
         D3D11HLSLProgram* mBoundComputeProgram;
+        uint32          mMaxBoundUavCS;
 
         TexturePtr                  mUavTexPtr[64];
         ID3D11UnorderedAccessView   *mUavs[64];
@@ -284,6 +285,8 @@ namespace Ogre
                                         ResourceAccess::ResourceAccess access,
                                         int32 mipmapLevel, int32 textureArrayIndex,
                                         PixelFormat pixelFormat );
+        virtual void _setTextureCS( uint32 slot, bool enabled, Texture *texPtr );
+        virtual void _setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock );
 
         virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso );
         virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso );

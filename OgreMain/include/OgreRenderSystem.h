@@ -790,6 +790,10 @@ namespace Ogre
                                         int32 mipmapLevel, int32 textureArrayIndex,
                                         PixelFormat pixelFormat ) = 0;
 
+        /// Binds a regular texture to a Compute Shader.
+        virtual void _setTextureCS( uint32 slot, bool enabled, Texture *texPtr ) = 0;
+        virtual void _setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *Samplerblock ) = 0;
+
         /**
         Sets the texture to bind to a given texture unit.
 
