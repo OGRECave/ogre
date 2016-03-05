@@ -661,8 +661,11 @@ namespace Ogre
         saveTexture( pbsDatablock->getSpecular(), "specular", PBSM_SPECULAR,
                      pbsDatablock, outString,
                      pbsDatablock->getWorkflow() == HlmsPbsDatablock::SpecularWorkflow );
-        saveFresnel( pbsDatablock, outString );
-        if( pbsDatablock->getWorkflow() == HlmsPbsDatablock::MetallicWorkflow )
+        if( pbsDatablock->getWorkflow() != HlmsPbsDatablock::MetallicWorkflow )
+        {
+            saveFresnel( pbsDatablock, outString );
+        }
+        else
         {
             saveTexture( pbsDatablock->getMetallness(), "metallness", PBSM_METALLIC,
                          pbsDatablock, outString );
