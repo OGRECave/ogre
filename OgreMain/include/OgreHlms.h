@@ -144,8 +144,6 @@ namespace Ogre
 
         HlmsDatablockMap mDatablocks;
 
-        typedef vector<IdString>::type IdStringVec;
-
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
         IdStringVec     mRsSpecificExtensions;
         String const    *mShaderTargets[NumShaderTypes]; ///[0] = "vs_4_0", etc. Only used by D3D

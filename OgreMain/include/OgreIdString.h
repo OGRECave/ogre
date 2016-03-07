@@ -292,6 +292,8 @@ namespace Ogre
         #endif
         }
     };
+
+    typedef vector<IdString>::type IdStringVec;
 }
 
 #endif

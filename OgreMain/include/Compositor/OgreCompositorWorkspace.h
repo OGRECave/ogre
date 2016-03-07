@@ -92,6 +92,7 @@ namespace Ogre
         CompositorNodeVec       mNodeSequence;
         CompositorShadowNodeVec mShadowNodes;
         CompositorChannelVec    mGlobalTextures;
+        CompositorNamedBufferVec mGlobalBuffers;
         Camera                  *mDefaultCamera; /// Could be null. @See CompositorManager2::addWorkspace
         SceneManager            *mSceneManager;
         RenderSystem            *mRenderSys;
@@ -141,6 +142,8 @@ namespace Ogre
         virtual ~CompositorWorkspace();
 
         const CompositorChannel& getGlobalTexture( IdString name ) const;
+
+        const CompositorNamedBufferVec& getGlobalBuffers(void) const    { return mGlobalBuffers; }
 
         /// Only valid workspaces can update without crashing
         bool isValid(void) const                            { return mValid; }

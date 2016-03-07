@@ -39,8 +39,6 @@ namespace Ogre
 {
     class CompositorNodeDef;
 
-    typedef vector<IdString>::type IdStringVec;
-
     /** \addtogroup Core
     *  @{
     */

@@ -36,6 +36,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreTextureManager.h"
 #include "OgreDepthBuffer.h"
+#include "Vao/OgreVaoManager.h"
 
 namespace Ogre
 {
@@ -58,6 +59,23 @@ namespace Ogre
             TextureSource texSource;
             decodeTexSource( itor->second, index, texSource );
             if( texSource == TEXTURE_INPUT )
+                ++numInputChannels;
+            ++itor;
+        }
+
+        return numInputChannels;
+    }
+    //-----------------------------------------------------------------------------------
+    size_t TextureDefinitionBase::getNumInputBufferChannels(void) const
+    {
+        size_t numInputChannels = 0;
+        IdString nullString;
+        IdStringVec::const_iterator itor = mInputBuffers.begin();
+        IdStringVec::const_iterator end  = mInputBuffers.end();
+
+        while( itor != end )
+        {
+            if( *itor != nullString )
                 ++numInputChannels;
             ++itor;
         }
@@ -418,6 +436,158 @@ namespace Ogre
                 *itorTex = newChannel;
             }
             ++itorTex;
+            ++itor;
+        }
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////
+    /// Buffers
+    /////////////////////////////////////////////////////////////////////////////////
+    void TextureDefinitionBase::addBufferInput( size_t inputChannel, IdString name )
+    {
+        if( inputChannel >= mInputBuffers.size() )
+            mInputBuffers.resize( inputChannel + 1u );
+        mInputBuffers[inputChannel] = name;
+    }
+    //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::addBufferDefinition( IdString name, size_t numElements,
+                                                     uint32 bytesPerElement, uint32 bindFlags,
+                                                     float widthFactor, float heightFactor )
+    {
+        mLocalBufferDefs.push_back( BufferDefinition( name, numElements, bytesPerElement, bindFlags,
+                                                      widthFactor, heightFactor ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::removeBuffer( IdString name )
+    {
+        //Search it everywhere and remove where it's appropiate
+        {
+            IdStringVec::iterator itor = mInputBuffers.begin();
+            IdStringVec::iterator end  = mInputBuffers.end();
+
+            while( itor != end )
+            {
+                if( *itor == name )
+                    *itor = IdString();
+                ++itor;
+            }
+
+            while( !mInputBuffers.empty() && mInputBuffers.back() == IdString() )
+                mInputBuffers.pop_back();
+        }
+
+        {
+            BufferDefinitionVec::iterator itor = mLocalBufferDefs.begin();
+            BufferDefinitionVec::iterator end  = mLocalBufferDefs.end();
+
+            while( itor != end )
+            {
+                if( itor->getName() == name )
+                {
+                    itor = efficientVectorRemove( mLocalBufferDefs, itor );
+                    end  = mLocalBufferDefs.end();
+                }
+                else
+                {
+                    ++itor;
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::renameBuffer( IdString oldName, const String &newName )
+    {
+        //Search it everywhere and remove where it's appropiate
+        {
+            IdStringVec::iterator itor = mInputBuffers.begin();
+            IdStringVec::iterator end  = mInputBuffers.end();
+
+            while( itor != end )
+            {
+                if( *itor == oldName )
+                    *itor = newName;
+                ++itor;
+            }
+        }
+
+        {
+            BufferDefinitionVec::iterator itor = mLocalBufferDefs.begin();
+            BufferDefinitionVec::iterator end  = mLocalBufferDefs.end();
+
+            while( itor != end )
+            {
+                if( itor->getName() == oldName )
+                    itor->_setName( newName );
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::createBuffers( const BufferDefinitionVec &bufferDefs,
+                                               CompositorNamedBufferVec &inOutBufContainer,
+                                               const RenderTarget *finalTarget, RenderSystem *renderSys )
+    {
+        CompositorNamedBuffer cmp;
+
+        VaoManager *vaoManager = renderSys->getVaoManager();
+        BufferDefinitionVec::const_iterator itor = bufferDefs.begin();
+        BufferDefinitionVec::const_iterator end  = bufferDefs.end();
+
+        while( itor != end )
+        {
+            CompositorNamedBufferVec::iterator itBuf = std::lower_bound( inOutBufContainer.begin(),
+                                                                         inOutBufContainer.end(),
+                                                                         itor->name, cmp );
+
+            if( itBuf != inOutBufContainer.end() && itBuf->name == itor->name )
+            {
+                OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM,
+                             "Buffer with name '" + itor->name.getFriendlyText() + "' defined twice!",
+                             "TextureDefinitionBase::createBuffers" );
+            }
+
+            size_t numElements = itor->numElements;
+
+            if( itor->widthFactor > 0 )
+            {
+                numElements *= static_cast<size_t>( ceilf( finalTarget->getWidth() *
+                                                           itor->widthFactor ) );
+            }
+            if( itor->heightFactor > 0 )
+            {
+                numElements *= static_cast<size_t>( ceilf( finalTarget->getHeight() *
+                                                           itor->heightFactor ) );
+            }
+
+            UavBufferPacked *uavBuffer = vaoManager->createUavBuffer( numElements, itor->bytesPerElement,
+                                                                      itor->bindFlags, 0, false );
+            inOutBufContainer.insert( itBuf, 1, CompositorNamedBuffer( itor->name, uavBuffer ) );
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::destroyBuffers( const BufferDefinitionVec &bufferDefs,
+                                                CompositorNamedBufferVec &inOutBufContainer,
+                                                RenderSystem *renderSys )
+    {
+        CompositorNamedBuffer cmp;
+
+        VaoManager *vaoManager = renderSys->getVaoManager();
+        BufferDefinitionVec::const_iterator itor = bufferDefs.begin();
+        BufferDefinitionVec::const_iterator end  = bufferDefs.end();
+
+        while( itor != end )
+        {
+            CompositorNamedBufferVec::iterator itBuf = std::lower_bound( inOutBufContainer.begin(),
+                                                                         inOutBufContainer.end(),
+                                                                         itor->name, cmp );
+
+            if( itBuf != inOutBufContainer.end() && itBuf->name == itor->name )
+            {
+                vaoManager->destroyUavBuffer( itBuf->buffer );
+                inOutBufContainer.erase( itBuf );
+            }
+
             ++itor;
         }
     }

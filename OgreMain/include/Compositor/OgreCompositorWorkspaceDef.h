@@ -74,6 +74,7 @@ namespace Ogre
         IdString            mName;
         NodeAliasMap        mAliasedNodes;
         ChannelRouteList    mChannelRoutes;
+        ChannelRouteList    mBufferChannelRoutes;
         
         uint32              mFinalInChannel;/// Input Channel # to send the RenderWindow to
         IdString            mFinalNode;     /// Alias of the final node to send the RenderWindow to

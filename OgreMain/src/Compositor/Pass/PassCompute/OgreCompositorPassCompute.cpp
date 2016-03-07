@@ -46,8 +46,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    void CompositorPassComputeDef::addTextureSource( size_t texUnitIdx, const String &textureName,
-                                                     size_t mrtIndex )
+    void CompositorPassComputeDef::addTextureSource( uint32 texUnitIdx, const String &textureName,
+                                                     uint32 mrtIndex )
     {
         if( textureName.find( "global_" ) == 0 )
         {
@@ -57,8 +57,8 @@ namespace Ogre
         mTextureSources.push_back( ComputeTextureSource( texUnitIdx, textureName, mrtIndex ) );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorPassComputeDef::addUavSource( size_t texUnitIdx, const String &textureName,
-                                                 size_t mrtIndex,
+    void CompositorPassComputeDef::addUavSource( uint32 texUnitIdx, const String &textureName,
+                                                 uint32 mrtIndex,
                                                  ResourceAccess::ResourceAccess access,
                                                  int32 textureArrayIndex, int32 mipmapLevel,
                                                  PixelFormat pixelFormat,
@@ -72,6 +72,13 @@ namespace Ogre
         mUavSources.push_back( ComputeTextureSource( texUnitIdx, textureName, mrtIndex, access,
                                                      mipmapLevel, textureArrayIndex, pixelFormat,
                                                      allowWriteAfterWrite ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassComputeDef::addUavBuffer( uint32 slotIdx, const String &bufferName, size_t offset,
+                                                 size_t bytes, bool allowWriteAfterWrite )
+    {
+        mBufferSources.push_back( BufferSource( slotIdx, bufferName, offset,
+                                                bytes, allowWriteAfterWrite ) );
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------

@@ -53,6 +53,8 @@ THE SOFTWARE.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderTexture.h"
 
+#include "OgreLogManager.h"
+
 namespace Ogre
 {
     CompositorNode::CompositorNode( IdType id, IdString name, const CompositorNodeDef *definition,
@@ -62,6 +64,7 @@ namespace Ogre
             mName( name ),
             mEnabled( definition->mStartEnabled ),
             mNumConnectedInputs( 0 ),
+            mNumConnectedBufferInputs( 0 ),
             mWorkspace( workspace ),
             mRenderSystem( renderSys ),
             mDefinition( definition )
@@ -72,6 +75,14 @@ namespace Ogre
         //Create local textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mLocalTextures,
                                                 id, false, finalTarget, mRenderSystem );
+
+        const CompositorNamedBufferVec &globalBuffers = workspace->getGlobalBuffers();
+
+        //Create local buffers
+        mBuffers.reserve( mDefinition->mLocalBufferDefs.size() + mDefinition->mInputBuffers.size() +
+                          globalBuffers.size() );
+        TextureDefinitionBase::createBuffers( definition->mLocalBufferDefs, mBuffers,
+                                              finalTarget, renderSys );
 
         //Local textures will be routed now.
         routeOutputs();
@@ -89,6 +100,9 @@ namespace Ogre
             while( itor != end )
                 OGRE_DELETE *itor++;
         }
+
+        //Destroy our local buffers
+        TextureDefinitionBase::destroyBuffers( mDefinition->mLocalBufferDefs, mBuffers, mRenderSystem );
 
         //Destroy our local textures
         TextureDefinitionBase::destroyTextures( mLocalTextures, mRenderSystem );
@@ -134,6 +148,34 @@ namespace Ogre
         }
 
         mConnectedNodes.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::populateGlobalBuffers(void)
+    {
+        //Makes global buffers visible to our passes.
+        CompositorNamedBuffer cmp;
+        const CompositorNamedBufferVec &globalBuffers = mWorkspace->getGlobalBuffers();
+        CompositorNamedBufferVec::const_iterator itor = globalBuffers.begin();
+        CompositorNamedBufferVec::const_iterator end  = globalBuffers.end();
+        while( itor != end )
+        {
+            CompositorNamedBufferVec::iterator itBuf = std::lower_bound( mBuffers.begin(),
+                                                                         mBuffers.end(),
+                                                                         itor->name, cmp );
+            if( itBuf != mBuffers.end() && itBuf->name == itor->name )
+            {
+                LogManager::getSingleton().logMessage(
+                            "WARNING: Locally defined buffer '" + itBuf->name.getFriendlyText() +
+                            "' in Node '" + mDefinition->mNameStr + "' occludes global texture"
+                            " of the same name." );
+            }
+            else
+            {
+                mBuffers.insert( itBuf, 1, *itor );
+            }
+
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::notifyRecreated( const CompositorChannel &oldChannel,
@@ -268,6 +310,69 @@ namespace Ogre
         mConnectedNodes.clear();
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNode::connectBufferTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB )
+    {
+        if( inChannelB >= nodeB->mDefinition->mInputBuffers.size() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "There is no input channel #" +
+                         StringConverter::toString( inChannelB ) + " for node " +
+                         nodeB->mDefinition->mNameStr + " when trying to connect it "
+                         "from " + this->mDefinition->mNameStr + " channel #" +
+                         StringConverter::toString( outChannelA ),
+                         "CompositorNode::connectBufferTo" );
+        }
+        if( outChannelA >= this->mDefinition->mOutBufferChannelMapping.size() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "There is no output channel #" +
+                         StringConverter::toString( outChannelA ) + " for node " +
+                         this->mDefinition->mNameStr + " when trying to connect it "
+                         "to " + nodeB->mDefinition->mNameStr + " channel #" +
+                         StringConverter::toString( inChannelB ),
+                         "CompositorNode::connectBufferTo" );
+        }
+
+        CompositorNamedBuffer cmp;
+
+        const IdString &outBufferName = this->mDefinition->mOutBufferChannelMapping[outChannelA];
+        CompositorNamedBufferVec::iterator outBuf = std::lower_bound( this->mBuffers.begin(),
+                                                                      this->mBuffers.end(),
+                                                                      outBufferName, cmp );
+
+        //Nodes must be connected in the right order. We know for sure there is a buffer named
+        //outBufferName in either input/local because we checked in mapOutputBufferChannel.
+        assert( (outBuf != mBuffers.end() && outBuf->name == outBufferName) &&
+                "Compositor node got connected in the wrong order!" );
+
+        const IdString &inBufferName = nodeB->mDefinition->mInputBuffers[inChannelB];
+        CompositorNamedBufferVec::iterator inBuf = std::lower_bound( nodeB->mBuffers.begin(),
+                                                                     nodeB->mBuffers.end(),
+                                                                     inBufferName, cmp );
+
+        if( inBufferName == IdString() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Input buffer channels must not have gaps."
+                         " Channel #" + StringConverter::toString( inChannelB ) + " from node '" +
+                         nodeB->mDefinition->mNameStr + "' is not defined.",
+                         "CompositorNode::connectBufferTo" );
+        }
+
+        if( inBuf != nodeB->mBuffers.end() && inBuf->name == inBufferName )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Buffer with name '" +
+                         inBufferName.getFriendlyText() + "' was already defined in node " +
+                         nodeB->mDefinition->mNameStr + " while trying to connect to its "
+                         "channel #" + StringConverter::toString( inChannelB ) +
+                         "from " + this->mDefinition->mNameStr + " channel #" +
+                         StringConverter::toString( outChannelA ),
+                         "CompositorNode::connectBufferTo" );
+        }
+        else
+        {
+            nodeB->mBuffers.insert( inBuf, 1, *outBuf );
+            ++mNumConnectedBufferInputs;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorNode::connectTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB )
     {
         if( inChannelB >= nodeB->mInTextures.size() )
@@ -321,6 +426,12 @@ namespace Ogre
 
         if( this->mNumConnectedInputs >= this->mInTextures.size() )
             this->routeOutputs();
+    }
+    //-----------------------------------------------------------------------------------
+    bool CompositorNode::areAllInputsConnected() const
+    {
+        return mNumConnectedInputs == mInTextures.size() &&
+               mNumConnectedBufferInputs == mDefinition->mInputBuffers.size();
     }
     //-----------------------------------------------------------------------------------
     TexturePtr CompositorNode::getDefinedTexture( IdString textureName, size_t mrtIndex ) const
@@ -386,6 +497,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorNode::createPasses(void)
     {
+        populateGlobalBuffers();
+
         CompositorTargetDefVec::const_iterator itor = mDefinition->mTargetPasses.begin();
         CompositorTargetDefVec::const_iterator end  = mDefinition->mTargetPasses.end();
 

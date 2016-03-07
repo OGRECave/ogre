@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -70,6 +70,11 @@ namespace Ogre
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
                                                 id, true, mRenderWindow.target, mRenderSys );
 
+        //Create local buffers
+        mGlobalBuffers.reserve( mDefinition->mLocalBufferDefs.size() );
+        TextureDefinitionBase::createBuffers( definition->mLocalBufferDefs, mGlobalBuffers,
+                                              mRenderWindow.target, mRenderSys );
+
         recreateAllNodes();
 
         mCurrentWidth   = mRenderWindow.target->getWidth();
@@ -79,6 +84,10 @@ namespace Ogre
     CompositorWorkspace::~CompositorWorkspace()
     {
         destroyAllNodes();
+
+        //Destroy our global buffers
+        TextureDefinitionBase::destroyBuffers( mDefinition->mLocalBufferDefs,
+                                               mGlobalBuffers, mRenderSys );
 
         //Destroy our global textures
         TextureDefinitionBase::destroyTextures( mGlobalTextures, mRenderSys );
@@ -167,6 +176,19 @@ namespace Ogre
                         {
                             node->connectTo( itRoute->outChannel, findNode( itRoute->inNode, true ),
                                              itRoute->inChannel );
+                        }
+                        ++itRoute;
+                    }
+
+                    itRoute = mDefinition->mBufferChannelRoutes.begin();
+                    enRoute = mDefinition->mBufferChannelRoutes.end();
+
+                    while( itRoute != enRoute )
+                    {
+                        if( itRoute->outNode == node->getName() )
+                        {
+                            node->connectBufferTo( itRoute->outChannel, findNode( itRoute->inNode, true ),
+                                                   itRoute->inChannel );
                         }
                         ++itRoute;
                     }

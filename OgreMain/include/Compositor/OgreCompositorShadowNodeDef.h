@@ -142,6 +142,7 @@ namespace Ogre
         /// Overloaded to prevent creating input channels.
         virtual IdString addTextureSourceName( const String &name, size_t index,
                                                 TextureSource textureSource );
+        virtual void addBufferInput( size_t inputChannel, IdString name );
 
         virtual void postInitializePassDef( CompositorPassDef *passDef );
 

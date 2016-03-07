@@ -53,11 +53,11 @@ namespace Ogre
 		struct ComputeTextureSource
         {
             /// Index of texture unit state to change
-            size_t      texUnitIdx;
+            uint32      texUnitIdx;
             /// Name of the texture (can come from input channel, local textures, or global ones)
             IdString    textureName;
             /// Index in case of MRT. Ignored if textureSource isn't mrt
-            size_t      mrtIndex;
+            uint32      mrtIndex;
 
             //Used by UAVs
             ResourceAccess::ResourceAccess access;
@@ -81,9 +81,25 @@ namespace Ogre
         };
         typedef vector<ComputeTextureSource>::type TextureSources;
 
+        struct BufferSource
+        {
+            uint32      slotIdx;
+            IdString    bufferName;
+            size_t      offset;
+            size_t      bytes;
+            bool        allowWriteAfterWrite;
+
+            BufferSource( uint32 _slotIdx, IdString _bufferName, size_t _offset=0,
+                          size_t _bytes=0, bool _allowWriteAfterWrite=false ) :
+                slotIdx( _slotIdx ), bufferName( _bufferName ), offset( _offset ),
+                bytes( _bytes ), allowWriteAfterWrite( _allowWriteAfterWrite ) {}
+        };
+        typedef vector<BufferSource>::type BufferSourceVec;
+
     protected:
         TextureSources      mTextureSources;
         TextureSources      mUavSources;
+        BufferSourceVec     mBufferSources;
         CompositorNodeDef   *mParentNodeDef;
 
     public:
@@ -100,11 +116,14 @@ namespace Ogre
         /** Indicates the pass to change the texture units to use the specified texture sources.
             @See ComputeTextureSource for params
         */
-        void addTextureSource( size_t texUnitIdx, const String &textureName, size_t mrtIndex );
+        void addTextureSource( uint32 texUnitIdx, const String &textureName, uint32 mrtIndex );
 
-        void addUavSource( size_t texUnitIdx, const String &textureName, size_t mrtIndex,
+        void addUavSource( uint32 texUnitIdx, const String &textureName, uint32 mrtIndex,
                            ResourceAccess::ResourceAccess access, int32 textureArrayIndex,
                            int32 mipmapLevel, PixelFormat pixelFormat, bool allowWriteAfterWrite );
+
+        void addUavBuffer( uint32 slotIdx, const String &bufferName, size_t offset=0,
+                           size_t bytes=0, bool allowWriteAfterWrite=false );
 
         const TextureSources& getTextureSources(void) const     { return mTextureSources; }
         const TextureSources& getUavSources(void) const         { return mUavSources; }

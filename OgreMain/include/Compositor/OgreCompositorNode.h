@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "Compositor/OgreCompositorCommon.h"
 #include "Compositor/OgreCompositorChannel.h"
+#include "Compositor/OgreCompositorNamedBuffer.h"
 #include "OgreResourceTransition.h"
 #include "OgreIdString.h"
 #include "OgreId.h"
@@ -105,6 +106,9 @@ namespace Ogre
         /// Contains pointers that are ither in mInTextures or mLocalTextures
         CompositorChannelVec    mOutTextures;
 
+        size_t                      mNumConnectedBufferInputs;
+        CompositorNamedBufferVec    mBuffers;
+
         CompositorPassVec   mPasses;
 
         /// Nodes we're connected to. If we destroy our local textures, we need to inform them
@@ -128,6 +132,11 @@ namespace Ogre
             making much mess and leaving everything else working.
         */
         void disconnectOutput();
+
+        /// Makes global buffers visible to our passes. Must be done last in case
+        /// there's an input/local buffer with the same name as a global buffer
+        /// (local scope prevails over global scope)
+        void populateGlobalBuffers(void);
 
         /** Called right after we create a pass. Derived
             classes may want to do something with it
@@ -166,7 +175,16 @@ namespace Ogre
         bool getEnabled(void) const                         { return mEnabled; }
 
         /** Connects this node (let's call it node 'A') to node 'B', mapping the output
-            channel from A into the input channel from B
+            channel from A into the input channel from B (buffer version)
+        @param outChannelA
+            Output to use from node A.
+        @param inChannelB
+            Input to connect the output from A.
+        */
+        void connectBufferTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB );
+
+        /** Connects this node (let's call it node 'A') to node 'B', mapping the output
+            channel from A into the input channel from B (texture version)
         @param outChannelA
             Output to use from node A.
         @param inChannelB
@@ -187,7 +205,7 @@ namespace Ogre
         void connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
                                 size_t inChannelA );
 
-        bool areAllInputsConnected() const  { return mNumConnectedInputs == mInTextures.size(); }
+        bool areAllInputsConnected() const;
         const CompositorChannelVec& getInputChannel() const         { return mInTextures; }
         const CompositorChannelVec& getLocalTextures() const        { return mLocalTextures; }
 
