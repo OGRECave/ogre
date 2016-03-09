@@ -41,6 +41,8 @@ THE SOFTWARE.
 #include "OgreHlmsCompute.h"
 #include "OgreHlmsComputeJob.h"
 
+#include "Vao/OgreUavBufferPacked.h"
+
 #include "OgreRenderTexture.h"
 #include "OgreHardwarePixelBuffer.h"
 
@@ -74,11 +76,19 @@ namespace Ogre
                                                      allowWriteAfterWrite ) );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorPassComputeDef::addUavBuffer( uint32 slotIdx, const String &bufferName, size_t offset,
-                                                 size_t bytes, bool allowWriteAfterWrite )
+//    void CompositorPassComputeDef::addTexBuffer( uint32 slotIdx, const String &bufferName,
+//                                                 size_t offset, size_t sizeBytes )
+//    {
+//        //TODO.
+//    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassComputeDef::addUavBuffer( uint32 slotIdx, const String &bufferName,
+                                                 ResourceAccess::ResourceAccess access, size_t offset,
+                                                 size_t sizeBytes, bool allowWriteAfterWrite )
     {
-        mBufferSources.push_back( BufferSource( slotIdx, bufferName, offset,
-                                                bytes, allowWriteAfterWrite ) );
+        assert( access != ResourceAccess::Undefined );
+        mBufferSources.push_back( BufferSource( slotIdx, bufferName, access, offset,
+                                                sizeBytes, allowWriteAfterWrite ) );
     }
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
@@ -119,31 +129,56 @@ namespace Ogre
             ++itor;
         }
 
-        itor = textureSources.begin();
-        end  = textureSources.end();
-        while( itor != end )
-        {
-            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            mComputeJob->setTexture( itor->texUnitIdx, texture );
-            ++itor;
-        }
-
-        const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
-        itor = uavSources.begin();
-        end  = uavSources.end();
-        while( itor != end )
-        {
-            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            mComputeJob->setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
-                                        itor->access, itor->mipmapLevel, itor->pixelFormat );
-            ++itor;
-        }
+        setResourcesToJob();
 
         const CompositorWorkspace *workspace = parentNode->getWorkspace();
         if( mDefinition->mCameraName != IdString() )
             mCamera = workspace->findCamera( mDefinition->mCameraName );
         else
             mCamera = defaultCamera;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassCompute::setResourcesToJob(void)
+    {
+        {
+            const CompositorPassComputeDef::TextureSources &textureSources =
+                    mDefinition->getTextureSources();
+            CompositorPassComputeDef::TextureSources::const_iterator itor = textureSources.begin();
+            CompositorPassComputeDef::TextureSources::const_iterator end  = textureSources.end();
+            while( itor != end )
+            {
+                TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+                mComputeJob->setTexture( itor->texUnitIdx, texture );
+                ++itor;
+            }
+
+            const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
+            itor = uavSources.begin();
+            end  = uavSources.end();
+            while( itor != end )
+            {
+                TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+                mComputeJob->setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
+                                            itor->access, itor->mipmapLevel, itor->pixelFormat );
+                ++itor;
+            }
+        }
+
+        {
+            const CompositorPassComputeDef::BufferSourceVec &bufferSources =
+                    mDefinition->getBufferSources();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator itor = bufferSources.begin();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator end  = bufferSources.end();
+
+            while( itor != end )
+            {
+                CompositorPassComputeDef::BufferSource *itor=0;
+                UavBufferPacked *uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
+                mComputeJob->setUavBuffer( itor->slotIdx, uavBuffer, itor->access,
+                                           itor->offset, itor->sizeBytes );
+                ++itor;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
 	void CompositorPassCompute::execute( const Camera *lodCamera )
@@ -163,28 +198,7 @@ namespace Ogre
         executeResourceTransitions();
 
         //Set textures/uavs every frame
-        const CompositorPassComputeDef::TextureSources &textureSources = mDefinition->getTextureSources();
-        CompositorPassComputeDef::TextureSources::const_iterator itor = textureSources.begin();
-        CompositorPassComputeDef::TextureSources::const_iterator end  = textureSources.end();
-        while( itor != end )
-        {
-            //Pass a null samplerblock to keep the previous one we
-            //set in the constructor (avoids the lookup every call)
-            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            mComputeJob->setTexture( itor->texUnitIdx, texture, (const HlmsSamplerblock*)0 );
-            ++itor;
-        }
-
-        const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
-        itor = uavSources.begin();
-        end  = uavSources.end();
-        while( itor != end )
-        {
-            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            mComputeJob->setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
-                                        itor->access, itor->mipmapLevel, itor->pixelFormat );
-            ++itor;
-        }
+        setResourcesToJob();
 
         //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();

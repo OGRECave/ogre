@@ -573,6 +573,9 @@ namespace Ogre
             TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs,
                                                                 mGlobalTextures, mRenderWindow.target,
                                                                 mRenderSys, allNodes, 0 );
+            TextureDefinitionBase::recreateResizableBuffers( mDefinition->mLocalBufferDefs,
+                                                             mGlobalBuffers, mRenderWindow.target,
+                                                             mRenderSys, allNodes, 0 );
         }
 
         //Add global textures to the SceneManager so they can be referenced by materials

@@ -228,6 +228,20 @@ namespace Ogre
 
         const CompositorChannel* _getDefinedTexture( IdString textureName ) const;
 
+        /** Returns the buffer pointer of a buffer based on it's name.
+        @remarks
+            The buffer may come from a local buffer, an input buffer, or
+            global (workspace).
+        @param bufferName
+            The name of the buffer. This name may only be valid at node scope. It can
+            refer to an input buffer, a local buffer, or a global one.
+            If a local or input buffer has the same name as a global one, the global
+            one is ignored.
+        @return
+            Null if not found (or global buffer not registered). The buffer otherwise
+        */
+        UavBufferPacked* getDefinedBuffer( IdString bufferName ) const;
+
         /** Creates all passes based on our definition
         @remarks
             Call this function after connecting all channels (at least our input)
@@ -268,6 +282,7 @@ namespace Ogre
             The new replacement textures
         */
         void notifyRecreated( const CompositorChannel &oldChannel, const CompositorChannel &newChannel );
+        void notifyRecreated( const UavBufferPacked *oldBuffer, UavBufferPacked *newBuffer );
 
         /** Call this function when caller has destroyed a RenderTarget in which the callee
             may have a reference to that pointer, so that we can clean it up.
@@ -275,6 +290,7 @@ namespace Ogre
             Channel containing the pointer about to be destroyed (must still be valid)
         */
         void notifyDestroyed( const CompositorChannel &channel );
+        void notifyDestroyed( const UavBufferPacked *buffer );
 
         /** Internal Use. Called when connections are all being zero'ed. We rely our
             caller is doing this to all nodes, hence we do not notify our @mConnectedNodes

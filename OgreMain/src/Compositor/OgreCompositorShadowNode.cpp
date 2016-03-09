@@ -714,5 +714,9 @@ namespace Ogre
         mLocalTextures.erase( mLocalTextures.begin() + normalStart, mLocalTextures.end() );
         mLocalTextures.insert( mLocalTextures.end(), normalLocalTextures.begin(),
                                                      normalLocalTextures.end() );
+
+        TextureDefinitionBase::recreateResizableBuffers( mDefinition->mLocalBufferDefs, mBuffers,
+                                                         finalTarget, mRenderSystem, mConnectedNodes,
+                                                         &mPasses );
     }
 }

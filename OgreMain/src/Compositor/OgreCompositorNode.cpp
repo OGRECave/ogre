@@ -144,6 +144,19 @@ namespace Ogre
             while( texIt != texEn )
                 (*itor)->notifyDestroyed( *texIt++ );
 
+            CompositorNodeDef::BufferDefinitionVec::const_iterator bufIt =
+                    mDefinition->mLocalBufferDefs.begin();
+            CompositorNodeDef::BufferDefinitionVec::const_iterator bufEn =
+                    mDefinition->mLocalBufferDefs.end();
+
+            while( bufIt != bufEn )
+            {
+                UavBufferPacked *uavBuffer = this->getDefinedBuffer( bufIt->name );
+                if( uavBuffer )
+                    (*itor)->notifyDestroyed( uavBuffer );
+                ++bufIt;
+            }
+
             ++itor;
         }
 
@@ -231,6 +244,59 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNode::notifyRecreated( const UavBufferPacked *oldBuffer, UavBufferPacked *newBuffer )
+    {
+        //Clear our inputs
+        CompositorNamedBufferVec::iterator bufIt = mBuffers.begin();
+        CompositorNamedBufferVec::iterator bufEn = mBuffers.end();
+
+        bool bFoundOuts = false;
+
+        //We can't early out, it's possible to assign the same output to two different
+        //input channels (though it would work very unintuitively...)
+        while( bufIt != bufEn )
+        {
+            if( bufIt->buffer == oldBuffer )
+            {
+                bufIt->buffer = newBuffer;
+
+                //Check if we'll need to clear our outputs
+                IdStringVec::const_iterator itor = mDefinition->mOutBufferChannelMapping.begin();
+                IdStringVec::const_iterator end  = mDefinition->mOutBufferChannelMapping.end();
+
+                while( itor != end && !bFoundOuts )
+                {
+                    if( *itor == bufIt->name )
+                        bFoundOuts = true;
+                    ++itor;
+                }
+            }
+
+            ++bufIt;
+        }
+
+        if( bFoundOuts )
+        {
+            //Our attachees may be using that buffer too.
+            CompositorNodeVec::const_iterator itor = mConnectedNodes.begin();
+            CompositorNodeVec::const_iterator end  = mConnectedNodes.end();
+
+            while( itor != end )
+            {
+                (*itor)->notifyRecreated( oldBuffer, newBuffer );
+                ++itor;
+            }
+        }
+
+        CompositorPassVec::const_iterator passIt = mPasses.begin();
+        CompositorPassVec::const_iterator passEn = mPasses.end();
+        while( passIt != passEn )
+        {
+            (*passIt)->notifyRecreated( oldBuffer, newBuffer );
+            ++passIt;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorNode::notifyDestroyed( const CompositorChannel &channel )
     {
         //Clear our inputs
@@ -287,6 +353,64 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNode::notifyDestroyed( const UavBufferPacked *buffer )
+    {
+        //Clear our inputs
+        CompositorNamedBufferVec::iterator bufIt = mBuffers.begin();
+        CompositorNamedBufferVec::iterator bufEn = mBuffers.end();
+
+        bool bFoundOuts = false;
+
+        //We can't early out, it's possible to assign the same output to two different
+        //input channels (though it would work very unintuitively...)
+        while( bufIt != bufEn )
+        {
+            if( bufIt->buffer == buffer )
+            {
+                //Check if we'll need to clear our outputs
+                IdStringVec::const_iterator itor = mDefinition->mOutBufferChannelMapping.begin();
+                IdStringVec::const_iterator end  = mDefinition->mOutBufferChannelMapping.end();
+
+                while( itor != end && !bFoundOuts )
+                {
+                    if( *itor == bufIt->name )
+                        bFoundOuts = true;
+                    ++itor;
+                }
+
+                //Remove this buffer.
+                bufIt = mBuffers.erase( bufIt );
+                bufEn = mBuffers.end();
+                --mNumConnectedBufferInputs;
+            }
+            else
+            {
+                ++bufIt;
+            }
+        }
+
+        if( bFoundOuts )
+        {
+            //Our attachees may be using that buffer too.
+            CompositorNodeVec::const_iterator itor = mConnectedNodes.begin();
+            CompositorNodeVec::const_iterator end  = mConnectedNodes.end();
+
+            while( itor != end )
+            {
+                (*itor)->notifyDestroyed( buffer );
+                ++itor;
+            }
+        }
+
+        CompositorPassVec::const_iterator passIt = mPasses.begin();
+        CompositorPassVec::const_iterator passEn = mPasses.end();
+        while( passIt != passEn )
+        {
+            (*passIt)->notifyDestroyed( buffer );
+            ++passIt;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorNode::_notifyCleared(void)
     {
         //Clear our inputs
@@ -297,6 +421,22 @@ namespace Ogre
             *texIt++ = CompositorChannel();
 
         mNumConnectedInputs = 0;
+
+        //Clear our inputs (buffers)
+        CompositorNamedBuffer cmp;
+        IdStringVec::const_iterator bufNameIt = mDefinition->mInputBuffers.begin();
+        IdStringVec::const_iterator bufNameEn = mDefinition->mInputBuffers.end();
+
+        while( bufNameIt != bufNameEn )
+        {
+            CompositorNamedBufferVec::iterator itBuf = std::lower_bound( mBuffers.begin(),
+                                                                         mBuffers.end(),
+                                                                         *bufNameIt, cmp );
+            mBuffers.erase( itBuf );
+            ++bufNameIt;
+        }
+
+        mNumConnectedBufferInputs = 0;
 
         //This call will clear only our outputs that come from input channels.
         routeOutputs();
@@ -493,6 +633,20 @@ namespace Ogre
         assert( !channel->textures.empty() && "Are you trying to use the RenderWindow as a texture???" );
 
         return channel;
+    }
+    //-----------------------------------------------------------------------------------
+    UavBufferPacked* CompositorNode::getDefinedBuffer( IdString bufferName ) const
+    {
+        UavBufferPacked *retVal = 0;
+
+        CompositorNamedBuffer cmp;
+        CompositorNamedBufferVec::const_iterator itBuf = std::lower_bound( mBuffers.begin(),
+                                                                           mBuffers.end(),
+                                                                           bufferName, cmp );
+        if( itBuf != mBuffers.end() && itBuf->name == bufferName )
+            retVal = itBuf->buffer;
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::createPasses(void)
@@ -720,6 +874,9 @@ namespace Ogre
         TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs, mLocalTextures,
                                                             finalTarget, mRenderSystem, mConnectedNodes,
                                                             &mPasses );
+        TextureDefinitionBase::recreateResizableBuffers( mDefinition->mLocalBufferDefs, mBuffers,
+                                                         finalTarget, mRenderSystem, mConnectedNodes,
+                                                         &mPasses );
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::resetAllNumPassesLeft(void)

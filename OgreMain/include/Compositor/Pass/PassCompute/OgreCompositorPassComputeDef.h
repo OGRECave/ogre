@@ -85,14 +85,17 @@ namespace Ogre
         {
             uint32      slotIdx;
             IdString    bufferName;
+            ResourceAccess::ResourceAccess access;
             size_t      offset;
-            size_t      bytes;
+            size_t      sizeBytes;
             bool        allowWriteAfterWrite;
+            //PixelFormat pixelFormat; /// PF_UNKNOWN if used as UAV.
 
-            BufferSource( uint32 _slotIdx, IdString _bufferName, size_t _offset=0,
-                          size_t _bytes=0, bool _allowWriteAfterWrite=false ) :
-                slotIdx( _slotIdx ), bufferName( _bufferName ), offset( _offset ),
-                bytes( _bytes ), allowWriteAfterWrite( _allowWriteAfterWrite ) {}
+            BufferSource( uint32 _slotIdx, IdString _bufferName,
+                          ResourceAccess::ResourceAccess _access, size_t _offset=0,
+                          size_t _sizeBytes=0, bool _allowWriteAfterWrite=false ) :
+                slotIdx( _slotIdx ), bufferName( _bufferName ), access( _access ), offset( _offset ),
+                sizeBytes( _sizeBytes ), allowWriteAfterWrite( _allowWriteAfterWrite ) {}
         };
         typedef vector<BufferSource>::type BufferSourceVec;
 
@@ -122,11 +125,15 @@ namespace Ogre
                            ResourceAccess::ResourceAccess access, int32 textureArrayIndex,
                            int32 mipmapLevel, PixelFormat pixelFormat, bool allowWriteAfterWrite );
 
-        void addUavBuffer( uint32 slotIdx, const String &bufferName, size_t offset=0,
-                           size_t bytes=0, bool allowWriteAfterWrite=false );
+//        void addTexBuffer( uint32 slotIdx, const String &bufferName,
+//                           size_t offset=0, size_t sizeBytes=0 );
+        void addUavBuffer( uint32 slotIdx, const String &bufferName,
+                           ResourceAccess::ResourceAccess access, size_t offset=0,
+                           size_t sizeBytes=0, bool allowWriteAfterWrite=false );
 
         const TextureSources& getTextureSources(void) const     { return mTextureSources; }
         const TextureSources& getUavSources(void) const         { return mUavSources; }
+        const BufferSourceVec& getBufferSources(void) const     { return mBufferSources; }
     };
 
     /** @} */

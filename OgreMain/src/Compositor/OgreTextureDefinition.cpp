@@ -546,24 +546,31 @@ namespace Ogre
                              "TextureDefinitionBase::createBuffers" );
             }
 
-            size_t numElements = itor->numElements;
-
-            if( itor->widthFactor > 0 )
-            {
-                numElements *= static_cast<size_t>( ceilf( finalTarget->getWidth() *
-                                                           itor->widthFactor ) );
-            }
-            if( itor->heightFactor > 0 )
-            {
-                numElements *= static_cast<size_t>( ceilf( finalTarget->getHeight() *
-                                                           itor->heightFactor ) );
-            }
-
-            UavBufferPacked *uavBuffer = vaoManager->createUavBuffer( numElements, itor->bytesPerElement,
-                                                                      itor->bindFlags, 0, false );
+            UavBufferPacked *uavBuffer = createBuffer( *itor, finalTarget, vaoManager );
             inOutBufContainer.insert( itBuf, 1, CompositorNamedBuffer( itor->name, uavBuffer ) );
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    UavBufferPacked* TextureDefinitionBase::createBuffer( const BufferDefinition &bufferDef,
+                                                          const RenderTarget *finalTarget,
+                                                          VaoManager *vaoManager )
+    {
+        size_t numElements = bufferDef.numElements;
+
+        if( bufferDef.widthFactor > 0 )
+        {
+            numElements *= static_cast<size_t>( ceilf( finalTarget->getWidth() *
+                                                       bufferDef.widthFactor ) );
+        }
+        if( bufferDef.heightFactor > 0 )
+        {
+            numElements *= static_cast<size_t>( ceilf( finalTarget->getHeight() *
+                                                       bufferDef.heightFactor ) );
+        }
+
+        return vaoManager->createUavBuffer( numElements, bufferDef.bytesPerElement,
+                                            bufferDef.bindFlags, 0, false );
     }
     //-----------------------------------------------------------------------------------
     void TextureDefinitionBase::destroyBuffers( const BufferDefinitionVec &bufferDefs,
@@ -586,6 +593,58 @@ namespace Ogre
             {
                 vaoManager->destroyUavBuffer( itBuf->buffer );
                 inOutBufContainer.erase( itBuf );
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void TextureDefinitionBase::recreateResizableBuffers( const BufferDefinitionVec &bufferDefs,
+                                                          CompositorNamedBufferVec &inOutBufContainer,
+                                                          const RenderTarget *finalTarget,
+                                                          RenderSystem *renderSys,
+                                                          const CompositorNodeVec &connectedNodes,
+                                                          const CompositorPassVec *passes )
+    {
+        CompositorNamedBuffer cmp;
+
+        VaoManager *vaoManager = renderSys->getVaoManager();
+        BufferDefinitionVec::const_iterator itor = bufferDefs.begin();
+        BufferDefinitionVec::const_iterator end  = bufferDefs.end();
+
+        while( itor != end )
+        {
+            if( itor->widthFactor > 0 || itor->heightFactor > 0 )
+            {
+                CompositorNamedBufferVec::iterator itBuf = std::lower_bound( inOutBufContainer.begin(),
+                                                                             inOutBufContainer.end(),
+                                                                             itor->name, cmp );
+
+                UavBufferPacked *newUavBuffer = createBuffer( *itor, finalTarget, vaoManager );
+
+                if( passes )
+                {
+                    CompositorPassVec::const_iterator passIt = passes->begin();
+                    CompositorPassVec::const_iterator passEn = passes->end();
+                    while( passIt != passEn )
+                    {
+                        (*passIt)->notifyRecreated( itBuf->buffer, newUavBuffer );
+                        ++passIt;
+                    }
+                }
+
+                CompositorNodeVec::const_iterator itNodes = connectedNodes.begin();
+                CompositorNodeVec::const_iterator enNodes = connectedNodes.end();
+
+                while( itNodes != enNodes )
+                {
+                    (*itNodes)->notifyRecreated( itBuf->buffer, newUavBuffer );
+                    ++itNodes;
+                }
+
+                vaoManager->destroyUavBuffer( itBuf->buffer );
+
+                itBuf->buffer = newUavBuffer;
             }
 
             ++itor;

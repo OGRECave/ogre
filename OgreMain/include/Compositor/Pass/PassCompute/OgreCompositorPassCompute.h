@@ -85,6 +85,7 @@ namespace Ogre
         HlmsComputeJob  *mComputeJob;
         Camera          *mCamera;
 
+        void setResourcesToJob(void);
     public:
         CompositorPassCompute( const CompositorPassComputeDef *definition, Camera *defaultCamera,
                                CompositorNode *parentNode, const CompositorChannel &target );

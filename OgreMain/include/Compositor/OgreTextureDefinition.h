@@ -432,6 +432,9 @@ namespace Ogre
                                    CompositorNamedBufferVec &inOutBufContainer,
                                    const RenderTarget *finalTarget, RenderSystem *renderSys );
 
+        static UavBufferPacked* createBuffer( const BufferDefinition &bufferDef,
+                                              const RenderTarget *finalTarget, VaoManager *vaoManager );
+
         /// @see createBuffers
         /// We need the definition because, unlike textures, the container passed in may
         /// contain textures that were not created by us (i.e. global & input textures)
@@ -441,6 +444,30 @@ namespace Ogre
         static void destroyBuffers( const BufferDefinitionVec &bufferDefs,
                                     CompositorNamedBufferVec &inOutBufContainer,
                                     RenderSystem *renderSys );
+
+        /** Destroys & recreates only the buffers that depend on the main RT
+            (i.e. the RenderWindow) resolution
+        @param textureDefs
+            Array of texture definitions, so we know which ones depend on main RT's resolution
+        @param inOutTexContainer
+            Where we'll replace the RTs & textures
+        @param finalTarget
+            The final render target (usually the render window) we have to clone parameters from
+            (eg. when using auto width & height, or fsaa settings)
+        @param renderSys
+            The RenderSystem to use
+        @param connectedNodes
+            Array of connected nodes that may be using our buffers and need to be notified.
+        @param passes
+            Array of Compositor Passes which may contain the texture being recreated
+            When the pointer is null, we don't iterate through it.
+        */
+        static void recreateResizableBuffers( const BufferDefinitionVec &bufferDefs,
+                                              CompositorNamedBufferVec &inOutBufContainer,
+                                              const RenderTarget *finalTarget,
+                                              RenderSystem *renderSys,
+                                              const CompositorNodeVec &connectedNodes,
+                                              const CompositorPassVec *passes );
     };
 
     /** @} */
