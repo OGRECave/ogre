@@ -6448,6 +6448,110 @@ namespace Ogre{
         td->preferDepthTexture  = preferDepthTexture;
         td->fsaaExplicitResolve = fsaaExplicitResolve;
     }
+    //-----------------------------------------------------------------------------------
+    void CompositorTextureBaseTranslator::translateBufferProperty( TextureDefinitionBase *defBase,
+                                                                   PropertyAbstractNode *prop,
+                                                                   ScriptCompiler *compiler ) const
+    {
+        size_t atomIndex = 1;
+        AbstractNodeList::const_iterator it = getNodeAt(prop->values, 0);
+
+        if((*it)->type != ANT_ATOM)
+        {
+            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+            return;
+        }
+        // Save the first atom, should be name
+        AtomAbstractNode *atom0 = (AtomAbstractNode*)(*it).get();
+
+        size_t numElements = 0;
+        uint32 bytesPerElement = 0;
+        float widthFactor = 0.0f, heightFactor = 0.0f;
+
+        while (atomIndex < prop->values.size())
+        {
+            it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+            if((*it)->type != ANT_ATOM)
+            {
+                compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                return;
+            }
+            AtomAbstractNode *atom = (AtomAbstractNode*)(*it).get();
+
+            switch(atom->id)
+            {
+            case ID_TARGET_WIDTH:
+                widthFactor = 1.0f;
+                break;
+            case ID_TARGET_HEIGHT:
+                heightFactor = 1.0f;
+                break;
+            case ID_TARGET_WIDTH_SCALED:
+            case ID_TARGET_HEIGHT_SCALED:
+                {
+                    float *pFactor;
+
+                    if (atom->id == ID_TARGET_WIDTH_SCALED)
+                        pFactor = &widthFactor;
+                    else
+                        pFactor = &heightFactor;
+
+                    // advance to next to get scaling
+                    it = getNodeAt(prop->values, static_cast<int>(atomIndex++));
+                    if(prop->values.end() == it || (*it)->type != ANT_ATOM)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    atom = (AtomAbstractNode*)(*it).get();
+                    if (!StringConverter::isNumber(atom->value))
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+
+                    *pFactor = StringConverter::parseReal(atom->value);
+                }
+                break;
+            default:
+                if (StringConverter::isNumber(atom->value))
+                {
+                    if (atomIndex == 2)
+                    {
+                        numElements = StringConverter::parseUnsignedInt(atom->value);
+                    }
+                    else if (atomIndex == 3)
+                    {
+                        bytesPerElement = StringConverter::parseUnsignedInt(atom->value);
+                    }
+                    else
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                }
+                else
+                {
+                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    return;
+                }
+            }
+        }
+
+        if( numElements * bytesPerElement == 0u )
+        {
+            compiler->addError( ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line,
+                                "numElements * bytesPerElement must be non-zero for buffer '" +
+                                atom0->value + "'. Syntax is: buffer name size bytesPerElement "
+                                "[target_width] [target_height]" );
+            return;
+        }
+
+        // No errors, create.
+        //TODO: Support more flags?
+        defBase->addBufferDefinition( atom0->value, numElements, bytesPerElement,
+                                      BB_FLAG_UAV, widthFactor, heightFactor );
+    }
 
     /**************************************************************************
      * CompositorWorkspaceTranslator
@@ -6513,6 +6617,9 @@ namespace Ogre{
                 {
                 case ID_TEXTURE:
                     translateTextureProperty( mWorkspaceDef, prop, compiler );
+                    break;
+                case ID_BUFFER:
+                    translateBufferProperty( mWorkspaceDef, prop, compiler );
                     break;
                 case ID_ALIAS:
                     if(prop->values.empty())
@@ -6734,6 +6841,9 @@ namespace Ogre{
                 case ID_TEXTURE:
                     translateTextureProperty( mNodeDef, prop, compiler );
                     break;
+                case ID_BUFFER:
+                    translateBufferProperty( mNodeDef, prop, compiler );
+                    break;
                 case ID_IN:
                     if(prop->values.empty())
                     {
@@ -6770,7 +6880,7 @@ namespace Ogre{
                     else if(prop->values.size() != 2)
                     {
                         compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                            "'in' only supports 2 arguments");
+                            "'out' only supports 2 arguments");
                     }
                     else
                     {
@@ -6781,6 +6891,56 @@ namespace Ogre{
                         String textureName;
                         if( getUInt( *it0, &outChannel ) && getString( *it1, &textureName ) )
                             mNodeDef->mapOutputChannel( outChannel, textureName );
+                        else
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    }
+                    break;
+                case ID_IN_BUFFER:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() != 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "'in_buffer' only supports 2 arguments");
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator it1 = prop->values.begin();
+                        AbstractNodeList::const_iterator it0 = it1++;
+
+                        uint32 inChannel;
+                        IdString bufferName;
+                        if( getUInt( *it0, &inChannel ) && getIdString( *it1, &bufferName ) )
+                        {
+                            mNodeDef->addBufferInput( inChannel, bufferName );
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        }
+                    }
+                    break;
+                case ID_OUT_BUFFER:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() != 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "'out_buffer' only supports 2 arguments");
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator it1 = prop->values.begin();
+                        AbstractNodeList::const_iterator it0 = it1++;
+
+                        uint32 outChannel;
+                        IdString bufferName;
+                        if( getUInt( *it0, &outChannel ) && getIdString( *it1, &bufferName ) )
+                            mNodeDef->mapOutputBufferChannel( outChannel, bufferName );
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
@@ -7185,6 +7345,9 @@ namespace Ogre{
                 case ID_TEXTURE:
                     translateTextureProperty( mShadowNodeDef, prop, compiler );
                     break;
+                case ID_BUFFER:
+                    translateBufferProperty( mShadowNodeDef, prop, compiler );
+                    break;
                 case ID_TECHNIQUE:
                     if(prop->values.empty())
                     {
@@ -7308,6 +7471,29 @@ namespace Ogre{
                         String textureName;
                         if( getUInt( *it0, &outChannel ) && getString( *it1, &textureName ) )
                             mShadowNodeDef->mapOutputChannel( outChannel, textureName );
+                        else
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    }
+                    break;
+                case ID_OUT_BUFFER:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() != 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "'out_buffer' only supports 2 arguments");
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator it1 = prop->values.begin();
+                        AbstractNodeList::const_iterator it0 = it1++;
+
+                        uint32 outChannel;
+                        IdString bufferName;
+                        if( getUInt( *it0, &outChannel ) && getIdString( *it1, &bufferName ) )
+                            mShadowNodeDef->mapOutputBufferChannel( outChannel, bufferName );
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }

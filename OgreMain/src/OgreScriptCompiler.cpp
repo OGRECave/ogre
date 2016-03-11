@@ -1215,7 +1215,10 @@ namespace Ogre
         mIds["compositor_node"] = ID_COMPOSITOR_NODE;
         mIds["in"]              = ID_IN;
         mIds["out"]             = ID_OUT;
+        mIds["in_buffer"]       = ID_IN_BUFFER;
+        mIds["out_buffer"]      = ID_OUT_BUFFER;
         mIds["custom_id"]       = ID_CUSTOM_ID;
+        mIds["buffer"]          = ID_BUFFER;
         mIds["target_width"]        = ID_TARGET_WIDTH;
         mIds["target_height"]       = ID_TARGET_HEIGHT;
         mIds["target_width_scaled"] = ID_TARGET_WIDTH_SCALED;

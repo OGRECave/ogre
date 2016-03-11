@@ -254,6 +254,8 @@ namespace Ogre{
     protected:
         void translateTextureProperty( TextureDefinitionBase *defBase, PropertyAbstractNode *prop,
                                         ScriptCompiler *compiler ) const;
+        void translateBufferProperty( TextureDefinitionBase *defBase, PropertyAbstractNode *prop,
+                                      ScriptCompiler *compiler ) const;
     };
     class _OgreExport CompositorWorkspaceTranslator : public CompositorTextureBaseTranslator
     {
