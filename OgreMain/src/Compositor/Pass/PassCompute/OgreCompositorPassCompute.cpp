@@ -172,7 +172,6 @@ namespace Ogre
 
             while( itor != end )
             {
-                CompositorPassComputeDef::BufferSource *itor=0;
                 UavBufferPacked *uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
                 mComputeJob->setUavBuffer( itor->slotIdx, uavBuffer, itor->access,
                                            itor->offset, itor->sizeBytes );

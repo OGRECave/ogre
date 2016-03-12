@@ -8727,7 +8727,7 @@ namespace Ogre{
                                 else
                                 {
                                     compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                                       (*j)->getValue() + " is not a supported argument to the texture property");
+                                                       (*j)->getValue() + " is not a supported argument to the uav property");
                                 }
                                 ++j;
                             }
@@ -8749,7 +8749,104 @@ namespace Ogre{
                         else
                         {
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
-                                               (*j)->getValue() + " is not a valid texture name");
+                                               (*j)->getValue() + " is not a valid uav name");
+                        }
+                    }
+                    break;
+                case ID_UAV_BUFFER:
+                    if(prop->values.size() < 3)
+                    {
+                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                        return;
+                    }
+                    else if (prop->values.size() > 5)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator j = prop->values.begin();
+
+                        uint32 slot = ~0u;
+                        size_t offset = 0;
+                        bool offsetSet = false;
+                        size_t sizeBytes = 0;
+                        uint32 access = ResourceAccess::Undefined;
+                        bool allowWriteAfterWrite = false;
+
+                        if( !getUInt( *j, &slot ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        ++j;
+
+                        String val;
+                        if(getString(*j, &val))
+                        {
+                            ++j;
+                            while(j != prop->values.end())
+                            {
+                                if((*j)->type == ANT_ATOM)
+                                {
+                                    AtomAbstractNode *atom = (AtomAbstractNode*)(*j).get();
+                                    switch(atom->id)
+                                    {
+                                    case ID_READ:
+                                        access |= ResourceAccess::Read;
+                                    case ID_WRITE:
+                                        access |= ResourceAccess::Write;
+                                        break;
+                                    case ID_ALLOW_WRITE_AFTER_WRITE:
+                                        allowWriteAfterWrite = true;
+                                        break;
+                                    default:
+                                        if(StringConverter::isNumber(atom->value))
+                                        {
+                                            if( !offsetSet )
+                                            {
+                                                offset = StringConverter::parseUnsignedInt(atom->value);
+                                                offsetSet = true;
+                                            }
+                                            else
+                                            {
+                                                sizeBytes = StringConverter::parseUnsignedInt(atom->value);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                               (*j)->getValue() + " is not a supported argument to the uav_buffer property");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                       (*j)->getValue() + " is not a supported argument to the uav_buffer property");
+                                }
+                                ++j;
+                            }
+
+                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::UAV, val);
+                            compiler->_fireEvent(&evt, 0);
+
+                            if( !access )
+                            {
+                                compiler->addError( ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                    "UAV must have the 'read' and/or 'write' access tokens." );
+                            }
+
+                            passCompute->addUavBuffer( slot, evt.mName,
+                                                       static_cast<ResourceAccess::ResourceAccess>(access),
+                                                       offset, sizeBytes, allowWriteAfterWrite );
+                        }
+                        else
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               (*j)->getValue() + " is not a valid buffer name");
                         }
                     }
                     break;

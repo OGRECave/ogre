@@ -911,6 +911,7 @@ namespace Ogre
                     //Used by PASS_UAV (& PASS_COMPUTE)
                     ID_UAV,
                     ID_UAV_EXTERNAL,
+                    ID_UAV_BUFFER,
                     ID_STARTING_SLOT,
                     ID_KEEP_PREVIOUS_UAV,
                     ID_READ,

@@ -1305,6 +1305,7 @@ namespace Ogre
 
         mIds["uav"]             = ID_UAV;
         mIds["uav_external"]    = ID_UAV_EXTERNAL;
+        mIds["uav_buffer"]      = ID_UAV_BUFFER;
         mIds["starting_slot"]   = ID_STARTING_SLOT;
         mIds["keep_previous_uavs"]= ID_KEEP_PREVIOUS_UAV;
 

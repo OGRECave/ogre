@@ -11,7 +11,8 @@ compositor_node ComputeTest01_RenderingNode
 		{
 			job	TestJob
 			
-			uav 0 testTexture	read write
+			//uav # textureName read write allow_write_after_write
+			uav 0 testTexture	write
 			//input 0 mrtTexture 1
 		}
 	}
