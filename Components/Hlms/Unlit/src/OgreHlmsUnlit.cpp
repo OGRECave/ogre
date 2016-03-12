@@ -32,6 +32,10 @@ THE SOFTWARE.
 #include "OgreHlmsUnlitDatablock.h"
 #include "OgreHlmsListener.h"
 
+#if !OGRE_NO_JSON
+#include "OgreHlmsJsonUnlit.h"
+#endif
+
 #include "OgreViewport.h"
 #include "OgreRenderTarget.h"
 #include "OgreHighLevelGpuProgramManager.h"
@@ -739,6 +743,27 @@ namespace Ogre
         HlmsBufferManager::frameEnded();
         mCurrentPassBuffer  = 0;
     }
+#if !OGRE_NO_JSON
+	//-----------------------------------------------------------------------------------
+	void HlmsUnlit::_loadJson(const rapidjson::Value &jsonValue, const HlmsJson::NamedBlocks &blocks,
+		HlmsDatablock *datablock) const
+	{
+		HlmsJsonUnlit jsonUnlit(mHlmsManager);
+		jsonUnlit.loadMaterial(jsonValue, blocks, datablock);
+	}
+	//-----------------------------------------------------------------------------------
+	void HlmsUnlit::_saveJson(const HlmsDatablock *datablock, String &outString) const
+	{
+		HlmsJsonUnlit jsonUnlit(mHlmsManager);
+		jsonUnlit.saveMaterial(datablock, outString);
+	}
+	//-----------------------------------------------------------------------------------
+	void HlmsUnlit::_collectSamplerblocks(set<const HlmsSamplerblock*>::type &outSamplerblocks,
+		const HlmsDatablock *datablock) const
+	{
+		HlmsJsonUnlit::collectSamplerblocks(datablock, outSamplerblocks);
+	}
+#endif
     //-----------------------------------------------------------------------------------
     HlmsDatablock* HlmsUnlit::createDatablockImpl( IdString datablockName,
                                                        const HlmsMacroblock *macroblock,
