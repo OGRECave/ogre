@@ -1,6 +1,6 @@
 
 #include "GraphicsSystem.h"
-#include "Compute01GameState.h"
+#include "TutorialCompute01_UavTextureGameState.h"
 
 #include "OgreRenderWindow.h"
 #include "OgreTimer.h"
@@ -18,13 +18,13 @@ using namespace Demo;
 
 namespace Demo
 {
-    class Compute01GraphicsSystem : public GraphicsSystem
+    class TutorialCompute01_UavTextureGraphicsSystem : public GraphicsSystem
     {
         virtual Ogre::CompositorWorkspace* setupCompositor()
         {
             Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
             return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-                                                    "ComputeTest01_Workspace", true );
+                                                    "TutorialComputeTest01_UavTextureWorkspace", true );
         }
 
         virtual void setupResources(void)
@@ -46,9 +46,9 @@ namespace Demo
                 "2.0/scripts/materials/Common",
                 "2.0/scripts/materials/Common/GLSL",
                 "2.0/scripts/materials/Common/HLSL",
-                "2.0/scripts/materials/Tests/Compute01",
-                "2.0/scripts/materials/Tests/Compute01/GLSL",
-                "2.0/scripts/materials/Tests/Compute01/HLSL",
+                "2.0/scripts/materials/TutorialCompute01_UavTexture",
+                "2.0/scripts/materials/TutorialCompute01_UavTexture/GLSL",
+                "2.0/scripts/materials/TutorialCompute01_UavTexture/HLSL"
             };
 
             for( size_t i=0; i<6; ++i )
@@ -59,7 +59,7 @@ namespace Demo
         }
 
     public:
-        Compute01GraphicsSystem( GameState *gameState ) :
+        TutorialCompute01_UavTextureGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
         }
@@ -72,11 +72,11 @@ INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 int mainApp()
 #endif
 {
-    Compute01GameState compute01GameState(
+    TutorialCompute01_UavTextureGameState tutorialCompute01_UavTextureGameState(
         "Compute Test 01" );
-    Compute01GraphicsSystem graphicsSystem( &compute01GameState );
+    TutorialCompute01_UavTextureGraphicsSystem graphicsSystem( &tutorialCompute01_UavTextureGameState );
 
-    compute01GameState._notifyGraphicsSystem( &graphicsSystem );
+    tutorialCompute01_UavTextureGameState._notifyGraphicsSystem( &graphicsSystem );
 
     graphicsSystem.initialize( "Test: Compute 01" );
 

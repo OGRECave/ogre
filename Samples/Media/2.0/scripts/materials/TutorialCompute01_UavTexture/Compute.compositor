@@ -1,4 +1,4 @@
-compositor_node ComputeTest01_RenderingNode
+compositor_node TutorialComputeTest01_UavTextureRenderingNode
 {
 	in 0 rt_renderwindow
 
@@ -39,7 +39,7 @@ compositor_node ComputeTest01_RenderingNode
 	}
 }
 
-workspace ComputeTest01_Workspace
+workspace TutorialComputeTest01_UavTextureWorkspace
 {
-	connect_output ComputeTest01_RenderingNode 0
+	connect_output TutorialComputeTest01_UavTextureRenderingNode 0
 }

@@ -1,5 +1,5 @@
 
-#include "Compute01GameState.h"
+#include "TutorialCompute01_UavTextureGameState.h"
 #include "GraphicsSystem.h"
 
 #include "OgreSceneManager.h"
@@ -11,14 +11,15 @@ using namespace Demo;
 
 namespace Demo
 {
-    Compute01GameState::Compute01GameState( const Ogre::String &helpDescription ) :
+    TutorialCompute01_UavTextureGameState::TutorialCompute01_UavTextureGameState(
+            const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mSceneNode( 0 ),
         mDisplacement( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
-    void Compute01GameState::createScene01(void)
+    void TutorialCompute01_UavTextureGameState::createScene01(void)
     {
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
 
@@ -35,7 +36,7 @@ namespace Demo
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
-    void Compute01GameState::update( float timeSinceLast )
+    void TutorialCompute01_UavTextureGameState::update( float timeSinceLast )
     {
         const Ogre::Vector3 origin( -5.0f, 0.0f, 0.0f );
 

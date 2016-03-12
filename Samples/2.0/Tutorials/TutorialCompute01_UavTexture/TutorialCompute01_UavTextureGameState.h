@@ -1,19 +1,19 @@
 
-#ifndef _Demo_Compute01GameState_H_
-#define _Demo_Compute01GameState_H_
+#ifndef _Demo_TutorialCompute01_UavTextureGameState_H_
+#define _Demo_TutorialCompute01_UavTextureGameState_H_
 
 #include "OgrePrerequisites.h"
 #include "TutorialGameState.h"
 
 namespace Demo
 {
-    class Compute01GameState : public TutorialGameState
+    class TutorialCompute01_UavTextureGameState : public TutorialGameState
     {
         Ogre::SceneNode     *mSceneNode;
         float               mDisplacement;
 
     public:
-        Compute01GameState( const Ogre::String &helpDescription );
+        TutorialCompute01_UavTextureGameState( const Ogre::String &helpDescription );
 
         virtual void createScene01(void);
 

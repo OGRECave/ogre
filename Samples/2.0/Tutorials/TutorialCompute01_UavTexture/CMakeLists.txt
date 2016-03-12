@@ -15,7 +15,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Test_Compute01 WIN32 ${SOURCE_FILES})
+ogre_add_executable(TutorialCompute01_UavTexture WIN32 ${SOURCE_FILES})
 
-target_link_libraries(Test_Compute01 ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
-ogre_config_sample_lib(Test_Compute01)
+target_link_libraries(TutorialCompute01_UavTexture ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
+ogre_config_sample_lib(TutorialCompute01_UavTexture)
