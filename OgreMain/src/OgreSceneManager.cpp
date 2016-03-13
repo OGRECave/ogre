@@ -1478,7 +1478,7 @@ void SceneManager::_setSkyBox(bool enable,
 
                         // Also clamp texture, don't wrap (otherwise edges can get filtered)
                         HlmsSamplerblock samplerblock = *t->getSamplerblock();
-                        samplerblock.setAddressinMode( TAM_CLAMP );
+                        samplerblock.setAddressingMode( TAM_CLAMP );
 
                         t->setSamplerblock( samplerblock );
                         t->setCurrentFrame(i);

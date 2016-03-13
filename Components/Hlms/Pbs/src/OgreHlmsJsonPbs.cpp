@@ -330,12 +330,18 @@ namespace Ogre
                 parseFresnelMode( itor->value.GetString(), isColoured, useIOR );
 
             itor = subobj.FindMember( "value" );
-            if( itor != subobj.MemberEnd() && itor->value.IsArray() )
+            if( itor != subobj.MemberEnd() && (itor->value.IsArray() || itor->value.IsNumber()) )
             {
-                if( !useIOR )
-                    pbsDatablock->setFresnel( parseVector3Array( itor->value ), isColoured );
+                Vector3 value;
+                if( itor->value.IsArray() )
+                    value = parseVector3Array( itor->value );
                 else
-                    pbsDatablock->setIndexOfRefraction( parseVector3Array( itor->value ), isColoured );
+                    value = static_cast<Real>( itor->value.GetDouble() );
+
+                if( !useIOR )
+                    pbsDatablock->setFresnel( value, isColoured );
+                else
+                    pbsDatablock->setIndexOfRefraction( value, isColoured );
             }
         }
 
@@ -444,6 +450,33 @@ namespace Ogre
     {
         outString += '"';
         outString += c_workflows[value];
+        outString += '"';
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::toQuotedStr( uint32 value, String &outString )
+    {
+        outString += '"';
+        switch( value )
+        {
+        case PbsBrdf::Default:
+            outString += "default";
+            break;
+        case PbsBrdf::CookTorrance:
+            outString += "cook_torrance";
+            break;
+        case PbsBrdf::DefaultUncorrelated:
+            outString += "default_uncorrelated";
+            break;
+        case PbsBrdf::DefaultSeparateDiffuseFresnel:
+            outString += "default_separate_diffuse_fresnel";
+            break;
+        case PbsBrdf::CookTorranceSeparateDiffuseFresnel:
+            outString += "cook_torrance_separate_diffuse_fresnel";
+            break;
+        default:
+            outString += "unknown / custom";
+            break;
+        }
         outString += '"';
     }
     //-----------------------------------------------------------------------------------
@@ -605,14 +638,20 @@ namespace Ogre
         outString += ",\n\t\t\t\"workflow\" : ";
         toQuotedStr( pbsDatablock->getWorkflow(), outString );
 
+        if( pbsDatablock->getBrdf() != PbsBrdf::Default )
+        {
+            outString += ",\n\t\t\t\"brdf\" : ";
+            toQuotedStr( pbsDatablock->getBrdf(), outString );
+        }
+
         if( pbsDatablock->getTransparencyMode() != HlmsPbsDatablock::None )
         {
-            outString += "\n\t\t\t\"transparency\" :\n\t\t\t{";
+            outString += ",\n\t\t\t\"transparency\" :\n\t\t\t{";
             outString += "\n\t\t\t\t\"value\" : ";
             outString += StringConverter::toString( pbsDatablock->getTransparency() );
-            outString += "\n\t\t\t\t\"mode\" : ";
+            outString += ",\n\t\t\t\t\"mode\" : ";
             toQuotedStr( pbsDatablock->getTransparencyMode(), outString );
-            outString += "\n\t\t\t\t\"use_alpha_from_textures\" : ";
+            outString += ",\n\t\t\t\t\"use_alpha_from_textures\" : ";
             outString += pbsDatablock->getUseAlphaFromTextures() ? "true" : "false";
             outString += "\n\t\t\t}";
         }
@@ -622,8 +661,11 @@ namespace Ogre
         saveTexture( pbsDatablock->getSpecular(), "specular", PBSM_SPECULAR,
                      pbsDatablock, outString,
                      pbsDatablock->getWorkflow() == HlmsPbsDatablock::SpecularWorkflow );
-        saveFresnel( pbsDatablock, outString );
-        if( pbsDatablock->getWorkflow() == HlmsPbsDatablock::MetallicWorkflow )
+        if( pbsDatablock->getWorkflow() != HlmsPbsDatablock::MetallicWorkflow )
+        {
+            saveFresnel( pbsDatablock, outString );
+        }
+        else
         {
             saveTexture( pbsDatablock->getMetallness(), "metallness", PBSM_METALLIC,
                          pbsDatablock, outString );

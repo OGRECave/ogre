@@ -235,6 +235,7 @@ namespace Ogre
             UV coordinate set. Value must be between in range [0; 8)
         */
         void setTextureUvSource( uint8 sourceType, uint8 uvSet );
+        uint8 getTextureUvSource( uint8 sourceType ) const;
 
         /** Sets the blending mode (how the texture unit gets layered
             on top of the previous texture units).

@@ -242,7 +242,7 @@ float3 qmul( float4 q, float3 v )
 	float3 vTangent = normalize( inPs.tangent );
 
 	//Get the TBN matrix
-	float3 vBinormal	= normalize( cross( vTangent, geomNormal )@insertpiece( tbnApplyReflection ) );
+	float3 vBinormal	= normalize( cross( geomNormal, vTangent )@insertpiece( tbnApplyReflection ) );
 	float3x3 TBN		= float3x3( vTangent, vBinormal, geomNormal );
 
 	@property( normal_map_tex )nNormal = getTSNormal( float3( inPs.uv@value(uv_normal).xy, normalIdx ) );@end
