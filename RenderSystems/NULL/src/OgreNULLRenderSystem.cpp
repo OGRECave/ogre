@@ -204,6 +204,12 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void NULLRenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                         ResourceAccess::ResourceAccess access,
+                                         size_t offset, size_t sizeBytes )
+    {
+    }
+    //-------------------------------------------------------------------------
     void NULLRenderSystem::clearUAVs(void)
     {
     }

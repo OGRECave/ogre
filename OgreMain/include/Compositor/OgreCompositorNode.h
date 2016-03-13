@@ -238,9 +238,11 @@ namespace Ogre
             If a local or input buffer has the same name as a global one, the global
             one is ignored.
         @return
-            Null if not found (or global buffer not registered). The buffer otherwise
+            Regular: The buffer. Throws if buffer wasn't found.
+            No throw version: Null if not found. The buffer otherwise
         */
         UavBufferPacked* getDefinedBuffer( IdString bufferName ) const;
+        UavBufferPacked* getDefinedBufferNoThrow( IdString bufferName ) const;
 
         /** Creates all passes based on our definition
         @remarks

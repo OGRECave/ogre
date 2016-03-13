@@ -118,7 +118,7 @@ namespace Ogre
         assert( offset < (mNumElements - 1) );
         assert( sizeBytes < mNumElements );
 
-        sizeBytes = !sizeBytes ? (mNumElements - offset) : sizeBytes;
+        sizeBytes = !sizeBytes ? (mNumElements * mBytesPerElement - offset) : sizeBytes;
 
         ID3D11UnorderedAccessView *resourceView = 0;
         for( int i=0; i<16; ++i )

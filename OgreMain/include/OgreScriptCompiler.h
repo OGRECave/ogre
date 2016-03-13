@@ -513,6 +513,7 @@ namespace Ogre
             MATERIAL,
             GPU_PROGRAM,
             UAV,
+            UAV_BUFFER,
             COMPOSITOR
         };
         ResourceType mResourceType;

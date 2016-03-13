@@ -64,6 +64,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreIndexBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
+#include "Vao/OgreUavBufferPacked.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
@@ -1115,11 +1116,12 @@ namespace Ogre {
     {
         assert( slot < 64 );
 
-        if( mUavs[slot].texture.isNull() && texture.isNull() )
+        if( !mUavs[slot].buffer && mUavs[slot].texture.isNull() && texture.isNull() )
             return;
 
         mUavs[slot].dirty       = true;
         mUavs[slot].texture     = texture;
+        mUavs[slot].buffer      = 0;
 
         if( !texture.isNull() )
         {
@@ -1165,6 +1167,28 @@ namespace Ogre {
         mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
     }
 
+    void GL3PlusRenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                            ResourceAccess::ResourceAccess access,
+                                            size_t offset, size_t sizeBytes )
+    {
+        assert( slot < 64 );
+
+        if( mUavs[slot].texture.isNull() && !mUavs[slot].buffer && !buffer )
+            return;
+
+        mUavs[slot].dirty       = true;
+        mUavs[slot].buffer      = buffer;
+        mUavs[slot].texture.setNull();
+
+        if( buffer )
+        {
+            mUavs[slot].offset      = offset;
+            mUavs[slot].sizeBytes   = sizeBytes;
+        }
+
+        mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+    }
+
     void GL3PlusRenderSystem::clearUAVs(void)
     {
         for( size_t i=0; i<64; ++i )
@@ -1172,6 +1196,7 @@ namespace Ogre {
             if( !mUavs[i].texture.isNull() )
             {
                 mUavs[i].dirty = true;
+                mUavs[i].buffer = 0;
                 mUavs[i].texture.setNull();
                 mMaxModifiedUavPlusOne = i + 1;
             }
@@ -1191,9 +1216,16 @@ namespace Ogre {
                                               mUavs[i].arrayIndex, mUavs[i].access,
                                               mUavs[i].format) );
                 }
+                else if( mUavs[i].buffer )
+                {
+                    //bindBufferCS binds it to all stages in GL, so this will do.
+                    mUavs[i].buffer->bindBufferCS( mUavStartingSlot + i, mUavs[i].offset,
+                                                   mUavs[i].sizeBytes );
+                }
                 else
                 {
-                    glBindImageTexture( 0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
+                    OCGE( glBindImageTexture( mUavStartingSlot + i, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI ) );
+                    OCGE( glBindBufferRange( GL_SHADER_STORAGE_BUFFER, mUavStartingSlot + i, 0, 0, 0 ) );
                 }
 
                 mUavs[i].dirty = false;

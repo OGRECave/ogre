@@ -8449,7 +8449,7 @@ namespace Ogre{
                         compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
                         return;
                     }
-                    else if (prop->values.size() > 5)
+                    else if (prop->values.size() > 8)
                     {
                         compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
                         return;
@@ -8549,6 +8549,110 @@ namespace Ogre{
                                                (*j)->getValue() + " is not a valid texture name");
                     }
                     break;
+                case ID_UAV_BUFFER:
+                    if(prop->values.size() < 1)
+                    {
+                        compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    else if (prop->values.size() > 6)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line);
+                        return;
+                    }
+                    else if( prop->values.size() == 1 )
+                    {
+                        AbstractNodeList::const_iterator j = prop->values.begin();
+
+                        uint32 slot = ~0u;
+                        if( !getUInt( *j, &slot ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        // Clearing the UAV
+                        passUav->addUavBuffer( slot, IdString(), ResourceAccess::Read, 0, 0 );
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator j = prop->values.begin();
+
+                        uint32 slot = ~0u;
+                        if( !getUInt( *j, &slot ) )
+                        {
+                            compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        ++j;
+
+                        String val;
+                        if(getString(*j, &val))
+                        {
+                            uint32 access = 0;
+                            size_t offset = 0;
+                            bool offsetSet = false;
+                            size_t sizeBytes = 0;
+
+                            ++j;
+                            while(j != prop->values.end())
+                            {
+                                if((*j)->type == ANT_ATOM)
+                                {
+                                    AtomAbstractNode *atom = (AtomAbstractNode*)(*j).get();
+                                    switch(atom->id)
+                                    {
+                                    case ID_READ:
+                                        access |= ResourceAccess::Read;
+                                    case ID_WRITE:
+                                        access |= ResourceAccess::Write;
+                                        break;
+                                    default:
+                                        if(StringConverter::isNumber(atom->value))
+                                        {
+                                            if( !offsetSet )
+                                            {
+                                                offset = StringConverter::parseUnsignedInt(atom->value);
+                                                offsetSet = true;
+                                            }
+                                            else
+                                            {
+                                                sizeBytes = StringConverter::parseUnsignedInt(atom->value);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                               (*j)->getValue() + " is not a supported argument to the uav_buffer property");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                       (*j)->getValue() + " is not a supported argument to the uav_buffer property");
+                                }
+                                ++j;
+                            }
+
+                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::UAV_BUFFER, val);
+                            compiler->_fireEvent(&evt, 0);
+
+                            if( !access )
+                            {
+                                compiler->addError( ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                                    "UAV must have the 'read' and/or 'write' access tokens." );
+                            }
+                            passUav->addUavBuffer( slot, evt.mName,
+                                                   static_cast<ResourceAccess::ResourceAccess>(access),
+                                                   offset, sizeBytes );
+                        }
+                        else
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                               (*j)->getValue() + " is not a valid texture name");
+                    }
+                    break;
                 case ID_STARTING_SLOT:
                 {
                     if(prop->values.empty())
@@ -8569,7 +8673,7 @@ namespace Ogre{
                     }
                 }
                 break;
-            case ID_KEEP_PREVIOUS_UAV:
+                case ID_KEEP_PREVIOUS_UAV:
                 {
                     if(prop->values.empty())
                     {
@@ -8830,7 +8934,7 @@ namespace Ogre{
                                 ++j;
                             }
 
-                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::UAV, val);
+                            ProcessResourceNameScriptCompilerEvent evt(ProcessResourceNameScriptCompilerEvent::UAV_BUFFER, val);
                             compiler->_fireEvent(&evt, 0);
 
                             if( !access )

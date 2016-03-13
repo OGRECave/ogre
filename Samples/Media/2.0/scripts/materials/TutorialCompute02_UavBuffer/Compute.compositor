@@ -29,12 +29,24 @@ compositor_node TutorialComputeTest02_UavBufferRenderingNode
 			colour_value 0.2 0.4 0.6 1
 		}
 
+		//The bindings made by pass bind_uav PERSIST even after we're out of rt_renderwindow.
+		pass bind_uav
+		{
+			starting_slot 1
+
+			// When true, we only affect the UAVs we're changing.
+			// When false, we clear all UAVs settings from all slots.
+			keep_previous_uavs	false
+
+			uav_buffer 0 testBuffer			read
+		}
+
 		//Compositor will issue the appropiate barriers because
 		//it knows testTexture will be used as a texture.
 		pass render_quad
 		{
-			material Ogre/Copy/4xFP32
-			input 0 testTexture
+			material DrawFromUavBuffer
+			uses_uav 0 read
 		}
 
 		pass render_scene

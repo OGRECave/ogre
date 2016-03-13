@@ -70,6 +70,14 @@ namespace Ogre
                                                   access, mipmapLevel, pixelFormat ) );
     }
     //-----------------------------------------------------------------------------------
+    void CompositorPassUavDef::addUavBuffer( uint32 slotIdx, IdString bufferName,
+                                             ResourceAccess::ResourceAccess access, size_t offset,
+                                             size_t sizeBytes )
+    {
+        assert( access != ResourceAccess::Undefined );
+        mBufferSources.push_back( BufferSource( slotIdx, bufferName, access, offset, sizeBytes ) );
+    }
+    //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     CompositorPassUav::CompositorPassUav( const CompositorPassUavDef *definition,
                                           CompositorNode *parentNode,
@@ -112,39 +120,59 @@ namespace Ogre
         if( !mDefinition->mKeepPreviousUavs )
             renderSystem->clearUAVs();
 
-        const CompositorPassUavDef::TextureSources &textureSources =
-                                                            mDefinition->getTextureSources();
-        CompositorPassUavDef::TextureSources::const_iterator itor = textureSources.begin();
-        CompositorPassUavDef::TextureSources::const_iterator end  = textureSources.end();
-        while( itor != end )
         {
-            TexturePtr texture;
-
-            if( itor->externalTextureName.empty() )
+            const CompositorPassUavDef::TextureSources &textureSources =
+                    mDefinition->getTextureSources();
+            CompositorPassUavDef::TextureSources::const_iterator itor = textureSources.begin();
+            CompositorPassUavDef::TextureSources::const_iterator end  = textureSources.end();
+            while( itor != end )
             {
-                texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            }
-            else if( itor->textureName != IdString() )
-            {
-                texture = TextureManager::getSingleton().getByName(
-                            itor->externalTextureName,
-                            ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+                TexturePtr texture;
 
-                if( texture.isNull() )
+                if( itor->externalTextureName.empty() )
                 {
-                    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
-                                 "Texture with name: " + itor->externalTextureName + " does not exist."
-                                 "The texture must exist by the time the workspace is executed. "
-                                 "Are you trying to use a texture defined by the compositor? If so"
-                                 "you need to set it via 'uav' instead of 'uav_external'",
-                                 "CompositorPassUav::execute" );
+                    texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
                 }
+                else if( itor->textureName != IdString() )
+                {
+                    texture = TextureManager::getSingleton().getByName(
+                                itor->externalTextureName,
+                                ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+                    if( texture.isNull() )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                                     "Texture with name: " + itor->externalTextureName +
+                                     " does not exist. The texture must exist by the time the "
+                                     "workspace is executed. Are you trying to use a texture "
+                                     "defined by the compositor? If so you need to set it via "
+                                     "'uav' instead of 'uav_external'", "CompositorPassUav::execute" );
+                    }
+                }
+
+                renderSystem->queueBindUAV( itor->uavSlot, texture, itor->access,
+                                            itor->mipmapLevel, 0, itor->pixelFormat );
+
+                ++itor;
             }
+        }
 
-            renderSystem->queueBindUAV( itor->uavSlot, texture, itor->access,
-                                        itor->mipmapLevel, 0, itor->pixelFormat );
+        {
+            const CompositorPassUavDef::BufferSourceVec &bufferSources = mDefinition->getBufferSources();
+            CompositorPassUavDef::BufferSourceVec::const_iterator itor = bufferSources.begin();
+            CompositorPassUavDef::BufferSourceVec::const_iterator end  = bufferSources.end();
+            while( itor != end )
+            {
+                UavBufferPacked *uavBuffer = 0;
 
-            ++itor;
+                if( itor->bufferName != IdString() )
+                    uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
+
+                renderSystem->queueBindUAV( itor->slotIdx, uavBuffer, itor->access,
+                                            itor->offset, itor->sizeBytes );
+
+                ++itor;
+            }
         }
 
         if( listener )

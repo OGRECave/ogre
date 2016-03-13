@@ -766,6 +766,16 @@ namespace Ogre
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN ) = 0;
 
+        /** See other overload. The slots are shared with the textures'
+        @param offset
+            Offset to bind, in bytes
+        @param sizeBytes
+            Size to bind, in bytes. Use 0 to bind until the end of the buffer.
+        */
+        virtual void queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                   size_t offset = 0, size_t sizeBytes = 0 ) = 0;
+
         /// By default queueBindUAV will keep all other slots intact. Calling this function
         /// will unset all bound UAVs. Will take effect after flushUAVs or setting a new RT.
         virtual void clearUAVs(void) = 0;

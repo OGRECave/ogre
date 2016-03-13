@@ -151,7 +151,7 @@ namespace Ogre
 
             while( bufIt != bufEn )
             {
-                UavBufferPacked *uavBuffer = this->getDefinedBuffer( bufIt->name );
+                UavBufferPacked *uavBuffer = this->getDefinedBufferNoThrow( bufIt->name );
                 if( uavBuffer )
                     (*itor)->notifyDestroyed( uavBuffer );
                 ++bufIt;
@@ -636,6 +636,20 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     UavBufferPacked* CompositorNode::getDefinedBuffer( IdString bufferName ) const
+    {
+        UavBufferPacked *retVal = getDefinedBufferNoThrow( bufferName );
+
+        if( !retVal )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find UAV buffer " +
+                         bufferName.getFriendlyText() + " in node '" +
+                         mDefinition->mNameStr + "'", "CompositorNode::getDefinedBuffer" );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    UavBufferPacked* CompositorNode::getDefinedBufferNoThrow( IdString bufferName ) const
     {
         UavBufferPacked *retVal = 0;
 
