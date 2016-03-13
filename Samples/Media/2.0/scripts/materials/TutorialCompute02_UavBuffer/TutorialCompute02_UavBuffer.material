@@ -18,6 +18,11 @@ fragment_program DrawFromUavBuffer_ps unified
 {
 	delegate DrawFromUavBuffer_ps_HLSL
 	delegate DrawFromUavBuffer_ps_GLSL
+	
+	default_params
+	{
+		param_named		texResolution	uint2	128 128
+	}
 }
 
 // Material definition
