@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreD3D11Prerequisites.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreHardwareUniformBuffer.h"
+#include "Vao/OgreVertexBufferPacked.h"
 
 
 namespace Ogre {

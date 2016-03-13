@@ -262,7 +262,7 @@ namespace Ogre
                                                                  size_t sizeBytes,
                                                                  BufferType bufferType,
                                                                  void *initialData,
-                                                                 uint32_t structureByteStride = 0 );
+                                                                 uint32 structureByteStride = 0 );
 
     public:
         D3D11VaoManager( bool supportsIndirectBuffers, D3D11Device &device,
