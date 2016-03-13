@@ -256,19 +256,19 @@ namespace Ogre
 
                 gp->load();
 
-                ShaderParams *shaderParams = job->_getShaderParams( "Default" );
-                if( shaderParams )
-                    shaderParams->updateParameters( gp->getDefaultParameters() );
-
-                shaderParams = job->_getShaderParams( mShaderProfile );
-                if( shaderParams )
-                    shaderParams->updateParameters( gp->getDefaultParameters() );
-
                 shader = gp;
 
                 mCompiledShaderCache[hashVal] = shader;
             }
         }
+
+        ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+        if( shaderParams )
+            shaderParams->updateParameters( shader->getDefaultParameters() );
+
+        shaderParams = job->_getShaderParams( mShaderProfile );
+        if( shaderParams )
+            shaderParams->updateParameters( shader->getDefaultParameters() );
 
         //Reset the disable flag.
         setProperty( HlmsBaseProp::DisableStage, 0 );

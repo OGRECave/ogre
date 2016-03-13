@@ -79,6 +79,11 @@ namespace Demo
             texResolution->setManualValue( res, sizeof(res) / sizeof(Ogre::uint32) );
             shaderParams.setDirty();
 
+            mComputeJob->setNumThreadGroups( (res[0] + mComputeJob->getThreadsPerGroupX() - 1u) /
+                                             mComputeJob->getThreadsPerGroupX(),
+                                             (res[1] + mComputeJob->getThreadsPerGroupY() - 1u) /
+                                             mComputeJob->getThreadsPerGroupY(), 1u );
+
             //Update the pass that draws the UAV Buffer into the RTT (we could
             //use auto param viewport_size, but this more flexible)
             Ogre::GpuProgramParametersSharedPtr psParams = mDrawFromUavBufferMat->getTechnique(0)->

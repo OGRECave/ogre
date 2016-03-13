@@ -178,6 +178,10 @@ namespace Ogre
             dimension.
         */
         void setThreadsPerGroup( uint32 threadsPerGroupX, uint32 threadsPerGroupY, uint32 threadsPerGroupZ );
+        uint32 getThreadsPerGroupX(void) const          { return mThreadsPerGroup[0]; }
+        uint32 getThreadsPerGroupY(void) const          { return mThreadsPerGroup[1]; }
+        uint32 getThreadsPerGroupZ(void) const          { return mThreadsPerGroup[2]; }
+        const uint32* getThreadsPerGroup(void) const    { return mThreadsPerGroup; }
 
         /** Sets the number of groups of threads to dispatch. Note the actual value may be
             changed by the shader template using the @pset() function.
@@ -196,6 +200,10 @@ namespace Ogre
             dimension.
         */
         void setNumThreadGroups( uint32 numThreadGroupsX, uint32 numThreadGroupsY, uint32 numThreadGroupsZ );
+        uint32 getNumThreadGroupsX(void) const          { return mNumThreadGroups[0]; }
+        uint32 getNumThreadGroupsY(void) const          { return mNumThreadGroups[1]; }
+        uint32 getNumThreadGroupsZ(void) const          { return mNumThreadGroups[2]; }
+        const uint32* getNumThreadGroups(void) const    { return mNumThreadGroups; }
 
         /** Instead of calling setNumThreadGroups, Ogre can automatically deduce
             them based on the Texture resolution and the threads per group.

@@ -2,7 +2,7 @@
 
 out vec4 fragColour;
 
-layout(std430, binding = 0) buffer PixelBuffer
+layout(std430, binding = 1) buffer PixelBuffer
 {
     readonly uint data[];
 } pixelBuffer;
@@ -13,6 +13,6 @@ uniform uvec2 texResolution;
 
 void main()
 {
-    uint idx = uint(gl_FragCoord.y) * texResolution.y + uint(gl_FragCoord.x);
+    uint idx = uint(gl_FragCoord.y) * texResolution.x + uint(gl_FragCoord.x);
     fragColour = unpackUnorm4x8( pixelBuffer.data[idx] );
 }

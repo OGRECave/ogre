@@ -74,7 +74,7 @@ namespace Ogre
             /// Gets reinterpret_cast'ed based on elementType
             uint8       dataBytes[64];
         };
-        struct Param
+        struct _OgreExport Param
         {
             String  name;
             bool    isAutomatic;

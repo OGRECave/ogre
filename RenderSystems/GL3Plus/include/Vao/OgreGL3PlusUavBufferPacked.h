@@ -38,9 +38,6 @@ namespace Ogre
 
     class _OgreGL3PlusExport GL3PlusUavBufferPacked : public UavBufferPacked
     {
-        GLuint mTexName;
-        GLenum mInternalFormat;
-
         virtual TexBufferPacked* getAsTexBufferImpl( PixelFormat pixelFormat );
 
         inline void bindBuffer( uint16 slot, size_t offset, size_t sizeBytes );
