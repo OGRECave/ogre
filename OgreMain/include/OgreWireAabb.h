@@ -5,6 +5,8 @@
 #include "OgreMovableObject.h"
 #include "OgreRenderable.h"
 
+#include "OgreHeaderPrefix.h"
+
 namespace Ogre
 {
     /** Helper class to display the Aabb of a MovableObject as lines.
@@ -73,5 +75,7 @@ namespace Ogre
         void destroyInstance( MovableObject* obj);
     };
 }
+
+#include "OgreHeaderSuffix.h"
 
 #endif

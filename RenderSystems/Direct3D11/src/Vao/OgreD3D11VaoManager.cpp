@@ -779,7 +779,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     D3D11CompatBufferInterface* D3D11VaoManager::createShaderBufferInterface(
             uint32 bindFlags, size_t sizeBytes, BufferType bufferType,
-            void *initialData, uint32_t structureByteStride )
+            void *initialData, uint32 structureByteStride )
     {
         ID3D11DeviceN *d3dDevice = mDevice.get();
 

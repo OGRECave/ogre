@@ -60,11 +60,13 @@ namespace Ogre
         #endif
             public PassAlloc
     {
+    public:
+        typedef vector<uint16>::type BlockIdxVec;
+    protected:
         Hlms    *mRegisteredHlms[HLMS_MAX];
         bool    mDeleteRegisteredOnExit[HLMS_MAX];
         HlmsCompute *mComputeHlms;
 
-        typedef vector<uint16>::type BlockIdxVec;
         HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
         HlmsBlendblock      mBlendblocks[OGRE_HLMS_NUM_BLENDBLOCKS];
         HlmsSamplerblock    mSamplerblocks[OGRE_HLMS_NUM_SAMPLERBLOCKS];
@@ -203,6 +205,10 @@ namespace Ogre
         /// instead of going fallback to default.
         HlmsDatablock* getDatablockNoDefault( IdString name ) const;
 
+        /// Returns all registered datablocks. @see getDatablock,
+        /// @see _datablockAdded, @see _datablockDestroyed
+        const HlmsDatablockMap& getDatablocks(void) const   { return mRegisteredDatablocks; }
+
         /// Alias function. @See getDatablock, as many beginners will probably think of the word
         /// "Material" first. Datablock is a more technical (and accurate) name of what it does
         /// (it's a block.. of data). Prefer calling getDatablock directly.
@@ -285,6 +291,41 @@ namespace Ogre
         virtual const StringVector& getScriptPatterns(void) const       { return mScriptPatterns; }
         virtual Real getLoadingOrder(void) const;
 #endif
+
+        /// Gets the indices of active blocks @see _getBlocks @see _getMacroblock
+        /// @see _getBlendblock @see _getSamplerblock
+        const BlockIdxVec& _getActiveBlocksIndices( const HlmsBasicBlock &blockType ) const;
+
+        /// Gets all blocks of a given type. This is an advanced function useful in retrieving
+        /// all the Macroblocks, all the Blendblocks, and all the Samplerblocks currently in use.
+        /// Example:
+        ///     Get all macroblocks:
+        ///         const BlockIdxVec &activeMacroblockIdx = mgr->_getActiveBlocksIndices( BLOCK_MACRO );
+        ///         BasicBlock const * const *macroblocks = mgr->_getBlocks( BLOCK_MACRO );
+        ///         BlockIdxVec::const_iterator itor = activeMacroblockIdx.begin();
+        ///         BlockIdxVec::const_iterator end  = activeMacroblockIdx.end();
+        ///         while( itor != end )
+        ///         {
+        ///             const HlmsMacroblock *macroblock = static_cast<const HlmsMacroblock*>(
+        ///                                                                  macroblocks[*itor] );
+        ///             ++itor;
+        ///         }
+        BasicBlock const * const *  _getBlocks( const HlmsBasicBlock &blockType ) const;
+
+        /// Gets a macroblock based on its index. @see _getActiveBlocksIndices
+        /// to get how which indices are active. @see _getBlocks to retrieve
+        /// all types of block in a generic way.
+        const HlmsMacroblock* _getMacroblock( uint16 idx ) const;
+
+        /// Gets a blendblock based on its index. @see _getActiveBlocksIndices
+        /// to get how which indices are active. @see _getBlocks to retrieve
+        /// all types of block in a generic way.
+        const HlmsBlendblock* _getBlendblock( uint16 idx ) const;
+
+        /// Gets a samplerblock based on its index. @see _getActiveBlocksIndices
+        /// to get how which indices are active. @see _getBlocks to retrieve
+        /// all types of block in a generic way.
+        const HlmsSamplerblock* _getSamplerblock( uint16 idx ) const;
     };
     /** @} */
     /** @} */

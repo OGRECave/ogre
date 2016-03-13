@@ -699,4 +699,32 @@ namespace Ogre
         return 100;
     }
 #endif
+    //-----------------------------------------------------------------------------------
+    const HlmsManager::BlockIdxVec& HlmsManager::_getActiveBlocksIndices( const HlmsBasicBlock &blockType ) const
+    {
+        return mActiveBlocks[blockType];
+    }
+    //-----------------------------------------------------------------------------------
+    BasicBlock const * const * HlmsManager::_getBlocks( const HlmsBasicBlock &blockType ) const
+    {
+        return mBlocks[blockType];
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsMacroblock* HlmsManager::_getMacroblock( uint16 idx ) const
+    {
+        assert( idx < OGRE_HLMS_NUM_MACROBLOCKS );
+        return &mMacroblocks[idx];
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsBlendblock* HlmsManager::_getBlendblock( uint16 idx ) const
+    {
+        assert( idx < OGRE_HLMS_NUM_BLENDBLOCKS );
+        return &mBlendblocks[idx];
+    }
+    //-----------------------------------------------------------------------------------
+    const HlmsSamplerblock* HlmsManager::_getSamplerblock( uint16 idx ) const
+    {
+        assert( idx < OGRE_HLMS_NUM_SAMPLERBLOCKS );
+        return &mSamplerblocks[idx];
+    }
 }

@@ -106,7 +106,7 @@ namespace Ogre
 
         /// Helper function to set filtering to the most common settings
         void setFiltering( TextureFilterOptions filterType );
-        void setAddressinMode( TextureAddressingMode addressingMode );
+        void setAddressingMode( TextureAddressingMode addressingMode );
     };
 
     /** @} */

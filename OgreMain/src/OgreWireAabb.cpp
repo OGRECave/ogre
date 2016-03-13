@@ -1,4 +1,6 @@
 
+#include "OgreStableHeaders.h"
+
 #include "OgreWireAabb.h"
 
 #include "Vao/OgreVaoManager.h"

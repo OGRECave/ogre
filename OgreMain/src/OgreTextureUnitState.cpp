@@ -75,7 +75,7 @@ namespace Ogre {
 
         HlmsManager *hlmsManager = parent->_getDatablock()->getCreator()->getHlmsManager();
         HlmsSamplerblock samplerblock;
-        samplerblock.setAddressinMode( TAM_WRAP );
+        samplerblock.setAddressingMode( TAM_WRAP );
         mSamplerblock = hlmsManager->getSamplerblock( HlmsSamplerblock() );
     }
     //-----------------------------------------------------------------------
@@ -123,7 +123,7 @@ namespace Ogre {
 
         HlmsManager *hlmsManager = parent->_getDatablock()->getCreator()->getHlmsManager();
         HlmsSamplerblock samplerblock;
-        samplerblock.setAddressinMode( TAM_WRAP );
+        samplerblock.setAddressingMode( TAM_WRAP );
         mSamplerblock = hlmsManager->getSamplerblock( HlmsSamplerblock() );
     }
     //-----------------------------------------------------------------------

@@ -63,6 +63,7 @@ namespace Ogre
                           PackedTexture textures[NUM_PBSM_TEXTURE_TYPES] );
 
         static void toQuotedStr( HlmsPbsDatablock::Workflows value, String &outString );
+        static void toQuotedStr( uint32 value, String &outString );
         static void toQuotedStr( HlmsPbsDatablock::TransparencyModes value, String &outString );
 
         void saveFresnel( const HlmsPbsDatablock *datablock, String &outString );

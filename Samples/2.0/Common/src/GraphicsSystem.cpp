@@ -122,8 +122,10 @@ std::string macBundlePath()
         Ogre::ConfigOptionMap::iterator opt = cfgOpts.find( "Video Mode" );
         if( opt != cfgOpts.end() )
         {
+            //Ignore leading space
+            const Ogre::String::size_type start = opt->second.currentValue.find_first_of("012356789");
             //Get the width and height
-            Ogre::String::size_type widthEnd = opt->second.currentValue.find(' ');
+            Ogre::String::size_type widthEnd = opt->second.currentValue.find(' ', start);
             // we know that the height starts 3 characters after the width and goes until the next space
             Ogre::String::size_type heightEnd = opt->second.currentValue.find(' ', widthEnd+3);
             // Now we can parse out the values
@@ -171,7 +173,7 @@ std::string macBundlePath()
     #ifdef WIN32
         case SDL_SYSWM_WINDOWS:
             // Windows code
-            winHandle = Ogre::StringConverter::toString( (unsigned long)wmInfo.info.win.window );
+            winHandle = Ogre::StringConverter::toString( (uintptr_t)wmInfo.info.win.window );
             break;
     #elif __MACOSX__
         case SDL_SYSWM_COCOA:
@@ -183,7 +185,7 @@ std::string macBundlePath()
             break;
     #else
         case SDL_SYSWM_X11:
-            winHandle = Ogre::StringConverter::toString( (unsigned long)wmInfo.info.x11.window );
+            winHandle = Ogre::StringConverter::toString( (uintptr_t)wmInfo.info.x11.window );
             break;
     #endif
         default:

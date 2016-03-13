@@ -480,6 +480,12 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    uint8 HlmsUnlitDatablock::getTextureUvSource( uint8 sourceType ) const
+    {
+        assert( sourceType < 8 );
+        return mUvSource[sourceType];
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsUnlitDatablock::setBlendMode( uint8 texType, UnlitBlendModes blendMode )
     {
         if( texType >= NUM_UNLIT_TEXTURE_TYPES )

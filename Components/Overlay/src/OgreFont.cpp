@@ -251,7 +251,7 @@ namespace Ogre
         mMaterial->getTechnique(0)->getPass(0)->setVertexColourTracking(TVC_DIFFUSE);
         HlmsSamplerblock samplerblock = *texLayer->getSamplerblock();
         // Clamp to avoid fuzzy edges
-        samplerblock.setAddressinMode( TAM_CLAMP );
+        samplerblock.setAddressingMode( TAM_CLAMP );
         // Allow min/mag filter, but no mip
         samplerblock.mMinFilter = FO_LINEAR;
         samplerblock.mMagFilter = FO_LINEAR;
@@ -294,7 +294,7 @@ namespace Ogre
         // Allow min/mag filter, but no mip
         HlmsSamplerblock samplerblock = *t->getSamplerblock();
         // Clamp to avoid fuzzy edges
-        samplerblock.setAddressinMode( TAM_CLAMP );
+        samplerblock.setAddressingMode( TAM_CLAMP );
         // Allow min/mag filter, but no mip
         samplerblock.mMinFilter = FO_LINEAR;
         samplerblock.mMagFilter = FO_LINEAR;
