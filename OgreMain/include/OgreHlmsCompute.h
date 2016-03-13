@@ -80,10 +80,14 @@ namespace Ogre
             HlmsComputeJob *job;
             HlmsPropertyVec setProperties;
             HlmsComputePso  pso;
+            uint32          paramsUpdateCounter;
+            uint32          paramsProfileUpdateCounter;
 
-            ComputePsoCache() : job( 0 ) {}
+            ComputePsoCache() :
+                job( 0 ), paramsUpdateCounter( ~0u ), paramsProfileUpdateCounter( ~0u ) {}
             ComputePsoCache( HlmsComputeJob *_job, const HlmsPropertyVec &properties ) :
-                job( _job ), setProperties( properties ) {}
+                job( _job ), setProperties( properties ),
+                paramsUpdateCounter( ~0u ), paramsProfileUpdateCounter( ~0u ) {}
 
             bool operator == ( const ComputePsoCache &_r ) const
             {

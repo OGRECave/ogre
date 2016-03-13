@@ -4,8 +4,13 @@
 
 #include "OgreSceneManager.h"
 #include "OgreItem.h"
-
-#include "OgreTextAreaOverlayElement.h"
+#include "OgreRoot.h"
+#include "OgreHlmsCompute.h"
+#include "OgreHlmsComputeJob.h"
+#include "OgreMaterialManager.h"
+#include "OgreTechnique.h"
+#include "OgrePass.h"
+#include "OgreRenderWindow.h"
 
 using namespace Demo;
 
@@ -15,7 +20,10 @@ namespace Demo
             const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mSceneNode( 0 ),
-        mDisplacement( 0 )
+        mDisplacement( 0 ),
+        mComputeJob( 0 ),
+        mLastWindowWidth( 0 ),
+        mLastWindowHeight( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -33,7 +41,19 @@ namespace Demo
 
         mSceneNode->attachObject( item );
 
+        Ogre::Root *root = mGraphicsSystem->getRoot();
+        Ogre::HlmsCompute *hlmsCompute = root->getHlmsManager()->getComputeHlms();
+        mComputeJob = hlmsCompute->findComputeJob( "TestJob" );
+        mDrawFromUavBufferMat = Ogre::MaterialManager::getSingleton().load(
+                    "DrawFromUavBuffer", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                staticCast<Ogre::Material>();
+
         TutorialGameState::createScene01();
+    }
+    //-----------------------------------------------------------------------------------
+    void TutorialCompute02_UavBufferGameState::destroyScene(void)
+    {
+        mDrawFromUavBufferMat.setNull();
     }
     //-----------------------------------------------------------------------------------
     void TutorialCompute02_UavBufferGameState::update( float timeSinceLast )
@@ -44,6 +64,30 @@ namespace Demo
         mDisplacement = fmodf( mDisplacement, 10.0f );
 
         mSceneNode->setPosition( origin + Ogre::Vector3::UNIT_X * mDisplacement );
+
+        Ogre::RenderWindow *renderWindow = mGraphicsSystem->getRenderWindow();
+        if( mLastWindowWidth != renderWindow->getWidth() ||
+            mLastWindowHeight != renderWindow->getHeight() )
+        {
+            Ogre::uint32 res[2];
+            res[0] = renderWindow->getWidth();
+            res[1] = renderWindow->getHeight();
+
+            //Update the compute shader's
+            Ogre::ShaderParams &shaderParams = mComputeJob->getShaderParams( "Default" );
+            Ogre::ShaderParams::Param *texResolution = shaderParams.findParameter( "texResolution" );
+            texResolution->setManualValue( res, sizeof(res) / sizeof(Ogre::uint32) );
+            shaderParams.setDirty();
+
+            //Update the pass that draws the UAV Buffer into the RTT (we could
+            //use auto param viewport_size, but this more flexible)
+            Ogre::GpuProgramParametersSharedPtr psParams = mDrawFromUavBufferMat->getTechnique(0)->
+                    getPass(0)->getFragmentProgramParameters();
+            psParams->setNamedConstant( "texResolution", res, 1u, 2u );
+
+            mLastWindowWidth  = renderWindow->getWidth();
+            mLastWindowHeight = renderWindow->getHeight();
+        }
 
         TutorialGameState::update( timeSinceLast );
     }

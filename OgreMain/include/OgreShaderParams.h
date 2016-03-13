@@ -78,23 +78,58 @@ namespace Ogre
         {
             String  name;
             bool    isAutomatic;
+            bool    isDirty;
 
             union
             {
                 AutoParam ap;
                 ManualParam mp;
             };
+
+            template <typename T>
+            void setManualValue( T value, uint32 numValues, ElementType elementType );
+
+            void setManualValue( const Vector2 &value );
+            void setManualValue( const Vector3 &value );
+            void setManualValue( const Vector4 &value );
+            void setManualValue( const Matrix3 &value );
+            void setManualValue( const Matrix4 &value );
+
+            /** Shortcut for setting the given value without dealing with mp manually.
+            @remarks
+                You can't write more than 64 bytes of data per parameter.
+                (i.e. 16 uint32, 16 int32, or 16 floats)
+                Remember to call @see ShaderParams::setDirty otherwise
+                changes won't take effect.
+            */
+            void setManualValue( float value );
+            void setManualValue( float *value, uint32 numValues );
+            void setManualValue( int32 value );
+            void setManualValue( int32 *value, uint32 numValues );
+            void setManualValue( uint32 value );
+            void setManualValue( uint32 *value, uint32 numValues );
         };
 
         typedef vector<Param>::type ShaderParamVec;
 
         /// Don't log exceptions about missing parameters
         bool mSilenceMissingParameterWarnings;
+        uint32 mUpdateCounter;
         ShaderParamVec mParams;
 
         ShaderParams();
 
         void updateParameters( GpuProgramParametersSharedPtr params );
+
+        /// Call this whenever you've updated a parameter in mParams
+        void setDirty(void)                         { ++mUpdateCounter; }
+        uint32 getUpdateCounter(void) const         { return mUpdateCounter; }
+
+        /// Finds a parameter. Returns null if not found.
+        /// This operation is O(N) as it makes a linear search.
+        /// You can cache the return pointer (as long as the
+        /// iterators from mParams aren't invalidated)
+        Param* findParameter( const String &name );
     };
 
     /** @} */

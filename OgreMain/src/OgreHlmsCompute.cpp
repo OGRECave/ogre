@@ -357,6 +357,13 @@ namespace Ogre
 
                 //Compile and add the PSO to the cache.
                 psoCache.pso = compileShader( job, mComputeShaderCache.size() );
+
+                ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+                if( shaderParams )
+                    psoCache.paramsUpdateCounter = shaderParams->getUpdateCounter();
+                if( shaderParams )
+                    psoCache.paramsProfileUpdateCounter = shaderParams->getUpdateCounter();
+
                 mComputeShaderCache.push_back( psoCache );
 
                 //The PSO in the cache doesn't have the properties. Make a hard copy.
@@ -375,7 +382,24 @@ namespace Ogre
             }
         }
 
-        const ComputePsoCache &psoCache = mComputeShaderCache[job->mPsoCacheHash];
+        ComputePsoCache &psoCache = mComputeShaderCache[job->mPsoCacheHash];
+
+        {
+            //Update dirty parameters, if necessary
+            ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+            if( shaderParams && psoCache.paramsUpdateCounter != shaderParams->getUpdateCounter() )
+            {
+                shaderParams->updateParameters( psoCache.pso.computeShader->getDefaultParameters() );
+                psoCache.paramsUpdateCounter = shaderParams->getUpdateCounter();
+            }
+
+            shaderParams = job->_getShaderParams( mShaderProfile );
+            if( shaderParams && psoCache.paramsProfileUpdateCounter != shaderParams->getUpdateCounter() )
+            {
+                shaderParams->updateParameters( psoCache.pso.computeShader->getDefaultParameters() );
+                psoCache.paramsProfileUpdateCounter = shaderParams->getUpdateCounter();
+            }
+        }
 
         mRenderSystem->_setComputePso( &psoCache.pso );
 

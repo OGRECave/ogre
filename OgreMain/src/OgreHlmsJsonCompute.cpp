@@ -126,7 +126,8 @@ namespace Ogre
             {
                 //Automatic param
                 ShaderParams::Param param;
-                param.isAutomatic = true;
+                param.isAutomatic   = true;
+                param.isDirty       = true;
                 param.name = paramName;
 
                 const GpuProgramParameters::AutoConstantDefinition *acDef = GpuProgramParameters::
@@ -194,7 +195,8 @@ namespace Ogre
             else
             {
                 ShaderParams::Param param;
-                param.isAutomatic = false;
+                param.isAutomatic   = false;
+                param.isDirty       = true;
                 param.name = paramName;
 
                 param.mp.elementType = ShaderParams::ElementFloat;
@@ -297,6 +299,7 @@ namespace Ogre
                 ShaderParams::Param param;
                 param.name = jsonArray[1].GetString();
                 param.isAutomatic = false;
+                param.isDirty     = true;
                 param.mp.elementType    = ShaderParams::ElementInt;
                 param.mp.dataSizeBytes  = sizeof(int32);
                 memcpy( param.mp.dataBytes, &texLocation.xIdx, sizeof(int32) );
