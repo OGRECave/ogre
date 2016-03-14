@@ -1,20 +1,27 @@
-RWTexture2D<uint> testTexture			: register(u1);
+RWStructuredBuffer<uint> pixelBuffer : register(u1);
 
 struct PS_INPUT
 {
 	float2 uv0 : TEXCOORD0;
 };
 
+uniform uint2 texResolution;
+
+float4 unpackUnorm4x8( uint value )
+{
+	float4 retVal;
+	retVal.x = float(value & 0xFF);
+	retVal.y = float((value >>  8u) & 0xFF);
+	retVal.z = float((value >> 16u) & 0xFF);
+	retVal.w = float((value >> 24u) & 0xFF);
+
+	return retVal * 0.0039215687f; // 1.0 / 255.0f;
+}
+
 float4 main( PS_INPUT inPs, float4 gl_FragCoord : SV_Position ) : SV_Target
 {
-	int2 fragPos = int2( gl_FragCoord.xy );
+	uint idx = uint(gl_FragCoord.y) * texResolution.x + uint(gl_FragCoord.x);
+	float4 fragColour = unpackUnorm4x8( pixelBuffer[idx] );
 	
-	uint packedVal = testTexture[fragPos];
-	
-	float4 fragColour;
-	fragColour.x = (packedVal >> 24u);
-	fragColour.y = (packedVal >> 16u) & 0xFF;
-	fragColour.z = (packedVal >>  8u) & 0xFF;
-	fragColour.w = packedVal & 0xFF;
-	return fragColour * 0.00392157f; // 1/255
+	return fragColour;
 }

@@ -1165,8 +1165,9 @@ namespace Ogre {
                                         newVar.name += "."; 
                                         newVar.name += mMemberTypeName[nameCount++].Name;
                                         newVar.size = mMemberTypeDesc[memberCount].Rows * mMemberTypeDesc[memberCount].Columns * 
-                                                                    (mMemberTypeDesc[memberCount].Type == D3D_SVT_FLOAT ||
-                                                                        mMemberTypeDesc[memberCount].Type == D3D_SVT_INT ? 4 : 1);
+                                                                    ((mMemberTypeDesc[memberCount].Type == D3D_SVT_FLOAT ||
+                                                                      mMemberTypeDesc[memberCount].Type == D3D_SVT_INT ||
+                                                                      mMemberTypeDesc[memberCount].Type == D3D_SVT_UINT) ? 4 : 1);
                                         newVar.startOffset = parentOffset + mMemberTypeDesc[memberCount].Offset;
                                         memberCount++;
                                         fixVariableNameFromCg(newVar);
@@ -1272,6 +1273,16 @@ namespace Ogre {
                 mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
                 mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
             }
+            else if( def.isUnsignedInt() )
+            {
+                def.physicalIndex = mUIntLogicalToPhysical->bufferSize;
+                OGRE_LOCK_MUTEX(mUIntLogicalToPhysical->mutex);
+                    mUIntLogicalToPhysical->map.insert(
+                    GpuLogicalIndexUseMap::value_type(paramIndex,
+                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+                mUIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+                mConstantDefs->uintBufferSize = mUIntLogicalToPhysical->bufferSize;
+            }
             else
             {
                 def.physicalIndex = mIntLogicalToPhysical->bufferSize;
@@ -1361,7 +1372,8 @@ namespace Ogre {
         else
         {
             // Process params
-            if (varRefTypeDesc.Type == D3D_SVT_FLOAT || varRefTypeDesc.Type == D3D_SVT_INT || varRefTypeDesc.Type == D3D_SVT_BOOL)
+            if (varRefTypeDesc.Type == D3D_SVT_FLOAT || varRefTypeDesc.Type == D3D_SVT_INT ||
+                varRefTypeDesc.Type == D3D_SVT_UINT || varRefTypeDesc.Type == D3D_SVT_BOOL)
             {
                 GpuConstantDefinitionWithName def;
                 String * name = new String(prefix + paramName);
@@ -1399,6 +1411,23 @@ namespace Ogre {
                 break;
             case 4:
                 def.constType = GCT_INT4;
+                break;
+            } // columns
+            break;
+        case D3D10_SVT_UINT:
+            switch(d3dDesc.Columns)
+            {
+            case 1:
+                def.constType = GCT_UINT1;
+                break;
+            case 2:
+                def.constType = GCT_UINT2;
+                break;
+            case 3:
+                def.constType = GCT_UINT3;
+                break;
+            case 4:
+                def.constType = GCT_UINT4;
                 break;
             } // columns
             break;
@@ -2068,6 +2097,10 @@ namespace Ogre {
                         {
                             src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
                         }
+                        else if( def.isUnsignedInt() )
+                        {
+                            src = (void *)&(*(params->getUnsignedIntConstantList().begin() + def.physicalIndex));
+                        }
                         else
                         {
                             src = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
@@ -2113,6 +2146,10 @@ namespace Ogre {
                         if(def.isFloat())
                         {
                             src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
+                        }
+                        else if( def.isUnsignedInt() )
+                        {
+                            src = (void *)&(*(params->getUnsignedIntConstantList().begin() + def.physicalIndex));
                         }
                         else
                         {

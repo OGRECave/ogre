@@ -99,6 +99,7 @@ namespace Ogre
         srDesc.ViewDimension        = D3D11_UAV_DIMENSION_BUFFER;
         srDesc.Buffer.FirstElement  = (mFinalBufferStart + offset) / mBytesPerElement;
         srDesc.Buffer.NumElements   = sizeBytes / mBytesPerElement;
+        srDesc.Buffer.Flags         = 0;
 
         assert( dynamic_cast<D3D11CompatBufferInterface*>( mBufferInterface ) );
         D3D11CompatBufferInterface *bufferInterface = static_cast<D3D11CompatBufferInterface*>(
@@ -107,13 +108,12 @@ namespace Ogre
 
         mDevice.get()->CreateUnorderedAccessView( vboName, &srDesc,
                                                   &mCachedResourceViews[cacheIdx].mResourceView );
-
         mCurrentCacheCursor = (cacheIdx + 1) % 16;
 
         return mCachedResourceViews[cacheIdx].mResourceView;
     }
     //-----------------------------------------------------------------------------------
-    ID3D11UnorderedAccessView* D3D11UavBufferPacked::bindBufferCommon( size_t offset, size_t sizeBytes )
+    ID3D11UnorderedAccessView* D3D11UavBufferPacked::_bindBufferCommon( size_t offset, size_t sizeBytes )
     {
         assert( offset < (mNumElements - 1) );
         assert( sizeBytes < mNumElements );
@@ -149,42 +149,42 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
 //    void D3D11UavBufferPacked::bindBufferVS( uint16 slot, size_t offset, size_t sizeBytes )
 //    {
-//        ID3D11UnorderedAccessView *resourceView = bindBufferCommon( offset, sizeBytes );
+//        ID3D11UnorderedAccessView *resourceView = _bindBufferCommon( offset, sizeBytes );
 //        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 //        deviceContext->VSSetShaderResources( slot, 1, &resourceView );
 //    }
 //    //-----------------------------------------------------------------------------------
 //    void D3D11UavBufferPacked::bindBufferPS( uint16 slot, size_t offset, size_t sizeBytes )
 //    {
-//        ID3D11UnorderedAccessView *resourceView = bindBufferCommon( offset, sizeBytes );
+//        ID3D11UnorderedAccessView *resourceView = _bindBufferCommon( offset, sizeBytes );
 //        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 //        deviceContext->PSSetShaderResources( slot, 1, &resourceView );
 //    }
 //    //-----------------------------------------------------------------------------------
 //    void D3D11UavBufferPacked::bindBufferGS( uint16 slot, size_t offset, size_t sizeBytes )
 //    {
-//        ID3D11UnorderedAccessView *resourceView = bindBufferCommon( offset, sizeBytes );
+//        ID3D11UnorderedAccessView *resourceView = _bindBufferCommon( offset, sizeBytes );
 //        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 //        deviceContext->GSSetShaderResources( slot, 1, &resourceView );
 //    }
 //    //-----------------------------------------------------------------------------------
 //    void D3D11UavBufferPacked::bindBufferHS( uint16 slot, size_t offset, size_t sizeBytes )
 //    {
-//        ID3D11UnorderedAccessView *resourceView = bindBufferCommon( offset, sizeBytes );
+//        ID3D11UnorderedAccessView *resourceView = _bindBufferCommon( offset, sizeBytes );
 //        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 //        deviceContext->HSSetShaderResources( slot, 1, &resourceView );
 //    }
 //    //-----------------------------------------------------------------------------------
 //    void D3D11UavBufferPacked::bindBufferDS( uint16 slot, size_t offset, size_t sizeBytes )
 //    {
-//        ID3D11UnorderedAccessView *resourceView = bindBufferCommon( offset, sizeBytes );
+//        ID3D11UnorderedAccessView *resourceView = _bindBufferCommon( offset, sizeBytes );
 //        ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 //        deviceContext->DSSetShaderResources( slot, 1, &resourceView );
 //    }
     //-----------------------------------------------------------------------------------
     void D3D11UavBufferPacked::bindBufferCS( uint16 slot, size_t offset, size_t sizeBytes )
     {
-        ID3D11UnorderedAccessView *resourceView = bindBufferCommon( offset, sizeBytes );
+        ID3D11UnorderedAccessView *resourceView = _bindBufferCommon( offset, sizeBytes );
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
         deviceContext->CSSetUnorderedAccessViews( slot, 1, &resourceView, 0 );
     }

@@ -54,7 +54,6 @@ namespace Ogre
         virtual TexBufferPacked* getAsTexBufferImpl( PixelFormat pixelFormat );
 
         ID3D11UnorderedAccessView* createResourceView( int cacheIdx, uint32 offset, uint32 sizeBytes );
-        ID3D11UnorderedAccessView* bindBufferCommon( size_t offset, size_t sizeBytes );
 
     public:
         D3D11UavBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
@@ -62,6 +61,8 @@ namespace Ogre
                               VaoManager *vaoManager, BufferInterface *bufferInterface,
                               D3D11Device &device );
         virtual ~D3D11UavBufferPacked();
+
+        ID3D11UnorderedAccessView* _bindBufferCommon( size_t offset, size_t sizeBytes );
 
 //        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
 //        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );

@@ -60,6 +60,7 @@ THE SOFTWARE.
 #include "Vao/OgreD3D11VaoManager.h"
 #include "Vao/OgreD3D11BufferInterface.h"
 #include "Vao/OgreD3D11VertexArrayObject.h"
+#include "Vao/OgreD3D11UavBufferPacked.h"
 #include "Vao/OgreIndexBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
@@ -162,6 +163,7 @@ bail:
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
+        memset( mUavBuffers, 0, sizeof( mUavBuffers ) );
         memset( mUavs, 0, sizeof( mUavs ) );
 
         mRenderSystemWasInited = false;
@@ -2316,12 +2318,19 @@ bail:
     {
         assert( slot < 64 );
 
-        if( mUavTexPtr[slot].isNull() && texture.isNull() )
+        if( !mUavBuffers[slot] && mUavTexPtr[slot].isNull() && texture.isNull() )
             return;
 
         mUavsDirty = true;
 
         mUavTexPtr[slot] = texture;
+
+        if( mUavBuffers[slot] )
+        {
+            //If the UAV view belonged to a buffer, don't decrement the reference count.
+            mUavBuffers[slot] = 0;
+            mUavs[slot] = 0;
+        }
 
         //Release oldUav *after* we've created the new UAV (if D3D11 needs
         //to return the same UAV, if we release it earlier we may cause
@@ -2393,6 +2402,57 @@ bail:
                     "'\nError Description: " + errorDescription,
                     "D3D11RenderSystem::queueBindUAV" );
             }
+
+            mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+        }
+        else
+        {
+            if( slot + 1 == mMaxModifiedUavPlusOne )
+            {
+                --mMaxModifiedUavPlusOne;
+                while( mMaxModifiedUavPlusOne != 0 && !mUavs[mMaxModifiedUavPlusOne-1] )
+                    --mMaxModifiedUavPlusOne;
+            }
+        }
+
+        if( oldUav )
+        {
+            oldUav->Release();
+            oldUav = 0;
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                          ResourceAccess::ResourceAccess access,
+                                          size_t offset, size_t sizeBytes )
+    {
+        assert( slot < 64 );
+
+        if( mUavTexPtr[slot].isNull() && !mUavBuffers[slot] && !buffer )
+            return;
+
+        mUavsDirty = true;
+
+        if( mUavBuffers[slot] )
+        {
+            //If the UAV view belonged to a buffer, don't decrement the reference count.
+            mUavs[slot] = 0;
+        }
+
+        mUavTexPtr[slot].setNull();
+
+        //Release oldUav *after* we've created the new UAV (if D3D11 needs
+        //to return the same UAV, if we release it earlier we may cause
+        //unnecessary alloc/deallocations)
+        ID3D11UnorderedAccessView *oldUav = mUavs[slot];
+        mUavs[slot] = 0;
+
+        if( buffer )
+        {
+            assert( dynamic_cast<D3D11UavBufferPacked*>( buffer ) );
+            D3D11UavBufferPacked *uavBufferPacked = static_cast<D3D11UavBufferPacked*>( buffer );
+
+            mUavs[slot] = uavBufferPacked->_bindBufferCommon( offset, sizeBytes );
 
             mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
         }
