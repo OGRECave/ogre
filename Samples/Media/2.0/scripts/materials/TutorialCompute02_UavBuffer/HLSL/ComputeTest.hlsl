@@ -5,10 +5,10 @@ uniform uint2 texResolution;
 
 uint packUnorm4x8( float4 value )
 {
-	uint x = uint(saturate(value.x * 255.0f));
-	uint y = uint(saturate(value.y * 255.0f));
-	uint z = uint(saturate(value.z * 255.0f));
-	uint w = uint(saturate(value.w * 255.0f));
+	uint x = uint(saturate(value.x) * 255.0f);
+	uint y = uint(saturate(value.y) * 255.0f);
+	uint z = uint(saturate(value.z) * 255.0f);
+	uint w = uint(saturate(value.w) * 255.0f);
 	
 	return x | (y << 8u) | (z << 16u ) | (w << 24u);
 }
