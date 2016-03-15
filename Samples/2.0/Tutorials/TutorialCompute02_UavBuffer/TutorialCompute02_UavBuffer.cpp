@@ -73,12 +73,12 @@ int mainApp()
 #endif
 {
     TutorialCompute02_UavBufferGameState TutorialCompute02_UavBufferGameState(
-        "Compute Test 01" );
+        "This sample shows how to setup and use UAV Buffers with compute shaders." );
     TutorialCompute02_UavBufferGraphicsSystem graphicsSystem( &TutorialCompute02_UavBufferGameState );
 
     TutorialCompute02_UavBufferGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize( "Test: Compute 01" );
+    graphicsSystem.initialize( "Tutorial: Compute 02" );
 
     if( graphicsSystem.getQuit() )
     {

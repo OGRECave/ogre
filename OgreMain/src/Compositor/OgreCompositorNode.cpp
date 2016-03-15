@@ -569,6 +569,46 @@ namespace Ogre
             this->routeOutputs();
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNode::connectExternalBuffer( UavBufferPacked *buffer, size_t inChannelA )
+    {
+        if( inChannelA >= this->mDefinition->mInputBuffers.size() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS, "There is no input buffer channel #" +
+                         StringConverter::toString( inChannelA ) + " for node " +
+                         mDefinition->mNameStr, "CompositorNode::connectExternalBuffer" );
+        }
+
+        CompositorNamedBuffer cmp;
+        const IdString &inBufferName = mDefinition->mInputBuffers[inChannelA];
+        CompositorNamedBufferVec::iterator inBuf = std::lower_bound( mBuffers.begin(),
+                                                                     mBuffers.end(),
+                                                                     inBufferName, cmp );
+
+        if( inBufferName == IdString() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Input buffer channels must not have gaps."
+                         " Channel #" + StringConverter::toString( inChannelA ) + " from node '" +
+                         mDefinition->mNameStr + "' is not defined.",
+                         "CompositorNode::connectExternalBuffer" );
+        }
+
+        if( inBuf != mBuffers.end() && inBuf->name == inBufferName )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Buffer with name '" +
+                         inBufferName.getFriendlyText() + "' was already defined in node " +
+                         mDefinition->mNameStr + " while trying to connect to its "
+                         "channel #" + StringConverter::toString( inChannelA ) +
+                         ". Did you define the buffer twice?",
+                         "CompositorNode::connectExternalBuffer" );
+        }
+        else
+        {
+            const CompositorNamedBuffer namedBuffer( inBufferName, buffer );
+            mBuffers.insert( inBuf, 1, namedBuffer );
+            ++mNumConnectedBufferInputs;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     bool CompositorNode::areAllInputsConnected() const
     {
         return mNumConnectedInputs == mInTextures.size() &&

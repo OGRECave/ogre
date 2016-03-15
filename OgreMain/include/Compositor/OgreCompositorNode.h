@@ -205,6 +205,15 @@ namespace Ogre
         void connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
                                 size_t inChannelA );
 
+        /** Connects (injects) an external buffer into the given channel. Usually used for
+            the "connect_external" directive.
+        @param buffer
+            The buffer.
+        @param inChannelA
+            In which channel number to inject to.
+        */
+        void connectExternalBuffer( UavBufferPacked *buffer, size_t inChannelA );
+
         bool areAllInputsConnected() const;
         const CompositorChannelVec& getInputChannel() const         { return mInTextures; }
         const CompositorChannelVec& getLocalTextures() const        { return mLocalTextures; }

@@ -79,6 +79,12 @@ namespace Ogre
         uint32              mFinalInChannel;/// Input Channel # to send the RenderWindow to
         IdString            mFinalNode;     /// Alias of the final node to send the RenderWindow to
 
+        /// outChannel  => Which channel to connect to.
+        /// outNode     => Which node to connect to.
+        /// inChannel   => Index to CompositorWorkspace::mExternalBuffers.
+        /// inNode      => Not used.
+        ChannelRouteList    mExternalBufferChannelRoutes;
+
         CompositorManager2  *mCompositorManager;
 
         /** Checks if nodeName is already aliased (whether explicitly or implicitly). If not,
@@ -91,6 +97,11 @@ namespace Ogre
             Name of the node definition.
         */
         void createImplicitAlias( IdString nodeName );
+
+        /// Checks the buffer input channel of the given node is not in use.
+        /// Logs a warning if it's in use.
+        void checkInputBufferChannelIsEmpty( IdString inNode, uint32 inChannel,
+                                             const std::string &outNodeName ) const;
 
     public:
         CompositorWorkspaceDef( IdString name, CompositorManager2 *compositorManager );
@@ -119,6 +130,28 @@ namespace Ogre
             inNode is not yet aliased, an implicit alias will be created.
         */
         void connectOutput( IdString inNode, uint32 inChannel );
+
+        /** Connects outNode's output buffer channel to inNode's input buffer channel.
+        @remarks
+            This mapping will later be used to know how connections should be done when
+            instantiating. @See CompositorNode::connectBufferTo
+            If outNode & inNode are not yet aliased, an alias for them will be created.
+        */
+        void connectBuffer( IdString outNode, uint32 outChannel, IdString inNode, uint32 inChannel );
+
+        /** Connects all output buffer channels from outNode to all input buffer channels from inNode.
+            If the number of channels don't match, only the first N channels are set (where N is
+            the minimum between outNode's output channels and inNode's input channels).
+        @remarks
+            If outNode & inNode are not yet aliased, an alias for them will be created.
+        */
+        void connectBuffer( IdString outNode, IdString inNode );
+
+        /** Connects an external buffer to the given input channel
+        @remarks
+            If inNode is not yet aliased, an implicit alias will be created.
+        */
+        void connectExternalBuffer( uint32 externalBufferIdx, IdString inNode, uint32 inChannel );
 
         /** Clears all the connection between channels of the nodes (@see connect).
         @remarks
