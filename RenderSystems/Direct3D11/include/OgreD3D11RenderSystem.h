@@ -113,6 +113,10 @@ namespace Ogre
         D3D11HLSLProgram* mBoundComputeProgram;
         uint32          mMaxBoundUavCS;
 
+        uint            mNumberOfViews;
+        ID3D11RenderTargetView *mRenderTargetViews[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        ID3D11DepthStencilView *mDepthStencilView;
+
         TexturePtr                  mUavTexPtr[64];
         UavBufferPacked             *mUavBuffers[64];
         ID3D11UnorderedAccessView   *mUavs[64];

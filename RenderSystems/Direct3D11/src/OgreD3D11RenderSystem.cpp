@@ -154,6 +154,8 @@ bail:
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
           mpDXGIFactory(0),
+          mNumberOfViews( 0 ),
+          mDepthStencilView( 0 ),
           mMaxModifiedUavPlusOne( 0 ),
           mUavsDirty( false ),
           mDSTResView(0)
@@ -163,6 +165,7 @@ bail:
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
+        memset( mRenderTargetViews, 0, sizeof( mRenderTargetViews ) );
         memset( mUavBuffers, 0, sizeof( mUavBuffers ) );
         memset( mUavs, 0, sizeof( mUavs ) );
 
@@ -2162,13 +2165,8 @@ bail:
 
         if (target)
         {
-            ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-            memset(pRTView, 0, sizeof(pRTView));
-
-            target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
-
-            uint numberOfViews;
-            target->getCustomAttribute( "numberOfViews", &numberOfViews );
+            target->getCustomAttribute( "ID3D11RenderTargetView", &mRenderTargetViews );
+            target->getCustomAttribute( "numberOfViews", &mNumberOfViews );
 
             //Retrieve depth buffer
             D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
@@ -2184,33 +2182,31 @@ bail:
             depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
 
             if( !colourWrite )
-                numberOfViews = 0;
+                mNumberOfViews = 0;
+
+            mDepthStencilView = depthBuffer ? depthBuffer->getDepthStencilView() : 0;
 
             if( mMaxModifiedUavPlusOne )
             {
-                if( mUavStartingSlot < numberOfViews )
+                if( mUavStartingSlot < mNumberOfViews )
                 {
                     OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                         "mUavStartingSlot is lower than the number of RenderTargets attached.\n"
-                        "There are " + StringConverter::toString( numberOfViews ) + " RTs attached,\n"
+                        "There are " + StringConverter::toString( mNumberOfViews ) + " RTs attached,\n"
                         "and mUavStartingSlot = " + StringConverter::toString( mUavStartingSlot ) + "\n"
                         "use setUavStartingSlot to fix this, or set a MRT with less RTs",
                         "D3D11RenderSystem::_setRenderTargetViews" );
                 }
 
                 mDevice.GetImmediateContext()->OMSetRenderTargetsAndUnorderedAccessViews(
-                            numberOfViews,
-                            pRTView,
-                            depthBuffer ? depthBuffer->getDepthStencilView() : 0,
+                            mNumberOfViews, mRenderTargetViews, mDepthStencilView,
                             mUavStartingSlot, mMaxModifiedUavPlusOne, mUavs, 0 );
             }
             else
             {
                 // now switch to the new render target
-                mDevice.GetImmediateContext()->OMSetRenderTargets(
-                            numberOfViews,
-                            pRTView,
-                            depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
+                mDevice.GetImmediateContext()->OMSetRenderTargets( mNumberOfViews, mRenderTargetViews,
+                                                                   mDepthStencilView );
             }
 
             if (mDevice.isError())
@@ -2439,6 +2435,7 @@ bail:
             mUavs[slot] = 0;
         }
 
+        mUavBuffers[slot] = buffer;
         mUavTexPtr[slot].setNull();
 
         //Release oldUav *after* we've created the new UAV (if D3D11 needs
@@ -2483,7 +2480,9 @@ bail:
 
             if( mUavs[i] )
             {
-                mUavs[i]->Release();
+                //If the UAV view belonged to a buffer, don't decrement the reference count.
+                if( !mUavBuffers[i] )
+                    mUavs[i]->Release();
                 mUavs[i] = 0;
             }
         }
@@ -3073,6 +3072,13 @@ bail:
         if( pso )
         {
             newComputeShader = reinterpret_cast<D3D11HLSLProgram*>( pso->rsData );
+
+            {
+                //Using Compute Shaders? Unset the UAV from rendering
+                mDevice.GetImmediateContext()->OMSetRenderTargets( mNumberOfViews, mRenderTargetViews,
+                                                                   mDepthStencilView );
+                mUavsDirty = true;
+            }
 
             if( mBoundComputeProgram == newComputeShader )
                 return;
