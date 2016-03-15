@@ -78,17 +78,17 @@ namespace Ogre
 
         struct BufferSource
         {
-            uint32      slotIdx;
+            uint32      uavSlot;
             IdString    bufferName;
             ResourceAccess::ResourceAccess access;
             size_t      offset;
             size_t      sizeBytes;
             //PixelFormat pixelFormat; /// PF_UNKNOWN if used as UAV.
 
-            BufferSource( uint32 _slotIdx, IdString _bufferName,
+            BufferSource( uint32 _uavSlot, IdString _bufferName,
                           ResourceAccess::ResourceAccess _access, size_t _offset=0,
                           size_t _sizeBytes=0 ) :
-                slotIdx( _slotIdx ), bufferName( _bufferName ), access( _access ), offset( _offset ),
+                uavSlot( _uavSlot ), bufferName( _bufferName ), access( _access ), offset( _offset ),
                 sizeBytes( _sizeBytes ) {}
         };
         typedef vector<BufferSource>::type BufferSourceVec;

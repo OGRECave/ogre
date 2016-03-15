@@ -227,44 +227,89 @@ namespace Ogre
     {
         CompositorPass::_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
 
-        const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
-        CompositorPassComputeDef::TextureSources::const_iterator itor = uavSources.begin();
-        CompositorPassComputeDef::TextureSources::const_iterator end  = uavSources.end();
-
-        while( itor != end )
         {
-            TexturePtr uavTex = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+            //<anything> -> Texture UAVs
+            const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
+            CompositorPassComputeDef::TextureSources::const_iterator itor = uavSources.begin();
+            CompositorPassComputeDef::TextureSources::const_iterator end  = uavSources.end();
 
-            //TODO: Do we have to do this for all slices? Or just one? Refactor is needed.
-            RenderTarget *uavRt = uavTex->getBuffer( 0, 0 )->getRenderTarget( 0 );
-
-            ResourceAccessMap::iterator itResAccess = uavsAccess.find( uavRt );
-
-            if( itResAccess == uavsAccess.end() )
+            while( itor != end )
             {
-                //First time accessing the UAV. If we need a barrier,
-                //we will see it in the second pass.
-                uavsAccess[uavRt] = ResourceAccess::Undefined;
-                itResAccess = uavsAccess.find( uavRt );
+                TexturePtr uavTex = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+
+                //TODO: Do we have to do this for all slices? Or just one? Refactor is needed.
+                RenderTarget *uavRt = uavTex->getBuffer( 0, 0 )->getRenderTarget( 0 );
+
+                ResourceAccessMap::iterator itResAccess = uavsAccess.find( uavRt );
+
+                if( itResAccess == uavsAccess.end() )
+                {
+                    //First time accessing the UAV. If we need a barrier,
+                    //we will see it in the second pass.
+                    uavsAccess[uavRt] = ResourceAccess::Undefined;
+                    itResAccess = uavsAccess.find( uavRt );
+                }
+
+                ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( uavRt );
+
+                if( currentLayout->second != ResourceLayout::Uav ||
+                        !( (itor->access == ResourceAccess::Read &&
+                            itResAccess->second == ResourceAccess::Read) ||
+                           (itor->access == ResourceAccess::Write &&
+                            itResAccess->second == ResourceAccess::Write &&
+                            itor->allowWriteAfterWrite) ||
+                           itResAccess->second == ResourceAccess::Undefined ) )
+                {
+                    //Not RaR (or not WaW when they're explicitly allowed). Insert the barrier.
+                    //We also may need the barrier if the resource wasn't an UAV.
+                    addResourceTransition( currentLayout, ResourceLayout::Uav, ReadBarrier::Uav );
+                }
+
+                itResAccess->second = itor->access;
+                ++itor;
             }
+        }
 
-            ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( uavRt );
+        {
+            //<anything> -> Buffer UAVs
+            const CompositorPassComputeDef::BufferSourceVec &bufferSources =
+                    mDefinition->getBufferSources();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator itor = bufferSources.begin();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator end  = bufferSources.end();
 
-            if( currentLayout->second != ResourceLayout::Uav ||
-                !( (itor->access == ResourceAccess::Read &&
-                    itResAccess->second == ResourceAccess::Read) ||
-                   (itor->access == ResourceAccess::Write &&
-                    itResAccess->second == ResourceAccess::Write &&
-                    itor->allowWriteAfterWrite) ||
-                   itResAccess->second == ResourceAccess::Undefined ) )
+            while( itor != end )
             {
-                //Not RaR (or not WaW when they're explicitly allowed). Insert the barrier.
-                //We also may need the barrier if the resource wasn't an UAV.
-                addResourceTransition( currentLayout, ResourceLayout::Uav, ReadBarrier::Uav );
-            }
+                UavBufferPacked *uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
 
-            itResAccess->second = itor->access;
-            ++itor;
+                ResourceAccessMap::iterator itResAccess = uavsAccess.find( uavBuffer );
+
+                if( itResAccess == uavsAccess.end() )
+                {
+                    //First time accessing the UAV. If we need a barrier,
+                    //we will see it in the second pass.
+                    uavsAccess[uavBuffer] = ResourceAccess::Undefined;
+                    itResAccess = uavsAccess.find( uavBuffer );
+                }
+
+                ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( uavBuffer );
+
+                if( currentLayout->second != ResourceLayout::Uav ||
+                    !( (itor->access == ResourceAccess::Read &&
+                        itResAccess->second == ResourceAccess::Read) ||
+                       (itor->access == ResourceAccess::Write &&
+                        itResAccess->second == ResourceAccess::Write &&
+                        itor->allowWriteAfterWrite) ||
+                       itResAccess->second == ResourceAccess::Undefined ) )
+                {
+                    //Not RaR (or not WaW when they're explicitly allowed). Insert the barrier.
+                    //We also may need the barrier if the resource wasn't an UAV.
+                    addResourceTransition( currentLayout, ResourceLayout::Uav, ReadBarrier::Uav );
+                }
+
+                itResAccess->second = itor->access;
+
+                ++itor;
+            }
         }
     }
 }

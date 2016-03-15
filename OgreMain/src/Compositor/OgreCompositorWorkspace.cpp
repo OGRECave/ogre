@@ -412,6 +412,8 @@ namespace Ogre
         }
         CompositorNode::fillResourcesLayout( resourcesLayout, mGlobalTextures,
                                              ResourceLayout::Undefined );
+        CompositorNode::initResourcesLayout( resourcesLayout, mGlobalBuffers,
+                                             ResourceLayout::Undefined );
 
         CompositorNodeVec::iterator itor = mNodeSequence.begin();
         CompositorNodeVec::iterator end  = mNodeSequence.end();

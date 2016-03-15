@@ -47,6 +47,7 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/Pass/OgreCompositorPassProvider.h"
+#include "Vao/OgreUavBufferPacked.h"
 
 #include "OgreRenderSystem.h"
 #include "OgreSceneManager.h"
@@ -807,12 +808,28 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNode::initResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                              const CompositorNamedBufferVec &buffers,
+                                              ResourceLayout::Layout layout )
+    {
+        CompositorNamedBufferVec::const_iterator itor = buffers.begin();
+        CompositorNamedBufferVec::const_iterator end  = buffers.end();
+
+        while( itor != end )
+        {
+            if( outResourcesLayout.find( itor->buffer ) == outResourcesLayout.end() )
+                outResourcesLayout[itor->buffer] = layout;
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorNode::_placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
                                                                ResourceAccessMap &uavsAccess,
                                                                ResourceLayoutMap &resourcesLayout )
     {
         //All locally defined textures start as 'undefined'.
         fillResourcesLayout( resourcesLayout, mLocalTextures, ResourceLayout::Undefined );
+        initResourcesLayout( resourcesLayout, mBuffers, ResourceLayout::Undefined );
 
         CompositorPassVec::const_iterator itPasses = mPasses.begin();
         CompositorPassVec::const_iterator enPasses = mPasses.end();

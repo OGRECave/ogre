@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceListener.h"
+#include "Vao/OgreUavBufferPacked.h"
 
 #include "OgreRenderTexture.h"
 #include "OgreRenderSystem.h"
@@ -168,7 +169,7 @@ namespace Ogre
                 if( itor->bufferName != IdString() )
                     uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
 
-                renderSystem->queueBindUAV( itor->slotIdx, uavBuffer, itor->access,
+                renderSystem->queueBindUAV( itor->uavSlot, uavBuffer, itor->access,
                                             itor->offset, itor->sizeBytes );
 
                 ++itor;
@@ -187,49 +188,72 @@ namespace Ogre
                                             BoundUav boundUavs[64], ResourceAccessMap &uavsAccess,
                                             ResourceLayoutMap &resourcesLayout )
     {
-        const CompositorPassUavDef::TextureSources &textureSources =
-                                                            mDefinition->getTextureSources();
-        CompositorPassUavDef::TextureSources::const_iterator itor = textureSources.begin();
-        CompositorPassUavDef::TextureSources::const_iterator end  = textureSources.end();
-        while( itor != end )
         {
-            TexturePtr texture;
-
-            if( itor->externalTextureName.empty() )
+            const CompositorPassUavDef::TextureSources &textureSources =
+                    mDefinition->getTextureSources();
+            CompositorPassUavDef::TextureSources::const_iterator itor = textureSources.begin();
+            CompositorPassUavDef::TextureSources::const_iterator end  = textureSources.end();
+            while( itor != end )
             {
-                texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            }
-            else if( itor->textureName != IdString() )
-            {
-                texture = TextureManager::getSingleton().getByName(
-                            itor->externalTextureName,
-                            ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+                TexturePtr texture;
 
-                if( texture.isNull() )
+                if( itor->externalTextureName.empty() )
                 {
-                    OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
-                                 "Texture with name: " + itor->externalTextureName + " does not exist."
-                                 "The texture must exist by the time the workspace is executed. "
-                                 "Are you trying to use a texture defined by the compositor? If so"
-                                 "you need to set it via 'uav' instead of 'uav_external'",
+                    texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+                }
+                else if( itor->textureName != IdString() )
+                {
+                    texture = TextureManager::getSingleton().getByName(
+                                itor->externalTextureName,
+                                ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+                    if( texture.isNull() )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                                     "Texture with name: " + itor->externalTextureName +
+                                     " does not exist. The texture must exist by the time the workspace"
+                                     " is executed. Are you trying to use a texture defined by the "
+                                     "compositor? If so you need to set it via 'uav' instead of "
+                                     "'uav_external'",
+                                     "CompositorPassUav::_placeBarriersAndEmulateUavExecution" );
+                    }
+                }
+
+                if( !(texture->getUsage() & TU_UAV) )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                 "Texture " + texture->getName() +
+                                 " must have been created with TU_UAV to be bound as UAV",
                                  "CompositorPassUav::_placeBarriersAndEmulateUavExecution" );
                 }
-            }
 
-            if( !(texture->getUsage() & TU_UAV) )
+                //Only "simulate the bind" of UAVs. We will evaluate the actual resource
+                //transition when the UAV is actually used in the subsequent passes.
+                boundUavs[itor->uavSlot].rttOrBuffer = texture->getBuffer()->getRenderTarget();
+                boundUavs[itor->uavSlot].boundAccess = itor->access;
+
+                ++itor;
+            }
+        }
+
+        {
+            const CompositorPassUavDef::BufferSourceVec &bufferSources = mDefinition->getBufferSources();
+            CompositorPassUavDef::BufferSourceVec::const_iterator itor = bufferSources.begin();
+            CompositorPassUavDef::BufferSourceVec::const_iterator end  = bufferSources.end();
+            while( itor != end )
             {
-                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-                             "Texture " + texture->getName() +
-                             " must have been created with TU_UAV to be bound as UAV",
-                             "CompositorPassUav::_placeBarriersAndEmulateUavExecution" );
+                UavBufferPacked *uavBuffer = 0;
+
+                if( itor->bufferName != IdString() )
+                    uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
+
+                //Only "simulate the bind" of UAVs. We will evaluate the actual resource
+                //transition when the UAV is actually used in the subsequent passes.
+                boundUavs[itor->uavSlot].rttOrBuffer = uavBuffer;
+                boundUavs[itor->uavSlot].boundAccess = itor->access;
+
+                ++itor;
             }
-
-            //Only "simulate the bind" of UAVs. We will evaluate the actual resource
-            //transition when the UAV is actually used in the subsequent passes.
-            boundUavs[itor->uavSlot].renderTarget = texture->getBuffer()->getRenderTarget();
-            boundUavs[itor->uavSlot].boundAccess = itor->access;
-
-            ++itor;
         }
 
         //Do not use base class functionality at all.

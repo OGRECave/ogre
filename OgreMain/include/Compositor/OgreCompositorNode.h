@@ -262,8 +262,13 @@ namespace Ogre
         */
         void _update( const Camera *lodCamera, SceneManager *sceneManager );
 
+        /// Overrides a resource with the given layout if it's already in outResourcesLayout
         static void fillResourcesLayout( ResourceLayoutMap &outResourcesLayout,
                                          const CompositorChannelVec &compositorChannels,
+                                         ResourceLayout::Layout layout );
+        /// Only inits a resource with the given layout if it wasn't already in outResourcesLayout
+        static void initResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                         const CompositorNamedBufferVec &buffers,
                                          ResourceLayout::Layout layout );
 
         /// @see CompositorPass::_placeBarriersAndEmulateUavExecution

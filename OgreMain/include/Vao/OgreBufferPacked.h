@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef _Ogre_BufferPacked_H_
 #define _Ogre_BufferPacked_H_
 
-#include "OgrePrerequisites.h"
+#include "OgreResourceTransition.h"
 
 namespace Ogre
 {
@@ -126,7 +126,7 @@ namespace Ogre
         }
     };
 
-    class _OgreExport BufferPacked : public BufferPackedAlloc
+    class _OgreExport BufferPacked : public GpuResource, public BufferPackedAlloc
     {
         friend class BufferInterface;
         friend class D3D11BufferInterface;

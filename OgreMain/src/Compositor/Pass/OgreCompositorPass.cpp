@@ -339,7 +339,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            RenderTarget *uavRt = boundUavs[itor->uavSlot].renderTarget;
+            GpuResource *uavRt = boundUavs[itor->uavSlot].rttOrBuffer;
 
             if( !uavRt )
             {
