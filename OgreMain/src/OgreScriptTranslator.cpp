@@ -6721,6 +6721,86 @@ namespace Ogre{
                         }
                     }
                     break;
+                case ID_CONNECT_BUFFER:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() < 2)
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "connect_buffer needs at least 2 argument");
+                    }
+                    else if( prop->values.size() & 0x01 )
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "connect_buffer must have an even number of arguments");
+                    }
+                    else
+                    {
+                        size_t numStrings = 0;
+                        IdString outNode, inNode;
+
+                        //Find out the names of the out & in nodes.
+                        AbstractNodeList::const_iterator itor = prop->values.begin();
+                        AbstractNodeList::const_iterator end  = prop->values.end();
+
+                        AbstractNodeList::const_iterator inNodeStart = itor;
+
+                        while( itor != end )
+                        {
+                            uint32 unused;
+                            if( !getUInt( *itor, &unused ) )
+                            {
+                                if( numStrings >= 2 )
+                                {
+                                    compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                    numStrings = 3; //Flag the error somehow
+                                }
+                                else
+                                {
+                                    if( !getIdString( *itor, numStrings == 0 ? &outNode : &inNode ) )
+                                    {
+                                        compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                                        numStrings = 3; //Flag the error somehow
+                                    }
+                                    else
+                                    {
+                                        ++numStrings;
+                                        inNodeStart = itor;
+                                    }
+                                }
+                            }
+                            ++itor;
+                        }
+
+                        if( numStrings != 2 )
+                        {
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line,
+                                "The only non-numeric arguments expected are the 'out node' and 'in node' names");
+                        }
+                        else
+                        {
+                            itor = prop->values.begin();
+                            ++itor;
+                            ++inNodeStart;
+                            uint32 outChannel, inChannel;
+
+                            while( itor != prop->values.end() && inNodeStart != prop->values.end() )
+                            {
+                                getUInt( *itor, &outChannel );
+                                getUInt( *inNodeStart, &inChannel );
+                                mWorkspaceDef->connectBuffer( outNode, outChannel, inNode, inChannel );
+                                ++itor;
+                                ++inNodeStart;
+                            }
+
+                            //No explicit numeric channels provided.
+                            if( prop->values.size() == 2 )
+                                mWorkspaceDef->connectBuffer( outNode, inNode );
+                        }
+                    }
+                    break;
                 case ID_CONNECT_OUTPUT:
                     if(prop->values.empty())
                     {
@@ -6740,6 +6820,35 @@ namespace Ogre{
                         IdString inNode;
                         if( getIdString( *it0, &inNode ) && getUInt( *it1, &inChannel ) )
                             mWorkspaceDef->connectOutput( inNode, inChannel );
+                        else
+                            compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
+                    }
+                    break;
+                case ID_CONNECT_BUFFER_EXTERNAL:
+                    if(prop->values.empty())
+                    {
+                        compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                    }
+                    else if(prop->values.size() != 3 )
+                    {
+                        compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
+                            "connect_buffer_external only supports 3 arguments");
+                    }
+                    else
+                    {
+                        AbstractNodeList::const_iterator it2 = prop->values.begin();
+                        AbstractNodeList::const_iterator it1 = it2++;
+                        AbstractNodeList::const_iterator it0 = it2++;
+
+                        uint32 externalBufferChannel;
+                        uint32 inChannel;
+                        IdString inNode;
+                        if( getUInt( *it0, &inChannel ) && getIdString( *it1, &inNode ) &&
+                            getUInt( *it2, &inChannel ) )
+                        {
+                            mWorkspaceDef->connectExternalBuffer( externalBufferChannel,
+                                                                  inNode, inChannel );
+                        }
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }

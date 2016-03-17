@@ -175,7 +175,7 @@ namespace Ogre
     void CompositorWorkspaceDef::connectExternalBuffer( uint32 externalBufferIdx, IdString inNode,
                                                         uint32 inChannel )
     {
-        checkInputBufferChannelIsEmpty( inNode, inChannel, "connect_external" );
+        checkInputBufferChannelIsEmpty( inNode, inChannel, "connect_buffer_external" );
         createImplicitAlias( inNode );
         mExternalBufferChannelRoutes.push_back( ChannelRoute( externalBufferIdx, IdString(),
                                                               inChannel, inNode ) );

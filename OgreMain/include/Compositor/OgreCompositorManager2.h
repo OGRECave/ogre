@@ -284,7 +284,7 @@ namespace Ogre
             Defaults to -1; which means update last.
         @param uavBuffers
             Array of UAV Buffers that will be exposed to compositors, via the
-            'connect_external' script keyword, or the call
+            'connect_buffer_external' script keyword, or the call
             CompositorWorkspaceDef::connectExternalBuffer
         @param vpOffsetScale
             The viewport of every pass from every node will be offseted and scaled by

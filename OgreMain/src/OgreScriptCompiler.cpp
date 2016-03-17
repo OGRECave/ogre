@@ -1210,7 +1210,9 @@ namespace Ogre
         mIds["workspace"]       = ID_WORKSPACE;
         mIds["alias"]           = ID_ALIAS;
         mIds["connect"]         = ID_CONNECT;
+        mIds["connect_buffer"]  = ID_CONNECT_BUFFER;
         mIds["connect_output"]  = ID_CONNECT_OUTPUT;
+        mIds["connect_buffer_external"] = ID_CONNECT_BUFFER_EXTERNAL;
 
         mIds["compositor_node"] = ID_COMPOSITOR_NODE;
         mIds["in"]              = ID_IN;

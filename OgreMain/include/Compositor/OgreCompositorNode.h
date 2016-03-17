@@ -206,7 +206,7 @@ namespace Ogre
                                 size_t inChannelA );
 
         /** Connects (injects) an external buffer into the given channel. Usually used for
-            the "connect_external" directive.
+            the 'connect_buffer_external' directive.
         @param buffer
             The buffer.
         @param inChannelA
