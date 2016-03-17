@@ -88,6 +88,7 @@ namespace Ogre
             it is global.
         */
         ChannelMappings         mOutChannelMapping;
+        IdStringVec             mOutBufferChannelMapping;
         CompositorTargetDefVec  mTargetPasses;
 
         bool        mStartEnabled;
@@ -190,6 +191,32 @@ namespace Ogre
 
         /// @copydoc TextureDefinitionBase::removeTexture
         virtual void removeTexture( IdString name );
+
+        /** Reserves enough memory for all output channel mappings (efficient allocation, better
+            than using linked lists or other containers with two level of indirections)
+        @remarks
+            Calling this function is not obligatory, but recommended
+        @param numPasses
+            The number of output buffer channels expected to contain.
+        */
+        void setNumOutputBufferChannels( size_t numOuts )
+                                                { mOutBufferChannelMapping.reserve( numOuts ); }
+
+        /** Maps the output channel to the given buffer name which can be either a
+            local buffer or a reference to an input channel. Global buffers can't
+            be used as output.
+        @remarks
+            Don't leave gaps. (i.e. set channel 0 & 2, without setting channel 1)
+            It's ok to map them out of order (i.e. set channel 2, then 0, then 1)
+            Prefer calling @see setNumOutputChannels beforehand
+            Will throw if the local texture hasn't been declared yet or the input
+            channel name hasn't been set yet (declaration order is important!).
+        @param outChannel
+            Output channel # to map
+        @param textureName
+            Name of the buffer
+        */
+        void mapOutputBufferChannel( size_t outChannel, IdString bufferName );
 
         /** Returns the pass # of the given pass definition in this node.
             This operation is O(N). Useful for debug output.

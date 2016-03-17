@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -44,12 +44,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    CompositorWorkspace::CompositorWorkspace(IdType id, const CompositorWorkspaceDef *definition,
-                                                const CompositorChannel &finalRenderTarget,
-                                                SceneManager *sceneManager, Camera *defaultCam,
-                                                RenderSystem *renderSys, bool bEnabled,
-                                                uint8 executionMask, uint8 viewportModifierMask,
-                                                const Vector4 &vpOffsetScale ) :
+    CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
+                                              const CompositorChannel &finalRenderTarget,
+                                              SceneManager *sceneManager, Camera *defaultCam,
+                                              RenderSystem *renderSys, bool bEnabled,
+                                              uint8 executionMask, uint8 viewportModifierMask,
+                                              const Vector4 &vpOffsetScale,
+                                              const UavBufferPackedVec *uavBuffers ) :
             IdObject( id ),
             mDefinition( definition ),
             mValid( false ),
@@ -66,9 +67,17 @@ namespace Ogre
         assert( (!defaultCam || (defaultCam->getSceneManager() == sceneManager)) &&
                 "Camera was created with a different SceneManager than supplied" );
 
+        if( uavBuffers )
+            mExternalBuffers = *uavBuffers;
+
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
                                                 id, true, mRenderWindow.target, mRenderSys );
+
+        //Create local buffers
+        mGlobalBuffers.reserve( mDefinition->mLocalBufferDefs.size() );
+        TextureDefinitionBase::createBuffers( definition->mLocalBufferDefs, mGlobalBuffers,
+                                              mRenderWindow.target, mRenderSys );
 
         recreateAllNodes();
 
@@ -79,6 +88,10 @@ namespace Ogre
     CompositorWorkspace::~CompositorWorkspace()
     {
         destroyAllNodes();
+
+        //Destroy our global buffers
+        TextureDefinitionBase::destroyBuffers( mDefinition->mLocalBufferDefs,
+                                               mGlobalBuffers, mRenderSys );
 
         //Destroy our global textures
         TextureDefinitionBase::destroyTextures( mGlobalTextures, mRenderSys );
@@ -133,6 +146,21 @@ namespace Ogre
             CompositorNode *finalNode = findNode( mDefinition->mFinalNode );
             finalNode->connectFinalRT( mRenderWindow.target, mRenderWindow.textures,
                                        mDefinition->mFinalInChannel );
+
+            {
+                CompositorWorkspaceDef::ChannelRouteList::const_iterator itor =
+                        mDefinition->mExternalBufferChannelRoutes.begin();
+                CompositorWorkspaceDef::ChannelRouteList::const_iterator end =
+                        mDefinition->mExternalBufferChannelRoutes.end();
+
+                while( itor != end )
+                {
+                    CompositorWorkspaceDef::ChannelRoute *itor = 0;
+                    CompositorNode *node = findNode( itor->inNode );
+                    node->connectExternalBuffer( mExternalBuffers[itor->inChannel], itor->outChannel );
+                    ++itor;
+                }
+            }
         }
 
         CompositorNodeVec unprocessedList( mNodeSequence.begin(), mNodeSequence.end() );
@@ -167,6 +195,19 @@ namespace Ogre
                         {
                             node->connectTo( itRoute->outChannel, findNode( itRoute->inNode, true ),
                                              itRoute->inChannel );
+                        }
+                        ++itRoute;
+                    }
+
+                    itRoute = mDefinition->mBufferChannelRoutes.begin();
+                    enRoute = mDefinition->mBufferChannelRoutes.end();
+
+                    while( itRoute != enRoute )
+                    {
+                        if( itRoute->outNode == node->getName() )
+                        {
+                            node->connectBufferTo( itRoute->outChannel, findNode( itRoute->inNode, true ),
+                                                   itRoute->inChannel );
                         }
                         ++itRoute;
                     }
@@ -390,6 +431,8 @@ namespace Ogre
         }
         CompositorNode::fillResourcesLayout( resourcesLayout, mGlobalTextures,
                                              ResourceLayout::Undefined );
+        CompositorNode::initResourcesLayout( resourcesLayout, mGlobalBuffers,
+                                             ResourceLayout::Undefined );
 
         CompositorNodeVec::iterator itor = mNodeSequence.begin();
         CompositorNodeVec::iterator end  = mNodeSequence.end();
@@ -410,6 +453,23 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     CompositorNode* CompositorWorkspace::findNode( IdString aliasName, bool includeShadowNodes ) const
+    {
+        CompositorNode *retVal = findNodeNoThrow( aliasName, includeShadowNodes );
+
+        if( !retVal )
+        {
+            OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                         "Couldn't find node with name '" + aliasName.getFriendlyText() +
+                         "'. includeShadowNodes = " + (includeShadowNodes ? String("true") :
+                                                                            String("false")),
+                         "CompositorWorkspace::findNode" );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorNode* CompositorWorkspace::findNodeNoThrow( IdString aliasName,
+                                                          bool includeShadowNodes ) const
     {
         CompositorNode *retVal = 0;
         CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
@@ -551,6 +611,9 @@ namespace Ogre
             TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs,
                                                                 mGlobalTextures, mRenderWindow.target,
                                                                 mRenderSys, allNodes, 0 );
+            TextureDefinitionBase::recreateResizableBuffers( mDefinition->mLocalBufferDefs,
+                                                             mGlobalBuffers, mRenderWindow.target,
+                                                             mRenderSys, allNodes, 0 );
         }
 
         //Add global textures to the SceneManager so they can be referenced by materials

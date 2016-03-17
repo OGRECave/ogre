@@ -204,6 +204,12 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void NULLRenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                         ResourceAccess::ResourceAccess access,
+                                         size_t offset, size_t sizeBytes )
+    {
+    }
+    //-------------------------------------------------------------------------
     void NULLRenderSystem::clearUAVs(void)
     {
     }
@@ -216,6 +222,14 @@ namespace Ogre
                                               ResourceAccess::ResourceAccess access,
                                               int32 mipmapLevel, int32 textureArrayIndex,
                                               PixelFormat pixelFormat )
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
+    {
+    }
+    //-------------------------------------------------------------------------
+    void NULLRenderSystem::_setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
     }
     //-------------------------------------------------------------------------

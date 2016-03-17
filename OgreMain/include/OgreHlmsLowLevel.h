@@ -76,6 +76,8 @@ namespace Ogre
         HlmsLowLevel();
         ~HlmsLowLevel();
 
+        AutoParamDataSource* _getAutoParamDataSource(void) const    { return mAutoParamDataSource; }
+
         virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,

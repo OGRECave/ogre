@@ -80,10 +80,14 @@ namespace Ogre
             HlmsComputeJob *job;
             HlmsPropertyVec setProperties;
             HlmsComputePso  pso;
+            uint32          paramsUpdateCounter;
+            uint32          paramsProfileUpdateCounter;
 
-            ComputePsoCache() : job( 0 ) {}
+            ComputePsoCache() :
+                job( 0 ), paramsUpdateCounter( ~0u ), paramsProfileUpdateCounter( ~0u ) {}
             ComputePsoCache( HlmsComputeJob *_job, const HlmsPropertyVec &properties ) :
-                job( _job ), setProperties( properties ) {}
+                job( _job ), setProperties( properties ),
+                paramsUpdateCounter( ~0u ), paramsProfileUpdateCounter( ~0u ) {}
 
             bool operator == ( const ComputePsoCache &_r ) const
             {
@@ -117,7 +121,7 @@ namespace Ogre
 
     public:
         HlmsCompute( AutoParamDataSource *autoParamDataSource );
-        ~HlmsCompute();
+        virtual ~HlmsCompute();
 
         /** An HlmsComputeJob is very similar to an HlmsDatablock, except it
             contains a compute job instead. If multiple HlmsComputeJob end up
@@ -144,6 +148,14 @@ namespace Ogre
         /// Finds an existing Compute Job. If none found, returns null.
         HlmsComputeJob* findComputeJobNoThrow( IdString datablockName ) const;
 
+        /// Returns the string name associated with its hashed name (this was
+        /// passed as refName in @createComputeJob). Returns null ptr if
+        /// not found.
+        /// The reason this String doesn't live in HlmsComputeJob is to prevent
+        /// cache trashing (jobs are hot iterated every frame, and the
+        /// full name is rarely ever used)
+        const String* getJobNameStr( IdString name ) const;
+
         /// Destroys all jobs created via @see createComputeJob
         void destroyAllComputeJobs(void);
 
@@ -151,9 +163,25 @@ namespace Ogre
         virtual void clearShaderCache(void);
 
         /// Main function for dispatching a compute job.
-        void dispatch( HlmsComputeJob *job );
+        void dispatch( HlmsComputeJob *job, SceneManager *sceneManager, Camera *camera );
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
+
+        virtual HlmsDatablock* createDefaultDatablock(void);
+
+        virtual uint32 fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                       bool casterPass, uint32 lastCacheHash,
+                                       uint32 lastTextureHash );
+
+        virtual uint32 fillBuffersForV1( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
+
+        virtual uint32 fillBuffersForV2( const HlmsCache *cache,
+                                         const QueuedRenderable &queuedRenderable,
+                                         bool casterPass, uint32 lastCacheHash,
+                                         CommandBuffer *commandBuffer );
     };
 
     struct _OgreExport ComputeProperty

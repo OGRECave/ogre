@@ -41,13 +41,15 @@ THE SOFTWARE.
 #include "OgreHlmsCompute.h"
 #include "OgreHlmsComputeJob.h"
 
+#include "Vao/OgreUavBufferPacked.h"
+
 #include "OgreRenderTexture.h"
 #include "OgreHardwarePixelBuffer.h"
 
 namespace Ogre
 {
-    void CompositorPassComputeDef::addTextureSource( size_t texUnitIdx, const String &textureName,
-                                                     size_t mrtIndex )
+    void CompositorPassComputeDef::addTextureSource( uint32 texUnitIdx, const String &textureName,
+                                                     uint32 mrtIndex )
     {
         if( textureName.find( "global_" ) == 0 )
         {
@@ -57,8 +59,8 @@ namespace Ogre
         mTextureSources.push_back( ComputeTextureSource( texUnitIdx, textureName, mrtIndex ) );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorPassComputeDef::addUavSource( size_t texUnitIdx, const String &textureName,
-                                                 size_t mrtIndex,
+    void CompositorPassComputeDef::addUavSource( uint32 texUnitIdx, const String &textureName,
+                                                 uint32 mrtIndex,
                                                  ResourceAccess::ResourceAccess access,
                                                  int32 textureArrayIndex, int32 mipmapLevel,
                                                  PixelFormat pixelFormat,
@@ -74,18 +76,32 @@ namespace Ogre
                                                      allowWriteAfterWrite ) );
     }
     //-----------------------------------------------------------------------------------
+//    void CompositorPassComputeDef::addTexBuffer( uint32 slotIdx, const String &bufferName,
+//                                                 size_t offset, size_t sizeBytes )
+//    {
+//        //TODO.
+//    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassComputeDef::addUavBuffer( uint32 slotIdx, const String &bufferName,
+                                                 ResourceAccess::ResourceAccess access, size_t offset,
+                                                 size_t sizeBytes, bool allowWriteAfterWrite )
+    {
+        assert( access != ResourceAccess::Undefined );
+        mBufferSources.push_back( BufferSource( slotIdx, bufferName, access, offset,
+                                                sizeBytes, allowWriteAfterWrite ) );
+    }
+    //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     CompositorPassCompute::CompositorPassCompute( const CompositorPassComputeDef *definition,
+                                                  Camera *defaultCamera,
                                                   CompositorNode *parentNode,
                                                   const CompositorChannel &target ) :
         CompositorPass( definition, target, parentNode ),
-        mDefinition( definition )
+        mDefinition( definition ),
+        mCamera( 0 )
     {
-        const CompositorWorkspace *workspace = parentNode->getWorkspace();
-
         HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
-        //hlmsManager->getHlms()
-        HlmsCompute *hlmsCompute = 0;
+        HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
 
         mComputeJob = hlmsCompute->findComputeJob( mDefinition->mJobName );
 
@@ -113,24 +129,54 @@ namespace Ogre
             ++itor;
         }
 
-        itor = textureSources.begin();
-        end  = textureSources.end();
-        while( itor != end )
+        setResourcesToJob();
+
+        const CompositorWorkspace *workspace = parentNode->getWorkspace();
+        if( mDefinition->mCameraName != IdString() )
+            mCamera = workspace->findCamera( mDefinition->mCameraName );
+        else
+            mCamera = defaultCamera;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPassCompute::setResourcesToJob(void)
+    {
         {
-            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            mComputeJob->setTexture( itor->texUnitIdx, texture );
-            ++itor;
+            const CompositorPassComputeDef::TextureSources &textureSources =
+                    mDefinition->getTextureSources();
+            CompositorPassComputeDef::TextureSources::const_iterator itor = textureSources.begin();
+            CompositorPassComputeDef::TextureSources::const_iterator end  = textureSources.end();
+            while( itor != end )
+            {
+                TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+                mComputeJob->setTexture( itor->texUnitIdx, texture );
+                ++itor;
+            }
+
+            const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
+            itor = uavSources.begin();
+            end  = uavSources.end();
+            while( itor != end )
+            {
+                TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+                mComputeJob->setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
+                                            itor->access, itor->mipmapLevel, itor->pixelFormat );
+                ++itor;
+            }
         }
 
-        const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
-        itor = uavSources.begin();
-        end  = uavSources.end();
-        while( itor != end )
         {
-            TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-            mComputeJob->setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
-                                        itor->access, itor->mipmapLevel, itor->pixelFormat );
-            ++itor;
+            const CompositorPassComputeDef::BufferSourceVec &bufferSources =
+                    mDefinition->getBufferSources();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator itor = bufferSources.begin();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator end  = bufferSources.end();
+
+            while( itor != end )
+            {
+                UavBufferPacked *uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
+                mComputeJob->setUavBuffer( itor->slotIdx, uavBuffer, itor->access,
+                                           itor->offset, itor->sizeBytes );
+                ++itor;
+            }
         }
     }
     //-----------------------------------------------------------------------------------
@@ -150,13 +196,22 @@ namespace Ogre
 
         executeResourceTransitions();
 
+        //Set textures/uavs every frame
+        setResourcesToJob();
+
         //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
             listener->passPreExecute( this );
 
-        HlmsCompute *hlmsCompute = 0;
-        hlmsCompute->dispatch( mComputeJob );
+        assert( dynamic_cast<HlmsCompute*>( mComputeJob->getCreator() ) );
+
+        SceneManager *sceneManager = 0;
+        if( mCamera )
+            sceneManager = mCamera->getSceneManager();
+
+        HlmsCompute *hlmsCompute = static_cast<HlmsCompute*>( mComputeJob->getCreator() );
+        hlmsCompute->dispatch( mComputeJob, sceneManager, mCamera );
 
         if( listener )
             listener->passPosExecute( this );
@@ -172,44 +227,89 @@ namespace Ogre
     {
         CompositorPass::_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
 
-        const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
-        CompositorPassComputeDef::TextureSources::const_iterator itor = uavSources.begin();
-        CompositorPassComputeDef::TextureSources::const_iterator end  = uavSources.end();
-
-        while( itor != end )
         {
-            TexturePtr uavTex = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+            //<anything> -> Texture UAVs
+            const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
+            CompositorPassComputeDef::TextureSources::const_iterator itor = uavSources.begin();
+            CompositorPassComputeDef::TextureSources::const_iterator end  = uavSources.end();
 
-            //TODO: Do we have to do this for all slices? Or just one? Refactor is needed.
-            RenderTarget *uavRt = uavTex->getBuffer( 0, 0 )->getRenderTarget( 0 );
-
-            ResourceAccessMap::iterator itResAccess = uavsAccess.find( uavRt );
-
-            if( itResAccess == uavsAccess.end() )
+            while( itor != end )
             {
-                //First time accessing the UAV. If we need a barrier,
-                //we will see it in the second pass.
-                uavsAccess[uavRt] = ResourceAccess::Undefined;
-                itResAccess = uavsAccess.find( uavRt );
+                TexturePtr uavTex = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
+
+                //TODO: Do we have to do this for all slices? Or just one? Refactor is needed.
+                RenderTarget *uavRt = uavTex->getBuffer( 0, 0 )->getRenderTarget( 0 );
+
+                ResourceAccessMap::iterator itResAccess = uavsAccess.find( uavRt );
+
+                if( itResAccess == uavsAccess.end() )
+                {
+                    //First time accessing the UAV. If we need a barrier,
+                    //we will see it in the second pass.
+                    uavsAccess[uavRt] = ResourceAccess::Undefined;
+                    itResAccess = uavsAccess.find( uavRt );
+                }
+
+                ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( uavRt );
+
+                if( currentLayout->second != ResourceLayout::Uav ||
+                        !( (itor->access == ResourceAccess::Read &&
+                            itResAccess->second == ResourceAccess::Read) ||
+                           (itor->access == ResourceAccess::Write &&
+                            itResAccess->second == ResourceAccess::Write &&
+                            itor->allowWriteAfterWrite) ||
+                           itResAccess->second == ResourceAccess::Undefined ) )
+                {
+                    //Not RaR (or not WaW when they're explicitly allowed). Insert the barrier.
+                    //We also may need the barrier if the resource wasn't an UAV.
+                    addResourceTransition( currentLayout, ResourceLayout::Uav, ReadBarrier::Uav );
+                }
+
+                itResAccess->second = itor->access;
+                ++itor;
             }
+        }
 
-            ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( uavRt );
+        {
+            //<anything> -> Buffer UAVs
+            const CompositorPassComputeDef::BufferSourceVec &bufferSources =
+                    mDefinition->getBufferSources();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator itor = bufferSources.begin();
+            CompositorPassComputeDef::BufferSourceVec::const_iterator end  = bufferSources.end();
 
-            if( currentLayout->second != ResourceLayout::Uav ||
-                !( (itor->access == ResourceAccess::Read &&
-                    itResAccess->second == ResourceAccess::Read) ||
-                   (itor->access == ResourceAccess::Write &&
-                    itResAccess->second == ResourceAccess::Write &&
-                    itor->allowWriteAfterWrite) ||
-                   itResAccess->second == ResourceAccess::Undefined ) )
+            while( itor != end )
             {
-                //Not RaR (or not WaW when they're explicitly allowed). Insert the barrier.
-                //We also may need the barrier if the resource wasn't an UAV.
-                addResourceTransition( currentLayout, ResourceLayout::Uav, ReadBarrier::Uav );
-            }
+                UavBufferPacked *uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
 
-            itResAccess->second = itor->access;
-            ++itor;
+                ResourceAccessMap::iterator itResAccess = uavsAccess.find( uavBuffer );
+
+                if( itResAccess == uavsAccess.end() )
+                {
+                    //First time accessing the UAV. If we need a barrier,
+                    //we will see it in the second pass.
+                    uavsAccess[uavBuffer] = ResourceAccess::Undefined;
+                    itResAccess = uavsAccess.find( uavBuffer );
+                }
+
+                ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( uavBuffer );
+
+                if( currentLayout->second != ResourceLayout::Uav ||
+                    !( (itor->access == ResourceAccess::Read &&
+                        itResAccess->second == ResourceAccess::Read) ||
+                       (itor->access == ResourceAccess::Write &&
+                        itResAccess->second == ResourceAccess::Write &&
+                        itor->allowWriteAfterWrite) ||
+                       itResAccess->second == ResourceAccess::Undefined ) )
+                {
+                    //Not RaR (or not WaW when they're explicitly allowed). Insert the barrier.
+                    //We also may need the barrier if the resource wasn't an UAV.
+                    addResourceTransition( currentLayout, ResourceLayout::Uav, ReadBarrier::Uav );
+                }
+
+                itResAccess->second = itor->access;
+
+                ++itor;
+            }
         }
     }
 }

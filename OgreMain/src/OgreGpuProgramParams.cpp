@@ -2209,7 +2209,7 @@ namespace Ogre
 				for (i = mNamedConstants->map.begin(); i != mNamedConstants->map.end(); ++i)
 					knownNames.append(i->first).append(" ");
 #endif
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                OGRE_EXCEPT(Exception::ERR_ITEM_NOT_FOUND,
 				"Parameter called " + name + " does not exist. " + knownNames,
                             "GpuProgramParameters::_findNamedConstantDefinition");
 			}

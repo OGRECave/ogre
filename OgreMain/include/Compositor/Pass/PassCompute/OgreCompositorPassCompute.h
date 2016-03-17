@@ -83,9 +83,11 @@ namespace Ogre
 		CompositorPassComputeDef const *mDefinition;
     protected:
         HlmsComputeJob  *mComputeJob;
+        Camera          *mCamera;
 
+        void setResourcesToJob(void);
     public:
-        CompositorPassCompute( const CompositorPassComputeDef *definition,
+        CompositorPassCompute( const CompositorPassComputeDef *definition, Camera *defaultCamera,
                                CompositorNode *parentNode, const CompositorChannel &target );
 
         virtual void execute( const Camera *lodCamera );

@@ -64,6 +64,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "Vao/OgreGL3PlusBufferInterface.h"
 #include "Vao/OgreIndexBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
+#include "Vao/OgreUavBufferPacked.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
 #include "OgreRoot.h"
 #include "OgreConfig.h"
@@ -1115,11 +1116,12 @@ namespace Ogre {
     {
         assert( slot < 64 );
 
-        if( mUavs[slot].texture.isNull() && texture.isNull() )
+        if( !mUavs[slot].buffer && mUavs[slot].texture.isNull() && texture.isNull() )
             return;
 
         mUavs[slot].dirty       = true;
         mUavs[slot].texture     = texture;
+        mUavs[slot].buffer      = 0;
 
         if( !texture.isNull() )
         {
@@ -1165,6 +1167,28 @@ namespace Ogre {
         mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
     }
 
+    void GL3PlusRenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                            ResourceAccess::ResourceAccess access,
+                                            size_t offset, size_t sizeBytes )
+    {
+        assert( slot < 64 );
+
+        if( mUavs[slot].texture.isNull() && !mUavs[slot].buffer && !buffer )
+            return;
+
+        mUavs[slot].dirty       = true;
+        mUavs[slot].buffer      = buffer;
+        mUavs[slot].texture.setNull();
+
+        if( buffer )
+        {
+            mUavs[slot].offset      = offset;
+            mUavs[slot].sizeBytes   = sizeBytes;
+        }
+
+        mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+    }
+
     void GL3PlusRenderSystem::clearUAVs(void)
     {
         for( size_t i=0; i<64; ++i )
@@ -1172,6 +1196,7 @@ namespace Ogre {
             if( !mUavs[i].texture.isNull() )
             {
                 mUavs[i].dirty = true;
+                mUavs[i].buffer = 0;
                 mUavs[i].texture.setNull();
                 mMaxModifiedUavPlusOne = i + 1;
             }
@@ -1191,9 +1216,16 @@ namespace Ogre {
                                               mUavs[i].arrayIndex, mUavs[i].access,
                                               mUavs[i].format) );
                 }
+                else if( mUavs[i].buffer )
+                {
+                    //bindBufferCS binds it to all stages in GL, so this will do.
+                    mUavs[i].buffer->bindBufferCS( mUavStartingSlot + i, mUavs[i].offset,
+                                                   mUavs[i].sizeBytes );
+                }
                 else
                 {
-                    glBindImageTexture( 0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
+                    OCGE( glBindImageTexture( mUavStartingSlot + i, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI ) );
+                    OCGE( glBindBufferRange( GL_SHADER_STORAGE_BUFFER, mUavStartingSlot + i, 0, 0, 0 ) );
                 }
 
                 mUavs[i].dirty = false;
@@ -1247,6 +1279,16 @@ namespace Ogre {
         {
             glBindImageTexture( 0, 0, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32UI );
         }
+    }
+
+    void GL3PlusRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
+    {
+        this->_setTexture( slot, enabled, texPtr );
+    }
+
+    void GL3PlusRenderSystem::_setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock )
+    {
+        this->_setHlmsSamplerblock( texUnit, samplerblock );
     }
 
     GLint GL3PlusRenderSystem::getTextureAddressingMode(TextureAddressingMode tam) const
@@ -1912,7 +1954,7 @@ namespace Ogre {
 
     void GL3PlusRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
-        assert( samplerblock->mRsData &&
+        assert( (!samplerblock || samplerblock->mRsData) &&
                 "The block must have been created via HlmsManager::getSamplerblock!" );
 
         if( !samplerblock )
@@ -2040,6 +2082,7 @@ namespace Ogre {
 
         mUseAdjacency   = false;
         mPso            = 0;
+        mCurrentComputeShader = 0;
 
         if( !pso )
             return;
@@ -2112,6 +2155,7 @@ namespace Ogre {
         // this is mostly to avoid holding bound programs that might get deleted
         // outside via the resource manager
         _setPipelineStateObject( 0 );
+        _setComputePso( 0 );
 
         glBindProgramPipeline( 0 );
     }
@@ -2444,23 +2488,6 @@ namespace Ogre {
         }
 
         activateGLTextureUnit(0);
-
-        // Launch compute shader job(s).
-        if (mCurrentComputeShader) // && mComputeProgramPosition == CP_PRERENDER && mComputeProgramExecutions <= compute_execution_cap)
-        {
-            //FIXME give user control over when and what memory barriers are created
-            // if (mPreComputeMemoryBarrier)
-            OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
-            Vector3 workgroupDim = mCurrentComputeShader->getComputeGroupDimensions();
-            OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0],
-                                                  workgroupDim[1],
-                                                  workgroupDim[2]));
-            // if (mPostComputeMemoryBarrier)
-            //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
-            // if (compute_execution_cap > 0)
-            //     mComputeProgramExecutions++;
-        }
-
 
         // Determine the correct primitive type to render.
         GLint primType;

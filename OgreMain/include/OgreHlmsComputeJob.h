@@ -29,8 +29,8 @@ THE SOFTWARE.
 #define _OgreHlmsComputeJob_H_
 
 #include "OgreHlmsDatablock.h"
-#include "OgreMatrix4.h"
 #include "OgreResourceTransition.h"
+#include "OgreShaderParams.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -47,6 +47,18 @@ namespace Ogre
     {
         friend class HlmsCompute;
 
+    public:
+        enum ThreadGroupsBasedOn
+        {
+            /// Disabled. (obey @see setNumThreadGroups)
+            ThreadGroupsBasedOnNothing,
+            /// Based the number of thread groups on a texture. @see setNumThreadGroupsBasedOn
+            ThreadGroupsBasedOnTexture,
+            /// Based the number of thread groups on a UAV. @see setNumThreadGroupsBasedOn
+            ThreadGroupsBasedOnUav,
+        };
+
+    protected:
         struct ConstBufferSlot
         {
             uint8 slotIdx;
@@ -68,7 +80,6 @@ namespace Ogre
 
         struct TextureSlot
         {
-            uint8 slotIdx;
             BufferPacked *buffer;
             size_t offset;
             size_t sizeBytes;
@@ -83,22 +94,9 @@ namespace Ogre
             PixelFormat     pixelFormat;
 
             TextureSlot() :
-                slotIdx( 0 ), buffer( 0 ), offset( 0 ), sizeBytes( 0 ), samplerblock( 0 ),
+                buffer( 0 ), offset( 0 ), sizeBytes( 0 ), samplerblock( 0 ),
                 access( ResourceAccess::Undefined ), mipmapLevel( 0 ), textureArrayIndex( 0 ),
                 pixelFormat( PF_UNKNOWN ) {}
-
-            bool operator () ( const TextureSlot &left, uint8 right ) const
-            {
-                return left.slotIdx < right;
-            }
-            bool operator () ( uint8 left, const TextureSlot &right ) const
-            {
-                return left < right.slotIdx;
-            }
-            bool operator () ( const TextureSlot &left, const TextureSlot &right ) const
-            {
-                return left.slotIdx < right.slotIdx;
-            }
         };
 
         typedef vector<ConstBufferSlot>::type ConstBufferSlotVec;
@@ -115,6 +113,9 @@ namespace Ogre
         /// @see setNumThreadGroups
         uint32  mNumThreadGroups[3];
 
+        ThreadGroupsBasedOn mThreadGroupsBasedOnTexture;
+        uint8               mThreadGroupsBasedOnTexSlot;
+
         ConstBufferSlotVec  mConstBuffers;
         TextureSlotVec      mTextureSlots;
         TextureSlotVec      mUavSlots;
@@ -124,6 +125,8 @@ namespace Ogre
         uint8 mMaxUavUnitReached;
         HlmsPropertyVec mSetProperties;
         size_t          mPsoCacheHash;
+
+        map<IdString, ShaderParams>::type mShaderParams;
 
         void updateAutoProperties( const TextureSlotVec &textureSlots,
                                    uint8 &outMaxTexUnitReached,
@@ -141,6 +144,10 @@ namespace Ogre
         HlmsComputeJob( IdString name, Hlms *creator, const String &sourceFilename,
                         const StringVector &includedPieceFiles );
         virtual ~HlmsComputeJob();
+
+        Hlms* getCreator(void) const                { return mCreator; }
+
+        IdString getName(void) const                { return mName; }
 
         void _updateAutoProperties(void);
 
@@ -171,6 +178,10 @@ namespace Ogre
             dimension.
         */
         void setThreadsPerGroup( uint32 threadsPerGroupX, uint32 threadsPerGroupY, uint32 threadsPerGroupZ );
+        uint32 getThreadsPerGroupX(void) const          { return mThreadsPerGroup[0]; }
+        uint32 getThreadsPerGroupY(void) const          { return mThreadsPerGroup[1]; }
+        uint32 getThreadsPerGroupZ(void) const          { return mThreadsPerGroup[2]; }
+        const uint32* getThreadsPerGroup(void) const    { return mThreadsPerGroup; }
 
         /** Sets the number of groups of threads to dispatch. Note the actual value may be
             changed by the shader template using the @pset() function.
@@ -189,6 +200,31 @@ namespace Ogre
             dimension.
         */
         void setNumThreadGroups( uint32 numThreadGroupsX, uint32 numThreadGroupsY, uint32 numThreadGroupsZ );
+        uint32 getNumThreadGroupsX(void) const          { return mNumThreadGroups[0]; }
+        uint32 getNumThreadGroupsY(void) const          { return mNumThreadGroups[1]; }
+        uint32 getNumThreadGroupsZ(void) const          { return mNumThreadGroups[2]; }
+        const uint32* getNumThreadGroups(void) const    { return mNumThreadGroups; }
+
+        /** Instead of calling setNumThreadGroups, Ogre can automatically deduce
+            them based on the Texture resolution and the threads per group.
+            It is calculated as follows:
+                numThreadGroupsX = (textureWidth + threadsPerGroupX - 1u) / threadsPerGroupX;
+        @remarks
+            Unless disabled, this will overwrite your setNumThreadGroups based on the
+            texture bound at the time the job is dispatched.
+        @par
+            If no texture/uav is bound at the given slot (or no such slot exists), we
+            will log a warning.
+        @param source
+            What to use as source for the calculations. @see ThreadGroupsBasedOn
+        @param texSlot
+            Index of the texture/uav unit.
+        */
+        void setNumThreadGroupsBasedOn( ThreadGroupsBasedOn source, uint8 texSlot );
+
+        /// INTERNAL USE. Calculates the number of thread groups as specified
+        /// in @see setNumThreadGroupsBasedOn, overriding setNumThreadGroups.
+        void _calculateNumThreadGroupsBasedOnSetting();
 
         /** Sets an arbitrary property to pass to the shader.
         @remarks
@@ -202,6 +238,19 @@ namespace Ogre
         void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
 
+        /// Creates a set of shader paramters with a given key,
+        /// e.g. "Default" "glsl" "hlsl".
+        /// Does nothing if parameters already exist.
+        void createShaderParams( IdString key );
+
+        /// Gets a shader parameter with the given key.
+        /// Creates if does not exist.
+        ShaderParams& getShaderParams( IdString key );
+
+        /// Gets a shader parameter with the given key.
+        /// Returns null if doesn't exist. @see createShaderParams
+        ShaderParams* _getShaderParams( IdString key );
+
         /** Sets a const/uniform bufferat the given slot ID.
         @param slotIdx
             Slot to bind to. It's independent from the texture & UAV ones.
@@ -209,6 +258,20 @@ namespace Ogre
             Const buffer to bind.
         */
         void setConstBuffer( uint8 slotIdx, ConstBufferPacked *constBuffer );
+
+        /// Creates 'numSlots' number of slots before they can be set.
+        void setNumTexUnits( uint8 numSlots );
+        /// Destroys a given texture unit, displacing all the higher tex units.
+        void removeTexUnit( uint8 slotIdx );
+        size_t getNumTexUnits(void) const               { return mTextureSlots.size(); }
+
+        const TexturePtr& getTexture( uint8 slotIdx ) const;
+
+        /// @copydoc setNumTexUnits
+        void setNumUavUnits( uint8 numSlots );
+        /// @copydoc removeTexUnit
+        void removeUavUnit( uint8 slotIdx );
+        size_t getNumUavUnits(void) const               { return mUavSlots.size(); }
 
         /** Sets a texture buffer at the given slot ID.
         @remarks
@@ -219,6 +282,7 @@ namespace Ogre
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
         @param slotIdx
+            @see setNumTexUnits.
             The slot index to bind this texture buffer
             In OpenGL, a few cards support between to 16-18 texture units,
             while most cards support up to 32
@@ -249,6 +313,7 @@ namespace Ogre
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
         @param slotIdx
+            @see setNumTexUnits.
             The slot index to bind this texture
             In OpenGL, some cards support up to 16-18 texture units, while most
             cards support up to 32
@@ -264,6 +329,25 @@ namespace Ogre
         void setTexture( uint8 slotIdx, TexturePtr &texture,
 						 const HlmsSamplerblock *refParams=0 );
 
+        /** Sets a samplerblock based on reference parameters
+        @param slotIdx
+            @see setNumTexUnits.
+        @param refParams
+            We'll create (or retrieve an existing) samplerblock based on the input parameters.
+        */
+        void setSamplerblock( uint8 slotIdx, const HlmsSamplerblock &refParams );
+
+        /** Sets a samplerblock directly. For internal use / advanced users.
+        @param slotIdx
+            @see setNumTexUnits.
+        @param refParams
+            Direct samplerblock. Reference count is assumed to already have been increased.
+            We won't increase it ourselves.
+        @param params
+            The sampler block to use as reference.
+        */
+        void _setSamplerblock( uint8 slotIdx, const HlmsSamplerblock *refParams );
+
         /** Sets an UAV buffer at the given slot ID.
         @remarks
             UAV slots are shared with setUavTexture. Calling this
@@ -273,6 +357,7 @@ namespace Ogre
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
         @param slotIdx
+            @see setNumUavUnits.
             The slot index to bind this UAV buffer.
         @param access
             Access. Should match what the shader expects. Needed by Ogre to
@@ -301,13 +386,14 @@ namespace Ogre
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
         @param slot
+            @see setNumUavUnits.
         @param texture
         @param textureArrayIndex
         @param access
         @param mipmapLevel
         @param pixelFormat
         */
-        void setUavTexture( uint32 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
+        void setUavTexture( uint8 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
                             ResourceAccess::ResourceAccess access, int32 mipmapLevel,
                             PixelFormat pixelFormat );
     };

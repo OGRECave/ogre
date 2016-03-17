@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -31,6 +31,7 @@ THE SOFTWARE.
 #if !OGRE_NO_JSON
 
 #include "OgreHlmsJson.h"
+#include "OgreHlmsJsonCompute.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
 #include "OgreLwString.h"
@@ -394,8 +395,8 @@ namespace Ogre
             if( itor->value.IsString() )
             {
                 map<LwConstString, const HlmsMacroblock*>::type::const_iterator it =
-                        blocks.macroblocks.find( LwConstString::FromUnsafeCStr(
-                                                     itor->value.GetString() ) );
+                        blocks.macroblocks.find( LwConstString( itor->value.GetString(),
+                                                                itor->value.GetStringLength() + 1u ) );
                 if( it != blocks.macroblocks.end() )
                     datablock->setMacroblock( it->second );
             }
@@ -408,8 +409,8 @@ namespace Ogre
                     if( array[i].IsString() )
                     {
                         map<LwConstString, const HlmsMacroblock*>::type::const_iterator it =
-                                blocks.macroblocks.find( LwConstString::FromUnsafeCStr(
-                                                             array[i].GetString() ) );
+                                blocks.macroblocks.find( LwConstString( array[i].GetString(),
+                                                                        array[i].GetStringLength() + 1u ) );
                         if( it != blocks.macroblocks.end() )
                             datablock->setMacroblock( it->second, i == 0 );
                     }
@@ -423,8 +424,8 @@ namespace Ogre
             if( itor->value.IsString() )
             {
                 map<LwConstString, const HlmsBlendblock*>::type::const_iterator it =
-                        blocks.blendblocks.find( LwConstString::FromUnsafeCStr(
-                                                     itor->value.GetString() ) );
+                        blocks.blendblocks.find( LwConstString( itor->value.GetString(),
+                                                                itor->value.GetStringLength() + 1u ) );
                 if( it != blocks.blendblocks.end() )
                     datablock->setBlendblock( it->second );
             }
@@ -437,8 +438,9 @@ namespace Ogre
                     if( array[i].IsString() )
                     {
                         map<LwConstString, const HlmsBlendblock*>::type::const_iterator it =
-                                blocks.blendblocks.find( LwConstString::FromUnsafeCStr(
-                                                             array[i].GetString() ) );
+                                blocks.blendblocks.find(
+                                    LwConstString( array[i].GetString(),
+                                                   array[i].GetStringLength() + 1u ) );
                         if( it != blocks.blendblocks.end() )
                             datablock->setBlendblock( it->second, i == 0 );
                     }
@@ -513,7 +515,8 @@ namespace Ogre
                 HlmsSamplerblock samplerblock;
                 loadSampler( itSampler->value, samplerblock );
 
-                LwConstString keyName( LwConstString::FromUnsafeCStr(itSampler->name.GetString()) );
+                LwConstString keyName( LwConstString( itSampler->name.GetString(),
+                                                      itSampler->name.GetStringLength() + 1u ) );
 
                 blocks.samplerblocks[keyName] = mHlmsManager->getSamplerblock( samplerblock );
 
@@ -535,7 +538,8 @@ namespace Ogre
                 HlmsMacroblock macroblock;
                 loadMacroblock( itMacros->value, macroblock );
 
-                LwConstString keyName( LwConstString::FromUnsafeCStr(itMacros->name.GetString()) );
+                LwConstString keyName( LwConstString( itMacros->name.GetString(),
+                                                      itMacros->name.GetStringLength() + 1u ) );
 
                 blocks.macroblocks[keyName] = mHlmsManager->getMacroblock( macroblock );
 
@@ -557,7 +561,8 @@ namespace Ogre
                 HlmsBlendblock blendblock;
                 loadBlendblock( itBlends->value, blendblock );
 
-                LwConstString keyName( LwConstString::FromUnsafeCStr(itBlends->name.GetString()) );
+                LwConstString keyName( LwConstString( itBlends->name.GetString(),
+                                                      itBlends->name.GetStringLength() + 1u ) );
 
                 blocks.blendblocks[keyName] = mHlmsManager->getBlendblock( blendblock );
 
@@ -580,6 +585,12 @@ namespace Ogre
                 {
                     loadDatablocks( itDatablock->value, blocks, hlms );
                 }
+            }
+
+            if( typeName == "compute" )
+            {
+                HlmsJsonCompute jsonCompute( mHlmsManager );
+                jsonCompute.loadJobs( itDatablock->value, blocks );
             }
 
             ++itDatablock;

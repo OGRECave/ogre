@@ -165,8 +165,10 @@ namespace Ogre
         //Collect pieces
         mPieces.clear();
 
+        const String sourceFilename = job->mSourceFilename + mShaderFileExt;
+
         ResourceGroupManager &resourceGroupMgr = ResourceGroupManager::getSingleton();
-        DataStreamPtr inFile = resourceGroupMgr.openResource( job->mSourceFilename );
+        DataStreamPtr inFile = resourceGroupMgr.openResource( sourceFilename );
 
         if( mShaderProfile == "glsl" ) //TODO: String comparision
             setProperty( HlmsBaseProp::GL3Plus, 330 );
@@ -225,7 +227,7 @@ namespace Ogre
             OGRE_HASH128_FUNC( outString.c_str(), outString.size(), IdString::Seed, &hashVal );
 
             CompiledShaderMap::const_iterator itor = mCompiledShaderCache.find( hashVal );
-            if( itor == mCompiledShaderCache.end() )
+            if( itor != mCompiledShaderCache.end() )
             {
                 shader = itor->second;
             }
@@ -259,6 +261,14 @@ namespace Ogre
                 mCompiledShaderCache[hashVal] = shader;
             }
         }
+
+        ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+        if( shaderParams )
+            shaderParams->updateParameters( shader->getDefaultParameters() );
+
+        shaderParams = job->_getShaderParams( mShaderProfile );
+        if( shaderParams )
+            shaderParams->updateParameters( shader->getDefaultParameters() );
 
         //Reset the disable flag.
         setProperty( HlmsBaseProp::DisableStage, 0 );
@@ -320,8 +330,10 @@ namespace Ogre
         mComputeShaderCache.clear();
     }
     //-----------------------------------------------------------------------------------
-    void HlmsCompute::dispatch( HlmsComputeJob *job )
+    void HlmsCompute::dispatch( HlmsComputeJob *job, SceneManager *sceneManager, Camera *camera )
     {
+        job->_calculateNumThreadGroupsBasedOnSetting();
+
         if( job->mPsoCacheHash >= mComputeShaderCache.size() )
         {
             //Potentially needs to recompile.
@@ -345,6 +357,13 @@ namespace Ogre
 
                 //Compile and add the PSO to the cache.
                 psoCache.pso = compileShader( job, mComputeShaderCache.size() );
+
+                ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+                if( shaderParams )
+                    psoCache.paramsUpdateCounter = shaderParams->getUpdateCounter();
+                if( shaderParams )
+                    psoCache.paramsProfileUpdateCounter = shaderParams->getUpdateCounter();
+
                 mComputeShaderCache.push_back( psoCache );
 
                 //The PSO in the cache doesn't have the properties. Make a hard copy.
@@ -363,7 +382,26 @@ namespace Ogre
             }
         }
 
-        const ComputePsoCache &psoCache = mComputeShaderCache[job->mPsoCacheHash];
+        ComputePsoCache &psoCache = mComputeShaderCache[job->mPsoCacheHash];
+
+        {
+            //Update dirty parameters, if necessary
+            ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+            if( shaderParams && psoCache.paramsUpdateCounter != shaderParams->getUpdateCounter() )
+            {
+                shaderParams->updateParameters( psoCache.pso.computeShader->getDefaultParameters() );
+                psoCache.paramsUpdateCounter = shaderParams->getUpdateCounter();
+            }
+
+            shaderParams = job->_getShaderParams( mShaderProfile );
+            if( shaderParams && psoCache.paramsProfileUpdateCounter != shaderParams->getUpdateCounter() )
+            {
+                shaderParams->updateParameters( psoCache.pso.computeShader->getDefaultParameters() );
+                psoCache.paramsProfileUpdateCounter = shaderParams->getUpdateCounter();
+            }
+        }
+
+        mRenderSystem->_setComputePso( &psoCache.pso );
 
         HlmsComputeJob::ConstBufferSlotVec::const_iterator itConst =
                 job->mConstBuffers.begin();
@@ -376,6 +414,7 @@ namespace Ogre
             ++itConst;
         }
 
+        uint32 slotIdx = 0u;
         HlmsComputeJob::TextureSlotVec::const_iterator itTex = job->mTextureSlots.begin();
         HlmsComputeJob::TextureSlotVec::const_iterator enTex = job->mTextureSlots.end();
 
@@ -384,17 +423,20 @@ namespace Ogre
             if( itTex->buffer )
             {
                 static_cast<TexBufferPacked*>( itTex->buffer )->bindBufferCS(
-                            itTex->slotIdx, itTex->offset, itTex->sizeBytes );
+                            slotIdx, itTex->offset, itTex->sizeBytes );
             }
             else
             {
-                mRenderSystem->_setTexture( itTex->slotIdx, true, itTex->texture.get() );
-                mRenderSystem->_setHlmsSamplerblock( itTex->slotIdx, itTex->samplerblock );
+                mRenderSystem->_setTextureCS( slotIdx, !itTex->texture.isNull(), itTex->texture.get() );
+                if( itTex->samplerblock )
+                    mRenderSystem->_setHlmsSamplerblock( slotIdx, itTex->samplerblock );
             }
 
+            ++slotIdx;
             ++itTex;
         }
 
+        slotIdx = 0u;
         HlmsComputeJob::TextureSlotVec::const_iterator itUav = job->mUavSlots.begin();
         HlmsComputeJob::TextureSlotVec::const_iterator enUav = job->mUavSlots.end();
 
@@ -403,19 +445,29 @@ namespace Ogre
             if( itUav->buffer )
             {
                 static_cast<UavBufferPacked*>( itUav->buffer )->bindBufferCS(
-                            itUav->slotIdx, itUav->offset, itUav->sizeBytes );
+                            slotIdx, itUav->offset, itUav->sizeBytes );
             }
             else
             {
-                mRenderSystem->_bindTextureUavCS( itUav->slotIdx, itUav->texture.get(),
+                mRenderSystem->_bindTextureUavCS( slotIdx, itUav->texture.get(),
                                                   itUav->access, itUav->mipmapLevel,
                                                   itUav->textureArrayIndex, itUav->pixelFormat );
             }
 
+            ++slotIdx;
             ++itUav;
         }
 
-        mRenderSystem->_setComputePso( &psoCache.pso );
+        mAutoParamDataSource->setCurrentJob( job );
+        mAutoParamDataSource->setCurrentCamera( camera );
+        mAutoParamDataSource->setCurrentSceneManager( sceneManager );
+        //mAutoParamDataSource->setCurrentShadowNode( shadowNode );
+        //mAutoParamDataSource->setCurrentViewport( sceneManager->getCurrentViewport() );
+
+        GpuProgramParametersSharedPtr csParams = psoCache.pso.computeShader->getDefaultParameters();
+        csParams->_updateAutoParams( mAutoParamDataSource, GPV_ALL );
+        mRenderSystem->bindGpuProgramParameters( GPT_COMPUTE_PROGRAM, csParams, GPV_ALL );
+
         mRenderSystem->_dispatch( psoCache.pso );
     }
     //----------------------------------------------------------------------------------
@@ -461,6 +513,45 @@ namespace Ogre
             retVal = itor->second.computeJob;
 
         return retVal;
+    }
+    //----------------------------------------------------------------------------------
+    const String* HlmsCompute::getJobNameStr( IdString name ) const
+    {
+        String const *retVal = 0;
+        HlmsComputeJobMap::const_iterator itor = mComputeJobs.find( name );
+        if( itor != mComputeJobs.end() )
+            retVal = &itor->second.name;
+
+        return retVal;
+    }
+    //----------------------------------------------------------------------------------
+    HlmsDatablock* HlmsCompute::createDefaultDatablock(void)
+    {
+        return 0;
+    }
+    //----------------------------------------------------------------------------------
+    uint32 HlmsCompute::fillBuffersFor( const HlmsCache *cache, const QueuedRenderable &queuedRenderable,
+                                   bool casterPass, uint32 lastCacheHash,
+                                   uint32 lastTextureHash )
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALID_CALL, "This is a Compute Hlms",
+                     "HlmsCompute::fillBuffersFor" );
+    }
+    uint32 HlmsCompute::fillBuffersForV1( const HlmsCache *cache,
+                                     const QueuedRenderable &queuedRenderable,
+                                     bool casterPass, uint32 lastCacheHash,
+                                     CommandBuffer *commandBuffer )
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALID_CALL, "This is a Compute Hlms",
+                     "HlmsCompute::fillBuffersForV1" );
+    }
+    uint32 HlmsCompute::fillBuffersForV2( const HlmsCache *cache,
+                                     const QueuedRenderable &queuedRenderable,
+                                     bool casterPass, uint32 lastCacheHash,
+                                     CommandBuffer *commandBuffer )
+    {
+        OGRE_EXCEPT( Exception::ERR_INVALID_CALL, "This is a Compute Hlms",
+                     "HlmsCompute::fillBuffersForV2" );
     }
 }
 

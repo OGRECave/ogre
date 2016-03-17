@@ -339,7 +339,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            RenderTarget *uavRt = boundUavs[itor->uavSlot].renderTarget;
+            GpuResource *uavRt = boundUavs[itor->uavSlot].rttOrBuffer;
 
             if( !uavRt )
             {
@@ -451,10 +451,18 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void CompositorPass::notifyRecreated( const UavBufferPacked *oldBuffer, UavBufferPacked *newBuffer )
+    {
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorPass::notifyDestroyed( const CompositorChannel &channel )
     {
         if( mTarget == calculateRenderTarget( mDefinition->getRtIndex(), channel ) )
             mTarget = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::notifyDestroyed( const UavBufferPacked *buffer )
+    {
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::notifyCleared(void)

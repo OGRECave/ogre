@@ -1,0 +1,143 @@
+{
+    "samplers" :
+   {
+        "unique_name" :
+        {
+            "min" : "linear",
+            "mag" : "linear",
+            "mip" : "linear",
+            "u" : "wrap",
+            "v" : "wrap",
+            "w" : "wrap",
+            "miplodbias" : 0,
+            "max_anisotropic" : 1,
+            "compare_function" : "disabled",
+            "border" : [1, 1, 1, 1],
+            "min_lod" : -3.40282347E+38,
+            "max_lod" : 3.40282347E+38
+        }
+    },
+
+    "macroblocks" :
+    {
+        "unique_name" :
+        {
+            "scissor_test" : false,
+            "depth_check" : true,
+            "depth_write" : true,
+            "depth_function" : "less_equal",
+            "depth_bias_constant" : 0,
+            "depth_bias_slope_scale" : 0,
+            "cull_mode" : "clockwise",
+            "polygon_mode" : "solid"
+        }
+    },
+
+    "blendblocks" :
+    {
+        "unique_name" :
+        {
+            "alpha_to_coverage" : false,
+            "blendmask" : "rgba",
+            "separate_blend" : false,
+            "src_blend_factor" : "one",
+            "dst_blend_factor" : "zero",
+            "src_alpha_blend_factor" : "one",
+            "dst_alpha_blend_factor" : "zero",
+            "blend_operation" : "add",
+            "blend_operation_alpha" : "add"
+        }
+    },
+
+    "pbs" :
+    {
+        "material_name" :
+        {
+            "macroblock" : "unique_name",
+            "blendblock" : "unique_name",
+            "alpha_test" : ["disabled", 0.5],
+            "shadow_const_bias" : 0.01,
+
+            "workflow" : "specular_fresnel",
+
+            "transparency" :
+            {
+                "value" : 1.0,
+                "mode" : "None",
+                "use_alpha_from_textures" : true
+            },
+
+            "diffuse" :
+            {
+                "value" : [1, 1, 1],
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "specular" :
+            {
+                "value" : [1, 1, 1]
+            },
+
+            "roughness" :
+            {
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "fresnel" :
+            {
+                "mode" : "coeff",
+                "value" : [1, 1, 1],
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "normal" :
+            {
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "detail_weight" :
+            {
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "detail_diffuse0" :
+            {
+                "mode" : "NormalNonPremul",
+                "offset" : [0, 0],
+                "scale" : [1, 1],
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "detail_normal0" :
+            {
+                "offset" : [0, 0],
+                "scale" : [1, 1],
+                "value" : 1,
+                "texture" : "texture.png",
+                "sampler" : "unique_name",
+                "uv" : 0
+            },
+
+            "reflection" :
+            {
+                "texture" : "cubemap.png",
+                "sampler" : "unique_name"
+            }
+        }
+    }
+}

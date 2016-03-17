@@ -65,6 +65,7 @@ namespace Ogre
     protected:
         Hlms    *mRegisteredHlms[HLMS_MAX];
         bool    mDeleteRegisteredOnExit[HLMS_MAX];
+        HlmsCompute *mComputeHlms;
 
         HlmsMacroblock      mMacroblocks[OGRE_HLMS_NUM_MACROBLOCKS];
         HlmsBlendblock      mBlendblocks[OGRE_HLMS_NUM_BLENDBLOCKS];
@@ -113,6 +114,8 @@ namespace Ogre
 
         /// Returns a registered HLMS based on type. May be null.
         Hlms* getHlms( HlmsTypes type )                 { return mRegisteredHlms[type]; }
+
+        HlmsCompute* getComputeHlms(void)               { return mComputeHlms; }
 
         /** Creates a macroblock that matches the same parameter as the input. If it already exists,
             returns the existing one.
@@ -233,6 +236,9 @@ namespace Ogre
         /// Unregisters an HLMS provider of the given type. Does nothing if no provider was registered.
         /// @See registerHlms for details.
         void unregisterHlms( HlmsTypes type );
+
+        void registerComputeHlms( HlmsCompute *provider );
+        void unregisterComputeHlms(void);
 
         /** Sets whether or not shadow casters should be rendered into shadow
             textures using their back faces rather than their front faces.

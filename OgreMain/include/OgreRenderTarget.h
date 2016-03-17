@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgrePixelFormat.h"
+#include "OgreResourceTransition.h"
 #include "OgreHeaderPrefix.h"
 
 /* Define the number of priority groups for the render system's render targets. */
@@ -59,7 +60,7 @@ namespace Ogre {
         @version
             1.0
      */
-    class _OgreExport RenderTarget : public RenderSysAlloc
+    class _OgreExport RenderTarget : public GpuResource, public RenderSysAlloc
     {
     public:
         enum StatFlags

@@ -113,6 +113,8 @@ namespace Ogre
             paramsSize += mDoubleLogicalToPhysical.getPointer()->bufferSize;
         if(!mIntLogicalToPhysical.isNull())
             paramsSize += mIntLogicalToPhysical.getPointer()->bufferSize;
+        if(!mUIntLogicalToPhysical.isNull())
+            paramsSize += mUIntLogicalToPhysical.getPointer()->bufferSize;
         if(!mConstantDefs.isNull())
             paramsSize += mConstantDefs->calculateSize();
 
@@ -201,10 +203,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists) const
     {
+        //TODO: OpenGL doesn't use this AT ALL.
         if (recreateIfExists || mFloatLogicalToPhysical.isNull())
             mFloatLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
         if (recreateIfExists || mIntLogicalToPhysical.isNull())
             mIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
+        if (recreateIfExists || mUIntLogicalToPhysical.isNull())
+            mUIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
     }
     //---------------------------------------------------------------------
     void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists) const
@@ -226,8 +231,10 @@ namespace Ogre
 
         mFloatLogicalToPhysical->bufferSize = mConstantDefs->floatBufferSize;
         mIntLogicalToPhysical->bufferSize = mConstantDefs->intBufferSize;
+        mUIntLogicalToPhysical->bufferSize = mConstantDefs->uintBufferSize;
         mFloatLogicalToPhysical->map.clear();
         mIntLogicalToPhysical->map.clear();
+        mUIntLogicalToPhysical->map.clear();
         // need to set up logical mappings too for some rendersystems
         for (GpuConstantDefinitionMap::const_iterator i = mConstantDefs->map.begin();
             i != mConstantDefs->map.end(); ++i)
@@ -242,6 +249,10 @@ namespace Ogre
                 if (def.isFloat())
                 {
                     mFloatLogicalToPhysical->map.insert(val);
+                }
+                else if( def.isUnsignedInt() )
+                {
+                    mUIntLogicalToPhysical->map.insert(val);
                 }
                 else
                 {

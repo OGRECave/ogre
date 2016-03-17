@@ -76,8 +76,26 @@ namespace Ogre
         };
         typedef vector<TextureSource>::type TextureSources;
 
+        struct BufferSource
+        {
+            uint32      uavSlot;
+            IdString    bufferName;
+            ResourceAccess::ResourceAccess access;
+            size_t      offset;
+            size_t      sizeBytes;
+            //PixelFormat pixelFormat; /// PF_UNKNOWN if used as UAV.
+
+            BufferSource( uint32 _uavSlot, IdString _bufferName,
+                          ResourceAccess::ResourceAccess _access, size_t _offset=0,
+                          size_t _sizeBytes=0 ) :
+                uavSlot( _uavSlot ), bufferName( _bufferName ), access( _access ), offset( _offset ),
+                sizeBytes( _sizeBytes ) {}
+        };
+        typedef vector<BufferSource>::type BufferSourceVec;
+
     protected:
         TextureSources      mTextureSources;
+        BufferSourceVec     mBufferSources;
         CompositorNodeDef   *mParentNodeDef;
         //bool                mNeedsFlush;
 
@@ -108,7 +126,12 @@ namespace Ogre
         void setUav( uint32 slot, bool isExternal, const String &textureName, uint32 mrtIndex,
                      ResourceAccess::ResourceAccess access, int32 mipmapLevel, PixelFormat pixelFormat );
 
+        void addUavBuffer( uint32 slotIdx, IdString bufferName,
+                           ResourceAccess::ResourceAccess access, size_t offset=0,
+                           size_t sizeBytes=0 );
+
         const TextureSources& getTextureSources(void) const     { return mTextureSources; }
+        const BufferSourceVec& getBufferSources(void) const     { return mBufferSources; }
     };
 
     /** @} */

@@ -792,8 +792,8 @@ namespace Ogre
         if( bindFlags & BB_FLAG_UAV )
         {
             desc.BindFlags |= D3D11_BIND_UNORDERED_ACCESS;
-            desc.MiscFlags |= D3D11_RESOURCE_MISC_BUFFER_STRUCTURED |
-                    D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
+            desc.MiscFlags |= D3D11_RESOURCE_MISC_BUFFER_STRUCTURED /*|
+                    D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS*/;
         }
         desc.ByteWidth      = sizeBytes;
         desc.CPUAccessFlags = 0;

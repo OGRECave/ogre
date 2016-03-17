@@ -60,6 +60,7 @@ THE SOFTWARE.
 #include "Vao/OgreD3D11VaoManager.h"
 #include "Vao/OgreD3D11BufferInterface.h"
 #include "Vao/OgreD3D11VertexArrayObject.h"
+#include "Vao/OgreD3D11UavBufferPacked.h"
 #include "Vao/OgreIndexBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
@@ -148,9 +149,13 @@ bail:
           mBoundIndirectBuffer( 0 ),
           mSwIndirectBufferPtr( 0 ),
           mPso( 0 ),
+          mBoundComputeProgram( 0 ),
+          mMaxBoundUavCS( 0 ),
           mCurrentVertexBuffer( 0 ),
           mCurrentIndexBuffer( 0 ),
           mpDXGIFactory(0),
+          mNumberOfViews( 0 ),
+          mDepthStencilView( 0 ),
           mMaxModifiedUavPlusOne( 0 ),
           mUavsDirty( false ),
           mDSTResView(0)
@@ -160,6 +165,8 @@ bail:
     {
         LogManager::getSingleton().logMessage( "D3D11 : " + getName() + " created." );
 
+        memset( mRenderTargetViews, 0, sizeof( mRenderTargetViews ) );
+        memset( mUavBuffers, 0, sizeof( mUavBuffers ) );
         memset( mUavs, 0, sizeof( mUavs ) );
 
         mRenderSystemWasInited = false;
@@ -2158,13 +2165,8 @@ bail:
 
         if (target)
         {
-            ID3D11RenderTargetView * pRTView[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-            memset(pRTView, 0, sizeof(pRTView));
-
-            target->getCustomAttribute( "ID3D11RenderTargetView", &pRTView );
-
-            uint numberOfViews;
-            target->getCustomAttribute( "numberOfViews", &numberOfViews );
+            target->getCustomAttribute( "ID3D11RenderTargetView", &mRenderTargetViews );
+            target->getCustomAttribute( "numberOfViews", &mNumberOfViews );
 
             //Retrieve depth buffer
             D3D11DepthBuffer *depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
@@ -2180,33 +2182,31 @@ bail:
             depthBuffer = static_cast<D3D11DepthBuffer*>(target->getDepthBuffer());
 
             if( !colourWrite )
-                numberOfViews = 0;
+                mNumberOfViews = 0;
+
+            mDepthStencilView = depthBuffer ? depthBuffer->getDepthStencilView() : 0;
 
             if( mMaxModifiedUavPlusOne )
             {
-                if( mUavStartingSlot < numberOfViews )
+                if( mUavStartingSlot < mNumberOfViews )
                 {
                     OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                         "mUavStartingSlot is lower than the number of RenderTargets attached.\n"
-                        "There are " + StringConverter::toString( numberOfViews ) + " RTs attached,\n"
+                        "There are " + StringConverter::toString( mNumberOfViews ) + " RTs attached,\n"
                         "and mUavStartingSlot = " + StringConverter::toString( mUavStartingSlot ) + "\n"
                         "use setUavStartingSlot to fix this, or set a MRT with less RTs",
                         "D3D11RenderSystem::_setRenderTargetViews" );
                 }
 
                 mDevice.GetImmediateContext()->OMSetRenderTargetsAndUnorderedAccessViews(
-                            numberOfViews,
-                            pRTView,
-                            depthBuffer ? depthBuffer->getDepthStencilView() : 0,
+                            mNumberOfViews, mRenderTargetViews, mDepthStencilView,
                             mUavStartingSlot, mMaxModifiedUavPlusOne, mUavs, 0 );
             }
             else
             {
                 // now switch to the new render target
-                mDevice.GetImmediateContext()->OMSetRenderTargets(
-                            numberOfViews,
-                            pRTView,
-                            depthBuffer ? depthBuffer->getDepthStencilView() : 0 );
+                mDevice.GetImmediateContext()->OMSetRenderTargets( mNumberOfViews, mRenderTargetViews,
+                                                                   mDepthStencilView );
             }
 
             if (mDevice.isError())
@@ -2314,12 +2314,19 @@ bail:
     {
         assert( slot < 64 );
 
-        if( mUavTexPtr[slot].isNull() && texture.isNull() )
+        if( !mUavBuffers[slot] && mUavTexPtr[slot].isNull() && texture.isNull() )
             return;
 
         mUavsDirty = true;
 
         mUavTexPtr[slot] = texture;
+
+        if( mUavBuffers[slot] )
+        {
+            //If the UAV view belonged to a buffer, don't decrement the reference count.
+            mUavBuffers[slot] = 0;
+            mUavs[slot] = 0;
+        }
 
         //Release oldUav *after* we've created the new UAV (if D3D11 needs
         //to return the same UAV, if we release it earlier we may cause
@@ -2411,6 +2418,58 @@ bail:
         }
     }
     //---------------------------------------------------------------------
+    void D3D11RenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                          ResourceAccess::ResourceAccess access,
+                                          size_t offset, size_t sizeBytes )
+    {
+        assert( slot < 64 );
+
+        if( mUavTexPtr[slot].isNull() && !mUavBuffers[slot] && !buffer )
+            return;
+
+        mUavsDirty = true;
+
+        if( mUavBuffers[slot] )
+        {
+            //If the UAV view belonged to a buffer, don't decrement the reference count.
+            mUavs[slot] = 0;
+        }
+
+        mUavBuffers[slot] = buffer;
+        mUavTexPtr[slot].setNull();
+
+        //Release oldUav *after* we've created the new UAV (if D3D11 needs
+        //to return the same UAV, if we release it earlier we may cause
+        //unnecessary alloc/deallocations)
+        ID3D11UnorderedAccessView *oldUav = mUavs[slot];
+        mUavs[slot] = 0;
+
+        if( buffer )
+        {
+            assert( dynamic_cast<D3D11UavBufferPacked*>( buffer ) );
+            D3D11UavBufferPacked *uavBufferPacked = static_cast<D3D11UavBufferPacked*>( buffer );
+
+            mUavs[slot] = uavBufferPacked->_bindBufferCommon( offset, sizeBytes );
+
+            mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+        }
+        else
+        {
+            if( slot + 1 == mMaxModifiedUavPlusOne )
+            {
+                --mMaxModifiedUavPlusOne;
+                while( mMaxModifiedUavPlusOne != 0 && !mUavs[mMaxModifiedUavPlusOne-1] )
+                    --mMaxModifiedUavPlusOne;
+            }
+        }
+
+        if( oldUav )
+        {
+            oldUav->Release();
+            oldUav = 0;
+        }
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::clearUAVs(void)
     {
         mUavsDirty = true;
@@ -2421,7 +2480,9 @@ bail:
 
             if( mUavs[i] )
             {
-                mUavs[i]->Release();
+                //If the UAV view belonged to a buffer, don't decrement the reference count.
+                if( !mUavBuffers[i] )
+                    mUavs[i]->Release();
                 mUavs[i] = 0;
             }
         }
@@ -2447,10 +2508,49 @@ bail:
             D3D11Texture *dt = static_cast<D3D11Texture*>( texture );
             ID3D11UnorderedAccessView *uavView = dt->getUavView( mipmapLevel, textureArrayIndex, pixelFormat );
             mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, &uavView, NULL );
+
+            mMaxBoundUavCS = std::max( mMaxBoundUavCS, slot );
         }
         else
         {
-            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, NULL, NULL );
+            ID3D11UnorderedAccessView *nullUavView = NULL;
+            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( slot, 1, &nullUavView, NULL );
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
+    {
+        D3D11Texture *dt = static_cast<D3D11Texture*>( texPtr );
+        if (enabled && dt && dt->getSize() > 0)
+        {
+            // note used
+            dt->touch();
+            ID3D11ShaderResourceView * pTex = dt->getTexture();
+
+            mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(slot), static_cast<UINT>(1), &pTex);
+        }
+        else
+        {
+            ID3D11ShaderResourceView *nullSrv = NULL;
+            mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(slot), static_cast<UINT>(1), &nullSrv);
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11RenderSystem::_setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock )
+    {
+        assert( samplerblock->mRsData &&
+                "The block must have been created via HlmsManager::getSamplerblock!" );
+
+        ID3D11SamplerState *samplerState = reinterpret_cast<ID3D11SamplerState*>( samplerblock->mRsData );
+
+        mDevice.GetImmediateContext()->CSSetSamplers( static_cast<UINT>(texUnit), static_cast<UINT>(1),
+                                                      &samplerState );
+        if( mDevice.isError() )
+        {
+            String errorDescription = mDevice.getErrorDescription();
+            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                "D3D11 device cannot set pixel shader samplers\nError Description:" + errorDescription,
+                "D3D11RenderSystem::_render");
         }
     }
     //---------------------------------------------------------------------
@@ -2973,6 +3073,13 @@ bail:
         {
             newComputeShader = reinterpret_cast<D3D11HLSLProgram*>( pso->rsData );
 
+            {
+                //Using Compute Shaders? Unset the UAV from rendering
+                mDevice.GetImmediateContext()->OMSetRenderTargets( mNumberOfViews, mRenderTargetViews,
+                                                                   mDepthStencilView );
+                mUavsDirty = true;
+            }
+
             if( mBoundComputeProgram == newComputeShader )
                 return;
         }
@@ -3014,6 +3121,9 @@ bail:
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_endFrame()
     {
+        mBoundComputeProgram = 0;
+        mActiveComputeGpuProgramParameters.setNull();
+        mComputeProgramBound = false;
     }
     //---------------------------------------------------------------------
     // TODO: Move this class to the right place.
@@ -3130,22 +3240,6 @@ bail:
                 }
             }
 
-            /// Compute Shader binding
-            if (mBoundComputeProgram && mBindingType == TextureUnitState::BT_COMPUTE)
-            {
-                if (mFeatureLevel >= D3D_FEATURE_LEVEL_10_0)
-                {
-                    mDevice.GetImmediateContext()->CSSetShaderResources(static_cast<UINT>(0), static_cast<UINT>(opState->mTexturesCount), &opState->mTextures[0]);
-                    if (mDevice.isError())
-                    {
-                        String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set compute shader resources\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::_render");
-                    }
-                }
-            }
-
             /// Hull Shader binding
             if (mPso->hullShader && mBindingType == TextureUnitState::BT_TESSELLATION_HULL)
             {
@@ -3223,20 +3317,7 @@ bail:
         DWORD primCount = 0;
 
         // Handle computing
-        if(mBoundComputeProgram)
-        {
-            // Bound unordered access views
-            mDevice.GetImmediateContext()->Dispatch(1, 1, 1);
-
-            ID3D11UnorderedAccessView* views[] = { 0 };
-            ID3D11ShaderResourceView* srvs[] = { 0 };
-            mDevice.GetImmediateContext()->CSSetShaderResources( 0, 1, srvs );
-            mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( 0, 1, views, NULL );
-            mDevice.GetImmediateContext()->CSSetShader( NULL, NULL, 0 );
-
-            return;
-        }
-        else if(mPso->hullShader && mPso->domainShader)
+        if(mPso->hullShader && mPso->domainShader)
         {
             // useful primitives for tessellation
             switch( op.operationType )
@@ -3438,6 +3519,12 @@ bail:
         mDevice.GetImmediateContext()->Dispatch( pso.mNumThreadGroups[0],
                                                  pso.mNumThreadGroups[1],
                                                  pso.mNumThreadGroups[2] );
+
+        assert( mMaxBoundUavCS < 8u );
+        ID3D11UnorderedAccessView *nullUavViews[8];
+        memset( nullUavViews, 0, sizeof( nullUavViews ) );
+        mDevice.GetImmediateContext()->CSSetUnorderedAccessViews( 0, mMaxBoundUavCS + 1u,
+                                                                  nullUavViews, NULL );
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_setVertexArrayObject( const VertexArrayObject *_vao )
