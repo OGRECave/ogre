@@ -43,7 +43,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     ##################################################################    
     	
 	if(OGRE_BUILD_RENDERSYSTEM_GLES2)
-	    SET(DEPENDENCIES OgreMain RenderSystem_GLES2)
+	    SET(DEPENDENCIES OgreMain OgreGLSupport RenderSystem_GLES2)
 	else()
 	    SET(DEPENDENCIES OgreMain RenderSystem_GLES)		
 	endif()
@@ -142,4 +142,3 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         message(WARNING "Android executable not found. Not building ${ANDROID_PROJECT_TARGET} APK. Do you have the Android SDK installed?")
     endif()
 endmacro(create_android_proj)
-

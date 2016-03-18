@@ -2291,6 +2291,10 @@ namespace Ogre {
     }
     //---------------------------------------------------------------------
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    void GLES2RenderSystem::notifyOnContextLost() {
+        GLES2RenderSystem::mResourceManager->notifyOnContextLost();
+    }
+
     void GLES2RenderSystem::resetRenderer(RenderWindow* win)
     {
         LogManager::getSingleton().logMessage("********************************************");
