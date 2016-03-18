@@ -54,6 +54,11 @@ namespace Ogre {
             GLContext.
         */
         virtual void _unregisterContext(GLContext *context) = 0;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+        virtual void resetRenderer(RenderWindow* pRenderWnd) = 0;
+        virtual void notifyOnContextLost() = 0;
+#endif
     };
 }
 

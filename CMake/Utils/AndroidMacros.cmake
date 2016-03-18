@@ -43,7 +43,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
     ##################################################################    
     	
 	if(OGRE_BUILD_RENDERSYSTEM_GLES2)
-	    SET(DEPENDENCIES OgreMain RenderSystem_GLES2)
+	    SET(DEPENDENCIES OgreMain OgreGLSupport RenderSystem_GLES2)
 	else()
 	    SET(DEPENDENCIES OgreMain RenderSystem_GLES)		
 	endif()
