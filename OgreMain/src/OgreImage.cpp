@@ -667,8 +667,8 @@ namespace Ogre {
         case PF_X8B8G8R8: case PF_X8R8G8B8:
             if( !gammaCorrected )
             {
-                downsampler2DFunc   = downscale2x_AXXX8888;
-                downsamplerCubeFunc = downscale2x_AXXX8888_cube;
+                downsampler2DFunc   = downscale2x_XXXA8888;
+                downsamplerCubeFunc = downscale2x_XXXA8888_cube;
             }
             else
             {
@@ -691,6 +691,22 @@ namespace Ogre {
         case PF_R8G8B8A8_SNORM: case PF_R8G8B8A8_SINT:
             downsampler2DFunc   = downscale2x_Signed_XXXA8888;
             downsamplerCubeFunc = downscale2x_Signed_XXXA8888_cube;
+            break;
+        case PF_FLOAT32_RGBA:
+            downsampler2DFunc   = downscale2x_Float32_XXXA;
+            downsamplerCubeFunc = downscale2x_Float32_XXXA_cube;
+            break;
+        case PF_FLOAT32_RGB:
+            downsampler2DFunc   = downscale2x_Float32_XXX;
+            downsamplerCubeFunc = downscale2x_Float32_XXX_cube;
+            break;
+        case PF_FLOAT32_GR:
+            downsampler2DFunc   = downscale2x_Float32_XX;
+            downsamplerCubeFunc = downscale2x_Float32_XX_cube;
+            break;
+        case PF_FLOAT32_R:
+            downsampler2DFunc   = downscale2x_Float32_X;
+            downsamplerCubeFunc = downscale2x_Float32_X_cube;
             break;
         default: //Keep compiler happy
             break;

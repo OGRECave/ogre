@@ -426,6 +426,8 @@ namespace Ogre {
         static bool isFloatingPoint(PixelFormat format);
         /** Shortcut method to determine if the format is integer */
         static bool isInteger(PixelFormat format);
+        /** Shortcut method to determine if the format is signed */
+        static bool isSigned(PixelFormat format);
         /** Shortcut method to determine if the format is compressed */
         static bool isCompressed(PixelFormat format);
         /** Shortcut method to determine if the format is a depth format. */

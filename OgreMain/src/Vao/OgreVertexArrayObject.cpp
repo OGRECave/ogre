@@ -36,6 +36,9 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    VertexBufferPacked VertexArrayObject::msDummyVertexBuffer( 0, 0, 1, BT_DEFAULT, 0, false, 0,
+                                                               0, VertexElement2Vec(), 0, 0, 0 );
+
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
 
     VertexArrayObject::VertexArrayObject( uint32 vaoName, uint32 renderQueueId,
@@ -50,9 +53,12 @@ namespace Ogre
             mIndexBuffer( indexBuffer ),
             mOperationType( operationType )
     {
+        if( mVertexBuffers.empty() )
+            mVertexBuffers.push_back( &msDummyVertexBuffer );
+
         if( mIndexBuffer )
             mPrimCount = mIndexBuffer->getNumElements();
-        else
+        else if( mVertexBuffers[0] != &msDummyVertexBuffer )
             mPrimCount = mVertexBuffers[0]->getNumElements();
 
         /*switch( mOperationType )
@@ -75,7 +81,12 @@ namespace Ogre
         if( mIndexBuffer )
             limit = mIndexBuffer->getNumElements();
         else
-            limit = mVertexBuffers[0]->getNumElements();
+        {
+            if( mVertexBuffers[0] != &msDummyVertexBuffer )
+                limit = mVertexBuffers[0]->getNumElements();
+            else
+                limit = std::numeric_limits<uint32>::max();
+        }
 
         if( primStart > limit )
         {

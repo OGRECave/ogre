@@ -183,15 +183,6 @@ namespace Ogre
     #define DOWNSAMPLE_CUBE_NAME downscale2x_XXXA8888_cube
     #include "OgreImageDownsampler.cpp"
 
-    #define OGRE_DOWNSAMPLE_A 0
-    #define OGRE_DOWNSAMPLE_R 1
-    #define OGRE_DOWNSAMPLE_G 2
-    #define OGRE_DOWNSAMPLE_B 3
-    #define OGRE_TOTAL_SIZE 4
-    #define DOWNSAMPLE_NAME downscale2x_AXXX8888
-    #define DOWNSAMPLE_CUBE_NAME downscale2x_AXXX8888_cube
-    #include "OgreImageDownsampler.cpp"
-
     #define OGRE_DOWNSAMPLE_R 0
     #define OGRE_DOWNSAMPLE_G 1
     #define OGRE_DOWNSAMPLE_B 2
@@ -226,13 +217,6 @@ namespace Ogre
 	#define DOWNSAMPLE_CUBE_NAME downscale2x_XA88_cube
     #include "OgreImageDownsampler.cpp"
 
-    #define OGRE_DOWNSAMPLE_A 0
-    #define OGRE_DOWNSAMPLE_R 1
-    #define OGRE_TOTAL_SIZE 2
-    #define DOWNSAMPLE_NAME downscale2x_AX88
-	#define DOWNSAMPLE_CUBE_NAME downscale2x_AX88_cube
-    #include "OgreImageDownsampler.cpp"
-
     //-----------------------------------------------------------------------------------
     //Signed versions
     //-----------------------------------------------------------------------------------
@@ -249,15 +233,6 @@ namespace Ogre
     #define OGRE_TOTAL_SIZE 4
     #define DOWNSAMPLE_NAME downscale2x_Signed_XXXA8888
     #define DOWNSAMPLE_CUBE_NAME downscale2x_Signed_XXXA8888_cube
-    #include "OgreImageDownsampler.cpp"
-
-    #define OGRE_DOWNSAMPLE_A 0
-    #define OGRE_DOWNSAMPLE_R 1
-    #define OGRE_DOWNSAMPLE_G 2
-    #define OGRE_DOWNSAMPLE_B 3
-    #define OGRE_TOTAL_SIZE 4
-    #define DOWNSAMPLE_NAME downscale2x_Signed_AXXX8888
-    #define DOWNSAMPLE_CUBE_NAME downscale2x_Signed_AXXX8888_cube
     #include "OgreImageDownsampler.cpp"
 
     #define OGRE_DOWNSAMPLE_R 0
@@ -294,11 +269,56 @@ namespace Ogre
     #define DOWNSAMPLE_CUBE_NAME downscale2x_Signed_XA88_cube
     #include "OgreImageDownsampler.cpp"
 
-    #define OGRE_DOWNSAMPLE_A 0
-    #define OGRE_DOWNSAMPLE_R 1
+    //-----------------------------------------------------------------------------------
+    //Float32 versions
+    //-----------------------------------------------------------------------------------
+
+    #undef OGRE_UINT8
+    #undef OGRE_UINT32
+    #define OGRE_UINT8 float
+    #define OGRE_UINT32 float
+
+    #define OGRE_DOWNSAMPLE_R 0
+    #define OGRE_DOWNSAMPLE_G 1
+    #define OGRE_DOWNSAMPLE_B 2
+    #define OGRE_DOWNSAMPLE_A 3
+    #define OGRE_TOTAL_SIZE 4
+    #define DOWNSAMPLE_NAME downscale2x_Float32_XXXA
+    #define DOWNSAMPLE_CUBE_NAME downscale2x_Float32_XXXA_cube
+    #include "OgreImageDownsampler.cpp"
+
+    #define OGRE_DOWNSAMPLE_R 0
+    #define OGRE_DOWNSAMPLE_G 1
+    #define OGRE_DOWNSAMPLE_B 2
+    #define OGRE_TOTAL_SIZE 3
+    #define DOWNSAMPLE_NAME downscale2x_Float32_XXX
+    #define DOWNSAMPLE_CUBE_NAME downscale2x_Float32_XXX_cube
+    #include "OgreImageDownsampler.cpp"
+
+    #define OGRE_DOWNSAMPLE_R 0
+    #define OGRE_DOWNSAMPLE_G 1
     #define OGRE_TOTAL_SIZE 2
-    #define DOWNSAMPLE_NAME downscale2x_Signed_AX88
-    #define DOWNSAMPLE_CUBE_NAME downscale2x_Signed_AX88_cube
+    #define DOWNSAMPLE_NAME downscale2x_Float32_XX
+    #define DOWNSAMPLE_CUBE_NAME downscale2x_Float32_XX_cube
+    #include "OgreImageDownsampler.cpp"
+
+    #define OGRE_DOWNSAMPLE_R 0
+    #define OGRE_TOTAL_SIZE 1
+    #define DOWNSAMPLE_NAME downscale2x_Float32_X
+    #define DOWNSAMPLE_CUBE_NAME downscale2x_Float32_X_cube
+    #include "OgreImageDownsampler.cpp"
+
+    #define OGRE_DOWNSAMPLE_A 0
+    #define OGRE_TOTAL_SIZE 1
+    #define DOWNSAMPLE_NAME downscale2x_Float32_A
+    #define DOWNSAMPLE_CUBE_NAME downscale2x_Float32_A_cube
+    #include "OgreImageDownsampler.cpp"
+
+    #define OGRE_DOWNSAMPLE_R 0
+    #define OGRE_DOWNSAMPLE_A 1
+    #define OGRE_TOTAL_SIZE 2
+    #define DOWNSAMPLE_NAME downscale2x_Float32_XA
+    #define DOWNSAMPLE_CUBE_NAME downscale2x_Float32_XA_cube
     #include "OgreImageDownsampler.cpp"
 
     //-----------------------------------------------------------------------------------

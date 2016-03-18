@@ -55,13 +55,11 @@ namespace Ogre
                                        const int8 kernelStartY, const int8 kernelEndY );
 
     ImageDownsampler2D downscale2x_XXXA8888;
-    ImageDownsampler2D downscale2x_AXXX8888;
     ImageDownsampler2D downscale2x_XXX888;
     ImageDownsampler2D downscale2x_XX88;
     ImageDownsampler2D downscale2x_X8;
     ImageDownsampler2D downscale2x_A8;
     ImageDownsampler2D downscale2x_XA88;
-    ImageDownsampler2D downscale2x_AX88;
 
     //
     //  CUBEMAP versions
@@ -76,13 +74,11 @@ namespace Ogre
                                        uint8 currentFace );
 
     ImageDownsamplerCube downscale2x_XXXA8888_cube;
-    ImageDownsamplerCube downscale2x_AXXX8888_cube;
     ImageDownsamplerCube downscale2x_XXX888_cube;
     ImageDownsamplerCube downscale2x_XX88_cube;
     ImageDownsamplerCube downscale2x_X8_cube;
     ImageDownsamplerCube downscale2x_A8_cube;
     ImageDownsamplerCube downscale2x_XA88_cube;
-    ImageDownsamplerCube downscale2x_AX88_cube;
 
     //-----------------------------------------------------------------------------------
     //Signed versions
@@ -90,26 +86,45 @@ namespace Ogre
 
 
     ImageDownsampler2D downscale2x_Signed_XXXA8888;
-    ImageDownsampler2D downscale2x_Signed_AXXX8888;
     ImageDownsampler2D downscale2x_Signed_XXX888;
     ImageDownsampler2D downscale2x_Signed_XX88;
     ImageDownsampler2D downscale2x_Signed_X8;
     ImageDownsampler2D downscale2x_Signed_A8;
     ImageDownsampler2D downscale2x_Signed_XA88;
-    ImageDownsampler2D downscale2x_Signed_AX88;
 
     //
     //  CUBEMAP Signed versions
     //
 
     ImageDownsamplerCube downscale2x_Signed_XXXA8888_cube;
-    ImageDownsamplerCube downscale2x_Signed_AXXX8888_cube;
     ImageDownsamplerCube downscale2x_Signed_XXX888_cube;
     ImageDownsamplerCube downscale2x_Signed_XX88_cube;
     ImageDownsamplerCube downscale2x_Signed_X8_cube;
     ImageDownsamplerCube downscale2x_Signed_A8_cube;
     ImageDownsamplerCube downscale2x_Signed_XA88_cube;
-    ImageDownsamplerCube downscale2x_Signed_AX88_cube;
+
+    //-----------------------------------------------------------------------------------
+    //Float32 versions
+    //-----------------------------------------------------------------------------------
+
+
+    ImageDownsampler2D downscale2x_Float32_XXXA;
+    ImageDownsampler2D downscale2x_Float32_XXX;
+    ImageDownsampler2D downscale2x_Float32_XX;
+    ImageDownsampler2D downscale2x_Float32_X;
+    ImageDownsampler2D downscale2x_Float32_A;
+    ImageDownsampler2D downscale2x_Float32_XA;
+
+    //
+    //  CUBEMAP Float32 versions
+    //
+
+    ImageDownsamplerCube downscale2x_Float32_XXXA_cube;
+    ImageDownsamplerCube downscale2x_Float32_XXX_cube;
+    ImageDownsamplerCube downscale2x_Float32_XX_cube;
+    ImageDownsamplerCube downscale2x_Float32_X_cube;
+    ImageDownsamplerCube downscale2x_Float32_A_cube;
+    ImageDownsamplerCube downscale2x_Float32_XA_cube;
 
     //-----------------------------------------------------------------------------------
     //sRGB versions
