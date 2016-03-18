@@ -1,7 +1,7 @@
 
 //See Hable_John_Uncharted2_HDRLighting.pptx
 //See http://filmicgames.com/archives/75
-//See http://rich5264.wordpress.com/2010/05/04/reinhards_tone_mapping_operator/
+//See https://expf.wordpress.com/2010/05/04/reinhards_tone_mapping_operator/
 /*static const float A = 0.15f;
 static const float B = 0.50f;
 static const float C = 0.10f;
