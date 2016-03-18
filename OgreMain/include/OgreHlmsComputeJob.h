@@ -273,6 +273,9 @@ namespace Ogre
         void removeUavUnit( uint8 slotIdx );
         size_t getNumUavUnits(void) const               { return mUavSlots.size(); }
 
+        const TexturePtr& getUavTexture( uint8 slotIdx ) const;
+        UavBufferPacked* getUavBuffer( uint8 slotIdx ) const;
+
         /** Sets a texture buffer at the given slot ID.
         @remarks
             Texture buffer slots are shared with setTexture's. Calling this
@@ -281,6 +284,9 @@ namespace Ogre
         @par
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
+        @par
+            Setting a RenderTarget that could be used for writing is dangerous
+            in explicit APIs (DX12, Vulkan). Use the CompositorPassComputeDef
         @param slotIdx
             @see setNumTexUnits.
             The slot index to bind this texture buffer
@@ -356,6 +362,11 @@ namespace Ogre
         @par
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
+        @par
+            Be very careful when calling this directly. The Compositor needs to
+            evaluate memory barriers and resource transitions. Leaving inconsistent
+            memory barriers can result in hazards/race conditions in some APIs.
+            If in doubt, change the CompositorPassComputeDef instead.
         @param slotIdx
             @see setNumUavUnits.
             The slot index to bind this UAV buffer.
@@ -373,9 +384,9 @@ namespace Ogre
             Size in bytes to bind the tex buffer. When zero,
             binds from offset until the end of the buffer.
         */
-        void setUavBuffer( uint8 slotIdx, UavBufferPacked *uavBuffer,
-                           ResourceAccess::ResourceAccess access,
-                           size_t offset=0, size_t sizeBytes=0 );
+        void _setUavBuffer( uint8 slotIdx, UavBufferPacked *uavBuffer,
+                            ResourceAccess::ResourceAccess access,
+                            size_t offset=0, size_t sizeBytes=0 );
 
         /** Sets an UAV texture.
         @remarks
@@ -385,6 +396,11 @@ namespace Ogre
         @par
             May trigger a recompilation if @see setInformHlmsOfTextureData
             is enabled.
+        @par
+            Be very careful when calling this directly. The Compositor needs to
+            evaluate memory barriers and resource transitions. Leaving inconsistent
+            memory barriers can result in hazards/race conditions in some APIs.
+            If in doubt, change the CompositorPassComputeDef instead.
         @param slot
             @see setNumUavUnits.
         @param texture
@@ -393,9 +409,9 @@ namespace Ogre
         @param mipmapLevel
         @param pixelFormat
         */
-        void setUavTexture( uint8 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
-                            ResourceAccess::ResourceAccess access, int32 mipmapLevel,
-                            PixelFormat pixelFormat );
+        void _setUavTexture( uint8 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
+                             ResourceAccess::ResourceAccess access, int32 mipmapLevel,
+                             PixelFormat pixelFormat );
     };
 
     /** @} */

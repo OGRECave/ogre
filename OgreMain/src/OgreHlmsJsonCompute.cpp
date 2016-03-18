@@ -324,50 +324,6 @@ namespace Ogre
 //        }
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJsonCompute::loadUav( const rapidjson::Value &json, HlmsComputeJob *job, uint8 slotIdx )
-    {
-        PixelFormat pixelFormat = PF_UNKNOWN;
-        int32 slice = 0;
-        int32 mipmap = 0;
-        ResourceAccess::ResourceAccess access = ResourceAccess::Undefined;
-
-        rapidjson::Value::ConstMemberIterator itor = json.FindMember( "access" );
-        if( itor != json.MemberEnd() && (itor->value.IsString() || itor->value.IsArray()) )
-            access = parseAccess( itor->value );
-
-        itor = json.FindMember( "slice" );
-        if( itor != json.MemberEnd() && itor->value.IsUint() )
-            slice = itor->value.GetUint();
-
-        itor = json.FindMember( "mipmap" );
-        if( itor != json.MemberEnd() && itor->value.IsUint() )
-            mipmap = itor->value.GetUint();
-
-        itor = json.FindMember( "format" );
-        if( itor != json.MemberEnd() && itor->value.IsString() )
-        {
-            const String formatName = String( itor->value.GetString(),
-                                              itor->value.GetStringLength() );
-            pixelFormat = PixelUtil::getFormatFromName( formatName );
-        }
-
-        itor = json.FindMember( "texture" );
-        if( itor != json.MemberEnd() && itor->value.IsString() )
-        {
-            const char *textureName = itor->value.GetString();
-
-            TexturePtr texture = TextureManager::getSingleton().getByName(
-                        textureName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
-
-            if( pixelFormat == PF_UNKNOWN )
-                pixelFormat = texture->getFormat();
-
-            job->setUavTexture( slotIdx, texture, slice, access, mipmap, pixelFormat );
-        }
-
-        //TODO: Implement named buffers
-    }
-    //-----------------------------------------------------------------------------------
     void HlmsJsonCompute::loadJob( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                                    HlmsComputeJob *job, const String &jobName )
     {
@@ -494,21 +450,11 @@ namespace Ogre
             }
         }
 
-        itor = json.FindMember( "uav" );
-        if( itor != json.MemberEnd() && itor->value.IsArray() )
+        itor = json.FindMember( "uav_units" );
+        if( itor != json.MemberEnd() && itor->value.IsUint() )
         {
-            const rapidjson::Value &jsonArray = itor->value;
-
-            assert( jsonArray.Size() < 256u && "Exceeding max limit!" );
-
-            const uint8 arraySize = std::min( jsonArray.Size(), 255u );
-            job->setNumUavUnits( arraySize );
-
-            for( uint8 i=0; i<arraySize; ++i )
-            {
-                if( jsonArray[i].IsObject() )
-                    loadUav( jsonArray[i], job, i );
-            }
+            assert( itor->value.GetUint() < 256u && "Exceeding max limit!" );
+            job->setNumUavUnits( std::min( itor->value.GetUint(), 255u ) );
         }
     }
     //-----------------------------------------------------------------------------------

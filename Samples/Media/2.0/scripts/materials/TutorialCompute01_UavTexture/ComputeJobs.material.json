@@ -9,11 +9,7 @@
 
             "source" : "ComputeTest",
 
-            "uav" :
-            [
-                {
-                }
-            ],
+            "uav_units" : 1,
 
             "params" :
             [

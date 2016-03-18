@@ -129,6 +129,22 @@ namespace Ogre
             ++itor;
         }
 
+        {
+            //Ensure our compute job has enough UAV units available.
+            uint8 maxUsedSlot = 0u;
+            const CompositorPassComputeDef::TextureSources &uavSources = mDefinition->getUavSources();
+            CompositorPassComputeDef::TextureSources::const_iterator it = uavSources.begin();
+            CompositorPassComputeDef::TextureSources::const_iterator en = uavSources.end();
+            while( it != en )
+            {
+                maxUsedSlot = std::max( maxUsedSlot, static_cast<uint8>(it->texUnitIdx) );
+                ++it;
+            }
+
+            if( maxUsedSlot >= mComputeJob->getNumUavUnits() )
+                mComputeJob->setNumUavUnits( maxUsedSlot + 1u );
+        }
+
         setResourcesToJob();
 
         const CompositorWorkspace *workspace = parentNode->getWorkspace();
@@ -158,8 +174,8 @@ namespace Ogre
             while( itor != end )
             {
                 TexturePtr texture = mParentNode->getDefinedTexture( itor->textureName, itor->mrtIndex );
-                mComputeJob->setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
-                                            itor->access, itor->mipmapLevel, itor->pixelFormat );
+                mComputeJob->_setUavTexture( itor->texUnitIdx, texture, itor->textureArrayIndex,
+                                             itor->access, itor->mipmapLevel, itor->pixelFormat );
                 ++itor;
             }
         }
@@ -173,8 +189,8 @@ namespace Ogre
             while( itor != end )
             {
                 UavBufferPacked *uavBuffer = mParentNode->getDefinedBuffer( itor->bufferName );
-                mComputeJob->setUavBuffer( itor->slotIdx, uavBuffer, itor->access,
-                                           itor->offset, itor->sizeBytes );
+                mComputeJob->_setUavBuffer( itor->slotIdx, uavBuffer, itor->access,
+                                            itor->offset, itor->sizeBytes );
                 ++itor;
             }
         }

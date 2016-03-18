@@ -487,6 +487,16 @@ namespace Ogre
             mPsoCacheHash = -1;
     }
     //-----------------------------------------------------------------------------------
+    const TexturePtr& HlmsComputeJob::getUavTexture( uint8 slotIdx ) const
+    {
+        return mUavSlots[slotIdx].texture;
+    }
+    //-----------------------------------------------------------------------------------
+    UavBufferPacked* HlmsComputeJob::getUavBuffer( uint8 slotIdx ) const
+    {
+        return static_cast<UavBufferPacked*>( mUavSlots[slotIdx].buffer );
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setTexBuffer( uint8 slotIdx, TexBufferPacked *texBuffer,
                                        size_t offset, size_t sizeBytes )
     {
@@ -565,16 +575,16 @@ namespace Ogre
             hlmsManager->destroySamplerblock( oldSamplerblock );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsComputeJob::setUavBuffer( uint8 slotIdx, UavBufferPacked *uavBuffer,
-                                       ResourceAccess::ResourceAccess access,
-                                       size_t offset, size_t sizeBytes )
+    void HlmsComputeJob::_setUavBuffer( uint8 slotIdx, UavBufferPacked *uavBuffer,
+                                        ResourceAccess::ResourceAccess access,
+                                        size_t offset, size_t sizeBytes )
     {
         setBuffer( slotIdx, uavBuffer, offset, sizeBytes, access, mUavSlots );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsComputeJob::setUavTexture( uint8 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
-                                        ResourceAccess::ResourceAccess access, int32 mipmapLevel,
-                                        PixelFormat pixelFormat )
+    void HlmsComputeJob::_setUavTexture( uint8 slotIdx, TexturePtr &texture, int32 textureArrayIndex,
+                                         ResourceAccess::ResourceAccess access, int32 mipmapLevel,
+                                         PixelFormat pixelFormat )
     {
         assert( slotIdx < mUavSlots.size() );
 

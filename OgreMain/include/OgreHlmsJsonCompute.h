@@ -55,8 +55,7 @@ namespace Ogre
         void loadParams( const rapidjson::Value &jsonArray, ShaderParams &shaderParams,
                          const String &jobName );
         void loadTexture( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
-                          HlmsComputeJob *job, uint8 slotIdx );
-        void loadUav( const rapidjson::Value &json, HlmsComputeJob *job, uint8 slotIdx );
+						  HlmsComputeJob *job, uint8 slotIdx );
     public:
         HlmsJsonCompute( HlmsManager *hlmsManager );
 

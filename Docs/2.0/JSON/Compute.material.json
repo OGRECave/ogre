@@ -63,24 +63,7 @@
                 }
             ],
 
-            "uav" :
-            [
-                {
-                    "texture" : "texture0.png",
-                    "access" : ["read", "write"],
-                    "mipmap" : 0,
-                    "slice"  : 0,
-                    "format" : "PF_FLOAT32_R"
-                },
-                {
-                },
-                {
-                    "buffer" : "buffer_name",
-                    "access" : ["read", "write"],
-                    "offset" : 0,
-                    "size"   : 0
-                }
-            ],
+            "uav_units" : 1,
 
             "params" :
             [
