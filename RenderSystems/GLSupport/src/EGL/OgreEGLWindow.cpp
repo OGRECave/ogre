@@ -216,7 +216,7 @@ namespace Ogre {
         if (surface == EGL_NO_SURFACE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to create EGLSurface based on X NativeWindowType",
+                        "Fail to create EGLSurface based on NativeWindowType",
                         __FUNCTION__);
         }
         return surface;

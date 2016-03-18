@@ -32,11 +32,10 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
 
-#include "OgreGLES2RenderSystem.h"
+#include "OgreGLRenderSystemCommon.h"
 
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
-#include "OgreGLES2ManagedResourceManager.h"
 #include "OgreViewport.h"
 
 #include <iostream>
@@ -242,7 +241,7 @@ namespace Ogre {
         {
             mContext->setCurrent();
 
-            GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
+            static_cast<GLRenderSystemCommon*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->notifyOnContextLost();
             mContext->_destroyInternalResources();
         }
         
@@ -373,7 +372,7 @@ namespace Ogre {
             {
                 mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
 
-                static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
+                static_cast<GLRenderSystemCommon*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
             }
         }
     }
