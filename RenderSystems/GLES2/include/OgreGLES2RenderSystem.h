@@ -527,6 +527,8 @@ namespace Ogre {
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             void resetRenderer(RenderWindow* pRenderWnd);
         
+            void notifyOnContextLost();
+
             static GLES2ManagedResourceManager* getResourceManager();
     private:
             static GLES2ManagedResourceManager* mResourceManager;

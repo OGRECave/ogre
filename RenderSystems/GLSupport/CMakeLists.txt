@@ -87,7 +87,7 @@ if(NOT APPLE_IOS)
         set_target_properties(OgreGLSupport PROPERTIES LINK_FLAGS "-framework Cocoa -framework OpenGL")
     endif()
 
-    ogre_config_common(OgreGLSupport)
+    ogre_config_component(OgreGLSupport)
 
     set(GLSUPPORT_LIBS OgreGLSupport ${PLATFORM_LIBS} PARENT_SCOPE) 
 endif()
