@@ -9,7 +9,7 @@ in block
 
 //See Hable_John_Uncharted2_HDRLighting.pptx
 //See http://filmicgames.com/archives/75
-//See http://rich5264.wordpress.com/2010/05/04/reinhards_tone_mapping_operator/
+//See https://expf.wordpress.com/2010/05/04/reinhards_tone_mapping_operator/
 /*const float A = 0.15;
 const float B = 0.50;
 const float C = 0.10;

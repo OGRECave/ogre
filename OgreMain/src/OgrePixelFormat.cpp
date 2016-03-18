@@ -316,6 +316,11 @@ namespace Ogre {
         return (PixelUtil::getFlags(format) & PFF_INTEGER) > 0;
     }
     //-----------------------------------------------------------------------
+    bool PixelUtil::isSigned(PixelFormat format)
+    {
+        return (PixelUtil::getFlags(format) & PFF_SIGNED) > 0;
+    }
+    //-----------------------------------------------------------------------
     bool PixelUtil::isCompressed(PixelFormat format)
     {
         return (PixelUtil::getFlags(format) & PFF_COMPRESSED) > 0;
