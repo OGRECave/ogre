@@ -474,7 +474,14 @@ namespace Ogre {
 
     void* Win32GLSupport::getProcAddress(const char* procname)
     {
-            return (void*)wglGetProcAddress( procname );
+        void* res = wglGetProcAddress(procname);
+
+        if (!res) {
+            static HMODULE libgl = LoadLibraryA("opengl32.dll");
+            res = GetProcAddress(libgl, procname);
+        }
+
+        return res;
     }
     void Win32GLSupport::initialiseWGL()
     {
