@@ -102,11 +102,11 @@ namespace Ogre
     //-----------------------------------------------------------------------
     void SkeletonManager::add( SkeletonDefPtr skeletonDef )
     {
-        IdString idName( skeletonDef->getName() );
+        IdString idName( skeletonDef->getNameStr() );
         if( mSkeletonDefs.find( idName ) != mSkeletonDefs.end() )
         {
             OGRE_EXCEPT( Exception::ERR_DUPLICATE_ITEM,
-                         "Skeleton with name '" + skeletonDef->getName() +"' already exists!",
+                         "Skeleton with name '" + skeletonDef->getNameStr() +"' already exists!",
                          "SkeletonManager::add" );
         }
 
