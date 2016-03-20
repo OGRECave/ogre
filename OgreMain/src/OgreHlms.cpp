@@ -1363,7 +1363,7 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    const String* Hlms::getFullNameString( IdString name ) const
+    const String* Hlms::getNameStr(IdString name) const
     {
         String const *retVal = 0;
         HlmsDatablockMap::const_iterator itor = mDatablocks.find( name );

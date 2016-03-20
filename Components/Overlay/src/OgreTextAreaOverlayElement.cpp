@@ -633,7 +633,7 @@ namespace v1 {
         {
             mFont->load();
             this->setDatablock( mFont->getHlmsDatablock() );
-            mMaterialName = *mFont->getHlmsDatablock()->getFullName();
+            mMaterialName = *mFont->getHlmsDatablock()->getNameStr();
         }
     }
     //---------------------------------------------------------------------------------------------

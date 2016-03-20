@@ -868,14 +868,14 @@ namespace Ogre
             if( mTransparencyMode == None && mBlendblock[0]->mIsTransparent )
             {
                 LogManager::getSingleton().logMessage(
-                            "WARNING: PBS Datablock '" + *getFullName() +
+                            "WARNING: PBS Datablock '" + *getNameStr() +
                             "' disabling transparency but forcing a blendblock to"
                             " keep using alpha blending. Performance will be affected." );
             }
             else if( mTransparencyMode != None && !mBlendblock[0]->mIsTransparent )
             {
                 LogManager::getSingleton().logMessage(
-                            "WARNING: PBS Datablock '" + *getFullName() +
+                            "WARNING: PBS Datablock '" + *getNameStr() +
                             "' enabling transparency but forcing a blendblock to avoid"
                             " alpha blending. Results may not look as expected." );
             }

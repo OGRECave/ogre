@@ -1141,7 +1141,7 @@ namespace Ogre
             String datablockName = "[Unnamed]";
 
             {
-                const String *fullName = datablock->getFullName();
+                const String *fullName = datablock->getNameStr();
                 if( fullName )
                     datablockName = *fullName;
             }
