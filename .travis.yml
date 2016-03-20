@@ -37,6 +37,8 @@ matrix:
           compiler: clang
         - os: linux
           env: IOS=TRUE
+        - os: linux
+          env: GL3ES=TRUE
         - os: osx
           compiler: gcc
         - os: osx
@@ -51,7 +53,7 @@ script:
     # run unit tests
     - if [ $TEST ]; then bin/Test_Ogre ; fi
     # run visual tests
-    - if [ $TEST ]; then cd bin && ./TestContext ; fi
+    - if [ $TEST ]; then cd bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
     # verify that the python modules are loadable
     - if [ $TEST ]; then cd ../lib && python3 -c "import _Ogre; import _OgreRTShader" ; fi
 os:
