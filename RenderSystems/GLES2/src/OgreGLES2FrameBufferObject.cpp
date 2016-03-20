@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include "OgreGLES2HardwarePixelBuffer.h"
 #include "OgreGLES2FBORenderTexture.h"
 #include "OgreGLES2DepthBuffer.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreRoot.h"
 #include "OgreGLES2RenderSystem.h"
 

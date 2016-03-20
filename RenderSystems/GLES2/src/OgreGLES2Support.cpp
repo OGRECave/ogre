@@ -31,31 +31,11 @@ THE SOFTWARE.
 #include "OgreLogManager.h"
 
 namespace Ogre {
-    void GLES2Support::setConfigOption(const String &name, const String &value)
-    {
-        ConfigOptionMap::iterator it = mOptions.find(name);
-
-        if (it == mOptions.end())
-        {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Option named " + name +  " does not exist.",
-                        "GLES2Support::setConfigOption");
-        }
-        else
-        {
-            it->second.currentValue = value;
-        }
-    }
-
-    ConfigOptionMap& GLES2Support::getConfigOptions(void)
-    {
-        return mOptions;
-    }
-
     void GLES2Support::initialiseExtensions(void)
     {
-        // Set version string
         String tmpStr;
+#if 1
+        // Set version string
         const GLubyte* pcVer = glGetString(GL_VERSION);
         assert(pcVer && "Problems getting GL version string using glGetString");
         tmpStr = (const char*)pcVer;
@@ -66,10 +46,11 @@ namespace Ogre {
         if(tmpStr.length() > offset) {
             mVersion.fromString(tmpStr.substr(offset, tmpStr.find(" ", offset)));
         }
-
+#else
         // GLES3 way, but should work with ES2 as well, so disabled for now
-        //glGetIntegerv(GL_MAJOR_VERSION, &mVersion.major);
-        //glGetIntegerv(GL_MINOR_VERSION, &mVersion.minor);
+        glGetIntegerv(GL_MAJOR_VERSION, &mVersion.major);
+        glGetIntegerv(GL_MINOR_VERSION, &mVersion.minor);
+#endif
 
         LogManager::getSingleton().logMessage("GL_VERSION = " + mVersion.toString());
 
@@ -113,6 +94,6 @@ namespace Ogre {
 
     bool GLES2Support::checkExtension(const String& ext) const
     {
-        return extensionList.find(ext) != extensionList.end();
+        return extensionList.find(ext) != extensionList.end() || mNative->checkExtension(ext);
     }
 }

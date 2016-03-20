@@ -36,6 +36,8 @@ matrix:
           compiler: clang
         - os: linux
           env: IOS=TRUE
+        - os: linux
+          env: GL3ES=TRUE
         - os: osx
           compiler: gcc
         - os: osx
@@ -48,7 +50,7 @@ script:
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then BUILD_CMD="set -o pipefail && $BUILD_CMD | xcpretty" ; fi
     - echo $BUILD_CMD && eval $BUILD_CMD
     - if [ $TEST ]; then bin/Test_Ogre ; fi
-    - if [ $TEST ]; then cd bin && ./TestContext ; fi
+    - if [ $TEST ]; then cd bin && ./TestContext -rs "OpenGL Rendering Subsystem" ; fi
 os:
     - linux
     - osx

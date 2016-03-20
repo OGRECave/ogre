@@ -30,8 +30,9 @@ THE SOFTWARE.
 #include "OgreGLES2HardwareBufferManager.h"
 #include "OgreGLES2RenderSystem.h"
 #include "OgreRoot.h"
-#include "OgreGLES2Util.h"
+#include "OgreGLUtil.h"
 #include "OgreGLES2StateCacheManager.h"
+#include "OgreGLES2Support.h"
 
 namespace Ogre {
     GLES2HardwareIndexBuffer::GLES2HardwareIndexBuffer(HardwareBufferManagerBase* mgr, 
