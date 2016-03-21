@@ -223,7 +223,7 @@ namespace Ogre
         setManualValue( &value, 1u, ElementFloat );
     }
     //-----------------------------------------------------------------------------------
-    void ShaderParams::Param::setManualValue( float *value, uint32 numValues )
+    void ShaderParams::Param::setManualValue( const float *value, uint32 numValues )
     {
         setManualValue( value, numValues, ElementFloat );
     }
@@ -233,7 +233,7 @@ namespace Ogre
         setManualValue( &value, 1u, ElementInt );
     }
     //-----------------------------------------------------------------------------------
-    void ShaderParams::Param::setManualValue( int32 *value, uint32 numValues )
+    void ShaderParams::Param::setManualValue( const int32 *value, uint32 numValues )
     {
         setManualValue( value, numValues, ElementInt );
     }
@@ -243,7 +243,7 @@ namespace Ogre
         setManualValue( &value, 1u, ElementUInt );
     }
     //-----------------------------------------------------------------------------------
-    void ShaderParams::Param::setManualValue( uint32 *value, uint32 numValues )
+    void ShaderParams::Param::setManualValue( const uint32 *value, uint32 numValues )
     {
         setManualValue( value, numValues, ElementUInt );
     }

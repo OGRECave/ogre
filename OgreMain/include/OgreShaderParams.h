@@ -103,11 +103,38 @@ namespace Ogre
                 changes won't take effect.
             */
             void setManualValue( float value );
-            void setManualValue( float *value, uint32 numValues );
+            void setManualValue( const float *value, uint32 numValues );
             void setManualValue( int32 value );
-            void setManualValue( int32 *value, uint32 numValues );
+            void setManualValue( const int32 *value, uint32 numValues );
             void setManualValue( uint32 value );
-            void setManualValue( uint32 *value, uint32 numValues );
+            void setManualValue( const uint32 *value, uint32 numValues );
+
+            /** Returns the value. Assumes this is a manual value.
+                Assumes the param holds enough bytes to fill the type
+                of value you want to retrieve.
+                Examples:
+                    uint32 myVal;
+                    param->getManualValue( myVal );
+                    Vector4 myVector4;
+                    param->getManualValue( myVector4 );
+            */
+            template <typename T>
+            void getManualValue( T &value ) const
+            {
+                assert( !isAutomatic && sizeof(T) <= mp.dataSizeBytes );
+                memcpy( &value, mp.dataBytes, sizeof(T) );
+            }
+            /// See other overload.
+            /// Examples:
+            ///     uint32 myVal = param->getManualValue();
+            ///     Vector4 myVector4 = param->getManualValue();
+            template <typename T>
+            T getManualValue(void) const
+            {
+                T retVal;
+                getManualValue( retVal );
+                return retVal;
+            }
         };
 
         typedef vector<Param>::type ShaderParamVec;
