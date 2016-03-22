@@ -530,7 +530,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * * RESTRICT_ALIAS src )
+    inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * RESTRICT_ALIAS * src )
     {
         for( int i=0; i<12; i+= 4 )
         {
@@ -552,7 +552,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    inline void ArrayMatrixAf4x3::loadFromAoS( const SimpleMatrixAf4x3 * * RESTRICT_ALIAS src )
+    inline void ArrayMatrixAf4x3::loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS * src )
     {
         for( int i=0; i<12; i+= 4 )
         {
