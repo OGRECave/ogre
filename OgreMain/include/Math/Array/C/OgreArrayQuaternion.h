@@ -177,6 +177,12 @@ namespace Ogre
 
         /// @See Quaternion::nlerp
         /// @remarks
+        ///     shortestPath is always true
+        static inline ArrayQuaternion nlerpShortest( ArrayReal fT, const ArrayQuaternion& rkP,
+                                                    const ArrayQuaternion& rkQ );
+
+        /// @See Quaternion::nlerp
+        /// @remarks
         ///     shortestPath is always false
         static inline ArrayQuaternion nlerp( ArrayReal fT, const ArrayQuaternion& rkP, 
                                                     const ArrayQuaternion& rkQ );
