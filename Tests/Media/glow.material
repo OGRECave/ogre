@@ -1,6 +1,11 @@
 vertex_program glow_vs_glsl glsl
 {
-	source vs_glow.glsl
+	source vs_glow.glsl	
+	
+	default_params
+	{
+        param_named_auto worldViewProjMatrix worldviewproj_matrix
+	}
 }
 
 vertex_program glow_vs_glsl150 glsl
