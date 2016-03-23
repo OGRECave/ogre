@@ -2266,7 +2266,7 @@ namespace Ogre {
 
         if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
         {
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE && ENABLE_GL_DEBUG_OUTPUT
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
             OGRE_CHECK_GL_ERROR(glDebugMessageCallbackARB(&GLDebugCallback, NULL));
