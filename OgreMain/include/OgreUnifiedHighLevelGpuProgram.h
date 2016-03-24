@@ -71,7 +71,11 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
-        static void setPrioriry(String shaderLanguage,int priority);
+        OGRE_DEPRECATED static void setPrioriry(String shaderLanguage,int priority) {
+            setPriority(shaderLanguage,priority);
+        }
+
+        static void setPriority(String shaderLanguage,int priority);
         static int  getPriority(String shaderLanguage);
 
     protected:
