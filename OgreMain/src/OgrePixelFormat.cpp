@@ -876,7 +876,7 @@ namespace Ogre {
     {
         ColourValue cv;
 
-        unsigned char pixelSize = PixelUtil::getNumElemBytes(format);
+        size_t pixelSize = PixelUtil::getNumElemBytes(format);
         size_t pixelOffset = pixelSize * (z * slicePitch + y * rowPitch + x);
         PixelUtil::unpackColour(&cv, format, (unsigned char *)data + pixelOffset);
 
@@ -885,7 +885,7 @@ namespace Ogre {
 
     void PixelBox::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
     {
-        unsigned char pixelSize = PixelUtil::getNumElemBytes(format);
+        size_t pixelSize = PixelUtil::getNumElemBytes(format);
         size_t pixelOffset = pixelSize * (z * slicePitch + y * rowPitch + x);
         PixelUtil::packColour(cv, format, (unsigned char *)data + pixelOffset);
     }

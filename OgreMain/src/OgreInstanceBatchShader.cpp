@@ -158,7 +158,7 @@ namespace Ogre
                                         VET_UBYTE4, VES_BLEND_INDICES );
 
 
-        for( size_t i=0; i<thisVertexData->vertexDeclaration->getMaxSource(); ++i )
+        for( uint16 i=0; i<thisVertexData->vertexDeclaration->getMaxSource(); ++i )
         {
             //Create our own vertex buffer
             HardwareVertexBufferSharedPtr vertexBuffer =
@@ -270,7 +270,7 @@ namespace Ogre
         const size_t numBones = baseSubMesh->blendIndexToBoneIndexMap.size();
         mNumWorldMatrices = mInstancesPerBatch * numBones;
 
-        for( size_t i=0; i<=thisVertexData->vertexDeclaration->getMaxSource(); ++i )
+        for( uint16 i=0; i<=thisVertexData->vertexDeclaration->getMaxSource(); ++i )
         {
             //Create our own vertex buffer
             HardwareVertexBufferSharedPtr vertexBuffer =

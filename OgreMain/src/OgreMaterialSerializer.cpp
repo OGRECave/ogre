@@ -75,6 +75,13 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------
+    void trimAndUnquoteWord(String& val)
+    {
+        StringUtil::trim(val);
+        if(val.size() >= 2 && val[0] == '\"' && val[val.size() - 1] == '\"')
+            val = val.substr(1, val.size() - 2);
+    }
+    //-----------------------------------------------------------------------
     ColourValue _parseColourValue(StringVector& vecparams)
     {
         return ColourValue(
@@ -917,7 +924,7 @@ namespace Ogre
     // Texture layer attributes
     bool parseTexture(String& params, MaterialScriptContext& context)
     {
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         const size_t numParams = vecparams.size();
         if (numParams > 5)
         {
@@ -1019,7 +1026,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseAnimTexture(String& params, MaterialScriptContext& context)
     {
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         size_t numParams = vecparams.size();
         // Determine which form it is
         // Must have at least 3 params though
@@ -1052,7 +1059,7 @@ namespace Ogre
     bool parseCubicTexture(String& params, MaterialScriptContext& context)
     {
 
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         size_t numParams = vecparams.size();
 
         // Get final param
@@ -1711,6 +1718,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseTextureAlias(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         context.textureUnit->setTextureNameAlias(params);
 
         return false;
@@ -1812,6 +1820,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseScheme(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         context.technique->setSchemeName(params);
         return false;
     }
@@ -1819,7 +1828,7 @@ namespace Ogre
     bool parseGPUVendorRule(String& params, MaterialScriptContext& context)
     {
         Technique::GPUVendorRule rule;
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         if (vecparams.size() != 2)
         {
             logParseError("Wrong number of parameters for gpu_vendor_rule, expected 2", context);
@@ -1852,7 +1861,7 @@ namespace Ogre
     bool parseGPUDeviceRule(String& params, MaterialScriptContext& context)
     {
         Technique::GPUDeviceNameRule rule;
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         if (vecparams.size() != 2 && vecparams.size() != 3)
         {
             logParseError("Wrong number of parameters for gpu_vendor_rule, expected 2 or 3", context);
@@ -1882,12 +1891,14 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseShadowCasterMaterial(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         context.technique->setShadowCasterMaterial(params);
         return false;
     }
     //-----------------------------------------------------------------------
     bool parseShadowReceiverMaterial(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         context.technique->setShadowReceiverMaterial(params);
         return false;
     }
@@ -2422,7 +2433,7 @@ namespace Ogre
         {
             // if a second parameter exists then assume its the name of the base material
             // that this new material should clone from
-            StringUtil::trim(vecparams[1]);
+            trimAndUnquoteWord(vecparams[1]);
             // make sure base material exists
             basematerial = MaterialManager::getSingleton().getByName(vecparams[1]);
             // if it doesn't exist then report error in log and just create a new material
@@ -2434,7 +2445,7 @@ namespace Ogre
         }
 
         // get rid of leading and trailing white space from material name
-        StringUtil::trim(vecparams[0]);
+        trimAndUnquoteWord(vecparams[0]);
 
         context.material =
             MaterialManager::getSingleton().create(vecparams[0], context.groupName);
@@ -2461,6 +2472,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseTechnique(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
 
         // if params is not empty then see if the technique name already exists
         if (!params.empty() && (context.material->getNumTechniques() > 0))
@@ -2520,6 +2532,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parsePass(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // if params is not empty then see if the pass name already exists
         if (!params.empty() && (context.technique->getNumPasses() > 0))
         {
@@ -2565,6 +2578,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseTextureUnit(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // if params is a name then see if that texture unit exists
         // if not then log the warning and just move on to the next TU from current
         if (!params.empty() && (context.pass->getNumTextureUnitStates() > 0))
@@ -2613,6 +2627,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseVertexProgramRef(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // update section
         context.section = MSS_PROGRAM_REF;
 
@@ -2662,6 +2677,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseGeometryProgramRef(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // update section
         context.section = MSS_PROGRAM_REF;
 
@@ -2711,6 +2727,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseShadowCasterVertexProgramRef(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // update section
         context.section = MSS_PROGRAM_REF;
 
@@ -2744,6 +2761,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseShadowCasterFragmentProgramRef(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // update section
         context.section = MSS_PROGRAM_REF;
 
@@ -2777,6 +2795,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseShadowReceiverVertexProgramRef(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // update section
         context.section = MSS_PROGRAM_REF;
 
@@ -2811,6 +2830,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseShadowReceiverFragmentProgramRef(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // update section
         context.section = MSS_PROGRAM_REF;
 
@@ -2845,6 +2865,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseFragmentProgramRef(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // update section
         context.section = MSS_PROGRAM_REF;
 
@@ -2901,7 +2922,7 @@ namespace Ogre
         context.programDef->usesVertexTextureFetch = false;
 
         // Get name and language code
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         if (vecparams.size() != 2)
         {
             logParseError("Invalid vertex_program entry - expected "
@@ -2932,7 +2953,7 @@ namespace Ogre
         context.programDef->usesVertexTextureFetch = false;
 
         // Get name and language code
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         if (vecparams.size() != 2)
         {
             logParseError("Invalid geometry_program entry - expected "
@@ -2963,7 +2984,7 @@ namespace Ogre
         context.programDef->usesVertexTextureFetch = false;
 
         // Get name and language code
-        StringVector vecparams = StringUtil::split(params, " \t");
+        StringVector vecparams = StringUtil::tokenise(params, " \t");
         if (vecparams.size() != 2)
         {
             logParseError("Invalid fragment_program entry - expected "
@@ -2983,6 +3004,7 @@ namespace Ogre
     //-----------------------------------------------------------------------
     bool parseProgramSource(String& params, MaterialScriptContext& context)
     {
+        trimAndUnquoteWord(params);
         // Source filename, preserve case
         context.programDef->source = params;
 
