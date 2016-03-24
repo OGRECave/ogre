@@ -46,7 +46,7 @@ namespace Ogre
             return (*it).second;
     }
 
-    void UnifiedHighLevelGpuProgram::setPrioriry(String shaderLanguage,int priority)
+    void UnifiedHighLevelGpuProgram::setPriority(String shaderLanguage,int priority)
     {
         mLanguagePriorities[shaderLanguage] = priority;
     }
