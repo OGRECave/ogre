@@ -427,9 +427,20 @@ bail:
         optMaxFeatureLevels.possibleValues.push_back("10.0");
         optMaxFeatureLevels.possibleValues.push_back("10.1");
         optMaxFeatureLevels.possibleValues.push_back("11.0");
+#if defined(_WIN32_WINNT_WIN8) && _WIN32_WINNT >= _WIN32_WINNT_WIN8
+        if (isWindows8OrGreater())
+        {
+            optMaxFeatureLevels.possibleValues.push_back("11.1");
+            optMaxFeatureLevels.currentValue = "11.1";
+        }
+        else
+        {
+            optMaxFeatureLevels.currentValue = "11.0";
+        }
+#else
         optMaxFeatureLevels.currentValue = "11.0";
 #endif
-
+#endif 
         optMaxFeatureLevels.immutable = false;      
 
         // Exceptions Error Level
@@ -1855,6 +1866,14 @@ bail:
             mDevice.ReleaseAll();
             //mActiveD3DDriver->setDevice(D3D11Device(NULL));
         }
+    }
+    //---------------------------------------------------------------------
+    bool D3D11RenderSystem::isWindows8OrGreater()
+    {
+        DWORD version = GetVersion();
+        DWORD major = (DWORD)(LOBYTE(LOWORD(version)));
+        DWORD minor = (DWORD)(HIBYTE(LOWORD(version)));
+        return (major > 6) || ((major == 6) && (minor >= 2));
     }
     //---------------------------------------------------------------------
     VertexElementType D3D11RenderSystem::getColourVertexElementType(void) const
