@@ -1284,8 +1284,13 @@ bail:
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
             rsc->setCapability(RSC_HWRENDER_TO_TEXTURE_3D);
             rsc->setCapability(RSC_TEXTURE_1D);
-            rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
             rsc->setCapability(RSC_COMPLETE_TEXTURE_BINDING);
+        }
+
+        if (mFeatureLevel >= D3D_FEATURE_LEVEL_11_0)
+        {
+            rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
         }
 
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
