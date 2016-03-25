@@ -84,6 +84,7 @@ namespace Ogre
         void refreshD3DSettings(void);
         void refreshFSAAOptions(void);
         void freeDevice(void);
+        bool isWindows8OrGreater();
         
         v1::D3D11HardwareBufferManager* mHardwareBufferManager;
         D3D11GpuProgramManager* mGpuProgramManager;
