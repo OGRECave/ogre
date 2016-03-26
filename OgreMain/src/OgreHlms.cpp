@@ -1491,8 +1491,9 @@ namespace Ogre
 
         while( itor != end )
         {
-            //only open piece files with current render system extention
-            if (itor->find(mShaderFileExt) != String::npos)
+            //Only open piece files with current render system extension
+            const String::size_type extPos = itor->find( mShaderFileExt );
+            if( extPos == itor->size() - mShaderFileExt.size() )
             {
                 DataStreamPtr inFile = archive->open(*itor);
 
