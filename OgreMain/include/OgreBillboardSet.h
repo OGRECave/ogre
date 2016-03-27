@@ -560,6 +560,9 @@ namespace v1 {
         */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
+        /// Internal version that does not call _notifyCurrentCamera (i.e. you've already done it)
+        void _updateRenderQueueImpl(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
+
         /** Overridden from MovableObject
         @see
             MovableObject
