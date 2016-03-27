@@ -529,7 +529,7 @@ namespace Ogre {
             ArrayInt * RESTRICT_ALIAS queryFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
                 (objData.mQueryFlags);
 
-            ArrayMaskR allVolumesMask = ARRAY_REAL_ZERO;
+            ArrayMaskR allVolumesMask = ARRAY_MASK_ZERO;
             size_t planeCounter = 0;
             for( size_t v=0; v<mVolumes.size(); ++v )
             {
