@@ -1,0 +1,18 @@
+compositor_node Terra/ShadowGenerator
+{
+	in 0 terrain_shadows
+
+	target terrain_shadows
+	{
+		pass compute
+		{
+			job Terra/ShadowGenerator
+			uav 0 terrain_shadows write
+		}
+	}
+}
+
+workspace Terra/ShadowGeneratorWorkspace
+{
+	connect_output Terra/ShadowGenerator 0
+}

@@ -1,0 +1,17 @@
+compositor_node Terra/GpuNormalMapper
+{
+	in 0 rt_output
+
+	target rt_output
+	{
+		pass render_quad
+		{
+			material Terra/GpuNormalMapper
+		}
+	}
+}
+
+workspace Terra/GpuNormalMapperWorkspace
+{
+	connect_output Terra/GpuNormalMapper 0
+}

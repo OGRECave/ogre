@@ -1,0 +1,33 @@
+{
+    "compute" :
+    {
+        "Terra/ShadowGenerator" :
+        {
+            "threads_per_group" : [64, 1, 1],
+            "thread_groups" : [32, 1, 1],
+
+            "source" : "TerraShadowGenerator",
+
+            "uav_units" : 1,
+			
+			"textures" :
+            [
+				{}
+			],
+			
+			"params" :
+			[
+				["xyStep",     		[1], "int"],
+				["isSteep",      	[1], "int"],
+				["delta",			[1.0, 0.0]],
+				["heightDelta",     [0.001]]
+			],
+			
+			"params_glsl" :
+            [
+                ["shadowMap",		[0], "int"],
+				["heightMap",		[0], "int"]
+            ]
+        }
+    }
+}
