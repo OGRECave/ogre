@@ -26,8 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef __C_BooleanMask_H__
-#define __C_BooleanMask_H___
+#ifndef _C_BooleanMask_H_
+#define _C_BooleanMask_H_
 
 #ifndef __BooleanMask_H__
     #error "Don't include this file directly. include Math/Array/OgreBooleanMask.h"
