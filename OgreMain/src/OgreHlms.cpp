@@ -1013,6 +1013,48 @@ namespace Ogre
         return syntaxError;
     }
     //-----------------------------------------------------------------------------------
+    bool Hlms::parseUndefPieces( String &inBuffer, String &outBuffer )
+    {
+        outBuffer.clear();
+        outBuffer.reserve( inBuffer.size() );
+
+        StringVector argValues;
+        SubStringRef subString( &inBuffer, 0 );
+        size_t pos = subString.find( "@undefpiece" );
+
+        bool syntaxError = false;
+
+        while( pos != String::npos && !syntaxError )
+        {
+            //Copy what comes before the block
+            copy( outBuffer, subString, pos );
+
+            subString.setStart( subString.getStart() + pos + sizeof( "@undefpiece" ) );
+            evaluateParamArgs( subString, argValues, syntaxError );
+
+            syntaxError |= argValues.size() != 1u;
+
+            if( !syntaxError )
+            {
+                const IdString pieceName( argValues[0] );
+                PiecesMap::const_iterator it = mPieces.find( pieceName );
+                if( it != mPieces.end() )
+                    mPieces.erase( it );
+            }
+            else
+            {
+                printf( "Syntax Error at line %lu: @undefpiece expects one parameter",
+                        calculateLineCount( subString ) );
+            }
+
+            pos = subString.find( "@undefpiece" );
+        }
+
+        copy( outBuffer, subString, subString.getSize() );
+
+        return syntaxError;
+    }
+    //-----------------------------------------------------------------------------------
     bool Hlms::collectPieces( const String &inBuffer, String &outBuffer )
     {
         outBuffer.clear();
@@ -1519,8 +1561,9 @@ namespace Ogre
                 this->parseMath(inString, outString);
                 this->parseForEach(outString, inString);
                 this->parseProperties(inString, outString);
-                this->collectPieces(outString, inString);
-                this->parseCounter(inString, outString);
+                this->parseUndefPieces(outString, inString);
+                this->collectPieces(inString, outString);
+                this->parseCounter(outString, inString);
             }
             ++itor;
         }
@@ -1602,15 +1645,14 @@ namespace Ogre
                 syntaxError |= this->parseMath( inString, outString );
                 syntaxError |= this->parseForEach( outString, inString );
                 syntaxError |= this->parseProperties( inString, outString );
+                syntaxError |= this->parseUndefPieces( outString, inString );
                 while( !syntaxError  && (outString.find( "@piece" ) != String::npos ||
                                          outString.find( "@insertpiece" ) != String::npos) )
                 {
-                    syntaxError |= this->collectPieces( outString, inString );
-                    syntaxError |= this->insertPieces( inString, outString );
+                    syntaxError |= this->collectPieces( inString, outString );
+                    syntaxError |= this->insertPieces( outString, inString );
                 }
-                syntaxError |= this->parseCounter( outString, inString );
-
-                outString.swap( inString );
+                syntaxError |= this->parseCounter( inString, outString );
 
                 if( syntaxError )
                 {

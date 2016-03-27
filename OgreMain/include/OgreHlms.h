@@ -206,6 +206,7 @@ namespace Ogre
         bool parseMath( const String &inBuffer, String &outBuffer );
         bool parseForEach( const String &inBuffer, String &outBuffer ) const;
         bool parseProperties( String &inBuffer, String &outBuffer ) const;
+        bool parseUndefPieces( String &inBuffer, String &outBuffer );
         bool collectPieces( const String &inBuffer, String &outBuffer );
         bool insertPieces( String &inBuffer, String &outBuffer ) const;
         bool parseCounter( const String &inBuffer, String &outBuffer );
