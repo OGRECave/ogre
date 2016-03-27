@@ -6843,7 +6843,7 @@ namespace Ogre{
                         uint32 externalBufferChannel;
                         uint32 inChannel;
                         IdString inNode;
-                        if( getUInt( *it0, &inChannel ) && getIdString( *it1, &inNode ) &&
+                        if( getUInt( *it0, &externalBufferChannel ) && getIdString( *it1, &inNode ) &&
                             getUInt( *it2, &inChannel ) )
                         {
                             mWorkspaceDef->connectExternalBuffer( externalBufferChannel,
