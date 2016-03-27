@@ -50,6 +50,7 @@ THE SOFTWARE.
 
                 #define ARRAY_REAL_ZERO _mm_setzero_ps()
                 #define ARRAY_INT_ZERO _mm_setzero_si128()
+                #define ARRAY_MASK_ZERO _mm_setzero_ps()
 
                 class ArrayRadian;
             }
@@ -93,6 +94,7 @@ THE SOFTWARE.
 
                 #define ARRAY_REAL_ZERO vdupq_n_f32( 0.0f )
                 #define ARRAY_INT_ZERO vdupq_n_u32( 0 )
+                #define ARRAY_MASK_ZERO vdupq_n_u32( 0 )
 
                 class ArrayRadian;
             }
@@ -167,6 +169,7 @@ THE SOFTWARE.
 
         #define ARRAY_REAL_ZERO 0
         #define ARRAY_INT_ZERO 0
+        #define ARRAY_MASK_ZERO false
 
         /// Input must be 16-byte aligned
         #define CastArrayToReal( outFloatPtr, arraySimd )       (*(outFloatPtr) = arraySimd)
