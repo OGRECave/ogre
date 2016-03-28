@@ -2095,6 +2095,7 @@ namespace Ogre
                 }                               
             }                                                                       
         }
-        mFsaaResolveDirty = false;
+
+        RenderTexture::swapBuffers();
     }
 }

@@ -343,6 +343,10 @@ namespace v1 {
     {
         extremityPoints.clear();
 
+        // Make it possible to remove already existing extremes by calling this method with 0
+        if (0 == count)
+            return;
+
         /* Currently this uses just one criteria: the points must be
          * as far as possible from each other. This at least ensures
          * that the extreme points characterise the submesh as
