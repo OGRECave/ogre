@@ -161,6 +161,27 @@ namespace Ogre
         return rkT;
     }
 
+    inline ArrayQuaternion ArrayQuaternion::nlerpShortest( ArrayReal fT, const ArrayQuaternion &rkP,
+                                                           const ArrayQuaternion &rkQ )
+    {
+        //Flip the sign of rkQ when p.dot( q ) < 0 to get the shortest path
+        ArrayReal sign = rkP.Dot( rkQ );
+
+        ArrayQuaternion tmpQ = ArrayQuaternion( rkQ.w * sign,
+                                                rkQ.x * sign,
+                                                rkQ.y * sign,
+                                                rkQ.z * sign );
+
+        ArrayQuaternion retVal(
+                ogre_madd( fT, tmpQ.w - rkP.w, rkP.w ),
+                ogre_madd( fT, tmpQ.x - rkP.x, rkP.x ),
+                ogre_madd( fT, tmpQ.y - rkP.y, rkP.y ),
+                ogre_madd( fT, tmpQ.z - rkP.z, rkP.z ) );
+        retVal.normalise();
+
+        return retVal;
+    }
+
     inline ArrayQuaternion ArrayQuaternion::nlerp( ArrayReal fT, const ArrayQuaternion &rkP,
                                                         const ArrayQuaternion &rkQ )
     {

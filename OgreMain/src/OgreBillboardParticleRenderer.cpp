@@ -135,6 +135,7 @@ namespace v1 {
         RenderableArray &outRenderables )
     {
         mBillboardSet->setCullIndividually(cullIndividually);
+        mBillboardSet->_notifyCurrentCamera( lodCamera );
 
         // Update billboard set geometry
         mBillboardSet->beginBillboards(currentParticles.size());
@@ -166,7 +167,7 @@ namespace v1 {
         mBillboardSet->endBillboards();
 
         // Update the queue
-        mBillboardSet->_updateRenderQueue(queue, camera, lodCamera);
+        mBillboardSet->_updateRenderQueueImpl(queue, camera, lodCamera);
 
         outRenderables.clear();
         outRenderables.push_back( mBillboardSet );

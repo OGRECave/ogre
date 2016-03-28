@@ -369,6 +369,7 @@ namespace Ogre {
     {
         RenderWindow::swapBuffers();
         // Not used on emscripten
+        RenderWindow::swapBuffers();
     }
 
     EM_BOOL EmscriptenEGLWindow::canvasWindowResized(int eventType, const EmscriptenUiEvent *uiEvent, void *userData)

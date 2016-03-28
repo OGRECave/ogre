@@ -122,6 +122,7 @@ namespace Ogre
         HlmsPropertyVec mSetProperties;
         PiecesMap       mPieces;
 
+    public:
         struct Library
         {
             Archive         *dataFolder;
@@ -129,6 +130,7 @@ namespace Ogre
         };
 
         typedef vector<Library>::type LibraryVec;
+    protected:
         LibraryVec      mLibrary;
         Archive         *mDataFolder;
         StringVector    mPieceFiles[NumShaderTypes];
@@ -370,6 +372,7 @@ namespace Ogre
         virtual void reloadFrom( Archive *newDataFolder, ArchiveVec *libraryFolders=0 );
 
         Archive* getDataFolder(void)                        { return mDataFolder; }
+        const LibraryVec& getPiecesLibrary(void) const      { return mLibrary; }
 
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks

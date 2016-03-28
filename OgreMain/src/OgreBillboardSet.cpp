@@ -380,8 +380,9 @@ namespace v1 {
 
         if( mLastLockedFrame == mVaoManager->getFrameCount() )
         {
-            createExtraVertexBuffer( mMainBuffers[0][0]->getVertexSize() );
             ++mLastLockedBuffer;
+            if( mLastLockedBuffer >= mMainBuffers[0].size() )
+                createExtraVertexBuffer( mMainBuffers[0][0]->getVertexSize() );
         }
         else
         {
@@ -568,7 +569,11 @@ namespace v1 {
     void BillboardSet::_updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
     {
         _notifyCurrentCamera( lodCamera );
-
+        _updateRenderQueueImpl( queue, camera, lodCamera );
+    }
+    //-----------------------------------------------------------------------
+    void BillboardSet::_updateRenderQueueImpl(RenderQueue* queue, Camera *camera, const Camera *lodCamera)
+    {
         // If we're driving this from our own data, update geometry if need to.
         if (!mExternalData && (mAutoUpdate || mBillboardDataChanged || !mBuffersCreated))
         {

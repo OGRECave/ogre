@@ -109,7 +109,7 @@ float3 qmul( float4 q, float3 v )
 }
 @end
 @property( normal_weight_tex )#define normalMapWeight asfloat( material.indices4_7.w )@end
-@property( detail_maps_normal )float3 getTSDetailNormal( SamplerState samplerState, Texture2D normalMap, float3 uv )
+@property( detail_maps_normal )float3 getTSDetailNormal( SamplerState samplerState, Texture2DArray normalMap, float3 uv )
 {
 	float3 tsNormal;
 @property( signed_int_textures )
