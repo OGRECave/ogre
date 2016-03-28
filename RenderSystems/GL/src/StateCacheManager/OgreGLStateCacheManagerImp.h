@@ -63,14 +63,14 @@ namespace Ogre
          */
 
         /// Stores textures currently bound to each texture stage
-        HashMap <GLenum, GLuint> mBoundTextures;
+        OGRE_HashMap <GLenum, GLuint> mBoundTextures;
 
         struct TexGenParams
         {
             std::set<GLenum> mEnabled;
         };
         /// Stores the currently enabled texcoord generation types per texture unit
-        HashMap <GLenum, TexGenParams> mTextureCoordGen;
+        OGRE_HashMap <GLenum, TexGenParams> mTextureCoordGen;
 
         /// A map of different buffer types and the currently bound buffer for each type
         BindBufferMap mActiveBufferMap;
