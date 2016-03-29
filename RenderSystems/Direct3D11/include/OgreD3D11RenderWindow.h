@@ -239,7 +239,7 @@ namespace Ogre
 
 #if !__OGRE_WINRT_PHONE_80
 
-    class D3D11RenderWindowImageSource
+    class _OgreD3D11Export D3D11RenderWindowImageSource
         : public D3D11RenderWindowBase
     {
     public:
