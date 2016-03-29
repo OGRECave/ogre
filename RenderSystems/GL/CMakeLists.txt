@@ -109,7 +109,7 @@ endif ()
 
 if (APPLE)
     set_target_properties(RenderSystem_GL PROPERTIES
-        LINK_FLAGS "-framework Cocoa -framework Carbon -framework OpenGL")
+        LINK_FLAGS "-framework Cocoa -framework Carbon -framework OpenGL -framework AGL")
 endif ()
 
 ogre_config_framework(RenderSystem_GL)
