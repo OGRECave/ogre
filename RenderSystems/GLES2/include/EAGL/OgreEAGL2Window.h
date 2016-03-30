@@ -84,6 +84,7 @@ namespace Ogre {
             EAGL2Window(EAGL2Support* glsupport);
             virtual ~EAGL2Window();
 
+            float getViewPointToPixelScale() { return mIsContentScalingSupported ? mContentScalingFactor : 1.0f; }
             void create(const String& name, unsigned int width, unsigned int height,
                         bool fullScreen, const NameValuePairList *miscParams);
 
