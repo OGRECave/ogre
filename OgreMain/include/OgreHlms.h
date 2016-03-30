@@ -40,6 +40,7 @@ namespace Ogre
 {
     class CompositorShadowNode;
     struct QueuedRenderable;
+    typedef vector<Archive*>::type ArchiveVec;
 
     /** \addtogroup Core
     *  @{

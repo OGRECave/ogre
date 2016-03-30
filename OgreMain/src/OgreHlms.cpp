@@ -1037,7 +1037,7 @@ namespace Ogre
             if( !syntaxError )
             {
                 const IdString pieceName( argValues[0] );
-                PiecesMap::const_iterator it = mPieces.find( pieceName );
+                PiecesMap::iterator it = mPieces.find( pieceName );
                 if( it != mPieces.end() )
                     mPieces.erase( it );
             }

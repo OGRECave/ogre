@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Terra/Hlms/OgreHlmsTerraPrerequisites.h"
 #include "OgreHlmsBufferManager.h"
 #include "OgreConstBufferPool.h"
+#include "OgreMatrix4.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
