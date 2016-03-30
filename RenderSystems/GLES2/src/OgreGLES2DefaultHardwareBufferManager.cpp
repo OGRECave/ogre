@@ -262,12 +262,8 @@ namespace Ogre {
     
     Ogre::RenderToVertexBufferSharedPtr GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer( void )
     {
-        if(!gleswIsSupported(3, 0))
-        {
-            OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                     "Cannot create RenderToVertexBuffer in GLES2DefaultHardwareBufferManagerBase", 
                     "GLES2DefaultHardwareBufferManagerBase::createRenderToVertexBuffer");
-        }
-//        return HardwareUniformBufferSharedPtr(new GLES2DefaultHardwareRenderToVertexBuffer(this, sizeBytes, usage, useShadowBuffer, name));
     }
 }
