@@ -218,7 +218,7 @@ namespace Ogre {
             attribs[i++] = (NSOpenGLPixelFormatAttribute) 8;
 
             attribs[i++] = NSOpenGLPFADepthSize;
-            attribs[i++] = (NSOpenGLPixelFormatAttribute) depth;
+            attribs[i++] = (NSOpenGLPixelFormatAttribute) (hasDepthBuffer? 16 : 0);
             
             if(fsaa_samples > 0)
             {
