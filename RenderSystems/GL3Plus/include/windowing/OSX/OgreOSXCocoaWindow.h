@@ -64,8 +64,10 @@ namespace Ogre {
         String mWindowTitle;
         bool mUseNSView;
         float mContentScalingFactor;
-
-        void _setWindowParameters(void);
+        
+        int _getPixelFromPoint(int viewPt) const;
+        void _setWindowParameters(unsigned int widthPt, unsigned int heightPt);
+        
     public:
         CocoaWindow();
         ~CocoaWindow();
@@ -75,6 +77,9 @@ namespace Ogre {
         NSOpenGLContext* nsopenGLContext() const { return mGLContext; };
         void createWithView(OgreGL3PlusView *view);
 
+        /** @copydoc see RenderWindow::getViewPointToPixelScale */
+        float getViewPointToPixelScale();
+        /** Overridden - see RenderWindow */
         void create(const String& name, unsigned int widthPt, unsigned int heightPt,
                 bool fullScreen, const NameValuePairList *miscParams);
         /** Overridden - see RenderWindow */
@@ -107,7 +112,6 @@ namespace Ogre {
         virtual unsigned int getHeight(void) const;
         /** Overridden - see RenderWindow */
         void windowMovedOrResized(void);
-        void windowResized(void);
         void windowHasResized(void);
         void createNewWindow(unsigned int width, unsigned int height, String title);
         void createWindowFromExternal(NSView *viewRef);
