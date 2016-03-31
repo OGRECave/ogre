@@ -80,7 +80,7 @@ void main()
 					uVertexPos.y == (cellData.numVertsPerLine.z + 2u) );
 
 	//Now shift X position for the left & right skirts
-	uVertexPos.x = max( int(uVertexPos.x) - 1, 0 );
+	uVertexPos.x = uint( max( int(uVertexPos.x) - 1, 0 ) );
 	uVertexPos.x = min( uVertexPos.x, ((cellData.numVertsPerLine.x - 7u) >> 1u) );
 	// uVertexPos.x becomes:
 	// 0 0 0 1 1 2 2 3 3 4 4 4
@@ -88,7 +88,7 @@ void main()
 	// 0 0 0 0 0 1 1 2 2 2 2 2
 
 	//Now shift Y position for the front & back skirts
-	uVertexPos.y = max( int(uVertexPos.y) - 1, 0 );
+	uVertexPos.y = uint( max( int(uVertexPos.y) - 1, 0 ) );
 	uVertexPos.y = min( uVertexPos.y, cellData.numVertsPerLine.z );
 @end
 
