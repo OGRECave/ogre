@@ -30,15 +30,13 @@
 
 #import <AppKit/NSWindow.h>
 
-using namespace Ogre;
-
 @interface CocoaWindowDelegate : NSObject
 {
 @private
-    RenderWindow *ogreWindow;
+    Ogre::RenderWindow *ogreWindow;
     NSWindow *window;
 }
 
--(id)initWithNSWindow:(NSWindow*)nswin ogreWindow:(RenderWindow*)ogrewin;
+-(id)initWithNSWindow:(NSWindow*)nswin ogreWindow:(Ogre::RenderWindow*)ogrewin;
 
 @end
