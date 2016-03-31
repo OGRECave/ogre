@@ -32,7 +32,7 @@ namespace Ogre
 {
 
     CocoaContext::CocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat)
-      : mBackingWidth(0), mBackingHeight(0), mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
+      : mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
 	{
         if(mNSGLPixelFormat)
             [mNSGLPixelFormat retain];

@@ -575,37 +575,6 @@ namespace Ogre {
 		[mGLContext update];
     }
 
-    void OSXCocoaWindow::windowResized()
-    {
-        // Ensure the context is current
-        if(!mIsFullScreen)
-        {
-            NSRect viewFrame = [mView frame];
-            NSRect windowFrame = [[mView window] frame];
-            NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
-
-            GLint bufferRect[4];
-            bufferRect[0] = _getPixelFromPoint(viewFrame.origin.x); // 0 = left edge
-            bufferRect[1] = _getPixelFromPoint(windowFrame.size.height - (viewFrame.origin.y + viewFrame.size.height)); // 0 = bottom edge
-            bufferRect[2] = _getPixelFromPoint(viewFrame.size.width); // width of buffer rect
-            bufferRect[3] = _getPixelFromPoint(viewFrame.size.height); // height of buffer rect
-            CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
-            CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
-            [mGLContext update];
-
-            CGFloat leftPt = viewFrame.origin.x;
-            CGFloat topPt = screenFrame.size.height - viewFrame.size.height;
-            mLeft = _getPixelFromPoint(leftPt);
-            mTop = _getPixelFromPoint(topPt);
-            mWindowOriginPt = NSMakePoint(leftPt, topPt);
-        }
-        
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it) 
-        { 
-            (*it).second->_updateDimensions(); 
-        }
-    }
-
     void OSXCocoaWindow::windowHasResized()
     {
         // Ensure the context is current
