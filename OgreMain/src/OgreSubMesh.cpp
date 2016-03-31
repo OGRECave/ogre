@@ -507,7 +507,7 @@ namespace v1 {
             newSub->vertexData[VpNormal] = this->vertexData[VpNormal]->clone();
 
             if( this->vertexData[VpNormal] == this->vertexData[VpShadow] )
-                newSub->vertexData[VpNormal] = newSub->vertexData[VpShadow];
+                newSub->vertexData[VpShadow] = newSub->vertexData[VpNormal];
             else
                 newSub->vertexData[VpShadow] = this->vertexData[VpShadow]->clone();
 
@@ -523,7 +523,7 @@ namespace v1 {
         newSub->indexData[VpNormal] = this->indexData[VpNormal]->clone();
 
         if( this->indexData[VpNormal] == this->indexData[VpShadow] )
-            newSub->indexData[VpNormal] = newSub->indexData[VpShadow];
+            newSub->indexData[VpShadow] = newSub->indexData[VpNormal];
         else
             newSub->indexData[VpShadow] = this->indexData[VpShadow]->clone();
 
