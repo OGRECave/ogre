@@ -69,7 +69,7 @@ void main()
 	uVertexPos.x = pointInLine >> 1u;
     //Even numbers are the next line, odd numbers are current line.
 	uVertexPos.y = (pointInLine & 0x01u) == 0u ? 1u : 0u;
-	uVertexPos.y += gl_VertexID / cellData.numVertsPerLine.x;
+	uVertexPos.y += uint(gl_VertexID) / cellData.numVertsPerLine.x;
 	//uVertexPos.y += floor( (float)gl_VertexID / (float)cellData.numVertsPerLine ); Could be faster on GCN.
 
 @property( use_skirts )
@@ -93,7 +93,7 @@ void main()
 @end
 
 	uint lodLevel = cellData.numVertsPerLine.y;
-	uVertexPos = ivec2( uvec2(uVertexPos) << lodLevel );
+	uVertexPos = uVertexPos << lodLevel;
 
 	uVertexPos.xy = uvec2( clamp( ivec2(uVertexPos.xy) + cellData.xzTexPosBounds.xy,
                            ivec2( 0, 0 ), cellData.xzTexPosBounds.zw ) );

@@ -85,7 +85,7 @@ void main()
 	int numIterations = perGroupData[gl_WorkGroupID.x].iterations;
 	for( int i=0; i<numIterations; ++i )
 	{
-		if( isSteep )
+		if( isSteep != 0 )
 			prevHeight = calcShadow( ivec2( y, x ), prevHeight );
 		else
 			prevHeight = calcShadow( ivec2( x, y ), prevHeight );
