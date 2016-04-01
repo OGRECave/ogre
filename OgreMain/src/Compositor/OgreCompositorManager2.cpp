@@ -73,7 +73,8 @@ namespace Ogre
         mFrameCount( 0 ),
         mRenderSystem( renderSystem ),
         mSharedTriangleFS( 0 ),
-        mSharedQuadFS( 0 )
+        mSharedQuadFS( 0 ),
+        mCompositorPassProvider( 0 )
     {
         mSharedTriangleFS   = OGRE_NEW Rectangle2D( false );
         mSharedQuadFS       = OGRE_NEW Rectangle2D( true );
