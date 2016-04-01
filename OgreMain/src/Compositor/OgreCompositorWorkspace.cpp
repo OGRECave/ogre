@@ -50,7 +50,9 @@ namespace Ogre
                                               RenderSystem *renderSys, bool bEnabled,
                                               uint8 executionMask, uint8 viewportModifierMask,
                                               const Vector4 &vpOffsetScale,
-                                              const UavBufferPackedVec *uavBuffers ) :
+                                              const UavBufferPackedVec *uavBuffers,
+                                              const ResourceLayoutMap *initialLayouts,
+                                              const ResourceAccessMap *initialUavAccess ) :
             IdObject( id ),
             mDefinition( definition ),
             mValid( false ),
@@ -67,8 +69,16 @@ namespace Ogre
         assert( (!defaultCam || (defaultCam->getSceneManager() == sceneManager)) &&
                 "Camera was created with a different SceneManager than supplied" );
 
+        assert( ((initialLayouts && initialUavAccess) || (!initialLayouts && !initialUavAccess)) &&
+                "If initial layout is provided, initial UAV access must be provided as well" );
+
         if( uavBuffers )
             mExternalBuffers = *uavBuffers;
+
+        if( initialLayouts )
+            mInitialResourcesLayout = *initialLayouts;
+        if( initialUavAccess )
+            mInitialUavsAccess = *initialUavAccess;
 
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
@@ -413,8 +423,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::analyzeHazardsAndPlaceBarriers(void)
     {
-        ResourceLayoutMap resourcesLayout;
-        ResourceAccessMap uavsAccess;
+        mResourcesLayout    = mInitialResourcesLayout;
+        mUavsAccess         = mInitialUavsAccess;
 
         //Q: Include mListener in the constructor so that we can account for the listener?
         //A: No. If the user overrides normal behavior, it's his responsability to clean
@@ -422,16 +432,17 @@ namespace Ogre
         BoundUav boundUavs[64];
         memset( boundUavs, 0, sizeof(boundUavs) );
 
-        resourcesLayout[mRenderWindow.target] = ResourceLayout::RenderTarget;
+        if( mResourcesLayout.find( mRenderWindow.target ) == mResourcesLayout.end() )
         {
+            mResourcesLayout[mRenderWindow.target] = ResourceLayout::RenderTarget;
             Ogre::CompositorChannelVec renderTargetChannel;
             renderTargetChannel.push_back( mRenderWindow );
-            CompositorNode::fillResourcesLayout( resourcesLayout, renderTargetChannel,
+            CompositorNode::fillResourcesLayout( mResourcesLayout, renderTargetChannel,
                                                  ResourceLayout::RenderTarget );
         }
-        CompositorNode::fillResourcesLayout( resourcesLayout, mGlobalTextures,
+        CompositorNode::fillResourcesLayout( mResourcesLayout, mGlobalTextures,
                                              ResourceLayout::Undefined );
-        CompositorNode::initResourcesLayout( resourcesLayout, mGlobalBuffers,
+        CompositorNode::initResourcesLayout( mResourcesLayout, mGlobalBuffers,
                                              ResourceLayout::Undefined );
 
         CompositorNodeVec::iterator itor = mNodeSequence.begin();
@@ -439,12 +450,12 @@ namespace Ogre
 
         while( itor != end )
         {
-            (*itor)->_placeBarriersAndEmulateUavExecution( boundUavs, uavsAccess, resourcesLayout );
+            (*itor)->_placeBarriersAndEmulateUavExecution( boundUavs, mUavsAccess, mResourcesLayout );
             ++itor;
         }
 
         //Check the output is still a RenderTarget at the end.
-        ResourceLayoutMap::iterator currentLayout = resourcesLayout.find( mRenderWindow.target );
+        ResourceLayoutMap::iterator currentLayout = mResourcesLayout.find( mRenderWindow.target );
         if( currentLayout->second != ResourceLayout::RenderTarget )
         {
             CompositorNode *node = mNodeSequence.back();

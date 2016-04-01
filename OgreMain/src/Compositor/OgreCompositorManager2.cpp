@@ -351,13 +351,16 @@ namespace Ogre
                                              RenderTarget *finalRenderTarget, Camera *defaultCam,
                                              IdString definitionName, bool bEnabled, int position,
                                              const UavBufferPackedVec *uavBuffers,
+                                             const ResourceLayoutMap* initialLayouts,
+                                             const ResourceAccessMap* initialUavAccess,
                                              const Vector4 &vpOffsetScale,
                                              uint8 vpModifierMask, uint8 executionMask )
     {
         CompositorChannel channel;
         channel.target = finalRenderTarget;
         return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled, position,
-                             uavBuffers, vpOffsetScale, vpModifierMask, executionMask );
+                             uavBuffers, initialLayouts, initialUavAccess,
+                             vpOffsetScale, vpModifierMask, executionMask );
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
@@ -365,6 +368,8 @@ namespace Ogre
                                              Camera *defaultCam, IdString definitionName,
                                              bool bEnabled, int position,
                                              const UavBufferPackedVec *uavBuffers,
+                                             const ResourceLayoutMap* initialLayouts,
+                                             const ResourceAccessMap* initialUavAccess,
                                              const Vector4 &vpOffsetScale,
                                              uint8 vpModifierMask, uint8 executionMask )
     {
@@ -385,7 +390,7 @@ namespace Ogre
                                 Id::generateNewId<CompositorWorkspace>(), itor->second,
                                 finalRenderTarget, sceneManager, defaultCam, mRenderSystem,
                                 bEnabled, executionMask, vpModifierMask, vpOffsetScale,
-                                uavBuffers );
+                                uavBuffers, initialLayouts, initialUavAccess );
 
             mQueuedWorkspaces.push_back( QueuedWorkspace( workspace, position ) );
         }

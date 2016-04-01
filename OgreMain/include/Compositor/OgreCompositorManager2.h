@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "OgreCompositorCommon.h"
 #include "OgreIdString.h"
+#include "OgreResourceTransition.h"
 
 #include "OgreTexture.h"
 
@@ -312,6 +313,8 @@ namespace Ogre
         CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
                                            int position=-1, const UavBufferPackedVec *uavBuffers=0,
+                                           const ResourceLayoutMap* initialLayouts=0,
+                                           const ResourceAccessMap* initialUavAccess=0,
                                            const Vector4 &vpOffsetScale = Vector4::ZERO,
                                            uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
 
@@ -319,6 +322,8 @@ namespace Ogre
         CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
                                            int position=-1, const UavBufferPackedVec *uavBuffers=0,
+                                           const ResourceLayoutMap* initialLayouts=0,
+                                           const ResourceAccessMap* initialUavAccess=0,
                                            const Vector4 &vpOffsetScale = Vector4::ZERO,
                                            uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
 

@@ -108,6 +108,11 @@ namespace Ogre
 
         UavBufferPackedVec      mExternalBuffers;
 
+        ResourceLayoutMap       mInitialResourcesLayout;
+        ResourceAccessMap       mInitialUavsAccess;
+        ResourceLayoutMap       mResourcesLayout;
+        ResourceAccessMap       mUavsAccess;
+
         /// Creates all the node instances from our definition
         void createAllNodes(void);
 
@@ -142,7 +147,9 @@ namespace Ogre
                              Camera *defaultCam, RenderSystem *renderSys, bool bEnabled,
                              uint8 executionMask, uint8 viewportModifierMask,
                              const Vector4 &vpOffsetScale,
-                             const UavBufferPackedVec *uavBuffers );
+                             const UavBufferPackedVec *uavBuffers,
+                             const ResourceLayoutMap* initialLayouts,
+                             const ResourceAccessMap* initialUavAccess );
         virtual ~CompositorWorkspace();
 
         const CompositorChannel& getGlobalTexture( IdString name ) const;
@@ -157,6 +164,9 @@ namespace Ogre
 
         void setListener( CompositorWorkspaceListener *listener )   { mListener = listener; }
         CompositorWorkspaceListener* getListener(void) const        { return mListener; }
+
+        const ResourceLayoutMap& getResourcesLayout(void) const     { return mResourcesLayout; }
+        const ResourceAccessMap& getUavsAccess(void) const          { return mUavsAccess; }
 
         /** Finds a node instance with the given aliased name
         @remarks

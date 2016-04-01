@@ -75,6 +75,8 @@ namespace Demo
             mEyeWorkspaces[0] = compositorManager->addWorkspace( mSceneManager, mRenderWindow,
                                                                  mEyeCameras[0], workspaceName,
                                                                  true, -1, (Ogre::UavBufferPackedVec*)0,
+                                                                 (Ogre::ResourceLayoutMap*)0,
+                                                                 (Ogre::ResourceAccessMap*)0,
                                                                  vpOffsetScale,
                                                                  vpModifierMask,
                                                                  executionMask );
@@ -85,6 +87,8 @@ namespace Demo
             mEyeWorkspaces[1] = compositorManager->addWorkspace( mSceneManager, mRenderWindow,
                                                                  mEyeCameras[1], workspaceName,
                                                                  true, -1, (Ogre::UavBufferPackedVec*)0,
+                                                                 (Ogre::ResourceLayoutMap*)0,
+                                                                 (Ogre::ResourceAccessMap*)0,
                                                                  vpOffsetScale,
                                                                  vpModifierMask,
                                                                  executionMask);
