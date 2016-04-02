@@ -168,7 +168,7 @@ namespace Ogre
                 while( itor != end )
                 {
                     CompositorNode *node = findNode( itor->inNode );
-                    node->connectExternalRT( mExternalRenderTargets[itor->inChannel], itor->outChannel );
+                    node->connectExternalRT( mExternalRenderTargets[itor->outChannel], itor->inChannel );
                     ++itor;
                 }
             }
@@ -182,7 +182,7 @@ namespace Ogre
                 while( itor != end )
                 {
                     CompositorNode *node = findNode( itor->inNode );
-                    node->connectExternalBuffer( mExternalBuffers[itor->inChannel], itor->outChannel );
+                    node->connectExternalBuffer( mExternalBuffers[itor->outChannel], itor->inChannel );
                     ++itor;
                 }
             }
