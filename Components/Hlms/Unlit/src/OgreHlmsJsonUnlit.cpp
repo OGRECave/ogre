@@ -156,8 +156,11 @@ namespace Ogre
 			LwString blockName(LwString::FromEmptyPointer(tmpBuffer, sizeof(tmpBuffer)));
 			blockName.a("diffuse_map", i);
 			itor = json.FindMember(blockName.c_str());
-			const rapidjson::Value &subobj = itor->value;
-			loadTexture(subobj, blocks, i, unlitDatablock);
+			if (itor != json.MemberEnd())
+			{
+				const rapidjson::Value &subobj = itor->value;
+				loadTexture(subobj, blocks, i, unlitDatablock);
+			}
 		}
 	}
 	//-----------------------------------------------------------------------------------
