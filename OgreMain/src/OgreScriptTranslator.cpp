@@ -6824,6 +6824,7 @@ namespace Ogre{
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);
                     }
                     break;
+                case ID_CONNECT_EXTERNAL:
                 case ID_CONNECT_BUFFER_EXTERNAL:
                     if(prop->values.empty())
                     {
@@ -6832,7 +6833,7 @@ namespace Ogre{
                     else if(prop->values.size() != 3 )
                     {
                         compiler->addError(ScriptCompiler::CE_FEWERPARAMETERSEXPECTED, prop->file, prop->line,
-                            "connect_buffer_external only supports 3 arguments");
+                            "connect_external & connect_buffer_external only support 3 arguments");
                     }
                     else
                     {
@@ -6840,14 +6841,22 @@ namespace Ogre{
                         AbstractNodeList::const_iterator it1 = it2++;
                         AbstractNodeList::const_iterator it0 = it2++;
 
-                        uint32 externalBufferChannel;
+                        uint32 externalChannel;
                         uint32 inChannel;
                         IdString inNode;
-                        if( getUInt( *it0, &externalBufferChannel ) && getIdString( *it1, &inNode ) &&
+                        if( getUInt( *it0, &externalChannel ) && getIdString( *it1, &inNode ) &&
                             getUInt( *it2, &inChannel ) )
                         {
-                            mWorkspaceDef->connectExternalBuffer( externalBufferChannel,
-                                                                  inNode, inChannel );
+                            if( prop->id == ID_CONNECT_EXTERNAL )
+                            {
+                                mWorkspaceDef->connectExternal( externalChannel,
+                                                                inNode, inChannel );
+                            }
+                            else
+                            {
+                                mWorkspaceDef->connectExternalBuffer( externalChannel,
+                                                                      inNode, inChannel );
+                            }
                         }
                         else
                             compiler->addError(ScriptCompiler::CE_INVALIDPARAMETERS, prop->file, prop->line);

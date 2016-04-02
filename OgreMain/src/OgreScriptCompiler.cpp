@@ -1212,6 +1212,7 @@ namespace Ogre
         mIds["connect"]         = ID_CONNECT;
         mIds["connect_buffer"]  = ID_CONNECT_BUFFER;
         mIds["connect_output"]  = ID_CONNECT_OUTPUT;
+        mIds["connect_external"]= ID_CONNECT_EXTERNAL;
         mIds["connect_buffer_external"] = ID_CONNECT_BUFFER_EXTERNAL;
 
         mIds["compositor_node"] = ID_COMPOSITOR_NODE;
