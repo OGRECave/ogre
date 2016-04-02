@@ -34,7 +34,7 @@ namespace Ogre
 {
     static unsigned int modeCount = 0;
 
-    class D3D11VideoMode
+    class _OgreD3D11Export D3D11VideoMode
     {
     private:
         DXGI_OUTPUT_DESC mDisplayMode;

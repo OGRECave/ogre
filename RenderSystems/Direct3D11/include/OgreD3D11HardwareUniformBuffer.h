@@ -35,7 +35,7 @@ THE SOFTWARE.
 namespace Ogre {
 
     /// Specialisation of HardwareBuffer for D3D11
-    class D3D11HardwareUniformBuffer : public HardwareUniformBuffer 
+    class _OgreD3D11Export D3D11HardwareUniformBuffer : public HardwareUniformBuffer
     {
     protected:
         D3D11HardwareBuffer* mBufferImpl;

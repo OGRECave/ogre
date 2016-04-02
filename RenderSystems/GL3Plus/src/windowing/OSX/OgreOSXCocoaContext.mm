@@ -27,12 +27,14 @@ THE SOFTWARE.
 */
 
 #import "OgreOSXCocoaContext.h"
+#include "OgreGL3PlusRenderSystem.h"
+#include "OgreRoot.h"
 
 namespace Ogre
 {
 
     CocoaContext::CocoaContext(NSOpenGLContext *context, NSOpenGLPixelFormat *pixelFormat)
-      : mBackingWidth(0), mBackingHeight(0), mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
+      : mNSGLContext(context), mNSGLPixelFormat(pixelFormat)
 	{
         if(mNSGLPixelFormat)
             [mNSGLPixelFormat retain];
@@ -40,6 +42,9 @@ namespace Ogre
 
 	CocoaContext::~CocoaContext()
 	{
+        GL3PlusRenderSystem *rs = static_cast<GL3PlusRenderSystem*>(Root::getSingleton().getRenderSystem());
+        rs->_unregisterContext(this);
+
         if(mNSGLPixelFormat)
             [mNSGLPixelFormat release];
     }

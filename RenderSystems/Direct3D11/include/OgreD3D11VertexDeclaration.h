@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre { 
 
     /** Specialisation of VertexDeclaration for D3D11 */
-    class D3D11VertexDeclaration
+    class _OgreD3D11Export D3D11VertexDeclaration
         : public VertexDeclaration
         , protected D3D11DeviceResource
     {

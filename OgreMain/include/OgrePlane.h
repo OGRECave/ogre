@@ -61,6 +61,10 @@ namespace Ogre {
     class _OgreExport Plane
     {
     public:
+        Vector3 normal;
+        Real d;
+
+    public:
         /** Default constructor - sets everything to 0.
         */
         Plane ();
@@ -141,8 +145,11 @@ namespace Ogre {
         */
         Real normalise(void);
 
-        Vector3 normal;
-        Real d;
+        /// Get flipped plane, with same location but reverted orientation
+        Plane operator - () const
+        {
+            return Plane(-(normal.x), -(normal.y), -(normal.z), -d); // not equal to Plane(-normal, -d)
+        }
 
         /// Comparison operator
         bool operator==(const Plane& rhs) const

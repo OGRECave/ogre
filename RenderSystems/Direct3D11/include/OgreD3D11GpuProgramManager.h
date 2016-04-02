@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    class D3D11GpuProgramManager : public GpuProgramManager
+    class _OgreD3D11Export D3D11GpuProgramManager : public GpuProgramManager
     {
     protected:
         /// @copydoc ResourceManager::createImpl

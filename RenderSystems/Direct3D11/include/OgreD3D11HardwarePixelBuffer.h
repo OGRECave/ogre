@@ -36,7 +36,7 @@ struct ID3D11Resource;
 
 namespace Ogre {
 
-    class D3D11HardwarePixelBuffer: public HardwarePixelBuffer
+    class _OgreD3D11Export D3D11HardwarePixelBuffer : public HardwarePixelBuffer
     {
     protected:
         /// Lock a box

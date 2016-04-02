@@ -272,7 +272,7 @@ namespace Ogre {
         DataStreamPtr& stream, 
         uint32 uWidth, uint32 uHeight, uint32 uDepth,
         PixelFormat eFormat,
-        size_t numFaces, size_t numMipMaps)
+        size_t numFaces, uint8 numMipMaps)
     {
 
         size_t size = calculateSize(numMipMaps, numFaces, uWidth, uHeight, uDepth, eFormat);
@@ -690,8 +690,8 @@ namespace Ogre {
     
     void Image::setColourAt(ColourValue const &cv, size_t x, size_t y, size_t z)
     {
-        unsigned char pixelSize = PixelUtil::getNumElemBytes(getFormat());
-        PixelUtil::packColour(cv, getFormat(), &((unsigned char *)getData())[pixelSize * (z * getWidth() * getHeight() + y * getWidth() + x)]);
+        size_t pixelSize = PixelUtil::getNumElemBytes(getFormat());
+        PixelUtil::packColour(cv, getFormat(), &(getData())[pixelSize * (z * getWidth() * getHeight() + y * getWidth() + x)]);
     }
 
     //-----------------------------------------------------------------------------    
