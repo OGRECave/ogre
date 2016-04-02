@@ -98,7 +98,7 @@ namespace Ogre
         SceneManager            *mSceneManager;
         RenderSystem            *mRenderSys;
 
-        CompositorChannel       mRenderWindow;
+        CompositorChannelVec    mExternalRenderTargets;
         uint                    mCurrentWidth;
         uint                    mCurrentHeight;
 
@@ -108,6 +108,7 @@ namespace Ogre
 
         UavBufferPackedVec      mExternalBuffers;
 
+        bool                    mBarriersDirty;
         ResourceLayoutMap       mInitialResourcesLayout;
         ResourceAccessMap       mInitialUavsAccess;
         ResourceLayoutMap       mResourcesLayout;
@@ -141,10 +142,13 @@ namespace Ogre
 
         void analyzeHazardsAndPlaceBarriers(void);
 
+        CompositorNode* getLastEnabledNode(void);
+
     public:
         CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-                             const CompositorChannel &finalRenderTarget, SceneManager *sceneManager,
-                             Camera *defaultCam, RenderSystem *renderSys, bool bEnabled,
+                             const CompositorChannelVec &externalRenderTargets,
+                             SceneManager *sceneManager, Camera *defaultCam,
+                             RenderSystem *renderSys, bool bEnabled,
                              uint8 executionMask, uint8 viewportModifierMask,
                              const Vector4 &vpOffsetScale,
                              const UavBufferPackedVec *uavBuffers,
@@ -237,7 +241,7 @@ namespace Ogre
         @remarks
             Call this after _endUpdate
         */
-        void _swapFinalTarget(void);
+        void _swapFinalTarget( vector<RenderTarget*>::type &swappedTargets );
 
         /** For compatibility with D3D9, forces a device lost check
             on the RenderWindow, so that BeginScene doesn't fail.
@@ -284,13 +288,19 @@ namespace Ogre
 
         SceneManager* getSceneManager() const               { return mSceneManager; }
 
+        /// Usually by convention the RenderTarget[0] is the one we're rendering to. May be empty.
+        const CompositorChannelVec& getExternalRenderTargets(void) const
+															{ return mExternalRenderTargets; }
         /// Returns the RenderTarget we're rendering to. May be null.
-        RenderTarget* getFinalTarget(void) const            { return mRenderWindow.target; }
+        /// @see getExternalRenderTargets
+        RenderTarget* getFinalTarget(void) const;
 
         uint8 getViewportModifierMask(void) const           { return mViewportModifierMask; }
         const Vector4& getViewportModifier(void) const      { return mViewportModifier; }
 
         uint8 getExecutionMask(void) const                  { return mExecutionMask; }
+
+        void _notifyBarriersDirty(void)                     { mBarriersDirty = true; }
 
         /// Gets the compositor manager (non const)
         CompositorManager2* getCompositorManager();

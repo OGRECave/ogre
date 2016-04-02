@@ -76,13 +76,16 @@ namespace Ogre
         ChannelRouteList    mChannelRoutes;
         ChannelRouteList    mBufferChannelRoutes;
         
-        uint32              mFinalInChannel;/// Input Channel # to send the RenderWindow to
-        IdString            mFinalNode;     /// Alias of the final node to send the RenderWindow to
+        /// outChannel  => Index to CompositorWorkspace::mExternalRenderTargets.
+        /// outNode     => Not used.
+        /// inChannel   => Which channel to connect to.
+        /// inNode      => Which node to connect to.
+        ChannelRouteList	mExternalChannelRoutes;
 
-        /// outChannel  => Which channel to connect to.
-        /// outNode     => Which node to connect to.
-        /// inChannel   => Index to CompositorWorkspace::mExternalBuffers.
-        /// inNode      => Not used.
+        /// outChannel  => Index to CompositorWorkspace::mExternalBuffers
+        /// outNode     => Not used.
+        /// inChannel   => Which channel to connect to.
+        /// inNode      => Which node to connect to.
         ChannelRouteList    mExternalBufferChannelRoutes;
 
         CompositorManager2  *mCompositorManager;
@@ -98,10 +101,25 @@ namespace Ogre
         */
         void createImplicitAlias( IdString nodeName );
 
+        /// Checks the input channel of the given node is not in use.
+        /// Logs a warning if it's in use. Generic version.
+        void checkInputChannelIsEmpty( const ChannelRouteList &internalChannelRoutes,
+                                       const ChannelRouteList &externalChannelRoutes,
+                                       IdString inNode, uint32 inChannel,
+                                       const std::string &outNodeName,
+                                       uint32 outChannel ) const;
+
+        /// Checks the input channel of the given node is not in use.
+        /// Logs a warning if it's in use.
+        void checkInputChannelIsEmpty( IdString inNode, uint32 inChannel,
+                                       const std::string &outNodeName,
+                                       uint32 outChannel ) const;
+
         /// Checks the buffer input channel of the given node is not in use.
         /// Logs a warning if it's in use.
         void checkInputBufferChannelIsEmpty( IdString inNode, uint32 inChannel,
-                                             const std::string &outNodeName ) const;
+                                             const std::string &outNodeName,
+                                             uint32 outChannel ) const;
 
     public:
         CompositorWorkspaceDef( IdString name, CompositorManager2 *compositorManager );
@@ -124,12 +142,10 @@ namespace Ogre
 
         /** Connects the (probably "final") node by passing the RenderWindow in the given input channel
         @remarks
-            @See connect
-            Only passing the RenderTarget to one node is supported. If the user wants to use it
-            in more nodes, he can use a dummy node as splitter (gotta love Nodes' flexibility! :)).
+            @see connect
             inNode is not yet aliased, an implicit alias will be created.
         */
-        void connectOutput( IdString inNode, uint32 inChannel );
+        void connectExternal( uint32 externalIdx, IdString inNode, uint32 inChannel );
 
         /** Connects outNode's output buffer channel to inNode's input buffer channel.
         @remarks

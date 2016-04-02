@@ -67,9 +67,9 @@ namespace Ogre
                     TEX_TYPE_2D, m_heightMapTex->getWidth(), m_heightMapTex->getHeight(), 1,
                     PF_A2B10G10R10, TU_RENDERTARGET | TU_UAV );
 
-        CompositorChannel finalTarget;
-        finalTarget.target = m_shadowMapTex->getBuffer(0)->getRenderTarget();
-        finalTarget.textures.push_back( m_shadowMapTex );
+        CompositorChannelVec finalTarget( 1, CompositorChannel() );
+        finalTarget[0].target = m_shadowMapTex->getBuffer(0)->getRenderTarget();
+        finalTarget[0].textures.push_back( m_shadowMapTex );
         m_shadowWorkspace = m_compositorManager->addWorkspace( m_sceneManager, finalTarget, 0,
                                                                "Terra/ShadowGeneratorWorkspace", false );
 
