@@ -64,7 +64,7 @@ namespace Ogre
         m_shadowMapTex = TextureManager::getSingleton().createManual(
                     "ShadowMap" + StringConverter::toString( id ),
                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                    TEX_TYPE_2D, m_heightMapTex->getWidth(), m_heightMapTex->getHeight(), 1,
+                    TEX_TYPE_2D, m_heightMapTex->getWidth(), m_heightMapTex->getHeight(), 0,
                     PF_A2B10G10R10, TU_RENDERTARGET | TU_UAV );
 
         CompositorChannelVec finalTarget( 1, CompositorChannel() );
@@ -236,6 +236,11 @@ namespace Ogre
 
         m_jobParamHeightDelta->setManualValue( ( -lightDir.y * (xzDimensions.x / width) ) /
                                                heightScale );
+
+        //y0 is not needed anymore, and we need it to be either 0 or heightOrWidth for the
+        //algorithm to work correctly (depending on the sign of xyStep[1]). So do this now.
+        if( y0 >= y1 )
+            y0 = heightOrWidth;
 
         int32 *starts = startsBase;
 
