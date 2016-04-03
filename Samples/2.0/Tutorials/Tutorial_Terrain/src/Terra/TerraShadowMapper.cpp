@@ -152,6 +152,7 @@ namespace Ogre
         };
 
         Vector2 lightDir2d( Vector2(lightDir.x, lightDir.z).normalisedCopy() );
+        float heightDelta = lightDir.y;
 
         if( lightDir2d.squaredLength() < 1e-6f )
         {
@@ -184,12 +185,16 @@ namespace Ogre
             y1 *= fabsf( lightDir2d.y ) / fabsf( lightDir2d.x );
             heightOrWidth = height;
             widthOrHeight = width;
+
+            heightDelta *= 1.0f / fabsf( lightDir.x );
         }
         else
         {
             x1 *= fabsf( lightDir2d.x ) / fabsf( lightDir2d.y );
             heightOrWidth = width;
             widthOrHeight = height;
+
+            heightDelta *= 1.0f / fabsf( lightDir.z );
         }
 
         if( lightDir2d.x < 0 )
@@ -234,8 +239,11 @@ namespace Ogre
         };
         m_jobParamXYStep->setManualValue( xyStep, 2u );
 
-        m_jobParamHeightDelta->setManualValue( ( -lightDir.y * (xzDimensions.x / width) ) /
-                                               heightScale );
+        heightDelta = ( -heightDelta * (xzDimensions.x / width) ) / heightScale;
+        //Avoid sending +/- inf (which causes NaNs inside the shader).
+        //Values greater than 1.0 (or less than -1.0) are pointless anyway.
+        heightDelta = Ogre::max( -1.0f, Ogre::min( 1.0f, heightDelta ) );
+        m_jobParamHeightDelta->setManualValue( heightDelta );
 
         //y0 is not needed anymore, and we need it to be either 0 or heightOrWidth for the
         //algorithm to work correctly (depending on the sign of xyStep[1]). So do this now.
