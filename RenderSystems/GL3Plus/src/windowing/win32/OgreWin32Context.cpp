@@ -64,9 +64,6 @@ namespace Ogre {
     {
         // Create new context based on own HDC
 		int major = 3, minor = 3;
-		glGetIntegerv(GL_MAJOR_VERSION, &major);
-		glGetIntegerv(GL_MINOR_VERSION, &minor);
-
 		int attribList[] =
 		{
 			WGL_CONTEXT_MAJOR_VERSION_ARB, major,

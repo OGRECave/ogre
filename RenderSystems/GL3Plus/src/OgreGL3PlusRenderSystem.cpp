@@ -2286,23 +2286,11 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-		// initialize GLEW 
-		GLenum err;
-		glewExperimental = GL_TRUE;
-#ifdef GLEW_MX
-		err = glewContextInit(glewGetContext());
-#  ifdef _WIN32
-		err = err || wglewContextInit(wglewGetContext());
-#  elif !defined(__APPLE__) && !defined(__HAIKU__) || defined(GLEW_APPLE_GLX)
-		err = err || glxewContextInit(glxewGetContext());
-#  endif
-#else
-		err = glewInit();
-#endif
-        if (GLEW_OK != err) { 
+		// Initialise GL3W
+		if (gl3wInit()) { // gl3wInit() fails if GL3.0 is not supported
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-				reinterpret_cast<const char*>(glewGetErrorString(err)),
-                        "GL3PlusRenderSystem::initialiseContext"); //
+				"OpenGL 3.0 is not supported",
+				"GL3PlusRenderSystem::initialiseContext");
         }
 
         // Setup GL3PlusSupport
