@@ -37,7 +37,7 @@ namespace Ogre {
 
     SimpleRenderable::SimpleRenderable()
     : MovableObject()
-    , mWorldTransform(Matrix4::IDENTITY)
+    , mTransform(Matrix4::IDENTITY)
     , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
     , mParentSceneManager(NULL)
@@ -52,7 +52,7 @@ namespace Ogre {
 
     SimpleRenderable::SimpleRenderable(const String& name)
     : MovableObject(name)
-    , mWorldTransform(Matrix4::IDENTITY)
+    , mTransform(Matrix4::IDENTITY)
     , mMatName("BaseWhite")
     , mMaterial(MaterialManager::getSingleton().getByName("BaseWhite"))
     , mParentSceneManager(NULL)
@@ -87,14 +87,14 @@ namespace Ogre {
         mRenderOp = rend;
     }
 
-    void SimpleRenderable::setWorldTransform( const Matrix4& xform )
+    void SimpleRenderable::setTransform( const Matrix4& xform )
     {
-        mWorldTransform = xform;
+        mTransform = xform;
     }
 
     void SimpleRenderable::getWorldTransforms( Matrix4* xform ) const
     {
-        *xform = mWorldTransform * mParentNode->_getFullTransform();
+        *xform = mParentNode->_getFullTransform() * mTransform;
     }
 
     void SimpleRenderable::_notifyCurrentCamera(Camera* cam)
