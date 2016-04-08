@@ -52,7 +52,7 @@ namespace Ogre {
     protected:
         RenderOperation mRenderOp;
 
-        Matrix4 mWorldTransform;
+        Matrix4 mTransform;
         AxisAlignedBox mBox;
 
         String mMatName;
@@ -80,7 +80,7 @@ namespace Ogre {
         virtual void setRenderOperation( const RenderOperation& rend );
         virtual void getRenderOperation(RenderOperation& op);
 
-        void setWorldTransform( const Matrix4& xform );
+        void setTransform( const Matrix4& xform );
         virtual void getWorldTransforms( Matrix4* xform ) const;
 
 
