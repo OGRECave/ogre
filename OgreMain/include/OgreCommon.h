@@ -34,7 +34,7 @@ THE SOFTWARE.
 #if OGRE_CPU == OGRE_CPU_X86
     #include <xmmintrin.h>
     #include <emmintrin.h>
-#elif OGRE_CPU == OGRE_CPU_ARM
+#elif OGRE_CPU == OGRE_CPU_ARM && OGRE_USE_SIMD
     #include <arm_neon.h>
 #endif
 
