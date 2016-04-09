@@ -554,6 +554,11 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    Ogre::TexturePtr Terra::_getShadowMapTex(void) const
+    {
+        return m_shadowMapper->getShadowMapTex();
+    }
+    //-----------------------------------------------------------------------------------
     const String& Terra::getMovableType(void) const
     {
         static const String movType = "Terra";

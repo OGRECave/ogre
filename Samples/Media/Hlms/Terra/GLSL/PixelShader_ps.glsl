@@ -45,6 +45,7 @@ in block
 } inPs;
 
 uniform sampler2D terrainNormals;
+uniform sampler2D terrainShadows;
 
 @property( hlms_forward3d )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
@@ -278,14 +279,15 @@ void main()
 	mat3 TBN		= mat3( pass.viewSpaceTangent, vBinormal, geomNormal );
 @end
 
+	float fShadow = texture( terrainShadows, inPs.uv0.xy ).x;
+
 @property( hlms_pssm_splits )
-    float fShadow = 1.0;
     if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+		fShadow *= getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+		fShadow *= getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
-    float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	fShadow *= getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end
 
 	/// The first iteration must initialize nNormal instead of try to merge with it.

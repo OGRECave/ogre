@@ -100,8 +100,11 @@ namespace Ogre
         //MovableObject overloads
         const String& getMovableType(void) const;
 
+        const ShadowMapper* getShadowMapper(void) const { return m_shadowMapper; }
+
         Ogre::TexturePtr getHeightMapTex(void) const    { return m_heightMapTex; }
         Ogre::TexturePtr getNormalMapTex(void) const    { return m_normalMapTex; }
+        Ogre::TexturePtr _getShadowMapTex(void) const;
     };
 }
 

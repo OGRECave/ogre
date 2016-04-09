@@ -10,6 +10,8 @@
 
 namespace Ogre
 {
+    struct CompositorChannel;
+
     class ShadowMapper
     {
         Ogre::TexturePtr    m_heightMapTex;
@@ -69,6 +71,12 @@ namespace Ogre
         void createShadowMap( IdType id, TexturePtr &heightMapTex );
         void destroyShadowMap(void);
         void updateShadowMap( const Vector3 &lightDir, const Vector2 &xzDimensions, float heightScale );
+
+        void fillUavDataForCompositorChannel( CompositorChannel &outChannel,
+                                              ResourceLayoutMap &outInitialLayouts,
+                                              ResourceAccessMap &outInitialUavAccess ) const;
+
+        Ogre::TexturePtr getShadowMapTex(void) const            { return m_shadowMapTex; }
     };
 }
 

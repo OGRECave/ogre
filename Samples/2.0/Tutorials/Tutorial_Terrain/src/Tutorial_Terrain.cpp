@@ -24,12 +24,13 @@ namespace Demo
 {
     class Tutorial_TerrainGraphicsSystem : public GraphicsSystem
     {
-//        virtual Ogre::CompositorWorkspace* setupCompositor()
-//        {
-//            Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-//            return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-//                                                    "Tutorial_TerrainWorkspace", true );
-//        }
+        virtual Ogre::CompositorWorkspace* setupCompositor()
+        {
+            //Delegate compositor creation to the game state. We need terra's shadow texture
+            //to be passed to the compositor so Ogre can insert the proper barriers.
+            assert( dynamic_cast<Tutorial_TerrainGameState*>(mCurrentGameState) );
+            return static_cast<Tutorial_TerrainGameState*>(mCurrentGameState)->setupCompositor();
+        }
 
         virtual void setupResources(void)
         {

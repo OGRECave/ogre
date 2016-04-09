@@ -321,4 +321,16 @@ namespace Ogre
 
         m_shadowWorkspace->_update();
     }
+    //-----------------------------------------------------------------------------------
+    void ShadowMapper::fillUavDataForCompositorChannel( CompositorChannel &outChannel,
+                                                        ResourceLayoutMap &outInitialLayouts,
+                                                        ResourceAccessMap &outInitialUavAccess ) const
+    {
+        outChannel.target = m_shadowMapTex->getBuffer(0)->getRenderTarget();
+        outChannel.textures.push_back( m_shadowMapTex );
+        outInitialLayouts.insert( m_shadowWorkspace->getResourcesLayout().begin(),
+                                  m_shadowWorkspace->getResourcesLayout().end() );
+        outInitialUavAccess.insert( m_shadowWorkspace->getUavsAccess().begin(),
+                                    m_shadowWorkspace->getUavsAccess().end() );
+    }
 }
