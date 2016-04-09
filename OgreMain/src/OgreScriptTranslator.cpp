@@ -6838,8 +6838,8 @@ namespace Ogre{
                     else
                     {
                         AbstractNodeList::const_iterator it2 = prop->values.begin();
-                        AbstractNodeList::const_iterator it1 = it2++;
                         AbstractNodeList::const_iterator it0 = it2++;
+                        AbstractNodeList::const_iterator it1 = it2++;
 
                         uint32 externalChannel;
                         uint32 inChannel;
