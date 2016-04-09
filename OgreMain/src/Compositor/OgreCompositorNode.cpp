@@ -964,26 +964,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorNode::_update( const Camera *lodCamera, SceneManager *sceneManager )
     {
-        //Add local & input textures to the SceneManager so they can be referenced by materials
-        size_t oldNumTextures = sceneManager->getNumCompositorTextures();
-        TextureDefinitionBase::NameToChannelMap::const_iterator it =
-                                                                mDefinition->mNameToChannelMap.begin();
-        TextureDefinitionBase::NameToChannelMap::const_iterator en =
-                                                                mDefinition->mNameToChannelMap.end();
-
-        while( it != en )
-        {
-            size_t index;
-            TextureDefinitionBase::TextureSource texSource;
-            mDefinition->decodeTexSource( it->second, index, texSource );
-            if( texSource == TextureDefinitionBase::TEXTURE_INPUT )
-                sceneManager->_addCompositorTexture( it->first, &mInTextures[index].textures );
-            else if( texSource == TextureDefinitionBase::TEXTURE_LOCAL )
-                sceneManager->_addCompositorTexture( it->first, &mLocalTextures[index].textures );
-
-            ++it;
-        }
-
         uint8 executionMask = mWorkspace->getExecutionMask();
 
         //Execute our passes
@@ -993,14 +973,30 @@ namespace Ogre
         while( itor != end )
         {
             CompositorPass *pass = *itor;
+            const CompositorPassDef *passDef = pass->getDefinition();
 
-            if( executionMask & pass->getDefinition()->mExecutionMask )
+            if( executionMask & passDef->mExecutionMask )
+            {
+                //Make explicitly exposed textures available to materials during this pass.
+                const size_t oldNumTextures = sceneManager->getNumCompositorTextures();
+                IdStringVec::const_iterator itExposed = passDef->mExposedTextures.begin();
+                IdStringVec::const_iterator enExposed = passDef->mExposedTextures.end();
+
+                while( itExposed != enExposed )
+                {
+                    const CompositorChannel *exposedChannel = this->_getDefinedTexture( *itExposed );
+                    sceneManager->_addCompositorTexture( *itExposed, &exposedChannel->textures );
+                    ++itExposed;
+                }
+
+                //Execute pass
                 pass->execute( lodCamera );
+
+                //Remove our textures
+                sceneManager->_removeCompositorTextures( oldNumTextures );
+            }
             ++itor;
         }
-
-        //Remove our textures
-        sceneManager->_removeCompositorTextures( oldNumTextures );
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::finalTargetResized( const RenderTarget *finalTarget )

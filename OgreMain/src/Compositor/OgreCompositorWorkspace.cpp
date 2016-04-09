@@ -710,23 +710,6 @@ namespace Ogre
                                                              mRenderSys, allNodes, 0 );
         }
 
-        //Add global textures to the SceneManager so they can be referenced by materials
-        size_t oldNumTextures = mSceneManager->getNumCompositorTextures();
-        TextureDefinitionBase::NameToChannelMap::const_iterator it =
-                                                                mDefinition->mNameToChannelMap.begin();
-        TextureDefinitionBase::NameToChannelMap::const_iterator en =
-                                                                mDefinition->mNameToChannelMap.end();
-
-        while( it != en )
-        {
-            size_t index;
-            TextureDefinitionBase::TextureSource texSource;
-            mDefinition->decodeTexSource( it->second, index, texSource );
-            mSceneManager->_addCompositorTexture( it->first, &this->mGlobalTextures[index].textures );
-
-            ++it;
-        }
-
         CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
         CompositorNodeVec::const_iterator end  = mNodeSequence.end();
 
@@ -751,9 +734,6 @@ namespace Ogre
             }
             ++itor;
         }
-
-        //Remove our textures
-        mSceneManager->_removeCompositorTextures( oldNumTextures );
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::_swapFinalTarget( vector<RenderTarget*>::type &swappedTargets )
