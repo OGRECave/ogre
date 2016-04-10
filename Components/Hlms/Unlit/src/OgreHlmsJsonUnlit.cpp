@@ -181,7 +181,7 @@ namespace Ogre
 			texLocation.texture = datablock->getTexture(textureType);
 			if (!texLocation.texture.isNull())
 			{
-				texLocation.xIdx = 0;
+                texLocation.xIdx = datablock->_getTextureIdx( textureType );
 				texLocation.yIdx = 0;
 				texLocation.divisor = 1;
 
