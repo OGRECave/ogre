@@ -106,6 +106,14 @@ namespace Demo
             GraphicsSystem( gameState )
         {
         }
+
+        void createScene01()
+        {
+            GraphicsSystem::createScene01();
+            //The first time setupCompositor got called, Terra wasn't ready yet.
+            //Create the workspace again (will destroy previous workspace).
+            mWorkspace = setupCompositor();
+        }
     };
 }
 

@@ -17,6 +17,7 @@
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
 #include "Compositor/OgreCompositorManager2.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 
 #include "OgreTextureManager.h"
 #include "OgreTexture.h"
@@ -38,6 +39,22 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     Ogre::CompositorWorkspace* Tutorial_TerrainGameState::setupCompositor()
     {
+        // The first time this function gets called Terra is not initialized. This is a very possible
+        // scenario i.e. load a level without Terrain, but we still need a workspace to render.
+        //
+        // Thus we pass a PF_NULL texture to the workspace as a dud that barely consumes any
+        // memory (it consumes no GPU memory btw) by specifying PF_NULL. Alternatively you
+        // could use a different workspace (either defined in script or programmatically) that
+        // doesn't require specifying a second external texture. But using a dud is just simpler.
+        //
+        // The second time we get called, Terra will be initialized and we can pass the
+        // proper external texture filled with the UAV so Ogre can place the right
+        // barriers.
+        //
+        // Note: We *could* delay the creation of the workspace in this sample until Terra
+        // is initialized; instead of creating the workspace unnecessarily twice.
+        // However we're doing this on purpose to show how to deal with perfectly valid &
+        // very common scenarios.
         using namespace Ogre;
 
         Root *root = mGraphicsSystem->getRoot();
@@ -45,6 +62,15 @@ namespace Demo
         RenderWindow *renderWindow = mGraphicsSystem->getRenderWindow();
         Camera *camera = mGraphicsSystem->getCamera();
         CompositorManager2 *compositorManager = root->getCompositorManager2();
+
+        CompositorWorkspace *oldWorkspace = mGraphicsSystem->getCompositorWorkspace();
+        if( oldWorkspace )
+        {
+            TexturePtr terraShadowTex = oldWorkspace->getExternalRenderTargets()[1].textures.back();
+            if( terraShadowTex->getFormat() == PF_NULL )
+                TextureManager::getSingleton().remove( ResourcePtr( terraShadowTex ) );
+            compositorManager->removeWorkspace( oldWorkspace );
+        }
 
         CompositorChannelVec externalChannels( 2 );
         //Render window
@@ -55,12 +81,14 @@ namespace Demo
         ResourceAccessMap initialUavAccess;
         if( mTerra )
         {
+            //Terra is initialized
             const ShadowMapper *shadowMapper = mTerra->getShadowMapper();
             shadowMapper->fillUavDataForCompositorChannel( externalChannels[1], initialLayouts,
                                                            initialUavAccess );
         }
         else
         {
+            //The texture is not available. Create a dummy dud using PF_NULL.
             TexturePtr nullTex = TextureManager::getSingleton().createManual(
                         "DummyNull", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                         TEX_TYPE_2D, 1, 1, 0, PF_NULL );

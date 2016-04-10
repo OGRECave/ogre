@@ -955,7 +955,7 @@ namespace Ogre
             while( itor != end && (*itor->textures)[0] != terraShadowText )
                 ++itor;
 
-            if( itor != end )
+            if( itor == end )
             {
                 assert( "Hazard Detected! You should expose this Terra's shadow map texture"
                         " to the compositor pass so Ogre can place the proper Barriers" && false );
