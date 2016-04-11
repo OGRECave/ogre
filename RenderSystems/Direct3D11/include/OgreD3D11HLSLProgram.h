@@ -250,9 +250,9 @@ namespace Ogre {
         };
 
         // Make sure that objects have index and name, or some search will fail
-        typedef std::set<BufferInfo> BufferInfoMap;
-        typedef std::set<BufferInfo>::iterator BufferInfoIterator;
-        BufferInfoMap mBufferInfoMap;
+//        typedef std::set<BufferInfo> BufferInfoMap;
+//        typedef std::set<BufferInfo>::iterator BufferInfoIterator;
+//        BufferInfoMap mBufferInfoMap;
 
         // Map to store interface slot position. 
         // Number of interface slots is size of this map.
@@ -274,7 +274,7 @@ namespace Ogre {
         typedef vector<GpuConstantDefinitionWithName>::type D3d11ShaderVariableSubparts;
         typedef D3d11ShaderVariableSubparts::iterator D3d11ShaderVariableSubpartsIter; 
 
-        typedef struct MemberTypeName
+        struct MemberTypeName
         {
             LPCSTR                  Name;           
         };
@@ -299,6 +299,15 @@ namespace Ogre {
         D3d11ShaderVariables mVarDescPointer;
         D3d11ShaderTypeDescs mD3d11ShaderTypeDescs;
         D3d11ShaderTypeDescs mMemberTypeDesc;
+        enum DefaultBufferTypes
+        {
+            BufferGlobal,
+            BufferParam,
+            NumDefaultBufferTypes
+        };
+        //D3D11_SHADER_INPUT_BIND_DESC    mDefaultBufferBindPoints[NumDefaultBufferTypes];
+        UINT        mDefaultBufferBindPoint;
+        BufferInfo  mDefaultBuffers[NumDefaultBufferTypes];
         MemberTypeNames mMemberTypeName;
         InterfaceSlots mInterfaceSlots;
 
@@ -352,11 +361,9 @@ namespace Ogre {
         ID3D11ComputeShader* getComputeShader(void) const;
         const MicroCode &  getMicroCode(void) const;  
 
-        ID3D11Buffer* getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask);
-
-        void getConstantBuffers(ID3D11Buffer** buffers, unsigned int& numBuffers,
-                                ID3D11ClassInstance** classes, unsigned int& numInstances,
-                                GpuProgramParametersSharedPtr params, uint16 variabilityMask);
+        /// buffers must have a capacity of 2, i.e. ID3D11Buffer *buffers[2];
+        void getConstantBuffers( ID3D11Buffer** buffers, UINT &outSlotStart, UINT &outNumBuffers,
+                                 GpuProgramParametersSharedPtr params, uint16 variabilityMask );
 
         // Get slot for a specific interface
         unsigned int getSubroutineSlot(const String& subroutineSlotName) const;
