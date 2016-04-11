@@ -3099,8 +3099,7 @@ bail:
 
             {
                 //Using Compute Shaders? Unset the UAV from rendering
-                mDevice.GetImmediateContext()->OMSetRenderTargets( mNumberOfViews, mRenderTargetViews,
-                                                                   mDepthStencilView );
+                mDevice.GetImmediateContext()->OMSetRenderTargets( 0, 0, 0 );
                 mUavsDirty = true;
             }
 

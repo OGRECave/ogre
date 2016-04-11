@@ -52,14 +52,17 @@ namespace Ogre
             mPrimCount( 0 ),
             mVertexBuffers( vertexBuffers ),
             mIndexBuffer( indexBuffer ),
+            mBaseVertexBuffer( 0 ),
             mOperationType( operationType )
     {
         if( mVertexBuffers.empty() )
-            mVertexBuffers.push_back( &msDummyVertexBuffer );
+            mBaseVertexBuffer = &msDummyVertexBuffer;
+        else
+            mBaseVertexBuffer = mVertexBuffers[0];
 
         if( mIndexBuffer )
             mPrimCount = mIndexBuffer->getNumElements();
-        else if( mVertexBuffers[0] != &msDummyVertexBuffer )
+        else if( !mVertexBuffers.empty() )
             mPrimCount = mVertexBuffers[0]->getNumElements();
 
         /*switch( mOperationType )
@@ -83,7 +86,7 @@ namespace Ogre
             limit = mIndexBuffer->getNumElements();
         else
         {
-            if( mVertexBuffers[0] != &msDummyVertexBuffer )
+            if( !mVertexBuffers.empty() )
                 limit = mVertexBuffers[0]->getNumElements();
             else
                 limit = std::numeric_limits<uint32>::max();

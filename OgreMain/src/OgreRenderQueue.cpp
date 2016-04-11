@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -614,7 +614,7 @@ namespace Ogre
                     drawIndexedPtr->instanceCount   = 1;
                     drawIndexedPtr->firstVertexIndex= vao->mIndexBuffer->_getFinalBufferStart() +
                                                                                     vao->mPrimStart;
-                    drawIndexedPtr->baseVertex      = vao->mVertexBuffers[0]->_getFinalBufferStart();
+                    drawIndexedPtr->baseVertex      = vao->mBaseVertexBuffer->_getFinalBufferStart();
                     drawIndexedPtr->baseInstance    = baseInstance;
 
                     instanceCount = 1;
@@ -627,7 +627,7 @@ namespace Ogre
                     drawCountPtr = drawStripPtr;
                     drawStripPtr->primCount         = vao->mPrimCount;
                     drawStripPtr->instanceCount     = 1;
-                    drawStripPtr->firstVertexIndex  = vao->mVertexBuffers[0]->_getFinalBufferStart() +
+                    drawStripPtr->firstVertexIndex  = vao->mBaseVertexBuffer->_getFinalBufferStart() +
                                                                                         vao->mPrimStart;
                     drawStripPtr->baseInstance      = baseInstance;
 

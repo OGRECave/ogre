@@ -2065,6 +2065,20 @@ namespace Ogre {
                 ++currDesc;
         }
 
+        {
+            //Account system-generated values which don't require a match in the PSO.
+            for( size_t j=0; j<numShaderInputs && numShaderInputsFound < numShaderInputs; ++j )
+            {
+                D3D11_SIGNATURE_PARAMETER_DESC shaderDesc = mD3d11ShaderInputParameters[j];
+                if( shaderDesc.SystemValueType == D3D_NAME_VERTEX_ID ||
+                    shaderDesc.SystemValueType == D3D_NAME_PRIMITIVE_ID ||
+                    shaderDesc.SystemValueType == D3D_NAME_INSTANCE_ID )
+                {
+                    ++numShaderInputsFound;
+                }
+            }
+        }
+
         if( numShaderInputsFound < numShaderInputs )
         {
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
