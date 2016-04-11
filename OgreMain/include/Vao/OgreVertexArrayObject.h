@@ -78,6 +78,8 @@ namespace Ogre
         VertexBufferPackedVec   mVertexBuffers;
         IndexBufferPacked       *mIndexBuffer;
 
+        VertexBufferPacked      *mBaseVertexBuffer;
+
         /// The type of operation to perform
         v1::RenderOperation::OperationType mOperationType;
 
