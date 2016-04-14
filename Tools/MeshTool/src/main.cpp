@@ -1302,6 +1302,7 @@ int main(int numargs, char** args)
         {
             if( !v1Mesh.isNull() )
             {
+                mesh->_updateCompiledBoneAssignments();
                 v1::Mesh::msOptimizeForShadowMapping = !opts.stripShadowMapping;
                 mesh->prepareForShadowMapping( false );
                 v1::Mesh::msOptimizeForShadowMapping = false;

@@ -44,6 +44,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassUav/OgreCompositorPassUav.h"
 #include "Compositor/Pass/PassUav/OgreCompositorPassUavDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
+#include "Compositor/OgreCompositorShadowNode.h"
 
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/Pass/OgreCompositorPassProvider.h"
@@ -921,6 +922,11 @@ namespace Ogre
             ++it;
         }
 
+        //If we're in a caster pass, we need to skip shadow map passes that have no light associated
+        const CompositorShadowNode *shadowNode = 0;
+        if( sceneManager->_getCurrentRenderStage() == SceneManager::IRS_RENDER_TO_TEXTURE )
+            shadowNode = sceneManager->getCurrentShadowNode();
+
         uint8 executionMask = mWorkspace->getExecutionMask();
 
         //Execute our passes
@@ -930,9 +936,13 @@ namespace Ogre
         while( itor != end )
         {
             CompositorPass *pass = *itor;
+            const CompositorPassDef *passDef = (*itor)->getDefinition();
 
-            if( executionMask & pass->getDefinition()->mExecutionMask )
+            if( executionMask & passDef->mExecutionMask &&
+                (!shadowNode || shadowNode->isShadowMapIdxActive( passDef->mShadowMapIdx ) ) )
+            {
                 pass->execute( lodCamera );
+            }
             ++itor;
         }
 

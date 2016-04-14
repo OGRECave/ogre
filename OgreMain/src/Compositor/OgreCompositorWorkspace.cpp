@@ -1,4 +1,4 @@
-/*
+﻿/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -79,6 +79,10 @@ namespace Ogre
             mInitialResourcesLayout = *initialLayouts;
         if( initialUavAccess )
             mInitialUavsAccess = *initialUavAccess;
+
+        //We need this so OpenGL can switch contexts (if needed) before creating the textures
+        if( mRenderWindow.target )
+            mRenderSys->_setRenderTarget( mRenderWindow.target, true );
 
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,

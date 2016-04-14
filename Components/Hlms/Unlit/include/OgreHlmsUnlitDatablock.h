@@ -192,6 +192,10 @@ namespace Ogre
 
         TexturePtr getTexture( uint8 texType ) const;
 
+        /// Returns the internal index to the array in a texture array.
+        /// Note: If there is no texture assigned to the given texType, returned value is undefined
+        uint16 _getTextureIdx( uint8 texType ) const                    { return mTexIndices[texType]; }
+
         /** Sets the final swizzle when sampling the given texture. e.g.
             calling setTextureSwizzle( 0, R_MASK, G_MASK, R_MASK, G_MASK );
             will generated the following pixel shader:

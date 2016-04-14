@@ -38,6 +38,24 @@ namespace Ogre {
     class MeshSerializerListener;
     
     /// Mesh compatibility versions
+    /// Naming convention:
+    ///     MeshSerializer_v2.1 R0 LEGACYV1
+    /// * "v2.1" means it was written during the development of Ogre 2.1
+    /// * "R0" is the revision number. If we later add something new to the format while still developing
+    ///   Ogre 2.1; we will increase it to R1. Then R2, R3 and so on. This ensure we don't break
+    ///   compatibility with our users who are actively working with Ogre 2.1 the next time their pull
+    ///   from the repo. It would be a disaster if we broke compatibility. However we plan that the
+    ///   final version of Ogre 2.1 (when we officially release it) to remove compatibility with these
+    ///   temporary R0-Rn-1 formats and only leave RN as the final version. Users should be able to
+    ///   upgrade via OgreMeshTool before that happens. But forcing them to upgrade every single time
+    ///   we update something is insane.
+    /// * LEGACYV1 means it's a v1 format, which can be opened by Entity. To open it via Item, you need
+    ///   to import the mesh to a v2 format (as shown in V2Mesh sample).
+    /// * Lack of LEGACYV1 word means this is a v2 format, which can be opened by Item. To open via
+    ///   Entity, you need to import the mesh to a v1 format (OgreMeshTool shows how to do this; it's
+    ///   basically the reverse of importing a v1 into a v2)
+    ///
+    /// See http://www.ogre3d.org/forums/viewtopic.php?f=25&t=85491&p=524682#p524682
     enum MeshVersion 
     {
         /// Latest version available
