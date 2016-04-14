@@ -23,9 +23,16 @@
 	//pass.f3dGridHWW[slice].y = grid_height / renderTarget->height;
 	//pass.f3dGridHWW[slice].z = grid_width * lightsPerCell;
 	//uint sampleOffset = 0;
+@property( hlms_forward3d_flipY )
+	float windowHeight = pass.f3dGridHWW[1].w; //renderTarget->height
+	uint sampleOffset = offset +
+						uint(floor( (windowHeight - gl_FragCoord.y) * pass.f3dGridHWW[slice].y ) * pass.f3dGridHWW[slice].z) +
+						uint(floor( gl_FragCoord.x * pass.f3dGridHWW[slice].x ) * lightsPerCell);
+@end @property( !hlms_forward3d_flipY )
 	uint sampleOffset = offset +
 						uint(floor( gl_FragCoord.y * pass.f3dGridHWW[slice].y ) * pass.f3dGridHWW[slice].z) +
 						uint(floor( gl_FragCoord.x * pass.f3dGridHWW[slice].x ) * lightsPerCell);
+@end
 
 	uint numLightsInGrid = texelFetch( f3dGrid, int(sampleOffset) ).x;
 

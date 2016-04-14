@@ -91,6 +91,7 @@ namespace Ogre
     const IdString HlmsBaseProp::ShadowCaster       = IdString( "hlms_shadowcaster" );
     const IdString HlmsBaseProp::ShadowUsesDepthTexture= IdString( "hlms_shadow_uses_depth_texture" );
     const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
+    const IdString HlmsBaseProp::Forward3DFlipY     = IdString( "hlms_forward3d_flipY" );
     const IdString HlmsBaseProp::Forward3DDebug     = IdString( "hlms_forward3d_debug" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
 
@@ -1867,6 +1868,16 @@ namespace Ogre
                 setProperty( HlmsBaseProp::Forward3D,       forward3D->getNumSlices() );
                 setProperty( HlmsBaseProp::Forward3DDebug,  forward3D->getDebugMode() );
                 setProperty( HlmsBaseProp::VPos, 1 );
+
+                if( !mShaderTargets[0] ) //Not using D3D11
+                {
+                    //Actually the problem is not texture flipping, but origin. In D3D11,
+                    //we need to always flip because origin is different, but it's consistent
+                    //between texture and render window. In GL, RenderWindows don't need
+                    //to flip, but textures do.
+                    RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+                    setProperty( HlmsBaseProp::Forward3DFlipY, renderTarget->requiresTextureFlipping() );
+                }
             }
 
             uint numLightsPerType[Light::NUM_LIGHT_TYPES];

@@ -18,13 +18,14 @@
 	uint offset = cellsPerTableOnGrid0 * (((1u << (slice << 1u)) - 1u) / 3u);
 
 	float lightsPerCell = passBuf.f3dGridHWW[0].w;
+	float windowHeight = passBuf.f3dGridHWW[1].w; //renderTarget->height
 
 	//passBuf.f3dGridHWW[slice].x = grid_width / renderTarget->width;
 	//passBuf.f3dGridHWW[slice].y = grid_height / renderTarget->height;
 	//passBuf.f3dGridHWW[slice].z = grid_width * lightsPerCell;
 	//uint sampleOffset = 0;
 	uint sampleOffset = offset +
-						uint(floor( gl_FragCoord.y * passBuf.f3dGridHWW[slice].y ) * passBuf.f3dGridHWW[slice].z) +
+						uint(floor( (windowHeight - gl_FragCoord.y) * passBuf.f3dGridHWW[slice].y ) * passBuf.f3dGridHWW[slice].z) +
 						uint(floor( gl_FragCoord.x * passBuf.f3dGridHWW[slice].x ) * lightsPerCell);
 
 	uint numLightsInGrid = f3dGrid.Load( int(sampleOffset) ).x;
