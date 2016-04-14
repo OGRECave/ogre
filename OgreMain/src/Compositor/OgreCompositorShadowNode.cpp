@@ -602,6 +602,22 @@ namespace Ogre
         return &mCurrentLightList;
     }
     //-----------------------------------------------------------------------------------
+    bool CompositorShadowNode::isShadowMapIdxActive( uint32 shadowMapIdx ) const
+    {
+        if( shadowMapIdx < mDefinition->mShadowMapTexDefinitions.size() )
+        {
+            //TODO: This does not account missing PSSM directional lights (Pbs shaders don't either).
+            //Or shadow maps exclusive to a lights type (also TODO).
+            const ShadowTextureDefinition &shadowTexDef =
+                    mDefinition->mShadowMapTexDefinitions[shadowMapIdx];
+            return shadowTexDef.light < mShadowMapCastingLights.size();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorShadowNode::getMinMaxDepthRange( const Frustum *shadowMapCamera,
                                                     Real &outMin, Real &outMax ) const
     {

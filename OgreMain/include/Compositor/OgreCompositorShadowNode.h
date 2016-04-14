@@ -180,6 +180,11 @@ namespace Ogre
         /// @See mCastersBox
         const AxisAlignedBox& getCastersBox(void) const     { return mCastersBox; }
 
+        /// Returns true if the shadow map index is not active. For example:
+        ///     * There are 3 shadow maps, but only 2 shadow casting lights
+        ///     * There are 3 directional maps for directional PSSM, but no directional light.
+        bool isShadowMapIdxActive( uint32 shadowMapIdx ) const;
+
         /** Outputs the min & max depth range for the given camera. 0 & 100000 if camera not found
         @remarks
             Performs linear search O(N), except the overload that provides a shadowMapIdx
