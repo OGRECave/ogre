@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonInstance.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonAnimationDef.h"
+#include "Animation/OgreSkeletonManager.h"
 
 #include "OgreId.h"
 
@@ -382,8 +383,25 @@ namespace Ogre
         OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
                      "Can't find animation '" + name.getFriendlyText() + "'",
                      "SkeletonInstance::getAnimation" );
-        return 0;
-    }
+        return 0;    
+	}
+	//-----------------------------------------------------------------------------------
+	void SkeletonInstance::addAnimationsFromSkeleton(const String &skelName, const String &groupName) {
+		SkeletonDefPtr defition = SkeletonManager::getSingleton().getSkeletonDef(skelName, groupName);
+
+		const SkeletonAnimationDefVec &animationDefs = defition->getAnimationDefs();
+		mAnimations.reserve(mAnimations.size() + animationDefs.size());
+
+		SkeletonAnimationDefVec::const_iterator itor = animationDefs.begin();
+		SkeletonAnimationDefVec::const_iterator end = animationDefs.end();
+		while (itor != end)
+		{
+			SkeletonAnimation animation(&(*itor), &mSlotStarts, this);
+			mAnimations.push_back(animation);
+			mAnimations.back()._initialize();
+			++itor;
+		}
+	}
     //-----------------------------------------------------------------------------------
     void SkeletonInstance::_enableAnimation( SkeletonAnimation *animation )
     {
