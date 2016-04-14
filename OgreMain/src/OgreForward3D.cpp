@@ -668,17 +668,18 @@ namespace Ogre
         *reinterpret_cast<uint32*RESTRICT_ALIAS>(passBufferPtr) = mTableSize;
         ++passBufferPtr;
 
-        float fLightsPerCell = static_cast<float>( mLightsPerCell );
+        const float fLightsPerCell = static_cast<float>( mLightsPerCell );
+
+        const float renderTargetWidth = static_cast<float>( renderTarget->getWidth() );
+        const float renderTargetHeight = static_cast<float>( renderTarget->getHeight() );
 
         //vec4 f3dGridHWW[mNumSlices];
         for( uint32 i=0; i<mNumSlices; ++i )
         {
-            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].width ) /
-                                renderTarget->getWidth();
-            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].height ) /
-                                renderTarget->getHeight();
+            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].width ) / renderTargetWidth;
+            *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].height ) / renderTargetHeight;
             *passBufferPtr++ = static_cast<float>( mResolutionAtSlice[i].width * mLightsPerCell );
-            *passBufferPtr++ = fLightsPerCell;
+            *passBufferPtr++ = i < 1u ? fLightsPerCell : renderTargetHeight;
         }
     }
 }

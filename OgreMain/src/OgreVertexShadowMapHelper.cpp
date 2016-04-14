@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -270,16 +270,21 @@ namespace Ogre
                                                       const size_t srcBytesPerVertex[],
                                                       uint32 numVertices )
     {
-        size_t elementOffset[3+1];
+        size_t elementOffset[3];
+        size_t elementSize[3];
         memset( elementOffset, 0, sizeof(elementOffset) );
+        memset( elementSize, 0, sizeof(elementSize) );
 
         size_t bytesPerVertex = 0;
 
         for( size_t i=0; i<3; ++i )
         {
             if( vertexElements[i] )
-                elementOffset[i+1] = v1::VertexElement::getTypeSize( vertexElements[i]->mType );
-            bytesPerVertex += elementOffset[i+1];
+            {
+                elementSize[i] = v1::VertexElement::getTypeSize( vertexElements[i]->mType );
+                elementOffset[i] += bytesPerVertex;
+            }
+            bytesPerVertex += elementSize[i];
         }
 
         for( uint32 i=0; i<numVertices; ++i )
@@ -289,7 +294,7 @@ namespace Ogre
             {
                 memcpy( dstData + elementOffset[j]  + i * bytesPerVertex,
                         srcData[j] + srcOffset[j]   + i * srcBytesPerVertex[j],
-                        elementOffset[j+1] );
+                        elementSize[j] );
             }
         }
 

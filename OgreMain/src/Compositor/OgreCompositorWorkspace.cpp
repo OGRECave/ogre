@@ -83,6 +83,10 @@ namespace Ogre
 
         RenderTarget *finalTarget = getFinalTarget();
 
+        //We need this so OpenGL can switch contexts (if needed) before creating the textures
+        if( finalTarget )
+            mRenderSys->_setRenderTarget( finalTarget, true );
+
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
                                                 id, true, finalTarget, mRenderSys );

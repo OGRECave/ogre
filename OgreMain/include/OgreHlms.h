@@ -633,6 +633,7 @@ namespace Ogre
         static const IdString ShadowUsesDepthTexture;
         static const IdString RenderDepthOnly;
         static const IdString Forward3D;
+        static const IdString Forward3DFlipY;
         static const IdString Forward3DDebug;
         static const IdString VPos;
 
