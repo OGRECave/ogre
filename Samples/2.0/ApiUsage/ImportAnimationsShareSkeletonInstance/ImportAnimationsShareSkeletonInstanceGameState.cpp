@@ -78,7 +78,7 @@ namespace Demo
                 AUTODETECT_RESOURCE_GROUP_NAME,
                 Ogre::SCENE_DYNAMIC);
             sceneNode->attachObject(charPart);
-            charPart->shareSkeletonInstanceWith(charItem);
+            charPart->useSkeletonInstanceFrom(charItem);
         }
 
         {

@@ -102,8 +102,10 @@ namespace Ogre
                 boneChild( _boneChild ), sceneNodeParent( _sceneNodeParent ) {}
         };
         typedef vector<SceneNodeBonePair>::type SceneNodeBonePairVec;
-
+                
         SceneNodeBonePairVec    mCustomParentSceneNodes;
+
+        uint16 mRefCount;
 
     public:
         SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
@@ -203,6 +205,10 @@ namespace Ogre
 
         const void* _getMemoryBlock(void) const;
         const void* _getMemoryUniqueOffset(void) const;
+
+        void _incrementRefCount(void);
+        void _decrementRefCount(void);
+        uint16 _getRefCount(void) const;
     };
 
     inline bool OrderSkeletonInstanceByMemory( const SkeletonInstance *_left,

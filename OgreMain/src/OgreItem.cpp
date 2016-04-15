@@ -19,9 +19,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR     
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR     WISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR      DEALINGS IN
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
@@ -56,8 +56,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     Item::Item( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager )
         : MovableObject( id, objectMemoryManager, manager, 0 ),
-          mInitialised( false ),
-          mSharesSkeletonInstance( false )
+          mInitialised( false )
     {
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
     }
@@ -66,8 +65,7 @@ namespace Ogre {
                 const MeshPtr& mesh ) :
         MovableObject( id, objectMemoryManager, manager, 0 ),
         mMesh( mesh ),
-        mInitialised( false ),
-        mSharesSkeletonInstance( false )
+        mInitialised( false )
     {
         _initialise();
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
@@ -141,9 +139,12 @@ namespace Ogre {
 
         // If mesh is skeletally animated: destroy instance
         assert( mManager || !mSkeletonInstance );
-        if (!mSharesSkeletonInstance && mSkeletonInstance)
+        if ( mSkeletonInstance )
         {
-            mManager->destroySkeletonInstance( mSkeletonInstance );
+			mSkeletonInstance->_decrementRefCount();
+			if ( mSkeletonInstance->_getRefCount() <= 0 ) {
+				mManager->destroySkeletonInstance( mSkeletonInstance );
+			}
         }
         mSkeletonInstance = 0;
 
@@ -279,34 +280,40 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    void Item::shareSkeletonInstanceWith(Item* item)
+	void Item::useSkeletonInstanceFrom(Item* master)
     {
-        if ( mMesh->getSkeletonName() != item->mMesh->getSkeletonName() ) 
+		if ( mMesh->getSkeletonName() != master->mMesh->getSkeletonName() )
         {
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
                 "Cannot share skeleton instance if meshes use different skeletons ", "Item::shareSkeletonInstanceWith");
         }
 
-        if ( !mSharesSkeletonInstance && mSkeletonInstance )
-        {
-            mManager->destroySkeletonInstance(mSkeletonInstance);
-            mSkeletonInstance = 0;
-        }        
-        mSkeletonInstance = item->mSkeletonInstance;
-        mSharesSkeletonInstance = true;
+		if ( mSkeletonInstance )
+		{
+			mSkeletonInstance->_decrementRefCount();
+			if ( mSkeletonInstance->_getRefCount() <= 0 ) {
+				mManager->destroySkeletonInstance( mSkeletonInstance );
+			}
+		}        
+		mSkeletonInstance = master->mSkeletonInstance;
+		mSkeletonInstance->_incrementRefCount();
     }
     //-----------------------------------------------------------------------
-    void Item::stopSharingSkeletonInstance()
+	void Item::stopUsingSkeletonInstanceFromMaster()
     {
-        if ( !mSharesSkeletonInstance ) {
-            return;
-        }
-        if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull() && mManager)
-        {
-            const SkeletonDef *skeletonDef = mMesh->getSkeleton().get();
-            mSkeletonInstance = mManager->createSkeletonInstance(skeletonDef);
-        }
-        mSharesSkeletonInstance = false;
+		if (mSkeletonInstance)
+		{
+			mSkeletonInstance->_decrementRefCount();
+			if (mSkeletonInstance->_getRefCount() <= 0) {
+				mManager->destroySkeletonInstance(mSkeletonInstance);
+			}
+			mSkeletonInstance = 0;
+		}
+    }
+    //-----------------------------------------------------------------------
+    bool Item::sharesSkeletonInstance() const             
+    { 
+        return mSkeletonInstance && mSkeletonInstance->_getRefCount() > 1; 
     }
     //-----------------------------------------------------------------------
     void Item::_notifyParentNodeMemoryChanged(void)

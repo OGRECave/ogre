@@ -43,7 +43,8 @@ namespace Ogre
     SkeletonInstance::SkeletonInstance( const SkeletonDef *skeletonDef,
                                         BoneMemoryManager *boneMemoryManager ) :
             mDefinition( skeletonDef ),
-            mParentNode( 0 )
+            mParentNode( 0 ),
+            mRefCount( 1 )
     {
         mBones.resize( mDefinition->getBones().size(), Bone() );
 
@@ -483,5 +484,20 @@ namespace Ogre
     {
         return reinterpret_cast<const void*>(
                         mBoneStartTransforms[0].mOwner + mBoneStartTransforms[0].mIndex );
+    }
+    //-----------------------------------------------------------------------------------
+    void SkeletonInstance::_incrementRefCount(void) 
+    {
+		mRefCount++;
+    }
+    //-----------------------------------------------------------------------------------
+    void SkeletonInstance::_decrementRefCount(void) 
+	{
+		mRefCount--;
+    }
+    //-----------------------------------------------------------------------------------
+    uint16 SkeletonInstance::_getRefCount(void) const 
+    {
+		return mRefCount;
     }
 }
