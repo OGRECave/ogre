@@ -15,7 +15,7 @@ using namespace Demo;
 
 namespace Demo
 {
-	class ImportAnimationsShareSkeletonInstanceGraphicsSystem : public GraphicsSystem
+    class ImportAnimationsShareSkeletonInstanceGraphicsSystem : public GraphicsSystem
     {
         virtual void setupResources(void)
         {
@@ -44,7 +44,7 @@ namespace Demo
         }
 
     public:
-		ImportAnimationsShareSkeletonInstanceGraphicsSystem(GameState *gameState) :
+        ImportAnimationsShareSkeletonInstanceGraphicsSystem(GameState *gameState) :
             GraphicsSystem( gameState )
         {
         }
@@ -57,12 +57,12 @@ INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 int mainApp()
 #endif
 {
-	ImportAnimationsShareSkeletonInstanceGameState importAnimationsShareSkeletonInstanceGameState(
+    ImportAnimationsShareSkeletonInstanceGameState importAnimationsShareSkeletonInstanceGameState(
         "This sample shows how to directly import animation clips from a .skeleton file directly into a v2Mesh\n"
         "And also how to share the same skeleton instance between components of the same actor/character.\n" );
-	ImportAnimationsShareSkeletonInstanceGraphicsSystem graphicsSystem(&importAnimationsShareSkeletonInstanceGameState);
+    ImportAnimationsShareSkeletonInstanceGraphicsSystem graphicsSystem(&importAnimationsShareSkeletonInstanceGameState);
 
-	importAnimationsShareSkeletonInstanceGameState._notifyGraphicsSystem(&graphicsSystem);
+    importAnimationsShareSkeletonInstanceGameState._notifyGraphicsSystem(&graphicsSystem);
 
     graphicsSystem.initialize( "Using TagPoints to attach nodes to Skeleton Bones" );
 

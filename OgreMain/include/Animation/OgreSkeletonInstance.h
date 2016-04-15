@@ -168,11 +168,11 @@ namespace Ogre
         ///Return all animations associated with this skeleton
         const SkeletonAnimationVec& getAnimations() const { return mAnimations; }
 
-		/**	Add all animation clips found in skelName. 
-		@remarks
-			skelName skeleton must have the same structure (bone count, bone hierarchy) as this, otherwise it may output unexpected behavior or crashes.
-		*/
-		void addAnimationsFromSkeleton( const String &skelName, const String &groupName );
+        /**    Add all animation clips found in skelName. 
+        @remarks
+            skelName skeleton must have the same structure (bone count, bone hierarchy) as this, otherwise it may output unexpected behavior or crashes.
+        */
+        void addAnimationsFromSkeleton( const String &skelName, const String &groupName );
 
         /// Internal use. Enables given animation. Input should belong to us and not already animated.
         void _enableAnimation( SkeletonAnimation *animation );

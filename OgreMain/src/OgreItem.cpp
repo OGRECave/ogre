@@ -57,7 +57,7 @@ namespace Ogre {
     Item::Item( IdType id, ObjectMemoryManager *objectMemoryManager, SceneManager *manager )
         : MovableObject( id, objectMemoryManager, manager, 0 ),
           mInitialised( false ),
-		  mSharesSkeletonInstance( false )
+          mSharesSkeletonInstance( false )
     {
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
     }
@@ -67,7 +67,7 @@ namespace Ogre {
         MovableObject( id, objectMemoryManager, manager, 0 ),
         mMesh( mesh ),
         mInitialised( false ),
-		mSharesSkeletonInstance( false )
+        mSharesSkeletonInstance( false )
     {
         _initialise();
         mObjectData.mQueryFlags[mObjectData.mIndex] = SceneManager::QUERY_ENTITY_DEFAULT_MASK;
@@ -145,7 +145,7 @@ namespace Ogre {
         {
             mManager->destroySkeletonInstance( mSkeletonInstance );
         }
-		mSkeletonInstance = 0;
+        mSkeletonInstance = 0;
 
         mInitialised = false;
     }
@@ -281,32 +281,32 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Item::shareSkeletonInstanceWith(Item* item)
     {
-		if ( mMesh->getSkeletonName() != item->mMesh->getSkeletonName() ) 
-		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-				"Cannot share skeleton instance if meshes use different skeletons ", "Item::shareSkeletonInstanceWith");
-		}
+        if ( mMesh->getSkeletonName() != item->mMesh->getSkeletonName() ) 
+        {
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
+                "Cannot share skeleton instance if meshes use different skeletons ", "Item::shareSkeletonInstanceWith");
+        }
 
-		if ( !mSharesSkeletonInstance && mSkeletonInstance )
-		{
-			mManager->destroySkeletonInstance(mSkeletonInstance);
-			mSkeletonInstance = 0;
-		}		
-		mSkeletonInstance = item->mSkeletonInstance;
-		mSharesSkeletonInstance = true;
+        if ( !mSharesSkeletonInstance && mSkeletonInstance )
+        {
+            mManager->destroySkeletonInstance(mSkeletonInstance);
+            mSkeletonInstance = 0;
+        }        
+        mSkeletonInstance = item->mSkeletonInstance;
+        mSharesSkeletonInstance = true;
     }
     //-----------------------------------------------------------------------
     void Item::stopSharingSkeletonInstance()
     {
-		if ( !mSharesSkeletonInstance ) {
-			return;
-		}
-		if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull() && mManager)
-		{
-			const SkeletonDef *skeletonDef = mMesh->getSkeleton().get();
-			mSkeletonInstance = mManager->createSkeletonInstance(skeletonDef);
-		}
-		mSharesSkeletonInstance = false;
+        if ( !mSharesSkeletonInstance ) {
+            return;
+        }
+        if (mMesh->hasSkeleton() && !mMesh->getSkeleton().isNull() && mManager)
+        {
+            const SkeletonDef *skeletonDef = mMesh->getSkeleton().get();
+            mSkeletonInstance = mManager->createSkeletonInstance(skeletonDef);
+        }
+        mSharesSkeletonInstance = false;
     }
     //-----------------------------------------------------------------------
     void Item::_notifyParentNodeMemoryChanged(void)

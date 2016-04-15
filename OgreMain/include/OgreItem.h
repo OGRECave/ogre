@@ -114,8 +114,8 @@ namespace Ogre {
         /// Has this Item been initialised yet?
         bool mInitialised;
 
-		// Is this skeletonInstance originally from another Item
-		bool mSharesSkeletonInstance;
+        // Is this skeletonInstance originally from another Item
+        bool mSharesSkeletonInstance;
 
         /** Builds a list of SubItems based on the SubMeshes contained in the Mesh. */
         void buildSubItems(void);
@@ -208,7 +208,7 @@ namespace Ogre {
 
         /** Returns whether this Item shares it's SkeltonInstance with other Item instances.
         */
-		bool sharesSkeletonInstance() const             { return mSharesSkeletonInstance; }
+        bool sharesSkeletonInstance() const             { return mSharesSkeletonInstance; }
 
         /** Returns a pointer to the set of entities which share a OldSkeletonInstance.
             If this instance does not share it's OldSkeletonInstance with other instances @c NULL will be returned

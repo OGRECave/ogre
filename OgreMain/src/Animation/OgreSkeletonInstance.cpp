@@ -384,24 +384,24 @@ namespace Ogre
                      "Can't find animation '" + name.getFriendlyText() + "'",
                      "SkeletonInstance::getAnimation" );
         return 0;    
-	}
-	//-----------------------------------------------------------------------------------
-	void SkeletonInstance::addAnimationsFromSkeleton(const String &skelName, const String &groupName) {
-		SkeletonDefPtr defition = SkeletonManager::getSingleton().getSkeletonDef(skelName, groupName);
+    }
+    //-----------------------------------------------------------------------------------
+    void SkeletonInstance::addAnimationsFromSkeleton(const String &skelName, const String &groupName) {
+        SkeletonDefPtr defition = SkeletonManager::getSingleton().getSkeletonDef(skelName, groupName);
 
-		const SkeletonAnimationDefVec &animationDefs = defition->getAnimationDefs();
-		mAnimations.reserve(mAnimations.size() + animationDefs.size());
+        const SkeletonAnimationDefVec &animationDefs = defition->getAnimationDefs();
+        mAnimations.reserve(mAnimations.size() + animationDefs.size());
 
-		SkeletonAnimationDefVec::const_iterator itor = animationDefs.begin();
-		SkeletonAnimationDefVec::const_iterator end = animationDefs.end();
-		while (itor != end)
-		{
-			SkeletonAnimation animation(&(*itor), &mSlotStarts, this);
-			mAnimations.push_back(animation);
-			mAnimations.back()._initialize();
-			++itor;
-		}
-	}
+        SkeletonAnimationDefVec::const_iterator itor = animationDefs.begin();
+        SkeletonAnimationDefVec::const_iterator end = animationDefs.end();
+        while (itor != end)
+        {
+            SkeletonAnimation animation(&(*itor), &mSlotStarts, this);
+            mAnimations.push_back(animation);
+            mAnimations.back()._initialize();
+            ++itor;
+        }
+    }
     //-----------------------------------------------------------------------------------
     void SkeletonInstance::_enableAnimation( SkeletonAnimation *animation )
     {

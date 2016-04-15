@@ -7,21 +7,21 @@
 
 namespace Ogre
 {
-	class SkeletonAnimation;
+    class SkeletonAnimation;
 }
 
 namespace Demo
 {
-	class ImportAnimationsShareSkeletonInstanceGameState : public TutorialGameState
-	{
-		Ogre::SkeletonAnimation *mAnyAnimation;
+    class ImportAnimationsShareSkeletonInstanceGameState : public TutorialGameState
+    {
+        Ogre::SkeletonAnimation *mAnyAnimation;
 
-	public:
-		ImportAnimationsShareSkeletonInstanceGameState(const Ogre::String &helpDescription);
+    public:
+        ImportAnimationsShareSkeletonInstanceGameState(const Ogre::String &helpDescription);
 
-		virtual void createScene01(void);
-		virtual void update(float timeSinceLast);
-	};
+        virtual void createScene01(void);
+        virtual void update(float timeSinceLast);
+    };
 }
 
 #endif
