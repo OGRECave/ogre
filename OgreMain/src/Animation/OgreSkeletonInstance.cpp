@@ -488,16 +488,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void SkeletonInstance::_incrementRefCount(void) 
     {
-		mRefCount++;
+        mRefCount++;
     }
     //-----------------------------------------------------------------------------------
     void SkeletonInstance::_decrementRefCount(void) 
 	{
-		mRefCount--;
+        mRefCount--;
     }
     //-----------------------------------------------------------------------------------
     uint16 SkeletonInstance::_getRefCount(void) const 
     {
-		return mRefCount;
+        return mRefCount;
     }
 }
