@@ -201,7 +201,7 @@ namespace Ogre {
 
         /** Returns whether this Item shares it's SkeltonInstance with other Item instances.
         */
-		bool sharesSkeletonInstance() const;
+        bool sharesSkeletonInstance() const;
 
         /** Returns whether or not this Item is either morph or pose animated.
         */
