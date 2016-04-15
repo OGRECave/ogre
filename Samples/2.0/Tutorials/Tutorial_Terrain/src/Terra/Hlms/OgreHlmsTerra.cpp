@@ -211,8 +211,8 @@ namespace Ogre
             //Forward3D consumes 2 more slots.
             if( mGridBuffer )
             {
-                psParams->setNamedConstant( "f3dGrid",      2 );
-                psParams->setNamedConstant( "f3dLightList", 3 );
+                psParams->setNamedConstant( "f3dGrid",      3 );
+                psParams->setNamedConstant( "f3dLightList", 4 );
                 texUnit += 2;
             }
 
