@@ -113,7 +113,7 @@ namespace Ogre {
 
         /// Has this Item been initialised yet?
         bool mInitialised;
-        
+
         /** Builds a list of SubItems based on the SubMeshes contained in the Mesh. */
         void buildSubItems(void);
 
