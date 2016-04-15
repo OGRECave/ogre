@@ -612,7 +612,7 @@ namespace Ogre {
 
                 D3D11_SHADER_INPUT_BIND_DESC curParam;
                 HRESULT hr;
-                hr = shaderReflection->GetResourceBindingDescByName( "$Global", &curParam );
+                hr = shaderReflection->GetResourceBindingDescByName( "$Globals", &curParam );
 
                 if( SUCCEEDED(hr) )
                     mDefaultBufferBindPoint = std::min( curParam.BindPoint, mDefaultBufferBindPoint );
@@ -1146,12 +1146,12 @@ namespace Ogre {
             // so parse all.
             case D3D_CT_CBUFFER:
             case D3D_CT_TBUFFER:
-                if( !strcmp( mD3d11ShaderBufferDescs[b].Name, "$Global" ) ||
+                if( !strcmp( mD3d11ShaderBufferDescs[b].Name, "$Globals" ) ||
                     !strcmp( mD3d11ShaderBufferDescs[b].Name, "$Params" ) )
                 {
                     const DefaultBufferTypes bufferType = !strcmp( mD3d11ShaderBufferDescs[b].Name,
-                                                                   "$Global" ) ? BufferGlobal :
-                                                                                 BufferParam;
+                                                                   "$Globals" ) ? BufferGlobal :
+                                                                                  BufferParam;
                     BufferInfo *it = &mDefaultBuffers[bufferType];
 
                     // Guard to create uniform buffer only once
