@@ -71,7 +71,10 @@ namespace Demo
         {
             TexturePtr terraShadowTex = oldWorkspace->getExternalRenderTargets()[1].textures.back();
             if( terraShadowTex->getFormat() == PF_NULL )
-                TextureManager::getSingleton().remove( ResourcePtr( terraShadowTex ) );
+            {
+                ResourcePtr resourcePtr( terraShadowTex );
+                TextureManager::getSingleton().remove( resourcePtr );
+            }
             compositorManager->removeWorkspace( oldWorkspace );
         }
 

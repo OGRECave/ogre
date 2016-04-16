@@ -202,7 +202,7 @@ namespace Ogre
         if( lightDir2d.y < 0 )
             std::swap( y0, y1 );
 
-        const bool steep = abs(y1 - y0) > abs(x1 - x0);
+        const bool steep = fabsf(y1 - y0) > fabsf(x1 - x0);
         if( steep )
         {
             std::swap( x0, y0 );
