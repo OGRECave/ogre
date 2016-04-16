@@ -307,11 +307,9 @@ namespace Ogre {
             else
             {
                 // Load skeleton
-                try {
-                    v1::SkeletonPtr oldSkeleton = v1::OldSkeletonManager::getSingleton().load(skelName, mGroup).staticCast<v1::Skeleton>();
-
-                    //TODO: put mOldSkeleton in legacy mode only.
-                    mSkeleton = SkeletonManager::getSingleton().getSkeletonDef( oldSkeleton.get() );
+                try
+                {
+                    mSkeleton = SkeletonManager::getSingleton().getSkeletonDef( skelName, mGroup );
                 }
                 catch (...)
                 {
@@ -322,10 +320,7 @@ namespace Ogre {
                         + ". This Mesh will not be animated. "
                         + "You can ignore this message if you are using an offline tool.";
                     LogManager::getSingleton().logMessage(msg);
-
                 }
-
-
             }
             if (isLoaded())
                 _dirtyState();
