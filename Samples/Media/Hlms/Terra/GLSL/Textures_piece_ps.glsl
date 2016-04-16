@@ -1,4 +1,7 @@
 
+@undefpiece( kD )
+@piece( kD )diffuseCol@end
+
 @undefpiece( kS )
 @piece( kS )vec3( 1, 1, 1 )@end
 

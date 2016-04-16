@@ -126,7 +126,7 @@ float3 qmul( float4 q, float3 v )
 
 @insertpiece( DeclareBRDF )
 
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
+@piece( DarkenWithShadowFirstLight )* fShadow@end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
 @insertpiece( output_type ) main( PS_INPUT inPs
@@ -209,8 +209,12 @@ float3 qmul( float4 q, float3 v )
 	diffuseCol.xyz *=	(detailCol0 * detailWeights.x + detailCol1 * detailWeights.y) +
 						(detailCol2 * detailWeights.z + detailCol3 * detailWeights.w);
 @end @property( !diffuse_map )
-	diffuseCol.xyz =	(detailCol0 * detailWeights.x + detailCol1 * detailWeights.y) +
-						(detailCol2 * detailWeights.z + detailCol3 * detailWeights.w);
+	@property( detail_maps_diffuse )
+		diffuseCol.xyz =	(detailCol0 * detailWeights.x + detailCol1 * detailWeights.y) +
+							(detailCol2 * detailWeights.z + detailCol3 * detailWeights.w);
+	@end @property( !detail_maps_diffuse )
+		diffuseCol.xyzw = float4( 1, 1, 1, 1 );
+	@end
 @end
 
 	/// Apply the material's diffuse over the textures

@@ -1,4 +1,7 @@
 
+@undefpiece( kD )
+@piece( kD )diffuseCol@end
+
 @undefpiece( kS )
 @piece( kS )float3( 1, 1, 1 )@end
 
@@ -7,22 +10,22 @@
 @add( textureRegShadowMapStart, 2 )
 @add( samplerStateStart, 2 )
 
+@undefpiece( diffuseExtraParam )
 @undefpiece( specularExtraParam )
 @undefpiece( roughnessExtraParam )
 @undefpiece( metallicExtraParam )
 
+@undefpiece( diffuseExtraParamDef )
 @undefpiece( specularExtraParamDef )
 @undefpiece( roughnessExtraParamDef )
 @undefpiece( metallicExtraParamDef )
 
-@property( metalness_map0 || metalness_map1 || metalness_map2 || metalness_map3 )
-	@piece( metallicExtraParamDef ), float3 F0@end
-	@piece( metallicExtraParam ), F0@end
-@end
-@property( roughness_map0 || roughness_map1 || roughness_map2 || roughness_map3 )
-	@piece( roughnessExtraParamDef ), float ROUGHNESS@end
-	@piece( roughnessExtraParam ), ROUGHNESS@end
-@end
+@piece( diffuseExtraParamDef ), float3 diffuseCol@end
+@piece( diffuseExtraParam ), diffuseCol.xyz@end
+@piece( metallicExtraParamDef ), float3 F0@end
+@piece( metallicExtraParam ), F0@end
+@piece( roughnessExtraParamDef ), float ROUGHNESS@end
+@piece( roughnessExtraParam ), ROUGHNESS@end
 
 @foreach( detail_maps_normal, n )
 	@undefpiece( SampleDetailMapNm@n )

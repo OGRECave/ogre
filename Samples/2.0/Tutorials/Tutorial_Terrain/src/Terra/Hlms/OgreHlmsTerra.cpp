@@ -472,6 +472,14 @@ namespace Ogre
         HlmsCache retVal = Hlms::preparePassHashBase( shadowNode, casterPass,
                                                       dualParaboloid, sceneManager );
 
+        if( getProperty( HlmsBaseProp::LightsDirNonCaster ) > 0 )
+        {
+            //First directional light always cast shadows thanks to our terrain shadows.
+            int32 shadowCasterDirectional = getProperty( HlmsBaseProp::LightsDirectional );
+            shadowCasterDirectional = std::max( shadowCasterDirectional, 1 );
+            setProperty( HlmsBaseProp::LightsDirectional, shadowCasterDirectional );
+        }
+
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
 
         const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
