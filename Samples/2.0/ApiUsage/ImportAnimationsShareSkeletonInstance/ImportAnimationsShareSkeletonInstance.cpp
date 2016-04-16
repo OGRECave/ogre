@@ -17,32 +17,6 @@ namespace Demo
 {
     class ImportAnimationsShareSkeletonInstanceGraphicsSystem : public GraphicsSystem
     {
-        virtual void setupResources(void)
-        {
-            GraphicsSystem::setupResources();
-
-            Ogre::ConfigFile cf;
-            cf.load(mResourcePath + "resources2.cfg");
-
-            Ogre::String originalDataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
-
-            if( originalDataFolder.empty() )
-                originalDataFolder = "./";
-            else if( *(originalDataFolder.end() - 1) != '/' )
-                originalDataFolder += "/";
-
-            const char *c_locations[1] =
-            {
-                "Models",
-            };
-
-            for( size_t i=0; i<1; ++i )
-            {
-                Ogre::String dataFolder = originalDataFolder + c_locations[i];
-                addResourceLocation( dataFolder, "FileSystem", "General" );
-            }
-        }
-
     public:
         ImportAnimationsShareSkeletonInstanceGraphicsSystem(GameState *gameState) :
             GraphicsSystem( gameState )
@@ -58,13 +32,18 @@ int mainApp()
 #endif
 {
     ImportAnimationsShareSkeletonInstanceGameState importAnimationsShareSkeletonInstanceGameState(
-        "This sample shows how to directly import animation clips from a .skeleton file directly into a v2Mesh\n"
-        "And also how to share the same skeleton instance between components of the same actor/character.\n" );
-    ImportAnimationsShareSkeletonInstanceGraphicsSystem graphicsSystem(&importAnimationsShareSkeletonInstanceGameState);
+        "This sample shows how to directly import animation clips from multiple .skeleton files \n"
+        "directly into a single skeleton from a v2Mesh\n"
+        "And also how to share the same skeleton instance between components of the same\n"
+        "actor/character. For example, an RPG player wearing armour, boots, helmets, etc.\n"
+        "In this sample, the feet, hands, head, legs and torso are all separate items using\n"
+        "the same skeleton." );
+    ImportAnimationsShareSkeletonInstanceGraphicsSystem graphicsSystem(
+                &importAnimationsShareSkeletonInstanceGameState );
 
-    importAnimationsShareSkeletonInstanceGameState._notifyGraphicsSystem(&graphicsSystem);
+    importAnimationsShareSkeletonInstanceGameState._notifyGraphicsSystem( &graphicsSystem );
 
-    graphicsSystem.initialize( "Using TagPoints to attach nodes to Skeleton Bones" );
+    graphicsSystem.initialize( "Import animations & share skeleton" );
 
     if( graphicsSystem.getQuit() )
     {

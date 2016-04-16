@@ -387,21 +387,36 @@ namespace Ogre
         return 0;    
     }
     //-----------------------------------------------------------------------------------
-    void SkeletonInstance::addAnimationsFromSkeleton(const String &skelName, const String &groupName) {
-        SkeletonDefPtr defition = SkeletonManager::getSingleton().getSkeletonDef(skelName, groupName);
+    void SkeletonInstance::addAnimationsFromSkeleton( const String &skelName, const String &groupName )
+    {
+        //First save BoneWeightPtr which would otherwise be freed during mAnimations' resize
+        //SkeletonAnimation does not follow the rule of 3
+        //https://en.wikipedia.org/wiki/Rule_of_three_(C%2B%2B_programming)
+        typedef vector< RawSimdUniquePtr<ArrayReal, MEMCATEGORY_ANIMATION> >::type BoneWeightPtrVec;
+        const size_t oldNumAnimations = mAnimations.size();
+        BoneWeightPtrVec boneWeightPtrs( mAnimations.size() );
 
-        const SkeletonAnimationDefVec &animationDefs = defition->getAnimationDefs();
-        mAnimations.reserve(mAnimations.size() + animationDefs.size());
+        for( size_t i=0; i<oldNumAnimations; ++i )
+            mAnimations[i]._swapBoneWeightsUniquePtr( boneWeightPtrs[i] );
+
+        SkeletonDefPtr definition = SkeletonManager::getSingleton().getSkeletonDef(skelName, groupName);
+
+        const SkeletonAnimationDefVec &animationDefs = definition->getAnimationDefs();
+        mAnimations.reserve( mAnimations.size() + animationDefs.size() );
 
         SkeletonAnimationDefVec::const_iterator itor = animationDefs.begin();
-        SkeletonAnimationDefVec::const_iterator end = animationDefs.end();
-        while (itor != end)
+        SkeletonAnimationDefVec::const_iterator end  = animationDefs.end();
+        while( itor != end )
         {
-            SkeletonAnimation animation(&(*itor), &mSlotStarts, this);
-            mAnimations.push_back(animation);
+            SkeletonAnimation animation( &(*itor), &mSlotStarts, this );
+            mAnimations.push_back( animation );
             mAnimations.back()._initialize();
             ++itor;
         }
+
+        //Restore the BoneWeightPtr
+        for( size_t i=0; i<oldNumAnimations; ++i )
+            mAnimations[i]._swapBoneWeightsUniquePtr( boneWeightPtrs[i] );
     }
     //-----------------------------------------------------------------------------------
     void SkeletonInstance::_enableAnimation( SkeletonAnimation *animation )

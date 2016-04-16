@@ -38,7 +38,7 @@ namespace Demo
         bool halfUVs = true;
         bool useQtangents = false;
 
-        { // Prepare char_reference mesh
+        {   // Prepare char_reference mesh
             v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
                 "char_reference.mesh", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
                 Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC);
@@ -49,63 +49,72 @@ namespace Demo
         }
 
         size_t numParts = 5;
-        Ogre::String parts[] = { "char_feet.mesh", "char_hands.mesh", "char_head.mesh",
-            "char_legs.mesh", "char_torso.mesh" };
+        const Ogre::String parts[] =
+        {
+            "char_feet.mesh", "char_hands.mesh", "char_head.mesh", "char_legs.mesh", "char_torso.mesh"
+        };
 
         // Prepare parts
-        for (size_t i = 0; i< numParts; ++i) {
+        for( size_t i = 0; i< numParts; ++i )
+        {
             v1Mesh = Ogre::v1::MeshManager::getSingleton().load(
-                parts[i], Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-                Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC);
+                        parts[i], Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                        Ogre::v1::HardwareBuffer::HBU_STATIC, Ogre::v1::HardwareBuffer::HBU_STATIC );
             v2Mesh = Ogre::MeshManager::getSingleton().createManual(
-                parts[i], Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-            v2Mesh->importV1(v1Mesh.get(), halfPosition, halfUVs, useQtangents);
+                        parts[i], Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME );
+            v2Mesh->importV1( v1Mesh.get(), halfPosition, halfUVs, useQtangents );
             v1Mesh->unload();
         }
 
-        Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode(Ogre::SCENE_DYNAMIC)->
-            createChildSceneNode(Ogre::SCENE_DYNAMIC);
+        Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
+                createChildSceneNode( Ogre::SCENE_DYNAMIC );
 
-        Ogre::Item *charItem = sceneManager->createItem("char_reference.mesh",
-            Ogre::ResourceGroupManager::
-            AUTODETECT_RESOURCE_GROUP_NAME,
-            Ogre::SCENE_DYNAMIC);
-        sceneNode->attachObject(charItem);
+        //Create the master.
+        Ogre::Item *charItem = sceneManager->createItem( "char_reference.mesh",
+                                                         Ogre::ResourceGroupManager::
+                                                         AUTODETECT_RESOURCE_GROUP_NAME,
+                                                         Ogre::SCENE_DYNAMIC );
+        sceneNode->attachObject( charItem );
 
-        for (size_t i = 0; i< numParts; ++i) {
-            Ogre::Item* charPart = sceneManager->createItem(parts[i],
-                Ogre::ResourceGroupManager::
-                AUTODETECT_RESOURCE_GROUP_NAME,
-                Ogre::SCENE_DYNAMIC);
-            sceneNode->attachObject(charPart);
-            charPart->useSkeletonInstanceFrom(charItem);
+        for( size_t i = 0; i<numParts; ++i )
+        {
+            //Create the slaves, and make them use the skeleton from the master.
+            Ogre::Item* charPart = sceneManager->createItem( parts[i],
+                                                             Ogre::ResourceGroupManager::
+                                                             AUTODETECT_RESOURCE_GROUP_NAME,
+                                                             Ogre::SCENE_DYNAMIC );
+            sceneNode->attachObject( charPart );
+            charPart->useSkeletonInstanceFrom( charItem );
         }
 
         {
+            //Import animation from char_mining.skeleton
             Ogre::SkeletonInstance *skeletonInstance = charItem->getSkeletonInstance();
-            skeletonInstance->addAnimationsFromSkeleton("char_mining.skeleton", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-            mAnyAnimation = skeletonInstance->getAnimation("char_mining");
-            mAnyAnimation->setEnabled(true);
+            skeletonInstance->addAnimationsFromSkeleton( "char_mining.skeleton",
+                                                         Ogre::ResourceGroupManager::
+                                                         AUTODETECT_RESOURCE_GROUP_NAME );
+            mAnyAnimation = skeletonInstance->getAnimation( "char_mining" );
+            mAnyAnimation->setEnabled( true );
         }
 
         Ogre::Light *light = sceneManager->createLight();
         Ogre::SceneNode *lightNode = sceneManager->getRootSceneNode()->createChildSceneNode();
-        lightNode->attachObject(light);
-        light->setPowerScale(Ogre::Math::PI); //Since we don't do HDR, counter the PBS' division by PI
-        light->setType(Ogre::Light::LT_DIRECTIONAL);
-        light->setDirection(Ogre::Vector3(-1, -1, -1).normalisedCopy());
+        lightNode->attachObject( light );
+        light->setPowerScale( Ogre::Math::PI ); //Since we don't do HDR, counter the PBS' division by PI
+        light->setType( Ogre::Light::LT_DIRECTIONAL );
+        light->setDirection( Ogre::Vector3(-1, -1, -1).normalisedCopy() );
 
-        mCameraController = new CameraController(mGraphicsSystem, false);
+        mCameraController = new CameraController( mGraphicsSystem, false );
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
-        camera->setPosition(Ogre::Vector3(0, 2.5, 4));
+        camera->setPosition( Ogre::Vector3( 0, 2.5, 4 ) );
 
         TutorialGameState::createScene01();
     }
     //-----------------------------------------------------------------------------------
-    void ImportAnimationsShareSkeletonInstanceGameState::update(float timeSinceLast)
+    void ImportAnimationsShareSkeletonInstanceGameState::update( float timeSinceLast )
     {        
-        mAnyAnimation->addTime(timeSinceLast);
+        mAnyAnimation->addTime( timeSinceLast );
 
-        TutorialGameState::update(timeSinceLast);
+        TutorialGameState::update( timeSinceLast );
     }
 }

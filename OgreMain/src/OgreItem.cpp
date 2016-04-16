@@ -139,14 +139,14 @@ namespace Ogre {
 
         // If mesh is skeletally animated: destroy instance
         assert( mManager || !mSkeletonInstance );
-        if ( mSkeletonInstance )
+        if( mSkeletonInstance )
         {
             mSkeletonInstance->_decrementRefCount();
-            if ( mSkeletonInstance->_getRefCount() <= 0 ) {
+            if( mSkeletonInstance->_getRefCount() == 0u )
                 mManager->destroySkeletonInstance( mSkeletonInstance );
-            }
+
+            mSkeletonInstance = 0;
         }
-        mSkeletonInstance = 0;
 
         mInitialised = false;
     }
@@ -282,38 +282,43 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Item::useSkeletonInstanceFrom(Item* master)
     {
-        if ( mMesh->getSkeletonName() != master->mMesh->getSkeletonName() )
+        if( mMesh->getSkeletonName() != master->mMesh->getSkeletonName() )
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                "Cannot share skeleton instance if meshes use different skeletons ", "Item::shareSkeletonInstanceWith");
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Cannot share skeleton instance if meshes use different skeletons",
+                         "Item::useSkeletonInstanceFrom" );
         }
 
-        if ( mSkeletonInstance )
+        if( mSkeletonInstance )
         {
             mSkeletonInstance->_decrementRefCount();
-            if ( mSkeletonInstance->_getRefCount() <= 0 ) {
+            if( mSkeletonInstance->_getRefCount() == 0u )
                 mManager->destroySkeletonInstance( mSkeletonInstance );
-            }
-        }        
+        }
+
         mSkeletonInstance = master->mSkeletonInstance;
         mSkeletonInstance->_incrementRefCount();
     }
     //-----------------------------------------------------------------------
     void Item::stopUsingSkeletonInstanceFromMaster()
     {
-        if (mSkeletonInstance)
+        if( mSkeletonInstance )
         {
+            assert( mSkeletonInstance->_getRefCount() > 1u &&
+                    "This skeleton is Item is not sharing its skeleton!" );
+
             mSkeletonInstance->_decrementRefCount();
-            if (mSkeletonInstance->_getRefCount() <= 0) {
-                mManager->destroySkeletonInstance(mSkeletonInstance);
-            }
-            mSkeletonInstance = 0;
+            if( mSkeletonInstance->_getRefCount() == 0u )
+                mManager->destroySkeletonInstance( mSkeletonInstance );
+
+            const SkeletonDef *skeletonDef = mMesh->getSkeleton().get();
+            mSkeletonInstance = mManager->createSkeletonInstance( skeletonDef );
         }
     }
     //-----------------------------------------------------------------------
     bool Item::sharesSkeletonInstance() const             
     { 
-        return mSkeletonInstance && mSkeletonInstance->_getRefCount() > 1; 
+        return mSkeletonInstance && mSkeletonInstance->_getRefCount() > 1u;
     }
     //-----------------------------------------------------------------------
     void Item::_notifyParentNodeMemoryChanged(void)
