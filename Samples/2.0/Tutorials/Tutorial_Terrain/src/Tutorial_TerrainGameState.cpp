@@ -24,6 +24,9 @@
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreRenderTexture.h"
 
+#include "OgreLwString.h"
+#include "OgreGpuProgramManager.h"
+
 using namespace Demo;
 
 namespace Demo
@@ -168,15 +171,50 @@ namespace Demo
     void Tutorial_TerrainGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
         TutorialGameState::generateDebugText( timeSinceLast, outText );
-        outText += "\n+/- to change time of day. [";
-        outText += Ogre::StringConverter::toString( mTimeOfDay * 180.0f / Ogre::Math::PI ) + "]";
-        outText += "\n9/6 to change azimuth. [";
-        outText += Ogre::StringConverter::toString( mAzimuth * 180.0f / Ogre::Math::PI ) + "]";
+
+        if( mDisplayHelpMode == 0 )
+        {
+            outText += "\nCtrl+F4 will reload Terra's shaders.";
+        }
+        else if( mDisplayHelpMode == 1 )
+        {
+            char tmp[128];
+            Ogre::LwString str( Ogre::LwString::FromEmptyPointer(tmp, sizeof(tmp)) );
+            Ogre::Vector3 camPos = mGraphicsSystem->getCamera()->getPosition();
+
+            using namespace Ogre;
+
+            outText += "\n+/- to change time of day. [";
+            outText += StringConverter::toString( mTimeOfDay * 180.0f / Math::PI ) + "]";
+            outText += "\n9/6 to change azimuth. [";
+            outText += StringConverter::toString( mAzimuth * 180.0f / Math::PI ) + "]";
+            outText += "\n\nCamera: ";
+            str.a( "[", LwString::Float( camPos.x, 2, 2 ), ", ",
+                        LwString::Float( camPos.y, 2, 2 ), ", ",
+                        LwString::Float( camPos.z, 2, 2 ), "]" );
+            outText += str.c_str();
+            outText += "\nLightDir: ";
+            str.clear();
+            str.a( "[", LwString::Float( mSunLight->getDirection().x, 2, 2 ), ", ",
+                        LwString::Float( mSunLight->getDirection().y, 2, 2 ), ", ",
+                        LwString::Float( mSunLight->getDirection().z, 2, 2 ), "]" );
+            outText += str.c_str();
+        }
     }
     //-----------------------------------------------------------------------------------
     void Tutorial_TerrainGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
-        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
+        if( arg.keysym.sym == SDLK_F4 && (arg.keysym.mod & (KMOD_LCTRL|KMOD_RCTRL)) )
+        {
+            //Hot reload of Terra shaders.
+            Ogre::Root *root = mGraphicsSystem->getRoot();
+            Ogre::HlmsManager *hlmsManager = root->getHlmsManager();
+
+            Ogre::Hlms *hlms = hlmsManager->getHlms( Ogre::HLMS_USER3 );
+            Ogre::GpuProgramManager::getSingleton().clearMicrocodeCache();
+            hlms->reloadFrom( hlms->getDataFolder() );
+        }
+        else if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
         {
             TutorialGameState::keyReleased( arg );
             return;
