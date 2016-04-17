@@ -374,6 +374,7 @@ namespace Ogre
 
         Archive* getDataFolder(void)                        { return mDataFolder; }
         const LibraryVec& getPiecesLibrary(void) const      { return mLibrary; }
+        ArchiveVec getPiecesLibraryAsArchiveVec(void) const;
 
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks
@@ -561,6 +562,8 @@ namespace Ogre
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
+        int32 _getProperty( IdString key, int32 defaultVal=0 ) const
+                                                { return getProperty( key, defaultVal ); }
 
         /// Utility helper, mostly useful to HlmsListener implementations.
         static int32 getProperty( const HlmsPropertyVec &properties,

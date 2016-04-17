@@ -98,7 +98,20 @@ namespace Demo
                             dataFolder + "Hlms/Terra/" + shaderSyntax,
                             "FileSystem", true );
             Ogre::HlmsTerra *hlmsTerra = OGRE_NEW Ogre::HlmsTerra( archiveTerra, &library );
-            Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsTerra );
+            Ogre::HlmsManager *hlmsManager = mRoot->getHlmsManager();
+            hlmsManager->registerHlms( hlmsTerra );
+
+            //Add Terra's piece files that customize the PBS implementation.
+            //These pieces are coded so that they will be activated when
+            //we set the HlmsPbsTerraShadows listener and there's an active Terra
+            //(see Tutorial_TerrainGameState::createScene01)
+            Ogre::Hlms *hlmsPbs = hlmsManager->getHlms( Ogre::HLMS_PBS );
+            Ogre::Archive *archivePbs = hlmsPbs->getDataFolder();
+            Ogre::ArchiveVec libraryPbs = hlmsPbs->getPiecesLibraryAsArchiveVec();
+            libraryPbs.push_back( Ogre::ArchiveManager::getSingletonPtr()->load(
+                                      dataFolder + "Hlms/Terra/" + shaderSyntax + "/PbsTerraShadows",
+                                      "FileSystem", true ) );
+            hlmsPbs->reloadFrom( archivePbs, &libraryPbs );
         }
 
     public:

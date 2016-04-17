@@ -1393,6 +1393,21 @@ namespace Ogre
         enumeratePieceFiles();
     }
     //-----------------------------------------------------------------------------------
+    ArchiveVec Hlms::getPiecesLibraryAsArchiveVec(void) const
+    {
+        ArchiveVec retVal;
+        LibraryVec::const_iterator itor = mLibrary.begin();
+        LibraryVec::const_iterator end  = mLibrary.end();
+
+        while( itor != end )
+        {
+            retVal.push_back( itor->dataFolder );
+            ++itor;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDatablock( IdString name, const String &refName,
                                           const HlmsMacroblock &macroblockRef,
                                           const HlmsBlendblock &blendblockRef,

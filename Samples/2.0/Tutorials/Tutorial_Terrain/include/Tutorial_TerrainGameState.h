@@ -8,6 +8,7 @@
 namespace Ogre
 {
     class Terra;
+    class HlmsPbsTerraShadows;
 }
 
 namespace Demo
@@ -18,6 +19,9 @@ namespace Demo
         float mAzimuth;
         Ogre::Terra *mTerra;
         Ogre::Light *mSunLight;
+
+        /// Listener to make PBS objects also be affected by terrain's shadows
+        Ogre::HlmsPbsTerraShadows *mHlmsPbsTerraShadows;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 

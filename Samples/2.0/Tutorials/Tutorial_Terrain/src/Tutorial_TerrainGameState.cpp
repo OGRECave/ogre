@@ -14,6 +14,7 @@
 
 #include "Terra/Terra.h"
 #include "Terra/TerraShadowMapper.h"
+#include "Terra/Hlms/PbsListener/OgreHlmsPbsTerraShadows.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
 #include "Compositor/OgreCompositorManager2.h"
@@ -36,7 +37,8 @@ namespace Demo
         mTimeOfDay( Ogre::Math::PI * /*0.25f*/0.55f ),
         mAzimuth( 0 ),
         mTerra( 0 ),
-        mSunLight( 0 )
+        mSunLight( 0 ),
+        mHlmsPbsTerraShadows( 0 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -136,6 +138,14 @@ namespace Demo
         //datablock->setMacroblock( macroblock );
         mTerra->setDatablock( datablock );
 
+        {
+            mHlmsPbsTerraShadows = new Ogre::HlmsPbsTerraShadows();
+            mHlmsPbsTerraShadows->setTerra( mTerra );
+            //Set the PBS listener so regular objects also receive terrain shadows
+            Ogre::Hlms *hlmsPbs = root->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+            hlmsPbs->setListener( mHlmsPbsTerraShadows );
+        }
+
         mSunLight = sceneManager->createLight();
         Ogre::SceneNode *lightNode = rootNode->createChildSceneNode();
         lightNode->attachObject( mSunLight );
@@ -151,6 +161,17 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void Tutorial_TerrainGameState::destroyScene(void)
     {
+        Ogre::Root *root = mGraphicsSystem->getRoot();
+        Ogre::Hlms *hlmsPbs = root->getHlmsManager()->getHlms( Ogre::HLMS_PBS );
+
+        //Unset the PBS listener and destroy it
+        if( hlmsPbs->getListener() == mHlmsPbsTerraShadows )
+        {
+            hlmsPbs->setListener( 0 );
+            delete mHlmsPbsTerraShadows;
+            mHlmsPbsTerraShadows = 0;
+        }
+
         delete mTerra;
         mTerra = 0;
 

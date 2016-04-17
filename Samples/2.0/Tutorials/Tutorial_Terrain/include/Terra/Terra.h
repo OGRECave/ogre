@@ -105,6 +105,10 @@ namespace Ogre
         Ogre::TexturePtr getHeightMapTex(void) const    { return m_heightMapTex; }
         Ogre::TexturePtr getNormalMapTex(void) const    { return m_normalMapTex; }
         Ogre::TexturePtr _getShadowMapTex(void) const;
+
+        const Vector2& getXZDimensions(void) const      { return m_xzDimensions; }
+        float getHeight(void) const                     { return m_height; }
+        const Vector3& getTerrainOrigin(void) const     { return m_terrainOrigin; }
     };
 }
 
