@@ -190,12 +190,14 @@ namespace Demo
 
         mTerra->update( mSunLight->getDerivedDirectionUpdated() );
 
+        TutorialGameState::update( timeSinceLast );
+
+        //Camera must be locked to ground *after* we've moved it. Otherwise
+        //fast motion may go below the terrain for 1 or 2 frames.
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         Ogre::Vector3 camPos = camera->getPosition();
         if( mLockCameraToGround && mTerra->getHeightAt( camPos ) )
             camera->setPosition( camPos + Ogre::Vector3::UNIT_Y * 10.0f );
-
-        TutorialGameState::update( timeSinceLast );
     }
     //-----------------------------------------------------------------------------------
     void Tutorial_TerrainGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
