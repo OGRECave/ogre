@@ -34,6 +34,7 @@ namespace Demo
 {
     Tutorial_TerrainGameState::Tutorial_TerrainGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
+        mLockCameraToGround( false ),
         mTimeOfDay( Ogre::Math::PI * /*0.25f*/0.55f ),
         mAzimuth( 0 ),
         mTerra( 0 ),
@@ -189,6 +190,11 @@ namespace Demo
 
         mTerra->update( mSunLight->getDerivedDirectionUpdated() );
 
+        Ogre::Camera *camera = mGraphicsSystem->getCamera();
+        Ogre::Vector3 camPos = camera->getPosition();
+        if( mLockCameraToGround && mTerra->getHeightAt( camPos ) )
+            camera->setPosition( camPos + Ogre::Vector3::UNIT_Y * 10.0f );
+
         TutorialGameState::update( timeSinceLast );
     }
     //-----------------------------------------------------------------------------------
@@ -208,6 +214,8 @@ namespace Demo
 
             using namespace Ogre;
 
+            outText += "\nF1 Lock Camera to Ground: [";
+            outText += mLockCameraToGround ? "Yes]" : "No]";
             outText += "\n+/- to change time of day. [";
             outText += StringConverter::toString( mTimeOfDay * 180.0f / Math::PI ) + "]";
             outText += "\n9/6 to change azimuth. [";
@@ -255,7 +263,8 @@ namespace Demo
             mTimeOfDay -= 0.1f;
             mTimeOfDay = Ogre::max( mTimeOfDay, 0 );
         }
-        else if( arg.keysym.scancode == SDL_SCANCODE_KP_9 )
+
+        if( arg.keysym.scancode == SDL_SCANCODE_KP_9 )
         {
             mAzimuth += 0.1f;
             mAzimuth = fmodf( mAzimuth, Ogre::Math::TWO_PI );
@@ -265,7 +274,12 @@ namespace Demo
             mAzimuth -= 0.1f;
             mAzimuth = fmodf( mAzimuth, Ogre::Math::TWO_PI );
             if( mAzimuth < 0 )
-                mAzimuth = Ogre::Math::TWO_PI - mAzimuth;
+                mAzimuth = Ogre::Math::TWO_PI + mAzimuth;
+        }
+
+        if( arg.keysym.scancode == SDL_SCANCODE_F1 )
+        {
+            mLockCameraToGround = !mLockCameraToGround;
         }
         else
         {

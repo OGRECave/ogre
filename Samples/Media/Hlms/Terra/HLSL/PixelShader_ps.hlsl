@@ -226,12 +226,12 @@ float3 qmul( float4 q, float3 v )
 
 @property( !detail_maps_normal )
 	// Geometric normal
-	nNormal = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xyz;
+	nNormal = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xyz * 2.0f - 1.0f;
 	//nNormal.xz = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xy;
-	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x + nNormal.z * nNormal.z, 0.0 ) );
+	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x - nNormal.z * nNormal.z, 0.0 ) );
 	nNormal = mul( (float3x3)passBuf.view, nNormal );
 @end @property( detail_maps_normal )
-	float3 geomNormal = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xyz;
+	float3 geomNormal = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xyz * 2.0f - 1.0f;
 	geomNormal = mul( (float3x3)passBuf.view, geomNormal );
 
 	//Get the TBN matrix

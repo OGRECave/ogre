@@ -169,7 +169,9 @@ namespace Ogre
                     "NormalMapTex_" + StringConverter::toString( getId() ),
                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                     TEX_TYPE_2D, m_heightMapTex->getWidth(), m_heightMapTex->getHeight(),
-                    0, PF_R8G8B8A8_SNORM, TU_RENDERTARGET|TU_AUTOMIPMAP );
+                    PixelUtil::getMaxMipmapCount( m_heightMapTex->getWidth(),
+                                                  m_heightMapTex->getHeight() ),
+                    PF_A2B10G10R10, TU_RENDERTARGET|TU_AUTOMIPMAP );
 
         MaterialPtr normalMapperMat = MaterialManager::getSingleton().load(
                     "Terra/GpuNormalMapper",

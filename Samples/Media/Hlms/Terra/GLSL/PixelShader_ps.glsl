@@ -270,12 +270,12 @@ void main()
 
 @property( !detail_maps_normal )
 	// Geometric normal
-	nNormal = texture( terrainNormals, inPs.uv0.xy ).xyz;
+	nNormal = texture( terrainNormals, inPs.uv0.xy ).xyz * 2.0 - 1.0;
 	//nNormal.xz = texture( terrainNormals, inPs.uv0.xy ).xy;
-	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x + nNormal.z * nNormal.z, 0.0 ) );
+	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x - nNormal.z * nNormal.z, 0.0 ) );
 	nNormal = mat3(pass.view) * nNormal;
 @end @property( detail_maps_normal )
-	vec3 geomNormal = texture( terrainNormals, inPs.uv0.xy ).xyz;
+	vec3 geomNormal = texture( terrainNormals, inPs.uv0.xy ).xyz * 2.0 - 1.0;
 	geomNormal = mat3(pass.view) * geomNormal;
 
 	//Get the TBN matrix

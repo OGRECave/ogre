@@ -15,6 +15,7 @@ namespace Demo
 {
     class Tutorial_TerrainGameState : public TutorialGameState
     {
+        bool mLockCameraToGround;
         float mTimeOfDay;
         float mAzimuth;
         Ogre::Terra *mTerra;
