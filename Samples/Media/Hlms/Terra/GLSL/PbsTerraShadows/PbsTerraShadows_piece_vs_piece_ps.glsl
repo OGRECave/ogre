@@ -25,14 +25,15 @@
     vec3 terraShadowData = texture( terrainShadows, worldPos.xz * pass.terraBounds.xz ).xyz;
     float terraHeightWeight = worldPos.y * pass.terraBounds.y + pass.terraBounds.w;
     terraHeightWeight = (terraHeightWeight - terraShadowData.y) * terraShadowData.z * 1023.0;
-    outVs.terrainShadow = mix( terraShadowData.x, 1.0, saturate( terraHeightWeight ) );
+    outVs.terrainShadow = mix( terraShadowData.x, 1.0, clamp( terraHeightWeight, 0.0, 1.0 ) );
 @end
 
-/// Make shadows consider terrain's shadows. Terrain shadows will not be applied if
-/// the object isn't receiving regular shadows, which keeps things consistent.
-/// (actually we do this just because it's easier)
 @property( hlms_num_shadow_maps )
     @piece( custom_ps_preLights )fShadow *= inPs.terrainShadow;@end
+@end @property( !hlms_num_shadow_maps )
+    @piece( custom_ps_preLights )float fShadow = inPs.terrainShadow;@end
 @end
+
+@piece( custom_ps_posExecution )	outColour.xyz = fShadow.xxx;@end
 
 @end

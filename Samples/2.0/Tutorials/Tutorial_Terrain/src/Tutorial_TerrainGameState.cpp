@@ -2,6 +2,7 @@
 #include "Tutorial_TerrainGameState.h"
 #include "CameraController.h"
 #include "GraphicsSystem.h"
+#include "Utils/MeshUtils.h"
 
 #include "OgreSceneManager.h"
 
@@ -27,6 +28,8 @@
 
 #include "OgreLwString.h"
 #include "OgreGpuProgramManager.h"
+
+#include "OgreItem.h"
 
 using namespace Demo;
 
@@ -156,6 +159,32 @@ namespace Demo
 
         mCameraController = new CameraController( mGraphicsSystem, false );
         mGraphicsSystem->getCamera()->setFarClipDistance( 100000.0f );
+
+
+        MeshUtils::importV1Mesh( "tudorhouse.mesh",
+                                 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+
+        //Create some meshes to show off terrain shadows.
+        Ogre::Item *item = sceneManager->createItem( "tudorhouse.mesh",
+                                                     Ogre::ResourceGroupManager::
+                                                     AUTODETECT_RESOURCE_GROUP_NAME,
+                                                     Ogre::SCENE_STATIC );
+        Ogre::Vector3 objPos( 3.5f, 4.5f, -2.0f );
+        mTerra->getHeightAt( objPos );
+        objPos.y += -Ogre::min( item->getLocalAabb().getMinimum().y, 0.0f ) * 0.01f;
+        sceneNode = rootNode->createChildSceneNode( Ogre::SCENE_STATIC, objPos );
+        sceneNode->scale( 0.01f, 0.01f, 0.01f );
+        sceneNode->attachObject( item );
+
+        item = sceneManager->createItem( "tudorhouse.mesh",
+                                         Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
+                                         Ogre::SCENE_STATIC );
+        objPos = Ogre::Vector3( -3.5f, 4.5f, -2.0f );
+        mTerra->getHeightAt( objPos );
+        objPos.y += -Ogre::min( item->getLocalAabb().getMinimum().y, 0.0f ) * 0.01f;
+        sceneNode = rootNode->createChildSceneNode( Ogre::SCENE_STATIC, objPos );
+        sceneNode->scale( 0.01f, 0.01f, 0.01f );
+        sceneNode->attachObject( item );
 
         TutorialGameState::createScene01();
     }
