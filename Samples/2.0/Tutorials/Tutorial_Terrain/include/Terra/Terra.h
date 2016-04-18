@@ -94,6 +94,16 @@ namespace Ogre
 
         void load( const String &texName, const Vector3 center, const Vector3 &dimensions );
 
+        /** Gets the interpolated height at the given location.
+            If outside the bounds, it leaves the height untouched.
+        @param vPos
+            [in] XZ position, Y for default height.
+            [out] Y height, or default Y (from input) if outside terrain bounds.
+        @return
+            True if Y component was changed
+        */
+        bool getHeightAt( Vector3 &vPos ) const;
+
         /// load must already have been called.
         void setDatablock( HlmsDatablock *datablock );
 

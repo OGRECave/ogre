@@ -542,6 +542,53 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    bool Terra::getHeightAt( Vector3 &vPos ) const
+    {
+        bool retVal = false;
+        GridPoint pos2D = worldToGrid( vPos );
+
+        if( pos2D.x < m_width-1 && pos2D.z < m_depth-1 )
+        {
+            const Vector2 vPos2D = gridToWorld( pos2D );
+
+            const float dx = (vPos.x - vPos2D.x) * m_width * m_xzInvDimensions.x;
+            const float dz = (vPos.z - vPos2D.y) * m_depth * m_xzInvDimensions.y;
+
+            float a, b, c;
+            const float h00 = m_heightMap[ pos2D.z * m_width + pos2D.x ];
+            const float h11 = m_heightMap[ (pos2D.z+1) * m_width + pos2D.x + 1 ];
+
+            c = h00;
+            if( dx < dz )
+            {
+                //Plane eq: y = ax + bz + c
+                //x=0 z=0 -> c		= h00
+                //x=0 z=1 -> b + c	= h01 -> b = h01 - c
+                //x=1 z=1 -> a + b + c  = h11 -> a = h11 - b - c
+                const float h01 = m_heightMap[ (pos2D.z+1) * m_width + pos2D.x ];
+
+                b = h01 - c;
+                a = h11 - b - c;
+            }
+            else
+            {
+                //Plane eq: y = ax + bz + c
+                //x=0 z=0 -> c		= h00
+                //x=1 z=0 -> a + c	= h10 -> a = h10 - c
+                //x=1 z=1 -> a + b + c  = h11 -> b = h11 - a - c
+                const float h10 = m_heightMap[ pos2D.z * m_width + pos2D.x + 1 ];
+
+                a = h10 - c;
+                b = h11 - a - c;
+            }
+
+            vPos.y = a * dx + b * dz + c + m_terrainOrigin.y;
+            retVal = true;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void Terra::setDatablock( HlmsDatablock *datablock )
     {
         std::vector<TerrainCell>::iterator itor = m_terrainCells.begin();
