@@ -34,7 +34,6 @@ THE SOFTWARE.
 #include "OgreViewport.h"
 #include "OgreLogManager.h"
 #include "OgreRenderSystem.h"
-#include "OgreImageCodec.h"
 #include "OgreStringConverter.h"
 #include "OgreException.h"
 #include "OgreWin32GLSupport.h"
@@ -42,6 +41,7 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreGL3PlusPixelFormat.h"
 #include "OgreDepthBuffer.h"
+
 
 namespace Ogre {
 
@@ -479,17 +479,24 @@ namespace Ogre {
         }
         if (mOwnsGLContext)
         {
-            mGlrc = wglCreateContext(mHDC);
+			int major = 3, minor = 3;
+			int attribList[] =
+			{
+				WGL_CONTEXT_MAJOR_VERSION_ARB, major,
+				WGL_CONTEXT_MINOR_VERSION_ARB, minor,
+				WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB
+#if OGRE_DEBUG_MODE
+				| WGL_CONTEXT_DEBUG_BIT_ARB,
+#endif
+				WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+				0
+			};
+
+			mGlrc = wglCreateContextAttribsARB(mHDC, old_context, attribList);
+
             if (!mGlrc)
                 OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
                 "wglCreateContext failed: " + translateWGLError(), "Win32Window::create");
-        }
-
-        if (old_context && old_context != mGlrc)
-        {
-            // Share lists with old context
-            if (!wglShareLists(old_context, mGlrc))
-                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, "wglShareLists() failed", " Win32Window::create");
         }
 
         if (!wglMakeCurrent(mHDC, mGlrc))

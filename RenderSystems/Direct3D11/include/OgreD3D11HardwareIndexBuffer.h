@@ -34,7 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre { 
 
-    class D3D11HardwareIndexBuffer : public HardwareIndexBuffer
+    class _OgreD3D11Export D3D11HardwareIndexBuffer : public HardwareIndexBuffer
     {
     protected:
         D3D11HardwareBuffer* mBufferImpl;

@@ -37,7 +37,7 @@ namespace Ogre
     class D3D11VideoModeList;
     class D3D11VideoMode;
 
-    class D3D11Driver
+    class _OgreD3D11Export D3D11Driver
     {
     private:
         ComPtr<IDXGIAdapterN> mDXGIAdapter;

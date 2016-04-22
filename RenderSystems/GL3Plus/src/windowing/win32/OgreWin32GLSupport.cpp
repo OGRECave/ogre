@@ -40,6 +40,8 @@
 using namespace Ogre;
 
 namespace Ogre {
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = 0;
+
     Win32GLSupport::Win32GLSupport()
         : mInitialWindow(0)
         , mHasPixelFormatARB(false)
@@ -557,6 +559,9 @@ namespace Ogre {
             // if wglMakeCurrent fails, wglGetProcAddress will return null
             wglMakeCurrent(hdc, hrc);
             
+			wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)
+				wglGetProcAddress("wglCreateContextAttribsARB");
+
             PFNWGLGETEXTENSIONSSTRINGARBPROC _wglGetExtensionsStringARB =
                 (PFNWGLGETEXTENSIONSSTRINGARBPROC)
                 wglGetProcAddress("wglGetExtensionsStringARB");

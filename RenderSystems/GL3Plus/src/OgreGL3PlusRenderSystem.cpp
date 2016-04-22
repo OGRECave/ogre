@@ -2266,7 +2266,7 @@ namespace Ogre {
 
         if (mGLSupport->checkExtension("GL_KHR_debug") || mHasGL43)
         {
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE && ENABLE_GL_DEBUG_OUTPUT
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT));
             OGRE_CHECK_GL_ERROR(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
             OGRE_CHECK_GL_ERROR(glDebugMessageCallbackARB(&GLDebugCallback, NULL));
@@ -2286,11 +2286,11 @@ namespace Ogre {
         if (mCurrentContext)
             mCurrentContext->setCurrent();
 
-        // Initialise GL3W
-        if (gl3wInit()) { // gl3wInit() fails if GL3.0 is not supported
+		// Initialise GL3W
+		if (gl3wInit()) { // gl3wInit() fails if GL3.0 is not supported
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "OpenGL 3.0 is not supported",
-                        "GL3PlusRenderSystem::initialiseContext");
+				"OpenGL 3.0 is not supported",
+				"GL3PlusRenderSystem::initialiseContext");
         }
 
         // Setup GL3PlusSupport

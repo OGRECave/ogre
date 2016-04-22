@@ -114,7 +114,6 @@ namespace Ogre {
         virtual unsigned int getHeight(void) const;
         /** Overridden - see RenderWindow */
         void windowMovedOrResized(void);
-        void windowResized(void);
         void windowHasResized(void);
         void createNewWindow(unsigned int width, unsigned int height, String title);
         void createWindowFromExternal(NSView *viewRef);

@@ -42,7 +42,7 @@ THE SOFTWARE.
 
 namespace Ogre {
 	/** Specialisation of Texture for D3D11 */
-    class D3D11Texture
+    class _OgreD3D11Export D3D11Texture
         : public Texture
         , protected D3D11DeviceResource
     {
@@ -188,7 +188,7 @@ namespace Ogre {
     };
 
     /// RenderTexture implementation for D3D11
-    class D3D11RenderTexture
+    class _OgreD3D11Export D3D11RenderTexture
         : public RenderTexture
         , protected D3D11DeviceResource
     {

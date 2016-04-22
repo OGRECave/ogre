@@ -63,11 +63,13 @@ THE SOFTWARE.
 namespace Ogre {
 
     OSXCocoaWindow::OSXCocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
-        mWindowDelegate(NULL), mActive(false), mClosed(false), mHasResized(false), mIsExternal(false), mWindowTitle(""),
+        mWindowDelegate(NULL), mActive(false), mClosed(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
         mUseNSView(false), mContentScalingFactor(1.0), mContentScalingSupported(false)
     {
         GLRenderSystem *rs = static_cast<GLRenderSystem*>(Root::getSingleton().getRenderSystem());
         mContentScalingSupported = dynamic_cast<OSXGLSupport*>(rs->getGLSupportRef())->OSVersionIsAtLeast(NSAppKitVersionNumber10_7);
+        
+        // Set vsync by default to save battery and reduce tearing
     }
 
     OSXCocoaWindow::~OSXCocoaWindow()
@@ -166,6 +168,10 @@ namespace Ogre {
 			if(opt != miscParams->end())
 				mHwGamma = StringConverter::parseBool(opt->second);
 
+            opt = miscParams->find("vsync");
+            if(opt != miscParams->end())
+                mVSync = StringConverter::parseBool(opt->second);
+            
 			opt = miscParams->find("colourDepth");
 			if(opt != miscParams->end())
 				depth = StringConverter::parseUnsignedInt(opt->second);
@@ -256,8 +262,7 @@ namespace Ogre {
             mGLContext = [[NSOpenGLContext alloc] initWithFormat:mGLPixelFormat shareContext:shareContext];
         }
 
-        // Set vsync by default to save battery and reduce tearing
-        GLint swapInterval = 1;
+        GLint swapInterval = (GLint)mVSync;
         [mGLContext setValues:&swapInterval forParameter:NSOpenGLCPSwapInterval];
 
         if(miscParams)
@@ -573,37 +578,6 @@ namespace Ogre {
             [mWindow setFrame:frame display:YES];
         }
 		[mGLContext update];
-    }
-
-    void OSXCocoaWindow::windowResized()
-    {
-        // Ensure the context is current
-        if(!mIsFullScreen)
-        {
-            NSRect viewFrame = [mView frame];
-            NSRect windowFrame = [[mView window] frame];
-            NSRect screenFrame = [[NSScreen mainScreen] visibleFrame];
-
-            GLint bufferRect[4];
-            bufferRect[0] = _getPixelFromPoint(viewFrame.origin.x); // 0 = left edge
-            bufferRect[1] = _getPixelFromPoint(windowFrame.size.height - (viewFrame.origin.y + viewFrame.size.height)); // 0 = bottom edge
-            bufferRect[2] = _getPixelFromPoint(viewFrame.size.width); // width of buffer rect
-            bufferRect[3] = _getPixelFromPoint(viewFrame.size.height); // height of buffer rect
-            CGLContextObj ctx = (CGLContextObj)[mGLContext CGLContextObj];
-            CGLSetParameter(ctx, kCGLCPSwapRectangle, bufferRect);
-            [mGLContext update];
-
-            CGFloat leftPt = viewFrame.origin.x;
-            CGFloat topPt = screenFrame.size.height - viewFrame.size.height;
-            mLeft = _getPixelFromPoint(leftPt);
-            mTop = _getPixelFromPoint(topPt);
-            mWindowOriginPt = NSMakePoint(leftPt, topPt);
-        }
-        
-        for (ViewportList::iterator it = mViewportList.begin(); it != mViewportList.end(); ++it) 
-        { 
-            (*it).second->_updateDimensions(); 
-        }
     }
 
     void OSXCocoaWindow::windowHasResized()

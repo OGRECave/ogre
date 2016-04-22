@@ -83,7 +83,7 @@ namespace Ogre
 
         HighLevelGpuProgramPtr tmpDelegate;
         tmpDelegate.setNull();
-        int tmpPriority = -1;
+        int tmpPriority = -10;
 
         for (StringVector::const_iterator i = mDelegateNames.begin(); i != mDelegateNames.end(); ++i)
         {
@@ -98,7 +98,7 @@ namespace Ogre
             {
                 int priority = getPriority(deleg->getLanguage());
                 //Find the delegate with the highest prioriry
-                if (priority >= tmpPriority)
+                if (priority > tmpPriority)
                 {
                     tmpDelegate = deleg;
                     tmpPriority = priority;
