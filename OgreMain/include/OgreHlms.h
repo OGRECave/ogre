@@ -203,6 +203,8 @@ namespace Ogre
 
         typedef std::vector<Expression> ExpressionVec;
 
+        inline int interpretAsNumberThenAsProperty( const String &argValue ) const;
+
         static void copy( String &outBuffer, const SubStringRef &inSubString, size_t length );
         static void repeat( String &outBuffer, const SubStringRef &inSubString, size_t length,
                             size_t passNum, const String &counterVar );

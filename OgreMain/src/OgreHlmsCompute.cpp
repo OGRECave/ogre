@@ -136,8 +136,13 @@ namespace Ogre
                 inFile->read(&inString[0], inFile->size());
 
                 this->parseMath(inString, outString);
-                this->parseForEach(outString, inString);
-                this->parseProperties(inString, outString);
+                while( outString.find( "@foreach" ) != String::npos )
+                {
+                    this->parseForEach(outString, inString);
+                    inString.swap( outString );
+                }
+                this->parseProperties(outString, inString);
+                this->parseUndefPieces(inString, outString);
                 this->collectPieces(outString, inString);
                 this->parseCounter(inString, outString);
             }
@@ -187,8 +192,13 @@ namespace Ogre
         bool syntaxError = false;
 
         syntaxError |= this->parseMath( inString, outString );
-        syntaxError |= this->parseForEach( outString, inString );
-        syntaxError |= this->parseProperties( inString, outString );
+        while( !syntaxError && outString.find( "@foreach" ) != String::npos )
+        {
+            syntaxError |= this->parseForEach( outString, inString );
+            inString.swap( outString );
+        }
+        syntaxError |= this->parseProperties( outString, inString );
+        syntaxError |= this->parseUndefPieces( inString, outString );
         while( !syntaxError  && (outString.find( "@piece" ) != String::npos ||
                                  outString.find( "@insertpiece" ) != String::npos) )
         {
