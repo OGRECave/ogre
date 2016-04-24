@@ -60,7 +60,8 @@ RWTexture2D<@insertpiece(uav0_pf_type)> outputImage : register(u0);
 
 uniform float4 g_f4OutputSize;
 
-uniform float c_weights[@value( kernel_radius_plus1 )];
+//Tightly pack the weights
+uniform float4 c_weights[(@value( kernel_radius_plus1 ) + 3u) / 4u];
 
 @insertpiece( lds_data_type ) sampleTex( int2 i2Position , float2 f2Offset )
 {
@@ -80,7 +81,7 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 		RDI[ @iPixel ] = @insertpiece( decode_lds )( g_f3LDS[ iLineOffset ][ iPixelOffset + @value( kernel_radius ) + @iPixel ] );@end
 
 	@foreach( 4, iPixel )
-		outColour[ @iPixel ].xyz = RDI[ @iPixel ] * c_weights[ @value( kernel_radius ) ];@end
+		outColour[ @iPixel ].xyz = RDI[ @iPixel ] * c_weights[ @value( kernel_radius ) >> 2u ][ @value( kernel_radius ) & 3u ];@end
 
 	@foreach( 4, iPixel )
 		RDI[ @iPixel ] = @insertpiece( decode_lds )( g_f3LDS[ iLineOffset ][ iPixelOffset + @iPixel ] );@end
@@ -90,7 +91,7 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 	/// for ( iIteration = 0; iIteration < radius; iIteration += 1 )
 	@foreach( kernel_radius, iIteration )
 		@foreach( 4, iPixel )
-			outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @iIteration ];@end
+			outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @iIteration >> 2u ][ @iIteration & 3u ];@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
 		@foreach( 1, iPixel )
@@ -109,7 +110,7 @@ void ComputeFilterKernel( int iPixelOffset, int iLineOffset, int2 i2Center, int2
 	/// for ( iIteration = radius + 1; iIteration < ( radius * 2 + 1 ); iIteration += 1 )
 	@foreach( kernel_radius2x_plus1, iIteration, kernel_radius_plus1 )
 		@foreach( 4, iPixel )
-			outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ @value( kernel_radius2x ) - @iIteration ];@end
+			outColour[ @iPixel ].xyz += RDI[ @iPixel ] * c_weights[ (@value( kernel_radius2x ) - @iIteration) >> 2u ][ (@value( kernel_radius2x ) - @iIteration) & 3u ];@end
 		@foreach( 3, iPixel )
 			RDI[ @iPixel ] = RDI[ @iPixel + ( 1 ) ];@end
 		@foreach( 1, iPixel )
