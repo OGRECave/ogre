@@ -453,7 +453,7 @@ namespace Ogre
             {
                 mRenderSystem->_setTextureCS( slotIdx, !itTex->texture.isNull(), itTex->texture.get() );
                 if( itTex->samplerblock )
-                    mRenderSystem->_setHlmsSamplerblock( slotIdx, itTex->samplerblock );
+                    mRenderSystem->_setHlmsSamplerblockCS( slotIdx, itTex->samplerblock );
             }
 
             ++slotIdx;

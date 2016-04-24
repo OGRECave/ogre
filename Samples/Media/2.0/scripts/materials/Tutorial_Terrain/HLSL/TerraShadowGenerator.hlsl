@@ -39,21 +39,24 @@ uniform float heightDelta;
 float2 calcShadow( int2 xyPos, float2 prevHeight )
 {
 	prevHeight.x -= heightDelta;
-	prevHeight.y = prevHeight.y * 0.9 - heightDelta; //Used for the penumbra region
+	prevHeight.y = prevHeight.y * 0.985 - heightDelta; //Used for the penumbra region
 
 	float currHeight = heightMap.Load( int3( xyPos, 0 ) );
 
-	float shadowValue = smoothstep( prevHeight.y, prevHeight.x, currHeight );
+	float shadowValue = smoothstep( prevHeight.y, prevHeight.x, currHeight + 0.001 );
 	prevHeight.x = currHeight >= prevHeight.x ? currHeight : prevHeight.x;
-	prevHeight.y = currHeight >= prevHeight.x ? currHeight : prevHeight.y;
+	prevHeight.y = currHeight >= prevHeight.y ? currHeight : prevHeight.y;
 
 	//We store shadow's height in 10 bits, but the actual heightmap is in 16 bits.
-	//If we have a height of 0.9775, it will translate to 1000.96 rounding to 1001
-	//Thus when sampling, the terrain will be self shadowed by itself.
-	//We need to floor, not round.
-	float2 flooredHeight = floor( prevHeight.xy * 1024.0 ) * 0.0009765625;
-	
-	shadowMap[xyPos] = float4( shadowValue, flooredHeight.xy, 1.0 );
+	//If we have a height of 0.9775, it will translate to 999.98 rounding to 1000
+	//Thus when sampling, the objects on top of the terrain will be shadowed by the
+	//terrain at that spot. Thus we subtract 1 from the height, and add 1 to
+	//invHeightLength for a smooth gradient (which also prevents div. by zero).
+	float2 roundedHeight = floor( saturate( prevHeight.xy ) * 1023.0 + 0.5 ) - 1.0;
+	float invHeightLength = 1.0 / (roundedHeight.x - roundedHeight.y + 1); //+1 Avoids div. by zero
+	roundedHeight.y *= 0.000977517;
+
+	shadowMap[xyPos] = float4( shadowValue, roundedHeight.y, invHeightLength, 1.0 );
 	
 	return prevHeight;
 }
