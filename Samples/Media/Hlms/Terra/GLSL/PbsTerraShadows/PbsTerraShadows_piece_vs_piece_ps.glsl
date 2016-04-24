@@ -35,6 +35,4 @@
     @piece( DarkenWithShadowFirstLight )* fShadow@end
 @end
 
-@piece( custom_ps_posExecution )	outColour.xyz = fShadow.xxx;@end
-
 @end

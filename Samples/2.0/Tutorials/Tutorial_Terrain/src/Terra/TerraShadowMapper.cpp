@@ -345,22 +345,9 @@ namespace Ogre
 
         HlmsComputeJob *job = 0;
         job = hlmsCompute->findComputeJob( "Terra/GaussianBlurH" );
-        const uint32 width  = m_heightMapTex->getWidth();
-        const uint32 height = m_heightMapTex->getHeight();
-        const uint32 pixelsPerRow       = job->getThreadsPerGroupX() * 4u;
-        const uint32 rowsPerThreadGroup = job->getThreadsPerGroupY();
-
         setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
-        job->setNumThreadGroups( alignToNextMultiple( width, pixelsPerRow ) / pixelsPerRow,
-                                 alignToNextMultiple( height, rowsPerThreadGroup ) / rowsPerThreadGroup,
-                                 1u );
-
         job = hlmsCompute->findComputeJob( "Terra/GaussianBlurV" );
         setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
-
-        job->setNumThreadGroups( alignToNextMultiple( width, rowsPerThreadGroup ) / rowsPerThreadGroup,
-                                 alignToNextMultiple( height, pixelsPerRow ) / pixelsPerRow,
-                                 1u );
     }
     //-----------------------------------------------------------------------------------
     void ShadowMapper::setGaussianFilterParams( HlmsComputeJob *job, uint8 kernelRadius,

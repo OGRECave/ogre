@@ -50,6 +50,7 @@ namespace Ogre
         Ogre::TexturePtr    m_heightMapTex;
         Ogre::TexturePtr    m_normalMapTex;
 
+        Vector3             m_prevLightDir;
         ShadowMapper        *m_shadowMapper;
 
         //Ogre stuff
@@ -90,7 +91,24 @@ namespace Ogre
                uint8 renderQueueId, CompositorManager2 *compositorManager, Camera *camera );
         ~Terra();
 
-        void update( const Vector3 &lightDir );
+        /** Must be called every frame so we can check the camera's position
+            (passed in the constructor) and update our visible batches (and LODs)
+            We also update the shadow map if the light direction changed.
+        @param lightDir
+            Light direction for computing the shadow map.
+        @param lightEpsilon
+            Epsilon to consider how different light must be from previous
+            call to recompute the shadow map.
+            Interesting values are in the range [0; 2], but any value is accepted.
+        @par
+            Large epsilons will reduce the frequency in which the light is updated,
+            improving performance (e.g. only compute the shadow map when needed)
+        @par
+            Use an epsilon of <= 0 to force recalculation every frame. This is
+            useful to prevent heterogeneity between frames (reduce stutter) if
+            you intend to update the light slightly every frame.
+        */
+        void update( const Vector3 &lightDir, float lightEpsilon=1e-6f );
 
         void load( const String &texName, const Vector3 center, const Vector3 &dimensions );
 

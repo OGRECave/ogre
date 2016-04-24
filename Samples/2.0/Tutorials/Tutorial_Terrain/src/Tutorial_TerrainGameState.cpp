@@ -219,7 +219,11 @@ namespace Demo
                                  Ogre::Vector3( cosf( mTimeOfDay ), -sinf( mTimeOfDay ), 0.0 ).normalisedCopy() );
         //mSunLight->setDirection( -Ogre::Vector3::UNIT_Y );
 
-        mTerra->update( mSunLight->getDerivedDirectionUpdated() );
+        //Force update the shadow map every frame to avoid the feeling we're "cheating" the
+        //user in this sample with higher framerates than what he may encounter in many of
+        //his possible uses.
+        const float lightEpsilon = 0.0f;
+        mTerra->update( mSunLight->getDerivedDirectionUpdated(), lightEpsilon );
 
         TutorialGameState::update( timeSinceLast );
 
@@ -247,7 +251,7 @@ namespace Demo
 
             using namespace Ogre;
 
-            outText += "\nF1 Lock Camera to Ground: [";
+            outText += "\nF2 Lock Camera to Ground: [";
             outText += mLockCameraToGround ? "Yes]" : "No]";
             outText += "\n+/- to change time of day. [";
             outText += StringConverter::toString( mTimeOfDay * 180.0f / Math::PI ) + "]";
@@ -310,7 +314,7 @@ namespace Demo
                 mAzimuth = Ogre::Math::TWO_PI + mAzimuth;
         }
 
-        if( arg.keysym.scancode == SDL_SCANCODE_F1 )
+        if( arg.keysym.scancode == SDL_SCANCODE_F2 )
         {
             mLockCameraToGround = !mLockCameraToGround;
         }

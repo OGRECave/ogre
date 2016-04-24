@@ -34,6 +34,7 @@ namespace Ogre
         m_terrainOrigin( Vector3::ZERO ),
         m_basePixelDimension( 256u ),
         m_currentCell( 0u ),
+        m_prevLightDir( Vector3::ZERO ),
         m_shadowMapper( 0 ),
         m_compositorManager( compositorManager ),
         m_camera( camera )
@@ -372,10 +373,16 @@ namespace Ogre
         m_collectedCells[0].clear();
     }
     //-----------------------------------------------------------------------------------
-    void Terra::update( const Vector3 &lightDir )
+    void Terra::update( const Vector3 &lightDir, float lightEpsilon )
     {
+        const float lightCosAngleChange = Math::Clamp(
+                    m_prevLightDir.dotProduct( lightDir.normalisedCopy() ), -1.0f, 1.0f );
+        if( lightCosAngleChange <= (1.0f - lightEpsilon) )
+        {
+            m_shadowMapper->updateShadowMap( lightDir, m_xzDimensions, m_height );
+            m_prevLightDir = lightDir.normalisedCopy();
+        }
         //m_shadowMapper->updateShadowMap( Vector3::UNIT_X, m_xzDimensions, m_height );
-        m_shadowMapper->updateShadowMap( lightDir, m_xzDimensions, m_height );
         //m_shadowMapper->updateShadowMap( Vector3(2048,0,1024), m_xzDimensions, m_height );
         //m_shadowMapper->updateShadowMap( Vector3(1,0,0.1), m_xzDimensions, m_height );
         //m_shadowMapper->updateShadowMap( Vector3::UNIT_Y, m_xzDimensions, m_height ); //Check! Does NAN

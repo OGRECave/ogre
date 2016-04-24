@@ -46,7 +46,7 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[6] =
+            const char *c_locations[7] =
             {
                 "2.0/scripts/materials/Common",
                 "2.0/scripts/materials/Common/GLSL",
@@ -54,9 +54,10 @@ namespace Demo
                 "2.0/scripts/materials/Tutorial_Terrain",
                 "2.0/scripts/materials/Tutorial_Terrain/GLSL",
                 "2.0/scripts/materials/Tutorial_Terrain/HLSL",
+                "2.0/scripts/materials/Postprocessing/SceneAssets"
             };
 
-            for( size_t i=0; i<6; ++i )
+            for( size_t i=0; i<7; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
@@ -153,6 +154,8 @@ int mainApp()
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/Tutorial_Terrain.compositor\n"
         "   * Samples/Media/2.0/materials/Tutorial_Terrain/*.*\n"
+        "   * Samples/Media/2.0/materials/Common/GLSL/GaussianBlurBase_cs.glsl\n"
+        "   * Samples/Media/2.0/materials/Common/HLSL/GaussianBlurBase_cs.hlsl\n"
         "   * Samples/Media/Hlms/Terra/*.*\n" );
     Tutorial_TerrainGraphicsSystem graphicsSystem( &tutorial_TerrainGameState );
 

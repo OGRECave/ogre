@@ -17,6 +17,8 @@
 //	image_store
 //	image_sample
 //	decode_lds (optional, i.e. when lds_data_type != data_type)
+// The script uses the template syntax to automatically set the num. of threadgroups
+// based on the bound input texture.
 
 uniform sampler2D inputImage;
 layout (@insertpiece(uav0_pf_type)) uniform restrict writeonly image2D outputImage;
@@ -28,6 +30,33 @@ layout( local_size_x = 32,
 @pset( threads_per_group_x, 32 )
 @pset( threads_per_group_y, 2 )
 @pset( threads_per_group_z, 1 )
+
+@pmul( pixelsPerRow, threads_per_group_x, 4 )
+@pset( rowsPerThreadGroup, threads_per_group_y )
+@pset( num_thread_groups_z, 1 )
+@property( horizontal_pass )
+	/// Calculate num_thread_groups_
+	/// num_thread_groups_x = (texture0_width + pixelsPerRow - 1) / pixelsPerRow
+	/// num_thread_groups_y = (texture0_height + rowsPerThreadGroup - 1) / rowsPerThreadGroup
+	@add( num_thread_groups_x, texture0_width, pixelsPerRow )
+	@sub( num_thread_groups_x, 1 )
+	@div( num_thread_groups_x, pixelsPerRow )
+
+	@add( num_thread_groups_y, texture0_height, rowsPerThreadGroup )
+	@sub( num_thread_groups_y, 1 )
+	@div( num_thread_groups_y, rowsPerThreadGroup )
+@end @property( !horizontal_pass )
+	/// Calculate num_thread_groups_
+	/// num_thread_groups_x = (texture0_width + rowsPerThreadGroup - 1) / rowsPerThreadGroup
+	/// num_thread_groups_y = (texture0_height + pixelsPerRow - 1) / pixelsPerRow
+	@add( num_thread_groups_x, texture0_width, rowsPerThreadGroup )
+	@sub( num_thread_groups_x, 1 )
+	@div( num_thread_groups_x, rowsPerThreadGroup )
+
+	@add( num_thread_groups_y, texture0_height, pixelsPerRow )
+	@sub( num_thread_groups_y, 1 )
+	@div( num_thread_groups_y, pixelsPerRow )
+@end
 
 /// shared vec3 g_f3LDS[ 2 ] [ @value( samples_per_threadgroup ) ];
 @insertpiece( lds_definition )
