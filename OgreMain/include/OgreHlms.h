@@ -74,8 +74,6 @@ namespace Ogre
         typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
 
     protected:
-        typedef std::map<IdString, String> PiecesMap;
-
         struct RenderableCache
         {
             HlmsPropertyVec setProperties;
@@ -202,6 +200,8 @@ namespace Ogre
         };
 
         typedef std::vector<Expression> ExpressionVec;
+
+        inline int interpretAsNumberThenAsProperty( const String &argValue ) const;
 
         static void copy( String &outBuffer, const SubStringRef &inSubString, size_t length );
         static void repeat( String &outBuffer, const SubStringRef &inSubString, size_t length,
@@ -374,6 +374,7 @@ namespace Ogre
 
         Archive* getDataFolder(void)                        { return mDataFolder; }
         const LibraryVec& getPiecesLibrary(void) const      { return mLibrary; }
+        ArchiveVec getPiecesLibraryAsArchiveVec(void) const;
 
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks
@@ -561,6 +562,8 @@ namespace Ogre
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
+        int32 _getProperty( IdString key, int32 defaultVal=0 ) const
+                                                { return getProperty( key, defaultVal ); }
 
         /// Utility helper, mostly useful to HlmsListener implementations.
         static int32 getProperty( const HlmsPropertyVec &properties,

@@ -202,16 +202,17 @@ namespace Ogre
         {
             GpuProgramParametersSharedPtr psParams = retVal->pso.pixelShader->getDefaultParameters();
 
-            int texUnit = 2; //Vertex shader consumes 1 slot with its heightmap,
-                             //PS consumes 1 slot with its normalmap.
+            int texUnit = 3; //Vertex shader consumes 1 slot with its heightmap,
+                             //PS consumes 2 slot with its normalmap & shadow texture.
 
             psParams->setNamedConstant( "terrainNormals", 1 );
+            psParams->setNamedConstant( "terrainShadows", 2 );
 
             //Forward3D consumes 2 more slots.
             if( mGridBuffer )
             {
-                psParams->setNamedConstant( "f3dGrid",      2 );
-                psParams->setNamedConstant( "f3dLightList", 3 );
+                psParams->setNamedConstant( "f3dGrid",      3 );
+                psParams->setNamedConstant( "f3dLightList", 4 );
                 texUnit += 2;
             }
 
@@ -401,7 +402,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     HlmsCache HlmsTerra::preparePassHash( const CompositorShadowNode *shadowNode, bool casterPass,
-                                        bool dualParaboloid, SceneManager *sceneManager )
+                                          bool dualParaboloid, SceneManager *sceneManager )
     {
         mSetProperties.clear();
 
@@ -470,6 +471,14 @@ namespace Ogre
 
         HlmsCache retVal = Hlms::preparePassHashBase( shadowNode, casterPass,
                                                       dualParaboloid, sceneManager );
+
+        if( getProperty( HlmsBaseProp::LightsDirNonCaster ) > 0 )
+        {
+            //First directional light always cast shadows thanks to our terrain shadows.
+            int32 shadowCasterDirectional = getProperty( HlmsBaseProp::LightsDirectional );
+            shadowCasterDirectional = std::max( shadowCasterDirectional, 1 );
+            setProperty( HlmsBaseProp::LightsDirectional, shadowCasterDirectional );
+        }
 
         RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
 
@@ -872,11 +881,11 @@ namespace Ogre
                                                                            passBuffer->
                                                                            getTotalSizeBytes() );
 
-            size_t texUnit = 2;
+            size_t texUnit = 3;
 
             if( mGridBuffer )
             {
-                texUnit = 4;
+                texUnit = 5;
                 *commandBuffer->addCommand<CbShaderBuffer>() =
                         CbShaderBuffer( PixelShader, 2, mGridBuffer, 0, 0 );
                 *commandBuffer->addCommand<CbShaderBuffer>() =
@@ -934,6 +943,32 @@ namespace Ogre
                     CbTexture( 0, true, terraObj->getHeightMapTex().get() );
             *commandBuffer->addCommand<CbTexture>() =
                     CbTexture( 1, true, terraObj->getNormalMapTex().get(), mTerraSamplerblock );
+            *commandBuffer->addCommand<CbTexture>() =
+                    CbTexture( 2, true, terraObj->_getShadowMapTex().get(), mTerraSamplerblock );
+
+#if OGRE_DEBUG_MODE
+//          Commented: Hack to get a barrier without dealing with the Compositor while debugging.
+//            ResourceTransition resourceTransition;
+//            resourceTransition.readBarrierBits = ReadBarrier::Uav;
+//            resourceTransition.writeBarrierBits = WriteBarrier::Uav;
+//            mRenderSystem->_resourceTransitionCreated( &resourceTransition );
+//            mRenderSystem->_executeResourceTransition( &resourceTransition );
+//            mRenderSystem->_resourceTransitionDestroyed( &resourceTransition );
+            TexturePtr terraShadowText = terraObj->_getShadowMapTex();
+            const CompositorTextureVec &compositorTextures = queuedRenderable.movableObject->
+                    _getManager()->getCompositorTextures();
+            CompositorTextureVec::const_iterator itor = compositorTextures.begin();
+            CompositorTextureVec::const_iterator end  = compositorTextures.end();
+
+            while( itor != end && (*itor->textures)[0] != terraShadowText )
+                ++itor;
+
+            if( itor == end )
+            {
+                assert( "Hazard Detected! You should expose this Terra's shadow map texture"
+                        " to the compositor pass so Ogre can place the proper Barriers" && false );
+            }
+#endif
 
             mLastMovableObject = queuedRenderable.movableObject;
         }
@@ -965,7 +1000,7 @@ namespace Ogre
             if( datablock->mTextureHash != mLastTextureHash )
             {
                 //Rebind textures
-                size_t texUnit = mPreparedPass.shadowMaps.size() + (!mGridBuffer ? 2 : 4);
+                size_t texUnit = mPreparedPass.shadowMaps.size() + (!mGridBuffer ? 3 : 5);
 
                 TerraBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
                 TerraBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();

@@ -106,19 +106,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorPass::~CompositorPass()
     {
-        RenderSystem *renderSystem = mParentNode->getRenderSystem();
-
-
-        assert( mNumValidResourceTransitions <= mResourceTransitions.size() );
-        ResourceTransitionVec::iterator itor = mResourceTransitions.begin();
-
-        for( size_t i=0; i<mNumValidResourceTransitions; ++i )
-        {
-            renderSystem->_resourceTransitionDestroyed( &(*itor) );
-            ++itor;
-        }
-
-        mNumValidResourceTransitions = 0;
+        _removeAllBarriers();
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::populateTextureDependenciesFromExposedTextures(void)
@@ -392,6 +380,23 @@ namespace Ogre
 
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::_removeAllBarriers(void)
+    {
+        assert( mNumValidResourceTransitions <= mResourceTransitions.size() );
+
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+        ResourceTransitionVec::iterator itor = mResourceTransitions.begin();
+
+        for( size_t i=0; i<mNumValidResourceTransitions; ++i )
+        {
+            renderSystem->_resourceTransitionDestroyed( &(*itor) );
+            ++itor;
+        }
+
+        mNumValidResourceTransitions = 0;
+        mResourceTransitions.clear();
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::notifyRecreated( const CompositorChannel &oldChannel,

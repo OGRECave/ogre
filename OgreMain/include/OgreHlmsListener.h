@@ -88,7 +88,7 @@ namespace Ogre
                                       SceneManager *sceneManager, Hlms *hlms ) {}
 
         /// Listeners should return the extra bytes they wish to allocate for storing additional
-        /// data in the pass buffer.
+        /// data in the pass buffer. Return value must be in bytes.
         virtual uint32 getPassBufferSize( const CompositorShadowNode *shadowNode, bool casterPass,
                                           bool dualParaboloid, SceneManager *sceneManager ) const
                                                                     { return 0; }

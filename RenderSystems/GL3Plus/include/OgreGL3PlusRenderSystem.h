@@ -35,6 +35,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRenderSystem.h"
 #include "OgreHlmsSamplerblock.h"
 #include "OgreGLSLShader.h"
+#include "OgreGL3PlusPixelFormatToShaderType.h"
 
 namespace Ogre {
     class GL3PlusContext;
@@ -161,6 +162,9 @@ namespace Ogre {
         /// @copydoc RenderSystem::checkExtension
         virtual bool checkExtension( const String &ext ) const;
 
+        /// @copydoc RenderSystem::getPixelFormatToShaderType
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const;
+
         unsigned char *mSwIndirectBufferPtr;
 
         GL3PlusHlmsPso const *mPso;
@@ -190,6 +194,8 @@ namespace Ogre {
         /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
         /// and still mMaxUavIndexPlusOne = 3.
         uint8   mMaxModifiedUavPlusOne;
+
+        GL3PlusPixelFormatToShaderType mPixelFormatToShaderType;
 
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
         static GLenum getBlendMode(SceneBlendFactor ogreBlend);

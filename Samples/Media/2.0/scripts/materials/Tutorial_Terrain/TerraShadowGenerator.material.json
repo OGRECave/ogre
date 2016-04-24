@@ -1,17 +1,36 @@
 {
-    "compute" :
-    {
-        "Terra/ShadowGenerator" :
-        {
-            "threads_per_group" : [64, 1, 1],
-            "thread_groups" : [32, 1, 1],
+	"samplers" :
+	{
+		"LinearClamp" :
+		{
+			"min" : "linear",
+			"mag" : "linear",
+			"mip" : "linear",
+			"u" : "clamp",
+			"v" : "clamp",
+			"w" : "clamp",
+			"miplodbias" : 0,
+			"max_anisotropic" : 1,
+			"compare_function" : "disabled",
+			"border" : [1, 1, 1, 1],
+			"min_lod" : -3.40282347E+38,
+			"max_lod" : 3.40282347E+38
+		}
+	},
 
-            "source" : "TerraShadowGenerator",
+	"compute" :
+	{
+		"Terra/ShadowGenerator" :
+		{
+			"threads_per_group" : [64, 1, 1],
+			"thread_groups" : [32, 1, 1],
 
-            "uav_units" : 1,
+			"source" : "TerraShadowGenerator",
+
+			"uav_units" : 1,
 			
 			"textures" :
-            [
+			[
 				{}
 			],
 			
@@ -24,10 +43,82 @@
 			],
 			
 			"params_glsl" :
-            [
-                ["shadowMap",		[0], "int"],
+			[
+				["shadowMap",		[0], "int"],
 				["heightMap",		[0], "int"]
-            ]
-        }
-    }
+			]
+		},
+
+		"Terra/GaussianBlurH" :
+		{
+			"threads_per_group" : [32, 2, 1],
+			"thread_groups" : [8, 512, 1],
+
+			"source" : "GaussianBlurBase_cs",
+			"pieces" : ["TerraGaussianBlur_cs"],
+			"inform_shader_of_texture_data_change" : true,
+
+			"uav_units" : 1,
+			
+			"textures" :
+			[
+				{
+					"sampler" : "LinearClamp"
+				}
+			],
+			
+			"params" :
+			[
+				["g_f4OutputSize",	"packed_texture_size", 0]
+			],
+			
+			"params_glsl" :
+			[
+				["inputImage",		[0], "int"],
+				["outputImage",		[0], "int"]
+			],
+
+			"properties" :
+			{
+				"horizontal_pass" : 1,
+				"kernel_radius" : 8
+			}
+		},
+
+		"Terra/GaussianBlurV" :
+		{
+			"threads_per_group" : [32, 2, 1],
+			"thread_groups" : [512, 8, 1],
+
+			"source" : "GaussianBlurBase_cs",
+			"pieces" : ["TerraGaussianBlur_cs"],
+			"inform_shader_of_texture_data_change" : true,
+
+			"uav_units" : 1,
+			
+			"textures" :
+			[
+				{
+					"sampler" : "LinearClamp"
+				}
+			],
+			
+			"params" :
+			[
+				["g_f4OutputSize",	"packed_texture_size", 0]
+			],
+			
+			"params_glsl" :
+			[
+				["inputImage",		[0], "int"],
+				["outputImage",		[0], "int"]
+			],
+
+			"properties" :
+			{
+				"horizontal_pass" : 0,
+				"kernel_radius" : 8
+			}
+		}
+	}
 }

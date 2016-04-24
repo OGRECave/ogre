@@ -296,6 +296,23 @@ namespace Ogre {
         return getDescriptionFor(format).elemBytes * 8;
     }
     //-----------------------------------------------------------------------
+    uint8 PixelUtil::getMaxMipmapCount( uint32 maxResolution )
+    {
+        uint8 numMipmaps;
+#if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1800))
+        numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(maxResolution) ) /
+                                                 logf( 2.0f ) ) );
+#else
+        numMipmaps = static_cast<uint8>( floorf( log2f( static_cast<float>(maxResolution) ) ) );
+#endif
+        return numMipmaps;
+    }
+    //-----------------------------------------------------------------------
+    uint8 PixelUtil::getMaxMipmapCount( uint32 width, uint32 height )
+    {
+        return getMaxMipmapCount( std::max( width, height ) );
+    }
+    //-----------------------------------------------------------------------
     unsigned int PixelUtil::getFlags( PixelFormat format )
     {
         return getDescriptionFor(format).flags;

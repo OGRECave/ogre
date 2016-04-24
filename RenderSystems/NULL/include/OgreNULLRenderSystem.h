@@ -40,6 +40,12 @@ namespace Ogre
         class HardwareBufferManager;
     }
 
+    class _OgreNULLExport NULLPixelFormatToShaderType : public PixelFormatToShaderType
+    {
+    public:
+        virtual const char* getPixelFormatType( PixelFormat pixelFormat ) const { return 0; }
+    };
+
     /**
        Implementation of NULL as a rendering system.
     */
@@ -51,6 +57,8 @@ namespace Ogre
         ConfigOptionMap mOptions;
 
         vector<RenderTarget*>::type mRenderTargets;
+
+        NULLPixelFormatToShaderType mPixelFormatToShaderType;
 
     public:
         NULLRenderSystem();
@@ -178,6 +186,8 @@ namespace Ogre
         virtual void registerThread();
         virtual void unregisterThread();
         virtual unsigned int getDisplayMonitorCount() const     { return 1; }
+
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const;
 
         virtual void beginProfileEvent( const String &eventName );
         virtual void endProfileEvent( void );

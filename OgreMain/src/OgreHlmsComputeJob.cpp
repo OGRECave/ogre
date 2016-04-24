@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreHlmsManager.h"
 #include "OgreHlmsCompute.h"
 
+#include "OgreRenderSystem.h"
+
 #include "Vao/OgreTexBufferPacked.h"
 #include "Vao/OgreUavBufferPacked.h"
 
@@ -84,6 +86,8 @@ namespace Ogre
                                                const IdString &propNumTextureSlots,
                                                const IdString &propMaxTextureSlot )
     {
+        assert( propTexture == ComputeProperty::Texture || propTexture == ComputeProperty::Uav );
+
         char tmpData[64];
         LwString propName = LwString::FromEmptyPointer( tmpData, sizeof(tmpData) );
 
@@ -99,51 +103,59 @@ namespace Ogre
 
             propName.a( "_width" );                 //texture0_width
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_height" );                //texture0_height
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_depth" );                 //texture0_depth
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_mipmaps" );               //texture0_mipmaps
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_msaa" );                  //texture0_msaa
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_msaa_samples" );          //texture0_msaa_samples
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_is_1d" );                 //texture0_is_1d
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_is_2d" );                 //texture0_is_2d
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_is_3d" );                 //texture0_is_3d
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_is_cubemap" );            //texture0_is_cubemap
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_is_2d_array" );           //texture0_is_2d_array
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
 
             propName.a( "_is_buffer" );             //texture0_is_buffer
             removeProperty( propName.c_str() );
-            propName.resize( texturePropSize + 1u );
+            propName.resize( texturePropSize );
+
+            //Note we're comparing pointers, not string comparison!
+            if( propTexture == ComputeProperty::Uav )
+            {
+                propName.a( "_pf_type" );           //uav0_pf_type
+                removePiece( propName.c_str() );
+                propName.resize( texturePropSize );
+            }
         }
 
         //Set the new value.
@@ -152,6 +164,9 @@ namespace Ogre
         if( mInformHlmsOfTextureData )
         {
             setProperty( propNumTextureSlots, static_cast<int32>( textureSlots.size() ) );
+
+            RenderSystem *renderSystem = mCreator->getRenderSystem();
+            const PixelFormatToShaderType *toShaderType = renderSystem->getPixelFormatToShaderType();
 
             TextureSlotVec::const_iterator begin= textureSlots.begin();
             TextureSlotVec::const_iterator itor = textureSlots.begin();
@@ -170,54 +185,64 @@ namespace Ogre
 
                     propName.a( "_width" );                 //texture0_width
                     setProperty( propName.c_str(), texture->getWidth() );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_height" );                //texture0_height
                     setProperty( propName.c_str(), texture->getHeight() );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_depth" );                 //texture0_depth
                     setProperty( propName.c_str(), std::max<uint32>( texture->getDepth(),
                                                                      texture->getNumFaces() ) );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_mipmaps" );               //texture0_mipmaps
                     setProperty( propName.c_str(), texture->getNumMipmaps() + 1 );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_msaa" );                  //texture0_msaa
                     setProperty( propName.c_str(), texture->getFSAA() > 1 ? 1 : 0 );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_msaa_samples" );          //texture0_msaa_samples
                     setProperty( propName.c_str(), texture->getFSAA() );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_is_1d" );                 //texture0_is_1d
                     setProperty( propName.c_str(), texture->getTextureType() == TEX_TYPE_1D );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_is_2d" );                 //texture0_is_2d
                     setProperty( propName.c_str(), texture->getTextureType() == TEX_TYPE_2D );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_is_3d" );                 //texture0_is_3d
                     setProperty( propName.c_str(), texture->getTextureType() == TEX_TYPE_3D );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_is_cubemap" );            //texture0_is_cubemap
                     setProperty( propName.c_str(), texture->getTextureType() == TEX_TYPE_CUBE_MAP );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
 
                     propName.a( "_is_2d_array" );           //texture0_is_2d_array
                     setProperty( propName.c_str(), texture->getTextureType() == TEX_TYPE_2D_ARRAY );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
+
+                    //Note we're comparing pointers, not string comparison!
+                    if( propTexture == ComputeProperty::Uav )
+                    {
+                        propName.a( "_pf_type" );           //uav0_pf_type
+                        const char *typeName = toShaderType->getPixelFormatType( texture->getFormat() );
+                        if( typeName )
+                            setPiece( propName.c_str(), typeName );
+                        propName.resize( texturePropSize );
+                    }
                 }
                 else if( itor->buffer )
                 {
                     propName.a( "_is_buffer" );             //texture0_is_buffer
                     setProperty( propName.c_str(), 1 );
-                    propName.resize( texturePropSize + 1u );
+                    propName.resize( texturePropSize );
                 }
 
                 ++itor;
@@ -371,6 +396,25 @@ namespace Ogre
                                                          p, OrderPropertyByIdString );
         if( it != mSetProperties.end() && it->keyName == p.keyName )
             mSetProperties.erase( it );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::setPiece( IdString pieceName, const String &pieceContent )
+    {
+        mPieces[pieceName] = pieceContent;
+
+        int32 contentHash = 0;
+        MurmurHash3_x86_32( pieceContent.c_str(), pieceContent.size(), IdString::Seed, &contentHash );
+        setProperty( pieceName, contentHash );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsComputeJob::removePiece( IdString pieceName )
+    {
+        PiecesMap::iterator it = mPieces.find( pieceName );
+        if( it != mPieces.end() )
+        {
+            removeProperty( pieceName );
+            mPieces.erase( it );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsComputeJob::setConstBuffer( uint8 slotIdx, ConstBufferPacked *constBuffer )

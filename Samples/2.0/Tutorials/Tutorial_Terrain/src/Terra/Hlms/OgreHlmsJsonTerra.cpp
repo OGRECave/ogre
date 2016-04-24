@@ -26,6 +26,8 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
+#include "OgreBuildSettings.h"
+
 #if !OGRE_NO_JSON
 
 #include "Terra/Hlms/OgreHlmsJsonTerra.h"

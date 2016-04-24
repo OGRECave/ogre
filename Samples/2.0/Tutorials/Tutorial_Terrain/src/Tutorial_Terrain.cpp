@@ -24,12 +24,13 @@ namespace Demo
 {
     class Tutorial_TerrainGraphicsSystem : public GraphicsSystem
     {
-//        virtual Ogre::CompositorWorkspace* setupCompositor()
-//        {
-//            Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-//            return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-//                                                    "Tutorial_TerrainWorkspace", true );
-//        }
+        virtual Ogre::CompositorWorkspace* setupCompositor()
+        {
+            //Delegate compositor creation to the game state. We need terra's shadow texture
+            //to be passed to the compositor so Ogre can insert the proper barriers.
+            assert( dynamic_cast<Tutorial_TerrainGameState*>(mCurrentGameState) );
+            return static_cast<Tutorial_TerrainGameState*>(mCurrentGameState)->setupCompositor();
+        }
 
         virtual void setupResources(void)
         {
@@ -45,7 +46,7 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[6] =
+            const char *c_locations[7] =
             {
                 "2.0/scripts/materials/Common",
                 "2.0/scripts/materials/Common/GLSL",
@@ -53,9 +54,10 @@ namespace Demo
                 "2.0/scripts/materials/Tutorial_Terrain",
                 "2.0/scripts/materials/Tutorial_Terrain/GLSL",
                 "2.0/scripts/materials/Tutorial_Terrain/HLSL",
+                "2.0/scripts/materials/Postprocessing/SceneAssets"
             };
 
-            for( size_t i=0; i<6; ++i )
+            for( size_t i=0; i<7; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
@@ -97,13 +99,34 @@ namespace Demo
                             dataFolder + "Hlms/Terra/" + shaderSyntax,
                             "FileSystem", true );
             Ogre::HlmsTerra *hlmsTerra = OGRE_NEW Ogre::HlmsTerra( archiveTerra, &library );
-            Ogre::Root::getSingleton().getHlmsManager()->registerHlms( hlmsTerra );
+            Ogre::HlmsManager *hlmsManager = mRoot->getHlmsManager();
+            hlmsManager->registerHlms( hlmsTerra );
+
+            //Add Terra's piece files that customize the PBS implementation.
+            //These pieces are coded so that they will be activated when
+            //we set the HlmsPbsTerraShadows listener and there's an active Terra
+            //(see Tutorial_TerrainGameState::createScene01)
+            Ogre::Hlms *hlmsPbs = hlmsManager->getHlms( Ogre::HLMS_PBS );
+            Ogre::Archive *archivePbs = hlmsPbs->getDataFolder();
+            Ogre::ArchiveVec libraryPbs = hlmsPbs->getPiecesLibraryAsArchiveVec();
+            libraryPbs.push_back( Ogre::ArchiveManager::getSingletonPtr()->load(
+                                      dataFolder + "Hlms/Terra/" + shaderSyntax + "/PbsTerraShadows",
+                                      "FileSystem", true ) );
+            hlmsPbs->reloadFrom( archivePbs, &libraryPbs );
         }
 
     public:
         Tutorial_TerrainGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
+        }
+
+        void createScene01()
+        {
+            GraphicsSystem::createScene01();
+            //The first time setupCompositor got called, Terra wasn't ready yet.
+            //Create the workspace again (will destroy previous workspace).
+            mWorkspace = setupCompositor();
         }
     };
 }
@@ -131,6 +154,8 @@ int mainApp()
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/Tutorial_Terrain.compositor\n"
         "   * Samples/Media/2.0/materials/Tutorial_Terrain/*.*\n"
+        "   * Samples/Media/2.0/materials/Common/GLSL/GaussianBlurBase_cs.glsl\n"
+        "   * Samples/Media/2.0/materials/Common/HLSL/GaussianBlurBase_cs.hlsl\n"
         "   * Samples/Media/Hlms/Terra/*.*\n" );
     Tutorial_TerrainGraphicsSystem graphicsSystem( &tutorial_TerrainGameState );
 

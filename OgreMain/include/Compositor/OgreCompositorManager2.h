@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreCompositorCommon.h"
 #include "OgreIdString.h"
 #include "OgreResourceTransition.h"
+#include "Compositor/OgreCompositorChannel.h"
 
 #include "OgreTexture.h"
 
@@ -319,7 +320,8 @@ namespace Ogre
                                            uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
 
         /// Overload that allows a full RenderTexture to be used as render target (see CubeMapping demo)
-        CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
+        CompositorWorkspace* addWorkspace( SceneManager *sceneManager,
+                                           const CompositorChannelVec &externalRenderTargets,
                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
                                            int position=-1, const UavBufferPackedVec *uavBuffers=0,
                                            const ResourceLayoutMap* initialLayouts=0,

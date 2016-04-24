@@ -81,6 +81,6 @@ float4 main
 
 	vNormal = normalize( vNormal );
 
-	//return vNormal.xz;
-	return float4( vNormal.xyz, 1.0f );
+	//return vNormal.zx;
+	return float4( vNormal.zyx * 0.5f + 0.5f, 1.0f );
 }

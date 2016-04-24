@@ -814,6 +814,7 @@ namespace Ogre
             ID_CONNECT,
             ID_CONNECT_BUFFER,
             ID_CONNECT_OUTPUT,
+            ID_CONNECT_EXTERNAL,
             ID_CONNECT_BUFFER_EXTERNAL,
         ID_COMPOSITOR_NODE,
             ID_IN,

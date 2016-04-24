@@ -1,96 +1,96 @@
 {
-    "samplers" :
+	"samplers" :
    {
-        "unique_name" :
-        {
-            "min" : "linear",
-            "mag" : "linear",
-            "mip" : "linear",
-            "u" : "wrap",
-            "v" : "wrap",
-            "w" : "wrap",
-            "miplodbias" : 0,
-            "max_anisotropic" : 1,
-            "compare_function" : "disabled",
-            "border" : [1, 1, 1, 1],
-            "min_lod" : -3.40282347E+38,
-            "max_lod" : 3.40282347E+38
-        }
-    },
+		"unique_name" :
+		{
+			"min" : "linear",
+			"mag" : "linear",
+			"mip" : "linear",
+			"u" : "wrap",
+			"v" : "wrap",
+			"w" : "wrap",
+			"miplodbias" : 0,
+			"max_anisotropic" : 1,
+			"compare_function" : "disabled",
+			"border" : [1, 1, 1, 1],
+			"min_lod" : -3.40282347E+38,
+			"max_lod" : 3.40282347E+38
+		}
+	},
 
-    "compute" :
-    {
-        "job_name" :
-        {
-        	"threads_per_group" : [16, 16, 1],
-            "thread_groups" : [16, 16, 1],
-            "thread_groups_based_on_texture" : 0,
-            "thread_groups_based_on_uav" : 0,
-            "inform_shader_of_texture_data_change" : true,
+	"compute" :
+	{
+		"job_name" :
+		{
+			"threads_per_group" : [16, 16, 1],
+			"thread_groups" : [16, 16, 1],
+			"thread_groups_based_on_texture" : 0,
+			"thread_groups_based_on_uav" : 0,
+			"inform_shader_of_texture_data_change" : true,
 
-            "source" : "MyComputeShader",
-            "pieces" : ["File0", "File1", "File2"],
-            "Comment0" : "These two are optional",
-            "entry_point" : "main",
-            "profiles" : ["cs_5_0", "cs_4_1"],
+			"source" : "MyComputeShader",
+			"pieces" : ["File0", "File1", "File2"],
+			"Comment0" : "These two are optional",
+			"entry_point" : "main",
+			"profiles" : ["cs_5_0", "cs_4_1"],
 
-            "properties" :
-            {
-                "ArbitraryName" : 1
-            },
+			"properties" :
+			{
+				"ArbitraryName" : 1
+			},
 
-            "textures" :
-            [
-                {
-                    "texture" : "texture0.png",
-                    "texture_hlms" : ["texture0.png", "variableNameHoldingSliceIdx"],
-                    "sampler" : "unique_name"
-                },
-                {
-                    "texture" : "texture1.png",
-                    "sampler" : "unique_name"
-                },
-                {
-                },
-                {
-                    "texture" : "texture2.png",
-                    "sampler" : "unique_name"
-                },
-                {
-                    "buffer" : "buffer_name",
-                    "offset" : 0,
-                    "size"   : 0
-                }
-            ],
+			"textures" :
+			[
+				{
+					"texture" : "texture0.png",
+					"texture_hlms" : ["texture0.png", "variableNameHoldingSliceIdx"],
+					"sampler" : "unique_name"
+				},
+				{
+					"texture" : "texture1.png",
+					"sampler" : "unique_name"
+				},
+				{
+				},
+				{
+					"texture" : "texture2.png",
+					"sampler" : "unique_name"
+				},
+				{
+					"buffer" : "buffer_name",
+					"offset" : 0,
+					"size"   : 0
+				}
+			],
 
-            "uav_units" : 1,
+			"uav_units" : 1,
 
-            "params" :
-            [
-                {
-                    "Comment0" :
-                    [
-                    "If 2nd parameter is a string, it's an auto parameter. If it's an array,",
-                    "it's manual. The 3rd parameter is optional. For auto params it's the",
-                    "extra param needed, for manual params valid options are int uint float"
-                    ]
-                },
+			"params" :
+			[
+				{
+					"Comment0" :
+					[
+					"If 2nd parameter is a string, it's an auto parameter. If it's an array,",
+					"it's manual. The 3rd parameter is optional. For auto params it's the",
+					"extra param needed, for manual params valid options are int uint float"
+					]
+				},
 
-                ["arbitraryParam",  [5.0, 7.0, 8.0]],
-                ["cameraPos",       "camera_position"],
-                ["integerVar",      [0], "int"],
-                ["texProj0",        "texture_viewproj_matrix", 0]
-            ],
+				["arbitraryParam",  [5.0, 7.0, 8.0]],
+				["cameraPos",       "camera_position"],
+				["integerVar",      [0], "int"],
+				["texProj0",        "texture_viewproj_matrix", 0]
+			],
 
-            "params_glsl" :
-            [
-                ["textureVar0",     [0], "int"]
-            ],
+			"params_glsl" :
+			[
+				["textureVar0",     [0], "int"]
+			],
 
-            "params_hlsl" :
-            [
-                ["someDxOnlyVar",   [0], "int"]
-            ]
-        }
-    }
+			"params_hlsl" :
+			[
+				["someDxOnlyVar",   [0], "int"]
+			]
+		}
+	}
 }

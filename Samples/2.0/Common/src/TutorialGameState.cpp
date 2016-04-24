@@ -15,6 +15,7 @@
 
 #include "OgreHlmsManager.h"
 #include "OgreHlms.h"
+#include "OgreHlmsCompute.h"
 #include "OgreGpuProgramManager.h"
 
 using namespace Demo;
@@ -73,8 +74,10 @@ namespace Demo
             outText = mHelpDescription;
             outText += "\n\nPress F1 to toggle help";
             outText += "\n\nProtip: Ctrl+F1 will reload PBS shaders (for real time template editing).\n"
-                       "Ctrl+F2 reloads Unlit shaders. Note: If the modified templates produce\n"
-                       "invalid shader code, crashes or exceptions can happen.\n";
+                       "Ctrl+F2 reloads Unlit shaders.\n"
+                       "Ctrl+F3 reloads Compute shaders.\n"
+                       "Note: If the modified templates produce invalid shader code, "
+                       "crashes or exceptions can happen.\n";
             return;
         }
 
@@ -155,6 +158,16 @@ namespace Demo
             Ogre::HlmsManager *hlmsManager = root->getHlmsManager();
 
             Ogre::Hlms *hlms = hlmsManager->getHlms( Ogre::HLMS_UNLIT );
+            Ogre::GpuProgramManager::getSingleton().clearMicrocodeCache();
+            hlms->reloadFrom( hlms->getDataFolder() );
+        }
+        else if( arg.keysym.sym == SDLK_F3 && (arg.keysym.mod & (KMOD_LCTRL|KMOD_RCTRL)) )
+        {
+            //Hot reload of Unlit shaders.
+            Ogre::Root *root = mGraphicsSystem->getRoot();
+            Ogre::HlmsManager *hlmsManager = root->getHlmsManager();
+
+            Ogre::Hlms *hlms = hlmsManager->getComputeHlms();
             Ogre::GpuProgramManager::getSingleton().clearMicrocodeCache();
             hlms->reloadFrom( hlms->getDataFolder() );
         }

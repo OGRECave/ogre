@@ -34,6 +34,7 @@ namespace Ogre
         m_terrainOrigin( Vector3::ZERO ),
         m_basePixelDimension( 256u ),
         m_currentCell( 0u ),
+        m_prevLightDir( Vector3::ZERO ),
         m_shadowMapper( 0 ),
         m_compositorManager( compositorManager ),
         m_camera( camera )
@@ -169,7 +170,9 @@ namespace Ogre
                     "NormalMapTex_" + StringConverter::toString( getId() ),
                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                     TEX_TYPE_2D, m_heightMapTex->getWidth(), m_heightMapTex->getHeight(),
-                    0, PF_R8G8B8A8_SNORM, TU_RENDERTARGET|TU_AUTOMIPMAP );
+                    PixelUtil::getMaxMipmapCount( m_heightMapTex->getWidth(),
+                                                  m_heightMapTex->getHeight() ),
+                    PF_A2B10G10R10, TU_RENDERTARGET|TU_AUTOMIPMAP );
 
         MaterialPtr normalMapperMat = MaterialManager::getSingleton().load(
                     "Terra/GpuNormalMapper",
@@ -188,14 +191,14 @@ namespace Ogre
                                                                     1, 1 ) );
         psParams->setNamedConstant( "vScale", vScale );
 
-        CompositorChannel finalTargetChannel;
-        finalTargetChannel.target = m_normalMapTex->getBuffer()->getRenderTarget();
-        finalTargetChannel.textures.push_back( m_normalMapTex );
+        CompositorChannelVec finalTargetChannels( 1, CompositorChannel() );
+        finalTargetChannels[0].target = m_normalMapTex->getBuffer()->getRenderTarget();
+        finalTargetChannels[0].textures.push_back( m_normalMapTex );
 
         Camera *dummyCamera = mManager->createCamera( "TerraDummyCamera" );
 
         CompositorWorkspace *workspace =
-                m_compositorManager->addWorkspace( mManager, finalTargetChannel, dummyCamera,
+                m_compositorManager->addWorkspace( mManager, finalTargetChannels, dummyCamera,
                                                    "Terra/GpuNormalMapperWorkspace", false );
         workspace->_beginUpdate( true );
         workspace->_update();
@@ -370,10 +373,16 @@ namespace Ogre
         m_collectedCells[0].clear();
     }
     //-----------------------------------------------------------------------------------
-    void Terra::update( const Vector3 &lightDir )
+    void Terra::update( const Vector3 &lightDir, float lightEpsilon )
     {
+        const float lightCosAngleChange = Math::Clamp(
+                    m_prevLightDir.dotProduct( lightDir.normalisedCopy() ), -1.0f, 1.0f );
+        if( lightCosAngleChange <= (1.0f - lightEpsilon) )
+        {
+            m_shadowMapper->updateShadowMap( lightDir, m_xzDimensions, m_height );
+            m_prevLightDir = lightDir.normalisedCopy();
+        }
         //m_shadowMapper->updateShadowMap( Vector3::UNIT_X, m_xzDimensions, m_height );
-        m_shadowMapper->updateShadowMap( lightDir, m_xzDimensions, m_height );
         //m_shadowMapper->updateShadowMap( Vector3(2048,0,1024), m_xzDimensions, m_height );
         //m_shadowMapper->updateShadowMap( Vector3(1,0,0.1), m_xzDimensions, m_height );
         //m_shadowMapper->updateShadowMap( Vector3::UNIT_Y, m_xzDimensions, m_height ); //Check! Does NAN
@@ -542,6 +551,53 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    bool Terra::getHeightAt( Vector3 &vPos ) const
+    {
+        bool retVal = false;
+        GridPoint pos2D = worldToGrid( vPos );
+
+        if( pos2D.x < m_width-1 && pos2D.z < m_depth-1 )
+        {
+            const Vector2 vPos2D = gridToWorld( pos2D );
+
+            const float dx = (vPos.x - vPos2D.x) * m_width * m_xzInvDimensions.x;
+            const float dz = (vPos.z - vPos2D.y) * m_depth * m_xzInvDimensions.y;
+
+            float a, b, c;
+            const float h00 = m_heightMap[ pos2D.z * m_width + pos2D.x ];
+            const float h11 = m_heightMap[ (pos2D.z+1) * m_width + pos2D.x + 1 ];
+
+            c = h00;
+            if( dx < dz )
+            {
+                //Plane eq: y = ax + bz + c
+                //x=0 z=0 -> c		= h00
+                //x=0 z=1 -> b + c	= h01 -> b = h01 - c
+                //x=1 z=1 -> a + b + c  = h11 -> a = h11 - b - c
+                const float h01 = m_heightMap[ (pos2D.z+1) * m_width + pos2D.x ];
+
+                b = h01 - c;
+                a = h11 - b - c;
+            }
+            else
+            {
+                //Plane eq: y = ax + bz + c
+                //x=0 z=0 -> c		= h00
+                //x=1 z=0 -> a + c	= h10 -> a = h10 - c
+                //x=1 z=1 -> a + b + c  = h11 -> b = h11 - a - c
+                const float h10 = m_heightMap[ pos2D.z * m_width + pos2D.x + 1 ];
+
+                a = h10 - c;
+                b = h11 - a - c;
+            }
+
+            vPos.y = a * dx + b * dz + c + m_terrainOrigin.y;
+            retVal = true;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void Terra::setDatablock( HlmsDatablock *datablock )
     {
         std::vector<TerrainCell>::iterator itor = m_terrainCells.begin();
@@ -552,6 +608,11 @@ namespace Ogre
             itor->setDatablock( datablock );
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    Ogre::TexturePtr Terra::_getShadowMapTex(void) const
+    {
+        return m_shadowMapper->getShadowMapTex();
     }
     //-----------------------------------------------------------------------------------
     const String& Terra::getMovableType(void) const

@@ -142,6 +142,7 @@ namespace Ogre
         virtual void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
                                                            ResourceAccessMap &uavsAccess,
                                                            ResourceLayoutMap &resourcesLayout );
+        void _removeAllBarriers(void);
 
         /// @See CompositorNode::notifyRecreated
         virtual void notifyRecreated( const CompositorChannel &oldChannel,

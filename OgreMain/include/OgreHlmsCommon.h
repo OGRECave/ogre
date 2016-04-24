@@ -144,6 +144,7 @@ namespace Ogre
     };
 
     typedef vector<HlmsProperty>::type HlmsPropertyVec;
+    typedef map<IdString, String>::type PiecesMap;
 
     inline bool OrderPropertyByIdString( const HlmsProperty &_left, const HlmsProperty &_right )
     {

@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -45,7 +45,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     CompositorWorkspace::CompositorWorkspace( IdType id, const CompositorWorkspaceDef *definition,
-                                              const CompositorChannel &finalRenderTarget,
+                                              const CompositorChannelVec &externalRenderTargets,
                                               SceneManager *sceneManager, Camera *defaultCam,
                                               RenderSystem *renderSys, bool bEnabled,
                                               uint8 executionMask, uint8 viewportModifierMask,
@@ -61,10 +61,11 @@ namespace Ogre
             mDefaultCamera( defaultCam ),
             mSceneManager( sceneManager ),
             mRenderSys( renderSys ),
-            mRenderWindow( finalRenderTarget ),
+            mExternalRenderTargets( externalRenderTargets ),
             mExecutionMask( executionMask ),
             mViewportModifierMask( viewportModifierMask ),
-            mViewportModifier( vpOffsetScale )
+            mViewportModifier( vpOffsetScale ),
+            mBarriersDirty( true )
     {
         assert( (!defaultCam || (defaultCam->getSceneManager() == sceneManager)) &&
                 "Camera was created with a different SceneManager than supplied" );
@@ -80,23 +81,25 @@ namespace Ogre
         if( initialUavAccess )
             mInitialUavsAccess = *initialUavAccess;
 
+        RenderTarget *finalTarget = getFinalTarget();
+
         //We need this so OpenGL can switch contexts (if needed) before creating the textures
-        if( mRenderWindow.target )
-            mRenderSys->_setRenderTarget( mRenderWindow.target, true );
+        if( finalTarget )
+            mRenderSys->_setRenderTarget( finalTarget, true );
 
         //Create global textures
         TextureDefinitionBase::createTextures( definition->mLocalTextureDefs, mGlobalTextures,
-                                                id, true, mRenderWindow.target, mRenderSys );
+                                                id, true, finalTarget, mRenderSys );
 
         //Create local buffers
         mGlobalBuffers.reserve( mDefinition->mLocalBufferDefs.size() );
         TextureDefinitionBase::createBuffers( definition->mLocalBufferDefs, mGlobalBuffers,
-                                              mRenderWindow.target, mRenderSys );
+                                              finalTarget, mRenderSys );
 
         recreateAllNodes();
 
-        mCurrentWidth   = mRenderWindow.target->getWidth();
-        mCurrentHeight  = mRenderWindow.target->getHeight();
+        mCurrentWidth   = finalTarget->getWidth();
+        mCurrentHeight  = finalTarget->getHeight();
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace::~CompositorWorkspace()
@@ -120,12 +123,14 @@ namespace Ogre
 
         const CompositorManager2 *compoManager = mDefinition->mCompositorManager;
 
+        RenderTarget *finalTarget = getFinalTarget();
+
         while( itor != end )
         {
             const CompositorNodeDef *nodeDef = compoManager->getNodeDefinition( itor->second );
             CompositorNode *newNode = OGRE_NEW CompositorNode( Id::generateNewId<CompositorNode>(),
                                                                 itor->first, nodeDef, this, mRenderSys,
-                                                                mRenderWindow.target );
+                                                                finalTarget );
             mNodeSequence.push_back( newNode );
             ++itor;
         }
@@ -156,10 +161,21 @@ namespace Ogre
     void CompositorWorkspace::connectAllNodes(void)
     {
         {
-            //First connect the RenderWindow, otherwise the node could end up not being processed
-            CompositorNode *finalNode = findNode( mDefinition->mFinalNode );
-            finalNode->connectFinalRT( mRenderWindow.target, mRenderWindow.textures,
-                                       mDefinition->mFinalInChannel );
+            //First connect the external dependencies, otherwise
+            //the node could end up not being processed
+            {
+                CompositorWorkspaceDef::ChannelRouteList::const_iterator itor =
+                        mDefinition->mExternalChannelRoutes.begin();
+                CompositorWorkspaceDef::ChannelRouteList::const_iterator end =
+                        mDefinition->mExternalChannelRoutes.end();
+
+                while( itor != end )
+                {
+                    CompositorNode *node = findNode( itor->inNode );
+                    node->connectExternalRT( mExternalRenderTargets[itor->outChannel], itor->inChannel );
+                    ++itor;
+                }
+            }
 
             {
                 CompositorWorkspaceDef::ChannelRouteList::const_iterator itor =
@@ -169,9 +185,8 @@ namespace Ogre
 
                 while( itor != end )
                 {
-                    CompositorWorkspaceDef::ChannelRoute *itor = 0;
                     CompositorNode *node = findNode( itor->inNode );
-                    node->connectExternalBuffer( mExternalBuffers[itor->inChannel], itor->outChannel );
+                    node->connectExternalBuffer( mExternalBuffers[itor->outChannel], itor->inChannel );
                     ++itor;
                 }
             }
@@ -436,35 +451,77 @@ namespace Ogre
         BoundUav boundUavs[64];
         memset( boundUavs, 0, sizeof(boundUavs) );
 
-        if( mResourcesLayout.find( mRenderWindow.target ) == mResourcesLayout.end() )
-        {
-            mResourcesLayout[mRenderWindow.target] = ResourceLayout::RenderTarget;
-            Ogre::CompositorChannelVec renderTargetChannel;
-            renderTargetChannel.push_back( mRenderWindow );
-            CompositorNode::fillResourcesLayout( mResourcesLayout, renderTargetChannel,
-                                                 ResourceLayout::RenderTarget );
-        }
+        //Initialize to undefined state
+        CompositorNode::initResourcesLayout( mResourcesLayout, mExternalRenderTargets,
+                                             ResourceLayout::Undefined );
         CompositorNode::fillResourcesLayout( mResourcesLayout, mGlobalTextures,
                                              ResourceLayout::Undefined );
         CompositorNode::initResourcesLayout( mResourcesLayout, mGlobalBuffers,
                                              ResourceLayout::Undefined );
 
-        CompositorNodeVec::iterator itor = mNodeSequence.begin();
-        CompositorNodeVec::iterator end  = mNodeSequence.end();
+        {
+            //Place the barriers
+            CompositorNodeVec::iterator itor = mNodeSequence.begin();
+            CompositorNodeVec::iterator end  = mNodeSequence.end();
+
+            while( itor != end )
+            {
+                if( (*itor)->getEnabled() )
+                {
+                    (*itor)->_placeBarriersAndEmulateUavExecution( boundUavs, mUavsAccess,
+                                                                   mResourcesLayout );
+                }
+                ++itor;
+            }
+        }
+
+        const RenderSystemCapabilities *caps = mRenderSys->getCapabilities();
+        const bool explicitApi = caps->hasCapability( RSC_EXPLICIT_API );
+
+        if( explicitApi )
+        {
+            //Check the output is still a RenderTarget at the end.
+            CompositorNode *node = getLastEnabledNode();
+
+            if( node )
+            {
+                CompositorChannelVec::const_iterator itor = mExternalRenderTargets.begin();
+                CompositorChannelVec::const_iterator end  = mExternalRenderTargets.end();
+                while( itor != end )
+                {
+                    RenderTarget *renderTarget = itor->target;
+                    if( renderTarget->isRenderWindow() )
+                    {
+                        ResourceLayoutMap::iterator currentLayout =
+                                mResourcesLayout.find( renderTarget );
+
+                        if( currentLayout->second != ResourceLayout::RenderTarget )
+                            node->_setFinalTargetAsRenderTarget( currentLayout );
+                    }
+
+                    ++itor;
+                }
+            }
+        }
+
+        mBarriersDirty = false;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorNode* CompositorWorkspace::getLastEnabledNode(void)
+    {
+        CompositorNode *retVal = 0;
+
+        CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
+        CompositorNodeVec::const_iterator end  = mNodeSequence.end();
 
         while( itor != end )
         {
-            (*itor)->_placeBarriersAndEmulateUavExecution( boundUavs, mUavsAccess, mResourcesLayout );
+            if( (*itor)->getEnabled() )
+                retVal = *itor;
             ++itor;
         }
 
-        //Check the output is still a RenderTarget at the end.
-        ResourceLayoutMap::iterator currentLayout = mResourcesLayout.find( mRenderWindow.target );
-        if( currentLayout->second != ResourceLayout::RenderTarget )
-        {
-            CompositorNode *node = mNodeSequence.back();
-            node->_setFinalTargetAsRenderTarget( currentLayout );
-        }
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     CompositorNode* CompositorWorkspace::findNode( IdString aliasName, bool includeShadowNodes ) const
@@ -540,6 +597,15 @@ namespace Ogre
         return mSceneManager->findCamera( cameraName );
     }
     //-----------------------------------------------------------------------------------
+    RenderTarget* CompositorWorkspace::getFinalTarget(void) const
+    {
+        RenderTarget *finalTarget = 0;
+        if( !mExternalRenderTargets.empty() )
+            finalTarget = mExternalRenderTargets.front().target;
+
+        return finalTarget;
+    }
+    //-----------------------------------------------------------------------------------
     CompositorManager2* CompositorWorkspace::getCompositorManager()
     {
         return mDefinition->mCompositorManager;
@@ -559,8 +625,9 @@ namespace Ogre
     {
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that _beginFrame calls go to the right device.
-        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
-        if( mRenderWindow.target->isRenderWindow() || forceBeginFrame )
+        RenderTarget *finalTarget = getFinalTarget();
+        mRenderSys->_setRenderTarget( finalTarget, true );
+        if( finalTarget->isRenderWindow() || forceBeginFrame )
         {
             // Begin the frame
             mRenderSys->_beginFrame();
@@ -571,8 +638,9 @@ namespace Ogre
     {
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that _endFrame calls go to the right device.
-        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
-        if( mRenderWindow.target->isRenderWindow() || forceEndFrame )
+        RenderTarget *finalTarget = getFinalTarget();
+        mRenderSys->_setRenderTarget( finalTarget, true );
+        if( finalTarget->isRenderWindow() || forceEndFrame )
         {
             // End the frame
             mRenderSys->_endFrame();
@@ -581,19 +649,34 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::_update(void)
     {
+        if( mBarriersDirty )
+        {
+            CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
+            CompositorNodeVec::const_iterator end  = mNodeSequence.end();
+
+            while( itor != end )
+            {
+                (*itor)->_removeAllBarriers();
+                ++itor;
+            }
+
+            analyzeHazardsAndPlaceBarriers();
+        }
+
         if( mListener )
             mListener->workspacePreUpdate( this );
 
+        RenderTarget *finalTarget = getFinalTarget();
         //We need to do this so that D3D9 (and D3D11?) knows which device
         //is active now, so that our calls go to the right device.
-        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
+        mRenderSys->_setRenderTarget( finalTarget, true );
 
-        if( mCurrentWidth != mRenderWindow.target->getWidth() || mCurrentHeight != mRenderWindow.target->getHeight() )
+        if( mCurrentWidth != finalTarget->getWidth() || mCurrentHeight != finalTarget->getHeight() )
         {
             //Main RenderTarget reference changed resolution. Some nodes may need to rebuild
             //their textures if they're based on mRenderWindow's resolution.
-            mCurrentWidth   = mRenderWindow.target->getWidth();
-            mCurrentHeight  = mRenderWindow.target->getHeight();
+            mCurrentWidth   = finalTarget->getWidth();
+            mCurrentHeight  = finalTarget->getHeight();
 
             {
                 CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
@@ -602,7 +685,7 @@ namespace Ogre
                 while( itor != end )
                 {
                     CompositorNode *node = *itor;
-                    node->finalTargetResized( mRenderWindow.target );
+                    node->finalTargetResized( finalTarget );
                     ++itor;
                 }
             }
@@ -614,7 +697,7 @@ namespace Ogre
                 while( itor != end )
                 {
                     CompositorShadowNode *node = *itor;
-                    node->finalTargetResized( mRenderWindow.target );
+                    node->finalTargetResized( finalTarget );
                     ++itor;
                 }
             }
@@ -624,28 +707,11 @@ namespace Ogre
             allNodes.insert( allNodes.end(), mNodeSequence.begin(), mNodeSequence.end() );
             allNodes.insert( allNodes.end(), mShadowNodes.begin(), mShadowNodes.end() );
             TextureDefinitionBase::recreateResizableTextures( mDefinition->mLocalTextureDefs,
-                                                                mGlobalTextures, mRenderWindow.target,
+                                                                mGlobalTextures, finalTarget,
                                                                 mRenderSys, allNodes, 0 );
             TextureDefinitionBase::recreateResizableBuffers( mDefinition->mLocalBufferDefs,
-                                                             mGlobalBuffers, mRenderWindow.target,
+                                                             mGlobalBuffers, finalTarget,
                                                              mRenderSys, allNodes, 0 );
-        }
-
-        //Add global textures to the SceneManager so they can be referenced by materials
-        size_t oldNumTextures = mSceneManager->getNumCompositorTextures();
-        TextureDefinitionBase::NameToChannelMap::const_iterator it =
-                                                                mDefinition->mNameToChannelMap.begin();
-        TextureDefinitionBase::NameToChannelMap::const_iterator en =
-                                                                mDefinition->mNameToChannelMap.end();
-
-        while( it != en )
-        {
-            size_t index;
-            TextureDefinitionBase::TextureSource texSource;
-            mDefinition->decodeTexSource( it->second, index, texSource );
-            mSceneManager->_addCompositorTexture( it->first, &this->mGlobalTextures[index].textures );
-
-            ++it;
         }
 
         CompositorNodeVec::const_iterator itor = mNodeSequence.begin();
@@ -672,20 +738,33 @@ namespace Ogre
             }
             ++itor;
         }
-
-        //Remove our textures
-        mSceneManager->_removeCompositorTextures( oldNumTextures );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorWorkspace::_swapFinalTarget(void)
+    void CompositorWorkspace::_swapFinalTarget( vector<RenderTarget*>::type &swappedTargets )
     {
-        if( mRenderWindow.target )
-            mRenderWindow.target->swapBuffers();
+        CompositorChannelVec::const_iterator itor = mExternalRenderTargets.begin();
+        CompositorChannelVec::const_iterator end  = mExternalRenderTargets.end();
+
+        while( itor != end )
+        {
+            RenderTarget *externalTarget = itor->target;
+            const bool alreadySwapped = std::find( swappedTargets.begin(),
+                                                   swappedTargets.end(),
+                                                   externalTarget ) != swappedTargets.end();
+
+            if( !alreadySwapped )
+            {
+                externalTarget->swapBuffers();
+                swappedTargets.push_back( externalTarget );
+            }
+
+            ++itor;
+        }
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspace::_validateFinalTarget(void)
     {
-        mRenderSys->_setRenderTarget( mRenderWindow.target, true );
+        mRenderSys->_setRenderTarget( getFinalTarget(), true );
     }
     //-----------------------------------------------------------------------------------
     CompositorShadowNode* CompositorWorkspace::findShadowNode( IdString nodeDefName ) const
@@ -714,9 +793,10 @@ namespace Ogre
         {
             //Not found, create one.
             const CompositorManager2 *compoManager = mDefinition->mCompositorManager;
+            RenderTarget *finalTarget = getFinalTarget();
             const CompositorShadowNodeDef *def = compoManager->getShadowNodeDefinition( nodeDefName );
             retVal = OGRE_NEW CompositorShadowNode( Id::generateNewId<CompositorNode>(),
-                                                    def, this, mRenderSys, mRenderWindow.target );
+                                                    def, this, mRenderSys, finalTarget );
             mShadowNodes.push_back( retVal );
             bCreated = true;
         }

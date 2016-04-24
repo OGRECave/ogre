@@ -16,6 +16,8 @@
 #include "Vao/OgreConstBufferPacked.h"
 #include "OgreRoot.h"
 
+#include "OgreLwString.h"
+
 namespace Ogre
 {
     ShadowMapper::ShadowMapper( SceneManager *sceneManager, CompositorManager2 *compositorManager ) :
@@ -64,20 +66,22 @@ namespace Ogre
         m_shadowMapTex = TextureManager::getSingleton().createManual(
                     "ShadowMap" + StringConverter::toString( id ),
                     Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                    TEX_TYPE_2D, m_heightMapTex->getWidth(), m_heightMapTex->getHeight(), 1,
+                    TEX_TYPE_2D, m_heightMapTex->getWidth(), m_heightMapTex->getHeight(), 0,
                     PF_A2B10G10R10, TU_RENDERTARGET | TU_UAV );
 
-        CompositorChannel finalTarget;
-        finalTarget.target = m_shadowMapTex->getBuffer(0)->getRenderTarget();
-        finalTarget.textures.push_back( m_shadowMapTex );
+        CompositorChannelVec finalTarget( 1, CompositorChannel() );
+        finalTarget[0].target = m_shadowMapTex->getBuffer(0)->getRenderTarget();
+        finalTarget[0].textures.push_back( m_shadowMapTex );
         m_shadowWorkspace = m_compositorManager->addWorkspace( m_sceneManager, finalTarget, 0,
                                                                "Terra/ShadowGeneratorWorkspace", false );
 
-        ShaderParams &shaderParams = m_shadowJob->getShaderParams( "Default" );
+        ShaderParams &shaderParams = m_shadowJob->getShaderParams( "default" );
         m_jobParamDelta = shaderParams.findParameter( "delta" );
         m_jobParamXYStep = shaderParams.findParameter( "xyStep" );
         m_jobParamIsStep = shaderParams.findParameter( "isSteep" );
         m_jobParamHeightDelta = shaderParams.findParameter( "heightDelta" );
+
+        setGaussianFilterParams( 8, 0.5f );
     }
     //-----------------------------------------------------------------------------------
     void ShadowMapper::destroyShadowMap(void)
@@ -152,6 +156,7 @@ namespace Ogre
         };
 
         Vector2 lightDir2d( Vector2(lightDir.x, lightDir.z).normalisedCopy() );
+        float heightDelta = lightDir.y;
 
         if( lightDir2d.squaredLength() < 1e-6f )
         {
@@ -184,12 +189,16 @@ namespace Ogre
             y1 *= fabsf( lightDir2d.y ) / fabsf( lightDir2d.x );
             heightOrWidth = height;
             widthOrHeight = width;
+
+            heightDelta *= 1.0f / fabsf( lightDir.x );
         }
         else
         {
             x1 *= fabsf( lightDir2d.x ) / fabsf( lightDir2d.y );
             heightOrWidth = width;
             widthOrHeight = height;
+
+            heightDelta *= 1.0f / fabsf( lightDir.z );
         }
 
         if( lightDir2d.x < 0 )
@@ -197,7 +206,7 @@ namespace Ogre
         if( lightDir2d.y < 0 )
             std::swap( y0, y1 );
 
-        const bool steep = abs(y1 - y0) > abs(x1 - x0);
+        const bool steep = fabsf(y1 - y0) > fabsf(x1 - x0);
         if( steep )
         {
             std::swap( x0, y0 );
@@ -234,8 +243,16 @@ namespace Ogre
         };
         m_jobParamXYStep->setManualValue( xyStep, 2u );
 
-        m_jobParamHeightDelta->setManualValue( ( -lightDir.y * (xzDimensions.x / width) ) /
-                                               heightScale );
+        heightDelta = ( -heightDelta * (xzDimensions.x / width) ) / heightScale;
+        //Avoid sending +/- inf (which causes NaNs inside the shader).
+        //Values greater than 1.0 (or less than -1.0) are pointless anyway.
+        heightDelta = Ogre::max( -1.0f, Ogre::min( 1.0f, heightDelta ) );
+        m_jobParamHeightDelta->setManualValue( heightDelta );
+
+        //y0 is not needed anymore, and we need it to be either 0 or heightOrWidth for the
+        //algorithm to work correctly (depending on the sign of xyStep[1]). So do this now.
+        if( y0 >= y1 )
+            y0 = heightOrWidth;
 
         int32 *starts = startsBase;
 
@@ -303,9 +320,107 @@ namespace Ogre
 
         m_shadowJob->setNumThreadGroups( totalThreadGroups, 1u, 1u );
 
-        ShaderParams &shaderParams = m_shadowJob->getShaderParams( "Default" );
+        ShaderParams &shaderParams = m_shadowJob->getShaderParams( "default" );
         shaderParams.setDirty();
 
         m_shadowWorkspace->_update();
+    }
+    //-----------------------------------------------------------------------------------
+    void ShadowMapper::fillUavDataForCompositorChannel( CompositorChannel &outChannel,
+                                                        ResourceLayoutMap &outInitialLayouts,
+                                                        ResourceAccessMap &outInitialUavAccess ) const
+    {
+        outChannel.target = m_shadowMapTex->getBuffer(0)->getRenderTarget();
+        outChannel.textures.push_back( m_shadowMapTex );
+        outInitialLayouts.insert( m_shadowWorkspace->getResourcesLayout().begin(),
+                                  m_shadowWorkspace->getResourcesLayout().end() );
+        outInitialUavAccess.insert( m_shadowWorkspace->getUavsAccess().begin(),
+                                    m_shadowWorkspace->getUavsAccess().end() );
+    }
+    //-----------------------------------------------------------------------------------
+    void ShadowMapper::setGaussianFilterParams( uint8 kernelRadius, float gaussianDeviationFactor )
+    {
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        HlmsCompute *hlmsCompute = hlmsManager->getComputeHlms();
+
+        HlmsComputeJob *job = 0;
+        job = hlmsCompute->findComputeJob( "Terra/GaussianBlurH" );
+        setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
+        job = hlmsCompute->findComputeJob( "Terra/GaussianBlurV" );
+        setGaussianFilterParams( job, kernelRadius, gaussianDeviationFactor );
+    }
+    //-----------------------------------------------------------------------------------
+    void ShadowMapper::setGaussianFilterParams( HlmsComputeJob *job, uint8 kernelRadius,
+                                                float gaussianDeviationFactor )
+    {
+        assert( !(kernelRadius & 0x01) && "kernelRadius must be even!" );
+
+        job->setProperty( "kernel_radius", kernelRadius );
+        ShaderParams &shaderParams = job->getShaderParams( "default" );
+
+        std::vector<float> weights( kernelRadius + 1u );
+
+        const float fKernelRadius = kernelRadius;
+        const float gaussianDeviation = fKernelRadius * gaussianDeviationFactor;
+
+        //It's 2.0f if using the approximate filter (sampling between two pixels to
+        //get the bilinear interpolated result and cut the number of samples in half)
+        const float stepSize = 1.0f;
+
+        //Calculate the weights
+        float fWeightSum = 0;
+        for( uint32 i=0; i<kernelRadius + 1u; ++i )
+        {
+            const float _X = i - fKernelRadius + ( 1.0f - 1.0f / stepSize );
+            float fWeight = 1.0f / sqrt ( 2.0f * Math::PI * gaussianDeviation * gaussianDeviation );
+            fWeight *= exp( - ( _X * _X ) / ( 2.0f * gaussianDeviation * gaussianDeviation ) );
+
+            fWeightSum += fWeight;
+			weights[i] = fWeight;
+        }
+
+        //Normalize the weights
+        for( uint32 i=0; i<kernelRadius + 1u; ++i )
+            weights[i] /= fWeightSum;
+
+        //Remove shader constants from previous calls (needed in case we've reduced the radius size)
+        ShaderParams::ParamVec::iterator itor = shaderParams.mParams.begin();
+        ShaderParams::ParamVec::iterator end  = shaderParams.mParams.end();
+
+        while( itor != end )
+        {
+            String::size_type pos = itor->name.find( "c_weights[" );
+
+            if( pos != String::npos )
+            {
+                itor = shaderParams.mParams.erase( itor );
+                end  = shaderParams.mParams.end();
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+
+        //Set the shader constants, 16 at a time (since that's the limit of what ManualParam can hold)
+        char tmp[32];
+        LwString weightsString( LwString::FromEmptyPointer( tmp, sizeof(tmp) ) );
+        const uint32 floatsPerParam = sizeof( ShaderParams::ManualParam::dataBytes ) / sizeof(float);
+        for( uint32 i=0; i<kernelRadius + 1u; i += floatsPerParam )
+        {
+            weightsString.clear();
+            weightsString.a( "c_weights[", i, "]" );
+
+            ShaderParams::Param p;
+            p.isAutomatic   = false;
+            p.isDirty       = true;
+            p.name = weightsString.c_str();
+            shaderParams.mParams.push_back( p );
+            ShaderParams::Param *param = &shaderParams.mParams.back();
+
+            param->setManualValue( &weights[i], std::min<uint32>( floatsPerParam, weights.size() - i ) );
+        }
+
+        shaderParams.setDirty();
     }
 }

@@ -10,6 +10,8 @@
 
 namespace Ogre
 {
+    struct CompositorChannel;
+
     class ShadowMapper
     {
         Ogre::TexturePtr    m_heightMapTex;
@@ -62,13 +64,30 @@ namespace Ogre
         */
         static inline float getErrorAfterXsteps( uint32 xIterationsToSkip, float dx, float dy );
 
+        static void setGaussianFilterParams( HlmsComputeJob *job, uint8 kernelRadius,
+                                             float gaussianDeviationFactor=0.5f );
+
     public:
         ShadowMapper( SceneManager *sceneManager, CompositorManager2 *compositorManager );
         ~ShadowMapper();
 
+        /** Sets the parameter of the gaussian filter we apply to the shadow map.
+        @param kernelRadius
+            Kernel radius. Must be an even number.
+        @param gaussianDeviationFactor
+            Expressed in terms of gaussianDeviation = kernelRadius * gaussianDeviationFactor
+        */
+        void setGaussianFilterParams( uint8 kernelRadius, float gaussianDeviationFactor=0.5f );
+
         void createShadowMap( IdType id, TexturePtr &heightMapTex );
         void destroyShadowMap(void);
         void updateShadowMap( const Vector3 &lightDir, const Vector2 &xzDimensions, float heightScale );
+
+        void fillUavDataForCompositorChannel( CompositorChannel &outChannel,
+                                              ResourceLayoutMap &outInitialLayouts,
+                                              ResourceAccessMap &outInitialUavAccess ) const;
+
+        Ogre::TexturePtr getShadowMapTex(void) const            { return m_shadowMapTex; }
     };
 }
 

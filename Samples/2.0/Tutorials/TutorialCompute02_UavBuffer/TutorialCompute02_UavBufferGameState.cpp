@@ -74,7 +74,7 @@ namespace Demo
             res[1] = renderWindow->getHeight();
 
             //Update the compute shader's
-            Ogre::ShaderParams &shaderParams = mComputeJob->getShaderParams( "Default" );
+            Ogre::ShaderParams &shaderParams = mComputeJob->getShaderParams( "default" );
             Ogre::ShaderParams::Param *texResolution = shaderParams.findParameter( "texResolution" );
             texResolution->setManualValue( res, sizeof(res) / sizeof(Ogre::uint32) );
             shaderParams.setDirty();

@@ -123,6 +123,8 @@ namespace Ogre
         HlmsCompute( AutoParamDataSource *autoParamDataSource );
         virtual ~HlmsCompute();
 
+        virtual void reloadFrom( Archive *newDataFolder, ArchiveVec *libraryFolders=0 );
+
         /** An HlmsComputeJob is very similar to an HlmsDatablock, except it
             contains a compute job instead. If multiple HlmsComputeJob end up
             having the same compute shader (i.e. the resulting source code is

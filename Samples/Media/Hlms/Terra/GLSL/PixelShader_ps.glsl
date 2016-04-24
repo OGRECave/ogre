@@ -45,6 +45,7 @@ in block
 } inPs;
 
 uniform sampler2D terrainNormals;
+uniform sampler2D terrainShadows;
 
 @property( hlms_forward3d )
 /*layout(binding = 1) */uniform usamplerBuffer f3dGrid;
@@ -184,7 +185,7 @@ vec3 qmul( vec4 q, vec3 v )
 
 @insertpiece( DeclareBRDF )
 
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
+@piece( DarkenWithShadowFirstLight )* fShadow@end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
 void main()
@@ -252,8 +253,12 @@ void main()
 	diffuseCol.xyz *=	(detailCol0 * detailWeights.x + detailCol1 * detailWeights.y) +
 						(detailCol2 * detailWeights.z + detailCol3 * detailWeights.w);
 @end @property( !diffuse_map )
-	diffuseCol.xyz =	(detailCol0 * detailWeights.x + detailCol1 * detailWeights.y) +
-						(detailCol2 * detailWeights.z + detailCol3 * detailWeights.w);
+	@property( detail_maps_diffuse )
+		diffuseCol.xyz =	(detailCol0 * detailWeights.x + detailCol1 * detailWeights.y) +
+							(detailCol2 * detailWeights.z + detailCol3 * detailWeights.w);
+	@end @property( !detail_maps_diffuse )
+		diffuseCol.xyzw = vec4( 1, 1, 1, 1 );
+	@end
 @end
 
 	/// Apply the material's diffuse over the textures
@@ -265,12 +270,12 @@ void main()
 
 @property( !detail_maps_normal )
 	// Geometric normal
-	nNormal = texture( terrainNormals, inPs.uv0.xy ).xyz;
+	nNormal = texture( terrainNormals, inPs.uv0.xy ).xyz * 2.0 - 1.0;
 	//nNormal.xz = texture( terrainNormals, inPs.uv0.xy ).xy;
-	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x + nNormal.z * nNormal.z, 0.0 ) );
+	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x - nNormal.z * nNormal.z, 0.0 ) );
 	nNormal = mat3(pass.view) * nNormal;
 @end @property( detail_maps_normal )
-	vec3 geomNormal = texture( terrainNormals, inPs.uv0.xy ).xyz;
+	vec3 geomNormal = texture( terrainNormals, inPs.uv0.xy ).xyz * 2.0 - 1.0;
 	geomNormal = mat3(pass.view) * geomNormal;
 
 	//Get the TBN matrix
@@ -278,14 +283,15 @@ void main()
 	mat3 TBN		= mat3( pass.viewSpaceTangent, vBinormal, geomNormal );
 @end
 
+	float fShadow = texture( terrainShadows, inPs.uv0.xy ).x;
+
 @property( hlms_pssm_splits )
-    float fShadow = 1.0;
     if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+		fShadow *= getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-        fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+		fShadow *= getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
-    float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	fShadow *= getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end
 
 	/// The first iteration must initialize nNormal instead of try to merge with it.
@@ -304,7 +310,7 @@ void main()
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
 	vec3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
@@ -411,7 +417,7 @@ void main()
 	@end
 @end @property( !hlms_alphablend )
 	outColour.w		= 1.0;@end
-
+	
 	@insertpiece( custom_ps_posExecution )
 }
 @end

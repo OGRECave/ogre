@@ -493,7 +493,7 @@ namespace Ogre
         if (fullscreen == mIsFullScreen && width == mWidth && height == mHeight)
             return;
 
-        if (mIsFullScreen != fullscreen && &mGLSupport->mAtomFullScreen == None)
+        if (mIsFullScreen != fullscreen && mGLSupport->mAtomFullScreen == None)
         {
             // Without WM support it is best to give up.
             LogManager::getSingleton().logMessage("GLXWindow::switchFullScreen: Your WM has no fullscreen support");
@@ -774,7 +774,7 @@ namespace Ogre
     //-------------------------------------------------------------------------------------------------//
     void GLXWindow::switchFullScreen(bool fullscreen)
     {
-        if (&mGLSupport->mAtomFullScreen != None)
+        if (mGLSupport->mAtomFullScreen != None)
         {
             Display* xDisplay = mGLSupport->getXDisplay();
             XClientMessageEvent xMessage;

@@ -8,6 +8,10 @@ compositor_node Terra/GpuNormalMapper
 		{
 			material Terra/GpuNormalMapper
 		}
+
+		pass generate_mipmaps
+		{
+		}
 	}
 }
 

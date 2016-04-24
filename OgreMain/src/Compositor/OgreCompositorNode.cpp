@@ -452,6 +452,15 @@ namespace Ogre
         mConnectedNodes.clear();
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNode::setEnabled( bool bEnabled )
+    {
+        if( mEnabled != bEnabled )
+        {
+            mEnabled = bEnabled;
+            mWorkspace->_notifyBarriersDirty();
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorNode::connectBufferTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB )
     {
         if( inChannelB >= nodeB->mDefinition->mInputBuffers.size() )
@@ -551,8 +560,7 @@ namespace Ogre
         this->mConnectedNodes.push_back( nodeB );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorNode::connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
-                                            size_t inChannelA )
+    void CompositorNode::connectExternalRT( const CompositorChannel &externalTexture, size_t inChannelA )
     {
         if( inChannelA >= mInTextures.size() )
         {
@@ -563,8 +571,7 @@ namespace Ogre
 
         if( !mInTextures[inChannelA].target )
             ++mNumConnectedInputs;
-        mInTextures[inChannelA].target      = rt;
-        mInTextures[inChannelA].textures    = textures;
+        mInTextures[inChannelA] = externalTexture;
 
         if( this->mNumConnectedInputs >= this->mInTextures.size() )
             this->routeOutputs();
@@ -850,6 +857,48 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::initResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                              const CompositorChannelVec &compositorChannels,
+                                              ResourceLayout::Layout layout )
+    {
+        CompositorChannelVec::const_iterator itor = compositorChannels.begin();
+        CompositorChannelVec::const_iterator end  = compositorChannels.end();
+
+        while( itor != end )
+        {
+            if( outResourcesLayout.find( itor->target ) == outResourcesLayout.end() )
+                outResourcesLayout[itor->target] = layout;
+
+            TextureVec::const_iterator itTex = itor->textures.begin();
+            TextureVec::const_iterator enTex = itor->textures.end();
+
+            while( itTex != enTex )
+            {
+                const Ogre::TexturePtr tex = *itTex;
+                const size_t numFaces = tex->getNumFaces();
+                const uint8 numMips = tex->getNumMipmaps() + 1;
+                const uint32 numSlices = tex->getTextureType() == TEX_TYPE_CUBE_MAP ? 1u :
+                                                                                      tex->getDepth();
+                for( size_t face=0; face<numFaces; ++face )
+                {
+                    for( uint8 mip=0; mip<numMips; ++mip )
+                    {
+                        for( uint32 slice=0; slice<numSlices; ++slice )
+                        {
+                            RenderTarget *rt = tex->getBuffer( face, mip )->getRenderTarget( slice );
+                            if( outResourcesLayout.find( rt ) == outResourcesLayout.end() )
+                                outResourcesLayout[rt] = layout;
+                        }
+                    }
+                }
+
+                ++itTex;
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorNode::initResourcesLayout( ResourceLayoutMap &outResourcesLayout,
                                               const CompositorNamedBufferVec &buffers,
                                               ResourceLayout::Layout layout )
     {
@@ -884,13 +933,27 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void CompositorNode::_removeAllBarriers(void)
+    {
+        CompositorPassVec::const_iterator itPasses = mPasses.begin();
+        CompositorPassVec::const_iterator enPasses = mPasses.end();
+
+        while( itPasses != enPasses )
+        {
+            CompositorPass *pass = *itPasses;
+            pass->_removeAllBarriers();
+
+            ++itPasses;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorNode::_setFinalTargetAsRenderTarget(
                                                 ResourceLayoutMap::iterator finalTargetCurrentLayout )
     {
         if( mPasses.empty() )
         {
             OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
-                         "Node " + mName.getFriendlyText() + "has no passes!",
+                         "Node " + mName.getFriendlyText() + " has no passes!",
                          "CompositorNode::_setFinalTargetAsRenderTarget" );
         }
 
@@ -902,31 +965,10 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CompositorNode::_update( const Camera *lodCamera, SceneManager *sceneManager )
     {
-        //Add local & input textures to the SceneManager so they can be referenced by materials
-        size_t oldNumTextures = sceneManager->getNumCompositorTextures();
-        TextureDefinitionBase::NameToChannelMap::const_iterator it =
-                                                                mDefinition->mNameToChannelMap.begin();
-        TextureDefinitionBase::NameToChannelMap::const_iterator en =
-                                                                mDefinition->mNameToChannelMap.end();
-
-        while( it != en )
-        {
-            size_t index;
-            TextureDefinitionBase::TextureSource texSource;
-            mDefinition->decodeTexSource( it->second, index, texSource );
-            if( texSource == TextureDefinitionBase::TEXTURE_INPUT )
-                sceneManager->_addCompositorTexture( it->first, &mInTextures[index].textures );
-            else if( texSource == TextureDefinitionBase::TEXTURE_LOCAL )
-                sceneManager->_addCompositorTexture( it->first, &mLocalTextures[index].textures );
-
-            ++it;
-        }
-
         //If we're in a caster pass, we need to skip shadow map passes that have no light associated
         const CompositorShadowNode *shadowNode = 0;
         if( sceneManager->_getCurrentRenderStage() == SceneManager::IRS_RENDER_TO_TEXTURE )
             shadowNode = sceneManager->getCurrentShadowNode();
-
         uint8 executionMask = mWorkspace->getExecutionMask();
 
         //Execute our passes
@@ -936,18 +978,31 @@ namespace Ogre
         while( itor != end )
         {
             CompositorPass *pass = *itor;
-            const CompositorPassDef *passDef = (*itor)->getDefinition();
+            const CompositorPassDef *passDef = pass->getDefinition();
 
             if( executionMask & passDef->mExecutionMask &&
                 (!shadowNode || shadowNode->isShadowMapIdxActive( passDef->mShadowMapIdx ) ) )
             {
+                //Make explicitly exposed textures available to materials during this pass.
+                const size_t oldNumTextures = sceneManager->getNumCompositorTextures();
+                IdStringVec::const_iterator itExposed = passDef->mExposedTextures.begin();
+                IdStringVec::const_iterator enExposed = passDef->mExposedTextures.end();
+
+                while( itExposed != enExposed )
+                {
+                    const CompositorChannel *exposedChannel = this->_getDefinedTexture( *itExposed );
+                    sceneManager->_addCompositorTexture( *itExposed, &exposedChannel->textures );
+                    ++itExposed;
+                }
+
+                //Execute pass
                 pass->execute( lodCamera );
+
+                //Remove our textures
+                sceneManager->_removeCompositorTextures( oldNumTextures );
             }
             ++itor;
         }
-
-        //Remove our textures
-        sceneManager->_removeCompositorTextures( oldNumTextures );
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::finalTargetResized( const RenderTarget *finalTarget )

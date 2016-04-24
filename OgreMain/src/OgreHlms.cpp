@@ -787,6 +787,18 @@ namespace Ogre
             Operation( "pmax", sizeof( "@pmax" ), &maxOp )
         };
     //-----------------------------------------------------------------------------------
+    inline int Hlms::interpretAsNumberThenAsProperty( const String &argValue ) const
+    {
+        int opValue = StringConverter::parseInt( argValue, -std::numeric_limits<int>::max() );
+        if( opValue == -std::numeric_limits<int>::max() )
+        {
+            //Not a number, interpret as property
+            opValue = getProperty( argValue );
+        }
+
+        return opValue;
+    }
+    //-----------------------------------------------------------------------------------
     bool Hlms::parseMath( const String &inBuffer, String &outBuffer )
     {
         outBuffer.clear();
@@ -830,25 +842,10 @@ namespace Ogre
 
             if( !syntaxError )
             {
-                IdString dstProperty;
-                IdString srcProperty;
-                int op1Value;
-                int op2Value;
-
-                dstProperty = argValues[0];
-                size_t idx  = 1;
-                srcProperty = dstProperty;
-                if( argValues.size() == 3 )
-                    srcProperty = argValues[idx++];
-                op1Value    = getProperty( srcProperty );
-                op2Value    = StringConverter::parseInt( argValues[idx],
-                                                         -std::numeric_limits<int>::max() );
-
-                if( op2Value == -std::numeric_limits<int>::max() )
-                {
-                    //Not a number, interpret as property
-                    op2Value = getProperty( argValues[idx] );
-                }
+                const IdString dstProperty = argValues[0];
+                const size_t idx = argValues.size() == 3 ? 1 : 0;
+                const int op1Value = interpretAsNumberThenAsProperty( argValues[idx] );
+                const int op2Value = interpretAsNumberThenAsProperty( argValues[idx + 1] );
 
                 int result = c_operations[keyword].opFunc( op1Value, op2Value );
                 setProperty( dstProperty, result );
@@ -1240,20 +1237,10 @@ namespace Ogre
                 }
                 else
                 {
-                    dstProperty = argValues[0];
-                    size_t idx  = 1;
-                    srcProperty = dstProperty;
-                    if( argValues.size() == 3 )
-                        srcProperty = argValues[idx++];
-                    op1Value    = getProperty( srcProperty );
-                    op2Value    = StringConverter::parseInt( argValues[idx],
-                                                             -std::numeric_limits<int>::max() );
-
-                    if( op2Value == -std::numeric_limits<int>::max() )
-                    {
-                        //Not a number, interpret as property
-                        op2Value = getProperty( argValues[idx] );
-                    }
+                    const IdString dstProperty = argValues[0];
+                    const size_t idx = argValues.size() == 3 ? 1 : 0;
+                    const int op1Value = interpretAsNumberThenAsProperty( argValues[idx] );
+                    const int op2Value = interpretAsNumberThenAsProperty( argValues[idx + 1] );
 
                     int result = c_counterOperations[keyword].opFunc( op1Value, op2Value );
                     setProperty( dstProperty, result );
@@ -1391,6 +1378,21 @@ namespace Ogre
 
         mDataFolder = newDataFolder;
         enumeratePieceFiles();
+    }
+    //-----------------------------------------------------------------------------------
+    ArchiveVec Hlms::getPiecesLibraryAsArchiveVec(void) const
+    {
+        ArchiveVec retVal;
+        LibraryVec::const_iterator itor = mLibrary.begin();
+        LibraryVec::const_iterator end  = mLibrary.end();
+
+        while( itor != end )
+        {
+            retVal.push_back( itor->dataFolder );
+            ++itor;
+        }
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     HlmsDatablock* Hlms::createDatablock( IdString name, const String &refName,
@@ -1561,11 +1563,15 @@ namespace Ogre
                 inFile->read(&inString[0], inFile->size());
 
                 this->parseMath(inString, outString);
-                this->parseForEach(outString, inString);
-                this->parseProperties(inString, outString);
-                this->parseUndefPieces(outString, inString);
-                this->collectPieces(inString, outString);
-                this->parseCounter(outString, inString);
+                while( outString.find( "@foreach" ) != String::npos )
+                {
+                    this->parseForEach(outString, inString);
+                    inString.swap( outString );
+                }
+                this->parseProperties(outString, inString);
+                this->parseUndefPieces(inString, outString);
+                this->collectPieces(outString, inString);
+                this->parseCounter(inString, outString);
             }
             ++itor;
         }
@@ -1645,16 +1651,22 @@ namespace Ogre
                 bool syntaxError = false;
 
                 syntaxError |= this->parseMath( inString, outString );
-                syntaxError |= this->parseForEach( outString, inString );
-                syntaxError |= this->parseProperties( inString, outString );
-                syntaxError |= this->parseUndefPieces( outString, inString );
+                while( !syntaxError && outString.find( "@foreach" ) != String::npos )
+                {
+                    syntaxError |= this->parseForEach( outString, inString );
+                    inString.swap( outString );
+                }
+                syntaxError |= this->parseProperties( outString, inString );
+                syntaxError |= this->parseUndefPieces( inString, outString );
                 while( !syntaxError  && (outString.find( "@piece" ) != String::npos ||
                                          outString.find( "@insertpiece" ) != String::npos) )
                 {
-                    syntaxError |= this->collectPieces( inString, outString );
-                    syntaxError |= this->insertPieces( outString, inString );
+                    syntaxError |= this->collectPieces( outString, inString );
+                    syntaxError |= this->insertPieces( inString, outString );
                 }
-                syntaxError |= this->parseCounter( inString, outString );
+                syntaxError |= this->parseCounter( outString, inString );
+
+                outString.swap( inString );
 
                 if( syntaxError )
                 {

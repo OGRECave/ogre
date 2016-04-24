@@ -124,23 +124,39 @@ namespace Ogre
 
         while( itor != end )
         {
-            //only open piece files with current render system extention
-            if (itor->find(mShaderFileExt) != String::npos)
+            String filename = *itor;
+
+            //If it has an explicit extension, only open it if it matches the current
+            //render system's. If it doesn't, then we add it ourselves.
+            String::size_type pos = filename.find_last_of( '.' );
+            if( pos == String::npos ||
+                (filename.compare( pos + 1, String::npos, mShaderFileExt ) != 0 &&
+                 filename.compare( pos + 1, String::npos, "metal" ) != 0 &&
+                 filename.compare( pos + 1, String::npos, "glsl" ) != 0 &&
+                 filename.compare( pos + 1, String::npos, "glsles" ) != 0 &&
+                 filename.compare( pos + 1, String::npos, "hlsl" ) != 0) )
             {
-                DataStreamPtr inFile = resourceGroupMgr.openResource( *itor );
-
-                String inString;
-                String outString;
-
-                inString.resize(inFile->size());
-                inFile->read(&inString[0], inFile->size());
-
-                this->parseMath(inString, outString);
-                this->parseForEach(outString, inString);
-                this->parseProperties(inString, outString);
-                this->collectPieces(outString, inString);
-                this->parseCounter(inString, outString);
+                filename += mShaderFileExt;
             }
+
+            DataStreamPtr inFile = resourceGroupMgr.openResource( filename );
+
+            String inString;
+            String outString;
+
+            inString.resize(inFile->size());
+            inFile->read(&inString[0], inFile->size());
+
+            this->parseMath(inString, outString);
+            while( outString.find( "@foreach" ) != String::npos )
+            {
+                this->parseForEach(outString, inString);
+                inString.swap( outString );
+            }
+            this->parseProperties(outString, inString);
+            this->parseUndefPieces(inString, outString);
+            this->collectPieces(outString, inString);
+            this->parseCounter(inString, outString);
 
             ++itor;
         }
@@ -165,6 +181,9 @@ namespace Ogre
         //Collect pieces
         mPieces.clear();
 
+        //Start with the pieces sent by the user
+        mPieces = job->mPieces;
+
         const String sourceFilename = job->mSourceFilename + mShaderFileExt;
 
         ResourceGroupManager &resourceGroupMgr = ResourceGroupManager::getSingleton();
@@ -187,8 +206,13 @@ namespace Ogre
         bool syntaxError = false;
 
         syntaxError |= this->parseMath( inString, outString );
-        syntaxError |= this->parseForEach( outString, inString );
-        syntaxError |= this->parseProperties( inString, outString );
+        while( !syntaxError && outString.find( "@foreach" ) != String::npos )
+        {
+            syntaxError |= this->parseForEach( outString, inString );
+            inString.swap( outString );
+        }
+        syntaxError |= this->parseProperties( outString, inString );
+        syntaxError |= this->parseUndefPieces( inString, outString );
         while( !syntaxError  && (outString.find( "@piece" ) != String::npos ||
                                  outString.find( "@insertpiece" ) != String::npos) )
         {
@@ -262,7 +286,7 @@ namespace Ogre
             }
         }
 
-        ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+        ShaderParams *shaderParams = job->_getShaderParams( "default" );
         if( shaderParams )
             shaderParams->updateParameters( shader->getDefaultParameters() );
 
@@ -358,7 +382,7 @@ namespace Ogre
                 //Compile and add the PSO to the cache.
                 psoCache.pso = compileShader( job, mComputeShaderCache.size() );
 
-                ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+                ShaderParams *shaderParams = job->_getShaderParams( "default" );
                 if( shaderParams )
                     psoCache.paramsUpdateCounter = shaderParams->getUpdateCounter();
                 if( shaderParams )
@@ -386,7 +410,7 @@ namespace Ogre
 
         {
             //Update dirty parameters, if necessary
-            ShaderParams *shaderParams = job->_getShaderParams( "Default" );
+            ShaderParams *shaderParams = job->_getShaderParams( "default" );
             if( shaderParams && psoCache.paramsUpdateCounter != shaderParams->getUpdateCounter() )
             {
                 shaderParams->updateParameters( psoCache.pso.computeShader->getDefaultParameters() );
@@ -429,7 +453,7 @@ namespace Ogre
             {
                 mRenderSystem->_setTextureCS( slotIdx, !itTex->texture.isNull(), itTex->texture.get() );
                 if( itTex->samplerblock )
-                    mRenderSystem->_setHlmsSamplerblock( slotIdx, itTex->samplerblock );
+                    mRenderSystem->_setHlmsSamplerblockCS( slotIdx, itTex->samplerblock );
             }
 
             ++slotIdx;
@@ -477,6 +501,39 @@ namespace Ogre
                                                      const HlmsParamVec &paramVec )
     {
         return 0;
+    }
+    //----------------------------------------------------------------------------------
+    void HlmsCompute::reloadFrom( Archive *newDataFolder, ArchiveVec *libraryFolders )
+    {
+        Hlms::reloadFrom( newDataFolder, libraryFolders );
+
+        HlmsComputeJobMap::const_iterator itor = mComputeJobs.begin();
+        HlmsComputeJobMap::const_iterator end  = mComputeJobs.end();
+
+        while( itor != end )
+        {
+            HlmsComputeJob *job = itor->second.computeJob;
+            map<IdString, ShaderParams>::type::iterator it = job->mShaderParams.begin();
+            map<IdString, ShaderParams>::type::iterator en = job->mShaderParams.end();
+
+            while( it != en )
+            {
+                ShaderParams &shaderParams = it->second;
+                ShaderParams::ParamVec::iterator itParam = shaderParams.mParams.begin();
+                ShaderParams::ParamVec::iterator enParam = shaderParams.mParams.end();
+
+                while( itParam != enParam )
+                {
+                    itParam->isDirty = true;
+                    ++itParam;
+                }
+
+                shaderParams.setDirty();
+                ++it;
+            }
+
+            ++itor;
+        }
     }
     //----------------------------------------------------------------------------------
     HlmsComputeJob* HlmsCompute::createComputeJob( IdString datablockName, const String &refName,

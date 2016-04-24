@@ -3099,8 +3099,7 @@ bail:
 
             {
                 //Using Compute Shaders? Unset the UAV from rendering
-                mDevice.GetImmediateContext()->OMSetRenderTargets( mNumberOfViews, mRenderTargetViews,
-                                                                   mDepthStencilView );
+                mDevice.GetImmediateContext()->OMSetRenderTargets( 0, 0, 0 );
                 mUavsDirty = true;
             }
 
@@ -3826,112 +3825,121 @@ bail:
 
         // Do everything here in Dx11, since deal with via buffers anyway so number of calls
         // is actually the same whether we categorise the updates or not
-        ID3D11Buffer* pBuffers[1] ;
+        ID3D11Buffer* pBuffers[2];
+        UINT slotStart, numBuffers;
         switch(gptype)
         {
         case GPT_VERTEX_PROGRAM:
+            if( mPso->vertexShader )
             {
-                //  if (params->getAutoConstantCount() > 0)
-                //{
-                if (mPso->vertexShader)
+                mPso->vertexShader->getConstantBuffers( pBuffers, slotStart, numBuffers, params, mask );
+                if( numBuffers > 0 )
                 {
-                    pBuffers[0] = mPso->vertexShader->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->VSSetConstantBuffers( 0, 1, pBuffers );
+                    mDevice.GetImmediateContext()->VSSetConstantBuffers( slotStart, numBuffers,
+                                                                         pBuffers );
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set vertex shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                     "D3D11 device cannot set vertex shader constant buffers\n"
+                                     "Error Description:" + errorDescription,
+                                     "D3D11RenderSystem::bindGpuProgramParameters" );
+                    }
                 }
             }
             break;
         case GPT_FRAGMENT_PROGRAM:
+            if( mPso->pixelShader )
             {
-                //if (params->getAutoConstantCount() > 0)
-                //{
-                if (mPso->pixelShader)
+                mPso->pixelShader->getConstantBuffers( pBuffers, slotStart, numBuffers, params, mask );
+                if( numBuffers > 0 )
                 {
-                    pBuffers[0] = mPso->pixelShader->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->PSSetConstantBuffers( 0, 1, pBuffers );
+                    mDevice.GetImmediateContext()->PSSetConstantBuffers( slotStart, numBuffers,
+                                                                         pBuffers );
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set fragment shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                     "D3D11 device cannot set pixel shader constant buffers\n"
+                                     "Error Description:" + errorDescription,
+                                     "D3D11RenderSystem::bindGpuProgramParameters" );
+                    }
                 }
             }
             break;
         case GPT_GEOMETRY_PROGRAM:
+            if( mPso->geometryShader )
             {
-                if (mPso->geometryShader)
+                mPso->geometryShader->getConstantBuffers( pBuffers, slotStart, numBuffers, params, mask );
+                if( numBuffers > 0 )
                 {
-                    pBuffers[0] = mPso->geometryShader->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->GSSetConstantBuffers( 0, 1, pBuffers );
+                    mDevice.GetImmediateContext()->GSSetConstantBuffers( slotStart, numBuffers,
+                                                                         pBuffers );
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Geometry shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                     "D3D11 device cannot set geometry shader constant buffers\n"
+                                     "Error Description:" + errorDescription,
+                                     "D3D11RenderSystem::bindGpuProgramParameters" );
+                    }
                 }
             }
             break;
         case GPT_HULL_PROGRAM:
+            if( mPso->hullShader )
             {
-                if (mPso->hullShader)
+                mPso->hullShader->getConstantBuffers( pBuffers, slotStart, numBuffers, params, mask );
+                if( numBuffers > 0 )
                 {
-                    pBuffers[0] = mPso->hullShader->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->HSSetConstantBuffers( 0, 1, pBuffers );
+                    mDevice.GetImmediateContext()->HSSetConstantBuffers( slotStart, numBuffers,
+                                                                         pBuffers );
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Hull shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                     "D3D11 device cannot set hull shader constant buffers\n"
+                                     "Error Description:" + errorDescription,
+                                     "D3D11RenderSystem::bindGpuProgramParameters" );
+                    }
                 }
             }
             break;
         case GPT_DOMAIN_PROGRAM:
+            if( mPso->domainShader )
             {
-                if (mPso->domainShader)
+                mPso->domainShader->getConstantBuffers( pBuffers, slotStart, numBuffers, params, mask );
+                if( numBuffers > 0 )
                 {
-                    pBuffers[0] = mPso->domainShader->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->DSSetConstantBuffers( 0, 1, pBuffers );
+                    mDevice.GetImmediateContext()->DSSetConstantBuffers( slotStart, numBuffers,
+                                                                         pBuffers );
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Domain shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                     "D3D11 device cannot set domain shader constant buffers\n"
+                                     "Error Description:" + errorDescription,
+                                     "D3D11RenderSystem::bindGpuProgramParameters" );
+                    }
                 }
             }
             break;
         case GPT_COMPUTE_PROGRAM:
+            if( mBoundComputeProgram )
             {
-                if (mBoundComputeProgram)
+                mBoundComputeProgram->getConstantBuffers( pBuffers, slotStart, numBuffers, params, mask );
+                if( numBuffers > 0 )
                 {
-                    pBuffers[0] = mBoundComputeProgram->getConstantBuffer(params, mask);
-                    mDevice.GetImmediateContext()->CSSetConstantBuffers( 0, 1, pBuffers );
+                    mDevice.GetImmediateContext()->CSSetConstantBuffers( slotStart, numBuffers,
+                                                                         pBuffers );
                     if (mDevice.isError())
                     {
                         String errorDescription = mDevice.getErrorDescription();
-                        OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR, 
-                            "D3D11 device cannot set Compute shader constant buffers\nError Description:" + errorDescription,
-                            "D3D11RenderSystem::bindGpuProgramParameters");
-                    }       
-
+                        OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                                     "D3D11 device cannot set compute shader constant buffers\n"
+                                     "Error Description:" + errorDescription,
+                                     "D3D11RenderSystem::bindGpuProgramParameters" );
+                    }
                 }
             }
             break;
@@ -4495,6 +4503,11 @@ bail:
             mDevice.GetProfiler()->SetMarker(wideNameOk ? wideName : L"<too long or empty event name>");
         }
 #endif
+    }
+    //---------------------------------------------------------------------
+    const PixelFormatToShaderType* D3D11RenderSystem::getPixelFormatToShaderType(void) const
+    {
+        return &mD3D11PixelFormatToShaderType;
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::_clearStateAndFlushCommandBuffer(void)

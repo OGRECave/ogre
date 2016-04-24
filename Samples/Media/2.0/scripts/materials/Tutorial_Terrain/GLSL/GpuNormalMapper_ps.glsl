@@ -83,6 +83,6 @@ void main()
 
 	vNormal = normalize( vNormal );
 
-	//fragColour.xy = vNormal.xz;
-	fragColour = vec4( vNormal.xyz, 1.0f );
+	//fragColour.xy = vNormal.zx;
+	fragColour = vec4( vNormal.zyx * 0.5 + 0.5, 1.0f );
 }

@@ -3799,4 +3799,9 @@ namespace Ogre {
     {
         return mGLSupport->checkExtension( ext );
     }
+
+    const PixelFormatToShaderType* GL3PlusRenderSystem::getPixelFormatToShaderType(void) const
+    {
+        return &mPixelFormatToShaderType;
+    }
 }

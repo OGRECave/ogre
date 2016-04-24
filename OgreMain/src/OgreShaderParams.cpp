@@ -46,8 +46,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ShaderParams::updateParameters( GpuProgramParametersSharedPtr params )
     {
-        ShaderParamVec::iterator itor = mParams.begin();
-        ShaderParamVec::iterator end  = mParams.end();
+        ParamVec::iterator itor = mParams.begin();
+        ParamVec::iterator end  = mParams.end();
 
         while( itor != end )
         {
@@ -112,8 +112,8 @@ namespace Ogre
     {
         ShaderParams::Param *retVal = 0;
 
-        ShaderParamVec::iterator itor = mParams.begin();
-        ShaderParamVec::iterator end  = mParams.end();
+        ParamVec::iterator itor = mParams.begin();
+        ParamVec::iterator end  = mParams.end();
 
         while( itor != end && itor->name != name )
             ++itor;

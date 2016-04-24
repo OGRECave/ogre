@@ -169,7 +169,7 @@ namespace Ogre
             This function is useful frequently toggling a compositor effect without having
             to recreate any API resource (which often would involve stalls).
         */
-        void setEnabled( bool bEnabled )                    { mEnabled = bEnabled; }
+        void setEnabled( bool bEnabled );
 
         /// Returns if this instance is enabled. @See setEnabled
         bool getEnabled(void) const                         { return mEnabled; }
@@ -193,7 +193,7 @@ namespace Ogre
         void connectTo( size_t outChannelA, CompositorNode *nodeB, size_t inChannelB );
 
         /** Connects (injects) an external RT into the given channel. Usually used for
-            the "connect_output" directive for the RenderWindow.
+            the "connect_output" / "connect_external" directive for the RenderWindow.
         @param rt
             The RenderTarget.
         @param textures
@@ -202,8 +202,7 @@ namespace Ogre
         @param inChannelA
             In which channel number to inject to.
         */
-        void connectFinalRT( RenderTarget *rt, CompositorChannel::TextureVec &textures,
-                                size_t inChannelA );
+        void connectExternalRT( const CompositorChannel &externalTexture, size_t inChannelA );
 
         /** Connects (injects) an external buffer into the given channel. Usually used for
             the 'connect_buffer_external' directive.
@@ -277,6 +276,10 @@ namespace Ogre
                                          ResourceLayout::Layout layout );
         /// Only inits a resource with the given layout if it wasn't already in outResourcesLayout
         static void initResourcesLayout( ResourceLayoutMap &outResourcesLayout,
+                                         const CompositorChannelVec &compositorChannels,
+                                         ResourceLayout::Layout layout );
+        /// Only inits a resource with the given layout if it wasn't already in outResourcesLayout
+        static void initResourcesLayout( ResourceLayoutMap &outResourcesLayout,
                                          const CompositorNamedBufferVec &buffers,
                                          ResourceLayout::Layout layout );
 
@@ -284,6 +287,8 @@ namespace Ogre
         void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
                                                    ResourceAccessMap &uavsAccess,
                                                    ResourceLayoutMap &resourcesLayout );
+        /// @see CompositorPass::_removeAllBarriers
+        void _removeAllBarriers(void);
 
         /// Places a resource transition in our last pass to the given RenderTarget.
         /// Usually needed to ensure the final 'RenderWindow' is still a RenderTarget

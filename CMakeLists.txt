@@ -127,7 +127,10 @@ if (MSVC)
     # set variable to state that we are using nmake makefiles
 	set(NMAKE TRUE)
   endif ()
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast /arch:SSE2")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast")
+  if (NOT OGRE_PLATFORM_X64)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /arch:SSE2")
+  endif()
   # Enable intrinsics on MSVC in debug mode
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
   if (CMAKE_CL_64)
