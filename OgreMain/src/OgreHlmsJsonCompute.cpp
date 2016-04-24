@@ -295,7 +295,7 @@ namespace Ogre
 
             if( jsonArray.Size() >= 2u && jsonArray[1].IsString() )
             {
-                ShaderParams &shaderParams = job->getShaderParams( "Default" );
+                ShaderParams &shaderParams = job->getShaderParams( "default" );
                 ShaderParams::Param param;
                 param.name = jsonArray[1].GetString();
                 param.isAutomatic = false;
@@ -423,7 +423,7 @@ namespace Ogre
 
         itor = json.FindMember( "params" );
         if( itor != json.MemberEnd() && itor->value.IsArray() )
-            loadParams( itor->value, job->getShaderParams( "Default" ), jobName );
+            loadParams( itor->value, job->getShaderParams( "default" ), jobName );
 
         itor = json.FindMember( "params_glsl" );
         if( itor != json.MemberEnd() && itor->value.IsArray() )

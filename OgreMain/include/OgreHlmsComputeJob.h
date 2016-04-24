@@ -124,6 +124,8 @@ namespace Ogre
         uint8 mMaxTexUnitReached;
         uint8 mMaxUavUnitReached;
         HlmsPropertyVec mSetProperties;
+        /// Don't add or remove directly! @see setPiece and @see removePiece
+        PiecesMap       mPieces;
         size_t          mPsoCacheHash;
 
         map<IdString, ShaderParams>::type mShaderParams;
@@ -238,16 +240,41 @@ namespace Ogre
         void setProperty( IdString key, int32 value );
         int32 getProperty( IdString key, int32 defaultVal=0 ) const;
 
+        /** Defines a piece, i.e. the same as doing @piece( pieceName )pieceContent@end
+            If the piece doesn't exist, it gets created.
+            If the piece already exists, it gets overwritten.
+        @remarks
+            Because we need to efficiently track changes (to know when to recompile, when
+            we can reuse a cached shader, etc), we store a property of the same
+            name as pieceName with the hash of the piece's content as value.
+            e.g. doing setPiece( pieceName, pieceContent ) implies calling
+            setProperty( pieceName, hash( pieceContent ).
+            Hence you should NOT manipulate mPieces directly, otherwise we won't
+            see changes performed to it, or use shaders from a cache we shouldn't
+            use.
+        @param pieceName
+            Name of the piece.
+        @param pieceContent
+            The contents of the piece.
+        */
+        void setPiece( IdString pieceName, const String &pieceContent );
+
+        /// Removes an existing piece. @see setPiece.
+        /// Does nothing if the piece didn't exist.
+        void removePiece( IdString pieceName );
+
         /// Creates a set of shader paramters with a given key,
-        /// e.g. "Default" "glsl" "hlsl".
+        /// e.g. "default" "glsl" "hlsl".
         /// Does nothing if parameters already exist.
         void createShaderParams( IdString key );
 
         /// Gets a shader parameter with the given key.
+        /// e.g. "default" "glsl" "hlsl".
         /// Creates if does not exist.
         ShaderParams& getShaderParams( IdString key );
 
         /// Gets a shader parameter with the given key.
+        /// e.g. "default" "glsl" "hlsl".
         /// Returns null if doesn't exist. @see createShaderParams
         ShaderParams* _getShaderParams( IdString key );
 

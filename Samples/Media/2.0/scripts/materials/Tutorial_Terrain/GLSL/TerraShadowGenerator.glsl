@@ -45,14 +45,16 @@ uniform float heightDelta;
 vec2 calcShadow( ivec2 xyPos, vec2 prevHeight )
 {
 	prevHeight.x -= heightDelta;
-	prevHeight.y = prevHeight.y * 0.9 - heightDelta; //Used for the penumbra region
+	prevHeight.y = prevHeight.y * 0.985 - heightDelta; //Used for the penumbra region
 
 	float currHeight = texelFetch( heightMap, xyPos, 0 ).x;
 
-	float shadowValue = smoothstep( prevHeight.y, prevHeight.x, currHeight );
-	//float shadowValue = currHeight < prevHeight.x ? 0.0 : 1.0;
-	prevHeight.x = currHeight >= prevHeight.x ? currHeight : prevHeight.x;
-	prevHeight.y = currHeight >= prevHeight.x ? currHeight : prevHeight.y;
+	//float shadowValue = smoothstep( prevHeight.y, prevHeight.x, clamp( currHeight, prevHeight.y, prevHeight.x ) );
+	float shadowValue = smoothstep( prevHeight.y, prevHeight.x, currHeight + 0.001 );
+	//float shadowValue = currHeight + 0.001 < prevHeight.x ? 0.0 : 1.0;
+	float oldPrevHeight = prevHeight.x;
+	prevHeight.x = currHeight + 0.000 >= prevHeight.x ? currHeight : prevHeight.x;
+	prevHeight.y = currHeight + 0.000 >= prevHeight.y ? currHeight : prevHeight.y;
 
 	//We store shadow's height in 10 bits, but the actual heightmap is in 16 bits.
 	//If we have a height of 0.9775, it will translate to 999.98 rounding to 1000

@@ -1,5 +1,5 @@
 
-RWTexture2D<float4> shadowMap			: register(u0);
+RWTexture2D<unorm float4> shadowMap		: register(u0);
 Texture2D<float> heightMap;
 
 //in uvec3 gl_NumWorkGroups;

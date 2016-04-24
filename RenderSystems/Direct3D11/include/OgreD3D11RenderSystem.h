@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreRenderSystem.h"
 #include "OgreD3D11Device.h"
 #include "OgreD3D11Mappings.h"
+#include "OgreD3D11PixelFormatToShaderType.h"
 
 namespace Ogre 
 {
@@ -180,6 +181,8 @@ namespace Ogre
         bool mRenderSystemWasInited;
 
         IDXGIFactoryN*  mpDXGIFactory;
+
+        D3D11PixelFormatToShaderType mD3D11PixelFormatToShaderType;
 		
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		D3D11StereoDriverBridge* mStereoDriver;
@@ -406,6 +409,9 @@ namespace Ogre
 		
 		/// @copydoc RenderSystem::setDrawBuffer
 		virtual bool setDrawBuffer(ColourBufferType colourBuffer);
+
+        /// @copydoc RenderSystem::getPixelFormatToShaderType
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const;
 
         void _clearStateAndFlushCommandBuffer(void);
     };

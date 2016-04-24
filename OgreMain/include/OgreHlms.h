@@ -74,8 +74,6 @@ namespace Ogre
         typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
 
     protected:
-        typedef std::map<IdString, String> PiecesMap;
-
         struct RenderableCache
         {
             HlmsPropertyVec setProperties;

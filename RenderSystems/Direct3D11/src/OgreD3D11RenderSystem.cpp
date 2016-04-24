@@ -4505,6 +4505,11 @@ bail:
 #endif
     }
     //---------------------------------------------------------------------
+    const PixelFormatToShaderType* D3D11RenderSystem::getPixelFormatToShaderType(void) const
+    {
+        return &mD3D11PixelFormatToShaderType;
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::_clearStateAndFlushCommandBuffer(void)
     {
         mDevice.GetImmediateContext()->ClearState();

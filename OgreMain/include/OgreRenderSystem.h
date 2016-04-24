@@ -1399,6 +1399,8 @@ namespace Ogre
         /// Checks for the presense of an API-specific extension (eg. Vulkan, GL)
         virtual bool checkExtension( const String &ext ) const      { return false; }
 
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const = 0;
+
     protected:
 
         void cleanReleasedDepthBuffers(void);

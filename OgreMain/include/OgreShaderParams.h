@@ -137,12 +137,12 @@ namespace Ogre
             }
         };
 
-        typedef vector<Param>::type ShaderParamVec;
+        typedef vector<Param>::type ParamVec;
 
         /// Don't log exceptions about missing parameters
         bool mSilenceMissingParameterWarnings;
         uint32 mUpdateCounter;
-        ShaderParamVec mParams;
+        ParamVec mParams;
 
         ShaderParams();
 

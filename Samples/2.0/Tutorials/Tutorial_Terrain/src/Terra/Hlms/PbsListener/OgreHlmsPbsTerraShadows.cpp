@@ -41,9 +41,11 @@ namespace Ogre
     const IdString PbsTerraProperty::TerraEnabled   = IdString( "terra_enabled" );
 
     HlmsPbsTerraShadows::HlmsPbsTerraShadows() :
-        mTerra( 0 ),
-        mTerraSamplerblock( 0 ),
-        mSceneManager( 0 )
+          mTerra( 0 )
+        , mTerraSamplerblock( 0 )
+#if OGRE_DEBUG_MODE
+        , mSceneManager( 0 )
+#endif
     {
     }
     //-----------------------------------------------------------------------------------
@@ -116,7 +118,7 @@ namespace Ogre
                                                    bool casterPass, bool dualParaboloid,
                                                    SceneManager *sceneManager ) const
     {
-        return (!casterPass && mTerra) ? 16u : 0u;
+        return (!casterPass && mTerra) ? 32u : 0u;
     }
     //-----------------------------------------------------------------------------------
     float* HlmsPbsTerraShadows::preparePassBuffer( const CompositorShadowNode *shadowNode,
@@ -127,10 +129,17 @@ namespace Ogre
         if( !casterPass && mTerra )
         {
             const float invHeight = 1.0f / mTerra->getHeight();
-            *passBufferPtr++ = mTerra->getXZDimensions().x;
+            const Vector3 &terrainOrigin = mTerra->getTerrainOrigin();
+            const Vector2 &terrainXZInvDim = mTerra->getXZInvDimensions();
+            *passBufferPtr++ = -terrainOrigin.x * terrainXZInvDim.x;
+            *passBufferPtr++ = -terrainOrigin.y * invHeight;
+            *passBufferPtr++ = -terrainOrigin.z * terrainXZInvDim.y;
+            *passBufferPtr++ = 1.0f;
+
+            *passBufferPtr++ = terrainXZInvDim.x;
             *passBufferPtr++ = invHeight;
-            *passBufferPtr++ = mTerra->getXZDimensions().y;
-            *passBufferPtr++ = mTerra->getTerrainOrigin().y * invHeight;
+            *passBufferPtr++ = terrainXZInvDim.y;
+            *passBufferPtr++ = 1.0f;
         }
 
         return passBufferPtr;
