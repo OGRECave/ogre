@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -116,7 +116,7 @@ namespace Ogre
         CbBase( CB_SET_V1_RENDER_OP )
     {
         vertexData  = renderOp.vertexData;
-        indexData   = renderOp.indexData;
+        indexData   = renderOp.useIndexes ? renderOp.indexData : 0;
         operationType = static_cast<uint8>( renderOp.operationType );
     }
 
