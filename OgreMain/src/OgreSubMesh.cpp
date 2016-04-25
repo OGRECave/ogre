@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -645,7 +645,7 @@ namespace v1 {
             }
         }
         mMaterialName = subMesh->getMaterialName();
-        mMatInitialised = false;
+        mMatInitialised = !mMaterialName.empty();
     }
     //---------------------------------------------------------------------
     void SubMesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
