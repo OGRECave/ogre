@@ -722,7 +722,7 @@ namespace Ogre
                     lastRenderOp = renderOp;
                 }
 
-                if( renderOp.indexData )
+                if( renderOp.useIndexes )
                 {
                     v1::CbDrawCallIndexed *drawCall =
                             mCommandBuffer->addCommand<v1::CbDrawCallIndexed>();
