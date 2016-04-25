@@ -355,6 +355,8 @@ namespace v1 {
             prepareForShadowMapping( true );
 
         setSkeletonName( mesh->getSkeletonName() );
+
+        setToLoaded();
     }
     //-----------------------------------------------------------------------
     void Mesh::arrangeEfficient( bool halfPos, bool halfTexCoords, bool qTangents )
