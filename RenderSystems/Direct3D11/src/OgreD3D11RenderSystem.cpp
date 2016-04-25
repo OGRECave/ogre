@@ -3492,7 +3492,7 @@ bail:
 
         ID3D11DeviceContextN *deviceContext = mDevice.GetImmediateContext();
 
-        if( cmd->indexData )
+        if( cmd->indexData && !cmd->indexData->indexBuffer.isNull() )
         {
             v1::D3D11HardwareIndexBuffer* indexBuffer =
                     static_cast<v1::D3D11HardwareIndexBuffer*>( cmd->indexData->indexBuffer.get() );

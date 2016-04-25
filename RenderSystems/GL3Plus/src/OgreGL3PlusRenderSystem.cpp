@@ -2723,7 +2723,7 @@ namespace Ogre {
             ++itor;
         }
 
-        if( cmd->indexData )
+        if( cmd->indexData && !cmd->indexData->indexBuffer.isNull() )
         {
             v1::GL3PlusHardwareIndexBuffer *indexBuffer = static_cast<v1::GL3PlusHardwareIndexBuffer*>(
                                                                     cmd->indexData->indexBuffer.get() );
