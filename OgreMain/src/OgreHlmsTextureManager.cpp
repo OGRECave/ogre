@@ -325,17 +325,31 @@ namespace Ogre
                     imageFormat != PF_BC5_SNORM )
                 {
                     LogManager::getSingleton().logMessage(
-                                "Warning: normal map texture " + texName + " is not BC5S compressed. "
+                                "WARNING: normal map texture " + texName + " is not BC5S compressed. "
                                 "This is encouraged for lower memory usage. If you don't want to see "
                                 "this message without compressing to BC5, set "
                                 "getDefaultTextureParameters()[TEXTURE_TYPE_NORMALS].pixelFormat to "
                                 "PF_R8G8_SNORM (or PF_BYTE_LA if RSC_TEXTURE_SIGNED_INT is not "
-                                "supported)", LML_TRIVIAL );
+                                "supported)", LML_NORMAL);
                     imageFormat = caps->hasCapability( RSC_TEXTURE_SIGNED_INT ) ? PF_R8G8_SNORM :
                                                                                   PF_BYTE_LA;
                 }
-                else
+                else if (mDefaultTextureParameters[mapType].pixelFormat != imageFormat &&
+                         (PixelUtil::isCompressed(imageFormat) ||
+                          PixelUtil::isCompressed(mDefaultTextureParameters[mapType].pixelFormat)))
                 {
+                    //Image formats do not match, and one or both of the formats is compressed
+                    //and therefore we can not convert it to the desired format.
+                    //So we use the src image format instead of the requested image format
+                    LogManager::getSingleton().logMessage(
+                        "WARNING: The input texture " + texName + " is a " + PixelUtil::getFormatName(imageFormat) + " " +
+                        "texture and can not be converted to the requested pixel format of " +
+                        PixelUtil::getFormatName(mDefaultTextureParameters[mapType].pixelFormat) + ". " +
+                        "This will potentially cause both an increase in memory usage and a decrease in performance. " +
+                        "It is highly recommended you convert this texture to the requested format.", LML_NORMAL);
+                }
+                else
+                {	
                     imageFormat = mDefaultTextureParameters[mapType].pixelFormat;
                 }
             }
