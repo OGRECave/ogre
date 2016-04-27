@@ -405,7 +405,7 @@ namespace Ogre
         //Set the shader constants, 16 at a time (since that's the limit of what ManualParam can hold)
         char tmp[32];
         LwString weightsString( LwString::FromEmptyPointer( tmp, sizeof(tmp) ) );
-        const uint32 floatsPerParam = sizeof( ShaderParams::ManualParam::dataBytes ) / sizeof(float);
+        const uint32 floatsPerParam = sizeof( ShaderParams::ManualParam().dataBytes ) / sizeof(float);
         for( uint32 i=0; i<kernelRadius + 1u; i += floatsPerParam )
         {
             weightsString.clear();
