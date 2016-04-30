@@ -111,6 +111,8 @@ namespace Ogre
     const IdString HlmsBaseProp::Forward3D          = IdString( "hlms_forward3d" );
     const IdString HlmsBaseProp::Forward3DFlipY     = IdString( "hlms_forward3d_flipY" );
     const IdString HlmsBaseProp::Forward3DDebug     = IdString( "hlms_forward3d_debug" );
+    const IdString HlmsBaseProp::Forward3DFadeAttenRange
+                                                    = IdString( "hlms_forward_fade_attenuation_range" );
     const IdString HlmsBaseProp::VPos               = IdString( "hlms_vpos" );
 
     //Change per material (hash can be cached on the renderable)
@@ -1989,6 +1991,8 @@ namespace Ogre
             {
                 setProperty( HlmsBaseProp::Forward3D,       forward3D->getNumSlices() );
                 setProperty( HlmsBaseProp::Forward3DDebug,  forward3D->getDebugMode() );
+                setProperty( HlmsBaseProp::Forward3DFadeAttenRange,
+                             forward3D->getFadeAttenuationRange() );
                 setProperty( HlmsBaseProp::VPos, 1 );
 
                 if( !mShaderTargets[0] ) //Not using D3D11

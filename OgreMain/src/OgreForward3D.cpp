@@ -59,7 +59,8 @@ namespace Ogre
         mInvMaxDistance( 1.0f / mMaxDistance ),
         mVaoManager( 0 ),
         mSceneManager( sceneManager ),
-        mDebugMode( false )
+        mDebugMode( false ),
+        mFadeAttenuationRange( true )
     {
         uint32 sliceWidth   = mWidth;
         uint32 sliceHeight  = mHeight;
@@ -531,7 +532,7 @@ namespace Ogre
             *lightData++ = attenRange;
             *lightData++ = attenLinear;
             *lightData++ = attenQuadratic;
-            ++lightData;
+            *lightData++ = 1.0f / attenRange;
 
             //vec3 lights[numLights].spotDirection;
             Vector3 spotDir = viewMatrix3 * light->getDerivedDirection();

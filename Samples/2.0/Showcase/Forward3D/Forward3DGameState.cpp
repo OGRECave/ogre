@@ -2,6 +2,7 @@
 #include "Forward3DGameState.h"
 #include "CameraController.h"
 #include "GraphicsSystem.h"
+#include "OgreForward3D.h"
 
 #include "OgreSceneManager.h"
 #include "OgreItem.h"
@@ -287,15 +288,20 @@ namespace Demo
 
         if( mDisplayHelpMode == 2 )
         {
-            outText += "\nPress F2 to toggle animation. ";
+            Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+            Ogre::Forward3D *forward3D = sceneManager->getForward3D();
+
+            outText += "\nF2 to toggle animation. ";
             outText += mAnimateObjects ? "[On]" : "[Off]";
-            outText += "\nPress F3 to use a low/high threshold for radius. ";
+            outText += "\nF3 to use a low/high threshold for radius. ";
             outText += mLowThreshold ? "[Low]" : "[High]";
-            outText += "\nPress F5/F6 to increase/reduce number of lights. ";
+            outText += "\nF4 to use atten. range approximation. ";
+            outText += forward3D->getFadeAttenuationRange() ? "[On]" : "[Off]";
+            outText += "\nF5/F6 to increase/reduce number of lights. ";
             outText += "[" + Ogre::StringConverter::toString( mNumLights ) + "]";
-            outText += "\nPress F7/F8 to increase/reduce light's radius. ";
+            outText += "\nF7/F8 to increase/reduce light's radius. ";
             outText += "[" + Ogre::StringConverter::toString( mLightRadius ) + "]";
-            outText += "\nPress [Shift+] SPACE to switch Forward3D settings back and forth. ";
+            outText += "\n[Shift+] SPACE to switch Forward3D settings back and forth. ";
             outText += "Preset: [" + Ogre::StringConverter::toString( mCurrentForward3DPreset ) + "]";
 
             const Presets &preset = c_presets[mCurrentForward3DPreset];
@@ -310,7 +316,11 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void Forward3DGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
-        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
+        if( arg.keysym.sym == SDLK_SPACE )
+        {
+            changeForward3DPreset( !(arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) );
+        }
+        else if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
         {
             TutorialGameState::keyReleased( arg );
             return;
@@ -320,10 +330,16 @@ namespace Demo
         {
             mAnimateObjects = !mAnimateObjects;
         }
-        if( arg.keysym.sym == SDLK_F3 )
+        else if( arg.keysym.sym == SDLK_F3 )
         {
             mLowThreshold = !mLowThreshold;
             generateLights();
+        }
+        else if( arg.keysym.sym == SDLK_F4 )
+        {
+            Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+            Ogre::Forward3D *forward3D = sceneManager->getForward3D();
+            forward3D->setFadeAttenuationRange( !forward3D->getFadeAttenuationRange() );
         }
         else if( arg.keysym.sym == SDLK_F5 || arg.keysym.sym == SDLK_F6 )
         {
@@ -344,10 +360,6 @@ namespace Demo
 
             mLightRadius = Ogre::Math::Clamp( mLightRadius, 0.5f, 100.0f );
             generateLights();
-        }
-        else if( arg.keysym.sym == SDLK_SPACE )
-        {
-            changeForward3DPreset( !(arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT)) );
         }
         else
         {

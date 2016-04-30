@@ -638,6 +638,7 @@ namespace Ogre
         static const IdString Forward3D;
         static const IdString Forward3DFlipY;
         static const IdString Forward3DDebug;
+        static const IdString Forward3DFadeAttenRange;
         static const IdString VPos;
 
         //Change per material (hash can be cached on the renderable)
