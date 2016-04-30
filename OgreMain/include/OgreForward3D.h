@@ -93,6 +93,7 @@ namespace Ogre
         SceneManager    *mSceneManager;
 
         bool    mDebugMode;
+        bool    mFadeAttenuationRange;
 
         /// Performs the reverse of getSliceAtDepth. @see getSliceAtDepth.
         inline Real getDepthAtSlice( uint32 slice ) const;
@@ -168,6 +169,23 @@ namespace Ogre
         /// Turns on visualization of light cell occupancy
         void setDebugMode( bool debugMode )                             { mDebugMode = debugMode; }
         bool getDebugMode(void) const                                   { return mDebugMode; }
+
+        /// Attenuates the light by the attenuation range, causing smooth endings when
+        /// at the end of the light range instead of a sudden sharp termination. This
+        /// isn't physically based (light's range is infinite), but looks very well,
+        /// and makes more intuitive to manipulate a light by controlling its range
+        /// instead of controlling its radius. @see Light::setAttenuationBasedOnRadius
+        /// and @see setAttenuation.
+        /// And even when controlling the light by its radius, you don't have to worry
+        /// so much about the threshold's value being accurate.
+        /// It has a tendency to make lights dimmer though. That's the price to pay
+        /// for this optimization and having more intuitive controls.
+        /// Enabled by default.
+        ///
+        /// In math:
+        ///     atten *= max( (attenRange - fDistance) / attenRange, 0.0f );
+        void setFadeAttenuationRange( bool fade )                       { mFadeAttenuationRange = fade; }
+        bool getFadeAttenuationRange(void) const                        { return mFadeAttenuationRange; }
     };
 
     /** @} */

@@ -40,7 +40,7 @@
 
 		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyz;
 		float3 lightSpecular= f3dLightList.Load( int(idx + 2u) ).xyz;
-		float3 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyz;
+		float4 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyzw;
 
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
@@ -49,6 +49,9 @@
 		{
 			lightDir *= 1.0 / fDistance;
 			float atten = 1.0 / (1.0 + (attenuation.y + attenuation.z * fDistance) * fDistance );
+			@property( hlms_forward_fade_attenuation_range )
+				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
+			@end
 
 			if( posAndType.w == 1.0 )
 			{
