@@ -15,7 +15,7 @@ compositor_node Tutorial_TerrainRenderingNode
 			expose TerraShadowTexture
 
 			overlays	on
-			//shadows		Tutorial_TerrainShadowNode
+			shadows		Tutorial_TerrainShadowNode
 		}
 	}
 }
@@ -31,10 +31,11 @@ compositor_node_shadow Tutorial_TerrainShadowNode
 	shadow_map 2 1024 1024 PF_D32_FLOAT light 0 split 2
 
 	technique focused
-	shadow_map 4 2048 2048 PF_D32_FLOAT light 1
-	shadow_map 5 2048 2048 PF_D32_FLOAT light 2
+	//shadow_map 4 2048 2048 PF_D32_FLOAT light 1
+	//shadow_map 5 2048 2048 PF_D32_FLOAT light 2
 
-	shadow_map 0 1 2 4 5
+	//shadow_map 0 1 2 4 5
+	shadow_map 0 1 2
 	{
 		pass clear
 		{

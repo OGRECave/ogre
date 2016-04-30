@@ -157,7 +157,10 @@ namespace Ogre
             samplerblock.mU             = TAM_BORDER;
             samplerblock.mV             = TAM_BORDER;
             samplerblock.mW             = TAM_CLAMP;
-            samplerblock.mBorderColour  = ColourValue::White;
+            samplerblock.mBorderColour  = ColourValue( std::numeric_limits<float>::max(),
+                                                       std::numeric_limits<float>::max(),
+                                                       std::numeric_limits<float>::max(),
+                                                       std::numeric_limits<float>::max() );
 
             if( mShaderProfile != "hlsl" )
             {
