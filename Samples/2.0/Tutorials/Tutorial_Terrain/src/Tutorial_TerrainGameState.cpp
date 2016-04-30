@@ -159,8 +159,13 @@ namespace Demo
         mSunLight->setType( Ogre::Light::LT_DIRECTIONAL );
         mSunLight->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
 
+        sceneManager->setAmbientLight( Ogre::ColourValue( 0.33f, 0.61f, 0.98f ) * 0.01f,
+                                       Ogre::ColourValue( 0.02f, 0.53f, 0.96f ) * 0.01f,
+                                       Ogre::Vector3::UNIT_Y );
+
         mCameraController = new CameraController( mGraphicsSystem, false );
         mGraphicsSystem->getCamera()->setFarClipDistance( 100000.0f );
+        mGraphicsSystem->getCamera()->setPosition( -10.0f, 80.0f, 10.0f );
 
 
         MeshUtils::importV1Mesh( "tudorhouse.mesh",
@@ -173,7 +178,7 @@ namespace Demo
                                                      Ogre::SCENE_STATIC );
         Ogre::Vector3 objPos( 3.5f, 4.5f, -2.0f );
         mTerra->getHeightAt( objPos );
-        objPos.y += -Ogre::min( item->getLocalAabb().getMinimum().y, 0.0f ) * 0.01f;
+        objPos.y += -Ogre::min( item->getLocalAabb().getMinimum().y, 0.0f ) * 0.01f - 0.5f;
         sceneNode = rootNode->createChildSceneNode( Ogre::SCENE_STATIC, objPos );
         sceneNode->scale( 0.01f, 0.01f, 0.01f );
         sceneNode->attachObject( item );
@@ -183,7 +188,7 @@ namespace Demo
                                          Ogre::SCENE_STATIC );
         objPos = Ogre::Vector3( -3.5f, 4.5f, -2.0f );
         mTerra->getHeightAt( objPos );
-        objPos.y += -Ogre::min( item->getLocalAabb().getMinimum().y, 0.0f ) * 0.01f;
+        objPos.y += -Ogre::min( item->getLocalAabb().getMinimum().y, 0.0f ) * 0.01f - 0.5f;
         sceneNode = rootNode->createChildSceneNode( Ogre::SCENE_STATIC, objPos );
         sceneNode->scale( 0.01f, 0.01f, 0.01f );
         sceneNode->attachObject( item );
