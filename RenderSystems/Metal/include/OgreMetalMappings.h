@@ -47,7 +47,7 @@ namespace Ogre
     class _OgreMetalExport MetalMappings
     {
     public:
-        static MTLPixelFormat getPixelFormat( PixelFormat pf );
+        static MTLPixelFormat getPixelFormat( PixelFormat pf, bool isGamma );
         static MTLBlendFactor get( SceneBlendFactor op );
         static MTLBlendOperation get( SceneBlendOperation op );
         /// @see HlmsBlendblock::BlendChannelMasks

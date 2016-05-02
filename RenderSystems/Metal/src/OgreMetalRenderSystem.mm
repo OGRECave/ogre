@@ -434,7 +434,7 @@ namespace Ogre
             psd.colorAttachments[i].writeMask = MetalMappings::get( blendblock->mBlendChannelMask );
         }
 
-        psd.depthAttachmentPixelFormat = MetalMappings::getPixelFormat( newPso->pass.depthFormat );
+        psd.depthAttachmentPixelFormat = MetalMappings::getPixelFormat( newPso->pass.depthFormat, false );
 
         NSError* error = NULL;
         id <MTLRenderPipelineState> pso =
