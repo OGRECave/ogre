@@ -60,11 +60,13 @@ namespace Ogre
 
         case PF_A2R10G10B10:            return MTLPixelFormatRGB10A2Unorm;
         case PF_A2B10G10R10:            return MTLPixelFormatRGB10A2Unorm;
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         case PF_DXT1:                   return !isGamma ? MTLPixelFormatBC1_RGBA : MTLPixelFormatBC1_RGBA_sRGB;
         case PF_DXT2:                   return !isGamma ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
         case PF_DXT3:                   return !isGamma ? MTLPixelFormatBC2_RGBA : MTLPixelFormatBC2_RGBA_sRGB;
         case PF_DXT4:                   return !isGamma ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
         case PF_DXT5:                   return !isGamma ? MTLPixelFormatBC3_RGBA : MTLPixelFormatBC3_RGBA_sRGB;
+#endif
         case PF_FLOAT16_R:              return MTLPixelFormatR16Float;
         case PF_FLOAT16_RGB:            return MTLPixelFormatRGBA16Float;
         case PF_FLOAT16_RGBA:           return MTLPixelFormatRGBA16Float;
@@ -109,6 +111,7 @@ namespace Ogre
         case PF_R32G32B32_SINT:         return MTLPixelFormatRGBA32Sint;
         case PF_R32G32B32A32_SINT:      return MTLPixelFormatRGBA32Sint;
         case PF_R9G9B9E5_SHAREDEXP:     return MTLPixelFormatRGB9E5Float;
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         case PF_BC4_UNORM:              return MTLPixelFormatBC4_RUnorm;
         case PF_BC4_SNORM:              return MTLPixelFormatBC4_RSnorm;
         case PF_BC5_UNORM:              return MTLPixelFormatBC5_RGUnorm;
@@ -117,6 +120,7 @@ namespace Ogre
         case PF_BC6H_SF16:              return MTLPixelFormatBC6H_RGBFloat;
         case PF_BC7_UNORM:              return MTLPixelFormatBC7_RGBAUnorm;
         case PF_BC7_UNORM_SRGB:         return MTLPixelFormatBC7_RGBAUnorm_sRGB;
+#endif
         case PF_R8:                     return !isGamma ? MTLPixelFormatR8Unorm : MTLPixelFormatR8Unorm_sRGB;
         case PF_RG8:                    return !isGamma ? MTLPixelFormatRG8Unorm : MTLPixelFormatRG8Unorm_sRGB;
         case PF_R8_SNORM:               return MTLPixelFormatR8Snorm;
@@ -135,12 +139,19 @@ namespace Ogre
         case PF_ATC_RGBA_EXPLICIT_ALPHA:        return MTLPixelFormatInvalid;
         case PF_ATC_RGBA_INTERPOLATED_ALPHA:    return MTLPixelFormatInvalid;
 
-        //TODO: PF_D24_UNORM_S8_UINT is normally treated as "guaranteed default" in Ogre, but
-        //in Metal, the guaranteed is MTLPixelFormatDepth32Float. Should we account this here?
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         case PF_D24_UNORM_S8_UINT:      return MTLPixelFormatDepth24Unorm_Stencil8;
         case PF_D24_UNORM_X8:           return MTLPixelFormatDepth24Unorm_Stencil8;
+#else
+        case PF_D24_UNORM_S8_UINT:      return MTLPixelFormatDepth32Float_Stencil8;
+        case PF_D24_UNORM_X8:           return MTLPixelFormatDepth32Float;
+#endif
         case PF_X24_S8_UINT:            return MTLPixelFormatStencil8;
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         case PF_D24_UNORM:              return MTLPixelFormatDepth24Unorm_Stencil8;
+#else
+        case PF_D24_UNORM:              return MTLPixelFormatDepth32Float;
+#endif
         case PF_D16_UNORM:              return MTLPixelFormatDepth32Float;
         case PF_D32_FLOAT:              return MTLPixelFormatDepth32Float;
         case PF_D32_FLOAT_X24_S8_UINT:  return MTLPixelFormatDepth32Float_Stencil8;
