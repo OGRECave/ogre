@@ -30,6 +30,7 @@
 
 ## RTShaderSystem
 * fix flipped Environment Maps using GLSL (GLSES) shaders
+* fix different lighting intensity compared to legacy GL
 
 ## GLSupport (new component)
 * Factored out GL Support classes that handle GL context creation
@@ -39,11 +40,11 @@
 * only one place for fixing GLX/ WGL/ Carbon related bugs
 * Dropped 10.000 LOC. Could use SDL2 internally to drop even more
 
-## GLES2: use ES context profile on Desktop ([PR](https://github.com/OGRECave/ogre/pull/183))
+## GLES2: use ES context profile on Desktop ([branch](https://github.com/OGRECave/ogre/pull/183))
 * run and test the GLES2/3 RenderSystem on Desktop
 * optionally uses GLSupport Module instead of EGL for Extensions/ Context
 
-## EGL in GLNativeSupport (WIP, [PR](https://github.com/OGRECave/ogre/pull/185))
+## EGL in GLNativeSupport ([branch](https://github.com/OGRECave/ogre/pull/185))
 * all supported RenderSystems ported to GLNativeSupport 
 * allow EGL to create "full" GL Contexts as well
 * needed for [real headless rendering](http://devblogs.nvidia.com/parallelforall/egl-eye-opengl-visualization-without-x-server/)

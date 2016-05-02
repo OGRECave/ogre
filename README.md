@@ -47,9 +47,5 @@ or by just getting the regularly released snapshots.
 The changes included in this current version can be
 viewed on the <a href="Docs/ChangeLog.md">ChangeLog</a>.
 
-## Getting Support
-Please use our <a href="http://www.ogre3d.org/forums">community support forums</a> if you need help or
-think you may have found a bug.
-
 ## Licensing
 Please see the <a href="Docs/License.md">full license documentation</a> for details.
