@@ -34,10 +34,12 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgrePixelFormat.h"
 #include "OgreBlendMode.h"
 #include "Vao/OgreVertexElements.h"
+#include "OgreHlmsSamplerblock.h"
 
+#import <Metal/MTLDepthStencil.h>
 #import <Metal/MTLPixelFormat.h>
 #import <Metal/MTLRenderPipeline.h>
-#import <Metal/MTLDepthStencil.h>
+#import <Metal/MTLSampler.h>
 #import <Metal/MTLVertexDescriptor.h>
 
 namespace Ogre
@@ -54,6 +56,10 @@ namespace Ogre
         static MTLCompareFunction get( CompareFunction cmp );
 
         static MTLVertexFormat get( VertexElementType vertexElemType );
+
+        static MTLSamplerMinMagFilter get( FilterOptions filter );
+        static MTLSamplerMipFilter getMipFilter( FilterOptions filter );
+        static MTLSamplerAddressMode get( TextureAddressingMode mode );
     };
 }
 

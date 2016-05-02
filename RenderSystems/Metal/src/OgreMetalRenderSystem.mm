@@ -465,16 +465,48 @@ namespace Ogre
         pso->rsData = 0;
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newPso )
+    void MetalRenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newBlock )
     {
+        MTLSamplerDescriptor *samplerDescriptor = [MTLSamplerDescriptor new];
+        samplerDescriptor.minFilter = MetalMappings::get( newBlock->mMinFilter );
+        samplerDescriptor.magFilter = MetalMappings::get( newBlock->mMagFilter );
+        samplerDescriptor.mipFilter = MetalMappings::getMipFilter( newBlock->mMipFilter );
+        samplerDescriptor.maxAnisotropy = newBlock->mMaxAnisotropy;
+        samplerDescriptor.sAddressMode  = MetalMappings::get( newBlock->mU );
+        samplerDescriptor.tAddressMode  = MetalMappings::get( newBlock->mV );
+        samplerDescriptor.rAddressMode  = MetalMappings::get( newBlock->mW );
+        samplerDescriptor.normalizedCoordinates = YES;
+        samplerDescriptor.lodMinClamp   = newBlock->mMinLod;
+        samplerDescriptor.lodMaxClamp   = newBlock->mMaxLod;
+
+        if( newBlock->mCompareFunction != NUM_COMPARE_FUNCTIONS )
+            samplerDescriptor.compareFunction = MetalMappings::get( newBlock->mCompareFunction );
+
+        id <MTLSamplerState> sampler = [mDevice newSamplerStateWithDescriptor:samplerDescriptor];
+
+        newBlock->mRsData = const_cast<void*>( CFBridgingRetain( sampler ) );
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::_hlmsSamplerblockDestroyed( HlmsSamplerblock *pso )
+    void MetalRenderSystem::_hlmsSamplerblockDestroyed( HlmsSamplerblock *block )
     {
+        id <MTLSamplerState> sampler = reinterpret_cast< id <MTLSamplerState> >(
+                    CFBridgingRelease( block->mRsData ) );
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock )
+    void MetalRenderSystem::_setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
+        assert( (!samplerblock || samplerblock->mRsData) &&
+                "The block must have been created via HlmsManager::getSamplerblock!" );
+
+        if( !samplerblock )
+        {
+            [encoder setFragmentSamplerState:0 atIndex: texUnit];
+        }
+        else
+        {
+            id <MTLSamplerState> sampler = reinterpret_cast< id <MTLSamplerState> >( samplerblock->mRsData );
+            [encoder setFragmentSamplerState:sampler atIndex: texUnit];
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setPipelineStateObject( const HlmsPso *pso )

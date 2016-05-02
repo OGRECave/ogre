@@ -177,7 +177,7 @@ namespace Ogre
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
 
-        virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *Samplerblock );
+        virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
         virtual void _setPipelineStateObject( const HlmsPso *pso );
         virtual void _setComputePso( const HlmsComputePso *pso );
 
