@@ -30,12 +30,14 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreMetalRenderWindow.h"
 #include "OgreMetalTextureManager.h"
 #include "Vao/OgreMetalVaoManager.h"
+#include "OgreMetalHlmsPso.h"
 
 #include "OgreDefaultHardwareBufferManager.h"
 
 #include "OgreMetalMappings.h"
 
 #import <Metal/Metal.h>
+#import <Foundation/NSEnumerator.h>
 
 namespace Ogre
 {
@@ -43,8 +45,9 @@ namespace Ogre
     MetalRenderSystem::MetalRenderSystem() :
         RenderSystem(),
         mInitialized( false ),
-        mHardwareBufferManager( 0 )
-    {
+        mHardwareBufferManager( 0 ),
+        mPso( 0 )
+    {	
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::shutdown(void)
@@ -280,81 +283,186 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    id <MTLDepthStencilState> MetalRenderSystem::getDepthStencilState( HlmsPso *pso )
+    {
+        CachedDepthStencilState depthState;
+        if( pso->macroblock->mDepthCheck )
+        {
+            depthState.depthFunc    = pso->macroblock->mDepthFunc;
+            depthState.depthWrite   = pso->macroblock->mDepthWrite;
+        }
+        else
+        {
+            depthState.depthFunc    = CMPF_ALWAYS_PASS;
+            depthState.depthWrite   = false;
+        }
+
+        depthState.stencilParams = pso->pass.stencilParams;
+
+        CachedDepthStencilStateVec::iterator itor = std::lower_bound( mDepthStencilStates.begin(),
+                                                                      mDepthStencilStates.end(),
+                                                                      depthState );
+
+        if( itor == mDepthStencilStates.end() || depthState != *itor )
+        {
+            //Not cached. Add the entry
+            MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
+            depthStateDesc.depthCompareFunction = MetalMappings::get( depthState.depthFunc );
+            depthStateDesc.depthWriteEnabled    = depthState.depthWrite;
+
+            //TODO: Convert stencil params
+            if( pso->pass.stencilParams.enabled )
+            {
+//                pso->pass.stencilParams.readMask;
+//                pso->pass.stencilParams.writeMask;
+//                depthStateDesc.frontFaceStencil =;
+//                depthStateDesc.backFaceStencil =;
+            }
+
+            depthState.depthStencilState = [mDevice newDepthStencilStateWithDescriptor:depthStateDesc];
+
+            itor = mDepthStencilStates.insert( itor, depthState );
+        }
+
+        ++itor->refCount;
+        return itor->depthStencilState;
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::removeDepthStencilState( HlmsPso *pso )
+    {
+        CachedDepthStencilState depthState;
+        if( pso->macroblock->mDepthCheck )
+        {
+            depthState.depthFunc    = pso->macroblock->mDepthFunc;
+            depthState.depthWrite   = pso->macroblock->mDepthWrite;
+        }
+        else
+        {
+            depthState.depthFunc    = CMPF_ALWAYS_PASS;
+            depthState.depthWrite   = false;
+        }
+
+        depthState.stencilParams = pso->pass.stencilParams;
+
+        CachedDepthStencilStateVec::iterator itor = std::lower_bound( mDepthStencilStates.begin(),
+                                                                      mDepthStencilStates.end(),
+                                                                      depthState );
+
+        if( itor == mDepthStencilStates.end() || !(depthState != *itor) )
+        {
+            --itor->refCount;
+            if( !itor->refCount )
+            {
+                mDepthStencilStates.erase( itor );
+            }
+        }
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::_hlmsPipelineStateObjectCreated( HlmsPso *newPso )
     {
-//        MTLRenderPipelineDescriptor *psd = [[MTLRenderPipelineDescriptor alloc] init];
-//        [psd setSampleCount: newPso->pass.multisampleCount];
-////		[psd setVertexFunction:vsShader];
-////		[psd setFragmentFunction:psShader];
+        MTLRenderPipelineDescriptor *psd = [[MTLRenderPipelineDescriptor alloc] init];
+        [psd setSampleCount: newPso->pass.multisampleCount];
+//		[psd setVertexFunction:newPso->vertexShader->vsShader];
+//		[psd setFragmentFunction:newPso->pixelShader->psShader];
 
-//        //TODO: Ogre should track the number of RTTs instead of assuming
-//        //OGRE_MAX_MULTIPLE_RENDER_TARGETS (will NOT work on Metal!)
-//        for( int i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
-//        {
-//            HlmsBlendblock const *blendblock = newPso->blendblock;
-//            psd.colorAttachments[i].pixelFormat = MetalMappings::getPixelFormat( newPso->pass.colourFormat[i] );
+        if( !newPso->vertexElements.empty() )
+        {
+            size_t elementIdx = 0;
+            MTLVertexDescriptor *vertexDescriptor = [MTLVertexDescriptor vertexDescriptor];
 
-//            if( blendblock->mBlendOperation == SBO_ADD &&
-//                blendblock->mSourceBlendFactor == SBF_ONE &&
-//                blendblock->mDestBlendFactor == SBF_ZERO &&
-//                (!blendblock->mSeparateBlend ||
-//                 blendblock->mBlendOperation == blendblock->mBlendOperationAlpha &&
-//                 blendblock->mSourceBlendFactor == blendblock->mSourceBlendFactorAlpha &&
-//                 blendblock->mDestBlendFactor == blendblock->mDestBlendFactorAlpha) )
-//            {
-//                //Note: Can NOT use blendblock->mIsTransparent. What Ogre understand
-//                //as transparent differs from what Metal understands.
-//                psd.colorAttachments[i].blendingEnabled = NO;
-//            }
-//            else
-//            {
-//                psd.colorAttachments[i].blendingEnabled = YES;
-//            }
-//            psd.colorAttachments[i].rgbBlendOperation           = MetalMappings::get( blendblock->mBlendOperation );
-//            psd.colorAttachments[i].alphaBlendOperation         = MetalMappings::get( blendblock->mBlendOperationAlpha );
-//            psd.colorAttachments[i].sourceRGBBlendFactor        = MetalMappings::get( blendblock->mSourceBlendFactor );
-//            psd.colorAttachments[i].destinationRGBBlendFactor   = MetalMappings::get( blendblock->mDestBlendFactor );
-//            psd.colorAttachments[i].sourceAlphaBlendFactor      = MetalMappings::get( blendblock->mSourceBlendFactorAlpha );
-//            psd.colorAttachments[i].destinationAlphaBlendFactor = MetalMappings::get( blendblock->mDestBlendFactorAlpha );
+            VertexElement2VecVec::const_iterator itor = newPso->vertexElements.begin();
+            VertexElement2VecVec::const_iterator end  = newPso->vertexElements.end();
 
-//            psd.colorAttachments[i].writeMask = MetalMappings::get( blendblock->mBlendChannelMask );
-//        }
+            while( itor != end )
+            {
+                size_t accumOffset = 0;
+                const size_t bufferIdx = itor - newPso->vertexElements.begin();
+                VertexElement2Vec::const_iterator it = itor->begin();
+                VertexElement2Vec::const_iterator en = itor->end();
 
-//        psd.depthAttachmentPixelFormat = MetalMappings::get( newPso->pass.depthFormat );
+                while( it != en )
+                {
+                    vertexDescriptor.attributes[elementIdx].format = MetalMappings::get( it->mType );
+                    vertexDescriptor.attributes[elementIdx].bufferIndex = bufferIdx;
+                    vertexDescriptor.attributes[elementIdx].offset = accumOffset;
 
-//        NSError* error = NULL;
-//        id <MTLRenderPipelineState> pso =
-//                [mDevice newRenderPipelineStateWithDescriptor:psd error:&error];
+                    accumOffset += v1::VertexElement::getTypeSize( it->mType );
 
-//        //TODO: Ogre should throw.
-//        if( !pso ) {
-//            NSLog(@"Failed to created pipeline state, error %@", error);
-//        }
+                    ++elementIdx;
+                    ++it;
+                }
 
-//        MTLDepthStencilDescriptor *depthStateDesc = [[MTLDepthStencilDescriptor alloc] init];
-//        if( newPso->macroblock->mDepthCheck )
-//        {
-//            depthStateDesc.depthCompareFunction = MetalMappings::get( newPso->macroblock->mDepthFunc );
-//            depthStateDesc.depthWriteEnabled    = newPso->macroblock->mDepthWrite;
-//        }
-//        else
-//        {
-//            depthStateDesc.depthCompareFunction = MTLCompareFunctionAlways;
-//            depthStateDesc.depthWriteEnabled    = NO;
-//        }
-//        if( newPso->pass.stencilParams.enabled )
-//        {
-//            newPso->pass.stencilParams.readMask;
-//            newPso->pass.stencilParams.writeMask;
-//            depthStateDesc.frontFaceStencil =;
-//            depthStateDesc.backFaceStencil =;
-//        }
-//        id <MTLDepthStencilState> depthStencilState =
-//                [mDevice newDepthStencilStateWithDescriptor:depthStateDesc];
+                vertexDescriptor.layouts[bufferIdx].stride = accumOffset;
+                vertexDescriptor.layouts[bufferIdx].stepFunction = MTLVertexStepFunctionPerVertex;
+
+                ++itor;
+            }
+
+            [psd setVertexDescriptor:vertexDescriptor];
+        }
+
+        //TODO: Ogre should track the number of RTTs instead of assuming
+        //OGRE_MAX_MULTIPLE_RENDER_TARGETS (will NOT work on Metal!)
+        for( int i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+        {
+            HlmsBlendblock const *blendblock = newPso->blendblock;
+            psd.colorAttachments[i].pixelFormat = MetalMappings::getPixelFormat( newPso->pass.colourFormat[i] );
+
+            if( blendblock->mBlendOperation == SBO_ADD &&
+                blendblock->mSourceBlendFactor == SBF_ONE &&
+                blendblock->mDestBlendFactor == SBF_ZERO &&
+                (!blendblock->mSeparateBlend ||
+                 (blendblock->mBlendOperation == blendblock->mBlendOperationAlpha &&
+                 blendblock->mSourceBlendFactor == blendblock->mSourceBlendFactorAlpha &&
+                 blendblock->mDestBlendFactor == blendblock->mDestBlendFactorAlpha)) )
+            {
+                //Note: Can NOT use blendblock->mIsTransparent. What Ogre understand
+                //as transparent differs from what Metal understands.
+                psd.colorAttachments[i].blendingEnabled = NO;
+            }
+            else
+            {
+                psd.colorAttachments[i].blendingEnabled = YES;
+            }
+            psd.colorAttachments[i].rgbBlendOperation           = MetalMappings::get( blendblock->mBlendOperation );
+            psd.colorAttachments[i].alphaBlendOperation         = MetalMappings::get( blendblock->mBlendOperationAlpha );
+            psd.colorAttachments[i].sourceRGBBlendFactor        = MetalMappings::get( blendblock->mSourceBlendFactor );
+            psd.colorAttachments[i].destinationRGBBlendFactor   = MetalMappings::get( blendblock->mDestBlendFactor );
+            psd.colorAttachments[i].sourceAlphaBlendFactor      = MetalMappings::get( blendblock->mSourceBlendFactorAlpha );
+            psd.colorAttachments[i].destinationAlphaBlendFactor = MetalMappings::get( blendblock->mDestBlendFactorAlpha );
+
+            psd.colorAttachments[i].writeMask = MetalMappings::get( blendblock->mBlendChannelMask );
+        }
+
+        psd.depthAttachmentPixelFormat = MetalMappings::getPixelFormat( newPso->pass.depthFormat );
+
+        NSError* error = NULL;
+        id <MTLRenderPipelineState> pso =
+                [mDevice newRenderPipelineStateWithDescriptor:psd error:&error];
+
+        //TODO: Ogre should throw.
+        if( !pso ) {
+            NSLog(@"Failed to created pipeline state, error %@", error);
+        }
+
+        id <MTLDepthStencilState> depthStencilState = getDepthStencilState( newPso );
+
+        MetalHlmsPso *metalPso = new MetalHlmsPso();
+        metalPso->pso = pso;
+        metalPso->depthStencilState = depthStencilState;
+
+        newPso->rsData = metalPso;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_hlmsPipelineStateObjectDestroyed( HlmsPso *pso )
     {
+        assert( pso->rsData );
+
+        removeDepthStencilState( pso );
+
+        MetalHlmsPso *metalPso = reinterpret_cast<MetalHlmsPso*>(pso->rsData);
+        delete metalPso;
+        pso->rsData = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_hlmsSamplerblockCreated( HlmsSamplerblock *newPso )
@@ -371,6 +479,16 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setPipelineStateObject( const HlmsPso *pso )
     {
+        MetalHlmsPso *metalPso = reinterpret_cast<MetalHlmsPso*>(pso->rsData);
+
+        if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
+            [encoder setDepthStencilState:metalPso->depthStencilState];
+
+        if( mPso != metalPso )
+        {
+            [encoder setRenderPipelineState:metalPso->pso];
+            mPso = metalPso;
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setComputePso( const HlmsComputePso *pso )

@@ -33,6 +33,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include "OgreRenderSystem.h"
 
+#import <Metal/MTLDepthStencil.h>
+
 namespace Ogre
 {
     namespace v1
@@ -51,6 +53,34 @@ namespace Ogre
     */
     class _OgreMetalExport MetalRenderSystem : public RenderSystem
     {
+        struct CachedDepthStencilState
+        {
+            uint16                      refCount;
+            bool                        depthWrite;
+            CompareFunction             depthFunc;
+            StencilParams               stencilParams;
+
+            id <MTLDepthStencilState>   depthStencilState;
+
+            CachedDepthStencilState() : refCount( 0 ) {}
+
+            bool operator < ( const CachedDepthStencilState &other ) const
+            {
+                return this->depthWrite < other.depthWrite &&
+                       this->depthFunc < other.depthFunc &&
+                       this->stencilParams < other.stencilParams;
+            }
+
+            bool operator != ( const CachedDepthStencilState &other ) const
+            {
+                return this->depthWrite != other.depthWrite &&
+                       this->depthFunc != other.depthFunc &&
+                       this->stencilParams != other.stencilParams;
+            }
+        };
+
+        typedef vector<CachedDepthStencilState>::type CachedDepthStencilStateVec;
+
         bool mInitialized;
         v1::HardwareBufferManager *mHardwareBufferManager;
 
@@ -59,6 +89,12 @@ namespace Ogre
         vector<RenderTarget*>::type mRenderTargets;
 
         MetalPixelFormatToShaderType mPixelFormatToShaderType;
+
+        CachedDepthStencilStateVec mDepthStencilStates;
+        MetalHlmsPso const *mPso;
+
+        id <MTLDepthStencilState> getDepthStencilState( HlmsPso *pso );
+        void removeDepthStencilState( HlmsPso *pso );
 
     public:
         MetalRenderSystem();

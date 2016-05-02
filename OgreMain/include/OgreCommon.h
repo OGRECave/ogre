@@ -123,6 +123,22 @@ namespace Ogre {
             stencilPassOp( SOP_KEEP ),
             stencilDepthFailOp( SOP_KEEP ),
             compareOp( CMPF_ALWAYS_FAIL ) {}
+
+        bool operator < ( const StencilStateOp &other ) const
+        {
+            return this->stencilFailOp < other.stencilFailOp &&
+                   this->stencilPassOp < other.stencilPassOp &&
+                   this->stencilDepthFailOp < other.stencilDepthFailOp &&
+                   this->compareOp < other.compareOp;
+        }
+
+        bool operator != ( const StencilStateOp &other ) const
+        {
+            return this->stencilFailOp != other.stencilFailOp &&
+                   this->stencilPassOp != other.stencilPassOp &&
+                   this->stencilDepthFailOp != other.stencilDepthFailOp &&
+                   this->compareOp != other.compareOp;
+        }
     };
 
     struct StencilParams
@@ -137,6 +153,24 @@ namespace Ogre {
             enabled( false ),
             readMask( 0xFF ),
             writeMask( 0xFF ) {}
+
+        bool operator < ( const StencilParams &other ) const
+        {
+            return this->enabled < other.enabled &&
+                   this->readMask < other.readMask &&
+                   this->writeMask < other.writeMask &&
+                   this->stencilFront < other.stencilFront &&
+                   this->stencilBack < other.stencilBack;
+        }
+
+        bool operator != ( const StencilParams &other ) const
+        {
+            return this->enabled != other.enabled &&
+                   this->readMask != other.readMask &&
+                   this->writeMask != other.writeMask &&
+                   this->stencilFront != other.stencilFront &&
+                   this->stencilBack != other.stencilBack;
+        }
     };
 
     /** High-level filtering options providing shortcuts to settings the

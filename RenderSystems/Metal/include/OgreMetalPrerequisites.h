@@ -35,6 +35,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     // Forward declarations
+    struct MetalHlmsPso;
     class MetalStagingBuffer;
     class MetalRenderSystem;
     class MetalVaoManager;
