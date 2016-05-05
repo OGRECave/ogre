@@ -376,6 +376,8 @@ namespace Ogre {
         /// Allow visitor helper to access protected methods
         friend class SceneMgrQueuedRenderableVisitor;
 
+        typedef map<String, Camera* >::type CameraList;
+        typedef map<String, Animation*>::type AnimationList;
     protected:
 
         /// Subclasses can override this to ensure their specialised SceneNode is used.
@@ -395,8 +397,6 @@ namespace Ogre {
 
         /// The rendering system to send the scene to
         RenderSystem *mDestRenderSystem;
-
-        typedef map<String, Camera* >::type CameraList;
 
         /** Central list of cameras - for easy memory management and lookup.
         */
@@ -629,7 +629,6 @@ namespace Ogre {
         bool mDisplayNodes;
 
         /// Storage of animations, lookup by name
-        typedef map<String, Animation*>::type AnimationList;
         AnimationList mAnimationsList;
         OGRE_MUTEX(mAnimationsListMutex);
         AnimationStateSet mAnimationStates;
