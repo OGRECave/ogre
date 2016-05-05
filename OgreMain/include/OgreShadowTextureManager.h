@@ -62,8 +62,8 @@ namespace Ogre
     typedef vector<ShadowTextureConfig>::type ShadowTextureConfigList;
     typedef ConstVectorIterator<ShadowTextureConfigList> ConstShadowTextureConfigIterator;
 
-    inline _OgreExport bool operator== ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
-    inline _OgreExport bool operator!= ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
+    _OgreExport bool operator== ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
+    _OgreExport bool operator!= ( const ShadowTextureConfig& lhs, const ShadowTextureConfig& rhs );
 
 
     /** Class to manage the available shadow textures which may be shared between
