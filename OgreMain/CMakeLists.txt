@@ -273,6 +273,10 @@ endif()
 if (OGRE_CONFIG_ENABLE_STBI)
   list(APPEND HEADER_FILES include/OgreSTBICodec.h)
   list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
+  if(CMAKE_COMPILER_IS_GNUCXX)
+      # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
+      list(APPEND LIBRARIES gcc)
+  endif()
 endif ()
 
 if (OGRE_CONFIG_ENABLE_DDS)
