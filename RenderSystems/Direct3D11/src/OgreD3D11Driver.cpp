@@ -116,7 +116,7 @@ namespace Ogre
         delete [] str;
         StringUtil::trim(driverDescription);
 
-        return  driverDescription;
+        return  driverDescription+= "_" + Ogre::StringConverter::toString(mAdapterNumber);
     }
     //---------------------------------------------------------------------
     D3D11VideoModeList* D3D11Driver::getVideoModeList()
