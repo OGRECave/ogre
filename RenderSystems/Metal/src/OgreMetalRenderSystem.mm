@@ -450,7 +450,9 @@ namespace Ogre
         MetalHlmsPso *metalPso = new MetalHlmsPso();
         metalPso->pso = pso;
         metalPso->depthStencilState = depthStencilState;
-
+        metalPso->depthBiasConstant = 0.0f;
+        metalPso->depthBiasSlopeScale = 0.0f;
+        
         newPso->rsData = metalPso;
     }
     //-------------------------------------------------------------------------
@@ -512,9 +514,12 @@ namespace Ogre
     void MetalRenderSystem::_setPipelineStateObject( const HlmsPso *pso )
     {
         MetalHlmsPso *metalPso = reinterpret_cast<MetalHlmsPso*>(pso->rsData);
-
+        
         if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
             [encoder setDepthStencilState:metalPso->depthStencilState];
+        
+        if( !mPso || mPso->depthBiasConstant != metalPso->depthBiasConstant || mPso->depthBiasSlopeScale != metalPso->depthBiasSlopeScale )
+            [encoder setDepthBias:metalPso->depthBiasConstant slopeScale:metalPso->depthBiasSlopeScale clamp:0.0f];
 
         if( mPso != metalPso )
         {

@@ -45,6 +45,8 @@ namespace Ogre
     {
         id <MTLRenderPipelineState> pso;
         id <MTLDepthStencilState> depthStencilState;
+        float depthBiasConstant;
+        float depthBiasSlopeScale;
     };
 
     /** @} */
