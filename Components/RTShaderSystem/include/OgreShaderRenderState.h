@@ -135,7 +135,7 @@ typedef RenderStateList::const_iterator         RenderStateConstIterator;
 It will be initially build from the FFP state of a given Pass by the FFP builder and then will be linked
 with the custom pass render state and the global scheme render state. See ShaderGenerator::SGPass::buildTargetRenderState().
 */
-class TargetRenderState : public RenderState
+class _OgreRTSSExport TargetRenderState : public RenderState
 {
 
 // Interface.
