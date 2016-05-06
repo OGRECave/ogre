@@ -168,7 +168,7 @@ namespace Ogre {
     };
 
     /** Factory class for Unified programs. */
-    class UnifiedHighLevelGpuProgramFactory : public HighLevelGpuProgramFactory
+    class _OgreExport UnifiedHighLevelGpuProgramFactory : public HighLevelGpuProgramFactory
     {
     public:
         UnifiedHighLevelGpuProgramFactory();
