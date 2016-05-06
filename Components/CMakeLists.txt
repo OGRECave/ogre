@@ -43,3 +43,7 @@ endif ()
 if (OGRE_BUILD_COMPONENT_HLMS)
 	add_subdirectory(HLMS)
 endif ()
+
+if (OGRE_BUILD_COMPONENT_PYTHON)
+    add_subdirectory(Python)
+endif()
