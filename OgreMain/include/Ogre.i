@@ -108,6 +108,8 @@ JNIEnv* OgreJNIGetEnv() {
 
 #ifdef SWIGJAVA
 #define REPRFUNC toString
+#elif defined(SWIGCSHARP)
+#define REPRFUNC ToString
 #else
 #define REPRFUNC __repr__
 #endif
@@ -132,6 +134,42 @@ JNIEnv* OgreJNIGetEnv() {
 %include "enums.swg"
 // conflicts with SWIG method
 %ignore *::getType;
+#endif
+
+#ifdef SWIGCSHARP
+%ignore Ogre::TextureUsage;
+%ignore Ogre::GpuConstantType;
+%ignore Ogre::Capabilities;
+%csmethodmodifiers *::ToString "public override";
+// wrong "override" because of multiple inheritance
+%csmethodmodifiers *::getMaterial "public";
+%csmethodmodifiers *::getSquaredViewDepth "public";
+%csmethodmodifiers *::getWorldTransforms "public";
+%csmethodmodifiers *::getRenderOperation "public";
+%csmethodmodifiers *::getLights "public";
+%csmethodmodifiers *::queryResult "public";
+%csmethodmodifiers *::createInstance "public";
+%csmethodmodifiers *::loadingComplete "public";
+%csmethodmodifiers *::getBoundingBox "public";
+%csmethodmodifiers *::getBoundingRadius "public";
+%csmethodmodifiers *::getMovableType "public";
+%csmethodmodifiers *::visitRenderables "public";
+%csmethodmodifiers *::loadResource "public";
+%csmethodmodifiers *::createAnimation "public";
+%csmethodmodifiers *::getAnimation "public";
+%csmethodmodifiers *::hasAnimation "public";
+%csmethodmodifiers *::removeAnimation "public";
+%csmethodmodifiers *::getNumAnimations "public";
+%csmethodmodifiers *::getAnimation "public";
+%csmethodmodifiers *::_notifyCurrentCamera "public";
+%csmethodmodifiers *::_updateRenderQueue "public";
+%csmethodmodifiers *::_notifyAttached "public";
+%csmethodmodifiers *::setRenderQueueGroup "public";
+%csmethodmodifiers *::setRenderQueueGroupAndPriority "public";
+%csmethodmodifiers *::getTypeFlags "public";
+%csmethodmodifiers *::viewportDestroyed "public";
+%csmethodmodifiers *::viewportDimensionsChanged "public";
+%csmethodmodifiers *::viewportCameraChanged "public";
 #endif
 
 // connect operator[] to __getitem__
@@ -286,7 +324,7 @@ SHARED_PTR(HardwareBuffer);
 %include "OgreHardwareBuffer.h"
 %include "OgreParticleIterator.h"
 
-#ifndef SWIGJAVA
+#ifdef SWIGPYTHON
 %ignore std::vector<Ogre::ParameterDef>::resize; // non default constructible
 %ignore std::vector<Ogre::ParameterDef>::vector;
 %template(ParameterList) std::vector<Ogre::ParameterDef>;

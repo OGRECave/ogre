@@ -23,6 +23,10 @@
 
 #define _OgreOverlayExport
 
+#ifdef SWIGCSHARP
+%csmethodmodifiers Ogre::OverlaySystem::eventOccurred "public";
+#endif
+
 %include "OgreOverlayPrerequisites.h"
 %shared_ptr(Ogre::Font);
 %include "OgreFont.h"
