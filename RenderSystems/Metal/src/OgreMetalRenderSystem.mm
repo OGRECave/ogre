@@ -518,9 +518,9 @@ namespace Ogre
         if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
             [encoder setDepthStencilState:metalPso->depthStencilState];
         
-        if( !mPso || mPso->depthBiasConstant != metalPso->depthBiasConstant || mPso->depthBiasSlopeScale != metalPso->depthBiasSlopeScale )
-            [encoder setDepthBias:metalPso->depthBiasConstant slopeScale:metalPso->depthBiasSlopeScale clamp:0.0f];
-
+        [encoder setDepthBias:pso->macroblock->mDepthBiasConstant slopeScale:pso->macroblock->mDepthBiasSlopeScale clamp:0.0f];
+        [encoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)]; // Ogre CullMode starts with 1 and Metals starts with 0
+        
         if( mPso != metalPso )
         {
             [encoder setRenderPipelineState:metalPso->pso];
