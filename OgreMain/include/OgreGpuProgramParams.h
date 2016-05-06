@@ -1649,7 +1649,7 @@ namespace Ogre {
             @param val Pointer to the values to write, must contain 4*count ints
             @param count The number of groups of 4 ints to write
         */
-        void setConstant(size_t index, const bool *val, size_t count);
+        //void setConstant(size_t index, const bool *val, size_t count);
 
         /** Write a series of floating point values into the underlying float
             constant buffer at the given physical index.
@@ -1752,7 +1752,7 @@ namespace Ogre {
             @param physicalIndex The physical buffer index at which to place the parameter
             @param val The value to set
         */
-        void _writeRawConstant(size_t physicalIndex, bool val);
+        //void _writeRawConstant(size_t physicalIndex, bool val);
         /** Write a 3-element floating-point parameter to the program via Vector3.
             @note You can use these methods if you have already derived the physical
             constant buffer location, for a slight speed improvement over using
