@@ -198,7 +198,7 @@ protected:
 A factory that enables creation of LayeredBlending instances.
 @remarks Sub class of SubRenderStateFactory
 */
-class LayeredBlendingFactory : public SubRenderStateFactory
+class _OgreRTSSExport LayeredBlendingFactory : public SubRenderStateFactory
 {
 public:
 
