@@ -49,7 +49,10 @@ namespace Ogre
         mPso( 0 ),
         mNumMRTs( 0 ),
         mCurrentDepthBuffer( 0 ),
-        mRenderEncoder( 0 )
+        mRenderEncoder( 0 ),
+        mDevice( 0 ),
+        mMainCommandQueue( 0 ),
+        mMainCommandBuffer( 0 )
     {
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
             mCurrentColourRTs[i] = 0;
@@ -171,7 +174,7 @@ namespace Ogre
             mRenderPassAttachmentsMap.erase( it->second );
         }
 
-        RenderSystem::detachRenderTarget( name );
+        return RenderSystem::detachRenderTarget( name );
     }
     //-------------------------------------------------------------------------
     String MetalRenderSystem::getErrorDescription(long errorNumber) const
@@ -352,8 +355,7 @@ namespace Ogre
         }
 
         //id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
-        id<MTLCommandBuffer> commandBuffer = 0; //TODO
-        mRenderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:passDesc];
+        mRenderEncoder = [mMainCommandBuffer renderCommandEncoderWithDescriptor:passDesc];
     }
     //-------------------------------------------------------------------------
     id <MTLDepthStencilState> MetalRenderSystem::getDepthStencilState( HlmsPso *pso )

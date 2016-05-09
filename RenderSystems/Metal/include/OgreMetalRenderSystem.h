@@ -103,6 +103,10 @@ namespace Ogre
         DepthBuffer     *mCurrentDepthBuffer;
         id<MTLRenderCommandEncoder> mRenderEncoder;
 
+        id<MTLDevice>               mDevice;
+        id<MTLCommandQueue>         mMainCommandQueue;
+        id<MTLCommandBuffer>        mMainCommandBuffer;
+
         MTLRenderPassColorAttachmentDescriptor* getRenderPass( RenderTarget *rtt );
         MTLRenderPassDepthAttachmentDescriptor* getDepthRenderPass( DepthBuffer *depthBuffer );
         MTLRenderPassStencilAttachmentDescriptor* getStencilRenderPass( DepthBuffer *depthBuffer );
