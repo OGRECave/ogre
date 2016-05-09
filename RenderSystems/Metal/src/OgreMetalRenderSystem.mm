@@ -294,7 +294,6 @@ namespace Ogre
     {
         RenderPassAttachmentsByRttMap::const_iterator itor = mRenderPassAttachmentsMap.find( rtt );
         assert( itor != mRenderPassAttachmentsMap.end() );
-        assert( dynamic_cast<MTLRenderPassColorAttachmentDescriptor*>( itor->second ) );
         return static_cast<MTLRenderPassColorAttachmentDescriptor*>( itor->second );
     }
     //-------------------------------------------------------------------------
@@ -304,7 +303,6 @@ namespace Ogre
         RenderPassAttachmentsByRttMap::const_iterator itor =
                 mRenderPassAttachmentsMap.find( depthBuffer );
         assert( itor != mRenderPassAttachmentsMap.end() );
-        assert( dynamic_cast<MTLRenderPassDepthAttachmentDescriptor*>( itor->second ) );
         return static_cast<MTLRenderPassDepthAttachmentDescriptor*>( itor->second );
     }
     //-------------------------------------------------------------------------
@@ -314,7 +312,6 @@ namespace Ogre
         RenderPassAttachmentsByRttMap::const_iterator itor =
                 mRenderPassAttachmentsMap.find( depthBuffer );
         assert( itor != mRenderPassAttachmentsMap.end() );
-        assert( dynamic_cast<MTLRenderPassStencilAttachmentDescriptor*>( itor->second ) );
         return static_cast<MTLRenderPassStencilAttachmentDescriptor*>( itor->second );
     }
     //-------------------------------------------------------------------------
