@@ -46,12 +46,19 @@ namespace Ogre
         RenderSystem(),
         mInitialized( false ),
         mHardwareBufferManager( 0 ),
-        mPso( 0 )
-    {	
+        mPso( 0 ),
+        mNumMRTs( 0 ),
+        mCurrentDepthBuffer( 0 ),
+        mRenderEncoder( 0 )
+    {
+        for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+            mCurrentColourRTs[i] = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::shutdown(void)
     {
+        RenderSystem::shutdown();
+
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
 
@@ -59,8 +66,8 @@ namespace Ogre
         mTextureManager = 0;
 
         {
-            vector<RenderTarget*>::type::const_iterator itor = mRenderTargets.begin();
-            vector<RenderTarget*>::type::const_iterator end  = mRenderTargets.end();
+            RenderTargetMap::const_iterator itor = mRenderTargets.begin();
+            RenderTargetMap::const_iterator end  = mRenderTargets.end();
 
             while( itor != end )
             {
@@ -70,6 +77,8 @@ namespace Ogre
 
             mRenderTargets.clear();
         }
+
+        mRenderPassAttachmentsMap.clear();
     }
     //-------------------------------------------------------------------------
     const String& MetalRenderSystem::getName(void) const
@@ -165,6 +174,17 @@ namespace Ogre
     MultiRenderTarget* MetalRenderSystem::createMultiRenderTarget(const String & name)
     {
         return 0;
+    }
+    //-------------------------------------------------------------------------
+    RenderTarget* MetalRenderSystem::detachRenderTarget( const String &name )
+    {
+        RenderTargetMap::iterator it = mRenderTargets.find( name );
+        if( it != mRenderTargets.end() )
+        {
+            mRenderPassAttachmentsMap.erase( it->second );
+        }
+
+        RenderSystem::detachRenderTarget( name );
     }
     //-------------------------------------------------------------------------
     String MetalRenderSystem::getErrorDescription(long errorNumber) const
@@ -281,6 +301,75 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setViewport(Viewport *vp)
     {
+    }
+    //-------------------------------------------------------------------------
+    MTLRenderPassColorAttachmentDescriptor* MetalRenderSystem::getRenderPass( RenderTarget *rtt )
+    {
+        RenderPassAttachmentsByRttMap::const_iterator itor = mRenderPassAttachmentsMap.find( rtt );
+        assert( itor != mRenderPassAttachmentsMap.end() );
+        assert( dynamic_cast<MTLRenderPassColorAttachmentDescriptor*>( itor->second ) );
+        return static_cast<MTLRenderPassColorAttachmentDescriptor*>( itor->second );
+    }
+    //-------------------------------------------------------------------------
+    MTLRenderPassDepthAttachmentDescriptor* MetalRenderSystem::getDepthRenderPass(
+            DepthBuffer *depthBuffer )
+    {
+        RenderPassAttachmentsByRttMap::const_iterator itor =
+                mRenderPassAttachmentsMap.find( depthBuffer );
+        assert( itor != mRenderPassAttachmentsMap.end() );
+        assert( dynamic_cast<MTLRenderPassDepthAttachmentDescriptor*>( itor->second ) );
+        return static_cast<MTLRenderPassDepthAttachmentDescriptor*>( itor->second );
+    }
+    //-------------------------------------------------------------------------
+    MTLRenderPassStencilAttachmentDescriptor* MetalRenderSystem::getStencilRenderPass(
+            DepthBuffer *depthBuffer )
+    {
+        RenderPassAttachmentsByRttMap::const_iterator itor =
+                mRenderPassAttachmentsMap.find( depthBuffer );
+        assert( itor != mRenderPassAttachmentsMap.end() );
+        assert( dynamic_cast<MTLRenderPassStencilAttachmentDescriptor*>( itor->second ) );
+        return static_cast<MTLRenderPassStencilAttachmentDescriptor*>( itor->second );
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::createRenderEncoder(void)
+    {
+        if( mRenderEncoder )
+        {
+            [mRenderEncoder endEncoding];
+            mRenderEncoder = 0;
+        }
+
+        //TODO: When a DepthBuffer or RenderTarget are destroyed, we need to remove them from
+        //mRenderPassAttachmentsMap
+
+        //TODO: With a couple modifications, Compositor should be able to tell us
+        //if we can use MTLStoreActionDontCare.
+
+        MTLRenderPassDescriptor *passDesc = [MTLRenderPassDescriptor renderPassDescriptor];
+        for( uint8 i=0; i<mNumMRTs; ++i )
+        {
+            MTLRenderPassColorAttachmentDescriptor *desc = getRenderPass( mCurrentColourRTs[i] );
+            passDesc.colorAttachments[i] = [desc copy];
+            //Next time it will be used it will have to be loaded
+            //unless we're later told to clear or discard.
+            desc.loadAction = MTLLoadActionLoad;
+        }
+        if( mCurrentDepthBuffer )
+        {
+            MTLRenderPassDepthAttachmentDescriptor *descDepth =
+                    getDepthRenderPass( mCurrentDepthBuffer );
+            passDesc.depthAttachment = [descDepth copy];
+            descDepth.loadAction = MTLLoadActionLoad;
+
+            MTLRenderPassStencilAttachmentDescriptor *descStencil =
+                    getStencilRenderPass( mCurrentDepthBuffer );
+            passDesc.stencilAttachment = [descStencil copy];
+            descStencil.loadAction = MTLLoadActionLoad;
+        }
+
+        //id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
+        id<MTLCommandBuffer> commandBuffer = 0; //TODO
+        mRenderEncoder = [commandBuffer renderCommandEncoderWithDescriptor:passDesc];
     }
     //-------------------------------------------------------------------------
     id <MTLDepthStencilState> MetalRenderSystem::getDepthStencilState( HlmsPso *pso )
@@ -451,8 +540,6 @@ namespace Ogre
         MetalHlmsPso *metalPso = new MetalHlmsPso();
         metalPso->pso = pso;
         metalPso->depthStencilState = depthStencilState;
-        metalPso->depthBiasConstant = 0.0f;
-        metalPso->depthBiasSlopeScale = 0.0f;
         
         newPso->rsData = metalPso;
     }
@@ -503,12 +590,13 @@ namespace Ogre
 
         if( !samplerblock )
         {
-            [encoder setFragmentSamplerState:0 atIndex: texUnit];
+            [mRenderEncoder setFragmentSamplerState:0 atIndex: texUnit];
         }
         else
         {
-            id <MTLSamplerState> sampler = reinterpret_cast< id <MTLSamplerState> >( samplerblock->mRsData );
-            [encoder setFragmentSamplerState:sampler atIndex: texUnit];
+            id <MTLSamplerState> sampler =
+                    reinterpret_cast< id <MTLSamplerState> >( samplerblock->mRsData );
+            [mRenderEncoder setFragmentSamplerState:sampler atIndex: texUnit];
         }
     }
     //-------------------------------------------------------------------------
@@ -517,17 +605,17 @@ namespace Ogre
         MetalHlmsPso *metalPso = reinterpret_cast<MetalHlmsPso*>(pso->rsData);
         
         if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
-            [encoder setDepthStencilState:metalPso->depthStencilState];
+            [mRenderEncoder setDepthStencilState:metalPso->depthStencilState];
         
-        [encoder setDepthBias:pso->macroblock->mDepthBiasConstant
-                              slopeScale:pso->macroblock->mDepthBiasSlopeScale
-                              clamp:0.0f];
+        [mRenderEncoder setDepthBias:pso->macroblock->mDepthBiasConstant
+                                     slopeScale:pso->macroblock->mDepthBiasSlopeScale
+                                     clamp:0.0f];
         // Ogre CullMode starts with 1 and Metals starts with 0
-        [encoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)];
+        [mRenderEncoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)];
         
         if( mPso != metalPso )
         {
-            [encoder setRenderPipelineState:metalPso->pso];
+            [mRenderEncoder setRenderPipelineState:metalPso->pso];
             mPso = metalPso;
         }
     }

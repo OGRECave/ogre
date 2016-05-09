@@ -34,6 +34,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRenderSystem.h"
 
 #import <Metal/MTLDepthStencil.h>
+#import <Metal/MTLRenderCommandEncoder.h>
+#import <Metal/MTLRenderPass.h>
 
 namespace Ogre
 {
@@ -86,14 +88,28 @@ namespace Ogre
 
         ConfigOptionMap mOptions;
 
-        vector<RenderTarget*>::type mRenderTargets;
-
         MetalPixelFormatToShaderType mPixelFormatToShaderType;
 
         CachedDepthStencilStateVec mDepthStencilStates;
         MetalHlmsPso const *mPso;
 
-        id <MTLDepthStencilState> getDepthStencilState( HlmsPso *pso );
+//        typedef map< id<MTLTexture>,
+//                     MTLRenderPassAttachmentDescriptor* >::type RenderPassAttachmentsByTextureMap;
+        typedef map<void*, MTLRenderPassAttachmentDescriptor*>::type RenderPassAttachmentsByRttMap;
+
+        RenderPassAttachmentsByRttMap mRenderPassAttachmentsMap;
+        uint8           mNumMRTs;
+        RenderTarget    *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        DepthBuffer     *mCurrentDepthBuffer;
+        id<MTLRenderCommandEncoder> mRenderEncoder;
+
+        MTLRenderPassColorAttachmentDescriptor* getRenderPass( RenderTarget *rtt );
+        MTLRenderPassDepthAttachmentDescriptor* getDepthRenderPass( DepthBuffer *depthBuffer );
+        MTLRenderPassStencilAttachmentDescriptor* getStencilRenderPass( DepthBuffer *depthBuffer );
+
+        void createRenderEncoder(void);
+
+        id<MTLDepthStencilState> getDepthStencilState( HlmsPso *pso );
         void removeDepthStencilState( HlmsPso *pso );
 
     public:
@@ -122,6 +138,8 @@ namespace Ogre
                                                    const NameValuePairList *miscParams = 0);
 
         virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
+
+        virtual RenderTarget* detachRenderTarget( const String &name );
 
         virtual String getErrorDescription(long errorNumber) const;
 
