@@ -31,6 +31,8 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreMetalTextureManager.h"
 #include "Vao/OgreMetalVaoManager.h"
 #include "OgreMetalHlmsPso.h"
+#include "OgreMetalRenderTargetCommon.h"
+#include "OgreMetalDepthBuffer.h"
 
 #include "OgreDefaultHardwareBufferManager.h"
 
@@ -67,8 +69,6 @@ namespace Ogre
 
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
-
-        mRenderPassAttachmentsMap.clear();
     }
     //-------------------------------------------------------------------------
     const String& MetalRenderSystem::getName(void) const
@@ -164,17 +164,6 @@ namespace Ogre
     MultiRenderTarget* MetalRenderSystem::createMultiRenderTarget(const String & name)
     {
         return 0;
-    }
-    //-------------------------------------------------------------------------
-    RenderTarget* MetalRenderSystem::detachRenderTarget( const String &name )
-    {
-        RenderTargetMap::iterator it = mRenderTargets.find( name );
-        if( it != mRenderTargets.end() )
-        {
-            mRenderPassAttachmentsMap.erase( it->second );
-        }
-
-        return RenderSystem::detachRenderTarget( name );
     }
     //-------------------------------------------------------------------------
     String MetalRenderSystem::getErrorDescription(long errorNumber) const
@@ -293,31 +282,6 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
-    MTLRenderPassColorAttachmentDescriptor* MetalRenderSystem::getRenderPass( RenderTarget *rtt )
-    {
-        RenderPassAttachmentsByRttMap::const_iterator itor = mRenderPassAttachmentsMap.find( rtt );
-        assert( itor != mRenderPassAttachmentsMap.end() );
-        return static_cast<MTLRenderPassColorAttachmentDescriptor*>( itor->second );
-    }
-    //-------------------------------------------------------------------------
-    MTLRenderPassDepthAttachmentDescriptor* MetalRenderSystem::getDepthRenderPass(
-            DepthBuffer *depthBuffer )
-    {
-        RenderPassAttachmentsByRttMap::const_iterator itor =
-                mRenderPassAttachmentsMap.find( depthBuffer );
-        assert( itor != mRenderPassAttachmentsMap.end() );
-        return static_cast<MTLRenderPassDepthAttachmentDescriptor*>( itor->second );
-    }
-    //-------------------------------------------------------------------------
-    MTLRenderPassStencilAttachmentDescriptor* MetalRenderSystem::getStencilRenderPass(
-            DepthBuffer *depthBuffer )
-    {
-        RenderPassAttachmentsByRttMap::const_iterator itor =
-                mRenderPassAttachmentsMap.find( depthBuffer );
-        assert( itor != mRenderPassAttachmentsMap.end() );
-        return static_cast<MTLRenderPassStencilAttachmentDescriptor*>( itor->second );
-    }
-    //-------------------------------------------------------------------------
     void MetalRenderSystem::createRenderEncoder(void)
     {
         if( mRenderEncoder )
@@ -326,32 +290,34 @@ namespace Ogre
             mRenderEncoder = 0;
         }
 
-        //TODO: When a DepthBuffer or RenderTarget are destroyed, we need to remove them from
-        //mRenderPassAttachmentsMap
-
         //TODO: With a couple modifications, Compositor should be able to tell us
         //if we can use MTLStoreActionDontCare.
 
         MTLRenderPassDescriptor *passDesc = [MTLRenderPassDescriptor renderPassDescriptor];
         for( uint8 i=0; i<mNumMRTs; ++i )
         {
-            MTLRenderPassColorAttachmentDescriptor *desc = getRenderPass( mCurrentColourRTs[i] );
-            passDesc.colorAttachments[i] = [desc copy];
+            passDesc.colorAttachments[i] = [mCurrentColourRTs[i]->mColourAttachmentDesc copy];
             //Next time it will be used it will have to be loaded
             //unless we're later told to clear or discard.
-            desc.loadAction = MTLLoadActionLoad;
+            mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionLoad;
         }
         if( mCurrentDepthBuffer )
         {
             MTLRenderPassDepthAttachmentDescriptor *descDepth =
-                    getDepthRenderPass( mCurrentDepthBuffer );
-            passDesc.depthAttachment = [descDepth copy];
-            descDepth.loadAction = MTLLoadActionLoad;
+                    mCurrentDepthBuffer->mDepthAttachmentDesc;
+            if( descDepth )
+            {
+                passDesc.depthAttachment = [descDepth copy];
+                descDepth.loadAction = MTLLoadActionLoad;
+            }
 
             MTLRenderPassStencilAttachmentDescriptor *descStencil =
-                    getStencilRenderPass( mCurrentDepthBuffer );
-            passDesc.stencilAttachment = [descStencil copy];
-            descStencil.loadAction = MTLLoadActionLoad;
+                    mCurrentDepthBuffer->mStencilAttachmentDesc;
+            if( descStencil )
+            {
+                passDesc.stencilAttachment = [descStencil copy];
+                descStencil.loadAction = MTLLoadActionLoad;
+            }
         }
 
         //id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
@@ -663,6 +629,33 @@ namespace Ogre
     void MetalRenderSystem::clearFrameBuffer( unsigned int buffers, const ColourValue& colour,
                                              Real depth, unsigned short stencil )
     {
+        if( buffers & FBT_COLOUR )
+        {
+            for( size_t i=0; i<mNumMRTs; ++i )
+            {
+                if( mCurrentColourRTs[i] )
+                {
+                    mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionClear;
+                    mCurrentColourRTs[i]->mColourAttachmentDesc.clearColor =
+                            MTLClearColorMake( colour.r, colour.g, colour.b, colour.a );
+                }
+            }
+        }
+
+        if( mCurrentDepthBuffer )
+        {
+            if( buffers & FBT_DEPTH && mCurrentDepthBuffer->mDepthAttachmentDesc )
+            {
+                mCurrentDepthBuffer->mDepthAttachmentDesc.loadAction = MTLLoadActionClear;
+                mCurrentDepthBuffer->mDepthAttachmentDesc.clearDepth = depth;
+            }
+
+            if( buffers & FBT_STENCIL && mCurrentDepthBuffer->mStencilAttachmentDesc )
+            {
+                mCurrentDepthBuffer->mStencilAttachmentDesc.loadAction = MTLLoadActionClear;
+                mCurrentDepthBuffer->mStencilAttachmentDesc.clearStencil = stencil;
+            }
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::discardFrameBuffer( unsigned int buffers )
@@ -691,6 +684,38 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setRenderTarget(RenderTarget *target, bool colourWrite)
     {
+        if( target )
+        {
+            colourWrite &= !target->getForceDisableColourWrites();
+
+            //TODO: Deal with MRT.
+            target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
+            MTLRenderPassColorAttachmentDescriptor *desc = mCurrentColourRTs[0]->mColourAttachmentDesc;
+
+            //TODO. This information is stored in Texture. Metal needs it now.
+            const bool explicitResolve = false;
+
+            //TODO: Compositor should be able to tell us whether to use
+            //MTLStoreActionDontCare with some future enhancements.
+            if( target->getFSAA() > 1 && !explicitResolve )
+            {
+                desc.storeAction = MTLStoreActionMultisampleResolve;
+            }
+            else
+            {
+                desc.storeAction = MTLStoreActionStore;
+            }
+
+            MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>( target->getDepthBuffer() );
+            mCurrentDepthBuffer = depthBuffer;
+            if( depthBuffer )
+            {
+                if( depthBuffer->mDepthAttachmentDesc )
+                    depthBuffer->mDepthAttachmentDesc.storeAction = MTLStoreActionStore;
+                if( depthBuffer->mStencilAttachmentDesc )
+                    depthBuffer->mStencilAttachmentDesc.storeAction = MTLStoreActionStore;
+            }
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::preExtraThreadsStarted()

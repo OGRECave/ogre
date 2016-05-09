@@ -4,7 +4,7 @@ This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,28 +25,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreMetalPrerequisites_H_
-#define _OgreMetalPrerequisites_H_
+#ifndef _OgreMetalDepthBuffer_H_
+#define _OgreMetalDepthBuffer_H_
 
-#include "OgrePrerequisites.h"
+#include "OgreMetalPrerequisites.h"
+#include "OgreDepthBuffer.h"
 
-#include "OgreLogManager.h"
+#import <Metal/MTLRenderPass.h>
 
 namespace Ogre
 {
-    // Forward declarations
-    class MetalDepthBuffer;
-    struct MetalHlmsPso;
-    class MetalStagingBuffer;
-    class MetalRenderSystem;
-    class MetalRenderTargetCommon;
-    class MetalVaoManager;
+    class _OgreMetalExport MetalDepthBuffer : public DepthBuffer
+    {
+    public:
+        MTLRenderPassDepthAttachmentDescriptor      *mDepthAttachmentDesc;
+        MTLRenderPassStencilAttachmentDescriptor    *mStencilAttachmentDesc;
+
+    public:
+        MetalDepthBuffer( uint16 poolId, MetalRenderSystem *renderSystem,
+                          uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
+                          PixelFormat pixelFormat, bool isDepthTexture, bool _isManual );
+        virtual ~MetalDepthBuffer();
+
+        /// @copydoc DepthBuffer::isCompatible
+        virtual bool isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const;
+
+    protected:
+        virtual bool copyToImpl( DepthBuffer *destination );
+    };
 }
-
-#if defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreMetalExport  __attribute__ ((visibility("default")))
-#else
-#    define _OgreMetalExport
 #endif
-
-#endif //#ifndef _OgreMetalPrerequisites_H_

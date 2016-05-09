@@ -93,23 +93,14 @@ namespace Ogre
         CachedDepthStencilStateVec mDepthStencilStates;
         MetalHlmsPso const *mPso;
 
-//        typedef map< id<MTLTexture>,
-//                     MTLRenderPassAttachmentDescriptor* >::type RenderPassAttachmentsByTextureMap;
-        typedef map<void*, MTLRenderPassAttachmentDescriptor*>::type RenderPassAttachmentsByRttMap;
-
-        RenderPassAttachmentsByRttMap mRenderPassAttachmentsMap;
         uint8           mNumMRTs;
-        RenderTarget    *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-        DepthBuffer     *mCurrentDepthBuffer;
+        MetalRenderTargetCommon *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        MetalDepthBuffer        *mCurrentDepthBuffer;
         id<MTLRenderCommandEncoder> mRenderEncoder;
 
         id<MTLDevice>               mDevice;
         id<MTLCommandQueue>         mMainCommandQueue;
         id<MTLCommandBuffer>        mMainCommandBuffer;
-
-        MTLRenderPassColorAttachmentDescriptor* getRenderPass( RenderTarget *rtt );
-        MTLRenderPassDepthAttachmentDescriptor* getDepthRenderPass( DepthBuffer *depthBuffer );
-        MTLRenderPassStencilAttachmentDescriptor* getStencilRenderPass( DepthBuffer *depthBuffer );
 
         void createRenderEncoder(void);
 
@@ -142,8 +133,6 @@ namespace Ogre
                                                    const NameValuePairList *miscParams = 0);
 
         virtual MultiRenderTarget* createMultiRenderTarget(const String & name);
-
-        virtual RenderTarget* detachRenderTarget( const String &name );
 
         virtual String getErrorDescription(long errorNumber) const;
 
