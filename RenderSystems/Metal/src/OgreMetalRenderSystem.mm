@@ -65,19 +65,6 @@ namespace Ogre
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
 
-        {
-            RenderTargetMap::const_iterator itor = mRenderTargets.begin();
-            RenderTargetMap::const_iterator end  = mRenderTargets.end();
-
-            while( itor != end )
-            {
-                OGRE_DELETE *itor;
-                ++itor;
-            }
-
-            mRenderTargets.clear();
-        }
-
         mRenderPassAttachmentsMap.clear();
     }
     //-------------------------------------------------------------------------
