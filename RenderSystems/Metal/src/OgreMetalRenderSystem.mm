@@ -660,6 +660,23 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::discardFrameBuffer( unsigned int buffers )
     {
+        if( buffers & FBT_COLOUR )
+        {
+            for( size_t i=0; i<mNumMRTs; ++i )
+            {
+                if( mCurrentColourRTs[i] )
+                    mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionDontCare;
+            }
+        }
+
+        if( mCurrentDepthBuffer )
+        {
+            if( buffers & FBT_DEPTH && mCurrentDepthBuffer->mDepthAttachmentDesc )
+                mCurrentDepthBuffer->mDepthAttachmentDesc.loadAction = MTLLoadActionDontCare;
+
+            if( buffers & FBT_STENCIL && mCurrentDepthBuffer->mStencilAttachmentDesc )
+                mCurrentDepthBuffer->mStencilAttachmentDesc.loadAction = MTLLoadActionDontCare;
+        }
     }
     //-------------------------------------------------------------------------
     Real MetalRenderSystem::getHorizontalTexelOffset(void)
