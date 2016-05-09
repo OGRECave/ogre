@@ -95,6 +95,7 @@ namespace Ogre
         /// Stencil support
         StencilParams   stencilParams;
 
+        bool        hwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         /// PF_NULL if no colour attachment is used.
         PixelFormat colourFormat[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         /// PF_NULL if no depth buffer is used.

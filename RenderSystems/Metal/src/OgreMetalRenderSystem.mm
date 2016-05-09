@@ -406,7 +406,8 @@ namespace Ogre
         for( int i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
         {
             HlmsBlendblock const *blendblock = newPso->blendblock;
-            psd.colorAttachments[i].pixelFormat = MetalMappings::getPixelFormat( newPso->pass.colourFormat[i] );
+            psd.colorAttachments[i].pixelFormat = MetalMappings::getPixelFormat(
+                        newPso->pass.colourFormat[i], newPso->pass.hwGamma[i] );
 
             if( blendblock->mBlendOperation == SBO_ADD &&
                 blendblock->mSourceBlendFactor == SBF_ONE &&
@@ -518,8 +519,11 @@ namespace Ogre
         if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
             [encoder setDepthStencilState:metalPso->depthStencilState];
         
-        [encoder setDepthBias:pso->macroblock->mDepthBiasConstant slopeScale:pso->macroblock->mDepthBiasSlopeScale clamp:0.0f];
-        [encoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)]; // Ogre CullMode starts with 1 and Metals starts with 0
+        [encoder setDepthBias:pso->macroblock->mDepthBiasConstant
+                              slopeScale:pso->macroblock->mDepthBiasSlopeScale
+                              clamp:0.0f];
+        // Ogre CullMode starts with 1 and Metals starts with 0
+        [encoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)];
         
         if( mPso != metalPso )
         {

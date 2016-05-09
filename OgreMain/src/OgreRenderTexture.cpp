@@ -109,7 +109,8 @@ namespace Ogre
         RenderTarget::swapBuffers();
     }
     //-----------------------------------------------------------------------
-    void MultiRenderTarget::getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
+    void MultiRenderTarget::getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
+                                              bool outHwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
     {
         BoundSufaceList::const_iterator itor = mBoundSurfaces.begin();
         BoundSufaceList::const_iterator end  = mBoundSurfaces.end();
@@ -117,11 +118,16 @@ namespace Ogre
         size_t idx = 0;
         while( itor != end )
         {
-            outFormats[idx++] = (*itor)->getFormat();
+            outFormats[idx] = (*itor)->getFormat();
+            outHwGamma[idx] = (*itor)->isHardwareGammaEnabled();
+            ++idx;
             ++itor;
         }
 
         for( size_t i=mBoundSurfaces.size(); i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+        {
             outFormats[i] = PF_NULL;
+            outHwGamma[i] = false;
+        }
     }
 }

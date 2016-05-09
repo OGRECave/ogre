@@ -2149,7 +2149,7 @@ namespace Ogre
 
         passPso.stencilParams = mRenderSystem->getStencilBufferParams();
 
-        renderTarget->getFormatsForPso( passPso.colourFormat );
+        renderTarget->getFormatsForPso( passPso.colourFormat, passPso.hwGamma );
 
         passPso.depthFormat = PF_NULL;
         const DepthBuffer *depthBuffer = renderTarget->getDepthBuffer();
