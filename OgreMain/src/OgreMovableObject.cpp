@@ -844,8 +844,8 @@ namespace Ogre {
             finalMask               = Mathlib::And( finalMask, isCaster );
             ArrayMaskR casterMask   = CastIntToReal( finalMask );
 
-            //Merge with bounds only if they're visible. We first merge, then CMov its older
-            //value if the object isn't visible. Also do the same with the receiver-only aabb
+            //Merge with bounds only if they're visible. We first merge,
+            //then CMov its older value if the object isn't visible.
             ArrayVector3 oldVal( vMinBounds );
             vMinBounds.makeFloor( objData.mWorldAabb->mCenter - objData.mWorldAabb->mHalfSize );
             vMinBounds.CmovRobust( casterMask, oldVal );
