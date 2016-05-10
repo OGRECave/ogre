@@ -129,20 +129,11 @@ namespace Ogre {
             Modes                   mMode;
 
             RenderQueueGroup() : mDoSort( true ), mSorted( false ), mMode( V1_FAST ) {}
-
-            void swap( RenderQueueGroup &other )
-            {
-                this->mQueuedRenderablesPerThread.swap( other.mQueuedRenderablesPerThread );
-                this->mQueuedRenderables.swap( other.mQueuedRenderables );
-                std::swap( this->mSorted, other.mSorted );
-                std::swap( this->mMode, other.mMode );
-            }
         };
 
         typedef vector<IndirectBufferPacked*>::type IndirectBufferPackedVec;
 
         RenderQueueGroup mRenderQueues[256];
-        RenderQueueGroup mRenderQueuesBackup[256];
 
         HlmsManager *mHlmsManager;
         SceneManager*mSceneManager;
@@ -232,9 +223,7 @@ namespace Ogre {
 
         /// Called when the frame has fully ended (ALL passes have been executed to all RTTs)
         void frameEnded(void);
-
-        void _swapQueuesForShadowMapping(void);
-
+		
         /** Sets the mode for the RenderQueue ID. @see RenderQueue::Modes
         @param rqId
             ID of the render queue
