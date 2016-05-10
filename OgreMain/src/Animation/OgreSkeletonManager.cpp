@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonManager.h"
 
 #include "OgreSkeleton.h"
+#include "OgreOldSkeletonManager.h"
 
 namespace Ogre
 {
@@ -78,16 +79,26 @@ namespace Ogre
         SkeletonDefMap::iterator itor = mSkeletonDefs.find( name );
         if( itor == mSkeletonDefs.end() )
         {
-            v1::Skeleton *oldSkeleton = OGRE_NEW v1::Skeleton( 0, name, 0, groupName, false, 0 );
+            bool wasNonExistent = false;
+            v1::SkeletonPtr oldSkeleton = v1::OldSkeletonManager::getSingleton().
+                    getByName( name, groupName ).staticCast<v1::Skeleton>();
+
+            if( oldSkeleton.isNull() )
+            {
+                oldSkeleton = v1::OldSkeletonManager::getSingleton().load( name, groupName ).
+                        staticCast<v1::Skeleton>();
+                wasNonExistent = true;
+            }
+
+            const bool wasUnloaded = oldSkeleton->getLoadingState() == Resource::LOADSTATE_UNLOADED;
             oldSkeleton->load();
             if( oldSkeleton->isLoaded() )
-                retVal = SkeletonDefPtr( new SkeletonDef( oldSkeleton, 1.0f ) );
-            delete oldSkeleton;
-
-            if( retVal.isNull() )
             {
-                OGRE_EXCEPT( Exception::ERR_FILE_NOT_FOUND, "Can't find Skeleton '" + name + "'",
-                             "SkeletonManager::getSkeletonDef" );
+                retVal = SkeletonDefPtr( new SkeletonDef( oldSkeleton.get(), 1.0f ) );
+                if( wasUnloaded )
+                    oldSkeleton->unload();
+                if( wasNonExistent )
+                    v1::OldSkeletonManager::getSingleton().remove( oldSkeleton->getHandle() );
             }
 
             mSkeletonDefs[idName] = retVal;

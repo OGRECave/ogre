@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "Animation/OgreSkeletonInstance.h"
 #include "Animation/OgreSkeletonDef.h"
 #include "Animation/OgreSkeletonAnimationDef.h"
+#include "Animation/OgreSkeletonManager.h"
 
 #include "OgreId.h"
 
@@ -42,7 +43,8 @@ namespace Ogre
     SkeletonInstance::SkeletonInstance( const SkeletonDef *skeletonDef,
                                         BoneMemoryManager *boneMemoryManager ) :
             mDefinition( skeletonDef ),
-            mParentNode( 0 )
+            mParentNode( 0 ),
+            mRefCount( 1 )
     {
         mBones.resize( mDefinition->getBones().size(), Bone() );
 
@@ -382,7 +384,39 @@ namespace Ogre
         OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
                      "Can't find animation '" + name.getFriendlyText() + "'",
                      "SkeletonInstance::getAnimation" );
-        return 0;
+        return 0;    
+    }
+    //-----------------------------------------------------------------------------------
+    void SkeletonInstance::addAnimationsFromSkeleton( const String &skelName, const String &groupName )
+    {
+        //First save BoneWeightPtr which would otherwise be freed during mAnimations' resize
+        //SkeletonAnimation does not follow the rule of 3
+        //https://en.wikipedia.org/wiki/Rule_of_three_(C%2B%2B_programming)
+        typedef vector< RawSimdUniquePtr<ArrayReal, MEMCATEGORY_ANIMATION> >::type BoneWeightPtrVec;
+        const size_t oldNumAnimations = mAnimations.size();
+        BoneWeightPtrVec boneWeightPtrs( mAnimations.size() );
+
+        for( size_t i=0; i<oldNumAnimations; ++i )
+            mAnimations[i]._swapBoneWeightsUniquePtr( boneWeightPtrs[i] );
+
+        SkeletonDefPtr definition = SkeletonManager::getSingleton().getSkeletonDef(skelName, groupName);
+
+        const SkeletonAnimationDefVec &animationDefs = definition->getAnimationDefs();
+        mAnimations.reserve( mAnimations.size() + animationDefs.size() );
+
+        SkeletonAnimationDefVec::const_iterator itor = animationDefs.begin();
+        SkeletonAnimationDefVec::const_iterator end  = animationDefs.end();
+        while( itor != end )
+        {
+            SkeletonAnimation animation( &(*itor), &mSlotStarts, this );
+            mAnimations.push_back( animation );
+            mAnimations.back()._initialize();
+            ++itor;
+        }
+
+        //Restore the BoneWeightPtr
+        for( size_t i=0; i<oldNumAnimations; ++i )
+            mAnimations[i]._swapBoneWeightsUniquePtr( boneWeightPtrs[i] );
     }
     //-----------------------------------------------------------------------------------
     void SkeletonInstance::_enableAnimation( SkeletonAnimation *animation )
@@ -465,5 +499,20 @@ namespace Ogre
     {
         return reinterpret_cast<const void*>(
                         mBoneStartTransforms[0].mOwner + mBoneStartTransforms[0].mIndex );
+    }
+    //-----------------------------------------------------------------------------------
+    void SkeletonInstance::_incrementRefCount(void) 
+    {
+        mRefCount++;
+    }
+    //-----------------------------------------------------------------------------------
+    void SkeletonInstance::_decrementRefCount(void) 
+    {
+        mRefCount--;
+    }
+    //-----------------------------------------------------------------------------------
+    uint16 SkeletonInstance::_getRefCount(void) const 
+    {
+        return mRefCount;
     }
 }

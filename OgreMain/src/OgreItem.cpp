@@ -19,9 +19,9 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR     
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR     WISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR      DEALINGS IN
   THE SOFTWARE.
   -----------------------------------------------------------------------------
 */
@@ -139,9 +139,12 @@ namespace Ogre {
 
         // If mesh is skeletally animated: destroy instance
         assert( mManager || !mSkeletonInstance );
-        if (mSkeletonInstance)
+        if( mSkeletonInstance )
         {
-            mManager->destroySkeletonInstance( mSkeletonInstance );
+            mSkeletonInstance->_decrementRefCount();
+            if( mSkeletonInstance->_getRefCount() == 0u )
+                mManager->destroySkeletonInstance( mSkeletonInstance );
+
             mSkeletonInstance = 0;
         }
 
@@ -277,75 +280,46 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
-    /*void Item::shareSkeletonInstanceWith(Item* item)
+    void Item::useSkeletonInstanceFrom(Item* master)
     {
-        if (item->getMesh()->getSkeleton() != getMesh()->getSkeleton())
+        if( mMesh->getSkeletonName() != master->mMesh->getSkeletonName() )
         {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "The supplied Item has a different skeleton.",
-                "Item::shareSkeletonWith");
-        }
-        if (!mSkeletonInstance)
-        {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "This Item has no skeleton.",
-                "Item::shareSkeletonWith");
-        }
-        if (mSharedSkeletonEntities != NULL && item->mSharedSkeletonEntities != NULL)
-        {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "Both entities already shares their SkeletonInstances! At least "
-                "one of the instances must not share it's instance.",
-                "Item::shareSkeletonWith");
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Cannot share skeleton instance if meshes use different skeletons",
+                         "Item::useSkeletonInstanceFrom" );
         }
 
-        //check if we already share our skeletoninstance, we don't want to delete it if so
-        if (mSharedSkeletonEntities != NULL)
+        if( mSkeletonInstance )
         {
-            Item->shareSkeletonInstanceWith(this);
+            mSkeletonInstance->_decrementRefCount();
+            if( mSkeletonInstance->_getRefCount() == 0u )
+                mManager->destroySkeletonInstance( mSkeletonInstance );
         }
-        else
-        {
-            OGRE_DELETE mSkeletonInstance;
-            mSkeletonInstance = item->mSkeletonInstance;
 
-            if (item->mSharedSkeletonEntities == NULL)
-            {
-                item->mSharedSkeletonEntities = OGRE_NEW_T(ItemSet, MEMCATEGORY_ANIMATION)();
-                item->mSharedSkeletonEntities->insert(Item);
-            }
-            mSharedSkeletonEntities = item->mSharedSkeletonEntities;
-            mSharedSkeletonEntities->insert(this);
+        mSkeletonInstance = master->mSkeletonInstance;
+        mSkeletonInstance->_incrementRefCount();
+    }
+    //-----------------------------------------------------------------------
+    void Item::stopUsingSkeletonInstanceFromMaster()
+    {
+        if( mSkeletonInstance )
+        {
+            assert( mSkeletonInstance->_getRefCount() > 1u &&
+                    "This skeleton is Item is not sharing its skeleton!" );
+
+            mSkeletonInstance->_decrementRefCount();
+            if( mSkeletonInstance->_getRefCount() == 0u )
+                mManager->destroySkeletonInstance( mSkeletonInstance );
+
+            const SkeletonDef *skeletonDef = mMesh->getSkeleton().get();
+            mSkeletonInstance = mManager->createSkeletonInstance( skeletonDef );
         }
     }
     //-----------------------------------------------------------------------
-    void Item::stopSharingSkeletonInstance()
-    {
-        if (mSharedSkeletonEntities == NULL)
-        {
-            OGRE_EXCEPT(Exception::ERR_RT_ASSERTION_FAILED,
-                "This Item is not sharing it's skeletoninstance.",
-                "Item::shareSkeletonWith");
-        }
-        //check if there's no other than us sharing the skeleton instance
-        if (mSharedSkeletonEntities->size() == 1)
-        {
-            //just reset
-            OGRE_DELETE_T(mSharedSkeletonEntities, ItemSet, MEMCATEGORY_ANIMATION);
-            mSharedSkeletonEntities = 0;
-        }
-        else
-        {
-            mSkeletonInstance = OGRE_NEW SkeletonInstance( mMesh->getSkeleton() );
-            mSkeletonInstance->load();
-            mSharedSkeletonEntities->erase(this);
-            if (mSharedSkeletonEntities->size() == 1)
-            {
-                (*mSharedSkeletonEntities->begin())->stopSharingSkeletonInstance();
-            }
-            mSharedSkeletonEntities = 0;
-        }
-    }*/
+    bool Item::sharesSkeletonInstance() const             
+    { 
+        return mSkeletonInstance && mSkeletonInstance->_getRefCount() > 1u;
+    }
     //-----------------------------------------------------------------------
     void Item::_notifyParentNodeMemoryChanged(void)
     {

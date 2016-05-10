@@ -214,4 +214,10 @@ namespace Ogre
             ++itor;
         }
     }
+    //-----------------------------------------------------------------------------------
+    void SkeletonAnimation::_swapBoneWeightsUniquePtr( RawSimdUniquePtr<ArrayReal, MEMCATEGORY_ANIMATION>
+                                                       &inOutBoneWeights )
+    {
+        inOutBoneWeights.swap( mBoneWeights );
+    }
 }

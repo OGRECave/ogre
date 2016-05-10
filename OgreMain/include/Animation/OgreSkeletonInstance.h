@@ -102,8 +102,10 @@ namespace Ogre
                 boneChild( _boneChild ), sceneNodeParent( _sceneNodeParent ) {}
         };
         typedef vector<SceneNodeBonePair>::type SceneNodeBonePairVec;
-
+                
         SceneNodeBonePairVec    mCustomParentSceneNodes;
+
+        uint16 mRefCount;
 
     public:
         SkeletonInstance( const SkeletonDef *skeletonDef, BoneMemoryManager *boneMemoryManager );
@@ -168,6 +170,12 @@ namespace Ogre
         ///Return all animations associated with this skeleton
         const SkeletonAnimationVec& getAnimations() const { return mAnimations; }
 
+        /**    Add all animation clips found in skelName. 
+        @remarks
+            skelName skeleton must have the same structure (bone count, bone hierarchy) as this, otherwise it may output unexpected behavior or crashes.
+        */
+        void addAnimationsFromSkeleton( const String &skelName, const String &groupName );
+
         /// Internal use. Enables given animation. Input should belong to us and not already animated.
         void _enableAnimation( SkeletonAnimation *animation );
 
@@ -197,6 +205,10 @@ namespace Ogre
 
         const void* _getMemoryBlock(void) const;
         const void* _getMemoryUniqueOffset(void) const;
+
+        void _incrementRefCount(void);
+        void _decrementRefCount(void);
+        uint16 _getRefCount(void) const;
     };
 
     inline bool OrderSkeletonInstanceByMemory( const SkeletonInstance *_left,
