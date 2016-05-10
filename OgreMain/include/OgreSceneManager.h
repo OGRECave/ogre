@@ -976,9 +976,6 @@ namespace Ogre {
         */
         VisibleObjectsPerThreadArray mVisibleObjects;
 
-        /// @See CompositorShadowNode remarks
-        VisibleObjectsPerThreadArray mVisibleObjectsBackup;
-
         /** @See mVisibleObjects. This one is a variable used for temporary storage by (eg.) Instance
             Managers to cull their internal instanced entities from multiple threads. We do not
             guarantee that those who acquired our data retain sole ownership; thus extra care may

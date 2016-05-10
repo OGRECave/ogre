@@ -179,7 +179,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
     mGlobalLightListPerThread.resize( mNumWorkerThreads );
     mBuildLightListRequestPerThread.resize( mNumWorkerThreads );
     mVisibleObjects.resize( mNumWorkerThreads );
-    mVisibleObjectsBackup.resize( mNumWorkerThreads );
     mTmpVisibleObjects.resize( mNumWorkerThreads );
 
     startWorkerThreads();
