@@ -1132,12 +1132,6 @@ void SceneManager::prepareRenderQueue(void)
 
 }
 //-----------------------------------------------------------------------
-void SceneManager::_swapVisibleObjectsForShadowMapping()
-{
-    mVisibleObjects.swap( mVisibleObjectsBackup );
-}
-//-----------------------------------------------------------------------
-//-----------------------------------------------------------------------
 void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewport* vp,
                                  uint8 firstRq, uint8 lastRq )
 {

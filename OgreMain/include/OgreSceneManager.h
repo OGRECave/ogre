@@ -1781,9 +1781,6 @@ namespace Ogre {
         */
         virtual void _renderVisibleObjects(void);
 
-        /// @See CompositorShadowNode remarks
-        void _swapVisibleObjectsForShadowMapping();
-
         /** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
                 @See CompositorShadowNode to understand why rendering is split in two phases

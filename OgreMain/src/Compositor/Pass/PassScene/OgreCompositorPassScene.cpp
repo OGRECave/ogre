@@ -140,19 +140,14 @@ namespace Ogre
         //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
-            listener->passPreExecute( this );
-
-        mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
-                                             mDefinition->mFirstRQ, mDefinition->mLastRQ );
+            listener->passPreExecute( this );        
 
         if( mUpdateShadowNode && shadowNode )
         {
             //We need to prepare for rendering another RT (we broke the contiguous chain)
             mTarget->_endUpdate();
 
-            sceneManager->_swapVisibleObjectsForShadowMapping();
             shadowNode->_update( mCamera, usedLodCamera, sceneManager );
-            sceneManager->_swapVisibleObjectsForShadowMapping();
 
             //ShadowNode passes may've overriden this setting.
             sceneManager->_setCurrentShadowNode( shadowNode );
@@ -160,6 +155,9 @@ namespace Ogre
             //We need to restore the previous RT's update
             mTarget->_beginUpdate();
         }
+        
+        mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
+                                             mDefinition->mFirstRQ, mDefinition->mLastRQ );
 
         mTarget->setFsaaResolveDirty();
         mTarget->_updateViewportRenderPhase02( mViewport, mCamera, usedLodCamera,
