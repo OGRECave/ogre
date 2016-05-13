@@ -922,9 +922,6 @@ namespace Ogre {
         */
         VisibleObjectsPerThreadArray mVisibleObjects;
 
-        /// @See CompositorShadowNode remarks
-        VisibleObjectsPerThreadArray mVisibleObjectsBackup;
-
         /** @See mVisibleObjects. This one is a variable used for temporary storage by (eg.) Instance
             Managers to cull their internal instanced entities from multiple threads. We do not
             guarantee that those who acquired our data retain sole ownership; thus extra care may
@@ -1855,9 +1852,6 @@ namespace Ogre {
             Uses the internally stored AnimationState objects to apply animation to SceneNodes.
         */
         virtual void _applySceneAnimations(void);
-
-        /// @See CompositorShadowNode remarks
-        void _swapVisibleObjectsForShadowMapping();
 
         /** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
