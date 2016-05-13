@@ -388,7 +388,7 @@ namespace Ogre
         void determineFSAASettings(uint fsaa, const String& fsaaHint, DXGI_FORMAT format, DXGI_SAMPLE_DESC* outFSAASettings);
 
         /// @copydoc RenderSystem::getDisplayMonitorCount
-        unsigned int getDisplayMonitorCount() const {return 1;} //todo
+        unsigned int getDisplayMonitorCount() const;
 
         /// @copydoc RenderSystem::hasAnisotropicMipMapFilter
         virtual bool hasAnisotropicMipMapFilter() const { return true; }  
