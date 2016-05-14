@@ -79,6 +79,7 @@ execute_process(COMMAND cmake
     -DOGRE_BUILD_TESTS=ON
     -DOGRE_CONFIG_ALLOCATOR=1 # disable nedalloc
     -DOGRE_BUILD_DEPENDENCIES=${BUILD_DEPS}
+    -DSWIG_EXECUTABLE=/usr/bin/swig3.0
     ${RENDERSYSTEMS}
     ${OTHER}
     ${GENERATOR}
