@@ -30,4 +30,4 @@ install(FILES ${HEADER_FILES} DESTINATION include/OGRE/RenderSystems/Metal)
 install(FILES ${PLATFORM_HEADERS} DESTINATION include/OGRE/RenderSystems/Metal/${PLATFORM_HEADER_INSTALL})
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include DESTINATION include/OGRE/RenderSystems/Metal)
 
-set_target_properties( RenderSystem_Metal CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES )
+set_target_properties( RenderSystem_Metal PROPERTIES CMAKE_XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES )
