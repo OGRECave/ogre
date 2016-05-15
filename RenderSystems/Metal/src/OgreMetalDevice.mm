@@ -26,32 +26,40 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 
-#include "OgreMetalRenderTargetCommon.h"
+#include "OgreMetalDevice.h"
+
+#import <Metal/MTLDevice.h>
+#import <Metal/MTLCommandQueue.h>
 
 namespace Ogre
 {
-    MetalRenderTargetCommon::MetalRenderTargetCommon( MetalDevice *ownerDevice ) :
-        mColourAttachmentDesc( 0 ),
-        mOwnerDevice( ownerDevice )
+    MetalDevice::MetalDevice() :
+        mDevice( 0 ),
+        mMainCommandQueue( 0 ),
+        mCurrentCommandBuffer( 0 ),
+        mRenderEncoder( 0 )
     {
     }
-    //-----------------------------------------------------------------------------------
-    MetalRenderTargetCommon::~MetalRenderTargetCommon()
+    //-------------------------------------------------------------------------
+    MetalDevice::~MetalDevice()
     {
-        destroy();
+        mDevice = 0;
+        mMainCommandQueue = 0;
+        mCurrentCommandBuffer = 0;
+        mRenderEncoder = 0;
     }
-    //-----------------------------------------------------------------------------------
-    void MetalRenderTargetCommon::init( id<MTLTexture> texture, id<MTLTexture> resolveTexture )
+    //-------------------------------------------------------------------------
+    void MetalDevice::init(void)
     {
-        mColourAttachmentDesc = [MTLRenderPassColorAttachmentDescriptor alloc];
-        mColourAttachmentDesc.loadAction = MTLLoadActionDontCare;
-        mColourAttachmentDesc.storeAction = MTLStoreActionStore;
-        mColourAttachmentDesc.texture = texture;
-        mColourAttachmentDesc.resolveTexture = resolveTexture;
+        mDevice = MTLCreateSystemDefaultDevice();
+        mMainCommandQueue = [mDevice newCommandQueue];
+        mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
+        mRenderEncoder = 0;
     }
-    //-----------------------------------------------------------------------------------
-    void MetalRenderTargetCommon::destroy(void)
+    //-------------------------------------------------------------------------
+    void MetalDevice::nextCommandBuffer(void)
     {
-        mColourAttachmentDesc = 0;
+        mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
     }
+    //-------------------------------------------------------------------------
 }

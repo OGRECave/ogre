@@ -33,6 +33,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreMetalHlmsPso.h"
 #include "OgreMetalRenderTargetCommon.h"
 #include "OgreMetalDepthBuffer.h"
+#include "OgreMetalDevice.h"
 
 #include "OgreDefaultHardwareBufferManager.h"
 
@@ -51,10 +52,8 @@ namespace Ogre
         mPso( 0 ),
         mNumMRTs( 0 ),
         mCurrentDepthBuffer( 0 ),
-        mRenderEncoder( 0 ),
-        mDevice( 0 ),
-        mMainCommandQueue( 0 ),
-        mMainCommandBuffer( 0 ),
+        mActiveDevice( 0 ),
+        mActiveRenderEncoder( 0 ),
         mMainGpuSyncSemaphore( 0 )
     {
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
@@ -147,8 +146,7 @@ namespace Ogre
     {
         if( !mInitialized )
         {
-            mDevice = MTLCreateSystemDefaultDevice();
-            mMainCommandQueue = [mDevice newCommandQueue];
+            mDevice.init();
             const long c_inFlightCommandBuffers = 3;
             mMainGpuSyncSemaphore = dispatch_semaphore_create(c_inFlightCommandBuffers);
             mRealCapabilities = createRenderSystemCapabilities();
@@ -161,7 +159,7 @@ namespace Ogre
             mInitialized = true;
         }
 
-        RenderWindow *win = OGRE_NEW MetalRenderWindow( mDevice, this );
+        RenderWindow *win = OGRE_NEW MetalRenderWindow( &mDevice, this );
         win->create( name, width, height, fullScreen, miscParams );
         return win;
     }
@@ -286,14 +284,16 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_endFrameOnce(void)
     {
-        if( mRenderEncoder )
+        //TODO: We shouldn't tidy up JUST the active device. But all of them.
+        if( mActiveRenderEncoder )
         {
-            [mRenderEncoder endEncoding];
-            mRenderEncoder = 0;
+            [mActiveRenderEncoder endEncoding];
+            mActiveDevice->mRenderEncoder = 0;
+            mActiveRenderEncoder = 0;
         }
 
         __block dispatch_semaphore_t blockSemaphore = mMainGpuSyncSemaphore;
-        [mMainCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+        [mActiveDevice->mCurrentCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
         {
             // GPU has completed rendering the frame and is done using the contents of any buffers
             // previously encoded on the CPU for that frame. Signal the semaphore and allow the CPU
@@ -302,8 +302,8 @@ namespace Ogre
         }];
 
         // Finalize rendering here. this will push the command buffer to the GPU
-        [mMainCommandBuffer commit];
-        mMainCommandBuffer = [mMainCommandQueue commandBuffer];
+        [mActiveDevice->mCurrentCommandBuffer commit];
+        mActiveDevice->nextCommandBuffer();
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrame(void)
@@ -318,12 +318,23 @@ namespace Ogre
     {
     }
     //-------------------------------------------------------------------------
+    void MetalRenderSystem::setActiveDevice( MetalDevice *device )
+    {
+        if( mActiveDevice != device )
+        {
+            mActiveDevice           = device;
+            mActiveRenderEncoder    = device->mRenderEncoder;
+        }
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::createRenderEncoder(void)
     {
-        if( mRenderEncoder )
+        assert( mActiveDevice );
+
+        if( mActiveRenderEncoder )
         {
-            [mRenderEncoder endEncoding];
-            mRenderEncoder = 0;
+            [mActiveRenderEncoder endEncoding];
+            mActiveRenderEncoder = 0;
         }
 
         //TODO: With a couple modifications, Compositor should be able to tell us
@@ -356,9 +367,9 @@ namespace Ogre
             }
         }
 
-        if( !mMainCommandBuffer )
-            mMainCommandBuffer = [mMainCommandQueue commandBuffer];
-        mRenderEncoder = [mMainCommandBuffer renderCommandEncoderWithDescriptor:passDesc];
+        mActiveDevice->mRenderEncoder =
+                [mActiveDevice->mCurrentCommandBuffer renderCommandEncoderWithDescriptor:passDesc];
+        mActiveRenderEncoder = mActiveDevice->mRenderEncoder;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
@@ -403,7 +414,8 @@ namespace Ogre
 //                depthStateDesc.backFaceStencil =;
             }
 
-            depthState.depthStencilState = [mDevice newDepthStencilStateWithDescriptor:depthStateDesc];
+            depthState.depthStencilState =
+                    [mActiveDevice->mDevice newDepthStencilStateWithDescriptor:depthStateDesc];
 
             itor = mDepthStencilStates.insert( itor, depthState );
         }
@@ -523,7 +535,7 @@ namespace Ogre
 
         NSError* error = NULL;
         id <MTLRenderPipelineState> pso =
-                [mDevice newRenderPipelineStateWithDescriptor:psd error:&error];
+                [mActiveDevice->mDevice newRenderPipelineStateWithDescriptor:psd error:&error];
 
         //TODO: Ogre should throw.
         if( !pso ) {
@@ -567,7 +579,8 @@ namespace Ogre
         if( newBlock->mCompareFunction != NUM_COMPARE_FUNCTIONS )
             samplerDescriptor.compareFunction = MetalMappings::get( newBlock->mCompareFunction );
 
-        id <MTLSamplerState> sampler = [mDevice newSamplerStateWithDescriptor:samplerDescriptor];
+        id <MTLSamplerState> sampler =
+                [mActiveDevice->mDevice newSamplerStateWithDescriptor:samplerDescriptor];
 
         newBlock->mRsData = const_cast<void*>( CFBridgingRetain( sampler ) );
     }
@@ -585,12 +598,12 @@ namespace Ogre
 
         if( !samplerblock )
         {
-            [mRenderEncoder setFragmentSamplerState:0 atIndex: texUnit];
+            [mActiveRenderEncoder setFragmentSamplerState:0 atIndex: texUnit];
         }
         else
         {
             id <MTLSamplerState> sampler = (__bridge id<MTLSamplerState>)samplerblock->mRsData;
-            [mRenderEncoder setFragmentSamplerState:sampler atIndex: texUnit];
+            [mActiveRenderEncoder setFragmentSamplerState:sampler atIndex: texUnit];
         }
     }
     //-------------------------------------------------------------------------
@@ -599,17 +612,17 @@ namespace Ogre
         MetalHlmsPso *metalPso = reinterpret_cast<MetalHlmsPso*>(pso->rsData);
         
         if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
-            [mRenderEncoder setDepthStencilState:metalPso->depthStencilState];
+            [mActiveRenderEncoder setDepthStencilState:metalPso->depthStencilState];
         
-        [mRenderEncoder setDepthBias:pso->macroblock->mDepthBiasConstant
+        [mActiveRenderEncoder setDepthBias:pso->macroblock->mDepthBiasConstant
                                      slopeScale:pso->macroblock->mDepthBiasSlopeScale
                                      clamp:0.0f];
         // Ogre CullMode starts with 1 and Metals starts with 0
-        [mRenderEncoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)];
+        [mActiveRenderEncoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)];
         
         if( mPso != metalPso )
         {
-            [mRenderEncoder setRenderPipelineState:metalPso->pso];
+            [mActiveRenderEncoder setRenderPipelineState:metalPso->pso];
             mPso = metalPso;
         }
     }

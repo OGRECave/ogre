@@ -36,15 +36,19 @@ namespace Ogre
 {
     class _OgreMetalExport MetalRenderTargetCommon
     {
+    protected:
+        MetalDevice *mOwnerDevice;
     public:
         MTLRenderPassColorAttachmentDescriptor *mColourAttachmentDesc;
 
     public:
-        MetalRenderTargetCommon();
+        MetalRenderTargetCommon( MetalDevice *ownerDevice );
         ~MetalRenderTargetCommon();
 
         void init( id<MTLTexture> texture, id<MTLTexture> resolveTexture );
         void destroy(void);
+
+        MetalDevice* getOwnerDevice(void) const     { return mOwnerDevice; }
     };
 }
 

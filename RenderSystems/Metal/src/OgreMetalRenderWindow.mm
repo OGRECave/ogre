@@ -33,13 +33,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    MetalRenderWindow::MetalRenderWindow( id<MTLDevice> device, MetalRenderSystem *renderSystem ) :
+    MetalRenderWindow::MetalRenderWindow( MetalDevice *ownerDevice, MetalRenderSystem *renderSystem ) :
         RenderWindow(),
-        MetalRenderTargetCommon(),
+        MetalRenderTargetCommon( ownerDevice ),
         mMetalLayer( 0 ),
         mCurrentDrawable( 0 ),
         mMsaaTex( 0 ),
-        mDevice( device ),
         mRenderSystem( renderSystem )
     {
         mIsFullScreen = false;
@@ -105,10 +104,8 @@ namespace Ogre
         else
             mColourAttachmentDesc.texture = 0;
 
-        id<MTLCommandBuffer> commandBuffer = mRenderSystem->_getLastCommandBuffer();
-
         // Schedule a present once rendering to the framebuffer is complete
-        [commandBuffer presentDrawable:mCurrentDrawable];
+        [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable];
         mCurrentDrawable = 0;
     }
     //-------------------------------------------------------------------------
@@ -120,7 +117,7 @@ namespace Ogre
             mWidth  = mMetalLayer.drawableSize.width;
             mHeight = mMetalLayer.drawableSize.height;
 
-            if( mFSAA > 1 )
+            if( mFSAA > 1 && mWidth > 0 && mHeight > 0 )
             {
                 mMsaaTex = 0;
                 MTLTextureDescriptor* desc = [MTLTextureDescriptor
@@ -130,7 +127,7 @@ namespace Ogre
                 desc.textureType = MTLTextureType2DMultisample;
                 desc.sampleCount = mFSAA;
 
-                mMsaaTex = [mDevice newTextureWithDescriptor: desc];
+                mMsaaTex = [mOwnerDevice->mDevice newTextureWithDescriptor: desc];
             }
 
             ViewportList::iterator itor = mViewportList.begin();
@@ -166,7 +163,7 @@ namespace Ogre
         mMetalView = [[OgreMetalView alloc] initWithFrame:frame];
         mMetalLayer = (CAMetalLayer*)mMetalView.layer;
 
-        mMetalLayer.device      = mDevice;
+        mMetalLayer.device      = mOwnerDevice->mDevice;
         mMetalLayer.pixelFormat = MetalMappings::getPixelFormat( mFormat, mHwGamma );
 
         //This is the default but if we wanted to perform compute

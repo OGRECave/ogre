@@ -47,11 +47,10 @@ namespace Ogre
         id<MTLTexture>      mMsaaTex;
         OgreMetalView       *mMetalView;
 
-        id<MTLDevice>       mDevice;
         MetalRenderSystem   *mRenderSystem;
 
     public:
-        MetalRenderWindow( id<MTLDevice> device, MetalRenderSystem *renderSystem );
+        MetalRenderWindow( MetalDevice *ownerDevice, MetalRenderSystem *renderSystem );
         ~MetalRenderWindow();
 
         void _metalUpdate(void);

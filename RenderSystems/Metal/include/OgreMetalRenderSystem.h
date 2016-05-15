@@ -32,6 +32,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreMetalPrerequisites.h"
 
 #include "OgreRenderSystem.h"
+#include "OgreMetalDevice.h"
 
 #import <Metal/MTLDepthStencil.h>
 #import <Metal/MTLRenderCommandEncoder.h>
@@ -94,15 +95,15 @@ namespace Ogre
         MetalHlmsPso const *mPso;
 
         uint8           mNumMRTs;
-        MetalRenderTargetCommon *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-        MetalDepthBuffer        *mCurrentDepthBuffer;
-        id<MTLRenderCommandEncoder> mRenderEncoder;
+        MetalRenderTargetCommon     *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        MetalDepthBuffer            *mCurrentDepthBuffer;
+        MetalDevice                 *mActiveDevice;
+        __unsafe_unretained id<MTLRenderCommandEncoder> mActiveRenderEncoder;
 
-        id<MTLDevice>               mDevice;
-        id<MTLCommandQueue>         mMainCommandQueue;
-        id<MTLCommandBuffer>        mMainCommandBuffer;
-        dispatch_semaphore_t        mMainGpuSyncSemaphore;
+        MetalDevice             mDevice;
+        dispatch_semaphore_t    mMainGpuSyncSemaphore;
 
+        void setActiveDevice( MetalDevice *device );
         void createRenderEncoder(void);
 
         id<MTLDepthStencilState> getDepthStencilState( HlmsPso *pso );
@@ -253,8 +254,6 @@ namespace Ogre
 
         virtual void setClipPlanesImpl(const PlaneList& clipPlanes);
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
-
-        id<MTLCommandBuffer> _getLastCommandBuffer(void)        { return mMainCommandBuffer; }
 
         void _clearRenderTargetImmediately( RenderTarget *renderTarget );
     };

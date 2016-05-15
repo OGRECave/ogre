@@ -26,32 +26,31 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
   -----------------------------------------------------------------------------
 */
 
-#include "OgreMetalRenderTargetCommon.h"
+#ifndef _OgreMetalDevice_H_
+#define _OgreMetalDevice_H_
+
+#include "OgreMetalPrerequisites.h"
+
+#import <Metal/MTLDevice.h>
+#import <Metal/MTLCommandBuffer.h>
 
 namespace Ogre
 {
-    MetalRenderTargetCommon::MetalRenderTargetCommon( MetalDevice *ownerDevice ) :
-        mColourAttachmentDesc( 0 ),
-        mOwnerDevice( ownerDevice )
+    struct _OgreMetalExport MetalDevice
     {
-    }
-    //-----------------------------------------------------------------------------------
-    MetalRenderTargetCommon::~MetalRenderTargetCommon()
-    {
-        destroy();
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalRenderTargetCommon::init( id<MTLTexture> texture, id<MTLTexture> resolveTexture )
-    {
-        mColourAttachmentDesc = [MTLRenderPassColorAttachmentDescriptor alloc];
-        mColourAttachmentDesc.loadAction = MTLLoadActionDontCare;
-        mColourAttachmentDesc.storeAction = MTLStoreActionStore;
-        mColourAttachmentDesc.texture = texture;
-        mColourAttachmentDesc.resolveTexture = resolveTexture;
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalRenderTargetCommon::destroy(void)
-    {
-        mColourAttachmentDesc = 0;
-    }
+        id<MTLDevice>           mDevice;
+        id<MTLCommandQueue>     mMainCommandQueue;
+        id<MTLCommandBuffer>    mCurrentCommandBuffer;
+        id<MTLRenderCommandEncoder> mRenderEncoder;
+
+        MetalDevice();
+        ~MetalDevice();
+
+        void init(void);
+
+        //Grabs a new mMainCommandBuffer (i.e. you've called commit)
+        void nextCommandBuffer(void);
+    };
 }
+
+#endif
