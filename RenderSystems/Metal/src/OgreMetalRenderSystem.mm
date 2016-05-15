@@ -54,7 +54,8 @@ namespace Ogre
         mRenderEncoder( 0 ),
         mDevice( 0 ),
         mMainCommandQueue( 0 ),
-        mMainCommandBuffer( 0 )
+        mMainCommandBuffer( 0 ),
+        mMainGpuSyncSemaphore( 0 )
     {
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
             mCurrentColourRTs[i] = 0;
@@ -144,10 +145,12 @@ namespace Ogre
                                                          bool fullScreen,
                                                          const NameValuePairList *miscParams )
     {
-        RenderWindow *win = OGRE_NEW MetalRenderWindow();
-
         if( !mInitialized )
         {
+            mDevice = MTLCreateSystemDefaultDevice();
+            mMainCommandQueue = [mDevice newCommandQueue];
+            const long c_inFlightCommandBuffers = 3;
+            mMainGpuSyncSemaphore = dispatch_semaphore_create(c_inFlightCommandBuffers);
             mRealCapabilities = createRenderSystemCapabilities();
             mCurrentCapabilities = mRealCapabilities;
 
@@ -158,6 +161,8 @@ namespace Ogre
             mInitialized = true;
         }
 
+        RenderWindow *win = OGRE_NEW MetalRenderWindow( mDevice, this );
+        win->create( name, width, height, fullScreen, miscParams );
         return win;
     }
     //-------------------------------------------------------------------------
@@ -270,6 +275,37 @@ namespace Ogre
         return 0;
     }
     //-------------------------------------------------------------------------
+    void MetalRenderSystem::_beginFrameOnce(void)
+    {
+        //Allow the renderer to preflight 3 frames on the CPU (using a semapore as a guard) and
+        //commit them to the GPU. This semaphore will get signaled once the GPU completes a
+        //frame's work via addCompletedHandler callback below, signifying the CPU can go ahead
+        //and prepare another frame.
+        dispatch_semaphore_wait( mMainGpuSyncSemaphore, DISPATCH_TIME_FOREVER );
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_update(void)
+    {
+        {
+            //TODO: this is duct tape
+            createRenderEncoder();
+            [mRenderEncoder endEncoding];
+        }
+
+        __block dispatch_semaphore_t blockSemaphore = mMainGpuSyncSemaphore;
+        [mMainCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+        {
+            // GPU has completed rendering the frame and is done using the contents of any buffers
+            // previously encoded on the CPU for that frame. Signal the semaphore and allow the CPU
+            // to proceed and construct the next frame.
+            dispatch_semaphore_signal( blockSemaphore );
+        }];
+
+        // Finalize rendering here. this will push the command buffer to the GPU
+        [mMainCommandBuffer commit];
+        mMainCommandBuffer = [mMainCommandQueue commandBuffer];
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrame(void)
     {
     }
@@ -320,7 +356,8 @@ namespace Ogre
             }
         }
 
-        //id<MTLCommandBuffer> commandBuffer = [_commandQueue commandBuffer];
+        if( !mMainCommandBuffer )
+            mMainCommandBuffer = [mMainCommandQueue commandBuffer];
         mRenderEncoder = [mMainCommandBuffer renderCommandEncoderWithDescriptor:passDesc];
     }
     //-------------------------------------------------------------------------
@@ -706,6 +743,7 @@ namespace Ogre
             colourWrite &= !target->getForceDisableColourWrites();
 
             //TODO: Deal with MRT.
+            mNumMRTs = 1;
             target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
             MTLRenderPassColorAttachmentDescriptor *desc = mCurrentColourRTs[0]->mColourAttachmentDesc;
 
@@ -732,6 +770,11 @@ namespace Ogre
                 if( depthBuffer->mStencilAttachmentDesc )
                     depthBuffer->mStencilAttachmentDesc.storeAction = MTLStoreActionStore;
             }
+        }
+        else
+        {
+            mNumMRTs = 0;
+            mCurrentDepthBuffer = 0;
         }
     }
     //-------------------------------------------------------------------------

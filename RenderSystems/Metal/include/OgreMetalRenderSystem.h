@@ -101,6 +101,7 @@ namespace Ogre
         id<MTLDevice>               mDevice;
         id<MTLCommandQueue>         mMainCommandQueue;
         id<MTLCommandBuffer>        mMainCommandBuffer;
+        dispatch_semaphore_t        mMainGpuSyncSemaphore;
 
         void createRenderEncoder(void);
 
@@ -179,6 +180,9 @@ namespace Ogre
         virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget,
                                                     bool exactMatchFormat );
 
+        virtual void _beginFrameOnce(void);
+        virtual void _update(void);
+
         virtual void _beginFrame(void);
         virtual void _endFrame(void);
         virtual void _setViewport(Viewport *vp);
@@ -249,6 +253,8 @@ namespace Ogre
 
         virtual void setClipPlanesImpl(const PlaneList& clipPlanes);
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
+
+        id<MTLCommandBuffer> _getLastCommandBuffer(void)        { return mMainCommandBuffer; }
     };
 }
 

@@ -31,17 +31,35 @@ THE SOFTWARE.
 #include "OgreMetalPrerequisites.h"
 #include "OgreRenderWindow.h"
 
+#include "OgreMetalRenderTargetCommon.h"
+#include "Windowing/iOS/OgreMetalView.h"
+
+#import <QuartzCore/CAMetalLayer.h>
+
 namespace Ogre
 {
-    class MetalRenderWindow : public RenderWindow
+    class MetalRenderWindow : public RenderWindow, public MetalRenderTargetCommon
     {
         bool    mClosed;
+
+        CAMetalLayer        *mMetalLayer;
+        id<CAMetalDrawable> mCurrentDrawable;
+        id<MTLTexture>      mMsaaTex;
+        OgreMetalView       *mMetalView;
+
+        id<MTLDevice>       mDevice;
+        MetalRenderSystem   *mRenderSystem;
+
     public:
-        MetalRenderWindow();
+        MetalRenderWindow( id<MTLDevice> device, MetalRenderSystem *renderSystem );
         ~MetalRenderWindow();
 
+        void _metalUpdate(void);
+        virtual void swapBuffers(void);
+        virtual void windowMovedOrResized(void);
+
         virtual void create( const String& name, unsigned int width, unsigned int height,
-                             bool fullScreen, const NameValuePairList *miscParams);
+                             bool fullScreen, const NameValuePairList *miscParams );
         virtual void destroy(void);
 
         virtual void resize( unsigned int width, unsigned int height );
@@ -49,11 +67,11 @@ namespace Ogre
 
         virtual bool isClosed(void) const;
 
-        virtual void getCustomAttribute( const String& name, void* pData ) {}
-
         // RenderTarget overloads.
         virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer) {}
         virtual bool requiresTextureFlipping() const { return false; }
+
+        virtual void getCustomAttribute( const String& name, void* pData );
     };
 }
 

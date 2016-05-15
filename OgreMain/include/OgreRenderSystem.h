@@ -945,7 +945,7 @@ namespace Ogre
         virtual void _endFrame(void) = 0;
 
         /// Called once per frame, regardless of how many active workspaces there are
-        void _update(void);
+        virtual void _update(void);
 
         /**
         Sets the provided viewport as the active one for future

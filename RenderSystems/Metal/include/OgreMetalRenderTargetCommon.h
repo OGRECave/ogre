@@ -40,7 +40,11 @@ namespace Ogre
         MTLRenderPassColorAttachmentDescriptor *mColourAttachmentDesc;
 
     public:
-        MetalRenderTargetCommon( id<MTLTexture> texture, id<MTLTexture> resolveTexture );
+        MetalRenderTargetCommon();
+        ~MetalRenderTargetCommon();
+
+        void init( id<MTLTexture> texture, id<MTLTexture> resolveTexture );
+        void destroy(void);
     };
 }
 

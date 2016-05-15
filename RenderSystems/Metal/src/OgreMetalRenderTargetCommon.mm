@@ -30,14 +30,27 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 namespace Ogre
 {
-    MetalRenderTargetCommon::MetalRenderTargetCommon( id<MTLTexture> texture,
-                                                      id<MTLTexture> resolveTexture ) :
+    MetalRenderTargetCommon::MetalRenderTargetCommon() :
         mColourAttachmentDesc( 0 )
     {
-        mColourAttachmentDesc = [MTLRenderPassColorAttachmentDescriptor init];
+    }
+    //-----------------------------------------------------------------------------------
+    MetalRenderTargetCommon::~MetalRenderTargetCommon()
+    {
+        destroy();
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalRenderTargetCommon::init( id<MTLTexture> texture, id<MTLTexture> resolveTexture )
+    {
+        mColourAttachmentDesc = [MTLRenderPassColorAttachmentDescriptor alloc];
         mColourAttachmentDesc.loadAction = MTLLoadActionDontCare;
         mColourAttachmentDesc.storeAction = MTLStoreActionStore;
         mColourAttachmentDesc.texture = texture;
         mColourAttachmentDesc.resolveTexture = resolveTexture;
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalRenderTargetCommon::destroy(void)
+    {
+        mColourAttachmentDesc = 0;
     }
 }
