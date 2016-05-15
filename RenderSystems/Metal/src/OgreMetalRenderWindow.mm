@@ -188,13 +188,18 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderWindow::resize( unsigned int width, unsigned int height )
     {
-        //TODO?
-//        mWidth = width;
-//        mHeight = height;
+        CGRect frame = mMetalView.frame;
+        frame.size.width    = width;
+        frame.size.height   = height;
+        mMetalView.frame = frame;
     }
     //-------------------------------------------------------------------------
     void MetalRenderWindow::reposition( int left, int top )
     {
+        CGRect frame = mMetalView.frame;
+        frame.origin.x = left;
+        frame.origin.y = top;
+        mMetalView.frame = frame;
     }
     //-------------------------------------------------------------------------
     bool MetalRenderWindow::isClosed(void) const
