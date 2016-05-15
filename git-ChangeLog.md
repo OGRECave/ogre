@@ -32,6 +32,12 @@
 * fix flipped Environment Maps using GLSL (GLSES) shaders
 * fix different lighting intensity compared to legacy GL
 
+## Python Bindings (SWIG based)
+* cover OgreMain and RTShaderSystem
+* allows implementing Listeners in Python (see Sample)
+* still rough edged around iterators
+* can be extended for C#, Java, etc.
+
 ## GLSupport (new component)
 * Factored out GL Support classes that handle GL context creation
 * Defines new GLNativeSupport interface. Platform specific classes (e.g. GLX, WGL) no longer directly accessible.
