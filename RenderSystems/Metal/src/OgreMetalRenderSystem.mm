@@ -589,8 +589,7 @@ namespace Ogre
         }
         else
         {
-            id <MTLSamplerState> sampler =
-                    reinterpret_cast< id <MTLSamplerState> >( samplerblock->mRsData );
+            id <MTLSamplerState> sampler = (__bridge id<MTLSamplerState>)samplerblock->mRsData;
             [mRenderEncoder setFragmentSamplerState:sampler atIndex: texUnit];
         }
     }
