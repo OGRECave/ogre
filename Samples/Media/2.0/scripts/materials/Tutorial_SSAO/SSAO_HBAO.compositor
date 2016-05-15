@@ -1,0 +1,84 @@
+compositor_node SSAO_RenderNode
+{
+	in 0 rt_renderwindow
+
+	texture RT0 target_width target_height PF_FLOAT16_RGBA depth_texture depth_format PF_D32_FLOAT depth_pool 2
+	
+	texture depthTexture target_width target_height PF_D32_FLOAT depth_pool 2
+	texture depthTextureCopy target_width target_height PF_D32_FLOAT
+	
+	texture ssaoTexture target_width target_height PF_FLOAT16_R
+	texture blurTexture target_width target_height PF_FLOAT16_R
+	
+	target RT0
+	{		
+		pass clear
+		{
+			colour_value 0 0 0 1
+		}
+		
+		pass render_scene
+		{
+			lod_update_list	off
+			overlays	off
+		}
+	}
+	
+	target ssaoTexture
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+		
+		pass depth_copy
+		{
+			alias_on_copy_failure	on
+			in		depthTexture
+			out		depthTextureCopy
+		}
+		
+		pass render_quad
+		{
+			material SSAO/HBAO
+	    	input 0 depthTextureCopy
+
+			quad_normals	camera_far_corners_view_space
+		}
+	}
+	
+	target blurTexture
+	{
+		pass render_quad
+		{
+			material SSAO/Blur
+			input 0 ssaoTexture
+		}
+	}
+	
+	
+	target rt_renderwindow
+	{
+		pass render_quad
+		{
+			material SSAO/Apply
+			input 0 blurTexture
+			input 1 RT0
+		}
+		
+		pass render_scene
+		{
+			lod_update_list	off
+
+			//Render Overlays
+			overlays	on
+			rq_first	254
+			rq_last		255
+		}
+	}
+}
+
+workspace SSAOWorkspace
+{
+	connect_output SSAO_RenderNode 0
+}
