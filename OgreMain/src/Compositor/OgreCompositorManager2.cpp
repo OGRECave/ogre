@@ -618,6 +618,8 @@ namespace Ogre
 
             ++itor;
         }
+
+        mRenderSystem->_endFrameOnce();
     }
     //-----------------------------------------------------------------------------------
     void CompositorManager2::createBasicWorkspaceDef( const IdString &workspaceDefName,

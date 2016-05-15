@@ -91,6 +91,12 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderWindow::swapBuffers(void)
     {
+        if( mColourAttachmentDesc.loadAction == MTLLoadActionClear )
+        {
+            //A clear has been asked but no rendering command was issued. Do it now.
+            mRenderSystem->_clearRenderTargetImmediately( this );
+        }
+
         RenderWindow::swapBuffers();
 
         // Do not retain current drawable's texture beyond the frame.

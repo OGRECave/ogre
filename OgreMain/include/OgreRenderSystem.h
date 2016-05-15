@@ -915,6 +915,9 @@ namespace Ogre
         /// Signifies the beginning of the main frame. i.e. will only be called once per frame,
         /// not per viewport
         virtual void _beginFrameOnce(void);
+        /// Called once per frame, regardless of how many active workspaces there are.
+        /// Gets called AFTER all RenderWindows have been swapped.
+        virtual void _endFrameOnce(void) {}
 
         /**
         * Signifies the beginning of a frame, i.e. the start of rendering on a single viewport. Will occur
@@ -945,7 +948,7 @@ namespace Ogre
         virtual void _endFrame(void) = 0;
 
         /// Called once per frame, regardless of how many active workspaces there are
-        virtual void _update(void);
+        void _update(void);
 
         /**
         Sets the provided viewport as the active one for future

@@ -181,7 +181,7 @@ namespace Ogre
                                                     bool exactMatchFormat );
 
         virtual void _beginFrameOnce(void);
-        virtual void _update(void);
+        virtual void _endFrameOnce(void);
 
         virtual void _beginFrame(void);
         virtual void _endFrame(void);
@@ -255,6 +255,8 @@ namespace Ogre
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
         id<MTLCommandBuffer> _getLastCommandBuffer(void)        { return mMainCommandBuffer; }
+
+        void _clearRenderTargetImmediately( RenderTarget *renderTarget );
     };
 }
 

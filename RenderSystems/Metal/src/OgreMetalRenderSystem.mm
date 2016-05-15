@@ -284,12 +284,12 @@ namespace Ogre
         dispatch_semaphore_wait( mMainGpuSyncSemaphore, DISPATCH_TIME_FOREVER );
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::_update(void)
+    void MetalRenderSystem::_endFrameOnce(void)
     {
+        if( mRenderEncoder )
         {
-            //TODO: this is duct tape
-            createRenderEncoder();
             [mRenderEncoder endEncoding];
+            mRenderEncoder = 0;
         }
 
         __block dispatch_semaphore_t blockSemaphore = mMainGpuSyncSemaphore;
@@ -359,6 +359,12 @@ namespace Ogre
         if( !mMainCommandBuffer )
             mMainCommandBuffer = [mMainCommandQueue commandBuffer];
         mRenderEncoder = [mMainCommandBuffer renderCommandEncoderWithDescriptor:passDesc];
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
+    {
+        _setRenderTarget( renderTarget, true );
+        createRenderEncoder();
     }
     //-------------------------------------------------------------------------
     id <MTLDepthStencilState> MetalRenderSystem::getDepthStencilState( HlmsPso *pso )
@@ -742,23 +748,31 @@ namespace Ogre
         {
             colourWrite &= !target->getForceDisableColourWrites();
 
-            //TODO: Deal with MRT.
-            mNumMRTs = 1;
-            target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
-            MTLRenderPassColorAttachmentDescriptor *desc = mCurrentColourRTs[0]->mColourAttachmentDesc;
-
-            //TODO. This information is stored in Texture. Metal needs it now.
-            const bool explicitResolve = false;
-
-            //TODO: Compositor should be able to tell us whether to use
-            //MTLStoreActionDontCare with some future enhancements.
-            if( target->getFSAA() > 1 && !explicitResolve )
+            if( colourWrite )
             {
-                desc.storeAction = MTLStoreActionMultisampleResolve;
+                //TODO: Deal with MRT.
+                mNumMRTs = 1;
+                target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
+                MTLRenderPassColorAttachmentDescriptor *desc =
+                        mCurrentColourRTs[0]->mColourAttachmentDesc;
+
+                //TODO. This information is stored in Texture. Metal needs it now.
+                const bool explicitResolve = false;
+
+                //TODO: Compositor should be able to tell us whether to use
+                //MTLStoreActionDontCare with some future enhancements.
+                if( target->getFSAA() > 1 && !explicitResolve )
+                {
+                    desc.storeAction = MTLStoreActionMultisampleResolve;
+                }
+                else
+                {
+                    desc.storeAction = MTLStoreActionStore;
+                }
             }
             else
             {
-                desc.storeAction = MTLStoreActionStore;
+                mNumMRTs = 0;
             }
 
             MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>( target->getDepthBuffer() );
