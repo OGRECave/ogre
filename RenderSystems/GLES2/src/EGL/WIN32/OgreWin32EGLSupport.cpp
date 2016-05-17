@@ -38,12 +38,14 @@ THE SOFTWARE.
 #include "OgreWin32EGLSupport.h"
 #include "OgreWin32EGLWindow.h"
 #include "OgreWin32EGLRenderTexture.h"
-#include "OgreWin32EGLContext.h"
 
-
+#include "OgreGLUtil.h"
 
 namespace Ogre {
-
+    GLNativeSupport* getGLSupport(int profile)
+    {
+        return new Win32EGLSupport(profile);
+    }
 
     Win32EGLSupport::Win32EGLSupport()
     {

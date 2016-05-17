@@ -30,14 +30,13 @@ THE SOFTWARE.
 #ifndef __EGLContext_H__
 #define __EGLContext_H__
 
-#include "OgreGLES2Prerequisites.h"
 #include "OgreGLContext.h"
 #include <EGL/egl.h>
 
 namespace Ogre {
     class EGLSupport;
 
-    class _OgrePrivate EGLContext: public GLES2Context
+    class _OgrePrivate EGLContext : public GLContext
     {
         protected:
             ::EGLConfig    mConfig;
@@ -49,17 +48,23 @@ namespace Ogre {
         public:
             EGLContext(EGLDisplay eglDisplay, const EGLSupport* glsupport, ::EGLConfig fbconfig, ::EGLSurface drawable);
 
-            virtual ~EGLContext();
+            ~EGLContext();
 
-            virtual void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
-            virtual void _destroyInternalResources();
+            void _createInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable, ::EGLContext shareContext);
+            void _destroyInternalResources();
         
-            virtual void setCurrent();
-            virtual void endCurrent();
-            virtual GLES2Context* clone() const = 0;
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+            void _updateInternalResources(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLSurface drawable);
+#endif
 
-        EGLSurface getDrawable() const;
+            void setCurrent();
+            void endCurrent();
 
+            GLContext* clone() const {
+                return new EGLContext(mEglDisplay, mGLSupport, mConfig, mDrawable);
+            }
+
+            EGLSurface getDrawable() const;
     };
 }
 

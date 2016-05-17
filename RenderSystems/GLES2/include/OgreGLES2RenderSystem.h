@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreMaterialManager.h"
 #include "OgreRenderSystem.h"
 #include "OgreGLES2GpuProgram.h"
+#include "OgreGLRenderSystemCommon.h"
 
 namespace Ogre {
     class GLES2Support;
@@ -53,7 +54,7 @@ namespace Ogre {
     /**
       Implementation of GL ES 2.x as a rendering system.
      */
-    class _OgreGLES2Export GLES2RenderSystem : public RenderSystem
+    class _OgreGLES2Export GLES2RenderSystem : public GLRenderSystemCommon
     {
         private:
             /// View matrix to set world against
@@ -530,6 +531,8 @@ namespace Ogre {
     private:
             static GLES2ManagedResourceManager* mResourceManager;
 #endif
+            void _copyContentsToMemory(Viewport* src, const PixelBox& dst,
+                                       RenderWindow::FrameBuffer buffer);
     };
 }
 

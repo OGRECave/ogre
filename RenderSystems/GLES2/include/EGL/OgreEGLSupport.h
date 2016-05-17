@@ -31,10 +31,27 @@ THE SOFTWARE.
 #define __EGLSupport_H__
 
 
-#include "OgreGLES2Support.h"
-//#include "OgreGLES2Prerequisites.h"
-//#include "OgreGLESPBuffer.h"
+#include "OgreGLNativeSupport.h"
+#include <EGL/egl.h>
 #include "OgreEGLWindow.h"
+
+#define ENABLE_EGL_CHECK 0
+
+#if ENABLE_EGL_CHECK
+    #define EGL_CHECK_ERROR \
+    { \
+        int e = eglGetError(); \
+        if ((e != 0) && (e != EGL_SUCCESS))\
+        { \
+            char msgBuf[4096]; \
+            sprintf(msgBuf, "EGL error 0x%04X in %s at line %i\n", e, __PRETTY_FUNCTION__, __LINE__); \
+            LogManager::getSingleton().logMessage(msgBuf); \
+            OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR, msgBuf, __PRETTY_FUNCTION__); \
+        } \
+    }
+#else
+    #define EGL_CHECK_ERROR {}
+#endif
 
 namespace Ogre {
     template<class C> void removeDuplicates(C& c)
@@ -44,7 +61,7 @@ namespace Ogre {
         c.erase(p, c.end());
     }
 
-    class _OgrePrivate EGLSupport : public GLES2Support
+    class _OgrePrivate EGLSupport : public GLNativeSupport
     {
         protected:
             void refreshConfig(void);
@@ -63,10 +80,13 @@ namespace Ogre {
             VideoMode mCurrentMode;
             StringVector mSampleLevels;
 
+            EGLint mEGLMajor, mEGLMinor;
+
             //virtual EGLWindow* createEGLWindow( EGLSupport * support) = 0;
+
+            void initialiseExtensions();
         public:
-            EGLSupport();
-            virtual ~EGLSupport();
+            EGLSupport(int profile);
 
             void start(void);
             void stop(void);
@@ -79,17 +99,19 @@ namespace Ogre {
             EGLConfig* chooseGLConfig(const EGLint *attribList, EGLint *nElements);
             EGLConfig* getConfigs(EGLint *nElements);
             EGLBoolean getGLConfigAttrib(EGLConfig fbConfig, EGLint attribute, EGLint *value);
-            void* getProcAddress(const Ogre::String& name);
+            void* getProcAddress(const char* name);
             ::EGLContext createNewContext(EGLDisplay eglDisplay, ::EGLConfig glconfig, ::EGLContext shareList) const;
 
             RenderWindow* createWindow(bool autoCreateWindow,
-                                       GLES2RenderSystem *renderSystem,
+                                       RenderSystem *renderSystem,
                                        const String& windowTitle);
 
-//            RenderWindow* newWindow(const String& name,
-//                                    unsigned int width, unsigned int height,
-//                                    bool fullScreen,
-//                                    const NameValuePairList *miscParams = 0);
+            RenderWindow* newWindow(const String& name,
+                                    unsigned int width, unsigned int height,
+                                    bool fullScreen,
+                                    const NameValuePairList *miscParams = 0) {
+                return NULL;
+            }
 
             ::EGLConfig getGLConfigFromContext(::EGLContext context);
             ::EGLConfig getGLConfigFromDrawable(::EGLSurface drawable,
@@ -97,7 +119,7 @@ namespace Ogre {
             ::EGLConfig selectGLConfig (const EGLint* minAttribs, const EGLint *maxAttribs);
             void switchMode(void);
             virtual void switchMode(uint& width, uint& height, short& frequency) = 0;
-           // virtual GLES2PBuffer* createPBuffer(PixelComponentType format,
+           // virtual GLPBuffer* createPBuffer(PixelComponentType format,
             //                           size_t width, size_t height) = 0;
 //          NativeDisplayType getNativeDisplay();
     };

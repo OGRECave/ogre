@@ -33,12 +33,8 @@ THE SOFTWARE.
 #include "OgreWindowEventUtilities.h"
 #include "OgreViewport.h"
 
-#include "OgreGLES2Prerequisites.h"
-#include "OgreGLES2RenderSystem.h"
-
 #include "OgreX11EGLSupport.h"
 #include "OgreX11EGLWindow.h"
-#include "OgreX11EGLContext.h"
 
 #include <iostream>
 #include <algorithm>
@@ -102,11 +98,6 @@ namespace Ogre {
             return;
         }
 
-    }
-
-    EGLContext * X11EGLWindow::createEGLContext() const
-    {
-        return new X11EGLContext(mEglDisplay, mGLSupport, mEglConfig, mEglSurface);
     }
 
     void X11EGLWindow::getLeftAndTopFromNativeWindow( int & left, int & top, uint width, uint height )
