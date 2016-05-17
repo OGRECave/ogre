@@ -230,9 +230,9 @@ namespace Demo
 		Ogre::TexturePtr sampleTexture = Ogre::TextureManager::getSingleton().createManual(
 			"sampleTexture",
 			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-			Ogre::TextureType::TEX_TYPE_2D, 8, 8, 0,
+            Ogre::TEX_TYPE_2D, 8, 8, 0,
 			Ogre::PF_R8G8B8,
-			Ogre::TextureUsage::TU_DYNAMIC_WRITE_ONLY);
+            Ogre::TU_STATIC_WRITE_ONLY);
 
 		Ogre::v1::HardwarePixelBufferSharedPtr pixelBuffer = sampleTexture->getBuffer();
 		const Ogre::PixelBox& pixelBox = pixelBuffer->lock(Ogre::Box(0, 0, sampleTexture->getWidth(), sampleTexture->getHeight()), Ogre::v1::HardwareBuffer::HBL_DISCARD);
@@ -242,7 +242,7 @@ namespace Demo
 		{
 			for (size_t i = 0; i < pixelBox.getHeight(); i++)
 			{
-				Ogre::PixelBox& pb = Ogre::PixelBox(pixelBox);
+                Ogre::PixelBox pb = pixelBox;
 				pb.setColourAt(Ogre::ColourValue(kernelSamples[sampleIter].x, kernelSamples[sampleIter].y, kernelSamples[sampleIter].z, 1.0f), j, i, 0);
 				sampleIter++;
 			}
@@ -253,9 +253,9 @@ namespace Demo
 		Ogre::TexturePtr noiseTexture = Ogre::TextureManager::getSingleton().createManual(
 			"noiseTexture",
 			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-			Ogre::TextureType::TEX_TYPE_2D, 2, 2, 0,
-			Ogre::PixelFormat::PF_R8G8B8,
-			Ogre::TextureUsage::TU_DYNAMIC_WRITE_ONLY);
+            Ogre::TEX_TYPE_2D, 2, 2, 0,
+            Ogre::PF_R8G8B8,
+            Ogre::TU_STATIC_WRITE_ONLY );
 
 		
 		Ogre::v1::HardwarePixelBufferSharedPtr pixelBuffer2 = noiseTexture->getBuffer();
@@ -265,14 +265,16 @@ namespace Demo
 		{
 			for (size_t i = 0; i < pixelBox2.getHeight(); i++)
 			{
-				Ogre::Vector3 noise = Ogre::Vector3(Ogre::Math::RangeRandom(-1.0f, 1.0f), Ogre::Math::RangeRandom(-1.0f, 1.0f), 0.0f);
+                Ogre::Vector3 noise = Ogre::Vector3( Ogre::Math::RangeRandom(-1.0f, 1.0f),
+                                                     Ogre::Math::RangeRandom(-1.0f, 1.0f),
+                                                     0.0f );
 				noise.normalise();
 
 				//Range values to [0.0 - 1.0] we will re-range them later in shader to the orginal ones
 				noise.x = (noise.x + 1.0f) * 0.5f;
 				noise.y = (noise.y + 1.0f) * 0.5f;
 
-				Ogre::PixelBox& pb = Ogre::PixelBox(pixelBox2);
+                Ogre::PixelBox pb = pixelBox2;
 				pb.setColourAt(Ogre::ColourValue(noise.x, noise.y, noise.z, 1.0f), j, i, 0);
 			}
 		}
