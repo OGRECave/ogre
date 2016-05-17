@@ -147,6 +147,8 @@ namespace Ogre
         if( !mInitialized )
         {
             mDevice.init();
+            setActiveDevice(&mDevice);
+            
             const long c_inFlightCommandBuffers = 3;
             mMainGpuSyncSemaphore = dispatch_semaphore_create(c_inFlightCommandBuffers);
             mRealCapabilities = createRenderSystemCapabilities();
