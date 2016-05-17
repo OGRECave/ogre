@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "OgreD3D11VideoMode.h"
 #include "OgreD3D11Device.h"
 #include "OgreString.h"
+#include "OgreStringConverter.h"
 namespace Ogre
 {
     //---------------------------------------------------------------------
