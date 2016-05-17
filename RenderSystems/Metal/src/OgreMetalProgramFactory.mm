@@ -25,29 +25,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreMetalPrerequisites_H_
-#define _OgreMetalPrerequisites_H_
 
-#include "OgrePrerequisites.h"
+#import "OgreMetalProgramFactory.h"
+#import "OgreMetalProgram.h"
+#import "OgreRoot.h"
+#import "OgreHighLevelGpuProgram.h"
 
-#include "OgreLogManager.h"
-
-namespace Ogre
-{
-    // Forward declarations
-    class MetalDepthBuffer;
-    struct MetalDevice;
-    struct MetalHlmsPso;
-    class MetalStagingBuffer;
-    class MetalRenderSystem;
-    class MetalRenderTargetCommon;
-    class MetalVaoManager;
+namespace Ogre {
+    //-----------------------------------------------------------------------
+    String MetalProgramFactory::sLanguageName = "metal";
+    //-----------------------------------------------------------------------
+    MetalProgramFactory::MetalProgramFactory(void)
+    {
+    }
+    //-----------------------------------------------------------------------
+    MetalProgramFactory::~MetalProgramFactory(void)
+    {
+    }
+    //-----------------------------------------------------------------------
+    const String& MetalProgramFactory::getLanguage(void) const
+    {
+        return sLanguageName;
+    }
+    //-----------------------------------------------------------------------
+    HighLevelGpuProgram* MetalProgramFactory::create(ResourceManager* creator, 
+        const String& name, ResourceHandle handle,
+        const String& group, bool isManual, ManualResourceLoader* loader)
+    {
+        return OGRE_NEW MetalProgram(creator, name, handle, group, isManual, loader);
+    }
+    //-----------------------------------------------------------------------
+    void MetalProgramFactory::destroy(HighLevelGpuProgram* prog)
+    {
+        OGRE_DELETE prog;
+    }
 }
-
-#if defined ( OGRE_GCC_VISIBILITY )
-#    define _OgreMetalExport  __attribute__ ((visibility("default")))
-#else
-#    define _OgreMetalExport
-#endif
-
-#endif //#ifndef _OgreMetalPrerequisites_H_

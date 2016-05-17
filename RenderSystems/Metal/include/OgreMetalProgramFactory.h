@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2016 Torus Knot Software Ltd
 
@@ -26,42 +26,31 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _Ogre_MetalStagingBuffer_H_
-#define _Ogre_MetalStagingBuffer_H_
 
-#include "OgreMetalPrerequisites.h"
+#ifndef __OgreMetalProgramFactory_H__
+#define __OgreMetalProgramFactory_H__
 
-#include "Vao/OgreStagingBuffer.h"
+#import "OgreMetalPrerequisites.h"
+#import "OgreHighLevelGpuProgramManager.h"
 
 namespace Ogre
 {
-    /** A staging buffer is a buffer that resides on the GPU and be written to/from both CPU & GPU
-        However the access in both cases is limited. GPUs can only copy (i.e. memcpy) to another
-        real buffer (can't be used directly as i.e. texture or vertex buffer) and CPUs can only
-        map it.
-        In other words, a staging buffer is an intermediate buffer to transfer data between
-        CPU & GPU
-    */
-    class _OgreMetalExport MetalStagingBuffer : public StagingBuffer
+    /** Factory class for Metal programs. */
+    class _OgreMetalExport MetalProgramFactory : public HighLevelGpuProgramFactory
     {
     protected:
-        void    *mMappedPtr;
-
-        uint8   *mNullDataPtr;
-
-        virtual void* mapImpl( size_t sizeBytes );
-        virtual void unmapImpl( const Destination *destinations, size_t numDestinations );
-        virtual const void* _mapForReadImpl( size_t offset, size_t sizeBytes );
-
+        static String sLanguageName;
     public:
-        MetalStagingBuffer( size_t internalBufferStart, size_t sizeBytes,
-                              VaoManager *vaoManager, bool uploadOnly );
-        virtual ~MetalStagingBuffer();
-
-        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
-
-        virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
+        MetalProgramFactory(void);
+        ~MetalProgramFactory(void);
+        /// Get the name of the language this factory creates programs for
+        const String& getLanguage(void) const;
+        /// Create an instance of MetalProgram
+        HighLevelGpuProgram* create(ResourceManager* creator, 
+            const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader);
+        void destroy(HighLevelGpuProgram* prog);
     };
 }
 
-#endif
+#endif // __MetalProgramFactory_H__
