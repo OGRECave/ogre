@@ -659,8 +659,9 @@ namespace Ogre {
             {
                 const v1::VertexElement &origElement = *itor;
 
-                if( origElement.getSemantic() == VES_TANGENT ||
-                    origElement.getSemantic() == VES_BINORMAL )
+                if( qTangents &&
+                    (origElement.getSemantic() == VES_TANGENT ||
+                    origElement.getSemantic() == VES_BINORMAL) )
                 {
                     hasTangents = true;
                 }
