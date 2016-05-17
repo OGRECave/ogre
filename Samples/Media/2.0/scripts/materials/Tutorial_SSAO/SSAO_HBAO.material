@@ -71,7 +71,7 @@ material SSAO/HBAO
 
 			texture_unit depthTexture
 			{
-				filtering			none
+				filtering			bilinear
 				tex_address_mode	clamp
 			}
 			
@@ -139,7 +139,7 @@ material SSAO/Blur
 
 			texture_unit ssaoTexture
 			{
-				filtering			bilinear
+				filtering			none
 				tex_address_mode	clamp
 			}
 			
@@ -196,7 +196,7 @@ material SSAO/Apply
 
 			texture_unit ssaoTexture
 			{
-				filtering			none
+				filtering			bilinear
 				tex_address_mode	clamp
 			}
 			

@@ -10,9 +10,8 @@ in block
    vec3 cameraDir;
 } inPs;
 
-uniform vec2 projectionParams;
 
-// defines for SSAO
+uniform vec2 projectionParams;
 uniform int kernelSize;
 uniform float kernelRadius;
 uniform vec2 noiseScale;
@@ -28,7 +27,7 @@ vec3 reconstructNormal(vec3 posInView)
 
 void main()
 {
-    float fDepth = texture( depthTexture, inPs.uv0).x;
+    float fDepth = texture( depthTexture, inPs.uv0*2.0).x; //multiply uv coords by 2 because we are working with half res
 	float linearDepth = projectionParams.y / (fDepth - projectionParams.x);
 
     vec3 fragPos = inPs.cameraDir * linearDepth;
@@ -54,16 +53,15 @@ void main()
 			vec3 sample = TBN * sNoise; // From tangent to view-space
 			sample = fragPos + sample * kernelRadius; 
         
-			// project sample position (to sample texture) (to get position on screen/texture)
+			// project sample position
 			vec4 offset = vec4(sample, 1.0);
 			offset = projection * offset; // from view to clip-space
 			offset.xyz /= offset.w; // perspective divide
 			offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
-			
 			offset.y = 1.0 - offset.y;
 
 			// get sample depth
-			float fSampleDepth = texture(depthTexture, offset.xy).x; // Get depth value of sample
+			float fSampleDepth = texture(depthTexture, offset.xy*2.0).x; // Get depth value of sample. multiply uv coords by 2 because we are working with half res
 			float newLinearDepth = projectionParams.y / (fSampleDepth - projectionParams.x);
 			vec3 sampleFragPos = inPs.cameraDir * newLinearDepth;
 			float sampleDepth = sampleFragPos.z;
@@ -73,7 +71,7 @@ void main()
 			occlusion += (sampleDepth >= sample.z ? 1.0 : 0.0) * rangeCheck; 
 		}      
     }
-    occlusion = 1.0 - (occlusion / kernelSize);
+    occlusion = 1.0 - (occlusion / float(kernelSize));
    
     fragColour = occlusion;
 }

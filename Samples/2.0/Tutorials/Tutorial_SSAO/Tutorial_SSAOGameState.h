@@ -20,6 +20,12 @@ namespace Demo
 		size_t          mNumSpheres;
 
 		Ogre::Pass* mSSAOPass;
+		Ogre::Pass* mApplyPass;
+
+		float mKernelRadius;
+		float mPowerScale;
+
+		virtual void generateDebugText(float timeSinceLast, Ogre::String &outText);
 
     public:
         Tutorial_SSAOGameState( const Ogre::String &helpDescription );

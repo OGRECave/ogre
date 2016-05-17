@@ -39,7 +39,9 @@ namespace Demo
 	Tutorial_SSAOGameState::Tutorial_SSAOGameState(const Ogre::String &helpDescription) :
 		TutorialGameState(helpDescription),
 		mAnimateObjects(true),
-		mNumSpheres(0)
+		mNumSpheres(0),
+		mPowerScale(1.5f),
+		mKernelRadius(0.35f)
 	{
 		memset(mSceneNode, 0, sizeof(mSceneNode));
 	}
@@ -310,7 +312,7 @@ namespace Demo
 
 		//Set other uniforms
 		psParams->setNamedConstant("kernelRadius", 0.35f);
-		psParams->setNamedConstant("noiseScale", Ogre::Vector2((float)mGraphicsSystem->getRenderWindow()->getWidth()/2.0f, (float)mGraphicsSystem->getRenderWindow()->getHeight()/2.0f));
+		psParams->setNamedConstant("noiseScale", Ogre::Vector2(((float)mGraphicsSystem->getRenderWindow()->getWidth()*0.5f)/2.0f, ((float)mGraphicsSystem->getRenderWindow()->getHeight()*0.5f)/2.0f));
 		psParams->setNamedConstant("kernelSize", 64);
 
 		//Set blur shader uniforms
@@ -321,7 +323,8 @@ namespace Demo
 
 		Ogre::Pass *passBlur = materialBlur->getTechnique(0)->getPass(0);
 		Ogre::GpuProgramParametersSharedPtr psParamsBlur = passBlur->getFragmentProgramParameters();
-		psParamsBlur->setNamedConstant("texelSize", Ogre::Vector2( 1.0f/mGraphicsSystem->getRenderWindow()->getWidth(), 1.0f/mGraphicsSystem->getRenderWindow()->getHeight() ));
+		//use half render window size because we are running HBAO in half resolution
+		psParamsBlur->setNamedConstant("texelSize", Ogre::Vector2( 1.0f/(mGraphicsSystem->getRenderWindow()->getWidth()*0.5f), 1.0f/(mGraphicsSystem->getRenderWindow()->getHeight()*0.5f) ));
 
 		//Set apply shader uniforms
 		Ogre::MaterialPtr materialApply = Ogre::MaterialManager::getSingleton().load(
@@ -330,6 +333,7 @@ namespace Demo
 			AUTODETECT_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();
 
 		Ogre::Pass *passApply = materialApply->getTechnique(0)->getPass(0);
+		mApplyPass = passApply;
 		Ogre::GpuProgramParametersSharedPtr psParamsApply = passApply->getFragmentProgramParameters();
 		psParamsApply->setNamedConstant("powerScale", (float)1.5f);
 
@@ -341,12 +345,26 @@ namespace Demo
 
 		Ogre::GpuProgramParametersSharedPtr psParams = mSSAOPass->getFragmentProgramParameters();
 		psParams->setNamedConstant("projection", mGraphicsSystem->getCamera()->getProjectionMatrix());
+		psParams->setNamedConstant("kernelRadius", mKernelRadius);
+
+		Ogre::GpuProgramParametersSharedPtr psParamsApply = mApplyPass->getFragmentProgramParameters();
+		psParamsApply->setNamedConstant("powerScale", mPowerScale);
 
 		TutorialGameState::update(timeSinceLast);
 	}
 	//-----------------------------------------------------------------------------------
+	void Tutorial_SSAOGameState::generateDebugText(float timeSinceLast, Ogre::String &outText)
+	{
+		TutorialGameState::generateDebugText(timeSinceLast, outText);
 
-	
+		if (mDisplayHelpMode == 1)
+		{
+			outText += "\nPress F5/F6 to increase/reduce kernel radius. ";
+			outText += "[" + Ogre::StringConverter::toString(mKernelRadius) + "]";
+			outText += "\nPress F7/F8 to increase/reduce power scale. ";
+			outText += "[" + Ogre::StringConverter::toString(mPowerScale) + "]";
+		}
+	}
 	//-----------------------------------------------------------------------------------
 	void Tutorial_SSAOGameState::keyReleased(const SDL_KeyboardEvent &arg)
 	{
@@ -359,6 +377,24 @@ namespace Demo
 		if (arg.keysym.sym == SDLK_F2)
 		{
 			mAnimateObjects = !mAnimateObjects;
+		}
+		else if (arg.keysym.sym == SDLK_F5)
+		{
+			mKernelRadius = mKernelRadius - 0.1f;
+			if (mKernelRadius < 0.05f) mKernelRadius = 0.05f;
+		}
+		else if (arg.keysym.sym == SDLK_F6)
+		{
+			mKernelRadius = mKernelRadius + 0.1f;
+			if (mKernelRadius > 10.0f) mKernelRadius = 10.0f;
+		}
+		else if (arg.keysym.sym == SDLK_F7)
+		{
+			mPowerScale = mPowerScale - 0.25f;
+		}
+		else if (arg.keysym.sym == SDLK_F8)
+		{
+			mPowerScale = mPowerScale + 0.25f;
 		}
 		else
 		{

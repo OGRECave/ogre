@@ -7,8 +7,8 @@ compositor_node SSAO_RenderNode
 	texture depthTexture target_width target_height PF_D32_FLOAT depth_pool 2
 	texture depthTextureCopy target_width target_height PF_D32_FLOAT
 	
-	texture ssaoTexture target_width target_height PF_FLOAT16_R
-	texture blurTexture target_width target_height PF_FLOAT16_R
+	texture ssaoTexture target_width_scaled 0.5 target_height_scaled 0.5 PF_FLOAT16_R
+	texture blurTexture target_width_scaled 0.5 target_height_scaled 0.5 PF_FLOAT16_R
 	
 	target RT0
 	{		
@@ -23,6 +23,7 @@ compositor_node SSAO_RenderNode
 			overlays	off
 		}
 	}
+	
 	
 	target ssaoTexture
 	{
