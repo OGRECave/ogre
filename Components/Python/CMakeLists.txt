@@ -1,3 +1,5 @@
+project(OgrePython)
+
 find_package(SWIG)
 find_package(PythonLibs)
 include_directories(${PYTHON_INCLUDE_PATH})
@@ -11,7 +13,7 @@ include(${SWIG_USE_FILE})
 
 set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/)
 
-set(CMAKE_SWIG_FLAGS "-w401,314")
+set(CMAKE_SWIG_FLAGS -w401,314)
 
 add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized)
 set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
@@ -29,4 +31,23 @@ if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
     set_target_properties(${SWIG_MODULE_OgreRTShader_REAL_NAME} PROPERTIES DEBUG_POSTFIX "")
     install(TARGETS ${SWIG_MODULE_OgreRTShader_REAL_NAME} LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES})
     install(FILES ${CMAKE_BINARY_DIR}/Components/Python/OgreRTShader.py DESTINATION ${PYTHON_SITE_PACKAGES})
+endif()
+
+if(OGRE_BUILD_COMPONENT_BITES)
+    if(SDL2_FOUND)
+        include_directories(${SDL2_INCLUDE_DIR})
+        list(APPEND CMAKE_SWIG_FLAGS -DHAVE_SDL)
+        add_definitions(-DHAVE_SDL)
+    endif()
+
+    if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
+        list(APPEND CMAKE_SWIG_FLAGS -DINCLUDE_RTSHADER_SYSTEM)
+        add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
+    endif()
+    
+    ogre_add_component_include_dir(Bites)
+    set_source_files_properties(../Bites/include/OgreBites.i PROPERTIES CPLUSPLUS ON)
+    swig_add_module(OgreBites python ../Bites/include/OgreBites.i)
+    swig_link_libraries(OgreBites OgreMain OgreBites ${PYTHON_LIBRARIES})
+    set_target_properties(${SWIG_MODULE_OgreBites_REAL_NAME} PROPERTIES DEBUG_POSTFIX "")
 endif()
