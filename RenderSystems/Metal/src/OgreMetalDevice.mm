@@ -27,17 +27,20 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreMetalDevice.h"
+#include "OgreMetalRenderSystem.h"
 
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLCommandQueue.h>
 
 namespace Ogre
 {
-    MetalDevice::MetalDevice() :
+    MetalDevice::MetalDevice( MetalRenderSystem *renderSystem ) :
         mDevice( 0 ),
         mMainCommandQueue( 0 ),
         mCurrentCommandBuffer( 0 ),
-        mRenderEncoder( 0 )
+        mBlitEncoder( 0 ),
+        mRenderEncoder( 0 ),
+        mRenderSystem( renderSystem )
     {
     }
     //-------------------------------------------------------------------------
@@ -46,6 +49,7 @@ namespace Ogre
         mDevice = 0;
         mMainCommandQueue = 0;
         mCurrentCommandBuffer = 0;
+        mBlitEncoder = 0;
         mRenderEncoder = 0;
     }
     //-------------------------------------------------------------------------
@@ -54,12 +58,57 @@ namespace Ogre
         mDevice = MTLCreateSystemDefaultDevice();
         mMainCommandQueue = [mDevice newCommandQueue];
         mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
+        mBlitEncoder = 0;
         mRenderEncoder = 0;
     }
     //-------------------------------------------------------------------------
-    void MetalDevice::nextCommandBuffer(void)
+    void MetalDevice::endBlitEncoder(void)
     {
+        if( mBlitEncoder )
+        {
+            [mBlitEncoder endEncoding];
+            mBlitEncoder = 0;
+        }
+    }
+    //-------------------------------------------------------------------------
+    void MetalDevice::endRenderEncoder(void)
+    {
+        if( mRenderEncoder )
+        {
+            [mRenderEncoder endEncoding];
+            mRenderEncoder = 0;
+
+            if( mRenderSystem->getActiveDevice() == this )
+                mRenderSystem->_notifyActiveEncoderEnded();
+        }
+    }
+    //-------------------------------------------------------------------------
+    void MetalDevice::endComputeEncoder(void)
+    {
+    }
+    //-------------------------------------------------------------------------
+    void MetalDevice::endAllEncoders(void)
+    {
+        endBlitEncoder();
+        endRenderEncoder();
+        endComputeEncoder();
+    }
+    //-------------------------------------------------------------------------
+    void MetalDevice::commitAndNextCommandBuffer(void)
+    {
+        endAllEncoders();
+        //Push the command buffer to the GPU
+        [mCurrentCommandBuffer commit];
         mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
     }
     //-------------------------------------------------------------------------
+    id<MTLBlitCommandEncoder> MetalDevice::getBlitEncoder(void)
+    {
+        endRenderEncoder();
+        endComputeEncoder();
+
+        mBlitEncoder = [mCurrentCommandBuffer blitCommandEncoder];
+
+        return mBlitEncoder;
+    }
 }

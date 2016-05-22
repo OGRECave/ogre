@@ -33,18 +33,20 @@ THE SOFTWARE.
 
 #include "Vao/OgreBufferPacked.h"
 
+#import <Metal/MTLBuffer.h>
+
 namespace Ogre
 {
-    /** GL3+ doesn't support mapping the same buffer twice even if the regions
-        don't overlap. For performance we keep many buffers as one big buffer,
-        but for compatibility reasons (with GL3/DX10 HW) we treat them as
-        separate buffers.
+    /** Metal doesn't "map". You can directly access the unsynchronized contents
+        For performance we keep many buffers as one big buffer, but for compatibility
+        reasons (with GL3/DX10 HW) we treat them as separate buffers.
     @par
-        This class takes care of mapping buffers once while allowing
-        BufferInterface to map subregions of it as if they were separate
-        buffers.
+        This class treats mapping in a GL-style. The most usefulness is that in OS X
+        we need to inform what regions were modified (flush). On iOS it serves
+        no real purpose and is just a pass through with some asserts for consistency
+        checking.
     @remarks
-        This is a very thin/lightweight wrapper around OpenGL glMapBufferRange, thus:
+        This is a very thin/lightweight wrapper around MTLBuffer, thus:
             Caller is responsible for flushing regions before unmapping.
             Caller is responsible for proper synchronization.
             No check is performed to see if two map calls overlap.
@@ -62,32 +64,27 @@ namespace Ogre
 
         typedef vector<MappedRange>::type MappedRangeVec;
 
-        GLuint  mVboName;
-        GLuint  mVboSize;
-        void    *mMappedPtr;
+        id<MTLBuffer>   mVboName;
+        size_t          mVboSize;
+        void            *mMappedPtr;
 
         MappedRangeVec mMappedRanges;
         vector<size_t>::type mFreeRanges;
 
-        BufferType mPersistentMethod;
-
         size_t addMappedRange( size_t start, size_t count );
 
     public:
-        MetalDynamicBuffer( GLuint vboName, GLuint vboSize, MetalVaoManager *vaoManager,
-                              BufferType persistentMethod );
+        MetalDynamicBuffer( id<MTLBuffer> vboName, size_t vboSize );
         ~MetalDynamicBuffer();
 
-        GLuint getVboName(void) const               { return mVboName; }
+        id<MTLBuffer> getVboName(void) const        { return mVboName; }
 
-        /// Assumes mVboName is already bound to GL_COPY_WRITE_BUFFER!!!
         DECL_MALLOC void* map( size_t start, size_t count, size_t &outTicket );
 
         /// Flushes the region of the given ticket. start is 0-based.
         void flush( size_t ticket, size_t start, size_t count );
 
         /// Unmaps given ticket (got from @see map).
-        /// Assumes mVboName is already bound to GL_COPY_WRITE_BUFFER!!!
         /// The ticket becomes invalid after this.
         void unmap( size_t ticket );
     };

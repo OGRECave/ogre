@@ -4,7 +4,7 @@ This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org
 
-Copyright (c) 2000-2014 Torus Knot Software Ltd
+Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,39 +30,193 @@ THE SOFTWARE.
 #include "Vao/OgreMetalVaoManager.h"
 #include "Vao/OgreMetalBufferInterface.h"
 
+#include "OgreMetalDevice.h"
+
 #include "OgreStringConverter.h"
+
+#import <Metal/MTLBlitCommandEncoder.h>
 
 namespace Ogre
 {
     MetalStagingBuffer::MetalStagingBuffer( size_t internalBufferStart, size_t sizeBytes,
-                                                VaoManager *vaoManager, bool uploadOnly ) :
+                                            VaoManager *vaoManager, bool uploadOnly,
+                                            id<MTLBuffer> vboName, MetalDevice *device ) :
         StagingBuffer( internalBufferStart, sizeBytes, vaoManager, uploadOnly ),
+        mVboName( vboName ),
         mMappedPtr( 0 ),
-        mNullDataPtr( 0 )
+        mDevice( device ),
+        mFenceThreshold( sizeBytes / 4 ),
+        mUnfencedBytes( 0 )
     {
-        mNullDataPtr = reinterpret_cast<uint8*>( OGRE_MALLOC_SIMD( sizeBytes, MEMCATEGORY_RENDERSYS ) );
     }
     //-----------------------------------------------------------------------------------
     MetalStagingBuffer::~MetalStagingBuffer()
     {
-        OGRE_FREE_SIMD( mNullDataPtr, MEMCATEGORY_RENDERSYS );
-        mNullDataPtr = 0;
+        if( !mFences.empty() )
+            wait( mFences.back().fenceName );
+
+        deleteFences( mFences.begin(), mFences.end() );
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::addFence( size_t from, size_t to, bool forceFence )
+    {
+        assert( to <= mSizeBytes );
+
+        MetalFence unfencedHazard( from, to );
+
+        mUnfencedHazards.push_back( unfencedHazard );
+
+        assert( from <= to );
+
+        mUnfencedBytes += to - from;
+
+        if( mUnfencedBytes >= mFenceThreshold || forceFence )
+        {
+            MetalFenceVec::const_iterator itor = mUnfencedHazards.begin();
+            MetalFenceVec::const_iterator end  = mUnfencedHazards.end();
+
+            size_t startRange = itor->start;
+            size_t endRange   = itor->end;
+
+            while( itor != end )
+            {
+                if( endRange <= itor->end )
+                {
+                    //Keep growing (merging) the fences into one fence
+                    endRange = itor->end;
+                }
+                else
+                {
+                    //We wrapped back to 0. Can't keep merging. Make a fence.
+                    MetalFence fence( startRange, endRange );
+                    fence.fenceName = dispatch_semaphore_create( 0 );
+
+                    __block dispatch_semaphore_t blockSemaphore = fence.fenceName;
+                    [mDevice->mCurrentCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+                    {
+                        dispatch_semaphore_signal( blockSemaphore );
+                    }];
+
+                    mDevice->commitAndNextCommandBuffer();
+                    mFences.push_back( fence );
+
+                    startRange  = itor->start;
+                    endRange    = itor->end;
+                }
+
+                ++itor;
+            }
+
+            //Make the last fence.
+            MetalFence fence( startRange, endRange );
+            fence.fenceName = dispatch_semaphore_create( 0 );
+            __block dispatch_semaphore_t blockSemaphore = fence.fenceName;
+            [mDevice->mCurrentCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+            {
+                dispatch_semaphore_signal( blockSemaphore );
+            }];
+
+            mDevice->commitAndNextCommandBuffer();
+            mFences.push_back( fence );
+
+            mUnfencedHazards.clear();
+            mUnfencedBytes = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::wait( dispatch_semaphore_t syncObj )
+    {
+        long result = dispatch_semaphore_wait( syncObj, DISPATCH_TIME_FOREVER );
+
+        if( result < 0 )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Failure while waiting for a MetalFence. Could be out of GPU memory. "
+                         "Update your video card drivers. If that doesn't help, "
+                         "contact the developers. Error code: " + StringConverter::toString( result ),
+                         "MetalStagingBuffer::wait" );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::deleteFences( MetalFenceVec::iterator itor, MetalFenceVec::iterator end )
+    {
+        while( itor != end )
+        {
+            //ARC will destroy it
+            itor->fenceName = 0;
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::waitIfNeeded(void)
+    {
+        assert( mUploadOnly );
+
+        size_t mappingStart = mMappingStart;
+        size_t sizeBytes    = mMappingCount;
+
+        if( mappingStart + sizeBytes > mSizeBytes )
+        {
+            if( !mUnfencedHazards.empty() )
+            {
+                //mUnfencedHazards will be cleared in addFence
+                addFence( mUnfencedHazards.front().start, mSizeBytes - 1, true );
+            }
+
+            //Wraps around the ring buffer. Sadly we can't do advanced virtual memory
+            //manipulation to keep the virtual space contiguous, so we'll have to reset to 0
+            mappingStart = 0;
+        }
+
+        MetalFence regionToMap( mappingStart, mappingStart + sizeBytes );
+
+        MetalFenceVec::iterator itor = mFences.begin();
+        MetalFenceVec::iterator end  = mFences.end();
+
+        MetalFenceVec::iterator lastWaitableFence = end;
+
+        while( itor != end )
+        {
+            if( regionToMap.overlaps( *itor ) )
+                lastWaitableFence = itor;
+
+            ++itor;
+        }
+
+        if( lastWaitableFence != end )
+        {
+            wait( lastWaitableFence->fenceName );
+            deleteFences( mFences.begin(), lastWaitableFence + 1 );
+            mFences.erase( mFences.begin(), lastWaitableFence + 1 );
+        }
+
+        mMappingStart = mappingStart;
     }
     //-----------------------------------------------------------------------------------
     void* MetalStagingBuffer::mapImpl( size_t sizeBytes )
     {
         assert( mUploadOnly );
 
-        mMappingStart = 0;
         mMappingCount = sizeBytes;
 
-        mMappedPtr = mNullDataPtr + mInternalBufferStart + mMappingStart;
+        waitIfNeeded(); //Will fill mMappingStart
+
+        mMappedPtr = reinterpret_cast<uint8*>( [mVboName contents] ) +
+                mInternalBufferStart + mMappingStart;
 
         return mMappedPtr;
     }
     //-----------------------------------------------------------------------------------
     void MetalStagingBuffer::unmapImpl( const Destination *destinations, size_t numDestinations )
     {
+        if( mUploadOnly )
+        {
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+            NSRange range = NSMakeRange( mInternalBufferStart + mMappingStart, mMappingCount );
+            [mVboName didModifyRange:range];
+#endif
+        }
+
         mMappedPtr = 0;
 
         for( size_t i=0; i<numDestinations; ++i )
@@ -74,21 +228,79 @@ namespace Ogre
 
             assert( dst.destination->getBufferType() == BT_DEFAULT );
 
-            size_t dstOffset = dst.dstOffset + dst.destination->_getInternalBufferStart() *
-                                                        dst.destination->getBytesPerElement();
+            const size_t dstOffset = dst.dstOffset + dst.destination->_getInternalBufferStart() *
+                                                            dst.destination->getBytesPerElement();
 
-            uint8 *dstPtr = bufferInterface->getNullDataPtr();
+            __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
+            [blitEncoder copyFromBuffer:mVboName
+                                        sourceOffset:mInternalBufferStart + mMappingStart + dst.srcOffset
+                                        toBuffer:bufferInterface->getVboName()
+                                        destinationOffset:dstOffset size:dst.length];
+        }
 
-            memcpy( dstPtr + dstOffset,
-                    mNullDataPtr + mInternalBufferStart + mMappingStart + dst.srcOffset,
-                    dst.length );
+        if( mUploadOnly )
+        {
+            //Add fence to this region (or at least, track the hazard).
+            addFence( mMappingStart, mMappingStart + mMappingCount - 1, false );
         }
     }
     //-----------------------------------------------------------------------------------
     StagingStallType MetalStagingBuffer::uploadWillStall( size_t sizeBytes ) const
     {
         assert( mUploadOnly );
-        return STALL_NONE;
+
+        size_t mappingStart = mMappingStart;
+
+        StagingStallType retVal = STALL_NONE;
+
+        if( mappingStart + sizeBytes > mSizeBytes )
+        {
+            if( !mUnfencedHazards.empty() )
+            {
+                MetalFence regionToMap( 0, sizeBytes );
+                MetalFence hazardousRegion( mUnfencedHazards.front().start, mSizeBytes - 1 );
+
+                if( hazardousRegion.overlaps( regionToMap ) )
+                {
+                    retVal = STALL_FULL;
+                    return retVal;
+                }
+            }
+
+            mappingStart = 0;
+        }
+
+        MetalFence regionToMap( mappingStart, mappingStart + sizeBytes );
+
+        MetalFenceVec::const_iterator itor = mFences.begin();
+        MetalFenceVec::const_iterator end  = mFences.end();
+
+        MetalFenceVec::const_iterator lastWaitableFence = end;
+
+        while( itor != end )
+        {
+            if( regionToMap.overlaps( *itor ) )
+                lastWaitableFence = itor;
+
+            ++itor;
+        }
+
+        if( lastWaitableFence != end )
+        {
+            //Ask Metal to return immediately and tells us about the fence
+            long waitRet = dispatch_semaphore_wait( lastWaitableFence->fenceName, DISPATCH_TIME_NOW );
+
+            if( waitRet < 0 )
+                retVal = STALL_PARTIAL;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::cleanUnfencedHazards(void)
+    {
+        if( !mUnfencedHazards.empty() )
+            addFence( mUnfencedHazards.front().start, mUnfencedHazards.back().end, true );
     }
     //-----------------------------------------------------------------------------------
     //
@@ -100,7 +312,7 @@ namespace Ogre
     {
         size_t freeRegionOffset = getFreeDownloadRegion( srcLength );
 
-        if( freeRegionOffset == -1u )
+        if( freeRegionOffset == -1 )
         {
             OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
                          "Cannot download the request amount of " +
@@ -116,11 +328,16 @@ namespace Ogre
         MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
                                                             source->getBufferInterface() );
 
-        uint8 *srcPtr = bufferInterface->getNullDataPtr();
-
-        memcpy( mNullDataPtr + mInternalBufferStart + freeRegionOffset,
-                srcPtr + source->_getFinalBufferStart() * source->getBytesPerElement() + srcOffset,
-                srcLength );
+        __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
+        [blitEncoder copyFromBuffer:bufferInterface->getVboName()
+                                    sourceOffset:source->_getFinalBufferStart() *
+                                        source->getBytesPerElement() + srcOffset
+                                    toBuffer:mVboName
+                                    destinationOffset:mInternalBufferStart + freeRegionOffset
+                                    size:srcLength];
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        [blitEncoder synchronizeResource:mVboName];
+#endif
 
         return freeRegionOffset;
     }
@@ -132,7 +349,8 @@ namespace Ogre
         mMappingStart = offset;
         mMappingCount = sizeBytes;
 
-        mMappedPtr = mNullDataPtr + mInternalBufferStart + mMappingStart;
+        mMappedPtr = reinterpret_cast<uint8*>( [mVboName contents] ) +
+                mInternalBufferStart + mMappingStart;
 
         //Put the mapped region back to our records as "available" for subsequent _asyncDownload
         _cancelDownload( offset, sizeBytes );

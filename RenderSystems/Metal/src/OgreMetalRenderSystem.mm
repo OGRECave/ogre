@@ -54,6 +54,7 @@ namespace Ogre
         mCurrentDepthBuffer( 0 ),
         mActiveDevice( 0 ),
         mActiveRenderEncoder( 0 ),
+        mDevice( this ),
         mMainGpuSyncSemaphore( 0 )
     {
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
@@ -154,7 +155,7 @@ namespace Ogre
 
             mHardwareBufferManager = new v1::DefaultHardwareBufferManager();
             mTextureManager = new MetalTextureManager();
-            mVaoManager = OGRE_NEW MetalVaoManager();
+            mVaoManager = OGRE_NEW MetalVaoManager( c_inFlightCommandBuffers, &mDevice );
 
             mInitialized = true;
         }
@@ -285,13 +286,6 @@ namespace Ogre
     void MetalRenderSystem::_endFrameOnce(void)
     {
         //TODO: We shouldn't tidy up JUST the active device. But all of them.
-        if( mActiveRenderEncoder )
-        {
-            [mActiveRenderEncoder endEncoding];
-            mActiveDevice->mRenderEncoder = 0;
-            mActiveRenderEncoder = 0;
-        }
-
         __block dispatch_semaphore_t blockSemaphore = mMainGpuSyncSemaphore;
         [mActiveDevice->mCurrentCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
         {
@@ -301,9 +295,7 @@ namespace Ogre
             dispatch_semaphore_signal( blockSemaphore );
         }];
 
-        // Finalize rendering here. this will push the command buffer to the GPU
-        [mActiveDevice->mCurrentCommandBuffer commit];
-        mActiveDevice->nextCommandBuffer();
+        mActiveDevice->commitAndNextCommandBuffer();
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrame(void)
@@ -331,11 +323,8 @@ namespace Ogre
     {
         assert( mActiveDevice );
 
-        if( mActiveRenderEncoder )
-        {
-            [mActiveRenderEncoder endEncoding];
-            mActiveRenderEncoder = 0;
-        }
+        mActiveDevice->endAllEncoders();
+        mActiveRenderEncoder = 0;
 
         //TODO: With a couple modifications, Compositor should be able to tell us
         //if we can use MTLStoreActionDontCare.
@@ -370,6 +359,11 @@ namespace Ogre
         mActiveDevice->mRenderEncoder =
                 [mActiveDevice->mCurrentCommandBuffer renderCommandEncoderWithDescriptor:passDesc];
         mActiveRenderEncoder = mActiveDevice->mRenderEncoder;
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_notifyActiveEncoderEnded(void)
+    {
+        mActiveRenderEncoder = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
@@ -760,11 +754,14 @@ namespace Ogre
         {
             colourWrite &= !target->getForceDisableColourWrites();
 
+            //We need to set mCurrentColourRTs[0] to grab the active device,
+            //even if we won't be drawing to colour target.
+            target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
+
             if( colourWrite )
             {
                 //TODO: Deal with MRT.
                 mNumMRTs = 1;
-                target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
                 MTLRenderPassColorAttachmentDescriptor *desc =
                         mCurrentColourRTs[0]->mColourAttachmentDesc;
 
@@ -796,6 +793,8 @@ namespace Ogre
                 if( depthBuffer->mStencilAttachmentDesc )
                     depthBuffer->mStencilAttachmentDesc.storeAction = MTLStoreActionStore;
             }
+
+            setActiveDevice( mCurrentColourRTs[0]->getOwnerDevice() );
         }
         else
         {

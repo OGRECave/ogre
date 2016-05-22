@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreMetalPrerequisites.h"
 #include "Vao/OgreVaoManager.h"
 
+#import <Metal/MTLBuffer.h>
+
 namespace Ogre
 {
     class _OgreMetalExport MetalVaoManager : public VaoManager
@@ -83,7 +85,9 @@ namespace Ogre
     protected:
         struct Vbo
         {
-            size_t sizeBytes;
+            id<MTLBuffer>       vboName;
+            size_t              sizeBytes;
+            MetalDynamicBuffer  *dynamicBuffer; //Null for CPU_INACCESSIBLE BOs.
 
             BlockVec            freeBlocks;
             StrideChangerVec    strideChangers;
@@ -93,7 +97,7 @@ namespace Ogre
         {
             struct VertexBinding
             {
-                //GLuint              vertexBufferVbo;
+                id<MTLBuffer>       vertexBufferVbo;
                 VertexElement2Vec   vertexElements;
                 uint32              stride;
                 size_t              offset;
@@ -104,7 +108,7 @@ namespace Ogre
 
                 bool operator == ( const VertexBinding &_r ) const
                 {
-                    return //vertexBufferVbo == _r.vertexBufferVbo &&
+                    return  vertexBufferVbo == _r.vertexBufferVbo &&
                             vertexElements == _r.vertexElements &&
                             stride == _r.stride &&
                             offset == _r.offset &&
@@ -115,7 +119,7 @@ namespace Ogre
             typedef vector<VertexBinding>::type VertexBindingVec;
 
             VertexBindingVec    vertexBuffers;
-            uint32              indexBufferVbo;
+            id<MTLBuffer>       indexBufferVbo;
             IndexBufferPacked::IndexType indexType;
             uint32              refCount;
         };
@@ -125,10 +129,61 @@ namespace Ogre
         typedef map<VertexElement2Vec, Vbo>::type VboMap;
 
         VboVec  mVbos[MAX_VBO_FLAG];
+        size_t  mDefaultPoolSize[MAX_VBO_FLAG];
 
         VaoVec  mVaos;
 
+        MetalDevice *mDevice;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        ConstBufferPacked   *mDrawId;
+#else
         VertexBufferPacked  *mDrawId;
+#endif
+
+        typedef deque<dispatch_semaphore_t>::type SemaforeDeque;
+        SemaforeDeque   mSemaphores;
+
+        /** Asks for allocating buffer space in a VBO (Vertex Buffer Object).
+            If the VBO doesn't exist, all VBOs are full or can't fit this request,
+            then a new VBO will be created.
+        @remarks
+            Can throw if out of video memory
+        @param sizeBytes
+            The requested size, in bytes.
+        @param bytesPerElement
+            The number of bytes per vertex or per index (i.e. 16-bit indices = 2).
+            Cannot be 0.
+        @param bufferType
+            The type of buffer
+        @param outVboIdx [out]
+            The index to the mVbos.
+        @param outBufferOffset [out]
+            The offset in bytes at which the buffer data should be placed.
+        */
+        void allocateVbo( size_t sizeBytes, size_t alignment, BufferType bufferType,
+                          size_t &outVboIdx, size_t &outBufferOffset );
+
+        /** Deallocates a buffer allocated with @allocateVbo.
+        @remarks
+            All four parameters *must* match with the ones provided to or
+            returned from allocateVbo, otherwise the behavior is undefined.
+        @param vboIdx
+            The index to the mVbos pool that was returned by allocateVbo
+        @param bufferOffset
+            The buffer offset that was returned by allocateVbo
+        @param sizeBytes
+            The sizeBytes parameter that was passed to allocateVbos.
+        @param bufferType
+            The type of buffer that was passed to allocateVbo.
+        */
+        void deallocateVbo( size_t vboIdx, size_t bufferOffset, size_t sizeBytes,
+                            BufferType bufferType );
+
+    public:
+        /// @see StagingBuffer::mergeContiguousBlocks
+        static void mergeContiguousBlocks( BlockVec::iterator blockToMerge,
+                                           BlockVec &blocks );
 
     protected:
         virtual VertexBufferPacked* createVertexBufferImpl( size_t numElements,
@@ -179,10 +234,8 @@ namespace Ogre
         static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 
     public:
-        MetalVaoManager();
+        MetalVaoManager( uint8 dynamicBufferMultiplier, MetalDevice *device );
         virtual ~MetalVaoManager();
-
-        bool supportsArbBufferStorage(void) const       { return false; }
 
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks

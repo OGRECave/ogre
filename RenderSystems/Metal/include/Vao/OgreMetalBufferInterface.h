@@ -33,28 +33,33 @@ THE SOFTWARE.
 
 #include "Vao/OgreBufferInterface.h"
 
+#import <Metal/MTLBuffer.h>
+
 namespace Ogre
 {
-    /** For GL3+, most (if not all) buffers, can be treated with the same code.
+    /** For Metal, all buffers can be treated with the same code.
         Hence most equivalent functionality is encapsulated here.
     */
     class _OgreMetalExport MetalBufferInterface : public BufferInterface
     {
     protected:
-        size_t  mVboPoolIdx;
-        void    *mMappedPtr;
+        size_t          mVboPoolIdx;
+        id<MTLBuffer>   mVboName;
+        void            *mMappedPtr;
 
-        uint8   *mNullDataPtr;
+        size_t              mUnmapTicket;
+        MetalDynamicBuffer  *mDynamicBuffer;
 
         size_t advanceFrame( bool bAdvanceFrame );
 
     public:
-        MetalBufferInterface( size_t vboPoolIdx );
-        ~MetalBufferInterface();
+        MetalBufferInterface( size_t vboPoolIdx, id<MTLBuffer> vboName,
+                              MetalDynamicBuffer *dynamicBuffer );
+        virtual ~MetalBufferInterface();
 
-        size_t getVboPoolIndex(void)                { return mVboPoolIdx; }
-
-        uint8* getNullDataPtr(void)                 { return mNullDataPtr; }
+        size_t getVboPoolIndex(void)                                { return mVboPoolIdx; }
+        /// Use __unsafe_unretained when possible to avoid unnecessary ARC overhead.
+        id<MTLBuffer> getVboName(void) const                        { return mVboName; }
 
         /// Only use this function for the first upload
         void _firstUpload( const void *data, size_t elementStart, size_t elementCount );
@@ -65,8 +70,6 @@ namespace Ogre
                             size_t flushStartElem = 0, size_t flushSizeElem = 0 );
         virtual void advanceFrame(void);
         virtual void regressFrame(void);
-
-        virtual void _notifyBuffer( BufferPacked *buffer );
     };
 }
 

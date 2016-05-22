@@ -39,6 +39,7 @@ namespace Ogre
     class _OgreMetalExport MetalMultiSourceVertexBufferPool : public MultiSourceVertexBufferPool
     {
         size_t mVboPoolIndex;
+        id<MTLBuffer> mVboName;
 
         MetalVaoManager::BlockVec mFreeBlocks;
 
@@ -60,11 +61,11 @@ namespace Ogre
         virtual void destroyVertexBuffersImpl( VertexBufferPackedVec &inOutVertexBuffers );
 
     public:
-        MetalMultiSourceVertexBufferPool( size_t vboPoolIndex,
-                                            const VertexElement2VecVec &vertexElementsBySource,
-                                            size_t maxVertices, BufferType bufferType,
-                                            size_t internalBufferStart,
-                                            VaoManager *vaoManager );
+        MetalMultiSourceVertexBufferPool( size_t vboPoolIndex, id<MTLBuffer> vboName,
+                                          const VertexElement2VecVec &vertexElementsBySource,
+                                          size_t maxVertices, BufferType bufferType,
+                                          size_t internalBufferStart,
+                                          VaoManager *vaoManager );
         virtual ~MetalMultiSourceVertexBufferPool();
 
         void createVertexBuffers( VertexBufferPackedVec &outVertexBuffers, size_t numVertices,

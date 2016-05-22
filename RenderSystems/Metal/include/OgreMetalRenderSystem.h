@@ -255,7 +255,10 @@ namespace Ogre
         virtual void setClipPlanesImpl(const PlaneList& clipPlanes);
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
+        MetalDevice* getActiveDevice(void)                      { return mActiveDevice; }
+
         void _clearRenderTargetImmediately( RenderTarget *renderTarget );
+        void _notifyActiveEncoderEnded(void);
     };
 }
 

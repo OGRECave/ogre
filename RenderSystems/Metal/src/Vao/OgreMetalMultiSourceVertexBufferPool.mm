@@ -33,14 +33,15 @@ THE SOFTWARE.
 namespace Ogre
 {
     MetalMultiSourceVertexBufferPool::MetalMultiSourceVertexBufferPool(
-                                                size_t vboPoolIndex,
+                                                size_t vboPoolIndex, id<MTLBuffer> vboName,
                                                 const VertexElement2VecVec &vertexElementsBySource,
                                                 size_t maxVertices, BufferType bufferType,
                                                 size_t internalBufferStart,
                                                 VaoManager *vaoManager ) :
         MultiSourceVertexBufferPool( vertexElementsBySource, maxVertices, bufferType,
                                      internalBufferStart, vaoManager ),
-        mVboPoolIndex( vboPoolIndex )
+        mVboPoolIndex( vboPoolIndex ),
+        mVboName( vboName )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -103,7 +104,7 @@ namespace Ogre
         {
             for( size_t i=0; i<mVertexElementsBySource.size(); ++i )
             {
-                MetalBufferInterface *bufferInterface = new MetalBufferInterface( 0 );
+                MetalBufferInterface *bufferInterface = new MetalBufferInterface( 0, mVboName, 0 /*TODO*/ );
                 void *_initialData = 0;
                 if( initialData )
                     _initialData = initialData[i];

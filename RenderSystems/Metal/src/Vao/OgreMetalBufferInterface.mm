@@ -29,23 +29,22 @@ THE SOFTWARE.
 #include "Vao/OgreMetalBufferInterface.h"
 #include "Vao/OgreMetalVaoManager.h"
 #include "Vao/OgreMetalStagingBuffer.h"
+#include "Vao/OgreMetalDynamicBuffer.h"
 
 namespace Ogre
 {
-    MetalBufferInterface::MetalBufferInterface( size_t vboPoolIdx ) :
+    MetalBufferInterface::MetalBufferInterface( size_t vboPoolIdx, id<MTLBuffer> vboName,
+                                                MetalDynamicBuffer *dynamicBuffer ) :
         mVboPoolIdx( vboPoolIdx ),
+        mVboName( vboName ),
         mMappedPtr( 0 ),
-        mNullDataPtr( 0 )
+        mUnmapTicket( (size_t)~0 ),
+        mDynamicBuffer( dynamicBuffer )
     {
     }
     //-----------------------------------------------------------------------------------
     MetalBufferInterface::~MetalBufferInterface()
     {
-        if( mNullDataPtr )
-        {
-            OGRE_FREE_SIMD( mNullDataPtr, MEMCATEGORY_RENDERSYS );
-            mNullDataPtr = 0;
-        }
     }
     //-----------------------------------------------------------------------------------
     void MetalBufferInterface::_firstUpload( const void *data, size_t elementStart, size_t elementCount )
@@ -68,18 +67,17 @@ namespace Ogre
         size_t bytesPerElement = mBuffer->mBytesPerElement;
 
         MetalVaoManager *vaoManager = static_cast<MetalVaoManager*>( mBuffer->mVaoManager );
-        bool canPersistentMap = vaoManager->supportsArbBufferStorage();
 
         size_t dynamicCurrentFrame = advanceFrame( bAdvanceFrame );
 
-        if( prevMappingState == MS_UNMAPPED || !canPersistentMap )
+        if( prevMappingState == MS_UNMAPPED )
         {
             //Non-persistent buffers just map the small region they'll need.
             size_t offset = mBuffer->mInternalBufferStart + elementStart +
                             mBuffer->mNumElements * dynamicCurrentFrame;
             size_t length = elementCount;
 
-            if( mBuffer->mBufferType >= BT_DYNAMIC_PERSISTENT && canPersistentMap )
+            if( mBuffer->mBufferType >= BT_DYNAMIC_PERSISTENT )
             {
                 //Persistent buffers map the *whole* assigned buffer,
                 //we later care for the offsets and lengths
@@ -87,7 +85,9 @@ namespace Ogre
                 length = mBuffer->mNumElements * vaoManager->getDynamicBufferMultiplier();
             }
 
-            mMappedPtr = mNullDataPtr + offset * bytesPerElement;
+            mMappedPtr = mDynamicBuffer->map( offset * bytesPerElement,
+                                              length * bytesPerElement,
+                                              mUnmapTicket );
         }
 
         //For regular maps, mLastMappingStart is 0. So that we can later flush correctly.
@@ -96,7 +96,7 @@ namespace Ogre
 
         char *retVal = (char*)mMappedPtr;
 
-        if( mBuffer->mBufferType >= BT_DYNAMIC_PERSISTENT && canPersistentMap )
+        if( mBuffer->mBufferType >= BT_DYNAMIC_PERSISTENT )
         {
             //For persistent maps, we've mapped the whole 3x size of the buffer. mLastMappingStart
             //points to the right offset so that we can later flush correctly.
@@ -116,18 +116,20 @@ namespace Ogre
         assert( flushStartElem + flushSizeElem <= mBuffer->mLastMappingCount &&
                 "Flush region out of bounds!" );
 
-        bool canPersistentMap = static_cast<MetalVaoManager*>( mBuffer->mVaoManager )->
-                                                                supportsArbBufferStorage();
-
         if( mBuffer->mBufferType <= BT_DYNAMIC_PERSISTENT ||
-            unmapOption == UO_UNMAP_ALL || !canPersistentMap )
+            unmapOption == UO_UNMAP_ALL )
         {
             if( !flushSizeElem )
                 flushSizeElem = mBuffer->mLastMappingCount - flushStartElem;
 
-            if( unmapOption == UO_UNMAP_ALL || !canPersistentMap ||
+            mDynamicBuffer->flush( mUnmapTicket,
+                                   mBuffer->mLastMappingStart + flushStartElem,
+                                   flushSizeElem * mBuffer->mBytesPerElement );
+
+            if( unmapOption == UO_UNMAP_ALL ||
                 mBuffer->mBufferType == BT_DYNAMIC_DEFAULT )
             {
+                mDynamicBuffer->unmap( mUnmapTicket );
                 mMappedPtr = 0;
             }
         }
@@ -166,13 +168,5 @@ namespace Ogre
 
         mBuffer->mFinalBufferStart = mBuffer->mInternalBufferStart +
                                         dynamicCurrentFrame * mBuffer->mNumElements;
-    }
-    //-----------------------------------------------------------------------------------
-    void MetalBufferInterface::_notifyBuffer( BufferPacked *buffer )
-    {
-        BufferInterface::_notifyBuffer( buffer );
-
-        mNullDataPtr = reinterpret_cast<uint8*>( OGRE_MALLOC_SIMD( mBuffer->getTotalSizeBytes(),
-                                                                    MEMCATEGORY_RENDERSYS ) );
     }
 }

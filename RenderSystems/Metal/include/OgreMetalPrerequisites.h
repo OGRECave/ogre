@@ -37,6 +37,7 @@ namespace Ogre
     // Forward declarations
     class MetalDepthBuffer;
     struct MetalDevice;
+    class MetalDynamicBuffer;
     struct MetalHlmsPso;
     class MetalStagingBuffer;
     class MetalRenderSystem;

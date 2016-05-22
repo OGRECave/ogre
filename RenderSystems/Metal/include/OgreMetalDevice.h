@@ -41,15 +41,34 @@ namespace Ogre
         id<MTLDevice>           mDevice;
         id<MTLCommandQueue>     mMainCommandQueue;
         id<MTLCommandBuffer>    mCurrentCommandBuffer;
+        id<MTLBlitCommandEncoder>   mBlitEncoder;
         id<MTLRenderCommandEncoder> mRenderEncoder;
 
-        MetalDevice();
+        MetalRenderSystem       *mRenderSystem;
+
+        MetalDevice( MetalRenderSystem *renderSystem );
         ~MetalDevice();
 
         void init(void);
 
-        //Grabs a new mMainCommandBuffer (i.e. you've called commit)
-        void nextCommandBuffer(void);
+        void endBlitEncoder(void);
+        void endRenderEncoder(void);
+        void endComputeEncoder(void);
+
+        void endAllEncoders(void);
+
+        //Ends all encoders, calls commit and grabs a new mMainCommandBuffer
+        void commitAndNextCommandBuffer(void);
+
+        /** Gets current blit encoder. If none is current, ends all other
+            encoders and creates a new blit encoder.
+        @remarks
+            Use __unsafe_unretained to avoid unnecessary ARC overhead; unless
+            you really need to hold on to the returned variable.
+            i.e.
+            __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
+        */
+        id<MTLBlitCommandEncoder> getBlitEncoder(void);
     };
 }
 
