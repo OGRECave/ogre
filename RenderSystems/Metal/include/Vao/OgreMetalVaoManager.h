@@ -141,9 +141,6 @@ namespace Ogre
         VertexBufferPacked  *mDrawId;
 #endif
 
-        typedef deque<dispatch_semaphore_t>::type SemaforeDeque;
-        SemaforeDeque   mSemaphores;
-
         /** Asks for allocating buffer space in a VBO (Vertex Buffer Object).
             If the VBO doesn't exist, all VBOs are full or can't fit this request,
             then a new VBO will be created.
@@ -249,10 +246,20 @@ namespace Ogre
 
         virtual void _update(void);
 
-        /// Returns the current frame # (which wraps to 0 every mDynamicBufferMultiplier
-        /// times). But first stalls until that mDynamicBufferMultiplier-1 frame behind
-        /// is finished.
+        /// @see VaoManager::waitForTailFrameToFinish
         uint8 waitForTailFrameToFinish(void);
+
+        /** Will stall undefinitely until GPU finishes (signals the sync object).
+        @param fenceName
+            Sync object to wait for. Will be deleted on success. On failure,
+            throws an exception and fenceName will not be deleted.
+        @param device
+            Device this fence is linked to.
+        @returns
+            Null ptr on success. Should throw on failure, but if this function for some
+            strange reason doesn't throw, it is programmed to return 'fenceName'
+        */
+        static dispatch_semaphore_t waitFor( dispatch_semaphore_t fenceName, MetalDevice *device );
     };
 }
 

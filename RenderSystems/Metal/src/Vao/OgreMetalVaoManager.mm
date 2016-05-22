@@ -674,7 +674,7 @@ namespace Ogre
                                                          size_t elementStart, size_t elementCount )
     {
         return AsyncTicketPtr( OGRE_NEW MetalAsyncTicket( creator, stagingBuffer,
-                                                            elementStart, elementCount ) );
+                                                          elementStart, elementCount, mDevice ) );
     }
     //-----------------------------------------------------------------------------------
     void MetalVaoManager::_update(void)
@@ -736,7 +736,39 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     uint8 MetalVaoManager::waitForTailFrameToFinish(void)
     {
+        //Don't wait because MetalRenderSystem::_beginFrameOnce does a global waiting for us.
         return mDynamicBufferCurrentFrame;
+    }
+    //-----------------------------------------------------------------------------------
+    dispatch_semaphore_t MetalVaoManager::waitFor( dispatch_semaphore_t fenceName, MetalDevice *device )
+    {
+        dispatch_time_t timeout = DISPATCH_TIME_NOW;
+        while( true )
+        {
+            long result = dispatch_semaphore_wait( fenceName, DISPATCH_TIME_FOREVER );
+
+            if( result == 0 )
+                return 0; //Success waiting.
+
+            if( timeout == DISPATCH_TIME_NOW )
+            {
+                // After the first time, need to start flushing, and wait for a looong time.
+                timeout = DISPATCH_TIME_FOREVER;
+                device->commitAndNextCommandBuffer();
+            }
+            else if( result < 0 )
+            {
+                OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                             "Failure while waiting for a MetalFence. Could be out of GPU memory. "
+                             "Update your video card drivers. If that doesn't help, "
+                             "contact the developers. Error code: " + StringConverter::toString( result ),
+                             "MetalStagingBuffer::wait" );
+
+                return fenceName;
+            }
+        }
+
+        return 0;
     }
     //-----------------------------------------------------------------------------------
     MetalVaoManager::VboFlag MetalVaoManager::bufferTypeToVboFlag( BufferType bufferType )

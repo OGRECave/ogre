@@ -96,8 +96,6 @@ namespace Ogre
                     {
                         dispatch_semaphore_signal( blockSemaphore );
                     }];
-
-                    mDevice->commitAndNextCommandBuffer();
                     mFences.push_back( fence );
 
                     startRange  = itor->start;
@@ -116,6 +114,7 @@ namespace Ogre
                 dispatch_semaphore_signal( blockSemaphore );
             }];
 
+            //Flush the device for accuracy in the fences.
             mDevice->commitAndNextCommandBuffer();
             mFences.push_back( fence );
 

@@ -33,28 +33,63 @@ THE SOFTWARE.
 
 #include "Vao/OgreStagingBuffer.h"
 
+#include "OgreMetalDevice.h"
+
 namespace Ogre
 {
     MetalAsyncTicket::MetalAsyncTicket( BufferPacked *creator,
-                                            StagingBuffer *stagingBuffer,
-                                            size_t elementStart,
-                                            size_t elementCount ) :
-        AsyncTicket( creator, stagingBuffer, elementStart, elementCount )
+                                        StagingBuffer *stagingBuffer,
+                                        size_t elementStart,
+                                        size_t elementCount,
+                                        MetalDevice *device ) :
+        AsyncTicket( creator, stagingBuffer, elementStart, elementCount ),
+        mFenceName( 0 ),
+        mDevice( device )
     {
+        mFenceName = dispatch_semaphore_create( 0 );
+
+        __block dispatch_semaphore_t blockSemaphore = mFenceName;
+        [mDevice->mCurrentCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+        {
+            dispatch_semaphore_signal( blockSemaphore );
+        }];
+        //Flush now for accuracy with downloads.
+        mDevice->commitAndNextCommandBuffer();
     }
     //-----------------------------------------------------------------------------------
     MetalAsyncTicket::~MetalAsyncTicket()
     {
+        mFenceName = 0;
     }
     //-----------------------------------------------------------------------------------
     const void* MetalAsyncTicket::mapImpl(void)
     {
+        if( mFenceName )
+            mFenceName = MetalVaoManager::waitFor( mFenceName, mDevice );
+
         return mStagingBuffer->_mapForRead( mStagingBufferMapOffset,
                                             mElementCount * mCreator->getBytesPerElement() );
     }
     //-----------------------------------------------------------------------------------
     bool MetalAsyncTicket::queryIsTransferDone(void)
     {
-        return true;
+        bool retVal = false;
+
+        if( mFenceName )
+        {
+            //Ask to return immediately and tell us about the fence
+            const long result = dispatch_semaphore_wait( mFenceName, DISPATCH_TIME_NOW );
+            if( result == 0 )
+            {
+                mFenceName = 0;
+                retVal = true;
+            }
+        }
+        else
+        {
+            retVal = true;
+        }
+
+        return retVal;
     }
 }
