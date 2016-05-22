@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2016 Torus Knot Software Ltd
 
@@ -26,22 +26,31 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "Vao/OgreMetalTexBufferPacked.h"
-#include "Vao/OgreMetalBufferInterface.h"
+
+#ifndef __OgreMetalProgramFactory_H__
+#define __OgreMetalProgramFactory_H__
+
+#import "OgreMetalPrerequisites.h"
+#import "OgreHighLevelGpuProgramManager.h"
 
 namespace Ogre
 {
-    MetalTexBufferPacked::MetalTexBufferPacked(
-                size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                BufferType bufferType, void *initialData, bool keepAsShadow,
-                VaoManager *vaoManager, MetalBufferInterface *bufferInterface, PixelFormat pf ) :
-        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
-                         initialData, keepAsShadow, vaoManager, bufferInterface, pf )
+    /** Factory class for Metal programs. */
+    class _OgreMetalExport MetalProgramFactory : public HighLevelGpuProgramFactory
     {
-    }
-    //-----------------------------------------------------------------------------------
-    MetalTexBufferPacked::~MetalTexBufferPacked()
-    {
-    }
-    //-----------------------------------------------------------------------------------
+    protected:
+        static String sLanguageName;
+    public:
+        MetalProgramFactory(void);
+        ~MetalProgramFactory(void);
+        /// Get the name of the language this factory creates programs for
+        const String& getLanguage(void) const;
+        /// Create an instance of MetalProgram
+        HighLevelGpuProgram* create(ResourceManager* creator, 
+            const String& name, ResourceHandle handle,
+            const String& group, bool isManual, ManualResourceLoader* loader);
+        void destroy(HighLevelGpuProgram* prog);
+    };
 }
+
+#endif // __MetalProgramFactory_H__
