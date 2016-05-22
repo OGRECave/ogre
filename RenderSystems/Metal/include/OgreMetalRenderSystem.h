@@ -91,6 +91,8 @@ namespace Ogre
 
         MetalPixelFormatToShaderType mPixelFormatToShaderType;
 
+        __unsafe_unretained id<MTLBuffer>   mIndirectBuffer;
+        unsigned char                       *mSwIndirectBufferPtr;
         CachedDepthStencilStateVec mDepthStencilStates;
         MetalHlmsPso const *mPso;
 

@@ -28,7 +28,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreMetalVaoManager.h"
 #include "Vao/OgreMetalStagingBuffer.h"
-#include "Vao/OgreMetalVertexArrayObject.h"
+#include "Vao/OgreVertexArrayObject.h"
 #include "Vao/OgreMetalBufferInterface.h"
 #include "Vao/OgreMetalConstBufferPacked.h"
 #include "Vao/OgreMetalTexBufferPacked.h"
@@ -119,6 +119,10 @@ namespace Ogre
                                        size_t &outVboIdx, size_t &outBufferOffset )
     {
         assert( alignment > 0 );
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        alignment = 16; //On iOS this alignment makes it good to go for everything.
+#endif
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
@@ -617,6 +621,7 @@ namespace Ogre
                                                             IndexBufferPacked *indexBuffer,
                                                             OperationType opType )
     {
+        //TODO: Share same idx for the same input layouts + same buffers.
         size_t idx = mVertexArrayObjects.size();
 
         const int bitsOpType = 3;
@@ -633,19 +638,19 @@ namespace Ogre
                 ( (idx & maskVaoGl) << shiftVaoGl ) |
                 (idx & maskVao);
 
-        MetalVertexArrayObject *retVal = OGRE_NEW MetalVertexArrayObject( idx,
-                                                                        renderQueueId,
-                                                                        vertexBuffers,
-                                                                        indexBuffer,
-                                                                        opType );
+        VertexArrayObject *retVal = OGRE_NEW VertexArrayObject( idx,
+                                                                renderQueueId,
+                                                                idx,
+                                                                vertexBuffers,
+                                                                indexBuffer,
+                                                                opType );
 
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void MetalVaoManager::destroyVertexArrayObjectImpl( VertexArrayObject *vao )
     {
-        MetalVertexArrayObject *glVao = static_cast<MetalVertexArrayObject*>( vao );
-        OGRE_DELETE glVao;
+        OGRE_DELETE vao;
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* MetalVaoManager::createStagingBuffer( size_t sizeBytes, bool forUpload )

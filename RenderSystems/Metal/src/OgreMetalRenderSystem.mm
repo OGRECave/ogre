@@ -30,12 +30,17 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalRenderWindow.h"
 #include "OgreMetalTextureManager.h"
 #include "Vao/OgreMetalVaoManager.h"
+#include "Vao/OgreMetalBufferInterface.h"
 #include "OgreMetalHlmsPso.h"
 #include "OgreMetalRenderTargetCommon.h"
 #include "OgreMetalDepthBuffer.h"
 #include "OgreMetalDevice.h"
 
 #include "OgreDefaultHardwareBufferManager.h"
+
+#include "Vao/OgreIndirectBufferPacked.h"
+#include "Vao/OgreVertexArrayObject.h"
+#include "CommandBuffer/OgreCbDrawCall.h"
 
 #include "OgreMetalMappings.h"
 
@@ -49,6 +54,8 @@ namespace Ogre
         RenderSystem(),
         mInitialized( false ),
         mHardwareBufferManager( 0 ),
+        mIndirectBuffer( 0 ),
+        mSwIndirectBufferPtr( 0 ),
         mPso( 0 ),
         mNumMRTs( 0 ),
         mCurrentDepthBuffer( 0 ),
@@ -268,6 +275,26 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setIndirectBuffer( IndirectBufferPacked *indirectBuffer )
     {
+        if( mVaoManager->supportsIndirectBuffers() )
+        {
+            if( indirectBuffer )
+            {
+                MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
+                                                            indirectBuffer->getBufferInterface() );
+                mIndirectBuffer = bufferInterface->getVboName();
+            }
+            else
+            {
+                mIndirectBuffer = 0;
+            }
+        }
+        else
+        {
+            if( indirectBuffer )
+                mSwIndirectBufferPtr = indirectBuffer->getSwBufferPtr();
+            else
+                mSwIndirectBufferPtr = 0;
+        }
     }
     //-------------------------------------------------------------------------
     DepthBuffer* MetalRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget,
@@ -638,6 +665,30 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setVertexArrayObject( const VertexArrayObject *vao )
     {
+        __unsafe_unretained id<MTLBuffer> metalVertexBuffers[16];
+        NSUInteger offsets[16];
+        memset( offsets, 0, sizeof(offsets) );
+
+        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
+
+        size_t numVertexBuffers = 0;
+        VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+        while( itor != end )
+        {
+            MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
+                        (*itor)->getBufferInterface() );
+            metalVertexBuffers[numVertexBuffers++] = bufferInterface->getVboName();
+            ++itor;
+        }
+
+#if OGRE_DEBUG_MODE
+        assert( numVertexBuffers < 16u );
+#endif
+
+        [mActiveRenderEncoder setVertexBuffers:metalVertexBuffers offsets:offsets
+                                               withRange:NSMakeRange( 0, numVertexBuffers )];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_render( const CbDrawCallIndexed *cmd )
@@ -650,6 +701,63 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_renderEmulated( const CbDrawCallIndexed *cmd )
     {
+        const VertexArrayObject *vao = cmd->vao;
+        CbDrawIndexed *drawCmd = reinterpret_cast<CbDrawIndexed*>(
+                                    mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
+
+        const MTLIndexType indexType = static_cast<MTLIndexType>( vao->mIndexBuffer->getIndexType() );
+        const MTLPrimitiveType primType =  std::min(
+                    MTLPrimitiveTypeTriangleStrip,
+                    static_cast<MTLPrimitiveType>( vao->getOperationType() - 1u ) );
+
+        //Calculate bytesPerVertexBuffer & numVertexBuffers which is the same for all draws in this cmd
+        uint32 bytesPerVertexBuffer[16];
+        size_t numVertexBuffers = 0;
+        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
+        VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+        while( itor != end )
+        {
+            bytesPerVertexBuffer[numVertexBuffers] = (*itor)->getBytesPerElement();
+            ++numVertexBuffers;
+            ++itor;
+        }
+
+        //Get index buffer stuff which is the same for all draws in this cmd
+        const size_t bytesPerIndexElement = vao->mIndexBuffer->getBytesPerElement();
+
+        MetalBufferInterface *indexBufferInterface = static_cast<MetalBufferInterface*>(
+                    vao->mIndexBuffer->getBufferInterface() );
+        __unsafe_unretained id<MTLBuffer> indexBuffer = indexBufferInterface->getVboName();
+
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            for( size_t j=0; j<numVertexBuffers; ++j )
+            {
+                //Manually set vertex buffer offsets since in iOS baseVertex is not supported
+                //until iOS GPU Family 3 v1 & OS X (we just use indirect rendering there).
+                [mActiveRenderEncoder setVertexBufferOffset:drawCmd->baseVertex * bytesPerVertexBuffer[j]
+                                                            atIndex:j];
+            }
+
+            //TODO: Setup baseInstance.
+
+#if OGRE_DEBUG_MODE
+            assert( (drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x04 == 0
+                    && "Index Buffer must be aligned to 4 bytes. If you're messing with "
+                    "VertexArrayObject::setPrimitiveRange, you've entered an invalid "
+                    "primStart; not supported by the Metal API." );
+#endif
+
+            [mActiveRenderEncoder drawIndexedPrimitives:primType
+                       indexCount:drawCmd->primCount
+                        indexType:indexType
+                      indexBuffer:indexBuffer
+                indexBufferOffset:drawCmd->firstVertexIndex * bytesPerIndexElement
+                instanceCount:drawCmd->instanceCount];
+            ++drawCmd;
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_renderEmulated( const CbDrawCallStrip *cmd )
