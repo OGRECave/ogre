@@ -95,12 +95,12 @@ namespace Ogre
 
         struct Vao
         {
+            uint32 vaoName;
+
             struct VertexBinding
             {
-                id<MTLBuffer>       vertexBufferVbo;
+                __unsafe_unretained id<MTLBuffer> vertexBufferVbo;
                 VertexElement2Vec   vertexElements;
-                uint32              stride;
-                size_t              offset;
 
                 //OpenGL supports this parameter per attribute, but
                 //we're a bit more conservative and do it per buffer
@@ -110,18 +110,19 @@ namespace Ogre
                 {
                     return  vertexBufferVbo == _r.vertexBufferVbo &&
                             vertexElements == _r.vertexElements &&
-                            stride == _r.stride &&
-                            offset == _r.offset &&
                             instancingDivisor == _r.instancingDivisor;
                 }
             };
 
             typedef vector<VertexBinding>::type VertexBindingVec;
 
+            /// Not used anymore, however it's useful for sorting
+            /// purposes in the RenderQueue (using the Vao's ID).
+            OperationType operationType;
             VertexBindingVec    vertexBuffers;
-            id<MTLBuffer>       indexBufferVbo;
+            __unsafe_unretained id<MTLBuffer> indexBufferVbo;
             IndexBufferPacked::IndexType indexType;
-            uint32              refCount;
+            //uint32              refCount;
         };
 
         typedef vector<Vbo>::type VboVec;
@@ -132,6 +133,7 @@ namespace Ogre
         size_t  mDefaultPoolSize[MAX_VBO_FLAG];
 
         VaoVec  mVaos;
+        uint32  mVaoNames;
 
         MetalDevice *mDevice;
 
@@ -227,6 +229,15 @@ namespace Ogre
                                                         OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
+
+        /// Finds the Vao. Calls createVao automatically if not found.
+        /// Increases refCount before returning the iterator.
+        VaoVec::iterator findVao( const VertexBufferPackedVec &vertexBuffers,
+                                  IndexBufferPacked *indexBuffer,
+                                  OperationType opType );
+        uint32 createVao( const Vao &vaoRef );
+
+        static uint32 generateRenderQueueId( uint32 vaoName, uint32 uniqueVaoId );
 
         static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 

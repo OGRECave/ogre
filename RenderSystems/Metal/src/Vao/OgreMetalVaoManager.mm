@@ -42,6 +42,8 @@ THE SOFTWARE.
 #include "OgreMetalDevice.h"
 
 #include "OgreRenderQueue.h"
+#include "OgreRoot.h"
+#include "OgreHlmsManager.h"
 
 #include "OgreTimer.h"
 #include "OgreStringConverter.h"
@@ -49,6 +51,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     MetalVaoManager::MetalVaoManager( uint8 dynamicBufferMultiplier, MetalDevice *device ) :
+        mVaoNames( 1 ),
         mDevice( device ),
         mDrawId( 0 )
     {
@@ -621,26 +624,17 @@ namespace Ogre
                                                             IndexBufferPacked *indexBuffer,
                                                             OperationType opType )
     {
-        //TODO: Share same idx for the same input layouts + same buffers.
-        size_t idx = mVertexArrayObjects.size();
+        HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+        VertexElement2VecVec vertexElements = VertexArrayObject::getVertexDeclaration( vertexBuffers );
+        const uint8 inputLayout = hlmsManager->_addInputLayoutId( vertexElements, opType );
 
-        const int bitsOpType = 3;
-        const int bitsVaoGl  = 2;
-        const uint32 maskOpType = OGRE_RQ_MAKE_MASK( bitsOpType );
-        const uint32 maskVaoGl  = OGRE_RQ_MAKE_MASK( bitsVaoGl );
-        const uint32 maskVao    = OGRE_RQ_MAKE_MASK( RqBits::MeshBits - bitsOpType - bitsVaoGl );
+        VaoVec::iterator itor = findVao( vertexBuffers, indexBuffer, opType );
 
-        const uint32 shiftOpType    = RqBits::MeshBits - bitsOpType;
-        const uint32 shiftVaoGl     = shiftOpType - bitsVaoGl;
+        const uint32 renderQueueId = generateRenderQueueId( itor->vaoName, mNumGeneratedVaos );
 
-        uint32 renderQueueId =
-                ( (opType & maskOpType) << shiftOpType ) |
-                ( (idx & maskVaoGl) << shiftVaoGl ) |
-                (idx & maskVao);
-
-        VertexArrayObject *retVal = OGRE_NEW VertexArrayObject( idx,
+        VertexArrayObject *retVal = OGRE_NEW VertexArrayObject( itor->vaoName,
                                                                 renderQueueId,
-                                                                idx,
+                                                                inputLayout,
                                                                 vertexBuffers,
                                                                 indexBuffer,
                                                                 opType );
@@ -651,6 +645,123 @@ namespace Ogre
     void MetalVaoManager::destroyVertexArrayObjectImpl( VertexArrayObject *vao )
     {
         OGRE_DELETE vao;
+    }
+    //-----------------------------------------------------------------------------------
+    MetalVaoManager::VaoVec::iterator MetalVaoManager::findVao(
+                                                        const VertexBufferPackedVec &vertexBuffers,
+                                                        IndexBufferPacked *indexBuffer,
+                                                        OperationType opType )
+    {
+        Vao vao;
+
+        vao.operationType = opType;
+        vao.vertexBuffers.reserve( vertexBuffers.size() );
+
+        {
+            VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
+            VertexBufferPackedVec::const_iterator end  = vertexBuffers.end();
+
+            while( itor != end )
+            {
+                Vao::VertexBinding vertexBinding;
+                vertexBinding.vertexBufferVbo   = static_cast<MetalBufferInterface*>(
+                                                        (*itor)->getBufferInterface() )->getVboName();
+                vertexBinding.vertexElements    = (*itor)->getVertexElements();
+                vertexBinding.instancingDivisor = 0;
+
+                /*const MultiSourceVertexBufferPool *multiSourcePool = (*itor)->getMultiSourcePool();
+                if( multiSourcePool )
+                {
+                    vertexBinding.offset = multiSourcePool->getBytesOffsetToSource(
+                                                            (*itor)->_getSourceIndex() );
+                }*/
+
+                vao.vertexBuffers.push_back( vertexBinding );
+
+                ++itor;
+            }
+        }
+
+        //vao.refCount = 0;
+
+        if( indexBuffer )
+        {
+            vao.indexBufferVbo  = static_cast<MetalBufferInterface*>(
+                                    indexBuffer->getBufferInterface() )->getVboName();
+            vao.indexType       = indexBuffer->getIndexType();
+        }
+        else
+        {
+            vao.indexBufferVbo  = 0;
+            vao.indexType       = IndexBufferPacked::IT_16BIT;
+        }
+
+        bool bFound = false;
+        VaoVec::iterator itor = mVaos.begin();
+        VaoVec::iterator end  = mVaos.end();
+
+        while( itor != end && !bFound )
+        {
+            if( itor->operationType == vao.operationType &&
+                itor->indexBufferVbo == vao.indexBufferVbo &&
+                itor->indexType == vao.indexType &&
+                itor->vertexBuffers == vao.vertexBuffers )
+            {
+                bFound = true;
+            }
+            else
+            {
+                ++itor;
+            }
+        }
+
+        if( !bFound )
+        {
+            vao.vaoName = createVao( vao );
+            mVaos.push_back( vao );
+            itor = mVaos.begin() + mVaos.size() - 1;
+        }
+
+        //++itor->refCount;
+
+        return itor;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 MetalVaoManager::createVao( const Vao &vaoRef )
+    {
+        return mVaoNames++;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 MetalVaoManager::generateRenderQueueId( uint32 vaoName, uint32 uniqueVaoId )
+    {
+        //Mix mNumGeneratedVaos with the D3D11 Vao for better sorting purposes:
+        //  If we only use the D3D11's vao, the RQ will sort Meshes with
+        //  multiple submeshes mixed with other meshes.
+        //  For cache locality, and assuming all of them have the same GL vao,
+        //  we prefer the RQ to sort:
+        //      1. Mesh A - SubMesh 0
+        //      2. Mesh A - SubMesh 1
+        //      3. Mesh B - SubMesh 0
+        //      4. Mesh B - SubMesh 1
+        //      5. Mesh D - SubMesh 0
+        //  If we don't mix mNumGeneratedVaos in it; the following could be possible:
+        //      1. Mesh B - SubMesh 1
+        //      2. Mesh D - SubMesh 0
+        //      3. Mesh A - SubMesh 1
+        //      4. Mesh B - SubMesh 0
+        //      5. Mesh A - SubMesh 0
+        //  Thus thrashing the cache unnecessarily.
+        const int bitsVaoGl  = 5;
+        const uint32 maskVaoGl  = OGRE_RQ_MAKE_MASK( bitsVaoGl );
+        const uint32 maskVao    = OGRE_RQ_MAKE_MASK( RqBits::MeshBits - bitsVaoGl );
+
+        const uint32 shiftVaoGl     = RqBits::MeshBits - bitsVaoGl;
+
+        uint32 renderQueueId =
+                ( (vaoName & maskVaoGl) << shiftVaoGl ) |
+                (uniqueVaoId & maskVao);
+
+        return renderQueueId;
     }
     //-----------------------------------------------------------------------------------
     StagingBuffer* MetalVaoManager::createStagingBuffer( size_t sizeBytes, bool forUpload )
