@@ -762,6 +762,30 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_renderEmulated( const CbDrawCallStrip *cmd )
     {
+        const VertexArrayObject *vao = cmd->vao;
+        CbDrawStrip *drawCmd = reinterpret_cast<CbDrawStrip*>(
+                                    mSwIndirectBufferPtr + (size_t)cmd->indirectBufferOffset );
+
+        const MTLPrimitiveType primType =  std::min(
+                    MTLPrimitiveTypeTriangleStrip,
+                    static_cast<MTLPrimitiveType>( vao->getOperationType() - 1u ) );
+
+//        const size_t numVertexBuffers = vertexBuffers.size();
+//        for( size_t j=0; j<numVertexBuffers; ++j )
+//        {
+//            //baseVertex is not needed as vertexStart does the same job.
+//            [mActiveRenderEncoder setVertexBufferOffset:0 atIndex:j];
+//        }
+
+        for( uint32 i=cmd->numDraws; i--; )
+        {
+            //TODO: Setup baseInstance.
+            [mActiveRenderEncoder drawPrimitives:primType
+                      vertexStart:drawCmd->firstVertexIndex
+                      vertexCount:drawCmd->primCount
+                    instanceCount:drawCmd->instanceCount];
+            ++drawCmd;
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setRenderOperation( const v1::CbRenderOp *cmd )
