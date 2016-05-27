@@ -196,7 +196,7 @@ namespace Ogre
     {
         assert( mUploadOnly );
 
-        mMappingCount = sizeBytes;
+        mMappingCount = alignToNextMultiple( sizeBytes, 4u );
 
         waitIfNeeded(); //Will fill mMappingStart
 
@@ -234,7 +234,8 @@ namespace Ogre
             [blitEncoder copyFromBuffer:mVboName
                                         sourceOffset:mInternalBufferStart + mMappingStart + dst.srcOffset
                                         toBuffer:bufferInterface->getVboName()
-                                        destinationOffset:dstOffset size:dst.length];
+                                        destinationOffset:dstOffset
+                                        size:alignToNextMultiple( dst.length, 4u )];
         }
 
         if( mUploadOnly )
@@ -307,9 +308,10 @@ namespace Ogre
     //
     //-----------------------------------------------------------------------------------
     size_t MetalStagingBuffer::_asyncDownload( BufferPacked *source, size_t srcOffset,
-                                                 size_t srcLength )
+                                               size_t srcLength )
     {
-        size_t freeRegionOffset = getFreeDownloadRegion( srcLength );
+        //Metal has alignment restrictions of 4 bytes for offset and size in copyFromBuffer
+        size_t freeRegionOffset = getFreeDownloadRegion( alignToNextMultiple( srcLength, 4u ) );
 
         if( freeRegionOffset == -1 )
         {
@@ -324,6 +326,15 @@ namespace Ogre
         assert( dynamic_cast<MetalBufferInterface*>( source->getBufferInterface() ) );
         assert( (srcOffset + srcLength) <= source->getTotalSizeBytes() );
 
+        size_t extraOffset = 0;
+        if( srcOffset & 0x04 )
+        {
+            //Not multiple of 4. Backtrack to make it multiple of 4, then add this value
+            //to the return value so it gets correctly mapped in _mapForRead.
+            extraOffset = srcOffset & 0x04;
+            srcOffset -= extraOffset;
+        }
+
         MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
                                                             source->getBufferInterface() );
 
@@ -333,12 +344,19 @@ namespace Ogre
                                         source->getBytesPerElement() + srcOffset
                                     toBuffer:mVboName
                                     destinationOffset:mInternalBufferStart + freeRegionOffset
-                                    size:srcLength];
+                                    size:alignToNextMultiple( srcLength, 4u )];
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         [blitEncoder synchronizeResource:mVboName];
 #endif
 
-        return freeRegionOffset;
+        return freeRegionOffset + extraOffset;
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::_cancelDownload( size_t offset, size_t sizeBytes )
+    {
+        //If offset isn't multiple of 4, we were making it go forward in
+        //_asyncDownload. We need to backgrack it so regions stay contiguous.
+        StagingBuffer::_cancelDownload( offset & ~size_t(0x04), sizeBytes );
     }
     //-----------------------------------------------------------------------------------
     const void* MetalStagingBuffer::_mapForReadImpl( size_t offset, size_t sizeBytes )
@@ -346,7 +364,7 @@ namespace Ogre
         assert( !mUploadOnly );
 
         mMappingStart = offset;
-        mMappingCount = sizeBytes;
+        mMappingCount = alignToNextMultiple( sizeBytes, 4u );
 
         mMappedPtr = reinterpret_cast<uint8*>( [mVboName contents] ) +
                 mInternalBufferStart + mMappingStart;

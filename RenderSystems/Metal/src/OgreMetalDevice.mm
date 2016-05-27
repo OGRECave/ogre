@@ -104,10 +104,13 @@ namespace Ogre
     //-------------------------------------------------------------------------
     id<MTLBlitCommandEncoder> MetalDevice::getBlitEncoder(void)
     {
-        endRenderEncoder();
-        endComputeEncoder();
+        if( !mBlitEncoder )
+        {
+            endRenderEncoder();
+            endComputeEncoder();
 
-        mBlitEncoder = [mCurrentCommandBuffer blitCommandEncoder];
+            mBlitEncoder = [mCurrentCommandBuffer blitCommandEncoder];
+        }
 
         return mBlitEncoder;
     }

@@ -227,7 +227,7 @@ namespace Ogre
         /// Releases memory assigned to a download that hasn't been mapped yet,
         /// to make space for another _asyncDownload call. Useful when you
         /// suddenly don't intend to call _mapForRead.
-        void _cancelDownload( size_t offset, size_t sizeBytes );
+        virtual void _cancelDownload( size_t offset, size_t sizeBytes );
 
         /** Maps the buffer for read acces for the CPU.
         @remarks

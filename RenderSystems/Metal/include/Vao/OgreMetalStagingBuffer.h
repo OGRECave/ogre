@@ -119,6 +119,7 @@ namespace Ogre
         void cleanUnfencedHazards(void);
 
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
+        virtual void _cancelDownload( size_t offset, size_t sizeBytes );
 
         id<MTLBuffer> getBufferName(void) const     { return mVboName; }
     };

@@ -125,6 +125,8 @@ namespace Ogre
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         alignment = 16; //On iOS this alignment makes it good to go for everything.
+#else
+        alignment = std::min<size_t>( alignment, 4u );
 #endif
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
@@ -767,6 +769,7 @@ namespace Ogre
     StagingBuffer* MetalVaoManager::createStagingBuffer( size_t sizeBytes, bool forUpload )
     {
         sizeBytes = std::max<size_t>( sizeBytes, 4 * 1024 * 1024 );
+        sizeBytes = alignToNextMultiple( sizeBytes, 4u );
 
         MTLResourceOptions resourceOptions = 0;
 
