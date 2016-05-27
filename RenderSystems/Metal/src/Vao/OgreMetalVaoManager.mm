@@ -62,8 +62,8 @@ namespace Ogre
         mConstBufferAlignment   = 16;
         mTexBufferAlignment     = 16;
 
-        //Keep pools of 32MB each for static buffers
-        mDefaultPoolSize[CPU_INACCESSIBLE]  = 32;
+        //Keep pools of 32MB for static buffers
+        mDefaultPoolSize[CPU_INACCESSIBLE]  = 32 * 1024 * 1024;
 
         //Keep pools of 8MB each for dynamic buffers
         for( size_t i=CPU_ACCESSIBLE_DEFAULT; i<=CPU_ACCESSIBLE_PERSISTENT_COHERENT; ++i )
@@ -76,7 +76,7 @@ namespace Ogre
         mConstBufferAlignment   = 256;
         mTexBufferAlignment     = 256;
 
-        //Keep pools of 128MB each for static buffers
+        //Keep pools of 128MB for static buffers
         mDefaultPoolSize[CPU_INACCESSIBLE]  = 128 * 1024 * 1024;
 
         //Keep pools of 32MB each for dynamic buffers
@@ -118,14 +118,27 @@ namespace Ogre
         deleteAllBuffers();
     }
     //-----------------------------------------------------------------------------------
+    /// Returns Greatest Common Denominator
+    size_t gcd( size_t a, size_t b )
+    {
+        return b == 0u ? a : gcd( b, a % b );
+    }
+    /// Returns Least Common Multiple
+    size_t lcm( size_t a, size_t b )
+    {
+        return a * b / gcd( a, b );
+    }
     void MetalVaoManager::allocateVbo( size_t sizeBytes, size_t alignment, BufferType bufferType,
                                        size_t &outVboIdx, size_t &outBufferOffset )
     {
         assert( alignment > 0 );
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        alignment = 16; //On iOS this alignment makes it good to go for everything.
+        //On iOS 16 byte alignment makes it good to go for everything; but we need to satisfy
+        //both original alignment for baseVertex reasons. So find LCM between both.
+        alignment = lcm( alignment, 16u );
 #else
+        //On OSX we have several alignments (just like GL & D3D11), but it can never be lower than 4.
         alignment = std::min<size_t>( alignment, 4u );
 #endif
 
@@ -339,7 +352,7 @@ namespace Ogre
                                                                           vbo.dynamicBuffer );
 
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
-                                                        0, numElements, bytesPerElement,
+                                                        bufferOffset, numElements, bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
