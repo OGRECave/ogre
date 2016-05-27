@@ -264,6 +264,7 @@ namespace Ogre
             const String filename = ShaderFiles[i];
             hasValidFile |= mDataFolder->exists( filename + ".glsl" );
             hasValidFile |= mDataFolder->exists( filename + ".hlsl" );
+            hasValidFile |= mDataFolder->exists( filename + ".metal" );
         }
 
         if( !hasValidFile )
@@ -2349,10 +2350,10 @@ namespace Ogre
         if( mRenderSystem )
         {
             //Prefer glsl over glsles
-            const String shaderProfiles[3] = { "hlsl", "glsles", "glsl" };
+            const String shaderProfiles[4] = { "hlsl", "glsles", "glsl", "metal" };
             const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
 
-            for( size_t i=0; i<3; ++i )
+            for( size_t i=0; i<4; ++i )
             {
                 if( capabilities->isShaderProfileSupported( shaderProfiles[i] ) )
                     mShaderProfile = shaderProfiles[i];

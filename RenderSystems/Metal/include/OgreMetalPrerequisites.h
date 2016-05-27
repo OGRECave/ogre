@@ -38,6 +38,7 @@ namespace Ogre
     class MetalDepthBuffer;
     struct MetalDevice;
     class MetalDynamicBuffer;
+    class MetalGpuProgramManager;
     struct MetalHlmsPso;
     class MetalStagingBuffer;
     class MetalRenderSystem;

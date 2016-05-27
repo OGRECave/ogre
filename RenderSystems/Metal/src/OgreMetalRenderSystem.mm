@@ -35,6 +35,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalRenderTargetCommon.h"
 #include "OgreMetalDepthBuffer.h"
 #include "OgreMetalDevice.h"
+#include "OgreMetalGpuProgramManager.h"
 
 #include "OgreDefaultHardwareBufferManager.h"
 
@@ -54,6 +55,7 @@ namespace Ogre
         RenderSystem(),
         mInitialized( false ),
         mHardwareBufferManager( 0 ),
+        mShaderManager( 0 ),
         mIndirectBuffer( 0 ),
         mSwIndirectBufferPtr( 0 ),
         mPso( 0 ),
@@ -74,6 +76,9 @@ namespace Ogre
 
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
+
+        OGRE_DELETE mShaderManager;
+        mShaderManager = 0;
 
         OGRE_DELETE mTextureManager;
         mTextureManager = 0;
@@ -128,6 +133,8 @@ namespace Ogre
 
         rsc->setMaximumResolutions( 16384, 4096, 16384 );
 
+        rsc->addShaderProfile( "metal" );
+
         return rsc;
     }
     //-------------------------------------------------------------------------
@@ -160,7 +167,13 @@ namespace Ogre
             const long c_inFlightCommandBuffers = 3;
             mMainGpuSyncSemaphore = dispatch_semaphore_create(c_inFlightCommandBuffers);
             mRealCapabilities = createRenderSystemCapabilities();
-            mCurrentCapabilities = mRealCapabilities;
+
+            if (!mUseCustomCapabilities)
+                mCurrentCapabilities = mRealCapabilities;
+
+            fireEvent("RenderSystemCapabilitiesCreated");
+
+            initialiseFromRenderSystemCapabilities( mCurrentCapabilities, 0 );
 
             mHardwareBufferManager = new v1::DefaultHardwareBufferManager();
             mTextureManager = new MetalTextureManager();
@@ -393,6 +406,7 @@ namespace Ogre
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
     {
         mActiveRenderEncoder = 0;
+        mPso = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
@@ -481,6 +495,11 @@ namespace Ogre
     {
         MTLRenderPipelineDescriptor *psd = [[MTLRenderPipelineDescriptor alloc] init];
         [psd setSampleCount: newPso->pass.multisampleCount];
+
+        id<MTLLibrary> library = [mActiveDevice->mDevice newDefaultLibrary];
+        [psd setVertexFunction:[library newFunctionWithName:@"vertex_vs"]];
+        [psd setFragmentFunction:[library newFunctionWithName:@"pixel_ps"]];
+
 //		[psd setVertexFunction:newPso->vertexShader->vsShader];
 //		[psd setFragmentFunction:newPso->pixelShader->psShader];
 
@@ -599,8 +618,18 @@ namespace Ogre
         samplerDescriptor.lodMinClamp   = newBlock->mMinLod;
         samplerDescriptor.lodMaxClamp   = newBlock->mMaxLod;
 
-        if( newBlock->mCompareFunction != NUM_COMPARE_FUNCTIONS )
-            samplerDescriptor.compareFunction = MetalMappings::get( newBlock->mCompareFunction );
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        const bool supportsCompareFunction =
+                [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily3_v1];
+#else
+        const bool supportsCompareFunction = true;
+#endif
+
+        if( supportsCompareFunction )
+        {
+            if( newBlock->mCompareFunction != NUM_COMPARE_FUNCTIONS )
+                samplerDescriptor.compareFunction = MetalMappings::get( newBlock->mCompareFunction );
+        }
 
         id <MTLSamplerState> sampler =
                 [mActiveDevice->mDevice newSamplerStateWithDescriptor:samplerDescriptor];
@@ -633,6 +662,9 @@ namespace Ogre
     void MetalRenderSystem::_setPipelineStateObject( const HlmsPso *pso )
     {
         MetalHlmsPso *metalPso = reinterpret_cast<MetalHlmsPso*>(pso->rsData);
+
+        if( pso && !mActiveRenderEncoder )
+            createRenderEncoder();
         
         if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
             [mActiveRenderEncoder setDepthStencilState:metalPso->depthStencilState];
@@ -744,7 +776,7 @@ namespace Ogre
             //TODO: Setup baseInstance.
 
 #if OGRE_DEBUG_MODE
-            assert( (drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x04 == 0
+            assert( ((drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x04) == 0
                     && "Index Buffer must be aligned to 4 bytes. If you're messing with "
                     "VertexArrayObject::setPrimitiveRange, you've entered an invalid "
                     "primStart; not supported by the Metal API." );
@@ -976,5 +1008,6 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
+        mShaderManager = OGRE_NEW MetalGpuProgramManager();
     }
 }

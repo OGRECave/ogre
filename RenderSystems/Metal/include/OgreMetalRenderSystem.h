@@ -85,7 +85,8 @@ namespace Ogre
         typedef vector<CachedDepthStencilState>::type CachedDepthStencilStateVec;
 
         bool mInitialized;
-        v1::HardwareBufferManager *mHardwareBufferManager;
+        v1::HardwareBufferManager   *mHardwareBufferManager;
+        MetalGpuProgramManager      *mShaderManager;
 
         ConfigOptionMap mOptions;
 
