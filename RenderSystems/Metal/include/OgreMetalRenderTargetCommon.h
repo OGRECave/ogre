@@ -30,8 +30,6 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreMetalPrerequisites.h"
 
-#import <Metal/MTLRenderPass.h>
-
 namespace Ogre
 {
     class _OgreMetalExport MetalRenderTargetCommon

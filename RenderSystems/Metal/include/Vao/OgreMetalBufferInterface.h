@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 #include "Vao/OgreBufferInterface.h"
 
-#import <Metal/MTLBuffer.h>
-
 namespace Ogre
 {
     /** For Metal, all buffers can be treated with the same code.

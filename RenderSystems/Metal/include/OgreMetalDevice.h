@@ -31,9 +31,6 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreMetalPrerequisites.h"
 
-#import <Metal/MTLDevice.h>
-#import <Metal/MTLCommandBuffer.h>
-
 namespace Ogre
 {
     struct _OgreMetalExport MetalDevice

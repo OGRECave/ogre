@@ -35,6 +35,8 @@ THE SOFTWARE.
 
 #include "OgreMetalDevice.h"
 
+#import <Metal/MTLCommandBuffer.h>
+
 namespace Ogre
 {
     MetalAsyncTicket::MetalAsyncTicket( BufferPacked *creator,

@@ -203,7 +203,7 @@ namespace Ogre
         @param length
             The size in bytes that need to be downloaded.
         */
-        bool canDownload( size_t length ) const;
+        virtual bool canDownload( size_t length ) const;
 
         /** Copies the GPU data in BufferPacked to the StagingBuffer so that it can be
             later read by the CPU using an AsyncTicket. @see AsyncTicket.

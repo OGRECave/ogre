@@ -28,6 +28,8 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreMetalRenderTargetCommon.h"
 
+#import <Metal/MTLRenderPass.h>
+
 namespace Ogre
 {
     MetalRenderTargetCommon::MetalRenderTargetCommon( MetalDevice *ownerDevice ) :

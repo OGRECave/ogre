@@ -31,8 +31,6 @@ THE SOFTWARE.
 #include "OgreMetalPrerequisites.h"
 #include "OgreDepthBuffer.h"
 
-#import <Metal/MTLRenderPass.h>
-
 namespace Ogre
 {
     class _OgreMetalExport MetalDepthBuffer : public DepthBuffer

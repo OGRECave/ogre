@@ -48,6 +48,8 @@ THE SOFTWARE.
 #include "OgreTimer.h"
 #include "OgreStringConverter.h"
 
+#import <Metal/MTLDevice.h>
+
 namespace Ogre
 {
     MetalVaoManager::MetalVaoManager( uint8 dynamicBufferMultiplier, MetalDevice *device ) :

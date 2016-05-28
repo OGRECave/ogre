@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #include "Vao/OgreStagingBuffer.h"
 
-#import <Metal/MTLBuffer.h>
+#import <dispatch/dispatch.h>
 
 namespace Ogre
 {
@@ -118,6 +118,7 @@ namespace Ogre
 
         void cleanUnfencedHazards(void);
 
+        virtual bool canDownload( size_t length ) const;
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
         virtual void _cancelDownload( size_t offset, size_t sizeBytes );
 

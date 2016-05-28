@@ -32,6 +32,19 @@ THE SOFTWARE.
 
 #include "OgreLogManager.h"
 
+@protocol MTLBlitCommandEncoder;
+@protocol MTLBuffer;
+@protocol MTLCommandBuffer;
+@protocol MTLCommandQueue;
+@protocol MTLDepthStencilState;
+@protocol MTLDevice;
+@protocol MTLRenderCommandEncoder;
+@protocol MTLTexture;
+
+@class MTLRenderPassColorAttachmentDescriptor;
+@class MTLRenderPassDepthAttachmentDescriptor;
+@class MTLRenderPassStencilAttachmentDescriptor;
+
 namespace Ogre
 {
     // Forward declarations

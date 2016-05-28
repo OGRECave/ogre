@@ -33,8 +33,6 @@ THE SOFTWARE.
 
 #include "Vao/OgreBufferPacked.h"
 
-#import <Metal/MTLBuffer.h>
-
 namespace Ogre
 {
     /** Metal doesn't "map". You can directly access the unsynchronized contents

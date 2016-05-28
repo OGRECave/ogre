@@ -31,6 +31,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLCommandQueue.h>
+#import <Metal/MTLCommandBuffer.h>
 
 namespace Ogre
 {

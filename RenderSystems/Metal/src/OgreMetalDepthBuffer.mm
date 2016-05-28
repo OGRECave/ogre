@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include "OgreMetalDepthBuffer.h"
 #include "OgreMetalRenderSystem.h"
 
+#import <Metal/MTLRenderPass.h>
+
 namespace Ogre
 {
     MetalDepthBuffer::MetalDepthBuffer( uint16 poolId, MetalRenderSystem *renderSystem,

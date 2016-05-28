@@ -30,6 +30,8 @@ THE SOFTWARE.
 #include "Vao/OgreMetalVaoManager.h"
 #include "Vao/OgreMetalStagingBuffer.h"
 
+#import <Metal/MTLBuffer.h>
+
 namespace Ogre
 {
     MetalDynamicBuffer::MetalDynamicBuffer( id<MTLBuffer> vboName, size_t vboSize ) :

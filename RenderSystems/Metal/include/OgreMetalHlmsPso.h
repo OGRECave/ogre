@@ -43,8 +43,8 @@ namespace Ogre
     /// @See HlmsPso
     struct _OgreMetalExport MetalHlmsPso
     {
-        id <MTLRenderPipelineState> pso;
-        id <MTLDepthStencilState> depthStencilState;
+        id<MTLRenderPipelineState> pso;
+        id<MTLDepthStencilState> depthStencilState;
     };
 
     /** @} */

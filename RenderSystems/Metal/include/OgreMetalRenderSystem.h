@@ -34,9 +34,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreRenderSystem.h"
 #include "OgreMetalDevice.h"
 
-#import <Metal/MTLDepthStencil.h>
-#import <Metal/MTLRenderCommandEncoder.h>
-#import <Metal/MTLRenderPass.h>
+#import <dispatch/dispatch.h>
 
 namespace Ogre
 {
@@ -63,7 +61,7 @@ namespace Ogre
             CompareFunction             depthFunc;
             StencilParams               stencilParams;
 
-            id <MTLDepthStencilState>   depthStencilState;
+            id<MTLDepthStencilState>    depthStencilState;
 
             CachedDepthStencilState() : refCount( 0 ) {}
 

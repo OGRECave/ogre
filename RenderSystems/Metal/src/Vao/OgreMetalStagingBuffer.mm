@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 
 #import <Metal/MTLBlitCommandEncoder.h>
+#import <Metal/MTLCommandBuffer.h>
 
 namespace Ogre
 {
@@ -350,6 +351,11 @@ namespace Ogre
 #endif
 
         return freeRegionOffset + extraOffset;
+    }
+    //-----------------------------------------------------------------------------------
+    bool MetalStagingBuffer::canDownload( size_t length ) const
+    {
+        return StagingBuffer::canDownload( alignToNextMultiple( length, 4u ) );
     }
     //-----------------------------------------------------------------------------------
     void MetalStagingBuffer::_cancelDownload( size_t offset, size_t sizeBytes )

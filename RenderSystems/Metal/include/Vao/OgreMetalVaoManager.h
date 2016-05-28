@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgreMetalPrerequisites.h"
 #include "Vao/OgreVaoManager.h"
 
-#import <Metal/MTLBuffer.h>
+#import <dispatch/dispatch.h>
 
 namespace Ogre
 {
