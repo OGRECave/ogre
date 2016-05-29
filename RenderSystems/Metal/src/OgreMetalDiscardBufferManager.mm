@@ -249,6 +249,9 @@ namespace Ogre
 
         if( itor != mDiscardBuffers.end() )
         {
+            assert( discardBuffer->mOwner == this &&
+                    "Manager says it owns the discard buffer, but discard buffer says it doesn't" );
+
             //Release the block back into the pool (sorted by mLastFrameUsed)
             UnsafeBlock unsafeBlock( discardBuffer->getBlockStart(),
                                      discardBuffer->getBlockSize(),
@@ -284,5 +287,11 @@ namespace Ogre
         mVaoManager( vaoManager ),
         mOwner( owner )
     {
+    }
+    //-------------------------------------------------------------------------
+    id<MTLBuffer> MetalDiscardBuffer::getBufferName(void)
+    {
+        mLastFrameUsed = mVaoManager->getFrameCount();
+        return mBuffer;
     }
 }

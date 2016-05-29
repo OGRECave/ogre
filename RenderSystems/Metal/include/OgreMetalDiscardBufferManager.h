@@ -134,10 +134,16 @@ namespace Ogre
         MetalDiscardBuffer( size_t bufferSize, uint16 alignment, VaoManager *vaoManager,
                             MetalDiscardBufferManager *owner );
 
-        uint16 getAlignment(void) const;
-        /// Size of the buffer, may be bigger than requested due to 4-byte alignment.
-        size_t getSizeBytes(void) const;
+        uint16 getAlignment(void) const         { return mAlignment; }
+        /// Size of the buffer, may be bigger than requested due to 4-byte alignment required by Metal.
+        size_t getSizeBytes(void) const         { return mBufferSize; }
 
+        size_t getOffset(void) const            { return mBufferOffset; }
+        /// Returns the actual API buffer, but first sets mLastFrameUsed as
+        /// we assume you're calling this function to the buffer in the GPU.
+        id<MTLBuffer> getBufferName(void);
+
+        /// For internal use by MetalDiscardBufferManager
         size_t getBlockStart(void) const        { return mBufferOffset - mBlockPrePadding; }
         size_t getBlockSize(void) const         { return mBufferSize + mBlockPrePadding; }
     };
