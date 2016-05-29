@@ -87,10 +87,10 @@ int mainApp()
         "from the depth buffer and combine it with the frustum corners to get the view space\n"
         "projection.\n"
         "There is also example in the shader how to reconstruct view space normals from fragment position.\n"
-        "Normals are used in HBAO to rotate hemisphere sample kernel pointing outwards\n"
+        "Normals are used in SSAO to rotate hemisphere sample kernel pointing outwards\n"
 		"from fragment's face.\n"
-		"There are three steps: calculate occlusion (SSAO_HBAO_ps.glsl/hlsl),\n"
-		"blur (SSAO_Blur_ps.glsl/hlsl) and apply (SSAO_Apply_ps.glsl/hlsl).\n"
+		"There are three steps: calculate occlusion (SSAO_HS_ps.glsl/hlsl),\n"
+		"blur (SSAO_BlurV/H_ps.glsl/hlsl) and apply (SSAO_Apply_ps.glsl/hlsl).\n"
 	);
     Tutorial_SSAOGraphicsSystem graphicsSystem( &tutorial_SSAOGameState );
 

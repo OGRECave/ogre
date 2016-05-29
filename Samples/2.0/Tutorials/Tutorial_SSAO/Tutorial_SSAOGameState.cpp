@@ -41,7 +41,7 @@ namespace Demo
 		mAnimateObjects(true),
 		mNumSpheres(0),
 		mPowerScale(1.5f),
-		mKernelRadius(0.35f)
+		mKernelRadius(1.0f)
 	{
 		memset(mSceneNode, 0, sizeof(mSceneNode));
 	}
@@ -217,7 +217,7 @@ namespace Demo
 			sample.normalise();
 
 			float scale = (float)i / 64.0f;
-			scale = Ogre::Math::lerp(0.1f, 1.0f, scale*scale);
+			scale = Ogre::Math::lerp(0.3f, 1.0f, scale*scale);
 			sample = sample * scale;
 
 			sample.x = (sample.x + 1.0f) * 0.5f;
@@ -281,7 +281,7 @@ namespace Demo
 		//---------------------------------------------------------------------------------
 		//Get GpuProgramParametersSharedPtr to set uniforms that we need
 		Ogre::MaterialPtr material = Ogre::MaterialManager::getSingleton().load(
-			"SSAO/HBAO",
+			"SSAO/HS",
 			Ogre::ResourceGroupManager::
 			AUTODETECT_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();
 
@@ -316,15 +316,25 @@ namespace Demo
 		psParams->setNamedConstant("kernelSize", 64);
 
 		//Set blur shader uniforms
-		Ogre::MaterialPtr materialBlur = Ogre::MaterialManager::getSingleton().load(
-			"SSAO/Blur",
+		Ogre::MaterialPtr materialBlurH = Ogre::MaterialManager::getSingleton().load(
+			"SSAO/BlurH",
 			Ogre::ResourceGroupManager::
 			AUTODETECT_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();
 
-		Ogre::Pass *passBlur = materialBlur->getTechnique(0)->getPass(0);
-		Ogre::GpuProgramParametersSharedPtr psParamsBlur = passBlur->getFragmentProgramParameters();
-		//use half render window size because we are running HBAO in half resolution
-		psParamsBlur->setNamedConstant("texelSize", Ogre::Vector2( 1.0f/(mGraphicsSystem->getRenderWindow()->getWidth()*0.5f), 1.0f/(mGraphicsSystem->getRenderWindow()->getHeight()*0.5f) ));
+		Ogre::Pass *passBlurH = materialBlurH->getTechnique(0)->getPass(0);
+		Ogre::GpuProgramParametersSharedPtr psParamsBlurH = passBlurH->getFragmentProgramParameters();
+		psParamsBlurH->setNamedConstant("texelSize", Ogre::Vector2( 1.0f/(mGraphicsSystem->getRenderWindow()->getWidth()), 1.0f/(mGraphicsSystem->getRenderWindow()->getHeight()) ));
+		psParamsBlurH->setNamedConstant("projectionParams", Ogre::Vector2(projectionA, projectionB));
+
+		Ogre::MaterialPtr materialBlurV = Ogre::MaterialManager::getSingleton().load(
+			"SSAO/BlurV",
+			Ogre::ResourceGroupManager::
+			AUTODETECT_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();
+
+		Ogre::Pass *passBlurV = materialBlurV->getTechnique(0)->getPass(0);
+		Ogre::GpuProgramParametersSharedPtr psParamsBlurV = passBlurV->getFragmentProgramParameters();
+		psParamsBlurV->setNamedConstant("texelSize", Ogre::Vector2(1.0f / (mGraphicsSystem->getRenderWindow()->getWidth()), 1.0f / (mGraphicsSystem->getRenderWindow()->getHeight())));
+		psParamsBlurV->setNamedConstant("projectionParams", Ogre::Vector2(projectionA, projectionB));
 
 		//Set apply shader uniforms
 		Ogre::MaterialPtr materialApply = Ogre::MaterialManager::getSingleton().load(

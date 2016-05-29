@@ -24,23 +24,18 @@ float3 getScreenSpacePos(float2 uv, float3 cameraNormal)
 	float fDepth = depthTexture.Sample(samplerState0, uv).x;
 	float linearDepth = projectionParams.y / (fDepth - projectionParams.x);
 
-	float3 Pos = (cameraNormal * linearDepth);
-
-	return Pos;
+	return (cameraNormal * linearDepth);
 }
 
 float3 reconstructNormal(float3 posInView)
 {
-	float3 dNorm = cross(normalize(ddy(posInView)), normalize(ddx(posInView)));
-	//dNorm = normalize(dNorm);
-	return dNorm;
+	return cross(normalize(ddy(posInView)), normalize(ddx(posInView)));
 }
 
 float3 getNoiseVec(float2 uv)
 {
 	float3 randomVec = noiseTexture.Sample(samplerState1, uv*noiseScale).xyz;
 	randomVec.xy = randomVec.xy * 2.0 - 1.0;
-	//randomVec = normalize(randomVec);
 	return randomVec;
 }
 
@@ -65,10 +60,9 @@ float main
 		{
 			float3 sNoise = sampleTexture.Sample(samplerState2, float2((1.0 / 8.0)*(float(i) + 0.5), (1.0 / 8.0)*(float(a) + 0.5)));
 			sNoise.xy = sNoise.xy * 2.0 - 1.0;
-			sNoise = normalize(sNoise);
 
 			// get sample position
-			float3 oSample = mul(TBN, sNoise); //to view-space
+			float3 oSample = mul(sNoise, TBN); //to view-space
 			oSample = viewPosition + oSample * kernelRadius;
 
 			// project sample position to get UV coords
@@ -76,7 +70,6 @@ float main
 			offset = mul(projection, offset).xyzw; // from view to clip-space
 			offset.xyz /= offset.w; // perspective divide
 			offset.xy = offset.xy * 0.5 + float2(0.5, 0.5); // transform to range [0-1]
-
 			offset.y = 1.0 - offset.y;
 
 			float sampleDepth = getScreenSpacePos(offset.xy, inPs.cameraDir).z;

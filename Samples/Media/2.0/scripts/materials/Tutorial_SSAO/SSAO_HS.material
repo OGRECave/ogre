@@ -1,13 +1,13 @@
 
 // GLSL shaders
-vertex_program SSAO_HBAO_vs_GLSL glsl
+vertex_program SSAO_HS_vs_GLSL glsl
 {
-	source SSAO_HBAO_vs.glsl
+	source SSAO_HS_vs.glsl
 }
 
-fragment_program SSAO_HBAO_ps_GLSL glsl
+fragment_program SSAO_HS_ps_GLSL glsl
 {
-	source SSAO_HBAO_ps.glsl
+	source SSAO_HS_ps.glsl
 	default_params
 	{
 		param_named depthTexture int 0
@@ -17,25 +17,25 @@ fragment_program SSAO_HBAO_ps_GLSL glsl
 }
 
 // HLSL shaders
-vertex_program SSAO_HBAO_vs_HLSL hlsl
+vertex_program SSAO_HS_vs_HLSL hlsl
 {
-    source SSAO_HBAO_vs.hlsl
+    source SSAO_HS_vs.hlsl
     entry_point main
     target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
 }
 
-fragment_program SSAO_HBAO_ps_HLSL hlsl
+fragment_program SSAO_HS_ps_HLSL hlsl
 {
-	source SSAO_HBAO_ps.hlsl
+	source SSAO_HS_ps.hlsl
 	entry_point main
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 // Unified definitions
-vertex_program SSAO_HBAO_vs unified
+vertex_program SSAO_HS_vs unified
 {
-	delegate SSAO_HBAO_vs_HLSL
-	delegate SSAO_HBAO_vs_GLSL
+	delegate SSAO_HS_vs_HLSL
+	delegate SSAO_HS_vs_GLSL
 	
 	default_params
     {
@@ -43,14 +43,14 @@ vertex_program SSAO_HBAO_vs unified
     }
 }
 
-fragment_program SSAO_HBAO_ps unified
+fragment_program SSAO_HS_ps unified
 {
-	delegate SSAO_HBAO_ps_HLSL
-	delegate SSAO_HBAO_ps_GLSL
+	delegate SSAO_HS_ps_HLSL
+	delegate SSAO_HS_ps_GLSL
 }
 
 // Material definition
-material SSAO/HBAO
+material SSAO/HS
 {
 	technique
 	{
@@ -61,11 +61,11 @@ material SSAO/HBAO
 
 			cull_hardware none
 
-			vertex_program_ref SSAO_HBAO_vs
+			vertex_program_ref SSAO_HS_vs
 			{
 			}
 
-			fragment_program_ref SSAO_HBAO_ps
+			fragment_program_ref SSAO_HS_ps
 			{
 			}
 
@@ -93,32 +93,33 @@ material SSAO/HBAO
 
 //-----------------------------------------------------------------------------
 // GLSL shaders
-fragment_program SSAO_Blur_ps_GLSL glsl
+fragment_program SSAO_BlurH_ps_GLSL glsl
 {
-	source SSAO_Blur_ps.glsl
+	source SSAO_BlurH_ps.glsl
 	default_params
 	{
 		param_named ssaoTexture int 0
+		param_named depthTexture int 1
 	}
 }
 
 // HLSL shaders
-fragment_program SSAO_Blur_ps_HLSL hlsl
+fragment_program SSAO_BlurH_ps_HLSL hlsl
 {
-	source SSAO_Blur_ps.hlsl
+	source SSAO_BlurH_ps.hlsl
 	entry_point main
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
 
-fragment_program SSAO_Blur_ps unified
+fragment_program SSAO_BlurH_ps unified
 {
-	delegate SSAO_Blur_ps_HLSL
-	delegate SSAO_Blur_ps_GLSL
+	delegate SSAO_BlurH_ps_HLSL
+	delegate SSAO_BlurH_ps_GLSL
 }
 
 // Material definition
-material SSAO/Blur
+material SSAO/BlurH
 {
 	technique
 	{
@@ -133,13 +134,83 @@ material SSAO/Blur
 			{
 			}
 
-			fragment_program_ref SSAO_Blur_ps
+			fragment_program_ref SSAO_BlurH_ps
 			{
 			}
 
 			texture_unit ssaoTexture
 			{
-				filtering			none
+				filtering			bilinear
+				tex_address_mode	clamp
+			}
+			
+			texture_unit depthTexture
+			{
+				filtering			bilinear
+				tex_address_mode	clamp
+			}
+			
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// GLSL shaders
+fragment_program SSAO_BlurV_ps_GLSL glsl
+{
+	source SSAO_BlurV_ps.glsl
+	default_params
+	{
+		param_named ssaoTexture int 0
+		param_named depthTexture int 1
+	}
+}
+
+// HLSL shaders
+fragment_program SSAO_BlurV_ps_HLSL hlsl
+{
+	source SSAO_BlurV_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+
+fragment_program SSAO_BlurV_ps unified
+{
+	delegate SSAO_BlurV_ps_HLSL
+	delegate SSAO_BlurV_ps_GLSL
+}
+
+// Material definition
+material SSAO/BlurV
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref SSAO_BlurV_ps
+			{
+			}
+
+			texture_unit ssaoTexture
+			{
+				filtering			bilinear
+				tex_address_mode	clamp
+			}
+			
+			texture_unit depthTexture
+			{
+				filtering			bilinear
 				tex_address_mode	clamp
 			}
 			
@@ -196,7 +267,7 @@ material SSAO/Apply
 
 			texture_unit ssaoTexture
 			{
-				filtering			bilinear
+				filtering			none
 				tex_address_mode	clamp
 			}
 			

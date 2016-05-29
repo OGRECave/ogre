@@ -19,26 +19,35 @@ uniform mat4 projection;
 
 out float fragColour;
 
+vec3 getScreenSpacePos(vec2 uv, vec3 cameraNormal)
+{
+	float fDepth = texture( depthTexture, uv*2.0).x; //multiply uv coords by 2 because we are working with half res
+	float linearDepth = projectionParams.y / (fDepth - projectionParams.x);
+	return (cameraNormal * linearDepth);
+}
+
 vec3 reconstructNormal(vec3 posInView)
 {
 	vec3 dNorm = cross(normalize(dFdy(posInView)), normalize(dFdx(posInView)));
 	return dNorm;
 }
 
+vec3 getRandomVec(vec2 uv)
+{
+	vec3 randomVec = texture(noiseTexture, uv * noiseScale * 2.0).xyz;
+    randomVec.xy = randomVec.xy * 2.0 - 1.0;
+	return randomVec;
+}
+
 void main()
 {
-    float fDepth = texture( depthTexture, inPs.uv0*2.0).x; //multiply uv coords by 2 because we are working with half res
-	float linearDepth = projectionParams.y / (fDepth - projectionParams.x);
-
-    vec3 fragPos = inPs.cameraDir * linearDepth;
-    vec3 normal = reconstructNormal(fragPos);
+    vec3 viewPosition = getScreenSpacePos(inPs.uv0, inPs.cameraDir);
+    vec3 viewNormal = reconstructNormal(viewPosition);
+    vec3 randomVec = getRandomVec(inPs.uv0);
    
-    vec3 randomVec = texture(noiseTexture, inPs.uv0 * noiseScale).xyz;
-    randomVec.xy = randomVec.xy * 2.0 - 1.0;
-   
-    vec3 tangent = normalize(randomVec - normal * dot(randomVec, normal));
-    vec3 bitangent = cross(normal, tangent);
-    mat3 TBN = mat3(tangent, bitangent, normal);
+    vec3 tangent = normalize(randomVec - viewNormal * dot(randomVec, viewNormal));
+    vec3 bitangent = cross(viewNormal, tangent);
+    mat3 TBN = mat3(tangent, bitangent, viewNormal);
    
     float occlusion = 0.0;
     for(int i = 0; i < 8; ++i)
@@ -47,11 +56,10 @@ void main()
 		{
 			vec3 sNoise = texture(sampleTexture, vec2((1.0/8.0)*(float(i)+0.5), (1.0/8.0)*(float(a)+0.5))).xyz;
 			sNoise.xy = sNoise.xy * 2.0 - 1.0;
-			sNoise = normalize(sNoise);
          
 			// get sample position
 			vec3 sample = TBN * sNoise; // From tangent to view-space
-			sample = fragPos + sample * kernelRadius; 
+			sample = viewPosition + sample * kernelRadius; 
         
 			// project sample position
 			vec4 offset = vec4(sample, 1.0);
@@ -60,15 +68,11 @@ void main()
 			offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
 			offset.y = 1.0 - offset.y;
 
-			// get sample depth
-			float fSampleDepth = texture(depthTexture, offset.xy*2.0).x; // Get depth value of sample. multiply uv coords by 2 because we are working with half res
-			float newLinearDepth = projectionParams.y / (fSampleDepth - projectionParams.x);
-			vec3 sampleFragPos = inPs.cameraDir * newLinearDepth;
-			float sampleDepth = sampleFragPos.z;
-         
-			// range check & accumulate
-			float rangeCheck = smoothstep(0.0, 1.0, kernelRadius / abs(fragPos.z - sampleDepth));
-			occlusion += (sampleDepth >= sample.z ? 1.0 : 0.0) * rangeCheck; 
+			float sampleDepth = getScreenSpacePos(offset.xy, inPs.cameraDir).z;
+
+			float rangeCheck = smoothstep(0.0, 1.0, kernelRadius / abs(viewPosition.z - sampleDepth));
+			occlusion += (sampleDepth >= sample.z ? 1.0 : 0.0) * rangeCheck;
+			
 		}      
     }
     occlusion = 1.0 - (occlusion / float(kernelSize));
