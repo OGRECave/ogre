@@ -879,7 +879,7 @@ namespace Ogre
         dispatch_time_t timeout = DISPATCH_TIME_NOW;
         while( true )
         {
-            long result = dispatch_semaphore_wait( fenceName, DISPATCH_TIME_FOREVER );
+            long result = dispatch_semaphore_wait( fenceName, timeout );
 
             if( result == 0 )
                 return 0; //Success waiting.
@@ -890,7 +890,7 @@ namespace Ogre
                 timeout = DISPATCH_TIME_FOREVER;
                 device->commitAndNextCommandBuffer();
             }
-            else if( result < 0 )
+            else if( result != 0 )
             {
                 OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                              "Failure while waiting for a MetalFence. Could be out of GPU memory. "

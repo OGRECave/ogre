@@ -128,7 +128,7 @@ namespace Ogre
     {
         long result = dispatch_semaphore_wait( syncObj, DISPATCH_TIME_FOREVER );
 
-        if( result < 0 )
+        if( result != 0 )
         {
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                          "Failure while waiting for a MetalFence. Could be out of GPU memory. "
@@ -291,8 +291,15 @@ namespace Ogre
             //Ask Metal to return immediately and tells us about the fence
             long waitRet = dispatch_semaphore_wait( lastWaitableFence->fenceName, DISPATCH_TIME_NOW );
 
-            if( waitRet < 0 )
+            if( waitRet != 0 )
+            {
                 retVal = STALL_PARTIAL;
+            }
+            else
+            {
+                deleteFences( mFences.begin(), lastWaitableFence + 1 );
+                mFences.erase( mFences.begin(), lastWaitableFence + 1 );
+            }
         }
 
         return retVal;
