@@ -78,6 +78,8 @@ namespace v1
         /// @see HardwareBuffer.
         void copyData( MetalHardwareBufferCommon &srcBuffer, size_t srcOffset,
                        size_t dstOffset, size_t length, bool discardWholeBuffer = false );
+
+        size_t getSizeBytes(void) const         { return mSizeBytes; }
     };
 }
 }

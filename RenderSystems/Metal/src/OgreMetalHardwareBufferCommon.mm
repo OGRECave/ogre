@@ -214,7 +214,7 @@ namespace v1
     //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::readData( size_t offset, size_t length, void* pDest )
     {
-        assert( (offset + length) <= mSizeInBytes );
+        assert( (offset + length) <= mSizeBytes );
 
         void const *srcData = 0;
         StagingBuffer *stagingBuffer = 0;
@@ -223,7 +223,7 @@ namespace v1
         const uint32 bufferMultiplier   = mVaoManager->getDynamicBufferMultiplier();
 
         if( mDiscardBuffer )
-        {
+ 	       {
             //We can't write from GPU to discardable memory. No need to check.
             srcData = mDiscardBuffer->map( true );
         }

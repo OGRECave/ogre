@@ -434,8 +434,7 @@ namespace Ogre
         }
 
         assert( !mUploadOnly );
-        assert( dynamic_cast<MetalBufferInterface*>( source->getBufferInterface() ) );
-        assert( (srcOffset + srcLength) <= source->getTotalSizeBytes() );
+        assert( (srcOffset + srcLength) <= source->getSizeBytes() );
 
         size_t extraOffset = 0;
         if( srcOffset & 0x04 )

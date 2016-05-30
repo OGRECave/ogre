@@ -117,7 +117,7 @@ namespace Ogre
         VaoManager* getVaoManager(void) const       { return mVaoManager; }
     };
 
-    class _OgreMetalExport MetalDiscardBuffer
+    class _OgreMetalExport MetalDiscardBuffer : public BufferAlloc
     {
         friend class MetalDiscardBufferManager;
 
