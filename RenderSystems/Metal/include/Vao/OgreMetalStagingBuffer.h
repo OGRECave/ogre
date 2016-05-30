@@ -117,6 +117,7 @@ namespace Ogre
         virtual StagingStallType uploadWillStall( size_t sizeBytes );
 
         void cleanUnfencedHazards(void);
+        void _notifyDeviceStalled(void);
 
         void _unmapToV1( v1::MetalHardwareBufferCommon *hwBuffer, size_t lockStart, size_t lockSize );
 

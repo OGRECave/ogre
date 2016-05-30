@@ -39,7 +39,7 @@ namespace Ogre
 namespace v1
 {
     MetalHardwareBufferCommon::MetalHardwareBufferCommon( size_t sizeBytes, HardwareBuffer::Usage usage,
-                                                          bool useShadowBuffer, uint16 alignment,
+                                                          uint16 alignment,
                                                           MetalDiscardBufferManager *discardBufferMgr,
                                                           MetalDevice *device ) :
         mBuffer( 0 ),
@@ -55,12 +55,6 @@ namespace v1
 
         MTLResourceOptions resourceOptions = 0;
 
-//        if( (usage & HardwareBuffer::HBU_STATIC) && (usage & HardwareBuffer::HBU_DYNAMIC) )
-//        {
-//            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
-//                         "Buffer can't be both HBU_STATIC & HBU_DYNAMIC",
-//                         "MetalHardwareBufferCommon::MetalHardwareBufferCommon" );
-//        }
         if( usage & HardwareBuffer::HBU_WRITE_ONLY )
         {
             resourceOptions |= MTLResourceStorageModePrivate;
@@ -90,6 +84,26 @@ namespace v1
             discardBufferManager->destroyDiscardBuffer( mDiscardBuffer );
             mDiscardBuffer = 0;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalHardwareBufferCommon::_notifyDeviceStalled(void)
+    {
+        mLastFrameUsed      = mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
+        mLastFrameGpuWrote  = mLastFrameUsed;
+    }
+    //-----------------------------------------------------------------------------------
+    id<MTLBuffer> MetalHardwareBufferCommon::getBufferName(void)
+    {
+        mLastFrameUsed = mVaoManager->getFrameCount();
+        return !mDiscardBuffer ? mBuffer : mDiscardBuffer->getBufferName();
+    }
+    //-----------------------------------------------------------------------------------
+    id<MTLBuffer> MetalHardwareBufferCommon::getBufferNameForGpuWrite(void)
+    {
+        assert( !mDiscardBuffer && "Discardable buffers can't be written from GPU!" );
+        mLastFrameUsed      = mVaoManager->getFrameCount();
+        mLastFrameGpuWrote  = mLastFrameUsed;
+        return mBuffer;
     }
     //-----------------------------------------------------------------------------------
     void* MetalHardwareBufferCommon::lockImpl( size_t offset, size_t length,
@@ -127,7 +141,7 @@ namespace v1
                                 "PERFORMANCE WARNING: locking with HBL_NORMAL or HBL_WRITE_ONLY for a "
                                 "buffer created with HBU_DISCARDABLE bit is slow/stalling. Consider "
                                 "locking w/ another locking option, or change the buffer's usage flag" );
-                    this->stall();
+                    mDevice->stall();
                 }
             }
 
@@ -141,7 +155,7 @@ namespace v1
                 if( options == HardwareBuffer::HBL_READ_ONLY )
                 {
                     if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
-                        this->stall();
+                        mDevice->stall();
                 }
                 else if( options != HardwareBuffer::HBL_NO_OVERWRITE )
                 {
@@ -151,7 +165,7 @@ namespace v1
                                     "PERFORMANCE WARNING: locking to a non-HBU_WRITE_ONLY or "
                                     "non-HBU_DISCARDABLE for other than reading is slow/stalling." );
 
-                        this->stall();
+                        mDevice->stall();
                     }
                 }
 
@@ -191,27 +205,6 @@ namespace v1
         }
     }
     //-----------------------------------------------------------------------------------
-    void MetalHardwareBufferCommon::stall(void)
-    {
-        mDevice->stall();
-        mLastFrameUsed      = mVaoManager->getFrameCount() - mVaoManager->getDynamicBufferMultiplier();
-        mLastFrameGpuWrote  = mLastFrameUsed;
-    }
-    //-----------------------------------------------------------------------------------
-    id<MTLBuffer> MetalHardwareBufferCommon::getBufferName(void)
-    {
-        mLastFrameUsed = mVaoManager->getFrameCount();
-        return !mDiscardBuffer ? mBuffer : mDiscardBuffer->getBufferName();
-    }
-    //-----------------------------------------------------------------------------------
-    id<MTLBuffer> MetalHardwareBufferCommon::getBufferNameForGpuWrite(void)
-    {
-        assert( !mDiscardBuffer && "Discardable buffers can't be written from GPU!" );
-        mLastFrameUsed      = mVaoManager->getFrameCount();
-        mLastFrameGpuWrote  = mLastFrameUsed;
-        return mBuffer;
-    }
-    //-----------------------------------------------------------------------------------
     void MetalHardwareBufferCommon::readData( size_t offset, size_t length, void* pDest )
     {
         assert( (offset + length) <= mSizeBytes );
@@ -223,7 +216,7 @@ namespace v1
         const uint32 bufferMultiplier   = mVaoManager->getDynamicBufferMultiplier();
 
         if( mDiscardBuffer )
- 	       {
+           {
             //We can't write from GPU to discardable memory. No need to check.
             srcData = mDiscardBuffer->map( true );
         }
@@ -232,7 +225,7 @@ namespace v1
             if( mBuffer.storageMode != MTLStorageModePrivate )
             {
                 if( currentFrame - mLastFrameGpuWrote < bufferMultiplier )
-                    this->stall();
+                    mDevice->stall();
                 srcData = [mBuffer contents];
             }
             else
@@ -241,7 +234,7 @@ namespace v1
                 stagingBuffer = mVaoManager->getStagingBuffer( length, false );
                 size_t stagingBufferOffset = static_cast<MetalStagingBuffer*>(
                             stagingBuffer )->_asyncDownloadV1( this, offset, length );
-                this->stall();
+                mDevice->stall();
                 srcData = stagingBuffer->_mapForRead( stagingBufferOffset, length );
                 offset = 0;
             }
@@ -277,12 +270,12 @@ namespace v1
         }
     }
     //-----------------------------------------------------------------------------------
-    void MetalHardwareBufferCommon::copyData( MetalHardwareBufferCommon &srcBuffer, size_t srcOffset,
+    void MetalHardwareBufferCommon::copyData( MetalHardwareBufferCommon *srcBuffer, size_t srcOffset,
                                               size_t dstOffset, size_t length, bool discardWholeBuffer )
     {
-        if( !this->mDiscardBuffer || srcBuffer.mBuffer.storageMode == MTLStorageModePrivate )
+        if( !this->mDiscardBuffer || srcBuffer->mBuffer.storageMode == MTLStorageModePrivate )
         {
-            __unsafe_unretained id<MTLBuffer> srcBuf = srcBuffer.getBufferName();
+            __unsafe_unretained id<MTLBuffer> srcBuf = srcBuffer->getBufferName();
             __unsafe_unretained id<MTLBuffer> dstBuf = this->getBufferNameForGpuWrite();
 
             __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
@@ -293,7 +286,7 @@ namespace v1
                                    size:length];
 
             if( this->mDiscardBuffer )
-                this->stall();
+                mDevice->stall();
         }
         else
         {
@@ -303,14 +296,14 @@ namespace v1
             else
                 dstOption = HardwareBuffer::HBL_WRITE_ONLY;
 
-            const void *srcData = srcBuffer.lockImpl( srcOffset, length,
-                                                      HardwareBuffer::HBL_READ_ONLY, false );
+            const void *srcData = srcBuffer->lockImpl( srcOffset, length,
+                                                       HardwareBuffer::HBL_READ_ONLY, false );
             void *dstData = this->lockImpl( dstOffset, length, dstOption, false );
 
             memcpy( dstData, srcData, length );
 
             this->unlockImpl( dstOffset, length );
-            srcBuffer.unlockImpl( srcOffset, length );
+            srcBuffer->unlockImpl( srcOffset, length );
         }
     }
 }

@@ -37,6 +37,12 @@ namespace Ogre
 namespace v1
 {
     /// Common buffer operations for most v1 buffer interfaces used in Metal
+    /// This implementation treats:
+    ///		Ignores STATIC and DYNAMIC bit in buffers
+    ///		Lack of WRITE_ONLY and DISCARDABLE buffer puts it in slowest path.
+    ///		Puts WRITE_ONLY in device memory and uses staging buffers to avoid blocking.
+    ///			Use WRITE_ONLY when possible.
+    ///		When DISCARDABLE bit is set, it uses MetalDiscardBuffer.
     class _OgreMetalExport MetalHardwareBufferCommon
     {
     private:
@@ -49,25 +55,24 @@ namespace v1
         uint32              mLastFrameUsed;
         uint32              mLastFrameGpuWrote;
 
-    protected:
-        /// @see HardwareBuffer.
-        void* lockImpl( size_t offset, size_t length,
-                        HardwareBuffer::LockOptions options, bool isLocked );
-        /// @see HardwareBuffer.
-        void unlockImpl( size_t lockStart, size_t lockSize );
-
-        void stall(void);
-
     public:
-        MetalHardwareBufferCommon( size_t sizeBytes, HardwareBuffer::Usage usage, bool useShadowBuffer,
-                                   uint16 alignment, MetalDiscardBufferManager *discardBufferManager,
+        MetalHardwareBufferCommon( size_t sizeBytes, HardwareBuffer::Usage usage, uint16 alignment,
+                                   MetalDiscardBufferManager *discardBufferManager,
                                    MetalDevice *device );
         virtual ~MetalHardwareBufferCommon();
+
+        void _notifyDeviceStalled(void);
 
         /// Returns the actual API buffer, but first sets mLastFrameUsed as
         /// we assume you're calling this function to the buffer in the GPU.
         id<MTLBuffer> getBufferName(void);
         id<MTLBuffer> getBufferNameForGpuWrite(void);
+
+        /// @see HardwareBuffer.
+        void* lockImpl( size_t offset, size_t length,
+                        HardwareBuffer::LockOptions options, bool isLocked );
+        /// @see HardwareBuffer.
+        void unlockImpl( size_t lockStart, size_t lockSize );
 
         /// @see HardwareBuffer.
         void readData( size_t offset, size_t length, void* pDest );
@@ -76,7 +81,7 @@ namespace v1
         void writeData( size_t offset, size_t length,
                         const void* pSource, bool discardWholeBuffer = false );
         /// @see HardwareBuffer.
-        void copyData( MetalHardwareBufferCommon &srcBuffer, size_t srcOffset,
+        void copyData( MetalHardwareBufferCommon *srcBuffer, size_t srcOffset,
                        size_t dstOffset, size_t length, bool discardWholeBuffer = false );
 
         size_t getSizeBytes(void) const         { return mSizeBytes; }

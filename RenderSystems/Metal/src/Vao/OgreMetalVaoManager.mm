@@ -868,6 +868,32 @@ namespace Ogre
         mDynamicBufferCurrentFrame = (mDynamicBufferCurrentFrame + 1) % mDynamicBufferMultiplier;
     }
     //-----------------------------------------------------------------------------------
+    void MetalVaoManager::_notifyDeviceStalled(void)
+    {
+        for( size_t i=0; i<2u; ++i )
+        {
+            StagingBufferVec::const_iterator itor = mRefedStagingBuffers[i].begin();
+            StagingBufferVec::const_iterator end  = mRefedStagingBuffers[i].end();
+
+            while( itor != end )
+            {
+                MetalStagingBuffer *stagingBuffer = static_cast<MetalStagingBuffer*>( *itor );
+                stagingBuffer->_notifyDeviceStalled();
+                ++itor;
+            }
+
+            itor = mZeroRefStagingBuffers[i].begin();
+            end  = mZeroRefStagingBuffers[i].end();
+
+            while( itor != end )
+            {
+                MetalStagingBuffer *stagingBuffer = static_cast<MetalStagingBuffer*>( *itor );
+                stagingBuffer->_notifyDeviceStalled();
+                ++itor;
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
     uint8 MetalVaoManager::waitForTailFrameToFinish(void)
     {
         //Don't wait because MetalRenderSystem::_beginFrameOnce does a global waiting for us.

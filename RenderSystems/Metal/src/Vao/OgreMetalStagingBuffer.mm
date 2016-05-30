@@ -312,6 +312,14 @@ namespace Ogre
             addFence( mUnfencedHazards.front().start, mUnfencedHazards.back().end, true );
     }
     //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::_notifyDeviceStalled(void)
+    {
+        deleteFences( mFences.begin(), mFences.end() );
+        mFences.clear();
+        mUnfencedHazards.clear();
+        mUnfencedBytes = 0;
+    }
+    //-----------------------------------------------------------------------------------
     void MetalStagingBuffer::_unmapToV1( v1::MetalHardwareBufferCommon *hwBuffer,
                                          size_t lockStart, size_t lockSize )
     {

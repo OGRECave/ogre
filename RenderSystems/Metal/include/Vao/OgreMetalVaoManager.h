@@ -256,6 +256,7 @@ namespace Ogre
                                                   size_t elementStart, size_t elementCount );
 
         virtual void _update(void);
+        void _notifyDeviceStalled(void);
 
         /// @see VaoManager::waitForTailFrameToFinish
         uint8 waitForTailFrameToFinish(void);

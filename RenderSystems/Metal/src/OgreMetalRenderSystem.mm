@@ -37,7 +37,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalDevice.h"
 #include "OgreMetalGpuProgramManager.h"
 
-#include "OgreDefaultHardwareBufferManager.h"
+#include "OgreMetalHardwareBufferManager.h"
 
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "Vao/OgreVertexArrayObject.h"
@@ -175,9 +175,9 @@ namespace Ogre
 
             initialiseFromRenderSystemCapabilities( mCurrentCapabilities, 0 );
 
-            mHardwareBufferManager = new v1::DefaultHardwareBufferManager();
             mTextureManager = new MetalTextureManager();
             mVaoManager = OGRE_NEW MetalVaoManager( c_inFlightCommandBuffers, &mDevice );
+            mHardwareBufferManager = new v1::MetalHardwareBufferManager( &mDevice, mVaoManager );
 
             mInitialized = true;
         }
@@ -408,6 +408,16 @@ namespace Ogre
         mActiveRenderEncoder = 0;
         mPso = 0;
     }
+	//-------------------------------------------------------------------------
+	void MetalRenderSystem::_notifyDeviceStalled(void)
+	{
+        v1::MetalHardwareBufferManager *hwBufferMgr = static_cast<v1::MetalHardwareBufferManager*>(
+                    mHardwareBufferManager );
+        MetalVaoManager *vaoManager = static_cast<MetalVaoManager*>( mVaoManager );
+
+        hwBufferMgr->_notifyDeviceStalled();
+        vaoManager->_notifyDeviceStalled();
+	}
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
     {

@@ -138,6 +138,6 @@ namespace Ogre
                          "MetalDevice::stall" );
         }
 
-        //TODO: Call a manager so we can inform everyone it's safe (to avoid more unnecessary stalls)
+        mRenderSystem->_notifyDeviceStalled();
     }
 }

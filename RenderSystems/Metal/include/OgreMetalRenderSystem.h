@@ -260,6 +260,7 @@ namespace Ogre
 
         void _clearRenderTargetImmediately( RenderTarget *renderTarget );
         void _notifyActiveEncoderEnded(void);
+        void _notifyDeviceStalled(void);
     };
 }
 
