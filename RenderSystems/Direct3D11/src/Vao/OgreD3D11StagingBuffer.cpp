@@ -106,7 +106,7 @@ namespace Ogre
             mMappingStart = 0;
     }
     //-----------------------------------------------------------------------------------
-    StagingStallType D3D11StagingBuffer::uploadWillStall( size_t sizeBytes ) const
+    StagingStallType D3D11StagingBuffer::uploadWillStall( size_t sizeBytes )
     {
         assert( mUploadOnly );
 

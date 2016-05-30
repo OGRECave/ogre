@@ -246,7 +246,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    StagingStallType MetalStagingBuffer::uploadWillStall( size_t sizeBytes ) const
+    StagingStallType MetalStagingBuffer::uploadWillStall( size_t sizeBytes )
     {
         assert( mUploadOnly );
 
@@ -273,10 +273,10 @@ namespace Ogre
 
         MetalFence regionToMap( mappingStart, mappingStart + sizeBytes );
 
-        MetalFenceVec::const_iterator itor = mFences.begin();
-        MetalFenceVec::const_iterator end  = mFences.end();
+        MetalFenceVec::iterator itor = mFences.begin();
+        MetalFenceVec::iterator end  = mFences.end();
 
-        MetalFenceVec::const_iterator lastWaitableFence = end;
+        MetalFenceVec::iterator lastWaitableFence = end;
 
         while( itor != end )
         {

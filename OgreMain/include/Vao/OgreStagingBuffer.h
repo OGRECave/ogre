@@ -193,7 +193,7 @@ namespace Ogre
             mUploadOnly must be false.
             It is the counter side of @see canDownload
         */
-        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes );
 
         /** Checks if this staging buffer has enough free space to use _asyncDownload.
             Otherwise such function would raise an exception.

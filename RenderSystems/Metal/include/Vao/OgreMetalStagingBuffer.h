@@ -114,7 +114,7 @@ namespace Ogre
                             id<MTLBuffer> vboName, MetalDevice *device );
         virtual ~MetalStagingBuffer();
 
-        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes );
 
         void cleanUnfencedHazards(void);
 

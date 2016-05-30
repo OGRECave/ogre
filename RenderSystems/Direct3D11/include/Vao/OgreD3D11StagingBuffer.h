@@ -84,7 +84,7 @@ namespace Ogre
                             ID3D11Buffer *stagingBuffer, D3D11Device &device );
         virtual ~D3D11StagingBuffer();
 
-        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes );
 
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
 
