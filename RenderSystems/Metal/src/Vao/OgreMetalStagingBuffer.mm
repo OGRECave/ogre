@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "Vao/OgreMetalVaoManager.h"
 #include "Vao/OgreMetalBufferInterface.h"
 
+#include "OgreMetalHardwareBufferCommon.h"
 #include "OgreMetalDevice.h"
 
 #include "OgreStringConverter.h"
@@ -311,6 +312,35 @@ namespace Ogre
             addFence( mUnfencedHazards.front().start, mUnfencedHazards.back().end, true );
     }
     //-----------------------------------------------------------------------------------
+    void MetalStagingBuffer::_unmapToV1( v1::MetalHardwareBufferCommon *hwBuffer,
+                                         size_t lockStart, size_t lockSize )
+    {
+        assert( mUploadOnly );
+
+        if( mUploadOnly )
+        {
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+            NSRange range = NSMakeRange( mInternalBufferStart + mMappingStart, mMappingCount );
+            [mVboName didModifyRange:range];
+#endif
+        }
+
+        mMappedPtr = 0;
+
+        __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
+        [blitEncoder copyFromBuffer:mVboName
+                                    sourceOffset:mInternalBufferStart + mMappingStart
+                                    toBuffer:hwBuffer->getBufferNameForGpuWrite()
+                                    destinationOffset:lockStart
+                                    size:alignToNextMultiple( lockSize, 4u )];
+
+        if( mUploadOnly )
+        {
+            //Add fence to this region (or at least, track the hazard).
+            addFence( mMappingStart, mMappingStart + mMappingCount - 1, false );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     //
     //  DOWNLOADS
     //
@@ -386,5 +416,46 @@ namespace Ogre
         _cancelDownload( offset, sizeBytes );
 
         return mMappedPtr;
+    }
+    //-----------------------------------------------------------------------------------
+    size_t MetalStagingBuffer::_asyncDownloadV1( v1::MetalHardwareBufferCommon *source,
+                                                 size_t srcOffset, size_t srcLength )
+    {
+        //Metal has alignment restrictions of 4 bytes for offset and size in copyFromBuffer
+        size_t freeRegionOffset = getFreeDownloadRegion( alignToNextMultiple( srcLength, 4u ) );
+
+        if( freeRegionOffset == -1 )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "Cannot download the request amount of " +
+                         StringConverter::toString( srcLength ) + " bytes to this staging buffer. "
+                         "Try another one (we're full of requests that haven't been read by CPU yet)",
+                         "MetalStagingBuffer::_asyncDownload" );
+        }
+
+        assert( !mUploadOnly );
+        assert( dynamic_cast<MetalBufferInterface*>( source->getBufferInterface() ) );
+        assert( (srcOffset + srcLength) <= source->getTotalSizeBytes() );
+
+        size_t extraOffset = 0;
+        if( srcOffset & 0x04 )
+        {
+            //Not multiple of 4. Backtrack to make it multiple of 4, then add this value
+            //to the return value so it gets correctly mapped in _mapForRead.
+            extraOffset = srcOffset & 0x04;
+            srcOffset -= extraOffset;
+        }
+
+        __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
+        [blitEncoder copyFromBuffer:source->getBufferName()
+                                    sourceOffset:srcOffset
+                                    toBuffer:mVboName
+                                    destinationOffset:mInternalBufferStart + freeRegionOffset
+                                    size:alignToNextMultiple( srcLength, 4u )];
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        [blitEncoder synchronizeResource:mVboName];
+#endif
+
+        return freeRegionOffset + extraOffset;
     }
 }

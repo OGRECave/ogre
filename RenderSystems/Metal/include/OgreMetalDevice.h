@@ -31,6 +31,8 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreMetalPrerequisites.h"
 
+#import <dispatch/dispatch.h>
+
 namespace Ogre
 {
     struct _OgreMetalExport MetalDevice
@@ -40,8 +42,8 @@ namespace Ogre
         id<MTLCommandBuffer>    mCurrentCommandBuffer;
         id<MTLBlitCommandEncoder>   mBlitEncoder;
         id<MTLRenderCommandEncoder> mRenderEncoder;
-
         MetalRenderSystem       *mRenderSystem;
+        dispatch_semaphore_t    mStallSemaphore;
 
         MetalDevice( MetalRenderSystem *renderSystem );
         ~MetalDevice();
@@ -66,6 +68,9 @@ namespace Ogre
             __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
         */
         id<MTLBlitCommandEncoder> getBlitEncoder(void);
+
+        /// Waits for the GPU to finish all pending commands.
+        void stall(void);
     };
 }
 

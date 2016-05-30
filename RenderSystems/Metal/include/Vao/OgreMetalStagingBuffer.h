@@ -118,9 +118,13 @@ namespace Ogre
 
         void cleanUnfencedHazards(void);
 
+        void _unmapToV1( v1::MetalHardwareBufferCommon *hwBuffer, size_t lockStart, size_t lockSize );
+
         virtual bool canDownload( size_t length ) const;
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
         virtual void _cancelDownload( size_t offset, size_t sizeBytes );
+        virtual size_t _asyncDownloadV1( v1::MetalHardwareBufferCommon *source,
+                                         size_t srcOffset, size_t srcLength );
 
         id<MTLBuffer> getBufferName(void) const     { return mVboName; }
     };

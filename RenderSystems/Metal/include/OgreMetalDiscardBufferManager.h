@@ -113,6 +113,8 @@ namespace Ogre
             MetalDiscardBuffer to destroy
         */
         void destroyDiscardBuffer( MetalDiscardBuffer *discardBuffer );
+
+        VaoManager* getVaoManager(void) const       { return mVaoManager; }
     };
 
     class _OgreMetalExport MetalDiscardBuffer
@@ -134,6 +136,14 @@ namespace Ogre
         MetalDiscardBuffer( size_t bufferSize, uint16 alignment, VaoManager *vaoManager,
                             MetalDiscardBufferManager *owner );
 
+        /** Returns a pointer that maps to the beginning of this buffer to begin writing.
+        @param noOverwrite
+            When true, noOverwrite is slow
+        @return
+        */
+        void* map( bool noOverwrite );
+        void unmap(void);
+
         uint16 getAlignment(void) const         { return mAlignment; }
         /// Size of the buffer, may be bigger than requested due to 4-byte alignment required by Metal.
         size_t getSizeBytes(void) const         { return mBufferSize; }
@@ -146,6 +156,8 @@ namespace Ogre
         /// For internal use by MetalDiscardBufferManager
         size_t getBlockStart(void) const        { return mBufferOffset - mBlockPrePadding; }
         size_t getBlockSize(void) const         { return mBufferSize + mBlockPrePadding; }
+
+        MetalDiscardBufferManager* getOwner(void)   { return mOwner; }
     };
 }
 

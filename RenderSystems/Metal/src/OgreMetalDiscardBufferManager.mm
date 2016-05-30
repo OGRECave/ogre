@@ -43,10 +43,17 @@ namespace Ogre
         mVaoManager( vaoManager )
     {
         const size_t defaultCapacity = 4 * 1024 * 1024;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         MTLResourceOptions resourceOptions = MTLResourceCPUCacheModeWriteCombined |
                                              MTLResourceStorageModeShared;
+#else
+        MTLResourceOptions resourceOptions = MTLResourceCPUCacheModeWriteCombined |
+                                             MTLResourceStorageModeManaged;
+#endif
 
         mBuffer = [mDevice->mDevice newBufferWithLength:defaultCapacity options:resourceOptions];
+        mBuffer.label = @"Discardable Buffer";
         mFreeBlocks.push_back( MetalVaoManager::Block( 0, defaultCapacity ) );
     }
     //-------------------------------------------------------------------------
@@ -74,9 +81,10 @@ namespace Ogre
                                              MTLResourceStorageModeShared;
         id<MTLBuffer> oldBuffer = mBuffer;
         mBuffer = [mDevice->mDevice newBufferWithLength:newCapacity options:resourceOptions];
+        mBuffer.label = @"Discardable Buffer";
 
         //TODO DEBUG: We need to check if we need to retain oldBuffer or Metal does that.
-        NSLog( @"Pre: Retain count is %ld", CFGetRetainCount( (__bridge CFTypeRef)oldBuffer ) );
+        NSLog( @"DEBUG Pre: Retain count is %ld", CFGetRetainCount( (__bridge CFTypeRef)oldBuffer ) );
 
         {
             //Update our buffers so they point to the new buffer, copy their blocks in use from old
@@ -109,7 +117,18 @@ namespace Ogre
             }
         }
 
-        NSLog( @"Pos: Retain count is %ld", CFGetRetainCount( (__bridge CFTypeRef)oldBuffer ) );
+        NSLog( @"DEBUG Pos: Retain count is %ld", CFGetRetainCount( (__bridge CFTypeRef)oldBuffer ) );
+
+        LogManager::getSingleton().logMessage(
+                    "PERFORMANCE WARNING: MetalDiscardBufferManager::growToFit must stall."
+                    "Consider increasing the default discard capacity to at least " +
+                    StringConverter::toString( newCapacity ) + " bytes" );
+
+        //According to Metal docs, it's undefined behavior if both CPU & GPU
+        //write to the same resource even if the regions don't overlap.
+        mDevice->stall();
+
+        NSLog( @"DEBUG Pos2: Retain count is %ld", CFGetRetainCount( (__bridge CFTypeRef)oldBuffer ) );
 
         mFreeBlocks.push_back( MetalVaoManager::Block( oldCapacity, newCapacity - oldCapacity ) );
 
@@ -283,10 +302,25 @@ namespace Ogre
         mBufferOffset( 0 ),
         mBufferSize( bufferSize ),
         mAlignment( alignment ),
-        mLastFrameUsed( 0 ),
+        mLastFrameUsed( vaoManager->getFrameCount() - vaoManager->getDynamicBufferMultiplier() ),
         mVaoManager( vaoManager ),
         mOwner( owner )
     {
+    }
+    //-------------------------------------------------------------------------
+    void* MetalDiscardBuffer::map( bool noOverwrite )
+    {
+        if( !noOverwrite )
+            mOwner->_getBlock( this );
+        return reinterpret_cast<uint8*>( [mBuffer contents] ) + mBufferOffset;
+    }
+    //-------------------------------------------------------------------------
+    void MetalDiscardBuffer::unmap(void)
+    {
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        NSRange range = NSMakeRange( mBufferOffset, mBufferSize );
+        [mBuffer didModifyRange:range];
+#endif
     }
     //-------------------------------------------------------------------------
     id<MTLBuffer> MetalDiscardBuffer::getBufferName(void)

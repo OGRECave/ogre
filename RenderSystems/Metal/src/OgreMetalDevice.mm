@@ -41,8 +41,10 @@ namespace Ogre
         mCurrentCommandBuffer( 0 ),
         mBlitEncoder( 0 ),
         mRenderEncoder( 0 ),
-        mRenderSystem( renderSystem )
+        mRenderSystem( renderSystem ),
+        mStallSemaphore( 0 )
     {
+        mStallSemaphore = dispatch_semaphore_create( 0 );
     }
     //-------------------------------------------------------------------------
     MetalDevice::~MetalDevice()
@@ -114,5 +116,28 @@ namespace Ogre
         }
 
         return mBlitEncoder;
+    }
+    //-------------------------------------------------------------------------
+    void MetalDevice::stall(void)
+    {
+        __block dispatch_semaphore_t blockSemaphore = mStallSemaphore;
+        [mCurrentCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
+        {
+            dispatch_semaphore_signal( blockSemaphore );
+        }];
+        commitAndNextCommandBuffer();
+
+        const long result = dispatch_semaphore_wait( mStallSemaphore, DISPATCH_TIME_FOREVER );
+
+        if( result != 0 )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Failure while waiting for a MetalFence. Could be out of GPU memory. "
+                         "Update your video card drivers. If that doesn't help, "
+                         "contact the developers. Error code: " + StringConverter::toString( result ),
+                         "MetalDevice::stall" );
+        }
+
+        //TODO: Call a manager so we can inform everyone it's safe (to avoid more unnecessary stalls)
     }
 }

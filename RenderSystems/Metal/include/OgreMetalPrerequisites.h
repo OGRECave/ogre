@@ -50,6 +50,8 @@ namespace Ogre
     // Forward declarations
     class MetalDepthBuffer;
     struct MetalDevice;
+    class MetalDiscardBuffer;
+    class MetalDiscardBufferManager;
     class MetalDynamicBuffer;
     class MetalGpuProgramManager;
     struct MetalHlmsPso;
@@ -57,6 +59,11 @@ namespace Ogre
     class MetalRenderSystem;
     class MetalRenderTargetCommon;
     class MetalVaoManager;
+
+    namespace v1
+    {
+        class MetalHardwareBufferCommon;
+    }
 }
 
 #if defined ( OGRE_GCC_VISIBILITY )
