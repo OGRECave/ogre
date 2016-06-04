@@ -270,10 +270,6 @@ namespace Ogre
             smallestBlock->offset   = discardBuffer->mBufferOffset + discardBuffer->mBufferSize;
             smallestBlock->size     -= shrunkBytes;
 
-            mUnsafeBlocks.push_back( UnsafeBlock( discardBuffer->getBlockStart(),
-                                                  discardBuffer->getBlockSize(),
-                                                  mVaoManager->getFrameCount() ) );
-
             if( smallestBlock->size == 0 )
             {
                 mFreeBlocks.erase( smallestBlock );
@@ -358,9 +354,10 @@ namespace Ogre
 #endif
     }
     //-------------------------------------------------------------------------
-    id<MTLBuffer> MetalDiscardBuffer::getBufferName(void)
+    id<MTLBuffer> MetalDiscardBuffer::getBufferName( size_t &outOffset )
     {
         mLastFrameUsed = mVaoManager->getFrameCount();
+        outOffset = mBufferOffset;
         return mBuffer;
     }
 }

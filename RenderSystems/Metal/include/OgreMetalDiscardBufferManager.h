@@ -152,9 +152,15 @@ namespace Ogre
         size_t getSizeBytes(void) const         { return mBufferSize; }
 
         size_t getOffset(void) const            { return mBufferOffset; }
-        /// Returns the actual API buffer, but first sets mLastFrameUsed as
-        /// we assume you're calling this function to the buffer in the GPU.
-        id<MTLBuffer> getBufferName(void);
+        /** Returns the actual API buffer, but first sets mLastFrameUsed as we
+            assume you're calling this function to use the buffer in the GPU.
+        @param outOffset
+            Out. Guaranteed to be written. Used to point to the start
+            of our data in the internal ring buffer we've allocated.
+        @return
+            The MTLBuffer in question.
+        */
+        id<MTLBuffer> getBufferName( size_t &outOffset );
 
         /// For internal use by MetalDiscardBufferManager
         size_t getBlockStart(void) const        { return mBufferOffset - mBlockPrePadding; }

@@ -467,9 +467,12 @@ namespace Ogre
             srcOffset -= extraOffset;
         }
 
+        size_t srcOffsetStart = 0;
+        __unsafe_unretained id<MTLBuffer> srcBuffer = source->getBufferName( srcOffsetStart );
+
         __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
-        [blitEncoder copyFromBuffer:source->getBufferName()
-                                    sourceOffset:srcOffset
+        [blitEncoder copyFromBuffer:srcBuffer
+                                    sourceOffset:srcOffset + srcOffsetStart
                                     toBuffer:mVboName
                                     destinationOffset:mInternalBufferStart + freeRegionOffset
                                     size:alignToNextMultiple( srcLength, 4u )];

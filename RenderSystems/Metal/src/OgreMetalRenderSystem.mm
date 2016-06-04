@@ -855,8 +855,10 @@ namespace Ogre
 #if OGRE_DEBUG_MODE
             assert( slot < 16u );
 #endif
-            offsets[slot]            = cmd->vertexData->vertexStart * metalBuffer->getVertexSize();
-            metalVertexBuffers[slot] = metalBuffer->getBufferName();
+            size_t offsetStart;
+            metalVertexBuffers[slot] = metalBuffer->getBufferName( offsetStart );
+            offsets[slot]            = cmd->vertexData->vertexStart * metalBuffer->getVertexSize() +
+                                                                                        offsetStart;
 
             ++itor;
             maxUsedSlot = std::max( maxUsedSlot, slot + 1u );
@@ -878,9 +880,10 @@ namespace Ogre
         //Get index buffer stuff which is the same for all draws in this cmd
         const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
 
+        size_t offsetStart;
         v1::MetalHardwareIndexBuffer *metalBuffer =
             static_cast<v1::MetalHardwareIndexBuffer*>( mCurrentIndexBuffer->indexBuffer.get() );
-        __unsafe_unretained id<MTLBuffer> indexBuffer = metalBuffer->getBufferName();
+        __unsafe_unretained id<MTLBuffer> indexBuffer = metalBuffer->getBufferName( offsetStart );
 
         //TODO: Setup baseInstance.
 
@@ -895,7 +898,7 @@ namespace Ogre
                    indexCount:cmd->primCount
                     indexType:indexType
                   indexBuffer:indexBuffer
-            indexBufferOffset:cmd->firstVertexIndex * bytesPerIndexElement
+            indexBufferOffset:cmd->firstVertexIndex * bytesPerIndexElement + offsetStart
             instanceCount:cmd->instanceCount];
     }
     //-------------------------------------------------------------------------

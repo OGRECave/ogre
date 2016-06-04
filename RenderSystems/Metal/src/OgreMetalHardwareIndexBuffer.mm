@@ -62,9 +62,9 @@ namespace v1 {
         mMetalHardwareBufferCommon._notifyDeviceStalled();
     }
     //-----------------------------------------------------------------------------------
-    id<MTLBuffer> MetalHardwareIndexBuffer::getBufferName(void)
+    id<MTLBuffer> MetalHardwareIndexBuffer::getBufferName( size_t &outOffset )
     {
-        return mMetalHardwareBufferCommon.getBufferName();
+        return mMetalHardwareBufferCommon.getBufferName( outOffset );
     }
     //-----------------------------------------------------------------------------------
     id<MTLBuffer> MetalHardwareIndexBuffer::getBufferNameForGpuWrite(void)

@@ -94,10 +94,11 @@ namespace v1
         mLastFrameGpuWrote  = mLastFrameUsed;
     }
     //-----------------------------------------------------------------------------------
-    id<MTLBuffer> MetalHardwareBufferCommon::getBufferName(void)
+    id<MTLBuffer> MetalHardwareBufferCommon::getBufferName( size_t &outOffset )
     {
         mLastFrameUsed = mVaoManager->getFrameCount();
-        return !mDiscardBuffer ? mBuffer : mDiscardBuffer->getBufferName();
+        outOffset = 0;
+        return !mDiscardBuffer ? mBuffer : mDiscardBuffer->getBufferName( outOffset );
     }
     //-----------------------------------------------------------------------------------
     id<MTLBuffer> MetalHardwareBufferCommon::getBufferNameForGpuWrite(void)
@@ -277,12 +278,13 @@ namespace v1
     {
         if( !this->mDiscardBuffer || srcBuffer->mBuffer.storageMode == MTLStorageModePrivate )
         {
-            __unsafe_unretained id<MTLBuffer> srcBuf = srcBuffer->getBufferName();
+            size_t srcOffsetStart = 0;
+            __unsafe_unretained id<MTLBuffer> srcBuf = srcBuffer->getBufferName( srcOffsetStart );
             __unsafe_unretained id<MTLBuffer> dstBuf = this->getBufferNameForGpuWrite();
 
             __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
             [blitEncoder copyFromBuffer:srcBuf
-                           sourceOffset:srcOffset
+                           sourceOffset:srcOffset + srcOffsetStart
                                toBuffer:dstBuf
                       destinationOffset:dstOffset
                                    size:length];

@@ -63,9 +63,15 @@ namespace v1
 
         void _notifyDeviceStalled(void);
 
-        /// Returns the actual API buffer, but first sets mLastFrameUsed as
-        /// we assume you're calling this function to the buffer in the GPU.
-        id<MTLBuffer> getBufferName(void);
+        /** Returns the actual API buffer, but first sets mLastFrameUsed as we
+            assume you're calling this function to use the buffer in the GPU.
+        @param outOffset
+            Out. Guaranteed to be written. Used by HBU_DISCARDABLE buffers which
+            need an offset to the internal ring buffer we've allocated.
+        @return
+            The MTLBuffer in question.
+        */
+        id<MTLBuffer> getBufferName( size_t &outOffset );
         id<MTLBuffer> getBufferNameForGpuWrite(void);
 
         /// @see HardwareBuffer.

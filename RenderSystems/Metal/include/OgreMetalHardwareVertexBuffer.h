@@ -52,7 +52,7 @@ namespace v1 {
         void _notifyDeviceStalled(void);
 
         /// @copydoc MetalHardwareBufferCommon::getBufferName
-        id<MTLBuffer> getBufferName(void);
+        id<MTLBuffer> getBufferName( size_t &outOffset );
         /// @copydoc MetalHardwareBufferCommon::getBufferNameForGpuWrite
         id<MTLBuffer> getBufferNameForGpuWrite(void);
 
