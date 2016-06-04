@@ -62,6 +62,16 @@ namespace v1 {
         mMetalHardwareBufferCommon._notifyDeviceStalled();
     }
     //-----------------------------------------------------------------------------------
+    id<MTLBuffer> MetalHardwareVertexBuffer::getBufferName(void)
+    {
+        return mMetalHardwareBufferCommon.getBufferName();
+    }
+    //-----------------------------------------------------------------------------------
+    id<MTLBuffer> MetalHardwareVertexBuffer::getBufferNameForGpuWrite(void)
+    {
+        return mMetalHardwareBufferCommon.getBufferNameForGpuWrite();
+    }
+    //-----------------------------------------------------------------------------------
     void MetalHardwareVertexBuffer::readData( size_t offset, size_t length, void* pDest )
     {
         if( mUseShadowBuffer )

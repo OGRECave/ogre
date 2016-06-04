@@ -63,6 +63,8 @@ namespace Ogre
     namespace v1
     {
         class MetalHardwareBufferCommon;
+        class MetalHardwareIndexBuffer;
+        class MetalHardwareVertexBuffer;
     }
 }
 

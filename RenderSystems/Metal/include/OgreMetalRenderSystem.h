@@ -34,6 +34,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreRenderSystem.h"
 #include "OgreMetalDevice.h"
 
+#import <Metal/MTLRenderCommandEncoder.h>
 #import <dispatch/dispatch.h>
 
 namespace Ogre
@@ -92,8 +93,12 @@ namespace Ogre
 
         __unsafe_unretained id<MTLBuffer>   mIndirectBuffer;
         unsigned char                       *mSwIndirectBufferPtr;
-        CachedDepthStencilStateVec mDepthStencilStates;
-        MetalHlmsPso const *mPso;
+        CachedDepthStencilStateVec          mDepthStencilStates;
+        MetalHlmsPso const                  *mPso;
+
+        //For v1 rendering.
+        v1::IndexData       *mCurrentIndexBuffer;
+        MTLPrimitiveType    mCurrentPrimType;
 
         uint8           mNumMRTs;
         MetalRenderTargetCommon     *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];

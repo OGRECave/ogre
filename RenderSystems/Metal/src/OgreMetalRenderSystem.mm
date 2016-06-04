@@ -38,6 +38,8 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalGpuProgramManager.h"
 
 #include "OgreMetalHardwareBufferManager.h"
+#include "OgreMetalHardwareIndexBuffer.h"
+#include "OgreMetalHardwareVertexBuffer.h"
 
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "Vao/OgreVertexArrayObject.h"
@@ -59,6 +61,8 @@ namespace Ogre
         mIndirectBuffer( 0 ),
         mSwIndirectBufferPtr( 0 ),
         mPso( 0 ),
+        mCurrentIndexBuffer( 0 ),
+        mCurrentPrimType( MTLPrimitiveTypePoint ),
         mNumMRTs( 0 ),
         mCurrentDepthBuffer( 0 ),
         mActiveDevice( 0 ),
@@ -797,7 +801,7 @@ namespace Ogre
                         indexType:indexType
                       indexBuffer:indexBuffer
                 indexBufferOffset:drawCmd->firstVertexIndex * bytesPerIndexElement
-                instanceCount:drawCmd->instanceCount];
+                    instanceCount:drawCmd->instanceCount];
             ++drawCmd;
         }
     }
@@ -832,14 +836,76 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setRenderOperation( const v1::CbRenderOp *cmd )
     {
+        __unsafe_unretained id<MTLBuffer> metalVertexBuffers[16];
+        NSUInteger offsets[16];
+        memset( offsets, 0, sizeof(offsets) );
+
+        size_t maxUsedSlot = 0;
+        const v1::VertexBufferBinding::VertexBufferBindingMap& binds =
+                cmd->vertexData->vertexBufferBinding->getBindings();
+        v1::VertexBufferBinding::VertexBufferBindingMap::const_iterator itor = binds.begin();
+        v1::VertexBufferBinding::VertexBufferBindingMap::const_iterator end  = binds.end();
+
+        while( itor != end )
+        {
+            v1::MetalHardwareVertexBuffer *metalBuffer =
+                static_cast<v1::MetalHardwareVertexBuffer*>( itor->second.get() );
+
+            const size_t slot = itor->first;
+#if OGRE_DEBUG_MODE
+            assert( slot < 16u );
+#endif
+            offsets[slot]            = cmd->vertexData->vertexStart * metalBuffer->getVertexSize();
+            metalVertexBuffers[slot] = metalBuffer->getBufferName();
+
+            ++itor;
+            maxUsedSlot = std::max( maxUsedSlot, slot + 1u );
+        }
+
+        [mActiveRenderEncoder setVertexBuffers:metalVertexBuffers offsets:offsets
+                                               withRange:NSMakeRange( 0, maxUsedSlot )];
+
+        mCurrentIndexBuffer = cmd->indexData;
+        mCurrentPrimType    = std::min(  MTLPrimitiveTypeTriangleStrip,
+                                         static_cast<MTLPrimitiveType>( cmd->operationType - 1u ) );
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_render( const v1::CbDrawCallIndexed *cmd )
     {
+        const MTLIndexType indexType = static_cast<MTLIndexType>(
+                    mCurrentIndexBuffer->indexBuffer->getType() );
+
+        //Get index buffer stuff which is the same for all draws in this cmd
+        const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
+
+        v1::MetalHardwareIndexBuffer *metalBuffer =
+            static_cast<v1::MetalHardwareIndexBuffer*>( mCurrentIndexBuffer->indexBuffer.get() );
+        __unsafe_unretained id<MTLBuffer> indexBuffer = metalBuffer->getBufferName();
+
+        //TODO: Setup baseInstance.
+
+#if OGRE_DEBUG_MODE
+        assert( ((cmd->firstVertexIndex * bytesPerIndexElement) & 0x04) == 0
+                && "Index Buffer must be aligned to 4 bytes. If you're messing with "
+                "IndexBuffer::indexStart, you've entered an invalid "
+                "indexStart; not supported by the Metal API." );
+#endif
+
+        [mActiveRenderEncoder drawIndexedPrimitives:mCurrentPrimType
+                   indexCount:cmd->primCount
+                    indexType:indexType
+                  indexBuffer:indexBuffer
+            indexBufferOffset:cmd->firstVertexIndex * bytesPerIndexElement
+            instanceCount:cmd->instanceCount];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_render( const v1::CbDrawCallStrip *cmd )
     {
+        //TODO: Setup baseInstance.
+        [mActiveRenderEncoder drawPrimitives:mCurrentPrimType
+                  vertexStart:0 /*cmd->firstVertexIndex already handled in _setRenderOperation*/
+                  vertexCount:cmd->primCount
+                instanceCount:cmd->instanceCount];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::bindGpuProgramParameters(GpuProgramType gptype,

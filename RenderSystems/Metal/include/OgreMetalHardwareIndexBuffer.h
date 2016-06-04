@@ -51,6 +51,11 @@ namespace v1 {
 
         void _notifyDeviceStalled(void);
 
+        /// @copydoc MetalHardwareBufferCommon::getBufferName
+        id<MTLBuffer> getBufferName(void);
+        /// @copydoc MetalHardwareBufferCommon::getBufferNameForGpuWrite
+        id<MTLBuffer> getBufferNameForGpuWrite(void);
+
         virtual void readData( size_t offset, size_t length, void* pDest );
         virtual void writeData( size_t offset, size_t length,
                                 const void* pSource, bool discardWholeBuffer = false );
