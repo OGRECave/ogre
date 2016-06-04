@@ -75,6 +75,8 @@ namespace v1 {
                 ++itor;
             }
         }
+
+        mDiscardBufferManager->_notifyDeviceStalled();
     }
     //-----------------------------------------------------------------------------------
     HardwareVertexBufferSharedPtr

@@ -167,6 +167,38 @@ namespace Ogre
         mUnsafeBlocks.erase( mUnsafeBlocks.begin(), itor );
     }
     //-------------------------------------------------------------------------
+    void MetalDiscardBufferManager::_notifyDeviceStalled(void)
+    {
+        {
+            UnsafeBlockVec::iterator itor = mUnsafeBlocks.begin();
+            UnsafeBlockVec::iterator end  = mUnsafeBlocks.end();
+
+            while( itor != end )
+            {
+                //This block is safe now to put back into free blocks.
+                mFreeBlocks.push_back( *itor );
+                MetalVaoManager::mergeContiguousBlocks( mFreeBlocks.end() - 1, mFreeBlocks );
+                ++itor;
+            }
+
+            mUnsafeBlocks.clear();
+        }
+
+        {
+            const uint32 currentFrame       = mVaoManager->getFrameCount();
+            const uint32 bufferMultiplier   = mVaoManager->getDynamicBufferMultiplier();
+
+            MetalDiscardBufferVec::const_iterator itor = mDiscardBuffers.begin();
+            MetalDiscardBufferVec::const_iterator end  = mDiscardBuffers.end();
+
+            while( itor != end )
+            {
+                (*itor)->mLastFrameUsed = currentFrame - bufferMultiplier;
+                ++itor;
+            }
+        }
+    }
+    //-------------------------------------------------------------------------
     void MetalDiscardBufferManager::_getBlock( MetalDiscardBuffer *discardBuffer )
     {
         const size_t alignment = discardBuffer->getAlignment();

@@ -90,6 +90,8 @@ namespace Ogre
         MetalDiscardBufferManager( MetalDevice *device, VaoManager *vaoManager );
         ~MetalDiscardBufferManager();
 
+        void _notifyDeviceStalled(void);
+
         /** For internal use. Retrieves a fresh new block. The old block will be returned
             to a pool until it's safe to reuse again. Used by the DiscardBuffer when
             map( DISCARD ) is called.
