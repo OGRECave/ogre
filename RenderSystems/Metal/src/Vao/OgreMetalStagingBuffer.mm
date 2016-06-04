@@ -325,6 +325,13 @@ namespace Ogre
     {
         assert( mUploadOnly );
 
+        if( mMappingState != MS_MAPPED )
+        {
+            //This stuff would normally be done in StagingBuffer::unmap
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE, "Unmapping an unmapped buffer!",
+                         "MetalStagingBuffer::unmap" );
+        }
+
         if( mUploadOnly )
         {
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
@@ -347,6 +354,13 @@ namespace Ogre
             //Add fence to this region (or at least, track the hazard).
             addFence( mMappingStart, mMappingStart + mMappingCount - 1, false );
         }
+
+        //This stuff would normally be done in StagingBuffer::unmap
+        mMappingState = MS_UNMAPPED;
+        mMappingStart += mMappingCount;
+
+        if( mMappingStart >= mSizeBytes )
+            mMappingStart = 0;
     }
     //-----------------------------------------------------------------------------------
     //

@@ -284,10 +284,12 @@ namespace Ogre
     MetalDiscardBuffer* MetalDiscardBufferManager::createDiscardBuffer( size_t bufferSize,
                                                                         uint16 alignment )
     {
+        alignment = std::max<uint16>( 4u, alignment ); //Prevent alignments lower than 4 bytes.
         MetalDiscardBuffer *retVal = OGRE_NEW MetalDiscardBuffer( bufferSize, alignment,
                                                                   mVaoManager, this );
         mDiscardBuffers.push_back( retVal );
         _getBlock( retVal );
+        retVal->mBuffer = mBuffer;
 
         return retVal;
     }
@@ -338,6 +340,7 @@ namespace Ogre
         mVaoManager( vaoManager ),
         mOwner( owner )
     {
+        assert( alignment >= 4u );
     }
     //-------------------------------------------------------------------------
     void* MetalDiscardBuffer::map( bool noOverwrite )

@@ -47,6 +47,7 @@ namespace v1
         mDevice( device ),
         mDiscardBuffer( 0 ),
         mVaoManager( discardBufferMgr->getVaoManager() ),
+        mStagingBuffer( 0 ),
         mLastFrameUsed( 0 ),
         mLastFrameGpuWrote( 0 )
     {
@@ -67,7 +68,8 @@ namespace v1
 
         if( !(usage & HardwareBuffer::HBU_DISCARDABLE) )
         {
-            mBuffer = [mDevice->mDevice newBufferWithLength:sizeBytes options:resourceOptions];
+            mBuffer = [mDevice->mDevice newBufferWithLength:alignToNextMultiple( sizeBytes, 4u )
+                                                    options:resourceOptions];
         }
         else
         {

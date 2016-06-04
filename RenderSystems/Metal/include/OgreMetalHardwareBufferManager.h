@@ -62,12 +62,6 @@ namespace v1 {
                                                                     HardwareBuffer::Usage usage,
                                                                     bool useShadowBuffer,
                                                                     const String& name = "");
-        /// Create a uniform buffer
-        virtual HardwareUniformBufferSharedPtr createUniformBuffer( size_t sizeBytes,
-                                                                    HardwareBuffer::Usage usage,
-                                                                    bool useShadowBuffer,
-                                                                    size_t binding,
-                                                                    const String& name = "" );
         /// Create a counter buffer
         virtual HardwareCounterBufferSharedPtr createCounterBuffer( size_t sizeBytes,
                                                                     HardwareBuffer::Usage usage,
