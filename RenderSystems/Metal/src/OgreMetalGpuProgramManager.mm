@@ -31,7 +31,8 @@ THE SOFTWARE.
 #import "OgreLogManager.h"
 
 namespace Ogre {
-    MetalGpuProgramManager::MetalGpuProgramManager()
+    MetalGpuProgramManager::MetalGpuProgramManager( MetalDevice *device ) :
+        mDevice( device )
     {
         // Superclass sets up members
 
@@ -77,7 +78,7 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new MetalProgram(this, name, handle, group, isManual, loader);
+            return new MetalProgram(this, name, handle, group, isManual, loader, mDevice);
         }
 
         GpuProgramType gpt;
@@ -106,7 +107,7 @@ namespace Ogre {
         {
             // No factory, this is an unsupported syntax code, probably for another rendersystem
             // Create a basic one, it doesn't matter what it is since it won't be used
-            return new MetalProgram(this, name, handle, group, isManual, loader);
+            return new MetalProgram(this, name, handle, group, isManual, loader, mDevice);
         }
         
         return (iter->second)(this, name, handle, group, isManual, loader, gptype, syntaxCode);

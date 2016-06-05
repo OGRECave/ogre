@@ -35,7 +35,8 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     String MetalProgramFactory::sLanguageName = "metal";
     //-----------------------------------------------------------------------
-    MetalProgramFactory::MetalProgramFactory(void)
+    MetalProgramFactory::MetalProgramFactory( MetalDevice *device ) :
+        mDevice( device )
     {
     }
     //-----------------------------------------------------------------------
@@ -52,7 +53,7 @@ namespace Ogre {
         const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader)
     {
-        return OGRE_NEW MetalProgram(creator, name, handle, group, isManual, loader);
+        return OGRE_NEW MetalProgram(creator, name, handle, group, isManual, loader, mDevice);
     }
     //-----------------------------------------------------------------------
     void MetalProgramFactory::destroy(HighLevelGpuProgram* prog)

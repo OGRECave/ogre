@@ -36,6 +36,8 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalDepthBuffer.h"
 #include "OgreMetalDevice.h"
 #include "OgreMetalGpuProgramManager.h"
+#include "OgreMetalProgram.h"
+#include "OgreMetalProgramFactory.h"
 
 #include "OgreMetalHardwareBufferManager.h"
 #include "OgreMetalHardwareIndexBuffer.h"
@@ -58,6 +60,7 @@ namespace Ogre
         mInitialized( false ),
         mHardwareBufferManager( 0 ),
         mShaderManager( 0 ),
+        mMetalProgramFactory( 0 ),
         mIndirectBuffer( 0 ),
         mSwIndirectBufferPtr( 0 ),
         mPso( 0 ),
@@ -80,6 +83,15 @@ namespace Ogre
 
         OGRE_DELETE mHardwareBufferManager;
         mHardwareBufferManager = 0;
+
+        if( mMetalProgramFactory )
+        {
+            // Remove from manager safely
+            if( HighLevelGpuProgramManager::getSingletonPtr() )
+                HighLevelGpuProgramManager::getSingleton().removeFactory( mMetalProgramFactory );
+            OGRE_DELETE mMetalProgramFactory;
+            mMetalProgramFactory = 0;
+        }
 
         OGRE_DELETE mShaderManager;
         mShaderManager = 0;
@@ -510,12 +522,23 @@ namespace Ogre
         MTLRenderPipelineDescriptor *psd = [[MTLRenderPipelineDescriptor alloc] init];
         [psd setSampleCount: newPso->pass.multisampleCount];
 
+//        if( !newPso->vertexShader.isNull() )
+//        {
+//            MetalProgram *shader = static_cast<MetalProgram*>( newPso->vertexShader->
+//                                                               _getBindingDelegate() );
+//            [psd setVertexFunction:shader->getMetalFunction()];
+//        }
+
+//        if( !newPso->pixelShader.isNull() )
+//        {
+//            MetalProgram *shader = static_cast<MetalProgram*>( newPso->pixelShader->
+//                                                               _getBindingDelegate() );
+//            [psd setFragmentFunction:shader->getMetalFunction()];
+//        }
+        //Ducttape shaders
         id<MTLLibrary> library = [mActiveDevice->mDevice newDefaultLibrary];
         [psd setVertexFunction:[library newFunctionWithName:@"vertex_vs"]];
         [psd setFragmentFunction:[library newFunctionWithName:@"pixel_ps"]];
-
-//		[psd setVertexFunction:newPso->vertexShader->vsShader];
-//		[psd setFragmentFunction:newPso->pixelShader->psShader];
 
         if( !newPso->vertexElements.empty() )
         {
@@ -1087,6 +1110,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
-        mShaderManager = OGRE_NEW MetalGpuProgramManager();
+        mShaderManager = OGRE_NEW MetalGpuProgramManager( &mDevice );
+        mMetalProgramFactory = new MetalProgramFactory( &mDevice );
+        HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
     }
 }

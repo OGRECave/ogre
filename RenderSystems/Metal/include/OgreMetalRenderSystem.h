@@ -86,6 +86,7 @@ namespace Ogre
         bool mInitialized;
         v1::HardwareBufferManager   *mHardwareBufferManager;
         MetalGpuProgramManager      *mShaderManager;
+        MetalProgramFactory         *mMetalProgramFactory;
 
         ConfigOptionMap mOptions;
 

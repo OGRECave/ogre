@@ -45,6 +45,9 @@ THE SOFTWARE.
 @class MTLRenderPassDepthAttachmentDescriptor;
 @class MTLRenderPassStencilAttachmentDescriptor;
 
+#define OGRE_METAL_CONST_SLOT_START     16u
+#define OGRE_METAL_TEX_SLOT_START       24u
+
 namespace Ogre
 {
     // Forward declarations
@@ -55,6 +58,8 @@ namespace Ogre
     class MetalDynamicBuffer;
     class MetalGpuProgramManager;
     struct MetalHlmsPso;
+    class MetalProgram;
+    class MetalProgramFactory;
     class MetalStagingBuffer;
     class MetalRenderSystem;
     class MetalRenderTargetCommon;

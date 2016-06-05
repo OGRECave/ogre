@@ -40,9 +40,11 @@ namespace Ogre
     {
     protected:
         static String sLanguageName;
+        MetalDevice *mDevice;
+
     public:
-        MetalProgramFactory(void);
-        ~MetalProgramFactory(void);
+        MetalProgramFactory( MetalDevice *device );
+        virtual ~MetalProgramFactory(void);
         /// Get the name of the language this factory creates programs for
         const String& getLanguage(void) const;
         /// Create an instance of MetalProgram

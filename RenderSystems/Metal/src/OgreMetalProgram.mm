@@ -42,11 +42,15 @@ namespace Ogre {
     MetalProgram::CmdEntryPoint MetalProgram::msCmdEntryPoint;
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
-    MetalProgram::MetalProgram(ResourceManager* creator, 
-        const String& name, ResourceHandle handle,
-        const String& group, bool isManual, ManualResourceLoader* loader)
-        : HighLevelGpuProgram(creator, name, handle, group, isManual, loader) 
-        , mLibrary(nil), mFunction(nil), mCompiled(0)
+    MetalProgram::MetalProgram( ResourceManager* creator, const String& name,
+                                ResourceHandle handle, const String& group,
+                                bool isManual, ManualResourceLoader* loader,
+                                MetalDevice *device ) :
+        HighLevelGpuProgram(creator, name, handle, group, isManual, loader),
+        mLibrary( nil ),
+        mFunction( nil ),
+        mDevice( device ),
+        mCompiled( false )
     {
         if (createParamDictionary("MetalProgram"))
         {
@@ -64,7 +68,7 @@ namespace Ogre {
 
         // Manually assign language now since we use it immediately
         mSyntaxCode = "metal";
-        mEntryPoint = "main_hlms";
+        mEntryPoint = "main_metal";
     }
     //---------------------------------------------------------------------------
     MetalProgram::~MetalProgram()
@@ -86,17 +90,68 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MetalProgram::loadFromSource(void)
     {
+        compile( true );
     }
     //-----------------------------------------------------------------------
     bool MetalProgram::compile(const bool checkErrors)
     {
-        return (mCompiled == 1);
+        NSError *error;
+
+        mLibrary = [mDevice->mDevice newLibraryWithSource:[NSString stringWithUTF8String:mSource.c_str()]
+                options:nil error:&error];
+
+        if( !mLibrary && checkErrors )
+        {
+            String errorDesc;
+            if( error )
+                errorDesc = [error localizedDescription].UTF8String;
+
+            LogManager::getSingleton().logMessage(
+                        "Metal SL Compiler Error in " + mName + ":\n" + errorDesc );
+        }
+        else
+        {
+            mCompiled = true;
+
+            if( error )
+            {
+                String errorDesc;
+                if( error )
+                    errorDesc = [error localizedDescription].UTF8String;
+                LogManager::getSingleton().logMessage(
+                            "Metal SL Compiler Warnings in " + mName + ":\n" + errorDesc );
+            }
+        }
+
+        mLibrary.label = [NSString stringWithUTF8String:mName.c_str()];
+
+        mFunction = [mLibrary newFunctionWithName:[NSString stringWithUTF8String:mEntryPoint.c_str()]];
+        if( !mFunction )
+        {
+            mCompiled = false;
+            LogManager::getSingleton().logMessage(
+                        "Error retriving entry point '" + mEntryPoint + "' in shader " + mName );
+        }
+
+        // Log a message that the shader compiled successfully.
+        if( mCompiled && checkErrors )
+            LogManager::getSingleton().logMessage( "Shader " + mName + " compiled successfully." );
+
+        if( !mCompiled )
+        {
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         ((mType == GPT_VERTEX_PROGRAM) ? "Vertex Program " : "Fragment Program ") +
+                         mName + " failed to compile. See compile log above for details.",
+                         "MetalProgram::compile" );
+        }
+
+        return mCompiled;
     }
     //-----------------------------------------------------------------------
     void MetalProgram::createLowLevelImpl(void)
     {
-        mAssemblerProgram = GpuProgramPtr(this);
-        if(!mCompiled)
+        mAssemblerProgram = GpuProgramPtr(this, SPFM_NONE);
+        if( !mCompiled )
             compile(true);
     }
     //---------------------------------------------------------------------------
@@ -112,34 +167,14 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void MetalProgram::unloadHighLevelImpl(void)
     {
-        if (isSupported())
-        {
-            // Release everything
-            if(mLibrary)
-            {
-                mLibrary = nil;
-            }
-
-            if(mFunction)
-            {
-                mFunction = nil;
-            }
-            mCompiled = 0;
-        }
-    }
-    //-----------------------------------------------------------------------------
-    void MetalProgram::bindProgram(void)
-    {
-        LogManager::getSingleton().logMessage("Deleting shader program " + mName);
-    }
-    //-----------------------------------------------------------------------------
-    void MetalProgram::unbindProgram(void)
-    {
+        // Release everything
+        mLibrary = nil;
+        mFunction = nil;
+        mCompiled = false;
     }
     //-----------------------------------------------------------------------------
     void MetalProgram::bindProgramParameters(id <MTLRenderCommandEncoder> &encoder, GpuProgramParametersSharedPtr params, uint16 mask)
     {
-
     }
     //-----------------------------------------------------------------------
     void MetalProgram::populateParameterNames(GpuProgramParametersSharedPtr params)

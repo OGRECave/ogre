@@ -71,10 +71,10 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
-        MetalProgram(ResourceManager* creator,
-            const String& name, ResourceHandle handle,
-            const String& group, bool isManual, ManualResourceLoader* loader);
-        ~MetalProgram();
+        MetalProgram( ResourceManager* creator, const String& name, ResourceHandle handle,
+                      const String& group, bool isManual, ManualResourceLoader* loader,
+                      MetalDevice *device );
+        virtual ~MetalProgram();
 
         /// Overridden
         bool getPassTransformStates(void) const;
@@ -97,15 +97,11 @@ namespace Ogre {
         GpuProgramParametersSharedPtr createParameters(void);
 
         /// Retrieve the Metal function object
-        id <MTLFunction> getMetalFunction(void) { return mFunction; }
+        id<MTLFunction> getMetalFunction(void) const    { return mFunction; }
 
         /// Compile source into shader object
         bool compile(const bool checkErrors = false);
 
-        /// Execute the binding functions for this program
-        void bindProgram(void);
-        /// Execute the unbinding functions for this program
-        void unbindProgram(void);
         /// Execute the param binding functions for this program
         void bindProgramParameters(id <MTLRenderCommandEncoder> &encoder, GpuProgramParametersSharedPtr params, uint16 mask);
         void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
@@ -140,6 +136,8 @@ namespace Ogre {
     private:
         id <MTLLibrary> mLibrary;
         id <MTLFunction> mFunction;
+
+        MetalDevice *mDevice;
         
         /// Flag indicating if shader object successfully compiled
         bool mCompiled;
