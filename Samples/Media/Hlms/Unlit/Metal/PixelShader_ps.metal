@@ -15,16 +15,8 @@ struct PS_INPUT
 
 @property( !hlms_shadowcaster )
 
-@foreach( num_array_textures, n )
-Texture2DArray textureMapsArray@n : register(t@value(array_texture_bind@n));@end
-@foreach( num_textures, n )
-Texture2D textureMaps@n : register(t@value(texture_bind@n));@end
-
 @padd( numSamplerStates, num_array_textures, num_textures )
 @pset( samplerStateBind, 2 )
-
-@foreach( numSamplerStates, n )
-SamplerState samplerState@n : register(s@counter(samplerStateBind));@end
 
 @property( diffuse )@piece( MultiplyDiffuseConst )* material.diffuse@end @end
 
@@ -42,6 +34,13 @@ fragment @insertpiece( output_type ) main_metal
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
 	@property( hlms_vpos ), float4 gl_FragCoord : [[position]]@end
+
+	@foreach( num_array_textures, n )
+		, texture2d_array textureMapsArray@n [[texture(@value(array_texture_bind@n))]]@end
+	@foreach( num_textures, n )
+		, texture2d textureMaps@n [[texture(@value(texture_bind@n))]]@end
+	@foreach( numSamplerStates, n )
+		, sampler samplerState@n : [[sampler(@counter(samplerStateBind))]]@end
 )
 {
 	PS_OUTPUT outPs;
@@ -65,10 +64,10 @@ fragment @insertpiece( output_type ) main_metal
 
 @property( diffuse_map )@property( diffuse_map0 )
 	//Load base image
-	outPs.colour0 = @insertpiece( TextureOrigin0 ).Sample( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) ).@insertpiece(diffuse_map0_tex_swizzle);@end
+	outPs.colour0 = @insertpiece( TextureOrigin0 ).sample( @insertpiece( SamplerOrigin0 ), @insertpiece( SamplerUV0 ) ).@insertpiece(diffuse_map0_tex_swizzle);@end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
-	float4 topImage@n = @insertpiece( TextureOrigin@n ).Sample( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) ).@insertpiece(diffuse_map@n_tex_swizzle);@end @end
+	float4 topImage@n = @insertpiece( TextureOrigin@n ).sample( @insertpiece( SamplerOrigin@n ), @insertpiece( SamplerUV@n ) ).@insertpiece(diffuse_map@n_tex_swizzle);@end @end
 
 @foreach( diffuse_map, n, 1 )@property( diffuse_map@n )
 	@insertpiece( blend_mode_idx@n )@end @end

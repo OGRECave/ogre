@@ -111,7 +111,7 @@
 	@property( diffuse_map@n_array )
 		@piece( TextureOrigin@n )textureMapsArray@value(diffuse_map@n_idx)@end
 		@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
-		@piece( SamplerUV@n )float3( inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), @insertpiece( diffuseIdx@n ) )@end
+		@piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), @insertpiece( diffuseIdx@n )@end
 	@end @property( !diffuse_map@n_array )
 		@piece( TextureOrigin@n )textureMaps@value(diffuse_map@n_idx)@end
 		@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
