@@ -29,14 +29,20 @@ THE SOFTWARE.
 #include "Vao/OgreMetalConstBufferPacked.h"
 #include "Vao/OgreMetalBufferInterface.h"
 
+#include "OgreMetalDevice.h"
+
+#import <Metal/MTLRenderCommandEncoder.h>
+
 namespace Ogre
 {
     MetalConstBufferPacked::MetalConstBufferPacked(
                 size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                 BufferType bufferType, void *initialData, bool keepAsShadow,
-                VaoManager *vaoManager, BufferInterface *bufferInterface , size_t bindableSize ) :
+                VaoManager *vaoManager, BufferInterface *bufferInterface , size_t bindableSize,
+                MetalDevice *device ) :
         ConstBufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
-                           initialData, keepAsShadow, vaoManager, bufferInterface, bindableSize )
+                           initialData, keepAsShadow, vaoManager, bufferInterface, bindableSize ),
+        mDevice( device )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -44,4 +50,25 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
+    void MetalConstBufferPacked::bindBufferVS( uint16 slot )
+    {
+        assert( mDevice->mRenderEncoder );
+        assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
+
+        [mDevice->mRenderEncoder setVertexBuffer:bufferInterface->getVboName()
+                                          offset:mFinalBufferStart * mBytesPerElement
+                                         atIndex:slot + OGRE_METAL_CONST_SLOT_START];
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalConstBufferPacked::bindBufferPS( uint16 slot )
+    {
+        assert( mDevice->mRenderEncoder );
+        assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
+
+        [mDevice->mRenderEncoder setFragmentBuffer:bufferInterface->getVboName()
+                                            offset:mFinalBufferStart * mBytesPerElement
+                                           atIndex:slot + OGRE_METAL_CONST_SLOT_START];
+    }
 }

@@ -35,9 +35,11 @@ namespace Ogre
     MetalUavBufferPacked::MetalUavBufferPacked(
                 size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
                 uint32 bindFlags, void *initialData, bool keepAsShadow,
-                VaoManager *vaoManager, MetalBufferInterface *bufferInterface) :
+                VaoManager *vaoManager, MetalBufferInterface *bufferInterface,
+                MetalDevice *device ) :
         UavBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bindFlags,
-                         initialData, keepAsShadow, vaoManager, bufferInterface )
+                         initialData, keepAsShadow, vaoManager, bufferInterface ),
+        mDevice( device )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -56,7 +58,8 @@ namespace Ogre
                                                         mInternalBufferStart * mBytesPerElement,
                                                         mNumElements, mBytesPerElement,
                                                         mBufferType, (void*)0, false,
-                                                        (VaoManager*)0, bufferInterface, pixelFormat );
+                                                        (VaoManager*)0, bufferInterface, pixelFormat,
+                                                        mDevice );
 
         mTexBufferViews.push_back( retVal );
 

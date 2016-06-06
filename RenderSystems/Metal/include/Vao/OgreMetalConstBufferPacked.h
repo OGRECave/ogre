@@ -36,16 +36,18 @@ namespace Ogre
 {
     class _OgreMetalExport MetalConstBufferPacked : public ConstBufferPacked
     {
+        MetalDevice *mDevice;
+
     public:
         MetalConstBufferPacked( size_t internalBufferStartBytes, size_t numElements,
-                                  uint32 bytesPerElement,
-                                  BufferType bufferType, void *initialData, bool keepAsShadow,
-                                  VaoManager *vaoManager, BufferInterface *bufferInterface,
-                                  size_t bindableSize );
-        ~MetalConstBufferPacked();
+                                uint32 bytesPerElement,
+                                BufferType bufferType, void *initialData, bool keepAsShadow,
+                                VaoManager *vaoManager, BufferInterface *bufferInterface,
+                                size_t bindableSize, MetalDevice *device );
+        virtual ~MetalConstBufferPacked();
 
-        virtual void bindBufferVS( uint16 slot ) {}
-        virtual void bindBufferPS( uint16 slot ) {}
+        virtual void bindBufferVS( uint16 slot );
+        virtual void bindBufferPS( uint16 slot );
         virtual void bindBufferGS( uint16 slot ) {}
         virtual void bindBufferHS( uint16 slot ) {}
         virtual void bindBufferDS( uint16 slot ) {}

@@ -49,6 +49,7 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 
 #import <Metal/MTLDevice.h>
+#import <Metal/MTLRenderCommandEncoder.h>
 
 namespace Ogre
 {
@@ -64,12 +65,12 @@ namespace Ogre
         mConstBufferAlignment   = 16;
         mTexBufferAlignment     = 16;
 
-        //Keep pools of 32MB for static buffers
-        mDefaultPoolSize[CPU_INACCESSIBLE]  = 32 * 1024 * 1024;
+        //Keep pools of 16MB for static buffers
+        mDefaultPoolSize[CPU_INACCESSIBLE]  = 16 * 1024 * 1024;
 
-        //Keep pools of 8MB each for dynamic buffers
+        //Keep pools of 4MB each for dynamic buffers
         for( size_t i=CPU_ACCESSIBLE_DEFAULT; i<=CPU_ACCESSIBLE_PERSISTENT_COHERENT; ++i )
-            mDefaultPoolSize[i] = 8 * 1024 * 1024;
+            mDefaultPoolSize[i] = 4 * 1024 * 1024;
 
         //TODO: iOS v3 family does support indirect buffers.
         mSupportsIndirectBuffers    = false;
@@ -463,7 +464,8 @@ namespace Ogre
         ConstBufferPacked *retVal = OGRE_NEW MetalConstBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface, bindableSize );
+                                                        this, bufferInterface, bindableSize,
+                                                        mDevice );
 
         if( initialData )
             bufferInterface->_firstUpload( initialData, 0, sizeBytes );
@@ -511,7 +513,8 @@ namespace Ogre
         TexBufferPacked *retVal = OGRE_NEW MetalTexBufferPacked(
                                                         bufferOffset, sizeBytes, 1,
                                                         bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface, pixelFormat );
+                                                        this, bufferInterface, pixelFormat,
+                                                        mDevice );
 
         if( initialData )
             bufferInterface->_firstUpload( initialData, 0, sizeBytes );
@@ -551,7 +554,7 @@ namespace Ogre
         UavBufferPacked *retVal = OGRE_NEW MetalUavBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
                                                         bindFlags, initialData, keepAsShadow,
-                                                        this, bufferInterface );
+                                                        this, bufferInterface, mDevice );
 
         if( initialData )
             bufferInterface->_firstUpload( initialData, 0, numElements );
@@ -634,6 +637,19 @@ namespace Ogre
                            indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
                            indirectBuffer->getBufferType() );
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalVaoManager::bindDrawId(void)
+    {
+        assert( mDevice->mRenderEncoder );
+
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
+                    mDrawId->getBufferInterface() );
+
+        [mDevice->mRenderEncoder setVertexBuffer:bufferInterface->getVboName() offset:0 atIndex:15];
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        [mDevice->mRenderEncoder setFragmentBuffer:bufferInterface->getVboName() offset:0 atIndex:15];
+#endif
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* MetalVaoManager::createVertexArrayObjectImpl(

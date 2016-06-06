@@ -50,6 +50,10 @@ THE SOFTWARE.
 
 #include "OgreHlmsListener.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #include "iOS/macUtils.h"
+#endif
+
 namespace Ogre
 {
     const int HlmsBits::HlmsTypeBits    = 3;
@@ -120,6 +124,7 @@ namespace Ogre
     const IdString HlmsBaseProp::AlphaBlend     = IdString( "hlms_alphablend" );
 
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
+    const IdString HlmsBaseProp::iOS            = IdString( "iOS" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
     const IdString HlmsBaseProp::TexGather      = IdString( "hlms_tex_gather" );
     const IdString HlmsBaseProp::DisableStage   = IdString( "hlms_disable_stage" );
@@ -207,6 +212,10 @@ namespace Ogre
         }
 
         enumeratePieceFiles();
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        mOutputPath = macCachePath() + '/';
+#endif
     }
     //-----------------------------------------------------------------------------------
     Hlms::~Hlms()
@@ -1627,6 +1636,9 @@ namespace Ogre
                 if( mShaderProfile == "glsl" ) //TODO: String comparision
                     setProperty( HlmsBaseProp::GL3Plus, 330 );
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                setProperty( HlmsBaseProp::iOS, 1 );
+#endif
                 setProperty( HlmsBaseProp::HighQuality, mHighQuality );
 
                 //Library piece files first
@@ -2371,6 +2383,10 @@ namespace Ogre
                             mShaderTargets[i] = &BestD3DShaderTargets[i][j];
                     }
                 }
+            }
+            else if( mShaderProfile == "metal" )
+            {
+                mShaderFileExt = ".metal";
             }
             else
             {

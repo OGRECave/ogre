@@ -38,13 +38,16 @@ namespace Ogre
 
     class _OgreMetalExport MetalUavBufferPacked : public UavBufferPacked
     {
+        MetalDevice *mDevice;
+
     protected:
         virtual TexBufferPacked* getAsTexBufferImpl( PixelFormat pixelFormat );
 
     public:
         MetalUavBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
                               uint32 bindFlags, void *initialData, bool keepAsShadow,
-                              VaoManager *vaoManager, MetalBufferInterface *bufferInterface );
+                              VaoManager *vaoManager, MetalBufferInterface *bufferInterface,
+                              MetalDevice *device );
         ~MetalUavBufferPacked();
 
 //        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}

@@ -38,15 +38,17 @@ namespace Ogre
 
     class _OgreMetalExport MetalTexBufferPacked : public TexBufferPacked
     {
+        MetalDevice *mDevice;
+
     public:
         MetalTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                                BufferType bufferType, void *initialData, bool keepAsShadow,
-                                VaoManager *vaoManager, MetalBufferInterface *bufferInterface,
-                                Ogre::PixelFormat pf );
-        ~MetalTexBufferPacked();
+                              BufferType bufferType, void *initialData, bool keepAsShadow,
+                              VaoManager *vaoManager, MetalBufferInterface *bufferInterface,
+                              Ogre::PixelFormat pf, MetalDevice *device );
+        virtual ~MetalTexBufferPacked();
 
-        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
-        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
+        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
         virtual void bindBufferGS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
         virtual void bindBufferDS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
         virtual void bindBufferHS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}

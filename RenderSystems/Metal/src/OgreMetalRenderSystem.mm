@@ -47,6 +47,8 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "Vao/OgreVertexArrayObject.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
 
+#include "OgreFrustum.h"
+
 #include "OgreMetalMappings.h"
 
 #import <Metal/Metal.h>
@@ -65,6 +67,7 @@ namespace Ogre
         mSwIndirectBufferPtr( 0 ),
         mPso( 0 ),
         mCurrentIndexBuffer( 0 ),
+        mCurrentVertexBuffer( 0 ),
         mCurrentPrimType( MTLPrimitiveTypePoint ),
         mNumMRTs( 0 ),
         mCurrentDepthBuffer( 0 ),
@@ -417,6 +420,8 @@ namespace Ogre
         mActiveDevice->mRenderEncoder =
                 [mActiveDevice->mCurrentCommandBuffer renderCommandEncoderWithDescriptor:passDesc];
         mActiveRenderEncoder = mActiveDevice->mRenderEncoder;
+
+        static_cast<MetalVaoManager*>( mVaoManager )->bindDrawId();
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
@@ -522,25 +527,29 @@ namespace Ogre
         MTLRenderPipelineDescriptor *psd = [[MTLRenderPipelineDescriptor alloc] init];
         [psd setSampleCount: newPso->pass.multisampleCount];
 
-//        if( !newPso->vertexShader.isNull() )
-//        {
-//            MetalProgram *shader = static_cast<MetalProgram*>( newPso->vertexShader->
-//                                                               _getBindingDelegate() );
-//            [psd setVertexFunction:shader->getMetalFunction()];
-//        }
+        if( !newPso->vertexShader.isNull() )
+        {
+            MetalProgram *shader = static_cast<MetalProgram*>( newPso->vertexShader->
+                                                               _getBindingDelegate() );
+            [psd setVertexFunction:shader->getMetalFunction()];
+        }
 
-//        if( !newPso->pixelShader.isNull() )
-//        {
-//            MetalProgram *shader = static_cast<MetalProgram*>( newPso->pixelShader->
-//                                                               _getBindingDelegate() );
-//            [psd setFragmentFunction:shader->getMetalFunction()];
-//        }
+        if( !newPso->pixelShader.isNull() )
+        {
+            MetalProgram *shader = static_cast<MetalProgram*>( newPso->pixelShader->
+                                                               _getBindingDelegate() );
+            [psd setFragmentFunction:shader->getMetalFunction()];
+        }
         //Ducttape shaders
-        id<MTLLibrary> library = [mActiveDevice->mDevice newDefaultLibrary];
-        [psd setVertexFunction:[library newFunctionWithName:@"vertex_vs"]];
-        [psd setFragmentFunction:[library newFunctionWithName:@"pixel_ps"]];
+//        id<MTLLibrary> library = [mActiveDevice->mDevice newDefaultLibrary];
+//        [psd setVertexFunction:[library newFunctionWithName:@"vertex_vs"]];
+//        [psd setFragmentFunction:[library newFunctionWithName:@"pixel_ps"]];
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        // On iOS we can skip the Vertex Desc.
+        // On OS X we always need to set it for the baseInstance / draw id
         if( !newPso->vertexElements.empty() )
+#endif
         {
             size_t elementIdx = 0;
             MTLVertexDescriptor *vertexDescriptor = [MTLVertexDescriptor vertexDescriptor];
@@ -573,6 +582,10 @@ namespace Ogre
                 ++itor;
             }
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+            vertexDescriptor.layouts[15].stride = 0;
+            vertexDescriptor.layouts[15].stepFunction = MTLVertexStepFunctionPerInstance;
+#endif
             [psd setVertexDescriptor:vertexDescriptor];
         }
 
@@ -728,14 +741,150 @@ namespace Ogre
         return VET_COLOUR_ARGB;
     }
     //-------------------------------------------------------------------------
+    void MetalRenderSystem::_convertProjectionMatrix( const Matrix4& matrix, Matrix4& dest,
+                                                      bool forGpuProgram )
+    {
+        dest = matrix;
+
+        // Convert depth range from [-1,+1] to [0,1]
+        dest[2][0] = (dest[2][0] + dest[3][0]) / 2;
+        dest[2][1] = (dest[2][1] + dest[3][1]) / 2;
+        dest[2][2] = (dest[2][2] + dest[3][2]) / 2;
+        dest[2][3] = (dest[2][3] + dest[3][3]) / 2;
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_makeProjectionMatrix( Real left, Real right, Real bottom, Real top,
+                                                   Real nearPlane, Real farPlane, Matrix4 &dest,
+                                                   bool forGpuProgram )
+    {
+        // Correct position for off-axis projection matrix
+        if (!forGpuProgram)
+        {
+            Real offsetX = left + right;
+            Real offsetY = top + bottom;
+
+            left -= offsetX;
+            right -= offsetX;
+            top -= offsetY;
+            bottom -= offsetY;
+        }
+
+        Real width = right - left;
+        Real height = top - bottom;
+        Real q, qn;
+        if (farPlane == 0)
+        {
+            q = 1 - Frustum::INFINITE_FAR_PLANE_ADJUST;
+            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 1);
+        }
+        else
+        {
+            q = farPlane / ( farPlane - nearPlane );
+            qn = -q * nearPlane;
+        }
+        dest = Matrix4::ZERO;
+        dest[0][0] = 2 * nearPlane / width;
+        dest[0][2] = (right+left) / width;
+        dest[1][1] = 2 * nearPlane / height;
+        dest[1][2] = (top+bottom) / height;
+        dest[2][2] = -q;
+        dest[3][2] = -1.0f;
+        dest[2][3] = qn;
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_makeProjectionMatrix( const Radian& fovy, Real aspect, Real nearPlane,
+                                                   Real farPlane, Matrix4& dest, bool forGpuProgram )
+    {
+        Radian theta ( fovy * 0.5 );
+        Real h = 1 / Math::Tan(theta);
+        Real w = h / aspect;
+        Real q, qn;
+        if (farPlane == 0)
+        {
+            q = 1 - Frustum::INFINITE_FAR_PLANE_ADJUST;
+            qn = nearPlane * (Frustum::INFINITE_FAR_PLANE_ADJUST - 1);
+        }
+        else
+        {
+            q = farPlane / ( farPlane - nearPlane );
+            qn = -q * nearPlane;
+        }
+
+        dest = Matrix4::ZERO;
+        dest[0][0] = w;
+        dest[1][1] = h;
+
+        dest[2][2] = -q;
+        dest[3][2] = -1.0f;
+
+        dest[2][3] = qn;
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_makeOrthoMatrix( const Radian& fovy, Real aspect, Real nearPlane,
+                                              Real farPlane, Matrix4& dest, bool forGpuProgram )
+    {
+        Radian thetaY (fovy / 2.0f);
+        Real tanThetaY = Math::Tan(thetaY);
+
+        //Real thetaX = thetaY * aspect;
+        Real tanThetaX = tanThetaY * aspect; //Math::Tan(thetaX);
+        Real half_w = tanThetaX * nearPlane;
+        Real half_h = tanThetaY * nearPlane;
+        Real iw = 1.0f / half_w;
+        Real ih = 1.0f / half_h;
+        Real q;
+        if (farPlane == 0)
+        {
+            q = 0;
+        }
+        else
+        {
+            q = 1.0f / (farPlane - nearPlane);
+        }
+
+        dest = Matrix4::ZERO;
+        dest[0][0] = iw;
+        dest[1][1] = ih;
+        dest[2][2] = -q;
+        dest[2][3] = -nearPlane / (farPlane - nearPlane);
+        dest[3][3] = 1;
+    }
+    //---------------------------------------------------------------------
+    void MetalRenderSystem::_applyObliqueDepthProjection( Matrix4& matrix, const Plane& plane,
+                                                          bool forGpuProgram )
+    {
+        // Thanks to Eric Lenyel for posting this calculation at www.terathon.com
+
+        // Calculate the clip-space corner point opposite the clipping plane
+        // as (sgn(clipPlane.x), sgn(clipPlane.y), 1, 1) and
+        // transform it into camera space by multiplying it
+        // by the inverse of the projection matrix
+
+        Vector4 q;
+        q.x = (Math::Sign(plane.normal.x) + matrix[0][2]) / matrix[0][0];
+        q.y = (Math::Sign(plane.normal.y) + matrix[1][2]) / matrix[1][1];
+        q.z = -1.0F;
+        q.w = (1.0F + matrix[2][2]) / matrix[2][3];
+
+        // Calculate the scaled plane vector
+        Vector4 clipPlane4d(plane.normal.x, plane.normal.y, plane.normal.z, plane.d);
+        Vector4 c = clipPlane4d * (2.0F / (clipPlane4d.dotProduct(q)));
+
+        // Replace the third row of the projection matrix
+        matrix[2][0] = c.x;
+        matrix[2][1] = c.y;
+        matrix[2][2] = c.z + 1.0F;
+        matrix[2][3] = c.w;
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::_dispatch( const HlmsComputePso &pso )
     {
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setVertexArrayObject( const VertexArrayObject *vao )
     {
-        __unsafe_unretained id<MTLBuffer> metalVertexBuffers[16];
-        NSUInteger offsets[16];
+        __unsafe_unretained id<MTLBuffer> metalVertexBuffers[15];
+        NSUInteger offsets[15];
         memset( offsets, 0, sizeof(offsets) );
 
         const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
@@ -753,7 +902,7 @@ namespace Ogre
         }
 
 #if OGRE_DEBUG_MODE
-        assert( numVertexBuffers < 16u );
+        assert( numVertexBuffers < 15u );
 #endif
 
         [mActiveRenderEncoder setVertexBuffers:metalVertexBuffers offsets:offsets
@@ -780,7 +929,7 @@ namespace Ogre
                     static_cast<MTLPrimitiveType>( vao->getOperationType() - 1u ) );
 
         //Calculate bytesPerVertexBuffer & numVertexBuffers which is the same for all draws in this cmd
-        uint32 bytesPerVertexBuffer[16];
+        uint32 bytesPerVertexBuffer[15];
         size_t numVertexBuffers = 0;
         const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
         VertexBufferPackedVec::const_iterator itor = vertexBuffers.begin();
@@ -810,7 +959,9 @@ namespace Ogre
                                                             atIndex:j];
             }
 
-            //TODO: Setup baseInstance.
+            //Setup baseInstance.
+            [mActiveRenderEncoder setVertexBufferOffset:drawCmd->baseInstance * sizeof(uint32)
+                                                atIndex:15];
 
 #if OGRE_DEBUG_MODE
             assert( ((drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x04) == 0
@@ -848,7 +999,9 @@ namespace Ogre
 
         for( uint32 i=cmd->numDraws; i--; )
         {
-            //TODO: Setup baseInstance.
+            //Setup baseInstance.
+            [mActiveRenderEncoder setVertexBufferOffset:drawCmd->baseInstance * sizeof(uint32)
+                                                atIndex:15];
             [mActiveRenderEncoder drawPrimitives:primType
                       vertexStart:drawCmd->firstVertexIndex
                       vertexCount:drawCmd->primCount
@@ -859,8 +1012,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setRenderOperation( const v1::CbRenderOp *cmd )
     {
-        __unsafe_unretained id<MTLBuffer> metalVertexBuffers[16];
-        NSUInteger offsets[16];
+        __unsafe_unretained id<MTLBuffer> metalVertexBuffers[15];
+        NSUInteger offsets[15];
         memset( offsets, 0, sizeof(offsets) );
 
         size_t maxUsedSlot = 0;
@@ -876,13 +1029,14 @@ namespace Ogre
 
             const size_t slot = itor->first;
 #if OGRE_DEBUG_MODE
-            assert( slot < 16u );
+            assert( slot < 15u );
 #endif
             size_t offsetStart;
             metalVertexBuffers[slot] = metalBuffer->getBufferName( offsetStart );
-            offsets[slot]            = cmd->vertexData->vertexStart * metalBuffer->getVertexSize() +
-                                                                                        offsetStart;
-
+            offsets[slot] = offsetStart;
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            offsets[slot] += cmd->vertexData->vertexStart * metalBuffer->getVertexSize();
+#endif
             ++itor;
             maxUsedSlot = std::max( maxUsedSlot, slot + 1u );
         }
@@ -891,6 +1045,7 @@ namespace Ogre
                                                withRange:NSMakeRange( 0, maxUsedSlot )];
 
         mCurrentIndexBuffer = cmd->indexData;
+        mCurrentVertexBuffer= cmd->vertexData;
         mCurrentPrimType    = std::min(  MTLPrimitiveTypeTriangleStrip,
                                          static_cast<MTLPrimitiveType>( cmd->operationType - 1u ) );
     }
@@ -908,14 +1063,17 @@ namespace Ogre
             static_cast<v1::MetalHardwareIndexBuffer*>( mCurrentIndexBuffer->indexBuffer.get() );
         __unsafe_unretained id<MTLBuffer> indexBuffer = metalBuffer->getBufferName( offsetStart );
 
-        //TODO: Setup baseInstance.
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #if OGRE_DEBUG_MODE
+            assert( ((cmd->firstVertexIndex * bytesPerIndexElement) & 0x04) == 0
+                    && "Index Buffer must be aligned to 4 bytes. If you're messing with "
+                    "IndexBuffer::indexStart, you've entered an invalid "
+                    "indexStart; not supported by the Metal API." );
+    #endif
 
-#if OGRE_DEBUG_MODE
-        assert( ((cmd->firstVertexIndex * bytesPerIndexElement) & 0x04) == 0
-                && "Index Buffer must be aligned to 4 bytes. If you're messing with "
-                "IndexBuffer::indexStart, you've entered an invalid "
-                "indexStart; not supported by the Metal API." );
-#endif
+        //Setup baseInstance.
+        [mActiveRenderEncoder setVertexBufferOffset:cmd->baseInstance * sizeof(uint32)
+                                            atIndex:15];
 
         [mActiveRenderEncoder drawIndexedPrimitives:mCurrentPrimType
                    indexCount:cmd->primCount
@@ -923,15 +1081,35 @@ namespace Ogre
                   indexBuffer:indexBuffer
             indexBufferOffset:cmd->firstVertexIndex * bytesPerIndexElement + offsetStart
             instanceCount:cmd->instanceCount];
+#else
+        [mActiveRenderEncoder drawIndexedPrimitives:mCurrentPrimType
+                   indexCount:cmd->primCount
+                    indexType:indexType
+                  indexBuffer:indexBuffer
+            indexBufferOffset:cmd->firstVertexIndex * bytesPerIndexElement + offsetStart
+                instanceCount:cmd->instanceCount
+                   baseVertex:mCurrentVertexBuffer->vertexStart
+                 baseInstance:cmd->baseInstance];
+#endif
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_render( const v1::CbDrawCallStrip *cmd )
     {
-        //TODO: Setup baseInstance.
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        //Setup baseInstance.
+        [mActiveRenderEncoder setVertexBufferOffset:cmd->baseInstance * sizeof(uint32)
+                                            atIndex:15];
         [mActiveRenderEncoder drawPrimitives:mCurrentPrimType
                   vertexStart:0 /*cmd->firstVertexIndex already handled in _setRenderOperation*/
                   vertexCount:cmd->primCount
                 instanceCount:cmd->instanceCount];
+#else
+        [mActiveRenderEncoder drawPrimitives:mCurrentPrimType
+                  vertexStart:cmd->firstVertexIndex
+                  vertexCount:cmd->primCount
+                instanceCount:cmd->instanceCount
+                 baseInstance:cmd->baseInstance];
+#endif
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::bindGpuProgramParameters(GpuProgramType gptype,

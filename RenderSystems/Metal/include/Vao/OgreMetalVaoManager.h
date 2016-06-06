@@ -245,6 +245,9 @@ namespace Ogre
         MetalVaoManager( uint8 dynamicBufferMultiplier, MetalDevice *device );
         virtual ~MetalVaoManager();
 
+        /// Binds the Draw ID to the current RenderEncoder. (Assumed to be active!)
+        void bindDrawId(void);
+
         /** Creates a new staging buffer and adds it to the pool. @see getStagingBuffer.
         @remarks
             The returned buffer starts with a reference count of 1. You should decrease
