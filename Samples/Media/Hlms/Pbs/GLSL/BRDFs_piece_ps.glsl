@@ -136,7 +136,7 @@ vec3 BRDF( vec3 lightDir, vec3 viewDir, float NdotV, vec3 lightDiffuse, vec3 lig
 	float fresnelD = 1.0f - @insertpiece( getMaxFresnelS );@end
 
 	//We should divide Rd by PI, but it is already included in kD
-	vec3 Rd = (lightScatter * viewScatter * fresnelD) * @insertpiece( kD ).xyz * lightDiffuse;
+	vec3 Rd = (lightScatter * viewScatter * energyFactor * fresnelD) * @insertpiece( kD ).xyz * lightDiffuse;
 
 	return NdotL * (Rs + Rd);
 }
