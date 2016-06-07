@@ -36,9 +36,9 @@ uniform sampler2D heightMap;
 
 @piece( VertexTransform )
 	//Lighting is in view space
-	outVs.pos		= ( pass.view * vec4(worldPos.xyz, 1.0f) ).xyz;
+	outVs.pos		= ( vec4(worldPos.xyz, 1.0f) * pass.view ).xyz;
 @property( !hlms_dual_paraboloid_mapping )
-	gl_Position = pass.viewProj * vec4(worldPos.xyz, 1.0f);@end
+	gl_Position = vec4(worldPos.xyz, 1.0f) * pass.viewProj;@end
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	gl_Position.w	= 1.0f;
@@ -50,7 +50,7 @@ uniform sampler2D heightMap;
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-    outVs.posL@n = pass.shadowRcv[@n].texViewProj * vec4(worldPos.xyz, 1.0f);@end
+	outVs.posL@n = vec4(worldPos.xyz, 1.0f) * pass.shadowRcv[@n].texViewProj;@end
 @end
 
 void main()

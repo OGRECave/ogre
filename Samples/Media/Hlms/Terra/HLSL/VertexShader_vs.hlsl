@@ -31,9 +31,9 @@ Texture2D<float> heightMap: register(t0);
 
 @piece( VertexTransform )
 	//Lighting is in view space
-	outVs.pos		= mul( passBuf.view, float4( worldPos.xyz, 1.0f ) ).xyz;
+	outVs.pos		= mul( float4( worldPos.xyz, 1.0f ), passBuf.view ).xyz;
 @property( !hlms_dual_paraboloid_mapping )
-	outVs.gl_Position = mul( passBuf.viewProj, float4( worldPos.xyz, 1.0f ) );@end
+	outVs.gl_Position = mul( float4( worldPos.xyz, 1.0f ), passBuf.viewProj );@end
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	outVs.gl_Position.w	= 1.0f;
@@ -45,7 +45,7 @@ Texture2D<float> heightMap: register(t0);
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-	outVs.posL@n = mul( passBuf.shadowRcv[@n].texViewProj, float4(worldPos.xyz, 1.0f) );@end
+	outVs.posL@n = mul( float4(worldPos.xyz, 1.0f), passBuf.shadowRcv[@n].texViewProj );@end
 @end
 
 PS_INPUT main( VS_INPUT input )
