@@ -118,15 +118,15 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
     @piece( worldViewMat )worldView@end
 @end
 
-@piece( CalculatePsPos )(@insertpiece( worldViewMat ) * @insertpiece(local_vertex)).xyz@end
+@piece( CalculatePsPos )(@insertpiece(local_vertex) * @insertpiece( worldViewMat )).xyz@end
 
 @piece( VertexTransform )
 	//Lighting is in view space
 	@property( hlms_normal || hlms_qtangent )outVs.pos		= @insertpiece( CalculatePsPos );@end
-    @property( hlms_normal || hlms_qtangent )outVs.normal	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_normal);@end
-    @property( normal_map )outVs.tangent	= mat3(@insertpiece( worldViewMat )) * @insertpiece(local_tangent);@end
+	@property( hlms_normal || hlms_qtangent )outVs.normal	= @insertpiece(local_normal) * mat3(@insertpiece( worldViewMat ));@end
+	@property( normal_map )outVs.tangent	= @insertpiece(local_tangent) * mat3(@insertpiece( worldViewMat ));@end
 @property( !hlms_dual_paraboloid_mapping )
-    gl_Position = pass.viewProj * worldPos;@end
+	gl_Position = worldPos * pass.viewProj;@end
 @property( hlms_dual_paraboloid_mapping )
 	//Dual Paraboloid Mapping
 	gl_Position.w	= 1.0f;
@@ -139,7 +139,7 @@ layout(binding = 0) uniform samplerBuffer worldMatBuf;
 @end
 @piece( ShadowReceive )
 @foreach( hlms_num_shadow_maps, n )
-    outVs.posL@n = pass.shadowRcv[@n].texViewProj * vec4(worldPos.xyz, 1.0f);@end
+	outVs.posL@n = vec4(worldPos.xyz, 1.0f) * pass.shadowRcv[@n].texViewProj;@end
 @end
 
 void main()
@@ -151,7 +151,7 @@ void main()
     mat4 worldView = UNPACK_MAT4( worldMatBuf, (drawId << 1u) + 1u );
 	@end
 
-    vec4 worldPos = vec4( (worldMat * vertex).xyz, 1.0f );
+	vec4 worldPos = vec4( (vertex * worldMat).xyz, 1.0f );
 @end
 
 @property( hlms_qtangent )

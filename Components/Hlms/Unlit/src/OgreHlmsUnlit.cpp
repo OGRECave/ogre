@@ -513,14 +513,12 @@ namespace Ogre
         //---------------------------------------------------------------------------
 
         //mat4 viewProj[0];
-        Matrix4 tmp = mPreparedPass.viewProjMatrix[0].transpose();
         for( size_t i=0; i<16; ++i )
-            *passBufferPtr++ = (float)tmp[0][i];
+            *passBufferPtr++ = (float)mPreparedPass.viewProjMatrix[0][0][i];
 
         //mat4 viewProj[1] (identityProj);
-        tmp = mPreparedPass.viewProjMatrix[1].transpose();
         for( size_t i=0; i<16; ++i )
-            *passBufferPtr++ = (float)tmp[0][i];
+            *passBufferPtr++ = (float)mPreparedPass.viewProjMatrix[1][0][i];
 
         if( casterPass )
         {

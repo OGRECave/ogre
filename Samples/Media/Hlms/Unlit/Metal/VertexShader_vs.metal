@@ -3,7 +3,7 @@
 // START UNIFORM STRUCT DECLARATION
 @insertpiece( PassStructDecl )
 @insertpiece( custom_vs_uniformStructDeclaration )
-// END UNIFORM STRUCT  DECLARATION
+// END UNIFORM STRUCT DECLARATION
 
 struct VS_INPUT
 {
