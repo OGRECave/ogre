@@ -229,10 +229,10 @@ float3 qmul( float4 q, float3 v )
 	nNormal = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xyz * 2.0f - 1.0f;
 	//nNormal.xz = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xy;
 	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x - nNormal.z * nNormal.z, 0.0 ) );
-	nNormal = mul( (float3x3)passBuf.view, nNormal );
+	nNormal = mul( nNormal, (float3x3)passBuf.view );
 @end @property( detail_maps_normal )
 	float3 geomNormal = terrainNormals.Sample( terrainNormalsSamplerState, inPs.uv0.xy ).xyz * 2.0f - 1.0f;
-	geomNormal = mul( (float3x3)passBuf.view, geomNormal );
+	geomNormal = mul( geomNormal, (float3x3)passBuf.view );
 
 	//Get the TBN matrix
 	float3 vBinormal	= normalize( cross( geomNormal, vTangent ) );

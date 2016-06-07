@@ -171,6 +171,9 @@ namespace Ogre
 
         void _applyAnimation( const TransformArray &boneTransforms );
 
+        void _swapBoneWeightsUniquePtr( RawSimdUniquePtr<ArrayReal, MEMCATEGORY_ANIMATION>
+                                        &inOutBoneWeights );
+
         const SkeletonAnimationDef* getDefinition(void) const       { return mDefinition; }
     };
 

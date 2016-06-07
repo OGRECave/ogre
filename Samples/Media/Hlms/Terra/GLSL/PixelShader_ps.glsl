@@ -273,10 +273,10 @@ void main()
 	nNormal = texture( terrainNormals, inPs.uv0.xy ).xyz * 2.0 - 1.0;
 	//nNormal.xz = texture( terrainNormals, inPs.uv0.xy ).xy;
 	//nNormal.y = sqrt( max( 1.0 - nNormal.x * nNormal.x - nNormal.z * nNormal.z, 0.0 ) );
-	nNormal = mat3(pass.view) * nNormal;
+	nNormal = nNormal * mat3(pass.view);
 @end @property( detail_maps_normal )
 	vec3 geomNormal = texture( terrainNormals, inPs.uv0.xy ).xyz * 2.0 - 1.0;
-	geomNormal = mat3(pass.view) * geomNormal;
+	geomNormal = geomNormal * mat3(pass.view);
 
 	//Get the TBN matrix
 	vec3 vBinormal	= normalize( cross( geomNormal, vTangent ) );

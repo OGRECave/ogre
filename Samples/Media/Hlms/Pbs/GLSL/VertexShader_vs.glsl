@@ -8,7 +8,7 @@ out gl_PerVertex
 layout(std140) uniform;
 
 @insertpiece( Common_Matrix_DeclUnpackMatrix4x4 )
-@insertpiece( Common_Matrix_DeclUnpackMatrix4x3 )
+@insertpiece( Common_Matrix_DeclUnpackMatrix3x4 )
 
 in vec4 vertex;
 
@@ -146,7 +146,7 @@ void main()
 {
     @insertpiece( custom_vs_preExecution )
 @property( !hlms_skeleton )
-    mat4x3 worldMat = UNPACK_MAT4x3( worldMatBuf, drawId @property( !hlms_shadowcaster )<< 1u@end );
+	mat3x4 worldMat = UNPACK_MAT3x4( worldMatBuf, drawId @property( !hlms_shadowcaster )<< 1u@end );
 	@property( hlms_normal || hlms_qtangent )
     mat4 worldView = UNPACK_MAT4( worldMatBuf, (drawId << 1u) + 1u );
 	@end

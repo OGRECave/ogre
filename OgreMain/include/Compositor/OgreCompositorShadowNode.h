@@ -55,44 +55,19 @@ namespace Ogre
     @par
         Shadow Nodes derive from nodes so that they can be used as regular nodes
     @par
-        During a render with shadow mapping enabled, in theory we should render first
-        the Shadow Node's pass, then render the regular scene. However in practice we
-        need information that is calculated during the reulgar scene render, namely:
-            * An AABB enclosing all visible objects (calculated in cullFrusum)
-            * An AABB enclosing all visible objects that receive shadows (also in cullFrusum)
-        Unfortunately calculating them twice (first for shadow map, then for the regular pass)
-        is very expensive so the smart thing to do is to reuse such data.
-
-        As a result, Ogre divides the rendering into two stages: The culling phase (01),
-        and the rendering phase (02). Ogre first calls the culling phase 01 of the regular
-        pass, and the resulting output is:
-            * An array(s) containing all visible/culled objects (@See SceneManager::mVisibleObjects)
-            * The 2 aabbs we need. (@See SceneManager::mVisibleObjsPerRenderQueue)
-        The next step, before entering rendering phase 02, is to update the shadow node (which
-        implies entering both its cull & render phases); only then, enter rendering phase 02.
-
-        There is a caveat: When entering shadow node's cull phase 01, the array of visible
-        objects is overwritten, but we'll still need it for phase 02. As a result, we save
-        the content of the array before updating the shadow node, and restore it afterwards.
+        During a render with shadow mapping enabled, we render first the Shadow Node's pass,
+        then render the regular scene.
+        In the past there used to be an AABB enclosing all visible objects that receive shadows
+        that was used for calculating the shadow maps. This forced Ogre 2.x to split
+        rendering into two stages: _cullPhase01 & _renderPhase02.
+        This is not needed anymore.
 
         To summarize: a normal rendering flow with shadow map looks like this:
+            shadowNode->setupShadowCamera( normal->getVisibleBoundsInfo() );
+            shadowNode->_cullPhase01();
+            shadowNode->_renderPhase02();
             normal->_cullPhase01();
-            saveCulledObjects( normal->getSceneManager() );
-                shadowNode->setupShadowCamera( normal->getVisibleBoundsInfo() );
-                shadowNode->_cullPhase01();
-                shadowNode->_renderPhase02();
-            restoreCulledObjects( normal->getSceneManager() );
             normal->_renderPhase02();
-
-        Another issues that has to take care is that if shadow map will render render queues 0 to 4
-        and the normal pass only renders RQs from 0 to 2, then unfortunately we'll need to
-        calculate the bounds information of RQs 3 & 4.
-
-        It may sound complicated, but it's just the old rendering sequence divided into stages.
-        It's much more elegant than Ogre 1.x, which just interrupted the normal rendering sequence
-        with lots of branches and called itself recursively to render the shadow maps.
-        This separation also provides a way to isolate & encapsulate systems (SceneManager now has
-        no idea of how to take care of shadow map rendering)
     @par
     @par
         On forward lighting passes, shadow mapping is handled in the following way:

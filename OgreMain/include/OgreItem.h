@@ -189,23 +189,39 @@ namespace Ogre {
         /** Returns whether or not this Item is skeletally animated. */
         bool hasSkeleton(void) const                    { return mSkeletonInstance != 0; }
 
-        /** Shares the SkeletonInstance with the supplied Item.
-            Note that in order for this to work, both entities must have the same
-            Skeleton.
-        */
-        //void shareSkeletonInstanceWith(Item* Item);
+        /** Starts using the SkeletonInstance from 'master' instead of using our own.
+            Useful when multiple Items can use exactly the same skeleton (e.g. on
+            RPG games the master could be the player's character, then the clothes,
+            and armor the slaves sharing the skeleton instance with its master)
+        @remarks
+            Calling
+            armour->useSkeletonInstanceFrom( player );
+            armour->useSkeletonInstanceFrom( newPlayer );
 
-        /** Returns whether or not this Item is either morph or pose animated.
+            is valid and more efficient than calling:
+            armour->useSkeletonInstanceFrom( player );
+            armour->stopUsingSkeletonInstanceFromMaster();
+            armour->useSkeletonInstanceFrom( newPlayer );
+        @par
+            Due to the nature of skeleton sharing, all slaves will end up in the position
+            of the master. Therefore it is highly recommended you attach the slaves and
+            master to the same SceneNode, or that you keep all SceneNodes' transforms in
+            sync.
+            Failure to do so could cause Ogre to cull some of those objects because
+            it thinks they're located somewhere else.
         */
-        bool hasVertexAnimation(void) const;
+        void useSkeletonInstanceFrom( Item* master );
 
-        /** Stops sharing the SkeletonInstance with other entities.
-        */
-        void stopSharingSkeletonInstance();
+        /// Stops sharing the SkeletonInstance with other Items. @see useSkeletonInstanceFrom
+        void stopUsingSkeletonInstanceFromMaster();
 
         /** Returns whether this Item shares it's SkeltonInstance with other Item instances.
         */
-        //bool sharesSkeletonInstance() const             { return mSharedSkeletonEntities != NULL; }
+        bool sharesSkeletonInstance() const;
+
+        /** Returns whether or not this Item is either morph or pose animated.
+        */
+        bool hasVertexAnimation(void) const;                
 
         /** Returns a pointer to the set of entities which share a OldSkeletonInstance.
             If this instance does not share it's OldSkeletonInstance with other instances @c NULL will be returned
