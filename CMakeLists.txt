@@ -127,6 +127,10 @@ if (MSVC)
     # set variable to state that we are using nmake makefiles
 	set(NMAKE TRUE)
   endif ()
+  if (CMAKE_BUILD_TOOL STREQUAL "jom")
+	# set variable to state that we are using jom makefiles
+	set(JOM TRUE)
+  endif ()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /fp:fast /arch:SSE2")
   # Enable intrinsics on MSVC in debug mode
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Oi")
