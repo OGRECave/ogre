@@ -551,7 +551,6 @@ namespace Ogre
         if( !newPso->vertexElements.empty() )
 #endif
         {
-            size_t elementIdx = 0;
             MTLVertexDescriptor *vertexDescriptor = [MTLVertexDescriptor vertexDescriptor];
 
             VertexElement2VecVec::const_iterator itor = newPso->vertexElements.begin();
@@ -566,13 +565,12 @@ namespace Ogre
 
                 while( it != en )
                 {
+                    const size_t elementIdx = MetalVaoManager::getAttributeIndexFor( it->mSemantic );
                     vertexDescriptor.attributes[elementIdx].format = MetalMappings::get( it->mType );
                     vertexDescriptor.attributes[elementIdx].bufferIndex = bufferIdx;
                     vertexDescriptor.attributes[elementIdx].offset = accumOffset;
 
                     accumOffset += v1::VertexElement::getTypeSize( it->mType );
-
-                    ++elementIdx;
                     ++it;
                 }
 

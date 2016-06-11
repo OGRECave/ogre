@@ -53,6 +53,27 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    const uint32 MetalVaoManager::VERTEX_ATTRIBUTE_INDEX[VES_COUNT] =
+    {
+        0,  // VES_POSITION - 1
+        3,  // VES_BLEND_WEIGHTS - 1
+        4,  // VES_BLEND_INDICES - 1
+        1,  // VES_NORMAL - 1
+        5,  // VES_DIFFUSE - 1
+        6,  // VES_SPECULAR - 1
+        7,  // VES_TEXTURE_COORDINATES - 1
+        //There are up to 8 VES_TEXTURE_COORDINATES. Occupy range [7; 15)
+        //Range [13; 15) overlaps with VES_BLEND_WEIGHTS2 & VES_BLEND_INDICES2
+        //Index 15 is reserved for draw ID.
+
+        //VES_BINORMAL would use slot 16. Since Binormal is rarely used, we don't support it.
+        //(slot 16 is where const buffers start)
+        ~0u,// VES_BINORMAL - 1
+        2,  // VES_TANGENT - 1
+        13, // VES_BLEND_WEIGHTS2 - 1
+        14, // VES_BLEND_INDICES2 - 1
+    };
+
     MetalVaoManager::MetalVaoManager( uint8 dynamicBufferMultiplier, MetalDevice *device ) :
         mVaoNames( 1 ),
         mDevice( device ),
@@ -945,6 +966,11 @@ namespace Ogre
         }
 
         return 0;
+    }
+    //-----------------------------------------------------------------------------------
+    uint32 MetalVaoManager::getAttributeIndexFor( VertexElementSemantic semantic )
+    {
+        return VERTEX_ATTRIBUTE_INDEX[semantic - 1];
     }
     //-----------------------------------------------------------------------------------
     MetalVaoManager::VboFlag MetalVaoManager::bufferTypeToVboFlag( BufferType bufferType )

@@ -25,16 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#import "OgreHighLevelGpuProgramManager.h"
-#import "OgreHardwareBufferManager.h"
-#import "OgreLogManager.h"
-#import "OgrePass.h"
-#import "OgreTechnique.h"
-#import "OgreRoot.h"
-#import "OgreStringConverter.h"
-#import "OgreMetalRenderSystem.h"
 #import "OgreMetalProgram.h"
-#import "OgreRenderOperation.h"
+#import "OgreHighLevelGpuProgramManager.h"
+#import "OgreLogManager.h"
+#import "OgreMetalDevice.h"
+#import "Vao/OgreMetalVaoManager.h"
+
+#import <Metal/MTLDevice.h>
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -95,10 +92,47 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     bool MetalProgram::compile(const bool checkErrors)
     {
-        NSError *error;
+		//Send fixed vertex attributes as macros/definitions.
+		MTLCompileOptions *options = [[MTLCompileOptions alloc] init];
+		NSMutableDictionary<NSString *, NSObject *> *preprocessorMacros =
+				[NSMutableDictionary dictionary];
+		NSString *names[VES_COUNT] =
+		{
+			@"VES_POSITION",
+			@"VES_BLEND_WEIGHTS",
+			@"VES_BLEND_INDICES",
+			@"VES_NORMAL",
+			@"VES_DIFFUSE",
+			@"VES_SPECULAR",
+			@"VES_TEXTURE_COORDINATES",
+			@"VES_BINORMAL",
+			@"VES_TANGENT",
+			@"VES_BLEND_WEIGHTS2",
+			@"VES_BLEND_INDICES2"
+		};
+		for( size_t i=0; i<VES_COUNT; ++i )
+		{
+			if( i + 1u != VES_BINORMAL )
+			{
+				preprocessorMacros[names[i]] =
+						[NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
+							static_cast<VertexElementSemantic>( i + 1u ) ) ];
+			}
+		}
+		for( uint32 i=0; i<8u; ++i )
+		{
+			NSString *key = [NSString stringWithFormat:@"VES_TEXTURE_COORDINATES%d", i];
+			preprocessorMacros[key] =
+					[NSNumber numberWithUnsignedInt:MetalVaoManager::getAttributeIndexFor(
+						static_cast<VertexElementSemantic>( VES_TEXTURE_COORDINATES + i ) )];
+		}
 
-        mLibrary = [mDevice->mDevice newLibraryWithSource:[NSString stringWithUTF8String:mSource.c_str()]
-                options:nil error:&error];
+		options.preprocessorMacros = preprocessorMacros;
+
+        NSError *error;
+		mLibrary = [mDevice->mDevice newLibraryWithSource:[NSString stringWithUTF8String:mSource.c_str()]
+												  options:options
+													error:&error];
 
         if( !mLibrary && checkErrors )
         {

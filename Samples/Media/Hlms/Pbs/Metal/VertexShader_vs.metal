@@ -9,23 +9,23 @@
 
 struct VS_INPUT
 {
-	float4 position [[attribute(@counter(attrib))]];
-@property( hlms_normal )	float3 normal [[attribute(@counter(attrib))]];@end
-@property( hlms_qtangent )	float4 qtangent [[attribute(@counter(attrib))]];@end
+    float4 position [[attribute(VES_POSITION)]];
+@property( hlms_normal )	float3 normal [[attribute(VES_NORMAL)]];@end
+@property( hlms_qtangent )	float4 qtangent [[attribute(VES_NORMAL)]];@end
 
 @property( normal_map && !hlms_qtangent )
-	float3 tangent	[[attribute(@counter(attrib))]];
-	@property( hlms_binormal )float3 binormal	[[attribute(@counter(attrib))]];@end
+    float3 tangent	[[attribute(VES_TANGENT)]];
+    @property( hlms_binormal )float3 binormal	[[attribute(VES_BINORMAL)]];@end
 @end
 
 @property( hlms_skeleton )
-	uint4 blendIndices	[[attribute(@counter(attrib))]];
-	float4 blendWeights [[attribute(@counter(attrib))]];@end
+    uint4 blendIndices	[[attribute(VES_BLEND_INDICES)]];
+    float4 blendWeights [[attribute(VES_BLEND_WEIGHTS)]];@end
 
 @foreach( hlms_uv_count, n )
-	float@value( hlms_uv_count@n ) uv@n [[attribute(@counter(attrib))]];@end
+    float@value( hlms_uv_count@n ) uv@n [[attribute(VES_TEXTURE_COORDINATES@n)]];@end
 @property( !iOS )
-	uint drawId [[attribute(15)]];
+    uint drawId [[attribute(15)]];
 @end
 	@insertpiece( custom_vs_attributes )
 };

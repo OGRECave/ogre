@@ -143,6 +143,8 @@ namespace Ogre
         VertexBufferPacked  *mDrawId;
 #endif
 
+        static const uint32 VERTEX_ATTRIBUTE_INDEX[VES_COUNT];
+
         /** Asks for allocating buffer space in a VBO (Vertex Buffer Object).
             If the VBO doesn't exist, all VBOs are full or can't fit this request,
             then a new VBO will be created.
@@ -275,6 +277,8 @@ namespace Ogre
             strange reason doesn't throw, it is programmed to return 'fenceName'
         */
         static dispatch_semaphore_t waitFor( dispatch_semaphore_t fenceName, MetalDevice *device );
+
+        static uint32 getAttributeIndexFor( VertexElementSemantic semantic );
     };
 }
 
