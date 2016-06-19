@@ -20,8 +20,8 @@ struct Material
 	float4 alpha_test_threshold;
 	float4 diffuse;
 
-	uint4 indices0_3;
-	uint4 indices4_7;
+	@foreach( 8, n )
+		ushort diffuseIdx@n;@end
 };@end
 
 @piece( MaterialDecl )
@@ -50,7 +50,7 @@ struct Material
 
 @piece( VStoPS_block )
 	@property( !hlms_shadowcaster )
-		uint drawId [[flat]];
+		ushort drawId [[flat]];
 		@property( hlms_colour )float4 colour;@end
 		@foreach( out_uv_half_count, n )
 			float@value( out_uv_half_count@n ) uv@n;@end

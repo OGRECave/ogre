@@ -9,23 +9,23 @@
 
 struct VS_INPUT
 {
-    float4 position [[attribute(VES_POSITION)]];
+	float4 position [[attribute(VES_POSITION)]];
 @property( hlms_normal )	float3 normal [[attribute(VES_NORMAL)]];@end
 @property( hlms_qtangent )	float4 qtangent [[attribute(VES_NORMAL)]];@end
 
 @property( normal_map && !hlms_qtangent )
-    float3 tangent	[[attribute(VES_TANGENT)]];
-    @property( hlms_binormal )float3 binormal	[[attribute(VES_BINORMAL)]];@end
+	float3 tangent	[[attribute(VES_TANGENT)]];
+	@property( hlms_binormal )float3 binormal	[[attribute(VES_BINORMAL)]];@end
 @end
 
 @property( hlms_skeleton )
-    uint4 blendIndices	[[attribute(VES_BLEND_INDICES)]];
-    float4 blendWeights [[attribute(VES_BLEND_WEIGHTS)]];@end
+	uint4 blendIndices	[[attribute(VES_BLEND_INDICES)]];
+	float4 blendWeights [[attribute(VES_BLEND_WEIGHTS)]];@end
 
 @foreach( hlms_uv_count, n )
-    float@value( hlms_uv_count@n ) uv@n [[attribute(VES_TEXTURE_COORDINATES@n)]];@end
+	float@value( hlms_uv_count@n ) uv@n [[attribute(VES_TEXTURE_COORDINATES@n)]];@end
 @property( !iOS )
-    uint drawId [[attribute(15)]];
+	ushort drawId [[attribute(15)]];
 @end
 	@insertpiece( custom_vs_attributes )
 };
@@ -59,8 +59,8 @@ struct PS_INPUT
 @end
 
 @property( hlms_skeleton )@piece( SkeletonTransform )
-	uint _idx = (input.blendIndices[0] << 1u) + input.blendIndices[0]; //blendIndices[0] * 3u; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
-		uint matStart = worldMaterialIdx[drawId].x >> 9u;
+	int _idx = int((input.blendIndices[0] << 1u) + input.blendIndices[0]); //blendIndices[0] * 3u; a 32-bit int multiply is 4 cycles on GCN! (and mul24 is not exposed to GLSL...)
+		int matStart = int(worldMaterialIdx[drawId].x >> 9u);
 	float4 worldMat[3];
 		worldMat[0] = worldMatBuf[matStart + _idx + 0u];
 		worldMat[1] = worldMatBuf[matStart + _idx + 1u];
@@ -111,7 +111,7 @@ struct PS_INPUT
 @property( hlms_skeleton )
 	@piece( worldViewMat )pass.view@end
 @end @property( !hlms_skeleton )
-    @piece( worldViewMat )worldView@end
+	@piece( worldViewMat )worldView@end
 @end
 
 @piece( CalculatePsPos )( @insertpiece(local_vertex) * @insertpiece( worldViewMat ) ).xyz@end
@@ -143,8 +143,8 @@ vertex PS_INPUT main_metal
 (
 	VS_INPUT input [[stage_in]]
 	@property( iOS )
-		, uint instanceId [[instance_id]]
-		, constant uint &baseInstance [[buffer(15)]]
+		, ushort instanceId [[instance_id]]
+		, constant ushort &baseInstance [[buffer(15)]]
 	@end
 	// START UNIFORM DECLARATION
 	@insertpiece( PassDecl )
@@ -155,9 +155,9 @@ vertex PS_INPUT main_metal
 )
 {
 	@property( iOS )
-		uint drawId = baseInstance + instanceId;
+		ushort drawId = baseInstance + instanceId;
 	@end @property( !iOS )
-		uint drawId = input.drawId;
+		ushort drawId = input.drawId;
 	@end
 
 	PS_INPUT outVs;
@@ -195,12 +195,12 @@ vertex PS_INPUT main_metal
 
 @end @property( hlms_shadowcaster )
 	float shadowConstantBias = asfloat( worldMaterialIdx[drawId].y );
-	
+
 	@property( !hlms_shadow_uses_depth_texture )
 		//Linear depth
 		outVs.depth	= (outVs.gl_Position.z + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y;
 	@end
-		
+
 	//We can't make the depth buffer linear without Z out in the fragment shader;
 	//however we can use a cheap approximation ("pseudo linear depth")
 	//see http://www.yosoygames.com.ar/wp/2014/01/linear-depth-buffer-my-ass/

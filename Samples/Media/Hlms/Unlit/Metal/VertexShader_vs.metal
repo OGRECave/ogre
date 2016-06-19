@@ -12,7 +12,7 @@ struct VS_INPUT
 @foreach( hlms_uv_count, n )
 	float@value( hlms_uv_count@n ) uv@n [[attribute(VES_TEXTURE_COORDINATES@n)]];@end
 @property( !iOS )
-	uint drawId [[attribute(15)]];
+	ushort drawId [[attribute(15)]];
 @end
 	@insertpiece( custom_vs_attributes )
 };
@@ -37,8 +37,8 @@ vertex PS_INPUT main_metal
 (
 	VS_INPUT input [[stage_in]]
 	@property( iOS )
-		, uint instanceId [[instance_id]]
-		, constant uint &baseInstance [[buffer(15)]]
+		, ushort instanceId [[instance_id]]
+		, constant ushort &baseInstance [[buffer(15)]]
 	@end
 	// START UNIFORM DECLARATION
 	@insertpiece( PassDecl )
@@ -50,9 +50,9 @@ vertex PS_INPUT main_metal
 )
 {
 	@property( iOS )
-		uint drawId = baseInstance + instanceId;
+		ushort drawId = baseInstance + instanceId;
 	@end @property( !iOS )
-		uint drawId = input.drawId;
+		ushort drawId = input.drawId;
 	@end
 
 	PS_INPUT outVs;

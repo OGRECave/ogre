@@ -86,9 +86,24 @@ struct Material
 	float4 detailOffsetScaleD[4];
 	float4 detailOffsetScaleN[4];
 
-	uint4 indices0_3;
-	//asfloat( indices4_7.w ) contains mNormalMapWeight.
-	uint4 indices4_7;
+	//uint4 indices0_3;
+	ushort diffuseIdx;
+	ushort normalIdx;
+	ushort specularIdx;
+	ushort roughnessIdx;
+	ushort weightMapIdx;
+	ushort detailMapIdx0;
+	ushort detailMapIdx1;
+	ushort detailMapIdx2;
+
+	//uint4 indices4_7;
+	ushort detailMapIdx3;
+	ushort detailNormMapIdx0;
+	ushort detailNormMapIdx1;
+	ushort detailNormMapIdx2;
+	ushort detailNormMapIdx3;
+	ushort envMapIdx;
+	float mNormalMapWeight;
 };@end
 
 @piece( MaterialDecl )
@@ -114,7 +129,7 @@ struct Material
 
 @piece( VStoPS_block )
 	@property( !hlms_shadowcaster )
-		uint drawId [[flat]];
+		ushort drawId [[flat]];
 		@property( hlms_normal || hlms_qtangent )
 			float3 pos;
 			float3 normal;
@@ -133,7 +148,7 @@ struct Material
 
 	@property( hlms_shadowcaster )
 		@property( alpha_test )
-			uint drawId [[flat]];
+			ushort drawId [[flat]];
 			@foreach( hlms_uv_count, n )
 				float@value( hlms_uv_count@n ) uv@n;@end
 		@end

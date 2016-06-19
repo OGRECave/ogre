@@ -87,7 +87,7 @@ inline float3 qmul( float4 q, float3 v )
 @end
 
 @property( normal_map_tex || detail_maps_normal )
-inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMap, float2 uv, uint normalIdx )
+inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMap, float2 uv, ushort normalIdx )
 {
 	float3 tsNormal;
 @property( signed_int_textures )
@@ -102,7 +102,7 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 	return tsNormal;
 }
 @end
-@property( normal_weight_tex )#define normalMapWeight asfloat( material.indices4_7.w )@end
+@property( normal_weight_tex )#define normalMapWeight material.mNormalMapWeight )@end
 @property( detail_maps_normal )
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
@@ -121,9 +121,6 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 fragment @insertpiece( output_type ) main_metal
 (
 	PS_INPUT inPs [[stage_in]]
-	@property( iOS )
-		, constant uint &baseInstance [[buffer(15)]]
-	@end
 	// START UNIFORM DECLARATION
 	@property( !hlms_shadowcaster || alpha_test )
 		@property( !hlms_shadowcaster )
@@ -159,16 +156,16 @@ fragment @insertpiece( output_type ) main_metal
 
 	Material material;
 
-@property( diffuse_map )	uint diffuseIdx;@end
-@property( normal_map_tex )	uint normalIdx;@end
-@property( specular_map )	uint specularIdx;@end
-@property( roughness_map )	uint roughnessIdx;@end
-@property( detail_weight_map )	uint weightMapIdx;@end
+@property( diffuse_map )	ushort diffuseIdx;@end
+@property( normal_map_tex )	ushort normalIdx;@end
+@property( specular_map )	ushort specularIdx;@end
+@property( roughness_map )	ushort roughnessIdx;@end
+@property( detail_weight_map )	ushort weightMapIdx;@end
 @foreach( 4, n )
-	@property( detail_map@n )uint detailMapIdx@n;@end @end
+	@property( detail_map@n )ushort detailMapIdx@n;@end @end
 @foreach( 4, n )
-	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
-@property( envprobe_map )	uint envMapIdx;@end
+	@property( detail_map_nm@n )ushort detailNormMapIdx@n;@end @end
+@property( envprobe_map )	ushort envMapIdx;@end
 
 @property( diffuse_map || detail_maps_diffuse )float4 diffuseCol;@end
 @property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
@@ -178,22 +175,22 @@ fragment @insertpiece( output_type ) main_metal
 @property( hlms_normal || hlms_qtangent )	float3 nNormal;@end
 
 @property( hlms_normal || hlms_qtangent )
-	uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
+	ushort materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
 	material = materialArray[materialId];
-@property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
-@property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16u;@end
-@property( specular_map )	specularIdx			= material.indices0_3.y & 0x0000FFFFu;@end
-@property( roughness_map )	roughnessIdx		= material.indices0_3.y >> 16u;@end
-@property( detail_weight_map )	weightMapIdx		= material.indices0_3.z & 0x0000FFFFu;@end
-@property( detail_map0 )	detailMapIdx0		= material.indices0_3.z >> 16u;@end
-@property( detail_map1 )	detailMapIdx1		= material.indices0_3.w & 0x0000FFFFu;@end
-@property( detail_map2 )	detailMapIdx2		= material.indices0_3.w >> 16u;@end
-@property( detail_map3 )	detailMapIdx3		= material.indices4_7.x & 0x0000FFFFu;@end
-@property( detail_map_nm0 )	detailNormMapIdx0	= material.indices4_7.x >> 16u;@end
-@property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFFu;@end
-@property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
-@property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
-@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
+@property( diffuse_map )	diffuseIdx			= material.diffuseIdx;@end
+@property( normal_map_tex )	normalIdx			= material.normalIdx;@end
+@property( specular_map )	specularIdx			= material.specularIdx;@end
+@property( roughness_map )	roughnessIdx		= material.roughnessIdx;@end
+@property( detail_weight_map )	weightMapIdx	= material.weightMapIdx;@end
+@property( detail_map0 )	detailMapIdx0		= material.detailMapIdx0;@end
+@property( detail_map1 )	detailMapIdx1		= material.detailMapIdx1;@end
+@property( detail_map2 )	detailMapIdx2		= material.detailMapIdx2;@end
+@property( detail_map3 )	detailMapIdx3		= material.detailMapIdx3;@end
+@property( detail_map_nm0 )	detailNormMapIdx0	= material.detailNormMapIdx0;@end
+@property( detail_map_nm1 )	detailNormMapIdx1	= material.detailNormMapIdx1;@end
+@property( detail_map_nm2 )	detailNormMapIdx2	= material.detailNormMapIdx2;@end
+@property( detail_map_nm3 )	detailNormMapIdx3	= material.detailNormMapIdx3;@end
+@property( envprobe_map )	envMapIdx			= material.envMapIdx;@end
 
 	@insertpiece( custom_ps_posMaterialLoad )
 
@@ -436,21 +433,21 @@ fragment @insertpiece( output_type ) main_metal
 
 @property( alpha_test )
 	Material material;
-@property( diffuse_map )	uint diffuseIdx;@end
-@property( detail_weight_map )	uint weightMapIdx;@end
+@property( diffuse_map )	ushort diffuseIdx;@end
+@property( detail_weight_map )	ushort weightMapIdx;@end
 @foreach( 4, n )
-	@property( detail_map@n )uint detailMapIdx@n;@end @end
+	@property( detail_map@n )ushort detailMapIdx@n;@end @end
 
 @property( diffuse_map || detail_maps_diffuse )float diffuseCol;@end
 
-	uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
+	ushort materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
 	material = materialArray[materialId];
-@property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
-@property( detail_weight_map )	weightMapIdx		= material.indices0_3.z & 0x0000FFFFu;@end
-@property( detail_map0 )	detailMapIdx0		= material.indices0_3.z >> 16u;@end
-@property( detail_map1 )	detailMapIdx1		= material.indices0_3.w & 0x0000FFFFu;@end
-@property( detail_map2 )	detailMapIdx2		= material.indices0_3.w >> 16u;@end
-@property( detail_map3 )	detailMapIdx3		= material.indices4_7.x & 0x0000FFFFu;@end
+@property( diffuse_map )	diffuseIdx			= material.diffuseIdx;@end
+@property( detail_weight_map )	weightMapIdx		= material.weightMapIdx;@end
+@property( detail_map0 )	detailMapIdx0		= material.detailMapIdx0;@end
+@property( detail_map1 )	detailMapIdx1		= material.detailMapIdx1;@end
+@property( detail_map2 )	detailMapIdx2		= material.detailMapIdx2;@end
+@property( detail_map3 )	detailMapIdx3		= material.detailMapIdx3;@end
 
 @property( detail_maps_diffuse || detail_maps_normal )
 	//Prepare weight map for the detail maps.

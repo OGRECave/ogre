@@ -98,20 +98,11 @@
 @foreach( diffuse_map, n )
 	@sub( diffuse_map@n_idx, diffuse_map@n, 1 ) @end
 
-@piece( diffuseIdx0 )material.indices0_3.x & 0x0000FFFFu@end
-@piece( diffuseIdx1 )material.indices0_3.y >> 16u@end
-@piece( diffuseIdx2 )material.indices0_3.z & 0x0000FFFFu@end
-@piece( diffuseIdx3 )material.indices0_3.w >> 16u@end
-@piece( diffuseIdx4 )material.indices4_7.x & 0x0000FFFFu@end
-@piece( diffuseIdx5 )material.indices4_7.y >> 16u@end
-@piece( diffuseIdx6 )material.indices4_7.z & 0x0000FFFFu@end
-@piece( diffuseIdx7 )material.indices4_7.w >> 16u@end
-
 @foreach( diffuse_map, n )
 	@property( diffuse_map@n_array )
 		@piece( TextureOrigin@n )textureMapsArray@value(diffuse_map@n_idx)@end
 		@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end
-		@piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), @insertpiece( diffuseIdx@n )@end
+		@piece( SamplerUV@n )inPs.uv@value( uv_diffuse@n ).@insertpiece( uv_diffuse_swizzle@n ), material.diffuseIdx@n @end
 	@end @property( !diffuse_map@n_array )
 		@piece( TextureOrigin@n )textureMaps@value(diffuse_map@n_idx)@end
 		@piece( SamplerOrigin@n )samplerState@value(diffuse_map@n_idx)@end

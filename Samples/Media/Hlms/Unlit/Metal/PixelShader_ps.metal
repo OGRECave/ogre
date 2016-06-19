@@ -23,9 +23,6 @@ struct PS_INPUT
 fragment @insertpiece( output_type ) main_metal
 (
 	PS_INPUT inPs [[stage_in]]
-	@property( iOS )
-		, constant uint &baseInstance [[buffer(15)]]
-	@end
 	// START UNIFORM DECLARATION
 	@property( !hlms_shadowcaster )
 		@insertpiece( MaterialDecl )
@@ -50,7 +47,7 @@ fragment @insertpiece( output_type ) main_metal
 	@property( diffuse_map || alpha_test || diffuse )Material material;@end
 
 @property( diffuse_map || alpha_test || diffuse )
-	uint materialId	= materialIdx[inPs.drawId].x;
+	ushort materialId	= materialIdx[inPs.drawId].x;
 	material = materialArray[materialId];
 @end
 
