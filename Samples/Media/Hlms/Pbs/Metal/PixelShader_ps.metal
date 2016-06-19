@@ -28,47 +28,45 @@ struct PS_INPUT
 @end
 
 @property( hlms_num_shadow_maps )
-Texture2D texShadowMap[@value(hlms_num_shadow_maps)] : register(t@value(textureRegShadowMapStart));
-SamplerComparisonState shadowSampler : register(s@value(textureRegShadowMapStart));
-
-inline float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
+inline float getShadow( depth2d shadowMap, sampler shadowSampler,
+						float4 psPosLN, float4 invShadowMapSize )
 {
 	float fDepth = psPosLN.z;
-	float2 uv = psPosLN.xy / psPosLN.w;
+	half2 uv = half2( psPosLN.xy / psPosLN.w );
 	/*float c = shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
 	return c;*/
 
 	float retVal = 0;
 
 @property( pcf_3x3 || pcf_4x4 )
-	float2 offsets[@value(pcf_iterations)] =
+	half2 offsets[@value(pcf_iterations)] =
 	{
 	@property( pcf_3x3 )
-		float2( 0, 0 ),	//0, 0
-		float2( 1, 0 ),	//1, 0
-		float2( 0, 1 ),	//1, 1
-		float2( 0, 0 ) 	//1, 1
+		half2( 0.0h, 0.0h ),	//0, 0
+		half2( 1.0h, 0.0h ),	//1, 0
+		half2( 0.0h, 1.0h ),	//1, 1
+		half2( 0.0h, 0.0h ) 	//1, 1
 	@end
 	@property( pcf_4x4 )
-		float2( 0, 0 ),	//0, 0
-		float2( 1, 0 ),	//1, 0
-		float2( 1, 0 ),	//2, 0
+		half2( 0.0h, 0.0h ),	//0, 0
+		half2( 1.0h, 0.0h ),	//1, 0
+		half2( 1.0h, 0.0h ),	//2, 0
 
-		float2(-2, 1 ),	//0, 1
-		float2( 1, 0 ),	//1, 1
-		float2( 1, 0 ),	//2, 1
+		half2(-2.0h, 1.0h ),	//0, 1
+		half2( 1.0h, 0.0h ),	//1, 1
+		half2( 1.0h, 0.0h ),	//2, 1
 
-		float2(-2, 1 ),	//0, 2
-		float2( 1, 0 ),	//1, 2
-		float2( 1, 0 )	//2, 2
+		half2(-2.0h, 1.0h ),	//0, 2
+		half2( 1.0h, 0.0h ),	//1, 2
+		half2( 1.0h, 0.0h )		//2, 2
 	@end
 	};
 @end
 
 	@foreach( pcf_iterations, n )
-		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * invShadowMapSize.xy;@end
+		@property( pcf_3x3 || pcf_4x4 )uv += offsets[@n] * half2(invShadowMapSize.xy);@end
 		// 2x2 PCF
-		retVal += shadowMap.SampleCmpLevelZero( shadowSampler, uv.xy, fDepth );
+		retVal += shadowMap.sample_compare( shadowSampler, float2(uv.xy), fDepth );
 	@end
 
 	@property( pcf_3x3 )
@@ -118,7 +116,7 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 @end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
+@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap@value(CurrentShadowMap), samplerShadow, inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
 fragment @insertpiece( output_type ) main_metal
 (
@@ -149,6 +147,10 @@ fragment @insertpiece( output_type ) main_metal
 		, texturecube<float>	texEnvProbeMap [[texture(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
 		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
+	@foreach( hlms_num_shadow_maps, n )
+		, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
+	@property( hlms_num_shadow_maps )
+		, sampler shadowSampler [[sampler(@value(textureRegShadowMapStart))]]@end
 )
 {
 	PS_OUTPUT outPs;
@@ -269,11 +271,11 @@ fragment @insertpiece( output_type ) main_metal
 @property( hlms_pssm_splits )
 	float fShadow = 1.0;
 	if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+		fShadow = getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @foreach( hlms_pssm_splits, n, 1 )	else if( inPs.depth <= pass.pssmSplitPoints@value(CurrentShadowMap) )
-		fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+		fShadow = getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL@n, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end @end @property( !hlms_pssm_splits && hlms_num_shadow_maps && hlms_lights_directional )
-	float fShadow = getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
+	float fShadow = getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL0, pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize );
 @end
 
 @insertpiece( SampleSpecularMap )
