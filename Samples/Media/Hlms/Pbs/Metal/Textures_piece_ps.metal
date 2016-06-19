@@ -19,10 +19,10 @@
 
 @property( diffuse_map )
 	@property( !hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	diffuseCol = textureMaps[@value( diffuse_map_idx )].sample( samplerStates[@value(diffuse_map_idx)], inPs.uv@value(uv_diffuse).xy, diffuseIdx );
+		@piece( SampleDiffuseMap )	diffuseCol = textureMaps@value( diffuse_map_idx ).sample( samplerStates@value(diffuse_map_idx), inPs.uv@value(uv_diffuse).xy, diffuseIdx );
 @property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end @end
 	@end @property( hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	diffuseCol = textureMaps[@value( diffuse_map_idx )].sample( samplerStates[@value(diffuse_map_idx)], inPs.uv@value(uv_diffuse).xy, diffuseIdx ).w;@end
+		@piece( SampleDiffuseMap )	diffuseCol = textureMaps@value( diffuse_map_idx ).sample( samplerStates@value(diffuse_map_idx), inPs.uv@value(uv_diffuse).xy, diffuseIdx ).w;@end
 	@end
 @end
 
@@ -42,13 +42,13 @@
 
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )
-		@piece( SampleSpecularMap )	specularCol = textureMaps[@value( specular_map_idx )].sample( samplerStates[@value(specular_map_idx)], inPs.uv@value(uv_specular).xy, specularIdx ).xyz * material.kS.xyz;@end
+		@piece( SampleSpecularMap )	specularCol = textureMaps@value( specular_map_idx ).sample( samplerStates@value(specular_map_idx), inPs.uv@value(uv_specular).xy, specularIdx ).xyz * material.kS.xyz;@end
 		@piece( specularExtraParamDef ), float3 specularCol@end
 		@piece( specularExtraParam ), specularCol.xyz@end
 		@piece( kS )specularCol@end
 	@end
 	@property( specular_map && fresnel_workflow )
-		@piece( SampleSpecularMap )	F0 = textureMaps[@value( specular_map_idx )].sample( samplerStates[@value(specular_map_idx)], inPs.uv@value(uv_specular).xy, specularIdx ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
+		@piece( SampleSpecularMap )	F0 = textureMaps@value( specular_map_idx ).sample( samplerStates@value(specular_map_idx), inPs.uv@value(uv_specular).xy, specularIdx ).@insertpiece( FresnelSwizzle ) * material.F0.@insertpiece( FresnelSwizzle );@end
 		@piece( specularExtraParamDef ), @insertpiece( FresnelType ) F0@end
 		@piece( specularExtraParam ), F0@end
 	@end
@@ -58,7 +58,7 @@
 @end @property( metallic_workflow )
 @piece( SampleSpecularMap )
 	@property( specular_map )
-		float metalness = textureMaps[@value( specular_map_idx )].sample( samplerStates[@value(specular_map_idx)], inPs.uv@value(uv_specular).xy, specularIdx ).x * material.F0.x;
+		float metalness = textureMaps@value( specular_map_idx ).sample( samplerStates@value(specular_map_idx), inPs.uv@value(uv_specular).xy, specularIdx ).x * material.F0.x;
 		F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, metalness );
 		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * metalness;
 	@end @property( !specular_map )
@@ -75,7 +75,7 @@
 @end
 
 @property( roughness_map )
-	@piece( SampleRoughnessMap )	ROUGHNESS = material.kS.w * textureMaps[@value( roughness_map_idx )].sample( samplerStates[@value( roughness_map_idx )], inPs.uv@value(uv_roughness).xy, roughnessIdx ).x;
+	@piece( SampleRoughnessMap )	ROUGHNESS = material.kS.w * textureMaps@value( roughness_map_idx ).sample( samplerStates@value( roughness_map_idx ), inPs.uv@value(uv_roughness).xy, roughnessIdx ).x;
 	ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 	@piece( roughnessExtraParamDef ), float ROUGHNESS@end
 	@piece( roughnessExtraParam ), ROUGHNESS@end
@@ -85,11 +85,11 @@
 @piece( brdfExtraParams )@insertpiece( diffuseExtraParam )@insertpiece( specularExtraParam )@insertpiece( roughnessExtraParam )@insertpiece( metallicExtraParam )@end
 
 @foreach( detail_maps_normal, n )
-	@piece( SampleDetailMapNm@n )getTSDetailNormal( samplerStates[@value(detail_map_nm@n_idx)], textureMaps[@value(detail_map_nm@n_idx)], inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ), detailNormMapIdx@n ) * detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul )@end
+	@piece( SampleDetailMapNm@n )getTSDetailNormal( samplerStates@value(detail_map_nm@n_idx), textureMaps@value(detail_map_nm@n_idx), inPs.uv@value(uv_detail_nm@n).xy@insertpiece( offsetDetailN@n ), detailNormMapIdx@n ) * detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul )@end
 @end
 
 @property( detail_weight_map )
-	@piece( SamplerDetailWeightMap )textureMaps[@value(detail_weight_map_idx)].sample( samplerStates[@value(detail_weight_map_idx)], inPs.uv@value(uv_detail_weight).xy, weightMapIdx )@end
+	@piece( SamplerDetailWeightMap )textureMaps@value(detail_weight_map_idx).sample( samplerStates@value(detail_weight_map_idx), inPs.uv@value(uv_detail_weight).xy, weightMapIdx )@end
 @end
 
 @property( envmap_scale )

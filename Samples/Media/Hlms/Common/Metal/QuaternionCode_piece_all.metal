@@ -1,5 +1,5 @@
 @piece( DeclQuat_xAxis )
-float3 xAxis( float4 qQuat )
+inline float3 xAxis( float4 qQuat )
 {
 	float fTy  = 2.0 * qQuat.y;
 	float fTz  = 2.0 * qQuat.z;
@@ -15,7 +15,7 @@ float3 xAxis( float4 qQuat )
 @end
 
 @piece( DeclQuat_yAxis )
-float3 yAxis( float4 qQuat )
+inline float3 yAxis( float4 qQuat )
 {
 	float fTx  = 2.0 * qQuat.x;
 	float fTy  = 2.0 * qQuat.y;
@@ -32,7 +32,7 @@ float3 yAxis( float4 qQuat )
 @end
 
 @piece( DeclQuat_zAxis )
-float3 zAxis( float4 qQuat )
+inline float3 zAxis( float4 qQuat )
 {
 	float fTx  = 2.0 * qQuat.x;
 	float fTy  = 2.0 * qQuat.y;

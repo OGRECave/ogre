@@ -31,7 +31,7 @@ struct PS_INPUT
 Texture2D texShadowMap[@value(hlms_num_shadow_maps)] : register(t@value(textureRegShadowMapStart));
 SamplerComparisonState shadowSampler : register(s@value(textureRegShadowMapStart));
 
-float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
+inline float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
 {
 	float fDepth = psPosLN.z;
 	float2 uv = psPosLN.xy / psPosLN.w;
@@ -82,21 +82,22 @@ float getShadow( Texture2D shadowMap, float4 psPosLN, float4 invShadowMapSize )
 @end
 
 @property( hlms_lights_spot_textured )@insertpiece( DeclQuat_zAxis )
-float3 qmul( float4 q, float3 v )
+inline float3 qmul( float4 q, float3 v )
 {
 	return v + 2.0 * cross( cross( v, q.xyz ) + q.w * v, q.xyz );
 }
 @end
 
-@property( normal_map_tex )float3 getTSNormal( float2 uv, uint normalIdx )
+@property( normal_map_tex || detail_maps_normal )
+inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMap, float2 uv, uint normalIdx )
 {
 	float3 tsNormal;
 @property( signed_int_textures )
 	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = textureMaps[@value( normal_map_tex_idx )].sample( samplerStates[@value( normal_map_tex_idx )], uv, normalIdx ).xy;
+	tsNormal.xy = normalMap.sample( samplerState, uv, normalIdx ).xy;
 @end @property( !signed_int_textures )
 	//Normal texture must be in LA format!
-	tsNormal.xy = textureMaps[@value( normal_map_tex_idx )].sample( samplerStates[@value( normal_map_tex_idx )], uv, normalIdx ).xw * 2.0 - 1.0;
+	tsNormal.xy = normalMap.sample( samplerState, uv, normalIdx ).xw * 2.0 - 1.0;
 @end
 	tsNormal.z	= sqrt( max( 0, 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
@@ -104,20 +105,7 @@ float3 qmul( float4 q, float3 v )
 }
 @end
 @property( normal_weight_tex )#define normalMapWeight asfloat( material.indices4_7.w )@end
-@property( detail_maps_normal )float3 getTSDetailNormal( SamplerState samplerState, Texture2DArray normalMap, float3 uv )
-{
-	float3 tsNormal;
-@property( signed_int_textures )
-	//Normal texture must be in U8V8 or BC5 format!
-	tsNormal.xy = normalMap.Sample( samplerState, uv ).xy;
-@end @property( !signed_int_textures )
-	//Normal texture must be in LA format!
-	tsNormal.xy = normalMap.Sample( samplerState, uv ).xw * 2.0 - 1.0;
-@end
-	tsNormal.z	= sqrt( max( 0, 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
-
-	return tsNormal;
-}
+@property( detail_maps_normal )
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
 			@piece( detail@n_nm_weight_mul ) * material.normalWeights.@insertpiece( detail_swizzle@n )@end
@@ -155,12 +143,12 @@ fragment @insertpiece( output_type ) main_metal
 
 	@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end
 
-	@property( num_textures )
-		, texture2d_array textureMaps[@value( num_textures )] [[texture(@value(textureRegStart))]]@end
+	@foreach( num_textures, n )
+		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end
 	@property( envprobe_map )
-		, texturecube	texEnvProbeMap [[texture(@value(envMapReg))]]@end
-	@property( numSamplerStates || envprobe_map )
-		, sampler samplerStates[@value(numSamplerStates)] [[sampler(@value(samplerStateStart))]]@end
+		, texturecube<float>	texEnvProbeMap [[texture(@value(envMapReg))]]@end
+	@foreach( numSamplerStates, n )
+		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
 )
 {
 	PS_OUTPUT outPs;
@@ -220,7 +208,7 @@ fragment @insertpiece( output_type ) main_metal
 
 	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
-	float4 detailCol@n	= textureMaps[@value(detail_map@n_idx)].sample( samplerStates[@value(detail_map@n_idx)], inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n );
+	float4 detailCol@n	= textureMaps@value(detail_map@n_idx).sample( samplerStates@value(detail_map@n_idx), inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n );
 	@property( !hw_gamma_read )//Gamma to linear space
 		detailCol@n.xyz = detailCol@n.xyz * detailCol@n.xyz;@end
 	detailWeights.@insertpiece(detail_swizzle@n) *= detailCol@n.w;
@@ -269,7 +257,9 @@ fragment @insertpiece( output_type ) main_metal
 	float3 vBinormal	= normalize( cross( geomNormal, vTangent )@insertpiece( tbnApplyReflection ) );
 	float3x3 TBN		= float3x3( vTangent, vBinormal, geomNormal );
 
-	@property( normal_map_tex )nNormal = getTSNormal( inPs.uv@value(uv_normal).xy, normalIdx );@end
+	@property( normal_map_tex )nNormal = getTSNormal( samplerStates@value( normal_map_tex_idx ),
+													  textureMaps@value( normal_map_tex_idx ),
+													  inPs.uv@value(uv_normal).xy, normalIdx );@end
 	@property( normal_weight_tex )
 		// Apply the weight to the main normal map
 		nNormal = mix( float3( 0.0, 0.0, 1.0 ), nNormal, normalMapWeight );
@@ -384,8 +374,8 @@ fragment @insertpiece( output_type ) main_metal
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
 	@property( envprobe_map )
-		float3 envColourS = texEnvProbeMap.sample( samplerStates[@value(num_textures)], mul( reflDir, pass.invViewMatCubemap ), level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
-		float3 envColourD = texEnvProbeMap.sample( samplerStates[@value(num_textures)], mul( nNormal, pass.invViewMatCubemap ), level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+		float3 envColourS = texEnvProbeMap.sample( samplerStates@value(num_textures), mul( reflDir, pass.invViewMatCubemap ), level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+		float3 envColourD = texEnvProbeMap.sample( samplerStates@value(num_textures), mul( nNormal, pass.invViewMatCubemap ), level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
 		@property( !hw_gamma_read )	//Gamma to linear space
 			envColourS = envColourS * envColourS;
 			envColourD = envColourD * envColourD;
@@ -473,7 +463,7 @@ fragment @insertpiece( output_type ) main_metal
 
 	/// Sample detail maps and weight them against the weight map in the next foreach loop.
 @foreach( detail_maps_diffuse, n )@property( detail_map@n )
-	float detailCol@n	= textureMaps[@value(detail_map@n_idx)].sample( samplerStates[@value(detail_map@n_idx)], inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ).w;
+	float detailCol@n	= textureMaps@value(detail_map@n_idx).sample( samplerStates@value(detail_map@n_idx), inPs.uv@value(uv_detail@n).xy@insertpiece( offsetDetailD@n ), detailMapIdx@n ).w;
 	detailCol@n = detailWeights.@insertpiece(detail_swizzle@n) * detailCol@n;@end
 @end
 
