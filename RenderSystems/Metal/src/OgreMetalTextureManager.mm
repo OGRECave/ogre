@@ -29,10 +29,11 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalTextureManager.h"
 #include "OgreMetalTexture.h"
 
-namespace Ogre 
+namespace Ogre
 {
-    MetalTextureManager::MetalTextureManager() :
-        TextureManager()
+    MetalTextureManager::MetalTextureManager( MetalDevice *device ) :
+        TextureManager(),
+        mDevice( device )
     {
         ResourceGroupManager::getSingleton()._registerResourceManager(mResourceType, this);
     }
@@ -47,16 +48,19 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual,
         ManualResourceLoader* loader, const NameValuePairList* createParams)
     {
-        return new MetalTexture( this, name, handle, group, isManual, loader );
+        return new MetalTexture( this, name, handle, group, isManual, loader, mDevice );
     }
 
     PixelFormat MetalTextureManager::getNativeFormat(TextureType ttype, PixelFormat format, int usage)
     {
-        return PF_BYTE_RGBA;
+        if( format == PF_R8G8B8 )
+            return PF_X8R8G8B8;
+
+        return format;
     }
 
     bool MetalTextureManager::isHardwareFilteringSupported( TextureType ttype, PixelFormat format,
-                                                           int usage, bool preciseFormatOnly )
+                                                            int usage, bool preciseFormatOnly )
     {
         return true;
     }

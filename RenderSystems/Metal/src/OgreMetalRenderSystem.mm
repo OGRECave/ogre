@@ -38,6 +38,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalGpuProgramManager.h"
 #include "OgreMetalProgram.h"
 #include "OgreMetalProgramFactory.h"
+#include "OgreMetalTexture.h"
 
 #include "OgreMetalHardwareBufferManager.h"
 #include "OgreMetalHardwareIndexBuffer.h"
@@ -150,6 +151,8 @@ namespace Ogre
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
         rsc->setMaxPointSize(256);
 
+        rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
+
         rsc->setMaximumResolutions( 16384, 4096, 16384 );
 
         rsc->addShaderProfile( "metal" );
@@ -182,7 +185,7 @@ namespace Ogre
         {
             mDevice.init();
             setActiveDevice(&mDevice);
-            
+
             const long c_inFlightCommandBuffers = 3;
             mMainGpuSyncSemaphore = dispatch_semaphore_create(c_inFlightCommandBuffers);
             mRealCapabilities = createRenderSystemCapabilities();
@@ -194,7 +197,7 @@ namespace Ogre
 
             initialiseFromRenderSystemCapabilities( mCurrentCapabilities, 0 );
 
-            mTextureManager = new MetalTextureManager();
+            mTextureManager = new MetalTextureManager( &mDevice );
             mVaoManager = OGRE_NEW MetalVaoManager( c_inFlightCommandBuffers, &mDevice );
             mHardwareBufferManager = new v1::MetalHardwareBufferManager( &mDevice, mVaoManager );
 
@@ -286,6 +289,16 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setTexture(size_t unit, bool enabled,  Texture *texPtr)
     {
+        __unsafe_unretained id<MTLTexture> metalTexture = 0;
+
+        if( texPtr && enabled )
+        {
+            MetalTexture *metalTex = static_cast<MetalTexture*>( texPtr );
+            metalTexture = metalTex->getTextureForSampling( this );
+        }
+
+        [mActiveRenderEncoder setVertexTexture:metalTexture atIndex:unit];
+        [mActiveRenderEncoder setFragmentTexture:metalTexture atIndex:unit];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setTextureCoordSet(size_t unit, size_t index)
@@ -337,6 +350,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrameOnce(void)
     {
+        mHardwareBufferManager->_updateDirtyInputLayouts();
+
         //Allow the renderer to preflight 3 frames on the CPU (using a semapore as a guard) and
         //commit them to the GPU. This semaphore will get signaled once the GPU completes a
         //frame's work via addCompletedHandler callback below, signifying the CPU can go ahead
@@ -429,16 +444,16 @@ namespace Ogre
         mActiveRenderEncoder = 0;
         mPso = 0;
     }
-	//-------------------------------------------------------------------------
-	void MetalRenderSystem::_notifyDeviceStalled(void)
-	{
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_notifyDeviceStalled(void)
+    {
         v1::MetalHardwareBufferManager *hwBufferMgr = static_cast<v1::MetalHardwareBufferManager*>(
                     mHardwareBufferManager );
         MetalVaoManager *vaoManager = static_cast<MetalVaoManager*>( mVaoManager );
 
         hwBufferMgr->_notifyDeviceStalled();
         vaoManager->_notifyDeviceStalled();
-	}
+    }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
     {
@@ -637,7 +652,7 @@ namespace Ogre
         MetalHlmsPso *metalPso = new MetalHlmsPso();
         metalPso->pso = pso;
         metalPso->depthStencilState = depthStencilState;
-        
+
         newPso->rsData = metalPso;
     }
     //-------------------------------------------------------------------------
@@ -713,16 +728,16 @@ namespace Ogre
 
         if( pso && !mActiveRenderEncoder )
             createRenderEncoder();
-        
+
         if( !mPso || mPso->depthStencilState != metalPso->depthStencilState )
             [mActiveRenderEncoder setDepthStencilState:metalPso->depthStencilState];
-        
+
         [mActiveRenderEncoder setDepthBias:pso->macroblock->mDepthBiasConstant
                                      slopeScale:pso->macroblock->mDepthBiasSlopeScale
                                      clamp:0.0f];
         // Ogre CullMode starts with 1 and Metals starts with 0
         [mActiveRenderEncoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)];
-        
+
         if( mPso != metalPso )
         {
             [mActiveRenderEncoder setRenderPipelineState:metalPso->pso];
@@ -1108,6 +1123,103 @@ namespace Ogre
                 instanceCount:cmd->instanceCount
                  baseInstance:cmd->baseInstance];
 #endif
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_render( const v1::RenderOperation &op )
+    {
+        // Call super class.
+        RenderSystem::_render(op);
+
+        const size_t numberOfInstances = op.numberOfInstances;
+        const bool hasInstanceData = mCurrentVertexBuffer->vertexBufferBinding->getHasInstanceData();
+
+        // Render to screen!
+        if( op.useIndexes )
+        {
+            do
+            {
+                // Update derived depth bias.
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    [mActiveRenderEncoder setDepthBias:mDerivedDepthBiasBase +
+                                                       mDerivedDepthBiasMultiplier *
+                                                       mCurrentPassIterationNum
+                                            slopeScale:mDerivedDepthBiasSlopeScale
+                                                 clamp:0.0f];
+                }
+
+                const MTLIndexType indexType = static_cast<MTLIndexType>(
+                            mCurrentIndexBuffer->indexBuffer->getType() );
+
+                //Get index buffer stuff which is the same for all draws in this cmd
+                const size_t bytesPerIndexElement = mCurrentIndexBuffer->indexBuffer->getIndexSize();
+
+                size_t offsetStart;
+                v1::MetalHardwareIndexBuffer *metalBuffer =
+                    static_cast<v1::MetalHardwareIndexBuffer*>( mCurrentIndexBuffer->indexBuffer.get() );
+                __unsafe_unretained id<MTLBuffer> indexBuffer = metalBuffer->getBufferName( offsetStart );
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #if OGRE_DEBUG_MODE
+                    assert( ((mCurrentIndexBuffer->indexStart * bytesPerIndexElement) & 0x04) == 0
+                            && "Index Buffer must be aligned to 4 bytes. If you're messing with "
+                            "IndexBuffer::indexStart, you've entered an invalid "
+                            "indexStart; not supported by the Metal API." );
+    #endif
+
+                [mActiveRenderEncoder drawIndexedPrimitives:mCurrentPrimType
+                           indexCount:mCurrentIndexBuffer->indexCount
+                            indexType:indexType
+                          indexBuffer:indexBuffer
+                    indexBufferOffset:mCurrentIndexBuffer->indexStart * bytesPerIndexElement + offsetStart
+                        instanceCount:numberOfInstances];
+#else
+                [mActiveRenderEncoder drawIndexedPrimitives:mCurrentPrimType
+                           indexCount:mCurrentIndexBuffer->indexCount
+                            indexType:indexType
+                          indexBuffer:indexBuffer
+                    indexBufferOffset:mCurrentIndexBuffer->indexStart * bytesPerIndexElement + offsetStart
+                        instanceCount:numberOfInstances
+                           baseVertex:mCurrentVertexBuffer->vertexStart
+                         baseInstance:0];
+#endif
+            } while (updatePassIterationRenderState());
+        }
+        else
+        {
+            do
+            {
+                // Update derived depth bias.
+                if (mDerivedDepthBias && mCurrentPassIterationNum > 0)
+                {
+                    [mActiveRenderEncoder setDepthBias:mDerivedDepthBiasBase +
+                                                       mDerivedDepthBiasMultiplier *
+                                                       mCurrentPassIterationNum
+                                            slopeScale:mDerivedDepthBiasSlopeScale
+                                                 clamp:0.0f];
+                }
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                const uint32 vertexStart = 0;
+#else
+                const uint32 vertexStart = static_cast<uint32>( mCurrentVertexBuffer->vertexStart );
+#endif
+
+                if (hasInstanceData)
+                {
+                    [mActiveRenderEncoder drawPrimitives:mCurrentPrimType
+                                             vertexStart:vertexStart
+                                             vertexCount:mCurrentVertexBuffer->vertexCount
+                                           instanceCount:numberOfInstances];
+                }
+                else
+                {
+                    [mActiveRenderEncoder drawPrimitives:mCurrentPrimType
+                                             vertexStart:vertexStart
+                                             vertexCount:mCurrentVertexBuffer->vertexCount];
+                }
+            } while (updatePassIterationRenderState());
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::bindGpuProgramParameters(GpuProgramType gptype,

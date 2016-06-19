@@ -371,6 +371,7 @@ namespace Ogre {
         */
         static uint8 getMaxMipmapCount( uint32 maxResolution );
         static uint8 getMaxMipmapCount( uint32 width, uint32 height );
+        static uint8 getMaxMipmapCount( uint32 width, uint32 height, uint32 depth );
 
         /** Returns the size in memory of a region with the given extents and pixel
             format with consecutive memory layout.

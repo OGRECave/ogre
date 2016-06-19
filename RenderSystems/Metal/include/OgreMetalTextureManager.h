@@ -36,13 +36,15 @@ namespace Ogre
     class MetalTextureManager : public TextureManager
     {
     protected:
+        MetalDevice *mDevice;
+
         /// @copydoc ResourceManager::createImpl
         virtual Resource* createImpl(const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader,
             const NameValuePairList* createParams);
 
     public:
-        MetalTextureManager();
+        MetalTextureManager( MetalDevice *device );
         virtual ~MetalTextureManager();
 
         /// @copydoc TextureManager::getNativeFormat

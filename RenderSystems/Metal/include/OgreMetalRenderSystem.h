@@ -230,6 +230,7 @@ namespace Ogre
         virtual void _setRenderOperation( const v1::CbRenderOp *cmd );
         virtual void _render( const v1::CbDrawCallIndexed *cmd );
         virtual void _render( const v1::CbDrawCallStrip *cmd );
+        virtual void _render( const v1::RenderOperation &op );
 
         virtual void bindGpuProgramParameters(GpuProgramType gptype,
             GpuProgramParametersSharedPtr params, uint16 variabilityMask);

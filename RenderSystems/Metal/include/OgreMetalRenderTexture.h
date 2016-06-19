@@ -25,51 +25,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreMetalRenderWindow_H_
-#define _OgreMetalRenderWindow_H_
+#ifndef _OgreMetalRenderTexture_H_
+#define _OgreMetalRenderTexture_H_
 
 #include "OgreMetalPrerequisites.h"
-#include "OgreRenderWindow.h"
+#include "OgreRenderTexture.h"
 
 #include "OgreMetalRenderTargetCommon.h"
-#include "Windowing/iOS/OgreMetalView.h"
-
-#import <QuartzCore/CAMetalLayer.h>
 
 namespace Ogre
 {
-    class MetalRenderWindow : public RenderWindow, public MetalRenderTargetCommon
+    class MetalRenderTexture : public RenderTexture, public MetalRenderTargetCommon
     {
-        bool    mClosed;
-
-        CAMetalLayer        *mMetalLayer;
-        id<CAMetalDrawable> mCurrentDrawable;
-        id<MTLTexture>      mMsaaTex;
-        OgreMetalView       *mMetalView;
-
         MetalRenderSystem   *mRenderSystem;
 
     public:
-        MetalRenderWindow( MetalDevice *ownerDevice, MetalRenderSystem *renderSystem );
-        virtual ~MetalRenderWindow();
+        MetalRenderTexture( MetalDevice *ownerDevice, const String &name,
+                            v1::HardwarePixelBuffer *buffer,
+                            __unsafe_unretained id<MTLTexture> renderTexture,
+                            __unsafe_unretained id<MTLTexture> resolveTexture,
+                            PixelFormat format, uint32 depthPlane, uint32 slice,
+                            uint32 fsaa, uint32 mip );
+        virtual ~MetalRenderTexture();
 
-        void _metalUpdate(void);
         virtual void swapBuffers(void);
-        virtual void windowMovedOrResized(void);
-
-        virtual void create( const String& name, unsigned int width, unsigned int height,
-                             bool fullScreen, const NameValuePairList *miscParams );
-        virtual void destroy(void);
-
-        virtual void resize( unsigned int width, unsigned int height );
-        virtual void reposition( int left, int top );
-
-        virtual bool isClosed(void) const;
 
         // RenderTarget overloads.
-        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer) {}
         virtual bool requiresTextureFlipping() const { return false; }
-
         virtual void getCustomAttribute( const String& name, void* pData );
     };
 }

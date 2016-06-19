@@ -25,19 +25,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
+
 #ifndef _OgreMetalHardwarePixelBuffer_H_
 #define _OgreMetalHardwarePixelBuffer_H_
 
 #include "OgreMetalPrerequisites.h"
 #include "OgreHardwarePixelBuffer.h"
 
+#import <Metal/MTLTexture.h>
+
 namespace Ogre {
 namespace v1 {
-class MetalHardwarePixelBuffer : public HardwarePixelBuffer
+    class _OgreMetalExport MetalHardwarePixelBuffer : public HardwarePixelBuffer
     {
     protected:
-        virtual PixelBox lockImpl( const Image::Box &lockBox,  LockOptions options );
-        virtual void unlockImpl(void);
+        /// Lock a box
+        PixelBox lockImpl(const Image::Box &lockBox, LockOptions options);
+
+        /// Unlock a box
+        void unlockImpl(void);
 
         // Internal buffer; either on-card or in system memory, freed/allocated on demand
         // depending on buffer usage
@@ -45,25 +51,95 @@ class MetalHardwarePixelBuffer : public HardwarePixelBuffer
         LockOptions mCurrentLockOptions;
 
         // Buffer allocation/freeage
-        void allocateBuffer( size_t bytes );
-        void freeBuffer(void);
+        void allocateBuffer();
+
+        void freeBuffer();
+
         // Upload a box of pixels to this buffer on the card
         virtual void upload(const PixelBox &data, const Image::Box &dest);
+
         // Download a box of pixels from the card
         virtual void download(const PixelBox &data);
 
     public:
-        MetalHardwarePixelBuffer( uint32 inWidth, uint32 inHeight, uint32 inDepth,
-                                 PixelFormat inFormat, bool hwGamma,
-                                 HardwareBuffer::Usage usage );
+        /// Should be called by HardwareBufferManager
+        MetalHardwarePixelBuffer( uint32 width, uint32 height, uint32 depth,
+                                  PixelFormat format, bool hwGamma,
+                                  HardwareBuffer::Usage usage );
+
+        /// @copydoc HardwarePixelBuffer::blitFromMemory
+        void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
+
+        /// @copydoc HardwarePixelBuffer::blitToMemory
+        void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
+
         virtual ~MetalHardwarePixelBuffer();
 
-        virtual void blitFromMemory(const PixelBox &src, const Image::Box &dstBox);
-        virtual void blitToMemory(const Image::Box &srcBox, const PixelBox &dst);
+        /** Bind surface to frame buffer. Needs FBO extension.
+        */
+        virtual void bindToFramebuffer(uint32 attachment, size_t zoffset);
+    };
 
-        /// Get rendertarget for z slice
-        virtual RenderTexture *getRenderTarget(size_t zoffset);
+    /// Texture surface.
+    class _OgreMetalExport MetalTextureBuffer : public MetalHardwarePixelBuffer
+    {
+    public:
+        /** Texture constructor */
+        MetalTextureBuffer( __unsafe_unretained id<MTLTexture> renderTexture,
+                            __unsafe_unretained id<MTLTexture> resolveTexture,
+                            MetalDevice *device,
+                            const String &baseName, MTLTextureType target,
+                            int width, int height, int depth, PixelFormat format,
+                            int face, int level, Usage usage,
+                            bool writeGamma, uint fsaa );
+        virtual ~MetalTextureBuffer();
+
+        /// @copydoc HardwarePixelBuffer::bindToFramebuffer
+        virtual void bindToFramebuffer(uint32 attachment, size_t zoffset);
+
+        /// @copydoc HardwarePixelBuffer::getRenderTarget
+        RenderTexture* getRenderTarget(size_t slice);
+
+        /// Upload a box of pixels to this buffer on the card
+        virtual void upload(const PixelBox &data, const Image::Box &dest);
+
+        /// Download a box of pixels from the card
+        virtual void download(const PixelBox &data);
+
+        /// Hardware implementation of blitFromMemory
+        virtual void blitFromMemory(const PixelBox &src_orig, const Image::Box &dstBox);
+
+        /// Lock a box
+//            PixelBox lockImpl(const Image::Box &lockBox, LockOptions options) { return PixelBox(); }
+
+        /// Notify TextureBuffer of destruction of render target
+        void _clearSliceRTT(size_t zoffset)
+        {
+            mSliceTRT[zoffset] = 0;
+        }
+
+        // Copy from framebuffer
+        void copyFromFramebuffer(size_t zoffset);
+
+        /// @copydoc HardwarePixelBuffer::blit
+        void blit( const v1::HardwarePixelBufferSharedPtr &src,
+                   const Image::Box &srcBox, const Image::Box &dstBox );
+        // Blitting implementation
+        void blitFromTexture( MetalTextureBuffer *src, const Image::Box &srcBox,
+                              const Image::Box &dstBox );
+
+    protected:
+        __unsafe_unretained id<MTLTexture> mTexture;
+        // In case this is a texture level
+        MTLTextureType mTarget;
+        uint32 mBufferId;
+        int mFace;
+        int mLevel;
+
+        typedef vector<RenderTexture*>::type SliceTRT;
+        SliceTRT mSliceTRT;
     };
 }
-};
+}
+
 #endif

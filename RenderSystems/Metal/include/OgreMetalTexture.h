@@ -36,57 +36,53 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreException.h"
 #include "OgreHardwarePixelBuffer.h"
 
+#import <Metal/MTLTexture.h>
+
 namespace Ogre
 {
     class MetalTexture : public Texture
     {
     protected:
-        virtual void createInternalResourcesImpl(void) {}
-        virtual void freeInternalResourcesImpl(void) {}
+        id<MTLTexture>  mTexture;
+        id<MTLTexture>  mMsaaTexture;
+        MetalDevice     *mDevice;
+
+        /// Vector of pointers to subsurfaces
+        typedef vector<v1::HardwarePixelBufferSharedPtr>::type SurfaceList;
+        SurfaceList mSurfaceList;
+
+        /// Used to hold images between calls to prepare and load.
+        typedef SharedPtr< vector<Image>::type > LoadedImages;
+
+        /// Vector of images that were pulled from disk by
+        /// prepareLoad but have yet to be pushed into texture memory
+        /// by loadImpl.  Images should be deleted by loadImpl and unprepareImpl.
+        LoadedImages mLoadedImages;
+
+        MTLTextureType getMetalTextureTarget(void) const;
+        void createMetalTexResource(void);
+        void createSurfaceList(void);
+
+        virtual void createInternalResourcesImpl(void);
+        virtual void freeInternalResourcesImpl(void);
 
         /// Resource overloads
-        virtual void loadImpl() {}
+        virtual void prepareImpl(void);
+        virtual void unprepareImpl(void);
+        virtual void loadImpl();
 
     public:
         MetalTexture( ResourceManager* creator, const String& name, ResourceHandle handle,
-                     const String& group, bool isManual, ManualResourceLoader* loader ) :
-            Texture(creator, name, handle, group, isManual, loader)
-        {
-        }
+                      const String& group, bool isManual, ManualResourceLoader* loader,
+                      MetalDevice *device );
+        virtual ~MetalTexture();
 
-        virtual v1::HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap)
-        {
-            uint32 width = mWidth;
-            uint32 height = mHeight;
-            uint32 depth = mDepth;
-            for( size_t i=0; i<mipmap; ++i )
-            {
-                width >>= 1;
-                width = std::max<uint32>( 1, width );
-                height >>= 1;
-                height = std::max<uint32>( 1, height );
-                depth >>= 1;
-                depth = std::max<uint32>( 1, depth );
-            }
+        virtual v1::HardwarePixelBufferSharedPtr getBuffer( size_t face, size_t mipmap );
 
-            v1::MetalHardwarePixelBuffer *buf = new v1::MetalHardwarePixelBuffer(width, height, depth,
-                    mFormat, isHardwareGammaEnabled(), static_cast<v1::HardwareBuffer::Usage>(mUsage));
-            return v1::HardwarePixelBufferSharedPtr(buf);
-        }
-
+        //TODO
         virtual void _autogenerateMipmaps(void) {}
-    };
 
-
-    class MetalRenderTexture : public RenderTexture
-    {
-    public:
-        MetalRenderTexture( v1::HardwarePixelBuffer *buffer, size_t zoffset ) :
-            RenderTexture(buffer, zoffset)
-        {
-        }
-
-        virtual bool requiresTextureFlipping(void) const { return true; }
+        id<MTLTexture> getTextureForSampling( MetalRenderSystem *renderSystem );
     };
 }
 

@@ -160,7 +160,7 @@ fragment @insertpiece( output_type ) main_metal
 	@property( envprobe_map )
 		, texturecube	texEnvProbeMap [[texture(@value(envMapReg))]]@end
 	@property( numSamplerStates || envprobe_map )
-		, sampler samplerStates[@value(numSamplerStates)] [[texture(@value(samplerStateStart))]]@end
+		, sampler samplerStates[@value(numSamplerStates)] [[sampler(@value(samplerStateStart))]]@end
 )
 {
 	PS_OUTPUT outPs;
