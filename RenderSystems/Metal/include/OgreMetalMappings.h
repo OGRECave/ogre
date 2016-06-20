@@ -48,6 +48,9 @@ namespace Ogre
     {
     public:
         static MTLPixelFormat getPixelFormat( PixelFormat pf, bool isGamma );
+        /// Can throw if PixelFormat is not depth.
+        static void getDepthStencilFormat( MetalDevice *device, PixelFormat pf,
+                                           MTLPixelFormat &outDepth, MTLPixelFormat &outStencil );
         static MTLBlendFactor get( SceneBlendFactor op );
         static MTLBlendOperation get( SceneBlendOperation op );
         /// @see HlmsBlendblock::BlendChannelMasks

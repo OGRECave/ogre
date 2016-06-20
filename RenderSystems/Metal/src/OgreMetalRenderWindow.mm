@@ -44,6 +44,7 @@ namespace Ogre
         mIsFullScreen = false;
         mActive = false;
         mClosed = false;
+        mFSAA = 1;
     }
     //-------------------------------------------------------------------------
     MetalRenderWindow::~MetalRenderWindow()
@@ -130,6 +131,8 @@ namespace Ogre
                 mMsaaTex = [mOwnerDevice->mDevice newTextureWithDescriptor: desc];
             }
 
+            detachDepthBuffer();
+
             ViewportList::iterator itor = mViewportList.begin();
             ViewportList::iterator end  = mViewportList.end();
             while( itor != end )
@@ -192,6 +195,8 @@ namespace Ogre
         frame.size.width    = width;
         frame.size.height   = height;
         mMetalView.frame = frame;
+
+        detachDepthBuffer();
     }
     //-------------------------------------------------------------------------
     void MetalRenderWindow::reposition( int left, int top )

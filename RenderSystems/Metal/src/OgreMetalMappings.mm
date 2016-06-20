@@ -28,6 +28,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreMetalMappings.h"
 #include "OgreHlmsDatablock.h"
+#include "OgreMetalDevice.h"
 
 namespace Ogre
 {
@@ -162,6 +163,64 @@ namespace Ogre
         default:
         case PF_COUNT:                  return MTLPixelFormatInvalid;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalMappings::getDepthStencilFormat( MetalDevice *device, PixelFormat pf,
+                                               MTLPixelFormat &outDepth, MTLPixelFormat &outStencil )
+    {
+        MTLPixelFormat depthFormat = MTLPixelFormatInvalid;
+        MTLPixelFormat stencilFormat = MTLPixelFormatInvalid;
+
+        switch( pf )
+        {
+        case PF_D24_UNORM_S8_UINT:
+        case PF_D24_UNORM_X8:
+        case PF_X24_S8_UINT:
+        case PF_D24_UNORM:
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            depthFormat = MTLPixelFormatDepth32Float;
+            stencilFormat = MTLPixelFormatStencil8;
+#else
+            if( device->mDevice.depth24Stencil8PixelFormatSupported )
+            {
+                depthFormat = MTLPixelFormatDepth24Unorm_Stencil8;
+                stencilFormat = MTLPixelFormatDepth24Unorm_Stencil8;
+            }
+            else
+            {
+                depthFormat = MTLPixelFormatDepth32Float_Stencil8;
+                stencilFormat = MTLPixelFormatDepth32Float_Stencil8;
+            }
+#endif
+            break;
+        case PF_D16_UNORM:
+            depthFormat = MTLPixelFormatDepth32Float;
+            break;
+        case PF_D32_FLOAT:
+        case PF_D32_FLOAT_X24_X8:
+            depthFormat = MTLPixelFormatDepth32Float;
+            break;
+        case PF_D32_FLOAT_X24_S8_UINT:
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            depthFormat = MTLPixelFormatDepth32Float;
+            stencilFormat = MTLPixelFormatStencil8;
+#else
+            depthFormat = MTLPixelFormatDepth32Float_Stencil8;
+            stencilFormat = MTLPixelFormatDepth32Float_Stencil8;
+#endif
+            break;
+        case PF_X32_X24_S8_UINT:
+            stencilFormat = MTLPixelFormatStencil8;
+            break;
+        default:
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "PixelFormat '" + PixelUtil::getFormatName( pf ) +
+                         "' is not a valid depth buffer format",
+                         "MetalRenderSystem::_createDepthBufferFor" );
+        }
+
+        outDepth = depthFormat;
+        outStencil = stencilFormat;
     }
     //-----------------------------------------------------------------------------------
     MTLBlendFactor MetalMappings::get( SceneBlendFactor op )

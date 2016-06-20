@@ -39,10 +39,15 @@ namespace Ogre
         MTLRenderPassDepthAttachmentDescriptor      *mDepthAttachmentDesc;
         MTLRenderPassStencilAttachmentDescriptor    *mStencilAttachmentDesc;
 
+    protected:
+        MetalDevice *mDevice;
+
     public:
         MetalDepthBuffer( uint16 poolId, MetalRenderSystem *renderSystem,
                           uint32 width, uint32 height, uint32 fsaa, uint32 multiSampleQuality,
-                          PixelFormat pixelFormat, bool isDepthTexture, bool _isManual );
+                          PixelFormat pixelFormat, bool isDepthTexture, bool _isManual,
+                          id<MTLTexture> depthTexture, id<MTLTexture> stencilTexture,
+                          MetalDevice *device );
         virtual ~MetalDepthBuffer();
 
         /// @copydoc DepthBuffer::isCompatible

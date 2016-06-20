@@ -27,23 +27,82 @@ THE SOFTWARE.
 */
 #include "OgreMetalDepthBuffer.h"
 #include "OgreMetalRenderSystem.h"
+#include "OgreRenderTarget.h"
+#include "OgreMetalRenderTargetCommon.h"
 
 #import <Metal/MTLRenderPass.h>
+#import <Metal/MTLBlitCommandEncoder.h>
 
 namespace Ogre
 {
     MetalDepthBuffer::MetalDepthBuffer( uint16 poolId, MetalRenderSystem *renderSystem,
                                         uint32 width, uint32 height, uint32 fsaa,
                                         uint32 multiSampleQuality, PixelFormat pixelFormat,
-                                        bool isDepthTexture, bool _isManual ) :
+                                        bool isDepthTexture, bool _isManual,
+                                        id<MTLTexture> depthTexture, id<MTLTexture> stencilTexture,
+                                        MetalDevice *device ) :
         DepthBuffer( poolId, 0, width, height, fsaa, "",
                      pixelFormat, isDepthTexture, _isManual, renderSystem ),
         mDepthAttachmentDesc( 0 ),
-        mStencilAttachmentDesc( 0 )
+        mStencilAttachmentDesc( 0 ),
+        mDevice( device )
     {
+        if( depthTexture )
+        {
+            mDepthAttachmentDesc = [MTLRenderPassDepthAttachmentDescriptor new];
+            mDepthAttachmentDesc.loadAction = MTLLoadActionDontCare;
+            mDepthAttachmentDesc.storeAction = MTLStoreActionStore;
+            mDepthAttachmentDesc.texture = depthTexture;
+        }
+
+        if( stencilTexture )
+        {
+            mStencilAttachmentDesc = [MTLRenderPassStencilAttachmentDescriptor new];
+            mStencilAttachmentDesc.loadAction = MTLLoadActionDontCare;
+            mStencilAttachmentDesc.storeAction = MTLStoreActionStore;
+            mStencilAttachmentDesc.texture = stencilTexture;
+        }
     }
     //-----------------------------------------------------------------------------------
     MetalDepthBuffer::~MetalDepthBuffer()
     {
+        mDepthAttachmentDesc = 0;
+        mStencilAttachmentDesc = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    bool MetalDepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
+    {
+        //First check they belong to the same GPU device.
+        MetalRenderTargetCommon *colourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+        colourRTs[0] = 0;
+        renderTarget->getCustomAttribute( "MetalRenderTargetCommon", &colourRTs[0] );
+
+        if( colourRTs[0] && colourRTs[0]->getOwnerDevice() == mDevice &&
+            this->getWidth() == renderTarget->getWidth() &&
+            this->getHeight() == renderTarget->getHeight() &&
+            this->getFsaa() == renderTarget->getFSAA() &&
+            mDepthTexture == renderTarget->prefersDepthTexture() &&
+            mFormat == renderTarget->getDesiredDepthBufferFormat() )
+        {
+            return true;
+        }
+
+        return false;
+    }
+    //-----------------------------------------------------------------------------------
+    bool MetalDepthBuffer::copyToImpl( DepthBuffer *destination )
+    {
+        MetalDepthBuffer *dstDepthBuffer = static_cast<MetalDepthBuffer*>( destination );
+
+        __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
+        [blitEncoder copyFromTexture:mDepthAttachmentDesc.texture
+                         sourceSlice:0
+                         sourceLevel:0
+                        sourceOrigin:MTLOriginMake( 0, 0, 0 )
+                          sourceSize:MTLSizeMake( mWidth, mHeight, 1u )
+                           toTexture:dstDepthBuffer->mDepthAttachmentDesc.texture
+                    destinationSlice:0
+                    destinationLevel:0
+                   destinationOrigin:MTLOriginMake( 0, 0, 0 )];
     }
 }

@@ -343,9 +343,58 @@ namespace Ogre
     }
     //-------------------------------------------------------------------------
     DepthBuffer* MetalRenderSystem::_createDepthBufferFor( RenderTarget *renderTarget,
-                                                          bool exactMatchFormat )
+                                                           bool exactMatchFormat )
     {
-        return 0;
+        MTLTextureDescriptor *desc = [MTLTextureDescriptor new];
+        desc.sampleCount = renderTarget->getFSAA();
+        desc.textureType = renderTarget->getFSAA() > 1u ? MTLTextureType2DMultisample :
+                                                          MTLTextureType2D;
+        desc.width              = (NSUInteger)renderTarget->getWidth();
+        desc.height             = (NSUInteger)renderTarget->getHeight();
+        desc.depth              = (NSUInteger)1u;
+        desc.arrayLength        = 1u;
+        desc.mipmapLevelCount   = 1u;
+
+        desc.usage = MTLTextureUsageRenderTarget;
+        if( renderTarget->prefersDepthTexture() )
+            desc.usage |= MTLTextureUsageShaderRead;
+
+        PixelFormat desiredDepthBufferFormat = renderTarget->getDesiredDepthBufferFormat();
+
+        MTLPixelFormat depthFormat = MTLPixelFormatInvalid;
+        MTLPixelFormat stencilFormat = MTLPixelFormatInvalid;
+        MetalMappings::getDepthStencilFormat( mActiveDevice, desiredDepthBufferFormat,
+                                              depthFormat, stencilFormat );
+
+        id<MTLTexture> depthTexture = 0;
+        id<MTLTexture> stencilTexture = 0;
+
+        if( depthFormat != MTLPixelFormatInvalid )
+        {
+            desc.pixelFormat = depthFormat;
+            depthTexture = [mActiveDevice->mDevice newTextureWithDescriptor: desc];
+        }
+
+        if( stencilFormat != MTLPixelFormatInvalid
+         && stencilFormat != MTLPixelFormatDepth32Float_Stencil8
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+         && stencilFormat != MTLPixelFormatDepth24Unorm_Stencil8
+#endif
+          )
+        {
+            desc.pixelFormat = stencilFormat;
+            stencilTexture = [mActiveDevice->mDevice newTextureWithDescriptor: desc];
+        }
+
+        DepthBuffer *retVal = new MetalDepthBuffer( 0, this, renderTarget->getWidth(),
+                                                    renderTarget->getHeight(),
+                                                    renderTarget->getFSAA(), 0,
+                                                    desiredDepthBufferFormat,
+                                                    renderTarget->prefersDepthTexture(), false,
+                                                    depthTexture, stencilTexture,
+                                                    mActiveDevice );
+
+        return retVal;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrameOnce(void)
@@ -636,7 +685,15 @@ namespace Ogre
             psd.colorAttachments[i].writeMask = MetalMappings::get( blendblock->mBlendChannelMask );
         }
 
-        psd.depthAttachmentPixelFormat = MetalMappings::getPixelFormat( newPso->pass.depthFormat, false );
+        if( newPso->pass.depthFormat != PF_NULL )
+        {
+            MTLPixelFormat depthFormat = MTLPixelFormatInvalid;
+            MTLPixelFormat stencilFormat = MTLPixelFormatInvalid;
+            MetalMappings::getDepthStencilFormat( mActiveDevice, newPso->pass.depthFormat,
+                                                  depthFormat, stencilFormat );
+            psd.depthAttachmentPixelFormat = depthFormat;
+            psd.stencilAttachmentPixelFormat = stencilFormat;
+        }
 
         NSError* error = NULL;
         id <MTLRenderPipelineState> pso =
@@ -1310,6 +1367,7 @@ namespace Ogre
         {
             colourWrite &= !target->getForceDisableColourWrites();
 
+            mCurrentColourRTs[0] = 0;
             //We need to set mCurrentColourRTs[0] to grab the active device,
             //even if we won't be drawing to colour target.
             target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
@@ -1341,6 +1399,14 @@ namespace Ogre
             }
 
             MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>( target->getDepthBuffer() );
+
+            if( target->getDepthBufferPool() != DepthBuffer::POOL_NO_DEPTH && !depthBuffer )
+            {
+                // Depth is automatically managed and there is no depth buffer attached to this RT
+                setDepthBufferFor( target, true );
+            }
+
+            depthBuffer = static_cast<MetalDepthBuffer*>( target->getDepthBuffer() );
             mCurrentDepthBuffer = depthBuffer;
             if( depthBuffer )
             {
@@ -1398,6 +1464,7 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary)
     {
+        DepthBuffer::DefaultDepthBufferFormat = PF_D32_FLOAT_X24_S8_UINT;
         mShaderManager = OGRE_NEW MetalGpuProgramManager( &mDevice );
         mMetalProgramFactory = new MetalProgramFactory( &mDevice );
         HighLevelGpuProgramManager::getSingleton().addFactory( mMetalProgramFactory );
