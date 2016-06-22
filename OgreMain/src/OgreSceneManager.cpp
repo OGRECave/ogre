@@ -179,7 +179,6 @@ mGpuParamsDirty((uint16)GPV_ALL)
     mGlobalLightListPerThread.resize( mNumWorkerThreads );
     mBuildLightListRequestPerThread.resize( mNumWorkerThreads );
     mVisibleObjects.resize( mNumWorkerThreads );
-    mVisibleObjectsBackup.resize( mNumWorkerThreads );
     mTmpVisibleObjects.resize( mNumWorkerThreads );
 
     startWorkerThreads();
@@ -1131,12 +1130,6 @@ void SceneManager::prepareRenderQueue(void)
     }
 
 }
-//-----------------------------------------------------------------------
-void SceneManager::_swapVisibleObjectsForShadowMapping()
-{
-    mVisibleObjects.swap( mVisibleObjectsBackup );
-}
-//-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
 void SceneManager::_cullPhase01( Camera* camera, const Camera *lodCamera, Viewport* vp,
                                  uint8 firstRq, uint8 lastRq )

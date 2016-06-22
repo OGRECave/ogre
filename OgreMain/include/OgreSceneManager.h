@@ -976,9 +976,6 @@ namespace Ogre {
         */
         VisibleObjectsPerThreadArray mVisibleObjects;
 
-        /// @See CompositorShadowNode remarks
-        VisibleObjectsPerThreadArray mVisibleObjectsBackup;
-
         /** @See mVisibleObjects. This one is a variable used for temporary storage by (eg.) Instance
             Managers to cull their internal instanced entities from multiple threads. We do not
             guarantee that those who acquired our data retain sole ownership; thus extra care may
@@ -1780,9 +1777,6 @@ namespace Ogre {
         /** Sends visible objects found during _cullPhase01 to the rendering engine.
         */
         virtual void _renderVisibleObjects(void);
-
-        /// @See CompositorShadowNode remarks
-        void _swapVisibleObjectsForShadowMapping();
 
         /** Performs the frustum culling that will later be needed by _renderPhase02
             @remarks
