@@ -48,7 +48,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	    SET(DEPENDENCIES OgreMain RenderSystem_GLES)		
 	endif()
 	
-	SET(DEPENDENCIES ${DEPENDENCIES} OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
+	SET(DEPENDENCIES ${DEPENDENCIES} OgreBites OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
 	add_dependencies(${ANDROID_PROJECT_TARGET} ${DEPENDENCIES})
 	set(DEPEND_STATIC_LIBS "")	
 	foreach(DEPENDENCY ${DEPENDENCIES})
@@ -142,4 +142,3 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
         message(WARNING "Android executable not found. Not building ${ANDROID_PROJECT_TARGET} APK. Do you have the Android SDK installed?")
     endif()
 endmacro(create_android_proj)
-

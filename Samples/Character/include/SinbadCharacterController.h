@@ -2,7 +2,7 @@
 #define __Sinbad_H__
 
 #include "Ogre.h"
-#include "Input.h"
+#include "OgreInput.h"
 
 using namespace Ogre;
 using namespace OgreBites;

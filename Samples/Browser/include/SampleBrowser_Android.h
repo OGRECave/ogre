@@ -34,7 +34,7 @@
 #include <EGL/egl.h>
 #include "OgrePlatform.h"
 #include "SampleBrowser.h"
-#include "Input.h"
+#include "OgreInput.h"
 #include "Android/OgreAndroidEGLWindow.h"
 
 #include <gestureDetector.h>

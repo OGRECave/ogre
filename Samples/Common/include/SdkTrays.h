@@ -38,7 +38,7 @@
 #include "OgreRoot.h"
 #include "OgreCamera.h"
 #include "OgreRenderWindow.h"
-#include "Input.h"
+#include "OgreInput.h"
 
 #include <iomanip>
 
