@@ -615,6 +615,7 @@ namespace Ogre {
 
             // Get the shader language version
             const char* shadingLangVersion = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+            LogManager::getSingleton().logMessage("Shading language version: " + String(shadingLangVersion));
             tokens = StringUtil::split(shadingLangVersion, ". ");
             size_t i = 0;
 
@@ -625,6 +626,8 @@ namespace Ogre {
                     break;
             }
             mNativeShadingLanguageVersion = (StringConverter::parseUnsignedInt(tokens[i]) * 100) + StringConverter::parseUnsignedInt(tokens[i+1]);
+            if (mNativeShadingLanguageVersion < 100) // Emscripten + MS IE/Edge reports an experimental WebGL version (e.g. 0.96) which causes a compile error
+                mNativeShadingLanguageVersion = 100;
 
             // Initialise GL after the first window has been created
             // TODO: fire this from emulation options, and don't duplicate Real and Current capabilities
