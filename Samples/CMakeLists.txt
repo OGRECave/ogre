@@ -13,6 +13,8 @@ endif()
 if (OGRE_BUILD_SAMPLES)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
+  ogre_add_component_include_dir(Bites)
+
   # Make sure all plugins are built
   if (OGRE_BUILD_PLUGIN_OCTREE)
 	set(SAMPLE_DEPENDENCIES ${SAMPLE_DEPENDENCIES} Plugin_OctreeSceneManager)
@@ -128,9 +130,8 @@ if (OGRE_BUILD_SAMPLES)
 	if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)	
   		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreRTShaderSystem)
 	endif () 
-	if (OGRE_BUILD_COMPONENT_OVERLAY)	
-  		set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay)
-	endif () 
+    
+	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay OgreBites)
   endif ()
   
   add_subdirectory(AtomicCounters)

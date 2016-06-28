@@ -47,7 +47,7 @@
 #include "OgreShaderGenerator.h"
 #endif
 
-#include "Input.h"
+#include "OgreInput.h"
 
 namespace OgreBites
 {

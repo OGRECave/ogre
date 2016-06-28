@@ -17,6 +17,9 @@ if (OGRE_BUILD_TESTS)
 
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
+  ogre_add_component_include_dir(Bites)
+  set(TEST_DEPENDENCIES OgreBites)
+
   # Make sure all plugins are built
   if (OGRE_BUILD_PLUGIN_OCTREE)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_OctreeSceneManager)

@@ -125,7 +125,6 @@ typedef std::map<String, OgreBites::SdkSample *> PluginMap;
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
 // If cache path is not set - all shaders are generated to system memory.
 //#define _RTSS_WRITE_SHADERS_TO_DISK
-#include "ShaderGeneratorTechniqueResolverListener.h"
 #endif // INCLUDE_RTSHADER_SYSTEM   
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
@@ -157,10 +156,10 @@ namespace OgreBites
     {
     public:
 
-    SampleBrowser(bool nograb = false, int startSampleIndex = -1) : SampleContext()
+    SampleBrowser(bool nograb = false, int startSampleIndex = -1)
+    : SampleContext("OGRE Sample Browser", !nograb)
         {
             mIsShuttingDown = false;
-            mNoGrabInput = nograb;
             mTrayMgr = 0;
             mLastViewCategory = 0;
             mLastViewTitle = 0;
@@ -183,10 +182,6 @@ namespace OgreBites
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = 0;
 #endif
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            mShaderGenerator     = NULL;
-            mMaterialMgrListener = NULL;
-#endif // INCLUDE_RTSHADER_SYSTEM
         }
 
         /*-----------------------------------------------------------------------------
@@ -215,23 +210,6 @@ namespace OgreBites
             mOisFactory = oisFactory;
             mInitWidth = initWidth;
             mInitHeight = initHeight;
-        }
-#endif
-
-        /*-----------------------------------------------------------------------------
-          | init pre-created window for android
-          -----------------------------------------------------------------------------*/
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app)
-        {
-            mWindow = window;
-
-            if(app != NULL)
-            {
-                mAssetMgr = app->activity->assetManager;
-                Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(app->activity->assetManager) );
-                Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(app->activity->assetManager) );
-            }
         }
 #endif
 
@@ -974,7 +952,7 @@ namespace OgreBites
             if(mWindow == NULL)
                 mWindow = createWindow();
 
-            setupInput(mNoGrabInput);
+            setupInput(mGrabInput);
             locateResources();
 
 #ifdef OGRE_STATIC_LIB
@@ -1128,81 +1106,12 @@ namespace OgreBites
         }
 
     protected:
-
-        /*-----------------------------------------------------------------------------
-          | Restores config instead of using a dialog to save time.
-          | If that fails, the config dialog is shown.
-          -----------------------------------------------------------------------------*/
-        virtual bool oneTimeConfig()
-        {
-            if (!mRoot->restoreConfig()) return mRoot->showConfigDialog();
-            return true;
-        }
-
         /*-----------------------------------------------------------------------------
           | Overrides the default window title.
           -----------------------------------------------------------------------------*/
         virtual Ogre::RenderWindow* createWindow()
         {
-            Ogre::RenderWindow* res = mRoot->initialise(false, "OGRE Sample Browser");
-            Ogre::NameValuePairList miscParams;
-#if OGRE_PLATFORM == OGRE_PLATFORM_NACL
-            miscParams["pp::Instance"] = Ogre::StringConverter::toString((unsigned long)mNaClInstance);
-            miscParams["SwapCallback"] = Ogre::StringConverter::toString((unsigned long)mNaClSwapCallback);
-            // create 1x1 window - we will resize later
-            return mRoot->createRenderWindow("OGRE Sample Browser Window", mInitWidth, mInitHeight, false, &miscParams);
-
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_WINRT)
-            if(mNativeWindow.Get())
-            {
-                miscParams["externalWindowHandle"] = Ogre::StringConverter::toString((size_t)reinterpret_cast<void*>(mNativeWindow.Get()));
-                res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeWindow->Bounds.Width, mNativeWindow->Bounds.Height, false, &miscParams);
-            }
-#       if !__OGRE_WINRT_PHONE_80
-            else if(mNativeControl)
-            {
-                miscParams["windowType"] = "SurfaceImageSource";
-                res = mRoot->createRenderWindow("OGRE Sample Browser Window", mNativeControl->ActualWidth, mNativeControl->ActualHeight, false, &miscParams);
-                void* pUnk = NULL;
-                res->getCustomAttribute("ImageBrush", &pUnk);
-                mNativeControl->Fill = reinterpret_cast<Windows::UI::Xaml::Media::ImageBrush^>(pUnk);
-            }
-#       endif // !__OGRE_WINRT_PHONE_80
-
-            return res;
-
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-            return NULL;
-#else
-            Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
-
-            size_t w, h;
-
-            std::istringstream mode(ropts["Video Mode"].currentValue);
-            Ogre::String token;
-            mode >> w; // width
-            mode >> token; // 'x' as seperator between width and height
-            mode >> h; // height
-
-            miscParams["FSAA"] = ropts["FSAA"].currentValue;
-            miscParams["vsync"] = ropts["VSync"].currentValue;
-
-#ifdef HAVE_SDL
-            mSDLWindow = SDL_CreateWindow("OGRE Sample Browser", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
-
-            SDL_SysWMinfo wmInfo;
-            SDL_VERSION(&wmInfo.version);
-            SDL_GetWindowWMInfo(mSDLWindow, &wmInfo);
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-            miscParams["parentWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
-#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-            miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.win.window));
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-            miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.cocoa.window));
-#endif
-#endif
-            res = mRoot->createRenderWindow("OGRE Sample Browser Window", w, h, false, &miscParams);
+            Ogre::RenderWindow* res = ApplicationContext::createWindow();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             mGestureView = [[SampleBrowserGestureView alloc] init];
@@ -1212,7 +1121,6 @@ namespace OgreBites
 #endif
 
             return res;
-#endif
         }
 
         /*-----------------------------------------------------------------------------
@@ -1244,12 +1152,14 @@ namespace OgreBites
 #ifdef INCLUDE_RTSHADER_SYSTEM
             // Initialize shader generator.
             // Must be before resource loading in order to allow parsing extended material attributes.
-            if (!initialiseRTShaderSystem(sm))
+            if (!initialiseRTShaderSystem())
             {
                 OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
                             "Shader Generator Initialization failed - Core shader libs path not found",
                             "SampleBrowser::createDummyScene");
             }
+
+            mShaderGenerator->addSceneManager(sm);
 #endif // INCLUDE_RTSHADER_SYSTEM
         }
 
@@ -1716,102 +1626,6 @@ namespace OgreBites
 #endif
         }
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
-
-        /*-----------------------------------------------------------------------------
-          | Initialize the RT Shader system.
-          -----------------------------------------------------------------------------*/
-        virtual bool initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
-        {
-            if (Ogre::RTShader::ShaderGenerator::initialize())
-            {
-                mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-
-                mShaderGenerator->addSceneManager(sceneMgr);
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-                // Setup core libraries and shader cache path.
-                Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
-                Ogre::StringVector::iterator itGroup = groupVector.begin();
-                Ogre::StringVector::iterator itGroupEnd = groupVector.end();
-                Ogre::String shaderCoreLibsPath;
-                Ogre::String shaderCachePath;
-
-                for (; itGroup != itGroupEnd; ++itGroup)
-                {
-                    Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
-                    Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
-                    Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
-                    bool coreLibsFound = false;
-
-                    // Try to find the location of the core shader lib functions and use it
-                    // as shader cache path as well - this will reduce the number of generated files
-                    // when running from different directories.
-                    for (; it != itEnd; ++it)
-                    {
-                        if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
-                        {
-                            shaderCoreLibsPath = (*it)->archive->getName() + "/cache/";
-                            shaderCachePath = shaderCoreLibsPath;
-                            coreLibsFound = true;
-                            break;
-                        }
-                    }
-                    // Core libs path found in the current group.
-                    if (coreLibsFound)
-                        break;
-                }
-
-                // Core shader libs not found -> shader generating will fail.
-                if (shaderCoreLibsPath.empty())
-                    return false;
-
-#ifdef _RTSS_WRITE_SHADERS_TO_DISK
-                // Set shader cache path.
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-                shaderCachePath = Ogre::macCachePath();
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-                shaderCachePath = Ogre::macCachePath() + "/org.ogre3d.RTShaderCache";
-#endif
-                mShaderGenerator->setShaderCachePath(shaderCachePath);
-#endif
-#endif
-                // Create and register the material manager listener if it doesn't exist yet.
-                if (mMaterialMgrListener == NULL) {
-                    mMaterialMgrListener = new ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
-                    Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
-                }
-            }
-
-            return true;
-        }
-
-        /*-----------------------------------------------------------------------------
-        | Destroy the RT Shader system.
-          -----------------------------------------------------------------------------*/
-        virtual void destroyRTShaderSystem()
-        {
-            // Restore default scheme.
-            Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
-
-            // Unregister the material manager listener.
-            if (mMaterialMgrListener != NULL)
-            {
-                Ogre::MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
-                delete mMaterialMgrListener;
-                mMaterialMgrListener = NULL;
-            }
-
-            // Destroy RTShader system.
-            if (mShaderGenerator != NULL)
-            {
-                Ogre::RTShader::ShaderGenerator::destroy();
-                mShaderGenerator = NULL;
-            }
-        }
-#endif // INCLUDE_RTSHADER_SYSTEM
-
-        bool mNoGrabInput;                             // don't grab input devices
         SdkTrayManager* mTrayMgr;                      // SDK tray interface
 #ifdef OGRE_STATIC_LIB
         PluginMap mPluginNameMap;                      // A structure to map plugin names to class types
@@ -1845,10 +1659,6 @@ namespace OgreBites
         Ogre::uint32 mInitWidth;
         Ogre::uint32 mInitHeight;
 #endif
-#ifdef INCLUDE_RTSHADER_SYSTEM
-        Ogre::RTShader::ShaderGenerator*                        mShaderGenerator;                       // The Shader generator instance.
-        ShaderGeneratorTechniqueResolverListener*       mMaterialMgrListener;           // Shader generator material manager listener.
-#endif // INCLUDE_RTSHADER_SYSTEM
     public:
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         SampleBrowserGestureView *mGestureView;
