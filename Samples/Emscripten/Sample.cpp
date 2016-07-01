@@ -37,8 +37,7 @@
 #define RESOURCE_CFG "resources.cfg"
 
 Sample::Sample()
-    :   mRoot(NULL), mWindow(NULL), mSceneMgr(NULL), mCamera(NULL), mExitMainLoop(false), mEntity(NULL), mBuffer(NULL),
-        mOrbiting(false), mZoom(false)
+    :   mRoot(NULL), mWindow(NULL), mSceneMgr(NULL), mCamera(NULL), mExitMainLoop(false), mEntity(NULL), mBuffer(NULL)
 {
 }
 
@@ -77,7 +76,7 @@ void Sample::setupEngine()
         mShaderGenerator->setShaderCachePath("");
         mShaderGenerator->setTargetLanguage("glsles");
         
-        mMaterialListener = OGRE_NEW OgreBites::ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
+        mMaterialListener = OGRE_NEW OgreBites::SGTechniqueResolverListener(mShaderGenerator);
         Ogre::MaterialManager::getSingleton().addListener(mMaterialListener);
         mShaderGenerator->addSceneManager(mSceneMgr);
     }
@@ -101,7 +100,7 @@ void Sample::setupEngine()
     emscripten_set_beforeunload_callback((void*)this, Sample::beforeunload_callback);
 
     // Setup UI
-    mTrayMgr = OGRE_NEW OgreBites::TrayManager("InterfaceName", mWindow, this);
+    mTrayMgr = OGRE_NEW OgreBites::TrayManager("InterfaceName", mWindow);
     mTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
     mTrayMgr->hideCursor();
@@ -142,44 +141,30 @@ EM_BOOL Sample::keypress_callback(int eventType, const EmscriptenKeyboardEvent* 
 EM_BOOL Sample::mousedown_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
 {
     Sample* thizz = static_cast<Sample*>(userData);
-    if (mouseEvent->button == 0)
-        thizz->mOrbiting = true;
-    else if(mouseEvent->button == 1)
-        thizz->mZoom = true;
     
+    OgreBites::MouseButtonEvent evt = {mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
+    thizz->mCameraMan->injectMouseDown(evt);
+
     return 0;
 }
 
 EM_BOOL Sample::mouseup_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
 {
     Sample* thizz = static_cast<Sample*>(userData);
-    if (mouseEvent->button == 0)
-        thizz->mOrbiting = false;
-    else if(mouseEvent->button == 1)
-        thizz->mZoom = false;
     
+    OgreBites::MouseButtonEvent evt = {mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
+    thizz->mCameraMan->injectMouseUp(evt);
+
     return 0;
 }
 
 EM_BOOL Sample::mousemove_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
 {
     Sample* thizz = static_cast<Sample*>(userData);
-    
-    
-    Ogre::Real dist = (thizz->mCamera->getPosition() - thizz->mEntity->_getDerivedPosition()).length();
-    
-    if(thizz->mOrbiting)
-    {
-        thizz->mCamera->setPosition(thizz->mEntity->_getDerivedPosition());
-        thizz->mCamera->yaw(Ogre::Degree(-mouseEvent->movementX * 0.25f));
-        thizz->mCamera->pitch(Ogre::Degree(-mouseEvent->movementY * 0.25f));
-        thizz->mCamera->moveRelative(Ogre::Vector3(0, 0, dist));
-    }
-    else if(thizz->mZoom)
-    {
-        thizz->mCamera->setPosition(thizz->mCamera->getPosition() * Ogre::Math::Pow(1.01, mouseEvent->movementY));
-    }
-    
+
+    OgreBites::MouseMotionEvent evt = {mouseEvent->canvasX, mouseEvent->canvasY, mouseEvent->movementX, mouseEvent->movementY};
+    thizz->mCameraMan->injectMouseMove(evt);
+
     return 0;
 }
 
@@ -200,8 +185,9 @@ EM_BOOL Sample::mousewheel_callback(int eventType, const EmscriptenWheelEvent* m
             adjust = 20.0f;
             break;
     }
-    
-    thizz->mCamera->setPosition(thizz->mCamera->getPosition() * Ogre::Math::Pow(1.02, mouseEvent->deltaY * adjust));
+
+    OgreBites::MouseWheelEvent evt = {-int(mouseEvent->deltaY*adjust)};
+    thizz->mCameraMan->injectMouseWheel(evt);
     
     return 0;
 }
@@ -290,13 +276,15 @@ void Sample::setupScene()
     mCamera = mSceneMgr->createCamera("MyCam");
 	mCamera->setNearClipDistance(1.0f);
 	mCamera->setFarClipDistance(100000.0f);
-	mCamera->setPosition(0,0,15.0f);
+
 	mCamera->lookAt(0,0,0);
 	mCamera->setAutoAspectRatio(true);
 
+	mCameraMan = new OgreBites::CameraMan(mCamera);
+	mCameraMan->setStyle(OgreBites::CS_ORBIT);
+    mCamera->setPosition(0,0,15.0f);
+
     mEntity = mSceneMgr->getRootSceneNode()->createChildSceneNode("EntityNode");
-    mCamera->setAutoTracking(true, mEntity);
-    
     mEntity->attachObject(mSceneMgr->createEntity("Sinbad.mesh"));
     
 	Ogre::Viewport* vp = mWindow->addViewport(mCamera);
