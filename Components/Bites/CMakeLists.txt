@@ -77,11 +77,12 @@ file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 # include headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${OGRE_SOURCE_DIR}/OgreMain/include)
+ogre_add_component_include_dir(Overlay)
 
 # setup target
 ogre_add_library_to_folder(Components OgreBites ${OGRE_COMP_LIB_TYPE} ${HEADER_FILES} ${SOURCE_FILES})
 set_target_properties(OgreBites PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
-target_link_libraries(OgreBites OgreMain ${DEPENDENCIES})
+target_link_libraries(OgreBites OgreMain OgreOverlay ${DEPENDENCIES})
 
 # install 
 ogre_config_framework(OgreBites)

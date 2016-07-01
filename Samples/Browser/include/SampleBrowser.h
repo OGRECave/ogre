@@ -31,7 +31,7 @@
 #include "Ogre.h"
 #include "SampleContext.h"
 #include "SamplePlugin.h"
-#include "SdkTrays.h"
+#include "OgreTrays.h"
 
 #ifdef HAVE_SDL
 #include <SDL_syswm.h>
