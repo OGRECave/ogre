@@ -36,7 +36,7 @@
 #include <emscripten/html5.h>
 
 
-class Sample : public Ogre::FrameListener, public OgreBites::SdkTrayListener
+class Sample : public Ogre::FrameListener, public OgreBites::TrayListener
 {
 public:
 	Sample();
@@ -67,7 +67,7 @@ private:
     Ogre::OverlaySystem* mOverlaySystem;
     Ogre::RTShader::ShaderGenerator* mShaderGenerator;
     Ogre::MaterialManager::Listener* mMaterialListener;
-    OgreBites::SdkTrayManager* mTrayMgr;
+    OgreBites::TrayManager* mTrayMgr;
 
 	void parseResources();
     void destroyMaterials( Ogre::String resourceGroupID );

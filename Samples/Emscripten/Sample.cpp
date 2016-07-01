@@ -101,7 +101,7 @@ void Sample::setupEngine()
     emscripten_set_beforeunload_callback((void*)this, Sample::beforeunload_callback);
 
     // Setup UI
-    mTrayMgr = OGRE_NEW OgreBites::SdkTrayManager("InterfaceName", mWindow, this);
+    mTrayMgr = OGRE_NEW OgreBites::TrayManager("InterfaceName", mWindow, this);
     mTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
     mTrayMgr->hideCursor();

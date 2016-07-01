@@ -152,7 +152,7 @@ namespace OgreBites
       | The OGRE Sample Browser. Features a menu accessible from all samples,
       | dynamic configuration, resource reloading, node labeling, and more.
       =============================================================================*/
-    class SampleBrowser : public SampleContext, public SdkTrayListener
+    class SampleBrowser : public SampleContext, public TrayListener
     {
     public:
 
@@ -1027,7 +1027,7 @@ namespace OgreBites
 #endif
 
             Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-            mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, this);
+            mTrayMgr = new TrayManager("BrowserControls", mWindow, this);
             mTrayMgr->showBackdrop("SdkTrays/Bands");
             mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
@@ -1577,7 +1577,7 @@ namespace OgreBites
 #endif
         }
 
-        SdkTrayManager* mTrayMgr;                      // SDK tray interface
+        TrayManager* mTrayMgr;                      // SDK tray interface
 #ifdef OGRE_STATIC_LIB
         PluginMap mPluginNameMap;                      // A structure to map plugin names to class types
 #endif
