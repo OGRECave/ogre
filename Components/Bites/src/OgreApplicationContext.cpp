@@ -34,8 +34,9 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mAppName = appName;
     mGrabInput = grabInput;
     mFSLayer = new Ogre::FileSystemLayer(mAppName);
-    mRoot = 0;
-    mWindow = 0;
+    mRoot = NULL;
+    mWindow = NULL;
+    mOverlaySystem = NULL;
     mSDLWindow = NULL;
     mFirstRun = true;
 #ifdef INCLUDE_RTSHADER_SYSTEM
@@ -251,6 +252,8 @@ void ApplicationContext::createRoot()
     mStaticPluginLoader.load();
 #   endif
 #endif
+
+    mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
 }
 
 bool ApplicationContext::oneTimeConfig()
@@ -258,6 +261,41 @@ bool ApplicationContext::oneTimeConfig()
     if (!mRoot->restoreConfig())
         return mRoot->showConfigDialog();
     return true;
+}
+
+void ApplicationContext::createDummyScene()
+{
+    mWindow->removeAllViewports();
+    Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
+    sm->addRenderQueueListener(mOverlaySystem);
+    Ogre::Camera* cam = sm->createCamera("DummyCamera");
+    mWindow->addViewport(cam);
+#ifdef INCLUDE_RTSHADER_SYSTEM
+    // Initialize shader generator.
+    // Must be before resource loading in order to allow parsing extended material attributes.
+    if (!initialiseRTShaderSystem())
+    {
+        OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
+                    "Shader Generator Initialization failed - Core shader libs path not found",
+                    "ApplicationContext::createDummyScene");
+    }
+
+    mShaderGenerator->addSceneManager(sm);
+#endif // INCLUDE_RTSHADER_SYSTEM
+}
+
+void ApplicationContext::destroyDummyScene()
+{
+    if(!mRoot->hasSceneManager("DummyScene"))
+        return;
+
+    Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
+#ifdef INCLUDE_RTSHADER_SYSTEM
+    mShaderGenerator->removeSceneManager(dummyScene);
+#endif
+    dummyScene->removeRenderQueueListener(mOverlaySystem);
+    mWindow->removeAllViewports();
+    mRoot->destroySceneManager(dummyScene);
 }
 
 Ogre::RenderWindow *ApplicationContext::createWindow()
@@ -536,8 +574,13 @@ void ApplicationContext::reconfigure(const Ogre::String &renderer, Ogre::NameVal
 
 void ApplicationContext::shutdown()
 {
-    // remove window event listener before shutting down OIS
+    // remove window event listener before shutting down SDL
     Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
+
+    if (mOverlaySystem)
+    {
+        OGRE_DELETE mOverlaySystem;
+    }
 
 #ifdef HAVE_SDL
     SDL_QuitSubSystem(SDL_INIT_EVENTS);

@@ -95,9 +95,6 @@ class TestContext : public OgreBites::SampleContext
     /** Called after tests successfully complete, generates output */
     virtual void finishedTests();
 
-    void createDummyScene();
-    void destroyDummyScene();
-
     /** Sets the timstep value
      *        @param timestep The time to simulate elapsed between each frame
      *        @remarks Use with care! Screenshots produced at different timesteps
