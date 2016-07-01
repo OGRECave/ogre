@@ -43,7 +43,7 @@ namespace OgreBites
     /*=============================================================================
     // Base SDK sample class. Includes default player camera and SDK trays.
     =============================================================================*/
-    class SdkSample : public Sample, public SdkTrayListener
+    class SdkSample : public Sample, public TrayListener
     {
     public:
         SdkSample()
@@ -427,7 +427,7 @@ namespace OgreBites
             createSceneManager();
             setupView();
 
-            mTrayMgr = new SdkTrayManager("SampleControls", window, this);  // create a tray interface
+            mTrayMgr = new TrayManager("SampleControls", window, this);  // create a tray interface
 
             loadResources();
             mResourcesLoaded = true;
@@ -536,7 +536,7 @@ namespace OgreBites
 
         Ogre::Viewport* mViewport;          // main viewport
         Ogre::Camera* mCamera;              // main camera
-        SdkTrayManager* mTrayMgr;           // tray interface manager
+        TrayManager* mTrayMgr;           // tray interface manager
         CameraMan* mCameraMan;           // basic camera controller
         ParamsPanel* mDetailsPanel;         // sample details panel
         bool mCursorWasVisible;             // was cursor visible before dialog appeared

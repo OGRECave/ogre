@@ -82,11 +82,11 @@ namespace OgreBites
     /*=============================================================================
     | Listener class for responding to tray events.
     =============================================================================*/
-    class _OgreBitesExport SdkTrayListener
+    class _OgreBitesExport TrayListener
     {
     public:
 
-        virtual ~SdkTrayListener() {}
+        virtual ~TrayListener() {}
         virtual void buttonHit(Button* button) {}
         virtual void itemSelected(SelectMenu* menu) {}
         virtual void labelHit(Label* label) {}
@@ -176,13 +176,13 @@ namespace OgreBites
         // internal methods used by SdkTrayManager. do not call directly.
 
         void _assignToTray(TrayLocation trayLoc) { mTrayLoc = trayLoc; }
-        void _assignListener(SdkTrayListener* listener) { mListener = listener; }
+        void _assignListener(TrayListener* listener) { mListener = listener; }
 
     protected:
 
         Ogre::OverlayElement* mElement;
         TrayLocation mTrayLoc;
-        SdkTrayListener* mListener;
+        TrayListener* mListener;
     };
 
     typedef std::vector<Widget*> WidgetList;
@@ -743,19 +743,19 @@ namespace OgreBites
     /*=============================================================================
     | Main class to manage a cursor, backdrop, trays and widgets.
     =============================================================================*/
-    class _OgreBitesExport SdkTrayManager : public SdkTrayListener, public Ogre::ResourceGroupListener
+    class _OgreBitesExport TrayManager : public TrayListener, public Ogre::ResourceGroupListener
     {
     public:
 
         /*-----------------------------------------------------------------------------
         | Creates backdrop, cursor, and trays.
         -----------------------------------------------------------------------------*/
-        SdkTrayManager(const Ogre::String& name, Ogre::RenderWindow* window, SdkTrayListener* listener = 0);
+        TrayManager(const Ogre::String& name, Ogre::RenderWindow* window, TrayListener* listener = 0);
 
         /*-----------------------------------------------------------------------------
         | Destroys background, cursor, widgets, and trays.
         -----------------------------------------------------------------------------*/
-        virtual ~SdkTrayManager();
+        virtual ~TrayManager();
 
         /*-----------------------------------------------------------------------------
         | Converts a 2D screen coordinate (in pixels) to a 3D ray into the scene.
@@ -777,12 +777,12 @@ namespace OgreBites
         Ogre::OverlayContainer* getCursorContainer() { return mCursor; }
         Ogre::OverlayElement* getCursorImage() { return mCursor->getChild(mCursor->getName() + "/CursorImage"); }
 
-        void setListener(SdkTrayListener* listener)
+        void setListener(TrayListener* listener)
         {
             mListener = listener;
         }
 
-        SdkTrayListener* getListener()
+        TrayListener* getListener()
         {
             return mListener;
         }
@@ -1194,7 +1194,7 @@ namespace OgreBites
         WidgetList mWidgets[10];              // widgets
         WidgetList mWidgetDeathRow;           // widget queue for deletion
         Ogre::OverlayContainer* mCursor;      // cursor
-        SdkTrayListener* mListener;           // tray listener
+        TrayListener* mListener;           // tray listener
         Ogre::Real mWidgetPadding;            // widget padding
         Ogre::Real mWidgetSpacing;            // widget spacing
         Ogre::Real mTrayPadding;              // tray padding

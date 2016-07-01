@@ -17,7 +17,7 @@ class SampleApp(OgreBites.ApplicationContext):
         # load essential resources for trays/ loading bar
         Ogre.ResourceGroupManager.getSingleton().initialiseResourceGroup("Essential")
         self.createDummyScene()
-        self.trays = OgreBites.SdkTrayManager("Interface", self.getRenderWindow())
+        self.trays = OgreBites.TrayManager("Interface", self.getRenderWindow())
 
         # show loading progress
         self.trays.showLoadingBar(1, 0)

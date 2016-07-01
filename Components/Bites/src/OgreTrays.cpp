@@ -1128,7 +1128,7 @@ void ProgressBar::setProgress(Ogre::Real progress)
     mFill->setWidth(std::max<int>((int)mFill->getHeight(), (int)(mProgress * (mMeter->getWidth() - 2 * mFill->getLeft()))));
 }
 
-SdkTrayManager::SdkTrayManager(const Ogre::String &name, Ogre::RenderWindow *window, SdkTrayListener *listener) :
+TrayManager::TrayManager(const Ogre::String &name, Ogre::RenderWindow *window, TrayListener *listener) :
     mName(name), mWindow(window), mWidgetDeathRow(), mListener(listener), mWidgetPadding(8),
     mWidgetSpacing(2), mTrayPadding(0), mTrayDrag(false), mExpandedMenu(0), mDialog(0), mOk(0), mYes(0),
     mNo(0), mCursorWasVisible(false), mFpsLabel(0), mStatsPanel(0), mLogo(0), mLoadBar(0),
@@ -1190,7 +1190,7 @@ SdkTrayManager::SdkTrayManager(const Ogre::String &name, Ogre::RenderWindow *win
     showCursor();
 }
 
-SdkTrayManager::~SdkTrayManager()
+TrayManager::~TrayManager()
 {
     Ogre::OverlayManager& om = Ogre::OverlayManager::getSingleton();
 
@@ -1220,38 +1220,38 @@ SdkTrayManager::~SdkTrayManager()
     }
 }
 
-Ogre::Ray SdkTrayManager::screenToScene(Ogre::Camera *cam, const Ogre::Vector2 &pt)
+Ogre::Ray TrayManager::screenToScene(Ogre::Camera *cam, const Ogre::Vector2 &pt)
 {
     return cam->getCameraToViewportRay(pt.x, pt.y);
 }
 
-Ogre::Vector2 SdkTrayManager::sceneToScreen(Ogre::Camera *cam, const Ogre::Vector3 &pt)
+Ogre::Vector2 TrayManager::sceneToScreen(Ogre::Camera *cam, const Ogre::Vector3 &pt)
 {
     Ogre::Vector3 result = cam->getProjectionMatrix() * cam->getViewMatrix() * pt;
     return Ogre::Vector2((result.x + 1) / 2, (-result.y + 1) / 2);
 }
 
-void SdkTrayManager::showAll()
+void TrayManager::showAll()
 {
     showBackdrop();
     showTrays();
     showCursor();
 }
 
-void SdkTrayManager::hideAll()
+void TrayManager::hideAll()
 {
     hideBackdrop();
     hideTrays();
     hideCursor();
 }
 
-void SdkTrayManager::showBackdrop(const Ogre::String &materialName)
+void TrayManager::showBackdrop(const Ogre::String &materialName)
 {
     if (materialName != Ogre::BLANKSTRING) mBackdrop->setMaterialName(materialName);
     mBackdropLayer->show();
 }
 
-void SdkTrayManager::showCursor(const Ogre::String &materialName)
+void TrayManager::showCursor(const Ogre::String &materialName)
 {
     if (materialName != Ogre::BLANKSTRING) getCursorImage()->setMaterialName(materialName);
 
@@ -1262,7 +1262,7 @@ void SdkTrayManager::showCursor(const Ogre::String &materialName)
     }
 }
 
-void SdkTrayManager::hideCursor()
+void TrayManager::hideCursor()
 {
     mCursorLayer->hide();
 
@@ -1278,7 +1278,7 @@ void SdkTrayManager::hideCursor()
     setExpandedMenu(0);
 }
 
-void SdkTrayManager::refreshCursor()
+void TrayManager::refreshCursor()
 {
 #if (OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0) || (OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS)
     // TODO:
@@ -1290,13 +1290,13 @@ void SdkTrayManager::refreshCursor()
         mCursor->setPosition(x, y);
 }
 
-void SdkTrayManager::showTrays()
+void TrayManager::showTrays()
 {
     mTraysLayer->show();
     mPriorityLayer->show();
 }
 
-void SdkTrayManager::hideTrays()
+void TrayManager::hideTrays()
 {
     mTraysLayer->hide();
     mPriorityLayer->hide();
@@ -1313,7 +1313,7 @@ void SdkTrayManager::hideTrays()
     setExpandedMenu(0);
 }
 
-void SdkTrayManager::setTrayWidgetAlignment(TrayLocation trayLoc, Ogre::GuiHorizontalAlignment gha)
+void TrayManager::setTrayWidgetAlignment(TrayLocation trayLoc, Ogre::GuiHorizontalAlignment gha)
 {
     mTrayWidgetAlign[trayLoc] = gha;
 
@@ -1323,25 +1323,25 @@ void SdkTrayManager::setTrayWidgetAlignment(TrayLocation trayLoc, Ogre::GuiHoriz
     }
 }
 
-void SdkTrayManager::setWidgetPadding(Ogre::Real padding)
+void TrayManager::setWidgetPadding(Ogre::Real padding)
 {
     mWidgetPadding = std::max<int>((int)padding, 0);
     adjustTrays();
 }
 
-void SdkTrayManager::setWidgetSpacing(Ogre::Real spacing)
+void TrayManager::setWidgetSpacing(Ogre::Real spacing)
 {
     mWidgetSpacing = std::max<int>((int)spacing, 0);
     adjustTrays();
 }
 
-void SdkTrayManager::setTrayPadding(Ogre::Real padding)
+void TrayManager::setTrayPadding(Ogre::Real padding)
 {
     mTrayPadding = std::max<int>((int)padding, 0);
     adjustTrays();
 }
 
-void SdkTrayManager::adjustTrays()
+void TrayManager::adjustTrays()
 {
     for (unsigned int i = 0; i < 9; i++)   // resizes and hides trays if necessary
     {
@@ -1433,12 +1433,12 @@ void SdkTrayManager::adjustTrays()
     }
 }
 
-Ogre::Ray SdkTrayManager::getCursorRay(Ogre::Camera *cam)
+Ogre::Ray TrayManager::getCursorRay(Ogre::Camera *cam)
 {
     return screenToScene(cam, Ogre::Vector2(mCursor->_getLeft(), mCursor->_getTop()));
 }
 
-Button *SdkTrayManager::createButton(TrayLocation trayLoc, const Ogre::String &name, const Ogre::String &caption, Ogre::Real width)
+Button *TrayManager::createButton(TrayLocation trayLoc, const Ogre::String &name, const Ogre::String &caption, Ogre::Real width)
 {
     Button* b = new Button(name, caption, width);
     moveWidgetToTray(b, trayLoc);
@@ -1446,7 +1446,7 @@ Button *SdkTrayManager::createButton(TrayLocation trayLoc, const Ogre::String &n
     return b;
 }
 
-TextBox *SdkTrayManager::createTextBox(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real height)
+TextBox *TrayManager::createTextBox(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real height)
 {
     TextBox* tb = new TextBox(name, caption, width, height);
     moveWidgetToTray(tb, trayLoc);
@@ -1454,7 +1454,7 @@ TextBox *SdkTrayManager::createTextBox(TrayLocation trayLoc, const Ogre::String 
     return tb;
 }
 
-SelectMenu *SdkTrayManager::createThickSelectMenu(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, unsigned int maxItemsShown, const Ogre::StringVector &items)
+SelectMenu *TrayManager::createThickSelectMenu(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, unsigned int maxItemsShown, const Ogre::StringVector &items)
 {
     SelectMenu* sm = new SelectMenu(name, caption, width, 0, maxItemsShown);
     moveWidgetToTray(sm, trayLoc);
@@ -1463,7 +1463,7 @@ SelectMenu *SdkTrayManager::createThickSelectMenu(TrayLocation trayLoc, const Og
     return sm;
 }
 
-SelectMenu *SdkTrayManager::createLongSelectMenu(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real boxWidth, unsigned int maxItemsShown, const Ogre::StringVector &items)
+SelectMenu *TrayManager::createLongSelectMenu(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real boxWidth, unsigned int maxItemsShown, const Ogre::StringVector &items)
 {
     SelectMenu* sm = new SelectMenu(name, caption, width, boxWidth, maxItemsShown);
     moveWidgetToTray(sm, trayLoc);
@@ -1472,12 +1472,12 @@ SelectMenu *SdkTrayManager::createLongSelectMenu(TrayLocation trayLoc, const Ogr
     return sm;
 }
 
-SelectMenu *SdkTrayManager::createLongSelectMenu(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real boxWidth, unsigned int maxItemsShown, const Ogre::StringVector &items)
+SelectMenu *TrayManager::createLongSelectMenu(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real boxWidth, unsigned int maxItemsShown, const Ogre::StringVector &items)
 {
     return createLongSelectMenu(trayLoc, name, caption, 0, boxWidth, maxItemsShown, items);
 }
 
-Label *SdkTrayManager::createLabel(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width)
+Label *TrayManager::createLabel(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width)
 {
     Label* l = new Label(name, caption, width);
     moveWidgetToTray(l, trayLoc);
@@ -1485,14 +1485,14 @@ Label *SdkTrayManager::createLabel(TrayLocation trayLoc, const Ogre::String &nam
     return l;
 }
 
-Separator *SdkTrayManager::createSeparator(TrayLocation trayLoc, const Ogre::String &name, Ogre::Real width)
+Separator *TrayManager::createSeparator(TrayLocation trayLoc, const Ogre::String &name, Ogre::Real width)
 {
     Separator* s = new Separator(name, width);
     moveWidgetToTray(s, trayLoc);
     return s;
 }
 
-Slider *SdkTrayManager::createThickSlider(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
+Slider *TrayManager::createThickSlider(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
 {
     Slider* s = new Slider(name, caption, width, 0, valueBoxWidth, minValue, maxValue, snaps);
     moveWidgetToTray(s, trayLoc);
@@ -1500,7 +1500,7 @@ Slider *SdkTrayManager::createThickSlider(TrayLocation trayLoc, const Ogre::Stri
     return s;
 }
 
-Slider *SdkTrayManager::createLongSlider(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real trackWidth, Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
+Slider *TrayManager::createLongSlider(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real trackWidth, Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
 {
     if (trackWidth <= 0) trackWidth = 1;
     Slider* s = new Slider(name, caption, width, trackWidth, valueBoxWidth, minValue, maxValue, snaps);
@@ -1509,19 +1509,19 @@ Slider *SdkTrayManager::createLongSlider(TrayLocation trayLoc, const Ogre::Strin
     return s;
 }
 
-Slider *SdkTrayManager::createLongSlider(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real trackWidth, Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
+Slider *TrayManager::createLongSlider(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real trackWidth, Ogre::Real valueBoxWidth, Ogre::Real minValue, Ogre::Real maxValue, unsigned int snaps)
 {
     return createLongSlider(trayLoc, name, caption, 0, trackWidth, valueBoxWidth, minValue, maxValue, snaps);
 }
 
-ParamsPanel *SdkTrayManager::createParamsPanel(TrayLocation trayLoc, const Ogre::String &name, Ogre::Real width, unsigned int lines)
+ParamsPanel *TrayManager::createParamsPanel(TrayLocation trayLoc, const Ogre::String &name, Ogre::Real width, unsigned int lines)
 {
     ParamsPanel* pp = new ParamsPanel(name, width, lines);
     moveWidgetToTray(pp, trayLoc);
     return pp;
 }
 
-ParamsPanel *SdkTrayManager::createParamsPanel(TrayLocation trayLoc, const Ogre::String &name, Ogre::Real width, const Ogre::StringVector &paramNames)
+ParamsPanel *TrayManager::createParamsPanel(TrayLocation trayLoc, const Ogre::String &name, Ogre::Real width, const Ogre::StringVector &paramNames)
 {
     ParamsPanel* pp = new ParamsPanel(name, width, (Ogre::uint)paramNames.size());
     pp->setAllParamNames(paramNames);
@@ -1529,7 +1529,7 @@ ParamsPanel *SdkTrayManager::createParamsPanel(TrayLocation trayLoc, const Ogre:
     return pp;
 }
 
-CheckBox *SdkTrayManager::createCheckBox(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width)
+CheckBox *TrayManager::createCheckBox(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width)
 {
     CheckBox* cb = new CheckBox(name, caption, width);
     moveWidgetToTray(cb, trayLoc);
@@ -1537,21 +1537,21 @@ CheckBox *SdkTrayManager::createCheckBox(TrayLocation trayLoc, const Ogre::Strin
     return cb;
 }
 
-DecorWidget *SdkTrayManager::createDecorWidget(TrayLocation trayLoc, const Ogre::String &name, const Ogre::String &templateName)
+DecorWidget *TrayManager::createDecorWidget(TrayLocation trayLoc, const Ogre::String &name, const Ogre::String &templateName)
 {
     DecorWidget* dw = new DecorWidget(name, templateName);
     moveWidgetToTray(dw, trayLoc);
     return dw;
 }
 
-ProgressBar *SdkTrayManager::createProgressBar(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real commentBoxWidth)
+ProgressBar *TrayManager::createProgressBar(TrayLocation trayLoc, const Ogre::String &name, const Ogre::DisplayString &caption, Ogre::Real width, Ogre::Real commentBoxWidth)
 {
     ProgressBar* pb = new ProgressBar(name, caption, width, commentBoxWidth);
     moveWidgetToTray(pb, trayLoc);
     return pb;
 }
 
-void SdkTrayManager::showFrameStats(TrayLocation trayLoc, int place)
+void TrayManager::showFrameStats(TrayLocation trayLoc, int place)
 {
     if (!areFrameStatsVisible())
     {
@@ -1571,7 +1571,7 @@ void SdkTrayManager::showFrameStats(TrayLocation trayLoc, int place)
     moveWidgetToTray(mStatsPanel, trayLoc, locateWidgetInTray(mFpsLabel) + 1);
 }
 
-void SdkTrayManager::hideFrameStats()
+void TrayManager::hideFrameStats()
 {
     if (areFrameStatsVisible())
     {
@@ -1582,13 +1582,13 @@ void SdkTrayManager::hideFrameStats()
     }
 }
 
-void SdkTrayManager::showLogo(TrayLocation trayLoc, int place)
+void TrayManager::showLogo(TrayLocation trayLoc, int place)
 {
     if (!isLogoVisible()) mLogo = createDecorWidget(TL_NONE, mName + "/Logo", "SdkTrays/Logo");
     moveWidgetToTray(mLogo, trayLoc, place);
 }
 
-void SdkTrayManager::hideLogo()
+void TrayManager::hideLogo()
 {
     if (isLogoVisible())
     {
@@ -1597,7 +1597,7 @@ void SdkTrayManager::hideLogo()
     }
 }
 
-void SdkTrayManager::showLoadingBar(unsigned int numGroupsInit, unsigned int numGroupsLoad, Ogre::Real initProportion)
+void TrayManager::showLoadingBar(unsigned int numGroupsInit, unsigned int numGroupsLoad, Ogre::Real initProportion)
 {
     if (mDialog) closeDialog();
     if (mLoadBar) hideLoadingBar();
@@ -1638,7 +1638,7 @@ void SdkTrayManager::showLoadingBar(unsigned int numGroupsInit, unsigned int num
     }
 }
 
-void SdkTrayManager::hideLoadingBar()
+void TrayManager::hideLoadingBar()
 {
     if (mLoadBar)
     {
@@ -1652,7 +1652,7 @@ void SdkTrayManager::hideLoadingBar()
     }
 }
 
-void SdkTrayManager::showOkDialog(const Ogre::DisplayString &caption, const Ogre::DisplayString &message)
+void TrayManager::showOkDialog(const Ogre::DisplayString &caption, const Ogre::DisplayString &message)
 {
     if (mLoadBar) hideLoadingBar();
 
@@ -1708,7 +1708,7 @@ void SdkTrayManager::showOkDialog(const Ogre::DisplayString &caption, const Ogre
     e->setTop(mDialog->getOverlayElement()->getTop() + mDialog->getOverlayElement()->getHeight() + 5);
 }
 
-void SdkTrayManager::showYesNoDialog(const Ogre::DisplayString &caption, const Ogre::DisplayString &question)
+void TrayManager::showYesNoDialog(const Ogre::DisplayString &caption, const Ogre::DisplayString &question)
 {
     if (mLoadBar) hideLoadingBar();
 
@@ -1769,7 +1769,7 @@ void SdkTrayManager::showYesNoDialog(const Ogre::DisplayString &caption, const O
     e->setTop(mDialog->getOverlayElement()->getTop() + mDialog->getOverlayElement()->getHeight() + 5);
 }
 
-void SdkTrayManager::closeDialog()
+void TrayManager::closeDialog()
 {
     if (mDialog)
     {
@@ -1798,18 +1798,18 @@ void SdkTrayManager::closeDialog()
     }
 }
 
-bool SdkTrayManager::isDialogVisible()
+bool TrayManager::isDialogVisible()
 {
     return mDialog != 0;
 }
 
-Widget *SdkTrayManager::getWidget(TrayLocation trayLoc, unsigned int place)
+Widget *TrayManager::getWidget(TrayLocation trayLoc, unsigned int place)
 {
     if (place < mWidgets[trayLoc].size()) return mWidgets[trayLoc][place];
     return 0;
 }
 
-Widget *SdkTrayManager::getWidget(TrayLocation trayLoc, const Ogre::String &name)
+Widget *TrayManager::getWidget(TrayLocation trayLoc, const Ogre::String &name)
 {
     for (unsigned int i = 0; i < mWidgets[trayLoc].size(); i++)
     {
@@ -1818,7 +1818,7 @@ Widget *SdkTrayManager::getWidget(TrayLocation trayLoc, const Ogre::String &name
     return 0;
 }
 
-Widget *SdkTrayManager::getWidget(const Ogre::String &name)
+Widget *TrayManager::getWidget(const Ogre::String &name)
 {
     for (unsigned int i = 0; i < 10; i++)
     {
@@ -1830,7 +1830,7 @@ Widget *SdkTrayManager::getWidget(const Ogre::String &name)
     return 0;
 }
 
-unsigned int SdkTrayManager::getNumWidgets()
+unsigned int TrayManager::getNumWidgets()
 {
     unsigned int total = 0;
 
@@ -1842,17 +1842,17 @@ unsigned int SdkTrayManager::getNumWidgets()
     return total;
 }
 
-size_t SdkTrayManager::getNumWidgets(TrayLocation trayLoc)
+size_t TrayManager::getNumWidgets(TrayLocation trayLoc)
 {
     return mWidgets[trayLoc].size();
 }
 
-WidgetIterator SdkTrayManager::getWidgetIterator(TrayLocation trayLoc)
+WidgetIterator TrayManager::getWidgetIterator(TrayLocation trayLoc)
 {
     return WidgetIterator(mWidgets[trayLoc].begin(), mWidgets[trayLoc].end());
 }
 
-int SdkTrayManager::locateWidgetInTray(Widget *widget)
+int TrayManager::locateWidgetInTray(Widget *widget)
 {
     for (unsigned int i = 0; i < mWidgets[widget->getTrayLocation()].size(); i++)
     {
@@ -1861,7 +1861,7 @@ int SdkTrayManager::locateWidgetInTray(Widget *widget)
     return -1;
 }
 
-void SdkTrayManager::destroyWidget(Widget *widget)
+void TrayManager::destroyWidget(Widget *widget)
 {
     if (!widget) OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, "Widget does not exist.", "TrayManager::destroyWidget");
 
@@ -1886,12 +1886,12 @@ void SdkTrayManager::destroyWidget(Widget *widget)
     adjustTrays();
 }
 
-void SdkTrayManager::destroyAllWidgetsInTray(TrayLocation trayLoc)
+void TrayManager::destroyAllWidgetsInTray(TrayLocation trayLoc)
 {
     while (!mWidgets[trayLoc].empty()) destroyWidget(mWidgets[trayLoc][0]);
 }
 
-void SdkTrayManager::destroyAllWidgets()
+void TrayManager::destroyAllWidgets()
 {
     for (unsigned int i = 0; i < 10; i++)  // destroy every widget in every tray (including null tray)
     {
@@ -1899,7 +1899,7 @@ void SdkTrayManager::destroyAllWidgets()
     }
 }
 
-void SdkTrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, int place)
+void TrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, int place)
 {
     if (!widget) OGRE_EXCEPT(Ogre::Exception::ERR_ITEM_NOT_FOUND, "Widget does not exist.", "TrayManager::moveWidgetToTray");
 
@@ -1925,7 +1925,7 @@ void SdkTrayManager::moveWidgetToTray(Widget *widget, TrayLocation trayLoc, int 
     widget->_assignToTray(trayLoc);
 }
 
-void SdkTrayManager::clearTray(TrayLocation trayLoc)
+void TrayManager::clearTray(TrayLocation trayLoc)
 {
     if (trayLoc == TL_NONE) return;      // can't clear the null tray
 
@@ -1935,7 +1935,7 @@ void SdkTrayManager::clearTray(TrayLocation trayLoc)
     }
 }
 
-void SdkTrayManager::clearAllTrays()
+void TrayManager::clearAllTrays()
 {
     for (unsigned int i = 0; i < 9; i++)
     {
@@ -1943,7 +1943,7 @@ void SdkTrayManager::clearAllTrays()
     }
 }
 
-bool SdkTrayManager::frameRenderingQueued(const Ogre::FrameEvent &evt)
+bool TrayManager::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
     for (unsigned int i = 0; i < mWidgetDeathRow.size(); i++)
     {
@@ -1997,14 +1997,14 @@ bool SdkTrayManager::frameRenderingQueued(const Ogre::FrameEvent &evt)
     return true;
 }
 
-void SdkTrayManager::windowUpdate()
+void TrayManager::windowUpdate()
 {
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_NACL
     mWindow->update();
 #endif
 }
 
-void SdkTrayManager::labelHit(Label *label)
+void TrayManager::labelHit(Label *label)
 {
     if (mStatsPanel->getOverlayElement()->isVisible())
     {
@@ -2020,7 +2020,7 @@ void SdkTrayManager::labelHit(Label *label)
     }
 }
 
-void SdkTrayManager::buttonHit(Button *button)
+void TrayManager::buttonHit(Button *button)
 {
     if (mListener)
     {
@@ -2030,7 +2030,7 @@ void SdkTrayManager::buttonHit(Button *button)
     closeDialog();
 }
 
-bool SdkTrayManager::injectMouseDown(const MouseButtonEvent &evt)
+bool TrayManager::injectMouseDown(const MouseButtonEvent &evt)
 {
     // Only process mouse buttons when stuff is visible.
     if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
@@ -2104,7 +2104,7 @@ bool SdkTrayManager::injectMouseDown(const MouseButtonEvent &evt)
     return true;   // a tray click is not to be handled by another party
 }
 
-bool SdkTrayManager::injectMouseUp(const MouseButtonEvent &evt)
+bool TrayManager::injectMouseUp(const MouseButtonEvent &evt)
 {
     // Only process mouse buttons when stuff is visible.
     if (!mCursorLayer->isVisible() || evt.button != BUTTON_LEFT) return false;
@@ -2150,7 +2150,7 @@ bool SdkTrayManager::injectMouseUp(const MouseButtonEvent &evt)
     return true;         // this click did originate in this tray, so don't pass it on
 }
 
-bool SdkTrayManager::injectMouseMove(const MouseMotionEvent &evt)
+bool TrayManager::injectMouseMove(const MouseMotionEvent &evt)
 {
     if (!mCursorLayer->isVisible()) return false;   // don't process if cursor layer is invisible
 
@@ -2194,7 +2194,7 @@ bool SdkTrayManager::injectMouseMove(const MouseMotionEvent &evt)
     return false;
 }
 
-void SdkTrayManager::setExpandedMenu(SelectMenu *m)
+void TrayManager::setExpandedMenu(SelectMenu *m)
 {
     if (!mExpandedMenu && m)
     {
