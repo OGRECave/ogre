@@ -5,6 +5,7 @@
 #include "OgreApplicationContext.h"
 #include "OgreSGTechniqueResolverListener.h"
 #include "OgreCameraMan.h"
+#include "OgreTrays.h"
 
 #ifdef HAVE_SDL
 #include "SDL_stdinc.h"
@@ -39,3 +40,4 @@
 %include "OgreWindowEventUtilities.h"
 %feature("director") OgreBites::ApplicationContext;
 %include "OgreApplicationContext.h"
+%include "OgreTrays.h"

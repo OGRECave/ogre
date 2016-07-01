@@ -15,7 +15,6 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
 )
 
 if (WINDOWS_STORE OR WINDOWS_PHONE)
