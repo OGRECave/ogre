@@ -35,10 +35,6 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 
 #include <iostream> // for Apple
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
-#include "ShaderGeneratorTechniqueResolverListener.h"
-#endif
-
 // These need to be included prior to everything else to prevent name clashes.
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE && defined(__OBJC__)
 
@@ -101,8 +97,6 @@ class TestContext : public OgreBites::SampleContext
 
     void createDummyScene();
     void destroyDummyScene();
-    bool initialiseRTShaderSystem(SceneManager* sceneMgr);
-    void finaliseRTShaderSystem();
 
     /** Sets the timstep value
      *        @param timestep The time to simulate elapsed between each frame
@@ -143,10 +137,6 @@ class TestContext : public OgreBites::SampleContext
 
     /// The active test (0 if none is active)
     VisualTest* mCurrentTest;
-#ifdef INCLUDE_RTSHADER_SYSTEM
-    RTShader::ShaderGenerator* mShaderGenerator; // The Shader generator instance.
-    OgreBites::ShaderGeneratorTechniqueResolverListener* mMaterialMgrListener; // Shader generator material manager listener.
-#endif // INCLUDE_RTSHADER_SYSTEM
 
     /// The current frame of a running test
     unsigned int mCurrentFrame;

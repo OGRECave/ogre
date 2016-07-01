@@ -30,7 +30,7 @@
 
 #include "Sample.h"
 #include "SdkTrays.h"
-#include "SdkCameraMan.h"
+#include "OgreCameraMan.h"
 
 #include "Ogre.h"
 
@@ -515,7 +515,7 @@ namespace OgreBites
             mCamera->setAutoAspectRatio(true);
             mCamera->setNearClipDistance(5);
 
-            mCameraMan = new SdkCameraMan(mCamera);   // create a default camera controller
+            mCameraMan = new CameraMan(mCamera);   // create a default camera controller
         }
 
         virtual void setDragLook(bool enabled)
@@ -537,7 +537,7 @@ namespace OgreBites
         Ogre::Viewport* mViewport;          // main viewport
         Ogre::Camera* mCamera;              // main camera
         SdkTrayManager* mTrayMgr;           // tray interface manager
-        SdkCameraMan* mCameraMan;           // basic camera controller
+        CameraMan* mCameraMan;           // basic camera controller
         ParamsPanel* mDetailsPanel;         // sample details panel
         bool mCursorWasVisible;             // was cursor visible before dialog appeared
         bool mDragLook;                     // click and drag to free-look

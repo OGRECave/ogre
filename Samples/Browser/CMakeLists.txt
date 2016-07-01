@@ -14,11 +14,8 @@ set (HEADER_FILES
 	${OGRE_SOURCE_DIR}/Samples/Common/include/Sample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SampleContext.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SamplePlugin.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkCameraMan.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkSample.h
 	${OGRE_SOURCE_DIR}/Samples/Common/include/SdkTrays.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/OgreStaticPluginLoader.h
-	${OGRE_SOURCE_DIR}/Samples/Common/include/Input.h
 )
 
 if (WINDOWS_STORE OR WINDOWS_PHONE)
@@ -256,7 +253,7 @@ if (OGRE_BUILD_RENDERSYSTEM_D3D9 AND OGRE_STATIC)
    target_link_libraries(SampleBrowser ${DirectX9_LIBRARIES})
 endif()
 
-target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES})
+target_link_libraries(SampleBrowser ${OGRE_LIBRARIES} ${OGRE_PLUGIN_LIBRARIES} ${SDL2_LIBRARY} ${SAMPLE_LIBRARIES} OgreBites)
 
 # Add samples as dependencies
 add_dependencies(SampleBrowser ${OGRE_SAMPLES_LIST})
@@ -380,6 +377,7 @@ if (APPLE)
 		COMMAND mkdir ARGS -p ${OGRE_SAMPLE_CONTENTS_PATH}/Plugins)
 
     set(FRAMEWORKS OgreOverlay
+		OgreBites
         OgrePaging
         OgreProperty
         OgreRTShaderSystem
@@ -432,4 +430,3 @@ if (OGRE_INSTALL_SAMPLES)
 	endif ()
 endif ()
 endif(ANDROID)
-

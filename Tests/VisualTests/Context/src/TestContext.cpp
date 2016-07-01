@@ -49,7 +49,7 @@ static id mAppDelegate;
 #include "PlayPenTestPlugin.h"
 #endif
 
-TestContext::TestContext(int argc, char** argv) : mSuccess(true), mTimestep(0.01f), mOutputDir(BLANKSTRING), mCurrentTest(0), mBatch(0)
+TestContext::TestContext(int argc, char** argv) : OgreBites::SampleContext(), mSuccess(true), mTimestep(0.01f), mCurrentTest(0), mBatch(0)
 {
     Ogre::UnaryOptionList unOpt;
     Ogre::BinaryOptionList binOpt;
@@ -89,11 +89,6 @@ TestContext::TestContext(int argc, char** argv) : mSuccess(true), mTimestep(0.01
 
     if(mReferenceSetPath == BLANKSTRING)
         mReferenceSetPath = mOutputDir;
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-    mShaderGenerator     = NULL;
-    mMaterialMgrListener = NULL;
-#endif // INCLUDE_RTSHADER_SYSTEM
 }
 //-----------------------------------------------------------------------
 
@@ -681,12 +676,14 @@ void TestContext::createDummyScene()
 #ifdef INCLUDE_RTSHADER_SYSTEM
     // Initialize shader generator.
     // Must be before resource loading in order to allow parsing extended material attributes.
-    if (!initialiseRTShaderSystem(sm))
+    if (!initialiseRTShaderSystem())
     {
         OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
                     "Shader Generator Initialization failed - Core shader libs path not found",
                     "SampleBrowser::createDummyScene");
     }
+
+    mShaderGenerator->addSceneManager(sm);
 #endif // INCLUDE_RTSHADER_SYSTEM
 }
 
@@ -700,101 +697,6 @@ void TestContext::destroyDummyScene()
     mWindow->removeAllViewports();
     mRoot->destroySceneManager(dummyScene);
 }
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-
-/*-----------------------------------------------------------------------------
-  | Initialize the RT Shader system.
-  -----------------------------------------------------------------------------*/
-bool TestContext::initialiseRTShaderSystem(Ogre::SceneManager* sceneMgr)
-{
-    if (Ogre::RTShader::ShaderGenerator::initialize())
-    {
-        mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-
-        mShaderGenerator->addSceneManager(sceneMgr);
-
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_NACL && OGRE_PLATFORM != OGRE_PLATFORM_WINRT
-        // Setup core libraries and shader cache path.
-        Ogre::StringVector groupVector = Ogre::ResourceGroupManager::getSingleton().getResourceGroups();
-        Ogre::StringVector::iterator itGroup = groupVector.begin();
-        Ogre::StringVector::iterator itGroupEnd = groupVector.end();
-        Ogre::String shaderCoreLibsPath;
-        Ogre::String shaderCachePath;
-
-        for (; itGroup != itGroupEnd; ++itGroup)
-        {
-            Ogre::ResourceGroupManager::LocationList resLocationsList = Ogre::ResourceGroupManager::getSingleton().getResourceLocationList(*itGroup);
-            Ogre::ResourceGroupManager::LocationList::iterator it = resLocationsList.begin();
-            Ogre::ResourceGroupManager::LocationList::iterator itEnd = resLocationsList.end();
-            bool coreLibsFound = false;
-
-            // Try to find the location of the core shader lib functions and use it
-            // as shader cache path as well - this will reduce the number of generated files
-            // when running from different directories.
-            for (; it != itEnd; ++it)
-            {
-                if ((*it)->archive->getName().find("RTShaderLib") != Ogre::String::npos)
-                {
-                    shaderCoreLibsPath = (*it)->archive->getName() + "/cache/";
-                    shaderCachePath = shaderCoreLibsPath;
-                    coreLibsFound = true;
-                    break;
-                }
-            }
-            // Core libs path found in the current group.
-            if (coreLibsFound)
-                break;
-        }
-
-        // Core shader libs not found -> shader generating will fail.
-        if (shaderCoreLibsPath.empty())
-            return false;
-
-#ifdef _RTSS_WRITE_SHADERS_TO_DISK
-        // Set shader cache path.
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        shaderCachePath = Ogre::macCachePath();
-#elif OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-        shaderCachePath = Ogre::macCachePath() + "/org.ogre3d.RTShaderCache";
-#endif
-        mShaderGenerator->setShaderCachePath(shaderCachePath);
-#endif
-#endif
-        // Create and register the material manager listener if it doesn't exist yet.
-        if (mMaterialMgrListener == NULL) {
-            mMaterialMgrListener = new OgreBites::ShaderGeneratorTechniqueResolverListener(mShaderGenerator);
-            Ogre::MaterialManager::getSingleton().addListener(mMaterialMgrListener);
-        }
-    }
-
-    return true;
-}
-
-/*-----------------------------------------------------------------------------
-  | Destroy the RT Shader system.
-  -----------------------------------------------------------------------------*/
-void TestContext::finaliseRTShaderSystem()
-{
-    // Restore default scheme.
-    Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
-
-    // Unregister the material manager listener.
-    if (mMaterialMgrListener != NULL)
-    {
-        Ogre::MaterialManager::getSingleton().removeListener(mMaterialMgrListener);
-        delete mMaterialMgrListener;
-        mMaterialMgrListener = NULL;
-    }
-
-    // Destroy RTShader system.
-    if (mShaderGenerator != NULL)
-    {
-        Ogre::RTShader::ShaderGenerator::destroy();
-        mShaderGenerator = NULL;
-    }
-}
-#endif // INCLUDE_RTSHADER_SYSTEM
 
 // main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...
 

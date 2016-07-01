@@ -12,6 +12,10 @@
 # Use same build type for components as main build
 set(OGRE_COMP_LIB_TYPE ${OGRE_LIB_TYPE})
 
+if (OGRE_BUILD_COMPONENT_BITES)
+    add_subdirectory(Bites)
+endif()
+
 if (OGRE_BUILD_COMPONENT_PAGING)
   add_subdirectory(Paging)
 endif ()
