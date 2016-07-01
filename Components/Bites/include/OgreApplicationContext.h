@@ -34,6 +34,7 @@
 #include "OgrePlugin.h"
 #include "OgreFileSystemLayer.h"
 #include "OgreFrameListener.h"
+#include "OgreOverlaySystem.h"
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
 // Remove the comment below in order to make the RTSS use valid path for writing down the generated shaders.
@@ -129,6 +130,10 @@ namespace OgreBites
 
         Ogre::Root* getRoot() {
             return mRoot;
+        }
+
+        Ogre::OverlaySystem* getOverlaySystem() {
+            return mOverlaySystem;
         }
 
         /*-----------------------------------------------------------------------------
@@ -228,6 +233,16 @@ namespace OgreBites
         | Captures input device states.
         -----------------------------------------------------------------------------*/
         virtual void captureInputDevices();
+
+        /*-----------------------------------------------------------------------------
+          | Creates dummy scene to allow rendering GUI in viewport.
+          -----------------------------------------------------------------------------*/
+        virtual void createDummyScene();
+
+        /*-----------------------------------------------------------------------------
+          | Destroys dummy scene.
+          -----------------------------------------------------------------------------*/
+        virtual void destroyDummyScene();
     protected:
 
         /**
@@ -245,6 +260,8 @@ namespace OgreBites
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
         tbb::task_scheduler_init mTaskScheduler;
 #endif
+
+        Ogre::OverlaySystem* mOverlaySystem;  // Overlay system
 
         Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
         Ogre::Root* mRoot;              // OGRE root

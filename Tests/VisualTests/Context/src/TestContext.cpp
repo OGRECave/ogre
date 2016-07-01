@@ -137,12 +137,6 @@ void TestContext::setup()
     locateResources();
 
     createDummyScene();
-#ifdef INCLUDE_RTSHADER_SYSTEM
-    if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
-    {
-        Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
-    }
-#endif // INCLUDE_RTSHADER_SYSTEM
 
     loadResources();
     Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
@@ -663,39 +657,6 @@ void TestContext::setTimestep(Ogre::Real timestep)
 {
     // ensure we're getting a positive value
     mTimestep = timestep >= 0.f ? timestep : mTimestep;
-}
-//-----------------------------------------------------------------------
-
-void TestContext::createDummyScene()
-{
-    mWindow->removeAllViewports();
-    Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
-    sm->addRenderQueueListener(mOverlaySystem);
-    Ogre::Camera* cam = sm->createCamera("DummyCamera");
-    mWindow->addViewport(cam);
-#ifdef INCLUDE_RTSHADER_SYSTEM
-    // Initialize shader generator.
-    // Must be before resource loading in order to allow parsing extended material attributes.
-    if (!initialiseRTShaderSystem())
-    {
-        OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
-                    "Shader Generator Initialization failed - Core shader libs path not found",
-                    "SampleBrowser::createDummyScene");
-    }
-
-    mShaderGenerator->addSceneManager(sm);
-#endif // INCLUDE_RTSHADER_SYSTEM
-}
-
-void TestContext::destroyDummyScene()
-{
-    Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
-#ifdef INCLUDE_RTSHADER_SYSTEM
-    mShaderGenerator->removeSceneManager(dummyScene);
-#endif
-    dummyScene->removeRenderQueueListener(mOverlaySystem);
-    mWindow->removeAllViewports();
-    mRoot->destroySceneManager(dummyScene);
 }
 
 // main, platform-specific stuff is copied from SampleBrowser and not guaranteed to work...

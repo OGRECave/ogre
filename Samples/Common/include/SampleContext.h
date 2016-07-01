@@ -29,7 +29,6 @@
 #define __SampleContext_H__
 
 #include "OgreApplicationContext.h"
-#include "OgreOverlaySystem.h"
 
 #include "Sample.h"
 
@@ -48,7 +47,6 @@ namespace OgreBites
         : ApplicationContext(appName, grabInput)
         {
             mCurrentSample = 0;
-            mOverlaySystem = 0;
             mSamplePaused = false;
             mLastRun = false;
             mLastSample = 0;
@@ -436,15 +434,6 @@ namespace OgreBites
             
             Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
         }
-        
-        /*-----------------------------------------------------------------------------
-        | Creates the OGRE root.
-        -----------------------------------------------------------------------------*/
-        virtual void createRoot()
-        {
-            ApplicationContext::createRoot();
-            mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
-        }
 
         /*-----------------------------------------------------------------------------
         | Reconfigures the context. Attempts to preserve the current sample state.
@@ -484,15 +473,8 @@ namespace OgreBites
             }
 
             ApplicationContext::shutdown();
-
-            if (mOverlaySystem)
-            {
-                OGRE_DELETE mOverlaySystem;
-            }
         }
         
-        Ogre::OverlaySystem* mOverlaySystem;  // Overlay system
-
         Sample* mCurrentSample;         // currently running sample
         bool mSamplePaused;             // whether current sample is paused
         bool mLastRun;                  // whether or not this is the final run
