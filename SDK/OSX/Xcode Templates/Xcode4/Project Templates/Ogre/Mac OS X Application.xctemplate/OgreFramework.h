@@ -70,9 +70,9 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #ifdef OGRE_IS_IOS
-class OgreFramework : public Ogre::Singleton<OgreFramework>, OIS::KeyListener, OIS::MultiTouchListener, OgreBites::SdkTrayListener
+class OgreFramework : public Ogre::Singleton<OgreFramework>, OIS::KeyListener, OIS::MultiTouchListener, OgreBites::TrayListener
 #else
-class OgreFramework : public Ogre::Singleton<OgreFramework>, OIS::KeyListener, OIS::MouseListener, OgreBites::SdkTrayListener
+class OgreFramework : public Ogre::Singleton<OgreFramework>, OIS::KeyListener, OIS::MouseListener, OgreBites::TrayListener
 #endif
 {
 public:
@@ -129,7 +129,7 @@ private:
     OgreFramework(const OgreFramework&);
     OgreFramework& operator= (const OgreFramework&);
     
-    OgreBites::SdkTrayManager*  m_pTrayMgr;
+    OgreBites::TrayManager*  m_pTrayMgr;
     Ogre::FrameEvent            m_FrameEvent;
     int                         m_iNumScreenShots;
     

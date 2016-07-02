@@ -31,7 +31,7 @@
 #include "Ogre.h"
 #include "SampleContext.h"
 #include "SamplePlugin.h"
-#include "SdkTrays.h"
+#include "OgreTrays.h"
 
 #ifdef HAVE_SDL
 #include <SDL_syswm.h>
@@ -152,7 +152,7 @@ namespace OgreBites
       | The OGRE Sample Browser. Features a menu accessible from all samples,
       | dynamic configuration, resource reloading, node labeling, and more.
       =============================================================================*/
-    class SampleBrowser : public SampleContext, public SdkTrayListener
+    class SampleBrowser : public SampleContext, public TrayListener
     {
     public:
 
@@ -1027,7 +1027,7 @@ namespace OgreBites
 #endif
 
             Ogre::ResourceGroupManager::getSingleton().initialiseResourceGroup("Essential");
-            mTrayMgr = new SdkTrayManager("BrowserControls", mWindow, this);
+            mTrayMgr = new TrayManager("BrowserControls", mWindow, this);
             mTrayMgr->showBackdrop("SdkTrays/Bands");
             mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
@@ -1056,14 +1056,6 @@ namespace OgreBites
 #endif
 
             createDummyScene();
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION) == false)
-            {
-                Ogre::RTShader::ShaderGenerator::getSingletonPtr()->addSceneManager(mRoot->getSceneManager("DummyScene"));
-            }
-#endif // INCLUDE_RTSHADER_SYSTEM
-
             loadResources();
 
 
@@ -1137,30 +1129,6 @@ namespace OgreBites
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mTrayMgr->hideLoadingBar();
 #endif
-        }
-
-        /*-----------------------------------------------------------------------------
-          | Creates dummy scene to allow rendering GUI in viewport.
-          -----------------------------------------------------------------------------*/
-        virtual void createDummyScene()
-        {
-            mWindow->removeAllViewports();
-            Ogre::SceneManager* sm = mRoot->createSceneManager(Ogre::ST_GENERIC, "DummyScene");
-            sm->addRenderQueueListener(mOverlaySystem);
-            Ogre::Camera* cam = sm->createCamera("DummyCamera");
-            mWindow->addViewport(cam);
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            // Initialize shader generator.
-            // Must be before resource loading in order to allow parsing extended material attributes.
-            if (!initialiseRTShaderSystem())
-            {
-                OGRE_EXCEPT(Ogre::Exception::ERR_FILE_NOT_FOUND,
-                            "Shader Generator Initialization failed - Core shader libs path not found",
-                            "SampleBrowser::createDummyScene");
-            }
-
-            mShaderGenerator->addSceneManager(sm);
-#endif // INCLUDE_RTSHADER_SYSTEM
         }
 
         /*-----------------------------------------------------------------------------
@@ -1562,23 +1530,6 @@ namespace OgreBites
         }
     protected:
         /*-----------------------------------------------------------------------------
-          | Destroys dummy scene.
-          -----------------------------------------------------------------------------*/
-        virtual void destroyDummyScene()
-        {
-            if(!mRoot->hasSceneManager("DummyScene"))
-                return;
-
-            Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            mShaderGenerator->removeSceneManager(dummyScene);
-#endif
-            dummyScene->removeRenderQueueListener(mOverlaySystem);
-            mWindow->removeAllViewports();
-            mRoot->destroySceneManager(dummyScene);
-        }
-
-        /*-----------------------------------------------------------------------------
           | Extend to temporarily hide a sample's overlays while in the pause menu.
           -----------------------------------------------------------------------------*/
         virtual void pauseCurrentSample()
@@ -1626,7 +1577,7 @@ namespace OgreBites
 #endif
         }
 
-        SdkTrayManager* mTrayMgr;                      // SDK tray interface
+        TrayManager* mTrayMgr;                      // SDK tray interface
 #ifdef OGRE_STATIC_LIB
         PluginMap mPluginNameMap;                      // A structure to map plugin names to class types
 #endif

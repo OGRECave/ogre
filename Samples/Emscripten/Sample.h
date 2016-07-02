@@ -31,12 +31,13 @@
 
 #include <Ogre.h>
 #include <RTShaderSystem/OgreShaderGenerator.h>
-#include <ShaderGeneratorTechniqueResolverListener.h>
-#include <SdkTrays.h>
+#include <OgreSGTechniqueResolverListener.h>
+#include <OgreTrays.h>
+#include <OgreCameraMan.h>
 #include <emscripten/html5.h>
 
 
-class Sample : public Ogre::FrameListener, public OgreBites::SdkTrayListener
+class Sample : public Ogre::FrameListener
 {
 public:
 	Sample();
@@ -61,13 +62,11 @@ private:
     unsigned char* mBuffer;
 	std::vector<Ogre::AnimationState*> mAnimations;
     
-    bool mOrbiting;
-    bool mZoom;
-    
     Ogre::OverlaySystem* mOverlaySystem;
     Ogre::RTShader::ShaderGenerator* mShaderGenerator;
     Ogre::MaterialManager::Listener* mMaterialListener;
-    OgreBites::SdkTrayManager* mTrayMgr;
+    OgreBites::TrayManager* mTrayMgr;
+    OgreBites::CameraMan* mCameraMan;
 
 	void parseResources();
     void destroyMaterials( Ogre::String resourceGroupID );

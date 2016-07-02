@@ -29,7 +29,7 @@
 #define __SdkSample_H__
 
 #include "Sample.h"
-#include "SdkTrays.h"
+#include "OgreTrays.h"
 #include "OgreCameraMan.h"
 
 #include "Ogre.h"
@@ -43,7 +43,7 @@ namespace OgreBites
     /*=============================================================================
     // Base SDK sample class. Includes default player camera and SDK trays.
     =============================================================================*/
-    class SdkSample : public Sample, public SdkTrayListener
+    class SdkSample : public Sample, public TrayListener
     {
     public:
         SdkSample()
@@ -167,19 +167,19 @@ namespace OgreBites
                 Ogre::TextureFilterOptions tfo;
                 unsigned int aniso;
 
-                switch (DISPLAY_STRING_TO_STRING(mDetailsPanel->getParamValue(9))[0])
+                switch (Ogre::MaterialManager::getSingleton().getDefaultTextureFiltering(Ogre::FT_MAG))
                 {
-                case 'B':
+                case Ogre::TFO_BILINEAR:
                     newVal = "Trilinear";
                     tfo = Ogre::TFO_TRILINEAR;
                     aniso = 1;
                     break;
-                case 'T':
+                case Ogre::TFO_TRILINEAR:
                     newVal = "Anisotropic";
                     tfo = Ogre::TFO_ANISOTROPIC;
                     aniso = 8;
                     break;
-                case 'A':
+                case Ogre::TFO_ANISOTROPIC:
                     newVal = "None";
                     tfo = Ogre::TFO_NONE;
                     aniso = 1;
@@ -427,7 +427,7 @@ namespace OgreBites
             createSceneManager();
             setupView();
 
-            mTrayMgr = new SdkTrayManager("SampleControls", window, this);  // create a tray interface
+            mTrayMgr = new TrayManager("SampleControls", window, this);  // create a tray interface
 
             loadResources();
             mResourcesLoaded = true;
@@ -536,7 +536,7 @@ namespace OgreBites
 
         Ogre::Viewport* mViewport;          // main viewport
         Ogre::Camera* mCamera;              // main camera
-        SdkTrayManager* mTrayMgr;           // tray interface manager
+        TrayManager* mTrayMgr;           // tray interface manager
         CameraMan* mCameraMan;           // basic camera controller
         ParamsPanel* mDetailsPanel;         // sample details panel
         bool mCursorWasVisible;             // was cursor visible before dialog appeared

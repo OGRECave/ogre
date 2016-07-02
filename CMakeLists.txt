@@ -392,7 +392,7 @@ cmake_dependent_option(OGRE_BUILD_COMPONENT_PROPERTY "Build Property component" 
 cmake_dependent_option(OGRE_BUILD_PLUGIN_CG "Build Cg plugin" TRUE "Cg_FOUND;NOT APPLE_IOS;NOT WINDOWS_STORE;NOT WINDOWS_PHONE" FALSE)
 cmake_dependent_option(OGRE_BUILD_COMPONENT_OVERLAY "Build Overlay component" TRUE "FREETYPE_FOUND" FALSE)
 option(OGRE_BUILD_COMPONENT_HLMS "Build HLMS component" TRUE)
-option(OGRE_BUILD_COMPONENT_BITES "Build OgreBites component [UNSTABLE]" TRUE)
+cmake_dependent_option(OGRE_BUILD_COMPONENT_BITES "Build OgreBites component [UNSTABLE]" TRUE "OGRE_BUILD_COMPONENT_OVERLAY" FALSE)
 option(OGRE_BUILD_COMPONENT_PYTHON "Build Python bindings" TRUE)
 option(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM "Build RTShader System component" TRUE)
 cmake_dependent_option(OGRE_BUILD_RTSHADERSYSTEM_CORE_SHADERS "Build RTShader System FFP core shaders" TRUE "OGRE_BUILD_COMPONENT_RTSHADERSYSTEM" FALSE)
