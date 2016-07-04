@@ -2,7 +2,6 @@
 
 if(SDL2_FOUND)
   include_directories(${SDL2_INCLUDE_DIR})
-  add_definitions(-DHAVE_SDL)
 endif()
 
 if(UNIX)

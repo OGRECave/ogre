@@ -8,7 +8,9 @@
 #ifndef SAMPLES_COMMON_INCLUDE_INPUT_H_
 #define SAMPLES_COMMON_INCLUDE_INPUT_H_
 
-#ifdef HAVE_SDL
+#include <OgreBuildSettings.h>
+
+#ifdef OGRE_BITES_HAVE_SDL
 #include <SDL.h>
 
 namespace OgreBites {

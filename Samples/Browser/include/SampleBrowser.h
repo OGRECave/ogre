@@ -33,10 +33,6 @@
 #include "SamplePlugin.h"
 #include "OgreTrays.h"
 
-#ifdef HAVE_SDL
-#include <SDL_syswm.h>
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #endif

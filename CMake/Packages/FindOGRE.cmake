@@ -427,6 +427,8 @@ ogre_find_component(Overlay OgreOverlaySystem.h)
 ogre_find_component(MeshLodGenerator OgreMeshLodGenerator.h)
 # look for HLMS component
 ogre_find_component(HLMS OgreHlmsManager.h)
+# look for Bites component
+ogre_find_component(Bites OgreApplicationContext.h)
 
 #########################################################
 # Find Ogre plugins
