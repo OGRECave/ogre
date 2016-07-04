@@ -7,11 +7,6 @@
 # free to make use of it in any way you like.
 #-------------------------------------------------------------------
 
-if(SDL2_FOUND)
-  include_directories(${SDL2_INCLUDE_DIR})
-  add_definitions(-DHAVE_SDL)
-endif()
-
 set(HEADER_FILES
     include/TestContext.h
 	../Common/include/ImageValidator.h
