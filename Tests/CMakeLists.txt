@@ -20,6 +20,10 @@ if (OGRE_BUILD_TESTS)
   ogre_add_component_include_dir(Bites)
   set(TEST_DEPENDENCIES OgreBites)
 
+  if(SDL2_FOUND)
+    include_directories(${SDL2_INCLUDE_DIR})
+  endif()
+
   # Make sure all plugins are built
   if (OGRE_BUILD_PLUGIN_OCTREE)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} Plugin_OctreeSceneManager)

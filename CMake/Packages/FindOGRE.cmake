@@ -272,6 +272,7 @@ if (OGRE_STATIC)
   find_package(OpenGLES2 QUIET)
   find_package(ZLIB QUIET)
   find_package(ZZip QUIET)
+  find_package(SDL2 QUIET)
   if (UNIX AND NOT APPLE AND NOT ANDROID)
     find_package(X11 QUIET)
     find_library(XAW_LIBRARY NAMES Xaw Xaw7 PATHS ${DEP_LIB_SEARCH_DIR} ${X11_LIB_SEARCH_PATH})
@@ -280,7 +281,7 @@ if (OGRE_STATIC)
     endif ()
   endif ()
 
-  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${ZZip_LIBRARIES} ${ZLIB_LIBRARIES} ${FreeImage_LIBRARIES} ${FREETYPE_LIBRARIES})
+  set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${ZZip_LIBRARIES} ${ZLIB_LIBRARIES} ${FreeImage_LIBRARIES} ${FREETYPE_LIBRARIES} ${SDL2_LIBRARY})
 
   if (APPLE AND NOT APPLE_IOS AND NOT ANDROID)
     set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${X11_LIBRARIES} ${X11_Xt_LIBRARIES} ${XAW_LIBRARY} ${X11_Xrandr_LIB} ${Carbon_LIBRARIES} ${Cocoa_LIBRARIES})
@@ -427,6 +428,8 @@ ogre_find_component(Overlay OgreOverlaySystem.h)
 ogre_find_component(MeshLodGenerator OgreMeshLodGenerator.h)
 # look for HLMS component
 ogre_find_component(HLMS OgreHlmsManager.h)
+# look for Bites component
+ogre_find_component(Bites OgreApplicationContext.h)
 
 #########################################################
 # Find Ogre plugins
@@ -592,4 +595,3 @@ set(OGRE_MEDIA_SEARCH_SUFFIX
 clear_if_changed(OGRE_PREFIX_WATCH OGRE_MEDIA_DIR)
 find_path(OGRE_MEDIA_DIR NAMES packs/cubemapsJS.zip HINTS ${OGRE_MEDIA_SEARCH_PATH}
   PATHS ${OGRE_PREFIX_PATH} PATH_SUFFIXES ${OGRE_MEDIA_SEARCH_SUFFIX})
-

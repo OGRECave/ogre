@@ -13,7 +13,7 @@
 #include "OgreRenderWindow.h"
 #include "OgreViewport.h"
 
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
 #include <SDL_video.h>
 #include <SDL_syswm.h>
 #endif
@@ -115,7 +115,7 @@ void ApplicationContext::closeApp()
         mTaskScheduler.terminate();
 #endif
 
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
     SDL_DestroyWindow(mSDLWindow);
     mSDLWindow = 0;
 #endif
@@ -213,7 +213,7 @@ void ApplicationContext::destroyRTShaderSystem()
 
 void ApplicationContext::setup()
 {
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
     SDL_Init(0);
     SDL_InitSubSystem(SDL_INIT_VIDEO);
 #endif
@@ -344,7 +344,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     miscParams["FSAA"] = ropts["FSAA"].currentValue;
     miscParams["vsync"] = ropts["VSync"].currentValue;
 
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
     mSDLWindow = SDL_CreateWindow(mAppName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
 
     SDL_SysWMinfo wmInfo;
@@ -395,7 +395,7 @@ Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName
 
 void ApplicationContext::setupInput(bool _grab)
 {
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
     if (SDL_InitSubSystem(SDL_INIT_EVENTS) != 0)
     {
         OGRE_EXCEPT(Ogre::Exception::ERR_INVALID_STATE,
@@ -582,7 +582,7 @@ void ApplicationContext::shutdown()
         OGRE_DELETE mOverlaySystem;
     }
 
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
     SDL_QuitSubSystem(SDL_INIT_EVENTS);
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
 #endif
@@ -590,7 +590,7 @@ void ApplicationContext::shutdown()
 
 void ApplicationContext::captureInputDevices()
 {
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
