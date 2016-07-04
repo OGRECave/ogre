@@ -199,6 +199,8 @@ else ()
   set(OGRE_SET_DISABLE_QUAD_BUFFER_STEREO 0)
 endif()
 
+set(OGRE_BITES_HAVE_SDL SDL2_FOUND)
+
 # generate OgreBuildSettings.h
 configure_file(${OGRE_TEMPLATES_DIR}/OgreBuildSettings.h.in ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h @ONLY)
 install(FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h DESTINATION include/OGRE)

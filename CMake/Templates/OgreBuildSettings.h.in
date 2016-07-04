@@ -85,4 +85,6 @@
 
 #cmakedefine RTSHADER_SYSTEM_BUILD_EXT_SHADERS
 
+#cmakedefine OGRE_BITES_HAVE_SDL
+
 #endif
