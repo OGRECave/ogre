@@ -1217,7 +1217,7 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
-#if !OGRE_DOUBLE_PRECISION
+
         if( !hasSkeletonAnimation )
         {
             //We need to correct currentMappedConstBuffer to point to the right texture buffer's
@@ -1248,16 +1248,40 @@ namespace Ogre
             *currentMappedConstBuffer = datablock->getAssignedSlot() & 0x1FF;
 
             //mat4x3 world
-            memcpy( currentMappedTexBuffer, &worldMat, 4 * 3 * sizeof(float) );
+#if !OGRE_DOUBLE_PRECISION
+            memcpy( currentMappedTexBuffer, &worldMat, 4 * 3 * sizeof( float ) );
             currentMappedTexBuffer += 16;
+#else
+            for( int y = 0; y < 3; ++y )
+            {
+                for( int x = 0; x < 4; ++x )
+                {
+                    *currentMappedTexBuffer++ = worldMat[ y ][ x ];
+                }
+            }
+            currentMappedTexBuffer += 4;
+#endif
 
             //mat4 worldView
             Matrix4 tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
     #ifdef OGRE_GLES2_WORKAROUND_1
             tmp = tmp.transpose();
-    #endif
-            memcpy( currentMappedTexBuffer, &tmp, sizeof(Matrix4) * !casterPass );
+#endif
+#if !OGRE_DOUBLE_PRECISION
+            memcpy( currentMappedTexBuffer, &tmp, sizeof( Matrix4 ) * !casterPass );
             currentMappedTexBuffer += 16 * !casterPass;
+#else
+            if( !casterPass )
+            {
+                for( int y = 0; y < 4; ++y )
+                {
+                    for( int x = 0; x < 4; ++x )
+                    {
+                        *currentMappedTexBuffer++ = tmp[ y ][ x ];
+                    }
+                }
+            }
+#endif
         }
         else
         {
@@ -1297,8 +1321,18 @@ namespace Ogre
                 queuedRenderable.renderable->getWorldTransforms( tmp );
                 for( size_t i=0; i<numWorldTransforms; ++i )
                 {
-                    memcpy( currentMappedTexBuffer, &tmp[i], 12 * sizeof(float) );
+#if !OGRE_DOUBLE_PRECISION
+                    memcpy( currentMappedTexBuffer, &tmp[ i ], 12 * sizeof( float ) );
                     currentMappedTexBuffer += 12;
+#else
+                    for( int y = 0; y < 3; ++y )
+                    {
+                        for( int x = 0; x < 4; ++x )
+                        {
+                            *currentMappedTexBuffer++ = tmp[ i ][ y ][ x ];
+                        }
+                    }
+#endif
                 }
             }
             else
@@ -1358,9 +1392,6 @@ namespace Ogre
             currentConstOffset = std::min( currentConstOffset, mCurrentTexBufferSize );
             currentMappedTexBuffer = mStartMappedTexBuffer + currentConstOffset;
         }
-#else
-    #error Not Coded Yet! (cannot use memcpy on Matrix4)
-#endif
 
         *reinterpret_cast<float * RESTRICT_ALIAS>( currentMappedConstBuffer+1 ) = datablock->
                                                                                     mShadowConstantBias;

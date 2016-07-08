@@ -37,7 +37,13 @@ namespace Ogre
         outIntegral = static_cast<ArrayReal>( _outIntegral );
         return fractpart;
 #else
+#if !OGRE_DOUBLE_PRECISION
         return modff( x, &outIntegral );
+#else
+        float out;
+        return modff( x, &out );
+        outIntegral = out;
+#endif
 #endif
     }
     //-----------------------------------------------------------------------------------

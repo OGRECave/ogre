@@ -893,7 +893,6 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
-#if !OGRE_DOUBLE_PRECISION
         if( !hasSkeletonAnimation )
         {
             const Matrix4 &worldMat = queuedRenderable.movableObject->_getParentNodeFullTransform();
@@ -902,17 +901,40 @@ namespace Ogre
             Matrix4 tmp = mPreparedPass.viewProjMatrix * worldMat;
     #ifdef OGRE_GLES2_WORKAROUND_1
             tmp = tmp.transpose();
-    #endif
-            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
+#endif
+#if !OGRE_DOUBLE_PRECISION
+            memcpy( vsUniformBuffer, &tmp, sizeof( Matrix4 ) );
             vsUniformBuffer += 16;
+#else
+            for( int y = 0; y < 4; ++y )
+            {
+                for( int x = 0; x < 4; ++x )
+                {
+                    *vsUniformBuffer++ = tmp[ y ][ x ];
+                }
+            }
+#endif
             //mat4 worldView
             tmp = mPreparedPass.viewMatrix.concatenateAffine( worldMat );
     #ifdef OGRE_GLES2_WORKAROUND_1
             //On GLES2, there is a bug in PowerVR SGX 540 where glProgramUniformMatrix4fvEXT doesn't
             tmp = tmp.transpose();
-    #endif
-            memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) * !casterPass );
+#endif
+#if !OGRE_DOUBLE_PRECISION
+            memcpy( vsUniformBuffer, &tmp, sizeof( Matrix4 ) * !casterPass );
             vsUniformBuffer += 16 * !casterPass;
+#else
+            if( !casterPass )
+            {
+                for( int y = 0; y < 4; ++y )
+                {
+                    for( int x = 0; x < 4; ++x )
+                    {
+                        *vsUniformBuffer++ = tmp[ y ][ x ];
+                    }
+                }
+            }
+#endif
         }
         else
         {
@@ -924,15 +946,22 @@ namespace Ogre
             queuedRenderable.renderable->getWorldTransforms( tmp );
             for( size_t i=0; i<numWorldTransforms; ++i )
             {
-                memcpy( vsUniformBuffer, &tmp[i], 12 * sizeof(float) );
+#if !OGRE_DOUBLE_PRECISION
+                memcpy( vsUniformBuffer, &tmp[ i ], 12 * sizeof( float ) );
                 vsUniformBuffer += 12;
+#else
+                for( int y = 0; y < 3; ++y )
+                {
+                    for( int x = 0; x < 4; ++x )
+                    {
+                        *vsUniformBuffer++ = tmp[ i ][ y ][ x ];
+                    }
+                }
+#endif
             }
 
             vsUniformBuffer += (60 - numWorldTransforms) * 12;
         }
-#else
-    #error Not Coded Yet! (cannot use memcpy on Matrix4)
-#endif
 
         if( casterPass )
             *vsUniformBuffer++ = datablock->mShadowConstantBias;
