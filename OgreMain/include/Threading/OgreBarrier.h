@@ -31,7 +31,7 @@ THE SOFTWARE.
 
 #include "OgrePlatform.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     //No need to include the heavy windows.h header for something like this!
     typedef long LONG;
     typedef void* HANDLE;
@@ -61,7 +61,7 @@ namespace Ogre
     */
     class _OgreExport Barrier
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         size_t                  mNumThreads;
         size_t                  mIndex;
         OGRE_ALIGNED_DECL( volatile LONG,   mLockCount,     4 );
