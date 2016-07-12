@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 #if defined(__i386) || defined(_M_IX86)
     // Calling conventions are needed for x86 (32-bit ONLY) CPUs
-    #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         #define OGRE_THREAD_CALL_CONVENTION _OGRE_SIMD_ALIGN_ATTRIBUTE __stdcall
     #elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
         #define __cdecl __attribute__((__cdecl__))
@@ -43,7 +43,7 @@ THE SOFTWARE.
     #define OGRE_THREAD_CALL_CONVENTION
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     /// @See Threads::CreateThread for an example on how to use
     #define THREAD_DECLARE( threadFunction ) \
     unsigned long OGRE_THREAD_CALL_CONVENTION threadFunction##_internal( void *argName )\
@@ -78,7 +78,7 @@ THE SOFTWARE.
     }
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     //No need to include the heavy windows.h header for something like this!
     typedef void* HANDLE;
 #else
@@ -89,7 +89,7 @@ namespace Ogre
 {
     class _OgreExport ThreadHandle
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         HANDLE  mThread;
 #else
         pthread_t mThread;
@@ -104,7 +104,7 @@ namespace Ogre
         size_t getThreadIdx() const         { return mThreadIdx; }
         void* getUserParam() const          { return mUserParam; }
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         /// Internal use
         void _setOsHandle( HANDLE handle )  { mThread = handle; }
         /// Internal use
@@ -120,7 +120,7 @@ namespace Ogre
     typedef SharedPtr<ThreadHandle> ThreadHandlePtr;
     typedef vector<ThreadHandlePtr>::type ThreadHandleVec;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     typedef unsigned long (OGRE_THREAD_CALL_CONVENTION *THREAD_ENTRY_POINT)( void *lpThreadParameter );
 #else
     typedef void* (OGRE_THREAD_CALL_CONVENTION *THREAD_ENTRY_POINT)( void *lpThreadParameter );

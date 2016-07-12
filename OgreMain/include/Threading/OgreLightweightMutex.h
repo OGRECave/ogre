@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePlatform.h"
 #include "OgrePlatformInformation.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
     //No need to include the heavy windows.h header for something like this!
     typedef void* HANDLE;
 #else
@@ -70,7 +70,7 @@ namespace Ogre
     */
     class _OgreExport LightweightMutex
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
         OGRE_ALIGNED_DECL( long, mCounter, 4 );
         HANDLE  mSemaphore;
 #else
