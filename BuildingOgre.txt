@@ -193,13 +193,12 @@ http://developer.apple.com/library/ios/documentation/Xcode/Conceptual/iphone_dev
 9. Building Ogre as Windows Store or Windows Phone application
 -------------------------------------------------------------------
 
-You need Windows 8.0 or later, Windows 8.1 is recommended.
+You need Windows 8.0 or later, Windows 10 is recommended.
 
-You need Visual Studio 2012 or later, Visual Studio 2013 is recommended
-as it is bundled with WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
+You need Visual Studio 2012 or later, Visual Studio 2015 is recommended as it is
+bundled with Universal 10.0.240.0, WinStore 8.0/8.1 and WinPhone 8.0/8.1 SDKs.
 
-Download and install CMake 3.1 (scheduled for release 2014-11-01) 
-or CMakeMS from http://cmakems.codeplex.com/
+Download and install CMake 3.4 or later.
 
 Patched dependencies must be used, compiled with appropriate WINAPI_FAMILY.
 Cg is not supported, and only headers from OIS are needed. 
@@ -211,11 +210,12 @@ separate folders, Win32 version can be built from OgreDependencies.VS201x.sln,
  WinRT from OgreDependencies.VS201x.WinRT.sln
 
 Run CMake, specify source and binaries folders, than "Configure", select
-"Visual Studio 12 2013" generator and "Specify options for cross-compiling"
-option, specify Operating System = "WindowsStore" or "WindowsPhone",
-Version = "8.0" or "8.1", than "Finish", specify WinRT dependencies folder
-for OGRE_DEPENDENCIES_DIR, "Configure", should be no more errors, then press
-"Generate". If you want build time to be shorter - set OGRE_UNITY_BUILD to on.
+"Visual Studio 14 2015" generator and "Specify options for cross-compiling" option,
+specify Operating System = "WindowsStore" or "WindowsPhone", Version = "8.0","8.1", 
+or for UAP Operating System = "WindowsStore", Version = "10.0.10240.0", "10.0.10586.0"
+than "Finish", specify WinRT dependencies folder for OGRE_DEPENDENCIES_DIR,
+"Configure", should be no more errors, then press "Generate".
+If you want build time to be shorter - set OGRE_UNITY_BUILD to on.
 
 Select SampleBrowser as the start up project and run.
 
