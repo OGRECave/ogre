@@ -20,8 +20,8 @@ if(WIN32) # The only platform it makes sense to check for DirectX11 SDK
 
 	# Windows 10 Universal SDK
 	if(MSVC14)
-		if(VS_TARGET_PLATFORM_VERSION)
-			set(W10SDK_VER VS_TARGET_PLATFORM_VERSION)
+		if(CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION)
+			set(W10SDK_VER ${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION})
 		else()
 			set(W10SDK_VER 10.0.10240.0)
 		endif()
