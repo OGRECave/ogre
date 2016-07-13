@@ -533,6 +533,13 @@ void ApplicationContext::locateResources()
     Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
     Ogre::String sec, type, arch;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    Ogre::String bundle = Ogre::macBundlePath();
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+    char* env_SNAP = getenv("SNAP");
+    Ogre::String bundle(env_SNAP ? env_SNAP : "");
+#endif
+
     // go through all specified resource groups
     while (seci.hasMoreElements())
     {
@@ -551,7 +558,11 @@ void ApplicationContext::locateResources()
             // In order to make things portable on OS X we need to provide
             // the loading with it's own bundle path location
             if (!Ogre::StringUtil::startsWith(arch, "/", false)) // only adjust relative dirs
-                arch = Ogre::String(Ogre::macBundlePath() + "/" + arch);
+                arch = bundle + "/" + arch;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+            // With Ubuntu Snappy changes absolute paths are relative to the snap package.
+            if (Ogre::StringUtil::startsWith(arch, "/", false)) // only adjust absolute dirs
+                arch = bundle + arch;
 #endif
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
         }
