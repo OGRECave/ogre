@@ -75,6 +75,7 @@ namespace Ogre
 					indexMap[idx] = usedCount++;
 		}
 		bool nothingToStrip() const { return usedCount == indexMap.size(); }
+		HardwareIndexBuffer::IndexType minimalIndexType() const { return usedCount < 0xFFFF ? HardwareIndexBuffer::IT_16BIT : HardwareIndexBuffer::IT_32BIT; }
 
 	public:
 		enum{ UnusedIdx = (unsigned)-1 };
@@ -131,9 +132,10 @@ namespace Ogre
 
 		size_t indexCount = indexData->indexCount;
 		HardwareIndexBuffer::IndexType indexType = indexData->indexBuffer->getType();
+		HardwareIndexBuffer::IndexType newIndexType = remapInfo.minimalIndexType();
 		HardwareIndexBufferSharedPtr newIndexBuffer = 
 			HardwareBufferManager::getSingleton().createIndexBuffer(
-			indexType, indexCount, indexData->indexBuffer->getUsage(), indexData->indexBuffer->hasShadowBuffer());
+			newIndexType, indexCount, indexData->indexBuffer->getUsage(), indexData->indexBuffer->hasShadowBuffer());
 
 		void* pSrc = indexData->indexBuffer->lock(
 			indexData->indexStart * indexData->indexBuffer->getIndexSize(),
@@ -141,13 +143,25 @@ namespace Ogre
 			HardwareBuffer::HBL_READ_ONLY);
 		void* pDst = newIndexBuffer->lock(HardwareBuffer::HBL_DISCARD);
 
-		if(indexType == HardwareIndexBuffer::IT_32BIT)
+		if(indexType == HardwareIndexBuffer::IT_32BIT && newIndexType == HardwareIndexBuffer::IT_32BIT)
 		{
 			uint32 *pSrc32 = (uint32*)pSrc, *pDst32 = (uint32*)pDst;
 			for(size_t i = 0; i < indexCount; ++i)
 				pDst32[i] = remapInfo.indexMap[pSrc32[i]];
 		}
-		else
+		if(indexType == HardwareIndexBuffer::IT_32BIT && newIndexType == HardwareIndexBuffer::IT_16BIT)
+		{
+			uint32 *pSrc32 = (uint32*)pSrc; uint16 *pDst16 = (uint16*)pDst;
+			for(size_t i = 0; i < indexCount; ++i)
+				pDst16[i] = (uint16)remapInfo.indexMap[pSrc32[i]];
+		}
+		if(indexType == HardwareIndexBuffer::IT_16BIT && newIndexType == HardwareIndexBuffer::IT_32BIT)
+		{
+			uint16 *pSrc16 = (uint16*)pSrc; uint32 *pDst32 = (uint32*)pDst;
+			for(size_t i = 0; i < indexCount; ++i)
+				pDst32[i] = remapInfo.indexMap[pSrc16[i]];
+		}
+		else if(indexType == HardwareIndexBuffer::IT_16BIT && newIndexType == HardwareIndexBuffer::IT_16BIT)
 		{
 			uint16 *pSrc16 = (uint16*)pSrc, *pDst16 = (uint16*)pDst;
 			for(size_t i = 0; i < indexCount; ++i)
