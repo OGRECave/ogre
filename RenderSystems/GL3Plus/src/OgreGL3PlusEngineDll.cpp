@@ -27,6 +27,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 */
 
 #include "OgreRoot.h"
+#include "OgreGL3PlusPrerequisites.h"
 #include "OgreGL3PlusPlugin.h"
 
 #ifndef OGRE_STATIC_LIB

@@ -52,7 +52,7 @@ if (OGRE_BUILD_TESTS)
   if (OGRE_BUILD_RENDERSYSTEM_GL)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GL)
   endif ()
-  if (OGRE_BUILD_RENDERSYSTEM_GLPLUS)
+  if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
     set(TEST_DEPENDENCIES ${TEST_DEPENDENCIES} RenderSystem_GL3Plus)
   endif ()
   if (OGRE_BUILD_RENDERSYSTEM_GLES)
@@ -74,6 +74,7 @@ if (OGRE_BUILD_TESTS)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/Direct3D11/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include)
     include_directories(
       ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include
       ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/src/GLSLES/include

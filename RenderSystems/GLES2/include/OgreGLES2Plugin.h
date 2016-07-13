@@ -30,10 +30,11 @@ THE SOFTWARE.
 #define __GLES2Plugin_H__
 
 #include "OgrePlugin.h"
-#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre 
 {
+    class GLES2RenderSystem;
+
     /** Plugin instance for GL ES 2 Manager */
     class GLES2Plugin : public Plugin
     {

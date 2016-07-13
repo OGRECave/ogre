@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "OgreGLES2Plugin.h"
 #include "OgreRoot.h"
+#include "OgreGLES2RenderSystem.h"
 
 namespace Ogre {
     static const String sPluginName = "OpenGL ES 2.0 RenderSystem";

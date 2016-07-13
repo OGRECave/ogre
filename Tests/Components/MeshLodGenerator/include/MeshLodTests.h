@@ -31,7 +31,7 @@ THE SOFTWARE.
 #include "OgreBuildSettings.h"
 #include "OgreFileSystemLayer.h"
 #ifdef OGRE_STATIC_LIB
-#include "../../../../Samples/Common/include/OgreStaticPluginLoader.h"
+#include "OgreStaticPluginLoader.h"
 #endif
 
 #include "OgreMesh.h"
