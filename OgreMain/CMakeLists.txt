@@ -273,6 +273,11 @@ endif()
 if (OGRE_CONFIG_ENABLE_STBI)
   list(APPEND HEADER_FILES include/OgreSTBICodec.h)
   list(APPEND SOURCE_FILES src/OgreSTBICodec.cpp)
+  
+  if(UNIX)
+    set_source_files_properties(src/OgreSTBICodec.cpp PROPERTIES COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function -Wno-shadow")
+  endif()
+  
   if(CMAKE_COMPILER_IS_GNUCXX)
       # workaround gcc5 bug on Ubuntu 16.04 regarding __builtin_cpu_supports
       list(APPEND LIBRARIES gcc)
