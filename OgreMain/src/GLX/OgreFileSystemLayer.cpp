@@ -114,35 +114,36 @@ namespace Ogre
     //---------------------------------------------------------------------
     void FileSystemLayer::prepareUserHome(const Ogre::String& subdir)
     {
-        struct passwd* pwd = getpwuid(getuid());
-        if (pwd)
-        {
-            mHomePath = pwd->pw_dir;
-        }
-        else
-        {
-            // try the $HOME environment variable
-            mHomePath = getenv("HOME");
+        char* xdg_cache = getenv("XDG_CACHE_HOME");
+
+        if(xdg_cache) {
+            mHomePath = xdg_cache;
+            mHomePath.append("/");
+        } else {
+            struct passwd* pwd = getpwuid(getuid());
+            if (pwd)
+            {
+                mHomePath = pwd->pw_dir;
+            }
+            else
+            {
+                // try the $HOME environment variable
+                mHomePath = getenv("HOME");
+            }
+
+            if(!mHomePath.empty()) {
+                mHomePath.append("/.cache/");
+            }
         }
 
         if (!mHomePath.empty())
         {
-            // create an .ogre subdir
-            mHomePath.append("/.ogre/");
+            // create the given subdir
+            mHomePath.append(subdir + '/');
             if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
             {
                 // can't create dir
                 mHomePath.clear();
-            }
-            else
-            {
-                // now create the given subdir
-                mHomePath.append(subdir + '/');
-                if (mkdir(mHomePath.c_str(), 0755) != 0 && errno != EEXIST)
-                {
-                    // can't create dir
-                    mHomePath.clear();
-                }
             }
         }
 
