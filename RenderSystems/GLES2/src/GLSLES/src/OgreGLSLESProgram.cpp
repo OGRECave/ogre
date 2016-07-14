@@ -43,9 +43,6 @@ THE SOFTWARE.
 
 namespace Ogre {
 
-    String operationTypeToString(RenderOperation::OperationType val);
-    RenderOperation::OperationType parseOperationType(const String& val);
-
     //-----------------------------------------------------------------------
     GLSLESProgram::CmdPreprocessorDefines GLSLESProgram::msCmdPreprocessorDefines;
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
@@ -475,61 +472,6 @@ namespace Ogre {
             {
                 LogManager::getSingleton().logMessage("The removing of the lines didn't help.");
             }
-        }
-    }
-    //-----------------------------------------------------------------------
-    RenderOperation::OperationType parseOperationType(const String& val)
-    {
-        if (val == "point_list")
-        {
-            return RenderOperation::OT_POINT_LIST;
-        }
-        else if (val == "line_list")
-        {
-            return RenderOperation::OT_LINE_LIST;
-        }
-        else if (val == "line_strip")
-        {
-            return RenderOperation::OT_LINE_STRIP;
-        }
-        else if (val == "triangle_strip")
-        {
-            return RenderOperation::OT_TRIANGLE_STRIP;
-        }
-        else if (val == "triangle_fan")
-        {
-            return RenderOperation::OT_TRIANGLE_FAN;
-        }
-        else 
-        {
-            //Triangle list is the default fallback. Keep it this way?
-            return RenderOperation::OT_TRIANGLE_LIST;
-        }
-    }
-    //-----------------------------------------------------------------------
-    String operationTypeToString(RenderOperation::OperationType val)
-    {
-        switch (val)
-        {
-        case RenderOperation::OT_POINT_LIST:
-            return "point_list";
-            break;
-        case RenderOperation::OT_LINE_LIST:
-            return "line_list";
-            break;
-        case RenderOperation::OT_LINE_STRIP:
-            return "line_strip";
-            break;
-        case RenderOperation::OT_TRIANGLE_STRIP:
-            return "triangle_strip";
-            break;
-        case RenderOperation::OT_TRIANGLE_FAN:
-            return "triangle_fan";
-            break;
-        case RenderOperation::OT_TRIANGLE_LIST:
-        default:
-            return "triangle_list";
-            break;
         }
     }
 }
