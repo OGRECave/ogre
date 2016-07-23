@@ -220,7 +220,7 @@ namespace OgreBites
 
         virtual void runSampleByIndex(int idx)
         {
-            runSample(Ogre::any_cast<Sample*>(mThumbs[idx]->getUserAny()));
+            runSample(Ogre::any_cast<Sample*>(mThumbs[idx]->getUserObjectBindings().getUserAny()));
         }
 
         /*-----------------------------------------------------------------------------
@@ -367,11 +367,15 @@ namespace OgreBites
             {
                 if (b->getCaption() == "Start Sample")
                 {
-                    if (mLoadedSamples.empty()) mTrayMgr->showOkDialog("Error!", "No sample selected!");
-                    // use the sample pointer we stored inside the thumbnail
-                    else runSample(Ogre::any_cast<Sample*>(mThumbs[mSampleMenu->getSelectionIndex()]->getUserAny()));
-                }
-                else runSample(0);
+                    if (mLoadedSamples.empty()) {
+                        mTrayMgr->showOkDialog("Error!", "No sample selected!");
+                    } else {
+                        // use the sample pointer we stored inside the thumbnail
+                        Ogre::Renderable* r = mThumbs[mSampleMenu->getSelectionIndex()];
+                        runSample(Ogre::any_cast<Sample*>(r->getUserObjectBindings().getUserAny()));
+                    }
+                } else
+                    runSample(0);
             }
             else if (b->getName() == "UnloadReload")   // unload or reload sample plugins and update controls
             {
@@ -562,7 +566,7 @@ namespace OgreBites
                         bp->setHorizontalAlignment(Ogre::GHA_RIGHT);
                         bp->setVerticalAlignment(Ogre::GVA_CENTER);
                         bp->setMaterialName(name);
-                        bp->setUserAny(Ogre::Any(*i));
+                        bp->getUserObjectBindings().setUserAny(Ogre::Any(*i));
                         mTrayMgr->getTraysLayer()->add2D(bp);
 
                         // add sample thumbnail and title
@@ -583,7 +587,8 @@ namespace OgreBites
                 if (mSampleSlider->getValue() != menu->getSelectionIndex() + 1)
                     mSampleSlider->setValue(menu->getSelectionIndex() + 1);
 
-                Sample* s = Ogre::any_cast<Sample*>(mThumbs[menu->getSelectionIndex()]->getUserAny());
+                Ogre::Renderable* r = mThumbs[mSampleMenu->getSelectionIndex()];
+                Sample* s = Ogre::any_cast<Sample*>(r->getUserObjectBindings().getUserAny());
                 mTitleLabel->setCaption(menu->getSelectedItem());
                 mDescBox->setText("Category: " + s->getInfo()["Category"] + "\nDescription: " + s->getInfo()["Description"]);
 
@@ -688,7 +693,8 @@ namespace OgreBites
             {
                 if (!mLoadedSamples.empty() && (mSamplePaused || mCurrentSample == 0))
                 {
-                    Sample* newSample = Ogre::any_cast<Sample*>(mThumbs[mSampleMenu->getSelectionIndex()]->getUserAny());
+                    Ogre::Renderable* r = mThumbs[mSampleMenu->getSelectionIndex()];
+                    Sample* newSample = Ogre::any_cast<Sample*>(r->getUserObjectBindings().getUserAny());
                     runSample(newSample == mCurrentSample ? 0 : newSample);
                 }
             }

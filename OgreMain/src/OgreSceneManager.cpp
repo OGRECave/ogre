@@ -1595,7 +1595,7 @@ void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
     {
         if (sys->getName().find("Direct3D11") != String::npos)
         {
-            UnifiedHighLevelGpuProgram::setPrioriry("hlsl", 1);
+            UnifiedHighLevelGpuProgram::setPriority("hlsl", 1);
         }
     }
 }
