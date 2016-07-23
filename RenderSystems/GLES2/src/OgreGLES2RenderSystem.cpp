@@ -359,10 +359,6 @@ namespace Ogre {
             rsc->setCapability(RSC_SEPARATE_SHADER_OBJECTS);
 #endif
 
-        // Separate shader objects don't work properly on Tegra
-        if (rsc->getVendor() == GPU_NVIDIA)
-            rsc->unsetCapability(RSC_SEPARATE_SHADER_OBJECTS);
-
         GLfloat floatConstantCount = 0;
 #if OGRE_NO_GLES3_SUPPORT == 0
         glGetFloatv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &floatConstantCount);
