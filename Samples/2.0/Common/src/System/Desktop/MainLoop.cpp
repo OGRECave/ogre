@@ -30,9 +30,9 @@ THE SOFTWARE.
 #include "OgreException.h"
 #include <iostream>
 
-#include "System/MainEntryPointImplementations.h"
+#include "System/MainEntryPoints.h"
 
 namespace Demo
 {
-    double gFrametime = 1.0 / 60.0;
+    double MainEntryPoints::Frametime = 1.0 / 60.0;
 }

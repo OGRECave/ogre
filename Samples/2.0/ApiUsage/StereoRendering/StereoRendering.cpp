@@ -10,7 +10,7 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-#include "System/MainEntryPointImplementations.h"
+#include "System/MainEntryPoints.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
@@ -18,7 +18,7 @@ INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 int mainApp( int argc, const char *argv[] )
 #endif
 {
-    return Demo::mainAppSingleThreaded( argc, argv );
+    return Demo::MainEntryPoints::mainAppSingleThreaded( argc, argv );
 }
 
 namespace Demo
@@ -108,10 +108,12 @@ namespace Demo
         }
     };
 
-    void createSystems( GameState **outGraphicsGameState, GraphicsSystem **outGraphicsSystem,
-                        GameState **outLogicGameState, LogicSystem **outLogicSystem )
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
     {
-        StereoRenderingGameState *myGameState = new StereoRenderingGameState(
+        StereoRenderingGameState *gfxGameState = new StereoRenderingGameState(
         "This tutorial demonstrates the most basic rendering loop: Variable framerate.\n"
         "Variable framerate means the application adapts to the current frame rendering\n"
         "performance and boosts or decreases the movement speed of objects to maintain\n"
@@ -126,22 +128,24 @@ namespace Demo
         "\n"
         "Note: The cube is black because there is no lighting. We are not focusing on that." );
 
-        GraphicsSystem *graphicsSystem = new StereoGraphicsSystem( myGameState );
+        GraphicsSystem *graphicsSystem = new StereoGraphicsSystem( gfxGameState );
 
-        myGameState->_notifyGraphicsSystem( graphicsSystem );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-        *outGraphicsGameState = myGameState;
+        *outGraphicsGameState = gfxGameState;
         *outGraphicsSystem = graphicsSystem;
     }
 
-    void destroySystems( GameState *graphicsGameState, GraphicsSystem *graphicsSystem,
-                         GameState *logicGameState, LogicSystem *logicSystem )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
         delete graphicsSystem;
         delete graphicsGameState;
     }
 
-    const char *getWindowTitle(void)
+    const char* MainEntryPoints::getWindowTitle(void)
     {
         return "Stereo Rendering Sample";
     }

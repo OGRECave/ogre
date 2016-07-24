@@ -1,24 +1,28 @@
 
 #include "GraphicsSystem.h"
 #include "DynamicGeometryGameState.h"
-#include "SdlInputHandler.h"
-
-#include "OgreTimer.h"
-#include "Threading/OgreThreads.h"
-#include "OgreRenderWindow.h"
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-
-using namespace Demo;
+#include "System/MainEntryPoints.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int mainApp()
+int mainApp( int argc, const char *argv[] )
 #endif
 {
-    DynamicGeometryGameState dynamicGeometryGameState(
+    return Demo::MainEntryPoints::mainAppSingleThreaded( argc, argv );
+}
+
+namespace Demo
+{
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        DynamicGeometryGameState *gfxGameState = new DynamicGeometryGameState(
         "Shows how to create a Mesh programmatically from code and update it.\n"
         "None of the cubes were loaded from disk.\n"
         "All of the animation is performed by uploading new vertex data from CPU.\n"
@@ -29,54 +33,26 @@ int mainApp()
         "      (dynamic buffers are required to reupload all data after mapping).\n"
         "   4. Same as 3., but shows how to perform more than one map per frame\n"
         "      (advanced GPU memory management)." );
-    GraphicsSystem graphicsSystem( &dynamicGeometryGameState );
 
-    dynamicGeometryGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new GraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "Dynamic Buffers Example" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Dynamic Buffers Example";
+    }
 }

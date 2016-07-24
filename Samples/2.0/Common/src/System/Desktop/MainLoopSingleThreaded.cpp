@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include <iostream>
 
-#include "System/MainEntryPointImplementations.h"
+#include "System/MainEntryPoints.h"
 
 #include "GraphicsSystem.h"
 #include "LogicSystem.h"
@@ -44,9 +44,10 @@ THE SOFTWARE.
 using namespace Demo;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI Demo::mainAppSingleThreaded( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI Demo::MainEntryPoints::mainAppSingleThreaded( HINSTANCE hInst, HINSTANCE,
+                                                         LPSTR strCmdLine, INT )
 #else
-int Demo::mainAppSingleThreaded( int argc, const char *argv[] )
+int Demo::MainEntryPoints::mainAppSingleThreaded( int argc, const char *argv[] )
 #endif
 {
     GameState *graphicsGameState = 0;
@@ -54,7 +55,8 @@ int Demo::mainAppSingleThreaded( int argc, const char *argv[] )
     GameState *logicGameState = 0;
     LogicSystem *logicSystem = 0;
 
-    createSystems( &graphicsGameState, &graphicsSystem, &logicGameState, &logicSystem );
+    MainEntryPoints::createSystems( &graphicsGameState, &graphicsSystem,
+                                    &logicGameState, &logicSystem );
 
     try
     {
@@ -68,8 +70,8 @@ int Demo::mainAppSingleThreaded( int argc, const char *argv[] )
                 logicSystem->deinitialize();
             graphicsSystem->deinitialize();
 
-            destroySystems( graphicsGameState, graphicsSystem,
-                            logicGameState, logicSystem );
+            MainEntryPoints::destroySystems( graphicsGameState, graphicsSystem,
+                                             logicGameState, logicSystem );
 
             return 0; //User cancelled config
         }
@@ -93,22 +95,22 @@ int Demo::mainAppSingleThreaded( int argc, const char *argv[] )
 
         Ogre::Timer timer;
         unsigned long startTime = timer.getMicroseconds();
-        double accumulator = gFrametime;
+        double accumulator = MainEntryPoints::Frametime;
 
         double timeSinceLast = 1.0 / 60.0;
 
         while( !graphicsSystem->getQuit() )
         {
-            while( accumulator >= gFrametime && logicSystem )
+            while( accumulator >= MainEntryPoints::Frametime && logicSystem )
             {
                 logicSystem->beginFrameParallel();
-                logicSystem->update( static_cast<float>( gFrametime ) );
+                logicSystem->update( static_cast<float>( MainEntryPoints::Frametime ) );
                 logicSystem->finishFrameParallel();
 
                 logicSystem->finishFrame();
                 graphicsSystem->finishFrame();
 
-                accumulator -= gFrametime;
+                accumulator -= MainEntryPoints::Frametime;
             }
 
             graphicsSystem->beginFrameParallel();
@@ -138,19 +140,19 @@ int Demo::mainAppSingleThreaded( int argc, const char *argv[] )
         }
         graphicsSystem->deinitialize();
 
-        destroySystems( graphicsGameState, graphicsSystem,
-                        logicGameState, logicSystem );
+        MainEntryPoints::destroySystems( graphicsGameState, graphicsSystem,
+                                         logicGameState, logicSystem );
     }
     catch( Ogre::Exception &e )
     {
-        destroySystems( graphicsGameState, graphicsSystem,
-                        logicGameState, logicSystem );
+        MainEntryPoints::destroySystems( graphicsGameState, graphicsSystem,
+                                         logicGameState, logicSystem );
         throw e;
     }
     catch( ... )
     {
-        destroySystems( graphicsGameState, graphicsSystem,
-                        logicGameState, logicSystem );
+        MainEntryPoints::destroySystems( graphicsGameState, graphicsSystem,
+                                         logicGameState, logicSystem );
     }
 
     return 0;

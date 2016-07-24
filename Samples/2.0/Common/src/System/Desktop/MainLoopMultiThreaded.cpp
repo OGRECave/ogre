@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 #include <iostream>
 
-#include "System/MainEntryPointImplementations.h"
+#include "System/MainEntryPoints.h"
 
 #include "GraphicsSystem.h"
 #include "LogicSystem.h"
@@ -61,9 +61,9 @@ struct ThreadData
 };
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI Demo::mainAppMultiThreaded( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI Demo::MainEntryPoints::mainAppMultiThreaded( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int Demo::mainAppMultiThreaded( int argc, const char *argv[] )
+int Demo::MainEntryPoints::mainAppMultiThreaded( int argc, const char *argv[] )
 #endif
 {
     GameState *graphicsGameState = 0;
@@ -73,7 +73,8 @@ int Demo::mainAppMultiThreaded( int argc, const char *argv[] )
 
     Ogre::Barrier barrier( 2 );
 
-    createSystems( &graphicsGameState, &graphicsSystem, &logicGameState, &logicSystem );
+    MainEntryPoints::createSystems( &graphicsGameState, &graphicsSystem,
+                                    &logicGameState, &logicSystem );
 
     GameEntityManager gameEntityManager( graphicsSystem, logicSystem );
 
@@ -88,7 +89,8 @@ int Demo::mainAppMultiThreaded( int argc, const char *argv[] )
 
     Ogre::Threads::WaitForThreads( 2, threadHandles );
 
-    destroySystems( graphicsGameState, graphicsSystem, logicGameState, logicSystem );
+    MainEntryPoints::destroySystems( graphicsGameState, graphicsSystem,
+                                     logicGameState, logicSystem );
 
     return 0;
 }
@@ -215,7 +217,7 @@ unsigned long logicThread( Ogre::ThreadHandle *threadHandle )
     while( !graphicsSystem->getQuit() )
     {
         logicSystem->beginFrameParallel();
-        logicSystem->update( static_cast<float>( gFrametime ) );
+        logicSystem->update( static_cast<float>( MainEntryPoints::Frametime ) );
         logicSystem->finishFrameParallel();
 
         logicSystem->finishFrame();
@@ -227,7 +229,7 @@ unsigned long logicThread( Ogre::ThreadHandle *threadHandle )
         }
 
         //YieldTimer will wait until the current time is greater than startTime + cFrametime
-        startTime = yieldTimer.yield( gFrametime, startTime );
+        startTime = yieldTimer.yield( MainEntryPoints::Frametime, startTime );
     }
 
     barrier->sync();

@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include "LogicSystem.h"
 #include "GameState.h"
 
-#include "System/MainEntryPointImplementations.h"
+#include "System/MainEntryPoints.h"
 
 using namespace Demo;
 
@@ -67,8 +67,8 @@ using namespace Demo;
         _graphicsSystem->deinitialize();
     }
 
-    destroySystems( _graphicsGameState, _graphicsSystem,
-                    _logicGameState, _logicSystem );
+    MainEntryPoints::destroySystems( _graphicsGameState, _graphicsSystem,
+                                     _logicGameState, _logicSystem );
     _graphicsGameState = 0;
     _graphicsSystem = 0;
     _logicGameState = 0;
@@ -81,8 +81,9 @@ using namespace Demo;
 
     if( !_graphicsSystem )
     {
-        createSystems( &_graphicsGameState, &_graphicsSystem, &_logicGameState, &_logicSystem );
-        _graphicsSystem->initialize( getWindowTitle() );
+        MainEntryPoints::createSystems( &_graphicsGameState, &_graphicsSystem,
+                                        &_logicGameState, &_logicSystem );
+        _graphicsSystem->initialize( MainEntryPoints::getWindowTitle() );
         if( _logicSystem )
             _logicSystem->initialize();
 
@@ -94,7 +95,7 @@ using namespace Demo;
         if( _logicSystem )
             _logicSystem->createScene02();
 
-        _accumulator = gFrametime;
+        _accumulator = MainEntryPoints::Frametime;
     }
 
     //Connect the UIView created by Ogre to our UIViewController
@@ -143,16 +144,16 @@ using namespace Demo;
     _timeSinceLast = std::min( 1.0, _timeSinceLast ); //Prevent from going haywire.
     _startTime = endTime;
 
-    while( _accumulator >= gFrametime && _logicSystem )
+    while( _accumulator >= MainEntryPoints::Frametime && _logicSystem )
     {
         _logicSystem->beginFrameParallel();
-        _logicSystem->update( static_cast<float>( gFrametime ) );
+        _logicSystem->update( static_cast<float>( MainEntryPoints::Frametime ) );
         _logicSystem->finishFrameParallel();
 
         _logicSystem->finishFrame();
         _graphicsSystem->finishFrame();
 
-        _accumulator -= gFrametime;
+        _accumulator -= MainEntryPoints::Frametime;
     }
 
     _graphicsSystem->beginFrameParallel();

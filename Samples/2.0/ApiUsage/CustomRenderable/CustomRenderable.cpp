@@ -1,77 +1,53 @@
 
 #include "GraphicsSystem.h"
 #include "CustomRenderableGameState.h"
-#include "SdlInputHandler.h"
-
-#include "OgreTimer.h"
-#include "Threading/OgreThreads.h"
-#include "OgreRenderWindow.h"
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-
-using namespace Demo;
+#include "System/MainEntryPoints.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
-int mainApp()
+int mainApp( int argc, const char *argv[] )
 #endif
 {
-    CustomRenderableGameState customRenderableGameState(
+    return Demo::MainEntryPoints::mainAppSingleThreaded( argc, argv );
+}
+
+namespace Demo
+{
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        CustomRenderableGameState *gfxGameState = new CustomRenderableGameState(
         "Shows how to create a custom class derived from both MovableObject and Renderable\n"
         "for fine control over rendering.\n"
         "This example uses an Immutable buffer. For an in-depth example of how to use the\n"
         "the other two different types of buffers (default and dynamic) which allow\n"
         "modification, see the DynamicGeometry sample." );
-    GraphicsSystem graphicsSystem( &customRenderableGameState );
 
-    customRenderableGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new GraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "CustomRenderable. Render v2 objects without using Items." );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "CustomRenderable. Render v2 objects without using Items.";
+    }
 }
