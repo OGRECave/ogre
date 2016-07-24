@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "GraphicsSystem.h"
 #include "LogicSystem.h"
 #include "GameState.h"
+#include "SdlInputHandler.h"
 
 #include "OgreRenderWindow.h"
 #include "OgreTimer.h"
@@ -82,6 +83,13 @@ int Demo::mainAppSingleThreaded( int argc, const char *argv[] )
         graphicsSystem->createScene02();
         if( logicSystem )
             logicSystem->createScene02();
+
+    #if OGRE_USE_SDL2
+        //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
+        SdlInputHandler *inputHandler = graphicsSystem->getInputHandler();
+        inputHandler->setGrabMousePointer( true );
+        inputHandler->setMouseVisible( false );
+    #endif
 
         Ogre::Timer timer;
         unsigned long startTime = timer.getMicroseconds();

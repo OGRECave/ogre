@@ -448,14 +448,30 @@ namespace Ogre
                     _setRenderTarget( vp->getTarget(), vp->getColourWrite() );
                 }
 
-                MTLViewport mtlVp;
-                mtlVp.originX   = vp->getActualLeft();
-                mtlVp.originY   = vp->getActualTop();
-                mtlVp.width     = vp->getActualWidth();
-                mtlVp.height    = vp->getActualHeight();
-                mtlVp.znear     = 0;
-                mtlVp.zfar      = 1;
-                [mActiveRenderEncoder setViewport:mtlVp];
+                if( mActiveRenderEncoder || (!mActiveRenderEncoder && !vp->coversEntireTarget()) )
+                {
+                    if( !mActiveRenderEncoder )
+                        createRenderEncoder();
+
+                    MTLViewport mtlVp;
+                    mtlVp.originX   = vp->getActualLeft();
+                    mtlVp.originY   = vp->getActualTop();
+                    mtlVp.width     = vp->getActualWidth();
+                    mtlVp.height    = vp->getActualHeight();
+                    mtlVp.znear     = 0;
+                    mtlVp.zfar      = 1;
+                    [mActiveRenderEncoder setViewport:mtlVp];
+
+                    if( !vp->scissorsMatchViewport() )
+                    {
+                        MTLScissorRect scissorRect;
+                        scissorRect.x       = vp->getScissorActualLeft();
+                        scissorRect.y       = vp->getScissorActualTop();
+                        scissorRect.width   = vp->getScissorActualWidth();
+                        scissorRect.height  = vp->getScissorActualHeight();
+                        [mActiveRenderEncoder setScissorRect:scissorRect];
+                    }
+                }
             }
         }
     }
@@ -1395,6 +1411,12 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setRenderTarget(RenderTarget *target, bool colourWrite)
     {
+        {
+            const bool activeHasColourWrites = mNumMRTs != 0;
+            if( mActiveRenderTarget == target && activeHasColourWrites == colourWrite )
+                return;
+        }
+
         mActiveRenderTarget = target;
 
         if( target )

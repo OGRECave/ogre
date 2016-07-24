@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "GraphicsSystem.h"
 #include "LogicSystem.h"
 #include "GameState.h"
+#include "SdlInputHandler.h"
 
 #include "Threading/YieldTimer.h"
 
@@ -113,6 +114,13 @@ unsigned long renderThreadApp( Ogre::ThreadHandle *threadHandle )
 
     graphicsSystem->createScene02();
     barrier->sync();
+
+    #if OGRE_USE_SDL2
+    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
+    SdlInputHandler *inputHandler = graphicsSystem->getInputHandler();
+    inputHandler->setGrabMousePointer( true );
+    inputHandler->setMouseVisible( false );
+    #endif
 
     Ogre::RenderWindow *renderWindow = graphicsSystem->getRenderWindow();
 
