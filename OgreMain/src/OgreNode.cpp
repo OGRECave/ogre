@@ -318,8 +318,8 @@ namespace Ogre {
     Node* Node::createChild(const Vector3& inTranslate, const Quaternion& inRotate)
     {
         Node* newNode = createChildImpl();
-        newNode->translate(inTranslate);
-        newNode->rotate(inRotate);
+        newNode->setPosition(inTranslate);
+        newNode->setOrientation(inRotate);
         this->addChild(newNode);
 
         return newNode;
@@ -328,8 +328,8 @@ namespace Ogre {
     Node* Node::createChild(const String& name, const Vector3& inTranslate, const Quaternion& inRotate)
     {
         Node* newNode = createChildImpl(name);
-        newNode->translate(inTranslate);
-        newNode->rotate(inRotate);
+        newNode->setPosition(inTranslate);
+        newNode->setOrientation(inRotate);
         this->addChild(newNode);
 
         return newNode;
