@@ -41,8 +41,12 @@ THE SOFTWARE.
                 typedef __m128d ArrayReal;
             }
         #else
-            #include <xmmintrin.h>
-            #include <emmintrin.h>  //SSE Math library still needs SSE2
+            #ifndef __MINGW32__
+                #include <xmmintrin.h>
+                #include <emmintrin.h>  //SSE Math library still needs SSE2
+            #else
+                #include <x86intrin.h> //Including separate intrinsics headers under MinGW causes compilation errors
+            #endif
             #define ARRAY_PACKED_REALS 4
             namespace Ogre {
                 typedef __m128 ArrayReal;
