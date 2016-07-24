@@ -526,102 +526,90 @@ namespace Ogre
         if (rayorig.x <= min.x && raydir.x > 0)
         {
             t = (min.x - rayorig.x) / raydir.x;
-            if (t >= 0)
+
+            // Substitute t back into ray and check bounds and dist
+            hitpoint = rayorig + raydir * t;
+            if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                hitpoint.z >= min.z && hitpoint.z <= max.z &&
+                (!hit || t < lowt))
             {
-                // Substitute t back into ray and check bounds and dist
-                hitpoint = rayorig + raydir * t;
-                if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
-                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
-					(!hit || t < lowt))
-                {
-                    hit = true;
-                    lowt = t;
-                }
+                hit = true;
+                lowt = t;
             }
         }
         // Max x
         if (rayorig.x >= max.x && raydir.x < 0)
         {
             t = (max.x - rayorig.x) / raydir.x;
-            if (t >= 0)
+
+            // Substitute t back into ray and check bounds and dist
+            hitpoint = rayorig + raydir * t;
+            if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                hitpoint.z >= min.z && hitpoint.z <= max.z &&
+                (!hit || t < lowt))
             {
-                // Substitute t back into ray and check bounds and dist
-                hitpoint = rayorig + raydir * t;
-                if (hitpoint.y >= min.y && hitpoint.y <= max.y &&
-                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
-                    (!hit || t < lowt))
-                {
-                    hit = true;
-                    lowt = t;
-                }
+                hit = true;
+                lowt = t;
             }
         }
         // Min y
         if (rayorig.y <= min.y && raydir.y > 0)
         {
             t = (min.y - rayorig.y) / raydir.y;
-            if (t >= 0)
+
+            // Substitute t back into ray and check bounds and dist
+            hitpoint = rayorig + raydir * t;
+            if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                hitpoint.z >= min.z && hitpoint.z <= max.z &&
+                (!hit || t < lowt))
             {
-                // Substitute t back into ray and check bounds and dist
-                hitpoint = rayorig + raydir * t;
-                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
-                    (!hit || t < lowt))
-                {
-                    hit = true;
-                    lowt = t;
-                }
+                hit = true;
+                lowt = t;
             }
         }
         // Max y
         if (rayorig.y >= max.y && raydir.y < 0)
         {
             t = (max.y - rayorig.y) / raydir.y;
-            if (t >= 0)
+
+            // Substitute t back into ray and check bounds and dist
+            hitpoint = rayorig + raydir * t;
+            if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                hitpoint.z >= min.z && hitpoint.z <= max.z &&
+                (!hit || t < lowt))
             {
-                // Substitute t back into ray and check bounds and dist
-                hitpoint = rayorig + raydir * t;
-                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-                    hitpoint.z >= min.z && hitpoint.z <= max.z &&
-                    (!hit || t < lowt))
-                {
-                    hit = true;
-                    lowt = t;
-                }
+                hit = true;
+                lowt = t;
             }
         }
         // Min z
         if (rayorig.z <= min.z && raydir.z > 0)
         {
             t = (min.z - rayorig.z) / raydir.z;
-            if (t >= 0)
+
+            // Substitute t back into ray and check bounds and dist
+            hitpoint = rayorig + raydir * t;
+            if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                (!hit || t < lowt))
             {
-                // Substitute t back into ray and check bounds and dist
-                hitpoint = rayorig + raydir * t;
-                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-                    hitpoint.y >= min.y && hitpoint.y <= max.y &&
-                    (!hit || t < lowt))
-                {
-                    hit = true;
-                    lowt = t;
-                }
+                hit = true;
+                lowt = t;
             }
         }
         // Max z
         if (rayorig.z >= max.z && raydir.z < 0)
         {
             t = (max.z - rayorig.z) / raydir.z;
-            if (t >= 0)
+
+            // Substitute t back into ray and check bounds and dist
+            hitpoint = rayorig + raydir * t;
+            if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
+                hitpoint.y >= min.y && hitpoint.y <= max.y &&
+                (!hit || t < lowt))
             {
-                // Substitute t back into ray and check bounds and dist
-                hitpoint = rayorig + raydir * t;
-                if (hitpoint.x >= min.x && hitpoint.x <= max.x &&
-                    hitpoint.y >= min.y && hitpoint.y <= max.y &&
-                    (!hit || t < lowt))
-                {
-                    hit = true;
-                    lowt = t;
-                }
+                hit = true;
+                lowt = t;
             }
         }
 
