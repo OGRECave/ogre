@@ -38,6 +38,8 @@ THE SOFTWARE.
 #include "OgreAndroidEGLWindow.h"
 #include "OgreViewport.h"
 
+#include <android/native_window.h>
+
 #include <iostream>
 #include <algorithm>
 #include <climits>
