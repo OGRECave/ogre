@@ -4,9 +4,18 @@
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+    #define WIN32_LEAN_AND_MEAN
+    #define VC_EXTRALEAN
+    #define NOMINMAX
+    #include <windows.h>
+#endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT );
+#define DEMO_MAIN_ENTRY_PARAMS hInst, hPrevInstance, strCmdLine, nCmdShow
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow );
 #else
+#define DEMO_MAIN_ENTRY_PARAMS argc, argv
 int mainApp( int argc, const char *argv[] );
 #endif
 

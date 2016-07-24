@@ -4,6 +4,13 @@
 
 #include "OgrePrerequisites.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WINRT
+    #define WIN32_LEAN_AND_MEAN
+    #define VC_EXTRALEAN
+    #define NOMINMAX
+    #include <windows.h>
+#endif
+
 namespace Demo
 {
     class GameState;
@@ -104,12 +111,14 @@ namespace Demo
         static double Frametime;
 
     #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        static INT WINAPI mainAppSingleThreaded( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT );
+        static INT WINAPI mainAppSingleThreaded( HINSTANCE hInst, HINSTANCE hPrevInstance,
+                                                 LPSTR strCmdLine, INT nCmdShow );
     #else
         static int mainAppSingleThreaded( int argc, const char *argv[] );
     #endif
     #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        static INT WINAPI mainAppMultiThreaded( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT );
+        static INT WINAPI mainAppMultiThreaded( HINSTANCE hInst, HINSTANCE hPrevInstance,
+                                                LPSTR strCmdLine, INT nCmdShow );
     #else
         static int mainAppMultiThreaded( int argc, const char *argv[] );
     #endif

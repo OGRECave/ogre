@@ -61,7 +61,8 @@ struct ThreadData
 };
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI Demo::MainEntryPoints::mainAppMultiThreaded( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI Demo::MainEntryPoints::mainAppMultiThreaded( HINSTANCE hInst, HINSTANCE hPrevInstance,
+                                                        LPSTR strCmdLine, INT nCmdShow )
 #else
 int Demo::MainEntryPoints::mainAppMultiThreaded( int argc, const char *argv[] )
 #endif
@@ -135,7 +136,7 @@ unsigned long renderThreadApp( Ogre::ThreadHandle *threadHandle )
     while( !graphicsSystem->getQuit() )
     {
         graphicsSystem->beginFrameParallel();
-        graphicsSystem->update( timeSinceLast );
+        graphicsSystem->update( static_cast<float>( timeSinceLast ) );
         graphicsSystem->finishFrameParallel();
 
         if( !renderWindow->isVisible() )

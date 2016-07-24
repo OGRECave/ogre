@@ -44,8 +44,8 @@ THE SOFTWARE.
 using namespace Demo;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI Demo::MainEntryPoints::mainAppSingleThreaded( HINSTANCE hInst, HINSTANCE,
-                                                         LPSTR strCmdLine, INT )
+INT WINAPI Demo::MainEntryPoints::mainAppSingleThreaded( HINSTANCE hInst, HINSTANCE hPrevInstance,
+                                                         LPSTR strCmdLine, INT nCmdShow )
 #else
 int Demo::MainEntryPoints::mainAppSingleThreaded( int argc, const char *argv[] )
 #endif
