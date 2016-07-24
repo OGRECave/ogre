@@ -44,8 +44,7 @@ if(DEFINED ENV{APPVEYOR})
         
     set(OTHER 
         -DOGRE_BUILD_DEPENDENCIES=TRUE
-        -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
-        -DOGRE_BUILD_SAMPLES=FALSE)
+        -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
 
     set(BUILD_DEPS TRUE)
 endif()
@@ -53,7 +52,7 @@ endif()
 if(DEFINED ENV{ANDROID})
     set(CROSS
         -DANDROID_NATIVE_API_LEVEL=21
-        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r10e
+        -DANDROID_NDK=${CMAKE_CURRENT_SOURCE_DIR}/android-ndk-r12b
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CMake/toolchain/android.toolchain.cmake)
 
     set(RENDERSYSTEMS
@@ -67,17 +66,15 @@ if(DEFINED ENV{ANDROID})
     
     message(STATUS "Downloading Android NDK")
     file(DOWNLOAD
-        http://dl.google.com/android/ndk/android-ndk-r10e-linux-x86_64.bin
-        ./android-ndk-r10e-linux-x86_64.bin)
-    execute_process(COMMAND chmod +x android-ndk-r10e-linux-x86_64.bin)
+        http://dl.google.com/android/repository/android-ndk-r12b-linux-x86_64.zip
+        ./android-ndk-r12b-linux-x86_64.zip)
     message(STATUS "Extracting Android NDK")
-    execute_process(COMMAND ./android-ndk-r10e-linux-x86_64.bin OUTPUT_QUIET)
+    execute_process(COMMAND unzip android-ndk-r12b-linux-x86_64.zip OUTPUT_QUIET)
 endif()
 
 execute_process(COMMAND cmake
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DOGRE_BUILD_TESTS=ON
-    -DOGRE_CONFIG_ALLOCATOR=1 # disable nedalloc
     -DOGRE_BUILD_DEPENDENCIES=${BUILD_DEPS}
     -DSWIG_EXECUTABLE=/usr/bin/swig3.0
     ${RENDERSYSTEMS}
