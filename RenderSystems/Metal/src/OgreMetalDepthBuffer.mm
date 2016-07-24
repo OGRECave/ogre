@@ -104,5 +104,7 @@ namespace Ogre
                     destinationSlice:0
                     destinationLevel:0
                    destinationOrigin:MTLOriginMake( 0, 0, 0 )];
+
+        return true;
     }
 }

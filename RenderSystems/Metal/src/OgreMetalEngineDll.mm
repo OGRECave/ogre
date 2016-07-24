@@ -28,6 +28,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreRoot.h"
 #include "OgreMetalPlugin.h"
+#include "OgreMetalPrerequisites.h"
 
 #ifndef OGRE_STATIC_LIB
 

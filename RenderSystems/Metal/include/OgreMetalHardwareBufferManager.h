@@ -85,7 +85,7 @@ namespace v1 {
         }
 
         void _notifyDeviceStalled(void)
-                    { static_cast<MetalHardwareBufferManager*>(mImpl)->_notifyDeviceStalled(); }
+                    { static_cast<MetalHardwareBufferManagerBase*>(mImpl)->_notifyDeviceStalled(); }
     };
 }
 }

@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2016 Torus Knot Software Ltd
 
@@ -25,39 +25,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreMetalPlugin_H_
-#define _OgreMetalPlugin_H_
 
-#include "OgrePlugin.h"
+#import <UIKit/UIKit.h>
+#import <Metal/Metal.h>
 
-namespace Ogre
-{
-    class MetalRenderSystem;
+@interface GameViewController : UIViewController
 
-    /** Plugin instance for Metal Manager */
-    class MetalPlugin : public Plugin
-    {
-    public:
-        MetalPlugin();
+@end
 
 
-        /// @copydoc Plugin::getName
-        const String& getName() const;
-
-        /// @copydoc Plugin::install
-        void install();
-
-        /// @copydoc Plugin::initialise
-        void initialise();
-
-        /// @copydoc Plugin::shutdown
-        void shutdown();
-
-        /// @copydoc Plugin::uninstall
-        void uninstall();
-    protected:
-        MetalRenderSystem* mRenderSystem;
-    };
-}
-
-#endif

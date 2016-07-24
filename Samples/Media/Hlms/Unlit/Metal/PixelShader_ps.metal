@@ -33,11 +33,11 @@ fragment @insertpiece( output_type ) main_metal
 	@property( hlms_vpos ), float4 gl_FragCoord : [[position]]@end
 
 	@foreach( num_array_textures, n )
-		, texture2d_array textureMapsArray@n [[texture(@value(array_texture_bind@n))]]@end
+		, texture2d_array<float> textureMapsArray@n [[texture(@value(array_texture_bind@n))]]@end
 	@foreach( num_textures, n )
-		, texture2d textureMaps@n [[texture(@value(texture_bind@n))]]@end
+		, texture2d<float> textureMaps@n [[texture(@value(texture_bind@n))]]@end
 	@foreach( numSamplerStates, n )
-		, sampler samplerState@n : [[sampler(@counter(samplerStateBind))]]@end
+		, sampler samplerState@n [[sampler(@counter(samplerStateBind))]]@end
 )
 {
 	PS_OUTPUT outPs;

@@ -32,18 +32,20 @@ THE SOFTWARE.
 
 #include "OgreLogManager.h"
 
-@protocol MTLBlitCommandEncoder;
-@protocol MTLBuffer;
-@protocol MTLCommandBuffer;
-@protocol MTLCommandQueue;
-@protocol MTLDepthStencilState;
-@protocol MTLDevice;
-@protocol MTLRenderCommandEncoder;
-@protocol MTLTexture;
+#ifdef __OBJC__
+    @protocol MTLBlitCommandEncoder;
+    @protocol MTLBuffer;
+    @protocol MTLCommandBuffer;
+    @protocol MTLCommandQueue;
+    @protocol MTLDepthStencilState;
+    @protocol MTLDevice;
+    @protocol MTLRenderCommandEncoder;
+    @protocol MTLTexture;
 
-@class MTLRenderPassColorAttachmentDescriptor;
-@class MTLRenderPassDepthAttachmentDescriptor;
-@class MTLRenderPassStencilAttachmentDescriptor;
+    @class MTLRenderPassColorAttachmentDescriptor;
+    @class MTLRenderPassDepthAttachmentDescriptor;
+    @class MTLRenderPassStencilAttachmentDescriptor;
+#endif
 
 #define OGRE_METAL_CONST_SLOT_START     16u
 #define OGRE_METAL_TEX_SLOT_START       24u

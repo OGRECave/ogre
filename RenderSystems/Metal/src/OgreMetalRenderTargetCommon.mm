@@ -33,8 +33,8 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 namespace Ogre
 {
     MetalRenderTargetCommon::MetalRenderTargetCommon( MetalDevice *ownerDevice ) :
-        mColourAttachmentDesc( 0 ),
-        mOwnerDevice( ownerDevice )
+        mOwnerDevice( ownerDevice ),
+        mColourAttachmentDesc( 0 )
     {
     }
     //-----------------------------------------------------------------------------------

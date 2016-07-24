@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This source file is part of OGRE
 (Object-oriented Graphics Rendering Engine)
-For the latest info, see http://www.ogre3d.org
+For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2016 Torus Knot Software Ltd
 
@@ -25,39 +25,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef _OgreMetalPlugin_H_
-#define _OgreMetalPlugin_H_
 
-#include "OgrePlugin.h"
+#include "System/StaticPluginLoader.h"
 
-namespace Ogre
-{
-    class MetalRenderSystem;
-
-    /** Plugin instance for Metal Manager */
-    class MetalPlugin : public Plugin
-    {
-    public:
-        MetalPlugin();
-
-
-        /// @copydoc Plugin::getName
-        const String& getName() const;
-
-        /// @copydoc Plugin::install
-        void install();
-
-        /// @copydoc Plugin::initialise
-        void initialise();
-
-        /// @copydoc Plugin::shutdown
-        void shutdown();
-
-        /// @copydoc Plugin::uninstall
-        void uninstall();
-    protected:
-        MetalRenderSystem* mRenderSystem;
-    };
-}
-
+#ifdef OGRE_STATIC_LIB
+    #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
+        #include "OgreMetalPlugin.h"
+    #endif
 #endif
+#include "OgreRoot.h"
+
+namespace Demo
+{
+    StaticPluginLoader::StaticPluginLoader()
+#ifdef OGRE_STATIC_LIB
+        :
+    #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
+        mMetalPlugin( 0 )
+    #endif
+#endif
+    {
+    }
+    //-----------------------------------------------------------------------------------
+    StaticPluginLoader::~StaticPluginLoader()
+    {
+#ifdef OGRE_STATIC_LIB
+    #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
+        OGRE_DELETE mMetalPlugin;
+        mMetalPlugin = 0;
+    #endif
+#endif
+    }
+    //-----------------------------------------------------------------------------------
+    void StaticPluginLoader::install( Ogre::Root *root )
+    {
+#ifdef OGRE_STATIC_LIB
+    #ifdef OGRE_BUILD_RENDERSYSTEM_METAL
+        if( !mMetalPlugin )
+            mMetalPlugin = OGRE_NEW Ogre::MetalPlugin();
+        root->installPlugin( mMetalPlugin );
+    #endif
+#endif
+    }
+}

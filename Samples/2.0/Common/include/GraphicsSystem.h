@@ -4,13 +4,17 @@
 
 #include "BaseSystem.h"
 #include "GameEntityManager.h"
+#include "System/StaticPluginLoader.h"
 #include "OgrePrerequisites.h"
 #include "OgreColourValue.h"
 #include "OgreOverlayPrerequisites.h"
 
 #include "Threading/OgreUniformScalableTask.h"
+#include "SdlEmulationLayer.h"
 
-#include <SDL.h>
+#if OGRE_USE_SDL2
+    #include <SDL.h>
+#endif
 
 namespace Demo
 {
@@ -21,8 +25,10 @@ namespace Demo
     protected:
         BaseSystem          *mLogicSystem;
 
+    #if OGRE_USE_SDL2
         SDL_Window          *mSdlWindow;
         SdlInputHandler     *mInputHandler;
+    #endif
 
         Ogre::Root                  *mRoot;
         Ogre::RenderWindow          *mRenderWindow;
@@ -32,6 +38,8 @@ namespace Demo
         Ogre::String                mResourcePath;
 
         Ogre::v1::OverlaySystem     *mOverlaySystem;
+
+        StaticPluginLoader          mStaticPluginLoader;
 
         /// Tracks the amount of elapsed time since we last
         /// heard from the LogicSystem finishing a frame
@@ -45,7 +53,9 @@ namespace Demo
 
         Ogre::ColourValue   mBackgroundColour;
 
+    #if OGRE_USE_SDL2
         void handleWindowEvent( const SDL_Event& evt );
+    #endif
 
         /// @see MessageQueueSystem::processIncomingMessage
         virtual void processIncomingMessage( Mq::MessageId messageId, const void *data );
@@ -99,7 +109,9 @@ namespace Demo
         const GameEntityVec& getGameEntities( Ogre::SceneMemoryMgrTypes type ) const
                                                                 { return mGameEntities[type]; }
 
+    #if OGRE_USE_SDL2
         SdlInputHandler* getInputHandler(void)                  { return mInputHandler; }
+    #endif
 
         bool getQuit(void) const                                { return mQuit; }
 

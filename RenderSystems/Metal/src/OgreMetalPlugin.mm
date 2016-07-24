@@ -27,6 +27,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 */
 
 #include "OgreMetalPlugin.h"
+#include "OgreMetalRenderSystem.h"
 #include "OgreRoot.h"
 
 #if !__has_feature( objc_arc )

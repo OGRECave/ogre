@@ -326,12 +326,7 @@ namespace v1 {
                         "MetalTextureBuffer::upload");
         }
 
-        NSUInteger alignment = 4;
-        if ((data.getWidth() * PixelUtil::getNumElemBytes(data.format)) & 3)
-        {
-            // Standard alignment of 4 is not right
-            alignment = 1;
-        }
+        NSUInteger rowPitch = data.rowPitchAlwaysBytes();
 
         // PVR textures should have 0 row size and data size
         if( data.format == PF_PVRTC2_2BPP ||
@@ -341,7 +336,7 @@ namespace v1 {
             data.format == PF_PVRTC_RGBA2 ||
             data.format == PF_PVRTC_RGBA4 )
         {
-            alignment = 0;
+            rowPitch = 0;
             dataSize = 0;
         }
 
@@ -351,27 +346,27 @@ namespace v1 {
                 [mTexture replaceRegion:MTLRegionMake1D( dest.left, dest.getWidth() )
                             mipmapLevel:mLevel
                               withBytes:data.data
-                            bytesPerRow:alignment * data.getWidth()];
+                            bytesPerRow:0];
                 break;
             case MTLTextureType1DArray:
                 [mTexture replaceRegion:MTLRegionMake1D( dest.left, dest.getWidth() )
                             mipmapLevel:mLevel
                               withBytes:data.data
-                            bytesPerRow:alignment * data.getWidth()];
+                            bytesPerRow:rowPitch];
                 break;
             case MTLTextureType2D:
                 [mTexture replaceRegion:MTLRegionMake2D( dest.left, dest.top,
                                                          dest.getWidth(), dest.getHeight() )
                             mipmapLevel:mLevel
                               withBytes:data.data
-                            bytesPerRow:alignment * data.getWidth()];
+                            bytesPerRow:rowPitch];
                 break;
             case MTLTextureType2DMultisample:
                 [mTexture replaceRegion:MTLRegionMake2D( dest.left, dest.top,
                                                          dest.getWidth(), dest.getHeight() )
                             mipmapLevel:mLevel
                               withBytes:data.data
-                            bytesPerRow:alignment * data.getWidth()];
+                            bytesPerRow:rowPitch];
                 break;
             case MTLTextureTypeCube:
                 [mTexture replaceRegion:MTLRegionMake2D( dest.left, dest.top,
@@ -379,7 +374,7 @@ namespace v1 {
                             mipmapLevel:mLevel
                                   slice:mFace
                               withBytes:data.data
-                            bytesPerRow:alignment * data.getWidth()
+                            bytesPerRow:rowPitch
                           bytesPerImage:dataSize];
                 break;
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
@@ -391,7 +386,7 @@ namespace v1 {
                             mipmapLevel:mLevel
                                   slice:dest.getDepth()
                               withBytes:data.data
-                            bytesPerRow:alignment * data.getWidth()
+                            bytesPerRow:rowPitch
                           bytesPerImage:dataSize];
 #endif
             case MTLTextureType3D:
@@ -403,7 +398,7 @@ namespace v1 {
                             mipmapLevel:mLevel
                                   slice:dest.getDepth() - 1u
                               withBytes:data.data
-                            bytesPerRow:alignment * data.getWidth()
+                            bytesPerRow:rowPitch
                           bytesPerImage:dataSize];
                 break;
         }

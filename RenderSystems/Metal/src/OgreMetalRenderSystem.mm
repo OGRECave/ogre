@@ -49,6 +49,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "CommandBuffer/OgreCbDrawCall.h"
 
 #include "OgreFrustum.h"
+#include "OgreViewport.h"
 
 #include "OgreMetalMappings.h"
 
@@ -433,6 +434,30 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setViewport(Viewport *vp)
     {
+        if( mActiveViewport != vp )
+        {
+            mActiveViewport = vp;
+
+            if( vp )
+            {
+                const bool activeHasColourWrites = mNumMRTs != 0;
+
+                if( vp->getTarget() != mActiveRenderTarget ||
+                    vp->getColourWrite() != activeHasColourWrites )
+                {
+                    _setRenderTarget( vp->getTarget(), vp->getColourWrite() );
+                }
+
+                MTLViewport mtlVp;
+                mtlVp.originX   = vp->getActualLeft();
+                mtlVp.originY   = vp->getActualTop();
+                mtlVp.width     = vp->getActualWidth();
+                mtlVp.height    = vp->getActualHeight();
+                mtlVp.znear     = 0;
+                mtlVp.zfar      = 1;
+                [mActiveRenderEncoder setViewport:mtlVp];
+            }
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::setActiveDevice( MetalDevice *device )
@@ -490,6 +515,7 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
     {
+        mActiveRenderTarget = 0;
         mActiveRenderEncoder = 0;
         mPso = 0;
     }
@@ -651,21 +677,27 @@ namespace Ogre
             [psd setVertexDescriptor:vertexDescriptor];
         }
 
-        //TODO: Ogre should track the number of RTTs instead of assuming
-        //OGRE_MAX_MULTIPLE_RENDER_TARGETS (will NOT work on Metal!)
+        uint8 mrtCount = 0;
         for( int i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+        {
+            if( newPso->pass.colourFormat[i] != PF_NULL )
+                mrtCount = i + 1u;
+        }
+
+        for( int i=0; i<mrtCount; ++i )
         {
             HlmsBlendblock const *blendblock = newPso->blendblock;
             psd.colorAttachments[i].pixelFormat = MetalMappings::getPixelFormat(
                         newPso->pass.colourFormat[i], newPso->pass.hwGamma[i] );
 
-            if( blendblock->mBlendOperation == SBO_ADD &&
-                blendblock->mSourceBlendFactor == SBF_ONE &&
-                blendblock->mDestBlendFactor == SBF_ZERO &&
+            if( psd.colorAttachments[i].pixelFormat == MTLPixelFormatInvalid ||
+                (blendblock->mBlendOperation == SBO_ADD &&
+                 blendblock->mSourceBlendFactor == SBF_ONE &&
+                 blendblock->mDestBlendFactor == SBF_ZERO &&
                 (!blendblock->mSeparateBlend ||
                  (blendblock->mBlendOperation == blendblock->mBlendOperationAlpha &&
                  blendblock->mSourceBlendFactor == blendblock->mSourceBlendFactorAlpha &&
-                 blendblock->mDestBlendFactor == blendblock->mDestBlendFactorAlpha)) )
+                 blendblock->mDestBlendFactor == blendblock->mDestBlendFactorAlpha))) )
             {
                 //Note: Can NOT use blendblock->mIsTransparent. What Ogre understand
                 //as transparent differs from what Metal understands.
@@ -1363,6 +1395,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setRenderTarget(RenderTarget *target, bool colourWrite)
     {
+        mActiveRenderTarget = target;
+
         if( target )
         {
             colourWrite &= !target->getForceDisableColourWrites();
