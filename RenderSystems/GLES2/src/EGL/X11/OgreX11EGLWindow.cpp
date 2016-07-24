@@ -459,16 +459,16 @@ namespace Ogre {
             {
                 eglContext = eglGetCurrentContext();
                 EGL_CHECK_ERROR
-                if (eglContext)
+                if (!eglContext)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                                 "currentGLContext was specified with no current GL context",
                                 "EGLWindow::create");
                 }
 
-                eglContext = eglGetCurrentContext();
-                EGL_CHECK_ERROR
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                EGL_CHECK_ERROR
+                mEglDisplay = eglGetCurrentDisplay();
                 EGL_CHECK_ERROR
             }
 
