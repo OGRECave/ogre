@@ -83,6 +83,8 @@ namespace Ogre
         virtual void _autogenerateMipmaps(void) {}
 
         id<MTLTexture> getTextureForSampling( MetalRenderSystem *renderSystem );
+
+        MetalDevice* getOwnerDevice(void) const             { return mDevice; }
     };
 }
 

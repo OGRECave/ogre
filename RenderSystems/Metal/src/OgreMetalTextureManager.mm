@@ -28,6 +28,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 
 #include "OgreMetalTextureManager.h"
 #include "OgreMetalTexture.h"
+#include "OgreMetalDepthTexture.h"
 
 namespace Ogre
 {
@@ -48,6 +49,24 @@ namespace Ogre
         ResourceHandle handle, const String& group, bool isManual,
         ManualResourceLoader* loader, const NameValuePairList* createParams)
     {
+        if( createParams )
+        {
+            if( createParams->find( "DepthTexture" ) != createParams->end() )
+            {
+                const bool shareableDepthBuffer = createParams->find( "shareableDepthBuffer" ) !=
+                                                                                createParams->end();
+                return new MetalDepthTexture( shareableDepthBuffer, this, name, handle, group,
+                                              isManual, loader, mDevice );
+            }
+
+//            NameValuePairList::const_iterator it = createParams->find( "SpecialFormat" );
+//            if( it != createParams->end() && it->second == "PF_NULL" )
+//            {
+//                return new MetalNullTexture( this, name, handle, group,
+//                                             isManual, loader, mDevice );
+//            }
+        }
+
         return new MetalTexture( this, name, handle, group, isManual, loader, mDevice );
     }
 

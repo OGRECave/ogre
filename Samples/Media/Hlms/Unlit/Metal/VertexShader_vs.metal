@@ -93,7 +93,7 @@ vertex PS_INPUT main_metal
 	outVs.drawId = drawId;
 
 @end @property( hlms_shadowcaster )
-	float shadowConstantBias = asfloat( materialIdx[drawId].y );
+	float shadowConstantBias = as_type<float>( materialIdx[drawId].y );
 	//Linear depth
 	outVs.depth	= (outVs.gl_Position.z - pass.depthRange.x + shadowConstantBias * pass.depthRange.y) * pass.depthRange.y;
 

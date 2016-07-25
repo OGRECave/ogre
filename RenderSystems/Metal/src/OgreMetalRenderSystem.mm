@@ -153,6 +153,8 @@ namespace Ogre
         rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
         rsc->setMaxPointSize(256);
 
+        rsc->setCapability(RSC_HW_GAMMA);
+        rsc->setCapability(RSC_TEXTURE_GATHER);
         rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
         rsc->setMaximumResolutions( 16384, 4096, 16384 );
@@ -482,7 +484,7 @@ namespace Ogre
         if( mActiveDevice != device )
         {
             mActiveDevice           = device;
-            mActiveRenderEncoder    = device->mRenderEncoder;
+            mActiveRenderEncoder    = device ? device->mRenderEncoder : 0;
         }
     }
     //-------------------------------------------------------------------------
@@ -498,29 +500,19 @@ namespace Ogre
 
         MTLRenderPassDescriptor *passDesc = [MTLRenderPassDescriptor renderPassDescriptor];
         for( uint8 i=0; i<mNumMRTs; ++i )
-        {
             passDesc.colorAttachments[i] = [mCurrentColourRTs[i]->mColourAttachmentDesc copy];
-            //Next time it will be used it will have to be loaded
-            //unless we're later told to clear or discard.
-            mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionLoad;
-        }
+
         if( mCurrentDepthBuffer )
         {
             MTLRenderPassDepthAttachmentDescriptor *descDepth =
                     mCurrentDepthBuffer->mDepthAttachmentDesc;
             if( descDepth )
-            {
                 passDesc.depthAttachment = [descDepth copy];
-                descDepth.loadAction = MTLLoadActionLoad;
-            }
 
             MTLRenderPassStencilAttachmentDescriptor *descStencil =
                     mCurrentDepthBuffer->mStencilAttachmentDesc;
             if( descStencil )
-            {
                 passDesc.stencilAttachment = [descStencil copy];
-                descStencil.loadAction = MTLLoadActionLoad;
-            }
         }
 
         mActiveDevice->mRenderEncoder =
@@ -532,7 +524,32 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
     {
-        mActiveRenderTarget = 0;
+        if( mActiveRenderTarget && mActiveRenderEncoder )
+        {
+            for( size_t i=0; i<mNumMRTs; ++i )
+            {
+                if( mCurrentColourRTs[i] )
+                {
+                    if( mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction == MTLLoadActionClear )
+                        mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionLoad;
+                }
+            }
+
+            if( mCurrentDepthBuffer )
+            {
+                if( mCurrentDepthBuffer->mDepthAttachmentDesc &&
+                    mCurrentDepthBuffer->mDepthAttachmentDesc.loadAction == MTLLoadActionClear )
+                {
+                    mCurrentDepthBuffer->mDepthAttachmentDesc.loadAction = MTLLoadActionLoad;
+                }
+                if( mCurrentDepthBuffer->mStencilAttachmentDesc &&
+                    mCurrentDepthBuffer->mStencilAttachmentDesc.loadAction == MTLLoadActionClear )
+                {
+                    mCurrentDepthBuffer->mStencilAttachmentDesc.loadAction = MTLLoadActionLoad;
+                }
+            }
+        }
+
         mActiveRenderEncoder = 0;
         mPso = 0;
     }
@@ -549,8 +566,21 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
     {
-        _setRenderTarget( renderTarget, true );
-        createRenderEncoder();
+        //asd;
+//        assert( false );
+
+//        const MetalHlmsPso *oldPso = mPso;
+//        Viewport *oldVp = mActiveViewport;
+//        RenderTarget *oldRt = mActiveRenderTarget;
+//        const bool activeHasColourWrites = mNumMRTs != 0;
+
+//        _setRenderTarget( renderTarget, true );
+//        createRenderEncoder();
+
+        //Restore relevant state
+//        _setViewport( oldVp );
+//        _setRenderTarget( oldRt, activeHasColourWrites );
+//        _setPipelineStateObject( oldPso );
     }
     //-------------------------------------------------------------------------
     id <MTLDepthStencilState> MetalRenderSystem::getDepthStencilState( HlmsPso *pso )
@@ -1418,6 +1448,9 @@ namespace Ogre
                 return;
         }
 
+        if( mActiveDevice )
+            mActiveDevice->endRenderEncoder();
+
         mActiveRenderTarget = target;
 
         if( target )
@@ -1428,6 +1461,8 @@ namespace Ogre
             //We need to set mCurrentColourRTs[0] to grab the active device,
             //even if we won't be drawing to colour target.
             target->getCustomAttribute( "MetalRenderTargetCommon", &mCurrentColourRTs[0] );
+
+            MetalDevice *ownerDevice = 0;
 
             if( colourWrite )
             {
@@ -1449,6 +1484,8 @@ namespace Ogre
                 {
                     desc.storeAction = MTLStoreActionStore;
                 }
+
+                ownerDevice = mCurrentColourRTs[0]->getOwnerDevice();
             }
             else
             {
@@ -1471,9 +1508,11 @@ namespace Ogre
                     depthBuffer->mDepthAttachmentDesc.storeAction = MTLStoreActionStore;
                 if( depthBuffer->mStencilAttachmentDesc )
                     depthBuffer->mStencilAttachmentDesc.storeAction = MTLStoreActionStore;
+
+                ownerDevice = depthBuffer->getOwnerDevice();
             }
 
-            setActiveDevice( mCurrentColourRTs[0]->getOwnerDevice() );
+            setActiveDevice( ownerDevice );
         }
         else
         {

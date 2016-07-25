@@ -194,7 +194,7 @@ vertex PS_INPUT main_metal
 @property( hlms_pssm_splits )	outVs.depth = outVs.gl_Position.z;@end
 
 @end @property( hlms_shadowcaster )
-	float shadowConstantBias = asfloat( worldMaterialIdx[drawId].y );
+	float shadowConstantBias = as_type<float>( worldMaterialIdx[drawId].y );
 
 	@property( !hlms_shadow_uses_depth_texture )
 		//Linear depth

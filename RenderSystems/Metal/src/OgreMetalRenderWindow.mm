@@ -220,6 +220,10 @@ namespace Ogre
                 _metalUpdate();
             *static_cast<MetalRenderTargetCommon**>(pData) = this;
         }
+        else if( name == "MetalDevice" )
+        {
+            *static_cast<MetalDevice**>(pData) = this->getOwnerDevice();
+        }
         else if( name == "UIView" )
         {
             *static_cast<void**>(pData) = (void*)CFBridgingRetain( mMetalView );

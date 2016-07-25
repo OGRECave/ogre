@@ -77,6 +77,10 @@ namespace Ogre
         {
             *static_cast<MetalRenderTargetCommon**>(pData) = this;
         }
+        else if( name == "MetalDevice" )
+        {
+            *static_cast<MetalDevice**>(pData) = this->getOwnerDevice();
+        }
         else
         {
             RenderTarget::getCustomAttribute( name, pData );

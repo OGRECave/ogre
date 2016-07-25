@@ -20,7 +20,12 @@ ogre_add_component_include_dir(Overlays)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Sample_ShadowMapDebugging WIN32 ${SOURCE_FILES})
+ogre_add_executable(Sample_ShadowMapDebugging WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
 target_link_libraries(Sample_ShadowMapDebugging ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_ShadowMapDebugging)
+
+if( APPLE )
+	set_target_properties( Sample_ShadowMapDebugging PROPERTIES RESOURCE "${SAMPLE_COMMON_RESOURCES}" )
+	set_target_properties( Sample_ShadowMapDebugging PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SAMPLES_PLIST} )
+endif()

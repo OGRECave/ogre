@@ -73,11 +73,10 @@ namespace Ogre
     bool MetalDepthBuffer::isCompatible( RenderTarget *renderTarget, bool exactFormatMatch ) const
     {
         //First check they belong to the same GPU device.
-        MetalRenderTargetCommon *colourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
-        colourRTs[0] = 0;
-        renderTarget->getCustomAttribute( "MetalRenderTargetCommon", &colourRTs[0] );
+        MetalDevice *device = 0;
+        renderTarget->getCustomAttribute( "MetalDevice", &device );
 
-        if( colourRTs[0] && colourRTs[0]->getOwnerDevice() == mDevice &&
+        if( device == mDevice && renderTarget->getFormat() != PF_NULL &&
             this->getWidth() == renderTarget->getWidth() &&
             this->getHeight() == renderTarget->getHeight() &&
             this->getFsaa() == renderTarget->getFSAA() &&

@@ -28,7 +28,7 @@ struct PS_INPUT
 @end
 
 @property( hlms_num_shadow_maps )
-inline float getShadow( depth2d shadowMap, sampler shadowSampler,
+inline float getShadow( depth2d<float> shadowMap, sampler shadowSampler,
 						float4 psPosLN, float4 invShadowMapSize )
 {
 	float fDepth = psPosLN.z;
@@ -116,7 +116,12 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 @end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
-@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap@value(CurrentShadowMap), samplerShadow, inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
+@property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
+
+constexpr sampler shadowSampler = sampler( coord::normalized,
+										   address::clamp_to_edge,
+										   filter::linear,
+										   compare_func::less_equal );
 
 fragment @insertpiece( output_type ) main_metal
 (
@@ -146,8 +151,6 @@ fragment @insertpiece( output_type ) main_metal
 		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
 	@foreach( hlms_num_shadow_maps, n )
 		, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
-	@property( hlms_num_shadow_maps )
-		, sampler shadowSampler [[sampler(@value(textureRegShadowMapStart))]]@end
 )
 {
 	PS_OUTPUT outPs;

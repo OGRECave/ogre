@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "OgreMetalRenderSystem.h"
 #include "OgreTextureManager.h"
 #include "OgreStringConverter.h"
+#include "OgreMetalDepthTexture.h"
+#include "OgreMetalDepthBuffer.h"
 
 #import "Metal/MTLBlitCommandEncoder.h"
 
@@ -103,9 +105,6 @@ namespace Ogre
         mFormat = TextureManager::getSingleton().getNativeFormat( mTextureType, mFormat, mUsage );
         const MTLTextureType texTarget = getMetalTextureTarget();
 
-        if( mFSAA < 1u )
-            mFSAA = 1u;
-
         // Check requested number of mipmaps
         const size_t maxMips = PixelUtil::getMaxMipmapCount( mWidth, mHeight,
                                                              mTextureType == TEX_TYPE_3D ? mDepth : 1 );
@@ -150,12 +149,18 @@ namespace Ogre
     // Creation / loading methods
     void MetalTexture::createInternalResourcesImpl(void)
     {
+        if( mFSAA < 1u )
+            mFSAA = 1u;
+
         createMetalTexResource();
         createSurfaceList();
     }
     //-----------------------------------------------------------------------------------
     void MetalTexture::prepareImpl(void)
     {
+        if( mFSAA < 1u )
+            mFSAA = 1u;
+
         if( mUsage & TU_RENDERTARGET )
             return;
 
@@ -337,14 +342,30 @@ namespace Ogre
         {
             RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
 
-#if OGRE_DEBUG_MODE
-            assert( dynamic_cast<MetalRenderTexture*>( renderTarget ) );
-#endif
-            MetalRenderTexture *renderTexture = static_cast<MetalRenderTexture*>( renderTarget );
-            if( renderTexture->mColourAttachmentDesc.loadAction == MTLLoadActionClear )
+            if( PixelUtil::isDepth( renderTarget->getFormat() ) )
             {
-                //A clear has been asked but no rendering command was issued. Do it now.
-                renderSystem->_clearRenderTargetImmediately( renderTexture );
+            #if OGRE_DEBUG_MODE
+                assert( dynamic_cast<MetalDepthTextureTarget*>( renderTarget ) );
+            #endif
+                MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>(
+                            renderTarget->getDepthBuffer() );
+                if( depthBuffer->mDepthAttachmentDesc.loadAction == MTLLoadActionClear )
+                {
+                    //A clear has been asked but no rendering command was issued. Do it now.
+                    renderSystem->_clearRenderTargetImmediately( renderTarget );
+                }
+            }
+            else
+            {
+            #if OGRE_DEBUG_MODE
+                assert( dynamic_cast<MetalRenderTexture*>( renderTarget ) );
+            #endif
+                MetalRenderTexture *renderTexture = static_cast<MetalRenderTexture*>( renderTarget );
+                if( renderTexture->mColourAttachmentDesc.loadAction == MTLLoadActionClear )
+                {
+                    //A clear has been asked but no rendering command was issued. Do it now.
+                    renderSystem->_clearRenderTargetImmediately( renderTexture );
+                }
             }
 
             if( mFSAA > 1u )
