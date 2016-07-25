@@ -33,7 +33,7 @@ namespace v1
     //-----------------------------------------------------------------------
     FORCEINLINE void InstancedEntity::writeSingleTransform3x4( float * RESTRICT_ALIAS xform ) const
     {
-#if defined( OGRE_USE_SIMD ) && OGRE_CPU == OGRE_CPU_X86
+#if OGRE_USE_SIMD > 0 && OGRE_CPU == OGRE_CPU_X86
         const Matrix4& mat = mParentNode->_getFullTransform();
         _mm_stream_ps( xform,    _mm_load_ps( mat[0] ) );
         _mm_stream_ps( xform+4,  _mm_load_ps( mat[1] ) );
@@ -62,7 +62,7 @@ namespace v1
 
         while( itor != end )
         {
-#if defined( OGRE_USE_SIMD ) && OGRE_CPU == OGRE_CPU_X86
+#if OGRE_USE_SIMD > 0 && OGRE_CPU == OGRE_CPU_X86
             Matrix4 const * RESTRICT_ALIAS mat = reinterpret_cast<Matrix4 const * RESTRICT_ALIAS>
                                                     (mBoneWorldMatrices[*itor++][0]);
             _mm_stream_ps( xform,    _mm_load_ps( (*mat)[0] ) );
@@ -89,7 +89,7 @@ namespace v1
     {
         while( itor != end )
         {
-#if defined( OGRE_USE_SIMD ) && OGRE_CPU == OGRE_CPU_X86
+#if OGRE_USE_SIMD > 0 && OGRE_CPU == OGRE_CPU_X86
             Matrix4 const * RESTRICT_ALIAS mat = reinterpret_cast<Matrix4 const * RESTRICT_ALIAS>
                                                     (mBoneMatrices[*itor++][0]);
             _mm_stream_ps( xform,    _mm_load_ps( (*mat)[0] ) );

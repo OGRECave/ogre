@@ -122,7 +122,7 @@ namespace Ogre
     {
         ArrayReal fCos = rkP.Dot( rkQ );
         /* Clamp fCos to [-1; 1] range */
-        fCos = Ogre::min( 1.0f, Ogre::max( -1.0f, fCos ) );
+        fCos = Ogre::min( Real(1.0), Ogre::max( Real(-1.0), fCos ) );
         
         /* Invert the rotation for shortest path? */
         /* m = fCos < 0.0f ? -1.0f : 1.0f; */
@@ -248,10 +248,10 @@ namespace Ogre
         //y = _copysign( y, m02 - m20 );
         //z = _copysign( z, m10 - m01 );
 
-        w = sqrt( Ogre::max( 0.0f, (1 + m00) + (m11 + m22) ) ) * 0.5f;
-        x = sqrt( Ogre::max( 0.0f, (1 + m00) - (m11 + m22) ) ) * 0.5f;
-        y = sqrt( Ogre::max( 0.0f, (1 - m00) + (m11 - m22) ) ) * 0.5f;
-        z = sqrt( Ogre::max( 0.0f, (1 - m00) - (m11 - m22) ) ) * 0.5f;
+        w = sqrt( Ogre::max( Real(0.0), (1 + m00) + (m11 + m22) ) ) * Real(0.5);
+        x = sqrt( Ogre::max( Real(0.0), (1 + m00) - (m11 + m22) ) ) * Real(0.5);
+        y = sqrt( Ogre::max( Real(0.0), (1 - m00) + (m11 - m22) ) ) * Real(0.5);
+        z = sqrt( Ogre::max( Real(0.0), (1 - m00) - (m11 - m22) ) ) * Real(0.5);
 
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1800
 		x = _copysign( x, m21 - m12 );

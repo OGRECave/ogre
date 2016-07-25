@@ -76,7 +76,7 @@ namespace Ogre
         /// positive values force a smaller mipmap to be used. Units are in numbers
         /// of levels, so +1 forces the mipmaps to one smaller level.
         /// @note Only does something if render system has capability RSC_MIPMAP_LOD_BIAS.
-        float               mMipLodBias;
+        Real                mMipLodBias;
         float               mMaxAnisotropy;
         /// Defaults to NUM_COMPARE_FUNCTIONS which means disabled.
         CompareFunction     mCompareFunction;

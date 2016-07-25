@@ -529,15 +529,16 @@ namespace Ogre
 
         for( size_t i=0; i<NumInternalBufferTypes; ++i )
         {
-            BufferPackedVec::const_iterator itor = mDelayedBuffers[i].begin();
+            BufferPackedVec::const_iterator start = mDelayedBuffers[i].begin();
 
-            while( itor != mDelayedBuffers[i].end() )
+            while( start != mDelayedBuffers[i].end() )
             {
                 //Each iteration means a new pool
                 Vbo newVbo;
 
                 //Calculate the size for this pool
-                BufferPackedVec::const_iterator end = mDelayedBuffers[i].end();
+                BufferPackedVec::const_iterator itor = start;
+                BufferPackedVec::const_iterator end  = mDelayedBuffers[i].end();
 
                 while( itor != end )
                 {
@@ -555,7 +556,7 @@ namespace Ogre
                 size_t dstOffset = 0;
 
                 //Merge the binary data as a contiguous array
-                itor = mDelayedBuffers[i].begin();
+                itor = start;
                 while( itor != end )
                 {
                     D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
@@ -598,7 +599,7 @@ namespace Ogre
 
                 //Each buffer needs to be told about its new D3D11 object
                 //(and pool index & where it starts).
-                itor = mDelayedBuffers[i].begin();
+                itor = start;
                 while( itor != end )
                 {
                     D3D11BufferInterface *bufferInterface = static_cast<D3D11BufferInterface*>(
@@ -613,6 +614,8 @@ namespace Ogre
 
                 OGRE_FREE_SIMD( mergedData, MEMCATEGORY_GEOMETRY );
                 mergedData = 0;
+
+                start = end;
             }
         }
 

@@ -672,7 +672,6 @@ namespace Ogre
         //---------------------------------------------------------------------------
         bool useIdentityProjection = queuedRenderable.renderable->getUseIdentityProjection();
 
-#if !OGRE_DOUBLE_PRECISION
         //uint materialIdx[]
         *currentMappedConstBuffer = datablock->getAssignedSlot();
         *reinterpret_cast<float * RESTRICT_ALIAS>( currentMappedConstBuffer+1 ) = datablock->
@@ -681,11 +680,18 @@ namespace Ogre
         currentMappedConstBuffer += 4;
 
         //mat4 worldViewProj
-        Matrix4 tmp = mPreparedPass.viewProjMatrix[useIdentityProjection] * worldMat;
-        memcpy( currentMappedTexBuffer, &tmp, sizeof(Matrix4) );
+        Matrix4 tmp = mPreparedPass.viewProjMatrix[ useIdentityProjection ] * worldMat;
+#if !OGRE_DOUBLE_PRECISION
+        memcpy( currentMappedTexBuffer, &tmp, sizeof( Matrix4 ) );
         currentMappedTexBuffer += 16;
 #else
-    #error Not Coded Yet! (cannot use memcpy on Matrix4)
+        for( int y = 0; y < 4; ++y )
+        {
+            for( int x = 0; x < 4; ++x )
+            {
+                *currentMappedTexBuffer++ = tmp[ y ][ x ];
+            }
+        }
 #endif
 
         //---------------------------------------------------------------------------

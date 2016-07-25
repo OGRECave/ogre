@@ -273,7 +273,7 @@ namespace Ogre
 
         assert( mNumSlices < 256 );
 
-        float projSpaceSliceEnd[256];
+        Real projSpaceSliceEnd[256];
         for( uint32 i=0; i<mNumSlices-1; ++i )
         {
             Vector4 r = projMatrix * Vector4( 0, 0, Math::Clamp( mResolutionAtSlice[i].zEnd,
