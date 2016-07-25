@@ -1,9 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "PbsMaterialsGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
@@ -13,8 +11,16 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
+#include "System/MainEntryPoints.h"
 
-using namespace Demo;
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
+}
 
 namespace Demo
 {
@@ -52,15 +58,13 @@ namespace Demo
         {
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    PbsMaterialsGameState pbsMaterialsGameState(
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        PbsMaterialsGameState *gfxGameState = new PbsMaterialsGameState(
         "Shows how to use the PBS material system. There's nothing really fancy,\n"
         "it's just programmer art. The PBS materials can be setup from script or\n"
         "code. This sample does both. At the time being, not all settings from the\n"
@@ -93,55 +97,27 @@ int mainApp()
         " * Mobile version only supports forward lighting.\n"
         "\n"
         "LEGAL: Uses Saint Peter's Basilica (C) by Emil Persson under CC Attrib 3.0 Unported\n"
-        "See Samples/Media/materials/textures/Cubemaps/License.txt for more information.");
-    PbsMaterialsGraphicsSystem graphicsSystem( &pbsMaterialsGameState );
+        "See Samples/Media/materials/textures/Cubemaps/License.txt for more information." );
 
-    pbsMaterialsGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new PbsMaterialsGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "PBS Materials Sample" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "PBS Materials Sample";
+    }
 }

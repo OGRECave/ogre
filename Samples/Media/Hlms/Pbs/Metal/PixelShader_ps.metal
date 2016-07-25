@@ -97,7 +97,7 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 	//Normal texture must be in LA format!
 	tsNormal.xy = normalMap.sample( samplerState, uv, normalIdx ).xw * 2.0 - 1.0;
 @end
-	tsNormal.z	= sqrt( max( 0, 1.0 - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
+	tsNormal.z	= sqrt( max( 0.0f, 1.0f - tsNormal.x * tsNormal.x - tsNormal.y * tsNormal.y ) );
 
 	return tsNormal;
 }
@@ -299,7 +299,7 @@ fragment @insertpiece( output_type ) main_metal
 	nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 @property( normal_map )
-	nNormal = normalize( mul( nNormal, TBN ) );
+	nNormal = normalize( nNormal * TBN );
 @end
 
 	//Everything's in Camera space

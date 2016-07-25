@@ -361,6 +361,15 @@ namespace v1 {
                               withBytes:data.data
                             bytesPerRow:rowPitch];
                 break;
+            case MTLTextureType2DArray:
+                [mTexture replaceRegion:MTLRegionMake2D( dest.left, dest.top,
+                                                         dest.getWidth(), dest.getHeight() )
+                            mipmapLevel:mLevel
+                                  slice:dest.getDepth() - 1u
+                              withBytes:data.data
+                            bytesPerRow:rowPitch
+                          bytesPerImage:dataSize];
+                break;
             case MTLTextureType2DMultisample:
                 [mTexture replaceRegion:MTLRegionMake2D( dest.left, dest.top,
                                                          dest.getWidth(), dest.getHeight() )
@@ -390,7 +399,6 @@ namespace v1 {
                           bytesPerImage:dataSize];
 #endif
             case MTLTextureType3D:
-            case MTLTextureType2DArray:
                 [mTexture replaceRegion:MTLRegionMake3D( dest.left, dest.top, dest.front,
                                                          dest.getWidth(),
                                                          dest.getHeight(),

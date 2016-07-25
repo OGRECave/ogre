@@ -107,7 +107,8 @@ namespace Ogre
             mFSAA = 1u;
 
         // Check requested number of mipmaps
-        const size_t maxMips = PixelUtil::getMaxMipmapCount( mWidth, mHeight, mDepth );
+        const size_t maxMips = PixelUtil::getMaxMipmapCount( mWidth, mHeight,
+                                                             mTextureType == TEX_TYPE_3D ? mDepth : 1 );
 
         if( PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0) )
             mNumRequestedMipmaps = 0;
