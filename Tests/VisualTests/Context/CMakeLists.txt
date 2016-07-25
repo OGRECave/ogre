@@ -207,6 +207,11 @@ if (APPLE)
 	endif()
 	
 	# Components
+    add_custom_command(TARGET TestContext POST_BUILD
+        COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgreBites.framework 
+        ${OGRE_TESTCONTEXT_CONTENTS_PATH}/Frameworks/
+        )
+    
 	if (OGRE_BUILD_COMPONENT_PAGING OR OGRE_SDK_BUILD)
 		add_custom_command(TARGET TestContext POST_BUILD
 			COMMAND ln ARGS -s -f ${OGRE_BINARY_DIR}/lib/${OGRE_OSX_BUILD_CONFIGURATION}/OgrePaging.framework 
