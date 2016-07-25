@@ -4,7 +4,7 @@ if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT ((WINDOWS_STORE OR WINDOWS_PHON
   message(STATUS "Could not find dependency: OIS")
   message(STATUS "Skipping samples build")
   set(OGRE_BUILD_SAMPLES 0)
- else()
+ elseif(OGRE_BUILD_SAMPLES)
 	include_directories(${OIS_INCLUDE_DIR})
 endif()
 

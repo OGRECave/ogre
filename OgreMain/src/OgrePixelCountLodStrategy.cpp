@@ -169,7 +169,7 @@ namespace Ogre {
             Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
 
             //Avoid division by zero
-            orthoArea = Ogre::max( orthoArea, 1e-6f );
+            orthoArea = Ogre::max( orthoArea, Real(1e-6) );
 
             //vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
             //order and use lower_bound (which wouldn't be the same as using upper_bound)
@@ -270,7 +270,7 @@ namespace Ogre {
             Real orthoArea = camera->getOrthoWindowHeight() * camera->getOrthoWindowWidth();
 
             //Avoid division by zero
-            orthoArea = Ogre::max( orthoArea, 1e-6f );
+            orthoArea = Ogre::max( orthoArea, Real(1e-6) );
 
             //vpAreaDotProjMat00dot11 is negative so we can store Lod values in ascending
             //order and use lower_bound (which wouldn't be the same as using upper_bound)

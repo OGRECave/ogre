@@ -133,7 +133,7 @@ namespace Ogre
         distance.mChunkBase[2] = Math::Abs( distance.mChunkBase[2] ) - mHalfSize.mChunkBase[2];
 
         return Ogre::max( Ogre::min( Ogre::min(
-                distance.mChunkBase[0], distance.mChunkBase[1] ), distance.mChunkBase[2] ), 0.0f );
+                distance.mChunkBase[0], distance.mChunkBase[1] ), distance.mChunkBase[2] ), Real(0.0) );
     }
     //-----------------------------------------------------------------------------------
     inline void ArrayAabb::transformAffine( const ArrayMatrix4 &m )

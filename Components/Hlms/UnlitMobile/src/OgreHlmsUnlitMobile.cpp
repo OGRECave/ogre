@@ -392,13 +392,19 @@ namespace Ogre
         //---------------------------------------------------------------------------
         //                          ---- VERTEX SHADER ----
         //---------------------------------------------------------------------------
-#if !OGRE_DOUBLE_PRECISION
         //mat4 worldViewProj
-        Matrix4 tmp = mPreparedPass.viewProjMatrix[useIdentityProjection] * worldMat;
-        memcpy( vsUniformBuffer, &tmp, sizeof(Matrix4) );
+        Matrix4 tmp = mPreparedPass.viewProjMatrix[ useIdentityProjection ] * worldMat;
+#if !OGRE_DOUBLE_PRECISION
+        memcpy( vsUniformBuffer, &tmp, sizeof( Matrix4 ) );
         vsUniformBuffer += 16;
 #else
-    #error Not Coded Yet! (cannot use memcpy on Matrix4)
+        for( int y = 0; y < 4; ++y )
+        {
+            for( int x = 0; x < 4; ++x )
+            {
+                *vsUniformBuffer++ = tmp[ y ][ x ];
+            }
+        }
 #endif
 
         memcpy( vsUniformBuffer, datablock->mTextureMatrices,

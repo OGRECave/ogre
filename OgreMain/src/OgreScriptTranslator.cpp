@@ -9275,7 +9275,7 @@ namespace Ogre{
 
                         if( prop->values.size() == 8 )
                         {
-                            AbstractNodeList::const_iterator it7 = it3;
+                            AbstractNodeList::const_iterator it7 = ++it3;
                             AbstractNodeList::const_iterator it4 = it7++;
                             AbstractNodeList::const_iterator it5 = it7++;
                             AbstractNodeList::const_iterator it6 = it7++;

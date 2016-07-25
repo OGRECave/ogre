@@ -4380,6 +4380,40 @@ bail:
         outFSAASettings->Quality = 0;
     }
     //---------------------------------------------------------------------
+    unsigned int D3D11RenderSystem::getDisplayMonitorCount() const
+    {
+        unsigned int monitorCount = 0;
+        HRESULT hr;
+        IDXGIOutput *pOutput;
+
+        if (!mDriverList)
+        {
+            return 0;
+        }
+        
+        for (size_t i = 0; i < mDriverList->count(); ++i)
+        {
+            for (size_t m = 0;; ++m)
+            {
+                hr = mDriverList->item(i)->getDeviceAdapter()->EnumOutputs(m, &pOutput);
+                if (DXGI_ERROR_NOT_FOUND == hr)
+                {
+                    break;
+                }
+                else if (FAILED(hr))
+                {
+                    break;   //Something bad happened.
+                }
+                else
+                {
+                    SAFE_RELEASE(pOutput);
+                    ++monitorCount;
+                }
+            }
+        }
+        return monitorCount;
+    }
+    //---------------------------------------------------------------------
     void D3D11RenderSystem::initRenderSystem()
     {
         if (mRenderSystemWasInited)
