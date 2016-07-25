@@ -12,11 +12,11 @@
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#define DEMO_MAIN_ENTRY_PARAMS hInst, hPrevInstance, strCmdLine, nCmdShow
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow );
+    #define DEMO_MAIN_ENTRY_PARAMS hInst, hPrevInstance, strCmdLine, nCmdShow
+    INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow );
 #else
-#define DEMO_MAIN_ENTRY_PARAMS argc, argv
-int mainApp( int argc, const char *argv[] );
+    #define DEMO_MAIN_ENTRY_PARAMS argc, argv
+    int mainApp( int argc, const char *argv[] );
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -28,11 +28,11 @@ int main( int argc, const char *argv[] )
     int retVal = -1;
     try
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+    #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
         retVal = WinMainApp( hInst, hInst2, strCmdLine, intParam );
-#else
+    #else
         retVal = mainApp( argc, argv );
-#endif
+    #endif
     }
     catch( Ogre::Exception& e )
     {
@@ -47,5 +47,9 @@ int main( int argc, const char *argv[] )
 
     return retVal;
 }
+
+#else
+
+#define DEMO_MAIN_ENTRY_PARAMS argc, argv
 
 #endif
