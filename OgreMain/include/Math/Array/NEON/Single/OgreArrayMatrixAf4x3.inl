@@ -425,7 +425,7 @@ namespace Ogre
         ArrayReal m20 = mChunkBase[8], m21 = mChunkBase[9], m22 = mChunkBase[10];
 
         ArrayReal t00 = _mm_nmsub_ps( m21, m12, vmulq_f32( m22, m11 ) ); //m22 * m11 - m21 * m12;
-        ArrayReal t10 = _mm_nmsub_ps( m22, m10, vmulq_f32( m20, m12 ) ); //m20 * m22 - m22 * m10;
+        ArrayReal t10 = _mm_nmsub_ps( m22, m10, vmulq_f32( m20, m12 ) ); //m20 * m12 - m22 * m10;
         ArrayReal t20 = _mm_nmsub_ps( m20, m11, vmulq_f32( m21, m10 ) ); //m21 * m10 - m20 * m11;
 
         ArrayReal m00 = mChunkBase[0], m01 = mChunkBase[1], m02 = mChunkBase[2];
