@@ -122,24 +122,24 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     
     message(STATUS "Building freetype")
     file(DOWNLOAD
-        http://download.savannah.gnu.org/releases/freetype/freetype-2.6.2.tar.gz
-        ./freetype-2.6.2.tar.gz)
-    execute_process(COMMAND cmake -E tar xf freetype-2.6.2.tar.gz)
+        http://download.savannah.gnu.org/releases/freetype/freetype-2.6.5.tar.gz
+        ./freetype-2.6.5.tar.gz)
+    execute_process(COMMAND cmake -E tar xf freetype-2.6.5.tar.gz)
     # patch toolchain for iOS
     execute_process(COMMAND cmake -E copy
         ${CMAKE_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake
-        freetype-2.6.2/builds/cmake/iOS.cmake)
+        freetype-2.6.5/builds/cmake/iOS.cmake)
     execute_process(COMMAND cmake
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DWITH_BZip2=OFF # tries to use it on iOS otherwise
         # workaround for broken iOS toolchain in freetype
-        -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.6.2
+        -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.6.5
         ${CROSS}
         -G ${CMAKE_GENERATOR}
         ..
-        WORKING_DIRECTORY freetype-2.6.2/objs)
-    execute_process(COMMAND cmake --build freetype-2.6.2/objs --target install)
+        WORKING_DIRECTORY freetype-2.6.5/objs)
+    execute_process(COMMAND cmake --build freetype-2.6.5/objs --target install)
 endif()
 
 #######################################################################
