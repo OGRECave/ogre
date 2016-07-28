@@ -550,6 +550,8 @@ namespace Ogre
             }
         }
 
+        mActiveViewport = 0;
+        mActiveRenderTarget = 0;
         mActiveRenderEncoder = 0;
         mPso = 0;
     }
