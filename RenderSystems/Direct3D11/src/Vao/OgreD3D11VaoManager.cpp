@@ -200,8 +200,9 @@ namespace Ogre
 
                 //Round to next multiple of alignment
                 size_t newOffset = ( (block.offset + alignment - 1) / alignment ) * alignment;
+                size_t padding = newOffset - block.offset;
 
-                if( sizeBytes <= block.size - (newOffset - block.offset) )
+                if( sizeBytes + padding <= block.size )
                 {
                     bestVboIdx      = itor - mVbos[internalType][bufferType].begin();
                     bestBlockIdx    = blockIt - itor->freeBlocks.begin();
