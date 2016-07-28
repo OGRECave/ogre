@@ -420,7 +420,7 @@ namespace Ogre
             HlmsTextureManager::TEXTURE_TYPE_NORMALS,
             HlmsTextureManager::TEXTURE_TYPE_DIFFUSE,
             HlmsTextureManager::TEXTURE_TYPE_MONOCHROME,
-            HlmsTextureManager::TEXTURE_TYPE_DETAIL,
+            HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
             HlmsTextureManager::TEXTURE_TYPE_DETAIL,
@@ -955,12 +955,16 @@ namespace Ogre
         default:
         case PBSM_DIFFUSE:
         case PBSM_SPECULAR:
+			retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+			break;
         case PBSM_DETAIL_WEIGHT:
+			retVal = HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA;
+			break;
         case PBSM_DETAIL0:
         case PBSM_DETAIL1:
         case PBSM_DETAIL2:
         case PBSM_DETAIL3:
-            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DETAIL;
             break;
 
         case PBSM_NORMAL:
