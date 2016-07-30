@@ -125,7 +125,7 @@ namespace Ogre
         desc.width              = mWidth;
         desc.height             = mHeight;
         desc.depth              = mTextureType == TEX_TYPE_2D_ARRAY ? 1u : mDepth;
-        desc.arrayLength        = mTextureType == TEX_TYPE_2D_ARRAY ? mDepth : getNumFaces();
+        desc.arrayLength        = mTextureType == TEX_TYPE_2D_ARRAY ? mDepth : 1u;
         desc.pixelFormat        = MetalMappings::getPixelFormat( mFormat, mHwGamma );
         desc.sampleCount        = 1u;
 

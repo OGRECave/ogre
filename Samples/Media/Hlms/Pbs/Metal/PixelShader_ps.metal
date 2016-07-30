@@ -376,8 +376,8 @@ fragment @insertpiece( output_type ) main_metal
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
 	@property( envprobe_map )
-		float3 envColourS = texEnvProbeMap.sample( samplerStates@value(num_textures), mul( reflDir, pass.invViewMatCubemap ), level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
-		float3 envColourD = texEnvProbeMap.sample( samplerStates@value(num_textures), mul( nNormal, pass.invViewMatCubemap ), level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+		float3 envColourS = texEnvProbeMap.sample( samplerStates@value(num_textures), reflDir * pass.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+		float3 envColourD = texEnvProbeMap.sample( samplerStates@value(num_textures), nNormal * pass.invViewMatCubemap, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
 		@property( !hw_gamma_read )	//Gamma to linear space
 			envColourS = envColourS * envColourS;
 			envColourD = envColourD * envColourD;
