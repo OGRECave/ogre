@@ -75,7 +75,9 @@ namespace Ogre
                 if( !(this->depthFunc < other.depthFunc) ) return false;
 
                 if(   this->stencilParams < other.stencilParams  ) return true;
-                if( !(this->stencilParams < other.stencilParams) ) return false;
+                //if( !(this->stencilParams < other.stencilParams) ) return false;
+
+                return false;
             }
 
             bool operator != ( const CachedDepthStencilState &other ) const

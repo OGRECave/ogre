@@ -127,7 +127,7 @@ namespace Ogre {
         bool operator < ( const StencilStateOp &other ) const
         {
             if(   this->stencilFailOp < other.stencilFailOp  ) return true;
-            if( (!this->stencilFailOp < other.stencilFailOp) ) return false;
+            if( !(this->stencilFailOp < other.stencilFailOp) ) return false;
 
             if(   this->stencilPassOp < other.stencilPassOp  ) return true;
             if( !(this->stencilPassOp < other.stencilPassOp) ) return false;
