@@ -842,18 +842,19 @@ namespace Ogre {
                         // slices are done individually
                         for(size_t z = 0; z < depth; ++z)
                         {
-                            size_t remainingWidth = width;
                             size_t remainingHeight = height;
 
                             // 4x4 blocks in x/y
                             for (size_t y = 0; y < height; y += 4)
                             {
-                                size_t sy = std::min( ( size_t )remainingHeight, ( size_t )4 );
+                                size_t sy = std::min<size_t>( remainingHeight, 4u );
                                 remainingHeight -= sy;
+
+                                size_t remainingWidth = width;
 
                                 for (size_t x = 0; x < width; x += 4)
                                 {
-                                    size_t sx = std::min((size_t)remainingWidth, (size_t)4);
+                                    size_t sx = std::min<size_t>( remainingWidth, 4u );
                                     size_t destPitchMinus4 = dstPitch - destBpp * sx;
 
                                     remainingWidth -= sx;
