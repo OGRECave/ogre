@@ -56,6 +56,7 @@ namespace Ogre
             * @TEXTURE_TYPE_ENV_MAP
             * @TEXTURE_TYPE_DETAIL
             * @TEXTURE_TYPE_DETAIL_NORMAL_MAP
+            * @TEXTURE_TYPE_NON_COLOR_DATA
         Different categories have different default parameters. By default
         all types try to use array textures unless the RenderSystem API doesn't
         support it (in which case fallbacks to UV atlas).
@@ -135,6 +136,7 @@ namespace Ogre
             TEXTURE_TYPE_ENV_MAP,
             TEXTURE_TYPE_DETAIL,
             TEXTURE_TYPE_DETAIL_NORMAL_MAP,
+            TEXTURE_TYPE_NON_COLOR_DATA,
             NUM_TEXTURE_TYPES
         };
 
