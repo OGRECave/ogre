@@ -47,7 +47,7 @@ namespace Ogre
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].pixelFormat=PF_BC5_SNORM;
         mDefaultTextureParameters[TEXTURE_TYPE_DETAIL_NORMAL_MAP].isNormalMap = true;
         mDefaultTextureParameters[TEXTURE_TYPE_ENV_MAP].hwGammaCorrection   = true;
-		mDefaultTextureParameters[TEXTURE_TYPE_NON_COLOR_DATA].hwGammaCorrection = false;
+        mDefaultTextureParameters[TEXTURE_TYPE_NON_COLOR_DATA].hwGammaCorrection = false;
     }
     //-----------------------------------------------------------------------------------
     HlmsTextureManager::~HlmsTextureManager()

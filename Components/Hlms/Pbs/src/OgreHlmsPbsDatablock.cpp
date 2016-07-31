@@ -958,7 +958,7 @@ namespace Ogre
 			retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
 			break;
         case PBSM_DETAIL_WEIGHT:
-			retVal = HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA;
+            retVal = HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA;
 			break;
         case PBSM_DETAIL0:
         case PBSM_DETAIL1:
