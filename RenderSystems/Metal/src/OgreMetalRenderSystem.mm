@@ -136,7 +136,9 @@ namespace Ogre
         rsc->setCapability(RSC_DOT3);
         rsc->setCapability(RSC_CUBEMAPPING);
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
+#endif
         rsc->setCapability(RSC_VBO);
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);
         rsc->setCapability(RSC_STENCIL_WRAP);
