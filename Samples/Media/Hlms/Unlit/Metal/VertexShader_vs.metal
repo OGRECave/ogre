@@ -43,8 +43,8 @@ vertex PS_INPUT main_metal
 	// START UNIFORM DECLARATION
 	@insertpiece( PassDecl )
 	@insertpiece( InstanceDecl )
-	, device float4x4 *worldMatBuf [[buffer(24)]]
-	@property( texture_matrix ), device float4x4 *animationMatrixBuf [[buffer(25)]]@end
+	, device const float4x4 *worldMatBuf [[buffer(TEX_SLOT_START+0)]]
+	@property( texture_matrix ), device const float4x4 *animationMatrixBuf [[buffer(TEX_SLOT_START+1)]]@end
 	@insertpiece( custom_vs_uniformDeclaration )
 	// END UNIFORM DECLARATION
 )

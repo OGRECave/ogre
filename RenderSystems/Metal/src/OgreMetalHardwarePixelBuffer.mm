@@ -119,12 +119,13 @@ namespace v1 {
             // No scaling or conversion needed
             scaled = PixelBox(src.getWidth(), src.getHeight(), src.getDepth(), src.format, src.data);
 
-            if (src.format == PF_R8G8B8)
+            if (src.format == PF_R8G8B8 || src.format == PF_B8G8R8)
             {
+                const PixelFormat newFormat = src.format == PF_R8G8B8 ? PF_X8R8G8B8 : PF_X8B8G8R8;
                 freeScaledBuffer = true;
                 size_t scaledSize = PixelUtil::getMemorySize( src.getWidth(), src.getHeight(),
-                                                              src.getDepth(), PF_X8R8G8B8 );
-                scaled.format = PF_X8R8G8B8;
+                                                              src.getDepth(), newFormat );
+                scaled.format = newFormat;
                 scaled.data = new uint8[scaledSize];
                 scaled.setConsecutive();
                 PixelUtil::bulkPixelConversion(src, scaled);

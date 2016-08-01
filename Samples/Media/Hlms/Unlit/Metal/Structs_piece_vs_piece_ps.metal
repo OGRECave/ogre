@@ -11,7 +11,7 @@ float4x4 viewProj[2];
 };@end
 
 @piece( PassDecl )
-, constant PassData &pass [[buffer(16)]]
+, constant PassData &pass [[buffer(CONST_SLOT_START+0)]]
 @end
 
 @piece( MaterialStructDecl )
@@ -25,7 +25,7 @@ struct Material
 };@end
 
 @piece( MaterialDecl )
-, constant Material *materialArray [[buffer(17)]]
+, constant Material *materialArray [[buffer(CONST_SLOT_START+1)]]
 @end
 
 
@@ -42,7 +42,7 @@ struct Material
 //.z =
 //Contains 0 or 1 to index into pass.viewProj[]. Only used
 //if hlms_identity_viewproj_dynamic is set.
-, constant uint4 *materialIdx [[buffer(18)]]
+, constant uint4 *materialIdx [[buffer(CONST_SLOT_START+2)]]
 @end
 
 //Reset texcoord to 0 for every shader stage (since values are preserved).

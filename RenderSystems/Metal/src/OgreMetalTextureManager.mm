@@ -74,6 +74,8 @@ namespace Ogre
     {
         if( format == PF_R8G8B8 )
             return PF_X8R8G8B8;
+        if( format == PF_B8G8R8 )
+            return PF_X8B8G8R8;
 
         return format;
     }

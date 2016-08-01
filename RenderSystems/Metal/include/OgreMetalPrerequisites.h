@@ -49,6 +49,7 @@ THE SOFTWARE.
 
 #define OGRE_METAL_CONST_SLOT_START     16u
 #define OGRE_METAL_TEX_SLOT_START       24u
+#define OGRE_METAL_PARAMETER_SLOT       23u
 
 namespace Ogre
 {

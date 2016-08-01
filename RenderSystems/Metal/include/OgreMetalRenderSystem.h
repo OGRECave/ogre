@@ -109,6 +109,14 @@ namespace Ogre
         v1::VertexData      *mCurrentVertexBuffer;
         MTLPrimitiveType    mCurrentPrimType;
 
+        //TODO: AutoParamsBuffer probably belongs to MetalDevice (because it's per device?)
+        typedef vector<ConstBufferPacked*>::type ConstBufferPackedVec;
+        ConstBufferPackedVec    mAutoParamsBuffer;
+        size_t                  mAutoParamsBufferIdx;
+        uint8                   *mCurrentAutoParamsBufferPtr;
+        size_t                  mCurrentAutoParamsBufferSpaceLeft;
+        size_t                  mHistoricalAutoParamsSize[60];
+
         uint8           mNumMRTs;
         MetalRenderTargetCommon     *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         MetalDepthBuffer            *mCurrentDepthBuffer;
@@ -123,6 +131,8 @@ namespace Ogre
 
         id<MTLDepthStencilState> getDepthStencilState( HlmsPso *pso );
         void removeDepthStencilState( HlmsPso *pso );
+
+        void cleanAutoParamsBuffers(void);
 
     public:
         MetalRenderSystem();
@@ -254,6 +264,7 @@ namespace Ogre
         virtual Real getMaximumDepthInputValue(void);
 
         virtual void _setRenderTarget(RenderTarget *target, bool colourWrite);
+        virtual void _notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget );
         virtual void preExtraThreadsStarted();
         virtual void postExtraThreadsStarted();
         virtual void registerThread();
@@ -272,8 +283,8 @@ namespace Ogre
         virtual void initialiseFromRenderSystemCapabilities(RenderSystemCapabilities* caps, RenderTarget* primary);
 
         MetalDevice* getActiveDevice(void)                      { return mActiveDevice; }
+        MetalProgramFactory* getMetalProgramFactory(void)       { return mMetalProgramFactory; }
 
-        void _clearRenderTargetImmediately( RenderTarget *renderTarget );
         void _notifyActiveEncoderEnded(void);
         void _notifyDeviceStalled(void);
     };

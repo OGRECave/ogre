@@ -1,9 +1,9 @@
 @property( hlms_forward3d )
 @piece( forward3dLighting )
-	float f3dMinDistance	= passBuf.f3dData.x;
-	float f3dInvMaxDistance	= passBuf.f3dData.y;
-	float f3dNumSlicesSub1	= passBuf.f3dData.z;
-	uint cellsPerTableOnGrid0= asuint( passBuf.f3dData.w );
+	float f3dMinDistance	= pass.f3dData.x;
+	float f3dInvMaxDistance	= pass.f3dData.y;
+	float f3dNumSlicesSub1	= pass.f3dData.z;
+	uint cellsPerTableOnGrid0= as_type<uint>( pass.f3dData.w );
 
 	// See C++'s Forward3D::getSliceAtDepth
 	/*float fSlice = 1.0 - clamp( (-inPs.pos.z + f3dMinDistance) * f3dInvMaxDistance, 0.0, 1.0 );
@@ -17,30 +17,30 @@
 	//TODO: Profile performance: derive this mathematically or use a lookup table?
 	uint offset = cellsPerTableOnGrid0 * (((1u << (slice << 1u)) - 1u) / 3u);
 
-	float lightsPerCell = passBuf.f3dGridHWW[0].w;
-	float windowHeight = passBuf.f3dGridHWW[1].w; //renderTarget->height
+	float lightsPerCell = pass.f3dGridHWW[0].w;
+	float windowHeight = pass.f3dGridHWW[1].w; //renderTarget->height
 
-	//passBuf.f3dGridHWW[slice].x = grid_width / renderTarget->width;
-	//passBuf.f3dGridHWW[slice].y = grid_height / renderTarget->height;
-	//passBuf.f3dGridHWW[slice].z = grid_width * lightsPerCell;
+	//pass.f3dGridHWW[slice].x = grid_width / renderTarget->width;
+	//pass.f3dGridHWW[slice].y = grid_height / renderTarget->height;
+	//pass.f3dGridHWW[slice].z = grid_width * lightsPerCell;
 	//uint sampleOffset = 0;
 	uint sampleOffset = offset +
-						uint(floor( (windowHeight - gl_FragCoord.y) * passBuf.f3dGridHWW[slice].y ) * passBuf.f3dGridHWW[slice].z) +
-						uint(floor( gl_FragCoord.x * passBuf.f3dGridHWW[slice].x ) * lightsPerCell);
+						uint(floor( (windowHeight - inPs.gl_FragCoord.y) * pass.f3dGridHWW[slice].y ) * pass.f3dGridHWW[slice].z) +
+						uint(floor( inPs.gl_FragCoord.x * pass.f3dGridHWW[slice].x ) * lightsPerCell);
 
-	uint numLightsInGrid = f3dGrid.Load( int(sampleOffset) ).x;
+	ushort numLightsInGrid = f3dGrid[int(sampleOffset)];
 
-	for( uint i=0u; i<numLightsInGrid; ++i )
+	for( ushort i=0u; i<numLightsInGrid; ++i )
 	{
 		//Get the light index
-		uint idx = f3dGrid.Load( int(sampleOffset + i + 1u) ).x;
+		uint idx = f3dGrid[int(sampleOffset + i + 1u)];
 
 		//Get the light
-		float4 posAndType = f3dLightList.Load( int(idx) );
+		float4 posAndType = f3dLightList[int(idx)];
 
-		float3 lightDiffuse	= f3dLightList.Load( int(idx + 1u) ).xyz;
-		float3 lightSpecular= f3dLightList.Load( int(idx + 2u) ).xyz;
-		float4 attenuation	= f3dLightList.Load( int(idx + 3u) ).xyzw;
+		float3 lightDiffuse	= f3dLightList[int(idx + 1u)].xyz;
+		float3 lightSpecular= f3dLightList[int(idx + 2u)].xyz;
+		float4 attenuation	= f3dLightList[int(idx + 3u)].xyzw;
 
 		float3 lightDir	= posAndType.xyz - inPs.pos;
 		float fDistance	= length( lightDir );
@@ -66,8 +66,8 @@
 				//spotParams.z = falloff
 
 				//Spot light
-				float3 spotDirection	= f3dLightList.Load( int(idx + 4u) ).xyz;
-				float3 spotParams		= f3dLightList.Load( int(idx + 5u) ).xyz;
+				float3 spotDirection	= f3dLightList[int(idx + 4u)].xyz;
+				float3 spotParams		= f3dLightList[int(idx + 5u)].xyz;
 
 				float spotCosAngle = dot( normalize( inPs.pos - posAndType.xyz ), spotDirection.xyz );
 
@@ -85,7 +85,7 @@
 	}
 
 	@property( hlms_forward3d_debug )
-		float occupancy = (numLightsInGrid / passBuf.f3dGridHWW[0].w);
+		float occupancy = (numLightsInGrid / pass.f3dGridHWW[0].w);
 		float3 occupCol = float3( 0.0, 0.0, 0.0 );
 		if( occupancy < 1.0 / 3.0 )
 			occupCol.z = occupancy;

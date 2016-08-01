@@ -13,6 +13,7 @@
 struct PS_INPUT
 {
 @insertpiece( VStoPS_block )
+@property( hlms_vpos )	float4 gl_FragCoord [[position]];@end
 };
 
 @insertpiece( PsOutputDecl )
@@ -137,11 +138,9 @@ fragment @insertpiece( output_type ) main_metal
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
 	@property( hlms_forward3d )
-		, device uint *f3dGrid [[buffer(25)]]
-		, device float4 *f3dLightList [[buffer(26)]]
+		, device const ushort *f3dGrid [[buffer(TEX_SLOT_START+1)]]
+		, device const float4 *f3dLightList [[buffer(TEX_SLOT_START+2)]]
 	@end
-
-	@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end
 
 	@foreach( num_textures, n )
 		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end

@@ -359,4 +359,162 @@ namespace Ogre
         default:                        return MTLSamplerAddressModeClampToEdge;
         }
     }
+    //-----------------------------------------------------------------------------------
+    MTLVertexFormat MetalMappings::dataTypeToVertexFormat( MTLDataType dataType )
+    {
+        switch( dataType )
+        {
+        case MTLDataTypeNone:           return MTLVertexFormatInvalid;
+        case MTLDataTypeStruct:         return MTLVertexFormatInvalid;
+        case MTLDataTypeArray:          return MTLVertexFormatInvalid;
+
+        case MTLDataTypeFloat:          return MTLVertexFormatFloat;
+        case MTLDataTypeFloat2:         return MTLVertexFormatFloat2;
+        case MTLDataTypeFloat3:         return MTLVertexFormatFloat3;
+        case MTLDataTypeFloat4:         return MTLVertexFormatFloat4;
+
+        case MTLDataTypeFloat2x2:       return MTLVertexFormatInvalid;
+        case MTLDataTypeFloat2x3:       return MTLVertexFormatInvalid;
+        case MTLDataTypeFloat2x4:       return MTLVertexFormatInvalid;
+
+        case MTLDataTypeFloat3x2:       return MTLVertexFormatInvalid;
+        case MTLDataTypeFloat3x3:       return MTLVertexFormatInvalid;
+        case MTLDataTypeFloat3x4:       return MTLVertexFormatInvalid;
+
+        case MTLDataTypeFloat4x2:       return MTLVertexFormatInvalid;
+        case MTLDataTypeFloat4x3:       return MTLVertexFormatInvalid;
+        case MTLDataTypeFloat4x4:       return MTLVertexFormatInvalid;
+
+        case MTLDataTypeHalf:           return MTLVertexFormatHalf2;
+        case MTLDataTypeHalf2:          return MTLVertexFormatHalf2;
+        case MTLDataTypeHalf3:          return MTLVertexFormatHalf3;
+        case MTLDataTypeHalf4:          return MTLVertexFormatHalf4;
+
+        case MTLDataTypeHalf2x2:        return MTLVertexFormatInvalid;
+        case MTLDataTypeHalf2x3:        return MTLVertexFormatInvalid;
+        case MTLDataTypeHalf2x4:        return MTLVertexFormatInvalid;
+
+        case MTLDataTypeHalf3x2:        return MTLVertexFormatInvalid;
+        case MTLDataTypeHalf3x3:        return MTLVertexFormatInvalid;
+        case MTLDataTypeHalf3x4:        return MTLVertexFormatInvalid;
+
+        case MTLDataTypeHalf4x2:        return MTLVertexFormatInvalid;
+        case MTLDataTypeHalf4x3:        return MTLVertexFormatInvalid;
+        case MTLDataTypeHalf4x4:        return MTLVertexFormatInvalid;
+
+        case MTLDataTypeInt:            return MTLVertexFormatInt;
+        case MTLDataTypeInt2:           return MTLVertexFormatInt2;
+        case MTLDataTypeInt3:           return MTLVertexFormatInt3;
+        case MTLDataTypeInt4:           return MTLVertexFormatInt4;
+
+        case MTLDataTypeUInt:           return MTLVertexFormatUInt;
+        case MTLDataTypeUInt2:          return MTLVertexFormatUInt2;
+        case MTLDataTypeUInt3:          return MTLVertexFormatUInt3;
+        case MTLDataTypeUInt4:          return MTLVertexFormatUInt4;
+
+        case MTLDataTypeShort:          return MTLVertexFormatShort2;
+        case MTLDataTypeShort2:         return MTLVertexFormatShort2;
+        case MTLDataTypeShort3:         return MTLVertexFormatShort3;
+        case MTLDataTypeShort4:         return MTLVertexFormatShort4;
+
+        case MTLDataTypeUShort:         return MTLVertexFormatUShort2;
+        case MTLDataTypeUShort2:        return MTLVertexFormatUShort2;
+        case MTLDataTypeUShort3:        return MTLVertexFormatUShort3;
+        case MTLDataTypeUShort4:        return MTLVertexFormatUShort4;
+
+        case MTLDataTypeChar:           return MTLVertexFormatChar2;
+        case MTLDataTypeChar2:          return MTLVertexFormatChar2;
+        case MTLDataTypeChar3:          return MTLVertexFormatChar3;
+        case MTLDataTypeChar4:          return MTLVertexFormatChar4;
+
+        case MTLDataTypeUChar:          return MTLVertexFormatUChar2;
+        case MTLDataTypeUChar2:         return MTLVertexFormatUChar2;
+        case MTLDataTypeUChar3:         return MTLVertexFormatUChar3;
+        case MTLDataTypeUChar4:         return MTLVertexFormatUChar4;
+
+        case MTLDataTypeBool:           return MTLVertexFormatFloat;
+        case MTLDataTypeBool2:          return MTLVertexFormatFloat2;
+        case MTLDataTypeBool3:          return MTLVertexFormatFloat3;
+        case MTLDataTypeBool4:          return MTLVertexFormatFloat4;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    GpuConstantType MetalMappings::get( MTLDataType dataType )
+    {
+        switch( dataType )
+        {
+        case MTLDataTypeNone:           return GCT_UNKNOWN;
+        case MTLDataTypeStruct:         return GCT_UNKNOWN;
+        case MTLDataTypeArray:          return GCT_UNKNOWN;
+
+        case MTLDataTypeFloat:          return GCT_FLOAT1;
+        case MTLDataTypeFloat2:         return GCT_FLOAT2;
+        case MTLDataTypeFloat3:         return GCT_FLOAT3;
+        case MTLDataTypeFloat4:         return GCT_FLOAT4;
+
+        case MTLDataTypeFloat2x2:       return GCT_MATRIX_2X2;
+        case MTLDataTypeFloat2x3:       return GCT_MATRIX_2X3;
+        case MTLDataTypeFloat2x4:       return GCT_MATRIX_2X4;
+
+        case MTLDataTypeFloat3x2:       return GCT_MATRIX_3X2;
+        case MTLDataTypeFloat3x3:       return GCT_MATRIX_3X3;
+        case MTLDataTypeFloat3x4:       return GCT_MATRIX_3X4;
+
+        case MTLDataTypeFloat4x2:       return GCT_MATRIX_4X2;
+        case MTLDataTypeFloat4x3:       return GCT_MATRIX_4X3;
+        case MTLDataTypeFloat4x4:       return GCT_MATRIX_4X4;
+
+        case MTLDataTypeHalf:           return GCT_UNKNOWN;
+        case MTLDataTypeHalf2:          return GCT_UNKNOWN;
+        case MTLDataTypeHalf3:          return GCT_UNKNOWN;
+        case MTLDataTypeHalf4:          return GCT_UNKNOWN;
+
+        case MTLDataTypeHalf2x2:        return GCT_UNKNOWN;
+        case MTLDataTypeHalf2x3:        return GCT_UNKNOWN;
+        case MTLDataTypeHalf2x4:        return GCT_UNKNOWN;
+
+        case MTLDataTypeHalf3x2:        return GCT_UNKNOWN;
+        case MTLDataTypeHalf3x3:        return GCT_UNKNOWN;
+        case MTLDataTypeHalf3x4:        return GCT_UNKNOWN;
+
+        case MTLDataTypeHalf4x2:        return GCT_UNKNOWN;
+        case MTLDataTypeHalf4x3:        return GCT_UNKNOWN;
+        case MTLDataTypeHalf4x4:        return GCT_UNKNOWN;
+
+        case MTLDataTypeInt:            return GCT_INT1;
+        case MTLDataTypeInt2:           return GCT_INT2;
+        case MTLDataTypeInt3:           return GCT_INT3;
+        case MTLDataTypeInt4:           return GCT_INT4;
+
+        case MTLDataTypeUInt:           return GCT_UINT1;
+        case MTLDataTypeUInt2:          return GCT_UINT2;
+        case MTLDataTypeUInt3:          return GCT_UINT3;
+        case MTLDataTypeUInt4:          return GCT_UINT4;
+
+        case MTLDataTypeShort:          return GCT_UNKNOWN;
+        case MTLDataTypeShort2:         return GCT_UNKNOWN;
+        case MTLDataTypeShort3:         return GCT_UNKNOWN;
+        case MTLDataTypeShort4:         return GCT_UNKNOWN;
+
+        case MTLDataTypeUShort:         return GCT_UNKNOWN;
+        case MTLDataTypeUShort2:        return GCT_UNKNOWN;
+        case MTLDataTypeUShort3:        return GCT_UNKNOWN;
+        case MTLDataTypeUShort4:        return GCT_UNKNOWN;
+
+        case MTLDataTypeChar:           return GCT_UNKNOWN;
+        case MTLDataTypeChar2:          return GCT_UNKNOWN;
+        case MTLDataTypeChar3:          return GCT_UNKNOWN;
+        case MTLDataTypeChar4:          return GCT_UNKNOWN;
+
+        case MTLDataTypeUChar:          return GCT_UNKNOWN;
+        case MTLDataTypeUChar2:         return GCT_UNKNOWN;
+        case MTLDataTypeUChar3:         return GCT_UNKNOWN;
+        case MTLDataTypeUChar4:         return GCT_UNKNOWN;
+
+        case MTLDataTypeBool:           return GCT_BOOL1;
+        case MTLDataTypeBool2:          return GCT_BOOL2;
+        case MTLDataTypeBool3:          return GCT_BOOL3;
+        case MTLDataTypeBool4:          return GCT_BOOL4;
+        }
+    }
 }

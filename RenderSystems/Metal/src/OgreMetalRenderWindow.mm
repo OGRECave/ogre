@@ -91,11 +91,9 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderWindow::swapBuffers(void)
     {
-        if( mColourAttachmentDesc.loadAction == MTLLoadActionClear )
-        {
-            //A clear has been asked but no rendering command was issued. Do it now.
-            mRenderSystem->_clearRenderTargetImmediately( this );
-        }
+        assert( mColourAttachmentDesc.loadAction != MTLLoadActionClear &&
+                "A clear has been asked but no rendering command was "
+                "issued and Ogre didn't catch it." );
 
         RenderWindow::swapBuffers();
 

@@ -1,5 +1,5 @@
 @piece( Common_Matrix_DeclUnpackMatrix4x4 )
-inline float4x4 UNPACK_MAT4( device float4 *matrixBuf, uint pixelIdx )
+inline float4x4 UNPACK_MAT4( device const float4 *matrixBuf, uint pixelIdx )
 {
 	float4 row0 = matrixBuf[(pixelIdx << 2u)];
 	float4 row1 = matrixBuf[(pixelIdx << 2u) + 1u];
@@ -10,7 +10,7 @@ inline float4x4 UNPACK_MAT4( device float4 *matrixBuf, uint pixelIdx )
 @end
 
 @piece( Common_Matrix_DeclUnpackMatrix3x4 )
-inline float3x4 UNPACK_MAT3x4( device float4 *matrixBuf, uint pixelIdx )
+inline float3x4 UNPACK_MAT3x4( device const float4 *matrixBuf, uint pixelIdx )
 {
 	float4 row0 = matrixBuf[(pixelIdx << 2u)];
 	float4 row1 = matrixBuf[(pixelIdx << 2u) + 1u];

@@ -44,6 +44,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalHardwareIndexBuffer.h"
 #include "OgreMetalHardwareVertexBuffer.h"
 
+#include "Vao/OgreMetalConstBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "Vao/OgreVertexArrayObject.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
@@ -71,6 +72,9 @@ namespace Ogre
         mCurrentIndexBuffer( 0 ),
         mCurrentVertexBuffer( 0 ),
         mCurrentPrimType( MTLPrimitiveTypePoint ),
+        mAutoParamsBufferIdx( 0 ),
+        mCurrentAutoParamsBufferPtr( 0 ),
+        mCurrentAutoParamsBufferSpaceLeft( 0 ),
         mNumMRTs( 0 ),
         mCurrentDepthBuffer( 0 ),
         mActiveDevice( 0 ),
@@ -78,12 +82,24 @@ namespace Ogre
         mDevice( this ),
         mMainGpuSyncSemaphore( 0 )
     {
+        memset( mHistoricalAutoParamsSize, 0, sizeof(mHistoricalAutoParamsSize) );
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
             mCurrentColourRTs[i] = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::shutdown(void)
     {
+        for( size_t i=0; i<mAutoParamsBuffer.size(); ++i )
+        {
+            if( mAutoParamsBuffer[i]->getMappingState() != MS_UNMAPPED )
+                mAutoParamsBuffer[i]->unmap( UO_UNMAP_ALL );
+            mVaoManager->destroyConstBuffer( mAutoParamsBuffer[i] );
+        }
+        mAutoParamsBuffer.clear();
+        mAutoParamsBufferIdx = 0;
+        mCurrentAutoParamsBufferPtr = 0;
+        mCurrentAutoParamsBufferSpaceLeft = 0;
+
         RenderSystem::shutdown();
 
         OGRE_DELETE mHardwareBufferManager;
@@ -417,6 +433,9 @@ namespace Ogre
     void MetalRenderSystem::_endFrameOnce(void)
     {
         //TODO: We shouldn't tidy up JUST the active device. But all of them.
+
+        cleanAutoParamsBuffers();
+
         __block dispatch_semaphore_t blockSemaphore = mMainGpuSyncSemaphore;
         [mActiveDevice->mCurrentCommandBuffer addCompletedHandler:^(id<MTLCommandBuffer> buffer)
         {
@@ -427,6 +446,57 @@ namespace Ogre
         }];
 
         mActiveDevice->commitAndNextCommandBuffer();
+
+        mActiveRenderTarget = 0;
+        mActiveViewport = 0;
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::cleanAutoParamsBuffers(void)
+    {
+        const size_t numUsedBuffers = mAutoParamsBufferIdx;
+        size_t usedBytes = 0;
+        for( size_t i=0; i<numUsedBuffers; ++i )
+        {
+            mAutoParamsBuffer[i]->unmap( (i == 0u && numUsedBuffers == 1u) ? UO_KEEP_PERSISTENT :
+                                                                             UO_UNMAP_ALL );
+            usedBytes += mAutoParamsBuffer[i]->getTotalSizeBytes();
+        }
+
+        //Get the max amount of bytes consumed in the last N frames.
+        const int numHistoricSamples = sizeof(mHistoricalAutoParamsSize) /
+                                       sizeof(mHistoricalAutoParamsSize[0]);
+        mHistoricalAutoParamsSize[numHistoricSamples-1] = usedBytes;
+        for( int i=0; i<numHistoricSamples - 1; ++i )
+        {
+            usedBytes = std::max( usedBytes, mHistoricalAutoParamsSize[i + 1] );
+            mHistoricalAutoParamsSize[i] = mHistoricalAutoParamsSize[i + 1];
+        }
+
+        if( //Merge all buffers into one for the next frame.
+            numUsedBuffers > 1u ||
+            //Historic data shows we've been using less memory. Shrink this record.
+            (!mAutoParamsBuffer.empty() && mAutoParamsBuffer[0]->getTotalSizeBytes() > usedBytes) )
+        {
+            if( mAutoParamsBuffer[0]->getMappingState() != MS_UNMAPPED )
+                mAutoParamsBuffer[0]->unmap( UO_UNMAP_ALL );
+
+            for( size_t i=0; i<mAutoParamsBuffer.size(); ++i )
+                mVaoManager->destroyConstBuffer( mAutoParamsBuffer[i] );
+            mAutoParamsBuffer.clear();
+
+            if( usedBytes > 0 )
+            {
+                ConstBufferPacked *constBuffer = mVaoManager->createConstBuffer( usedBytes,
+                                                                                 BT_DYNAMIC_PERSISTENT,
+                                                                                 0, false );
+                mAutoParamsBuffer.push_back( constBuffer );
+            }
+        }
+
+        mCurrentAutoParamsBufferPtr = 0;
+        mCurrentAutoParamsBufferSpaceLeft = 0;
+        mAutoParamsBufferIdx = 0;
+
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrame(void)
@@ -453,19 +523,24 @@ namespace Ogre
                     _setRenderTarget( vp->getTarget(), vp->getColourWrite() );
                 }
 
-                if( mActiveRenderEncoder || (!mActiveRenderEncoder && !vp->coversEntireTarget()) )
+                if( mActiveRenderEncoder || ( !mActiveRenderEncoder &&
+                                              (!vp->coversEntireTarget() ||
+                                               !vp->scissorsMatchViewport()) ) )
                 {
                     if( !mActiveRenderEncoder )
                         createRenderEncoder();
 
-                    MTLViewport mtlVp;
-                    mtlVp.originX   = vp->getActualLeft();
-                    mtlVp.originY   = vp->getActualTop();
-                    mtlVp.width     = vp->getActualWidth();
-                    mtlVp.height    = vp->getActualHeight();
-                    mtlVp.znear     = 0;
-                    mtlVp.zfar      = 1;
-                    [mActiveRenderEncoder setViewport:mtlVp];
+                    if( !vp->coversEntireTarget() )
+                    {
+                        MTLViewport mtlVp;
+                        mtlVp.originX   = vp->getActualLeft();
+                        mtlVp.originY   = vp->getActualTop();
+                        mtlVp.width     = vp->getActualWidth();
+                        mtlVp.height    = vp->getActualHeight();
+                        mtlVp.znear     = 0;
+                        mtlVp.zfar      = 1;
+                        [mActiveRenderEncoder setViewport:mtlVp];
+                    }
 
                     if( !vp->scissorsMatchViewport() )
                     {
@@ -494,27 +569,60 @@ namespace Ogre
     {
         assert( mActiveDevice );
 
+        const bool hadActiveRenderEncoder = mActiveRenderEncoder;
+        Viewport *prevViewport = 0;
+        RenderTarget *prevRenderTarget = 0;
+        if( hadActiveRenderEncoder )
+        {
+            //Ending all encoders will clear those, so we'll have to restore them.
+            prevViewport = mActiveViewport;
+            prevRenderTarget = mActiveRenderTarget;
+        }
+
         mActiveDevice->endAllEncoders();
         mActiveRenderEncoder = 0;
+
+        if( hadActiveRenderEncoder )
+        {
+            if( prevViewport && (!prevViewport->coversEntireTarget() ||
+                                 !prevViewport->scissorsMatchViewport()) )
+            {
+                _setViewport( prevViewport );
+            }
+            else
+            {
+                mActiveViewport = prevViewport;
+                mActiveRenderTarget = prevRenderTarget;
+            }
+        }
 
         //TODO: With a couple modifications, Compositor should be able to tell us
         //if we can use MTLStoreActionDontCare.
 
         MTLRenderPassDescriptor *passDesc = [MTLRenderPassDescriptor renderPassDescriptor];
         for( uint8 i=0; i<mNumMRTs; ++i )
+        {
             passDesc.colorAttachments[i] = [mCurrentColourRTs[i]->mColourAttachmentDesc copy];
+            mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionLoad;
+        }
 
         if( mCurrentDepthBuffer )
         {
             MTLRenderPassDepthAttachmentDescriptor *descDepth =
                     mCurrentDepthBuffer->mDepthAttachmentDesc;
             if( descDepth )
+            {
                 passDesc.depthAttachment = [descDepth copy];
+                descDepth.loadAction = MTLLoadActionLoad;
+            }
 
             MTLRenderPassStencilAttachmentDescriptor *descStencil =
                     mCurrentDepthBuffer->mStencilAttachmentDesc;
             if( descStencil )
+            {
                 passDesc.stencilAttachment = [descStencil copy];
+                descStencil.loadAction = MTLLoadActionLoad;
+            }
         }
 
         mActiveDevice->mRenderEncoder =
@@ -526,32 +634,6 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
     {
-        if( mActiveRenderTarget && mActiveRenderEncoder )
-        {
-            for( size_t i=0; i<mNumMRTs; ++i )
-            {
-                if( mCurrentColourRTs[i] )
-                {
-                    if( mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction == MTLLoadActionClear )
-                        mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionLoad;
-                }
-            }
-
-            if( mCurrentDepthBuffer )
-            {
-                if( mCurrentDepthBuffer->mDepthAttachmentDesc &&
-                    mCurrentDepthBuffer->mDepthAttachmentDesc.loadAction == MTLLoadActionClear )
-                {
-                    mCurrentDepthBuffer->mDepthAttachmentDesc.loadAction = MTLLoadActionLoad;
-                }
-                if( mCurrentDepthBuffer->mStencilAttachmentDesc &&
-                    mCurrentDepthBuffer->mStencilAttachmentDesc.loadAction == MTLLoadActionClear )
-                {
-                    mCurrentDepthBuffer->mStencilAttachmentDesc.loadAction = MTLLoadActionLoad;
-                }
-            }
-        }
-
         mActiveViewport = 0;
         mActiveRenderTarget = 0;
         mActiveRenderEncoder = 0;
@@ -566,25 +648,6 @@ namespace Ogre
 
         hwBufferMgr->_notifyDeviceStalled();
         vaoManager->_notifyDeviceStalled();
-    }
-    //-------------------------------------------------------------------------
-    void MetalRenderSystem::_clearRenderTargetImmediately( RenderTarget *renderTarget )
-    {
-        //asd;
-//        assert( false );
-
-//        const MetalHlmsPso *oldPso = mPso;
-//        Viewport *oldVp = mActiveViewport;
-//        RenderTarget *oldRt = mActiveRenderTarget;
-//        const bool activeHasColourWrites = mNumMRTs != 0;
-
-//        _setRenderTarget( renderTarget, true );
-//        createRenderEncoder();
-
-        //Restore relevant state
-//        _setViewport( oldVp );
-//        _setRenderTarget( oldRt, activeHasColourWrites );
-//        _setPipelineStateObject( oldPso );
     }
     //-------------------------------------------------------------------------
     id <MTLDepthStencilState> MetalRenderSystem::getDepthStencilState( HlmsPso *pso )
@@ -668,18 +731,19 @@ namespace Ogre
         MTLRenderPipelineDescriptor *psd = [[MTLRenderPipelineDescriptor alloc] init];
         [psd setSampleCount: newPso->pass.multisampleCount];
 
+        MetalProgram *vertexShader = 0;
+        MetalProgram *pixelShader = 0;
+
         if( !newPso->vertexShader.isNull() )
         {
-            MetalProgram *shader = static_cast<MetalProgram*>( newPso->vertexShader->
-                                                               _getBindingDelegate() );
-            [psd setVertexFunction:shader->getMetalFunction()];
+            vertexShader = static_cast<MetalProgram*>( newPso->vertexShader->_getBindingDelegate() );
+            [psd setVertexFunction:vertexShader->getMetalFunction()];
         }
 
         if( !newPso->pixelShader.isNull() )
         {
-            MetalProgram *shader = static_cast<MetalProgram*>( newPso->pixelShader->
-                                                               _getBindingDelegate() );
-            [psd setFragmentFunction:shader->getMetalFunction()];
+            pixelShader = static_cast<MetalProgram*>( newPso->pixelShader->_getBindingDelegate() );
+            [psd setFragmentFunction:pixelShader->getMetalFunction()];
         }
         //Ducttape shaders
 //        id<MTLLibrary> library = [mActiveDevice->mDevice newDefaultLibrary];
@@ -782,9 +846,15 @@ namespace Ogre
         id <MTLRenderPipelineState> pso =
                 [mActiveDevice->mDevice newRenderPipelineStateWithDescriptor:psd error:&error];
 
-        //TODO: Ogre should throw.
-        if( !pso ) {
-            NSLog(@"Failed to created pipeline state, error %@", error);
+        if( !pso || error )
+        {
+            String errorDesc;
+            if( error )
+                errorDesc = [error localizedDescription].UTF8String;
+
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Failed to created pipeline state for rendering, error " + errorDesc,
+                         "MetalRenderSystem::_hlmsPipelineStateObjectCreated" );
         }
 
         id <MTLDepthStencilState> depthStencilState = getDepthStencilState( newPso );
@@ -792,6 +862,8 @@ namespace Ogre
         MetalHlmsPso *metalPso = new MetalHlmsPso();
         metalPso->pso = pso;
         metalPso->depthStencilState = depthStencilState;
+        metalPso->vertexShader      = vertexShader;
+        metalPso->pixelShader       = pixelShader;
 
         newPso->rsData = metalPso;
     }
@@ -1362,9 +1434,108 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    void MetalRenderSystem::bindGpuProgramParameters(GpuProgramType gptype,
-        GpuProgramParametersSharedPtr params, uint16 variabilityMask)
+    void MetalRenderSystem::bindGpuProgramParameters( GpuProgramType gptype,
+                                                      GpuProgramParametersSharedPtr params,
+                                                      uint16 variabilityMask )
     {
+        MetalProgram *shader = 0;
+        switch (gptype)
+        {
+        case GPT_VERTEX_PROGRAM:
+            mActiveVertexGpuProgramParameters = params;
+            shader = mPso->vertexShader;
+            break;
+        case GPT_FRAGMENT_PROGRAM:
+            mActiveFragmentGpuProgramParameters = params;
+            shader = mPso->pixelShader;
+            break;
+        case GPT_GEOMETRY_PROGRAM:
+            mActiveGeometryGpuProgramParameters = params;
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "Geometry Shaders are not supported in Metal.",
+                         "MetalRenderSystem::bindGpuProgramParameters" );
+            break;
+        case GPT_HULL_PROGRAM:
+            mActiveTessellationHullGpuProgramParameters = params;
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "Tesselation is different in Metal.",
+                         "MetalRenderSystem::bindGpuProgramParameters" );
+            break;
+        case GPT_DOMAIN_PROGRAM:
+            mActiveTessellationDomainGpuProgramParameters = params;
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "Tesselation is different in Metal.",
+                         "MetalRenderSystem::bindGpuProgramParameters" );
+            break;
+        case GPT_COMPUTE_PROGRAM:
+            mActiveComputeGpuProgramParameters = params;
+            //shader = mCurrentComputeShader;
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
+                         "TODO Compute",
+                         "MetalRenderSystem::bindGpuProgramParameters" );
+            break;
+        default:
+            break;
+        }
+
+        size_t bytesToWrite = shader->getBufferRequiredSize();
+        if( shader && bytesToWrite > 0 )
+        {
+            if( mCurrentAutoParamsBufferSpaceLeft < bytesToWrite )
+            {
+                if( mAutoParamsBufferIdx >= mAutoParamsBuffer.size() )
+                {
+                    ConstBufferPacked *constBuffer =  mVaoManager->createConstBuffer(
+                                std::max<size_t>( 512u * 1024u, bytesToWrite ),
+                                BT_DYNAMIC_PERSISTENT, 0, false );
+                    mAutoParamsBuffer.push_back( constBuffer );
+                }
+
+                ConstBufferPacked *constBuffer = mAutoParamsBuffer[mAutoParamsBufferIdx];
+                mCurrentAutoParamsBufferPtr = reinterpret_cast<uint8*>(
+                            constBuffer->map( 0, constBuffer->getNumElements() ) );
+                mCurrentAutoParamsBufferSpaceLeft = constBuffer->getTotalSizeBytes();
+
+                ++mAutoParamsBufferIdx;
+            }
+
+            shader->updateBuffers( params, mCurrentAutoParamsBufferPtr );
+
+            assert( dynamic_cast<MetalConstBufferPacked*>(
+                    mAutoParamsBuffer[mAutoParamsBufferIdx-1u] ) );
+
+            MetalConstBufferPacked *constBuffer = static_cast<MetalConstBufferPacked*>(
+                        mAutoParamsBuffer[mAutoParamsBufferIdx-1u] );
+            switch (gptype)
+            {
+            case GPT_VERTEX_PROGRAM:
+                constBuffer->bindBufferVS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START );
+                break;
+            case GPT_FRAGMENT_PROGRAM:
+                constBuffer->bindBufferPS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START );
+                break;
+            case GPT_COMPUTE_PROGRAM:
+                constBuffer->bindBufferCS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START );
+                break;
+            case GPT_GEOMETRY_PROGRAM:
+            case GPT_HULL_PROGRAM:
+            case GPT_DOMAIN_PROGRAM:
+                break;
+            }
+
+            mCurrentAutoParamsBufferPtr += bytesToWrite;
+
+            const uint8 *oldBufferPos = mCurrentAutoParamsBufferPtr;
+            mCurrentAutoParamsBufferPtr = reinterpret_cast<uint8*>(
+                    alignToNextMultiple( reinterpret_cast<uintptr_t>( mCurrentAutoParamsBufferPtr ),
+                                         mVaoManager->getConstBufferAlignment() ) );
+            bytesToWrite += mCurrentAutoParamsBufferPtr - oldBufferPos;
+
+            //We know that bytesToWrite <= mCurrentAutoParamsBufferSpaceLeft, but that was
+            //before padding. After padding this may no longer hold true.
+            mCurrentAutoParamsBufferSpaceLeft -= std::min( mCurrentAutoParamsBufferSpaceLeft,
+                                                           bytesToWrite );
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::bindGpuProgramPassIterationParameters(GpuProgramType gptype)
@@ -1522,6 +1693,50 @@ namespace Ogre
         {
             mNumMRTs = 0;
             mCurrentDepthBuffer = 0;
+        }
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget )
+    {
+        if( previousTarget )
+        {
+            bool mustClear = false;
+            MetalRenderTargetCommon *currentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
+            previousTarget->getCustomAttribute( "MetalRenderTargetCommon", &currentColourRTs[0] );
+
+            //TODO: Deal with MRT
+            //for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+            for( size_t i=0; i<1u; ++i )
+            {
+                if( currentColourRTs[i] )
+                {
+                    if( currentColourRTs[i]->mColourAttachmentDesc.loadAction == MTLLoadActionClear )
+                        mustClear = true;
+                }
+            }
+
+            MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>(
+                        previousTarget->getDepthBuffer() );
+
+            if( depthBuffer )
+            {
+                if( depthBuffer->mDepthAttachmentDesc &&
+                    depthBuffer->mDepthAttachmentDesc.loadAction == MTLLoadActionClear )
+                {
+                    mustClear = true;
+                }
+                if( depthBuffer->mStencilAttachmentDesc &&
+                    depthBuffer->mStencilAttachmentDesc.loadAction == MTLLoadActionClear )
+                {
+                    mustClear = true;
+                }
+            }
+
+            if( mustClear )
+            {
+                _setRenderTarget( previousTarget, true );
+                createRenderEncoder();
+            }
         }
     }
     //-------------------------------------------------------------------------

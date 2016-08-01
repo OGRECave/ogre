@@ -20,7 +20,12 @@ ogre_add_component_include_dir(Overlays)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Sample_Forward3D WIN32 ${SOURCE_FILES})
+ogre_add_executable(Sample_Forward3D WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
 target_link_libraries(Sample_Forward3D ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_Forward3D)
+
+if( APPLE )
+	set_target_properties( Sample_Forward3D PROPERTIES RESOURCE "${SAMPLE_COMMON_RESOURCES}" )
+	set_target_properties( Sample_Forward3D PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SAMPLES_PLIST} )
+endif()

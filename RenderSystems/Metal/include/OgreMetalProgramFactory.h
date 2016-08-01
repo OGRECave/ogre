@@ -27,11 +27,13 @@ THE SOFTWARE.
 */
 
 
-#ifndef __OgreMetalProgramFactory_H__
-#define __OgreMetalProgramFactory_H__
+#ifndef _OgreMetalProgramFactory_H_
+#define _OgreMetalProgramFactory_H_
 
 #import "OgreMetalPrerequisites.h"
 #import "OgreHighLevelGpuProgramManager.h"
+
+@protocol MTLFunction;
 
 namespace Ogre
 {
@@ -41,6 +43,8 @@ namespace Ogre
     protected:
         static String sLanguageName;
         MetalDevice *mDevice;
+
+        id<MTLFunction> mReflectionVertexShaderFunction;
 
     public:
         MetalProgramFactory( MetalDevice *device );
@@ -52,6 +56,9 @@ namespace Ogre
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
         void destroy(HighLevelGpuProgram* prog);
+
+        id<MTLFunction> getReflectionVertexShaderFunction(void) const
+                                                { return mReflectionVertexShaderFunction; };
     };
 }
 

@@ -340,33 +340,22 @@ namespace Ogre
 
         if( mUsage & TU_RENDERTARGET )
         {
+        #if OGRE_DEBUG_MODE
             RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
-
             if( PixelUtil::isDepth( renderTarget->getFormat() ) )
             {
-            #if OGRE_DEBUG_MODE
                 assert( dynamic_cast<MetalDepthTextureTarget*>( renderTarget ) );
-            #endif
                 MetalDepthBuffer *depthBuffer = static_cast<MetalDepthBuffer*>(
                             renderTarget->getDepthBuffer() );
-                if( depthBuffer->mDepthAttachmentDesc.loadAction == MTLLoadActionClear )
-                {
-                    //A clear has been asked but no rendering command was issued. Do it now.
-                    renderSystem->_clearRenderTargetImmediately( renderTarget );
-                }
+                assert( depthBuffer->mDepthAttachmentDesc.loadAction != MTLLoadActionClear );
             }
             else
             {
-            #if OGRE_DEBUG_MODE
                 assert( dynamic_cast<MetalRenderTexture*>( renderTarget ) );
-            #endif
                 MetalRenderTexture *renderTexture = static_cast<MetalRenderTexture*>( renderTarget );
-                if( renderTexture->mColourAttachmentDesc.loadAction == MTLLoadActionClear )
-                {
-                    //A clear has been asked but no rendering command was issued. Do it now.
-                    renderSystem->_clearRenderTargetImmediately( renderTexture );
-                }
+                assert( renderTexture->mColourAttachmentDesc.loadAction != MTLLoadActionClear );
             }
+        #endif
 
             if( mFSAA > 1u )
             {

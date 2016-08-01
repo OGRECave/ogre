@@ -35,6 +35,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreBlendMode.h"
 #include "Vao/OgreVertexElements.h"
 #include "OgreHlmsSamplerblock.h"
+#include "OgreGpuProgramParams.h"
 
 #import <Metal/MTLDepthStencil.h>
 #import <Metal/MTLPixelFormat.h>
@@ -63,6 +64,10 @@ namespace Ogre
         static MTLSamplerMinMagFilter get( FilterOptions filter );
         static MTLSamplerMipFilter getMipFilter( FilterOptions filter );
         static MTLSamplerAddressMode get( TextureAddressingMode mode );
+
+        static MTLVertexFormat dataTypeToVertexFormat( MTLDataType dataType );
+
+        static GpuConstantType get( MTLDataType dataType );
     };
 }
 

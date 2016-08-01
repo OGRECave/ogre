@@ -149,7 +149,7 @@ vertex PS_INPUT main_metal
 	// START UNIFORM DECLARATION
 	@insertpiece( PassDecl )
 	@property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
-	, device float4 *worldMatBuf [[buffer(24)]]
+	, device const float4 *worldMatBuf [[buffer(TEX_SLOT_START+0)]]
 	@insertpiece( custom_vs_uniformDeclaration )
 	// END UNIFORM DECLARATION
 )

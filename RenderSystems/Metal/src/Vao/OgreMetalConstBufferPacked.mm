@@ -50,25 +50,40 @@ namespace Ogre
     {
     }
     //-----------------------------------------------------------------------------------
-    void MetalConstBufferPacked::bindBufferVS( uint16 slot )
+    void MetalConstBufferPacked::bindBufferVS( uint16 slot, uint32 offsetBytes )
     {
         assert( mDevice->mRenderEncoder );
         assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
         MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
 
         [mDevice->mRenderEncoder setVertexBuffer:bufferInterface->getVboName()
-                                          offset:mFinalBufferStart * mBytesPerElement
+                                          offset:mFinalBufferStart * mBytesPerElement + offsetBytes
                                          atIndex:slot + OGRE_METAL_CONST_SLOT_START];
     }
     //-----------------------------------------------------------------------------------
-    void MetalConstBufferPacked::bindBufferPS( uint16 slot )
+    void MetalConstBufferPacked::bindBufferPS( uint16 slot, uint32 offsetBytes )
     {
         assert( mDevice->mRenderEncoder );
         assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
         MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
 
         [mDevice->mRenderEncoder setFragmentBuffer:bufferInterface->getVboName()
-                                            offset:mFinalBufferStart * mBytesPerElement
+                                            offset:mFinalBufferStart * mBytesPerElement + offsetBytes
                                            atIndex:slot + OGRE_METAL_CONST_SLOT_START];
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalConstBufferPacked::bindBufferVS( uint16 slot )
+    {
+        bindBufferVS( slot, 0 );
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalConstBufferPacked::bindBufferPS( uint16 slot )
+    {
+        bindBufferPS( slot, 0 );
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalConstBufferPacked::bindBufferCS( uint16 slot )
+    {
+        bindBufferCS( slot, 0 );
     }
 }

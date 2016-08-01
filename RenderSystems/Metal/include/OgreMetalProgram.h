@@ -25,18 +25,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-#ifndef __OgreMetalProgram_H__
-#define __OgreMetalProgram_H__
+#ifndef _OgreMetalProgram_H_
+#define _OgreMetalProgram_H_
 
-#import "OgreMetalPrerequisites.h"
-#import "OgreHighLevelGpuProgram.h"
-#import "OgreHardwareVertexBuffer.h"
+#include "OgreMetalPrerequisites.h"
+#include "OgreHighLevelGpuProgram.h"
+#include "OgreHardwareVertexBuffer.h"
 #import <Metal/MTLLibrary.h>
 #import <Metal/MTLRenderPipeline.h>
 #import <Metal/MTLRenderCommandEncoder.h>
 
+@class MTLArgument;
 
-namespace Ogre {
+namespace Ogre
+{
     /** Specialisation of HighLevelGpuProgram to provide support for Metal
         Shader Language.
     @remarks
@@ -101,12 +103,14 @@ namespace Ogre {
 
         /// Compile source into shader object
         bool compile(const bool checkErrors = false);
+        void analyzeRenderParameters(void);
+        void analyzeParameterBuffer( MTLArgument *arg );
 
-        /// Execute the param binding functions for this program
-        void bindProgramParameters(id <MTLRenderCommandEncoder> &encoder, GpuProgramParametersSharedPtr params, uint16 mask);
-        void bindProgramPassIterationParameters(GpuProgramParametersSharedPtr params) {}
-        void bindUniformBuffers(id <MTLRenderCommandEncoder> &encoder, const Renderable *rend, const Pass *pass, const GpuProgramParametersSharedPtr params, MTLRenderPipelineDescriptor *pipeline);
-        void updateAttributeBuffer(id <MTLRenderCommandEncoder> &encoder, const size_t index, const size_t vertexStart, v1::HardwareVertexBufferSharedPtr hwBuffer);
+        /// In bytes.
+        uint32 getBufferRequiredSize(void) const;
+        /// dstData must be able to hold at least getBufferRequiredSize
+        void updateBuffers( const GpuProgramParametersSharedPtr &params,
+                            uint8 * RESTRICT_ALIAS dstData );
         NSUInteger getFunctionParamCount(void);
         size_t getSharedParamCount(void);
 
@@ -131,7 +135,7 @@ namespace Ogre {
         /// Populate the passed parameters with name->index map
         void populateParameterNames(GpuProgramParametersSharedPtr params);
         /// Populate the passed parameters with name->index map, must be overridden
-        void buildConstantDefinitions() const;
+        void buildConstantDefinitions(void) const;
 
     private:
         id <MTLLibrary> mLibrary;
@@ -141,10 +145,14 @@ namespace Ogre {
         
         /// Flag indicating if shader object successfully compiled
         bool mCompiled;
+        bool mCompilerErrors;
         /// Preprocessor options
         String mPreprocessorDefines;
         String mEntryPoint;
         String mTargetBufferName;
+
+        vector<GpuConstantDefinition>::type mConstantDefsSorted;
+        uint32 mConstantsBytesToWrite;
     };
 }
 

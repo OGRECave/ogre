@@ -51,7 +51,11 @@ namespace Ogre
         virtual void bindBufferGS( uint16 slot ) {}
         virtual void bindBufferHS( uint16 slot ) {}
         virtual void bindBufferDS( uint16 slot ) {}
-        virtual void bindBufferCS( uint16 slot ) {}
+        virtual void bindBufferCS( uint16 slot );
+
+        void bindBufferVS( uint16 slot, uint32 offsetBytes );
+        void bindBufferPS( uint16 slot, uint32 offsetBytes );
+        void bindBufferCS( uint16 slot, uint32 offsetBytes ) {}
     };
 }
 

@@ -39,6 +39,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     GpuProgram::CmdType GpuProgram::msTypeCmd;
     GpuProgram::CmdSyntax GpuProgram::msSyntaxCmd;
+    GpuProgram::CmdBuildParamsFromRefl GpuProgram::msBuildParamsFromReflCmd;
     GpuProgram::CmdSkeletal GpuProgram::msSkeletalCmd;
     GpuProgram::CmdMorph GpuProgram::msMorphCmd;
     GpuProgram::CmdPose GpuProgram::msPoseCmd;
@@ -52,8 +53,8 @@ namespace Ogre
     GpuProgram::GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 
         :Resource(creator, name, handle, group, isManual, loader),
-        mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true), mSkeletalAnimation(false),
-        mMorphAnimation(false), mPoseAnimation(0),
+        mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true), mBuildParametersFromReflection(true),
+        mSkeletalAnimation(false), mMorphAnimation(false), mPoseAnimation(0),
         mVertexTextureFetch(false), mNeedsAdjacencyInfo(false),
         mCompileError(false), mLoadedManualNamedConstants(false)
     {
@@ -329,6 +330,11 @@ namespace Ogre
         dict->addParameter(
             ParameterDef("syntax", "Syntax code, e.g. vs_1_1", PT_STRING), &msSyntaxCmd);
         dict->addParameter(
+            ParameterDef("build_parameters_from_reflection",
+                         "Whether to parse the shader to build parameters for auto "
+                         "params and such (optimization when disabled)", PT_BOOL),
+            &msBuildParamsFromReflCmd);
+        dict->addParameter(
             ParameterDef("includes_skeletal_animation", 
                          "Whether this vertex program includes skeletal animation", PT_BOOL), 
             &msSkeletalCmd);
@@ -434,6 +440,17 @@ namespace Ogre
     {
         GpuProgram* t = static_cast<GpuProgram*>(target);
         t->setSyntaxCode(val);
+    }
+    //-----------------------------------------------------------------------
+    String GpuProgram::CmdBuildParamsFromRefl::doGet(const void* target) const
+    {
+        const GpuProgram* t = static_cast<const GpuProgram*>(target);
+        return StringConverter::toString(t->getBuildParametersFromReflection());
+    }
+    void GpuProgram::CmdBuildParamsFromRefl::doSet(void* target, const String& val)
+    {
+        GpuProgram* t = static_cast<GpuProgram*>(target);
+        t->setBuildParametersFromReflection(StringConverter::parseBool(val));
     }
     //-----------------------------------------------------------------------
     String GpuProgram::CmdSkeletal::doGet(const void* target) const

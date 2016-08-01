@@ -62,7 +62,7 @@ struct PassData
 };@end
 
 @piece( PassDecl )
-, constant PassData &pass [[buffer(16)]]
+, constant PassData &pass [[buffer(CONST_SLOT_START+0)]]
 @end
 
 @property( fresnel_scalar )@piece( FresnelType )float3@end @piece( FresnelSwizzle )xyz@end @end
@@ -106,7 +106,7 @@ struct Material
 };@end
 
 @piece( MaterialDecl )
-, constant Material *materialArray [[buffer(17)]]
+, constant Material *materialArray [[buffer(CONST_SLOT_START+1)]]
 @end
 
 
@@ -120,7 +120,7 @@ struct Material
 //shadowConstantBias. Send the bias directly to avoid an
 //unnecessary indirection during the shadow mapping pass.
 //Must be loaded with uintBitsToFloat
-, constant uint4 *worldMaterialIdx [[buffer(18)]]
+, constant uint4 *worldMaterialIdx [[buffer(CONST_SLOT_START+2)]]
 @end
 
 //Reset texcoord to 0 for every shader stage (since values are preserved).

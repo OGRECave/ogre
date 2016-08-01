@@ -45,6 +45,9 @@ namespace Ogre
     {
         id<MTLRenderPipelineState> pso;
         id<MTLDepthStencilState> depthStencilState;
+
+        MetalProgram    *vertexShader;
+        MetalProgram    *pixelShader;
     };
 
     /** @} */

@@ -26,22 +26,53 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#import "OgreMetalProgramFactory.h"
-#import "OgreMetalProgram.h"
-#import "OgreRoot.h"
-#import "OgreHighLevelGpuProgram.h"
+#include "OgreMetalProgramFactory.h"
+#include "OgreMetalProgram.h"
+#include "OgreRoot.h"
+#include "OgreHighLevelGpuProgram.h"
+#include "OgreMetalDevice.h"
 
 namespace Ogre {
+    const char *c_dummyVertexShader =
+    "using namespace metal;\n"
+    "struct PS_INPUT { float4 gl_Position [[position]]; };"
+    "vertex PS_INPUT main_metal()\n"
+    "{"
+    "   PS_INPUT outVs;"
+    "   outVs.gl_Position = float4( 0, 0, 0, 1 );"
+    "   return outVs;\n"
+    "}";
     //-----------------------------------------------------------------------
     String MetalProgramFactory::sLanguageName = "metal";
     //-----------------------------------------------------------------------
     MetalProgramFactory::MetalProgramFactory( MetalDevice *device ) :
-        mDevice( device )
+        mDevice( device ),
+        mReflectionVertexShaderFunction( 0 )
     {
+        NSString *shaderSource = [NSString stringWithUTF8String:c_dummyVertexShader];
+
+        NSError *error = 0;
+        id<MTLLibrary> library = [mDevice->mDevice
+                newLibraryWithSource:shaderSource
+                             options:[[MTLCompileOptions alloc] init]
+                               error:&error];
+        if( !library )
+        {
+            String errorDesc;
+            if( error )
+                errorDesc = [error localizedDescription].UTF8String;
+
+            LogManager::getSingleton().logMessage(
+                        "Metal SL Compiler Error for basic shader using for reflection. "
+                        "Things could get bad:\n" + errorDesc );
+        }
+
+        mReflectionVertexShaderFunction = [library newFunctionWithName:@"main_metal"];
     }
     //-----------------------------------------------------------------------
     MetalProgramFactory::~MetalProgramFactory(void)
     {
+        mReflectionVertexShaderFunction = 0;
     }
     //-----------------------------------------------------------------------
     const String& MetalProgramFactory::getLanguage(void) const

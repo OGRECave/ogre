@@ -1271,6 +1271,45 @@ namespace Ogre
          */
         virtual void _setRenderTarget(RenderTarget *target, bool colourWrite) = 0;
 
+        /** This function was created because of Metal. The Metal API doesn't have a
+            'device->clear( texture )' function. Instead we must specify we want to
+            start rendering to a cleared surface. This allows mobile TBDR GPUs to begin
+            rendering without having to load any data from memory (saves a lot of bandwidth
+            and battery).
+        @par
+            But it also means Ogre must do an effort to delay the clear operation as much as
+            possible (until actual rendering to it, or until the texture is used for
+            reading/sampling).
+        @par
+            Normally, we'd want to stop deferring a clear and immediately issue it when
+            _setRenderTarget gets called with a different pointer. However, the following
+            scenario is too common:
+            target rtt
+            {
+                pass clear {}
+                pass render_scene
+                {
+                    shadows myShadowNode
+                }
+            }
+
+            Ogre will first issue a clear, then begin executing the shadow node (which switches
+            to the shadow map) then switch back to the original rtt to resume regular rendinering.
+            In this common case we want to delay the clear, but _setRenderTarget is clearly
+            not an trusted indication (we would get many false positives).
+        @par
+            Therefore the compositor has much better knowledge, and it informs of this fact
+            via this call.
+        @remarks
+            TODO: This function will eventually be removed. The Compositor should be creating
+            a resource transition. We only need to force clear when we're going to be using
+            the target as a texture for reading/sampling. That's exactly what
+            ResourceTransitions are for.
+        @param previousRenderTarget
+            RenderTarget that was being used (and we should clear if we have to).
+        */
+        virtual void _notifyCompositorNodeSwitchedRenderTarget( RenderTarget *previousTarget ) {}
+
         /** Defines a listener on the custom events that this render system 
         can raise.
         @see RenderSystem::addListener

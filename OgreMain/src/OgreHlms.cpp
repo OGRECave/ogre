@@ -1721,6 +1721,7 @@ namespace Ogre
                         gp->setParameter( "entry_point", "main" );
                     }
 
+                    gp->setBuildParametersFromReflection( false );
                     gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
                     gp->setMorphAnimationIncluded( false );
                     gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) );
