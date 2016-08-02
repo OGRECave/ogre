@@ -536,11 +536,8 @@ namespace Ogre {
         }
         else
         {
-            NSRect frame = [mWindow frame];
-            frame.size.width = widthPt;
-            frame.size.height = heightPt;
-            mWindowOriginPt = frame.origin;
-            [mWindow setFrame:frame display:YES];
+            mWindowOriginPt = [mWindow frame].origin;
+            [mWindow setContentSize:NSMakeSize(widthPt, heightPt)];
         }
 		[mGLContext update];
     }
