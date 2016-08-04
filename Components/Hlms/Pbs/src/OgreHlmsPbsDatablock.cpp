@@ -270,11 +270,10 @@ namespace Ogre
         for( size_t i=0; i<NUM_PBSM_TEXTURE_TYPES; ++i )
             textures[i].samplerBlock = mSamplerblocks[i];
 
-        bakeTextures( textures );
-
-        calculateHash();
-
         creator->requestSlot( /*mTextureHash*/0, this, false );
+
+        bakeTextures( textures );
+        calculateHash();
     }
     //-----------------------------------------------------------------------------------
     HlmsPbsDatablock::~HlmsPbsDatablock()
@@ -308,11 +307,24 @@ namespace Ogre
             ++itor;
         }
 
-        if( mTextureHash != hash.mHash )
+        if( static_cast<HlmsPbs*>(mCreator)->getOptimizationStrategy() == HlmsPbs::LowerGpuOverhead )
         {
-            mTextureHash = hash.mHash;
-            static_cast<HlmsPbs*>(mCreator)->requestSlot( /*mTextureHash*/0, this, false );
+            const size_t poolIdx = static_cast<HlmsPbs*>(mCreator)->getPoolIndex( this );
+            const uint32 finalHash = (hash.mHash & 0xFFFFFE00) | (poolIdx & 0x000001FF);
+            mTextureHash = finalHash;
         }
+        else
+        {
+            const size_t poolIdx = static_cast<HlmsPbs*>(mCreator)->getPoolIndex( this );
+            const uint32 finalHash = (hash.mHash & 0xFFFFFFF0) | (poolIdx & 0x0000000F);
+            mTextureHash = finalHash;
+        }
+
+//        if( mTextureHash != finalHash )
+//        {
+//            mTextureHash = finalHash;
+//            static_cast<HlmsPbs*>(mCreator)->requestSlot( /*mTextureHash*/0, this, false );
+//        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::scheduleConstBufferUpdate(void)
@@ -354,6 +366,11 @@ namespace Ogre
         mFresnelR = oldFresnelR;
         mFresnelG = oldFresnelG;
         mFresnelB = oldFresnelB;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::notifyOptimizationStrategyChanged(void)
+    {
+        calculateHash();
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::decompileBakedTextures( PbsBakedTexture outTextures[NUM_PBSM_TEXTURE_TYPES] )

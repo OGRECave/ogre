@@ -97,9 +97,12 @@ namespace Ogre
         HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders );
         HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders,
                    HlmsTypes type, const String &typeName );
-        ~HlmsUnlit();
+        virtual ~HlmsUnlit();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
+
+        /// Not supported
+        virtual void setOptimizationStrategy( OptimizationStrategy optimizationStrategy ) {}
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid,

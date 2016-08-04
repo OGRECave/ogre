@@ -112,7 +112,9 @@ layout(binding = 2) uniform InstanceBuffer
 
 @piece( VStoPS_block )
     @property( !hlms_shadowcaster )
-        flat uint drawId;
+		@property( !lower_gpu_overhead )
+			flat uint drawId;
+		@end
 		@property( hlms_normal || hlms_qtangent )
 			vec3 pos;
 			vec3 normal;
