@@ -83,6 +83,8 @@ namespace Ogre
             LowerGpuOverhead,
             /// Optimize for low CPU overhead. Use this if GPU is the bottleneck.
             /// This strategy performs best when you have few materials.
+            /// Do not enable this mode blindly unless you've profiled and
+            /// it gives you important benefits.
             /// Default on mobile.
             LowerCpuOverhead
         };
