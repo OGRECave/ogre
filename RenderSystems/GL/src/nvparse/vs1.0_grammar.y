@@ -1,5 +1,5 @@
 %start VS10Program
-%name-prefix="vs10_"
+%name-prefix "vs10_"
 %{
 void yyerror(const char *s);
 int yylex(void);
@@ -105,7 +105,7 @@ InstSequence: InstSequence InstLine
 	{
 		*($1) += $2;
 		delete $2;
-		$$ = $1
+		$$ = $1;
 	}
 	| InstLine
 	{
