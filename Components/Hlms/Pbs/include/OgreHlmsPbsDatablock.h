@@ -205,6 +205,7 @@ namespace Ogre
 
         void scheduleConstBufferUpdate(void);
         virtual void uploadToConstBuffer( char *dstPtr );
+        virtual void notifyOptimizationStrategyChanged(void);
 
         /// Sets the appropiate mTexIndices[textureType], and returns the texture pointer
         TexturePtr setTexture( const String &name, PbsTextureTypes textureType );

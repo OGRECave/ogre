@@ -193,7 +193,7 @@ void main()
 @foreach( hlms_uv_count, n )
 	outVs.uv@n = uv@n;@end
 
-@property( !hlms_shadowcaster || alpha_test )
+@property( (!hlms_shadowcaster || alpha_test) && !lower_gpu_overhead )
 	outVs.drawId = drawId;@end
 
 	@insertpiece( custom_vs_posExecution )
