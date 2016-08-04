@@ -74,6 +74,11 @@ namespace Ogre {
 
         destroy();
 
+        if(mView && !mUseNSView)
+        {
+            [(OgreGL3PlusView*)mView setOgreWindow:NULL];
+        }
+        
         if(mWindow && !mIsExternal)
         {
             [mWindow release];
