@@ -349,18 +349,17 @@ namespace Ogre
         return it - poolVec.begin();
     }
     //-----------------------------------------------------------------------------------
+    struct OldUserRecord
+    {
+        ConstBufferPoolUser *user;
+        uint32              hash;
+        bool                wantsExtraBuffer;
+        OldUserRecord( ConstBufferPoolUser *_user, uint32 _hash, bool _wantsExtraBuffer ) :
+            user( _user ), hash( _hash ), wantsExtraBuffer( _wantsExtraBuffer ) {}
+    };
+    typedef std::vector<OldUserRecord> OldUserRecordVec;
     void ConstBufferPool::setOptimizationStrategy( OptimizationStrategy optimizationStrategy )
     {
-        struct OldUserRecord
-        {
-            ConstBufferPoolUser *user;
-            uint32              hash;
-            bool                wantsExtraBuffer;
-            OldUserRecord( ConstBufferPoolUser *_user, uint32 _hash, bool _wantsExtraBuffer ) :
-                user( _user ), hash( _hash ), wantsExtraBuffer( _wantsExtraBuffer ) {}
-        };
-        typedef vector<OldUserRecord>::type OldUserRecordVec;
-
         if( mOptimizationStrategy != optimizationStrategy )
         {
             mDirtyUsers.clear();
