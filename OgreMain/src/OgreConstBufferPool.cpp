@@ -43,7 +43,12 @@ namespace Ogre
         mSlotsPerPool( 0 ),
         mBufferSize( 0 ),
         mExtraBufferParams( extraBufferParams ),
-        _mVaoManager( 0 )
+        _mVaoManager( 0 ),
+    #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
+        mOptimizationStrategy( LowerGpuOverhead )
+    #else
+        mOptimizationStrategy( LowerCpuOverhead )
+    #endif
     {
     }
     //-----------------------------------------------------------------------------------
@@ -326,6 +331,79 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    size_t ConstBufferPool::getPoolIndex( ConstBufferPoolUser *user ) const
+    {
+        BufferPool *pool = user->mAssignedPool;
+
+        assert( user->mAssignedSlot < mSlotsPerPool );
+        assert( std::find( pool->freeSlots.begin(),
+                           pool->freeSlots.end(),
+                           user->mAssignedSlot ) == pool->freeSlots.end() );
+
+        BufferPoolVecMap::const_iterator itor = mPools.find( pool->hash );
+        assert( itor != mPools.end() && "Error or argument doesn't belong to this pool manager." );
+
+        const BufferPoolVec &poolVec = itor->second;
+        BufferPoolVec::const_iterator it = std::find( poolVec.begin(), poolVec.end(), pool );
+
+        return it - poolVec.begin();
+    }
+    //-----------------------------------------------------------------------------------
+    void ConstBufferPool::setOptimizationStrategy( OptimizationStrategy optimizationStrategy )
+    {
+        struct OldUserRecord
+        {
+            ConstBufferPoolUser *user;
+            uint32              hash;
+            bool                wantsExtraBuffer;
+            OldUserRecord( ConstBufferPoolUser *_user, uint32 _hash, bool _wantsExtraBuffer ) :
+                user( _user ), hash( _hash ), wantsExtraBuffer( _wantsExtraBuffer ) {}
+        };
+        typedef vector<OldUserRecord>::type OldUserRecordVec;
+
+        if( mOptimizationStrategy != optimizationStrategy )
+        {
+            mDirtyUsers.clear();
+
+            OldUserRecordVec oldUserRecords;
+            {
+                //Save all the data we need before we destroy the pools.
+                ConstBufferPoolUserVec::const_iterator itor = mUsers.begin();
+                ConstBufferPoolUserVec::const_iterator end  = mUsers.end();
+
+                while( itor != end )
+                {
+                    OldUserRecord record( *itor, (*itor)->mAssignedPool->hash,
+                                          (*itor)->mAssignedPool->extraBuffer != 0 );
+                    oldUserRecords.push_back( record );
+                    ++itor;
+                }
+            }
+
+            destroyAllPools();
+
+            mOptimizationStrategy = optimizationStrategy;
+
+            {
+                //Recreate the pools.
+                OldUserRecordVec::const_iterator itor = oldUserRecords.begin();
+                OldUserRecordVec::const_iterator end  = oldUserRecords.end();
+
+                while( itor != end )
+                {
+                    this->requestSlot( itor->hash, itor->user, itor->wantsExtraBuffer );
+                    itor->user->notifyOptimizationStrategyChanged();
+                    ++itor;
+                }
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    ConstBufferPool::OptimizationStrategy ConstBufferPool::getOptimizationStrategy() const
+    {
+        return mOptimizationStrategy;
+    }
+    //-----------------------------------------------------------------------------------
     void ConstBufferPool::_changeRenderSystem( RenderSystem *newRs )
     {
         if( _mVaoManager )
@@ -339,7 +417,11 @@ namespace Ogre
         {
             _mVaoManager = newRs->getVaoManager();
 
-            mBufferSize = std::min<size_t>( _mVaoManager->getConstBufferMaxSize(), 64 * 1024 );
+            if( mOptimizationStrategy == LowerCpuOverhead )
+                mBufferSize = std::min<size_t>( _mVaoManager->getConstBufferMaxSize(), 64 * 1024 );
+            else
+                mBufferSize = mBytesPerSlot;
+
             mSlotsPerPool = mBufferSize / mBytesPerSlot;
         }
     }

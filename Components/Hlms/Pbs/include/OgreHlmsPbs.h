@@ -147,7 +147,7 @@ namespace Ogre
 
     public:
         HlmsPbs( Archive *dataFolder, ArchiveVec *libraryFolders );
-        ~HlmsPbs();
+        virtual ~HlmsPbs();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
 
@@ -195,6 +195,7 @@ namespace Ogre
         static const IdString HwGammaWrite;
         static const IdString SignedIntTex;
         static const IdString MaterialsPerBuffer;
+        static const IdString LowerGpuOverhead;
 
         static const IdString NumTextures;
         static const char *DiffuseMap;

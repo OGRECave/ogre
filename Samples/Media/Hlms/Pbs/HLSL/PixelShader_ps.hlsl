@@ -164,8 +164,12 @@ float4 main( PS_INPUT inPs
 @property( hlms_normal || hlms_qtangent )	float3 nNormal;@end
 	
 @property( hlms_normal || hlms_qtangent )
-	uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
-	material = materialArray[materialId];
+	@property( !lower_gpu_overhead )
+		uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
+		material = materialArray[materialId];
+	@end @property( lower_gpu_overhead )
+		material = materialArray[0];
+	@end
 @property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
 @property( normal_map_tex )	normalIdx			= material.indices0_3.x >> 16u;@end
 @property( specular_map )	specularIdx			= material.indices0_3.y & 0x0000FFFFu;@end
@@ -432,9 +436,12 @@ void main( PS_INPUT inPs )
 	@property( detail_map@n )uint detailMapIdx@n;@end @end
 
 @property( diffuse_map || detail_maps_diffuse )float diffuseCol;@end
-	
-	uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
-	material = materialArray[materialId];
+	@property( !lower_gpu_overhead )
+		uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
+		material = materialArray[materialId];
+	@end @property( lower_gpu_overhead )
+		material = materialArray[0];
+	@end
 @property( diffuse_map )	diffuseIdx			= material.indices0_3.x & 0x0000FFFFu;@end
 @property( detail_weight_map )	weightMapIdx		= material.indices0_3.z & 0x0000FFFFu;@end
 @property( detail_map0 )	detailMapIdx0		= material.indices0_3.z >> 16u;@end

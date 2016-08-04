@@ -119,7 +119,9 @@ cbuffer InstanceBuffer : register(b2)
 
 @piece( VStoPS_block )
     @property( !hlms_shadowcaster )
-		nointerpolation uint drawId	: TEXCOORD@counter(texcoord);
+		@property( !lower_gpu_overhead )
+			nointerpolation uint drawId	: TEXCOORD@counter(texcoord);
+		@end
 		@property( hlms_normal || hlms_qtangent )
 			float3 pos	: TEXCOORD@counter(texcoord);
 			float3 normal	: TEXCOORD@counter(texcoord);

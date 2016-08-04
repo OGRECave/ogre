@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -62,6 +62,7 @@ namespace Ogre
     const IdString PbsProperty::HwGammaWrite      = IdString( "hw_gamma_write" );
     const IdString PbsProperty::SignedIntTex      = IdString( "signed_int_textures" );
     const IdString PbsProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
+    const IdString PbsProperty::LowerGpuOverhead  = IdString( "lower_gpu_overhead" );
 
     const IdString PbsProperty::NumTextures     = IdString( "num_textures" );
     const char *PbsProperty::DiffuseMap         = "diffuse_map";
@@ -544,6 +545,9 @@ namespace Ogre
             if( datablock->mTransparencyMode == HlmsPbsDatablock::Transparent )
                 setProperty( PbsProperty::TransparentMode, 1 );
         }
+
+        if( mOptimizationStrategy == LowerGpuOverhead )
+            setProperty( PbsProperty::LowerGpuOverhead, 1 );
 
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
         inOutPieces[VertexShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;

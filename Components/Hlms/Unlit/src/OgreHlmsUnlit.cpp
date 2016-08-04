@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -67,6 +67,9 @@ namespace Ogre
     {
         //Override defaults
         mLightGatheringMode = LightGatherNone;
+
+        //Always use this strategy, even on mobile
+        mOptimizationStrategy = LowerCpuOverhead;
     }
     HlmsUnlit::HlmsUnlit( Archive *dataFolder, ArchiveVec *libraryFolders,
                           HlmsTypes type, const String &typeName ) :
@@ -79,6 +82,9 @@ namespace Ogre
     {
         //Override defaults
         mLightGatheringMode = LightGatherNone;
+
+        //Always use this strategy, even on mobile
+        mOptimizationStrategy = LowerCpuOverhead;
     }
     //-----------------------------------------------------------------------------------
     HlmsUnlit::~HlmsUnlit()

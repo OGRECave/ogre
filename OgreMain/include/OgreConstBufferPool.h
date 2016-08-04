@@ -74,6 +74,19 @@ namespace Ogre
                                bool _useTextureBuffers = true );
         };
 
+        enum OptimizationStrategy
+        {
+            /// Optimize for low GPU overhead. Use this on slow CPUs (i.e. older AMD CPU
+            /// models) or if CPU is the bottleneck. This strategy is optimized for having
+            /// a lot of different materials.
+            /// Default on Desktop.
+            LowerGpuOverhead,
+            /// Optimize for low CPU overhead. Use this if GPU is the bottleneck.
+            /// This strategy performs best when you have few materials.
+            /// Default on mobile.
+            LowerCpuOverhead
+        };
+
     protected:
         typedef vector<BufferPool*>::type           BufferPoolVec;
         typedef map<uint32, BufferPoolVec>::type    BufferPoolVecMap;
@@ -92,6 +105,8 @@ namespace Ogre
         ConstBufferPoolUserVec mDirtyUsers;
         ConstBufferPoolUserVec mUsers;
 
+        OptimizationStrategy    mOptimizationStrategy;
+
         void destroyAllPools(void);
 
         void uploadDirtyDatablocks(void);
@@ -106,6 +121,19 @@ namespace Ogre
         void releaseSlot( ConstBufferPoolUser *user );
 
         void scheduleForUpdate( ConstBufferPoolUser *dirtyUser );
+
+        /// Gets an ID corresponding to the pool this user was assigned to, unique per hash.
+        size_t getPoolIndex( ConstBufferPoolUser *user ) const;
+
+        /** Sets the optimization strategy. See OptimizationStrategy.
+        @remarks
+            Changing the optimization strategy on the fly
+            will trigger a massive shader recompilation.
+        @par
+            Implementations that don't support different strategies can overload this function.
+        */
+        virtual void setOptimizationStrategy( OptimizationStrategy optimizationStrategy );
+        OptimizationStrategy getOptimizationStrategy() const;
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
     };
@@ -128,6 +156,8 @@ namespace Ogre
         /// exceed the value passed to ConstBufferPool::uploadDirtyDatablocks
         virtual void uploadToConstBuffer( char *dstPtr ) = 0;
         virtual void uploadToExtraBuffer( char *dstPtr ) {}
+
+        virtual void notifyOptimizationStrategyChanged(void) {}
 
     public:
         ConstBufferPoolUser();

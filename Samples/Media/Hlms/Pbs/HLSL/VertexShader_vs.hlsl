@@ -185,7 +185,7 @@ PS_INPUT main( VS_INPUT input )
 @foreach( hlms_uv_count, n )
 	outVs.uv@n = input.uv@n;@end
 
-@property( !hlms_shadowcaster || alpha_test )
+@property( (!hlms_shadowcaster || alpha_test) && !lower_gpu_overhead )
 	outVs.drawId = input.drawId;@end
 
 	@insertpiece( custom_vs_posExecution )
