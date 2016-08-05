@@ -45,9 +45,9 @@ namespace Ogre
         mExtraBufferParams( extraBufferParams ),
         _mVaoManager( 0 ),
     #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-        mOptimizationStrategy( LowerGpuOverhead )
-    #else
         mOptimizationStrategy( LowerCpuOverhead )
+    #else
+        mOptimizationStrategy( LowerGpuOverhead )
     #endif
     {
     }
@@ -349,18 +349,17 @@ namespace Ogre
         return it - poolVec.begin();
     }
     //-----------------------------------------------------------------------------------
+    struct OldUserRecord
+    {
+        ConstBufferPoolUser *user;
+        uint32              hash;
+        bool                wantsExtraBuffer;
+        OldUserRecord( ConstBufferPoolUser *_user, uint32 _hash, bool _wantsExtraBuffer ) :
+            user( _user ), hash( _hash ), wantsExtraBuffer( _wantsExtraBuffer ) {}
+    };
+    typedef std::vector<OldUserRecord> OldUserRecordVec;
     void ConstBufferPool::setOptimizationStrategy( OptimizationStrategy optimizationStrategy )
     {
-        struct OldUserRecord
-        {
-            ConstBufferPoolUser *user;
-            uint32              hash;
-            bool                wantsExtraBuffer;
-            OldUserRecord( ConstBufferPoolUser *_user, uint32 _hash, bool _wantsExtraBuffer ) :
-                user( _user ), hash( _hash ), wantsExtraBuffer( _wantsExtraBuffer ) {}
-        };
-        typedef vector<OldUserRecord>::type OldUserRecordVec;
-
         if( mOptimizationStrategy != optimizationStrategy )
         {
             mDirtyUsers.clear();
@@ -381,8 +380,16 @@ namespace Ogre
             }
 
             destroyAllPools();
-
             mOptimizationStrategy = optimizationStrategy;
+            if( _mVaoManager )
+            {
+                if( mOptimizationStrategy == LowerCpuOverhead )
+                    mBufferSize = std::min<size_t>( _mVaoManager->getConstBufferMaxSize(), 64 * 1024 );
+                else
+                    mBufferSize = mBytesPerSlot;
+
+                mSlotsPerPool = mBufferSize / mBytesPerSlot;
+            }
 
             {
                 //Recreate the pools.
