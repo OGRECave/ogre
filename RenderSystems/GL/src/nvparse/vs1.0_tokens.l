@@ -34,8 +34,8 @@
 #include "_vs1.0_parser.h"
 #define yylineno line_number
 #include "nvparse_externs.h"
+#define YY_NO_UNPUT
 
-#define yylineno line_number
 int line_incr;
 void LexError(const char *format, ...);
 void LexWarning(const char *format, ...);

@@ -1,5 +1,5 @@
 %start WholeEnchilada
-%name-prefix="ts10_"
+%name-prefix "ts10_"
 %{
 void yyerror(const char* s);
 int yylex ( void );

@@ -432,15 +432,17 @@ namespace Ogre {
 
         window->create(name, width, height, fullScreen, miscParams);
 
-        if(!mInitialWindow)
+        if(!mInitialWindow) {
             mInitialWindow = window;
+            initialiseExtensions();
+        }
+
         return window;
     }
 
     void Win32GLSupport::start()
     {
         LogManager::getSingleton().logMessage("*** Starting Win32GL Subsystem ***");
-        initialiseExtensions();
     }
 
     void Win32GLSupport::stop()
