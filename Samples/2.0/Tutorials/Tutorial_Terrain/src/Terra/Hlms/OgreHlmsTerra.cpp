@@ -409,6 +409,13 @@ namespace Ogre
     {
         mSetProperties.clear();
 
+        if( casterPass )
+        {
+            HlmsCache retVal = Hlms::preparePassHashBase( shadowNode, casterPass,
+                                                          dualParaboloid, sceneManager );
+            return retVal;
+        }
+
         //The properties need to be set before preparePassHash so that
         //they are considered when building the HlmsCache's hash.
         if( shadowNode && !casterPass )
@@ -887,9 +894,9 @@ namespace Ogre
             {
                 texUnit = 5;
                 *commandBuffer->addCommand<CbShaderBuffer>() =
-                        CbShaderBuffer( PixelShader, 2, mGridBuffer, 0, 0 );
+                        CbShaderBuffer( PixelShader, 3, mGridBuffer, 0, 0 );
                 *commandBuffer->addCommand<CbShaderBuffer>() =
-                        CbShaderBuffer( PixelShader, 3, mGlobalLightListBuffer, 0, 0 );
+                        CbShaderBuffer( PixelShader, 4, mGlobalLightListBuffer, 0, 0 );
             }
 
             //We changed HlmsType, rebind the shared textures.
