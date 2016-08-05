@@ -279,8 +279,10 @@ void main()
 	geomNormal = geomNormal * mat3(pass.view);
 
 	//Get the TBN matrix
-	vec3 vBinormal	= normalize( cross( geomNormal, vTangent ) );
-	mat3 TBN		= mat3( pass.viewSpaceTangent, vBinormal, geomNormal );
+	vec3 viewSpaceUnitX	= vec3( pass.view[0].x, pass.view[1].x, pass.view[2].x );
+	vec3 vTangent		= normalize( cross( geomNormal, viewSpaceUnitX ) );
+	vec3 vBinormal		= cross( vTangent, geomNormal );
+	mat3 TBN			= mat3( vBinormal, vTangent, geomNormal );
 @end
 
 	float fShadow = texture( terrainShadows, inPs.uv0.xy ).x;

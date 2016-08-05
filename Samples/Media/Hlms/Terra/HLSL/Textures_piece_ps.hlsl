@@ -31,5 +31,5 @@
 	@undefpiece( SampleDetailMapNm@n )
 	@piece( SampleDetailMapNm@n )getTSDetailNormal( samplerStates[@value(detail_map_nm@n_idx)], textureMaps[@value(detail_map_nm@n_idx)],
 													float3( inPs.uv0.xy * material.detailOffsetScale[@n].zw +
-															material.detailOffsetScale[@n].xy, @value(detail_map_nm@n_slice_idx) ) )@end
+															material.detailOffsetScale[@n].xy, @value(detail_map_nm@n_idx_slice) ) )@end
 @end
