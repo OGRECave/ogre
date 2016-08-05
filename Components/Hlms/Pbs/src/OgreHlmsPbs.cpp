@@ -546,9 +546,6 @@ namespace Ogre
                 setProperty( PbsProperty::TransparentMode, 1 );
         }
 
-        if( mOptimizationStrategy == LowerGpuOverhead )
-            setProperty( PbsProperty::LowerGpuOverhead, 1 );
-
         String slotsPerPoolStr = StringConverter::toString( mSlotsPerPool );
         inOutPieces[VertexShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
         inOutPieces[PixelShader][PbsProperty::MaterialsPerBuffer] = slotsPerPoolStr;
@@ -714,6 +711,9 @@ namespace Ogre
             if( envMapScale != 1.0f )
                 setProperty( PbsProperty::EnvMapScale, 1 );
         }
+
+        if( mOptimizationStrategy == LowerGpuOverhead )
+            setProperty( PbsProperty::LowerGpuOverhead, 1 );
 
         HlmsCache retVal = Hlms::preparePassHashBase( shadowNode, casterPass,
                                                       dualParaboloid, sceneManager );

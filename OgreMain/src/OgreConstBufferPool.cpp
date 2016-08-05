@@ -45,9 +45,9 @@ namespace Ogre
         mExtraBufferParams( extraBufferParams ),
         _mVaoManager( 0 ),
     #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS && OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
-        mOptimizationStrategy( LowerGpuOverhead )
-    #else
         mOptimizationStrategy( LowerCpuOverhead )
+    #else
+        mOptimizationStrategy( LowerGpuOverhead )
     #endif
     {
     }
@@ -380,8 +380,16 @@ namespace Ogre
             }
 
             destroyAllPools();
-
             mOptimizationStrategy = optimizationStrategy;
+            if( _mVaoManager )
+            {
+                if( mOptimizationStrategy == LowerCpuOverhead )
+                    mBufferSize = std::min<size_t>( _mVaoManager->getConstBufferMaxSize(), 64 * 1024 );
+                else
+                    mBufferSize = mBytesPerSlot;
+
+                mSlotsPerPool = mBufferSize / mBytesPerSlot;
+            }
 
             {
                 //Recreate the pools.

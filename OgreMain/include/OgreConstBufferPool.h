@@ -76,17 +76,17 @@ namespace Ogre
 
         enum OptimizationStrategy
         {
-            /// Optimize for low GPU overhead. Use this on slow CPUs (i.e. older AMD CPU
+            /// Optimize for low CPU overhead. Use this on slow CPUs (i.e. older AMD CPU
             /// models) or if CPU is the bottleneck. This strategy is optimized for having
             /// a lot of different materials.
             /// Default on Desktop.
-            LowerGpuOverhead,
-            /// Optimize for low CPU overhead. Use this if GPU is the bottleneck.
+            LowerCpuOverhead,
+            /// Optimize for low GPU overhead. Use this if GPU is the bottleneck.
             /// This strategy performs best when you have few materials.
             /// Do not enable this mode blindly unless you've profiled and
             /// it gives you important benefits.
             /// Default on mobile.
-            LowerCpuOverhead
+            LowerGpuOverhead
         };
 
     protected:
