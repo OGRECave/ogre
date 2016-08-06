@@ -264,10 +264,7 @@ float3 qmul( float4 q, float3 v )
 	nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n);@end @end
 
 @property( detail_maps_normal )
-	/*nNormal = normalize( mul( @insertpiece( SampleDetailMapNm0 ), TBN ) );*/
-	/*nNormal = @insertpiece( SampleDetailMapNm1 );*/
 	nNormal = normalize( mul( nNormal, TBN ) );
-	//nNormal = normalize( nNormal );
 @end
 
 	//Everything's in Camera space
