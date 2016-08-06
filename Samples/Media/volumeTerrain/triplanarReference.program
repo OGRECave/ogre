@@ -375,29 +375,28 @@ fragment_program TriplanarReferenceLow_PSGLSL glsl
 
 fragment_program TriplanarReferenceLow_PS unified
 {
-    //delegate TriplanarReferenceLow_PSGLSL
+    delegate TriplanarReferenceLow_PSGLSL
 	delegate TriplanarReferenceLow_PShlsl
-    //delegate TriplanarReferenceLow_PSCg
+    delegate TriplanarReferenceLow_PSCg
 }
 
 fragment_program TriplanarReferenceHigh_PS unified
 {
-    //delegate TriplanarReferenceHigh_PSGLSL
+    delegate TriplanarReferenceHigh_PSGLSL
 	delegate TriplanarReferenceHigh_PShlsl
-    //delegate TriplanarReferenceHigh_PSCg
+    delegate TriplanarReferenceHigh_PSCg
 }
 
 vertex_program TriplanarReferenceLow_VS unified
 {
-    //delegate TriplanarReferenceLow_VSGLSL
+    delegate TriplanarReferenceLow_VSGLSL
 	delegate TriplanarReferenceLow_VShlsl
-    //delegate TriplanarReferenceLow_VSCg
+    delegate TriplanarReferenceLow_VSCg
 }
 
 vertex_program TriplanarReferenceHigh_VS unified
 {
-    //delegate TriplanarReferenceHigh_VSGLSL
+    delegate TriplanarReferenceHigh_VSGLSL
 	delegate TriplanarReferenceHigh_VShlsl
-    //delegate TriplanarReferenceHigh_VSCg
+    delegate TriplanarReferenceHigh_VSCg
 }
-

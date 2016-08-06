@@ -16,31 +16,31 @@ material triplanarReferenceHigh
                 texture_alias fromX
                 texture dirt_grayrocky_diffusespecular.dds
             }
-            // texture_unit
-            // {
-            //     texture_alias fromXNormal
-            //     texture dirt_grayrocky_normalheight.dds
-            // }
+            texture_unit
+            {
+                texture_alias fromXNormal
+                texture dirt_grayrocky_normalheight.dds
+            }
             texture_unit
             {
                 texture_alias fromY
                 texture grass_green-01_diffusespecular.dds
             }
-            // texture_unit
-            // {
-            //     texture_alias fromYNormal
-            //     texture grass_green-01_normalheight.dds
-            // }
+            texture_unit
+            {
+                texture_alias fromYNormal
+                texture grass_green-01_normalheight.dds
+            }
             texture_unit
             {
                 texture_alias fromZ
                 texture growth_weirdfungus-03_diffusespecular.dds
             }
-            // texture_unit
-            // {
-            //     texture_alias fromZNormal
-            //     texture growth_weirdfungus-03_normalheight.dds
-            // }
+            texture_unit
+            {
+                texture_alias fromZNormal
+                texture growth_weirdfungus-03_normalheight.dds
+            }
         }
     }
 }
@@ -62,31 +62,31 @@ material triplanarReferenceLow
                 texture_alias fromX
                 texture dirt_grayrocky_diffusespecular.dds
             }
-            // texture_unit
-            // {
-            //     texture_alias fromXNormal
-            //     texture dirt_grayrocky_normalheight.dds
-            // }
+            texture_unit
+            {
+                texture_alias fromXNormal
+                texture dirt_grayrocky_normalheight.dds
+            }
             texture_unit
             {
                 texture_alias fromY
                 texture grass_green-01_diffusespecular.dds
             }
-            // texture_unit
-            // {
-            //     texture_alias fromYNormal
-            //     texture grass_green-01_normalheight.dds
-            // }
+            texture_unit
+            {
+                texture_alias fromYNormal
+                texture grass_green-01_normalheight.dds
+            }
             texture_unit
             {
                 texture_alias fromZ
                 texture growth_weirdfungus-03_diffusespecular.dds
             }
-            // texture_unit
-            // {
-            //     texture_alias fromZNormal
-            //     texture growth_weirdfungus-03_normalheight.dds
-            // }
+            texture_unit
+            {
+                texture_alias fromZNormal
+                texture growth_weirdfungus-03_normalheight.dds
+            }
         }
     }
 }
