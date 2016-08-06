@@ -513,7 +513,7 @@ compositor_node FinalComposition
 		pass render_quad
 	    {
 			//Ignore the alpha channel
-			material Ogre/Copy/3xFP32
+			material Ogre/Copy/4xFP32
 	    	input 0 rtN
 		}
 		

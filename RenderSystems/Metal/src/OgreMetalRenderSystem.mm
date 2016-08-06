@@ -604,6 +604,8 @@ namespace Ogre
         {
             passDesc.colorAttachments[i] = [mCurrentColourRTs[i]->mColourAttachmentDesc copy];
             mCurrentColourRTs[i]->mColourAttachmentDesc.loadAction = MTLLoadActionLoad;
+
+            assert( passDesc.colorAttachments[i].texture );
         }
 
         if( mCurrentDepthBuffer )
@@ -1506,16 +1508,21 @@ namespace Ogre
 
             MetalConstBufferPacked *constBuffer = static_cast<MetalConstBufferPacked*>(
                         mAutoParamsBuffer[mAutoParamsBufferIdx-1u] );
+            const size_t bindOffset = constBuffer->getTotalSizeBytes() -
+                                        mCurrentAutoParamsBufferSpaceLeft;
             switch (gptype)
             {
             case GPT_VERTEX_PROGRAM:
-                constBuffer->bindBufferVS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START );
+                constBuffer->bindBufferVS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START,
+                                           bindOffset );
                 break;
             case GPT_FRAGMENT_PROGRAM:
-                constBuffer->bindBufferPS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START );
+                constBuffer->bindBufferPS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START,
+                                           bindOffset );
                 break;
             case GPT_COMPUTE_PROGRAM:
-                constBuffer->bindBufferCS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START );
+                constBuffer->bindBufferCS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START,
+                                           bindOffset );
                 break;
             case GPT_GEOMETRY_PROGRAM:
             case GPT_HULL_PROGRAM:

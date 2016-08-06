@@ -133,7 +133,6 @@ fragment @insertpiece( output_type ) main_metal
 			@insertpiece( PassDecl )
 		@end
 		@insertpiece( MaterialDecl )
-		@insertpiece( InstanceDecl )
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
@@ -177,8 +176,11 @@ fragment @insertpiece( output_type ) main_metal
 @property( hlms_normal || hlms_qtangent )	float3 nNormal;@end
 
 @property( hlms_normal || hlms_qtangent )
-	ushort materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
-	material = materialArray[materialId];
+	@property( !lower_gpu_overhead )
+		material = materialArray[inPs.materialId];
+	@end @property( lower_gpu_overhead )
+		material = materialArray[0];
+	@end
 @property( diffuse_map )	diffuseIdx			= material.diffuseIdx;@end
 @property( normal_map_tex )	normalIdx			= material.normalIdx;@end
 @property( specular_map )	specularIdx			= material.specularIdx;@end
@@ -442,8 +444,11 @@ fragment @insertpiece( output_type ) main_metal
 
 @property( diffuse_map || detail_maps_diffuse )float diffuseCol;@end
 
-	ushort materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
-	material = materialArray[materialId];
+	@property( !lower_gpu_overhead )
+		material = materialArray[inPs.materialId];
+	@end @property( lower_gpu_overhead )
+		material = materialArray[0];
+	@end
 @property( diffuse_map )	diffuseIdx			= material.diffuseIdx;@end
 @property( detail_weight_map )	weightMapIdx		= material.weightMapIdx;@end
 @property( detail_map0 )	detailMapIdx0		= material.detailMapIdx0;@end

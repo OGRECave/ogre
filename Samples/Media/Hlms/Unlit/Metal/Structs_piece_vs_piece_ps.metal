@@ -50,7 +50,7 @@ struct Material
 
 @piece( VStoPS_block )
 	@property( !hlms_shadowcaster )
-		ushort drawId [[flat]];
+		ushort materialId [[flat]];
 		@property( hlms_colour )float4 colour;@end
 		@foreach( out_uv_half_count, n )
 			float@value( out_uv_half_count@n ) uv@n;@end
