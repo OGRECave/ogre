@@ -49,7 +49,7 @@ namespace Ogre {
     public:
         /** Returns value with reversed bytes order.
         */
-        static FORCEINLINE uint16 bswap16(uint16 arg)
+        static OGRE_FORCE_INLINE uint16 bswap16(uint16 arg)
         {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
             return _byteswap_ushort(arg);
@@ -61,7 +61,7 @@ namespace Ogre {
         }
         /** Returns value with reversed bytes order.
         */
-        static FORCEINLINE uint32 bswap32(uint32 arg)
+        static OGRE_FORCE_INLINE uint32 bswap32(uint32 arg)
         {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
             return _byteswap_ulong(arg);
@@ -73,7 +73,7 @@ namespace Ogre {
         }
         /** Returns value with reversed bytes order.
         */
-        static FORCEINLINE uint64 bswap64(uint64 arg)
+        static OGRE_FORCE_INLINE uint64 bswap64(uint64 arg)
         {
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER >= 1310
             return _byteswap_uint64(arg);
@@ -121,7 +121,7 @@ namespace Ogre {
 
         /** Returns the most significant bit set in a value.
         */
-        static FORCEINLINE unsigned int mostSignificantBitSet(unsigned int value)
+        static OGRE_FORCE_INLINE unsigned int mostSignificantBitSet(unsigned int value)
         {
             unsigned int result = 0;
             while (value != 0) {
@@ -134,7 +134,7 @@ namespace Ogre {
             @note 0 and 1 are powers of two, so 
                 firstPO2From(0)==0 and firstPO2From(1)==1.
         */
-        static FORCEINLINE uint32 firstPO2From(uint32 n)
+        static OGRE_FORCE_INLINE uint32 firstPO2From(uint32 n)
         {
             --n;            
             n |= n >> 16;
@@ -149,7 +149,7 @@ namespace Ogre {
             @note 0 and 1 are tread as power of two.
         */
         template<typename T>
-        static FORCEINLINE bool isPO2(T n)
+        static OGRE_FORCE_INLINE bool isPO2(T n)
         {
             return (n & (n-1)) == 0;
         }
@@ -157,7 +157,7 @@ namespace Ogre {
             remove right-hand zeros.
         */
         template<typename T>
-        static FORCEINLINE unsigned int getBitShift(T mask)
+        static OGRE_FORCE_INLINE unsigned int getBitShift(T mask)
         {
             if (mask == 0)
                 return 0;

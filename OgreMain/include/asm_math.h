@@ -263,7 +263,7 @@ __declspec(naked) float __fastcall InvSqrt(float fValue)
 #endif
 
 // returns a random number
-FORCEINLINE float asm_rand()
+OGRE_FORCE_INLINE float asm_rand()
 {
 
 #if  OGRE_COMPILER == OGRE_COMPILER_MSVC &&  OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32 && OGRE_CPU == OGRE_CPU_X86
@@ -299,7 +299,7 @@ FORCEINLINE float asm_rand()
 }
 
 // returns the maximum random number
-FORCEINLINE float asm_rand_max()
+OGRE_FORCE_INLINE float asm_rand_max()
 {
 
 #if  OGRE_COMPILER == OGRE_COMPILER_MSVC &&  OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_32 && OGRE_CPU == OGRE_CPU_X86

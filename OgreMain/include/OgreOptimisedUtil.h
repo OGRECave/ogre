@@ -210,13 +210,13 @@ namespace Ogre {
         The offset are in bytes, no matter what type of the pointer.
     */
     template <class T>
-    static FORCEINLINE const T* rawOffsetPointer(const T* ptr, ptrdiff_t offset)
+    static OGRE_FORCE_INLINE const T* rawOffsetPointer(const T* ptr, ptrdiff_t offset)
     {
         return (const T*)((const char*)(ptr) + offset);
     }
 
     template <class T>
-    static FORCEINLINE T* rawOffsetPointer(T* ptr, ptrdiff_t offset)
+    static OGRE_FORCE_INLINE T* rawOffsetPointer(T* ptr, ptrdiff_t offset)
     {
         return (T*)((char*)(ptr) + offset);
     }
@@ -226,13 +226,13 @@ namespace Ogre {
         The offset are in bytes, no matter what type of the pointer.
     */
     template <class T>
-    static FORCEINLINE void advanceRawPointer(const T*& ptr, ptrdiff_t offset)
+    static OGRE_FORCE_INLINE void advanceRawPointer(const T*& ptr, ptrdiff_t offset)
     {
         ptr = rawOffsetPointer(ptr, offset);
     }
 
     template <class T>
-    static FORCEINLINE void advanceRawPointer(T*& ptr, ptrdiff_t offset)
+    static OGRE_FORCE_INLINE void advanceRawPointer(T*& ptr, ptrdiff_t offset)
     {
         ptr = rawOffsetPointer(ptr, offset);
     }
