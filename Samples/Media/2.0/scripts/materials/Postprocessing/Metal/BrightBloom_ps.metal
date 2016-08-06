@@ -17,8 +17,8 @@ struct PS_INPUT
 fragment float4 main_metal
 (
 	PS_INPUT inPs [[stage_in]],
-	texture2d<float>	g_RT [[texture(0)]],
-	sampler				samplerState [[sampler(0)]]
+	texture2d<float>	g_RT			[[texture(0)]],
+	sampler				samplerState	[[sampler(0)]]
 )
 {
 	float4 tex = g_RT.sample( samplerState, inPs.uv0 );

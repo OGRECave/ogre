@@ -8,6 +8,7 @@ fragment_program Postprocess/Halftone_ps_GLSL glsl
 		param_named noise int 1
 	}
 }
+
 fragment_program Postprocess/Halftone_ps_HLSL hlsl
 {
 	source Halftone_ps.hlsl
@@ -15,10 +16,16 @@ fragment_program Postprocess/Halftone_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program Postprocess/Halftone_ps_Metal metal
+{
+	source Halftone_ps.metal
+}
+
 fragment_program Postprocess/Halftone_ps unified
 {
 	delegate Postprocess/Halftone_ps_GLSL
 	delegate Postprocess/Halftone_ps_HLSL
+	delegate Postprocess/Halftone_ps_Metal
 
 	default_params
 	{

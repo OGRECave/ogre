@@ -42,8 +42,8 @@ struct PS_INPUT
 fragment float4 main_metal
 (
 	PS_INPUT inPs [[stage_in]],
-	texture2d<float>	Blur0 [[texture(0)]],
-	sampler				samplerState [[sampler(0)]]
+	texture2d<float>	Blur0			[[texture(0)]],
+	sampler				samplerState	[[sampler(0)]]
 )
 {
 	float2 uv = inPs.uv0.xy;

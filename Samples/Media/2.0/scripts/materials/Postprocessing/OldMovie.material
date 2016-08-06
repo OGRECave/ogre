@@ -17,10 +17,16 @@ fragment_program Postprocess/OldMovie_ps_GLSL glsl
    	}
 }
 
+fragment_program Postprocess/OldMovie_ps_Metal metal
+{
+	source OldMovie_ps.metal
+}
+
 fragment_program Postprocess/OldMovie_ps unified
 {
 	delegate Postprocess/OldMovie_ps_GLSL
 	delegate Postprocess/OldMovie_ps_HLSL
+	delegate Postprocess/OldMovie_ps_Metal
 }
 
 material Postprocess/OldMovie

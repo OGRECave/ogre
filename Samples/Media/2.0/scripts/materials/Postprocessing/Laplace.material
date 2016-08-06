@@ -10,17 +10,22 @@ fragment_program Postprocess/Laplace_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program Postprocess/Laplace_ps_Metal metal
+{
+	source Laplace_ps.metal
+}
+
 fragment_program Postprocess/Laplace_ps unified
 {
 	delegate Postprocess/Laplace_ps_GLSL
 	delegate Postprocess/Laplace_ps_HLSL
+	delegate Postprocess/Laplace_ps_Metal
 }
 
 material Postprocess/Laplace
 {
     technique
     {
-
 		pass
 		{
 			depth_check off

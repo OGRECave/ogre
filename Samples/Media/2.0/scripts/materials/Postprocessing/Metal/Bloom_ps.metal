@@ -18,9 +18,9 @@ struct Params
 fragment float4 main_metal
 (
 	PS_INPUT inPs [[stage_in]],
-	texture2d<float>	RT [[texture(0)]],
-	texture2d<float>	Blur1 [[texture(1)]],
-	sampler				samplerState [[sampler(0)]],
+	texture2d<float>	RT				[[texture(0)]],
+	texture2d<float>	Blur1			[[texture(1)]],
+	sampler				samplerState	[[sampler(0)]],
 
 	constant Params &params [[buffer(PARAMETER_SLOT)]]
 )
