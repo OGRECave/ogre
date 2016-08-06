@@ -9,33 +9,13 @@
 // Platform-specific functions and macros
 #include "OgrePlatform.h"
 
-// Microsoft Visual Studio
-
-#if defined( _MSC_VER ) && _MSC_VER < 1600
-
 namespace Ogre
 {
-    typedef unsigned char uint8_t;
-    typedef unsigned long uint32_t;
-    typedef unsigned __int64 uint64_t;
-}
-// Other compilers
+    void _OgreExport MurmurHash3_x86_32  ( const void * key, int len, uint32 seed, void * out );
 
-#else   // defined(_MSC_VER)
+    void _OgreExport MurmurHash3_x86_128 ( const void * key, int len, uint32 seed, void * out );
 
-#include <stdint.h>
-
-#endif // !defined(_MSC_VER)
-
-//-----------------------------------------------------------------------------
-
-namespace Ogre
-{
-    void _OgreExport MurmurHash3_x86_32  ( const void * key, int len, uint32_t seed, void * out );
-
-    void _OgreExport MurmurHash3_x86_128 ( const void * key, int len, uint32_t seed, void * out );
-
-    void _OgreExport MurmurHash3_x64_128 ( const void * key, int len, uint32_t seed, void * out );
+    void _OgreExport MurmurHash3_x64_128 ( const void * key, int len, uint32 seed, void * out );
 }
 
 //-----------------------------------------------------------------------------
