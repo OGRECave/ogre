@@ -120,11 +120,11 @@ namespace Ogre {
 
 /* See if we can use __forceinline or if we need to use __inline instead */
 #if OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_MSVC, 1200)
-    #define FORCEINLINE __forceinline
+    #define OGRE_FORCE_INLINE __forceinline
 #elif OGRE_COMPILER_MIN_VERSION(OGRE_COMPILER_GNUC, 340)
-    #define FORCEINLINE inline __attribute__((always_inline))
+    #define OGRE_FORCE_INLINE inline __attribute__((always_inline))
 #else
-        #define FORCEINLINE __inline
+        #define OGRE_FORCE_INLINE __inline
 #endif
 
 /* define OGRE_NORETURN macro */

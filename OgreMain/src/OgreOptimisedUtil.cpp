@@ -58,7 +58,7 @@ namespace Ogre {
     typedef unsigned __int64 uint64;
 #pragma warning(push)
 #pragma warning(disable: 4035)  // no return value
-    static FORCEINLINE uint64 getCpuTimestamp(void)
+    static OGRE_FORCE_INLINE uint64 getCpuTimestamp(void)
     {
         __asm rdtsc
         // Return values in edx:eax, No return statement requirement here for VC.
@@ -67,7 +67,7 @@ namespace Ogre {
 
 #elif (OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG)
     typedef unsigned long long uint64;
-    static FORCEINLINE uint64 getCpuTimestamp(void)
+    static OGRE_FORCE_INLINE uint64 getCpuTimestamp(void)
     {
         uint64 result;
         __asm__ __volatile__ ( "rdtsc" : "=A" (result) );
