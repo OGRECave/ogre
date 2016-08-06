@@ -167,7 +167,7 @@ namespace Ogre {
     
 /** Check whether or not the given pointer perfect aligned for DirectXMath.
 */
-static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
+static OGRE_FORCE_INLINE bool _isAlignedForDirectXMath(const void *p)
 {
     return (((size_t)p) & 15) == 0;
 }
@@ -288,11 +288,11 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
     template <bool aligned = false>
     struct DirectXMathMemoryAccessor
     {
-        static FORCEINLINE XMVECTOR load(const float *p)
+        static OGRE_FORCE_INLINE XMVECTOR load(const float *p)
         {
             return XMLoadFloat4(reinterpret_cast<const XMFLOAT4*>(p));
         }
-        static FORCEINLINE void store(float *p, const XMVECTOR& v)
+        static OGRE_FORCE_INLINE void store(float *p, const XMVECTOR& v)
         {
             XMStoreFloat4(reinterpret_cast<XMFLOAT4*>(p), v);
         }
@@ -301,11 +301,11 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
     template <>
     struct DirectXMathMemoryAccessor<true>
     {
-        static FORCEINLINE const XMVECTOR load(const float *p)
+        static OGRE_FORCE_INLINE const XMVECTOR load(const float *p)
         {
             return __DX_LOAD_PS(p);
         }
-        static FORCEINLINE void store(float *p, const XMVECTOR& v)
+        static OGRE_FORCE_INLINE void store(float *p, const XMVECTOR& v)
         {
             __DX_STORE_PS(p, v);
         }
@@ -758,7 +758,7 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
             }
         }
     };
-    static FORCEINLINE void softwareVertexSkinning_DirectXMath_PosNorm_Shared_Packed(
+    static OGRE_FORCE_INLINE void softwareVertexSkinning_DirectXMath_PosNorm_Shared_Packed(
             const float* pSrcPos, float* pDestPos,
             const float* pBlendWeight, const unsigned char* pBlendIndex,
             const Matrix4* const* blendMatrices,
@@ -913,7 +913,7 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
             }
         }
     };
-    static FORCEINLINE void softwareVertexSkinning_DirectXMath_PosNorm_Separated_Packed(
+    static OGRE_FORCE_INLINE void softwareVertexSkinning_DirectXMath_PosNorm_Separated_Packed(
         const float* pSrcPos, float* pDestPos,
         const float* pSrcNorm, float* pDestNorm,
         const float* pBlendWeight, const unsigned char* pBlendIndex,
@@ -1032,7 +1032,7 @@ static FORCEINLINE bool _isAlignedForDirectXMath(const void *p)
             }
         }
     };
-    static FORCEINLINE void softwareVertexSkinning_DirectXMath_PosOnly_Packed(
+    static OGRE_FORCE_INLINE void softwareVertexSkinning_DirectXMath_PosOnly_Packed(
         const float* pSrcPos, float* pDestPos,
         const float* pBlendWeight, const unsigned char* pBlendIndex,
         const Matrix4* const* blendMatrices,

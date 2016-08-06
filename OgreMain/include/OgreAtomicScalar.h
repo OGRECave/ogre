@@ -172,7 +172,7 @@ namespace Ogre {
 
         static func_InterlockedCompareExchange64 Ogre_InterlockedCompareExchange64;
 
-        static FORCEINLINE
+        static OGRE_FORCE_INLINE
             LONGLONG
             Ogre_InterlockedIncrement64 (
             __inout LONGLONG volatile *Addend
@@ -189,7 +189,7 @@ namespace Ogre {
             return Old + 1;
         }
 
-        static FORCEINLINE
+        static OGRE_FORCE_INLINE
             LONGLONG
             Ogre_InterlockedDecrement64 (
             __inout LONGLONG volatile *Addend
