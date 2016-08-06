@@ -107,6 +107,9 @@
 #   include "TerrainTessellation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
+#ifdef OGRE_BUILD_COMPONENT_HLMS
+#   include "HLMS.h"
+#endif
 #   if SAMPLES_INCLUDE_PLAYPEN
 #    include "PlayPenTestPlugin.h"
     static PlaypenTestPlugin* playPenTestPlugin = 0;
@@ -1024,6 +1027,11 @@ namespace OgreBites
 #       endif
                 mPluginNameMap["Sample_Dot3Bump"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Dot3Bump();
                 mPluginNameMap["Sample_Fresnel"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Fresnel();
+
+#ifdef OGRE_BUILD_COMPONENT_HLMS
+                mPluginNameMap["Sample_HLMS"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_HLMS();
+#endif
+
             }
 #endif
 #endif
