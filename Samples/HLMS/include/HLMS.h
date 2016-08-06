@@ -2,8 +2,8 @@
 #define __HLMS_H__
 
 #include "SdkSample.h"
-#include <Components/HLMS/include/OgreHlmsManager.h>
-#include <Components/HLMS/include/OgreHlmsPbsMaterial.h>
+#include <OgreHlmsManager.h>
+#include <OgreHlmsPbsMaterial.h>
 
 using namespace Ogre;
 using namespace OgreBites;
