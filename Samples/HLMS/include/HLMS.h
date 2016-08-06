@@ -170,13 +170,14 @@ protected:
 		{
 			Ogre::SubEntity* subEnt = ent->getSubEntity(i);
 			Ogre::MaterialPtr newMat = subEnt->getMaterial()->clone(matName + "_" + Ogre::StringConverter::toString(i));
-
-			newMat->getBestTechnique()->removeAllPasses();
-
-			Ogre::Pass* pass = newMat->getBestTechnique()->createPass();
+			newMat->removeAllTechniques();
+			Ogre::Pass* pass = newMat->createTechnique()->createPass();
+#if defined(INCLUDE_RTSHADER_SYSTEM)
+			// ensures that this material does not get picked up by the RTSS
+			newMat->getTechnique(0)->setSchemeName(mViewport->getMaterialScheme());
+#endif
 			pass->setName("pbs");
 			subEnt->setMaterial(newMat);
-
 			mMaterialList.push_back(newMat->getName());
 			mHlmsManager->bind(subEnt, pbsMaterial, "pbs");
 		}
