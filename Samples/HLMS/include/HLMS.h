@@ -170,13 +170,10 @@ protected:
 		{
 			Ogre::SubEntity* subEnt = ent->getSubEntity(i);
 			Ogre::MaterialPtr newMat = subEnt->getMaterial()->clone(matName + "_" + Ogre::StringConverter::toString(i));
-
-			newMat->getBestTechnique()->removeAllPasses();
-
-			Ogre::Pass* pass = newMat->getBestTechnique()->createPass();
+			newMat->removeAllTechniques();
+			Ogre::Pass* pass = newMat->createTechnique()->createPass();
 			pass->setName("pbs");
 			subEnt->setMaterial(newMat);
-
 			mMaterialList.push_back(newMat->getName());
 			mHlmsManager->bind(subEnt, pbsMaterial, "pbs");
 		}

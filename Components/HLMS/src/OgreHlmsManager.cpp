@@ -50,7 +50,6 @@ namespace Ogre
 	void HlmsManager::preFindVisibleObjects(SceneManager* source, SceneManager::IlluminationRenderStage irs, Viewport* v)
 	{
 		// Before the frame is renderd, check all binded renderables if there shaders have to be changed
-		const String& curMaterialScheme = v->getMaterialScheme();
 		const LightList& lightList = source->_getLightsAffectingFrustum();
 
 		// set all materials to dirty (IsUpToDate = false)
@@ -104,10 +103,6 @@ namespace Ogre
 				for (int t = 0; t < numTechniques; t++)
 				{
 					Technique* tech = mat->getTechnique(t);
-
-					// do not update technics which are not used
-					if (tech->getSchemeName() != curMaterialScheme)
-						continue;
 
 					unsigned short numPasses = tech->getNumPasses();
 					for (int p = 0; p < numPasses; p++)
