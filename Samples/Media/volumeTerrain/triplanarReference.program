@@ -307,9 +307,15 @@ fragment_program TriplanarReferenceHigh_PSGLSL glsl
 		param_named plateauSize float 0.2
 		param_named transitionSpeed float 2.0
 		param_named ambient float4 0.41 0.41 0.41 1.0
+		param_named texFromX int 0
+		param_named texFromXNormal int 1
+		param_named texFromY int 2
+		param_named texFromXNormal int 3
+		param_named texFromZ int 4
+		param_named texFromXNormal int 5
 	}
 	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
-	preprocessor_defines LIGHTNORMALMAPPING=1,USESPECULARMAP=1,LIGHT0=1
+	preprocessor_defines LIGHTNORMALMAPPING=0,USESPECULARMAP=1,LIGHT0=1
 }
 
 // low quality triplanar mapping
@@ -368,6 +374,12 @@ fragment_program TriplanarReferenceLow_PSGLSL glsl
 		param_named plateauSize float 0.2
 		param_named transitionSpeed float 2.0
 		param_named ambient float4 0.41 0.41 0.41 1.0
+		param_named texFromX int 0
+		param_named texFromXNormal int 1
+		param_named texFromY int 2
+		param_named texFromXNormal int 3
+		param_named texFromZ int 4
+		param_named texFromXNormal int 5
 	}
 	// Supported defines: -DLIGHTNORMALMAPPING -DUSESPECULARMAP -DLIGHT0 -DLIGHT1 -DLIGHT2 -DATTENUATION -DFOGLINEAR -DFOGEXPONENTIAL -DFOGEXPONENTIAL2
 	preprocessor_defines USESPECULARMAP=1,LIGHT0=1

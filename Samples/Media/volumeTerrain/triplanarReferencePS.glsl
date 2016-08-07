@@ -41,11 +41,11 @@ uniform vec4 fogColour;
 
 uniform vec4 ambient;
 uniform sampler2D texFromX;
-// uniform sampler2D texFromXNormal;
+uniform sampler2D texFromXNormal;
 uniform sampler2D texFromY;
-// uniform sampler2D texFromYNormal;
+uniform sampler2D texFromYNormal;
 uniform sampler2D texFromZ;
-// uniform sampler2D texFromZNormal;
+uniform sampler2D texFromZNormal;
 
 out vec4 fragColour;
 
@@ -114,45 +114,40 @@ void main()
 
     // Ported from http://http.developer.nvidia.com/GPUGems3/gpugems3_ch01.html
     vec3 blendWeights = abs(unitNormal);
-    // blendWeights = blendWeights - vec3(plateauSize);
-    // blendWeights = pow(max(blendWeights, 0), vec3(transitionSpeed)); //FIXME weird notation here
-    blendWeights = vec3(pow(max(blendWeights.x, 0), transitionSpeed), pow(max(blendWeights.y, 0), transitionSpeed), pow(max(blendWeights.z, 0), transitionSpeed));
-    // blendWeights /= vec3(blendWeights.x + blendWeights.y + blendWeights.z);
-    float sum = blendWeights.x + blendWeights.y + blendWeights.z;
-    blendWeights =  blendWeights / vec3(sum);
+    blendWeights = blendWeights - vec3(plateauSize);
+    blendWeights = pow(max(blendWeights, 0), vec3(transitionSpeed)); 
+    blendWeights /= vec3(blendWeights.x + blendWeights.y + blendWeights.z);
+
     // Move the planar mapping a bit according to the normal length to avoid bad looking skirts.
     float nLength = length(oNormAndFogVal.xyz - 1.0);
     vec2 coord1 = (oPos.yz + nLength) * texScale;
     vec2 coord2 = (oPos.zx + nLength) * texScale;
     vec2 coord3 = (oPos.xy + nLength) * texScale;
 
-    // vec4 col1 = texture(texFromX, coord1);
-    // vec4 col2 = texture(texFromY, coord2);
-    // vec4 col3 = texture(texFromZ, coord3);
-    vec4 col1 = texture(texFromY, coord1);
+    vec4 col1 = texture(texFromX, coord1);
     vec4 col2 = texture(texFromY, coord2);
-    vec4 col3 = texture(texFromY, coord3);
+    vec4 col3 = texture(texFromZ, coord3);
     vec4 textColour = vec4(col1.xyz * blendWeights.x +
                            col2.xyz * blendWeights.y +
                            col3.xyz * blendWeights.z, 1);
 
     // Normal Mapping
-// #if LIGHTNORMALMAPPING
-//     vec3 tangent = vec3(1, 0, 0);
-//     vec3 binormal = normalize(cross(tangent, unitNormal));
-//     tangent = normalize(cross(unitNormal, binormal));
-//     mat3 TBN = mat3(tangent, binormal, unitNormal);
-//     vec3 eyeDir2 = normalize(TBN * eyeDir);
-//     vec3 bumpFetch1 = expand(texture(texFromXNormal, coord1).rgb);
-//     vec3 bumpFetch2 = expand(texture(texFromYNormal, coord2).rgb);
-//     vec3 bumpFetch3 = expand(texture(texFromZNormal, coord3).rgb);
-//     vec3 normal2 = bumpFetch1.xyz * blendWeights.x +
-//         bumpFetch2.xyz * blendWeights.y +
-//         bumpFetch3.xyz * blendWeights.z;
-// #else
+#if LIGHTNORMALMAPPING
+     vec3 tangent = vec3(1, 0, 0);
+     vec3 binormal = normalize(cross(tangent, unitNormal));
+     tangent = normalize(cross(unitNormal, binormal));
+     mat3 TBN = mat3(tangent, binormal, unitNormal);
+     vec3 eyeDir2 = normalize(TBN * eyeDir);
+     vec3 bumpFetch1 = expand(texture(texFromXNormal, coord1).rgb);
+     vec3 bumpFetch2 = expand(texture(texFromYNormal, coord2).rgb);
+     vec3 bumpFetch3 = expand(texture(texFromZNormal, coord3).rgb);
+     vec3 normal2 = bumpFetch1.xyz * blendWeights.x +
+         bumpFetch2.xyz * blendWeights.y +
+         bumpFetch3.xyz * blendWeights.z;
+#else
     vec3 eyeDir2 = eyeDir;
     vec3 normal2 = unitNormal;
-// #endif
+#endif
 
 #if USESPECULARMAP
     float specularFactor = textColour.a;
@@ -166,13 +161,13 @@ void main()
 #if LIGHT0
     vec3 lightSpotDir0 = (world * spotlightDir0).xyz;
     vec3 lightDir0 = normalize(lightPosition0.xyz - oPos * lightPosition0.w);
-// #if LIGHTNORMALMAPPING
-//     vec3 lightSpotDir02 = normalize(TBN * lightSpotDir0);
-//     vec3 lightDir02 = normalize(TBN * lightDir0);
-// #else
+#if LIGHTNORMALMAPPING
+     vec3 lightSpotDir02 = normalize(TBN * lightSpotDir0);
+     vec3 lightDir02 = normalize(TBN * lightDir0);
+#else
     vec3 lightSpotDir02 = lightSpotDir0;
     vec3 lightDir02 = lightDir0;
-// #endif
+#endif
     lightContribution += doLighting(oPos, normal2, eyeDir2, exponent, specularFactor, lightDir02, lightPosition0, lightDiffuse0, lightSpecular0, lightAttenuation0, lightSpotlight0, lightSpotDir02);
 #endif
 
