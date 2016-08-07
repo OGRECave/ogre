@@ -122,10 +122,49 @@ fragment_program HDR/BoxBlurV_ps_HLSL hlsl
 	entry_point main
 }
 
+//------------------------
+//OpenGL GLSL Definitions
+//------------------------
+fragment_program HDR/DownScale01_SumLumStart_ps_Metal metal
+{
+	source DownScale01_SumLumStart_ps.metal
+}
+
+fragment_program HDR/DownScale02_SumLumIterative_ps_Metal metal
+{
+	source DownScale02_SumLumIterative_ps.metal
+}
+
+fragment_program HDR/DownScale03_SumLumEnd_ps_Metal metal
+{
+	source DownScale03_SumLumEnd_ps.metal
+}
+
+fragment_program HDR/FinalToneMapping_ps_Metal metal
+{
+	source FinalToneMapping_ps.metal
+}
+
+fragment_program HDR/BrightPass_Start_ps_Metal metal
+{
+	source BrightPass_Start_ps.metal
+}
+
+fragment_program HDR/BoxBlurH_ps_Metal metal
+{
+	source BoxBlurH_ps.metal
+}
+
+fragment_program HDR/BoxBlurV_ps_Metal metal
+{
+	source BoxBlurV_ps.metal
+}
+
 fragment_program HDR/DownScale01_SumLumStart_ps unified
 {
 	delegate HDR/DownScale01_SumLumStart_ps_GLSL
 	delegate HDR/DownScale01_SumLumStart_ps_HLSL
+	delegate HDR/DownScale01_SumLumStart_ps_Metal
 	
 	default_params
 	{
@@ -138,6 +177,7 @@ fragment_program HDR/DownScale02_SumLumIterative_ps unified
 {
 	delegate HDR/DownScale02_SumLumIterative_ps_GLSL
 	delegate HDR/DownScale02_SumLumIterative_ps_HLSL
+	delegate HDR/DownScale02_SumLumIterative_ps_Metal
 	
 	default_params
 	{
@@ -149,6 +189,7 @@ fragment_program HDR/DownScale03_SumLumEnd_ps unified
 {
 	delegate HDR/DownScale03_SumLumEnd_ps_GLSL
 	delegate HDR/DownScale03_SumLumEnd_ps_HLSL
+	delegate HDR/DownScale03_SumLumEnd_ps_Metal
 	
 	default_params
 	{
@@ -162,12 +203,14 @@ fragment_program HDR/FinalToneMapping_ps unified
 {
 	delegate HDR/FinalToneMapping_ps_GLSL
 	delegate HDR/FinalToneMapping_ps_HLSL
+	delegate HDR/FinalToneMapping_ps_Metal
 }
 
 fragment_program HDR/BrightPass_Start_ps unified
 {
 	delegate HDR/BrightPass_Start_ps_GLSL
 	delegate HDR/BrightPass_Start_ps_HLSL
+	delegate HDR/BrightPass_Start_ps_Metal
 	
 	default_params
 	{
@@ -179,6 +222,7 @@ fragment_program HDR/BoxBlurH_ps unified
 {
 	delegate HDR/BoxBlurH_ps_GLSL
 	delegate HDR/BoxBlurH_ps_HLSL
+	delegate HDR/BoxBlurH_ps_Metal
 	
 	default_params
 	{
@@ -190,6 +234,7 @@ fragment_program HDR/BoxBlurV_ps unified
 {
 	delegate HDR/BoxBlurV_ps_GLSL
 	delegate HDR/BoxBlurV_ps_HLSL
+	delegate HDR/BoxBlurV_ps_Metal
 	
 	default_params
 	{
