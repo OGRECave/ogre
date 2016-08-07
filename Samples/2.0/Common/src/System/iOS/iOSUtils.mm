@@ -1,7 +1,7 @@
 /*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
-    (Object-oriented Graphics Rendering Engine)
+(Object-oriented Graphics Rendering Engine)
 For the latest info, see http://www.ogre3d.org/
 
 Copyright (c) 2000-2016 Torus Knot Software Ltd
@@ -26,25 +26,17 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#import <QuartzCore/CAMetalLayer.h>
-#import <Metal/Metal.h>
-#import <UIKit/UIKit.h>
+#import "System/iOS/iOSUtils.h"
 
-@interface OgreMetalView : UIView
+#import <UIKit/UIScreen.h>
 
-@property (readwrite, nonatomic) BOOL layerSizeDidUpdate;
+namespace Demo
+{
+	Ogre::Vector2 iOSUtils::getScreenResolutionInPoints(void)
+	{
+		UIScreen *mainScreen = [UIScreen mainScreen];
+		CGRect screenRect = [mainScreen bounds];
 
-/// When true (default), we will try to set the contentScaleFactor to the native's.
-/// You can use 'nativeScaleFactor' for further control.
-/// Note: Changing contentScaleFactor directly will force this value to false.
-@property (nonatomic) bool scaleToNative;
-
-/// When scaleToNative = true, instead of setting self.contentScaleFactor, you
-/// should change this setting. It's expressed in fractions of the nativeScale.
-///
-/// For example on an iPad Mini 3 the native factor is 2.0; thus if you set
-/// nativeScaleFactor = 1; then contentScaleFactor = 2.0
-/// If you set nativeScaleFactor = 0.5; we'll set contentScaleFactor = 1.0
-@property (nonatomic) CGFloat nativeScaleFactor;
-
-@end
+		return Ogre::Vector2( screenRect.size.width, screenRect.size.height );
+	}
+}

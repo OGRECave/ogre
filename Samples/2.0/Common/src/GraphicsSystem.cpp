@@ -31,6 +31,9 @@
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #include "OSX/macUtils.h"
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        #include "System/iOS/iOSUtils.h"
+    #endif
 #endif
 
 namespace Demo
@@ -117,6 +120,14 @@ namespace Demo
 
         int width   = 1280;
         int height  = 720;
+
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        {
+            Ogre::Vector2 screenRes = iOSUtils::getScreenResolutionInPoints();
+            width = static_cast<int>( screenRes.x );
+            height = static_cast<int>( screenRes.y );
+        }
+    #endif
 
         Ogre::ConfigOptionMap::iterator opt = cfgOpts.find( "Video Mode" );
         if( opt != cfgOpts.end() )
