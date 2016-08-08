@@ -282,6 +282,13 @@ namespace Ogre {
 
     static uint queryCpuFeatures(void)
     {
+
+#define CPUID_FUNC_VENDOR_ID                 0x0
+#define CPUID_FUNC_STANDARD_FEATURES         0x1
+#define CPUID_FUNC_EXTENSION_QUERY           0x80000000
+#define CPUID_FUNC_EXTENDED_FEATURES         0x80000001
+#define CPUID_FUNC_ADVANCED_POWER_MANAGEMENT 0x80000007
+
 #define CPUID_STD_FPU               (1<<0)
 #define CPUID_STD_TSC               (1<<4)
 #define CPUID_STD_CMOV              (1<<15)
@@ -290,7 +297,9 @@ namespace Ogre {
 #define CPUID_STD_SSE2              (1<<26)
 #define CPUID_STD_HTT               (1<<28)     // EDX[28] - Bit 28 set indicates  Hyper-Threading Technology is supported in hardware.
 
-#define CPUID_STD_SSE3              (1<<0)      // ECX[0] - Bit 0 of standard function 1 indicate SSE3 supported
+#define CPUID_STD_SSE3              (1<<0)      // ECX[0]  - Bit 0 of standard function 1 indicate SSE3 supported
+#define CPUID_STD_SSE41             (1<<19)     // ECX[19] - Bit 0 of standard function 1 indicate SSE41 supported
+#define CPUID_STD_SSE42             (1<<20)     // ECX[20] - Bit 0 of standard function 1 indicate SSE42 supported
 
 #define CPUID_FAMILY_ID_MASK        0x0F00      // EAX[11:8] - Bit 11 thru 8 contains family  processor id
 #define CPUID_EXT_FAMILY_ID_MASK    0x0F00000   // EAX[23:20] - Bit 23 thru 20 contains extended family processor id
@@ -300,6 +309,9 @@ namespace Ogre {
 #define CPUID_EXT_AMD_3DNOWEXT      (1<<30)
 #define CPUID_EXT_AMD_MMXEXT        (1<<22)
 
+
+#define CPUID_APM_INVARIANT_TSC     (1<<8)      // EDX[8] - Bit 8 of function 0x80000007 indicates support for invariant TSC.
+
         uint features = 0;
 
         // Supports CPUID instruction ?
@@ -308,7 +320,7 @@ namespace Ogre {
             CpuidResult result;
 
             // Has standard feature ?
-            if (_performCpuid(0, result))
+            if (_performCpuid(CPUID_FUNC_VENDOR_ID, result))
             {
                 // Check vendor strings
                 if (memcmp(&result._ebx, "GenuineIntel", 12) == 0)
@@ -317,7 +329,7 @@ namespace Ogre {
                         features |= PlatformInformation::CPU_FEATURE_PRO;
 
                     // Check standard feature
-                    _performCpuid(1, result);
+                    _performCpuid(CPUID_FUNC_STANDARD_FEATURES, result);
 
                     if (result._edx & CPUID_STD_FPU)
                         features |= PlatformInformation::CPU_FEATURE_FPU;
@@ -331,9 +343,12 @@ namespace Ogre {
                         features |= PlatformInformation::CPU_FEATURE_MMXEXT | PlatformInformation::CPU_FEATURE_SSE;
                     if (result._edx & CPUID_STD_SSE2)
                         features |= PlatformInformation::CPU_FEATURE_SSE2;
-
                     if (result._ecx & CPUID_STD_SSE3)
                         features |= PlatformInformation::CPU_FEATURE_SSE3;
+                    if (result._ecx & CPUID_STD_SSE41)
+                        features |= PlatformInformation::CPU_FEATURE_SSE41;
+                    if (result._ecx & CPUID_STD_SSE42)
+                        features |= PlatformInformation::CPU_FEATURE_SSE42;
 
                     // Check to see if this is a Pentium 4 or later processor
                     if ((result._eax & CPUID_EXT_FAMILY_ID_MASK) ||
@@ -343,13 +358,23 @@ namespace Ogre {
                         if (result._edx & CPUID_STD_HTT)
                             features |= PlatformInformation::CPU_FEATURE_HTT;
                     }
+
+
+                    const int maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
+                    if (maxExtensionFunctionSupport >= CPUID_FUNC_ADVANCED_POWER_MANAGEMENT)
+                    {
+                        _performCpuid(CPUID_FUNC_ADVANCED_POWER_MANAGEMENT, result);
+
+                        if (result._edx & CPUID_APM_INVARIANT_TSC)
+                            features |= PlatformInformation::CPU_FEATURE_INVARIANT_TSC;
+                    }
                 }
                 else if (memcmp(&result._ebx, "AuthenticAMD", 12) == 0)
                 {
                     features |= PlatformInformation::CPU_FEATURE_PRO;
 
                     // Check standard feature
-                    _performCpuid(1, result);
+                    _performCpuid(CPUID_FUNC_STANDARD_FEATURES, result);
 
                     if (result._edx & CPUID_STD_FPU)
                         features |= PlatformInformation::CPU_FEATURE_FPU;
@@ -368,10 +393,11 @@ namespace Ogre {
                         features |= PlatformInformation::CPU_FEATURE_SSE3;
 
                     // Has extended feature ?
-                    if (_performCpuid(0x80000000, result) > 0x80000000)
+                    const int maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
+                    if (maxExtensionFunctionSupport >= CPUID_FUNC_EXTENDED_FEATURES)
                     {
                         // Check extended feature
-                        _performCpuid(0x80000001, result);
+                        _performCpuid(CPUID_FUNC_EXTENDED_FEATURES, result);
 
                         if (result._edx & CPUID_EXT_3DNOW)
                             features |= PlatformInformation::CPU_FEATURE_3DNOW;
@@ -379,6 +405,15 @@ namespace Ogre {
                             features |= PlatformInformation::CPU_FEATURE_3DNOWEXT;
                         if (result._edx & CPUID_EXT_AMD_MMXEXT)
                             features |= PlatformInformation::CPU_FEATURE_MMXEXT;
+                    }
+
+
+                    if (maxExtensionFunctionSupport >= CPUID_FUNC_ADVANCED_POWER_MANAGEMENT)
+                    {
+                        _performCpuid(CPUID_FUNC_ADVANCED_POWER_MANAGEMENT, result);
+
+                        if (result._edx & CPUID_APM_INVARIANT_TSC)
+                            features |= PlatformInformation::CPU_FEATURE_INVARIANT_TSC;
                     }
                 }
             }
@@ -391,8 +426,13 @@ namespace Ogre {
     {
         uint features = queryCpuFeatures();
 
-        const uint sse_features = PlatformInformation::CPU_FEATURE_SSE |
-            PlatformInformation::CPU_FEATURE_SSE2 | PlatformInformation::CPU_FEATURE_SSE3;
+        const uint sse_features = 0
+            | PlatformInformation::CPU_FEATURE_SSE
+            | PlatformInformation::CPU_FEATURE_SSE2
+            | PlatformInformation::CPU_FEATURE_SSE3
+            | PlatformInformation::CPU_FEATURE_SSE41
+            | PlatformInformation::CPU_FEATURE_SSE42;
+
         if ((features & sse_features) && !_checkOperatingSystemSupportSSE())
         {
             features &= ~sse_features;
@@ -647,38 +687,44 @@ namespace Ogre {
         if(_isSupportCpuid())
         {
             pLog->logMessage(
-                " *      SSE: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE), true));
+                " *          SSE: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE), true));
             pLog->logMessage(
-                " *     SSE2: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE2), true));
+                " *         SSE2: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE2), true));
             pLog->logMessage(
-                " *     SSE3: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE3), true));
+                " *         SSE3: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE3), true));
             pLog->logMessage(
-                " *      MMX: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMX), true));
+                " *        SSE41: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE41), true));
             pLog->logMessage(
-                " *   MMXEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMXEXT), true));
+                " *        SSE42: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_SSE42), true));
             pLog->logMessage(
-                " *    3DNOW: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOW), true));
+                " *          MMX: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMX), true));
             pLog->logMessage(
-                " * 3DNOWEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOWEXT), true));
+                " *       MMXEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MMXEXT), true));
             pLog->logMessage(
-                " *     CMOV: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_CMOV), true));
+                " *        3DNOW: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOW), true));
             pLog->logMessage(
-                " *      TSC: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_TSC), true));
+                " *     3DNOWEXT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_3DNOWEXT), true));
             pLog->logMessage(
-                " *      FPU: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_FPU), true));
+                " *         CMOV: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_CMOV), true));
             pLog->logMessage(
-                " *      PRO: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_PRO), true));
+                " *          TSC: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_TSC), true));
             pLog->logMessage(
-                " *       HT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_HTT), true));
+                " *INVARIANT TSC: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_INVARIANT_TSC), true));
+            pLog->logMessage(
+                " *          FPU: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_FPU), true));
+            pLog->logMessage(
+                " *          PRO: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_PRO), true));
+            pLog->logMessage(
+                " *           HT: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_HTT), true));
         }
 #elif OGRE_CPU == OGRE_CPU_ARM || OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         pLog->logMessage(
-                " *      VFP: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_VFP), true));
+                " *          VFP: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_VFP), true));
         pLog->logMessage(
-                " *     NEON: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_NEON), true));
+                " *         NEON: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_NEON), true));
 #elif OGRE_CPU == OGRE_CPU_MIPS
         pLog->logMessage(
-                " *      MSA: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MSA), true));
+                " *          MSA: " + StringConverter::toString(hasCpuFeature(CPU_FEATURE_MSA), true));
 #endif
         pLog->logMessage("-------------------------");
 
