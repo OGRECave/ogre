@@ -250,6 +250,10 @@ namespace Ogre
             uint8 meshLod = pMovableObject->getCurrentMeshLod();
             const VertexArrayObjectArray &vaos = pRend->getVaos( static_cast<VertexPass>(casterPass) );
 
+            assert( meshLod < vaos.size() && "Vaos meshLod/shadowLod not set. "
+                    "Note: If this is a v1 object, it is in the wrong RenderQueue ID "
+                    "(or the queue incorrectly set)." );
+
             VertexArrayObject *vao = vaos[meshLod];
             meshHash = vao->getRenderQueueId();
         }
