@@ -161,26 +161,29 @@ namespace Ogre {
         enum CpuFeatures
         {
 #if OGRE_CPU == OGRE_CPU_X86
-            CPU_FEATURE_SSE         = 1 << 0,
-            CPU_FEATURE_SSE2        = 1 << 1,
-            CPU_FEATURE_SSE3        = 1 << 2,
-            CPU_FEATURE_MMX         = 1 << 3,
-            CPU_FEATURE_MMXEXT      = 1 << 4,
-            CPU_FEATURE_3DNOW       = 1 << 5,
-            CPU_FEATURE_3DNOWEXT    = 1 << 6,
-            CPU_FEATURE_CMOV        = 1 << 7,
-            CPU_FEATURE_TSC         = 1 << 8,
-            CPU_FEATURE_FPU         = 1 << 9,
-            CPU_FEATURE_PRO         = 1 << 10,
-            CPU_FEATURE_HTT         = 1 << 11,
-#elif OGRE_CPU == OGRE_CPU_ARM
-            CPU_FEATURE_VFP         = 1 << 12,
-            CPU_FEATURE_NEON        = 1 << 13,
-#elif OGRE_CPU == OGRE_CPU_MIPS
-            CPU_FEATURE_MSA         = 1 << 14,
+            CPU_FEATURE_SSE             = 1 << 0,
+            CPU_FEATURE_SSE2            = 1 << 1,
+            CPU_FEATURE_SSE3            = 1 << 2,
+            CPU_FEATURE_SSE41           = 1 << 3,
+            CPU_FEATURE_SSE42           = 1 << 4,
+            CPU_FEATURE_MMX             = 1 << 5,
+            CPU_FEATURE_MMXEXT          = 1 << 6,
+            CPU_FEATURE_3DNOW           = 1 << 7,
+            CPU_FEATURE_3DNOWEXT        = 1 << 8,
+            CPU_FEATURE_CMOV            = 1 << 9,
+            CPU_FEATURE_TSC             = 1 << 10,
+            CPU_FEATURE_INVARIANT_TSC   = 1 << 11,
+            CPU_FEATURE_FPU             = 1 << 12,
+            CPU_FEATURE_PRO             = 1 << 13,
+            CPU_FEATURE_HTT             = 1 << 14,
+#elif OGRE_CPU == OGRE_CPU_ARM          
+            CPU_FEATURE_VFP             = 1 << 15,
+            CPU_FEATURE_NEON            = 1 << 16,
+#elif OGRE_CPU == OGRE_CPU_MIPS         
+            CPU_FEATURE_MSA             = 1 << 17,
 #endif
 
-            CPU_FEATURE_NONE        = 0
+            CPU_FEATURE_NONE            = 0
         };
 
         /** Gets a string of the CPU identifier.
