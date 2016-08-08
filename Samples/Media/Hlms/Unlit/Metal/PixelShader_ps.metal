@@ -26,7 +26,6 @@ fragment @insertpiece( output_type ) main_metal
 	// START UNIFORM DECLARATION
 	@property( !hlms_shadowcaster )
 		@insertpiece( MaterialDecl )
-		@insertpiece( InstanceDecl )
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
@@ -47,8 +46,7 @@ fragment @insertpiece( output_type ) main_metal
 	@property( diffuse_map || alpha_test || diffuse )Material material;@end
 
 @property( diffuse_map || alpha_test || diffuse )
-	ushort materialId	= materialIdx[inPs.drawId].x;
-	material = materialArray[materialId];
+	material = materialArray[inPs.materialId];
 @end
 
 	@insertpiece( custom_ps_posMaterialLoad )

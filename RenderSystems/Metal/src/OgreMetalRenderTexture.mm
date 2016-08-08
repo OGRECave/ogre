@@ -38,24 +38,26 @@ namespace Ogre
                                             __unsafe_unretained id<MTLTexture> renderTexture,
                                             __unsafe_unretained id<MTLTexture> resolveTexture,
                                             PixelFormat format, uint32 depthPlane, uint32 slice,
-                                            uint32 fsaa, uint32 mip ) :
+                                            uint32 fsaa, uint32 mip, bool hwGamma ) :
         RenderTexture( buffer, depthPlane != 1 ? depthPlane : slice ),
         MetalRenderTargetCommon( ownerDevice )
     {
         mActive = false;
+        mHwGamma = hwGamma;
 
         mName = name;
         mFormat = format;
-        mWidth  = renderTexture.width;
-        mHeight = renderTexture.height;
+        mWidth  = static_cast<uint32>( renderTexture.width );
+        mHeight = static_cast<uint32>( renderTexture.height );
         mFSAA = fsaa;
+
+        this->init( renderTexture, resolveTexture );
 
         mColourAttachmentDesc.depthPlane        = depthPlane;
         mColourAttachmentDesc.slice             = slice;
         mColourAttachmentDesc.level             = mip;
         mColourAttachmentDesc.resolveTexture    = resolveTexture;
         mColourAttachmentDesc.texture           = renderTexture;
-        mColourAttachmentDesc.resolveLevel      = mip;
         mColourAttachmentDesc.resolveLevel      = mip;
         mColourAttachmentDesc.resolveDepthPlane = depthPlane;
         mColourAttachmentDesc.resolveSlice      = slice;

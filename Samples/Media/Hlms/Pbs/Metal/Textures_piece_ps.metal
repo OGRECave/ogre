@@ -93,5 +93,5 @@
 @end
 
 @property( envmap_scale )
-	@piece( ApplyEnvMapScale )* passBuf.ambientUpperHemi.w@end
+	@piece( ApplyEnvMapScale )* pass.ambientUpperHemi.w@end
 @end

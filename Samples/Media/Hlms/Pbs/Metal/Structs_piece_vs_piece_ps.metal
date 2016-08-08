@@ -128,7 +128,9 @@ struct Material
 
 @piece( VStoPS_block )
 	@property( !hlms_shadowcaster )
-		ushort drawId [[flat]];
+		@property( !lower_gpu_overhead )
+			ushort materialId [[flat]];
+		@end
 		@property( hlms_normal || hlms_qtangent )
 			float3 pos;
 			float3 normal;

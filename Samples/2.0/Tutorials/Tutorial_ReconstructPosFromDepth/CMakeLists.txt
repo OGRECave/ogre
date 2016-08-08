@@ -15,7 +15,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Sample_Tutorial_ReconstructPosFromDepth WIN32 ${SOURCE_FILES})
+ogre_add_executable(Sample_Tutorial_ReconstructPosFromDepth WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
 target_link_libraries(Sample_Tutorial_ReconstructPosFromDepth ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_Tutorial_ReconstructPosFromDepth)
+
+if( APPLE )
+	set_target_properties( Sample_Tutorial_ReconstructPosFromDepth PROPERTIES RESOURCE "${SAMPLE_COMMON_RESOURCES}" )
+	set_target_properties( Sample_Tutorial_ReconstructPosFromDepth PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SAMPLES_PLIST} )
+endif()

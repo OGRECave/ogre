@@ -275,8 +275,10 @@ namespace v1 {
                 name = "rtt/" + StringConverter::toString((size_t)this) + "/" + baseName;
                 RenderTexture *trt = OGRE_NEW MetalRenderTexture( device, name, this,
                                                                   renderTexture, resolveTexture,
-                                                                  mFormat, zoffset, mFace, fsaa, level );
+                                                                  mFormat, zoffset, mFace, fsaa, level,
+                                                                  mHwGamma );
                 mSliceTRT.push_back(trt);
+                RenderTexture** val = &mSliceTRT[0];
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*mSliceTRT[zoffset]);
             }
         }
@@ -290,8 +292,11 @@ namespace v1 {
             // was deleted by the user.
             for (SliceTRT::const_iterator it = mSliceTRT.begin(); it != mSliceTRT.end(); ++it)
             {
-                Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
+                if( *it )
+                    Root::getSingleton().getRenderSystem()->destroyRenderTarget((*it)->getName());
             }
+
+            mSliceTRT.clear();
         }
     }
     
@@ -301,17 +306,8 @@ namespace v1 {
             return;
 
         // Calculate size for all mip levels of the texture
-        size_t dataSize = 0;
-        if(mTarget == MTLTextureType2DArray)
-        {
-            dataSize = PixelUtil::getMemorySize( dest.getWidth(), dest.getHeight(),
-                                                 dest.getDepth(), data.format );
-        }
-        else
-        {
-            dataSize = PixelUtil::getMemorySize( data.getWidth(), data.getHeight(),
-                                                 mDepth, data.format );
-        }
+        size_t bytesPerImage = PixelUtil::getMemorySize( dest.getWidth(), dest.getHeight(),
+                                                         1, data.format );
 
         if (data.getWidth() != data.rowPitch)
         {
@@ -338,7 +334,7 @@ namespace v1 {
             data.format == PF_PVRTC_RGBA4 )
         {
             rowPitch = 0;
-            dataSize = 0;
+            bytesPerImage = 0;
         }
 
         switch(mTarget)
@@ -369,7 +365,7 @@ namespace v1 {
                                   slice:dest.getDepth() - 1u
                               withBytes:data.data
                             bytesPerRow:rowPitch
-                          bytesPerImage:dataSize];
+                          bytesPerImage:bytesPerImage];
                 break;
             case MTLTextureType2DMultisample:
                 [mTexture replaceRegion:MTLRegionMake2D( dest.left, dest.top,
@@ -385,7 +381,7 @@ namespace v1 {
                                   slice:mFace
                               withBytes:data.data
                             bytesPerRow:rowPitch
-                          bytesPerImage:dataSize];
+                          bytesPerImage:bytesPerImage];
                 break;
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
             case MTLTextureTypeCubeArray:
@@ -397,7 +393,7 @@ namespace v1 {
                                   slice:dest.getDepth()
                               withBytes:data.data
                             bytesPerRow:rowPitch
-                          bytesPerImage:dataSize];
+                          bytesPerImage:bytesPerImage];
 #endif
             case MTLTextureType3D:
                 [mTexture replaceRegion:MTLRegionMake3D( dest.left, dest.top, dest.front,
@@ -405,10 +401,10 @@ namespace v1 {
                                                          dest.getHeight(),
                                                          dest.getDepth() )
                             mipmapLevel:mLevel
-                                  slice:dest.getDepth() - 1u
+                                  slice:0
                               withBytes:data.data
                             bytesPerRow:rowPitch
-                          bytesPerImage:dataSize];
+                          bytesPerImage:bytesPerImage];
                 break;
         }
 
@@ -419,7 +415,7 @@ namespace v1 {
         << " bytes: " << mSizeInBytes
         << " dest depth: " << dest.getDepth()
         << " dest front: " << dest.front
-        << " datasize: " << dataSize
+        << " bytesPerImage: " << bytesPerImage
         << " face: " << mFace << " level: " << mLevel
         << " width: " << mWidth << " height: "<< mHeight << " depth: " << mDepth
         << " format: " << PixelUtil::getFormatName(mFormat)

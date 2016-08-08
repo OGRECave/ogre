@@ -41,12 +41,16 @@ THE SOFTWARE.
 
 - (void)initCommon
 {
-    self.opaque          = YES;
-    self.backgroundColor = nil;
+    self.opaque             = YES;
+    self.backgroundColor    = nil;
+    self.scaleToNative      = true;
+    self.nativeScaleFactor  = 1.0;
 }
 
 - (void)didMoveToWindow
 {
+    if( self.scaleToNative )
+        [super setContentScaleFactor:self.window.screen.nativeScale * self.nativeScaleFactor];
     _layerSizeDidUpdate = YES;
 }
 
@@ -75,8 +79,8 @@ THE SOFTWARE.
 
 - (void)setContentScaleFactor:(CGFloat)contentScaleFactor
 {
+    self.scaleToNative = false;
     [super setContentScaleFactor:contentScaleFactor];
-    
     _layerSizeDidUpdate = YES;
 }
 

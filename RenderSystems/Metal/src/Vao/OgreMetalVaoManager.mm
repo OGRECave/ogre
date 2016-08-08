@@ -217,7 +217,10 @@ namespace Ogre
 
             Vbo newVbo;
 
+            //Ensure pool size is multiple of 4 otherwise some StagingBuffer copies can fail.
+            //(when allocations happen very close to the end of the pool)
             size_t poolSize = std::max( mDefaultPoolSize[vboFlag], sizeBytes );
+            poolSize = alignToNextMultiple( poolSize, 4u );
 
             //No luck, allocate a new buffer.
             MTLResourceOptions resourceOptions = 0;

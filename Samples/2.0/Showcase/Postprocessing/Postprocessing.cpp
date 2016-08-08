@@ -1,9 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "PostprocessingGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
@@ -13,8 +11,16 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
+#include "System/MainEntryPoints.h"
 
-using namespace Demo;
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
+}
 
 namespace Demo
 {
@@ -42,22 +48,28 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[8] =
+            const char *c_locations[10] =
             {
                 "2.0/scripts/materials/Common",
                 "2.0/scripts/materials/Common/GLSL",
                 "2.0/scripts/materials/Common/HLSL",
+                "2.0/scripts/materials/Common/Metal",
                 "2.0/scripts/materials/TutorialSky_Postprocess",
                 "2.0/scripts/materials/Postprocessing",
                 "2.0/scripts/materials/Postprocessing/GLSL",
                 "2.0/scripts/materials/Postprocessing/HLSL",
+                "2.0/scripts/materials/Postprocessing/Metal",
                 "2.0/scripts/materials/Postprocessing/SceneAssets",
             };
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE && OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
             Ogre::String dataFolder = originalDataFolder + "packs/cubemapsJS.zip";
+#else
+            Ogre::String dataFolder = originalDataFolder + "cubemapsJS.zip";
+#endif
             addResourceLocation( dataFolder, "Zip", "General" );
 
-            for( size_t i=0; i<8; ++i )
+            for( size_t i=0; i<10; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
@@ -70,15 +82,13 @@ namespace Demo
         {
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    PostprocessingGameState postprocessingGameState(
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        PostprocessingGameState *gfxGameState = new PostprocessingGameState(
         "Shows how to use the compositor for postprocessing effects.\n"
         "Use the numbers in the keyboard to toggle effects on/off\n"
         "\nThere is no 'right way' to setup a compositor. This sample\n"
@@ -97,54 +107,27 @@ int mainApp()
         "   * Samples/Media/2.0/materials/Postprocessing/*.*\n"
         "   * Samples/Media/2.0/scripts/materials/TutorialSky_Postprocess/*.*\n"
         "   * Samples/Media/packs/cubemapsJS.zip\n" );
-    PostprocessingGraphicsSystem graphicsSystem( &postprocessingGameState );
 
-    postprocessingGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new PostprocessingGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "Postprocessing Sample" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Postprocessing Sample";
+    }
 }
+

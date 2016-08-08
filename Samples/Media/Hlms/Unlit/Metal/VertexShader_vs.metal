@@ -90,7 +90,7 @@ vertex PS_INPUT main_metal
 @end @property( !out_uv@_texture_matrix )
 			input.uv@value( out_uv@n_source_uv ).xy;@end @end
 
-	outVs.drawId = drawId;
+	outVs.materialId = (ushort)materialIdx[drawId].x;
 
 @end @property( hlms_shadowcaster )
 	float shadowConstantBias = as_type<float>( materialIdx[drawId].y );

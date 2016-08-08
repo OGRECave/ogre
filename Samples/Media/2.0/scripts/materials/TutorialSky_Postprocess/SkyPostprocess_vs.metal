@@ -18,12 +18,12 @@ vertex PS_INPUT main_metal
 (
 	VS_INPUT input [[stage_in]],
 
-	constant float4x4 *worldViewProj [[buffer(PARAMETER_SLOT)]]
+	constant float4x4 &worldViewProj [[buffer(PARAMETER_SLOT)]]
 )
 {
 	PS_INPUT outVs;
 
-	outVs.gl_Position	= ( *worldViewProj * input.position ).xyww;
+	outVs.gl_Position	= ( worldViewProj * input.position ).xyww;
 	outVs.cameraDir		= input.normal;
 
 	return outVs;

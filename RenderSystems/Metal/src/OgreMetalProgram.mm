@@ -335,7 +335,8 @@ namespace Ogre {
 
                 mConstantsBytesToWrite = std::max<uint32>( mConstantsBytesToWrite,
                                                            def.logicalIndex +
-                                                           def.arraySize * def.elementSize );
+                                                           def.arraySize * def.elementSize *
+                                                           sizeof(float) );
             }
         }
 

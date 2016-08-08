@@ -109,7 +109,7 @@ namespace Ogre
         const size_t maxMips = PixelUtil::getMaxMipmapCount( mWidth, mHeight,
                                                              mTextureType == TEX_TYPE_3D ? mDepth : 1 );
 
-        if( PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0) )
+        if( (PixelUtil::isCompressed(mFormat) && (mNumMipmaps == 0)) || mTextureType == TEX_TYPE_1D )
             mNumRequestedMipmaps = 0;
 
         mNumMipmaps = mNumRequestedMipmaps;

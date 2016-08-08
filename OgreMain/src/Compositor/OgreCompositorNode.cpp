@@ -986,7 +986,10 @@ namespace Ogre
             const CompositorPassDef *passDef = pass->getDefinition();
 
             if( lastTarget != pass->getRenderTarget() )
+            {
                 mRenderSystem->_notifyCompositorNodeSwitchedRenderTarget( lastTarget );
+                lastTarget = pass->getRenderTarget();
+            }
 
             if( executionMask & passDef->mExecutionMask &&
                 (!shadowNode || shadowNode->isShadowMapIdxActive( passDef->mShadowMapIdx ) ) )

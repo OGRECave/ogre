@@ -45,7 +45,7 @@ namespace Ogre
                             __unsafe_unretained id<MTLTexture> renderTexture,
                             __unsafe_unretained id<MTLTexture> resolveTexture,
                             PixelFormat format, uint32 depthPlane, uint32 slice,
-                            uint32 fsaa, uint32 mip );
+                            uint32 fsaa, uint32 mip, bool hwGamma );
         virtual ~MetalRenderTexture();
 
         virtual void swapBuffers(void);

@@ -148,7 +148,7 @@ vertex PS_INPUT main_metal
 	@end
 	// START UNIFORM DECLARATION
 	@insertpiece( PassDecl )
-	@property( hlms_skeleton || hlms_shadowcaster )@insertpiece( InstanceDecl )@end
+	@insertpiece( InstanceDecl )
 	, device const float4 *worldMatBuf [[buffer(TEX_SLOT_START+0)]]
 	@insertpiece( custom_vs_uniformDeclaration )
 	// END UNIFORM DECLARATION
@@ -211,8 +211,8 @@ vertex PS_INPUT main_metal
 @foreach( hlms_uv_count, n )
 	outVs.uv@n = input.uv@n;@end
 
-@property( !hlms_shadowcaster || alpha_test )
-	outVs.drawId = drawId;@end
+@property( (!hlms_shadowcaster || alpha_test) && !lower_gpu_overhead )
+	outVs.materialId = worldMaterialIdx[drawId].x & 0x1FFu;@end
 
 	@insertpiece( custom_vs_posExecution )
 
