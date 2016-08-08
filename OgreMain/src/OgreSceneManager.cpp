@@ -2121,9 +2121,9 @@ void SceneManager::updateAllTransforms()
         const size_t numDepths = nodeMemoryManager->getNumDepths();
 
         size_t start = nodeMemoryManager->getMemoryManagerType() == SCENE_STATIC ?
-                                                    mStaticMinDepthLevelDirty : 1;
+                                                    mStaticMinDepthLevelDirty : 0;
 
-        //Start from the first level (not root) unless static (start from first dirty)
+        //Start from the zeroth level (root) unless static (start from first dirty)
         for( size_t i=start; i<numDepths; ++i )
         {
             Transform t;
