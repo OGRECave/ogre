@@ -31,15 +31,27 @@ THE SOFTWARE.
 
 using namespace Ogre;
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
+bool Timer::sUseQPCAffinityWorkaround = Timer::isQPCAffinityWorkaroundRequired();
+bool Timer::isQPCAffinityWorkaroundRequired()
+{
+    // Workaround is needed for Windows XP and Windows 2000 and only if CPU has no invariant TSC or there are many CPUs
+    // All OSes since Vista fallbacks to reliable timestamp sources in QPC implementation
+    // https://msdn.microsoft.com/en-us/library/windows/desktop/dn553408(v=vs.85).aspx
+    SYSTEM_INFO sysInfo;
+    return (DWORD)(LOBYTE(LOWORD(GetVersion()))) < 6 // version.major < Vista
+        && ((GetSystemInfo(&sysInfo), sysInfo.dwNumberOfProcessors > 1)
+        || !PlatformInformation::hasCpuFeature(PlatformInformation::CPU_FEATURE_INVARIANT_TSC));
+}
+#endif
 //-------------------------------------------------------------------------
 Timer::Timer()
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    : mTimerMask( 0 )
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
+    : mTimerMask(0)
 #endif
 {
     reset();
 }
-
 //-------------------------------------------------------------------------
 Timer::~Timer()
 {
@@ -48,8 +60,8 @@ Timer::~Timer()
 //-------------------------------------------------------------------------
 bool Timer::setOption( const String & key, const void * val )
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    if ( key == "QueryAffinityMask" )
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
+    if (sUseQPCAffinityWorkaround && key == "QueryAffinityMask" )
     {
         // Telling timer what core to use for a timer read
         DWORD newTimerMask = * static_cast < const DWORD * > ( val );
@@ -77,31 +89,38 @@ bool Timer::setOption( const String & key, const void * val )
 //-------------------------------------------------------------------------
 void Timer::reset()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
     // Get the current process core mask
-    DWORD_PTR procMask;
-    DWORD_PTR sysMask;
-    GetProcessAffinityMask(GetCurrentProcess(), &procMask, &sysMask);
-
-    // If procMask is 0, consider there is only one core available
-    // (using 0 as procMask will cause an infinite loop below)
-    if (procMask == 0)
-        procMask = 1;
-
-    // Find the lowest core that this process uses
-    if( mTimerMask == 0 )
+    HANDLE thread;
+    DWORD_PTR oldMask;
+    if (sUseQPCAffinityWorkaround)
     {
-        mTimerMask = 1;
-        while( ( mTimerMask & procMask ) == 0 )
+        DWORD_PTR procMask;
+        DWORD_PTR sysMask;
+        GetProcessAffinityMask(GetCurrentProcess(), &procMask, &sysMask);
+
+        // If procMask is 0, consider there is only one core available
+        // (using 0 as procMask will cause an infinite loop below)
+        if (procMask == 0)
+            procMask = 1;
+
+        // Find the lowest core that this process uses
+        if (mTimerMask == 0)
         {
-            mTimerMask <<= 1;
+            mTimerMask = 1;
+            while ((mTimerMask & procMask) == 0)
+            {
+                mTimerMask <<= 1;
+            }
         }
+
+        thread = GetCurrentThread();
+
+        // Set affinity to the first core
+
+
+        oldMask = SetThreadAffinityMask(thread, mTimerMask);
     }
-
-    HANDLE thread = GetCurrentThread();
-
-    // Set affinity to the first core
-    DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
 #endif
 
     // Get the constant frequency
@@ -111,9 +130,10 @@ void Timer::reset()
     QueryPerformanceCounter(&mStartTime);
     mStartTick = GetTickCount();
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
     // Reset affinity
-    SetThreadAffinityMask(thread, oldMask);
+    if (sUseQPCAffinityWorkaround)
+        SetThreadAffinityMask(thread, oldMask);
 #endif
 
     mLastTime = 0;
@@ -125,23 +145,28 @@ unsigned long Timer::getMilliseconds()
 {
     LARGE_INTEGER curTime;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    HANDLE thread = GetCurrentThread();
-
-    // Set affinity to the first core
-    DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
+    HANDLE thread;
+    DWORD_PTR oldMask;
+    if (sUseQPCAffinityWorkaround)
+    {
+        thread = GetCurrentThread();
+        // Set affinity to the first core
+        oldMask = SetThreadAffinityMask(thread, mTimerMask);
+    }
 #endif
 
     // Query the timer
     QueryPerformanceCounter(&curTime);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
     // Reset affinity
-    SetThreadAffinityMask(thread, oldMask);
+    if (sUseQPCAffinityWorkaround)
+        SetThreadAffinityMask(thread, oldMask);
 #endif
 
     LONGLONG newTime = curTime.QuadPart - mStartTime.QuadPart;
-    
+
     // scale by 1000 for milliseconds
     unsigned long newTicks = (unsigned long) (1000 * newTime / mFrequency.QuadPart);
 
@@ -171,23 +196,29 @@ unsigned long Timer::getMicroseconds()
 {
     LARGE_INTEGER curTime;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-    HANDLE thread = GetCurrentThread();
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
+    HANDLE thread;
+    DWORD_PTR oldMask;
+    if (sUseQPCAffinityWorkaround)
+    {
+        thread = GetCurrentThread();
+        // Set affinity to the first core
 
-    // Set affinity to the first core
-    DWORD_PTR oldMask = SetThreadAffinityMask(thread, mTimerMask);
+        oldMask = SetThreadAffinityMask(thread, mTimerMask);
+    }
 #endif
 
     // Query the timer
     QueryPerformanceCounter(&curTime);
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
     // Reset affinity
-    SetThreadAffinityMask(thread, oldMask);
+    if (sUseQPCAffinityWorkaround)
+        SetThreadAffinityMask(thread, oldMask);
 #endif
 
     LONGLONG newTime = curTime.QuadPart - mStartTime.QuadPart;
-    
+
     // get milliseconds to check against GetTickCount
     unsigned long newTicks = (unsigned long) (1000 * newTime / mFrequency.QuadPart);
     
