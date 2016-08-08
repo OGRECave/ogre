@@ -57,7 +57,9 @@ namespace Ogre
         LARGE_INTEGER mStartTime;
         LARGE_INTEGER mFrequency;
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32 && _WIN32_WINNT < _WIN32_WINNT_VISTA
+        static bool isQPCAffinityWorkaroundRequired();
+        static bool sUseQPCAffinityWorkaround;
         DWORD_PTR mTimerMask;
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
