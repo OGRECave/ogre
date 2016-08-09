@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "OgreGLES2GpuProgram.h"
 
 namespace Ogre {
+    class GLSLESProgram;
 
     /** GLSL ES low level compiled shader object - this class is used to get at the linked program object 
         and provide an interface for GLES2RenderSystem calls.  GLSL ES does not provide access to the
