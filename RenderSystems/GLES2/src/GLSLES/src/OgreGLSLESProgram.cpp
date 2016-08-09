@@ -246,7 +246,7 @@ namespace Ogre {
         }
 
         if (checkErrors)
-            logObjectInfo("GLSL ES compiling: " + mName, mGLShaderHandle);
+            GLSLES::logObjectInfo("GLSL ES compiling: " + mName, mGLShaderHandle);
 
         OGRE_CHECK_GL_ERROR(glCompileShader(mGLShaderHandle));
 
@@ -254,13 +254,13 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetShaderiv(mGLShaderHandle, GL_COMPILE_STATUS, &mCompiled));
         if(!mCompiled && checkErrors)
         {
-            String message = logObjectInfo("GLSL ES compile log: " + mName, mGLShaderHandle);
+            String message = GLSLES::logObjectInfo("GLSL ES compile log: " + mName, mGLShaderHandle);
             checkAndFixInvalidDefaultPrecisionError(message);
         }
 
         // Log a message that the shader compiled successfully.
         if (mCompiled && checkErrors)
-            logObjectInfo("GLSL ES compiled: " + mName, mGLShaderHandle);
+            GLSLES::logObjectInfo("GLSL ES compiled: " + mName, mGLShaderHandle);
 
         if(!mCompiled)
         {

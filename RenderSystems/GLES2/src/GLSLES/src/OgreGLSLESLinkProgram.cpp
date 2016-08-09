@@ -178,7 +178,7 @@ namespace Ogre {
         OGRE_CHECK_GL_ERROR(glGetProgramiv( mGLProgramHandle, GL_LINK_STATUS, &mLinked ));
         mTriedToLinkAndFailed = !mLinked;
 
-        logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
+        GLSLES::logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
         if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
@@ -197,7 +197,7 @@ namespace Ogre {
             glValidateProgram(mGLProgramHandle);
         }
 
-        logObjectInfo( getCombinedName() + String(" GLSL validation result : "), mGLProgramHandle );
+        GLSLES::logObjectInfo( getCombinedName() + String(" GLSL validation result : "), mGLProgramHandle );
 
         if(mLinked)
         {
