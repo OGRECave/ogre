@@ -94,7 +94,7 @@ namespace Ogre
                 
                 mTriedToLinkAndFailed = !linkStatus;
                 
-                logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
+                GLSLES::logObjectInfo( getCombinedName() + String("GLSL vertex program result : "), programHandle );
 
                 setSkeletalAnimationIncluded(mVertexProgram->isSkeletalAnimationIncluded());
             }
@@ -134,7 +134,7 @@ namespace Ogre
                 
                 mTriedToLinkAndFailed = !linkStatus;
                 
-                logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
+                GLSLES::logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
             }
         }
         
@@ -150,7 +150,7 @@ namespace Ogre
             }
 
             // Validate pipeline
-            logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
+            GLSLES::logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             if(mVertexProgram && mFragmentProgram && getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
             {
