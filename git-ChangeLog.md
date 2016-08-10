@@ -31,9 +31,11 @@
 * fix different lighting intensity compared to legacy GL
 
 ## OgreMain
-* restored compatibility with 1.9 (`StringUtil::BLANK`, `StringUtil::StrStreamType`)
+* restored API compatibility with 1.9 (`StringUtil::BLANK`, `StringUtil::StrStreamType`)
 * fix build on iOS using cross-toolchain/ add instructions
 * fix GLSLES Shaders for ShadowVolumeExtrudeProgram
+* OSX: `externalWindowHandle` expects a `NSWindow*` by default. `macAPICocoaUseNSView=false` switches to old behaviour.
+* FileSystemLayer: use `$XDG_CACHE_HOME` as base path on Linux
 
 ## Tests
 * Visual Tests can be built without OIS
@@ -57,6 +59,7 @@
 * can be compiled without any input. Start a sample using `./SampleBrowser <SampleNumber>`
 * neither SDL2 nor OIS needed for Android anymore
 * improved input handling on Android
+* VolumeTerrain: fixed triplanar texturing shaders 
 
 ## EGL in GLNativeSupport ([branch](https://github.com/OGRECave/ogre/pull/185))
 * all supported RenderSystems ported to GLNativeSupport 
