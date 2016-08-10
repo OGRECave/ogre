@@ -390,13 +390,13 @@ namespace Ogre
          <tr>
             <td>macAPICocoaUseNSView</td>
             <td>bool "true" or "false"</td>
-            <td>"false"</td>
+            <td>"true"</td>
             <td>On the Mac platform the most diffused method to embed OGRE in a custom application is to use Interface Builder
                 and add to the interface an instance of OgreView.
                 The pointer to this instance is then used as "externalWindowHandle".
-                However, there are cases where you are NOT using Interface Builder and you get the Cocoa NSView* of an existing interface.
+                However, there are cases where you are NOT using Interface Builder and you get the Cocoa NSWindow* of an existing interface.
                 For example, this is happens when you want to render into a Java/AWT interface.
-                In short, by setting this flag to "true" the Ogre::Root::createRenderWindow interprets the "externalWindowHandle" as a NSView*
+                In short, by setting this flag to "true" the Ogre::Root::createRenderWindow interprets the "externalWindowHandle" as a NSWindow*
                 instead of an OgreView*. See OgreOSXCocoaView.h/mm.
             </td>
             <td>Mac OS X Specific</td>
