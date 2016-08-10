@@ -63,7 +63,7 @@ namespace Ogre {
 
     CocoaWindow::CocoaWindow() : mWindow(nil), mView(nil), mGLContext(nil), mGLPixelFormat(nil), mWindowOriginPt(NSZeroPoint),
         mWindowDelegate(NULL), mActive(false), mClosed(false), mVSync(true), mHasResized(false), mIsExternal(false), mWindowTitle(""),
-        mUseNSView(false), mContentScalingFactor(1.0)
+        mUseNSView(true), mContentScalingFactor(1.0)
     {
         // Set vsync by default to save battery and reduce tearing
     }
@@ -292,14 +292,15 @@ namespace Ogre {
             param_useNSView_pair = miscParams->find("macAPICocoaUseNSView");
             
             if(param_useNSView_pair != miscParams->end())
-                if(param_useNSView_pair->second == "true")
-                    mUseNSView = true;
+                mUseNSView = StringConverter::parseBool(param_useNSView_pair->second, true);
+
             // If the macAPICocoaUseNSView parameter was set, use the winhandler as pointer to an NSView
             // Otherwise we assume the user created the interface with Interface Builder and instantiated an OgreView.
             
             if(mUseNSView) {
                 LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external plain NSView*");
-                NSView *nsview = (NSView*)StringConverter::parseUnsignedLong(opt->second);
+                NSWindow *nswindow = (NSWindow*)StringConverter::parseUnsignedLong(opt->second);
+                NSView *nsview = [nswindow contentView];
                 mView = nsview;
             } else {
                 LogManager::getSingleton().logMessage("Mac Cocoa Window: Rendering on an external OgreGL3PlusView*");
