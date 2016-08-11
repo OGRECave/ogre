@@ -99,13 +99,13 @@
 	@sub( diffuse_map@n_idx, diffuse_map@n, 1 ) @end
 
 @piece( diffuseIdx0 )material.indices0_3.x & 0x0000FFFFu@end
-@piece( diffuseIdx1 )material.indices0_3.y >> 16u@end
-@piece( diffuseIdx2 )material.indices0_3.z & 0x0000FFFFu@end
-@piece( diffuseIdx3 )material.indices0_3.w >> 16u@end
-@piece( diffuseIdx4 )material.indices4_7.x & 0x0000FFFFu@end
-@piece( diffuseIdx5 )material.indices4_7.y >> 16u@end
-@piece( diffuseIdx6 )material.indices4_7.z & 0x0000FFFFu@end
-@piece( diffuseIdx7 )material.indices4_7.w >> 16u@end
+@piece( diffuseIdx1 )material.indices0_3.x >> 16u@end
+@piece( diffuseIdx2 )material.indices0_3.y & 0x0000FFFFu@end
+@piece( diffuseIdx3 )material.indices0_3.y >> 16u@end
+@piece( diffuseIdx4 )material.indices0_3.z & 0x0000FFFFu@end
+@piece( diffuseIdx5 )material.indices0_3.z >> 16u@end
+@piece( diffuseIdx6 )material.indices0_3.w & 0x0000FFFFu@end
+@piece( diffuseIdx7 )material.indices0_3.w >> 16u@end
 
 @foreach( diffuse_map, n )
     @property( diffuse_map@n_array )
