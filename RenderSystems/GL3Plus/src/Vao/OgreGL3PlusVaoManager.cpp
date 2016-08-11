@@ -93,11 +93,11 @@ namespace Ogre
         glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
         mConstBufferAlignment = alignment;
         glGetIntegerv( GL_TEXTURE_BUFFER_OFFSET_ALIGNMENT, &alignment );
-        mTexBufferAlignment = alignment;
+        mTexBufferAlignment = std::max<uint32>( alignment, 16u );
         if( _supportsSsbo )
         {
             glGetIntegerv( GL_SHADER_STORAGE_BUFFER_OFFSET_ALIGNMENT, &alignment );
-            mUavBufferAlignment = alignment;
+            mUavBufferAlignment = std::max<uint32>( alignment, 16u );
         }
 
         GLint maxBufferSize;
