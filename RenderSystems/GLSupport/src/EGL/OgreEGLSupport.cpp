@@ -72,7 +72,7 @@ namespace Ogre {
         optVSync.name = "VSync";
         optVSync.possibleValues.push_back("No");
         optVSync.possibleValues.push_back("Yes");
-        optVSync.currentValue = optVSync.possibleValues[0];
+        optVSync.currentValue = optVSync.possibleValues[1];
         optVSync.immutable = false;
 
         optFSAA.name = "FSAA";
@@ -89,7 +89,7 @@ namespace Ogre {
         optFullScreen.possibleValues.push_back("No");
         optFullScreen.possibleValues.push_back("Yes");
 
-        optFullScreen.currentValue = optFullScreen.possibleValues[1];
+        optFullScreen.currentValue = optFullScreen.possibleValues[0];
 
         VideoModes::const_iterator value = mVideoModes.begin();
         VideoModes::const_iterator end = mVideoModes.end();
