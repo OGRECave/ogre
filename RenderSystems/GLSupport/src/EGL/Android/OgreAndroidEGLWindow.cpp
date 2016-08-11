@@ -32,12 +32,13 @@ THE SOFTWARE.
 #include "OgreStringConverter.h"
 #include "OgreWindowEventUtilities.h"
 
-#include "OgreGLES2RenderSystem.h"
+#include "OgreGLRenderSystemCommon.h"
 
 #include "OgreAndroidEGLSupport.h"
 #include "OgreAndroidEGLWindow.h"
-#include "OgreGLES2ManagedResourceManager.h"
 #include "OgreViewport.h"
+
+#include <android/native_window.h>
 
 #include <iostream>
 #include <algorithm>
@@ -125,15 +126,15 @@ namespace Ogre {
                 StringConverter::parseBool(opt->second))
             {
                 eglContext = eglGetCurrentContext();
-                if (eglContext)
+                if (!eglContext)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                                 "currentGLContext was specified with no current GL context",
                                 "EGLWindow::create");
                 }
                 
-                eglContext = eglGetCurrentContext();
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                mEglDisplay = eglGetCurrentDisplay();
             }
             
             
@@ -148,7 +149,7 @@ namespace Ogre {
             }
             
             int ctxHandle = -1;
-            if((miscParams->find("externalGLContext")) != end)
+            if((opt = miscParams->find("externalGLContext")) != end)
             {
                 mIsExternalGLControl = true;
                 ctxHandle = Ogre::StringConverter::parseInt(opt->second);
@@ -242,7 +243,7 @@ namespace Ogre {
         {
             mContext->setCurrent();
 
-            GLES2RenderSystem::getResourceManager()->notifyOnContextLost();
+            static_cast<GLRenderSystemCommon*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->notifyOnContextLost();
             mContext->_destroyInternalResources();
         }
         
@@ -352,7 +353,7 @@ namespace Ogre {
             eglGetConfigAttrib(mEglDisplay, mEglConfig, EGL_NATIVE_VISUAL_ID, &format);
             EGL_CHECK_ERROR
 
-            ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
+                ANativeWindow_setBuffersGeometry(mWindow, 0, 0, format);
 
             mEglSurface = createSurfaceFromWindow(mEglDisplay, mWindow);
 
@@ -373,7 +374,7 @@ namespace Ogre {
             {
                 mContext->_createInternalResources(mEglDisplay, mEglConfig, mEglSurface, NULL);
 
-                static_cast<GLES2RenderSystem*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
+                static_cast<GLRenderSystemCommon*>(Ogre::Root::getSingletonPtr()->getRenderSystem())->resetRenderer(this);
             }
         }
     }

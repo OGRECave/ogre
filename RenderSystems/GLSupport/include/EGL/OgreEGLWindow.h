@@ -44,6 +44,8 @@ namespace Ogre {
             bool mIsTopLevel;
             bool mIsExternal;
             bool mIsExternalGLControl;
+            bool mVSync;
+            unsigned int mVSyncInterval;
 
             EGLSupport* mGLSupport;
             EGLContext* mContext;
@@ -84,6 +86,22 @@ namespace Ogre {
             void setVisible(bool visible);
             void swapBuffers();
             void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+
+            /** @copydoc see RenderWindow::setVSyncEnabled */
+            void setVSyncEnabled(bool vsync);
+
+            /** @copydoc see RenderWindow::isVSyncEnabled */
+            bool isVSyncEnabled() const {
+                return mVSync;
+            }
+
+            /** @copydoc see RenderWindow::setVSyncInterval */
+            void setVSyncInterval(unsigned int interval);
+
+            /** @copydoc see RenderWindow::getVSyncInterval */
+            unsigned int getVSyncInterval() const {
+                return mVSyncInterval;
+            }
 
             /**
                @remarks

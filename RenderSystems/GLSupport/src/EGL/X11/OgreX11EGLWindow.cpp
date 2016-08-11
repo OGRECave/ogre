@@ -109,19 +109,18 @@ namespace Ogre {
 
     void X11EGLWindow::initNativeCreatedWindow(const NameValuePairList *miscParams)
     {
+        mExternalWindow = 0;
+        mNativeDisplay = mGLSupport->getNativeDisplay();
+        mParentWindow = DefaultRootWindow((Display*)mNativeDisplay);
+
         if (miscParams)
         {
             NameValuePairList::const_iterator opt;
             NameValuePairList::const_iterator end = miscParams->end();
 
-            mExternalWindow = 0;
-            mNativeDisplay = mGLSupport->getNativeDisplay();
-            mParentWindow = DefaultRootWindow((Display*)mNativeDisplay);
-
             if ((opt = miscParams->find("parentWindowHandle")) != end)
             {
-                //vector<String>::type tokens = StringUtil::split(opt->second, " :");
-                        StringVector tokens = StringUtil::split(opt->second, " :");
+                StringVector tokens = StringUtil::split(opt->second, " :");
 
                 if (tokens.size() == 3)
                 {
@@ -303,7 +302,7 @@ namespace Ogre {
 
     void X11EGLWindow::setFullscreen( bool fullscreen, uint width, uint height )
     {
-        if (mIsFullScreen != fullscreen && &mGLSupport->mAtomFullScreen == None)
+        if (mIsFullScreen != fullscreen && mGLSupport->mAtomFullScreen == None)
         {
             // Without WM support it is best to give up.
             LogManager::getSingleton().logMessage("EGLWindow::switchFullScreen: Your WM has no fullscreen support");
@@ -382,7 +381,7 @@ namespace Ogre {
 
         XGetWindowAttributes((Display*)mNativeDisplay, (Window)mWindow, &windowAttrib);
 
-        if (mWidth == windowAttrib.width && mHeight == windowAttrib.height)
+        if (mWidth == uint32(windowAttrib.width) && mHeight == uint32(windowAttrib.height))
         {
             return;
         }
@@ -397,7 +396,7 @@ namespace Ogre {
     }
     void X11EGLWindow::switchFullScreen(bool fullscreen)
     { 
-        if (&mGLSupport->mAtomFullScreen != None)
+        if (mGLSupport->mAtomFullScreen != None)
         {
             NativeDisplayType mNativeDisplay = mGLSupport->getNativeDisplay();
             XClientMessageEvent xMessage;
@@ -434,6 +433,8 @@ namespace Ogre {
         int left = 0;
         int top  = 0;
 
+        unsigned int vsyncInterval = 1;
+
         getLeftAndTopFromNativeWindow(left, top, width, height);
 
         mIsFullScreen = fullScreen;
@@ -448,16 +449,16 @@ namespace Ogre {
             {
                 eglContext = eglGetCurrentContext();
                 EGL_CHECK_ERROR
-                if (eglContext)
+                if (!eglContext)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                                 "currentGLContext was specified with no current GL context",
                                 "EGLWindow::create");
                 }
 
-                eglContext = eglGetCurrentContext();
-                EGL_CHECK_ERROR
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                EGL_CHECK_ERROR
+                mEglDisplay = eglGetCurrentDisplay();
                 EGL_CHECK_ERROR
             }
 
@@ -501,9 +502,9 @@ namespace Ogre {
             {
                 mIsExternalGLControl = StringConverter::parseBool(opt->second);
             }
-    }
+        }
 
-    initNativeCreatedWindow(miscParams);
+        initNativeCreatedWindow(miscParams);
 
         if (mEglSurface)
         {
@@ -566,24 +567,25 @@ namespace Ogre {
             mGLSupport->switchMode (width, height, frequency);
         }
 
-    if (!mIsExternal)
+        if (!mIsExternal)
         {
-        createNativeWindow(left, top, width, height, title);
-    }
+            createNativeWindow(left, top, width, height, title);
+        }
 
-    mContext = createEGLContext();
+        mContext = createEGLContext();
 
-        ::EGLSurface oldDrawableDraw = eglGetCurrentSurface(EGL_DRAW);
-        EGL_CHECK_ERROR
-        ::EGLSurface oldDrawableRead = eglGetCurrentSurface(EGL_READ);
-        EGL_CHECK_ERROR
-        ::EGLContext oldContext  = eglGetCurrentContext();
-        EGL_CHECK_ERROR
+        // apply vsync settings. call setVSyncInterval first to avoid
+        // setting vsync more than once.
+        setVSyncInterval(vsyncInterval);
+        setVSyncEnabled(vsync);
 
-        int glConfigID;
-
-        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_CONFIG_ID, &glConfigID);
-        LogManager::getSingleton().logMessage("EGLWindow::create used FBConfigID = " + StringConverter::toString(glConfigID));
+        int Rsz, Gsz, Bsz, Asz;
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_RED_SIZE, &Rsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_BLUE_SIZE, &Gsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_GREEN_SIZE, &Bsz);
+        mGLSupport->getGLConfigAttrib(mEglConfig, EGL_ALPHA_SIZE, &Asz);
+        LogManager::getSingleton().stream() << "X11EGLWindow::create used FBConfig = " <<
+                Rsz << "/" << Bsz << "/" << Gsz << "/" << Asz;
 
         mName = name;
         mWidth = width;

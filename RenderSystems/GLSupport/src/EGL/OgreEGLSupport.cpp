@@ -55,6 +55,7 @@ namespace Ogre {
         ConfigOption optVideoMode;
         ConfigOption optDisplayFrequency;
         ConfigOption optFSAA;
+        ConfigOption optVSync;
 #if GL_OES_packed_depth_stencil
         ConfigOption optRTTMode;
 #endif
@@ -67,6 +68,12 @@ namespace Ogre {
 
         optDisplayFrequency.name = "Display Frequency";
         optDisplayFrequency.immutable = false;
+
+        optVSync.name = "VSync";
+        optVSync.possibleValues.push_back("No");
+        optVSync.possibleValues.push_back("Yes");
+        optVSync.currentValue = optVSync.possibleValues[0];
+        optVSync.immutable = false;
 
         optFSAA.name = "FSAA";
         optFSAA.immutable = false;
@@ -115,6 +122,7 @@ namespace Ogre {
         mOptions[optVideoMode.name] = optVideoMode;
         mOptions[optDisplayFrequency.name] = optDisplayFrequency;
         mOptions[optFSAA.name] = optFSAA;
+        mOptions[optVSync.name] = optVSync;
 #if GL_OES_packed_depth_stencil
         mOptions[optRTTMode.name] = optRTTMode;
 #endif
@@ -468,6 +476,9 @@ namespace Ogre {
                 miscParams["FSAA"] = opt->second.currentValue;
             }
 
+            if((opt = mOptions.find("VSync")) != end)
+                miscParams["vsync"] = opt->second.currentValue;
+
             window = renderSystem->_createRenderWindow(windowTitle, w, h, fullscreen, &miscParams);
         }
 
@@ -482,6 +493,18 @@ namespace Ogre {
             EGL_CONTEXT_CLIENT_VERSION, OGRE_NO_GLES3_SUPPORT ? 2 : 3,
             EGL_NONE
         };
+
+        if(mContextProfile != CONTEXT_ES) {
+            if (!eglBindAPI(EGL_OPENGL_API))
+            {
+                OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
+                        "Couldn`t initialize API ",
+                        "EGLSupport::getGLDisplay");
+            }
+            EGL_CHECK_ERROR
+
+            contextAttrs[0] = EGL_NONE;
+        }
 
         ::EGLContext context = 0;
         if (!eglDisplay)

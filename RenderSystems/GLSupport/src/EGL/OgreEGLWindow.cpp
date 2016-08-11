@@ -216,7 +216,7 @@ namespace Ogre {
         if (surface == EGL_NO_SURFACE)
         {
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
-                        "Fail to create EGLSurface based on X NativeWindowType",
+                        "Fail to create EGLSurface based on NativeWindowType",
                         __FUNCTION__);
         }
         return surface;
@@ -225,6 +225,38 @@ namespace Ogre {
     bool EGLWindow::requiresTextureFlipping() const
     {
         return false;
+    }
+
+    void EGLWindow::setVSyncEnabled(bool vsync) {
+        mVSync = vsync;
+        // we need to make our context current to set vsync
+        // store previous context to restore when finished.
+        ::EGLSurface oldRead = eglGetCurrentSurface(EGL_READ);
+        EGL_CHECK_ERROR
+        ::EGLSurface oldDraw = eglGetCurrentSurface(EGL_DRAW);
+        EGL_CHECK_ERROR
+        ::EGLContext  oldContext  = eglGetCurrentContext();
+        EGL_CHECK_ERROR
+        ::EGLDisplay dpy = mGLSupport->getGLDisplay();
+
+        mContext->setCurrent();
+
+        if (! mIsExternalGLControl )
+        {
+            eglSwapInterval(dpy, vsync ? mVSyncInterval : 0);
+            EGL_CHECK_ERROR
+        }
+
+        mContext->endCurrent();
+
+        eglMakeCurrent (dpy, oldDraw, oldRead, oldContext);
+        EGL_CHECK_ERROR
+    }
+
+    void EGLWindow::setVSyncInterval(unsigned int interval) {
+        mVSyncInterval = interval;
+        if (mVSync)
+            setVSyncEnabled(true);
     }
 
 }
