@@ -87,7 +87,6 @@ namespace Ogre {
         ConfigOption optFSAA;
         ConfigOption optRTTMode;
         ConfigOption optSRGB;
-        ConfigOption optEnableFixedPipeline;
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		ConfigOption optStereoMode;
 #endif
@@ -96,7 +95,7 @@ namespace Ogre {
         optFullScreen.name = "Full Screen";
         optFullScreen.possibleValues.push_back("Yes");
         optFullScreen.possibleValues.push_back("No");
-        optFullScreen.currentValue = "Yes";
+        optFullScreen.currentValue = "No";
         optFullScreen.immutable = false;
 
         // Video mode possibilities
@@ -128,7 +127,7 @@ namespace Ogre {
         optVSync.immutable = false;
         optVSync.possibleValues.push_back("No");
         optVSync.possibleValues.push_back("Yes");
-        optVSync.currentValue = "No";
+        optVSync.currentValue = "Yes";
 
         optVSyncInterval.name = "VSync Interval";
         optVSyncInterval.immutable = false;
@@ -168,12 +167,6 @@ namespace Ogre {
         optSRGB.currentValue = "No";
         optSRGB.immutable = false;
 
-        optEnableFixedPipeline.name = "Fixed Pipeline Enabled";
-        optEnableFixedPipeline.possibleValues.push_back( "Yes" );
-        optEnableFixedPipeline.possibleValues.push_back( "No" );
-        optEnableFixedPipeline.currentValue = "Yes";
-        optEnableFixedPipeline.immutable = false;
-
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 		optStereoMode.name = "Stereo Mode";
 		optStereoMode.possibleValues.push_back(StringConverter::toString(SMT_NONE));
@@ -193,7 +186,6 @@ namespace Ogre {
         mOptions[optFSAA.name] = optFSAA;
         mOptions[optRTTMode.name] = optRTTMode;
         mOptions[optSRGB.name] = optSRGB;
-        mOptions[optEnableFixedPipeline.name] = optEnableFixedPipeline;
 
         refreshConfig();
     }
@@ -319,12 +311,6 @@ namespace Ogre {
             String multisample_hint;
             if (aavalues.size() > 1)
                 multisample_hint = aavalues[1];
-
-            opt = mOptions.find("Fixed Pipeline Enabled");
-            if (opt == mOptions.end())
-                OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Can't find Fixed Pipeline enabled options!", "Win32GLSupport::createWindow");
-            bool enableFixedPipeline = (opt->second.currentValue == "Yes");
-            renderSystem->setFixedPipelineEnabled(enableFixedPipeline);
 
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0
 			opt = mOptions.find("Stereo Mode");

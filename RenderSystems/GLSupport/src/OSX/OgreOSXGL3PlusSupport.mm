@@ -83,7 +83,7 @@ void OSXGL3PlusSupport::addConfig( void )
 	optVsync.name = "vsync";
 	optVsync.possibleValues.push_back( "Yes" );
 	optVsync.possibleValues.push_back( "No" );
-	optVsync.currentValue = "No";
+	optVsync.currentValue = "Yes";
 	optVsync.immutable = false;
 
 	optBitDepth.name = "Colour Depth";
