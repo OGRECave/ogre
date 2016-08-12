@@ -159,6 +159,11 @@ protected:
         setupLights();
     }
         
+    void cleanupContent()
+    {
+        MeshManager::getSingleton().remove("floor");
+    }
+
     void setupShaderGenerator()
     {
         new SegmentedDynamicLightManager;
