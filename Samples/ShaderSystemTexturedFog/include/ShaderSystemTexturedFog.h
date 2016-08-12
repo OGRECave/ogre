@@ -211,6 +211,11 @@ protected:
         return true;
     }
 
+    void cleanupContent()
+    {
+        MeshManager::getSingleton().remove("floor");
+    }
+
 private:
     RTShaderSRSTexturedFogFactory* mSRSTextureFogFactory;
 
