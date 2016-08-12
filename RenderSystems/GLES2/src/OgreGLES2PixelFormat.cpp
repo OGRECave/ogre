@@ -517,7 +517,7 @@ namespace Ogre {
             case PF_DXT5:
 #if GL_EXT_texture_compression_s3tc
                 if (!hwGamma)
-                    return GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+                    return GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 #endif
                 
 #if (GL_EXT_texture_rg && OGRE_PLATFORM != OGRE_PLATFORM_NACL) || (OGRE_NO_GLES3_SUPPORT == 0)
