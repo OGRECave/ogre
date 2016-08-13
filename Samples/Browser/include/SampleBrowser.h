@@ -233,20 +233,9 @@ namespace OgreBites
         {
             if (mCurrentSample)  // sample quitting
             {
-#ifdef INCLUDE_RTSHADER_SYSTEM
-                mShaderGenerator->removeAllShaderBasedTechniques(); // clear techniques from the RTSS
-#endif
                 mCurrentSample->_shutdown();
                 mCurrentSample = 0;
                 mSamplePaused = false;     // don't pause next sample
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-                if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
-                {
-                    destroyDummyScene();
-                    destroyRTShaderSystem();
-                }
-#endif
 
                 // create dummy scene and modify controls
                 createDummyScene();
@@ -266,11 +255,6 @@ namespace OgreBites
                 try
                 {
 #ifdef INCLUDE_RTSHADER_SYSTEM
-                    if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
-                    {
-                        createDummyScene();
-                    }
-
                     s->setShaderGenerator(mShaderGenerator);
 #endif
                     SampleContext::runSample(s);
