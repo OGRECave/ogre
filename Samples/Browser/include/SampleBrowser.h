@@ -107,6 +107,7 @@
 #   include "TerrainTessellation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
+#   include "VolumeTex.h"
 #ifdef OGRE_BUILD_COMPONENT_HLMS
 #   include "HLMS.h"
 #endif
@@ -975,6 +976,7 @@ namespace OgreBites
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
 #                       endif
+            mPluginNameMap["Sample_VolumeTex"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTex();
             mPluginNameMap["Sample_Shadows"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_Shadows();
             mPluginNameMap["Sample_Lighting"]           = (OgreBites::SdkSample *) OGRE_NEW Sample_Lighting();
             mPluginNameMap["Sample_MeshLod"]            = (OgreBites::SdkSample *) OGRE_NEW Sample_MeshLod();

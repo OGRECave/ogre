@@ -9,13 +9,14 @@
 
 # Configure VolumeTex demo build
 
-set(HEADER_FILES 
+set(HEADER_FILES
   include/VolumeRenderable.h
   include/Julia.h
   include/ThingRenderable.h
+  include/VolumeTex.h
 )
 
-set(SOURCE_FILES 
+set(SOURCE_FILES
   src/VolumeTex.cpp
   src/ThingRenderable.cpp
   src/VolumeRenderable.cpp
