@@ -286,9 +286,11 @@ namespace Ogre {
             os << "precision highp float;" << std::endl;
             os << "precision highp int;" << std::endl;
 
-            // Redefine texture functions to maintain reusability
             if(mGLSLVersion > 100)
             {
+                // sampler3D has no default precision
+                os << "precision highp sampler3D;" << std::endl;
+                // Redefine texture functions to maintain reusability
                 os << "#define texture2D texture" << std::endl;
                 os << "#define texture3D texture" << std::endl;
                 os << "#define textureCube texture" << std::endl;
