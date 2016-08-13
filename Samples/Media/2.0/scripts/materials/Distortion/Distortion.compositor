@@ -1,0 +1,86 @@
+compositor_node SceneRenderingNode
+{
+	// rt_scene is used to render the scene
+	// rt_distortion is the texture we will be rendering distortion objects. The texture is later used to postprocess the scene
+	
+	texture rt_scene target_width target_height PF_FLOAT16_RGBA depth_texture depth_format PF_D32_FLOAT depth_pool 2
+    texture rt_distortion target_width target_height PF_FLOAT16_RGBA depth_pool 2
+    
+	target rt_scene
+	{
+		pass clear
+		{
+			colour_value 0.6 0.6 0.6 1
+		}
+
+		pass render_scene
+		{
+			//lod_update_list	off					//Turn Lod off?
+			shadows				PbsMaterialsShadowNode
+			overlays			off
+            rq_first	0
+			rq_last		6
+		}
+	}
+    
+    target rt_distortion
+	{
+		pass clear
+		{
+			// Clear distortion texture to default values. R and G are representing distortion vectors along X and Y axis. A is controlling distortion strenght.
+			colour_value 0.5 0.5 0 0
+		}
+		
+		//Render distortion to its own texture with render queue id 6
+		pass render_scene
+		{
+			lod_update_list	off
+			overlays			off
+            rq_first	6
+			rq_last		7
+		}
+	}
+	
+	out 0 rt_scene
+    out 1 rt_distortion
+}
+
+compositor_node DistortionNode
+{
+	in 0 rt_scene
+    in 1 rt_distortion
+	in 2 rt_output
+    
+	target rt_output
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+
+		pass render_quad
+		{
+			material Distortion/Quad
+	    	input 0 rt_scene
+            input 1 rt_distortion
+		}
+		
+		pass render_scene
+		{
+			lod_update_list	off
+
+			//Render Overlays
+			overlays	on
+			rq_first	254
+			rq_last		255
+		}
+	}
+}
+
+workspace DistortionWorkspace
+{
+	connect SceneRenderingNode 0 DistortionNode 0
+	connect SceneRenderingNode 1 DistortionNode 1
+    
+	connect_output DistortionNode 2
+}
