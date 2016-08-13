@@ -1510,15 +1510,6 @@ namespace Ogre {
         if (!mStateCacheManager->activateGLTextureUnit(unit))
             return;
 
-        // This is a bit of a hack that will need to fleshed out later.
-        // On iOS cube maps are especially sensitive to texture parameter changes.
-        // So, for performance (and it's a large difference) we will skip updating them.
-        if(mTextureTypes[unit] == GL_TEXTURE_CUBE_MAP)
-        {
-            mStateCacheManager->activateGLTextureUnit(0);
-            return;
-        }
-
         switch (ftype)
         {
             case FT_MIN:
