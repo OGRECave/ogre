@@ -41,7 +41,7 @@ const Real Sample_VolumeTerrain::MOUSE_MODIFIER_TIME_LIMIT = (Real)0.033333;
 void Sample_VolumeTerrain::setupContent(void)
 {
     setupControls();
-        
+
     // Skydome
     mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
@@ -51,6 +51,8 @@ void Sample_VolumeTerrain::setupContent(void)
     directionalLight0->setDirection(Vector3((Real)1, (Real)-1, (Real)1));
     directionalLight0->setDiffuseColour((Real)1, (Real)0.98, (Real)0.73);
     directionalLight0->setSpecularColour((Real)0.1, (Real)0.1, (Real)0.1);
+
+    mSceneMgr->setAmbientLight(Ogre::ColourValue::White);
    
     // Volume
     mVolumeRoot = OGRE_NEW Chunk();
@@ -58,6 +60,12 @@ void Sample_VolumeTerrain::setupContent(void)
     Timer t;
     mVolumeRoot->load(mVolumeRootNode, mSceneMgr, "volumeTerrain.cfg", true);
     LogManager::getSingleton().stream() << "Loaded volume terrain in " << t.getMillisecondsCPU() << " ms";
+
+#if defined(INCLUDE_RTSHADER_SYSTEM)
+    // Make this viewport work with shader generator scheme.
+    mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+    mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+#endif
 
     // Camera
     mCamera->setPosition((Real)3264, (Real)2700, (Real)3264);
@@ -83,7 +91,7 @@ void Sample_VolumeTerrain::setupControls(void)
 
     mTrayMgr->createTextBox(TL_TOPLEFT, "VolumeTerrainHelp", "Usage:\n\nHold the left mouse button, press\nwasd for movement and move the\nmouse for the direction.\nYou can add spheres with the\nmiddle mouse button and remove\nspheres with the right one.", 310, 150);
 }
-    
+
 //-----------------------------------------------------------------------
 
 void Sample_VolumeTerrain::cleanupContent(void)
