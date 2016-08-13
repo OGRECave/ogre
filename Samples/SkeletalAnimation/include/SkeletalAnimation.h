@@ -154,11 +154,14 @@ protected:
     void setupContent()
     {
 
-/*#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        //To make glsles work the program will need to be provided with proper
-        //shadow caster materials
-        if (mShaderGenerator->getTargetLanguage() != "glsles" && mShaderGenerator->getTargetLanguage() != "glsl")
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+        // RTSS currently generates unusable shader for GLSL. HLSL to be tested.
+        if (mShaderGenerator->getTargetLanguage() == "cg")
         {
+            // Make this viewport work with shader generator scheme.
+            mShaderGenerator->invalidateScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+            mViewport->setMaterialScheme(RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
             //Add the hardware skinning to the shader generator default render state
             mSrsHardwareSkinning = mShaderGenerator->createSubRenderState(Ogre::RTShader::HardwareSkinning::Type);
             Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
@@ -172,7 +175,7 @@ protected:
             Ogre::RTShader::HardwareSkinningFactory::getSingleton().setCustomShadowCasterMaterials(
                 Ogre::RTShader::ST_DUAL_QUATERNION, pCast1, pCast2, pCast3, pCast4);
         }
-#endif*/
+#endif
         // set shadow properties
         mSceneMgr->setShadowTechnique(SHADOWTYPE_TEXTURE_MODULATIVE);
         mSceneMgr->setShadowTextureSize(512);
@@ -260,10 +263,9 @@ protected:
             ent->setMaterialName("jaiqua"); //"jaiquaDualQuatTest"
             sn->attachObject(ent);
 
-/*#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-            //To make glsles work the program will need to be provided with proper
-            //shadow caster materials
-            if (mShaderGenerator->getTargetLanguage() != "glsles")
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+            //see above
+            if (mShaderGenerator->getTargetLanguage() == "cg")
             {
                 //In case the system uses the RTSS, the following line will ensure
                 //that the entity is using hardware animation in RTSS as well.
@@ -277,7 +279,7 @@ protected:
                     Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME,
                     true);
             }
-#endif*/
+#endif
         
             // enable the entity's sneaking animation at a random speed and loop it manually since translation is involved
             as = ent->getAnimationState("Sneak");
@@ -373,15 +375,14 @@ protected:
         MeshManager::getSingleton().remove("floor");
         mSceneMgr->destroyEntity("Jaiqua");
 
-/*#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
-        //To make glsles work the program will need to be provided with proper
-        //shadow caster materials
-        if (mShaderGenerator->getTargetLanguage() != "glsles")
+#if defined(INCLUDE_RTSHADER_SYSTEM) && defined(RTSHADER_SYSTEM_BUILD_EXT_SHADERS)
+        //see above
+        if (mShaderGenerator->getTargetLanguage() == "cg")
         {
             Ogre::RTShader::RenderState* renderState = mShaderGenerator->getRenderState(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
             renderState->removeTemplateSubRenderState(mSrsHardwareSkinning);
         }
-#endif*/
+#endif
     }
 
     const int NUM_MODELS;
