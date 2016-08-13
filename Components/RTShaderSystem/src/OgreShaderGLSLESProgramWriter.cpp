@@ -225,13 +225,13 @@ namespace Ogre {
             mGpuConstTypeMap[GCT_MATRIX_4X3] = "mat4x3";
             mGpuConstTypeMap[GCT_MATRIX_4X4] = "mat4";
             mGpuConstTypeMap[GCT_INT1] = "int";
-            mGpuConstTypeMap[GCT_INT2] = "int2";
-            mGpuConstTypeMap[GCT_INT3] = "int3";
-            mGpuConstTypeMap[GCT_INT4] = "int4";
+            mGpuConstTypeMap[GCT_INT2] = "ivec2";
+            mGpuConstTypeMap[GCT_INT3] = "ivec3";
+            mGpuConstTypeMap[GCT_INT4] = "ivec4";
             mGpuConstTypeMap[GCT_UINT1] = "uint";
-            mGpuConstTypeMap[GCT_UINT2] = "uint2";
-            mGpuConstTypeMap[GCT_UINT3] = "uint3";
-            mGpuConstTypeMap[GCT_UINT4] = "uint4";
+            mGpuConstTypeMap[GCT_UINT2] = "uvec2";
+            mGpuConstTypeMap[GCT_UINT3] = "uvec3";
+            mGpuConstTypeMap[GCT_UINT4] = "uvec4";
 
             // Custom vertex attributes defined http://www.ogre3d.org/docs/manual/manual_21.html
             mContentToPerVertexAttributes[Parameter::SPC_POSITION_OBJECT_SPACE] = "vertex";
