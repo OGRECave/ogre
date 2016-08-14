@@ -49,13 +49,15 @@ namespace Ogre
 
         MetalRenderSystem   *mRenderSystem;
 
+        inline void checkLayerSizeChanges(void);
     public:
         MetalRenderWindow( MetalDevice *ownerDevice, MetalRenderSystem *renderSystem );
         virtual ~MetalRenderWindow();
 
-        void _metalUpdate(void);
         virtual void swapBuffers(void);
         virtual void windowMovedOrResized(void);
+
+        virtual void nextDrawable(void);
 
         virtual void create( const String& name, unsigned int width, unsigned int height,
                              bool fullScreen, const NameValuePairList *miscParams );

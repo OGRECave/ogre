@@ -46,6 +46,8 @@ namespace Ogre
         void init( id<MTLTexture> texture, id<MTLTexture> resolveTexture );
         void destroy(void);
 
+        virtual void nextDrawable(void) {}
+
         MetalDevice* getOwnerDevice(void) const     { return mOwnerDevice; }
     };
 }

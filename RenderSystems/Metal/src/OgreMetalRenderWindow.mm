@@ -52,7 +52,7 @@ namespace Ogre
         destroy();
     }
     //-------------------------------------------------------------------------
-    void MetalRenderWindow::_metalUpdate(void)
+    inline void MetalRenderWindow::checkLayerSizeChanges(void)
     {
         // Handle display changes here
         if( mMetalView.layerSizeDidUpdate )
@@ -68,24 +68,6 @@ namespace Ogre
             this->windowMovedOrResized();
 
             mMetalView.layerSizeDidUpdate = NO;
-        }
-
-        // do not retain current drawable beyond the frame.
-        // There should be no strong references to this object outside of this view class
-        mCurrentDrawable = [mMetalLayer nextDrawable];
-        if( !mCurrentDrawable )
-        {
-            LogManager::getSingleton().logMessage( "Metal ERROR: Failed to get a drawable!",
-                                                   LML_CRITICAL );
-            //We're unable to render. Skip frame.
-            //dispatch_semaphore_signal( _inflight_semaphore );
-        }
-        else
-        {
-            if( mFSAA > 1 )
-                mColourAttachmentDesc.resolveTexture = mCurrentDrawable.texture;
-            else
-                mColourAttachmentDesc.texture = mCurrentDrawable.texture;
         }
     }
     //-------------------------------------------------------------------------
@@ -139,6 +121,33 @@ namespace Ogre
             {
                 (*itor)->_updateDimensions();
                 ++itor;
+            }
+        }
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderWindow::nextDrawable(void)
+    {
+        if( !mCurrentDrawable )
+        {
+            if( mMetalView.layerSizeDidUpdate )
+                checkLayerSizeChanges();
+
+            // do not retain current drawable beyond the frame.
+            // There should be no strong references to this object outside of this view class
+            mCurrentDrawable = [mMetalLayer nextDrawable];
+            if( !mCurrentDrawable )
+            {
+                LogManager::getSingleton().logMessage( "Metal ERROR: Failed to get a drawable!",
+                                                       LML_CRITICAL );
+                //We're unable to render. Skip frame.
+                //dispatch_semaphore_signal( _inflight_semaphore );
+            }
+            else
+            {
+                if( mFSAA > 1 )
+                    mColourAttachmentDesc.resolveTexture = mCurrentDrawable.texture;
+                else
+                    mColourAttachmentDesc.texture = mCurrentDrawable.texture;
             }
         }
     }
@@ -230,8 +239,8 @@ namespace Ogre
     {
         if( name == "MetalRenderTargetCommon" )
         {
-            if( !mCurrentDrawable )
-                _metalUpdate();
+            if( mMetalView.layerSizeDidUpdate )
+                checkLayerSizeChanges();
             *static_cast<MetalRenderTargetCommon**>(pData) = this;
         }
         else if( name == "MetalDevice" )

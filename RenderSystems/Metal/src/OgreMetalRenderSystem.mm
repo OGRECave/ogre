@@ -600,6 +600,11 @@ namespace Ogre
         //TODO: With a couple modifications, Compositor should be able to tell us
         //if we can use MTLStoreActionDontCare.
 
+        //We assume the RenderWindow is at MRT#0 (in fact it
+        //would be very odd to use the RenderWindow as MRT)
+        if( mNumMRTs > 0 )
+            mCurrentColourRTs[0]->nextDrawable();
+
         MTLRenderPassDescriptor *passDesc = [MTLRenderPassDescriptor renderPassDescriptor];
         for( uint8 i=0; i<mNumMRTs; ++i )
         {
@@ -1192,7 +1197,7 @@ namespace Ogre
                                                 atIndex:15];
 
 #if OGRE_DEBUG_MODE
-            assert( ((drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x04) == 0
+            assert( ((drawCmd->firstVertexIndex * bytesPerIndexElement) & 0x03) == 0
                     && "Index Buffer must be aligned to 4 bytes. If you're messing with "
                     "VertexArrayObject::setPrimitiveRange, you've entered an invalid "
                     "primStart; not supported by the Metal API." );
@@ -1293,7 +1298,7 @@ namespace Ogre
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #if OGRE_DEBUG_MODE
-            assert( ((cmd->firstVertexIndex * bytesPerIndexElement) & 0x04) == 0
+            assert( ((cmd->firstVertexIndex * bytesPerIndexElement) & 0x03) == 0
                     && "Index Buffer must be aligned to 4 bytes. If you're messing with "
                     "IndexBuffer::indexStart, you've entered an invalid "
                     "indexStart; not supported by the Metal API." );
@@ -1376,7 +1381,7 @@ namespace Ogre
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #if OGRE_DEBUG_MODE
-                    assert( ((mCurrentIndexBuffer->indexStart * bytesPerIndexElement) & 0x04) == 0
+                    assert( ((mCurrentIndexBuffer->indexStart * bytesPerIndexElement) & 0x03) == 0
                             && "Index Buffer must be aligned to 4 bytes. If you're messing with "
                             "IndexBuffer::indexStart, you've entered an invalid "
                             "indexStart; not supported by the Metal API." );
