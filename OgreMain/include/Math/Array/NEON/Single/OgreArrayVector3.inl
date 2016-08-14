@@ -288,10 +288,10 @@ namespace Ogre
     inline ArrayReal ArrayVector3::length() const
     {
         return
-        vrsqrteq_f32( vaddq_f32( vaddq_f32(                 //sqrt(
-                vmulq_f32( mChunkBase[0], mChunkBase[0] ),  //(x * x +
+        MathlibNEON::Sqrt( vaddq_f32( vaddq_f32(                //sqrt(
+                vmulq_f32( mChunkBase[0], mChunkBase[0] ),		//(x * x +
                 vmulq_f32( mChunkBase[1], mChunkBase[1] ) ),    //y * y) +
-            vmulq_f32( mChunkBase[2], mChunkBase[2] ) ) );  //z * z )
+                vmulq_f32( mChunkBase[2], mChunkBase[2] ) ) );  //z * z )
     }
     //-----------------------------------------------------------------------------------
     inline ArrayReal ArrayVector3::squaredLength() const
