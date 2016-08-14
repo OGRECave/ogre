@@ -120,7 +120,7 @@ void SL_Light_Segment_Texture_Ambient_Diffuse(
 	
 	vec2 indexes = (vViewPos.xz - lightBounds.xy) * lightBounds.zw;
 	indexes = min(max(indexes, 0.0), 8.0);
-	int index = int(indexes.x + (indexes.y * 9.0));
+	int index = int(indexes.x) + int(indexes.y) * 9;
 	widthOffset += invWidth * 3.0 * float(index);
 	
 	vec4 indexBounds = textureLod(dataTexture, vec2(widthOffset,heightOffset), 0.0);
