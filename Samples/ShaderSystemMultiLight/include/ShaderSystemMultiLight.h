@@ -115,19 +115,6 @@ public:
 
 protected:
 
-    void testCapabilities( const RenderSystemCapabilities* caps )
-    {
-        if (!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_3_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_1") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_5_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("glsl"))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in Cg or GLSL type shader language, your graphic card must support Shader Profile 3 or above."
-                " You cannot run this sample. Sorry!", "Sample_ShaderSystemMultiLight::testCapabilities");
-        }
-    }
-
     void setupContent()
     {
         mTrayMgr->createThickSlider(TL_BOTTOM, NUM_OF_LIGHTS_SLIDER, "Num of lights", 240, 80, 0, 64, 65)->setValue(cInitialLightCount, false);
