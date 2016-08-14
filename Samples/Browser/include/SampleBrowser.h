@@ -92,8 +92,6 @@
 #   include "DynTex.h"
 #   include "FacialAnimation.h"
 #   include "Grass.h"
-#   include "Hair.h"
-#   include "Island.h"
 #   include "Lighting.h"
 #   include "MeshLod.h"
 #   include "ParticleFX.h"
@@ -106,7 +104,6 @@
 #   include "Smoke.h"
 #   include "SphereMapping.h"
 #   include "Tessellation.h"
-#   include "TerrainTessellation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   include "VolumeTex.h"
@@ -971,9 +968,6 @@ namespace OgreBites
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
             mPluginNameMap["Sample_Tessellation"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
             mPluginNameMap["Sample_PNTriangles"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_PNTriangles();
-            mPluginNameMap["Sample_Hair"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_Hair();
-            mPluginNameMap["Sample_Island"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_Island();
-            mPluginNameMap["Sample_TerrainTessellation"]= (OgreBites::SdkSample *) OGRE_NEW Sample_TerrainTessellation();
 #                       if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
