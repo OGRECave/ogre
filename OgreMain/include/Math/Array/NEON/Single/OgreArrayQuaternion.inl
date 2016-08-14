@@ -143,7 +143,7 @@ namespace Ogre
         ArrayReal fCos = rkP.Dot( rkQ );
         /* Clamp fCos to [-1; 1] range */
         fCos = vminq_f32( MathlibNEON::ONE, vmaxq_f32( MathlibNEON::NEG_ONE, fCos ) );
-        
+
         /* Invert the rotation for shortest path? */
         /* m = fCos < 0.0f ? -1.0f : 1.0f; */
         ArrayReal m = MathlibNEON::Cmov4( MathlibNEON::NEG_ONE, MathlibNEON::ONE,
@@ -153,9 +153,9 @@ namespace Ogre
                         vmulq_f32( rkQ.mChunkBase[1], m ),
                         vmulq_f32( rkQ.mChunkBase[2], m ),
                         vmulq_f32( rkQ.mChunkBase[3], m ) );
-        
-        ArrayReal fSin = vrsqrteq_f32( vsubq_f32( MathlibNEON::ONE, vmulq_f32( fCos, fCos ) ) );
-        
+
+        ArrayReal fSin = MathlibNEON::Sqrt( vsubq_f32( MathlibNEON::ONE, vmulq_f32( fCos, fCos ) ) );
+
         /* ATan2 in original Quaternion is slightly absurd, because fSin was derived from
            fCos (hence never negative) which makes ACos a better replacement. ACos is much
            faster than ATan2, as long as the input is whithin range [-1; 1], otherwise the generated
@@ -260,6 +260,56 @@ namespace Ogre
                                     vaddq_f32( uv.mChunkBase[1], uuv.mChunkBase[1] ) );
         inOutVec.mChunkBase[2] = vaddq_f32( inOutVec.mChunkBase[2],
                                     vaddq_f32( uv.mChunkBase[2], uuv.mChunkBase[2] ) );
+    }
+    //-----------------------------------------------------------------------------------
+    inline void ArrayQuaternion::FromOrthoDet1RotationMatrix( const ArrayReal * RESTRICT_ALIAS matrix )
+    {
+        ArrayReal m00 = matrix[0], m01 = matrix[1], m02 = matrix[2],
+                  m10 = matrix[3], m11 = matrix[4], m12 = matrix[5],
+                  m20 = matrix[6], m21 = matrix[7], m22 = matrix[8];
+
+        //To deal with matrices that don't have determinant = 1
+        //absQ2 = det( matrix )^(1/3)
+        // quaternion.w = sqrt( max( 0, absQ2 + m00 + m11 + m22 ) ) / 2; ... etc
+
+        //w = sqrt( max( 0, 1 + m00 + m11 + m22 ) ) / 2;
+        //x = sqrt( max( 0, 1 + m00 - m11 - m22 ) ) / 2;
+        //y = sqrt( max( 0, 1 - m00 + m11 - m22 ) ) / 2;
+        //z = sqrt( max( 0, 1 - m00 - m11 + m22 ) ) / 2;
+        //x = _copysign( x, m21 - m12 );
+        //y = _copysign( y, m02 - m20 );
+        //z = _copysign( z, m10 - m01 );
+        ArrayReal tmp;
+
+        //w = sqrt( max( 0, (1 + m00) + (m11 + m22) ) ) * 0.5f;
+        tmp = vmaxq_f32( vdupq_n_f32(0.0f),
+                          vaddq_f32( vaddq_f32( MathlibNEON::ONE, m00 ), vaddq_f32( m11, m22 ) ) );
+        mChunkBase[0] = vmulq_f32( MathlibNEON::Sqrt( tmp ), MathlibNEON::HALF );
+
+        //x = sqrt( max( 0, (1 + m00) - (m11 + m22) ) ) * 0.5f;
+        tmp = vmaxq_f32( vdupq_n_f32(0.0f),
+                          vsubq_f32( vaddq_f32( MathlibNEON::ONE, m00 ), vaddq_f32( m11, m22 ) ) );
+        mChunkBase[1] = vmulq_f32( MathlibNEON::Sqrt( tmp ), MathlibNEON::HALF );
+
+        //y = sqrt( max( 0, (1 - m00) + (m11 - m22) ) ) * 0.5f;
+        tmp = vmaxq_f32( vdupq_n_f32(0.0f),
+                          vaddq_f32( vsubq_f32( MathlibNEON::ONE, m00 ), vsubq_f32( m11, m22 ) ) );
+        mChunkBase[2] = vmulq_f32( MathlibNEON::Sqrt( tmp ), MathlibNEON::HALF );
+
+        //z = sqrt( max( 0, (1 - m00) - (m11 - m22) ) ) * 0.5f;
+        tmp = vmaxq_f32( vdupq_n_f32(0.0f),
+                          vsubq_f32( vsubq_f32( MathlibNEON::ONE, m00 ), vsubq_f32( m11, m22 ) ) );
+        mChunkBase[3] = vmulq_f32( MathlibNEON::Sqrt( tmp ), MathlibNEON::HALF );
+
+        //x = _copysign( x, m21 - m12 ); --> (x & 0x7FFFFFFF) | ((m21 - m12) & 0x80000000)
+        //y = _copysign( y, m02 - m20 ); --> (y & 0x7FFFFFFF) | ((m02 - m20) & 0x80000000)
+        //z = _copysign( z, m10 - m01 ); --> (z & 0x7FFFFFFF) | ((m10 - m01) & 0x80000000)
+        tmp = vandq_f32( vsubq_f32( m21, m12 ), MathlibNEON::SIGN_MASK );
+        mChunkBase[1] = vorrq_f32( vnand_f32( MathlibNEON::SIGN_MASK, mChunkBase[1] ), tmp );
+        tmp = vandq_f32( vsubq_f32( m02, m20 ), MathlibNEON::SIGN_MASK );
+        mChunkBase[2] = vorrq_f32( vnand_f32( MathlibNEON::SIGN_MASK, mChunkBase[2] ), tmp );
+        tmp = vandq_f32( vsubq_f32( m10, m01 ), MathlibNEON::SIGN_MASK );
+        mChunkBase[3] = vorrq_f32( vnand_f32( MathlibNEON::SIGN_MASK, mChunkBase[3] ), tmp );
     }
     //-----------------------------------------------------------------------------------
     inline void ArrayQuaternion::FromAngleAxis( const ArrayRadian& rfAngle, const ArrayVector3& rkAxis )
@@ -442,10 +492,10 @@ namespace Ogre
         // exp(q) = cos(A)+sin(A)*(x*i+y*j+z*k).  If sin(A) is near zero,
         // use exp(q) = cos(A)+A*(x*i+y*j+z*k) since A/sin(A) has limit 1.
 
-        ArrayReal fAngle = vrsqrteq_f32( vaddq_f32( vaddq_f32(                      //sqrt(
+        ArrayReal fAngle = MathlibNEON::Sqrt( vaddq_f32( vaddq_f32(				//sqrt(
                                 vmulq_f32( mChunkBase[1], mChunkBase[1] ),      //(x * x +
-                                vmulq_f32( mChunkBase[2], mChunkBase[2] ) ),        //y * y) +
-                                vmulq_f32( mChunkBase[3], mChunkBase[3] ) ) );  //z * z )
+                                vmulq_f32( mChunkBase[2], mChunkBase[2] ) ),    // y * y) +
+                                vmulq_f32( mChunkBase[3], mChunkBase[3] ) ) );  // z * z )
 
         ArrayReal w, fSin;
         MathlibNEON::SinCos4( fAngle, fSin, w );
