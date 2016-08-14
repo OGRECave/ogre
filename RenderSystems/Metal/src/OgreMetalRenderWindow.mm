@@ -119,6 +119,7 @@ namespace Ogre
             if( mFSAA > 1 && mWidth > 0 && mHeight > 0 )
             {
                 mMsaaTex = 0;
+                mColourAttachmentDesc.texture = 0;
                 MTLTextureDescriptor* desc = [MTLTextureDescriptor
                         texture2DDescriptorWithPixelFormat:
                         MetalMappings::getPixelFormat( mFormat, mHwGamma )
@@ -127,6 +128,7 @@ namespace Ogre
                 desc.sampleCount = mFSAA;
 
                 mMsaaTex = [mOwnerDevice->mDevice newTextureWithDescriptor: desc];
+                mColourAttachmentDesc.texture = mMsaaTex;
             }
 
             detachDepthBuffer();
@@ -155,6 +157,20 @@ namespace Ogre
 
         mFormat = PF_B8G8R8A8;
         mHwGamma = true;
+
+        if( miscParams )
+        {
+            NameValuePairList::const_iterator opt;
+            NameValuePairList::const_iterator end = miscParams->end();
+
+            opt = miscParams->find("FSAA");
+            if( opt != end )
+                mFSAA = std::max( 1u, StringConverter::parseUnsignedInt( opt->second ) );
+
+            opt = miscParams->find("gamma");
+            if( opt != end )
+                mHwGamma = StringConverter::parseBool( opt->second );
+        }
 
         CGRect frame;
         frame.origin.x = 0;
