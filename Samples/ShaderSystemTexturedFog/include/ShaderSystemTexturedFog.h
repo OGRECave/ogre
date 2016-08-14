@@ -8,15 +8,13 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint8 cPriorityMain = 50;
-const String FOG_DISTANCE_SLIDER = "FogDistance";
-const String ACTIVATE_FOG_BUTTON = "ActivateFog";
-const String FOG_BACKGROUND_SLIDER = "FogBackground";
-const String ACTIVATE_SKY_BUTTON = "ActivateSkyBox";
-
-
 class _OgreSampleClassExport Sample_ShaderSystemTexturedFog : public SdkSample
 {
+    static const uint8 cPriorityMain = 50;
+    static const String FOG_DISTANCE_SLIDER;
+    static const String ACTIVATE_FOG_BUTTON;
+    static const String FOG_BACKGROUND_SLIDER;
+    static const String ACTIVATE_SKY_BUTTON;
 public:
 
     Sample_ShaderSystemTexturedFog() :

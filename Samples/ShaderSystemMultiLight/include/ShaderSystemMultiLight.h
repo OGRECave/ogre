@@ -37,17 +37,16 @@ the more innovative ideas I've seen of late.
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint8 cPriorityMain = 50;
-const uint8 cPriorityQuery = 51;
-const uint8 cPriorityLights = 55;
-const unsigned int cInitialLightCount = 3;
-const String DEBUG_MODE_CHECKBOX = "DebugMode";
-const String NUM_OF_LIGHTS_SLIDER = "NumOfLights";
-const String TWIRL_LIGHTS_CHECKBOX = "TwirlLights";
-
-
 class _OgreSampleClassExport Sample_ShaderSystemMultiLight : public SdkSample
 {
+    static const uint8 cPriorityMain = 50;
+    static const uint8 cPriorityQuery = 51;
+    static const uint8 cPriorityLights = 55;
+    static const uint32 cInitialLightCount = 3;
+
+    static const String DEBUG_MODE_CHECKBOX;
+    static const String NUM_OF_LIGHTS_SLIDER;
+    static const String TWIRL_LIGHTS_CHECKBOX;
 public:
 
     Sample_ShaderSystemMultiLight() :
