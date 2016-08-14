@@ -387,11 +387,11 @@ namespace Ogre
         assert( (srcOffset + srcLength) <= source->getTotalSizeBytes() );
 
         size_t extraOffset = 0;
-        if( srcOffset & 0x04 )
+        if( srcOffset & 0x03 )
         {
             //Not multiple of 4. Backtrack to make it multiple of 4, then add this value
             //to the return value so it gets correctly mapped in _mapForRead.
-            extraOffset = srcOffset & 0x04;
+            extraOffset = srcOffset & 0x03;
             srcOffset -= extraOffset;
         }
 
@@ -421,7 +421,7 @@ namespace Ogre
     {
         //If offset isn't multiple of 4, we were making it go forward in
         //_asyncDownload. We need to backgrack it so regions stay contiguous.
-        StagingBuffer::_cancelDownload( offset & ~size_t(0x04), sizeBytes );
+        StagingBuffer::_cancelDownload( offset & ~size_t(0x03), sizeBytes );
     }
     //-----------------------------------------------------------------------------------
     const void* MetalStagingBuffer::_mapForReadImpl( size_t offset, size_t sizeBytes )
@@ -459,11 +459,11 @@ namespace Ogre
         assert( (srcOffset + srcLength) <= source->getSizeBytes() );
 
         size_t extraOffset = 0;
-        if( srcOffset & 0x04 )
+        if( srcOffset & 0x03 )
         {
             //Not multiple of 4. Backtrack to make it multiple of 4, then add this value
             //to the return value so it gets correctly mapped in _mapForRead.
-            extraOffset = srcOffset & 0x04;
+            extraOffset = srcOffset & 0x03;
             srcOffset -= extraOffset;
         }
 
