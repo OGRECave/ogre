@@ -20,7 +20,7 @@ struct Material
 	float4 alpha_test_threshold;
 	float4 diffuse;
 
-	@foreach( 8, n )
+	@foreach( 16, n )
 		ushort diffuseIdx@n;@end
 };@end
 
