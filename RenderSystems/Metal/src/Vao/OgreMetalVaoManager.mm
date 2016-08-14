@@ -854,8 +854,6 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalVaoManager::_update(void)
     {
-        VaoManager::_update();
-
         unsigned long currentTimeMs = mTimer->getMilliseconds();
 
         if( currentTimeMs >= mNextStagingBufferTimestampCheckpoint )
@@ -905,6 +903,8 @@ namespace Ogre
             waitForTailFrameToFinish();
             destroyDelayedBuffers( mDynamicBufferCurrentFrame );
         }
+
+        VaoManager::_update();
 
         mDynamicBufferCurrentFrame = (mDynamicBufferCurrentFrame + 1) % mDynamicBufferMultiplier;
     }
