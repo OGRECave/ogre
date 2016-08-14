@@ -60,8 +60,10 @@
 #   ifdef OGRE_BUILD_PLUGIN_BSP
 #       include "BSP.h"
 #   endif
-#   ifdef INCLUDE_RTSHADER_SYSTEM
+#   ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #       include "ShaderSystem.h"
+#       include "ShaderSystemTexturedFog.h"
+#       include "ShaderSystemMultiLight.h"
 #   endif
 #   include "DualQuaternion.h"
 #   include "DeferredShadingDemo.h"
@@ -1005,6 +1007,8 @@ namespace OgreBites
                 mPluginNameMap["Sample_DeferredShading"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_DeferredShading();
                 mPluginNameMap["Sample_SSAO"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_SSAO();
                 mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+                mPluginNameMap["Sample_ShaderSystemMultiLight"]= (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystemMultiLight();
+                mPluginNameMap["Sample_ShaderSystemTexturedFog"]= (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystemTexturedFog();
                 mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
                 mPluginNameMap["Sample_Water"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Water();
 #       ifdef OGRE_BUILD_COMPONENT_TERRAIN
