@@ -593,6 +593,7 @@ namespace Ogre
         */
         static inline ArrayReal InvSqrt4( ArrayReal f )
         {
+            //TODO NEON has vrsqrtsq_f32 to do this job
             ArrayReal invSqrt   = vrsqrteq_f32( f );
 
             ArrayReal halfInvSqrt= vmulq_f32( HALF, invSqrt );                      //0.5 * rsqrt( f )
@@ -625,11 +626,29 @@ namespace Ogre
         */
         static inline ArrayReal InvSqrtNonZero4( ArrayReal f )
         {
+            //TODO NEON has vrsqrtsq_f32 to do this job
             ArrayReal invSqrt = vrsqrteq_f32( f );
 
             ArrayReal halfInvSqrt= vmulq_f32( HALF, invSqrt );                      //0.5 * rsqrt( f )
             ArrayReal rightSide  = vmulq_f32( invSqrt, vmulq_f32( f, invSqrt ) );   //f * rsqrt( f ) * rsqrt( f )
             return vmulq_f32( halfInvSqrt, vsubq_f32( THREE, rightSide ) );     //halfInvSqrt*(3 - rightSide)
+        }
+
+        static inline ArrayReal Sqrt( ArrayReal f )
+        {
+            //Netwon-Raphson, 2 iterations.
+            const ArrayReal fStep0 = vrsqrteq_f32( f );
+            // step fStep0 = 1 / sqrt(x)
+            const ArrayReal fStepParm0  = vmulq_f32( f, fStep0 );
+            const ArrayReal fStepResult0= vrsqrtsq_f32( fStepParm0, fStep0 );
+            // step fStep1 = 1 / sqrt(x)
+            const ArrayReal fStep1      = vmulq_f32( fStep0, fStepResult0 );
+            const ArrayReal fStepParm1  = vmulq_f32( f, fStep1 );
+            const ArrayReal fStepResult1= vrsqrtsq_f32( fStepParm1, fStep1 );
+            // take the res. fStep2 = 1 / sqrt(x)
+            const ArrayReal fStep2      = vmulq_f32( fStep1, fStepResult1 );
+            // mul by x to get sqrt, not rsqrt
+            return vmulq_f32( f, fStep2 );
         }
 
         /** Break x into fractional and integral parts

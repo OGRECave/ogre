@@ -45,225 +45,114 @@ namespace Ogre
                 lhsChunkBase != rhsChunkBase &&
                 "Re-strict aliasing rule broken. Compile without OGRE_RESTRICT_ALIASING" );
 #endif
-        outChunkBase[0] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[0], rhsChunkBase[0] ),
-                vmulq_f32( lhsChunkBase[1], rhsChunkBase[4] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[2], rhsChunkBase[8] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[12] ) ) );
-        outChunkBase[1] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[0], rhsChunkBase[1] ),
-                vmulq_f32( lhsChunkBase[1], rhsChunkBase[5] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[2], rhsChunkBase[9] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[13] ) ) );
-        outChunkBase[2] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[0], rhsChunkBase[2] ),
-                vmulq_f32( lhsChunkBase[1], rhsChunkBase[6] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[2], rhsChunkBase[10] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[14] ) ) );
-        outChunkBase[3] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[0], rhsChunkBase[3] ),
-                vmulq_f32( lhsChunkBase[1], rhsChunkBase[7] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[2], rhsChunkBase[11] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[15] ) ) );
+        outChunkBase[0] =   _mm_madd_ps(  lhsChunkBase[0], rhsChunkBase[0],
+                            _mm_madd_ps(  lhsChunkBase[1], rhsChunkBase[4],
+                            vmulq_f32(    lhsChunkBase[2], rhsChunkBase[8] ) ) );
+        outChunkBase[1] =   _mm_madd_ps(  lhsChunkBase[0], rhsChunkBase[1],
+                            _mm_madd_ps(  lhsChunkBase[1], rhsChunkBase[5],
+                            vmulq_f32(    lhsChunkBase[2], rhsChunkBase[9] ) ) );
+        outChunkBase[2] =   _mm_madd_ps(  lhsChunkBase[0], rhsChunkBase[2],
+                            _mm_madd_ps(  lhsChunkBase[1], rhsChunkBase[6],
+                            vmulq_f32(    lhsChunkBase[2], rhsChunkBase[10] ) ) );
+        outChunkBase[3] =   _mm_madd_ps(  lhsChunkBase[0], rhsChunkBase[3],
+                            _mm_madd_ps(  lhsChunkBase[1], rhsChunkBase[7],
+                            _mm_madd_ps(  lhsChunkBase[2], rhsChunkBase[11],
+                                          lhsChunkBase[3] ) ) );
 
         /* Next row (1) */
-        outChunkBase[4] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[4], rhsChunkBase[0] ),
-                vmulq_f32( lhsChunkBase[5], rhsChunkBase[4] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[6], rhsChunkBase[8] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[12] ) ) );
-        outChunkBase[5] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[4], rhsChunkBase[1] ),
-                vmulq_f32( lhsChunkBase[5], rhsChunkBase[5] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[6], rhsChunkBase[9] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[13] ) ) );
-        outChunkBase[6] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[4], rhsChunkBase[2] ),
-                vmulq_f32( lhsChunkBase[5], rhsChunkBase[6] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[6], rhsChunkBase[10] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[14] ) ) );
-        outChunkBase[7] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[4], rhsChunkBase[3] ),
-                vmulq_f32( lhsChunkBase[5], rhsChunkBase[7] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[6], rhsChunkBase[11] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[15] ) ) );
+        outChunkBase[4] =   _mm_madd_ps(  lhsChunkBase[4], rhsChunkBase[0],
+                            _mm_madd_ps(  lhsChunkBase[5], rhsChunkBase[4],
+                            vmulq_f32(    lhsChunkBase[6], rhsChunkBase[8] ) ) );
+        outChunkBase[5] =   _mm_madd_ps(  lhsChunkBase[4], rhsChunkBase[1],
+                            _mm_madd_ps(  lhsChunkBase[5], rhsChunkBase[5],
+                            vmulq_f32(    lhsChunkBase[6], rhsChunkBase[9] ) ) );
+        outChunkBase[6] =   _mm_madd_ps(  lhsChunkBase[4], rhsChunkBase[2],
+                            _mm_madd_ps(  lhsChunkBase[5], rhsChunkBase[6],
+                            vmulq_f32(    lhsChunkBase[6], rhsChunkBase[10] ) ) );
+        outChunkBase[7] =   _mm_madd_ps(  lhsChunkBase[4], rhsChunkBase[3],
+                            _mm_madd_ps(  lhsChunkBase[5], rhsChunkBase[7],
+                            _mm_madd_ps(  lhsChunkBase[6], rhsChunkBase[11],
+                                          lhsChunkBase[7] ) ) );
 
         /* Next row (2) */
-        outChunkBase[8] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[8], rhsChunkBase[0] ),
-                vmulq_f32( lhsChunkBase[9], rhsChunkBase[4] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[10], rhsChunkBase[8] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[12] ) ) );
-        outChunkBase[9] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[8], rhsChunkBase[1] ),
-                vmulq_f32( lhsChunkBase[9], rhsChunkBase[5] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[10], rhsChunkBase[9] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[13] ) ) );
-        outChunkBase[10] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[8], rhsChunkBase[2] ),
-                vmulq_f32( lhsChunkBase[9], rhsChunkBase[6] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[10], rhsChunkBase[10] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[14] ) ) );
-        outChunkBase[11] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[8], rhsChunkBase[3] ),
-                vmulq_f32( lhsChunkBase[9], rhsChunkBase[7] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[10], rhsChunkBase[11] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[15] ) ) );
+        outChunkBase[8] =   _mm_madd_ps(  lhsChunkBase[8], rhsChunkBase[0],
+                            _mm_madd_ps(  lhsChunkBase[9], rhsChunkBase[4],
+                            vmulq_f32(    lhsChunkBase[10],rhsChunkBase[8] ) ) );
+        outChunkBase[9] =   _mm_madd_ps(  lhsChunkBase[8], rhsChunkBase[1],
+                            _mm_madd_ps(  lhsChunkBase[9], rhsChunkBase[5],
+                            vmulq_f32(    lhsChunkBase[10],rhsChunkBase[9] ) ) );
+        outChunkBase[10] =  _mm_madd_ps(  lhsChunkBase[8], rhsChunkBase[2],
+                            _mm_madd_ps(  lhsChunkBase[9], rhsChunkBase[6],
+                            vmulq_f32(    lhsChunkBase[10],rhsChunkBase[10] ) ) );
+        outChunkBase[11] =  _mm_madd_ps(  lhsChunkBase[8], rhsChunkBase[3],
+                            _mm_madd_ps(  lhsChunkBase[9], rhsChunkBase[7],
+                            _mm_madd_ps(  lhsChunkBase[10],rhsChunkBase[11],
+                                          lhsChunkBase[11] ) ) );
     }
 
     /// Update version
     FORCEINLINE void concatArrayMatAf4x3( ArrayReal * RESTRICT_ALIAS lhsChunkBase,
-                                        const ArrayReal * RESTRICT_ALIAS rhsChunkBase )
+                                          const ArrayReal * RESTRICT_ALIAS rhsChunkBase )
     {
 #if OGRE_RESTRICT_ALIASING != 0
         assert( lhsChunkBase != rhsChunkBase &&
                 "Re-strict aliasing rule broken. Compile without OGRE_RESTRICT_ALIASING" );
 #endif
         ArrayReal lhs0 = lhsChunkBase[0];
-        lhsChunkBase[0] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[0], rhsChunkBase[0] ),
-                vmulq_f32( lhsChunkBase[1], rhsChunkBase[4] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[2], rhsChunkBase[8] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[12] ) ) );
+        lhsChunkBase[0] =   _mm_madd_ps(  lhsChunkBase[0], rhsChunkBase[0],
+                            _mm_madd_ps(  lhsChunkBase[1], rhsChunkBase[4],
+                            vmulq_f32(    lhsChunkBase[2], rhsChunkBase[8] ) ) );
         ArrayReal lhs1 = lhsChunkBase[1];
-        lhsChunkBase[1] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[1] ),
-                vmulq_f32( lhsChunkBase[1], rhsChunkBase[5] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[2], rhsChunkBase[9] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[13] ) ) );
+        lhsChunkBase[1] =   _mm_madd_ps(  lhs0, rhsChunkBase[1],
+                            _mm_madd_ps(  lhsChunkBase[1], rhsChunkBase[5],
+                            vmulq_f32(    lhsChunkBase[2], rhsChunkBase[9] ) ) );
         ArrayReal lhs2 = lhsChunkBase[2];
-        lhsChunkBase[2] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[2] ),
-                vmulq_f32( lhs1, rhsChunkBase[6] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[2], rhsChunkBase[10] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[14] ) ) );
-        lhsChunkBase[3] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[3] ),
-                vmulq_f32( lhs1, rhsChunkBase[7] ) ),
-            vaddq_f32(
-                vmulq_f32( lhs2, rhsChunkBase[11] ),
-                vmulq_f32( lhsChunkBase[3], rhsChunkBase[15] ) ) );
+        lhsChunkBase[2] =   _mm_madd_ps(  lhs0, rhsChunkBase[2],
+                            _mm_madd_ps(  lhs1, rhsChunkBase[6],
+                            vmulq_f32(    lhsChunkBase[2], rhsChunkBase[10] ) ) );
+
+        lhsChunkBase[3] =   _mm_madd_ps(  lhs0, rhsChunkBase[3],
+                            _mm_madd_ps(  lhs1, rhsChunkBase[7],
+                            _mm_madd_ps(  lhs2, rhsChunkBase[11],
+                                          lhsChunkBase[3] ) ) );
 
         /* Next row (1) */
         lhs0 = lhsChunkBase[4];
-        lhsChunkBase[4] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[4], rhsChunkBase[0] ),
-                vmulq_f32( lhsChunkBase[5], rhsChunkBase[4] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[6], rhsChunkBase[8] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[12] ) ) );
+        lhsChunkBase[4] =   _mm_madd_ps(  lhsChunkBase[4], rhsChunkBase[0],
+                            _mm_madd_ps(  lhsChunkBase[5], rhsChunkBase[4],
+                            vmulq_f32(    lhsChunkBase[6], rhsChunkBase[8] ) ) );
         lhs1 = lhsChunkBase[5];
-        lhsChunkBase[5] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[1] ),
-                vmulq_f32( lhsChunkBase[5], rhsChunkBase[5] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[6], rhsChunkBase[9] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[13] ) ) );
+        lhsChunkBase[5] =   _mm_madd_ps(  lhs0, rhsChunkBase[1],
+                            _mm_madd_ps(  lhsChunkBase[5], rhsChunkBase[5],
+                            vmulq_f32(    lhsChunkBase[6], rhsChunkBase[9] ) ) );
         lhs2 = lhsChunkBase[6];
-        lhsChunkBase[6] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[2] ),
-                vmulq_f32( lhs1, rhsChunkBase[6] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[6], rhsChunkBase[10] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[14] ) ) );
-        lhsChunkBase[7] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[3] ),
-                vmulq_f32( lhs1, rhsChunkBase[7] ) ),
-            vaddq_f32(
-                vmulq_f32( lhs2, rhsChunkBase[11] ),
-                vmulq_f32( lhsChunkBase[7], rhsChunkBase[15] ) ) );
+        lhsChunkBase[6] =   _mm_madd_ps(  lhs0, rhsChunkBase[2],
+                            _mm_madd_ps(  lhs1, rhsChunkBase[6],
+                            vmulq_f32(    lhsChunkBase[6], rhsChunkBase[10] ) ) );
+
+        lhsChunkBase[7] =   _mm_madd_ps(  lhs0, rhsChunkBase[3],
+                            _mm_madd_ps(  lhs1, rhsChunkBase[7],
+                            _mm_madd_ps(  lhs2, rhsChunkBase[11],
+                                          lhsChunkBase[7] ) ) );
 
         /* Next row (2) */
         lhs0 = lhsChunkBase[8];
-        lhsChunkBase[8] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[8], rhsChunkBase[0] ),
-                vmulq_f32( lhsChunkBase[9], rhsChunkBase[4] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[10], rhsChunkBase[8] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[12] ) ) );
+        lhsChunkBase[8] =   _mm_madd_ps(  lhsChunkBase[8], rhsChunkBase[0],
+                            _mm_madd_ps(  lhsChunkBase[9], rhsChunkBase[4],
+                            vmulq_f32(    lhsChunkBase[10],rhsChunkBase[8] ) ) );
         lhs1 = lhsChunkBase[9];
-        lhsChunkBase[9] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[1] ),
-                vmulq_f32( lhsChunkBase[9], rhsChunkBase[5] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[10], rhsChunkBase[9] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[13] ) ) );
+        lhsChunkBase[9] =   _mm_madd_ps(  lhs0, rhsChunkBase[1],
+                            _mm_madd_ps(  lhsChunkBase[9], rhsChunkBase[5],
+                            vmulq_f32(    lhsChunkBase[10],rhsChunkBase[9] ) ) );
         lhs2 = lhsChunkBase[10];
-        lhsChunkBase[10] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[2] ),
-                vmulq_f32( lhs1, rhsChunkBase[6] ) ),
-            vaddq_f32(
-                vmulq_f32( lhsChunkBase[10], rhsChunkBase[10] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[14] ) ) );
-        lhsChunkBase[11] =
-            vaddq_f32(
-            vaddq_f32(
-                vmulq_f32( lhs0, rhsChunkBase[3] ),
-                vmulq_f32( lhs1, rhsChunkBase[7] ) ),
-            vaddq_f32(
-                vmulq_f32( lhs2, rhsChunkBase[11] ),
-                vmulq_f32( lhsChunkBase[11], rhsChunkBase[15] ) ) );
+        lhsChunkBase[10] =  _mm_madd_ps(  lhs0, rhsChunkBase[2],
+                            _mm_madd_ps(  lhs1, rhsChunkBase[6],
+                            vmulq_f32(    lhsChunkBase[10],rhsChunkBase[10] ) ) );
+
+        lhsChunkBase[11] =  _mm_madd_ps(  lhs0, rhsChunkBase[3],
+                            _mm_madd_ps(  lhs1, rhsChunkBase[7],
+                            _mm_madd_ps(  lhs2,rhsChunkBase[11],
+                                          lhsChunkBase[11] ) ) );
     }
 
     FORCEINLINE ArrayMatrixAf4x3 operator * ( const ArrayMatrixAf4x3 &lhs, const ArrayMatrixAf4x3 &rhs )
@@ -353,6 +242,119 @@ namespace Ogre
         chunkBase[9] = vmulq_f32( chunkBase[9], scaleChunkBase[1] );    //m21 * scale.y
         chunkBase[10]= vmulq_f32( chunkBase[10],scaleChunkBase[2] );    //m22 * scale.z
         chunkBase[11]=  posChunkBase[2];                                //m23 * pos.z
+    }
+    //-----------------------------------------------------------------------------------
+    inline void ArrayMatrixAf4x3::decomposition( ArrayVector3 &position, ArrayVector3 &scale,
+                                                 ArrayQuaternion &orientation ) const
+    {
+        const ArrayReal * RESTRICT_ALIAS chunkBase  = mChunkBase;
+        // build orthogonal matrix Q
+
+        ArrayReal m00 = mChunkBase[0], m01 = mChunkBase[1], m02 = mChunkBase[2];
+        ArrayReal m10 = mChunkBase[4], m11 = mChunkBase[5], m12 = mChunkBase[6];
+        ArrayReal m20 = mChunkBase[8], m21 = mChunkBase[9], m22 = mChunkBase[10];
+
+        //fInvLength = 1.0f / sqrt( m00 * m00 + m10 * m10 + m20 * m20 );
+        ArrayReal fInvLength = MathlibNEON::InvSqrt4(
+                        _mm_madd_ps( m00, m00,
+                        _mm_madd_ps( m10, m10,
+                         vmulq_f32( m20, m20 ) ) ) );
+
+        ArrayReal q00, q01, q02,
+                  q10, q11, q12,
+                  q20, q21, q22; //3x3 matrix
+        q00 = vmulq_f32( m00, fInvLength ); //q00 = m00 * fInvLength
+        q10 = vmulq_f32( m10, fInvLength ); //q10 = m10 * fInvLength
+        q20 = vmulq_f32( m20, fInvLength ); //q20 = m20 * fInvLength
+
+        //fDot = q00*m01 + q10*m11 + q20*m21
+        ArrayReal fDot = _mm_madd_ps( q00, m01, _mm_madd_ps( q10, m11, vmulq_f32( q20, m21 ) ) );
+        q01 = vsubq_f32( m01, vmulq_f32( fDot, q00 ) ); //q01 = m01 - fDot * q00;
+        q11 = vsubq_f32( m11, vmulq_f32( fDot, q10 ) ); //q11 = m11 - fDot * q10;
+        q21 = vsubq_f32( m21, vmulq_f32( fDot, q20 ) ); //q21 = m21 - fDot * q20;
+
+        //fInvLength = 1.0f / sqrt( q01 * q01 + q11 * q11 + q21 * q21 );
+        fInvLength = MathlibNEON::InvSqrt4(
+                        _mm_madd_ps( q01, q01,
+                        _mm_madd_ps( q11, q11,
+                         vmulq_f32( q21, q21 ) ) ) );
+
+        q01 = vmulq_f32( q01, fInvLength ); //q01 *= fInvLength;
+        q11 = vmulq_f32( q11, fInvLength ); //q11 *= fInvLength;
+        q21 = vmulq_f32( q21, fInvLength ); //q21 *= fInvLength;
+
+        //fDot = q00 * m02 + q10 * m12 + q20 * m22;
+        fDot = _mm_madd_ps( q00, m02, _mm_madd_ps( q10, m12, vmulq_f32( q20, m22 ) ) );
+        q02 = vsubq_f32( m02, vmulq_f32( fDot, q00 ) ); //q02 = m02 - fDot * q00;
+        q12 = vsubq_f32( m12, vmulq_f32( fDot, q10 ) ); //q12 = m12 - fDot * q10;
+        q22 = vsubq_f32( m22, vmulq_f32( fDot, q20 ) ); //q22 = m22 - fDot * q20;
+
+        //fDot = q01 * m02 + q11 * m12 + q21 * m22;
+        fDot = _mm_madd_ps( q01, m02, _mm_madd_ps( q11, m12, vmulq_f32( q21, m22 ) ) );
+        q02 = vsubq_f32( q02, vmulq_f32( fDot, q01 ) ); //q02 = q02 - fDot * q01;
+        q12 = vsubq_f32( q12, vmulq_f32( fDot, q11 ) ); //q12 = q12 - fDot * q11;
+        q22 = vsubq_f32( q22, vmulq_f32( fDot, q21 ) ); //q22 = q22 - fDot * q21;
+
+        //fInvLength = 1.0f / sqrt( q02 * q02 + q12 * q12 + q22 * q22 );
+        fInvLength = MathlibNEON::InvSqrt4(
+                        _mm_madd_ps( q02, q02,
+                        _mm_madd_ps( q12, q12,
+                         vmulq_f32( q22, q22 ) ) ) );
+
+        q02 = vmulq_f32( q02, fInvLength ); //q02 *= fInvLength;
+        q12 = vmulq_f32( q12, fInvLength ); //q12 *= fInvLength;
+        q22 = vmulq_f32( q22, fInvLength ); //q22 *= fInvLength;
+
+        // guarantee that orthogonal matrix has determinant 1 (no reflections)
+        //fDet = q00*q11*q22 + q01*q12*q20 +
+        //       q02*q10*q21 - q02*q11*q20 -
+        //       q01*q10*q22 - q00*q12*q21;
+        //fDet = (q00*q11*q22 + q01*q12*q20 + q02*q10*q21) -
+        //       (q02*q11*q20 + q01*q10*q22 + q00*q12*q21);
+        ArrayReal fDet = vaddq_f32(
+                    vaddq_f32( vmulq_f32( vmulq_f32( q00, q11 ), q22 ),
+                                vmulq_f32( vmulq_f32( q01, q12 ), q20 ) ),
+                    vmulq_f32( vmulq_f32( q02, q10 ), q21 ) );
+        ArrayReal fTmp = vaddq_f32(
+                    vaddq_f32( vmulq_f32( vmulq_f32( q02, q11 ), q20 ),
+                                vmulq_f32( vmulq_f32( q01, q10 ), q22 ) ),
+                    vmulq_f32( vmulq_f32( q00, q12 ), q21 ) );
+        fDet = vsubq_f32( fDet, fTmp );
+
+        //if ( fDet < 0.0 )
+        //{
+        //    for (size_t iRow = 0; iRow < 3; iRow++)
+        //        for (size_t iCol = 0; iCol < 3; iCol++)
+        //            kQ[iRow][iCol] = -kQ[iRow][iCol];
+        //}
+        fDet = vandq_f32( fDet, MathlibNEON::SIGN_MASK );
+        q00 = veorq_f32( q00, fDet );
+        q01 = veorq_f32( q01, fDet );
+        q02 = veorq_f32( q02, fDet );
+        q10 = veorq_f32( q10, fDet );
+        q11 = veorq_f32( q11, fDet );
+        q12 = veorq_f32( q12, fDet );
+        q20 = veorq_f32( q20, fDet );
+        q21 = veorq_f32( q21, fDet );
+        q22 = veorq_f32( q22, fDet );
+
+        const ArrayReal matrix[9] = { q00, q01, q02,
+                                      q10, q11, q12,
+                                      q20, q21, q22 };
+        orientation.FromOrthoDet1RotationMatrix( matrix );
+
+        //scale.x = q00 * m00 + q10 * m10 + q20 * m20;
+        //scale.y = q01 * m01 + q11 * m11 + q21 * m21;
+        //scale.z = q02 * m02 + q12 * m12 + q22 * m22;
+        ArrayReal * RESTRICT_ALIAS scaleChunkBase = scale.mChunkBase;
+        scaleChunkBase[0] = _mm_madd_ps( q00, m00, _mm_madd_ps( q10, m10, vmulq_f32( q20, m20 ) ) );
+        scaleChunkBase[1] = _mm_madd_ps( q01, m01, _mm_madd_ps( q11, m11, vmulq_f32( q21, m21 ) ) );
+        scaleChunkBase[2] = _mm_madd_ps( q02, m02, _mm_madd_ps( q12, m12, vmulq_f32( q22, m22 ) ) );
+
+        ArrayReal * RESTRICT_ALIAS posChunkBase = position.mChunkBase;
+        posChunkBase[0] = chunkBase[3];
+        posChunkBase[1] = chunkBase[7];
+        posChunkBase[2] = chunkBase[11];
     }
     //-----------------------------------------------------------------------------------
     inline void ArrayMatrixAf4x3::setToInverse(void)
@@ -632,18 +634,37 @@ namespace Ogre
     inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * RESTRICT_ALIAS src )
     {
         _MM_TRANSPOSE4_SRC_DST_PS(
-                            vld1q_f32( src[0]._m ), vld1q_f32( src[1]._m ), 
+                            vld1q_f32( src[0]._m ), vld1q_f32( src[1]._m ),
                             vld1q_f32( src[2]._m ), vld1q_f32( src[3]._m ),
                             this->mChunkBase[0], this->mChunkBase[1],
                             this->mChunkBase[2], this->mChunkBase[3] );
         _MM_TRANSPOSE4_SRC_DST_PS(
-                            vld1q_f32( src[0]._m+4 ), vld1q_f32( src[1]._m+4 ), 
+                            vld1q_f32( src[0]._m+4 ), vld1q_f32( src[1]._m+4 ),
                             vld1q_f32( src[2]._m+4 ), vld1q_f32( src[3]._m+4 ),
                             this->mChunkBase[4], this->mChunkBase[5],
                             this->mChunkBase[6], this->mChunkBase[7] );
         _MM_TRANSPOSE4_SRC_DST_PS(
-                            vld1q_f32( src[0]._m+8 ), vld1q_f32( src[1]._m+8 ), 
+                            vld1q_f32( src[0]._m+8 ), vld1q_f32( src[1]._m+8 ),
                             vld1q_f32( src[2]._m+8 ), vld1q_f32( src[3]._m+8 ),
+                            this->mChunkBase[8], this->mChunkBase[9],
+                            this->mChunkBase[10], this->mChunkBase[11] );
+    }
+    //-----------------------------------------------------------------------------------
+    inline void ArrayMatrixAf4x3::loadFromAoS( const Matrix4 * RESTRICT_ALIAS * src )
+    {
+        _MM_TRANSPOSE4_SRC_DST_PS(
+                            vld1q_f32( src[0]->_m ), vld1q_f32( src[1]->_m ),
+                            vld1q_f32( src[2]->_m ), vld1q_f32( src[3]->_m ),
+                            this->mChunkBase[0], this->mChunkBase[1],
+                            this->mChunkBase[2], this->mChunkBase[3] );
+        _MM_TRANSPOSE4_SRC_DST_PS(
+                            vld1q_f32( src[0]->_m+4 ), vld1q_f32( src[1]->_m+4 ),
+                            vld1q_f32( src[2]->_m+4 ), vld1q_f32( src[3]->_m+4 ),
+                            this->mChunkBase[4], this->mChunkBase[5],
+                            this->mChunkBase[6], this->mChunkBase[7] );
+        _MM_TRANSPOSE4_SRC_DST_PS(
+                            vld1q_f32( src[0]->_m+8 ), vld1q_f32( src[1]->_m+8 ),
+                            vld1q_f32( src[2]->_m+8 ), vld1q_f32( src[3]->_m+8 ),
                             this->mChunkBase[8], this->mChunkBase[9],
                             this->mChunkBase[10], this->mChunkBase[11] );
     }
