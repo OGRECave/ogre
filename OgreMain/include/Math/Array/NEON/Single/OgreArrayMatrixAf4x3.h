@@ -137,6 +137,10 @@ namespace Ogre
         inline void makeTransform( const ArrayVector3 &position, const ArrayVector3 &scale,
                                     const ArrayQuaternion &orientation );
 
+        /// @copydoc Matrix4::decomposition()
+        inline void decomposition( ArrayVector3 &position, ArrayVector3 &scale,
+                                  ArrayQuaternion &orientation ) const;
+
         /** Calculates the inverse of the matrix. If used against degenerate matrices,
             it may cause NaNs and Infs on those. Use @setToInverseDegeneratesAsIdentity
             if you want to deal with degenerate matrices.
@@ -173,6 +177,7 @@ namespace Ogre
             'src' must be aligned and assumed to have enough memory for ARRAY_PACKED_REALS matrices
         */
         inline void loadFromAoS( const Matrix4 * RESTRICT_ALIAS src );
+        inline void loadFromAoS( const Matrix4 * RESTRICT_ALIAS * src );
         inline void loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS src );
         inline void loadFromAoS( const SimpleMatrixAf4x3 * RESTRICT_ALIAS * src );
 

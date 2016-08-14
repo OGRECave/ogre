@@ -154,7 +154,7 @@ namespace Ogre
         // header for details. Adapted/ported to Ogre intrinsics.
         ArrayReal xabs = Abs4( x );
         ArrayMaskR select = vcltq_f32( x, vdupq_n_f32(0.0f) );
-        ArrayReal t1 = vrsqrteq_f32( vsubq_f32( ONE, xabs ) );
+        ArrayReal t1 = MathlibNEON::Sqrt( vsubq_f32( ONE, xabs ) );
         
         /* Instruction counts can be reduced if the polynomial was
          * computed entirely from nested (dependent) fma's. However, 
