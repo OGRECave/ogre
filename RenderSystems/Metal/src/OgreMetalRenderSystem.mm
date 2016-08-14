@@ -146,6 +146,7 @@ namespace Ogre
         rsc->setCapability(RSC_HWSTENCIL);
         rsc->setStencilBufferBitDepth(8);
         rsc->setNumTextureUnits(16);
+        rsc->setNumVertexTextureUnits(16);
         rsc->setCapability(RSC_ANISOTROPY);
         rsc->setCapability(RSC_AUTOMIPMAP);
         rsc->setCapability(RSC_BLENDING);
@@ -154,14 +155,16 @@ namespace Ogre
         rsc->setCapability(RSC_TEXTURE_COMPRESSION);
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         rsc->setCapability(RSC_TEXTURE_COMPRESSION_DXT);
+        rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC4_BC5);
+        //rsc->setCapability(RSC_TEXTURE_COMPRESSION_BC6H_BC7);
 #endif
         rsc->setCapability(RSC_VBO);
+        rsc->setCapability(RSC_32BIT_INDEX);
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);
         rsc->setCapability(RSC_STENCIL_WRAP);
         rsc->setCapability(RSC_USER_CLIP_PLANES);
         rsc->setCapability(RSC_VERTEX_FORMAT_UBYTE4);
         rsc->setCapability(RSC_INFINITE_FAR_PLANE);
-        rsc->setCapability(RSC_TEXTURE_3D);
         rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
         rsc->setNonPOW2TexturesLimited(false);
         rsc->setCapability(RSC_HWRENDER_TO_TEXTURE);
@@ -169,14 +172,67 @@ namespace Ogre
         rsc->setCapability(RSC_POINT_SPRITES);
         rsc->setCapability(RSC_POINT_EXTENDED_PARAMETERS);
         rsc->setCapability(RSC_TEXTURE_1D);
+        rsc->setCapability(RSC_TEXTURE_3D);
         rsc->setCapability(RSC_TEXTURE_SIGNED_INT);
+        rsc->setCapability(RSC_VERTEX_PROGRAM);
+        rsc->setCapability(RSC_FRAGMENT_PROGRAM);
+        rsc->setCapability(RSC_VERTEX_BUFFER_INSTANCE_DATA);
+        rsc->setCapability(RSC_MIPMAP_LOD_BIAS);
+        rsc->setCapability(RSC_ALPHA_TO_COVERAGE);
         rsc->setMaxPointSize(256);
 
         rsc->setCapability(RSC_HW_GAMMA);
         rsc->setCapability(RSC_TEXTURE_GATHER);
         rsc->setCapability(RSC_TEXTURE_2D_ARRAY);
 
-        rsc->setMaximumResolutions( 16384, 4096, 16384 );
+        //These don't make sense on Metal, so just use flexible defaults.
+        rsc->setVertexProgramConstantFloatCount( 16384 );
+        rsc->setVertexProgramConstantBoolCount( 16384 );
+        rsc->setVertexProgramConstantIntCount( 16384 );
+        rsc->setFragmentProgramConstantFloatCount( 16384 );
+        rsc->setFragmentProgramConstantBoolCount( 16384 );
+        rsc->setFragmentProgramConstantIntCount( 16384 );
+
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        uint8 mrtCount = 8u;
+#else
+        //Actually the limit is not the count but rather how many bytes are in the
+        //GPU's internal TBDR cache (16 bytes for Family 1, 32 bytes for the rest)
+        //Consult Metal's manual for more info.
+        uint8 mrtCount = 4u;
+        if( [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily2_v1] ||
+            [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily2_v2] ||
+            [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily3_v1] )
+        {
+            mrtCount = 8u;
+        }
+#endif
+        rsc->setNumMultiRenderTargets( std::min<int>(mrtCount, OGRE_MAX_MULTIPLE_RENDER_TARGETS) );
+        rsc->setCapability(RSC_MRT_DIFFERENT_BIT_DEPTHS);
+
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+        uint16 max2DResolution = 16384;
+#else
+        uint16 max2DResolution = 4096;
+        if( [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily1_v2] ||
+            [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily2_v2] )
+        {
+            max2DResolution = 8192;
+        }
+        if( [mActiveDevice->mDevice supportsFeatureSet:MTLFeatureSet_iOS_GPUFamily3_v1] )
+        {
+            max2DResolution = 16384;
+        }
+#endif
+        rsc->setMaximumResolutions( max2DResolution, 2048, max2DResolution );
+
+        //TODO: Compute
+        //rsc->setCapability(RSC_COMPUTE_PROGRAM);
+        //rsc->setCapability(RSC_UAV);
+        //rsc->setCapability(RSC_ATOMIC_COUNTERS);
+//        rsc->setComputeProgramConstantFloatCount( 16384 );
+//        rsc->setComputeProgramConstantBoolCount( 16384 );
+//        rsc->setComputeProgramConstantIntCount( 16384 );
 
         rsc->addShaderProfile( "metal" );
 
