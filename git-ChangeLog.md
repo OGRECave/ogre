@@ -59,10 +59,12 @@
 * can be compiled without any input. Start a sample using `./SampleBrowser <SampleNumber>`
 * neither SDL2 nor OIS needed for Android anymore
 * improved input handling on Android
-* VolumeTerrain: fixed triplanar texturing shaders 
+* VolumeTerrain: fixed triplanar texturing
+* ShaderSystemMultiLight: ported to GLES3
+* disabled unfinished Samples
 
-## EGL in GLNativeSupport ([branch](https://github.com/OGRECave/ogre/pull/185))
-* all supported RenderSystems ported to GLNativeSupport 
+## EGL in GLNativeSupport
+* all supported GL RenderSystems ported to GLNativeSupport 
 * allow EGL to create "full" GL Contexts as well
 * needed for [real headless rendering](http://devblogs.nvidia.com/parallelforall/egl-eye-opengl-visualization-without-x-server/)
-* allows running GL3Plus on EGL (Linux / Mesa EGL)
+* allows running GL3Plus on EGL (Linux, MESA or NVidia)
