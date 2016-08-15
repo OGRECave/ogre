@@ -60,8 +60,10 @@
 #   ifdef OGRE_BUILD_PLUGIN_BSP
 #       include "BSP.h"
 #   endif
-#   ifdef INCLUDE_RTSHADER_SYSTEM
+#   ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #       include "ShaderSystem.h"
+#       include "ShaderSystemTexturedFog.h"
+#       include "ShaderSystemMultiLight.h"
 #   endif
 #   include "DualQuaternion.h"
 #   include "DeferredShadingDemo.h"
@@ -90,8 +92,6 @@
 #   include "DynTex.h"
 #   include "FacialAnimation.h"
 #   include "Grass.h"
-#   include "Hair.h"
-#   include "Island.h"
 #   include "Lighting.h"
 #   include "MeshLod.h"
 #   include "ParticleFX.h"
@@ -104,7 +104,6 @@
 #   include "Smoke.h"
 #   include "SphereMapping.h"
 #   include "Tessellation.h"
-#   include "TerrainTessellation.h"
 #   include "TextureFX.h"
 #   include "Transparency.h"
 #   include "VolumeTex.h"
@@ -969,9 +968,6 @@ namespace OgreBites
             mPluginNameMap["Sample_TextureArray"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_TextureArray();
             mPluginNameMap["Sample_Tessellation"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_Tessellation();
             mPluginNameMap["Sample_PNTriangles"]                = (OgreBites::SdkSample *) OGRE_NEW Sample_PNTriangles();
-            mPluginNameMap["Sample_Hair"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_Hair();
-            mPluginNameMap["Sample_Island"]             = (OgreBites::SdkSample *) OGRE_NEW Sample_Island();
-            mPluginNameMap["Sample_TerrainTessellation"]= (OgreBites::SdkSample *) OGRE_NEW Sample_TerrainTessellation();
 #                       if defined(OGRE_BUILD_COMPONENT_VOLUME) && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             mPluginNameMap["Sample_VolumeCSG"]          = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeCSG();
             mPluginNameMap["Sample_VolumeTerrain"]      = (OgreBites::SdkSample *) OGRE_NEW Sample_VolumeTerrain();
@@ -1005,6 +1001,8 @@ namespace OgreBites
                 mPluginNameMap["Sample_DeferredShading"]    = (OgreBites::SdkSample *) OGRE_NEW Sample_DeferredShading();
                 mPluginNameMap["Sample_SSAO"]               = (OgreBites::SdkSample *) OGRE_NEW Sample_SSAO();
                 mPluginNameMap["Sample_ShaderSystem"]       = (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystem();
+                mPluginNameMap["Sample_ShaderSystemMultiLight"]= (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystemMultiLight();
+                mPluginNameMap["Sample_ShaderSystemTexturedFog"]= (OgreBites::SdkSample *) OGRE_NEW Sample_ShaderSystemTexturedFog();
                 mPluginNameMap["Sample_Ocean"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Ocean();
                 mPluginNameMap["Sample_Water"]              = (OgreBites::SdkSample *) OGRE_NEW Sample_Water();
 #       ifdef OGRE_BUILD_COMPONENT_TERRAIN

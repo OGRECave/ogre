@@ -7,13 +7,12 @@
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint8 cPriorityMain = 50;
-const uint8 cPriorityQuery = 51;
-const uint8 cPriorityLights = 55;
-
-
 class _OgreSampleClassExport Sample_Lighting : public SdkSample, public RenderObjectListener
 {
+    static const uint8 cPriorityMain = 50;
+    static const uint8 cPriorityQuery = 51;
+    static const uint8 cPriorityLights = 55;
+
 public:
 
     Sample_Lighting() :

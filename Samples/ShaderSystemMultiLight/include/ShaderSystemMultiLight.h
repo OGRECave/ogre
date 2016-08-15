@@ -37,17 +37,16 @@ the more innovative ideas I've seen of late.
 using namespace Ogre;
 using namespace OgreBites;
 
-const uint8 cPriorityMain = 50;
-const uint8 cPriorityQuery = 51;
-const uint8 cPriorityLights = 55;
-const unsigned int cInitialLightCount = 3;
-const String DEBUG_MODE_CHECKBOX = "DebugMode";
-const String NUM_OF_LIGHTS_SLIDER = "NumOfLights";
-const String TWIRL_LIGHTS_CHECKBOX = "TwirlLights";
-
-
 class _OgreSampleClassExport Sample_ShaderSystemMultiLight : public SdkSample
 {
+    static const uint8 cPriorityMain = 50;
+    static const uint8 cPriorityQuery = 51;
+    static const uint8 cPriorityLights = 55;
+    static const uint32 cInitialLightCount = 3;
+
+    static const String DEBUG_MODE_CHECKBOX;
+    static const String NUM_OF_LIGHTS_SLIDER;
+    static const String TWIRL_LIGHTS_CHECKBOX;
 public:
 
     Sample_ShaderSystemMultiLight() :
@@ -115,19 +114,6 @@ public:
     }
 
 protected:
-
-    void testCapabilities( const RenderSystemCapabilities* caps )
-    {
-        if (!Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_3_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_4_1") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("ps_5_0") &&
-            !Ogre::Root::getSingletonPtr()->getRenderSystem()->getCapabilities()->isShaderProfileSupported("glsl"))
-        {
-            OGRE_EXCEPT(Exception::ERR_NOT_IMPLEMENTED, "This sample uses dynamic loops in Cg or GLSL type shader language, your graphic card must support Shader Profile 3 or above."
-                " You cannot run this sample. Sorry!", "Sample_ShaderSystemMultiLight::testCapabilities");
-        }
-    }
 
     void setupContent()
     {

@@ -151,7 +151,7 @@ namespace Ogre {
         {
             // Uses recursion to find any functions that the supplied function invocation depends on
             FunctionMap::const_iterator itCache = mFunctionCacheMap.begin();
-            String body = BLANKSTRING;
+            String body;
 
             // Find the function in the cache and retrieve the body
             for (; itCache != mFunctionCacheMap.end(); ++itCache)
@@ -163,7 +163,7 @@ namespace Ogre {
                 break;
             }
 
-            if(body != BLANKSTRING)
+            if(!body.empty())
             {
                 // Trim whitespace
                 StringUtil::trim(body);
@@ -171,7 +171,7 @@ namespace Ogre {
 
                 for (StringVector::const_iterator it = tokens.begin(); it != tokens.end(); ++it)
                 {
-                    StringVector moreTokens = StringUtil::split(*it, " ");
+                    StringVector moreTokens = StringUtil::split(*it, " \n");
 
                     if (!moreTokens.empty())
                     {
@@ -995,7 +995,9 @@ namespace Ogre {
                                 if(lparen_pos != String::npos)
                                 {
                                     StringVector lineTokens = StringUtil::split(line, "(");
-                                    paramTokens = StringUtil::split(lineTokens[1], ",");
+                                    if(lineTokens.size() == 2) {
+                                        paramTokens = StringUtil::split(lineTokens[1], ",");
+                                    }
                                 }
                                 else
                                 {
