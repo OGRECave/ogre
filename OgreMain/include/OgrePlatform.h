@@ -207,7 +207,7 @@ namespace Ogre {
 
 /* define OGRE_DEPRECATED macro */
 #if OGRE_CPP_VER >= OGRE_CPP_VER_14
-#   define OGRE_DEPRECATED [[deprecated()]]
+#   define OGRE_DEPRECATED [[deprecated]]
 #elif OGRE_COMPILER == OGRE_COMPILER_MSVC
 #   define OGRE_DEPRECATED __declspec(deprecated)
 #elif OGRE_COMPILER == OGRE_COMPILER_GNUC || OGRE_COMPILER == OGRE_COMPILER_CLANG
