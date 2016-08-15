@@ -223,6 +223,12 @@ void FFP_Lerp(in vec4 vIn0, in vec4 vIn1, vec4 T, out vec4 vOut)
 }
 
 //-----------------------------------------------------------------------------
+void FFP_Lerp(in vec3 vIn0, in vec3 vIn1, in vec4 T, out vec3 vOut)
+{
+	vOut = mix(vIn0, vIn1, T.xyz);
+}
+
+//-----------------------------------------------------------------------------
 void FFP_DotProduct(in float vIn0, in float vIn1, out float vOut)
 {
 	vOut = dot(vIn0, vIn1);
