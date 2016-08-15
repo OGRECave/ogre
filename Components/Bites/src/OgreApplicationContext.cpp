@@ -515,6 +515,7 @@ void ApplicationContext::locateResources()
 #       ifdef INCLUDE_RTSHADER_SYSTEM
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSL", type, sec);
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSLES", type, sec);
     }
     else if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsl"))
