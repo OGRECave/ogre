@@ -136,12 +136,22 @@ void GLSLProgramProcessor::bindSubShaders(Program* program, GpuProgramPtr pGpuPr
                     ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, TargetLanguage, program->getType());
 
                 // Set the source name
-                String sourceName = program->getDependency(i) + "." + TargetLanguage;
+                String sourceName = program->getDependency(i) + ".glsl";
                 pSubGpuProgram->setSourceFile(sourceName);
                 pSubGpuProgram->load();
 
                 // Prepend the current GLSL version
-                String versionLine = "#version " + StringConverter::toString(Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion()) + "\n";
+                int GLSLVersion = Root::getSingleton().getRenderSystem()->getNativeShadingLanguageVersion();
+                String versionLine = "#version " + StringConverter::toString(GLSLVersion) + "\n";
+
+                if(GLSLVersion > 130) {
+                    // Redefine texture functions to maintain reusability
+                    versionLine += "#define texture1D texture\n";
+                    versionLine += "#define texture2D texture\n";
+                    versionLine += "#define texture3D texture\n";
+                    versionLine += "#define textureCube texture\n";
+                }
+
                 pSubGpuProgram->setSource(versionLine + pSubGpuProgram->getSource());
 
                 // If we have compile errors than stop processing
