@@ -7,7 +7,7 @@ if (OGRE_BUILD_SAMPLES AND NOT OIS_FOUND AND NOT ((WINDOWS_STORE OR WINDOWS_PHON
 endif()
 
 if (OGRE_BUILD_SAMPLES)
-  include_directories(${OIS_INCLUDE_DIR})
+  include_directories(${OIS_INCLUDE_DIRS})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
   # Make sure all plugins are built
