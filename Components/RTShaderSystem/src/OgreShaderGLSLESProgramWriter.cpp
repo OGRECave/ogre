@@ -910,7 +910,7 @@ namespace Ogre {
 
             mCachedFunctionLibraries[libName] = "";
 
-            String libFileName =  libName + ".glsles";
+            String libFileName =  libName + ".glsl";
 
             DataStreamPtr stream = ResourceGroupManager::getSingleton().openResource(libFileName);
 
