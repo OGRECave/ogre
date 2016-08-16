@@ -88,8 +88,8 @@ namespace Ogre
 
             while( itor.hasMoreElements() )
             {
-                size_t boneIdx              = itor.peekNextKey();
-                OldNodeAnimationTrack *track   = itor.getNext();
+                size_t boneIdx                  = itor.peekNextKey();
+                OldNodeAnimationTrack *track    = itor.getNext();
 
                 if( track->getNumKeyFrames() > 0 )
                 {
@@ -109,12 +109,29 @@ namespace Ogre
                     {
                         Real timestamp = track->getKeyFrame(i)->getTime();
                         TimestampVec::iterator it = std::lower_bound( itKeyframes->second.begin(),
-                                                                        itKeyframes->second.end(),
-                                                                        timestamp );
+                                                                      itKeyframes->second.end(),
+                                                                      timestamp );
                         if( it == itKeyframes->second.end() || *it != timestamp )
                             itKeyframes->second.insert( it, timestamp );
                     }
+                }
+            }
 
+            //We need to iterate again because 'std::distance( timestampsByBlock.begin(), itKeyframes )'
+            //would be bogus while we were still inserting to timestampsByBlock thus altering the order.
+            itor = animation->getOldNodeTrackIterator();
+
+            while( itor.hasMoreElements() )
+            {
+                size_t boneIdx                  = itor.peekNextKey();
+                OldNodeAnimationTrack *track    = itor.getNext();
+
+                if( track->getNumKeyFrames() > 0 )
+                {
+                    uint32 slotIdx = boneToSlot[boneIdx];
+                    uint32 blockIdx = SkeletonDef::slotToBlockIdx( slotIdx );
+
+                    TimestampsPerBlock::iterator itKeyframes = timestampsByBlock.find( blockIdx );
                     size_t trackDiff = std::distance( timestampsByBlock.begin(), itKeyframes );
                     mBoneToWeights[skeleton->getBone( boneIdx )->getName()] =
                                         (slotIdx & 0xFF000000) |
