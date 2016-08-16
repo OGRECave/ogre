@@ -142,10 +142,10 @@ namespace Ogre
         TextureUnitState::BindingType mBindingType;
 
         ComPtr<ID3D11ShaderResourceView> mDSTResView;
-        ID3D11BlendState * mBoundBlendState;
-        ID3D11RasterizerState * mBoundRasterizer;
-        ID3D11DepthStencilState * mBoundDepthStencilState;
-        ID3D11SamplerState * mBoundSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
+        ComPtr<ID3D11BlendState> mBoundBlendState;
+        ComPtr<ID3D11RasterizerState> mBoundRasterizer;
+        ComPtr<ID3D11DepthStencilState> mBoundDepthStencilState;
+        ComPtr<ID3D11SamplerState> mBoundSamplerStates[OGRE_MAX_TEXTURE_LAYERS];
         size_t mBoundSamplerStatesCount;
 
         ID3D11ShaderResourceView * mBoundTextures[OGRE_MAX_TEXTURE_LAYERS];
