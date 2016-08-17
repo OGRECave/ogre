@@ -23,7 +23,7 @@ uniform vec4 ambient;
 void main()
 {
 	// interpolate position
-	vec4 posinterp = vec4(pos + anim_t.x*uv1.xyz + anim_t.y*uv3.xyz, 1.0);
+	vec4 posinterp = vec4(vertex.xyz + anim_t.x*uv1.xyz + anim_t.y*uv3.xyz, 1.0);
 
     // nlerp normal
 	// nlerp normal
@@ -34,7 +34,7 @@ void main()
 	// This depends on what the cumulative weighting left the normal at, if it's lacking or cancelled out
 	//float remainder = 1.0 - min(anim_t.x + anim_t.y, 1.0);
 	float remainder = 1.0 - min(length(ninterp), 1.0);
-	ninterp = ninterp + (normal * remainder);
+	ninterp = ninterp + (normal.xyz * remainder);
 	ninterp = normalize(ninterp);
 
 	gl_Position = worldViewProj * posinterp;
