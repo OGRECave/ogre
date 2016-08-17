@@ -269,6 +269,13 @@ namespace Ogre
         return box;
     }
     //---------------------------------------------------------------------
+    PixelBox D3D11Mappings::getPixelBoxWithMapping(D3D11_BOX extents, PixelFormat pixelFormat, const D3D11_MAPPED_SUBRESOURCE& mapping)
+    {
+        PixelBox box(Box(extents.left, extents.top, extents.front, extents.right, extents.bottom, extents.back), pixelFormat);
+        setPixelBoxMapping(box, mapping);
+        return box;
+    }
+    //---------------------------------------------------------------------
     DXGI_FORMAT D3D11Mappings::getFormat(HardwareIndexBuffer::IndexType itype)
     {
 		return itype == HardwareIndexBuffer::IT_32BIT ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;

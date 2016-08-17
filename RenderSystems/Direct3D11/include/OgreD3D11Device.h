@@ -77,6 +77,9 @@ namespace Ogre
             return mD3D11Device.Get();
         }
 
+        void throwIfFailed(HRESULT hr, const char* desc, const char* src);
+        void throwIfFailed(const char* desc, const char* src) { throwIfFailed(NO_ERROR, desc, src); }
+
         String getErrorDescription(const HRESULT hr = NO_ERROR) const;
         void clearStoredErrorMessages() const;
         bool _getErrorsFromQueue() const;

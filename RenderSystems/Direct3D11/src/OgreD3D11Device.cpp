@@ -26,6 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreD3D11Device.h"
+#include "OgreException.h"
 
 namespace Ogre
 {
@@ -141,6 +142,15 @@ namespace Ogre
             {
                 hr = mD3D11Device->CreateClassLinkage(mClassLinkage.ReleaseAndGetAddressOf());
             }
+        }
+    }
+    //---------------------------------------------------------------------
+    void D3D11Device::throwIfFailed(HRESULT hr, const char* desc, const char* src)
+    {
+        if(FAILED(hr) || isError())
+        {
+            String description = std::string(desc).append("\nError Description:").append(getErrorDescription(hr));
+            OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr, description, src);
         }
     }
     //---------------------------------------------------------------------
