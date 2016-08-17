@@ -33,10 +33,6 @@
 #include "SamplePlugin.h"
 #include "OgreTrays.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#include "macUtils.h"
-#endif
-
 #define ENABLE_SHADERS_CACHE_SAVE 0
 #define ENABLE_SHADERS_CACHE_LOAD 0
 

@@ -29,10 +29,6 @@ Also see acknowledgements in Readme.html
 #include "OgreTerrainMaterialGeneratorA.h"
 #include "OgreTerrainPaging.h"
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS || OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include "macUtils.h"
-#endif
-
 #define TERRAIN_FILE_PREFIX String("testTerrain")
 #define TERRAIN_FILE_SUFFIX String("dat")
 #define TERRAIN_WORLD_SIZE 12000.0f

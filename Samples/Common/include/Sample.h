@@ -38,10 +38,6 @@
 #   include "OgreRTShaderSystem.h"
 #endif //INCLUDE_RTSHADER_SYSTEM
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-#   include "macUtils.h"
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL && !defined(INCLUDE_RTSHADER_SYSTEM)
 #   define INCLUDE_RTSHADER_SYSTEM
 #include "OgreShaderGenerator.h"
