@@ -404,35 +404,68 @@ namespace Ogre {
 
         //This is a pointer to the texture we're trying to copy
         //Only implemented for 2D at the moment...
-        ID3D11Texture2D *textureResource = mParentTexture->GetTex2D();
+        ID3D11Texture2D *texture = mParentTexture->GetTex2D();
+        HRESULT hr = texture ? S_OK : E_INVALIDARG;
+        mDevice.throwIfFailed(hr, "blitToMemory is implemented only for 2D textures", "D3D11HardwarePixelBuffer::blitToMemory");
 
         // get the description of the texture
         D3D11_TEXTURE2D_DESC desc = {0};
-        textureResource->GetDesc( &desc );
-        //Alter the description to set up a staging texture
-        desc.Usage = D3D11_USAGE_STAGING;
-        //This texture is not bound to any part of the pipeline
-        desc.BindFlags = 0;
-        //Allow CPU Access
-        desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-        //No Misc Flags
-        desc.MiscFlags = 0;
-        //Create the staging texture
-        ID3D11Texture2D* pStagingTexture = NULL;
-        mDevice->CreateTexture2D( &desc, NULL, &pStagingTexture );
-        //Copy our texture into the staging texture
-        mDevice.GetImmediateContext()->CopyResource( pStagingTexture, textureResource );
-        //Create a mapped resource and map the staging texture to the resource
+        texture->GetDesc( &desc );
+        UINT srcSubresource = getSubresourceIndex(srcBox.front); // one face of cubemap, one item of array
+        D3D11_BOX srcBoxDx11 = getSubresourceBox(srcBox);
+
+        // MSAA content must be resolved before being copied to a staging texture
+        ComPtr<ID3D11Texture2D> textureNoMSAA;
+        if(desc.SampleDesc.Count == 1)
+        {
+            textureNoMSAA = texture;
+        }
+        else
+        {
+            // Note - we create textureNoMSAA with all mip levels of parent texture (not good), but will resolve only required one.
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+
+            hr = mDevice->CreateTexture2D(&desc, 0, textureNoMSAA.ReleaseAndGetAddressOf());
+            mDevice.throwIfFailed(hr, "Error creating texture without MSAA", "D3D11HardwarePixelBuffer::blitToMemory");
+
+            mDevice.GetImmediateContext()->ResolveSubresource(textureNoMSAA.Get(), srcSubresource, texture, srcSubresource, desc.Format);
+            mDevice.throwIfFailed("Error resolving MSAA subresource", "D3D11HardwarePixelBuffer::blitToMemory");
+        }
+
+        // Create the staging texture
+        ComPtr<ID3D11Texture2D> stagingTexture;
+        if(desc.Usage == D3D11_USAGE_STAGING && (desc.CPUAccessFlags & D3D11_CPU_ACCESS_READ))
+        {
+            stagingTexture.Swap(textureNoMSAA); // Handle case where the source is already a staging texture we can use directly
+        }
+        else
+        {
+            desc.Usage = D3D11_USAGE_STAGING;
+            desc.BindFlags = 0;
+            desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+            desc.MiscFlags &= D3D11_RESOURCE_MISC_TEXTURECUBE;
+            hr = mDevice->CreateTexture2D(&desc, NULL, stagingTexture.ReleaseAndGetAddressOf());
+            mDevice.throwIfFailed(hr, "Error creating staging texture", "D3D11HardwarePixelBuffer::blitToMemory");
+
+            // Copy our texture into the staging texture
+            mDevice.GetImmediateContext()->CopySubresourceRegion(
+                stagingTexture.Get(), srcSubresource, srcBoxDx11.left, srcBoxDx11.top, srcBoxDx11.front,
+                textureNoMSAA.Get(), srcSubresource, &srcBoxDx11);
+            mDevice.throwIfFailed("Error while copying to staging texture", "D3D11HardwarePixelBuffer::blitToMemory");
+        }
+
+        // Map the subresource of the staging texture
         D3D11_MAPPED_SUBRESOURCE mapped = {0};
-        mDevice.GetImmediateContext()->Map( pStagingTexture, 0, D3D11_MAP_READ , 0, &mapped );
+        hr = mDevice.GetImmediateContext()->Map(stagingTexture.Get(), srcSubresource, D3D11_MAP_READ , 0, &mapped);
+        mDevice.throwIfFailed(hr, "Error while mapping staging texture", "D3D11HardwarePixelBuffer::blitToMemory");
         
-        // read the data out of the texture.
-        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping(dst.getWidth(), dst.getHeight(), dst.getDepth(), D3D11Mappings::_getPF(desc.Format), mapped);
+        // Read the data out of the texture.
+        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping(srcBoxDx11, D3D11Mappings::_getPF(desc.Format), mapped);
         PixelUtil::bulkPixelConversion(locked, dst);
 
-        //Release the staging texture
-        mDevice.GetImmediateContext()->Unmap( pStagingTexture, 0 );
-        pStagingTexture->Release();
+        // Release the staging texture
+        mDevice.GetImmediateContext()->Unmap(stagingTexture.Get(), srcSubresource);
     }
 
     //-----------------------------------------------------------------------------  
