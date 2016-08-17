@@ -87,7 +87,8 @@ namespace Ogre
 
     public:
         VertexBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                            BufferType bufferType, void *initialData, bool keepAsShadow,
+                            uint32 numElementsPadding, BufferType bufferType,
+                            void *initialData, bool keepAsShadow,
                             VaoManager *vaoManager, BufferInterface *bufferInterface,
                             const VertexElement2Vec &vertexElements, size_t multiSourceId,
                             MultiSourceVertexBufferPool *multiSourcePool, uint8 sourceIdx );

@@ -35,10 +35,10 @@ namespace Ogre
 {
     GL3PlusTexBufferPacked::GL3PlusTexBufferPacked(
                 size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                BufferType bufferType, void *initialData, bool keepAsShadow,
+                uint32 numElementsPadding, BufferType bufferType, void *initialData, bool keepAsShadow,
                 VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface, PixelFormat pf ) :
-        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
-                         initialData, keepAsShadow, vaoManager, bufferInterface, pf ),
+        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, numElementsPadding,
+                         bufferType, initialData, keepAsShadow, vaoManager, bufferInterface, pf ),
         mTexName( 0 )
     {
         OCGE( glGenTextures( 1, &mTexName ) );

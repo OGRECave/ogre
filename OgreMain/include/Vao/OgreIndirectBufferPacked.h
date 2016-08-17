@@ -41,7 +41,8 @@ namespace Ogre
 
     public:
         IndirectBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                              BufferType bufferType, void *initialData, bool keepAsShadow,
+                              uint32 numElementsPadding, BufferType bufferType,
+                              void *initialData, bool keepAsShadow,
                               VaoManager *vaoManager, BufferInterface *bufferInterface );
         ~IndirectBufferPacked();
 

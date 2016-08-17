@@ -721,6 +721,17 @@ namespace Ogre
         /** Get a bounding radius value from a bounding box. */
         static Real boundingRadiusFromAABB(const AxisAlignedBox& aabb);
 
+        /// Returns Greatest Common Denominator
+        static size_t gcd( size_t a, size_t b )
+        {
+            return b == 0u ? a : gcd( b, a % b );
+        }
+        /// Returns Least Common Multiple
+        static size_t lcm( size_t a, size_t b )
+        {
+            return a * b / gcd( a, b );
+        }
+
 
 
         static const Real POS_INFINITY;

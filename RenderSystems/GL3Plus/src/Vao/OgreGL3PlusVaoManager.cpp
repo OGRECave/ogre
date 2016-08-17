@@ -423,7 +423,7 @@ namespace Ogre
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
-                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferOffset, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
@@ -441,7 +441,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        vertexBuffer->_getInternalBufferStart() * vertexBuffer->getBytesPerElement(),
-                       vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
+                       vertexBuffer->_getInternalTotalSizeBytes(),
                        vertexBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -481,7 +481,7 @@ namespace Ogre
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
-                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferOffset, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -499,7 +499,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        indexBuffer->_getInternalBufferStart() * indexBuffer->getBytesPerElement(),
-                       indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
+                       indexBuffer->_getInternalTotalSizeBytes(),
                        indexBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -510,8 +510,7 @@ namespace Ogre
         size_t bufferOffset;
 
         GLint alignment = mConstBufferAlignment;
-
-        size_t bindableSize = sizeBytes;
+        size_t requestedSize = sizeBytes;
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
@@ -521,7 +520,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
@@ -530,12 +529,13 @@ namespace Ogre
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         ConstBufferPacked *retVal = OGRE_NEW GL3PlusConstBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        sizeBytes - requestedSize,
                                                         bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface, bindableSize );
+                                                        this, bufferInterface );
 
         if( initialData )
-            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+            bufferInterface->_firstUpload( initialData, 0, requestedSize );
 
         return retVal;
     }
@@ -548,7 +548,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        constBuffer->_getInternalBufferStart() * constBuffer->getBytesPerElement(),
-                       constBuffer->getNumElements() * constBuffer->getBytesPerElement(),
+                       constBuffer->_getInternalTotalSizeBytes(),
                        constBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -560,6 +560,7 @@ namespace Ogre
         size_t bufferOffset;
 
         GLint alignment = mTexBufferAlignment;
+        size_t requestedSize = sizeBytes;
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
@@ -569,7 +570,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
@@ -578,12 +579,13 @@ namespace Ogre
         GL3PlusBufferInterface *bufferInterface = new GL3PlusBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        sizeBytes - requestedSize,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat );
 
         if( initialData )
-            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+            bufferInterface->_firstUpload( initialData, 0, requestedSize );
 
         return retVal;
     }
@@ -596,7 +598,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
-                       texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
+                       texBuffer->_getInternalTotalSizeBytes(),
                        texBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -609,6 +611,7 @@ namespace Ogre
 
         GLint alignment = mUavBufferAlignment;
 
+        //UAV Buffers can't be dynamic.
         const BufferType bufferType = BT_DEFAULT;
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
@@ -636,7 +639,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        uavBuffer->_getInternalBufferStart() * uavBuffer->getBytesPerElement(),
-                       uavBuffer->getNumElements() * uavBuffer->getBytesPerElement(),
+                       uavBuffer->_getInternalTotalSizeBytes(),
                        uavBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -647,6 +650,7 @@ namespace Ogre
     {
         const size_t alignment = 4;
         size_t bufferOffset = 0;
+        size_t requestedSize = sizeBytes;
 
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -654,7 +658,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         GL3PlusBufferInterface *bufferInterface = 0;
@@ -670,7 +674,8 @@ namespace Ogre
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        sizeBytes - requestedSize,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -678,11 +683,11 @@ namespace Ogre
         {
             if( mSupportsIndirectBuffers )
             {
-                bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+                bufferInterface->_firstUpload( initialData, 0, requestedSize );
             }
             else
             {
-                memcpy( retVal->getSwBufferPtr(), initialData, sizeBytes );
+                memcpy( retVal->getSwBufferPtr(), initialData, requestedSize );
             }
         }
 
@@ -700,7 +705,7 @@ namespace Ogre
             deallocateVbo( bufferInterface->getVboPoolIndex(),
                            indirectBuffer->_getInternalBufferStart() *
                                 indirectBuffer->getBytesPerElement(),
-                           indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
+                           indirectBuffer->_getInternalTotalSizeBytes(),
                            indirectBuffer->getBufferType() );
         }
     }

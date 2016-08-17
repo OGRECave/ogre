@@ -37,17 +37,13 @@ namespace Ogre
      */
     class _OgreExport ConstBufferPacked : public BufferPacked
     {
-    protected:
-        size_t mBindableSizeBytes;
-
     public:
         ConstBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                           BufferType bufferType, void *initialData, bool keepAsShadow,
-                           VaoManager *vaoManager, BufferInterface *bufferInterface,
-                           size_t bindableSize ) :
-            BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
-                          initialData, keepAsShadow, vaoManager, bufferInterface ),
-            mBindableSizeBytes( bindableSize )
+                           uint32 numElementsPadding,BufferType bufferType,
+                           void *initialData, bool keepAsShadow,
+                           VaoManager *vaoManager, BufferInterface *bufferInterface ) :
+            BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, numElementsPadding,
+                          bufferType, initialData, keepAsShadow, vaoManager, bufferInterface )
         {
         }
 
@@ -69,10 +65,6 @@ namespace Ogre
         virtual void bindBufferHS( uint16 slot ) = 0;
         virtual void bindBufferDS( uint16 slot ) = 0;
         virtual void bindBufferCS( uint16 slot ) = 0;
-
-        /// Gets the size of the buffer that will get bound. May not be
-        /// the same as the size of the entire buffer (i.e. due to padding)
-        size_t getBindableSize(void) const                  { return mBindableSizeBytes; }
     };
 }
 

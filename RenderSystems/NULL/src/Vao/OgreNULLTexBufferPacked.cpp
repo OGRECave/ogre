@@ -33,10 +33,10 @@ namespace Ogre
 {
     NULLTexBufferPacked::NULLTexBufferPacked(
                 size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                BufferType bufferType, void *initialData, bool keepAsShadow,
+                uint32 numElementsPadding, BufferType bufferType, void *initialData, bool keepAsShadow,
                 VaoManager *vaoManager, NULLBufferInterface *bufferInterface, PixelFormat pf ) :
-        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
-                         initialData, keepAsShadow, vaoManager, bufferInterface, pf )
+        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, numElementsPadding,
+                         bufferType, initialData, keepAsShadow, vaoManager, bufferInterface, pf )
     {
     }
     //-----------------------------------------------------------------------------------

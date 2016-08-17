@@ -36,13 +36,15 @@ THE SOFTWARE.
 namespace Ogre
 {
     BufferPacked::BufferPacked( size_t internalBufferStartBytes, size_t numElements,
-                                uint32 bytesPerElement, BufferType bufferType, void *initialData,
+                                uint32 bytesPerElement, uint32 numElementsPadding,
+                                BufferType bufferType, void *initialData,
                                 bool keepAsShadow, VaoManager *vaoManager,
                                 BufferInterface *bufferInterface ) :
         mInternalBufferStart( internalBufferStartBytes / bytesPerElement ),
         mFinalBufferStart( internalBufferStartBytes / bytesPerElement ),
         mNumElements( numElements ),
         mBytesPerElement( bytesPerElement ),
+        mNumElementsPadding( numElementsPadding ),
         mBufferType( bufferType ),
         mVaoManager( vaoManager ),
         mMappingState( MS_UNMAPPED ),
