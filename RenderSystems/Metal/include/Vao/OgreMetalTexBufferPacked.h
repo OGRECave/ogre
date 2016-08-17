@@ -42,7 +42,8 @@ namespace Ogre
 
     public:
         MetalTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                              BufferType bufferType, void *initialData, bool keepAsShadow,
+                              uint32 numElementsPadding, BufferType bufferType,
+                              void *initialData, bool keepAsShadow,
                               VaoManager *vaoManager, MetalBufferInterface *bufferInterface,
                               Ogre::PixelFormat pf, MetalDevice *device );
         virtual ~MetalTexBufferPacked();

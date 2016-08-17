@@ -111,8 +111,8 @@ namespace Ogre
 
                 outVertexBuffers.push_back(
                     OGRE_NEW VertexBufferPacked( mInternalBufferStart + vertexOffset + mSourceOffset[i],
-                                                 numVertices, mBytesPerVertexPerSource[i], mBufferType,
-                                                 _initialData, keepAsShadow, mVaoManager,
+                                                 numVertices, mBytesPerVertexPerSource[i], 0,
+                                                 mBufferType, _initialData, keepAsShadow, mVaoManager,
                                                  bufferInterface, mVertexElementsBySource[i],
                                                  vertexOffset, this, i ) );
             }

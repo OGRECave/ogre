@@ -74,6 +74,16 @@ namespace Ogre
         14, // VES_BLEND_INDICES2 - 1
     };
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    //On iOS 16 byte alignment makes it good to go for everything; but we need to satisfy
+    //both original alignment for baseVertex reasons. So find LCM between both.
+    const uint32 c_minimumAlignment = 16u;
+#else
+    //On OSX we have several alignments (just like GL & D3D11), but it can never be lower than 4.
+    const uint32 c_minimumAlignment = 4u;
+#endif
+    const uint32 c_indexBufferAlignment = 4u;
+
     MetalVaoManager::MetalVaoManager( uint8 dynamicBufferMultiplier, MetalDevice *device ) :
         mVaoNames( 1 ),
         mDevice( device ),
@@ -142,29 +152,12 @@ namespace Ogre
         deleteAllBuffers();
     }
     //-----------------------------------------------------------------------------------
-    /// Returns Greatest Common Denominator
-    size_t gcd( size_t a, size_t b )
-    {
-        return b == 0u ? a : gcd( b, a % b );
-    }
-    /// Returns Least Common Multiple
-    size_t lcm( size_t a, size_t b )
-    {
-        return a * b / gcd( a, b );
-    }
     void MetalVaoManager::allocateVbo( size_t sizeBytes, size_t alignment, BufferType bufferType,
                                        size_t &outVboIdx, size_t &outBufferOffset )
     {
         assert( alignment > 0 );
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
-        //On iOS 16 byte alignment makes it good to go for everything; but we need to satisfy
-        //both original alignment for baseVertex reasons. So find LCM between both.
-        alignment = lcm( alignment, 16u );
-#else
-        //On OSX we have several alignments (just like GL & D3D11), but it can never be lower than 4.
-        alignment = std::min<size_t>( alignment, 4u );
-#endif
+        alignment = Math::lcm( alignment, c_minimumAlignment );
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
@@ -372,7 +365,20 @@ namespace Ogre
         size_t vboIdx;
         size_t bufferOffset;
 
-        allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
+        const size_t requestedSize = numElements * bytesPerElement;
+        size_t sizeBytes = requestedSize;
+
+        if( bufferType >= BT_DYNAMIC_DEFAULT )
+        {
+            //For dynamic buffers, the size will be 3x times larger
+            //(depending on mDynamicBufferMultiplier); we need the
+            //offset after each map to be aligned; and for that, we
+            //sizeBytes to be multiple of alignment.
+            const uint32 alignment = Math::lcm( bytesPerElement, c_minimumAlignment );
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
+        }
+
+        allocateVbo( sizeBytes, bytesPerElement, bufferType, vboIdx, bufferOffset );
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
         Vbo &vbo = mVbos[vboFlag][vboIdx];
@@ -381,6 +387,7 @@ namespace Ogre
 
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
+                                                        (sizeBytes - requestedSize) / bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
@@ -398,7 +405,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        vertexBuffer->_getInternalBufferStart() * vertexBuffer->getBytesPerElement(),
-                       vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
+                       vertexBuffer->_getInternalTotalSizeBytes(),
                        vertexBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -430,7 +437,20 @@ namespace Ogre
         size_t vboIdx;
         size_t bufferOffset;
 
-        allocateVbo( numElements * bytesPerElement, bytesPerElement, bufferType, vboIdx, bufferOffset );
+        const size_t requestedSize = numElements * bytesPerElement;
+        size_t sizeBytes = requestedSize;
+
+        if( bufferType >= BT_DYNAMIC_DEFAULT )
+        {
+            //For dynamic buffers, the size will be 3x times larger
+            //(depending on mDynamicBufferMultiplier); we need the
+            //offset after each map to be aligned; and for that, we
+            //sizeBytes to be multiple of alignment.
+            const uint32 alignment = Math::lcm( bytesPerElement, c_indexBufferAlignment );
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
+        }
+
+        allocateVbo( sizeBytes, bytesPerElement, bufferType, vboIdx, bufferOffset );
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
@@ -439,6 +459,7 @@ namespace Ogre
                                                                           vbo.dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
+                                                        (sizeBytes - requestedSize) / bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -456,7 +477,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        indexBuffer->_getInternalBufferStart() * indexBuffer->getBytesPerElement(),
-                       indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
+                       indexBuffer->_getInternalTotalSizeBytes(),
                        indexBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -468,9 +489,9 @@ namespace Ogre
 
         size_t alignment = mConstBufferAlignment;
 
-        size_t bindableSize = sizeBytes;
-
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
+
+        const size_t requestedSize = sizeBytes;
 
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -478,7 +499,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
@@ -487,13 +508,14 @@ namespace Ogre
         MetalBufferInterface *bufferInterface = new MetalBufferInterface( vboIdx, vbo.vboName,
                                                                               vbo.dynamicBuffer );
         ConstBufferPacked *retVal = OGRE_NEW MetalConstBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
-                                                        this, bufferInterface, bindableSize,
+                                                        this, bufferInterface,
                                                         mDevice );
 
         if( initialData )
-            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+            bufferInterface->_firstUpload( initialData, 0, requestedSize );
 
         return retVal;
     }
@@ -506,7 +528,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        constBuffer->_getInternalBufferStart() * constBuffer->getBytesPerElement(),
-                       constBuffer->getNumElements() * constBuffer->getBytesPerElement(),
+                       constBuffer->_getInternalTotalSizeBytes(),
                        constBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -521,13 +543,16 @@ namespace Ogre
 
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
+        const size_t requestedSize = sizeBytes;
+
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
             //For dynamic buffers, the size will be 3x times larger
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            const uint32 alignment = Math::lcm( 1, c_minimumAlignment );
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         allocateVbo( sizeBytes, alignment, bufferType, vboIdx, bufferOffset );
@@ -536,13 +561,14 @@ namespace Ogre
         MetalBufferInterface *bufferInterface = new MetalBufferInterface( vboIdx, vbo.vboName,
                                                                           vbo.dynamicBuffer );
         TexBufferPacked *retVal = OGRE_NEW MetalTexBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat,
                                                         mDevice );
 
         if( initialData )
-            bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+            bufferInterface->_firstUpload( initialData, 0, requestedSize );
 
         return retVal;
     }
@@ -555,7 +581,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
-                       texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
+                       texBuffer->_getInternalTotalSizeBytes(),
                        texBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -568,6 +594,7 @@ namespace Ogre
 
         size_t alignment = mUavBufferAlignment;
 
+        //UAV Buffers can't be dynamic.
         const BufferType bufferType = BT_DEFAULT;
         VboFlag vboFlag = bufferTypeToVboFlag( bufferType );
 
@@ -595,7 +622,7 @@ namespace Ogre
 
         deallocateVbo( bufferInterface->getVboPoolIndex(),
                        uavBuffer->_getInternalBufferStart() * uavBuffer->getBytesPerElement(),
-                       uavBuffer->getNumElements() * uavBuffer->getBytesPerElement(),
+                       uavBuffer->_getInternalTotalSizeBytes(),
                        uavBuffer->getBufferType() );
     }
     //-----------------------------------------------------------------------------------
@@ -607,13 +634,15 @@ namespace Ogre
         const size_t alignment = 4;
         size_t bufferOffset = 0;
 
+        const size_t requestedSize = sizeBytes;
+
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
             //For dynamic buffers, the size will be 3x times larger
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         MetalBufferInterface *bufferInterface = 0;
@@ -629,7 +658,8 @@ namespace Ogre
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -637,11 +667,11 @@ namespace Ogre
         {
             if( mSupportsIndirectBuffers )
             {
-                bufferInterface->_firstUpload( initialData, 0, sizeBytes );
+                bufferInterface->_firstUpload( initialData, 0, requestedSize );
             }
             else
             {
-                memcpy( retVal->getSwBufferPtr(), initialData, sizeBytes );
+                memcpy( retVal->getSwBufferPtr(), initialData, requestedSize );
             }
         }
 
@@ -659,7 +689,7 @@ namespace Ogre
             deallocateVbo( bufferInterface->getVboPoolIndex(),
                            indirectBuffer->_getInternalBufferStart() *
                                 indirectBuffer->getBytesPerElement(),
-                           indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
+                           indirectBuffer->_getInternalTotalSizeBytes(),
                            indirectBuffer->getBufferType() );
         }
     }

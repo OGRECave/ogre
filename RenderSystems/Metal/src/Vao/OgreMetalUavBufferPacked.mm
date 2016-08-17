@@ -56,7 +56,7 @@ namespace Ogre
 
         TexBufferPacked *retVal = OGRE_NEW MetalTexBufferPacked(
                                                         mInternalBufferStart * mBytesPerElement,
-                                                        mNumElements, mBytesPerElement,
+                                                        mNumElements, mBytesPerElement, 0,
                                                         mBufferType, (void*)0, false,
                                                         (VaoManager*)0, bufferInterface, pixelFormat,
                                                         mDevice );
