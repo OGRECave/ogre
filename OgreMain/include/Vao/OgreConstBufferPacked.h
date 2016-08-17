@@ -39,7 +39,7 @@ namespace Ogre
     {
     public:
         ConstBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                           uint32 numElementsPadding,BufferType bufferType,
+                           uint32 numElementsPadding, BufferType bufferType,
                            void *initialData, bool keepAsShadow,
                            VaoManager *vaoManager, BufferInterface *bufferInterface ) :
             BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, numElementsPadding,
