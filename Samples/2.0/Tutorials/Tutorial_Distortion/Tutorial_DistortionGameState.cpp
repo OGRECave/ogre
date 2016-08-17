@@ -233,7 +233,7 @@ namespace Demo
 		*/
 		{
 			//Lets setup a new render queue for distortion pass. Set ID 6 to be our distortion queue
-			mGraphicsSystem->getSceneManager()->getRenderQueue()->setRenderQueueMode(6, Ogre::RenderQueue::Modes::FAST);
+            mGraphicsSystem->getSceneManager()->getRenderQueue()->setRenderQueueMode(6, Ogre::RenderQueue::FAST);
 
 			Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
 			Ogre::HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
@@ -254,8 +254,8 @@ namespace Demo
 				//Create proper blend block for distortion objects
 				Ogre::HlmsBlendblock blendBlock = Ogre::HlmsBlendblock();
 				blendBlock.mIsTransparent = true;
-				blendBlock.mSourceBlendFactor = Ogre::SceneBlendFactor::SBF_SOURCE_ALPHA;
-				blendBlock.mDestBlendFactor = Ogre::SceneBlendFactor::SBF_ONE_MINUS_SOURCE_ALPHA;
+                blendBlock.mSourceBlendFactor = Ogre::SBF_SOURCE_ALPHA;
+                blendBlock.mDestBlendFactor = Ogre::SBF_ONE_MINUS_SOURCE_ALPHA;
 
 				//Create macro block to disable depth write
 				Ogre::HlmsMacroblock macroBlock = Ogre::HlmsMacroblock();
