@@ -1015,7 +1015,7 @@ namespace Ogre
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
                                                         bufferOffset, requestedSize, 1,
-                                                        sizeBytes - requestedSize,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
