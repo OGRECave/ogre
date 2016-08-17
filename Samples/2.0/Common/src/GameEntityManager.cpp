@@ -141,10 +141,14 @@ namespace Demo
         std::vector<Region>::iterator itor = mAvailableTransforms.begin();
         std::vector<Region>::iterator end  = mAvailableTransforms.end();
 
-        while( itor != end &&
-               itor->bufferIdx == bufferIdx &&
-               (itor->slotOffset == slot + 1 || slot == itor->slotOffset + itor->count) )
+        while( itor != end )
         {
+            if( itor->bufferIdx == bufferIdx &&
+                ( itor->slotOffset == slot + 1 || slot == itor->slotOffset + itor->count ) )
+            {
+                break;
+            }
+
             ++itor;
         }
 

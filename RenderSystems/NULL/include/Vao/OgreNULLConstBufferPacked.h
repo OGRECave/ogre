@@ -38,10 +38,10 @@ namespace Ogre
     {
     public:
         NULLConstBufferPacked( size_t internalBufferStartBytes, size_t numElements,
-                                  uint32 bytesPerElement,
-                                  BufferType bufferType, void *initialData, bool keepAsShadow,
-                                  VaoManager *vaoManager, BufferInterface *bufferInterface,
-                                  size_t bindableSize );
+                               uint32 bytesPerElement, uint32 numElementsPadding,
+                               BufferType bufferType, void *initialData, bool keepAsShadow,
+                               VaoManager *vaoManager, BufferInterface *bufferInterface,
+                               size_t bindableSize );
         ~NULLConstBufferPacked();
 
         virtual void bindBufferVS( uint16 slot ) {}

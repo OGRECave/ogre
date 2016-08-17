@@ -33,12 +33,13 @@ THE SOFTWARE.
 namespace Ogre
 {
     IndirectBufferPacked::IndirectBufferPacked( size_t internalBufStartBytes, size_t numElements,
-                                                uint32 bytesPerElement, BufferType bufferType,
+                                                uint32 bytesPerElement, uint32 numElementsPadding,
+                                                BufferType bufferType,
                                                 void *initialData, bool keepAsShadow,
                                                 VaoManager *vaoManager,
                                                 BufferInterface *bufferInterface ) :
-        BufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
-                      initialData, keepAsShadow, vaoManager, bufferInterface ),
+        BufferPacked( internalBufStartBytes, numElements, bytesPerElement, numElementsPadding,
+                      bufferType, initialData, keepAsShadow, vaoManager, bufferInterface ),
         mSwBuffer( 0 )
     {
         if( !vaoManager->supportsIndirectBuffers() )

@@ -36,6 +36,7 @@ namespace Ogre
 {
     class NULLBufferInterface;
 
+
     class _OgreNULLExport NULLUavBufferPacked : public UavBufferPacked
     {
     protected:

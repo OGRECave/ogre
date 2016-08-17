@@ -140,6 +140,7 @@ namespace Ogre
         size_t mFinalBufferStart;     /// In elements, includes dynamic buffer frame offset
         size_t mNumElements;
         uint32 mBytesPerElement;
+        uint32 mNumElementsPadding;
 
         BufferType      mBufferType;
         VaoManager      *mVaoManager;
@@ -183,7 +184,8 @@ namespace Ogre
             Must be false if bufferType >= BT_DYNAMIC
         */
         BufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                      BufferType bufferType, void *initialData, bool keepAsShadow,
+                      uint32 numElementsPadding, BufferType bufferType,
+                      void *initialData, bool keepAsShadow,
                       VaoManager *vaoManager, BufferInterface *bufferInterface );
         virtual ~BufferPacked();
 
@@ -279,6 +281,9 @@ namespace Ogre
 
         size_t _getInternalBufferStart(void) const              { return mInternalBufferStart; }
         size_t _getFinalBufferStart(void) const                 { return mFinalBufferStart; }
+        uint32 _getInternalTotalSizeBytes(void) const   { return (mNumElements + mNumElementsPadding) *
+                                                                 mBytesPerElement; }
+        uint32 _getInternalNumElements(void) const      { return mNumElements + mNumElementsPadding; }
 
         const void* getShadowCopy(void) const   { return mShadowCopy; }
     };

@@ -38,8 +38,8 @@ namespace Ogre
                 size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
                 uint32 bindFlags, void *initialData, bool keepAsShadow,
                 VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface ) :
-        UavBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bindFlags,
-                         initialData, keepAsShadow, vaoManager, bufferInterface )
+        UavBufferPacked( internalBufStartBytes, numElements, bytesPerElement,
+                         bindFlags, initialData, keepAsShadow, vaoManager, bufferInterface )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ namespace Ogre
 
         TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
                                                         mInternalBufferStart * mBytesPerElement,
-                                                        mNumElements, mBytesPerElement,
+                                                        mNumElements, mBytesPerElement, 0,
                                                         mBufferType, (void*)0, false,
                                                         (VaoManager*)0, bufferInterface, pixelFormat );
 

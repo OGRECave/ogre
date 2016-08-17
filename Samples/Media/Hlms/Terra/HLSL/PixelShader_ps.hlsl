@@ -235,8 +235,10 @@ float3 qmul( float4 q, float3 v )
 	geomNormal = mul( geomNormal, (float3x3)passBuf.view );
 
 	//Get the TBN matrix
-	float3 vBinormal	= normalize( cross( geomNormal, vTangent ) );
-	float3x3 TBN		= (float3x3)passBuf.viewSpaceTangent, vBinormal, geomNormal );
+	float3 viewSpaceUnitX	= passBuf.view[0].xyz;
+	float3 vTangent			= normalize( cross( geomNormal, viewSpaceUnitX ) );
+	float3 vBinormal		= cross( vTangent, geomNormal );
+	float3x3 TBN			= float3x3( vBinormal, vTangent, geomNormal );
 @end
 
 	float fShadow = terrainShadows.Sample( terrainShadowsSamplerState, inPs.uv0.xy ).x;

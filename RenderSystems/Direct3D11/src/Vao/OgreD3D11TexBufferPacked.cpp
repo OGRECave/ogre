@@ -38,11 +38,11 @@ namespace Ogre
 {
     D3D11TexBufferPacked::D3D11TexBufferPacked(
             size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-            BufferType bufferType, void *initialData, bool keepAsShadow,
+            uint32 numElementsPadding, BufferType bufferType, void *initialData, bool keepAsShadow,
             VaoManager *vaoManager, BufferInterface *bufferInterface, PixelFormat pf,
             D3D11Device &device ) :
-        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, bufferType,
-                         initialData, keepAsShadow, vaoManager, bufferInterface, pf ),
+        TexBufferPacked( internalBufStartBytes, numElements, bytesPerElement, numElementsPadding,
+                         bufferType, initialData, keepAsShadow, vaoManager, bufferInterface, pf ),
         mInternalFormat( DXGI_FORMAT_UNKNOWN ),
         mDevice( device ),
         mCurrentCacheCursor( 0 )

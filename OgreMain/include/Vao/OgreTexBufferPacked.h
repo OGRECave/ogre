@@ -43,10 +43,11 @@ namespace Ogre
 
     public:
         TexBufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                         BufferType bufferType, void *initialData, bool keepAsShadow,
+                         uint32 numElementsPadding, BufferType bufferType,
+                         void *initialData, bool keepAsShadow,
                          VaoManager *vaoManager, BufferInterface *bufferInterface, PixelFormat pf ) :
-            BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
-                          initialData, keepAsShadow, vaoManager, bufferInterface ),
+            BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, numElementsPadding,
+                          bufferType, initialData, keepAsShadow, vaoManager, bufferInterface ),
             mPixelFormat( pf )
         {
         }

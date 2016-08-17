@@ -71,7 +71,7 @@ namespace Ogre
 
 
         TexBufferPacked *retVal = OGRE_NEW D3D11TexBufferPacked(
-                    mInternalBufferStart * mBytesPerElement, mNumElements, mBytesPerElement,
+                    mInternalBufferStart * mBytesPerElement, mNumElements, mBytesPerElement, 0,
                     mBufferType, (void*)0, false, (VaoManager*)0, bufferInterface,
                     pixelFormat, mDevice );
 

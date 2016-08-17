@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 #include "Vao/OgreUavBufferPacked.h"
 #include "Vao/OgreTexBufferPacked.h"
+#include "Vao/OgreVaoManager.h"
 
 namespace Ogre
 {
@@ -36,7 +37,7 @@ namespace Ogre
                 size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
                 uint32 bindFlags, void *initialData, bool keepAsShadow,
                 VaoManager *vaoManager, BufferInterface *bufferInterface ) :
-        BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, BT_DEFAULT,
+        BufferPacked( internalBufferStartBytes, numElements, bytesPerElement, 0, BT_DEFAULT,
                       initialData, keepAsShadow, vaoManager, bufferInterface ),
         mBindFlags( bindFlags )
     {

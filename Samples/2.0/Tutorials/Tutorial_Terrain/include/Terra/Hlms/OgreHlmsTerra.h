@@ -147,9 +147,12 @@ namespace Ogre
 
     public:
         HlmsTerra( Archive *dataFolder, ArchiveVec *libraryFolders );
-        ~HlmsTerra();
+        virtual ~HlmsTerra();
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
+
+        /// Not supported
+        virtual void setOptimizationStrategy( OptimizationStrategy optimizationStrategy ) {}
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
                                            bool casterPass, bool dualParaboloid,

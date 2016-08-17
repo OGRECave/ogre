@@ -82,7 +82,7 @@ namespace Ogre
     {
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
-                                                        0, numElements, bytesPerElement,
+                                                        0, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
@@ -113,7 +113,7 @@ namespace Ogre
     {
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
-                                                        0, numElements, bytesPerElement,
+                                                        0, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -145,7 +145,7 @@ namespace Ogre
 
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         ConstBufferPacked *retVal = OGRE_NEW NULLConstBufferPacked(
-                                                        0, sizeBytes, 1,
+                                                        0, sizeBytes, 1, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, bindableSize );
 
@@ -178,7 +178,7 @@ namespace Ogre
 
         NULLBufferInterface *bufferInterface = new NULLBufferInterface( 0 );
         TexBufferPacked *retVal = OGRE_NEW NULLTexBufferPacked(
-                                                        0, sizeBytes, 1,
+                                                        0, sizeBytes, 1, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat );
 
@@ -236,7 +236,7 @@ namespace Ogre
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
-                                                        0, sizeBytes, 1,
+                                                        0, sizeBytes, 1, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 

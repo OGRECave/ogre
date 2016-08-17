@@ -34,14 +34,13 @@ THE SOFTWARE.
 namespace Ogre
 {
     D3D11ConstBufferPacked::D3D11ConstBufferPacked( size_t numElements, uint32 bytesPerElement,
-                                                    BufferType bufferType,
+                                                    uint32 numElementsPadding, BufferType bufferType,
                                                     void *initialData, bool keepAsShadow,
                                                     VaoManager *vaoManager,
                                                     BufferInterface *bufferInterface,
                                                     D3D11Device &device ) :
-        ConstBufferPacked( 0, numElements, bytesPerElement, bufferType,
-                           initialData, keepAsShadow, vaoManager, bufferInterface,
-                           numElements * bytesPerElement ),
+        ConstBufferPacked( 0, numElements, bytesPerElement, numElementsPadding, bufferType,
+                           initialData, keepAsShadow, vaoManager, bufferInterface ),
         mDevice( device )
     {
     }

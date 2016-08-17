@@ -470,7 +470,7 @@ namespace Ogre
         D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vboName,
                                                                           dynamicBuffer );
         VertexBufferPacked *retVal = OGRE_NEW VertexBufferPacked(
-                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferOffset, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, vElements, 0, 0, 0 );
 
@@ -497,7 +497,7 @@ namespace Ogre
         {
             deallocateVbo( bufferInterface->getVboPoolIndex(),
                            vertexBuffer->_getInternalBufferStart() * vertexBuffer->getBytesPerElement(),
-                           vertexBuffer->getNumElements() * vertexBuffer->getBytesPerElement(),
+                           vertexBuffer->_getInternalTotalSizeBytes(),
                            vertexBuffer->getBufferType(), VERTEX_BUFFER );
         }
     }
@@ -749,7 +749,7 @@ namespace Ogre
         D3D11BufferInterface *bufferInterface = new D3D11BufferInterface( vboIdx, vboName,
                                                                           dynamicBuffer );
         IndexBufferPacked *retVal = OGRE_NEW IndexBufferPacked(
-                                                        bufferOffset, numElements, bytesPerElement,
+                                                        bufferOffset, numElements, bytesPerElement, 0,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -776,7 +776,7 @@ namespace Ogre
         {
             deallocateVbo( bufferInterface->getVboPoolIndex(),
                            indexBuffer->_getInternalBufferStart() * indexBuffer->getBytesPerElement(),
-                           indexBuffer->getNumElements() * indexBuffer->getBytesPerElement(),
+                           indexBuffer->_getInternalTotalSizeBytes(),
                            indexBuffer->getBufferType(), INDEX_BUFFER );
         }
     }
@@ -843,7 +843,7 @@ namespace Ogre
                                                                                    bufferType,
                                                                                    initialData );
         ConstBufferPacked *retVal = OGRE_NEW D3D11ConstBufferPacked(
-                                                        sizeBytes, 1,
+                                                        sizeBytes, 1, 0,
                                                         bufferType,
                                                         initialData, keepAsShadow,
                                                         this, bufferInterface,
@@ -868,6 +868,9 @@ namespace Ogre
         size_t bufferOffset = 0;
 
         uint32 alignment = mTexBufferAlignment;
+        size_t requestedSize = sizeBytes;
+
+        const size_t bytesPerElement = 1;
 
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -875,7 +878,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, Math::lcm( alignment, bytesPerElement ) );
         }
 
         if( mD3D11RenderSystem->_getFeatureLevel() > D3D_FEATURE_LEVEL_11_0 )
@@ -898,11 +901,11 @@ namespace Ogre
             bufferInterface = createShaderBufferInterface( BB_FLAG_TEX, sizeBytes, bufferType, initialData );
         }
 
-        const size_t numElements        = sizeBytes;
-        const size_t bytesPerElement    = 1;
+        const size_t numElements = requestedSize;
 
         D3D11TexBufferPacked *retVal = OGRE_NEW D3D11TexBufferPacked(
                                                         bufferOffset, numElements, bytesPerElement,
+                                                        (sizeBytes - requestedSize) / bytesPerElement,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat, mDevice );
 
@@ -934,7 +937,7 @@ namespace Ogre
             {
                 deallocateVbo( bufferInterface->getVboPoolIndex(),
                                texBuffer->_getInternalBufferStart() * texBuffer->getBytesPerElement(),
-                               texBuffer->getNumElements() * texBuffer->getBytesPerElement(),
+                               texBuffer->_getInternalTotalSizeBytes(),
                                texBuffer->getBufferType(), SHADER_BUFFER );
             }
         }
@@ -983,6 +986,7 @@ namespace Ogre
     {
         const size_t alignment = 4;
         size_t bufferOffset = 0;
+        size_t requestedSize = sizeBytes;
 
         if( bufferType >= BT_DYNAMIC_DEFAULT )
         {
@@ -990,7 +994,7 @@ namespace Ogre
             //(depending on mDynamicBufferMultiplier); we need the
             //offset after each map to be aligned; and for that, we
             //sizeBytes to be multiple of alignment.
-            sizeBytes = ( (sizeBytes + alignment - 1) / alignment ) * alignment;
+            sizeBytes = alignToNextMultiple( sizeBytes, alignment );
         }
 
         D3D11BufferInterface *bufferInterface = 0;
@@ -1010,7 +1014,8 @@ namespace Ogre
         }
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
-                                                        bufferOffset, sizeBytes, 1,
+                                                        bufferOffset, requestedSize, 1,
+                                                        sizeBytes - requestedSize,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -1022,7 +1027,7 @@ namespace Ogre
             }
             else
             {
-                memcpy( retVal->getSwBufferPtr(), initialData, sizeBytes );
+                memcpy( retVal->getSwBufferPtr(), initialData, requestedSize );
             }
         }
 
@@ -1046,7 +1051,7 @@ namespace Ogre
                 deallocateVbo( bufferInterface->getVboPoolIndex(),
                                indirectBuffer->_getInternalBufferStart() *
                                     indirectBuffer->getBytesPerElement(),
-                               indirectBuffer->getNumElements() * indirectBuffer->getBytesPerElement(),
+                               indirectBuffer->_getInternalTotalSizeBytes(),
                                indirectBuffer->getBufferType(), SHADER_BUFFER );
             }
         }
