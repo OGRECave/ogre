@@ -3,9 +3,6 @@
 #include "TutorialCompute02_UavBufferGameState.h"
 
 #include "OgreRenderWindow.h"
-#include "OgreTimer.h"
-
-#include "Threading/OgreThreads.h"
 
 #include "OgreRoot.h"
 #include "Compositor/OgreCompositorManager2.h"
@@ -13,8 +10,7 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-
-using namespace Demo;
+#include "System/MainEntryPoints.h"
 
 namespace Demo
 {
@@ -64,59 +60,43 @@ namespace Demo
         {
         }
     };
+
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        TutorialCompute02_UavBufferGameState *gfxGameState = new TutorialCompute02_UavBufferGameState(
+        "This sample shows how to setup and use UAV Buffers with compute shaders." );
+
+        GraphicsSystem *graphicsSystem = new TutorialCompute02_UavBufferGraphicsSystem( gfxGameState );
+
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
+
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
+    }
+
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
+    {
+        delete graphicsSystem;
+        delete graphicsGameState;
+    }
+
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Tutorial: Compute 02";
+    }
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
 #else
-int mainApp()
+int mainApp( int argc, const char *argv[] )
 #endif
 {
-    TutorialCompute02_UavBufferGameState TutorialCompute02_UavBufferGameState(
-        "This sample shows how to setup and use UAV Buffers with compute shaders." );
-    TutorialCompute02_UavBufferGraphicsSystem graphicsSystem( &TutorialCompute02_UavBufferGameState );
-
-    TutorialCompute02_UavBufferGameState._notifyGraphicsSystem( &graphicsSystem );
-
-    graphicsSystem.initialize( "Tutorial: Compute 02" );
-
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
-    }
-
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
-    {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
-    }
-
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
 }
