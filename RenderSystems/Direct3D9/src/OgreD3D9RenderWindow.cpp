@@ -818,9 +818,9 @@ namespace Ogre
         }
     }
 
-    void D3D9RenderWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void D3D9RenderWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
-        mDevice->copyContentsToMemory(this, dst, buffer);
+        mDevice->copyContentsToMemory(this, src, dst, buffer);
     }
     //-----------------------------------------------------------------------------
     void D3D9RenderWindow::_beginUpdate()

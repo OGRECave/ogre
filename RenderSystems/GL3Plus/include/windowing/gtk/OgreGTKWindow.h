@@ -73,7 +73,7 @@ public:
     void reposition(int left, int top);
     void resize(unsigned int width, unsigned int height);
     void swapBuffers();
-    void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+    void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
 
     bool requiresTextureFlipping() const { return false; }
 

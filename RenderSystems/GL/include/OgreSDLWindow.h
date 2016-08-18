@@ -67,7 +67,7 @@ namespace Ogre {
         void swapBuffers();
 
         /** Overridden - see RenderTarget. */
-        void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
 
         /** @copydoc see RenderWindow::setVSyncEnabled */
         void setVSyncEnabled(bool vsync);

@@ -1274,7 +1274,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void D3D9Device::copyContentsToMemory(D3D9RenderWindow* renderWindow, 
-        const PixelBox &dst, RenderTarget::FrameBuffer buffer)
+        const Box& src, const PixelBox &dst, RenderTarget::FrameBuffer buffer)
     {
         RenderWindowToResourcesIterator it = getRenderWindowIterator(renderWindow);
         RenderWindowResources* resources = it->second;

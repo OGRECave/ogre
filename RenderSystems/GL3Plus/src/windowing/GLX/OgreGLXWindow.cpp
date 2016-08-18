@@ -721,16 +721,15 @@ namespace Ogre
     }
 
     //-------------------------------------------------------------------------------------------------//
-    void GLXWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void GLXWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
         if (mClosed)
             return;
 
-        if (dst.getWidth() > mWidth ||
-            dst.getHeight() > mHeight ||
-            dst.front != 0 || dst.back != 1)
+        if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1
+        || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight() || dst.getDepth() != 1)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "GLXWindow::copyContentsToMemory" );
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "GLXWindow::copyContentsToMemory");
         }
 
         if (buffer == FB_AUTO)
@@ -743,7 +742,7 @@ namespace Ogre
 
         if ((format == GL_NONE) || (type == 0))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format.", "GLXWindow::copyContentsToMemory" );
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format.", "GLXWindow::copyContentsToMemory");
         }
 
         // Switch context if different from current one
@@ -756,8 +755,8 @@ namespace Ogre
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
         glReadBuffer((buffer == FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
-                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+        glReadPixels((GLint)src.left, (GLint)(mHeight - src.bottom),
+                     (GLsizei)src.getWidth(), (GLsizei)src.getHeight(),
                      format, type, dst.getTopLeftFrontPixelPtr());
 
         // restore default alignment

@@ -61,7 +61,7 @@ namespace Ogre
         /** Overridden - see RenderWindow */
         virtual void swapBuffers( ) = 0;
         /** Overridden - see RenderTarget */
-        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
         /** Overridden - see RenderTarget */
         virtual void windowMovedOrResized() {};
 

@@ -105,7 +105,7 @@ namespace Ogre {
         /** Overridden - see RenderWindow */
         void swapBuffers();
         /** Overridden - see RenderTarget */
-        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
         /** Overridden - see RenderWindow */
         virtual void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt);
         /** Overridden - see RenderWindow */
