@@ -29,7 +29,7 @@ THE SOFTWARE.
 #import <UIKit/UIKit.h>
 #import <Metal/Metal.h>
 
-@interface GameViewController : UIViewController
+@interface RestartViewController : UIViewController
 
 @end
 

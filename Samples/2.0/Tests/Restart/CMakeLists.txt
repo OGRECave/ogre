@@ -21,15 +21,16 @@ add_recursive( ./ SOURCE_FILES )
 set( RESTART_RESOURCES ${SAMPLE_COMMON_RESOURCES} )
 if( APPLE )
 	set( RESTART_RESOURCES ${RESTART_RESOURCES}
-		 ${CMAKE_CURRENT_SOURCE_DIR}/Restart.storyboard )
+		 ${CMAKE_CURRENT_SOURCE_DIR}/iOS/Restart.storyboard )
+	set( SOURCE_FILES ${SOURCE_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/iOS/RestartViewController.mm )
 endif()
 
-ogre_add_executable(Test_Restart WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES} )
+ogre_add_executable(Test_Restart WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${RESTART_RESOURCES} )
 
 target_link_libraries(Test_Restart ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Test_Restart)
 
 if( APPLE )
-	set_target_properties( Test_Restart PROPERTIES RESOURCE "${SAMPLE_COMMON_RESOURCES}" )
-	set_target_properties( Test_Restart PROPERTIES MACOSX_BUNDLE_INFO_PLIST Info.plist )
+	set_target_properties( Test_Restart PROPERTIES RESOURCE "${RESTART_RESOURCES}" )
+	set_target_properties( Test_Restart PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/iOS/Info.plist )
 endif()

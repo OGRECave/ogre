@@ -87,6 +87,17 @@ namespace Ogre
             mCurrentColourRTs[i] = 0;
     }
     //-------------------------------------------------------------------------
+    MetalRenderSystem::~MetalRenderSystem()
+    {
+        shutdown();
+
+        // Destroy render windows
+        RenderTargetMap::iterator i;
+        for (i = mRenderTargets.begin(); i != mRenderTargets.end(); ++i)
+            OGRE_DELETE i->second;
+        mRenderTargets.clear();
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::shutdown(void)
     {
         for( size_t i=0; i<mAutoParamsBuffer.size(); ++i )

@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#import "System/iOS/GameViewController.h"
+#import "RestartViewController.h"
 #import "System/iOS/AppDelegate.h"
 
 #import <simd/simd.h>
@@ -41,7 +41,7 @@ THE SOFTWARE.
 
 using namespace Demo;
 
-@implementation GameViewController
+@implementation RestartViewController
 {
     Demo::GameState *_graphicsGameState;
     Demo::GraphicsSystem *_graphicsSystem;

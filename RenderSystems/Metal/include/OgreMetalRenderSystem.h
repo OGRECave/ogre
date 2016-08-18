@@ -136,6 +136,7 @@ namespace Ogre
 
     public:
         MetalRenderSystem();
+        virtual ~MetalRenderSystem();
 
         virtual void shutdown(void);
 
