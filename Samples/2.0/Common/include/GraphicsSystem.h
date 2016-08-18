@@ -50,6 +50,7 @@ namespace Demo
         float               mThreadWeight;
 
         bool                mQuit;
+        bool                mAlwaysAskForConfig;
 
         Ogre::ColourValue   mBackgroundColour;
 
@@ -113,6 +114,7 @@ namespace Demo
         SdlInputHandler* getInputHandler(void)                  { return mInputHandler; }
     #endif
 
+        void setQuit(void)                                      { mQuit = true; }
         bool getQuit(void) const                                { return mQuit; }
 
         float getAccumTimeSinceLastLogicFrame(void) const       { return mAccumTimeSinceLastLogicFrame; }

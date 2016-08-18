@@ -73,3 +73,7 @@ if( OGRE_BUILD_SAMPLES2 )
 	add_subdirectory(Tutorials/TutorialUav01_Setup)
 	add_subdirectory(Tutorials/TutorialUav02_Setup)
 endif()
+
+if( OGRE_BUILD_TESTS )
+	add_subdirectory(Tests/Restart)
+endif()

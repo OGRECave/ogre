@@ -57,6 +57,7 @@ namespace Demo
         mThreadGameEntityToUpdate( 0 ),
         mThreadWeight( 0 ),
         mQuit( false ),
+        mAlwaysAskForConfig( true ),
         mBackgroundColour( backgroundColour )
     {
     }
@@ -96,7 +97,7 @@ namespace Demo
 
         mStaticPluginLoader.install( mRoot );
 
-        //if( !mRoot->restoreConfig() )
+        if( mAlwaysAskForConfig || !mRoot->restoreConfig() )
         {
             if( !mRoot->showConfigDialog() )
             {

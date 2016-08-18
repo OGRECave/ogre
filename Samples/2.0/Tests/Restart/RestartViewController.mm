@@ -52,6 +52,8 @@ using namespace Demo;
 
     double _timeSinceLast;
     CFTimeInterval _startTime;
+
+    int _runCounter;
 }
 
 -(void)dealloc
@@ -144,6 +146,20 @@ using namespace Demo;
 
 -(void)mainLoop
 {
+    if( _graphicsSystem->getQuit() )
+    {
+        [self viewWillDisappear:NO];
+        [self shutdownOgre];
+        if( _runCounter < 5 )
+        {
+            [self viewDidLoad];
+            [self viewWillAppear:NO];
+        }
+
+        ++_runCounter;
+        return;
+    }
+
     CFTimeInterval endTime = CACurrentMediaTime();
     _timeSinceLast = endTime - _startTime;
     _timeSinceLast = std::min( 1.0, _timeSinceLast ); //Prevent from going haywire.
