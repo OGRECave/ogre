@@ -457,11 +457,11 @@ namespace Ogre {
 
         // Map the subresource of the staging texture
         D3D11_MAPPED_SUBRESOURCE mapped = {0};
-        hr = mDevice.GetImmediateContext()->Map(stagingTexture.Get(), srcSubresource, D3D11_MAP_READ , 0, &mapped);
+        hr = mDevice.GetImmediateContext()->Map(stagingTexture.Get(), srcSubresource, D3D11_MAP_READ, 0, &mapped);
         mDevice.throwIfFailed(hr, "Error while mapping staging texture", "D3D11HardwarePixelBuffer::blitToMemory");
         
         // Read the data out of the texture.
-        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping(srcBoxDx11, D3D11Mappings::_getPF(desc.Format), mapped);
+        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping(srcBoxDx11, desc.Format, mapped);
         PixelUtil::bulkPixelConversion(locked, dst);
 
         // Release the staging texture

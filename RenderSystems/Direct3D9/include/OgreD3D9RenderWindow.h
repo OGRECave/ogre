@@ -70,7 +70,7 @@ namespace Ogre
         
         /** Overridden - see RenderTarget.
         */
-        void                copyContentsToMemory    (const PixelBox &dst, FrameBuffer buffer);
+        void                copyContentsToMemory    (const Box& src, const PixelBox &dst, FrameBuffer buffer);
         bool                requiresTextureFlipping () const { return false; }
 
         // Method for dealing with resize / move & 3d library

@@ -77,7 +77,7 @@ namespace Ogre {
         uint                    getLastPresentFrame     () const { return mLastPresentFrame; }
 
         void                    setAdapterOrdinalIndex  (D3D9RenderWindow* renderWindow, uint adapterOrdinalInGroupIndex);
-        void                    copyContentsToMemory(D3D9RenderWindow* window, const PixelBox &dst, RenderTarget::FrameBuffer buffer);
+        void                    copyContentsToMemory(D3D9RenderWindow* window, const Box& src, const PixelBox &dst, RenderTarget::FrameBuffer buffer);
         void                    clearDeviceStreams      ();
         int                     getVBlankMissCount      (D3D9RenderWindow* renderWindow);
     

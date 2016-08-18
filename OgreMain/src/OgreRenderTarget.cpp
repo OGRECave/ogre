@@ -576,7 +576,7 @@ namespace Ogre {
         uchar *data = OGRE_ALLOC_T(uchar, mWidth * mHeight * PixelUtil::getNumElemBytes(pf), MEMCATEGORY_RENDERSYS);
         PixelBox pb(mWidth, mHeight, 1, pf, data);
 
-        copyContentsToMemory(pb);
+        copyContentsToMemory(pb, pb);
 
         Image().loadDynamicImage(data, mWidth, mHeight, 1, pf, false, 1, 0).save(filename);
 

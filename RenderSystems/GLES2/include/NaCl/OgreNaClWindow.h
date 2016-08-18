@@ -65,7 +65,7 @@ namespace Ogre {
         */
         void getCustomAttribute(const String& name, void* pData);
         
-        void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
         bool requiresTextureFlipping() const;
         void destroy(void);
         bool isClosed(void) const;
