@@ -236,6 +236,32 @@ namespace Ogre
 
         rsc->addShaderProfile( "metal" );
 
+        struct FeatureSets
+        {
+            MTLFeatureSet featureSet;
+            const char* name;
+        };
+
+        FeatureSets featureSets[] =
+        {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+            { MTLFeatureSet_iOS_GPUFamily1_v1, "iOS_GPUFamily1_v1" },
+            { MTLFeatureSet_iOS_GPUFamily2_v1, "iOS_GPUFamily2_v1" },
+
+            { MTLFeatureSet_iOS_GPUFamily1_v2, "iOS_GPUFamily1_v2" },
+            { MTLFeatureSet_iOS_GPUFamily2_v2, "iOS_GPUFamily2_v2" },
+            { MTLFeatureSet_iOS_GPUFamily3_v1, "iOS_GPUFamily3_v2" },
+#else
+            { MTLFeatureSet_OSX_GPUFamily1_v1, "OSX_GPUFamily1_v1" },
+#endif
+        };
+
+        for( int i=0; i<sizeof(featureSets) / sizeof(featureSets[0]); ++i )
+        {
+            if( [mActiveDevice->mDevice supportsFeatureSet:featureSets[i].featureSet] )
+                LogManager::getSingleton().logMessage( "Supports: " + String(featureSets[i].name) );
+        }
+
         return rsc;
     }
     //-------------------------------------------------------------------------
