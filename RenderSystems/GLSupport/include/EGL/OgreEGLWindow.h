@@ -85,7 +85,7 @@ namespace Ogre {
             bool isVisible(void) const;
             void setVisible(bool visible);
             void swapBuffers();
-            void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+            void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
 
             /** @copydoc see RenderWindow::setVSyncEnabled */
             void setVSyncEnabled(bool vsync);

@@ -138,7 +138,7 @@ namespace Ogre {
         LogManager::getSingleton().logMessage("\twindowMovedOrResized called");
     }
     
-    void NaClWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void NaClWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
     
     }

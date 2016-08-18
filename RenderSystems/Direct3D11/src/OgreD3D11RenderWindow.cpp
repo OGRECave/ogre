@@ -330,13 +330,12 @@ namespace Ogre
         RenderWindow::getCustomAttribute(name, pData);
     }
     //---------------------------------------------------------------------
-    void D3D11RenderWindowBase::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void D3D11RenderWindowBase::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
-        if (dst.getWidth() > mWidth ||
-            dst.getHeight() > mHeight ||
-            dst.front != 0 || dst.back != 1)
+        if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1
+        || dst.getWidth() != src.getWidth() || dst.getHeight() != dst.getHeight() || dst.getDepth() != 1)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "D3D11RenderWindowBase::copyContentsToMemory" );
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "D3D11RenderWindowBase::copyContentsToMemory");
         }
 
         if(!mpBackBuffer)
@@ -345,6 +344,8 @@ namespace Ogre
         // get the backbuffer desc
         D3D11_TEXTURE2D_DESC BBDesc;
         mpBackBuffer->GetDesc( &BBDesc );
+        UINT srcSubresource = 0;
+        D3D11_BOX srcBoxDx11 = { src.left, src.top, 0, src.right, src.bottom, 1 };
 
         // We need data from backbuffer without MSAA
         ComPtr<ID3D11Texture2D> backbufferNoMSAA;
@@ -356,6 +357,7 @@ namespace Ogre
         {
             backbufferNoMSAA = mpBackBufferNoMSAA;
             mDevice.GetImmediateContext()->ResolveSubresource(backbufferNoMSAA.Get(), 0, mpBackBuffer.Get(), 0, BBDesc.Format);
+            mDevice.throwIfFailed("Error resolving MSAA subresource", "D3D11RenderWindowBase::copyContentsToMemory");
         }
         else
         {
@@ -367,17 +369,11 @@ namespace Ogre
             desc.CPUAccessFlags = 0;
 
             HRESULT hr = mDevice->CreateTexture2D(&desc, NULL, backbufferNoMSAA.ReleaseAndGetAddressOf());
-            if (FAILED(hr) || mDevice.isError())
-            {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                    "Error creating texture\nError Description:" + errorDescription, 
-                    "D3D11RenderWindow::copyContentsToMemory" );
-            }
+            mDevice.throwIfFailed(hr, "Error creating texture without MSAA", "D3D11RenderWindowBase::copyContentsToMemory");
 
             mDevice.GetImmediateContext()->ResolveSubresource(backbufferNoMSAA.Get(), 0, mpBackBuffer.Get(), 0, BBDesc.Format);
+            mDevice.throwIfFailed("Error resolving MSAA subresource", "D3D11RenderWindowBase::copyContentsToMemory");
         }
-
 
         // change the parameters of the texture so we can read it
         BBDesc.SampleDesc.Count = 1;
@@ -386,30 +382,28 @@ namespace Ogre
         BBDesc.BindFlags = 0;
         BBDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
 
-        // create a temp buffer to copy to
-        ComPtr<ID3D11Texture2D> backbufferStaging;
-        HRESULT hr = mDevice->CreateTexture2D(&BBDesc, NULL, backbufferStaging.ReleaseAndGetAddressOf());
+        // Create the staging texture
+        ComPtr<ID3D11Texture2D> stagingTexture;
+        HRESULT hr = mDevice->CreateTexture2D(&BBDesc, NULL, stagingTexture.ReleaseAndGetAddressOf());
+        mDevice.throwIfFailed(hr, "Error creating staging texture", "D3D11RenderWindowBase::copyContentsToMemory");
 
-        if (FAILED(hr) || mDevice.isError())
-        {
-                String errorDescription = mDevice.getErrorDescription(hr);
-                OGRE_EXCEPT_EX(Exception::ERR_RENDERINGAPI_ERROR, hr,
-                        "Error creating texture\nError Description:" + errorDescription, 
-                        "D3D11RenderWindow::copyContentsToMemory" );
-        }
-        // copy the back buffer
-        mDevice.GetImmediateContext()->CopyResource(backbufferStaging.Get(), backbufferNoMSAA.Get());
+        // Copy the back buffer into the staging texture
+        mDevice.GetImmediateContext()->CopySubresourceRegion(
+            stagingTexture.Get(), srcSubresource, srcBoxDx11.left, srcBoxDx11.top, srcBoxDx11.front,
+            backbufferNoMSAA.Get(), srcSubresource, &srcBoxDx11);
+        mDevice.throwIfFailed("Error while copying to staging texture", "D3D11RenderWindowBase::copyContentsToMemory");
 
-        // map the copied texture
-        D3D11_MAPPED_SUBRESOURCE mappedTex2D;
-        mDevice.GetImmediateContext()->Map(backbufferStaging.Get(), 0, D3D11_MAP_READ, 0, &mappedTex2D);
+        // Map the subresource of the staging texture
+        D3D11_MAPPED_SUBRESOURCE mapped = {0};
+        hr = mDevice.GetImmediateContext()->Map(stagingTexture.Get(), srcSubresource, D3D11_MAP_READ, 0, &mapped);
+        mDevice.throwIfFailed(hr, "Error while mapping staging texture", "D3D11RenderWindowBase::copyContentsToMemory");
 
-        // copy the texture to the dest
-        PixelBox src = D3D11Mappings::getPixelBoxWithMapping(dst.getWidth(), dst.getHeight(), 1, D3D11Mappings::_getPF(BBDesc.Format), mappedTex2D);
-        PixelUtil::bulkPixelConversion(src, dst);
+        // Read the data out of the texture
+        PixelBox locked = D3D11Mappings::getPixelBoxWithMapping(srcBoxDx11, BBDesc.Format, mapped);
+        PixelUtil::bulkPixelConversion(locked, dst);
 
-        // unmap the temp buffer
-        mDevice.GetImmediateContext()->Unmap(backbufferStaging.Get(), 0);
+        // Release the staging texture
+        mDevice.GetImmediateContext()->Unmap(stagingTexture.Get(), srcSubresource);
     }
 	//---------------------------------------------------------------------
 #if OGRE_NO_QUAD_BUFFER_STEREO == 0

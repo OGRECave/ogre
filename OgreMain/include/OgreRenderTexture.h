@@ -51,7 +51,7 @@ namespace Ogre
         RenderTexture(HardwarePixelBuffer *buffer, uint32 zoffset);
         virtual ~RenderTexture();
 
-        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO);
         PixelFormat suggestPixelFormat() const;
 
     protected:
@@ -106,7 +106,7 @@ namespace Ogre
         /** Error throwing implementation, it's not possible to write a MultiRenderTarget
             to disk. 
         */
-        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO);
 
         /// Irrelevant implementation since cannot copy
         PixelFormat suggestPixelFormat() const { return PF_UNKNOWN; }

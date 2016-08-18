@@ -57,7 +57,7 @@ namespace Ogre {
         void swapBuffers();
 
         /** Overridden - see RenderTarget. */
-        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
 
         bool requiresTextureFlipping() const { return false; }
 

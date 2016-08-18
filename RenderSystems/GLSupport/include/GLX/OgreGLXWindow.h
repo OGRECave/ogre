@@ -93,7 +93,7 @@ namespace Ogre
         void swapBuffers();
         
         /** @copydoc see RenderTarget::copyContentsToMemory */
-        void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
         
         /**
            @remarks

@@ -857,15 +857,12 @@ namespace Ogre {
       }
     }
 
-    void Win32Window::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void Win32Window::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
-        if (dst.getWidth() > mWidth ||
-            dst.getHeight() > mHeight ||
-            dst.front != 0 || dst.back != 1)
+        if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1
+        || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight() || dst.getDepth() != 1)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Invalid box.",
-                        "Win32Window::copyContentsToMemory" );
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "Win32Window::copyContentsToMemory");
         }
 
         if (buffer == FB_AUTO)

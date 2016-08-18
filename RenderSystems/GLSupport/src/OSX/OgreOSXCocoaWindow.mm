@@ -454,15 +454,12 @@ namespace Ogre {
         return mVSync;
 	}
 
-    void CocoaWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void CocoaWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
-        if (dst.getWidth() > mWidth ||
-            dst.getHeight() > mHeight ||
-            dst.front != 0 || dst.back != 1)
+        if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1
+        || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight() || dst.getDepth() != 1)
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Invalid box.",
-                        "CocoaWindow::copyContentsToMemory" );
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", "CocoaWindow::copyContentsToMemory");
         }
         
         if (buffer == FB_AUTO)

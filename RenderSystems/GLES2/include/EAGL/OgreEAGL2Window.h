@@ -96,7 +96,7 @@ namespace Ogre {
             void setVisible(bool visible) { mVisible = visible; }
             void setClosed(bool closed) { mClosed = closed; }
             void swapBuffers();
-            void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+            void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
             PixelFormat suggestPixelFormat() const { return PF_BYTE_RGBA; }
 
             /**

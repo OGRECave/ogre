@@ -262,16 +262,9 @@ namespace Ogre
         box.data = mapping.pData;
     }
     //---------------------------------------------------------------------
-    PixelBox D3D11Mappings::getPixelBoxWithMapping(size_t width, size_t height, size_t depth, PixelFormat pixelFormat, const D3D11_MAPPED_SUBRESOURCE& mapping)
+    PixelBox D3D11Mappings::getPixelBoxWithMapping(D3D11_BOX extents, DXGI_FORMAT pixelFormat, const D3D11_MAPPED_SUBRESOURCE& mapping)
     {
-        PixelBox box(width, height, depth, pixelFormat);
-        setPixelBoxMapping(box, mapping);
-        return box;
-    }
-    //---------------------------------------------------------------------
-    PixelBox D3D11Mappings::getPixelBoxWithMapping(D3D11_BOX extents, PixelFormat pixelFormat, const D3D11_MAPPED_SUBRESOURCE& mapping)
-    {
-        PixelBox box(Box(extents.left, extents.top, extents.front, extents.right, extents.bottom, extents.back), pixelFormat);
+        PixelBox box(Box(extents.left, extents.top, extents.front, extents.right, extents.bottom, extents.back), _getPF(pixelFormat));
         setPixelBoxMapping(box, mapping);
         return box;
     }

@@ -65,7 +65,7 @@ namespace Ogre
 
         void getCustomAttribute( const String& name, void* pData );
         /** Overridden - see RenderTarget. */
-        virtual void copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer);
+        virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer);
         bool requiresTextureFlipping() const                    { return false; }
 
         virtual bool _shouldRebindBackBuffer()                  { return false; }

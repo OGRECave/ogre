@@ -483,18 +483,16 @@ namespace Ogre {
 		}
 	}
 
-    void EAGLWindow::copyContentsToMemory(const PixelBox &dst, FrameBuffer buffer)
+    void EAGLWindow::copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer)
     {
         if(dst.format != PF_A8R8G8B8)
             OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Only PF_A8R8G8B8 is a supported format for OpenGL ES", __FUNCTION__);
 
-        if (dst.getWidth() > mWidth ||
-            dst.getHeight() > mHeight ||
-            dst.front != 0 || dst.back != 1)
+        if(src.right > mWidth || src.bottom > mHeight || src.front != 0 || src.back != 1
+        || dst.getWidth() != src.getWidth() || dst.getHeight() != src.getHeight() || dst.getDepth() != 1
+        || dst.getWidth() != dst.rowPitch /* GLES does not support GL_PACK_ROW_LENGTH, nor iOS supports GL_NV_pack_subimage */)
 		{
-			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS,
-                        "Invalid box.",
-                        __FUNCTION__ );
+			OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Invalid box.", __FUNCTION__ );
 		}
 
 		if (buffer == FB_AUTO)
@@ -513,11 +511,13 @@ namespace Ogre {
         GLubyte *data = (GLubyte*)malloc(dataLength * sizeof(GLubyte));
 
         // Read pixel data from the framebuffer
-        glPixelStorei(GL_PACK_ALIGNMENT, 4);
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
         GL_CHECK_ERROR
-        glReadPixels((GLint)0, (GLint)(mHeight - dst.getHeight()),
-                     (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
+        glReadPixels((GLint)src.left, (GLint)(mHeight - src.bottom),
+                     (GLsizei)src.getWidth(), (GLsizei)src.getHeight(),
                      GL_RGBA, GL_UNSIGNED_BYTE, data);
+        GL_CHECK_ERROR
+        glPixelStorei(GL_PACK_ALIGNMENT, 4);
         GL_CHECK_ERROR
 
         // Create a CGImage with the pixel data
