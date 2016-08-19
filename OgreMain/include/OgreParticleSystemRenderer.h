@@ -123,13 +123,6 @@ namespace Ogre {
         /** Gets the desired particles sort mode of this renderer */
         virtual SortMode _getSortMode(void) const = 0;
 
-        /** Required method to allow the renderer to communicate the Renderables
-            it will be using to render the system to a visitor.
-        @see MovableObject::visitRenderables
-        */
-        virtual void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false) = 0;
-
     };
 
     /** Abstract class definition of a factory object for ParticleSystemRenderer. */

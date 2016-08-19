@@ -371,10 +371,6 @@ namespace Ogre {
         /// @copydoc AnimableObject::createAnimableValue
         AnimableValuePtr createAnimableValue(const String& valueName);
 
-        /// @copydoc MovableObject::visitRenderables
-        virtual void visitRenderables(Renderable::Visitor* visitor, 
-                                        bool debugRenderables = false) {}
-
         /** Sets the maximum distance away from the camera that shadows
             by this light will be visible.
         @remarks

@@ -628,11 +628,6 @@ namespace v1
         return queryLights();
     }
     //-----------------------------------------------------------------------
-    void InstanceBatch::visitRenderables( Renderable::Visitor* visitor, bool debugRenderables )
-    {
-        visitor->visit( this, 0, false );
-    }
-    //-----------------------------------------------------------------------
     void InstanceBatch::_setCustomParam( InstancedEntity *instancedEntity, unsigned char idx,
                                          const Vector4 &newParam )
     {

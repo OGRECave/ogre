@@ -375,38 +375,6 @@ namespace Ogre {
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
-
-        /** Visitor object that can be used to iterate over a collection of Renderable
-            instances abstractly.
-        @remarks
-            Different scene objects use Renderable differently; some will have a 
-            single Renderable, others will have many. This visitor interface allows
-            classes using Renderable to expose a clean way for external code to
-            get access to the contained Renderable instance(s) that it will
-            eventually add to the render queue.
-        @par
-            To actually have this method called, you have to call a method on the
-            class containing the Renderable instances. One example is 
-            MovableObject::visitRenderables.
-        */
-        class Visitor
-        {
-        public:
-            /** Virtual destructor needed as class has virtual methods. */
-            virtual ~Visitor() { }
-            /** Generic visitor method. 
-            @param rend The Renderable instance being visited
-            @param lodIndex The LOD index to which this Renderable belongs. Some
-                objects support LOD and this will tell you whether the Renderable
-                you're looking at is from the top LOD (0) or otherwise
-            @param isDebug Whether this is a debug renderable or not.
-            @param pAny Optional pointer to some additional data that the class
-                calling the visitor may populate if it chooses to.
-            */
-            virtual void visit(Renderable* rend, ushort lodIndex, bool isDebug, 
-                Any* pAny = 0) = 0;
-        };
-
         /** Gets RenderSystem private data
         @remarks
             This should only be used by a RenderSystem

@@ -755,13 +755,6 @@ namespace v1 {
     {
         return queryLights();
     }
-    //---------------------------------------------------------------------
-    void BillboardChain::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        // only one renderable
-        visitor->visit(this, 0, false);
-    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String BillboardChainFactory::FACTORY_TYPE_NAME = "BillboardChain";

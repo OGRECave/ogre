@@ -701,10 +701,6 @@ namespace v1 {
         /** @copydoc Renderable::getLights */
         const LightList& getLights(void) const;
 
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
-
         /** Sort the billboard set. Only called when enabled via setSortingEnabled */
         virtual void _sortBillboards(void);
 

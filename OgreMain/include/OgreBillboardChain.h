@@ -266,11 +266,6 @@ namespace v1 {
         virtual bool preRender(SceneManager* sm, RenderSystem* rsys);
         void getWorldTransforms(Matrix4 *) const;
         const LightList& getLights(void) const;
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
-
-
 
     protected:
 
