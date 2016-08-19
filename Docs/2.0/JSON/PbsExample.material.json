@@ -57,6 +57,7 @@
             "blendblock" : "unique_name",
             "alpha_test" : ["disabled", 0.5],
             "shadow_const_bias" : 0.01,
+            "two_sided"  :  false,
 
             "workflow" : "specular_fresnel",
 
