@@ -259,6 +259,10 @@ namespace Ogre
         if (itor != json.MemberEnd() && itor->value.IsString())
             pbsDatablock->setBrdf(parseBrdf(itor->value.GetString()));
 
+        itor = json.FindMember("two_sided");
+        if (itor != json.MemberEnd() && itor->value.IsBool())
+            pbsDatablock->setTwoSidedLighting( itor->value.GetBool(), false );
+
         itor = json.FindMember("transparency");
         if( itor != json.MemberEnd() && itor->value.IsObject() )
         {
@@ -646,6 +650,9 @@ namespace Ogre
             outString += ",\n\t\t\t\"brdf\" : ";
             toQuotedStr( pbsDatablock->getBrdf(), outString );
         }
+
+        if( pbsDatablock->getTwoSidedLighting() )
+            outString += ",\n\t\t\t\"two_sided\" : true";
 
         if( pbsDatablock->getTransparencyMode() != HlmsPbsDatablock::None )
         {

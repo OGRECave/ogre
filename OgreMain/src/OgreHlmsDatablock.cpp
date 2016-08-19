@@ -379,6 +379,25 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    bool HlmsDatablock::hasCustomShadowMacroblock(void) const
+    {
+        const HlmsMacroblock *macroblock0 = mMacroblock[0];
+        //Hard copy
+        HlmsMacroblock macroblock1 = *mMacroblock[1];
+
+        const bool useBackFaces = mCreator->getHlmsManager()->getShadowMappingUseBackFaces();
+
+        //Revert the flipping
+        if( useBackFaces && macroblock0->mCullMode != CULL_NONE && macroblock1.mCullMode != CULL_NONE )
+        {
+            macroblock1.mCullMode = macroblock1.mCullMode == CULL_CLOCKWISE ? CULL_ANTICLOCKWISE :
+                                                                              CULL_CLOCKWISE;
+        }
+
+        //Now compare if they're equal
+        return *macroblock0 != macroblock1;
+    }
+    //-----------------------------------------------------------------------------------
     static const char *c_cmpStrings[NUM_COMPARE_FUNCTIONS+1] =
     {
         "==",   //CMPF_ALWAYS_FAIL (dummy)

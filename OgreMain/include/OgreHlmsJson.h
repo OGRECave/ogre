@@ -109,8 +109,6 @@ namespace Ogre
         static String getName( const HlmsSamplerblock *samplerblock );
 
     protected:
-        bool hasCustomShadowMacroblock( const HlmsDatablock *datablock ) const;
-
         void saveSamplerblock( const HlmsSamplerblock *samplerblock, String &outString );
         void saveMacroblock( const HlmsMacroblock *macroblock, String &outString );
         void saveBlendblock( const HlmsBlendblock *blendblock, String &outString );

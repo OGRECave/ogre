@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -728,25 +728,6 @@ namespace Ogre
         return "\"Sampler_" + StringConverter::toString( samplerblock->mId ) + '"';
     }
     //-----------------------------------------------------------------------------------
-    bool HlmsJson::hasCustomShadowMacroblock( const HlmsDatablock *datablock ) const
-    {
-        const HlmsMacroblock *macroblock0 = datablock->getMacroblock( false );
-        //Hard copy
-        HlmsMacroblock macroblock1 = *datablock->getMacroblock( true );
-
-        const bool useBackFaces = mHlmsManager->getShadowMappingUseBackFaces();
-
-        //Revert the flipping
-        if( useBackFaces && macroblock1.mCullMode != CULL_NONE )
-        {
-            macroblock1.mCullMode = macroblock1.mCullMode == CULL_CLOCKWISE ? CULL_ANTICLOCKWISE :
-                                                                              CULL_CLOCKWISE;
-        }
-
-        //Now compare if they're equal
-        return *macroblock0 != macroblock1;
-    }
-    //-----------------------------------------------------------------------------------
     void HlmsJson::saveSamplerblock( const HlmsSamplerblock *samplerblock, String &outString )
     {
         outString += "\n\t\t";
@@ -884,7 +865,7 @@ namespace Ogre
 
         outString += "\t\t\t\"macroblock\" : ";
 
-        if( hasCustomShadowMacroblock( datablock ) )
+        if( datablock->hasCustomShadowMacroblock() )
         {
             outString += '[';
             outString += getName( datablock->getMacroblock(false) );
@@ -952,7 +933,7 @@ namespace Ogre
                 const HlmsMacroblock *macroblock = datablock->getMacroblock( false );
                 macroblocks.insert( macroblock );
 
-                if( hasCustomShadowMacroblock( datablock ) )
+                if( datablock->hasCustomShadowMacroblock() )
                     macroblocks.insert( datablock->getMacroblock( true ) );
 
                 const HlmsBlendblock *blendblock = datablock->getBlendblock( false );
@@ -1069,7 +1050,7 @@ namespace Ogre
             const HlmsMacroblock *macroblock = datablock->getMacroblock( false );
             macroblocks.insert( macroblock );
 
-            if( hasCustomShadowMacroblock( datablock ) )
+            if( datablock->hasCustomShadowMacroblock() )
                 macroblocks.insert( datablock->getMacroblock( true ) );
 
             const HlmsBlendblock *blendblock = datablock->getBlendblock( false );

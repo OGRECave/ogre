@@ -58,6 +58,7 @@ namespace Ogre
                                         const HlmsParamVec &params ) :
         HlmsDatablock( name, creator, macroblock, blendblock, params ),
         mFresnelTypeSizeBytes( 4 ),
+        mTwoSided( false ),
         mUseAlphaFromTextures( true ),
         mWorkflow( SpecularWorkflow ),
         mTransparencyMode( None ),
@@ -835,6 +836,46 @@ namespace Ogre
     uint8 HlmsPbsDatablock::getBakedTextureIdx( PbsTextureTypes texType ) const
     {
         return mTexToBakedTextureIdx[texType];
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setTwoSidedLighting( bool twoSided, bool changeMacroblock,
+                                                CullingMode oneSidedShadowCast )
+    {
+        mTwoSided = twoSided;
+
+        if( twoSided && changeMacroblock )
+        {
+            HlmsMacroblock macroblock = *mMacroblock[0];
+            macroblock.mCullMode = CULL_NONE;
+            setMacroblock( macroblock );
+
+            if( oneSidedShadowCast != CULL_NONE )
+            {
+                macroblock.mCullMode = oneSidedShadowCast;
+                setMacroblock( macroblock, true );
+            }
+        }
+
+        flushRenderables();
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsPbsDatablock::getTwoSidedLighting(void) const
+    {
+        return mTwoSided;
+    }
+    //-----------------------------------------------------------------------------------
+    bool HlmsPbsDatablock::hasCustomShadowMacroblock(void) const
+    {
+        if( mTwoSided &&
+            (mMacroblock[0]->mCullMode != CULL_NONE ||
+             mMacroblock[1]->mCullMode != CULL_NONE) )
+        {
+            //Since we may have ignored what HlmsManager::setShadowMappingUseBackFaces
+            //says, we need to treat them as custom.
+            return true;
+        }
+
+        return HlmsDatablock::hasCustomShadowMacroblock();
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setAlphaTestThreshold( float threshold )
