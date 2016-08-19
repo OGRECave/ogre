@@ -2980,7 +2980,7 @@ bail:
     }
     //---------------------------------------------------------------------
     // TODO: Move this class to the right place.
-    class D3D11RenderOperationState : public Renderable::RenderSystemData
+    class D3D11RenderOperationState
     {
     public:
         ID3D11ShaderResourceView * mTextures[OGRE_MAX_TEXTURE_LAYERS];

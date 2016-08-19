@@ -67,13 +67,6 @@ namespace Ogre {
     class _OgreExport Renderable
     {
     public:
-        /** An internal class that should be used only by a render system for internal use 
-        @remarks
-            This class was created so a render system can associate internal data to this class.
-            The need for this class started when the DX10 render system needed to save state objects.
-        */
-        class RenderSystemData {}; 
-    public:
         Renderable();
 
         /** Virtual destructor needed as class has virtual methods. */
@@ -375,23 +368,6 @@ namespace Ogre {
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
-        /** Gets RenderSystem private data
-        @remarks
-            This should only be used by a RenderSystem
-        */
-        virtual RenderSystemData * getRenderSystemData() const 
-        { 
-            return mRenderSystemData; 
-        }
-        /** Sets RenderSystem private data
-        @remarks
-            This should only be used by a RenderSystem
-        */
-        virtual void setRenderSystemData(RenderSystemData * val) const
-        { 
-            mRenderSystemData = val; 
-        }
-
         const VertexArrayObjectArray& getVaos( VertexPass vertexPass ) const
                                                 { return mVaoPerLod[vertexPass]; }
 
@@ -468,7 +444,6 @@ namespace Ogre {
         bool mUseIdentityProjection;
         bool mUseIdentityView;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
-        mutable RenderSystemData * mRenderSystemData;/// This should be used only by a render system for internal use
     };
 
     class _OgreExport RenderableAnimated : public Renderable
