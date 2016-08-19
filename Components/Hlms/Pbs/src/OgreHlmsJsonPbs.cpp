@@ -256,12 +256,15 @@ namespace Ogre
             pbsDatablock->setWorkflow( parseWorkflow( itor->value.GetString() ) );
 
         itor = json.FindMember("brdf");
-        if (itor != json.MemberEnd() && itor->value.IsString())
-            pbsDatablock->setBrdf(parseBrdf(itor->value.GetString()));
+        if( itor != json.MemberEnd() && itor->value.IsString() )
+            pbsDatablock->setBrdf( parseBrdf(itor->value.GetString()) );
 
         itor = json.FindMember("two_sided");
-        if (itor != json.MemberEnd() && itor->value.IsBool())
-            pbsDatablock->setTwoSidedLighting( itor->value.GetBool(), false );
+        if( itor != json.MemberEnd() && itor->value.IsBool() )
+        {
+            pbsDatablock->setTwoSidedLighting( itor->value.GetBool(), true,
+                                               pbsDatablock->getMacroblock(true)->mCullMode );
+        }
 
         itor = json.FindMember("transparency");
         if( itor != json.MemberEnd() && itor->value.IsObject() )
