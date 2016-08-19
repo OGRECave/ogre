@@ -16,6 +16,10 @@ struct PS_INPUT
 
 @property( !hlms_shadowcaster )
 
+@property( two_sided_lighting )
+@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
+@end
+
 @property( hlms_forward3d )
 Buffer<uint> f3dGrid : register(t1);
 Buffer<float4> f3dLightList : register(t2);@end
@@ -138,7 +142,8 @@ float3 qmul( float4 q, float3 v )
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
 @insertpiece( output_type ) main( PS_INPUT inPs
-@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end ) @insertpiece( output_type_sv )
+@property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end
+@property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end ) @insertpiece( output_type_sv )
 {
 	@insertpiece( custom_ps_preExecution )
 
@@ -239,10 +244,10 @@ float3 qmul( float4 q, float3 v )
 
 @property( !normal_map )
 	// Geometric normal
-	nNormal = normalize( inPs.normal );
+	nNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
 @end @property( normal_map )
 	//Normal mapping.
-	float3 geomNormal = normalize( inPs.normal );
+	float3 geomNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
 	float3 vTangent = normalize( inPs.tangent );
 
 	//Get the TBN matrix

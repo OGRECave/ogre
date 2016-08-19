@@ -86,6 +86,7 @@ namespace Ogre
     const IdString PbsProperty::TransparentMode   = IdString( "transparent_mode" );
     const IdString PbsProperty::FresnelWorkflow   = IdString( "fresnel_workflow" );
     const IdString PbsProperty::MetallicWorkflow  = IdString( "metallic_workflow" );
+    const IdString PbsProperty::TwoSidedLighting  = IdString( "two_sided_lighting" );
 
     const IdString PbsProperty::NormalWeight          = IdString( "normal_weight" );
     const IdString PbsProperty::NormalWeightTex       = IdString( "normal_weight_tex" );
@@ -445,6 +446,9 @@ namespace Ogre
         setProperty( PbsProperty::FresnelScalar, datablock->hasSeparateFresnel() || metallicWorkflow );
         setProperty( PbsProperty::FresnelWorkflow, fresnelWorkflow );
         setProperty( PbsProperty::MetallicWorkflow, metallicWorkflow );
+
+        if( datablock->getTwoSidedLighting() )
+            setProperty( PbsProperty::TwoSidedLighting, 1 );
 
         uint32 brdf = datablock->getBrdf();
         if( (brdf & PbsBrdf::BRDF_MASK) == PbsBrdf::Default )

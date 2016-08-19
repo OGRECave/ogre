@@ -176,6 +176,7 @@ namespace Ogre
         uint8   mUvSource[NUM_PBSM_SOURCES];
         uint8   mBlendModes[4];
         uint8   mFresnelTypeSizeBytes;              //4 if mFresnel is float, 12 if it is vec3
+        bool    mTwoSided;
         bool    mUseAlphaFromTextures;
         uint8	mWorkflow;
         TransparencyModes mTransparencyMode;
@@ -518,6 +519,26 @@ namespace Ogre
         /// Returns the index to mBakedTextures. Returns NUM_PBSM_TEXTURE_TYPES if
         /// there is no texture assigned to texType
         uint8 getBakedTextureIdx( PbsTextureTypes texType ) const;
+
+        /** Allows support for two sided lighting. Disabled by default (faster)
+        @remarks
+            Changing this parameter will cause a flushRenderables
+        @param twoSided
+            Whether to enable or disable.
+        @param changeMacroblock
+            Whether to change the current macroblock for one that has cullingMode = CULL_NONE
+            or set it to false to leave the current macroblock as is.
+        @param oneSidedShadowCast
+            If changeMacroblock == true; this parameter controls the culling mode of the
+            shadow caster (the setting of HlmsManager::setShadowMappingUseBackFaces is ignored!).
+            While oneSidedShadowCast == CULL_NONE is usually the "correct" option, setting
+            oneSidedShadowCast=CULL_ANTICLOCKWISE can prevent ugly self-shadowing on interiors.
+        */
+        void setTwoSidedLighting( bool twoSided, bool changeMacroblock=true,
+                                  CullingMode oneSidedShadowCast=CULL_ANTICLOCKWISE );
+        bool getTwoSidedLighting(void) const;
+
+        virtual bool hasCustomShadowMacroblock(void) const;
 
         /** @see HlmsDatablock::setAlphaTest
         @remarks

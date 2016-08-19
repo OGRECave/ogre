@@ -219,6 +219,7 @@ namespace Ogre
         static const IdString TransparentMode;
         static const IdString FresnelWorkflow;
         static const IdString MetallicWorkflow;
+        static const IdString TwoSidedLighting;
 
         static const IdString NormalWeight;
         static const IdString NormalWeightTex;
