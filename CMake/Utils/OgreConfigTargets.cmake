@@ -190,6 +190,10 @@ function(ogre_config_common TARGETNAME)
     #set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_GCC_INLINES_ARE_PRIVATE_EXTERN[arch=x86_64] "YES")
   endif()
 
+  # Prevent CMake from injecting predefined set of warnings, particularly "-Wmost"
+  # that overrides "-Wno-overloaded-virtual" and causes flood of warnings for Ogre headers
+  set_target_properties(${TARGETNAME} PROPERTIES XCODE_ATTRIBUTE_WARNING_CFLAGS "")
+
   ogre_create_vcproj_userfile(${TARGETNAME})
 endfunction(ogre_config_common)
 
