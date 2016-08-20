@@ -232,8 +232,6 @@ namespace Demo
 			scale = Ogre::Math::lerp(0.3f, 1.0f, scale*scale);
 			sample = sample * scale;
 
-            sample.normalise();
-
             kernelSamples[i][0] = sample.x;
             kernelSamples[i][1] = sample.y;
             kernelSamples[i][2] = sample.z;
