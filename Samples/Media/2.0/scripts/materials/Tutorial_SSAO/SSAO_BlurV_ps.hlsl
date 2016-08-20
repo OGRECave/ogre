@@ -10,7 +10,7 @@ SamplerState samplerState0		: register(s0);
 SamplerState samplerState1		: register(s1);
 
 uniform float2 projectionParams;
-uniform float2 texelSize;
+uniform float4 texelSize;
 
 static const float offsets[9] = { -8.0, -6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0, 8.0 };
 
@@ -33,7 +33,7 @@ float main
 
 	for (int i = 0; i < 9; ++i)
 	{
-		float2 offset = float2(0.0, texelSize.y*offsets[i]); //Vertical sample offsets
+		float2 offset = float2(0.0, texelSize.w*offsets[i]); //Vertical sample offsets
 		float2 samplePos = inPs.uv0 + offset;
 
 		float slDepth = getLinearDepth(samplePos);

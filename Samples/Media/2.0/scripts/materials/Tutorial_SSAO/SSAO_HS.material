@@ -116,6 +116,11 @@ fragment_program SSAO_BlurH_ps unified
 {
 	delegate SSAO_BlurH_ps_HLSL
 	delegate SSAO_BlurH_ps_GLSL
+
+	default_params
+	{
+		param_named_auto texelSize	viewport_size
+	}
 }
 
 // Material definition
@@ -180,6 +185,11 @@ fragment_program SSAO_BlurV_ps unified
 {
 	delegate SSAO_BlurV_ps_HLSL
 	delegate SSAO_BlurV_ps_GLSL
+
+	default_params
+	{
+		param_named_auto texelSize	viewport_size
+	}
 }
 
 // Material definition

@@ -8,7 +8,7 @@ in block
 	vec2 uv0;
 } inPs;
 
-uniform vec2 texelSize;
+uniform vec4 texelSize;
 uniform vec2 projectionParams;
 
 const float offsets[9] = float[9]( -8.0, -6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0, 8.0 );
@@ -31,7 +31,7 @@ void main()
 
 	for (int i = 0; i < 9; ++i)
 	{
-		vec2 offset = vec2(0.0, texelSize.y*offsets[i]); //Vertical sample offsets
+		vec2 offset = vec2(0.0, texelSize.w*offsets[i]); //Vertical sample offsets
 		vec2 samplePos = inPs.uv0 + offset;
 
 		float slDepth = getLinearDepth(samplePos);

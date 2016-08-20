@@ -315,9 +315,8 @@ namespace Demo
 			AUTODETECT_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();
 
 		Ogre::Pass *passBlurH = materialBlurH->getTechnique(0)->getPass(0);
-		Ogre::GpuProgramParametersSharedPtr psParamsBlurH = passBlurH->getFragmentProgramParameters();
-		psParamsBlurH->setNamedConstant("texelSize", Ogre::Vector2( 1.0f/(mGraphicsSystem->getRenderWindow()->getWidth()), 1.0f/(mGraphicsSystem->getRenderWindow()->getHeight()) ));
-		psParamsBlurH->setNamedConstant("projectionParams", Ogre::Vector2(projectionA, projectionB));
+        Ogre::GpuProgramParametersSharedPtr psParamsBlurH = passBlurH->getFragmentProgramParameters();
+        psParamsBlurH->setNamedConstant( "projectionParams", Ogre::Vector2(projectionA, projectionB) );
 
 		Ogre::MaterialPtr materialBlurV = Ogre::MaterialManager::getSingleton().load(
 			"SSAO/BlurV",
@@ -325,9 +324,8 @@ namespace Demo
 			AUTODETECT_RESOURCE_GROUP_NAME).staticCast<Ogre::Material>();
 
 		Ogre::Pass *passBlurV = materialBlurV->getTechnique(0)->getPass(0);
-		Ogre::GpuProgramParametersSharedPtr psParamsBlurV = passBlurV->getFragmentProgramParameters();
-		psParamsBlurV->setNamedConstant("texelSize", Ogre::Vector2(1.0f / (mGraphicsSystem->getRenderWindow()->getWidth()), 1.0f / (mGraphicsSystem->getRenderWindow()->getHeight())));
-		psParamsBlurV->setNamedConstant("projectionParams", Ogre::Vector2(projectionA, projectionB));
+        Ogre::GpuProgramParametersSharedPtr psParamsBlurV = passBlurV->getFragmentProgramParameters();
+        psParamsBlurV->setNamedConstant( "projectionParams", Ogre::Vector2(projectionA, projectionB) );
 
 		//Set apply shader uniforms
 		Ogre::MaterialPtr materialApply = Ogre::MaterialManager::getSingleton().load(
