@@ -5,18 +5,18 @@ compositor_node SSAO_RenderNode
 	texture RT0 target_width target_height PF_FLOAT16_RGBA depth_texture depth_format PF_D32_FLOAT depth_pool 2
 	
 	texture depthTexture target_width target_height PF_D32_FLOAT depth_pool 2
-	texture depthTextureCopy target_width target_height PF_D32_FLOAT
+	texture depthTextureCopy target_width_scaled 0.5 target_height_scaled 0.5 PF_D32_FLOAT
 	
-	texture ssaoTexture target_width_scaled 0.5 target_height_scaled 0.5 PF_FLOAT16_R
+	texture ssaoTexture target_width_scaled 0.5 target_height_scaled 0.5 PF_FLOAT16_R depth_pool 0
 	
-	texture blurTextureHorizontal target_width target_height PF_FLOAT16_R
-	texture blurTextureVertical target_width target_height PF_FLOAT16_R
+	texture blurTextureHorizontal target_width target_height PF_FLOAT16_R depth_pool 0
+	texture blurTextureVertical target_width target_height PF_FLOAT16_R depth_pool 0
 	
 	target RT0
 	{		
 		pass clear
 		{
-			colour_value 0 0 0 1
+			colour_value 0.2 0.4 0.6 1
 		}
 		
 		pass render_scene
@@ -26,16 +26,17 @@ compositor_node SSAO_RenderNode
 		}
 	}
 	
-	
+	target depthTextureCopy
+	{
+		pass render_quad
+		{
+			material Ogre/Depth/DownscaleMax
+	    	input 0 depthTexture
+		}
+	}
+
 	target ssaoTexture
 	{
-		pass depth_copy
-		{
-			alias_on_copy_failure	on
-			in		depthTexture
-			out		depthTextureCopy
-		}
-
 		pass clear
 		{
 			colour_value 1 1 1 1
