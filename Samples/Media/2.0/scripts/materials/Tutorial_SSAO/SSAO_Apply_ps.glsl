@@ -21,5 +21,5 @@ void main()
 	vec4 col = texture(sceneTexture, inPs.uv0);
 	
 	//fragColour = vec4( ssao, ssao, ssao, 1.0 ); //Use this if you want SSAO pass only
-	fragColour = vec4( col.x*ssao, col.y*ssao, col.z*ssao, col.a );
+	fragColour = vec4( col.xyz * ssao, col.a );
 }

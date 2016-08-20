@@ -5,6 +5,7 @@
 
 #include "OgreSceneManager.h"
 #include "OgreItem.h"
+#include "OgreBitwise.h"
 
 #include "OgreMeshManager.h"
 #include "OgreMeshManager2.h"
@@ -37,13 +38,13 @@ using namespace Demo;
 namespace Demo
 {
 	Tutorial_SSAOGameState::Tutorial_SSAOGameState(const Ogre::String &helpDescription) :
-		TutorialGameState(helpDescription),
-		mAnimateObjects(true),
-		mNumSpheres(0),
-		mPowerScale(1.5f),
-		mKernelRadius(1.0f)
+        TutorialGameState( helpDescription ),
+        mAnimateObjects( true ),
+        mNumSpheres( 0 ),
+        mPowerScale( 1.5f ),
+        mKernelRadius( 1.0f )
 	{
-		memset(mSceneNode, 0, sizeof(mSceneNode));
+        memset( mSceneNode, 0, sizeof(mSceneNode) );
 	}
 	//-----------------------------------------------------------------------------------
 	void Tutorial_SSAOGameState::createScene01(void)
@@ -107,31 +108,31 @@ namespace Demo
 			const float startX = (numX - 1) / 2.0f;
 			const float startZ = (numZ - 1) / 2.0f;
 
-			for (int x = 0; x<numX; ++x)
-			{
-				for (int z = 0; z<numZ; ++z)
+            for( int x=0; x<numX; ++x )
+            {
+                for( int z=0; z<numZ; ++z )
 				{
-					Ogre::String datablockName = "Test" + Ogre::StringConverter::toString(mNumSpheres++);
-					Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-						hlmsPbs->createDatablock(datablockName,
-							datablockName,
-							Ogre::HlmsMacroblock(),
-							Ogre::HlmsBlendblock(),
-							Ogre::HlmsParamVec()));
+                    Ogre::String datablockName = "Test" + Ogre::StringConverter::toString( mNumSpheres++ );
+                    Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                                hlmsPbs->createDatablock( datablockName,
+                                                          datablockName,
+                                                          Ogre::HlmsMacroblock(),
+                                                          Ogre::HlmsBlendblock(),
+                                                          Ogre::HlmsParamVec() ) );
 
-					Ogre::HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
-						createOrRetrieveTexture("SaintPetersBasilica.dds",
-							Ogre::HlmsTextureManager::TEXTURE_TYPE_ENV_MAP);
+                    Ogre::HlmsTextureManager::TextureLocation texLocation = hlmsTextureManager->
+                            createOrRetrieveTexture( "SaintPetersBasilica.dds",
+                                                     Ogre::HlmsTextureManager::TEXTURE_TYPE_ENV_MAP );
 
-					datablock->setTexture(Ogre::PBSM_REFLECTION, texLocation.xIdx, texLocation.texture);
-					datablock->setDiffuse(Ogre::Vector3(0.0f, 1.0f, 0.0f));
+                    datablock->setTexture( Ogre::PBSM_REFLECTION, texLocation.xIdx, texLocation.texture );
+                    datablock->setDiffuse( Ogre::Vector3( 0.0f, 1.0f, 0.0f ) );
 
-					datablock->setRoughness(std::max(0.02f, x / Ogre::max(1, (float)(numX - 1))));
-					datablock->setFresnel(Ogre::Vector3(z / Ogre::max(1, (float)(numZ - 1))), false);
+                    datablock->setRoughness( std::max( 0.02f, x / Ogre::max( 1, (float)(numX-1) ) ) );
+                    datablock->setFresnel( Ogre::Vector3( z / Ogre::max( 1, (float)(numZ-1) ) ), false );
 
 					std::string meshName;
 					float meshScale = 1.0f;
-					if (x == z)
+                    if( x == z )
 					{
 						meshName = "Sphere1000.mesh";
 						meshScale = 2.0f;
@@ -142,77 +143,88 @@ namespace Demo
 						meshScale = 3.0f;
 					}
 
-					Ogre::Item *item = sceneManager->createItem(meshName,
-						Ogre::ResourceGroupManager::
-						AUTODETECT_RESOURCE_GROUP_NAME,
-						Ogre::SCENE_DYNAMIC);
-					item->setDatablock(datablock);
-					item->setVisibilityFlags(0x000000002);
+                    Ogre::Item *item = sceneManager->createItem( meshName,
+                                                                 Ogre::ResourceGroupManager::
+                                                                 AUTODETECT_RESOURCE_GROUP_NAME,
+                                                                 Ogre::SCENE_DYNAMIC );
+                    item->setDatablock( datablock );
+                    item->setVisibilityFlags( 0x000000002 );
 
-					if(x != z) item->setDatablock("Marble");
+                    if( x != z )
+                        item->setDatablock("Marble");
 
 					Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode(Ogre::SCENE_DYNAMIC)->
 						createChildSceneNode(Ogre::SCENE_DYNAMIC);
-					sceneNode->setPosition(Ogre::Vector3(armsLength * x - startX,
-						0.0f + (numZ-z)*0.5f,
-						armsLength * z - startZ));
-					sceneNode->setScale(Ogre::Vector3(meshScale, meshScale, meshScale));
-					sceneNode->attachObject(item);
+                    sceneNode->setPosition( Ogre::Vector3( armsLength * x - startX,
+                                                           0.0f + ( numZ - z ) * 0.5f,
+                                                           armsLength * z - startZ ) );
+                    sceneNode->setScale( Ogre::Vector3(meshScale) );
+                    sceneNode->attachObject( item );
 				}
 			}
 		}
 
 		Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
 
-		Ogre::Light *light = sceneManager->createLight();
-		Ogre::SceneNode *lightNode = rootNode->createChildSceneNode();
-		lightNode->attachObject(light);
-		light->setPowerScale(1.0f);
-		light->setType(Ogre::Light::LT_DIRECTIONAL);
-		light->setDirection(Ogre::Vector3(-1, -1, -1).normalisedCopy());
+        Ogre::Light *light = sceneManager->createLight();
+        Ogre::SceneNode *lightNode = rootNode->createChildSceneNode();
+        lightNode->attachObject( light );
+        light->setPowerScale( 1.0f );
+        light->setType( Ogre::Light::LT_DIRECTIONAL );
+        light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
 
-		mLightNodes[0] = lightNode;
+        mLightNodes[0] = lightNode;
 
-		sceneManager->setAmbientLight(Ogre::ColourValue(0.3f, 0.5f, 0.7f) * 0.1f * 0.75f,
-			Ogre::ColourValue(0.6f, 0.45f, 0.3f) * 0.065f * 0.75f,
-			-light->getDirection() + Ogre::Vector3::UNIT_Y * 0.2f);
+        sceneManager->setAmbientLight( Ogre::ColourValue( 0.3f, 0.5f, 0.7f ) * 0.1f * 0.75f,
+                                       Ogre::ColourValue( 0.6f, 0.45f, 0.3f ) * 0.065f * 0.75f,
+                                       -light->getDirection() + Ogre::Vector3::UNIT_Y * 0.2f );
 
-		light = sceneManager->createLight();
-		lightNode = rootNode->createChildSceneNode();
-		lightNode->attachObject(light);
-		light->setDiffuseColour(0.8f, 0.4f, 0.2f); //Warm
-		light->setSpecularColour(0.8f, 0.4f, 0.2f);
-		light->setPowerScale(Ogre::Math::PI);
-		light->setType(Ogre::Light::LT_SPOTLIGHT);
-		lightNode->setPosition(-10.0f, 10.0f, 10.0f);
-		light->setDirection(Ogre::Vector3(1, -1, -1).normalisedCopy());
-		light->setAttenuationBasedOnRadius(10.0f, 0.01f);
+        light = sceneManager->createLight();
+        lightNode = rootNode->createChildSceneNode();
+        lightNode->attachObject( light );
+        light->setDiffuseColour( 0.8f, 0.4f, 0.2f ); //Warm
+        light->setSpecularColour( 0.8f, 0.4f, 0.2f );
+        light->setPowerScale( Ogre::Math::PI );
+        light->setType( Ogre::Light::LT_SPOTLIGHT );
+        lightNode->setPosition( -10.0f, 10.0f, 10.0f );
+        light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
+        light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
-		mLightNodes[1] = lightNode;
+        mLightNodes[1] = lightNode;
 
-		light = sceneManager->createLight();
-		lightNode = rootNode->createChildSceneNode();
-		lightNode->attachObject(light);
-		light->setDiffuseColour(0.2f, 0.4f, 0.8f); //Cold
-		light->setSpecularColour(0.2f, 0.4f, 0.8f);
-		light->setPowerScale(Ogre::Math::PI);
-		light->setType(Ogre::Light::LT_SPOTLIGHT);
-		lightNode->setPosition(10.0f, 10.0f, -10.0f);
-		light->setDirection(Ogre::Vector3(-1, -1, 1).normalisedCopy());
-		light->setAttenuationBasedOnRadius(10.0f, 0.01f);
+        light = sceneManager->createLight();
+        lightNode = rootNode->createChildSceneNode();
+        lightNode->attachObject( light );
+        light->setDiffuseColour( 0.2f, 0.4f, 0.8f ); //Cold
+        light->setSpecularColour( 0.2f, 0.4f, 0.8f );
+        light->setPowerScale( Ogre::Math::PI );
+        light->setType( Ogre::Light::LT_SPOTLIGHT );
+        lightNode->setPosition( 10.0f, 10.0f, -10.0f );
+        light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
+        light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
 
 		mLightNodes[2] = lightNode;
 
-		mCameraController = new CameraController(mGraphicsSystem, false);
+        mCameraController = new CameraController( mGraphicsSystem, false );
 
 		//---------------------------------------------------------------------------------
 
 		//We need to create SSAO kernel samples and noise texture
 		//Generate kernel samples first
-		Ogre::Vector3 kernelSamples[64];
-		for (int i = 0; i < 64; i++)
+        float kernelSamples[64][4];
+        for( size_t i=0; i<64u; ++i )
 		{
-			Ogre::Vector3 sample = Ogre::Vector3(Ogre::Math::RangeRandom(-1.0f, 1.0f), Ogre::Math::RangeRandom(-1.0f, 1.0f), Ogre::Math::RangeRandom(0.0f, 1.0f));
+//            Ogre::Vector3 sample( 10, 10, 10 );
+//            while( sample.squaredLength() > 1.0f )
+//            {
+//                sample = Ogre::Vector3( Ogre::Math::RangeRandom(  -1.0f, 1.0f ),
+//                                        Ogre::Math::RangeRandom(  -1.0f, 1.0f ),
+//                                        Ogre::Math::RangeRandom(  0.01f, 1.0f ) );
+////                sample = Ogre::Vector3( Ogre::Math::RangeRandom(  -0.1f, 0.1f ),
+////                                        Ogre::Math::RangeRandom(  -0.1f, 0.1f ),
+////                                        Ogre::Math::RangeRandom(  0.5f, 1.0f ) );
+//            }
+            Ogre::Vector3 sample = Ogre::Vector3(Ogre::Math::RangeRandom(-1.0f, 1.0f), Ogre::Math::RangeRandom(-1.0f, 1.0f), Ogre::Math::RangeRandom(0.0f, 1.0f));
 
 			sample.normalise();
 
@@ -220,65 +232,47 @@ namespace Demo
 			scale = Ogre::Math::lerp(0.3f, 1.0f, scale*scale);
 			sample = sample * scale;
 
-			sample.x = (sample.x + 1.0f) * 0.5f;
-			sample.y = (sample.y + 1.0f) * 0.5f;
+            sample.normalise();
 
-			kernelSamples[i] = sample;
+            kernelSamples[i][0] = sample.x;
+            kernelSamples[i][1] = sample.y;
+            kernelSamples[i][2] = sample.z;
+            kernelSamples[i][3] = 1.0f;
 		}
-
-		//Generate sample texture
-		Ogre::TexturePtr sampleTexture = Ogre::TextureManager::getSingleton().createManual(
-			"sampleTexture",
-			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            Ogre::TEX_TYPE_2D, 8, 8, 0,
-			Ogre::PF_R8G8B8,
-            Ogre::TU_STATIC_WRITE_ONLY);
-
-		Ogre::v1::HardwarePixelBufferSharedPtr pixelBuffer = sampleTexture->getBuffer();
-		const Ogre::PixelBox& pixelBox = pixelBuffer->lock(Ogre::Box(0, 0, sampleTexture->getWidth(), sampleTexture->getHeight()), Ogre::v1::HardwareBuffer::HBL_DISCARD);
-
-		unsigned int sampleIter = 0;
-		for (size_t j = 0; j < pixelBox.getWidth(); j++)
-		{
-			for (size_t i = 0; i < pixelBox.getHeight(); i++)
-			{
-                Ogre::PixelBox pb = pixelBox;
-				pb.setColourAt(Ogre::ColourValue(kernelSamples[sampleIter].x, kernelSamples[sampleIter].y, kernelSamples[sampleIter].z, 1.0f), j, i, 0);
-				sampleIter++;
-			}
-		}
-		pixelBuffer->unlock();
 
 		//Next generate noise texture
-		Ogre::TexturePtr noiseTexture = Ogre::TextureManager::getSingleton().createManual(
-			"noiseTexture",
-			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            Ogre::TEX_TYPE_2D, 2, 2, 0,
-            Ogre::PF_R8G8B8,
-            Ogre::TU_STATIC_WRITE_ONLY );
+        Ogre::TexturePtr noiseTexture = Ogre::TextureManager::getSingleton().createManual(
+                    "noiseTexture",
+                    Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                    Ogre::TEX_TYPE_2D, 2, 2, 0,
+                    Ogre::PF_R8G8B8A8_SNORM,
+                    Ogre::TU_STATIC_WRITE_ONLY );
 
 		
-		Ogre::v1::HardwarePixelBufferSharedPtr pixelBuffer2 = noiseTexture->getBuffer();
-		const Ogre::PixelBox& pixelBox2 = pixelBuffer2->lock(Ogre::Box(0, 0, noiseTexture->getWidth(), noiseTexture->getHeight()), Ogre::v1::HardwareBuffer::HBL_DISCARD);
+        Ogre::v1::HardwarePixelBufferSharedPtr pixelBuffer = noiseTexture->getBuffer();
+        const Ogre::PixelBox& pixelBox = pixelBuffer->lock(
+                    Ogre::Box( 0, 0, noiseTexture->getWidth(), noiseTexture->getHeight() ),
+                    Ogre::v1::HardwareBuffer::HBL_DISCARD );
 
-		for (size_t j = 0; j < pixelBox2.getWidth(); j++)
+        for( size_t j=0; j<pixelBox.getWidth(); ++j )
 		{
-			for (size_t i = 0; i < pixelBox2.getHeight(); i++)
+            for( size_t i=0; i<pixelBox.getHeight(); ++i )
 			{
                 Ogre::Vector3 noise = Ogre::Vector3( Ogre::Math::RangeRandom(-1.0f, 1.0f),
                                                      Ogre::Math::RangeRandom(-1.0f, 1.0f),
                                                      0.0f );
 				noise.normalise();
 
-				//Range values to [0.0 - 1.0] we will re-range them later in shader to the orginal ones
-				noise.x = (noise.x + 1.0f) * 0.5f;
-				noise.y = (noise.y + 1.0f) * 0.5f;
-
-                Ogre::PixelBox pb = pixelBox2;
-				pb.setColourAt(Ogre::ColourValue(noise.x, noise.y, noise.z, 1.0f), j, i, 0);
+                const size_t pixelSize = Ogre::PixelUtil::getNumElemBytes( Ogre::PF_R8G8B8A8_SNORM );
+                const size_t pixelOffset = pixelSize * ( j * pixelBox.rowPitch + i );
+                Ogre::uint8 *pixelData = reinterpret_cast<Ogre::uint8*>( pixelBox.data ) + pixelOffset;
+                pixelData[0] = Ogre::Bitwise::floatToSnorm8( noise.x );
+                pixelData[1] = Ogre::Bitwise::floatToSnorm8( noise.y );
+                pixelData[2] = Ogre::Bitwise::floatToSnorm8( noise.z );
+                pixelData[3] = Ogre::Bitwise::floatToSnorm8( 1.0f );
 			}
 		}
-		pixelBuffer2->unlock();
+        pixelBuffer->unlock();
 
 		//---------------------------------------------------------------------------------
 		//Get GpuProgramParametersSharedPtr to set uniforms that we need
@@ -296,10 +290,6 @@ namespace Demo
 		Ogre::TextureUnitState* noiseTextureState = pass->getTextureUnitState("noiseTexture");
 		noiseTextureState->setTexture(noiseTexture);
 
-		//Set texture uniform for sampler
-		Ogre::TextureUnitState* sampleTextureState = pass->getTextureUnitState("sampleTexture");
-		sampleTextureState->setTexture(sampleTexture);
-
 		//Reconstruct position from depth. Position is needed in SSAO
 		//We need to set the parameters based on camera to the
 		//shader so that the un-projection works as expected
@@ -313,9 +303,12 @@ namespace Demo
 		psParams->setNamedConstant("projectionParams", Ogre::Vector2(projectionA, projectionB));
 
 		//Set other uniforms
-		psParams->setNamedConstant("kernelRadius", 0.35f);
-		psParams->setNamedConstant("noiseScale", Ogre::Vector2(((float)mGraphicsSystem->getRenderWindow()->getWidth()*0.5f)/2.0f, ((float)mGraphicsSystem->getRenderWindow()->getHeight()*0.5f)/2.0f));
-		psParams->setNamedConstant("kernelSize", 64);
+        psParams->setNamedConstant( "kernelRadius", mKernelRadius );
+        psParams->setNamedConstant( "noiseScale", Ogre::Vector2(
+                                ( mGraphicsSystem->getRenderWindow()->getWidth() * 0.5f ) / 2.0f,
+                                ( mGraphicsSystem->getRenderWindow()->getHeight() * 0.5f ) / 2.0f ) );
+        psParams->setNamedConstant( "invKernelSize", 1.0f / 64.0f );
+        psParams->setNamedConstant( "sampleDirs", (float*)kernelSamples, 64, 4 );
 
 		//Set blur shader uniforms
 		Ogre::MaterialPtr materialBlurH = Ogre::MaterialManager::getSingleton().load(
@@ -347,7 +340,7 @@ namespace Demo
 		Ogre::Pass *passApply = materialApply->getTechnique(0)->getPass(0);
 		mApplyPass = passApply;
 		Ogre::GpuProgramParametersSharedPtr psParamsApply = passApply->getFragmentProgramParameters();
-		psParamsApply->setNamedConstant("powerScale", (float)1.5f);
+        psParamsApply->setNamedConstant( "powerScale", mPowerScale );
 
 		TutorialGameState::createScene01();
 	}

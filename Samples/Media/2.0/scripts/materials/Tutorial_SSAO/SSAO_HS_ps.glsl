@@ -2,7 +2,6 @@
 
 uniform sampler2D depthTexture;
 uniform sampler2D noiseTexture;
-uniform sampler2D sampleTexture;
 
 in block
 {
@@ -12,10 +11,12 @@ in block
 
 
 uniform vec2 projectionParams;
-uniform int kernelSize;
+uniform float invKernelSize;
 uniform float kernelRadius;
 uniform vec2 noiseScale;
 uniform mat4 projection;
+
+uniform vec4 sampleDirs[64];
 
 out float fragColour;
 
@@ -35,7 +36,6 @@ vec3 reconstructNormal(vec3 posInView)
 vec3 getRandomVec(vec2 uv)
 {
 	vec3 randomVec = texture(noiseTexture, uv * noiseScale * 2.0).xyz;
-    randomVec.xy = randomVec.xy * 2.0 - 1.0;
 	return randomVec;
 }
 
@@ -54,8 +54,7 @@ void main()
     {
 		for(int a = 0; a < 8; ++a)
 		{
-			vec3 sNoise = texture(sampleTexture, vec2((1.0/8.0)*(float(i)+0.5), (1.0/8.0)*(float(a)+0.5))).xyz;
-			sNoise.xy = sNoise.xy * 2.0 - 1.0;
+			vec3 sNoise = sampleDirs[(a << 2u) + i].xyz;
          
 			// get sample position
 			vec3 sample = TBN * sNoise; // From tangent to view-space
@@ -75,7 +74,7 @@ void main()
 			
 		}      
     }
-    occlusion = 1.0 - (occlusion / float(kernelSize));
+    occlusion = 1.0 - (occlusion * invKernelSize);
    
     fragColour = occlusion;
 }

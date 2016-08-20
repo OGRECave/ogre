@@ -18,9 +18,9 @@ float4 main
 {
 	float ssao = ssaoTexture.Sample(samplerState0, inPs.uv0);
 	
-	ssao = clamp(pow(ssao, powerScale), 0.0, 1.0);
+	ssao = saturate( pow(ssao, powerScale) );
 
 	float4 col = sceneTexture.Sample(samplerState0, inPs.uv0);
 	//return float4(ssao, ssao, ssao, col.w);
-	return float4( col.x*ssao, col.y*ssao, col.z*ssao, col.w );
+	return float4( col.xyz * ssao, col.w );
 }

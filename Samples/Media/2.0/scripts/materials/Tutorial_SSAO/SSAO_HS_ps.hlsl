@@ -6,17 +6,17 @@ struct PS_INPUT
 
 Texture2D<float> depthTexture	: register(t0);
 Texture2D<float3> noiseTexture  : register(t1);
-Texture2D<float3> sampleTexture : register(t2);
 
 SamplerState samplerState0		: register(s0);
 SamplerState samplerState1		: register(s1);
-SamplerState samplerState2		: register(s2);
 
 uniform float2 projectionParams;
-uniform int kernelSize;
+uniform float invKernelSize;
 uniform float kernelRadius;
 uniform float2 noiseScale;
 uniform matrix projection;
+
+uniform float4 sampleDirs[64];
 
 
 float3 getScreenSpacePos(float2 uv, float3 cameraNormal)
@@ -35,7 +35,6 @@ float3 reconstructNormal(float3 posInView)
 float3 getNoiseVec(float2 uv)
 {
 	float3 randomVec = noiseTexture.Sample(samplerState1, uv*noiseScale).xyz;
-	randomVec.xy = randomVec.xy * 2.0 - 1.0;
 	return randomVec;
 }
 
@@ -58,8 +57,7 @@ float main
 	{
 		for (int a = 0; a < 8; ++a)
 		{
-			float3 sNoise = sampleTexture.Sample(samplerState2, float2((1.0 / 8.0)*(float(i) + 0.5), (1.0 / 8.0)*(float(a) + 0.5)));
-			sNoise.xy = sNoise.xy * 2.0 - 1.0;
+			float3 sNoise = sampleDirs[(a << 2u) + i].xyz;
 
 			// get sample position
 			float3 oSample = mul(sNoise, TBN); //to view-space
@@ -80,7 +78,7 @@ float main
 		}
 	}
 
-	occlusion = 1.0 - (occlusion / float(kernelSize));
+	occlusion = 1.0 - (occlusion * invKernelSize);
 
 	return occlusion;
 }
