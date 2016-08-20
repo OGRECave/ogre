@@ -22,7 +22,7 @@ out float fragColour;
 
 vec3 getScreenSpacePos(vec2 uv, vec3 cameraNormal)
 {
-	float fDepth = texture( depthTexture, uv*2.0).x; //multiply uv coords by 2 because we are working with half res
+	float fDepth = texture( depthTexture, uv).x;
 	float linearDepth = projectionParams.y / (fDepth - projectionParams.x);
 	return (cameraNormal * linearDepth);
 }
@@ -35,7 +35,7 @@ vec3 reconstructNormal(vec3 posInView)
 
 vec3 getRandomVec(vec2 uv)
 {
-	vec3 randomVec = texture(noiseTexture, uv * noiseScale * 2.0).xyz;
+	vec3 randomVec = texture(noiseTexture, uv * noiseScale).xyz;
 	return randomVec;
 }
 

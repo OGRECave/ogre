@@ -29,18 +29,18 @@ compositor_node SSAO_RenderNode
 	
 	target ssaoTexture
 	{
-		pass clear
-		{
-			colour_value 1 1 1 1
-		}
-		
 		pass depth_copy
 		{
 			alias_on_copy_failure	on
 			in		depthTexture
 			out		depthTextureCopy
 		}
-		
+
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+
 		pass render_quad
 		{
 			material SSAO/HS
