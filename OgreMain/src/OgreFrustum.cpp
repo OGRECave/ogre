@@ -1331,17 +1331,6 @@ namespace Ogre {
         return mOrthoHeight * mAspect;  
     }
     //---------------------------------------------------------------------
-    void Frustum::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        // Only displayed in debug
-        if (debugRenderables)
-        {
-            visitor->visit(this, 0, true);
-        }
-
-    }
-    //---------------------------------------------------------------------
     void Frustum::setFrustumExtents(Real left, Real right, Real top, Real bottom)
     {
         mFrustumExtentsManuallySet = true;

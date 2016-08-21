@@ -1434,13 +1434,6 @@ namespace v1 {
         // because most billboards are unlit, but here we go anyway
         return queryLights();
     }
-    //---------------------------------------------------------------------
-    void BillboardSet::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        // only one renderable
-        visitor->visit(this, 0, false);
-    }
 
 
     void BillboardSet::setTextureCoords( Ogre::FloatRect const * coords, uint16 numCoords )

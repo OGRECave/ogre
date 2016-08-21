@@ -90,12 +90,6 @@ namespace v1 {
         return mBox;
     }
 
-    void SimpleRenderable::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        visitor->visit(this, 0, false);
-    }
-
     SimpleRenderable::~SimpleRenderable()
     {
     }

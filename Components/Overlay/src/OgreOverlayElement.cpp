@@ -623,12 +623,6 @@ namespace v1 {
             queue->addRenderableV1( mOverlay->getRenderQueueGroup(), false, this, mOverlay );
         }
     }
-    //---------------------------------------------------------------------
-    void OverlayElement::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        visitor->visit(this, 0, false);
-    }
     //-----------------------------------------------------------------------
     void OverlayElement::addBaseParameters(void)    
     {

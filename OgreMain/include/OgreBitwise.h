@@ -417,6 +417,25 @@ namespace Ogre {
             return Ogre::max( v / 32767.0f, -1.0f );
         }
 
+        static inline int8 floatToSnorm8( float v )
+        {
+            //According to D3D10 rules, the value "-1.0f" has two representations:
+            //  0x10 and 0x11
+            //This allows everyone to convert by just multiplying by 127 instead
+            //of multiplying the negative values by 128 and 127 for positive.
+            return static_cast<int8>( Math::Clamp( v >= 0.0f ?
+                                                       (v * 127.0f + 0.5f) :
+                                                       (v * 127.0f - 0.5f),
+                                                    -128.0f,
+                                                     127.0f ) );
+        }
+
+        static inline float snorm8ToFloat( int8 v )
+        {
+            // -128 & -127 both map to -1 according to D3D10 rules.
+            return Ogre::max( v / 127.0f, -1.0f );
+        }
+
     };
     /** @} */
     /** @} */

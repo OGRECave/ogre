@@ -640,10 +640,6 @@ namespace Ogre
         virtual bool isCustomNearClipPlaneEnabled(void) const 
         { return mObliqueDepthProjection; }
 
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
-
         /// Small constant used to reduce far plane projection to avoid inaccuracies
         static const Real INFINITE_FAR_PLANE_ADJUST;
 

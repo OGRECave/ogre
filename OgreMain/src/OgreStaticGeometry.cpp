@@ -685,17 +685,6 @@ namespace v1 {
         }
         of << "-------------------------------------------------" << std::endl;
     }
-    //---------------------------------------------------------------------
-    void StaticGeometry::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        for (RegionMap::const_iterator ri = mRegionMap.begin();
-            ri != mRegionMap.end(); ++ri)
-        {
-            ri->second->visitRenderables(visitor, debugRenderables);
-        }
-
-    }
     //--------------------------------------------------------------------------
     StaticGeometry::RegionIterator StaticGeometry::getRegionIterator(void)
     {
@@ -826,16 +815,6 @@ namespace v1 {
         mCamera = lodCamera;
         mSquaredViewDepth = mParentNode->getSquaredViewDepth( lodCamera );
         mLodBucketList[mCurrentMeshLod]->addRenderables(queue, mRenderQueueID, 0);
-    }
-    //---------------------------------------------------------------------
-    void StaticGeometry::Region::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        for (LODBucketList::iterator i = mLodBucketList.begin(); i != mLodBucketList.end(); ++i)
-        {
-            (*i)->visitRenderables(visitor, debugRenderables);
-        }
-
     }
     //--------------------------------------------------------------------------
     StaticGeometry::Region::LODIterator
@@ -985,17 +964,6 @@ namespace v1 {
         of << "------------------" << std::endl;
 
     }
-    //---------------------------------------------------------------------
-    void StaticGeometry::LODBucket::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        for (MaterialBucketMap::const_iterator i = mMaterialBucketMap.begin();
-            i != mMaterialBucketMap.end(); ++i)
-        {
-            i->second->visitRenderables(visitor, debugRenderables);
-        }
-
-    }
     //--------------------------------------------------------------------------
     //--------------------------------------------------------------------------
     StaticGeometry::MaterialBucket::MaterialBucket(LODBucket* parent,
@@ -1137,17 +1105,6 @@ namespace v1 {
             (*i)->dump(of);
         }
         of << "--------------------------------------------------" << std::endl;
-
-    }
-    //---------------------------------------------------------------------
-    void StaticGeometry::MaterialBucket::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        for (GeometryBucketList::const_iterator i = mGeometryBucketList.begin();
-            i != mGeometryBucketList.end(); ++i)
-        {
-            visitor->visit(*i, mParent->getLod(), false);
-        }
 
     }
     //--------------------------------------------------------------------------

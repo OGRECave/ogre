@@ -526,7 +526,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::createDelayedImmutableBuffers(void)
     {
-        size_t totalBytes = 0;
+        bool immutableBuffersCreated = false;
 
         for( size_t i=0; i<NumInternalBufferTypes; ++i )
         {
@@ -541,15 +541,22 @@ namespace Ogre
                 BufferPackedVec::const_iterator itor = start;
                 BufferPackedVec::const_iterator end  = mDelayedBuffers[i].end();
 
+                size_t totalBytes = (*itor)->getTotalSizeBytes();
+                ++itor;
+
                 while( itor != end )
                 {
-                    totalBytes = alignToNextMultiple( totalBytes, (*itor)->getBytesPerElement() );
-                    totalBytes += (*itor)->getTotalSizeBytes();
-
                     if( totalBytes + (*itor)->getTotalSizeBytes() > mDefaultPoolSize[i][BT_IMMUTABLE] )
-                        end = itor + 1;
+                    {
+                        end = itor;
+                    }
+                    else
+                    {
+                        totalBytes = alignToNextMultiple( totalBytes, (*itor)->getBytesPerElement() );
+                        totalBytes += (*itor)->getTotalSizeBytes();
 
-                    ++itor;
+                        ++itor;
+                    }
                 }
 
                 uint8 *mergedData = reinterpret_cast<uint8*>(OGRE_MALLOC_SIMD( totalBytes,
@@ -584,9 +591,6 @@ namespace Ogre
 
                     dstOffset += (*itor)->getTotalSizeBytes();
 
-                    if( totalBytes + (*itor)->getTotalSizeBytes() > mDefaultPoolSize[i][BT_IMMUTABLE] )
-                        end = itor + 1;
-
                     ++itor;
                 }
 
@@ -617,12 +621,13 @@ namespace Ogre
                 mergedData = 0;
 
                 start = end;
+                immutableBuffersCreated = true;
             }
         }
 
         //We've populated the Vertex & Index buffers with their GPU/API pointers. Now we need
         //to update the Vaos' internal structures that cache these GPU/API pointers.
-        if( totalBytes )
+        if( immutableBuffersCreated )
             reorganizeImmutableVaos();
 
         for( size_t i=0; i<NumInternalBufferTypes; ++i )
