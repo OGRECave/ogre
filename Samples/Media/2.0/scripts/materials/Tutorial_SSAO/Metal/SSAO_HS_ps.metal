@@ -13,12 +13,12 @@ struct Params
 	float invKernelSize;
 	float kernelRadius;
 	float2 noiseScale;
-	matrix projection;
+	float4x4 projection;
 
 	float4 sampleDirs[64];
 };
 
-inline float3 getScreenSpacePos( float2 uv, float3 cameraNormal, const Params &p,
+inline float3 getScreenSpacePos( float2 uv, float3 cameraNormal, constant const Params &p,
 								 texture2d<float> depthTexture, sampler samplerState0 )
 {
 	float fDepth = depthTexture.sample(samplerState0, uv).x;
@@ -29,10 +29,10 @@ inline float3 getScreenSpacePos( float2 uv, float3 cameraNormal, const Params &p
 
 inline float3 reconstructNormal( float3 posInView )
 {
-	return cross( normalize( ddy(posInView) ), normalize( ddx(posInView) ) );
+	return cross( normalize( dfdy(posInView) ), normalize( dfdx(posInView) ) );
 }
 
-inline float3 getNoiseVec( float2 uv, const Params &p,
+inline float3 getNoiseVec( float2 uv, constant const Params &p,
 						   texture2d<float> noiseTexture, sampler samplerState1 )
 {
 	float3 randomVec = noiseTexture.sample( samplerState1, uv * p.noiseScale ).xyz;
@@ -52,7 +52,7 @@ fragment float main_metal
 	constant Params &p					[[buffer(PARAMETER_SLOT)]]
 )
 {
-	float3 viewPosition = getScreenSpacePos( inPs.uv0, inPs.cameraDir, depthTexture, samplerState0 );
+	float3 viewPosition = getScreenSpacePos( inPs.uv0, inPs.cameraDir, p, depthTexture, samplerState0 );
 	float3 viewNormal = reconstructNormal( viewPosition );
 	float3 randomVec = getNoiseVec( inPs.uv0, p, noiseTexture, samplerState1 );
 
@@ -69,7 +69,7 @@ fragment float main_metal
 			float3 sNoise = p.sampleDirs[(a << 2u) + i].xyz;
 
 			// get sample position
-			float3 oSample = sNoise * TBN; //to view-space
+			float3 oSample = TBN * sNoise; //to view-space
 			oSample = viewPosition + oSample * p.kernelRadius;
 
 			// project sample position to get UV coords
@@ -79,8 +79,8 @@ fragment float main_metal
 			offset.xy = offset.xy * 0.5 + float2(0.5, 0.5); // transform to range [0-1]
 			offset.y = 1.0 - offset.y;
 
-			float sampleDepth = getScreenSpacePos( offset.xy, inPs.cameraDir,
-												  depthTexture, samplerState0 ).z;
+			float sampleDepth = getScreenSpacePos( offset.xy, inPs.cameraDir, p,
+												   depthTexture, samplerState0 ).z;
 
 			// range check and occlusion
 			float rangeCheck = smoothstep( 0.0, 1.0, p.kernelRadius /

@@ -8,7 +8,7 @@ struct PS_INPUT
 
 struct PS_OUTPUT
 {
-	float depth [[depth]];
+	float depth [[depth(any)]];
 };
 
 fragment PS_OUTPUT main_metal
@@ -20,10 +20,11 @@ fragment PS_OUTPUT main_metal
 	float4 gl_FragCoord [[position]]
 )
 {
-	float fDepth0 = depthTexture.read( uint2(gl_FragCoord.xy * 2.0) ).x;
-	float fDepth1 = depthTexture.read( uint2(gl_FragCoord.xy * 2.0) + uint2( 0, 1 ) ).x;
-	float fDepth2 = depthTexture.read( uint2(gl_FragCoord.xy * 2.0) + uint2( 1, 0 ) ).x;
-	float fDepth3 = depthTexture.read( uint2(gl_FragCoord.xy * 2.0) + uint2( 1, 1 ) ).x;
+	uint2 iFragCoord = (uint2)(gl_FragCoord.xy * 2.0);
+	float fDepth0 = depthTexture.read( iFragCoord );
+	float fDepth1 = depthTexture.read( iFragCoord + uint2( 0, 1 ) );
+	float fDepth2 = depthTexture.read( iFragCoord + uint2( 1, 0 ) );
+	float fDepth3 = depthTexture.read( iFragCoord + uint2( 1, 1 ) );
 	
 	PS_OUTPUT outPs;
 	//outPs.depth =depthTexture.read( uint2(gl_FragCoord.xy * 2.0) ).x;

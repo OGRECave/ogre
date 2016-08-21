@@ -14,7 +14,7 @@ struct Params
 
 constant constexpr float offsets[9] = { -8.0, -6.0, -4.0, -2.0, 0.0, 2.0, 4.0, 6.0, 8.0 };
 
-inline float getLinearDepth( float2 uv, const Params &p,
+inline float getLinearDepth( float2 uv, constant const Params &p,
 							 texture2d<float> depthTexture, sampler samplerState )
 {
 	float fDepth = depthTexture.sample( samplerState, uv ).x;

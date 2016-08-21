@@ -6,7 +6,7 @@ struct PS_INPUT
 	float2 uv0;
 };
 
-fragment float main_metal
+fragment float4 main_metal
 (
 	PS_INPUT inPs [[stage_in]],
 
@@ -18,10 +18,10 @@ fragment float main_metal
 	constant float &powerScale			[[buffer(PARAMETER_SLOT)]]
 )
 {
-	float ssao = ssaoTexture.sample( samplerState, inPs.uv0 );
+	float ssao = ssaoTexture.sample( samplerState, inPs.uv0 ).x;
 	
 	ssao = saturate( pow(ssao, powerScale) );
 
-	float4 col = sceneTexture.Sample( samplerState, inPs.uv0 );
+	float4 col = sceneTexture.sample( samplerState, inPs.uv0 ).xyzw;
 	return float4( col.xyz * ssao, col.w );
 }
