@@ -31,11 +31,23 @@ fragment_program SSAO_HS_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
+// Metal shaders
+vertex_program SSAO_HS_vs_Metal metal
+{
+	source SSAO_HS_vs.metal
+}
+
+fragment_program SSAO_HS_ps_Metal metal
+{
+	source SSAO_HS_ps.metal
+}
+
 // Unified definitions
 vertex_program SSAO_HS_vs unified
 {
-	delegate SSAO_HS_vs_HLSL
 	delegate SSAO_HS_vs_GLSL
+	delegate SSAO_HS_vs_HLSL
+	delegate SSAO_HS_vs_Metal
 	
 	default_params
     {
@@ -45,8 +57,9 @@ vertex_program SSAO_HS_vs unified
 
 fragment_program SSAO_HS_ps unified
 {
-	delegate SSAO_HS_ps_HLSL
 	delegate SSAO_HS_ps_GLSL
+	delegate SSAO_HS_ps_HLSL
+	delegate SSAO_HS_ps_Metal
 }
 
 // Material definition
@@ -80,13 +93,6 @@ material SSAO/HS
 				filtering			none
 				tex_address_mode	wrap
 			}
-			
-			texture_unit sampleTexture
-			{
-				filtering			none
-				tex_address_mode	clamp
-			}
-			
 		}
 	}
 }
@@ -111,11 +117,17 @@ fragment_program SSAO_BlurH_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
+// Metal shaders
+fragment_program SSAO_BlurH_ps_Metal metal
+{
+	source SSAO_BlurH_ps.metal
+}
 
 fragment_program SSAO_BlurH_ps unified
 {
-	delegate SSAO_BlurH_ps_HLSL
 	delegate SSAO_BlurH_ps_GLSL
+	delegate SSAO_BlurH_ps_HLSL
+	delegate SSAO_BlurH_ps_Metal
 
 	default_params
 	{
@@ -180,11 +192,17 @@ fragment_program SSAO_BlurV_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
+// Metal shaders
+fragment_program SSAO_BlurV_ps_Metal metal
+{
+	source SSAO_BlurV_ps.metal
+}
 
 fragment_program SSAO_BlurV_ps unified
 {
-	delegate SSAO_BlurV_ps_HLSL
 	delegate SSAO_BlurV_ps_GLSL
+	delegate SSAO_BlurV_ps_HLSL
+	delegate SSAO_BlurV_ps_Metal
 
 	default_params
 	{
@@ -248,11 +266,17 @@ fragment_program SSAO_Apply_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
+// Metal shaders
+fragment_program SSAO_Apply_ps_Metal metal
+{
+	source SSAO_Apply_ps.metal
+}
 
 fragment_program SSAO_Apply_ps unified
 {
-	delegate SSAO_Apply_ps_HLSL
 	delegate SSAO_Apply_ps_GLSL
+	delegate SSAO_Apply_ps_HLSL
+	delegate SSAO_Apply_ps_Metal
 }
 
 // Material definition
@@ -284,59 +308,6 @@ material SSAO/Apply
 			texture_unit sceneTexture
 			{
 				filtering			none
-				tex_address_mode	clamp
-			}
-			
-		}
-	}
-}
-
-fragment_program DepthDownscaleMax_ps_GLSL glsl
-{
-	source DepthDownscaleMax_ps.glsl
-	default_params
-	{
-		param_named depthTexture int 0
-	}
-}
-
-fragment_program DepthDownscaleMax_ps_HLSL hlsl
-{
-	source DepthDownscaleMax_ps.hlsl
-	entry_point main
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-}
-
-fragment_program DepthDownscaleMax_ps unified
-{
-	delegate DepthDownscaleMax_ps_GLSL
-	delegate DepthDownscaleMax_ps_HLSL
-}
-
-material SSAO/DepthDownscaleMax
-{
-	technique
-	{
-		pass
-		{
-			depth_check on
-			depth_write on
-			
-			depth_func always_pass
-
-			cull_hardware none
-
-			vertex_program_ref Ogre/Compositor/Quad_vs
-			{
-			}
-
-			fragment_program_ref DepthDownscaleMax_ps
-			{
-			}
-
-			texture_unit ssaoTexture
-			{
-				filtering			point
 				tex_address_mode	clamp
 			}
 		}
