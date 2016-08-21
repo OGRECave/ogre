@@ -15,10 +15,16 @@ fragment_program Ogre/Depth/DownscaleMax_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
+fragment_program Ogre/Depth/DownscaleMax_ps_Metal metal
+{
+	source DepthDownscaleMax_ps.metal
+}
+
 fragment_program Ogre/Depth/DownscaleMax_ps unified
 {
-	delegate DepthDownscaleMax_ps_GLSL
-	delegate DepthDownscaleMax_ps_HLSL
+	delegate Ogre/Depth/DownscaleMax_ps_GLSL
+	delegate Ogre/Depth/DownscaleMax_ps_HLSL
+	delegate Ogre/Depth/DownscaleMax_ps_Metal
 }
 
 // Downscales resolution of input depth texture by half (w/2 x h/2)

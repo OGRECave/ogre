@@ -80,13 +80,6 @@ material SSAO/HS
 				filtering			none
 				tex_address_mode	wrap
 			}
-			
-			texture_unit sampleTexture
-			{
-				filtering			none
-				tex_address_mode	clamp
-			}
-			
 		}
 	}
 }
@@ -284,59 +277,6 @@ material SSAO/Apply
 			texture_unit sceneTexture
 			{
 				filtering			none
-				tex_address_mode	clamp
-			}
-			
-		}
-	}
-}
-
-fragment_program DepthDownscaleMax_ps_GLSL glsl
-{
-	source DepthDownscaleMax_ps.glsl
-	default_params
-	{
-		param_named depthTexture int 0
-	}
-}
-
-fragment_program DepthDownscaleMax_ps_HLSL hlsl
-{
-	source DepthDownscaleMax_ps.hlsl
-	entry_point main
-	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
-}
-
-fragment_program DepthDownscaleMax_ps unified
-{
-	delegate DepthDownscaleMax_ps_GLSL
-	delegate DepthDownscaleMax_ps_HLSL
-}
-
-material SSAO/DepthDownscaleMax
-{
-	technique
-	{
-		pass
-		{
-			depth_check on
-			depth_write on
-			
-			depth_func always_pass
-
-			cull_hardware none
-
-			vertex_program_ref Ogre/Compositor/Quad_vs
-			{
-			}
-
-			fragment_program_ref DepthDownscaleMax_ps
-			{
-			}
-
-			texture_unit ssaoTexture
-			{
-				filtering			point
 				tex_address_mode	clamp
 			}
 		}

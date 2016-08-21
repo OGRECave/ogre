@@ -2,8 +2,8 @@
 
 uniform sampler2D depthTexture;
 
-vec4 gl_FragCoord;
-out float gl_FragDepth;
+in vec4 gl_FragCoord;
+//out float gl_FragDepth;
 
 void main()
 {
