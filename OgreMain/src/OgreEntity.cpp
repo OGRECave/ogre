@@ -2043,29 +2043,6 @@ namespace v1 {
         }
 
     }
-    //---------------------------------------------------------------------
-    void Entity::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        // Visit each SubEntity
-        for (SubEntityList::iterator i = mSubEntityList.begin(); i != mSubEntityList.end(); ++i)
-        {
-            visitor->visit( &(*i), 0, false);
-        }
-        // if manual LOD is in use, visit those too
-        ushort lodi = 1;
-        for (LODEntityList::iterator e = mLodEntityList.begin(); 
-            e != mLodEntityList.end(); ++e, ++lodi)
-        {
-            
-            size_t nsub = (*e)->getNumSubEntities();
-            for (size_t s = 0; s < nsub; ++s)
-            {
-                visitor->visit((*e)->getSubEntity(s), lodi, false);
-            }
-        }
-
-    }
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     String EntityFactory::FACTORY_TYPE_NAME = "Entity";

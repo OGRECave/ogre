@@ -18,6 +18,10 @@ layout(std140) uniform;
 in vec4 gl_FragCoord;
 @end
 
+@property( two_sided_lighting )
+@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
+@end
+
 // START UNIFORM DECLARATION
 @property( !hlms_shadowcaster || alpha_test )
 	@property( !hlms_shadowcaster )
@@ -293,10 +297,10 @@ void main()
 
 @property( !normal_map )
 	// Geometric normal
-	nNormal = normalize( inPs.normal );
+	nNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
 @end @property( normal_map )
 	//Normal mapping.
-	vec3 geomNormal = normalize( inPs.normal );
+	vec3 geomNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
 	vec3 vTangent = normalize( inPs.tangent );
 
 	//Get the TBN matrix

@@ -1,0 +1,54 @@
+
+fragment_program Ogre/Depth/DownscaleMax_ps_GLSL glsl
+{
+	source DepthDownscaleMax_ps.glsl
+	default_params
+	{
+		param_named depthTexture int 0
+	}
+}
+
+fragment_program Ogre/Depth/DownscaleMax_ps_HLSL hlsl
+{
+	source DepthDownscaleMax_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program Ogre/Depth/DownscaleMax_ps unified
+{
+	delegate DepthDownscaleMax_ps_GLSL
+	delegate DepthDownscaleMax_ps_HLSL
+}
+
+// Downscales resolution of input depth texture by half (w/2 x h/2)
+// using a max filter (max depth of all 4 neighbours)
+material Ogre/Depth/DownscaleMax
+{
+	technique
+	{
+		pass
+		{
+			depth_check on
+			depth_write on
+			
+			depth_func always_pass
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Ogre/Depth/DownscaleMax_ps
+			{
+			}
+
+			texture_unit depthTexture
+			{
+				filtering			point
+				tex_address_mode	clamp
+			}
+		}
+	}
+}

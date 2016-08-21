@@ -29,6 +29,7 @@ compositor_node SceneRenderingNode
 		{
 			// Clear distortion texture to default values. R and G are representing distortion vectors along X and Y axis. A is controlling distortion strenght.
 			colour_value 0.5 0.5 0 0
+			buffers	colour
 		}
 		
 		//Render distortion to its own texture with render queue id 6
@@ -55,7 +56,7 @@ compositor_node DistortionNode
 	{
 		pass clear
 		{
-			colour_value 1 1 1 1
+			discard_only	true
 		}
 
 		pass render_quad

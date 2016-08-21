@@ -50,8 +50,7 @@ namespace Ogre
         mHlmsGlobalIndex( ~0 ),
         mPolygonModeOverrideable( true ),
         mUseIdentityProjection( false ),
-        mUseIdentityView( false ),
-        mRenderSystemData( NULL )
+        mUseIdentityView( false )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -61,12 +60,6 @@ namespace Ogre
         {
             mHlmsDatablock->_unlinkRenderable( this );
             mHlmsDatablock = 0;
-        }
-
-        if (mRenderSystemData)
-        {
-            delete mRenderSystemData;
-            mRenderSystemData = NULL;
         }
     }
     //-----------------------------------------------------------------------------------

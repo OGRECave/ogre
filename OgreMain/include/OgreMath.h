@@ -729,7 +729,7 @@ namespace Ogre
         /// Returns Least Common Multiple
         static size_t lcm( size_t a, size_t b )
         {
-            return a * b / gcd( a, b );
+            return ( a / gcd( a, b ) ) * b;
         }
 
 

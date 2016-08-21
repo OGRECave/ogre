@@ -175,9 +175,6 @@ namespace v1 {
 
         /** @copydoc OverlayContainer::_updateRenderQueue */
         void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
-        /// @copydoc OverlayElement::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
 
         /** @copydoc OverlayElement::setMetricsMode */
         void setMetricsMode(GuiMetricsMode gmm);

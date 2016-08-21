@@ -298,7 +298,6 @@ namespace v1 {
             Technique* getCurrentTechnique(void) const { return mTechnique; }
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;
-            void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
         };
         /** A LODBucket is a collection of smaller buckets with the same LOD. 
         @remarks
@@ -347,7 +346,6 @@ namespace v1 {
             size_t getNumMaterials(void) const          { return mMaterialBucketMap.size(); }
             /// Dump contents for diagnostics
             void dump(std::ofstream& of) const;
-            void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables);
             EdgeData* getEdgeList() const { return mEdgeList; }
             bool isVertexProgramInUse() const { return mVertexProgramInUse; }
             
@@ -409,9 +407,6 @@ namespace v1 {
             const Vector3& getCentre(void) const { return mCentre; }
             const String& getMovableType(void) const;
             void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
-            /// @copydoc MovableObject::visitRenderables
-            void visitRenderables(Renderable::Visitor* visitor, 
-                bool debugRenderables = false);
             uint32 getTypeFlags(void) const;
 
             typedef VectorIterator<LODBucketList> LODIterator;
@@ -709,9 +704,6 @@ namespace v1 {
 
         /** Gets the queue group for this entity, see setRenderQueueGroup for full details. */
         virtual uint8 getRenderQueueGroup(void) const;
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
         
         /// Iterator for iterating over contained regions
         typedef MapIterator<RegionMap> RegionIterator;

@@ -434,11 +434,6 @@ namespace v1
 
         typedef vector<ManualObjectSection*>::type SectionList;
 
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
-        
-        
     protected:
         /// Dynamic?
         bool mDynamic;

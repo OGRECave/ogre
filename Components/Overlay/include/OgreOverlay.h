@@ -105,10 +105,6 @@ namespace v1 {
         /** Returns the type name of this object. */
         virtual const String& getMovableType(void) const;
 
-        virtual void visitRenderables( Renderable::Visitor* visitor,
-                                       bool debugRenderables = false ) {}
-
-
         OverlayContainer* getChild(const String& name);
         
         /** Alters the Z-order of this overlay. 

@@ -1,0 +1,344 @@
+
+// GLSL shaders
+vertex_program SSAO_HS_vs_GLSL glsl
+{
+	source SSAO_HS_vs.glsl
+}
+
+fragment_program SSAO_HS_ps_GLSL glsl
+{
+	source SSAO_HS_ps.glsl
+	default_params
+	{
+		param_named depthTexture int 0
+		param_named noiseTexture int 1
+		param_named sampleTexture int 2
+	}
+}
+
+// HLSL shaders
+vertex_program SSAO_HS_vs_HLSL hlsl
+{
+    source SSAO_HS_vs.hlsl
+    entry_point main
+    target vs_5_0 vs_4_0 vs_4_0_level_9_1 vs_4_0_level_9_3
+}
+
+fragment_program SSAO_HS_ps_HLSL hlsl
+{
+	source SSAO_HS_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+// Unified definitions
+vertex_program SSAO_HS_vs unified
+{
+	delegate SSAO_HS_vs_HLSL
+	delegate SSAO_HS_vs_GLSL
+	
+	default_params
+    {
+        param_named_auto worldViewProj worldviewproj_matrix
+    }
+}
+
+fragment_program SSAO_HS_ps unified
+{
+	delegate SSAO_HS_ps_HLSL
+	delegate SSAO_HS_ps_GLSL
+}
+
+// Material definition
+material SSAO/HS
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref SSAO_HS_vs
+			{
+			}
+
+			fragment_program_ref SSAO_HS_ps
+			{
+			}
+
+			texture_unit depthTexture
+			{
+				filtering			bilinear
+				tex_address_mode	clamp
+			}
+			
+			texture_unit noiseTexture
+			{
+				filtering			none
+				tex_address_mode	wrap
+			}
+			
+			texture_unit sampleTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+			
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// GLSL shaders
+fragment_program SSAO_BlurH_ps_GLSL glsl
+{
+	source SSAO_BlurH_ps.glsl
+	default_params
+	{
+		param_named ssaoTexture int 0
+		param_named depthTexture int 1
+	}
+}
+
+// HLSL shaders
+fragment_program SSAO_BlurH_ps_HLSL hlsl
+{
+	source SSAO_BlurH_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+
+fragment_program SSAO_BlurH_ps unified
+{
+	delegate SSAO_BlurH_ps_HLSL
+	delegate SSAO_BlurH_ps_GLSL
+
+	default_params
+	{
+		param_named_auto texelSize	viewport_size
+	}
+}
+
+// Material definition
+material SSAO/BlurH
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref SSAO_BlurH_ps
+			{
+			}
+
+			texture_unit ssaoTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+			
+			texture_unit depthTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+			
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+// GLSL shaders
+fragment_program SSAO_BlurV_ps_GLSL glsl
+{
+	source SSAO_BlurV_ps.glsl
+	default_params
+	{
+		param_named ssaoTexture int 0
+		param_named depthTexture int 1
+	}
+}
+
+// HLSL shaders
+fragment_program SSAO_BlurV_ps_HLSL hlsl
+{
+	source SSAO_BlurV_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+
+fragment_program SSAO_BlurV_ps unified
+{
+	delegate SSAO_BlurV_ps_HLSL
+	delegate SSAO_BlurV_ps_GLSL
+
+	default_params
+	{
+		param_named_auto texelSize	viewport_size
+	}
+}
+
+// Material definition
+material SSAO/BlurV
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref SSAO_BlurV_ps
+			{
+			}
+
+			texture_unit ssaoTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+			
+			texture_unit depthTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+			
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// GLSL shaders
+fragment_program SSAO_Apply_ps_GLSL glsl
+{
+	source SSAO_Apply_ps.glsl
+	default_params
+	{
+		param_named ssaoTexture int 0
+		param_named sceneTexture int 1
+	}
+}
+
+// HLSL shaders
+fragment_program SSAO_Apply_ps_HLSL hlsl
+{
+	source SSAO_Apply_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+
+fragment_program SSAO_Apply_ps unified
+{
+	delegate SSAO_Apply_ps_HLSL
+	delegate SSAO_Apply_ps_GLSL
+}
+
+// Material definition
+material SSAO/Apply
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref SSAO_Apply_ps
+			{
+			}
+
+			texture_unit ssaoTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+			
+			texture_unit sceneTexture
+			{
+				filtering			none
+				tex_address_mode	clamp
+			}
+			
+		}
+	}
+}
+
+fragment_program DepthDownscaleMax_ps_GLSL glsl
+{
+	source DepthDownscaleMax_ps.glsl
+	default_params
+	{
+		param_named depthTexture int 0
+	}
+}
+
+fragment_program DepthDownscaleMax_ps_HLSL hlsl
+{
+	source DepthDownscaleMax_ps.hlsl
+	entry_point main
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+}
+
+fragment_program DepthDownscaleMax_ps unified
+{
+	delegate DepthDownscaleMax_ps_GLSL
+	delegate DepthDownscaleMax_ps_HLSL
+}
+
+material SSAO/DepthDownscaleMax
+{
+	technique
+	{
+		pass
+		{
+			depth_check on
+			depth_write on
+			
+			depth_func always_pass
+
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref DepthDownscaleMax_ps
+			{
+			}
+
+			texture_unit ssaoTexture
+			{
+				filtering			point
+				tex_address_mode	clamp
+			}
+		}
+	}
+}

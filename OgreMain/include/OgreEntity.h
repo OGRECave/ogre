@@ -682,10 +682,6 @@ namespace v1 {
         /** Tear down the internal structures of this Entity, rendering it uninitialised. */
         void _deinitialise(void);
 
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
-
         /** Entity's skeleton's AnimationState will not be automatically updated when set to true.
             Useful if you wish to handle AnimationState updates manually.
         */

@@ -172,12 +172,6 @@ namespace v1 {
         outRenderables.clear();
         outRenderables.push_back( mBillboardSet );
     }
-    //---------------------------------------------------------------------
-    void BillboardParticleRenderer::visitRenderables(Renderable::Visitor* visitor, 
-        bool debugRenderables)
-    {
-        mBillboardSet->visitRenderables(visitor, debugRenderables);
-    }
     //-----------------------------------------------------------------------
     void BillboardParticleRenderer::_setDatablock( HlmsDatablock *datablock )
     {

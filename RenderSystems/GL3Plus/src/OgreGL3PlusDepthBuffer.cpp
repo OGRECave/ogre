@@ -246,6 +246,9 @@ namespace Ogre
     {
         GL3PlusDepthBuffer *destination = static_cast<GL3PlusDepthBuffer*>( _destination );
 
+        //Viewport state gets affected.
+        mRenderSystem->_setViewport( 0 );
+
         // Store old binding so it can be restored later
         GLint oldfb, oldDrawBuffer;
         OCGE( glGetIntegerv( GL_FRAMEBUFFER_BINDING, &oldfb ) );

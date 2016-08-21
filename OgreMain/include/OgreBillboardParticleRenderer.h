@@ -205,9 +205,6 @@ namespace v1 {
         void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera,
             list<Particle*>::type& currentParticles, bool cullIndividually,
             RenderableArray &outRenderables );
-        /// @copydoc ParticleSystemRenderer::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
         /// @copydoc ParticleSystemRenderer::_setDatablock
         virtual void _setDatablock( HlmsDatablock *datablock );
         /// @copydoc ParticleSystemRenderer::_setMaterialName

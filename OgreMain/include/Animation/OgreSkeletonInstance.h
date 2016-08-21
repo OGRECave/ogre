@@ -119,7 +119,7 @@ namespace Ogre
         void resetToPose(void);
 
         /** Sets the given node to manual. Manual bones won't be reset to binding pose
-            (@see resetToPose) and thus are suitable for manual control. However if the
+            (see resetToPose) and thus are suitable for manual control. However if the
             bone is animated, you're responsible for resetting the position/rotation/scale
             before each call to @see update
         @remarks

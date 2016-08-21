@@ -325,10 +325,6 @@ namespace v1 {
         /** Internal method to put the contents onto the render queue. */
         virtual void _updateRenderQueue(RenderQueue* queue, Camera *camera, const Camera *lodCamera);
 
-        /// @copydoc MovableObject::visitRenderables
-        void visitRenderables(Renderable::Visitor* visitor, 
-            bool debugRenderables = false);
-
         /** Gets the type name of the element. All concrete subclasses must implement this. */
         virtual const String& getTypeName(void) const = 0;
 

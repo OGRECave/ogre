@@ -67,13 +67,6 @@ namespace Ogre {
     class _OgreExport Renderable
     {
     public:
-        /** An internal class that should be used only by a render system for internal use 
-        @remarks
-            This class was created so a render system can associate internal data to this class.
-            The need for this class started when the DX10 render system needed to save state objects.
-        */
-        class RenderSystemData {}; 
-    public:
         Renderable();
 
         /** Virtual destructor needed as class has virtual methods. */
@@ -375,55 +368,6 @@ namespace Ogre {
         */
         const UserObjectBindings& getUserObjectBindings() const { return mUserObjectBindings; }
 
-
-        /** Visitor object that can be used to iterate over a collection of Renderable
-            instances abstractly.
-        @remarks
-            Different scene objects use Renderable differently; some will have a 
-            single Renderable, others will have many. This visitor interface allows
-            classes using Renderable to expose a clean way for external code to
-            get access to the contained Renderable instance(s) that it will
-            eventually add to the render queue.
-        @par
-            To actually have this method called, you have to call a method on the
-            class containing the Renderable instances. One example is 
-            MovableObject::visitRenderables.
-        */
-        class Visitor
-        {
-        public:
-            /** Virtual destructor needed as class has virtual methods. */
-            virtual ~Visitor() { }
-            /** Generic visitor method. 
-            @param rend The Renderable instance being visited
-            @param lodIndex The LOD index to which this Renderable belongs. Some
-                objects support LOD and this will tell you whether the Renderable
-                you're looking at is from the top LOD (0) or otherwise
-            @param isDebug Whether this is a debug renderable or not.
-            @param pAny Optional pointer to some additional data that the class
-                calling the visitor may populate if it chooses to.
-            */
-            virtual void visit(Renderable* rend, ushort lodIndex, bool isDebug, 
-                Any* pAny = 0) = 0;
-        };
-
-        /** Gets RenderSystem private data
-        @remarks
-            This should only be used by a RenderSystem
-        */
-        virtual RenderSystemData * getRenderSystemData() const 
-        { 
-            return mRenderSystemData; 
-        }
-        /** Sets RenderSystem private data
-        @remarks
-            This should only be used by a RenderSystem
-        */
-        virtual void setRenderSystemData(RenderSystemData * val) const
-        { 
-            mRenderSystemData = val; 
-        }
-
         const VertexArrayObjectArray& getVaos( VertexPass vertexPass ) const
                                                 { return mVaoPerLod[vertexPass]; }
 
@@ -500,7 +444,6 @@ namespace Ogre {
         bool mUseIdentityProjection;
         bool mUseIdentityView;
         UserObjectBindings mUserObjectBindings;      /// User objects binding.
-        mutable RenderSystemData * mRenderSystemData;/// This should be used only by a render system for internal use
     };
 
     class _OgreExport RenderableAnimated : public Renderable

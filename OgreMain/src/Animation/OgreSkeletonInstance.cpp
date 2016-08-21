@@ -290,9 +290,19 @@ namespace Ogre
         uint32 depthLevel = bone->getDepthLevel();
         Bone &firstBone = mBones[mDefinition->getDepthLevelInfo()[depthLevel].firstBoneIndex];
 
-        uintptr_t diff = bone->_getTransform().mOwner - firstBone._getTransform().mOwner;
+        const BoneTransform &boneTransf      = bone->_getTransform();
+        const BoneTransform &firstBoneTransf = firstBone._getTransform();
+
+        //Get bone offset relative to the beginning of its depth level.
+        uintptr_t diff = (boneTransf.mOwner - firstBoneTransf.mOwner) + boneTransf.mIndex;
+        //Offset by all past bones from parent levels.
+        diff += mDefinition->getNumberOfBoneBlocks( depthLevel ) * ARRAY_PACKED_REALS;
+
+        assert( diff < mManualBones.size() * ARRAY_PACKED_REALS &&
+                "Offset incorrectly calculated. manualBones[diff] will overflow!" );
+
         Real *manualBones = reinterpret_cast<Real*>( mManualBones.get() );
-        manualBones[diff] = isManual ? 1.0f : 0.0f;
+        manualBones[diff] = isManual ? 0.0f : 1.0f;
     }
     //-----------------------------------------------------------------------------------
     bool SkeletonInstance::isManualBone( Bone *bone )
@@ -302,9 +312,19 @@ namespace Ogre
         uint32 depthLevel = bone->getDepthLevel();
         Bone &firstBone = mBones[mDefinition->getDepthLevelInfo()[depthLevel].firstBoneIndex];
 
-        uintptr_t diff = bone->_getTransform().mOwner - firstBone._getTransform().mOwner;
+        const BoneTransform &boneTransf      = bone->_getTransform();
+        const BoneTransform &firstBoneTransf = firstBone._getTransform();
+
+        //Get bone offset relative to the beginning of its depth level.
+        uintptr_t diff = (boneTransf.mOwner - firstBoneTransf.mOwner) + boneTransf.mIndex;
+        //Offset by all past bones from parent levels.
+        diff += mDefinition->getNumberOfBoneBlocks( depthLevel ) * ARRAY_PACKED_REALS;
+
+        assert( diff < mManualBones.size() * ARRAY_PACKED_REALS &&
+                "Offset incorrectly calculated. manualBones[diff] will overflow!" );
+
         const Real *manualBones = reinterpret_cast<const Real*>( mManualBones.get() );
-        return manualBones[diff] != 0.0f;
+        return manualBones[diff] == 0.0f;
     }
     //-----------------------------------------------------------------------------------
     void SkeletonInstance::setSceneNodeAsParentOfBone( Bone *bone, SceneNode *nodeParent )

@@ -89,6 +89,8 @@ namespace Ogre
 
         mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
 
+        //The minimum alignment for these buffers is 16 because some
+        //places of Ogre assume such alignment for SIMD reasons.
         GLint alignment;
         glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
         mConstBufferAlignment = alignment;
@@ -530,7 +532,7 @@ namespace Ogre
                                                                               vbo.dynamicBuffer );
         ConstBufferPacked *retVal = OGRE_NEW GL3PlusConstBufferPacked(
                                                         bufferOffset, requestedSize, 1,
-                                                        sizeBytes - requestedSize,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 
@@ -580,7 +582,7 @@ namespace Ogre
                                                                               vbo.dynamicBuffer );
         TexBufferPacked *retVal = OGRE_NEW GL3PlusTexBufferPacked(
                                                         bufferOffset, requestedSize, 1,
-                                                        sizeBytes - requestedSize,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface, pixelFormat );
 
@@ -675,7 +677,7 @@ namespace Ogre
 
         IndirectBufferPacked *retVal = OGRE_NEW IndirectBufferPacked(
                                                         bufferOffset, requestedSize, 1,
-                                                        sizeBytes - requestedSize,
+                                                        (sizeBytes - requestedSize) / 1,
                                                         bufferType, initialData, keepAsShadow,
                                                         this, bufferInterface );
 

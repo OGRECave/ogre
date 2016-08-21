@@ -244,7 +244,6 @@ namespace v1
 
         /// Do nothing, InstanceBatch takes care of this.
         void _updateRenderQueue( RenderQueue* queue, Camera *camera, const Camera *lodCamera )  {}
-        void visitRenderables( Renderable::Visitor* visitor, bool debugRenderables = false ) {}
 
         /** @see Entity::hasSkeleton */
         bool hasSkeleton(void) const { return mSkeletonInstance != 0; }

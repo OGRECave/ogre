@@ -135,10 +135,17 @@ namespace v1
         return createResource(name,group,isManual,loader,createParams).staticCast<Mesh>();
     }
     //-----------------------------------------------------------------------
-    MeshPtr MeshManager::createManual( const String& name, const String& groupName, 
-        ManualResourceLoader* loader)
+    MeshPtr MeshManager::createManual( const String& name, const String& groupName,
+                                       ManualResourceLoader* loader )
     {
         // Don't try to get existing, create should fail if already exists
+        if( !this->getResourceByName( name, groupName ).isNull() )
+        {
+            OGRE_EXCEPT( Ogre::Exception::ERR_DUPLICATE_ITEM,
+                         "v1 Mesh with name '" + name + "' already exists.",
+                         "MeshManager::createManual" );
+        }
+
         return create(name, groupName, true, loader);
     }
     //-----------------------------------------------------------------------

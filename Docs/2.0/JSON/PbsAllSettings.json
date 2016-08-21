@@ -60,6 +60,7 @@ including invalid combinations (i.e. having a Metallic texture and a Specular te
             "blendblock" : "unique_name" ["unique_name", "unique_name_for_shadows"],
             "alpha_test" : ["less" "less_equal" "equal" "not_equal" "greater_equal" "greater" "never" "always" "disabled", 0.5],
             "shadow_const_bias" : 0.01,
+            "two_sided"  :  false,
 
             "workflow" : "specular_ogre" "specular_fresnel" "metallic",
 

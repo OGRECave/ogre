@@ -352,6 +352,8 @@ namespace Ogre
 
         const vector<Renderable*>::type& getLinkedRenderables(void) const { return mLinkedRenderables; }
 
+        virtual bool hasCustomShadowMacroblock(void) const;
+
         static const char* getCmpString( CompareFunction compareFunction );
     };
 
