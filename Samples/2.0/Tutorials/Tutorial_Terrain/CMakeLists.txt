@@ -20,7 +20,12 @@ include_directories( ./include )
 include_directories( ./include/Hlms )
 ogre_add_component_include_dir(Hlms/Common)
 
-ogre_add_executable(Sample_Tutorial_Terrain WIN32 ${SOURCE_FILES} ${HEADER_FILES} )
+ogre_add_executable(Sample_Tutorial_Terrain WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
 target_link_libraries(Sample_Tutorial_Terrain ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_Tutorial_Terrain)
+
+if( APPLE )
+	set_target_properties( Sample_Tutorial_Terrain PROPERTIES RESOURCE "${SAMPLE_COMMON_RESOURCES}" )
+	set_target_properties( Sample_Tutorial_Terrain PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SAMPLES_PLIST} )
+endif()
