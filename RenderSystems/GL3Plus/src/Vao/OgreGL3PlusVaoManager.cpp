@@ -87,6 +87,8 @@ namespace Ogre
 
         mFrameSyncVec.resize( mDynamicBufferMultiplier, 0 );
 
+        //The minimum alignment for these buffers is 16 because some
+        //places of Ogre assume such alignment for SIMD reasons.
         GLint alignment;
         glGetIntegerv( GL_UNIFORM_BUFFER_OFFSET_ALIGNMENT, &alignment );
         mConstBufferAlignment = alignment;
