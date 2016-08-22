@@ -41,21 +41,12 @@ THE SOFTWARE.
 #   if OGRE_DEBUG_MODE
 #       define OgreAssert( a, b ) assert( (a) && (b) )
 #   else
-#       if OGRE_COMP != OGRE_COMPILER_BORL
-#           define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), "no function info")
-#       else
-#           define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNC__ )
-#       endif
+#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNCTION__ )
 #   endif
 
 // EXCEPTIONS mode
 #elif OGRE_ASSERT_MODE == 2
-#   if OGRE_COMP != OGRE_COMPILER_BORL
-#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), "no function info")
-#   else
-#       define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNC__ )
-#   endif
-
+#   define OgreAssert( a, b ) if( !(a) ) OGRE_EXCEPT( Ogre::Exception::ERR_RT_ASSERTION_FAILED, (b), __FUNCTION__ )
 // STANDARD mode
 #else
 #   define OgreAssert( a, b ) assert( (a) && (b) )
