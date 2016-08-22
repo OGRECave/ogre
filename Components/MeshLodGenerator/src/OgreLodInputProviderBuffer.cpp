@@ -48,12 +48,14 @@ namespace Ogre
     {
         // Get Vertex count for container tuning.
         bool sharedVerticesAdded = false;
+        size_t trianglesCount = 0;
         size_t vertexCount = 0;
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
         unsigned short submeshCount = mBuffer.submesh.size();
         for (unsigned short i = 0; i < submeshCount; i++) {
             const LodInputBuffer::Submesh& submesh = mBuffer.submesh[i];
+            trianglesCount += submesh.indexBuffer.indexCount/3; //assume mBuffer provide triangle list only
             if (!submesh.useSharedVertexBuffer) {
                 size_t count = submesh.vertexBuffer.vertexCount;
                 vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
@@ -68,9 +70,7 @@ namespace Ogre
         // Tune containers:
         data->mUniqueVertexSet.rehash(4 * vertexCount); // less then 0.25 item/bucket for low collision rate
 
-        // There are less triangles then 2 * vertexCount. Except if there are bunch of triangles,
-        // where all vertices have the same position, but that would not make much sense.
-        data->mTriangleList.reserve(2 * vertexCount);
+        data->mTriangleList.reserve(trianglesCount);
 
         data->mVertexList.reserve(vertexCount);
         mSharedVertexLookup.reserve(sharedVertexLookupSize);
