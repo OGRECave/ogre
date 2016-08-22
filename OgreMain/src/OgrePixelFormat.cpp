@@ -723,7 +723,7 @@ namespace Ogre {
             // Everything consecutive?
             if(src.isConsecutive() && dst.isConsecutive())
             {
-                memcpy(dst.data, src.data, src.getConsecutiveSize());
+                memcpy(dst.getTopLeftFrontPixelPtr(), src.getTopLeftFrontPixelPtr(), src.getConsecutiveSize());
                 return;
             }
 
