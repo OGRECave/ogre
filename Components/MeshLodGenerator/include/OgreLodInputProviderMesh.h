@@ -35,6 +35,7 @@
 #include "OgreLodData.h"
 #include "OgreSharedPtr.h"
 #include "OgreLogManager.h"
+#include "OgreRenderOperation.h"
 
 namespace Ogre
 {
@@ -56,27 +57,63 @@ protected:
 
     void tuneContainerSize(LodData* data);
     void initialize(LodData* data);
-    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID);
+    void addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID, RenderOperation::OperationType renderOp);
     void addVertexData(LodData* data, VertexData* vertexData, bool useSharedVertexLookup);
     template<typename IndexType>
     void addIndexDataImpl(LodData* data, IndexType* iPos, const IndexType* iEnd,
-                                                VertexLookupList& lookup,
-                                                unsigned short submeshID)
+                          VertexLookupList& lookup, unsigned short submeshID, RenderOperation::OperationType renderOp)
     {
+        if(iEnd - iPos < 3 
+        || renderOp != RenderOperation::OT_TRIANGLE_LIST
+        && renderOp != RenderOperation::OT_TRIANGLE_STRIP
+        && renderOp != RenderOperation::OT_TRIANGLE_FAN)
+            return;
+
+        IndexType i0 = iPos[0], i1 = iPos[1], i2 = iPos[2];
+        unsigned inc = (renderOp==RenderOperation::OT_TRIANGLE_LIST) ? 3 : 1;
+        unsigned triangleIdx = 0;
+        
         // Loop through all triangles and connect them to the vertices.
-        for (; iPos < iEnd; iPos += 3) {
+        for (iPos += (3 - inc); iPos < iEnd; iPos += inc, ++triangleIdx) {
             // It should never reallocate or every pointer will be invalid.
             OgreAssert(data->mTriangleList.capacity() > data->mTriangleList.size(), "");
             data->mTriangleList.push_back(LodData::Triangle());
             LodData::Triangle* tri = &data->mTriangleList.back();
             tri->isRemoved = false;
             tri->submeshID = submeshID;
-            for (int i = 0; i < 3; i++) {
-                // Invalid index: Index is bigger then vertex buffer size.
-                OgreAssert(iPos[i] < lookup.size(), "");
-                tri->vertexID[i] = iPos[i];
-                tri->vertex[i] = lookup[iPos[i]];
+            
+            if(triangleIdx > 0)
+            {
+                switch(renderOp)
+                {
+                case RenderOperation::OT_TRIANGLE_LIST:
+                    i0 = iPos[0];
+                    i1 = iPos[1];
+                    i2 = iPos[2];
+                    break;
+                case RenderOperation::OT_TRIANGLE_STRIP:
+                    if(triangleIdx & 1)
+                        i0 = i2;
+                    else
+                        i1 = i2;
+                    i2 = iPos[0];
+                    break;
+                case RenderOperation::OT_TRIANGLE_FAN:
+                    i1 = i2;
+                    i2 = iPos[0];
+                    break;
+                }
             }
+            
+            // Invalid index: Index is bigger then vertex buffer size.
+            OgreAssert(i0 < lookup.size() && i1 < lookup.size() && i2 < lookup.size(), "");
+            tri->vertexID[0] = i0;
+            tri->vertexID[1] = i1;
+            tri->vertexID[2] = i2;
+            tri->vertex[0] = lookup[i0];
+            tri->vertex[1] = lookup[i1];
+            tri->vertex[2] = lookup[i2];
+            
             if (tri->isMalformed()) {
 #if OGRE_DEBUG_MODE
                 stringstream str;
