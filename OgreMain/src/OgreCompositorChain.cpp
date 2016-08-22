@@ -44,7 +44,8 @@ CompositorChain::CompositorChain(Viewport *vp):
     mViewport(vp),
     mOriginalScene(0),
     mDirty(true),
-    mAnyCompositorsEnabled(false)
+    mAnyCompositorsEnabled(false),
+    mOldLodBias(1.0f)
 {
     assert(vp);
     mOldClearEveryFrameBuffers = vp->getClearBuffers();
@@ -215,8 +216,11 @@ void CompositorChain::_removeInstance(CompositorInstance *i)
 {
     Instances::iterator it = std::find(mInstances.begin(), mInstances.end(), i);
     assert(it != mInstances.end());
-    mInstances.erase(it);
-    OGRE_DELETE i;
+    if(it != mInstances.end())
+    {
+        mInstances.erase(it);
+        OGRE_DELETE i;
+    }
 }
 //-----------------------------------------------------------------------
 void CompositorChain::_queuedOperation(CompositorInstance::RenderSystemOperation* op)

@@ -336,7 +336,7 @@ void CompositorInstance::collectPasses(TargetOperation &finalState, CompositionT
                 /// XXX We could support repeating the last queue, with some effort
                 LogManager::getSingleton().logMessage("Warning in compilation of Compositor "
                     +mCompositor->getName()+": Attempt to render queue "+
-                    StringConverter::toString(pass->getFirstRenderQueue())+" before "+
+                    StringConverter::toString(pass->getFirstRenderQueue())+" after "+
                     StringConverter::toString(finalState.currentQueueGroupID), LML_CRITICAL);
             }
 
@@ -605,6 +605,8 @@ void CompositorInstance::notifyResized()
 {
     freeResources(true, true);
     createResources(true);
+    /// Notify chain state needs recompile.
+    mChain->_markDirty();
 }
 //-----------------------------------------------------------------------
 void CompositorInstance::createResources(bool forResizeOnly)
