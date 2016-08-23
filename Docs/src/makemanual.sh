@@ -4,15 +4,10 @@
 # 
 # This script generates the manuals and APIs from source files in this folder
 # To run this script, you require:
-#   1. Doxygen
-#   2. Graphviz
-#   3. texi2html
+#   - texi2html
 # Run from the Docs folder. For example:
 # ./src/makedocs.sh
 # ----------------------------------------------------------------------------
-
-# Generate API docs using doxygen
-doxygen src/html.cfg
 
 # Remove old manual
 rm -rf manual vbo-update 

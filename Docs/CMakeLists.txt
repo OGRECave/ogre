@@ -31,12 +31,11 @@ if(DOXYGEN_FOUND)
 
 	configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
 	add_custom_target(OgreDoc COMMAND 
-    ${DOXYGEN_EXECUTABLE} ${OGRE_BINARY_DIR}/html.cfg 
-    WORKING_DIRECTORY ${OGRE_SOURCE_DIR}/Docs/src/ 
-    COMMENT "Building documentation" VERBATIM
-  )
-	file(WRITE ${OGRE_BINARY_DIR}/api/temp.txt "This file should be deleted before installation. It is only here to force the creation of the api folder")
-	file(REMOVE ${OGRE_BINARY_DIR}/api/temp.txt)
+        ${DOXYGEN_EXECUTABLE} ${OGRE_BINARY_DIR}/html.cfg
+        DEPENDS ${OGRE_BINARY_DIR}/html.cfg
+        WORKING_DIRECTORY ${OGRE_SOURCE_DIR}/Docs/src/ 
+        COMMENT "Building documentation" VERBATIM)
+	file(MAKE_DIRECTORY ${OGRE_BINARY_DIR}/api/)
 	if (OGRE_INSTALL_DOCS)
 		install(DIRECTORY ${OGRE_BINARY_DIR}/api DESTINATION ${OGRE_DOCS_PATH})
 	endif()
