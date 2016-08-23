@@ -28,7 +28,14 @@ if(DOXYGEN_FOUND)
 	PATTERN "src" EXCLUDE
       )
     endif ()
-
+    
+    set(CMAKE_DOXYGEN_INPUT_LIST 
+        ${OGRE_SOURCE_DIR}/OgreMain
+        ${OGRE_SOURCE_DIR}/Components
+        ${OGRE_SOURCE_DIR}/Plugins
+        ${OGRE_SOURCE_DIR}/RenderSystems
+        ${OGRE_SOURCE_DIR}/Docs/src/apimainpage.md)
+    string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
 	configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
 	add_custom_target(OgreDoc COMMAND 
         ${DOXYGEN_EXECUTABLE} ${OGRE_BINARY_DIR}/html.cfg
