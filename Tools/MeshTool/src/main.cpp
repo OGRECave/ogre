@@ -26,7 +26,6 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-
 #include "Ogre.h"
 #include "OgreSkeletonSerializer.h"
 #include "OgreDefaultHardwareBufferManager.h"
@@ -42,6 +41,10 @@ THE SOFTWARE.
 #include "OgreMesh2.h"
 
 #include "UpgradeOptions.h"
+
+#ifdef OGRE_STATIC_LIB
+#include "OgreNULLRenderSystem.h"
+#endif
 
 #include "XML/tinyxml.h"
 #include "XML/OgreXMLMeshSerializer.h"
@@ -1165,6 +1168,11 @@ int main(int numargs, char** args)
         setWorkingDirectory();
         root = OGRE_NEW Root( pluginsPath, "", "OgreMeshTool.log" ) ;
         restoreWorkingDir();
+		
+#ifdef OGRE_STATIC_LIB
+		root->addRenderSystem(new Ogre::NULLRenderSystem());
+#endif
+
         root->setRenderSystem( root->getRenderSystemByName( "NULL Rendering Subsystem" ) );
         root->initialise( true );
         LogManager::getSingleton().getDefaultLog()->setLogDetail( LL_NORMAL );
