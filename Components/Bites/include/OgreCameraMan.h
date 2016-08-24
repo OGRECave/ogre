@@ -35,18 +35,24 @@
 
 #include "OgreInput.h"
 
+/** \addtogroup Optional Components
+*  @{
+*/
+/** \addtogroup Bites
+*  @{
+*/
 namespace OgreBites
 {
-    enum CameraStyle   // enumerator values for different styles of camera movement
+    enum CameraStyle   /// enumerator values for different styles of camera movement
     {
         CS_FREELOOK,
         CS_ORBIT,
         CS_MANUAL
     };
 
-    /*=============================================================================
-    | Utility class for controlling the camera in samples.
-    =============================================================================*/
+    /**
+    Utility class for controlling the camera in samples.
+    */
     class _OgreBitesExport CameraMan
     {
     public:
@@ -54,9 +60,9 @@ namespace OgreBites
 
         virtual ~CameraMan() {}
 
-        /*-----------------------------------------------------------------------------
-        | Swaps the camera on our camera man for another camera.
-        -----------------------------------------------------------------------------*/
+        /**
+        Swaps the camera on our camera man for another camera.
+        */
         virtual void setCamera(Ogre::Camera* cam);
 
         virtual Ogre::Camera* getCamera()
@@ -64,9 +70,9 @@ namespace OgreBites
             return mCamera;
         }
 
-        /*-----------------------------------------------------------------------------
-        | Sets the target we will revolve around. Only applies for orbit style.
-        -----------------------------------------------------------------------------*/
+        /**
+        Sets the target we will revolve around. Only applies for orbit style.
+        */
         virtual void setTarget(Ogre::SceneNode* target);
 
         virtual Ogre::SceneNode* getTarget()
@@ -74,14 +80,14 @@ namespace OgreBites
             return mTarget;
         }
 
-        /*-----------------------------------------------------------------------------
-        | Sets the spatial offset from the target. Only applies for orbit style.
-        -----------------------------------------------------------------------------*/
+        /**
+        Sets the spatial offset from the target. Only applies for orbit style.
+        */
         virtual void setYawPitchDist(Ogre::Radian yaw, Ogre::Radian pitch, Ogre::Real dist);
 
-        /*-----------------------------------------------------------------------------
-        | Sets the camera's top speed. Only applies for free-look style.
-        -----------------------------------------------------------------------------*/
+        /**
+        Sets the camera's top speed. Only applies for free-look style.
+        */
         virtual void setTopSpeed(Ogre::Real topSpeed)
         {
             mTopSpeed = topSpeed;
@@ -92,9 +98,9 @@ namespace OgreBites
             return mTopSpeed;
         }
 
-        /*-----------------------------------------------------------------------------
-        | Sets the movement style of our camera man.
-        -----------------------------------------------------------------------------*/
+        /**
+        Sets the movement style of our camera man.
+        */
         virtual void setStyle(CameraStyle style);
 
         virtual CameraStyle getStyle()
@@ -102,40 +108,40 @@ namespace OgreBites
             return mStyle;
         }
 
-        /*-----------------------------------------------------------------------------
-        | Manually stops the camera when in free-look mode.
-        -----------------------------------------------------------------------------*/
+        /**
+        Manually stops the camera when in free-look mode.
+        */
         virtual void manualStop();
 
         virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
-        /*-----------------------------------------------------------------------------
-        | Processes key presses for free-look style movement.
-        -----------------------------------------------------------------------------*/
+        /**
+        Processes key presses for free-look style movement.
+        */
         virtual void injectKeyDown(const KeyboardEvent& evt);
 
-        /*-----------------------------------------------------------------------------
-        | Processes key releases for free-look style movement.
-        -----------------------------------------------------------------------------*/
+        /**
+        Processes key releases for free-look style movement.
+        */
         virtual void injectKeyUp(const KeyboardEvent& evt);
 
-        /*-----------------------------------------------------------------------------
-        | Processes mouse movement differently for each style.
-        -----------------------------------------------------------------------------*/
+        /**
+        Processes mouse movement differently for each style.
+        */
         virtual void injectMouseMove(const MouseMotionEvent& evt);
 
         virtual void injectMouseWheel(const MouseWheelEvent& evt);
 
-        /*-----------------------------------------------------------------------------
-        | Processes mouse presses. Only applies for orbit style.
-        | Left button is for orbiting, and right button is for zooming.
-        -----------------------------------------------------------------------------*/
+        /**
+        Processes mouse presses. Only applies for orbit style.
+        Left button is for orbiting, and right button is for zooming.
+        */
         virtual void injectMouseDown(const MouseButtonEvent& evt);
 
-        /*-----------------------------------------------------------------------------
-        | Processes mouse releases. Only applies for orbit style.
-        | Left button is for orbiting, and right button is for zooming.
-        -----------------------------------------------------------------------------*/
+        /**
+        Processes mouse releases. Only applies for orbit style.
+        Left button is for orbiting, and right button is for zooming.
+        */
         virtual void injectMouseUp(const MouseButtonEvent& evt);
 
     protected:

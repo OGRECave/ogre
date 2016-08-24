@@ -32,6 +32,12 @@
 #include <OgreRTShaderSystem.h>
 #include <OgreMaterialManager.h>
 
+/** \addtogroup Optional Components
+*  @{
+*/
+/** \addtogroup Bites
+*  @{
+*/
 namespace OgreBites {
 /** This class demonstrates basic usage of the RTShader system.
     It sub class the material manager listener class and when a target scheme callback
