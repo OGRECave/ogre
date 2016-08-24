@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-	/** \addtogroup Component
+	/** \addtogroup Optional Components
 	*  @{
 	*/
 	/** \addtogroup Hlms

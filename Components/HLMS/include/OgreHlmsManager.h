@@ -37,7 +37,7 @@ namespace Ogre
 {
 	class HlmsMaterialBase;
 
-	/** \addtogroup Component
+	/** \addtogroup Optional Components
 	*  @{
 	*/
 	/** \addtogroup Hlms
