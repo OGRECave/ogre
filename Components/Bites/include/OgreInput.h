@@ -13,6 +13,12 @@
 #if OGRE_BITES_HAVE_SDL
 #include <SDL.h>
 
+/** \addtogroup Optional Components
+*  @{
+*/
+/** \addtogroup Bites
+*  @{
+*/
 namespace OgreBites {
 enum {
     BUTTON_LEFT = SDL_BUTTON_LEFT,

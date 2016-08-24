@@ -88,7 +88,7 @@ extern "C" struct SDL_Window;
 #  include "OgreStaticPluginLoader.h"
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE |OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #   ifdef __OBJC__
@@ -104,13 +104,19 @@ extern "C" struct SDL_Window;
 #include "OgreInput.h"
 #include "OgreWindowEventUtilities.h"
 
+/** \addtogroup Optional Components
+*  @{
+*/
+/** \addtogroup Bites
+*  @{
+*/
 namespace OgreBites
 {
-    /*=============================================================================
-    | Base class responsible for setting up a common context for samples.
-    | May be subclassed for specific sample types (not specific samples).
-    | Allows one sample to run at a time, while maintaining a sample queue.
-    =============================================================================*/
+    /** 
+    Base class responsible for setting up a common context for samples.
+    May be subclassed for specific sample types (not specific samples).
+    Allows one sample to run at a time, while maintaining a sample queue.
+    */
     class _OgreBitesExport ApplicationContext :
             public Ogre::FrameListener,
             public Ogre::WindowEventListener
@@ -133,22 +139,22 @@ namespace OgreBites
             return mOverlaySystem;
         }
 
-        /*-----------------------------------------------------------------------------
-        | This function initializes the render system and resources.
-        -----------------------------------------------------------------------------*/
+        /**
+        This function initializes the render system and resources.
+        */
         virtual void initApp();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        /*-----------------------------------------------------------------------------
-         | init pre-created window for android
-         -----------------------------------------------------------------------------*/
+        /**
+         init pre-created window for android
+         */
         void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app);
 #endif
 
-        /*-----------------------------------------------------------------------------
-        | This function closes down the application - saves the configuration then
-        | shutdowns.
-        -----------------------------------------------------------------------------*/
+        /**
+        This function closes down the application - saves the configuration then
+        shutdowns.
+        */
         virtual void closeApp();
 
         // callback interface copied from various listeners to be used by ApplicationContext
@@ -170,75 +176,75 @@ namespace OgreBites
         virtual bool mousePressed(const MouseButtonEvent& evt) { return true; }
         virtual bool mouseReleased(const MouseButtonEvent& evt) { return true; }
 
-        /*-----------------------------------------------------------------------------
-          | Initialize the RT Shader system.
-          -----------------------------------------------------------------------------*/
+        /**
+          Initialize the RT Shader system.
+          */
         virtual bool initialiseRTShaderSystem();
 
-        /*-----------------------------------------------------------------------------
-        | Destroy the RT Shader system.
-          -----------------------------------------------------------------------------*/
+        /**
+        Destroy the RT Shader system.
+          */
         virtual void destroyRTShaderSystem();
 
-        /*-----------------------------------------------------------------------------
-         | Sets up the context after configuration.
-         -----------------------------------------------------------------------------*/
+        /**
+         Sets up the context after configuration.
+         */
         virtual void setup();
 
-        /*-----------------------------------------------------------------------------
-        | Creates the OGRE root.
-        -----------------------------------------------------------------------------*/
+        /**
+        Creates the OGRE root.
+        */
         virtual void createRoot();
 
-        /*-----------------------------------------------------------------------------
-        | Configures the startup settings for OGRE. I use the config dialog here,
-        | but you can also restore from a config file. Note that this only happens
-        | when you start the context, and not when you reset it.
-        -----------------------------------------------------------------------------*/
+        /**
+        Configures the startup settings for OGRE. I use the config dialog here,
+        but you can also restore from a config file. Note that this only happens
+        when you start the context, and not when you reset it.
+        */
         virtual bool oneTimeConfig();
 
-        /*-----------------------------------------------------------------------------
-        | Sets up SDL input.
-        -----------------------------------------------------------------------------*/
+        /**
+        Sets up SDL input.
+        */
         virtual void setupInput(bool grab);
 
 
-        /*-----------------------------------------------------------------------------
-        | Finds context-wide resource groups. I load paths from a config file here,
-        | but you can choose your resource locations however you want.
-        -----------------------------------------------------------------------------*/
+        /**
+        Finds context-wide resource groups. I load paths from a config file here,
+        but you can choose your resource locations however you want.
+        */
         virtual void locateResources();
 
-        /*-----------------------------------------------------------------------------
-        | Loads context-wide resource groups. I chose here to simply initialise all
-        | groups, but you can fully load specific ones if you wish.
-        -----------------------------------------------------------------------------*/
+        /**
+        Loads context-wide resource groups. I chose here to simply initialise all
+        groups, but you can fully load specific ones if you wish.
+        */
         virtual void loadResources();
 
-        /*-----------------------------------------------------------------------------
-        | Reconfigures the context. Attempts to preserve the current sample state.
-        -----------------------------------------------------------------------------*/
+        /**
+        Reconfigures the context. Attempts to preserve the current sample state.
+        */
         virtual void reconfigure(const Ogre::String& renderer, Ogre::NameValuePairList& options);
 
 
-        /*-----------------------------------------------------------------------------
-        | Cleans up and shuts down the context.
-        -----------------------------------------------------------------------------*/
+        /**
+        Cleans up and shuts down the context.
+        */
         virtual void shutdown();
 
-        /*-----------------------------------------------------------------------------
-        | Captures input device states.
-        -----------------------------------------------------------------------------*/
+        /**
+        Captures input device states.
+        */
         virtual void captureInputDevices();
 
-        /*-----------------------------------------------------------------------------
-          | Creates dummy scene to allow rendering GUI in viewport.
-          -----------------------------------------------------------------------------*/
+        /**
+        Creates dummy scene to allow rendering GUI in viewport.
+          */
         virtual void createDummyScene();
 
-        /*-----------------------------------------------------------------------------
-          | Destroys dummy scene.
-          -----------------------------------------------------------------------------*/
+        /**
+        Destroys dummy scene.
+          */
         virtual void destroyDummyScene();
     protected:
 
