@@ -295,14 +295,15 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 3)
 		src/Threading/OgreDefaultWorkQueueTBB.cpp
 	)
 elseif (OGRE_THREAD_PROVIDER EQUAL 4)
-list(APPEND THREAD_HEADER_FILES
-	include/Threading/OgreThreadDefinesSTD.h
-	include/Threading/OgreThreadHeadersSTD.h
-	include/Threading/OgreDefaultWorkQueueStandard.h
-)
-list(APPEND THREAD_SOURCE_FILES
-	src/Threading/OgreDefaultWorkQueueStandard.cpp
-)
+	list(APPEND THREAD_HEADER_FILES
+		include/Threading/OgreThreadDefinesSTD.h
+		include/Threading/OgreThreadHeadersSTD.h
+		include/Threading/OgreDefaultWorkQueueStandard.h
+	)
+	list(APPEND THREAD_SOURCE_FILES
+		src/Threading/OgreDefaultWorkQueueStandard.cpp
+		src/Threading/OgreThreadDefinesSTD.cpp
+	)
 endif ()
 
 list(APPEND HEADER_FILES ${THREAD_HEADER_FILES})

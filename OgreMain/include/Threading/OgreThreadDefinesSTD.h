@@ -26,6 +26,61 @@ THE SOFTWARE
 #ifndef __OgreThreadDefinesSTD_H__
 #define __OgreThreadDefinesSTD_H__
 
+namespace Ogre
+{
+	template< typename T > class ThreadLocalPtr
+	{
+	private:
+
+		ThreadLocalPtr(const ThreadLocalPtr&) = delete;
+		ThreadLocalPtr& operator = (const ThreadLocalPtr&) = delete;
+
+		std::vector< std::unique_ptr<T> >& _getVect() const
+		{
+			thread_local std::vector< std::unique_ptr<T> > locals;
+			return locals;
+		}
+
+		std::unique_ptr<T>& _get() const
+		{
+			return *std::next(std::begin(_getVect()), static_cast<int>(m_LocalID));
+		}
+	public:
+		ThreadLocalPtr() : m_LocalID(m_VarCounter++) {}
+
+		inline T* release()
+		{
+			_get().reset();
+		}
+
+		inline void reset(T* a = 0)
+		{
+			auto& vect = _getVect();
+			if (vect.size() <= m_LocalID)
+				vect.resize(static_cast<int>(m_LocalID) + 1);
+			_get().reset(a);
+		}
+
+		inline T* get() const
+		{
+			return _get().get();
+		}
+
+		inline T* operator->() const
+		{
+			return _get().get();
+		}
+
+		inline T& operator*() const
+		{
+			return *_get();
+		}
+
+		static thread_local std::int64_t m_VarCounter;
+		const std::int64_t m_LocalID;
+	};
+}
+
 #define OGRE_TOKEN_PASTE(x, y) x ## y
 #define OGRE_TOKEN_PASTE_EXTRA(x, y) OGRE_TOKEN_PASTE(x, y)
 
@@ -57,14 +112,12 @@ THE SOFTWARE
 #define OGRE_LOCK_RW_MUTEX_WRITE(name) std::unique_lock<std::recursive_mutex> OGRE_TOKEN_PASTE_EXTRA(ogrenameLock, __LINE__) (name)
 
 // Thread-local pointer
-#define OGRE_THREAD_POINTER(T, var) std::shared_ptr< thread_local T > var
-//#define OGRE_THREAD_POINTER_INIT(var) var(OGRE_NEW decltype(var.get()))
-//#define OGRE_THREAD_POINTER_INIT(var) var()
-#define OGRE_THREAD_POINTER_INIT(var) var( OGRE_NEW thread_local std::remove_reference<decltype( *var )>::type, [](decltype(var.get()) a) {delete a; } )
-#define OGRE_THREAD_POINTER_VAR(T, var) std::shared_ptr< thread_local T > var( OGRE_NEW T, [](T* a){OGRE_DELETE a;} )
+#define OGRE_THREAD_POINTER(T, var) Ogre::ThreadLocalPtr<T> var
+#define OGRE_THREAD_POINTER_INIT(var) var()
+#define OGRE_THREAD_POINTER_VAR(T, var) Ogre::ThreadLocalPtr<T> var ()
 #define OGRE_THREAD_POINTER_SET(var, expr) var.reset(expr)
 #define OGRE_THREAD_POINTER_GET(var) var.get()
-#define OGRE_THREAD_POINTER_DELETE(var) var.reset()
+#define OGRE_THREAD_POINTER_DELETE(var) var.reset(0)
 
 // Thread objects and related functions
 #define OGRE_THREAD_TYPE std::thread
