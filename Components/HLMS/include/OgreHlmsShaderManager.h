@@ -36,7 +36,7 @@ namespace Ogre
 	class ShaderPiecesManager;
 	class HlmsDatablock;
 
-	/** \addtogroup Component
+	/** \addtogroup Optional Components
 	*  @{
 	*/
 	/** \addtogroup Hlms

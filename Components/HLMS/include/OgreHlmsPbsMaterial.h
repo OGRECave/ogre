@@ -37,7 +37,7 @@ namespace Ogre
 
 #	define PBS_MAX_LIGHT_COUNT 10
 
-	/** \addtogroup Component
+	/** \addtogroup Optional Components
 	*  @{
 	*/
 	/** \addtogroup Hlms
