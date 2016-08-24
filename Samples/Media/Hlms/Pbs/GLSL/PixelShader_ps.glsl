@@ -17,7 +17,11 @@ in vec4 gl_FragCoord;
 @end
 
 @property( two_sided_lighting )
-@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
+	@property( !hlms_forward3d_flipY )
+		@piece( two_sided_flip_normal )* (gl_FrontFacing ? -1.0 : 1.0)@end
+	@end @property( hlms_forward3d_flipY )
+		@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
+	@end
 @end
 
 // START UNIFORM DECLARATION
