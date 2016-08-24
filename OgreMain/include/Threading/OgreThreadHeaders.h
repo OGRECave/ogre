@@ -36,6 +36,8 @@ THE SOFTWARE
     #include "OgreThreadHeadersPoco.h"
 #elif OGRE_THREAD_PROVIDER == 3
     #include "OgreThreadHeadersTBB.h"
+#elif OGRE_THREAD_PROVIDER == 4
+	#include "OgreThreadHeadersSTD.h"
 #endif
 
 #include "OgreThreadDefines.h"

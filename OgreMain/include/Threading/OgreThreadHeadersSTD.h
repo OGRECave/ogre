@@ -23,22 +23,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE
 -------------------------------------------------------------------------*/
-#ifndef __OgreDefaultWorkQueue_H__
-#define __OgreDefaultWorkQueue_H__
+#ifndef __OgreThreadHeadersSTD_H__
+#define __OgreThreadHeadersSTD_H__
 
-#if OGRE_THREAD_PROVIDER == 0
-    #include "OgreDefaultWorkQueueStandard.h"
-#elif OGRE_THREAD_PROVIDER == 1
-    #include "OgreDefaultWorkQueueStandard.h"
-#elif OGRE_THREAD_PROVIDER == 2
-    #include "OgreDefaultWorkQueueStandard.h"
-#elif OGRE_THREAD_PROVIDER == 3
-    #include "OgreDefaultWorkQueueTBB.h"
-#elif OGRE_THREAD_PROVIDER == 4
-	#include "OgreDefaultWorkQueueStandard.h"
-#endif
+#include <memory>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #endif
-
-
-

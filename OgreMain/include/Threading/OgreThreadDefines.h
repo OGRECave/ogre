@@ -35,6 +35,8 @@ THE SOFTWARE
     #include "OgreThreadDefinesPoco.h"
 #elif OGRE_THREAD_PROVIDER == 3
     #include "OgreThreadDefinesTBB.h"
+#elif OGRE_THREAD_PROVIDER == 4
+   #include "OgreThreadDefinesSTD.h"
 #endif
 
 #endif
