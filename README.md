@@ -26,7 +26,7 @@ MSVC [![Build status](https://ci.appveyor.com/api/projects/status/kcki7y0n1ahrgg
     been done for you, and you should use the sample projects to see how to compile your own code against OGRE. </p>
 * <a href="http://www.ogre3d.org/docs/manual/index.html">The OGRE Manual</a>
 <p>A high-level guide to the major parts of the engine and script reference.</p>
-* <a href="http://www.ogre3d.org/docs/api/1.9/index.html">API Reference</a>
+* <a href="https://ogrecave.github.io/ogre/api/1.10/">API Reference</a>
 <p class="maincontent">The full OGRE API documentation, as generated from the (heavily!) commented source.</p>
 * <a href="http://www.ogre3d.org/wiki">The OGRE Wiki</a>
 <p>A gold mine of tutorials, tips and code snippets which will help you get up to speed with the engine.</p>
