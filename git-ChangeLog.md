@@ -20,15 +20,22 @@
 * Shared between all GL RenderSystems
 * allows specifying GL context profile (Core, Compability, ES)
 * only one place for fixing GLX/ WGL/ Carbon related bugs
+* all supported GL RenderSystems ported to GLNativeSupport 
 * Dropped 10.000 LOC. Could use SDL2 internally to drop even more
-
+* EGL in GLNativeSupport
+    * allow EGL to create *full* GL Contexts as well
+    * allows running GL3Plus on EGL (tested on Linux, MESA and NVidia)
+    * needed for [real headless rendering](http://devblogs.nvidia.com/parallelforall/egl-eye-opengl-visualization-without-x-server/)
+    
 ## GLES2: use ES context profile on Desktop
 * run and test the GLES2/3 RenderSystem on Desktop
 * optionally uses GLSupport Module instead of EGL for Extensions/ Context
 
 ## RTShaderSystem
 * fix flipped Environment Maps using GLSL (GLSES) shaders
-* fix different lighting intensity compared to legacy GL
+* use same lighting equations as legacy GL resulting in equal light intensity
+* merge duplicated GLSL, GLSLES and GLSL150 shaders. Dropping 4200 loc.
+* allow RTSS to work with HLMS side by side
 
 ## OgreMain
 * restored API compatibility with 1.9 (`StringUtil::BLANK`, `StringUtil::StrStreamType`)
@@ -62,9 +69,3 @@
 * VolumeTerrain: fixed triplanar texturing
 * ShaderSystemMultiLight: ported to GLES3
 * disabled unfinished Samples
-
-## EGL in GLNativeSupport
-* all supported GL RenderSystems ported to GLNativeSupport 
-* allow EGL to create "full" GL Contexts as well
-* needed for [real headless rendering](http://devblogs.nvidia.com/parallelforall/egl-eye-opengl-visualization-without-x-server/)
-* allows running GL3Plus on EGL (Linux, MESA or NVidia)
