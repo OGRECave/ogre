@@ -18,7 +18,17 @@ add_recursive( ./ SOURCE_FILES )
 
 ogre_add_executable(OgreMeshTool ${SOURCE_FILES})
 ogre_add_component_include_dir(MeshLodGenerator)
+
+if(OGRE_STATIC)
+	include_directories("${OGRE_SOURCE_DIR}/RenderSystems/NULL/include")
+endif ()
+
 target_link_libraries(OgreMeshTool ${OGRE_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
+
+if(OGRE_STATIC)
+	target_link_libraries(OgreMeshTool RenderSystem_NULL)
+endif ()
+
 if (APPLE)
     set_target_properties(OgreMeshTool PROPERTIES
         LINK_FLAGS "-framework Carbon -framework Cocoa")
