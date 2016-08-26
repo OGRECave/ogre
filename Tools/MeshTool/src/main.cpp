@@ -1168,9 +1168,9 @@ int main(int numargs, char** args)
         setWorkingDirectory();
         root = OGRE_NEW Root( pluginsPath, "", "OgreMeshTool.log" ) ;
         restoreWorkingDir();
-		
+
 #ifdef OGRE_STATIC_LIB
-		root->addRenderSystem(new Ogre::NULLRenderSystem());
+        root->addRenderSystem(new Ogre::NULLRenderSystem());
 #endif
 
         root->setRenderSystem( root->getRenderSystemByName( "NULL Rendering Subsystem" ) );

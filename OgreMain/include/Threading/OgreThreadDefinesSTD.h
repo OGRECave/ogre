@@ -28,57 +28,57 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	template< typename T > class ThreadLocalPtr
-	{
-	private:
+    template< typename T > class ThreadLocalPtr
+    {
+    private:
 
-		ThreadLocalPtr(const ThreadLocalPtr&) = delete;
-		ThreadLocalPtr& operator = (const ThreadLocalPtr&) = delete;
+        ThreadLocalPtr(const ThreadLocalPtr&) = delete;
+        ThreadLocalPtr& operator = (const ThreadLocalPtr&) = delete;
 
-		std::vector< std::unique_ptr<T> >& _getVect() const
-		{
-			thread_local std::vector< std::unique_ptr<T> > locals;
-			return locals;
-		}
+        std::vector< std::unique_ptr<T> >& _getVect() const
+        {
+            thread_local std::vector< std::unique_ptr<T> > locals;
+            return locals;
+        }
 
-		std::unique_ptr<T>& _get() const
-		{
-			return *std::next(std::begin(_getVect()), static_cast<int>(m_LocalID));
-		}
-	public:
-		ThreadLocalPtr() : m_LocalID(m_VarCounter++) {}
+        std::unique_ptr<T>& _get() const
+        {
+            return *std::next(std::begin(_getVect()), static_cast<int>(m_LocalID));
+        }
+    public:
+        ThreadLocalPtr() : m_LocalID(m_VarCounter++) {}
 
-		inline T* release()
-		{
-			_get().reset();
-		}
+        inline T* release()
+        {
+            _get().reset();
+        }
 
-		inline void reset(T* a = 0)
-		{
-			auto& vect = _getVect();
-			if (vect.size() <= m_LocalID)
-				vect.resize(static_cast<int>(m_LocalID) + 1);
-			_get().reset(a);
-		}
+        inline void reset(T* a = 0)
+        {
+            auto& vect = _getVect();
+            if (vect.size() <= m_LocalID)
+                vect.resize(static_cast<int>(m_LocalID) + 1);
+            _get().reset(a);
+        }
 
-		inline T* get() const
-		{
-			return _get().get();
-		}
+        inline T* get() const
+        {
+            return _get().get();
+        }
 
-		inline T* operator->() const
-		{
-			return _get().get();
-		}
+        inline T* operator->() const
+        {
+            return _get().get();
+        }
 
-		inline T& operator*() const
-		{
-			return *_get();
-		}
+        inline T& operator*() const
+        {
+            return *_get();
+        }
 
-		static thread_local std::int64_t m_VarCounter;
-		const std::int64_t m_LocalID;
-	};
+        static thread_local std::int64_t m_VarCounter;
+        const std::int64_t m_LocalID;
+    };
 }
 
 #define OGRE_TOKEN_PASTE(x, y) x ## y

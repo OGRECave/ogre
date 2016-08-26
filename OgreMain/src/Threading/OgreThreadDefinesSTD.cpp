@@ -29,6 +29,6 @@ THE SOFTWARE
 
 namespace Ogre
 {
-	template< typename T >
-	thread_local std::int64_t ThreadLocalPtr<T>::m_VarCounter;
+    template< typename T >
+    thread_local std::int64_t ThreadLocalPtr<T>::m_VarCounter;
 }
