@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#import "System/iOS/GameViewController.h"
+#import "TutorialViewController.h"
 #import "System/iOS/AppDelegate.h"
 
 #import <simd/simd.h>
@@ -41,13 +41,10 @@ THE SOFTWARE.
 
 using namespace Demo;
 
-@implementation GameViewController
+@implementation TutorialViewController
 {
     Demo::GameState *_graphicsGameState;
     Demo::GraphicsSystem *_graphicsSystem;
-    Demo::GameState *_logicGameState;
-    Demo::LogicSystem *_logicSystem;
-    double _accumulator;
     CADisplayLink *_timer;
 }
 
@@ -61,20 +58,12 @@ using namespace Demo;
     if( _graphicsGameState )
     {
         _graphicsSystem->destroyScene();
-        if( _logicSystem )
-        {
-            _logicSystem->destroyScene();
-            _logicSystem->deinitialize();
-        }
         _graphicsSystem->deinitialize();
     }
 
-    MainEntryPoints::destroySystems( _graphicsGameState, _graphicsSystem,
-                                     _logicGameState, _logicSystem );
+    MainEntryPoints::destroySystems( _graphicsGameState, _graphicsSystem, 0, 0 );
     _graphicsGameState = 0;
     _graphicsSystem = 0;
-    _logicGameState = 0;
-    _logicSystem = 0;
 }
 
 -(void)viewDidLoad
@@ -83,21 +72,11 @@ using namespace Demo;
 
     if( !_graphicsSystem )
     {
-        MainEntryPoints::createSystems( &_graphicsGameState, &_graphicsSystem,
-                                        &_logicGameState, &_logicSystem );
-        _graphicsSystem->initialize( MainEntryPoints::getWindowTitle() );
-        if( _logicSystem )
-            _logicSystem->initialize();
+        MainEntryPoints::createSystems( &_graphicsGameState, &_graphicsSystem, 0, 0 );
+        _graphicsSystem->initialize( "Tutorial 01: Initialization" );
 
         _graphicsSystem->createScene01();
-        if( _logicSystem )
-            _logicSystem->createScene01();
-
         _graphicsSystem->createScene02();
-        if( _logicSystem )
-            _logicSystem->createScene02();
-
-        _accumulator = MainEntryPoints::Frametime;
     }
 
     //Connect the UIView created by Ogre to our UIViewController
@@ -141,25 +120,10 @@ using namespace Demo;
     //Prevent from going haywire.
     const float timeSinceLast = std::min( 1.0, _timer.duration * _timer.frameInterval );
 
-    while( _accumulator >= MainEntryPoints::Frametime && _logicSystem )
-    {
-        _logicSystem->beginFrameParallel();
-        _logicSystem->update( static_cast<float>( MainEntryPoints::Frametime ) );
-        _logicSystem->finishFrameParallel();
-
-        _logicSystem->finishFrame();
-        _graphicsSystem->finishFrame();
-
-        _accumulator -= MainEntryPoints::Frametime;
-    }
-
     _graphicsSystem->beginFrameParallel();
     _graphicsSystem->update( timeSinceLast );
     _graphicsSystem->finishFrameParallel();
-    if( !_logicSystem )
-        _graphicsSystem->finishFrame();
-
-    _accumulator += timeSinceLast;
+    _graphicsSystem->finishFrame();
 }
 
 @end

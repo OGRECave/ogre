@@ -26,7 +26,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#import "System/iOS/GameViewController.h"
+#import "TutorialViewController.h"
 #import "System/iOS/AppDelegate.h"
 
 #import <simd/simd.h>
@@ -39,16 +39,22 @@ THE SOFTWARE.
 
 #include "System/MainEntryPoints.h"
 
+#include "Threading/OgreThreads.h"
+
+#import "Windowing/iOS/OgreMetalView.h"
+
 using namespace Demo;
 
-@implementation GameViewController
+extern const double cFrametime[2];
+extern int gCurrentFrameTimeIdx;
+
+@implementation TutorialViewController
 {
     Demo::GameState *_graphicsGameState;
     Demo::GraphicsSystem *_graphicsSystem;
-    Demo::GameState *_logicGameState;
-    Demo::LogicSystem *_logicSystem;
-    double _accumulator;
     CADisplayLink *_timer;
+
+    double _accumTimeError;
 }
 
 -(void)dealloc
@@ -61,20 +67,12 @@ using namespace Demo;
     if( _graphicsGameState )
     {
         _graphicsSystem->destroyScene();
-        if( _logicSystem )
-        {
-            _logicSystem->destroyScene();
-            _logicSystem->deinitialize();
-        }
         _graphicsSystem->deinitialize();
     }
 
-    MainEntryPoints::destroySystems( _graphicsGameState, _graphicsSystem,
-                                     _logicGameState, _logicSystem );
+    MainEntryPoints::destroySystems( _graphicsGameState, _graphicsSystem, 0, 0 );
     _graphicsGameState = 0;
     _graphicsSystem = 0;
-    _logicGameState = 0;
-    _logicSystem = 0;
 }
 
 -(void)viewDidLoad
@@ -83,21 +81,11 @@ using namespace Demo;
 
     if( !_graphicsSystem )
     {
-        MainEntryPoints::createSystems( &_graphicsGameState, &_graphicsSystem,
-                                        &_logicGameState, &_logicSystem );
-        _graphicsSystem->initialize( MainEntryPoints::getWindowTitle() );
-        if( _logicSystem )
-            _logicSystem->initialize();
+        MainEntryPoints::createSystems( &_graphicsGameState, &_graphicsSystem, 0, 0 );
+        _graphicsSystem->initialize( "Tutorial 02: Variable Framerate" );
 
         _graphicsSystem->createScene01();
-        if( _logicSystem )
-            _logicSystem->createScene01();
-
         _graphicsSystem->createScene02();
-        if( _logicSystem )
-            _logicSystem->createScene02();
-
-        _accumulator = MainEntryPoints::Frametime;
     }
 
     //Connect the UIView created by Ogre to our UIViewController
@@ -123,6 +111,8 @@ using namespace Demo;
                                                  selector:@selector(mainLoop)];
     _timer.frameInterval = 1; //VSync to 60 FPS
     [_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+
+    _accumTimeError = 0;
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -131,6 +121,8 @@ using namespace Demo;
     {
         [_timer invalidate];
         _timer = nullptr;
+
+        _accumTimeError = 0;
     }
 
     [super viewWillDisappear:animated];
@@ -138,28 +130,40 @@ using namespace Demo;
 
 -(void)mainLoop
 {
-    //Prevent from going haywire.
-    const float timeSinceLast = std::min( 1.0, _timer.duration * _timer.frameInterval );
+    const double updateFrequency = _timer.duration;
+    const double timerTimestamp = _timer.timestamp;
 
-    while( _accumulator >= MainEntryPoints::Frametime && _logicSystem )
+    _accumTimeError += std::min( 1.0, _timer.duration * _timer.frameInterval );
+
+    OgreMetalView *ogreMetalView = (OgreMetalView*)self.view;
+    int framesProcessed = 0;
+
+    while( _accumTimeError >= 0 )
     {
-        _logicSystem->beginFrameParallel();
-        _logicSystem->update( static_cast<float>( MainEntryPoints::Frametime ) );
-        _logicSystem->finishFrameParallel();
+        //Schedule Metal to present the next frame after cFrametime seconds,
+        //but rounded to the closest updateFrequency interval
+        double presentationTime =
+                timerTimestamp + cFrametime[gCurrentFrameTimeIdx] * (framesProcessed + 1);
+        presentationTime = floor( (presentationTime + updateFrequency * 0.5) /
+                                  updateFrequency ) * updateFrequency;
+        ogreMetalView.presentationTime = presentationTime;
 
-        _logicSystem->finishFrame();
+        _graphicsSystem->beginFrameParallel();
+        _graphicsSystem->update( static_cast<float>( cFrametime[gCurrentFrameTimeIdx] ) );
+        _graphicsSystem->finishFrameParallel();
         _graphicsSystem->finishFrame();
 
-        _accumulator -= MainEntryPoints::Frametime;
+        _accumTimeError -= cFrametime[gCurrentFrameTimeIdx];
+        ++framesProcessed;
     }
 
-    _graphicsSystem->beginFrameParallel();
-    _graphicsSystem->update( timeSinceLast );
-    _graphicsSystem->finishFrameParallel();
-    if( !_logicSystem )
-        _graphicsSystem->finishFrame();
-
-    _accumulator += timeSinceLast;
+    if( cFrametime[gCurrentFrameTimeIdx] >= 1.0 / 30.0 )
+    {
+        if(_timer.frameInterval != 2 )
+            _timer.frameInterval = 2; //VSync to 30 FPS
+    }
+    else if( _timer.frameInterval != 1 )
+        _timer.frameInterval = 1; //VSync to 60 FPS
 }
 
 @end

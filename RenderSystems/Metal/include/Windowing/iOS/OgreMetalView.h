@@ -47,4 +47,16 @@ THE SOFTWARE.
 /// If you set nativeScaleFactor = 0.5; we'll set contentScaleFactor = 1.0
 @property (nonatomic) CGFloat nativeScaleFactor;
 
+/// The value of presentationTime will be passed to
+/// MTLCommandBuffer::presentDrawable atTime:presentationTime
+/// When negative, it means to present immediately (Ogre will call presentDrawable overload)
+/// This value is very important if you want to render at e.g. 30 fps:
+/// Calling CADisplayLink.frameInterval = 2 is not enough; as the CPU timer will be fired
+/// once every two VSync intervals, but if the GPU completes its job too soon, it will
+/// present immediately (i.e. in the next 16ms instead of waiting 33ms).
+/// In that case you'll want to set presentationTime = displayLink.timestamp+(1.0/fps)
+/// See
+/// https://developer.apple.com/library/prerelease/content/documentation/3DDrawing/Conceptual/MTLBestPracticesGuide/FrameRate.html
+@property (nonatomic) CFTimeInterval presentationTime;
+
 @end

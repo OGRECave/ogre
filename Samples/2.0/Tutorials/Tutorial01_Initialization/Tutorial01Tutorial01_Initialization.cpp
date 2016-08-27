@@ -20,6 +20,7 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
+#include "System/MainEntryPoints.h"
 
 using namespace Demo;
 
@@ -34,6 +35,29 @@ namespace Demo
         MyGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState ) {}
     };
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        GameState *gfxGameState = new GameState();
+        GraphicsSystem *graphicsSystem = new MyGraphicsSystem( gfxGameState );
+
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
+    }
+
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
+    {
+        delete graphicsSystem;
+        delete graphicsGameState;
+    }
+#endif
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

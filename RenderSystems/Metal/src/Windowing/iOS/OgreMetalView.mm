@@ -45,6 +45,7 @@ THE SOFTWARE.
     self.backgroundColor    = nil;
     self.scaleToNative      = true;
     self.nativeScaleFactor  = 1.0;
+    self.presentationTime   = -1.0;
 }
 
 - (void)didMoveToWindow

@@ -86,7 +86,17 @@ namespace Ogre
             mColourAttachmentDesc.texture = 0;
 
         // Schedule a present once rendering to the framebuffer is complete
-        [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable];
+        const CFTimeInterval presentationTime = mMetalView.presentationTime;
+
+        if( presentationTime < 0 )
+        {
+            [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable];
+        }
+        else
+        {
+            [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable
+                                                          atTime:presentationTime];
+        }
         mCurrentDrawable = 0;
     }
     //-------------------------------------------------------------------------
