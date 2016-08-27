@@ -193,7 +193,7 @@ namespace Ogre
             mUploadOnly must be false.
             It is the counter side of @see canDownload
         */
-        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes );
 
         /** Checks if this staging buffer has enough free space to use _asyncDownload.
             Otherwise such function would raise an exception.
@@ -203,7 +203,7 @@ namespace Ogre
         @param length
             The size in bytes that need to be downloaded.
         */
-        bool canDownload( size_t length ) const;
+        virtual bool canDownload( size_t length ) const;
 
         /** Copies the GPU data in BufferPacked to the StagingBuffer so that it can be
             later read by the CPU using an AsyncTicket. @see AsyncTicket.
@@ -227,7 +227,7 @@ namespace Ogre
         /// Releases memory assigned to a download that hasn't been mapped yet,
         /// to make space for another _asyncDownload call. Useful when you
         /// suddenly don't intend to call _mapForRead.
-        void _cancelDownload( size_t offset, size_t sizeBytes );
+        virtual void _cancelDownload( size_t offset, size_t sizeBytes );
 
         /** Maps the buffer for read acces for the CPU.
         @remarks

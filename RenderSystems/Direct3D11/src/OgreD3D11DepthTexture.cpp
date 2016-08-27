@@ -244,10 +244,14 @@ namespace v1
     }
     //-----------------------------------------------------------------------------------
     void D3D11DepthTextureTarget::getFormatsForPso(
-            PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
+            PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
+            bool outHwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
     {
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+        {
             outFormats[i] = PF_NULL;
+            outHwGamma[i] = PF_NULL;
+        }
     }
     //-----------------------------------------------------------------------------------
     void D3D11DepthTextureTarget::getCustomAttribute( const String& name, void* pData )

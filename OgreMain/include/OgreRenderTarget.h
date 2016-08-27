@@ -101,7 +101,8 @@ namespace Ogre {
         virtual uint32 getHeight(void) const;
         PixelFormat getFormat(void) const;
 
-        virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const;
+        virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
+                                       bool outHwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const;
 
         /**
          * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.

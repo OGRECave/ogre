@@ -128,7 +128,8 @@ namespace v1
         virtual bool attachDepthBuffer( DepthBuffer *depthBuffer, bool exactFormatMatch );
         virtual void detachDepthBuffer(void);
 
-        virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const;
+        virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
+                                       bool outHwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const;
 
         void getCustomAttribute( const String& name, void* pData );
     };

@@ -21,8 +21,7 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-
-using namespace Demo;
+#include "System/MainEntryPoints.h"
 
 namespace Demo
 {
@@ -49,22 +48,24 @@ namespace Demo
             else if( *(dataFolder.end() - 1) != '/' )
                 dataFolder += "/";
 
-            const char *c_locations[7] =
-			{
-				"2.0/scripts/materials/Tutorial_SSAO",
+            const char *c_locations[9] =
+            {
+                "2.0/scripts/materials/Tutorial_SSAO",
                 "2.0/scripts/materials/Tutorial_SSAO/GLSL",
                 "2.0/scripts/materials/Tutorial_SSAO/HLSL",
-				"2.0/scripts/materials/PbsMaterials",
-				"2.0/scripts/materials/Common",
-				"2.0/scripts/materials/Common/GLSL",
-				"2.0/scripts/materials/Common/HLSL"
-			};
+                "2.0/scripts/materials/Tutorial_SSAO/Metal",
+                "2.0/scripts/materials/PbsMaterials",
+                "2.0/scripts/materials/Common",
+                "2.0/scripts/materials/Common/GLSL",
+                "2.0/scripts/materials/Common/HLSL",
+                "2.0/scripts/materials/Common/Metal"
+            };
 
-            for (size_t i = 0; i<7; ++i)
-			{
-				Ogre::String dataFolderFull = dataFolder + c_locations[i];
-				addResourceLocation(dataFolderFull, "FileSystem", "General");
-			}
+            for (size_t i = 0; i<9; ++i)
+            {
+                Ogre::String dataFolderFull = dataFolder + c_locations[i];
+                addResourceLocation(dataFolderFull, "FileSystem", "General");
+            }
 
         }
 
@@ -74,74 +75,52 @@ namespace Demo
         {
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    Tutorial_SSAOGameState tutorial_SSAOGameState(
-		"This tutorial shows how to make depth-only horizontal based amibent occlusion (HBAO).\n"
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        Tutorial_SSAOGameState *gfxGameState = new Tutorial_SSAOGameState(
+        "This tutorial shows how to make depth-only horizontal based amibent occlusion (HBAO).\n"
         "The sample uses the compositor feature 'quad_normals camera_far_corners_view_space'\n"
         "in combination with a special shader so that we can unproject the depth sampled\n"
         "from the depth buffer and combine it with the frustum corners to get the view space\n"
         "projection.\n"
         "There is also example in the shader how to reconstruct view space normals from fragment position.\n"
         "Normals are used in SSAO to rotate hemisphere sample kernel pointing outwards\n"
-		"from fragment's face.\n"
-		"There are three steps: calculate occlusion (SSAO_HS_ps.glsl/hlsl),\n"
-		"blur (SSAO_BlurV/H_ps.glsl/hlsl) and apply (SSAO_Apply_ps.glsl/hlsl).\n"
-	);
-    Tutorial_SSAOGraphicsSystem graphicsSystem( &tutorial_SSAOGameState );
+        "from fragment's face.\n"
+        "There are three steps: calculate occlusion (SSAO_HS_ps.glsl/hlsl),\n"
+        "blur (SSAO_BlurV/H_ps.glsl/hlsl) and apply (SSAO_Apply_ps.glsl/hlsl).\n" );
 
-    tutorial_SSAOGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new Tutorial_SSAOGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "SSAO Demo" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "SSAO Demo";
+    }
+}
 
-    return 0;
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
 }

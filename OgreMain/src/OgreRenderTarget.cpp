@@ -105,11 +105,16 @@ namespace Ogre {
         return mFormat;
     }
     //-----------------------------------------------------------------------
-    void RenderTarget::getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
+    void RenderTarget::getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
+                                         bool outHwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const
     {
         outFormats[0] = mFormat;
+        outHwGamma[0] = mHwGamma;
         for( size_t i=1; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
+        {
             outFormats[i] = PF_NULL;
+            outHwGamma[i] = false;
+        }
     }
     //-----------------------------------------------------------------------
     void RenderTarget::setDepthBufferPool( uint16 poolId )

@@ -298,6 +298,9 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     uint8 PixelUtil::getMaxMipmapCount( uint32 maxResolution )
     {
+        if( !maxResolution ) //log( 0 ) is undefined.
+            return 0;
+
         uint8 numMipmaps;
 #if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1800))
         numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(maxResolution) ) /
@@ -311,6 +314,11 @@ namespace Ogre {
     uint8 PixelUtil::getMaxMipmapCount( uint32 width, uint32 height )
     {
         return getMaxMipmapCount( std::max( width, height ) );
+    }
+    //-----------------------------------------------------------------------
+    uint8 PixelUtil::getMaxMipmapCount( uint32 width, uint32 height, uint32 depth )
+    {
+        return getMaxMipmapCount( std::max( std::max( width, height ), depth ) );
     }
     //-----------------------------------------------------------------------
     unsigned int PixelUtil::getFlags( PixelFormat format )

@@ -1,11 +1,8 @@
 
 #include "GraphicsSystem.h"
 #include "StencilTestGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
 #include "OgreSceneManager.h"
-#include "OgreCamera.h"
 #include "OgreRoot.h"
 #include "OgreRenderWindow.h"
 #include "OgreConfigFile.h"
@@ -13,8 +10,7 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-
-using namespace Demo;
+#include "System/MainEntryPoints.h"
 
 namespace Demo
 {
@@ -61,69 +57,49 @@ namespace Demo
         {
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    StencilTestGameState stencilTestGameState(
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        StencilTestGameState *gfxGameState = new StencilTestGameState(
         "Shows how to properly use the Stencil Test. A sphere is drawn in one pass, filling\n"
         "the stencil with 1s. The next pass a cube is drawn, only drawing when stencil == 1.\n"
         "Stencil is usually left for advanced effects and ocassionally as a performance\n"
         "optimization.\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/StencilTest.compositor\n" );
-    StencilTestGraphicsSystem graphicsSystem( &stencilTestGameState );
 
-    stencilTestGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new StencilTestGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "Stencil Test Rendering Sample" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Stencil Test Rendering Sample";
+    }
+}
 
-    return 0;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
 }

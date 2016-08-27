@@ -15,7 +15,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 add_recursive( ./ SOURCE_FILES )
 
-ogre_add_executable(Sample_DynamicGeometry WIN32 ${SOURCE_FILES})
+ogre_add_executable(Sample_DynamicGeometry WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${SAMPLE_COMMON_RESOURCES})
 
 target_link_libraries(Sample_DynamicGeometry ${OGRE_LIBRARIES} ${OGRE_SAMPLES_LIBRARIES})
 ogre_config_sample_lib(Sample_DynamicGeometry)
+
+if( APPLE )
+	set_target_properties( Sample_DynamicGeometry PROPERTIES RESOURCE "${SAMPLE_COMMON_RESOURCES}" )
+	set_target_properties( Sample_DynamicGeometry PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${SAMPLES_PLIST} )
+endif()

@@ -24,9 +24,9 @@ extern bool gFakeFrameskip;
 bool gFakeFrameskip = false;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
 #else
-int mainApp()
+int mainApp( int argc, const char *argv[] )
 #endif
 {
     GraphicsGameState graphicsGameState(

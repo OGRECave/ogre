@@ -971,6 +971,11 @@ namespace Ogre
             shadowNode = sceneManager->getCurrentShadowNode();
         uint8 executionMask = mWorkspace->getExecutionMask();
 
+        RenderTarget *lastTarget = 0;
+
+        if( !mPasses.empty() )
+            lastTarget = mPasses.front()->getRenderTarget();
+
         //Execute our passes
         CompositorPassVec::const_iterator itor = mPasses.begin();
         CompositorPassVec::const_iterator end  = mPasses.end();
@@ -979,6 +984,12 @@ namespace Ogre
         {
             CompositorPass *pass = *itor;
             const CompositorPassDef *passDef = pass->getDefinition();
+
+            if( lastTarget != pass->getRenderTarget() )
+            {
+                mRenderSystem->_notifyCompositorNodeSwitchedRenderTarget( lastTarget );
+                lastTarget = pass->getRenderTarget();
+            }
 
             if( executionMask & passDef->mExecutionMask &&
                 (!shadowNode || shadowNode->isShadowMapIdxActive( passDef->mShadowMapIdx ) ) )
@@ -1003,6 +1014,9 @@ namespace Ogre
             }
             ++itor;
         }
+
+        if( !mPasses.empty() )
+            mRenderSystem->_notifyCompositorNodeSwitchedRenderTarget( lastTarget );
     }
     //-----------------------------------------------------------------------------------
     void CompositorNode::finalTargetResized( const RenderTarget *finalTarget )

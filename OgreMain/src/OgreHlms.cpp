@@ -50,6 +50,10 @@ THE SOFTWARE.
 
 #include "OgreHlmsListener.h"
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #include "iOS/macUtils.h"
+#endif
+
 namespace Ogre
 {
     const int HlmsBits::HlmsTypeBits    = 3;
@@ -120,6 +124,7 @@ namespace Ogre
     const IdString HlmsBaseProp::AlphaBlend     = IdString( "hlms_alphablend" );
 
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
+    const IdString HlmsBaseProp::iOS            = IdString( "iOS" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
     const IdString HlmsBaseProp::TexGather      = IdString( "hlms_tex_gather" );
     const IdString HlmsBaseProp::DisableStage   = IdString( "hlms_disable_stage" );
@@ -207,6 +212,10 @@ namespace Ogre
         }
 
         enumeratePieceFiles();
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        mOutputPath = macCachePath() + '/';
+#endif
     }
     //-----------------------------------------------------------------------------------
     Hlms::~Hlms()
@@ -264,6 +273,7 @@ namespace Ogre
             const String filename = ShaderFiles[i];
             hasValidFile |= mDataFolder->exists( filename + ".glsl" );
             hasValidFile |= mDataFolder->exists( filename + ".hlsl" );
+            hasValidFile |= mDataFolder->exists( filename + ".metal" );
         }
 
         if( !hasValidFile )
@@ -1626,6 +1636,9 @@ namespace Ogre
                 if( mShaderProfile == "glsl" ) //TODO: String comparision
                     setProperty( HlmsBaseProp::GL3Plus, 330 );
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+                setProperty( HlmsBaseProp::iOS, 1 );
+#endif
                 setProperty( HlmsBaseProp::HighQuality, mHighQuality );
 
                 //Library piece files first
@@ -1708,6 +1721,7 @@ namespace Ogre
                         gp->setParameter( "entry_point", "main" );
                     }
 
+                    gp->setBuildParametersFromReflection( false );
                     gp->setSkeletalAnimationIncluded( getProperty( HlmsBaseProp::Skeleton ) != 0 );
                     gp->setMorphAnimationIncluded( false );
                     gp->setPoseAnimationIncluded( getProperty( HlmsBaseProp::Pose ) );
@@ -2149,7 +2163,7 @@ namespace Ogre
 
         passPso.stencilParams = mRenderSystem->getStencilBufferParams();
 
-        renderTarget->getFormatsForPso( passPso.colourFormat );
+        renderTarget->getFormatsForPso( passPso.colourFormat, passPso.hwGamma );
 
         passPso.depthFormat = PF_NULL;
         const DepthBuffer *depthBuffer = renderTarget->getDepthBuffer();
@@ -2349,10 +2363,10 @@ namespace Ogre
         if( mRenderSystem )
         {
             //Prefer glsl over glsles
-            const String shaderProfiles[3] = { "hlsl", "glsles", "glsl" };
+            const String shaderProfiles[4] = { "hlsl", "glsles", "glsl", "metal" };
             const RenderSystemCapabilities *capabilities = mRenderSystem->getCapabilities();
 
-            for( size_t i=0; i<3; ++i )
+            for( size_t i=0; i<4; ++i )
             {
                 if( capabilities->isShaderProfileSupported( shaderProfiles[i] ) )
                     mShaderProfile = shaderProfiles[i];
@@ -2370,6 +2384,10 @@ namespace Ogre
                             mShaderTargets[i] = &BestD3DShaderTargets[i][j];
                     }
                 }
+            }
+            else if( mShaderProfile == "metal" )
+            {
+                mShaderFileExt = ".metal";
             }
             else
             {

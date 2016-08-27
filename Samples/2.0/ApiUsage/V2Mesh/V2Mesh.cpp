@@ -1,24 +1,28 @@
 
 #include "GraphicsSystem.h"
 #include "V2MeshGameState.h"
-#include "SdlInputHandler.h"
-
-#include "OgreTimer.h"
-#include "Threading/OgreThreads.h"
-#include "OgreRenderWindow.h"
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-
-using namespace Demo;
+#include "System/MainEntryPoints.h"
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
 #else
-int mainApp()
+int mainApp( int argc, const char *argv[] )
 #endif
 {
-    V2MeshGameState v2MeshGameState(
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
+}
+
+namespace Demo
+{
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        V2MeshGameState *gfxGameState = new V2MeshGameState(
         "The mesh file format for v2 objects (i.e. Items) is currently WIP. You can easily\n"
         "import V1 meshes into the V2 format.\n"
         "There are a couple considerations to take care:\n"
@@ -48,54 +52,26 @@ int mainApp()
         "With all options turned on, a 1.9 vertex format weighting 48 bytes per vertex\n"
         "(3x Position, 3x Normals, 1x reflection, 2x UV) can be stored with just 20 bytes,\n"
         "halving the video memory size and bandwidth required" );
-    GraphicsSystem graphicsSystem( &v2MeshGameState );
 
-    v2MeshGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new GraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "Importing V1 meshes into V2 objects (convert v1 objects to v2 format)" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Importing V1 meshes into V2 objects (convert v1 objects to v2 format)";
+    }
 }

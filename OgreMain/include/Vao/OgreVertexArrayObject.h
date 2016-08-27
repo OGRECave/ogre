@@ -60,6 +60,7 @@ namespace Ogre
         friend class RenderSystem;
         friend class D3D11RenderSystem;
         friend class GL3PlusRenderSystem;
+        friend class MetalRenderSystem;
 
     protected:
         /// ID of the internal vertex and index buffer layouts. If this ID

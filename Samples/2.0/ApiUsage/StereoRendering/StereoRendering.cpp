@@ -1,9 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "StereoRenderingGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
@@ -12,8 +10,16 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
+#include "System/MainEntryPoints.h"
 
-using namespace Demo;
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
+}
 
 namespace Demo
 {
@@ -101,70 +107,46 @@ namespace Demo
         {
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    StereoRenderingGameState stereoGameState(
-        "Shows the flexibility of the Compositor. Creates one workspace for each eye, using\n"
-        "execution and viewport modifier masks to control which passes are rendered in which\n"
-        "eyes, and also which ones are shown on the entire screen (i.e. clear, HUD)\n"
-        "This sample depends on the media files:\n"
-        "   * Samples/Media/2.0/scripts/Compositors/StereoRendering.compositor\n"
-        "For more information about stereo rendering and 'Stereo and Split-Screen Rendering'\n"
-        "section of the 2.0 guide in the Docs/2.0 folder." );
-    StereoGraphicsSystem graphicsSystem( &stereoGameState );
-
-    stereoGameState._notifyGraphicsSystem( &graphicsSystem );
-
-    graphicsSystem.initialize( "Stereo Rendering Sample" );
-
-    if( graphicsSystem.getQuit() )
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
     {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        StereoRenderingGameState *gfxGameState = new StereoRenderingGameState(
+        "This tutorial demonstrates the most basic rendering loop: Variable framerate.\n"
+        "Variable framerate means the application adapts to the current frame rendering\n"
+        "performance and boosts or decreases the movement speed of objects to maintain\n"
+        "the appearance that objects are moving at a constant velocity.\n"
+        "When framerate is low, it looks 'frame skippy'; when framerate is high,\n"
+        "it looks very smooth.\n"
+        "Note: If you can't exceed 60 FPS, it's probably because of VSync being turned on.\n"
+        "\n"
+        "Despite what it seems, this is the most basic form of updating, and a horrible way\n"
+        "to update your objects if you want to do any kind of serious game development.\n"
+        "Keep going through the Tutorials for superior methods of updating the rendering loop.\n"
+        "\n"
+        "Note: The cube is black because there is no lighting. We are not focusing on that." );
+
+        GraphicsSystem *graphicsSystem = new StereoGraphicsSystem( gfxGameState );
+
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
+
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Stereo Rendering Sample";
+    }
 }

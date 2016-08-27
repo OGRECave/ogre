@@ -16,10 +16,16 @@ fragment_program Postprocess/ASCII_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program Postprocess/ASCII_ps_Metal metal
+{
+	source ASCII_ps.metal
+}
+
 fragment_program Postprocess/ASCII_ps unified
 {
 	delegate Postprocess/ASCII_ps_GLSL
 	delegate Postprocess/ASCII_ps_HLSL
+	delegate Postprocess/ASCII_ps_Metal
 
 	default_params
 	{
@@ -35,7 +41,6 @@ material Postprocess/ASCII
 {
     technique
     {
-
 		pass
 		{
 			depth_check off
@@ -49,7 +54,6 @@ material Postprocess/ASCII
 
 			fragment_program_ref Postprocess/ASCII_ps
 			{
-
 			}
 
 			texture_unit RT

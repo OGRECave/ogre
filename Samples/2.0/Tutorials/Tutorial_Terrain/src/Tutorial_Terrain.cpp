@@ -1,10 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "Tutorial_TerrainGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
-#include "Threading/OgreThreads.h"
 #include "OgreRenderWindow.h"
 
 #include "OgreRoot.h"
@@ -17,8 +14,7 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
-
-using namespace Demo;
+#include "System/MainEntryPoints.h"
 
 namespace Demo
 {
@@ -129,15 +125,13 @@ namespace Demo
             mWorkspace = setupCompositor();
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    Tutorial_TerrainGameState tutorial_TerrainGameState(
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        Tutorial_TerrainGameState *gfxGameState = new Tutorial_TerrainGameState(
         "--- !!! NOTE: THIS SAMPLE IS A WORK IN PROGRESS !!! ---\n"
         "This is an advanced tutorial that shows several things working together:\n"
         "   * Own Hlms implementation to render the terrain\n"
@@ -157,54 +151,36 @@ int mainApp()
         "   * Samples/Media/2.0/materials/Common/GLSL/GaussianBlurBase_cs.glsl\n"
         "   * Samples/Media/2.0/materials/Common/HLSL/GaussianBlurBase_cs.hlsl\n"
         "   * Samples/Media/Hlms/Terra/*.*\n" );
-    Tutorial_TerrainGraphicsSystem graphicsSystem( &tutorial_TerrainGameState );
 
-    tutorial_TerrainGameState._notifyGraphicsSystem( &graphicsSystem );
+        Tutorial_TerrainGraphicsSystem *graphicsSystem =
+                new Tutorial_TerrainGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "Tutorial: Terrain" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Tutorial: Terrain";
+    }
+}
 
-    return 0;
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
 }

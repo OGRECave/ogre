@@ -11,10 +11,16 @@ fragment_program Postprocess/Posterize_ps_GLSL glsl
 	source Posterize_ps.glsl
 }
 
+fragment_program Postprocess/Posterize_ps_Metal metal
+{
+	source Posterize_ps.metal
+}
+
 fragment_program Postprocess/Posterize_ps unified
 {
 	delegate Postprocess/Posterize_ps_GLSL
 	delegate Postprocess/Posterize_ps_HLSL
+	delegate Postprocess/Posterize_ps_Metal
 }
 
 material Postprocess/Posterize

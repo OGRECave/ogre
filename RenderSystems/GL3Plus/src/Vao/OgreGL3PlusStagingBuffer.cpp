@@ -249,7 +249,7 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    StagingStallType GL3PlusStagingBuffer::uploadWillStall( size_t sizeBytes ) const
+    StagingStallType GL3PlusStagingBuffer::uploadWillStall( size_t sizeBytes )
     {
         assert( mUploadOnly );
 

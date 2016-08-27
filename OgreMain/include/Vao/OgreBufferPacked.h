@@ -132,6 +132,7 @@ namespace Ogre
         friend class D3D11BufferInterface;
         friend class D3D11CompatBufferInterface;
         friend class GL3PlusBufferInterface;
+        friend class MetalBufferInterface;
         friend class NULLBufferInterface;
 
     protected:

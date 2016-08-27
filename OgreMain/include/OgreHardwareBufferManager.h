@@ -463,6 +463,7 @@ namespace v1 {
         friend class HardwareIndexBufferSharedPtr;
     protected:
         HardwareBufferManagerBase* mImpl;
+
     public:
         HardwareBufferManager(HardwareBufferManagerBase* imp);
         ~HardwareBufferManager();

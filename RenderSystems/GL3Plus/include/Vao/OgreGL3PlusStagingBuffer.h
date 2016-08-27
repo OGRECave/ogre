@@ -112,7 +112,7 @@ namespace Ogre
                               VaoManager *vaoManager, bool uploadOnly, GLuint vboName );
         virtual ~GL3PlusStagingBuffer();
 
-        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes );
 
         void cleanUnfencedHazards(void);
 

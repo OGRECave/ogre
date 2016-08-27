@@ -1,10 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "V2ManualObjectGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
-#include "Threading/OgreThreads.h"
 #include "OgreRenderWindow.h"
 #include "OgreRoot.h"
 #include "OgreConfigFile.h"
@@ -12,6 +9,7 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
+#include "System/MainEntryPoints.h"
 
 namespace Demo
 {
@@ -42,17 +40,13 @@ namespace Demo
         {
         }
     };
-}
 
-using namespace Demo;
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    V2ManualObjectGameState v2ManualObjectGameState(
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        V2ManualObjectGameState *gfxGameState = new V2ManualObjectGameState(
         "Original ManualObject allowed users to simply create custom meshes in runtime.\n"
         "The new one does the same thing, except some limitations arising from the method\n"
         "used to update vertex and index buffers. Previously you were able to change the data layout\n"
@@ -61,54 +55,36 @@ int mainApp()
         "Not complying to this would cause buffer overflow and most likely crash the application.\n"
         "To change the data layout or buffer size, call clear() and create the buffer from scratch by\n"
         "calling begin() again.");
-    ManualObjectGraphicsSystem graphicsSystem( &v2ManualObjectGameState );
 
-    v2ManualObjectGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new ManualObjectGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "v2 ManualObject usage" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "v2 ManualObject usage";
+    }
+}
 
-    return 0;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
 }

@@ -172,6 +172,9 @@ namespace Ogre {
         int getScissorActualWidth(void) const           { return mScissorActWidth; }
         int getScissorActualHeight(void) const          { return mScissorActHeight; }
 
+        bool coversEntireTarget(void) const;
+        bool scissorsMatchViewport(void) const;
+
         /** Sets the dimensions (after creation).
         @param left
             Left point of viewport.
@@ -327,6 +330,8 @@ namespace Ogre {
         float mScissorRelLeft, mScissorRelTop, mScissorRelWidth, mScissorRelHeight;
         /// Actual dimensions, based on target dimensions, scissor rect
         int mScissorActLeft, mScissorActTop, mScissorActWidth, mScissorActHeight;
+        bool mCoversEntireTarget;
+        bool mScissorsMatchViewport;
 
         /// Z-order
         int mZOrder;
