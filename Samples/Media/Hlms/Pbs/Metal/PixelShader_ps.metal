@@ -141,6 +141,11 @@ fragment @insertpiece( output_type ) main_metal
 		, device const float4 *f3dLightList [[buffer(TEX_SLOT_START+2)]]
 	@end
 
+	@property( two_sided_lighting )
+		, bool gl_FrontFacing [[front_facing]]
+		@piece( two_sided_flip_normal )* (gl_FrontFacing ? 1.0 : -1.0)@end
+	@end
+
 	@foreach( num_textures, n )
 		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end
 	@property( envprobe_map )
@@ -250,10 +255,10 @@ fragment @insertpiece( output_type ) main_metal
 
 @property( !normal_map )
 	// Geometric normal
-	nNormal = normalize( inPs.normal );
+	nNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
 @end @property( normal_map )
 	//Normal mapping.
-	float3 geomNormal = normalize( inPs.normal );
+	float3 geomNormal = normalize( inPs.normal ) @insertpiece( two_sided_flip_normal );
 	float3 vTangent = normalize( inPs.tangent );
 
 	//Get the TBN matrix
