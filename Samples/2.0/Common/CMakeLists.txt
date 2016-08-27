@@ -43,14 +43,3 @@ add_library(${OGRE_SAMPLES_COMMON_LIBRARY} STATIC ${SOURCE_FILES} ${HEADER_FILES
 link_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(${OGRE_SAMPLES_COMMON_LIBRARY} ${SDL2_LIBRARY} OgreHlmsPbs OgreHlmsUnlit)
-
-if( NOT APPLE )
-	include_directories( BEFORE SYSTEM "/home/matias/OSX_Shared/Platforms/" )
-	include_directories( BEFORE SYSTEM "/home/matias/OSX_Shared/Platforms/iOS" )
-	include_directories( BEFORE SYSTEM "/home/matias/OSX_Shared/Platforms/iOS/include" )
-	include_directories( BEFORE SYSTEM "/home/matias/OSX_Shared/Platforms/iOS/include/c++/4.2.1" )
-	include_directories( BEFORE SYSTEM "/home/matias/OSX_Shared/Platforms/iOS/include/objc" )
-	include_directories( BEFORE SYSTEM "/home/matias/OSX_Shared/Platforms/iOS/include++" )
-	add_definitions( -D__arm64__ -DTARGET_CPU_ARM64 -D__APPLE_CPP__ -D__APPLE__ -D__APPLE_CC__ -D__IPHONE_OS_VERSION_MIN_REQUIRED=90000 "-include /home/matias/OSX_Shared/Platforms/__OSX_Fixes.h" -fblocks -fobjc-abi-version=3 -fobjc-arc -Wno-unknown-attributes -Wno-deprecated-register )
-	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11" )
-endif()
