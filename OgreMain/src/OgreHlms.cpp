@@ -500,7 +500,9 @@ namespace Ogre
             {
                 textStarted = false;
             }
-            else if( c == '!' )
+            else if( c == '!' &&
+                     //Avoid treating "!=" as a negation of variable.
+                     ( (it + 1) == en || *(it + 1) != '=' ) )
             {
                 nextExpressionNegates = true;
             }
@@ -513,14 +515,17 @@ namespace Ogre
                     currentExpression->children.back().negated = nextExpressionNegates;
                 }
 
-                if( c == '&' || c == '|' )
+                if( c == '&' || c == '|' ||
+                    c == '=' || c == '<' || c == '>' ||
+                    c == '!' /* can only mean "!=" */ )
                 {
                     if( currentExpression->children.empty() || nextExpressionNegates )
                     {
                         syntaxError = true;
                     }
                     else if( !currentExpression->children.back().value.empty() &&
-                             c != *(currentExpression->children.back().value.end()-1) )
+                             c != *(currentExpression->children.back().value.end()-1) &&
+                             c != '=' )
                     {
                         currentExpression->children.push_back( Expression() );
                     }
@@ -539,7 +544,7 @@ namespace Ogre
             syntaxError = true;
 
         if( !syntaxError )
-            retVal = evaluateExpressionRecursive( outExpressions, syntaxError );
+            retVal = evaluateExpressionRecursive( outExpressions, syntaxError ) != 0;
 
         if( syntaxError )
             printf( "Syntax Error at line %lu\n", calculateLineCount( subString ) );
@@ -549,46 +554,108 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
-    bool Hlms::evaluateExpressionRecursive( ExpressionVec &expression, bool &outSyntaxError ) const
+    int32 Hlms::evaluateExpressionRecursive( ExpressionVec &expression, bool &outSyntaxError ) const
     {
+        bool syntaxError = outSyntaxError;
+        bool lastExpWasOperator = true;
         ExpressionVec::iterator itor = expression.begin();
         ExpressionVec::iterator end  = expression.end();
 
         while( itor != end )
         {
-            if( itor->value == "&&" )
-                itor->type = EXPR_OPERATOR_AND;
-            else if( itor->value == "||" )
-                itor->type = EXPR_OPERATOR_OR;
-            else if( !itor->children.empty() )
-                itor->type = EXPR_OBJECT;
-            else
-                itor->type = EXPR_VAR;
-
-            ++itor;
-        }
-
-        bool syntaxError = outSyntaxError;
-        bool lastExpWasOperator = true;
-
-        itor = expression.begin();
-
-        while( itor != end && !syntaxError )
-        {
             Expression &exp = *itor;
-            if( ((exp.type == EXPR_OPERATOR_OR || exp.type == EXPR_OPERATOR_AND) && lastExpWasOperator) ||
-                ((exp.type == EXPR_VAR || exp.type == EXPR_OBJECT) && !lastExpWasOperator ) )
+
+            if( exp.value == "&&" )
+                exp.type = EXPR_OPERATOR_AND;
+            else if( exp.value == "||" )
+                exp.type = EXPR_OPERATOR_OR;
+            else if( exp.value == "<" )
+                exp.type = EXPR_OPERATOR_LE;
+            else if( exp.value == "<=" )
+                exp.type = EXPR_OPERATOR_LEEQ;
+            else if( exp.value == "==" )
+                exp.type = EXPR_OPERATOR_EQ;
+            else if( exp.value == "!=" )
+                exp.type = EXPR_OPERATOR_NEQ;
+            else if( exp.value == ">" )
+                exp.type = EXPR_OPERATOR_GR;
+            else if( exp.value == ">=" )
+                exp.type = EXPR_OPERATOR_GREQ;
+            else if( !exp.children.empty() )
+                exp.type = EXPR_OBJECT;
+            else
+                exp.type = EXPR_VAR;
+
+            if( ( exp.isOperator() &&  lastExpWasOperator) ||
+                (!exp.isOperator() && !lastExpWasOperator) )
             {
                 syntaxError = true;
                 printf( "Unrecognized token '%s'", exp.value.c_str() );
             }
-            else if( exp.type == EXPR_OPERATOR_OR || exp.type == EXPR_OPERATOR_AND )
+            else
             {
-                lastExpWasOperator = true;
+                lastExpWasOperator = exp.isOperator();
             }
-            else if( exp.type == EXPR_VAR )
+
+            ++itor;
+        }
+
+        //If we don't check 'expression.size() > 3u' here, we can end up in infinite recursion
+        //later on (because operators get turned into EXPR_OBJECT and thus the object
+        //is evaluated recusrively, and turned again into EXPR_OBJECT)
+        if( !syntaxError && expression.size() > 3u )
+        {
+            //We will now enclose "a < b" into "(a < b)" other wise statements like these:
+            //a && b < c will be parsed as (a && b) < c which is completely counterintuitive.
+
+            //We need expression.size() > 3 which is guaranteed because if back nor front
+            //are neither operators and we can't have two operators in a row, then they can
+            //only be in the middle, or there is no operator at all.
+            itor = expression.begin() + 1;
+            end  = expression.end();
+            while( itor != end )
             {
-                exp.result = getProperty( exp.value ) != 0;
+                if( itor->type >= EXPR_OPERATOR_LE && itor->type <= EXPR_OPERATOR_GREQ )
+                {
+                    //We need to merge n-1, n, n+1 into:
+                    // (n-1)' = EXPR_OBJECT with 3 children:
+                    //      n-1, n, n+1
+                    //and then remove both n & n+1.
+                    itor->children.resize( 3 );
+
+                    itor->children[1].type = itor->type;
+                    itor->children[1].value.swap( itor->value );
+                    itor->children[0].swap( *(itor - 1) );
+                    itor->children[2].swap( *(itor + 1) );
+
+                    itor->type = EXPR_OBJECT;
+
+                    (itor - 1)->swap( *itor );
+
+                    itor = expression.erase( itor, itor + 2 );
+                    end  = expression.end();
+                }
+                else
+                {
+                    ++itor;
+                }
+            }
+        }
+
+        //Evaluate the individual properties.
+        itor = expression.begin();
+        while( itor != end && !syntaxError )
+        {
+            Expression &exp = *itor;
+            if( exp.type == EXPR_VAR )
+            {
+                char *endPtr;
+                exp.result = strtol( exp.value.c_str(), &endPtr, 10 );
+                if( exp.value.c_str() == endPtr )
+                {
+                    //This isn't a number. Let's try if it's a variable
+                    exp.result = getProperty( exp.value );
+                }
                 lastExpWasOperator = false;
             }
             else
@@ -600,26 +667,37 @@ namespace Ogre
             ++itor;
         }
 
-        bool retVal = true;
-
+        //Perform operations between the different properties.
+        int32 retVal = 1;
         if( !syntaxError )
         {
             itor = expression.begin();
-            bool andMode = true;
+
+            ExpressionType nextOperation = EXPR_VAR;
 
             while( itor != end )
             {
-                if( itor->type == EXPR_OPERATOR_OR )
-                    andMode = false;
-                else if( itor->type == EXPR_OPERATOR_AND )
-                    andMode = true;
-                else
+                int32 result = itor->negated ? !itor->result : itor->result;
+
+                switch( nextOperation )
                 {
-                    if( andMode )
-                        retVal &= itor->negated ? !itor->result : itor->result;
-                    else
-                        retVal |= itor->negated ? !itor->result : itor->result;
+                case EXPR_OPERATOR_OR:      retVal = (retVal != 0) | (result != 0); break;
+                case EXPR_OPERATOR_AND:     retVal = (retVal != 0) & (result != 0); break;
+                case EXPR_OPERATOR_LE:      retVal =  retVal <  result; break;
+                case EXPR_OPERATOR_LEEQ:    retVal =  retVal <= result; break;
+                case EXPR_OPERATOR_EQ:      retVal =  retVal == result; break;
+                case EXPR_OPERATOR_NEQ:     retVal =  retVal != result; break;
+                case EXPR_OPERATOR_GR:      retVal =  retVal >  result; break;
+                case EXPR_OPERATOR_GREQ:    retVal =  retVal >= result; break;
+
+                case EXPR_OBJECT:
+                case EXPR_VAR:
+                    if( !itor->isOperator() )
+                        retVal = result;
+                    break;
                 }
+
+                nextOperation = itor->type;
 
                 ++itor;
             }
@@ -2456,5 +2534,15 @@ namespace Ogre
     size_t Hlms::calculateLineCount( const SubStringRef &subString )
     {
         return calculateLineCount( subString.getOriginalBuffer(), subString.getStart() );
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    inline void Hlms::Expression::swap( Expression &other )
+    {
+        std::swap( this->result,    other.result );
+        std::swap( this->negated,   other.negated );
+        std::swap( this->type,      other.type );
+        this->children.swap( other.children );
+        this->value.swap( other.value );
     }
 }
