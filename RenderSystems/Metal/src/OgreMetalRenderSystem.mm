@@ -731,6 +731,7 @@ namespace Ogre
         mActiveRenderEncoder = mActiveDevice->mRenderEncoder;
 
         static_cast<MetalVaoManager*>( mVaoManager )->bindDrawId();
+        [mActiveRenderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
@@ -966,6 +967,13 @@ namespace Ogre
         metalPso->vertexShader      = vertexShader;
         metalPso->pixelShader       = pixelShader;
 
+        switch( newPso->macroblock->mCullMode )
+        {
+        case CULL_NONE:             metalPso->cullMode = MTLCullModeNone; break;
+        case CULL_CLOCKWISE:        metalPso->cullMode = MTLCullModeBack; break;
+        case CULL_ANTICLOCKWISE:    metalPso->cullMode = MTLCullModeFront; break;
+        }
+
         newPso->rsData = metalPso;
     }
     //-------------------------------------------------------------------------
@@ -1048,8 +1056,7 @@ namespace Ogre
         [mActiveRenderEncoder setDepthBias:pso->macroblock->mDepthBiasConstant
                                      slopeScale:pso->macroblock->mDepthBiasSlopeScale
                                      clamp:0.0f];
-        // Ogre CullMode starts with 1 and Metals starts with 0
-        [mActiveRenderEncoder setCullMode:(MTLCullMode)((int)pso->macroblock->mCullMode - 1)];
+        [mActiveRenderEncoder setCullMode:metalPso->cullMode];
 
         if( mPso != metalPso )
         {
