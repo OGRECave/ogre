@@ -175,19 +175,29 @@ namespace Ogre
         {
             EXPR_OPERATOR_OR,        //||
             EXPR_OPERATOR_AND,       //&&
+            EXPR_OPERATOR_LE,        //<
+            EXPR_OPERATOR_LEEQ,      //<=
+            EXPR_OPERATOR_EQ,        //==
+            EXPR_OPERATOR_NEQ,       //!=
+            EXPR_OPERATOR_GR,        //>
+            EXPR_OPERATOR_GREQ,      //>=
             EXPR_OBJECT,             //(...)
             EXPR_VAR
         };
 
         struct Expression
         {
-            bool                    result;
+            int32                   result;
             bool                    negated;
             ExpressionType          type;
             std::vector<Expression> children;
             String                  value;
 
             Expression() : result( false ), negated( false ), type( EXPR_VAR ) {}
+
+            bool isOperator(void) const
+                { return type >= EXPR_OPERATOR_OR && type <= EXPR_OPERATOR_GREQ; }
+            inline void swap( Expression &other );
         };
 
         typedef std::vector<Expression> ExpressionVec;
@@ -215,7 +225,7 @@ namespace Ogre
         static void findBlockEnd( SubStringRef &outSubString , bool &syntaxError );
 
         bool evaluateExpression( SubStringRef &outSubString, bool &outSyntaxError ) const;
-        bool evaluateExpressionRecursive( ExpressionVec &expression, bool &outSyntaxError ) const;
+        int32 evaluateExpressionRecursive( ExpressionVec &expression, bool &outSyntaxError ) const;
         static size_t evaluateExpressionEnd( const SubStringRef &outSubString );
 
         static void evaluateParamArgs( SubStringRef &outSubString, StringVector &outArgs,
