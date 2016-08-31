@@ -4,7 +4,7 @@ This source file is a part of OGRE
 
 For the latest info, see http://www.ogre3d.org/
 
-Copyright (c) 2000-2016 Torus Knot Software Ltd
+Copyright (c) 2000-2014 Torus Knot Software Ltd
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -23,25 +23,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE
 -------------------------------------------------------------------------*/
-#ifndef __OgreThreadHeaders_H__
-#define __OgreThreadHeaders_H__
+#ifndef __OgreThreadHeadersSTD_H__
+#define __OgreThreadHeadersSTD_H__
 
-#if !defined(NOMINMAX) && defined(_MSC_VER)
-#   define NOMINMAX // required to stop windows.h messing up std::min
-#endif
-
-#if OGRE_THREAD_PROVIDER == 1
-    #include "OgreThreadHeadersBoost.h"
-#elif OGRE_THREAD_PROVIDER == 2
-    #include "OgreThreadHeadersPoco.h"
-#elif OGRE_THREAD_PROVIDER == 3
-    #include "OgreThreadHeadersTBB.h"
-#elif OGRE_THREAD_PROVIDER == 4
-	#include "OgreThreadHeadersSTD.h"
-#endif
-
-#include "OgreThreadDefines.h"
+#include <memory>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #endif
-
-

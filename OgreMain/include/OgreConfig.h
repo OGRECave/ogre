@@ -151,6 +151,8 @@ OGRE_THREAD_PROVIDER = 2
     Poco libraries provide threading functionality.
 OGRE_THREAD_PROVIDER = 3
     TBB library provides threading functionality.
+OGRE_THREAD_PROVIDER = 4
+    Standard library provides threading functionality. (requires compiler support)
 */
 #ifndef OGRE_THREAD_PROVIDER
 #define OGRE_THREAD_PROVIDER 0

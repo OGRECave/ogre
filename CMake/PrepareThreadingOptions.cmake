@@ -12,8 +12,8 @@
 # build, depending on the dependencies found.
 #######################################################################
 
-set(OGRE_THREAD_SUPPORT_AVAILABLE FALSE)
 set(OGRE_THREAD_DEFAULT_PROVIDER "none")
+set(OGRE_THREAD_TYPE "0")
 
 if (Boost_THREAD_FOUND AND Boost_DATE_TIME_FOUND)
 	set(Boost_THREADING TRUE)
@@ -22,36 +22,39 @@ endif ()
 if (Boost_THREADING AND NOT OGRE_THREAD_SUPPORT_AVAILABLE)
 	set(OGRE_THREAD_SUPPORT_AVAILABLE TRUE)
 	set(OGRE_THREAD_DEFAULT_PROVIDER "boost")
+	set(OGRE_THREAD_TYPE "2")
 endif ()
 
 if (POCO_FOUND AND NOT OGRE_THREAD_SUPPORT_AVAILABLE)
 	set(OGRE_THREAD_SUPPORT_AVAILABLE TRUE)
 	set(OGRE_THREAD_DEFAULT_PROVIDER "poco")
+	set(OGRE_THREAD_TYPE "2")
 endif ()
 
 if (TBB_FOUND AND NOT OGRE_THREAD_SUPPORT_AVAILABLE)
 	set(OGRE_THREAD_SUPPORT_AVAILABLE TRUE)
 	set(OGRE_THREAD_DEFAULT_PROVIDER "tbb")
+	set(OGRE_THREAD_TYPE "2")
 endif ()
 
-if (OGRE_THREAD_SUPPORT_AVAILABLE)
-	set(OGRE_CONFIG_THREADS 2 CACHE STRING 
-		"Enable Ogre thread support for background loading. Possible values:
-		0 - Threading off.
-		1 - Full background loading.
-		2 - Background resource preparation."
-	)
-	set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER} CACHE STRING
-		"Select the library to use for thread support. Possible values:
-		boost - Boost thread library.
-		poco  - Poco thread library.
-		tbb   - ThreadingBuildingBlocks library."
-	)
-else ()
-	set(OGRE_CONFIG_THREADS 0)
-	set(OGRE_CONFIG_THREAD_PROVIDER "none")
+if (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "std")
+	set(OGRE_THREAD_DEFAULT_PROVIDER "std")
+	set(OGRE_THREAD_TYPE "2")
 endif ()
 
+set(OGRE_CONFIG_THREADS ${OGRE_THREAD_TYPE} CACHE STRING 
+	"Enable Ogre thread support for background loading. Possible values:
+	0 - Threading off.
+	1 - Full background loading.
+	2 - Background resource preparation."
+)
+set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER} CACHE STRING
+	"Select the library to use for thread support. Possible values:
+	boost - Boost thread library.
+	poco  - Poco thread library.
+	tbb   - ThreadingBuildingBlocks library.
+	std   - STL thread library (requires compiler support)."
+)
 
 # sanitise threading choices
 if (NOT OGRE_CONFIG_THREADS)
@@ -73,6 +76,8 @@ else ()
 			message(STATUS "Warning: tbb is not available. Using ${OGRE_THREAD_DEFAULT_PROVIDER} as thread provider.")
 			set(OGRE_CONFIG_THREAD_PROVIDER ${OGRE_THREAD_DEFAULT_PROVIDER})
 		endif ()
+	elseif (OGRE_CONFIG_THREAD_PROVIDER STREQUAL "std")
+		#Potentially add test for compiler support
 	else ()
 		message(STATUS "Warning: Unknown thread provider chosen. Defaulting to ${OGRE_THREAD_DEFAULT_PROVIDER}.")
 	endif ()	

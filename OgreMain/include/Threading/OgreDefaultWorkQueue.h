@@ -34,6 +34,8 @@ THE SOFTWARE
     #include "OgreDefaultWorkQueueStandard.h"
 #elif OGRE_THREAD_PROVIDER == 3
     #include "OgreDefaultWorkQueueTBB.h"
+#elif OGRE_THREAD_PROVIDER == 4
+	#include "OgreDefaultWorkQueueStandard.h"
 #endif
 
 #endif
