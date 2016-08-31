@@ -221,7 +221,7 @@ namespace Ogre
             FreeOnDestructor dataPtrContainer( dstData );
 
             const void *srcData = asyncTicket->map();
-            memcpy( dstData, srcData, (*itBuffers)->getTotalSizeBytes() );
+            memcpy( dstData, srcData, mIndexBuffer->getTotalSizeBytes() );
             asyncTicket->unmap();
 
             const bool keepAsShadow = mIndexBuffer->getShadowCopy() != 0;

@@ -270,7 +270,7 @@ namespace Ogre
     {
         return ArrayVector3(
                 (mChunkBase[1] * rkVec.mChunkBase[2]) -
-                (mChunkBase[0] * rkVec.mChunkBase[1]),
+                (mChunkBase[2] * rkVec.mChunkBase[1]),
                 (mChunkBase[2] * rkVec.mChunkBase[0]) -
                 (mChunkBase[0] * rkVec.mChunkBase[2]),
                 (mChunkBase[0] * rkVec.mChunkBase[1]) -
