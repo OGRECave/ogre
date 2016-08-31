@@ -46,7 +46,7 @@ namespace Ogre
         "GrainMerge", "Difference"
     };
 
-    const size_t HlmsPbsDatablock::MaterialSizeInGpu          = 52 * 4 + NUM_PBSM_TEXTURE_TYPES * 2 + 4;
+    const size_t HlmsPbsDatablock::MaterialSizeInGpu          = 56 * 4 + NUM_PBSM_TEXTURE_TYPES * 2 + 4;
     const size_t HlmsPbsDatablock::MaterialSizeInGpuAligned   = alignToNextMultiple(
                                                                     HlmsPbsDatablock::MaterialSizeInGpu,
                                                                     4 * 4 );
@@ -62,6 +62,7 @@ namespace Ogre
         mUseAlphaFromTextures( true ),
         mWorkflow( SpecularWorkflow ),
         mTransparencyMode( None ),
+        mDiffuseCol( 1.0f ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 1 ),
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
@@ -87,6 +88,12 @@ namespace Ogre
             mTexToBakedTextureIdx[i] = NUM_PBSM_TEXTURE_TYPES;
 
         String paramVal;
+
+        if( Hlms::findParamInVec( params, "diffuse_colour", paramVal ) )
+        {
+            Vector4 val = StringConverter::parseVector4( paramVal, Vector4( 1.0f ) );
+            setDiffuseColour( val );
+        }
 
         if( Hlms::findParamInVec( params, "diffuse", paramVal ) )
         {
@@ -358,7 +365,7 @@ namespace Ogre
             mkDb *= mTransparencyValue * mTransparencyValue;
         }
 
-        memcpy( dstPtr, &mkDr, MaterialSizeInGpu );
+        memcpy( dstPtr, &mDiffuseCol, MaterialSizeInGpu );
 
         mkDr = oldkDr;
         mkDg = oldkDg;
@@ -475,6 +482,17 @@ namespace Ogre
         mTexIndices[textureType] = texLocation.xIdx;
 
         return texLocation.texture;
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setDiffuseColour( const Vector4 &diffuseColour )
+    {
+        mDiffuseCol = diffuseColour;
+        scheduleConstBufferUpdate();
+    }
+    //-----------------------------------------------------------------------------------
+    const Vector4& HlmsPbsDatablock::getDiffuseColour(void) const
+    {
+        return mDiffuseCol;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDiffuse( const Vector3 &diffuseColour )
@@ -969,6 +987,8 @@ namespace Ogre
 
         setWorkflow( SpecularAsFresnelWorkflow );
 
+        // setDiffuseColour() ?
+
         setDiffuse( diffuse );
 
         //Unity uses coloured fresnel as if it were specular. So we need to
@@ -1013,11 +1033,11 @@ namespace Ogre
         default:
         case PBSM_DIFFUSE:
         case PBSM_SPECULAR:
-			retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
-			break;
+            retVal = HlmsTextureManager::TEXTURE_TYPE_DIFFUSE;
+            break;
         case PBSM_DETAIL_WEIGHT:
             retVal = HlmsTextureManager::TEXTURE_TYPE_NON_COLOR_DATA;
-			break;
+            break;
         case PBSM_DETAIL0:
         case PBSM_DETAIL1:
         case PBSM_DETAIL2:

@@ -103,6 +103,7 @@ namespace Ogre
         static void toStr( const ColourValue &value, String &outString );
         static void toStr( const Vector2 &value, String &outString );
         static void toStr( const Vector3 &value, String &outString );
+        static void toStr( const Vector4 &value, String &outString );
 
         String getName( const HlmsMacroblock *macroblock ) const;
         String getName( const HlmsBlendblock *blendblock ) const;

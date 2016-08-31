@@ -19,26 +19,32 @@
 
 @property( diffuse_map )
 	@property( !hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	diffuseCol = textureMaps[@value( diffuse_map_idx )].Sample( samplerStates[@value(diffuse_map_idx)], float3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
-@property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end @end
+		@piece( SampleDiffuseMap )
+			diffuseCol = textureMaps[@value( diffuse_map_idx )].Sample( samplerStates[@value(diffuse_map_idx)], float3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
+			diffuseCol.xyz = lerp(material.diffuseCol.xyz, diffuseCol.xyz, diffuseCol.w);
+			diffuseCol.w = lerp(material.diffuseCol.w, 1.0, diffuseCol.w);
+			@property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end 
+		@end
 	@end @property( hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	diffuseCol = textureMaps[@value( diffuse_map_idx )].Sample( samplerStates[@value(diffuse_map_idx)], float3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) ).w;@end
+		@piece( SampleDiffuseMap )	
+			diffuseCol = textureMaps[@value( diffuse_map_idx )].Sample( samplerStates[@value(diffuse_map_idx)], float3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) ).w;
+			diffuseCol = lerp(material.diffuseCol.w, 1.0f, diffuseCol.w);
+		@end
 	@end
 @end
 
-@property( diffuse_map || detail_maps_diffuse )
+//property( diffuse_map || detail_maps_diffuse )
 	@property( !transparent_mode )
 		@piece( diffuseExtraParamDef ), float4 diffuseCol@end
 		@piece( diffuseExtraParam ), diffuseCol.xyzw@end
 	@end @property( transparent_mode )
-		@piece( diffuseExtraParamDef ), float3 diffuseCol@end
-		@piece( diffuseExtraParam ), diffuseCol.xyz@end
+		@piece( diffuseExtraParamDef ), float4 diffuseCol@end
+		@piece( diffuseExtraParam ), diffuseCol.xyzw@end
 	@end
-    //diffuseCol is multiplied against material.kD in PixelShader_ps as it is influenced by the detail maps.
-    @piece( kD )diffuseCol@end
-@end @property( !diffuse_map && !detail_maps_diffuse )
-    @piece( kD )material.kD@end
-@end
+//end
+
+//diffuseCol always has some colour and is multiplied against material.kD in PixelShader_ps.
+@piece( kD )diffuseCol@end
 
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )

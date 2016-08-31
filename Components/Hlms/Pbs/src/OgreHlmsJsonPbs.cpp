@@ -245,6 +245,20 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    inline Vector4 HlmsJsonPbs::parseVector4Array( const rapidjson::Value &jsonArray, const Vector4 &defaultValue )
+    {
+        Vector4 retVal( defaultValue );
+
+        const rapidjson::SizeType arraySize = std::min( 4u, jsonArray.Size() );
+        for( rapidjson::SizeType i=0; i<arraySize; ++i )
+        {
+            if( jsonArray[i].IsNumber() )
+                retVal[i] = static_cast<float>( jsonArray[i].GetDouble() );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::loadMaterial( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                                     HlmsDatablock *datablock )
     {
@@ -303,6 +317,10 @@ namespace Ogre
             itor = subobj.FindMember( "value" );
             if( itor != subobj.MemberEnd() && itor->value.IsArray() )
                 pbsDatablock->setDiffuse( parseVector3Array( itor->value ) );
+
+            itor = subobj.FindMember( "colour" );
+            if( itor != subobj.MemberEnd() && itor->value.IsArray() )
+                pbsDatablock->setDiffuseColour( parseVector4Array( itor->value, Vector4(1.0f) ) );
         }
 
         itor = json.FindMember("specular");
@@ -499,8 +517,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::saveFresnel( const HlmsPbsDatablock *datablock, String &outString )
     {
-        saveTexture( datablock->getFresnel(), "fresnel", PBSM_SPECULAR,
-                     true, true, true,
+        saveTexture( datablock->getFresnel(), Vector4::ZERO, "fresnel", PBSM_SPECULAR,
+                     true, false, true, true,
                      datablock->getWorkflow() == HlmsPbsDatablock::SpecularAsFresnelWorkflow,
                      datablock, outString );
     }
@@ -510,8 +528,8 @@ namespace Ogre
                                    const HlmsPbsDatablock *datablock, String &outString,
                                    bool writeTexture )
     {
-        saveTexture( Vector3( 0.0f ), blockName, textureType,
-                     false, false, false, writeTexture, datablock, outString );
+        saveTexture( Vector3(0.0f), Vector4::ZERO, blockName, textureType,
+                     false, false, false, false, writeTexture, datablock, outString);
     }
     //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::saveTexture( float value, const char *blockName,
@@ -519,22 +537,31 @@ namespace Ogre
                                    const HlmsPbsDatablock *datablock, String &outString,
                                    bool writeTexture )
     {
-        saveTexture( Vector3( value ), blockName, textureType,
-                     true, true, false, writeTexture, datablock, outString );
+        saveTexture( Vector3(value), Vector4::ZERO, blockName, textureType,
+                     true, false, true, false, writeTexture, datablock, outString);
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJsonPbs::saveTexture( const Vector3 &value, const char *blockName,
+    void HlmsJsonPbs::saveTexture(const Vector3 &value, const char *blockName,
                                    PbsTextureTypes textureType,
                                    const HlmsPbsDatablock *datablock, String &outString,
                                    bool writeTexture )
     {
-        saveTexture( value, blockName, textureType,
-                     true, false, false, writeTexture, datablock, outString );
+        saveTexture( value, Vector4::ZERO, blockName, textureType,
+                     true, true, false, false, writeTexture, datablock, outString );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJsonPbs::saveTexture( const Vector3 &value, const char *blockName,
+    void HlmsJsonPbs::saveTexture(const Vector3 &value, const Vector4 &colour, const char *blockName,
                                    PbsTextureTypes textureType,
-                                   bool writeValue, bool scalarValue, bool isFresnel, bool writeTexture,
+                                   const HlmsPbsDatablock *datablock, String &outString,
+                                   bool writeTexture )
+    {
+        saveTexture( value, colour, blockName, textureType,
+                     true, true, false, false, writeTexture, datablock, outString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveTexture( const Vector3 &value, const Vector4 &colour, const char *blockName,
+                                   PbsTextureTypes textureType,
+                                   bool writeValue, bool writeColour, bool scalarValue, bool isFresnel, bool writeTexture,
                                    const HlmsPbsDatablock *datablock, String &outString )
     {
         outString += ",\n\t\t\t\"";
@@ -555,6 +582,12 @@ namespace Ogre
             {
                 HlmsJson::toStr( value, outString );
             }
+        }
+
+        if( writeColour )
+        {
+            outString += "\t\t\t\t\"colour\" : ";
+            HlmsJson::toStr( colour, outString );
         }
 
         if( isFresnel )
@@ -669,7 +702,7 @@ namespace Ogre
             outString += "\n\t\t\t}";
         }
 
-        saveTexture( pbsDatablock->getDiffuse(), "diffuse", PBSM_DIFFUSE,
+        saveTexture( pbsDatablock->getDiffuse(), pbsDatablock->getDiffuseColour(), "diffuse", PBSM_DIFFUSE,
                      pbsDatablock, outString );
         saveTexture( pbsDatablock->getSpecular(), "specular", PBSM_SPECULAR,
                      pbsDatablock, outString,
