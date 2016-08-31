@@ -81,7 +81,7 @@ namespace Ogre
     };
 
     template< typename T >
-    thread_local std::int64_t ThreadLocalPtr<T>::m_VarCounter;
+    thread_local std::int64_t ThreadLocalPtr<T>::m_VarCounter = 0;
 }
 
 #define OGRE_TOKEN_PASTE(x, y) x ## y
