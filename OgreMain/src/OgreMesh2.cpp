@@ -195,7 +195,8 @@ namespace Ogre {
         setSkeletonName( BLANKSTRING );
     }
     //-----------------------------------------------------------------------
-    MeshPtr Mesh::clone( const String& newName, const String& newGroup )
+    MeshPtr Mesh::clone( const String& newName, const String& newGroup,
+                         int vertexBufferType, int indexBufferType )
     {
         // This is a bit like a copy constructor, but with the additional
         // aspect of registering the clone with the MeshManager
@@ -214,7 +215,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------
-    void Mesh::copy( const MeshPtr& destination )
+    void Mesh::copy( const MeshPtr& destination, int vertexBufferType, int indexBufferType )
     {
         destination->unload();
 
@@ -224,7 +225,7 @@ namespace Ogre {
 
         while( itor != end )
         {
-            (*itor)->clone( destination.get() );
+            (*itor)->clone( destination.get(), vertexBufferType, indexBufferType );
             ++itor;
         }
 

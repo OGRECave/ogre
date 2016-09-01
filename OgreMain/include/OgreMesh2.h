@@ -206,16 +206,29 @@ namespace Ogre {
             Optional name of the new group to assign the clone to;
             if you leave this blank, the clone will be assigned to the same
             group as this Mesh.
+        @param vertexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
+        @param indexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
         */
-        MeshPtr clone( const String& newName, const String& newGroup = BLANKSTRING );
+        MeshPtr clone( const String& newName, const String& newGroup = BLANKSTRING,
+                       int vertexBufferType = -1, int indexBufferType = -1 );
 
         /** Will copy this mesh into the destination mesh.
         @remarks
-        similar to clone however will copy into a mesh you define rather than creating one for you.
+            similar to clone however will copy into a mesh you define rather than creating one for you.
         @param destination
-        The mesh that will be the destination for the copy of *this
+            The mesh that will be the destination for the copy of *this
+        @param vertexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
+        @param indexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
         */
-        void copy( const MeshPtr& destination );
+        void copy( const MeshPtr& destination, int vertexBufferType = -1, int indexBufferType = -1 );
 
         /** Get the axis-aligned bounding box for this mesh.
         */

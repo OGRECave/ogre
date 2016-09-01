@@ -167,8 +167,14 @@ namespace Ogre {
         @param parentMesh
             Optional mesh to make the parent of the newly created clone.
             If you leave this blank, the clone will be parented to the same Mesh as the original.
+        @param vertexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
+        @param indexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
         */
-        SubMesh* clone( Mesh *parentMesh = 0 );
+        SubMesh* clone( Mesh *parentMesh = 0, int vertexBufferType = -1, int indexBufferType = -1 );
 
         void setMaterialName( const String &name )          { mMaterialName = name; }
         String getMaterialName(void) const                  { return mMaterialName; }
