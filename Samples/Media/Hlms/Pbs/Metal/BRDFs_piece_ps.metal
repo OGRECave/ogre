@@ -12,7 +12,7 @@
 @property( !fresnel_scalar )
 	@piece( maxR1F0 )max( 1.0 - ROUGHNESS, @insertpiece( F0 ).x )@end
 @end @property( fresnel_scalar )
-	@piece( maxR1F0 )max( (1.0 - ROUGHNESS).xxx, @insertpiece( F0 ).xyz )@end
+	@piece( maxR1F0 )max( (1.0 - ROUGHNESS), @insertpiece( F0 ).xyz )@end
 @end
 
 //For mortals:

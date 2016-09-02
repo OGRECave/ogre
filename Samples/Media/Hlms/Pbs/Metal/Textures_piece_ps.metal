@@ -59,10 +59,10 @@
 @piece( SampleSpecularMap )
 	@property( specular_map )
 		float metalness = textureMaps@value( specular_map_idx ).sample( samplerStates@value(specular_map_idx), inPs.uv@value(uv_specular).xy, specularIdx ).x * material.F0.x;
-		F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, metalness );
+		F0 = mix( 0.03f, @insertpiece( kD ).xyz * 3.14159f, metalness );
 		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * metalness;
 	@end @property( !specular_map )
-		F0 = lerp( float( 0.03f ).xxx, @insertpiece( kD ).xyz * 3.14159f, material.F0.x );
+		F0 = mix( 0.03f, @insertpiece( kD ).xyz * 3.14159f, material.F0.x );
 		@insertpiece( kD ).xyz = @insertpiece( kD ).xyz - @insertpiece( kD ).xyz * material.F0.x;
 	@end
 	@property( hlms_alphablend )F0 *= material.F0.w;@end
