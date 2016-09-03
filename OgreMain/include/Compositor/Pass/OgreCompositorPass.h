@@ -91,6 +91,7 @@ namespace Ogre
 
         CompositorNode  *mParentNode;
 
+        CompositorTexture       mTargetTexture;
         CompositorTextureVec    mTextureDependencies;
 
         typedef vector<ResourceTransition>::type ResourceTransitionVec;
@@ -168,6 +169,7 @@ namespace Ogre
 
 		const CompositorNode* getParentNode(void) const		{ return mParentNode; }
 
+        const CompositorTexture& getTargetTexture(void) const           { return mTargetTexture; }
         const CompositorTextureVec& getTextureDependencies(void) const  { return mTextureDependencies; }
     };
 

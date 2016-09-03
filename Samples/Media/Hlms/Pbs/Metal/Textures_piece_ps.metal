@@ -6,8 +6,9 @@
 
 @padd( samplerStateStart, hlms_num_shadow_maps, 1 )
 @pset( numSamplerStates, num_textures )
-@property( envprobe_map )
+@property( envprobe_map && envprobe_map != target_envprobe_map )
 	@add( numSamplerStates, 1 )
+	@set( use_envprobe_map, 1 )
 @end
 
 @property( hlms_forward3d )

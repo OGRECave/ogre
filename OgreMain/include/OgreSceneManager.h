@@ -881,6 +881,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr mShadowTextureCustomCasterFPParams;
 
         CompositorTextureVec        mCompositorTextures;
+        CompositorTexture           mCompositorTarget;
 
         /// Visibility mask used to show / hide objects
         uint32 mVisibilityMask;
@@ -1471,6 +1472,12 @@ namespace Ogre {
 
         /// Removes all compositor textures from 'from' to end.
         void _removeCompositorTextures( size_t from );
+
+        /// The compositor we are currently writing to.
+        void _setCompositorTarget( const CompositorTexture &compoTarget );
+
+        /// The compositor we are currently writing to.
+        const CompositorTexture& getCompositorTarget(void) const   { return mCompositorTarget; }
 
         /// Creates an instance of a skeleton based on the given definition.
         SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef );

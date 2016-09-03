@@ -135,6 +135,7 @@ namespace Ogre
     const IdString PbsProperty::EnvMapScale       = IdString( "envmap_scale" );
     const IdString PbsProperty::AmbientFixed      = IdString( "ambient_fixed" );
     const IdString PbsProperty::AmbientHemisphere = IdString( "ambient_hemisphere" );
+    const IdString PbsProperty::TargetEnvprobeMap = IdString( "target_envprobe_map" );
 
     const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
@@ -313,7 +314,9 @@ namespace Ogre
                                             texUnit++ );
             }
 
-            if( getProperty( PbsProperty::EnvProbeMap ) )
+            const int32 envProbeMap         = getProperty( PbsProperty::EnvProbeMap );
+            const int32 targetEnvProbeMap   = getProperty( PbsProperty::TargetEnvprobeMap );
+            if( envProbeMap && envProbeMap != targetEnvProbeMap )
             {
                 assert( !datablock->getTexture( PBSM_REFLECTION ).isNull() );
                 psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
@@ -519,6 +522,17 @@ namespace Ogre
         setTextureProperty( PbsProperty::EnvProbeMap,   datablock,  PBSM_REFLECTION );
         setTextureProperty( PbsProperty::DetailWeightMap,datablock, PBSM_DETAIL_WEIGHT );
 
+        {
+            //Save the name of the cubemap for hazard prevention
+            //(don't sample the cubemap and render to it at the same time).
+            TexturePtr reflectionTexture = datablock->getTexture( PBSM_REFLECTION );
+            if( !reflectionTexture.isNull() )
+            {
+                setProperty( PbsProperty::EnvProbeMap, static_cast<int32>(
+                             IdString( reflectionTexture->getName() ).mHash ) );
+            }
+        }
+
         bool usesNormalMap = !datablock->getTexture( PBSM_NORMAL ).isNull();
         for( size_t i=PBSM_DETAIL0_NM; i<=PBSM_DETAIL3_NM; ++i )
             usesNormalMap |= !datablock->getTexture( i ).isNull();
@@ -682,6 +696,8 @@ namespace Ogre
             }
         }
 
+        mTargetEnvMap.setNull();
+
         AmbientLightMode ambientMode = mAmbientLightMode;
         ColourValue upperHemisphere = sceneManager->getAmbientLightUpperHemisphere();
         ColourValue lowerHemisphere = sceneManager->getAmbientLightLowerHemisphere();
@@ -714,6 +730,19 @@ namespace Ogre
 
             if( envMapScale != 1.0f )
                 setProperty( PbsProperty::EnvMapScale, 1 );
+
+            //Save cubemap's name so that we never try to render & sample to/from it at the same time
+            const CompositorTexture &compoTarget = sceneManager->getCompositorTarget();
+            if( !compoTarget.textures->empty() )
+            {
+                const TexturePtr &firstTargetTex = (*compoTarget.textures)[0];
+                if( firstTargetTex->getTextureType() == TEX_TYPE_CUBE_MAP )
+                {
+                    setProperty( PbsProperty::TargetEnvprobeMap,
+                                 static_cast<int32>( IdString(firstTargetTex->getName()).mHash ) );
+                    mTargetEnvMap = firstTargetTex;
+                }
+            }
         }
 
         if( mOptimizationStrategy == LowerGpuOverhead )
@@ -1418,8 +1447,11 @@ namespace Ogre
 
                 while( itor != end )
                 {
-                    *commandBuffer->addCommand<CbTexture>() =
-                            CbTexture( texUnit++, true, itor->texture.get(), itor->samplerBlock );
+                    if( itor->texture != mTargetEnvMap )
+                    {
+                        *commandBuffer->addCommand<CbTexture>() =
+                                CbTexture( texUnit++, true, itor->texture.get(), itor->samplerBlock );
+                    }
                     ++itor;
                 }
 

@@ -50,11 +50,17 @@ namespace Ogre
             mViewport( 0 ),
             mNumPassesLeft( definition->mNumInitialPasses ),
             mParentNode( parentNode ),
+            mTargetTexture( IdString(), &target.textures ),
             mNumValidResourceTransitions( 0 )
     {
         assert( definition->mNumInitialPasses && "Definition is broken, pass will never execute!" );
 
         mTarget = calculateRenderTarget( mDefinition->getRtIndex(), target );
+
+        //TODO: Merging RenderTarget & Texture in a refactor would get rid of these missmatches
+        //between a "target" and a "texture" in mTargetTexture.
+        if( !target.textures.empty() )
+            mTargetTexture.name = IdString( target.textures[0]->getName() );
 
         const Real EPSILON = 1e-6f;
 

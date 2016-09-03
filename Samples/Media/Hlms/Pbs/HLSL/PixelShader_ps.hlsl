@@ -26,9 +26,9 @@ Buffer<float4> f3dLightList : register(t2);@end
 
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
-@property( envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));@end
+@property( use_envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));@end
 
-@property( numSamplerStates || envprobe_map )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
 @property( normal_map )
 @property( hlms_qtangent )
@@ -159,7 +159,7 @@ float3 qmul( float4 q, float3 v )
 	@property( detail_map@n )uint detailMapIdx@n;@end @end
 @foreach( 4, n )
 	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
-@property( envprobe_map )	uint envMapIdx;@end
+@property( use_envprobe_map )	uint envMapIdx;@end
 
 @property( diffuse_map || detail_maps_diffuse )float4 diffuseCol;@end
 @property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
@@ -188,7 +188,7 @@ float3 qmul( float4 q, float3 v )
 @property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFFu;@end
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
-@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
+@property( use_envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
 
 	@insertpiece( custom_ps_posMaterialLoad )
 
@@ -299,7 +299,7 @@ float3 qmul( float4 q, float3 v )
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
@@ -365,10 +365,10 @@ float3 qmul( float4 q, float3 v )
 
 @insertpiece( forward3dLighting )
 
-@property( envprobe_map || ambient_hemisphere )
+@property( use_envprobe_map || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 	
-	@property( envprobe_map )
+	@property( use_envprobe_map )
 		float3 envColourS = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );
 		float3 envColourD = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( nNormal, passBuf.invViewMatCubemap ), 11.0 ).xyz @insertpiece( ApplyEnvMapScale );
 		@property( !hw_gamma_read )	//Gamma to linear space
@@ -380,10 +380,10 @@ float3 qmul( float4 q, float3 v )
 		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( passBuf.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( envprobe_map )
+		@property( use_envprobe_map )
 			envColourS	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !envprobe_map )
+		@end @property( !use_envprobe_map )
 			float3 envColourS = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			float3 envColourD = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
 		@end

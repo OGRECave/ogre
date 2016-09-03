@@ -171,6 +171,17 @@ namespace Ogre
 
                 while( itor != end )
                 {
+                    if( itor->outChannel >= mExternalRenderTargets.size() )
+                    {
+                        OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                                     "Workspace '" + mDefinition->mName.getFriendlyText() + "' expects"
+                                     " at least " + StringConverter::toString( itor->outChannel ) +
+                                     " external inputs but only " +
+                                     StringConverter::toString( mExternalRenderTargets.size() ) +
+                                     " were provided to addWorkspace.",
+                                     "CompositorWorkspace::connectAllNodes" );
+                    }
+
                     CompositorNode *node = findNode( itor->inNode );
                     node->connectExternalRT( mExternalRenderTargets[itor->outChannel], itor->inChannel );
                     ++itor;

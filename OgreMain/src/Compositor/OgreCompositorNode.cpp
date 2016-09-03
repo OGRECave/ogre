@@ -1006,6 +1006,8 @@ namespace Ogre
                     ++itExposed;
                 }
 
+                sceneManager->_setCompositorTarget( pass->getTargetTexture() );
+
                 //Execute pass
                 pass->execute( lodCamera );
 

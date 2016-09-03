@@ -148,7 +148,7 @@ fragment @insertpiece( output_type ) main_metal
 
 	@foreach( num_textures, n )
 		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end
-	@property( envprobe_map )
+	@property( use_envprobe_map )
 		, texturecube<float>	texEnvProbeMap [[texture(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
 		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
@@ -171,7 +171,7 @@ fragment @insertpiece( output_type ) main_metal
 	@property( detail_map@n )ushort detailMapIdx@n;@end @end
 @foreach( 4, n )
 	@property( detail_map_nm@n )ushort detailNormMapIdx@n;@end @end
-@property( envprobe_map )	ushort envMapIdx;@end
+@property( use_envprobe_map )	ushort envMapIdx;@end
 
 @property( diffuse_map || detail_maps_diffuse )float4 diffuseCol;@end
 @property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
@@ -199,7 +199,7 @@ fragment @insertpiece( output_type ) main_metal
 @property( detail_map_nm1 )	detailNormMapIdx1	= material.detailNormMapIdx1;@end
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.detailNormMapIdx2;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.detailNormMapIdx3;@end
-@property( envprobe_map )	envMapIdx			= material.envMapIdx;@end
+@property( use_envprobe_map )	envMapIdx			= material.envMapIdx;@end
 
 	@insertpiece( custom_ps_posMaterialLoad )
 
@@ -312,7 +312,7 @@ fragment @insertpiece( output_type ) main_metal
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
@@ -378,10 +378,10 @@ fragment @insertpiece( output_type ) main_metal
 
 @insertpiece( forward3dLighting )
 
-@property( envprobe_map || ambient_hemisphere )
+@property( use_envprobe_map || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
-	@property( envprobe_map )
+	@property( use_envprobe_map )
 		float3 envColourS = texEnvProbeMap.sample( samplerStates@value(num_textures), reflDir * pass.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
 		float3 envColourD = texEnvProbeMap.sample( samplerStates@value(num_textures), nNormal * pass.invViewMatCubemap, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
 		@property( !hw_gamma_read )	//Gamma to linear space
@@ -393,10 +393,10 @@ fragment @insertpiece( output_type ) main_metal
 		float ambientWD = dot( pass.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( pass.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( envprobe_map )
+		@property( use_envprobe_map )
 			envColourS	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !envprobe_map )
+		@end @property( !use_envprobe_map )
 			float3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			float3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
 		@end

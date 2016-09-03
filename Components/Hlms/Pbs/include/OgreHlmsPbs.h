@@ -104,6 +104,7 @@ namespace Ogre
         HlmsSamplerblock const  *mShadowmapSamplerblock;    /// GL3+ only when not using depth textures
         HlmsSamplerblock const  *mShadowmapCmpSamplerblock; /// For depth textures & D3D11
         HlmsSamplerblock const  *mCurrentShadowmapSamplerblock;
+        TexturePtr              mTargetEnvMap;
 
         uint32                  mCurrentPassBuffer;     /// Resets every to zero every new frame.
 
@@ -267,9 +268,10 @@ namespace Ogre
         static const IdString Pcf4x4;
         static const IdString PcfIterations;
 
+        static const IdString AmbientHemisphere;
         static const IdString EnvMapScale;
         static const IdString AmbientFixed;
-        static const IdString AmbientHemisphere;
+        static const IdString TargetEnvprobeMap;
 
         static const IdString BrdfDefault;
         static const IdString BrdfCookTorrance;

@@ -134,6 +134,7 @@ mShadowTextureOffset(0.6),
 mShadowTextureFadeStart(0.7), 
 mShadowTextureFadeEnd(0.9),
 mShadowTextureCustomCasterPass(0),
+mCompositorTarget( IdString(), 0 ),
 mVisibilityMask(0xFFFFFFFF & VisibilityFlags::RESERVED_VISIBILITY_FLAGS),
 mFindVisibleObjects(true),
 mNumWorkerThreads( numWorkerThreads ),
@@ -540,6 +541,11 @@ void SceneManager::_addCompositorTexture( IdString name, const TextureVec *texs 
 void SceneManager::_removeCompositorTextures( size_t from )
 {
     mCompositorTextures.erase( mCompositorTextures.begin() + from, mCompositorTextures.end() );
+}
+//-----------------------------------------------------------------------
+void SceneManager::_setCompositorTarget( const CompositorTexture &compoTarget )
+{
+    mCompositorTarget = compoTarget;
 }
 //-----------------------------------------------------------------------
 SkeletonInstance* SceneManager::createSkeletonInstance( const SkeletonDef *skeletonDef )
