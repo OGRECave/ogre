@@ -51,7 +51,7 @@ compositor_node Tutorial_DynamicCubemapRenderingNode
 			//exposing is to ensure compatibility with Vulkan & D3D12.
 			expose demo_dynamic_cubemap
 
-			//shadows		Tutorial_DynamicCubemapShadowNode
+			shadows		Tutorial_DynamicCubemapShadowNode
 		}
 	}
 }
