@@ -79,8 +79,7 @@ namespace Ogre
 
         virtual v1::HardwarePixelBufferSharedPtr getBuffer( size_t face, size_t mipmap );
 
-        //TODO
-        virtual void _autogenerateMipmaps(void) {}
+        virtual void _autogenerateMipmaps(void);
 
         id<MTLTexture> getTextureForSampling( MetalRenderSystem *renderSystem );
 

@@ -334,6 +334,12 @@ namespace Ogre
         return mSurfaceList[idx];
     }
     //-----------------------------------------------------------------------------------
+    void MetalTexture::_autogenerateMipmaps(void)
+    {
+        __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
+        [blitEncoder generateMipmapsForTexture: mTexture];
+    }
+    //-----------------------------------------------------------------------------------
     id<MTLTexture> MetalTexture::getTextureForSampling( MetalRenderSystem *renderSystem )
     {
         __unsafe_unretained id<MTLTexture> retVal = mTexture;
@@ -380,6 +386,14 @@ namespace Ogre
                     //Fsaa texture before it has been resolved
                     retVal = mMsaaTexture;
                 }
+            }
+
+            if( (mUsage & (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO)) ==
+                    (TU_AUTOMIPMAP|TU_RENDERTARGET|TU_AUTOMIPMAP_AUTO) )
+            {
+                RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
+                if( renderTarget->isMipmapsDirty() )
+                    this->_autogenerateMipmaps();
             }
         }
 
