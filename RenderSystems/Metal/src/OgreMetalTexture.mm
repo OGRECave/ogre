@@ -338,6 +338,8 @@ namespace Ogre
     {
         __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
         [blitEncoder generateMipmapsForTexture: mTexture];
+
+        mSurfaceList[0]->getRenderTarget()->_setMipmapsUpdated();
     }
     //-----------------------------------------------------------------------------------
     id<MTLTexture> MetalTexture::getTextureForSampling( MetalRenderSystem *renderSystem )
