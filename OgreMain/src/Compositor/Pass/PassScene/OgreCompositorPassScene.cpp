@@ -39,14 +39,25 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+//    const Quaternion CubemapRotations[6] =
+//    {
+//        Quaternion( Degree(-90 ), Vector3::UNIT_Y ),          //+X
+//        Quaternion( Degree( 90 ), Vector3::UNIT_Y ),          //-X
+//        Quaternion( Degree( 90 ), Vector3::UNIT_X ),          //+Y
+//        Quaternion( Degree(-90 ), Vector3::UNIT_X ),          //-Y
+//        Quaternion::IDENTITY,                                 //+Z
+//        Quaternion( Degree(180 ), Vector3::UNIT_Y )           //-Z
+//    };
+    //Can NOT use UNIT_X/UNIT_Y and Degree here because on iOS C++ initialization
+    //order screws us and thus key global variables are still 0. Hardcode the values.
     const Quaternion CubemapRotations[6] =
     {
-        Quaternion( Degree(-90 ), Vector3::UNIT_Y ),        //+X
-        Quaternion( Degree( 90 ), Vector3::UNIT_Y ),        //-X
-        Quaternion( Degree( 90 ), Vector3::UNIT_X ),        //+Y
-        Quaternion( Degree(-90 ), Vector3::UNIT_X ),        //-Y
-        Quaternion::IDENTITY,                               //+Z
-        Quaternion( Degree(180 ), Vector3::UNIT_Y )         //-Z
+        Quaternion( Radian(-1.570796f ), Vector3( 0, 1, 0 ) ),  //+X
+        Quaternion( Radian( 1.570796f ), Vector3( 0, 1, 0 ) ),  //-X
+        Quaternion( Radian( 1.570796f ), Vector3( 1, 0, 0 ) ),  //+Y
+        Quaternion( Radian(-1.570796f ), Vector3( 1, 0, 0 ) ),  //-Y
+        Quaternion( 1, 0, 0, 0 ),                               //+Z
+        Quaternion( Radian( 3.1415927f), Vector3( 0, 1, 0 ) )   //-Z
     };
 
     CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
