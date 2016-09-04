@@ -37,6 +37,11 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/Plugins
         ${OGRE_SOURCE_DIR}/RenderSystems
         ${OGRE_SOURCE_DIR}/Docs/src/apimainpage.md
+        ${OGRE_SOURCE_DIR}/Docs/src/manual.md
+        ${OGRE_SOURCE_DIR}/Docs/src/material-scripts.md
+        ${OGRE_SOURCE_DIR}/Docs/src/high-level-programs.md
+	    ${OGRE_SOURCE_DIR}/Docs/src/particle-scripts.md
+        ${OGRE_SOURCE_DIR}/Docs/src/hardware-buffers.md
         ${TUTORIALS})
     string(REPLACE ";" " \\\n" CMAKE_DOXYGEN_INPUT_LIST "${CMAKE_DOXYGEN_INPUT_LIST}")
 	configure_file(${OGRE_TEMPLATES_DIR}/html.cfg.in ${OGRE_BINARY_DIR}/html.cfg)
