@@ -49,6 +49,9 @@ using namespace Demo;
     Demo::LogicSystem *_logicSystem;
     double _accumulator;
     CADisplayLink *_timer;
+
+    double _timeSinceLast;
+    CFTimeInterval _startTime;
 }
 
 -(void)dealloc
@@ -123,6 +126,9 @@ using namespace Demo;
                                                  selector:@selector(mainLoop)];
     _timer.frameInterval = 1; //VSync to 60 FPS
     [_timer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+
+    _timeSinceLast = 1.0 / 60.0;
+    _startTime = CACurrentMediaTime();
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -138,8 +144,10 @@ using namespace Demo;
 
 -(void)mainLoop
 {
-    //Prevent from going haywire.
-    const float timeSinceLast = std::min( 1.0, _timer.duration * _timer.frameInterval );
+    CFTimeInterval endTime = CACurrentMediaTime();
+    _timeSinceLast = endTime - _startTime;
+    _timeSinceLast = std::min( 1.0, _timeSinceLast ); //Prevent from going haywire.
+    _startTime = endTime;
 
     while( _accumulator >= MainEntryPoints::Frametime && _logicSystem )
     {
@@ -154,12 +162,12 @@ using namespace Demo;
     }
 
     _graphicsSystem->beginFrameParallel();
-    _graphicsSystem->update( timeSinceLast );
+    _graphicsSystem->update( _timeSinceLast );
     _graphicsSystem->finishFrameParallel();
     if( !_logicSystem )
         _graphicsSystem->finishFrame();
 
-    _accumulator += timeSinceLast;
+    _accumulator += _timeSinceLast;
 }
 
 @end
