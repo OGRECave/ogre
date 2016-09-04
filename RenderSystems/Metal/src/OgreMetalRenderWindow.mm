@@ -73,7 +73,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderWindow::swapBuffers(void)
     {
-        assert( mColourAttachmentDesc.loadAction != MTLLoadActionClear &&
+        assert( (mOwnerDevice->mFrameAborted ||
+                mColourAttachmentDesc.loadAction != MTLLoadActionClear) &&
                 "A clear has been asked but no rendering command was "
                 "issued and Ogre didn't catch it." );
 
@@ -85,17 +86,20 @@ namespace Ogre
         else
             mColourAttachmentDesc.texture = 0;
 
-        // Schedule a present once rendering to the framebuffer is complete
-        const CFTimeInterval presentationTime = mMetalView.presentationTime;
+        if( !mOwnerDevice->mFrameAborted )
+        {
+            // Schedule a present once rendering to the framebuffer is complete
+            const CFTimeInterval presentationTime = mMetalView.presentationTime;
 
-        if( presentationTime < 0 )
-        {
-            [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable];
-        }
-        else
-        {
-            [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable
-                                                          atTime:presentationTime];
+            if( presentationTime < 0 )
+            {
+                [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable];
+            }
+            else
+            {
+                [mOwnerDevice->mCurrentCommandBuffer presentDrawable:mCurrentDrawable
+                                                              atTime:presentationTime];
+            }
         }
         mCurrentDrawable = 0;
     }
@@ -135,8 +139,10 @@ namespace Ogre
         }
     }
     //-------------------------------------------------------------------------
-    void MetalRenderWindow::nextDrawable(void)
+    bool MetalRenderWindow::nextDrawable(void)
     {
+        bool isSuccess = true;
+
         if( !mCurrentDrawable )
         {
             if( mMetalView.layerSizeDidUpdate )
@@ -151,6 +157,8 @@ namespace Ogre
                                                        LML_CRITICAL );
                 //We're unable to render. Skip frame.
                 //dispatch_semaphore_signal( _inflight_semaphore );
+
+                isSuccess = false;
             }
             else
             {
@@ -160,6 +168,8 @@ namespace Ogre
                     mColourAttachmentDesc.texture = mCurrentDrawable.texture;
             }
         }
+
+        return isSuccess;
     }
     //-------------------------------------------------------------------------
     void MetalRenderWindow::create( const String& name, unsigned int width, unsigned int height,

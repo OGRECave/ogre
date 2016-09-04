@@ -543,6 +543,7 @@ namespace Ogre
 
         mActiveRenderTarget = 0;
         mActiveViewport = 0;
+        mActiveDevice->mFrameAborted = false;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::cleanAutoParamsBuffers(void)
@@ -663,6 +664,18 @@ namespace Ogre
     {
         assert( mActiveDevice );
 
+        //We assume the RenderWindow is at MRT#0 (in fact it
+        //would be very odd to use the RenderWindow as MRT)
+        if( mNumMRTs > 0 )
+            mActiveDevice->mFrameAborted |= !mCurrentColourRTs[0]->nextDrawable();
+
+        if( mActiveDevice->mFrameAborted )
+        {
+            mActiveDevice->endAllEncoders();
+            mActiveRenderEncoder = 0;
+            return;
+        }
+
         const bool hadActiveRenderEncoder = mActiveRenderEncoder;
         Viewport *prevViewport = 0;
         RenderTarget *prevRenderTarget = 0;
@@ -692,11 +705,6 @@ namespace Ogre
 
         //TODO: With a couple modifications, Compositor should be able to tell us
         //if we can use MTLStoreActionDontCare.
-
-        //We assume the RenderWindow is at MRT#0 (in fact it
-        //would be very odd to use the RenderWindow as MRT)
-        if( mNumMRTs > 0 )
-            mCurrentColourRTs[0]->nextDrawable();
 
         MTLRenderPassDescriptor *passDesc = [MTLRenderPassDescriptor renderPassDescriptor];
         for( uint8 i=0; i<mNumMRTs; ++i )

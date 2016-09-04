@@ -696,7 +696,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalVaoManager::bindDrawId(void)
     {
-        assert( mDevice->mRenderEncoder );
+        assert( mDevice->mRenderEncoder || mDevice->mFrameAborted );
 
         MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>(
                     mDrawId->getBufferInterface() );

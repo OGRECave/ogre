@@ -53,7 +53,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalConstBufferPacked::bindBufferVS( uint16 slot, uint32 offsetBytes )
     {
-        assert( mDevice->mRenderEncoder );
+        assert( mDevice->mRenderEncoder || mDevice->mFrameAborted );
         assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
         MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
 
@@ -64,7 +64,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void MetalConstBufferPacked::bindBufferPS( uint16 slot, uint32 offsetBytes )
     {
-        assert( mDevice->mRenderEncoder );
+        assert( mDevice->mRenderEncoder || mDevice->mFrameAborted );
         assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
         MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
 

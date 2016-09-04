@@ -37,6 +37,8 @@ namespace Ogre
 {
     struct _OgreMetalExport MetalDevice
     {
+        /// Once a frame is aborted, MTLRenderCommandEncoder are no longer created (ignored).
+        bool                    mFrameAborted;
         id<MTLDevice>           mDevice;
         id<MTLCommandQueue>     mMainCommandQueue;
         id<MTLCommandBuffer>    mCurrentCommandBuffer;

@@ -57,7 +57,7 @@ namespace Ogre
         virtual void swapBuffers(void);
         virtual void windowMovedOrResized(void);
 
-        virtual void nextDrawable(void);
+        virtual bool nextDrawable(void);
 
         virtual void create( const String& name, unsigned int width, unsigned int height,
                              bool fullScreen, const NameValuePairList *miscParams );

@@ -36,6 +36,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 namespace Ogre
 {
     MetalDevice::MetalDevice( MetalRenderSystem *renderSystem ) :
+        mFrameAborted( false ),
         mDevice( 0 ),
         mMainCommandQueue( 0 ),
         mCurrentCommandBuffer( 0 ),
