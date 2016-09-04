@@ -40,6 +40,7 @@ vertex_program SSAO_HS_vs_Metal metal
 fragment_program SSAO_HS_ps_Metal metal
 {
 	source SSAO_HS_ps.metal
+	shader_reflection_pair_hint SSAO_HS_vs_Metal
 }
 
 // Unified definitions
@@ -121,6 +122,7 @@ fragment_program SSAO_BlurH_ps_HLSL hlsl
 fragment_program SSAO_BlurH_ps_Metal metal
 {
 	source SSAO_BlurH_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program SSAO_BlurH_ps unified
@@ -196,6 +198,7 @@ fragment_program SSAO_BlurV_ps_HLSL hlsl
 fragment_program SSAO_BlurV_ps_Metal metal
 {
 	source SSAO_BlurV_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program SSAO_BlurV_ps unified
@@ -270,6 +273,7 @@ fragment_program SSAO_Apply_ps_HLSL hlsl
 fragment_program SSAO_Apply_ps_Metal metal
 {
 	source SSAO_Apply_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program SSAO_Apply_ps unified

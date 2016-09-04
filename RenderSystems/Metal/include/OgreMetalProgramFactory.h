@@ -44,8 +44,6 @@ namespace Ogre
         static String sLanguageName;
         MetalDevice *mDevice;
 
-        id<MTLFunction> mReflectionVertexShaderFunction;
-
     public:
         MetalProgramFactory( MetalDevice *device );
         virtual ~MetalProgramFactory(void);
@@ -56,9 +54,6 @@ namespace Ogre
             const String& name, ResourceHandle handle,
             const String& group, bool isManual, ManualResourceLoader* loader);
         void destroy(HighLevelGpuProgram* prog);
-
-        id<MTLFunction> getReflectionVertexShaderFunction(void) const
-                                                { return mReflectionVertexShaderFunction; };
     };
 }
 

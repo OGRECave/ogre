@@ -128,36 +128,43 @@ fragment_program HDR/BoxBlurV_ps_HLSL hlsl
 fragment_program HDR/DownScale01_SumLumStart_ps_Metal metal
 {
 	source DownScale01_SumLumStart_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program HDR/DownScale02_SumLumIterative_ps_Metal metal
 {
 	source DownScale02_SumLumIterative_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program HDR/DownScale03_SumLumEnd_ps_Metal metal
 {
 	source DownScale03_SumLumEnd_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program HDR/FinalToneMapping_ps_Metal metal
 {
 	source FinalToneMapping_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program HDR/BrightPass_Start_ps_Metal metal
 {
 	source BrightPass_Start_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program HDR/BoxBlurH_ps_Metal metal
 {
 	source BoxBlurH_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program HDR/BoxBlurV_ps_Metal metal
 {
 	source BoxBlurV_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program HDR/DownScale01_SumLumStart_ps unified

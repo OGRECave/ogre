@@ -77,18 +77,22 @@ fragment_program BrightBloom_ps_HLSL hlsl
 fragment_program BlurV_ps_Metal metal
 {
 	source BlurV_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 fragment_program BlurH_ps_Metal metal
 {
 	source BlurH_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 fragment_program Bloom_ps_Metal metal
 {
 	source Bloom_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 fragment_program BrightBloom_ps_Metal metal
 {
 	source BrightBloom_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 //------------------------

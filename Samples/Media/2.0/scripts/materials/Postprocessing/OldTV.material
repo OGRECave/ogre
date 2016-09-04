@@ -19,6 +19,7 @@ fragment_program OldTV_ps_HLSL hlsl
 fragment_program OldTV_ps_Metal metal
 {
 	source OldTV_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program OldTV_ps unified

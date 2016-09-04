@@ -38,6 +38,7 @@ vertex_program ReconstructPosFromDepth_vs_Metal metal
 fragment_program ReconstructPosFromDepth_ps_Metal metal
 {
 	source ReconstructPosFromDepth_ps.metal
+	shader_reflection_pair_hint ReconstructPosFromDepth_vs_Metal
 }
 
 // Unified definitions

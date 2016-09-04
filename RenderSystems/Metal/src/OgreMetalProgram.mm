@@ -26,12 +26,10 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 #include "OgreMetalProgram.h"
-#include "OgreHighLevelGpuProgramManager.h"
 #include "OgreLogManager.h"
 #include "OgreMetalDevice.h"
 #include "OgreMetalMappings.h"
-#include "OgreMetalProgramFactory.h"
-#include "OgreMetalRenderSystem.h"
+#include "OgreGpuProgramManager.h"
 #include "Vao/OgreMetalVaoManager.h"
 
 #import <Metal/MTLDevice.h>
@@ -41,6 +39,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     MetalProgram::CmdPreprocessorDefines MetalProgram::msCmdPreprocessorDefines;
     MetalProgram::CmdEntryPoint MetalProgram::msCmdEntryPoint;
+    MetalProgram::CmdShaderReflectionPairHint MetalProgram::msCmdShaderReflectionPairHint;
     //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     MetalProgram::MetalProgram( ResourceManager* creator, const String& name,
@@ -66,6 +65,12 @@ namespace Ogre {
             dict->addParameter(ParameterDef("preprocessor_defines",
                                             "Preprocessor defines use to compile the program.",
                                             PT_STRING),&msCmdPreprocessorDefines);
+            dict->addParameter(ParameterDef("shader_reflection_pair_hint",
+                                            "Metal requires Pixel Shaders to be paired with a valid "
+                                            "vertex shader to obtain reflection data (i.e. program "
+                                            "parameters). Pixel Shaders without parameters don't need "
+                                            "this. Pass the name of an already defined vertex shader.",
+                                            PT_STRING),&msCmdShaderReflectionPairHint);
         }
         mTargetBufferName = "";
 
@@ -196,6 +201,33 @@ namespace Ogre {
         mCompilerErrors = !mCompiled;
         return mCompiled;
     }
+
+    //-----------------------------------------------------------------------
+    void MetalProgram::autoFillDummyVertexAttributesForShader( id<MTLFunction> vertexFunction,
+                                                               MTLRenderPipelineDescriptor *psd )
+    {
+        if( [vertexFunction.vertexAttributes count] )
+        {
+            size_t maxSize = 0;
+            MTLVertexDescriptor *vertexDescriptor = [MTLVertexDescriptor vertexDescriptor];
+
+            for( MTLVertexAttribute *vertexAttribute in vertexFunction.vertexAttributes )
+            {
+                const size_t elementIdx = vertexAttribute.attributeIndex;
+                vertexDescriptor.attributes[elementIdx].format =
+                        MetalMappings::dataTypeToVertexFormat( vertexAttribute.attributeType );
+                vertexDescriptor.attributes[elementIdx].bufferIndex = 0;
+                vertexDescriptor.attributes[elementIdx].offset = elementIdx * 16u;
+
+                maxSize = std::max( maxSize, elementIdx * 16u );
+            }
+
+            vertexDescriptor.layouts[0].stride = maxSize + 16u;
+            vertexDescriptor.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
+
+            [psd setVertexDescriptor:vertexDescriptor];
+        }
+    }
     //-----------------------------------------------------------------------
     void MetalProgram::analyzeRenderParameters(void)
     {
@@ -208,39 +240,37 @@ namespace Ogre {
         {
             id<MTLFunction> metalFunction = this->getMetalFunction();
             [psd setVertexFunction:metalFunction];
-
-            if( [metalFunction.vertexAttributes count] )
-            {
-                size_t maxSize = 0;
-                MTLVertexDescriptor *vertexDescriptor = [MTLVertexDescriptor vertexDescriptor];
-
-                for( MTLVertexAttribute *vertexAttribute in metalFunction.vertexAttributes )
-                {
-                    const size_t elementIdx = vertexAttribute.attributeIndex;
-                    vertexDescriptor.attributes[elementIdx].format =
-                            MetalMappings::dataTypeToVertexFormat( vertexAttribute.attributeType );
-                    vertexDescriptor.attributes[elementIdx].bufferIndex = 0;
-                    vertexDescriptor.attributes[elementIdx].offset = elementIdx * 16u;
-
-                    maxSize = std::max( maxSize, elementIdx * 16u );
-                }
-
-                vertexDescriptor.layouts[0].stride = maxSize + 16u;
-                vertexDescriptor.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
-
-                [psd setVertexDescriptor:vertexDescriptor];
-            }
+            autoFillDummyVertexAttributesForShader( metalFunction, psd );
             break;
         }
         case GPT_FRAGMENT_PROGRAM:
         {
-            MetalProgramFactory *metalFactory = mDevice->mRenderSystem->getMetalProgramFactory();
-            [psd setVertexFunction:metalFactory->getReflectionVertexShaderFunction()];
+            GpuProgramPtr shader = GpuProgramManager::getSingleton().
+                    getByName( mShaderReflectionPairHint );
+            if( shader.isNull() )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND,
+                             "Shader reflection hint '" + mShaderReflectionPairHint +
+                             "' not found for pixel shader '" + mName + "'",
+                             "MetalProgram::analyzeRenderParameters" );
+            }
+            if( shader->getType() != GPT_VERTEX_PROGRAM )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Shader reflection hint '" + mShaderReflectionPairHint +
+                             "' for pixel shader '" + mName + "' must be a vertex shader.",
+                             "MetalProgram::analyzeRenderParameters" );
+            }
+            shader->load();
+            assert( dynamic_cast<MetalProgram*>( shader->_getBindingDelegate() ) );
+            MetalProgram *vertexShader = static_cast<MetalProgram*>( shader->_getBindingDelegate() );
+            autoFillDummyVertexAttributesForShader( vertexShader->getMetalFunction(), psd );
+            [psd setVertexFunction:vertexShader->getMetalFunction()];
             [psd setFragmentFunction:this->getMetalFunction()];
             break;
         }
         default:
-            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "", "MetalProgram::analyzeParameters" );
+            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "", "MetalProgram::analyzeRenderParameters" );
         }
 
         psd.depthAttachmentPixelFormat = MTLPixelFormatDepth32Float;
@@ -259,7 +289,7 @@ namespace Ogre {
 
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
                          "Failed to created pipeline state for reflection, error " +
-                         errorDesc, "MetalProgram::analyzeParameters" );
+                         errorDesc, "MetalProgram::analyzeRenderParameters" );
         }
         else
         {
@@ -455,6 +485,15 @@ namespace Ogre {
         if( !mBuildParametersFromReflection )
             return;
 
+        if( mType == GPT_FRAGMENT_PROGRAM && mShaderReflectionPairHint.empty() )
+        {
+            LogManager::getSingleton().logMessage(
+                        "WARNING: Pixel Shader '" + mName + "' without shader_reflection_pair_hint. "
+                        "If this is intentional, use build_parameters_from_reflection false to hide "
+                        "this warning.");
+            return;
+        }
+
         if( mCompilerErrors )
             return;
 
@@ -538,6 +577,16 @@ namespace Ogre {
     void MetalProgram::CmdPreprocessorDefines::doSet(void *target, const String& val)
     {
         static_cast<MetalProgram*>(target)->setPreprocessorDefines(val);
+    }
+    //-----------------------------------------------------------------------
+    String MetalProgram::CmdShaderReflectionPairHint::doGet(const void *target) const
+    {
+        return static_cast<const MetalProgram*>(target)->getShaderReflectionPairHint();
+    }
+    //-----------------------------------------------------------------------
+    void MetalProgram::CmdShaderReflectionPairHint::doSet(void *target, const String& val)
+    {
+        static_cast<MetalProgram*>(target)->setShaderReflectionPairHint(val);
     }
     //-----------------------------------------------------------------------
     const String& MetalProgram::getLanguage(void) const

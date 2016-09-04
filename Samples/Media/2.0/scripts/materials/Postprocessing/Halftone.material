@@ -19,6 +19,7 @@ fragment_program Postprocess/Halftone_ps_HLSL hlsl
 fragment_program Postprocess/Halftone_ps_Metal metal
 {
 	source Halftone_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program Postprocess/Halftone_ps unified

@@ -73,6 +73,14 @@ namespace Ogre
             void doSet(void* target, const String& val);
         };
 
+        /// Command object for setting vertex shader pair
+        class CmdShaderReflectionPairHint : public ParamCommand
+        {
+        public:
+            String doGet(const void* target) const;
+            void doSet(void* target, const String& val);
+        };
+
         MetalProgram( ResourceManager* creator, const String& name, ResourceHandle handle,
                       const String& group, bool isManual, ManualResourceLoader* loader,
                       MetalDevice *device );
@@ -93,6 +101,13 @@ namespace Ogre
         /** Gets the entry point defined for this program. */
         const String& getEntryPoint(void) const { return mEntryPoint; }
 
+        /// If this shader is a pixel shader, sets a vertex shader that can be paired with us
+        /// for properly getting reflection data for GPU program parameters.
+        void setShaderReflectionPairHint(const String& shaderName)
+                                                    { mShaderReflectionPairHint = shaderName; }
+        /// Gets the paired shader. See setShaderReflectionPairHint.
+        const String& getShaderReflectionPairHint(void) const       { return mShaderReflectionPairHint; }
+
         /// Overridden from GpuProgram
         const String& getLanguage(void) const;
         /// Overridden from GpuProgram
@@ -104,6 +119,8 @@ namespace Ogre
         /// Compile source into shader object
         bool compile(const bool checkErrors = false);
         void analyzeRenderParameters(void);
+        static void autoFillDummyVertexAttributesForShader( id<MTLFunction> inVertexFunction,
+                                                            MTLRenderPipelineDescriptor *outPsd );
         void analyzeParameterBuffer( MTLArgument *arg );
 
         /// In bytes.
@@ -117,6 +134,7 @@ namespace Ogre
     protected:
         static CmdPreprocessorDefines msCmdPreprocessorDefines;
         static CmdEntryPoint msCmdEntryPoint;
+        static CmdShaderReflectionPairHint msCmdShaderReflectionPairHint;
 
         /** Internal load implementation, must be implemented by subclasses.
         */
@@ -153,6 +171,8 @@ namespace Ogre
 
         vector<GpuConstantDefinition>::type mConstantDefsSorted;
         uint32 mConstantsBytesToWrite;
+
+        String mShaderReflectionPairHint;
     };
 }
 

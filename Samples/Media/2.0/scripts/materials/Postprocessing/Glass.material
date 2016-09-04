@@ -18,6 +18,7 @@ fragment_program Glass_ps_HLSL hlsl
 fragment_program Glass_ps_Metal metal
 {
 	source Glass_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program Glass_ps unified

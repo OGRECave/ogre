@@ -14,6 +14,7 @@ fragment_program Embossed_ps_GLSL glsl
 fragment_program Embossed_ps_Metal metal
 {
 	source Embossed_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program Embossed_ps unified

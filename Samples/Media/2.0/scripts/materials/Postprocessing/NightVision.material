@@ -19,6 +19,7 @@ fragment_program Postprocess/NightVision_ps_HLSL hlsl
 fragment_program Postprocess/NightVision_ps_Metal metal
 {
 	source NightVision_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program Postprocess/NightVision_ps unified

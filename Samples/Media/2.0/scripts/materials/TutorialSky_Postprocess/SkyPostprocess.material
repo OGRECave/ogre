@@ -51,6 +51,7 @@ vertex_program SkyPostprocess_vs_Metal metal
 fragment_program SkyPostprocess_ps_Metal metal
 {
 	source SkyPostprocess_ps.metal
+	shader_reflection_pair_hint SkyPostprocess_vs_Metal
 }
 
 // Unified definitions

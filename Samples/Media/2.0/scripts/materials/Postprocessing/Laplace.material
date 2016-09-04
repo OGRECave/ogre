@@ -13,6 +13,7 @@ fragment_program Postprocess/Laplace_ps_HLSL hlsl
 fragment_program Postprocess/Laplace_ps_Metal metal
 {
 	source Laplace_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program Postprocess/Laplace_ps unified
