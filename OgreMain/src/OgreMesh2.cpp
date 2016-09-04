@@ -210,7 +210,7 @@ namespace Ogre {
             theGroup = newGroup;
         MeshPtr newMesh = MeshManager::getSingleton().createManual( newName, theGroup );
         newMesh->mVaoManager = mVaoManager;
-        copy( newMesh );
+        copy( newMesh, vertexBufferType, indexBufferType );
         return newMesh;
     }
 
