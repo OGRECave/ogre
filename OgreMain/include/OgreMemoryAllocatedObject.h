@@ -57,6 +57,7 @@ namespace Ogre
     template <class Alloc>
     class _OgreExport AllocatedObject
     {
+#if OGRE_MEMORY_ALLOCATOR != OGRE_MEMORY_ALLOCATOR_STD || OGRE_MEMORY_TRACKER
     public:
         explicit AllocatedObject()
         { }
@@ -120,6 +121,7 @@ namespace Ogre
         {
             Alloc::deallocateBytes(ptr);
         }
+#endif
     };
 
 
