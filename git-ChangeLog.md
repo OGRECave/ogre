@@ -1,5 +1,9 @@
 # Changes in master but not on Bitbucket
 
+## Batteries Included
+* by default Ogre will now automatically fetch and build its core dependencies
+* [Unified documentation](https://ogrecave.github.io/ogre/api/1.10/index.html): merged API reference, manual and some of the wiki tutorials using Doxygen
+
 ## Python Bindings (new component)
 * cover OgreMain, RTShaderSystem, Overlay and OgreBites
 * allows implementing Listeners in Python (see Sample)
@@ -35,7 +39,9 @@
 * fix flipped Environment Maps using GLSL (GLSES) shaders
 * use same lighting equations as legacy GL resulting in equal light intensity
 * merge duplicated GLSL, GLSLES and GLSL150 shaders. Dropping 4200 loc.
-* allow RTSS to work with HLMS side by side
+
+## HLMS
+* add GLSLES template making it work on GLES2 (TODO: correct rendering requires GLES3)
 
 ## OgreMain
 * restored API compatibility with 1.9 (`StringUtil::BLANK`, `StringUtil::StrStreamType`)
@@ -43,6 +49,7 @@
 * fix GLSLES Shaders for ShadowVolumeExtrudeProgram
 * OSX: `externalWindowHandle` expects a `NSWindow*` by default. `macAPICocoaUseNSView=false` switches to old behaviour.
 * FileSystemLayer: use `$XDG_CACHE_HOME` as base path on Linux
+* allow using c++11 std::thread for background resource loading (also on bitbucket)
 
 ## Tests
 * Visual Tests can be built without OIS
@@ -51,9 +58,6 @@
 * Test Suite returns non-null for easy CI integration
 
 [see the results of the Visual Tests for the GL RenderSystems here](https://ogrecave.github.io/ogre/gl_status/)
-
-## Batteries Included
-* by default Ogre will now automatically fetch and build its core dependencies
 
 ## Emscripten
 * added minimal Sample to repository
@@ -69,3 +73,4 @@
 * VolumeTerrain: fixed triplanar texturing
 * ShaderSystemMultiLight: ported to GLES3
 * disabled unfinished Samples
+* allow HLMS Sample to work when RTSS is active (GL3Plus, GLES2)
