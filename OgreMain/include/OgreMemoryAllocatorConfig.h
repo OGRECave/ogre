@@ -365,7 +365,7 @@ namespace Ogre
 *  @{
 */
 
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE && (OGRE_MEMORY_ALLOCATOR != OGRE_MEMORY_ALLOCATOR_STD || OGRE_MEMORY_TRACKER)
 
 /// Allocate a block of raw memory, and indicate the category of usage
 #   define OGRE_MALLOC(bytes, category) ::Ogre::CategorisedAllocPolicy<category>::allocateBytes(bytes, __FILE__, __LINE__, __FUNCTION__)
