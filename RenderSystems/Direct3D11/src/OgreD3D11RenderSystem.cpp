@@ -1358,6 +1358,8 @@ bail:
         {
             caps->log(defaultLog);
         }
+
+        mGpuProgramManager->setSaveMicrocodesToCache(true);
     }
     //---------------------------------------------------------------------
     void D3D11RenderSystem::convertVertexShaderCaps(RenderSystemCapabilities* rsc) const
