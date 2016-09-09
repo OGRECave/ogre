@@ -12,6 +12,7 @@
 #include "OgreConfigFile.h"
 #include "OgreRenderWindow.h"
 #include "OgreViewport.h"
+#include "OgreOverlaySystem.h"
 
 #if OGRE_BITES_HAVE_SDL
 #include <SDL_video.h>
