@@ -41,6 +41,7 @@ namespace Ogre
         mMainCommandQueue( 0 ),
         mCurrentCommandBuffer( 0 ),
         mBlitEncoder( 0 ),
+        mComputeEncoder( 0 ),
         mRenderEncoder( 0 ),
         mRenderSystem( renderSystem ),
         mStallSemaphore( 0 )
@@ -54,6 +55,7 @@ namespace Ogre
         mMainCommandQueue = 0;
         mCurrentCommandBuffer = 0;
         mBlitEncoder = 0;
+        mComputeEncoder = 0;
         mRenderEncoder = 0;
     }
     //-------------------------------------------------------------------------
@@ -63,6 +65,7 @@ namespace Ogre
         mMainCommandQueue = [mDevice newCommandQueue];
         mCurrentCommandBuffer = [mMainCommandQueue commandBuffer];
         mBlitEncoder = 0;
+        mComputeEncoder = 0;
         mRenderEncoder = 0;
     }
     //-------------------------------------------------------------------------
@@ -89,6 +92,14 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalDevice::endComputeEncoder(void)
     {
+        if( mComputeEncoder )
+        {
+            [mComputeEncoder endEncoding];
+            mComputeEncoder = 0;
+
+            if( mRenderSystem->getActiveDevice() == this )
+                mRenderSystem->_notifyActiveComputeEnded();
+        }
     }
     //-------------------------------------------------------------------------
     void MetalDevice::endAllEncoders(void)
@@ -117,6 +128,19 @@ namespace Ogre
         }
 
         return mBlitEncoder;
+    }
+    //-------------------------------------------------------------------------
+    id<MTLComputeCommandEncoder> MetalDevice::getComputeEncoder(void)
+    {
+        if( !mComputeEncoder )
+        {
+            endRenderEncoder();
+            endBlitEncoder();
+
+            mComputeEncoder = [mCurrentCommandBuffer computeCommandEncoder];
+        }
+
+        return mComputeEncoder;
     }
     //-------------------------------------------------------------------------
     void MetalDevice::stall(void)

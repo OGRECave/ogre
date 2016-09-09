@@ -30,6 +30,10 @@ THE SOFTWARE.
 #include "Vao/OgreMetalBufferInterface.h"
 #include "Vao/OgreMetalTexBufferPacked.h"
 
+#include "OgreMetalDevice.h"
+
+#import <Metal/MTLComputeCommandEncoder.h>
+
 namespace Ogre
 {
     MetalUavBufferPacked::MetalUavBufferPacked(
@@ -64,5 +68,18 @@ namespace Ogre
         mTexBufferViews.push_back( retVal );
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalUavBufferPacked::bindBufferCS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
+
+        __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
+                mDevice->getComputeEncoder();
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
+
+        [computeEncoder setBuffer:bufferInterface->getVboName()
+                           offset:mFinalBufferStart * mBytesPerElement + offset
+                          atIndex:slot + OGRE_METAL_CS_UAV_SLOT_START];
     }
 }

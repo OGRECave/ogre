@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 #import <Metal/MTLDevice.h>
 #import <Metal/MTLVertexDescriptor.h>
+#import <Metal/MTLComputePipeline.h>
 
 namespace Ogre {
     //-----------------------------------------------------------------------
@@ -140,11 +141,17 @@ namespace Ogre {
 						static_cast<VertexElementSemantic>( VES_TEXTURE_COORDINATES + i ) )];
         }
         preprocessorMacros[@"CONST_SLOT_START"] =
-                [NSNumber numberWithUnsignedInt:OGRE_METAL_CONST_SLOT_START];
+                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
+                    OGRE_METAL_CONST_SLOT_START : OGRE_METAL_CS_CONST_SLOT_START];
         preprocessorMacros[@"TEX_SLOT_START"] =
-                [NSNumber numberWithUnsignedInt:OGRE_METAL_TEX_SLOT_START];
+                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
+                    OGRE_METAL_TEX_SLOT_START : OGRE_METAL_CS_TEX_SLOT_START];
+        preprocessorMacros[@"UAV_SLOT_START"] =
+                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
+                    OGRE_METAL_UAV_SLOT_START : OGRE_METAL_CS_UAV_SLOT_START];
         preprocessorMacros[@"PARAMETER_SLOT"] =
-                [NSNumber numberWithUnsignedInt:OGRE_METAL_PARAMETER_SLOT];
+                [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
+                    OGRE_METAL_PARAMETER_SLOT : OGRE_METAL_CS_PARAMETER_SLOT];
 
 		options.preprocessorMacros = preprocessorMacros;
 
@@ -229,6 +236,39 @@ namespace Ogre {
         }
     }
     //-----------------------------------------------------------------------
+    void MetalProgram::analyzeComputeParameters(void)
+    {
+        MTLAutoreleasedComputePipelineReflection reflection = 0;
+        NSError* error = 0;
+        id<MTLFunction> metalFunction = this->getMetalFunction();
+        id<MTLComputePipelineState> pso =
+                [mDevice->mDevice newComputePipelineStateWithFunction:metalFunction
+                                                              options:MTLPipelineOptionBufferTypeInfo
+                                                           reflection:&reflection
+                                                                error:&error];
+        if( !pso || error )
+        {
+            String errorDesc;
+            if( error )
+                errorDesc = [error localizedDescription].UTF8String;
+
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Failed to create pipeline state for reflection, error " +
+                         errorDesc, "MetalProgram::analyzeComputeParameters" );
+        }
+        else
+        {
+            createParameterMappingStructures( true );
+            NSArray<MTLArgument*> *arguments = reflection.arguments;
+
+            for( MTLArgument *arg in arguments )
+            {
+                if( arg.type == MTLArgumentTypeBuffer && arg.index == OGRE_METAL_CS_PARAMETER_SLOT )
+                    analyzeParameterBuffer( arg );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------
     void MetalProgram::analyzeRenderParameters(void)
     {
         MTLRenderPipelineDescriptor *psd = [[MTLRenderPipelineDescriptor alloc] init];
@@ -288,7 +328,7 @@ namespace Ogre {
                 errorDesc = [error localizedDescription].UTF8String;
 
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                         "Failed to created pipeline state for reflection, error " +
+                         "Failed to create pipeline state for reflection, error " +
                          errorDesc, "MetalProgram::analyzeRenderParameters" );
         }
         else

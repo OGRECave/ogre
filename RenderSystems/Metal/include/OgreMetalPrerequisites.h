@@ -37,6 +37,8 @@ THE SOFTWARE.
     @protocol MTLBuffer;
     @protocol MTLCommandBuffer;
     @protocol MTLCommandQueue;
+    @protocol MTLComputeCommandEncoder;
+    @protocol MTLComputePipelineState;
     @protocol MTLDepthStencilState;
     @protocol MTLDevice;
     @protocol MTLRenderCommandEncoder;
@@ -50,6 +52,12 @@ THE SOFTWARE.
 #define OGRE_METAL_CONST_SLOT_START     16u
 #define OGRE_METAL_TEX_SLOT_START       24u
 #define OGRE_METAL_PARAMETER_SLOT       23u
+#define OGRE_METAL_UAV_SLOT_START       28u //Not used
+
+#define OGRE_METAL_CS_PARAMETER_SLOT    0u
+#define OGRE_METAL_CS_CONST_SLOT_START  0u
+#define OGRE_METAL_CS_UAV_SLOT_START    8u
+#define OGRE_METAL_CS_TEX_SLOT_START    16u
 
 namespace Ogre
 {

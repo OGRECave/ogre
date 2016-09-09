@@ -118,6 +118,7 @@ namespace Ogre
 
         /// Compile source into shader object
         bool compile(const bool checkErrors = false);
+        void analyzeComputeParameters(void);
         void analyzeRenderParameters(void);
         static void autoFillDummyVertexAttributesForShader( id<MTLFunction> inVertexFunction,
                                                             MTLRenderPipelineDescriptor *outPsd );

@@ -103,6 +103,7 @@ namespace Ogre
         unsigned char                       *mSwIndirectBufferPtr;
         CachedDepthStencilStateVec          mDepthStencilStates;
         MetalHlmsPso const                  *mPso;
+        __unsafe_unretained id<MTLComputePipelineState> mComputePso;
 
         //For v1 rendering.
         v1::IndexData       *mCurrentIndexBuffer;
@@ -204,6 +205,9 @@ namespace Ogre
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
 
+        virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso );
+        virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *pso );
+
         virtual DepthBuffer* _createDepthBufferFor( RenderTarget *renderTarget,
                                                     bool exactMatchFormat );
 
@@ -287,6 +291,7 @@ namespace Ogre
         MetalProgramFactory* getMetalProgramFactory(void)       { return mMetalProgramFactory; }
 
         void _notifyActiveEncoderEnded(void);
+        void _notifyActiveComputeEnded(void);
         void _notifyDeviceStalled(void);
     };
 }

@@ -13,11 +13,19 @@ fragment_program DrawFromUavBuffer_ps_HLSL hlsl
 	target ps_5_0
 }
 
+// Metal shaders
+fragment_program DrawFromUavBuffer_ps_Metal metal
+{
+	source DrawFromUavBuffer_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 // Unified definitions
 fragment_program DrawFromUavBuffer_ps unified
 {
 	delegate DrawFromUavBuffer_ps_HLSL
 	delegate DrawFromUavBuffer_ps_GLSL
+	delegate DrawFromUavBuffer_ps_Metal
 	
 	default_params
 	{

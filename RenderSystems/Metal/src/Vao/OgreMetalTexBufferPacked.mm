@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "OgreMetalDevice.h"
 
 #import <Metal/MTLRenderCommandEncoder.h>
+#import <Metal/MTLComputeCommandEncoder.h>
 
 namespace Ogre
 {
@@ -71,5 +72,18 @@ namespace Ogre
         [mDevice->mRenderEncoder setFragmentBuffer:bufferInterface->getVboName()
                                             offset:mFinalBufferStart * mBytesPerElement + offset
                                            atIndex:slot + OGRE_METAL_TEX_SLOT_START];
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalTexBufferPacked::bindBufferCS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
+
+        __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
+                mDevice->getComputeEncoder();
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
+
+        [computeEncoder setBuffer:bufferInterface->getVboName()
+                           offset:mFinalBufferStart * mBytesPerElement + offset
+                          atIndex:slot + OGRE_METAL_CS_TEX_SLOT_START];
     }
 }

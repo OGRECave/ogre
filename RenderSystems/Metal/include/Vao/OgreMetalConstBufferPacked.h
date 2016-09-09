@@ -55,7 +55,7 @@ namespace Ogre
 
         void bindBufferVS( uint16 slot, uint32 offsetBytes );
         void bindBufferPS( uint16 slot, uint32 offsetBytes );
-        void bindBufferCS( uint16 slot, uint32 offsetBytes ) {}
+        void bindBufferCS( uint16 slot, uint32 offsetBytes );
     };
 }
 

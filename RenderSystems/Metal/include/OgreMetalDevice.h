@@ -43,6 +43,7 @@ namespace Ogre
         id<MTLCommandQueue>     mMainCommandQueue;
         id<MTLCommandBuffer>    mCurrentCommandBuffer;
         id<MTLBlitCommandEncoder>   mBlitEncoder;
+        id<MTLComputeCommandEncoder>mComputeEncoder;
         id<MTLRenderCommandEncoder> mRenderEncoder;
         MetalRenderSystem       *mRenderSystem;
         dispatch_semaphore_t    mStallSemaphore;
@@ -70,6 +71,9 @@ namespace Ogre
             __unsafe_unretained id<MTLBlitCommandEncoder> blitEncoder = mDevice->getBlitEncoder();
         */
         id<MTLBlitCommandEncoder> getBlitEncoder(void);
+
+        /// See getBlitEncoder.
+        id<MTLComputeCommandEncoder> getComputeEncoder(void);
 
         /// Waits for the GPU to finish all pending commands.
         void stall(void);

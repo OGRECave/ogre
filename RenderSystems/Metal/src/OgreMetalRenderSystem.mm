@@ -69,6 +69,7 @@ namespace Ogre
         mIndirectBuffer( 0 ),
         mSwIndirectBufferPtr( 0 ),
         mPso( 0 ),
+        mComputePso( 0 ),
         mCurrentIndexBuffer( 0 ),
         mCurrentVertexBuffer( 0 ),
         mCurrentPrimType( MTLPrimitiveTypePoint ),
@@ -368,9 +369,9 @@ namespace Ogre
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::queueBindUAV( uint32 slot, TexturePtr texture,
-                                         ResourceAccess::ResourceAccess access,
-                                         int32 mipmapLevel, int32 textureArrayIndex,
-                                         PixelFormat pixelFormat )
+                                          ResourceAccess::ResourceAccess access,
+                                          int32 mipmapLevel, int32 textureArrayIndex,
+                                          PixelFormat pixelFormat )
     {
     }
     //-------------------------------------------------------------------------
@@ -397,10 +398,37 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
     {
+        __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
+                mActiveDevice->getComputeEncoder();
+
+        __unsafe_unretained id<MTLTexture> metalTexture = 0;
+
+        if( texPtr && enabled )
+        {
+            MetalTexture *metalTex = static_cast<MetalTexture*>( texPtr );
+            metalTexture = metalTex->getTextureForSampling( this );
+        }
+
+        [computeEncoder setTexture:metalTexture atIndex:slot];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock )
     {
+        assert( (!samplerblock || samplerblock->mRsData) &&
+                "The block must have been created via HlmsManager::getSamplerblock!" );
+
+        __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
+                mActiveDevice->getComputeEncoder();
+
+        if( !samplerblock )
+        {
+            [computeEncoder setSamplerState:0 atIndex:texUnit];
+        }
+        else
+        {
+            id<MTLSamplerState> sampler = (__bridge id<MTLSamplerState>)samplerblock->mRsData;
+            [computeEncoder setSamplerState:sampler atIndex:texUnit];
+        }
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setTexture(size_t unit, bool enabled,  Texture *texPtr)
@@ -594,6 +622,51 @@ namespace Ogre
 
     }
     //-------------------------------------------------------------------------
+    void MetalRenderSystem::_hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso )
+    {
+        MetalProgram *computeShader = static_cast<MetalProgram*>(
+                    newPso->computeShader->_getBindingDelegate() );
+
+        //Btw. HlmsCompute guarantees mNumThreadGroups won't have zeroes.
+        assert( newPso->mNumThreadGroups[0] != 0 &&
+                newPso->mNumThreadGroups[1] != 0 &&
+                newPso->mNumThreadGroups[2] != 0 &&
+                "Invalid parameters. Will also cause div. by zero!" );
+
+        NSError* error = 0;
+        MTLComputePipelineDescriptor *psd = [[MTLComputePipelineDescriptor alloc] init];
+        psd.computeFunction = computeShader->getMetalFunction();
+        psd.threadGroupSizeIsMultipleOfThreadExecutionWidth =
+                (newPso->mThreadsPerGroup[0] % newPso->mNumThreadGroups[0] == 0) &&
+                (newPso->mThreadsPerGroup[1] % newPso->mNumThreadGroups[1] == 0) &&
+                (newPso->mThreadsPerGroup[2] % newPso->mNumThreadGroups[2] == 0);
+
+        id<MTLComputePipelineState> pso =
+                [mActiveDevice->mDevice newComputePipelineStateWithDescriptor:psd
+                                                                      options:MTLPipelineOptionNone
+                                                                   reflection:nil
+                                                                        error:&error];
+        if( !pso || error )
+        {
+            String errorDesc;
+            if( error )
+                errorDesc = [error localizedDescription].UTF8String;
+
+            OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
+                         "Failed to create pipeline state for compute, error " +
+                         errorDesc, "MetalProgram::_hlmsComputePipelineStateObjectCreated" );
+        }
+
+        newPso->rsData = const_cast<void*>( CFBridgingRetain( pso ) );
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *pso )
+    {
+        id<MTLComputePipelineState> metalPso = reinterpret_cast< id<MTLComputePipelineState> >(
+                    CFBridgingRelease( pso->rsData ) );
+        pso->rsData = 0;
+    }
+    //-------------------------------------------------------------------------
     void MetalRenderSystem::_beginFrame(void)
     {
     }
@@ -748,6 +821,11 @@ namespace Ogre
         mActiveRenderTarget = 0;
         mActiveRenderEncoder = 0;
         mPso = 0;
+    }
+    //-------------------------------------------------------------------------
+    void MetalRenderSystem::_notifyActiveComputeEnded(void)
+    {
+        mComputePso = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyDeviceStalled(void)
@@ -1075,6 +1153,16 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setComputePso( const HlmsComputePso *pso )
     {
+        id<MTLComputePipelineState> metalPso = (__bridge id<MTLComputePipelineState>)pso->rsData;
+
+        __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
+                mActiveDevice->getComputeEncoder();
+
+        if( mComputePso != metalPso )
+        {
+            [computeEncoder setComputePipelineState:metalPso];
+            mComputePso = metalPso;
+        }
     }
     //-------------------------------------------------------------------------
     VertexElementType MetalRenderSystem::getColourVertexElementType(void) const
@@ -1220,6 +1308,18 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_dispatch( const HlmsComputePso &pso )
     {
+        __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
+                mActiveDevice->getComputeEncoder();
+
+        MTLSize numThreadGroups = MTLSizeMake( pso.mNumThreadGroups[0],
+                                               pso.mNumThreadGroups[1],
+                                               pso.mNumThreadGroups[2] );
+        MTLSize threadsPerGroup = MTLSizeMake( pso.mThreadsPerGroup[0],
+                                               pso.mThreadsPerGroup[1],
+                                               pso.mThreadsPerGroup[2] );
+
+        [computeEncoder dispatchThreadgroups:numThreadGroups
+                       threadsPerThreadgroup:threadsPerGroup];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setVertexArrayObject( const VertexArrayObject *vao )
@@ -1635,7 +1735,7 @@ namespace Ogre
                                            bindOffset );
                 break;
             case GPT_COMPUTE_PROGRAM:
-                constBuffer->bindBufferCS( OGRE_METAL_PARAMETER_SLOT - OGRE_METAL_CONST_SLOT_START,
+                constBuffer->bindBufferCS( OGRE_METAL_CS_PARAMETER_SLOT - OGRE_METAL_CS_CONST_SLOT_START,
                                            bindOffset );
                 break;
             case GPT_GEOMETRY_PROGRAM:
