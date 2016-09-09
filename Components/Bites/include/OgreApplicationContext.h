@@ -34,13 +34,17 @@
 #include "OgrePlugin.h"
 #include "OgreFileSystemLayer.h"
 #include "OgreFrameListener.h"
-#include "OgreOverlaySystem.h"
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
 #include "OgreSGTechniqueResolverListener.h"
 #endif // INCLUDE_RTSHADER_SYSTEM
 
+// forward declarations
 extern "C" struct SDL_Window;
+
+namespace Ogre {
+    class OverlaySystem;
+}
 
 // Static plugins declaration section
 // Note that every entry in here adds an extra header / library dependency
