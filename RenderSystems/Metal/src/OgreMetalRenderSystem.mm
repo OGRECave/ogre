@@ -974,6 +974,10 @@ namespace Ogre
             }
 
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+            vertexDescriptor.attributes[15].format      = MTLVertexFormatUInt;
+            vertexDescriptor.attributes[15].bufferIndex = 15;
+            vertexDescriptor.attributes[15].offset      = 0;
+
             vertexDescriptor.layouts[15].stride = 0;
             vertexDescriptor.layouts[15].stepFunction = MTLVertexStepFunctionPerInstance;
 #endif
