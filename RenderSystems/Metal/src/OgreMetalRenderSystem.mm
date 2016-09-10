@@ -469,10 +469,22 @@ namespace Ogre
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_bindTextureUavCS( uint32 slot, Texture *texture,
-                                              ResourceAccess::ResourceAccess access,
-                                              int32 mipmapLevel, int32 textureArrayIndex,
-                                              PixelFormat pixelFormat )
+                                               ResourceAccess::ResourceAccess access,
+                                               int32 mipmapLevel, int32 textureArrayIndex,
+                                               PixelFormat pixelFormat )
     {
+        __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
+                mActiveDevice->getComputeEncoder();
+
+        __unsafe_unretained id<MTLTexture> metalTexture = 0;
+
+        if( texture )
+        {
+            MetalTexture *metalTex = static_cast<MetalTexture*>( texture );
+            metalTexture = metalTex->getTextureForSampling( this );
+        }
+
+        [computeEncoder setTexture:metalTexture atIndex:slot];
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setTextureCS( uint32 slot, bool enabled, Texture *texPtr )
