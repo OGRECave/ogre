@@ -308,7 +308,7 @@ fragment @insertpiece( output_type ) main_metal
 	nNormal.z	*= vDetail.z + 1.0 - detailWeights.@insertpiece(detail_swizzle@n) @insertpiece( detail@n_nm_weight_mul );@end @end
 
 @property( normal_map )
-	nNormal = normalize( nNormal * TBN );
+	nNormal = normalize( TBN * nNormal );
 @end
 
 	//Everything's in Camera space
