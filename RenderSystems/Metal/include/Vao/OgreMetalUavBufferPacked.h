@@ -50,8 +50,9 @@ namespace Ogre
                               MetalDevice *device );
         ~MetalUavBufferPacked();
 
-//        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
-//        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
+        void bindBufferAllRenderStages( uint16 slot, size_t offset=0 );
+        virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
+        virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
 //        virtual void bindBufferGS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
 //        virtual void bindBufferDS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}
 //        virtual void bindBufferHS( uint16 slot, size_t offset=0, size_t sizeBytes=0 ) {}

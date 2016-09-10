@@ -100,6 +100,10 @@ namespace Ogre
 
         mCurrentWidth   = finalTarget->getWidth();
         mCurrentHeight  = finalTarget->getHeight();
+
+        //Some RenderSystems assume we start the frame with empty pointer.
+        if( finalTarget )
+            mRenderSys->_setRenderTarget( 0, true );
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace::~CompositorWorkspace()

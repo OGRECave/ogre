@@ -399,6 +399,6 @@ namespace Ogre
             }
         }
 
-        return mTexture;
+        return retVal;
     }
 }

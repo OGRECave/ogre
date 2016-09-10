@@ -118,6 +118,24 @@ namespace Ogre
         size_t                  mCurrentAutoParamsBufferSpaceLeft;
         size_t                  mHistoricalAutoParamsSize[60];
 
+        struct Uav
+        {
+            TexturePtr      texture;
+            id<MTLTexture>  textureName;
+            UavBufferPacked *buffer;
+            size_t          offset;
+            //size_t          sizeBytes;
+
+            Uav() : textureName( 0 ), buffer( 0 ) {}
+        };
+
+        Uav             mUavs[64];
+        /// In range [0; 64]; note that a user may use
+        /// mUavs[0] & mUavs[2] leaving mUavs[1] empty.
+        /// and still mMaxUavIndexPlusOne = 3.
+        uint8           mMaxModifiedUavPlusOne;
+        bool            mUavsDirty;
+
         uint8           mNumMRTs;
         MetalRenderTargetCommon     *mCurrentColourRTs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         MetalDepthBuffer            *mCurrentDepthBuffer;

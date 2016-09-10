@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "OgreMetalDevice.h"
 
 #import <Metal/MTLComputeCommandEncoder.h>
+#import <Metal/MTLRenderCommandEncoder.h>
 
 namespace Ogre
 {
@@ -68,6 +69,42 @@ namespace Ogre
         mTexBufferViews.push_back( retVal );
 
         return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalUavBufferPacked::bindBufferAllRenderStages( uint16 slot, size_t offset )
+    {
+        assert( mDevice->mRenderEncoder || mDevice->mFrameAborted );
+        assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
+
+        [mDevice->mRenderEncoder setVertexBuffer:bufferInterface->getVboName()
+                                          offset:mFinalBufferStart * mBytesPerElement + offset
+                                         atIndex:slot + OGRE_METAL_UAV_SLOT_START];
+        [mDevice->mRenderEncoder setFragmentBuffer:bufferInterface->getVboName()
+                                            offset:mFinalBufferStart * mBytesPerElement + offset
+                                           atIndex:slot + OGRE_METAL_UAV_SLOT_START];
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalUavBufferPacked::bindBufferVS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        assert( mDevice->mRenderEncoder || mDevice->mFrameAborted );
+        assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
+
+        [mDevice->mRenderEncoder setVertexBuffer:bufferInterface->getVboName()
+                                          offset:mFinalBufferStart * mBytesPerElement + offset
+                                         atIndex:slot + OGRE_METAL_UAV_SLOT_START];
+    }
+    //-----------------------------------------------------------------------------------
+    void MetalUavBufferPacked::bindBufferPS( uint16 slot, size_t offset, size_t sizeBytes )
+    {
+        assert( mDevice->mRenderEncoder || mDevice->mFrameAborted );
+        assert( dynamic_cast<MetalBufferInterface*>( mBufferInterface ) );
+        MetalBufferInterface *bufferInterface = static_cast<MetalBufferInterface*>( mBufferInterface );
+
+        [mDevice->mRenderEncoder setFragmentBuffer:bufferInterface->getVboName()
+                                            offset:mFinalBufferStart * mBytesPerElement + offset
+                                           atIndex:slot + OGRE_METAL_UAV_SLOT_START];
     }
     //-----------------------------------------------------------------------------------
     void MetalUavBufferPacked::bindBufferCS( uint16 slot, size_t offset, size_t sizeBytes )

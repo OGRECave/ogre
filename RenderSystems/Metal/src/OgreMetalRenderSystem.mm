@@ -45,6 +45,7 @@ Copyright (c) 2000-2016 Torus Knot Software Ltd
 #include "OgreMetalHardwareVertexBuffer.h"
 
 #include "Vao/OgreMetalConstBufferPacked.h"
+#include "Vao/OgreMetalUavBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "Vao/OgreVertexArrayObject.h"
 #include "CommandBuffer/OgreCbDrawCall.h"
@@ -76,6 +77,8 @@ namespace Ogre
         mAutoParamsBufferIdx( 0 ),
         mCurrentAutoParamsBufferPtr( 0 ),
         mCurrentAutoParamsBufferSpaceLeft( 0 ),
+        mMaxModifiedUavPlusOne( 0 ),
+        mUavsDirty( false ),
         mNumMRTs( 0 ),
         mCurrentDepthBuffer( 0 ),
         mActiveDevice( 0 ),
@@ -373,20 +376,96 @@ namespace Ogre
                                           int32 mipmapLevel, int32 textureArrayIndex,
                                           PixelFormat pixelFormat )
     {
+        assert( slot < 64 );
+
+        if( !mUavs[slot].buffer && mUavs[slot].texture.isNull() && texture.isNull() )
+            return;
+
+        mUavs[slot].texture = texture;
+        mUavs[slot].buffer  = 0;
+
+        if( !texture.isNull() )
+        {
+            if( !(texture->getUsage() & TU_UAV) )
+            {
+                OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                             "Texture " + texture->getName() +
+                             " must have been created with TU_UAV to be bound as UAV",
+                             "GL3PlusRenderSystem::queueBindUAV" );
+            }
+
+            mUavs[slot].textureName = static_cast<MetalTexture*>( texture.get() )->
+                    getTextureForSampling( this );
+        }
+
+        mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::queueBindUAV( uint32 slot, UavBufferPacked *buffer,
-                                         ResourceAccess::ResourceAccess access,
-                                         size_t offset, size_t sizeBytes )
+                                          ResourceAccess::ResourceAccess access,
+                                          size_t offset, size_t sizeBytes )
     {
+        assert( slot < 64 );
+
+        if( mUavs[slot].texture.isNull() && !mUavs[slot].buffer && !buffer )
+            return;
+
+        mUavs[slot].buffer = buffer;
+        mUavs[slot].texture.setNull();
+
+        if( buffer )
+        {
+            mUavs[slot].offset      = offset;
+            //mUavs[slot].sizeBytes   = sizeBytes;
+        }
+
+        mMaxModifiedUavPlusOne = std::max( mMaxModifiedUavPlusOne, static_cast<uint8>( slot + 1 ) );
+        mUavsDirty = true;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::clearUAVs(void)
     {
+        for( size_t i=0; i<mMaxModifiedUavPlusOne; ++i )
+        {
+            mUavs[i].texture.setNull();
+            mUavs[i].buffer = 0;
+        }
+        mUavsDirty = mMaxModifiedUavPlusOne != 0;
+        mMaxModifiedUavPlusOne = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::flushUAVs(void)
     {
+        for( uint32 i=0; i<mMaxModifiedUavPlusOne; ++i )
+        {
+            if( !mUavs[i].texture.isNull() )
+            {
+                //TODO: Replace OGRE_METAL_UAV_SLOT_START w/ something
+                //more dynamic, possibly sync with Hlms.
+                [mActiveRenderEncoder setVertexTexture:mUavs[i].textureName
+                                               atIndex:i + OGRE_METAL_UAV_SLOT_START];
+                [mActiveRenderEncoder setFragmentTexture:mUavs[i].textureName
+                                                 atIndex:i + OGRE_METAL_UAV_SLOT_START];
+            }
+            else if( mUavs[i].buffer )
+            {
+                MetalUavBufferPacked *metalUav = static_cast<MetalUavBufferPacked*>( mUavs[i].buffer );
+                metalUav->bindBufferAllRenderStages( i, mUavs[i].offset );
+            }
+            else
+            {
+                [mActiveRenderEncoder setVertexTexture:0 atIndex:i + OGRE_METAL_UAV_SLOT_START];
+                [mActiveRenderEncoder setFragmentTexture:0 atIndex:i + OGRE_METAL_UAV_SLOT_START];
+                [mActiveRenderEncoder setVertexBuffer:0
+                                               offset:0
+                                              atIndex:i + OGRE_METAL_UAV_SLOT_START];
+                [mActiveRenderEncoder setFragmentBuffer:0
+                                                 offset:0
+                                                atIndex:i + OGRE_METAL_UAV_SLOT_START];
+            }
+        }
+
+        mUavsDirty = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_bindTextureUavCS( uint32 slot, Texture *texture,
@@ -550,6 +629,9 @@ namespace Ogre
         //frame's work via addCompletedHandler callback below, signifying the CPU can go ahead
         //and prepare another frame.
         dispatch_semaphore_wait( mMainGpuSyncSemaphore, DISPATCH_TIME_FOREVER );
+
+        mActiveRenderTarget = 0;
+        mActiveViewport = 0;
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_endFrameOnce(void)
@@ -722,6 +804,9 @@ namespace Ogre
                 }
             }
         }
+
+        if( mActiveRenderEncoder && mUavsDirty )
+            flushUAVs();
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::setActiveDevice( MetalDevice *device )
@@ -813,6 +898,7 @@ namespace Ogre
 
         static_cast<MetalVaoManager*>( mVaoManager )->bindDrawId();
         [mActiveRenderEncoder setFrontFacingWinding:MTLWindingCounterClockwise];
+        flushUAVs();
     }
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_notifyActiveEncoderEnded(void)
@@ -1842,7 +1928,11 @@ namespace Ogre
         {
             const bool activeHasColourWrites = mNumMRTs != 0;
             if( mActiveRenderTarget == target && activeHasColourWrites == colourWrite )
+            {
+                if( mActiveRenderEncoder && mUavsDirty )
+                    flushUAVs();
                 return;
+            }
         }
 
         if( mActiveDevice )
