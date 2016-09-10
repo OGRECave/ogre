@@ -2,13 +2,13 @@
 
 using namespace metal;
 
-kernel void metal_main
+kernel void main_metal
 (
 	device uint *pixelBuffer [[buffer(UAV_SLOT_START)]],
 	constant uint2 &texResolution [[buffer(PARAMETER_SLOT)]],
 
 	ushort3 gl_LocalInvocationID [[thread_position_in_threadgroup]],
-	ushort3 gl_GlobalInvocationID : [[thread_position_in_grid]]
+	ushort3 gl_GlobalInvocationID [[thread_position_in_grid]]
 )
 {
 	if( gl_GlobalInvocationID.x < texResolution.x && gl_GlobalInvocationID.y < texResolution.y )

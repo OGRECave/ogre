@@ -103,7 +103,7 @@ namespace Ogre
         unsigned char                       *mSwIndirectBufferPtr;
         CachedDepthStencilStateVec          mDepthStencilStates;
         MetalHlmsPso const                  *mPso;
-        __unsafe_unretained id<MTLComputePipelineState> mComputePso;
+        HlmsComputePso const                *mComputePso;
 
         //For v1 rendering.
         v1::IndexData       *mCurrentIndexBuffer;

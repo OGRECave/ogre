@@ -1162,10 +1162,10 @@ namespace Ogre
         __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
                 mActiveDevice->getComputeEncoder();
 
-        if( mComputePso != metalPso )
+        if( mComputePso != pso )
         {
             [computeEncoder setComputePipelineState:metalPso];
-            mComputePso = metalPso;
+            mComputePso = pso;
         }
     }
     //-------------------------------------------------------------------------
@@ -1689,10 +1689,7 @@ namespace Ogre
             break;
         case GPT_COMPUTE_PROGRAM:
             mActiveComputeGpuProgramParameters = params;
-            //shader = mCurrentComputeShader;
-            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED,
-                         "TODO Compute",
-                         "MetalRenderSystem::bindGpuProgramParameters" );
+            shader = static_cast<MetalProgram*>( mComputePso->computeShader->_getBindingDelegate() );
             break;
         default:
             break;

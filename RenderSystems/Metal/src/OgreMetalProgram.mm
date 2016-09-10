@@ -548,8 +548,7 @@ namespace Ogre {
         }
         else
         {
-            OGRE_EXCEPT( Exception::ERR_NOT_IMPLEMENTED, "Compute parameters not implemented yet",
-                         "MetalProgram::buildConstantDefinitions" );
+            const_cast<MetalProgram*>(this)->analyzeComputeParameters();
         }
     }
     //-----------------------------------------------------------------------
