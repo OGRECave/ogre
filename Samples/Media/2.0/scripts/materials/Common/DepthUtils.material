@@ -53,7 +53,7 @@ material Ogre/Depth/DownscaleMax
 
 			texture_unit depthTexture
 			{
-				filtering			point
+				filtering			none
 				tex_address_mode	clamp
 			}
 		}
