@@ -26,19 +26,15 @@
 	@end
 @end
 
-@property( diffuse_map || detail_maps_diffuse )
-	@property( !transparent_mode )
-		@piece( diffuseExtraParamDef ), float4 diffuseCol@end
-		@piece( diffuseExtraParam ), diffuseCol.xyzw@end
-	@end @property( transparent_mode )
-		@piece( diffuseExtraParamDef ), float3 diffuseCol@end
-		@piece( diffuseExtraParam ), diffuseCol.xyz@end
-	@end
-    //diffuseCol is multiplied against material.kD in PixelShader_ps as it is influenced by the detail maps.
-    @piece( kD )diffuseCol@end
-@end @property( !diffuse_map && !detail_maps_diffuse )
-    @piece( kD )material.kD@end
+@property( !transparent_mode )
+	@piece( diffuseExtraParamDef ), float4 diffuseCol@end
+	@piece( diffuseExtraParam ), diffuseCol.xyzw@end
+@end @property( transparent_mode )
+	@piece( diffuseExtraParamDef ), float4 diffuseCol@end
+	@piece( diffuseExtraParam ), diffuseCol.xyzw@end
 @end
+//diffuseCol always has some colour and is multiplied against material.kD in PixelShader_ps.
+@piece( kD )diffuseCol@end
 
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )

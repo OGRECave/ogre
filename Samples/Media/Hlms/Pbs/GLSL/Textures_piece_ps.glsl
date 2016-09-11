@@ -7,12 +7,8 @@
 	@end
 @end
 
-@property( diffuse_map || detail_maps_diffuse )
-    //diffuseCol is multiplied against material.kD in PixelShader_ps as it is influenced by the detail maps.
-	@piece( kD )diffuseCol@end
-@end @property( !diffuse_map && !detail_maps_diffuse )
-	@piece( kD )material.kD@end
-@end
+//diffuseCol always has some colour and is multiplied against material.kD in PixelShader_ps.
+@piece( kD )diffuseCol@end
 
 @property( !metallic_workflow )
 	@property( specular_map && !fresnel_workflow )

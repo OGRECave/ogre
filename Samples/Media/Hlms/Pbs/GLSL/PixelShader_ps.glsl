@@ -59,7 +59,7 @@ in block
 	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
 @property( envprobe_map )	uint envMapIdx;@end
 
-@property( diffuse_map || detail_maps_diffuse )vec4 diffuseCol;@end
+vec4 diffuseCol;
 @property( specular_map && !metallic_workflow && !fresnel_workflow )vec3 specularCol;@end
 @property( metallic_workflow || (specular_map && fresnel_workflow) )@insertpiece( FresnelType ) F0;@end
 @property( roughness_map )float ROUGHNESS;@end
@@ -272,29 +272,22 @@ void main()
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value. If there are no diffuse or detail maps,
 	/// we must not access diffuseCol at all, but rather use material.kD directly (see piece( kD ) ).
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = vec4( 0.0, 0.0, 0.0, 0.0 );@end
+	@property( !diffuse_map )diffuseCol = material.bgDiffuse;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )
 	@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
 
 	/// Apply the material's diffuse over the textures
-@property( diffuse_map || detail_maps_diffuse )
 	@property( !transparent_mode )
 		diffuseCol.xyz *= material.kD.xyz;
 	@end @property( transparent_mode )
 		diffuseCol.xyz *= material.kD.xyz * diffuseCol.w * diffuseCol.w;
 	@end
-@end
 
 @property( alpha_test )
-	@property( diffuse_map || detail_maps_diffuse )
 	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
 		discard;
-	@end @property( !diffuse_map && !detail_maps_diffuse )
-	if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
-		discard;
-	@end
 @end
 
 @property( !normal_map )
@@ -476,7 +469,7 @@ void main()
 
 @property( alpha_test )
 	Material material;
-	@property( diffuse_map || detail_maps_diffuse )float diffuseCol;@end
+	@property( detail_maps_diffuse )float diffuseCol;@end
 	@property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 	@property( diffuse_map )uint diffuseIdx;@end
 	@property( detail_weight_map )uint weightMapIdx;@end
@@ -524,7 +517,7 @@ void main()
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value. If there are no diffuse or detail maps,
 	/// we must not access diffuseCol at all, but rather use material.kD directly (see piece( kD ) ).
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = 0.0;@end
+	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = material.bgDiffuse.w;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )
@@ -533,13 +526,8 @@ void main()
 	/// Apply the material's alpha over the textures
 @property( TODO_REFACTOR_ACCOUNT_MATERIAL_ALPHA )	diffuseCol.xyz *= material.kD.xyz;@end
 
-	@property( diffuse_map || detail_maps_diffuse )
 	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol )
 		discard;
-	@end @property( !diffuse_map && !detail_maps_diffuse )
-	if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
-		discard;
-	@end
 @end /// !alpha_test
 
 @property( !hlms_shadow_uses_depth_texture )

@@ -57,6 +57,9 @@ namespace Ogre
         static void parseScale( const rapidjson::Value &jsonArray, Vector4 &offsetScale );
 
         static inline Vector3 parseVector3Array( const rapidjson::Value &jsonArray );
+        static inline ColourValue parseColourValueArray(
+                const rapidjson::Value &jsonArray,
+                const ColourValue &defaultValue = ColourValue::White );
 
         void loadTexture( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                           PbsTextureTypes textureType, HlmsPbsDatablock *datablock,
@@ -79,9 +82,15 @@ namespace Ogre
                           PbsTextureTypes textureType,
                           const HlmsPbsDatablock *datablock, String &outString,
                           bool writeTexture=true );
+        void saveTexture( const Vector3 &value, const ColourValue &colour,
+                          const char *blockName, PbsTextureTypes textureType,
+                          const HlmsPbsDatablock *datablock, String &outString,
+                          bool writeTexture=true );
 
-        void saveTexture( const Vector3 &value, const char *blockName, PbsTextureTypes textureType,
-                          bool writeValue, bool scalarValue, bool isFresnel, bool writeTexture,
+        void saveTexture( const Vector3 &value, const ColourValue &bgDiffuse, const char *blockName,
+                          PbsTextureTypes textureType,
+                          bool writeValue, bool writeBgDiffuse, bool scalarValue,
+                          bool isFresnel, bool writeTexture,
                           const HlmsPbsDatablock *datablock, String &outString );
 
     public:

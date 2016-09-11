@@ -713,6 +713,19 @@ namespace Ogre
         outString += ']';
     }
     //-----------------------------------------------------------------------------------
+    void HlmsJson::toStr( const Vector4 &value, String &outString )
+    {
+        outString += '[';
+        outString += StringConverter::toString( value.x );
+        outString += ", ";
+        outString += StringConverter::toString( value.y );
+        outString += ", ";
+        outString += StringConverter::toString( value.z );
+        outString += ", ";
+        outString += StringConverter::toString( value.w );
+        outString += ']';
+    }
+    //-----------------------------------------------------------------------------------
     String HlmsJson::getName( const HlmsMacroblock *macroblock ) const
     {
         return "\"Macroblock_" + StringConverter::toString( macroblock->mId ) + '"';
