@@ -11,5 +11,6 @@ float3 main
 	PS_INPUT inPs
 ) : SV_Target0
 {
-	return skyCubemap.Sample( samplerState, inPs.cameraDir ).xyz;
+	//Cubemaps are left-handed
+	return skyCubemap.Sample( samplerState, float3( inPs.cameraDir.xy, -inPs.cameraDir.z ) ).xyz;
 }
