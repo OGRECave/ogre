@@ -103,7 +103,7 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 	return tsNormal;
 }
 @end
-@property( normal_weight_tex )#define normalMapWeight material.mNormalMapWeight )@end
+@property( normal_weight_tex )#define normalMapWeight material.mNormalMapWeight@end
 @property( detail_maps_normal )
 	@foreach( 4, n )
 		@property( normal_weight_detail@n )
