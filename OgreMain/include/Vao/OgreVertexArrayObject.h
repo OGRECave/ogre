@@ -159,10 +159,17 @@ namespace Ogre
         @param sharedBuffers [in/out]
             Maps old vertex buffers to new vertex buffers so that we can reuse them.
             Optional. Use a null pointer to disable this feature.
+        @param vertexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
+        @param indexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
         @return
             New cloned Vao.
         */
-        VertexArrayObject* clone( VaoManager *vaoManager, SharedVertexBufferMap *sharedBuffers ) const;
+        VertexArrayObject* clone( VaoManager *vaoManager, SharedVertexBufferMap *sharedBuffers,
+                                  int vertexBufferType = -1, int indexBufferType = -1 ) const;
 
         struct ReadRequests
         {

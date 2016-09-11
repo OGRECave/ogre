@@ -206,8 +206,29 @@ namespace Ogre {
             Optional name of the new group to assign the clone to;
             if you leave this blank, the clone will be assigned to the same
             group as this Mesh.
+        @param vertexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
+        @param indexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
         */
-        MeshPtr clone( const String& newName, const String& newGroup = BLANKSTRING );
+        MeshPtr clone( const String& newName, const String& newGroup = BLANKSTRING,
+                       int vertexBufferType = -1, int indexBufferType = -1 );
+
+        /** Will copy this mesh into the destination mesh.
+        @remarks
+            similar to clone however will copy into a mesh you define rather than creating one for you.
+        @param destination
+            The mesh that will be the destination for the copy of *this
+        @param vertexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
+        @param indexBufferType
+            See BufferType. Must be set to a valid BufferType. Pass a negative
+            value to keep the same type of the original buffer being cloned.
+        */
+        void copy( const MeshPtr& destination, int vertexBufferType = -1, int indexBufferType = -1 );
 
         /** Get the axis-aligned bounding box for this mesh.
         */
@@ -437,6 +458,19 @@ namespace Ogre {
         /// Returns true if the shadow mapping buffers do not just reference the real buffers,
         /// but are rather their own separate set of optimized geometry.
         bool hasIndependentShadowMappingVaos(void) const;
+
+        /// will manually set the vao manager the mesh will use when it loads.
+        /// setting this when the mesh is already loaded will cause a crash on unload, use with caution!
+        inline void _setVaoManager( VaoManager* vaoManager )
+        {
+            mVaoManager = vaoManager;
+        }
+
+        /// will return the vao manager that this mesh will use for creating and destroying array objects
+        inline VaoManager* _getVaoManager() const
+        {
+            return mVaoManager;
+        }
     };
 
     /** @} */

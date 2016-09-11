@@ -180,8 +180,17 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VertexArrayObject::clone( VaoManager *vaoManager,
-                                                 SharedVertexBufferMap *sharedBuffers ) const
+                                                 SharedVertexBufferMap *sharedBuffers,
+                                                 int vertexBufferType,
+                                                 int indexBufferType ) const
     {
+        assert( vertexBufferType < 0 ||
+                (vertexBufferType >= BT_IMMUTABLE &&
+                 vertexBufferType <= BT_DYNAMIC_PERSISTENT_COHERENT) );
+        assert( indexBufferType < 0 ||
+                (indexBufferType >= BT_IMMUTABLE &&
+                 indexBufferType <= BT_DYNAMIC_PERSISTENT_COHERENT) );
+
         VertexBufferPackedVec newVertexBuffers;
         newVertexBuffers.reserve( mVertexBuffers.size() );
 
@@ -211,11 +220,14 @@ namespace Ogre
             memcpy( dstData, srcData, (*itBuffers)->getTotalSizeBytes() );
             asyncTicket->unmap();
 
+            const BufferType bufferType = vertexBufferType < 0 ?
+                        (*itBuffers)->getBufferType() : static_cast<BufferType>( vertexBufferType );
+
             const bool keepAsShadow = (*itBuffers)->getShadowCopy() != 0;
             VertexBufferPacked *newVertexBuffer = vaoManager->createVertexBuffer(
                                                     (*itBuffers)->getVertexElements(),
                                                     (*itBuffers)->getNumElements(),
-                                                    (*itBuffers)->getBufferType(),
+                                                    bufferType,
                                                     dstData, keepAsShadow );
 
             if( keepAsShadow ) //Don't free the pointer ourselves
@@ -238,13 +250,16 @@ namespace Ogre
             FreeOnDestructor dataPtrContainer( dstData );
 
             const void *srcData = asyncTicket->map();
-            memcpy( dstData, srcData, (*itBuffers)->getTotalSizeBytes() );
+            memcpy( dstData, srcData, mIndexBuffer->getTotalSizeBytes() );
             asyncTicket->unmap();
+
+            const BufferType bufferType = vertexBufferType < 0 ?
+                        mIndexBuffer->getBufferType() : static_cast<BufferType>( vertexBufferType );
 
             const bool keepAsShadow = mIndexBuffer->getShadowCopy() != 0;
             newIndexBuffer = vaoManager->createIndexBuffer( mIndexBuffer->getIndexType(),
                                                             mIndexBuffer->getNumElements(),
-                                                            mIndexBuffer->getBufferType(),
+                                                            bufferType,
                                                             dstData, keepAsShadow );
 
             if( keepAsShadow ) //Don't free the pointer ourselves

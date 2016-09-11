@@ -303,7 +303,6 @@ elseif (OGRE_THREAD_PROVIDER EQUAL 4)
 	)
 	list(APPEND THREAD_SOURCE_FILES
 		src/Threading/OgreDefaultWorkQueueStandard.cpp
-		src/Threading/OgreThreadDefinesSTD.cpp
 	)
 endif ()
 

@@ -877,8 +877,8 @@ namespace Ogre {
                 if( subMeshLod.vertexDeclarations.size() == 1 )
                 {
                     VertexBufferPacked *vertexBuffer = mVaoManager->createVertexBuffer(
-                                subMeshLod.vertexDeclarations[0], subMeshLod.numVertices,
-                                BT_IMMUTABLE, subMeshLod.vertexBuffers[0], true );
+                        subMeshLod.vertexDeclarations[0], subMeshLod.numVertices, sm->mParent->getVertexBufferDefaultType(),
+                        subMeshLod.vertexBuffers[0], sm->mParent->isVertexBufferShadowed() );
 
                     vertexBuffers.push_back( vertexBuffer );
                 }
@@ -915,8 +915,8 @@ namespace Ogre {
                 indexBuffer = mVaoManager->createIndexBuffer(
                                     subMeshLod.index32Bit ? IndexBufferPacked::IT_32BIT :
                                                             IndexBufferPacked::IT_16BIT,
-                                    subMeshLod.numIndices, BT_IMMUTABLE,
-                                    subMeshLod.indexData, true );
+                                    subMeshLod.numIndices, sm->mParent->getIndexBufferDefaultType(),
+                                    subMeshLod.indexData, sm->mParent->isIndexBufferShadowed() );
             }
 
             VertexArrayObject *vao = mVaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,

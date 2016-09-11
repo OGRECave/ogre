@@ -157,7 +157,7 @@ namespace Ogre {
 
             finalMat.streamToAoS( t.mDerivedTransform );
 
-            baseTransform.decomposition( *t.mDerivedPosition,
+            finalMat.decomposition( *t.mDerivedPosition,
                                          *t.mDerivedScale,
                                          *t.mDerivedOrientation );
 
@@ -206,7 +206,7 @@ namespace Ogre {
 
             finalMat.streamToAoS( t.mDerivedTransform );
 
-            baseTransform.decomposition( *t.mDerivedPosition,
+            finalMat.decomposition( *t.mDerivedPosition,
                                          *t.mDerivedScale,
                                          *t.mDerivedOrientation );
 

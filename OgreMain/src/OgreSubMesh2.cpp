@@ -310,7 +310,7 @@ namespace Ogre {
         mBoneAssignmentsOutOfDate = false;
     }
     //---------------------------------------------------------------------
-    SubMesh* SubMesh::clone( Mesh *parentMesh )
+    SubMesh* SubMesh::clone( Mesh *parentMesh, int vertexBufferType, int indexBufferType )
     {
         SubMesh* newSub;
         if( !parentMesh )
@@ -337,7 +337,8 @@ namespace Ogre {
 
             while( itor != end )
             {
-                VertexArrayObject *newVao = (*itor)->clone( parentMesh->mVaoManager, &sharedBuffers );
+                VertexArrayObject *newVao = (*itor)->clone( parentMesh->mVaoManager, &sharedBuffers,
+                                                            vertexBufferType, indexBufferType );
                 newSub->mVao[i].push_back( newVao );
                 ++itor;
             }

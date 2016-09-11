@@ -195,7 +195,8 @@ namespace Ogre {
         setSkeletonName( BLANKSTRING );
     }
     //-----------------------------------------------------------------------
-    MeshPtr Mesh::clone( const String& newName, const String& newGroup )
+    MeshPtr Mesh::clone( const String& newName, const String& newGroup,
+                         int vertexBufferType, int indexBufferType )
     {
         // This is a bit like a copy constructor, but with the additional
         // aspect of registering the clone with the MeshManager
@@ -208,6 +209,15 @@ namespace Ogre {
         else
             theGroup = newGroup;
         MeshPtr newMesh = MeshManager::getSingleton().createManual( newName, theGroup );
+        newMesh->mVaoManager = mVaoManager;
+        copy( newMesh, vertexBufferType, indexBufferType );
+        return newMesh;
+    }
+
+    //-----------------------------------------------------------------------
+    void Mesh::copy( const MeshPtr& destination, int vertexBufferType, int indexBufferType )
+    {
+        destination->unload();
 
         // Copy submeshes first
         SubMeshVec::const_iterator itor = mSubMeshes.begin();
@@ -215,36 +225,33 @@ namespace Ogre {
 
         while( itor != end )
         {
-            (*itor)->clone( newMesh.get() );
+            (*itor)->clone( destination.get(), vertexBufferType, indexBufferType );
             ++itor;
         }
 
         // Copy bounds
-        newMesh->mAabb          = mAabb;
-        newMesh->mBoundRadius   = mBoundRadius;
+        destination->mAabb          = mAabb;
+        destination->mBoundRadius   = mBoundRadius;
 
-        newMesh->mSkeletonName  = mSkeletonName;
-        newMesh->mSkeleton      = mSkeleton;
+        destination->mSkeletonName  = mSkeletonName;
+        destination->mSkeleton      = mSkeleton;
 
-        newMesh->mLodStrategyName   = mLodStrategyName;
-        newMesh->mNumLods           = mNumLods;
-        newMesh->mLodValues         = mLodValues;
+        destination->mLodStrategyName   = mLodStrategyName;
+        destination->mNumLods           = mNumLods;
+        destination->mLodValues         = mLodValues;
 
-        newMesh->mVaoManager = mVaoManager;
-
-        newMesh->mVertexBufferDefaultType   = mVertexBufferDefaultType;
-        newMesh->mIndexBufferDefaultType    = mIndexBufferDefaultType;
-        newMesh->mVertexBufferShadowBuffer  = mVertexBufferShadowBuffer;
-        newMesh->mIndexBufferShadowBuffer   = mIndexBufferShadowBuffer;
+        destination->mVertexBufferDefaultType   = mVertexBufferDefaultType;
+        destination->mIndexBufferDefaultType    = mIndexBufferDefaultType;
+        destination->mVertexBufferShadowBuffer  = mVertexBufferShadowBuffer;
+        destination->mIndexBufferShadowBuffer   = mIndexBufferShadowBuffer;
 
         // Copy submesh names
-        newMesh->mSubMeshNameMap = mSubMeshNameMap;
+        destination->mSubMeshNameMap = mSubMeshNameMap;
 
-        newMesh->load();
-        newMesh->touch();
-
-        return newMesh;
+        destination->load();
+        destination->touch();
     }
+
     //-----------------------------------------------------------------------
     const Aabb& Mesh::getAabb(void) const
     {

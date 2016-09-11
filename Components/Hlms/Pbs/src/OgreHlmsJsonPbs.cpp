@@ -245,6 +245,21 @@ namespace Ogre
         return retVal;
     }
     //-----------------------------------------------------------------------------------
+    inline ColourValue HlmsJsonPbs::parseColourValueArray( const rapidjson::Value &jsonArray,
+                                                           const ColourValue &defaultValue )
+    {
+        ColourValue retVal( defaultValue );
+
+        const rapidjson::SizeType arraySize = std::min( 4u, jsonArray.Size() );
+        for( rapidjson::SizeType i=0; i<arraySize; ++i )
+        {
+            if( jsonArray[i].IsNumber() )
+                retVal[i] = static_cast<float>( jsonArray[i].GetDouble() );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::loadMaterial( const rapidjson::Value &json, const HlmsJson::NamedBlocks &blocks,
                                     HlmsDatablock *datablock )
     {
@@ -303,6 +318,10 @@ namespace Ogre
             itor = subobj.FindMember( "value" );
             if( itor != subobj.MemberEnd() && itor->value.IsArray() )
                 pbsDatablock->setDiffuse( parseVector3Array( itor->value ) );
+
+            itor = subobj.FindMember( "colour" );
+            if( itor != subobj.MemberEnd() && itor->value.IsArray() )
+                pbsDatablock->setBackgroundDiffuse( parseColourValueArray( itor->value ) );
         }
 
         itor = json.FindMember("specular");
@@ -499,8 +518,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::saveFresnel( const HlmsPbsDatablock *datablock, String &outString )
     {
-        saveTexture( datablock->getFresnel(), "fresnel", PBSM_SPECULAR,
-                     true, true, true,
+        saveTexture( datablock->getFresnel(), ColourValue::ZERO, "fresnel", PBSM_SPECULAR,
+                     true, false, true, true,
                      datablock->getWorkflow() == HlmsPbsDatablock::SpecularAsFresnelWorkflow,
                      datablock, outString );
     }
@@ -510,8 +529,8 @@ namespace Ogre
                                    const HlmsPbsDatablock *datablock, String &outString,
                                    bool writeTexture )
     {
-        saveTexture( Vector3( 0.0f ), blockName, textureType,
-                     false, false, false, writeTexture, datablock, outString );
+        saveTexture( Vector3(0.0f), ColourValue::ZERO, blockName, textureType,
+                     false, false, false, false, writeTexture, datablock, outString);
     }
     //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::saveTexture( float value, const char *blockName,
@@ -519,22 +538,32 @@ namespace Ogre
                                    const HlmsPbsDatablock *datablock, String &outString,
                                    bool writeTexture )
     {
-        saveTexture( Vector3( value ), blockName, textureType,
-                     true, true, false, writeTexture, datablock, outString );
+        saveTexture( Vector3(value), ColourValue::ZERO, blockName, textureType,
+                     true, false, true, false, writeTexture, datablock, outString);
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJsonPbs::saveTexture( const Vector3 &value, const char *blockName,
+    void HlmsJsonPbs::saveTexture(const Vector3 &value, const char *blockName,
                                    PbsTextureTypes textureType,
                                    const HlmsPbsDatablock *datablock, String &outString,
                                    bool writeTexture )
     {
-        saveTexture( value, blockName, textureType,
-                     true, false, false, writeTexture, datablock, outString );
+        saveTexture( value, ColourValue::ZERO, blockName, textureType,
+                     true, true, false, false, writeTexture, datablock, outString );
     }
     //-----------------------------------------------------------------------------------
-    void HlmsJsonPbs::saveTexture( const Vector3 &value, const char *blockName,
-                                   PbsTextureTypes textureType,
-                                   bool writeValue, bool scalarValue, bool isFresnel, bool writeTexture,
+    void HlmsJsonPbs::saveTexture( const Vector3 &value, const ColourValue &colour,
+                                   const char *blockName, PbsTextureTypes textureType,
+                                   const HlmsPbsDatablock *datablock, String &outString,
+                                   bool writeTexture )
+    {
+        saveTexture( value, colour, blockName, textureType,
+                     true, true, false, false, writeTexture, datablock, outString );
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsJsonPbs::saveTexture( const Vector3 &value, const ColourValue &bgDiffuse,
+                                   const char *blockName, PbsTextureTypes textureType,
+                                   bool writeValue, bool writeBgDiffuse, bool scalarValue,
+                                   bool isFresnel, bool writeTexture,
                                    const HlmsPbsDatablock *datablock, String &outString )
     {
         outString += ",\n\t\t\t\"";
@@ -555,6 +584,12 @@ namespace Ogre
             {
                 HlmsJson::toStr( value, outString );
             }
+        }
+
+        if( writeBgDiffuse )
+        {
+            outString += "\t\t\t\t\"background\" : ";
+            HlmsJson::toStr( bgDiffuse, outString );
         }
 
         if( isFresnel )
@@ -669,8 +704,8 @@ namespace Ogre
             outString += "\n\t\t\t}";
         }
 
-        saveTexture( pbsDatablock->getDiffuse(), "diffuse", PBSM_DIFFUSE,
-                     pbsDatablock, outString );
+        saveTexture( pbsDatablock->getDiffuse(), pbsDatablock->getBackgroundDiffuse(),
+                     "diffuse", PBSM_DIFFUSE, pbsDatablock, outString );
         saveTexture( pbsDatablock->getSpecular(), "specular", PBSM_SPECULAR,
                      pbsDatablock, outString,
                      pbsDatablock->getWorkflow() == HlmsPbsDatablock::SpecularWorkflow );
