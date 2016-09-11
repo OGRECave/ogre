@@ -27,12 +27,12 @@
 	@end
 @end
 
-@property( !transparent_mode )
+@property( transparent_mode )
 	@piece( diffuseExtraParamDef ), float4 diffuseCol@end
 	@piece( diffuseExtraParam ), diffuseCol.xyzw@end
-@end @property( transparent_mode )
-	@piece( diffuseExtraParamDef ), float4 diffuseCol@end
-	@piece( diffuseExtraParam ), diffuseCol.xyzw@end
+@end @property( !transparent_mode )
+	@piece( diffuseExtraParamDef ), float3 diffuseCol@end
+	@piece( diffuseExtraParam ), diffuseCol.xyz@end
 @end
 //diffuseCol always has some colour and is multiplied against material.kD in PixelShader_ps.
 @piece( kD )diffuseCol@end
