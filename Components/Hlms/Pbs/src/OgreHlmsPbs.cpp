@@ -902,9 +902,14 @@ namespace Ogre
             //                          ---- PIXEL SHADER ----
             //---------------------------------------------------------------------------
 
-            Matrix3 viewMatrix3, invViewMatrix3;
+            Matrix3 viewMatrix3, invViewMatrixCubemap;
             viewMatrix.extract3x3Matrix( viewMatrix3 );
-            invViewMatrix3 = viewMatrix3.Inverse();
+            //Cubemaps are left-handed.
+            invViewMatrixCubemap = viewMatrix3;
+            invViewMatrixCubemap[0][2] = -invViewMatrixCubemap[0][2];
+            invViewMatrixCubemap[1][2] = -invViewMatrixCubemap[1][2];
+            invViewMatrixCubemap[2][2] = -invViewMatrixCubemap[2][2];
+            invViewMatrixCubemap = invViewMatrixCubemap.Inverse();
 
             //mat3 invViewMatCubemap
             for( size_t i=0; i<9; ++i )
@@ -913,10 +918,10 @@ namespace Ogre
                 Matrix3 xRot( 1.0f, 0.0f, 0.0f,
                               0.0f, 0.0f, -1.0f,
                               0.0f, 1.0f, 0.0f );
-                xRot = xRot * invViewMatrix3;
+                xRot = xRot * invViewMatrixCubemap;
                 *passBufferPtr++ = (float)xRot[0][i];
 #else
-                *passBufferPtr++ = (float)invViewMatrix3[0][i];
+                *passBufferPtr++ = (float)invViewMatrixCubemap[0][i];
 #endif
 
                 //Alignment: each row/column is one vec4, despite being 3x3

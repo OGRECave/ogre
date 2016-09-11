@@ -74,6 +74,7 @@ including invalid combinations (i.e. having a Metallic texture and a Specular te
             "diffuse" :
             {
                 "value" : [1, 1, 1],
+                "background" : [1, 1, 1, 1],
                 "texture" : "texture.png",
                 "sampler" : "unique_name",
                 "uv" : 0
