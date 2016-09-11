@@ -76,7 +76,7 @@ struct Material
 	/* kD is already divided by PI to make it energy conserving.
 	  (formula is finalDiffuse = NdotL * surfaceDiffuse / PI)
 	*/
-	float4 diffuseCol;
+	float4 bgDiffuse;
 	float4 kD; //kD.w is alpha_test_threshold
 	float4 kS; //kS.w is roughness
 	//Fresnel coefficient, may be per colour component (float3) or scalar (float)

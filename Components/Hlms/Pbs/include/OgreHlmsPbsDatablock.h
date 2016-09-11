@@ -181,7 +181,7 @@ namespace Ogre
         uint8	mWorkflow;
         TransparencyModes mTransparencyMode;
 
-        Vector4 mDiffuseCol;
+        float	mBgDiffuse[4];
         float   mkDr, mkDg, mkDb;                   //kD
         float   _padding0;
         float   mkSr, mkSg, mkSb;                   //kS
@@ -232,9 +232,10 @@ namespace Ogre
                 Note: Values extremely close to zero could cause NaNs and
                 INFs in the pixel shader, also depends on the GPU's precision.
 
-            * diffuse_colour <r g b a>
-                Specifies diffuse colour to use as a background for textures. Does not replace 'diffuse <r g b>'
-                Default: diffuse_colour 1 1 1 1
+            * background_diffuse <r g b a>
+                Specifies diffuse colour to use as a background when diffuse texture are not present.
+                Does not replace 'diffuse <r g b>'
+                Default: background_diffuse 1 1 1 1
 
             * diffuse <r g b>
                 Specifies the RGB diffuse colour. "kD" in most books about PBS
@@ -309,9 +310,10 @@ namespace Ogre
                           const HlmsParamVec &params );
         virtual ~HlmsPbsDatablock();
 
-        /// Sets the diffuse background colour. This colour is alpha blended with diffuse and detail textures
-        void setDiffuseColour( const Vector4 &diffuseColour );
-        const Vector4& getDiffuseColour(void) const;
+        /// Sets the diffuse background colour. When no diffuse texture is present, this
+        /// solid colour replaces it, and can act as a background for the detail maps.
+        void setBackgroundDiffuse( const ColourValue &bgDiffuse );
+        ColourValue getBackgroundDiffuse(void) const;
 
         /// Sets the diffuse colour (final multiplier). The colour will be divided by PI for energy conservation.
         void setDiffuse( const Vector3 &diffuseColour );

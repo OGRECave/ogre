@@ -161,7 +161,7 @@ float4 main( PS_INPUT inPs
 	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
 @property( envprobe_map )	uint envMapIdx;@end
 
-/*property( diffuse_map || detail_maps_diffuse )*/float4 diffuseCol;/*end*/
+float4 diffuseCol;
 @property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
 @property( metallic_workflow || (specular_map && fresnel_workflow) )@insertpiece( FresnelType ) F0;@end
 @property( roughness_map )float ROUGHNESS;@end
@@ -216,29 +216,22 @@ float4 main( PS_INPUT inPs
 
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value.
-	@property( !diffuse_map )diffuseCol = material.diffuseCol;@end
+	@property( !diffuse_map )diffuseCol = material.bgDiffuse;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )
 	@insertpiece( blend_mode_idx@n ) @add( t, 1 ) @end
 
 	/// Apply the material's diffuse over the textures
-//property( diffuse_map || detail_maps_diffuse )
 	@property( !transparent_mode )
 		diffuseCol.xyz *= material.kD.xyz;
 	@end @property( transparent_mode )
 		diffuseCol.xyz *= material.kD.xyz * diffuseCol.w * diffuseCol.w;
 	@end
-//end
 
 @property( alpha_test )
-	//property( diffuse_map || detail_maps_diffuse )
 	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol.a )
 		discard;
-	//end property( !diffuse_map && !detail_maps_diffuse )
-	//if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
-	//	discard;
-	//end
 @end
 
 @property( !normal_map )
@@ -440,7 +433,6 @@ void main( PS_INPUT inPs )
 	@property( detail_map@n )uint detailMapIdx@n;@end @end
 
 	float diffuseCol;
-	
 	@property( !lower_gpu_overhead )
 		uint materialId	= worldMaterialIdx[inPs.drawId].x & 0x1FFu;
 		material = materialArray[materialId];
@@ -475,7 +467,7 @@ void main( PS_INPUT inPs )
 
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value.
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = material.diffuseCol.w;@end
+	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = material.bgDiffuse.w;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )
@@ -484,13 +476,8 @@ void main( PS_INPUT inPs )
 	/// Apply the material's diffuse over the textures
 @property( TODO_REFACTOR_ACCOUNT_MATERIAL_ALPHA )	diffuseCol.xyz *= material.kD.xyz;@end
 
-	//property( diffuse_map || detail_maps_diffuse )
 	if( material.kD.w @insertpiece( alpha_test_cmp_func ) diffuseCol )
 		discard;
-	//end property( !diffuse_map && !detail_maps_diffuse )
-	//if( material.kD.w @insertpiece( alpha_test_cmp_func ) 1.0 )
-	//	discard;
-	//end
 @end /// !alpha_test
 
 	@insertpiece( custom_ps_posExecution )

@@ -62,7 +62,6 @@ namespace Ogre
         mUseAlphaFromTextures( true ),
         mWorkflow( SpecularWorkflow ),
         mTransparencyMode( None ),
-        mDiffuseCol( 1.0f ),
         mkDr( 0.318309886f ), mkDg( 0.318309886f ), mkDb( 0.318309886f ), //Max Diffuse = 1 / PI
         _padding0( 1 ),
         mkSr( 1 ), mkSg( 1 ), mkSb( 1 ),
@@ -74,6 +73,8 @@ namespace Ogre
     {
         memset( mUvSource, 0, sizeof( mUvSource ) );
         memset( mBlendModes, 0, sizeof( mBlendModes ) );
+
+        mBgDiffuse[0] = mBgDiffuse[1] = mBgDiffuse[2] = mBgDiffuse[3] = 1.0f;
 
         mDetailNormalWeight[0] = mDetailNormalWeight[1] = 1.0f;
         mDetailNormalWeight[2] = mDetailNormalWeight[3] = 1.0f;
@@ -89,10 +90,10 @@ namespace Ogre
 
         String paramVal;
 
-        if( Hlms::findParamInVec( params, "diffuse_colour", paramVal ) )
+        if( Hlms::findParamInVec( params, "background_diffuse", paramVal ) )
         {
-            Vector4 val = StringConverter::parseVector4( paramVal, Vector4( 1.0f ) );
-            setDiffuseColour( val );
+            ColourValue val = StringConverter::parseColourValue( paramVal, ColourValue::White );
+            setBackgroundDiffuse( val );
         }
 
         if( Hlms::findParamInVec( params, "diffuse", paramVal ) )
@@ -365,7 +366,7 @@ namespace Ogre
             mkDb *= mTransparencyValue * mTransparencyValue;
         }
 
-        memcpy( dstPtr, &mDiffuseCol, MaterialSizeInGpu );
+        memcpy( dstPtr, &mBgDiffuse[0], MaterialSizeInGpu );
 
         mkDr = oldkDr;
         mkDg = oldkDg;
@@ -468,7 +469,7 @@ namespace Ogre
         //If HLMS texture manager failed to find a reflection texture, have look int standard texture manager
         //NB we only do this for reflection textures as all other textures must be texture arrays for performance reasons
         if (textureType == PBSM_REFLECTION && texLocation.texture == hlmsTextureManager->getBlankTexture().texture)
-        {            
+        {
             Ogre::TexturePtr tex = Ogre::TextureManager::getSingleton().getByName(name);
             if (tex.isNull() == false)
             {
@@ -484,15 +485,19 @@ namespace Ogre
         return texLocation.texture;
     }
     //-----------------------------------------------------------------------------------
-    void HlmsPbsDatablock::setDiffuseColour( const Vector4 &diffuseColour )
+    void HlmsPbsDatablock::setBackgroundDiffuse( const ColourValue &bgDiffuse )
     {
-        mDiffuseCol = diffuseColour;
+        mBgDiffuse[0] = bgDiffuse.r;
+        mBgDiffuse[1] = bgDiffuse.g;
+        mBgDiffuse[2] = bgDiffuse.b;
+        mBgDiffuse[3] = bgDiffuse.a;
         scheduleConstBufferUpdate();
     }
     //-----------------------------------------------------------------------------------
-    const Vector4& HlmsPbsDatablock::getDiffuseColour(void) const
+    ColourValue HlmsPbsDatablock::getBackgroundDiffuse(void) const
     {
-        return mDiffuseCol;
+        ColourValue retVal( mBgDiffuse[0], mBgDiffuse[1], mBgDiffuse[2], mBgDiffuse[3] );
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setDiffuse( const Vector3 &diffuseColour )
@@ -986,8 +991,6 @@ namespace Ogre
         }
 
         setWorkflow( SpecularAsFresnelWorkflow );
-
-        // setDiffuseColour() ?
 
         setDiffuse( diffuse );
 

@@ -1,16 +1,9 @@
 @property( diffuse_map )
 	@property( !hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	
-			diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
-			diffuseCol.xyz = mix(material.diffuseCol.xyz, diffuseCol.xyz, diffuseCol.w);
-			diffuseCol.w = mix(material.diffuseCol.w, 1.0, diffuseCol.w);
-			@property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end 
-		@end
+		@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) );
+@property( !hw_gamma_read )	diffuseCol = diffuseCol * diffuseCol;@end @end
 	@end @property( hlms_shadowcaster )
-		@piece( SampleDiffuseMap )	
-			diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) ).w;
-			diffuseCol = mix(material.diffuseCol.w, 1.0f, diffuseCol.w);
-		@end
+		@piece( SampleDiffuseMap )	diffuseCol = texture( textureMaps[@value( diffuse_map_idx )], vec3( inPs.uv@value(uv_diffuse).xy, diffuseIdx ) ).w;@end
 	@end
 @end
 
