@@ -1076,7 +1076,7 @@ namespace Ogre
             vertexDescriptor.attributes[15].bufferIndex = 15;
             vertexDescriptor.attributes[15].offset      = 0;
 
-            vertexDescriptor.layouts[15].stride = 0;
+            vertexDescriptor.layouts[15].stride = 4;
             vertexDescriptor.layouts[15].stepFunction = MTLVertexStepFunctionPerInstance;
 #endif
             [psd setVertexDescriptor:vertexDescriptor];
