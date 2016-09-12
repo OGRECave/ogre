@@ -1950,16 +1950,16 @@ namespace Ogre
                 setProperty( HlmsBaseProp::Forward3DFadeAttenRange,
                              forward3D->getFadeAttenuationRange() );
                 setProperty( HlmsBaseProp::VPos, 1 );
+            }
 
-                if( !mShaderTargets[0] ) //Not using D3D11
-                {
-                    //Actually the problem is not texture flipping, but origin. In D3D11,
-                    //we need to always flip because origin is different, but it's consistent
-                    //between texture and render window. In GL, RenderWindows don't need
-                    //to flip, but textures do.
-                    RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
-                    setProperty( HlmsBaseProp::Forward3DFlipY, renderTarget->requiresTextureFlipping() );
-                }
+            if( mShaderFileExt == ".glsl" )
+            {
+                //Actually the problem is not texture flipping, but origin. In D3D11,
+                //we need to always flip because origin is different, but it's consistent
+                //between texture and render window. In GL, RenderWindows don't need
+                //to flip, but textures do.
+                RenderTarget *renderTarget = sceneManager->getCurrentViewport()->getTarget();
+                setProperty( HlmsBaseProp::Forward3DFlipY, renderTarget->requiresTextureFlipping() );
             }
 
             uint numLightsPerType[Light::NUM_LIGHT_TYPES];
