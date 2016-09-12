@@ -84,6 +84,8 @@ namespace Ogre
     {
         CompositorPassDef const *mDefinition;
     protected:
+        static const Quaternion CubemapRotations[6];
+
         RenderTarget    *mTarget;
         Viewport        *mViewport;
 

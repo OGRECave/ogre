@@ -184,6 +184,14 @@ namespace Ogre
             mFsRect->setCorners( 0.0f + hOffset, 0.0f - vOffset, 1.0f, 1.0f );
         }
 
+        const Quaternion oldCameraOrientation( mCamera->getOrientation() );
+
+        if( mDefinition->mCameraCubemapReorient )
+        {
+            uint32 sliceIdx = std::min<uint32>( mDefinition->getRtIndex(), 5 );
+            mCamera->setOrientation( oldCameraOrientation * CubemapRotations[sliceIdx] );
+        }
+
         if( mDefinition->mFrustumCorners == CompositorPassQuadDef::VIEW_SPACE_CORNERS )
         {
             const Ogre::Matrix4 &viewMat = mCamera->getViewMatrix(true);
@@ -239,6 +247,12 @@ namespace Ogre
         else
             mFsRect->setDatablock( mDatablock ); //Hlms material
         sceneManager->_renderSingleObject( mFsRect, mFsRect, false, false );
+
+        if( mDefinition->mCameraCubemapReorient )
+        {
+            //Restore orientation
+            mCamera->setOrientation( oldCameraOrientation );
+        }
 
         if( listener )
             listener->passPosExecute( this );
