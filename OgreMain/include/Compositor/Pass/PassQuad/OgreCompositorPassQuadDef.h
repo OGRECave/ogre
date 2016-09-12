@@ -89,6 +89,11 @@ namespace Ogre
         */
         bool    mIsResolve;
 
+        /** When true, the camera will be rotated 90°, -90° or 180° depending on the value of
+            mRtIndex and then restored to its original rotation after we're done.
+        */
+        bool    mCameraCubemapReorient;
+
         bool    mMaterialIsHlms;    /// If true, mMaterialName is an Hlms material
         String  mMaterialName;
 
@@ -103,6 +108,7 @@ namespace Ogre
             mParentNodeDef( parentNodeDef ),
             mUseQuad( false ),
             mIsResolve( false ),
+            mCameraCubemapReorient( false ),
             mMaterialIsHlms( false ),
             mFrustumCorners( NO_CORNERS )
         {

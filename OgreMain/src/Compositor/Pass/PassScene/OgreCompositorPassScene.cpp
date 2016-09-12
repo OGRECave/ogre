@@ -39,16 +39,6 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    const Quaternion CubemapRotations[6] =
-    {
-        Quaternion( Degree(-90 ), Vector3::UNIT_Y ),        //+X
-        Quaternion( Degree( 90 ), Vector3::UNIT_Y ),        //-X
-        Quaternion( Degree( 90 ), Vector3::UNIT_X ),        //+Y
-        Quaternion( Degree(-90 ), Vector3::UNIT_X ),        //-Y
-        Quaternion::IDENTITY,                               //+Z
-        Quaternion( Degree(180 ), Vector3::UNIT_Y )         //-Z
-    };
-
     CompositorPassScene::CompositorPassScene( const CompositorPassSceneDef *definition,
                                                 Camera *defaultCamera, const CompositorChannel &target,
                                                 CompositorNode *parentNode ) :
