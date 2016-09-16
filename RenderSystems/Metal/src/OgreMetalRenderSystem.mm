@@ -610,15 +610,23 @@ namespace Ogre
             depthTexture = [mActiveDevice->mDevice newTextureWithDescriptor: desc];
         }
 
-        if( stencilFormat != MTLPixelFormatInvalid
-         && stencilFormat != MTLPixelFormatDepth32Float_Stencil8
-#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-         && stencilFormat != MTLPixelFormatDepth24Unorm_Stencil8
-#endif
-          )
+        if( stencilFormat != MTLPixelFormatInvalid )
         {
-            desc.pixelFormat = stencilFormat;
-            stencilTexture = [mActiveDevice->mDevice newTextureWithDescriptor: desc];
+            if( stencilFormat != MTLPixelFormatDepth32Float_Stencil8
+   #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+            && stencilFormat != MTLPixelFormatDepth24Unorm_Stencil8
+   #endif
+            )
+            {
+                //Separate Stencil & Depth
+                desc.pixelFormat = stencilFormat;
+                stencilTexture = [mActiveDevice->mDevice newTextureWithDescriptor: desc];
+            }
+            else
+            {
+                //Combined Stencil & Depth
+                stencilTexture = depthTexture;
+            }
         }
 
         DepthBuffer *retVal = new MetalDepthBuffer( 0, this, renderTarget->getWidth(),
