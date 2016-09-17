@@ -319,7 +319,7 @@ namespace Ogre
             if( itor != subobj.MemberEnd() && itor->value.IsArray() )
                 pbsDatablock->setDiffuse( parseVector3Array( itor->value ) );
 
-            itor = subobj.FindMember( "colour" );
+            itor = subobj.FindMember( "background" );
             if( itor != subobj.MemberEnd() && itor->value.IsArray() )
                 pbsDatablock->setBackgroundDiffuse( parseColourValueArray( itor->value ) );
         }
@@ -588,7 +588,7 @@ namespace Ogre
 
         if( writeBgDiffuse )
         {
-            outString += "\t\t\t\t\"background\" : ";
+            outString += ",\n\t\t\t\t\"background\" : ";
             HlmsJson::toStr( bgDiffuse, outString );
         }
 
