@@ -545,19 +545,12 @@ namespace Ogre
     void HlmsJsonPbs::saveTexture(const Vector3 &value, const char *blockName,
                                    PbsTextureTypes textureType,
                                    const HlmsPbsDatablock *datablock, String &outString,
-                                   bool writeTexture )
+                                   bool writeTexture, const ColourValue &bgColour )
     {
-        saveTexture( value, ColourValue::ZERO, blockName, textureType,
-                     true, true, false, false, writeTexture, datablock, outString );
-    }
-    //-----------------------------------------------------------------------------------
-    void HlmsJsonPbs::saveTexture( const Vector3 &value, const ColourValue &colour,
-                                   const char *blockName, PbsTextureTypes textureType,
-                                   const HlmsPbsDatablock *datablock, String &outString,
-                                   bool writeTexture )
-    {
-        saveTexture( value, colour, blockName, textureType,
-                     true, true, false, false, writeTexture, datablock, outString );
+        const bool writeBgDiffuse = textureType == PBSM_DIFFUSE;
+        saveTexture( value, bgColour, blockName, textureType,
+                     true, writeBgDiffuse, false, false, writeTexture,
+                     datablock, outString );
     }
     //-----------------------------------------------------------------------------------
     void HlmsJsonPbs::saveTexture( const Vector3 &value, const ColourValue &bgDiffuse,
@@ -704,8 +697,8 @@ namespace Ogre
             outString += "\n\t\t\t}";
         }
 
-        saveTexture( pbsDatablock->getDiffuse(), pbsDatablock->getBackgroundDiffuse(),
-                     "diffuse", PBSM_DIFFUSE, pbsDatablock, outString );
+        saveTexture( pbsDatablock->getDiffuse(),  "diffuse", PBSM_DIFFUSE,
+                     pbsDatablock, outString, true, pbsDatablock->getBackgroundDiffuse() );
         saveTexture( pbsDatablock->getSpecular(), "specular", PBSM_SPECULAR,
                      pbsDatablock, outString,
                      pbsDatablock->getWorkflow() == HlmsPbsDatablock::SpecularWorkflow );
