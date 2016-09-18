@@ -580,12 +580,24 @@ namespace Ogre
 
         mContext->setCurrent();
 
+        PFNGLXSWAPINTERVALEXTPROC _glXSwapIntervalEXT;
+        _glXSwapIntervalEXT = (PFNGLXSWAPINTERVALEXTPROC)mGLSupport->getProcAddress("glXSwapIntervalEXT");
+        PFNGLXSWAPINTERVALMESAPROC _glXSwapIntervalMESA;
+        _glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC)mGLSupport->getProcAddress("glXSwapIntervalMESA");
         PFNGLXSWAPINTERVALSGIPROC _glXSwapIntervalSGI;
         _glXSwapIntervalSGI = (PFNGLXSWAPINTERVALSGIPROC)mGLSupport->getProcAddress("glXSwapIntervalSGI");
 
         if (! mIsExternalGLControl )
         {
-            _glXSwapIntervalSGI (vsync ? mVSyncInterval : 0);
+            if( _glXSwapIntervalEXT )
+            {
+                _glXSwapIntervalEXT( mGLSupport->getGLDisplay(), mContext->mDrawable,
+                                     vsync ? mVSyncInterval : 0 );
+            }
+            else if( _glXSwapIntervalMESA )
+                _glXSwapIntervalMESA( vsync ? mVSyncInterval : 0 );
+            else
+                _glXSwapIntervalSGI( vsync ? mVSyncInterval : 0 );
         }
 
         mContext->endCurrent();
