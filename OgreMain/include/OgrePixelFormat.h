@@ -364,6 +364,15 @@ namespace Ogre {
         */
         static size_t getNumElemBits( PixelFormat format );
 
+        /** Returns the maximum number of mipmaps given the resolution
+            e.g. at 4x4 there's 2 mipmaps. At 1x1 there's 0 mipmaps.
+        @return
+            Mip count.
+        */
+        static uint8 getMaxMipmapCount( uint32 maxResolution );
+        static uint8 getMaxMipmapCount( uint32 width, uint32 height );
+        static uint8 getMaxMipmapCount( uint32 width, uint32 height, uint32 depth );
+
         /** Returns the size in memory of a region with the given extents and pixel
             format with consecutive memory layout.
             @param width
