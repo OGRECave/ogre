@@ -1,0 +1,60 @@
+
+//#include "SyntaxHighlightingMisc.h"
+
+@piece( DeclCubemapProbeStruct )
+struct CubemapProbe
+{
+	float4 row0_minX;
+	float4 row1_minY;
+	float4 row2_minZ;
+	float4 maxZ;
+	float4 cubemapPos;
+};
+@end
+
+@piece( DeclParallaxLocalCorrect )
+/** Parallax Correct a reflection dir based on an OBB (Oriented Bounding Box) from a cubemap probe.
+@param reflDir
+	Reflection dir, in view space.
+@param pos
+	Position of the object where the reflection is going to reflect, in view space
+@param probe
+	Cubemap's probe
+@return
+	Parallax-Corrected reflection dir, IN LOCAL SPACE (local to probe's).
+*/
+@property( syntax == metal )inline@end float3 localCorrect( float3 reflDir, float3 pos, CubemapProbe probe )
+{
+	float3 minAabb = float3( probe.row0_minX.w, probe.row1_minY.w, probe.row2_minZ.w );
+	float3 maxAabb = probe.maxZ.xyz;
+
+	float3x3 viewSpaceToProbeLocal = float3x3( probe.row0_minX.xyz,
+											   probe.row1_minY.xyz,
+											   probe.row2_minZ.xyz );
+
+	@property( syntax == hlsl )
+		float3 reflDirLS = mul( viewSpaceToProbeLocal, reflDir );
+	@end @property( syntax != hlsl )
+		float3 reflDirLS = viewSpaceToProbeLocal * reflDir;
+	@end
+
+	//Find the ray intersection with box plane
+	float3 invReflDirLS = float3( 1.0, 1.0, 1.0 ) / reflDirLS;
+	float3 intersectAtMinPlane = ( minAabb - pos ) * invReflDirLS;
+	float3 intersectAtMaxPlane = ( maxAabb - pos ) * invReflDirLS;
+	//Get the largest intersection values (we are not intersted in negative values)
+	float3 largestIntersect = max( intersectAtMaxPlane.xyz, intersectAtMinPlane.xyz );
+	//Get the closest of all solutions
+	float distance = min( min( largestIntersect.x, largestIntersect.y ), largestIntersect.z );
+	//Get the intersection position
+	float3 intersectPositionLS = pos.xyz + reflDirLS.xyz * distance;
+	//Get corrected vector
+	float3 localCorrectedVec = intersectPositionLS.xyz - probe.cubemapPos.xyz;
+	return localCorrectedVec;
+}
+@end
+
+//float3 main( float3 reflDir : TEXCOORD0, float3 pos : TEXCOORD1 ) : SV_Target0
+//{
+//	return localCorrect( reflDir, pos, probe );
+//}

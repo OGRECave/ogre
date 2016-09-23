@@ -191,6 +191,8 @@ namespace Ogre
                    and should be disabled for the Workspace instance to be valid.
         */
         ChannelRouteList& _getChannelRoutes(void)                   { return mChannelRoutes; }
+
+        CompositorManager2* getCompositorManager(void) const        { return mCompositorManager; }
     };
 
     /** @} */
