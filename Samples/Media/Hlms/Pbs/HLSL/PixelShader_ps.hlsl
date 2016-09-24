@@ -467,7 +467,7 @@ void main( PS_INPUT inPs )
 
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value.
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = material.bgDiffuse.w;@end
+	@property( !diffuse_map )diffuseCol = material.bgDiffuse.w;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )
