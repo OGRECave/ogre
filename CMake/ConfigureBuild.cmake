@@ -311,20 +311,3 @@ foreach(flag_var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE C
     endif(${flag_var} MATCHES "/MDd")
 endforeach(flag_var)
 endif(OGRE_CONFIG_STATIC_LINK_CRT)
-
-### Commented because the FindOGRE script can currently fill this role better ###
-# # Create the CMake package files
-# if (WIN32)
-#   set(OGRE_CMAKE_DIR CMake)
-# elseif (UNIX)
-#   set(OGRE_CMAKE_DIR lib/cmake)
-# elseif (APPLE)
-# endif ()
-# configure_file(${OGRE_TEMPLATES_DIR}/OGREConfig.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake @ONLY)
-# configure_file(${OGRE_TEMPLATES_DIR}/OGREConfigVersion.cmake.in ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake @ONLY)
-# install(FILES
-#   ${OGRE_BINARY_DIR}/cmake/OGREConfig.cmake
-#   ${OGRE_BINARY_DIR}/cmake/OGREConfigVersion.cmake
-#   DESTINATION ${OGRE_CMAKE_DIR}
-# )
-#
