@@ -39,6 +39,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreRenderTexture.h"
 
+#include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
 #include "OgreTechnique.h"
 #include "OgreHardwarePixelBuffer.h"
@@ -78,7 +79,8 @@ namespace Ogre
             materialName.resize( matNameSize );
             materialName.a( cSuffixes[i] );
             MaterialPtr material = MaterialManager::getSingleton().load(
-                        materialName.c_str(), ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+                        materialName.c_str(), ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+                    staticCast<Material>();
             Pass *pass = material->getTechnique(0)->getPass(0);
 
             mBlendCubemapParams[i] = pass->getFragmentProgramParameters();
