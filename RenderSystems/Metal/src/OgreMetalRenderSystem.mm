@@ -517,7 +517,8 @@ namespace Ogre
         }
         else
         {
-            id<MTLSamplerState> sampler = (__bridge id<MTLSamplerState>)samplerblock->mRsData;
+            __unsafe_unretained id<MTLSamplerState> sampler =
+                    (__bridge id<MTLSamplerState>)samplerblock->mRsData;
             [computeEncoder setSamplerState:sampler atIndex:texUnit];
         }
     }
@@ -1234,7 +1235,8 @@ namespace Ogre
         }
         else
         {
-            id <MTLSamplerState> sampler = (__bridge id<MTLSamplerState>)samplerblock->mRsData;
+            __unsafe_unretained id <MTLSamplerState> sampler =
+                    (__bridge id<MTLSamplerState>)samplerblock->mRsData;
             [mActiveRenderEncoder setFragmentSamplerState:sampler atIndex: texUnit];
         }
     }
@@ -1263,7 +1265,8 @@ namespace Ogre
     //-------------------------------------------------------------------------
     void MetalRenderSystem::_setComputePso( const HlmsComputePso *pso )
     {
-        id<MTLComputePipelineState> metalPso = (__bridge id<MTLComputePipelineState>)pso->rsData;
+        __unsafe_unretained id<MTLComputePipelineState> metalPso =
+                (__bridge id<MTLComputePipelineState>)pso->rsData;
 
         __unsafe_unretained id<MTLComputeCommandEncoder> computeEncoder =
                 mActiveDevice->getComputeEncoder();

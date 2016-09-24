@@ -3,7 +3,7 @@
 		@piece( F0 )material.F0@end
 	@end @property( transparent_mode )
 		//Premultiply F0.xyz with the alpha from the texture, but only in transparent mode.
-		@piece( F0 )(material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
+		@piece( F0 )float1(material.F0.@insertpiece( FresnelSwizzle ) * diffuseCol.w)@end
 	@end
 @end @property( metallic_workflow || (specular_map && fresnel_workflow) )
 	@piece( F0 )F0@end
