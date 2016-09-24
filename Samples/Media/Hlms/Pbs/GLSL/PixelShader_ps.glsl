@@ -471,7 +471,7 @@ void main()
 
 @property( alpha_test )
 	Material material;
-	@property( detail_maps_diffuse )float diffuseCol;@end
+	float diffuseCol;
 	@property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 	@property( diffuse_map )uint diffuseIdx;@end
 	@property( detail_weight_map )uint weightMapIdx;@end
@@ -519,7 +519,7 @@ void main()
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value. If there are no diffuse or detail maps,
 	/// we must not access diffuseCol at all, but rather use material.kD directly (see piece( kD ) ).
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = material.bgDiffuse.w;@end
+	@property( !diffuse_map )diffuseCol = material.bgDiffuse.w;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )

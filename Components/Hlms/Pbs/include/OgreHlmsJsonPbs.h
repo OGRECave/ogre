@@ -81,11 +81,7 @@ namespace Ogre
         void saveTexture( const Vector3 &value, const char *blockName,
                           PbsTextureTypes textureType,
                           const HlmsPbsDatablock *datablock, String &outString,
-                          bool writeTexture=true );
-        void saveTexture( const Vector3 &value, const ColourValue &colour,
-                          const char *blockName, PbsTextureTypes textureType,
-                          const HlmsPbsDatablock *datablock, String &outString,
-                          bool writeTexture=true );
+                          bool writeTexture=true, const ColourValue &bgColour=ColourValue::ZERO );
 
         void saveTexture( const Vector3 &value, const ColourValue &bgDiffuse, const char *blockName,
                           PbsTextureTypes textureType,
