@@ -10,19 +10,122 @@
 # Find OGRE includes and library
 #
 # This module defines
-#  OGRE_INCLUDE_DIRS
-#  OGRE_LIBRARIES, the libraries to link against to use OGRE.
+#  OGRE_INCLUDE_DIRS - the OGRE include directories 
+#  OGRE_LIBRARIES - link these to use the OGRE core
 #  OGRE_LIBRARY_DIRS, the location of the libraries
-#  OGRE_FOUND, If false, do not try to use OGRE
-#
+#  OGRE_STATIC - whther ogre was build as static lib
+#  OGRE_${COMPONENT}_FOUND - ${COMPONENT} is available
+#  OGRE_${COMPONENT}_INCLUDE_DIRS - additional include directories for ${COMPONENT}
+#  OGRE_${COMPONENT}_LIBRARIES - link these to use ${COMPONENT} 
+#  OGRE_PLUGIN_DIR - The directory where the OGRE plugins are located
+#  OGRE_MEDIA_DIR - The directory where the OGRE sample media is located
+#  OGRE_CONFIG_DIR - The directory where the OGRE config files are located
 
-include(FindPackageMessage)
+set(OGRE_STATIC @OGRE_STATIC@)
+set(OGRE_MEDIA_DIR "@CMAKE_INSTALL_PREFIX@/@OGRE_MEDIA_PATH@")
+set(OGRE_PLUGIN_DIR "@CMAKE_INSTALL_PREFIX@/lib/OGRE")
+set(OGRE_CONFIG_DIR "@CMAKE_INSTALL_PREFIX@/@OGRE_CFG_INSTALL_PATH@") 
 
 set(OGRE_PREFIX_DIR "@CMAKE_INSTALL_PREFIX@")
 get_filename_component(OGRE_LIBRARY_DIRS "${OGRE_PREFIX_DIR}/lib" ABSOLUTE)
 get_filename_component(OGRE_INCLUDE_DIRS "${OGRE_PREFIX_DIR}/include/OGRE" ABSOLUTE)
-set(OGRE_LIBRARIES "OgreMain")
+set(OGRE_LIBRARIES "OgreMain@OGRE_LIB_SUFFIX@")
+
+if(@OGRE_USE_BOOST@)
+    list(APPEND OGRE_INCLUDE_DIRS @Boost_INCLUDE_DIRS@)
+    list(APPEND OGRE_LIBRARIES @Boost_LIBRARIES@)
+endif()
+
+set(OGRE_COMPONENTS)
+set(OGRE_PLUGINS)
+
+macro(ogre_declare_component COMPONENT)
+    set(OGRE_${COMPONENT}_FOUND TRUE)
+    set(OGRE_${COMPONENT}_INCLUDE_DIRS "${OGRE_PREFIX_DIR}/include/OGRE/${COMPONENT}")
+    set(OGRE_${COMPONENT}_LIBRARIES "Ogre${COMPONENT}@OGRE_LIB_SUFFIX@")
+    
+    list(APPEND OGRE_COMPONENTS ${COMPONENT})
+endmacro()
+
+macro(ogre_declare_plugin TYPE COMPONENT)
+    set(OGRE_${TYPE}_${COMPONENT}_FOUND TRUE)
+    set(OGRE_${TYPE}_${COMPONENT}_INCLUDE_DIRS "${OGRE_PREFIX_DIR}/include/OGRE/${TYPE}s/${COMPONENT}")
+    set(OGRE_${TYPE}_${COMPONENT}_LIBRARIES "${TYPE}${COMPONENT}@OGRE_LIB_SUFFIX@")
+    
+    list(APPEND OGRE_PLUGINS ${TYPE}_${COMPONENT})
+endmacro()
+
+## COMPONENTS
+if(@OGRE_BUILD_COMPONENT_BITES@)
+    ogre_declare_component(Bites)
+    list(APPEND OGRE_Bites_INCLUDE_DIRS @SDL2_INCLUDE_DIR@)
+    list(APPEND OGRE_Bites_LIBRARIES @SDL2_LIBRARY@)
+endif()
+if(@OGRE_BUILD_COMPONENT_HLMS@)
+    ogre_declare_component(HLMS)
+endif()
+if(@OGRE_BUILD_COMPONENT_OVERLAY@)
+    ogre_declare_component(Overlay)
+endif()
+if(@OGRE_BUILD_COMPONENT_PAGING@)
+    ogre_declare_component(Paging)
+endif()
+if(@OGRE_BUILD_COMPONENT_PROPERTY@)
+    ogre_declare_component(Property)
+endif()
+if(@OGRE_BUILD_COMPONENT_RTSHADERSYSTEM@)
+    ogre_declare_component(RTShaderSystem)
+endif()
+if(@OGRE_BUILD_COMPONENT_TERRAIN@)
+    ogre_declare_component(Terrain)
+endif()
+if(@OGRE_BUILD_COMPONENT_VOLUME@)
+    ogre_declare_component(Volume)
+endif()
+
+## PLUGINS
+if(@OGRE_BUILD_PLUGIN_BSP@)
+    ogre_declare_plugin(Plugin BSPSceneManager)
+endif()
+
+if(@OGRE_BUILD_PLUGIN_CG@)
+    ogre_declare_plugin(Plugin CgProgramManager)
+endif()
+
+if(@OGRE_BUILD_PLUGIN_OCTREE@)
+    ogre_declare_plugin(Plugin OctreeSceneManager)
+endif()
+
+if(@OGRE_BUILD_PLUGIN_PCZ@)
+    ogre_declare_plugin(Plugin PCZSceneManager)
+endif()
+
+if(@OGRE_BUILD_PLUGIN_PFX@)
+    ogre_declare_plugin(Plugin ParticleFX)
+endif()
+
+if(@OGRE_BUILD_RENDERSYSTEM_GL@)
+    ogre_declare_plugin(RenderSystem GL)
+endif()
+
+if(@OGRE_BUILD_RENDERSYSTEM_GLES2@)
+    ogre_declare_plugin(RenderSystem GLES2)
+endif()
+
+if(@OGRE_BUILD_RENDERSYSTEM_GL3PLUS@)
+    ogre_declare_plugin(RenderSystem GL3Plus)
+endif()
+
+if(@OGRE_BUILD_RENDERSYSTEM_D3D9@)
+    ogre_declare_plugin(RenderSystem Direct3D9)
+endif()
+
+if(@OGRE_BUILD_RENDERSYSTEM_D3D11@)
+    ogre_declare_plugin(RenderSystem Direct3D11)
+endif()
 
 message(STATUS "Found OGRE")
-message(STATUS "  libraries : '${OGRE_LIBRARIES}' from ${OGRE_LIBRARY_DIRS}")
-message(STATUS "  includes  : ${OGRE_INCLUDE_DIRS}")
+message(STATUS "  static     : ${OGRE_STATIC}")
+message(STATUS "  components : ${OGRE_COMPONENTS}")
+message(STATUS "  plugins    : ${OGRE_PLUGINS}")
+message(STATUS "  media      : ${OGRE_MEDIA_DIR}")
