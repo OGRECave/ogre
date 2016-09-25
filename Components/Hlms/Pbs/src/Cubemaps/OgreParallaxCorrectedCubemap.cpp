@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
+#include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorNodeDef.h"
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
@@ -57,13 +58,14 @@ namespace Ogre
     ParallaxCorrectedCubemap::ParallaxCorrectedCubemap( IdType id, SceneManager *sceneManager,
                                                         const CompositorWorkspaceDef *probeWorkspcDef ) :
         IdObject( id ),
+        mBlankProbe( this ),
         mBlendDummyCamera( 0 ),
         mBlendWorkspace( 0 ),
         mSamplerblockPoint( 0 ),
         mSamplerblockTrilinear( 0 ),
         mCurrentMip( 0 ),
         mSceneManager( sceneManager ),
-        mProbeWorkspaceDef( probeWorkspcDef )
+        mDefaultWorkspaceDef( probeWorkspcDef )
     {
         memset( mBlendCubemapTUs, 0, sizeof(mBlendCubemapTUs) );
         createCubemapBlendWorkspaceDefinition();
@@ -109,7 +111,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CubemapProbe* ParallaxCorrectedCubemap::createProbe(void)
     {
-        CubemapProbe *probe = OGRE_NEW CubemapProbe();
+        CubemapProbe *probe = OGRE_NEW CubemapProbe( this );
         mProbes.push_back( probe );
         return probe;
     }
@@ -130,22 +132,35 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::destroyAllProbes(void)
     {
-        CubemapProbeVec::iterator itor = mProbes.begin();
-        CubemapProbeVec::iterator end  = mProbes.end();
-
-        while( itor != end )
         {
-            OGRE_DELETE *itor;
-            ++itor;
+            TempRttVec::const_iterator itor = mTmpRtt.begin();
+            TempRttVec::const_iterator end  = mTmpRtt.end();
+            while( itor != end )
+            {
+                TextureManager::getSingleton().remove( itor->texture->getHandle() );
+                ++itor;
+            }
+            mTmpRtt.clear();
         }
 
-        mProbes.clear();
+        {
+            CubemapProbeVec::iterator itor = mProbes.begin();
+            CubemapProbeVec::iterator end  = mProbes.end();
+
+            while( itor != end )
+            {
+                OGRE_DELETE *itor;
+                ++itor;
+            }
+
+            mProbes.clear();
+        }
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::createCubemapBlendWorkspaceDefinition(void)
     {
         String workspaceName = "AutoGen_ParallaxCorrectedCubemapBlending_Workspace";
-        CompositorManager2 *compositorManager = mProbeWorkspaceDef->getCompositorManager();
+        CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
         CompositorWorkspaceDef *workspaceDef =
                 compositorManager->getWorkspaceDefinition( workspaceName );
         if( !workspaceDef )
@@ -184,7 +199,7 @@ namespace Ogre
             }
 
             CompositorWorkspaceDef *workDef = compositorManager->addWorkspaceDefinition( workspaceName );
-            workDef->connectOutput( nodeDef->getName(), 0 );
+            workDef->connectExternal( 0, nodeDef->getName(), 0 );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -196,12 +211,13 @@ namespace Ogre
         CompositorChannel channel;
         channel.target = mBlendCubemap->getBuffer()->getRenderTarget();
         channel.textures.push_back( mBlendCubemap );
+        CompositorChannelVec channels( 1, channel );
 
         const IdString workspaceName( "AutoGen_ParallaxCorrectedCubemapBlending_Workspace" );
 
-        CompositorManager2 *compositorManager = mProbeWorkspaceDef->getCompositorManager();
+        CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
         mBlendWorkspace = compositorManager->addWorkspace( mSceneManager,
-                                                           channel,
+                                                           channels,
                                                            mBlendDummyCamera,
                                                            workspaceName,
                                                            false );
@@ -209,7 +225,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::destroyCompositorData(void)
     {
-        CompositorManager2 *compositorManager = mProbeWorkspaceDef->getCompositorManager();
+        CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
         compositorManager->removeWorkspace( mBlendWorkspace );
         mBlendWorkspace = 0;
 
@@ -402,6 +418,75 @@ namespace Ogre
             if( mCollectedProbes[i]->mDirty || !mCollectedProbes[i]->mStatic )
                 mCollectedProbes[i]->_updateRender();
         }
+
+        mBlendWorkspace->_update();
+    }
+    //-----------------------------------------------------------------------------------
+    TexturePtr ParallaxCorrectedCubemap::findTmpRtt( const TexturePtr &baseParams )
+    {
+        TexturePtr retVal;
+
+        TempRttVec::iterator itor = mTmpRtt.begin();
+        TempRttVec::iterator end  = mTmpRtt.end();
+
+        while( itor != end )
+        {
+            if( itor->texture->getWidth() == baseParams->getWidth() &&
+                itor->texture->getHeight() == baseParams->getHeight() &&
+                itor->texture->getFormat() == baseParams->getFormat() &&
+                itor->texture->getFSAA() == baseParams->getFSAA() )
+            {
+                retVal = itor->texture;
+                ++itor->refCount;
+            }
+
+            ++itor;
+        }
+
+        if( retVal.isNull() )
+        {
+            TempRtt tmpRtt;
+            retVal = TextureManager::getSingleton().createManual(
+                        "ParallaxCorrectedCubemap Temp RTT " + StringConverter::toString( getId() ),
+                        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                        TEX_TYPE_CUBE_MAP, baseParams->getWidth(), baseParams->getHeight(),
+                        baseParams->getNumMipmaps(), baseParams->getFormat(),
+                        TU_RENDERTARGET|TU_AUTOMIPMAP, 0, true, baseParams->getFSAA() );
+            tmpRtt.texture = retVal;
+            tmpRtt.refCount = 1;
+            mTmpRtt.push_back( tmpRtt );
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::releaseTmpRtt( const TexturePtr &tmpRtt )
+    {
+        TempRttVec::iterator itor = mTmpRtt.begin();
+        TempRttVec::iterator end  = mTmpRtt.end();
+
+        while( itor != end && itor->texture != tmpRtt )
+            ++itor;
+
+        if( itor != end )
+        {
+            --itor->refCount;
+            if( !itor->refCount )
+            {
+                TextureManager::getSingleton().remove( tmpRtt->getHandle() );
+                efficientVectorRemove( mTmpRtt, itor );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    SceneManager* ParallaxCorrectedCubemap::getSceneManager(void) const
+    {
+        return mSceneManager;
+    }
+    //-----------------------------------------------------------------------------------
+    const CompositorWorkspaceDef* ParallaxCorrectedCubemap::getDefaultWorkspaceDef(void) const
+    {
+        return mDefaultWorkspaceDef;
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::passPreExecute( CompositorPass *pass )

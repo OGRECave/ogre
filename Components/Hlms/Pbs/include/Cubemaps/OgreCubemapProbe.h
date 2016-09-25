@@ -56,6 +56,8 @@ namespace Ogre
         CompositorWorkspace *mWorkspace;
         Camera              *mCamera;
 
+        ParallaxCorrectedCubemap *mCreator;
+
         /// False if it should be updated every frame. True if only updated when dirty
         bool    mStatic;
 
@@ -64,14 +66,32 @@ namespace Ogre
         bool    mDirty;
 
     protected:
-        void createWorkspace( SceneManager *sceneManager, const CompositorWorkspaceDef *def );
+        void destroyWorkspace(void);
+        void destroyTexture(void);
 
     public:
-        CubemapProbe();
+        CubemapProbe( ParallaxCorrectedCubemap *creator );
         ~CubemapProbe();
 
+        /**
+        @param width
+        @param height
+        @param pf
+        @param isStatic
+            Set to False if it should be updated every frame. True if only updated when dirty
+        @param fsaa
+        */
         void setTextureParams( uint32 width, uint32 height,
                                PixelFormat pf=PF_A8B8G8R8, bool isStatic=true, uint8 fsaa=1 );
+
+        /** Initializes the workspace so we can actually render to the cubemap.
+            You must call setTextureParams first.
+        @param workspaceDefOverride
+            Pass a null IdString() to use the default workspace definition passed to
+            ParallaxCorrectedCubemap.
+            This value allows you to override it with a different workspace definition.
+        */
+        void initWorkspace( IdString workspaceDefOverride=IdString() );
 
         /** Sets cubemap probe's parameters.
         @param probePos
@@ -94,8 +114,11 @@ namespace Ogre
         void set( const Vector3 &probePos, const Aabb &area,
                   const Matrix3 &aabbOrientation, const Vector3 &aabbFalloff );
 
-        /// Set to False if it should be updated every frame. True if only updated when dirty
-        void setStatic( bool bStatic );
+        /** Set to False if it should be updated every frame. True if only updated when dirty
+        @remarks
+            This call is not cheap.
+        */
+        void setStatic( bool isStatic );
         bool getStatic(void) const          { return mStatic; }
 
         Aabb getAreaLS(void) const          { return Aabb( Vector3::ZERO, mArea.mHalfSize ); }

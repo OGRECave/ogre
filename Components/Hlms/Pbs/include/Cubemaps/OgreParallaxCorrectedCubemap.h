@@ -61,7 +61,26 @@ namespace Ogre
         float                           mCurrentMip;
 
         SceneManager                    *mSceneManager;
-        CompositorWorkspaceDef const    *mProbeWorkspaceDef;
+        CompositorWorkspaceDef const    *mDefaultWorkspaceDef;
+
+        struct TempRtt
+        {
+            TexturePtr  texture;
+            uint32      refCount;
+        };
+
+        /// GPUs have the chance to optimize textures (i.e. layouts, compression) if
+        /// drivers know it's not a RenderTexture or not an UAV (in other words it's
+        /// read only).
+        /// For dynamic textures (which we render every frame) we render directly to
+        /// the Cubemap. However for static textures, we render to a temporary RTT
+        /// and then copy the results to the actual optimized cubemap.
+        /// Only Vulkan & D3D12 support changing the resource layout. But since
+        /// we need to support other APIs, we perform a copy instead.
+        /// The temp. RTTs can be shared by all probes if they match the same
+        /// resolution and format.
+        typedef vector<TempRtt>::type TempRttVec;
+        TempRttVec  mTmpRtt;
 
         void createCubemapBlendWorkspaceDefinition(void);
         void createCubemapBlendWorkspace(void);
@@ -81,6 +100,14 @@ namespace Ogre
 
         void updateSceneGraph(void);
         void updateRender(void);
+
+        /// See mTmpRtt. Finds an RTT that is compatible to copy to baseParams.
+        /// Creates one if none found.
+        TexturePtr findTmpRtt( const TexturePtr &baseParams );
+        void releaseTmpRtt( const TexturePtr &tmpRtt );
+
+        SceneManager* getSceneManager(void) const;
+        const CompositorWorkspaceDef* getDefaultWorkspaceDef(void) const;
 
         //CompositorWorkspaceListener overloads
         virtual void passPreExecute( CompositorPass *pass );

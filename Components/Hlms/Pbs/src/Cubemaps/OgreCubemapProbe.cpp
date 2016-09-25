@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include "OgreStableHeaders.h"
 
 #include "Cubemaps/OgreCubemapProbe.h"
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
 
 #include "OgreTextureManager.h"
 #include "OgreTexture.h"
@@ -44,7 +45,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    CubemapProbe::CubemapProbe() :
+    CubemapProbe::CubemapProbe( ParallaxCorrectedCubemap *creator ) :
         mProbePos( Vector3::ZERO ),
         mArea( Aabb::BOX_NULL ),
         mAabbOrientation( Matrix3::IDENTITY ),
@@ -52,6 +53,7 @@ namespace Ogre
         mFsaa( 1 ),
         mWorkspace( 0 ),
         mCamera( 0 ),
+        mCreator( creator ),
         mDirty( true ),
         mStatic( true )
     {
@@ -59,12 +61,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CubemapProbe::~CubemapProbe()
     {
-        if( mWorkspace )
-        {
-            CompositorManager2 *compositorManager = mWorkspace->getCompositorManager();
-            compositorManager->removeWorkspace( mWorkspace );
-            mWorkspace = 0;
-        }
+        destroyWorkspace();
+        destroyTexture();
 
         if( mCamera )
         {
@@ -72,7 +70,27 @@ namespace Ogre
             sceneManager->destroyCamera( mCamera );
             mCamera = 0;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::destroyWorkspace(void)
+    {
+        if( mWorkspace )
+        {
+            if( mStatic )
+            {
+                const CompositorChannel &channel = mWorkspace->getExternalRenderTargets()[0];
+                mCreator->releaseTmpRtt( channel.textures[0] );
+            }
 
+            CompositorManager2 *compositorManager = mWorkspace->getCompositorManager();
+            compositorManager->removeWorkspace( mWorkspace );
+            mWorkspace = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::destroyTexture(void)
+    {
+        assert( !mWorkspace );
         if( !mTexture.isNull() )
         {
             TextureManager::getSingleton().remove( mTexture->getHandle() );
@@ -83,6 +101,10 @@ namespace Ogre
     void CubemapProbe::setTextureParams( uint32 width, uint32 height, PixelFormat pf,
                                          bool isStatic, uint8 fsaa )
     {
+        const bool reinitWorkspace = mWorkspace != 0;
+        destroyWorkspace();
+        destroyTexture();
+
         char tmpBuffer[64];
         LwString texName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
         texName.a( "CubemapProbe_", Id::generateNewId<CubemapProbe>() );
@@ -95,7 +117,49 @@ namespace Ogre
                     TEX_TYPE_CUBE_MAP, width, height,
                     PixelUtil::getMaxMipmapCount( width, height, 1 ),
                     pf, flags, 0, true, fsaa );
+        mStatic = isStatic;
         mDirty = true;
+
+        if( !isStatic )
+            mCamera->setLightCullingVisibility( true, true );
+        else
+            mCamera->setLightCullingVisibility( false, false );
+
+        if( reinitWorkspace )
+            initWorkspace( mWorkspaceDefName );
+    }
+
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::initWorkspace( IdString workspaceDefOverride )
+    {
+        assert( !mTexture.isNull() && "Call setTextureParams first!" );
+
+        destroyWorkspace();
+
+        CompositorWorkspaceDef const *workspaceDef = mCreator->getDefaultWorkspaceDef();
+        CompositorManager2 *compositorManager = workspaceDef->getCompositorManager();
+
+        if( workspaceDefOverride != IdString() )
+            workspaceDef = compositorManager->getWorkspaceDefinition( workspaceDefOverride );
+
+        mWorkspaceDefName = workspaceDef->getName();
+        SceneManager *sceneManager = mCreator->getSceneManager();
+        mCamera = sceneManager->createCamera( mTexture->getName(), true, true );
+
+        TexturePtr rtt = mTexture;
+        if( mStatic )
+        {
+            //Grab tmp texture
+            rtt = mCreator->findTmpRtt( mTexture );
+        }
+
+        CompositorChannel channel;
+        channel.target = rtt->getBuffer()->getRenderTarget();
+        channel.textures.push_back( rtt );
+        CompositorChannelVec channels( 1, channel );
+
+        mWorkspace = compositorManager->addWorkspace( sceneManager, channels, mCamera,
+                                                      mWorkspaceDefName, false );
     }
     //-----------------------------------------------------------------------------------
     void CubemapProbe::set( const Vector3 &probePos, const Aabb &area,
@@ -121,16 +185,17 @@ namespace Ogre
         mDirty = true;
     }
     //-----------------------------------------------------------------------------------
-    void CubemapProbe::setStatic( bool bStatic )
+    void CubemapProbe::setStatic( bool isStatic )
     {
-        if( mStatic != bStatic )
+        if( mStatic != isStatic && !mTexture.isNull() )
         {
-            mStatic = bStatic;
-
-            if( !bStatic )
-                mCamera->setLightCullingVisibility( true, true );
-            else
-                mCamera->setLightCullingVisibility( false, false );
+            setTextureParams( mTexture->getWidth(), mTexture->getHeight(),
+                              mTexture->getFormat(), isStatic, mTexture->getFSAA() );
+        }
+        else
+        {
+            //We're not initialized yet, but still save the intention...
+            mStatic = isStatic;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -151,20 +216,6 @@ namespace Ogre
         return Ogre::max( Ogre::max( ndf.x, ndf.y ), ndf.z );
     }
     //-----------------------------------------------------------------------------------
-    void CubemapProbe::createWorkspace( SceneManager *sceneManager, const CompositorWorkspaceDef *def )
-    {
-        mWorkspaceDefName = def->getName();
-        mCamera = sceneManager->createCamera( mTexture->getName(), true, true );
-
-        CompositorChannel channel;
-        channel.target = mTexture->getBuffer()->getRenderTarget();
-        channel.textures.push_back( mTexture );
-
-        CompositorManager2 *compositorManager = def->getCompositorManager();
-        mWorkspace = compositorManager->addWorkspace( sceneManager, channel, mCamera,
-                                                      mWorkspaceDefName, false );
-    }
-    //-----------------------------------------------------------------------------------
     void CubemapProbe::_prepareForRendering(void)
     {
         if( mStatic )
@@ -177,7 +228,13 @@ namespace Ogre
         mWorkspace->_update();
 
         if( mStatic )
+        {
+            //Copy from tmp RTT to real texture.
+            const CompositorChannel &channel = mWorkspace->getExternalRenderTargets()[0];
+            channel.textures[0]->copyToTexture( mTexture );
+
             mCamera->setLightCullingVisibility( false, false );
+        }
         mDirty = false;
     }
 }
