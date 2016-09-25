@@ -46,6 +46,7 @@ namespace Ogre
         typedef vector<CubemapProbe*>::type CubemapProbeVec;
         CubemapProbeVec mProbes;
         CubemapProbe    *mCollectedProbes[OGRE_MAX_CUBE_PROBES];
+        uint32          mNumCollectedProbes;
         Real            mProbeNDFs[OGRE_MAX_CUBE_PROBES];
         Real            mProbeBlendFactors[OGRE_MAX_CUBE_PROBES];
 
@@ -66,7 +67,7 @@ namespace Ogre
         void createCubemapBlendWorkspace(void);
         void destroyCompositorData(void);
 
-        void calculateBlendFactors( uint8 numProbes );
+        void calculateBlendFactors(void);
 
     public:
         ParallaxCorrectedCubemap( IdType id, SceneManager *sceneManager,
@@ -78,7 +79,8 @@ namespace Ogre
         void destroyProbe( CubemapProbe *probe );
         void destroyAllProbes(void);
 
-        void update(void);
+        void updateSceneGraph(void);
+        void updateRender(void);
 
         //CompositorWorkspaceListener overloads
         virtual void passPreExecute( CompositorPass *pass );

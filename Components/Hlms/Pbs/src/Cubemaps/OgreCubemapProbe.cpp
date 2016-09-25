@@ -32,12 +32,15 @@ THE SOFTWARE.
 
 #include "OgreTextureManager.h"
 #include "OgreTexture.h"
+#include "OgreHardwarePixelBuffer.h"
+#include "OgreRenderTexture.h"
 #include "OgreLogManager.h"
 #include "OgreLwString.h"
 #include "OgreId.h"
 
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspace.h"
+#include "OgreSceneManager.h"
 
 namespace Ogre
 {
@@ -48,7 +51,8 @@ namespace Ogre
         mAabbFalloff( Vector3::ZERO ),
         mFsaa( 1 ),
         mWorkspace( 0 ),
-        mDirty( false ),
+        mCamera( 0 ),
+        mDirty( true ),
         mStatic( true )
     {
     }
@@ -60,6 +64,13 @@ namespace Ogre
             CompositorManager2 *compositorManager = mWorkspace->getCompositorManager();
             compositorManager->removeWorkspace( mWorkspace );
             mWorkspace = 0;
+        }
+
+        if( mCamera )
+        {
+            SceneManager *sceneManager = mCamera->getSceneManager();
+            sceneManager->destroyCamera( mCamera );
+            mCamera = 0;
         }
 
         if( !mTexture.isNull() )
@@ -110,6 +121,19 @@ namespace Ogre
         mDirty = true;
     }
     //-----------------------------------------------------------------------------------
+    void CubemapProbe::setStatic( bool bStatic )
+    {
+        if( mStatic != bStatic )
+        {
+            mStatic = bStatic;
+
+            if( !bStatic )
+                mCamera->setLightCullingVisibility( true, true );
+            else
+                mCamera->setLightCullingVisibility( false, false );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     Real CubemapProbe::getNDF( const Vector3 &posLS ) const
     {
         //Work in the upper left corner of the box. (Like Aabb::distance)
@@ -125,5 +149,35 @@ namespace Ogre
         Vector3 ndf = (dist - innerRange) / (outerRange - innerRange + Real(1e-6f));
 
         return Ogre::max( Ogre::max( ndf.x, ndf.y ), ndf.z );
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::createWorkspace( SceneManager *sceneManager, const CompositorWorkspaceDef *def )
+    {
+        mWorkspaceDefName = def->getName();
+        mCamera = sceneManager->createCamera( mTexture->getName(), true, true );
+
+        CompositorChannel channel;
+        channel.target = mTexture->getBuffer()->getRenderTarget();
+        channel.textures.push_back( mTexture );
+
+        CompositorManager2 *compositorManager = def->getCompositorManager();
+        mWorkspace = compositorManager->addWorkspace( sceneManager, channel, mCamera,
+                                                      mWorkspaceDefName, false );
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::_prepareForRendering(void)
+    {
+        if( mStatic )
+            mCamera->setLightCullingVisibility( true, true );
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::_updateRender(void)
+    {
+        assert( mDirty || !mStatic );
+        mWorkspace->_update();
+
+        if( mStatic )
+            mCamera->setLightCullingVisibility( false, false );
+        mDirty = false;
     }
 }

@@ -217,9 +217,9 @@ namespace Ogre
         mBlendDummyCamera = 0;
     }
     //-----------------------------------------------------------------------------------
-    void ParallaxCorrectedCubemap::calculateBlendFactors( uint8 numProbes )
+    void ParallaxCorrectedCubemap::calculateBlendFactors(void)
     {
-        assert( numProbes < OGRE_MAX_CUBE_PROBES );
+        assert( mNumCollectedProbes < OGRE_MAX_CUBE_PROBES );
 
         //See Sebastien Lagarde "Local Image-based Lighting With Parallax-corrected Cubemap"
         //https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
@@ -248,12 +248,12 @@ namespace Ogre
 
         Real sumNdf = 0.0;
 
-        for( int i=0; i<numProbes; ++i )
+        for( int i=0; i<mNumCollectedProbes; ++i )
             sumNdf += mProbeNDFs[i];
 
         const Real invSumNdf = 1.0 / sumNdf;
 
-        const Real reverseSumNdf = numProbes - sumNdf;
+        const Real reverseSumNdf = mNumCollectedProbes - sumNdf;
         const Real invRevSumNdf = 1.0 / reverseSumNdf;
 
         Real sumBlendFactor = 0;
@@ -263,7 +263,7 @@ namespace Ogre
         // respect constraint B.
         // Weight1 = normalized inverted NDF, so we have 1 at center, 0 at boundary
         // and respect constraint A."
-        for( int i=0; i<numProbes; ++i )
+        for( int i=0; i<mNumCollectedProbes; ++i )
         {
             mProbeBlendFactors[i] = 1.0f - (mProbeNDFs[i] * invSumNdf);
             mProbeBlendFactors[i] *= (1.0f - mProbeNDFs[i]) * invRevSumNdf;
@@ -275,13 +275,13 @@ namespace Ogre
 
         Real invSumBlendFactor = 1.0 / sumBlendFactor;
 
-        for( int i=0; i<numProbes; ++i )
+        for( int i=0; i<mNumCollectedProbes; ++i )
             mProbeBlendFactors[i] *= invSumBlendFactor;
-        for( int i=numProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
+        for( int i=mNumCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
             mProbeBlendFactors[i] = 0;
     }
     //-----------------------------------------------------------------------------------
-    void ParallaxCorrectedCubemap::update(void)
+    void ParallaxCorrectedCubemap::updateSceneGraph(void)
     {
         mCurrentMip = 0;
 
@@ -291,7 +291,7 @@ namespace Ogre
             mProbeNDFs[i] = std::numeric_limits<Real>::max();
         }
 
-        int numCollectedProbes = 0;
+        mNumCollectedProbes = 0;
 
         const Vector3 camPos = Vector3::ZERO;
         CubemapProbeVec::iterator itor = mProbes.begin();
@@ -310,9 +310,9 @@ namespace Ogre
                 if( ndf > 0 )
                 {
                     //Collect this probe, ensuring we collect the ones with the lowest NDF.
-                    int probeIdx = numCollectedProbes;
+                    uint32 probeIdx = mNumCollectedProbes;
 
-                    if( numCollectedProbes >= OGRE_MAX_CUBE_PROBES )
+                    if( mNumCollectedProbes >= OGRE_MAX_CUBE_PROBES )
                     {
                         Real highestNdf = -1;
                         int highestNdfIdx = OGRE_MAX_CUBE_PROBES;
@@ -341,7 +341,7 @@ namespace Ogre
                     //Early out. Use ONLY this probe.
                     mProbeNDFs[0]       = ndf;
                     mCollectedProbes[0] = probe;
-                    numCollectedProbes = 1;
+                    mNumCollectedProbes = 1;
                     itor = end;
                     break;
                 }
@@ -350,15 +350,17 @@ namespace Ogre
             ++itor;
         }
 
-        for( size_t i=numCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
+        for( size_t i=mNumCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
             mCollectedProbes[i] = &mBlankProbe;
 
-        calculateBlendFactors( numCollectedProbes );
+        calculateBlendFactors();
 
-        TODO_updateDirtyCubemaps; //Update could be over several frames.
+        //TODO: Update could be done over several frames.
+        for( size_t i=0; i<mNumCollectedProbes; ++i )
+            mCollectedProbes[i]->_prepareForRendering();
 
         bool requiresTrilinear = false;
-        for( int i=0; i<numCollectedProbes; ++i )
+        for( int i=0; i<mNumCollectedProbes; ++i )
         {
             if( mCollectedProbes[i]->mTexture->getNumMipmaps() != mBlendCubemap->getNumMipmaps() )
                 requiresTrilinear = true;
@@ -390,6 +392,15 @@ namespace Ogre
                 mBlendCubemapTUs[idx]->_setSamplerblock( requiresTrilinear ? mSamplerblockTrilinear :
                                                                              mSamplerblockPoint );
             }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::updateRender(void)
+    {
+        for( size_t i=0; i<mNumCollectedProbes; ++i )
+        {
+            if( mCollectedProbes[i]->mDirty || !mCollectedProbes[i]->mStatic )
+                mCollectedProbes[i]->_updateRender();
         }
     }
     //-----------------------------------------------------------------------------------

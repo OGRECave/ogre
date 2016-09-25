@@ -1156,6 +1156,9 @@ namespace Ogre {
         */
         virtual void destroyAllCameras(void);
 
+        /// See Camera::setLightCullingVisibility
+        void _setLightCullingVisibility( Camera *camera, bool collectLights, bool isCubemap );
+
         /** Creates a light for use in the scene.
             @remarks
                 The direction and position of a light is managed via

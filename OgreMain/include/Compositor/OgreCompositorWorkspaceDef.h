@@ -94,6 +94,9 @@ namespace Ogre
     public:
         CompositorWorkspaceDef( IdString name, CompositorManager2 *compositorManager );
         virtual ~CompositorWorkspaceDef() {}
+
+        IdString getName(void) const                                { return mName; }
+
         /** Connects outNode's output channel to inNode's input channel.
         @remarks
             This mapping will later be used to know how connections should be done when

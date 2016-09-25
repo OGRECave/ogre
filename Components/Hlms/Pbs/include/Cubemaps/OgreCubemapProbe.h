@@ -31,12 +31,14 @@ THE SOFTWARE.
 #include "OgreHlmsPbsPrerequisites.h"
 #include "OgreVector3.h"
 #include "Math/Simple/OgreAabb.h"
+#include "OgreIdString.h"
 #include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
 {
     class ParallaxCorrectedCubemap;
+    class CompositorWorkspaceDef;
 
     class CubemapProbe : public UtilityAlloc
     {
@@ -50,13 +52,19 @@ namespace Ogre
         TexturePtr  mTexture;
         uint8       mFsaa;
 
+        IdString            mWorkspaceDefName;
         CompositorWorkspace *mWorkspace;
+        Camera              *mCamera;
+
+        /// False if it should be updated every frame. True if only updated when dirty
+        bool    mStatic;
 
     public:
         /// True if we must re-render to update the texture's contents. False when we don't.
         bool    mDirty;
-        /// False if it should be updated every frame. True if only updated when dirty
-        bool    mStatic;
+
+    protected:
+        void createWorkspace( SceneManager *sceneManager, const CompositorWorkspaceDef *def );
 
     public:
         CubemapProbe();
@@ -86,6 +94,10 @@ namespace Ogre
         void set( const Vector3 &probePos, const Aabb &area,
                   const Matrix3 &aabbOrientation, const Vector3 &aabbFalloff );
 
+        /// Set to False if it should be updated every frame. True if only updated when dirty
+        void setStatic( bool bStatic );
+        bool getStatic(void) const          { return mStatic; }
+
         Aabb getAreaLS(void) const          { return Aabb( Vector3::ZERO, mArea.mHalfSize ); }
 
         /** Gets the Normalized Distance Function.
@@ -98,6 +110,9 @@ namespace Ogre
                 >=1 means we're outside the object.
         */
         Real getNDF( const Vector3 &posLS ) const;
+
+        void _prepareForRendering(void);
+        void _updateRender(void);
 
         const Vector3& getProbePos(void) const              { return mProbePos; }
         const Aabb& getArea(void) const                     { return mArea; }
