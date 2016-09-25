@@ -116,6 +116,7 @@ namespace Ogre
         ExternalTextureSourceManager* mExternalTextureSourceManager;
         HlmsManager         *mHlmsManager;
         HlmsLowLevel        *mHlmsLowLevelProxy;
+        HlmsCompute         *mHlmsCompute;
         CompositorManager2 *mCompositorManager2;
         unsigned long mNextFrame;
         Real mFrameSmoothingTime;
@@ -143,6 +144,7 @@ namespace Ogre
         MovableObjectFactory* mManualObjectFactory;
         MovableObjectFactory* mBillboardChainFactory;
         MovableObjectFactory* mRibbonTrailFactory;
+        MovableObjectFactory* mWireAabbFactory;
 
         /// Are we initialised yet?
         bool mIsInitialised;

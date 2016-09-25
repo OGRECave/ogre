@@ -1210,12 +1210,18 @@ namespace Ogre
         mIds["workspace"]       = ID_WORKSPACE;
         mIds["alias"]           = ID_ALIAS;
         mIds["connect"]         = ID_CONNECT;
+        mIds["connect_buffer"]  = ID_CONNECT_BUFFER;
         mIds["connect_output"]  = ID_CONNECT_OUTPUT;
+        mIds["connect_external"]= ID_CONNECT_EXTERNAL;
+        mIds["connect_buffer_external"] = ID_CONNECT_BUFFER_EXTERNAL;
 
         mIds["compositor_node"] = ID_COMPOSITOR_NODE;
         mIds["in"]              = ID_IN;
         mIds["out"]             = ID_OUT;
+        mIds["in_buffer"]       = ID_IN_BUFFER;
+        mIds["out_buffer"]      = ID_OUT_BUFFER;
         mIds["custom_id"]       = ID_CUSTOM_ID;
+        mIds["buffer"]          = ID_BUFFER;
         mIds["target_width"]        = ID_TARGET_WIDTH;
         mIds["target_height"]       = ID_TARGET_HEIGHT;
         mIds["target_width_scaled"] = ID_TARGET_WIDTH_SCALED;
@@ -1286,6 +1292,10 @@ namespace Ogre
         mIds["comp_func"]       = ID_COMP_FUNC;
         mIds["ref_value"]       = ID_REF_VALUE;
         mIds["mask"]            = ID_MASK;
+        mIds["read_mask"]       = ID_READ_MASK;
+        mIds["both"]            = ID_BOTH;
+        mIds["front"]           = ID_FRONT;
+        mIds["back"]            = ID_BACK;
         mIds["fail_op"]         = ID_FAIL_OP;
         mIds["keep"]            = ID_KEEP;
         mIds["increment"]       = ID_INCREMENT;
@@ -1295,12 +1305,14 @@ namespace Ogre
         mIds["invert"]          = ID_INVERT;
         mIds["depth_fail_op"]   = ID_DEPTH_FAIL_OP;
         mIds["pass_op"]         = ID_PASS_OP;
-        mIds["two_sided"]       = ID_TWO_SIDED;
 
         mIds["uav"]             = ID_UAV;
         mIds["uav_external"]    = ID_UAV_EXTERNAL;
+        mIds["uav_buffer"]      = ID_UAV_BUFFER;
         mIds["starting_slot"]   = ID_STARTING_SLOT;
         mIds["keep_previous_uavs"]= ID_KEEP_PREVIOUS_UAV;
+
+        mIds["job"]             = ID_JOB;
 
         mIds["compositor_node_shadow"]  = ID_SHADOW_NODE;
         mIds["num_splits"]              = ID_NUM_SPLITS;

@@ -111,6 +111,85 @@ namespace Ogre {
         SOP_INVERT
     };
 
+    struct StencilStateOp
+    {
+        StencilOperation stencilFailOp;
+        StencilOperation stencilPassOp;
+        StencilOperation stencilDepthFailOp;
+        CompareFunction compareOp;
+
+        StencilStateOp() :
+            stencilFailOp( SOP_KEEP ),
+            stencilPassOp( SOP_KEEP ),
+            stencilDepthFailOp( SOP_KEEP ),
+            compareOp( CMPF_ALWAYS_FAIL ) {}
+
+        bool operator < ( const StencilStateOp &other ) const
+        {
+            if(   this->stencilFailOp < other.stencilFailOp  ) return true;
+            if( !(this->stencilFailOp < other.stencilFailOp) ) return false;
+
+            if(   this->stencilPassOp < other.stencilPassOp  ) return true;
+            if( !(this->stencilPassOp < other.stencilPassOp) ) return false;
+
+            if(   this->stencilDepthFailOp < other.stencilDepthFailOp  ) return true;
+            if( !(this->stencilDepthFailOp < other.stencilDepthFailOp) ) return false;
+
+            if(   this->compareOp < other.compareOp  ) return true;
+            //if( !(this->compareOp < other.compareOp) ) return false;
+
+            return false;
+        }
+
+        bool operator != ( const StencilStateOp &other ) const
+        {
+            return this->stencilFailOp != other.stencilFailOp ||
+                   this->stencilPassOp != other.stencilPassOp ||
+                   this->stencilDepthFailOp != other.stencilDepthFailOp ||
+                   this->compareOp != other.compareOp;
+        }
+    };
+
+    struct StencilParams
+    {
+        bool            enabled;
+        uint8           readMask;
+        uint8           writeMask;
+        StencilStateOp  stencilFront;
+        StencilStateOp  stencilBack;
+
+        StencilParams() :
+            enabled( false ),
+            readMask( 0xFF ),
+            writeMask( 0xFF ) {}
+
+        bool operator < ( const StencilParams &other ) const
+        {
+            if(   this->enabled < other.enabled  ) return true;
+            if( !(this->enabled < other.enabled) ) return false;
+
+            if(   this->readMask < other.readMask  ) return true;
+            if( !(this->readMask < other.readMask) ) return false;
+
+            if(   this->stencilFront < other.stencilFront  ) return true;
+            if( !(this->stencilFront < other.stencilFront) ) return false;
+
+            if(   this->stencilBack < other.stencilBack  ) return true;
+            //if( !(this->stencilBack < other.stencilBack) ) return false;
+
+            return false;
+        }
+
+        bool operator != ( const StencilParams &other ) const
+        {
+            return this->enabled != other.enabled ||
+                   this->readMask != other.readMask ||
+                   this->writeMask != other.writeMask ||
+                   this->stencilFront != other.stencilFront ||
+                   this->stencilBack != other.stencilBack;
+        }
+    };
+
     /** High-level filtering options providing shortcuts to settings the
         minification, magnification and mip filters. */
     enum TextureFilterOptions

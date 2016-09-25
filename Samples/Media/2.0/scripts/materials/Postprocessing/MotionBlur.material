@@ -15,10 +15,17 @@ fragment_program Postprocess/Combine_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program Postprocess/Combine_ps_Metal metal
+{
+	source Combine_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program Postprocess/Combine_ps unified
 {
 	delegate Postprocess/Combine_ps_GLSL
 	delegate Postprocess/Combine_ps_HLSL
+	delegate Postprocess/Combine_ps_Metal
 
 	default_params
 	{

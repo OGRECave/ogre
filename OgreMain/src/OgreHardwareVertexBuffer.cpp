@@ -41,7 +41,7 @@ namespace v1 {
     HardwareVertexBuffer::HardwareVertexBuffer(HardwareBufferManagerBase* mgr, size_t vertexSize,  
         size_t numVertices, HardwareBuffer::Usage usage, 
         bool useSystemMemory, bool useShadowBuffer) 
-        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer), 
+        : HardwareBuffer(usage, useSystemMemory, useShadowBuffer),
           mMgr(mgr),
           mNumVertices(numVertices),
           mVertexSize(vertexSize),
@@ -425,12 +425,59 @@ namespace v1 {
         return VET_FLOAT1;
     }
     //-----------------------------------------------------------------------------
-    VertexDeclaration::VertexDeclaration()
+    VertexDeclaration::VertexDeclaration( HardwareBufferManagerBase *creator ) :
+        mCreator( creator ),
+        mInputLayoutId( std::numeric_limits<uint16>::max() ),
+        mInputLayoutDirty( false )
     {
+        vertexLayoutDirty();
     }
     //-----------------------------------------------------------------------------
     VertexDeclaration::~VertexDeclaration()
     {
+        if( mInputLayoutId != std::numeric_limits<uint16>::max() )
+            mCreator->_removeInputLayoutReference( static_cast<uint8>(mInputLayoutId) );
+    }
+    //-----------------------------------------------------------------------------
+    void VertexDeclaration::vertexLayoutDirty(void)
+    {
+        if( !mInputLayoutDirty )
+        {
+            if( mInputLayoutId != std::numeric_limits<uint16>::max() )
+            {
+                mCreator->_removeInputLayoutReference( getInputLayoutId() );
+                mInputLayoutId = std::numeric_limits<uint16>::max();
+            }
+
+            mCreator->_addDirtyInputLayout( this );
+            mInputLayoutDirty = true;
+        }
+    }
+    //-----------------------------------------------------------------------------
+    void VertexDeclaration::_setInputLayoutId( uint8 layoutId )
+    {
+        assert( mInputLayoutId == std::numeric_limits<uint16>::max() && mInputLayoutDirty );
+        mInputLayoutId = layoutId;
+        mInputLayoutDirty = false;
+    }
+    //-----------------------------------------------------------------------------
+    uint16 VertexDeclaration::_getInputLayoutId(void) const
+    {
+        return mInputLayoutId;
+    }
+    //-----------------------------------------------------------------------------
+    bool VertexDeclaration::_isInputLayoutDirty(void) const
+    {
+        return mInputLayoutDirty;
+    }
+    //-----------------------------------------------------------------------------
+    uint8 VertexDeclaration::getInputLayoutId(void) const
+    {
+        assert( !mInputLayoutDirty &&
+                "Must call HardwareBufferManagerBase::_updateDirtyInputLayouts first "
+                "or VertexDeclaration was altered inside the RenderQueue" );
+        assert( mInputLayoutId <= std::numeric_limits<uint8>::max() );
+        return static_cast<uint8>( mInputLayoutId );
     }
     //-----------------------------------------------------------------------------
     const VertexDeclaration::VertexElementList& VertexDeclaration::getElements(void) const
@@ -442,6 +489,7 @@ namespace v1 {
         size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
+        vertexLayoutDirty();
         // Refine colour type to a specific type
         if (theType == VET_COLOUR)
         {
@@ -457,6 +505,7 @@ namespace v1 {
         unsigned short source, size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
+        vertexLayoutDirty();
         if (atPosition >= mElementList.size())
         {
             return addElement(source, offset, theType, semantic, index);
@@ -486,6 +535,8 @@ namespace v1 {
     //-----------------------------------------------------------------------------
     void VertexDeclaration::removeElement(unsigned short elem_index)
     {
+        vertexLayoutDirty();
+
         assert(elem_index < mElementList.size() && "Index out of bounds");
         VertexElementList::iterator i = mElementList.begin();
         for (unsigned short n = 0; n < elem_index; ++n)
@@ -495,6 +546,8 @@ namespace v1 {
     //-----------------------------------------------------------------------------
     void VertexDeclaration::removeElement(VertexElementSemantic semantic, unsigned short index)
     {
+        vertexLayoutDirty();
+
         VertexElementList::iterator ei, eiend;
         eiend = mElementList.end();
         for (ei = mElementList.begin(); ei != eiend; ++ei)
@@ -509,6 +562,7 @@ namespace v1 {
     //-----------------------------------------------------------------------------
     void VertexDeclaration::removeAllElements(void)
     {
+        vertexLayoutDirty();
         mElementList.clear();
     }
     //-----------------------------------------------------------------------------
@@ -516,6 +570,7 @@ namespace v1 {
         unsigned short source, size_t offset, VertexElementType theType,
         VertexElementSemantic semantic, unsigned short index)
     {
+        vertexLayoutDirty();
         assert(elem_index < mElementList.size() && "Index out of bounds");
         VertexElementList::iterator i = mElementList.begin();
         std::advance(i, elem_index);
@@ -589,13 +644,42 @@ namespace v1 {
         return ret;
     }
     //-----------------------------------------------------------------------------------
+    bool VertexDeclaration::isSortedForV2(void) const
+    {
+        bool retVal = true;
+
+        if( !mElementList.empty() )
+        {
+            VertexElementList::const_iterator currElement = mElementList.begin();
+            VertexElementList::const_iterator nextElement = mElementList.begin();
+            VertexElementList::const_iterator end  = mElementList.end();
+
+            ++nextElement;
+
+            while( nextElement != end &&
+                   VertexDeclaration::vertexElementLessForV2( *currElement, *nextElement ) )
+            {
+                ++currElement;
+                ++nextElement;
+            }
+
+            retVal = nextElement == end;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
     VertexElement2VecVec VertexDeclaration::convertToV2(void)
     {
         VertexElement2VecVec retVal;
         retVal.resize( getMaxSource() + 1 );
 
-        //Make sure the declaration is sorted
-        sortForV2();
+        if( !isSortedForV2() )
+        {
+            //Make sure the declaration is sorted. Don't sort if already sorted, otherwise
+            //the declaration will be tagged as dirty when creating the PSO.
+            sortForV2();
+        }
 
         VertexElementList::const_iterator itor = mElementList.begin();
         VertexElementList::const_iterator end  = mElementList.end();
@@ -683,6 +767,7 @@ namespace v1 {
     }
     void VertexDeclaration::sort(void)
     {
+        vertexLayoutDirty();
         mElementList.sort(VertexDeclaration::vertexElementLess);
     }
     //-----------------------------------------------------------------------------
@@ -697,6 +782,7 @@ namespace v1 {
     }
     void VertexDeclaration::sortForV2(void)
     {
+        vertexLayoutDirty();
         mElementList.sort(VertexDeclaration::vertexElementLessForV2);
     }
     //-----------------------------------------------------------------------------
@@ -813,8 +899,6 @@ namespace v1 {
         }
 
         return newDecl;
-
-
     }
     //-----------------------------------------------------------------------------
     unsigned short VertexDeclaration::getMaxSource(void) const

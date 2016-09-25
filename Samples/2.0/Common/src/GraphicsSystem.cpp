@@ -1,7 +1,9 @@
 
 #include "GraphicsSystem.h"
 #include "GameState.h"
-#include "SdlInputHandler.h"
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
+    #include "SdlInputHandler.h"
+#endif
 #include "GameEntity.h"
 
 #include "OgreRoot.h"
@@ -23,43 +25,27 @@
 
 #include "OgreWindowEventUtilities.h"
 
-#include <SDL_syswm.h>
+#if OGRE_USE_SDL2
+    #include <SDL_syswm.h>
+#endif
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    #include "OSX/macUtils.h"
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        #include "System/iOS/iOSUtils.h"
+    #endif
+#endif
 
 namespace Demo
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-#include <CoreFoundation/CoreFoundation.h>
-
-// This function will locate the path to our application on OS X,
-// unlike windows you can not rely on the curent working directory
-// for locating your configuration files and resources.
-std::string macBundlePath()
-{
-    char path[1024];
-    CFBundleRef mainBundle = CFBundleGetMainBundle();
-    assert(mainBundle);
-
-    CFURLRef mainBundleURL = CFBundleCopyBundleURL(mainBundle);
-    assert(mainBundleURL);
-
-    CFStringRef cfStringRef = CFURLCopyFileSystemPath( mainBundleURL, kCFURLPOSIXPathStyle);
-    assert(cfStringRef);
-
-    CFStringGetCString(cfStringRef, path, 1024, kCFStringEncodingASCII);
-
-    CFRelease(mainBundleURL);
-    CFRelease(cfStringRef);
-
-    return std::string(path);
-}
-#endif
-
     GraphicsSystem::GraphicsSystem( GameState *gameState,
                                     Ogre::ColourValue backgroundColour ) :
         BaseSystem( gameState ),
         mLogicSystem( 0 ),
+    #if OGRE_USE_SDL2
         mSdlWindow( 0 ),
         mInputHandler( 0 ),
+    #endif
         mRoot( 0 ),
         mRenderWindow( 0 ),
         mSceneManager( 0 ),
@@ -71,6 +57,7 @@ std::string macBundlePath()
         mThreadGameEntityToUpdate( 0 ),
         mThreadWeight( 0 ),
         mQuit( false ),
+        mAlwaysAskForConfig( true ),
         mBackgroundColour( backgroundColour )
     {
     }
@@ -82,27 +69,35 @@ std::string macBundlePath()
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::initialize( const Ogre::String &windowTitle )
     {
+    #if OGRE_USE_SDL2
         if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
         {
             OGRE_EXCEPT( Ogre::Exception::ERR_INTERNAL_ERROR, "Cannot initialize SDL2!",
                          "GraphicsSystem::initialize" );
         }
+    #endif
 
         Ogre::String pluginsPath;
         // only use plugins.cfg if not static
-#ifndef OGRE_STATIC_LIB
+    #ifndef OGRE_STATIC_LIB
     #if OGRE_DEBUG_MODE
         pluginsPath = mResourcePath + "plugins_d.cfg";
     #else
         pluginsPath = mResourcePath + "plugins.cfg";
     #endif
-#endif
+    #endif
 
         mRoot = OGRE_NEW Ogre::Root( pluginsPath,
                                      mResourcePath + "ogre.cfg",
                                      mResourcePath + "Ogre.log" );
 
-        //if( !mRoot->restoreConfig() )
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        mResourcePath = Ogre::macBundlePath() + '/';
+    #endif
+
+        mStaticPluginLoader.install( mRoot );
+
+        if( mAlwaysAskForConfig || !mRoot->restoreConfig() )
         {
             if( !mRoot->showConfigDialog() )
             {
@@ -111,6 +106,14 @@ std::string macBundlePath()
             }
         }
 
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        {
+            Ogre::RenderSystem *renderSystem =
+                    mRoot->getRenderSystemByName( "Metal Rendering Subsystem" );
+            mRoot->setRenderSystem( renderSystem );
+        }
+    #endif
+
         mRoot->getRenderSystem()->setConfigOption( "sRGB Gamma Conversion", "Yes" );
         mRoot->initialise(false);
 
@@ -118,6 +121,14 @@ std::string macBundlePath()
 
         int width   = 1280;
         int height  = 720;
+
+    #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        {
+            Ogre::Vector2 screenRes = iOSUtils::getScreenResolutionInPoints();
+            width = static_cast<int>( screenRes.x );
+            height = static_cast<int>( screenRes.y );
+        }
+    #endif
 
         Ogre::ConfigOptionMap::iterator opt = cfgOpts.find( "Video Mode" );
         if( opt != cfgOpts.end() )
@@ -134,11 +145,13 @@ std::string macBundlePath()
                                                            widthEnd+3, heightEnd ) );
         }
 
+        Ogre::NameValuePairList params;
+        bool fullscreen = Ogre::StringConverter::parseBool( cfgOpts["Full Screen"].currentValue );
+    #if OGRE_USE_SDL2
         int screen = 0;
         int posX = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
         int posY = SDL_WINDOWPOS_CENTERED_DISPLAY(screen);
 
-        bool fullscreen = Ogre::StringConverter::parseBool( cfgOpts["Full Screen"].currentValue );
         if(fullscreen)
         {
             posX = SDL_WINDOWPOS_UNDEFINED_DISPLAY(screen);
@@ -166,16 +179,14 @@ std::string macBundlePath()
         }
 
         Ogre::String winHandle;
-        Ogre::NameValuePairList params;
-
         switch( wmInfo.subsystem )
         {
-    #ifdef WIN32
+        #ifdef WIN32
         case SDL_SYSWM_WINDOWS:
             // Windows code
             winHandle = Ogre::StringConverter::toString( (uintptr_t)wmInfo.info.win.window );
             break;
-    #elif __MACOSX__
+        #elif __MACOSX__
         case SDL_SYSWM_COCOA:
             //required to make OGRE play nice with our window
             params.insert( std::make_pair("macAPI", "cocoa") );
@@ -183,11 +194,11 @@ std::string macBundlePath()
 
             winHandle  = Ogre::StringConverter::toString(WindowContentViewHandle(wmInfo));
             break;
-    #else
+        #else
         case SDL_SYSWM_X11:
             winHandle = Ogre::StringConverter::toString( (uintptr_t)wmInfo.info.x11.window );
             break;
-    #endif
+        #endif
         default:
             OGRE_EXCEPT( Ogre::Exception::ERR_NOT_IMPLEMENTED,
                          "Unexpected WM! (SDL2)",
@@ -195,16 +206,17 @@ std::string macBundlePath()
             break;
         }
 
+        #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+            params.insert( std::make_pair("externalWindowHandle",  winHandle) );
+        #else
+            params.insert( std::make_pair("parentWindowHandle",  winHandle) );
+        #endif
+    #endif
+
         params.insert( std::make_pair("title", windowTitle) );
         params.insert( std::make_pair("gamma", "true") );
         params.insert( std::make_pair("FSAA", cfgOpts["FSAA"].currentValue) );
         params.insert( std::make_pair("vsync", cfgOpts["VSync"].currentValue) );
-
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        params.insert( std::make_pair("externalWindowHandle",  winHandle) );
-#else
-        params.insert( std::make_pair("parentWindowHandle",  winHandle) );
-#endif
 
         mRenderWindow = Ogre::Root::getSingleton().createRenderWindow( windowTitle, width, height,
                                                                        fullscreen, &params );
@@ -217,8 +229,10 @@ std::string macBundlePath()
         createCamera();
         mWorkspace = setupCompositor();
 
+    #if OGRE_USE_SDL2
         mInputHandler = new SdlInputHandler( mSdlWindow, mCurrentGameState,
                                              mCurrentGameState, mCurrentGameState );
+    #endif
 
         BaseSystem::initialize();
     }
@@ -233,12 +247,15 @@ std::string macBundlePath()
         OGRE_DELETE mOverlaySystem;
         mOverlaySystem = 0;
 
+    #if OGRE_USE_SDL2
         delete mInputHandler;
         mInputHandler = 0;
+    #endif
 
         OGRE_DELETE mRoot;
         mRoot = 0;
 
+    #if OGRE_USE_SDL2
         if( mSdlWindow )
         {
             // Restore desktop resolution on exit
@@ -248,12 +265,14 @@ std::string macBundlePath()
         }
 
         SDL_Quit();
+    #endif
     }
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::update( float timeSinceLast )
     {
         Ogre::WindowEventUtilities::messagePump();
 
+    #if OGRE_USE_SDL2
         SDL_Event evt;
         while( SDL_PollEvent( &evt ) )
         {
@@ -271,6 +290,7 @@ std::string macBundlePath()
 
             mInputHandler->_handleSdlEvents( evt );
         }
+    #endif
 
         BaseSystem::update( timeSinceLast );
 
@@ -285,6 +305,7 @@ std::string macBundlePath()
         SDL_GetDisplayBounds( 0, &rect );*/
     }
     //-----------------------------------------------------------------------------------
+    #if OGRE_USE_SDL2
     void GraphicsSystem::handleWindowEvent( const SDL_Event& evt )
     {
         switch( evt.window.event )
@@ -322,6 +343,7 @@ std::string macBundlePath()
                 break;
         }
     }
+    #endif
     //-----------------------------------------------------------------------------------
     void GraphicsSystem::processIncomingMessage( Mq::MessageId messageId, const void *data )
     {
@@ -366,12 +388,12 @@ std::string macBundlePath()
     void GraphicsSystem::addResourceLocation( const Ogre::String &archName, const Ogre::String &typeName,
                                               const Ogre::String &secName )
     {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
         // OS X does not set the working directory relative to the app,
         // In order to make things portable on OS X we need to provide
         // the loading with it's own bundle path location
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-                    Ogre::String(macBundlePath() + "/" + archName), typeName, secName);
+                    Ogre::String( Ogre::macBundlePath() + "/" + archName ), typeName, secName );
 #else
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
                     archName, typeName, secName);
@@ -409,9 +431,9 @@ std::string macBundlePath()
     void GraphicsSystem::registerHlms(void)
     {
         Ogre::ConfigFile cf;
-        cf.load(mResourcePath + "resources2.cfg");
+        cf.load( mResourcePath + "resources2.cfg" );
 
-        Ogre::String dataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
+        Ogre::String dataFolder = mResourcePath + cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
 
         if( dataFolder.empty() )
             dataFolder = "./";
@@ -423,6 +445,8 @@ std::string macBundlePath()
         Ogre::String shaderSyntax = "GLSL";
         if( renderSystem->getName() == "Direct3D11 Rendering Subsystem" )
             shaderSyntax = "HLSL";
+        else if( renderSystem->getName() == "Metal Rendering Subsystem" )
+            shaderSyntax = "Metal";
 
         Ogre::Archive *archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Common/" + shaderSyntax,

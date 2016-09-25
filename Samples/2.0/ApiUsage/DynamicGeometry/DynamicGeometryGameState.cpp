@@ -135,7 +135,7 @@ namespace Demo
         vertexBuffers.push_back( vertexBuffer );
         Ogre::IndexBufferPacked *indexBuffer = createIndexBuffer(); //Create the actual index buffer
         Ogre::VertexArrayObject *vao = vaoManager->createVertexArrayObject(
-                    vertexBuffers, indexBuffer, Ogre::v1::RenderOperation::OT_TRIANGLE_LIST );
+                    vertexBuffers, indexBuffer, Ogre::OT_TRIANGLE_LIST );
 
         //Each Vao pushed to the vector refers to an LOD level.
         //Must be in sync with mesh->mLodValues & mesh->mNumLods if you use more than one level
@@ -181,7 +181,7 @@ namespace Demo
         vertexBuffers.push_back( vertexBuffer );
         Ogre::IndexBufferPacked *indexBuffer = createIndexBuffer();
         Ogre::VertexArrayObject *vao = vaoManager->createVertexArrayObject(
-                    vertexBuffers, indexBuffer, Ogre::v1::RenderOperation::OT_TRIANGLE_LIST );
+                    vertexBuffers, indexBuffer, Ogre::OT_TRIANGLE_LIST );
 
         subMesh->mVao[Ogre::VpNormal].push_back( vao );
         //Use the same geometry for shadow casting.

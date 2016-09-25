@@ -26,9 +26,9 @@ Buffer<float4> f3dLightList : register(t2);@end
 
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
-@property( envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));@end
+@property( use_envprobe_map )TextureCube	texEnvProbeMap : register(t@value(envMapReg));@end
 
-@property( numSamplerStates || envprobe_map )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
+@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
 @property( normal_map )
 @property( hlms_qtangent )
@@ -141,9 +141,9 @@ float3 qmul( float4 q, float3 v )
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap[@value(CurrentShadowMap)], inPs.posL@value(CurrentShadowMap), passBuf.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
-float4 main( PS_INPUT inPs
+@insertpiece( output_type ) main( PS_INPUT inPs
 @property( hlms_vpos ), float4 gl_FragCoord : SV_Position@end
-@property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end ) : SV_Target0
+@property( two_sided_lighting ), bool gl_FrontFacing : SV_IsFrontFace@end ) @insertpiece( output_type_sv )
 {
 	@insertpiece( custom_ps_preExecution )
 
@@ -159,7 +159,7 @@ float4 main( PS_INPUT inPs
 	@property( detail_map@n )uint detailMapIdx@n;@end @end
 @foreach( 4, n )
 	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
-@property( envprobe_map )	uint envMapIdx;@end
+@property( use_envprobe_map )	uint envMapIdx;@end
 
 float4 diffuseCol;
 @property( specular_map && !metallic_workflow && !fresnel_workflow )float3 specularCol;@end
@@ -188,7 +188,7 @@ float4 diffuseCol;
 @property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFFu;@end
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
-@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
+@property( use_envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
 
 	@insertpiece( custom_ps_posMaterialLoad )
 
@@ -291,7 +291,7 @@ float4 diffuseCol;
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
 	float3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= saturate( dot( nNormal, viewDir ) );@end
 
@@ -357,10 +357,10 @@ float4 diffuseCol;
 
 @insertpiece( forward3dLighting )
 
-@property( envprobe_map || ambient_hemisphere )
+@property( use_envprobe_map || ambient_hemisphere )
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 	
-	@property( envprobe_map )
+	@property( use_envprobe_map )
 		float3 envColourS = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( reflDir, passBuf.invViewMatCubemap ), ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );
 		float3 envColourD = texEnvProbeMap.SampleLevel( samplerStates[@value(num_textures)], mul( nNormal, passBuf.invViewMatCubemap ), 11.0 ).xyz @insertpiece( ApplyEnvMapScale );
 		@property( !hw_gamma_read )	//Gamma to linear space
@@ -372,10 +372,10 @@ float4 diffuseCol;
 		float ambientWD = dot( passBuf.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( passBuf.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( envprobe_map )
+		@property( use_envprobe_map )
 			envColourS	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !envprobe_map )
+		@end @property( !use_envprobe_map )
 			float3 envColourS = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWD );
 			float3 envColourD = lerp( passBuf.ambientLowerHemi.xyz, passBuf.ambientUpperHemi.xyz, ambientWS );
 		@end
@@ -406,22 +406,16 @@ float4 diffuseCol;
 
 	@insertpiece( custom_ps_posExecution )
 
+@property( !hlms_render_depth_only )
 	return outColour;
+@end
 }
 @end
 @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture && !alpha_test )
-		@set( hlms_disable_stage, 1 )
-	@end
-
 @property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
 @property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 	
-@property( !hlms_shadow_uses_depth_texture )
-float main( PS_INPUT inPs ) : SV_Target0
-@end @property( hlms_shadow_uses_depth_texture )
-void main( PS_INPUT inPs )
-@end
+@insertpiece( output_type ) main( PS_INPUT inPs ) @insertpiece( output_type_sv )
 {
 	@insertpiece( custom_ps_preExecution )
 	
@@ -467,7 +461,7 @@ void main( PS_INPUT inPs )
 
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value.
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = material.bgDiffuse.w;@end
+	@property( !diffuse_map )diffuseCol = material.bgDiffuse.w;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )
@@ -482,8 +476,9 @@ void main( PS_INPUT inPs )
 
 	@insertpiece( custom_ps_posExecution )
 
-@property( !hlms_shadow_uses_depth_texture )
+@property( !hlms_render_depth_only )
 	return inPs.depth;
 @end
 }
 @end
+

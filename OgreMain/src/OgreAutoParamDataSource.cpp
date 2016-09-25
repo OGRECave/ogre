@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 #include "OgrePass.h"
 #include "OgreViewport.h"
+#include "OgreHlmsComputeJob.h"
 
 #include "Compositor/OgreCompositorShadowNode.h"
 
@@ -80,6 +81,7 @@ namespace Ogre {
          mCurrentViewport(0), 
          mCurrentSceneManager(0),
          mCurrentPass(0),
+         mCurrentJob(0),
          mCurrentShadowNode(0),
          mBlankLight( 0, &mObjectMemoryManager, 0 )
     {
@@ -516,6 +518,7 @@ namespace Ogre {
     void AutoParamDataSource::setCurrentPass(const Pass* pass)
     {
         mCurrentPass = pass;
+        setCurrentJob( 0 );
     }
     //-----------------------------------------------------------------------------
     const Pass* AutoParamDataSource::getCurrentPass(void) const
@@ -523,11 +526,31 @@ namespace Ogre {
         return mCurrentPass;
     }
     //-----------------------------------------------------------------------------
+    void AutoParamDataSource::setCurrentJob(const HlmsComputeJob* job)
+    {
+        mCurrentJob = job;
+    }
+    //-----------------------------------------------------------------------------
+    const HlmsComputeJob* AutoParamDataSource::getCurrentJob(void) const
+    {
+        return mCurrentJob;
+    }
+    //-----------------------------------------------------------------------------
     Vector4 AutoParamDataSource::getTextureSize(size_t index) const
     {
         Vector4 size = Vector4(1,1,1,1);
 
-        if (index < mCurrentPass->getNumTextureUnitStates())
+        if( mCurrentJob && index < mCurrentJob->getNumTexUnits() )
+        {
+            const TexturePtr& tex = mCurrentJob->getTexture( static_cast<uint8>(index) );
+            if (!tex.isNull())
+            {
+                size.x = static_cast<Real>(tex->getWidth());
+                size.y = static_cast<Real>(tex->getHeight());
+                size.z = static_cast<Real>(tex->getDepth());
+            }
+        }
+        else if (index < mCurrentPass->getNumTextureUnitStates())
         {
             const TexturePtr& tex = mCurrentPass->getTextureUnitState(
                 static_cast<unsigned short>(index))->_getTexturePtr();

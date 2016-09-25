@@ -503,6 +503,9 @@ namespace Ogre {
         FrustumVec  mVisibleCameras;
         FrustumVec  mCubeMapCameras;
 
+        typedef vector<WireAabb*>::type WireAabbVec;
+        WireAabbVec mTrackingWireAabbs;
+
         typedef map<String, v1::StaticGeometry* >::type StaticGeometryList;
         StaticGeometryList mStaticGeometryList;
 
@@ -878,6 +881,7 @@ namespace Ogre {
         GpuProgramParametersSharedPtr mShadowTextureCustomCasterFPParams;
 
         CompositorTextureVec        mCompositorTextures;
+        CompositorTexture           mCompositorTarget;
 
         /// Visibility mask used to show / hide objects
         uint32 mVisibilityMask;
@@ -957,7 +961,6 @@ namespace Ogre {
         virtual void useLights(const LightList& lights, unsigned short limit);
         virtual void setViewMatrix(const Matrix4& m);
         virtual void useLightsGpuProgram(const Pass* pass, const LightList* lights);
-        virtual void bindGpuProgram(GpuProgram* prog);
         virtual void updateGpuProgramParameters(const Pass* p);
 
 
@@ -1340,6 +1343,18 @@ namespace Ogre {
         /// Removes & destroys all Items.
         virtual void destroyAllItems(void);
 
+        /// Create an WireAabb
+        virtual WireAabb* createWireAabb(void);
+
+        /// Removes & destroys an WireAabb from the SceneManager.
+        virtual void destroyWireAabb( WireAabb *wireAabb );
+
+        /// Removes & destroys all WireAabbs.
+        virtual void destroyAllWireAabbs(void);
+
+        void _addWireAabb( WireAabb *wireAabb );
+        void _removeWireAabb( WireAabb *wireAabb );
+
         /** Create an Entity (instance of a discrete mesh).
             @param
                 meshName The name of the Mesh it is to be based on (e.g. 'knot.oof'). The
@@ -1460,6 +1475,12 @@ namespace Ogre {
 
         /// Removes all compositor textures from 'from' to end.
         void _removeCompositorTextures( size_t from );
+
+        /// The compositor we are currently writing to.
+        void _setCompositorTarget( const CompositorTexture &compoTarget );
+
+        /// The compositor we are currently writing to.
+        const CompositorTexture& getCompositorTarget(void) const   { return mCompositorTarget; }
 
         /// Creates an instance of a skeleton based on the given definition.
         SkeletonInstance* createSkeletonInstance( const SkeletonDef *skeletonDef );
@@ -2439,56 +2460,6 @@ namespace Ogre {
         /** Removes all animation states created using this SceneManager. */
         virtual void destroyAllAnimationStates(void);
 
-        /** Manual rendering method, for advanced users only.
-        @remarks
-            This method allows you to send rendering commands through the pipeline on
-            demand, bypassing OGRE's normal world processing. You should only use this if you
-            really know what you're doing; OGRE does lots of things for you that you really should
-            let it do. However, there are times where it may be useful to have this manual interface,
-            for example overlaying something on top of the scene rendered by OGRE.
-        @par
-            Because this is an instant rendering method, timing is important. The best 
-            time to call it is from a RenderTargetListener event handler.
-        @par
-            Don't call this method a lot, it's designed for rare (1 or 2 times per frame) use. 
-            Calling it regularly per frame will cause frame rate drops!
-        @param rend A RenderOperation object describing the rendering op
-        @param pass The Pass to use for this render
-        @param vp Pointer to the viewport to render to, or 0 to use the current viewport
-        @param worldMatrix The transform to apply from object to world space
-        @param viewMatrix The transform to apply from world to view space
-        @param projMatrix The transform to apply from view to screen space
-        @param doBeginEndFrame If true, beginFrame() and endFrame() are called, 
-            otherwise not. You should leave this as false if you are calling
-            this within the main render loop.
-        */
-        virtual void manualRender(v1::RenderOperation* rend, Pass* pass, Viewport* vp,
-            const Matrix4& worldMatrix, const Matrix4& viewMatrix, const Matrix4& projMatrix, 
-            bool doBeginEndFrame = false) ;
-
-        /** Manual rendering method for rendering a single object. 
-        @param rend The renderable to issue to the pipeline
-        @param pass The pass to use
-        @param vp Pointer to the viewport to render to, or 0 to use the existing viewport
-        @param doBeginEndFrame If true, beginFrame() and endFrame() are called, 
-        otherwise not. You should leave this as false if you are calling
-        this within the main render loop.
-        @param viewMatrix The transform to apply from world to view space
-        @param projMatrix The transform to apply from view to screen space
-        @param lightScissoringClipping If true, passes that have the getLightScissorEnabled
-        and/or getLightClipPlanesEnabled flags will cause calculation and setting of 
-        scissor rectangle and user clip planes. 
-        @param doLightIteration If true, this method will issue the renderable to
-        the pipeline possibly multiple times, if the pass indicates it should be
-        done once per light
-        @param manualLightList Only applicable if doLightIteration is false, this
-        method allows you to pass in a previously determined set of lights
-        which will be used for a single render of this object.
-        */
-        virtual void manualRender(Renderable* rend, const Pass* pass, Viewport* vp, 
-            const Matrix4& viewMatrix, const Matrix4& projMatrix, bool doBeginEndFrame = false,
-            bool lightScissoringClipping = true, bool doLightIteration = true);
-
         /** Registers a new RenderQueueListener which will be notified when render queues
             are processed.
         */
@@ -2970,18 +2941,6 @@ namespace Ogre {
         virtual void _renderSingleObject( Renderable* pRend, const MovableObject *pMovableObject,
                                           bool casterPass, bool dualParaboloid );
 
-        /** Render something as if it came from the current queue.
-            @param pass     Material pass to use for setting up this quad.
-            @param rend     Renderable to render
-            @param activeCamera When not null, it will override the current camera & viewport
-            settings. Won't restore them back after the call is finished. When null, uses
-            the old camera & viewport settings.
-            @param shadowDerivation Whether passes should be replaced with shadow caster passes
-         */
-        virtual void _injectRenderWithPass( Pass *pass, Renderable *rend, Camera *activeCamera=0,
-                                            bool shadowDerivation = true,
-                                            bool doLightIteration = false );
-
         /** Indicates to the SceneManager whether it should suppress changing
             the RenderSystem states when rendering objects.
         @remarks
@@ -3007,21 +2966,6 @@ namespace Ogre {
         */
         virtual bool _areRenderStateChangesSuppressed(void) const
         { return mSuppressRenderStateChanges; }
-
-        /** Internal method for setting up the renderstate for a rendering pass.
-            @param pass The Pass details to set.
-            @param evenIfSuppressed Sets the pass details even if render state
-                changes are suppressed; if you are using this to manually set state
-                when render state changes are suppressed, you should set this to 
-                true.
-            @param shadowDerivation If false, disables the derivation of shadow
-                passes from original passes
-            @return
-                A Pass object that was used instead of the one passed in, can
-                happen when rendering shadow passes
-        */
-        virtual const Pass* _setPass(const Pass* pass, 
-            bool evenIfSuppressed = false, bool shadowDerivation = true);
         
         /** Method to allow you to mark gpu parameters as dirty, causing them to 
             be updated according to the mask that you set when updateGpuProgramParameters is

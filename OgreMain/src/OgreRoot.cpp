@@ -65,8 +65,10 @@ THE SOFTWARE.
 #include "OgreLodStrategyManager.h"
 #include "Threading/OgreDefaultWorkQueue.h"
 #include "OgreFrameListener.h"
+#include "OgreWireAabb.h"
 #include "OgreNameGenerator.h"
 #include "OgreHlmsManager.h"
+#include "OgreHlmsCompute.h"
 #include "OgreHlmsLowLevel.h"
 #include "Animation/OgreSkeletonManager.h"
 #include "Compositor/OgreCompositorManager2.h"
@@ -258,6 +260,7 @@ namespace Ogre {
 
         mHlmsManager        = OGRE_NEW HlmsManager();
         mHlmsLowLevelProxy  = OGRE_NEW HlmsLowLevel();
+        mHlmsCompute        = OGRE_NEW HlmsCompute( mHlmsLowLevelProxy->_getAutoParamDataSource() );
 
         mCompilerManager = OGRE_NEW ScriptCompilerManager();
 
@@ -279,6 +282,8 @@ namespace Ogre {
         addMovableObjectFactory(mBillboardChainFactory);
         mRibbonTrailFactory = OGRE_NEW v1::RibbonTrailFactory();
         addMovableObjectFactory(mRibbonTrailFactory);
+        mWireAabbFactory = OGRE_NEW WireAabbFactory();
+        addMovableObjectFactory(mWireAabbFactory);
 
         // Load plugins
         if (!pluginFileName.empty())
@@ -348,6 +353,8 @@ namespace Ogre {
         OGRE_DELETE mParticleManager;
 
         OGRE_DELETE mMaterialManager;
+        OGRE_DELETE mHlmsCompute;
+        mHlmsCompute = 0;
         OGRE_DELETE mHlmsLowLevelProxy;
         mHlmsLowLevelProxy = 0;
         mHlmsManager->_changeRenderSystem((RenderSystem*)0);
@@ -369,6 +376,7 @@ namespace Ogre {
         OGRE_DELETE mManualObjectFactory;
         OGRE_DELETE mBillboardChainFactory;
         OGRE_DELETE mRibbonTrailFactory;
+        OGRE_DELETE mWireAabbFactory;
 
         OGRE_DELETE mWorkQueue;
 
@@ -1483,6 +1491,8 @@ namespace Ogre {
 
             if( !mHlmsManager->getHlms( mHlmsLowLevelProxy->getType() ) )
                 mHlmsManager->registerHlms( mHlmsLowLevelProxy, false );
+            if( !mHlmsManager->getComputeHlms() )
+                mHlmsManager->registerComputeHlms( mHlmsCompute );
             // Initialise material manager
             mMaterialManager->initialise();
             mCompositorManager2 = OGRE_NEW CompositorManager2( mActiveRenderer );

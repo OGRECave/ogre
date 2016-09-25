@@ -89,6 +89,7 @@ namespace Ogre {
         HWND    mHWnd;                  // Win32 Window handle
         HDC     mHDC;
         HGLRC   mGlrc;
+        uint32  mColourDepth;
         bool    mIsExternal;
         char*   mDeviceName;
         bool    mIsExternalGLControl;

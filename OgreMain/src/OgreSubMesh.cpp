@@ -44,7 +44,7 @@ namespace v1 {
     SubMesh::SubMesh()
         : useSharedVertices(true)
         , renderOpMeshIndex(++RenderOperation::MeshIndexId)
-        , operationType(RenderOperation::OT_TRIANGLE_LIST)
+        , operationType(OT_TRIANGLE_LIST)
         , parent(0)
         , mMatInitialised(false)
         , mBoneAssignmentsOutOfDate(false)

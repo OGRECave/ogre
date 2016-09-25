@@ -39,36 +39,36 @@
 
 namespace Ogre {
 
-    GLint getGLGeometryInputPrimitiveType(v1::RenderOperation::OperationType operationType, bool requiresAdjacency)
+    GLint getGLGeometryInputPrimitiveType(OperationType operationType, bool requiresAdjacency)
     {
         switch (operationType)
         {
-        case v1::RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             return GL_POINTS;
-        case v1::RenderOperation::OT_LINE_LIST:
+        case OT_LINE_LIST:
             return requiresAdjacency ? GL_LINES_ADJACENCY : GL_LINES;
-        case v1::RenderOperation::OT_LINE_STRIP:
+        case OT_LINE_STRIP:
             return requiresAdjacency ? GL_LINE_STRIP_ADJACENCY : GL_LINES;
         default:
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_STRIP:
             return requiresAdjacency ? GL_TRIANGLE_STRIP_ADJACENCY : GL_TRIANGLES;
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_FAN:
             return requiresAdjacency ? GL_TRIANGLES_ADJACENCY : GL_TRIANGLES;
         }
     }
 
 
-    GLint getGLGeometryOutputPrimitiveType(v1::RenderOperation::OperationType operationType)
+    GLint getGLGeometryOutputPrimitiveType(OperationType operationType)
     {
         switch (operationType)
         {
-        case v1::RenderOperation::OT_POINT_LIST:
+        case OT_POINT_LIST:
             return GL_POINTS;
-        case v1::RenderOperation::OT_LINE_STRIP:
+        case OT_LINE_STRIP:
             return GL_LINE_STRIP;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_STRIP:
             return GL_TRIANGLE_STRIP;
         default:
             OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,

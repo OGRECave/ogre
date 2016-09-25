@@ -1,0 +1,19 @@
+{
+    "compute" :
+    {
+        "TestJob" :
+        {
+            "threads_per_group" : [16, 16, 1],
+            "thread_groups" : [8, 8, 1],
+
+            "source" : "ComputeTest",
+
+            "uav_units" : 1,
+
+            "params" :
+            [
+                ["texResolution",   [128, 128], "uint"]
+            ]
+        }
+    }
+}

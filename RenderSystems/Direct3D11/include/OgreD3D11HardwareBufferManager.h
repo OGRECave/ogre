@@ -40,11 +40,6 @@ namespace v1 {
     protected:
         D3D11Device & mlpD3DDevice;
 
-        /// Internal method for creates a new vertex declaration, may be overridden by certain rendering APIs
-        VertexDeclaration* createVertexDeclarationImpl(void);
-        /// Internal method for destroys a vertex declaration, may be overridden by certain rendering APIs
-        void destroyVertexDeclarationImpl(VertexDeclaration* decl);
-
     public:
         D3D11HardwareBufferManagerBase(D3D11Device & device);
         ~D3D11HardwareBufferManagerBase();

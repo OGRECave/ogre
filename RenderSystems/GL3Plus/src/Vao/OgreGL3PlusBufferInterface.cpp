@@ -77,7 +77,7 @@ namespace Ogre
         {
             //Non-persistent buffers just map the small region they'll need.
             size_t offset = mBuffer->mInternalBufferStart + elementStart +
-                            mBuffer->mNumElements * dynamicCurrentFrame;
+                            mBuffer->_getInternalNumElements() * dynamicCurrentFrame;
             size_t length = elementCount;
 
             if( mBuffer->mBufferType >= BT_DYNAMIC_PERSISTENT && canPersistentMap )
@@ -85,7 +85,7 @@ namespace Ogre
                 //Persistent buffers map the *whole* assigned buffer,
                 //we later care for the offsets and lengths
                 offset = mBuffer->mInternalBufferStart;
-                length = mBuffer->mNumElements * vaoManager->getDynamicBufferMultiplier();
+                length = mBuffer->_getInternalNumElements() * vaoManager->getDynamicBufferMultiplier();
             }
 
             OCGE( glBindBuffer( GL_COPY_WRITE_BUFFER, mVboName ) );
@@ -104,7 +104,8 @@ namespace Ogre
         {
             //For persistent maps, we've mapped the whole 3x size of the buffer. mLastMappingStart
             //points to the right offset so that we can later flush correctly.
-            size_t lastMappingStart = elementStart + mBuffer->mNumElements * dynamicCurrentFrame;
+            size_t lastMappingStart = elementStart +
+                    mBuffer->_getInternalNumElements() * dynamicCurrentFrame;
             mBuffer->mLastMappingStart = lastMappingStart;
             retVal += lastMappingStart * bytesPerElement;
         }
@@ -152,14 +153,14 @@ namespace Ogre
     {
         GL3PlusVaoManager *vaoManager = static_cast<GL3PlusVaoManager*>( mBuffer->mVaoManager );
         size_t dynamicCurrentFrame = mBuffer->mFinalBufferStart - mBuffer->mInternalBufferStart;
-        dynamicCurrentFrame /= mBuffer->mNumElements;
+        dynamicCurrentFrame /= mBuffer->_getInternalNumElements();
 
         dynamicCurrentFrame = (dynamicCurrentFrame + 1) % vaoManager->getDynamicBufferMultiplier();
 
         if( bAdvanceFrame )
         {
             mBuffer->mFinalBufferStart = mBuffer->mInternalBufferStart +
-                                            dynamicCurrentFrame * mBuffer->mNumElements;
+                                            dynamicCurrentFrame * mBuffer->_getInternalNumElements();
         }
 
         return dynamicCurrentFrame;
@@ -169,12 +170,12 @@ namespace Ogre
     {
         GL3PlusVaoManager *vaoManager = static_cast<GL3PlusVaoManager*>( mBuffer->mVaoManager );
         size_t dynamicCurrentFrame = mBuffer->mFinalBufferStart - mBuffer->mInternalBufferStart;
-        dynamicCurrentFrame /= mBuffer->mNumElements;
+        dynamicCurrentFrame /= mBuffer->_getInternalNumElements();
 
         dynamicCurrentFrame = (dynamicCurrentFrame + vaoManager->getDynamicBufferMultiplier() - 1) %
                                 vaoManager->getDynamicBufferMultiplier();
 
         mBuffer->mFinalBufferStart = mBuffer->mInternalBufferStart +
-                                        dynamicCurrentFrame * mBuffer->mNumElements;
+                                        dynamicCurrentFrame * mBuffer->_getInternalNumElements();
     }
 }

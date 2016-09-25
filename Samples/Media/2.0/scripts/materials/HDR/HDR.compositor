@@ -87,7 +87,7 @@ compositor_node HdrPostprocessingNode
 		}
 	}
 	
-	target lumRt0
+	target lumRt0 : discardTarget
 	{
 		pass render_quad
 		{
@@ -97,7 +97,7 @@ compositor_node HdrPostprocessingNode
 		}
 	}
 	
-	target lumRt1
+	target lumRt1 : discardTarget
 	{
 		pass render_quad
 		{

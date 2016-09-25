@@ -71,11 +71,17 @@ namespace Ogre
             mViewport( 0 ),
             mNumPassesLeft( definition->mNumInitialPasses ),
             mParentNode( parentNode ),
+            mTargetTexture( IdString(), &target.textures ),
             mNumValidResourceTransitions( 0 )
     {
         assert( definition->mNumInitialPasses && "Definition is broken, pass will never execute!" );
 
         mTarget = calculateRenderTarget( mDefinition->getRtIndex(), target );
+
+        //TODO: Merging RenderTarget & Texture in a refactor would get rid of these missmatches
+        //between a "target" and a "texture" in mTargetTexture.
+        if( !target.textures.empty() )
+            mTargetTexture.name = IdString( target.textures[0]->getName() );
 
         const Real EPSILON = 1e-6f;
 
@@ -127,19 +133,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorPass::~CompositorPass()
     {
-        RenderSystem *renderSystem = mParentNode->getRenderSystem();
-
-
-        assert( mNumValidResourceTransitions <= mResourceTransitions.size() );
-        ResourceTransitionVec::iterator itor = mResourceTransitions.begin();
-
-        for( size_t i=0; i<mNumValidResourceTransitions; ++i )
-        {
-            renderSystem->_resourceTransitionDestroyed( &(*itor) );
-            ++itor;
-        }
-
-        mNumValidResourceTransitions = 0;
+        _removeAllBarriers();
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::populateTextureDependenciesFromExposedTextures(void)
@@ -360,7 +354,7 @@ namespace Ogre
 
         while( itor != end )
         {
-            RenderTarget *uavRt = boundUavs[itor->uavSlot].renderTarget;
+            GpuResource *uavRt = boundUavs[itor->uavSlot].rttOrBuffer;
 
             if( !uavRt )
             {
@@ -413,6 +407,23 @@ namespace Ogre
 
             ++itor;
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::_removeAllBarriers(void)
+    {
+        assert( mNumValidResourceTransitions <= mResourceTransitions.size() );
+
+        RenderSystem *renderSystem = mParentNode->getRenderSystem();
+        ResourceTransitionVec::iterator itor = mResourceTransitions.begin();
+
+        for( size_t i=0; i<mNumValidResourceTransitions; ++i )
+        {
+            renderSystem->_resourceTransitionDestroyed( &(*itor) );
+            ++itor;
+        }
+
+        mNumValidResourceTransitions = 0;
+        mResourceTransitions.clear();
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::notifyRecreated( const CompositorChannel &oldChannel,
@@ -472,10 +483,18 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void CompositorPass::notifyRecreated( const UavBufferPacked *oldBuffer, UavBufferPacked *newBuffer )
+    {
+    }
+    //-----------------------------------------------------------------------------------
     void CompositorPass::notifyDestroyed( const CompositorChannel &channel )
     {
         if( mTarget == calculateRenderTarget( mDefinition->getRtIndex(), channel ) )
             mTarget = 0;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorPass::notifyDestroyed( const UavBufferPacked *buffer )
+    {
     }
     //-----------------------------------------------------------------------------------
     void CompositorPass::notifyCleared(void)

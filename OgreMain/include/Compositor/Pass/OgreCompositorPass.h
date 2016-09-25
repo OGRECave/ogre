@@ -66,7 +66,7 @@ namespace Ogre
 
     struct BoundUav
     {
-        RenderTarget                    *renderTarget;
+        GpuResource                    *rttOrBuffer;
         ResourceAccess::ResourceAccess  boundAccess;
     };
 
@@ -93,6 +93,7 @@ namespace Ogre
 
         CompositorNode  *mParentNode;
 
+        CompositorTexture       mTargetTexture;
         CompositorTextureVec    mTextureDependencies;
 
         typedef vector<ResourceTransition>::type ResourceTransitionVec;
@@ -144,13 +145,16 @@ namespace Ogre
         virtual void _placeBarriersAndEmulateUavExecution( BoundUav boundUavs[64],
                                                            ResourceAccessMap &uavsAccess,
                                                            ResourceLayoutMap &resourcesLayout );
+        void _removeAllBarriers(void);
 
         /// @See CompositorNode::notifyRecreated
         virtual void notifyRecreated( const CompositorChannel &oldChannel,
                                         const CompositorChannel &newChannel );
+        virtual void notifyRecreated( const UavBufferPacked *oldBuffer, UavBufferPacked *newBuffer );
 
         /// @See CompositorNode::notifyDestroyed
         virtual void notifyDestroyed( const CompositorChannel &channel );
+        virtual void notifyDestroyed( const UavBufferPacked *buffer );
 
         /// @See CompositorNode::_notifyCleared
         virtual void notifyCleared(void);
@@ -167,6 +171,7 @@ namespace Ogre
 
 		const CompositorNode* getParentNode(void) const		{ return mParentNode; }
 
+        const CompositorTexture& getTargetTexture(void) const           { return mTargetTexture; }
         const CompositorTextureVec& getTextureDependencies(void) const  { return mTextureDependencies; }
     };
 

@@ -10,17 +10,23 @@ fragment_program B&W_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program B&W_ps_Metal metal
+{
+	source GrayScale_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program B&W_ps unified
 {
 	delegate B&W_ps_GLSL
 	delegate B&W_ps_HLSL
+	delegate B&W_ps_Metal
 }
 
 material Postprocess/BlackAndWhite
 {
 	technique
 	{
-
 		pass
 		{
 			depth_check off

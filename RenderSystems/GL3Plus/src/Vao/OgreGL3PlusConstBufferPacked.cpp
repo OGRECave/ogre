@@ -33,10 +33,10 @@ namespace Ogre
 {
     GL3PlusConstBufferPacked::GL3PlusConstBufferPacked(
                 size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                BufferType bufferType, void *initialData, bool keepAsShadow,
-                VaoManager *vaoManager, BufferInterface *bufferInterface , size_t bindableSize ) :
-        ConstBufferPacked( internalBufferStartBytes, numElements, bytesPerElement, bufferType,
-                           initialData, keepAsShadow, vaoManager, bufferInterface, bindableSize )
+                uint32 numElementsPadding, BufferType bufferType, void *initialData, bool keepAsShadow,
+                VaoManager *vaoManager, BufferInterface *bufferInterface ) :
+        ConstBufferPacked( internalBufferStartBytes, numElements, bytesPerElement, numElementsPadding,
+                           bufferType, initialData, keepAsShadow, vaoManager, bufferInterface )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -53,7 +53,7 @@ namespace Ogre
 
         OCGE(
           glBindBufferRange( GL_UNIFORM_BUFFER, slot, bufferInterface->getVboName(),
-                             mFinalBufferStart * mBytesPerElement, mBindableSizeBytes ) );
+                             mFinalBufferStart * mBytesPerElement, mNumElements * mBytesPerElement ) );
     }
     //-----------------------------------------------------------------------------------
     void GL3PlusConstBufferPacked::bindBufferVS( uint16 slot )

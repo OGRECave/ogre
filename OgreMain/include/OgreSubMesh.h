@@ -75,7 +75,7 @@ namespace v1 {
         uint32 renderOpMeshIndex;
 
         /// The render operation type used to render this submesh
-        RenderOperation::OperationType operationType;
+        OperationType operationType;
 
         /** Dedicated vertex data (only valid if useSharedVertices = false).
             [0] is for the regular pass, [1] is for the caster. Note that

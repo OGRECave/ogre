@@ -42,6 +42,14 @@ THE SOFTWARE.
 namespace Ogre {
     class _OgreD3D11Export D3D11Texture : public Texture
     {
+        struct CachedUavView
+        {
+            ID3D11UnorderedAccessView   *uavView;
+            int32           mipmapLevel;
+            int32           textureArrayIndex;
+            PixelFormat     pixelFormat;
+        };
+
 	public:
 		/// constructor 
 		D3D11Texture(ResourceManager* creator, const String& name, ResourceHandle handle,
@@ -63,6 +71,9 @@ namespace Ogre {
 		/// retrieves a pointer to the actual texture
         ID3D11ShaderResourceView *getTexture();
 		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
+
+        ID3D11UnorderedAccessView* getUavView( int32 mipmapLevel, int32 textureArrayIndex,
+                                               PixelFormat pixelFormat );
 
 		ID3D11Texture1D * GetTex1D() { return mp1DTex; };
 		ID3D11Texture2D * GetTex2D() { return mp2DTex; };
@@ -90,6 +101,8 @@ namespace Ogre {
 		ID3D11Resource 	*mpTex;
 
         ID3D11ShaderResourceView* mpShaderResourceView;
+        CachedUavView  mCachedUavViews[4];
+        uint8          mCurrentCacheCursor;
 
         bool mAutoMipMapGeneration;
 
@@ -113,6 +126,10 @@ namespace Ogre {
         void _create1DResourceView();
         void _create2DResourceView();
         void _create3DResourceView();
+
+        ID3D11UnorderedAccessView* createUavView( int cacheIdx, int32 mipmapLevel,
+                                                  int32 textureArrayIndex,
+                                                  PixelFormat pixelFormat );
 
         // is dynamic
         bool mIsDynamic; 

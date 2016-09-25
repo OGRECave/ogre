@@ -350,19 +350,27 @@ namespace Ogre
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
                                              RenderTarget *finalRenderTarget, Camera *defaultCam,
                                              IdString definitionName, bool bEnabled, int position,
+                                             const UavBufferPackedVec *uavBuffers,
+                                             const ResourceLayoutMap* initialLayouts,
+                                             const ResourceAccessMap* initialUavAccess,
                                              const Vector4 &vpOffsetScale,
                                              uint8 vpModifierMask, uint8 executionMask )
     {
-        CompositorChannel channel;
-        channel.target = finalRenderTarget;
-        return addWorkspace( sceneManager, channel, defaultCam, definitionName, bEnabled, position,
+        CompositorChannelVec channels;
+        channels.push_back( CompositorChannel() );
+        channels.back().target = finalRenderTarget;
+        return addWorkspace( sceneManager, channels, defaultCam, definitionName, bEnabled, position,
+                             uavBuffers, initialLayouts, initialUavAccess,
                              vpOffsetScale, vpModifierMask, executionMask );
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
-                                             const CompositorChannel &finalRenderTarget,
+                                             const CompositorChannelVec &externalRenderTargets,
                                              Camera *defaultCam, IdString definitionName,
                                              bool bEnabled, int position,
+                                             const UavBufferPackedVec *uavBuffers,
+                                             const ResourceLayoutMap* initialLayouts,
+                                             const ResourceAccessMap* initialUavAccess,
                                              const Vector4 &vpOffsetScale,
                                              uint8 vpModifierMask, uint8 executionMask )
     {
@@ -381,8 +389,9 @@ namespace Ogre
         {
             workspace = OGRE_NEW CompositorWorkspace(
                                 Id::generateNewId<CompositorWorkspace>(), itor->second,
-                                finalRenderTarget, sceneManager, defaultCam, mRenderSystem,
-                                bEnabled, executionMask, vpModifierMask, vpOffsetScale );
+                                externalRenderTargets, sceneManager, defaultCam, mRenderSystem,
+                                bEnabled, executionMask, vpModifierMask, vpOffsetScale,
+                                uavBuffers, initialLayouts, initialUavAccess );
 
             mQueuedWorkspaces.push_back( QueuedWorkspace( workspace, position ) );
         }
@@ -599,24 +608,18 @@ namespace Ogre
         WorkspaceVec::const_iterator end  = mWorkspaces.end();
 
         vector<RenderTarget*>::type swappedTargets;
-        swappedTargets.reserve( mWorkspaces.size() );
+        swappedTargets.reserve( mWorkspaces.size() * 2u );
 
         while( itor != end )
         {
             CompositorWorkspace *workspace = (*itor);
-
-            RenderTarget *finalTarget = workspace->getFinalTarget();
-            bool alreadySwapped = std::find( swappedTargets.begin(),
-                                             swappedTargets.end(), finalTarget ) != swappedTargets.end();
-
-            if( workspace->getEnabled() && workspace->isValid() && !alreadySwapped )
-            {
-                workspace->_swapFinalTarget();
-                swappedTargets.push_back( finalTarget );
-            }
+            if( workspace->getEnabled() && workspace->isValid() )
+                workspace->_swapFinalTarget( swappedTargets );
 
             ++itor;
         }
+
+        mRenderSystem->_endFrameOnce();
     }
     //-----------------------------------------------------------------------------------
     void CompositorManager2::createBasicWorkspaceDef( const IdString &workspaceDefName,
@@ -648,7 +651,7 @@ namespace Ogre
         }
 
         CompositorWorkspaceDef *workDef = this->addWorkspaceDefinition( workspaceDefName );
-        workDef->connectOutput( nodeDef->getName(), 0 );
+        workDef->connectExternal( 0, nodeDef->getName(), 0 );
     }
     //-----------------------------------------------------------------------------------
     void CompositorManager2::setCompositorPassProvider( CompositorPassProvider *passProvider )

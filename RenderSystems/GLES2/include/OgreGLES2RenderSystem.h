@@ -482,7 +482,6 @@ namespace Ogre {
             GLint convertCompareFunction(CompareFunction func) const;
             GLint convertStencilOp(StencilOperation op, bool invert = false) const;
 
-            void bindGpuProgram(GpuProgram* prg);
             void unbindGpuProgram(GpuProgramType gptype);
             void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
             void bindGpuProgramPassIterationParameters(GpuProgramType gptype);

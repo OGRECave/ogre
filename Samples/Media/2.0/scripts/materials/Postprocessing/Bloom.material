@@ -72,27 +72,55 @@ fragment_program BrightBloom_ps_HLSL hlsl
 }
 
 //------------------------
+//Metal Definitions
+//------------------------
+fragment_program BlurV_ps_Metal metal
+{
+	source BlurV_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+fragment_program BlurH_ps_Metal metal
+{
+	source BlurH_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+fragment_program Bloom_ps_Metal metal
+{
+	source Bloom_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+fragment_program BrightBloom_ps_Metal metal
+{
+	source BrightBloom_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+//------------------------
 //Unified Definitions
 //------------------------
 fragment_program Bloom_ps unified
 {
 	delegate Bloom_ps_HLSL
 	delegate Bloom_ps_GLSL
+	delegate Bloom_ps_Metal
 }
 fragment_program BlurV_ps unified
 {
 	delegate BlurV_ps_HLSL
 	delegate BlurV_ps_GLSL
+	delegate BlurV_ps_Metal
 }
 fragment_program BlurH_ps unified
 {
 	delegate BlurH_ps_HLSL
 	delegate BlurH_ps_GLSL
+	delegate BlurH_ps_Metal
 }
 fragment_program BrightBloom_ps unified
 {
 	delegate BrightBloom_ps_HLSL
 	delegate BrightBloom_ps_GLSL
+	delegate BrightBloom_ps_Metal
 }
 
 

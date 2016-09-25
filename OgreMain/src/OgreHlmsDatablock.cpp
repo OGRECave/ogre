@@ -208,6 +208,12 @@ namespace Ogre
                 setMacroblock( mMacroblock[0], true );
             }
         }
+
+        //Force the flush. It's tricky to check if we need this because the new block may
+        //be different but be assigned a different ID (old one's API construct was already
+        //destroyed) or be equal but have a different ID. It's not random or chaotic and
+        //there are guarantees, but it's tricky to get it right and not worth it.
+        flushRenderables();
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setMacroblock( const HlmsMacroblock *macroblock, bool casterBlock )
@@ -237,6 +243,12 @@ namespace Ogre
                 setMacroblock( mMacroblock[0], true );
             }
         }
+
+        //Force the flush. It's tricky to check if we need this because the new block may
+        //be different but be assigned a different ID (old one's API construct was already
+        //destroyed) or be equal but have a different ID. It's not random or chaotic and
+        //there are guarantees, but it's tricky to get it right and not worth it.
+        flushRenderables();
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setBlendblock( const HlmsBlendblock &blendblock, bool casterBlock )
@@ -252,6 +264,12 @@ namespace Ogre
 
         if( !casterBlock )
             setBlendblock( mBlendblock[0], true );
+
+        //Force the flush. It's tricky to check if we need this because the new block may
+        //be different but be assigned a different ID (old one's API construct was already
+        //destroyed) or be equal but have a different ID. It's not random or chaotic and
+        //there are guarantees, but it's tricky to get it right and not worth it.
+        flushRenderables();
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setBlendblock( const HlmsBlendblock *blendblock, bool casterBlock )
@@ -266,6 +284,12 @@ namespace Ogre
 
         if( !casterBlock )
             setBlendblock( mBlendblock[0], true );
+
+        //Force the flush. It's tricky to check if we need this because the new block may
+        //be different but be assigned a different ID (old one's API construct was already
+        //destroyed) or be equal but have a different ID. It's not random or chaotic and
+        //there are guarantees, but it's tricky to get it right and not worth it.
+        flushRenderables();
     }
     //-----------------------------------------------------------------------------------
     void HlmsDatablock::setAlphaTest( CompareFunction compareFunction )

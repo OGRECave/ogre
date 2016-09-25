@@ -513,6 +513,7 @@ namespace Ogre
             MATERIAL,
             GPU_PROGRAM,
             UAV,
+            UAV_BUFFER,
             COMPOSITOR
         };
         ResourceType mResourceType;
@@ -811,11 +812,17 @@ namespace Ogre
         ID_WORKSPACE,
             ID_ALIAS,
             ID_CONNECT,
+            ID_CONNECT_BUFFER,
             ID_CONNECT_OUTPUT,
+            ID_CONNECT_EXTERNAL,
+            ID_CONNECT_BUFFER_EXTERNAL,
         ID_COMPOSITOR_NODE,
             ID_IN,
             ID_OUT,
+            ID_IN_BUFFER,
+            ID_OUT_BUFFER,
             ID_CUSTOM_ID,
+            ID_BUFFER,
         //  ID_TEXTURE,
                 ID_TARGET_WIDTH,
                 ID_TARGET_HEIGHT,
@@ -887,9 +894,13 @@ namespace Ogre
                     ID_DISCARD_ONLY,
 
                     ID_CHECK,
-                    ID_COMP_FUNC,
                     ID_REF_VALUE,
                     ID_MASK,
+                    ID_READ_MASK,
+                    ID_BOTH,
+                    ID_FRONT,
+                    ID_BACK,
+                        ID_COMP_FUNC,
                     ID_FAIL_OP,
                         ID_KEEP,
                         ID_INCREMENT,
@@ -901,14 +912,18 @@ namespace Ogre
                     ID_PASS_OP,
                     ID_TWO_SIDED,
 
-                    //Used by PASS_UAV
+                    //Used by PASS_UAV (& PASS_COMPUTE)
                     ID_UAV,
                     ID_UAV_EXTERNAL,
+                    ID_UAV_BUFFER,
                     ID_STARTING_SLOT,
                     ID_KEEP_PREVIOUS_UAV,
                     ID_READ,
                     ID_WRITE,
                     ID_MIPMAP,
+
+                    //Used by PASS_COMPUTE
+                    ID_JOB,
 
             ID_READ_BACK_AS_TEXTURE,
 

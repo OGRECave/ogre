@@ -29,11 +29,24 @@ fragment_program ReconstructPosFromDepth_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
+// Metal shaders
+vertex_program ReconstructPosFromDepth_vs_Metal metal
+{
+	source ReconstructPosFromDepth_vs.metal
+}
+
+fragment_program ReconstructPosFromDepth_ps_Metal metal
+{
+	source ReconstructPosFromDepth_ps.metal
+	shader_reflection_pair_hint ReconstructPosFromDepth_vs_Metal
+}
+
 // Unified definitions
 vertex_program ReconstructPosFromDepth_vs unified
 {
 	delegate ReconstructPosFromDepth_vs_HLSL
 	delegate ReconstructPosFromDepth_vs_GLSL
+	delegate ReconstructPosFromDepth_vs_Metal
 	
 	default_params
     {
@@ -45,6 +58,7 @@ fragment_program ReconstructPosFromDepth_ps unified
 {
 	delegate ReconstructPosFromDepth_ps_HLSL
 	delegate ReconstructPosFromDepth_ps_GLSL
+	delegate ReconstructPosFromDepth_ps_Metal
 }
 
 // Material definition

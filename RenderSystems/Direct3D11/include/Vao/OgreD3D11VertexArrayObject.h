@@ -42,11 +42,10 @@ namespace Ogre
         UINT            mOffsets[16];
         ID3D11Buffer    *mIndexBuffer;
         DXGI_FORMAT     mIndexFormat;
-        D3D11_PRIMITIVE_TOPOLOGY mPrimType[3];
 
         D3D11VertexArrayObjectShared( const VertexBufferPackedVec &vertexBuffers,
                                       IndexBufferPacked *indexBuffer,
-                                      v1::RenderOperation::OperationType opType,
+                                      OperationType opType,
                                       VertexBufferPacked *drawId );
     };
 
@@ -54,12 +53,13 @@ namespace Ogre
     {
         D3D11VertexArrayObjectShared    *mSharedData;
 
-        D3D11VertexArrayObject( uint32 vaoName, uint32 renderQueueId,
+        D3D11VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint8 inputLayoutId,
                                 const VertexBufferPackedVec &vertexBuffers,
                                 IndexBufferPacked *indexBuffer,
-                                v1::RenderOperation::OperationType opType,
+                                OperationType opType,
                                 D3D11VertexArrayObjectShared *sharedData ) :
-            VertexArrayObject( vaoName, renderQueueId, vertexBuffers, indexBuffer, opType ),
+            VertexArrayObject( vaoName, renderQueueId, inputLayoutId,
+                               vertexBuffers, indexBuffer, opType ),
             mSharedData( sharedData )
         {
         }

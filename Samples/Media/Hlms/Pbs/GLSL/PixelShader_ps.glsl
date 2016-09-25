@@ -6,10 +6,12 @@
 
 layout(std140) uniform;
 #define FRAG_COLOR		0
-@property( !hlms_shadowcaster )
-layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
-@end @property( hlms_shadowcaster && !hlms_shadow_uses_depth_texture )
-layout(location = FRAG_COLOR, index = 0) out float outColour;
+@property( !hlms_render_depth_only )
+	@property( !hlms_shadowcaster )
+	layout(location = FRAG_COLOR, index = 0) out vec4 outColour;
+	@end @property( hlms_shadowcaster )
+	layout(location = FRAG_COLOR, index = 0) out float outColour;
+	@end
 @end
 
 @property( hlms_vpos )
@@ -46,7 +48,7 @@ in block
 /*layout(binding = 2) */uniform samplerBuffer f3dLightList;@end
 @property( !roughness_map )#define ROUGHNESS material.kS.w@end
 @property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
-@property( envprobe_map )uniform samplerCube	texEnvProbeMap;@end
+@property( use_envprobe_map )uniform samplerCube	texEnvProbeMap;@end
 
 @property( diffuse_map )	uint diffuseIdx;@end
 @property( normal_map_tex )	uint normalIdx;@end
@@ -57,7 +59,7 @@ in block
 	@property( detail_map@n )uint detailMapIdx@n;@end @end
 @foreach( 4, n )
 	@property( detail_map_nm@n )uint detailNormMapIdx@n;@end @end
-@property( envprobe_map )	uint envMapIdx;@end
+@property( use_envprobe_map )	uint envMapIdx;@end
 
 vec4 diffuseCol;
 @property( specular_map && !metallic_workflow && !fresnel_workflow )vec3 specularCol;@end
@@ -243,7 +245,7 @@ void main()
 @property( detail_map_nm1 )	detailNormMapIdx1	= material.indices4_7.y & 0x0000FFFFu;@end
 @property( detail_map_nm2 )	detailNormMapIdx2	= material.indices4_7.y >> 16u;@end
 @property( detail_map_nm3 )	detailNormMapIdx3	= material.indices4_7.z & 0x0000FFFFu;@end
-@property( envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
+@property( use_envprobe_map )	envMapIdx			= material.indices4_7.z >> 16u;@end
 
 	@insertpiece( custom_ps_posMaterialLoad )
 
@@ -347,7 +349,7 @@ void main()
 @end
 
 	//Everything's in Camera space
-@property( hlms_lights_spot || ambient_hemisphere || envprobe_map || hlms_forward3d )
+@property( hlms_lights_spot || ambient_hemisphere || use_envprobe_map || hlms_forward3d )
 	vec3 viewDir	= normalize( -inPs.pos );
 	float NdotV		= clamp( dot( nNormal, viewDir ), 0.0, 1.0 );@end
 
@@ -413,10 +415,10 @@ void main()
 
 @insertpiece( forward3dLighting )
 
-@property( envprobe_map || ambient_hemisphere )
+@property( use_envprobe_map || ambient_hemisphere )
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
-	@property( envprobe_map )
+	@property( use_envprobe_map )
 		vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
 		vec3 envColourD = textureLod( texEnvProbeMap, nNormal * pass.invViewMatCubemap, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
 		@property( !hw_gamma_read )	//Gamma to linear space
@@ -428,10 +430,10 @@ void main()
 		float ambientWD = dot( pass.ambientHemisphereDir.xyz, nNormal ) * 0.5 + 0.5;
 		float ambientWS = dot( pass.ambientHemisphereDir.xyz, reflDir ) * 0.5 + 0.5;
 
-		@property( envprobe_map )
+		@property( use_envprobe_map )
 			envColourS	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			envColourD	+= mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
-		@end @property( !envprobe_map )
+		@end @property( !use_envprobe_map )
 			vec3 envColourS = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWD );
 			vec3 envColourD = mix( pass.ambientLowerHemi.xyz, pass.ambientUpperHemi.xyz, ambientWS );
 		@end
@@ -439,37 +441,37 @@ void main()
 
 	@insertpiece( BRDF_EnvMap )
 @end
-@property( !hw_gamma_write )
-	//Linear to Gamma space
-	outColour.xyz	= sqrt( finalColour );
-@end @property( hw_gamma_write )
-	outColour.xyz	= finalColour;
-@end
 
-@property( hlms_alphablend )
-	@property( use_texture_alpha )
-		outColour.w		= material.F0.w * diffuseCol.w;
-	@end @property( !use_texture_alpha )
-		outColour.w		= material.F0.w;
+@property( !hlms_render_depth_only )
+	@property( !hw_gamma_write )
+		//Linear to Gamma space
+		outColour.xyz	= sqrt( finalColour );
+	@end @property( hw_gamma_write )
+		outColour.xyz	= finalColour;
 	@end
-@end @property( !hlms_alphablend )
-	outColour.w		= 1.0;@end
 
-@end @property( !hlms_normal && !hlms_qtangent )
-	outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+	@property( hlms_alphablend )
+		@property( use_texture_alpha )
+			outColour.w		= material.F0.w * diffuseCol.w;
+		@end @property( !use_texture_alpha )
+			outColour.w		= material.F0.w;
+		@end
+	@end @property( !hlms_alphablend )
+		outColour.w		= 1.0;@end
+
+	@end @property( !hlms_normal && !hlms_qtangent )
+		outColour = vec4( 1.0, 1.0, 1.0, 1.0 );
+	@end
 @end
 
 	@insertpiece( custom_ps_posExecution )
 }
 @end
 @property( hlms_shadowcaster )
-	@property( hlms_shadow_uses_depth_texture && !alpha_test )
-		@set( hlms_disable_stage, 1 )
-	@end
 
 @property( alpha_test )
 	Material material;
-	@property( detail_maps_diffuse )float diffuseCol;@end
+	float diffuseCol;
 	@property( num_textures )uniform sampler2DArray textureMaps[@value( num_textures )];@end
 	@property( diffuse_map )uint diffuseIdx;@end
 	@property( detail_weight_map )uint weightMapIdx;@end
@@ -517,7 +519,7 @@ void main()
 	/// 'insertpiece( SampleDiffuseMap )' must've written to diffuseCol. However if there are no
 	/// diffuse maps, we must initialize it to some value. If there are no diffuse or detail maps,
 	/// we must not access diffuseCol at all, but rather use material.kD directly (see piece( kD ) ).
-	@property( !diffuse_map && detail_maps_diffuse )diffuseCol = material.bgDiffuse.w;@end
+	@property( !diffuse_map )diffuseCol = material.bgDiffuse.w;@end
 
 	/// Blend the detail diffuse maps with the main diffuse.
 @foreach( detail_maps_diffuse, n )
@@ -530,7 +532,7 @@ void main()
 		discard;
 @end /// !alpha_test
 
-@property( !hlms_shadow_uses_depth_texture )
+@property( !hlms_render_depth_only )
 	@property( GL3+ )outColour = inPs.depth;@end
 	@property( !GL3+ )gl_FragColor.x = inPs.depth;@end
 @end

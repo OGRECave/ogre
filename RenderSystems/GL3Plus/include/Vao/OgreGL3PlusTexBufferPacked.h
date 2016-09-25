@@ -45,10 +45,11 @@ namespace Ogre
 
     public:
         GL3PlusTexBufferPacked( size_t internalBufStartBytes, size_t numElements, uint32 bytesPerElement,
-                                BufferType bufferType, void *initialData, bool keepAsShadow,
+                                uint32 numElementsPadding, BufferType bufferType,
+                                void *initialData, bool keepAsShadow,
                                 VaoManager *vaoManager, GL3PlusBufferInterface *bufferInterface,
                                 Ogre::PixelFormat pf );
-        ~GL3PlusTexBufferPacked();
+        virtual ~GL3PlusTexBufferPacked();
 
         virtual void bindBufferVS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );
         virtual void bindBufferPS( uint16 slot, size_t offset=0, size_t sizeBytes=0 );

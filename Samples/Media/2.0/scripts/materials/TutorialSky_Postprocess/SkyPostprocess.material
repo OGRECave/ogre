@@ -38,17 +38,35 @@ fragment_program SkyPostprocess_ps_HLSL hlsl
 	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
 }
 
+// Metal shaders
+vertex_program SkyPostprocess_vs_Metal metal
+{
+	source SkyPostprocess_vs.metal
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+
+fragment_program SkyPostprocess_ps_Metal metal
+{
+	source SkyPostprocess_ps.metal
+	shader_reflection_pair_hint SkyPostprocess_vs_Metal
+}
+
 // Unified definitions
 vertex_program SkyPostprocess_vs unified
 {
 	delegate SkyPostprocess_vs_HLSL
 	delegate SkyPostprocess_vs_GLSL
+	delegate SkyPostprocess_vs_Metal
 }
 
 fragment_program SkyPostprocess_ps unified
 {
 	delegate SkyPostprocess_ps_HLSL
 	delegate SkyPostprocess_ps_GLSL
+	delegate SkyPostprocess_ps_Metal
 }
 
 // Material definition

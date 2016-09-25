@@ -408,9 +408,9 @@ namespace Ogre
         case DXGI_FORMAT_R16G16B16A16_TYPELESS:     return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16B16A16_FLOAT:        return PF_FLOAT16_RGBA;
         case DXGI_FORMAT_R16G16B16A16_UNORM:        return PF_SHORT_RGBA;
-        case DXGI_FORMAT_R16G16B16A16_UINT:         return PF_UNKNOWN;
+        case DXGI_FORMAT_R16G16B16A16_UINT:         return PF_R16G16B16A16_UINT;
         case DXGI_FORMAT_R16G16B16A16_SNORM:        return PF_R16G16B16A16_SNORM;
-        case DXGI_FORMAT_R16G16B16A16_SINT:         return PF_UNKNOWN;
+        case DXGI_FORMAT_R16G16B16A16_SINT:         return PF_R16G16B16A16_SINT;
         case DXGI_FORMAT_R32G32_TYPELESS:           return PF_UNKNOWN;
         case DXGI_FORMAT_R32G32_FLOAT:              return PF_UNKNOWN;
         case DXGI_FORMAT_R32G32_UINT:               return PF_UNKNOWN;
@@ -426,14 +426,14 @@ namespace Ogre
         case DXGI_FORMAT_R8G8B8A8_TYPELESS:         return PF_UNKNOWN;
         case DXGI_FORMAT_R8G8B8A8_UNORM:            return PF_A8B8G8R8;
         case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:       return PF_A8B8G8R8;
-        case DXGI_FORMAT_R8G8B8A8_UINT:             return PF_UNKNOWN;
+        case DXGI_FORMAT_R8G8B8A8_UINT:             return PF_R8G8B8A8_UINT;
         case DXGI_FORMAT_R8G8B8A8_SNORM:            return PF_R8G8B8A8_SNORM;
-        case DXGI_FORMAT_R8G8B8A8_SINT:             return PF_UNKNOWN;
+        case DXGI_FORMAT_R8G8B8A8_SINT:             return PF_R8G8B8A8_SINT;
         case DXGI_FORMAT_R16G16_TYPELESS:           return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_FLOAT:              return PF_UNKNOWN;
         case DXGI_FORMAT_R16G16_UNORM:              return PF_SHORT_GR;
-        case DXGI_FORMAT_R16G16_UINT:               return PF_UNKNOWN;
-        case DXGI_FORMAT_R16G16_SNORM:              return PF_UNKNOWN;
+        case DXGI_FORMAT_R16G16_UINT:               return PF_R16G16_UINT;
+        case DXGI_FORMAT_R16G16_SNORM:              return PF_R16G16_SNORM;
         case DXGI_FORMAT_R16G16_SINT:               return PF_R16G16_SINT;
         case DXGI_FORMAT_R32_TYPELESS:              return PF_UNKNOWN;
         case DXGI_FORMAT_D32_FLOAT:                 return PF_D32_FLOAT;
@@ -536,13 +536,17 @@ namespace Ogre
         case PF_R8G8B8:         return DXGI_FORMAT_UNKNOWN;
         case PF_A8R8G8B8:       return DXGI_FORMAT_B8G8R8A8_UNORM;
         case PF_A8B8G8R8:       return DXGI_FORMAT_R8G8B8A8_UNORM;
+        case PF_R8G8B8A8_SNORM: return DXGI_FORMAT_R8G8B8A8_SNORM;
+        case PF_R8G8B8A8_UINT:  return DXGI_FORMAT_R8G8B8A8_UINT;
+        case PF_R8G8B8A8_SINT:  return DXGI_FORMAT_R8G8B8A8_SINT;
         case PF_X8R8G8B8:       return DXGI_FORMAT_UNKNOWN;
         case PF_X8B8G8R8:       return DXGI_FORMAT_UNKNOWN;
-        case PF_R8G8B8A8_SNORM: return DXGI_FORMAT_R8G8B8A8_SNORM;
         case PF_A2B10G10R10:    return DXGI_FORMAT_R10G10B10A2_UNORM;
         case PF_A2R10G10B10:    return DXGI_FORMAT_R10G10B10A2_UNORM;
         case PF_R16G16B16_SNORM:return DXGI_FORMAT_R16G16B16A16_SNORM;
         case PF_R16G16B16A16_SNORM: return DXGI_FORMAT_R16G16B16A16_SNORM;
+        case PF_R16G16B16A16_UINT: return DXGI_FORMAT_R16G16B16A16_UINT;
+        case PF_R16G16B16A16_SINT: return DXGI_FORMAT_R16G16B16A16_SINT;
         case PF_FLOAT16_R:      return DXGI_FORMAT_R16_FLOAT;
         case PF_FLOAT16_RGBA:   return DXGI_FORMAT_R16G16B16A16_FLOAT;
         case PF_FLOAT32_R:      return DXGI_FORMAT_R32_FLOAT;
@@ -564,6 +568,8 @@ namespace Ogre
         case PF_BC7_UNORM:      return DXGI_FORMAT_BC7_UNORM;
         case PF_BC7_UNORM_SRGB: return DXGI_FORMAT_BC7_UNORM_SRGB;
         case PF_R16G16_SINT:    return DXGI_FORMAT_R16G16_SINT;
+        case PF_R16G16_UINT:    return DXGI_FORMAT_R16G16_UINT;
+        case PF_R16G16_SNORM:   return DXGI_FORMAT_R16G16_SNORM;
         case PF_RG8:            return DXGI_FORMAT_R8G8_UNORM;
         case PF_R8G8_SINT:      return DXGI_FORMAT_R8G8_SINT;
         case PF_R8G8_UINT:      return DXGI_FORMAT_R8G8_UINT;
@@ -657,7 +663,7 @@ namespace Ogre
 			case DXGI_FORMAT_R10G10B10A2_TYPELESS:
 			case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
 			case DXGI_FORMAT_R8G8B8A8_TYPELESS:
-			case DXGI_FORMAT_R16G16_TYPELESS:
+            case DXGI_FORMAT_R16G16_TYPELESS:
 			case DXGI_FORMAT_R32_TYPELESS:
 			case DXGI_FORMAT_D32_FLOAT:
 			case DXGI_FORMAT_R24G8_TYPELESS:

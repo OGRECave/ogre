@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgrePrerequisites.h"
 
 #include "OgrePixelFormat.h"
+#include "OgreResourceTransition.h"
 #include "OgreHeaderPrefix.h"
 
 /* Define the number of priority groups for the render system's render targets. */
@@ -59,7 +60,7 @@ namespace Ogre {
         @version
             1.0
      */
-    class _OgreExport RenderTarget : public RenderSysAlloc
+    class _OgreExport RenderTarget : public GpuResource, public RenderSysAlloc
     {
     public:
         enum StatFlags
@@ -98,7 +99,10 @@ namespace Ogre {
 
         virtual uint32 getWidth(void) const;
         virtual uint32 getHeight(void) const;
-        virtual uint32 getColourDepth(void) const;
+        PixelFormat getFormat(void) const;
+
+        virtual void getFormatsForPso( PixelFormat outFormats[OGRE_MAX_MULTIPLE_RENDER_TARGETS],
+                                       bool outHwGamma[OGRE_MAX_MULTIPLE_RENDER_TARGETS] ) const;
 
         /**
          * Sets the pool ID this RenderTarget should query from. Default value is POOL_DEFAULT.
@@ -415,7 +419,7 @@ namespace Ogre {
 
         uint32 mWidth;
         uint32 mHeight;
-        uint32 mColourDepth;
+        PixelFormat mFormat;
         uint16      mDepthBufferPoolId;
         bool        mPreferDepthTexture;
         PixelFormat mDesiredDepthBufferFormat;

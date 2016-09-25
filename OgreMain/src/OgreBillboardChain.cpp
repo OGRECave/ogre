@@ -726,7 +726,7 @@ namespace v1 {
     void BillboardChain::getRenderOperation(RenderOperation& op, bool casterPass)
 	{
 		op.indexData = mIndexData;
-		op.operationType = RenderOperation::OT_TRIANGLE_LIST;
+        op.operationType = OT_TRIANGLE_LIST;
 #if OGRE_DEBUG_MODE
 		op.srcRenderable = this;
 #endif

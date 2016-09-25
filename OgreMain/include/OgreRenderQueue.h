@@ -140,8 +140,6 @@ namespace Ogre {
         VaoManager  *mVaoManager;
 
         bool                    mLastWasCasterPass;
-        HlmsMacroblock const    *mLastMacroblock;
-        HlmsBlendblock const    *mLastBlendblock;
         uint32                  mLastVaoName;
         v1::VertexData const    *mLastVertexData;
         v1::IndexData const     *mLastIndexData;

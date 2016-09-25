@@ -10,10 +10,17 @@ fragment_program Postprocess/RadialBlur_ps_HLSL hlsl
 	entry_point main
 }
 
+fragment_program Postprocess/RadialBlur_ps_Metal metal
+{
+	source RadialBlur_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
 fragment_program Postprocess/RadialBlur_ps unified
 {
 	delegate Postprocess/RadialBlur_ps_GLSL
 	delegate Postprocess/RadialBlur_ps_HLSL
+	delegate Postprocess/RadialBlur_ps_Metal
 }
 
 //Effect: Radial Blur

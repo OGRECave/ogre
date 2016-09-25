@@ -1,9 +1,7 @@
 
 #include "GraphicsSystem.h"
 #include "ShadowMapDebuggingGameState.h"
-#include "SdlInputHandler.h"
 
-#include "OgreTimer.h"
 #include "OgreSceneManager.h"
 #include "OgreCamera.h"
 #include "OgreRoot.h"
@@ -13,8 +11,16 @@
 
 //Declares WinMain / main
 #include "MainEntryPointHelper.h"
+#include "System/MainEntryPoints.h"
 
-using namespace Demo;
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR strCmdLine, INT nCmdShow )
+#else
+int mainApp( int argc, const char *argv[] )
+#endif
+{
+    return Demo::MainEntryPoints::mainAppSingleThreaded( DEMO_MAIN_ENTRY_PARAMS );
+}
 
 namespace Demo
 {
@@ -33,15 +39,13 @@ namespace Demo
         {
         }
     };
-}
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMainApp( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
-#else
-int mainApp()
-#endif
-{
-    ShadowMapDebuggingGameState ShadowMapDebuggingGameState(
+    void MainEntryPoints::createSystems( GameState **outGraphicsGameState,
+                                         GraphicsSystem **outGraphicsSystem,
+                                         GameState **outLogicGameState,
+                                         LogicSystem **outLogicSystem )
+    {
+        ShadowMapDebuggingGameState *gfxGameState = new ShadowMapDebuggingGameState(
         "Shows how to render the shadow map textures from a shadow node (compositor),\n"
         "using Overlays and the Unlit Hlms implementation.\n"
         "This is very useful for debugging shadow map artifacts, bugs or glitches.\n"
@@ -58,54 +62,26 @@ int mainApp()
         "\n"
         "This sample depends on the media files:\n"
         "   * Samples/Media/2.0/scripts/Compositors/ShadowMapDebugging.compositor" );
-    ShadowMapDebuggingGraphicsSystem graphicsSystem( &ShadowMapDebuggingGameState );
 
-    ShadowMapDebuggingGameState._notifyGraphicsSystem( &graphicsSystem );
+        GraphicsSystem *graphicsSystem = new ShadowMapDebuggingGraphicsSystem( gfxGameState );
 
-    graphicsSystem.initialize( "Shadow map debugging" );
+        gfxGameState->_notifyGraphicsSystem( graphicsSystem );
 
-    if( graphicsSystem.getQuit() )
-    {
-        graphicsSystem.deinitialize();
-        return 0; //User cancelled config
+        *outGraphicsGameState = gfxGameState;
+        *outGraphicsSystem = graphicsSystem;
     }
 
-    Ogre::RenderWindow *renderWindow = graphicsSystem.getRenderWindow();
-
-    graphicsSystem.createScene01();
-    graphicsSystem.createScene02();
-
-    //Do this after creating the scene for easier the debugging (the mouse doesn't hide itself)
-    SdlInputHandler *inputHandler = graphicsSystem.getInputHandler();
-    inputHandler->setGrabMousePointer( true );
-    inputHandler->setMouseVisible( false );
-
-    Ogre::Timer timer;
-    unsigned long startTime = timer.getMicroseconds();
-
-    double timeSinceLast = 1.0 / 60.0;
-
-    while( !graphicsSystem.getQuit() )
+    void MainEntryPoints::destroySystems( GameState *graphicsGameState,
+                                          GraphicsSystem *graphicsSystem,
+                                          GameState *logicGameState,
+                                          LogicSystem *logicSystem )
     {
-        graphicsSystem.beginFrameParallel();
-        graphicsSystem.update( static_cast<float>( timeSinceLast ) );
-        graphicsSystem.finishFrameParallel();
-        graphicsSystem.finishFrame();
-
-        if( !renderWindow->isVisible() )
-        {
-            //Don't burn CPU cycles unnecessary when we're minimized.
-            Ogre::Threads::Sleep( 500 );
-        }
-
-        unsigned long endTime = timer.getMicroseconds();
-        timeSinceLast = (endTime - startTime) / 1000000.0;
-        timeSinceLast = std::min( 1.0, timeSinceLast ); //Prevent from going haywire.
-        startTime = endTime;
+        delete graphicsSystem;
+        delete graphicsGameState;
     }
 
-    graphicsSystem.destroyScene();
-    graphicsSystem.deinitialize();
-
-    return 0;
+    const char* MainEntryPoints::getWindowTitle(void)
+    {
+        return "Shadow map debugging";
+    }
 }

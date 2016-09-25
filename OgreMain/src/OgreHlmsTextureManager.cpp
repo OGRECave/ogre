@@ -295,7 +295,8 @@ namespace Ogre
     HlmsTextureManager::TextureLocation HlmsTextureManager::createOrRetrieveTexture(
                                                                         const String &aliasName,
                                                                         const String &texName,
-                                                                        TextureMapType mapType )
+                                                                        TextureMapType mapType,
+                                                                        Image *imgSource )
     {
         TextureEntry searchName( aliasName );
         TextureEntryVec::iterator it = std::lower_bound( mEntries.begin(), mEntries.end(), searchName );
@@ -310,11 +311,16 @@ namespace Ogre
         {
             LogManager::getSingleton().logMessage( "Texture: loading " + texName + " as " + aliasName );
 
-            Image image;
-            image.load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+            Image localImageVar;
+            Image *image = imgSource;
 
+            if( !imgSource )
+            {
+                image = &localImageVar;
+                image->load( texName, ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME );
+            }
 
-            PixelFormat imageFormat = image.getFormat();
+            PixelFormat imageFormat = image->getFormat();
             const RenderSystemCapabilities *caps = mRenderSystem->getCapabilities();
 
             if( mDefaultTextureParameters[mapType].pixelFormat != PF_UNKNOWN )
@@ -370,9 +376,9 @@ namespace Ogre
 
             if( mDefaultTextureParameters[mapType].mipmaps )
             {
-                uint32 heighestRes = std::max( std::max( image.getWidth(), image.getHeight() ),
-                                               std::max<uint32>( image.getDepth(),
-                                                                 image.getNumFaces() ) );
+                uint32 heighestRes = std::max( std::max( image->getWidth(), image->getHeight() ),
+                                               std::max<uint32>( image->getDepth(),
+                                                                 image->getNumFaces() ) );
 #if (ANDROID || (OGRE_COMPILER == OGRE_COMPILER_MSVC && OGRE_COMP_VER < 1800))
                 numMipmaps = static_cast<uint8>( floorf( logf( static_cast<float>(heighestRes) ) /
                                                          logf( 2.0f ) ) );
@@ -385,21 +391,21 @@ namespace Ogre
             uint width, height, depth, faces;
             uint8 baseMipLevel = 0;
 
-            width   = image.getWidth();
-            height  = image.getHeight();
-            depth   = image.getDepth();
-            faces   = image.getNumFaces();
+            width   = image->getWidth();
+            height  = image->getHeight();
+            depth   = image->getDepth();
+            faces   = image->getNumFaces();
 
             ushort maxResolution = caps->getMaximumResolution2D();
 
-            if( image.hasFlag( IF_3D_TEXTURE ) )
+            if( image->hasFlag( IF_3D_TEXTURE ) )
             {
                 maxResolution = caps->getMaximumResolution3D();
                 texType = TEX_TYPE_3D;
             }
             else
             {
-                if( image.hasFlag( IF_CUBEMAP ) )
+                if( image->hasFlag( IF_CUBEMAP ) )
                 {
                     maxResolution = caps->getMaximumResolutionCubemap();
                     //TODO: Cubemap arrays supported since D3D10.1
@@ -426,11 +432,11 @@ namespace Ogre
             if( width > maxResolution || height > maxResolution )
             {
                 bool resize = true;
-                if( image.getNumMipmaps() )
+                if( image->getNumMipmaps() )
                 {
                     resize = false;
                     while( (width > maxResolution || height > maxResolution)
-                           && (baseMipLevel <= image.getNumMipmaps()) )
+                           && (baseMipLevel <= image->getNumMipmaps()) )
                     {
                         width  >>= 1;
                         height >>= 1;
@@ -444,8 +450,8 @@ namespace Ogre
                 if( resize )
                 {
                     baseMipLevel = 0;
-                    Real aspectRatio = (Real)image.getWidth() / (Real)image.getHeight();
-                    if( image.getWidth() >= image.getHeight() )
+                    Real aspectRatio = (Real)image->getWidth() / (Real)image->getHeight();
+                    if( image->getWidth() >= image->getHeight() )
                     {
                         width  = maxResolution;
                         height = static_cast<uint>( floorf( maxResolution / aspectRatio ) );
@@ -456,16 +462,16 @@ namespace Ogre
                         height = maxResolution;
                     }
 
-                    image.resize( width, height );
+                    image->resize( width, height );
                 }
             }
 
-            if (image.getNumMipmaps() - baseMipLevel != (numMipmaps - baseMipLevel))
+            if (image->getNumMipmaps() - baseMipLevel != (numMipmaps - baseMipLevel))
             {
-                if (image.generateMipmaps(mDefaultTextureParameters[mapType].hwGammaCorrection) == false)
+                if (image->generateMipmaps(mDefaultTextureParameters[mapType].hwGammaCorrection) == false)
                 {
                     //unable to generate preferred number of mipmaps, so use mipmaps of the input tex
-                    numMipmaps = image.getNumMipmaps();
+                    numMipmaps = image->getNumMipmaps();
 
                     LogManager::getSingleton().logMessage(
                         "WARNING: Could not generate mipmaps for " + texName + ". "
@@ -581,20 +587,20 @@ namespace Ogre
             {
                 if( mDefaultTextureParameters[mapType].packingMethod == TextureArrays )
                 {
-                    copyTextureToArray( image, dstArrayIt->texture, entryIdx,
+                    copyTextureToArray( *image, dstArrayIt->texture, entryIdx,
                                         baseMipLevel, dstArrayIt->isNormalMap );
                 }
                 else
                 {
-                    copyTextureToAtlas( image, dstArrayIt->texture, entryIdx,
+                    copyTextureToAtlas( *image, dstArrayIt->texture, entryIdx,
                                         dstArrayIt->sqrtMaxTextures, baseMipLevel,
                                         dstArrayIt->isNormalMap );
                 }
             }
             else
             {
-                copy3DTexture( image, dstArrayIt->texture, 0,
-                               std::max<uint32>( image.getNumFaces(), image.getDepth() ),
+                copy3DTexture( *image, dstArrayIt->texture, 0,
+                               std::max<uint32>( image->getNumFaces(), image->getDepth() ),
                                baseMipLevel );
             }
 

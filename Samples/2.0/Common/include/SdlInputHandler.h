@@ -7,6 +7,9 @@
 
 #include "BaseSystem.h"
 #include "OgrePrerequisites.h"
+#include "SdlEmulationLayer.h"
+
+#if OGRE_USE_SDL2
 
 #include <SDL.h>
 
@@ -87,5 +90,7 @@ namespace Demo
         void setMouseVisible( bool visible );
     };
 }
+
+#endif
 
 #endif

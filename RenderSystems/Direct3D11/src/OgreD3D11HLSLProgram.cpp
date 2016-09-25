@@ -332,6 +332,7 @@ namespace Ogre {
         cacheMicrocode->read(&mConstantBufferSize, sizeof(uint32));        
         cacheMicrocode->read(&mConstantBufferNr, sizeof(uint32));
         cacheMicrocode->read(&mNumSlots, sizeof(uint32));
+        cacheMicrocode->read(&mDefaultBufferBindPoint, sizeof(uint32));
         
         READ_START(mD3d11ShaderInputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
         READ_NAME(SemanticName)
@@ -605,6 +606,23 @@ namespace Ogre {
                 mSerStrings.push_back(name);
                 curParam.SemanticName = &(*name)[0]; 
             }
+
+            {
+                mDefaultBufferBindPoint = -1;
+
+                D3D11_SHADER_INPUT_BIND_DESC curParam;
+                HRESULT hr;
+                hr = shaderReflection->GetResourceBindingDescByName( "$Globals", &curParam );
+
+                if( SUCCEEDED(hr) )
+                    mDefaultBufferBindPoint = std::min( curParam.BindPoint, mDefaultBufferBindPoint );
+
+                hr = shaderReflection->GetResourceBindingDescByName( "$Params", &curParam );
+
+                if( SUCCEEDED(hr) )
+                    mDefaultBufferBindPoint = std::min( curParam.BindPoint, mDefaultBufferBindPoint );
+            }
+
             /*
             if (shaderDesc.ConstantBuffers > 1)
             {
@@ -794,6 +812,7 @@ namespace Ogre {
                                  + sizeof(uint32) // mConstantBufferSize
                                  + sizeof(uint32) // mConstantBufferNr
                                  + sizeof(uint32) // mNumSlots
+                                 + sizeof(uint32) // mDefaultBufferBindPoint
                                 SIZE_OF_DATA_START(mD3d11ShaderInputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
                                 SIZE_OF_DATA_NAME(SemanticName)
                                 SIZE_OF_DATA_UINT(SemanticIndex)
@@ -954,6 +973,7 @@ namespace Ogre {
                 newMicrocode->write(&mConstantBufferSize, sizeof(uint32));        
                 newMicrocode->write(&mConstantBufferNr, sizeof(uint32));
                 newMicrocode->write(&mNumSlots, sizeof(uint32));
+                newMicrocode->write(&mDefaultBufferBindPoint, sizeof(uint32));
 
                 WRITE_START(mD3d11ShaderInputParameters, D3D11_SIGNATURE_PARAMETER_DESC)
                 WRITE_NAME(SemanticName)
@@ -1077,20 +1097,6 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void D3D11HLSLProgram::analizeMicrocode()
     {
-        // enum parameters
-        mInputVertexDeclaration.removeAllElements();
-
-        for (UINT i=0 ; i < mD3d11ShaderInputParameters.size() ; i++)
-        {
-            D3D11_SIGNATURE_PARAMETER_DESC  & paramDesc = mD3d11ShaderInputParameters[i];
-            mInputVertexDeclaration.addElement(
-                paramDesc.Register, 
-                -1, // we don't need the offset
-                VET_FLOAT1, // doesn't matter
-                D3D11Mappings::get(paramDesc.SemanticName),
-                paramDesc.SemanticIndex);
-        }
-
         UINT bufferCount = 0;
         UINT pointerCount = 0;
         UINT typeCount = 0;
@@ -1140,9 +1146,13 @@ namespace Ogre {
             // so parse all.
             case D3D_CT_CBUFFER:
             case D3D_CT_TBUFFER:
+                if( !strcmp( mD3d11ShaderBufferDescs[b].Name, "$Globals" ) ||
+                    !strcmp( mD3d11ShaderBufferDescs[b].Name, "$Params" ) )
                 {
-                    // Insert buffer info
-                    BufferInfoIterator it = mBufferInfoMap.insert(BufferInfo(0, mD3d11ShaderBufferDescs[b].Name)).first;
+                    const DefaultBufferTypes bufferType = !strcmp( mD3d11ShaderBufferDescs[b].Name,
+                                                                   "$Globals" ) ? BufferGlobal :
+                                                                                  BufferParam;
+                    BufferInfo *it = &mDefaultBuffers[bufferType];
 
                     // Guard to create uniform buffer only once
                     if (it->mUniformBuffer.isNull())
@@ -1179,8 +1189,9 @@ namespace Ogre {
                                         newVar.name += "."; 
                                         newVar.name += mMemberTypeName[nameCount++].Name;
                                         newVar.size = mMemberTypeDesc[memberCount].Rows * mMemberTypeDesc[memberCount].Columns * 
-                                                                    (mMemberTypeDesc[memberCount].Type == D3D_SVT_FLOAT ||
-                                                                        mMemberTypeDesc[memberCount].Type == D3D_SVT_INT ? 4 : 1);
+                                                                    ((mMemberTypeDesc[memberCount].Type == D3D_SVT_FLOAT ||
+                                                                      mMemberTypeDesc[memberCount].Type == D3D_SVT_INT ||
+                                                                      mMemberTypeDesc[memberCount].Type == D3D_SVT_UINT) ? 4 : 1);
                                         newVar.startOffset = parentOffset + mMemberTypeDesc[memberCount].Offset;
                                         memberCount++;
                                         fixVariableNameFromCg(newVar);
@@ -1245,7 +1256,8 @@ namespace Ogre {
     void D3D11HLSLProgram::unloadHighLevelImpl(void)
     {
         mSlotMap.clear();
-        mBufferInfoMap.clear();
+        for( size_t i=0; i<NumDefaultBufferTypes; ++i )
+            mDefaultBuffers[i] = BufferInfo();
 
         InputLayoutVaoBindVec::const_iterator itor = mInputLayoutVaoBind.begin();
         InputLayoutVaoBindVec::const_iterator end  = mInputLayoutVaoBind.end();
@@ -1285,6 +1297,16 @@ namespace Ogre {
                     GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
                 mFloatLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
                 mConstantDefs->floatBufferSize = mFloatLogicalToPhysical->bufferSize;
+            }
+            else if( def.isUnsignedInt() )
+            {
+                def.physicalIndex = mUIntLogicalToPhysical->bufferSize;
+                OGRE_LOCK_MUTEX(mUIntLogicalToPhysical->mutex);
+                    mUIntLogicalToPhysical->map.insert(
+                    GpuLogicalIndexUseMap::value_type(paramIndex,
+                    GpuLogicalIndexUse(def.physicalIndex, def.arraySize * def.elementSize, GPV_GLOBAL)));
+                mUIntLogicalToPhysical->bufferSize += def.arraySize * def.elementSize;
+                mConstantDefs->uintBufferSize = mUIntLogicalToPhysical->bufferSize;
             }
             else
             {
@@ -1375,7 +1397,8 @@ namespace Ogre {
         else
         {
             // Process params
-            if (varRefTypeDesc.Type == D3D_SVT_FLOAT || varRefTypeDesc.Type == D3D_SVT_INT || varRefTypeDesc.Type == D3D_SVT_BOOL)
+            if (varRefTypeDesc.Type == D3D_SVT_FLOAT || varRefTypeDesc.Type == D3D_SVT_INT ||
+                varRefTypeDesc.Type == D3D_SVT_UINT || varRefTypeDesc.Type == D3D_SVT_BOOL)
             {
                 GpuConstantDefinitionWithName def;
                 String * name = new String(prefix + paramName);
@@ -1413,6 +1436,23 @@ namespace Ogre {
                 break;
             case 4:
                 def.constType = GCT_INT4;
+                break;
+            } // columns
+            break;
+        case D3D10_SVT_UINT:
+            switch(d3dDesc.Columns)
+            {
+            case 1:
+                def.constType = GCT_UINT1;
+                break;
+            case 2:
+                def.constType = GCT_UINT2;
+                break;
+            case 3:
+                def.constType = GCT_UINT3;
+                break;
+            case 4:
+                def.constType = GCT_UINT4;
                 break;
             } // columns
             break;
@@ -1504,7 +1544,8 @@ namespace Ogre {
         , mErrorsInCompile(false), mConstantBuffer(NULL), mDevice(device)
         , mVertexShader(NULL), mConstantBufferSize(0)
         , mPixelShader(NULL),mGeometryShader(NULL), mHullShader(NULL), mDomainShader(NULL), mComputeShader(NULL)
-		, mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false), mInputVertexDeclaration(device)
+        , mColumnMajorMatrices(true), mEnableBackwardsCompatibility(false), shaderMacroSet(false)
+        , mDefaultBufferBindPoint(-1)
     {
 #if SUPPORT_SM2_0_HLSL_SHADERS == 1
 		mEnableBackwardsCompatibility = true;
@@ -1537,7 +1578,8 @@ namespace Ogre {
     D3D11HLSLProgram::~D3D11HLSLProgram()
     {
         //SAFE_RELEASE(mConstantBuffer);
-        mBufferInfoMap.clear();
+        for( size_t i=0; i<NumDefaultBufferTypes; ++i )
+            mDefaultBuffers[i] = BufferInfo();
 
         // have to call this here reather than in Resource destructor
         // since calling virtual methods in base destructors causes crash
@@ -1933,37 +1975,24 @@ namespace Ogre {
         return it->second;
     }
     //-----------------------------------------------------------------------------
-    ID3D11InputLayout* D3D11HLSLProgram::getLayoutForVao( const VertexArrayObject *vao )
+    ID3D11InputLayout* D3D11HLSLProgram::getLayoutForPso( const VertexElement2VecVec &vertexElements )
     {
-        InputLayoutVaoBindVec::iterator itLayout = std::lower_bound(
-                    mInputLayoutVaoBind.begin(), mInputLayoutVaoBind.end(),
-                    InputLayoutVaoBind( vao->getVaoName(), 0 ) );
-
-        //Already cached.
-        if( itLayout != mInputLayoutVaoBind.end() && itLayout->vaoName == vao->getVaoName() )
-            return itLayout->inputLayout;
-
         size_t numShaderInputs = getNumInputs();
         size_t numShaderInputsFound = 0;
-
-        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
 
         size_t currDesc = 0;
         size_t uvCount = 0;
         size_t colourCount = 0;
-        D3D11_INPUT_ELEMENT_DESC inputDesc[128];
 
+        D3D11_INPUT_ELEMENT_DESC inputDesc[128];
         ZeroMemory( &inputDesc, sizeof(D3D11_INPUT_ELEMENT_DESC) * 128 );
 
-        for( size_t i=0; i<vao->getVertexBuffers().size(); ++i )
+        for( size_t i=0; i<vertexElements.size(); ++i )
         {
+            VertexElement2Vec::const_iterator it = vertexElements[i].begin();
+            VertexElement2Vec::const_iterator en = vertexElements[i].end();
+
             size_t bindAccumOffset = 0;
-
-            VertexBufferPacked *vertexBuffer = vertexBuffers[i];
-            const VertexElement2Vec &vertexElements = vertexBuffer->getVertexElements();
-
-            VertexElement2Vec::const_iterator it = vertexElements.begin();
-            VertexElement2Vec::const_iterator en = vertexElements.end();
 
             while( it != en )
             {
@@ -1973,7 +2002,7 @@ namespace Ogre {
                 {
                     inputDesc[currDesc].SemanticIndex = uvCount++;
                 }
-                else if( it->mSemantic == VES_TEXTURE_COORDINATES )
+                else if( it->mSemantic == VES_DIFFUSE )
                 {
                     inputDesc[currDesc].SemanticIndex = colourCount++;
                 }
@@ -1982,16 +2011,10 @@ namespace Ogre {
                 inputDesc[currDesc].InputSlot           = i;
                 inputDesc[currDesc].AlignedByteOffset   = bindAccumOffset;
 
-                /*if( binding.instancingDivisor == 0 );
-                {*/
-                    inputDesc[currDesc].InputSlotClass          = D3D11_INPUT_PER_VERTEX_DATA;
-                    inputDesc[currDesc].InstanceDataStepRate    = 0;
-                /*}
-                else
-                {
-                    inputDesc[currDesc].InputSlotClass          = D3D11_INPUT_PER_INSTANCE_DATA;
-                    inputDesc[currDesc].InstanceDataStepRate    = 1;
-                }*/
+                inputDesc[currDesc].InputSlotClass          = it->mInstancingStepRate == 0 ?
+                                                                    D3D11_INPUT_PER_VERTEX_DATA :
+                                                                    D3D11_INPUT_PER_INSTANCE_DATA;
+                inputDesc[currDesc].InstanceDataStepRate    = it->mInstancingStepRate;
 
                 bool bFound = false;
                 for( size_t j=0; j<numShaderInputs && !bFound; ++j )
@@ -2015,11 +2038,11 @@ namespace Ogre {
             }
         }
 
-        //Bind the draw ID. Must always be present
+        //Bind the draw ID, if present
         inputDesc[currDesc].SemanticName            = "DRAWID";
         inputDesc[currDesc].SemanticIndex           = 0;
         inputDesc[currDesc].Format                  = DXGI_FORMAT_R32_UINT;
-        inputDesc[currDesc].InputSlot               = vao->getVertexBuffers().size();
+        inputDesc[currDesc].InputSlot               = vertexElements.size();
         inputDesc[currDesc].AlignedByteOffset       = 0;
         inputDesc[currDesc].InputSlotClass          = D3D11_INPUT_PER_INSTANCE_DATA;
         inputDesc[currDesc].InstanceDataStepRate    = 1;
@@ -2059,8 +2082,9 @@ namespace Ogre {
         if( numShaderInputsFound < numShaderInputs )
         {
             OGRE_EXCEPT( Exception::ERR_RENDERINGAPI_ERROR,
-                         "Not all of the shader input semantics are set by the VertexArrayObject",
-                         "D3D11VertexDeclaration::getILayoutByShader");
+                         "The shader requires more input attributes/semantics than what the "
+                         "VertexArrayObject / v1::VertexDeclaration has to offer. You're "
+                         "missing a component", "D3D11HLSLProgram::getLayoutForPso" );
         }
 
         ID3D11DeviceN *d3dDevice = mDevice.get();
@@ -2081,68 +2105,22 @@ namespace Ogre {
 
             OGRE_EXCEPT_EX( Exception::ERR_RENDERINGAPI_ERROR, hr,
                             "Unable to create D3D11 input layout: " + errorDescription,
-                            "D3D11HLSLProgram::bindVao" );
+                            "D3D11HLSLProgram::getLayoutForPso" );
         }
-
-        mInputLayoutVaoBind.insert( itLayout, InputLayoutVaoBind( vao->getVaoName(), d3dInputLayout ) );
 
         return d3dInputLayout;
     }
     //-----------------------------------------------------------------------------
-    ID3D11Buffer* D3D11HLSLProgram::getConstantBuffer(GpuProgramParametersSharedPtr params, uint16 variabilityMask)
+    void D3D11HLSLProgram::getConstantBuffers( ID3D11Buffer** buffers, UINT &outSlotStart,
+                                               UINT &outNumBuffers, GpuProgramParametersSharedPtr params,
+                                               uint16 variabilityMask )
     {
-        // Update the Constant Buffer
-        
-		if(!mBufferInfoMap.empty())
-        {
-			BufferInfoIterator it = mBufferInfoMap.begin();
-            
-            if (!it->mUniformBuffer.isNull())
-            {
-                void* pMappedData = it->mUniformBuffer->lock(v1::HardwareBuffer::HBL_DISCARD);
+        UINT numBuffers = 0;
 
-                // Only iterate through parsed variables (getting size of list)
-                void* src = 0;
-                ShaderVarWithPosInBuf* iter = &(it->mShaderVars[0]);
-                unsigned int lSize = it->mShaderVars.size();
-                for (size_t i = 0 ; i < lSize; i++, iter++)
-                {
-                    const GpuConstantDefinition& def = params->getConstantDefinition(iter->name);
-                    // Since we are mapping with write discard, contents of the buffer are undefined.
-                    // We must set every variable, even if it has not changed.
-                    //if (def.variability & variabilityMask)
-                    {
-                        if(def.isFloat())
-                        {
-                            src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
-                        }
-                        else
-                        {
-                            src = (void *)&(*(params->getIntConstantList().begin() + def.physicalIndex));
-                        }
-
-                        memcpy( &(((char *)(pMappedData))[iter->startOffset]), src , iter->size);
-                    }
-                }
-
-                it->mUniformBuffer->unlock();
-
-                return static_cast<v1::D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
-            }
-        }
-
-        return NULL;
-    }
-    //-----------------------------------------------------------------------------
-    void D3D11HLSLProgram::getConstantBuffers(ID3D11Buffer** buffers, unsigned int& numBuffers,
-                                              ID3D11ClassInstance** classes, unsigned int& numClasses,
-                                              GpuProgramParametersSharedPtr params, uint16 variabilityMask)
-    {
         // Update the Constant Buffers
-        BufferInfoIterator it = mBufferInfoMap.begin();
-        BufferInfoIterator end = mBufferInfoMap.end();
-        while (it != end)
+        for( size_t i=0; i<NumDefaultBufferTypes; ++i )
         {
+            BufferInfo *it = &mDefaultBuffers[i];
             if (!it->mUniformBuffer.isNull())
             {
                 void* pMappedData = it->mUniformBuffer->lock(v1::HardwareBuffer::HBL_DISCARD);
@@ -2161,6 +2139,10 @@ namespace Ogre {
                         if(def.isFloat())
                         {
                             src = (void *)&(*(params->getFloatConstantList().begin() + def.physicalIndex));
+                        }
+                        else if( def.isUnsignedInt() )
+                        {
+                            src = (void *)&(*(params->getUnsignedIntConstantList().begin() + def.physicalIndex));
                         }
                         else
                         {
@@ -2174,26 +2156,30 @@ namespace Ogre {
                 it->mUniformBuffer->unlock();
 
                 // Add buffer to list
-                buffers[numBuffers] = static_cast<v1::D3D11HardwareUniformBuffer*>(it->mUniformBuffer.get())->getD3DConstantBuffer();
+                buffers[numBuffers] = static_cast<v1::D3D11HardwareUniformBuffer*>(
+                            it->mUniformBuffer.get())->getD3DConstantBuffer();
                 // Increment number of buffers
-                numBuffers++;
+                ++numBuffers;
             }
         }
 
-        // Update class instances
-        SlotIterator sit = mSlotMap.begin();
-        SlotIterator send = mSlotMap.end();
-        while (sit != send)
-        {
-            // Get constant name
-            const GpuConstantDefinition& def = params->getConstantDefinition(sit->first);
+        outSlotStart = mDefaultBufferBindPoint;
+        outNumBuffers = numBuffers;
 
-            // Set to correct slot
-            //classes[sit->second] = 
+        // Update class instances
+//        SlotIterator sit = mSlotMap.begin();
+//        SlotIterator send = mSlotMap.end();
+//        while (sit != send)
+//        {
+//            // Get constant name
+//            const GpuConstantDefinition& def = params->getConstantDefinition(sit->first);
+
+//            // Set to correct slot
+//            //classes[sit->second] =
             
-            // Increment class count
-            numClasses++;
-        }
+//            // Increment class count
+//            numClasses++;
+//        }
     }
     //-----------------------------------------------------------------------------
     ID3D11VertexShader* D3D11HLSLProgram::getVertexShader(void) const 

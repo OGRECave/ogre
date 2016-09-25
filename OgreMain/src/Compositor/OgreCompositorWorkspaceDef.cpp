@@ -40,7 +40,6 @@ namespace Ogre
                                                     CompositorManager2 *compositorManager ) :
             TextureDefinitionBase( TEXTURE_GLOBAL ),
             mName( name ),
-            mFinalInChannel( 0 ),
             mCompositorManager( compositorManager )
     {
     }
@@ -65,25 +64,71 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void CompositorWorkspaceDef::connect( IdString outNode, uint32 outChannel,
-                                            IdString inNode, uint32 inChannel )
+    void CompositorWorkspaceDef::checkInputChannelIsEmpty( const ChannelRouteList &internalChannelRoutes,
+                                                           const ChannelRouteList &externalChannelRoutes,
+                                                           IdString inNode, uint32 inChannel,
+                                                           const std::string &outNodeName,
+                                                           uint32 outChannel ) const
     {
-        ChannelRouteList::const_iterator itor = mChannelRoutes.begin();
-        ChannelRouteList::const_iterator end  = mChannelRoutes.end();
+        ChannelRouteList::const_iterator itor = internalChannelRoutes.begin();
+        ChannelRouteList::const_iterator end  = internalChannelRoutes.end();
 
         while( itor != end )
         {
             if( itor->inNode == inNode && itor->inChannel == inChannel )
             {
                 LogManager::getSingleton().logMessage( "WARNING: Node '" +
-                            itor->outNode.getFriendlyText() + "' and Node '" +
-                            outNode.getFriendlyText() + "' are both trying to connect "
-                            "to the same input channel #" + StringConverter::toString( inChannel ) +
-                            " from node '" + inNode.getFriendlyText() + "'. Only the latter will work" );
+                            itor->outNode.getFriendlyText() + "' from channel #" +
+                            StringConverter::toString( itor->outChannel ) + " and Node '" +
+                            outNodeName + "' from channel #" + StringConverter::toString( outChannel ) +
+                            "are both trying to connect its output to input channel #" +
+                            StringConverter::toString( inChannel ) +
+                            " of node '" + inNode.getFriendlyText() + "'. Only the latter will work" );
                 break; //Early out
             }
             ++itor;
         }
+
+        itor = externalChannelRoutes.begin();
+        end  = externalChannelRoutes.end();
+
+        while( itor != end )
+        {
+            if( itor->inNode == inNode && itor->inChannel == inChannel )
+            {
+                LogManager::getSingleton().logMessage( "WARNING: An external buffer/texture "
+                            "from channel #" + StringConverter::toString( itor->outChannel ) +
+                            " and Node '" + outNodeName + "' from channel #" +
+                            StringConverter::toString( outChannel ) + " are both trying to connect "
+                            "its output to input channel #" + StringConverter::toString( inChannel ) +
+                            " of node '" + inNode.getFriendlyText() + "'. Only the latter will work" );
+                break; //Early out
+            }
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspaceDef::checkInputChannelIsEmpty( IdString inNode, uint32 inChannel,
+                                                           const std::string &outNodeName,
+                                                           uint32 outChannel ) const
+    {
+        checkInputChannelIsEmpty( mChannelRoutes, mExternalChannelRoutes,
+                                  inNode, inChannel, outNodeName, outChannel );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspaceDef::checkInputBufferChannelIsEmpty( IdString inNode,
+                                                                 uint32 inChannel,
+                                                                 const std::string &outNodeName,
+                                                                 uint32 outChannel ) const
+    {
+        checkInputChannelIsEmpty( mBufferChannelRoutes, mExternalBufferChannelRoutes,
+                                  inNode, inChannel, outNodeName, outChannel );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspaceDef::connect( IdString outNode, uint32 outChannel,
+                                          IdString inNode, uint32 inChannel )
+    {
+        checkInputChannelIsEmpty( inNode, inChannel, outNode.getFriendlyText(), outChannel );
 
         createImplicitAlias( outNode );
         createImplicitAlias( inNode );
@@ -103,22 +148,58 @@ namespace Ogre
             connect( outNode, i, inNode, i );
     }
     //-----------------------------------------------------------------------------------
-    void CompositorWorkspaceDef::connectOutput( IdString inNode, uint32 inChannel )
+    void CompositorWorkspaceDef::connectExternal( uint32 externalIdx, IdString inNode,
+                                                  uint32 inChannel )
     {
+        checkInputChannelIsEmpty( inNode, inChannel, "connect_external / connect_output", externalIdx );
         createImplicitAlias( inNode );
-        mFinalInChannel = inChannel;
-        mFinalNode      = inNode;
+        mExternalChannelRoutes.push_back( ChannelRoute( externalIdx, IdString(),
+                                                        inChannel, inNode ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspaceDef::connectBuffer( IdString outNode, uint32 outChannel,
+                                                IdString inNode, uint32 inChannel )
+    {
+        checkInputBufferChannelIsEmpty( inNode, inChannel, outNode.getFriendlyText(), outChannel );
+
+        createImplicitAlias( outNode );
+        createImplicitAlias( inNode );
+
+        mBufferChannelRoutes.push_back( ChannelRoute( outChannel, outNode, inChannel, inNode ) );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspaceDef::connectBuffer( IdString outNode, IdString inNode )
+    {
+        const CompositorNodeDef *outDef = mCompositorManager->getNodeDefinition( outNode );
+        const CompositorNodeDef *inDef  = mCompositorManager->getNodeDefinition( inNode );
+
+        size_t inputChannels  = inDef->getNumInputChannels();
+        size_t outputChannels = outDef->getNumOutputChannels();
+
+        for( uint32 i=0; i<inputChannels && i<outputChannels; ++i )
+            connect( outNode, i, inNode, i );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorWorkspaceDef::connectExternalBuffer( uint32 externalBufferIdx, IdString inNode,
+                                                        uint32 inChannel )
+    {
+        checkInputBufferChannelIsEmpty( inNode, inChannel, "connect_buffer_external",
+                                        externalBufferIdx );
+        createImplicitAlias( inNode );
+        mExternalBufferChannelRoutes.push_back( ChannelRoute( externalBufferIdx, IdString(),
+                                                              inChannel, inNode ) );
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspaceDef::clearAllInterNodeConnections(void)
     {
         mChannelRoutes.clear();
+        mBufferChannelRoutes.clear();
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspaceDef::clearOutputConnections(void)
     {
-        mFinalInChannel = 0;
-        mFinalNode      = IdString();
+        mExternalChannelRoutes.clear();
+        mExternalBufferChannelRoutes.clear();
     }
     //-----------------------------------------------------------------------------------
     void CompositorWorkspaceDef::clearAll(void)

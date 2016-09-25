@@ -32,6 +32,8 @@ THE SOFTWARE.
 #include "OgreHeaderPrefix.h"
 #include "OgreCompositorCommon.h"
 #include "OgreIdString.h"
+#include "OgreResourceTransition.h"
+#include "Compositor/OgreCompositorChannel.h"
 
 #include "OgreTexture.h"
 
@@ -44,6 +46,7 @@ namespace Ogre
     class CompositorPassProvider;
 
     typedef vector<TexturePtr>::type TextureVec;
+    typedef vector<UavBufferPacked*>::type UavBufferPackedVec;
 
     /** \addtogroup Core
     *  @{
@@ -281,6 +284,10 @@ namespace Ogre
             last (depending on what you do with RTs, some OSes, like OS X, may not like
             it).
             Defaults to -1; which means update last.
+        @param uavBuffers
+            Array of UAV Buffers that will be exposed to compositors, via the
+            'connect_buffer_external' script keyword, or the call
+            CompositorWorkspaceDef::connectExternalBuffer
         @param vpOffsetScale
             The viewport of every pass from every node will be offseted and scaled by
             the following formula:
@@ -305,15 +312,20 @@ namespace Ogre
             eye (or the second split from the second player).
         */
         CompositorWorkspace* addWorkspace( SceneManager *sceneManager, RenderTarget *finalRenderTarget,
-                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
-                                            int position=-1,
-                                            const Vector4 &vpOffsetScale = Vector4::ZERO,
-                                            uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
+                                           Camera *defaultCam, IdString definitionName, bool bEnabled,
+                                           int position=-1, const UavBufferPackedVec *uavBuffers=0,
+                                           const ResourceLayoutMap* initialLayouts=0,
+                                           const ResourceAccessMap* initialUavAccess=0,
+                                           const Vector4 &vpOffsetScale = Vector4::ZERO,
+                                           uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
 
         /// Overload that allows a full RenderTexture to be used as render target (see CubeMapping demo)
-        CompositorWorkspace* addWorkspace( SceneManager *sceneManager, const CompositorChannel &finalRenderTarget,
+        CompositorWorkspace* addWorkspace( SceneManager *sceneManager,
+                                           const CompositorChannelVec &externalRenderTargets,
                                            Camera *defaultCam, IdString definitionName, bool bEnabled,
-                                           int position=-1,
+                                           int position=-1, const UavBufferPackedVec *uavBuffers=0,
+                                           const ResourceLayoutMap* initialLayouts=0,
+                                           const ResourceAccessMap* initialUavAccess=0,
                                            const Vector4 &vpOffsetScale = Vector4::ZERO,
                                            uint8 vpModifierMask=0x00, uint8 executionMask=0xFF );
 

@@ -121,7 +121,7 @@ namespace Ogre
             /// Strictly speaking the opType is not part of a GL's "VAO", however
             /// we need to generate a different VAO to perform correct rendering
             /// by the RenderQueue (and also satisfy Direct3D 11)
-            v1::RenderOperation::OperationType operationType;
+            OperationType operationType;
             VertexBindingVec    vertexBuffers;
             GLuint              indexBufferVbo;
             IndexBufferPacked::IndexType indexType;
@@ -221,6 +221,11 @@ namespace Ogre
                                                       void *initialData, bool keepAsShadow );
         virtual void destroyTexBufferImpl( TexBufferPacked *texBuffer );
 
+        virtual UavBufferPacked* createUavBufferImpl( size_t numElements, uint32 bytesPerElement,
+                                                      uint32 bindFlags,
+                                                      void *initialData, bool keepAsShadow );
+        virtual void destroyUavBufferImpl( UavBufferPacked *uavBuffer );
+
         virtual IndirectBufferPacked* createIndirectBufferImpl( size_t sizeBytes, BufferType bufferType,
                                                                 void *initialData, bool keepAsShadow );
         virtual void destroyIndirectBufferImpl( IndirectBufferPacked *indirectBuffer );
@@ -230,14 +235,15 @@ namespace Ogre
         virtual VertexArrayObject* createVertexArrayObjectImpl(
                                                         const VertexBufferPackedVec &vertexBuffers,
                                                         IndexBufferPacked *indexBuffer,
-                                                        v1::RenderOperation::OperationType opType );
+                                                        OperationType opType );
 
         virtual void destroyVertexArrayObjectImpl( VertexArrayObject *vao );
 
         static VboFlag bufferTypeToVboFlag( BufferType bufferType );
 
     public:
-        GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers );
+        GL3PlusVaoManager( bool supportsArbBufferStorage, bool supportsIndirectBuffers,
+                           bool supportsSsbo );
         virtual ~GL3PlusVaoManager();
 
         /// Binds the Draw ID to the currently bound vertex array object.

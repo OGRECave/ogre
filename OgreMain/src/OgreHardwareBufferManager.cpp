@@ -29,6 +29,8 @@ THE SOFTWARE.
 #include "OgreHardwareBufferManager.h"
 #include "OgreVertexIndexData.h"
 #include "OgreLogManager.h"
+#include "OgreRoot.h"
+#include "OgreHlmsManager.h"
 
 
 namespace Ogre {
@@ -63,6 +65,12 @@ namespace v1 {
     HardwareBufferManagerBase::HardwareBufferManagerBase()
         : mUnderUsedFrameCount(0)
     {
+        mFreeInputLayouts.reserve( OGRE_HLMS_NUM_INPUT_LAYOUTS );
+        for( uint8 i=0; i<OGRE_HLMS_NUM_INPUT_LAYOUTS; ++i )
+        {
+            mReferencedInputLayouts[i].refCount = 0;
+            mFreeInputLayouts.push_back( (OGRE_HLMS_NUM_INPUT_LAYOUTS - 1) - i );
+        }
     }
     //-----------------------------------------------------------------------
     HardwareBufferManagerBase::~HardwareBufferManagerBase()
@@ -93,6 +101,11 @@ namespace v1 {
     void HardwareBufferManagerBase::destroyVertexDeclaration(VertexDeclaration* decl)
     {
         OGRE_LOCK_MUTEX(mVertexDeclarationsMutex);
+
+        VertexDeclarationVec::iterator itor = std::find( mDirtyInputLayouts.begin(),
+                                                         mDirtyInputLayouts.end(), decl );
+        if( itor != mDirtyInputLayouts.end() )
+            efficientVectorRemove( mDirtyInputLayouts, itor );
         mVertexDeclarations.erase(decl);
         destroyVertexDeclarationImpl(decl);
     }
@@ -114,7 +127,7 @@ namespace v1 {
     //-----------------------------------------------------------------------
     VertexDeclaration* HardwareBufferManagerBase::createVertexDeclarationImpl(void)
     {
-        return OGRE_NEW VertexDeclaration();
+        return OGRE_NEW VertexDeclaration( this );
     }
     //-----------------------------------------------------------------------
     void HardwareBufferManagerBase::destroyVertexDeclarationImpl(VertexDeclaration* decl)
@@ -245,6 +258,87 @@ namespace v1 {
 
             vbl.expiredDelay = EXPIRED_DELAY_FRAME_THRESHOLD;
         }
+    }
+    //-----------------------------------------------------------------------
+    void HardwareBufferManagerBase::_addDirtyInputLayout( VertexDeclaration *vertexDecl )
+    {
+        assert( vertexDecl->_getInputLayoutId() == std::numeric_limits<uint16>::max() &&
+                !vertexDecl->_isInputLayoutDirty() );
+
+        mDirtyInputLayouts.push_back( vertexDecl );
+    }
+    //-----------------------------------------------------------------------
+    void HardwareBufferManagerBase::_removeInputLayoutReference( uint8 layoutId )
+    {
+        --mReferencedInputLayouts[layoutId].refCount;
+
+        if( !mReferencedInputLayouts[layoutId].refCount )
+        {
+            Ogre::HlmsManager *hlmsManager = Root::getSingleton().getHlmsManager();
+            hlmsManager->_notifyV1InputLayoutDestroyed( layoutId );
+
+            InputLayoutsIdVec::iterator itor = std::find( mActiveInputLayouts.begin(),
+                                                          mActiveInputLayouts.end(),
+                                                          layoutId );
+            assert( itor != mActiveInputLayouts.end() );
+            mActiveInputLayouts.erase( itor );
+
+            mFreeInputLayouts.push_back( layoutId );
+        }
+    }
+    //-----------------------------------------------------------------------
+    void HardwareBufferManagerBase::_updateDirtyInputLayouts(void)
+    {
+        VertexDeclarationVec::const_iterator itor = mDirtyInputLayouts.begin();
+        VertexDeclarationVec::const_iterator end  = mDirtyInputLayouts.end();
+
+        while( itor != end )
+        {
+            (*itor)->sort();
+
+            const VertexDeclaration::VertexElementList &vertexElements = (*itor)->getElements();
+
+            InputLayoutsIdVec::const_iterator itActiveIdx = mActiveInputLayouts.begin();
+            InputLayoutsIdVec::const_iterator enActiveIdx = mActiveInputLayouts.end();
+
+            uint8 idx = 0;
+
+            while( itActiveIdx != enActiveIdx &&
+                   mReferencedInputLayouts[*itActiveIdx].elementList != vertexElements )
+            {
+                ++itActiveIdx;
+            }
+
+            if( itActiveIdx != enActiveIdx )
+            {
+                idx = *itActiveIdx;
+            }
+            else
+            {
+                if( mFreeInputLayouts.empty() )
+                {
+                    OGRE_EXCEPT( Exception::ERR_INTERNAL_ERROR,
+                                 "Can't have more than " +
+                                 StringConverter::toString( mActiveInputLayouts.size() ) +
+                                 " active input layouts for V1 objects! You have too "
+                                 "many different vertex formats",
+                                 "HardwareBufferManagerBase::_updateDirtyInputLayouts" );
+                }
+
+                idx = static_cast<uint8>( mFreeInputLayouts.back() );
+                mFreeInputLayouts.pop_back();
+
+                mActiveInputLayouts.push_back( idx );
+                mReferencedInputLayouts[idx].elementList = vertexElements;
+            }
+
+            ++mReferencedInputLayouts[idx].refCount;
+
+            (*itor)->_setInputLayoutId( idx );
+            ++itor;
+        }
+
+        mDirtyInputLayouts.clear();
     }
     //-----------------------------------------------------------------------
     void HardwareBufferManagerBase::_freeUnusedBufferCopies(void)

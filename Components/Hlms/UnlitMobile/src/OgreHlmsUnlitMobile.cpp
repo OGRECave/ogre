@@ -190,7 +190,8 @@ namespace Ogre
 
         GpuNamedConstants *constantsDef;
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
-        constantsDef = const_cast<GpuNamedConstants*>( &retVal->vertexShader->getConstantDefinitions() );
+        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pso.vertexShader->
+                                                       getConstantDefinitions() );
         for( size_t i=0; i<sizeof( c_vsPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_vsPerObjectUniforms[i] );
@@ -199,7 +200,8 @@ namespace Ogre
         }
 
         //Nasty const_cast, but the refactor required to remove this is 100x nastier.
-        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pixelShader->getConstantDefinitions() );
+        constantsDef = const_cast<GpuNamedConstants*>( &retVal->pso.pixelShader->
+                                                       getConstantDefinitions() );
         for( size_t i=0; i<sizeof( c_psPerObjectUniforms ) / sizeof( String ); ++i )
         {
             GpuConstantDefinitionMap::iterator it = constantsDef->map.find( c_psPerObjectUniforms[i] );
@@ -212,7 +214,7 @@ namespace Ogre
                                                     queuedRenderable.renderable->getDatablock() );
 
         //Set samplers.
-        GpuProgramParametersSharedPtr psParams = retVal->pixelShader->getDefaultParameters();
+        GpuProgramParametersSharedPtr psParams = retVal->pso.pixelShader->getDefaultParameters();
 
         if( datablock->mNumTextureUnits > 0 )
         {
@@ -363,8 +365,8 @@ namespace Ogre
                                             bool casterPass, uint32 lastCacheHash,
                                             uint32 lastTextureHash )
     {
-        GpuProgramParametersSharedPtr vpParams = cache->vertexShader->getDefaultParameters();
-        GpuProgramParametersSharedPtr psParams = cache->pixelShader->getDefaultParameters();
+        GpuProgramParametersSharedPtr vpParams = cache->pso.vertexShader->getDefaultParameters();
+        GpuProgramParametersSharedPtr psParams = cache->pso.pixelShader->getDefaultParameters();
         float *vsUniformBuffer = vpParams->getFloatPointer( 0 );
 #if _SECURE_SCL
         float *psUniformBuffer = 0;

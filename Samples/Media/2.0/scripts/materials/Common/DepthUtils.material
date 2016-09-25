@@ -18,6 +18,7 @@ fragment_program Ogre/Depth/DownscaleMax_ps_HLSL hlsl
 fragment_program Ogre/Depth/DownscaleMax_ps_Metal metal
 {
 	source DepthDownscaleMax_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
 }
 
 fragment_program Ogre/Depth/DownscaleMax_ps unified
@@ -52,7 +53,7 @@ material Ogre/Depth/DownscaleMax
 
 			texture_unit depthTexture
 			{
-				filtering			point
+				filtering			none
 				tex_address_mode	clamp
 			}
 		}

@@ -58,7 +58,7 @@ namespace Ogre
                               VaoManager *vaoManager, bool uploadOnly );
         virtual ~NULLStagingBuffer();
 
-        virtual StagingStallType uploadWillStall( size_t sizeBytes ) const;
+        virtual StagingStallType uploadWillStall( size_t sizeBytes );
 
         virtual size_t _asyncDownload( BufferPacked *source, size_t srcOffset, size_t srcLength );
     };

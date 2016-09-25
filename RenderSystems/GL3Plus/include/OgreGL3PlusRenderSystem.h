@@ -35,6 +35,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #include "OgreRenderSystem.h"
 #include "OgreHlmsSamplerblock.h"
 #include "OgreGLSLShader.h"
+#include "OgreGL3PlusPixelFormatToShaderType.h"
 
 namespace Ogre {
     class GL3PlusContext;
@@ -96,9 +97,6 @@ namespace Ogre {
 
         /// Store last scissor enable state
         bool mScissorsEnabled;
-
-        /// Store last stencil mask state
-        uint32 mStencilWriteMask;
 
         GLfloat mAutoTextureMatrix[16];
 
@@ -164,14 +162,13 @@ namespace Ogre {
         /// @copydoc RenderSystem::checkExtension
         virtual bool checkExtension( const String &ext ) const;
 
+        /// @copydoc RenderSystem::getPixelFormatToShaderType
+        virtual const PixelFormatToShaderType* getPixelFormatToShaderType(void) const;
+
         unsigned char *mSwIndirectBufferPtr;
 
-        GLSLShader* mCurrentVertexShader;
-        GLSLShader* mCurrentFragmentShader;
-        GLSLShader* mCurrentGeometryShader;
-        GLSLShader* mCurrentHullShader;
-        GLSLShader* mCurrentDomainShader;
-        GLSLShader* mCurrentComputeShader;
+        GL3PlusHlmsPso const *mPso;
+        GLSLShader *mCurrentComputeShader;
 
         struct Uav
         {
@@ -183,6 +180,9 @@ namespace Ogre {
             GLint       arrayIndex;
             GLenum      access;
             GLenum      format;
+            UavBufferPacked *buffer;
+            GLintptr    offset;
+            GLsizeiptr  sizeBytes;
 
             Uav() : dirty( false ) {}
         };
@@ -195,8 +195,11 @@ namespace Ogre {
         /// and still mMaxUavIndexPlusOne = 3.
         uint8   mMaxModifiedUavPlusOne;
 
+        GL3PlusPixelFormatToShaderType mPixelFormatToShaderType;
+
         GLint getTextureAddressingMode(TextureAddressingMode tam) const;
-        GLenum getBlendMode(SceneBlendFactor ogreBlend) const;
+        static GLenum getBlendMode(SceneBlendFactor ogreBlend);
+        static GLenum getBlendOperation( SceneBlendOperation op );
 
         bool activateGLTextureUnit(size_t unit);
         void bindVertexElementToGpu( const v1::VertexElement &elem,
@@ -377,10 +380,21 @@ namespace Ogre {
                                    ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
                                    int32 mipmapLevel = 0, int32 textureArrayIndex = 0,
                                    PixelFormat pixelFormat = PF_UNKNOWN );
+        virtual void queueBindUAV( uint32 slot, UavBufferPacked *buffer,
+                                   ResourceAccess::ResourceAccess access = ResourceAccess::ReadWrite,
+                                   size_t offset = 0, size_t sizeBytes = 0 );
 
         virtual void clearUAVs(void);
 
         virtual void flushUAVs(void);
+
+        virtual void _bindTextureUavCS( uint32 slot, Texture *texture,
+                                        ResourceAccess::ResourceAccess access,
+                                        int32 mipmapLevel, int32 textureArrayIndex,
+                                        PixelFormat pixelFormat );
+        virtual void _setTextureCS( uint32 slot, bool enabled, Texture *texPtr );
+        virtual void _setHlmsSamplerblockCS( uint8 texUnit, const HlmsSamplerblock *samplerblock );
+
         /** See
             RenderSystem
         */
@@ -389,18 +403,24 @@ namespace Ogre {
         virtual void _resourceTransitionDestroyed( ResourceTransition *resTransition );
         virtual void _executeResourceTransition( ResourceTransition *resTransition );
 
+        virtual void _hlmsPipelineStateObjectCreated( HlmsPso *newPso );
+        virtual void _hlmsPipelineStateObjectDestroyed( HlmsPso *pso );
         virtual void _hlmsMacroblockCreated( HlmsMacroblock *newBlock );
         virtual void _hlmsMacroblockDestroyed( HlmsMacroblock *block );
         virtual void _hlmsBlendblockCreated( HlmsBlendblock *newBlock );
         virtual void _hlmsBlendblockDestroyed( HlmsBlendblock *block );
         virtual void _hlmsSamplerblockCreated( HlmsSamplerblock *newBlock );
         virtual void _hlmsSamplerblockDestroyed( HlmsSamplerblock *block );
-        virtual void _setHlmsMacroblock( const HlmsMacroblock *macroblock );
-        virtual void _setHlmsBlendblock( const HlmsBlendblock *blendblock );
+        void _setHlmsMacroblock( const HlmsMacroblock *macroblock, const GL3PlusHlmsPso *pso );
+        void _setHlmsBlendblock( const HlmsBlendblock *blendblock, const GL3PlusHlmsPso *pso );
         virtual void _setHlmsSamplerblock( uint8 texUnit, const HlmsSamplerblock *samplerblock );
-        virtual void _setProgramsFromHlms( const HlmsCache *hlmsCache );
+        virtual void _setPipelineStateObject( const HlmsPso *pso );
 
         virtual void _setIndirectBuffer( IndirectBufferPacked *indirectBuffer );
+
+        virtual void _hlmsComputePipelineStateObjectCreated( HlmsComputePso *newPso );
+        virtual void _hlmsComputePipelineStateObjectDestroyed( HlmsComputePso *newPso );
+        virtual void _setComputePso( const HlmsComputePso *pso );
         /** See
             RenderSystem
         */
@@ -447,35 +467,15 @@ namespace Ogre {
         */
         void enableClipPlane (ushort index, bool enable);
         /** See
-            RenderSystem
-        */
-        void setStencilCheckEnabled(bool enabled);
-        /** See
             RenderSystem.
         */
-        void setStencilBufferParams(CompareFunction func = CMPF_ALWAYS_PASS,
-                                    uint32 refValue = 0, uint32 compareMask = 0xFFFFFFFF, uint32 writeMask = 0xFFFFFFFF,
-                                    StencilOperation stencilFailOp = SOP_KEEP,
-                                    StencilOperation depthFailOp = SOP_KEEP,
-                                    StencilOperation passOp = SOP_KEEP,
-                    bool twoSidedOperation = false,
-                    bool readBackAsTexture = false);
-        /** See
-            RenderSystem
-        */
-        void setVertexDeclaration(v1::VertexDeclaration* decl) {}
-        /** See
-            RenderSystem
-        */
-        void setVertexDeclaration(v1::VertexDeclaration* decl, v1::VertexBufferBinding* binding) {}
-        /** See
-            RenderSystem.
-        */
-        void setVertexBufferBinding(v1::VertexBufferBinding* binding) {}
+        virtual void setStencilBufferParams( uint32 refValue, const StencilParams &stencilParams );
         /** See
             RenderSystem
         */
         void _render(const v1::RenderOperation& op);
+
+        virtual void _dispatch( const HlmsComputePso &pso );
 
         virtual void _setVertexArrayObject( const VertexArrayObject *vao );
         virtual void _render( const CbDrawCallIndexed *cmd );
@@ -531,12 +531,10 @@ namespace Ogre {
         void _setRenderTarget(RenderTarget *target, bool colourWrite);
 
         GLint convertCompareFunction(CompareFunction func) const;
-        GLint convertStencilOp(StencilOperation op, bool invert = false) const;
+        GLint convertStencilOp(StencilOperation op) const;
 
         const GL3PlusSupport* getGLSupport(void) const { return mGLSupport; }
 
-        void bindGpuProgram(GpuProgram* prg);
-        void unbindGpuProgram(GpuProgramType gptype);
         void bindGpuProgramParameters(GpuProgramType gptype, GpuProgramParametersSharedPtr params, uint16 mask);
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
 

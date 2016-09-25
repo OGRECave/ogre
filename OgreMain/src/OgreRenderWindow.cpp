@@ -42,7 +42,7 @@ namespace Ogre {
     {
         width = mWidth;
         height = mHeight;
-        colourDepth = mColourDepth;
+        colourDepth = PixelUtil::getNumElemBits( mFormat );
         left = mLeft;
         top = mTop;
     }

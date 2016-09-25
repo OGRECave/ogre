@@ -39,8 +39,6 @@ namespace Ogre
 {
     class CompositorNodeDef;
 
-    typedef vector<IdString>::type IdStringVec;
-
     /** \addtogroup Core
     *  @{
     */
@@ -58,6 +56,7 @@ namespace Ogre
         PASS_DEPTHCOPY,
         PASS_UAV,
         PASS_MIPMAP,
+        PASS_COMPUTE,
         PASS_CUSTOM
     };
 
@@ -68,6 +67,7 @@ namespace Ogre
             * PASS_STENCIL (@See CompositorPassStencilDef)
             * PASS_DEPTHCOPY (@See CompositorPassDepthCopy)
             * PASS_UAV (@See CompositorPassUavDef)
+            * PASS_COMPUTE (@See CompositorPassComputeDef)
             * PASS_MIPMAP (@See CompositorPassMipmapDef)
         This class doesn't do much on its own. See the derived types for more information
         A definition is shared by all pass instantiations (i.e. Five CompositorPassScene can

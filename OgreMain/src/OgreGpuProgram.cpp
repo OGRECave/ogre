@@ -39,6 +39,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------
     GpuProgram::CmdType GpuProgram::msTypeCmd;
     GpuProgram::CmdSyntax GpuProgram::msSyntaxCmd;
+    GpuProgram::CmdBuildParamsFromRefl GpuProgram::msBuildParamsFromReflCmd;
     GpuProgram::CmdSkeletal GpuProgram::msSkeletalCmd;
     GpuProgram::CmdMorph GpuProgram::msMorphCmd;
     GpuProgram::CmdPose GpuProgram::msPoseCmd;
@@ -52,8 +53,8 @@ namespace Ogre
     GpuProgram::GpuProgram(ResourceManager* creator, const String& name, ResourceHandle handle,
         const String& group, bool isManual, ManualResourceLoader* loader) 
         :Resource(creator, name, handle, group, isManual, loader),
-        mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true), mSkeletalAnimation(false),
-        mMorphAnimation(false), mPoseAnimation(0),
+        mType(GPT_VERTEX_PROGRAM), mLoadFromFile(true), mBuildParametersFromReflection(true),
+        mSkeletalAnimation(false), mMorphAnimation(false), mPoseAnimation(0),
         mVertexTextureFetch(false), mNeedsAdjacencyInfo(false),
         mCompileError(false), mLoadedManualNamedConstants(false)
     {
@@ -113,6 +114,8 @@ namespace Ogre
             paramsSize += mDoubleLogicalToPhysical.getPointer()->bufferSize;
         if(!mIntLogicalToPhysical.isNull())
             paramsSize += mIntLogicalToPhysical.getPointer()->bufferSize;
+        if(!mUIntLogicalToPhysical.isNull())
+            paramsSize += mUIntLogicalToPhysical.getPointer()->bufferSize;
         if(!mConstantDefs.isNull())
             paramsSize += mConstantDefs->calculateSize();
 
@@ -201,10 +204,13 @@ namespace Ogre
     //---------------------------------------------------------------------
     void GpuProgram::createLogicalParameterMappingStructures(bool recreateIfExists) const
     {
+        //TODO: OpenGL doesn't use this AT ALL.
         if (recreateIfExists || mFloatLogicalToPhysical.isNull())
             mFloatLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
         if (recreateIfExists || mIntLogicalToPhysical.isNull())
             mIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
+        if (recreateIfExists || mUIntLogicalToPhysical.isNull())
+            mUIntLogicalToPhysical = GpuLogicalBufferStructPtr(OGRE_NEW GpuLogicalBufferStruct());
     }
     //---------------------------------------------------------------------
     void GpuProgram::createNamedParameterMappingStructures(bool recreateIfExists) const
@@ -226,8 +232,10 @@ namespace Ogre
 
         mFloatLogicalToPhysical->bufferSize = mConstantDefs->floatBufferSize;
         mIntLogicalToPhysical->bufferSize = mConstantDefs->intBufferSize;
+        mUIntLogicalToPhysical->bufferSize = mConstantDefs->uintBufferSize;
         mFloatLogicalToPhysical->map.clear();
         mIntLogicalToPhysical->map.clear();
+        mUIntLogicalToPhysical->map.clear();
         // need to set up logical mappings too for some rendersystems
         for (GpuConstantDefinitionMap::const_iterator i = mConstantDefs->map.begin();
             i != mConstantDefs->map.end(); ++i)
@@ -242,6 +250,10 @@ namespace Ogre
                 if (def.isFloat())
                 {
                     mFloatLogicalToPhysical->map.insert(val);
+                }
+                else if( def.isUnsignedInt() )
+                {
+                    mUIntLogicalToPhysical->map.insert(val);
                 }
                 else
                 {
@@ -317,6 +329,11 @@ namespace Ogre
                          PT_STRING), &msTypeCmd);
         dict->addParameter(
             ParameterDef("syntax", "Syntax code, e.g. vs_1_1", PT_STRING), &msSyntaxCmd);
+        dict->addParameter(
+            ParameterDef("build_parameters_from_reflection",
+                         "Whether to parse the shader to build parameters for auto "
+                         "params and such (optimization when disabled)", PT_BOOL),
+            &msBuildParamsFromReflCmd);
         dict->addParameter(
             ParameterDef("includes_skeletal_animation", 
                          "Whether this vertex program includes skeletal animation", PT_BOOL), 
@@ -423,6 +440,17 @@ namespace Ogre
     {
         GpuProgram* t = static_cast<GpuProgram*>(target);
         t->setSyntaxCode(val);
+    }
+    //-----------------------------------------------------------------------
+    String GpuProgram::CmdBuildParamsFromRefl::doGet(const void* target) const
+    {
+        const GpuProgram* t = static_cast<const GpuProgram*>(target);
+        return StringConverter::toString(t->getBuildParametersFromReflection());
+    }
+    void GpuProgram::CmdBuildParamsFromRefl::doSet(void* target, const String& val)
+    {
+        GpuProgram* t = static_cast<GpuProgram*>(target);
+        t->setBuildParametersFromReflection(StringConverter::parseBool(val));
     }
     //-----------------------------------------------------------------------
     String GpuProgram::CmdSkeletal::doGet(const void* target) const

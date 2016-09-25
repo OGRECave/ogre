@@ -54,3 +54,7 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 @property( envmap_scale )
 	@piece( ApplyEnvMapScale )* pass.ambientUpperHemi.w@end
 @end
+
+@property( envprobe_map && envprobe_map != target_envprobe_map )
+	@set( use_envprobe_map, 1 )
+@end

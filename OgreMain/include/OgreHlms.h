@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #include "OgreStringVector.h"
 #include "OgreHlmsCommon.h"
+#include "OgreHlmsPso.h"
 #if !OGRE_NO_JSON
     #include "OgreHlmsJson.h"
 #endif
@@ -39,6 +40,7 @@ namespace Ogre
 {
     class CompositorShadowNode;
     struct QueuedRenderable;
+    typedef vector<Archive*>::type ArchiveVec;
 
     /** \addtogroup Core
     *  @{
@@ -72,8 +74,6 @@ namespace Ogre
         typedef std::map<IdString, DatablockEntry> HlmsDatablockMap;
 
     protected:
-        typedef std::map<IdString, String> PiecesMap;
-
         struct RenderableCache
         {
             HlmsPropertyVec setProperties;
@@ -100,10 +100,21 @@ namespace Ogre
             }
         };
 
-        typedef vector<HlmsPropertyVec>::type HlmsPropertyVecVec;
+        struct PassCache
+        {
+            HlmsPropertyVec properties;
+            HlmsPassPso     passPso;
+
+            bool operator == ( const PassCache &_r ) const
+            {
+                return properties == _r.properties && passPso == _r.passPso;
+            }
+        };
+
+        typedef vector<PassCache>::type PassCacheVec;
         typedef vector<RenderableCache>::type RenderableCacheVec;
 
-        HlmsPropertyVecVec  mPassCache;
+        PassCacheVec        mPassCache;
         RenderableCacheVec  mRenderableCache;
         HlmsCacheVec        mShaderCache;
 
@@ -133,8 +144,6 @@ namespace Ogre
         RenderSystem    *mRenderSystem;
 
         HlmsDatablockMap mDatablocks;
-
-        typedef vector<IdString>::type IdStringVec;
 
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
         IdStringVec     mRsSpecificExtensions;
@@ -202,12 +211,15 @@ namespace Ogre
 
         typedef std::vector<Expression> ExpressionVec;
 
+        inline int interpretAsNumberThenAsProperty( const String &argValue ) const;
+
         static void copy( String &outBuffer, const SubStringRef &inSubString, size_t length );
         static void repeat( String &outBuffer, const SubStringRef &inSubString, size_t length,
                             size_t passNum, const String &counterVar );
         bool parseMath( const String &inBuffer, String &outBuffer );
         bool parseForEach( const String &inBuffer, String &outBuffer ) const;
         bool parseProperties( String &inBuffer, String &outBuffer ) const;
+        bool parseUndefPieces( String &inBuffer, String &outBuffer );
         bool collectPieces( const String &inBuffer, String &outBuffer );
         bool insertPieces( String &inBuffer, String &outBuffer ) const;
         bool parseCounter( const String &inBuffer, String &outBuffer );
@@ -251,13 +263,9 @@ namespace Ogre
         /// Retrieves a cache entry using the returned value from @addRenderableCache
         const RenderableCache& getRenderableCache( uint32 hash ) const;
 
-        const HlmsCache* addShaderCache( uint32 hash, GpuProgramPtr &vertexShader,
-                                         GpuProgramPtr &geometryShader,
-                                         GpuProgramPtr &tesselationHullShader,
-                                         GpuProgramPtr &tesselationDomainShader,
-                                         GpuProgramPtr &pixelShader );
+        const HlmsCache* addShaderCache( uint32 hash, const HlmsPso &pso );
         const HlmsCache* getShaderCache( uint32 hash ) const;
-        void clearShaderCache(void);
+        virtual void clearShaderCache(void);
 
         void processPieces( Archive *archive, const StringVector &pieceFiles );
 
@@ -302,6 +310,8 @@ namespace Ogre
         HlmsCache preparePassHashBase( const Ogre::CompositorShadowNode *shadowNode,
                                        bool casterPass, bool dualParaboloid,
                                        SceneManager *sceneManager );
+
+        HlmsPassPso getPassPsoForScene( SceneManager *sceneManager );
 
     public:
         /**
@@ -374,6 +384,7 @@ namespace Ogre
 
         Archive* getDataFolder(void)                        { return mDataFolder; }
         const LibraryVec& getPiecesLibrary(void) const      { return mLibrary; }
+        ArchiveVec getPiecesLibraryAsArchiveVec(void) const;
 
         /** Creates a unique datablock that can be shared by multiple renderables.
         @remarks
@@ -488,7 +499,8 @@ namespace Ogre
             Structure containing all necessary shaders
         */
         const HlmsCache* getMaterial( HlmsCache const *lastReturnedValue, const HlmsCache &passCache,
-                                      const QueuedRenderable &queuedRenderable, bool casterPass );
+                                      const QueuedRenderable &queuedRenderable, uint8 inputLayout,
+                                      bool casterPass );
 
         /** Fills the constant buffers. Gets executed right before drawing the mesh.
         @param cache
@@ -560,6 +572,8 @@ namespace Ogre
 
         /// For debugging stuff. I.e. the Command line uses it for testing manually set properties
         void _setProperty( IdString key, int32 value )      { setProperty( key, value ); }
+        int32 _getProperty( IdString key, int32 defaultVal=0 ) const
+                                                { return getProperty( key, defaultVal ); }
 
         /// Utility helper, mostly useful to HlmsListener implementations.
         static int32 getProperty( const HlmsPropertyVec &properties,
@@ -567,6 +581,20 @@ namespace Ogre
 
         /// Internal use. @see HlmsManager::setShadowMappingUseBackFaces
         void _notifyShadowMappingBackFaceSetting(void);
+
+        /// When a macroblock is destroyed, the PSO is no longer valid. We need to destroy it.
+        /// Otherwise when we try to reuse a macroblock with the same internal ID but different
+        /// settings, the old (wrong) PSO will be used.
+        void _notifyMacroblockDestroyed( uint16 id );
+
+        /// @copydoc _notifyMacroblockDestroyed
+        void _notifyBlendblockDestroyed( uint16 id );
+
+        /// @copydoc _notifyMacroblockDestroyed
+        void _notifyInputLayoutDestroyed( uint16 id );
+
+        /// @copydoc _notifyMacroblockDestroyed
+        void _notifyV1InputLayoutDestroyed( uint16 id );
 
         virtual void _changeRenderSystem( RenderSystem *newRs );
 
@@ -616,6 +644,7 @@ namespace Ogre
         static const IdString PssmSplits;
         static const IdString ShadowCaster;
         static const IdString ShadowUsesDepthTexture;
+        static const IdString RenderDepthOnly;
         static const IdString Forward3D;
         static const IdString Forward3DFlipY;
         static const IdString Forward3DDebug;
@@ -627,6 +656,7 @@ namespace Ogre
         static const IdString AlphaBlend;
 
         static const IdString GL3Plus;
+        static const IdString iOS;
         static const IdString HighQuality;
         static const IdString TexGather;
         static const IdString DisableStage;
@@ -637,9 +667,35 @@ namespace Ogre
         static const IdString *UvCountPtrs[8];
     };
 
+    struct _OgreExport HlmsPsoProp
+    {
+        static const IdString Macroblock;
+        static const IdString Blendblock;
+        static const IdString OperationTypeV1;
+    };
+
     struct _OgreExport HlmsBasePieces
     {
         static const IdString AlphaTestCmpFunc;
+    };
+
+    struct _OgreExport HlmsBits
+    {
+        static const int HlmsTypeBits;
+        static const int RenderableBits;
+        static const int PassBits;
+        static const int InputLayoutBits;
+
+        static const int HlmsTypeShift;
+        static const int RenderableShift;
+        static const int PassShift;
+        static const int InputLayoutShift;
+
+        static const int RendarebleHlmsTypeMask;
+        static const int HlmsTypeMask;
+        static const int RenderableMask;
+        static const int PassMask;
+        static const int InputLayoutMask;
     };
 
     /** @} */

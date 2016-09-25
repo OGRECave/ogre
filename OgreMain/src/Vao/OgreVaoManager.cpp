@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Vao/OgreVertexArrayObject.h"
 #include "Vao/OgreConstBufferPacked.h"
 #include "Vao/OgreTexBufferPacked.h"
+#include "Vao/OgreUavBufferPacked.h"
 #include "Vao/OgreIndirectBufferPacked.h"
 #include "OgreTimer.h"
 #include "OgreCommon.h"
@@ -52,8 +53,10 @@ namespace Ogre
         mNumGeneratedVaos( 0 ),
         mConstBufferAlignment( 256 ),
         mTexBufferAlignment( 256 ),
+        mUavBufferAlignment( 256 ),
         mConstBufferMaxSize( 16 * 1024 * 1024 ), //Minimum guaranteed by GL.
-        mTexBufferMaxSize( 128 * 1024 * 1024 )   //Minimum guaranteed by GL.
+        mTexBufferMaxSize( 128 * 1024 * 1024 ),  //Minimum guaranteed by GL.
+        mUavBufferMaxSize( 16 * 1024 * 1024 )    //Minimum guaranteed by GL.
     {
         mTimer = OGRE_NEW Timer();
     }
@@ -267,6 +270,38 @@ namespace Ogre
         efficientVectorRemove( mBuffers[BP_TYPE_TEX], itor );
     }
     //-----------------------------------------------------------------------------------
+    UavBufferPacked* VaoManager::createUavBuffer( size_t numElements, uint32 bytesPerElement,
+                                                  uint32 bindFlags,
+                                                  void *initialData, bool keepAsShadow )
+    {
+        UavBufferPacked *retVal;
+        retVal = createUavBufferImpl( numElements, bytesPerElement, bindFlags,
+                                      initialData, keepAsShadow );
+        mBuffers[BP_TYPE_UAV].push_back( retVal );
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    void VaoManager::destroyUavBuffer( UavBufferPacked *uavBuffer )
+    {
+        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_UAV].begin(),
+                                                    mBuffers[BP_TYPE_UAV].end(), uavBuffer );
+
+        if( itor == mBuffers[BP_TYPE_UAV].end() )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALID_STATE,
+                         "UAV Buffer has already been destroyed or "
+                         "doesn't belong to this VaoManager.",
+                         "VaoManager::destroyUavBuffer" );
+        }
+
+        assert( uavBuffer->getBufferType() == BT_DEFAULT );
+
+        destroyUavBufferImpl( uavBuffer );
+        OGRE_DELETE *itor;
+
+        efficientVectorRemove( mBuffers[BP_TYPE_UAV], itor );
+    }
+    //-----------------------------------------------------------------------------------
     IndirectBufferPacked* VaoManager::createIndirectBuffer( size_t sizeBytes, BufferType bufferType,
                                                             void *initialData, bool keepAsShadow )
     {
@@ -307,7 +342,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
                                                             IndexBufferPacked *indexBuffer,
-                                                            v1::RenderOperation::OperationType opType )
+                                                            OperationType opType )
     {
         if( vertexBuffers.size() > 1 )
         {
@@ -510,6 +545,10 @@ namespace Ogre
         case BP_TYPE_TEX:
             assert( dynamic_cast<TexBufferPacked*>( bufferPacked ) );
             destroyTexBufferImpl( static_cast<TexBufferPacked*>( bufferPacked ) );
+            break;
+        case BP_TYPE_UAV:
+            assert( dynamic_cast<UavBufferPacked*>( bufferPacked ) );
+            destroyUavBufferImpl( static_cast<UavBufferPacked*>( bufferPacked ) );
             break;
         case BP_TYPE_INDIRECT:
             assert( dynamic_cast<IndirectBufferPacked*>( bufferPacked ) );

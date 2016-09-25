@@ -36,17 +36,18 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    VertexBufferPacked VertexArrayObject::msDummyVertexBuffer( 0, 0, 1, BT_DEFAULT, 0, false, 0,
+    VertexBufferPacked VertexArrayObject::msDummyVertexBuffer( 0, 0, 1, 0, BT_DEFAULT, 0, false, 0,
                                                                0, VertexElement2Vec(), 0, 0, 0 );
 
     typedef vector<VertexBufferPacked*>::type VertexBufferPackedVec;
 
-    VertexArrayObject::VertexArrayObject( uint32 vaoName, uint32 renderQueueId,
+    VertexArrayObject::VertexArrayObject( uint32 vaoName, uint32 renderQueueId, uint8 inputLayoutId,
                                           const VertexBufferPackedVec &vertexBuffers,
                                           IndexBufferPacked *indexBuffer,
-                                          v1::RenderOperation::OperationType operationType ) :
+                                          OperationType operationType ) :
             mVaoName( vaoName ),
             mRenderQueueId( renderQueueId ),
+            mInputLayoutId( inputLayoutId ),
             mPrimStart( 0 ),
             mPrimCount( 0 ),
             mVertexBuffers( vertexBuffers ),
@@ -66,11 +67,11 @@ namespace Ogre
 
         /*switch( mOperationType )
         {
-        case v1::RenderOperation::OT_TRIANGLE_LIST:
+        case OT_TRIANGLE_LIST:
             mFaceCount = (val / 3);
             break;
-        case v1::RenderOperation::OT_TRIANGLE_STRIP:
-        case v1::RenderOperation::OT_TRIANGLE_FAN:
+        case OT_TRIANGLE_STRIP:
+        case OT_TRIANGLE_FAN:
             mFaceCount = (val - 2);
             break;
         default:
@@ -152,6 +153,22 @@ namespace Ogre
         retVal.reserve( mVertexBuffers.size() );
         VertexBufferPackedVec::const_iterator itBuffers = mVertexBuffers.begin();
         VertexBufferPackedVec::const_iterator enBuffers = mVertexBuffers.end();
+
+        while( itBuffers != enBuffers )
+        {
+            retVal.push_back( (*itBuffers)->getVertexElements() );
+            ++itBuffers;
+        }
+
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    VertexElement2VecVec VertexArrayObject::getVertexDeclaration( const VertexBufferPackedVec &vertexBuffers )
+    {
+        VertexElement2VecVec retVal;
+        retVal.reserve( vertexBuffers.size() );
+        VertexBufferPackedVec::const_iterator itBuffers = vertexBuffers.begin();
+        VertexBufferPackedVec::const_iterator enBuffers = vertexBuffers.end();
 
         while( itBuffers != enBuffers )
         {

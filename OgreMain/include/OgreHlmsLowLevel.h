@@ -76,6 +76,8 @@ namespace Ogre
         HlmsLowLevel();
         ~HlmsLowLevel();
 
+        AutoParamDataSource* _getAutoParamDataSource(void) const    { return mAutoParamDataSource; }
+
         virtual void calculateHashFor( Renderable *renderable, uint32 &outHash, uint32 &outCasterHash );
 
         virtual HlmsCache preparePassHash( const Ogre::CompositorShadowNode *shadowNode,
@@ -95,6 +97,14 @@ namespace Ogre
                                          const QueuedRenderable &queuedRenderable,
                                          bool casterPass, uint32 lastCacheHash,
                                          CommandBuffer *commandBuffer );
+
+        void executeCommand( const MovableObject *movableObject, Renderable *renderable,
+                             bool casterPass );
+    };
+
+    struct _OgreExport LowLevelProp
+    {
+        static const IdString PassId;
     };
 
     /** @} */

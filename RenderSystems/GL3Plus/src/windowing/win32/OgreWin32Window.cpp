@@ -55,6 +55,8 @@ namespace Ogre {
         mIsFullScreen = false;
         mHWnd = 0;
         mGlrc = 0;
+        mColourDepth = 32;
+        mFormat = PF_R8G8B8A8;
         mIsExternal = false;
         mIsExternalGLControl = false;
         mOwnsGLContext = true;

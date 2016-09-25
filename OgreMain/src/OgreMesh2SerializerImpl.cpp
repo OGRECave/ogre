@@ -305,7 +305,7 @@ namespace Ogre {
             popInnerChunk(mStream);
         }
 
-        if( vao->getOperationType() != v1::RenderOperation::OT_TRIANGLE_LIST )
+        if( vao->getOperationType() != OT_TRIANGLE_LIST )
             writeSubMeshLodOperation( vao );
 
         popInnerChunk(mStream);
@@ -565,7 +565,7 @@ namespace Ogre {
     {
         size_t size = MSTREAM_OVERHEAD_SIZE;
 
-        if( vao->getOperationType() != v1::RenderOperation::OT_TRIANGLE_LIST )
+        if( vao->getOperationType() != OT_TRIANGLE_LIST )
             size += calcSubMeshLodOperationSize( vao );
 
         // uint32 indexCount
@@ -933,7 +933,7 @@ namespace Ogre {
 
         pushInnerChunk(stream);
 
-        subLod->operationType = v1::RenderOperation::OT_TRIANGLE_LIST;
+        subLod->operationType = OT_TRIANGLE_LIST;
 
         uint16 streamID = readChunk(stream);
         while( !stream->eof() &&
@@ -1126,7 +1126,7 @@ namespace Ogre {
         // uint16 operationType
         uint16 opType;
         readShorts(stream, &opType, 1);
-        subLod->operationType = static_cast<v1::RenderOperation::OperationType>(opType);
+        subLod->operationType = static_cast<OperationType>(opType);
     }
     //---------------------------------------------------------------------
     void MeshSerializerImpl::writeSkeletonLink(const String& skelName)

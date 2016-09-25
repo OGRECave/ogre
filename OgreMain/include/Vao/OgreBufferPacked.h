@@ -29,7 +29,7 @@ THE SOFTWARE.
 #ifndef _Ogre_BufferPacked_H_
 #define _Ogre_BufferPacked_H_
 
-#include "OgrePrerequisites.h"
+#include "OgreResourceTransition.h"
 
 namespace Ogre
 {
@@ -85,8 +85,19 @@ namespace Ogre
         BP_TYPE_INDEX,
         BP_TYPE_CONST,
         BP_TYPE_TEX,
+        BP_TYPE_UAV,
         BP_TYPE_INDIRECT,
         NUM_BUFFER_PACKED_TYPES
+    };
+
+    enum BufferBindFlags
+    {
+        BB_FLAG_VERTEX      = 1u << BP_TYPE_VERTEX,
+        BB_FLAG_INDEX       = 1u << BP_TYPE_INDEX,
+        BB_FLAG_CONST       = 1u << BP_TYPE_CONST,
+        BB_FLAG_TEX         = 1u << BP_TYPE_TEX,
+        BB_FLAG_UAV         = 1u << BP_TYPE_UAV,
+        BB_FLAG_INDIRECT    = 1u << BP_TYPE_INDIRECT
     };
 
     /** Helper class to that will free the pointer on the destructor. Usage:
@@ -115,12 +126,13 @@ namespace Ogre
         }
     };
 
-    class _OgreExport BufferPacked : public BufferPackedAlloc
+    class _OgreExport BufferPacked : public GpuResource, public BufferPackedAlloc
     {
         friend class BufferInterface;
         friend class D3D11BufferInterface;
         friend class D3D11CompatBufferInterface;
         friend class GL3PlusBufferInterface;
+        friend class MetalBufferInterface;
         friend class NULLBufferInterface;
 
     protected:
@@ -128,6 +140,7 @@ namespace Ogre
         size_t mFinalBufferStart;     /// In elements, includes dynamic buffer frame offset
         size_t mNumElements;
         uint32 mBytesPerElement;
+        uint32 mNumElementsPadding;
 
         BufferType      mBufferType;
         VaoManager      *mVaoManager;
@@ -171,12 +184,16 @@ namespace Ogre
             Must be false if bufferType >= BT_DYNAMIC
         */
         BufferPacked( size_t internalBufferStartBytes, size_t numElements, uint32 bytesPerElement,
-                      BufferType bufferType, void *initialData, bool keepAsShadow,
+                      uint32 numElementsPadding, BufferType bufferType,
+                      void *initialData, bool keepAsShadow,
                       VaoManager *vaoManager, BufferInterface *bufferInterface );
         virtual ~BufferPacked();
 
         /// Useful to query which one is the derived class.
         virtual BufferPackedTypes getBufferPackedType(void) const = 0;
+
+        /// For internal use.
+        void _setBufferInterface( BufferInterface *bufferInterface );
 
         BufferType getBufferType(void) const                    { return mBufferType; }
         BufferInterface* getBufferInterface(void) const         { return mBufferInterface; }
@@ -264,6 +281,9 @@ namespace Ogre
 
         size_t _getInternalBufferStart(void) const              { return mInternalBufferStart; }
         size_t _getFinalBufferStart(void) const                 { return mFinalBufferStart; }
+        uint32 _getInternalTotalSizeBytes(void) const   { return (mNumElements + mNumElementsPadding) *
+                                                                 mBytesPerElement; }
+        uint32 _getInternalNumElements(void) const      { return mNumElements + mNumElementsPadding; }
 
         const void* getShadowCopy(void) const   { return mShadowCopy; }
     };

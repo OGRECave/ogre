@@ -40,8 +40,8 @@ namespace Ogre
         NULLVertexArrayObject( uint32 vaoName, uint32 renderQueueId,
                                   const VertexBufferPackedVec &vertexBuffers,
                                   IndexBufferPacked *indexBuffer,
-                                  v1::RenderOperation::OperationType opType ) :
-            VertexArrayObject( vaoName, renderQueueId, vertexBuffers, indexBuffer, opType )
+                                  OperationType opType ) :
+            VertexArrayObject( vaoName, renderQueueId, 0, vertexBuffers, indexBuffer, opType )
         {
         }
     };
