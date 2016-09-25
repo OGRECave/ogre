@@ -59,6 +59,13 @@ namespace Ogre
             Warning: calling pass->execute can result in recursive calls.
         */
         virtual void passPosExecute( CompositorPass *pass ) {}
+
+        /** Called from CompositorManager2 (not CompositorWorkspace) when we're
+            about to update all the workspaces (it's safe to update your own workspaces
+            without calling _beginUpdate and _endUpdate)
+            Warning: Don't add/remove listeners to CompositorManager2 inside this function.
+        */
+        virtual void allWorkspacesBeginUpdate(void) {}
     };
 
     /** @} */

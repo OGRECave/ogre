@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "Cubemaps/OgreCubemapProbe.h"
 #include "OgreIdString.h"
 #include "OgreId.h"
+#include "OgreFrameListener.h"
 #include "Compositor/OgreCompositorWorkspaceListener.h"
 #include "OgreHeaderPrefix.h"
 
@@ -41,7 +42,8 @@ namespace Ogre
     /**
     */
     class _OgreHlmsPbsExport ParallaxCorrectedCubemap : public IdObject,
-                                                        public CompositorWorkspaceListener
+                                                        public CompositorWorkspaceListener,
+                                                        public FrameListener
     {
         typedef vector<CubemapProbe*>::type CubemapProbeVec;
         CubemapProbeVec mProbes;
@@ -60,6 +62,7 @@ namespace Ogre
         HlmsSamplerblock const          *mSamplerblockTrilinear;
         float                           mCurrentMip;
 
+        Root                            *mRoot;
         SceneManager                    *mSceneManager;
         CompositorWorkspaceDef const    *mDefaultWorkspaceDef;
 
@@ -89,7 +92,7 @@ namespace Ogre
         void calculateBlendFactors(void);
 
     public:
-        ParallaxCorrectedCubemap( IdType id, SceneManager *sceneManager,
+        ParallaxCorrectedCubemap( IdType id, Root *root, SceneManager *sceneManager,
                                   const CompositorWorkspaceDef *probeWorkspaceDef );
         ~ParallaxCorrectedCubemap();
 
@@ -111,6 +114,10 @@ namespace Ogre
 
         //CompositorWorkspaceListener overloads
         virtual void passPreExecute( CompositorPass *pass );
+        virtual void allWorkspacesBeginUpdate(void);
+
+        //FrameListener overloads
+        virtual bool frameStarted( const FrameEvent& evt );
     };
 
     /** @} */

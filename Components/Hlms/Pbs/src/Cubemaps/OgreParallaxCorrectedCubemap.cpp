@@ -37,6 +37,7 @@ THE SOFTWARE.
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
 
+#include "OgreRoot.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderTexture.h"
 
@@ -55,7 +56,8 @@ namespace Ogre
         "PZ", "NZ",
     };
 
-    ParallaxCorrectedCubemap::ParallaxCorrectedCubemap( IdType id, SceneManager *sceneManager,
+    ParallaxCorrectedCubemap::ParallaxCorrectedCubemap( IdType id, Root *root,
+                                                        SceneManager *sceneManager,
                                                         const CompositorWorkspaceDef *probeWorkspcDef ) :
         IdObject( id ),
         mBlankProbe( this ),
@@ -64,6 +66,7 @@ namespace Ogre
         mSamplerblockPoint( 0 ),
         mSamplerblockTrilinear( 0 ),
         mCurrentMip( 0 ),
+        mRoot( root ),
         mSceneManager( sceneManager ),
         mDefaultWorkspaceDef( probeWorkspcDef )
     {
@@ -94,10 +97,18 @@ namespace Ogre
         }
 
         mBlankProbe.setTextureParams( 1, 1 );
+
+        mRoot->addFrameListener( this );
+        CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
+        compositorManager->addListener( this );
     }
     //-----------------------------------------------------------------------------------
     ParallaxCorrectedCubemap::~ParallaxCorrectedCubemap()
     {
+        CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
+        compositorManager->removeListener( this );
+        mRoot->removeFrameListener( this );
+
         destroyCompositorData();
 
         destroyAllProbes();
@@ -221,10 +232,12 @@ namespace Ogre
                                                            mBlendDummyCamera,
                                                            workspaceName,
                                                            false );
+        mBlendWorkspace->setListener( this );
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::destroyCompositorData(void)
     {
+        mBlendWorkspace->setListener( 0 );
         CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
         compositorManager->removeWorkspace( mBlendWorkspace );
         mBlendWorkspace = 0;
@@ -505,5 +518,16 @@ namespace Ogre
         }
 
         ++mCurrentMip;
+    }
+    //-----------------------------------------------------------------------------------
+    bool ParallaxCorrectedCubemap::frameStarted( const FrameEvent& evt )
+    {
+        this->updateSceneGraph();
+        return true;
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::allWorkspacesBeginUpdate(void)
+    {
+        this->updateRender();
     }
 }

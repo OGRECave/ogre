@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
 
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
@@ -560,6 +561,17 @@ namespace Ogre
             ++itor;
         }
 
+        {
+            //Notify the listeners
+            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
+            while( itor != end )
+            {
+                (*itor)->allWorkspacesBeginUpdate();
+                ++itor;
+            }
+        }
+
         //The actual update
         itor = mWorkspaces.begin();
 
@@ -662,5 +674,21 @@ namespace Ogre
     CompositorPassProvider* CompositorManager2::getCompositorPassProvider(void) const
     {
         return mCompositorPassProvider;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::addListener( CompositorWorkspaceListener *listener )
+    {
+        mListeners.push_back( listener );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeListener( CompositorWorkspaceListener *listener )
+    {
+        CompositorWorkspaceListenerVec::iterator itor = std::find( mListeners.begin(),
+                                                                   mListeners.end(),
+                                                                   listener );
+
+        //Preserve order.
+        if( itor != mListeners.end() )
+            mListeners.erase( itor );
     }
 }
