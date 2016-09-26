@@ -132,6 +132,15 @@ namespace Demo
                     mGraphicsSystem->getRoot(),
                     mGraphicsSystem->getSceneManager(),
                     workspaceDef );
+
+        Ogre::CubemapProbe *probe = mParallaxCorrectedCubemap->createProbe();
+        probe->setTextureParams( 1024, 1024 );
+        probe->initWorkspace();
+        probe->set( Ogre::Vector3::ZERO,
+                    Ogre::Aabb::newFromExtents( Ogre::Vector3( -10, -1, -10 ),
+                                                Ogre::Vector3( 10, 10, 10 ) ),
+                    Ogre::Matrix3::IDENTITY,
+                    Ogre::Vector3( 1.0f ) );
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::createScene01(void)

@@ -75,7 +75,6 @@ namespace Demo
         LocalCubemapsGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
-            mAlwaysAskForConfig = false;
         }
     };
 
