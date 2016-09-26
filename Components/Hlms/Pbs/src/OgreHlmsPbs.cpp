@@ -43,6 +43,7 @@ THE SOFTWARE.
 #include "OgreHighLevelGpuProgramManager.h"
 #include "OgreHighLevelGpuProgram.h"
 #include "OgreForward3D.h"
+#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
 
 #include "OgreSceneManager.h"
 #include "Compositor/OgreCompositorShadowNode.h"
@@ -136,6 +137,7 @@ namespace Ogre
     const IdString PbsProperty::AmbientFixed      = IdString( "ambient_fixed" );
     const IdString PbsProperty::AmbientHemisphere = IdString( "ambient_hemisphere" );
     const IdString PbsProperty::TargetEnvprobeMap = IdString( "target_envprobe_map" );
+    const IdString PbsProperty::ParallaxCorrectCubemaps = IdString( "parallax_correct_cubemaps" );
 
     const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
@@ -200,6 +202,7 @@ namespace Ogre
         mShadowmapSamplerblock( 0 ),
         mShadowmapCmpSamplerblock( 0 ),
         mCurrentShadowmapSamplerblock( 0 ),
+        mParallaxCorrectedCubemap( 0 ),
         mCurrentPassBuffer( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
@@ -743,6 +746,9 @@ namespace Ogre
                     mTargetEnvMap = firstTargetTex;
                 }
             }
+
+            if( mParallaxCorrectedCubemap )
+                setProperty( PbsProperty::ParallaxCorrectCubemaps, 1 );
         }
 
         if( mOptimizationStrategy == LowerGpuOverhead )
@@ -794,6 +800,9 @@ namespace Ogre
                 mGridBuffer             = forward3D->getGridBuffer( camera );
                 mGlobalLightListBuffer  = forward3D->getGlobalLightListBuffer( camera );
             }
+
+            if( mParallaxCorrectedCubemap )
+                mapSize += mParallaxCorrectedCubemap->getConstBufferSize();
 
             //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
             //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
@@ -1091,6 +1100,13 @@ namespace Ogre
             {
                 forward3D->fillConstBufferData( renderTarget, passBufferPtr );
                 passBufferPtr += forward3D->getConstBufferSize() >> 2;
+            }
+
+            if( mParallaxCorrectedCubemap )
+            {
+                mParallaxCorrectedCubemap->fillConstBufferData( viewMatrix, invViewMatrixCubemap,
+                                                                passBufferPtr );
+                passBufferPtr += mParallaxCorrectedCubemap->getConstBufferSize() >> 2;
             }
         }
         else

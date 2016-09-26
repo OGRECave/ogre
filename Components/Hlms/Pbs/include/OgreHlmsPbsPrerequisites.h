@@ -92,6 +92,7 @@ namespace Ogre
     };
 
     class HlmsPbs;
+    class ParallaxCorrectedCubemap;
 }
 
 #endif

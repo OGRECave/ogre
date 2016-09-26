@@ -129,6 +129,10 @@ namespace Ogre
         void updateSceneGraph(void);
         void updateRender(void);
 
+        size_t getConstBufferSize(void) const;
+        void fillConstBufferData( const Matrix4 &viewMatrix, const Matrix3 &invViewMatrixLeftHanded,
+                                  float * RESTRICT_ALIAS passBufferPtr ) const;
+
         /// See mTmpRtt. Finds an RTT that is compatible to copy to baseParams.
         /// Creates one if none found.
         TexturePtr findTmpRtt( const TexturePtr &baseParams );
@@ -136,6 +140,8 @@ namespace Ogre
 
         SceneManager* getSceneManager(void) const;
         const CompositorWorkspaceDef* getDefaultWorkspaceDef(void) const;
+
+        TexturePtr _tempGetBlendCubemap(void) const    { return mBlendCubemap; }
 
         //CompositorWorkspaceListener overloads
         virtual void passPreExecute( CompositorPass *pass );

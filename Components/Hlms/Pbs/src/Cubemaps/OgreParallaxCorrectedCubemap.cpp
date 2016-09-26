@@ -491,6 +491,54 @@ namespace Ogre
         mBlendWorkspace->_update();
     }
     //-----------------------------------------------------------------------------------
+    size_t ParallaxCorrectedCubemap::getConstBufferSize(void) const
+    {
+        return 5 * 4 * sizeof(float); //CubemapProbe localProbe;
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::fillConstBufferData( const Matrix4 &viewMatrix,
+                                                        const Matrix3 &invViewMatrixLeftHanded,
+                                                        float * RESTRICT_ALIAS passBufferPtr ) const
+    {
+        const Matrix3 viewSpaceToProbeLocal = mCollectedProbes[0]->mAabbOrientation *
+                                              invViewMatrixLeftHanded;
+
+        const Aabb &aabb = mCollectedProbes[0]->getArea();
+        Vector3 aabbCenterVS = viewMatrix * aabb.mCenter; //View-space
+
+        //float4 row0_centerX;
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][0];
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][1];
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][2];
+        *passBufferPtr++ = aabbCenterVS.x;
+
+        //float4 row1_centerY;
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][3];
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][4];
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][5];
+        *passBufferPtr++ = aabbCenterVS.y;
+
+        //float4 row2_centerZ;
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][6];
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][7];
+        *passBufferPtr++ = viewSpaceToProbeLocal[0][8];
+        *passBufferPtr++ = aabbCenterVS.z;
+
+        //float4 halfSize;
+        *passBufferPtr++ = aabb.mHalfSize.x;
+        *passBufferPtr++ = aabb.mHalfSize.y;
+        *passBufferPtr++ = aabb.mHalfSize.z;
+        *passBufferPtr++ = 1.0f;
+
+        //float4 cubemapPosLS;
+        Vector3 cubemapPosLS = mCollectedProbes[0]->mProbePos - aabb.mCenter;
+        cubemapPosLS = mCollectedProbes[0]->mAabbOrientation * cubemapPosLS;
+        *passBufferPtr++ = cubemapPosLS.x;
+        *passBufferPtr++ = cubemapPosLS.y;
+        *passBufferPtr++ = cubemapPosLS.z;
+        *passBufferPtr++ = 1.0f;
+    }
+    //-----------------------------------------------------------------------------------
     TexturePtr ParallaxCorrectedCubemap::findTmpRtt( const TexturePtr &baseParams )
     {
         TexturePtr retVal;

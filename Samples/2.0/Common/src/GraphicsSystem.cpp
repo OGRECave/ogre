@@ -451,9 +451,13 @@ namespace Demo
         Ogre::Archive *archiveLibrary = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Common/" + shaderSyntax,
                         "FileSystem", true );
+        Ogre::Archive *archiveLibraryAny = Ogre::ArchiveManager::getSingletonPtr()->load(
+                        dataFolder + "Hlms/Common/Any",
+                        "FileSystem", true );
 
         Ogre::ArchiveVec library;
         library.push_back( archiveLibrary );
+        library.push_back( archiveLibraryAny );
 
         Ogre::Archive *archiveUnlit = Ogre::ArchiveManager::getSingletonPtr()->load(
                         dataFolder + "Hlms/Unlit/" + shaderSyntax,

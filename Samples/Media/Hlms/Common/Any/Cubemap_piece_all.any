@@ -1,55 +1,60 @@
 
 //#include "SyntaxHighlightingMisc.h"
+@property( parallax_correct_cubemaps )
 
 @piece( DeclCubemapProbeStruct )
 struct CubemapProbe
 {
-	float4 row0_minX;
-	float4 row1_minY;
-	float4 row2_minZ;
-	float4 maxZ;
-	float4 cubemapPos;
+	float4 row0_centerX;
+	float4 row1_centerY;
+	float4 row2_centerZ;
+	float4 halfSize;
+	float4 cubemapPosLS;
 };
 @end
 
 @piece( DeclParallaxLocalCorrect )
 /** Parallax Correct a reflection dir based on an OBB (Oriented Bounding Box) from a cubemap probe.
-@param reflDir
+\param reflDir
 	Reflection dir, in view space.
-@param pos
+\param pos
 	Position of the object where the reflection is going to reflect, in view space
-@param probe
+\param probe
 	Cubemap's probe
-@return
+\return
 	Parallax-Corrected reflection dir, IN LOCAL SPACE (local to probe's).
 */
 @property( syntax == metal )inline@end float3 localCorrect( float3 reflDir, float3 pos, CubemapProbe probe )
 {
-	float3 minAabb = float3( probe.row0_minX.w, probe.row1_minY.w, probe.row2_minZ.w );
-	float3 maxAabb = probe.maxZ.xyz;
+	float3 aabbCenterVS	= float3( probe.row0_centerX.w, probe.row1_centerY.w, probe.row2_centerZ.w );
+	float3 aabbHalfSize	= probe.halfSize.xyz;
 
-	float3x3 viewSpaceToProbeLocal = float3x3( probe.row0_minX.xyz,
-											   probe.row1_minY.xyz,
-											   probe.row2_minZ.xyz );
+	float3x3 viewSpaceToProbeLocal = float3x3(
+				probe.row0_centerX.x, probe.row0_centerX.y, probe.row0_centerX.z,
+				probe.row1_centerY.x, probe.row1_centerY.y, probe.row1_centerY.z,
+				probe.row2_centerZ.x, probe.row2_centerZ.y, probe.row2_centerZ.z );
+	float3 posLS = pos - aabbCenterVS;
 
 	@property( syntax == hlsl )
-		float3 reflDirLS = mul( viewSpaceToProbeLocal, reflDir );
+		float3 reflDirLS = mul( reflDir, viewSpaceToProbeLocal );
+		posLS = mul( posLS, viewSpaceToProbeLocal );
 	@end @property( syntax != hlsl )
-		float3 reflDirLS = viewSpaceToProbeLocal * reflDir;
+		float3 reflDirLS = reflDir * viewSpaceToProbeLocal;
+		posLS = posLS * viewSpaceToProbeLocal;
 	@end
 
 	//Find the ray intersection with box plane
 	float3 invReflDirLS = float3( 1.0, 1.0, 1.0 ) / reflDirLS;
-	float3 intersectAtMinPlane = ( minAabb - pos ) * invReflDirLS;
-	float3 intersectAtMaxPlane = ( maxAabb - pos ) * invReflDirLS;
+	float3 intersectAtMinPlane = ( -aabbHalfSize - posLS ) * invReflDirLS;
+	float3 intersectAtMaxPlane = (  aabbHalfSize - posLS ) * invReflDirLS;
 	//Get the largest intersection values (we are not intersted in negative values)
 	float3 largestIntersect = max( intersectAtMaxPlane.xyz, intersectAtMinPlane.xyz );
 	//Get the closest of all solutions
 	float distance = min( min( largestIntersect.x, largestIntersect.y ), largestIntersect.z );
 	//Get the intersection position
-	float3 intersectPositionLS = pos.xyz + reflDirLS.xyz * distance;
+	float3 intersectPositionLS = posLS.xyz + reflDirLS.xyz * distance;
 	//Get corrected vector
-	float3 localCorrectedVec = intersectPositionLS.xyz - probe.cubemapPos.xyz;
+	float3 localCorrectedVec = intersectPositionLS.xyz - probe.cubemapPosLS.xyz;
 	return localCorrectedVec;
 }
 @end
@@ -58,3 +63,4 @@ struct CubemapProbe
 //{
 //	return localCorrect( reflDir, pos, probe );
 //}
+@end

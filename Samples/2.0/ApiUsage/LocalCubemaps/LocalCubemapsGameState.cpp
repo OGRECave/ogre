@@ -118,10 +118,6 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::setupParallaxCorrectCubemaps(void)
     {
-//        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-//        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
-//        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
-
         Ogre::Root *root = mGraphicsSystem->getRoot();
         Ogre::CompositorManager2 *compositorManager = root->getCompositorManager2();
         Ogre::CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition(
@@ -138,11 +134,16 @@ namespace Demo
         Ogre::CubemapProbe *probe = mParallaxCorrectedCubemap->createProbe();
         probe->setTextureParams( 1024, 1024 );
         probe->initWorkspace();
-        probe->set( Ogre::Vector3( 0, 1, 0 ),
+        probe->set( Ogre::Vector3( 0, (-1 + 10) * 0.5, 0 ),
                     Ogre::Aabb::newFromExtents( Ogre::Vector3( -10, -1, -10 ),
                                                 Ogre::Vector3( 10, 10, 10 ) ),
                     Ogre::Matrix3::IDENTITY,
                     Ogre::Vector3( 1.0f ) );
+
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+        hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::createScene01(void)
@@ -175,7 +176,13 @@ namespace Demo
             sceneNode->setPosition( 0, -1, 0 );
             sceneNode->attachObject( item );
 
-            //datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mLocalCubemaps );
+            Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+            assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+            Ogre::HlmsPbsDatablock *datablock = (Ogre::HlmsPbsDatablock *)hlmsPbs->getDefaultDatablock();
+            datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
+            datablock->setRoughness( 0.02 );
+            datablock->setFresnel( Ogre::Vector3( 1 ), false );
         }
 
         for( int i=0; i<4; ++i )
@@ -242,10 +249,13 @@ namespace Demo
 
                     //Set the dynamic cubemap to these materials.
                     //datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mLocalCubemaps );
-                    datablock->setDiffuse( Ogre::Vector3( 0.0f, 1.0f, 0.0f ) );
+//                    datablock->setDiffuse( Ogre::Vector3( 0.0f, 1.0f, 0.0f ) );
 
-                    datablock->setRoughness( std::max( 0.02f, x / Ogre::max( 1, (float)(numX-1) ) ) );
-                    datablock->setFresnel( Ogre::Vector3( z / Ogre::max( 1, (float)(numZ-1) ) ), false );
+//                    datablock->setRoughness( std::max( 0.02f, x / Ogre::max( 1, (float)(numX-1) ) ) );
+//                    datablock->setFresnel( Ogre::Vector3( z / Ogre::max( 1, (float)(numZ-1) ) ), false );
+                    datablock->setDiffuse( Ogre::Vector3( 0.0f, 0.0f, 0.0f ) );
+                    datablock->setRoughness( 0.02f );
+                    datablock->setFresnel( Ogre::Vector3( 1.0f ), false );
 
                     Ogre::Item *item = sceneManager->createItem( "Sphere1000.mesh",
                                                                  Ogre::ResourceGroupManager::
@@ -316,6 +326,11 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::destroyScene(void)
     {
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+        hlmsPbs->setParallaxCorrectedCubemap( 0 );
+
         delete mParallaxCorrectedCubemap;
         mParallaxCorrectedCubemap = 0;
 

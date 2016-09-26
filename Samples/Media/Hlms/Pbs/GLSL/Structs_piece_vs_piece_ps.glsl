@@ -18,6 +18,8 @@ struct Light
 @end
 };
 
+@insertpiece( DeclCubemapProbeStruct )
+
 //Uniforms that change per pass
 layout(binding = 0) uniform PassBuffer
 {
@@ -58,6 +60,11 @@ layout(binding = 0) uniform PassBuffer
 	vec4 f3dData;
 	vec4 f3dGridHWW[@value( hlms_forward3d )];
 @end
+
+@property( parallax_correct_cubemaps )
+	CubemapProbe localProbe;
+@end
+
 	@insertpiece( custom_passBuffer )
 } pass;
 @end
