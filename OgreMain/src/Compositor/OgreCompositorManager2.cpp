@@ -337,15 +337,25 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinition( IdString name ) const
     {
-        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
-        if( itor == mWorkspaceDefs.end() )
+        CompositorWorkspaceDef *retVal = getWorkspaceDefinitionNoThrow( name );
+        if( !retVal )
         {
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace definition with name '" +
                             name.getFriendlyText() + "' not found",
                             "CompositorManager2::getWorkspaceDefinition" );
         }
 
-        return itor->second;
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinitionNoThrow( IdString name ) const
+    {
+        CompositorWorkspaceDef *retVal = 0;
+        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
+        if( itor != mWorkspaceDefs.end() )
+            retVal = itor->second;
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,

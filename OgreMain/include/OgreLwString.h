@@ -164,7 +164,7 @@ namespace Ogre
 
             if( newSize < this->mSize )
             {
-                mStrPtr[newSize + 1u] = '\0';
+                mStrPtr[newSize] = '\0';
                 mSize = newSize;
             }
         }

@@ -40,6 +40,7 @@ THE SOFTWARE.
 #include "OgreRoot.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderTexture.h"
+#include "OgreHlmsManager.h"
 
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
@@ -60,6 +61,8 @@ namespace Ogre
                                                         SceneManager *sceneManager,
                                                         const CompositorWorkspaceDef *probeWorkspcDef ) :
         IdObject( id ),
+        mPaused( false ),
+        mTrackedPosition( Vector3::ZERO ),
         mBlankProbe( this ),
         mBlendDummyCamera( 0 ),
         mBlendWorkspace( 0 ),
@@ -98,18 +101,17 @@ namespace Ogre
 
         mBlankProbe.setTextureParams( 1, 1 );
 
-        mRoot->addFrameListener( this );
-        CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
-        compositorManager->addListener( this );
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        HlmsSamplerblock samplerblock;
+        samplerblock.mMipFilter = FO_LINEAR;
+        mSamplerblockTrilinear = hlmsManager->getSamplerblock( samplerblock );
+        samplerblock.mMipFilter = FO_NONE;
+        mSamplerblockPoint = hlmsManager->getSamplerblock( samplerblock );
     }
     //-----------------------------------------------------------------------------------
     ParallaxCorrectedCubemap::~ParallaxCorrectedCubemap()
     {
-        CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
-        compositorManager->removeListener( this );
-        mRoot->removeFrameListener( this );
-
-        destroyCompositorData();
+        setEnabled( false );
 
         destroyAllProbes();
 
@@ -118,6 +120,12 @@ namespace Ogre
             TextureManager::getSingleton().remove( mBlendCubemap->getHandle() );
             mBlendCubemap.setNull();
         }
+
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+        hlmsManager->destroySamplerblock( mSamplerblockTrilinear );
+        mSamplerblockTrilinear = 0;
+        hlmsManager->destroySamplerblock( mSamplerblockPoint );
+        mSamplerblockPoint = 0;
     }
     //-----------------------------------------------------------------------------------
     CubemapProbe* ParallaxCorrectedCubemap::createProbe(void)
@@ -168,12 +176,41 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::setEnabled( bool bEnabled )
+    {
+        if( bEnabled == getEnabled() )
+            return;
+
+        if( bEnabled )
+        {
+            createCubemapBlendWorkspace();
+
+            mRoot->addFrameListener( this );
+            CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
+            compositorManager->addListener( this );
+        }
+        else
+        {
+            destroyCompositorData();
+
+            CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
+            compositorManager->removeListener( this );
+
+            mRoot->removeFrameListener( this );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    bool ParallaxCorrectedCubemap::getEnabled(void) const
+    {
+        return mBlendWorkspace != 0;
+    }
+    //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::createCubemapBlendWorkspaceDefinition(void)
     {
         String workspaceName = "AutoGen_ParallaxCorrectedCubemapBlending_Workspace";
         CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
-        CompositorWorkspaceDef *workspaceDef =
-                compositorManager->getWorkspaceDefinition( workspaceName );
+        CompositorWorkspaceDef *workspaceDef = 0;
+                compositorManager->getWorkspaceDefinitionNoThrow( workspaceName );
         if( !workspaceDef )
         {
             char tmpBuffer[64];
@@ -522,12 +559,14 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     bool ParallaxCorrectedCubemap::frameStarted( const FrameEvent& evt )
     {
-        this->updateSceneGraph();
+        if( !mPaused )
+            this->updateSceneGraph();
         return true;
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::allWorkspacesBeginUpdate(void)
     {
-        this->updateRender();
+        if( !mPaused )
+            this->updateRender();
     }
 }

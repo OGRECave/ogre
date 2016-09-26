@@ -108,7 +108,7 @@ material Cubemap/BlendCubemap_PX
 		}
 	}
 }
-material Cubemap/BlendCubemap_NX : Cubemap/BlendCubemap_px
+material Cubemap/BlendCubemap_NX : Cubemap/BlendCubemap_PX
 {
 	technique
 	{
@@ -118,7 +118,7 @@ material Cubemap/BlendCubemap_NX : Cubemap/BlendCubemap_px
 		}
 	}
 }
-material Cubemap/BlendCubemap_PY : Cubemap/BlendCubemap_px
+material Cubemap/BlendCubemap_PY : Cubemap/BlendCubemap_PX
 {
 	technique
 	{
@@ -128,7 +128,7 @@ material Cubemap/BlendCubemap_PY : Cubemap/BlendCubemap_px
 		}
 	}
 }
-material Cubemap/BlendCubemap_NY : Cubemap/BlendCubemap_px
+material Cubemap/BlendCubemap_NY : Cubemap/BlendCubemap_PX
 {
 	technique
 	{
@@ -138,7 +138,7 @@ material Cubemap/BlendCubemap_NY : Cubemap/BlendCubemap_px
 		}
 	}
 }
-material Cubemap/BlendCubemap_PZ : Cubemap/BlendCubemap_px
+material Cubemap/BlendCubemap_PZ : Cubemap/BlendCubemap_PX
 {
 	technique
 	{
@@ -148,7 +148,7 @@ material Cubemap/BlendCubemap_PZ : Cubemap/BlendCubemap_px
 		}
 	}
 }
-material Cubemap/BlendCubemap_NZ : Cubemap/BlendCubemap_px
+material Cubemap/BlendCubemap_NZ : Cubemap/BlendCubemap_PX
 {
 	technique
 	{

@@ -187,6 +187,7 @@ namespace Ogre
 
         /// Returns the workspace definition with the given name. Throws if not found
         CompositorWorkspaceDef* getWorkspaceDefinition( IdString name ) const;
+        CompositorWorkspaceDef* getWorkspaceDefinitionNoThrow( IdString name ) const;
 
         /** Returns a new workspace definition. The name must be unique, throws otherwise.
         @remarks

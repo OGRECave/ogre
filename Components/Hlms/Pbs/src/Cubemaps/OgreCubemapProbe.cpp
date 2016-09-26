@@ -120,15 +120,9 @@ namespace Ogre
         mStatic = isStatic;
         mDirty = true;
 
-        if( !isStatic )
-            mCamera->setLightCullingVisibility( true, true );
-        else
-            mCamera->setLightCullingVisibility( false, false );
-
         if( reinitWorkspace )
             initWorkspace( mWorkspaceDefName );
     }
-
     //-----------------------------------------------------------------------------------
     void CubemapProbe::initWorkspace( IdString workspaceDefOverride )
     {
@@ -151,6 +145,12 @@ namespace Ogre
         {
             //Grab tmp texture
             rtt = mCreator->findTmpRtt( mTexture );
+            //Set camera to skip light culling (efficiency)
+            mCamera->setLightCullingVisibility( false, false );
+        }
+        else
+        {
+            mCamera->setLightCullingVisibility( true, true );
         }
 
         CompositorChannel channel;

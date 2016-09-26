@@ -1,0 +1,113 @@
+abstract target cubemap_target
+{
+	pass clear
+	{
+		colour_value 0 0 0 1
+	}
+
+	pass render_scene
+	{
+		//Filter stuff that shouldn't be reflected (vampires?)
+		visibility_mask		0x00000005
+		overlays			off
+		camera_cubemap_reorient true
+	}
+}
+
+compositor_node LocalCubemapProbeRendererNode
+{
+	in 0 cubemap
+
+	target cubemap +X : cubemap_target { }
+	target cubemap -X : cubemap_target { }
+	target cubemap +Y : cubemap_target { }
+	target cubemap -Y : cubemap_target { }
+	target cubemap +Z : cubemap_target { }
+	target cubemap -Z : cubemap_target
+	{
+		pass generate_mipmaps
+		{
+		}
+	}
+}
+
+compositor_node LocalCubemapsRenderingNode
+{
+	in 0 rt_renderwindow
+	//in 1 demo_dynamic_cubemap
+
+	target rt_renderwindow
+	{
+		pass clear
+		{
+			colour_value 0 0 0 0 1
+		}
+
+		pass render_scene
+		{
+			//Our materials in this pass will be using this cubemap,
+			//so we need to expose it to the pass.
+			//Note: Even if it "just works" without exposing, the reason for
+			//exposing is to ensure compatibility with Vulkan & D3D12.
+			//expose demo_dynamic_cubemap
+
+			shadows		LocalCubemapsShadowNode
+			/*overlays	off
+			rq_first	0
+			rq_last		2*/
+		}
+
+		//Render sky (see TutorialSky_Postprocess)
+		/*pass render_quad
+		{
+			quad_normals	camera_direction
+			material SkyPostprocess
+		}
+
+		//Render transparent stuff after sky
+		pass render_scene
+		{
+			overlays	on
+			rq_first	2
+		}*/
+	}
+}
+
+compositor_node_shadow LocalCubemapsShadowNode
+{
+	technique pssm
+
+	num_splits		3
+	pssm_lambda		0.95
+	shadow_map 0 2048 2048 PF_D32_FLOAT light 0 split 0
+	shadow_map 1 1024 1024 PF_D32_FLOAT light 0 split 1
+	shadow_map 2 1024 1024 PF_D32_FLOAT light 0 split 2
+
+	technique focused
+	shadow_map 4 2048 2048 PF_D32_FLOAT light 1
+	shadow_map 5 2048 2048 PF_D32_FLOAT light 2
+
+	shadow_map 0 1 2 4 5
+	{
+		pass clear
+		{
+			colour_value 1 1 1 1
+		}
+		pass render_scene
+		{
+		}
+	}
+}
+
+workspace LocalCubemapsWorkspace
+{
+	//Render Window on channel #0
+	connect_external 0 LocalCubemapsRenderingNode 0
+	//Cubemap on channel #1
+	//connect_external 1 LocalCubemapsRenderingNode 1
+}
+
+workspace LocalCubemapsProbeWorkspace
+{
+	connect_external 0 LocalCubemapProbeRendererNode 0
+}

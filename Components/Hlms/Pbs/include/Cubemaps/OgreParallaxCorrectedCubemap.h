@@ -52,6 +52,11 @@ namespace Ogre
         Real            mProbeNDFs[OGRE_MAX_CUBE_PROBES];
         Real            mProbeBlendFactors[OGRE_MAX_CUBE_PROBES];
 
+        public: bool                    mPaused;
+        /// This variable should be updated every frame and often represents the camera position,
+        /// but it can also be used set to other things like the player's character position.
+        public: Vector3                 mTrackedPosition;
+    private:
         GpuProgramParametersSharedPtr   mBlendCubemapParams[6];
         TextureUnitState                *mBlendCubemapTUs[6*OGRE_MAX_CUBE_PROBES];
         CubemapProbe                    mBlankProbe;
@@ -100,6 +105,13 @@ namespace Ogre
         CubemapProbe* createProbe(void);
         void destroyProbe( CubemapProbe *probe );
         void destroyAllProbes(void);
+
+        /// Enables/disables this ParallaxCorrectedCubemap system.
+        /// It will (de)allocate some resources, thus it may cause stalls.
+        /// If you need to temporarily pause the system (or toggle at high frequency)
+        /// use mPaused instead (it's a public variable).
+        void setEnabled( bool bEnabled );
+        bool getEnabled(void) const;
 
         void updateSceneGraph(void);
         void updateRender(void);
