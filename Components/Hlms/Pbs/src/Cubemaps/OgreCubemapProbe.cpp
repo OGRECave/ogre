@@ -101,6 +101,15 @@ namespace Ogre
     void CubemapProbe::setTextureParams( uint32 width, uint32 height, PixelFormat pf,
                                          bool isStatic, uint8 fsaa )
     {
+        float cameraNear = 0.5;
+        float cameraFar = 1000;
+
+        if( mCamera )
+        {
+            cameraNear = mCamera->getNearClipDistance();
+            cameraFar = mCamera->getFarClipDistance();
+        }
+
         const bool reinitWorkspace = mWorkspace != 0;
         destroyWorkspace();
         destroyTexture();
@@ -111,7 +120,7 @@ namespace Ogre
 
         const uint32 flags = isStatic ? TU_STATIC_WRITE_ONLY : (TU_RENDERTARGET|TU_AUTOMIPMAP);
         mFsaa = fsaa;
-        fsaa = isStatic ? 1 : fsaa;
+        fsaa = isStatic ? 0 : fsaa;
         mTexture = TextureManager::getSingleton().createManual(
                     texName.c_str(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                     TEX_TYPE_CUBE_MAP, width, height,
@@ -121,10 +130,10 @@ namespace Ogre
         mDirty = true;
 
         if( reinitWorkspace )
-            initWorkspace( mWorkspaceDefName );
+            initWorkspace( cameraNear, cameraFar, mWorkspaceDefName );
     }
     //-----------------------------------------------------------------------------------
-    void CubemapProbe::initWorkspace( IdString workspaceDefOverride )
+    void CubemapProbe::initWorkspace( float cameraNear, float cameraFar, IdString workspaceDefOverride )
     {
         assert( !mTexture.isNull() && "Call setTextureParams first!" );
 
@@ -139,6 +148,11 @@ namespace Ogre
         mWorkspaceDefName = workspaceDef->getName();
         SceneManager *sceneManager = mCreator->getSceneManager();
         mCamera = sceneManager->createCamera( mTexture->getName(), true, true );
+        mCamera->setFOVy( Degree(90) );
+        mCamera->setAspectRatio( 1 );
+        mCamera->setFixedYawAxis(false);
+        mCamera->setNearClipDistance( cameraNear );
+        mCamera->setFarClipDistance( cameraFar );
 
         TexturePtr rtt = mTexture;
         if( mStatic )

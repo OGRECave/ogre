@@ -133,10 +133,12 @@ namespace Demo
                     mGraphicsSystem->getSceneManager(),
                     workspaceDef );
 
+        mParallaxCorrectedCubemap->setEnabled( true, 1024, 1024, Ogre::PF_R8G8B8A8 );
+
         Ogre::CubemapProbe *probe = mParallaxCorrectedCubemap->createProbe();
         probe->setTextureParams( 1024, 1024 );
         probe->initWorkspace();
-        probe->set( Ogre::Vector3::ZERO,
+        probe->set( Ogre::Vector3( 0, 1, 0 ),
                     Ogre::Aabb::newFromExtents( Ogre::Vector3( -10, -1, -10 ),
                                                 Ogre::Vector3( 10, 10, 10 ) ),
                     Ogre::Matrix3::IDENTITY,

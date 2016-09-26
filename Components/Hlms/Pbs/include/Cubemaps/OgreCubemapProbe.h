@@ -40,7 +40,7 @@ namespace Ogre
     class ParallaxCorrectedCubemap;
     class CompositorWorkspaceDef;
 
-    class CubemapProbe : public UtilityAlloc
+    class _OgreHlmsPbsExport CubemapProbe : public UtilityAlloc
     {
         friend class ParallaxCorrectedCubemap;
 
@@ -82,7 +82,7 @@ namespace Ogre
         @param fsaa
         */
         void setTextureParams( uint32 width, uint32 height,
-                               PixelFormat pf=PF_A8B8G8R8, bool isStatic=true, uint8 fsaa=1 );
+                               PixelFormat pf=PF_A8B8G8R8, bool isStatic=true, uint8 fsaa=0 );
 
         /** Initializes the workspace so we can actually render to the cubemap.
             You must call setTextureParams first.
@@ -91,7 +91,8 @@ namespace Ogre
             ParallaxCorrectedCubemap.
             This value allows you to override it with a different workspace definition.
         */
-        void initWorkspace( IdString workspaceDefOverride=IdString() );
+        void initWorkspace( float cameraNear = 0.5f, float cameraFar = 500.0f,
+                            IdString workspaceDefOverride=IdString() );
 
         /** Sets cubemap probe's parameters.
         @param probePos

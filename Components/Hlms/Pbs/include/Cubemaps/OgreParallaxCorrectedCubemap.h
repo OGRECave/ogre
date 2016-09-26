@@ -106,11 +106,24 @@ namespace Ogre
         void destroyProbe( CubemapProbe *probe );
         void destroyAllProbes(void);
 
-        /// Enables/disables this ParallaxCorrectedCubemap system.
-        /// It will (de)allocate some resources, thus it may cause stalls.
-        /// If you need to temporarily pause the system (or toggle at high frequency)
-        /// use mPaused instead (it's a public variable).
-        void setEnabled( bool bEnabled );
+        /** Enables/disables this ParallaxCorrectedCubemap system.
+            It will (de)allocate some resources, thus it may cause stalls.
+            If you need to temporarily pause the system (or toggle at high frequency)
+            use mPaused instead (it's a public variable).
+        @param bEnabled
+            True to enable. False to disable. When false, the rest of the arguments are ignored.
+        @param maxWidth
+            This system allows probes to be of different resolution. The final merge must have
+            a particular resolution though. This setting defines that value.
+            If there's a probe that has a bigger resolution than this, then you'll be wasting
+            memory and power on that probe.
+            In other words, no probe should have a higher res than this setting.
+        @param maxHeight
+            See maxHeight.
+        @param pixelFormat
+            PixelFormat of the final blended/merged cubemap.
+        */
+        void setEnabled( bool bEnabled, uint32 maxWidth, uint32 maxHeight, PixelFormat pixelFormat );
         bool getEnabled(void) const;
 
         void updateSceneGraph(void);

@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreRenderTexture.h"
 #include "OgreHlmsManager.h"
+#include "OgreDepthBuffer.h"
 
 #include "OgreTextureManager.h"
 #include "OgreMaterialManager.h"
@@ -111,7 +112,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     ParallaxCorrectedCubemap::~ParallaxCorrectedCubemap()
     {
-        setEnabled( false );
+        setEnabled( false, 0, 0, PF_UNKNOWN );
 
         destroyAllProbes();
 
@@ -176,13 +177,23 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void ParallaxCorrectedCubemap::setEnabled( bool bEnabled )
+    void ParallaxCorrectedCubemap::setEnabled( bool bEnabled, uint32 maxWidth,
+                                               uint32 maxHeight, PixelFormat pixelFormat )
     {
         if( bEnabled == getEnabled() )
             return;
 
         if( bEnabled )
         {
+            mBlendCubemap = TextureManager::getSingleton().createManual(
+                        "ParallaxCorrectedCubemap Blend Result " + StringConverter::toString( getId() ),
+                        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+                        TEX_TYPE_CUBE_MAP, maxWidth, maxHeight,
+                        PixelUtil::getMaxMipmapCount( maxWidth, maxHeight, 1 ), pixelFormat,
+                        TU_RENDERTARGET, 0, true );
+            RenderTarget *renderTarget = mBlendCubemap->getBuffer()->getRenderTarget();
+            renderTarget->setDepthBufferPool( DepthBuffer::POOL_NO_DEPTH );
+
             createCubemapBlendWorkspace();
 
             mRoot->addFrameListener( this );
@@ -314,7 +325,7 @@ namespace Ogre
 
         Real sumNdf = 0.0;
 
-        for( int i=0; i<mNumCollectedProbes; ++i )
+        for( size_t i=0; i<mNumCollectedProbes; ++i )
             sumNdf += mProbeNDFs[i];
 
         const Real invSumNdf = 1.0 / sumNdf;
@@ -329,7 +340,7 @@ namespace Ogre
         // respect constraint B.
         // Weight1 = normalized inverted NDF, so we have 1 at center, 0 at boundary
         // and respect constraint A."
-        for( int i=0; i<mNumCollectedProbes; ++i )
+        for( size_t i=0; i<mNumCollectedProbes; ++i )
         {
             mProbeBlendFactors[i] = 1.0f - (mProbeNDFs[i] * invSumNdf);
             mProbeBlendFactors[i] *= (1.0f - mProbeNDFs[i]) * invRevSumNdf;
@@ -341,9 +352,9 @@ namespace Ogre
 
         Real invSumBlendFactor = 1.0 / sumBlendFactor;
 
-        for( int i=0; i<mNumCollectedProbes; ++i )
+        for( size_t i=0; i<mNumCollectedProbes; ++i )
             mProbeBlendFactors[i] *= invSumBlendFactor;
-        for( int i=mNumCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
+        for( size_t i=mNumCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
             mProbeBlendFactors[i] = 0;
     }
     //-----------------------------------------------------------------------------------
@@ -426,7 +437,7 @@ namespace Ogre
             mCollectedProbes[i]->_prepareForRendering();
 
         bool requiresTrilinear = false;
-        for( int i=0; i<mNumCollectedProbes; ++i )
+        for( size_t i=0; i<mNumCollectedProbes; ++i )
         {
             if( mCollectedProbes[i]->mTexture->getNumMipmaps() != mBlendCubemap->getNumMipmaps() )
                 requiresTrilinear = true;
@@ -439,8 +450,8 @@ namespace Ogre
         {
             Matrix3 cubemap;
             cubemap = invFirstCubemap * mCollectedProbes[i]->mAabbOrientation;
-            for( size_t j=0; j<12; ++j )
-                cubemaps[i * 12u + j] = cubemap[0][j];
+            for( size_t j=0; j<9; ++j )
+                cubemaps[(i-1u) * 9u + j] = cubemap[0][j];
         }
 
         //Setup the TUs for blending.
