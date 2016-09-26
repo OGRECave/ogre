@@ -42,6 +42,8 @@ elseif (WIN32)
     set(NATIVE_INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/include/win32)
   endif()
+elseif(APPLE_IOS)
+  # only works with GLES2 - no shared components here.
 elseif (APPLE)
   file(GLOB PLATFORM_HEADERS "include/OSX/*.h")
   file(GLOB PLATFORM_SOURCES "src/OSX/*.mm")
@@ -76,18 +78,17 @@ endif ()
 
 file(GLOB GLSUPPORT_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 set(GLSUPPORT_HEADERS ${GLSUPPORT_HEADERS} PARENT_SCOPE)
-set(GLSUPPORT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/ PARENT_SCOPE)
+set(GLSUPPORT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include/  ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/ PARENT_SCOPE)
 
-if(NOT APPLE_IOS)
-    include_directories(${NATIVE_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR}/include/)
-    ogre_add_library(OgreGLSupport STATIC ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES})
-    target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})
-    
-    if (APPLE)
-        set_target_properties(OgreGLSupport PROPERTIES LINK_FLAGS "-framework Cocoa -framework OpenGL")
-    endif()
+include_directories(${NATIVE_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${CMAKE_CURRENT_SOURCE_DIR}/include/GLSL/)
+file(GLOB GLSL_SOURCES src/GLSL/*.cpp)
+ogre_add_library(OgreGLSupport STATIC ${GLSUPPORT_HEADERS} ${PLATFORM_HEADERS} ${PLATFORM_SOURCES} ${GLSL_SOURCES})
+target_link_libraries(OgreGLSupport OgreMain ${PLATFORM_LIBS})
 
-    ogre_config_component(OgreGLSupport)
-
-    set(GLSUPPORT_LIBS OgreGLSupport ${PLATFORM_LIBS} PARENT_SCOPE) 
+if (APPLE)
+    set_target_properties(OgreGLSupport PROPERTIES LINK_FLAGS "-framework Cocoa -framework OpenGL")
 endif()
+
+ogre_config_component(OgreGLSupport)
+
+set(GLSUPPORT_LIBS OgreGLSupport ${PLATFORM_LIBS} PARENT_SCOPE) 
