@@ -1028,6 +1028,41 @@ namespace Ogre {
     }
 
 
+    bool CPreprocessor::HandleElif (Token &iBody, int iLine)
+    {
+        if (EnableOutput == 1)
+        {
+            Error (iLine, "#elif without #if");
+            return false;
+        }
+
+        Macro defined (Token (Token::TK_KEYWORD, "defined", 7));
+        defined.Next = MacroList;
+        defined.ExpandFunc = ExpandDefined;
+        defined.NumArgs = 1;
+
+        // Temporary add the defined() function to the macro list
+        MacroList = &defined;
+
+        long val;
+        bool rc = GetValue (iBody, val, iLine);
+
+        // Restore the macro list
+        MacroList = defined.Next;
+        defined.Next = NULL;
+
+        if (!rc)
+            return false;
+
+        if (val)
+            EnableOutput |= 1;
+        else
+            EnableOutput &= ~1;
+
+        return true;
+    }
+
+
     bool CPreprocessor::HandleElse (Token &iBody, int iLine)
     {
         if (EnableOutput == 1)
@@ -1141,6 +1176,8 @@ namespace Ogre {
         }
         else if (IS_DIRECTIVE ("if"))
             rc = HandleIf (t, iLine);
+        else if (IS_DIRECTIVE ("elif"))
+            rc = HandleElif (t, iLine);
 
         else if (IS_DIRECTIVE ("else"))
             rc = HandleElse (t, iLine);
