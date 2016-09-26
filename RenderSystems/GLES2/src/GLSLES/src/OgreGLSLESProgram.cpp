@@ -39,7 +39,7 @@ THE SOFTWARE.
 #include "OgreGLSLESGpuProgram.h"
 #include "OgreGLSLESLinkProgramManager.h"
 #include "OgreGLSLESProgramPipelineManager.h"
-#include "OgreGLSLESPreprocessor.h"
+#include "OgreGLSLPreprocessor.h"
 
 namespace Ogre {
 

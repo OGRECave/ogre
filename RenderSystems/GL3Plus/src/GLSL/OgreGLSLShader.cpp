@@ -33,9 +33,10 @@
 
 #include "OgreGLSLShader.h"
 #include "OgreGLSLShader.h"
+
+#include "OgreGLSLPreprocessor.h"
 #include "OgreGLSLMonolithicProgramManager.h"
 #include "OgreGLSLSeparableProgramManager.h"
-#include "OgreGLSLPreprocessor.h"
 #include "OgreGLUtil.h"
 
 namespace Ogre {
