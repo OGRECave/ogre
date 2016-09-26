@@ -2,7 +2,7 @@ abstract target cubemap_target
 {
 	pass clear
 	{
-		colour_value 0 0 0 1
+		colour_value 0.2 0.4 0.6 1
 	}
 
 	pass render_scene

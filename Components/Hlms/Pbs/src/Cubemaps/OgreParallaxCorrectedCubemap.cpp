@@ -252,6 +252,7 @@ namespace Ogre
                                                                 ( targetDef->addPass( PASS_QUAD ) );
                         materialName.resize( matNameSize );
                         materialName.a( cSuffixes[i] );
+                        passQuad->mIdentifier = i;
                         passQuad->mMaterialName = materialName.c_str();
                     }
                 }
@@ -297,6 +298,15 @@ namespace Ogre
     void ParallaxCorrectedCubemap::calculateBlendFactors(void)
     {
         assert( mNumCollectedProbes < OGRE_MAX_CUBE_PROBES );
+
+        for( size_t i=mNumCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
+            mProbeBlendFactors[i] = 0;
+
+        if( mNumCollectedProbes <= 1 )
+        {
+            mProbeBlendFactors[0] = 1.0f;
+            return;
+        }
 
         //See Sebastien Lagarde "Local Image-based Lighting With Parallax-corrected Cubemap"
         //https://seblagarde.wordpress.com/2012/09/29/image-based-lighting-approaches-and-parallax-corrected-cubemap/
@@ -354,8 +364,6 @@ namespace Ogre
 
         for( size_t i=0; i<mNumCollectedProbes; ++i )
             mProbeBlendFactors[i] *= invSumBlendFactor;
-        for( size_t i=mNumCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
-            mProbeBlendFactors[i] = 0;
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateSceneGraph(void)
@@ -552,20 +560,23 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::passPreExecute( CompositorPass *pass )
     {
-        float mipLevels[OGRE_MAX_CUBE_PROBES];
-        for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+        if( pass->getType() == PASS_QUAD && pass->getDefinition()->mIdentifier == 0 )
         {
-            mipLevels[i] = (mCurrentMip * (mCollectedProbes[i]->mTexture->getNumMipmaps() + 1.0f)) /
-                           (mBlendCubemap->getNumMipmaps() + 1.0f);
-        }
+            float mipLevels[OGRE_MAX_CUBE_PROBES];
+            for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
+            {
+                mipLevels[i] = (mCurrentMip * (mCollectedProbes[i]->mTexture->getNumMipmaps() + 1.0f)) /
+                        (mBlendCubemap->getNumMipmaps() + 1.0f);
+            }
 
-        for( size_t i=0; i<6; ++i )
-        {
-            mBlendCubemapParams[i]->setNamedConstant( "lodLevel", &mipLevels[0],
-                                                      OGRE_MAX_CUBE_PROBES, 1 );
-        }
+            for( size_t i=0; i<6; ++i )
+            {
+                mBlendCubemapParams[i]->setNamedConstant( "lodLevel", &mipLevels[0],
+                        OGRE_MAX_CUBE_PROBES, 1 );
+            }
 
-        ++mCurrentMip;
+            ++mCurrentMip;
+        }
     }
     //-----------------------------------------------------------------------------------
     bool ParallaxCorrectedCubemap::frameStarted( const FrameEvent& evt )

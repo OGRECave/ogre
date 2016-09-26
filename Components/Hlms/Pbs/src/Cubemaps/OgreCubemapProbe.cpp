@@ -43,6 +43,9 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "OgreSceneManager.h"
 
+//Disable as OpenGL version of copyToTexture is super slow (makes a GPU->CPU->GPU roundtrip)
+#define USE_RTT_DIRECTLY 0
+
 namespace Ogre
 {
     CubemapProbe::CubemapProbe( ParallaxCorrectedCubemap *creator ) :
@@ -76,11 +79,13 @@ namespace Ogre
     {
         if( mWorkspace )
         {
+#if USE_RTT_DIRECTLY
             if( mStatic )
             {
                 const CompositorChannel &channel = mWorkspace->getExternalRenderTargets()[0];
                 mCreator->releaseTmpRtt( channel.textures[0] );
             }
+#endif
 
             CompositorManager2 *compositorManager = mWorkspace->getCompositorManager();
             compositorManager->removeWorkspace( mWorkspace );
@@ -118,7 +123,11 @@ namespace Ogre
         LwString texName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
         texName.a( "CubemapProbe_", Id::generateNewId<CubemapProbe>() );
 
+#if USE_RTT_DIRECTLY
         const uint32 flags = isStatic ? TU_STATIC_WRITE_ONLY : (TU_RENDERTARGET|TU_AUTOMIPMAP);
+#else
+        const uint32 flags = TU_RENDERTARGET|TU_AUTOMIPMAP;
+#endif
         mFsaa = fsaa;
         fsaa = isStatic ? 0 : fsaa;
         mTexture = TextureManager::getSingleton().createManual(
@@ -157,8 +166,10 @@ namespace Ogre
         TexturePtr rtt = mTexture;
         if( mStatic )
         {
+#if USE_RTT_DIRECTLY
             //Grab tmp texture
             rtt = mCreator->findTmpRtt( mTexture );
+#endif
             //Set camera to skip light culling (efficiency)
             mCamera->setLightCullingVisibility( false, false );
         }
@@ -243,9 +254,11 @@ namespace Ogre
 
         if( mStatic )
         {
+#if USE_RTT_DIRECTLY
             //Copy from tmp RTT to real texture.
             const CompositorChannel &channel = mWorkspace->getExternalRenderTargets()[0];
             channel.textures[0]->copyToTexture( mTexture );
+#endif
 
             mCamera->setLightCullingVisibility( false, false );
         }
