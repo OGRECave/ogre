@@ -39,13 +39,14 @@ THE SOFTWARE.
 namespace Ogre
 {
 #define OGRE_MAX_CUBE_PROBES 4u
+    typedef vector<CubemapProbe*>::type CubemapProbeVec;
+
     /**
     */
     class _OgreHlmsPbsExport ParallaxCorrectedCubemap : public IdObject,
                                                         public CompositorWorkspaceListener,
                                                         public FrameListener
     {
-        typedef vector<CubemapProbe*>::type CubemapProbeVec;
         CubemapProbeVec mProbes;
         CubemapProbe    *mCollectedProbes[OGRE_MAX_CUBE_PROBES];
         uint32          mNumCollectedProbes;
@@ -105,6 +106,8 @@ namespace Ogre
         CubemapProbe* createProbe(void);
         void destroyProbe( CubemapProbe *probe );
         void destroyAllProbes(void);
+
+        const CubemapProbeVec& getProbes(void) const        { return mProbes; }
 
         /** Enables/disables this ParallaxCorrectedCubemap system.
             It will (de)allocate some resources, thus it may cause stalls.

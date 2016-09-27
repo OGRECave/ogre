@@ -243,6 +243,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CubemapProbe::_prepareForRendering(void)
     {
+        mCamera->setPosition( mProbePos );
         if( mStatic )
             mCamera->setLightCullingVisibility( true, true );
     }

@@ -378,7 +378,6 @@ namespace Ogre
 
         mNumCollectedProbes = 0;
 
-        const Vector3 camPos = Vector3::ZERO;
         CubemapProbeVec::iterator itor = mProbes.begin();
         CubemapProbeVec::iterator end  = mProbes.end();
 
@@ -386,7 +385,7 @@ namespace Ogre
         {
             CubemapProbe *probe = *itor;
 
-            const Vector3 posLS = probe->mAabbOrientation * (camPos - probe->mArea.mCenter);
+            const Vector3 posLS = probe->mAabbOrientation * (mTrackedPosition - probe->mArea.mCenter);
             const Aabb areaLS = probe->getAreaLS();
             if( areaLS.contains( posLS ) )
             {
@@ -419,6 +418,8 @@ namespace Ogre
                     {
                         mProbeNDFs[probeIdx]        = ndf;
                         mCollectedProbes[probeIdx]  = probe;
+                        ++mNumCollectedProbes;
+                        mNumCollectedProbes = std::min( mNumCollectedProbes, OGRE_MAX_CUBE_PROBES );
                     }
                 }
                 else
@@ -439,6 +440,23 @@ namespace Ogre
             mCollectedProbes[i] = &mBlankProbe;
 
         calculateBlendFactors();
+
+        {
+            size_t highestIdx = 0;
+            //Find the probe with the highest weight and make that one the main one.
+            for( size_t i=1; i<mNumCollectedProbes; ++i )
+            {
+                if( mProbeBlendFactors[i] > mProbeBlendFactors[highestIdx] )
+                    highestIdx = i;
+            }
+
+            if( highestIdx != 0 )
+            {
+                std::swap( mProbeBlendFactors[0], mProbeBlendFactors[highestIdx] );
+                std::swap( mCollectedProbes[0], mCollectedProbes[highestIdx] );
+                std::swap( mProbeNDFs[0], mProbeNDFs[highestIdx] );
+            }
+        }
 
         //TODO: Update could be done over several frames.
         for( size_t i=0; i<mNumCollectedProbes; ++i )
