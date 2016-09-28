@@ -170,7 +170,7 @@ namespace Ogre
         }
 
         // Assignment.
-        LwString& operator = ( const LwString &other )
+        LwString& operator = ( const LwConstString &other )
         {
             assert( other.mSize < this->mCapacity );
             strncpy( this->mStrPtr, other.mStrPtr, this->mCapacity );
