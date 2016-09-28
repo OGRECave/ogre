@@ -58,6 +58,7 @@ namespace Ogre
     */
     class _OgreExport LwConstString
     {
+        friend class LwString;
     protected:
 #if _DEBUG || DEBUG
         char const *WarningHeader;
