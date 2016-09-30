@@ -289,10 +289,12 @@ namespace v1 {
     void Mesh::unloadImpl()
     {
         // Teardown submeshes
-        for (SubMeshList::iterator i = mSubMeshList.begin();
-            i != mSubMeshList.end(); ++i)
+
+        // mSubMeshList is iterated in submesh destructor, so pop after deleting
+        while ( !mSubMeshList.empty() )
         {
-            OGRE_DELETE *i;
+            OGRE_DELETE mSubMeshList.back();
+            mSubMeshList.pop_back();
         }
 
         if( sharedVertexData[VpNormal] == sharedVertexData[VpShadow] )
