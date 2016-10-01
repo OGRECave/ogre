@@ -291,6 +291,11 @@ if (UNIX)
     install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-Volume.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
   endif ()
 
+  if (OGRE_BUILD_COMPONENT_HLMS)
+    configure_file(${OGRE_TEMPLATES_DIR}/OGRE-HLMS.pc.in ${OGRE_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc @ONLY)
+    install(FILES ${OGRE_BINARY_DIR}/pkgconfig/OGRE-HLMS.pc DESTINATION ${OGRE_LIB_DIRECTORY}/pkgconfig)
+  endif ()
+
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_COMPILER_IS_CLANGXX 1)
   endif ()
