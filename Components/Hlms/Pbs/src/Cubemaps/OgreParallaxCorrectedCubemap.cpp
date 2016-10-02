@@ -685,6 +685,24 @@ namespace Ogre
             mProxyItems[i]->setVisible( i < mNumCollectedProbes );
 
             Matrix4 localToProbeLocal( mCollectedProbes[i]->mOrientation );
+            const Real maxComponent = Ogre::max( mCollectedProbes[i]->mProbeShape.mHalfSize.x,
+                                                 Ogre::max(
+                                                     mCollectedProbes[i]->mProbeShape.mHalfSize.y,
+                                                     mCollectedProbes[i]->mProbeShape.mHalfSize.z ) );
+            const Vector3 scaleRatio = mCollectedProbes[i]->mProbeShape.mHalfSize / maxComponent;
+
+            localToProbeLocal[0][0] *= scaleRatio.x;
+            localToProbeLocal[1][0] *= scaleRatio.x;
+            localToProbeLocal[2][0] *= scaleRatio.x;
+
+            localToProbeLocal[0][1] *= scaleRatio.y;
+            localToProbeLocal[1][1] *= scaleRatio.y;
+            localToProbeLocal[2][1] *= scaleRatio.y;
+
+            localToProbeLocal[0][1] *= scaleRatio.z;
+            localToProbeLocal[1][1] *= scaleRatio.z;
+            localToProbeLocal[2][1] *= scaleRatio.z;
+
             localToProbeLocal.setTrans( (mCollectedProbes[i]->mProbeShape.mCenter -
                                         mCollectedProbes[i]->mArea.mCenter) /
                                         mCollectedProbes[i]->mProbeShape.mHalfSize );
