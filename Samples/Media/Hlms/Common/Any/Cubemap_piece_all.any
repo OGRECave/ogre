@@ -23,21 +23,23 @@ struct CubemapProbe
 	Cubemap's probe
 \return
 	Parallax-Corrected reflection dir, IN LOCAL SPACE (local to probe's).
+	Unlike the inputs, this vector is LEFT HANDED.
 */
 @property( syntax == metal )inline@end float3 localCorrect( float3 reflDir, float3 pos, CubemapProbe probe )
 {
-	float3 aabbCenterVS	= float3( probe.row0_centerX.w, probe.row1_centerY.w, probe.row2_centerZ.w );
-	float3 aabbHalfSize	= probe.halfSize.xyz;
+	float3 probeShapeCenterVS = float3( probe.row0_centerX.w,
+										probe.row1_centerY.w,
+										probe.row2_centerZ.w );
+	float3 probeShapeHalfSize	= probe.halfSize.xyz;
 
-	float3x3 viewSpaceToProbeLocal = float3x3(
-				probe.row0_centerX.x, probe.row0_centerX.y, probe.row0_centerX.z,
-				probe.row1_centerY.x, probe.row1_centerY.y, probe.row1_centerY.z,
-				probe.row2_centerZ.x, probe.row2_centerZ.y, probe.row2_centerZ.z );
-	float3 posLS = pos - aabbCenterVS;
+	float3x3 viewSpaceToProbeLocal = float3x3( probe.row0_centerX.xyz,
+											   probe.row1_centerY.xyz,
+											   probe.row2_centerZ.xyz );
+	float3 posLS = pos - probeShapeCenterVS;
 
 	@property( syntax == hlsl )
-		float3 reflDirLS = mul( reflDir, viewSpaceToProbeLocal );
-		posLS = mul( posLS, viewSpaceToProbeLocal );
+		float3 reflDirLS = mul( viewSpaceToProbeLocal, reflDir );
+		posLS = mul( viewSpaceToProbeLocal, posLS );
 	@end @property( syntax != hlsl )
 		float3 reflDirLS = reflDir * viewSpaceToProbeLocal;
 		posLS = posLS * viewSpaceToProbeLocal;
@@ -45,8 +47,8 @@ struct CubemapProbe
 
 	//Find the ray intersection with box plane
 	float3 invReflDirLS = float3( 1.0, 1.0, 1.0 ) / reflDirLS;
-	float3 intersectAtMinPlane = ( -aabbHalfSize - posLS ) * invReflDirLS;
-	float3 intersectAtMaxPlane = (  aabbHalfSize - posLS ) * invReflDirLS;
+	float3 intersectAtMinPlane = ( -probeShapeHalfSize - posLS ) * invReflDirLS;
+	float3 intersectAtMaxPlane = (  probeShapeHalfSize - posLS ) * invReflDirLS;
 	//Get the largest intersection values (we are not intersted in negative values)
 	float3 largestIntersect = max( intersectAtMaxPlane.xyz, intersectAtMinPlane.xyz );
 	//Get the closest of all solutions
@@ -55,6 +57,9 @@ struct CubemapProbe
 	float3 intersectPositionLS = posLS.xyz + reflDirLS.xyz * distance;
 	//Get corrected vector
 	float3 localCorrectedVec = intersectPositionLS.xyz - probe.cubemapPosLS.xyz;
+
+	//Make it left-handed.
+	localCorrectedVec.z = -localCorrectedVec.z;
 	return localCorrectedVec;
 }
 @end

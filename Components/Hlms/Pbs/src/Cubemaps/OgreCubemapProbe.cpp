@@ -49,10 +49,10 @@ THE SOFTWARE.
 namespace Ogre
 {
     CubemapProbe::CubemapProbe( ParallaxCorrectedCubemap *creator ) :
-        mProbePos( Vector3::ZERO ),
         mArea( Aabb::BOX_NULL ),
-        mAabbOrientation( Matrix3::IDENTITY ),
-        mAabbFalloff( Vector3::ZERO ),
+        mAreaInnerRegion( Vector3::ZERO ),
+        mOrientation( Matrix3::IDENTITY ),
+        mProbeShape( Aabb::BOX_NULL ),
         mFsaa( 1 ),
         mWorkspace( 0 ),
         mCamera( 0 ),
@@ -126,14 +126,22 @@ namespace Ogre
 #if USE_RTT_DIRECTLY
         const uint32 flags = isStatic ? TU_STATIC_WRITE_ONLY : (TU_RENDERTARGET|TU_AUTOMIPMAP);
 #else
+    #if GENERATE_MIPMAPS_ON_BLEND
+        const uint32 flags = TU_RENDERTARGET;
+    #else
         const uint32 flags = TU_RENDERTARGET|TU_AUTOMIPMAP;
+    #endif
 #endif
         mFsaa = fsaa;
         fsaa = isStatic ? 0 : fsaa;
         mTexture = TextureManager::getSingleton().createManual(
                     texName.c_str(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                     TEX_TYPE_CUBE_MAP, width, height,
+            #if GENERATE_MIPMAPS_ON_BLEND
+                    0,
+            #else
                     PixelUtil::getMaxMipmapCount( width, height, 1 ),
+            #endif
                     pf, flags, 0, true, fsaa );
         mStatic = isStatic;
         mDirty = true;
@@ -187,24 +195,27 @@ namespace Ogre
                                                       mWorkspaceDefName, false );
     }
     //-----------------------------------------------------------------------------------
-    void CubemapProbe::set( const Vector3 &probePos, const Aabb &area,
-                            const Matrix3 &aabbOrientation, const Vector3 &aabbFalloff )
+    void CubemapProbe::set( const Aabb &area, const Vector3 &areaInnerRegion,
+                            const Matrix3 &orientation, const Aabb &probeShape )
     {
-        mProbePos           = probePos;
         mArea               = area;
-        mAabbOrientation    = aabbOrientation;
-        mAabbFalloff        = aabbFalloff;
+        mAreaInnerRegion    = areaInnerRegion;
+        mOrientation        = orientation;
+        mProbeShape         = probeShape;
 
-        mAabbFalloff.makeCeil( Vector3::ZERO );
-        mAabbFalloff.makeFloor( Vector3::UNIT_SCALE );
+        mAreaInnerRegion.makeCeil( Vector3::ZERO );
+        mAreaInnerRegion.makeFloor( Vector3::UNIT_SCALE );
 
-        const Vector3 localPos = mAabbOrientation * (mProbePos - area.mCenter);
-        if( !getAreaLS().contains( localPos ) )
+        if( !mProbeShape.contains( mArea ) )
         {
             LogManager::getSingleton().logMessage(
-                        "ERROR: Cubemap's probePos must be inside the probe's bounds. "
-                        "Forcing the probe position to be the same as the center of its bounds." );
-            mProbePos = mArea.mCenter;
+                        "ERROR: Cubemap's area must be fully inside the probe's shape. "
+                        "Forcing the area to inside the probe shape." );
+            Vector3 vMin = mArea.getMinimum();
+            vMin.makeCeil( mProbeShape.getMinimum() );
+            Vector3 vMax = mArea.getMaximum();
+            vMax.makeFloor( mProbeShape.getMaximum() );
+            mArea.setExtents( vMin, vMax );
         }
 
         mDirty = true;
@@ -232,7 +243,7 @@ namespace Ogre
         dist.y = Math::Abs( posLS.y );
         dist.z = Math::Abs( posLS.z );
 
-        const Vector3 innerRange = mArea.mHalfSize * mAabbFalloff;
+        const Vector3 innerRange = mArea.mHalfSize * mAreaInnerRegion;
         const Vector3 outerRange = mArea.mHalfSize;
 
         //1e-6f avoids division by zero.
@@ -243,7 +254,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CubemapProbe::_prepareForRendering(void)
     {
-        mCamera->setPosition( mProbePos );
+        mCamera->setPosition( mArea.mCenter );
         if( mStatic )
             mCamera->setLightCullingVisibility( true, true );
     }
@@ -263,6 +274,6 @@ namespace Ogre
 
             mCamera->setLightCullingVisibility( false, false );
         }
-        mDirty = false;
+        //mDirty = false;
     }
 }

@@ -35,6 +35,10 @@ THE SOFTWARE.
 #include "OgrePixelFormat.h"
 #include "OgreHeaderPrefix.h"
 
+//It's slightly more accurate if we render the cubemaps and generate the cubemaps, then blend.
+//But Ogre doesn't yet support RTT to mipmaps, so we generate the mipmaps after blending.
+#define GENERATE_MIPMAPS_ON_BLEND 1
+
 namespace Ogre
 {
     class ParallaxCorrectedCubemap;
@@ -44,10 +48,15 @@ namespace Ogre
     {
         friend class ParallaxCorrectedCubemap;
 
-        Vector3 mProbePos;
+        /// When the camera enters this area, the probe is collected for blending.
+        /// Also its center is where the camera will be positioned.
         Aabb    mArea;
-        Matrix3 mAabbOrientation;
-        Vector3 mAabbFalloff;
+        /// Value between [0; 1] per axis. At 1, the inner region matches mArea (the outer region)
+        Vector3 mAreaInnerRegion;
+        /// Orientationt. These are not AABBs, but rather OBB (oriented bounding boxes).
+        Matrix3 mOrientation;
+        /// The general shape this probe is supposed to represent.
+        Aabb    mProbeShape;
 
         TexturePtr  mTexture;
         uint8       mFsaa;
@@ -95,25 +104,25 @@ namespace Ogre
                             IdString workspaceDefOverride=IdString() );
 
         /** Sets cubemap probe's parameters.
-        @param probePos
-            The location where the cubemap camera will be positioned for rendering.
         @param area
-            The region that will be affected by this probe. When user's camera is inside this area,
-            this probe becomes the main active one. Note AABB is actually an OBB (Oriented Bounding
-            Box). See aabbOrientation parameter.
-            The OBB should closely match the shape of the environment around it. The better it fits,
-            the more accurate the reflections.
-        @param aabbOrientation
-            The orientation of the AABB that makes it an OBB. Skewing and shearing is supported.
-        @param aabbFalloff
+            When the camera enters this area, the probe is collected for blending.
+            Also its center is where the camera will be positioned.
+        @param areaInnerRegion
             A value in range [0; 1]. It indicates a % of the OBB's size that will have smooth
-            interpolation with other probes. W/ falloff = 1.0; stepping outside the OBB's results
+            interpolation with other probes. When region = 1.0; stepping outside the OBB's results
             in a lighting "pop". The smaller the value, the smoother the transition, but at the cost
             of quality & precision while inside the OBB (as results get mixed up with other probes').
-            The falloff is per axis.
+            The value is per axis.
+        @param orientation
+            The orientation of the AABB that makes it an OBB. Skewing and shearing is supported.
+            This orientation is applied to both probeShape AND area.
+        @param probeShape
+            Note AABB is actually an OBB (Oriented Bounding Box). See orientation parameter.
+            The OBB should closely match the shape of the environment around it. The better it fits,
+            the more accurate the reflections.
         */
-        void set( const Vector3 &probePos, const Aabb &area,
-                  const Matrix3 &aabbOrientation, const Vector3 &aabbFalloff );
+        void set( const Aabb &area, const Vector3 &areaInnerRegion,
+                  const Matrix3 &orientation, const Aabb &probeShape );
 
         /** Set to False if it should be updated every frame. True if only updated when dirty
         @remarks
@@ -138,10 +147,10 @@ namespace Ogre
         void _prepareForRendering(void);
         void _updateRender(void);
 
-        const Vector3& getProbePos(void) const              { return mProbePos; }
         const Aabb& getArea(void) const                     { return mArea; }
-        const Matrix3& getAabbOrientation(void) const       { return mAabbOrientation; }
-        const Vector3& getAabbFalloff(void) const           { return mAabbFalloff; }
+        const Vector3& getAreaInnerRegion(void) const       { return mAreaInnerRegion; }
+        const Matrix3& getOrientation(void) const           { return mOrientation; }
+        const Aabb& getProbeShape(void) const               { return mProbeShape; }
     };
 }
 

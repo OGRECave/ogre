@@ -39,8 +39,8 @@ namespace Ogre
                                             const MovableObject *_movableObject,
                                             Renderable *_renderable ) :
         CbBase( CB_LOW_LEVEL_MATERIAL ),
-        //casterPass( _casterPass ),
-        //hlmsLowLevel( _hlmsLowLevel ),
+        casterPass( _casterPass ),
+        hlmsLowLevel( _hlmsLowLevel ),
         movableObject( _movableObject ),
         renderable( _renderable )
     {
@@ -48,7 +48,7 @@ namespace Ogre
 
     void CommandBuffer::execute_lowLevelMaterial( CommandBuffer *_this, const CbBase * RESTRICT_ALIAS _cmd )
     {
-//        const CbLowLevelMaterial *cmd = static_cast<const CbLowLevelMaterial*>( _cmd );
-//        cmd->hlmsLowLevel->executeCommand( cmd->movableObject, cmd->renderable, cmd->casterPass );
+        const CbLowLevelMaterial *cmd = static_cast<const CbLowLevelMaterial*>( _cmd );
+        cmd->hlmsLowLevel->executeCommand( cmd->movableObject, cmd->renderable, cmd->casterPass );
     }
 }

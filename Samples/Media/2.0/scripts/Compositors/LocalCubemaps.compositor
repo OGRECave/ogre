@@ -11,7 +11,20 @@ abstract target cubemap_target
 		visibility_mask		0x00000005
 		overlays			off
 		camera_cubemap_reorient true
+
+		rq_first	0
+		rq_last		250
+
+		//shadows LocalCubemapsShadowNode
 	}
+
+	//Render sky (see TutorialSky_Postprocess)
+	/*pass render_quad
+	{
+		quad_normals	camera_direction
+		material SkyPostprocess
+		camera_cubemap_reorient true
+	}*/
 }
 
 compositor_node LocalCubemapProbeRendererNode
@@ -52,9 +65,18 @@ compositor_node LocalCubemapsRenderingNode
 			//expose demo_dynamic_cubemap
 
 			shadows		LocalCubemapsShadowNode
+
+			rq_first	0
+			rq_last		250
 			/*overlays	off
 			rq_first	0
 			rq_last		2*/
+		}
+
+		//Render overlays
+		pass render_scene
+		{
+			rq_first	251
 		}
 
 		//Render sky (see TutorialSky_Postprocess)
@@ -95,6 +117,8 @@ compositor_node_shadow LocalCubemapsShadowNode
 		}
 		pass render_scene
 		{
+			rq_first	0
+			rq_last		250
 		}
 	}
 }

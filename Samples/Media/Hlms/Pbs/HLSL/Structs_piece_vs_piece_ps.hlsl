@@ -19,6 +19,8 @@ struct Light
 @end
 };
 
+@insertpiece( DeclCubemapProbeStruct )
+
 //Uniforms that change per pass
 cbuffer PassBuffer : register(b0)
 {
@@ -61,6 +63,11 @@ cbuffer PassBuffer : register(b0)
 	float4 f3dData;
 	float4 f3dGridHWW[@value( hlms_forward3d )];
 @end
+
+@property( parallax_correct_cubemaps )
+	CubemapProbe localProbe;
+@end
+
 	@insertpiece( custom_passBuffer )
 	} passBuf;
 };

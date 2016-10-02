@@ -58,15 +58,25 @@ namespace Ogre
         /// but it can also be used set to other things like the player's character position.
         public: Vector3                 mTrackedPosition;
     private:
-        GpuProgramParametersSharedPtr   mBlendCubemapParams[6];
-        TextureUnitState                *mBlendCubemapTUs[6*OGRE_MAX_CUBE_PROBES];
+        GpuProgramParametersSharedPtr   mBlendCubemapParamsVs[OGRE_MAX_CUBE_PROBES];
+        GpuProgramParametersSharedPtr   mBlendCubemapParams[OGRE_MAX_CUBE_PROBES];
+        TextureUnitState                *mBlendCubemapTUs[OGRE_MAX_CUBE_PROBES];
+        GpuProgramParametersSharedPtr   mCopyCubemapParams[6];
+        TextureUnitState                *mCopyCubemapTUs[6];
         CubemapProbe                    mBlankProbe;
-        Camera                          *mBlendDummyCamera;
+        CubemapProbe                    mFinalProbe;
+        Camera                          *mBlendProxyCamera;
         CompositorWorkspace             *mBlendWorkspace;
+        CompositorWorkspace             *mCopyWorkspace;
         TexturePtr                      mBlendCubemap;
         HlmsSamplerblock const          *mSamplerblockPoint;
         HlmsSamplerblock const          *mSamplerblockTrilinear;
         float                           mCurrentMip;
+        uint32                          mProxyVisibilityMask;
+        uint8                           mReservedRqId;
+        MeshPtr                         mProxyMesh;
+        Item                            *mProxyItems[OGRE_MAX_CUBE_PROBES];
+        SceneNode                       *mProxyNodes[OGRE_MAX_CUBE_PROBES];
 
         Root                            *mRoot;
         SceneManager                    *mSceneManager;
@@ -91,6 +101,8 @@ namespace Ogre
         typedef vector<TempRtt>::type TempRttVec;
         TempRttVec  mTmpRtt;
 
+        void createProxyGeometry(void);
+        void destroyProxyGeometry(void);
         void createCubemapBlendWorkspaceDefinition(void);
         void createCubemapBlendWorkspace(void);
         void destroyCompositorData(void);
@@ -99,7 +111,8 @@ namespace Ogre
 
     public:
         ParallaxCorrectedCubemap( IdType id, Root *root, SceneManager *sceneManager,
-                                  const CompositorWorkspaceDef *probeWorkspaceDef );
+                                  const CompositorWorkspaceDef *probeWorkspaceDef,
+                                  uint8 reservedRqId, uint32 proxyVisibilityMask );
         ~ParallaxCorrectedCubemap();
 
         /// Adds a cubemap probe.
@@ -144,7 +157,10 @@ namespace Ogre
         SceneManager* getSceneManager(void) const;
         const CompositorWorkspaceDef* getDefaultWorkspaceDef(void) const;
 
-        TexturePtr _tempGetBlendCubemap(void) const    { return mBlendCubemap; }
+        TexturePtr _tempGetBlendCubemap(void) const     { return mBlendCubemap; }
+
+        //Statistics
+        uint32 getNumCollectedProbes(void) const        { return mNumCollectedProbes; }
 
         //CompositorWorkspaceListener overloads
         virtual void passPreExecute( CompositorPass *pass );

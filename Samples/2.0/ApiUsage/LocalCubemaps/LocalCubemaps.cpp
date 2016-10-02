@@ -52,7 +52,7 @@ namespace Demo
             else if( *(originalDataFolder.end() - 1) != '/' )
                 originalDataFolder += "/";
 
-            const char *c_locations[8] =
+            const char *c_locations[9] =
             {
                 "2.0/scripts/materials/Common",
                 "2.0/scripts/materials/Common/GLSL",
@@ -61,10 +61,11 @@ namespace Demo
                 "2.0/scripts/materials/LocalCubemaps/",
                 "2.0/scripts/materials/LocalCubemaps/GLSL",
                 "2.0/scripts/materials/LocalCubemaps/HLSL",
-                "2.0/scripts/materials/LocalCubemaps/Metal"
+                "2.0/scripts/materials/LocalCubemaps/Metal",
+                "2.0/scripts/materials/TutorialSky_Postprocess"
             };
 
-            for( size_t i=0; i<8; ++i )
+            for( size_t i=0; i<9; ++i )
             {
                 Ogre::String dataFolder = originalDataFolder + c_locations[i];
                 addResourceLocation( dataFolder, "FileSystem", "General" );
@@ -75,6 +76,7 @@ namespace Demo
         LocalCubemapsGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
+            mAlwaysAskForConfig = false;
         }
     };
 
