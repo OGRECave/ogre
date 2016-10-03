@@ -1104,8 +1104,7 @@ namespace Ogre
 
             if( mParallaxCorrectedCubemap )
             {
-                mParallaxCorrectedCubemap->fillConstBufferData( viewMatrix, invViewMatrixCubemap,
-                                                                passBufferPtr );
+                mParallaxCorrectedCubemap->fillConstBufferData( viewMatrix, passBufferPtr );
                 passBufferPtr += mParallaxCorrectedCubemap->getConstBufferSize() >> 2;
             }
         }

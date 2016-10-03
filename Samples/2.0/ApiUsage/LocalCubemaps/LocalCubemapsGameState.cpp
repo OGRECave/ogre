@@ -145,7 +145,7 @@ namespace Demo
         probe->initWorkspace();
 
         probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, -0.598495 );
-        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.5f ),
+        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
                     Ogre::Matrix3::IDENTITY, roomShape );
 
         //Probe 01
@@ -154,7 +154,7 @@ namespace Demo
         probe->initWorkspace();
 
         probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 5.423867 );
-        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.5f ),
+        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
                     Ogre::Matrix3::IDENTITY, roomShape );
 
         //Probe 02
@@ -163,7 +163,7 @@ namespace Demo
         probe->initWorkspace();
 
         probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 10.657585 );
-        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.5f ),
+        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
                     Ogre::Matrix3::IDENTITY, roomShape );
 
         Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
@@ -210,7 +210,7 @@ namespace Demo
                                                   Ogre::HlmsParamVec() ) );
             datablock->setBackgroundDiffuse( Ogre::ColourValue::Red );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
+            datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
@@ -219,7 +219,7 @@ namespace Demo
                                                   Ogre::HlmsParamVec() ) );
             datablock->setBackgroundDiffuse( Ogre::ColourValue::Green );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
+            datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
@@ -228,7 +228,7 @@ namespace Demo
                                                   Ogre::HlmsParamVec() ) );
             datablock->setBackgroundDiffuse( Ogre::ColourValue::Blue );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
+            datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
@@ -237,7 +237,7 @@ namespace Demo
                                                   Ogre::HlmsParamVec() ) );
             datablock->setBackgroundDiffuse( Ogre::ColourValue::White );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
+            datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
         }
 
@@ -386,9 +386,10 @@ namespace Demo
         light->setSpecularColour( 0.8f, 0.4f, 0.2f );
         light->setPowerScale( Ogre::Math::PI );
         light->setType( Ogre::Light::LT_SPOTLIGHT );
-        lightNode->setPosition( -10.0f, 10.0f, 10.0f );
-        light->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
+        lightNode->setPosition( -2.0f, 6.0f, 10.0f );
+        light->setDirection( Ogre::Vector3( 0.5, -1, -0.5 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+        light->setSpotlightOuterAngle( Ogre::Degree( 80.0f ) );
 
         mLightNodes[1] = lightNode;
 
@@ -399,9 +400,10 @@ namespace Demo
         light->setSpecularColour( 0.2f, 0.4f, 0.8f );
         light->setPowerScale( Ogre::Math::PI );
         light->setType( Ogre::Light::LT_SPOTLIGHT );
-        lightNode->setPosition( 10.0f, 10.0f, -10.0f );
-        light->setDirection( Ogre::Vector3( -1, -1, 1 ).normalisedCopy() );
+        lightNode->setPosition( 2.0f, 6.0f, -3.0f );
+        light->setDirection( Ogre::Vector3( -0.5, -1, 0.5 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
+        light->setSpotlightOuterAngle( Ogre::Degree( 80.0f ) );
 
         mLightNodes[2] = lightNode;
 
@@ -449,8 +451,9 @@ namespace Demo
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
 
-//        camera->setPosition( -1.03587, 2.50012, 3.62891 );
-//        camera->setOrientation( Ogre::Quaternion::IDENTITY );
+        //camera->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
+        //camera->setPosition( -1.03587, 2.50012, 3.62891 );
+        //camera->setOrientation( Ogre::Quaternion::IDENTITY );
 
         TutorialGameState::update( timeSinceLast );
     }

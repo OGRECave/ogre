@@ -15,7 +15,10 @@ abstract target cubemap_target
 		rq_first	0
 		rq_last		250
 
-		//shadows LocalCubemapsShadowNode
+		//We want very accurate shadows in the reflections and Ogre seems to
+		//be unable to detect for each pass shadows should be recalculated,
+		//so force it.
+		shadows LocalCubemapsShadowNode recalculate
 	}
 
 	//Render sky (see TutorialSky_Postprocess)
@@ -53,7 +56,7 @@ compositor_node LocalCubemapsRenderingNode
 	{
 		pass clear
 		{
-			colour_value 0 0 0 0 1
+			colour_value 0.2 0.4 0.6 1
 		}
 
 		pass render_scene

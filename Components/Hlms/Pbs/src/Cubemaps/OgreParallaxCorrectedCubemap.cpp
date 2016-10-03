@@ -573,6 +573,23 @@ namespace Ogre
             mProbeBlendFactors[i] *= invSumBlendFactor;
     }
     //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::setFinalProbeTo( size_t probeIdx )
+    {
+        mFinalProbe.mArea = mCollectedProbes[probeIdx]->mArea;
+        mFinalProbe.mAreaInnerRegion = mCollectedProbes[probeIdx]->mAreaInnerRegion;
+        mFinalProbe.mOrientation = mCollectedProbes[probeIdx]->mOrientation;
+        mFinalProbe.mProbeShape = mCollectedProbes[probeIdx]->mProbeShape;
+
+        const bool requiresTrilinear = mCollectedProbes[probeIdx]->mTexture->getNumMipmaps() !=
+                                                             mBlendCubemap->getNumMipmaps();
+        for( size_t i=0; i<6; ++i )
+        {
+            mCopyCubemapTUs[i]->setTexture( mCollectedProbes[probeIdx]->mTexture );
+            mCopyCubemapTUs[i]->_setSamplerblock( requiresTrilinear ? mSamplerblockTrilinear :
+                                                                      mSamplerblockPoint );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateSceneGraph(void)
     {
         mCurrentMip = 0;
@@ -715,28 +732,17 @@ namespace Ogre
                                                                        mSamplerblockPoint );
         }
 
+        //Project p0ToCam onto p0ToP1.
+//        Vector3 p0ToCam = mTrackedPosition - mCollectedProbes[0]->mArea.mCenter;
+//        Vector3 p0ToP1 = mCollectedProbes[1]->mArea.mCenter - mCollectedProbes[0]->mArea.mCenter;
+//        p0ToP1.normalise();
+//        Vector3 finalPos = p0ToP1 * p0ToP1.dotProduct( p0ToCam ) + mCollectedProbes[0]->mArea.mCenter;
+
         //TODO: restrict mTrackedPosition to a region between the 4 probes.
         const Quaternion qRot( mCollectedProbes[0]->mOrientation );
+        //mBlendProxyCamera->setPosition( finalPos );
         mBlendProxyCamera->setPosition( mTrackedPosition );
         mBlendProxyCamera->setOrientation( qRot );
-
-        mFinalProbe.mArea = mCollectedProbes[0]->mArea;
-        mFinalProbe.mAreaInnerRegion = mCollectedProbes[0]->mAreaInnerRegion;
-        mFinalProbe.mOrientation = mCollectedProbes[0]->mOrientation;
-        mFinalProbe.mProbeShape = mCollectedProbes[0]->mProbeShape;
-        if( mNumCollectedProbes > 1 )
-        {
-            mFinalProbe.mArea.mCenter = mBlendProxyCamera->getPosition();
-        }
-        else
-        {
-            for( size_t i=0; i<6; ++i )
-            {
-                mCopyCubemapTUs[i]->setTexture( mCollectedProbes[0]->mTexture );
-                mCopyCubemapTUs[i]->_setSamplerblock( requiresTrilinear ? mSamplerblockTrilinear :
-                                                                          mSamplerblockPoint );
-            }
-        }
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateRender(void)
@@ -744,8 +750,22 @@ namespace Ogre
         for( size_t i=0; i<mNumCollectedProbes; ++i )
         {
             if( mCollectedProbes[i]->mDirty || !mCollectedProbes[i]->mStatic )
-                mCollectedProbes[i]->_updateRender();
+            {
+                setFinalProbeTo( i );
+
+                for( int j=0; j<mCollectedProbes[i]->mNumIterations; ++j )
+                {
+                    mCopyWorkspace->_update();
+                    mCollectedProbes[i]->_updateRender();
+                }
+
+                mCollectedProbes[i]->mDirty = false;
+            }
         }
+
+        setFinalProbeTo( 0 );
+        if( mNumCollectedProbes > 1 )
+            mFinalProbe.mArea.mCenter = mBlendProxyCamera->getPosition();
 
         if( mNumCollectedProbes == 1u )
             mCopyWorkspace->_update();
@@ -759,11 +779,8 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::fillConstBufferData( const Matrix4 &viewMatrix,
-                                                        const Matrix3 &invViewMatrixLeftHanded,
                                                         float * RESTRICT_ALIAS passBufferPtr ) const
     {
-//        const Matrix3 viewSpaceToProbeLocal = mCollectedProbes[0]->mOrientation *
-//                                              invViewMatrixLeftHanded;
         Matrix3 invViewMat3;
         viewMatrix.extract3x3Matrix( invViewMat3 );
         invViewMat3 = invViewMat3.Inverse();

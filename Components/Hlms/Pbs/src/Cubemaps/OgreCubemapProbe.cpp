@@ -57,8 +57,9 @@ namespace Ogre
         mWorkspace( 0 ),
         mCamera( 0 ),
         mCreator( creator ),
+        mStatic( true ),
         mDirty( true ),
-        mStatic( true )
+        mNumIterations( 32 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -255,6 +256,7 @@ namespace Ogre
     void CubemapProbe::_prepareForRendering(void)
     {
         mCamera->setPosition( mArea.mCenter );
+        mCamera->setOrientation( Quaternion( mOrientation ) );
         if( mStatic )
             mCamera->setLightCullingVisibility( true, true );
     }
@@ -274,6 +276,5 @@ namespace Ogre
 
             mCamera->setLightCullingVisibility( false, false );
         }
-        //mDirty = false;
     }
 }

@@ -108,6 +108,7 @@ namespace Ogre
         void destroyCompositorData(void);
 
         void calculateBlendFactors(void);
+        void setFinalProbeTo( size_t probeIdx );
 
     public:
         ParallaxCorrectedCubemap( IdType id, Root *root, SceneManager *sceneManager,
@@ -146,7 +147,7 @@ namespace Ogre
         void updateRender(void);
 
         size_t getConstBufferSize(void) const;
-        void fillConstBufferData( const Matrix4 &viewMatrix, const Matrix3 &invViewMatrixLeftHanded,
+        void fillConstBufferData( const Matrix4 &viewMatrix,
                                   float * RESTRICT_ALIAS passBufferPtr ) const;
 
         /// See mTmpRtt. Finds an RTT that is compatible to copy to baseParams.
