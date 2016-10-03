@@ -103,8 +103,8 @@ namespace Ogre
     {
         {
             //Destroy all buffers which don't have a pool
-            BufferPackedVec::const_iterator itor = mBuffers[BP_TYPE_CONST].begin();
-            BufferPackedVec::const_iterator end  = mBuffers[BP_TYPE_CONST].end();
+            BufferPackedSet::const_iterator itor = mBuffers[BP_TYPE_CONST].begin();
+            BufferPackedSet::const_iterator end  = mBuffers[BP_TYPE_CONST].end();
             while( itor != end )
                 destroyConstBufferImpl( static_cast<ConstBufferPacked*>( *itor++ ) );
         }
@@ -635,8 +635,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void D3D11VaoManager::reorganizeImmutableVaos(void)
     {
-        VertexArrayObjectVec::const_iterator itor = mVertexArrayObjects.begin();
-        VertexArrayObjectVec::const_iterator end  = mVertexArrayObjects.end();
+        VertexArrayObjectSet::const_iterator itor = mVertexArrayObjects.begin();
+        VertexArrayObjectSet::const_iterator end  = mVertexArrayObjects.end();
 
         while( itor != end )
         {

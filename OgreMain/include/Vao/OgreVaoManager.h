@@ -38,8 +38,8 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    typedef vector<StagingBuffer*>::type        StagingBufferVec;
-    typedef vector<VertexArrayObject*>::type    VertexArrayObjectVec;
+    typedef vector<StagingBuffer*>::type               StagingBufferVec;
+    typedef unordered_set<VertexArrayObject*>::type    VertexArrayObjectSet;
 
     class _OgreExport VaoManager : public RenderSysAlloc
     {
@@ -61,8 +61,8 @@ namespace Ogre
         unsigned long   mNextStagingBufferTimestampCheckpoint;
         uint32          mFrameCount;
 
-        BufferPackedVec         mBuffers[NUM_BUFFER_PACKED_TYPES];
-        VertexArrayObjectVec    mVertexArrayObjects;
+        BufferPackedSet         mBuffers[NUM_BUFFER_PACKED_TYPES];
+        VertexArrayObjectSet    mVertexArrayObjects;
         uint32                  mNumGeneratedVaos; /// Increases on every createVertexArrayObject call
 
         struct DelayedBuffer
