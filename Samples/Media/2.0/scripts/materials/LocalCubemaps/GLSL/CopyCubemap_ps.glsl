@@ -44,5 +44,5 @@ vec3 getCubeDir( vec2 uv )
 void main()
 {
 	vec3 vDir = getCubeDir( inPs.uv0.xy * 2.0 - 1.0 );
-	fragColour = textureLod( cubeTexture, vDir, lodLevel.x ).xyzw;
+	fragColour = textureLod( cubeTexture, vDir, lodLevel ).xyzw;
 }

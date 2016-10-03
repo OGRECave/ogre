@@ -105,7 +105,7 @@ namespace Ogre
             for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
             {
                 materialName.resize( matNameSize );
-                materialName.a( i );
+                materialName.a( (uint32)i );
                 MaterialPtr material = MaterialManager::getSingleton().load(
                             materialName.c_str(), ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
                         staticCast<Material>();
