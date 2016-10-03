@@ -69,6 +69,7 @@ namespace Ogre
                                                         const CompositorWorkspaceDef *probeWorkspcDef,
                                                         uint8 reservedRqId, uint32 proxyVisibilityMask ) :
         IdObject( id ),
+        mNumCollectedProbes( 0 ),
         mPaused( false ),
         mTrackedPosition( Vector3::ZERO ),
         mBlankProbe( this ),
@@ -84,6 +85,9 @@ namespace Ogre
         mSceneManager( sceneManager ),
         mDefaultWorkspaceDef( probeWorkspcDef )
     {
+        memset( mProbeNDFs, 0, sizeof(mProbeNDFs) );
+        memset( mProbeBlendFactors, 0, sizeof(mProbeBlendFactors) );
+        memset( mCollectedProbes, 0, sizeof(mCollectedProbes) );
         memset( mBlendCubemapTUs, 0, sizeof(mBlendCubemapTUs) );
         memset( mCopyCubemapTUs, 0, sizeof(mCopyCubemapTUs) );
         memset( mProxyItems, 0, sizeof(mProxyItems) );
@@ -686,13 +690,6 @@ namespace Ogre
         for( size_t i=0; i<mNumCollectedProbes; ++i )
             mCollectedProbes[i]->_prepareForRendering();
 
-        bool requiresTrilinear = false;
-        for( size_t i=0; i<mNumCollectedProbes; ++i )
-        {
-            if( mCollectedProbes[i]->mTexture->getNumMipmaps() != mBlendCubemap->getNumMipmaps() )
-                requiresTrilinear = true;
-        }
-
         for( size_t i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
         {
             const Quaternion qRot( mCollectedProbes[i]->mOrientation );
@@ -727,6 +724,8 @@ namespace Ogre
             mBlendCubemapParamsVs[i]->setNamedConstant( "localToProbeLocal", localToProbeLocal );
             mBlendCubemapParams[i]->setNamedConstant( "weight", mProbeBlendFactors[i] );
 
+            const bool requiresTrilinear = mCollectedProbes[i]->mTexture->getNumMipmaps() !=
+                                                              mBlendCubemap->getNumMipmaps();
             mBlendCubemapTUs[i]->setTexture( mCollectedProbes[i]->mTexture );
             mBlendCubemapTUs[i]->_setSamplerblock( requiresTrilinear ? mSamplerblockTrilinear :
                                                                        mSamplerblockPoint );
@@ -771,6 +770,28 @@ namespace Ogre
             mCopyWorkspace->_update();
         else if( mNumCollectedProbes > 1u )
             mBlendWorkspace->_update();
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::updateAllDirtyProbes(void)
+    {
+        mSceneManager->updateSceneGraph();
+
+        mCopyWorkspace->_beginUpdate( true );
+        mBlendWorkspace->_beginUpdate( false );
+
+        CubemapProbeVec::const_iterator itor = mProbes.begin();
+        CubemapProbeVec::const_iterator end  = mProbes.end();
+
+        while( itor != end )
+        {
+            mTrackedPosition = (*itor)->mArea.mCenter;
+            this->updateSceneGraph();
+            this->updateRender();
+            ++itor;
+        }
+
+        mBlendWorkspace->_endUpdate( false );
+        mCopyWorkspace->_endUpdate( true );
     }
     //-----------------------------------------------------------------------------------
     size_t ParallaxCorrectedCubemap::getConstBufferSize(void) const

@@ -110,6 +110,9 @@ namespace Ogre
         void calculateBlendFactors(void);
         void setFinalProbeTo( size_t probeIdx );
 
+        void updateSceneGraph(void);
+        void updateRender(void);
+
     public:
         ParallaxCorrectedCubemap( IdType id, Root *root, SceneManager *sceneManager,
                                   const CompositorWorkspaceDef *probeWorkspaceDef,
@@ -143,8 +146,10 @@ namespace Ogre
         void setEnabled( bool bEnabled, uint32 maxWidth, uint32 maxHeight, PixelFormat pixelFormat );
         bool getEnabled(void) const;
 
-        void updateSceneGraph(void);
-        void updateRender(void);
+        /// By default the probes will be constructed when the user enters its vecinity.
+        /// This can cause noticeable stalls. Use this function to regenerate them all
+        /// at once (i.e. at loading time)
+        void updateAllDirtyProbes(void);
 
         size_t getConstBufferSize(void) const;
         void fillConstBufferData( const Matrix4 &viewMatrix,

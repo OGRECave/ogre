@@ -212,8 +212,9 @@ namespace Demo
         light->setSpecularColour( 0.8f, 0.4f, 0.2f );
         light->setPowerScale( Ogre::Math::PI );
         light->setType( Ogre::Light::LT_SPOTLIGHT );
-        lightNode->setPosition( -2.0f, 6.0f, 10.0f );
-        light->setDirection( Ogre::Vector3( 0.5, -1, -0.5 ).normalisedCopy() );
+        //lightNode->setPosition( -2.0f, 6.0f, 10.0f );
+        lightNode->setPosition( -12.0f, 6.0f, 8.0f );
+        light->setDirection( Ogre::Vector3( 1.5, -1, -0.5 ).normalisedCopy() );
         light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
         light->setSpotlightOuterAngle( Ogre::Degree( 80.0f ) );
 
@@ -239,6 +240,8 @@ namespace Demo
         mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
 
         TutorialGameState::createScene01();
+
+        mParallaxCorrectedCubemap->updateAllDirtyProbes();
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::destroyScene(void)
@@ -321,6 +324,8 @@ namespace Demo
                 mMaterials[i]->setTexture( Ogre::PBSM_REFLECTION, 0,
                                            mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
             }
+
+            mParallaxCorrectedCubemap->updateAllDirtyProbes();
         }
         else
         {
