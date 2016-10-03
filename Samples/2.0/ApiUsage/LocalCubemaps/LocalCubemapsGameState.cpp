@@ -27,6 +27,8 @@
 #include "Compositor/OgreCompositorManager2.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
 
+#include "OgreLwString.h"
+
 #include "Cubemaps/OgreParallaxCorrectedCubemap.h"
 
 #include "LocalCubemapScene.h"
@@ -37,89 +39,26 @@ namespace Demo
 {
     LocalCubemapsGameState::LocalCubemapsGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
-        mAnimateObjects( true ),
-        mCubeCamera( 0 ),
-        mLocalCubemapsWorkspace( 0 ),
-        mParallaxCorrectedCubemap( 0 )
+        mParallaxCorrectedCubemap( 0 ),
+        mUseMultipleProbes( true )
     {
-        memset( mSceneNode, 0, sizeof(mSceneNode) );
-    }
-    //-----------------------------------------------------------------------------------
-    Ogre::CompositorWorkspace* LocalCubemapsGameState::setupCompositor()
-    {
-        // We first create the Cubemap workspace and pass it to the final workspace
-        // that does the real rendering.
-        //
-        // If in your application you need to create a workspace but don't have a cubemap yet,
-        // you can either programatically modify the workspace definition (which is cumbersome)
-        // or just pass a PF_NULL texture that works as a dud and barely consumes any memory.
-        // See Tutorial_Terrain for an example of PF_NULL dud.
-        using namespace Ogre;
-
-        Root *root = mGraphicsSystem->getRoot();
-        SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-        RenderWindow *renderWindow = mGraphicsSystem->getRenderWindow();
-        Camera *camera = mGraphicsSystem->getCamera();
-        CompositorManager2 *compositorManager = root->getCompositorManager2();
-
-        //A RenderTarget created with TU_AUTOMIPMAP means the compositor still needs to
-        //explicitly generate the mipmaps by calling generate_mipmaps. It's just an API
-        //hint to tell the GPU we will be using the mipmaps auto generation routines.
-        mLocalCubemaps = TextureManager::getSingleton().createManual(
-                    "LocalCubemaps", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                    TEX_TYPE_CUBE_MAP, 1024, 1024,
-                    PixelUtil::getMaxMipmapCount( 1024, 1024, 1 ),
-                    PF_A8B8G8R8, TU_RENDERTARGET|TU_AUTOMIPMAP, 0, true );
-
-        // Create the camera used to render to our cubemap
-        mCubeCamera = sceneManager->createCamera( "CubeMapCamera", true, true );
-        mCubeCamera->setFOVy( Degree(90) );
-        mCubeCamera->setAspectRatio( 1 );
-        mCubeCamera->setFixedYawAxis(false);
-        mCubeCamera->setNearClipDistance(0.5);
-        //The default far clip distance is way too big for a cubemap-capable camera,
-        //hich prevents Ogre from better culling.
-        mCubeCamera->setFarClipDistance( 10000 );
-        mCubeCamera->setPosition( 0, 1.0, 0 );
-
-        //Setup the cubemap's compositor.
-        CompositorChannelVec cubemapExternalChannels( 1 );
-        //Any of the cubemap's render targets will do
-        cubemapExternalChannels[0].target = mLocalCubemaps->getBuffer(0)->getRenderTarget();
-        cubemapExternalChannels[0].textures.push_back( mLocalCubemaps );
-
-        const Ogre::IdString workspaceName( "Tutorial_LocalCubemaps_cubemap" );
-        if( !compositorManager->hasWorkspaceDefinition( workspaceName ) )
-        {
-            CompositorWorkspaceDef *workspaceDef = compositorManager->addWorkspaceDefinition(
-                                                                                    workspaceName );
-            //"CubemapRendererNode" has been defined in scripts.
-            //Very handy (as it 99% the same for everything)
-            workspaceDef->connectExternal( 0, "CubemapRendererNode", 0 );
-        }
-
-        ResourceLayoutMap initialCubemapLayouts;
-        ResourceAccessMap initialCubemapUavAccess;
-        mLocalCubemapsWorkspace =
-                compositorManager->addWorkspace( sceneManager, cubemapExternalChannels, mCubeCamera,
-                                                 workspaceName, true, -1, (UavBufferPackedVec*)0,
-                                                 &initialCubemapLayouts, &initialCubemapUavAccess );
-
-        //Now setup the regular renderer
-        CompositorChannelVec externalChannels( 2 );
-        //Render window
-        externalChannels[0].target = renderWindow;
-        externalChannels[1].target = mLocalCubemaps->getBuffer(0)->getRenderTarget();
-        externalChannels[1].textures.push_back( mLocalCubemaps );
-
-        return compositorManager->addWorkspace( sceneManager, externalChannels, camera,
-                                                "Tutorial_LocalCubemapsWorkspace",
-                                                true, -1, (UavBufferPackedVec*)0,
-                                                &initialCubemapLayouts, &initialCubemapUavAccess );
+        memset( mMaterials, 0, sizeof(mMaterials) );
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::setupParallaxCorrectCubemaps(void)
     {
+        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+
+        if( mParallaxCorrectedCubemap )
+        {
+            hlmsPbs->setParallaxCorrectedCubemap( 0 );
+
+            delete mParallaxCorrectedCubemap;
+            mParallaxCorrectedCubemap = 0;
+        }
+
         Ogre::Root *root = mGraphicsSystem->getRoot();
         Ogre::CompositorManager2 *compositorManager = root->getCompositorManager2();
         Ogre::CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition(
@@ -139,14 +78,17 @@ namespace Demo
         Ogre::Aabb probeArea;
         probeArea.mHalfSize = Ogre::Vector3( 5.064587, 3.891282, 3.891282 );
 
-        //Probe 00
-        probe = mParallaxCorrectedCubemap->createProbe();
-        probe->setTextureParams( 1024, 1024 );
-        probe->initWorkspace();
+        if( mUseMultipleProbes )
+        {
+            //Probe 00
+            probe = mParallaxCorrectedCubemap->createProbe();
+            probe->setTextureParams( 1024, 1024 );
+            probe->initWorkspace();
 
-        probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, -0.598495 );
-        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
-                    Ogre::Matrix3::IDENTITY, roomShape );
+            probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, -0.598495 );
+            probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+                        Ogre::Matrix3::IDENTITY, roomShape );
+        }
 
         //Probe 01
         probe = mParallaxCorrectedCubemap->createProbe();
@@ -154,21 +96,22 @@ namespace Demo
         probe->initWorkspace();
 
         probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 5.423867 );
-        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+        probe->set( mUseMultipleProbes ? probeArea : roomShape,
+                    Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
                     Ogre::Matrix3::IDENTITY, roomShape );
 
-        //Probe 02
-        probe = mParallaxCorrectedCubemap->createProbe();
-        probe->setTextureParams( 1024, 1024 );
-        probe->initWorkspace();
+        if( mUseMultipleProbes )
+        {
+            //Probe 02
+            probe = mParallaxCorrectedCubemap->createProbe();
+            probe->setTextureParams( 1024, 1024 );
+            probe->initWorkspace();
 
-        probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 10.657585 );
-        probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
-                    Ogre::Matrix3::IDENTITY, roomShape );
+            probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 10.657585 );
+            probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+                        Ogre::Matrix3::IDENTITY, roomShape );
+        }
 
-        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
-        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
         hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
     }
     //-----------------------------------------------------------------------------------
@@ -212,6 +155,7 @@ namespace Demo
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
+            mMaterials[0] = datablock;
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
                         hlmsPbs->createDatablock( "Green", "Green",
@@ -221,6 +165,7 @@ namespace Demo
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
+            mMaterials[1] = datablock;
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
                         hlmsPbs->createDatablock( "Blue", "Blue",
@@ -230,6 +175,7 @@ namespace Demo
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
+            mMaterials[2] = datablock;
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
                         hlmsPbs->createDatablock( "Cream", "Cream",
@@ -239,130 +185,10 @@ namespace Demo
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
             datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
+            mMaterials[3] = datablock;
         }
 
         generateScene( sceneManager );
-#if 0
-        {
-            Ogre::Item *item = sceneManager->createItem( planeMesh, Ogre::SCENE_DYNAMIC );
-            //item->setDatablock( "Marble" );
-            Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
-                                                    createChildSceneNode( Ogre::SCENE_DYNAMIC );
-            sceneNode->setPosition( 0, -1, 0 );
-            sceneNode->attachObject( item );
-
-            Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-            assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
-            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
-            Ogre::HlmsPbsDatablock *datablock = (Ogre::HlmsPbsDatablock *)hlmsPbs->getDefaultDatablock();
-            datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
-            datablock->setRoughness( 0.02 );
-            datablock->setFresnel( Ogre::Vector3( 1 ), false );
-        }
-
-        if( false )
-        {
-            Ogre::Item *item = sceneManager->createItem( "Cube_d.mesh",
-                                                         Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
-                                                         Ogre::SCENE_DYNAMIC );
-            //item->setDatablock( "Marble" );
-            Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
-                                                    createChildSceneNode( Ogre::SCENE_DYNAMIC );
-            sceneNode->setPosition( 0, (-1 + 10) * 0.5, 0 );
-            sceneNode->scale( Ogre::Vector3( 6 ) );
-            sceneNode->attachObject( item );
-        }
-
-        for( int i=0; i<4; ++i )
-        {
-            for( int j=0; j<4; ++j )
-            {
-                Ogre::String meshName;
-
-                if( i == j )
-                    meshName = "Sphere1000.mesh";
-                else
-                    meshName = "Cube_d.mesh";
-
-                Ogre::Item *item = sceneManager->createItem( meshName,
-                                                             Ogre::ResourceGroupManager::
-                                                             AUTODETECT_RESOURCE_GROUP_NAME,
-                                                             Ogre::SCENE_DYNAMIC );
-                item->setVisibilityFlags( 0x000000001 );
-
-                size_t idx = i * 4 + j;
-
-                mSceneNode[idx] = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
-                        createChildSceneNode( Ogre::SCENE_DYNAMIC );
-
-                mSceneNode[idx]->setPosition( (i - 1.5f) * armsLength,
-                                              2.0f,
-                                              (j - 1.5f) * armsLength );
-                mSceneNode[idx]->setScale( 0.65f, 0.65f, 0.65f );
-
-                mSceneNode[idx]->roll( Ogre::Radian( (Ogre::Real)idx ) );
-
-                mSceneNode[idx]->attachObject( item );
-                mObjects.push_back( item );
-            }
-        }
-
-        {
-            size_t numSpheres = 0;
-            Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-            Ogre::HlmsTextureManager *hlmsTextureManager = hlmsManager->getTextureManager();
-
-            assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
-
-            Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
-
-            const int numX = 1;
-            const int numZ = 1;
-
-            const float armsLength = 1.0f;
-            const float startX = (numX-1) / 2.0f;
-            const float startZ = (numZ-1) / 2.0f;
-
-            for( int x=0; x<numX; ++x )
-            {
-                for( int z=0; z<numZ; ++z )
-                {
-                    Ogre::String datablockName = "Test" + Ogre::StringConverter::toString( numSpheres++ );
-                    Ogre::HlmsPbsDatablock *datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                                hlmsPbs->createDatablock( datablockName,
-                                                          datablockName,
-                                                          Ogre::HlmsMacroblock(),
-                                                          Ogre::HlmsBlendblock(),
-                                                          Ogre::HlmsParamVec() ) );
-
-                    //Set the dynamic cubemap to these materials.
-                    //datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mLocalCubemaps );
-//                    datablock->setDiffuse( Ogre::Vector3( 0.0f, 1.0f, 0.0f ) );
-
-//                    datablock->setRoughness( std::max( 0.02f, x / Ogre::max( 1, (float)(numX-1) ) ) );
-//                    datablock->setFresnel( Ogre::Vector3( z / Ogre::max( 1, (float)(numZ-1) ) ), false );
-                    datablock->setDiffuse( Ogre::Vector3( 0.0f, 0.0f, 0.0f ) );
-                    datablock->setRoughness( 0.02f );
-                    datablock->setFresnel( Ogre::Vector3( 1.0f ), false );
-
-                    Ogre::Item *item = sceneManager->createItem( "Sphere1000.mesh",
-                                                                 Ogre::ResourceGroupManager::
-                                                                 AUTODETECT_RESOURCE_GROUP_NAME,
-                                                                 Ogre::SCENE_DYNAMIC );
-                    item->setDatablock( datablock );
-                    item->setVisibilityFlags( 0x000000002 | 0x00000004 );
-
-                    Ogre::SceneNode *sceneNode = sceneManager->getRootSceneNode( Ogre::SCENE_DYNAMIC )->
-                            createChildSceneNode( Ogre::SCENE_DYNAMIC );
-                    sceneNode->setPosition( Ogre::Vector3( armsLength * x - startX,
-                                                           1.0f,
-                                                           armsLength * z - startZ ) );
-                    sceneNode->attachObject( item );
-                    mSpheres.push_back( item );
-                }
-            }
-        }
-#endif
 
         Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
 
@@ -424,19 +250,6 @@ namespace Demo
 
         delete mParallaxCorrectedCubemap;
         mParallaxCorrectedCubemap = 0;
-
-//        Ogre::Root *root = mGraphicsSystem->getRoot();
-//        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-//        Ogre::CompositorManager2 *compositorManager = root->getCompositorManager2();
-
-//        compositorManager->removeWorkspace( mLocalCubemapsWorkspace );
-//        mLocalCubemapsWorkspace = 0;
-
-//        Ogre::TextureManager::getSingleton().remove( mLocalCubemaps->getHandle() );
-//        mLocalCubemaps.setNull();
-
-//        sceneManager->destroyCamera( mCubeCamera );
-//        mCubeCamera = 0;
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::update( float timeSinceLast )
@@ -460,23 +273,23 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
-        Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
+        char tmpBuffer[64];
+        Ogre::LwString roughnessStr( Ogre::LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+        roughnessStr.a( Ogre::LwString::Float( mMaterials[0]->getRoughness(), 2 ) );
 
         TutorialGameState::generateDebugText( timeSinceLast, outText );
-        outText += "\nPress F2 to toggle animation. ";
-        outText += mAnimateObjects ? "[On]" : "[Off]";
-        outText += "\nPress F3 to show/hide animated objects. ";
-        outText += (visibilityMask & 0x000000001) ? "[On]" : "[Off]";
+        outText += "\nPress F2/F3 to adjust material roughness: ";
+        outText += roughnessStr.c_str();
+        outText += "\nPress F4 to toggle number of probes. Num probes: ";
+        outText += mUseMultipleProbes ? "3" : "1";
+        outText += "\nProbes blending: ";
+        outText += Ogre::StringConverter::toString( mParallaxCorrectedCubemap->getNumCollectedProbes() );
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
+        outText += "\nCamera: ";
         outText += Ogre::StringConverter::toString( camera->getPosition().x ) + ", " +
                 Ogre::StringConverter::toString( camera->getPosition().y ) + ", " +
                 Ogre::StringConverter::toString( camera->getPosition().z );
-
-        outText += "\nProbes blending: ";
-        outText += Ogre::StringConverter::toString( mParallaxCorrectedCubemap->getNumCollectedProbes() );
-        //outText += "\nPress F4 to show/hide spheres from the reflection. ";
-        //outText += (mSpheres.back()->getVisibilityFlags() & 0x000000004) ? "[On]" : "[Off]";
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::keyReleased( const SDL_KeyboardEvent &arg )
@@ -489,77 +302,26 @@ namespace Demo
 
         if( arg.keysym.sym == SDLK_F2 )
         {
-            mAnimateObjects = !mAnimateObjects;
+            float roughness = mMaterials[0]->getRoughness();
+            for( int i=0; i<4; ++i )
+                mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness - 0.1f, 0.02f, 1.0f ) );
         }
         else if( arg.keysym.sym == SDLK_F3 )
         {
-            Ogre::uint32 visibilityMask = mGraphicsSystem->getSceneManager()->getVisibilityMask();
-            bool showMovingObjects = (visibilityMask & 0x00000001);
-            showMovingObjects = !showMovingObjects;
-            visibilityMask &= ~0x00000001;
-            visibilityMask |= (Ogre::uint32)showMovingObjects;
-            mGraphicsSystem->getSceneManager()->setVisibilityMask( visibilityMask );
+            float roughness = mMaterials[0]->getRoughness();
+            for( int i=0; i<4; ++i )
+                mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness + 0.1f, 0.02f, 1.0f ) );
         }
         else if( arg.keysym.sym == SDLK_F4 )
         {
-            std::vector<Ogre::MovableObject*>::const_iterator itor = mSpheres.begin();
-            std::vector<Ogre::MovableObject*>::const_iterator end  = mSpheres.end();
-            while( itor != end )
+            mUseMultipleProbes = !mUseMultipleProbes;
+            setupParallaxCorrectCubemaps();
+            for( int i=0; i<4; ++i )
             {
-                Ogre::uint32 visibilityMask = (*itor)->getVisibilityFlags();
-                bool showPalette = (visibilityMask & 0x00000004) != 0;
-                showPalette = !showPalette;
-                visibilityMask &= ~0x00000004;
-                visibilityMask |= (Ogre::uint32)(showPalette) << 2;
-
-                (*itor)->setVisibilityFlags( visibilityMask );
-                ++itor;
+                mMaterials[i]->setTexture( Ogre::PBSM_REFLECTION, 0,
+                                           mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
             }
         }
-//        else if( arg.keysym.sym == SDLK_KP_PLUS )
-//        {
-//            Ogre::CubemapProbeVec probes = mParallaxCorrectedCubemap->getProbes();
-//            Ogre::Vector3 probePos = probes[0]->getProbePos();
-//            Ogre::Aabb aabb = probes[0]->getArea();
-//            probePos += Ogre::Vector3::UNIT_Y * 0.5f;
-//            //aabb.mCenter += Ogre::Vector3::UNIT_Y * 0.5f;
-//            probes[0]->set( probePos, aabb,
-//                            probes[0]->getAabbOrientation(),
-//                            probes[0]->getAabbFalloff() );
-//        }
-//        else if( arg.keysym.sym == SDLK_KP_MINUS )
-//        {
-//            Ogre::CubemapProbeVec probes = mParallaxCorrectedCubemap->getProbes();
-//            Ogre::Vector3 probePos = probes[0]->getProbePos();
-//            Ogre::Aabb aabb = probes[0]->getArea();
-//            probePos -= Ogre::Vector3::UNIT_Y * 0.5f;
-//            //aabb.mCenter -= Ogre::Vector3::UNIT_Y * 0.5f;
-//            probes[0]->set( probePos, aabb,
-//                            probes[0]->getAabbOrientation(),
-//                            probes[0]->getAabbFalloff() );
-//        }
-//        else if( arg.keysym.sym == SDLK_KP_9 )
-//        {
-//            Ogre::CubemapProbeVec probes = mParallaxCorrectedCubemap->getProbes();
-//            Ogre::Vector3 probePos = probes[0]->getProbePos();
-//            Ogre::Aabb aabb = probes[0]->getArea();
-//            //probePos += Ogre::Vector3::UNIT_Y * 0.5f;
-//            aabb.mCenter += Ogre::Vector3::UNIT_Y * 0.5f;
-//            probes[0]->set( probePos, aabb,
-//                            probes[0]->getAabbOrientation(),
-//                            probes[0]->getAabbFalloff() );
-//        }
-//        else if( arg.keysym.sym == SDLK_KP_6 )
-//        {
-//            Ogre::CubemapProbeVec probes = mParallaxCorrectedCubemap->getProbes();
-//            Ogre::Vector3 probePos = probes[0]->getProbePos();
-//            Ogre::Aabb aabb = probes[0]->getArea();
-//            //probePos -= Ogre::Vector3::UNIT_Y * 0.5f;
-//            aabb.mCenter -= Ogre::Vector3::UNIT_Y * 0.5f;
-//            probes[0]->set( probePos, aabb,
-//                            probes[0]->getAabbOrientation(),
-//                            probes[0]->getAabbFalloff() );
-//        }
         else
         {
             TutorialGameState::keyReleased( arg );

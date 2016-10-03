@@ -10,25 +10,18 @@
 namespace Ogre
 {
     class ParallaxCorrectedCubemap;
+    class HlmsPbsDatablock;
 }
 
 namespace Demo
 {
     class LocalCubemapsGameState : public TutorialGameState
     {
-        Ogre::SceneNode     *mSceneNode[16];
-
         Ogre::SceneNode     *mLightNodes[3];
 
-        bool                mAnimateObjects;
-
-        std::vector<Ogre::MovableObject*> mSpheres;
-        std::vector<Ogre::MovableObject*> mObjects;
-
-        Ogre::Camera                *mCubeCamera;
-        Ogre::TexturePtr            mLocalCubemaps;
-        Ogre::CompositorWorkspace   *mLocalCubemapsWorkspace;
         Ogre::ParallaxCorrectedCubemap  *mParallaxCorrectedCubemap;
+        Ogre::HlmsPbsDatablock          *mMaterials[4];
+        bool                            mUseMultipleProbes;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
@@ -36,8 +29,6 @@ namespace Demo
 
     public:
         LocalCubemapsGameState( const Ogre::String &helpDescription );
-
-        Ogre::CompositorWorkspace* setupCompositor(void);
 
         virtual void createScene01(void);
         virtual void destroyScene(void);

@@ -358,7 +358,7 @@ namespace Ogre
     {
         String workspaceName = "AutoGen_ParallaxCorrectedCubemapBlending_Workspace";
         CompositorManager2 *compositorManager = mDefaultWorkspaceDef->getCompositorManager();
-        CompositorWorkspaceDef *workspaceDef = 0;
+        CompositorWorkspaceDef *workspaceDef =
                 compositorManager->getWorkspaceDefinitionNoThrow( workspaceName );
         if( !workspaceDef )
         {
