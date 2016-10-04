@@ -344,18 +344,25 @@ namespace Ogre {
 
 namespace std
 {
-    template < typename T >
-    struct hash< Ogre::SharedPtr< T > > : hash< T* >
+    #if __cplusplus < 201103L
+    namespace tr1
     {
-        typedef hash< T* > MyBase;
-        typedef Ogre::SharedPtr< T > argument_type;
-        typedef size_t result_type;
-
-        result_type operator()( const argument_type& k ) const
+    #endif
+        template < typename T >
+        struct hash< Ogre::SharedPtr< T > > : hash< T* >
         {
-            return MyBase::operator()( k.get() );
-        }
-    };
+            typedef hash< T* > MyBase;
+            typedef Ogre::SharedPtr< T > argument_type;
+            typedef size_t result_type;
+
+            result_type operator()( const argument_type& k ) const
+            {
+                return MyBase::operator()( k.get() );
+            }
+        };
+    #if __cplusplus < 201103L
+    }
+    #endif
 }
 
 #endif
