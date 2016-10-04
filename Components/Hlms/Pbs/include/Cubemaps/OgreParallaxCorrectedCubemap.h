@@ -57,6 +57,7 @@ namespace Ogre
         /// This variable should be updated every frame and often represents the camera position,
         /// but it can also be used set to other things like the player's character position.
         public: Vector3                 mTrackedPosition;
+        public: uint32                  mMask; /// @see CubemapProbe::mMask
     private:
         GpuProgramParametersSharedPtr   mBlendCubemapParamsVs[OGRE_MAX_CUBE_PROBES];
         GpuProgramParametersSharedPtr   mBlendCubemapParams[OGRE_MAX_CUBE_PROBES];

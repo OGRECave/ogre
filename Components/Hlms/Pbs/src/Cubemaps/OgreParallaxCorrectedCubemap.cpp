@@ -72,6 +72,7 @@ namespace Ogre
         mNumCollectedProbes( 0 ),
         mPaused( false ),
         mTrackedPosition( Vector3::ZERO ),
+        mMask( 0xffffffff ),
         mBlankProbe( this ),
         mFinalProbe( this ),
         mBlendProxyCamera( 0 ),
@@ -610,13 +611,15 @@ namespace Ogre
         CubemapProbeVec::iterator itor = mProbes.begin();
         CubemapProbeVec::iterator end  = mProbes.end();
 
+        const uint32 systemMask = mMask;
+
         while( itor != end )
         {
             CubemapProbe *probe = *itor;
 
             const Vector3 posLS = probe->mInvOrientation * (mTrackedPosition - probe->mArea.mCenter);
             const Aabb areaLS = probe->getAreaLS();
-            if( areaLS.contains( posLS ) )
+            if( areaLS.contains( posLS ) && probe->mEnabled && (probe->mMask & systemMask) )
             {
                 const Real ndf = probe->getNDF( posLS );
 
@@ -782,16 +785,21 @@ namespace Ogre
         mCopyWorkspace->_beginUpdate( true );
         mBlendWorkspace->_beginUpdate( false );
 
+        const uint32 systemMask = mMask;
+
         CubemapProbeVec::const_iterator itor = mProbes.begin();
         CubemapProbeVec::const_iterator end  = mProbes.end();
 
         while( itor != end )
         {
-            mTrackedPosition = (*itor)->mArea.mCenter;
-            this->updateSceneGraph();
-            for( size_t i=0; i<mNumCollectedProbes; ++i )
-                mProxyNodes[i]->_getFullTransformUpdated();
-            this->updateRender();
+            if( (*itor)->mEnabled && ((*itor)->mMask & systemMask) )
+            {
+                mTrackedPosition = (*itor)->mArea.mCenter;
+                this->updateSceneGraph();
+                for( size_t i=0; i<mNumCollectedProbes; ++i )
+                    mProxyNodes[i]->_getFullTransformUpdated();
+                this->updateRender();
+            }
             ++itor;
         }
 

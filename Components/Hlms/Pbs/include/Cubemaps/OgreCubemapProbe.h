@@ -72,6 +72,9 @@ namespace Ogre
         bool    mStatic;
 
     public:
+        /// While disabled, this probe won't be updated (even if dirty) and won't be considered
+        /// for blending (i.e. won't be used at all).
+        bool    mEnabled;
         /// True if we must re-render to update the texture's contents. False when we don't.
         bool    mDirty;
         /// Number of iterations. The more iterations, the more light bounces and
@@ -80,6 +83,16 @@ namespace Ogre
         /// Default value is 32.
         /// For non-static probes, you should set this value to 1 for performance.
         uint16  mNumIterations;
+
+        /// Mask to group probes. This probe will only be updated (even if dirty) and
+        /// blended if mMask & system->mMask is non-zero.
+        /// Useful for example for probes to be used during the day while other probes to
+        /// be used during the night; thus you only want one group to be active at the same
+        /// time.
+        /// Or if you have per room probes, but during a panoramic shot where many rooms
+        /// are in sight, and you want a more "global" probe.
+        /// Defaults to 0xffffffff
+        uint32  mMask;
 
     protected:
         void destroyWorkspace(void);

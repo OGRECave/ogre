@@ -59,8 +59,10 @@ namespace Ogre
         mCamera( 0 ),
         mCreator( creator ),
         mStatic( true ),
+        mEnabled( true ),
         mDirty( true ),
-        mNumIterations( 32 )
+        mNumIterations( 32 ),
+        mMask( 0xffffffff )
     {
     }
     //-----------------------------------------------------------------------------------
