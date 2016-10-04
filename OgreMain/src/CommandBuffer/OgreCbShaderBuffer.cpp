@@ -110,6 +110,7 @@ namespace Ogre
         bindSizeBytes( _bindSizeBytes )
     {
         assert( shaderType != NumShaderTypes );
+        assert( !_bufferPacked || _bindOffset < _bufferPacked->getTotalSizeBytes() );
     }
 
     void CommandBuffer::execute_setTextureBufferVS( CommandBuffer *_this,
