@@ -582,6 +582,7 @@ namespace Ogre
         mFinalProbe.mArea = mCollectedProbes[probeIdx]->mArea;
         mFinalProbe.mAreaInnerRegion = mCollectedProbes[probeIdx]->mAreaInnerRegion;
         mFinalProbe.mOrientation = mCollectedProbes[probeIdx]->mOrientation;
+        mFinalProbe.mInvOrientation = mCollectedProbes[probeIdx]->mInvOrientation;
         mFinalProbe.mProbeShape = mCollectedProbes[probeIdx]->mProbeShape;
 
         const bool requiresTrilinear = mCollectedProbes[probeIdx]->mTexture->getNumMipmaps() !=
@@ -613,7 +614,7 @@ namespace Ogre
         {
             CubemapProbe *probe = *itor;
 
-            const Vector3 posLS = probe->mOrientation * (mTrackedPosition - probe->mArea.mCenter);
+            const Vector3 posLS = probe->mInvOrientation * (mTrackedPosition - probe->mArea.mCenter);
             const Aabb areaLS = probe->getAreaLS();
             if( areaLS.contains( posLS ) )
             {
@@ -698,7 +699,7 @@ namespace Ogre
             mProxyNodes[i]->setOrientation( qRot );
             mProxyItems[i]->setVisible( i < mNumCollectedProbes );
 
-            Matrix4 localToProbeLocal( mCollectedProbes[i]->mOrientation );
+            Matrix4 localToProbeLocal( mCollectedProbes[0]->mOrientation * mCollectedProbes[i]->mInvOrientation );
             const Real maxComponent = Ogre::max( mCollectedProbes[i]->mProbeShape.mHalfSize.x,
                                                  Ogre::max(
                                                      mCollectedProbes[i]->mProbeShape.mHalfSize.y,
@@ -717,9 +718,10 @@ namespace Ogre
             localToProbeLocal[1][1] *= scaleRatio.z;
             localToProbeLocal[2][1] *= scaleRatio.z;
 
-            localToProbeLocal.setTrans( (mCollectedProbes[i]->mProbeShape.mCenter -
-                                        mCollectedProbes[i]->mArea.mCenter) /
-                                        mCollectedProbes[i]->mProbeShape.mHalfSize );
+            Vector3 translation = mCollectedProbes[i]->mInvOrientation *
+                    (mCollectedProbes[i]->mProbeShape.mCenter - mCollectedProbes[i]->mArea.mCenter);
+            translation /= mCollectedProbes[i]->mProbeShape.mHalfSize;
+            localToProbeLocal.setTrans( translation );
 
             mBlendCubemapParamsVs[i]->setNamedConstant( "localToProbeLocal", localToProbeLocal );
             mBlendCubemapParams[i]->setNamedConstant( "weight", mProbeBlendFactors[i] );
@@ -763,6 +765,7 @@ namespace Ogre
         }
 
         setFinalProbeTo( 0 );
+
         if( mNumCollectedProbes > 1 )
             mFinalProbe.mArea.mCenter = mBlendProxyCamera->getPosition();
 
@@ -786,6 +789,8 @@ namespace Ogre
         {
             mTrackedPosition = (*itor)->mArea.mCenter;
             this->updateSceneGraph();
+            for( size_t i=0; i<mNumCollectedProbes; ++i )
+                mProxyNodes[i]->_getFullTransformUpdated();
             this->updateRender();
             ++itor;
         }
@@ -805,8 +810,7 @@ namespace Ogre
         Matrix3 invViewMat3;
         viewMatrix.extract3x3Matrix( invViewMat3 );
         invViewMat3 = invViewMat3.Inverse();
-        const Matrix3 viewSpaceToProbeLocal = mFinalProbe.mOrientation *
-                                              invViewMat3;
+        const Matrix3 viewSpaceToProbeLocal = mFinalProbe.mInvOrientation * invViewMat3;
 
         const Aabb &probeShape = mFinalProbe.getProbeShape();
         Vector3 probeShapeCenterVS = viewMatrix * probeShape.mCenter; //View-space
@@ -837,7 +841,7 @@ namespace Ogre
 
         //float4 cubemapPosLS;
         Vector3 cubemapPosLS = mFinalProbe.mArea.mCenter - probeShape.mCenter;
-        cubemapPosLS = mFinalProbe.mOrientation * cubemapPosLS;
+        cubemapPosLS = mFinalProbe.mInvOrientation * cubemapPosLS;
         *passBufferPtr++ = cubemapPosLS.x;
         *passBufferPtr++ = cubemapPosLS.y;
         *passBufferPtr++ = cubemapPosLS.z;

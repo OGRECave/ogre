@@ -55,6 +55,7 @@ namespace Ogre
         Vector3 mAreaInnerRegion;
         /// Orientationt. These are not AABBs, but rather OBB (oriented bounding boxes).
         Matrix3 mOrientation;
+        Matrix3 mInvOrientation;
         /// The general shape this probe is supposed to represent.
         Aabb    mProbeShape;
 
@@ -120,8 +121,9 @@ namespace Ogre
             of quality & precision while inside the OBB (as results get mixed up with other probes').
             The value is per axis.
         @param orientation
-            The orientation of the AABB that makes it an OBB. Skewing and shearing is supported.
+            The orientation of the AABB that makes it an OBB.
             This orientation is applied to both probeShape AND area.
+            Skewing and shearing is not tested. May or may not work.
         @param probeShape
             Note AABB is actually an OBB (Oriented Bounding Box). See orientation parameter.
             The OBB should closely match the shape of the environment around it. The better it fits,

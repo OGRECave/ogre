@@ -52,6 +52,7 @@ namespace Ogre
         mArea( Aabb::BOX_NULL ),
         mAreaInnerRegion( Vector3::ZERO ),
         mOrientation( Matrix3::IDENTITY ),
+        mInvOrientation( Matrix3::IDENTITY ),
         mProbeShape( Aabb::BOX_NULL ),
         mFsaa( 1 ),
         mWorkspace( 0 ),
@@ -202,22 +203,16 @@ namespace Ogre
         mArea               = area;
         mAreaInnerRegion    = areaInnerRegion;
         mOrientation        = orientation;
+        mInvOrientation     = mOrientation.Inverse();
         mProbeShape         = probeShape;
 
         mAreaInnerRegion.makeCeil( Vector3::ZERO );
         mAreaInnerRegion.makeFloor( Vector3::UNIT_SCALE );
 
-        if( !mProbeShape.contains( mArea ) )
-        {
-            LogManager::getSingleton().logMessage(
-                        "ERROR: Cubemap's area must be fully inside the probe's shape. "
-                        "Forcing the area to inside the probe shape." );
-            Vector3 vMin = mArea.getMinimum();
-            vMin.makeCeil( mProbeShape.getMinimum() );
-            Vector3 vMax = mArea.getMaximum();
-            vMax.makeFloor( mProbeShape.getMaximum() );
-            mArea.setExtents( vMin, vMax );
-        }
+        Aabb areaLocalToShape = mArea;
+        areaLocalToShape.mCenter -= mProbeShape.mCenter;
+        areaLocalToShape.mCenter = mInvOrientation * areaLocalToShape.mCenter;
+        areaLocalToShape.mCenter += mProbeShape.mCenter;
 
         mDirty = true;
     }
