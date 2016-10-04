@@ -235,6 +235,8 @@ namespace Demo
         mLightNodes[2] = lightNode;
 
         mCameraController = new CameraController( mGraphicsSystem, false );
+        mCameraController->mCameraBaseSpeed = 1.0f;
+        mCameraController->mCameraSpeedBoost = 10.0f;
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
