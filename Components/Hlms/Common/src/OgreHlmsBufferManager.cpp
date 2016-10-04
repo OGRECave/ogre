@@ -254,11 +254,18 @@ namespace Ogre
                 bindOffset = (mCurrentMappedTexBuffer - mRealStartMappedTexBuffer) * sizeof(float);
             }
 
-            //Add a new binding command.
-            shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
-            *shaderBufferCmd = CbShaderBuffer( VertexShader, 0, mTexBuffers[mCurrentTexBuffer],
-                                               mTexLastOffset + bindOffset, 0 );
-            mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
+            if( mTexLastOffset + bindOffset >= mTexBuffers[mCurrentTexBuffer]->getTotalSizeBytes() )
+            {
+                mapNextTexBuffer( commandBuffer, minimumSizeBytes );
+            }
+            else
+            {
+                //Add a new binding command.
+                shaderBufferCmd = commandBuffer->addCommand<CbShaderBuffer>();
+                *shaderBufferCmd = CbShaderBuffer( VertexShader, 0, mTexBuffers[mCurrentTexBuffer],
+                                                   mTexLastOffset + bindOffset, 0 );
+                mLastTexBufferCmdOffset = commandBuffer->getCommandOffset( shaderBufferCmd );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
