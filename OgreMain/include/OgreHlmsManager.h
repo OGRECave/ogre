@@ -57,7 +57,7 @@ namespace Ogre
         #if !OGRE_NO_JSON
             public ScriptLoader,
         #endif
-            public PassAlloc
+            public HlmsAlloc
     {
     public:
         typedef vector<uint16>::type BlockIdxVec;

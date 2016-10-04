@@ -44,7 +44,7 @@ namespace Ogre
     class CompositorShadowNode;
 
     /** Forward3D */
-    class _OgreExport Forward3D : public PassAlloc
+    class _OgreExport Forward3D : public HlmsAlloc
     {
         struct Resolution
         {
