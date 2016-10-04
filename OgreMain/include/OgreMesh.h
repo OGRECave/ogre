@@ -123,7 +123,7 @@ namespace v1 {
         /** A hashmap used to store optional SubMesh names.
             Translates a name into SubMesh index.
         */
-        typedef OGRE_HashMap<String, ushort> SubMeshNameMap ;
+        typedef unordered_map<String, ushort>::type SubMeshNameMap ;
 
         
     protected:
