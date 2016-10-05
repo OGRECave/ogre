@@ -106,7 +106,7 @@ namespace Ogre {
     #       if _MSC_VER >= 1900 // VC++ 2015
     #           define OGRE_HASH_NAMESPACE ::std
     #       elif _MSC_FULL_VER >= 150030729 // VC++ 9.0/2008 SP1+
-    #           define OGRE_HASH_NAMESPACE ::std::tr
+    #           define OGRE_HASH_NAMESPACE ::std::tr1
     #       elif OGRE_THREAD_PROVIDER == 1
     #           define OGRE_HASH_NAMESPACE ::boost
     #       endif
