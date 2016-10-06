@@ -784,6 +784,25 @@ namespace v1 {
         //Only implemented for 2D at the moment...
         ID3D11Texture2D *textureResource = mParentTexture->GetTex2D();
 
+        if( mParentTexture->getResolveTextureResource() )
+        {
+            textureResource = static_cast<ID3D11Texture2D*>(
+                        mParentTexture->getResolveTextureResource() );
+        }
+        else if( mParentTexture->getFSAA() > 1 || atoi(mParentTexture->getFSAAHint().c_str()) > 0 )
+        {
+            //Backbuffer? Create a temporary texture where to resolve to.
+            D3D11_TEXTURE2D_DESC desc = {0};
+            mParentTexture->GetTex2D()->GetDesc( &desc );
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            mDevice->CreateTexture2D( &desc, NULL, &textureResource );
+
+            mDevice.GetImmediateContext()->ResolveSubresource( textureResource, 0,
+                                                               mParentTexture->GetTex2D(), 0,
+                                                               mParentTexture->getD3dFormat() );
+        }
+
         // get the description of the texture
         D3D11_TEXTURE2D_DESC desc = {0};
         textureResource->GetDesc( &desc );
@@ -811,8 +830,13 @@ namespace v1 {
         //Release the staging texture
         mDevice.GetImmediateContext()->Unmap( pStagingTexture, 0 );
         pStagingTexture->Release();
-    }
 
+        if( !mParentTexture->getResolveTextureResource() &&
+            (mParentTexture->getFSAA() > 1 || atoi(mParentTexture->getFSAAHint().c_str()) > 0) )
+        {
+            textureResource->Release();
+        }
+    }
     //-----------------------------------------------------------------------------  
     void D3D11HardwarePixelBuffer::_genMipmaps()
     {

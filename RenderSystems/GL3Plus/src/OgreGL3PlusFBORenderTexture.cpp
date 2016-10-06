@@ -68,7 +68,8 @@ namespace Ogre {
 
     void GL3PlusFBORenderTexture::swapBuffers()
     {
-        mFB.swapBuffers();
+        if( isFsaaResolveDirty() )
+            mFB.swapBuffers();
         GL3PlusRenderTexture::swapBuffers();
     }
     //-----------------------------------------------------------------------------
