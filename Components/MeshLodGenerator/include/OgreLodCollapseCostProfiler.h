@@ -58,7 +58,7 @@ namespace Ogre
 
         HasVertexProfileList mHasProfile;
 
-        typedef OGRE_HashMultiMap<LodData::Vertex*, ProfiledEdge> ProfileLookup;
+        typedef unordered_multimap<LodData::Vertex*, ProfiledEdge>::type ProfileLookup;
         ProfileLookup mProfileLookup;
         LodProfile mProfile;
 

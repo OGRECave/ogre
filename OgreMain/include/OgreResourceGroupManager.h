@@ -310,7 +310,7 @@ namespace Ogre {
         typedef map<String, Archive*>::type ResourceLocationIndex;
 
         /// List of resources which can be loaded / unloaded
-        typedef list<ResourcePtr>::type LoadUnloadResourceList;
+        typedef unordered_set<ResourcePtr>::type LoadUnloadResourceSet;
         /// Resource group entry
         struct ResourceGroup
         {
@@ -341,7 +341,7 @@ namespace Ogre {
             /// Created resources which are ready to be loaded / unloaded
             // Group by loading order of the type (defined by ResourceManager)
             // (e.g. skeletons and materials before meshes)
-            typedef map<Real, LoadUnloadResourceList*>::type LoadResourceOrderMap;
+            typedef map<Real, LoadUnloadResourceSet*>::type LoadResourceOrderMap;
             LoadResourceOrderMap loadResourceOrderMap;
             /// Linked world geometry, as passed to setWorldGeometry
             String worldGeometry;

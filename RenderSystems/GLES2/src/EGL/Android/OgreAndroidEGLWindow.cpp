@@ -135,15 +135,15 @@ namespace Ogre {
                 StringConverter::parseBool(opt->second))
             {
                 eglContext = eglGetCurrentContext();
-                if (eglContext)
+                if (!eglContext)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                                 "currentGLContext was specified with no current GL context",
                                 "EGLWindow::create");
                 }
-                
-                eglContext = eglGetCurrentContext();
+
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                mEglDisplay = eglGetCurrentDisplay();
             }
             
             
@@ -158,7 +158,7 @@ namespace Ogre {
             }
             
             int ctxHandle = -1;
-            if((miscParams->find("externalGLContext")) != end)
+            if((opt = miscParams->find("externalGLContext")) != end)
             {
                 mIsExternalGLControl = true;
                 ctxHandle = Ogre::StringConverter::parseInt(opt->second);

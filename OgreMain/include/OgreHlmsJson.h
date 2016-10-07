@@ -59,7 +59,7 @@ namespace Ogre
     *  @{
     */
     /** HLMS stands for "High Level Material System". */
-    class _OgreExport HlmsJson : public PassAlloc
+    class _OgreExport HlmsJson : public HlmsAlloc
     {
     public:
         struct NamedBlocks

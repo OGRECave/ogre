@@ -56,11 +56,7 @@ namespace Ogre
         struct VertexHash;
         struct VertexEqual;
 
-        typedef vector<Vertex>::type VertexList;
-        typedef vector<Triangle>::type TriangleList;
-        typedef OGRE_HashSet<Vertex*, VertexHash, VertexEqual> UniqueVertexSet;
         typedef multimap<Real, Vertex*>::type CollapseCostHeap;
-
         typedef VectorSet<Edge, 8> VEdges;
         typedef VectorSet<Triangle*, 7> VTriangles;
 
@@ -145,6 +141,10 @@ namespace Ogre
         };
 
         typedef vector<IndexBufferInfo>::type IndexBufferInfoList;
+
+        typedef vector<Vertex>::type VertexList;
+        typedef vector<Triangle>::type TriangleList;
+        typedef unordered_set<Vertex*, VertexHash, VertexEqual>::type UniqueVertexSet;
 
         /// Provides position based vertex lookup. Position is the real identifier of a vertex.
         UniqueVertexSet mUniqueVertexSet;

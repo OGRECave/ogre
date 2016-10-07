@@ -342,6 +342,27 @@ namespace Ogre {
     /** @} */
 }
 
+namespace std
+{
+    #if __cplusplus < 201103L
+    namespace tr1
+    {
+    #endif
+        template < typename T >
+        struct hash< Ogre::SharedPtr< T > > : hash< T* >
+        {
+            typedef hash< T* > MyBase;
+            typedef Ogre::SharedPtr< T > argument_type;
+            typedef size_t result_type;
 
+            result_type operator()( const argument_type& k ) const
+            {
+                return MyBase::operator()( k.get() );
+            }
+        };
+    #if __cplusplus < 201103L
+    }
+    #endif
+}
 
 #endif

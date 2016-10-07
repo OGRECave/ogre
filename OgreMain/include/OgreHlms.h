@@ -50,7 +50,7 @@ namespace Ogre
     */
 
     /** HLMS stands for "High Level Material System". */
-    class _OgreExport Hlms : public PassAlloc
+    class _OgreExport Hlms : public HlmsAlloc
     {
     public:
         enum LightGatheringMode
