@@ -360,7 +360,7 @@ namespace Ogre {
                     }
 
 
-                    const int maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
+                    const uint maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
                     if (maxExtensionFunctionSupport >= CPUID_FUNC_ADVANCED_POWER_MANAGEMENT)
                     {
                         _performCpuid(CPUID_FUNC_ADVANCED_POWER_MANAGEMENT, result);
@@ -393,7 +393,7 @@ namespace Ogre {
                         features |= PlatformInformation::CPU_FEATURE_SSE3;
 
                     // Has extended feature ?
-                    const int maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
+                    const uint maxExtensionFunctionSupport = _performCpuid(CPUID_FUNC_EXTENSION_QUERY, result);
                     if (maxExtensionFunctionSupport >= CPUID_FUNC_EXTENDED_FEATURES)
                     {
                         // Check extended feature

@@ -1177,23 +1177,9 @@ namespace Ogre {
                 size_t yMax = squashY ? height >> 1 : height;
                 size_t zMax = squashZ ? depth >> 1 : depth;
                 PixelBox newBox(xMax, yMax, zMax, scaled.format, scaled.data);
-                size_t xMask, yMask, zMask;
-                size_t mask = 1;
-                if (squashX)
-                {
-                    xMask = mask;
-                    mask <<= 1;
-                }
-                if (squashY)
-                {
-                    yMask = mask;
-                    mask <<= 1;
-                }
-                if (squashZ)
-                {
-                    zMask = mask;
-                    mask <<= 1;
-                }
+                size_t xMask = 1, yMask = 1 << squashX, zMask = 1 << (squashX + squashY);
+                size_t mask = 1 << (squashX + squashY + squashZ);
+
                 // Generate next mipmap level by averaging together consecutive pixels from this level
                 for (size_t z = 0; z < zMax; ++z)
                 {

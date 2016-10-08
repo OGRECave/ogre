@@ -255,7 +255,7 @@ namespace Ogre
 
 	inline void Lod0Stripifier::performPoseRemap(Pose* pose, const RemapInfo& remapInfo)
 	{
-		if(remapInfo.nothingToStrip() || pose->getVertexOffsets().empty() && pose->getNormals().empty())
+		if(remapInfo.nothingToStrip() || (pose->getVertexOffsets().empty() && pose->getNormals().empty()))
 			return;
 
 		Pose::VertexOffsetMap vv = pose->getVertexOffsets();

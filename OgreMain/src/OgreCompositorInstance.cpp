@@ -117,7 +117,7 @@ class RSClearOperation: public CompositorInstance::RenderSystemOperation
 {
 public:
     RSClearOperation(uint32 inBuffers, ColourValue inColour, Real inDepth, unsigned short inStencil, bool inAutomaticColour):
-        buffers(inBuffers), colour(inColour), depth(inDepth), stencil(inStencil), automaticColour(inAutomaticColour)
+        buffers(inBuffers), colour(inColour), automaticColour(inAutomaticColour), depth(inDepth), stencil(inStencil)
     {}
     /// Which buffers to clear (FrameBufferType)
     uint32 buffers;

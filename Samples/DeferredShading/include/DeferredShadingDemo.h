@@ -50,6 +50,11 @@ The wiki article explaining this demo can be found here :
 using namespace Ogre;
 using namespace OgreBites;
 
+const ColourValue SAMPLE_COLORS[] =
+{   ColourValue::Red, ColourValue::Green, ColourValue::Blue,
+    ColourValue::White, ColourValue(1,1,0,1), ColourValue(1,0,1,1)
+};
+
 class _OgreSampleClassExport Sample_DeferredShading : public SdkSample, public RenderTargetListener
 {
 protected:

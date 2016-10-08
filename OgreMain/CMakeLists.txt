@@ -29,6 +29,11 @@ list(APPEND HEADER_FILES ${OGRE_BINARY_DIR}/include/OgreBuildSettings.h
 
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/Hash/*.cpp")
 
+# silence deprecation warning for internal call
+if(UNIX)
+  set_source_files_properties(src/OgreResource.cpp PROPERTIES COMPILE_FLAGS "-Wno-deprecated-declarations")
+endif()
+
 # Remove optional header files
 list(REMOVE_ITEM HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreFreeImageCodec.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/include/OgreDDSCodec.h"
