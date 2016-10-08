@@ -117,7 +117,7 @@ namespace Demo
         {
         }
 
-        void createScene01()
+        virtual void createScene01()
         {
             GraphicsSystem::createScene01();
             //The first time setupCompositor got called, Terra wasn't ready yet.
