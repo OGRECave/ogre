@@ -45,6 +45,9 @@ macro(ogre_declare_component COMPONENT)
     set(OGRE_${COMPONENT}_LIBRARIES "Ogre${COMPONENT}@OGRE_LIB_SUFFIX@")
     
     list(APPEND OGRE_COMPONENTS ${COMPONENT})
+    
+    list(APPEND OGRE_INCLUDE_DIRS ${OGRE_${COMPONENT}_INCLUDE_DIRS})
+    list(APPEND OGRE_LIBRARIES ${OGRE_${COMPONENT}_LIBRARIES})
 endmacro()
 
 macro(ogre_declare_plugin TYPE COMPONENT)
@@ -58,8 +61,12 @@ endmacro()
 ## COMPONENTS
 if(@OGRE_BUILD_COMPONENT_BITES@)
     ogre_declare_component(Bites)
+    
     list(APPEND OGRE_Bites_INCLUDE_DIRS @SDL2_INCLUDE_DIR@)
     list(APPEND OGRE_Bites_LIBRARIES @SDL2_LIBRARY@)
+    
+    list(APPEND OGRE_INCLUDE_DIRS @SDL2_INCLUDE_DIR@)
+    list(APPEND OGRE_LIBRARIES @SDL2_LIBRARY@)
 endif()
 if(@OGRE_BUILD_COMPONENT_HLMS@)
     ogre_declare_component(HLMS)
