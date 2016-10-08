@@ -113,7 +113,7 @@ namespace Ogre
         VertexBufferPacked *retVal = createVertexBufferImpl( numVertices, bytesPerVertex, bufferType,
                                                              initialData, keepAsShadow, vertexElements );
 
-        mBuffers[BP_TYPE_VERTEX].push_back( retVal );
+        mBuffers[BP_TYPE_VERTEX].insert( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
@@ -126,8 +126,7 @@ namespace Ogre
                          "VaoManager::destroyVertexBuffer" );
         }
 
-        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_VERTEX].begin(),
-                                                    mBuffers[BP_TYPE_VERTEX].end(), vertexBuffer );
+        BufferPackedSet::iterator itor = mBuffers[ BP_TYPE_VERTEX ].find( vertexBuffer );
 
         if( itor == mBuffers[BP_TYPE_VERTEX].end() )
         {
@@ -150,7 +149,7 @@ namespace Ogre
             OGRE_DELETE vertexBuffer;
         }
 
-        efficientVectorRemove( mBuffers[BP_TYPE_VERTEX], itor );
+        mBuffers[ BP_TYPE_VERTEX ].erase( itor );
     }
     //-----------------------------------------------------------------------------------
     IndexBufferPacked* VaoManager::createIndexBuffer( IndexBufferPacked::IndexType indexType,
@@ -160,14 +159,13 @@ namespace Ogre
         IndexBufferPacked *retVal;
         retVal = createIndexBufferImpl( numIndices, indexType == IndexBufferPacked::IT_16BIT ? 2 : 4,
                                         bufferType, initialData, keepAsShadow );
-        mBuffers[BP_TYPE_INDEX].push_back( retVal );
+        mBuffers[BP_TYPE_INDEX].insert( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyIndexBuffer( IndexBufferPacked *indexBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_INDEX].begin(),
-                                                    mBuffers[BP_TYPE_INDEX].end(), indexBuffer );
+        BufferPackedSet::iterator itor = mBuffers[ BP_TYPE_INDEX ].find( indexBuffer );
 
         if( itor == mBuffers[BP_TYPE_INDEX].end() )
         {
@@ -190,7 +188,7 @@ namespace Ogre
             OGRE_DELETE *itor;
         }
 
-        efficientVectorRemove( mBuffers[BP_TYPE_INDEX], itor );
+        mBuffers[ BP_TYPE_INDEX ].erase( itor );
     }
     //-----------------------------------------------------------------------------------
     ConstBufferPacked* VaoManager::createConstBuffer( size_t sizeBytes, BufferType bufferType,
@@ -198,14 +196,13 @@ namespace Ogre
     {
         ConstBufferPacked *retVal;
         retVal = createConstBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
-        mBuffers[BP_TYPE_CONST].push_back( retVal );
+        mBuffers[BP_TYPE_CONST].insert( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyConstBuffer( ConstBufferPacked *constBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_CONST].begin(),
-                                                    mBuffers[BP_TYPE_CONST].end(), constBuffer );
+        BufferPackedSet::iterator itor = mBuffers[ BP_TYPE_CONST ].find( constBuffer );
 
         if( itor == mBuffers[BP_TYPE_CONST].end() )
         {
@@ -228,7 +225,7 @@ namespace Ogre
             OGRE_DELETE *itor;
         }
 
-        efficientVectorRemove( mBuffers[BP_TYPE_CONST], itor );
+        mBuffers[ BP_TYPE_CONST ].erase( itor );
     }
     //-----------------------------------------------------------------------------------
     TexBufferPacked* VaoManager::createTexBuffer( PixelFormat pixelFormat, size_t sizeBytes,
@@ -237,14 +234,13 @@ namespace Ogre
     {
         TexBufferPacked *retVal;
         retVal = createTexBufferImpl( pixelFormat, sizeBytes, bufferType, initialData, keepAsShadow );
-        mBuffers[BP_TYPE_TEX].push_back( retVal );
+        mBuffers[BP_TYPE_TEX].insert( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyTexBuffer( TexBufferPacked *texBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_TEX].begin(),
-                                                    mBuffers[BP_TYPE_TEX].end(), texBuffer );
+        BufferPackedSet::iterator itor = mBuffers[ BP_TYPE_TEX ].find( texBuffer );
 
         if( itor == mBuffers[BP_TYPE_TEX].end() )
         {
@@ -267,7 +263,7 @@ namespace Ogre
             OGRE_DELETE *itor;
         }
 
-        efficientVectorRemove( mBuffers[BP_TYPE_TEX], itor );
+        mBuffers[ BP_TYPE_TEX ].erase( itor );
     }
     //-----------------------------------------------------------------------------------
     UavBufferPacked* VaoManager::createUavBuffer( size_t numElements, uint32 bytesPerElement,
@@ -277,14 +273,13 @@ namespace Ogre
         UavBufferPacked *retVal;
         retVal = createUavBufferImpl( numElements, bytesPerElement, bindFlags,
                                       initialData, keepAsShadow );
-        mBuffers[BP_TYPE_UAV].push_back( retVal );
+        mBuffers[BP_TYPE_UAV].insert( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyUavBuffer( UavBufferPacked *uavBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_UAV].begin(),
-                                                    mBuffers[BP_TYPE_UAV].end(), uavBuffer );
+        BufferPackedSet::iterator itor = mBuffers[BP_TYPE_UAV].find( uavBuffer );
 
         if( itor == mBuffers[BP_TYPE_UAV].end() )
         {
@@ -299,7 +294,7 @@ namespace Ogre
         destroyUavBufferImpl( uavBuffer );
         OGRE_DELETE *itor;
 
-        efficientVectorRemove( mBuffers[BP_TYPE_UAV], itor );
+        mBuffers[BP_TYPE_UAV].erase( itor );
     }
     //-----------------------------------------------------------------------------------
     IndirectBufferPacked* VaoManager::createIndirectBuffer( size_t sizeBytes, BufferType bufferType,
@@ -307,14 +302,13 @@ namespace Ogre
     {
         IndirectBufferPacked *retVal;
         retVal = createIndirectBufferImpl( sizeBytes, bufferType, initialData, keepAsShadow );
-        mBuffers[BP_TYPE_INDIRECT].push_back( retVal );
+        mBuffers[BP_TYPE_INDIRECT].insert( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyIndirectBuffer( IndirectBufferPacked *indirectBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_INDIRECT].begin(),
-                                                    mBuffers[BP_TYPE_INDIRECT].end(), indirectBuffer );
+        BufferPackedSet::iterator itor = mBuffers[ BP_TYPE_INDIRECT ].find( indirectBuffer );
 
         if( itor == mBuffers[BP_TYPE_INDIRECT].end() )
         {
@@ -337,7 +331,7 @@ namespace Ogre
             OGRE_DELETE *itor;
         }
 
-        efficientVectorRemove( mBuffers[BP_TYPE_INDIRECT], itor );
+        mBuffers[BP_TYPE_INDIRECT].erase( itor );
     }
     //-----------------------------------------------------------------------------------
     VertexArrayObject* VaoManager::createVertexArrayObject( const VertexBufferPackedVec &vertexBuffers,
@@ -379,15 +373,14 @@ namespace Ogre
 
         VertexArrayObject *retVal;
         retVal = createVertexArrayObjectImpl( vertexBuffers, indexBuffer, opType );
-        mVertexArrayObjects.push_back( retVal );
+        mVertexArrayObjects.insert( retVal );
         ++mNumGeneratedVaos;
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyVertexArrayObject( VertexArrayObject *vao )
     {
-        VertexArrayObjectVec::iterator itor = std::find( mVertexArrayObjects.begin(),
-                                                         mVertexArrayObjects.end(), vao );
+        VertexArrayObjectSet::iterator itor = mVertexArrayObjects.find( vao );
 
         if( itor == mVertexArrayObjects.end() )
         {
@@ -398,14 +391,13 @@ namespace Ogre
         }
 
         destroyVertexArrayObjectImpl( vao );
-
-        efficientVectorRemove( mVertexArrayObjects, itor );
+        mVertexArrayObjects.erase( itor );
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyAllVertexArrayObjects(void)
     {
-        VertexArrayObjectVec::const_iterator itor = mVertexArrayObjects.begin();
-        VertexArrayObjectVec::const_iterator end  = mVertexArrayObjects.end();
+        VertexArrayObjectSet::const_iterator itor = mVertexArrayObjects.begin();
+        VertexArrayObjectSet::const_iterator end  = mVertexArrayObjects.end();
 
         while( itor != end )
         {
@@ -420,8 +412,8 @@ namespace Ogre
     {
         for( int i=0; i<NUM_BUFFER_PACKED_TYPES; ++i )
         {
-            BufferPackedVec::const_iterator itor = mBuffers[i].begin();
-            BufferPackedVec::const_iterator end  = mBuffers[i].end();
+            BufferPackedSet::const_iterator itor = mBuffers[i].begin();
+            BufferPackedSet::const_iterator end  = mBuffers[i].end();
 
             while( itor != end )
             {

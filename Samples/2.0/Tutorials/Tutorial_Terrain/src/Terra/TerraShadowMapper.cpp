@@ -279,7 +279,8 @@ namespace Ogre
             {
                 *starts++ = static_cast<int32>( x0 );
                 *starts++ = static_cast<int32>( y0 ) + static_cast<int32>( startY + i ) * xyStep[1];
-                starts += 2u;
+                *starts++ = 0; //Padding
+                *starts++ = 0; //Padding
 
                 if( starts - startsBase >= (4096u << 2u) )
                     starts -= (4096u << 2u) - 2u;
@@ -287,6 +288,8 @@ namespace Ogre
 
             perGroupData->iterations = widthOrHeight - std::max<int32>( 0, idy - (heightOrWidth - startY) );
             perGroupData->deltaErrorStart = 0;
+            perGroupData->padding0 = 0;
+            perGroupData->padding1 = 0;
             ++perGroupData;
         }
 
@@ -299,7 +302,8 @@ namespace Ogre
             {
                 *starts++ = static_cast<int32>( x0 ) + xN * xyStep[0];
                 *starts++ = static_cast<int32>( y0 ) -  static_cast<int32>( i ) * xyStep[1];
-                starts += 2u;
+                *starts++ = 0; //Padding
+                *starts++ = 0; //Padding
 
                 if( starts - startsBase >= (4096u << 2u) )
                     starts -= (4096u << 2u) - 2u;

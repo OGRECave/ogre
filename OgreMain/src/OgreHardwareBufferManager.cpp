@@ -294,7 +294,7 @@ namespace v1 {
 
         while( itor != end )
         {
-            (*itor)->sort();
+            (*itor)->sortForV2();
 
             const VertexDeclaration::VertexElementList &vertexElements = (*itor)->getElements();
 

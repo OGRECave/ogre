@@ -289,6 +289,7 @@ namespace Ogre
     };
 
     typedef vector<BufferPacked*>::type BufferPackedVec;
+    typedef unordered_set<BufferPacked*>::type BufferPackedSet;
 }
 
 #endif

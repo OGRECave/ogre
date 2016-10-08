@@ -289,10 +289,12 @@ namespace v1 {
     void Mesh::unloadImpl()
     {
         // Teardown submeshes
-        for (SubMeshList::iterator i = mSubMeshList.begin();
-            i != mSubMeshList.end(); ++i)
+
+        // mSubMeshList is iterated in submesh destructor, so pop after deleting
+        while ( !mSubMeshList.empty() )
         {
-            OGRE_DELETE *i;
+            OGRE_DELETE mSubMeshList.back();
+            mSubMeshList.pop_back();
         }
 
         if( sharedVertexData[VpNormal] == sharedVertexData[VpShadow] )
@@ -950,40 +952,16 @@ namespace v1 {
         bind->setBinding(bindIndex, vbuf);
         const VertexElement *pIdxElem, *pWeightElem;
 
-        // add new vertex elements
-        // Note, insert directly after all elements using the same source as
-        // position to abide by pre-Dx9 format restrictions
-        const VertexElement* firstElem = decl->getElement(0);
-        if(firstElem->getSemantic() == VES_POSITION)
-        {
-            unsigned short insertPoint = 1;
-            while (insertPoint < decl->getElementCount() &&
-                decl->getElement(insertPoint)->getSource() == firstElem->getSource())
-            {
-                ++insertPoint;
-            }
-            const VertexElement& idxElem =
-                decl->insertElement(insertPoint, bindIndex, 0, VET_UBYTE4, VES_BLEND_INDICES);
-            const VertexElement& wtElem =
-                decl->insertElement(insertPoint+1, bindIndex, sizeof(unsigned char)*4,
-                VertexElement::multiplyTypeCount(VET_FLOAT1, numBlendWeightsPerVertex),
-                VES_BLEND_WEIGHTS);
-            pIdxElem = &idxElem;
-            pWeightElem = &wtElem;
-        }
-        else
-        {
-            // Position is not the first semantic, therefore this declaration is
-            // not pre-Dx9 compatible anyway, so just tack it on the end
-            const VertexElement& idxElem =
-                decl->addElement(bindIndex, 0, VET_UBYTE4, VES_BLEND_INDICES);
-            const VertexElement& wtElem =
-                decl->addElement(bindIndex, sizeof(unsigned char)*4,
-                VertexElement::multiplyTypeCount(VET_FLOAT1, numBlendWeightsPerVertex),
-                VES_BLEND_WEIGHTS);
-            pIdxElem = &idxElem;
-            pWeightElem = &wtElem;
-        }
+        // We do no longer care for pre-Dx9 compatible vertex decls., so just tack it on the end
+        // We'll sort at the end
+        const VertexElement& idxElem =
+            decl->addElement(bindIndex, 0, VET_UBYTE4, VES_BLEND_INDICES);
+        const VertexElement& wtElem =
+            decl->addElement(bindIndex, sizeof(unsigned char)*4,
+            VertexElement::multiplyTypeCount(VET_FLOAT1, numBlendWeightsPerVertex),
+            VES_BLEND_WEIGHTS);
+        pIdxElem = &idxElem;
+        pWeightElem = &wtElem;
 
         // Assign data
         size_t v;
@@ -1022,7 +1000,6 @@ namespace v1 {
         }
 
         vbuf->unlock();
-
     }
     //---------------------------------------------------------------------
     Real distLineSegToPoint( const Vector3& line0, const Vector3& line1, const Vector3& pt )

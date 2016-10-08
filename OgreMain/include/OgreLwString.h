@@ -125,7 +125,7 @@ namespace Ogre
 
         /// Takes a subset from source in the range [_start; _start + size),
         /// and copies it to our string.
-        void setToSubstr( const LwString &source, size_t _start, size_t size )
+        void setToSubstr( const LwConstString &source, size_t _start, size_t size )
         {
             assert( (size + 1u) <= this->mCapacity );
             assert( _start <= source.mSize );
@@ -144,7 +144,7 @@ namespace Ogre
             source string.
             That is, both _start & _end are in range [source.begin(), source.end()]
         */
-        void setToSubstr( const LwString &source, char *_start, char *_end )
+        void setToSubstr( const LwConstString &source, char *_start, char *_end )
         {
             assert( _start >= source.begin() && _start <= source.end() );
             this->setToSubstr( source, _start - source.mStrPtr, _end - _start );
@@ -171,7 +171,7 @@ namespace Ogre
         }
 
         // Assignment.
-        LwString& operator = ( const LwString &other )
+        LwString& operator = ( const LwConstString &other )
         {
             assert( other.mSize < this->mCapacity );
             strncpy( this->mStrPtr, other.mStrPtr, this->mCapacity );

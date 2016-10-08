@@ -329,15 +329,15 @@ namespace Ogre {
                 StringConverter::parseBool(opt->second))
             {
                 eglContext = eglGetCurrentContext();
-                if (eglContext)
+                if (!eglContext)
                 {
                     OGRE_EXCEPT(Exception::ERR_RENDERINGAPI_ERROR,
                                 "currentGLContext was specified with no current GL context",
                                 "EGLWindow::create");
                 }
 
-                eglContext = eglGetCurrentContext();
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
+                mEglDisplay = eglGetCurrentDisplay();
             }
 
             // Note: Some platforms support AA inside ordinary windows

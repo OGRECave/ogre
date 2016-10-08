@@ -206,7 +206,7 @@ namespace Ogre {
                 oi != grp->loadResourceOrderMap.end(); ++oi)
             {
                 size_t n = 0;
-                LoadUnloadResourceList::iterator l = oi->second->begin();
+                LoadUnloadResourceSet::iterator l = oi->second->begin();
                 while (l != oi->second->end())
                 {
                     ResourcePtr res = *l;
@@ -303,7 +303,7 @@ namespace Ogre {
                 oi != grp->loadResourceOrderMap.end(); ++oi)
             {
                 size_t n = 0;
-                LoadUnloadResourceList::iterator l = oi->second->begin();
+                LoadUnloadResourceSet::iterator l = oi->second->begin();
                 while (l != oi->second->end())
                 {
                     ResourcePtr res = *l;
@@ -376,7 +376,7 @@ namespace Ogre {
         // unload in reverse order
         for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
         {
-            for (LoadUnloadResourceList::iterator l = oi->second->begin();
+            for (LoadUnloadResourceSet::iterator l = oi->second->begin();
                 l != oi->second->end(); ++l)
             {
                 Resource* resource = l->get();
@@ -416,7 +416,7 @@ namespace Ogre {
         // unload in reverse order
         for (oi = grp->loadResourceOrderMap.rbegin(); oi != grp->loadResourceOrderMap.rend(); ++oi)
         {
-            for (LoadUnloadResourceList::iterator l = oi->second->begin();
+            for (LoadUnloadResourceSet::iterator l = oi->second->begin();
                 l != oi->second->end(); ++l)
             {
                 // A use count of 3 means that only RGM and RM have references
@@ -1117,10 +1117,10 @@ namespace Ogre {
             // Add resource to load list
             ResourceGroup::LoadResourceOrderMap::iterator li = 
                 grp->loadResourceOrderMap.find(mgr->getLoadingOrder());
-            LoadUnloadResourceList* loadList;
+            LoadUnloadResourceSet* loadList;
             if (li == grp->loadResourceOrderMap.end())
             {
-                loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
+                loadList = OGRE_NEW_T(LoadUnloadResourceSet, MEMCATEGORY_RESOURCE)();
                 grp->loadResourceOrderMap[mgr->getLoadingOrder()] = loadList;
             }
         }
@@ -1167,18 +1167,10 @@ namespace Ogre {
                         res->getCreator()->getLoadingOrder());
                 if (i != grp->loadResourceOrderMap.end())
                 {
-                    // Iterate over the resource list and remove
-                    LoadUnloadResourceList* resList = i->second;
-                    for (LoadUnloadResourceList::iterator l = resList->begin();
-                        l != resList->end(); ++ l)
-                    {
-                        if ((*l).getPointer() == res.getPointer())
-                        {
-                            // this is the one
-                            resList->erase(l);
-                            break;
-                        }
-                    }
+                    LoadUnloadResourceSet* resList = i->second;
+                    LoadUnloadResourceSet::iterator l = resList->find( res );
+                    if ( l != resList->end() )
+                        resList->erase( l );
                 }
             }
         }
@@ -1200,16 +1192,16 @@ namespace Ogre {
             ResourceGroup::LoadResourceOrderMap::iterator i = 
                 grp->loadResourceOrderMap.find(order);
             assert(i != grp->loadResourceOrderMap.end());
-            LoadUnloadResourceList* loadList = i->second;
-            for (LoadUnloadResourceList::iterator l = loadList->begin(); 
-                l != loadList->end(); ++l)
+            LoadUnloadResourceSet* loadList = i->second;
+
+            ResourcePtr rawWrapper; ( res );
+            rawWrapper.bind( res, Ogre::SPFM_NONE ); // this will ensure it wont free on destruction.
+
+            LoadUnloadResourceSet::iterator l = loadList->find( rawWrapper );
+            if ( l != loadList->end() )
             {
-                if ((*l).getPointer() == res)
-                {
-                    resPtr = *l;
-                    loadList->erase(l);
-                    break;
-                }
+                resPtr = *l;
+                loadList->erase( l );
             }
         }
 
@@ -1236,13 +1228,13 @@ namespace Ogre {
                 oi != grpi->second->loadResourceOrderMap.end(); ++oi)
             {
                 // Iterate over all resources
-                for (LoadUnloadResourceList::iterator l = oi->second->begin();
+                for (LoadUnloadResourceSet::iterator l = oi->second->begin();
                     l != oi->second->end(); )
                 {
                     if ((*l)->getCreator() == manager)
                     {
                         // Increment first since iterator will be invalidated
-                        LoadUnloadResourceList::iterator del = l++;
+                        LoadUnloadResourceSet::iterator del = l++;
                         oi->second->erase(del);
                     }
                     else
@@ -1261,17 +1253,17 @@ namespace Ogre {
         Real order = res->getCreator()->getLoadingOrder();
 
         ResourceGroup::LoadResourceOrderMap::iterator i = grp.loadResourceOrderMap.find(order);
-        LoadUnloadResourceList* loadList;
+        LoadUnloadResourceSet* loadList;
         if (i == grp.loadResourceOrderMap.end())
         {
-            loadList = OGRE_NEW_T(LoadUnloadResourceList, MEMCATEGORY_RESOURCE)();
+            loadList = OGRE_NEW_T(LoadUnloadResourceSet, MEMCATEGORY_RESOURCE)();
             grp.loadResourceOrderMap[order] = loadList;
         }
         else
         {
             loadList = i->second;
         }
-        loadList->push_back(res);
+        loadList->insert(res);
     }
     //-----------------------------------------------------------------------
     ResourceGroupManager::ResourceGroup* ResourceGroupManager::getResourceGroup(const String& name)
@@ -1319,12 +1311,12 @@ namespace Ogre {
         for (j = grp->loadResourceOrderMap.begin(); j != jend; ++j)
         {
             // Iterate over resources
-            for (LoadUnloadResourceList::iterator k = j->second->begin();
+            for (LoadUnloadResourceSet::iterator k = j->second->begin();
                 k != j->second->end(); ++k)
             {
                 (*k)->getCreator()->remove((*k)->getHandle());
             }
-            OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
+            OGRE_DELETE_T(j->second, LoadUnloadResourceSet, MEMCATEGORY_RESOURCE);
         }
         grp->loadResourceOrderMap.clear();
 
@@ -1345,7 +1337,7 @@ namespace Ogre {
             {
                 // Don't iterate over resources to drop with ResourceManager
                 // Assume this is being done anyway since this is a shutdown method
-                OGRE_DELETE_T(j->second, LoadUnloadResourceList, MEMCATEGORY_RESOURCE);
+                OGRE_DELETE_T(j->second, LoadUnloadResourceSet, MEMCATEGORY_RESOURCE);
             }
             // Drop location list
             for (LocationList::iterator ll = grp->locationList.begin();

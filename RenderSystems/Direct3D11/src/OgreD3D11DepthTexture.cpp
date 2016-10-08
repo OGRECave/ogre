@@ -250,7 +250,7 @@ namespace v1
         for( size_t i=0; i<OGRE_MAX_MULTIPLE_RENDER_TARGETS; ++i )
         {
             outFormats[i] = PF_NULL;
-            outHwGamma[i] = PF_NULL;
+            outHwGamma[i] = false;
         }
     }
     //-----------------------------------------------------------------------------------

@@ -68,9 +68,10 @@ namespace Ogre {
         v1::HardwarePixelBufferSharedPtr getBuffer(size_t face, size_t mipmap);
 
 		ID3D11Resource *getTextureResource() { assert(mpTex); return mpTex; }
+        ID3D11Resource *getResolveTextureResource()
+                                            { assert(mpResolveTexture); return mpResolveTexture; }
 		/// retrieves a pointer to the actual texture
         ID3D11ShaderResourceView *getTexture();
-		D3D11_SHADER_RESOURCE_VIEW_DESC getShaderResourceViewDesc() const { return mSRVDesc; }
 
         ID3D11UnorderedAccessView* getUavView( int32 mipmapLevel, int32 textureArrayIndex,
                                                PixelFormat pixelFormat );
@@ -80,6 +81,9 @@ namespace Ogre {
 		ID3D11Texture3D	* GetTex3D() { return mp3DTex; };
 
 		bool HasAutoMipMapGenerationEnabled() const { return mAutoMipMapGeneration; }
+
+        DXGI_FORMAT getD3dFormat(void) const                        { return mD3dFormat; }
+        D3D11_SRV_DIMENSION getD3dViewDimension(void) const         { return mD3dViewDimension; }
 
 	protected:
 		TextureUsage _getTextureUsage() { return static_cast<TextureUsage>(mUsage); }
@@ -99,8 +103,11 @@ namespace Ogre {
 		ID3D11Texture3D	*mp3DTex;
         /// actual texture pointer
 		ID3D11Resource 	*mpTex;
+        /// Used by MSAA only.
+        ID3D11Resource  *mpResolveTexture;
 
         ID3D11ShaderResourceView* mpShaderResourceView;
+        ID3D11ShaderResourceView* mpShaderResourceViewMsaa;
         CachedUavView  mCachedUavViews[4];
         uint8          mCurrentCacheCursor;
 
@@ -136,15 +143,15 @@ namespace Ogre {
 
         /// cube texture individual face names
         String                          mCubeFaceNames[6];
-        /// back buffer pixel format
-        DXGI_FORMAT                     mBBPixelFormat;
         // Dynamic textures?
         bool                            mDynamicTextures;
         /// Vector of pointers to subsurfaces
         typedef vector<v1::HardwarePixelBufferSharedPtr>::type SurfaceList;
         SurfaceList                     mSurfaceList;
 
-        D3D11_SHADER_RESOURCE_VIEW_DESC mSRVDesc;
+        DXGI_FORMAT                     mD3dFormat;
+        D3D11_SRV_DIMENSION             mD3dViewDimension;
+
         /// internal method, load a normal texture
         void _loadTex(LoadedStreams & loadedStreams);
 
@@ -204,6 +211,7 @@ namespace Ogre {
     {
         D3D11Device & mDevice;
         ID3D11RenderTargetView * mRenderTargetView;
+        bool mHasFsaaResource;
     public:
         D3D11RenderTexture( const String &name, v1::D3D11HardwarePixelBuffer *buffer,
                             bool writeGamma, D3D11Device & device );
@@ -214,6 +222,8 @@ namespace Ogre {
         virtual void getCustomAttribute( const String& name, void *pData );
 
         bool requiresTextureFlipping() const { return false; }
+
+        virtual void swapBuffers(void);
     };
 
 }
