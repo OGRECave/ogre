@@ -117,9 +117,4 @@ protected:
     void logCurrentMode(void);
 };
 
-const ColourValue SAMPLE_COLORS[] = 
-{   ColourValue::Red, ColourValue::Green, ColourValue::Blue, 
-    ColourValue::White, ColourValue(1,1,0,1), ColourValue(1,0,1,1)
-};
-
 #endif

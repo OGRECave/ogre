@@ -1046,7 +1046,7 @@ int main(int numargs, char** args)
         stat( source.c_str(), &tagStat );
         MemoryDataStream* memstream = new MemoryDataStream(source, tagStat.st_size, true);
         size_t result = fread( (void*)memstream->getPtr(), 1, tagStat.st_size, pFile );
-        if (result != tagStat.st_size)
+        if (result != size_t(tagStat.st_size))
             OGRE_EXCEPT(Exception::ERR_INTERNAL_ERROR,
                 "Unexpected error while reading file " + source, "OgreMeshUpgrade");
         fclose( pFile );

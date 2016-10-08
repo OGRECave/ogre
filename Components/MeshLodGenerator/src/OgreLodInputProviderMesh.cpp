@@ -131,7 +131,6 @@ namespace Ogre
 
         HardwareVertexBufferSharedPtr vNormalBuf;
         unsigned char* vNormal = NULL;
-        size_t vNormSize;
         const VertexElement* elemNormal = vertexData->vertexDeclaration->findElementBySemantic(VES_NORMAL);
 
         data->mUseVertexNormals &= (elemNormal != NULL);
@@ -144,7 +143,6 @@ namespace Ogre
                 vNormalBuf = vertexData->vertexBufferBinding->getBuffer(elemNormal->getSource());
                 vNormal = static_cast<unsigned char*>(vNormalBuf->lock(HardwareBuffer::HBL_READ_ONLY));
             }
-            vNormSize = vNormalBuf->getVertexSize();
         }
 
 
@@ -191,7 +189,7 @@ namespace Ogre
                     v->normal.z = pFloat[2];
                     v->normal.normalise();
                 }
-                vNormal += vNormSize;
+                vNormal += vNormalBuf->getVertexSize();;
             }
         }
         vbuf->unlock();

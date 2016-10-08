@@ -95,26 +95,26 @@ void BitwiseTests::testIntReadWrite()
     
     // Test reading and writing integers
     uint32 testje = 0x12345678;
-    assert(Bitwise::intRead(&testje, 4) == 0x12345678);
+    CPPUNIT_ASSERT(Bitwise::intRead(&testje, 4) == 0x12345678);
     uint16 testje2 = 0x1234;
-    assert(Bitwise::intRead(&testje2, 2) == 0x1234);
+    CPPUNIT_ASSERT(Bitwise::intRead(&testje2, 2) == 0x1234);
     uint8 testje3 = 0xD3;
-    assert(Bitwise::intRead(&testje3, 1) == 0xD3);
+    CPPUNIT_ASSERT(Bitwise::intRead(&testje3, 1) == 0xD3);
 #if OGRE_ENDIAN == OGRE_ENDIAN_BIG
     uint8 testje4[] = {0x12, 0x34, 0x56};
 #else
     uint8 testje4[] = {0x56, 0x34, 0x12};
 #endif
-    assert(Bitwise::intRead(&testje4, 3) == 0x123456);
+    CPPUNIT_ASSERT(Bitwise::intRead(&testje4, 3) == 0x123456);
 
     Bitwise::intWrite(&testje, 4, 0x87654321);
-    assert(testje == 0x87654321);
+    CPPUNIT_ASSERT(testje == 0x87654321);
 
     Bitwise::intWrite(&testje2, 2, 0x4321);
-    assert(testje2 == 0x4321);
+    CPPUNIT_ASSERT(testje2 == 0x4321);
 
     Bitwise::intWrite(&testje3, 1, 0x12);
-    assert(testje3 == 0x12);
+    CPPUNIT_ASSERT(testje3 == 0x12);
 }
 //--------------------------------------------------------------------------
 void BitwiseTests::testHalf()

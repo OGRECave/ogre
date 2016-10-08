@@ -64,9 +64,9 @@ protected:
                           VertexLookupList& lookup, unsigned short submeshID, RenderOperation::OperationType renderOp)
     {
         if(iEnd - iPos < 3 
-        || renderOp != RenderOperation::OT_TRIANGLE_LIST
+        || (renderOp != RenderOperation::OT_TRIANGLE_LIST
         && renderOp != RenderOperation::OT_TRIANGLE_STRIP
-        && renderOp != RenderOperation::OT_TRIANGLE_FAN)
+        && renderOp != RenderOperation::OT_TRIANGLE_FAN))
             return;
 
         IndexType i0 = iPos[0], i1 = iPos[1], i2 = iPos[2];
@@ -101,6 +101,9 @@ protected:
                 case RenderOperation::OT_TRIANGLE_FAN:
                     i1 = i2;
                     i2 = iPos[0];
+                    break;
+                default:
+                    OgreAssert(false, "Invalid RenderOperation");
                     break;
                 }
             }
