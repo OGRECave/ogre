@@ -273,14 +273,13 @@ namespace Ogre
         UavBufferPacked *retVal;
         retVal = createUavBufferImpl( numElements, bytesPerElement, bindFlags,
                                       initialData, keepAsShadow );
-        mBuffers[BP_TYPE_UAV].push_back( retVal );
+        mBuffers[BP_TYPE_UAV].insert( retVal );
         return retVal;
     }
     //-----------------------------------------------------------------------------------
     void VaoManager::destroyUavBuffer( UavBufferPacked *uavBuffer )
     {
-        BufferPackedVec::iterator itor = std::find( mBuffers[BP_TYPE_UAV].begin(),
-                                                    mBuffers[BP_TYPE_UAV].end(), uavBuffer );
+        BufferPackedSet::iterator itor = mBuffers[BP_TYPE_UAV].find( uavBuffer );
 
         if( itor == mBuffers[BP_TYPE_UAV].end() )
         {
@@ -295,7 +294,7 @@ namespace Ogre
         destroyUavBufferImpl( uavBuffer );
         OGRE_DELETE *itor;
 
-        efficientVectorRemove( mBuffers[BP_TYPE_UAV], itor );
+        mBuffers[BP_TYPE_UAV].erase( itor );
     }
     //-----------------------------------------------------------------------------------
     IndirectBufferPacked* VaoManager::createIndirectBuffer( size_t sizeBytes, BufferType bufferType,
