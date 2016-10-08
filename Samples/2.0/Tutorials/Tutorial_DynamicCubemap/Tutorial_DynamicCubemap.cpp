@@ -119,6 +119,6 @@ namespace Demo
 
     const char* MainEntryPoints::getWindowTitle(void)
     {
-        return "PBS Materials Sample";
+        return "Dynamic Cubemap Tutorial";
     }
 }

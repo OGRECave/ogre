@@ -125,8 +125,9 @@ namespace Ogre
 
         ID3D11ShaderResourceView *retVal = mpShaderResourceView;
 
-        if( mFSAA > 1 )
+        if( mpResolveTexture )
         {
+            //Has MSAA
             RenderTarget *renderTarget = mSurfaceList[0]->getRenderTarget();
             if( !mFsaaExplicitResolve )
             {
@@ -1361,7 +1362,8 @@ namespace Ogre
                                             D3D11Device & device ) :
         mDevice(device),
         RenderTexture(buffer, 0),
-        mRenderTargetView(NULL)
+        mRenderTargetView(NULL),
+        mHasFsaaResource( mFSAA > 1 || (atoi(mFSAAHint.c_str()) > 0) )
     {
         mName = name;
         mHwGamma = writeGamma;
@@ -1376,7 +1378,7 @@ namespace Ogre
     //---------------------------------------------------------------------
     void D3D11RenderTexture::swapBuffers(void)
     {
-        if( isFsaaResolveDirty() )
+        if( isFsaaResolveDirty() && mHasFsaaResource )
         {
             assert( dynamic_cast<v1::D3D11HardwarePixelBuffer*>( mBuffer ) );
             v1::D3D11HardwarePixelBuffer *buffer = static_cast<v1::D3D11HardwarePixelBuffer*>( mBuffer );
