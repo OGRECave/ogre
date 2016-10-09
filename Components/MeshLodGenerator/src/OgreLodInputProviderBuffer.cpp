@@ -52,7 +52,7 @@ namespace Ogre
         size_t vertexCount = 0;
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
-        unsigned short submeshCount = mBuffer.submesh.size();
+        unsigned short submeshCount = ushort(mBuffer.submesh.size());
         for (unsigned short i = 0; i < submeshCount; i++) {
             const LodInputBuffer::Submesh& submesh = mBuffer.submesh[i];
             trianglesCount += submesh.indexBuffer.indexCount/3; //assume mBuffer provide triangle list only
@@ -84,7 +84,7 @@ namespace Ogre
         data->mMeshName = mBuffer.meshName;
 #endif
         data->mMeshBoundingSphereRadius = mBuffer.boundingSphereRadius;
-        unsigned short submeshCount = mBuffer.submesh.size();
+        unsigned short submeshCount = ushort(mBuffer.submesh.size());
         for (unsigned short i = 0; i < submeshCount; ++i) {
             LodInputBuffer::Submesh& submesh = mBuffer.submesh[i];
             LodVertexBuffer& vertexBuffer =

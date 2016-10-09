@@ -465,7 +465,7 @@ bool HardwareSkinningFactory::extractSkeletonData(const Entity* pEntity, unsigne
         pSubMesh->_getRenderOperation(ro,0);
 
         //get the largest bone assignment
-        boneCount = std::max<ushort>(pMesh->sharedBlendIndexToBoneIndexMap.size(), pSubMesh->blendIndexToBoneIndexMap.size());
+        boneCount = ushort(std::max(pMesh->sharedBlendIndexToBoneIndexMap.size(), pSubMesh->blendIndexToBoneIndexMap.size()));
             
         //go over vertex deceleration 
         //check that they have blend indices and blend weights
