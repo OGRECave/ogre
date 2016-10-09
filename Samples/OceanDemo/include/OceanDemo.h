@@ -329,7 +329,7 @@ void Sample_Ocean::changePage(int pageNum /* = -1 : toggle */)
     mCurrentPage = (pageNum == -1) ? (mCurrentPage+1) % mNumPages : pageNum;
 
     static char pageText[64];
-    sprintf(pageText, "Parameters %lu / %d", mCurrentPage+1, (int)mNumPages);
+    sprintf(pageText, "Parameters %zu / %zu", mCurrentPage+1, mNumPages);
     static_cast<OgreBites::Button*>(mTrayMgr->getWidget("PageButtonControl"))->setCaption(pageText);
 
     if(!mActiveMaterial.isNull() && mActiveMaterial->getNumSupportedTechniques())
