@@ -143,14 +143,7 @@ namespace Ogre {
                 eglContext = eglGetCurrentContext();
                 mEglSurface = eglGetCurrentSurface(EGL_DRAW);
             }
-            
-            int ctxHandle = -1;
-            if((miscParams->find("externalGLContext")) != end)
-            {
-                mIsExternalGLControl = true;
-                ctxHandle = Ogre::StringConverter::parseInt(opt->second);
-            }
-            
+
             if((opt = miscParams->find("maxColourBufferSize")) != end)
             {
                 mMaxBufferSize = Ogre::StringConverter::parseInt(opt->second);
