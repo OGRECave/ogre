@@ -1190,10 +1190,11 @@ namespace OgreBites
             }
 #endif
 
+            SampleSet newSamples;
 #if defined(SAMPLES_INCLUDE_PLAYPEN) && defined(OGRE_STATIC_LIB)
             playPenTestPlugin = OGRE_NEW PlaypenTestPlugin();
             mRoot->installPlugin(playPenTestPlugin);
-            SampleSet newSamples = playPenTestPlugin->getSamples();
+            newSamples = playPenTestPlugin->getSamples();
             for (SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
             {
                 Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info
@@ -1236,7 +1237,7 @@ namespace OgreBites
                     mRoot->loadPlugin(sampleDir + *i);
 #endif
                 }
-                catch (Ogre::Exception e)   // plugin couldn't be loaded
+                catch (Ogre::Exception& e)   // plugin couldn't be loaded
                 {
                     unloadedSamplePlugins.push_back(sampleDir + *i);
                     continue;
@@ -1259,7 +1260,7 @@ namespace OgreBites
                 mLoadedSamplePlugins.push_back(sampleDir + *i);   // add to records
 
                 // go through every sample in the plugin...
-                SampleSet newSamples = sp->getSamples();
+                newSamples = sp->getSamples();
                 for (SampleSet::iterator j = newSamples.begin(); j != newSamples.end(); j++)
                 {
                     Ogre::NameValuePairList& info = (*j)->getInfo();   // acquire custom sample info

@@ -257,6 +257,9 @@ namespace Ogre {
         case RenderOperation::OT_TRIANGLE_STRIP:
             subMeshNode->SetAttribute("operationtype", "triangle_strip");
             break;
+        default:
+            OgreAssert(false, "Patch control point operations not supported");
+            break;
         }
 
         if (s->indexData->indexCount > 0)

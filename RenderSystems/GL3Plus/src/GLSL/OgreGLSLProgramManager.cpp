@@ -1116,13 +1116,9 @@ namespace Ogre {
                 }
                 else
                 {
-                    try
-                    {
-                        const GpuConstantDefinition &sharedDef = sharedParams->getConstantDefinition(paramName);
-                        (void)sharedDef;    // Silence warning
-                    }
-                    catch (Exception& e)
-                    {
+                    const GpuConstantDefinitionMap& map = sharedParams->getConstantDefinitions().map;
+
+                    if(map.find(paramName) == map.end()) {
                         // This constant doesn't exist so we'll create a new one
                         sharedParams->addConstantDefinition(paramName, def.constType);
                     }

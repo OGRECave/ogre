@@ -66,7 +66,7 @@ Copyright (c) 2000-2014 Torus Knot Software Ltd
 #define GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT 0x84FF
 #endif
 
-#if OGRE_DEBUG_MODE
+#if OGRE_DEBUG_MODE && ENABLE_GL_DEBUG_OUTPUT
 static void APIENTRY GLDebugCallback(GLenum source,
                                      GLenum type,
                                      GLuint id,
@@ -1454,8 +1454,8 @@ namespace Ogre {
         Real tanThetaX = tanThetaY * aspect; // Math::Tan(thetaX);
         Real half_w = tanThetaX * nearPlane;
         Real half_h = tanThetaY * nearPlane;
-        Real iw = 1.0 / half_w;
-        Real ih = 1.0 / half_h;
+        Real iw = 1.0f / half_w;
+        Real ih = 1.0f / half_h;
         Real q;
         if (farPlane == 0)
         {
@@ -1463,7 +1463,7 @@ namespace Ogre {
         }
         else
         {
-            q = 2.0 / (farPlane - nearPlane);
+            q = 2.0f / (farPlane - nearPlane);
         }
         dest = Matrix4::ZERO;
         dest[0][0] = iw;
@@ -1814,9 +1814,9 @@ namespace Ogre {
             // if (mPreComputeMemoryBarrier)
             OGRE_CHECK_GL_ERROR(glMemoryBarrier(GL_ALL_BARRIER_BITS));
             Vector3 workgroupDim = mCurrentComputeShader->getComputeGroupDimensions();
-            OGRE_CHECK_GL_ERROR(glDispatchCompute(workgroupDim[0],
-                                                  workgroupDim[1],
-                                                  workgroupDim[2]));
+            OGRE_CHECK_GL_ERROR(glDispatchCompute(int(workgroupDim[0]),
+                                                  int(workgroupDim[1]),
+                                                  int(workgroupDim[2])));
             // if (mPostComputeMemoryBarrier)
             //     OGRE_CHECK_GL_ERROR(glMemoryBarrier(toGL(MB_TEXTURE)));
             // if (compute_execution_cap > 0)

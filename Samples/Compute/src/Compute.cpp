@@ -17,9 +17,6 @@ same license as the rest of the engine.
 using namespace Ogre;
 using namespace OgreBites;
 
-static SamplePlugin* sp;
-static Sample* s;
-
 class _OgreSampleClassExport Sample_Compute : public SdkSample
 {
     Entity* mOgreEnt;
@@ -145,6 +142,9 @@ class _OgreSampleClassExport Sample_Compute : public SdkSample
 };
 
 #ifndef OGRE_STATIC_LIB
+
+static SamplePlugin* sp;
+static Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {
