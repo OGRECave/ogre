@@ -28,9 +28,6 @@ same license as the rest of the engine.
 using namespace Ogre;
 using namespace OgreBites;
 
-static SamplePlugin* sp;
-static Sample* s;
-
 class _OgreSampleClassExport Sample_Isosurf : public SdkSample
 {
     Entity* tetrahedra;
@@ -109,6 +106,9 @@ class _OgreSampleClassExport Sample_Isosurf : public SdkSample
 };
 
 #ifndef OGRE_STATIC_LIB
+
+static SamplePlugin* sp;
+static Sample* s;
 
 extern "C" _OgreSampleExport void dllStartPlugin()
 {

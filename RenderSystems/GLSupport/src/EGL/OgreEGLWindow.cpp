@@ -45,11 +45,11 @@ namespace Ogre {
     EGLWindow::EGLWindow(EGLSupport *glsupport)
         : mGLSupport(glsupport),
           mContext(0),
-          mEglConfig(0),
-          mEglSurface(0),
           mWindow(0),
           mNativeDisplay(0),
-          mEglDisplay(EGL_NO_DISPLAY)
+          mEglDisplay(EGL_NO_DISPLAY),
+          mEglConfig(0),
+          mEglSurface(0)
     {
         mIsTopLevel = false;
         mIsFullScreen = false;

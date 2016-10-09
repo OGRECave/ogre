@@ -165,7 +165,7 @@ namespace Ogre
 		{
 			uint16 *pSrc16 = (uint16*)pSrc, *pDst16 = (uint16*)pDst;
 			for(size_t i = 0; i < indexCount; ++i)
-				pDst16[i] = remapInfo.indexMap[pSrc16[i]];
+				pDst16[i] = uint16(remapInfo.indexMap[pSrc16[i]]);
 		}
 
 		indexData->indexBuffer->unlock();

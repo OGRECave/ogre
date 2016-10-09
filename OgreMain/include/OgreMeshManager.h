@@ -75,6 +75,8 @@ namespace Ogre {
                             bool isManual = false, ManualResourceLoader* loader = 0,
                             const NameValuePairList* createParams = 0);
 
+        using ResourceManager::createOrRetrieve;
+
         /** Create a new mesh, or retrieve an existing one with the same
             name if it already exists.
             @param vertexBufferUsage The usage flags with which the vertex buffer(s)
@@ -90,8 +92,8 @@ namespace Ogre {
         ResourceCreateOrRetrieveResult createOrRetrieve(
             const String& name,
             const String& group,
-            bool isManual=false, ManualResourceLoader* loader=0,
-            const NameValuePairList* params=0,
+            bool isManual, ManualResourceLoader* loader,
+            const NameValuePairList* params,
             HardwareBuffer::Usage vertexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             HardwareBuffer::Usage indexBufferUsage = HardwareBuffer::HBU_STATIC_WRITE_ONLY, 
             bool vertexBufferShadowed = true, bool indexBufferShadowed = true);

@@ -183,7 +183,7 @@ namespace Ogre
         size_t retVal = 0;
 
         //Now lock the vertex buffer and copy the 4x3 matrices, only those who need it!
-        const ushort bufferIdx = mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1;
+        const ushort bufferIdx = ushort(mRenderOperation.vertexData->vertexBufferBinding->getBufferCount()-1);
         float *pDest = static_cast<float*>(mRenderOperation.vertexData->vertexBufferBinding->
                                             getBuffer(bufferIdx)->lock( HardwareBuffer::HBL_DISCARD ));
 

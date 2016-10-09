@@ -364,7 +364,7 @@ namespace Ogre {
     unsigned int CocoaWindow::getWidth() const
     {
         // keep mWidth in sync with reality
-        assert(mView == nil || mWidth == _getPixelFromPoint([mView frame].size.width));
+        assert(mView == nil || int(mWidth) == _getPixelFromPoint([mView frame].size.width));
         
         return mWidth;
     }
@@ -372,7 +372,7 @@ namespace Ogre {
     unsigned int CocoaWindow::getHeight() const
     {
         // keep mHeight in sync with reality
-        assert(mView == nil || mHeight == _getPixelFromPoint([mView frame].size.height));
+        assert(mView == nil || int(mHeight) == _getPixelFromPoint([mView frame].size.height));
         
         return mHeight;
     }
