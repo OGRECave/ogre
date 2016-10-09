@@ -227,6 +227,7 @@ namespace Ogre {
         // Depth buffer is not handled here anymore.
         // See GLES2FrameBufferObject::attachDepthBuffer() & RenderSystem::setDepthBufferFor()
 
+#if OGRE_NO_GLES3_SUPPORT == 0
         GLenum bufs[OGRE_MAX_MULTIPLE_RENDER_TARGETS];
         GLsizei n=0;
         for(unsigned int x=0; x<maxSupportedMRTs; ++x)
@@ -247,7 +248,6 @@ namespace Ogre {
             }
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 0
         // Drawbuffer extension supported, use it
         if(getFormat() != PF_DEPTH)
             OGRE_CHECK_GL_ERROR(glDrawBuffers(n, bufs));

@@ -192,7 +192,7 @@ protected:
 			generateTangents |= hasNoTangentsAndCanGenerate(vertexDecl);
 		}
 
-		for (size_t i = 0; i<mesh->getNumSubMeshes(); ++i)
+		for (ushort i = 0; i<mesh->getNumSubMeshes(); ++i)
 		{
 			Ogre::SubMesh *subMesh = mesh->getSubMesh(i);
 			if (subMesh->vertexData)

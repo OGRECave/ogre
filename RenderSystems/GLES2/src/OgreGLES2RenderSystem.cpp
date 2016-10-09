@@ -69,10 +69,12 @@ using namespace std;
 
 namespace Ogre {
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
     static GLES2Support* glsupport;
     static void* get_proc(const char* proc) {
         return glsupport->getProcAddress(proc);
     }
+#endif
 
     GLES2RenderSystem::GLES2RenderSystem()
         : mGpuProgramManager(0),
@@ -100,7 +102,9 @@ namespace Ogre {
         mGLSupport = new GLES2Support(getGLSupport(GLNativeSupport::CONTEXT_ES));
         mGLSupport->setStateCacheManager(mStateCacheManager);
         
+#if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         glsupport = mGLSupport;
+#endif
 
         mWorldMatrix = Matrix4::IDENTITY;
         mViewMatrix = Matrix4::IDENTITY;
