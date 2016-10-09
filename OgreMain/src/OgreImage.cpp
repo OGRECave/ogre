@@ -235,7 +235,7 @@ namespace Ogre {
     Image& Image::loadDynamicImage( uchar* pData, uint32 uWidth, uint32 uHeight,
         uint32 depth,
         PixelFormat eFormat, bool autoDelete, 
-        size_t numFaces, uint8 numMipMaps)
+        size_t numFaces, uint32 numMipMaps)
     {
 
         freeMemory();
@@ -272,7 +272,7 @@ namespace Ogre {
         DataStreamPtr& stream, 
         uint32 uWidth, uint32 uHeight, uint32 uDepth,
         PixelFormat eFormat,
-        size_t numFaces, uint8 numMipMaps)
+        size_t numFaces, uint32 numMipMaps)
     {
 
         size_t size = calculateSize(numMipMaps, numFaces, uWidth, uHeight, uDepth, eFormat);
@@ -467,7 +467,7 @@ namespace Ogre {
     }
 
     //-----------------------------------------------------------------------------
-    uint8 Image::getNumMipmaps() const
+    uint32 Image::getNumMipmaps() const
     {
         return mNumMipmaps;
     }

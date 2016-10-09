@@ -178,7 +178,7 @@ namespace Ogre {
             // Compressed formats
             GLsizei size;
 
-            for (uint8 mip = 0; mip <= mNumMipmaps; mip++)
+            for (uint32 mip = 0; mip <= mNumMipmaps; mip++)
             {
                 size = static_cast<GLsizei>(PixelUtil::getMemorySize(width, height, depth, mFormat));
                 // std::stringstream str;
@@ -276,7 +276,7 @@ namespace Ogre {
             else
             {
                 // Run through this process to pregenerate mipmap pyramid
-                for(uint8 mip = 0; mip <= mNumMipmaps; mip++)
+                for(uint32 mip = 0; mip <= mNumMipmaps; mip++)
                 {
                     //                    std::stringstream str;
                     //                    str << "GL3PlusTexture::create - " << StringConverter::toString(mTextureID)
@@ -485,7 +485,7 @@ namespace Ogre {
 
         for (uint8 face = 0; face < getNumFaces(); face++)
         {
-            for (uint8 mip = 0; mip <= getNumMipmaps(); mip++)
+            for (uint32 mip = 0; mip <= getNumMipmaps(); mip++)
             {
                 GL3PlusHardwarePixelBuffer *buf = new GL3PlusTextureBuffer(mName,
                                                                            getGL3PlusTextureTarget(),

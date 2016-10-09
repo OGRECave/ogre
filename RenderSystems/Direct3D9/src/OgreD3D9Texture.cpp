@@ -1727,7 +1727,7 @@ namespace Ogre
         assert(textureResources != NULL);
         assert(textureResources->pBaseTex);
         // Make sure number of mips is right
-        mNumMipmaps = static_cast<uint8>(textureResources->pBaseTex->GetLevelCount() - 1);
+        mNumMipmaps = static_cast<uint32>(textureResources->pBaseTex->GetLevelCount() - 1);
         // Need to know static / dynamic
         unsigned int bufusage;
         if ((mUsage & TU_DYNAMIC) && mDynamicTextures)

@@ -213,7 +213,7 @@ namespace Ogre {
         }
 
         // The custom mipmaps in the image have priority over everything
-        uint8 imageMips = images[0]->getNumMipmaps();
+        uint32 imageMips = images[0]->getNumMipmaps();
 
         if(imageMips > 0)
         {
