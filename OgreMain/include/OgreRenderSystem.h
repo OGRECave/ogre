@@ -365,10 +365,10 @@ namespace Ogre
             <td>OpenGL specific</td>
         </tr>
         <tr>
-            <td>externalGLContext</td>
-            <td>Context as Unsigned Long</td>
-            <td>0 (create own context)</td>
-            <td>Use an externally created GL context</td>
+            <td>currentGLContext</td>
+            <td>true, false</td>
+            <td>false</td>
+            <td>Use an externally created GL context. (Must be current)</td>
             <td>OpenGL Specific</td>
         </tr>
         <tr>

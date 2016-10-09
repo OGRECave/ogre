@@ -147,14 +147,7 @@ namespace Ogre {
             {
                 config = (AConfiguration*)(Ogre::StringConverter::parseSizeT(opt->second));
             }
-            
-            int ctxHandle = -1;
-            if((opt = miscParams->find("externalGLContext")) != end)
-            {
-                mIsExternalGLControl = true;
-                ctxHandle = Ogre::StringConverter::parseInt(opt->second);
-            }
-            
+
             if((opt = miscParams->find("maxColourBufferSize")) != end)
             {
                 mMaxBufferSize = Ogre::StringConverter::parseInt(opt->second);
