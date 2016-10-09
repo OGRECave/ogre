@@ -47,7 +47,7 @@ namespace Ogre
     void LodOutputProviderBuffer::bakeManualLodLevel( LodData* data, String& manualMeshName, int lodIndex )
     {
         // placeholder dummy
-        unsigned short submeshCount = mBuffer.submesh.size();
+        unsigned short submeshCount = ushort(mBuffer.submesh.size());
         LodIndexBuffer buffer;
         buffer.indexSize = 2;
         buffer.indexCount = 0;
@@ -66,7 +66,7 @@ namespace Ogre
 
     void LodOutputProviderBuffer::bakeLodLevel(LodData* data, int lodIndex)
     {
-        unsigned short submeshCount = mBuffer.submesh.size();
+        unsigned short submeshCount = ushort(mBuffer.submesh.size());
 
         // Create buffers.
         for (unsigned short i = 0; i < submeshCount; i++) {
@@ -112,7 +112,7 @@ namespace Ogre
 
 void LodOutputProviderBuffer::inject()
 {
-    unsigned short submeshCount = mBuffer.submesh.size();
+    unsigned short submeshCount = ushort(mBuffer.submesh.size());
     OgreAssert(mMesh->getNumSubMeshes() == submeshCount, "");
     mMesh->removeLodLevels();
     for (unsigned short i = 0; i < submeshCount; i++) {
