@@ -104,8 +104,8 @@ void MeshLodGenerator::_configureMeshLodUsage(const LodConfig& lodConfig)
     lodConfig.mesh->freeEdgeList();
     lodConfig.mesh->setLodStrategy(lodConfig.strategy);
     MeshLodUsage usage;
-    size_t n = 0;
-    lodConfig.mesh->_setLodInfo(lodConfig.levels.size() + 1); // add Lod levels
+    ushort n = 0;
+    lodConfig.mesh->_setLodInfo(ushort(lodConfig.levels.size()) + 1); // add Lod levels
     for(size_t i = 0; i < lodConfig.levels.size(); i++) {
         // Record usages. First Lod usage is the mesh itself.
 
