@@ -164,7 +164,7 @@ namespace Ogre {
         Image& loadDynamicImage( uchar* data, uint32 width, uint32 height,
                             uint32 depth,
                              PixelFormat format, bool autoDelete = false, 
-                             size_t numFaces = 1, uint8 numMipMaps = 0);
+                             size_t numFaces = 1, uint32 numMipMaps = 0);
         
         /** Stores a pointer to raw data in memory. The pixel format has to be specified.
             @remarks
@@ -229,7 +229,7 @@ namespace Ogre {
             DataStreamPtr& stream, 
             uint32 width, uint32 height, uint32 depth,
             PixelFormat format,
-            size_t numFaces = 1, uint8 numMipMaps = 0);
+            size_t numFaces = 1, uint32 numMipMaps = 0);
         /** Loads raw data from a stream. The pixel format has to be specified. 
             @remarks This function is deprecated; one should really use the
                 Image::loadRawData(stream, width, height, depth, format, ...) to be compatible
@@ -378,7 +378,7 @@ namespace Ogre {
 
         /** Returns the number of mipmaps contained in the image.
         */
-        uint8 getNumMipmaps() const;
+        uint32 getNumMipmaps() const;
 
         /** Returns true if the image has the appropriate flag set.
         */
@@ -483,7 +483,7 @@ namespace Ogre {
         /// The size of the image buffer
         size_t mBufSize;
         /// The number of mipmaps the image contains
-        uint8 mNumMipmaps;
+        uint32 mNumMipmaps;
         /// Image specific flags.
         int mFlags;
 
