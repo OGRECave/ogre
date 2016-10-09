@@ -127,13 +127,13 @@ namespace Ogre {
 
         /** Gets the number of mipmaps to be used for this texture.
         */
-        virtual uint8 getNumMipmaps(void) const {return mNumMipmaps;}
+        virtual uint32 getNumMipmaps(void) const {return mNumMipmaps;}
 
         /** Sets the number of mipmaps to be used for this texture.
             @note
                 Must be set before calling any 'load' method.
         */
-        virtual void setNumMipmaps(uint8 num) {mNumRequestedMipmaps = mNumMipmaps = num;}
+        virtual void setNumMipmaps(uint32 num) {mNumRequestedMipmaps = mNumMipmaps = num;}
 
         /** Are mipmaps hardware generated?
         @remarks
@@ -411,8 +411,8 @@ namespace Ogre {
         uint32 mWidth;
         uint32 mDepth;
 
-        uint8 mNumRequestedMipmaps;
-        uint8 mNumMipmaps;
+        uint32 mNumRequestedMipmaps;
+        uint32 mNumMipmaps;
         bool mMipmapsHardwareGenerated;
         float mGamma;
         bool mHwGamma;

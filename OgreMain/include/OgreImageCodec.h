@@ -63,7 +63,7 @@ namespace Ogre {
             uint32 depth;
             size_t size;
             
-            uint8 num_mipmaps;
+            uint32 num_mipmaps;
             uint flags;
 
             PixelFormat format;
