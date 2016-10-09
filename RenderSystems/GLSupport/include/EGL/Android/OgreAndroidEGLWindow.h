@@ -45,12 +45,12 @@ namespace Ogre {
     class _OgrePrivate AndroidEGLWindow : public EGLWindow
     {
     private:
-        uint mMaxBufferSize;
-        uint mMinBufferSize;
-        uint mMaxDepthSize;
-        uint mMaxStencilSize;
-        uint mMSAA;
-        uint mCSAA;
+        int mMaxBufferSize;
+        int mMinBufferSize;
+        int mMaxDepthSize;
+        int mMaxStencilSize;
+        int mMSAA;
+        int mCSAA;
         bool mPreserveContext;
         
     protected:
