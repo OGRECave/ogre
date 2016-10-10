@@ -122,6 +122,15 @@ cbuffer InstanceBuffer : register(b2)
 };
 @end
 
+@property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )
+@piece( PccManualProbeDecl )
+cbuffer ManualProbe : register(b3)
+{
+	CubemapProbe manualProbe;
+};
+@end
+@end
+
 //Reset texcoord to 0 for every shader stage (since values are preserved).
 @pset( texcoord, 0 )
 

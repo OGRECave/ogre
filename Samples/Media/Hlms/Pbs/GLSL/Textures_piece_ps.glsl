@@ -65,6 +65,6 @@ ROUGHNESS = max( ROUGHNESS, 0.001f );@end
 		@set( use_parallax_correct_cubemaps, 1 )
 	@end
 	@property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )
-		@piece( pccProbeSource )manualProbe@end
+		@piece( pccProbeSource )manualProbe.probe@end
 	@end
 @end

@@ -1280,6 +1280,14 @@ namespace Ogre
                                                                            1, newPool->materialBuffer, 0,
                                                                            newPool->materialBuffer->
                                                                            getTotalSizeBytes() );
+            CubemapProbe *manualProbe = datablock->getCubemapProbe();
+            if( manualProbe )
+            {
+                ConstBufferPacked *probeConstBuf = manualProbe->getConstBufferForManualProbes();
+                *commandBuffer->addCommand<CbShaderBuffer>() = CbShaderBuffer( PixelShader,
+                                                                               3, probeConstBuf,
+                                                                               0, 0 );
+            }
             mLastBoundPool = newPool;
         }
 

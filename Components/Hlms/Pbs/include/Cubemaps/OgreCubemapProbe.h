@@ -179,6 +179,8 @@ namespace Ogre
         TexturePtr getInternalTexture(void) const           { return mTexture; }
         void _addReference(void);
         void _removeReference(void);
+
+        ConstBufferPacked* getConstBufferForManualProbes(void)  { return mConstBufferForManualProbes; }
     };
 }
 

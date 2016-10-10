@@ -6,6 +6,7 @@
 	@end
 	@insertpiece( MaterialDecl )
 	@insertpiece( InstanceDecl )
+	@insertpiece( PccManualProbeDecl )
 @end
 @insertpiece( custom_ps_uniformDeclaration )
 // END UNIFORM DECLARATION
