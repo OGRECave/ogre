@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "OgreRenderTexture.h"
 #include "OgreHlmsManager.h"
+#include "OgreHlms.h"
 #include "OgreDepthBuffer.h"
 
 #include "OgreTextureManager.h"
@@ -55,6 +56,7 @@ THE SOFTWARE.
 #include "OgreSubMesh2.h"
 #include "OgreItem.h"
 
+#include "Vao/OgreConstBufferPacked.h"
 #include "Vao/OgreStagingBuffer.h"
 
 namespace Ogre
@@ -612,7 +614,8 @@ namespace Ogre
         //Check the staging buffer is big enough to avoid a stall
         VaoManager *vaoManager = mSceneManager->getDestinationRenderSystem()->getVaoManager();
         const size_t neededBytes = mManuallyActiveProbes.size() * getConstBufferSize() *
-                vaoManager->getDynamicBufferMultiplier() * std::max( 1u, mLastPassNumViewMatrices );
+                vaoManager->getDynamicBufferMultiplier() * std::max<size_t>( 1u,
+                                                                             mLastPassNumViewMatrices );
 
         if( (!mStagingBuffer && !mManuallyActiveProbes.empty()) ||
             neededBytes > mStagingBuffer->getMaxSize() )
@@ -893,8 +896,9 @@ namespace Ogre
 
             while( itor != end )
             {
-                destinations.push_back( StagingBuffer::Destination( (*itor)->mConstBufferForManualProbes, 0,
-                                                                    srcOffset, getConstBufferSize() ) );
+                destinations.push_back( StagingBuffer::Destination( (*itor)->mConstBufferForManualProbes,
+                                                                    0, srcOffset,
+                                                                    getConstBufferSize() ) );
 
                 fillConstBufferData( **itor, viewMatrix, invViewMat3, probeData );
                 probeData += getConstBufferSize() >> 2u;
