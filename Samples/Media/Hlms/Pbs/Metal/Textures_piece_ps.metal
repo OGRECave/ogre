@@ -6,16 +6,29 @@
 
 @padd( samplerStateStart, hlms_num_shadow_maps, 1 )
 @pset( numSamplerStates, num_textures )
-@property( envprobe_map && envprobe_map != target_envprobe_map )
-	@add( numSamplerStates, 1 )
-	@set( use_envprobe_map, 1 )
-@end
 
 @property( hlms_forward3d )
 	@add( textureRegStart, 2 )
 	@add( envMapReg, 2 )
 	@add( textureRegShadowMapStart, 2 )
 	@add( samplerStateStart, 2 )
+@end
+
+@property( (envprobe_map && envprobe_map != target_envprobe_map) || parallax_correct_cubemaps )
+	@set( use_envprobe_map, 1 )
+
+	@property( !envprobe_map || envprobe_map == target_envprobe_map )
+		/// "No cubemap"? Then we're in auto mode or...
+		/// We're rendering to the cubemap probe we're using as manual. Use the auto mode as fallback.
+		@piece( pccProbeSource )pass.autoProbe@end
+		@set( use_parallax_correct_cubemaps, 1 )
+		/// Auto cubemap textures are set at the beginning. Manual cubemaps are the end.
+		@set( envMapReg, textureRegStart )
+		@add( textureRegStart, 1 )
+	@end
+	@property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )
+		@piece( pccProbeSource )manualProbe@end
+	@end
 @end
 
 @property( diffuse_map )

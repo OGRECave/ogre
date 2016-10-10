@@ -33,35 +33,56 @@ fragment_program Cubemap/CopyCubemap_NY_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps
 fragment_program Cubemap/CopyCubemap_PZ_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps_HLSL { preprocessor_defines FACEIDX=4 }
 fragment_program Cubemap/CopyCubemap_NZ_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps_HLSL { preprocessor_defines FACEIDX=5 }
 
+//------------------------
+//Metal Definitions
+//------------------------
+fragment_program Cubemap/CopyCubemap_PX_ps_Metal metal
+{
+	source CopyCubemap_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+fragment_program Cubemap/CopyCubemap_NX_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=1 }
+fragment_program Cubemap/CopyCubemap_PY_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=2 }
+fragment_program Cubemap/CopyCubemap_NY_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=3 }
+fragment_program Cubemap/CopyCubemap_PZ_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=4 }
+fragment_program Cubemap/CopyCubemap_NZ_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=5 }
+
 fragment_program Cubemap/CopyCubemap_PX_ps unified
 {
 	delegate Cubemap/CopyCubemap_PX_ps_GLSL
 	delegate Cubemap/CopyCubemap_PX_ps_HLSL
+	delegate Cubemap/CopyCubemap_PX_ps_Metal
 }
 fragment_program Cubemap/CopyCubemap_NX_ps unified
 {
 	delegate Cubemap/CopyCubemap_NX_ps_GLSL
 	delegate Cubemap/CopyCubemap_NX_ps_HLSL
+	delegate Cubemap/CopyCubemap_NX_ps_Metal
 }
 fragment_program Cubemap/CopyCubemap_PY_ps unified
 {
 	delegate Cubemap/CopyCubemap_PY_ps_GLSL
 	delegate Cubemap/CopyCubemap_PY_ps_HLSL
+	delegate Cubemap/CopyCubemap_PY_ps_Metal
 }
 fragment_program Cubemap/CopyCubemap_NY_ps unified
 {
 	delegate Cubemap/CopyCubemap_NY_ps_GLSL
 	delegate Cubemap/CopyCubemap_NY_ps_HLSL
+	delegate Cubemap/CopyCubemap_NY_ps_Metal
 }
 fragment_program Cubemap/CopyCubemap_PZ_ps unified
 {
 	delegate Cubemap/CopyCubemap_PZ_ps_GLSL
 	delegate Cubemap/CopyCubemap_PZ_ps_HLSL
+	delegate Cubemap/CopyCubemap_PZ_ps_Metal
 }
 fragment_program Cubemap/CopyCubemap_NZ_ps unified
 {
 	delegate Cubemap/CopyCubemap_NZ_ps_GLSL
 	delegate Cubemap/CopyCubemap_NZ_ps_HLSL
+	delegate Cubemap/CopyCubemap_NZ_ps_Metal
 }
 
 material Cubemap/CopyCubemap_PX

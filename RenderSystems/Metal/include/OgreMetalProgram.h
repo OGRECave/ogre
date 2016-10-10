@@ -156,6 +156,8 @@ namespace Ogre
         /// Populate the passed parameters with name->index map, must be overridden
         void buildConstantDefinitions(void) const;
 
+        void parsePreprocessorDefinitions( NSMutableDictionary<NSString*, NSObject*> *inOutMacros );
+
     private:
         id <MTLLibrary> mLibrary;
         id <MTLFunction> mFunction;

@@ -19,6 +19,8 @@ struct Light
 @end
 };
 
+@insertpiece( DeclCubemapProbeStruct )
+
 //Uniforms that change per pass
 struct PassData
 {
@@ -58,6 +60,11 @@ struct PassData
 	float4 f3dData;
 	float4 f3dGridHWW[@value( hlms_forward3d )];
 @end
+
+@property( parallax_correct_cubemaps )
+	CubemapProbe autoProbe;
+@end
+
 	@insertpiece( custom_passBuffer )
 };@end
 
@@ -122,6 +129,12 @@ struct Material
 //unnecessary indirection during the shadow mapping pass.
 //Must be loaded with uintBitsToFloat
 , constant uint4 *worldMaterialIdx [[buffer(CONST_SLOT_START+2)]]
+@end
+
+@property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )
+@piece( PccManualProbeDecl )
+, constant CubemapProbe &manualProbe [[buffer(CONST_SLOT_START+3)]]
+@end
 @end
 
 //Reset texcoord to 0 for every shader stage (since values are preserved).

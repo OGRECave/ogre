@@ -30,10 +30,24 @@ fragment_program Cubemap/BlendProjectCubemap_ps_HLSL hlsl
 	entry_point main
 }
 
+//------------------------
+//Metal Definitions
+//------------------------
+vertex_program Cubemap/BlendProjectCubemap_vs_Metal metal
+{
+	source BlendProjectCubemap_vs.metal
+}
+fragment_program Cubemap/BlendProjectCubemap_ps_Metal metal
+{
+	source BlendProjectCubemap_ps.metal
+	shader_reflection_pair_hint Cubemap/BlendProjectCubemap_vs_Metal
+}
+
 vertex_program Cubemap/BlendProjectCubemap_vs unified
 {
 	delegate Cubemap/BlendProjectCubemap_vs_GLSL
 	delegate Cubemap/BlendProjectCubemap_vs_HLSL
+	delegate Cubemap/BlendProjectCubemap_vs_Metal
 
 	default_params
 	{
@@ -44,6 +58,7 @@ fragment_program Cubemap/BlendProjectCubemap_ps unified
 {
 	delegate Cubemap/BlendProjectCubemap_ps_GLSL
 	delegate Cubemap/BlendProjectCubemap_ps_HLSL
+	delegate Cubemap/BlendProjectCubemap_ps_Metal
 }
 
 material Cubemap/BlendProjectCubemap0

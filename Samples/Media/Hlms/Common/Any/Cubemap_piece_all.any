@@ -25,7 +25,7 @@ struct CubemapProbe
 	Parallax-Corrected reflection dir, IN LOCAL SPACE (local to probe's).
 	Unlike the inputs, this vector is LEFT HANDED.
 */
-@property( syntax == metal )inline@end float3 localCorrect( float3 reflDir, float3 pos, CubemapProbe probe )
+@property( syntax == metal )inline @end float3 localCorrect( float3 reflDir, float3 pos, CubemapProbe probe )
 {
 	float3 probeShapeCenterVS = float3( probe.row0_centerX.w,
 										probe.row1_centerY.w,
