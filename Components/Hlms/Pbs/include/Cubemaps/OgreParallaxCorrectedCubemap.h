@@ -42,6 +42,7 @@ namespace Ogre
     typedef vector<CubemapProbe*>::type CubemapProbeVec;
 
     /**
+    @see HlmsPbsDatablock::setCubemapProbe
     */
     class _OgreHlmsPbsExport ParallaxCorrectedCubemap : public IdObject,
                                                         public CompositorWorkspaceListener,
@@ -52,6 +53,11 @@ namespace Ogre
         uint32          mNumCollectedProbes;
         Real            mProbeNDFs[OGRE_MAX_CUBE_PROBES];
         Real            mProbeBlendFactors[OGRE_MAX_CUBE_PROBES];
+
+        CubemapProbeVec mManuallyActiveProbes;
+        StagingBuffer   *mStagingBuffer;
+        size_t          mLastPassNumViewMatrices;
+        Matrix4         mCachedLastViewMatrix;
 
         public: bool                    mPaused;
         /// This variable should be updated every frame and often represents the camera position,
@@ -111,7 +117,17 @@ namespace Ogre
         void calculateBlendFactors(void);
         void setFinalProbeTo( size_t probeIdx );
 
+        void checkStagingBufferIsBigEnough(void);
         void updateSceneGraph(void);
+        /// Probes with a large number of iterations will blow up our memory consumption
+        /// because too many commands will be queued up before flushing the command buffer
+        /// (e.g. a probe with 32 iterations 5 shadow maps per face will consume
+        ///     6 faces * 6 pass_scene * 32 iterations = 1152
+        /// 1152x the number of commands.
+        /// This function will flush with each iteration so that memory consumption doesn't
+        /// skyrocket. Furthermore this allows GPU & CPU to work in parallel.
+        /// This function must NOT be called after the Compositor started updating workspaces.
+        void updateExpensiveCollectedDirtyProbes( uint16 iterationThreshold );
         void updateRender(void);
 
     public:
@@ -152,8 +168,14 @@ namespace Ogre
         /// at once (i.e. at loading time)
         void updateAllDirtyProbes(void);
 
-        size_t getConstBufferSize(void) const;
+        void _notifyPreparePassHash( const Matrix4 &viewMatrix );
+
+        static size_t getConstBufferSize(void);
         void fillConstBufferData( const Matrix4 &viewMatrix,
+                                  float * RESTRICT_ALIAS passBufferPtr ) const;
+        void fillConstBufferData( const CubemapProbe &probe,
+                                  const Matrix4 &viewMatrix,
+                                  const Matrix3 &invViewMat3,
                                   float * RESTRICT_ALIAS passBufferPtr ) const;
 
         /// See mTmpRtt. Finds an RTT that is compatible to copy to baseParams.
@@ -161,16 +183,21 @@ namespace Ogre
         TexturePtr findTmpRtt( const TexturePtr &baseParams );
         void releaseTmpRtt( const TexturePtr &tmpRtt );
 
+        void _addManuallyActiveProbe( CubemapProbe *probe );
+        void _removeManuallyActiveProbe( CubemapProbe *probe );
+
         SceneManager* getSceneManager(void) const;
         const CompositorWorkspaceDef* getDefaultWorkspaceDef(void) const;
 
-        TexturePtr _tempGetBlendCubemap(void) const     { return mBlendCubemap; }
+        TexturePtr getBlendCubemap(void) const          { return mBlendCubemap; }
+        const HlmsSamplerblock* getBlendCubemapTrilinearSamplerblock(void)  { return mSamplerblockTrilinear; }
 
         //Statistics
         uint32 getNumCollectedProbes(void) const        { return mNumCollectedProbes; }
 
         //CompositorWorkspaceListener overloads
         virtual void passPreExecute( CompositorPass *pass );
+        virtual void allWorkspacesBeforeBeginUpdate(void);
         virtual void allWorkspacesBeginUpdate(void);
 
         //FrameListener overloads

@@ -547,6 +547,17 @@ namespace Ogre
             ++itor;
         }
 
+        {
+            //Notify the listeners
+            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
+            while( itor != end )
+            {
+                (*itor)->allWorkspacesBeforeBeginUpdate();
+                ++itor;
+            }
+        }
+
         mRenderSystem->_beginFrameOnce();
 
         itor = mWorkspaces.begin();

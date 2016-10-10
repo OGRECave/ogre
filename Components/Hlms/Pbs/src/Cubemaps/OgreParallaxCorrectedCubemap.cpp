@@ -55,6 +55,8 @@ THE SOFTWARE.
 #include "OgreSubMesh2.h"
 #include "OgreItem.h"
 
+#include "Vao/OgreStagingBuffer.h"
+
 namespace Ogre
 {
     const char *cSuffixes[6] =
@@ -70,6 +72,9 @@ namespace Ogre
                                                         uint8 reservedRqId, uint32 proxyVisibilityMask ) :
         IdObject( id ),
         mNumCollectedProbes( 0 ),
+        mStagingBuffer( 0 ),
+        mLastPassNumViewMatrices( 1 ),
+        mCachedLastViewMatrix( Matrix4::ZERO ),
         mPaused( false ),
         mTrackedPosition( Vector3::ZERO ),
         mMask( 0xffffffff ),
@@ -169,6 +174,12 @@ namespace Ogre
         mSamplerblockTrilinear = 0;
         hlmsManager->destroySamplerblock( mSamplerblockPoint );
         mSamplerblockPoint = 0;
+
+        if( mStagingBuffer )
+        {
+            mStagingBuffer->removeReferenceCount();
+            mStagingBuffer = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     CubemapProbe* ParallaxCorrectedCubemap::createProbe(void)
@@ -596,6 +607,26 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::checkStagingBufferIsBigEnough(void)
+    {
+        //Check the staging buffer is big enough to avoid a stall
+        VaoManager *vaoManager = mSceneManager->getDestinationRenderSystem()->getVaoManager();
+        const size_t neededBytes = mManuallyActiveProbes.size() * getConstBufferSize() *
+                vaoManager->getDynamicBufferMultiplier() * std::max( 1u, mLastPassNumViewMatrices );
+
+        if( (!mStagingBuffer && !mManuallyActiveProbes.empty()) ||
+            neededBytes > mStagingBuffer->getMaxSize() )
+        {
+            if( mStagingBuffer )
+                mStagingBuffer->removeReferenceCount();
+
+            mStagingBuffer = vaoManager->getStagingBuffer( neededBytes, true );
+        }
+
+        mLastPassNumViewMatrices = 0;
+        mCachedLastViewMatrix = Matrix4::ZERO;
+    }
+    //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateSceneGraph(void)
     {
         mCurrentMip = 0;
@@ -747,6 +778,46 @@ namespace Ogre
         //mBlendProxyCamera->setPosition( finalPos );
         mBlendProxyCamera->setPosition( mTrackedPosition );
         mBlendProxyCamera->setOrientation( qRot );
+
+        if( !mManuallyActiveProbes.empty() )
+            checkStagingBufferIsBigEnough();
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::updateExpensiveCollectedDirtyProbes( uint16 iterationThreshold )
+    {
+        RenderSystem *renderSystem = mSceneManager->getDestinationRenderSystem();
+        HlmsManager *hlmsManager = mRoot->getHlmsManager();
+
+        for( size_t i=0; i<mNumCollectedProbes; ++i )
+        {
+            if( (mCollectedProbes[i]->mDirty || !mCollectedProbes[i]->mStatic) &&
+                mCollectedProbes[i]->mNumIterations > iterationThreshold )
+            {
+                setFinalProbeTo( i );
+
+                for( int j=0; j<mCollectedProbes[i]->mNumIterations; ++j )
+                {
+                    renderSystem->_beginFrameOnce();
+                    mCopyWorkspace->_beginUpdate( true );
+                        mCopyWorkspace->_update();
+                        mCollectedProbes[i]->_updateRender();
+                    mCopyWorkspace->_endUpdate( true );
+
+                    mSceneManager->_frameEnded();
+                    for( size_t i=0; i<HLMS_MAX; ++i )
+                    {
+                        Hlms *hlms = hlmsManager->getHlms( static_cast<HlmsTypes>( i ) );
+                        if( hlms )
+                            hlms->frameEnded();
+                    }
+
+                    renderSystem->_update();
+                    renderSystem->_endFrameOnce();
+                }
+
+                mCollectedProbes[i]->mDirty = false;
+            }
+        }
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateRender(void)
@@ -782,9 +853,6 @@ namespace Ogre
     {
         mSceneManager->updateSceneGraph();
 
-        mCopyWorkspace->_beginUpdate( true );
-        mBlendWorkspace->_beginUpdate( false );
-
         const uint32 systemMask = mMask;
 
         CubemapProbeVec::const_iterator itor = mProbes.begin();
@@ -798,16 +866,51 @@ namespace Ogre
                 this->updateSceneGraph();
                 for( size_t i=0; i<mNumCollectedProbes; ++i )
                     mProxyNodes[i]->_getFullTransformUpdated();
-                this->updateRender();
+                this->updateExpensiveCollectedDirtyProbes( 0 );
             }
             ++itor;
         }
-
-        mBlendWorkspace->_endUpdate( false );
-        mCopyWorkspace->_endUpdate( true );
     }
     //-----------------------------------------------------------------------------------
-    size_t ParallaxCorrectedCubemap::getConstBufferSize(void) const
+    void ParallaxCorrectedCubemap::_notifyPreparePassHash( const Matrix4 &viewMatrix )
+    {
+        if( !mManuallyActiveProbes.empty() && viewMatrix != mCachedLastViewMatrix)
+        {
+            Matrix3 invViewMat3;
+            viewMatrix.extract3x3Matrix( invViewMat3 );
+            invViewMat3 = invViewMat3.Inverse();
+
+            const size_t neededBytes = mManuallyActiveProbes.size() * getConstBufferSize();
+
+            StagingBuffer::DestinationVec destinations;
+
+            float * RESTRICT_ALIAS probeData = static_cast<float * RESTRICT_ALIAS>(
+                        mStagingBuffer->map( neededBytes ) );
+            size_t srcOffset = 0;
+
+            CubemapProbeVec::const_iterator itor = mManuallyActiveProbes.begin();
+            CubemapProbeVec::const_iterator end  = mManuallyActiveProbes.end();
+
+            while( itor != end )
+            {
+                destinations.push_back( StagingBuffer::Destination( (*itor)->mConstBufferForManualProbes, 0,
+                                                                    srcOffset, getConstBufferSize() ) );
+
+                fillConstBufferData( **itor, viewMatrix, invViewMat3, probeData );
+                probeData += getConstBufferSize() >> 2u;
+                srcOffset += getConstBufferSize();
+
+                ++itor;
+            }
+
+            mStagingBuffer->unmap( destinations );
+
+            mCachedLastViewMatrix = viewMatrix;
+            ++mLastPassNumViewMatrices;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    size_t ParallaxCorrectedCubemap::getConstBufferSize(void)
     {
         return 5 * 4 * sizeof(float); //CubemapProbe localProbe;
     }
@@ -818,9 +921,17 @@ namespace Ogre
         Matrix3 invViewMat3;
         viewMatrix.extract3x3Matrix( invViewMat3 );
         invViewMat3 = invViewMat3.Inverse();
-        const Matrix3 viewSpaceToProbeLocal = mFinalProbe.mInvOrientation * invViewMat3;
+        fillConstBufferData( mFinalProbe, viewMatrix, invViewMat3, passBufferPtr );
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::fillConstBufferData( const CubemapProbe &probe,
+                                                        const Matrix4 &viewMatrix,
+                                                        const Matrix3 &invViewMat3,
+                                                        float * RESTRICT_ALIAS passBufferPtr ) const
+    {
+        const Matrix3 viewSpaceToProbeLocal = probe.mInvOrientation * invViewMat3;
 
-        const Aabb &probeShape = mFinalProbe.getProbeShape();
+        const Aabb &probeShape = probe.getProbeShape();
         Vector3 probeShapeCenterVS = viewMatrix * probeShape.mCenter; //View-space
 
         //float4 row0_centerX;
@@ -848,8 +959,8 @@ namespace Ogre
         *passBufferPtr++ = 1.0f;
 
         //float4 cubemapPosLS;
-        Vector3 cubemapPosLS = mFinalProbe.mArea.mCenter - probeShape.mCenter;
-        cubemapPosLS = mFinalProbe.mInvOrientation * cubemapPosLS;
+        Vector3 cubemapPosLS = probe.mArea.mCenter - probeShape.mCenter;
+        cubemapPosLS = probe.mInvOrientation * cubemapPosLS;
         *passBufferPtr++ = cubemapPosLS.x;
         *passBufferPtr++ = cubemapPosLS.y;
         *passBufferPtr++ = cubemapPosLS.z;
@@ -913,6 +1024,26 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::_addManuallyActiveProbe( CubemapProbe *probe )
+    {
+        mManuallyActiveProbes.push_back( probe );
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::_removeManuallyActiveProbe( CubemapProbe *probe )
+    {
+        CubemapProbeVec::iterator itor = std::find( mManuallyActiveProbes.begin(),
+                                                    mManuallyActiveProbes.end(), probe );
+
+        if( itor != mManuallyActiveProbes.end() )
+            efficientVectorRemove( mManuallyActiveProbes, itor );
+
+        if( mManuallyActiveProbes.empty() && mStagingBuffer )
+        {
+            mStagingBuffer->removeReferenceCount();
+            mStagingBuffer = 0;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     SceneManager* ParallaxCorrectedCubemap::getSceneManager(void) const
     {
         return mSceneManager;
@@ -950,6 +1081,12 @@ namespace Ogre
         if( !mPaused )
             this->updateSceneGraph();
         return true;
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::allWorkspacesBeforeBeginUpdate(void)
+    {
+        if( !mPaused )
+            this->updateExpensiveCollectedDirtyProbes( 1 );
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::allWorkspacesBeginUpdate(void)

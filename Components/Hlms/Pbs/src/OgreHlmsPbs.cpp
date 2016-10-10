@@ -138,6 +138,7 @@ namespace Ogre
     const IdString PbsProperty::AmbientHemisphere = IdString( "ambient_hemisphere" );
     const IdString PbsProperty::TargetEnvprobeMap = IdString( "target_envprobe_map" );
     const IdString PbsProperty::ParallaxCorrectCubemaps = IdString( "parallax_correct_cubemaps" );
+    const IdString PbsProperty::UseParallaxCorrectCubemaps= IdString( "use_parallax_correct_cubemaps" );
 
     const IdString PbsProperty::BrdfDefault       = IdString( "BRDF_Default" );
     const IdString PbsProperty::BrdfCookTorrance  = IdString( "BRDF_CookTorrance" );
@@ -306,6 +307,11 @@ namespace Ogre
                 psParams->setNamedConstant( "texShadowMap", &shadowMaps[0], shadowMaps.size(), 1 );
             }
 
+            int cubemapTexUnit = 0;
+            const int32 parallaxCorrectCubemaps = getProperty( PbsProperty::ParallaxCorrectCubemaps );
+            if( parallaxCorrectCubemaps )
+                cubemapTexUnit = texUnit++;
+
             assert( dynamic_cast<const HlmsPbsDatablock*>( queuedRenderable.renderable->getDatablock() ) );
             const HlmsPbsDatablock *datablock = static_cast<const HlmsPbsDatablock*>(
                                                         queuedRenderable.renderable->getDatablock() );
@@ -319,10 +325,13 @@ namespace Ogre
 
             const int32 envProbeMap         = getProperty( PbsProperty::EnvProbeMap );
             const int32 targetEnvProbeMap   = getProperty( PbsProperty::TargetEnvprobeMap );
-            if( envProbeMap && envProbeMap != targetEnvProbeMap )
+            if( (envProbeMap && envProbeMap != targetEnvProbeMap) || parallaxCorrectCubemaps )
             {
-                assert( !datablock->getTexture( PBSM_REFLECTION ).isNull() );
-                psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
+                assert( !datablock->getTexture( PBSM_REFLECTION ).isNull() || parallaxCorrectCubemaps );
+                if( !envProbeMap || envProbeMap == targetEnvProbeMap )
+                    psParams->setNamedConstant( "texEnvProbeMap", cubemapTexUnit );
+                else
+                    psParams->setNamedConstant( "texEnvProbeMap", texUnit++ );
             }
         }
 
@@ -531,6 +540,9 @@ namespace Ogre
             TexturePtr reflectionTexture = datablock->getTexture( PBSM_REFLECTION );
             if( !reflectionTexture.isNull() )
             {
+                //Manual reflection texture
+                if( datablock->getCubemapProbe() )
+                    setProperty( PbsProperty::UseParallaxCorrectCubemaps, 1 );
                 setProperty( PbsProperty::EnvProbeMap, static_cast<int32>(
                              IdString( reflectionTexture->getName() ).mHash ) );
             }
@@ -1099,13 +1111,13 @@ namespace Ogre
             if( forward3D )
             {
                 forward3D->fillConstBufferData( renderTarget, passBufferPtr );
-                passBufferPtr += forward3D->getConstBufferSize() >> 2;
+                passBufferPtr += forward3D->getConstBufferSize() >> 2u;
             }
 
             if( mParallaxCorrectedCubemap )
             {
                 mParallaxCorrectedCubemap->fillConstBufferData( viewMatrix, passBufferPtr );
-                passBufferPtr += mParallaxCorrectedCubemap->getConstBufferSize() >> 2;
+                passBufferPtr += mParallaxCorrectedCubemap->getConstBufferSize() >> 2u;
             }
         }
         else
@@ -1221,6 +1233,16 @@ namespace Ogre
                                                                          mCurrentShadowmapSamplerblock );
                     ++texUnit;
                     ++itor;
+                }
+
+                if( mParallaxCorrectedCubemap )
+                {
+                    Texture *pccTexture = mParallaxCorrectedCubemap->getBlendCubemap().get();
+                    const HlmsSamplerblock *samplerblock =
+                            mParallaxCorrectedCubemap->getBlendCubemapTrilinearSamplerblock();
+                    *commandBuffer->addCommand<CbTexture>() = CbTexture( texUnit, true, pccTexture,
+                                                                         samplerblock );
+                    ++texUnit;
                 }
             }
             else

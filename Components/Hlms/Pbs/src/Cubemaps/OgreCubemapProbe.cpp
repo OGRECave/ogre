@@ -43,6 +43,8 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "OgreSceneManager.h"
 
+#include "Vao/OgreConstBufferPacked.h"
+
 //Disable as OpenGL version of copyToTexture is super slow (makes a GPU->CPU->GPU roundtrip)
 #define USE_RTT_DIRECTLY 0
 
@@ -58,6 +60,8 @@ namespace Ogre
         mWorkspace( 0 ),
         mCamera( 0 ),
         mCreator( creator ),
+        mConstBufferForManualProbes( 0 ),
+        mNumDatablockUsers( 0 ),
         mStatic( true ),
         mEnabled( true ),
         mDirty( true ),
@@ -76,6 +80,16 @@ namespace Ogre
             SceneManager *sceneManager = mCamera->getSceneManager();
             sceneManager->destroyCamera( mCamera );
             mCamera = 0;
+        }
+
+        assert( !mNumDatablockUsers &&
+                "There's still datablocks using this probe! Pointers will become dangling!" );
+        if( mConstBufferForManualProbes )
+        {
+            SceneManager *sceneManager = mCreator->getSceneManager();
+            VaoManager *vaoManager = sceneManager->getDestinationRenderSystem()->getVaoManager();
+            vaoManager->destroyConstBuffer( mConstBufferForManualProbes );
+            mCreator->_removeManuallyActiveProbe( this );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -272,6 +286,37 @@ namespace Ogre
 #endif
 
             mCamera->setLightCullingVisibility( false, false );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::_addReference(void)
+    {
+        ++mNumDatablockUsers;
+
+        if( !mConstBufferForManualProbes )
+        {
+            SceneManager *sceneManager = mCreator->getSceneManager();
+            VaoManager *vaoManager = sceneManager->getDestinationRenderSystem()->getVaoManager();
+            mConstBufferForManualProbes = vaoManager->createConstBuffer(
+                        ParallaxCorrectedCubemap::getConstBufferSize(),
+                        BT_DEFAULT, 0, false );
+            mCreator->_addManuallyActiveProbe( this );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::_removeReference(void)
+    {
+        --mNumDatablockUsers;
+        if( !mNumDatablockUsers )
+        {
+            assert( mConstBufferForManualProbes );
+            if( mConstBufferForManualProbes )
+            {
+                SceneManager *sceneManager = mCreator->getSceneManager();
+                VaoManager *vaoManager = sceneManager->getDestinationRenderSystem()->getVaoManager();
+                vaoManager->destroyConstBuffer( mConstBufferForManualProbes );
+                mCreator->_removeManuallyActiveProbe( this );
+            }
         }
     }
 }

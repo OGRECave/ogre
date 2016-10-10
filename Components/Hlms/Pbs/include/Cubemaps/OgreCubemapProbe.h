@@ -68,6 +68,9 @@ namespace Ogre
 
         ParallaxCorrectedCubemap *mCreator;
 
+        ConstBufferPacked   *mConstBufferForManualProbes;
+        uint32              mNumDatablockUsers;
+
         /// False if it should be updated every frame. True if only updated when dirty
         bool    mStatic;
 
@@ -172,6 +175,10 @@ namespace Ogre
         const Vector3& getAreaInnerRegion(void) const       { return mAreaInnerRegion; }
         const Matrix3& getOrientation(void) const           { return mOrientation; }
         const Aabb& getProbeShape(void) const               { return mProbeShape; }
+
+        TexturePtr getInternalTexture(void) const           { return mTexture; }
+        void _addReference(void);
+        void _removeReference(void);
     };
 }
 

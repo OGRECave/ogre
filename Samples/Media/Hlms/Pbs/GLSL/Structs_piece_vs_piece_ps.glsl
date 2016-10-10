@@ -62,7 +62,7 @@ layout(binding = 0) uniform PassBuffer
 @end
 
 @property( parallax_correct_cubemaps )
-	CubemapProbe localProbe;
+	CubemapProbe autoProbe;
 @end
 
 	@insertpiece( custom_passBuffer )

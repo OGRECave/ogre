@@ -91,6 +91,7 @@ namespace Ogre
         NUM_PBSM_BLEND_MODES
     };
 
+    class CubemapProbe;
     class HlmsPbs;
     class ParallaxCorrectedCubemap;
 }

@@ -76,7 +76,6 @@ namespace Demo
         LocalCubemapsGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
-            mAlwaysAskForConfig = false;
         }
     };
 
@@ -114,6 +113,6 @@ namespace Demo
 
     const char* MainEntryPoints::getWindowTitle(void)
     {
-        return "PBS Materials Sample";
+        return "Local Reflections using Parallax Corrected Cubemaps";
     }
 }

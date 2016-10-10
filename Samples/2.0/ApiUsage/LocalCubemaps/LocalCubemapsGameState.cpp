@@ -154,7 +154,6 @@ namespace Demo
             datablock->setBackgroundDiffuse( Ogre::ColourValue::Red );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
-            datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
             mMaterials[0] = datablock;
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
@@ -164,7 +163,6 @@ namespace Demo
             datablock->setBackgroundDiffuse( Ogre::ColourValue::Green );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
-            datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
             mMaterials[1] = datablock;
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
@@ -174,7 +172,6 @@ namespace Demo
             datablock->setBackgroundDiffuse( Ogre::ColourValue::Blue );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
-            datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
             mMaterials[2] = datablock;
 
             datablock = static_cast<Ogre::HlmsPbsDatablock*>(
@@ -184,7 +181,6 @@ namespace Demo
             datablock->setBackgroundDiffuse( Ogre::ColourValue::White );
             datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
             datablock->setRoughness( 0.65 );
-            datablock->setTexture( Ogre::PBSM_REFLECTION, 0, mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
             mMaterials[3] = datablock;
         }
 
@@ -324,7 +320,7 @@ namespace Demo
             for( int i=0; i<4; ++i )
             {
                 mMaterials[i]->setTexture( Ogre::PBSM_REFLECTION, 0,
-                                           mParallaxCorrectedCubemap->_tempGetBlendCubemap() );
+                                           mParallaxCorrectedCubemap->getBlendCubemap() );
             }
 
             mParallaxCorrectedCubemap->updateAllDirtyProbes();

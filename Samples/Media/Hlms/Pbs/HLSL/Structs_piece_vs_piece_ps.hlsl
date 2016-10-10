@@ -65,7 +65,7 @@ cbuffer PassBuffer : register(b0)
 @end
 
 @property( parallax_correct_cubemaps )
-	CubemapProbe localProbe;
+	CubemapProbe autoProbe;
 @end
 
 	@insertpiece( custom_passBuffer )
