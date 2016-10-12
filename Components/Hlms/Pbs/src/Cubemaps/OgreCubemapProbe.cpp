@@ -51,6 +51,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     CubemapProbe::CubemapProbe( ParallaxCorrectedCubemap *creator ) :
+        mProbeCameraPos( Vector3::ZERO ),
         mArea( Aabb::BOX_NULL ),
         mAreaInnerRegion( Vector3::ZERO ),
         mOrientation( Matrix3::IDENTITY ),
@@ -213,9 +214,10 @@ namespace Ogre
                                                       mWorkspaceDefName, false );
     }
     //-----------------------------------------------------------------------------------
-    void CubemapProbe::set( const Aabb &area, const Vector3 &areaInnerRegion,
+    void CubemapProbe::set( const Vector3 &cameraPos, const Aabb &area, const Vector3 &areaInnerRegion,
                             const Matrix3 &orientation, const Aabb &probeShape )
     {
+        mProbeCameraPos     = cameraPos;
         mArea               = area;
         mAreaInnerRegion    = areaInnerRegion;
         mOrientation        = orientation;
@@ -266,7 +268,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void CubemapProbe::_prepareForRendering(void)
     {
-        mCamera->setPosition( mArea.mCenter );
+        mCamera->setPosition( mProbeCameraPos );
         mCamera->setOrientation( Quaternion( mOrientation ) );
         if( mStatic )
             mCamera->setLightCullingVisibility( true, true );

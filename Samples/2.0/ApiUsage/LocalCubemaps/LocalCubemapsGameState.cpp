@@ -86,7 +86,7 @@ namespace Demo
             probe->initWorkspace();
 
             probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, -0.598495 );
-            probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+            probe->set( probeArea.mCenter, probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
                         Ogre::Matrix3::IDENTITY, roomShape );
         }
 
@@ -96,7 +96,8 @@ namespace Demo
         probe->initWorkspace();
 
         probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 5.423867 );
-        probe->set( mUseMultipleProbes ? probeArea : roomShape,
+        probe->set( mUseMultipleProbes ? probeArea.mCenter : roomShape.mCenter,
+                    mUseMultipleProbes ? probeArea : roomShape,
                     Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
                     Ogre::Matrix3::IDENTITY, roomShape );
 
@@ -108,7 +109,7 @@ namespace Demo
             probe->initWorkspace();
 
             probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 10.657585 );
-            probe->set( probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
+            probe->set( probeArea.mCenter, probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
                         Ogre::Matrix3::IDENTITY, roomShape );
         }
 

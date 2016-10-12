@@ -144,7 +144,7 @@ namespace Ogre
         }
 
         mBlankProbe.setTextureParams( 1, 1 );
-        mBlankProbe.set( Aabb( Vector3::ZERO, Vector3::UNIT_SCALE ),
+        mBlankProbe.set( Vector3::ZERO, Aabb( Vector3::ZERO, Vector3::UNIT_SCALE ),
                          Vector3::ZERO, Matrix3::IDENTITY,
                          Aabb( Vector3::ZERO, Vector3::UNIT_SCALE ) );
         mBlankProbe.mDirty = false;
@@ -593,6 +593,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::setFinalProbeTo( size_t probeIdx )
     {
+        mFinalProbe.mProbeCameraPos = mCollectedProbes[probeIdx]->mProbeCameraPos;
         mFinalProbe.mArea = mCollectedProbes[probeIdx]->mArea;
         mFinalProbe.mAreaInnerRegion = mCollectedProbes[probeIdx]->mAreaInnerRegion;
         mFinalProbe.mOrientation = mCollectedProbes[probeIdx]->mOrientation;
@@ -756,7 +757,7 @@ namespace Ogre
             localToProbeLocal[2][1] *= scaleRatio.z;
 
             Vector3 translation = mCollectedProbes[i]->mInvOrientation *
-                    (mCollectedProbes[i]->mProbeShape.mCenter - mCollectedProbes[i]->mArea.mCenter);
+                    (mCollectedProbes[i]->mProbeShape.mCenter - mCollectedProbes[i]->mProbeCameraPos);
             translation /= mCollectedProbes[i]->mProbeShape.mHalfSize;
             localToProbeLocal.setTrans( translation );
 
@@ -771,10 +772,10 @@ namespace Ogre
         }
 
         //Project p0ToCam onto p0ToP1.
-//        Vector3 p0ToCam = mTrackedPosition - mCollectedProbes[0]->mArea.mCenter;
-//        Vector3 p0ToP1 = mCollectedProbes[1]->mArea.mCenter - mCollectedProbes[0]->mArea.mCenter;
+//        Vector3 p0ToCam = mTrackedPosition - mCollectedProbes[0]->mProbeCameraPos;
+//        Vector3 p0ToP1 = mCollectedProbes[1]->mProbeCameraPos - mCollectedProbes[0]->mProbeCameraPos;
 //        p0ToP1.normalise();
-//        Vector3 finalPos = p0ToP1 * p0ToP1.dotProduct( p0ToCam ) + mCollectedProbes[0]->mArea.mCenter;
+//        Vector3 finalPos = p0ToP1 * p0ToP1.dotProduct( p0ToCam ) + mCollectedProbes[0]->mProbeCameraPos;
 
         //TODO: restrict mTrackedPosition to a region between the 4 probes.
         const Quaternion qRot( mCollectedProbes[0]->mOrientation );
@@ -844,7 +845,7 @@ namespace Ogre
         setFinalProbeTo( 0 );
 
         if( mNumCollectedProbes > 1 )
-            mFinalProbe.mArea.mCenter = mBlendProxyCamera->getPosition();
+            mFinalProbe.mProbeCameraPos = mBlendProxyCamera->getPosition();
 
         if( mNumCollectedProbes == 1u )
             mCopyWorkspace->_update();
@@ -865,7 +866,7 @@ namespace Ogre
         {
             if( (*itor)->mEnabled && ((*itor)->mMask & systemMask) )
             {
-                mTrackedPosition = (*itor)->mArea.mCenter;
+                mTrackedPosition = (*itor)->mProbeCameraPos;
                 this->updateSceneGraph();
                 for( size_t i=0; i<mNumCollectedProbes; ++i )
                     mProxyNodes[i]->_getFullTransformUpdated();
@@ -963,7 +964,7 @@ namespace Ogre
         *passBufferPtr++ = 1.0f;
 
         //float4 cubemapPosLS;
-        Vector3 cubemapPosLS = probe.mArea.mCenter - probeShape.mCenter;
+        Vector3 cubemapPosLS = probe.mProbeCameraPos - probeShape.mCenter;
         cubemapPosLS = probe.mInvOrientation * cubemapPosLS;
         *passBufferPtr++ = cubemapPosLS.x;
         *passBufferPtr++ = cubemapPosLS.y;

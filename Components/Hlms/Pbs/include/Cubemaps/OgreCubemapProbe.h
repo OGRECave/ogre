@@ -48,8 +48,9 @@ namespace Ogre
     {
         friend class ParallaxCorrectedCubemap;
 
+        /// Where to position the camera while constructing the probe.
+        Vector3 mProbeCameraPos;
         /// When the camera enters this area, the probe is collected for blending.
-        /// Also its center is where the camera will be positioned.
         Aabb    mArea;
         /// Value between [0; 1] per axis. At 1, the inner region matches mArea (the outer region)
         Vector3 mAreaInnerRegion;
@@ -127,9 +128,10 @@ namespace Ogre
                             IdString workspaceDefOverride=IdString() );
 
         /** Sets cubemap probe's parameters.
+        @param cameraPos
+            Specify where the camera will be positioned.
         @param area
             When the camera enters this area, the probe is collected for blending.
-            Also its center is where the camera will be positioned.
         @param areaInnerRegion
             A value in range [0; 1]. It indicates a % of the OBB's size that will have smooth
             interpolation with other probes. When region = 1.0; stepping outside the OBB's results
@@ -145,7 +147,8 @@ namespace Ogre
             The OBB should closely match the shape of the environment around it. The better it fits,
             the more accurate the reflections.
         */
-        void set( const Aabb &area, const Vector3 &areaInnerRegion,
+        void set( const Vector3 &cameraPos,
+                  const Aabb &area, const Vector3 &areaInnerRegion,
                   const Matrix3 &orientation, const Aabb &probeShape );
 
         /** Set to False if it should be updated every frame. True if only updated when dirty
