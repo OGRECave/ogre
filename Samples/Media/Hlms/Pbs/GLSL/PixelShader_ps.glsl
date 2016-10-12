@@ -425,10 +425,28 @@ void main()
 
 	@property( use_envprobe_map )
 		@property( use_parallax_correct_cubemaps )
-			vec3 reflDirLS = localCorrect( reflDir, inPs.pos, @insertpiece( pccProbeSource ) );
-			vec3 nNormalLS = localCorrect( nNormal, inPs.pos, @insertpiece( pccProbeSource ) );
-			vec3 envColourS = textureLod( texEnvProbeMap, reflDirLS, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
-			vec3 envColourD = textureLod( texEnvProbeMap, nNormalLS, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+			vec3 envColourS;
+			vec3 envColourD;
+			vec3 posInProbSpace = toProbeLocalSpace( inPs.pos, @insertpiece( pccProbeSource ) );
+			float probeFade = getProbeFade( posInProbSpace, @insertpiece( pccProbeSource ) );
+			if( probeFade > 0 )
+			{
+				vec3 reflDirLS = localCorrect( reflDir, posInProbSpace, @insertpiece( pccProbeSource ) );
+				vec3 nNormalLS = localCorrect( nNormal, posInProbSpace, @insertpiece( pccProbeSource ) );
+				envColourS = textureLod( texEnvProbeMap,
+										 reflDirLS, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+				envColourD = textureLod( texEnvProbeMap,
+										 nNormalLS, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+
+				envColourS = envColourS * clamp( probeFade * 200.0, 0.0, 1.0 );
+				envColourD = envColourD * clamp( probeFade * 200.0, 0.0, 1.0 );
+			}
+			else
+			{
+				//TODO: Fallback to a global cubemap.
+				envColourS = vec3( 0, 0, 0 );
+				envColourD = vec3( 0, 0, 0 );
+			}
 		@end @property( !use_parallax_correct_cubemaps )
 			vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
 			vec3 envColourD = textureLod( texEnvProbeMap, nNormal * pass.invViewMatCubemap, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;

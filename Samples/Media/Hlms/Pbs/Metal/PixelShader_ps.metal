@@ -381,10 +381,28 @@ float4 diffuseCol;
 
 	@property( use_envprobe_map )
 		@property( use_parallax_correct_cubemaps )
-			float3 reflDirLS = localCorrect( reflDir, inPs.pos, @insertpiece( pccProbeSource ) );
-			float3 nNormalLS = localCorrect( nNormal, inPs.pos, @insertpiece( pccProbeSource ) );
-			float3 envColourS = texEnvProbeMap.sample( envMapSamplerState, reflDirLS, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
-			float3 envColourD = texEnvProbeMap.sample( envMapSamplerState, nNormalLS, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+			float3 envColourS;
+			float3 envColourD;
+			float3 posInProbSpace = toProbeLocalSpace( inPs.pos, @insertpiece( pccProbeSource ) );
+			float probeFade = getProbeFade( posInProbSpace, @insertpiece( pccProbeSource ) );
+			if( probeFade > 0 )
+			{
+				float3 reflDirLS = localCorrect( reflDir, inPs.pos, @insertpiece( pccProbeSource ) );
+				float3 nNormalLS = localCorrect( nNormal, inPs.pos, @insertpiece( pccProbeSource ) );
+				envColourS = texEnvProbeMap.sample( envMapSamplerState,
+													reflDirLS, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+				envColourD = texEnvProbeMap.sample( envMapSamplerState,
+													nNormalLS, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+
+				envColourS = envColourS * saturate( probeFade * 200.0 );
+				envColourD = envColourD * saturate( probeFade * 200.0 );
+			}
+			else
+			{
+				//TODO: Fallback to a global cubemap.
+				envColourS = vec3( 0, 0, 0 );
+				envColourD = vec3( 0, 0, 0 );
+			}
 		@end @property( !use_parallax_correct_cubemaps )
 			float3 envColourS = texEnvProbeMap.sample( envMapSamplerState, reflDir * pass.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
 			float3 envColourD = texEnvProbeMap.sample( envMapSamplerState, nNormal * pass.invViewMatCubemap, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );

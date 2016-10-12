@@ -18,31 +18,26 @@ struct CubemapProbe
 \param reflDir
 	Reflection dir, in view space.
 \param pos
-	Position of the object where the reflection is going to reflect, in view space
+	Position of the object where the reflection is going to reflect, in local space.
+	Use toProbeLocalSpace to conver to LS.
 \param probe
 	Cubemap's probe
 \return
 	Parallax-Corrected reflection dir, IN LOCAL SPACE (local to probe's).
 	Unlike the inputs, this vector is LEFT HANDED.
 */
-@property( syntax == metal )inline @end float3 localCorrect( float3 reflDir, float3 pos, CubemapProbe probe )
+@property( syntax == metal )inline @end float3 localCorrect( float3 reflDir, float3 posLS,
+															 CubemapProbe probe )
 {
-	float3 probeShapeCenterVS = float3( probe.row0_centerX.w,
-										probe.row1_centerY.w,
-										probe.row2_centerZ.w );
 	float3 probeShapeHalfSize	= probe.halfSize.xyz;
-
 	float3x3 viewSpaceToProbeLocal = float3x3( probe.row0_centerX.xyz,
 											   probe.row1_centerY.xyz,
 											   probe.row2_centerZ.xyz );
-	float3 posLS = pos - probeShapeCenterVS;
 
 	@property( syntax == hlsl )
 		float3 reflDirLS = mul( viewSpaceToProbeLocal, reflDir );
-		posLS = mul( viewSpaceToProbeLocal, posLS );
 	@end @property( syntax != hlsl )
 		float3 reflDirLS = reflDir * viewSpaceToProbeLocal;
-		posLS = posLS * viewSpaceToProbeLocal;
 	@end
 
 	//Find the ray intersection with box plane
@@ -61,6 +56,49 @@ struct CubemapProbe
 	//Make it left-handed.
 	localCorrectedVec.z = -localCorrectedVec.z;
 	return localCorrectedVec;
+}
+/** Converts a position from view space to probe's local space.
+\param pos
+	Position of the object where the reflection is going to reflect, in view space
+\return
+	Position in local space.
+*/
+@property( syntax == metal )inline @end float3 toProbeLocalSpace( float3 pos, CubemapProbe probe )
+{
+	float3 probeShapeCenterVS = float3( probe.row0_centerX.w,
+										probe.row1_centerY.w,
+										probe.row2_centerZ.w );
+
+	float3x3 viewSpaceToProbeLocal = float3x3( probe.row0_centerX.xyz,
+											   probe.row1_centerY.xyz,
+											   probe.row2_centerZ.xyz );
+	float3 posLS = pos - probeShapeCenterVS;
+
+	@property( syntax == hlsl )
+		posLS = mul( viewSpaceToProbeLocal, posLS );
+	@end @property( syntax != hlsl )
+		posLS = posLS * viewSpaceToProbeLocal;
+	@end
+
+	return posLS;
+}
+
+/// Returns true if position (in local space) is inside the probe. False otherwise
+@property( syntax == metal )inline @end bool isInsideProbe( float3 posLS, CubemapProbe probe )
+{
+	return !( abs( posLS.x ) > probe.halfSize.x ||
+			  abs( posLS.y ) > probe.halfSize.y ||
+			  abs( posLS.z ) > probe.halfSize.z );
+}
+
+/// Returns value in range (-inf; 1].
+/// 1 means being at the center of the probe.
+/// 0 means being at the edge of the probe
+/// <0 means position is outside the probe.
+@property( syntax == metal )inline @end float getProbeFade( float3 posLS, CubemapProbe probe )
+{
+	float3 vDiff = ( probe.halfSize.xyz - abs( posLS.xyz ) ) / probe.halfSize.xyz;
+	return min( min( vDiff.x, vDiff.y ), vDiff.z );
 }
 @end
 
