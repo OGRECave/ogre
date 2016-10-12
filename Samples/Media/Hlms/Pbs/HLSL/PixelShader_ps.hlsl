@@ -374,8 +374,8 @@ float4 diffuseCol;
 			float probeFade = getProbeFade( posInProbSpace, @insertpiece( pccProbeSource ) );
 			if( probeFade > 0 )
 			{
-				float3 reflDirLS = localCorrect( reflDir, inPs.pos, @insertpiece( pccProbeSource ) );
-				float3 nNormalLS = localCorrect( nNormal, inPs.pos, @insertpiece( pccProbeSource ) );
+				float3 reflDirLS = localCorrect( reflDir, posInProbSpace, @insertpiece( pccProbeSource ) );
+				float3 nNormalLS = localCorrect( nNormal, posInProbSpace, @insertpiece( pccProbeSource ) );
 				envColourS = texEnvProbeMap.SampleLevel( envMapSamplerState,
 														 reflDirLS, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
 				envColourD = texEnvProbeMap.SampleLevel( envMapSamplerState,
