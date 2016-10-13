@@ -44,6 +44,15 @@ namespace Ogre
         VertexElement2( VertexElementType type, VertexElementSemantic semantic ) :
             mType( type ), mSemantic( semantic ) {}
 
+		bool operator < ( const VertexElement2 a_Rhs ) const
+		{
+			if( mType != a_Rhs.mType )
+				return mType < a_Rhs.mType;
+			if( mSemantic != a_Rhs.mSemantic )
+				return mSemantic < a_Rhs.mSemantic;
+			return false;
+		}
+
         bool operator == ( const VertexElement2 _r ) const
         {
             return mType == _r.mType && mSemantic == _r.mSemantic;
