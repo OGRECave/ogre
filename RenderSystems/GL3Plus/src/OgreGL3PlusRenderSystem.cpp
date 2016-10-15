@@ -2891,7 +2891,7 @@ namespace Ogre {
 	}
 #endif
 
-    void GL3PlusRenderSystem::_copyContentsToMemory(Viewport* src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
+    void GL3PlusRenderSystem::_copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
     {
         GLenum format = GL3PlusPixelUtil::getGLOriginFormat(dst.format);
         GLenum type = GL3PlusPixelUtil::getGLOriginDataType(dst.format);
@@ -2902,17 +2902,17 @@ namespace Ogre {
         }
 
         // Switch context if different from current one
-        _setViewport(src);
+        _setViewport(vp);
 
         if(dst.getWidth() != dst.rowPitch)
             glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
         // Must change the packing to ensure no overruns!
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
-        uint32_t height = src->getTarget()->getHeight();
+        uint32_t height = vp->getTarget()->getHeight();
 
         glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
-        glReadPixels((GLint)0, (GLint)(height - dst.getHeight()),
+        glReadPixels((GLint)src.left, (GLint)(height - src.bottom),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
                      format, type, dst.getTopLeftFrontPixelPtr());
 

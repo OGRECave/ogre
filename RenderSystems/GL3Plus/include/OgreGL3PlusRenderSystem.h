@@ -573,7 +573,7 @@ namespace Ogre {
         virtual void markProfileEvent( const String &eventName );
 
         /** @copydoc RenderTarget::copyContentsToMemory */
-        void _copyContentsToMemory(Viewport* src, const PixelBox &dst, RenderWindow::FrameBuffer buffer);
+        void _copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox &dst, RenderWindow::FrameBuffer buffer);
     };
 }
 

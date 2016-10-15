@@ -3912,18 +3912,18 @@ namespace Ogre {
 	}
 #endif
 
-    void GLRenderSystem::_copyContentsToMemory(Viewport* src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
+    void GLRenderSystem::_copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox &dst, RenderWindow::FrameBuffer buffer)
     {
         GLenum format = GLPixelUtil::getGLOriginFormat(dst.format);
         GLenum type = GLPixelUtil::getGLOriginDataType(dst.format);
 
         if ((format == GL_NONE) || (type == 0))
         {
-            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format.", "GLXWindow::copyContentsToMemory" );
+            OGRE_EXCEPT(Exception::ERR_INVALIDPARAMS, "Unsupported format.", "GLRenderSystem::copyContentsToMemory" );
         }
 
         // Switch context if different from current one
-        _setViewport(src);
+        _setViewport(vp);
 
         if(dst.getWidth() != dst.rowPitch)
             glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
@@ -3932,9 +3932,9 @@ namespace Ogre {
 
         glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
 
-        uint32_t height = src->getTarget()->getHeight();
+        uint32_t height = vp->getTarget()->getHeight();
 
-        glReadPixels((GLint)0, (GLint)(height - dst.getHeight()),
+        glReadPixels((GLint)src.left, (GLint)(height - src.bottom),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
                      format, type, dst.getTopLeftFrontPixelPtr());
 
