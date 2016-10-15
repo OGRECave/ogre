@@ -145,6 +145,7 @@ namespace Ogre
             //ShadowNode passes may've overriden these settings.
             sceneManager->_setCurrentShadowNode( shadowNode, mDefinition->mShadowNodeRecalculation ==
                                                                                     SHADOW_NODE_REUSE );
+            sceneManager->_setCompositorTarget( mTargetTexture );
             mCamera->_notifyViewport( mViewport );
 
             //We need to restore the previous RT's update
