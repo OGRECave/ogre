@@ -765,10 +765,24 @@ namespace Ogre
 //        p0ToP1.normalise();
 //        Vector3 finalPos = p0ToP1 * p0ToP1.dotProduct( p0ToCam ) + mCollectedProbes[0]->mProbeCameraPos;
 
+        Vector3 finalPos = mCollectedProbes[0]->mProbeCameraPos;
+
+        if( mNumCollectedProbes > 1 )
+        {
+            //When mNumCollectedProbes = 2
+            //mProbeBlendFactors[0] is in range [0.5; 1] so we need to move it to range [0; 1]
+            //When mNumCollectedProbes = 3
+            //mProbeBlendFactors[0] is in range [0.333; 1] so we need to move it to range [0; 1]
+            //When mNumCollectedProbes = 4
+            //mProbeBlendFactors[0] is in range [0.25; 1] so we need to move it to range [0; 1]
+            finalPos = Math::lerp( mTrackedPosition, finalPos,
+                                   mProbeBlendFactors[0] * mNumCollectedProbes - Real(1.0) );
+        }
+
         //TODO: restrict mTrackedPosition to a region between the 4 probes.
         const Quaternion qRot( mCollectedProbes[0]->mOrientation );
-        //mBlendProxyCamera->setPosition( finalPos );
-        mBlendProxyCamera->setPosition( mTrackedPosition );
+        mBlendProxyCamera->setPosition( finalPos );
+        //mBlendProxyCamera->setPosition( mTrackedPosition );
         mBlendProxyCamera->setOrientation( qRot );
 
         if( !mManuallyActiveProbes.empty() )
@@ -834,19 +848,33 @@ namespace Ogre
 
         for( size_t i=1; i<mNumCollectedProbes; ++i )
         {
+            //When mNumCollectedProbes = 2
+            //mProbeBlendFactors[1] is in range [0; 0.5] so we need to move it to range [0; 1]
+            //When mNumCollectedProbes = 3
+            //mProbeBlendFactors[1] is in range [0.333; 0.5] so we need to move it to range [0; 1]
+            //mProbeBlendFactors[2] is in range [0; 0.333] so we need to move it to range [0; 1]
+            //When mNumCollectedProbes = 4
+            //mProbeBlendFactors[1] is in range [0.25; 0.5] so we need to move it to range [0; 1]
+            //mProbeBlendFactors[2] is in range [0.25; 0.333] so we need to move it to range [0; 1]
+            //mProbeBlendFactors[3] is in range [0; 0.25] so we need to move it to range [0; 1]
+            Real weight = mProbeBlendFactors[i] * (i+1);
+            if( i != mNumCollectedProbes - 1u )
+                weight -= Real(i+1) / (Real)mNumCollectedProbes;
+
             Aabb mergedProbe = mFinalProbe.mProbeShape;
             mergedProbe.merge( mCollectedProbes[i]->mProbeShape );
             Vector3 newMin = Math::lerp( mFinalProbe.mProbeShape.getMinimum(),
                                          mergedProbe.getMinimum(),
-                                         mProbeBlendFactors[i] );
+                                         weight * weight * weight );
             Vector3 newMax = Math::lerp( mFinalProbe.mProbeShape.getMaximum(),
                                          mergedProbe.getMaximum(),
-                                         mProbeBlendFactors[i] );
+                                         weight * weight * weight );
             mFinalProbe.mProbeShape.setExtents( newMin, newMax );
         }
 
-        if( mNumCollectedProbes > 1 )
-            mFinalProbe.mProbeCameraPos = mBlendProxyCamera->getPosition();
+        //Warning to other devs: Don't mess with mFinalProbe.mProbeCameraPos here.
+        //Change mBlendProxyCamera->setPosition instead in updateSceneGraph.
+        mFinalProbe.mProbeCameraPos = mBlendProxyCamera->getPosition();
 
         if( mNumCollectedProbes == 1u )
             mCopyWorkspace->_update();

@@ -232,6 +232,7 @@ namespace Ogre
         mOrientation        = orientation;
         mInvOrientation     = mOrientation.Inverse();
         mProbeShape         = probeShape;
+        mProbeShape.mHalfSize *= 1.005; //Add some padding.
 
         mAreaInnerRegion.makeCeil( Vector3::ZERO );
         mAreaInnerRegion.makeFloor( Vector3::UNIT_SCALE );
