@@ -113,8 +113,12 @@ namespace Ogre
         @param isStatic
             Set to False if it should be updated every frame. True if only updated when dirty
         @param fsaa
+        @param useManual
+            Set to true if you plan on using thie probe for manually rendering, so we keep
+            mipmaps at the probe level. User is responsible for supplying a workspace
+            definition that will generate mipmaps though!
         */
-        void setTextureParams( uint32 width, uint32 height,
+        void setTextureParams( uint32 width, uint32 height, bool useManual=false,
                                PixelFormat pf=PF_A8B8G8R8, bool isStatic=true, uint8 fsaa=0 );
 
         /** Initializes the workspace so we can actually render to the cubemap.

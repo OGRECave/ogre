@@ -84,7 +84,7 @@ namespace Demo
 
         //Probe 00
         probe = mParallaxCorrectedCubemap->createProbe();
-        probe->setTextureParams( 1024, 1024 );
+        probe->setTextureParams( 1024, 1024, true );
         probe->initWorkspace();
 
         probeCenter = Ogre::Vector3( -0.0, 1.799999, 0.232415 );
@@ -97,7 +97,7 @@ namespace Demo
 
         //Probe 01
         probe = mParallaxCorrectedCubemap->createProbe();
-        probe->setTextureParams( 1024, 1024 );
+        probe->setTextureParams( 1024, 1024, true );
         probe->initWorkspace();
 
         probeCenter = Ogre::Vector3( -5.232418, 1.799997, 18.313454 );
@@ -110,7 +110,7 @@ namespace Demo
 
         //Probe 02
         probe = mParallaxCorrectedCubemap->createProbe();
-        probe->setTextureParams( 1024, 1024 );
+        probe->setTextureParams( 1024, 1024, true );
         probe->initWorkspace();
 
         probeCenter = Ogre::Vector3( 3.767576, 1.799997, 20.84387 );
@@ -123,7 +123,7 @@ namespace Demo
 
         //Probe 03
         probe = mParallaxCorrectedCubemap->createProbe();
-        probe->setTextureParams( 1024, 1024 );
+        probe->setTextureParams( 1024, 1024, true );
         probe->initWorkspace();
 
         probeCenter = Ogre::Vector3( -2.565753, 1.799996, 20.929661 );
@@ -276,6 +276,9 @@ namespace Demo
     //-----------------------------------------------------------------------------------
     void LocalCubemapsManualProbesGameState::destroyScene(void)
     {
+        for( int i=0; i<4*4; ++i )
+            mMaterials[i]->setCubemapProbe( 0 );
+
         Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
         assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
         Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
@@ -336,13 +339,13 @@ namespace Demo
         if( arg.keysym.sym == SDLK_F2 )
         {
             float roughness = mMaterials[0]->getRoughness();
-            for( int i=0; i<4; ++i )
+            for( int i=0; i<4*4; ++i )
                 mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness - 0.1f, 0.02f, 1.0f ) );
         }
         else if( arg.keysym.sym == SDLK_F3 )
         {
             float roughness = mMaterials[0]->getRoughness();
-            for( int i=0; i<4; ++i )
+            for( int i=0; i<4*4; ++i )
                 mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness + 0.1f, 0.02f, 1.0f ) );
         }
         /*else if( arg.keysym.sym == SDLK_F4 )

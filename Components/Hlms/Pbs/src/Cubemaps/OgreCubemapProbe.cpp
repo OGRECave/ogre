@@ -46,7 +46,7 @@ THE SOFTWARE.
 #include "Vao/OgreConstBufferPacked.h"
 
 //Disable as OpenGL version of copyToTexture is super slow (makes a GPU->CPU->GPU roundtrip)
-#define USE_RTT_DIRECTLY 0
+#define USE_RTT_DIRECTLY 1
 
 namespace Ogre
 {
@@ -90,6 +90,7 @@ namespace Ogre
             SceneManager *sceneManager = mCreator->getSceneManager();
             VaoManager *vaoManager = sceneManager->getDestinationRenderSystem()->getVaoManager();
             vaoManager->destroyConstBuffer( mConstBufferForManualProbes );
+            mConstBufferForManualProbes = 0;
             mCreator->_removeManuallyActiveProbe( this );
         }
     }
@@ -98,7 +99,7 @@ namespace Ogre
     {
         if( mWorkspace )
         {
-#if USE_RTT_DIRECTLY
+#if !USE_RTT_DIRECTLY
             if( mStatic )
             {
                 const CompositorChannel &channel = mWorkspace->getExternalRenderTargets()[0];
@@ -122,8 +123,8 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void CubemapProbe::setTextureParams( uint32 width, uint32 height, PixelFormat pf,
-                                         bool isStatic, uint8 fsaa )
+    void CubemapProbe::setTextureParams( uint32 width, uint32 height, bool useManual,
+                                         PixelFormat pf, bool isStatic, uint8 fsaa )
     {
         float cameraNear = 0.5;
         float cameraFar = 1000;
@@ -142,25 +143,33 @@ namespace Ogre
         LwString texName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
         texName.a( "CubemapProbe_", Id::generateNewId<CubemapProbe>() );
 
-#if USE_RTT_DIRECTLY
+#if !USE_RTT_DIRECTLY
         const uint32 flags = isStatic ? TU_STATIC_WRITE_ONLY : (TU_RENDERTARGET|TU_AUTOMIPMAP);
 #else
     #if GENERATE_MIPMAPS_ON_BLEND
-        const uint32 flags = TU_RENDERTARGET;
+        uint32 flags = TU_RENDERTARGET;
     #else
         const uint32 flags = TU_RENDERTARGET|TU_AUTOMIPMAP;
     #endif
 #endif
+
+#if GENERATE_MIPMAPS_ON_BLEND
+        uint numMips = 0;
+        if( useManual )
+        {
+            numMips = PixelUtil::getMaxMipmapCount( width, height, 1 );
+            flags |= TU_AUTOMIPMAP;
+        }
+#else
+        const uint numMips = PixelUtil::getMaxMipmapCount( width, height, 1 );
+#endif
+
         mFsaa = fsaa;
         fsaa = isStatic ? 0 : fsaa;
+
         mTexture = TextureManager::getSingleton().createManual(
                     texName.c_str(), ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                    TEX_TYPE_CUBE_MAP, width, height,
-            #if GENERATE_MIPMAPS_ON_BLEND
-                    0,
-            #else
-                    PixelUtil::getMaxMipmapCount( width, height, 1 ),
-            #endif
+                    TEX_TYPE_CUBE_MAP, width, height, numMips,
                     pf, flags, 0, true, fsaa );
         mStatic = isStatic;
         mDirty = true;
@@ -193,7 +202,7 @@ namespace Ogre
         TexturePtr rtt = mTexture;
         if( mStatic )
         {
-#if USE_RTT_DIRECTLY
+#if !USE_RTT_DIRECTLY
             //Grab tmp texture
             rtt = mCreator->findTmpRtt( mTexture );
 #endif
@@ -252,7 +261,7 @@ namespace Ogre
     {
         if( mStatic != isStatic && !mTexture.isNull() )
         {
-            setTextureParams( mTexture->getWidth(), mTexture->getHeight(),
+            setTextureParams( mTexture->getWidth(), mTexture->getHeight(), mTexture->getNumMipmaps() > 0,
                               mTexture->getFormat(), isStatic, mTexture->getFSAA() );
         }
         else
@@ -294,7 +303,7 @@ namespace Ogre
 
         if( mStatic )
         {
-#if USE_RTT_DIRECTLY
+#if !USE_RTT_DIRECTLY
             //Copy from tmp RTT to real texture.
             const CompositorChannel &channel = mWorkspace->getExternalRenderTargets()[0];
             channel.textures[0]->copyToTexture( mTexture );
@@ -330,6 +339,7 @@ namespace Ogre
                 SceneManager *sceneManager = mCreator->getSceneManager();
                 VaoManager *vaoManager = sceneManager->getDestinationRenderSystem()->getVaoManager();
                 vaoManager->destroyConstBuffer( mConstBufferForManualProbes );
+                mConstBufferForManualProbes = 0;
                 mCreator->_removeManuallyActiveProbe( this );
             }
         }
