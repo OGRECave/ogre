@@ -533,8 +533,7 @@ namespace Ogre {
     private:
             static GLES2ManagedResourceManager* mResourceManager;
 #endif
-            void _copyContentsToMemory(Viewport* src, const PixelBox& dst,
-                                       RenderWindow::FrameBuffer buffer);
+            void _copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox& dst, RenderWindow::FrameBuffer buffer);
     };
 }
 
