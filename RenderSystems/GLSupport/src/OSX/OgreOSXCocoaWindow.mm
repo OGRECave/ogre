@@ -468,7 +468,7 @@ namespace Ogre {
         }
         
         static_cast<GLRenderSystemCommon*>(Root::getSingleton().getRenderSystem())
-                ->_copyContentsToMemory(getViewport(0), dst, buffer);
+                ->_copyContentsToMemory(getViewport(0), src, dst, buffer);
     }
 
     float CocoaWindow::getViewPointToPixelScale()

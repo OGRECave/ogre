@@ -40,7 +40,7 @@ namespace Ogre {
         virtual ~GLRenderSystemCommon() {}
 
         /** @copydoc RenderTarget::copyContentsToMemory */
-        virtual void _copyContentsToMemory(Viewport* src, const PixelBox& dst,
+        virtual void _copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox& dst,
                                            RenderWindow::FrameBuffer buffer) = 0;
 
         /** Returns the main context */

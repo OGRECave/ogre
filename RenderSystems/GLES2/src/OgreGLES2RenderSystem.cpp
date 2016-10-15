@@ -2432,7 +2432,7 @@ namespace Ogre {
         }
     }
 
-    void GLES2RenderSystem::_copyContentsToMemory(Viewport* src, const PixelBox& dst,
+    void GLES2RenderSystem::_copyContentsToMemory(Viewport* vp, const Box& src, const PixelBox& dst,
                                                   RenderWindow::FrameBuffer buffer) {
         GLenum format = GLES2PixelUtil::getGLOriginFormat(dst.format);
         GLenum type = GLES2PixelUtil::getGLOriginDataType(dst.format);
@@ -2444,9 +2444,13 @@ namespace Ogre {
                 "GLES2RenderSystem::_copyContentsToMemory" );
         }
 
+#if OGRE_NO_GLES3_SUPPORT == 1
+        /* TODO: check for GL_NV_pack_subimage availability */
+        OgreAssert(dst.getWidth() == dst.rowPitch, "GLES2 does not support GL_PACK_ROW_LENGTH");
+#endif
 
         // Switch context if different from current one
-        _setViewport(src);
+        _setViewport(vp);
 
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
@@ -2460,9 +2464,9 @@ namespace Ogre {
 #if OGRE_NO_GLES3_SUPPORT == 0
         glReadBuffer((buffer == RenderWindow::FB_FRONT)? GL_FRONT : GL_BACK);
 #endif
-        uint32_t height = src->getTarget()->getHeight();
+        uint32_t height = vp->getTarget()->getHeight();
 
-        glReadPixels((GLint)0, (GLint)(height - dst.getHeight()),
+        glReadPixels((GLint)src.left, (GLint)(height - src.bottom),
                      (GLsizei)dst.getWidth(), (GLsizei)dst.getHeight(),
                      format, type, dst.getTopLeftFrontPixelPtr());
 
