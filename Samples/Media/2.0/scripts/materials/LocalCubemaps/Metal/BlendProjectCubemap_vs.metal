@@ -15,7 +15,8 @@ struct PS_INPUT
 struct Params
 {
 	float4x4 worldViewProj;
-	float4x4 localToProbeLocal;
+	float3x4 worldScaledMatrix;
+	float3 probeCameraPosScaled;
 };
 
 vertex PS_INPUT main_metal
@@ -27,8 +28,9 @@ vertex PS_INPUT main_metal
 	PS_INPUT outVs;
 
 	outVs.gl_Position	= ( p.worldViewProj * float4( input.position.xyz, 1.0 ) ).xyzw;
-	outVs.posLS			= ( p.localToProbeLocal * float4( input.position.xyz, 1.0 ) ).xyz;
-	outVs.posLS.z = -outVs.posLS.z; //Left handed
+	outVs.posLS			= ( float4( input.position.xyz, 1.0 ) * p.worldScaledMatrix ).xyz;
+	outVs.posLS			= outVs.posLS - p.probeCameraPosScaled;
+	outVs.posLS.z		= -outVs.posLS.z; //Left handed
 
 	return outVs;
 }

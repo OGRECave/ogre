@@ -737,31 +737,19 @@ namespace Ogre
             mProxyNodes[i]->setOrientation( qRot );
             mProxyItems[i]->setVisible( i < mNumCollectedProbes );
 
-            Matrix4 localToProbeLocal( mCollectedProbes[0]->mOrientation * mCollectedProbes[i]->mInvOrientation );
+            //Divide by maxComponent to get better precision in the GPU.
             const Real maxComponent = Ogre::max( mCollectedProbes[i]->mProbeShape.mHalfSize.x,
                                                  Ogre::max(
                                                      mCollectedProbes[i]->mProbeShape.mHalfSize.y,
                                                      mCollectedProbes[i]->mProbeShape.mHalfSize.z ) );
-            const Vector3 scaleRatio = mCollectedProbes[i]->mProbeShape.mHalfSize / maxComponent;
+            Matrix4 worldScaledMatrix;
+            worldScaledMatrix.makeTransform( mCollectedProbes[i]->mProbeShape.mCenter / maxComponent,
+                                             mCollectedProbes[i]->mProbeShape.mHalfSize / maxComponent,
+                                             mCollectedProbes[i]->mOrientation );
+            const Vector3 probeCameraPosScaled = mCollectedProbes[i]->mProbeCameraPos / maxComponent;
 
-            localToProbeLocal[0][0] *= scaleRatio.x;
-            localToProbeLocal[1][0] *= scaleRatio.x;
-            localToProbeLocal[2][0] *= scaleRatio.x;
-
-            localToProbeLocal[0][1] *= scaleRatio.y;
-            localToProbeLocal[1][1] *= scaleRatio.y;
-            localToProbeLocal[2][1] *= scaleRatio.y;
-
-            localToProbeLocal[0][1] *= scaleRatio.z;
-            localToProbeLocal[1][1] *= scaleRatio.z;
-            localToProbeLocal[2][1] *= scaleRatio.z;
-
-            Vector3 translation = mCollectedProbes[i]->mInvOrientation *
-                    (mCollectedProbes[i]->mProbeShape.mCenter - mCollectedProbes[i]->mProbeCameraPos);
-            translation /= mCollectedProbes[i]->mProbeShape.mHalfSize;
-            localToProbeLocal.setTrans( translation );
-
-            mBlendCubemapParamsVs[i]->setNamedConstant( "localToProbeLocal", localToProbeLocal );
+            mBlendCubemapParamsVs[i]->setNamedConstant( "worldScaledMatrix", worldScaledMatrix[0], 3 );
+            mBlendCubemapParamsVs[i]->setNamedConstant( "probeCameraPosScaled", probeCameraPosScaled );
             mBlendCubemapParams[i]->setNamedConstant( "weight", mProbeBlendFactors[i] );
 
             const bool requiresTrilinear = mCollectedProbes[i]->mTexture->getNumMipmaps() !=
@@ -843,6 +831,19 @@ namespace Ogre
         }
 
         setFinalProbeTo( 0 );
+
+        for( size_t i=1; i<mNumCollectedProbes; ++i )
+        {
+            Aabb mergedProbe = mFinalProbe.mProbeShape;
+            mergedProbe.merge( mCollectedProbes[i]->mProbeShape );
+            Vector3 newMin = Math::lerp( mFinalProbe.mProbeShape.getMinimum(),
+                                         mergedProbe.getMinimum(),
+                                         mProbeBlendFactors[i] );
+            Vector3 newMax = Math::lerp( mFinalProbe.mProbeShape.getMaximum(),
+                                         mergedProbe.getMaximum(),
+                                         mProbeBlendFactors[i] );
+            mFinalProbe.mProbeShape.setExtents( newMin, newMax );
+        }
 
         if( mNumCollectedProbes > 1 )
             mFinalProbe.mProbeCameraPos = mBlendProxyCamera->getPosition();

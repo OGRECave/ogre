@@ -232,6 +232,19 @@ namespace Ogre
         areaLocalToShape.mCenter = mInvOrientation * areaLocalToShape.mCenter;
         areaLocalToShape.mCenter += mProbeShape.mCenter;
 
+        if( !mProbeShape.contains( mArea ) )
+        {
+            LogManager::getSingleton().logMessage(
+                        "WARNING: Area must be fully inside probe's shape otherwise "
+                        "artifacts appear. Forcing area to be inside probe" );
+            Vector3 vMin = mArea.getMinimum() * 0.98f;
+            Vector3 vMax = mArea.getMaximum() * 0.98f;
+
+            vMin.makeCeil( mProbeShape.getMinimum() );
+            vMax.makeFloor( mProbeShape.getMaximum() );
+            mArea.setExtents( vMin, vMax );
+        }
+
         mDirty = true;
     }
     //-----------------------------------------------------------------------------------
