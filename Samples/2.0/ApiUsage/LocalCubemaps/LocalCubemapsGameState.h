@@ -22,10 +22,13 @@ namespace Demo
         Ogre::ParallaxCorrectedCubemap  *mParallaxCorrectedCubemap;
         Ogre::HlmsPbsDatablock          *mMaterials[4];
         bool                            mUseMultipleProbes;
+        bool                            mRegenerateProbes;
+        bool                            mRoughnessDirty;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
         void setupParallaxCorrectCubemaps(void);
+        void forceUpdateAllProbes(void);
 
     public:
         LocalCubemapsGameState( const Ogre::String &helpDescription );

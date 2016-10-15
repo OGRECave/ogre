@@ -40,7 +40,9 @@ namespace Demo
     LocalCubemapsGameState::LocalCubemapsGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mParallaxCorrectedCubemap( 0 ),
-        mUseMultipleProbes( true )
+        mUseMultipleProbes( true ),
+        mRegenerateProbes( true ),
+        mRoughnessDirty( false )
     {
         memset( mMaterials, 0, sizeof(mMaterials) );
     }
@@ -114,6 +116,23 @@ namespace Demo
         }
 
         hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
+    }
+    //-----------------------------------------------------------------------------------
+    void LocalCubemapsGameState::forceUpdateAllProbes(void)
+    {
+        const Ogre::CubemapProbeVec &probes = mParallaxCorrectedCubemap->getProbes();
+
+        Ogre::CubemapProbeVec::const_iterator itor = probes.begin();
+        Ogre::CubemapProbeVec::const_iterator end  = probes.end();
+
+        while( itor != end )
+        {
+            (*itor)->mDirty = true;
+            ++itor;
+        }
+
+        mParallaxCorrectedCubemap->updateAllDirtyProbes();
+        mRoughnessDirty = false;
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsGameState::createScene01(void)
@@ -282,7 +301,9 @@ namespace Demo
         TutorialGameState::generateDebugText( timeSinceLast, outText );
         outText += "\nPress F2/F3 to adjust material roughness: ";
         outText += roughnessStr.c_str();
-        outText += "\nPress F4 to toggle number of probes. Num probes: ";
+        outText += "\nPress F5 to regenerate probes when adjusting roughness: ";
+        outText += mRegenerateProbes ? "[Slow & Accurate]" : "[Fast]";
+        outText += "\nPress F6 to toggle number of probes. Num probes: ";
         outText += mUseMultipleProbes ? "3" : "1";
         outText += "\nProbes blending: ";
         outText += Ogre::StringConverter::toString( mParallaxCorrectedCubemap->getNumCollectedProbes() );
@@ -307,14 +328,28 @@ namespace Demo
             float roughness = mMaterials[0]->getRoughness();
             for( int i=0; i<4; ++i )
                 mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness - 0.1f, 0.02f, 1.0f ) );
+
+            mRoughnessDirty = true;
+            if( mRegenerateProbes )
+                forceUpdateAllProbes();
         }
         else if( arg.keysym.sym == SDLK_F3 )
         {
             float roughness = mMaterials[0]->getRoughness();
             for( int i=0; i<4; ++i )
                 mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness + 0.1f, 0.02f, 1.0f ) );
+
+            mRoughnessDirty = true;
+            if( mRegenerateProbes )
+                forceUpdateAllProbes();
         }
-        else if( arg.keysym.sym == SDLK_F4 )
+        else if( arg.keysym.sym == SDLK_F5 )
+        {
+            mRegenerateProbes = !mRegenerateProbes;
+            if( mRegenerateProbes && mRoughnessDirty )
+                forceUpdateAllProbes();
+        }
+        else if( arg.keysym.sym == SDLK_F6 )
         {
             mUseMultipleProbes = !mUseMultipleProbes;
             setupParallaxCorrectCubemaps();
