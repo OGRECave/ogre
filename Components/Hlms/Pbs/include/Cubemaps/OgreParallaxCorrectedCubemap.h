@@ -59,6 +59,8 @@ namespace Ogre
         size_t          mLastPassNumViewMatrices;
         Matrix4         mCachedLastViewMatrix;
 
+        bool            mBlendedProbeNeedsUpdate;
+
         public: bool                    mPaused;
         /// This variable should be updated every frame and often represents the camera position,
         /// but it can also be used set to other things like the player's character position.

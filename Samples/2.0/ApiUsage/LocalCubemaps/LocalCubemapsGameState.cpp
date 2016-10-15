@@ -353,12 +353,6 @@ namespace Demo
         {
             mUseMultipleProbes = !mUseMultipleProbes;
             setupParallaxCorrectCubemaps();
-            for( int i=0; i<4; ++i )
-            {
-                mMaterials[i]->setTexture( Ogre::PBSM_REFLECTION, 0,
-                                           mParallaxCorrectedCubemap->getBlendCubemap() );
-            }
-
             mParallaxCorrectedCubemap->updateAllDirtyProbes();
         }
         else

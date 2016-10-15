@@ -77,6 +77,7 @@ namespace Ogre
         mStagingBuffer( 0 ),
         mLastPassNumViewMatrices( 1 ),
         mCachedLastViewMatrix( Matrix4::ZERO ),
+        mBlendedProbeNeedsUpdate( true ),
         mPaused( false ),
         mTrackedPosition( Vector3::ZERO ),
         mMask( 0xffffffff ),
@@ -633,6 +634,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateSceneGraph(void)
     {
+        const uint32 prevNumCollectedProbes = mNumCollectedProbes;
+        const CubemapProbe *prevProbe = mCollectedProbes[0];
+
         mCurrentMip = 0;
 
         for( int i=0; i<OGRE_MAX_CUBE_PROBES; ++i )
@@ -785,6 +789,11 @@ namespace Ogre
         //mBlendProxyCamera->setPosition( mTrackedPosition );
         mBlendProxyCamera->setOrientation( qRot );
 
+        mBlendedProbeNeedsUpdate = !(prevNumCollectedProbes <= 1 &&
+                                     mNumCollectedProbes <= 1 &&
+                                     prevNumCollectedProbes == mNumCollectedProbes &&
+                                     mCollectedProbes[0] == prevProbe);
+
         if( !mManuallyActiveProbes.empty() )
             checkStagingBufferIsBigEnough();
     }
@@ -876,10 +885,13 @@ namespace Ogre
         //Change mBlendProxyCamera->setPosition instead in updateSceneGraph.
         mFinalProbe.mProbeCameraPos = mBlendProxyCamera->getPosition();
 
-        if( mNumCollectedProbes == 1u )
-            mCopyWorkspace->_update();
-        else if( mNumCollectedProbes > 1u )
-            mBlendWorkspace->_update();
+        if( mBlendedProbeNeedsUpdate )
+        {
+            if( mNumCollectedProbes == 1u )
+                mCopyWorkspace->_update();
+            else if( mNumCollectedProbes > 1u )
+                mBlendWorkspace->_update();
+        }
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateAllDirtyProbes(void)
