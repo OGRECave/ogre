@@ -264,13 +264,9 @@ namespace Demo
 
         TutorialGameState::createScene01();
 
-        for( int i=0; i<4; ++i )
-        {
-            for( int j=0; j<4; ++j )
-            {
-                mMaterials[i*4+j]->setCubemapProbe( mParallaxCorrectedCubemap->getProbes()[j] );
-            }
-        }
+        const Ogre::CubemapProbeVec &probes = mParallaxCorrectedCubemap->getProbes();
+        for( int i=0; i<4*4; ++i )
+            mMaterials[i]->setCubemapProbe( probes[i%4] );
         mParallaxCorrectedCubemap->updateAllDirtyProbes();
     }
     //-----------------------------------------------------------------------------------
@@ -316,8 +312,8 @@ namespace Demo
         TutorialGameState::generateDebugText( timeSinceLast, outText );
         outText += "\nPress F2/F3 to adjust material roughness: ";
         outText += roughnessStr.c_str();
-        outText += "\nPress F4 to toggle number of probes. Num probes: ";
-        //outText += mUseMultipleProbes ? "3" : "1";
+        outText += "\nPress F4 to toggle mode. ";
+        outText += mMaterials[0]->getCubemapProbe() == 0 ? "[Auto]" : "[Manual]";
         outText += "\nProbes blending: ";
         outText += Ogre::StringConverter::toString( mParallaxCorrectedCubemap->getNumCollectedProbes() );
 
@@ -348,18 +344,17 @@ namespace Demo
             for( int i=0; i<4*4; ++i )
                 mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness + 0.1f, 0.02f, 1.0f ) );
         }
-        /*else if( arg.keysym.sym == SDLK_F4 )
+        else if( arg.keysym.sym == SDLK_F4 )
         {
-            mUseMultipleProbes = !mUseMultipleProbes;
-            setupParallaxCorrectCubemaps();
-            for( int i=0; i<4; ++i )
+            const Ogre::CubemapProbeVec &probes = mParallaxCorrectedCubemap->getProbes();
+            for( int i=0; i<4*4; ++i )
             {
-                mMaterials[i]->setTexture( Ogre::PBSM_REFLECTION, 0,
-                                           mParallaxCorrectedCubemap->getBlendCubemap() );
+                if( mMaterials[i]->getCubemapProbe() )
+                    mMaterials[i]->setCubemapProbe( 0 );
+                else
+                    mMaterials[i]->setCubemapProbe( probes[i%4] );
             }
-
-            mParallaxCorrectedCubemap->updateAllDirtyProbes();
-        }*/
+        }
         else
         {
             TutorialGameState::keyReleased( arg );
