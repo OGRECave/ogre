@@ -172,42 +172,39 @@ namespace Demo
             Ogre::HlmsBlendblock blendblock;
             Ogre::HlmsMacroblock macroblock;
 
-            Ogre::HlmsPbsDatablock *datablock;
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Red", "Red",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::Red );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
-            mMaterials[0] = datablock;
+            struct DemoMaterials
+            {
+                Ogre::String matName;
+                Ogre::ColourValue colour;
+            };
 
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Green", "Green",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::Green );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
-            mMaterials[1] = datablock;
+            DemoMaterials materials[4] =
+            {
+                { "Red", Ogre::ColourValue::Red },
+                { "Green", Ogre::ColourValue::Green },
+                { "Blue", Ogre::ColourValue::Blue },
+                { "Cream", Ogre::ColourValue::White },
+            };
 
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Blue", "Blue",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::Blue );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
-            mMaterials[2] = datablock;
+            for( int i=0; i<4; ++i )
+            {
+                for( int j=0; j<4; ++j )
+                {
+                    Ogre::String finalName = materials[i].matName + "_P" +
+                            Ogre::StringConverter::toString(j);
 
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Cream", "Cream",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::White );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.02 );
-            mMaterials[3] = datablock;
+                    Ogre::HlmsPbsDatablock *datablock;
+                    datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                                hlmsPbs->createDatablock( finalName, finalName,
+                                                          macroblock, blendblock,
+                                                          Ogre::HlmsParamVec() ) );
+                    datablock->setBackgroundDiffuse( materials[i].colour );
+                    datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
+                    datablock->setRoughness( 0.02 );
+                    //datablock->setCubemapProbe( mParallaxCorrectedCubemap->getProbes()[j] );
+                    mMaterials[i*4+j] = datablock;
+                }
+            }
         }
 
         generateScene( sceneManager );
@@ -267,6 +264,13 @@ namespace Demo
 
         TutorialGameState::createScene01();
 
+        for( int i=0; i<4; ++i )
+        {
+            for( int j=0; j<4; ++j )
+            {
+                mMaterials[i*4+j]->setCubemapProbe( mParallaxCorrectedCubemap->getProbes()[j] );
+            }
+        }
         mParallaxCorrectedCubemap->updateAllDirtyProbes();
     }
     //-----------------------------------------------------------------------------------

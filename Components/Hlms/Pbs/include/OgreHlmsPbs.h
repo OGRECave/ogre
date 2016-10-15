@@ -112,6 +112,8 @@ namespace Ogre
         TexBufferPacked         *mGridBuffer;
         TexBufferPacked         *mGlobalLightListBuffer;
 
+        uint32                  mTexUnitSlotStart;
+
         ConstBufferPool::BufferPool const *mLastBoundPool;
 
         uint32 mLastTextureHash;

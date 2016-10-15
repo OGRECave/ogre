@@ -20,7 +20,7 @@ namespace Demo
         Ogre::SceneNode     *mLightNodes[3];
 
         Ogre::ParallaxCorrectedCubemap  *mParallaxCorrectedCubemap;
-        Ogre::HlmsPbsDatablock          *mMaterials[4];
+        Ogre::HlmsPbsDatablock          *mMaterials[4*4];
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 

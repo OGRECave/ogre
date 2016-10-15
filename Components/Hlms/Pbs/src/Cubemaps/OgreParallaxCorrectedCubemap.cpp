@@ -879,7 +879,7 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::_notifyPreparePassHash( const Matrix4 &viewMatrix )
     {
-        if( !mManuallyActiveProbes.empty() && viewMatrix != mCachedLastViewMatrix)
+        if( !mManuallyActiveProbes.empty() && viewMatrix != mCachedLastViewMatrix )
         {
             Matrix3 invViewMat3;
             viewMatrix.extract3x3Matrix( invViewMat3 );

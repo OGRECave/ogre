@@ -13,7 +13,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Cream" );
+	item->setDatablock( "Cream_P2" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -25,7 +25,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Blue" );
+	item->setDatablock( "Blue_P1" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -37,7 +37,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Cream" );
+	item->setDatablock( "Cream_P0" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -49,7 +49,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 0.38268354535102844, 6.206565217325988e-08, 0.9238795042037964, 1.4983983476213325e-07 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Red" );
+	item->setDatablock( "Red_P2" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -61,7 +61,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Blue" );
+	item->setDatablock( "Blue_P2" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -73,7 +73,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Cream" );
+	item->setDatablock( "Cream_P2" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -85,7 +85,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Red" );
+	item->setDatablock( "Red_P2" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -97,7 +97,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Green" );
+	item->setDatablock( "Green_P2" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -109,7 +109,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Cream" );
+	item->setDatablock( "Cream_P3" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -121,7 +121,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Blue" );
+	item->setDatablock( "Blue_P1" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -133,7 +133,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Cream" );
+	item->setDatablock( "Cream_P1" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -145,7 +145,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Green" );
+	item->setDatablock( "Green_P0" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -157,7 +157,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Red" );
+	item->setDatablock( "Red_P0" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -169,7 +169,7 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Green" );
+	item->setDatablock( "Green_P0" );
 
 	item = sceneManager->createItem( "Cube_d.mesh",
 									 Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME,
@@ -181,5 +181,5 @@ void generateScene( Ogre::SceneManager *sceneManager )
 	sceneNode->setOrientation( 1.0, 0.0, 0.0, 0.0 );
 	sceneNode->attachObject( item );
 
-	item->setDatablock( "Red" );
+	item->setDatablock( "Red_P0" );
 }

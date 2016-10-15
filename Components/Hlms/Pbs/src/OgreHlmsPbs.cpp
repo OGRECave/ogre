@@ -205,6 +205,9 @@ namespace Ogre
         mCurrentShadowmapSamplerblock( 0 ),
         mParallaxCorrectedCubemap( 0 ),
         mCurrentPassBuffer( 0 ),
+        mGridBuffer( 0 ),
+        mGlobalLightListBuffer( 0 ),
+        mTexUnitSlotStart( 0 ),
         mLastBoundPool( 0 ),
         mLastTextureHash( 0 ),
         mShadowFilter( PCF_3x3 ),
@@ -814,7 +817,10 @@ namespace Ogre
             }
 
             if( mParallaxCorrectedCubemap )
+            {
+                mParallaxCorrectedCubemap->_notifyPreparePassHash( viewMatrix );
                 mapSize += mParallaxCorrectedCubemap->getConstBufferSize();
+            }
 
             //mat4 view + mat4 shadowRcv[numShadowMaps].texViewProj +
             //              vec2 shadowRcv[numShadowMaps].shadowDepthRange +
@@ -1157,6 +1163,12 @@ namespace Ogre
         else
             mCurrentShadowmapSamplerblock = mShadowmapCmpSamplerblock;
 
+        mTexUnitSlotStart = mPreparedPass.shadowMaps.size() + 1;
+        if( mGridBuffer )
+            mTexUnitSlotStart += 2;
+        if( mParallaxCorrectedCubemap )
+            mTexUnitSlotStart += 1;
+
         uploadDirtyDatablocks();
 
         return retVal;
@@ -1490,7 +1502,7 @@ namespace Ogre
             if( datablock->mTextureHash != mLastTextureHash )
             {
                 //Rebind textures
-                size_t texUnit = mPreparedPass.shadowMaps.size() + (!mGridBuffer ? 1 : 3);
+                size_t texUnit = mTexUnitSlotStart;
 
                 PbsBakedTextureArray::const_iterator itor = datablock->mBakedTextures.begin();
                 PbsBakedTextureArray::const_iterator end  = datablock->mBakedTextures.end();

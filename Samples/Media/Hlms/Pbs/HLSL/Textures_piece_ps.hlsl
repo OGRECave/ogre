@@ -1,18 +1,25 @@
 
 //Set the sampler starts. Note that 'padd' get calculated before _any_ 'add'
-@pset( textureRegShadowMapStart, 1 )
-@padd( textureRegStart, hlms_num_shadow_maps, 1 )
-@padd( envMapReg, textureRegStart, num_textures )
-
-@padd( samplerStateStart, hlms_num_shadow_maps, 1 )
-@pset( numSamplerStates, num_textures )
+@set( texUnit, 1 )
 
 @property( hlms_forward3d )
-	@add( textureRegStart, 2 )
-	@add( envMapReg, 2 )
-	@add( textureRegShadowMapStart, 2 )
-	@add( samplerStateStart, 2 )
+	@add( texUnit, 1 )
 @end
+
+@set( textureRegShadowMapStart, texUnit )
+@add( texUnit, hlms_num_shadow_maps )
+
+@property( parallax_correct_cubemaps )
+	@set( globaPccTexUnit, texUnit )
+	@add( texUnit, 1 )
+@end
+
+@set( textureRegStart, texUnit )
+@set( samplerStateStart, texUnit )
+@set( numSamplerStates, num_textures )
+@add( texUnit, num_textures )
+
+@set( envMapReg, texUnit )
 
 @property( (envprobe_map && envprobe_map != target_envprobe_map) || parallax_correct_cubemaps )
 	@set( use_envprobe_map, 1 )
@@ -23,8 +30,7 @@
 		@piece( pccProbeSource )passBuf.autoProbe@end
 		@set( use_parallax_correct_cubemaps, 1 )
 		/// Auto cubemap textures are set at the beginning. Manual cubemaps are the end.
-		@set( envMapReg, textureRegStart )
-		@add( textureRegStart, 1 )
+		@set( envMapReg, globaPccTexUnit )
 	@end
 	@property( envprobe_map && envprobe_map != target_envprobe_map && use_parallax_correct_cubemaps )
 		@piece( pccProbeSource )manualProbe@end
