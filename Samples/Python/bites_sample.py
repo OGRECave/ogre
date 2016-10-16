@@ -57,7 +57,7 @@ class SampleApp(OgreBites.ApplicationContext):
 
         self.camman = OgreBites.CameraMan(cam)
         self.camman.setStyle(OgreBites.CS_ORBIT)
-        cam.setPosition(0, 0, 15)
+        self.camman.setYawPitchDist(Ogre.Radian(0), Ogre.Radian(0.3), 15)
 
         vp = self.getRenderWindow().addViewport(cam)
         vp.setBackgroundColour(Ogre.ColourValue(.3, .3, .3))
