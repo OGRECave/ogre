@@ -525,91 +525,104 @@ namespace std
 
 //for stl container
 namespace Ogre
-{ 
-    template <typename T, typename A = STLAllocator<T, GeneralAllocPolicy> > 
-    struct deque 
-    { 
+{
 #if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
-        typedef typename std::deque<T, A> type;    
+    template <typename T, typename A = STLAllocator<T, GeneralAllocPolicy> >
+    struct deque
+    {
+        typedef typename std::deque<T, A> type;
         typedef typename std::deque<T, A>::iterator iterator;
         typedef typename std::deque<T, A>::const_iterator const_iterator;
-#else
-        typedef typename std::deque<T> type;
-        typedef typename std::deque<T>::iterator iterator;
-        typedef typename std::deque<T>::const_iterator const_iterator;
-#endif
-    }; 
+    };
 
-    template <typename T, typename A = STLAllocator<T, GeneralAllocPolicy> > 
-    struct vector 
-    { 
-#if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
+    template <typename T, typename A = STLAllocator<T, GeneralAllocPolicy> >
+    struct vector
+    {
         typedef typename std::vector<T, A> type;
         typedef typename std::vector<T, A>::iterator iterator;
         typedef typename std::vector<T, A>::const_iterator const_iterator;
-#else
-        typedef typename std::vector<T> type;
-        typedef typename std::vector<T>::iterator iterator;
-        typedef typename std::vector<T>::const_iterator const_iterator;
-#endif
-    }; 
+    };
 
-    template <typename T, typename A = STLAllocator<T, GeneralAllocPolicy> > 
-    struct list 
-    { 
-#if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
+    template <typename T, typename A = STLAllocator<T, GeneralAllocPolicy> >
+    struct list
+    {
         typedef typename std::list<T, A> type;
         typedef typename std::list<T, A>::iterator iterator;
         typedef typename std::list<T, A>::const_iterator const_iterator;
-#else
-        typedef typename std::list<T> type;
-        typedef typename std::list<T>::iterator iterator;
-        typedef typename std::list<T>::const_iterator const_iterator;
-#endif
-    }; 
+    };
 
-    template <typename T, typename P = std::less<T>, typename A = STLAllocator<T, GeneralAllocPolicy> > 
-    struct set 
-    { 
-#if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
+    template <typename T, typename P = std::less<T>, typename A = STLAllocator<T, GeneralAllocPolicy> >
+    struct set
+    {
         typedef typename std::set<T, P, A> type;
         typedef typename std::set<T, P, A>::iterator iterator;
         typedef typename std::set<T, P, A>::const_iterator const_iterator;
-#else
-        typedef typename std::set<T, P> type;
-        typedef typename std::set<T, P>::iterator iterator;
-        typedef typename std::set<T, P>::const_iterator const_iterator;
-#endif
-    }; 
+    };
 
-    template <typename K, typename V, typename P = std::less<K>, typename A = STLAllocator<std::pair<const K, V>, GeneralAllocPolicy> > 
-    struct map 
-    { 
-#if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
+    template <typename K, typename V, typename P = std::less<K>, typename A = STLAllocator<std::pair<const K, V>, GeneralAllocPolicy> >
+    struct map
+    {
         typedef typename std::map<K, V, P, A> type;
         typedef typename std::map<K, V, P, A>::iterator iterator;
         typedef typename std::map<K, V, P, A>::const_iterator const_iterator;
-#else
-        typedef typename std::map<K, V, P> type;
-        typedef typename std::map<K, V, P>::iterator iterator;
-        typedef typename std::map<K, V, P>::const_iterator const_iterator;
-#endif
-    }; 
+    };
 
-    template <typename K, typename V, typename P = std::less<K>, typename A = STLAllocator<std::pair<const K, V>, GeneralAllocPolicy> > 
-    struct multimap 
-    { 
-#if OGRE_CONTAINERS_USE_CUSTOM_MEMORY_ALLOCATOR
+    template <typename K, typename V, typename P = std::less<K>, typename A = STLAllocator<std::pair<const K, V>, GeneralAllocPolicy> >
+    struct multimap
+    {
         typedef typename std::multimap<K, V, P, A> type;
         typedef typename std::multimap<K, V, P, A>::iterator iterator;
         typedef typename std::multimap<K, V, P, A>::const_iterator const_iterator;
+    };
 #else
+    template <typename T>
+    struct deque 
+    { 
+        typedef typename std::deque<T> type;
+        typedef typename std::deque<T>::iterator iterator;
+        typedef typename std::deque<T>::const_iterator const_iterator;
+    };
+
+    template <typename T>
+    struct vector 
+    { 
+        typedef typename std::vector<T> type;
+        typedef typename std::vector<T>::iterator iterator;
+        typedef typename std::vector<T>::const_iterator const_iterator;
+    };
+
+    template <typename T>
+    struct list 
+    { 
+        typedef typename std::list<T> type;
+        typedef typename std::list<T>::iterator iterator;
+        typedef typename std::list<T>::const_iterator const_iterator;
+    };
+
+    template <typename T, typename P = std::less<T> >
+    struct set 
+    { 
+        typedef typename std::set<T, P> type;
+        typedef typename std::set<T, P>::iterator iterator;
+        typedef typename std::set<T, P>::const_iterator const_iterator;
+    };
+
+    template <typename K, typename V, typename P = std::less<K> >
+    struct map 
+    { 
+        typedef typename std::map<K, V, P> type;
+        typedef typename std::map<K, V, P>::iterator iterator;
+        typedef typename std::map<K, V, P>::const_iterator const_iterator;
+    };
+
+    template <typename K, typename V, typename P = std::less<K> >
+    struct multimap 
+    { 
         typedef typename std::multimap<K, V, P> type;
         typedef typename std::multimap<K, V, P>::iterator iterator;
         typedef typename std::multimap<K, V, P>::const_iterator const_iterator;
+    };
 #endif
-    }; 
-
 } // Ogre
 
 #endif // __OgrePrerequisites_H__
