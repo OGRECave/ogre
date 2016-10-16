@@ -57,7 +57,6 @@
 %include "OgrePlatform.h"
 %include "OgreConfig.h"
 %include "OgreMemoryAllocatorConfig.h"
-%include "OgreMemorySTLAllocator.h"
 %include "OgreCommon.h"
 // Basic Data Types
 %include "OgreException.h"
@@ -65,6 +64,7 @@
 %include "OgreSharedPtr.h"
 %include "OgreAny.h"
 %include "OgreIteratorWrapper.h"
+%include "OgreMath.h"
 //%include "OgreStringVector.h"
 // the original definitions confuses SWIG by typedeffing to std inside a struct
 namespace Ogre {
