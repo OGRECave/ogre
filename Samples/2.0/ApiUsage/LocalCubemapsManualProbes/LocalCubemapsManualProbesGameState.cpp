@@ -264,10 +264,14 @@ namespace Demo
 
         TutorialGameState::createScene01();
 
+        mParallaxCorrectedCubemap->updateAllDirtyProbes();
+
+        //Updates the probe after assigning the manual ones, as results will be different.
+        //Whether they look better or worse depends on how good you've subdivided the
+        //scene and assigned the manual probes.
         const Ogre::CubemapProbeVec &probes = mParallaxCorrectedCubemap->getProbes();
         for( int i=0; i<4*4; ++i )
             mMaterials[i]->setCubemapProbe( probes[i%4] );
-        mParallaxCorrectedCubemap->updateAllDirtyProbes();
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsManualProbesGameState::destroyScene(void)
