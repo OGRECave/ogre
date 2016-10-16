@@ -400,7 +400,7 @@ namespace Ogre
                     {
                         CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>
                                                                 ( targetDef->addPass( PASS_CLEAR ) );
-                        passClear->mColourValue      = Ogre::ColourValue::Black;
+                        passClear->mColourValue      = ColourValue::Black;
                         passClear->mClearBufferFlags = FBT_COLOUR;
                     }
                     {
@@ -450,7 +450,7 @@ namespace Ogre
                     {
                         CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>
                                                                 ( targetDef->addPass( PASS_CLEAR ) );
-                        passClear->mColourValue      = Ogre::ColourValue::Black;
+                        passClear->mColourValue      = ColourValue::Black;
                         passClear->mClearBufferFlags = FBT_COLOUR;
                     }
                     {
@@ -467,6 +467,31 @@ namespace Ogre
                         targetDef->addPass( PASS_MIPMAP );
                     }
 #endif
+                }
+            }
+
+            workDef = compositorManager->addWorkspaceDefinition( workspaceName );
+            workDef->connectExternal( 0, nodeDef->getName(), 0 );
+
+
+            //Create clear workspace definition (to clear dirty probes)
+            workspaceName = "AutoGen_ParallaxCorrectedCubemapClear_Workspace";
+            nodeDef = compositorManager->addNodeDefinition(
+                        "AutoGen_ParallaxCorrectedCubemapClear_Node" );
+            //Input texture
+            nodeDef->addTextureSourceName( "ProbeRT", 0, TextureDefinitionBase::TEXTURE_INPUT );
+            nodeDef->setNumTargetPass( 6 );
+
+            for( uint32 i=0; i<6; ++i )
+            {
+                CompositorTargetDef *targetDef = nodeDef->addTargetPass( "ProbeRT", i );
+                targetDef->setNumPasses( 1 );
+                {
+                    {
+                        CompositorPassClearDef *passClear = static_cast<CompositorPassClearDef*>
+                                                                ( targetDef->addPass( PASS_CLEAR ) );
+                        passClear->mColourValue = ColourValue::Black;
+                    }
                 }
             }
 
@@ -792,7 +817,7 @@ namespace Ogre
         mBlendedProbeNeedsUpdate = !(prevNumCollectedProbes <= 1 &&
                                      mNumCollectedProbes <= 1 &&
                                      prevNumCollectedProbes == mNumCollectedProbes &&
-                                     mCollectedProbes[0] == prevProbe);
+                                     mCollectedProbes[0] == prevProbe );
 
         if( !mManuallyActiveProbes.empty() )
             checkStagingBufferIsBigEnough();
@@ -814,6 +839,8 @@ namespace Ogre
                 {
                     renderSystem->_beginFrameOnce();
                     mCopyWorkspace->_beginUpdate( true );
+                        if( j == 0 )
+                            mCollectedProbes[i]->_clearCubemap();
                         mCopyWorkspace->_update();
                         mCollectedProbes[i]->_updateRender();
                     mCopyWorkspace->_endUpdate( true );
@@ -828,9 +855,12 @@ namespace Ogre
 
                     renderSystem->_update();
                     renderSystem->_endFrameOnce();
+
+                    mCurrentMip = 0;
                 }
 
                 mCollectedProbes[i]->mDirty = false;
+                mBlendedProbeNeedsUpdate = true;
             }
         }
     }
@@ -843,13 +873,17 @@ namespace Ogre
             {
                 setFinalProbeTo( i );
 
+                mCollectedProbes[i]->_clearCubemap();
+
                 for( int j=0; j<mCollectedProbes[i]->mNumIterations; ++j )
                 {
                     mCopyWorkspace->_update();
                     mCollectedProbes[i]->_updateRender();
+                    mCurrentMip = 0;
                 }
 
                 mCollectedProbes[i]->mDirty = false;
+                mBlendedProbeNeedsUpdate = true;
             }
         }
 
@@ -915,6 +949,9 @@ namespace Ogre
             }
             ++itor;
         }
+
+        //Set to 0 so next time mBlendedProbeNeedsUpdate will be set to true correctly;
+        mNumCollectedProbes = 0;
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::_notifyPreparePassHash( const Matrix4 &viewMatrix )

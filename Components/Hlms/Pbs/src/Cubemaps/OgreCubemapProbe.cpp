@@ -58,6 +58,7 @@ namespace Ogre
         mInvOrientation( Matrix3::IDENTITY ),
         mProbeShape( Aabb::BOX_NULL ),
         mFsaa( 1 ),
+        mClearWorkspace( 0 ),
         mWorkspace( 0 ),
         mCamera( 0 ),
         mCreator( creator ),
@@ -66,7 +67,7 @@ namespace Ogre
         mStatic( true ),
         mEnabled( true ),
         mDirty( true ),
-        mNumIterations( 32 ),
+        mNumIterations( 8 ),
         mMask( 0xffffffff )
     {
     }
@@ -110,6 +111,13 @@ namespace Ogre
             CompositorManager2 *compositorManager = mWorkspace->getCompositorManager();
             compositorManager->removeWorkspace( mWorkspace );
             mWorkspace = 0;
+        }
+
+        if( mClearWorkspace )
+        {
+            CompositorManager2 *compositorManager = mClearWorkspace->getCompositorManager();
+            compositorManager->removeWorkspace( mClearWorkspace );
+            mClearWorkspace = 0;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -221,6 +229,15 @@ namespace Ogre
 
         mWorkspace = compositorManager->addWorkspace( sceneManager, channels, mCamera,
                                                       mWorkspaceDefName, false );
+
+        if( !mStatic )
+        {
+            mClearWorkspace =
+                    compositorManager->addWorkspace( sceneManager, channels,
+                                                     mCamera,
+                                                     "AutoGen_ParallaxCorrectedCubemapClear_Workspace",
+                                                     false );
+        }
     }
     //-----------------------------------------------------------------------------------
     void CubemapProbe::set( const Vector3 &cameraPos, const Aabb &area, const Vector3 &areaInnerRegion,
@@ -295,6 +312,32 @@ namespace Ogre
         mCamera->setOrientation( Quaternion( mOrientation ) );
         if( mStatic )
             mCamera->setLightCullingVisibility( true, true );
+    }
+    //-----------------------------------------------------------------------------------
+    void CubemapProbe::_clearCubemap(void)
+    {
+        if( !mClearWorkspace )
+        {
+            CompositorWorkspaceDef const *workspaceDef = mCreator->getDefaultWorkspaceDef();
+            CompositorManager2 *compositorManager = workspaceDef->getCompositorManager();
+
+            SceneManager *sceneManager = mCreator->getSceneManager();
+            CompositorChannelVec channels( mWorkspace->getExternalRenderTargets() );
+            mClearWorkspace =
+                    compositorManager->addWorkspace( sceneManager, channels,
+                                                     mCamera,
+                                                     "AutoGen_ParallaxCorrectedCubemapClear_Workspace",
+                                                     false );
+        }
+
+        mClearWorkspace->_update();
+
+        if( mStatic )
+        {
+            CompositorManager2 *compositorManager = mClearWorkspace->getCompositorManager();
+            compositorManager->removeWorkspace( mClearWorkspace );
+            mClearWorkspace = 0;
+        }
     }
     //-----------------------------------------------------------------------------------
     void CubemapProbe::_updateRender(void)

@@ -64,6 +64,7 @@ namespace Ogre
         uint8       mFsaa;
 
         IdString            mWorkspaceDefName;
+        CompositorWorkspace *mClearWorkspace;
         CompositorWorkspace *mWorkspace;
         Camera              *mCamera;
 
@@ -176,6 +177,7 @@ namespace Ogre
         Real getNDF( const Vector3 &posLS ) const;
 
         void _prepareForRendering(void);
+        void _clearCubemap(void);
         void _updateRender(void);
 
         const Aabb& getArea(void) const                     { return mArea; }
