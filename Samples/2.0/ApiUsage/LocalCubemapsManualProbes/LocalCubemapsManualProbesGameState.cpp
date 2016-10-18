@@ -43,7 +43,8 @@ using namespace Demo;
 
 namespace Demo
 {
-    LocalCubemapsManualProbesGameState::LocalCubemapsManualProbesGameState( const Ogre::String &helpDescription ) :
+    LocalCubemapsManualProbesGameState::LocalCubemapsManualProbesGameState(
+            const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
         mParallaxCorrectedCubemap( 0 )
     {
@@ -136,9 +137,11 @@ namespace Demo
 
         hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
 
-		Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().load( "SkyPostprocess", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).staticCast<Ogre::Material>();
-        Ogre::TextureUnitState *tu = mat->getBestTechnique()->getPass(0)->getTextureUnitState(0);
-        tu->setTexture( mParallaxCorrectedCubemap->getBlendCubemap() );
+//        Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().load(
+//                    "SkyPostprocess", Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME ).
+//                staticCast<Ogre::Material>();
+//        Ogre::TextureUnitState *tu = mat->getBestTechnique()->getPass(0)->getTextureUnitState(0);
+//        tu->setTexture( mParallaxCorrectedCubemap->getBlendCubemap() );
     }
     //-----------------------------------------------------------------------------------
     void LocalCubemapsManualProbesGameState::createScene01(void)
