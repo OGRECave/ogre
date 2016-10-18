@@ -400,8 +400,8 @@ float4 diffuseCol;
 			else
 			{
 				//TODO: Fallback to a global cubemap.
-				envColourS = vec3( 0, 0, 0 );
-				envColourD = vec3( 0, 0, 0 );
+				envColourS = float3( 0, 0, 0 );
+				envColourD = float3( 0, 0, 0 );
 			}
 		@end @property( !use_parallax_correct_cubemaps )
 			float3 envColourS = texEnvProbeMap.sample( envMapSamplerState, reflDir * pass.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
