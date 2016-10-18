@@ -146,6 +146,7 @@ namespace Ogre
         HlmsDatablockMap mDatablocks;
 
         String          mShaderProfile; /// "glsl", "glsles", "hlsl"
+        IdString        mShaderSyntax;
         IdStringVec     mRsSpecificExtensions;
         String const    *mShaderTargets[NumShaderTypes]; ///[0] = "vs_4_0", etc. Only used by D3D
         String          mShaderFileExt; /// Either glsl or hlsl
@@ -655,6 +656,11 @@ namespace Ogre
         static const IdString AlphaTest;
         static const IdString AlphaBlend;
 
+        static const IdString Syntax;
+        static const IdString Hlsl;
+        static const IdString Glsl;
+        static const IdString Glsles;
+        static const IdString Metal;
         static const IdString GL3Plus;
         static const IdString iOS;
         static const IdString HighQuality;

@@ -123,6 +123,11 @@ namespace Ogre
     const IdString HlmsBaseProp::AlphaTest      = IdString( "alpha_test" );
     const IdString HlmsBaseProp::AlphaBlend     = IdString( "hlms_alphablend" );
 
+    const IdString HlmsBaseProp::Syntax         = IdString( "syntax" );
+    const IdString HlmsBaseProp::Hlsl           = IdString( "hlsl" );
+    const IdString HlmsBaseProp::Glsl           = IdString( "glsl" );
+    const IdString HlmsBaseProp::Glsles         = IdString( "glsles" );
+    const IdString HlmsBaseProp::Metal          = IdString( "metal" );
     const IdString HlmsBaseProp::GL3Plus        = IdString( "GL3+" );
     const IdString HlmsBaseProp::iOS            = IdString( "iOS" );
     const IdString HlmsBaseProp::HighQuality    = IdString( "hlms_high_quality" );
@@ -187,6 +192,7 @@ namespace Ogre
         mListener( &c_defaultListener ),
         mRenderSystem( 0 ),
         mShaderProfile( "unset!" ),
+        mShaderSyntax( "unset!" ),
         mShaderFileExt( "unset!" ),
         mDebugOutput( true ),
         mHighQuality( false ),
@@ -274,6 +280,7 @@ namespace Ogre
             hasValidFile |= mDataFolder->exists( filename + ".glsl" );
             hasValidFile |= mDataFolder->exists( filename + ".hlsl" );
             hasValidFile |= mDataFolder->exists( filename + ".metal" );
+            hasValidFile |= mDataFolder->exists( filename + ".any" );
         }
 
         if( !hasValidFile )
@@ -1641,8 +1648,10 @@ namespace Ogre
         while( itor != end )
         {
             //Only open piece files with current render system extension
-            const String::size_type extPos = itor->find( mShaderFileExt );
-            if( extPos == itor->size() - mShaderFileExt.size() )
+            const String::size_type extPos0 = itor->find( mShaderFileExt );
+            const String::size_type extPos1 = itor->find( ".any" );
+            if( extPos0 == itor->size() - mShaderFileExt.size() ||
+                extPos1 == itor->size() - 4u )
             {
                 DataStreamPtr inFile = archive->open(*itor);
 
@@ -1713,6 +1722,12 @@ namespace Ogre
             {
                 if( mShaderProfile == "glsl" ) //TODO: String comparision
                     setProperty( HlmsBaseProp::GL3Plus, 330 );
+
+                setProperty( HlmsBaseProp::Syntax,  mShaderSyntax.mHash );
+                setProperty( HlmsBaseProp::Hlsl,    HlmsBaseProp::Hlsl.mHash );
+                setProperty( HlmsBaseProp::Glsl,    HlmsBaseProp::Glsl.mHash );
+                setProperty( HlmsBaseProp::Glsles,  HlmsBaseProp::Glsles.mHash );
+                setProperty( HlmsBaseProp::Metal,   HlmsBaseProp::Metal.mHash );
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
                 setProperty( HlmsBaseProp::iOS, 1 );
@@ -2436,6 +2451,7 @@ namespace Ogre
 
         mShaderProfile = "unset!";
         mShaderFileExt = "unset!";
+        mShaderSyntax  = "unset!";
         memset( mShaderTargets, 0, sizeof(mShaderTargets) );
 
         if( mRenderSystem )
@@ -2447,7 +2463,10 @@ namespace Ogre
             for( size_t i=0; i<4; ++i )
             {
                 if( capabilities->isShaderProfileSupported( shaderProfiles[i] ) )
+                {
                     mShaderProfile = shaderProfiles[i];
+                    mShaderSyntax = shaderProfiles[i];
+                }
             }
 
             if( mShaderProfile == "hlsl" )

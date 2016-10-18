@@ -202,6 +202,8 @@ namespace Ogre
 
         HlmsSamplerblock const  *mSamplerblocks[NUM_PBSM_TEXTURE_TYPES];
 
+        CubemapProbe *mCubemapProbe;
+
         /// @see PbsBrdf::PbsBrdf
         uint32  mBrdf;
 
@@ -582,6 +584,57 @@ namespace Ogre
         float getTransparency(void) const                           { return mTransparencyValue; }
         TransparencyModes getTransparencyMode(void) const           { return mTransparencyMode; }
         bool getUseAlphaFromTextures(void) const                    { return mUseAlphaFromTextures; }
+
+        /** Manually set a probe to affect this particular material.
+        @remarks
+            PCC (Parallax Corrected Cubemaps) have two main forms of operation: Auto and manual.
+            They both have advantages and disadvantages. This method allows you to enable
+            the manual mode of operation.
+        @par
+            Manual Advantages:
+                * It's independent of camera position.
+                * The reflections are always visible and working on the object.
+                * Works best for static objects
+                * Also works well on dynamic objects that you can guarantee are going
+                  to be constrained to the probe's area.
+            Manual Disadvantages:
+                * Needs to be manually applied on the material by the user.
+                * Can produce harsh lighting/reflection seams when two objects affected
+                  by different probes are close together.
+                * Sucks for dynamic objects.
+
+            To use manual probes just call:
+                datablock->setCubemapProbe( probe );
+        @par
+            Auto Advantages:
+                * Smoothly blends between probes, making smooth transitions
+                * Avoids seams.
+                * No need to change anything on the material or the object,
+                  you don't need to do anything.
+                * Works best for dynamic objects (eg. characters)
+                * Also works well on static objects if the camera is inside rooms/corridors, thus
+                  blocking the view from distant rooms that aren't receiving reflections.
+            Auto Disadvantages:
+                * Objects that are further away won't have reflections as
+                  only one probe can be active.
+                * It depends on the camera's position.
+                * Doesn't work well if the user can see many distant objects at once, as they
+                  won't have reflections until you get close.
+
+            To use Auto you don't need to do anything. Just enable PCC:
+                hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
+            and leave PBSM_REFLECTION empty and don't enable manual mode.
+        @par
+            When other reflection methods can be used as fallback (Planar reflections, SSR),
+            then usually auto will be the preferred choice.
+            But if multiple reflections/fallbacks aren't available, you'll likely have to make
+            good use of manual and auto
+        @param probe
+            The probe that should affect this material to enable manual mode.
+            Null pointer to disable manual mode and switch to auto.
+        */
+        void setCubemapProbe( CubemapProbe *probe );
+        CubemapProbe* getCubemapProbe(void) const;
 
         /// Changes the BRDF in use. Calling this function may trigger an
         /// HlmsDatablock::flushRenderables

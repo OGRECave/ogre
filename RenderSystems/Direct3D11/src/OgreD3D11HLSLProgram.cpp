@@ -2249,7 +2249,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------------
     String D3D11HLSLProgram::getNameForMicrocodeCache()
     {
-        return mSource + "_" + mTarget;
+        return mSource + "_" + mTarget + "_" + mPreprocessorDefines;
     }
 
 

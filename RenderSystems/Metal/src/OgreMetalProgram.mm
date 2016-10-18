@@ -101,6 +101,65 @@ namespace Ogre {
     {
         compile( true );
     }
+	//-----------------------------------------------------------------------
+	void MetalProgram::parsePreprocessorDefinitions( NSMutableDictionary<NSString*,
+													 NSObject*> *inOutMacros )
+	{
+		if( mPreprocessorDefines.empty() )
+			return;
+		String::size_type pos = 0;
+		while( pos != String::npos )
+		{
+			// Find delims
+			String::size_type endPos = mPreprocessorDefines.find_first_of( ";,=", pos );
+			if( endPos != String::npos )
+			{
+				String::size_type macro_name_start = pos;
+				size_t macro_name_len = endPos - pos;
+				pos = endPos;
+
+				// Check definition part
+				if( mPreprocessorDefines[pos] == '=' )
+				{
+					// Set up a definition, skip delim
+					++pos;
+					String::size_type macro_val_start = pos;
+					size_t macro_val_len;
+
+					endPos = mPreprocessorDefines.find_first_of(";,", pos);
+					if (endPos == String::npos)
+					{
+						macro_val_len = mPreprocessorDefines.size () - pos;
+						pos = endPos;
+					}
+					else
+					{
+						macro_val_len = endPos - pos;
+						pos = endPos+1;
+					}
+					String tmpStr;
+					tmpStr = mPreprocessorDefines.substr( macro_name_start, macro_name_len );
+					NSString *key = [NSString stringWithUTF8String:tmpStr.c_str()];
+
+					tmpStr = mPreprocessorDefines.substr( macro_val_start, macro_val_len );
+					NSString *value = [NSString stringWithUTF8String:tmpStr.c_str()];
+					inOutMacros[key] = value;
+				}
+				else
+				{
+					// No definition part, define as "1"
+					++pos;
+
+					String tmpStr;
+					tmpStr = mPreprocessorDefines.substr( macro_name_start, macro_name_len );
+					NSString *key = [NSString stringWithUTF8String:tmpStr.c_str()];
+					inOutMacros[key] = [NSNumber numberWithUnsignedInt:1];
+				}
+			}
+			else
+				pos = endPos;
+		}
+	}
     //-----------------------------------------------------------------------
     bool MetalProgram::compile(const bool checkErrors)
     {
@@ -152,6 +211,8 @@ namespace Ogre {
         preprocessorMacros[@"PARAMETER_SLOT"] =
                 [NSNumber numberWithUnsignedInt:mType != GPT_COMPUTE_PROGRAM ?
                     OGRE_METAL_PARAMETER_SLOT : OGRE_METAL_CS_PARAMETER_SLOT];
+
+		parsePreprocessorDefinitions( preprocessorMacros );
 
 		options.preprocessorMacros = preprocessorMacros;
 

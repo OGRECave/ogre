@@ -1,0 +1,163 @@
+//------------------------
+//OpenGL GLSL Definitions
+//------------------------
+fragment_program Cubemap/CopyCubemap_PX_ps_GLSL glsl
+{
+	source CopyCubemap_ps.glsl
+	default_params
+	{
+		param_named cubeTexture		int 0
+	}
+}
+
+fragment_program Cubemap/CopyCubemap_NX_ps_GLSL glsl : Cubemap/CopyCubemap_PX_ps_GLSL { preprocessor_defines FACEIDX=1 }
+fragment_program Cubemap/CopyCubemap_PY_ps_GLSL glsl : Cubemap/CopyCubemap_PX_ps_GLSL { preprocessor_defines FACEIDX=2 }
+fragment_program Cubemap/CopyCubemap_NY_ps_GLSL glsl : Cubemap/CopyCubemap_PX_ps_GLSL { preprocessor_defines FACEIDX=3 }
+fragment_program Cubemap/CopyCubemap_PZ_ps_GLSL glsl : Cubemap/CopyCubemap_PX_ps_GLSL { preprocessor_defines FACEIDX=4 }
+fragment_program Cubemap/CopyCubemap_NZ_ps_GLSL glsl : Cubemap/CopyCubemap_PX_ps_GLSL { preprocessor_defines FACEIDX=5 }
+
+//------------------------
+//DirectX 11 HLSL Definitions
+//------------------------
+
+fragment_program Cubemap/CopyCubemap_PX_ps_HLSL hlsl
+{
+	source CopyCubemap_ps.hlsl
+	target ps_5_0 ps_4_0 ps_4_0_level_9_1 ps_4_0_level_9_3
+	entry_point main
+}
+
+fragment_program Cubemap/CopyCubemap_NX_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps_HLSL { preprocessor_defines FACEIDX=1 }
+fragment_program Cubemap/CopyCubemap_PY_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps_HLSL { preprocessor_defines FACEIDX=2 }
+fragment_program Cubemap/CopyCubemap_NY_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps_HLSL { preprocessor_defines FACEIDX=3 }
+fragment_program Cubemap/CopyCubemap_PZ_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps_HLSL { preprocessor_defines FACEIDX=4 }
+fragment_program Cubemap/CopyCubemap_NZ_ps_HLSL hlsl : Cubemap/CopyCubemap_PX_ps_HLSL { preprocessor_defines FACEIDX=5 }
+
+//------------------------
+//Metal Definitions
+//------------------------
+fragment_program Cubemap/CopyCubemap_PX_ps_Metal metal
+{
+	source CopyCubemap_ps.metal
+	shader_reflection_pair_hint Ogre/Compositor/Quad_vs
+}
+
+fragment_program Cubemap/CopyCubemap_NX_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=1 }
+fragment_program Cubemap/CopyCubemap_PY_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=2 }
+fragment_program Cubemap/CopyCubemap_NY_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=3 }
+fragment_program Cubemap/CopyCubemap_PZ_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=4 }
+fragment_program Cubemap/CopyCubemap_NZ_ps_Metal metal : Cubemap/CopyCubemap_PX_ps_Metal { preprocessor_defines FACEIDX=5 }
+
+fragment_program Cubemap/CopyCubemap_PX_ps unified
+{
+	delegate Cubemap/CopyCubemap_PX_ps_GLSL
+	delegate Cubemap/CopyCubemap_PX_ps_HLSL
+	delegate Cubemap/CopyCubemap_PX_ps_Metal
+}
+fragment_program Cubemap/CopyCubemap_NX_ps unified
+{
+	delegate Cubemap/CopyCubemap_NX_ps_GLSL
+	delegate Cubemap/CopyCubemap_NX_ps_HLSL
+	delegate Cubemap/CopyCubemap_NX_ps_Metal
+}
+fragment_program Cubemap/CopyCubemap_PY_ps unified
+{
+	delegate Cubemap/CopyCubemap_PY_ps_GLSL
+	delegate Cubemap/CopyCubemap_PY_ps_HLSL
+	delegate Cubemap/CopyCubemap_PY_ps_Metal
+}
+fragment_program Cubemap/CopyCubemap_NY_ps unified
+{
+	delegate Cubemap/CopyCubemap_NY_ps_GLSL
+	delegate Cubemap/CopyCubemap_NY_ps_HLSL
+	delegate Cubemap/CopyCubemap_NY_ps_Metal
+}
+fragment_program Cubemap/CopyCubemap_PZ_ps unified
+{
+	delegate Cubemap/CopyCubemap_PZ_ps_GLSL
+	delegate Cubemap/CopyCubemap_PZ_ps_HLSL
+	delegate Cubemap/CopyCubemap_PZ_ps_Metal
+}
+fragment_program Cubemap/CopyCubemap_NZ_ps unified
+{
+	delegate Cubemap/CopyCubemap_NZ_ps_GLSL
+	delegate Cubemap/CopyCubemap_NZ_ps_HLSL
+	delegate Cubemap/CopyCubemap_NZ_ps_Metal
+}
+
+material Cubemap/CopyCubemap_PX
+{
+	technique
+	{
+		pass
+		{
+			depth_check off
+			depth_write off
+			cull_hardware none
+
+			vertex_program_ref Ogre/Compositor/Quad_vs
+			{
+			}
+
+			fragment_program_ref Cubemap/CopyCubemap_PX_ps
+			{
+			}
+
+			texture_unit cubemap0
+			{
+				tex_address_mode	clamp
+				filtering none
+			}
+		}
+	}
+}
+material Cubemap/CopyCubemap_NX : Cubemap/CopyCubemap_PX
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Cubemap/CopyCubemap_NX_ps {}
+		}
+	}
+}
+material Cubemap/CopyCubemap_PY : Cubemap/CopyCubemap_PX
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Cubemap/CopyCubemap_PY_ps {}
+		}
+	}
+}
+material Cubemap/CopyCubemap_NY : Cubemap/CopyCubemap_PX
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Cubemap/CopyCubemap_NY_ps {}
+		}
+	}
+}
+material Cubemap/CopyCubemap_PZ : Cubemap/CopyCubemap_PX
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Cubemap/CopyCubemap_PZ_ps {}
+		}
+	}
+}
+material Cubemap/CopyCubemap_NZ : Cubemap/CopyCubemap_PX
+{
+	technique
+	{
+		pass
+		{
+			fragment_program_ref Cubemap/CopyCubemap_NZ_ps {}
+		}
+	}
+}

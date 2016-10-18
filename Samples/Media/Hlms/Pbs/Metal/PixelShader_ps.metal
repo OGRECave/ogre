@@ -116,6 +116,10 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 @insertpiece( DeclareBRDF )
 @end
 
+@property( use_parallax_correct_cubemaps )
+@insertpiece( DeclParallaxLocalCorrect )
+@end
+
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadow ) * getShadow( texShadowMap@value(CurrentShadowMap), shadowSampler, inPs.posL@value(CurrentShadowMap), pass.shadowRcv[@counter(CurrentShadowMap)].invShadowMapSize )@end @end
 
@@ -133,6 +137,7 @@ fragment @insertpiece( output_type ) main_metal
 			@insertpiece( PassDecl )
 		@end
 		@insertpiece( MaterialDecl )
+		@insertpiece( PccManualProbeDecl )
 	@end
 	@insertpiece( custom_ps_uniformDeclaration )
 	// END UNIFORM DECLARATION
@@ -147,11 +152,12 @@ fragment @insertpiece( output_type ) main_metal
 	@end
 
 	@foreach( num_textures, n )
-		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end
+		, texture2d_array<float> textureMaps@n [[texture(@value(textureRegStart))]]@end
 	@property( use_envprobe_map )
-		, texturecube<float>	texEnvProbeMap [[texture(@value(envMapReg))]]@end
+		, texturecube<float>	texEnvProbeMap [[texture(@value(envMapReg))]]
+		, sampler envMapSamplerState [[sampler(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
-		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
+		, sampler samplerStates@n [[sampler(@value(samplerStateStart))]]@end
 	@foreach( hlms_num_shadow_maps, n )
 		, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
 )
@@ -374,8 +380,33 @@ float4 diffuseCol;
 	float3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
 	@property( use_envprobe_map )
-		float3 envColourS = texEnvProbeMap.sample( samplerStates@value(num_textures), reflDir * pass.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
-		float3 envColourD = texEnvProbeMap.sample( samplerStates@value(num_textures), nNormal * pass.invViewMatCubemap, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+		@property( use_parallax_correct_cubemaps )
+			float3 envColourS;
+			float3 envColourD;
+			float3 posInProbSpace = toProbeLocalSpace( inPs.pos, @insertpiece( pccProbeSource ) );
+			float probeFade = getProbeFade( posInProbSpace, @insertpiece( pccProbeSource ) );
+			if( probeFade > 0 )
+			{
+				float3 reflDirLS = localCorrect( reflDir, posInProbSpace, @insertpiece( pccProbeSource ) );
+				float3 nNormalLS = localCorrect( nNormal, posInProbSpace, @insertpiece( pccProbeSource ) );
+				envColourS = texEnvProbeMap.sample( envMapSamplerState,
+													reflDirLS, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+				envColourD = texEnvProbeMap.sample( envMapSamplerState,
+													nNormalLS, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+
+				envColourS = envColourS * saturate( probeFade * 200.0 );
+				envColourD = envColourD * saturate( probeFade * 200.0 );
+			}
+			else
+			{
+				//TODO: Fallback to a global cubemap.
+				envColourS = float3( 0, 0, 0 );
+				envColourD = float3( 0, 0, 0 );
+			}
+		@end @property( !use_parallax_correct_cubemaps )
+			float3 envColourS = texEnvProbeMap.sample( envMapSamplerState, reflDir * pass.invViewMatCubemap, level( ROUGHNESS * 12.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+			float3 envColourD = texEnvProbeMap.sample( envMapSamplerState, nNormal * pass.invViewMatCubemap, level( 11.0 ) ).xyz @insertpiece( ApplyEnvMapScale );
+		@end
 		@property( !hw_gamma_read )	//Gamma to linear space
 			envColourS = envColourS * envColourS;
 			envColourD = envColourD * envColourD;
@@ -425,10 +456,23 @@ float4 diffuseCol;
 }
 @end
 @property( hlms_shadowcaster )
-@property( num_textures )Texture2DArray textureMaps[@value( num_textures )] : register(t@value(textureRegStart));@end
-@property( numSamplerStates )SamplerState samplerStates[@value(numSamplerStates)] : register(s@value(samplerStateStart));@end
 
-@insertpiece( output_type ) main( PS_INPUT inPs ) @insertpiece( output_type_sv )
+fragment @insertpiece( output_type ) main_metal
+(
+	PS_INPUT inPs [[stage_in]]
+
+	// START UNIFORM DECLARATION
+	@property( !hlms_shadowcaster || alpha_test )
+		@insertpiece( MaterialDecl )
+	@end
+	@insertpiece( custom_ps_uniformDeclaration )
+	// END UNIFORM DECLARATION
+
+	@foreach( num_textures, n )
+		, texture2d_array<float> textureMaps@n [[texture(@value(textureRegStart))]]@end
+	@foreach( numSamplerStates, n )
+		, sampler samplerStates@n [[sampler(@value(samplerStateStart))]]@end
+)
 {
 	@insertpiece( custom_ps_preExecution )
 

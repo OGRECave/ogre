@@ -370,6 +370,23 @@ void SceneManager::destroyAllCameras(void)
     }
 }
 //-----------------------------------------------------------------------
+void SceneManager::_setLightCullingVisibility( Camera *camera, bool collectLights, bool isCubemap )
+{
+    isCubemap &= collectLights;
+
+    FrustumVec::iterator it = std::find( mVisibleCameras.begin(), mVisibleCameras.end(), camera );
+    if( it != mVisibleCameras.end() && !collectLights )
+        efficientVectorRemove( mVisibleCameras, it );
+    else if( it == mVisibleCameras.end() && collectLights && !isCubemap )
+        mVisibleCameras.push_back( camera );
+
+    it = std::find( mCubeMapCameras.begin(), mCubeMapCameras.end(), camera );
+    if( it != mCubeMapCameras.end() && !isCubemap )
+        efficientVectorRemove( mCubeMapCameras, it );
+    else if( it == mCubeMapCameras.end() && isCubemap )
+        mCubeMapCameras.push_back( camera );
+}
+//-----------------------------------------------------------------------
 void SceneManager::clearFrameData(void)
 {
     mGlobalLightList.lights.clear();

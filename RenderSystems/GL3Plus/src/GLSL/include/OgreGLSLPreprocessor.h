@@ -53,7 +53,7 @@ namespace Ogre {
  * <li>#define: Parametrized and non-parametrized macros. Invoking a macro with
  *     less arguments than it takes assignes empty values to missing arguments.
  * <li>#undef: Forget defined macros
- * <li>#ifdef/#ifndef/#else/#endif: Conditional suppression of parts of code.
+ * <li>#ifdef/#ifndef/#elif/#else/#endif: Conditional suppression of parts of code.
  * <li>#if: Supports numeric expression of any complexity, also supports the
  *     defined() pseudo-function.
  * <ul>

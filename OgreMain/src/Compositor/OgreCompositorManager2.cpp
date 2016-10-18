@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "Compositor/OgreCompositorShadowNodeDef.h"
 #include "Compositor/OgreCompositorWorkspace.h"
 #include "Compositor/OgreCompositorWorkspaceDef.h"
+#include "Compositor/OgreCompositorWorkspaceListener.h"
 
 #include "Compositor/Pass/PassClear/OgreCompositorPassClearDef.h"
 #include "Compositor/Pass/PassQuad/OgreCompositorPassQuadDef.h"
@@ -336,15 +337,25 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinition( IdString name ) const
     {
-        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
-        if( itor == mWorkspaceDefs.end() )
+        CompositorWorkspaceDef *retVal = getWorkspaceDefinitionNoThrow( name );
+        if( !retVal )
         {
             OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Workspace definition with name '" +
                             name.getFriendlyText() + "' not found",
                             "CompositorManager2::getWorkspaceDefinition" );
         }
 
-        return itor->second;
+        return retVal;
+    }
+    //-----------------------------------------------------------------------------------
+    CompositorWorkspaceDef* CompositorManager2::getWorkspaceDefinitionNoThrow( IdString name ) const
+    {
+        CompositorWorkspaceDef *retVal = 0;
+        CompositorWorkspaceDefMap::const_iterator itor = mWorkspaceDefs.find( name );
+        if( itor != mWorkspaceDefs.end() )
+            retVal = itor->second;
+
+        return retVal;
     }
     //-----------------------------------------------------------------------------------
     CompositorWorkspace* CompositorManager2::addWorkspace( SceneManager *sceneManager,
@@ -536,6 +547,17 @@ namespace Ogre
             ++itor;
         }
 
+        {
+            //Notify the listeners
+            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
+            while( itor != end )
+            {
+                (*itor)->allWorkspacesBeforeBeginUpdate();
+                ++itor;
+            }
+        }
+
         mRenderSystem->_beginFrameOnce();
 
         itor = mWorkspaces.begin();
@@ -558,6 +580,17 @@ namespace Ogre
                 }
             }
             ++itor;
+        }
+
+        {
+            //Notify the listeners
+            CompositorWorkspaceListenerVec::const_iterator itor = mListeners.begin();
+            CompositorWorkspaceListenerVec::const_iterator end  = mListeners.end();
+            while( itor != end )
+            {
+                (*itor)->allWorkspacesBeginUpdate();
+                ++itor;
+            }
         }
 
         //The actual update
@@ -662,5 +695,21 @@ namespace Ogre
     CompositorPassProvider* CompositorManager2::getCompositorPassProvider(void) const
     {
         return mCompositorPassProvider;
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::addListener( CompositorWorkspaceListener *listener )
+    {
+        mListeners.push_back( listener );
+    }
+    //-----------------------------------------------------------------------------------
+    void CompositorManager2::removeListener( CompositorWorkspaceListener *listener )
+    {
+        CompositorWorkspaceListenerVec::iterator itor = std::find( mListeners.begin(),
+                                                                   mListeners.end(),
+                                                                   listener );
+
+        //Preserve order.
+        if( itor != mListeners.end() )
+            mListeners.erase( itor );
     }
 }

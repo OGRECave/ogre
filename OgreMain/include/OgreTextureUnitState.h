@@ -967,6 +967,11 @@ namespace Ogre {
         /// Changes the current samplerblock for a new one.
         void setSamplerblock( const HlmsSamplerblock &samplerblock );
 
+        /// Changes the current samplerblock for a new one.
+        /// MUST'VE BEEN CREATED VIA HlmsManager!!!
+        /// INCREASES THE REFERENCE COUNT OF THE SAMPLERBLOCK
+        void _setSamplerblock( const HlmsSamplerblock *samplerblock );
+
         /** Retrieves current samplerblock. Don't const_cast the return value to modify it.
             @See HlmsDatablock remarks.
         */

@@ -33,6 +33,7 @@ in vec4 gl_FragCoord;
 	@end
 	@insertpiece( MaterialDecl )
 	@insertpiece( InstanceDecl )
+	@insertpiece( PccManualProbeDecl )
 @end
 @insertpiece( custom_ps_uniformDeclaration )
 // END UNIFORM DECLARATION
@@ -217,6 +218,10 @@ vec3 qmul( vec4 q, vec3 v )
 
 @property( hlms_normal || hlms_qtangent )
 @insertpiece( DeclareBRDF )
+@end
+
+@property( use_parallax_correct_cubemaps )
+@insertpiece( DeclParallaxLocalCorrect )
 @end
 
 @property( hlms_num_shadow_maps )@piece( DarkenWithShadowFirstLight )* fShadow@end @end
@@ -419,8 +424,33 @@ void main()
 	vec3 reflDir = 2.0 * dot( viewDir, nNormal ) * nNormal - viewDir;
 
 	@property( use_envprobe_map )
-		vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
-		vec3 envColourD = textureLod( texEnvProbeMap, nNormal * pass.invViewMatCubemap, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+		@property( use_parallax_correct_cubemaps )
+			vec3 envColourS;
+			vec3 envColourD;
+			vec3 posInProbSpace = toProbeLocalSpace( inPs.pos, @insertpiece( pccProbeSource ) );
+			float probeFade = getProbeFade( posInProbSpace, @insertpiece( pccProbeSource ) );
+			if( probeFade > 0 )
+			{
+				vec3 reflDirLS = localCorrect( reflDir, posInProbSpace, @insertpiece( pccProbeSource ) );
+				vec3 nNormalLS = localCorrect( nNormal, posInProbSpace, @insertpiece( pccProbeSource ) );
+				envColourS = textureLod( texEnvProbeMap,
+										 reflDirLS, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+				envColourD = textureLod( texEnvProbeMap,
+										 nNormalLS, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+
+				envColourS = envColourS * clamp( probeFade * 200.0, 0.0, 1.0 );
+				envColourD = envColourD * clamp( probeFade * 200.0, 0.0, 1.0 );
+			}
+			else
+			{
+				//TODO: Fallback to a global cubemap.
+				envColourS = vec3( 0, 0, 0 );
+				envColourD = vec3( 0, 0, 0 );
+			}
+		@end @property( !use_parallax_correct_cubemaps )
+			vec3 envColourS = textureLod( texEnvProbeMap, reflDir * pass.invViewMatCubemap, ROUGHNESS * 12.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+			vec3 envColourD = textureLod( texEnvProbeMap, nNormal * pass.invViewMatCubemap, 11.0 ).xyz @insertpiece( ApplyEnvMapScale );// * 0.0152587890625;
+		@end
 		@property( !hw_gamma_read )	//Gamma to linear space
 			envColourS = envColourS * envColourS;
 			envColourD = envColourD * envColourD;

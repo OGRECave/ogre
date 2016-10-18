@@ -125,12 +125,15 @@ namespace Ogre
 
         typedef vector<CompositorWorkspace*>::type              WorkspaceVec;
         typedef vector<QueuedWorkspace>::type                   QueuedWorkspaceVec;
+        typedef vector<CompositorWorkspaceListener*>::type      CompositorWorkspaceListenerVec;
         WorkspaceVec            mWorkspaces;
         /// All workspaces created via addWorkspace are first stored in this
         /// container, to prevent corrupting mWorkspaces' iterators in
         /// case we happen to be adding a workspace while inside the
         /// workspace's update loop (i.e. in a listener)
         QueuedWorkspaceVec      mQueuedWorkspaces;
+        /// Listeners to call CompositorWorkspaceListener::allWorkspacesBeginUpdate
+        CompositorWorkspaceListenerVec mListeners;
 
         size_t                  mFrameCount;
 
@@ -184,6 +187,7 @@ namespace Ogre
 
         /// Returns the workspace definition with the given name. Throws if not found
         CompositorWorkspaceDef* getWorkspaceDefinition( IdString name ) const;
+        CompositorWorkspaceDef* getWorkspaceDefinitionNoThrow( IdString name ) const;
 
         /** Returns a new workspace definition. The name must be unique, throws otherwise.
         @remarks
@@ -375,6 +379,9 @@ namespace Ogre
         /// your nodes. @see CompositorPassProvider
         void setCompositorPassProvider( CompositorPassProvider *passProvider );
         CompositorPassProvider* getCompositorPassProvider(void) const;
+
+        void addListener( CompositorWorkspaceListener *listener );
+        void removeListener( CompositorWorkspaceListener *listener );
     };
 
     /** @} */

@@ -35,6 +35,7 @@ THE SOFTWARE.
 #include "OgreTexture.h"
 #include "OgreTextureManager.h"
 #include "OgreLogManager.h"
+#include "Cubemaps/OgreCubemapProbe.h"
 
 namespace Ogre
 {
@@ -69,6 +70,7 @@ namespace Ogre
         mFresnelR( 0.818f ), mFresnelG( 0.818f ), mFresnelB( 0.818f ),
         mTransparencyValue( 1.0f ),
         mNormalMapWeight( 1.0f ),
+        mCubemapProbe( 0 ),
         mBrdf( PbsBrdf::Default )
     {
         memset( mUvSource, 0, sizeof( mUvSource ) );
@@ -316,6 +318,8 @@ namespace Ogre
             ++itor;
         }
 
+        const uint32 oldTexHash = mTextureHash;
+
         if( static_cast<HlmsPbs*>(mCreator)->getOptimizationStrategy() == HlmsPbs::LowerGpuOverhead )
         {
             const size_t poolIdx = static_cast<HlmsPbs*>(mCreator)->getPoolIndex( this );
@@ -329,11 +333,13 @@ namespace Ogre
             mTextureHash = finalHash;
         }
 
-//        if( mTextureHash != finalHash )
-//        {
-//            mTextureHash = finalHash;
-//            static_cast<HlmsPbs*>(mCreator)->requestSlot( /*mTextureHash*/0, this, false );
-//        }
+        //When ParallaxCorrectedCubemaps are used, we set a const buffer with the
+        //probe's information. Thus we need to keep them in different pools
+        if( oldTexHash != mTextureHash && mCubemapProbe )
+        {
+            IdString probeHash( mCubemapProbe->getInternalTexture()->getName() );
+            static_cast<HlmsPbs*>(mCreator)->requestSlot( probeHash.mHash, this, false );
+        }
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::scheduleConstBufferUpdate(void)
@@ -965,6 +971,32 @@ namespace Ogre
         scheduleConstBufferUpdate();
         if( mustFlush )
             flushRenderables();
+    }
+    //-----------------------------------------------------------------------------------
+    void HlmsPbsDatablock::setCubemapProbe( CubemapProbe *probe )
+    {
+        if( mCubemapProbe != probe )
+        {
+            if( mCubemapProbe )
+                mCubemapProbe->_removeReference();
+
+            mCubemapProbe = probe;
+            if( mCubemapProbe )
+            {
+                mCubemapProbe->_addReference();
+                setTexture( PBSM_REFLECTION, 0, mCubemapProbe->getInternalTexture() );
+            }
+            else
+            {
+                TexturePtr nullTex;
+                setTexture( PBSM_REFLECTION, 0, nullTex );
+            }
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    CubemapProbe* HlmsPbsDatablock::getCubemapProbe(void) const
+    {
+        return mCubemapProbe;
     }
     //-----------------------------------------------------------------------------------
     void HlmsPbsDatablock::setBrdf( PbsBrdf::PbsBrdf brdf )
