@@ -39,9 +39,6 @@
 %ignore *::setUserAny; // deprecated
 %ignore *::getUserAny; // deprecated
 %ignore *::getSingletonPtr; // only expose the non ptr variant
-%rename(__getitem__) *::operator[];
-%ignore Ogre::Matrix3::operator[];
-%ignore Ogre::Matrix4::operator[];
 %rename(OgreException) Ogre::Exception; // confilcts with Python Exception
 
 // convert c++ exceptions to language native exceptions
@@ -53,6 +50,9 @@
     }
 }
 
+// connect operator<< to tp_repr
+%ignore ::operator<<;
+%feature("python:slot", "tp_repr", functype="reprfunc") *::__repr__;
 %define ADD_REPR(classname)
 %extend Ogre::classname {
     const std::string __repr__() {
@@ -62,6 +62,12 @@
     }
 }
 %enddef
+
+// connect operator[] to __getitem__
+%feature("python:slot", "sq_item", functype="ssizeargfunc") *::operator[];
+%rename(__getitem__) *::operator[];
+%ignore Ogre::Matrix3::operator[];
+%ignore Ogre::Matrix4::operator[];
 
 /* these are ordered by dependancy */
 %include "OgreBuildSettings.h"

@@ -13,7 +13,7 @@ include(${SWIG_USE_FILE})
 
 set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages/)
 
-set(CMAKE_SWIG_FLAGS -w401,314)
+set(CMAKE_SWIG_FLAGS -w401,314 -builtin)
 
 add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized)
 set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
