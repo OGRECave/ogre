@@ -233,6 +233,8 @@ typedef Ogre::SharedPtr<StringVector> StringVectorPtr;
 %include "OgreMeshManager.h"
 %include "OgrePass.h"
     %include "OgreTechnique.h"
+%ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
+%ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated
 %include "OgreRenderTarget.h"
     %include "OgreRenderWindow.h"
     %include "OgreRenderTexture.h"
