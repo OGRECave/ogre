@@ -36,10 +36,12 @@
 %feature("flatnested") Ogre::MaterialManager::Listener;
 
 %ignore *::operator=;  // needs rename to wrap
-%ignore *::operator[]; // needs rename to wrap
 %ignore *::setUserAny; // deprecated
 %ignore *::getUserAny; // deprecated
 %ignore *::getSingletonPtr; // only expose the non ptr variant
+%rename(__getitem__) *::operator[];
+%ignore Ogre::Matrix3::operator[];
+%ignore Ogre::Matrix4::operator[];
 %rename(OgreException) Ogre::Exception; // confilcts with Python Exception
 
 // convert c++ exceptions to language native exceptions
