@@ -36,7 +36,6 @@
 %feature("flatnested") Ogre::MaterialManager::Listener;
 
 %ignore *::operator=;  // needs rename to wrap
-%ignore *::operator[]; // needs rename to wrap
 %ignore *::setUserAny; // deprecated
 %ignore *::getUserAny; // deprecated
 %ignore *::getSingletonPtr; // only expose the non ptr variant
@@ -50,6 +49,25 @@
         SWIG_exception(SWIG_RuntimeError, e.what());
     }
 }
+
+// connect operator<< to tp_repr
+%ignore ::operator<<;
+%feature("python:slot", "tp_repr", functype="reprfunc") *::__repr__;
+%define ADD_REPR(classname)
+%extend Ogre::classname {
+    const std::string __repr__() {
+        std::ostringstream out;
+        out << *$self;
+        return out.str();
+    }
+}
+%enddef
+
+// connect operator[] to __getitem__
+%feature("python:slot", "sq_item", functype="ssizeargfunc") *::operator[];
+%rename(__getitem__) *::operator[];
+%ignore Ogre::Matrix3::operator[];
+%ignore Ogre::Matrix4::operator[];
 
 /* these are ordered by dependancy */
 %include "OgreBuildSettings.h"
@@ -65,6 +83,8 @@
 %include "OgreAny.h"
 %include "OgreIteratorWrapper.h"
 %include "OgreMath.h"
+ADD_REPR(Degree)
+ADD_REPR(Radian)
 //%include "OgreStringVector.h"
 // the original definitions confuses SWIG by typedeffing to std inside a struct
 namespace Ogre {
@@ -75,17 +95,25 @@ typedef Ogre::SharedPtr<StringVector> StringVectorPtr;
 %template(StringVectorPtr) Ogre::SharedPtr<std::vector<std::string> >;
 // Linear Algebra
 %include "OgreVector2.h"
+ADD_REPR(Vector2)
 %include "OgreVector3.h"
+ADD_REPR(Vector3)
 %include "OgreVector4.h"
+ADD_REPR(Vector4)
 %include "OgreMatrix3.h"
+ADD_REPR(Matrix3)
 %include "OgreMatrix4.h"
+ADD_REPR(Matrix4)
 %include "OgreQuaternion.h"
+ADD_REPR(Quaternion)
 %include "OgreSimpleSpline.h"
 %include "OgreRotationalSpline.h"
 // Geometric Primitives
 %include "OgreAxisAlignedBox.h"
+ADD_REPR(AxisAlignedBox)
 %include "OgreSphere.h"
 %include "OgrePlane.h"
+ADD_REPR(Plane)
 %include "OgrePlaneBoundedVolume.h"
 // I/O
 %include "OgreConfigOptionMap.h"
@@ -114,6 +142,7 @@ typedef Ogre::SharedPtr<StringVector> StringVectorPtr;
 %include "OgreRenderTargetListener.h"
 // More Data Types
 %include "OgreColourValue.h"
+ADD_REPR(ColourValue)
 %include "OgrePixelFormat.h"
 %include "OgreBlendMode.h"
 %include "OgreRay.h"
@@ -213,6 +242,7 @@ typedef Ogre::SharedPtr<StringVector> StringVectorPtr;
         %include "OgreShadowCameraSetupPSSM.h"
     %include "OgreFrustum.h"
         %include "OgreCamera.h"
+        ADD_REPR(Camera)
     %include "OgreManualObject.h"
     %include "OgreEntity.h"
     %include "OgreSubEntity.h"
@@ -233,6 +263,8 @@ typedef Ogre::SharedPtr<StringVector> StringVectorPtr;
 %include "OgreMeshManager.h"
 %include "OgrePass.h"
     %include "OgreTechnique.h"
+%ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&);
+%ignore Ogre::RenderTarget::copyContentsToMemory(const PixelBox&, FrameBuffer); // deprecated
 %include "OgreRenderTarget.h"
     %include "OgreRenderWindow.h"
     %include "OgreRenderTexture.h"
