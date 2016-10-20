@@ -11,11 +11,6 @@
 
 # Tools can't be run on the iOS so don't build them
 if (NOT APPLE_IOS AND NOT (WINDOWS_STORE OR WINDOWS_PHONE) AND OGRE_BUILD_COMPONENT_MESHLODGENERATOR)
-  if(UNIX)
-    # this is abused way to much in OgreMain
-    add_definitions(-Wno-overloaded-virtual)
-  endif()
-
   add_subdirectory(XMLConverter)
   add_subdirectory(MeshUpgrader)
 endif (NOT APPLE_IOS AND NOT (WINDOWS_STORE OR WINDOWS_PHONE) AND OGRE_BUILD_COMPONENT_MESHLODGENERATOR)

@@ -143,7 +143,7 @@ namespace Ogre {
         @param createParams If any parameters are required to create an instance,
             they should be supplied here as name / value pairs
         */
-        virtual ResourcePtr createResource(const String& name, const String& group,
+        ResourcePtr createResource(const String& name, const String& group,
             bool isManual = false, ManualResourceLoader* loader = 0, 
             const NameValuePairList* createParams = 0);
 
@@ -161,7 +161,7 @@ namespace Ogre {
         @return A pair, the first element being the pointer, and the second being 
             an indicator specifying whether the resource was newly created.
         */
-        virtual ResourceCreateOrRetrieveResult createOrRetrieve(const String& name, 
+        ResourceCreateOrRetrieveResult createOrRetrieve(const String& name,
             const String& group, bool isManual = false, 
             ManualResourceLoader* loader = 0, 
             const NameValuePairList* createParams = 0);
@@ -418,7 +418,7 @@ namespace Ogre {
         @param backgroundThread Optional boolean which lets the load routine know if it
             is being run on the background resource loading thread
         */
-        virtual ResourcePtr prepare(const String& name, 
+        ResourcePtr prepare(const String& name,
             const String& group, bool isManual = false, 
             ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
             bool backgroundThread = false);
@@ -438,7 +438,7 @@ namespace Ogre {
         @param backgroundThread Optional boolean which lets the load routine know if it
             is being run on the background resource loading thread
         */
-        virtual ResourcePtr load(const String& name, 
+        ResourcePtr load(const String& name,
             const String& group, bool isManual = false, 
             ManualResourceLoader* loader = 0, const NameValuePairList* loadParams = 0,
             bool backgroundThread = false);
