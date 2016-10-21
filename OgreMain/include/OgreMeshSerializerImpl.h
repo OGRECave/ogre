@@ -237,6 +237,7 @@ namespace Ogre {
         size_t calcMorphKeyframeSize(const VertexMorphKeyFrame* kf, size_t vertexCount);
         size_t calcPoseSize(const Pose* pose);
         size_t calcPoseVertexSize(void);
+        using MeshSerializerImpl::calcPoseVertexSize;
     };
 
     /** Class for providing backwards-compatibility for loading version 1.4 of the .mesh format. 
