@@ -189,9 +189,9 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesGL()
 #endif
 
     RenderSystem* rs = root->getRenderSystemByName("OpenGL Rendering Subsystem");
-    if(rs == 0)
+    if(!rs)
     {
-        CPPUNIT_ASSERT_ASSERTION_PASS("This test is irrelevant because GL RenderSystem is not available");
+        // This test is irrelevant because GL RenderSystem is not available
     }
     else
     {
@@ -248,9 +248,9 @@ void UseCustomCapabilitiesTests::testCustomCapabilitiesD3D9()
 #endif
 
     RenderSystem* rs = root->getRenderSystemByName("Direct3D9 Rendering Subsystem");
-    if(rs == 0)
+    if(!rs)
     {
-        CPPUNIT_ASSERT_ASSERTION_PASS("This test is irrelevant because D3D9 RenderSystem is not available");
+        // This test is irrelevant because D3D9 RenderSystem is not available
     }
     else
     {   
