@@ -15,7 +15,7 @@ set(PYTHON_SITE_PACKAGES lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINO
 
 set(CMAKE_SWIG_FLAGS -w401,314 -builtin)
 
-add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized)
+add_definitions(-Wno-cast-qual -Wno-shadow -Wno-maybe-uninitialized -Wno-unused-label)
 set_source_files_properties(../../OgreMain/include/Ogre.i PROPERTIES CPLUSPLUS ON)
 swig_add_module(Ogre python ../../OgreMain/include/Ogre.i)
 swig_link_libraries(Ogre OgreMain ${PYTHON_LIBRARIES})
