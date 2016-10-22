@@ -152,7 +152,9 @@ namespace OgreBites
         /**
          init pre-created window for android
          */
-        void initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app);
+        void initAppForAndroid(AConfiguration* config, struct android_app* app);
+
+        void injectInputEvent(AInputEvent* event, int wheel = 0);
 #endif
 
         /**
@@ -262,6 +264,9 @@ namespace OgreBites
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
         AAssetManager* mAssetMgr;       // Android asset manager to access files inside apk
+        AConfiguration* mAConfig;
+        size_t mAndroidWinHdl;
+        TouchFingerEvent mLastTouch;
 #endif
 
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
