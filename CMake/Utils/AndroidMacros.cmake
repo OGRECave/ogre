@@ -95,6 +95,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 		SET(SCREEN_SIZE "|screenSize")
 	endif()
 	
+    set(OGRE_ANDROID_CFLAGS "${CMAKE_CXX_FLAGS} ${OGRE_ANDROID_CFLAGS}")
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
 
     file(MAKE_DIRECTORY "${NDKOUT}")
