@@ -104,7 +104,7 @@ namespace Ogre
     }
 #endif // if OGRE_DEBUG_MODE
 
-    bool LodCollapser::hasSrcID(unsigned int srcID, unsigned short submeshID)
+    bool LodCollapser::hasSrcID(unsigned int srcID, size_t submeshID)
     {
         // This will only return exact matches.
         for (size_t i = 0; i < tmpCollapsedEdges.size(); i++) {
@@ -132,7 +132,7 @@ namespace Ogre
         }
     }
 
-    size_t LodCollapser::findDstID(unsigned int srcID, unsigned short submeshID)
+    size_t LodCollapser::findDstID(unsigned int srcID, size_t submeshID)
     {
         // Tries to find a compatible edge.
 

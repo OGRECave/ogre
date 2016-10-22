@@ -696,7 +696,7 @@ namespace Ogre
 
         if (!posbuf.isNull())
         {
-            destPosRowSkip = mVertexDataRecord->size * posbuf->getVertexSize();
+            destPosRowSkip = mVertexDataRecord->size * uint16(posbuf->getVertexSize());
             pRootPosBuf = static_cast<unsigned char*>(posbuf->lock(lockMode));
             pRowPosBuf = pRootPosBuf;
             // skip dest buffer in by left/top
@@ -704,7 +704,7 @@ namespace Ogre
         }
         if (!deltabuf.isNull())
         {
-            destDeltaRowSkip = mVertexDataRecord->size * deltabuf->getVertexSize();
+            destDeltaRowSkip = mVertexDataRecord->size * uint16(deltabuf->getVertexSize());
             pRootDeltaBuf = static_cast<unsigned char*>(deltabuf->lock(lockMode));
             pRowDeltaBuf = pRootDeltaBuf;
             // skip dest buffer in by left/top
@@ -993,10 +993,10 @@ namespace Ogre
         const VertexDataRecord* vdr = getVertexDataRecord();
 
         // Ratio of the main terrain resolution in relation to this vertex data resolution
-        size_t resolutionRatio = (mTerrain->getSize() - 1) / (vdr->resolution - 1);
+        uint16 resolutionRatio = (mTerrain->getSize() - 1) / (vdr->resolution - 1);
         // At what frequency do we sample the vertex data we're using?
         // mSize is the coverage in terms of the original terrain data (not split to fit in 16-bit)
-        size_t vertexIncrement = (mSize-1) / (batchSize-1);
+        uint16 vertexIncrement = (mSize-1) / (batchSize-1);
         // however, the vertex data we're referencing may not be at the full resolution anyway
         vertexIncrement /= resolutionRatio;
         uint16 vdatasizeOffsetX = (mOffsetX - mNodeWithVertexData->mOffsetX) / resolutionRatio;

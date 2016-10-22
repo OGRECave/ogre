@@ -309,8 +309,8 @@ namespace Ogre {
             // No specified top left -> Center the window in the middle of the monitor
             if (left == -1 || top == -1)
             {               
-                int screenw = monitorInfoEx.rcWork.right  - monitorInfoEx.rcWork.left;
-                int screenh = monitorInfoEx.rcWork.bottom - monitorInfoEx.rcWork.top;
+                uint screenw = monitorInfoEx.rcWork.right  - monitorInfoEx.rcWork.left;
+                uint screenh = monitorInfoEx.rcWork.bottom - monitorInfoEx.rcWork.top;
 
                 unsigned int winWidth, winHeight;
                 adjustWindow(width, height, &winWidth, &winHeight);
@@ -639,8 +639,8 @@ namespace Ogre {
                 monitorInfo.cbSize = sizeof(MONITORINFO);
                 GetMonitorInfo(hMonitor, &monitorInfo);
 
-                LONG screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
-                LONG screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
+                uint screenw = monitorInfo.rcWork.right  - monitorInfo.rcWork.left;
+                uint screenh = monitorInfo.rcWork.bottom - monitorInfo.rcWork.top;
 
 
                 int left = screenw > winWidth ? ((screenw - winWidth) / 2) : 0;
@@ -786,7 +786,7 @@ namespace Ogre {
     {
         if (mHWnd && !mIsFullScreen)
         {
-            RECT rc = { 0, 0, width, height };
+            RECT rc = { 0, 0, int(width), int(height) };
             AdjustWindowRect(&rc, getWindowStyle(mIsFullScreen), false);
             width = rc.right - rc.left;
             height = rc.bottom - rc.top;

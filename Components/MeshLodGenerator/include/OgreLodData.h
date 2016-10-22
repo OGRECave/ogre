@@ -108,7 +108,7 @@ struct _OgreLodExport LodData {
         Vertex* vertex[3];
         Vector3 normal;
         bool isRemoved;
-        unsigned short submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
+        size_t submeshID; /// ID of the submesh. Usable with mMesh.getSubMesh() function.
         unsigned int vertexID[3]; /// Vertex ID in the buffer associated with the submeshID.
 
         void computeNormal();

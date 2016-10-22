@@ -155,9 +155,9 @@ namespace Ogre {
         destroySubMesh(index);
     }
     //-----------------------------------------------------------------------
-    unsigned short Mesh::getNumSubMeshes() const
+    size_t Mesh::getNumSubMeshes() const
     {
-        return static_cast< unsigned short >( mSubMeshList.size() );
+        return mSubMeshList.size();
     }
 
     //---------------------------------------------------------------------
@@ -180,7 +180,7 @@ namespace Ogre {
         return getSubMesh(index);
     }
     //-----------------------------------------------------------------------
-    SubMesh* Mesh::getSubMesh(unsigned short index) const
+    SubMesh* Mesh::getSubMesh(size_t index) const
     {
         if (index >= mSubMeshList.size())
         {

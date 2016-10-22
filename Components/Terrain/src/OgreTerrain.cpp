@@ -4372,7 +4372,7 @@ namespace Ogre
     }
     //---------------------------------------------------------------------
     void Terrain::_populateIndexBuffer(uint16* pI, uint16 batchSize, 
-        uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+        uint16 vdatasize, uint16 vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols,
         uint16 skirtRowColSkip)
     {
         /* For even / odd tri strip rows, triangles are this shape:
@@ -4399,8 +4399,8 @@ namespace Ogre
         // and one extra index, which is the degenerate triangle and also turning
         // around the winding
 
-        size_t rowSize = vdatasize * vertexIncrement;
-        size_t numRows = batchSize - 1;
+        uint16 rowSize = vdatasize * vertexIncrement;
+        uint16 numRows = batchSize - 1;
 
         // Start on the right
         uint16 currentVertex = (batchSize - 1) * vertexIncrement;
@@ -4660,7 +4660,7 @@ namespace Ogre
                 .createIndexBuffer(HardwareIndexBuffer::IT_16BIT, indexCount, 
                 HardwareBuffer::HBU_STATIC_WRITE_ONLY);
             uint16* pI = static_cast<uint16*>(ret->lock(HardwareBuffer::HBL_DISCARD));
-            Terrain::_populateIndexBuffer(pI, batchSize, vdatasize, vertexIncrement, xoffset, yoffset, numSkirtRowsCols, skirtRowColSkip);
+            Terrain::_populateIndexBuffer(pI, batchSize, vdatasize, uint16(vertexIncrement), xoffset, yoffset, numSkirtRowsCols, skirtRowColSkip);
             ret->unlock();
 
             mSharedIBufMap[hsh] = ret;
