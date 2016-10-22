@@ -42,14 +42,6 @@
 #undef LOGI
 #undef LOGW
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
-#   include "OgreRTShaderSystem.h"
-#endif
-
-#ifdef OGRE_STATIC_LIB
-#   include "OgreStaticPluginLoader.h"
-#endif
-
 #if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
 #   error This header is for use with Android only
 #endif
@@ -70,111 +62,28 @@ namespace OgreBites
             state->onAppCmd = &OgreAndroidBridge::handleCmd;
             state->onInputEvent = &OgreAndroidBridge::handleInput;
 
-            if(mInit)
+            if(mBrowser.getRoot())
                 return;
 
-            mRoot = new Ogre::Root();
-#ifdef OGRE_STATIC_LIB
-            mStaticPluginLoader = new Ogre::StaticPluginLoader();
-            mStaticPluginLoader->load();
-#endif
-            mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
-            mRoot->initialise(false);
-            mInit = true;
+            mBrowser.createRoot();
         }
 
         static void shutdown()
         {
-            if(!mInit)
+            if(!mBrowser.getRoot())
                 return;
 
-            mInit = false;
-
-            if(mBrowser)
-            {
-                mBrowser->closeApp();
-                OGRE_DELETE mBrowser;
-                mBrowser = NULL;
-            }
-
-            OGRE_DELETE mRoot;
-            mRoot = NULL;
-            mRenderWnd = NULL;
-
-#ifdef OGRE_STATIC_LIB
-            mStaticPluginLoader->unload();
-            delete mStaticPluginLoader;
-            mStaticPluginLoader = NULL;
-#endif
-        }
-
-        static void injectKeyEvent(int action, int32_t keyCode)
-        {
-            if(keyCode != AKEYCODE_BACK)
-                return;
-
-            KeyboardEvent evt = {SDL_SCANCODE_ESCAPE, 0};
-
-            if(action == AKEY_EVENT_ACTION_DOWN){
-                mBrowser->keyPressed(evt);
-            } else {
-                mBrowser->keyReleased(evt);
-            }
-        }
-        
-        static void injectTouchEvent(int action, float x, float y, int pointerId = 0)
-        {
-            TouchFingerEvent evt = {0};
-
-            switch (action) {
-            case AMOTION_EVENT_ACTION_DOWN:
-                evt.type = SDL_FINGERDOWN;
-                break;
-            case AMOTION_EVENT_ACTION_UP:
-                evt.type = SDL_FINGERUP;
-                break;
-            case AMOTION_EVENT_ACTION_MOVE:
-                evt.type = SDL_FINGERMOTION;
-                break;
-            default:
-                return;
-            }
-
-            evt.fingerId = pointerId;
-            evt.x = x / mBrowser->getRenderWindow()->getWidth();
-            evt.y = y / mBrowser->getRenderWindow()->getHeight();
-
-            if(evt.type == SDL_FINGERMOTION) {
-                if(evt.fingerId != mLastTouch.fingerId)
-                    return; // wrong finger
-
-                evt.dx = evt.x - mLastTouch.x;
-                evt.dy = evt.y - mLastTouch.y;
-            }
-
-            mLastTouch = evt;
-
-            switch (evt.type) {
-            case SDL_FINGERDOWN:
-                // for finger down we have to move the pointer first
-                mBrowser->touchMoved(evt);
-                mBrowser->touchPressed(evt);
-                break;
-            case SDL_FINGERUP:
-                mBrowser->touchReleased(evt);
-                break;
-            case SDL_FINGERMOTION:
-                mBrowser->touchMoved(evt);
-                break;
-            }
+            mBrowser.closeApp();
         }
         
         static int32_t handleInput(struct android_app* app, AInputEvent* event) 
         {
-            if (!mBrowser)
+            if (!mBrowser.getRenderWindow())
                 return 0;
 
             static float len = 0;
+
+            int wheel = 0; // overrides other events if mPinchGesture triggers
 
             if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION)
             {
@@ -190,27 +99,14 @@ namespace OgreBites
                     mPinchGesture.GetPointers(p1, p2);
                     float curr = (p1 - p2).Length();
 
-                    if(fabs(curr - len)/mBrowser->getRenderWindow()->getWidth() > 0.01) {
-                        MouseWheelEvent e;
-                        e.y = (curr - len) > 0 ? 1 : -1;
-                        mBrowser->mouseWheelRolled(e);
+                    if(fabs(curr - len)/mBrowser.getRenderWindow()->getWidth() > 0.01) {
+                        wheel = (curr - len) > 0 ? 1 : -1;
                         len = curr;
                     }
                 }
-
-                if(s != ndk_helper::GESTURE_STATE_NONE) {
-                    mLastTouch.fingerId = -1; // prevent move-jump after pinch is over
-                    return 1;
-                }
-
-                int32_t action = AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event);
-                injectTouchEvent(action, AMotionEvent_getRawX(event, 0), AMotionEvent_getRawY(event, 0),
-                        AMotionEvent_getPointerId(event, 0));
             }
-            else
-            {
-                injectKeyEvent(AKeyEvent_getAction(event), AKeyEvent_getKeyCode(event));
-            }
+
+            mBrowser.injectInputEvent(event, wheel);
 
             return 1;
         }
@@ -222,38 +118,27 @@ namespace OgreBites
                 case APP_CMD_SAVE_STATE:
                 break;
                 case APP_CMD_INIT_WINDOW:
-                    if (app->window && mRoot)
+                    if (app->window && mBrowser.getRoot())
                     {
                         AConfiguration* config = AConfiguration_new();
                         AConfiguration_fromAssetManager(config, app->activity->assetManager);
                         
-                        if (!mRenderWnd) 
+                        if (!mBrowser.getRenderWindow())
                         {
-                            Ogre::NameValuePairList opt;
-                            opt["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(app->window));
-                            opt["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(config));
-                            opt["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
-                            
-                            mRenderWnd = Ogre::Root::getSingleton().createRenderWindow("OgreWindow", 0, 0, false, &opt);
-
-                            if(!mBrowser)
-                            {
-                                mBrowser = OGRE_NEW SampleBrowser();
-                                mBrowser->initAppForAndroid(mRenderWnd, app);
-                                mBrowser->initApp();
-                            }
+                            mBrowser.initAppForAndroid(config, app);
+                            mBrowser.initApp();
                         }
                         else
                         {
-                            static_cast<AndroidEGLWindow*>(mRenderWnd)->_createInternalResources(app->window, config);
+                            static_cast<AndroidEGLWindow*>(mBrowser.getRenderWindow())->_createInternalResources(app->window, config);
                         }
                         
                         AConfiguration_delete(config);
                     }
                     break;
                 case APP_CMD_TERM_WINDOW:
-                    if(mRoot && mRenderWnd)
-                        static_cast<AndroidEGLWindow*>(mRenderWnd)->_destroyInternalResources();
+                    if(mBrowser.getRenderWindow())
+                        static_cast<AndroidEGLWindow*>(mBrowser.getRenderWindow())->_destroyInternalResources();
                     break;
                 case APP_CMD_GAINED_FOCUS:
                     break;
@@ -280,31 +165,17 @@ namespace OgreBites
                         return;
                 }
                 
-                if(mRenderWnd != NULL && mRenderWnd->isActive())
+                if(mBrowser.getRenderWindow() && mBrowser.getRenderWindow()->isActive())
                 {
-                    mRenderWnd->windowMovedOrResized();
-                    mRoot->renderOneFrame();
+                    mBrowser.getRenderWindow()->windowMovedOrResized();
+                    mBrowser.getRoot()->renderOneFrame();
                 }
             }
         }
-        
-        static Ogre::RenderWindow* getRenderWindow()
-        {
-            return mRenderWnd;
-        }
-            
-    private:
-        static SampleBrowser* mBrowser;
-        static Ogre::RenderWindow* mRenderWnd;
-        static Ogre::Root* mRoot;
-        static bool mInit;
-        
-        static TouchFingerEvent mLastTouch;
-        static ndk_helper::PinchDetector mPinchGesture;
 
-#ifdef OGRE_STATIC_LIB
-        static Ogre::StaticPluginLoader* mStaticPluginLoader;
-#endif
+    private:
+        static SampleBrowser mBrowser;
+        static ndk_helper::PinchDetector mPinchGesture;
     };
     
 }

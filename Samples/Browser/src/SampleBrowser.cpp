@@ -47,16 +47,8 @@
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
 #include "SampleBrowser_Android.h"
 
-SampleBrowser* OgreAndroidBridge::mBrowser = NULL;
-Ogre::RenderWindow* OgreAndroidBridge::mRenderWnd = NULL;
-Ogre::Root* OgreAndroidBridge::mRoot = NULL;
-bool OgreAndroidBridge::mInit = false;
+SampleBrowser OgreAndroidBridge::mBrowser;
 ndk_helper::PinchDetector OgreAndroidBridge::mPinchGesture;
-TouchFingerEvent OgreAndroidBridge::mLastTouch = {0};
-
-#   ifdef OGRE_STATIC_LIB
-StaticPluginLoader* OgreAndroidBridge::mStaticPluginLoader = NULL;
-#   endif
 
 #endif
 

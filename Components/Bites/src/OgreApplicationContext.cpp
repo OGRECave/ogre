@@ -44,6 +44,14 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mOverlaySystem = NULL;
     mSDLWindow = NULL;
     mFirstRun = true;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    mAssetMgr = NULL;
+    mAConfig = NULL;
+    mAndroidWinHdl = 0;
+    mLastTouch = TouchFingerEvent();
+#endif
+
 #ifdef INCLUDE_RTSHADER_SYSTEM
     mMaterialMgrListener = NULL;
     mShaderGenerator = NULL;
@@ -73,7 +81,7 @@ void ApplicationContext::initApp()
     // Clear event times
     Ogre::Root::getSingleton().clearEventTimes();
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    createRoot();
+    // createRoot();
 
     setup();
 
@@ -101,20 +109,23 @@ void ApplicationContext::initApp()
 
 void ApplicationContext::closeApp()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    shutdown();
-#else
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     mRoot->saveConfig();
+#endif
+
     shutdown();
     if (mRoot)
     {
         OGRE_DELETE mRoot;
+        mRoot = NULL;
     }
+
+    mWindow = NULL;
 
 #ifdef OGRE_STATIC_LIB
     mStaticPluginLoader.unload();
 #endif
-#endif
+
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
     if (mTaskScheduler.is_active())
         mTaskScheduler.terminate();
@@ -122,7 +133,7 @@ void ApplicationContext::closeApp()
 
 #if OGRE_BITES_HAVE_SDL
     SDL_DestroyWindow(mSDLWindow);
-    mSDLWindow = 0;
+    mSDLWindow = NULL;
 #endif
 }
 
@@ -244,7 +255,10 @@ void ApplicationContext::createRoot()
     mTaskScheduler.initialize(OGRE_THREAD_HARDWARE_CONCURRENCY);
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mRoot = Ogre::Root::getSingletonPtr();
+    mRoot = OGRE_NEW Ogre::Root();
+    mStaticPluginLoader.load();
+    mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
+    mRoot->initialise(false);
 #else
     Ogre::String pluginsPath = Ogre::BLANKSTRING;
 #   ifndef OGRE_STATIC_LIB
@@ -334,7 +348,11 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     return res;
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    return NULL;
+    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(mAndroidWinHdl);
+    miscParams["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAConfig));
+    miscParams["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
+
+    return Ogre::Root::getSingleton().createRenderWindow(mAppName, 0, 0, false, &miscParams);
 #else
     Ogre::ConfigOptionMap ropts = mRoot->getRenderSystem()->getConfigOptions();
 
@@ -370,16 +388,13 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-void ApplicationContext::initAppForAndroid(Ogre::RenderWindow *window, struct android_app* app)
+void ApplicationContext::initAppForAndroid(AConfiguration* config, struct android_app* app)
 {
-    mWindow = window;
-
-    if(app != NULL)
-    {
-        mAssetMgr = app->activity->assetManager;
-        Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(app->activity->assetManager) );
-        Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(app->activity->assetManager) );
-    }
+    mAConfig = config;
+    mAndroidWinHdl = reinterpret_cast<size_t>(app->window);
+    mAssetMgr = app->activity->assetManager;
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(app->activity->assetManager) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(app->activity->assetManager) );
 }
 
 Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
@@ -396,6 +411,73 @@ Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName
         stream = Ogre::DataStreamPtr(new Ogre::MemoryDataStream(membuf, length, true, true));
     }
     return stream;
+}
+
+void ApplicationContext::injectInputEvent(AInputEvent* event, int wheel) {
+    if(wheel) {
+        MouseWheelEvent e = {wheel};
+        mouseWheelRolled(e);
+        mLastTouch.fingerId = -1; // prevent move-jump after pinch is over
+        return;
+    }
+
+    if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
+        int32_t action = AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event);
+        TouchFingerEvent evt = {0};
+
+        switch (action) {
+        case AMOTION_EVENT_ACTION_DOWN:
+            evt.type = SDL_FINGERDOWN;
+            break;
+        case AMOTION_EVENT_ACTION_UP:
+            evt.type = SDL_FINGERUP;
+            break;
+        case AMOTION_EVENT_ACTION_MOVE:
+            evt.type = SDL_FINGERMOTION;
+            break;
+        default:
+            return;
+        }
+
+        evt.fingerId = AMotionEvent_getPointerId(event, 0);
+        evt.x = AMotionEvent_getRawX(event, 0) / mWindow->getWidth();
+        evt.y = AMotionEvent_getRawY(event, 0) / mWindow->getHeight();
+
+        if(evt.type == SDL_FINGERMOTION) {
+            if(evt.fingerId != mLastTouch.fingerId)
+                return; // wrong finger
+
+            evt.dx = evt.x - mLastTouch.x;
+            evt.dy = evt.y - mLastTouch.y;
+        }
+
+        mLastTouch = evt;
+
+        switch (evt.type) {
+        case SDL_FINGERDOWN:
+            // for finger down we have to move the pointer first
+            touchMoved(evt);
+            touchPressed(evt);
+            break;
+        case SDL_FINGERUP:
+            touchReleased(evt);
+            break;
+        case SDL_FINGERMOTION:
+            touchMoved(evt);
+            break;
+        }
+    } else {
+        if(AKeyEvent_getKeyCode(event) != AKEYCODE_BACK)
+            return;
+
+        KeyboardEvent evt = {SDL_SCANCODE_ESCAPE, 0};
+
+        if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN){
+            keyPressed(evt);
+        } else {
+            keyReleased(evt);
+        }
+    }
 }
 #endif
 
