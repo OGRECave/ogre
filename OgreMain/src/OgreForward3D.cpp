@@ -62,6 +62,8 @@ namespace Ogre
         mDebugMode( false ),
         mFadeAttenuationRange( true )
     {
+        assert( numSlices > 1 && "Must use at least 2 slices for Forward3D!" );
+
         uint32 sliceWidth   = mWidth;
         uint32 sliceHeight  = mHeight;
         mResolutionAtSlice.reserve( mNumSlices );
