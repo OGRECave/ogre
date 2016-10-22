@@ -3,7 +3,7 @@
 @set( texUnit, 1 )
 
 @property( hlms_forward3d )
-	@add( texUnit, 1 )
+	@add( texUnit, 2 )
 @end
 
 @set( textureRegShadowMapStart, texUnit )
