@@ -475,6 +475,7 @@ namespace Ogre {
         /// Queue of objects for rendering
         RenderQueue* mRenderQueue;
 
+        Forward3D   *mForward3DSystem;
         Forward3D   *mForward3DImpl;
 
         /// Updated every frame, has enough memory to hold all lights.
@@ -1306,7 +1307,12 @@ namespace Ogre {
         void setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
                            uint32 lightsPerCell, float minDistance, float maxDistance );
 
-        Forward3D* getForward3D(void)                       { return mForward3DImpl; }
+        Forward3D* getForward3D(void)                       { return mForward3DSystem; }
+        Forward3D* _getActivePassForward3D(void)            { return mForward3DImpl; }
+
+        /// For internal use.
+        /// @see CompositorPassSceneDef::mEnableForward3D
+        void _setForward3DEnabledInPass( bool bEnable );
 
         NodeMemoryManager& _getNodeMemoryManager(SceneMemoryMgrTypes sceneType)
                                                                 { return mNodeMemoryManager[sceneType]; }

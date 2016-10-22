@@ -46,9 +46,15 @@ namespace v1 {
 
     //-----------------------------------------------------------------------------  
 
-    D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer(D3D11Texture * parentTexture, D3D11Device & device, size_t subresourceIndex,
-        size_t width, size_t height, size_t depth, size_t face, PixelFormat format, HardwareBuffer::Usage usage):
-    HardwarePixelBuffer(width, height, depth, format, parentTexture->isHardwareGammaEnabled(), usage, false, false),
+    D3D11HardwarePixelBuffer::D3D11HardwarePixelBuffer( D3D11Texture *parentTexture,
+                                                        D3D11Device &device,
+                                                        size_t subresourceIndex,
+                                                        size_t width, size_t height, size_t depth,
+                                                        size_t face, PixelFormat format,
+                                                        uint fsaa, const String &fsaaHint,
+                                                        HardwareBuffer::Usage usage ) :
+        HardwarePixelBuffer( width, height, depth, format,
+                             parentTexture->isHardwareGammaEnabled(), usage, false, false ),
         mParentTexture(parentTexture),
         mDevice(device),
         mSubresourceIndex(subresourceIndex),
@@ -63,9 +69,10 @@ namespace v1 {
             for(size_t zoffset=0; zoffset<mDepth; ++zoffset)
             {
                 String name;
-                name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" + StringConverter::toString(mSubresourceIndex) + "/" + parentTexture->getName();
+                name = "rtt/"+StringConverter::toString((size_t)mParentTexture) + "/" +
+                        StringConverter::toString(mSubresourceIndex) + "/" + parentTexture->getName();
 
-                RenderTexture *trt = new D3D11RenderTexture(name, this, mHwGamma, mDevice);
+                RenderTexture *trt = new D3D11RenderTexture(name, this, mHwGamma, fsaa, fsaaHint, mDevice);
                 mSliceTRT.push_back(trt);
                 Root::getSingleton().getRenderSystem()->attachRenderTarget(*trt);
             }

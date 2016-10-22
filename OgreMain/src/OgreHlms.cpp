@@ -2093,7 +2093,7 @@ namespace Ogre
                 setProperty( HlmsBaseProp::ShadowUsesDepthTexture, usesDepthTextures );
             }
 
-            Forward3D *forward3D = sceneManager->getForward3D();
+            Forward3D *forward3D = sceneManager->_getActivePassForward3D();
             if( forward3D )
             {
                 setProperty( HlmsBaseProp::Forward3D,       forward3D->getNumSlices() );

@@ -808,7 +808,7 @@ namespace Ogre
 
         if( !casterPass )
         {
-            Forward3D *forward3D = sceneManager->getForward3D();
+            Forward3D *forward3D = sceneManager->_getActivePassForward3D();
             if( forward3D )
             {
                 mapSize += forward3D->getConstBufferSize();
@@ -1113,7 +1113,7 @@ namespace Ogre
                 }
             }
 
-            Forward3D *forward3D = sceneManager->getForward3D();
+            Forward3D *forward3D = sceneManager->_getActivePassForward3D();
             if( forward3D )
             {
                 forward3D->fillConstBufferData( renderTarget, passBufferPtr );

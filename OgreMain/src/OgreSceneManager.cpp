@@ -96,6 +96,7 @@ mStaticMinDepthLevelDirty( 0 ),
 mStaticEntitiesDirty( true ),
 mName(name),
 mRenderQueue( 0 ),
+mForward3DSystem( 0 ),
 mForward3DImpl( 0 ),
 mCameraInProgress(0),
 mCurrentViewport(0),
@@ -251,11 +252,12 @@ SceneManager::~SceneManager()
         mSceneRoot[i] = 0;
     }
     OGRE_DELETE mFullScreenQuad;
-    OGRE_DELETE mForward3DImpl;
+    OGRE_DELETE mForward3DSystem;
     OGRE_DELETE mRenderQueue;
     OGRE_DELETE mAutoParamDataSource;
 
     mFullScreenQuad         = 0;
+    mForward3DSystem        = 0;
     mForward3DImpl          = 0;
     mRenderQueue            = 0;
     mAutoParamDataSource    = 0;
@@ -847,17 +849,26 @@ void SceneManager::unregisterSceneNodeListener( SceneNode *sceneNode )
 void SceneManager::setForward3D( bool bEnable, uint32 width, uint32 height, uint32 numSlices,
                                  uint32 lightsPerCell, float minDistance, float maxDistance )
 {
-    OGRE_DELETE mForward3DImpl;
+    OGRE_DELETE mForward3DSystem;
+    mForward3DSystem = 0;
     mForward3DImpl = 0;
 
     if( bEnable )
     {
-        mForward3DImpl = OGRE_NEW Forward3D( width, height, numSlices, lightsPerCell,
-                                             minDistance, maxDistance, this );
+        mForward3DSystem = OGRE_NEW Forward3D( width, height, numSlices, lightsPerCell,
+                                               minDistance, maxDistance, this );
 
         if( mDestRenderSystem )
-            mForward3DImpl->_changeRenderSystem( mDestRenderSystem );
+            mForward3DSystem->_changeRenderSystem( mDestRenderSystem );
     }
+}
+//-----------------------------------------------------------------------
+void SceneManager::_setForward3DEnabledInPass( bool bEnable )
+{
+    if( bEnable )
+        mForward3DImpl = mForward3DSystem;
+    else
+        mForward3DImpl = 0;
 }
 //-----------------------------------------------------------------------
 void SceneManager::prepareRenderQueue(void)
@@ -1164,8 +1175,8 @@ void SceneManager::_setDestinationRenderSystem(RenderSystem* sys)
 {
     mDestRenderSystem = sys;
 
-    if( mForward3DImpl )
-        mForward3DImpl->_changeRenderSystem( sys );
+    if( mForward3DSystem )
+        mForward3DSystem->_changeRenderSystem( sys );
 }
 //-----------------------------------------------------------------------
 void SceneManager::prepareWorldGeometry(const String& filename)
@@ -2432,7 +2443,7 @@ void SceneManager::buildLightList()
 
     //Now fire the threads again, to build the per-MovableObject lists
 
-    if( mForward3DImpl )
+    if( mForward3DSystem )
         return; //Don't do this on non-forward passes.
     return;
 
