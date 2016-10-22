@@ -206,12 +206,7 @@ namespace Ogre
         static String strName( "Direct3D11 Rendering Subsystem");
         return strName;
     }
-    //---------------------------------------------------------------------
-	const String& D3D11RenderSystem::getFriendlyName(void) const
-	{
-		static String strName("Direct3D 11");
-		return strName;
-	}
+
 	//---------------------------------------------------------------------
     D3D11DriverList* D3D11RenderSystem::getDirect3DDrivers(bool refreshList /* = false*/)
     {
