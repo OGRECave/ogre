@@ -87,6 +87,10 @@ namespace Ogre
         /// Last Render Queue ID to render. Not inclusive
         uint8           mLastRQ;
 
+        /// Enable Forward3D during the pass (if Forward3D system was created)
+        /// Disabling optimizes performance when you don't need it.
+        bool            mEnableForward3D;
+
         /** When true, the camera will be rotated 90°, -90° or 180° depending on the value of
             mRtIndex and then restored to its original rotation after we're done.
         */
@@ -119,6 +123,7 @@ namespace Ogre
             mShadowNodeRecalculation( SHADOW_NODE_FIRST_ONLY ),
             mFirstRQ( 0 ),
             mLastRQ( -1 ),
+            mEnableForward3D( true ),
             mCameraCubemapReorient( false ),
             mUpdateLodLists( true ),
             mLodBias( 1.0f ),

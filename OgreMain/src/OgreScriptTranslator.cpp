@@ -8414,6 +8414,21 @@ namespace Ogre{
                         }
                     }
                     break;
+                case ID_ENABLE_FORWARD3D:
+                    {
+                        if(prop->values.empty())
+                        {
+                            compiler->addError(ScriptCompiler::CE_STRINGEXPECTED, prop->file, prop->line);
+                            return;
+                        }
+
+                        AbstractNodeList::const_iterator it0 = prop->values.begin();
+                        if( !getBoolean( *it0, &passScene->mEnableForward3D ) )
+                        {
+                             compiler->addError(ScriptCompiler::CE_NUMBEREXPECTED, prop->file, prop->line);
+                        }
+                    }
+                    break;
                 case ID_MATERIAL_SCHEME:
                     {
                         if (prop->values.empty())

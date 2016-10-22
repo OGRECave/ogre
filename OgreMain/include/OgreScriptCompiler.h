@@ -870,6 +870,7 @@ namespace Ogre
                     ID_FIRST_RENDER_QUEUE,
                     ID_LAST_RENDER_QUEUE,
                     ID_CAMERA_CUBEMAP_REORIENT,
+                    ID_ENABLE_FORWARD3D,
 
                     //Used by PASS_QUAD
                     ID_USE_QUAD,

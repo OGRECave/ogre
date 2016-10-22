@@ -128,8 +128,6 @@ namespace Ogre
                                                                                     SHADOW_NODE_REUSE );
         }
 
-        mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
-
         //Fire the listener in case it wants to change anything
         CompositorWorkspaceListener *listener = mParentNode->getWorkspace()->getListener();
         if( listener )
@@ -151,7 +149,10 @@ namespace Ogre
             //We need to restore the previous RT's update
             mTarget->_beginUpdate();
         }
-        
+
+        mViewport->_setVisibilityMask( mDefinition->mVisibilityMask );
+        sceneManager->_setForward3DEnabledInPass( mDefinition->mEnableForward3D );
+
         mTarget->_updateViewportCullPhase01( mViewport, mCamera, usedLodCamera,
                                              mDefinition->mFirstRQ, mDefinition->mLastRQ );
 

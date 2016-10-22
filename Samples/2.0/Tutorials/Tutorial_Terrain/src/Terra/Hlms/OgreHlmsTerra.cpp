@@ -524,7 +524,7 @@ namespace Ogre
         mGridBuffer             = 0;
         mGlobalLightListBuffer  = 0;
 
-        Forward3D *forward3D = sceneManager->getForward3D();
+        Forward3D *forward3D = sceneManager->_getActivePassForward3D();
         if( forward3D )
         {
             mapSize += forward3D->getConstBufferSize();
