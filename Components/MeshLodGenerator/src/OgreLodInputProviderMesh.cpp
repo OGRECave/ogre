@@ -60,13 +60,13 @@ namespace Ogre
         size_t vertexCount = 0;
         size_t vertexLookupSize = 0;
         size_t sharedVertexLookupSize = 0;
-        unsigned short submeshCount = mMesh->getNumSubMeshes();
-        for (unsigned short i = 0; i < submeshCount; i++) {
+        size_t submeshCount = mMesh->getNumSubMeshes();
+        for (size_t i = 0; i < submeshCount; i++) {
             const SubMesh* submesh = mMesh->getSubMesh(i);
             trianglesCount += getTriangleCount(submesh->operationType , submesh->indexData->indexCount);
             if (!submesh->useSharedVertices) {
                 size_t count = submesh->vertexData->vertexCount;
-                vertexLookupSize = std::max<size_t>(vertexLookupSize, count);
+                vertexLookupSize = std::max(vertexLookupSize, count);
                 vertexCount += count;
             } else if (!sharedVerticesAdded) {
                 sharedVerticesAdded = true;
@@ -92,8 +92,8 @@ namespace Ogre
         data->mMeshName = mMesh->getName();
 #endif
         data->mMeshBoundingSphereRadius = mMesh->getBoundingSphereRadius();
-        unsigned short submeshCount = mMesh->getNumSubMeshes();
-        for (unsigned short i = 0; i < submeshCount; ++i) {
+        size_t submeshCount = mMesh->getNumSubMeshes();
+        for (size_t i = 0; i < submeshCount; ++i) {
             const SubMesh* submesh = mMesh->getSubMesh(i);
             VertexData* vertexData = (submesh->useSharedVertices ? mMesh->sharedVertexData : submesh->vertexData);
             addVertexData(data, vertexData, submesh->useSharedVertices);
@@ -197,7 +197,7 @@ namespace Ogre
             vNormalBuf->unlock();
         }
     }
-    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, unsigned short submeshID, RenderOperation::OperationType renderOp)
+    void LodInputProviderMesh::addIndexData(LodData* data, IndexData* indexData, bool useSharedVertexLookup, size_t submeshID, RenderOperation::OperationType renderOp)
     {
         const HardwareIndexBufferSharedPtr& ibuf = indexData->indexBuffer;
         size_t isize = ibuf->getIndexSize();

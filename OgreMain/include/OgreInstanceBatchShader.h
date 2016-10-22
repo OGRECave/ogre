@@ -65,7 +65,7 @@ namespace Ogre
      */
     class _OgreExport InstanceBatchShader : public InstanceBatch
     {
-        unsigned short  mNumWorldMatrices;
+        size_t  mNumWorldMatrices;
 
         void setupVertices( const SubMesh* baseSubMesh );
         void setupIndices( const SubMesh* baseSubMesh );

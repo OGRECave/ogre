@@ -1525,7 +1525,7 @@ namespace Ogre {
     void Entity::buildSubEntityList(MeshPtr& mesh, SubEntityList* sublist)
     {
         // Create SubEntities
-        unsigned short i, numSubMeshes;
+        size_t i, numSubMeshes;
 
         numSubMeshes = mesh->getNumSubMeshes();
         for (i = 0; i < numSubMeshes; ++i)

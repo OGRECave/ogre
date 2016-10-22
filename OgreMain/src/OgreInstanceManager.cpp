@@ -574,7 +574,7 @@ namespace Ogre
             newVertexData->vertexCount = indicesMap.size();
             newVertexData->vertexDeclaration = sharedVertexData->vertexDeclaration->clone();
 
-            for (size_t bufIdx = 0; bufIdx < sharedVertexData->vertexBufferBinding->getBufferCount(); bufIdx++) 
+            for (uint16 bufIdx = 0; bufIdx < uint16(sharedVertexData->vertexBufferBinding->getBufferCount()); bufIdx++)
             {
                 HardwareVertexBufferSharedPtr sharedVertexBuffer = sharedVertexData->vertexBufferBinding->getBuffer(bufIdx);
                 size_t vertexSize = sharedVertexBuffer->getVertexSize();                

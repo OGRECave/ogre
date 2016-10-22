@@ -254,11 +254,11 @@ namespace Ogre {
 
         /** Gets the number of sub meshes which comprise this mesh.
         */
-        unsigned short getNumSubMeshes(void) const;
+        size_t getNumSubMeshes(void) const;
 
         /** Gets a pointer to the submesh indicated by the index.
         */
-        SubMesh* getSubMesh(unsigned short index) const;
+        SubMesh* getSubMesh(size_t index) const;
 
         /** Gets a SubMesh by name
         */
