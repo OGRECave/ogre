@@ -273,6 +273,9 @@ namespace Ogre
         Real nearPlane  = camera->getNearClipDistance();
         Real farPlane   = camera->getFarClipDistance();
 
+        if( farPlane == 0 )
+            farPlane = std::numeric_limits<Real>::max();
+
         assert( mNumSlices < 256 );
 
         Real projSpaceSliceEnd[256];
