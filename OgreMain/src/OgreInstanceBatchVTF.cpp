@@ -156,7 +156,7 @@ namespace Ogre
             float const *pWeights = reinterpret_cast<float const*>(baseBuffer + veWeights->getOffset());
 
             uint8 biggestWeightIdx = 0;
-            for( size_t j=1; j< mWeightCount; ++j )
+            for( uint8 j=1; j< uint8(mWeightCount); ++j )
             {
                 biggestWeightIdx = pWeights[biggestWeightIdx] < pWeights[j] ? j : biggestWeightIdx;
             }
@@ -398,8 +398,8 @@ namespace Ogre
                 //In each entity update the "transform lookup number" so that:
                 // 1. All entities sharing the same transformation will share the same unique number
                 // 2. "transform lookup number" will be numbered from 0 up to getMaxLookupTableInstances
-                size_t lookupCounter = 0;
-                typedef map<Matrix4*,size_t>::type MapTransformId;
+                uint16 lookupCounter = 0;
+                typedef map<Matrix4*,uint16>::type MapTransformId;
                 MapTransformId transformToId;
                 InstancedEntityVec::const_iterator itEnt = mInstancedEntities.begin(),
                     itEntEnd = mInstancedEntities.end();
@@ -411,7 +411,7 @@ namespace Ogre
                         MapTransformId::iterator itLu = transformToId.find(transformUniqueId);
                         if (itLu == transformToId.end())
                         {
-                            itLu = transformToId.insert(MapTransformId::value_type(transformUniqueId,lookupCounter)).first;
+                            itLu = transformToId.insert(std::make_pair(transformUniqueId,lookupCounter)).first;
                             ++lookupCounter;
                         }
                         (*itEnt)->setTransformLookupNumber(itLu->second);
@@ -611,7 +611,7 @@ namespace Ogre
                     originalVal = *initBuf32++;
 
                 if( indexType == HardwareIndexBuffer::IT_16BIT )
-                    *thisBuf16++ = static_cast<uint16>(originalVal) + vertexOffset;
+                    *thisBuf16++ = static_cast<uint16>(originalVal + vertexOffset);
                 else
                     *thisBuf32++ = static_cast<uint32>(originalVal + vertexOffset);
             }

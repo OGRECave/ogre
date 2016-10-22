@@ -68,7 +68,7 @@ protected:
     struct CollapsedEdge {
         unsigned int srcID;
         unsigned int dstID;
-        unsigned short submeshID;
+        size_t submeshID;
     };
     
     typedef vector<CollapsedEdge>::type CollapsedEdges;
@@ -84,9 +84,9 @@ protected:
     void assertOutdatedCollapseCost(LodData* data, LodCollapseCost* cost, LodData::Vertex* vertex);
     void assertValidMesh(LodData* data);
     void assertValidVertex(LodData* data, LodData::Vertex* v);
-    bool hasSrcID(unsigned int srcID, unsigned short submeshID);
+    bool hasSrcID(unsigned int srcID, size_t submeshID);
     void removeTriangleFromEdges(LodData::Triangle* triangle, LodData::Vertex* skip);
-    size_t findDstID(unsigned int srcID, unsigned short submeshID);
+    size_t findDstID(unsigned int srcID, size_t submeshID);
     void replaceVertexID(LodData::Triangle* triangle, unsigned int oldID, unsigned int newID, LodData::Vertex* dst);
 };
 

@@ -194,13 +194,7 @@ namespace Ogre {
 
     const String& GL3PlusRenderSystem::getName(void) const
     {
-        static String strName("OpenGL 3+ Rendering Subsystem (ALPHA)");
-        return strName;
-    }
-
-    const String& GL3PlusRenderSystem::getFriendlyName(void) const
-    {
-        static String strName("OpenGL 3+");
+        static String strName("OpenGL 3+ Rendering Subsystem");
         return strName;
     }
 

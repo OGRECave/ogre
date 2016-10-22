@@ -515,7 +515,7 @@ namespace Ogre {
         @param rotate
             Initial rotation relative to parent
         */
-        virtual Node* createChild(
+        Node* createChild(
             const Vector3& translate = Vector3::ZERO, 
             const Quaternion& rotate = Quaternion::IDENTITY );
 
@@ -528,7 +528,7 @@ namespace Ogre {
         @param rotate
             Initial rotation relative to parent
         */
-        virtual Node* createChild(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
+        Node* createChild(const String& name, const Vector3& translate = Vector3::ZERO, const Quaternion& rotate = Quaternion::IDENTITY);
 
         /** Adds a (precreated) child scene node to this node. If it is attached to another node,
             it must be detached first.

@@ -624,7 +624,7 @@ namespace Ogre
 
         */
         static void _populateIndexBuffer(uint16* pIndexes, uint16 batchSize, 
-            uint16 vdatasize, size_t vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols, 
+            uint16 vdatasize, uint16 vertexIncrement, uint16 xoffset, uint16 yoffset, uint16 numSkirtRowsCols,
             uint16 skirtRowColSkip);
 
         /** Utility method to calculate the skirt index for a given original vertex index. */
