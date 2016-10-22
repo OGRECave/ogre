@@ -190,10 +190,6 @@ namespace Ogre {
         /** See
             RenderSystem
         */
-            const String& getFriendlyName(void) const;
-        /** See
-            RenderSystem
-        */
         ConfigOptionMap& getConfigOptions(void);
         /** See
             RenderSystem

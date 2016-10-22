@@ -180,8 +180,6 @@ namespace Ogre {
          */
         const String& getName(void) const;
 
-		const String& getFriendlyName(void) const;
-
         /** See
           RenderSystem
          */
