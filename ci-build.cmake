@@ -1,5 +1,5 @@
 set(GENERATOR)
-set(OTHER)
+set(OTHER -DCMAKE_CXX_FLAGS=-std=c++11)
 set(CROSS)
 
 set(CMAKE_BUILD_TYPE Debug)
@@ -21,6 +21,7 @@ if(DEFINED ENV{IOS})
         -DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CMake/toolchain/ios.toolchain.xcode.cmake)
 
     set(OTHER
+        -DCMAKE_CXX_FLAGS=-std=c++11
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
         ${CROSS})
     set(BUILD_DEPS TRUE)
@@ -31,6 +32,7 @@ elseif("$ENV{TRAVIS_OS_NAME}" STREQUAL "osx")
         -DOGRE_BUILD_RENDERSYSTEM_GL3PLUS=TRUE)
 
     set(OTHER
+        -DCMAKE_CXX_FLAGS=-std=c++11
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps
         ${CROSS})
 endif()
@@ -62,6 +64,7 @@ if(DEFINED ENV{ANDROID})
 
     set(OTHER
         ${CROSS}
+        -DCMAKE_CXX_FLAGS=-std=c++11
         -DOGRE_DEPENDENCIES_DIR=${CMAKE_CURRENT_SOURCE_DIR}/ogredeps)
     set(BUILD_DEPS TRUE)
     
@@ -77,6 +80,7 @@ execute_process(COMMAND cmake
     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
     -DOGRE_BUILD_TESTS=ON
     -DOGRE_BUILD_DEPENDENCIES=${BUILD_DEPS}
+    -DOGRE_CONFIG_THREAD_PROVIDER=std
     -DSWIG_EXECUTABLE=/usr/bin/swig3.0
     ${RENDERSYSTEMS}
     ${OTHER}
