@@ -16,6 +16,14 @@ list(APPEND SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/glew.c")
 file(GLOB NVPARSE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/*.cpp")
 file(GLOB NVPARSE_HEADERS "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/*.h")
 
+if(UNIX)
+  # easier than porting to new flex
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/_ps1.0_lexer.cpp 
+    PROPERTIES COMPILE_FLAGS "-Wno-shadow -Wno-cast-qual -Wno-unused-function")
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/_vs1.0_lexer.cpp 
+    PROPERTIES COMPILE_FLAGS "-Wno-cast-qual -Wno-unused-function")
+endif()
+
 # Remove test app file
 list(REMOVE_ITEM NVPARSE_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/nvparse/ps1.0__test_main.cpp")
 

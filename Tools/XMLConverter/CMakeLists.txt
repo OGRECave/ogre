@@ -42,7 +42,7 @@ ogre_add_component_include_dir(MeshLodGenerator)
 add_definitions(-DTIXML_USE_STL)
 
 if(UNIX)
-    add_definitions(-Wno-logical-op-parentheses) # inside tinyxml sources
+    add_definitions(-Wno-shadow) # inside tinyxml sources
 endif()
 
 ogre_add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
