@@ -456,7 +456,7 @@ void XMLToBinary(XmlOptions opts)
 
         if( opts.mergeTexcoordResult != opts.mergeTexcoordToDestroy )
         {
-            newMesh->mergeAdjacentTexcoords( opts.mergeTexcoordResult, opts.mergeTexcoordToDestroy );
+            newMesh->mergeAdjacentTexcoords( uint16(opts.mergeTexcoordResult), uint16(opts.mergeTexcoordToDestroy) );
         }
 
         if (opts.nuextremityPoints)
