@@ -40,6 +40,11 @@ endif(NOT TINYXML_FOUND)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${TINYXML_INCLUDE_DIR})
 ogre_add_component_include_dir(MeshLodGenerator)
 add_definitions(-DTIXML_USE_STL)
+
+if(UNIX)
+    add_definitions(-Wno-logical-op-parentheses) # inside tinyxml sources
+endif()
+
 ogre_add_executable(OgreXMLConverter ${HEADER_FILES} ${SOURCE_FILES})
 target_link_libraries(OgreXMLConverter ${OGRE_LIBRARIES} ${TINYXML_LIBRARIES} ${OGRE_MeshLodGenerator_LIBRARIES})
 
