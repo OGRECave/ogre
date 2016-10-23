@@ -48,7 +48,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 	    SET(DEPENDENCIES OgreMain RenderSystem_GLES)		
 	endif()
 	
-	SET(DEPENDENCIES ${DEPENDENCIES} OgreHLMS OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgreBites OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager)
+	SET(DEPENDENCIES ${DEPENDENCIES} OgreHLMS OgreTerrain OgreRTShaderSystem OgreMeshLodGenerator OgreOverlay OgrePaging OgreVolume Plugin_ParticleFX Plugin_OctreeSceneManager OgreBites)
 	add_dependencies(${ANDROID_PROJECT_TARGET} ${DEPENDENCIES})
 	set(DEPEND_STATIC_LIBS "")	
 	foreach(DEPENDENCY ${DEPENDENCIES})
@@ -95,6 +95,7 @@ macro(create_android_proj ANDROID_PROJECT_TARGET)
 		SET(SCREEN_SIZE "|screenSize")
 	endif()
 	
+    set(OGRE_ANDROID_CFLAGS "${CMAKE_CXX_FLAGS} ${OGRE_ANDROID_CFLAGS}")
     SET(ANDROID_TARGET "android-${ANDROID_SDK_API_LEVEL}")
 
     file(MAKE_DIRECTORY "${NDKOUT}")
