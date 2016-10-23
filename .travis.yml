@@ -49,6 +49,7 @@ matrix:
 script:
     - cmake -P ci-build.cmake
     - BUILD_CMD="cmake --build ."
+    - if [ "$TRAVIS_OS_NAME" = "linux" ]; then BUILD_CMD="$BUILD_CMD -- -k" ; fi
     - if [ "$TRAVIS_OS_NAME" == "osx" ]; then BUILD_CMD="set -o pipefail && $BUILD_CMD | xcpretty" ; fi
     - echo $BUILD_CMD && eval $BUILD_CMD
     # run unit tests
