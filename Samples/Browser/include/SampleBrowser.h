@@ -320,7 +320,7 @@ namespace OgreBites
             {
                 return SampleContext::frameRenderingQueued(evt);
             }
-            catch (Ogre::Exception e)   // show error and fall back to menu
+            catch (Ogre::Exception& e)   // show error and fall back to menu
             {
                 runSample(0);
                 mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
@@ -387,7 +387,7 @@ namespace OgreBites
                         mCategoryMenu->selectItem(mLastViewCategory);
                         mSampleMenu->selectItem(mLastViewTitle);
                     }
-                    catch (Ogre::Exception e) {}
+                    catch (Ogre::Exception&) {}
                 }
             }
             else if (b->getName() == "Configure")   // enter configuration screen
@@ -717,7 +717,7 @@ namespace OgreBites
             {
                 return SampleContext::keyPressed(evt);
             }
-            catch (Ogre::Exception e)   // show error and fall back to menu
+            catch (Ogre::Exception& e)   // show error and fall back to menu
             {
                 runSample(0);
                 mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
@@ -792,7 +792,7 @@ namespace OgreBites
                 // return SampleContext::mousePressed(orientedEvt);
                 return SampleContext::mousePressed(evt);
             }
-            catch (Ogre::Exception e)   // show error and fall back to menu
+            catch (Ogre::Exception& e)   // show error and fall back to menu
             {
                 runSample(0);
                 mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
@@ -823,7 +823,7 @@ namespace OgreBites
             {
                 return SampleContext::mouseReleased(evt);
             }
-            catch (Ogre::Exception e)   // show error and fall back to menu
+            catch (Ogre::Exception& e)   // show error and fall back to menu
             {
                 runSample(0);
                 mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
@@ -855,7 +855,7 @@ namespace OgreBites
             {
                 return SampleContext::mouseMoved(evt);
             }
-            catch (Ogre::Exception e)   // show error and fall back to menu
+            catch (Ogre::Exception& e)   // show error and fall back to menu
             {
                 runSample(0);
                 mTrayMgr->showOkDialog("Error!", e.getDescription() + "\nSource: " + e.getSource());
@@ -1237,7 +1237,7 @@ namespace OgreBites
                     mRoot->loadPlugin(sampleDir + *i);
 #endif
                 }
-                catch (Ogre::Exception& e)   // plugin couldn't be loaded
+                catch (Ogre::Exception&)   // plugin couldn't be loaded
                 {
                     unloadedSamplePlugins.push_back(sampleDir + *i);
                     continue;
