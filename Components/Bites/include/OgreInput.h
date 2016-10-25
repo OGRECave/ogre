@@ -26,6 +26,7 @@ enum {
     BUTTON_RIGHT = SDL_BUTTON_RIGHT,
 };
 
+typedef SDL_Event Event;
 typedef SDL_KeyboardEvent KeyboardEvent;
 typedef SDL_MouseMotionEvent MouseMotionEvent;
 typedef SDL_MouseButtonEvent MouseButtonEvent;
@@ -42,29 +43,42 @@ enum {
     BUTTON_RIGHT,
 };
 struct KeyboardEvent {
+    int type;
     union {
         Keycode scancode;
     } keysym;
     int repeat;
 };
 struct MouseMotionEvent {
+    int type;
     int x, y;
     int xrel, yrel;
     int windowID;
 };
 struct MouseButtonEvent {
+    int type;
     int x, y;
     int button;
 };
 struct MouseWheelEvent {
+    int type;
     int y;
 };
-
 struct TouchFingerEvent {
     int type;
     int fingerId;
     float x, y;
     float dx, dy;
+};
+
+union Event
+{
+    int type;
+    KeyboardEvent key;
+    MouseButtonEvent button;
+    MouseWheelEvent wheel;
+    MouseMotionEvent motion;
+    TouchFingerEvent tfinger;
 };
 }
 

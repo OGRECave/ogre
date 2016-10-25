@@ -151,7 +151,7 @@ namespace OgreBites
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         void initAppForAndroid(AConfiguration* config, struct android_app* app);
 
-        void injectInputEvent(AInputEvent* event, int wheel = 0);
+        void _fireInputEventAndroid(AInputEvent* event, int wheel = 0);
 #endif
 
         /**
@@ -169,6 +169,13 @@ namespace OgreBites
         virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
         virtual void windowClosed(Ogre::RenderWindow* rw) {}
         virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
+
+        /**
+         * inspect the event and call one of the corresponding functions defined below
+         * @param event Input Event
+         */
+        void _fireInputEvent(const Event& event);
+
         virtual bool keyPressed(const KeyboardEvent& evt) { return true; }
         virtual bool keyReleased(const KeyboardEvent& evt) { return true; }
         virtual bool touchMoved(const TouchFingerEvent& evt) { return true; }

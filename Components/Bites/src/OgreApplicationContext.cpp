@@ -49,7 +49,6 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mAssetMgr = NULL;
     mAConfig = NULL;
     mAndroidWinHdl = 0;
-    mLastTouch = TouchFingerEvent();
 #endif
 
 #ifdef INCLUDE_RTSHADER_SYSTEM
@@ -401,17 +400,21 @@ Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName
     return stream;
 }
 
-void ApplicationContext::injectInputEvent(AInputEvent* event, int wheel) {
+void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
+    Event evt = {0};
+
+    static TouchFingerEvent lastTouch = {0};
+
     if(wheel) {
-        MouseWheelEvent e = {wheel};
-        mouseWheelRolled(e);
+        evt.type = SDL_MOUSEWHEEL;
+        evt.wheel.y = wheel;
+        _fireInputEvent(evt);
         mLastTouch.fingerId = -1; // prevent move-jump after pinch is over
         return;
     }
 
     if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
         int32_t action = AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event);
-        TouchFingerEvent evt = {0};
 
         switch (action) {
         case AMOTION_EVENT_ACTION_DOWN:
@@ -427,47 +430,67 @@ void ApplicationContext::injectInputEvent(AInputEvent* event, int wheel) {
             return;
         }
 
-        evt.fingerId = AMotionEvent_getPointerId(event, 0);
-        evt.x = AMotionEvent_getRawX(event, 0) / mWindow->getWidth();
-        evt.y = AMotionEvent_getRawY(event, 0) / mWindow->getHeight();
+        evt.tfinger.fingerId = AMotionEvent_getPointerId(event, 0);
+        evt.tfinger.x = AMotionEvent_getRawX(event, 0) / mWindow->getWidth();
+        evt.tfinger.y = AMotionEvent_getRawY(event, 0) / mWindow->getHeight();
 
         if(evt.type == SDL_FINGERMOTION) {
-            if(evt.fingerId != mLastTouch.fingerId)
+            if(evt.tfinger.fingerId != mLastTouch.fingerId)
                 return; // wrong finger
 
-            evt.dx = evt.x - mLastTouch.x;
-            evt.dy = evt.y - mLastTouch.y;
+            evt.tfinger.dx = evt.tfinger.x - mLastTouch.x;
+            evt.tfinger.dy = evt.tfinger.y - mLastTouch.y;
         }
 
-        mLastTouch = evt;
-
-        switch (evt.type) {
-        case SDL_FINGERDOWN:
-            // for finger down we have to move the pointer first
-            touchMoved(evt);
-            touchPressed(evt);
-            break;
-        case SDL_FINGERUP:
-            touchReleased(evt);
-            break;
-        case SDL_FINGERMOTION:
-            touchMoved(evt);
-            break;
-        }
+        lastTouch = evt.tfinger;
     } else {
         if(AKeyEvent_getKeyCode(event) != AKEYCODE_BACK)
             return;
 
-        KeyboardEvent evt = {SDL_SCANCODE_ESCAPE, 0};
-
-        if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN){
-            keyPressed(evt);
-        } else {
-            keyReleased(evt);
-        }
+        evt.type = AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN ? SDL_KEYDOWN : SDL_KEYUP;
+        evt.key.keysym.scancode = SDL_SCANCODE_ESCAPE;
     }
+
+    _fireInputEvent(evt);
 }
 #endif
+
+void ApplicationContext::_fireInputEvent(const Event& event) {
+    switch (event.type)
+    {
+    case SDL_KEYDOWN:
+        // Ignore repeated signals from key being held down.
+        if (event.key.repeat) break;
+        keyPressed(event.key);
+        break;
+    case SDL_KEYUP:
+        keyReleased(event.key);
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        mousePressed(event.button);
+        break;
+    case SDL_MOUSEBUTTONUP:
+        mouseReleased(event.button);
+        break;
+    case SDL_MOUSEWHEEL:
+        mouseWheelRolled(event.wheel);
+        break;
+    case SDL_MOUSEMOTION:
+        mouseMoved(event.motion);
+        break;
+    case SDL_FINGERDOWN:
+        // for finger down we have to move the pointer first
+        touchMoved(event.tfinger);
+        touchPressed(event.tfinger);
+        break;
+    case SDL_FINGERUP:
+        touchReleased(event.tfinger);
+        break;
+    case SDL_FINGERMOTION:
+        touchMoved(event.tfinger);
+        break;
+    }
+}
 
 void ApplicationContext::setupInput(bool _grab)
 {
@@ -684,34 +707,8 @@ void ApplicationContext::captureInputDevices()
                 windowResized(mWindow);
             }
             break;
-        case SDL_KEYDOWN:
-            // Ignore repeated signals from key being held down.
-            if (event.key.repeat) break;
-            keyPressed(event.key);
-            break;
-        case SDL_KEYUP:
-            keyReleased(event.key);
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            mousePressed(event.button);
-            break;
-        case SDL_MOUSEBUTTONUP:
-            mouseReleased(event.button);
-            break;
-        case SDL_MOUSEWHEEL:
-            mouseWheelRolled(event.wheel);
-            break;
-        case SDL_MOUSEMOTION:
-            mouseMoved(event.motion);
-            break;
-        case SDL_FINGERDOWN:
-            touchPressed(event.tfinger);
-            break;
-        case SDL_FINGERUP:
-            touchReleased(event.tfinger);
-            break;
-        case SDL_FINGERMOTION:
-            touchMoved(event.tfinger);
+        default:
+            _fireInputEvent(event);
             break;
         }
     }
