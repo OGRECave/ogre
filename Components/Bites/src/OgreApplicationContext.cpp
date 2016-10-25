@@ -65,9 +65,8 @@ ApplicationContext::~ApplicationContext()
 
 void ApplicationContext::initApp()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     createRoot();
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     if (!oneTimeConfig()) return;
 
     if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
@@ -80,28 +79,18 @@ void ApplicationContext::initApp()
 
     // Clear event times
     Ogre::Root::getSingleton().clearEventTimes();
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    // createRoot();
-
-    setup();
-
-    //mRoot->saveConfig();
-
-    Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
-
-    // Clear event times
-    Ogre::Root::getSingleton().clearEventTimes();
-
 #else
-    createRoot();
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
     mNextRenderer = mRoot->getAvailableRenderers()[0]->getName();
 #else
     if (!oneTimeConfig()) return;
 #endif
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     // if the context was reconfigured, set requested renderer
     if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
+#endif
 
     setup();
 #endif
@@ -254,11 +243,9 @@ void ApplicationContext::createRoot()
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
     mTaskScheduler.initialize(OGRE_THREAD_HARDWARE_CONCURRENCY);
 #endif
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
     mRoot = OGRE_NEW Ogre::Root();
-    mStaticPluginLoader.load();
-    mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
-    mRoot->initialise(false);
 #else
     Ogre::String pluginsPath = Ogre::BLANKSTRING;
 #   ifndef OGRE_STATIC_LIB
@@ -266,19 +253,22 @@ void ApplicationContext::createRoot()
 #   endif
     mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogre.cfg"),
                                 mFSLayer->getWritablePath("ogre.log"));
-
-#   ifdef OGRE_STATIC_LIB
-    mStaticPluginLoader.load();
-#   endif
 #endif
 
+#ifdef OGRE_STATIC_LIB
+    mStaticPluginLoader.load();
+#endif
     mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
 }
 
 bool ApplicationContext::oneTimeConfig()
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
+#else
     if (!mRoot->restoreConfig())
         return mRoot->showConfigDialog();
+#endif
     return true;
 }
 
@@ -393,8 +383,6 @@ void ApplicationContext::initAppForAndroid(AConfiguration* config, struct androi
     mAConfig = config;
     mAndroidWinHdl = reinterpret_cast<size_t>(app->window);
     mAssetMgr = app->activity->assetManager;
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(app->activity->assetManager) );
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(app->activity->assetManager) );
 }
 
 Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
@@ -510,6 +498,8 @@ void ApplicationContext::locateResources()
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAssetMgr) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAssetMgr) );
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #   else
     cf.load(mFSLayer->getConfigFilePath("resources.cfg"));

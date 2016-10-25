@@ -149,9 +149,6 @@ namespace OgreBites
         virtual void initApp();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        /**
-         init pre-created window for android
-         */
         void initAppForAndroid(AConfiguration* config, struct android_app* app);
 
         void injectInputEvent(AInputEvent* event, int wheel = 0);
