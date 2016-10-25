@@ -101,7 +101,7 @@ namespace OgreBites
                 }
             }
 
-            mBrowser.injectInputEvent(event, wheel);
+            mBrowser._fireInputEventAndroid(event, wheel);
 
             return 1;
         }
