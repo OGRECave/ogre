@@ -1326,6 +1326,8 @@ namespace Ogre {
         */
         ObjectMemoryManager& _getEntityMemoryManager(SceneMemoryMgrTypes sceneType)
                                                             { return mEntityMemoryManager[sceneType]; }
+        ObjectMemoryManager& _getLightMemoryManager(void)
+                                                            { return mLightMemoryManager; }
 
         /** Create an Item (instance of a discrete mesh).
             @param
