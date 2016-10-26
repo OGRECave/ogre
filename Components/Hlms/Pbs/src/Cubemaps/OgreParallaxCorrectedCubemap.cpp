@@ -951,6 +951,8 @@ namespace Ogre
             ++itor;
         }
 
+        mSceneManager->clearFrameData();
+
         //Set to 0 so next time mBlendedProbeNeedsUpdate will be set to true correctly;
         mNumCollectedProbes = 0;
     }
