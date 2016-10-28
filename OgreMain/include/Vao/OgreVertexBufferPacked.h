@@ -60,6 +60,13 @@ namespace Ogre
             return mSemantic == semantic;
         }
 
+        /// Warning: Beware a VertexElement2Vec shouldn't be sorted.
+        /// The order in which they're pushed into the vector defines the offsets
+        /// in the vertex buffer. Altering the order would cause the GPU to
+        /// to read garbage when trying to interpret the vertex buffer
+        /// This operator exists because it's useful when implementing
+        /// a '<' operator in other structs that contain VertexElement2Vecs
+        /// (see HlmsPso)
         bool operator < ( const VertexElement2 &_r ) const
         {
             if( this->mType < _r.mType ) return true;
