@@ -59,6 +59,17 @@ namespace Ogre
         {
             return mSemantic == semantic;
         }
+
+        bool operator < ( const VertexElement2 &_r ) const
+        {
+            if( this->mType < _r.mType ) return true;
+            if( this->mType > _r.mType ) return false;
+
+            if( this->mSemantic < _r.mSemantic ) return true;
+            if( this->mSemantic > _r.mSemantic ) return false;
+
+            return this->mInstancingStepRate < _r.mInstancingStepRate;
+        }
     };
 
     typedef vector<VertexElement2>::type VertexElement2Vec;
