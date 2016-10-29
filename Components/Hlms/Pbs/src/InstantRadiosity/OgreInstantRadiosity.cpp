@@ -38,7 +38,11 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "Vao/OgreAsyncTicket.h"
 
-#include <tr1/random>
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+    #include <random>
+#else
+    #include <tr1/random>
+#endif
 
 namespace Ogre
 {
@@ -411,10 +415,13 @@ namespace Ogre
         {
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
-                MovableObject *movableObject = objData.mOwner[j];
-                if( movableObject->getVisible() &&
-                    (movableObject->getVisibilityFlags() & visibilityMask) )
+                uint32 * RESTRICT_ALIAS visibilityFlags = objData.mVisibilityFlags;
+
+                if( visibilityFlags[j] & VisibilityFlags::LAYER_VISIBILITY &&
+                    visibilityFlags[j] & visibilityMask )
                 {
+                    MovableObject *movableObject = objData.mOwner[j];
+
                     const Matrix4 &worldMatrix = movableObject->_getParentNodeFullTransform();
                     RenderableArray::const_iterator itor = movableObject->mRenderables.begin();
                     RenderableArray::const_iterator end  = movableObject->mRenderables.end();
@@ -570,14 +577,18 @@ namespace Ogre
             ObjectData objData;
             const size_t totalObjs = memoryManager.getFirstObjectData( objData, i );
 
-            for( size_t j=0; j<totalObjs; j += ARRAY_PACKED_REALS )
+            //for( size_t j=0; j<totalObjs; j += ARRAY_PACKED_REALS )
             {
-                for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                //for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                size_t j=0;//TODO
+                size_t k=0;//TODO
                 {
-                    Light *light = static_cast<Light*>( objData.mOwner[k] );
-                    if( light->getVisible() &&
-                        light->getVisibilityFlags() & lightMask )
+                    uint32 * RESTRICT_ALIAS visibilityFlags = objData.mVisibilityFlags;
+
+                    if( visibilityFlags[j] & VisibilityFlags::LAYER_VISIBILITY &&
+                        visibilityFlags[j] & lightMask )
                     {
+                        Light *light = static_cast<Light*>( objData.mOwner[k] );
                         Node *lightNode = light->getParentNode();
                         Vector3 diffuseCol;
                         diffuseCol.x = light->getDiffuseColour().r;
