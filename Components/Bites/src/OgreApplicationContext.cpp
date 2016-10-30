@@ -195,7 +195,6 @@ bool ApplicationContext::initialiseRTShaderSystem()
 void ApplicationContext::destroyRTShaderSystem()
 {
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
-    //mShaderGenerator->invalidateScheme( Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME );
     //mShaderGenerator->removeAllShaderBasedTechniques();
     //mShaderGenerator->flushShaderCache();
 
@@ -248,7 +247,7 @@ void ApplicationContext::createRoot()
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-    mRoot = OGRE_NEW Ogre::Root();
+    mRoot = OGRE_NEW Ogre::Root("");
 #else
     Ogre::String pluginsPath = Ogre::BLANKSTRING;
 #   ifndef OGRE_STATIC_LIB
