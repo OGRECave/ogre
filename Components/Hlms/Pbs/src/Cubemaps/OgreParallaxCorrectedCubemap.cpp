@@ -829,6 +829,9 @@ namespace Ogre
         RenderSystem *renderSystem = mSceneManager->getDestinationRenderSystem();
         HlmsManager *hlmsManager = mRoot->getHlmsManager();
 
+        const uint32 oldVisibilityMask = mSceneManager->getVisibilityMask();
+        mSceneManager->setVisibilityMask( 0xffffffff );
+
         for( size_t i=0; i<mNumCollectedProbes; ++i )
         {
             if( (mCollectedProbes[i]->mDirty || !mCollectedProbes[i]->mStatic) &&
@@ -864,10 +867,15 @@ namespace Ogre
                 mBlendedProbeNeedsUpdate = true;
             }
         }
+
+        mSceneManager->setVisibilityMask( oldVisibilityMask );
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateRender(void)
     {
+        const uint32 oldVisibilityMask = mSceneManager->getVisibilityMask();
+        mSceneManager->setVisibilityMask( 0xffffffff );
+
         for( size_t i=0; i<mNumCollectedProbes; ++i )
         {
             if( mCollectedProbes[i]->mDirty || !mCollectedProbes[i]->mStatic )
@@ -927,6 +935,8 @@ namespace Ogre
             else if( mNumCollectedProbes > 1u )
                 mBlendWorkspace->_update();
         }
+
+        mSceneManager->setVisibilityMask( oldVisibilityMask );
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateAllDirtyProbes(void)
