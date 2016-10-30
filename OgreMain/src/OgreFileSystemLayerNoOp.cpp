@@ -26,10 +26,6 @@
  -----------------------------------------------------------------------------
  */
 #include "OgreFileSystemLayer.h"
-#include <sys/types.h>
-#include <ppapi\cpp\file_system.h>
-#include <ppapi\cpp\file_ref.h>
-#include <ppapi\cpp\file_io.h>
 
 namespace Ogre
 {
