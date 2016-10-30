@@ -34,64 +34,42 @@
 #include <OgreZip.h>
 
 #define SAFE_DELETE(x) if(x){delete x;  x= NULL;}
-#define RESOURCE_CFG "resources.cfg"
 
 Sample::Sample()
-    :   mRoot(NULL), mWindow(NULL), mSceneMgr(NULL), mCamera(NULL), mExitMainLoop(false), mEntity(NULL), mBuffer(NULL)
+    :   OgreBites::ApplicationContext(), mSceneMgr(NULL), mCamera(NULL), mExitMainLoop(false), mNode(NULL), mBuffer(NULL)
 {
 }
 
-Sample::~Sample()
-{
-	SAFE_DELETE(mRoot)
-}
+void Sample::createRoot() {
+    OgreBites::ApplicationContext::createRoot();
 
-void Sample::setupEngine()
-{
-	// Create root node and load plugins which are defined inside our plugin.cfg
-	mRoot = new Ogre::Root("","","");
-    Ogre::RenderSystem* renderSystem = OGRE_NEW Ogre::GLES2RenderSystem();
-    mRoot->addRenderSystem(renderSystem);
-    mRoot->setRenderSystem(renderSystem);
-    mRoot->initialise(false);
-    
-    // Create our main window
-    Ogre::NameValuePairList miscRenderWindowParams;
-    miscRenderWindowParams[ "FSAA" ] = "0";
-    mWindow = mRoot->createRenderWindow("EmscriptenRenderer", 640, 480, false, &miscRenderWindowParams);
+    mRoot->addRenderSystem(new Ogre::GLES2RenderSystem());
     Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MIP, Ogre::FO_LINEAR);
     Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MAG, Ogre::FO_ANISOTROPIC);
+}
 
-	// Parse resources
-	parseResources();
+void Sample::setup()
+{
+    OgreBites::ApplicationContext::setup();
 
     // Create the scenemanger
-	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
-    
-    // Create RTSS
-    if (Ogre::RTShader::ShaderGenerator::initialize())
-    {
-        mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
-        mShaderGenerator->setCreateShaderOverProgrammablePass(false);
-        mShaderGenerator->setShaderCachePath("");
-        mShaderGenerator->setTargetLanguage("glsles");
-        
-        mMaterialListener = OGRE_NEW OgreBites::SGTechniqueResolverListener(mShaderGenerator);
-        Ogre::MaterialManager::getSingleton().addListener(mMaterialListener);
-        mShaderGenerator->addSceneManager(mSceneMgr);
-    }
-    
-    // Create overlay system
-    mOverlaySystem = OGRE_NEW(Ogre::OverlaySystem);
+    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
+    mShaderGenerator->addSceneManager(mSceneMgr);
     mSceneMgr->addRenderQueueListener(mOverlaySystem);
     
-    // start script parsing
-	Ogre::ResourceGroupManager::getSingletonPtr()->initialiseResourceGroup(Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-    
+    // Setup UI
+    mTrayMgr = OGRE_NEW OgreBites::TrayManager("InterfaceName", mWindow);
+    mTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
+    mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
+    mTrayMgr->hideCursor();
+
     // Create Camera / Viewport
     setupScene();
+}
 
-	// Setup input
+void Sample::startMainLoop()
+{
+    // Setup input
     emscripten_set_keypress_callback(NULL, (void*)this, 1, &Sample::keypress_callback);
     emscripten_set_mousedown_callback("#canvas", (void*)this, 1, &Sample::mousedown_callback);
     emscripten_set_mouseup_callback("#canvas", (void*)this, 1, &Sample::mouseup_callback);
@@ -99,17 +77,6 @@ void Sample::setupEngine()
     emscripten_set_wheel_callback("#canvas", (void*)this, 1, &Sample::mousewheel_callback);
     emscripten_set_beforeunload_callback((void*)this, Sample::beforeunload_callback);
 
-    // Setup UI
-    mTrayMgr = OGRE_NEW OgreBites::TrayManager("InterfaceName", mWindow);
-    mTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
-    mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
-    mTrayMgr->hideCursor();
-    
-	mRoot->addFrameListener(this);
-}
-
-void Sample::startMainLoop()
-{
     emscripten_set_main_loop_arg(_mainLoop, static_cast<void*>(this), 0, 1);
 }
 
@@ -142,7 +109,7 @@ EM_BOOL Sample::mousedown_callback(int eventType, const EmscriptenMouseEvent* mo
 {
     Sample* thizz = static_cast<Sample*>(userData);
     
-    OgreBites::MouseButtonEvent evt = {mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
+    OgreBites::MouseButtonEvent evt = {0, mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
     thizz->mCameraMan->injectMouseDown(evt);
 
     return 0;
@@ -152,7 +119,7 @@ EM_BOOL Sample::mouseup_callback(int eventType, const EmscriptenMouseEvent* mous
 {
     Sample* thizz = static_cast<Sample*>(userData);
     
-    OgreBites::MouseButtonEvent evt = {mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
+    OgreBites::MouseButtonEvent evt = {0, mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
     thizz->mCameraMan->injectMouseUp(evt);
 
     return 0;
@@ -162,7 +129,7 @@ EM_BOOL Sample::mousemove_callback(int eventType, const EmscriptenMouseEvent* mo
 {
     Sample* thizz = static_cast<Sample*>(userData);
 
-    OgreBites::MouseMotionEvent evt = {mouseEvent->canvasX, mouseEvent->canvasY, mouseEvent->movementX, mouseEvent->movementY};
+    OgreBites::MouseMotionEvent evt = {0, mouseEvent->canvasX, mouseEvent->canvasY, mouseEvent->movementX, mouseEvent->movementY};
     thizz->mCameraMan->injectMouseMove(evt);
 
     return 0;
@@ -186,7 +153,7 @@ EM_BOOL Sample::mousewheel_callback(int eventType, const EmscriptenWheelEvent* m
             break;
     }
 
-    OgreBites::MouseWheelEvent evt = {-int(mouseEvent->deltaY*adjust)};
+    OgreBites::MouseWheelEvent evt = {0, -int(mouseEvent->deltaY*adjust)};
     thizz->mCameraMan->injectMouseWheel(evt);
     
     return 0;
@@ -200,18 +167,10 @@ const char* Sample::beforeunload_callback(int eventType, const void* reserved, v
 
 bool Sample::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
+    mAnimation->addTime(evt.timeSinceLastFrame);
+
     mTrayMgr->frameRenderingQueued(evt);
     return true;
-}
-
-bool Sample::frameStarted(const Ogre::FrameEvent& evt)
-{
-	for(size_t i = 0; i < mAnimations.size(); i++)
-	{
-		mAnimations[i]->addTime(evt.timeSinceLastFrame);
-	}
-	
-	return true;
 }
 
 void Sample::_mainLoop(void* target)
@@ -246,49 +205,35 @@ void Sample::_mainLoop(void* target)
     }
 }
 
-void Sample::parseResources()
-{
-	// load resource paths from config file
-	Ogre::ConfigFile resCfg;
-	resCfg.load(RESOURCE_CFG);
-	Ogre::ConfigFile::SectionIterator seci = resCfg.getSectionIterator();
-	// go through all specified resource groups
-	while (seci.hasMoreElements()) {
-		Ogre::String sec = seci.peekNextKey();
-		Ogre::ConfigFile::SettingsMultiMap* settings = seci.getNext();
-		// go through all resource paths
-		for (Ogre::ConfigFile::SettingsMultiMap::iterator i = settings->begin(); i != settings->end(); i++) {
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(i->second, i->first, sec);
-		}
-	}
-}
-
 void Sample::setupScene()
 {
+    mSceneMgr->setSkyBox(true, "SkyBox");
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0, 0, 0));
 
 	Ogre::SceneNode* pNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Light* pDirLight = mSceneMgr->createLight();
-	pDirLight->setType(Ogre::Light::LT_DIRECTIONAL);
-	pDirLight->setDirection(Ogre::Vector3(0,0.5,-1));
+	pDirLight->setPosition(Ogre::Vector3(0,10,15));
 	pNode->attachObject(pDirLight);
     
     mCamera = mSceneMgr->createCamera("MyCam");
 	mCamera->setNearClipDistance(1.0f);
-	mCamera->setFarClipDistance(100000.0f);
 
 	mCamera->lookAt(0,0,0);
 	mCamera->setAutoAspectRatio(true);
 
 	mCameraMan = new OgreBites::CameraMan(mCamera);
 	mCameraMan->setStyle(OgreBites::CS_ORBIT);
-    mCamera->setPosition(0,0,15.0f);
+	mCameraMan->setYawPitchDist(Ogre::Radian(0),Ogre::Radian(0.3),15.0f);
 
-    mEntity = mSceneMgr->getRootSceneNode()->createChildSceneNode("EntityNode");
-    mEntity->attachObject(mSceneMgr->createEntity("Sinbad.mesh"));
+    mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("EntityNode");
+    Ogre::Entity* ent = mSceneMgr->createEntity("Sinbad.mesh");
+    mNode->attachObject(ent);
     
+    mAnimation = ent->getAnimationState("IdleTop");
+    mAnimation->setEnabled(true);
+
 	Ogre::Viewport* vp = mWindow->addViewport(mCamera);
-	vp->setBackgroundColour(Ogre::ColourValue(0.5,0.5,0.5));
+	vp->setBackgroundColour(Ogre::ColourValue(0.3,0.3,0.3));
 }
 
 void Sample::unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName)
@@ -375,12 +320,12 @@ void Sample::clearScene()
 {
     if (mBuffer != NULL)
     {
-        auto it = mEntity->getAttachedObjectIterator();
+        auto it = mNode->getAttachedObjectIterator();
         while (it.hasMoreElements())
         {
             mSceneMgr->destroyMovableObject(it.getNext());
         }
-        mEntity->detachAllObjects();
+        mNode->detachAllObjects();
      
         Ogre::MaterialManager* matMgr = Ogre::MaterialManager::getSingletonPtr();
         matMgr->removeUnreferencedResources();
@@ -402,7 +347,6 @@ void Sample::clearScene()
         
         Ogre::EmbeddedZipArchiveFactory::removeEmbbeddedFile("download.zip");
         
-        mShaderGenerator->invalidateScheme( Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME );
         mShaderGenerator->removeAllShaderBasedTechniques();
         mShaderGenerator->flushShaderCache();
         
@@ -426,7 +370,7 @@ void Sample::passAssetAsArrayBuffer(unsigned char* arr, int length) {
         Ogre::StringVectorPtr meshes = Ogre::ArchiveManager::getSingleton().load("download.zip","EmbeddedZip",true)->find("*.mesh");
         for (auto i : *meshes)
         {
-            mEntity->attachObject(mSceneMgr->createEntity(i));
+            mNode->attachObject(mSceneMgr->createEntity(i));
         }
         
     } catch (Ogre::Exception ex) {

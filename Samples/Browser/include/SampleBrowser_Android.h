@@ -61,11 +61,6 @@ namespace OgreBites
         {
             state->onAppCmd = &OgreAndroidBridge::handleCmd;
             state->onInputEvent = &OgreAndroidBridge::handleInput;
-
-            if(mBrowser.getRoot())
-                return;
-
-            mBrowser.createRoot();
         }
 
         static void shutdown()
@@ -106,7 +101,7 @@ namespace OgreBites
                 }
             }
 
-            mBrowser.injectInputEvent(event, wheel);
+            mBrowser._fireInputEventAndroid(event, wheel);
 
             return 1;
         }
@@ -118,7 +113,7 @@ namespace OgreBites
                 case APP_CMD_SAVE_STATE:
                 break;
                 case APP_CMD_INIT_WINDOW:
-                    if (app->window && mBrowser.getRoot())
+                    if (app->window)
                     {
                         AConfiguration* config = AConfiguration_new();
                         AConfiguration_fromAssetManager(config, app->activity->assetManager);

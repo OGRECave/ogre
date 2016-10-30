@@ -5,6 +5,7 @@ OGRE_SDK=../../installed_em
 # copy together a minimal media subset
 cp ../Media/packs/SdkTrays.zip media/
 cp ../Media/packs/Sinbad.zip media/
+cp ../Media/packs/cubemapsJS.zip media/
 cp -R ../Media/RTShaderLib/GLSL media/RTShaderLib/
 cp -R ../Media/RTShaderLib/GLSLES media/RTShaderLib/
 

@@ -49,10 +49,9 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mAssetMgr = NULL;
     mAConfig = NULL;
     mAndroidWinHdl = 0;
-    mLastTouch = TouchFingerEvent();
 #endif
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     mMaterialMgrListener = NULL;
     mShaderGenerator = NULL;
 #endif
@@ -65,9 +64,8 @@ ApplicationContext::~ApplicationContext()
 
 void ApplicationContext::initApp()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     createRoot();
-
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     if (!oneTimeConfig()) return;
 
     if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
@@ -80,28 +78,18 @@ void ApplicationContext::initApp()
 
     // Clear event times
     Ogre::Root::getSingleton().clearEventTimes();
-#elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    // createRoot();
-
-    setup();
-
-    //mRoot->saveConfig();
-
-    Ogre::Root::getSingleton().getRenderSystem()->_initRenderTargets();
-
-    // Clear event times
-    Ogre::Root::getSingleton().clearEventTimes();
-
 #else
-    createRoot();
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_NACL
     mNextRenderer = mRoot->getAvailableRenderers()[0]->getName();
 #else
     if (!oneTimeConfig()) return;
 #endif
 
+#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID
     // if the context was reconfigured, set requested renderer
     if (!mFirstRun) mRoot->setRenderSystem(mRoot->getRenderSystemByName(mNextRenderer));
+#endif
 
     setup();
 #endif
@@ -139,7 +127,7 @@ void ApplicationContext::closeApp()
 
 bool ApplicationContext::initialiseRTShaderSystem()
 {
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     if (Ogre::RTShader::ShaderGenerator::initialize())
     {
         mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
@@ -206,7 +194,10 @@ bool ApplicationContext::initialiseRTShaderSystem()
 
 void ApplicationContext::destroyRTShaderSystem()
 {
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    //mShaderGenerator->removeAllShaderBasedTechniques();
+    //mShaderGenerator->flushShaderCache();
+
     // Restore default scheme.
     Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
@@ -237,7 +228,7 @@ void ApplicationContext::setup()
     mWindow = createWindow();
     setupInput(mGrabInput);
     locateResources();
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     initialiseRTShaderSystem();
 #endif
     loadResources();
@@ -254,11 +245,9 @@ void ApplicationContext::createRoot()
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
     mTaskScheduler.initialize(OGRE_THREAD_HARDWARE_CONCURRENCY);
 #endif
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mRoot = OGRE_NEW Ogre::Root();
-    mStaticPluginLoader.load();
-    mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
-    mRoot->initialise(false);
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    mRoot = OGRE_NEW Ogre::Root("");
 #else
     Ogre::String pluginsPath = Ogre::BLANKSTRING;
 #   ifndef OGRE_STATIC_LIB
@@ -266,19 +255,22 @@ void ApplicationContext::createRoot()
 #   endif
     mRoot = OGRE_NEW Ogre::Root(pluginsPath, mFSLayer->getWritablePath("ogre.cfg"),
                                 mFSLayer->getWritablePath("ogre.log"));
-
-#   ifdef OGRE_STATIC_LIB
-    mStaticPluginLoader.load();
-#   endif
 #endif
 
+#ifdef OGRE_STATIC_LIB
+    mStaticPluginLoader.load();
+#endif
     mOverlaySystem = OGRE_NEW Ogre::OverlaySystem();
 }
 
 bool ApplicationContext::oneTimeConfig()
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
+#else
     if (!mRoot->restoreConfig())
         return mRoot->showConfigDialog();
+#endif
     return true;
 }
 
@@ -289,7 +281,7 @@ void ApplicationContext::createDummyScene()
     sm->addRenderQueueListener(mOverlaySystem);
     Ogre::Camera* cam = sm->createCamera("DummyCamera");
     mWindow->addViewport(cam);
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     // Initialize shader generator.
     // Must be before resource loading in order to allow parsing extended material attributes.
     if (!initialiseRTShaderSystem())
@@ -300,7 +292,7 @@ void ApplicationContext::createDummyScene()
     }
 
     mShaderGenerator->addSceneManager(sm);
-#endif // INCLUDE_RTSHADER_SYSTEM
+#endif // OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 }
 
 void ApplicationContext::destroyDummyScene()
@@ -309,7 +301,7 @@ void ApplicationContext::destroyDummyScene()
         return;
 
     Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     mShaderGenerator->removeSceneManager(dummyScene);
 #endif
     dummyScene->removeRenderQueueListener(mOverlaySystem);
@@ -393,8 +385,6 @@ void ApplicationContext::initAppForAndroid(AConfiguration* config, struct androi
     mAConfig = config;
     mAndroidWinHdl = reinterpret_cast<size_t>(app->window);
     mAssetMgr = app->activity->assetManager;
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(app->activity->assetManager) );
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(app->activity->assetManager) );
 }
 
 Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
@@ -413,17 +403,21 @@ Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName
     return stream;
 }
 
-void ApplicationContext::injectInputEvent(AInputEvent* event, int wheel) {
+void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
+    Event evt = {0};
+
+    static TouchFingerEvent lastTouch = {0};
+
     if(wheel) {
-        MouseWheelEvent e = {wheel};
-        mouseWheelRolled(e);
+        evt.type = SDL_MOUSEWHEEL;
+        evt.wheel.y = wheel;
+        _fireInputEvent(evt);
         mLastTouch.fingerId = -1; // prevent move-jump after pinch is over
         return;
     }
 
     if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
         int32_t action = AMOTION_EVENT_ACTION_MASK & AMotionEvent_getAction(event);
-        TouchFingerEvent evt = {0};
 
         switch (action) {
         case AMOTION_EVENT_ACTION_DOWN:
@@ -439,47 +433,67 @@ void ApplicationContext::injectInputEvent(AInputEvent* event, int wheel) {
             return;
         }
 
-        evt.fingerId = AMotionEvent_getPointerId(event, 0);
-        evt.x = AMotionEvent_getRawX(event, 0) / mWindow->getWidth();
-        evt.y = AMotionEvent_getRawY(event, 0) / mWindow->getHeight();
+        evt.tfinger.fingerId = AMotionEvent_getPointerId(event, 0);
+        evt.tfinger.x = AMotionEvent_getRawX(event, 0) / mWindow->getWidth();
+        evt.tfinger.y = AMotionEvent_getRawY(event, 0) / mWindow->getHeight();
 
         if(evt.type == SDL_FINGERMOTION) {
-            if(evt.fingerId != mLastTouch.fingerId)
+            if(evt.tfinger.fingerId != mLastTouch.fingerId)
                 return; // wrong finger
 
-            evt.dx = evt.x - mLastTouch.x;
-            evt.dy = evt.y - mLastTouch.y;
+            evt.tfinger.dx = evt.tfinger.x - mLastTouch.x;
+            evt.tfinger.dy = evt.tfinger.y - mLastTouch.y;
         }
 
-        mLastTouch = evt;
-
-        switch (evt.type) {
-        case SDL_FINGERDOWN:
-            // for finger down we have to move the pointer first
-            touchMoved(evt);
-            touchPressed(evt);
-            break;
-        case SDL_FINGERUP:
-            touchReleased(evt);
-            break;
-        case SDL_FINGERMOTION:
-            touchMoved(evt);
-            break;
-        }
+        lastTouch = evt.tfinger;
     } else {
         if(AKeyEvent_getKeyCode(event) != AKEYCODE_BACK)
             return;
 
-        KeyboardEvent evt = {SDL_SCANCODE_ESCAPE, 0};
-
-        if(AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN){
-            keyPressed(evt);
-        } else {
-            keyReleased(evt);
-        }
+        evt.type = AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN ? SDL_KEYDOWN : SDL_KEYUP;
+        evt.key.keysym.scancode = SDL_SCANCODE_ESCAPE;
     }
+
+    _fireInputEvent(evt);
 }
 #endif
+
+void ApplicationContext::_fireInputEvent(const Event& event) {
+    switch (event.type)
+    {
+    case SDL_KEYDOWN:
+        // Ignore repeated signals from key being held down.
+        if (event.key.repeat) break;
+        keyPressed(event.key);
+        break;
+    case SDL_KEYUP:
+        keyReleased(event.key);
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        mousePressed(event.button);
+        break;
+    case SDL_MOUSEBUTTONUP:
+        mouseReleased(event.button);
+        break;
+    case SDL_MOUSEWHEEL:
+        mouseWheelRolled(event.wheel);
+        break;
+    case SDL_MOUSEMOTION:
+        mouseMoved(event.motion);
+        break;
+    case SDL_FINGERDOWN:
+        // for finger down we have to move the pointer first
+        touchMoved(event.tfinger);
+        touchPressed(event.tfinger);
+        break;
+    case SDL_FINGERUP:
+        touchReleased(event.tfinger);
+        break;
+    case SDL_FINGERMOTION:
+        touchMoved(event.tfinger);
+        break;
+    }
+}
 
 void ApplicationContext::setupInput(bool _grab)
 {
@@ -510,6 +524,8 @@ void ApplicationContext::locateResources()
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAssetMgr) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAssetMgr) );
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #   else
     cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
@@ -595,7 +611,7 @@ void ApplicationContext::locateResources()
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
     }
 
-#       ifdef INCLUDE_RTSHADER_SYSTEM
+#       ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSL", type, sec);
@@ -620,7 +636,7 @@ void ApplicationContext::locateResources()
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/HLSL_Cg", type, sec);
     }
-#       endif /* INCLUDE_RTSHADER_SYSTEM */
+#       endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
 #   endif /* OGRE_PLATFORM != OGRE_PLATFORM_ANDROID */
 #endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 }
@@ -694,34 +710,8 @@ void ApplicationContext::captureInputDevices()
                 windowResized(mWindow);
             }
             break;
-        case SDL_KEYDOWN:
-            // Ignore repeated signals from key being held down.
-            if (event.key.repeat) break;
-            keyPressed(event.key);
-            break;
-        case SDL_KEYUP:
-            keyReleased(event.key);
-            break;
-        case SDL_MOUSEBUTTONDOWN:
-            mousePressed(event.button);
-            break;
-        case SDL_MOUSEBUTTONUP:
-            mouseReleased(event.button);
-            break;
-        case SDL_MOUSEWHEEL:
-            mouseWheelRolled(event.wheel);
-            break;
-        case SDL_MOUSEMOTION:
-            mouseMoved(event.motion);
-            break;
-        case SDL_FINGERDOWN:
-            touchPressed(event.tfinger);
-            break;
-        case SDL_FINGERUP:
-            touchReleased(event.tfinger);
-            break;
-        case SDL_FINGERMOTION:
-            touchMoved(event.tfinger);
+        default:
+            _fireInputEvent(event);
             break;
         }
     }

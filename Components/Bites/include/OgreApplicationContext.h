@@ -35,7 +35,7 @@
 #include "OgreFileSystemLayer.h"
 #include "OgreFrameListener.h"
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #include "OgreSGTechniqueResolverListener.h"
 #endif // INCLUDE_RTSHADER_SYSTEM
 
@@ -149,12 +149,9 @@ namespace OgreBites
         virtual void initApp();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-        /**
-         init pre-created window for android
-         */
         void initAppForAndroid(AConfiguration* config, struct android_app* app);
 
-        void injectInputEvent(AInputEvent* event, int wheel = 0);
+        void _fireInputEventAndroid(AInputEvent* event, int wheel = 0);
 #endif
 
         /**
@@ -172,6 +169,13 @@ namespace OgreBites
         virtual bool windowClosing(Ogre::RenderWindow* rw) { return true; }
         virtual void windowClosed(Ogre::RenderWindow* rw) {}
         virtual void windowFocusChange(Ogre::RenderWindow* rw) {}
+
+        /**
+         * inspect the event and call one of the corresponding functions defined below
+         * @param event Input Event
+         */
+        void _fireInputEvent(const Event& event);
+
         virtual bool keyPressed(const KeyboardEvent& evt) { return true; }
         virtual bool keyReleased(const KeyboardEvent& evt) { return true; }
         virtual bool touchMoved(const TouchFingerEvent& evt) { return true; }
@@ -288,7 +292,7 @@ namespace OgreBites
         Ogre::RenderWindow* mWindow;    // render window
         SDL_Window* mSDLWindow;
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*       mShaderGenerator;                       // The Shader generator instance.
         SGTechniqueResolverListener*       mMaterialMgrListener;           // Shader generator material manager listener.
 #endif // INCLUDE_RTSHADER_SYSTEM
