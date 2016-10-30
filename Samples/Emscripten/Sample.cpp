@@ -36,7 +36,7 @@
 #define SAFE_DELETE(x) if(x){delete x;  x= NULL;}
 
 Sample::Sample()
-    :   OgreBites::ApplicationContext(), mSceneMgr(NULL), mCamera(NULL), mExitMainLoop(false), mEntity(NULL), mBuffer(NULL)
+    :   OgreBites::ApplicationContext(), mSceneMgr(NULL), mCamera(NULL), mExitMainLoop(false), mNode(NULL), mBuffer(NULL)
 {
 }
 
@@ -167,18 +167,10 @@ const char* Sample::beforeunload_callback(int eventType, const void* reserved, v
 
 bool Sample::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
+    mAnimation->addTime(evt.timeSinceLastFrame);
+
     mTrayMgr->frameRenderingQueued(evt);
     return true;
-}
-
-bool Sample::frameStarted(const Ogre::FrameEvent& evt)
-{
-	for(size_t i = 0; i < mAnimations.size(); i++)
-	{
-		mAnimations[i]->addTime(evt.timeSinceLastFrame);
-	}
-	
-	return true;
 }
 
 void Sample::_mainLoop(void* target)
@@ -215,6 +207,7 @@ void Sample::_mainLoop(void* target)
 
 void Sample::setupScene()
 {
+    mSceneMgr->setSkyBox(true, "SkyBox");
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0, 0, 0));
 
 	Ogre::SceneNode* pNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -232,9 +225,13 @@ void Sample::setupScene()
 	mCameraMan->setStyle(OgreBites::CS_ORBIT);
 	mCameraMan->setYawPitchDist(Ogre::Radian(0),Ogre::Radian(0.3),15.0f);
 
-    mEntity = mSceneMgr->getRootSceneNode()->createChildSceneNode("EntityNode");
-    mEntity->attachObject(mSceneMgr->createEntity("Sinbad.mesh"));
+    mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("EntityNode");
+    Ogre::Entity* ent = mSceneMgr->createEntity("Sinbad.mesh");
+    mNode->attachObject(ent);
     
+    mAnimation = ent->getAnimationState("IdleTop");
+    mAnimation->setEnabled(true);
+
 	Ogre::Viewport* vp = mWindow->addViewport(mCamera);
 	vp->setBackgroundColour(Ogre::ColourValue(0.3,0.3,0.3));
 }
@@ -323,12 +320,12 @@ void Sample::clearScene()
 {
     if (mBuffer != NULL)
     {
-        auto it = mEntity->getAttachedObjectIterator();
+        auto it = mNode->getAttachedObjectIterator();
         while (it.hasMoreElements())
         {
             mSceneMgr->destroyMovableObject(it.getNext());
         }
-        mEntity->detachAllObjects();
+        mNode->detachAllObjects();
      
         Ogre::MaterialManager* matMgr = Ogre::MaterialManager::getSingletonPtr();
         matMgr->removeUnreferencedResources();
@@ -373,7 +370,7 @@ void Sample::passAssetAsArrayBuffer(unsigned char* arr, int length) {
         Ogre::StringVectorPtr meshes = Ogre::ArchiveManager::getSingleton().load("download.zip","EmbeddedZip",true)->find("*.mesh");
         for (auto i : *meshes)
         {
-            mEntity->attachObject(mSceneMgr->createEntity(i));
+            mNode->attachObject(mSceneMgr->createEntity(i));
         }
         
     } catch (Ogre::Exception ex) {
