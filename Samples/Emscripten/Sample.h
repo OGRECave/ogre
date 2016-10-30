@@ -30,22 +30,21 @@
 #define __SAMPLE_H__
 
 #include <Ogre.h>
-#include <RTShaderSystem/OgreShaderGenerator.h>
-#include <OgreSGTechniqueResolverListener.h>
 #include <OgreTrays.h>
 #include <OgreCameraMan.h>
+#include <OgreApplicationContext.h>
 #include <emscripten/html5.h>
 
 
-class Sample : public Ogre::FrameListener
+class Sample : public OgreBites::ApplicationContext
 {
 public:
 	Sample();
-	virtual ~Sample();
 
-	void setupEngine();
+	void setup();
 	void setupScene();
 	void startMainLoop();
+	void createRoot();
     bool frameRenderingQueued(const Ogre::FrameEvent& evt);
     bool frameStarted(const Ogre::FrameEvent& evt);
     
@@ -53,8 +52,6 @@ public:
     void clearScene();
     
 private:
-	Ogre::Root* mRoot;
-	Ogre::RenderWindow* mWindow;
 	Ogre::SceneManager* mSceneMgr;
 	Ogre::Camera* mCamera;
 	bool mExitMainLoop;
@@ -62,13 +59,9 @@ private:
     unsigned char* mBuffer;
 	std::vector<Ogre::AnimationState*> mAnimations;
     
-    Ogre::OverlaySystem* mOverlaySystem;
-    Ogre::RTShader::ShaderGenerator* mShaderGenerator;
-    Ogre::MaterialManager::Listener* mMaterialListener;
     OgreBites::TrayManager* mTrayMgr;
     OgreBites::CameraMan* mCameraMan;
 
-	void parseResources();
     void destroyMaterials( Ogre::String resourceGroupID );
     void destroyTextures( Ogre::String resourceGroupID );
     void unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName);
