@@ -51,7 +51,7 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mAndroidWinHdl = 0;
 #endif
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     mMaterialMgrListener = NULL;
     mShaderGenerator = NULL;
 #endif
@@ -127,7 +127,7 @@ void ApplicationContext::closeApp()
 
 bool ApplicationContext::initialiseRTShaderSystem()
 {
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     if (Ogre::RTShader::ShaderGenerator::initialize())
     {
         mShaderGenerator = Ogre::RTShader::ShaderGenerator::getSingletonPtr();
@@ -194,7 +194,11 @@ bool ApplicationContext::initialiseRTShaderSystem()
 
 void ApplicationContext::destroyRTShaderSystem()
 {
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    //mShaderGenerator->invalidateScheme( Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME );
+    //mShaderGenerator->removeAllShaderBasedTechniques();
+    //mShaderGenerator->flushShaderCache();
+
     // Restore default scheme.
     Ogre::MaterialManager::getSingleton().setActiveScheme(Ogre::MaterialManager::DEFAULT_SCHEME_NAME);
 
@@ -225,7 +229,7 @@ void ApplicationContext::setup()
     mWindow = createWindow();
     setupInput(mGrabInput);
     locateResources();
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     initialiseRTShaderSystem();
 #endif
     loadResources();
@@ -243,7 +247,7 @@ void ApplicationContext::createRoot()
     mTaskScheduler.initialize(OGRE_THREAD_HARDWARE_CONCURRENCY);
 #endif
 
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     mRoot = OGRE_NEW Ogre::Root();
 #else
     Ogre::String pluginsPath = Ogre::BLANKSTRING;
@@ -262,7 +266,7 @@ void ApplicationContext::createRoot()
 
 bool ApplicationContext::oneTimeConfig()
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
+#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
     mRoot->setRenderSystem(mRoot->getAvailableRenderers().at(0));
 #else
     if (!mRoot->restoreConfig())
@@ -278,7 +282,7 @@ void ApplicationContext::createDummyScene()
     sm->addRenderQueueListener(mOverlaySystem);
     Ogre::Camera* cam = sm->createCamera("DummyCamera");
     mWindow->addViewport(cam);
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     // Initialize shader generator.
     // Must be before resource loading in order to allow parsing extended material attributes.
     if (!initialiseRTShaderSystem())
@@ -289,7 +293,7 @@ void ApplicationContext::createDummyScene()
     }
 
     mShaderGenerator->addSceneManager(sm);
-#endif // INCLUDE_RTSHADER_SYSTEM
+#endif // OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 }
 
 void ApplicationContext::destroyDummyScene()
@@ -298,7 +302,7 @@ void ApplicationContext::destroyDummyScene()
         return;
 
     Ogre::SceneManager*  dummyScene = mRoot->getSceneManager("DummyScene");
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     mShaderGenerator->removeSceneManager(dummyScene);
 #endif
     dummyScene->removeRenderQueueListener(mOverlaySystem);
@@ -608,7 +612,7 @@ void ApplicationContext::locateResources()
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/materials/programs/HLSL_Cg", type, sec);
     }
 
-#       ifdef INCLUDE_RTSHADER_SYSTEM
+#       ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
     if(Ogre::GpuProgramManager::getSingleton().isSyntaxSupported("glsles"))
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/GLSL", type, sec);
@@ -633,7 +637,7 @@ void ApplicationContext::locateResources()
     {
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch + "/RTShaderLib/HLSL_Cg", type, sec);
     }
-#       endif /* INCLUDE_RTSHADER_SYSTEM */
+#       endif /* OGRE_BUILD_COMPONENT_RTSHADERSYSTEM */
 #   endif /* OGRE_PLATFORM != OGRE_PLATFORM_ANDROID */
 #endif /* OGRE_PLATFORM == OGRE_PLATFORM_NACL */
 }
