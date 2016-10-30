@@ -55,7 +55,8 @@ namespace Ogre {
         emscripten_set_fullscreenchange_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::fullscreenCallback);
         emscripten_set_webglcontextlost_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextLostCallback);
         emscripten_set_webglcontextrestored_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::contextRestoredCallback);
-        emscripten_set_resize_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
+        // we can not correctly switch back from fullscreen if we do this
+        //emscripten_set_resize_callback(NULL, (void*)this, 1, &EmscriptenEGLWindow::canvasWindowResized);
     }
 
     EmscriptenEGLWindow::~EmscriptenEGLWindow()
@@ -358,7 +359,7 @@ namespace Ogre {
     EM_BOOL EmscriptenEGLWindow::canvasWindowResized(int eventType, const EmscriptenUiEvent *event, void *userData)
     {
         EmscriptenEGLWindow* thiz = static_cast<EmscriptenEGLWindow*>(userData);
-        //thiz->resize(event->documentBodyClientWidth, event->documentBodyClientHeight);
+        thiz->resize(event->documentBodyClientWidth, event->documentBodyClientHeight);
         return EMSCRIPTEN_RESULT_SUCCESS;
     }
     
