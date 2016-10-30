@@ -46,7 +46,6 @@ public:
 	void startMainLoop();
 	void createRoot();
     bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-    bool frameStarted(const Ogre::FrameEvent& evt);
     
     void passAssetAsArrayBuffer(unsigned char*, int length);
     void clearScene();
@@ -55,9 +54,9 @@ private:
 	Ogre::SceneManager* mSceneMgr;
 	Ogre::Camera* mCamera;
 	bool mExitMainLoop;
-	Ogre::SceneNode* mEntity;
+	Ogre::SceneNode* mNode;
     unsigned char* mBuffer;
-	std::vector<Ogre::AnimationState*> mAnimations;
+	Ogre::AnimationState* mAnimation;
     
     OgreBites::TrayManager* mTrayMgr;
     OgreBites::CameraMan* mCameraMan;
