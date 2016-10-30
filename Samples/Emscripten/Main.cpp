@@ -34,8 +34,9 @@ int main( int argc, const char* argv[] ) {
 	try
 	{
 		sampleInst = new Sample();
-		sampleInst->setupEngine();
+		sampleInst->initApp();
 		sampleInst->startMainLoop();
+		sampleInst->closeApp();
         delete sampleInst;
         sampleInst = NULL;
 	}
