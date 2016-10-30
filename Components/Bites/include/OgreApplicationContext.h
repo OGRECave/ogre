@@ -35,7 +35,7 @@
 #include "OgreFileSystemLayer.h"
 #include "OgreFrameListener.h"
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #include "OgreSGTechniqueResolverListener.h"
 #endif // INCLUDE_RTSHADER_SYSTEM
 
@@ -292,7 +292,7 @@ namespace OgreBites
         Ogre::RenderWindow* mWindow;    // render window
         SDL_Window* mSDLWindow;
 
-#ifdef INCLUDE_RTSHADER_SYSTEM
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
         Ogre::RTShader::ShaderGenerator*       mShaderGenerator;                       // The Shader generator instance.
         SGTechniqueResolverListener*       mMaterialMgrListener;           // Shader generator material manager listener.
 #endif // INCLUDE_RTSHADER_SYSTEM
