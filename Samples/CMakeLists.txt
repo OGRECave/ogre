@@ -94,18 +94,10 @@ if (OGRE_BUILD_SAMPLES)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
   	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
     if (OGRE_BUILD_RENDERSYSTEM_GL)
-      	include_directories(
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/include
-		    ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-    		${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-		    )
+      	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL/include)
 	endif()
     if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-      	include_directories(
-	    	${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
-	        ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include/GLSL
-    		)
+      	include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include)
     endif()
 
 	# Link to all enabled plugins

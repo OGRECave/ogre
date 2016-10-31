@@ -48,8 +48,7 @@ if(OGRE_BUILD_COMPONENT_BITES)
     endif()
 
     if(OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-        list(APPEND CMAKE_SWIG_FLAGS -DINCLUDE_RTSHADER_SYSTEM)
-        add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
+        list(APPEND CMAKE_SWIG_FLAGS)
     endif()
     
     ogre_add_component_include_dir(Bites)

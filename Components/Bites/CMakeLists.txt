@@ -35,20 +35,8 @@ if (OGRE_STATIC)
   include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
   include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
   include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
-  if (OGRE_BUILD_RENDERSYSTEM_GL)
-	  include_directories(
-		  ${OGRE_SOURCE_DIR}/RenderSystems/GL/include
-		  ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-		  ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-		  ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-		  )
-  endif()
-  if (OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
-	  include_directories(
-		  ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include
-		  ${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include/GLSL
-		  )
-  endif()
+  include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL/include)
+  include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include)
 
   # Link to all enabled plugins
   set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${SAMPLE_DEPENDENCIES})
@@ -64,7 +52,6 @@ if (OGRE_STATIC)
 endif ()
 
 if (OGRE_BUILD_COMPONENT_RTSHADERSYSTEM)
-  add_definitions(-DINCLUDE_RTSHADER_SYSTEM)
   ogre_add_component_include_dir(RTShaderSystem)
   set(DEPENDENCIES ${DEPENDENCIES} OgreRTShaderSystem)
 endif ()
