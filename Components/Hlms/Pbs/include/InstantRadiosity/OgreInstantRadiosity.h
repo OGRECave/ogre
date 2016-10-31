@@ -67,9 +67,17 @@ namespace Ogre
             Vector3 materialDiffuse;
             Vector3 triVerts[3];
             Vector3 triNormal;
+            Vector3 rayDir;
         };
+        struct Vpl
+        {
+            Vector3 diffuse;
+            Real radius;
+            Vector3 position;
+            Vector3 normal;
+        };
+
         typedef vector<RayHit>::type RayHitVec;
-        typedef vector<Vector3>::type Vector3Vec;
 
         struct OrderRenderOperation
         {
@@ -85,9 +93,9 @@ namespace Ogre
         uint32          mLightMask;
 
         size_t          mNumRays;
+        Real            mCellSize;
     private:
         RayHitVec       mRayHits;
-        Vector3Vec      mRayDirections;
 
         typedef map<VertexArrayObject*, MeshData>::type MeshDataMapV2;
         typedef map<v1::RenderOperation, MeshData, OrderRenderOperation>::type MeshDataMapV1;
@@ -103,6 +111,9 @@ namespace Ogre
         void processLight( const Vector3 &lightPos, ObjectData objData, size_t numNodes );
         void processLight( const Vector3 &lightPos, const MeshData meshData,
                            Matrix4 worldMatrix, Vector3 materialDiffuse );
+
+        Vpl convertToVpl( Vector3 lightColour, Vector3 pointOnTri, const RayHit &hit );
+        void clusterLights( Vector3 lightPos, Vector3 lightColour );
 
     public:
         InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager );

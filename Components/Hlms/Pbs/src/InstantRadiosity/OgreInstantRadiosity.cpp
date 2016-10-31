@@ -76,6 +76,11 @@ namespace Ogre
             retVal.x = sharedTerm * Math::Cos( theta );
             retVal.y = sharedTerm * Math::Sin( theta );
             retVal.z = z;
+//            Vector3 retVal;
+//            retVal.x = boxRand();
+//            retVal.y = boxRand();
+//            retVal.z = boxRand();
+//            retVal.normalise();
 
             return retVal;
         }
@@ -90,7 +95,9 @@ namespace Ogre
         mFirstRq( 0 ),
         mLastRq( 255 ),
         mLightMask( 0xffffffff ),
-        mNumRays( 8 )
+        //mNumRays( 10000 ),
+        mNumRays( 32 ),
+        mCellSize( 2 )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -108,19 +115,179 @@ namespace Ogre
                 _l.indexData < _r.indexData;
     }
     //-----------------------------------------------------------------------------------
+    InstantRadiosity::Vpl InstantRadiosity::convertToVpl( Vector3 lightColour,
+                                                          Vector3 pointOnTri,
+                                                          const RayHit &hit )
+    {
+        const Real invPi = Real(1.0) / Math::PI;
+        //const Real invPi = 1.0f;
+        const Real NdotL = hit.triNormal.dotProduct( -hit.rayDir );
+
+//        TODO_attenuation_over_distance;
+//        TODO_kill_rays_exceeding_range;
+
+        //LogManager::getSingleton().logMessage( "NdotL " + StringConverter::toString( NdotL )  );
+
+        //materialDiffuse is already divided by PI
+        Vector3 diffuseTerm = invPi * NdotL * hit.materialDiffuse * lightColour;
+
+    #if 0
+        if( hasUVs )
+        {
+            const Real invTriArea = Real(1.0) / ( (hit.triVerts[0] - hit.triVerts[1]).
+                    crossProduct( hit.triVerts[0] - hit.triVerts[2] ).length() );
+
+            //Calculate barycentric coordinates (only works if point is inside tri)
+            //Calculate vectors from point to vertices p0, p1 and p2:
+            const Vector3 f0 = hit.triVerts[0] - pointOnTri;
+            const Vector3 f1 = hit.triVerts[1] - pointOnTri;
+            const Vector3 f2 = hit.triVerts[2] - pointOnTri;
+
+            //Calculate the areas and factors (order of parameters doesn't matter):
+            //a0 = p0's triangle area / tri_area
+            const Real a0 = f1.crossProduct( f2 ).length() * hit.invTriArea;
+            const Real a1 = f2.crossProduct( f0 ).length() * hit.invTriArea;
+            const Real a2 = f0.crossProduct( f1 ).length() * hit.invTriArea;
+
+            const Vector2 interpUV = uv[0] * a0 + uv[1] * a1 + uv[2] * a2;
+        }
+    #endif
+
+        Vpl vpl;
+        vpl.diffuse = diffuseTerm;
+        vpl.normal = hit.triNormal;
+        vpl.position = pointOnTri;
+
+        return vpl;
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::clusterLights( Vector3 lightPos, Vector3 lightColour )
+    {
+        assert( mCellSize > 0 );
+
+        SceneNode *rootNode = mSceneManager->getRootSceneNode( SCENE_DYNAMIC );
+
+        int32 blockX, blockY, blockZ;
+        const Real cellSize = Real(1.0) / mCellSize;
+
+        while( !mRayHits.empty() )
+        {
+            const RayHit &hit = mRayHits.front();
+
+            if( hit.distance >= std::numeric_limits<Real>::max() )
+            {
+                efficientVectorRemove( mRayHits, mRayHits.begin() );
+                continue;
+            }
+
+            //const Real bias = Real( 0.9f );
+            const Real bias = Real( 1.0f );
+
+            const Vector3 pointOnTri = lightPos + hit.rayDir * hit.distance * bias;
+
+            blockX = static_cast<int32>( Math::Floor( pointOnTri.x * cellSize ) );
+            blockY = static_cast<int32>( Math::Floor( pointOnTri.y * cellSize ) );
+            blockZ = static_cast<int32>( Math::Floor( pointOnTri.z * cellSize ) );
+
+            Vpl vpl = convertToVpl( lightColour, pointOnTri, hit );
+            Real numCollectedVpls = 1.0f;
+
+            //Merge the lights (simple average) that lie in the same cluster.
+            RayHitVec::iterator itor = mRayHits.begin() + 1u;
+            RayHitVec::iterator end  = mRayHits.end();
+
+            while( itor != end )
+            {
+                const RayHit &alikeHit = *itor;
+
+                const Vector3 pointOnTri02 = lightPos + alikeHit.rayDir * alikeHit.distance * bias;
+
+                const int32 alikeBlockX = static_cast<int32>( Math::Floor( pointOnTri02.x * cellSize ) );
+                const int32 alikeBlockY = static_cast<int32>( Math::Floor( pointOnTri02.y * cellSize ) );
+                const int32 alikeBlockZ = static_cast<int32>( Math::Floor( pointOnTri02.z * cellSize ) );
+
+                if( blockX == alikeBlockX && blockY == alikeBlockY && blockZ == alikeBlockZ )
+                {
+                    Vpl alikeVpl = convertToVpl( lightColour, pointOnTri02, alikeHit );
+                    vpl.diffuse += alikeVpl.diffuse;
+                    vpl.normal  += alikeVpl.normal;
+                    vpl.radius  += alikeVpl.radius;
+                    vpl.position+= alikeVpl.position;
+
+                    ++numCollectedVpls;
+
+                    itor = efficientVectorRemove( mRayHits, itor );
+                    end  = mRayHits.end();
+                }
+                else
+                {
+                    ++itor;
+                }
+            }
+
+            //vpl.diffuse /= numCollectedVpls;
+            vpl.radius  /= numCollectedVpls;
+            vpl.position/= numCollectedVpls;
+            vpl.normal.normalise();
+
+            vpl.diffuse /= mNumRays;
+
+            vpl.radius = 1.0f;
+
+            SceneNode *lightNode = rootNode->createChildSceneNode( SCENE_DYNAMIC );
+#if 1
+            Light *vplLight = mSceneManager->createLight();
+            lightNode->attachObject( vplLight );
+
+            ColourValue colour;
+            colour.r = vpl.diffuse.x;
+            colour.g = vpl.diffuse.y;
+            colour.b = vpl.diffuse.z;
+            colour.a = 1.0f;
+            vplLight->setDiffuseColour( colour );
+            vplLight->setSpecularColour( ColourValue::Black );
+            vplLight->setType( Light::LT_POINT );
+            //vplLight->setAttenuationBasedOnRadius( 5.0f, 0.892f ); //TODO
+            //vplLight->setAttenuation( 10, 0.5, 1.0, 0.5 / (vpl.radius * vpl.radius) );
+            vplLight->setAttenuation( 10, 0.5, 1.0, 0.0 );
+#else
+            Item *item = mSceneManager->createItem( "Sphere1000.mesh",
+                                                    Ogre::ResourceGroupManager::
+                                                    AUTODETECT_RESOURCE_GROUP_NAME,
+                                                    Ogre::SCENE_DYNAMIC);
+            {
+                Real radius = 5.0f;
+                Real mAttenuationConst   = 0.5f;
+                Real mAttenuationLinear  = 0.0f;
+                Real mAttenuationQuad    = 0.5f / (radius * radius);
+                Real lumThreshold = 0.892f;
+
+                Real h = mAttenuationConst - 1.0f / lumThreshold;
+                Real rootPart = sqrt( mAttenuationLinear * mAttenuationLinear - 4.0f * mAttenuationQuad * h );
+                Real mRange = (-mAttenuationLinear + rootPart) / (2.0f * mAttenuationQuad);
+                //lightNode->scale( Vector3(mRange) );
+                lightNode->scale( Vector3(2) );
+            }
+            lightNode->attachObject( item );
+#endif
+            lightNode->setPosition( vpl.position );
+
+            efficientVectorRemove( mRayHits, mRayHits.begin() );
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosity::processLight( Vector3 lightPos, const Vector3 &lightDir,
                                          Radian angle, Vector3 lightColour )
     {
         //Same RNG/seed for every object & triangle
         RandomNumberGenerator rng;
         mRayHits.resize( mNumRays );
-        mRayDirections.resize( mNumRays );
 
         for( size_t i=0; i<mNumRays; ++i )
         {
             mRayHits[i].distance = std::numeric_limits<Real>::max();
             //TODO: Respect lightDir & angle
-            mRayDirections[i] = rng.getRandomDir();
+            mRayHits[i].rayDir = rng.getRandomDir();
         }
 
         for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
@@ -141,60 +308,7 @@ namespace Ogre
             }
         }
 
-        SceneNode *rootNode = mSceneManager->getRootSceneNode( SCENE_DYNAMIC );
-
-        for( size_t i=0; i<mNumRays; ++i )
-        {
-            const RayHit &hit = mRayHits[i];
-
-            if( hit.distance < std::numeric_limits<Real>::max() )
-            {
-                const Vector3 pointOnTri = lightPos + mRayDirections[i] * hit.distance;
-
-                const Real NdotL = hit.triNormal.dotProduct( -mRayDirections[i] );
-
-                //materialDiffuse is already divided by PI
-                Vector3 diffuseTerm = /*invPi **/ NdotL * hit.materialDiffuse * lightColour;
-
-            #if 0
-                if( hasUVs )
-                {
-                    const Real invTriArea = Real(1.0) / ( (hit.triVerts[0] - hit.triVerts[1]).
-                            crossProduct( hit.triVerts[0] - hit.triVerts[2] ).length() );
-
-                    //Calculate barycentric coordinates (only works if point is inside tri)
-                    //Calculate vectors from point to vertices p0, p1 and p2:
-                    const Vector3 f0 = hit.triVerts[0] - pointOnTri;
-                    const Vector3 f1 = hit.triVerts[1] - pointOnTri;
-                    const Vector3 f2 = hit.triVerts[2] - pointOnTri;
-
-                    //Calculate the areas and factors (order of parameters doesn't matter):
-                    //a0 = p0's triangle area / tri_area
-                    const Real a0 = f1.crossProduct( f2 ).length() * hit.invTriArea;
-                    const Real a1 = f2.crossProduct( f0 ).length() * hit.invTriArea;
-                    const Real a2 = f0.crossProduct( f1 ).length() * hit.invTriArea;
-
-                    const Vector2 interpUV = uv[0] * a0 + uv[1] * a1 + uv[2] * a2;
-                }
-            #endif
-
-                //TODO: SCENE_STATIC?
-                Light *vpl = mSceneManager->createLight();
-                SceneNode *lightNode = rootNode->createChildSceneNode( SCENE_DYNAMIC );
-                lightNode->attachObject( vpl );
-
-                ColourValue colour;
-                colour.r = diffuseTerm.x;
-                colour.g = diffuseTerm.y;
-                colour.b = diffuseTerm.z;
-                colour.a = 1.0f;
-                vpl->setDiffuseColour( colour / mNumRays );
-                vpl->setSpecularColour( ColourValue::Black );
-                vpl->setType( Light::LT_POINT );
-                vpl->setAttenuationBasedOnRadius( 1.0f, 0.00392f ); //TODO
-                lightNode->setPosition( pointOnTri );
-            }
-        }
+        clusterLights( lightPos, lightColour );
     }
     //-----------------------------------------------------------------------------------
     const InstantRadiosity::MeshData* InstantRadiosity::downloadVao( VertexArrayObject *vao )
@@ -451,6 +565,13 @@ namespace Ogre
                             HlmsPbsDatablock *pbsDatablock = static_cast<HlmsPbsDatablock*>( datablock );
                             //TODO: Should we account fresnel here? What about metalness?
                             Vector3 materialDiffuse = pbsDatablock->getDiffuse();
+                            if( pbsDatablock->getTexture( PBSM_DIFFUSE ).isNull() )
+                            {
+                                const ColourValue &bgDiffuse = pbsDatablock->getBackgroundDiffuse();
+                                materialDiffuse.x *= bgDiffuse.r;
+                                materialDiffuse.y *= bgDiffuse.g;
+                                materialDiffuse.z *= bgDiffuse.b;
+                            }
                             processLight( lightPos, *meshData, worldMatrix, materialDiffuse );
                         }
 
@@ -533,7 +654,7 @@ namespace Ogre
             {
                 //TODO: create an array of rays that hit the AABB of the object.
                 //TODO_fill_uv;
-                ray.setDirection( mRayDirections[j] );
+                ray.setDirection( mRayHits[j].rayDir );
 
                 const std::pair<bool, Real> inters = Math::intersects(
                             ray, triVerts[0], triVerts[1], triVerts[2], triNormal, true, false );
@@ -591,14 +712,18 @@ namespace Ogre
                         Light *light = static_cast<Light*>( objData.mOwner[k] );
                         Node *lightNode = light->getParentNode();
                         Vector3 diffuseCol;
-                        diffuseCol.x = light->getDiffuseColour().r;
-                        diffuseCol.y = light->getDiffuseColour().g;
-                        diffuseCol.z = light->getDiffuseColour().b;
+                        ColourValue lightColour = light->getDiffuseColour() * light->getPowerScale() * 5;
+                        diffuseCol.x = lightColour.r;
+                        diffuseCol.y = lightColour.g;
+                        diffuseCol.z = lightColour.b;
 
                         processLight( lightNode->_getDerivedPosition(),
                                       light->getDirection(),
                                       light->getSpotlightOuterAngle(),
                                       diffuseCol );
+
+                        //light->setPowerScale( Math::PI * 4 );
+                        light->setPowerScale( 0 );
                     }
                 }
 
