@@ -204,7 +204,7 @@ namespace OgreBites
         -----------------------------------------------------------------------------*/
         virtual bool frameStarted(const Ogre::FrameEvent& evt)
         {
-            captureInputDevices();      // capture input
+            pollEvents();
 
             // manually call sample callback to ensure correct order
             return (mCurrentSample && !mSamplePaused) ? mCurrentSample->frameStarted(evt) : true;
