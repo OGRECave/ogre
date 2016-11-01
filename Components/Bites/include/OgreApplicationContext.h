@@ -101,7 +101,7 @@ namespace OgreBites
         /**
         This function initializes the render system and resources.
         */
-        virtual void initApp();
+        void initApp();
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         void initAppForAndroid(AConfiguration* config, struct android_app* app);
@@ -147,12 +147,12 @@ namespace OgreBites
         /**
           Initialize the RT Shader system.
           */
-        virtual bool initialiseRTShaderSystem();
+        bool initialiseRTShaderSystem();
 
         /**
         Destroy the RT Shader system.
           */
-        virtual void destroyRTShaderSystem();
+        void destroyRTShaderSystem();
 
         /**
          Sets up the context after configuration.
@@ -208,12 +208,12 @@ namespace OgreBites
         /**
         Creates dummy scene to allow rendering GUI in viewport.
           */
-        virtual void createDummyScene();
+        void createDummyScene();
 
         /**
         Destroys dummy scene.
           */
-        virtual void destroyDummyScene();
+        void destroyDummyScene();
     protected:
 
         /**
