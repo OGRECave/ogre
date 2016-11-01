@@ -704,7 +704,7 @@ void ApplicationContext::shutdown()
 #endif
 }
 
-void ApplicationContext::captureInputDevices()
+void ApplicationContext::pollEvents()
 {
 #if OGRE_BITES_HAVE_SDL
     SDL_Event event;

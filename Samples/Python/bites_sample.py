@@ -84,10 +84,6 @@ class SampleApp(OgreBites.ApplicationContext):
         self.camman.injectMouseUp(evt)
         return True
 
-    def frameStarted(self, evt):
-        self.captureInputDevices()
-        return True
-
     def frameRenderingQueued(self, evt):
         self.trays.frameRenderingQueued(evt)
         return True

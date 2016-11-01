@@ -316,7 +316,7 @@ OgreBites::Sample* TestContext::loadTests(Ogre::String set)
 
 bool TestContext::frameStarted(const Ogre::FrameEvent& evt)
 {
-    captureInputDevices();
+    pollEvents();
 
     // pass a fixed timestep along to the tests
     Ogre::FrameEvent fixed_evt = Ogre::FrameEvent();

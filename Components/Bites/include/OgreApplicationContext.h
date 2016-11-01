@@ -116,7 +116,10 @@ namespace OgreBites
         virtual void closeApp();
 
         // callback interface copied from various listeners to be used by ApplicationContext
-        virtual bool frameStarted(const Ogre::FrameEvent& evt) { return true; }
+        virtual bool frameStarted(const Ogre::FrameEvent& evt) {
+            pollEvents();
+            return true;
+        }
         virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt) { return true; }
         virtual bool frameEnded(const Ogre::FrameEvent& evt) { return true; }
         virtual void windowMoved(Ogre::RenderWindow* rw) {}
@@ -198,9 +201,9 @@ namespace OgreBites
         virtual void shutdown();
 
         /**
-        Captures input device states.
+        poll for any events for the main window
         */
-        virtual void captureInputDevices();
+        void pollEvents();
 
         /**
         Creates dummy scene to allow rendering GUI in viewport.
