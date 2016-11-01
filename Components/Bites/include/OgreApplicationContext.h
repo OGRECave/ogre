@@ -34,6 +34,7 @@
 #include "OgrePlugin.h"
 #include "OgreFileSystemLayer.h"
 #include "OgreFrameListener.h"
+#include "OgreStaticPluginLoader.h"
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
 #include "OgreSGTechniqueResolverListener.h"
@@ -45,52 +46,6 @@ extern "C" struct SDL_Window;
 namespace Ogre {
     class OverlaySystem;
 }
-
-// Static plugins declaration section
-// Note that every entry in here adds an extra header / library dependency
-#ifdef OGRE_STATIC_LIB
-#  ifdef OGRE_BUILD_RENDERSYSTEM_GL
-#    define OGRE_STATIC_GL
-#  endif
-#  ifdef OGRE_BUILD_RENDERSYSTEM_GL3PLUS
-#    define OGRE_STATIC_GL3Plus
-#  endif
-#  ifdef OGRE_BUILD_RENDERSYSTEM_GLES
-#    define OGRE_STATIC_GLES
-#  endif
-#  ifdef OGRE_BUILD_RENDERSYSTEM_GLES2
-#    define OGRE_STATIC_GLES2
-#  endif
-#  ifdef OGRE_BUILD_RENDERSYSTEM_D3D9
-#     define OGRE_STATIC_Direct3D9
-#  endif
-// dx11 will only work on vista and above, so be careful about statically linking
-#  ifdef OGRE_BUILD_RENDERSYSTEM_D3D11
-#    define OGRE_STATIC_Direct3D11
-#  endif
-
-#  ifdef OGRE_BUILD_PLUGIN_BSP
-#  define OGRE_STATIC_BSPSceneManager
-#  endif
-#  ifdef OGRE_BUILD_PLUGIN_PFX
-#  define OGRE_STATIC_ParticleFX
-#  endif
-#  ifdef OGRE_BUILD_PLUGIN_CG
-#  define OGRE_STATIC_CgProgramManager
-#  endif
-
-#  ifdef OGRE_USE_PCZ
-#    ifdef OGRE_BUILD_PLUGIN_PCZ
-#    define OGRE_STATIC_PCZSceneManager
-#    define OGRE_STATIC_OctreeZone
-#    endif
-#  else
-#    ifdef OGRE_BUILD_PLUGIN_OCTREE
-#    define OGRE_STATIC_OctreeSceneManager
-#  endif
-#     endif
-#  include "OgreStaticPluginLoader.h"
-#endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE |OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
 #include "macUtils.h"
@@ -281,9 +236,7 @@ namespace OgreBites
 
         Ogre::FileSystemLayer* mFSLayer; // File system abstraction layer
         Ogre::Root* mRoot;              // OGRE root
-#ifdef OGRE_STATIC_LIB
         Ogre::StaticPluginLoader mStaticPluginLoader;
-#endif
         bool mGrabInput;
         bool mFirstRun;
         Ogre::String mNextRenderer;     // name of renderer used for next run
