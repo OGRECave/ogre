@@ -227,7 +227,6 @@ namespace OgreBites
         Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
         android_app* mAndroidApp;
         AConfiguration* mAConfig;
-        TouchFingerEvent mLastTouch;
 #endif
 
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
