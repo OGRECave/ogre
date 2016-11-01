@@ -225,9 +225,8 @@ namespace OgreBites
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
         Ogre::DataStreamPtr openAPKFile(const Ogre::String& fileName);
-        AAssetManager* mAssetMgr;       // Android asset manager to access files inside apk
+        android_app* mAndroidApp;
         AConfiguration* mAConfig;
-        size_t mAndroidWinHdl;
         TouchFingerEvent mLastTouch;
 #endif
 

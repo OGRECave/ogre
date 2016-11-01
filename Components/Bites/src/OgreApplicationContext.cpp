@@ -46,9 +46,8 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mFirstRun = true;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mAssetMgr = NULL;
+    mAndroidApp = NULL;
     mAConfig = NULL;
-    mAndroidWinHdl = 0;
 #endif
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -340,7 +339,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     return res;
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(mAndroidWinHdl);
+    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAndroidApp->window));
     miscParams["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAConfig));
     miscParams["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
 
@@ -383,14 +382,14 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
 void ApplicationContext::initAppForAndroid(AConfiguration* config, struct android_app* app)
 {
     mAConfig = config;
-    mAndroidWinHdl = reinterpret_cast<size_t>(app->window);
-    mAssetMgr = app->activity->assetManager;
+    mAndroidApp = app;
+    initApp();
 }
 
 Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
 {
     Ogre::DataStreamPtr stream;
-    AAsset* asset = AAssetManager_open(mAssetMgr, fileName.c_str(), AASSET_MODE_BUFFER);
+    AAsset* asset = AAssetManager_open(mAndroidApp->activity->assetManager, fileName.c_str(), AASSET_MODE_BUFFER);
     if(asset)
     {
         off_t length = AAsset_getLength(asset);
@@ -524,8 +523,8 @@ void ApplicationContext::locateResources()
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAssetMgr) );
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAssetMgr) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAndroidApp->activity->assetManager) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAndroidApp->activity->assetManager) );
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #   else
     cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
