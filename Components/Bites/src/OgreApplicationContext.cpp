@@ -411,7 +411,7 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
         evt.type = SDL_MOUSEWHEEL;
         evt.wheel.y = wheel;
         _fireInputEvent(evt);
-        mLastTouch.fingerId = -1; // prevent move-jump after pinch is over
+        lastTouch.fingerId = -1; // prevent move-jump after pinch is over
         return;
     }
 
@@ -437,11 +437,11 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
         evt.tfinger.y = AMotionEvent_getRawY(event, 0) / mWindow->getHeight();
 
         if(evt.type == SDL_FINGERMOTION) {
-            if(evt.tfinger.fingerId != mLastTouch.fingerId)
+            if(evt.tfinger.fingerId != lastTouch.fingerId)
                 return; // wrong finger
 
-            evt.tfinger.dx = evt.tfinger.x - mLastTouch.x;
-            evt.tfinger.dy = evt.tfinger.y - mLastTouch.y;
+            evt.tfinger.dx = evt.tfinger.x - lastTouch.x;
+            evt.tfinger.dy = evt.tfinger.y - lastTouch.y;
         }
 
         lastTouch = evt.tfinger;
