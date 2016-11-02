@@ -74,7 +74,7 @@ namespace Ogre
         @version
             1.0
      */
-    class _OgreExport InstancedEntity : public Ogre::MovableObject
+    class _OgreExport InstancedEntity : public MovableObject
     {
         friend class InstanceBatch;
         friend class InstanceBatchShader;
