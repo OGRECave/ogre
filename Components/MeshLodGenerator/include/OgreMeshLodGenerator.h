@@ -41,6 +41,14 @@
 namespace Ogre
 {
 
+/** \addtogroup Optional
+*  @{
+*/
+/** \defgroup MeshLodGenerator MeshLodGenerator
+* Generate Low-poly models from High-poly models automatically
+*  @{
+*/
+
 class _OgreLodExport MeshLodGenerator :
 public Singleton<MeshLodGenerator>
 {
@@ -93,6 +101,7 @@ protected:
     LodWorkQueueWorker* mWQWorker;
     LodWorkQueueInjector* mWQInjector;
 };
-
+/** @} */
+/** @} */
 }
 #endif

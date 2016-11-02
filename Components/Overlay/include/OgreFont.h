@@ -34,10 +34,10 @@ THE SOFTWARE
 
 namespace Ogre
 {
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
-    /** \addtogroup Resources
+    /** \addtogroup Overlays
     *  @{
     */
     /** Enumerates the types of Font usable in the engine. */

@@ -31,13 +31,13 @@ THE SOFTWARE.
 
 #include "OgrePagingPrerequisites.h"
 
-/** \addtogroup Optional Components
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Paging
 *  Some details on paging component
+*  @{
 */
-/*@{*/
 
 
 /** @file

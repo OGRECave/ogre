@@ -38,7 +38,7 @@ namespace RTShader {
     class Function;
     class Program;
 
-/** \addtogroup Core
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup RTShader

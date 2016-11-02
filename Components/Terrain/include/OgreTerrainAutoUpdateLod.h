@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Terrain
