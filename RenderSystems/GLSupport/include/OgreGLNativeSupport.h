@@ -35,6 +35,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    /** \addtogroup RenderSystems RenderSystems
+    *  @{
+    */
+    /** \defgroup GLSupport GLSupport
+    * provides OpenGL Context creation using GLX, WGL, EGL, Cocoa
+    *  @{
+    */
     class _OgreGLExport GLNativeSupport
     {
         public:
@@ -125,6 +132,8 @@ namespace Ogre
 
             ContextProfile mContextProfile;
     };
+    /** @} */
+    /** @} */
 
 }
 
