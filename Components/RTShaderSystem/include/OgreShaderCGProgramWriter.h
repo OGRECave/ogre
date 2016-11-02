@@ -40,7 +40,7 @@ namespace RTShader {
     class FunctionAtom;
     class Program;
 
-/** \addtogroup Core
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup RTShader

@@ -34,7 +34,12 @@
 
 namespace Ogre
 {
-
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup MeshLodGenerator
+*  @{
+*/
 struct _OgreLodExport ProfiledEdge {
     Vector3 src; // Vertex identifier
     Vector3 dst; // Direction of collapse
@@ -160,5 +165,7 @@ struct _OgreLodExport LodConfig {
         Advanced();
     } advanced;
 };
+/** @} */
+/** @} */
 }
 #endif

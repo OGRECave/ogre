@@ -34,6 +34,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup MeshLodGenerator
+*  @{
+*/
 /// This class will mark vertices of a mesh, which are visible from far away (from outside).
 /// Triangle is visible if each vertex of it is visible.
 class _OgreLodExport LodOutsideMarker
@@ -118,6 +124,8 @@ private:
     bool isInsideLine(const Vector3& ptarget, const Vector3& p0, const Vector3& p1); /// Whether ptarget is between p0 and p1. Assuming they are on the same line.
     bool isSamePosition(const Vector3& p0, const Vector3& p1); /// Whether p0 = p1 with mEpsilon allowed float error.
 };
+/** @} */
+/** @} */
 }
 
 #endif /* ifndef __OutsideMarker_H__ */

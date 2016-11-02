@@ -38,7 +38,7 @@ namespace Ogre
 {
     class HardwareVertexBufferSharedPtr;
     
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Terrain

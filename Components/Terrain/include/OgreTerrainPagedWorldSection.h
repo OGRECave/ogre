@@ -40,7 +40,7 @@ namespace Ogre
     class Grid2DPageStrategy;
     class Grid2DPageStrategyData;
 
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Terrain

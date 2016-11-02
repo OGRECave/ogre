@@ -36,7 +36,7 @@ namespace Ogre
 {
     class PSSMShadowCameraSetup;
 
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Terrain

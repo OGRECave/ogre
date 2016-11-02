@@ -43,10 +43,11 @@ THE SOFTWARE.
 #include "OgreShaderExHardwareSkinning.h"
 #include "OgreShaderMaterialSerializerListener.h"
 
-/** \addtogroup Core
+/** \addtogroup Optional
 *  @{
 */
-/** \addtogroup RTShader
+/** \defgroup RTShader RTShaderSystem
+* Real Time Shader System: enables GPU program generation during the runtime of a process
 *  @{
 */
 

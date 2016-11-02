@@ -40,7 +40,7 @@ namespace RTShader {
     class Operand;
     class Program;
 
-/** \addtogroup Core
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup RTShader

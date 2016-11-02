@@ -34,10 +34,10 @@ THE SOFTWARE
 
 namespace Ogre
 {
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
-    /** \addtogroup Resources
+    /** \addtogroup Overlays
     *  @{
     */
     /** Manages Font resources, parsing .fontdef files and generally organising them.*/

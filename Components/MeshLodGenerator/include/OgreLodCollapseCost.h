@@ -35,7 +35,12 @@
 
 namespace Ogre
 {
-
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup MeshLodGenerator
+*  @{
+*/
 class _OgreLodExport LodCollapseCost {
 public:
     virtual ~LodCollapseCost() {}
@@ -53,7 +58,8 @@ protected:
     // Helper functions:
     bool isBorderVertex(const LodData::Vertex* vertex) const;
 };
-
+/** @} */
+/** @} */
 }
 #endif
 

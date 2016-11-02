@@ -33,7 +33,7 @@ THE SOFTWARE.
 
 namespace Ogre  {
 
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Overlays

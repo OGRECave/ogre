@@ -34,13 +34,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Paging
     *  Some details on paging component
+    *  @{
     */
-    /*@{*/
 
 
     /** Abstract marker class representing the data held against the PagedWorldSection

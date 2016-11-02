@@ -36,7 +36,7 @@ THE SOFTWARE.
 namespace Ogre
 {
     class Image;
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Terrain

@@ -42,7 +42,7 @@ namespace RTShader {
     class HardwareSkinningTechnique;
     class LinearSkinning;
 
-/** \addtogroup Core
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup RTShader

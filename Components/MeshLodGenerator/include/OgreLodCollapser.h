@@ -35,7 +35,12 @@
 
 namespace Ogre
 {
-
+/** \addtogroup Optional
+*  @{
+*/
+/** \addtogroup MeshLodGenerator
+*  @{
+*/
 class _OgreLodExport LodCollapser
 {
 public:
@@ -89,7 +94,8 @@ protected:
     size_t findDstID(unsigned int srcID, size_t submeshID);
     void replaceVertexID(LodData::Triangle* triangle, unsigned int oldID, unsigned int newID, LodData::Vertex* dst);
 };
-
+/** @} */
+/** @} */
 }
 #endif
 

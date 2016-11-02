@@ -38,7 +38,7 @@ namespace Ogre
 {
     class TerrainAutoUpdateLod;
 
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Terrain
