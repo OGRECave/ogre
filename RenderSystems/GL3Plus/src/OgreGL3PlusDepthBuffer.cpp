@@ -48,22 +48,34 @@ namespace Ogre
                 mDepthBufferName( 0 ),
                 mStencilBufferName( 0 )
     {
+        GLenum formatType;
+
         switch( depthFormat )
         {
         case GL_DEPTH_COMPONENT16:
             mBitDepth = 16;
+            formatType = GL_UNSIGNED_SHORT;
             break;
         case GL_DEPTH_COMPONENT24:
+            mBitDepth = 24;
+            formatType = GL_UNSIGNED_INT;
+            break;
         case GL_DEPTH24_STENCIL8:  // Packed depth / stencil
             mBitDepth = 24;
+            formatType = GL_UNSIGNED_INT_24_8;
             break;
         case GL_DEPTH_COMPONENT32:
         case GL_DEPTH_COMPONENT32F:
-        case GL_DEPTH32F_STENCIL8:
             mBitDepth = 32;
+            formatType = GL_FLOAT;
+            break;
+        case GL_DEPTH32F_STENCIL8:  // Packed depth / stencil
+            mBitDepth = 32;
+            formatType = GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
             break;
         default:
             mBitDepth = 0;
+            formatType = GL_UNSIGNED_INT;
             break;
         }
 
@@ -101,7 +113,7 @@ namespace Ogre
                 {
                     OCGE( glTexImage2D( GL_TEXTURE_2D, GLint(0), depthFormat,
                                         GLsizei(mWidth), GLsizei(mHeight),
-                                        0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL ) );
+                                        0, GL_DEPTH_COMPONENT, formatType, NULL ) );
                 }
             }
             else
