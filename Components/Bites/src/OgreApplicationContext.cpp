@@ -46,9 +46,8 @@ ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInp
     mFirstRun = true;
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    mAssetMgr = NULL;
+    mAndroidApp = NULL;
     mAConfig = NULL;
-    mAndroidWinHdl = 0;
 #endif
 
 #ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
@@ -340,7 +339,7 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
     return res;
 
 #elif OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(mAndroidWinHdl);
+    miscParams["externalWindowHandle"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAndroidApp->window));
     miscParams["androidConfig"] = Ogre::StringConverter::toString(reinterpret_cast<size_t>(mAConfig));
     miscParams["preserveContext"] = "true"; //Optionally preserve the gl context, prevents reloading all resources, this is false by default
 
@@ -383,14 +382,14 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
 void ApplicationContext::initAppForAndroid(AConfiguration* config, struct android_app* app)
 {
     mAConfig = config;
-    mAndroidWinHdl = reinterpret_cast<size_t>(app->window);
-    mAssetMgr = app->activity->assetManager;
+    mAndroidApp = app;
+    initApp();
 }
 
 Ogre::DataStreamPtr ApplicationContext::openAPKFile(const Ogre::String& fileName)
 {
     Ogre::DataStreamPtr stream;
-    AAsset* asset = AAssetManager_open(mAssetMgr, fileName.c_str(), AASSET_MODE_BUFFER);
+    AAsset* asset = AAssetManager_open(mAndroidApp->activity->assetManager, fileName.c_str(), AASSET_MODE_BUFFER);
     if(asset)
     {
         off_t length = AAsset_getLength(asset);
@@ -412,7 +411,7 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
         evt.type = SDL_MOUSEWHEEL;
         evt.wheel.y = wheel;
         _fireInputEvent(evt);
-        mLastTouch.fingerId = -1; // prevent move-jump after pinch is over
+        lastTouch.fingerId = -1; // prevent move-jump after pinch is over
         return;
     }
 
@@ -438,11 +437,11 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
         evt.tfinger.y = AMotionEvent_getRawY(event, 0) / mWindow->getHeight();
 
         if(evt.type == SDL_FINGERMOTION) {
-            if(evt.tfinger.fingerId != mLastTouch.fingerId)
+            if(evt.tfinger.fingerId != lastTouch.fingerId)
                 return; // wrong finger
 
-            evt.tfinger.dx = evt.tfinger.x - mLastTouch.x;
-            evt.tfinger.dy = evt.tfinger.y - mLastTouch.y;
+            evt.tfinger.dx = evt.tfinger.x - lastTouch.x;
+            evt.tfinger.dy = evt.tfinger.y - lastTouch.y;
         }
 
         lastTouch = evt.tfinger;
@@ -524,14 +523,21 @@ void ApplicationContext::locateResources()
     // load resource paths from config file
     Ogre::ConfigFile cf;
 #   if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAssetMgr) );
-    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAssetMgr) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKFileSystemArchiveFactory(mAndroidApp->activity->assetManager) );
+    Ogre::ArchiveManager::getSingleton().addArchiveFactory( new Ogre::APKZipArchiveFactory(mAndroidApp->activity->assetManager) );
     cf.load(openAPKFile(mFSLayer->getConfigFilePath("resources.cfg")));
 #   else
     cf.load(mFSLayer->getConfigFilePath("resources.cfg"));
 #   endif
     Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
     Ogre::String sec, type, arch;
+
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+    Ogre::String bundle = Ogre::macBundlePath();
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+    char* env_SNAP = getenv("SNAP");
+    Ogre::String bundle(env_SNAP ? env_SNAP : "");
+#endif
 
     // go through all specified resource groups
     while (seci.hasMoreElements())
@@ -551,7 +557,11 @@ void ApplicationContext::locateResources()
             // In order to make things portable on OS X we need to provide
             // the loading with it's own bundle path location
             if (!Ogre::StringUtil::startsWith(arch, "/", false)) // only adjust relative dirs
-                arch = Ogre::String(Ogre::macBundlePath() + "/" + arch);
+                arch = bundle + "/" + arch;
+#elif OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+            // With Ubuntu Snappy changes absolute paths are relative to the snap package.
+            if (Ogre::StringUtil::startsWith(arch, "/", false)) // only adjust absolute dirs
+                arch = bundle + arch;
 #endif
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(arch, type, sec);
         }
@@ -693,7 +703,7 @@ void ApplicationContext::shutdown()
 #endif
 }
 
-void ApplicationContext::captureInputDevices()
+void ApplicationContext::pollEvents()
 {
 #if OGRE_BITES_HAVE_SDL
     SDL_Event event;

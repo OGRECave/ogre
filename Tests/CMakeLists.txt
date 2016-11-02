@@ -70,16 +70,8 @@ if (OGRE_BUILD_TESTS)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLSupport/include)
     include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL3Plus/include)
-    include_directories(
-      ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GLES2/src/GLSLES/include
-      )
-    include_directories(
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/GLSL/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/atifs/include
-      ${OGRE_SOURCE_DIR}/RenderSystems/GL/src/nvparse
-      )
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
+    include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GL/include)
     # Link to all enabled plugins
     set(OGRE_LIBRARIES ${OGRE_LIBRARIES} ${TEST_DEPENDENCIES})
 
@@ -148,7 +140,7 @@ if (OGRE_BUILD_TESTS)
     endif ()
 
     add_executable(Test_Ogre WIN32 ${HEADER_FILES} ${SOURCE_FILES} ${RESOURCE_FILES} )
-    ogre_config_sample_exe(Test_Ogre)
+    ogre_install_target(Test_Ogre "" FALSE)
     target_link_libraries(Test_Ogre ${OGRE_LIBRARIES} ${CppUnit_LIBRARIES})
 
     if(APPLE AND NOT APPLE_IOS)
@@ -284,13 +276,11 @@ if (OGRE_BUILD_TESTS)
 	  
 	else() # not APPLE
 		# Copy necessary unit test data
-				
 		if (OGRE_CONFIG_ENABLE_ZIP)
 			file(COPY ${OGRE_SOURCE_DIR}/Tests/OgreMain/misc DESTINATION ${OGRE_BINARY_DIR}/Tests/OgreMain/)
 		endif ()
 		
 		file(COPY ${OGRE_SOURCE_DIR}/Tests/Media/CustomCapabilities DESTINATION ${OGRE_BINARY_DIR}/Tests/Media)
-	  
     endif()
   else (CppUnit_FOUND)
     # Necessary for tests to link when CppUnit is unavailable.

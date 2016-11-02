@@ -331,7 +331,7 @@ function(ogre_config_sample_common SAMPLENAME)
     set_target_properties(${SAMPLENAME} PROPERTIES VERSION ${OGRE_SOVERSION} SOVERSION ${OGRE_SOVERSION})
   endif()
 
-  if (OGRE_INSTALL_SAMPLES)
+  if (OGRE_INSTALL_SAMPLES AND NOT OGRE_STATIC)
 	ogre_install_target(${SAMPLENAME} ${OGRE_SAMPLE_PATH} FALSE)
   endif()
   

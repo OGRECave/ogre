@@ -121,7 +121,6 @@ namespace OgreBites
                         if (!mBrowser.getRenderWindow())
                         {
                             mBrowser.initAppForAndroid(config, app);
-                            mBrowser.initApp();
                         }
                         else
                         {

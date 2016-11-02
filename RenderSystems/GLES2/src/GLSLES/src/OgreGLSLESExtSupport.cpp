@@ -34,6 +34,7 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    namespace GLSLES {
     //-----------------------------------------------------------------------------
     String logObjectInfo(const String& msg, const GLuint obj)
     {
@@ -110,5 +111,5 @@ namespace Ogre
         return logMessage;
     }
 
-
+    }
 } // namespace Ogre
