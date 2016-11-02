@@ -37,6 +37,13 @@ THE SOFTWARE.
 
 namespace Ogre 
 {
+    /** \addtogroup RenderSystems RenderSystems
+    *  @{
+    */
+    /** \defgroup Direct3D9 Direct3D9
+    * Implementation of DirectX9 as a rendering system.
+    *  @{
+    */
 #define MAX_LIGHTS 8
 
     class D3D9DriverList;
@@ -322,17 +329,11 @@ namespace Ogre
         void setVertexBufferBinding(VertexBufferBinding* binding);
         void setVertexBufferBinding(VertexBufferBinding* binding, size_t numberOfInstances, bool useGlobalInstancingVertexBufferIsAvailable, bool indexesUsed);
         void _render(const RenderOperation& op);
-        /** See
-          RenderSystem
-         */
+
         void bindGpuProgram(GpuProgram* prg);
-        /** See
-          RenderSystem
-         */
+
         void unbindGpuProgram(GpuProgramType gptype);
-        /** See
-          RenderSystem
-         */
+
         void bindGpuProgramParameters(GpuProgramType gptype, 
             GpuProgramParametersSharedPtr params, uint16 variabilityMask);
         void bindGpuProgramPassIterationParameters(GpuProgramType gptype);
@@ -428,5 +429,7 @@ namespace Ogre
         friend class D3D9Device;
         friend class D3D9DeviceManager;     
     };
+    /** @} */
+    /** @} */
 }
 #endif
