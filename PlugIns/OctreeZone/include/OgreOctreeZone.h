@@ -45,6 +45,13 @@ Code Style Update    :
 
 namespace Ogre
 {
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup OctreeZone OctreeZone
+    * Octree version of PCZone
+    *  @{
+    */
     /** Octree version of PCZone 
     */
     class Octree;
@@ -251,7 +258,8 @@ namespace Ogre
         bool supportsPCZoneType(const String& zoneType);
         PCZone* createPCZone(PCZSceneManager * pczsm, const String& zoneName);
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

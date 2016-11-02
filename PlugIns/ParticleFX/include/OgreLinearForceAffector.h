@@ -34,7 +34,12 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
     /** This class defines a ParticleAffector which applies a linear force to particles in a system.
     @remarks
         This affector (see ParticleAffector) applies a linear force, such as gravity, to a particle system.
@@ -112,7 +117,8 @@ namespace Ogre {
 
     };
 
-
+    /** @} */
+    /** @} */
 }
 
 

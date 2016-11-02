@@ -33,7 +33,12 @@ THE SOFTWARE.
 #include "OgreEllipsoidEmitter.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
     /** Particle emitter which emits particles randomly from points inside a hollow ellipsoid.
     @remarks
         This particle emitter emits particles from a hollow ellipsoid area.
@@ -119,7 +124,8 @@ namespace Ogre {
 
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

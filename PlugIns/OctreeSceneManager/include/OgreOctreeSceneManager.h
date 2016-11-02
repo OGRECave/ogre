@@ -48,7 +48,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-
+/** \addtogroup Plugins Plugins
+*  @{
+*/
+/** \addtogroup Octree OctreeSceneManager
+* Octree datastructure for managing scene nodes.
+*  @{
+*/
 class OctreeNode;
 class OctreeCamera;
 
@@ -225,7 +231,8 @@ public:
 };
 
 
-
+/** @} */
+/** @} */
 }
 
 #endif

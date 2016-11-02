@@ -32,6 +32,12 @@ THE SOFTWARE.
 #include "OgreAreaEmitter.h"
 
 namespace Ogre {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
 
     /** Particle emitter which emits particles randomly from points inside a box.
     @remarks
@@ -53,7 +59,8 @@ namespace Ogre {
     protected:
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

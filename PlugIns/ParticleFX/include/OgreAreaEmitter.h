@@ -33,6 +33,14 @@ THE SOFTWARE.
 
 namespace Ogre {
 
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup ParticleFX ParticleFX
+    * Particle Effects (Emmiters, Affectors)
+    *  @{
+    */
+
     /** Particle emitter which emits particles randomly from points inside
         an area (box, sphere, ellipsoid whatever subclasses choose to be).
     @remarks
@@ -132,7 +140,8 @@ namespace Ogre {
 
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

@@ -32,7 +32,12 @@ THE SOFTWARE.
 #include "OgreParticleEmitter.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
     /** Particle emitter which emits particles from a single point.
     @remarks
         This basic particle emitter emits particles from a single point in space. The
@@ -56,7 +61,8 @@ namespace Ogre {
 
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

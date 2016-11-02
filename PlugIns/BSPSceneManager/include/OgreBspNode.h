@@ -34,7 +34,12 @@ THE SOFTWARE.
 #include "OgreSceneQuery.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup BSPSceneManager
+    *  @{
+    */
     /** Encapsulates a node in a BSP tree.
         A BSP tree represents space partitioned by planes . The space which is
         partitioned is either the world (in the case of the root node) or the space derived
@@ -205,7 +210,8 @@ namespace Ogre {
 
 
     };
-
+    /** @} */
+    /** @} */
 
 }
 
