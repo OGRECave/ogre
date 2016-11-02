@@ -248,7 +248,7 @@ namespace Ogre {
             // Load, no mipmaps, brighten by factor 2.5
             DataStreamPtr stream(OGRE_NEW MemoryDataStream(pLightmap, 128 * 128 * 3, false));
             Image img; 
-            img.loadRawData( stream, 128, 128, PF_BYTE_RGB );
+            img.loadRawData( stream, 128, 128, 1, PF_BYTE_RGB );
             TextureManager::getSingleton().loadImage( name.str(), 
                 ResourceGroupManager::getSingleton().getWorldResourceGroupName(), img, TEX_TYPE_2D, 0, 4.0f );
             pLightmap += BSP_LIGHTMAP_BANKSIZE;

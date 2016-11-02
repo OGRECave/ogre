@@ -422,7 +422,7 @@ namespace Ogre
             OGRE_NEW MemoryDataStream(imageData, data_size, true));
 
         Image img;
-        img.loadRawData( memStream, finalWidth, finalHeight, PF_BYTE_LA );
+        img.loadRawData( memStream, finalWidth, finalHeight, 1, PF_BYTE_LA );
 
         Texture* tex = static_cast<Texture*>(res);
         // Call internal _loadImages, not loadImage since that's external and 

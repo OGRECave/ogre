@@ -85,7 +85,7 @@ namespace Ogre {
         ushort uWidth, ushort uHeight, PixelFormat eFormat)
     {
         Image img;
-        img.loadRawData(stream, uWidth, uHeight, eFormat);
+        img.loadRawData(stream, uWidth, uHeight, 1, eFormat);
         loadImage(img);
     }
     //--------------------------------------------------------------------------    

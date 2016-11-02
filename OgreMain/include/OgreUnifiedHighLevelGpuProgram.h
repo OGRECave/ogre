@@ -71,6 +71,8 @@ namespace Ogre {
             void doSet(void* target, const String& val);
         };
 
+
+        /// @deprecated use UnifiedHighLevelGpuProgram::setPriority
         OGRE_DEPRECATED static void setPrioriry(String shaderLanguage,int priority) {
             setPriority(shaderLanguage,priority);
         }
