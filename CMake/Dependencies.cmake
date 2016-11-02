@@ -89,7 +89,13 @@ set(CMAKE_PREFIX_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_PREFIX_PATH})
 set(CMAKE_FRAMEWORK_PATH ${OGRE_DEP_SEARCH_PATH} ${CMAKE_FRAMEWORK_PATH})
 
 if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
-    if(MSVC OR EMSCRIPTEN) # others platforms ship zlib
+    set(OGREDEPS_SHARED TRUE)
+    if(OGRE_STATIC OR MSVC)
+        # freetype does not like shared build on MSVC and it generally eases distribution there
+        set(OGREDEPS_SHARED FALSE)
+    endif()
+
+    if(MSVC OR EMSCRIPTEN) # other platforms ship zlib
         message(STATUS "Building zlib")
         file(DOWNLOAD
             http://zlib.net/zlib-1.2.8.tar.gz
@@ -98,6 +104,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         execute_process(COMMAND cmake
             -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+            -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
             -G ${CMAKE_GENERATOR}
             ${CROSS}
             .
@@ -114,6 +121,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
         -DZLIB_ROOT=${OGREDEPS_PATH}
+        -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
         -G ${CMAKE_GENERATOR}
         ${CROSS}
         .
@@ -132,6 +140,7 @@ if(OGRE_BUILD_DEPENDENCIES AND NOT EXISTS ${OGREDEPS_PATH})
     execute_process(COMMAND cmake
         -DCMAKE_INSTALL_PREFIX=${OGREDEPS_PATH}
         -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+        -DBUILD_SHARED_LIBS=${OGREDEPS_SHARED}
         -DWITH_BZip2=OFF # tries to use it on iOS otherwise
         # workaround for broken iOS toolchain in freetype
         -DPROJECT_SOURCE_DIR=${CMAKE_BINARY_DIR}/freetype-2.6.5

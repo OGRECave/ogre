@@ -230,8 +230,6 @@ if (APPLE)
   endif ()
 endif (APPLE)
 
-# Find dependencies
-include(Dependencies)
 # definitions for samples
 set(OGRE_LIBRARIES OgreMain)
 set(OGRE_MeshLodGenerator_LIBRARIES OgreMeshLodGenerator)
@@ -357,6 +355,9 @@ endif()
 if(OGRE_BUILD_RENDERSYSTEM_GL3PLUS)
   set(OGRE_CONFIG_ENABLE_ETC TRUE CACHE BOOL "Forcing ETC codec for OpenGL 3+" FORCE)
 endif()
+
+# Find dependencies
+include(Dependencies)
 
 ######################################################################
 # Provide user options to customise the build process
