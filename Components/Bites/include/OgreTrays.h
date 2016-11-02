@@ -49,7 +49,7 @@
 #endif
 
 
-/** \addtogroup Optional Components
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Bites
@@ -1227,4 +1227,6 @@ namespace OgreBites
     };
 }
 
+/** @} */
+/** @} */
 #endif

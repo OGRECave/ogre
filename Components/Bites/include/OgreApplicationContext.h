@@ -63,18 +63,18 @@ namespace Ogre {
 #include "OgreInput.h"
 #include "OgreWindowEventUtilities.h"
 
-/** \addtogroup Optional Components
+/** \addtogroup Optional Optional Components
 *  @{
 */
-/** \addtogroup Bites
+/** \defgroup Bites Bites
+* reusable utilities for rapid prototyping
 *  @{
 */
 namespace OgreBites
 {
     /** 
-    Base class responsible for setting up a common context for samples.
-    May be subclassed for specific sample types (not specific samples).
-    Allows one sample to run at a time, while maintaining a sample queue.
+    Base class responsible for setting up a common context for applications.
+    Subclass to implement specific event callbacks.
     */
     class _OgreBitesExport ApplicationContext :
             public Ogre::FrameListener,
@@ -252,5 +252,6 @@ namespace OgreBites
 #endif // INCLUDE_RTSHADER_SYSTEM
     };
 }
-
+/** @} */
+/** @} */
 #endif

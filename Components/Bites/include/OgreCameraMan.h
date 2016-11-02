@@ -35,7 +35,7 @@
 
 #include "OgreInput.h"
 
-/** \addtogroup Optional Components
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Bites
@@ -162,5 +162,6 @@ namespace OgreBites
         bool mFastMove;
     };
 }
-
+/** @} */
+/** @} */
 #endif
