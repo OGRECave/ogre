@@ -1,6 +1,4 @@
-========================================================================
-    About the "Plugin_PCZSceneManager" Project
-========================================================================
+# Using the PCZ Scene Manager {#pczscenemanager}
 
 The Portal-Connected-Zone Scene Manager (PCZSM) is a plugin for Ogre3D (see
 www.ogre3d.org for more information about Ogre3d) which allows traversal of
@@ -20,15 +18,13 @@ Cheers,
 
 Eric "Chaster" Cha
 
-/////////////////////////////////////////////////////////////////////////////
-			USING THE PCZ_SCENEMANAGER
-/////////////////////////////////////////////////////////////////////////////
+## USING THE PCZ_SCENEMANAGER
 
 NOTE: For an example of PCZSM usage, see the PCZTestApp Application.  It
 is probably a lot easier to understand than trying to figure it all out
 from this. 
 
-LOADING & INITIALIZATION:
+## LOADING & INITIALIZATION:
 
 The PCZSM is loaded just like any other Scene Manager plugin.  Included in
 the standard PCZSM plugin is the "default" zone.  If the user wishes to
@@ -41,7 +37,7 @@ ZoneType_OCtree, ZoneType_Terrain) the PCZSM should use for the default zone.
 The default zone is the zone where entities are placed if they are not 
 specified to be in other zones.  
 
-CREATING ZONES:
+## CREATING ZONES:
 
 Once the PCZSM has been initialized, the user can proceed with creating
 zones (PCZSceneManager::createZone(zoneType, zoneName)).  Zones can be 
@@ -57,7 +53,7 @@ the sky when the 'outdoor' zone is visible).  Usually, the Sky should be
 associated with the default zone (which is usually used as the "all
 encompassing exterior zone").
 
-CREATING PORTALS:
+## CREATING PORTALS:
 
 Once the user has created a zone (in addition to the default zone), 
 they can create portals to attach two zones together.  
@@ -73,7 +69,6 @@ and errors if the scene is destroyed and recreated.
 To destroy a portal use PCZSceneManager::destroyPortal(Portal *p) or 
 PCZSceneManager::destroyPortal(String & portalName).
 
-***
 
 Then set the portal corner points, attaches it to a node, and then adds it 
 to the zone (see PCZTestApp -> RoomObject.cpp -> createPortals() function).  
@@ -137,7 +132,7 @@ call PCZSceneManager::connectPortalsToTargetZonesByLocation() to do it
 automatically.  Note that this function requires all portals to have a matching
 portal in the target zone.  
 
-ANTIPORTALS  ** NEW As of 3/17/09 **
+## ANTIPORTALS  ** NEW As of 3/17/09 **
 
 Antiportals are a new feature (thanks to Lf3thn4d). Antiportals prevent traversal of 
 portals located behind them (as viewed from the camera).  They are created and manipulated
@@ -149,7 +144,7 @@ To Create an antiportal, it's very similar to regular portals.  All you need to 
 PCZSceneManager::createAntiPortal("name of the antiportal"), set the corner values,
 attach it to a node, and add it to the proper zone.  
 
-CREATING OBJECTS/ENTITIES:
+## CREATING OBJECTS/ENTITIES:
 
 Once the zones and portals have been created, the user can create objects/entities. 
 The user should use SceneManager::createSceneNode() to create all scene nodes.
@@ -179,18 +174,16 @@ So for example, the enclosure node/object for a room would be the model of the
 walls, ceiling, and floor (assuming they are all modeled as one object or at least
 all attached to the same node).  See the PCZTestApp for an example.
 
-SCENE QUERIES:
+## SCENE QUERIES:
 
 I have implemented Scene Query functions for Default & Octree Zones.  In general,
 they are used the same way as Scene Queries for any other Scene Manager, with
 one difference.  The user must specify the "start zone" for any scene query
 using XXXSceneQuery::setStartZone(zone) where "XXX" is Ray, Sphere, AxisAlignedBox, etc.
 
-KNOWN BUGS:
+## KNOWN BUGS:
 
 * Light traversal is not quite correct.  In order to avoid infinite recursion, I had to
   put in a hack which can potentially result in lighting not traversing into some zones properly.
   It will probably not be noticeable in most situations, but could potentially show up in
   very complex portal/zone setups.
-
-/////////////////////////////////////////////////////////////////////////////

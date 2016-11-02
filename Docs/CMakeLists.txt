@@ -35,6 +35,7 @@ if(DOXYGEN_FOUND)
         ${OGRE_SOURCE_DIR}/OgreMain
         ${OGRE_SOURCE_DIR}/Components
         ${OGRE_SOURCE_DIR}/Plugins
+        ${OGRE_SOURCE_DIR}/PlugIns/PCZSceneManager/docs/readme.md
         ${OGRE_SOURCE_DIR}/RenderSystems
         ${OGRE_SOURCE_DIR}/Docs/src/apimainpage.md
         ${OGRE_SOURCE_DIR}/Docs/src/manual.md
