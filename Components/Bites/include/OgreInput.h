@@ -12,13 +12,15 @@
 
 #if OGRE_BITES_HAVE_SDL
 #include <SDL.h>
+#endif
 
-/** \addtogroup Optional Components
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Bites
 *  @{
 */
+#if OGRE_BITES_HAVE_SDL
 namespace OgreBites {
 enum {
     BUTTON_LEFT = SDL_BUTTON_LEFT,
@@ -81,6 +83,8 @@ union Event
     TouchFingerEvent tfinger;
 };
 }
+/** @} */
+/** @} */
 
 // SDL compat
 enum {
