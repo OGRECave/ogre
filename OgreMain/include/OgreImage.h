@@ -197,11 +197,11 @@ namespace Ogre {
             @note
                  The memory associated with this buffer is NOT destroyed with the
                  Image object.
-            @remarks This function is deprecated; one should really use the
+            @deprecated use the
                 Image::loadDynamicImage(data, width, height, depth, format, ...) to be compatible
                 with future Ogre versions.
          */
-        Image& loadDynamicImage( uchar* data, uint32 width,
+        OGRE_DEPRECATED Image& loadDynamicImage( uchar* data, uint32 width,
                                  uint32 height, PixelFormat format)
         {
             return loadDynamicImage(data, width, height, 1, format);
@@ -231,7 +231,7 @@ namespace Ogre {
             PixelFormat format,
             size_t numFaces = 1, uint32 numMipMaps = 0);
         /** Loads raw data from a stream. The pixel format has to be specified. 
-            @remarks This function is deprecated; one should really use the
+            @deprecated use the
                 Image::loadRawData(stream, width, height, depth, format, ...) to be compatible
                 with future Ogre versions.
             @note
@@ -249,7 +249,7 @@ namespace Ogre {
                 Of course, you will never have multiple faces (cube map) and
                 depth too.
         */
-        Image & loadRawData( 
+        OGRE_DEPRECATED Image & loadRawData(
             DataStreamPtr& stream, 
             uint32 width, uint32 height,
             PixelFormat format )

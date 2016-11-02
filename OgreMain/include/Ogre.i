@@ -151,6 +151,8 @@ ADD_REPR(ColourValue)
 %include "OgreController.h"
 %include "OgreRenderSystemCapabilities.h"
 %include "OgreGpuProgramParams.h"
+%ignore Ogre::Image::loadDynamicImage(uchar*, uint32, uint32, PixelFormat); // deprecated
+%ignore Ogre::Image::loadRawData(DataStreamPtr&, uint32, uint32, PixelFormat); // deprecated
 %include "OgreImage.h"
 %include "OgreBillboard.h"
 %include "OgreParticle.h"

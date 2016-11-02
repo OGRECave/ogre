@@ -334,7 +334,7 @@ namespace Ogre {
         virtual void copyContentsToMemory(const Box& src, const PixelBox &dst, FrameBuffer buffer = FB_AUTO) = 0;
 
         /** Copies the current contents of the render target to a pixelbox. 
-        @remarks This function is deprecated as behavior for dst.size < RenderTarget.size
+        @deprecated This function is deprecated as behavior for dst.size < RenderTarget.size
             was inconsistent in previous versions of Ogre. Sometimes the whole rect was used as a source,
             sometimes the rect with the size equal to the size of destination rect but located
             in the top left corner of the render target, sometimes the destination rect itself.
