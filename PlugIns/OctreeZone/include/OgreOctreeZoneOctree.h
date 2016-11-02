@@ -44,7 +44,12 @@ Modified slightly for use with PCZSceneManager Octree Zones by Eric Cha
 
 namespace Ogre
 {
-
+/** \addtogroup Plugins
+*  @{
+*/
+/** \addtogroup OctreeZone
+*  @{
+    */
 class PCZSceneNode;
 class PCZone;
 
@@ -192,7 +197,8 @@ protected:
     Octree * mParent;
 
 };
-
+/** @} */
+/** @} */
 }
 
 #endif

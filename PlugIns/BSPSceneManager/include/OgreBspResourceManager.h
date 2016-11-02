@@ -33,7 +33,12 @@ THE SOFTWARE.
 #include "OgreSingleton.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup BSPSceneManager
+    *  @{
+    */
     /** Manages the locating and loading of BSP-based indoor levels.
     Like other ResourceManager specialisations it manages the location and loading
     of a specific type of resource, in this case files containing Binary
@@ -105,7 +110,8 @@ namespace Ogre {
         Quake3ShaderManager *mShaderMgr;
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

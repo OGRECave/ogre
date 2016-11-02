@@ -35,7 +35,12 @@ THE SOFTWARE.
 #include "OgreBlendMode.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup BSPSceneManager
+    *  @{
+    */
 
     /** Class for managing Quake3 custom shaders.
         Quake3 uses .shader files to define custom shaders, or Materials in Ogre-speak.
@@ -119,7 +124,8 @@ namespace Ogre {
 
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

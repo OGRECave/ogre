@@ -32,7 +32,12 @@ THE SOFTWARE.
 #include "OgreSceneNode.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup BSPSceneManager
+    *  @{
+    */
     /** Specialisation of SceneNode for the BspSceneManager.
     @remarks
         This specialisation of SceneNode is to enable information about the
@@ -73,7 +78,8 @@ namespace Ogre {
 
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

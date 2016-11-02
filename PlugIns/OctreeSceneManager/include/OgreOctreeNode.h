@@ -44,7 +44,13 @@ email                : janders@users.sf.net
 
 namespace Ogre
 {
-
+/** \addtogroup Plugins Plugins
+*  @{
+*/
+/** \addtogroup Octree OctreeSceneManager
+* Octree datastructure for managing scene nodes.
+*  @{
+*/
 /** Specialized SceneNode that is customized for working within an Octree. Each node
 * maintains its own bounding box, rather than merging it with all the children.
 *
@@ -140,7 +146,8 @@ protected:
 
 
 };
-
+/** @} */
+/** @} */
 }
 
 

@@ -38,7 +38,12 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup BSPSceneManager
+    *  @{
+    */
 
     /** Specialisation of the SceneManager class to deal with indoor scenes
         based on a BSP tree.
@@ -275,6 +280,8 @@ namespace Ogre {
         SceneManager* createInstance(const String& instanceName);
         void destroyInstance(SceneManager* instance);
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

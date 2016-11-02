@@ -34,7 +34,12 @@ THE SOFTWARE.
 #include "OgreAreaEmitter.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
     /** Particle emitter which emits particles randomly from points inside a cylinder.
     @remarks
         This basic particle emitter emits particles from a cylinder area. The
@@ -53,7 +58,8 @@ namespace Ogre {
         /** See ParticleEmitter. */
         void _initParticle(Particle* pParticle);
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

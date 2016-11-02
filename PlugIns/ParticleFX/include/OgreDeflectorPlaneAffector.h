@@ -34,7 +34,12 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
     /** This class defines a ParticleAffector which deflects particles.
     @remarks
         This affector (see ParticleAffector) offers a simple (and inaccurate) physical deflection.
@@ -108,7 +113,8 @@ namespace Ogre {
         /// bounce factor (0.5 means 50 percent)
         Real mBounce;
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif
