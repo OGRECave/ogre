@@ -160,7 +160,8 @@ namespace Ogre {
         /** Returns the number of bones in this skeleton. */
         virtual unsigned short getNumBones(void) const;
 
-        /** Gets the root bone of the skeleton: deprecated in favour of getRootBoneIterator. 
+        /** Gets the root bone of the skeleton
+        @deprecated use Skeleton::getRootBoneIterator.
         @remarks
             The system derives the root bone the first time you ask for it. The root bone is the
             only bone in the skeleton which has no parent. The system locates it by taking the
