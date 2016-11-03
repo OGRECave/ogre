@@ -60,16 +60,6 @@ namespace Ogre {
         GL3PlusScratchBufferAlloc* ptrAlloc = (GL3PlusScratchBufferAlloc*)mScratchBufferPool;
         ptrAlloc->size = SCRATCH_POOL_SIZE - sizeof(GL3PlusScratchBufferAlloc);
         ptrAlloc->free = 1;
-
-        // Win32 machines with ATI GPU are having issues glMapBuffer, looks like buffer corruption
-        // disable for now until we figure out where the problem lies
-#       if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-        if (Root::getSingleton().getRenderSystem()->getCapabilities()->getVendor() == GPU_AMD)
-        {
-            mMapBufferThreshold = 0xffffffffUL  /* maximum unsigned long value */;
-        }
-#       endif
-
     }
 
     GL3PlusHardwareBufferManagerBase::~GL3PlusHardwareBufferManagerBase()
