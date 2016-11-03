@@ -388,14 +388,12 @@ namespace Ogre {
 #endif
 
         // ES 3 always supports NPOT textures
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || mHasGLES30)
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
             rsc->setNonPOW2TexturesLimited(false);
         }
-        else
-#endif
+        else if(mGLSupport->checkExtension("GL_APPLE_texture_2D_limited_npot"))
         {
             rsc->setNonPOW2TexturesLimited(true);
         }
