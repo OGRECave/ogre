@@ -36,7 +36,7 @@ namespace Ogre {
 namespace RTShader {
 
 
-/** \addtogroup Core
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup RTShader

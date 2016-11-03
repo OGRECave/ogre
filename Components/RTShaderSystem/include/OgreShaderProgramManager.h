@@ -37,7 +37,7 @@ namespace RTShader {
 
     class ProgramWriter;
 
-/** \addtogroup Core
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup RTShader

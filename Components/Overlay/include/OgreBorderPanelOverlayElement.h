@@ -32,7 +32,7 @@ THE SOFTWARE.
 #include "OgrePanelOverlayElement.h"
 
 namespace Ogre {
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Overlays

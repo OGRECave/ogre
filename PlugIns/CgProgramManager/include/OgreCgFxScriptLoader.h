@@ -38,6 +38,13 @@ THE SOFTWARE.
 #include "OgreGpuProgram.h"
 
 namespace Ogre {
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup CgProgramManager CgProgramManager
+    * Specialisation of HighLevelGpuProgram to provide support for nVidia's CG language.
+    *  @{
+    */
 
     /** Manages Overlay objects, parsing them from .overlay files and
         storing a lookup library of them. Alo manages the creation of 
@@ -1534,7 +1541,8 @@ namespace Ogre {
     private:
 
     };
-
+    /** @} */
+    /** @} */
 } // namespace Ogre
 
 #endif 

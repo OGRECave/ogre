@@ -41,11 +41,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
-    /** \addtogroup Terrain
-    *  Some details on the terrain component
+    /** \defgroup Terrain Terrain
+    *
     *  @{
     */
 

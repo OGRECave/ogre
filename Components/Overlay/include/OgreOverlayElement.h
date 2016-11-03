@@ -37,7 +37,7 @@ THE SOFTWARE.
 #include "OgreColourValue.h"
 
 namespace Ogre {
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Overlays

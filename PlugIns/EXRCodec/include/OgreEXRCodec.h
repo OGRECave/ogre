@@ -31,7 +31,13 @@ THE SOFTWARE.
 #include "OgreImageCodec.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup EXRCodec EXRCodec
+    * Codec specialized in loading OpenEXR high dynamic range images.
+    *  @{
+    */
     /** 
      * Codec specialized in loading OpenEXR high dynamic range images.
      */
@@ -52,7 +58,8 @@ namespace Ogre {
 
         String getType() const;
     };
-
+    /** @} */
+    /** @} */
 } // namespace
 
 #endif

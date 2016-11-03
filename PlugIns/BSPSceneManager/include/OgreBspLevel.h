@@ -39,6 +39,13 @@ THE SOFTWARE.
 
 
 namespace Ogre {
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup BSPSceneManager BSPSceneManager
+    * Binary Space Parition (BSP) based indoor level scene manager
+    *  @{
+    */
 
     /** Holds all the data associated with a Binary Space Parition
         (BSP) based indoor level.
@@ -221,6 +228,8 @@ namespace Ogre {
 
     };
     typedef SharedPtr<BspLevel> BspLevelPtr;
+    /** @} */
+    /** @} */
 }
 
 #endif

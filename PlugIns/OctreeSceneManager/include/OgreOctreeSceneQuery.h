@@ -42,6 +42,13 @@ email                : janders@users.sf.net
 
 namespace Ogre
 {
+/** \addtogroup Plugins Plugins
+*  @{
+*/
+/** \addtogroup Octree OctreeSceneManager
+* Octree datastructure for managing scene nodes.
+*  @{
+*/
 /** Octree implementation of IntersectionSceneQuery. */
 class _OgreOctreePluginExport OctreeIntersectionSceneQuery :  public DefaultIntersectionSceneQuery
 {
@@ -94,7 +101,8 @@ public:
     void execute(SceneQueryListener* listener);
 };
 
-
+/** @} */
+/** @} */
 }
 
 #endif

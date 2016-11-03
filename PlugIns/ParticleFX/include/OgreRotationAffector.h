@@ -34,7 +34,12 @@ THE SOFTWARE.
 #include "OgreStringInterface.h"
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
 
     /** This plugin subclass of ParticleAffector allows you to alter the rotation of particles.
     @remarks
@@ -123,7 +128,8 @@ namespace Ogre {
 
     };
 
-
+    /** @} */
+    /** @} */
 }
 
 

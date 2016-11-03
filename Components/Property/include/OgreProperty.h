@@ -45,10 +45,11 @@ THE SOFTWARE.
 #include <tr1/functional>
 #endif
 
-/** \addtogroup Optional Components
+/** \addtogroup Optional
 *  @{
 */
-/** \addtogroup Property
+/** \defgroup Property Property
+* Associate values of arbitrary type with names
 *  @{
 */
 
@@ -109,7 +110,7 @@ namespace Ogre
     using std::tr1::function;
 #endif
 
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Property

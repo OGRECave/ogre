@@ -43,6 +43,13 @@ Code Style Update    :
 
 namespace Ogre
 {
+    /** \addtogroup Plugins Plugins
+    *  @{
+    */
+    /** \defgroup PCZSceneManager PCZSceneManager
+    * SceneManager that uses Portal-Connected-Zones to divide the scene spatially
+    *  @{
+    */
     class PCZoneFactoryManager;
     class PortalBase;
 
@@ -390,7 +397,8 @@ namespace Ogre
     };
 
 
-
+    /** @} */
+    /** @} */
 }
 
 #endif

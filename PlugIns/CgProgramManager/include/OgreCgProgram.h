@@ -33,6 +33,12 @@ THE SOFTWARE.
 #include "OgreStringVector.h"
 
 namespace Ogre {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup CgProgramManager
+    *  @{
+    */
     /** Specialisation of HighLevelGpuProgram to provide support for nVidia's CG language.
     @remarks
         Cg can be used to compile common, high-level, C-like code down to assembler
@@ -170,6 +176,8 @@ namespace Ogre {
         /// Scan the file for #include and replace with source from the OGRE resources
         static String resolveCgIncludes(const String& source, Resource* resourceBeingLoaded, const String& fileName);
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

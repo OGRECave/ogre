@@ -37,10 +37,11 @@ THE SOFTWARE.
 namespace Ogre {
 
 
-    /** \addtogroup Core
+    /** \addtogroup Optional
     *  @{
     */
-    /** \addtogroup Overlays
+    /** \defgroup Overlays Overlay
+    * Layers which is rendered on top of the 'normal' scene contents
     *  @{
     */
     /** Represents a layer which is rendered on top of the 'normal' scene contents.

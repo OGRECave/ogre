@@ -33,6 +33,12 @@ THE SOFTWARE.
 
 namespace Ogre
 {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup CgProgramManager
+    *  @{
+    */
     /** Factory class for Cg programs. */
     class CgProgramFactory : public HighLevelGpuProgramFactory
     {
@@ -50,6 +56,8 @@ namespace Ogre
         void destroy(HighLevelGpuProgram* prog);
 
     };
+    /** @} */
+    /** @} */
 }
 
 #endif

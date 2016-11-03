@@ -34,7 +34,12 @@ THE SOFTWARE.
 
 
 namespace Ogre {
-
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
     /** This class defines a ParticleAffector which applies randomness to the movement of the particles.
     @remarks
         This affector (see ParticleAffector) applies randomness to the movement of the particles by

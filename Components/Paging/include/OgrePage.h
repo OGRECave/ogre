@@ -36,11 +36,11 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
-    /** \addtogroup Paging
-    *  Some details on paging component
+    /** \defgroup Paging Paging
+    *  Render large modular structures
     *  @{
     */
 

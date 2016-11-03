@@ -37,7 +37,7 @@ namespace Ogre
 {
     class PageManager;
 
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Paging

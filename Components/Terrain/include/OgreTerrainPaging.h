@@ -39,7 +39,7 @@ namespace Ogre
     class TerrainGroup;
     class TerrainPagedWorldSection;
 
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Terrain

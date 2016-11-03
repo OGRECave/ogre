@@ -34,6 +34,12 @@ THE SOFTWARE.
 #include "OgreMath.h"
 
 namespace Ogre {
+    /** \addtogroup Plugins
+    *  @{
+    */
+    /** \addtogroup ParticleFX
+    *  @{
+    */
 
     /** Particle emitter which emits particles randomly from points inside a ring (e.g. a tube).
     @remarks
@@ -104,7 +110,8 @@ namespace Ogre {
 
 
     };
-
+    /** @} */
+    /** @} */
 }
 
 #endif

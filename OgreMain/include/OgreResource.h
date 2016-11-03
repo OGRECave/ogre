@@ -86,13 +86,13 @@ namespace Ogre {
 
             /** Callback to indicate that background loading has completed.
             @deprecated
-                Use loadingComplete instead.
+                Use Listener::loadingComplete instead.
             */
             OGRE_DEPRECATED virtual void backgroundLoadingComplete(Resource*) {}
 
             /** Callback to indicate that background preparing has completed.
             @deprecated
-                Use preparingComplete instead.
+                Use Listener::preparingComplete instead.
             */
             OGRE_DEPRECATED virtual void backgroundPreparingComplete(Resource*) {}
 

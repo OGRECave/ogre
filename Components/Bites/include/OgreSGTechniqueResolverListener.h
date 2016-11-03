@@ -32,7 +32,7 @@
 #include <OgreRTShaderSystem.h>
 #include <OgreMaterialManager.h>
 
-/** \addtogroup Optional Components
+/** \addtogroup Optional
 *  @{
 */
 /** \addtogroup Bites
@@ -66,3 +66,5 @@ protected:
     Ogre::RTShader::ShaderGenerator* mShaderGenerator; // The shader generator instance.
 };
 }
+/** @} */
+/** @} */

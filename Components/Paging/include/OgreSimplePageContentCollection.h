@@ -35,13 +35,13 @@ THE SOFTWARE.
 
 namespace Ogre
 {
-    /** \addtogroup Optional Components
+    /** \addtogroup Optional
     *  @{
     */
     /** \addtogroup Paging
     *  Some details on paging component
+    * @{
     */
-    /*@{*/
 
 
     /** Specialisation of PageContentCollection which just provides a simple list
