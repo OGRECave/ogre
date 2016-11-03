@@ -184,19 +184,6 @@ namespace Ogre  {
     {
         switch(format)
         {
-        case PF_DEPTH_DEPRECATED:
-        case PF_D24_UNORM:
-        case PF_D16_UNORM:
-        case PF_D32_FLOAT:
-            return GL_DEPTH_COMPONENT;
-        case PF_D24_UNORM_S8_UINT:
-        case PF_D24_UNORM_X8:
-        case PF_X24_S8_UINT:
-        case PF_D32_FLOAT_X24_S8_UINT:
-        case PF_D32_FLOAT_X24_X8:
-        case PF_X32_X24_S8_UINT:
-            return GL_DEPTH_STENCIL;
-
         case PF_BYTE_LA:
         case PF_A8:
         case PF_L8:
@@ -260,6 +247,7 @@ namespace Ogre  {
         case PF_FLOAT32_GR:
         case PF_FLOAT32_RGB:
         case PF_FLOAT32_RGBA:
+        case PF_D32_FLOAT:
             return GL_FLOAT;
         case PF_SHORT_RGBA:
         case PF_SHORT_RGB:
@@ -281,8 +269,14 @@ namespace Ogre  {
         case PF_R8G8B8A8_UINT:
         case PF_R16G16B16A16_UINT:
         case PF_R32G32B32A32_UINT:
+        case PF_DEPTH_DEPRECATED:
+        case PF_D24_UNORM:
+        case PF_D16_UNORM:
             return GL_UNSIGNED_INT;
-
+        case PF_D24_UNORM_S8_UINT:
+        case PF_D24_UNORM_X8:
+        case PF_X24_S8_UINT:
+            return GL_UNSIGNED_INT_24_8;
         case PF_R8G8_SINT:
         case PF_R16G16_SINT:
         case PF_R32G32_SINT:
@@ -296,6 +290,10 @@ namespace Ogre  {
         case PF_R16G16B16A16_SINT:
         case PF_R32G32B32A32_SINT:
             return GL_INT;
+        case PF_D32_FLOAT_X24_S8_UINT:
+        case PF_X32_X24_S8_UINT:
+        case PF_D32_FLOAT_X24_X8:
+            return GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
 
         default:
             return 0;

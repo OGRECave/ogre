@@ -194,17 +194,19 @@ namespace Ogre
                 }
             }
 
-            void *dstData = OGRE_MALLOC_SIMD( ( *itBuffers )->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
+            void *dstData = OGRE_MALLOC_SIMD( (*itBuffers)->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
             FreeOnDestructor dataPtrContainer( dstData );
 
             // only map if there is no shadow buffer
-            if( const void* shadowBuff = ( *itBuffers )->getShadowCopy() )
+            if( (*itBuffers)->getShadowCopy() )
             {
+                const void* shadowBuff = ( *itBuffers )->getShadowCopy();
                 memcpy( dstData, shadowBuff, ( *itBuffers )->getTotalSizeBytes() );
             }
             else
             {
-                AsyncTicketPtr asyncTicket = ( *itBuffers )->readRequest( 0, ( *itBuffers )->getNumElements() );
+                AsyncTicketPtr asyncTicket = (*itBuffers)->readRequest( 0,
+                                                                        (*itBuffers)->getNumElements() );
                 const void *srcData = asyncTicket->map();
                 memcpy( dstData, srcData, ( *itBuffers )->getTotalSizeBytes() );
                 asyncTicket->unmap();
@@ -238,8 +240,9 @@ namespace Ogre
             FreeOnDestructor dataPtrContainer( dstData );
 
             // only map if there is no shadow buffer
-            if( const void* shadowBuff = mIndexBuffer->getShadowCopy() )
+            if( mIndexBuffer->getShadowCopy() )
             {
+                const void* shadowBuff = mIndexBuffer->getShadowCopy();
                 memcpy( dstData, shadowBuff, mIndexBuffer->getTotalSizeBytes() );
             }
             else
