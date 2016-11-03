@@ -459,7 +459,8 @@ namespace Ogre {
         for (vbi = bindings.begin(); vbi != vbiend; ++vbi)
         {
             const HardwareVertexBufferSharedPtr& vbuf = vbi->second;
-            size = (MSTREAM_OVERHEAD_SIZE * 2) + (sizeof(unsigned short) * 2) + vbuf->getSizeInBytes();
+            size_t vbufSizeInBytes = vbuf->getVertexSize() * vertexData->vertexCount; // vbuf->getSizeInBytes() is too large for meshes prepared for shadow volumes
+            size = (MSTREAM_OVERHEAD_SIZE * 2) + (sizeof(unsigned short) * 2) + vbufSizeInBytes;
             writeChunkHeader(M_GEOMETRY_VERTEX_BUFFER,  size);
             // unsigned short bindIndex;    // Index to bind this buffer to
                 unsigned short tmp = vbi->first;
@@ -470,7 +471,7 @@ namespace Ogre {
                 pushInnerChunk(mStream);
                 {
             // Data
-            size = MSTREAM_OVERHEAD_SIZE + vbuf->getSizeInBytes();
+            size = MSTREAM_OVERHEAD_SIZE + vbufSizeInBytes;
             writeChunkHeader(M_GEOMETRY_VERTEX_BUFFER_DATA, size);
             void* pBuf = vbuf->lock(HardwareBuffer::HBL_READ_ONLY);
 
@@ -478,8 +479,8 @@ namespace Ogre {
             {
                 // endian conversion
                 // Copy data
-                unsigned char* tempData = OGRE_ALLOC_T(unsigned char, vbuf->getSizeInBytes(), MEMCATEGORY_GEOMETRY);
-                memcpy(tempData, pBuf, vbuf->getSizeInBytes());
+                unsigned char* tempData = OGRE_ALLOC_T(unsigned char, vbufSizeInBytes, MEMCATEGORY_GEOMETRY);
+                memcpy(tempData, pBuf, vbufSizeInBytes);
                 flipToLittleEndian(
                     tempData,
                     vertexData->vertexCount,
@@ -668,7 +669,7 @@ namespace Ogre {
         for (vbi = bindings.begin(); vbi != vbiend; ++vbi)
         {
             const HardwareVertexBufferSharedPtr& vbuf = vbi->second;
-            size += vbuf->getSizeInBytes();
+            size += vbuf->getVertexSize() * vertexData->vertexCount; // vbuf->getSizeInBytes() is too large for meshes prepared for shadow volumes
         }
         return size;
     }
