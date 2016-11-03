@@ -862,9 +862,21 @@ namespace Ogre {
             if(glSupport->checkExtension("GL_APPLE_texture_max_level") || glSupport->hasMinGLVersion(3, 0))
                 glSupport->getStateCacheManager()->setTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL_APPLE, 0);
 
+            const RenderSystemCapabilities *renderCaps =
+                    Root::getSingleton().getRenderSystem()->getCapabilities();
+
+            GLsizei width = dstBox.getWidth();
+            GLsizei height = dstBox.getHeight();
+
+            if(!renderCaps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES)) {
+                width = Bitwise::firstPO2From(width);
+                height = Bitwise::firstPO2From(height);
+            }
+
+
             // Allocate temporary texture of the size of the destination area
             OGRE_CHECK_GL_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, tempFormat, 
-                         GLES2PixelUtil::optionalPO2(dstBox.getWidth()), GLES2PixelUtil::optionalPO2(dstBox.getHeight()), 
+                         width, height,
                          0, GL_RGBA, GL_UNSIGNED_BYTE, 0));
             OGRE_CHECK_GL_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                                       GL_TEXTURE_2D, tempTex, 0));
@@ -1046,9 +1058,19 @@ namespace Ogre {
 #endif
             GL_TEXTURE_2D;
 
-        GLsizei width = (GLsizei)GLES2PixelUtil::optionalPO2(src.getWidth());
-        GLsizei height = (GLsizei)GLES2PixelUtil::optionalPO2(src.getHeight());
-        GLsizei depth = (GLsizei)GLES2PixelUtil::optionalPO2(src.getDepth());
+        const RenderSystemCapabilities *renderCaps =
+                Root::getSingleton().getRenderSystem()->getCapabilities();
+
+        GLsizei width = src.getWidth();
+        GLsizei height = src.getHeight();
+        GLsizei depth = src.getDepth();
+
+        if(!renderCaps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES)) {
+            width = Bitwise::firstPO2From(width);
+            height = Bitwise::firstPO2From(height);
+            depth = Bitwise::firstPO2From(depth);
+        }
+
         GLenum format = GLES2PixelUtil::getClosestGLInternalFormat(src.format);
 
         // Generate texture name

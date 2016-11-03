@@ -62,8 +62,8 @@ namespace Ogre {
             size_t w = 0, h = 0;
             
             // Scale to nearest power of 2
-            w = GLES2PixelUtil::optionalPO2(images[imgIdx].getWidth());
-            h = GLES2PixelUtil::optionalPO2(images[imgIdx].getHeight());
+            w = Bitwise::firstPO2From(images[imgIdx].getWidth());
+            h = Bitwise::firstPO2From(images[imgIdx].getHeight());
             if((images[imgIdx].getWidth() != w) || (images[imgIdx].getHeight() != h))
                 images[imgIdx].resize(w, h);
         }
@@ -123,9 +123,9 @@ namespace Ogre {
         if( !nonPowerOfTwoSupported )
         {
             // Convert to nearest power-of-two size if required
-            mWidth = GLES2PixelUtil::optionalPO2(mWidth);
-            mHeight = GLES2PixelUtil::optionalPO2(mHeight);
-            mDepth = GLES2PixelUtil::optionalPO2(mDepth);
+            mWidth = Bitwise::firstPO2From(mWidth);
+            mHeight = Bitwise::firstPO2From(mHeight);
+            mDepth = Bitwise::firstPO2From(mDepth);
         }
 
         // Adjust format if required

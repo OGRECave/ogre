@@ -90,11 +90,6 @@ namespace Ogre {
                     so this might differ.
             */
             static size_t getMaxMipmaps(uint32 width, uint32 height, uint32 depth, PixelFormat format);
-
-            /** Returns next power-of-two size if required by render system, in case
-                RSC_NON_POWER_OF_2_TEXTURES is supported it returns value as-is.
-            */
-            static uint32 optionalPO2(uint32 value);
     };
 }
 
