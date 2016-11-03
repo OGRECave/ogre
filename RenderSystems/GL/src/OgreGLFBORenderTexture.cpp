@@ -366,20 +366,6 @@ static const size_t depthBits[] =
                     else
                     {
                         // Packed depth/stencil format
-
-// #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-// It now seems as if this workaround now *breaks* nvidia cards on Linux with the 169.12 drivers on Linux
-#if 0
-                        // Only query packed depth/stencil formats for 32-bit
-                        // non-floating point formats (ie not R32!) 
-                        // Linux nVidia driver segfaults if you query others
-                        if (PixelUtil::getNumElemBits((PixelFormat)x) != 32 ||
-                            PixelUtil::isFloatingPoint((PixelFormat)x))
-                        {
-                            continue;
-                        }
-#endif
-
                         if (_tryPackedFormat(depthFormats[depth]))
                         {
                             /// Add mode to allowed modes
