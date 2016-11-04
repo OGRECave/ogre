@@ -253,21 +253,7 @@ namespace Ogre {
         bool hasGL42 = mGLSupport->hasMinGLVersion(4, 2);
 
         // Check for hardware mipmapping support.
-        bool disableAutoMip = false;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-        // Apple & Linux ATI drivers have faults in hardware mipmap generation
-        // TODO: Test this with GL3+
-        if (rsc->getVendor() == GPU_AMD)
-            disableAutoMip = true;
-#endif
-        // The Intel 915G frequently corrupts textures when using hardware mip generation
-        // I'm not currently sure how many generations of hardware this affects,
-        // so for now, be safe.
-        if (rsc->getVendor() == GPU_INTEL)
-            disableAutoMip = true;
-
-        if (!disableAutoMip)
-            rsc->setCapability(RSC_AUTOMIPMAP);
+        rsc->setCapability(RSC_AUTOMIPMAP);
 
         // Check for blending support
         rsc->setCapability(RSC_BLENDING);
@@ -2248,12 +2234,8 @@ namespace Ogre {
 
         if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map") || mHasGL32)
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-            // Some Apple NVIDIA hardware can't handle seamless cubemaps
-            if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
-#endif
-                // Enable seamless cube maps
-                OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
+            // Enable seamless cube maps
+            OGRE_CHECK_GL_ERROR(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
         }
 
         if (mGLSupport->checkExtension("GL_ARB_provoking_vertex") || mHasGL32)

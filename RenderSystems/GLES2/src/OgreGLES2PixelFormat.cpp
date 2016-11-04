@@ -808,20 +808,4 @@ namespace Ogre {
         }       
         return count;
     }
-    //-----------------------------------------------------------------------------
-    // TODO: Remove
-    uint32 GLES2PixelUtil::optionalPO2(uint32 value)
-    {
-        const RenderSystemCapabilities *caps =
-            Root::getSingleton().getRenderSystem()->getCapabilities();
-
-        if (caps->hasCapability(RSC_NON_POWER_OF_2_TEXTURES))
-        {
-            return value;
-        }
-        else
-        {
-            return Bitwise::firstPO2From(value);
-        }
-    }
 }

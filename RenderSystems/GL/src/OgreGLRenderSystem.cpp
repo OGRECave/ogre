@@ -267,24 +267,7 @@ namespace Ogre {
         // Check for hardware mipmapping support.
         if(GLEW_VERSION_1_4 || GLEW_SGIS_generate_mipmap)
         {
-            bool disableAutoMip = false;
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_LINUX
-            // Apple & Linux ATI drivers have faults in hardware mipmap generation
-            if (rsc->getVendor() == GPU_AMD)
-                disableAutoMip = true;
-#endif
-            // The Intel 915G frequently corrupts textures when using hardware mip generation
-            // I'm not currently sure how many generations of hardware this affects,
-            // so for now, be safe.
-            if (rsc->getVendor() == GPU_INTEL)
-                disableAutoMip = true;
-
-            // SiS chipsets also seem to have problems with this
-            if (rsc->getVendor() == GPU_SIS)
-                disableAutoMip = true;
-
-            if (!disableAutoMip)
-                rsc->setCapability(RSC_AUTOMIPMAP);
+            rsc->setCapability(RSC_AUTOMIPMAP);
         }
 
         // Check for blending support
@@ -3496,12 +3479,8 @@ namespace Ogre {
 
 		if (mGLSupport->checkExtension("GL_ARB_seamless_cube_map"))
 		{
-#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
-			// Some Apple NVIDIA hardware can't handle seamless cubemaps
-			if (mCurrentCapabilities->getVendor() != GPU_NVIDIA)
-#endif
-				// Enable seamless cube maps
-				glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+            // Enable seamless cube maps
+            glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 		}
 
         static_cast<GLTextureManager*>(mTextureManager)->createWarningTexture();

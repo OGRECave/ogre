@@ -302,10 +302,7 @@ namespace Ogre {
         rsc->setVertexTextureUnitsShared(true);
 
         // Hardware support mipmapping
-#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        if (rsc->getVendor() != Ogre::GPU_MOZILLA)
-#endif
-            rsc->setCapability(RSC_AUTOMIPMAP);
+        rsc->setCapability(RSC_AUTOMIPMAP);
 
         // Blending support
         rsc->setCapability(RSC_BLENDING);
@@ -388,14 +385,12 @@ namespace Ogre {
 #endif
 
         // ES 3 always supports NPOT textures
-#if OGRE_PLATFORM != OGRE_PLATFORM_ANDROID && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
         if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || mHasGLES30)
         {
             rsc->setCapability(RSC_NON_POWER_OF_2_TEXTURES);
             rsc->setNonPOW2TexturesLimited(false);
         }
-        else
-#endif
+        else if(mGLSupport->checkExtension("GL_APPLE_texture_2D_limited_npot"))
         {
             rsc->setNonPOW2TexturesLimited(true);
         }
@@ -787,9 +782,7 @@ namespace Ogre {
 
         if (enabled)
         {
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
             mCurTexMipCount = 0;
-#endif
             GLuint texID =  0;
             if (!tex.isNull())
             {
@@ -797,9 +790,7 @@ namespace Ogre {
                 tex->touch();
                 mTextureTypes[stage] = tex->getGLES2TextureTarget();
                 texID = tex->getGLID();
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
                 mCurTexMipCount = tex->getNumMipmaps();
-#endif
             }
             else
             {
@@ -1493,12 +1484,10 @@ namespace Ogre {
                 FilterOptions magFilter, FilterOptions mipFilter)
     {       
         mMipFilter = mipFilter;
-#if OGRE_PLATFORM == OGRE_PLATFORM_ANDROID || OGRE_PLATFORM == OGRE_PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         if(mCurTexMipCount == 0 && mMipFilter != FO_NONE)
         {
             mMipFilter = FO_NONE;           
         }
-#endif
         _setTextureUnitFiltering(unit, FT_MAG, magFilter);
         _setTextureUnitFiltering(unit, FT_MIN, minFilter);
     }
