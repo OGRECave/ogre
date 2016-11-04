@@ -25,31 +25,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
-#ifndef __VectorTests_H__
-#define __VectorTests_H__
-
 #include <cppunit/TestFixture.h>
 #include <cppunit/extensions/HelperMacros.h>
 
-class VectorTests : public CppUnit::TestFixture
+class QuaternionTests : public CppUnit::TestFixture
 {
     // CppUnit macros for setting up the test suite
-    CPPUNIT_TEST_SUITE(VectorTests);
-    CPPUNIT_TEST(testVector2Scaler);
-    CPPUNIT_TEST(testVector3Scaler);
-    CPPUNIT_TEST(testVector4Scaler);
-    CPPUNIT_TEST(testPerpendicularVector);
+    CPPUNIT_TEST_SUITE(QuaternionTests);
+    CPPUNIT_TEST(testFromVectors);
     CPPUNIT_TEST_SUITE_END();
 
 public:
     void setUp();
     void tearDown();
-
-    void testVector2Scaler();
-    void testVector3Scaler();
-    void testVector4Scaler();
-    void testPerpendicularVector();
+    //Tests conversion from two vectors to a rotation quaternion
+    void testFromVectors();
 };
-
-#endif

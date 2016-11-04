@@ -571,21 +571,11 @@ namespace Ogre
         */
         inline Vector3 perpendicular(void) const
         {
-            static const Real fSquareZero = (Real)(1e-06 * 1e-06);
-
-            Vector3 perp = this->crossProduct( Vector3::UNIT_X );
-
-            // Check length
-            if( perp.squaredLength() < fSquareZero )
-            {
-                /* This vector is the Y axis multiplied by a scalar, so we have
-                   to use another axis.
-                */
-                perp = this->crossProduct( Vector3::UNIT_Y );
-            }
-            perp.normalise();
-
-            return perp;
+            // From Sam Hocevar's article "On picking an orthogonal
+            // vector (and combing coconuts)"
+            Vector3 perp = Math::Abs(x) > Math::Abs(z)
+                         ? Vector3(-y, x, 0.0) : Vector3(0.0, -z, y);
+            return perp.normalisedCopy();
         }
         /** Generates a new random vector which deviates from this vector by a
             given angle in a random direction.
@@ -661,50 +651,26 @@ namespace Ogre
         Quaternion getRotationTo(const Vector3& dest,
             const Vector3& fallbackAxis = Vector3::ZERO) const
         {
-            // Based on Stan Melax's article in Game Programming Gems
-            Quaternion q;
-            // Copy, since cannot modify local
-            Vector3 v0 = *this;
-            Vector3 v1 = dest;
-            v0.normalise();
-            v1.normalise();
+            // From Sam Hocevar's article "Quaternion from two vectors:
+            // the final version"
+            Real a = Math::Sqrt(this->squaredLength() * dest.squaredLength());
+            Real b = a + this->dotProduct(dest);
+            Vector3 axis;
 
-            Real d = v0.dotProduct(v1);
-            // If dot == 1, vectors are the same
-            if (d >= 1.0f)
+            if (b < (Real)1e-06 * a)
             {
-                return Quaternion::IDENTITY;
-            }
-            if (d < (1e-6f - 1.0f))
-            {
-                if (fallbackAxis != Vector3::ZERO)
-                {
-                    // rotate 180 degrees about the fallback axis
-                    q.FromAngleAxis(Radian(Math::PI), fallbackAxis);
-                }
-                else
-                {
-                    // Generate an axis
-                    Vector3 axis = Vector3::UNIT_X.crossProduct(*this);
-                    if (axis.isZeroLength()) // pick another if colinear
-                        axis = Vector3::UNIT_Y.crossProduct(*this);
-                    axis.normalise();
-                    q.FromAngleAxis(Radian(Math::PI), axis);
-                }
+                b = (Real)0.0;
+                axis = fallbackAxis != Vector3::ZERO ? fallbackAxis
+                     : Math::Abs(x) > Math::Abs(z) ? Vector3(-y, x, (Real)0.0)
+                     : Vector3((Real)0.0, -z, y);
             }
             else
             {
-                Real s = Math::Sqrt( (1+d)*2 );
-                Real invs = 1 / s;
-
-                Vector3 c = v0.crossProduct(v1);
-
-                q.x = c.x * invs;
-                q.y = c.y * invs;
-                q.z = c.z * invs;
-                q.w = s * 0.5f;
-                q.normalise();
+                axis = this->crossProduct(dest);
             }
+
+            Quaternion q(b, axis.x, axis.y, axis.z);
+            q.normalise();
             return q;
         }
 
