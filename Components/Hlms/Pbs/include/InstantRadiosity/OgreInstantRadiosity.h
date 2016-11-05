@@ -92,8 +92,34 @@ namespace Ogre
         uint32          mVisibilityMask;
         uint32          mLightMask;
 
+        /// Number of rays to trace. More usually results in more accuracy. Sometimes really
+        /// low values (e.g. 32 rays) may achieve convincing results with high performance, while
+        /// high large values (e.g. 10000) achieve more accurate results.
         size_t          mNumRays;
+        /// Controls how we cluster multiple VPLs into one averaged VPL. Smaller values generate
+        /// more VPLs (reducing performance but improving quality). Bigger values result in less
+        /// VPLs (higher performance, less quality)
         Real            mCellSize;
+        /// How big each VPL should be. Larger ranges leak light more but also are more accurate
+        /// in the sections they lit correctly, but they are also get more expensive.
+        Real            mVplMaxRange;
+        Real            mVplConstAtten;
+        Real            mVplLinearAtten;
+        Real            mVplQuadAtten;
+        /// If all three components of the diffuse colour of a VPL light is below this threshold,
+        /// the VPL is removed (useful for improving performance for VPLs that barely contribute
+        /// to the scene).
+        Real            mVplThreshold;
+        /// Value ideally in range (0; 1]
+        /// When 1, the VPL is placed at exactly the location where the light ray hits the triangle.
+        /// At 0.99 it will be placed at 99% the distance from light to the location (i.e. moves away
+        /// from the triangle). Using Bias can help with light bleeding, and also allows reducing
+        /// mVplMaxRange (thus increasing performance) at the cost of lower accuracy but still
+        /// "looking good".
+        Real            mBias;
+        /// Tweaks how strong VPL lights should be.
+        /// In range (0; inf)
+        Real            mVplPowerBoost;
     private:
         RayHitVec       mRayHits;
 
@@ -103,7 +129,8 @@ namespace Ogre
         MeshDataMapV1   mMeshDataMapV1;
 
         void processLight( Vector3 lightPos, const Vector3 &lightDir,
-                           Radian angle, Vector3 lightColour );
+                           Radian angle, Vector3 lightColour,
+                           Real attenConst, Real attenLinear, Real attenQuad );
 
         const MeshData* downloadVao( VertexArrayObject *vao );
         const MeshData* downloadRenderOp( const v1::RenderOperation &renderOp );
@@ -113,7 +140,8 @@ namespace Ogre
                            Matrix4 worldMatrix, Vector3 materialDiffuse );
 
         Vpl convertToVpl( Vector3 lightColour, Vector3 pointOnTri, const RayHit &hit );
-        void clusterLights( Vector3 lightPos, Vector3 lightColour );
+        void clusterLights( Vector3 lightPos, Vector3 lightColour,
+                            Real attenConst, Real attenLinear, Real attenQuad );
 
     public:
         InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager );

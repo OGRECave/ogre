@@ -97,7 +97,14 @@ namespace Ogre
         mLightMask( 0xffffffff ),
         //mNumRays( 10000 ),
         mNumRays( 32 ),
-        mCellSize( 2 )
+        mCellSize( 2 ),
+        mVplMaxRange( 12 ),
+        mVplConstAtten( 0.5 ),
+        mVplLinearAtten( 0.5 ),
+        mVplQuadAtten( 0 ),
+        mVplThreshold( 0.05 ),
+        mBias( 0.97f ),
+        mVplPowerBoost( 2.0f )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -119,8 +126,6 @@ namespace Ogre
                                                           Vector3 pointOnTri,
                                                           const RayHit &hit )
     {
-        const Real invPi = Real(1.0) / Math::PI;
-        //const Real invPi = 1.0f;
         const Real NdotL = hit.triNormal.dotProduct( -hit.rayDir );
 
 //        TODO_attenuation_over_distance;
@@ -129,7 +134,7 @@ namespace Ogre
         //LogManager::getSingleton().logMessage( "NdotL " + StringConverter::toString( NdotL )  );
 
         //materialDiffuse is already divided by PI
-        Vector3 diffuseTerm = invPi * NdotL * hit.materialDiffuse * lightColour;
+        Vector3 diffuseTerm = /*NdotL **/ hit.materialDiffuse * lightColour;
 
     #if 0
         if( hasUVs )
@@ -161,7 +166,8 @@ namespace Ogre
         return vpl;
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::clusterLights( Vector3 lightPos, Vector3 lightColour )
+    void InstantRadiosity::clusterLights( Vector3 lightPos, Vector3 lightColour,
+                                          Real attenConst, Real attenLinear, Real attenQuad )
     {
         assert( mCellSize > 0 );
 
@@ -180,8 +186,12 @@ namespace Ogre
                 continue;
             }
 
-            //const Real bias = Real( 0.9f );
-            const Real bias = Real( 1.0f );
+            const Real bias = mBias;
+            const Real vplPowerBoost = mVplPowerBoost;
+
+            Real atten = Real(1.0f) /
+                    (attenConst + (attenLinear + attenQuad * hit.distance) * hit.distance);
+            atten = Ogre::min( Real(1.0f), atten );
 
             const Vector3 pointOnTri = lightPos + hit.rayDir * hit.distance * bias;
 
@@ -190,6 +200,8 @@ namespace Ogre
             blockZ = static_cast<int32>( Math::Floor( pointOnTri.z * cellSize ) );
 
             Vpl vpl = convertToVpl( lightColour, pointOnTri, hit );
+            vpl.diffuse *= atten;
+
             Real numCollectedVpls = 1.0f;
 
             //Merge the lights (simple average) that lie in the same cluster.
@@ -200,6 +212,10 @@ namespace Ogre
             {
                 const RayHit &alikeHit = *itor;
 
+                Real alikeAtten = Real(1.0f) /
+                        (attenConst + (attenLinear + attenQuad * alikeHit.distance) * alikeHit.distance);
+                alikeAtten = Ogre::min( Real(1.0f), alikeAtten );
+
                 const Vector3 pointOnTri02 = lightPos + alikeHit.rayDir * alikeHit.distance * bias;
 
                 const int32 alikeBlockX = static_cast<int32>( Math::Floor( pointOnTri02.x * cellSize ) );
@@ -209,7 +225,7 @@ namespace Ogre
                 if( blockX == alikeBlockX && blockY == alikeBlockY && blockZ == alikeBlockZ )
                 {
                     Vpl alikeVpl = convertToVpl( lightColour, pointOnTri02, alikeHit );
-                    vpl.diffuse += alikeVpl.diffuse;
+                    vpl.diffuse += alikeVpl.diffuse * alikeAtten;
                     vpl.normal  += alikeVpl.normal;
                     vpl.radius  += alikeVpl.radius;
                     vpl.position+= alikeVpl.position;
@@ -230,54 +246,47 @@ namespace Ogre
             vpl.position/= numCollectedVpls;
             vpl.normal.normalise();
 
+            vpl.diffuse *= vplPowerBoost;
             vpl.diffuse /= mNumRays;
 
             vpl.radius = 1.0f;
 
-            SceneNode *lightNode = rootNode->createChildSceneNode( SCENE_DYNAMIC );
-#if 1
-            Light *vplLight = mSceneManager->createLight();
-            lightNode->attachObject( vplLight );
-
-            ColourValue colour;
-            colour.r = vpl.diffuse.x;
-            colour.g = vpl.diffuse.y;
-            colour.b = vpl.diffuse.z;
-            colour.a = 1.0f;
-            vplLight->setDiffuseColour( colour );
-            vplLight->setSpecularColour( ColourValue::Black );
-            vplLight->setType( Light::LT_POINT );
-            //vplLight->setAttenuationBasedOnRadius( 5.0f, 0.892f ); //TODO
-            //vplLight->setAttenuation( 10, 0.5, 1.0, 0.5 / (vpl.radius * vpl.radius) );
-            vplLight->setAttenuation( 10, 0.5, 1.0, 0.0 );
-#else
-            Item *item = mSceneManager->createItem( "Sphere1000.mesh",
-                                                    Ogre::ResourceGroupManager::
-                                                    AUTODETECT_RESOURCE_GROUP_NAME,
-                                                    Ogre::SCENE_DYNAMIC);
+            if( vpl.diffuse.x >= mVplThreshold ||
+                vpl.diffuse.y >= mVplThreshold ||
+                vpl.diffuse.z >= mVplThreshold )
             {
-                Real radius = 5.0f;
-                Real mAttenuationConst   = 0.5f;
-                Real mAttenuationLinear  = 0.0f;
-                Real mAttenuationQuad    = 0.5f / (radius * radius);
-                Real lumThreshold = 0.892f;
+                SceneNode *lightNode = rootNode->createChildSceneNode( SCENE_DYNAMIC );
+#if 1
+                Light *vplLight = mSceneManager->createLight();
+                lightNode->attachObject( vplLight );
 
-                Real h = mAttenuationConst - 1.0f / lumThreshold;
-                Real rootPart = sqrt( mAttenuationLinear * mAttenuationLinear - 4.0f * mAttenuationQuad * h );
-                Real mRange = (-mAttenuationLinear + rootPart) / (2.0f * mAttenuationQuad);
-                //lightNode->scale( Vector3(mRange) );
-                lightNode->scale( Vector3(2) );
-            }
-            lightNode->attachObject( item );
+                ColourValue colour;
+                colour.r = vpl.diffuse.x;
+                colour.g = vpl.diffuse.y;
+                colour.b = vpl.diffuse.z;
+                colour.a = 1.0f;
+                vplLight->setDiffuseColour( colour );
+                vplLight->setSpecularColour( ColourValue::Black );
+                vplLight->setType( Light::LT_VPL );
+                vplLight->setAttenuation( mVplMaxRange, mVplConstAtten, mVplLinearAtten, mVplQuadAtten );
+#else
+                Item *item = mSceneManager->createItem( "Sphere1000.mesh",
+                                                        Ogre::ResourceGroupManager::
+                                                        AUTODETECT_RESOURCE_GROUP_NAME,
+                                                        Ogre::SCENE_DYNAMIC);
+                lightNode->scale( mVplMaxRange );
+                lightNode->attachObject( item );
 #endif
-            lightNode->setPosition( vpl.position );
+                lightNode->setPosition( vpl.position );
 
-            efficientVectorRemove( mRayHits, mRayHits.begin() );
+                efficientVectorRemove( mRayHits, mRayHits.begin() );
+            }
         }
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::processLight( Vector3 lightPos, const Vector3 &lightDir,
-                                         Radian angle, Vector3 lightColour )
+                                         Radian angle, Vector3 lightColour,
+                                         Real attenConst, Real attenLinear, Real attenQuad )
     {
         //Same RNG/seed for every object & triangle
         RandomNumberGenerator rng;
@@ -308,7 +317,7 @@ namespace Ogre
             }
         }
 
-        clusterLights( lightPos, lightColour );
+        clusterLights( lightPos, lightColour, attenConst, attenLinear, attenQuad );
     }
     //-----------------------------------------------------------------------------------
     const InstantRadiosity::MeshData* InstantRadiosity::downloadVao( VertexArrayObject *vao )
@@ -710,20 +719,26 @@ namespace Ogre
                         visibilityFlags[j] & lightMask )
                     {
                         Light *light = static_cast<Light*>( objData.mOwner[k] );
-                        Node *lightNode = light->getParentNode();
-                        Vector3 diffuseCol;
-                        ColourValue lightColour = light->getDiffuseColour() * light->getPowerScale() * 5;
-                        diffuseCol.x = lightColour.r;
-                        diffuseCol.y = lightColour.g;
-                        diffuseCol.z = lightColour.b;
+                        if( light->getType() != Light::LT_VPL )
+                        {
+                            Node *lightNode = light->getParentNode();
+                            Vector3 diffuseCol;
+                            ColourValue lightColour = light->getDiffuseColour() * light->getPowerScale();
+                            diffuseCol.x = lightColour.r;
+                            diffuseCol.y = lightColour.g;
+                            diffuseCol.z = lightColour.b;
 
-                        processLight( lightNode->_getDerivedPosition(),
-                                      light->getDirection(),
-                                      light->getSpotlightOuterAngle(),
-                                      diffuseCol );
+                            processLight( lightNode->_getDerivedPosition(),
+                                          light->getDirection(),
+                                          light->getSpotlightOuterAngle(),
+                                          diffuseCol,
+                                          light->getAttenuationConstant(),
+                                          light->getAttenuationLinear(),
+                                          light->getAttenuationQuadric() );
 
-                        //light->setPowerScale( Math::PI * 4 );
-                        light->setPowerScale( 0 );
+                            //light->setPowerScale( Math::PI * 4 );
+                            //light->setPowerScale( 0 );
+                        }
                     }
                 }
 

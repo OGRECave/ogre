@@ -82,6 +82,7 @@ namespace Ogre {
             break;
         case LT_POINT:
         case LT_SPOTLIGHT:
+        case LT_VPL:
             resetAabb();
             updateLightBounds();
             break;
@@ -185,7 +186,7 @@ namespace Ogre {
     void Light::resetAabb()
     {
         mObjectData.mLocalRadius[mObjectData.mIndex] = 1.0f;
-        if( mLightType == LT_POINT )
+        if( mLightType == LT_POINT || mLightType == LT_VPL )
         {
             mObjectData.mLocalAabb->setFromAabb( Aabb( Vector3::ZERO, Vector3( mRange ) ),
                                                  mObjectData.mIndex );
@@ -200,7 +201,7 @@ namespace Ogre {
     //-----------------------------------------------------------------------
     void Light::updateLightBounds(void)
     {
-        if( mLightType == LT_POINT )
+        if( mLightType == LT_POINT || mLightType == LT_VPL )
         {
             if( !mAffectParentNode )
             {

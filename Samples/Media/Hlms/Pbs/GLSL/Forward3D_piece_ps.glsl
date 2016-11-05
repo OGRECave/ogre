@@ -65,6 +65,16 @@
 				vec3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular );
 				finalColour += tmpColour * atten;
 			}
+			@property( hlms_instant_radiosity || 1 )
+			else if( posAndType.w == 3.0 )
+			{
+				vec3 lightDir2	= posAndType.xyz - inPs.pos;
+				//lightDir2 *= 1.0 / max( 1, fDistance );
+				//lightDir2 *= 1.0 / fDistance;
+
+				finalColour += BRDF_IR( lightDir2, lightDiffuse ) * atten;
+			}
+			@end
 			else
 			{
 				//spotParams.x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )

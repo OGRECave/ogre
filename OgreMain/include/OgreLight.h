@@ -86,6 +86,8 @@ namespace Ogre {
             LT_POINT = 1,
             /// Spotlights simulate a cone of light from a source so require position and direction, plus extra values for falloff
             LT_SPOTLIGHT = 2,
+            /// Virtual point lights, used for Instant Radiosity (Global Illumination fake / approximation)
+            LT_VPL = 3,
 
             NUM_LIGHT_TYPES
         };
