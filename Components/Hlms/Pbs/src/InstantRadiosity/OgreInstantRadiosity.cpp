@@ -126,12 +126,7 @@ namespace Ogre
                                                           Vector3 pointOnTri,
                                                           const RayHit &hit )
     {
-        const Real NdotL = hit.triNormal.dotProduct( -hit.rayDir );
-
-//        TODO_attenuation_over_distance;
-//        TODO_kill_rays_exceeding_range;
-
-        //LogManager::getSingleton().logMessage( "NdotL " + StringConverter::toString( NdotL )  );
+        //const Real NdotL = hit.triNormal.dotProduct( -hit.rayDir );
 
         //materialDiffuse is already divided by PI
         Vector3 diffuseTerm = /*NdotL **/ hit.materialDiffuse * lightColour;
@@ -159,6 +154,7 @@ namespace Ogre
     #endif
 
         Vpl vpl;
+        vpl.light = 0;
         vpl.diffuse = diffuseTerm;
         vpl.normal = hit.triNormal;
         vpl.position = pointOnTri;
@@ -171,10 +167,10 @@ namespace Ogre
     {
         assert( mCellSize > 0 );
 
-        SceneNode *rootNode = mSceneManager->getRootSceneNode( SCENE_DYNAMIC );
-
         int32 blockX, blockY, blockZ;
         const Real cellSize = Real(1.0) / mCellSize;
+
+        const Real bias = mBias;
 
         while( !mRayHits.empty() )
         {
@@ -185,9 +181,6 @@ namespace Ogre
                 efficientVectorRemove( mRayHits, mRayHits.begin() );
                 continue;
             }
-
-            const Real bias = mBias;
-            const Real vplPowerBoost = mVplPowerBoost;
 
             Real atten = Real(1.0f) /
                     (attenConst + (attenLinear + attenQuad * hit.distance) * hit.distance);
@@ -246,41 +239,13 @@ namespace Ogre
             vpl.position/= numCollectedVpls;
             vpl.normal.normalise();
 
-            vpl.diffuse *= vplPowerBoost;
             vpl.diffuse /= mNumRays;
 
             vpl.radius = 1.0f;
 
-            if( vpl.diffuse.x >= mVplThreshold ||
-                vpl.diffuse.y >= mVplThreshold ||
-                vpl.diffuse.z >= mVplThreshold )
-            {
-                SceneNode *lightNode = rootNode->createChildSceneNode( SCENE_DYNAMIC );
-#if 1
-                Light *vplLight = mSceneManager->createLight();
-                lightNode->attachObject( vplLight );
+            mVpls.push_back( vpl );
 
-                ColourValue colour;
-                colour.r = vpl.diffuse.x;
-                colour.g = vpl.diffuse.y;
-                colour.b = vpl.diffuse.z;
-                colour.a = 1.0f;
-                vplLight->setDiffuseColour( colour );
-                vplLight->setSpecularColour( ColourValue::Black );
-                vplLight->setType( Light::LT_VPL );
-                vplLight->setAttenuation( mVplMaxRange, mVplConstAtten, mVplLinearAtten, mVplQuadAtten );
-#else
-                Item *item = mSceneManager->createItem( "Sphere1000.mesh",
-                                                        Ogre::ResourceGroupManager::
-                                                        AUTODETECT_RESOURCE_GROUP_NAME,
-                                                        Ogre::SCENE_DYNAMIC);
-                lightNode->scale( mVplMaxRange );
-                lightNode->attachObject( item );
-#endif
-                lightNode->setPosition( vpl.position );
-
-                efficientVectorRemove( mRayHits, mRayHits.begin() );
-            }
+            efficientVectorRemove( mRayHits, mRayHits.begin() );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -684,6 +649,62 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::updateExistingVpls(void)
+    {
+        SceneNode *rootNode = mSceneManager->getRootSceneNode( SCENE_DYNAMIC );
+
+        VplVec::iterator itor = mVpls.begin();
+        VplVec::iterator end  = mVpls.end();
+
+        while( itor != end )
+        {
+            Vpl &vpl = *itor;
+            if( vpl.diffuse.x >= mVplThreshold ||
+                vpl.diffuse.y >= mVplThreshold ||
+                vpl.diffuse.z >= mVplThreshold )
+            {
+                if( !vpl.light )
+                {
+                    SceneNode *lightNode = rootNode->createChildSceneNode( SCENE_DYNAMIC );
+                    vpl.light = mSceneManager->createLight();
+                    vpl.light->setType( Light::LT_VPL );
+                    lightNode->attachObject( vpl.light );
+                    lightNode->setPosition( vpl.position );
+#if 0
+                    Item *item = mSceneManager->createItem( "Sphere1000.mesh",
+                                                            Ogre::ResourceGroupManager::
+                                                            AUTODETECT_RESOURCE_GROUP_NAME,
+                                                            Ogre::SCENE_DYNAMIC);
+                    lightNode->scale( mVplMaxRange );
+                    lightNode->attachObject( item );
+#endif
+                }
+
+                ColourValue colour;
+                colour.r = vpl.diffuse.x * mVplPowerBoost;
+                colour.g = vpl.diffuse.y * mVplPowerBoost;
+                colour.b = vpl.diffuse.z * mVplPowerBoost;
+                colour.a = 1.0f;
+                vpl.light->setDiffuseColour( colour );
+                vpl.light->setSpecularColour( ColourValue::Black );
+                vpl.light->setAttenuation( mVplMaxRange, mVplConstAtten,
+                                           mVplLinearAtten, mVplQuadAtten );
+            }
+            else if( vpl.light )
+            {
+                SceneNode *lightNode = vpl.light->getParentSceneNode();
+                lightNode->getParentSceneNode()->removeAndDestroyChild( lightNode );
+                mSceneManager->destroyLight( vpl.light );
+                vpl.light = 0;
+#if 0
+                mSceneManager->destroyItem(  );
+#endif
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosity::build(void)
     {
         Hlms *hlms = mHlmsManager->getHlms( HLMS_PBS );
@@ -703,20 +724,17 @@ namespace Ogre
 
         for( size_t i=0; i<numRenderQueues; ++i )
         {
-            //TODO: New lights may be added thus memoryManager may be invalidated!!!
             ObjectData objData;
             const size_t totalObjs = memoryManager.getFirstObjectData( objData, i );
 
-            //for( size_t j=0; j<totalObjs; j += ARRAY_PACKED_REALS )
+            for( size_t j=0; j<totalObjs; j += ARRAY_PACKED_REALS )
             {
-                //for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
-                size_t j=0;//TODO
-                size_t k=0;//TODO
+                for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
                 {
                     uint32 * RESTRICT_ALIAS visibilityFlags = objData.mVisibilityFlags;
 
-                    if( visibilityFlags[j] & VisibilityFlags::LAYER_VISIBILITY &&
-                        visibilityFlags[j] & lightMask )
+                    if( visibilityFlags[k] & VisibilityFlags::LAYER_VISIBILITY &&
+                        visibilityFlags[k] & lightMask )
                     {
                         Light *light = static_cast<Light*>( objData.mOwner[k] );
                         if( light->getType() != Light::LT_VPL )
@@ -745,6 +763,8 @@ namespace Ogre
                 objData.advancePack();
             }
         }
+
+        updateExistingVpls();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::freeMemory(void)

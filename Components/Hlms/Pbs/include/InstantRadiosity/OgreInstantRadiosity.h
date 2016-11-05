@@ -71,6 +71,7 @@ namespace Ogre
         };
         struct Vpl
         {
+            Light *light;
             Vector3 diffuse;
             Real radius;
             Vector3 position;
@@ -78,6 +79,7 @@ namespace Ogre
         };
 
         typedef vector<RayHit>::type RayHitVec;
+        typedef vector<Vpl>::type VplVec;
 
         struct OrderRenderOperation
         {
@@ -121,6 +123,7 @@ namespace Ogre
         /// In range (0; inf)
         Real            mVplPowerBoost;
     private:
+        VplVec          mVpls;
         RayHitVec       mRayHits;
 
         typedef map<VertexArrayObject*, MeshData>::type MeshDataMapV2;
@@ -146,6 +149,8 @@ namespace Ogre
     public:
         InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager );
         ~InstantRadiosity();
+
+        void updateExistingVpls(void);
 
         void build(void);
 
