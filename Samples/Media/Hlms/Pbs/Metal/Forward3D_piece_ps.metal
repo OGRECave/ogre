@@ -48,7 +48,7 @@
 		if( fDistance <= attenuation.x )
 		{
 			lightDir *= 1.0 / fDistance;
-			float atten = 1.0 / (1.0 + (attenuation.y + attenuation.z * fDistance) * fDistance );
+			float atten = 1.0 / (0.5 + (attenuation.y + attenuation.z * fDistance) * fDistance );
 			@property( hlms_forward_fade_attenuation_range )
 				atten *= max( (attenuation.x - fDistance) * attenuation.w, 0.0f );
 			@end
