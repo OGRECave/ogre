@@ -100,6 +100,7 @@ namespace v1 {
         Hlms *hlms = Root::getSingleton().getHlmsManager()->getHlms( HLMS_UNLIT );
         setDatablock( hlms->getDefaultDatablock() );
 
+        setCastShadows( false );
     }
     //-----------------------------------------------------------------------
     BillboardChain::~BillboardChain()
@@ -716,10 +717,11 @@ namespace v1 {
     {
         updateIndexBuffer();
 
-        if (mIndexData->indexCount > 0)
+        mRenderables.clear();
+        if( mIndexData->indexCount > 0 )
         {
-            //TODO: RENDER QUEUE
-            //queue->addRenderable(this, mRenderQueueID, mRenderQueuePriority);
+            mRenderables.push_back( this );
+            preRender( camera->getSceneManager(), 0 );
         }
 	}
 	//-----------------------------------------------------------------------
