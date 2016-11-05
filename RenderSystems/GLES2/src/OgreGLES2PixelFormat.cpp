@@ -229,7 +229,6 @@ namespace Ogre {
             case PF_X8R8G8B8:
             case PF_A8B8G8R8:
             case PF_A8R8G8B8:
-                return GL_UNSIGNED_INT_8_8_8_8_REV;
             case PF_B8G8R8A8:
             case PF_R8G8B8A8:
                 return GL_UNSIGNED_BYTE;
