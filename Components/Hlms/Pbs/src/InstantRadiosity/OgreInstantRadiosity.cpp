@@ -111,6 +111,7 @@ namespace Ogre
     InstantRadiosity::~InstantRadiosity()
     {
         freeMemory();
+        clear();
     }
     //-----------------------------------------------------------------------------------
     bool InstantRadiosity::OrderRenderOperation::operator () ( const v1::RenderOperation &_l,
@@ -705,8 +706,34 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::clear(void)
+    {
+        VplVec::const_iterator itor = mVpls.begin();
+        VplVec::const_iterator end  = mVpls.end();
+
+        while( itor != end )
+        {
+            const Vpl &vpl = *itor;
+            if( vpl.light )
+            {
+                SceneNode *lightNode = vpl.light->getParentSceneNode();
+                lightNode->getParentSceneNode()->removeAndDestroyChild( lightNode );
+                mSceneManager->destroyLight( vpl.light );
+#if 0
+                mSceneManager->destroyItem(  );
+#endif
+            }
+
+            ++itor;
+        }
+
+        mVpls.clear();
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosity::build(void)
     {
+        clear();
+
         Hlms *hlms = mHlmsManager->getHlms( HLMS_PBS );
         if( !dynamic_cast<HlmsPbs*>( hlms ) )
         {

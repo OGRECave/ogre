@@ -102,6 +102,16 @@ namespace Ogre
         /// more VPLs (reducing performance but improving quality). Bigger values result in less
         /// VPLs (higher performance, less quality)
         Real            mCellSize;
+        /// Value ideally in range (0; 1]
+        /// When 1, the VPL is placed at exactly the location where the light ray hits the triangle.
+        /// At 0.99 it will be placed at 99% the distance from light to the location (i.e. moves away
+        /// from the triangle). Using Bias can help with light bleeding, and also allows reducing
+        /// mVplMaxRange (thus increasing performance) at the cost of lower accuracy but still
+        /// "looking good".
+        Real            mBias;
+
+        /// ANY CHANGE TO A mVpl* variable will take effect after calling updateExistingVpls
+        /// (or calling build)
         /// How big each VPL should be. Larger ranges leak light more but also are more accurate
         /// in the sections they lit correctly, but they are also get more expensive.
         Real            mVplMaxRange;
@@ -112,13 +122,6 @@ namespace Ogre
         /// the VPL is removed (useful for improving performance for VPLs that barely contribute
         /// to the scene).
         Real            mVplThreshold;
-        /// Value ideally in range (0; 1]
-        /// When 1, the VPL is placed at exactly the location where the light ray hits the triangle.
-        /// At 0.99 it will be placed at 99% the distance from light to the location (i.e. moves away
-        /// from the triangle). Using Bias can help with light bleeding, and also allows reducing
-        /// mVplMaxRange (thus increasing performance) at the cost of lower accuracy but still
-        /// "looking good".
-        Real            mBias;
         /// Tweaks how strong VPL lights should be.
         /// In range (0; inf)
         Real            mVplPowerBoost;
@@ -150,7 +153,14 @@ namespace Ogre
         InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager );
         ~InstantRadiosity();
 
+        /// Does nothing if build hasn't been called yet.
+        /// Updates VPLs with the latest changes made to all mVpl* variables.
+        /// May create/remove VPL lights because of mVplThreshold
         void updateExistingVpls(void);
+
+        /// Clears everything, removing our VPLs. Does not freeMemory.
+        /// You will have to call build again to get VPLs again.
+        void clear(void);
 
         void build(void);
 
