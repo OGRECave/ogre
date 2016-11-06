@@ -229,7 +229,7 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported by OpenGL ES
         rsc->setCapability(RSC_VBO);
-        if(mGLSupport->checkExtension("GL_OES_element_index_uint"))
+        if(mGLSupport->checkExtension("GL_OES_element_index_uint") || mHasGLES30)
             rsc->setCapability(RSC_32BIT_INDEX);
 
         // Check for hardware occlusion support
