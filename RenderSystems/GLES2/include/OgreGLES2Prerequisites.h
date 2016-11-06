@@ -55,16 +55,7 @@ namespace Ogre {
 #           endif
 #       endif
 #   endif
-#elif (OGRE_PLATFORM == OGRE_PLATFORM_ANDROID) || (OGRE_PLATFORM == OGRE_PLATFORM_NACL) || (OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN)
-#   if OGRE_NO_GLES3_SUPPORT == 0 && OGRE_PLATFORM != OGRE_PLATFORM_EMSCRIPTEN
-#       include <GLES3/gl3platform.h>
-#       include <GLES3/gl3.h>
-#   else
-#       include <GLES2/gl2platform.h>
-#       include <GLES2/gl2.h>
-#       include <GLES2/gl2ext.h>
-#   endif
-#   if (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
+#elif (OGRE_PLATFORM == OGRE_PLATFORM_NACL)
 #       include "ppapi/cpp/completion_callback.h"
 #       include "ppapi/cpp/instance.h"
 #       include "ppapi/c/ppp_graphics_3d.h"
@@ -74,7 +65,6 @@ namespace Ogre {
 #       undef GL_OES_get_program_binary
 #       undef GL_OES_mapbuffer
 #       undef GL_OES_vertex_array_object
-#   endif
 #else
 #   if (OGRE_PLATFORM == OGRE_PLATFORM_WIN32)
 #       if !defined( __MINGW32__ )
@@ -86,13 +76,6 @@ namespace Ogre {
 #               define NOMINMAX // required to stop windows.h messing up std::min
 #           endif
 #       endif
-#   endif
-#   if OGRE_NO_GLES3_SUPPORT == 0
-#       include <GLES3/gl3platform.h>
-#       include <GLES3/gl3.h>
-#   else
-#       include <GLES2/gl2.h>
-#       include <GLES2/gl2ext.h>
 #   endif
 #endif
 
