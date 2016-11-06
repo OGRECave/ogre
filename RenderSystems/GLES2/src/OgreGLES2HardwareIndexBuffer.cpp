@@ -42,7 +42,6 @@ namespace Ogre {
                                                      bool useShadowBuffer)
         : HardwareIndexBuffer(mgr, idxType, numIndexes, usage, false, useShadowBuffer)
     {
-#if OGRE_NO_GLES3_SUPPORT == 1
         if (!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_32BIT_INDEX) &&
             idxType == HardwareIndexBuffer::IT_32BIT)
         {
@@ -50,7 +49,7 @@ namespace Ogre {
                 "32 bit hardware buffers are not allowed in OpenGL ES.",
                 "GLES2HardwareIndexBuffer");
         }
-#endif
+
         createBuffer();
     }
 
