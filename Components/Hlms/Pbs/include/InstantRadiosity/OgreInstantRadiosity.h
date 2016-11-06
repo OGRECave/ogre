@@ -73,9 +73,9 @@ namespace Ogre
         {
             Light *light;
             Vector3 diffuse;
-            Real radius;
             Vector3 position;
             Vector3 normal;
+            Real    numMergedVpls;
         };
 
         typedef vector<RayHit>::type RayHitVec;
@@ -134,20 +134,25 @@ namespace Ogre
         MeshDataMapV2   mMeshDataMapV2;
         MeshDataMapV1   mMeshDataMapV1;
 
-        void processLight( Vector3 lightPos, const Vector3 &lightDir,
+        void processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                            Radian angle, Vector3 lightColour,
                            Real attenConst, Real attenLinear, Real attenQuad );
 
         const MeshData* downloadVao( VertexArrayObject *vao );
         const MeshData* downloadRenderOp( const v1::RenderOperation &renderOp );
 
-        void processLight( const Vector3 &lightPos, ObjectData objData, size_t numNodes );
-        void processLight( const Vector3 &lightPos, const MeshData meshData,
-                           Matrix4 worldMatrix, Vector3 materialDiffuse );
+        void testLightVsAllObjects( const Vector3 &lightPos, ObjectData objData, size_t numNodes );
+        void raycastLightRayVsMesh( const Vector3 &lightPos, const MeshData meshData,
+                                    Matrix4 worldMatrix, Vector3 materialDiffuse );
 
         Vpl convertToVpl( Vector3 lightColour, Vector3 pointOnTri, const RayHit &hit );
-        void clusterLights( Vector3 lightPos, Vector3 lightColour,
-                            Real attenConst, Real attenLinear, Real attenQuad );
+        /// Generates the VPLs from a particular lights, and clusters them.
+        void generateAndClusterVpls( Vector3 lightPos, Vector3 lightColour,
+                                     Real attenConst, Real attenLinear, Real attenQuad );
+        /// Clusters the VPL from all lights (these VPLs may have been clustered with other
+        /// VPLs from the same light, now we need to do this again with lights from different
+        /// clusters)
+        void clusterAllVpls(void);
 
     public:
         InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager );

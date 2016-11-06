@@ -84,6 +84,21 @@ namespace Ogre
 
             return retVal;
         }
+
+        /// Returns values in range [-1; 1] both XY, inside a circle of radius 1.
+        Vector2 getRandomPointInCircle(void)
+        {
+            const Real theta= Real(2.0) * Math::PI * saturatedRand();
+            const Real r    = saturatedRand();
+
+            const Real sqrtR = Math::Sqrt( r );
+
+            Vector2 retVal;
+            retVal.x = sqrtR * Math::Cos( theta );
+            retVal.y = sqrtR * Math::Sin( theta );
+
+            return retVal;
+        }
     };
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
@@ -102,7 +117,7 @@ namespace Ogre
         mVplConstAtten( 0.5 ),
         mVplLinearAtten( 0.5 ),
         mVplQuadAtten( 0 ),
-        mVplThreshold( 0.05 ),
+        mVplThreshold( 0.0 ),
         mBias( 0.97f ),
         mVplPowerBoost( 2.0f )
     {
@@ -159,18 +174,17 @@ namespace Ogre
         vpl.diffuse = diffuseTerm;
         vpl.normal = hit.triNormal;
         vpl.position = pointOnTri;
+        vpl.numMergedVpls = 1.0f;
 
         return vpl;
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::clusterLights( Vector3 lightPos, Vector3 lightColour,
-                                          Real attenConst, Real attenLinear, Real attenQuad )
+    void InstantRadiosity::generateAndClusterVpls( Vector3 lightPos, Vector3 lightColour,
+                                                   Real attenConst, Real attenLinear, Real attenQuad )
     {
         assert( mCellSize > 0 );
 
-        int32 blockX, blockY, blockZ;
         const Real cellSize = Real(1.0) / mCellSize;
-
         const Real bias = mBias;
 
         while( !mRayHits.empty() )
@@ -189,9 +203,9 @@ namespace Ogre
 
             const Vector3 pointOnTri = lightPos + hit.rayDir * hit.distance * bias;
 
-            blockX = static_cast<int32>( Math::Floor( pointOnTri.x * cellSize ) );
-            blockY = static_cast<int32>( Math::Floor( pointOnTri.y * cellSize ) );
-            blockZ = static_cast<int32>( Math::Floor( pointOnTri.z * cellSize ) );
+            const int32 blockX = static_cast<int32>( Math::Floor( pointOnTri.x * cellSize ) );
+            const int32 blockY = static_cast<int32>( Math::Floor( pointOnTri.y * cellSize ) );
+            const int32 blockZ = static_cast<int32>( Math::Floor( pointOnTri.z * cellSize ) );
 
             Vpl vpl = convertToVpl( lightColour, pointOnTri, hit );
             vpl.diffuse *= atten;
@@ -221,7 +235,6 @@ namespace Ogre
                     Vpl alikeVpl = convertToVpl( lightColour, pointOnTri02, alikeHit );
                     vpl.diffuse += alikeVpl.diffuse * alikeAtten;
                     vpl.normal  += alikeVpl.normal;
-                    vpl.radius  += alikeVpl.radius;
                     vpl.position+= alikeVpl.position;
 
                     ++numCollectedVpls;
@@ -236,13 +249,10 @@ namespace Ogre
             }
 
             //vpl.diffuse /= numCollectedVpls;
-            vpl.radius  /= numCollectedVpls;
+            vpl.diffuse /= mNumRays;
             vpl.position/= numCollectedVpls;
             vpl.normal.normalise();
-
-            vpl.diffuse /= mNumRays;
-
-            vpl.radius = 1.0f;
+            vpl.numMergedVpls = numCollectedVpls;
 
             mVpls.push_back( vpl );
 
@@ -250,7 +260,74 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::processLight( Vector3 lightPos, const Vector3 &lightDir,
+    void InstantRadiosity::clusterAllVpls(void)
+    {
+        assert( mCellSize > 0 );
+
+        const Real cellSize = Real(1.0) / mCellSize;
+
+        VplVec::iterator itor = mVpls.begin();
+        VplVec::iterator end  = mVpls.end();
+
+        while( itor != end )
+        {
+            Vpl vpl = *itor; //Hard copy!
+            vpl.normal  *= vpl.numMergedVpls;
+            vpl.position*= vpl.numMergedVpls;
+
+            const size_t idx = itor - mVpls.begin();
+
+            const int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * cellSize ) );
+            const int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * cellSize ) );
+            const int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * cellSize ) );
+
+            Real numCollectedVpls = vpl.numMergedVpls;
+
+            //Merge the lights (simple average) that lie in the same cluster.
+            VplVec::iterator itAlike = itor + 1;
+
+            while( itAlike != end )
+            {
+                const Vpl &alikeVpl = *itAlike;
+
+                const Vector3 pointOnTri02 = itAlike->position;
+
+                const int32 alikeBlockX = static_cast<int32>( Math::Floor( pointOnTri02.x * cellSize ) );
+                const int32 alikeBlockY = static_cast<int32>( Math::Floor( pointOnTri02.y * cellSize ) );
+                const int32 alikeBlockZ = static_cast<int32>( Math::Floor( pointOnTri02.z * cellSize ) );
+
+                if( blockX == alikeBlockX && blockY == alikeBlockY && blockZ == alikeBlockZ )
+                {
+                    vpl.diffuse += alikeVpl.diffuse;
+                    vpl.normal  += alikeVpl.normal * alikeVpl.numMergedVpls;
+                    vpl.position+= alikeVpl.position * alikeVpl.numMergedVpls;
+
+                    numCollectedVpls += alikeVpl.numMergedVpls;
+
+                    //Iterators get invalidated!
+                    itAlike = efficientVectorRemove( mVpls, itAlike );
+                    itor    = mVpls.begin() + idx;
+                    end     = mVpls.end();
+                }
+                else
+                {
+                    ++itAlike;
+                }
+            }
+
+            if( numCollectedVpls > vpl.numMergedVpls )
+            {
+                vpl.position/= numCollectedVpls;
+                vpl.normal.normalise();
+                vpl.numMergedVpls = numCollectedVpls;
+                *itor = vpl;
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                                          Radian angle, Vector3 lightColour,
                                          Real attenConst, Real attenLinear, Real attenQuad )
     {
@@ -261,8 +338,25 @@ namespace Ogre
         for( size_t i=0; i<mNumRays; ++i )
         {
             mRayHits[i].distance = std::numeric_limits<Real>::max();
-            //TODO: Respect lightDir & angle
-            mRayHits[i].rayDir = rng.getRandomDir();
+
+            if( lightType == Light::LT_POINT )
+            {
+                mRayHits[i].rayDir = rng.getRandomDir();
+            }
+            else if( lightType == Light::LT_SPOTLIGHT )
+            {
+                assert( angle < Degree(180) );
+                Vector2 pointInCircle = rng.getRandomPointInCircle();
+                pointInCircle *= Math::Tan( angle * 0.5f );
+                mRayHits[i].rayDir = Vector3( pointInCircle.x, pointInCircle.y, -1.0f );
+                mRayHits[i].rayDir.normalise();
+                mRayHits[i].rayDir = lightRot * mRayHits[i].rayDir;
+            }
+            else
+            {
+                //TODO: Directional lights
+                mRayHits[i].rayDir = rng.getRandomDir();
+            }
         }
 
         for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
@@ -279,11 +373,11 @@ namespace Ogre
             {
                 ObjectData objData;
                 const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
-                processLight( lightPos, objData, totalObjs );
+                testLightVsAllObjects( lightPos, objData, totalObjs );
             }
         }
 
-        clusterLights( lightPos, lightColour, attenConst, attenLinear, attenQuad );
+        generateAndClusterVpls( lightPos, lightColour, attenConst, attenLinear, attenQuad );
     }
     //-----------------------------------------------------------------------------------
     const InstantRadiosity::MeshData* InstantRadiosity::downloadVao( VertexArrayObject *vao )
@@ -497,7 +591,8 @@ namespace Ogre
         return &mMeshDataMapV1[renderOp];
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::processLight( const Vector3 &lightPos, ObjectData objData, size_t numNodes )
+    void InstantRadiosity::testLightVsAllObjects( const Vector3 &lightPos,
+                                                  ObjectData objData, size_t numNodes )
     {
         const uint32 visibilityMask = mVisibilityMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
         for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
@@ -547,7 +642,7 @@ namespace Ogre
                                 materialDiffuse.y *= bgDiffuse.g;
                                 materialDiffuse.z *= bgDiffuse.b;
                             }
-                            processLight( lightPos, *meshData, worldMatrix, materialDiffuse );
+                            raycastLightRayVsMesh( lightPos, *meshData, worldMatrix, materialDiffuse );
                         }
 
                         ++itor;
@@ -559,8 +654,8 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::processLight( const Vector3 &lightPos, const MeshData meshData,
-                                         Matrix4 worldMatrix, Vector3 materialDiffuse )
+    void InstantRadiosity::raycastLightRayVsMesh( const Vector3 &lightPos, const MeshData meshData,
+                                                  Matrix4 worldMatrix, Vector3 materialDiffuse )
     {
         Ray ray;
         ray.setOrigin( lightPos );
@@ -660,9 +755,10 @@ namespace Ogre
         while( itor != end )
         {
             Vpl &vpl = *itor;
-            if( vpl.diffuse.x >= mVplThreshold ||
-                vpl.diffuse.y >= mVplThreshold ||
-                vpl.diffuse.z >= mVplThreshold )
+            Vector3 diffuseCol = vpl.diffuse * mVplPowerBoost;
+            if( diffuseCol.x >= mVplThreshold ||
+                diffuseCol.y >= mVplThreshold ||
+                diffuseCol.z >= mVplThreshold )
             {
                 if( !vpl.light )
                 {
@@ -676,15 +772,15 @@ namespace Ogre
                                                             Ogre::ResourceGroupManager::
                                                             AUTODETECT_RESOURCE_GROUP_NAME,
                                                             Ogre::SCENE_DYNAMIC);
-                    lightNode->scale( mVplMaxRange );
+                    lightNode->scale( Vector3( mVplMaxRange * 0.01f ) );
                     lightNode->attachObject( item );
 #endif
                 }
 
                 ColourValue colour;
-                colour.r = vpl.diffuse.x * mVplPowerBoost;
-                colour.g = vpl.diffuse.y * mVplPowerBoost;
-                colour.b = vpl.diffuse.z * mVplPowerBoost;
+                colour.r = diffuseCol.x;
+                colour.g = diffuseCol.y;
+                colour.b = diffuseCol.z;
                 colour.a = 1.0f;
                 vpl.light->setDiffuseColour( colour );
                 vpl.light->setSpecularColour( ColourValue::Black );
@@ -774,7 +870,8 @@ namespace Ogre
                             diffuseCol.z = lightColour.b;
 
                             processLight( lightNode->_getDerivedPosition(),
-                                          light->getDirection(),
+                                          lightNode->_getDerivedOrientation(),
+                                          light->getType(),
                                           light->getSpotlightOuterAngle(),
                                           diffuseCol,
                                           light->getAttenuationConstant(),
@@ -790,6 +887,8 @@ namespace Ogre
                 objData.advancePack();
             }
         }
+
+        clusterAllVpls();
 
         updateExistingVpls();
     }
