@@ -65,6 +65,10 @@ Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = N
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+#ifndef GL_PACK_ROW_LENGTH_NV
+#define GL_PACK_ROW_LENGTH_NV             0x0D02
+#endif
+
 using namespace std;
 
 namespace Ogre {
@@ -380,9 +384,9 @@ namespace Ogre {
             rsc->setCapability(RSC_TEXTURE_FLOAT);
 
         rsc->setCapability(RSC_TEXTURE_1D);
-#if OGRE_NO_GLES3_SUPPORT == 0
-        rsc->setCapability(RSC_TEXTURE_3D);
-#endif
+
+        if(mHasGLES30)
+            rsc->setCapability(RSC_TEXTURE_3D);
 
         // ES 3 always supports NPOT textures
         if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || mHasGLES30)
@@ -2427,20 +2431,17 @@ namespace Ogre {
                 "GLES2RenderSystem::_copyContentsToMemory" );
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 1
-        /* TODO: check for GL_NV_pack_subimage availability */
-        OgreAssert(dst.getWidth() == dst.rowPitch, "GLES2 does not support GL_PACK_ROW_LENGTH");
-#endif
+        bool hasPackImage = mHasGLES30 || mGLSupport->checkExtension("GL_NV_pack_subimage");
+        OgreAssert(dst.getWidth() == dst.rowPitch || hasPackImage, "GL_PACK_ROW_LENGTH not supported");
 
         // Switch context if different from current one
         _setViewport(vp);
 
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if(dst.getWidth() != dst.rowPitch)
-            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
-#endif
+        if(dst.getWidth() != dst.rowPitch && hasPackImage)
+            glPixelStorei(GL_PACK_ROW_LENGTH_NV, dst.rowPitch);
+
         // Must change the packing to ensure no overruns!
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -2455,9 +2456,7 @@ namespace Ogre {
 
         // restore default alignment
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
-#if OGRE_NO_GLES3_SUPPORT == 0
-        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-#endif
+        glPixelStorei(GL_PACK_ROW_LENGTH_NV, 0);
 
         PixelUtil::bulkPixelVerticalFlip(dst);
     }
