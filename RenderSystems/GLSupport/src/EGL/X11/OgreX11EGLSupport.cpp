@@ -185,8 +185,8 @@ namespace Ogre {
 
         for(mode = mVideoModes.begin(); mode != end; size++)
         {
-            if (mode->first.first >= static_cast<int>(width) &&
-                mode->first.second >= static_cast<int>(height))
+            if (mode->first.first >= width &&
+                mode->first.second >= height)
             {
                 if (!newMode ||
                     mode->first.first < newMode->first.first ||
@@ -210,7 +210,6 @@ namespace Ogre {
 
         if (newMode && *newMode != mCurrentMode)
         {
-            XWindowAttributes winAtt;
             newMode->first.first = DisplayWidth(mNativeDisplay, 0);
             newMode->first.second = DisplayHeight(mNativeDisplay, 0);
             newMode->second = 0; // TODO: Hardcoding refresh rate for LCD's
