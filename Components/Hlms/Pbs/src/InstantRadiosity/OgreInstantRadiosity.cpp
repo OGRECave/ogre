@@ -38,6 +38,10 @@ THE SOFTWARE.
 #include "OgreSceneManager.h"
 #include "Vao/OgreAsyncTicket.h"
 
+#include "Math/Array/OgreBooleanMask.h"
+
+//#include "OgreItem.h"
+
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC
     #include <random>
 #else
@@ -179,8 +183,8 @@ namespace Ogre
         return vpl;
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::generateAndClusterVpls( Vector3 lightPos, Vector3 lightColour,
-                                                   Real attenConst, Real attenLinear, Real attenQuad )
+    void InstantRadiosity::generateAndClusterVpls( Vector3 lightColour, Real attenConst,
+                                                   Real attenLinear, Real attenQuad )
     {
         assert( mCellSize > 0 );
 
@@ -193,7 +197,8 @@ namespace Ogre
 
             if( hit.distance >= std::numeric_limits<Real>::max() )
             {
-                efficientVectorRemove( mRayHits, mRayHits.begin() );
+                RayHitVec::iterator itRay = mRayHits.begin();
+                efficientVectorRemove( mRayHits, itRay );
                 continue;
             }
 
@@ -201,7 +206,7 @@ namespace Ogre
                     (attenConst + (attenLinear + attenQuad * hit.distance) * hit.distance);
             atten = Ogre::min( Real(1.0f), atten );
 
-            const Vector3 pointOnTri = lightPos + hit.rayDir * hit.distance * bias;
+            const Vector3 pointOnTri = hit.ray.getPoint( hit.distance * bias );
 
             const int32 blockX = static_cast<int32>( Math::Floor( pointOnTri.x * cellSize ) );
             const int32 blockY = static_cast<int32>( Math::Floor( pointOnTri.y * cellSize ) );
@@ -224,7 +229,7 @@ namespace Ogre
                         (attenConst + (attenLinear + attenQuad * alikeHit.distance) * alikeHit.distance);
                 alikeAtten = Ogre::min( Real(1.0f), alikeAtten );
 
-                const Vector3 pointOnTri02 = lightPos + alikeHit.rayDir * alikeHit.distance * bias;
+                const Vector3 pointOnTri02 = alikeHit.ray.getPoint( alikeHit.distance * bias );
 
                 const int32 alikeBlockX = static_cast<int32>( Math::Floor( pointOnTri02.x * cellSize ) );
                 const int32 alikeBlockY = static_cast<int32>( Math::Floor( pointOnTri02.y * cellSize ) );
@@ -256,7 +261,8 @@ namespace Ogre
 
             mVpls.push_back( vpl );
 
-            efficientVectorRemove( mRayHits, mRayHits.begin() );
+            RayHitVec::iterator itRay = mRayHits.begin();
+            efficientVectorRemove( mRayHits, itRay );
         }
     }
     //-----------------------------------------------------------------------------------
@@ -328,12 +334,14 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
-                                         Radian angle, Vector3 lightColour,
+                                         Radian angle, Vector3 lightColour, Real lightRange,
                                          Real attenConst, Real attenLinear, Real attenQuad )
     {
         //Same RNG/seed for every object & triangle
         RandomNumberGenerator rng;
         mRayHits.resize( mNumRays );
+
+        ArrayRay * RESTRICT_ALIAS arrayRays = mArrayRays.get();
 
         for( size_t i=0; i<mNumRays; ++i )
         {
@@ -341,22 +349,29 @@ namespace Ogre
 
             if( lightType == Light::LT_POINT )
             {
-                mRayHits[i].rayDir = rng.getRandomDir();
+                mRayHits[i].ray.setOrigin( lightPos );
+                mRayHits[i].ray.setDirection( rng.getRandomDir() );
             }
             else if( lightType == Light::LT_SPOTLIGHT )
             {
                 assert( angle < Degree(180) );
                 Vector2 pointInCircle = rng.getRandomPointInCircle();
                 pointInCircle *= Math::Tan( angle * 0.5f );
-                mRayHits[i].rayDir = Vector3( pointInCircle.x, pointInCircle.y, -1.0f );
-                mRayHits[i].rayDir.normalise();
-                mRayHits[i].rayDir = lightRot * mRayHits[i].rayDir;
+                Vector3 rayDir = Vector3( pointInCircle.x, pointInCircle.y, -1.0f );
+                rayDir.normalise();
+                rayDir = lightRot * rayDir;
+                mRayHits[i].ray.setOrigin( lightPos );
+                mRayHits[i].ray.setDirection( rayDir );
             }
             else
             {
                 //TODO: Directional lights
-                mRayHits[i].rayDir = rng.getRandomDir();
+                mRayHits[i].ray.setOrigin( lightPos );
+                mRayHits[i].ray.setDirection( -lightRot.zAxis() );
             }
+
+            arrayRays->mOrigin.setAll( mRayHits[i].ray.getOrigin() );
+            arrayRays->mDirection.setAll( mRayHits[i].ray.getDirection() );
         }
 
         for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
@@ -373,11 +388,11 @@ namespace Ogre
             {
                 ObjectData objData;
                 const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
-                testLightVsAllObjects( lightPos, objData, totalObjs );
+                testLightVsAllObjects( lightType, lightRange, objData, totalObjs );
             }
         }
 
-        generateAndClusterVpls( lightPos, lightColour, attenConst, attenLinear, attenQuad );
+        generateAndClusterVpls( lightColour, attenConst, attenLinear, attenQuad );
     }
     //-----------------------------------------------------------------------------------
     const InstantRadiosity::MeshData* InstantRadiosity::downloadVao( VertexArrayObject *vao )
@@ -419,7 +434,6 @@ namespace Ogre
                                                     vao->getPrimitiveCount() );
         }
 
-        //TODO: Free these structs
         if( indexBuffer )
         {
             meshData.numVertices = vertexBuffers[posIdx]->getNumElements();
@@ -523,7 +537,6 @@ namespace Ogre
         MeshData meshData;
         memset( &meshData, 0, sizeof(meshData) );
 
-        //TODO: Free these structs
         meshData.numVertices = renderOp.vertexData->vertexCount;
         meshData.vertexPos = reinterpret_cast<float*>(
                     OGRE_MALLOC_SIMD( meshData.numVertices * sizeof(float) * 3u,
@@ -591,18 +604,57 @@ namespace Ogre
         return &mMeshDataMapV1[renderOp];
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::testLightVsAllObjects( const Vector3 &lightPos,
+    void InstantRadiosity::testLightVsAllObjects( uint8 lightType, Real lightRange,
                                                   ObjectData objData, size_t numNodes )
     {
-        const uint32 visibilityMask = mVisibilityMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
+        const size_t numRays = mNumRays;
+        const ArrayInt sceneFlags = Mathlib::SetAll( mVisibilityMask &
+                                                     VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
         for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
         {
+            ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
+                                                                        (objData.mVisibilityFlags);
+
+            //isObjectHitByRays = isVisble;
+            ArrayMaskR isObjectHitByRays = Mathlib::TestFlags4( *visibilityFlags,
+                                               Mathlib::SetAll( VisibilityFlags::LAYER_VISIBILITY ) );
+            //isObjectHitByRays = isVisble & (sceneFlags & visibilityFlags);
+            isObjectHitByRays = Mathlib::And( isObjectHitByRays,
+                                              Mathlib::And( sceneFlags, *visibilityFlags ) );
+
+            if( BooleanMask4::getScalarMask( isObjectHitByRays ) == 0 )
+            {
+                //None of these objects are visible. Early out.
+                objData.advancePack();
+                continue;
+            }
+
+            //TODO: Check if obj is in area of interest for directional lights
+            //isObjectHitByRays = isInAreaOfInterest( objData.mWorldAabb );
+
+            for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                mTmpRaysThatHitObject[k].clear();
+
+            //Make a list of rays that hit these objects (i.e. broadphase)
+            ArrayRay * RESTRICT_ALIAS arrayRays = mArrayRays.get();
+            for( size_t j=0; j<numRays; j += ARRAY_PACKED_REALS )
+            {
+                ArrayMaskR rayHits = arrayRays->intersects( *objData.mWorldAabb );
+                uint32 scalarRayHits = BooleanMask4::getScalarMask( rayHits );
+                for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
+                {
+                    if( IS_BIT_SET( k, scalarRayHits ) )
+                        mTmpRaysThatHitObject[k].push_back( j );
+                }
+            }
+
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
             {
-                uint32 * RESTRICT_ALIAS visibilityFlags = objData.mVisibilityFlags;
+                //Convert isInAreaOfIterest into something smaller we can work with.
+                uint32 scalarIsObjectHitByRays = BooleanMask4::getScalarMask( isObjectHitByRays );
 
-                if( visibilityFlags[j] & VisibilityFlags::LAYER_VISIBILITY &&
-                    visibilityFlags[j] & visibilityMask )
+                if( !mTmpRaysThatHitObject[j].empty() &&
+                    IS_BIT_SET( j, scalarIsObjectHitByRays ) )
                 {
                     MovableObject *movableObject = objData.mOwner[j];
 
@@ -642,7 +694,9 @@ namespace Ogre
                                 materialDiffuse.y *= bgDiffuse.g;
                                 materialDiffuse.z *= bgDiffuse.b;
                             }
-                            raycastLightRayVsMesh( lightPos, *meshData, worldMatrix, materialDiffuse );
+                            raycastLightRayVsMesh( lightRange, *meshData,
+                                                   worldMatrix, materialDiffuse,
+                                                   mTmpRaysThatHitObject[j] );
                         }
 
                         ++itor;
@@ -654,13 +708,10 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::raycastLightRayVsMesh( const Vector3 &lightPos, const MeshData meshData,
-                                                  Matrix4 worldMatrix, Vector3 materialDiffuse )
+    void InstantRadiosity::raycastLightRayVsMesh( Real lightRange, const MeshData meshData,
+                                                  Matrix4 worldMatrix, Vector3 materialDiffuse,
+                                                  const FastArray<size_t> &raysThatHitObj )
     {
-        Ray ray;
-        ray.setOrigin( lightPos );
-
-        const size_t numRays = mNumRays;
         const size_t numElements = meshData.indexData ? meshData.numIndices : meshData.numVertices;
 
         const uint16 * RESTRICT_ALIAS indexData16 = reinterpret_cast<const uint16 * RESTRICT_ALIAS>(
@@ -720,27 +771,31 @@ namespace Ogre
                         triVerts[0], triVerts[1], triVerts[2] );
             triNormal.normalise();
 
-            for( size_t j=0; j<numRays; ++j )
+            FastArray<size_t>::const_iterator itRayIdx = raysThatHitObj.begin();
+            FastArray<size_t>::const_iterator enRayIdx = raysThatHitObj.end();
+            while( itRayIdx != enRayIdx )
             {
-                //TODO: create an array of rays that hit the AABB of the object.
                 //TODO_fill_uv;
-                ray.setDirection( mRayHits[j].rayDir );
+                Ray ray = mRayHits[*itRayIdx].ray;
 
                 const std::pair<bool, Real> inters = Math::intersects(
                             ray, triVerts[0], triVerts[1], triVerts[2], triNormal, true, false );
 
                 if( inters.first )
                 {
-                    if( inters.second < mRayHits[j].distance )
+                    if( inters.second < mRayHits[*itRayIdx].distance &&
+                        inters.second <= lightRange )
                     {
-                        mRayHits[j].distance = inters.second;
-                        mRayHits[j].materialDiffuse = materialDiffuse;
-                        mRayHits[j].triVerts[0] = triVerts[0];
-                        mRayHits[j].triVerts[1] = triVerts[1];
-                        mRayHits[j].triVerts[2] = triVerts[2];
-                        mRayHits[j].triNormal = triNormal;
+                        mRayHits[*itRayIdx].distance = inters.second;
+                        mRayHits[*itRayIdx].materialDiffuse = materialDiffuse;
+                        mRayHits[*itRayIdx].triVerts[0] = triVerts[0];
+                        mRayHits[*itRayIdx].triVerts[1] = triVerts[1];
+                        mRayHits[*itRayIdx].triVerts[2] = triVerts[2];
+                        mRayHits[*itRayIdx].triNormal = triNormal;
                     }
                 }
+
+                ++itRayIdx;
             }
         }
     }
@@ -840,6 +895,8 @@ namespace Ogre
                          "InstantRadiosity::build" );
         }
 
+        mArrayRays = RawSimdUniquePtr<ArrayRay, MEMCATEGORY_GENERAL>( mNumRays );
+
         const uint32 lightMask = mLightMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
 
         ObjectMemoryManager &memoryManager = mSceneManager->_getLightMemoryManager();
@@ -869,11 +926,16 @@ namespace Ogre
                             diffuseCol.y = lightColour.g;
                             diffuseCol.z = lightColour.b;
 
+                            Real lightRange = light->getAttenuationRange();
+                            if( light->getType() == Light::LT_DIRECTIONAL )
+                                lightRange = std::numeric_limits<Real>::max();
+
                             processLight( lightNode->_getDerivedPosition(),
                                           lightNode->_getDerivedOrientation(),
                                           light->getType(),
                                           light->getSpotlightOuterAngle(),
                                           diffuseCol,
+                                          lightRange,
                                           light->getAttenuationConstant(),
                                           light->getAttenuationLinear(),
                                           light->getAttenuationQuadric() );
@@ -891,6 +953,9 @@ namespace Ogre
         clusterAllVpls();
 
         updateExistingVpls();
+
+        //Free memory
+        mArrayRays = RawSimdUniquePtr<ArrayRay, MEMCATEGORY_GENERAL>();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::freeMemory(void)

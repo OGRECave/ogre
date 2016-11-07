@@ -31,6 +31,9 @@ THE SOFTWARE.
 #include "OgreHlmsPbsPrerequisites.h"
 #include "OgreHlmsBufferManager.h"
 #include "OgreConstBufferPool.h"
+#include "OgreRay.h"
+#include "OgreRawPtr.h"
+#include "Math/Array/OgreArrayRay.h"
 #include "OgreHeaderPrefix.h"
 
 namespace Ogre
@@ -67,7 +70,7 @@ namespace Ogre
             Vector3 materialDiffuse;
             Vector3 triVerts[3];
             Vector3 triNormal;
-            Vector3 rayDir;
+            Ray ray;
         };
         struct Vpl
         {
@@ -110,6 +113,13 @@ namespace Ogre
         /// "looking good".
         Real            mBias;
 
+        /// Areas of interest. Only used for directional lights. Normally you don't want to
+        /// use this system for empty landscapes because a regular environment map and simple
+        /// math can take care of that. You want to focus on a particular building, or
+        /// in different cities; but not everything.
+        typedef vector<Aabb>::type AabbVec;
+        AabbVec         mAoI;
+
         /// ANY CHANGE TO A mVpl* variable will take effect after calling updateExistingVpls
         /// (or calling build)
         /// How big each VPL should be. Larger ranges leak light more but also are more accurate
@@ -128,6 +138,9 @@ namespace Ogre
     private:
         VplVec          mVpls;
         RayHitVec       mRayHits;
+        RawSimdUniquePtr<ArrayRay, MEMCATEGORY_GENERAL> mArrayRays;
+
+        FastArray<size_t> mTmpRaysThatHitObject[ARRAY_PACKED_REALS];
 
         typedef map<VertexArrayObject*, MeshData>::type MeshDataMapV2;
         typedef map<v1::RenderOperation, MeshData, OrderRenderOperation>::type MeshDataMapV1;
@@ -135,20 +148,22 @@ namespace Ogre
         MeshDataMapV1   mMeshDataMapV1;
 
         void processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
-                           Radian angle, Vector3 lightColour,
+                           Radian angle, Vector3 lightColour, Real lightRange,
                            Real attenConst, Real attenLinear, Real attenQuad );
 
         const MeshData* downloadVao( VertexArrayObject *vao );
         const MeshData* downloadRenderOp( const v1::RenderOperation &renderOp );
 
-        void testLightVsAllObjects( const Vector3 &lightPos, ObjectData objData, size_t numNodes );
-        void raycastLightRayVsMesh( const Vector3 &lightPos, const MeshData meshData,
-                                    Matrix4 worldMatrix, Vector3 materialDiffuse );
+        void testLightVsAllObjects( uint8 lightType, Real lightRange,
+                                    ObjectData objData, size_t numNodes );
+        void raycastLightRayVsMesh( Real lightRange, const MeshData meshData,
+                                    Matrix4 worldMatrix, Vector3 materialDiffuse,
+                                    const FastArray<size_t> &raysThatHitObj );
 
         Vpl convertToVpl( Vector3 lightColour, Vector3 pointOnTri, const RayHit &hit );
         /// Generates the VPLs from a particular lights, and clusters them.
-        void generateAndClusterVpls( Vector3 lightPos, Vector3 lightColour,
-                                     Real attenConst, Real attenLinear, Real attenQuad );
+        void generateAndClusterVpls( Vector3 lightColour, Real attenConst,
+                                     Real attenLinear, Real attenQuad );
         /// Clusters the VPL from all lights (these VPLs may have been clustered with other
         /// VPLs from the same light, now we need to do this again with lights from different
         /// clusters)
