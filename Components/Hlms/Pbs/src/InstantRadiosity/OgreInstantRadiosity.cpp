@@ -415,6 +415,7 @@ namespace Ogre
 
             arrayRays->mOrigin.setAll( mRayHits[i].ray.getOrigin() );
             arrayRays->mDirection.setAll( mRayHits[i].ray.getDirection() );
+            ++arrayRays;
         }
 
         for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
@@ -668,7 +669,7 @@ namespace Ogre
                                                Mathlib::SetAll( VisibilityFlags::LAYER_VISIBILITY ) );
             //isObjectHitByRays = isVisble & (sceneFlags & visibilityFlags);
             isObjectHitByRays = Mathlib::And( isObjectHitByRays,
-                                              Mathlib::And( sceneFlags, *visibilityFlags ) );
+                                              Mathlib::TestFlags4( sceneFlags, *visibilityFlags ) );
 
             if( lightType == Light::LT_DIRECTIONAL )
             {
@@ -689,7 +690,7 @@ namespace Ogre
 
             //Make a list of rays that hit these objects (i.e. broadphase)
             ArrayRay * RESTRICT_ALIAS arrayRays = mArrayRays.get();
-            for( size_t j=0; j<numRays; j += ARRAY_PACKED_REALS )
+            for( size_t j=0; j<numRays; ++j )
             {
                 ArrayMaskR rayHits = arrayRays->intersects( *objData.mWorldAabb );
                 uint32 scalarRayHits = BooleanMask4::getScalarMask( rayHits );
