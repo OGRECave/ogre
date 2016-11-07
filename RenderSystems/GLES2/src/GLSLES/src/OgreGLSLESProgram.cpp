@@ -171,6 +171,25 @@ namespace Ogre {
             free (out);
     }
 
+    GLuint GLSLESProgram::createGLProgramHandle() {
+        if(!Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+            return 0;
+
+        if (mGLProgramHandle)
+            return mGLProgramHandle;
+
+        OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
+#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
+        if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
+        {
+            OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
+                glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
+        }
+#endif
+
+        return mGLProgramHandle;
+    }
+
     bool GLSLESProgram::compile(const bool checkErrors)
     {
         if (mCompiled == 1)
@@ -199,18 +218,7 @@ namespace Ogre {
                     glLabelObjectEXT(GL_SHADER_OBJECT_EXT, mGLShaderHandle, 0, mName.c_str());
             }
 #endif
-
-            if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
-            {
-                OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-                if(getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
-                {
-                    OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
-                        glLabelObjectEXT(GL_PROGRAM_OBJECT_EXT, mGLProgramHandle, 0, mName.c_str());
-                }
-#endif
-            }
+            createGLProgramHandle();
         }
 
         // Add preprocessor extras and main source
