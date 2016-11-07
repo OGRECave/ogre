@@ -406,14 +406,8 @@ namespace Ogre {
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
         
-#if OGRE_NO_GLES2_VAO_SUPPORT == 0
-#   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30 || emscripten_get_compiler_setting("LEGACY_GL_EMULATION"))
-#   else
-            if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30)
-#   endif
-                rsc->setCapability(RSC_VAO);
-#endif
+        if(!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_vertex_array_object"))
+            rsc->setCapability(RSC_VAO);
 
 #if OGRE_NO_GLES3_SUPPORT == 0
         if (mGLSupport->checkExtension("GL_OES_get_program_binary") || mHasGLES30)
@@ -1605,11 +1599,7 @@ namespace Ogre {
             static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
         // Use a little shorthand
-#if OGRE_NO_GLES2_VAO_SUPPORT == 0
         bool useVAO = (gles2decl && gles2decl->isInitialised());
-#else
-        bool useVAO = false;
-#endif
 
         if(useVAO)
             setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
@@ -1735,11 +1725,9 @@ namespace Ogre {
             gles2decl->setInitialised(true);
         }
 
-#if OGRE_NO_GLES2_VAO_SUPPORT == 0
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30)
+        if(getCapabilities()->hasCapability(RSC_VAO))
             // Unbind the vertex array object.  Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
-#endif
 
         // Unbind all attributes
         for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
@@ -2337,7 +2325,6 @@ namespace Ogre {
         void* pBufferData = 0;
         const GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get());
 
-        // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
         if (updateVAO)
         {
             mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
