@@ -36,23 +36,26 @@ namespace Ogre {
     std::locale StringConverter::msLocale = std::locale(msDefaultStringLocale.c_str());
     bool StringConverter::msUseLocale = false;
 
-    //-----------------------------------------------------------------------
-    String StringConverter::toString(Real val, unsigned short precision, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
+    template<typename T>
+    String StringConverter::_toString(T val, uint16 width, char fill, std::ios::fmtflags flags)
     {
         StringStream stream;
         if (msUseLocale)
             stream.imbue(msLocale);
-        stream.precision(precision);
         stream.width(width);
         stream.fill(fill);
-        if (flags)
+        if (flags & std::ios::basefield) {
+            stream.setf(flags, std::ios::basefield);
+            stream.setf((flags & ~std::ios::basefield) | std::ios::showbase);
+        }
+        else if (flags)
             stream.setf(flags);
+
         stream << val;
 
         return stream.str();
     }
-#if OGRE_DOUBLE_PRECISION == 1
+
     //-----------------------------------------------------------------------
     String StringConverter::toString(float val, unsigned short precision,
                                      unsigned short width, char fill, std::ios::fmtflags flags)
@@ -68,7 +71,7 @@ namespace Ogre {
         stream << val;
         return stream.str();
     }
-#else
+
     //-----------------------------------------------------------------------
     String StringConverter::toString(double val, unsigned short precision,
                                      unsigned short width, char fill, std::ios::fmtflags flags)
@@ -84,110 +87,47 @@ namespace Ogre {
         stream << val;
         return stream.str();
     }
-#endif
+
     //-----------------------------------------------------------------------
-    String StringConverter::toString(int val, 
+    String StringConverter::toString(int val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
-        stream.width(width);
-        stream.fill(fill);
-        if (flags)
-            stream.setf(flags);
-        stream << val;
-        return stream.str();
+        return _toString(val, width, fill, flags);
     }
-    //-----------------------------------------------------------------------
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL &&  ( OGRE_ARCH_TYPE == OGRE_ARCHITECTURE_64 || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS )
-    String StringConverter::toString(unsigned int val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
-    {
-        StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
-        stream.width(width);
-        stream.fill(fill);
-        if (flags)
-            stream.setf(flags);
-        stream << val;
-        return stream.str();
-    }
     //-----------------------------------------------------------------------
-    String StringConverter::toString(size_t val, 
+    String StringConverter::toString(unsigned int val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
-        stream.width(width);
-        stream.fill(fill);
-        if (flags)
-            stream.setf(flags);
-        stream << val;
-        return stream.str();
+        return _toString(val, width, fill, flags);
     }
 #if OGRE_COMPILER == OGRE_COMPILER_MSVC || defined(__MINGW32__)
     //-----------------------------------------------------------------------
-    String StringConverter::toString(unsigned long val, 
+    String StringConverter::toString(unsigned long val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
-        stream.width(width);
-        stream.fill(fill);
-        if (flags)
-            stream.setf(flags);
-        stream << val;
-        return stream.str();
+        return _toString(val, width, fill, flags);
     }
-
 #endif
-    //-----------------------------------------------------------------------
 #else
-    String StringConverter::toString(size_t val, 
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(unsigned long val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
-        stream.width(width);
-        stream.fill(fill);
-        if (flags)
-            stream.setf(flags);
-        stream << val;
-        return stream.str();
+        return _toString(val, width, fill, flags);
     }
-    //-----------------------------------------------------------------------
-    String StringConverter::toString(unsigned long val, 
-        unsigned short width, char fill, std::ios::fmtflags flags)
-    {
-        StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
-        stream.width(width);
-        stream.fill(fill);
-        if (flags)
-            stream.setf(flags);
-        stream << val;
-        return stream.str();
-    }
-    //-----------------------------------------------------------------------
 #endif
-    String StringConverter::toString(long val, 
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(size_t val,
         unsigned short width, char fill, std::ios::fmtflags flags)
     {
-        StringStream stream;
-        if (msUseLocale)
-            stream.imbue(msLocale);
-        stream.width(width);
-        stream.fill(fill);
-        if (flags)
-            stream.setf(flags);
-        stream << val;
-        return stream.str();
+        return _toString(val, width, fill, flags);
+    }
+    //-----------------------------------------------------------------------
+    String StringConverter::toString(long val,
+        unsigned short width, char fill, std::ios::fmtflags flags)
+    {
+        return _toString(val, width, fill, flags);
     }
     //-----------------------------------------------------------------------
     String StringConverter::toString(const Vector2& val)
