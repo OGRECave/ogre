@@ -225,6 +225,10 @@ namespace Ogre {
 #define glMapBufferRangeEXT glMapBufferRange
 #define glFlushMappedBufferRangeEXT glFlushMappedBufferRange
 
+#define glTexImage3DOES glTexImage3D
+#define glCompressedTexImage3DOES glCompressedTexImage3D
+#define glTexSubImage3DOES glTexSubImage3D
+
 #define GL_SYNC_GPU_COMMANDS_COMPLETE_APPLE GL_SYNC_GPU_COMMANDS_COMPLETE
 #define GL_SYNC_FLUSH_COMMANDS_BIT_APPLE GL_SYNC_FLUSH_COMMANDS_BIT
 #define GL_TIMEOUT_IGNORED_APPLE GL_TIMEOUT_IGNORED
