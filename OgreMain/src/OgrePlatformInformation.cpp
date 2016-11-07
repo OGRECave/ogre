@@ -537,6 +537,9 @@ namespace Ogre {
         AndroidCpuFamily cpuInfo = android_getCpuFamily();
         
         switch (cpuInfo) {
+            case ANDROID_CPU_FAMILY_ARM64:
+                cpuID = "ARM64";
+                break;
             case ANDROID_CPU_FAMILY_ARM:
             {
                 if (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_ARMv7) 
