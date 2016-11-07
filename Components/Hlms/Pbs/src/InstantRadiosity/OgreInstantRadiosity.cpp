@@ -664,7 +664,7 @@ namespace Ogre
                                                                         (objData.mVisibilityFlags);
 
             //isObjectHitByRays = isVisble;
-            ArrayMaskR isObjectHitByRays = Mathlib::TestFlags4( *visibilityFlags,
+            ArrayMaskI isObjectHitByRays = Mathlib::TestFlags4( *visibilityFlags,
                                                Mathlib::SetAll( VisibilityFlags::LAYER_VISIBILITY ) );
             //isObjectHitByRays = isVisble & (sceneFlags & visibilityFlags);
             isObjectHitByRays = Mathlib::And( isObjectHitByRays,
@@ -673,8 +673,8 @@ namespace Ogre
             if( lightType == Light::LT_DIRECTIONAL )
             {
                 //Check if obj is in area of interest for directional lights
-                isObjectHitByRays = Mathlib::And( isObjectHitByRays,
-                                                  areaOfInfluence.intersects( *objData.mWorldAabb ) );
+                ArrayMaskI hitMask = CastRealToInt( areaOfInfluence.intersects( *objData.mWorldAabb ) );
+                isObjectHitByRays = Mathlib::And( isObjectHitByRays, hitMask );
             }
 
             if( BooleanMask4::getScalarMask( isObjectHitByRays ) == 0 )
