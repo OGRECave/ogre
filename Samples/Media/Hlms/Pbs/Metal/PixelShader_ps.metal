@@ -114,6 +114,7 @@ inline float3 getTSNormal( sampler samplerState, texture2d_array<float> normalMa
 
 @property( hlms_normal || hlms_qtangent )
 @insertpiece( DeclareBRDF )
+@insertpiece( DeclareBRDF_InstantRadiosity )
 @end
 
 @property( use_parallax_correct_cubemaps )

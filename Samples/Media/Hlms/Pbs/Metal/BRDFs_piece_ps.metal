@@ -141,6 +141,21 @@ inline float3 BRDF( float3 lightDir, float3 viewDir, float NdotV, float3 lightDi
 @end
 @end
 
+@property( hlms_instant_radiosity || 1 )
+@piece( DeclareBRDF_InstantRadiosity )
+//Simplified cheap BRDF for Instant Radiosity.
+float3 BRDF_IR( float3 lightDir, float3 lightDiffuse,
+				Material material, float3 nNormal @insertpiece( brdfExtraParamDefs ) )
+{
+	float NdotL = clamp( dot( nNormal, lightDir ), 0.0, 1.0 );
+	@insertpiece( FresnelType ) fresnelD = @insertpiece( getDiffuseFresnel );
+
+	//We should divide Rd by PI, but it is already included in kD
+	return NdotL * fresnelD * @insertpiece( kD ).xyz * lightDiffuse;
+}
+@end
+@end
+
 /// Applying Fresnel term to prefiltered cubemap has a bad effect of always showing high specular
 /// color at edge, even for rough surface. See https://seblagarde.wordpress.com/2011/08/17/hello-world/
 /// and see http://www.ogre3d.org/forums/viewtopic.php?f=25&p=523550#p523544
