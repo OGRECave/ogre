@@ -252,14 +252,13 @@ namespace Ogre {
             mHeight = 1;
 
 #if OGRE_NO_GLES3_SUPPORT == 0
-        if(target != GL_TEXTURE_3D && target != GL_TEXTURE_2D_ARRAY)
+        if(target != GL_TEXTURE_3D_OES && target != GL_TEXTURE_2D_ARRAY)
+#else
+        if(target != GL_TEXTURE_3D_OES)
+#endif
             mDepth = 1; // Depth always 1 for non-3D textures
         else
             mDepth = depth;
-#else
-        // Only 2D is supported so depth is always 1
-        mDepth = 1;
-#endif
 
         mGLInternalFormat = internalFormat;
         mFormat = GLES2PixelUtil::getClosestOGREFormat(internalFormat, format);
@@ -669,7 +668,16 @@ namespace Ogre {
                                     GLES2PixelUtil::getGLOriginFormat(data.format),
                                     GLES2PixelUtil::getGLOriginDataType(data.format),
                                     data.data));
-                break;
+                    break;
+                case GL_TEXTURE_3D_OES:
+                    OGRE_CHECK_GL_ERROR(glTexSubImage3DOES(mFaceTarget,
+                                    mLevel,
+                                    dest.left, dest.top, dest.front,
+                                    dest.getWidth(), dest.getHeight(), dest.getDepth(),
+                                    GLES2PixelUtil::getGLOriginFormat(data.format),
+                                    GLES2PixelUtil::getGLOriginDataType(data.format),
+                                    data.data));
+                    break;
             }
         }
 
@@ -756,7 +764,9 @@ namespace Ogre {
         // Source texture must be 2D
         if(((src->getUsage() & TU_RENDERTARGET) == 0 && (srct->mTarget == GL_TEXTURE_2D))
 #if OGRE_NO_GLES3_SUPPORT == 0
-        || ((srct->mTarget == GL_TEXTURE_3D) && (mTarget != GL_TEXTURE_2D_ARRAY))
+        || ((srct->mTarget == GL_TEXTURE_3D_OES) && (mTarget != GL_TEXTURE_2D_ARRAY))
+#else
+        || (srct->mTarget == GL_TEXTURE_3D_OES)
 #endif
         )
         {
@@ -837,9 +847,12 @@ namespace Ogre {
         // Clamp to edge (fastest)
         OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
         OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-#if OGRE_NO_GLES3_SUPPORT == 0
-        OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE));
 
+        if(src->getDepth() > 1) {
+            OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_WRAP_R_OES, GL_CLAMP_TO_EDGE));
+        }
+
+#if OGRE_NO_GLES3_SUPPORT == 0
         // Set origin base level mipmap to make sure we source from the right mip
         // level.
         OGRE_CHECK_GL_ERROR(glTexParameteri(src->mTarget, GL_TEXTURE_BASE_LEVEL, src->mLevel));
@@ -1052,11 +1065,7 @@ namespace Ogre {
         
         // Create temporary texture to store source data
         GLuint id = 0;
-        GLenum target =
-#if OGRE_NO_GLES3_SUPPORT == 0
-        (src.getDepth() != 1) ? GL_TEXTURE_3D :
-#endif
-            GL_TEXTURE_2D;
+        GLenum target = (src.getDepth() != 1) ? GL_TEXTURE_3D_OES : GL_TEXTURE_2D;
 
         const RenderSystemCapabilities *renderCaps =
                 Root::getSingleton().getRenderSystem()->getCapabilities();
@@ -1084,7 +1093,7 @@ namespace Ogre {
             glSupport->getStateCacheManager()->setTexParameteri(target, GL_TEXTURE_MAX_LEVEL_APPLE, 1000);
 
         // Allocate texture memory
-#if OGRE_NO_GLES3_SUPPORT == 0
+#if OGRE_NO_GLES3_SUPPORT == 0 && 0
         if(src.getDepth() != 1)
         {
             OGRE_CHECK_GL_ERROR(glTexStorage3D(GL_TEXTURE_3D, 1, format, GLsizei(width), GLsizei(height), GLsizei(depth)));
@@ -1095,7 +1104,14 @@ namespace Ogre {
         }
 #else
         GLenum datatype = (GLsizei)GLES2PixelUtil::getGLOriginDataType(src.format);
-        OGRE_CHECK_GL_ERROR(glTexImage2D(target, 0, format, width, height, 0, format, datatype, 0));
+        if(src.getDepth() != 1)
+        {
+            OGRE_CHECK_GL_ERROR(glTexImage3DOES(target, 0, format, width, height, depth, 0, format, datatype, 0));
+        }
+        else
+        {
+            OGRE_CHECK_GL_ERROR(glTexImage2D(target, 0, format, width, height, 0, format, datatype, 0));
+        }
 #endif
 
         // GL texture buffer
@@ -1172,9 +1188,10 @@ namespace Ogre {
                                                      scaled.data));
                     break;
 #if OGRE_NO_GLES3_SUPPORT == 0
-                case GL_TEXTURE_3D:
                 case GL_TEXTURE_2D_ARRAY:
-                    OGRE_CHECK_GL_ERROR(glTexImage3D(mFaceTarget,
+#endif
+                case GL_TEXTURE_3D_OES:
+                    OGRE_CHECK_GL_ERROR(glTexImage3DOES(mFaceTarget,
                                                      level,
                                                      mGLInternalFormat,
                                                      width, height, depth,
@@ -1183,16 +1200,11 @@ namespace Ogre {
                                                      dataType,
                                                      scaled.data));
                     break;
-#endif
             }
             
             bool squashX = (width > 1);
             bool squashY = (height > 1);
-#if OGRE_NO_GLES3_SUPPORT == 0
-            bool squashZ = (mTarget == GL_TEXTURE_3D && depth > 1);
-#else
-            bool squashZ = false;
-#endif
+            bool squashZ = (mTarget == GL_TEXTURE_3D_OES && depth > 1);
             if (squashX || squashY || squashZ)
             {
                 size_t xMax = squashX ? width >> 1 : width;

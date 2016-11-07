@@ -385,7 +385,7 @@ namespace Ogre {
 
         rsc->setCapability(RSC_TEXTURE_1D);
 
-        if(mHasGLES30)
+        if(!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_texture_3D"))
             rsc->setCapability(RSC_TEXTURE_3D);
 
         // ES 3 always supports NPOT textures
@@ -841,9 +841,7 @@ namespace Ogre {
 
         mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
         mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
-#if OGRE_NO_GLES3_SUPPORT == 0
-        mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w));
-#endif
+        mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_R_OES, getTextureAddressingMode(uvw.w));
         mStateCacheManager->activateGLTextureUnit(0);
     }
 
