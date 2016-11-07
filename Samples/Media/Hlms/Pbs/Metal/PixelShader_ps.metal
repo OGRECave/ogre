@@ -152,12 +152,12 @@ fragment @insertpiece( output_type ) main_metal
 	@end
 
 	@foreach( num_textures, n )
-		, texture2d_array<float> textureMaps@n [[texture(@value(textureRegStart))]]@end
+		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end
 	@property( use_envprobe_map )
 		, texturecube<float>	texEnvProbeMap [[texture(@value(envMapReg))]]
 		, sampler envMapSamplerState [[sampler(@value(envMapReg))]]@end
 	@foreach( numSamplerStates, n )
-		, sampler samplerStates@n [[sampler(@value(samplerStateStart))]]@end
+		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
 	@foreach( hlms_num_shadow_maps, n )
 		, depth2d<float> texShadowMap@n [[texture(@counter(textureRegShadowMapStart))]]@end
 )
@@ -469,9 +469,9 @@ fragment @insertpiece( output_type ) main_metal
 	// END UNIFORM DECLARATION
 
 	@foreach( num_textures, n )
-		, texture2d_array<float> textureMaps@n [[texture(@value(textureRegStart))]]@end
+		, texture2d_array<float> textureMaps@n [[texture(@counter(textureRegStart))]]@end
 	@foreach( numSamplerStates, n )
-		, sampler samplerStates@n [[sampler(@value(samplerStateStart))]]@end
+		, sampler samplerStates@n [[sampler(@counter(samplerStateStart))]]@end
 )
 {
 	@insertpiece( custom_ps_preExecution )
