@@ -138,6 +138,7 @@ float3 qmul( float4 q, float3 v )
 
 @property( hlms_normal || hlms_qtangent )
 @insertpiece( DeclareBRDF )
+@insertpiece( DeclareBRDF_InstantRadiosity )
 @end
 
 @property( use_parallax_correct_cubemaps )

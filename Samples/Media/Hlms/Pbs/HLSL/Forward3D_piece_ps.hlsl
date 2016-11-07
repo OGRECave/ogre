@@ -59,6 +59,17 @@
 				float3 tmpColour = BRDF( lightDir, viewDir, NdotV, lightDiffuse, lightSpecular, material, nNormal @insertpiece( brdfExtraParams ) );
 				finalColour += tmpColour * atten;
 			}
+			@property( hlms_instant_radiosity || 1 )
+			else if( posAndType.w == 3.0 )
+			{
+				float3 lightDir2 = posAndType.xyz - inPs.pos;
+				//lightDir2 *= 1.0 / max( 1, fDistance );
+				//lightDir2 *= 1.0 / fDistance;
+
+				finalColour += BRDF_IR( lightDir2, lightDiffuse, material,
+										nNormal @insertpiece( brdfExtraParams ) ) * atten;
+			}
+			@end
 			else
 			{
 				//spotParams.x = 1.0 / cos( InnerAngle ) - cos( OuterAngle )
