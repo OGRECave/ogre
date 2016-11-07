@@ -78,6 +78,8 @@ namespace Ogre {
         void detachFromProgramObject( const GLuint programObject );
         GLuint getGLProgramHandle() const { return mGLProgramHandle; }
 
+        GLuint createGLProgramHandle();
+
         /// Overridden
         bool getPassTransformStates(void) const;
         bool getPassSurfaceAndLightStates(void) const;

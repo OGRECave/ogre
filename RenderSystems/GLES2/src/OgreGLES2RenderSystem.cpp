@@ -409,17 +409,15 @@ namespace Ogre {
         if(!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_vertex_array_object"))
             rsc->setCapability(RSC_VAO);
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if (mGLSupport->checkExtension("GL_OES_get_program_binary") || mHasGLES30)
+        if (!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_get_program_binary"))
         {
             // http://www.khronos.org/registry/gles/extensions/OES/OES_get_program_binary.txt
             GLint formats;
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &formats));
 
             if(formats > 0)
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
-#endif
 
         if (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
         {

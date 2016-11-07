@@ -68,6 +68,14 @@ namespace Ogre
             {
                 mLinked |= VERTEX_PROGRAM_LINKED;
             }
+            else if(getMicrocodeFromCache(
+                    mVertexProgram->getName(),
+                    mVertexProgram->getGLSLProgram()->createGLProgramHandle()))
+            {
+                mVertexProgram->setLinked(true);
+                mLinked |= VERTEX_PROGRAM_LINKED;
+                mTriedToLinkAndFailed = false;
+            }
             else
             {
                 try
@@ -107,6 +115,14 @@ namespace Ogre
             {
                 mLinked |= FRAGMENT_PROGRAM_LINKED;
             }
+            else if(getMicrocodeFromCache(
+                    mFragmentProgram->getName(),
+                    mFragmentProgram->getGLSLProgram()->createGLProgramHandle()))
+            {
+                mFragmentProgram->setLinked(true);
+                mLinked |= FRAGMENT_PROGRAM_LINKED;
+                mTriedToLinkAndFailed = false;
+            }
             else
             {
                 try
@@ -125,15 +141,15 @@ namespace Ogre
                 mFragmentProgram->getGLSLProgram()->attachToProgramObject(programHandle);
                 OGRE_CHECK_GL_ERROR(glLinkProgram(programHandle));
                 OGRE_CHECK_GL_ERROR(glGetProgramiv(programHandle, GL_LINK_STATUS, &linkStatus));
-                
+
                 if(linkStatus)
                 {
                     mFragmentProgram->setLinked(linkStatus);
                     mLinked |= FRAGMENT_PROGRAM_LINKED;
                 }
-                
+
                 mTriedToLinkAndFailed = !linkStatus;
-                
+
                 GLSLES::logObjectInfo( getCombinedName() + String("GLSL fragment program result : "), programHandle );
             }
         }
@@ -143,22 +159,22 @@ namespace Ogre
             if(mVertexProgram && mVertexProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_VERTEX_SHADER_BIT_EXT, mVertexProgram->getGLSLProgram()->getGLProgramHandle()));
+                _writeToCache(mVertexProgram->getName(), mVertexProgram->getGLSLProgram()->getGLProgramHandle());
             }
             if(mFragmentProgram && mFragmentProgram->isLinked())
             {
                 OGRE_CHECK_GL_ERROR(glUseProgramStagesEXT(mGLProgramPipelineHandle, GL_FRAGMENT_SHADER_BIT_EXT, mFragmentProgram->getGLSLProgram()->getGLProgramHandle()));
+                _writeToCache(mFragmentProgram->getName(), mFragmentProgram->getGLSLProgram()->getGLProgramHandle());
             }
 
             // Validate pipeline
             GLSLES::logObjectInfo( getCombinedName() + String("GLSL program pipeline result : "), mGLProgramPipelineHandle );
-#if OGRE_PLATFORM != OGRE_PLATFORM_NACL
             if(mVertexProgram && mFragmentProgram && getGLES2SupportRef()->checkExtension("GL_EXT_debug_label"))
             {
                 OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
                     glLabelObjectEXT(GL_PROGRAM_PIPELINE_OBJECT_EXT, mGLProgramPipelineHandle, 0,
                                  (mVertexProgram->getName() + "/" + mFragmentProgram->getName()).c_str());
             }
-#endif
         }
 #endif
     }
