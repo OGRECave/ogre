@@ -333,10 +333,48 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::autogenerateAreaOfInfluence(void)
+    {
+        AxisAlignedBox areaOfInfluence;
+        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+        {
+            ObjectMemoryManager &memoryManager = mSceneManager->_getEntityMemoryManager(
+                        static_cast<SceneMemoryMgrTypes>(i) );
+
+            const size_t numRenderQueues = memoryManager.getNumRenderQueues();
+
+            size_t firstRq = std::min<size_t>( mFirstRq, numRenderQueues );
+            size_t lastRq  = std::min<size_t>( mLastRq,  numRenderQueues );
+
+            for( size_t j=firstRq; j<lastRq; ++j )
+            {
+                AxisAlignedBox tmpBox;
+                ObjectData objData;
+                const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
+                MovableObject::calculateCastersBox( totalObjs, objData,
+                                                    mVisibilityMask &
+                                                    VisibilityFlags::RESERVED_VISIBILITY_FLAGS,
+                                                    &tmpBox );
+                areaOfInfluence.merge( tmpBox );
+            }
+        }
+
+        mAoI.push_back( Aabb::newFromExtents( areaOfInfluence.getMinimum(),
+                                              areaOfInfluence.getMaximum() ) );
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosity::processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                                          Radian angle, Vector3 lightColour, Real lightRange,
-                                         Real attenConst, Real attenLinear, Real attenQuad )
+                                         Real attenConst, Real attenLinear, Real attenQuad,
+                                         const Aabb &areaOfInfluence )
     {
+        Aabb rotatedAoI = areaOfInfluence;
+        {
+            Matrix4 rotMatrix;
+            rotMatrix.makeTransform( Vector3::ZERO, Vector3::UNIT_SCALE, lightRot.Inverse() );
+            rotatedAoI.transformAffine( rotMatrix );
+        }
+
         //Same RNG/seed for every object & triangle
         RandomNumberGenerator rng;
         mRayHits.resize( mNumRays );
@@ -365,8 +403,13 @@ namespace Ogre
             }
             else
             {
-                //TODO: Directional lights
-                mRayHits[i].ray.setOrigin( lightPos );
+                Vector3 randomPos;
+                randomPos.x = rng.boxRand() * rotatedAoI.mHalfSize.x;
+                randomPos.y = rng.boxRand() * rotatedAoI.mHalfSize.y;
+                randomPos.z = rotatedAoI.mHalfSize.z + 1.0f;
+                randomPos = lightRot * randomPos + areaOfInfluence.mCenter;
+
+                mRayHits[i].ray.setOrigin( randomPos );
                 mRayHits[i].ray.setDirection( -lightRot.zAxis() );
             }
 
@@ -388,7 +431,8 @@ namespace Ogre
             {
                 ObjectData objData;
                 const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
-                testLightVsAllObjects( lightType, lightRange, objData, totalObjs );
+                testLightVsAllObjects( lightType, lightRange, objData, totalObjs,
+                                       areaOfInfluence );
             }
         }
 
@@ -605,11 +649,15 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::testLightVsAllObjects( uint8 lightType, Real lightRange,
-                                                  ObjectData objData, size_t numNodes )
+                                                  ObjectData objData, size_t numNodes,
+                                                  const Aabb &scalarAreaOfInfluence )
     {
         const size_t numRays = mNumRays;
         const ArrayInt sceneFlags = Mathlib::SetAll( mVisibilityMask &
                                                      VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
+        ArrayAabb areaOfInfluence( ArrayVector3::ZERO, ArrayVector3::ZERO );
+        areaOfInfluence.setAll( scalarAreaOfInfluence );
+
         for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
         {
             ArrayInt * RESTRICT_ALIAS visibilityFlags = reinterpret_cast<ArrayInt*RESTRICT_ALIAS>
@@ -622,15 +670,19 @@ namespace Ogre
             isObjectHitByRays = Mathlib::And( isObjectHitByRays,
                                               Mathlib::And( sceneFlags, *visibilityFlags ) );
 
+            if( lightType == Light::LT_DIRECTIONAL )
+            {
+                //Check if obj is in area of interest for directional lights
+                isObjectHitByRays = Mathlib::And( isObjectHitByRays,
+                                                  areaOfInfluence.intersects( *objData.mWorldAabb ) );
+            }
+
             if( BooleanMask4::getScalarMask( isObjectHitByRays ) == 0 )
             {
                 //None of these objects are visible. Early out.
                 objData.advancePack();
                 continue;
             }
-
-            //TODO: Check if obj is in area of interest for directional lights
-            //isObjectHitByRays = isInAreaOfInterest( objData.mWorldAabb );
 
             for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
                 mTmpRaysThatHitObject[k].clear();
@@ -646,6 +698,8 @@ namespace Ogre
                     if( IS_BIT_SET( k, scalarRayHits ) )
                         mTmpRaysThatHitObject[k].push_back( j );
                 }
+
+                ++arrayRays;
             }
 
             for( size_t j=0; j<ARRAY_PACKED_REALS; ++j )
@@ -902,6 +956,13 @@ namespace Ogre
         ObjectMemoryManager &memoryManager = mSceneManager->_getLightMemoryManager();
         const size_t numRenderQueues = memoryManager.getNumRenderQueues();
 
+        bool aoiAutogenerated = false;
+        if( mAoI.empty() )
+        {
+            autogenerateAreaOfInfluence();
+            aoiAutogenerated = true;
+        }
+
         for( size_t i=0; i<numRenderQueues; ++i )
         {
             ObjectData objData;
@@ -930,15 +991,25 @@ namespace Ogre
                             if( light->getType() == Light::LT_DIRECTIONAL )
                                 lightRange = std::numeric_limits<Real>::max();
 
-                            processLight( lightNode->_getDerivedPosition(),
-                                          lightNode->_getDerivedOrientation(),
-                                          light->getType(),
-                                          light->getSpotlightOuterAngle(),
-                                          diffuseCol,
-                                          lightRange,
-                                          light->getAttenuationConstant(),
-                                          light->getAttenuationLinear(),
-                                          light->getAttenuationQuadric() );
+                            size_t numAoI = mAoI.size();
+
+                            if( light->getType() != Light::LT_DIRECTIONAL )
+                                numAoI = 1;
+
+                            for( size_t l=0; l<numAoI; ++l )
+                            {
+                                const Aabb &areaOfInfluence = mAoI[l];
+                                processLight( lightNode->_getDerivedPosition(),
+                                              lightNode->_getDerivedOrientation(),
+                                              light->getType(),
+                                              light->getSpotlightOuterAngle(),
+                                              diffuseCol,
+                                              lightRange,
+                                              light->getAttenuationConstant(),
+                                              light->getAttenuationLinear(),
+                                              light->getAttenuationQuadric(),
+                                              areaOfInfluence );
+                            }
 
                             //light->setPowerScale( Math::PI * 4 );
                             //light->setPowerScale( 0 );
@@ -956,6 +1027,9 @@ namespace Ogre
 
         //Free memory
         mArrayRays = RawSimdUniquePtr<ArrayRay, MEMCATEGORY_GENERAL>();
+
+        if( aoiAutogenerated )
+            mAoI.clear();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::freeMemory(void)

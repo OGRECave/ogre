@@ -117,6 +117,7 @@ namespace Ogre
         /// use this system for empty landscapes because a regular environment map and simple
         /// math can take care of that. You want to focus on a particular building, or
         /// in different cities; but not everything.
+        /// If left unfilled, the system will auto-calculate one (not recommended).
         typedef vector<Aabb>::type AabbVec;
         AabbVec         mAoI;
 
@@ -147,15 +148,30 @@ namespace Ogre
         MeshDataMapV2   mMeshDataMapV2;
         MeshDataMapV1   mMeshDataMapV1;
 
+        /**
+        @param lightPos
+        @param lightRot
+        @param lightType
+        @param angle
+        @param lightColour
+        @param lightRange
+        @param attenConst
+        @param attenLinear
+        @param attenQuad
+        @param areaOfInfluence
+            Only used for directional light types. See mAoI
+        */
         void processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                            Radian angle, Vector3 lightColour, Real lightRange,
-                           Real attenConst, Real attenLinear, Real attenQuad );
+                           Real attenConst, Real attenLinear, Real attenQuad,
+                           const Aabb &areaOfInfluence );
 
         const MeshData* downloadVao( VertexArrayObject *vao );
         const MeshData* downloadRenderOp( const v1::RenderOperation &renderOp );
 
         void testLightVsAllObjects( uint8 lightType, Real lightRange,
-                                    ObjectData objData, size_t numNodes );
+                                    ObjectData objData, size_t numNodes,
+                                    const Aabb &areaOfInfluence );
         void raycastLightRayVsMesh( Real lightRange, const MeshData meshData,
                                     Matrix4 worldMatrix, Vector3 materialDiffuse,
                                     const FastArray<size_t> &raysThatHitObj );
@@ -168,6 +184,7 @@ namespace Ogre
         /// VPLs from the same light, now we need to do this again with lights from different
         /// clusters)
         void clusterAllVpls(void);
+        void autogenerateAreaOfInfluence(void);
 
     public:
         InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager );
