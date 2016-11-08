@@ -33,15 +33,14 @@
 #include "SamplePlugin.h"
 #include "OgreTrays.h"
 
-#define ENABLE_SHADERS_CACHE_SAVE 0
-#define ENABLE_SHADERS_CACHE_LOAD 0
+#define ENABLE_SHADERS_CACHE 1
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WINRT
 #    include <sdkddkver.h>
 #    if defined(_WIN32_WINNT) && _WIN32_WINNT == _WIN32_WINNT_WIN8
 //      For WinRT 8.0 we only support running from the cache file.
-#       undef ENABLE_SHADERS_CACHE_LOAD
-#       define ENABLE_SHADERS_CACHE_LOAD 1
+#       undef ENABLE_SHADERS_CACHE
+#       define ENABLE_SHADERS_CACHE 1
 #    endif
 #endif
 
@@ -1026,28 +1025,8 @@ namespace OgreBites
             mTrayMgr->showBackdrop("SdkTrays/Bands");
             mTrayMgr->getTrayContainer(TL_NONE)->hide();
 
-#if ENABLE_SHADERS_CACHE_SAVE == 1
-            if(Ogre::GpuProgramManager::getSingleton().canGetCompiledShaderBuffer())
-                Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
-#endif
-#if ENABLE_SHADERS_CACHE_LOAD == 1
-            // Load for a package version of the shaders.
-            Ogre::String path = getShaderCacheFileName();
-            FILE * inFile = NULL;
-            inFile = fopen(path.c_str(), "rb");
-            // If that does not exist, see if there is a version in the writable location.
-            if (!inFile)
-            {
-                path = mFSLayer->getWritablePath(getShaderCacheFileName());
-                inFile = fopen(path.c_str(), "rb");
-            }
-            if (inFile)
-            {
-                Ogre::LogManager::getSingleton().logMessage("Loading shader cache from ");
-                Ogre::LogManager::getSingleton().logMessage(path.c_str());
-                Ogre::DataStreamPtr istream(new Ogre::FileHandleDataStream(path.c_str(), inFile, Ogre::DataStream::READ));
-                Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
-            }
+#if ENABLE_SHADERS_CACHE == 1
+            enableShaderCache();
 #endif
 
             createDummyScene();
@@ -1476,22 +1455,6 @@ namespace OgreBites
           -----------------------------------------------------------------------------*/
         virtual void shutdown()
         {
-#if ENABLE_SHADERS_CACHE_SAVE == 1
-            if (Ogre::GpuProgramManager::getSingleton().isCacheDirty())
-            {
-                Ogre::String path = mFSLayer->getWritablePath(getShaderCacheFileName());
-                FILE * outFile = fopen(path.c_str(), "wb");
-                if (outFile)
-                {
-                    Ogre::LogManager::getSingleton().logMessage("Writing shader cache to ");
-                    Ogre::LogManager::getSingleton().logMessage(path.c_str());
-                    Ogre::DataStreamPtr ostream(new Ogre::FileHandleDataStream(path.c_str(), outFile, Ogre::DataStream::WRITE));
-                    Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache(ostream);
-                    ostream->close();
-                }
-            }
-#endif
-
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
             [mGestureView release];
 #endif

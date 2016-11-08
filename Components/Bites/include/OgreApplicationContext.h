@@ -214,6 +214,13 @@ namespace OgreBites
         Destroys dummy scene.
           */
         void destroyDummyScene();
+
+        /**
+         * enables the caching of compiled shaders to file
+         *
+         * also loads any existing cache
+         */
+        void enableShaderCache();
     protected:
 
         /**
