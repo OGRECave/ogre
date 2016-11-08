@@ -229,6 +229,11 @@ namespace OgreBites
         {
             if (mCurrentSample)  // sample quitting
             {
+#ifdef INCLUDE_RTSHADER_SYSTEM
+                // this also removes all rtshader material properties and e.g. the triplanar samples break
+                // however if we skip this, samples segfault on reloading
+                mShaderGenerator->removeAllShaderBasedTechniques();
+#endif
                 mCurrentSample->_shutdown();
                 mCurrentSample = 0;
                 mSamplePaused = false;     // don't pause next sample
