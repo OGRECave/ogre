@@ -45,7 +45,7 @@
 %exception {
     try {
         $action
-    } catch (const Ogre::Exception& e) {
+    } catch (const std::exception& e) {
         SWIG_exception(SWIG_RuntimeError, e.what());
     }
 }
