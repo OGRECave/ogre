@@ -278,14 +278,15 @@ namespace Ogre
         while( itor != end )
         {
             Vpl vpl = *itor; //Hard copy!
-            vpl.normal  *= vpl.numMergedVpls;
-            vpl.position*= vpl.numMergedVpls;
 
             const size_t idx = itor - mVpls.begin();
 
             const int32 blockX = static_cast<int32>( Math::Floor( vpl.position.x * cellSize ) );
             const int32 blockY = static_cast<int32>( Math::Floor( vpl.position.y * cellSize ) );
             const int32 blockZ = static_cast<int32>( Math::Floor( vpl.position.z * cellSize ) );
+
+            vpl.normal  *= vpl.numMergedVpls;
+            vpl.position*= vpl.numMergedVpls;
 
             Real numCollectedVpls = vpl.numMergedVpls;
 
