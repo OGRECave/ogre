@@ -19,7 +19,7 @@ option(OGRE_BUILD_DEPENDENCIES "automaitcally build Ogre Dependencies (freetype,
 include(FindPkgMacros)
 getenv_path(OGRE_DEPENDENCIES_DIR)
 if(OGRE_BUILD_PLATFORM_EMSCRIPTEN)
-  set(OGRE_DEP_SEARCH_PATH 
+  set(OGRE_DEP_SEARCH_PATH
     ${OGRE_DEPENDENCIES_DIR}
     ${EMSCRIPTEN_ROOT_PATH}/system
     ${ENV_OGRE_DEPENDENCIES_DIR}
