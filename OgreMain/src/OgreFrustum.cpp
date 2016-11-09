@@ -337,10 +337,10 @@ namespace Ogre {
         {
             if (mFrustumExtentsManuallySet)
             {
-                left = mLeft;
-                right = mRight;
-                top = mTop;
-                bottom = mBottom;
+                left = mLeft * mNearDist;
+                right = mRight * mNearDist;
+                top = mTop * mNearDist;
+                bottom = mBottom * mNearDist;
             }
             // Calculate general projection parameters
             else if (mProjType == PT_PERSPECTIVE)
