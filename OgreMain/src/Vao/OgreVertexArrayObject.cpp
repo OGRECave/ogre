@@ -211,14 +211,23 @@ namespace Ogre
                 }
             }
 
-            AsyncTicketPtr asyncTicket = (*itBuffers)->readRequest( 0, (*itBuffers)->getNumElements() );
-
             void *dstData = OGRE_MALLOC_SIMD( (*itBuffers)->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
             FreeOnDestructor dataPtrContainer( dstData );
 
-            const void *srcData = asyncTicket->map();
-            memcpy( dstData, srcData, (*itBuffers)->getTotalSizeBytes() );
-            asyncTicket->unmap();
+            // only map if there is no shadow buffer
+            if( (*itBuffers)->getShadowCopy() )
+            {
+                const void* shadowBuff = ( *itBuffers )->getShadowCopy();
+                memcpy( dstData, shadowBuff, ( *itBuffers )->getTotalSizeBytes() );
+            }
+            else
+            {
+                AsyncTicketPtr asyncTicket = (*itBuffers)->readRequest( 0,
+                                                                        (*itBuffers)->getNumElements() );
+                const void *srcData = asyncTicket->map();
+                memcpy( dstData, srcData, ( *itBuffers )->getTotalSizeBytes() );
+                asyncTicket->unmap();
+            }
 
             const BufferType bufferType = vertexBufferType < 0 ?
                         (*itBuffers)->getBufferType() : static_cast<BufferType>( vertexBufferType );
@@ -244,17 +253,25 @@ namespace Ogre
         IndexBufferPacked *newIndexBuffer = 0;
         if( mIndexBuffer )
         {
-            AsyncTicketPtr asyncTicket = mIndexBuffer->readRequest( 0, mIndexBuffer->getNumElements() );
-
             void *dstData = OGRE_MALLOC_SIMD( mIndexBuffer->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
             FreeOnDestructor dataPtrContainer( dstData );
 
-            const void *srcData = asyncTicket->map();
-            memcpy( dstData, srcData, mIndexBuffer->getTotalSizeBytes() );
-            asyncTicket->unmap();
+            // only map if there is no shadow buffer
+            if( mIndexBuffer->getShadowCopy() )
+            {
+                const void* shadowBuff = mIndexBuffer->getShadowCopy();
+                memcpy( dstData, shadowBuff, mIndexBuffer->getTotalSizeBytes() );
+            }
+            else
+            {
+                AsyncTicketPtr asyncTicket = mIndexBuffer->readRequest( 0, mIndexBuffer->getNumElements() );
+                const void *srcData = asyncTicket->map();
+                memcpy( dstData, srcData, mIndexBuffer->getTotalSizeBytes() );
+                asyncTicket->unmap();
+            }
 
-            const BufferType bufferType = vertexBufferType < 0 ?
-                        mIndexBuffer->getBufferType() : static_cast<BufferType>( vertexBufferType );
+            const BufferType bufferType = indexBufferType < 0 ?
+                        mIndexBuffer->getBufferType() : static_cast<BufferType>( indexBufferType );
 
             const bool keepAsShadow = mIndexBuffer->getShadowCopy() != 0;
             newIndexBuffer = vaoManager->createIndexBuffer( mIndexBuffer->getIndexType(),
