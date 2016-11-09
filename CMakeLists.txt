@@ -108,11 +108,7 @@ endif ()
 
 # Set compiler specific build flags
 if (UNIX)
-  if (EMSCRIPTEN)
-    set(OGRE_GCC_HAS_SSE FALSE)
-  else()
-    check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
-  endif()
+  check_cxx_compiler_flag(-msse OGRE_GCC_HAS_SSE)
   if (OGRE_GCC_HAS_SSE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse")
   endif ()
