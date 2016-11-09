@@ -14,6 +14,8 @@ class SampleApp(OgreBites.ApplicationContext):
         return True
 
     def loadResources(self):
+        self.enableShaderCache()
+
         # load essential resources for trays/ loading bar
         Ogre.ResourceGroupManager.getSingleton().initialiseResourceGroup("Essential")
         self.createDummyScene()
@@ -92,3 +94,4 @@ if __name__ == "__main__":
     app = SampleApp()
     app.initApp()
     app.getRoot().startRendering()
+    app.closeApp()

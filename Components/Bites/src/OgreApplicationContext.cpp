@@ -13,6 +13,7 @@
 #include "OgreRenderWindow.h"
 #include "OgreViewport.h"
 #include "OgreOverlaySystem.h"
+#include "OgreDataStream.h"
 
 #if OGRE_BITES_HAVE_SDL
 #include <SDL_video.h>
@@ -30,6 +31,8 @@
 //#define _RTSS_WRITE_SHADERS_TO_DISK
 
 namespace OgreBites {
+
+static const char* SHADER_CACHE_FILENAME = "cache.bin";
 
 ApplicationContext::ApplicationContext(const Ogre::String& appName, bool grabInput)
 #if (OGRE_THREAD_PROVIDER == 3) && (OGRE_NO_TBB_SCHEDULER == 1)
@@ -306,6 +309,20 @@ void ApplicationContext::destroyDummyScene()
     dummyScene->removeRenderQueueListener(mOverlaySystem);
     mWindow->removeAllViewports();
     mRoot->destroySceneManager(dummyScene);
+}
+
+void ApplicationContext::enableShaderCache() {
+    Ogre::GpuProgramManager::getSingleton().setSaveMicrocodesToCache(true);
+
+    // Load for a package version of the shaders.
+    Ogre::String path = mFSLayer->getWritablePath(SHADER_CACHE_FILENAME);
+    std::fstream inFile(path.c_str(), std::ios::binary);
+    if (inFile.is_open())
+    {
+        Ogre::LogManager::getSingleton().logMessage("Loading shader cache from "+path);
+        Ogre::DataStreamPtr istream(new Ogre::FileStreamDataStream(path, &inFile, false));
+        Ogre::GpuProgramManager::getSingleton().loadMicrocodeCache(istream);
+    }
 }
 
 Ogre::RenderWindow *ApplicationContext::createWindow()
@@ -689,6 +706,19 @@ void ApplicationContext::reconfigure(const Ogre::String &renderer, Ogre::NameVal
 
 void ApplicationContext::shutdown()
 {
+    if (Ogre::GpuProgramManager::getSingleton().isCacheDirty())
+    {
+        Ogre::String path = mFSLayer->getWritablePath(SHADER_CACHE_FILENAME);
+        std::fstream outFile(path.c_str(), std::ios::out | std::ios::binary);
+
+        if (outFile.is_open())
+        {
+            Ogre::LogManager::getSingleton().logMessage("Writing shader cache to "+path);
+            Ogre::DataStreamPtr ostream(new Ogre::FileStreamDataStream(path, &outFile, false));
+            Ogre::GpuProgramManager::getSingleton().saveMicrocodeCache(ostream);
+        }
+    }
+
     // remove window event listener before shutting down SDL
     Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
 

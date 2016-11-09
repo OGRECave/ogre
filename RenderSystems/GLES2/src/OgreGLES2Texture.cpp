@@ -100,9 +100,9 @@ namespace Ogre {
                 return GL_TEXTURE_2D;
             case TEX_TYPE_CUBE_MAP:
                 return GL_TEXTURE_CUBE_MAP;
-#if OGRE_NO_GLES3_SUPPORT == 0
             case TEX_TYPE_3D:
-                return GL_TEXTURE_3D;
+                return GL_TEXTURE_3D_OES;
+#if OGRE_NO_GLES3_SUPPORT == 0
             case TEX_TYPE_2D_ARRAY:
                 return GL_TEXTURE_2D_ARRAY;
 #endif
@@ -237,12 +237,12 @@ namespace Ogre {
                         break;
 #if OGRE_NO_GLES3_SUPPORT == 0
                     case TEX_TYPE_2D_ARRAY:
+#endif
                     case TEX_TYPE_3D:
-                        glCompressedTexImage3D(getGLES2TextureTarget(), mip, format,
+                        glCompressedTexImage3DOES(getGLES2TextureTarget(), mip, format,
                             width, height, depth, 0, 
                             size, tmpdata);
                         break;
-#endif
                     default:
                         break;
                 };
@@ -323,6 +323,15 @@ namespace Ogre {
                                      mip,
                                      internalformat,
                                      width, height,
+                                     0,
+                                     format,
+                                     datatype, 0));
+                        break;
+                    case TEX_TYPE_3D:
+                        OGRE_CHECK_GL_ERROR(glTexImage3DOES(GL_TEXTURE_3D_OES,
+                                     mip,
+                                     internalformat,
+                                     width, height, depth,
                                      0,
                                      format,
                                      datatype, 0));

@@ -2,12 +2,13 @@
 %{
 /* Includes the header in the wrapper code */
 #include "Ogre.h"
+#include "OgreBuildSettings.h"
 #include "OgreApplicationContext.h"
 #include "OgreSGTechniqueResolverListener.h"
 #include "OgreCameraMan.h"
 #include "OgreTrays.h"
 
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
 #include "SDL_stdinc.h"
 #include "SDL_events.h"
 #include "SDL_keyboard.h"
@@ -22,7 +23,7 @@
 
 #define _OgreBitesExport
 
-#ifdef HAVE_SDL
+#if OGRE_BITES_HAVE_SDL
 #define DECLSPEC
 #define SDLCALL
 #define SDL_FORCE_INLINE

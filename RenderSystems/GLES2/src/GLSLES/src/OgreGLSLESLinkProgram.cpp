@@ -91,12 +91,7 @@ namespace Ogre {
 
             OGRE_CHECK_GL_ERROR(mGLProgramHandle = glCreateProgram());
 
-            if ( GpuProgramManager::getSingleton().canGetCompiledShaderBuffer() &&
-                GpuProgramManager::getSingleton().isMicrocodeAvailableInCache(getCombinedName()) )
-            {
-                getMicrocodeFromCache();
-            }
-            else
+            if (!getMicrocodeFromCache(getCombinedName(), mGLProgramHandle))
             {
 #if !OGRE_NO_GLES2_GLSL_OPTIMISER
                 // Check CmdParams for each shader type to see if we should optimize
@@ -180,8 +175,10 @@ namespace Ogre {
 
         GLSLES::logObjectInfo( getCombinedName() + String("GLSL link result : "), mGLProgramHandle );
 
+        const RenderSystemCapabilities* caps = Root::getSingleton().getRenderSystem()->getCapabilities();
+
 #if OGRE_PLATFORM != OGRE_PLATFORM_NACL
-        if(Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
+        if(caps->hasCapability(RSC_SEPARATE_SHADER_OBJECTS))
         {
             OGRE_IF_IOS_VERSION_IS_GREATER_THAN(5.0)
             {
@@ -201,31 +198,7 @@ namespace Ogre {
 
         if(mLinked)
         {
-            if ( GpuProgramManager::getSingleton().getSaveMicrocodesToCache() )
-            {
-                GLES2Support* glSupport = getGLES2SupportRef();
-
-                // Add to the microcode to the cache
-                String name;
-                name = getCombinedName();
-
-                // Get buffer size
-                GLint binaryLength = 0;
-                if(glSupport->checkExtension("GL_OES_get_program_binary") || glSupport->hasMinGLVersion(3, 0))
-                    OGRE_CHECK_GL_ERROR(glGetProgramiv(mGLProgramHandle, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength));
-
-                // Create microcode
-                GpuProgramManager::Microcode newMicrocode = 
-                    GpuProgramManager::getSingleton().createMicrocode(static_cast<uint32>(binaryLength + sizeof(GLenum)));
-
-                // Get binary
-                if(glSupport->checkExtension("GL_OES_get_program_binary") || glSupport->hasMinGLVersion(3, 0))
-                    OGRE_CHECK_GL_ERROR(glGetProgramBinaryOES(mGLProgramHandle, binaryLength, NULL, (GLenum *)newMicrocode->getPtr(),
-                                                          newMicrocode->getPtr() + sizeof(GLenum)));
-
-                // Add to the microcode to the cache
-                GpuProgramManager::getSingleton().addMicrocodeToCache(name, newMicrocode);
-            }
+            _writeToCache(getCombinedName(), mGLProgramHandle);
         }
     }
 

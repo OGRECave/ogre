@@ -65,6 +65,10 @@ Ogre::GLES2ManagedResourceManager* Ogre::GLES2RenderSystem::mResourceManager = N
 // Convenience macro from ARB_vertex_buffer_object spec
 #define VBO_BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+#ifndef GL_PACK_ROW_LENGTH_NV
+#define GL_PACK_ROW_LENGTH_NV             0x0D02
+#endif
+
 using namespace std;
 
 namespace Ogre {
@@ -229,7 +233,7 @@ namespace Ogre {
 
         // Vertex Buffer Objects are always supported by OpenGL ES
         rsc->setCapability(RSC_VBO);
-        if(mGLSupport->checkExtension("GL_OES_element_index_uint"))
+        if(mGLSupport->checkExtension("GL_OES_element_index_uint") || mHasGLES30)
             rsc->setCapability(RSC_32BIT_INDEX);
 
         // Check for hardware occlusion support
@@ -380,9 +384,9 @@ namespace Ogre {
             rsc->setCapability(RSC_TEXTURE_FLOAT);
 
         rsc->setCapability(RSC_TEXTURE_1D);
-#if OGRE_NO_GLES3_SUPPORT == 0
-        rsc->setCapability(RSC_TEXTURE_3D);
-#endif
+
+        if(!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_texture_3D"))
+            rsc->setCapability(RSC_TEXTURE_3D);
 
         // ES 3 always supports NPOT textures
         if(mGLSupport->checkExtension("GL_OES_texture_npot") || mGLSupport->checkExtension("GL_ARB_texture_non_power_of_two") || mHasGLES30)
@@ -402,26 +406,18 @@ namespace Ogre {
         // No point sprites, so no size
         rsc->setMaxPointSize(0.f);
         
-#if OGRE_NO_GLES2_VAO_SUPPORT == 0
-#   if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30 || emscripten_get_compiler_setting("LEGACY_GL_EMULATION"))
-#   else
-            if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30)
-#   endif
-                rsc->setCapability(RSC_VAO);
-#endif
+        if(!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_vertex_array_object"))
+            rsc->setCapability(RSC_VAO);
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if (mGLSupport->checkExtension("GL_OES_get_program_binary") || mHasGLES30)
+        if (!OGRE_NO_GLES3_SUPPORT || mGLSupport->checkExtension("GL_OES_get_program_binary"))
         {
             // http://www.khronos.org/registry/gles/extensions/OES/OES_get_program_binary.txt
             GLint formats;
-            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS, &formats));
+            OGRE_CHECK_GL_ERROR(glGetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &formats));
 
             if(formats > 0)
                 rsc->setCapability(RSC_CAN_GET_COMPILED_SHADER_BUFFER);
         }
-#endif
 
         if (mGLSupport->checkExtension("GL_EXT_instanced_arrays") || mHasGLES30)
         {
@@ -837,9 +833,7 @@ namespace Ogre {
 
         mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_S, getTextureAddressingMode(uvw.u));
         mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_T, getTextureAddressingMode(uvw.v));
-#if OGRE_NO_GLES3_SUPPORT == 0
-        mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_R, getTextureAddressingMode(uvw.w));
-#endif
+        mStateCacheManager->setTexParameteri(mTextureTypes[stage], GL_TEXTURE_WRAP_R_OES, getTextureAddressingMode(uvw.w));
         mStateCacheManager->activateGLTextureUnit(0);
     }
 
@@ -1603,11 +1597,7 @@ namespace Ogre {
             static_cast<GLES2VertexDeclaration*>(op.vertexData->vertexDeclaration);
 
         // Use a little shorthand
-#if OGRE_NO_GLES2_VAO_SUPPORT == 0
         bool useVAO = (gles2decl && gles2decl->isInitialised());
-#else
-        bool useVAO = false;
-#endif
 
         if(useVAO)
             setVertexDeclaration(op.vertexData->vertexDeclaration, op.vertexData->vertexBufferBinding);
@@ -1733,11 +1723,9 @@ namespace Ogre {
             gles2decl->setInitialised(true);
         }
 
-#if OGRE_NO_GLES2_VAO_SUPPORT == 0
-        if(mGLSupport->checkExtension("GL_OES_vertex_array_object") || mHasGLES30)
+        if(getCapabilities()->hasCapability(RSC_VAO))
             // Unbind the vertex array object.  Marks the end of what state will be included.
             OGRE_CHECK_GL_ERROR(glBindVertexArrayOES(0));
-#endif
 
         // Unbind all attributes
         for (vector<GLuint>::type::iterator ai = mRenderAttribsBound.begin(); ai != mRenderAttribsBound.end(); ++ai)
@@ -2335,7 +2323,6 @@ namespace Ogre {
         void* pBufferData = 0;
         const GLES2HardwareVertexBuffer* hwGlBuffer = static_cast<const GLES2HardwareVertexBuffer*>(vertexBuffer.get());
 
-        // FIXME: Having this commented out fixes some rendering issues but leaves VAO's useless
         if (updateVAO)
         {
             mStateCacheManager->bindGLBuffer(GL_ARRAY_BUFFER,
@@ -2427,20 +2414,17 @@ namespace Ogre {
                 "GLES2RenderSystem::_copyContentsToMemory" );
         }
 
-#if OGRE_NO_GLES3_SUPPORT == 1
-        /* TODO: check for GL_NV_pack_subimage availability */
-        OgreAssert(dst.getWidth() == dst.rowPitch, "GLES2 does not support GL_PACK_ROW_LENGTH");
-#endif
+        bool hasPackImage = mHasGLES30 || mGLSupport->checkExtension("GL_NV_pack_subimage");
+        OgreAssert(dst.getWidth() == dst.rowPitch || hasPackImage, "GL_PACK_ROW_LENGTH not supported");
 
         // Switch context if different from current one
         _setViewport(vp);
 
         OGRE_CHECK_GL_ERROR(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
-#if OGRE_NO_GLES3_SUPPORT == 0
-        if(dst.getWidth() != dst.rowPitch)
-            glPixelStorei(GL_PACK_ROW_LENGTH, dst.rowPitch);
-#endif
+        if(dst.getWidth() != dst.rowPitch && hasPackImage)
+            glPixelStorei(GL_PACK_ROW_LENGTH_NV, dst.rowPitch);
+
         // Must change the packing to ensure no overruns!
         glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
@@ -2455,9 +2439,7 @@ namespace Ogre {
 
         // restore default alignment
         glPixelStorei(GL_PACK_ALIGNMENT, 4);
-#if OGRE_NO_GLES3_SUPPORT == 0
-        glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-#endif
+        glPixelStorei(GL_PACK_ROW_LENGTH_NV, 0);
 
         PixelUtil::bulkPixelVerticalFlip(dst);
     }
