@@ -218,7 +218,7 @@ elseif (UNIX)
   set(OGRE_SAMPLES_DIR_DBG "${OGRE_BINARY_DIR}/lib")
 endif ()
 
-if (WINDOWS_STORE OR WINDOWS_PHONE)
+if (WINDOWS_STORE OR WINDOWS_PHONE OR EMSCRIPTEN)
   # These platfroms requires all resources to be packaged inside the application bundle,
   # therefore install versions of configs would be copied and added as content file to each project.
 elseif (MSVC AND NOT NMAKE)

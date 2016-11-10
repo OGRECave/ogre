@@ -275,11 +275,9 @@ Install the Emscripten SDK and make sure that the environment variables are corr
 Run cmake in cross compile mode using emscripten as following:
 
 ```
-cmake -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake -DOGRE_BUILD_SAMPLES=FALSE -DCMAKE_INSTALL_PREFIX=installed_em .
+cmake -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake -DOGRE_BUILD_SAMPLES=TRUE .
 ```
 
-note that the SampleBrowser is not ported yet, so there is no point of building it.
+this will not build the full SampleBrowser, but just a minimal Sample. The resulting `EmscriptenSample.html` will be placed in `${CMAKE_BINARY_DIR}/bin/`.
 
-The actual Emscripten Sample is located in [Samples/Emscripten](Samples/Emscripten). Execute `build.sh` inside that folder to build it. This will generate a release.html file.
-
-To prevent any cross-origin issues, start a local webserver as `python -m SimpleHTTPServer 8000` and visit `localhost:8000`.
+To prevent any cross-origin issues, start a local webserver as `python3 -m http.server 8000` and visit `localhost:8000`.
