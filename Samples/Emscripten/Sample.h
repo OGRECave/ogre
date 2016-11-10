@@ -53,7 +53,6 @@ public:
 private:
 	Ogre::SceneManager* mSceneMgr;
 	Ogre::Camera* mCamera;
-	bool mExitMainLoop;
 	Ogre::SceneNode* mNode;
     unsigned char* mBuffer;
 	Ogre::AnimationState* mAnimation;

@@ -30,13 +30,13 @@
 #include <OgreSceneManager.h>
 #include <OgreManualObject.h>
 #include <OgrePrefabFactory.h>
-#include <RenderSystems/GLES2/OgreGLES2RenderSystem.h>
+#include <OgreGLES2RenderSystem.h>
 #include <OgreZip.h>
 
 #define SAFE_DELETE(x) if(x){delete x;  x= NULL;}
 
 Sample::Sample()
-    :   OgreBites::ApplicationContext(), mSceneMgr(NULL), mCamera(NULL), mExitMainLoop(false), mNode(NULL), mBuffer(NULL)
+    :   OgreBites::ApplicationContext(), mSceneMgr(NULL), mCamera(NULL), mNode(NULL), mBuffer(NULL)
 {
 }
 
@@ -82,19 +82,19 @@ void Sample::startMainLoop()
 
 EM_BOOL Sample::keydown_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData)
 {
-    Sample* thizz = static_cast<Sample*>(userData);
+    //Sample* thizz = static_cast<Sample*>(userData);
     return 0;
 }
 
 EM_BOOL Sample::keyup_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData)
 {
-    Sample* thizz = static_cast<Sample*>(userData);
+    //Sample* thizz = static_cast<Sample*>(userData);
     return 0;
 }
 
 EM_BOOL Sample::keypress_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData)
 {
-    Sample* thizz = static_cast<Sample*>(userData);
+    //Sample* thizz = static_cast<Sample*>(userData);
     
     std::string code(keyEvent->key);
     if (code == "Escape")
@@ -270,7 +270,7 @@ void Sample::destroyMaterials( Ogre::String resourceGroupID )
             }
         }
         
-        for( int i = 0; i < materialNamesToRemove.size(); ++i )
+        for( size_t i = 0; i < materialNamesToRemove.size(); ++i )
         {
             materialManager->remove( materialNamesToRemove[i] );
         }
@@ -304,7 +304,7 @@ void Sample::destroyTextures( Ogre::String resourceGroupID )
             }
         }
         
-        for( int i = 0; i < textureNamesToRemove.size(); ++i )
+        for( size_t i = 0; i < textureNamesToRemove.size(); ++i )
         {
             textureManager->remove( textureNamesToRemove[i] );
         }
