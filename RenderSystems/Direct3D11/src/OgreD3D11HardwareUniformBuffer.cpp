@@ -73,10 +73,10 @@ namespace Ogre {
 	void D3D11HardwareUniformBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
 		size_t dstOffset, size_t length, bool discardWholeBuffer)
 	{
-		// check if the other buffer is also a D3D11HardwareVertexBuffer
+		// check if the other buffer is also a D3D11HardwareUniformBuffer
 		if (srcBuffer.isSystemMemory())
 		{
-			// src is not a D3D11HardwareVertexBuffer - use default copy
+			// src is not a D3D11HardwareUniformBuffer - use default copy
 			HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
 		}
 		else
