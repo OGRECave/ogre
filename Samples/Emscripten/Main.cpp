@@ -35,7 +35,7 @@ int main( int argc, const char* argv[] ) {
 	{
 		sampleInst = new Sample();
 		sampleInst->initApp();
-		sampleInst->startMainLoop();
+	    emscripten_set_main_loop_arg(Sample::_mainLoop, sampleInst, 0, 1);
 		sampleInst->closeApp();
         delete sampleInst;
         sampleInst = NULL;

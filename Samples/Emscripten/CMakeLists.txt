@@ -7,10 +7,10 @@ include_directories(${OGRE_SOURCE_DIR}/RenderSystems/GLES2/include)
 set(MEDIA_DIR ${CMAKE_BINARY_DIR}/bin/media/)
 
 set(CMAKE_EXECUTABLE_SUFFIX ".html")
-set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s ALLOW_MEMORY_GROWTH=1 --closure 1 -s EXPORTED_FUNCTIONS=\"['_passAssetAsArrayBuffer', '_clearScene', '_main']\"")
+set(CMAKE_EXE_LINKER_FLAGS "--preload-file ${MEDIA_DIR}/@. -s ALLOW_MEMORY_GROWTH=1 --closure 1 -s EXPORTED_FUNCTIONS=\"['_passAssetAsArrayBuffer', '_clearScene', '_main']\" -s USE_SDL=2")
 
 add_executable(EmscriptenSample Main.cpp Sample.cpp)
-target_link_libraries(EmscriptenSample ${OGRE_LIBRARIES} OgreRTShaderSystem RenderSystem_GLES2 OgreOverlay OgreBites)
+target_link_libraries(EmscriptenSample ${OGRE_LIBRARIES} OgreBites OgreRTShaderSystem RenderSystem_GLES2 OgreOverlay)
 
 file(COPY
     "${CMAKE_SOURCE_DIR}/Samples/Emscripten/media" 
