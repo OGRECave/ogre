@@ -43,13 +43,13 @@ public:
 
 	void setup();
 	void setupScene();
-	void startMainLoop();
 	void createRoot();
     bool frameRenderingQueued(const Ogre::FrameEvent& evt);
     
     void passAssetAsArrayBuffer(unsigned char*, int length);
     void clearScene();
     
+    static void _mainLoop(void* target);
 private:
 	Ogre::SceneManager* mSceneMgr;
 	Ogre::Camera* mCamera;
@@ -64,14 +64,9 @@ private:
     void destroyTextures( Ogre::String resourceGroupID );
     void unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName);
 
-    static EM_BOOL keydown_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData);
-    static EM_BOOL keyup_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData);
-    static EM_BOOL keypress_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData);
-    static EM_BOOL mousedown_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData);
-    static EM_BOOL mouseup_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData);
-    static EM_BOOL mousemove_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData);
-    static EM_BOOL mousewheel_callback(int eventType, const EmscriptenWheelEvent* mouseEvent, void* userData);
-    static const char* beforeunload_callback(int eventType, const void* reserved, void* userData);
-    static void _mainLoop(void* target);
+    bool mouseMoved(const OgreBites::MouseMotionEvent& evt);
+    bool mouseWheelRolled(const OgreBites::MouseWheelEvent& evt);
+    bool mousePressed(const OgreBites::MouseButtonEvent& evt);
+    bool mouseReleased(const OgreBites::MouseButtonEvent& evt);
 };
 #endif

@@ -36,7 +36,7 @@
 #define SAFE_DELETE(x) if(x){delete x;  x= NULL;}
 
 Sample::Sample()
-    :   OgreBites::ApplicationContext(), mSceneMgr(NULL), mCamera(NULL), mNode(NULL), mBuffer(NULL)
+    :   OgreBites::ApplicationContext("OGRE Emscripten Sample", false), mSceneMgr(NULL), mCamera(NULL), mNode(NULL), mBuffer(NULL)
 {
 }
 
@@ -61,108 +61,33 @@ void Sample::setup()
     mTrayMgr = OGRE_NEW OgreBites::TrayManager("InterfaceName", mWindow);
     mTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
     mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
-    mTrayMgr->hideCursor();
 
     // Create Camera / Viewport
     setupScene();
 }
 
-void Sample::startMainLoop()
-{
-    // Setup input
-    emscripten_set_keypress_callback(NULL, (void*)this, 1, &Sample::keypress_callback);
-    emscripten_set_mousedown_callback("#canvas", (void*)this, 1, &Sample::mousedown_callback);
-    emscripten_set_mouseup_callback("#canvas", (void*)this, 1, &Sample::mouseup_callback);
-    emscripten_set_mousemove_callback("#canvas", (void*)this, 1, &Sample::mousemove_callback);
-    emscripten_set_wheel_callback("#canvas", (void*)this, 1, &Sample::mousewheel_callback);
-    emscripten_set_beforeunload_callback((void*)this, Sample::beforeunload_callback);
-
-    emscripten_set_main_loop_arg(_mainLoop, static_cast<void*>(this), 0, 1);
+bool Sample::mouseMoved(const OgreBites::MouseMotionEvent& evt) {
+    mCameraMan->injectMouseMove(evt);
+    mTrayMgr->injectMouseMove(evt);
+    return true;
 }
 
-EM_BOOL Sample::keydown_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData)
-{
-    //Sample* thizz = static_cast<Sample*>(userData);
-    return 0;
+bool Sample::mouseWheelRolled(const OgreBites::MouseWheelEvent& evt) {
+    OgreBites::MouseWheelEvent _evt = evt;
+    // chrome reports values of 53 here
+    _evt.y = std::min(3, std::max(-3, evt.y));
+    mCameraMan->injectMouseWheel(_evt);
+    return true;
 }
 
-EM_BOOL Sample::keyup_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData)
-{
-    //Sample* thizz = static_cast<Sample*>(userData);
-    return 0;
+bool Sample::mousePressed(const OgreBites::MouseButtonEvent& evt) {
+    mCameraMan->injectMouseDown(evt);
+    return true;
 }
 
-EM_BOOL Sample::keypress_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData)
-{
-    //Sample* thizz = static_cast<Sample*>(userData);
-    
-    std::string code(keyEvent->key);
-    if (code == "Escape")
-	{
-		//thizz->mExitMainLoop = true;
-	}
-    
-    return 0;
-}
-
-EM_BOOL Sample::mousedown_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
-{
-    Sample* thizz = static_cast<Sample*>(userData);
-    
-    OgreBites::MouseButtonEvent evt = {0, mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
-    thizz->mCameraMan->injectMouseDown(evt);
-
-    return 0;
-}
-
-EM_BOOL Sample::mouseup_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
-{
-    Sample* thizz = static_cast<Sample*>(userData);
-    
-    OgreBites::MouseButtonEvent evt = {0, mouseEvent->clientX, mouseEvent->clientY, mouseEvent->button};
-    thizz->mCameraMan->injectMouseUp(evt);
-
-    return 0;
-}
-
-EM_BOOL Sample::mousemove_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData)
-{
-    Sample* thizz = static_cast<Sample*>(userData);
-
-    OgreBites::MouseMotionEvent evt = {0, mouseEvent->canvasX, mouseEvent->canvasY, mouseEvent->movementX, mouseEvent->movementY};
-    thizz->mCameraMan->injectMouseMove(evt);
-
-    return 0;
-}
-
-EM_BOOL Sample::mousewheel_callback(int eventType, const EmscriptenWheelEvent* mouseEvent, void* userData)
-{
-    Sample* thizz = static_cast<Sample*>(userData);
-    
-    float adjust;
-    switch (mouseEvent->deltaMode)
-    {
-        case DOM_DELTA_PIXEL:
-            adjust = 0.1f;
-            break;
-        case DOM_DELTA_LINE:
-            adjust = 1.0f;
-            break;
-        case DOM_DELTA_PAGE:
-            adjust = 20.0f;
-            break;
-    }
-
-    OgreBites::MouseWheelEvent evt = {0, -int(mouseEvent->deltaY*adjust)};
-    thizz->mCameraMan->injectMouseWheel(evt);
-    
-    return 0;
-}
-
-const char* Sample::beforeunload_callback(int eventType, const void* reserved, void* userData)
-{
-    emscripten_cancel_main_loop();
-    return NULL;
+bool Sample::mouseReleased(const OgreBites::MouseButtonEvent& evt) {
+    mCameraMan->injectMouseUp(evt);
+    return true;
 }
 
 bool Sample::frameRenderingQueued(const Ogre::FrameEvent& evt)
