@@ -22,6 +22,10 @@ if(ANDROID)
     include_directories(${ANDROID_NDK}/sources/android/native_app_glue)
 endif()
 
+if(EMSCRIPTEN)
+    add_definitions(-s USE_SDL=2)
+endif()
+
 if (OGRE_STATIC)
   # Static linking means we need to directly use plugins
   include_directories(${OGRE_SOURCE_DIR}/PlugIns/BSPSceneManager/include)

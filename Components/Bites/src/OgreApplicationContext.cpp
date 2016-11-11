@@ -378,9 +378,14 @@ Ogre::RenderWindow *ApplicationContext::createWindow()
 #if OGRE_BITES_HAVE_SDL
     mSDLWindow = SDL_CreateWindow(mAppName.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, SDL_WINDOW_RESIZABLE);
 
+#if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
+    SDL_GL_CreateContext(mSDLWindow);
+    miscParams["currentGLContext"] = "true";
+#else
     SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version);
     SDL_GetWindowWMInfo(mSDLWindow, &wmInfo);
+#endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
     miscParams["parentWindowHandle"] = Ogre::StringConverter::toString(size_t(wmInfo.info.x11.window));
