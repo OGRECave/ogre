@@ -71,9 +71,19 @@ namespace Ogre {
     void D3D11HardwareIndexBuffer::copyData(HardwareBuffer& srcBuffer, size_t srcOffset, 
         size_t dstOffset, size_t length, bool discardWholeBuffer)
     {
-        D3D11HardwareIndexBuffer& d3dBuf = static_cast<D3D11HardwareIndexBuffer&>(srcBuffer);
+        // check if the other buffer is also a D3D11HardwareIndexBuffer
+        if (srcBuffer.isSystemMemory())
+        {
+            // src is not a D3D11HardwareIndexBuffer - use default copy
+            HardwareBuffer::copyData(srcBuffer, srcOffset, dstOffset, length, discardWholeBuffer);
+        }
+        else
+        {
+            // src is a D3D11HardwareIndexBuffer use d3d11 optimized copy
+            D3D11HardwareIndexBuffer& d3dBuf = static_cast<D3D11HardwareIndexBuffer&>(srcBuffer);
 
-        mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
+            mBufferImpl->copyData(*(d3dBuf.mBufferImpl), srcOffset, dstOffset, length, discardWholeBuffer);
+        }
     }
     //---------------------------------------------------------------------
     bool D3D11HardwareIndexBuffer::isLocked(void) const
