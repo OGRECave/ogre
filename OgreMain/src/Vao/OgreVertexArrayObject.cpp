@@ -113,9 +113,12 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     const VertexElement2* VertexArrayObject::findBySemantic( VertexElementSemantic semantic,
-                                                             size_t &outIndex, size_t &outOffset ) const
+                                                             size_t &outIndex, size_t &outOffset,
+                                                             size_t repeat ) const
     {
         const VertexElement2 *retVal = 0;
+
+        size_t matchFoundCount = 0;
 
         VertexBufferPackedVec::const_iterator itBuffers = mVertexBuffers.begin();
         VertexBufferPackedVec::const_iterator enBuffers = mVertexBuffers.end();
@@ -136,9 +139,14 @@ namespace Ogre
 
             if( itElements != enElements && itElements->mSemantic == semantic )
             {
-                outIndex = itBuffers - mVertexBuffers.begin();
-                outOffset = accumOffset;
-                retVal = &(*itElements);
+                if( matchFoundCount >= repeat )
+                {
+                    outIndex = itBuffers - mVertexBuffers.begin();
+                    outOffset = accumOffset;
+                    retVal = &(*itElements);
+                }
+
+                ++matchFoundCount;
             }
 
             ++itBuffers;
@@ -211,14 +219,23 @@ namespace Ogre
                 }
             }
 
-            AsyncTicketPtr asyncTicket = (*itBuffers)->readRequest( 0, (*itBuffers)->getNumElements() );
-
             void *dstData = OGRE_MALLOC_SIMD( (*itBuffers)->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
             FreeOnDestructor dataPtrContainer( dstData );
 
-            const void *srcData = asyncTicket->map();
-            memcpy( dstData, srcData, (*itBuffers)->getTotalSizeBytes() );
-            asyncTicket->unmap();
+            // only map if there is no shadow buffer
+            if( (*itBuffers)->getShadowCopy() )
+            {
+                const void* shadowBuff = ( *itBuffers )->getShadowCopy();
+                memcpy( dstData, shadowBuff, ( *itBuffers )->getTotalSizeBytes() );
+            }
+            else
+            {
+                AsyncTicketPtr asyncTicket = (*itBuffers)->readRequest( 0,
+                                                                        (*itBuffers)->getNumElements() );
+                const void *srcData = asyncTicket->map();
+                memcpy( dstData, srcData, ( *itBuffers )->getTotalSizeBytes() );
+                asyncTicket->unmap();
+            }
 
             const BufferType bufferType = vertexBufferType < 0 ?
                         (*itBuffers)->getBufferType() : static_cast<BufferType>( vertexBufferType );
@@ -244,17 +261,25 @@ namespace Ogre
         IndexBufferPacked *newIndexBuffer = 0;
         if( mIndexBuffer )
         {
-            AsyncTicketPtr asyncTicket = mIndexBuffer->readRequest( 0, mIndexBuffer->getNumElements() );
-
             void *dstData = OGRE_MALLOC_SIMD( mIndexBuffer->getTotalSizeBytes(), MEMCATEGORY_GEOMETRY );
             FreeOnDestructor dataPtrContainer( dstData );
 
-            const void *srcData = asyncTicket->map();
-            memcpy( dstData, srcData, mIndexBuffer->getTotalSizeBytes() );
-            asyncTicket->unmap();
+            // only map if there is no shadow buffer
+            if( mIndexBuffer->getShadowCopy() )
+            {
+                const void* shadowBuff = mIndexBuffer->getShadowCopy();
+                memcpy( dstData, shadowBuff, mIndexBuffer->getTotalSizeBytes() );
+            }
+            else
+            {
+                AsyncTicketPtr asyncTicket = mIndexBuffer->readRequest( 0, mIndexBuffer->getNumElements() );
+                const void *srcData = asyncTicket->map();
+                memcpy( dstData, srcData, mIndexBuffer->getTotalSizeBytes() );
+                asyncTicket->unmap();
+            }
 
-            const BufferType bufferType = vertexBufferType < 0 ?
-                        mIndexBuffer->getBufferType() : static_cast<BufferType>( vertexBufferType );
+            const BufferType bufferType = indexBufferType < 0 ?
+                        mIndexBuffer->getBufferType() : static_cast<BufferType>( indexBufferType );
 
             const bool keepAsShadow = mIndexBuffer->getShadowCopy() != 0;
             newIndexBuffer = vaoManager->createIndexBuffer( mIndexBuffer->getIndexType(),
@@ -279,13 +304,18 @@ namespace Ogre
     {
         set<VertexBufferPacked*>::type seenBuffers;
 
+        size_t semanticCounts[VES_COUNT];
+        memset( semanticCounts, 0, sizeof( semanticCounts ) );
+
         ReadRequestsArray::iterator itor = requests.begin();
         ReadRequestsArray::iterator end  = requests.end();
 
         while( itor != end )
         {
             size_t bufferIdx, offset;
-            const VertexElement2 *vElement = findBySemantic( itor->semantic, bufferIdx, offset );
+            const VertexElement2 *vElement = findBySemantic( itor->semantic, bufferIdx, offset,
+                                                             semanticCounts[itor->semantic-1] );
+            ++semanticCounts[itor->semantic-1];
             if( !vElement )
             {
                 OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find semantic in VertexArrayObject",

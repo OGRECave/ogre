@@ -80,6 +80,7 @@ namespace Ogre
         mBlendedProbeNeedsUpdate( true ),
         mPaused( false ),
         mTrackedPosition( Vector3::ZERO ),
+        mTrackedViewProjMatrix( Matrix4::IDENTITY ),
         mMask( 0xffffffff ),
         mBlankProbe( this ),
         mFinalProbe( this ),
@@ -231,6 +232,12 @@ namespace Ogre
 
             mProbes.clear();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::setUpdatedTrackedDataFromCamera( Camera *trackedCamera )
+    {
+        mTrackedPosition = trackedCamera->getDerivedPosition();
+        mTrackedViewProjMatrix = trackedCamera->getProjectionMatrix() * trackedCamera->getViewMatrix();
     }
     //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::setEnabled( bool bEnabled, uint32 maxWidth,
@@ -658,6 +665,79 @@ namespace Ogre
         mCachedLastViewMatrix = Matrix4::ZERO;
     }
     //-----------------------------------------------------------------------------------
+    void ParallaxCorrectedCubemap::findClosestProbe(void)
+    {
+        //When we're not inside of any probe, select the 'closest' one.
+        //We do that by projecting the AABBs into the camera and determining
+        //which AABBs occupy more visible volume (approximation)
+        CubemapProbeVec::iterator itor = mProbes.begin();
+        CubemapProbeVec::iterator end  = mProbes.end();
+
+        const uint32 systemMask = mMask;
+
+        Matrix4 viewProjMatrix = mTrackedViewProjMatrix;
+
+        AxisAlignedBox axisAlignedBox;
+
+        mProbeNDFs[0] = 0;
+
+        while( itor != end )
+        {
+            CubemapProbe *probe = *itor;
+
+            if( probe->mEnabled && (probe->mMask & systemMask) )
+            {
+                Vector3 vMin = probe->mArea.getMinimum();
+                Vector3 vMax = probe->mArea.getMaximum();
+                axisAlignedBox.setExtents( vMin, vMax );
+
+                const Vector3 *corners = axisAlignedBox.getAllCorners();
+
+                Vector3 psMin = Vector3::UNIT_SCALE, psMax = -Vector3::UNIT_SCALE;
+
+                for( int i=0; i<8; ++i )
+                {
+                    Vector4 transformedVert( probe->mOrientation * corners[i] );
+                    transformedVert = viewProjMatrix * transformedVert;
+                    transformedVert.w = Ogre::max( transformedVert.w, Real(1e-6f) );
+                    transformedVert /= transformedVert.w;
+
+                    Vector3 psVertex( transformedVert.ptr() );
+                    psVertex.makeFloor( Vector3::UNIT_SCALE );
+                    psVertex.makeCeil( -Vector3::UNIT_SCALE );
+
+                    psMin.makeFloor( psVertex );
+                    psMax.makeCeil( psVertex );
+                }
+
+                //Check the probe isn't behind us.
+                if( psMax.z > -1.0f )
+                {
+                    //psMin.z is in range [-1; 1]; bring it to range [0; 1] and square it
+                    //in an attempt to fight Z's behavior (Z grows a lot when close to,
+                    //camera grows little when far from camera)
+                    psMin.z = psMin.z * 0.5f + 0.5f;
+                    psMax.z = psMax.z * 0.5f + 0.5f;
+                    psMin.z *= psMin.z;
+                    psMax.z *= psMax.z;
+                    Real area = (psMax.x - psMin.x) * (psMax.y - psMin.y) * (psMax.z - psMin.z);
+
+                    if( area > mProbeNDFs[0] )
+                    {
+                        mProbeNDFs[0]       = area;
+                        mCollectedProbes[0] = probe;
+                        mNumCollectedProbes = 1;
+                    }
+                }
+            }
+
+            ++itor;
+        }
+
+        if( mNumCollectedProbes == 0 )
+            mProbeNDFs[0] = std::numeric_limits<Real>::max();
+    }
+    //-----------------------------------------------------------------------------------
     void ParallaxCorrectedCubemap::updateSceneGraph(void)
     {
         const uint32 prevNumCollectedProbes = mNumCollectedProbes;
@@ -732,6 +812,9 @@ namespace Ogre
 
             ++itor;
         }
+
+        if( mNumCollectedProbes == 0 )
+            findClosestProbe();
 
         for( size_t i=mNumCollectedProbes; i<OGRE_MAX_CUBE_PROBES; ++i )
             mCollectedProbes[i] = &mBlankProbe;

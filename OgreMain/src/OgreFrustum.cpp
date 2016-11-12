@@ -67,6 +67,7 @@ namespace Ogre {
         mCustomViewMatrix(false),
         mCustomProjMatrix(false),
         mFrustumExtentsManuallySet(false),
+        mMultiplyNearPlaneAgainstManuallFrustumExtents(false),
         mOrientationMode(OR_DEGREE_0),
         mReflect(false), 
         mLinkedReflectPlane(0),
@@ -341,6 +342,14 @@ namespace Ogre {
                 right = mRight;
                 top = mTop;
                 bottom = mBottom;
+
+                if( mMultiplyNearPlaneAgainstManuallFrustumExtents )
+                {
+                    left    *= mNearDist;
+                    right   *= mNearDist;
+                    top     *= mNearDist;
+                    bottom  *= mNearDist;
+                }
             }
             // Calculate general projection parameters
             else if (mProjType == PT_PERSPECTIVE)
@@ -1331,9 +1340,11 @@ namespace Ogre {
         return mOrthoHeight * mAspect;  
     }
     //---------------------------------------------------------------------
-    void Frustum::setFrustumExtents(Real left, Real right, Real top, Real bottom)
+    void Frustum::setFrustumExtents( Real left, Real right, Real top, Real bottom,
+                                     bool multiplyNearPlaneAgainstManuallFrustumExtents )
     {
         mFrustumExtentsManuallySet = true;
+        mMultiplyNearPlaneAgainstManuallFrustumExtents = multiplyNearPlaneAgainstManuallFrustumExtents;
         mLeft = left;
         mRight = right;
         mTop = top;
@@ -1345,6 +1356,7 @@ namespace Ogre {
     void Frustum::resetFrustumExtents()
     {
         mFrustumExtentsManuallySet = false;
+        mMultiplyNearPlaneAgainstManuallFrustumExtents = false;
         invalidateFrustum();
     }
     //---------------------------------------------------------------------

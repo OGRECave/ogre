@@ -133,6 +133,9 @@ namespace Ogre
         bool mCustomProjMatrix;
         /// Have the frustum extents been manually set?
         bool mFrustumExtentsManuallySet;
+        /// Whether to treat frustum extents as tangents of the angles between the viewing
+        /// vector and the edges of the field of view. This needs to be true for VR.
+        bool mMultiplyNearPlaneAgainstManuallFrustumExtents;
         /// Frustum extents
         mutable Real mLeft, mRight, mTop, mBottom;
         /// Frustum orientation mode
@@ -315,8 +318,14 @@ namespace Ogre
         /** Manually set the extents of the frustum.
         @param left, right, top, bottom The position where the side clip planes intersect
             the near clip plane, in eye space
+        @param multiplyNearPlaneAgainstManuallFrustumExtents
+            Whether to multiply the near plane against the left/right/top/bottom when
+            calling calcProjectionParameters. This needs to be true for VR,
+            treating frustum extents as tangents of the angles between the viewing vector and
+            the edges of the field of view.
         */
-        virtual void setFrustumExtents(Real left, Real right, Real top, Real bottom);
+        virtual void setFrustumExtents( Real left, Real right, Real top, Real bottom,
+                                        bool multiplyNearPlaneAgainstManuallFrustumExtents=false );
         /** Reset the frustum extents to be automatically derived from other params. */
         virtual void resetFrustumExtents(); 
         /** Get the extents of the frustum in view space. */

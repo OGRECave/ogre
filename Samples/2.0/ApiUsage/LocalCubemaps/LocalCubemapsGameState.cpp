@@ -255,7 +255,7 @@ namespace Demo
         mCameraController->mCameraSpeedBoost = 10.0f;
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
-        mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
+        mParallaxCorrectedCubemap->setUpdatedTrackedDataFromCamera( camera );
 
         TutorialGameState::createScene01();
 
@@ -283,7 +283,7 @@ namespace Demo
 
         //Have the parallax corrected cubemap system keep track of the camera.
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
-        mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
+        mParallaxCorrectedCubemap->setUpdatedTrackedDataFromCamera( camera );
 
         //camera->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
         //camera->setPosition( -1.03587, 2.50012, 3.62891 );

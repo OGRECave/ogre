@@ -263,7 +263,7 @@ namespace Demo
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         camera->setPosition( Ogre::Vector3( 3.767576, 1.799997, 20.84387 ) );
         camera->lookAt( camera->getPosition() + Ogre::Vector3( -1, 0, 0 ) );
-        mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
+        mParallaxCorrectedCubemap->setUpdatedTrackedDataFromCamera( camera );
 
         TutorialGameState::createScene01();
 
@@ -301,7 +301,7 @@ namespace Demo
 
         //Have the parallax corrected cubemap system keep track of the camera.
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
-        mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
+        mParallaxCorrectedCubemap->setUpdatedTrackedDataFromCamera( camera );
 
         //camera->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
         //camera->setPosition( -1.03587, 2.50012, 3.62891 );
