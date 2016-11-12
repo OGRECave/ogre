@@ -90,8 +90,8 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         terrain->getTerrainPosition(centrepos, &tsPos);
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         const uint8* state = SDL_GetKeyboardState(NULL);
-        if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS] ||
-            state[SDL_SCANCODE_KP_MINUS] || state[SDL_SCANCODE_MINUS])
+        if (state['='] || state[SDLK_KP_PLUS] ||
+            state[SDLK_KP_MINUS] || state['-'])
         {
             switch(mMode)
             {
@@ -120,7 +120,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
                             float addedHeight = weight * 250.0 * timeElapsed;
                             float newheight;
-                            if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS])
+                            if (state['='] || state[SDLK_KP_PLUS])
                                 newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
                             else
                                 newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
@@ -159,7 +159,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                             float paint = weight * timeElapsed;
                             size_t imgY = imgSize - y;
                             float val;
-                            if (state[SDL_SCANCODE_EQUALS] || state[SDL_SCANCODE_KP_PLUS])
+                            if (state['='] || state[SDLK_KP_PLUS])
                                 val = layer->getBlendValue(x, imgY) + paint;
                             else
                                 val = layer->getBlendValue(x, imgY) - paint;
@@ -286,9 +286,9 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
     {
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         SDL_Keymod mod = SDL_GetModState();
-        switch (e.keysym.scancode)
+        switch (e.keysym.sym)
         {
-        case SDL_SCANCODE_S:
+        case 's':
             // CTRL-S to save
             if (mod & KMOD_CTRL)
             {
@@ -297,7 +297,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             else
                 return SdkSample::keyPressed(e);
             break;
-        case SDL_SCANCODE_F10:
+        case SDLK_F10:
             // dump
             {
                 TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
@@ -313,14 +313,14 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
             }
             break;
             /*
-              case SDL_SCANCODE_F7:
+              case SDLK_F7:
               // change terrain size
               if (mTerrainGroup->getTerrainSize() == 513)
               mTerrainGroup->setTerrainSize(1025);
               else
               mTerrainGroup->setTerrainSize(513);
               break;
-              case SDL_SCANCODE_F8:
+              case SDLK_F8:
               // change terrain world size
               if (mTerrainGroup->getTerrainWorldSize() == TERRAIN_WORLD_SIZE)
               mTerrainGroup->setTerrainWorldSize(TERRAIN_WORLD_SIZE * 2);

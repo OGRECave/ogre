@@ -44,9 +44,9 @@ class _OgreSampleClassExport Sample_Grass : public SdkSample
 
     bool keyPressed(const KeyboardEvent& evt)
     {
-        Keycode key = evt.keysym.scancode;
+        Keycode key = evt.keysym.sym;
         // toggle bounding boxes with B key unless the help dialog is visible
-        if (key == SDL_SCANCODE_B && !mTrayMgr->isDialogVisible())
+        if (key == 'b' && !mTrayMgr->isDialogVisible())
             mSceneMgr->showBoundingBoxes(!mSceneMgr->getShowBoundingBoxes());
         return SdkSample::keyPressed(evt);
     }

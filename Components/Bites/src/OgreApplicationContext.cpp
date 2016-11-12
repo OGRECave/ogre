@@ -472,7 +472,7 @@ void ApplicationContext::_fireInputEventAndroid(AInputEvent* event, int wheel) {
             return;
 
         evt.type = AKeyEvent_getAction(event) == AKEY_EVENT_ACTION_DOWN ? SDL_KEYDOWN : SDL_KEYUP;
-        evt.key.keysym.scancode = SDL_SCANCODE_ESCAPE;
+        evt.key.keysym.sym = SDLK_ESCAPE;
     }
 
     _fireInputEvent(evt);

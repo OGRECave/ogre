@@ -556,7 +556,7 @@ public:
     {
         static bool rain = false;
 
-        if(evt.keysym.scancode == SDL_SCANCODE_SPACE) {
+        if(evt.keysym.sym == SDLK_SPACE) {
             rain = !rain;
             particleEmitter->setEmissionRate(rain ? 20.0f : 0.0f);
         }

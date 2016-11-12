@@ -12,7 +12,7 @@
 #include "SDL_stdinc.h"
 #include "SDL_events.h"
 #include "SDL_keyboard.h"
-#include "SDL_scancode.h"
+#include "SDL_keycode.h"
 #endif
 %}
 
@@ -31,7 +31,16 @@
 %ignore SDL_vsnprintf;
 %include "SDL_stdinc.h"
 %include "SDL_keyboard.h"
-%include "SDL_scancode.h"
+
+// tell SWIG that we need ints here
+%warnfilter(302) SDLK_ESCAPE;
+%warnfilter(302) SDLK_RETURN;
+%warnfilter(302) SDLK_SPACE;
+%constant int SDLK_ESCAPE;
+%constant int SDLK_RETURN;
+%constant int SDLK_SPACE;
+%include "SDL_keycode.h"
+
 %include "SDL_events.h"
 #endif
 
