@@ -65,6 +65,10 @@ namespace Ogre
         /// This variable should be updated every frame and often represents the camera position,
         /// but it can also be used set to other things like the player's character position.
         public: Vector3                 mTrackedPosition;
+        /// When mTrackedPosition is not inside any probe, we'll use the view-projection matrix
+        /// to select the closest probe based on which one has approximately the largest volume
+        /// shown on camera. See setUpdatedTrackedDataFromCamera if you don't know how to set this
+        public: Matrix4                 mTrackedViewProjMatrix;
         public: uint32                  mMask; /// @see CubemapProbe::mMask
     private:
         GpuProgramParametersSharedPtr   mBlendCubemapParamsVs[OGRE_MAX_CUBE_PROBES];
@@ -120,6 +124,7 @@ namespace Ogre
         void setFinalProbeTo( size_t probeIdx );
 
         void checkStagingBufferIsBigEnough(void);
+        void findClosestProbe(void);
         void updateSceneGraph(void);
         /// Probes with a large number of iterations will blow up our memory consumption
         /// because too many commands will be queued up before flushing the command buffer
@@ -144,6 +149,17 @@ namespace Ogre
         void destroyAllProbes(void);
 
         const CubemapProbeVec& getProbes(void) const        { return mProbes; }
+
+        /** Will update both mTrackedPosition & mTrackedViewProjMatrix with appropiate settings
+            every time it's called. Must be called every time the camera changes.
+        @remarks
+            You don't *have to* use a camera, which is why mTrackedPosition & mTrackedViewProjMatrix
+            are public variables. Sometimes you want something else to be used as reference for probe
+            blending (e.g. character's position instead of the camera). This is up to you.
+        @param trackedCamera
+            Camera whose settings to use as reference. We will not keep a reference to this pointer.
+        */
+        void setUpdatedTrackedDataFromCamera( Camera *trackedCamera );
 
         /** Enables/disables this ParallaxCorrectedCubemap system.
             It will (de)allocate some resources, thus it may cause stalls.
