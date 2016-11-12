@@ -33,19 +33,13 @@
 #include <OgreGLES2RenderSystem.h>
 #include <OgreZip.h>
 
+#include <emscripten/html5.h>
+
 #define SAFE_DELETE(x) if(x){delete x;  x= NULL;}
 
 Sample::Sample()
     :   OgreBites::ApplicationContext("OGRE Emscripten Sample", false), mSceneMgr(NULL), mCamera(NULL), mNode(NULL), mBuffer(NULL)
 {
-}
-
-void Sample::createRoot() {
-    OgreBites::ApplicationContext::createRoot();
-
-    mRoot->addRenderSystem(new Ogre::GLES2RenderSystem());
-    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MIP, Ogre::FO_LINEAR);
-    Ogre::MaterialManager::getSingleton().setDefaultTextureFiltering(Ogre::FT_MAG, Ogre::FO_ANISOTROPIC);
 }
 
 void Sample::setup()

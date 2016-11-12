@@ -33,8 +33,6 @@
 #include <OgreTrays.h>
 #include <OgreCameraMan.h>
 #include <OgreApplicationContext.h>
-#include <emscripten/html5.h>
-
 
 class Sample : public OgreBites::ApplicationContext
 {
@@ -43,7 +41,7 @@ public:
 
 	void setup();
 	void setupScene();
-	void createRoot();
+
     bool frameRenderingQueued(const Ogre::FrameEvent& evt);
     
     void passAssetAsArrayBuffer(unsigned char*, int length);
