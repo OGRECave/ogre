@@ -338,10 +338,10 @@ namespace Ogre {
         {
             if (mFrustumExtentsManuallySet)
             {
-                left = mLeft * mNearDist;
-                right = mRight * mNearDist;
-                top = mTop * mNearDist;
-                bottom = mBottom * mNearDist;
+                left = mLeft;
+                right = mRight;
+                top = mTop;
+                bottom = mBottom;
 
                 if( mMultiplyNearPlaneAgainstManuallFrustumExtents )
                 {
