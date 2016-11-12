@@ -30,10 +30,17 @@
     * allow EGL to create *full* GL Contexts as well
     * allows running GL3Plus on EGL (tested on Linux, MESA and NVidia)
     * needed for [real headless rendering](http://devblogs.nvidia.com/parallelforall/egl-eye-opengl-visualization-without-x-server/)
+    * added support for VSync, MSAA
     
-## GLES2: use ES context profile on Desktop
-* run and test the GLES2/3 RenderSystem on Desktop
-* optionally uses GLSupport Module instead of EGL for Extensions/ Context
+## GLES2
+* use ES context profile on Desktop
+    * run and test the GLES2/3 RenderSystem on Desktop
+    * optionally uses GLSupport Module instead of EGL for Extensions/ Context
+* remove legacy workarounds frome code which fixes several VTests
+* improved Extension handling
+    * fixes crashes in GLES2 mode on GLES3 contexts (Android)
+    * allows using 3D textures in GLES2 mode
+    * allows always using VAOs
 
 ## RTShaderSystem
 * fix flipped Environment Maps using GLSL (GLSES) shaders
@@ -49,7 +56,6 @@
 * fix GLSLES Shaders for ShadowVolumeExtrudeProgram
 * OSX: `externalWindowHandle` expects a `NSWindow*` by default. `macAPICocoaUseNSView=false` switches to old behaviour.
 * FileSystemLayer: use `$XDG_CACHE_HOME` as base path on Linux
-* allow using c++11 std::thread for background resource loading (also on bitbucket)
 
 ## Tests
 * Visual Tests can be built without OIS
@@ -60,8 +66,10 @@
 [see the results of the Visual Tests for the GL RenderSystems here](https://ogrecave.github.io/ogre/gl_status/)
 
 ## Emscripten
-* added minimal Sample to repository
 * added build instructions
+* added minimal Sample to repository
+* updated glue code to work with ApplicationContext
+* uses SDL2 for context creation and input
 
 [the Emscipten Demo is available online here](https://ogrecave.github.io/ogre/emscripten/)
 
