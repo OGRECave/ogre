@@ -275,8 +275,10 @@ Install the Emscripten SDK and make sure that the environment variables are corr
 Run cmake in cross compile mode using emscripten as following:
 
 ```
-cmake -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake -DOGRE_BUILD_SAMPLES=TRUE .
+cmake -DCMAKE_TOOLCHAIN_FILE=$EMSCRIPTEN/cmake/Modules/Platform/Emscripten.cmake .
 ```
+
+in cmkae GUI change `CMAKE_AR` to `emcc`. Then run `make`.
 
 this will not build the full SampleBrowser, but just a minimal Sample. The resulting `EmscriptenSample.html` will be placed in `${CMAKE_BINARY_DIR}/bin/`.
 
