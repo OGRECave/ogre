@@ -635,9 +635,9 @@ namespace OgreBites
         {
             if (mTrayMgr->isDialogVisible()) return true;  // ignore keypresses when dialog is showing
 			
-			Keycode key = evt.keysym.scancode;
+			Keycode key = evt.keysym.sym;
 			
-            if (key == SDL_SCANCODE_ESCAPE)
+            if (key == SDLK_ESCAPE)
             {
 #if __OGRE_WINRT_PHONE
                 // If there is a quit button, assume that we intended to press it via 'ESC'.
@@ -670,13 +670,13 @@ namespace OgreBites
                 }
                 else buttonHit((Button*)mTrayMgr->getWidget("Back"));  // if we're in config, just go back
             }
-            else if ((key == SDL_SCANCODE_UP || key == SDL_SCANCODE_DOWN) && mTitleLabel->getTrayLocation() != TL_NONE)
+            else if ((key == SDLK_UP || key == SDLK_DOWN) && mTitleLabel->getTrayLocation() != TL_NONE)
             {
                 // if we're in the main screen, use the up and down arrow keys to cycle through samples
-                int newIndex = mSampleMenu->getSelectionIndex() + (key == SDL_SCANCODE_UP ? -1 : 1);
+                int newIndex = mSampleMenu->getSelectionIndex() + (key == SDLK_UP ? -1 : 1);
                 mSampleMenu->selectItem(Ogre::Math::Clamp<int>(newIndex, 0, mSampleMenu->getNumItems() - 1));
             }
-            else if (key == SDL_SCANCODE_RETURN)   // start or stop sample
+            else if (key == SDLK_RETURN)   // start or stop sample
             {
                 if (!mLoadedSamples.empty() && (mSamplePaused || mCurrentSample == 0))
                 {
@@ -686,7 +686,7 @@ namespace OgreBites
                 }
             }
 #if OGRE_NO_VIEWPORT_ORIENTATIONMODE == 0
-            else if (key == SDL_SCANCODE_M)   // change orientation mode
+            else if (key == SDLK_M)   // change orientation mode
             {
                 unsigned int orientationMode = (unsigned int)mWindow->getViewport(0)->getOrientationMode();
                 orientationMode++;
@@ -695,7 +695,7 @@ namespace OgreBites
                 mWindow->getViewport(0)->setOrientationMode((Ogre::OrientationMode)orientationMode);
             }
 #endif
-            else if(key == SDL_SCANCODE_F9)   // toggle full screen
+            else if(key == SDLK_F9)   // toggle full screen
             {
                 // Make sure we use the window size as originally requested, NOT the
                 // current window size (which may have altered to fit desktop)
@@ -706,13 +706,13 @@ namespace OgreBites
                 unsigned int h = Ogre::StringConverter::parseUnsignedInt(vmopts[1]);
                 mWindow->setFullscreen(!mWindow->isFullScreen(), w, h);
             }
-            else if(key == SDL_SCANCODE_F11 || key == SDL_SCANCODE_F12) // Decrease and increase FSAA level on the fly
+            else if(key == SDLK_F11 || key == SDLK_F12) // Decrease and increase FSAA level on the fly
             {
                 // current FSAA                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16
                 unsigned decreasedFSAA[17] = { 0, 0, 1, 2, 2, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8 };
                 unsigned increasedFSAA[17] = { 2, 2, 4, 4, 8, 8, 8, 8,16,16,16,16,16,16,16,16, 0, };
                 unsigned FSAA = std::min(mWindow->getFSAA(), 16U);
-                unsigned newFSAA = (key == SDL_SCANCODE_F12) ? increasedFSAA[FSAA] : decreasedFSAA[FSAA];
+                unsigned newFSAA = (key == SDLK_F12) ? increasedFSAA[FSAA] : decreasedFSAA[FSAA];
                 if(newFSAA != 0)
                     mWindow->setFSAA(newFSAA, mWindow->getFSAAHint());
             }

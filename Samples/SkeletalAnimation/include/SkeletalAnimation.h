@@ -86,9 +86,9 @@ public:
         if ( !mTrayMgr->isDialogVisible() )
         {
             // Handle keypresses.
-            switch (evt.keysym.scancode)
+            switch (evt.keysym.sym)
             {
-            case SDL_SCANCODE_V:
+            case 'v':
                 // Toggle visualise bounding boxes.
                 switch (mVisualiseBoundingBoxMode)
                 {
@@ -105,7 +105,7 @@ public:
                 return true;
                 break;
 
-            case SDL_SCANCODE_B:
+            case 'b':
                 {
                     // Toggle bone based bounding boxes for all models.
                     enableBoneBoundingBoxMode( ! mBoneBoundingBoxes );

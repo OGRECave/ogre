@@ -134,9 +134,9 @@ namespace OgreBites
 
         virtual bool keyPressed(const KeyboardEvent& evt)
         {
-        	Keycode key = evt.keysym.scancode;
+        	int key = evt.keysym.sym;
         	
-            if (key == SDL_SCANCODE_H || key == SDL_SCANCODE_F1)   // toggle visibility of help dialog
+            if (key == 'h' || key == SDLK_F1)   // toggle visibility of help dialog
             {
                 if (!mTrayMgr->isDialogVisible() && mInfo["Help"] != "") mTrayMgr->showOkDialog("Help", mInfo["Help"]);
                 else mTrayMgr->closeDialog();
@@ -144,11 +144,11 @@ namespace OgreBites
 
             if (mTrayMgr->isDialogVisible()) return true;   // don't process any more keys if dialog is up
 
-            if (key == SDL_SCANCODE_F)   // toggle visibility of advanced frame stats
+            if (key == 'f')   // toggle visibility of advanced frame stats
             {
                 mTrayMgr->toggleAdvancedFrameStats();
             }
-            else if (key == SDL_SCANCODE_G)   // toggle visibility of even rarer debugging details
+            else if (key == 'g')   // toggle visibility of even rarer debugging details
             {
                 if (mDetailsPanel->getTrayLocation() == TL_NONE)
                 {
@@ -161,7 +161,7 @@ namespace OgreBites
                     mDetailsPanel->hide();
                 }
             }
-            else if (key == SDL_SCANCODE_T)   // cycle texture filtering mode
+            else if (key == 't')   // cycle texture filtering mode
             {
                 Ogre::String newVal;
                 Ogre::TextureFilterOptions tfo;
@@ -194,7 +194,7 @@ namespace OgreBites
                 Ogre::MaterialManager::getSingleton().setDefaultAnisotropy(aniso);
                 mDetailsPanel->setParamValue(9, newVal);
             }
-            else if (key == SDL_SCANCODE_R)   // cycle polygon rendering mode
+            else if (key == 'r')   // cycle polygon rendering mode
             {
                 Ogre::String newVal;
                 Ogre::PolygonMode pm;
@@ -217,18 +217,18 @@ namespace OgreBites
                 mCamera->setPolygonMode(pm);
                 mDetailsPanel->setParamValue(10, newVal);
             }
-            else if(key == SDL_SCANCODE_F5)   // refresh all textures
+            else if(key == SDLK_F5)   // refresh all textures
             {
                 Ogre::TextureManager::getSingleton().reloadAll();
             }
-            else if (key == SDL_SCANCODE_F6)   // take a screenshot
+            else if (key == SDLK_F6)   // take a screenshot
             {
                 mWindow->writeContentsToTimestampedFile("screenshot", ".png");
             }
 
 #ifdef INCLUDE_RTSHADER_SYSTEM      
             // Toggle schemes.          
-            else if (key == SDL_SCANCODE_F2)
+            else if (key == SDLK_F2)
             {   
                 if(mRoot->getRenderSystem()->getCapabilities()->hasCapability(Ogre::RSC_FIXED_FUNCTION))
                 {
@@ -248,7 +248,7 @@ namespace OgreBites
                 }
             }           
             // Toggles per pixel per light model.
-            else if (key == SDL_SCANCODE_F3)
+            else if (key == SDLK_F3)
             {
                 static bool usePerPixelLighting = true;                 
                                                 
@@ -298,7 +298,7 @@ namespace OgreBites
             }   
 
             // Switch vertex shader outputs compaction policy.
-            else if (key == SDL_SCANCODE_F4)
+            else if (key == SDLK_F4)
             {
                 switch (mShaderGenerator->getVertexShaderOutputsCompactPolicy())
                 {
@@ -325,7 +325,7 @@ namespace OgreBites
 
 #if OGRE_PROFILING
             // Toggle visibility of profiler window
-            else if (key == SDL_SCANCODE_P)
+            else if (key == SDLK_P)
             {
                 Ogre::Profiler* prof = Ogre::Profiler::getSingletonPtr();
                 if (prof)

@@ -138,14 +138,14 @@ void CameraMan::injectKeyDown(const KeyboardEvent &evt)
 {
     if (mStyle == CS_FREELOOK)
     {
-        Keycode key = evt.keysym.scancode;
-        if (key == SDL_SCANCODE_W || key == SDL_SCANCODE_UP) mGoingForward = true;
-        else if (key == SDL_SCANCODE_S || key == SDL_SCANCODE_DOWN) mGoingBack = true;
-        else if (key == SDL_SCANCODE_A || key == SDL_SCANCODE_LEFT) mGoingLeft = true;
-        else if (key == SDL_SCANCODE_D || key == SDL_SCANCODE_RIGHT) mGoingRight = true;
-        else if (key == SDL_SCANCODE_PAGEUP) mGoingUp = true;
-        else if (key == SDL_SCANCODE_PAGEDOWN) mGoingDown = true;
-        else if (key == SDL_SCANCODE_LSHIFT) mFastMove = true;
+        Keycode key = evt.keysym.sym;
+        if (key == 'w' || key == SDLK_UP) mGoingForward = true;
+        else if (key == 's' || key == SDLK_DOWN) mGoingBack = true;
+        else if (key == 'a' || key == SDLK_LEFT) mGoingLeft = true;
+        else if (key == 'd' || key == SDLK_RIGHT) mGoingRight = true;
+        else if (key == SDLK_PAGEUP) mGoingUp = true;
+        else if (key == SDLK_PAGEDOWN) mGoingDown = true;
+        else if (key == SDLK_LSHIFT) mFastMove = true;
     }
 }
 
@@ -153,14 +153,14 @@ void CameraMan::injectKeyUp(const KeyboardEvent &evt)
 {
     if (mStyle == CS_FREELOOK)
     {
-        Keycode key = evt.keysym.scancode;
-        if (key == SDL_SCANCODE_W || key == SDL_SCANCODE_UP) mGoingForward = false;
-        else if (key == SDL_SCANCODE_S || key == SDL_SCANCODE_DOWN) mGoingBack = false;
-        else if (key == SDL_SCANCODE_A || key == SDL_SCANCODE_LEFT) mGoingLeft = false;
-        else if (key == SDL_SCANCODE_D || key == SDL_SCANCODE_RIGHT) mGoingRight = false;
-        else if (key == SDL_SCANCODE_PAGEUP) mGoingUp = false;
-        else if (key == SDL_SCANCODE_PAGEDOWN) mGoingDown = false;
-        else if (key == SDL_SCANCODE_LSHIFT) mFastMove = false;
+        Keycode key = evt.keysym.sym;
+        if (key == 'w' || key == SDLK_UP) mGoingForward = false;
+        else if (key == 's' || key == SDLK_DOWN) mGoingBack = false;
+        else if (key == 'a' || key == SDLK_LEFT) mGoingLeft = false;
+        else if (key == 'd' || key == SDLK_RIGHT) mGoingRight = false;
+        else if (key == SDLK_PAGEUP) mGoingUp = false;
+        else if (key == SDLK_PAGEDOWN) mGoingDown = false;
+        else if (key == SDLK_LSHIFT) mFastMove = false;
     }
 }
 

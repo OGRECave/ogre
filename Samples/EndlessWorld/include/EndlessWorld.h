@@ -165,9 +165,9 @@ public:
 	bool keyPressed (const KeyboardEvent &e)
 	{
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
-		switch (e.keysym.scancode)
+		switch (e.keysym.sym)
 		{
-		case SDL_SCANCODE_PAGEUP:
+		case SDLK_PAGEUP:
 			{
 				mAutoBox->setChecked(false);
 				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
@@ -179,7 +179,7 @@ public:
 				}
 			}
 			break;
-		case SDL_SCANCODE_PAGEDOWN:
+		case SDLK_PAGEDOWN:
 			{
 				mAutoBox->setChecked(false);
 				TerrainGroup::TerrainIterator ti = mTerrainGroup->getTerrainIterator();
@@ -192,7 +192,7 @@ public:
 			}
 			break;
 		// generate new random offset, to make terrains different
-		case SDL_SCANCODE_C:
+		case 'c':
 			if(mPerlinNoiseTerrainGenerator)
 			{
 				// random a new origin point

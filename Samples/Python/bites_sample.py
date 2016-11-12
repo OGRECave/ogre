@@ -8,7 +8,7 @@ class SampleApp(OgreBites.ApplicationContext):
         OgreBites.ApplicationContext.__init__(self, "PySample", False)
 
     def keyPressed(self, evt):
-        if evt.keysym.scancode == OgreBites.SDL_SCANCODE_ESCAPE:
+        if evt.keysym.sym == OgreBites.SDLK_ESCAPE:
             self.getRoot().queueEndRendering()
 
         return True
