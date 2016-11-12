@@ -26,75 +26,29 @@
  -----------------------------------------------------------------------------
  */
 
-#include "Sample.h"
-#include <OgreSceneManager.h>
-#include <OgreManualObject.h>
-#include <OgrePrefabFactory.h>
-#include <OgreGLES2RenderSystem.h>
 #include <OgreZip.h>
 
+#include "SamplePlugin.h"
+#include "CharacterSample.h"
+
 #include <emscripten/html5.h>
+#include "Context.h"
 
-#define SAFE_DELETE(x) if(x){delete x;  x= NULL;}
-
-Sample::Sample()
-    :   OgreBites::ApplicationContext("OGRE Emscripten Sample", false), mSceneMgr(NULL), mCamera(NULL), mNode(NULL), mBuffer(NULL)
+Context::Context()
+    :   OgreBites::SampleContext("OGRE Emscripten Sample", false), mBuffer(NULL), mNode(NULL)
 {
 }
 
-void Sample::setup()
-{
-    OgreBites::ApplicationContext::setup();
-
-    // Create the scenemanger
-    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
-    mShaderGenerator->addSceneManager(mSceneMgr);
-    mSceneMgr->addRenderQueueListener(mOverlaySystem);
-    
-    // Setup UI
-    mTrayMgr = OGRE_NEW OgreBites::TrayManager("InterfaceName", mWindow);
-    mTrayMgr->showFrameStats(OgreBites::TL_BOTTOMLEFT);
-    mTrayMgr->showLogo(OgreBites::TL_BOTTOMRIGHT);
-
-    // Create Camera / Viewport
-    setupScene();
-}
-
-bool Sample::mouseMoved(const OgreBites::MouseMotionEvent& evt) {
-    mCameraMan->injectMouseMove(evt);
-    mTrayMgr->injectMouseMove(evt);
-    return true;
-}
-
-bool Sample::mouseWheelRolled(const OgreBites::MouseWheelEvent& evt) {
+bool Context::mouseWheelRolled(const OgreBites::MouseWheelEvent& evt) {
     OgreBites::MouseWheelEvent _evt = evt;
     // chrome reports values of 53 here
     _evt.y = std::min(3, std::max(-3, evt.y));
-    mCameraMan->injectMouseWheel(_evt);
-    return true;
+    return OgreBites::SampleContext::mouseWheelRolled(evt);
 }
 
-bool Sample::mousePressed(const OgreBites::MouseButtonEvent& evt) {
-    mCameraMan->injectMouseDown(evt);
-    return true;
-}
-
-bool Sample::mouseReleased(const OgreBites::MouseButtonEvent& evt) {
-    mCameraMan->injectMouseUp(evt);
-    return true;
-}
-
-bool Sample::frameRenderingQueued(const Ogre::FrameEvent& evt)
+void Context::_mainLoop(void* target)
 {
-    mAnimation->addTime(evt.timeSinceLastFrame);
-
-    mTrayMgr->frameRenderingQueued(evt);
-    return true;
-}
-
-void Sample::_mainLoop(void* target)
-{
-    Sample* thizz = static_cast<Sample*>(target);
+    Context* thizz = static_cast<Context*>(target);
     if (thizz->mRoot->endRenderingQueued())
 	{
 	    emscripten_cancel_main_loop();
@@ -124,38 +78,8 @@ void Sample::_mainLoop(void* target)
     }
 }
 
-void Sample::setupScene()
-{
-    mSceneMgr->setSkyBox(true, "SkyBox");
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0, 0, 0));
 
-	Ogre::SceneNode* pNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	Ogre::Light* pDirLight = mSceneMgr->createLight();
-	pDirLight->setPosition(Ogre::Vector3(0,10,15));
-	pNode->attachObject(pDirLight);
-    
-    mCamera = mSceneMgr->createCamera("MyCam");
-	mCamera->setNearClipDistance(1.0f);
-
-	mCamera->lookAt(0,0,0);
-	mCamera->setAutoAspectRatio(true);
-
-	mCameraMan = new OgreBites::CameraMan(mCamera);
-	mCameraMan->setStyle(OgreBites::CS_ORBIT);
-	mCameraMan->setYawPitchDist(Ogre::Radian(0),Ogre::Radian(0.3),15.0f);
-
-    mNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("EntityNode");
-    Ogre::Entity* ent = mSceneMgr->createEntity("Sinbad.mesh");
-    mNode->attachObject(ent);
-    
-    mAnimation = ent->getAnimationState("IdleTop");
-    mAnimation->setEnabled(true);
-
-	Ogre::Viewport* vp = mWindow->addViewport(mCamera);
-	vp->setBackgroundColour(Ogre::ColourValue(0.3,0.3,0.3));
-}
-
-void Sample::unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName)
+void Context::unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName)
 {
     Ogre::ResourcePtr rPtr = resMgr->getResourceByName(resourceName);
     if (rPtr.isNull())
@@ -165,7 +89,7 @@ void Sample::unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& r
     resMgr->remove(resourceName);
 }
 
-void Sample::destroyMaterials( Ogre::String resourceGroupID )
+void Context::destroyMaterials( Ogre::String resourceGroupID )
 {
     
     try
@@ -202,7 +126,7 @@ void Sample::destroyMaterials( Ogre::String resourceGroupID )
     
 }
 
-void Sample::destroyTextures( Ogre::String resourceGroupID )
+void Context::destroyTextures( Ogre::String resourceGroupID )
 {
     try
     {
@@ -235,17 +159,17 @@ void Sample::destroyTextures( Ogre::String resourceGroupID )
     
 }
 
-void Sample::clearScene()
+void Context::clearScene()
 {
     if (mBuffer != NULL)
     {
         auto it = mNode->getAttachedObjectIterator();
         while (it.hasMoreElements())
         {
-            mSceneMgr->destroyMovableObject(it.getNext());
+            //mSceneMgr->destroyMovableObject(it.getNext());
         }
         mNode->detachAllObjects();
-     
+
         Ogre::MaterialManager* matMgr = Ogre::MaterialManager::getSingletonPtr();
         matMgr->removeUnreferencedResources();
         
@@ -274,7 +198,7 @@ void Sample::clearScene()
     }
 }
 
-void Sample::passAssetAsArrayBuffer(unsigned char* arr, int length) {
+void Context::passAssetAsArrayBuffer(unsigned char* arr, int length) {
     
     try {
         
@@ -289,12 +213,20 @@ void Sample::passAssetAsArrayBuffer(unsigned char* arr, int length) {
         Ogre::StringVectorPtr meshes = Ogre::ArchiveManager::getSingleton().load("download.zip","EmbeddedZip",true)->find("*.mesh");
         for (auto i : *meshes)
         {
-            mNode->attachObject(mSceneMgr->createEntity(i));
+            //mNode->attachObject(mSceneMgr->createEntity(i));
         }
         
-    } catch (Ogre::Exception ex) {
+    } catch (Ogre::Exception& ex) {
         Ogre::LogManager::getSingleton().logMessage(ex.what());
         
     }
     
+
+}
+
+void Context::setup() {
+    OgreBites::ApplicationContext::setup();
+    mCurrentSample = new Sample_Character();
+    mCurrentSample->setShaderGenerator(mShaderGenerator);
+    mCurrentSample->_setup(mWindow, mFSLayer, mOverlaySystem);
 }

@@ -4,9 +4,7 @@ if(SDL2_FOUND)
   include_directories(${SDL2_INCLUDE_DIR})
 endif()
 
-if(EMSCRIPTEN AND OGRE_BUILD_SAMPLES)
-  add_subdirectory(Emscripten)
-elseif (OGRE_BUILD_SAMPLES)
+if (OGRE_BUILD_SAMPLES)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Common/include)
 
   ogre_add_component_include_dir(Bites)
@@ -121,6 +119,11 @@ elseif (OGRE_BUILD_SAMPLES)
     
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay OgreBites)
   endif ()
+  
+  if(EMSCRIPTEN)
+    add_subdirectory(Emscripten)
+    return()
+  endif()
   
   #add_subdirectory(AtomicCounters)
   add_subdirectory(BezierPatch)

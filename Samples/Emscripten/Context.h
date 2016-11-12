@@ -34,37 +34,27 @@
 #include <OgreCameraMan.h>
 #include <OgreApplicationContext.h>
 
-class Sample : public OgreBites::ApplicationContext
+#include "SampleContext.h"
+
+class Context : public OgreBites::SampleContext
 {
 public:
-	Sample();
-
-	void setup();
-	void setupScene();
-
-    bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    Context();
     
     void passAssetAsArrayBuffer(unsigned char*, int length);
     void clearScene();
     
     static void _mainLoop(void* target);
 private:
-	Ogre::SceneManager* mSceneMgr;
-	Ogre::Camera* mCamera;
-	Ogre::SceneNode* mNode;
     unsigned char* mBuffer;
-	Ogre::AnimationState* mAnimation;
-    
-    OgreBites::TrayManager* mTrayMgr;
-    OgreBites::CameraMan* mCameraMan;
+    Ogre::SceneNode* mNode;
 
     void destroyMaterials( Ogre::String resourceGroupID );
     void destroyTextures( Ogre::String resourceGroupID );
     void unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName);
 
-    bool mouseMoved(const OgreBites::MouseMotionEvent& evt);
+    void setup();
+
     bool mouseWheelRolled(const OgreBites::MouseWheelEvent& evt);
-    bool mousePressed(const OgreBites::MouseButtonEvent& evt);
-    bool mouseReleased(const OgreBites::MouseButtonEvent& evt);
 };
 #endif
