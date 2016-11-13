@@ -41,7 +41,8 @@ namespace Ogre
         static const IdString HwGammaWrite;
         static const IdString SignedIntTex;
         static const IdString MaterialsPerBuffer;
-        static const IdString AnimationMatricesPerBuffer;
+        static const IdString AnimationMatricesPerBuffer; //TODO: Seems dead
+        static const IdString TextureMatrix;
 
         static const IdString TexMatrixCount;
         static const IdString TexMatrixCount0;

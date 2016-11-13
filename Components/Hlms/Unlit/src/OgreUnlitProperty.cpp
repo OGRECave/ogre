@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -41,6 +41,7 @@ namespace Ogre
     const IdString UnlitProperty::SignedIntTex      = IdString( "signed_int_textures" );
     const IdString UnlitProperty::MaterialsPerBuffer= IdString( "materials_per_buffer" );
     const IdString UnlitProperty::AnimationMatricesPerBuffer = IdString( "animation_matrices_per_buffer" );
+    const IdString UnlitProperty::TextureMatrix     = IdString( "texture_matrix" );
 
     const IdString UnlitProperty::TexMatrixCount        = IdString( "hlms_texture_matrix_count" );
     const IdString UnlitProperty::TexMatrixCount0       = IdString( "hlms_texture_matrix_count0" );
