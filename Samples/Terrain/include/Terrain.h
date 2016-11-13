@@ -90,8 +90,8 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
         terrain->getTerrainPosition(centrepos, &tsPos);
 #if OGRE_PLATFORM != OGRE_PLATFORM_APPLE_IOS
         const uint8* state = SDL_GetKeyboardState(NULL);
-        if (state['='] || state[SDLK_KP_PLUS] ||
-            state[SDLK_KP_MINUS] || state['-'])
+        if (state[uint('=')] || state[SDLK_KP_PLUS] ||
+            state[SDLK_KP_MINUS] || state[uint('-')])
         {
             switch(mMode)
             {
@@ -120,7 +120,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
 
                             float addedHeight = weight * 250.0 * timeElapsed;
                             float newheight;
-                            if (state['='] || state[SDLK_KP_PLUS])
+                            if (state[uint('=')] || state[SDLK_KP_PLUS])
                                 newheight = terrain->getHeightAtPoint(x, y) + addedHeight;
                             else
                                 newheight = terrain->getHeightAtPoint(x, y) - addedHeight;
@@ -159,7 +159,7 @@ class _OgreSampleClassExport Sample_Terrain : public SdkSample
                             float paint = weight * timeElapsed;
                             size_t imgY = imgSize - y;
                             float val;
-                            if (state['='] || state[SDLK_KP_PLUS])
+                            if (state[uint('=')] || state[SDLK_KP_PLUS])
                                 val = layer->getBlendValue(x, imgY) + paint;
                             else
                                 val = layer->getBlendValue(x, imgY) - paint;
