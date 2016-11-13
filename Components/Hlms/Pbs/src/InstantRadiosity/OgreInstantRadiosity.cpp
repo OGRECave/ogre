@@ -462,7 +462,7 @@ namespace Ogre
 
         if( !vertexBuffers[posIdx]->getShadowCopy() )
         {
-            if( indexBuffer )
+            if( !indexBuffer )
             {
                 posTicket = vertexBuffers[posIdx]->readRequest( vao->getPrimitiveStart(),
                                                                 vao->getPrimitiveCount() );
