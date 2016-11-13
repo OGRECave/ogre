@@ -7,6 +7,7 @@
 
 #include "OgreLight.h"
 
+#include "SdlEmulationLayer.h"
 #if OGRE_USE_SDL2
     #include "SDL_keyboard.h"
 #endif
