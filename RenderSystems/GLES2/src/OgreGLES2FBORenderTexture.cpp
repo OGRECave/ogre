@@ -436,7 +436,7 @@ namespace Ogre {
 #endif
     }
 
-    void GLES2FBOManager::getBestDepthStencil(GLenum internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
+    void GLES2FBOManager::getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
     {
         const FormatProperties &props = mProps[internalFormat];
         if (props.modes.size() == 0 ) {
