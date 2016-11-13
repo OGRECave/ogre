@@ -941,6 +941,10 @@ namespace Ogre
     {
         clear();
 
+        //Ensure position & AABB data is up to date.
+        mSceneManager->updateSceneGraph();
+        mSceneManager->clearFrameData();
+
         Hlms *hlms = mHlmsManager->getHlms( HLMS_PBS );
         if( !dynamic_cast<HlmsPbs*>( hlms ) )
         {

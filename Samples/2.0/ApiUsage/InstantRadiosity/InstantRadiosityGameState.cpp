@@ -281,8 +281,6 @@ namespace Demo
         Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
         //Ogre::InstantRadiosity instantRadiosity( sceneManager, hlmsManager );
         Ogre::InstantRadiosity *instantRadiosity = new Ogre::InstantRadiosity( sceneManager, hlmsManager );
-        sceneManager->updateSceneGraph();
-        sceneManager->clearFrameData();
         instantRadiosity->build();
     }
     //-----------------------------------------------------------------------------------
