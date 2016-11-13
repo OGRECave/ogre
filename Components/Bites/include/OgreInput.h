@@ -34,11 +34,11 @@ typedef SDL_MouseMotionEvent MouseMotionEvent;
 typedef SDL_MouseButtonEvent MouseButtonEvent;
 typedef SDL_MouseWheelEvent MouseWheelEvent;
 typedef SDL_TouchFingerEvent TouchFingerEvent;
-typedef SDL_Scancode Keycode;
+typedef SDL_Keycode Keycode;
 }
 #else
 namespace OgreBites {
-typedef char Keycode;
+typedef int Keycode;
 enum {
     BUTTON_LEFT,
     BUTTON_MIDDLE,
@@ -47,7 +47,7 @@ enum {
 struct KeyboardEvent {
     int type;
     union {
-        Keycode scancode;
+        Keycode sym;
     } keysym;
     int repeat;
 };
@@ -88,45 +88,29 @@ union Event
 
 // SDL compat
 enum {
-    SDL_SCANCODE_A,
-    SDL_SCANCODE_B,
-    SDL_SCANCODE_C,
-    SDL_SCANCODE_D,
-    SDL_SCANCODE_E,
-    SDL_SCANCODE_F,
-    SDL_SCANCODE_G,
-    SDL_SCANCODE_H,
-    SDL_SCANCODE_Q,
-    SDL_SCANCODE_R,
-    SDL_SCANCODE_S,
-    SDL_SCANCODE_T,
-    SDL_SCANCODE_V,
-    SDL_SCANCODE_W,
-    SDL_SCANCODE_DOWN,
-    SDL_SCANCODE_UP,
-    SDL_SCANCODE_LEFT,
-    SDL_SCANCODE_RIGHT,
-    SDL_SCANCODE_SPACE,
-    SDL_SCANCODE_PAGEUP,
-    SDL_SCANCODE_PAGEDOWN,
-    SDL_SCANCODE_LSHIFT,
-    SDL_SCANCODE_F1,
-    SDL_SCANCODE_F2,
-    SDL_SCANCODE_F3,
-    SDL_SCANCODE_F4,
-    SDL_SCANCODE_F5,
-    SDL_SCANCODE_F6,
-    SDL_SCANCODE_F9,
-    SDL_SCANCODE_F10,
-    SDL_SCANCODE_F11,
-    SDL_SCANCODE_F12,
-    SDL_SCANCODE_EQUALS,
-    SDL_SCANCODE_KP_PLUS,
-    SDL_SCANCODE_KP_MINUS,
-    SDL_SCANCODE_MINUS,
-    SDL_SCANCODE_RETURN,
-    SDL_SCANCODE_ESCAPE,
-    SDL_NUM_SCANCODES = 512
+    SDLK_RETURN = '\r',
+    SDLK_ESCAPE = '\033',
+    SDLK_SPACE = ' ',
+    SDLK_DOWN,
+    SDLK_UP,
+    SDLK_LEFT,
+    SDLK_RIGHT,
+    SDLK_PAGEUP,
+    SDLK_PAGEDOWN,
+    SDLK_LSHIFT,
+    SDLK_F1,
+    SDLK_F2,
+    SDLK_F3,
+    SDLK_F4,
+    SDLK_F5,
+    SDLK_F6,
+    SDLK_F9,
+    SDLK_F10,
+    SDLK_F11,
+    SDLK_F12,
+    SDLK_KP_PLUS,
+    SDLK_KP_MINUS,
+    SDL_NUM_KEYCODES = 512
 };
 
 enum {
@@ -145,7 +129,7 @@ enum {
 typedef int SDL_Keymod;
 
 inline unsigned char* SDL_GetKeyboardState(void*) {
-    static unsigned char state[SDL_NUM_SCANCODES] = {0};
+    static unsigned char state[SDL_NUM_KEYCODES] = {0};
     return state;
 }
 inline int SDL_GetMouseState(int* x, int* y) {

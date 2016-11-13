@@ -120,6 +120,11 @@ if (OGRE_BUILD_SAMPLES)
 	set(OGRE_LIBRARIES ${OGRE_LIBRARIES} OgreOverlay OgreBites)
   endif ()
   
+  if(EMSCRIPTEN)
+    add_subdirectory(Emscripten)
+    return()
+  endif()
+  
   #add_subdirectory(AtomicCounters)
   add_subdirectory(BezierPatch)
   add_subdirectory(CameraTrack)

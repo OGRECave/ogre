@@ -33,46 +33,28 @@
 #include <OgreTrays.h>
 #include <OgreCameraMan.h>
 #include <OgreApplicationContext.h>
-#include <emscripten/html5.h>
 
+#include "SampleContext.h"
 
-class Sample : public OgreBites::ApplicationContext
+class Context : public OgreBites::SampleContext
 {
 public:
-	Sample();
-
-	void setup();
-	void setupScene();
-	void startMainLoop();
-	void createRoot();
-    bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    Context();
     
     void passAssetAsArrayBuffer(unsigned char*, int length);
     void clearScene();
     
+    static void _mainLoop(void* target);
 private:
-	Ogre::SceneManager* mSceneMgr;
-	Ogre::Camera* mCamera;
-	bool mExitMainLoop;
-	Ogre::SceneNode* mNode;
     unsigned char* mBuffer;
-	Ogre::AnimationState* mAnimation;
-    
-    OgreBites::TrayManager* mTrayMgr;
-    OgreBites::CameraMan* mCameraMan;
+    Ogre::SceneNode* mNode;
 
     void destroyMaterials( Ogre::String resourceGroupID );
     void destroyTextures( Ogre::String resourceGroupID );
     void unloadResource(Ogre::ResourceManager* resMgr, const Ogre::String& resourceName);
 
-    static EM_BOOL keydown_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData);
-    static EM_BOOL keyup_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData);
-    static EM_BOOL keypress_callback(int eventType, const EmscriptenKeyboardEvent* keyEvent, void* userData);
-    static EM_BOOL mousedown_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData);
-    static EM_BOOL mouseup_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData);
-    static EM_BOOL mousemove_callback(int eventType, const EmscriptenMouseEvent* mouseEvent, void* userData);
-    static EM_BOOL mousewheel_callback(int eventType, const EmscriptenWheelEvent* mouseEvent, void* userData);
-    static const char* beforeunload_callback(int eventType, const void* reserved, void* userData);
-    static void _mainLoop(void* target);
+    void setup();
+
+    bool mouseWheelRolled(const OgreBites::MouseWheelEvent& evt);
 };
 #endif

@@ -115,18 +115,18 @@ Sample_VolumeTerrain::Sample_VolumeTerrain(void) : mVolumeRoot(0), mHideAll(fals
 
 bool Sample_VolumeTerrain::keyPressed(const KeyboardEvent& evt)
 {
-    switch(evt.keysym.scancode)
+    switch(evt.keysym.sym)
     {
-    case SDL_SCANCODE_F10:
+    case SDLK_F10:
         mVolumeRoot->setVolumeVisible(!mVolumeRoot->getVolumeVisible());
         break;
-    case SDL_SCANCODE_F11:
+    case SDLK_F11:
         mVolumeRoot->setOctreeVisible(!mVolumeRoot->getOctreeVisible());
         break;
-    case SDL_SCANCODE_F12:
+    case SDLK_F12:
         mVolumeRoot->setDualGridVisible(!mVolumeRoot->getDualGridVisible());
         break;
-    case SDL_SCANCODE_H:
+    case 'h':
         if (mHideAll)
         {
             mTrayMgr->showAll();

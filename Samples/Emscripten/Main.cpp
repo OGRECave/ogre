@@ -26,16 +26,16 @@
  -----------------------------------------------------------------------------
  */
 
-#include "Sample.h"
+#include "Context.h"
 
-static Sample* sampleInst = NULL;
+static Context* sampleInst = NULL;
 
 int main( int argc, const char* argv[] ) {	
 	try
 	{
-		sampleInst = new Sample();
+		sampleInst = new Context();
 		sampleInst->initApp();
-		sampleInst->startMainLoop();
+	    emscripten_set_main_loop_arg(Context::_mainLoop, sampleInst, 0, 1);
 		sampleInst->closeApp();
         delete sampleInst;
         sampleInst = NULL;

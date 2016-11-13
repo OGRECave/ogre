@@ -323,7 +323,7 @@ namespace Ogre {
         switch (fmt)
         {
             case PF_DEPTH:
-                return GL_DEPTH_COMPONENT;
+                return GL_DEPTH_COMPONENT16;
 #if GL_IMG_texture_compression_pvrtc && OGRE_PLATFORM != OGRE_PLATFORM_NACL
             case PF_PVRTC_RGB2:
                 return GL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG;

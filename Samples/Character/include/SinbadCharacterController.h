@@ -58,14 +58,14 @@ public:
 
     void injectKeyDown(const KeyboardEvent& evt)
     {
-        Keycode key = evt.keysym.scancode;
-        if (key == SDL_SCANCODE_Q && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
+        Keycode key = evt.keysym.sym;
+        if (key == 'q' && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
         {
             // take swords out (or put them back, since it's the same animation but reversed)
             setTopAnimation(ANIM_DRAW_SWORDS, true);
             mTimer = 0;
         }
-        else if (key == SDL_SCANCODE_E && !mSwordsDrawn)
+        else if (key == 'e' && !mSwordsDrawn)
         {
             if (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP)
             {
@@ -86,12 +86,12 @@ public:
         }
 
         // keep track of the player's intended direction
-        else if (key == SDL_SCANCODE_W) mKeyDirection.z = -1;
-        else if (key == SDL_SCANCODE_A) mKeyDirection.x = -1;
-        else if (key == SDL_SCANCODE_S) mKeyDirection.z = 1;
-        else if (key == SDL_SCANCODE_D) mKeyDirection.x = 1;
+        else if (key == 'w') mKeyDirection.z = -1;
+        else if (key == 'a') mKeyDirection.x = -1;
+        else if (key == 's') mKeyDirection.z = 1;
+        else if (key == 'd') mKeyDirection.x = 1;
 
-        else if (key == SDL_SCANCODE_SPACE && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
+        else if (key == SDLK_SPACE && (mTopAnimID == ANIM_IDLE_TOP || mTopAnimID == ANIM_RUN_TOP))
         {
             // jump if on ground
             setBaseAnimation(ANIM_JUMP_START, true);
@@ -109,12 +109,12 @@ public:
 
     void injectKeyUp(const KeyboardEvent& evt)
     {
-        Keycode key = evt.keysym.scancode;
+        Keycode key = evt.keysym.sym;
         // keep track of the player's intended direction
-        if (key == SDL_SCANCODE_W && mKeyDirection.z == -1) mKeyDirection.z = 0;
-        else if (key == SDL_SCANCODE_A && mKeyDirection.x == -1) mKeyDirection.x = 0;
-        else if (key == SDL_SCANCODE_S && mKeyDirection.z == 1) mKeyDirection.z = 0;
-        else if (key == SDL_SCANCODE_D && mKeyDirection.x == 1) mKeyDirection.x = 0;
+        if (key == 'w' && mKeyDirection.z == -1) mKeyDirection.z = 0;
+        else if (key == 'a' && mKeyDirection.x == -1) mKeyDirection.x = 0;
+        else if (key == 's' && mKeyDirection.z == 1) mKeyDirection.z = 0;
+        else if (key == 'd' && mKeyDirection.x == 1) mKeyDirection.x = 0;
 
         if (mKeyDirection.isZeroLength() && mBaseAnimID == ANIM_RUN_BASE)
         {
