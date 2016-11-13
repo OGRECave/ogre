@@ -724,6 +724,11 @@ void ApplicationContext::shutdown()
         }
     }
 
+#ifdef OGRE_BUILD_COMPONENT_RTSHADERSYSTEM
+    // Destroy the RT Shader System.
+    destroyRTShaderSystem();
+#endif
+
     // remove window event listener before shutting down SDL
     Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
 

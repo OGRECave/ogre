@@ -1480,12 +1480,6 @@ namespace OgreBites
             mWindow = 0;
 
             unloadSamples();
-
-#ifdef INCLUDE_RTSHADER_SYSTEM
-            // Destroy the RT Shader System.
-            destroyRTShaderSystem();
-#endif // INCLUDE_RTSHADER_SYSTEM
-
         }
     protected:
         /*-----------------------------------------------------------------------------
