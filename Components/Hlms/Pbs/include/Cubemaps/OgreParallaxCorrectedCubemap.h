@@ -210,6 +210,13 @@ namespace Ogre
         TexturePtr getBlendCubemap(void) const          { return mBlendCubemap; }
         const HlmsSamplerblock* getBlendCubemapTrilinearSamplerblock(void)  { return mSamplerblockTrilinear; }
 
+        /// Returns the RenderQueue ID you told us you reserved for storing our internal objects.
+        /// Do not attempt to render the objects that match in that Rq ID & visibility mask.
+        uint8 getProxyReservedRenderQueueId(void) const     { return mReservedRqId; }
+        /// Returns the visibility mask you told us you reserved for storing our internal objects.
+        /// Do not attempt to render the objects that match in that Rq ID & visibility mask.
+        uint32 getProxyReservedVisibilityMask(void) const   { return mProxyVisibilityMask; }
+
         //Statistics
         uint32 getNumCollectedProbes(void) const        { return mNumCollectedProbes; }
 
