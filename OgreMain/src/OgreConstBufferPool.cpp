@@ -179,10 +179,11 @@ namespace Ogre
             if( usersPool->extraBuffer )
             {
                 (*itor)->uploadToExtraBuffer( extraData );
-                extraData += extraBufferSizeInGpu;
 
                 const size_t extraSrcOffset = static_cast<size_t>( extraData - bufferStart );
                 const size_t extraDstOffset = (*itor)->getAssignedSlot() * extraBufferSizeInGpu;
+
+                extraData += extraBufferSizeInGpu;
 
                 StagingBuffer::Destination extraDst( usersPool->extraBuffer, extraDstOffset,
                                                      extraSrcOffset, extraBufferSizeInGpu );

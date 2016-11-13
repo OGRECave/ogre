@@ -56,7 +56,7 @@ namespace Ogre
     {
         assert( dynamic_cast<GL3PlusBufferInterface*>( mBufferInterface ) );
         assert( offset < (mNumElements * mBytesPerElement - 1) );
-        assert( sizeBytes < mNumElements * mBytesPerElement );
+        assert( (offset + sizeBytes) <= mNumElements * mBytesPerElement );
 
         sizeBytes = !sizeBytes ? (mNumElements * mBytesPerElement - offset) : sizeBytes;
 

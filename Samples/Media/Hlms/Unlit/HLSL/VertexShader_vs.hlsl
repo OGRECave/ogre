@@ -66,12 +66,12 @@ PS_INPUT main( VS_INPUT input )
 @property( texture_matrix )	float4x4 textureMatrix;@end
 
 @foreach( out_uv_count, n )
-	@property( out_uv@_texture_matrix )textureMatrix = UNPACK_MAT4( animationMatrixBuf, (materialIdx[input.drawId].x << 4u) + @value( out_uv@n_tex_unit ) );@end
-	outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) =
-@property( out_uv@_texture_matrix )
-			mul( input.uv@value( out_uv@n_source_uv ).xy, textureMatrix );
-@end @property( !out_uv@_texture_matrix )
-			input.uv@value( out_uv@n_source_uv ).xy;@end @end
+	@property( out_uv@n_texture_matrix )
+		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (materialIdx[input.drawId].x << 4u) + @value( out_uv@n_tex_unit ) );
+		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = mul( textureMatrix, float4( input.uv@value( out_uv@n_source_uv ).xy, 0, 1 ) ).xy;
+	@end @property( !out_uv@n_texture_matrix )
+		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = input.uv@value( out_uv@n_source_uv ).xy;
+	@end @end
 
 	outVs.drawId = input.drawId;
 
