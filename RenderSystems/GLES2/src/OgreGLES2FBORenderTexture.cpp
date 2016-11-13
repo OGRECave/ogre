@@ -350,8 +350,7 @@ namespace Ogre {
                 for (size_t depth = 0; depth < DEPTHFORMAT_COUNT; ++depth)
                 {
 #if OGRE_NO_GLES3_SUPPORT == 1
-                    if (getGLES2SupportRef()->checkExtension("GL_OES_packed_depth_stencil") &&
-                        depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
+                    if (depthFormats[depth] != GL_DEPTH24_STENCIL8_OES)
 #else
                     if (depthFormats[depth] != GL_DEPTH24_STENCIL8 && depthFormats[depth] != GL_DEPTH32F_STENCIL8)
 #endif
@@ -386,7 +385,7 @@ namespace Ogre {
                             }
                         }
                     }
-                    else
+                    else if(getGLES2SupportRef()->checkExtension("GL_OES_packed_depth_stencil") )
                     {
                         // Packed depth/stencil format
                         if (_tryPackedFormat(depthFormats[depth]))
