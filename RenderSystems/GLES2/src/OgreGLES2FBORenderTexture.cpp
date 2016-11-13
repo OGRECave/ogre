@@ -304,11 +304,10 @@ namespace Ogre {
     {
 #if OGRE_PLATFORM == OGRE_PLATFORM_EMSCRIPTEN
         // TODO: Fix that probing all formats slows down startup not just on the web also on Android / iOS
-        for(size_t x = 0; x < PF_COUNT; ++x)
-        {
-            mProps[x].valid = true;
-        }
-        LogManager::getSingleton().logMessage("[GLES2] : Valid FBO targets: detectFBOFormats is disabled on this platform (due performance reasons)");
+        mProps[PF_A8B8G8R8].valid = true;
+        FormatProperties::Mode mode = {1, 0};
+        mProps[PF_A8B8G8R8].modes.push_back(mode);
+        LogManager::getSingleton().logMessage("[GLES2] : detectFBOFormats is disabled on this platform (due performance reasons)");
 #else
         // Try all formats, and report which ones work as target
         GLuint fb = 0, tid = 0;
@@ -424,7 +423,7 @@ namespace Ogre {
 
         // Clear any errors
         glGetError();
-
+#endif
         String fmtstring;
         for(size_t x = 0; x < PF_COUNT; ++x)
         {
@@ -432,7 +431,7 @@ namespace Ogre {
                 fmtstring += PixelUtil::getFormatName((PixelFormat)x)+" ";
         }
         LogManager::getSingleton().logMessage("[GLES2] : Valid FBO targets " + fmtstring);
-#endif
+
     }
 
     void GLES2FBOManager::getBestDepthStencil(PixelFormat internalFormat, GLenum *depthFormat, GLenum *stencilFormat)
