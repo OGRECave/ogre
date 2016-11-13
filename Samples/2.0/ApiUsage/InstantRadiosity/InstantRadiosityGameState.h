@@ -7,7 +7,9 @@
 
 #include "OgreLight.h"
 
-#include "SDL_keyboard.h"
+#if OGRE_USE_SDL2
+    #include "SDL_keyboard.h"
+#endif
 
 namespace Ogre
 {

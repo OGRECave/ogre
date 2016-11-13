@@ -42,7 +42,7 @@ THE SOFTWARE.
 
 //#include "OgreItem.h"
 
-#if OGRE_COMPILER == OGRE_COMPILER_MSVC
+#if OGRE_COMPILER == OGRE_COMPILER_MSVC || OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
     #include <random>
 #else
     #include <tr1/random>
@@ -52,7 +52,11 @@ namespace Ogre
 {
     class RandomNumberGenerator
     {
+#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE || OGRE_PLATFORM == OGRE_PLATFORM_APPLE_IOS
+        std::mt19937        mRng;
+#else
         std::tr1::mt19937   mRng;
+#endif
 
     public:
         uint32 rand()       { return mRng(); }
