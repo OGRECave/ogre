@@ -11,25 +11,15 @@
 #include "OgreMesh2.h"
 
 #include "OgreCamera.h"
-#include "OgreRenderWindow.h"
 
 #include "OgreHlmsPbsDatablock.h"
-#include "OgreHlmsSamplerblock.h"
 
 #include "OgreRoot.h"
 #include "OgreHlmsManager.h"
 #include "OgreHlmsTextureManager.h"
 #include "OgreHlmsPbs.h"
 
-#include "OgreTextureManager.h"
-#include "OgreHardwarePixelBuffer.h"
-#include "OgreRenderTexture.h"
-#include "Compositor/OgreCompositorManager2.h"
-#include "Compositor/OgreCompositorWorkspaceDef.h"
-
 #include "OgreLwString.h"
-
-#include "Cubemaps/OgreParallaxCorrectedCubemap.h"
 
 #include "../LocalCubemaps/LocalCubemapScene.h"
 
@@ -42,113 +32,57 @@ namespace Demo
 {
     InstantRadiosityGameState::InstantRadiosityGameState( const Ogre::String &helpDescription ) :
         TutorialGameState( helpDescription ),
-        mParallaxCorrectedCubemap( 0 ),
-        mUseMultipleProbes( true ),
-        mRegenerateProbes( true ),
-        mRoughnessDirty( false )
+        mLightNode( 0 ),
+        mLight( 0 ),
+        mInstantRadiosity( 0 ),
+        mCurrentType( Ogre::Light::LT_SPOTLIGHT )
     {
-        memset( mMaterials, 0, sizeof(mMaterials) );
+        mDisplayHelpMode        = 2;
+        mNumDisplayHelpModes    = 3;
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosityGameState::setupParallaxCorrectCubemaps(void)
+    void InstantRadiosityGameState::createLight(void)
     {
-        return;
-        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
-        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+        Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
+        Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
 
-        if( mParallaxCorrectedCubemap )
+        if( mLight )
         {
-            hlmsPbs->setParallaxCorrectedCubemap( 0 );
-
-            delete mParallaxCorrectedCubemap;
-            mParallaxCorrectedCubemap = 0;
+            sceneManager->destroyLight( mLight );
+            mLight = 0;
+            mLightNode->getParentSceneNode()->removeAndDestroyChild( mLightNode );
+            mLightNode = 0;
         }
 
-        Ogre::Root *root = mGraphicsSystem->getRoot();
-        Ogre::CompositorManager2 *compositorManager = root->getCompositorManager2();
-        Ogre::CompositorWorkspaceDef *workspaceDef = compositorManager->getWorkspaceDefinition(
-                    "InstantRadiosityProbeWorkspace" );
+        mLight = sceneManager->createLight();
+        mLightNode = rootNode->createChildSceneNode();
+        mLightNode->attachObject( mLight );
+        mLight->setPowerScale( Ogre::Math::PI );
 
-        mParallaxCorrectedCubemap = new Ogre::ParallaxCorrectedCubemap(
-                    Ogre::Id::generateNewId<Ogre::ParallaxCorrectedCubemap>(),
-                    mGraphicsSystem->getRoot(),
-                    mGraphicsSystem->getSceneManager(),
-                    workspaceDef, 250, 1u << 25u );
-
-        mParallaxCorrectedCubemap->setEnabled( true, 1024, 1024, Ogre::PF_R8G8B8A8 );
-
-        Ogre::CubemapProbe *probe = 0;
-        Ogre::Aabb roomShape( Ogre::Vector3( -0.505, 3.400016, 5.066226 ),
-                              Ogre::Vector3( 5.064587, 3.891282, 9.556003 ) );
-        Ogre::Aabb probeArea;
-        probeArea.mHalfSize = Ogre::Vector3( 5.064587, 3.891282, 3.891282 );
-
-        if( mUseMultipleProbes )
+        switch( mCurrentType )
         {
-            //Probe 00
-            probe = mParallaxCorrectedCubemap->createProbe();
-            probe->setTextureParams( 1024, 1024 );
-            probe->initWorkspace();
-
-            probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, -0.598495 );
-            probe->set( probeArea.mCenter, probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
-                        Ogre::Matrix3::IDENTITY, roomShape );
+        default:
+        case Ogre::Light::LT_SPOTLIGHT:
+            mLight->setType( Ogre::Light::LT_SPOTLIGHT );
+            mLight->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
+            mLightNode->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
+            break;
+        case Ogre::Light::LT_POINT:
+            mLight->setType( Ogre::Light::LT_POINT );
+            mLightNode->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
+            break;
+        case Ogre::Light::LT_DIRECTIONAL:
+            mLight->setType( Ogre::Light::LT_DIRECTIONAL );
+            mLight->setDirection( Ogre::Vector3( 1, -1, -1 ).normalisedCopy() );
+            break;
         }
-
-        //Probe 01
-        probe = mParallaxCorrectedCubemap->createProbe();
-        probe->setTextureParams( 1024, 1024 );
-        probe->initWorkspace();
-
-        probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 5.423867 );
-        probe->set( mUseMultipleProbes ? probeArea.mCenter : roomShape.mCenter,
-                    mUseMultipleProbes ? probeArea : roomShape,
-                    Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
-                    Ogre::Matrix3::IDENTITY, roomShape );
-
-        if( mUseMultipleProbes )
-        {
-            //Probe 02
-            probe = mParallaxCorrectedCubemap->createProbe();
-            probe->setTextureParams( 1024, 1024 );
-            probe->initWorkspace();
-
-            probeArea.mCenter = Ogre::Vector3( -0.505, 3.400016, 10.657585 );
-            probe->set( probeArea.mCenter, probeArea, Ogre::Vector3( 1.0f, 1.0f, 0.3f ),
-                        Ogre::Matrix3::IDENTITY, roomShape );
-        }
-
-        hlmsPbs->setParallaxCorrectedCubemap( mParallaxCorrectedCubemap );
-    }
-    //-----------------------------------------------------------------------------------
-    void InstantRadiosityGameState::forceUpdateAllProbes(void)
-    {
-        return;
-        const Ogre::CubemapProbeVec &probes = mParallaxCorrectedCubemap->getProbes();
-
-        Ogre::CubemapProbeVec::const_iterator itor = probes.begin();
-        Ogre::CubemapProbeVec::const_iterator end  = probes.end();
-
-        while( itor != end )
-        {
-            (*itor)->mDirty = true;
-            ++itor;
-        }
-
-        mParallaxCorrectedCubemap->updateAllDirtyProbes();
-        mRoughnessDirty = false;
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::createScene01(void)
     {
-        setupParallaxCorrectCubemaps();
-
         //Setup a scene similar to that of PBS sample, except
         //we apply the cubemap to everything via C++ code
         Ogre::SceneManager *sceneManager = mGraphicsSystem->getSceneManager();
-
-        const float armsLength = 2.5f;
 
         Ogre::v1::MeshPtr planeMeshV1 = Ogre::v1::MeshManager::getSingleton().createPlane( "Plane v1",
                                             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
@@ -171,128 +105,62 @@ namespace Demo
             Ogre::HlmsBlendblock blendblock;
             Ogre::HlmsMacroblock macroblock;
 
-            Ogre::HlmsPbsDatablock *datablock;
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Red", "Red",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::Red );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.65 );
-            mMaterials[0] = datablock;
+            struct DemoMaterials
+            {
+                Ogre::String matName;
+                Ogre::ColourValue colour;
+            };
 
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Green", "Green",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::Green );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.65 );
-            mMaterials[1] = datablock;
+            DemoMaterials materials[4] =
+            {
+                { "Red", Ogre::ColourValue::Red },
+                { "Green", Ogre::ColourValue::Green },
+                { "Blue", Ogre::ColourValue::Blue },
+                { "Cream", Ogre::ColourValue::White },
+            };
 
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Blue", "Blue",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::Blue );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.65 );
-            mMaterials[2] = datablock;
+            for( int i=0; i<4; ++i )
+            {
+                Ogre::String finalName = materials[i].matName;
 
-            datablock = static_cast<Ogre::HlmsPbsDatablock*>(
-                        hlmsPbs->createDatablock( "Cream", "Cream",
-                                                  macroblock, blendblock,
-                                                  Ogre::HlmsParamVec() ) );
-            datablock->setBackgroundDiffuse( Ogre::ColourValue::White );
-            datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
-            datablock->setRoughness( 0.65 );
-            mMaterials[3] = datablock;
+                Ogre::HlmsPbsDatablock *datablock;
+                datablock = static_cast<Ogre::HlmsPbsDatablock*>(
+                            hlmsPbs->createDatablock( finalName, finalName,
+                                                      macroblock, blendblock,
+                                                      Ogre::HlmsParamVec() ) );
+                datablock->setBackgroundDiffuse( materials[i].colour );
+                datablock->setFresnel( Ogre::Vector3( 0.1f ), false );
+                datablock->setRoughness( 0.02 );
+            }
         }
 
         generateScene( sceneManager );
 
-        Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
-
-//        Ogre::Light *light = sceneManager->createLight();
-//        Ogre::SceneNode *lightNode = rootNode->createChildSceneNode();
-//        lightNode->attachObject( light );
-//        light->setPowerScale( 1.0f );
-//        light->setType( Ogre::Light::LT_DIRECTIONAL );
-//        light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
-
-//        mLightNodes[0] = lightNode;
-
-//        sceneManager->setAmbientLight( Ogre::ColourValue( 0.3f, 0.5f, 0.7f ) * 0.1f * 0.75f,
-//                                       Ogre::ColourValue( 0.6f, 0.45f, 0.3f ) * 0.065f * 0.75f,
-//                                       -light->getDirection() + Ogre::Vector3::UNIT_Y * 0.2f );
-
-//        light = sceneManager->createLight();
-//        lightNode = rootNode->createChildSceneNode();
-//        lightNode->attachObject( light );
-//        light->setDiffuseColour( 0.8f, 0.4f, 0.2f ); //Warm
-//        light->setSpecularColour( 0.8f, 0.4f, 0.2f );
-//        light->setPowerScale( Ogre::Math::PI );
-//        light->setType( Ogre::Light::LT_SPOTLIGHT );
-//        //lightNode->setPosition( -2.0f, 6.0f, 10.0f );
-//        lightNode->setPosition( -12.0f, 6.0f, 8.0f );
-//        light->setDirection( Ogre::Vector3( 1.5, -1, -0.5 ).normalisedCopy() );
-//        light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
-//        light->setSpotlightOuterAngle( Ogre::Degree( 80.0f ) );
-
-//        mLightNodes[1] = lightNode;
-
-//        light = sceneManager->createLight();
-//        lightNode = rootNode->createChildSceneNode();
-//        lightNode->attachObject( light );
-//        light->setDiffuseColour( 0.2f, 0.4f, 0.8f ); //Cold
-//        light->setSpecularColour( 0.2f, 0.4f, 0.8f );
-//        light->setPowerScale( Ogre::Math::PI );
-//        light->setType( Ogre::Light::LT_SPOTLIGHT );
-//        lightNode->setPosition( 2.0f, 6.0f, -3.0f );
-//        light->setDirection( Ogre::Vector3( -0.5, -1, 0.5 ).normalisedCopy() );
-//        light->setAttenuationBasedOnRadius( 10.0f, 0.01f );
-//        light->setSpotlightOuterAngle( Ogre::Degree( 80.0f ) );
-
-//        mLightNodes[2] = lightNode;
-
-        Ogre::Light *light = sceneManager->createLight();
-        Ogre::SceneNode *lightNode = rootNode->createChildSceneNode();
-        lightNode->attachObject( light );
-        light->setPowerScale( Ogre::Math::PI );
-        light->setType( Ogre::Light::LT_SPOTLIGHT );
-        //light->setType( Ogre::Light::LT_DIRECTIONAL );
-        light->setDirection( Ogre::Vector3( -1, -1, -1 ).normalisedCopy() );
-        lightNode->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
+        createLight();
 
         mCameraController = new CameraController( mGraphicsSystem, false );
         mCameraController->mCameraBaseSpeed = 1.0f;
         mCameraController->mCameraSpeedBoost = 10.0f;
 
-        sceneManager->setForward3D( true, 4, 4, 4, 1024, 0.5, 20 );
+        sceneManager->setForward3D( true, 4, 4, 4, 96, 0.5, 20 );
         sceneManager->getForward3D()->setFadeAttenuationRange( true );
-
-        Ogre::Camera *camera = mGraphicsSystem->getCamera();
-        //mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
 
         TutorialGameState::createScene01();
 
-        //mParallaxCorrectedCubemap->updateAllDirtyProbes();
-
         Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-        //Ogre::InstantRadiosity instantRadiosity( sceneManager, hlmsManager );
-        Ogre::InstantRadiosity *instantRadiosity = new Ogre::InstantRadiosity( sceneManager, hlmsManager );
-        instantRadiosity->build();
+        mInstantRadiosity = new Ogre::InstantRadiosity( sceneManager, hlmsManager );
+        mInstantRadiosity->build();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::destroyScene(void)
     {
-        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
-        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
-        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
-        hlmsPbs->setParallaxCorrectedCubemap( 0 );
+//        Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
+//        assert( dynamic_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms( Ogre::HLMS_PBS ) ) );
+//        Ogre::HlmsPbs *hlmsPbs = static_cast<Ogre::HlmsPbs*>( hlmsManager->getHlms(Ogre::HLMS_PBS) );
+//        hlmsPbs->setParallaxCorrectedCubemap( 0 );
 
-        delete mParallaxCorrectedCubemap;
-        mParallaxCorrectedCubemap = 0;
+        delete mInstantRadiosity;
+        mInstantRadiosity = 0;
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::update( float timeSinceLast )
@@ -303,32 +171,75 @@ namespace Demo
                 mSceneNode[i]->yaw( Ogre::Radian(timeSinceLast * i * 0.125f) );
         }*/
 
-        //Have the parallax corrected cubemap system keep track of the camera.
-        Ogre::Camera *camera = mGraphicsSystem->getCamera();
-        //mParallaxCorrectedCubemap->mTrackedPosition = camera->getDerivedPosition();
+        std::map<SDL_Keycode, SDL_Keysym>::const_iterator itor = mKeysHold.begin();
+        std::map<SDL_Keycode, SDL_Keysym>::const_iterator end  = mKeysHold.end();
 
-        //camera->setPosition( Ogre::Vector3( -0.505, 3.400016, 5.423867 ) );
-        //camera->setPosition( -1.03587, 2.50012, 3.62891 );
-        //camera->setOrientation( Ogre::Quaternion::IDENTITY );
+        bool changedVplSetting = false;
+        bool needsRebuild = false;
+        while( itor != end )
+        {
+            const SDL_Keysym &keySym = itor->second;
+            const bool reverse = (keySym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            const float modPerFrame = reverse ? -timeSinceLast : timeSinceLast;
+            if( keySym.sym == SDLK_j )
+            {
+                mInstantRadiosity->mCellSize += modPerFrame;
+                mInstantRadiosity->mCellSize = Ogre::max( mInstantRadiosity->mCellSize,
+                                                          Ogre::Real(0.001f) );
+                needsRebuild = true;
+            }
+            if( keySym.sym == SDLK_k )
+            {
+                mInstantRadiosity->mBias += modPerFrame;
+                mInstantRadiosity->mBias = Ogre::Math::Clamp( mInstantRadiosity->mBias,
+                                                              Ogre::Real(0.0f), Ogre::Real(1.0f) );
+                needsRebuild = true;
+            }
+            if( keySym.sym == SDLK_u )
+            {
+                mInstantRadiosity->mVplMaxRange += modPerFrame * 4.0f;
+                changedVplSetting = true;
+            }
+            if( keySym.sym == SDLK_i )
+            {
+                mInstantRadiosity->mVplPowerBoost += modPerFrame * 2.0f;
+                changedVplSetting = true;
+            }
+            if( keySym.sym == SDLK_o )
+            {
+                mInstantRadiosity->mVplThreshold += modPerFrame * 0.05f;
+                changedVplSetting = true;
+            }
+
+            ++itor;
+        }
+
+        if( changedVplSetting && !needsRebuild )
+            mInstantRadiosity->updateExistingVpls();
+        if( needsRebuild )
+            mInstantRadiosity->build();
 
         TutorialGameState::update( timeSinceLast );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::generateDebugText( float timeSinceLast, Ogre::String &outText )
     {
-        char tmpBuffer[64];
-        Ogre::LwString roughnessStr( Ogre::LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
-        roughnessStr.a( Ogre::LwString::Float( mMaterials[0]->getRoughness(), 2 ) );
-
         TutorialGameState::generateDebugText( timeSinceLast, outText );
-        outText += "\nPress F2/F3 to adjust material roughness: ";
-        outText += roughnessStr.c_str();
-        outText += "\nPress F5 to regenerate probes when adjusting roughness: ";
-        outText += mRegenerateProbes ? "[Slow & Accurate]" : "[Fast]";
-        outText += "\nPress F6 to toggle number of probes. Num probes: ";
-        outText += mUseMultipleProbes ? "3" : "1";
-        outText += "\nProbes blending: ";
-        //outText += Ogre::StringConverter::toString( mParallaxCorrectedCubemap->getNumCollectedProbes() );
+
+        outText += "\nHold [Shift] to change value in opposite direction";
+        outText += "\nVPL Max range [U]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplMaxRange );
+        outText += "\nVPL Power Boost [I]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplPowerBoost );
+        outText += "\nVPL Threshold [O]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplThreshold );
+
+        outText += "\nNum Rays [H]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumRays );
+        outText += "\nCluster size [J]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mCellSize );
+        outText += "\nBias [K]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mBias );
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         outText += "\nCamera: ";
@@ -337,45 +248,35 @@ namespace Demo
                 Ogre::StringConverter::toString( camera->getPosition().z );
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosityGameState::keyPressed( const SDL_KeyboardEvent &arg )
+    {
+        mKeysHold[arg.keysym.sym] = arg.keysym;
+        TutorialGameState::keyPressed( arg );
+    }
+    //-----------------------------------------------------------------------------------
     void InstantRadiosityGameState::keyReleased( const SDL_KeyboardEvent &arg )
     {
-        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS)) != 0 )
+        mKeysHold.erase( arg.keysym.sym );
+
+        if( (arg.keysym.mod & ~(KMOD_NUM|KMOD_CAPS|KMOD_LSHIFT|KMOD_RSHIFT)) != 0 )
         {
             TutorialGameState::keyReleased( arg );
             return;
         }
 
-        if( arg.keysym.sym == SDLK_F2 )
+        if( arg.keysym.sym == SDLK_h )
         {
-            float roughness = mMaterials[0]->getRoughness();
-            for( int i=0; i<4; ++i )
-                mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness - 0.1f, 0.02f, 1.0f ) );
+            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            if( reverse )
+                mInstantRadiosity->mNumRays >>= 1u;
+            else
+                mInstantRadiosity->mNumRays <<= 1u;
 
-            mRoughnessDirty = true;
-            if( mRegenerateProbes )
-                forceUpdateAllProbes();
-        }
-        else if( arg.keysym.sym == SDLK_F3 )
-        {
-            float roughness = mMaterials[0]->getRoughness();
-            for( int i=0; i<4; ++i )
-                mMaterials[i]->setRoughness( Ogre::Math::Clamp( roughness + 0.1f, 0.02f, 1.0f ) );
+            //Too many rays and the app will become unresponsive
+            mInstantRadiosity->mNumRays = std::max<size_t>( mInstantRadiosity->mNumRays, 1u );
+            mInstantRadiosity->mNumRays = std::min<size_t>( mInstantRadiosity->mNumRays, 32768u );
 
-            mRoughnessDirty = true;
-            if( mRegenerateProbes )
-                forceUpdateAllProbes();
-        }
-        else if( arg.keysym.sym == SDLK_F5 )
-        {
-            mRegenerateProbes = !mRegenerateProbes;
-            if( mRegenerateProbes && mRoughnessDirty )
-                forceUpdateAllProbes();
-        }
-        else if( arg.keysym.sym == SDLK_F6 )
-        {
-            mUseMultipleProbes = !mUseMultipleProbes;
-            setupParallaxCorrectCubemaps();
-            //mParallaxCorrectedCubemap->updateAllDirtyProbes();
+            mInstantRadiosity->build();
         }
         else
         {

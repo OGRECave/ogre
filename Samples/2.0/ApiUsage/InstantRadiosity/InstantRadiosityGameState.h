@@ -5,11 +5,13 @@
 #include "OgrePrerequisites.h"
 #include "TutorialGameState.h"
 
-#include "OgreTexture.h"
+#include "OgreLight.h"
+
+#include "SDL_keyboard.h"
 
 namespace Ogre
 {
-    class ParallaxCorrectedCubemap;
+    class InstantRadiosity;
     class HlmsPbsDatablock;
 }
 
@@ -17,18 +19,17 @@ namespace Demo
 {
     class InstantRadiosityGameState : public TutorialGameState
     {
-        Ogre::SceneNode     *mLightNodes[3];
+        Ogre::SceneNode     *mLightNode;
+        Ogre::Light         *mLight;
+        Ogre::Light::LightTypes  mCurrentType;
 
-        Ogre::ParallaxCorrectedCubemap  *mParallaxCorrectedCubemap;
-        Ogre::HlmsPbsDatablock          *mMaterials[4];
-        bool                            mUseMultipleProbes;
-        bool                            mRegenerateProbes;
-        bool                            mRoughnessDirty;
+        Ogre::InstantRadiosity          *mInstantRadiosity;
+
+        std::map<SDL_Keycode, SDL_Keysym> mKeysHold;
 
         virtual void generateDebugText( float timeSinceLast, Ogre::String &outText );
 
-        void setupParallaxCorrectCubemaps(void);
-        void forceUpdateAllProbes(void);
+        void createLight(void);
 
     public:
         InstantRadiosityGameState( const Ogre::String &helpDescription );
@@ -38,6 +39,7 @@ namespace Demo
 
         virtual void update( float timeSinceLast );
 
+        virtual void keyPressed( const SDL_KeyboardEvent &arg );
         virtual void keyReleased( const SDL_KeyboardEvent &arg );
     };
 }

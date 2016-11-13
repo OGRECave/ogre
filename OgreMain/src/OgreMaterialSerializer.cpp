@@ -371,6 +371,7 @@ namespace Ogre
                     case Light::LT_SPOTLIGHT:
                         writeValue("spot");
                         break;
+                    case Light::LT_VPL:
                     case Light::NUM_LIGHT_TYPES: //Keep compiler happy
                         break;
                     };

@@ -26,57 +26,10 @@ namespace Demo
 {
     class InstantRadiosityGraphicsSystem : public GraphicsSystem
     {
-//        virtual Ogre::CompositorWorkspace* setupCompositor()
-//        {
-//            //Delegate compositor creation to the game state. We need cubemap's texture
-//            //to be passed to the compositor so Ogre can insert the proper barriers.
-////            assert( dynamic_cast<InstantRadiosityGameState*>(mCurrentGameState) );
-////            return static_cast<InstantRadiosityGameState*>(mCurrentGameState)->setupCompositor();
-
-//            Ogre::CompositorManager2 *compositorManager = mRoot->getCompositorManager2();
-//            return compositorManager->addWorkspace( mSceneManager, mRenderWindow, mCamera,
-//                                                    "InstantRadiosityWorkspace", true );
-//        }
-
-        /*virtual void setupResources(void)
-        {
-            GraphicsSystem::setupResources();
-
-            Ogre::ConfigFile cf;
-            cf.load(mResourcePath + "resources2.cfg");
-
-            Ogre::String originalDataFolder = cf.getSetting( "DoNotUseAsResource", "Hlms", "" );
-
-            if( originalDataFolder.empty() )
-                originalDataFolder = "./";
-            else if( *(originalDataFolder.end() - 1) != '/' )
-                originalDataFolder += "/";
-
-            const char *c_locations[9] =
-            {
-                "2.0/scripts/materials/Common",
-                "2.0/scripts/materials/Common/GLSL",
-                "2.0/scripts/materials/Common/HLSL",
-                "2.0/scripts/materials/Common/Metal",
-                "2.0/scripts/materials/InstantRadiosity/",
-                "2.0/scripts/materials/InstantRadiosity/GLSL",
-                "2.0/scripts/materials/InstantRadiosity/HLSL",
-                "2.0/scripts/materials/InstantRadiosity/Metal",
-                "2.0/scripts/materials/TutorialSky_Postprocess"
-            };
-
-            for( size_t i=0; i<9; ++i )
-            {
-                Ogre::String dataFolder = originalDataFolder + c_locations[i];
-                addResourceLocation( dataFolder, "FileSystem", "General" );
-            }
-        }*/
-
     public:
         InstantRadiosityGraphicsSystem( GameState *gameState ) :
             GraphicsSystem( gameState )
         {
-            mAlwaysAskForConfig = false;
         }
     };
 
@@ -86,7 +39,20 @@ namespace Demo
                                          LogicSystem **outLogicSystem )
     {
         InstantRadiosityGameState *gfxGameState = new InstantRadiosityGameState(
-        "TBD\n"
+        "This sample shows how to use 'Instant Radiosity' (IR for short).\n"
+        "IR traces rays in CPU and creates a VPL (Virtual Point Light) at every hit point to mimic\n"
+        "the effect of Global Illumination. A few highlights:\n"
+        "   * As GI solution, IR is neither too fast nor too slow. Somewhere in the middle.\n"
+        "   * The build process may be expensive enough for it to not be real time.\n"
+        "   * The advantage of IR is that it works on dynamic objects.\n"
+        "   * VPLs get averaged and clustered based on cluster size to improve speed.\n"
+        "There's several ways to fight light leaking:\n"
+        "   * Smaller cluster sizes are more accurate, but are much slower (because of more VPLs)\n"
+        "   * Smaller mVplMaxRange is faster and leaks less, but its illumination reach is lower,\n"
+        "     causing them to be less accurate\n"
+        "   * mBias pushes the placement of the VPL away from its true position. This is not physically\n"
+        "     accurate but allows to reduce mVplMaxRange and fight light leaking at the same time.\n"
+        "   * mVplThreshold helps removing very weak VPLs, improving performance\n"
         "\n" );
 
         GraphicsSystem *graphicsSystem = new InstantRadiosityGraphicsSystem( gfxGameState );
