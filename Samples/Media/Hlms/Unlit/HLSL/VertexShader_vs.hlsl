@@ -68,7 +68,7 @@ PS_INPUT main( VS_INPUT input )
 @foreach( out_uv_count, n )
 	@property( out_uv@n_texture_matrix )
 		textureMatrix = UNPACK_MAT4( animationMatrixBuf, (materialIdx[input.drawId].x << 4u) + @value( out_uv@n_tex_unit ) );
-		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = mul( textureMatrix, float4( input.uv@value( out_uv@n_source_uv ).xy, 0, 1 ) ).xy;
+		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = mul( float4( input.uv@value( out_uv@n_source_uv ).xy, 0, 1 ), textureMatrix ).xy;
 	@end @property( !out_uv@n_texture_matrix )
 		outVs.uv@value( out_uv@n_out_uv ).@insertpiece( out_uv@n_swizzle ) = input.uv@value( out_uv@n_source_uv ).xy;
 	@end @end
