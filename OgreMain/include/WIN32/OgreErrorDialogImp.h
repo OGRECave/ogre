@@ -45,7 +45,7 @@ namespace Ogre
     *  @{
     */
     /** Class for displaying the error dialog if Ogre fails badly. */
-    class _OgreExport ErrorDialog
+    class _OgreExport OGRE_DEPRECATED ErrorDialog
     {
     public:
         ErrorDialog();
