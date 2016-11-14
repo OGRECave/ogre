@@ -228,6 +228,11 @@ namespace Ogre {
             rsc->setStencilBufferBitDepth(stencil);
         }
 
+        if(mHasGLES30 ||
+                (mGLSupport->checkExtension("GL_EXT_sRGB")
+                 && mGLSupport->checkExtension("GL_NV_sRGB_formats")))
+            rsc->setCapability(RSC_HW_GAMMA);
+
         // Scissor test is standard
         rsc->setCapability(RSC_SCISSOR_TEST);
 
