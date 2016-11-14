@@ -282,6 +282,8 @@ namespace Ogre {
         rsc->setCapability(RSC_TWO_SIDED_STENCIL);
         rsc->setStencilBufferBitDepth(8);
 
+        rsc->setCapability(RSC_HW_GAMMA);
+
         // Vertex Buffer Objects are always supported
         rsc->setCapability(RSC_VBO);
         rsc->setCapability(RSC_32BIT_INDEX);

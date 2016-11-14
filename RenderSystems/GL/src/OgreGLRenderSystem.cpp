@@ -354,6 +354,7 @@ namespace Ogre {
             rsc->setStencilBufferBitDepth(stencil);
         }
 
+        rsc->setCapability(RSC_HW_GAMMA);
 
         if(GLEW_VERSION_1_5 || GLEW_ARB_vertex_buffer_object)
         {
