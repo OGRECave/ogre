@@ -70,17 +70,8 @@ namespace Ogre {
         pLog->logMessage(" * Fixed function pipeline: " 
             + StringConverter::toString(hasCapability(RSC_FIXED_FUNCTION), true));
         pLog->logMessage(
-            " * Hardware generation of mipmaps: "
-            + StringConverter::toString(hasCapability(RSC_AUTOMIPMAP), true));
-        pLog->logMessage(
-            " * Texture blending: "
-            + StringConverter::toString(hasCapability(RSC_BLENDING), true));
-        pLog->logMessage(
             " * Anisotropic texture filtering: "
             + StringConverter::toString(hasCapability(RSC_ANISOTROPY), true));
-        pLog->logMessage(
-            " * Dot product texture operation: "
-            + StringConverter::toString(hasCapability(RSC_DOT3), true));
         pLog->logMessage(
             " * Cube mapping: "
             + StringConverter::toString(hasCapability(RSC_CUBEMAPPING), true));
@@ -99,9 +90,6 @@ namespace Ogre {
                 "   - Wrap stencil values: "
                 + StringConverter::toString(hasCapability(RSC_STENCIL_WRAP), true));
         }
-        pLog->logMessage(
-            " * Hardware vertex / index buffers: "
-            + StringConverter::toString(hasCapability(RSC_VBO), true));
         if(hasCapability(RSC_VBO))
         {
             pLog->logMessage(
@@ -220,9 +208,6 @@ namespace Ogre {
         }
 
         pLog->logMessage(
-            " * Scissor Rectangle: "
-            + StringConverter::toString(hasCapability(RSC_SCISSOR_TEST), true));
-        pLog->logMessage(
             " * Hardware Occlusion Query: "
             + StringConverter::toString(hasCapability(RSC_HWOCCLUSION), true));
         pLog->logMessage(
@@ -258,6 +243,9 @@ namespace Ogre {
         pLog->logMessage(
             " * Point Sprites: "
             + StringConverter::toString(hasCapability(RSC_POINT_SPRITES), true));
+        pLog->logMessage(
+            " * Hardware Gamma: "
+            + StringConverter::toString(hasCapability(RSC_HW_GAMMA), true));
         pLog->logMessage(
             " * Extended point parameters: "
             + StringConverter::toString(hasCapability(RSC_POINT_EXTENDED_PARAMETERS), true));
@@ -302,24 +290,8 @@ namespace Ogre {
         if (mCategoryRelevant[CAPS_CATEGORY_GL])
         {
             pLog->logMessage(
-                " * GL 1.5 without VBO workaround: "
-                + StringConverter::toString(hasCapability(RSC_GL1_5_NOVBO), true));
-
-            pLog->logMessage(
-                " * Frame Buffer objects: "
-                + StringConverter::toString(hasCapability(RSC_FBO), true));
-            pLog->logMessage(
-                " * Frame Buffer objects (ARB extension): "
-                + StringConverter::toString(hasCapability(RSC_FBO_ARB), true));
-            pLog->logMessage(
-                " * Frame Buffer objects (ATI extension): "
-                + StringConverter::toString(hasCapability(RSC_FBO_ATI), true));
-            pLog->logMessage(
                 " * PBuffer support: "
                 + StringConverter::toString(hasCapability(RSC_PBUFFER), true));
-            pLog->logMessage(
-                " * GL 1.5 without HW-occlusion workaround: "
-                + StringConverter::toString(hasCapability(RSC_GL1_5_NOHWOCCLUSION), true));
             pLog->logMessage(
                 " * Vertex Array Objects: "
                 + StringConverter::toString(hasCapability(RSC_VAO), true));
