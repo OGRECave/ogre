@@ -83,8 +83,7 @@ namespace Ogre
 		mVertexDatablock.setTemplateName("PBS");
 		mFragmentDatablock.setTemplateName("PBS");
 
-		// TODO check if the hardware supports gamma correction "Root::getSingleton().getRenderSystem()->getCapabilities()" doesen't support this check
-		mCanHardwareGamma = false;
+		mCanHardwareGamma = Root::getSingleton().getRenderSystem()->getCapabilities()->hasCapability(RSC_HW_GAMMA);
 	}
 	//-----------------------------------------------------------------------------------
 	PbsMaterial::PbsMaterial(const PbsMaterial &obj)
