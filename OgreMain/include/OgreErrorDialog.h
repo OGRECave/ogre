@@ -37,8 +37,10 @@ THE SOFTWARE.
 #else
 namespace Ogre
 {
-    /** Class for displaying the error dialog if Ogre fails badly. */
-    class _OgreExport ErrorDialog
+    /** Class for displaying the error dialog if Ogre fails badly.
+
+     @deprecated this class will be gone in a future release*/
+    class _OgreExport OGRE_DEPRECATED ErrorDialog
     {
     public:
         ErrorDialog();
