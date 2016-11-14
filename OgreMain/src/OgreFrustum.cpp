@@ -322,8 +322,8 @@ namespace Ogre {
         {
             // Convert clipspace corners to camera space
             Matrix4 invProj = mProjMatrix.inverse();
-            Vector3 topLeft(-0.5f, 0.5f, 0.0f);
-            Vector3 bottomRight(0.5f, -0.5f, 0.0f);
+            Vector3 topLeft(-1.0f, 1.0f, 0.0f);
+            Vector3 bottomRight(1.0f, -1.0f, 0.0f);
 
             topLeft = invProj * topLeft;
             bottomRight = invProj * bottomRight;
