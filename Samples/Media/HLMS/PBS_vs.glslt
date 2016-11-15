@@ -1,4 +1,11 @@
+@property( is_gles )
+#version 300 es
+
+#define varying out
+#define attribute in
+@end @property( !is_gles )
 #version 120
+@end
 
 precision highp int;
 precision highp float;

@@ -92,12 +92,12 @@ namespace Ogre
 		HighLevelGpuProgramPtr gpuProgram = HighLevelGpuProgramManager::getSingleton().createProgram(name,
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, dataBlock->getLanguage(), dataBlock->getShaderType());
 
-		gpuProgram->setParameter("entry_point", "main");
-
 		gpuProgram->setSource(code);
 
 		if (dataBlock->getLanguage() == "hlsl")
 		{
+			gpuProgram->setParameter("entry_point", "main");
+		
 			// HLSL program requires specific target profile settings - we have to split the profile string.
 			const StringVector& profilesList = dataBlock->getProfileList();
 			StringVector::const_iterator it = profilesList.begin();

@@ -84,8 +84,9 @@ namespace Ogre
 	//-----------------------------------------------------------------------------------
 	void HlmsDatablock::reload()
 	{
-		String path = mTamplateName + FilePatterns[mShaderType] + "." + mLanguage + "t";
-		mTemplate.setTemplateFileName(path);
+	    StringStream ss;
+	    ss << mTamplateName << FilePatterns[mShaderType] << "." << (mLanguage == "glsles" ? "glsl" : mLanguage) << "t";
+		mTemplate.setTemplateFileName(ss.str());
 
 		mHash = mTemplate.getHash() + mShaderType + calcHash(mLanguage) + calcHash(mProfilesList);
 	}
