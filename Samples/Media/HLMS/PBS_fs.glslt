@@ -1,11 +1,23 @@
+@property( !is_gles )
 #version 120
-#define ROUGHNESS_BIAS 0.005
+
 #extension GL_ARB_shader_texture_lod : require  
-#extension GL_EXT_shader_texture_lod : require 
+@end @property( is_gles )
+#version 300 es
+
+#define varying in
+#define texture2D texture
+#define textureCubeLod textureLod
+#define gl_FragColor FragColor
+
+out highp vec4 FragColor;
 
 precision highp int;
 precision highp float;
 precision highp samplerCube;
+@end
+
+#define ROUGHNESS_BIAS 0.005
 
 varying vec3 var_position_es;
 varying vec3 var_normal_es;
