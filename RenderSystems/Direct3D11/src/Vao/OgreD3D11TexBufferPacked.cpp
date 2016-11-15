@@ -113,7 +113,7 @@ namespace Ogre
     ID3D11ShaderResourceView* D3D11TexBufferPacked::bindBufferCommon( size_t offset, size_t sizeBytes )
     {
         assert( offset < (mNumElements - 1) );
-        assert( sizeBytes < mNumElements );
+        assert( (offset + sizeBytes) <= mNumElements );
 
         sizeBytes = !sizeBytes ? (mNumElements - offset) : sizeBytes;
 

@@ -124,6 +124,12 @@ namespace Ogre
         @param outIndex
             The offset in bytes to retrieve the element in the vertex data.
             If the semantic isn't found, the value is left untouched.
+        @param repeat
+            The number of times to skip a semantic before returning the hit. Useful
+            when you have more than one VES_TEXTURE_COORDINATES for example.
+            Set repeat = 0 to retrieve the first set of VES_TEXTURE_COORDINATES
+            Set repeat = 1 to retrieve the second set of VES_TEXTURE_COORDINATES
+            etc.
         @return
             Null if not found. The returned pointer might be invalidated by future calls
             (e.g. something happens to the vertex buffer or the Vao) although this is
@@ -131,7 +137,7 @@ namespace Ogre
             constructed.
         */
         const VertexElement2* findBySemantic( VertexElementSemantic semantic, size_t &outIndex,
-                                              size_t &outOffset ) const;
+                                              size_t &outOffset, size_t repeat=0 ) const;
 
         /// Gets the combined vertex declaration of all the vertex buffers. Note that we
         /// iterate through all of them and allocate the vector. You should cache

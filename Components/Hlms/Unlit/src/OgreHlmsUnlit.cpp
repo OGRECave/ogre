@@ -258,6 +258,7 @@ namespace Ogre
         setProperty( UnlitProperty::DiffuseMap,
                      datablock->mBakedTextures.empty() ? 0 : NUM_UNLIT_TEXTURE_TYPES );
 
+        bool hasAnimationMatrices = false;
         UvOutputVec uvOutputs;
 
         for( uint8 i=0; i<NUM_UNLIT_TEXTURE_TYPES; ++i )
@@ -303,6 +304,7 @@ namespace Ogre
                     uvOutput.uvSource   = datablock->mUvSource[i];
                     uvOutput.texUnit    = i;
                     uvOutput.isAnimated = true;
+                    hasAnimationMatrices = true;
 
                     setProperty( *UnlitProperty::DiffuseMapPtrs[i].uvSource,
                                  static_cast<int32>( uvOutputs.size() >> 1u ) );
@@ -359,6 +361,9 @@ namespace Ogre
                 inOutPieces[PixelShader][diffuseMapNTexSwizzle] = texSwizzle;
             }
         }
+
+        if( hasAnimationMatrices )
+            setProperty( UnlitProperty::TextureMatrix, 1 );
 
         size_t halfUvOutputs = (uvOutputs.size() + 1u) >> 1u;
         setProperty( UnlitProperty::OutUvCount, static_cast<int32>( uvOutputs.size() ) );
