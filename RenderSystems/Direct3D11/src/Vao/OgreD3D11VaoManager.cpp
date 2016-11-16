@@ -1303,6 +1303,9 @@ namespace Ogre
                                                                          mDevice );
         mRefedStagingBuffers[forUpload].push_back( stagingBuffer );
 
+        if( mNextStagingBufferTimestampCheckpoint == (unsigned long)( ~0 ) )
+            mNextStagingBufferTimestampCheckpoint = mTimer->getMilliseconds() + mDefaultStagingBufferLifetime;
+
         return stagingBuffer;
     }
     //-----------------------------------------------------------------------------------
@@ -1364,12 +1367,10 @@ namespace Ogre
                     StagingBuffer *stagingBuffer = *itor;
 
                     mNextStagingBufferTimestampCheckpoint = std::min(
-                                                    mNextStagingBufferTimestampCheckpoint,
-                                                    stagingBuffer->getLastUsedTimestamp() +
-                                                    currentTimeMs );
+                        mNextStagingBufferTimestampCheckpoint, 
+                        stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() );
 
-                    if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
-                        stagingBuffer->getLifetimeThreshold() )
+                    if( stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() < currentTimeMs )
                     {
                         //Time to delete this buffer.
                         static_cast<D3D11StagingBuffer*>(stagingBuffer)->getBufferName()->Release();

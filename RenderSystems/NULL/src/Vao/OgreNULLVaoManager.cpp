@@ -283,6 +283,9 @@ namespace Ogre
         NULLStagingBuffer *stagingBuffer = OGRE_NEW NULLStagingBuffer( 0, sizeBytes, this, forUpload );
         mRefedStagingBuffers[forUpload].push_back( stagingBuffer );
 
+        if( mNextStagingBufferTimestampCheckpoint == (unsigned long)( ~0 ) )
+            mNextStagingBufferTimestampCheckpoint = mTimer->getMilliseconds() + mDefaultStagingBufferLifetime;
+
         return stagingBuffer;
     }
     //-----------------------------------------------------------------------------------
@@ -314,12 +317,10 @@ namespace Ogre
                     StagingBuffer *stagingBuffer = *itor;
 
                     mNextStagingBufferTimestampCheckpoint = std::min(
-                                                    mNextStagingBufferTimestampCheckpoint,
-                                                    stagingBuffer->getLastUsedTimestamp() +
-                                                    currentTimeMs );
+                        mNextStagingBufferTimestampCheckpoint, 
+                        stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() );
 
-                    /*if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
-                        stagingBuffer->getUnfencedTimeThreshold() )
+                    /*if( stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() < currentTimeMs )
                     {
                         static_cast<NULLStagingBuffer*>( stagingBuffer )->cleanUnfencedHazards();
                     }*/
