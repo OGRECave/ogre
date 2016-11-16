@@ -38,7 +38,7 @@ namespace Ogre
     struct RegisterRSWorker
     {
         RegisterRSWorker(DefaultWorkQueue* queue): mQueue(queue) { }
-        void operator() () { mQueue->_registerThreadWithRenderSystem(); }
+        void operator() () const { mQueue->_registerThreadWithRenderSystem(); }
         DefaultWorkQueue* mQueue;
     };
 
