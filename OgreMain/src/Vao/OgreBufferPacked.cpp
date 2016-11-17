@@ -273,5 +273,18 @@ namespace Ogre
 
         return true;
     }
+
+    //-----------------------------------------------------------------------------------
+    void BufferPacked::_setShadowCopy( void* copy )
+    {
+        if( mBufferType >= BT_DYNAMIC_DEFAULT )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                "Dynamic buffers can't have a shadow copy!",
+                "BufferPacked::BufferPacked" );
+        }
+        mShadowCopy = copy;
+    }
+
 }
 

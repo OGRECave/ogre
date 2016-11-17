@@ -949,6 +949,9 @@ namespace Ogre
                                                                              forUpload, bufferName );
         mRefedStagingBuffers[forUpload].push_back( stagingBuffer );
 
+        if( mNextStagingBufferTimestampCheckpoint == (unsigned long)( ~0 ) )
+            mNextStagingBufferTimestampCheckpoint = mTimer->getMilliseconds() + mDefaultStagingBufferLifetime;
+
         return stagingBuffer;
     }
     //-----------------------------------------------------------------------------------
@@ -980,18 +983,15 @@ namespace Ogre
                     StagingBuffer *stagingBuffer = *itor;
 
                     mNextStagingBufferTimestampCheckpoint = std::min(
-                                                    mNextStagingBufferTimestampCheckpoint,
-                                                    stagingBuffer->getLastUsedTimestamp() +
-                                                    currentTimeMs );
+                        mNextStagingBufferTimestampCheckpoint, 
+                        stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() );
 
-                    if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
-                        stagingBuffer->getUnfencedTimeThreshold() )
+                    if( stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getUnfencedTimeThreshold() < currentTimeMs )
                     {
                         static_cast<GL3PlusStagingBuffer*>( stagingBuffer )->cleanUnfencedHazards();
                     }
 
-                    if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
-                        stagingBuffer->getLifetimeThreshold() )
+                    if( stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() < currentTimeMs )
                     {
                         //Time to delete this buffer.
                         bufferNames.push_back( static_cast<GL3PlusStagingBuffer*>(

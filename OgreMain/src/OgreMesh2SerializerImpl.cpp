@@ -857,7 +857,7 @@ namespace Ogre {
         popInnerChunk(stream);
     }
     //---------------------------------------------------------------------
-    void MeshSerializerImpl::createSubMeshVao( SubMesh *sm, const SubMeshLodVec &submeshLods,
+    void MeshSerializerImpl::createSubMeshVao( SubMesh *sm, SubMeshLodVec &submeshLods,
                                                uint8 casterPass )
     {
         sm->mVao[casterPass].reserve( submeshLods.size() );
@@ -865,7 +865,7 @@ namespace Ogre {
         VertexBufferPackedVec vertexBuffers;
         for( size_t i=0; i<submeshLods.size(); ++i )
         {
-            const SubMeshLod &subMeshLod = submeshLods[i];
+            const SubMeshLod& subMeshLod = submeshLods[i];
 
             vertexBuffers.clear();
             vertexBuffers.reserve( subMeshLod.vertexBuffers.size() );
@@ -879,6 +879,12 @@ namespace Ogre {
                     VertexBufferPacked *vertexBuffer = mVaoManager->createVertexBuffer(
                         subMeshLod.vertexDeclarations[0], subMeshLod.numVertices, sm->mParent->getVertexBufferDefaultType(),
                         subMeshLod.vertexBuffers[0], sm->mParent->isVertexBufferShadowed() );
+
+                    if( !sm->mParent->isVertexBufferShadowed() )
+                    {
+                        OGRE_FREE_SIMD( subMeshLod.vertexBuffers[ 0 ], MEMCATEGORY_GEOMETRY );
+                        submeshLods[ i ].vertexBuffers.erase( subMeshLod.vertexBuffers.begin() );
+                    }
 
                     vertexBuffers.push_back( vertexBuffer );
                 }
@@ -917,6 +923,12 @@ namespace Ogre {
                                                             IndexBufferPacked::IT_16BIT,
                                     subMeshLod.numIndices, sm->mParent->getIndexBufferDefaultType(),
                                     subMeshLod.indexData, sm->mParent->isIndexBufferShadowed() );
+
+                if( !sm->mParent->isIndexBufferShadowed() )
+                {
+                    OGRE_FREE_SIMD( subMeshLod.indexData, MEMCATEGORY_GEOMETRY );
+                    submeshLods[ i ].indexData = 0;
+                }
             }
 
             VertexArrayObject *vao = mVaoManager->createVertexArrayObject( vertexBuffers, indexBuffer,
