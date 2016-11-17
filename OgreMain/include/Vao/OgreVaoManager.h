@@ -346,7 +346,31 @@ namespace Ogre
             long since the last time they've reached ref count 0.
             When the time threshold is met, the staging buffer gets removed.
         @remarks
-            @see getStagingBuffer
+            See getStagingBuffer
+        @par
+            Small explanation on StagingBuffer lifetime management (so you can make sense on
+            what we're doing here):
+
+            StagingBuffers may produce "pops" when created (due to API/driver stalls) so we
+            reuse them. We keep track of how long StagingBuffers have been remained unused,
+            and delete old ones. The intention is to be able to recycle old buffers,
+            while getting rid of the excess if a sudden spike happened. That's what the lifetime
+            threshold controls.
+
+            We also have the "unfenced threshold". This controls something very different.
+            StagingBuffers usages need fences to check whether we're done using the buffer.
+            But we don't issue a fence every time you do something with them, because that could
+            result in a lot of fences (i.e. imagine you do a 1000 uploads of 16 bytes each, in
+            succession, we shouldn't do 1000 fences); so we fence when certain upload/download
+            thresholds are met (i.e. you've uploaded 1MB of data). So if you've uploaded 750kb
+            so far, no fence will be issued. But if you upload 300kb more, we will fence.
+            But what happens if you've only uploaded 750kb and then nothing more for the last
+            10 minutes? Since we haven't fenced, and now you need to upload a lot more, we don't
+            know if those 750kb are done uploading because we never fenced it. It probably ended
+            10 minutes ago, but we won't know. We would have to fence now and perform a full
+            stall waiting for that fence. To solve this edge case, we fence whenever X time has
+            elapsed without fencing (and only if there's data that remains unfenced of course).
+            That's what the unfenced threshold is for.
         @param lifetime
             Time in milliseconds. The default is 5 minutes.
             A staging buffer that remained at zero ref. count for lifetime milliseconds
