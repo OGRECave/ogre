@@ -986,13 +986,12 @@ namespace Ogre
                         mNextStagingBufferTimestampCheckpoint, 
                         stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() );
 
-                    if( stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() < currentTimeMs )
+                    if( stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getUnfencedTimeThreshold() < currentTimeMs )
                     {
                         static_cast<GL3PlusStagingBuffer*>( stagingBuffer )->cleanUnfencedHazards();
                     }
 
-                    if( stagingBuffer->getLastUsedTimestamp() - currentTimeMs >
-                        stagingBuffer->getLifetimeThreshold() )
+                    if( stagingBuffer->getLastUsedTimestamp() + stagingBuffer->getLifetimeThreshold() < currentTimeMs )
                     {
                         //Time to delete this buffer.
                         bufferNames.push_back( static_cast<GL3PlusStagingBuffer*>(

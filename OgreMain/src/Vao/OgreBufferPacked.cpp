@@ -275,7 +275,7 @@ namespace Ogre
     }
 
     //-----------------------------------------------------------------------------------
-    void BufferPacked::setShadowCopy( void* copy )
+    void BufferPacked::_setShadowCopy( void* copy )
     {
         if( mBufferType >= BT_DYNAMIC_DEFAULT )
         {

@@ -272,7 +272,7 @@ namespace Ogre
         /// before calling this function.
         /// This will also not automatically upload the shadow data to the GPU. The user must call
         /// upload or use a staging buffer themselves to achieve this.
-        void setShadowCopy( void* copy );
+        void _setShadowCopy( void* copy );
     };
 
     typedef vector<BufferPacked*>::type BufferPackedVec;
