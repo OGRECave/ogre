@@ -2032,14 +2032,14 @@ namespace v1 {
             }
             if (s->useSharedVertices)
             {
-                eb.addIndexData(s->indexData, 0, s->operationType);
+                eb.addIndexData(s->indexData[ VpNormal ], 0, s->operationType);
             }
             else if(s->isBuildEdgesEnabled())
             {
                 // own vertex data, add it and reference it directly
-                eb.addVertexData(s->vertexData);
+                eb.addVertexData(s->vertexData[ VpNormal ] );
                 // Base index data
-                eb.addIndexData(s->indexData, vertexSetCount++,
+                eb.addIndexData(s->indexData[ VpNormal ], vertexSetCount++,
                     s->operationType);
             }
         }
