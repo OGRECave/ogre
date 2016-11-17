@@ -176,7 +176,7 @@ namespace Ogre {
         virtual void readMorphKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track);
         virtual void readPoseKeyFrame(DataStreamPtr& stream, VertexAnimationTrack* track);*/
 
-        virtual void createSubMeshVao( SubMesh *sm, const SubMeshLodVec &submeshLods,
+        virtual void createSubMeshVao( SubMesh *sm, SubMeshLodVec &submeshLods,
                                        uint8 numVaoPasses );
 
         /// Flip an entire vertex buffer to/from little endian
