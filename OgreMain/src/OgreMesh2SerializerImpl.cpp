@@ -1,4 +1,4 @@
-﻿/*
+/*
 -----------------------------------------------------------------------------
 This source file is part of OGRE
     (Object-oriented Graphics Rendering Engine)
@@ -882,8 +882,8 @@ namespace Ogre {
 
                     if( !sm->mParent->isVertexBufferShadowed() )
                     {
-                        OGRE_FREE_SIMD( subMeshLod.vertexBuffers[ 0 ], MEMCATEGORY_GEOMETRY );
-                        submeshLods[ i ].vertexBuffers.erase( subMeshLod.vertexBuffers.begin() );
+                        OGRE_FREE_SIMD( submeshLods[i].vertexBuffers[0], MEMCATEGORY_GEOMETRY );
+                        submeshLods[i].vertexBuffers.erase( submeshLods[i].vertexBuffers.begin() );
                     }
 
                     vertexBuffers.push_back( vertexBuffer );
