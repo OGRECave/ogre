@@ -382,13 +382,14 @@ namespace Ogre {
         size_t getConsecutiveSize() const;
         /** Return a subvolume of this PixelBox.
             @param def  Defines the bounds of the subregion to return
+            @param resetOrigin set origin of the new PixelBox to be (0,0,0)
             @return A pixel box describing the region and the data in it
             @remarks    This function does not copy any data, it just returns
                 a PixelBox object with a data pointer pointing somewhere inside 
                 the data of object.
             @throws Exception(ERR_INVALIDPARAMS) if def is not fully contained
         */
-        PixelBox getSubVolume(const Box &def) const;
+        PixelBox getSubVolume(const Box &def, bool resetOrigin = true) const;
         
         /** Return a data pointer pointing to top left front pixel of the pixel box.
             @remarks Non consecutive pixel boxes are supported.
