@@ -149,6 +149,7 @@ namespace Demo
 
         Ogre::HlmsManager *hlmsManager = mGraphicsSystem->getRoot()->getHlmsManager();
         mInstantRadiosity = new Ogre::InstantRadiosity( sceneManager, hlmsManager );
+        mInstantRadiosity->mNumSpreadIterations = 0;
         mInstantRadiosity->build();
     }
     //-----------------------------------------------------------------------------------
@@ -226,6 +227,8 @@ namespace Demo
     {
         TutorialGameState::generateDebugText( timeSinceLast, outText );
 
+        outText += "\nF2 to toggle debug VPL markers";
+        outText += mInstantRadiosity->getEnableDebugMarkers() ? "\n[On]" : "\n[Off]";
         outText += "\nHold [Shift] to change value in opposite direction";
         outText += "\nVPL Max range [U]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplMaxRange );
@@ -264,7 +267,11 @@ namespace Demo
             return;
         }
 
-        if( arg.keysym.sym == SDLK_h )
+        if( arg.keysym.sym == SDLK_F2 )
+        {
+            mInstantRadiosity->setEnableDebugMarkers( !mInstantRadiosity->getEnableDebugMarkers() );
+        }
+        else if( arg.keysym.sym == SDLK_h )
         {
             const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
             if( reverse )

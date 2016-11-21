@@ -40,7 +40,7 @@ THE SOFTWARE.
 
 #include "Math/Array/OgreBooleanMask.h"
 
-//#include "OgreItem.h"
+#include "OgreItem.h"
 
 #if (OGRE_COMPILER == OGRE_COMPILER_MSVC ||\
     OGRE_PLATFORM == OGRE_PLATFORM_APPLE ||\
@@ -129,7 +129,10 @@ namespace Ogre
         mVplQuadAtten( 0 ),
         mVplThreshold( 0.0 ),
         mBias( 0.97f ),
-        mVplPowerBoost( 2.0f )
+        mNumSpreadIterations( 6 ),
+        mSpreadThreshold( 0.0004 ),
+        mVplPowerBoost( 2.0f ),
+        mEnableDebugMarkers( false )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -196,6 +199,10 @@ namespace Ogre
 
         const Real cellSize = Real(1.0) / mCellSize;
         const Real bias = mBias;
+
+        mTmpSparseClusters[0].clear();
+        mTmpSparseClusters[1].clear();
+        mTmpSparseClusters[2].clear();
 
         while( !mRayHits.empty() )
         {
@@ -267,8 +274,135 @@ namespace Ogre
 
             mVpls.push_back( vpl );
 
+            mTmpSparseClusters[0].insert( SparseCluster( blockX, blockY, blockZ,
+                                                         vpl.diffuse, vpl.normal ) );
+
             RayHitVec::iterator itRay = mRayHits.begin();
             efficientVectorRemove( mRayHits, itRay );
+        }
+
+        if( mNumSpreadIterations > 0 )
+        {
+            mTmpSparseClusters[1] = mTmpSparseClusters[0];
+
+            for( int i=mNumSpreadIterations; --i; )
+            {
+                spreadSparseClusters( mTmpSparseClusters[0], mTmpSparseClusters[1] );
+                mTmpSparseClusters[0] = mTmpSparseClusters[1];
+            }
+
+            createVplsFromSpreadClusters( mTmpSparseClusters[0] );
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::spreadSparseClusters( const SparseClusterSet &grid0,
+                                                 SparseClusterSet &inOutGrid1 )
+    {
+        SparseClusterSet grid1;
+        grid1.swap( inOutGrid1 );
+
+        const int32 c_directions[6][3] =
+        {
+            {  0,  0, -1 },
+            { -1,  0,  0 },
+            {  1,  0,  0 },
+            {  0, -1,  0 },
+            {  0,  1,  0 },
+            {  0,  0,  1 }
+        };
+
+        Vector3 vDirs[6][9];
+        for( int i=0; i<6; ++i )
+        {
+            Vector3 clusterCorner = Vector3( c_directions[i][0],
+                                             c_directions[i][1],
+                                             c_directions[i][2] );
+            vDirs[i][0] = clusterCorner;
+            vDirs[i][1] = clusterCorner + Vector3( -0.5f, -0.5f, -0.5f );
+            vDirs[i][2] = clusterCorner + Vector3(  0.5f, -0.5f, -0.5f );
+            vDirs[i][3] = clusterCorner + Vector3( -0.5f,  0.5f, -0.5f );
+            vDirs[i][4] = clusterCorner + Vector3(  0.5f,  0.5f, -0.5f );
+            vDirs[i][5] = clusterCorner + Vector3( -0.5f, -0.5f,  0.5f );
+            vDirs[i][6] = clusterCorner + Vector3(  0.5f, -0.5f,  0.5f );
+            vDirs[i][7] = clusterCorner + Vector3( -0.5f,  0.5f,  0.5f );
+            vDirs[i][8] = clusterCorner + Vector3(  0.5f,  0.5f,  0.5f );
+
+            for( int j=0; j<9; ++j )
+                vDirs[i][j].normalise();
+        }
+
+        const Real invNumSpreadIterations = Real(1.0f) / mNumSpreadIterations;
+
+        SparseClusterSet::const_iterator itor = grid0.begin();
+        SparseClusterSet::const_iterator end  = grid0.end();
+
+        while( itor != end )
+        {
+            const Vector3 lightDir = itor->direction.normalisedCopy();
+
+            //Spread into all 6 directions. We don't do diagonals because it
+            //would be prohibitively expensive (26 directions). We hope doing
+            //this multiple times ends up spreading into all directions.
+            for( int i=0; i<6; ++i )
+            {
+                Real NdotL = 0;
+                for( int j=0; j<9; ++j )
+                    NdotL += Ogre::max( lightDir.dotProduct( vDirs[i][j] ), 0 );
+                NdotL /= 9.0f;
+
+                const Vector3 diffuseCol = NdotL * itor->diffuse * invNumSpreadIterations;
+
+                if( diffuseCol.x >= mSpreadThreshold ||
+                    diffuseCol.y >= mSpreadThreshold ||
+                    diffuseCol.z >= mSpreadThreshold )
+                {
+                    int32 newBlockHash[3];
+                    newBlockHash[0] = itor->blockHash[0] + c_directions[i][0];
+                    newBlockHash[1] = itor->blockHash[1] + c_directions[i][1];
+                    newBlockHash[2] = itor->blockHash[2] + c_directions[i][2];
+
+                    SparseClusterSet::iterator gridCluster = grid1.find( (int32*)newBlockHash );
+
+                    if( gridCluster == grid1.end() )
+                    {
+                        grid1.insert( SparseCluster( newBlockHash ) );
+                        gridCluster = grid1.find( (int32*)newBlockHash );
+                    }
+
+                    //TODO: Consider attenuation.
+                    gridCluster->diffuse    += diffuseCol;
+                    gridCluster->direction  += itor->direction;
+                }
+            }
+
+            ++itor;
+        }
+
+        grid1.swap( inOutGrid1 );
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::createVplsFromSpreadClusters( const SparseClusterSet &spreadCluster )
+    {
+        const Real cellSize = mCellSize;
+
+        SparseClusterSet::const_iterator itor = spreadCluster.begin();
+        SparseClusterSet::const_iterator end  = spreadCluster.end();
+
+        while( itor != end )
+        {
+            Vector3 vClusterCenter( itor->blockHash[0], itor->blockHash[1], itor->blockHash[2] );
+            vClusterCenter = (vClusterCenter + 0.5f) * cellSize;
+
+            Vpl vpl;
+            vpl.light = 0;
+            vpl.diffuse = itor->diffuse;
+            vpl.normal = itor->direction;
+            vpl.position = vClusterCenter;
+            vpl.numMergedVpls = 1.0f;
+
+            mVpls.push_back( vpl );
+
+            ++itor;
         }
     }
     //-----------------------------------------------------------------------------------
@@ -884,14 +1018,6 @@ namespace Ogre
                     vpl.light->setType( Light::LT_VPL );
                     lightNode->attachObject( vpl.light );
                     lightNode->setPosition( vpl.position );
-#if 0
-                    Item *item = mSceneManager->createItem( "Sphere1000.mesh",
-                                                            Ogre::ResourceGroupManager::
-                                                            AUTODETECT_RESOURCE_GROUP_NAME,
-                                                            Ogre::SCENE_DYNAMIC);
-                    lightNode->scale( Vector3( mVplMaxRange * 0.01f ) );
-                    lightNode->attachObject( item );
-#endif
                 }
 
                 ColourValue colour;
@@ -910,13 +1036,13 @@ namespace Ogre
                 lightNode->getParentSceneNode()->removeAndDestroyChild( lightNode );
                 mSceneManager->destroyLight( vpl.light );
                 vpl.light = 0;
-#if 0
-                mSceneManager->destroyItem(  );
-#endif
             }
 
             ++itor;
         }
+
+        if( mEnableDebugMarkers )
+            createDebugMarkers();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::clear(void)
@@ -932,15 +1058,14 @@ namespace Ogre
                 SceneNode *lightNode = vpl.light->getParentSceneNode();
                 lightNode->getParentSceneNode()->removeAndDestroyChild( lightNode );
                 mSceneManager->destroyLight( vpl.light );
-#if 0
-                mSceneManager->destroyItem(  );
-#endif
             }
 
             ++itor;
         }
 
         mVpls.clear();
+
+        destroyDebugMarkers();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::build(void)
@@ -1084,5 +1209,99 @@ namespace Ogre
 
             mMeshDataMapV1.clear();
         }
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::createDebugMarkers(void)
+    {
+        destroyDebugMarkers();
+
+        SceneNode *rootNode = mSceneManager->getRootSceneNode( SCENE_STATIC );
+
+        Hlms *hlms = mHlmsManager->getHlms( HLMS_UNLIT );
+
+        VplVec::const_iterator itor = mVpls.begin();
+        VplVec::const_iterator end  = mVpls.end();
+
+        while( itor != end )
+        {
+            const Vpl &vpl = *itor;
+            if( vpl.light )
+            {
+                SceneNode *sceneNode = rootNode->createChildSceneNode( SCENE_STATIC );
+                sceneNode->setPosition( vpl.position );
+                sceneNode->setScale( Vector3( mCellSize * 0.05f ) );
+
+                Item *item = mSceneManager->createItem( "Sphere1000.mesh",
+                                                        Ogre::ResourceGroupManager::
+                                                        AUTODETECT_RESOURCE_GROUP_NAME,
+                                                        Ogre::SCENE_STATIC );
+                sceneNode->attachObject( item );
+                item->setDatablock( hlms->getDefaultDatablock() );
+                mDebugMarkers.push_back( item );
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::destroyDebugMarkers(void)
+    {
+        vector<Item*>::type::const_iterator itor = mDebugMarkers.begin();
+        vector<Item*>::type::const_iterator end  = mDebugMarkers.end();
+
+        while( itor != end )
+        {
+            SceneNode *sceneNode = (*itor)->getParentSceneNode();
+            sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
+            mSceneManager->destroyItem( *itor );
+            ++itor;
+        }
+
+        mDebugMarkers.clear();
+    }
+    //-----------------------------------------------------------------------------------
+    void InstantRadiosity::setEnableDebugMarkers( bool bEnable )
+    {
+        mEnableDebugMarkers = bEnable;
+
+        if( bEnable )
+            createDebugMarkers();
+        else
+            destroyDebugMarkers();
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    InstantRadiosity::SparseCluster::SparseCluster() {}
+    //-----------------------------------------------------------------------------------
+    InstantRadiosity::SparseCluster::SparseCluster( int32 blockX, int32 blockY, int32 blockZ,
+                                                    const Vector3 _diffuse, const Vector3 dir ) :
+        diffuse( _diffuse ), direction( dir )
+    {
+        blockHash[0] = blockX;
+        blockHash[1] = blockY;
+        blockHash[2] = blockZ;
+    }
+    //-----------------------------------------------------------------------------------
+    InstantRadiosity::SparseCluster::SparseCluster( int32 _blockHash[3] ) :
+        diffuse( Vector3::ZERO ), direction( Vector3::ZERO )
+    {
+        blockHash[0] = _blockHash[0];
+        blockHash[1] = _blockHash[1];
+        blockHash[2] = _blockHash[2];
+    }
+    //-----------------------------------------------------------------------------------
+    bool InstantRadiosity::SparseCluster::operator () ( const SparseCluster &_l, int32 _r[3] ) const
+    {
+        return memcmp( _l.blockHash, _r, sizeof( blockHash ) ) < 0;
+    }
+    bool InstantRadiosity::SparseCluster::operator () ( int32 _l[3], const SparseCluster &_r ) const
+    {
+        return memcmp( _l, _r.blockHash, sizeof( blockHash ) ) < 0;
+    }
+    bool InstantRadiosity::SparseCluster::operator () ( const SparseCluster &_l,
+                                                         const SparseCluster &_r ) const
+    {
+        return memcmp( _l.blockHash, _r.blockHash, sizeof( blockHash ) ) < 0;
     }
 }

@@ -81,8 +81,25 @@ namespace Ogre
             Real    numMergedVpls;
         };
 
+        struct SparseCluster
+        {
+            int32   blockHash[3];
+            Vector3 diffuse;
+            Vector3 direction;
+
+            SparseCluster();
+            SparseCluster( int32 blockX, int32 blockY, int32 blockZ,
+                           const Vector3 _diffuse, const Vector3 dir );
+            SparseCluster( int32 _blockHash[3] );
+
+            bool operator () ( const SparseCluster &_l, int32 _r[3] ) const;
+            bool operator () ( int32 _l[3], const SparseCluster &_r ) const;
+            bool operator () ( const SparseCluster &_l, const SparseCluster &_r ) const;
+        };
+
         typedef vector<RayHit>::type RayHitVec;
         typedef vector<Vpl>::type VplVec;
+        typedef set<SparseCluster, SparseCluster>::type SparseClusterSet;
 
         struct OrderRenderOperation
         {
@@ -112,6 +129,8 @@ namespace Ogre
         /// mVplMaxRange (thus increasing performance) at the cost of lower accuracy but still
         /// "looking good".
         Real            mBias;
+        uint32          mNumSpreadIterations;
+        Real            mSpreadThreshold;
 
         /// Areas of interest. Only used for directional lights. Normally you don't want to
         /// use this system for empty landscapes because a regular environment map and simple
@@ -142,11 +161,15 @@ namespace Ogre
         RawSimdUniquePtr<ArrayRay, MEMCATEGORY_GENERAL> mArrayRays;
 
         FastArray<size_t> mTmpRaysThatHitObject[ARRAY_PACKED_REALS];
+        SparseClusterSet  mTmpSparseClusters[3];
 
         typedef map<VertexArrayObject*, MeshData>::type MeshDataMapV2;
         typedef map<v1::RenderOperation, MeshData, OrderRenderOperation>::type MeshDataMapV1;
         MeshDataMapV2   mMeshDataMapV2;
         MeshDataMapV1   mMeshDataMapV1;
+
+        vector<Item*>::type mDebugMarkers;
+        bool                mEnableDebugMarkers;
 
         /**
         @param lightPos
@@ -180,11 +203,16 @@ namespace Ogre
         /// Generates the VPLs from a particular lights, and clusters them.
         void generateAndClusterVpls( Vector3 lightColour, Real attenConst,
                                      Real attenLinear, Real attenQuad );
+        void spreadSparseClusters( const SparseClusterSet &grid0, SparseClusterSet &inOutGrid1 );
+        void createVplsFromSpreadClusters( const SparseClusterSet &spreadCluster );
         /// Clusters the VPL from all lights (these VPLs may have been clustered with other
         /// VPLs from the same light, now we need to do this again with lights from different
         /// clusters)
         void clusterAllVpls(void);
         void autogenerateAreaOfInfluence(void);
+
+        void createDebugMarkers(void);
+        void destroyDebugMarkers(void);
 
     public:
         InstantRadiosity( SceneManager *sceneManager, HlmsManager *hlmsManager );
@@ -205,6 +233,9 @@ namespace Ogre
         /// them after build (in case you want to build again).
         /// If you wish to free that memory, call this function.
         void freeMemory(void);
+
+        void setEnableDebugMarkers( bool bEnable );
+        bool getEnableDebugMarkers(void) const      { return mEnableDebugMarkers; }
     };
 
     /** @} */
