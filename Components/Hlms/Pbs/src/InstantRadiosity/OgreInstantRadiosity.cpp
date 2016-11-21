@@ -75,6 +75,11 @@ namespace Ogre
             return saturatedRand() * Real(2.0) - Real(1.0);
         }
 
+        Real rangeRand( Real min, Real max )
+        {
+            return saturatedRand() * (max - min) + min;
+        }
+
         Vector3 getRandomDir(void)
         {
             const Real theta= Real(2.0) * Math::PI * saturatedRand();
@@ -107,6 +112,31 @@ namespace Ogre
             retVal.x = sqrtR * Math::Cos( theta );
             retVal.y = sqrtR * Math::Sin( theta );
 
+            return retVal;
+        }
+
+        Vector3 getRandomDirInRange( Radian angle )
+        {
+            const Real theta= Real(2.0) * Math::PI * saturatedRand();
+            const Real z    = rangeRand( Math::Cos( angle ), 1.0f );
+
+            const Real sharedTerm = Math::Sqrt( Real(1.0) - z * z );
+
+            Vector3 retVal;
+            retVal.x = sharedTerm * Math::Cos( theta );
+            retVal.y = sharedTerm * Math::Sin( theta );
+            retVal.z = z;
+
+            return retVal;
+        }
+
+        Vector3 randomizeDirAroundCone( const Vector3 vDir, Radian angle )
+        {
+            Vector3 vUp = vDir.perpendicular();
+            Vector3 vRight = vUp.crossProduct( vDir );
+            Quaternion qRot;
+            qRot.FromAxes( vRight, vUp, vDir );
+            Vector3 retVal = qRot * getRandomDirInRange( angle );
             return retVal;
         }
     };
@@ -601,14 +631,15 @@ namespace Ogre
             numRays = static_cast<size_t>( mNumRays * powf( mSurvivingRayFraction, k + 1 ) );
             numRays = std::min<size_t>( numRays, std::max<int>( 0, mTotalNumRays - rayStart ) );
 
-            numRays = generateRayBounces( oldRayStart, oldNumRays, numRays );
+            numRays = generateRayBounces( oldRayStart, oldNumRays, numRays, rng );
         }
 
         generateAndClusterVpls( lightColour, attenConst, attenLinear, attenQuad );
     }
     //-----------------------------------------------------------------------------------
     size_t InstantRadiosity::generateRayBounces( size_t raySrcStart, size_t raySrcCount,
-                                                 size_t raysToGenerate )
+                                                 size_t raysToGenerate,
+                                                 RandomNumberGenerator &rng )
     {
         size_t rayIdx = raySrcStart;
         size_t raysRemaining = raysToGenerate;
@@ -636,7 +667,7 @@ namespace Ogre
                 mRayHits[i].distance = std::numeric_limits<Real>::max();
                 mRayHits[i].accumDistance = hit.accumDistance + hit.distance;
                 mRayHits[i].ray.setOrigin( pointOnTri );
-                mRayHits[i].ray.setDirection( hit.triNormal.reflect( -hit.ray.getDirection() ) );
+                mRayHits[i].ray.setDirection( rng.randomizeDirAroundCone( hit.triNormal, Degree( 90.0f ) ) );
                 arrayRays[i].mOrigin.setAll( mRayHits[i].ray.getOrigin() );
                 arrayRays[i].mDirection.setAll( mRayHits[i].ray.getDirection() );
 
@@ -1073,9 +1104,9 @@ namespace Ogre
         {
             Vpl &vpl = *itor;
             Vector3 diffuseCol = vpl.diffuse * mVplPowerBoost;
-            if( diffuseCol.x >= mVplThreshold ||
-                diffuseCol.y >= mVplThreshold ||
-                diffuseCol.z >= mVplThreshold )
+            if( diffuseCol.x > mVplThreshold ||
+                diffuseCol.y > mVplThreshold ||
+                diffuseCol.z > mVplThreshold )
             {
                 if( !vpl.light )
                 {

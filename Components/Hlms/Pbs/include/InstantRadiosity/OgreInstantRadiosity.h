@@ -45,6 +45,8 @@ namespace Ogre
     *  @{
     */
 
+    class RandomNumberGenerator;
+
     class _OgreHlmsPbsExport InstantRadiosity
     {
         struct MeshData
@@ -203,7 +205,7 @@ namespace Ogre
         /// The generated rays are stored between mRayHits[raySrcStart+raySrcCount] &
         /// mRayHits[raySrcStart+raySrcCount+returnValue]
         size_t generateRayBounces( size_t raySrcStart, size_t raySrcCount,
-                                   size_t raysToGenerate );
+                                   size_t raysToGenerate, RandomNumberGenerator &rng);
 
         const MeshData* downloadVao( VertexArrayObject *vao );
         const MeshData* downloadRenderOp( const v1::RenderOperation &renderOp );
