@@ -77,8 +77,8 @@ namespace Ogre
             tmin = Mathlib::Max( tmin, Mathlib::Min( minIntersect.mChunkBase[2], tmax ) );
             tmax = Mathlib::Min( tmax, Mathlib::Max( maxIntersect.mChunkBase[2], tmin ) );
 #endif
-            //tmax > max( tmin, 0 )
-            return Mathlib::CompareGreater( tmax, Mathlib::Max( tmin, ARRAY_REAL_ZERO ) );
+            //tmax >= max( tmin, 0 )
+            return Mathlib::CompareGreaterEqual( tmax, Mathlib::Max( tmin, ARRAY_REAL_ZERO ) );
         }
     };
 }
