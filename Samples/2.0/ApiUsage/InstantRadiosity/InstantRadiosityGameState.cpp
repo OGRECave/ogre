@@ -243,6 +243,8 @@ namespace Demo
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mCellSize );
         outText += "\nBias [K]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mBias );
+        outText += "\nSpread Iterations [L]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumSpreadIterations );
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         outText += "\nCamera: ";
@@ -282,6 +284,22 @@ namespace Demo
             //Too many rays and the app will become unresponsive
             mInstantRadiosity->mNumRays = std::max<size_t>( mInstantRadiosity->mNumRays, 1u );
             mInstantRadiosity->mNumRays = std::min<size_t>( mInstantRadiosity->mNumRays, 32768u );
+
+            mInstantRadiosity->build();
+        }
+        else if( arg.keysym.sym == SDLK_l )
+        {
+            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            if( reverse )
+            {
+                if( mInstantRadiosity->mNumSpreadIterations )
+                    --mInstantRadiosity->mNumSpreadIterations;
+            }
+            else
+            {
+                if( mInstantRadiosity->mNumSpreadIterations < 100 )
+                    ++mInstantRadiosity->mNumSpreadIterations;
+            }
 
             mInstantRadiosity->build();
         }

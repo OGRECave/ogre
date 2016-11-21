@@ -350,7 +350,7 @@ namespace Ogre
                     NdotL += Ogre::max( lightDir.dotProduct( vDirs[i][j] ), 0 );
                 NdotL /= 9.0f;
 
-                const Vector3 diffuseCol = NdotL * itor->diffuse * invNumSpreadIterations;
+                const Vector3 diffuseCol = NdotL * itor->diffuse;
 
                 if( diffuseCol.x >= mSpreadThreshold ||
                     diffuseCol.y >= mSpreadThreshold ||
@@ -370,7 +370,7 @@ namespace Ogre
                     }
 
                     //TODO: Consider attenuation.
-                    gridCluster->diffuse    += diffuseCol;
+                    gridCluster->diffuse    += diffuseCol * invNumSpreadIterations;
                     gridCluster->direction  += itor->direction;
                 }
             }
