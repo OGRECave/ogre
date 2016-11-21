@@ -218,8 +218,10 @@ namespace Ogre
                 continue;
             }
 
+            const Real accumDistance = hit.accumDistance + hit.distance;
+
             Real atten = Real(1.0f) /
-                    (attenConst + (attenLinear + attenQuad * hit.distance) * hit.distance);
+                    (attenConst + (attenLinear + attenQuad * accumDistance) * accumDistance);
             atten = Ogre::min( Real(1.0f), atten );
 
             const Vector3 pointOnTri = hit.ray.getPoint( hit.distance * bias );
@@ -241,8 +243,10 @@ namespace Ogre
             {
                 const RayHit &alikeHit = *itor;
 
+                const Real alikeAccumDistance = alikeHit.accumDistance + alikeHit.distance;
                 Real alikeAtten = Real(1.0f) /
-                        (attenConst + (attenLinear + attenQuad * alikeHit.distance) * alikeHit.distance);
+                        (attenConst + (attenLinear +
+                                       attenQuad * alikeAccumDistance) * alikeAccumDistance);
                 alikeAtten = Ogre::min( Real(1.0f), alikeAtten );
 
                 const Vector3 pointOnTri02 = alikeHit.ray.getPoint( alikeHit.distance * bias );
@@ -531,6 +535,7 @@ namespace Ogre
         for( size_t i=0; i<mNumRays; ++i )
         {
             mRayHits[i].distance = std::numeric_limits<Real>::max();
+            mRayHits[i].accumDistance = 0;
 
             if( lightType == Light::LT_POINT )
             {
@@ -629,6 +634,7 @@ namespace Ogre
 
                 size_t i = rayDstStart++;
                 mRayHits[i].distance = std::numeric_limits<Real>::max();
+                mRayHits[i].accumDistance = hit.accumDistance + hit.distance;
                 mRayHits[i].ray.setOrigin( pointOnTri );
                 mRayHits[i].ray.setDirection( hit.triNormal.reflect( -hit.ray.getDirection() ) );
                 arrayRays[i].mOrigin.setAll( mRayHits[i].ray.getOrigin() );

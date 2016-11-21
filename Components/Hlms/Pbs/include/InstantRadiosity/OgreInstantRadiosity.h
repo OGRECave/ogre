@@ -66,6 +66,7 @@ namespace Ogre
         struct RayHit
         {
             Real    distance;
+            Real    accumDistance;
             //Vector3 pointOnTri;
             Vector3 materialDiffuse;
             Vector3 triVerts[3];
