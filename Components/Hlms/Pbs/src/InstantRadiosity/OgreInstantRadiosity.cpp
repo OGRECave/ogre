@@ -369,9 +369,12 @@ namespace Ogre
                         gridCluster = grid1.find( (int32*)newBlockHash );
                     }
 
+                    //We guarantee we won't change the order of the iterators.
+                    SparseCluster *gridClusterNonConst = const_cast<SparseCluster*>( &(*gridCluster) );
+
                     //TODO: Consider attenuation.
-                    gridCluster->diffuse    += diffuseCol * invNumSpreadIterations;
-                    gridCluster->direction  += itor->direction;
+                    gridClusterNonConst->diffuse    += diffuseCol * invNumSpreadIterations;
+                    gridClusterNonConst->direction  += itor->direction;
                 }
             }
 
