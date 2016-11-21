@@ -122,6 +122,8 @@ namespace Ogre
         mLightMask( 0xffffffff ),
         //mNumRays( 10000 ),
         mNumRays( 32 ),
+        mNumRayBounces( 0 ),
+        mSurvivingRayFraction( 0.5f ),
         mCellSize( 2 ),
         mVplMaxRange( 12 ),
         mVplConstAtten( 0.5 ),
@@ -132,6 +134,7 @@ namespace Ogre
         mNumSpreadIterations( 6 ),
         mSpreadThreshold( 0.0004 ),
         mVplPowerBoost( 2.0f ),
+        mTotalNumRays( 0 ),
         mEnableDebugMarkers( false )
     {
     }
@@ -267,7 +270,7 @@ namespace Ogre
             }
 
             //vpl.diffuse /= numCollectedVpls;
-            vpl.diffuse /= mNumRays;
+            vpl.diffuse /= mTotalNumRays;
             vpl.position/= numCollectedVpls;
             vpl.normal.normalise();
             vpl.numMergedVpls = numCollectedVpls;
@@ -521,7 +524,7 @@ namespace Ogre
 
         //Same RNG/seed for every object & triangle
         RandomNumberGenerator rng;
-        mRayHits.resize( mNumRays );
+        mRayHits.resize( mTotalNumRays );
 
         ArrayRay * RESTRICT_ALIAS arrayRays = mArrayRays.get();
 
@@ -562,26 +565,80 @@ namespace Ogre
             ++arrayRays;
         }
 
-        for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
+        size_t rayStart = 0;
+        size_t numRays = mNumRays;
+
+        for( size_t k=0; k<mNumRayBounces + 1u; ++k )
         {
-            ObjectMemoryManager &memoryManager = mSceneManager->_getEntityMemoryManager(
-                        static_cast<SceneMemoryMgrTypes>(i) );
-
-            const size_t numRenderQueues = memoryManager.getNumRenderQueues();
-
-            size_t firstRq = std::min<size_t>( mFirstRq, numRenderQueues );
-            size_t lastRq  = std::min<size_t>( mLastRq,  numRenderQueues );
-
-            for( size_t j=firstRq; j<lastRq; ++j )
+            for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
             {
-                ObjectData objData;
-                const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
-                testLightVsAllObjects( lightType, lightRange, objData, totalObjs,
-                                       areaOfInfluence );
+                ObjectMemoryManager &memoryManager = mSceneManager->_getEntityMemoryManager(
+                            static_cast<SceneMemoryMgrTypes>(i) );
+
+                const size_t numRenderQueues = memoryManager.getNumRenderQueues();
+
+                size_t firstRq = std::min<size_t>( mFirstRq, numRenderQueues );
+                size_t lastRq  = std::min<size_t>( mLastRq,  numRenderQueues );
+
+                for( size_t j=firstRq; j<lastRq; ++j )
+                {
+                    ObjectData objData;
+                    const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
+                    testLightVsAllObjects( lightType, lightRange, objData, totalObjs,
+                                           areaOfInfluence, rayStart, numRays );
+                }
             }
+
+            const size_t oldRayStart    = rayStart;
+            const size_t oldNumRays     = numRays;
+
+            rayStart += numRays;
+            numRays = static_cast<size_t>( mNumRays * powf( mSurvivingRayFraction, k + 1 ) );
+            numRays = std::min<size_t>( numRays, std::max<int>( 0, mTotalNumRays - rayStart ) );
+
+            numRays = generateRayBounces( oldRayStart, oldNumRays, numRays );
         }
 
         generateAndClusterVpls( lightColour, attenConst, attenLinear, attenQuad );
+    }
+    //-----------------------------------------------------------------------------------
+    size_t InstantRadiosity::generateRayBounces( size_t raySrcStart, size_t raySrcCount,
+                                                 size_t raysToGenerate )
+    {
+        size_t rayIdx = raySrcStart;
+        size_t raysRemaining = raysToGenerate;
+        size_t rayDstStart = raySrcStart + raySrcCount;
+        const size_t raySrcLimit = rayDstStart;
+
+        const Real bias = mBias;
+
+        ArrayRay * RESTRICT_ALIAS arrayRays = mArrayRays.get();
+
+        while( rayIdx < raySrcLimit && raysRemaining > 0 )
+        {
+            while( rayIdx < raySrcLimit &&
+                   mRayHits[rayIdx].distance >= std::numeric_limits<Real>::max() )
+            {
+                ++rayIdx;
+            }
+
+            if( rayIdx < raySrcLimit )
+            {
+                const RayHit &hit = mRayHits[rayIdx];
+                const Vector3 pointOnTri = hit.ray.getPoint( hit.distance * bias );
+
+                size_t i = rayDstStart++;
+                mRayHits[i].distance = std::numeric_limits<Real>::max();
+                mRayHits[i].ray.setOrigin( pointOnTri );
+                mRayHits[i].ray.setDirection( hit.triNormal.reflect( -hit.ray.getDirection() ) );
+                arrayRays[i].mOrigin.setAll( mRayHits[i].ray.getOrigin() );
+                arrayRays[i].mDirection.setAll( mRayHits[i].ray.getDirection() );
+
+                --raysRemaining;
+            }
+        }
+
+        return raysToGenerate - raysRemaining;
     }
     //-----------------------------------------------------------------------------------
     const InstantRadiosity::MeshData* InstantRadiosity::downloadVao( VertexArrayObject *vao )
@@ -795,9 +852,9 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::testLightVsAllObjects( uint8 lightType, Real lightRange,
                                                   ObjectData objData, size_t numNodes,
-                                                  const Aabb &scalarAreaOfInfluence )
+                                                  const Aabb &scalarAreaOfInfluence,
+                                                  size_t rayStart, size_t numRays )
     {
-        const size_t numRays = mNumRays;
         const ArrayInt sceneFlags = Mathlib::SetAll( mVisibilityMask &
                                                      VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
         ArrayAabb areaOfInfluence( ArrayVector3::ZERO, ArrayVector3::ZERO );
@@ -833,7 +890,7 @@ namespace Ogre
                 mTmpRaysThatHitObject[k].clear();
 
             //Make a list of rays that hit these objects (i.e. broadphase)
-            ArrayRay * RESTRICT_ALIAS arrayRays = mArrayRays.get();
+            ArrayRay * RESTRICT_ALIAS arrayRays = mArrayRays.get() + rayStart;
             for( size_t j=0; j<numRays; ++j )
             {
                 ArrayMaskR rayHits = arrayRays->intersects( *objData.mWorldAabb );
@@ -841,7 +898,7 @@ namespace Ogre
                 for( size_t k=0; k<ARRAY_PACKED_REALS; ++k )
                 {
                     if( IS_BIT_SET( k, scalarRayHits ) )
-                        mTmpRaysThatHitObject[k].push_back( j );
+                        mTmpRaysThatHitObject[k].push_back( j + rayStart );
                 }
 
                 ++arrayRays;
@@ -1075,6 +1132,26 @@ namespace Ogre
     {
         clear();
 
+        if( mNumRayBounces > 0 && (mSurvivingRayFraction <= 0 || mSurvivingRayFraction > 1.0f) )
+        {
+            OGRE_EXCEPT( Exception::ERR_INVALIDPARAMS,
+                         "For multiple bounces, mSurvivingRayFraction must be in range (0; 1]",
+                         "InstantRadiosity::build" );
+        }
+
+        //Sum of the first n terms of a geometric series
+        //mNumRays + mNumRays * mSurvivingRayFraction + mNumRays * mSurvivingRayFraction^2 + ...
+        if( mSurvivingRayFraction != 1.0f )
+        {
+            mTotalNumRays = static_cast<size_t>( mNumRays *
+                        (1.0f - powf( mSurvivingRayFraction, mNumRayBounces + 1u )) /
+                        (1.0f - mSurvivingRayFraction) );
+        }
+        else
+        {
+            mTotalNumRays = mNumRays * (mNumRayBounces + 1u);
+        }
+
         //Ensure position & AABB data is up to date.
         mSceneManager->updateSceneGraph();
         mSceneManager->clearFrameData();
@@ -1089,7 +1166,7 @@ namespace Ogre
                          "InstantRadiosity::build" );
         }
 
-        mArrayRays = RawSimdUniquePtr<ArrayRay, MEMCATEGORY_GENERAL>( mNumRays );
+        mArrayRays = RawSimdUniquePtr<ArrayRay, MEMCATEGORY_GENERAL>( mTotalNumRays );
 
         const uint32 lightMask = mLightMask & VisibilityFlags::RESERVED_VISIBILITY_FLAGS;
 
