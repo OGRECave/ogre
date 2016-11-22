@@ -1,9 +1,7 @@
 project(OgrePython)
 
 find_package(SWIG)
-find_package(PythonLibs)
 include_directories(${PYTHON_INCLUDE_PATH})
-find_package(PythonInterp)
 
 if(NOT PYTHONLIBS_FOUND OR NOT SWIG_FOUND)
     return()
