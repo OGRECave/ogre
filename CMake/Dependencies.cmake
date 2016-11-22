@@ -312,11 +312,14 @@ macro_log_feature(GLSL_Optimizer_FOUND "GLSL Optimizer" "GLSL Optimizer" "http:/
 find_package(HLSL2GLSL)
 macro_log_feature(HLSL2GLSL_FOUND "HLSL2GLSL" "HLSL2GLSL" "http://hlsl2glslfork.googlecode.com/" FALSE "" "")
 
+# OpenEXR
+find_package(OpenEXR)
+macro_log_feature(OPENEXR_FOUND "OpenEXR" "Load High dynamic range images" "http://www.openexr.com/" FALSE "" "")
+
 # Python
-if (EMSCRIPTEN)
-  find_package(PythonInterp)
-  macro_log_feature(PYTHONINTERP_FOUND "Python" "Used to generate indices for dynamic file loading" "http://www.python.org/" FALSE "" "")
-endif()
+find_package(PythonLibs)
+find_package(PythonInterp)
+macro_log_feature(PYTHONLIBS_FOUND "Python" "Language bindings to use OGRE from Python" "http://www.python.org/" FALSE "" "")
 
 #######################################################################
 # Samples dependencies
