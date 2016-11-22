@@ -583,8 +583,6 @@ The height of the inner area which does not emit any particles.
 
 See also: [Particle Scripts](#Particle-Scripts), [Particle Emitters](#Particle-Emitters)
 
-<a name=""></a>
-
 ## Emitting Emitters {#Emitting-Emitters}
 
 It is possible to spawn new emitters on the expiry of particles, for example to product ’firework’ style effects. This is controlled via the following directives:

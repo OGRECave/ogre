@@ -732,7 +732,7 @@ namespace Ogre {
         void setNamedConstant(const String& name, int val);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, uint val) */
         void setNamedConstant(const String& name, uint val);
-        // /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, bool val) */
+        // /* @copydoc GpuProgramParameters::setNamedConstant(const String& name, bool val) */
         // void setNamedConstant(const String& name, bool val);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Vector4& vec) */
         void setNamedConstant(const String& name, const Vector4& vec);
@@ -744,17 +744,13 @@ namespace Ogre {
         void setNamedConstant(const String& name, const Matrix4& m);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const Matrix4* m, size_t numEntries) */
         void setNamedConstant(const String& name, const Matrix4* m, size_t numEntries);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const float *val, size_t count) */
         void setNamedConstant(const String& name, const float *val, size_t count);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const double *val, size_t count) */
         void setNamedConstant(const String& name, const double *val, size_t count);
         /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const ColourValue& colour) */
         void setNamedConstant(const String& name, const ColourValue& colour);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const int *val, size_t count) */
         void setNamedConstant(const String& name, const int *val, size_t count);
-        /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const uint *val, size_t count) */
         void setNamedConstant(const String& name, const uint *val, size_t count);
-        // /** @copydoc GpuProgramParameters::setNamedConstant(const String& name, const bool *val, size_t count) */
+        // /* @copydoc GpuProgramParameters::setNamedConstant(const String& name, const bool *val, size_t count) */
         // void setNamedConstant(const String& name, const bool *val, size_t count);
 
         /// Get a pointer to the 'nth' item in the float buffer
@@ -1635,7 +1631,7 @@ namespace Ogre {
             @param count The number of groups of 4 ints to write
         */
         void setConstant(size_t index, const uint *val, size_t count);
-        /** Sets a multiple value constant boolean parameter to the program.
+        /* Sets a multiple value constant boolean parameter to the program.
             @remarks
             Different types of GPU programs support different types of constant parameters.
             For example, it's relatively common to find that vertex programs only support
@@ -1679,7 +1675,7 @@ namespace Ogre {
             @param count The number of ints to write
         */
         void _writeRawConstants(size_t physicalIndex, const uint* val, size_t count);
-        // /** Write a series of boolean values into the underlying integer
+        // /* Write a series of boolean values into the underlying integer
         //     constant buffer at the given physical index.
         //     @param physicalIndex The buffer position to start writing
         //     @param val Pointer to a list of values to write
@@ -1745,7 +1741,7 @@ namespace Ogre {
             @param val The value to set
         */
         void _writeRawConstant(size_t physicalIndex, uint val);
-        /** Write a single boolean parameter to the program.
+        /* Write a single boolean parameter to the program.
             @note You can use these methods if you have already derived the physical
             constant buffer location, for a slight speed improvement over using
             the named / logical index versions.
@@ -1783,6 +1779,7 @@ namespace Ogre {
             constant buffer location, for a slight speed improvement over using
             the named / logical index versions.
             @param physicalIndex The physical buffer index at which to place the parameter
+            @param m The value to set
             @param numEntries Number of Matrix4 entries
         */
         void _writeRawConstant(size_t physicalIndex, const Matrix4* m, size_t numEntries);
@@ -2002,7 +1999,7 @@ namespace Ogre {
             @note Only applicable for low-level programs.
         */
         const AutoConstantEntry* findUnsignedIntAutoConstantEntry(size_t logicalIndex);
-        // /** Finds an auto constant that's affecting a given logical parameter
+        // /* Finds an auto constant that's affecting a given logical parameter
         //     index for boolean values.
         //     @note Only applicable for low-level programs.
         // */
@@ -2102,7 +2099,7 @@ namespace Ogre {
             @param val The value to set
         */
         void setNamedConstant(const String& name, uint val);
-        // /** Sets a single value constant boolean parameter to the program.
+        // Sets a single value constant boolean parameter to the program.
         //     @remarks
         //     Different types of GPU programs support different types of constant parameters.
         //     For example, it's relatively common to find that vertex programs only support
@@ -2120,8 +2117,9 @@ namespace Ogre {
         //     from a high-level program (HighLevelGpuProgram).
         //     @param name The name of the parameter
         //     @param val The value to set
-        // */
+        //
         // void setNamedConstant(const String& name, bool val);
+
         /** Sets a Vector4 parameter to the program.
             @param name The name of the parameter
             @param vec The value to set
@@ -2131,12 +2129,7 @@ namespace Ogre {
             @note
             This named option will only work if you are using a parameters object created
             from a high-level program (HighLevelGpuProgram).
-            @param index The index at which to place the parameter
-            NB this index refers to the number of floats, so a Vector3 is 3. Note that many
-            rendersystems & programs assume that every floating point parameter is passed in
-            as a vector of 4 items, so you are strongly advised to check with
-            RenderSystemCapabilities before using this version - if in doubt use Vector4
-            or ColourValue instead (both are 4D).
+            @param name The name of the parameter
             @param vec The value to set
         */
         void setNamedConstant(const String& name, const Vector3& vec);
@@ -2235,7 +2228,7 @@ namespace Ogre {
         */
         void setNamedConstant(const String& name, const uint *val, size_t count,
                               size_t multiple = 4);
-        // /** Sets a multiple value constant boolean parameter to the program.
+        // Sets a multiple value constant boolean parameter to the program.
         //     @par
         //     Some systems only allow constants to be set on certain boundaries,
         //     e.g. in sets of 4 values for example. The 'multiple' parameter allows
@@ -2250,7 +2243,7 @@ namespace Ogre {
         //     @param count The number of 'multiples' of floats to write
         //     @param multiple The number of raw entries in each element to write,
         //     the default is 4 so count = 1 would write 4 floats.
-        // */
+        //
         // void setNamedConstant(const String& name, const bool *val, size_t count,
         //                       size_t multiple = 4);
         /** Sets up a constant which will automatically be updated by the system.
@@ -2314,6 +2307,7 @@ namespace Ogre {
             @note Only applicable to low-level programs.
             @param logicalIndex The logical parameter index
             @param requestedSize The requested size - pass 0 to ignore missing entries
+            @param variability
             and return std::numeric_limits<size_t>::max()
         */
         size_t _getFloatConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
@@ -2338,7 +2332,7 @@ namespace Ogre {
             and return std::numeric_limits<size_t>::max()
         */
         size_t _getUnsignedIntConstantPhysicalIndex(size_t logicalIndex, size_t requestedSize, uint16 variability);
-        /** Gets the physical buffer index associated with a logical bool constant index.
+        /* Gets the physical buffer index associated with a logical bool constant index.
             @note Only applicable to low-level programs.
             @param logicalIndex The logical parameter index
             @param requestedSize The requested size - pass 0 to ignore missing entries

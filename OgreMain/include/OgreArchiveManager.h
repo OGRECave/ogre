@@ -70,6 +70,8 @@ namespace Ogre {
                 The filename that will be opened
             @param archiveType
                 The type of archive that this is. For example: "Zip".
+            @param readOnly
+                Whether the Archive is read only
             @return
                 If the function succeeds, a valid pointer to an Archive
                 object is returned.

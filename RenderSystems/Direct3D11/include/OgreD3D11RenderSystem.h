@@ -241,10 +241,8 @@ namespace Ogre
         /// @copydoc RenderSystem::_swapAllRenderTargetBuffers
         virtual void _swapAllRenderTargetBuffers();
 
-        /// @copydoc RenderSystem::fireDeviceEvent
         void fireDeviceEvent( D3D11Device* device, const String & name, D3D11RenderWindowBase* sendingWindow = NULL);
 
-        /// @copydoc RenderSystem::createRenderTexture
         RenderTexture * createRenderTexture( const String & name, unsigned int width, unsigned int height,
             TextureType texType = TEX_TYPE_2D, PixelFormat internalFormat = PF_X8R8G8B8, 
             const NameValuePairList *miscParams = 0 ); 
@@ -405,10 +403,8 @@ namespace Ogre
         
         D3D_FEATURE_LEVEL _getFeatureLevel() const { return mFeatureLevel; }
 
-        /// @copydoc RenderSystem::setSubroutine
         void setSubroutine(GpuProgramType gptype, unsigned int slotIndex, const String& subroutineName);
         
-        /// @copydoc RenderSystem::setSubroutineName
         void setSubroutine(GpuProgramType gptype, const String& slotName, const String& subroutineName);
 
         /// @copydoc RenderSystem::beginProfileEvent

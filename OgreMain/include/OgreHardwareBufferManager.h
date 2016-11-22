@@ -471,7 +471,6 @@ namespace Ogre {
             return mImpl->createCounterBuffer(sizeBytes, usage, useShadowBuffer, name);
         }
 
-        /** @copydoc HardwareBufferManagerInterface::createVertexDeclaration */
         virtual VertexDeclaration* createVertexDeclaration(void)
         {
             return mImpl->createVertexDeclaration();
@@ -553,12 +552,12 @@ namespace Ogre {
         {
             mImpl->_notifyIndexBufferDestroyed(buf);
         }
-        /** @copydoc HardwareBufferManagerInterface::_notifyUniformBufferDestroyed */
+        /** @copydoc HardwareBufferManagerBase::_notifyUniformBufferDestroyed */
         void _notifyUniformBufferDestroyed(HardwareUniformBuffer* buf)
         {
             mImpl->_notifyUniformBufferDestroyed(buf);
         }
-        /** @copydoc HardwareBufferManagerInterface::_notifyCounterBufferDestroyed */
+        /** @copydoc HardwareBufferManagerBase::_notifyCounterBufferDestroyed */
         void _notifyConterBufferDestroyed(HardwareCounterBuffer* buf)
         {
             mImpl->_notifyCounterBufferDestroyed(buf);

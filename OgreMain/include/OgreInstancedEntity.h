@@ -266,7 +266,7 @@ namespace Ogre
                 mParentNode ? mParentNode->_getDerivedPosition() : Vector3::ZERO;
         }
 
-        /** @copydoc MovableObject::isInScene. */
+        /** @copydoc MovableObject::isInScene */
         virtual bool isInScene(void) const
         {
             //We assume that the instanced entity is in the scene if it is in use

@@ -58,7 +58,7 @@ namespace Ogre{
         /// @copydoc Archive::create
         DataStreamPtr create(const String& filename);
 
-        /// @copydoc Archive::delete
+        /// @copydoc Archive::remove
         void remove(const String& filename);
 
         /// @copydoc Archive::list
@@ -87,13 +87,13 @@ namespace Ogre{
         virtual ~APKFileSystemArchiveFactory() {}
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
-        /// @copydoc FactoryObj::createInstance
+        /// @copydoc ArchiveFactory::createInstance
         Archive *createInstance( const String& name, bool readOnly ) 
         {
             return OGRE_NEW APKFileSystemArchive(name, getType(), mAssetMgr);
         }
         /// @copydoc FactoryObj::destroyInstance
-        void destroyInstance( Archive* arch) { OGRE_DELETE arch; }
+        void destroyInstance( Archive* ptr) { OGRE_DELETE ptr; }
     private:
         AAssetManager* mAssetMgr;
     };

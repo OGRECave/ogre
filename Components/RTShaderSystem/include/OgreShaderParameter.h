@@ -309,6 +309,7 @@ public:
     @param semantic The semantic of this parameter.
     @param index The index of this parameter.
     @param content The content of this parameter.
+    @param size
     */
     Parameter(GpuConstantType type, const String& name, 
         const Semantic& semantic, int index, 

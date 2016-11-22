@@ -44,10 +44,8 @@ namespace Ogre {
                              bool writeGamma, uint fsaa);
         ~GL3PlusTextureBuffer();
 
-        /// @copydoc HardwarePixelBuffer::bindToFramebuffer
         virtual void bindToFramebuffer(GLenum attachment, uint32 zoffset);
 
-        /// @copydoc HardwarePixelBuffer::getRenderTarget
         RenderTexture* getRenderTarget(size_t);
 
         /// Upload a box of pixels to this buffer on the card.

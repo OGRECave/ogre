@@ -109,7 +109,7 @@ namespace Ogre
         ManualObject(const String& name);
         virtual ~ManualObject();
 
-        /** @copydoc MovableObject::_releaseManualHardwareResources. */
+        /** @copydoc MovableObject::_releaseManualHardwareResources */
         void _releaseManualHardwareResources() { clear(); }
 
         //pre-declare ManualObjectSection
@@ -382,15 +382,15 @@ namespace Ogre
         bool getKeepDeclarationOrder() const { return mKeepDeclarationOrder; }
         // MovableObject overrides
 
-        /** @copydoc MovableObject::getMovableType. */
+        /** @copydoc MovableObject::getMovableType */
         const String& getMovableType(void) const;
-        /** @copydoc MovableObject::getBoundingBox. */
+        /** @copydoc MovableObject::getBoundingBox */
         const AxisAlignedBox& getBoundingBox(void) const;
-        /** @copydoc MovableObject::getBoundingRadius. */
+        /** @copydoc MovableObject::getBoundingRadius */
         Real getBoundingRadius(void) const;
-        /** @copydoc MovableObject::_updateRenderQueue. */
+        /** @copydoc MovableObject::_updateRenderQueue */
         void _updateRenderQueue(RenderQueue* queue);
-        /** Implement this method to enable stencil shadows. */
+        /** Implement this method to enable stencil shadows */
         EdgeData* getEdgeList(void);
         /** Overridden member from ShadowCaster. */
         bool hasEdgeList(void);
@@ -432,15 +432,15 @@ namespace Ogre
             bool get32BitIndices() const { return m32BitIndices; }
             
             // Renderable overrides
-            /** @copydoc Renderable::getMaterial. */
+            /** @copydoc Renderable::getMaterial */
             const MaterialPtr& getMaterial(void) const;
-            /** @copydoc Renderable::getRenderOperation. */
+            /** @copydoc Renderable::getRenderOperation */
             void getRenderOperation(RenderOperation& op);
-            /** @copydoc Renderable::getWorldTransforms. */
+            /** @copydoc Renderable::getWorldTransforms */
             void getWorldTransforms(Matrix4* xform) const;
-            /** @copydoc Renderable::getSquaredViewDepth. */
+            /** @copydoc Renderable::getSquaredViewDepth */
             Real getSquaredViewDepth(const Ogre::Camera *) const;
-            /** @copydoc Renderable::getLights. */
+            /** @copydoc Renderable::getLights */
             const LightList &getLights(void) const;
 
 

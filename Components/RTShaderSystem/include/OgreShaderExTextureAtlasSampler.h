@@ -263,8 +263,10 @@ public:
     
         The ".tai" format consist of lines, where each line corresponds to a specific texture
         in the texture atlas. Each line has the following format:
-        # <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
-    
+        @verbatim
+        <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
+        @endverbatim
+
         @param filename The full path to the file containing a ".tai" format data.
         @param textureAtlasTable A table into which the data in the stream will be filled. This
             parameter will be filled only if it is not null. The system factory keeps a copy of this
@@ -272,19 +274,9 @@ public:
     */
     bool addTexutreAtlasDefinition( const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
     /**
-        Adds a texture atlas definition from a stream. 
+        @overload addTexutreAtlasDefinition(const Ogre::String& filename, TextureAtlasTablePtr textureAtlasTable)
 
-        This function loads a texture atlas definition file from a stream. The accepted format for
-        this file is the NVidia Texture Atlas Tools ".tai" file format. This file as
-    
-        The ".tai" format consist of lines, where each line corresponds to a specific texture
-        in the texture atlas. Each line has the following format:
-        # <original texture filename>/t/t<atlas filename>, <atlas idx>, <atlas type>, <woffset>, <hoffset>, <depth offset>, <width>, <height>
-    
         @param stream A stream to a file containing ".tai" format data
-        @param textureAtlasTable A table into which the data in the stream will be filled. This
-            parameter will be filled only if it is not null. The system factory keeps a copy of this
-            information in any case.
     */
     bool addTexutreAtlasDefinition( DataStreamPtr stream, TextureAtlasTablePtr textureAtlasTable = TextureAtlasTablePtr());
 

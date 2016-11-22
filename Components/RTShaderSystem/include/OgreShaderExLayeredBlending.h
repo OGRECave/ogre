@@ -130,6 +130,7 @@ public:
 
     /** 
     Set the source modifier parameters for a given texture unit
+    @param index Texture blend index
     @param modType The source modification type to use
     @param customNum The custom parameter number used to control the modification
     */

@@ -92,7 +92,7 @@ namespace Ogre {
             virtual void notifyResourcesCreated(bool forResizeOnly);
 
             /** Notification before resources have been destructed.
-              @param resizeOnly Was the creation because the viewport was resized?
+              @param forResizeOnly Was the creation because the viewport was resized?
              */
             virtual void notifyResourcesReleased(bool forResizeOnly);
         };

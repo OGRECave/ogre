@@ -188,18 +188,18 @@ namespace Ogre
         /** Check if portal touches another portal */
         bool closeTo(const PortalBase* otherPortal);
 
-        /** @copydoc MovableObject::getBoundingBox. */
+        /** @copydoc MovableObject::getBoundingBox */
         const AxisAlignedBox& getBoundingBox() const;
 
-        /** @copydoc MovableObject::getBoundingRadius. */
+        /** @copydoc MovableObject::getBoundingRadius */
         Real getBoundingRadius() const
         { return getRadius(); }
 
-        /** @copydoc MovableObject::_updateRenderQueue. */
+        /** @copydoc MovableObject::_updateRenderQueue */
         void _updateRenderQueue(RenderQueue* queue)
         { /* Draw debug info if needed? */ }
 
-        /** @copydoc MovableObject::visitRenderables. */
+        /** @copydoc MovableObject::visitRenderables */
         void visitRenderables(Renderable::Visitor* visitor, bool debugRenderables = false)
         { }
 

@@ -411,29 +411,29 @@ namespace Ogre {
         */
         void setMaterial(const MaterialPtr& material);
 
-        /** @copydoc MovableObject::_releaseManualHardwareResources. */
+        /** @copydoc MovableObject::_releaseManualHardwareResources */
         void _releaseManualHardwareResources();
-        /** @copydoc MovableObject::_restoreManualHardwareResources. */
+        /** @copydoc MovableObject::_restoreManualHardwareResources */
         void _restoreManualHardwareResources();
 
-        /** @copydoc MovableObject::_notifyCurrentCamera.
+        /** @copydoc MovableObject::_notifyCurrentCamera
         */
         void _notifyCurrentCamera(Camera* cam);
 
-        /// @copydoc MovableObject::setRenderQueueGroup.
+        /// @copydoc MovableObject::setRenderQueueGroup
         void setRenderQueueGroup(uint8 queueID);
 
-        /// @copydoc MovableObject::setRenderQueueGroupAndPriority.
+        /// @copydoc MovableObject::setRenderQueueGroupAndPriority
         void setRenderQueueGroupAndPriority(uint8 queueID, ushort priority);
 
-        /** @copydoc MovableObject::getBoundingBox.
+        /** @copydoc MovableObject::getBoundingBox
         */
         const AxisAlignedBox& getBoundingBox(void) const;
 
         /// Merge all the child object Bounds a return it.
         AxisAlignedBox getChildObjectsBoundingBox(void) const;
 
-        /** @copydoc MovableObject::_updateRenderQueue.
+        /** @copydoc MovableObject::_updateRenderQueue
         */
         void _updateRenderQueue(RenderQueue* queue);
 
@@ -606,11 +606,11 @@ namespace Ogre {
         /** @copydoc MovableObject::getWorldBoundingSphere */
         const Sphere& getWorldBoundingSphere(bool derive = false) const;
 
-        /** @copydoc ShadowCaster::getEdgeList. */
+        /** @copydoc ShadowCaster::getEdgeList */
         EdgeData* getEdgeList(void);
-        /** @copydoc ShadowCaster::hasEdgeList. */
+        /** @copydoc ShadowCaster::hasEdgeList */
         bool hasEdgeList(void);
-        /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator. */
+        /** @copydoc ShadowCaster::getShadowVolumeRenderableIterator */
         ShadowRenderableListIterator getShadowVolumeRenderableIterator(
             ShadowTechnique shadowTechnique, const Light* light,
             HardwareIndexBufferSharedPtr* indexBuffer, size_t* indexBufferUsedSize,

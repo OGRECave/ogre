@@ -447,7 +447,7 @@ namespace Ogre {
                 The size in bytes
             @remarks
                 In case that the format is non-compressed, this simply returns
-                width*height*depth*PixelUtil::getNumElemBytes(format). In the compressed
+                width * height * depth * PixelUtil::getNumElemBytes(format). In the compressed
                 case, this does serious magic.
         */
         static size_t getMemorySize(uint32 width, uint32 height, uint32 depth, PixelFormat format);

@@ -62,6 +62,7 @@ namespace Ogre {
         virtual ~ArchiveFactory() {}
         /** Creates a new object.
         @param name Name of the object to create
+        @param readOnly whether the Archive is read only
         @return
             An object created by the factory. The type of the object depends on
             the factory.
