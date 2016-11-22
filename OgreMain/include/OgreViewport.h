@@ -393,7 +393,7 @@ namespace Ogre {
 			the render target does not support stereo (ie. left
 			and right), then only back and front will be used.
 		@param
-			buffer Specifies the particular buffer that will be
+			colourBuffer Specifies the particular buffer that will be
 			targeted by the render target.
 		*/
 		void setDrawBuffer(ColourBufferType colourBuffer);

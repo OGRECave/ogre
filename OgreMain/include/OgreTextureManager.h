@@ -76,8 +76,8 @@ namespace Ogre {
 
         using ResourceManager::createOrRetrieve;
 
-        /** Create a new texture, or retrieve an existing one with the same
-            name if it already exists.
+        /** @overload ResourceManager::createOrRetrieve
+
             @param
                 texType The type of texture to load/create, defaults to normal 2D textures
             @param
@@ -99,7 +99,6 @@ namespace Ogre {
                 to linear space when reading from this texture. Only applicable for 
                 8-bits per channel textures, will be ignored for other types. Has the advantage
                 over pre-applied gamma that the texture precision is maintained.
-            @see ResourceManager::createOrRetrieve
         */
         ResourceCreateOrRetrieveResult createOrRetrieve(
             const String &name, const String& group, bool isManual,

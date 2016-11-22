@@ -137,7 +137,6 @@ namespace Ogre {
         /** Default constructor. */
         DistanceLodSphereStrategy();
 
-        /// @copydoc DistanceLodStrategy::getSquaredDepth
         Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const;
 
         /** Override standard Singleton retrieval.
@@ -199,7 +198,6 @@ namespace Ogre {
         /** Default constructor. */
         DistanceLodBoxStrategy();
 
-        /// @copydoc DistanceLodStrategy::getSquaredDepth
         Real getSquaredDepth(const MovableObject *movableObject, const Ogre::Camera *camera) const;
 
         /** Override standard Singleton retrieval.

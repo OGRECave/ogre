@@ -41,8 +41,7 @@ namespace Ogre
     */
     /** \addtogroup Paging
     *  Some details on paging component
-    */
-    /** @{ */
+    * @{ */
 
 
     /// The 2D grid mode

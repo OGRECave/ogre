@@ -85,7 +85,7 @@ namespace Ogre
         and happen to also hash to the same number.
     @par
         In practice we truncate to 32 bytes. If your fear this is too little for you and
-        also fear about collisions, increase @OGRE_DEBUG_STR_SIZE
+        also fear about collisions, increase @see OGRE_DEBUG_STR_SIZE
     @author
         Matias N. Goldberg
     @version

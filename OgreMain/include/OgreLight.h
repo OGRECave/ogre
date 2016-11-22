@@ -328,7 +328,7 @@ namespace Ogre {
         /** Retrieves the direction of the light including any transform from nodes it is attached to. */
         const Vector3& getDerivedDirection(void) const;
 
-        /** @copydoc MovableObject::setVisible.
+        /** @copydoc MovableObject::setVisible
         @remarks
             Although lights themselves are not 'visible', setting a light to invisible
             means it no longer affects the scene.

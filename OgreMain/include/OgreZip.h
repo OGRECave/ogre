@@ -138,7 +138,7 @@ namespace Ogre {
         virtual ~EmbeddedZipArchiveFactory();
         /// @copydoc FactoryObj::getType
         const String& getType(void) const;
-        /// @copydoc FactoryObj::createInstance
+        /// @copydoc ArchiveFactory::createInstance
         Archive *createInstance( const String& name, bool readOnly ) 
         {
             ZipArchive * resZipArchive = OGRE_NEW ZipArchive(name, "EmbeddedZip", mPluginIo);

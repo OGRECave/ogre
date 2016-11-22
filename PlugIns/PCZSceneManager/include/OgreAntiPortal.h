@@ -42,7 +42,7 @@ namespace Ogre
         AntiPortal(const String &name, const PORTAL_TYPE type = PORTAL_TYPE_QUAD);
         virtual ~AntiPortal();
 
-        /** @copydoc MovableObject::getMovableType. */
+        /** @copydoc MovableObject::getMovableType */
         const String& getMovableType() const;
 
     };

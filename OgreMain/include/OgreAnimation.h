@@ -241,6 +241,7 @@ namespace Ogre {
         @remarks
             It does not consider the actual node tracks are attached to.
             As such, it resembles the apply method for a given skeleton (see below).
+        @param node
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
           other animations.
@@ -253,6 +254,7 @@ namespace Ogre {
         @remarks
             Where you have associated animation tracks with Node objects, you can easily apply
             an animation to those nodes by calling this method.
+        @param skeleton
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
             other animations.
@@ -265,6 +267,7 @@ namespace Ogre {
         @remarks
             Where you have associated animation tracks with Node objects, you can easily apply
             an animation to those nodes by calling this method.
+        @param skeleton
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
             other animations.
@@ -290,6 +293,7 @@ namespace Ogre {
         /** Applies all numeric tracks given a specific time point and weight to the specified animable value.
         @remarks
             It does not applies to actual attached animable values but rather uses all tracks for a single animable value.
+        @param anim
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
           other animations.
@@ -301,6 +305,7 @@ namespace Ogre {
         /** Applies all vertex tracks given a specific time point and weight to the specified vertex data.
         @remarks
             It does not apply to the actual attached vertex data but rather uses all tracks for a given vertex data.
+        @param data
         @param timePos The time position in the animation to apply.
         @param weight The influence to give to this track, 1.0 for full influence, less to blend with
           other animations.

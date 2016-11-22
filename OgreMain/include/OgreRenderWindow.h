@@ -92,9 +92,9 @@ namespace Ogre
 
         /** Creates & displays the new window.
             @param
-                width The width of the window in view points.
+                widthPt The width of the window in view points.
             @param
-                height The height of the window in view points.
+                heightPt The height of the window in view points.
             @param
                 fullScreen If true, the window fills the screen,
                 with no title bar or border.
@@ -109,8 +109,8 @@ namespace Ogre
         @note Nothing will happen unless the settings here are different from the
             current settings.
         @param fullScreen Whether to use fullscreen mode or not. 
-        @param width The new width to use
-        @param height The new height to use
+        @param widthPt The new width to use
+        @param heightPt The new height to use
         */
         virtual void setFullscreen(bool fullScreen, unsigned int widthPt, unsigned int heightPt)
                 { (void)fullScreen; (void)widthPt; (void)heightPt; }

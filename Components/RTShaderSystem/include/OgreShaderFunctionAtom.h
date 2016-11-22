@@ -115,6 +115,7 @@ public:
     @param parameter A function parameter.
     @param opSemantic The in/out semantic of the parameter.
     @param opMask The field mask of the parameter.
+    @param indirectionLevel
     */
     Operand(ParameterPtr parameter, Operand::OpSemantic opSemantic, int opMask = Operand::OPM_ALL, ushort indirectionLevel = 0);
 
