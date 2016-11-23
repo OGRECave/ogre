@@ -1553,8 +1553,8 @@ namespace v1 {
         {
             retVal &= ((*itor)->vertexData[VpNormal] == 0) || ((*itor)->vertexData[VpNormal] != 0 &&
                                                                (*itor)->vertexData[VpShadow] != 0);
-            retVal &= ((*itor)->indexData[VpNormal] == 0) || ((*itor)->indexData[VpNormal] != 0 &&
-                                                              (*itor)->indexData[VpShadow] != 0);
+            retVal &= (( *itor )->indexData[ VpNormal ] == 0 || ( *itor )->indexData[ VpNormal ]->indexBuffer.isNull()) 
+                  || ( ( *itor )->indexData[ VpNormal ] != 0 && (*itor)->indexData[VpShadow] != 0);
 
             retVal &= (*itor)->mLodFaceList[VpNormal].size() == (*itor)->mLodFaceList[VpShadow].size();
 
