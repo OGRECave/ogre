@@ -3,6 +3,7 @@
 ## Batteries Included
 * by default Ogre will now automatically fetch and build its core dependencies
 * [Unified documentation](https://ogrecave.github.io/ogre/api/1.10/index.html): merged API reference, manual and some of the wiki tutorials using Doxygen
+* the EXRCodec can now be build again by setting `OGRE_BUILD_PLUGIN_EXRCODEC=TRUE`
 
 ## Python Bindings (new component)
 * cover OgreMain, RTShaderSystem, Overlay and OgreBites
