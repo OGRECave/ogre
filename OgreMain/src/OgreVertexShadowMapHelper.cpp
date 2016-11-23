@@ -606,7 +606,7 @@ namespace v1
 
             v1::IndexData *shadowIndexData = 0;
 
-            if( geom.indexData )
+            if( geom.indexData && !geom.indexData->indexBuffer.isNull() )
             {
                 shadowIndexData = OGRE_NEW v1::IndexData();
                 shadowIndexData->indexCount = geom.indexData->indexCount;
