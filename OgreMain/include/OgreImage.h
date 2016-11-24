@@ -159,7 +159,7 @@ namespace Ogre {
                  The memory associated with this buffer is NOT destroyed with the
                  Image object, unless autoDelete is set to true.
             @remarks 
-                The size of the buffer must be numFaces*PixelUtil::getMemorySize(width, height, depth, format)
+                The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
          */
         Image& loadDynamicImage( uchar* data, uint32 width, uint32 height,
                             uint32 depth,
@@ -209,7 +209,7 @@ namespace Ogre {
         /** Loads raw data from a stream. See the function
             loadDynamicImage for a description of the parameters.
             @remarks 
-                The size of the buffer must be numFaces*PixelUtil::getMemorySize(width, height, depth, format)
+                The size of the buffer must be numFaces * PixelUtil::getMemorySize(width, height, depth, format)
             @note
                 Whilst typically your image is likely to be a simple 2D image,
                 you can define complex images including cube maps

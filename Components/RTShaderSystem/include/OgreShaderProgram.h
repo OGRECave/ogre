@@ -124,6 +124,7 @@ public:
     /** Create new function in this program. Return the newly created function instance.
     @param name The name of the function to create.
     @param desc The description of the function.
+    @param functionType
     */
     Function* createFunction(const String& name, const String& desc, const Function::FunctionType functionType);
 

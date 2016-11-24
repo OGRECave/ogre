@@ -469,9 +469,9 @@ namespace Ogre {
             /** Overridden member from ShadowCaster. */
             bool hasEdgeList(void);
 
-            /** @copydoc MovableObject::_releaseManualHardwareResources. */
+            /** @copydoc MovableObject::_releaseManualHardwareResources */
             void _releaseManualHardwareResources();
-            /** @copydoc MovableObject::_restoreManualHardwareResources. */
+            /** @copydoc MovableObject::_restoreManualHardwareResources */
             void _restoreManualHardwareResources();
 
             /// Dump contents for diagnostics

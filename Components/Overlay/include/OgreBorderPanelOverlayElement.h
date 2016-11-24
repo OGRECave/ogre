@@ -64,9 +64,9 @@ namespace Ogre {
 
         virtual void initialise(void);
 
-        /** @copydoc OverlayElement::_releaseManualHardwareResources. */
+        /** @copydoc OverlayElement::_releaseManualHardwareResources */
         virtual void _releaseManualHardwareResources();
-        /** @copydoc OverlayElement::_restoreManualHardwareResources. */
+        /** @copydoc OverlayElement::_restoreManualHardwareResources */
         virtual void _restoreManualHardwareResources();
 
         const String& getTypeName(void) const;

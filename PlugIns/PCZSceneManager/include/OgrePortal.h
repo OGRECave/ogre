@@ -63,7 +63,7 @@ namespace Ogre
         /** Get the connected portal (if any) */
         Portal* getTargetPortal() {return mTargetPortal;}
 
-        /** @copydoc MovableObject::getMovableType. */
+        /** @copydoc MovableObject::getMovableType */
         const String& getMovableType() const;
 
     protected:

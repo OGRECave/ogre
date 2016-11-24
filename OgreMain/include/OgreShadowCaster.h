@@ -73,7 +73,7 @@ namespace Ogre {
         void getWorldTransforms(Matrix4* xform) const = 0;
         /// @copydoc Renderable::getSquaredViewDepth
         Real getSquaredViewDepth(const Camera*) const{ return 0; /* not used */}
-        /// @copydoc Renderable::getLights.
+        /// @copydoc Renderable::getLights
         const LightList& getLights(void) const;
         /** Does this renderable require a separate light cap?
         @remarks

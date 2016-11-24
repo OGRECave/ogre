@@ -89,7 +89,7 @@ namespace Ogre {
                                GLint format, GLint face, GLint level, Usage usage, bool softwareMipmap, bool writeGamma, uint fsaa);
             virtual ~GLES2TextureBuffer();
 
-            /// @copydoc HardwarePixelBuffer::bindToFramebuffer
+            /// @copydoc GLES2HardwarePixelBuffer::bindToFramebuffer
             virtual void bindToFramebuffer(GLenum attachment, size_t zoffset);
 
             /// @copydoc HardwarePixelBuffer::getRenderTarget
