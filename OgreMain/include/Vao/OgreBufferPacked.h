@@ -286,6 +286,13 @@ namespace Ogre
         uint32 _getInternalNumElements(void) const      { return mNumElements + mNumElementsPadding; }
 
         const void* getShadowCopy(void) const   { return mShadowCopy; }
+
+        /// This will not delete the existing shadow copy so it can be used for other purposes
+        /// if it is not needed call OGRE_FREE_SIMD( m->getShadowCopy(), MEMCATEGORY_GEOMETRY )
+        /// before calling this function.
+        /// This will also not automatically upload the shadow data to the GPU. The user must call
+        /// upload or use a staging buffer themselves to achieve this.
+        void _setShadowCopy( void* copy );
     };
 
     typedef vector<BufferPacked*>::type BufferPackedVec;

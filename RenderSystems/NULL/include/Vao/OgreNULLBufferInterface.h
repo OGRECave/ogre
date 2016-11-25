@@ -56,6 +56,9 @@ namespace Ogre
 
         uint8* getNullDataPtr(void)                 { return mNullDataPtr; }
 
+        /// will null the data ptr so it wont be freed on destruction
+        void nullDataPtr() { mNullDataPtr = 0; }
+
         /// Only use this function for the first upload
         void _firstUpload( const void *data, size_t elementStart, size_t elementCount );
 
