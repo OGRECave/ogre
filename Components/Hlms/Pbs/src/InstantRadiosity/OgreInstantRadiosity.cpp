@@ -41,6 +41,7 @@ THE SOFTWARE.
 #include "Math/Array/OgreBooleanMask.h"
 
 #include "OgreItem.h"
+#include "OgreLwString.h"
 
 #if (OGRE_COMPILER == OGRE_COMPILER_MSVC ||\
     OGRE_PLATFORM == OGRE_PLATFORM_APPLE ||\
@@ -1213,7 +1214,6 @@ namespace Ogre
             FastArray<size_t>::const_iterator enRayIdx = raysThatHitObj.end();
             while( itRayIdx != enRayIdx )
             {
-                //TODO_fill_uv;
                 Ray ray = mRayHits[*itRayIdx].ray;
 
                 const std::pair<bool, Real> inters = Math::intersects(
@@ -1501,6 +1501,7 @@ namespace Ogre
         VplVec::const_iterator itor = mVpls.begin();
         VplVec::const_iterator end  = mVpls.end();
 
+        char tmpBuffer[128];
         while( itor != end )
         {
             const Vpl &vpl = *itor;
@@ -1510,12 +1511,28 @@ namespace Ogre
                 sceneNode->setPosition( vpl.position );
                 sceneNode->setScale( Vector3( mCellSize * 0.05f ) );
 
+                ColourValue colour = vpl.light->getDiffuseColour();
+                //Prevent very dark VPLs from being almost invisible
+                colour = colour * ColourValue( 0.95f, 0.95f, 0.95f ) +
+                        ColourValue( 0.05f, 0.05f, 0.05f );
+
+                LwString texName( LwString::FromEmptyPointer( tmpBuffer, sizeof(tmpBuffer) ) );
+                texName.a( colour.r, " ", colour.g, " ", colour.b );
+                HlmsParamVec params;
+                params.push_back( std::pair<IdString, String>( "diffuse", texName.c_str() ) );
+
+                String datablockName = "InstantRadiosity_DebugMarker_" +
+                        StringConverter::toString( Id::generateNewId<InstantRadiosity>() );
+                HlmsDatablock *datablock = hlms->createDatablock( datablockName, datablockName,
+                                                                  HlmsMacroblock(), HlmsBlendblock(),
+                                                                  params, false );
+
                 Item *item = mSceneManager->createItem( "Sphere1000.mesh",
                                                         Ogre::ResourceGroupManager::
                                                         AUTODETECT_RESOURCE_GROUP_NAME,
                                                         Ogre::SCENE_STATIC );
                 sceneNode->attachObject( item );
-                item->setDatablock( hlms->getDefaultDatablock() );
+                item->setDatablock( datablock );
                 mDebugMarkers.push_back( item );
             }
 
@@ -1525,6 +1542,8 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::destroyDebugMarkers(void)
     {
+        Hlms *hlms = mHlmsManager->getHlms( HLMS_UNLIT );
+
         vector<Item*>::type::const_iterator itor = mDebugMarkers.begin();
         vector<Item*>::type::const_iterator end  = mDebugMarkers.end();
 
@@ -1532,7 +1551,10 @@ namespace Ogre
         {
             SceneNode *sceneNode = (*itor)->getParentSceneNode();
             sceneNode->getParentSceneNode()->removeAndDestroyChild( sceneNode );
+            HlmsDatablock *datablock = (*itor)->getSubItem(0)->getDatablock();
             mSceneManager->destroyItem( *itor );
+
+            hlms->destroyDatablock( datablock->getName() );
             ++itor;
         }
 
