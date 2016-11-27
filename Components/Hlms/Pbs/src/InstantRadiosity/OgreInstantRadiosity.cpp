@@ -164,8 +164,10 @@ namespace Ogre
         mNumSpreadIterations( 6 ),
         mSpreadThreshold( 0.0004 ),
         mVplPowerBoost( 2.0f ),
+        mMipmapBias( 0 ),
         mTotalNumRays( 0 ),
-        mEnableDebugMarkers( false )
+        mEnableDebugMarkers( false ),
+        mUseTextures( true )
     {
     }
     //-----------------------------------------------------------------------------------
@@ -191,10 +193,9 @@ namespace Ogre
         //const Real NdotL = hit.triNormal.dotProduct( -hit.rayDir );
 
         //materialDiffuse is already divided by PI
-        Vector3 diffuseTerm = /*NdotL **/ hit.materialDiffuse * lightColour;
+        Vector3 diffuseTerm = /*NdotL **/ hit.material.diffuse * lightColour;
 
-    #if 0
-        if( hasUVs )
+        if( hit.material.needsUv )
         {
             const Real invTriArea = Real(1.0) / ( (hit.triVerts[0] - hit.triVerts[1]).
                     crossProduct( hit.triVerts[0] - hit.triVerts[2] ).length() );
@@ -207,13 +208,41 @@ namespace Ogre
 
             //Calculate the areas and factors (order of parameters doesn't matter):
             //a0 = p0's triangle area / tri_area
-            const Real a0 = f1.crossProduct( f2 ).length() * hit.invTriArea;
-            const Real a1 = f2.crossProduct( f0 ).length() * hit.invTriArea;
-            const Real a2 = f0.crossProduct( f1 ).length() * hit.invTriArea;
+            const Real a0 = f1.crossProduct( f2 ).length() * invTriArea;
+            const Real a1 = f2.crossProduct( f0 ).length() * invTriArea;
+            const Real a2 = f0.crossProduct( f1 ).length() * invTriArea;
 
-            const Vector2 interpUV = uv[0] * a0 + uv[1] * a1 + uv[2] * a2;
+            for( int i=0; i<5 && hit.material.image[i]; ++i )
+            {
+                const uint8 uvSet = hit.material.uvSet[i];
+                const Vector2 * RESTRICT_ALIAS uv = hit.triUVs[uvSet];
+                Vector2 interpUV = uv[0] * a0 + uv[1] * a1 + uv[2] * a2;
+
+                const Real texWidth  = hit.material.image[i]->getWidth();
+                const Real texHeight = hit.material.image[i]->getHeight();
+
+                //The texel centers are in the middle of the pixel, so we need to subtract
+                //0.5; but later we need to add 0.5 to do correct rounding. So they negate
+                interpUV.x = interpUV.x * texWidth/* - 0.5f*/;
+                interpUV.y = interpUV.y * texHeight/* - 0.5f*/;
+
+                interpUV.x = fmod( interpUV.x, texWidth );
+                interpUV.y = fmod( interpUV.y, texHeight );
+                if( interpUV.x < 0 )
+                    interpUV.x += 1.0f;
+                if( interpUV.y < 0 )
+                    interpUV.y += 1.0f;
+
+                //TODO: Do blending modes
+                ColourValue colourVal =
+                        hit.material.image[i]->getColourAt( static_cast<size_t>(interpUV.x),
+                                                            static_cast<size_t>(interpUV.y),
+                                                            0u );
+                diffuseTerm.x *= colourVal.r;
+                diffuseTerm.y *= colourVal.g;
+                diffuseTerm.z *= colourVal.b;
+            }
         }
-    #endif
 
         Vpl vpl;
         vpl.light = 0;
@@ -684,31 +713,46 @@ namespace Ogre
         if( itor != mMeshDataMapV2.end() )
             return &itor->second;
 
-        const VertexBufferPackedVec &vertexBuffers = vao->getVertexBuffers();
         IndexBufferPacked *indexBuffer = vao->getIndexBuffer();
 
         MeshData meshData;
         memset( &meshData, 0, sizeof(meshData) );
 
-        size_t posIdx, posOffset;
-        const VertexElement2 *posElement = vao->findBySemantic( VES_POSITION, posIdx, posOffset );
-
         //Issue all async requests now.
-        AsyncTicketPtr posTicket;
+        VertexArrayObject::ReadRequestsArray readRequests;
         AsyncTicketPtr indexTicket;
 
-        if( !vertexBuffers[posIdx]->getShadowCopy() )
         {
+            //Request to read VES_POSITION (must be present) and all of its UVs
+            readRequests.push_back( VES_POSITION );
+
+            //Avoid downloading UVs if not needed
+            if( mUseTextures )
+            {
+                VertexElement2VecVec vertexDeclaration = vao->getVertexDeclaration();
+                VertexElement2VecVec::const_iterator it0 = vertexDeclaration.begin();
+                VertexElement2VecVec::const_iterator en0 = vertexDeclaration.end();
+
+                while( it0 != en0 )
+                {
+                    VertexElement2Vec::const_iterator it1 = it0->begin();
+                    VertexElement2Vec::const_iterator en1 = it0->end();
+
+                    while( it1 != en1 )
+                    {
+                        if( *it1 == VES_TEXTURE_COORDINATES )
+                            readRequests.push_back( VES_TEXTURE_COORDINATES );
+                        ++it1;
+                    }
+
+                    ++it0;
+                }
+            }
+
             if( !indexBuffer )
-            {
-                posTicket = vertexBuffers[posIdx]->readRequest( vao->getPrimitiveStart(),
-                                                                vao->getPrimitiveCount() );
-            }
+                vao->readRequests( readRequests, vao->getPrimitiveStart(), vao->getPrimitiveCount() );
             else
-            {
-                posTicket =
-                        vertexBuffers[posIdx]->readRequest( 0, vertexBuffers[posIdx]->getNumElements() );
-            }
+                vao->readRequests( readRequests );
         }
 
         if( indexBuffer && !indexBuffer->getShadowCopy() )
@@ -719,7 +763,7 @@ namespace Ogre
 
         if( indexBuffer )
         {
-            meshData.numVertices = vertexBuffers[posIdx]->getNumElements();
+            meshData.numVertices = readRequests[0].vertexBuffer->getNumElements();
             meshData.useIndices16bit = indexBuffer->getIndexType() == IndexBufferPacked::IT_16BIT;
             meshData.numIndices = vao->getPrimitiveCount();
             if( !indexBuffer->getShadowCopy() )
@@ -734,51 +778,67 @@ namespace Ogre
         {
             meshData.numVertices = vao->getPrimitiveCount();
         }
-        meshData.vertexPos = reinterpret_cast<float*>(
-                    OGRE_MALLOC_SIMD( meshData.numVertices * sizeof(float) * 3u,
+
+        const size_t numVertexElements = readRequests.size();
+
+        meshData.vertexData = reinterpret_cast<float*>(
+                    OGRE_MALLOC_SIMD( meshData.numVertices * (sizeof(float) * 3u +
+                                      sizeof(float) * 2u * (numVertexElements - 1u)),
                                       MEMCATEGORY_GEOMETRY ) );
 
-        //Copy position
-        bool isHalf = v1::VertexElement::getBaseType( posElement->mType ) == VET_HALF2;
-        uint8 const *posBuffer = 0;
+        //Copy position + UVs
+        bool isHalf[9];
+        for( size_t j=0; j<numVertexElements; ++j )
+            isHalf[j] = v1::VertexElement::getBaseType( readRequests[j].type ) == VET_HALF2;
 
-        if( !vertexBuffers[posIdx]->getShadowCopy() )
-        {
-            posBuffer = reinterpret_cast<uint8 const * RESTRICT_ALIAS>( posTicket->map() ) + posOffset;
-        }
-        else
-        {
-            posBuffer = reinterpret_cast<uint8 const * RESTRICT_ALIAS>(
-                        vertexBuffers[posIdx]->getShadowCopy() ) + posOffset;
-        }
-
-        if( !indexBuffer )
-            posBuffer += vao->getPrimitiveStart() * vertexBuffers[posIdx]->getBytesPerElement();
+        vao->mapAsyncTickets( readRequests );
 
         for( size_t i=0; i<meshData.numVertices; ++i )
         {
-            if( isHalf )
+            //Copy position
+            if( isHalf[0] )
             {
-                uint16 const * RESTRICT_ALIAS posBuffer16 =
-                        reinterpret_cast<uint16 const * RESTRICT_ALIAS>( posBuffer );
-                meshData.vertexPos[i*3u + 0u] = Bitwise::halfToFloat( posBuffer16[0] );
-                meshData.vertexPos[i*3u + 1u] = Bitwise::halfToFloat( posBuffer16[1] );
-                meshData.vertexPos[i*3u + 2u] = Bitwise::halfToFloat( posBuffer16[2] );
+                uint16 const * RESTRICT_ALIAS bufferF16 =
+                        reinterpret_cast<uint16 const * RESTRICT_ALIAS>( readRequests[0].data );
+                meshData.vertexData[i*3u + 0u] = Bitwise::halfToFloat( bufferF16[0] );
+                meshData.vertexData[i*3u + 1u] = Bitwise::halfToFloat( bufferF16[1] );
+                meshData.vertexData[i*3u + 2u] = Bitwise::halfToFloat( bufferF16[2] );
             }
             else
             {
-                float const * RESTRICT_ALIAS posBufferF32 =
-                        reinterpret_cast<float const * RESTRICT_ALIAS>( posBuffer );
-                meshData.vertexPos[i*3u + 0u] = posBufferF32[0];
-                meshData.vertexPos[i*3u + 1u] = posBufferF32[1];
-                meshData.vertexPos[i*3u + 2u] = posBufferF32[2];
+                float const * RESTRICT_ALIAS bufferF32 =
+                        reinterpret_cast<float const * RESTRICT_ALIAS>( readRequests[0].data );
+                meshData.vertexData[i*3u + 0u] = bufferF32[0];
+                meshData.vertexData[i*3u + 1u] = bufferF32[1];
+                meshData.vertexData[i*3u + 2u] = bufferF32[2];
             }
 
-            posBuffer += vertexBuffers[posIdx]->getBytesPerElement();
+            readRequests[0].data += readRequests[0].vertexBuffer->getBytesPerElement();
+
+            //Copy UVs
+            for( size_t j=1; j<numVertexElements; ++j )
+            {
+                float * RESTRICT_ALIAS uvDst = meshData.getUvStart( j - 1u );
+                if( isHalf[j] )
+                {
+                    uint16 const * RESTRICT_ALIAS bufferF16 =
+                            reinterpret_cast<uint16 const * RESTRICT_ALIAS>( readRequests[j].data );
+                    uvDst[i*2u + 0u] = Bitwise::halfToFloat( bufferF16[0] );
+                    uvDst[i*2u + 1u] = Bitwise::halfToFloat( bufferF16[1] );
+                }
+                else
+                {
+                    float const * RESTRICT_ALIAS bufferF32 =
+                            reinterpret_cast<float const * RESTRICT_ALIAS>( readRequests[j].data );
+                    uvDst[i*2u + 0u] = bufferF32[0];
+                    uvDst[i*2u + 1u] = bufferF32[1];
+                }
+
+                readRequests[j].data += readRequests[j].vertexBuffer->getBytesPerElement();
+            }
         }
 
-        if( !posTicket.isNull() )
-            posTicket->unmap();
+        vao->unmapAsyncTickets( readRequests );
 
         //Copy index buffer
         if( indexBuffer )
@@ -810,19 +870,39 @@ namespace Ogre
         if( itor != mMeshDataMapV1.end() )
             return &itor->second;
 
-        const v1::VertexElement *posElement = renderOp.vertexData->vertexDeclaration->
-                findElementBySemantic( VES_POSITION );
+        v1::VertexData::ReadRequestsArray readRequests;
 
-        size_t posIdx, posOffset;
-        posIdx = posElement->getSource();
-        posOffset = posElement->getOffset();
+        {
+            //Request to read VES_POSITION (must be present) and all of its UVs
+            readRequests.push_back( VES_POSITION );
+
+            //Avoid downloading UVs if not needed
+            if( mUseTextures )
+            {
+                const v1::VertexDeclaration::VertexElementList &vertexElements =
+                        renderOp.vertexData->vertexDeclaration->getElements();
+                v1::VertexDeclaration::VertexElementList::const_iterator it0 = vertexElements.begin();
+                v1::VertexDeclaration::VertexElementList::const_iterator en0 = vertexElements.end();
+
+                while( it0 != en0 )
+                {
+                    if( it0->getSemantic() == VES_TEXTURE_COORDINATES )
+                        readRequests.push_back( VES_TEXTURE_COORDINATES );
+                    ++it0;
+                }
+            }
+        }
+
+        const size_t numVertexElements = readRequests.size();
+        renderOp.vertexData->lockMultipleElements( readRequests, v1::HardwareBuffer::HBL_READ_ONLY );
 
         MeshData meshData;
         memset( &meshData, 0, sizeof(meshData) );
 
         meshData.numVertices = renderOp.vertexData->vertexCount;
-        meshData.vertexPos = reinterpret_cast<float*>(
-                    OGRE_MALLOC_SIMD( meshData.numVertices * sizeof(float) * 3u,
+        meshData.vertexData = reinterpret_cast<float*>(
+                    OGRE_MALLOC_SIMD( meshData.numVertices * (sizeof(float) * 3u +
+                                      sizeof(float) * 2u * (numVertexElements - 1u)),
                                       MEMCATEGORY_GEOMETRY ) );
         if( renderOp.useIndexes )
         {
@@ -835,39 +915,65 @@ namespace Ogre
                                           MEMCATEGORY_GEOMETRY ) );
         }
 
-        //Copy position
-        bool isHalf = v1::VertexElement::getBaseType( posElement->getType() ) == VET_HALF2;
-        uint8 const *posBuffer = reinterpret_cast<uint8 const * RESTRICT_ALIAS>(
-                    renderOp.vertexData->vertexBufferBinding->
-                    getBuffer(posIdx)->lock( v1::HardwareBuffer::HBL_READ_ONLY ) );
+        //Copy position + UVs
+        bool isHalf[9];
+        for( size_t j=0; j<numVertexElements; ++j )
+        {
+            isHalf[j] = v1::VertexElement::getBaseType( readRequests[j].type ) == VET_HALF2;
 
-        posBuffer += posOffset;
-        if( !renderOp.useIndexes )
-            posBuffer += renderOp.vertexData->vertexStart;
+            if( !renderOp.useIndexes )
+            {
+                readRequests[j].data += renderOp.vertexData->vertexStart *
+                        readRequests[j].vertexBuffer->getVertexSize();
+            }
+        }
 
         for( size_t i=0; i<meshData.numVertices; ++i )
         {
-            if( isHalf )
+            //Copy position
+            if( isHalf[0] )
             {
-                uint16 const * RESTRICT_ALIAS posBuffer16 =
-                        reinterpret_cast<uint16 const * RESTRICT_ALIAS>( posBuffer );
-                meshData.vertexPos[i*3u + 0u] = Bitwise::halfToFloat( posBuffer16[0] );
-                meshData.vertexPos[i*3u + 1u] = Bitwise::halfToFloat( posBuffer16[1] );
-                meshData.vertexPos[i*3u + 2u] = Bitwise::halfToFloat( posBuffer16[2] );
+                uint16 const * RESTRICT_ALIAS bufferF16 =
+                        reinterpret_cast<uint16 const * RESTRICT_ALIAS>( readRequests[0].data );
+                meshData.vertexData[i*3u + 0u] = Bitwise::halfToFloat( bufferF16[0] );
+                meshData.vertexData[i*3u + 1u] = Bitwise::halfToFloat( bufferF16[1] );
+                meshData.vertexData[i*3u + 2u] = Bitwise::halfToFloat( bufferF16[2] );
             }
             else
             {
-                float const * RESTRICT_ALIAS posBufferF32 =
-                        reinterpret_cast<float const * RESTRICT_ALIAS>( posBuffer );
-                meshData.vertexPos[i*3u + 0u] = posBufferF32[0];
-                meshData.vertexPos[i*3u + 1u] = posBufferF32[1];
-                meshData.vertexPos[i*3u + 2u] = posBufferF32[2];
+                float const * RESTRICT_ALIAS bufferF32 =
+                        reinterpret_cast<float const * RESTRICT_ALIAS>( readRequests[0].data );
+                meshData.vertexData[i*3u + 0u] = bufferF32[0];
+                meshData.vertexData[i*3u + 1u] = bufferF32[1];
+                meshData.vertexData[i*3u + 2u] = bufferF32[2];
             }
 
-            posBuffer += renderOp.vertexData->vertexDeclaration->getVertexSize(posIdx);
+            readRequests[0].data += readRequests[0].vertexBuffer->getVertexSize();
+
+            //Copy UVs
+            for( size_t j=1; j<numVertexElements; ++j )
+            {
+                float * RESTRICT_ALIAS uvDst = meshData.getUvStart( j - 1u );
+                if( isHalf[j] )
+                {
+                    uint16 const * RESTRICT_ALIAS bufferF16 =
+                            reinterpret_cast<uint16 const * RESTRICT_ALIAS>( readRequests[j].data );
+                    uvDst[i*2u + 0u] = Bitwise::halfToFloat( bufferF16[0] );
+                    uvDst[i*2u + 1u] = Bitwise::halfToFloat( bufferF16[1] );
+                }
+                else
+                {
+                    float const * RESTRICT_ALIAS bufferF32 =
+                            reinterpret_cast<float const * RESTRICT_ALIAS>( readRequests[j].data );
+                    uvDst[i*2u + 0u] = bufferF32[0];
+                    uvDst[i*2u + 1u] = bufferF32[1];
+                }
+
+                readRequests[j].data += readRequests[j].vertexBuffer->getVertexSize();
+            }
         }
 
-        renderOp.vertexData->vertexBufferBinding->getBuffer(posIdx)->unlock();
+        renderOp.vertexData->unlockMultipleElements( readRequests );
 
         //Copy index buffer
         if( renderOp.useIndexes )
@@ -885,6 +991,19 @@ namespace Ogre
         mMeshDataMapV1[renderOp] = meshData;
 
         return &mMeshDataMapV1[renderOp];
+    }
+    //-----------------------------------------------------------------------------------
+    const Image& InstantRadiosity::downloadTexture( const TexturePtr &texture )
+    {
+        ImageMap::iterator itor = mImageMap.find( texture.get() );
+        if( itor != mImageMap.end() )
+            return itor->second;
+
+        mImageMap[texture.get()] = Image();
+        itor = mImageMap.find( texture.get() );
+        texture->convertToImage( itor->second, false, mMipmapBias );
+
+        return itor->second;
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::testLightVsAllObjects( uint8 lightType, Real lightRange,
@@ -977,18 +1096,50 @@ namespace Ogre
 
                         if( datablock->mType == HLMS_PBS )
                         {
+                            MaterialData material;
+                            memset( &material, 0, sizeof(material) );
+                            int imageIdx = 0;
+
                             HlmsPbsDatablock *pbsDatablock = static_cast<HlmsPbsDatablock*>( datablock );
                             //TODO: Should we account fresnel here? What about metalness?
-                            Vector3 materialDiffuse = pbsDatablock->getDiffuse();
+                            material.diffuse = pbsDatablock->getDiffuse();
                             if( pbsDatablock->getTexture( PBSM_DIFFUSE ).isNull() )
                             {
                                 const ColourValue &bgDiffuse = pbsDatablock->getBackgroundDiffuse();
-                                materialDiffuse.x *= bgDiffuse.r;
-                                materialDiffuse.y *= bgDiffuse.g;
-                                materialDiffuse.z *= bgDiffuse.b;
+                                material.diffuse.x *= bgDiffuse.r;
+                                material.diffuse.y *= bgDiffuse.g;
+                                material.diffuse.z *= bgDiffuse.b;
                             }
+                            else if( mUseTextures )
+                            {
+                                material.image[imageIdx] = &downloadTexture(
+                                            pbsDatablock->getTexture( PBSM_DIFFUSE ) );
+                                material.uvSet[imageIdx] =
+                                        pbsDatablock->getTextureUvSource( PBSM_DIFFUSE );
+                                material.needsUv = true;
+                                ++imageIdx;
+                            }
+
+                            if( mUseTextures )
+                            {
+                                for( int i=0; i<4; ++i )
+                                {
+                                    const PbsTextureTypes texType = static_cast<PbsTextureTypes>(
+                                                                                PBSM_DETAIL0 + i );
+                                    TexturePtr detailTex = pbsDatablock->getTexture( texType );
+                                    if( !detailTex.isNull() )
+                                    {
+                                        material.image[imageIdx] = &downloadTexture( detailTex );
+                                        material.uvSet[imageIdx] =
+                                                pbsDatablock->getTextureUvSource( texType );
+                                        material.needsUv = true;
+                                        ++imageIdx;
+                                    }
+                                }
+                            }
+
                             raycastLightRayVsMesh( lightRange, *meshData,
-                                                   worldMatrix, materialDiffuse,
+                                                   worldMatrix, material,
                                                    mTmpRaysThatHitObject[j] );
                         }
 
@@ -1002,7 +1153,7 @@ namespace Ogre
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::raycastLightRayVsMesh( Real lightRange, const MeshData meshData,
-                                                  Matrix4 worldMatrix, Vector3 materialDiffuse,
+                                                  Matrix4 worldMatrix, const MaterialData &material,
                                                   const FastArray<size_t> &raysThatHitObj )
     {
         const size_t numElements = meshData.indexData ? meshData.numIndices : meshData.numVertices;
@@ -1016,45 +1167,39 @@ namespace Ogre
         {
             Vector3 triVerts[3];
 
+            uint32 vertexIdx[3];
+
             if( meshData.indexData )
             {
                 if( meshData.useIndices16bit )
                 {
-                    triVerts[0].x = meshData.vertexPos[indexData16[i+0] * 3u + 0];
-                    triVerts[0].y = meshData.vertexPos[indexData16[i+0] * 3u + 1];
-                    triVerts[0].z = meshData.vertexPos[indexData16[i+0] * 3u + 2];
-                    triVerts[1].x = meshData.vertexPos[indexData16[i+1] * 3u + 0];
-                    triVerts[1].y = meshData.vertexPos[indexData16[i+1] * 3u + 1];
-                    triVerts[1].z = meshData.vertexPos[indexData16[i+1] * 3u + 2];
-                    triVerts[2].x = meshData.vertexPos[indexData16[i+2] * 3u + 0];
-                    triVerts[2].y = meshData.vertexPos[indexData16[i+2] * 3u + 1];
-                    triVerts[2].z = meshData.vertexPos[indexData16[i+2] * 3u + 2];
+                    vertexIdx[0] = indexData16[i+0];
+                    vertexIdx[1] = indexData16[i+1];
+                    vertexIdx[2] = indexData16[i+2];
                 }
                 else
                 {
-                    triVerts[0].x = meshData.vertexPos[indexData32[i+0] * 3u + 0];
-                    triVerts[0].y = meshData.vertexPos[indexData32[i+0] * 3u + 1];
-                    triVerts[0].z = meshData.vertexPos[indexData32[i+0] * 3u + 2];
-                    triVerts[1].x = meshData.vertexPos[indexData32[i+1] * 3u + 0];
-                    triVerts[1].y = meshData.vertexPos[indexData32[i+1] * 3u + 1];
-                    triVerts[1].z = meshData.vertexPos[indexData32[i+1] * 3u + 2];
-                    triVerts[2].x = meshData.vertexPos[indexData32[i+2] * 3u + 0];
-                    triVerts[2].y = meshData.vertexPos[indexData32[i+2] * 3u + 1];
-                    triVerts[2].z = meshData.vertexPos[indexData32[i+2] * 3u + 2];
+                    vertexIdx[0] = indexData32[i+0];
+                    vertexIdx[1] = indexData32[i+1];
+                    vertexIdx[2] = indexData32[i+2];
                 }
             }
             else
             {
-                triVerts[0].x = meshData.vertexPos[(i+0) * 3u + 0];
-                triVerts[0].y = meshData.vertexPos[(i+0) * 3u + 1];
-                triVerts[0].z = meshData.vertexPos[(i+0) * 3u + 2];
-                triVerts[1].x = meshData.vertexPos[(i+1) * 3u + 0];
-                triVerts[1].y = meshData.vertexPos[(i+1) * 3u + 1];
-                triVerts[1].z = meshData.vertexPos[(i+1) * 3u + 2];
-                triVerts[2].x = meshData.vertexPos[(i+2) * 3u + 0];
-                triVerts[2].y = meshData.vertexPos[(i+2) * 3u + 1];
-                triVerts[2].z = meshData.vertexPos[(i+2) * 3u + 2];
+                vertexIdx[0] = i+0;
+                vertexIdx[1] = i+1;
+                vertexIdx[2] = i+2;
             }
+
+            triVerts[0].x = meshData.vertexData[vertexIdx[0] * 3u + 0];
+            triVerts[0].y = meshData.vertexData[vertexIdx[0] * 3u + 1];
+            triVerts[0].z = meshData.vertexData[vertexIdx[0] * 3u + 2];
+            triVerts[1].x = meshData.vertexData[vertexIdx[1] * 3u + 0];
+            triVerts[1].y = meshData.vertexData[vertexIdx[1] * 3u + 1];
+            triVerts[1].z = meshData.vertexData[vertexIdx[1] * 3u + 2];
+            triVerts[2].x = meshData.vertexData[vertexIdx[2] * 3u + 0];
+            triVerts[2].y = meshData.vertexData[vertexIdx[2] * 3u + 1];
+            triVerts[2].z = meshData.vertexData[vertexIdx[2] * 3u + 2];
 
             triVerts[0] = worldMatrix * triVerts[0];
             triVerts[1] = worldMatrix * triVerts[1];
@@ -1076,15 +1221,30 @@ namespace Ogre
 
                 if( inters.first )
                 {
-                    if( inters.second < mRayHits[*itRayIdx].distance &&
+                    RayHit &rayHit = mRayHits[*itRayIdx];
+                    if( inters.second < rayHit.distance &&
                         inters.second <= lightRange )
                     {
-                        mRayHits[*itRayIdx].distance = inters.second;
-                        mRayHits[*itRayIdx].materialDiffuse = materialDiffuse;
-                        mRayHits[*itRayIdx].triVerts[0] = triVerts[0];
-                        mRayHits[*itRayIdx].triVerts[1] = triVerts[1];
-                        mRayHits[*itRayIdx].triVerts[2] = triVerts[2];
-                        mRayHits[*itRayIdx].triNormal = triNormal;
+                        rayHit.distance = inters.second;
+                        rayHit.material = material;
+                        rayHit.triVerts[0] = triVerts[0];
+                        rayHit.triVerts[1] = triVerts[1];
+                        rayHit.triVerts[2] = triVerts[2];
+                        rayHit.triNormal = triNormal;
+
+                        for( int j=0; j<5 && material.image[j]; ++j )
+                        {
+                            const uint8 uvSet = material.uvSet[j];
+                            const float * RESTRICT_ALIAS uvPtr = meshData.getUvStart( uvSet );
+                            rayHit.triUVs[j][0].x = uvPtr[vertexIdx[0] * 2u + 0];
+                            rayHit.triUVs[j][0].y = uvPtr[vertexIdx[0] * 2u + 1];
+
+                            rayHit.triUVs[j][1].x = uvPtr[vertexIdx[1] * 2u + 0];
+                            rayHit.triUVs[j][1].y = uvPtr[vertexIdx[1] * 2u + 1];
+
+                            rayHit.triUVs[j][2].x = uvPtr[vertexIdx[2] * 2u + 0];
+                            rayHit.triUVs[j][2].y = uvPtr[vertexIdx[2] * 2u + 1];
+                        }
                     }
                 }
 
@@ -1295,8 +1455,8 @@ namespace Ogre
             while( itor != end )
             {
                 MeshData &meshData = itor->second;
-                OGRE_FREE_SIMD( meshData.vertexPos, MEMCATEGORY_GEOMETRY );
-                meshData.vertexPos = 0;
+                OGRE_FREE_SIMD( meshData.vertexData, MEMCATEGORY_GEOMETRY );
+                meshData.vertexData = 0;
                 if( meshData.indexData && !itor->first->getIndexBuffer()->getShadowCopy() )
                 {
                     OGRE_FREE_SIMD( meshData.indexData, MEMCATEGORY_GEOMETRY );
@@ -1314,8 +1474,8 @@ namespace Ogre
             while( itor != end )
             {
                 MeshData &meshData = itor->second;
-                OGRE_FREE_SIMD( meshData.vertexPos, MEMCATEGORY_GEOMETRY );
-                meshData.vertexPos = 0;
+                OGRE_FREE_SIMD( meshData.vertexData, MEMCATEGORY_GEOMETRY );
+                meshData.vertexData = 0;
                 if( meshData.indexData )
                 {
                     OGRE_FREE_SIMD( meshData.indexData, MEMCATEGORY_GEOMETRY );
@@ -1326,6 +1486,8 @@ namespace Ogre
 
             mMeshDataMapV1.clear();
         }
+
+        mImageMap.clear();
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::createDebugMarkers(void)
@@ -1387,6 +1549,15 @@ namespace Ogre
             destroyDebugMarkers();
     }
     //-----------------------------------------------------------------------------------
+    void InstantRadiosity::setUseTextures( bool bUseTextures )
+    {
+        if( mUseTextures != bUseTextures )
+        {
+            freeMemory();
+            mUseTextures = bUseTextures;
+        }
+    }
+    //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     //-----------------------------------------------------------------------------------
     InstantRadiosity::SparseCluster::SparseCluster() {}
@@ -1420,5 +1591,12 @@ namespace Ogre
                                                          const SparseCluster &_r ) const
     {
         return memcmp( _l.blockHash, _r.blockHash, sizeof( blockHash ) ) < 0;
+    }
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------
+    float* InstantRadiosity::MeshData::getUvStart( uint8_t uvSet ) const
+    {
+        return vertexData + numVertices * 3u + uvSet * 2u;
     }
 }

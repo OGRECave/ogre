@@ -218,8 +218,14 @@ namespace Ogre
             Throws if an element couldn't be found.
         @param requests [in/out]
             Array filled with the semantic.
+        @param skipRequestIfBufferHasShadowCopy
+            Avoid generating the AsyncTicket if the buffer has a shadow copy. Useful if you
+            want to read directly from the shadow copy instead of downloading from the GPU.
+            The 'data' variable will be filled immediately if there's a shadow copy available,
+            and mapAsyncTickets can be safely called even if skipRequestIfBufferHasShadowCopy=true
         */
-        void readRequests( ReadRequestsArray &requests );
+        void readRequests( ReadRequestsArray &requests, size_t elementStart=0, size_t elementCount=0,
+                           bool skipRequestIfBufferHasShadowCopy=false );
 
         /// Maps the buffers requested via @see readRequests
         static void mapAsyncTickets( ReadRequestsArray &tickets );

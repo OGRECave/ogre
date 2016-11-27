@@ -697,6 +697,69 @@ namespace v1 {
         return supportedCount;
     }
     //-----------------------------------------------------------------------
+    void VertexData::lockMultipleElements( ReadRequestsArray &requests,
+                                           HardwareBuffer::LockOptions lockOptions,
+                                           HardwareBuffer::UploadOptions uploadOptions )
+    {
+        map<HardwareVertexBuffer*, char*>::type seenBuffers;
+
+        size_t semanticCounts[VES_COUNT];
+        memset( semanticCounts, 0, sizeof( semanticCounts ) );
+
+        ReadRequestsArray::iterator itor = requests.begin();
+        ReadRequestsArray::iterator end  = requests.end();
+
+        while( itor != end )
+        {
+            const VertexElement *vElement = vertexDeclaration->findElementBySemantic(
+                        itor->semantic, semanticCounts[itor->semantic-1] );
+
+            ++semanticCounts[itor->semantic-1];
+            if( !vElement )
+            {
+                OGRE_EXCEPT( Exception::ERR_ITEM_NOT_FOUND, "Cannot find semantic in VertexDeclaration",
+                             "VertexData::lockMultipleElements" );
+            }
+
+            const HardwareVertexBufferSharedPtr &vertexBuffer =
+                    vertexBufferBinding->getBuffer( vElement->getSource() );
+
+            itor->type = vElement->getType();
+            itor->offset = vElement->getOffset();
+            itor->vertexBuffer = vertexBuffer.get();
+
+            map<HardwareVertexBuffer*, char*>::type::const_iterator itSeenBuffer =
+                    seenBuffers.find( vertexBuffer.get() );
+            if( itSeenBuffer == seenBuffers.end() )
+            {
+                itor->data = reinterpret_cast<char*>( vertexBuffer->lock( lockOptions, uploadOptions ) );
+                seenBuffers[vertexBuffer.get()] = itor->data;
+                itor->data += itor->offset;
+            }
+            else
+            {
+                itor->data = itSeenBuffer->second;
+                itor->data += itor->offset;
+            }
+
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
+    void VertexData::unlockMultipleElements( ReadRequestsArray &requests )
+    {
+        ReadRequestsArray::iterator itor = requests.begin();
+        ReadRequestsArray::iterator end  = requests.end();
+
+        while( itor != end )
+        {
+            itor->data = 0;
+            if( itor->vertexBuffer->isLocked() )
+                itor->vertexBuffer->unlock();
+            ++itor;
+        }
+    }
+    //-----------------------------------------------------------------------
     //-----------------------------------------------------------------------
     IndexData::IndexData()
     {

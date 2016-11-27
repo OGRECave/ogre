@@ -182,14 +182,14 @@ namespace Demo
             const SDL_Keysym &keySym = itor->second;
             const bool reverse = (keySym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
             const float modPerFrame = reverse ? -timeSinceLast : timeSinceLast;
-            if( keySym.sym == SDLK_j )
+            if( keySym.sym == SDLK_h )
             {
                 mInstantRadiosity->mCellSize += modPerFrame;
                 mInstantRadiosity->mCellSize = Ogre::max( mInstantRadiosity->mCellSize,
                                                           Ogre::Real(0.001f) );
                 needsRebuild = true;
             }
-            if( keySym.sym == SDLK_k )
+            if( keySym.sym == SDLK_j )
             {
                 mInstantRadiosity->mBias += modPerFrame;
                 mInstantRadiosity->mBias = Ogre::Math::Clamp( mInstantRadiosity->mBias,
@@ -227,8 +227,8 @@ namespace Demo
     {
         TutorialGameState::generateDebugText( timeSinceLast, outText );
 
-        outText += "\nF2 to toggle debug VPL markers";
-        outText += mInstantRadiosity->getEnableDebugMarkers() ? "\n[On]" : "\n[Off]";
+        outText += "\nF2 to toggle debug VPL markers ";
+        outText += mInstantRadiosity->getEnableDebugMarkers() ? "[On]" : "[Off]";
         outText += "\nHold [Shift] to change value in opposite direction";
         outText += "\nVPL Max range [U]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplMaxRange );
@@ -237,14 +237,16 @@ namespace Demo
         outText += "\nVPL Threshold [O]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mVplThreshold );
 
-        outText += "\nNum Rays [H]: ";
+        outText += "\nNum Rays [G]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumRays );
-        outText += "\nCluster size [J]: ";
+        outText += "\nCluster size [H]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mCellSize );
-        outText += "\nBias [K]: ";
+        outText += "\nBias [J]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mBias );
-        outText += "\nSpread Iterations [L]: ";
+        outText += "\nSpread Iterations [K]: ";
         outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumSpreadIterations );
+        outText += "\nNum bounces [L]: ";
+        outText += Ogre::StringConverter::toString( mInstantRadiosity->mNumRayBounces );
 
         Ogre::Camera *camera = mGraphicsSystem->getCamera();
         outText += "\nCamera: ";
@@ -273,7 +275,7 @@ namespace Demo
         {
             mInstantRadiosity->setEnableDebugMarkers( !mInstantRadiosity->getEnableDebugMarkers() );
         }
-        else if( arg.keysym.sym == SDLK_h )
+        else if( arg.keysym.sym == SDLK_g )
         {
             const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
             if( reverse )
@@ -287,7 +289,7 @@ namespace Demo
 
             mInstantRadiosity->build();
         }
-        else if( arg.keysym.sym == SDLK_l )
+        else if( arg.keysym.sym == SDLK_k )
         {
             const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
             if( reverse )
@@ -297,8 +299,24 @@ namespace Demo
             }
             else
             {
-                if( mInstantRadiosity->mNumSpreadIterations < 100 )
+                if( mInstantRadiosity->mNumSpreadIterations < 10 )
                     ++mInstantRadiosity->mNumSpreadIterations;
+            }
+
+            mInstantRadiosity->build();
+        }
+        else if( arg.keysym.sym == SDLK_l )
+        {
+            const bool reverse = (arg.keysym.mod & (KMOD_LSHIFT|KMOD_RSHIFT));
+            if( reverse )
+            {
+                if( mInstantRadiosity->mNumRayBounces )
+                    --mInstantRadiosity->mNumRayBounces;
+            }
+            else
+            {
+                if( mInstantRadiosity->mNumRayBounces < 5 )
+                    ++mInstantRadiosity->mNumRayBounces;
             }
 
             mInstantRadiosity->build();

@@ -398,10 +398,15 @@ namespace Ogre {
 
 
         /** Populate an Image with the contents of this texture. 
-        @param destImage The target image (contents will be overwritten)
-        @param includeMipMaps Whether to embed mipmaps in the image
+        @param destImage
+            The target image (contents will be overwritten)
+        @param includeMipMaps
+            Whether to embed mipmaps in the image
+        @param mipmapBias
+            From which mipmap we should start from; in range [0; getNumMipmaps()]
         */
-        virtual void convertToImage(Image& destImage, bool includeMipMaps = false);
+        virtual void convertToImage( Image& destImage, bool includeMipMaps = false,
+                                     uint32 mipmapBias=0 );
         
         /** Retrieve a platform or API-specific piece of information from this texture.
          This method of retrieving information should only be used if you know what you're doing.
