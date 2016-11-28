@@ -238,13 +238,13 @@ namespace Ogre
         @param attenConst
         @param attenLinear
         @param attenQuad
-        @param areaOfInfluence
+        @param areaOfInterest
             Only used for directional light types. See mAoI
         */
         void processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                            Radian angle, Vector3 lightColour, Real lightRange,
                            Real attenConst, Real attenLinear, Real attenQuad,
-                           const AreaOfInterest &areaOfInfluence );
+                           const AreaOfInterest &areaOfInterest );
 
         /// Generates the ray bounces based on mRayHits[raySrcStart] through
         /// mRayHits[raySrcStart+raySrcCount-1]; generating up to 'raysToGenerate' rays
@@ -260,7 +260,7 @@ namespace Ogre
 
         void testLightVsAllObjects( uint8 lightType, Real lightRange,
                                     ObjectData objData, size_t numNodes,
-                                    const AreaOfInterest &areaOfInfluence,
+                                    const AreaOfInterest &areaOfInterest,
                                     size_t rayStart, size_t numRays );
         void raycastLightRayVsMesh( Real lightRange, const MeshData meshData,
                                     Matrix4 worldMatrix, const MaterialData &material,
@@ -276,7 +276,7 @@ namespace Ogre
         /// VPLs from the same light, now we need to do this again with lights from different
         /// clusters)
         void clusterAllVpls(void);
-        void autogenerateAreaOfInfluence(void);
+        void autogenerateAreaOfInterest(void);
 
         void createDebugMarkers(void);
         void destroyDebugMarkers(void);

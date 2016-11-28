@@ -551,9 +551,9 @@ namespace Ogre
         }
     }
     //-----------------------------------------------------------------------------------
-    void InstantRadiosity::autogenerateAreaOfInfluence(void)
+    void InstantRadiosity::autogenerateAreaOfInterest(void)
     {
-        AxisAlignedBox areaOfInfluence;
+        AxisAlignedBox areaOfInterest;
         for( size_t i=0; i<NUM_SCENE_MEMORY_MANAGER_TYPES; ++i )
         {
             ObjectMemoryManager &memoryManager = mSceneManager->_getEntityMemoryManager(
@@ -573,20 +573,20 @@ namespace Ogre
                                                     mVisibilityMask &
                                                     VisibilityFlags::RESERVED_VISIBILITY_FLAGS,
                                                     &tmpBox );
-                areaOfInfluence.merge( tmpBox );
+                areaOfInterest.merge( tmpBox );
             }
         }
 
-        Aabb aabb = Aabb::newFromExtents( areaOfInfluence.getMinimum(), areaOfInfluence.getMaximum() );
+        Aabb aabb = Aabb::newFromExtents( areaOfInterest.getMinimum(), areaOfInterest.getMaximum() );
         mAoI.push_back( AreaOfInterest( aabb, 0.0f ) );
     }
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::processLight( Vector3 lightPos, const Quaternion &lightRot, uint8 lightType,
                                          Radian angle, Vector3 lightColour, Real lightRange,
                                          Real attenConst, Real attenLinear, Real attenQuad,
-                                         const AreaOfInterest &areaOfInfluence )
+                                         const AreaOfInterest &areaOfInterest )
     {
-        Aabb rotatedAoI = areaOfInfluence.aabb;
+        Aabb rotatedAoI = areaOfInterest.aabb;
         {
             Matrix4 rotMatrix;
             rotMatrix.makeTransform( Vector3::ZERO, Vector3::UNIT_SCALE, lightRot.Inverse() );
@@ -625,8 +625,8 @@ namespace Ogre
                 Vector3 randomPos;
                 randomPos.x = rng.boxRand() * rotatedAoI.mHalfSize.x;
                 randomPos.y = rng.boxRand() * rotatedAoI.mHalfSize.y;
-                randomPos.z = Ogre::max( rotatedAoI.mHalfSize.z, areaOfInfluence.sphereRadius ) + 1.0f;
-                randomPos = lightRot * randomPos + areaOfInfluence.aabb.mCenter;
+                randomPos.z = Ogre::max( rotatedAoI.mHalfSize.z, areaOfInterest.sphereRadius ) + 1.0f;
+                randomPos = lightRot * randomPos + areaOfInterest.aabb.mCenter;
 
                 mRayHits[i].ray.setOrigin( randomPos );
                 mRayHits[i].ray.setDirection( -lightRot.zAxis() );
@@ -662,7 +662,7 @@ namespace Ogre
                     ObjectData objData;
                     const size_t totalObjs = memoryManager.getFirstObjectData( objData, j );
                     testLightVsAllObjects( lightType, lightRange, objData, totalObjs,
-                                           areaOfInfluence, rayStart, numRays );
+                                           areaOfInterest, rayStart, numRays );
                 }
             }
 
@@ -1022,16 +1022,16 @@ namespace Ogre
     //-----------------------------------------------------------------------------------
     void InstantRadiosity::testLightVsAllObjects( uint8 lightType, Real lightRange,
                                                   ObjectData objData, size_t numNodes,
-                                                  const AreaOfInterest &scalarAreaOfInfluence,
+                                                  const AreaOfInterest &scalarAreaOfInterest,
                                                   size_t rayStart, size_t numRays )
     {
-        Aabb biggestAoI = scalarAreaOfInfluence.aabb;
-        biggestAoI.merge( Aabb( biggestAoI.mCenter, Vector3( scalarAreaOfInfluence.sphereRadius ) ) );
+        Aabb biggestAoI = scalarAreaOfInterest.aabb;
+        biggestAoI.merge( Aabb( biggestAoI.mCenter, Vector3( scalarAreaOfInterest.sphereRadius ) ) );
 
         const ArrayInt sceneFlags = Mathlib::SetAll( mVisibilityMask &
                                                      VisibilityFlags::RESERVED_VISIBILITY_FLAGS );
-        ArrayAabb areaOfInfluence( ArrayVector3::ZERO, ArrayVector3::ZERO );
-        areaOfInfluence.setAll( biggestAoI );
+        ArrayAabb areaOfInterest( ArrayVector3::ZERO, ArrayVector3::ZERO );
+        areaOfInterest.setAll( biggestAoI );
 
         for( size_t i=0; i<numNodes; i += ARRAY_PACKED_REALS )
         {
@@ -1048,7 +1048,7 @@ namespace Ogre
             if( lightType == Light::LT_DIRECTIONAL )
             {
                 //Check if obj is in area of interest for directional lights
-                ArrayMaskI hitMask = CastRealToInt( areaOfInfluence.intersects( *objData.mWorldAabb ) );
+                ArrayMaskI hitMask = CastRealToInt( areaOfInterest.intersects( *objData.mWorldAabb ) );
                 isObjectHitByRays = Mathlib::And( isObjectHitByRays, hitMask );
             }
 
@@ -1389,7 +1389,7 @@ namespace Ogre
         bool aoiAutogenerated = false;
         if( mAoI.empty() )
         {
-            autogenerateAreaOfInfluence();
+            autogenerateAreaOfInterest();
             aoiAutogenerated = true;
         }
 
@@ -1428,7 +1428,7 @@ namespace Ogre
 
                             for( size_t l=0; l<numAoI; ++l )
                             {
-                                const AreaOfInterest &areaOfInfluence = mAoI[l];
+                                const AreaOfInterest &areaOfInterest = mAoI[l];
                                 processLight( lightNode->_getDerivedPosition(),
                                               lightNode->_getDerivedOrientation(),
                                               light->getType(),
@@ -1438,7 +1438,7 @@ namespace Ogre
                                               light->getAttenuationConstant(),
                                               light->getAttenuationLinear(),
                                               light->getAttenuationQuadric(),
-                                              areaOfInfluence );
+                                              areaOfInterest );
                             }
 
                             //light->setPowerScale( Math::PI * 4 );
