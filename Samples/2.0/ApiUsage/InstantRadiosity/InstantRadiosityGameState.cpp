@@ -163,12 +163,6 @@ namespace Demo
                     Ogre::Aabb( Ogre::Vector3( -6.26f, 3.969576f, -0.415852f ),
                                 Ogre::Vector3( 1.673888f, 6.04f, 1.3284f ) * 0.5f ), 30.0f ) );
 
-        mInstantRadiosity->mVplPowerBoost = 1.13775f;
-        mInstantRadiosity->mVplMaxRange = 10.97f;
-        mInstantRadiosity->mNumRays = 2048;
-        mInstantRadiosity->mCellSize = 2;
-        mInstantRadiosity->mNumRayBounces = 2;
-
         createLight();
 
         mCameraController = new CameraController( mGraphicsSystem, false );
